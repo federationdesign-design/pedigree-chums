@@ -1408,7 +1408,19 @@ export default function LineageMap({
   return (
     <>
     <div
-      className={`${styles.overlay}${circular || strongBg ? " " + styles.overlayStrong : ""}${strongBg && !circular ? " " + styles.overlayAlt : ""}`}
+      // BACKGROUND: the chum family tree is back on the faint brand wash.
+      //
+      // It wore overlayStrong and then a hue-shifted overlayAlt, both added while
+      // the two near-identical layers needed telling apart during testing. That
+      // job is done, so it returns to .overlay's light blue gradient and the
+      // heavy wash is left to the pit lift, where the pit behind it needs
+      // covering. The alt colour has moved to the game over screen.
+      //
+      // strongBg stays as a prop. It is no longer only about the background: it
+      // now marks "this is the mini pit" for the lifted root, the five-across
+      // frames, the smaller nodes, the back button's size and the hidden pack
+      // header. Removing it here would quietly undo all five.
+      className={`${styles.overlay}${circular ? " " + styles.overlayStrong : ""}`}
       onClick={closeIfTap}
       onPointerDown={onPanDown}
       onPointerMove={onPanMove}

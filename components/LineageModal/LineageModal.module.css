@@ -254,7 +254,11 @@
   align-items: center;
   justify-content: center;
   gap: 26px;
-  background: rgba(10, 58, 87, 0.45);
+  /* The wash the chum family tree wore until now, moved here by request:
+     a radial gradient at 50% 40%, rgba(15,65,165,0.62) to rgba(8,34,100,0.86).
+     It was a flat rgba(10,58,87,0.45). Only .endOverlay changes: the same value
+     appears again further down on another element and is left alone. */
+  background: radial-gradient(120% 120% at 50% 40%, rgba(15, 65, 165, 0.62), rgba(8, 34, 100, 0.86));
 }
 .endFlash {
   font-family: var(--font-display, "Luckiest Guy", system-ui);
