@@ -149,9 +149,59 @@
 
 /* ---- Section slides --------------------------------------------------- */
 
+/* ---- Section groups: sticky top, panels beneath --------------------- */
+
+/* One group per section, nine panels wide. It is a column so the image can
+   sit above the panel row, and the row is what makes it nine screens wide. */
+.sectionGroup {
+  flex: 0 0 auto;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* THE MECHANISM. Sticky to the left edge of the scroller, so it holds its
+   position on screen for the whole nine panels of its own section, then is
+   pushed out by the next section's group. One scroller, no nesting, which is
+   what lets a swipe anywhere move the page. */
+.stickyTop {
+  position: sticky;
+  left: 0;
+  z-index: 3;
+  flex: 0 0 52%;
+  width: 100vw;
+  min-height: 0;
+}
+
+.panelRow {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: row;
+}
+
+/* One sub-slide. Fixed to the viewport width so it does not measure itself
+   against the group, which is nine times wider. */
+.panel {
+  flex: 0 0 100vw;
+  width: 100vw;
+  height: 100%;
+  scroll-snap-align: start;
+  box-sizing: border-box;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 22px 24px 34px;
+  background: var(--blue-deep, #0b78bd);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 12px;
+}
+
 .slideImg {
   position: relative;
-  flex: 0 0 52%;
+  width: 100%;
+  height: 100%;
   overflow: hidden;
 }
 
@@ -167,23 +217,6 @@
   font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.08em;
-}
-
-/* The text half. It scrolls on its own because the detail paragraph is long
-   on several sections and a fixed slide height cannot grow to meet it. The
-   carousel itself only pans horizontally, so a vertical scroll here does not
-   fight it. */
-.slideInfo {
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  padding: 22px 24px 34px;
-  box-sizing: border-box;
-  background: var(--blue-deep, #0b78bd);
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
 }
 
 /* The title's home is the foot of the image, not the top of the text half.
@@ -240,4 +273,44 @@
   z-index: 5;
   background: var(--yellow, #ffd23e);
   pointer-events: none;
+}
+
+/* ---- Panel content ---------------------------------------------------- */
+
+.bulletText {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #ffffff;
+  line-height: 1.35;
+  margin: 0;
+}
+
+/* Round, centred, half the panel width, above the words. aspect-ratio keeps
+   it a true circle whatever the source crop is. */
+.factImg {
+  width: 50%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
+  margin: 0 auto;
+}
+
+.factLabel {
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: 30pt;
+  color: var(--yellow, #ffd23e);
+  letter-spacing: 0.03em;
+  line-height: 1.05;
+  margin: 0;
+}
+
+.factText {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #ffffff;
+  line-height: 1.35;
+  margin: 0;
 }

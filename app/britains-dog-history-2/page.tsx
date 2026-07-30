@@ -27,18 +27,20 @@ export const metadata: Metadata = {
    slides and thirty-eight bullet slides, and a flat list keeps the counter,
    the progress bar and the snap index reading the same single sequence. */
 
-type Slide =
-  | { kind: "section"; title: string; accent: string; image: string; imageAlt: string; intro: string; detail: string };
+type Panel =
+  | { kind: "text"; intro: string; detail: string }
+  | { kind: "bullet"; text: string }
+  | { kind: "fact"; text: string; image: string };
 
-const SLIDES: Slide[] = SECTIONS.map((s) => ({
-  kind: "section" as const,
-  title: s.title,
-  accent: s.accent,
-  image: s.image,
-  imageAlt: s.imageAlt,
-  intro: s.intro,
-  detail: s.detail,
-}));
+/* Nine panels per section: the text panel, then the four bullets, then the
+   four facts. */
+function panelsFor(s: (typeof SECTIONS)[number]): Panel[] {
+  return [
+    { kind: "text", intro: s.intro, detail: s.detail },
+    ...s.bullets.map((b) => ({ kind: "bullet" as const, text: b })),
+    ...s.facts.map((f) => ({ kind: "fact" as const, text: f.text, image: f.image || s.image })),
+  ];
+}
 
 export default function HistoryV2Page() {
   return (
@@ -76,35 +78,59 @@ export default function HistoryV2Page() {
               </div>
             </div>
 
-            {/* Section slides: image top, text below, matching the
-                good-dog-bad-dog slide split. */}
-            {SLIDES.map((s, i) => {
+            {/* One group per section. The image and title are STICKY at the
+                left edge, so they hold their position while the group's nine
+                panels scroll past beneath them, then slide out when the next
+                section's group arrives. This is why there is no second scroll
+                container: the whole page is still one horizontal scroller and
+                a swipe anywhere moves it. */}
+            {SECTIONS.map((s, si) => {
               const prefix = s.title.slice(0, s.title.length - s.accent.length);
+              const panels = panelsFor(s);
               return (
-                <div key={i} className={styles.slide}>
-                  <div className={styles.slideImg}>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={s.image}
-                      alt={s.imageAlt}
-                      style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
-                    />
-                    <div className={styles.slideCount}>{i + 1} / {SLIDES.length}</div>
-                    {/* The title sits ON the photograph rather than at the top
-                        of the text half. It is the last child so it paints over
-                        the image, and it carries its own scrim: the nine images
-                        are arbitrary photographs and several are light exactly
-                        where the words land. */}
-                    <div className={styles.slideTitleWrap}>
-                      <h2 className={styles.slideTitle}>
-                        {prefix}
-                        <span className={styles.titleAccent}>{s.accent}</span>
-                      </h2>
+                <div key={si} className={styles.sectionGroup}>
+                  <div className={styles.stickyTop}>
+                    <div className={styles.slideImg}>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={s.image}
+                        alt={s.imageAlt}
+                        style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                      />
+                      <div className={styles.slideCount}>{si + 1} / {SECTIONS.length}</div>
+                      {/* The title sits ON the photograph rather than at the top
+                          of the text half. Last child so it paints over the image. */}
+                      <div className={styles.slideTitleWrap}>
+                        <h2 className={styles.slideTitle}>
+                          {prefix}
+                          <span className={styles.titleAccent}>{s.accent}</span>
+                        </h2>
+                      </div>
                     </div>
                   </div>
-                  <div className={styles.slideInfo}>
-                    <p className={styles.slideIntro}>{s.intro}</p>
-                    <p className={styles.slideDetail}>{s.detail}</p>
+
+                  <div className={styles.panelRow}>
+                    {panels.map((p, pi) => (
+                      <div key={pi} className={styles.panel}>
+                        {p.kind === "text" && (
+                          <>
+                            <p className={styles.slideIntro}>{p.intro}</p>
+                            <p className={styles.slideDetail}>{p.detail}</p>
+                          </>
+                        )}
+                        {p.kind === "bullet" && (
+                          <p className={styles.bulletText}>{p.text}</p>
+                        )}
+                        {p.kind === "fact" && (
+                          <>
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img className={styles.factImg} src={p.image} alt="" />
+                            <p className={styles.factLabel}>Did you know?</p>
+                            <p className={styles.factText}>{p.text}</p>
+                          </>
+                        )}
+                      </div>
+                    ))}
                   </div>
                 </div>
               );
@@ -135,7 +161,10 @@ export default function HistoryV2Page() {
                replaced these nodes during hydration. */
             var c = document.getElementById('mobile-carousel');
             if (!c) return;
-            var count = c.children.length;
+            /* Panels, not sections: a top-level child is now a whole section
+               group nine panels wide, so counting children under-counted by
+               nine and clamped every jump into the first section. */
+            var count = Math.round(c.scrollWidth / c.clientWidth);
             if (idx < 0) idx = 0;
             if (idx > count - 1) idx = count - 1;
             var from = c.scrollLeft;
@@ -204,7 +233,7 @@ export default function HistoryV2Page() {
             } else {
               idx = Math.round(carousel.scrollLeft / w);
             }
-            var count = carousel.children.length;
+            var count = Math.round(carousel.scrollWidth / carousel.clientWidth);
             if (idx < 0) idx = 0;
             if (idx > count - 1) idx = count - 1;
             carousel.scrollTo({ left: idx * w, behavior: 'smooth' });
