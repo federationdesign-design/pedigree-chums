@@ -90,12 +90,19 @@ export default function HistoryV2Page() {
                       style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
                     />
                     <div className={styles.slideCount}>{i + 1} / {SLIDES.length}</div>
+                    {/* The title sits ON the photograph rather than at the top
+                        of the text half. It is the last child so it paints over
+                        the image, and it carries its own scrim: the nine images
+                        are arbitrary photographs and several are light exactly
+                        where the words land. */}
+                    <div className={styles.slideTitleWrap}>
+                      <h2 className={styles.slideTitle}>
+                        {prefix}
+                        <span className={styles.titleAccent}>{s.accent}</span>
+                      </h2>
+                    </div>
                   </div>
                   <div className={styles.slideInfo}>
-                    <h2 className={styles.slideTitle}>
-                      {prefix}
-                      <span className={styles.titleAccent}>{s.accent}</span>
-                    </h2>
                     <p className={styles.slideIntro}>{s.intro}</p>
                     <p className={styles.slideDetail}>{s.detail}</p>
                   </div>
