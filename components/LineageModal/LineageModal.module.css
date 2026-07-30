@@ -295,6 +295,34 @@
   transform: translateY(2px);
   box-shadow: 0 2px 0 rgba(10, 58, 87, 0.35);
 }
+/* Icon-only versions of the end buttons: square rather than a text pill, so the
+   glyph sits in the middle instead of being letterboxed. Sized off the shake and
+   slowmo buttons, which are the pit's own icon family. */
+.endBtnIcon {
+  width: 100.8px;
+  height: 100.8px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+}
+.endIcon {
+  width: 52%;
+  height: 52%;
+  display: block;
+  color: currentColor;
+}
+.endIconReplay {
+  background-image: url("/replay-icon.svg");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
+@media (max-width: 768px) {
+  .endBtnIcon {
+    width: 67.5px;
+    height: 67.5px;
+  }
+}
 .endBtnAlt {
   background: #ffffff;
 }

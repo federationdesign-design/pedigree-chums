@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import BreedTree from "../BreedTree/BreedTree";
 import CookieBanner from "../CookieBanner/CookieBanner";
+import { BRAIN_PATH, BRAIN_ARTBOARD } from "../icons/brain";
 import type { LineageNode } from "../../data/lineage";
 import { levelThemeFor } from "../../data/levelThemes";
 import css from "./LineageModal.module.css";
@@ -481,11 +482,26 @@ export default function LineageModal({ name, image, character, lineage, onClose,
                 <span className={css.endFlashWord}>GAME</span>
                 <span className={css.endFlashWord}>OVER</span>
               </div>
+              {/* ICONS, not words. Restart wears the replay mark, Learn wears the
+                  pit's own brain, imported rather than copied so the two cannot
+                  drift apart. Both keep the button shapes they already had, so
+                  the primary and secondary reading survives.
+                  The labels move to aria-label: an icon-only control with no
+                  accessible name is unusable with a screen reader. */}
               <div className={css.endBtns}>
                 {onStartOver && (lives === undefined || lives > 0) && (
-                  <button type="button" className={css.endBtn} onClick={onStartOver}>Restart</button>
+                  <button type="button" className={`${css.endBtn} ${css.endBtnIcon}`} onClick={onStartOver} aria-label="Restart this level" title="Restart">
+                    {/* A background rather than an <img>: Next flags img elements,
+                        and for a decorative icon with the label on the button
+                        there is nothing an img gives us here. */}
+                    <span className={`${css.endIcon} ${css.endIconReplay}`} aria-hidden="true" />
+                  </button>
                 )}
-                <button type="button" className={`${css.endBtn} ${css.endBtnAlt}`} onClick={() => goLearn(false)}>Learn</button>
+                <button type="button" className={`${css.endBtn} ${css.endBtnAlt} ${css.endBtnIcon}`} onClick={() => goLearn(false)} aria-label="Go to the learn area" title="Learn">
+                  <svg className={css.endIcon} viewBox={`0 0 ${BRAIN_ARTBOARD.w} ${BRAIN_ARTBOARD.h}`} aria-hidden="true" focusable="false">
+                    <path d={BRAIN_PATH} fill="currentColor" />
+                  </svg>
+                </button>
               </div>
             </>
           )}
