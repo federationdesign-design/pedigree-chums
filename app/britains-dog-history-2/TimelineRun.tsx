@@ -371,7 +371,12 @@ export default function TimelineRun({
                           rounded corner. The lettering does NOT live here, see
                           .dogFlash further down: it breaks out past the card
                           edges and would be sliced by that same clip. */}
-                      {kind && <span className={styles.dogFlashWedge} aria-hidden="true" />}
+                      {kind && (
+                        <span
+                          className={`${styles.dogFlashWedge} ${arrived[b.name] ? styles.dogFlashWedgeIn : ""}`}
+                          aria-hidden="true"
+                        />
+                      )}
                       {/* The family tree glyph, copied from .lineageBadge */}
                       {/* Turns the card over. Replaces the tree glyph that
                           used to sit here, which did nothing. */}
@@ -455,7 +460,10 @@ export default function TimelineRun({
                         Being a child of .dogFlipInner it still turns away with
                         the card, which a layer parked on .dogCard would not. */}
                     {kind && (
-                      <span className={styles.dogFlash} aria-hidden="true">
+                      <span
+                        className={`${styles.dogFlash} ${arrived[b.name] ? styles.dogFlashPop : ""}`}
+                        aria-hidden="true"
+                      >
                         <span
                           className={kind === "play" ? styles.dogFlashPlay : styles.dogFlashLearn}
                         />
