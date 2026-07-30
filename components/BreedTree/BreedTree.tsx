@@ -1722,7 +1722,10 @@ export default function BreedTree({
     el.style.cssText =
       "position:absolute;inset:0;z-index:200;display:flex;font-family:var(--font-display,'Luckiest Guy',system-ui);color:#fff;pointer-events:none;text-shadow:0 4px 40px rgba(0,0,0,0.6);" +
       (cdMobile
-        ? "align-items:flex-start;justify-content:flex-end;padding:180px 18px 0 0;font-size:clamp(3.4rem,13vw,7rem);"
+        // The top-right CORNER, over the close square, as asked. It was 180px
+        // down because I placed it below the pit's own squares from their
+        // measurements rather than from what is actually on screen.
+        ? "align-items:flex-start;justify-content:flex-end;padding:18px 18px 0 0;font-size:clamp(3.4rem,13vw,7rem);"
         : "align-items:center;justify-content:center;font-size:clamp(5rem,18vw,12rem);");
     st.appendChild(el);
     const steps = ["10","9","8","7","6","5","4","3","2","1","0"];
@@ -1743,10 +1746,21 @@ export default function BreedTree({
         // moment later, and saying it twice made the first one look like a bug.
         // Sized and shadowed to match .endFlash on that screen, so the two read
         // as one beat rather than two different treatments.
+        // MATCHED TO THE GAME OVER TEXT, figure for figure, from .endFlash plus
+        // its inline size override: centred, clamp(6.8rem, 24vw, 16rem), a 0.6
+        // shadow and a line-height of 1. No rotation, which I had wrong before.
+        //
+        // The container is re-centred here too. On mobile the digits sit in the
+        // top-right corner, and this word must not: it is the same beat as the
+        // shell's own screen and belongs in the same place on it.
         el.textContent = "Oh no...";
+        el.style.alignItems = "center";
+        el.style.justifyContent = "center";
+        el.style.padding = "0";
+        el.style.textAlign = "center";
         el.style.fontSize = "clamp(6.8rem, 24vw, 16rem)";
-        el.style.textShadow = "0 4px 40px rgba(0,0,0,0.55)";
-        el.style.lineHeight = "0.82";
+        el.style.textShadow = "0 4px 40px rgba(0,0,0,0.6)";
+        el.style.lineHeight = "1";
         window.setTimeout(() => { el.remove(); cdElRef.current = null; onPitFull?.(); }, 1400);
       }, 1200);
     }, 1000);

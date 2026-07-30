@@ -328,6 +328,26 @@
   background: #22c55e;
   color: #ffffff;
 }
+/* Red on the way out. #ef4444 is the red already used for the temperament cons,
+   so it is the site's red rather than a new one. */
+.endBtnRed {
+  background: #ef4444;
+  color: #ffffff;
+}
+.endBtnRed:hover {
+  background: #ef4444;
+  color: #ffffff;
+}
+/* Learn inverted: a blue box with a YELLOW glyph. The only button here that is
+   not a way out, so it reads as a different kind of action. */
+.endBtnBlue {
+  background: var(--blue-deep, #0b78bd);
+  color: var(--yellow, #ffd23e);
+}
+.endBtnBlue:hover {
+  background: var(--blue-deep, #0b78bd);
+  color: var(--yellow, #ffd23e);
+}
 /* The pit's yellow with a navy glyph, which is what every pit control wears. */
 .endBtnYellow {
   background: var(--yellow, #ffd23e);

@@ -484,44 +484,29 @@ export default function LineageModal({ name, image, character, lineage, onClose,
                   The labels move to aria-label: an icon-only control with no
                   accessible name is unusable with a screen reader. */}
               <div className={css.endBtns}>
-                {/* RESTART, and it is offered whether or not lives remain.
-                    It used to be gated on lives > 0, so a spent run had no way
-                    back into the level at all: the only controls left were Learn
-                    and the close X, and the X drops you out to the level strip.
-                    That reads as "restart sent me back to the beginning" even
-                    though Restart was never on screen.
-                    With lives left it costs one and replays the level. With none
-                    left it restores the run first, so you come back here with a
-                    full set rather than being sent out to find your way in. */}
-                {(onStartOver || onResetRun) && (
-                  <button
-                    type="button"
-                    className={`${css.endBtn} ${css.endBtnIcon} ${css.endBtnGreen}`}
-                    onClick={() => {
-                      if (lives !== undefined && lives <= 0) { onResetRun?.(); replay(); return; }
-                      onStartOver?.();
-                    }}
-                    aria-label={lives !== undefined && lives <= 0 ? "Start again on this level" : "Restart this level"}
-                    title={lives !== undefined && lives <= 0 ? "Start again" : "Restart"}
-                  >
-                    {/* A background rather than an <img>: Next flags img elements,
-                        and for a decorative icon with the label on the button
-                        there is nothing an img gives us here. */}
-                    <span className={`${css.endIcon} ${css.endIconReplay}`} aria-hidden="true" />
-                  </button>
-                )}
-                <button type="button" className={`${css.endBtn} ${css.endBtnIcon} ${css.endBtnYellow}`} onClick={() => goLearn(false)} aria-label="Go to the learn area" title="Learn">
-                  <svg className={css.endIcon} viewBox={`0 0 ${BRAIN_ARTBOARD.w} ${BRAIN_ARTBOARD.h}`} aria-hidden="true" focusable="false">
-                    <path d={BRAIN_PATH} fill="currentColor" />
-                  </svg>
-                </button>
-                {/* REWIND, back to this level's start screen with LEARN and PLAY
-                    on it. Not a retry: it does not spend a life and does not
-                    reset the score, because the life for this round is already
-                    gone and the score is what you keep. */}
+                {/* ORDER AND COLOUR set by request: close, rewind, replay,
+                    learn. Learn is inverted, a blue box with a yellow glyph,
+                    which is the only one that reads as a different kind of
+                    action rather than a way out. */}
                 <button
                   type="button"
-                  className={`${css.endBtn} ${css.endBtnIcon} ${css.endBtnYellow}`}
+                  className={`${css.endBtn} ${css.endBtnIcon} ${css.endBtnRed}`}
+                  onClick={onClose}
+                  aria-label="Leave the game"
+                  title="Leave"
+                >
+                  <svg className={css.endIcon} viewBox="0 0 24 24" aria-hidden="true" focusable="false"
+                    stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" fill="none">
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                  </svg>
+                </button>
+                {/* REWIND, back to this level's start screen. Not a retry: no
+                    life spent and no score reset, because the life for this
+                    round has already gone and the score is what you keep. */}
+                <button
+                  type="button"
+                  className={`${css.endBtn} ${css.endBtnIcon} ${css.endBtnGreen}`}
                   onClick={() => {
                     setPhase("play");
                     setResumeInLearn(false);
@@ -537,19 +522,23 @@ export default function LineageModal({ name, image, character, lineage, onClose,
                     <path d="M21 5 L13 12 L21 19 Z" fill="currentColor" />
                   </svg>
                 </button>
-                {/* The close X, moved out of the top-right corner so every way
-                    out of this screen sits in one row. */}
-                <button
-                  type="button"
-                  className={`${css.endBtn} ${css.endBtnIcon} ${css.endBtnYellow}`}
-                  onClick={onClose}
-                  aria-label="Leave the game"
-                  title="Leave"
-                >
-                  <svg className={css.endIcon} viewBox="0 0 24 24" aria-hidden="true" focusable="false"
-                    stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" fill="none">
-                    <line x1="6" y1="6" x2="18" y2="18" />
-                    <line x1="18" y1="6" x2="6" y2="18" />
+                {(onStartOver || onResetRun) && (
+                  <button
+                    type="button"
+                    className={`${css.endBtn} ${css.endBtnIcon} ${css.endBtnYellow}`}
+                    onClick={() => {
+                      if (lives !== undefined && lives <= 0) { onResetRun?.(); replay(); return; }
+                      onStartOver?.();
+                    }}
+                    aria-label={lives !== undefined && lives <= 0 ? "Start again on this level" : "Restart this level"}
+                    title={lives !== undefined && lives <= 0 ? "Start again" : "Restart"}
+                  >
+                    <span className={`${css.endIcon} ${css.endIconReplay}`} aria-hidden="true" />
+                  </button>
+                )}
+                <button type="button" className={`${css.endBtn} ${css.endBtnIcon} ${css.endBtnBlue}`} onClick={() => goLearn(false)} aria-label="Go to the learn area" title="Learn">
+                  <svg className={css.endIcon} viewBox={`0 0 ${BRAIN_ARTBOARD.w} ${BRAIN_ARTBOARD.h}`} aria-hidden="true" focusable="false">
+                    <path d={BRAIN_PATH} fill="currentColor" />
                   </svg>
                 </button>
               </div>
