@@ -416,7 +416,10 @@ export default function TimelineRun({
                           extinct breeds are that era's sources. On the other
                           eight runs they would be sitting on a Cockapoo. Add an
                           era here once it has links of its own. */}
-                      {OUTBOUND_ERAS.includes(era) && (
+                      {/* Ancient-medieval only, and only on a dog that has a level.
+                          A dog that sends you to its own breed page has no
+                          lineage to read around. */}
+                      {kind === "play" && OUTBOUND_ERAS.includes(era) && (
                         <span className={styles.backLinks}>
                           {OUTBOUND.map((o) => (
                             <span
@@ -471,13 +474,19 @@ export default function TimelineRun({
                 data-dog={b.name}
                 ref={(el) => { rowRefs.current[b.name] = el; }}
               >
-                {/* Opens the level. NOT WIRED YET: LineageModal and the lives,
-                    streak and campaign score it needs still live inside
-                    BreedStrip. */}
+                {/* Opens the level at its start screen, the same handler the
+                    card itself uses.
+                    A dog with no level KEEPS ITS BOX and is hidden rather than
+                    removed. The row is centred, so dropping a 40px button would
+                    shift the yellow disc 30px off the timeline line that runs
+                    down the middle of the screen. */}
                 <button
                   type="button"
-                  className={styles.markerTree}
-                  aria-label={`Open the ${b.name} family tree`}
+                  className={`${styles.markerTree} ${kind === "play" ? "" : styles.markerTreeOff}`}
+                  onClick={kind === "play" ? openLevel : undefined}
+                  aria-hidden={kind === "play" ? undefined : true}
+                  tabIndex={kind === "play" ? undefined : -1}
+                  aria-label={kind === "play" ? `Open the ${b.name} level` : undefined}
                 >
                   <svg viewBox="0 0 24 24" aria-hidden="true">
                     <circle cx="12" cy="5" r="2.4" />

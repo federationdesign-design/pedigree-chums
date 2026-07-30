@@ -970,9 +970,12 @@
   /* Doubled from 1rem, then 4pt off. */
   font-size: calc(2rem - 4pt);
   line-height: 1.1em;
-  /* 20px clear of the row of links above. */
-  /* Tighter under the text. */
-  margin: 20px 0 -6px;
+  /* THE GAP UNDER THE SMALL LINE. It was 36px: .dogBack's own 16px flex gap
+     plus a 20px margin here, while every other element on the card had a level
+     16. Now 8px, so the note reads as belonging to the line above it.
+     A negative margin because the 16 is a flex gap and applies between every
+     pair, so it cannot be changed for one pair on its own. */
+  margin: -8px 0 -6px;
   order: 3;
 }
 
@@ -1138,6 +1141,15 @@
   background: var(--yellow, #ffd23e);
   border: 3px solid var(--navy, #0a3a57);
   color: var(--navy, #0a3a57);
+}
+
+/* A dog with no level. HIDDEN, NOT REMOVED, and the difference matters: the
+   row is centred, so taking a 40px button out of it would slide the yellow
+   disc 30px to the left of the timeline line that runs down the middle of
+   every screen. visibility keeps the box and the balance. */
+.markerTreeOff {
+  visibility: hidden;
+  pointer-events: none;
 }
 
 .markerTree svg {
