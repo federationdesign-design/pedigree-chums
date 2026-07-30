@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Nav from "../../components/Nav/Nav";
 import Footer from "../../components/Footer/Footer";
 import { SECTIONS } from "./sections";
+import ScrubVideo from "./ScrubVideo";
 import styles from "./history2.module.css";
 
 export const metadata: Metadata = {
@@ -33,7 +34,10 @@ type Panel =
   | { kind: "fact"; text: string; image: string };
 
 /* Nine panels per section: the text panel, then the four bullets, then the
-   four facts. */
+   four facts. Shared with the counter script and the video scrub, both of
+   which convert a global panel index into a section and a position within it. */
+const PANELS_PER_SECTION = 9;
+
 function panelsFor(s: (typeof SECTIONS)[number]): Panel[] {
   return [
     { kind: "text", intro: s.intro, detail: s.detail },
@@ -91,12 +95,18 @@ export default function HistoryV2Page() {
                 <div key={si} className={styles.sectionGroup}>
                   <div className={styles.stickyTop}>
                     <div className={styles.slideImg}>
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={s.image}
-                        alt={s.imageAlt}
-                        style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
-                      />
+                      {s.video ? (
+                        <ScrubVideo
+                          src={s.video}
+                          poster={s.image}
+                          className={styles.topMedia}
+                          sectionIndex={si}
+                          panelsPerSection={PANELS_PER_SECTION}
+                        />
+                      ) : (
+                        /* eslint-disable-next-line @next/next/no-img-element */
+                        <img src={s.image} alt={s.imageAlt} className={styles.topMedia} />
+                      )}
                       {/* Sub-slide counter. The value is written by the script
                           below, because this element lives in the sticky header
                           and has to change as the panels beneath it scroll. The
@@ -169,7 +179,7 @@ export default function HistoryV2Page() {
              nothing there, then 1 to 8 across the four bullets and the four
              facts. Only the current section's counter is touched, so a
              neighbouring one cannot flash the wrong figure mid-transition. */
-          var PANELS_PER_SECTION = 9;
+          var PANELS_PER_SECTION = ${PANELS_PER_SECTION};
           var counters = document.querySelectorAll('[data-pc-count]');
           function updateCount() {
             var w = carousel.clientWidth;

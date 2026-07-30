@@ -18,6 +18,10 @@ export type Section = {
   detail: string;
   facts: { text: string; image?: string }[];
   image: string; // /history/<name>.jpg image path; drop art in later
+  // Optional scroll-scrubbed video for the sticky top. `image` stays as the
+  // poster, so a section without a video, or one whose video has not landed
+  // yet, still shows the photograph.
+  video?: string;
   imageAlt: string;
 };
 
@@ -44,6 +48,7 @@ export const SECTIONS: Section[] = [
       { text: "One of the first books written in English, 'The Master of Game' from around 1406, was a guide to hunting hounds and their care.", image: "/history/master-of-the-game.jpg" },
     ],
     image: "/history/medieveal-dogs.jpg",
+    video: "/history/medieval-tudor-opt.mp4",
     imageAlt: "Medieval hunting hounds and a Tudor lapdog",
   },
   {

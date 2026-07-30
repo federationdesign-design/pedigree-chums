@@ -205,6 +205,15 @@
   overflow: hidden;
 }
 
+/* The photograph and the video are interchangeable in the sticky top, so they
+   are sized by one rule rather than two that could drift apart. */
+.topMedia {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
 .slideCount {
   position: absolute;
   bottom: 14px;
