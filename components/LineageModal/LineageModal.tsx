@@ -72,6 +72,11 @@ type Props = {
   lineage: LineageNode;
   onClose: () => void;
   nextLevelLabel?: string;
+  /* The next era's name, set only when the level just won is the last of its
+     era. A message on the win screen and nothing more: the round carries on to
+     the next level exactly as it would have, so the score and the run survive
+     the join. */
+  eraJoinLabel?: string;
   initialScore?: number;
   onScoreChange?: (s: number) => void;
   onNextLevel?: () => void;
@@ -95,7 +100,7 @@ type Props = {
   era?: string;
 };
 
-export default function LineageModal({ name, image, character, lineage, onClose, nextLevelLabel, onNextLevel, onStartOver, initialScore, onScoreChange, era, lives, livesMax = 6, onLost, onSpendLife, onResetRun, nextLevelImage, levelNo }: Props) {
+export default function LineageModal({ name, image, character, lineage, onClose, nextLevelLabel, onNextLevel, onStartOver, initialScore, onScoreChange, era, lives, livesMax = 6, onLost, onSpendLife, onResetRun, nextLevelImage, levelNo, eraJoinLabel }: Props) {
   const theme = levelThemeFor(era);
   // The close X asks before it closes. A round can take a couple of minutes to
   // build up, and losing it to a mis-tap in the corner is a rotten exit.
@@ -492,6 +497,19 @@ export default function LineageModal({ name, image, character, lineage, onClose,
               </div>
               <div className={css.winScore}>Your Round Score: {score.toLocaleString()}</div>
               <div className={css.winFlash}>Round Won</div>
+              {/* THE ERA JOIN. Two messages in one slot: the first lands with
+                  the screen, the second pops over the top of it a beat later.
+                  Sits ABOVE the next-level block rather than replacing it, so
+                  the dog just finished keeps its own ending. */}
+              {eraJoinLabel && (
+                <div className={css.eraJoin} aria-label={`Era complete. Next era, ${eraJoinLabel}`}>
+                  <span className={css.eraJoinDone} aria-hidden="true">Era complete</span>
+                  <span className={css.eraJoinNext} aria-hidden="true">
+                    <span className={css.eraJoinNextLead}>Next era</span>
+                    <span className={css.eraJoinNextName}>{eraJoinLabel}</span>
+                  </span>
+                </div>
+              )}
               {nextLevelLabel && onNextLevel ? (
                 <>
                   <div className={css.winNextLead}>Next Level Up...</div>

@@ -357,13 +357,32 @@ export default function BreedStrip({
   /* The level window, built once and used by both presentations. It is the
      whole reason the slider borrows this component rather than copying it:
      every rule below is written here and nowhere else. */
+  /* THE ERA JOIN, as a message only. The level list runs across all nine eras,
+     so a run rolls from the last dog of one straight into the first of the
+     next with nothing marking it.
+
+     COMPARE THE CURRENT LEVEL'S OWN STRIP, NOT THIS STRIP'S `era` PROP. The
+     player opens a level from one era and then plays on across the joins, so
+     `era` stays where they started while the round moves on. Testing against it
+     would call every level after the first join a crossing.
+
+     Nothing about the round changes: the next level is still offered, the pit
+     is not closed, and the score carries. */
+  const nextUp = active ? nextLevelOf(active.name) : null;
+  const curStrip = active ? ukBreeds.find((b) => b.name === active.name)?.strip : undefined;
+  const eraJoinLabel =
+    nextUp && curStrip && nextUp.strip !== curStrip
+      ? ERA_LABELS[nextUp.strip] ?? nextUp.strip
+      : undefined;
+
   const modal = active && (
     <LineageModal
       key={`${active.name}:${runKey}`}
       era={era}
       initialScore={campaignScore}
       onScoreChange={setCampaignScore}
-      nextLevelLabel={nextLevelOf(active.name)?.name}
+      eraJoinLabel={eraJoinLabel}
+      nextLevelLabel={nextUp?.name}
       nextLevelImage={(() => { const nb = nextLevelOf(active.name); return nb ? buildActive(nb)?.image : undefined; })()}
       lives={lives}
       livesMax={LIVES_MAX}
