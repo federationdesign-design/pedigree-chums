@@ -392,36 +392,61 @@ export default function LineageModal({ name, image, character, lineage, onClose,
         >
           <div className={css.exitPanel} onClick={(e) => e.stopPropagation()}>
             <div className={css.exitTitle}>PAUSED</div>
-            {/* Ordered least destructive first, so the safe choice is the one
-                under the thumb and the way out of the game is last. */}
+            {/* ICONS, in the same order and the same colours as the game over
+                row, so the two menus read as one system: close, back to the
+                start screen, keep playing, learn.
+                Learn is inverted, blue with a yellow glyph, because it is the
+                only one here that is not a way out of the round. */}
             <div className={css.exitBtns}>
               <button
                 type="button"
-                className={`${css.endBtn} ${css.endBtnAlt}`}
-                onClick={() => setExitAsk(false)}
-                aria-label="Keep playing"
-                autoFocus
+                className={`${css.endBtn} ${css.endBtnIcon} ${css.endBtnRed}`}
+                onClick={onClose}
+                aria-label="Leave the game"
+                title="Leave"
               >
-                Keep playing
+                <svg className={css.endIcon} viewBox="0 0 24 24" aria-hidden="true" focusable="false"
+                  stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" fill="none">
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                </svg>
               </button>
               <button
                 type="button"
-                className={css.endBtn}
-                onClick={() => { setExitAsk(false); backToLearn(); }}
-                aria-label="Go to the learn area"
-              >
-                Learn area
-              </button>
-              <button
-                type="button"
-                className={css.endBtn}
+                className={`${css.endBtn} ${css.endBtnIcon} ${css.endBtnGreen}`}
                 onClick={() => { setExitAsk(false); backToStart(); }}
                 aria-label="Back to the start screen"
+                title="Start screen"
               >
-                Start screen
+                <svg className={css.endIcon} viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <path d="M12 5 L4 12 L12 19 Z" fill="currentColor" />
+                  <path d="M21 5 L13 12 L21 19 Z" fill="currentColor" />
+                </svg>
               </button>
-              <button type="button" className={css.endBtn} onClick={onClose} aria-label="Leave the game">
-                Leave game
+              {/* KEEP PLAYING keeps the autoFocus. A keyboard user landing on
+                  this menu should start on the option that changes nothing. */}
+              <button
+                type="button"
+                className={`${css.endBtn} ${css.endBtnIcon} ${css.endBtnYellow}`}
+                onClick={() => setExitAsk(false)}
+                aria-label="Keep playing"
+                title="Keep playing"
+                autoFocus
+              >
+                <svg className={css.endIcon} viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <path d="M7 4 L19 12 L7 20 Z" fill="currentColor" />
+                </svg>
+              </button>
+              <button
+                type="button"
+                className={`${css.endBtn} ${css.endBtnIcon} ${css.endBtnBlue}`}
+                onClick={() => { setExitAsk(false); backToLearn(); }}
+                aria-label="Go to the learn area"
+                title="Learn"
+              >
+                <svg className={css.endIcon} viewBox={`0 0 ${BRAIN_ARTBOARD.w} ${BRAIN_ARTBOARD.h}`} aria-hidden="true" focusable="false">
+                  <path d={BRAIN_PATH} fill="currentColor" />
+                </svg>
               </button>
             </div>
           </div>
