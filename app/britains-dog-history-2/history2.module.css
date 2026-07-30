@@ -481,8 +481,10 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 16px;
+  /* No centring: the two rail legs take the slack instead, which is what makes
+     the line meet the card exactly. */
+  justify-content: flex-start;
+  gap: 0;
 }
 
 /* The title screen is a notch too, so the reader stops on it rather than
@@ -519,24 +521,6 @@
    finishes with the last dog, with nothing measured in JavaScript. */
 .railWrap {
   position: relative;
-}
-
-/* The vertical line. Copied from .stripRail::before in history.module.css,
-   which is the horizontal version on the desktop page: same 4px, same
-   rgba(255, 255, 255, 0.32), same pill radius. Turned on its side. */
-.rail {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  /* MEASURED FROM THE CONCEPT at a device pixel ratio of 2: 14 device pixels
-     wide, so 7 CSS px, solid white, and centred rather than left-hand. */
-  width: 7px;
-  background: #ffffff;
-  border-radius: var(--radius-pill, 999px);
-  pointer-events: none;
-  z-index: 0;
 }
 
 /* The line's first stretch, on the title screen. Runs from under the text to
@@ -728,74 +712,94 @@
   color: var(--blue-deep, #0b78bd);
 }
 
-.dogName {
+/* ---- Dog screen: rail leg, card, marker row, rail leg ------------------ */
+
+/* The stretches of line above and below the card. `flex: 1` on both means they
+   split whatever space the card and the marker row leave, so the line stops
+   dead at the card's top edge and picks up under the marker. Nothing is
+   measured and nothing needs re-measuring when the card changes size. */
+.railLeg {
+  flex: 1 1 0;
+  width: 7px;
+  min-height: 0;
+  background: #ffffff;
+  border-radius: var(--radius-pill, 999px);
+}
+
+/* The name, over the picture and above the status bar. MEASURED from the
+   concept: caps about 32.5 CSS px tall, which is roughly a 45px face. */
+.dogNameOver {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 62px;
+  z-index: 1;
   font-family: var(--font-display, "Luckiest Guy", cursive);
-  /* Doubled: was clamp(1.8rem, 8vw, 2.6rem). */
-  font-size: clamp(3.6rem, 16vw, 5.2rem);
+  font-size: clamp(2rem, 10vw, 3.2rem);
+  line-height: 0.95;
   color: #ffffff;
+  text-align: center;
   letter-spacing: 0.03em;
-  line-height: 1;
-  text-align: center;
   text-shadow: 0 2px 16px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
 }
 
-/* The note repeated under the name, the same words as the back of the card. */
-.dogNoteUnder {
-  margin: 0;
-  max-width: 34ch;
-  font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: 1rem;
-  font-weight: 600;
-  line-height: 1.35;
-  color: #ffffff;
-  text-align: center;
-  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
-}
-
-.dogActions {
+/* The marker and its two buttons, sitting across the line. */
+.markerRow {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 18px;
+  gap: 20px;
+  padding: 18px 0;
 }
 
-/* One size and shape for both, so they read as a pair. */
-.actionInfo,
-.actionTree {
+/* MEASURED: a 35px yellow disc. Ringed white, like the head of the rail. */
+.markerDot {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  background: var(--yellow, #ffd23e);
+  border: 5px solid #ffffff;
+  box-sizing: border-box;
+  flex: 0 0 auto;
+}
+
+.markerTree,
+.markerInfo {
   appearance: none;
   padding: 0;
-  width: 52px;
-  height: 52px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   box-sizing: border-box;
+  flex: 0 0 auto;
 }
 
-/* Copied from .relCardInfo in BreedTree.module.css: blue fill, white ring,
-   italic Georgia. Scaled from 28px to sit level with the tree button. */
-.actionInfo {
-  background: var(--blue-deep, #0c5b92);
+/* Yellow disc, navy ring and navy glyph, as in the concept. */
+.markerTree {
+  background: var(--yellow, #ffd23e);
+  border: 3px solid var(--navy, #0a3a57);
+  color: var(--navy, #0a3a57);
+}
+
+.markerTree svg {
+  width: 22px;
+  height: 22px;
+  fill: currentColor;
+}
+
+/* Navy disc, white ring, white italic i. Same treatment as .relCardInfo. */
+.markerInfo {
+  background: var(--navy, #0a3a57);
   border: 3px solid #ffffff;
   color: #ffffff;
   font-family: Georgia, serif;
   font-style: italic;
   font-weight: 700;
-  font-size: 26px;
+  font-size: 20px;
   line-height: 1;
-}
-
-/* The family tree glyph, from .lineageBadge on the desktop page. */
-.actionTree {
-  background: var(--yellow, #ffd23e);
-  border: 3px solid #ffffff;
-  color: var(--navy, #0a3a57);
-}
-
-.actionTree svg {
-  width: 28px;
-  height: 28px;
-  fill: currentColor;
 }

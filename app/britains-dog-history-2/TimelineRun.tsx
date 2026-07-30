@@ -111,11 +111,15 @@ export default function TimelineRun({
             the dogs and starts where the title screen ends: the wrapper's own
             height is the line's length, with no measuring involved. */}
         <div className={styles.railWrap}>
-          <span className={styles.rail} aria-hidden="true" />
         {breeds.map((b) => {
           const isFlipped = flipped === b.name;
           return (
             <div key={b.name} className={styles.dogScreen}>
+              {/* The rail arrives, stops at the card, and begins again below
+                  the marker. Both legs are flex children that take the
+                  leftover space, so they meet the card and the row exactly
+                  with nothing measured. */}
+              <span className={styles.railLeg} aria-hidden="true" />
               <div className={styles.dogCard}>
                 {/* The whole card is the target: tapping anywhere opens the
                     level. The information icon sits OUTSIDE this button rather
@@ -146,6 +150,8 @@ export default function TimelineRun({
                           <path d="M12 7v3.2M6 15.6V12h12v3.6" fill="none" stroke="currentColor" strokeWidth="1.6" />
                         </svg>
                       </span>
+                      {/* The name sits ON the picture, above the status bar. */}
+                      <span className={styles.dogNameOver}>{b.name}</span>
                       {b.tag && (
                         <span className={`${styles.dogTag} ${styles[`dogTag_${b.tag.replace("-", "")}`] ?? ""}`}>
                           {TAG_LABEL[b.tag] ?? b.tag}
@@ -183,15 +189,26 @@ export default function TimelineRun({
                   i
                 </span>
               </div>
-              <span className={styles.dogName}>{b.name}</span>
-
-              {/* The same words that are on the back of the card. */}
-              <p className={styles.dogNoteUnder}>{b.note}</p>
-
-              <div className={styles.dogActions}>
+              <div className={styles.markerRow}>
+                {/* Opens the level. NOT WIRED YET: LineageModal and the lives,
+                    streak and campaign score it needs still live inside
+                    BreedStrip. */}
+                <button
+                  type="button"
+                  className={styles.markerTree}
+                  aria-label={`Open the ${b.name} family tree`}
+                >
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <circle cx="12" cy="5" r="2.4" />
+                    <circle cx="6" cy="18" r="2.4" />
+                    <circle cx="18" cy="18" r="2.4" />
+                    <path d="M12 7v3.2M6 15.6V12h12v3.6" fill="none" stroke="currentColor" strokeWidth="1.6" />
+                  </svg>
+                </button>
+                <span className={styles.markerDot} aria-hidden="true" />
                 {/* Turns the card over. Nothing else. */}
                 <span
-                  className={styles.actionInfo}
+                  className={styles.markerInfo}
                   role="button"
                   tabIndex={0}
                   aria-label={`About ${b.name}`}
@@ -205,22 +222,8 @@ export default function TimelineRun({
                 >
                   i
                 </span>
-                {/* Opens the level. NOT WIRED YET: LineageModal and the lives,
-                    streak and campaign score it needs still live inside
-                    BreedStrip. That is the next stage. */}
-                <button
-                  type="button"
-                  className={styles.actionTree}
-                  aria-label={`Open the ${b.name} family tree`}
-                >
-                  <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <circle cx="12" cy="5" r="2.4" />
-                    <circle cx="6" cy="18" r="2.4" />
-                    <circle cx="18" cy="18" r="2.4" />
-                    <path d="M12 7v3.2M6 15.6V12h12v3.6" fill="none" stroke="currentColor" strokeWidth="1.6" />
-                  </svg>
-                </button>
               </div>
+              <span className={styles.railLeg} aria-hidden="true" />
             </div>
           );
         })}
