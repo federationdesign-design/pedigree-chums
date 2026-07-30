@@ -54,6 +54,23 @@ const ERA_LABELS: Record<string, string> = {
    to be untouchable from the slider. */
 export type BreedStripOpen = (b: UKBreed) => (() => void) | undefined;
 
+/* WHAT A CARD IS. One answer, read by both the tap and any badge drawn on the
+   card, so a card can never advertise PLAY and then fail to play.
+
+   "learn" means the breed has a page of its own and the tap navigates there.
+   "play" means it has no page but has a lineage, so the tap opens a level.
+   null means neither, and the card is not tappable.
+
+   Measured across all 90 dogs on the history pages: 62 play, 28 learn, none
+   null. Pure and stateless, so it is safe to call from anywhere. */
+export type BreedCardKind = "play" | "learn";
+
+export function breedCardKind(name: string): BreedCardKind | null {
+  const packName = resolveLineageName(name);
+  if (packBreeds.find((x) => x.name === packName)?.slug) return "learn";
+  return getLineage(packName) ? "play" : null;
+}
+
 export default function BreedStrip({
   era,
   renderLevels,
@@ -117,11 +134,12 @@ export default function BreedStrip({
      tappable. Measured across all 90 dogs: 62 open a level, 28 navigate, none
      fall through. */
   const openFor: BreedStripOpen = (b) => {
+    const kind = breedCardKind(b.name);
     const packName = resolveLineageName(b.name);
     const lineage = getLineage(packName);
     const pack = packBreeds.find((x) => x.name === packName);
-    if (pack?.slug) return () => router.push(`/chums/${pack.slug}`);
-    if (!lineage) return undefined;
+    if (kind === "learn" && pack?.slug) return () => router.push(`/chums/${pack.slug}`);
+    if (kind !== "play" || !lineage) return undefined;
     return () => {
       // opening a level from the page is a fresh run
       setLives(LIVES_START);

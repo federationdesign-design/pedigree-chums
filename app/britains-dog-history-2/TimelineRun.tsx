@@ -7,7 +7,7 @@ import { ukBreeds } from "../../data/uk-breeds";
    Passing it our own markup means the slider and the live page can never hold
    two versions of those rules. Nothing about the game is written in this file.
    See the renderLevels note in BreedStrip.tsx. */
-import BreedStrip from "../britains-dog-history/BreedStrip";
+import BreedStrip, { breedCardKind } from "../britains-dog-history/BreedStrip";
 import styles from "./history2.module.css";
 
 /*
@@ -264,7 +264,30 @@ export default function TimelineRun({
               shape while the line draws itself. */}
           <span className={styles.railHead} aria-hidden="true">
             <span ref={dotRef} className={`${styles.railDot} ${moved ? styles.railDotGo : ""}`} />
+            {/* The scroll-down cue. ERA SCREEN ONLY, and it goes the moment the
+                reader moves. It has to: .runLine grows from this same disc down
+                the middle of the screen, so a cue that stayed would sit beside
+                it and read as two lines, which is the exact fault the per-screen
+                legs caused before. */}
+            <span className={`${styles.railCue} ${moved ? styles.railCueOff : ""}`} />
             </span>
+
+          {/* How many dogs are in this run. Read from the data, so it cannot go
+              stale when a breed is added. Era screen only. */}
+          <span className={styles.eraCount} aria-label={`${breeds.length} dogs`}>
+            {/* The outline is a second copy sitting behind the solid one.
+                -webkit-text-stroke on its own draws the stroke CENTRED on the
+                letter edge, which eats half the black away. Two copies keep the
+                letterform at full weight with the white entirely outside it. */}
+            <span className={styles.eraCountOutline} aria-hidden="true">
+              <span className={styles.eraCountNum}>{breeds.length}</span>
+              <span className={styles.eraCountWord}>dogs</span>
+            </span>
+            <span className={styles.eraCountFill} aria-hidden="true">
+              <span className={styles.eraCountNum}>{breeds.length}</span>
+              <span className={styles.eraCountWord}>dogs</span>
+            </span>
+          </span>
         </div>
 
         {/* A fragment comes back from BreedStrip, so these screens stay DIRECT
@@ -317,6 +340,21 @@ export default function TimelineRun({
                         />
                       ) : (
                         <span className={styles.dogThumb} />
+                      )}
+                      {/* The corner flash. Reads its state from the SAME
+                          function the tap handler uses, so it cannot promise a
+                          level the card will not open. Inside the photo face,
+                          so the card's rounded corner clips it and it turns
+                          away with the picture. Drawn as a background image, so
+                          a missing file shows nothing rather than a broken
+                          graphic. */}
+                      {breedCardKind(b.name) && (
+                        <span
+                          className={`${styles.dogFlash} ${
+                            breedCardKind(b.name) === "play" ? styles.dogFlashPlay : styles.dogFlashLearn
+                          }`}
+                          aria-hidden="true"
+                        />
                       )}
                       {/* The family tree glyph, copied from .lineageBadge */}
                       {/* Turns the card over. Replaces the tree glyph that

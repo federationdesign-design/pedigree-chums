@@ -632,6 +632,92 @@
   background: #22c55e;
 }
 
+/* The scroll-down cue under the disc: a short stem with an arrowhead. Sized
+   from the disc rather than in loose pixels, so the three pieces keep their
+   proportions if the disc is ever resized. */
+.railCue {
+  flex: 0 0 auto;
+  width: 7px;
+  height: 56px;
+  background: #ffffff;
+  border-radius: var(--radius-pill, 999px);
+  position: relative;
+  opacity: 0;
+  /* Lands just after the disc has popped, never before it. */
+  animation: pcCueIn 0.4s ease 1.55s both;
+}
+
+/* The arrowhead. A child of the stem, so it can never drift away from it. */
+.railCue::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  transform: translateX(-50%);
+  border-left: 20px solid transparent;
+  border-right: 20px solid transparent;
+  border-top: 38px solid #ffffff;
+}
+
+/* Gone the moment the reader moves, before .runLine can grow past it. */
+.railCueOff {
+  animation: none;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+@keyframes pcCueIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* How many dogs are in this run. Bottom right of the era screen only. */
+.eraCount {
+  position: absolute;
+  right: 18px;
+  bottom: 10px;
+  z-index: 2;
+  pointer-events: none;
+  display: block;
+}
+
+.eraCountOutline,
+.eraCountFill {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  /* Tight, so the word tucks under the numeral as in the concept. */
+  line-height: 0.78;
+}
+
+/* The white behind. Fill AND stroke are white, so this copy is a fattened
+   silhouette of the letterform with nothing showing through. */
+.eraCountOutline {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  color: #ffffff;
+  -webkit-text-stroke: 14px #ffffff;
+}
+
+.eraCountFill {
+  position: relative;
+  color: #0b0b0b;
+}
+
+.eraCountNum,
+.eraCountWord {
+  font-family: var(--font-arrow), var(--font-display), system-ui, sans-serif;
+}
+
+.eraCountNum {
+  font-size: clamp(3.4rem, 18vw, 5rem);
+}
+
+.eraCountWord {
+  font-size: clamp(1.1rem, 6vw, 1.6rem);
+}
+
 @keyframes pcDotIn {
   0% { opacity: 0; transform: scale(0.2); }
   1% { opacity: 1; transform: scale(0.2); }
@@ -707,6 +793,34 @@
   height: 100%;
   object-fit: cover;
   display: block;
+}
+
+/* The corner flash, top left of the photo face. Clipped by .dogFront's own
+   overflow and radius, so it follows the card's rounded corner exactly.
+   A background image rather than an <img>: a missing file then shows nothing
+   instead of a broken-image glyph.
+   Sized as a share of the card, not in pixels, so it holds when the card
+   shrinks on a short phone. */
+.dogFlash {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 46%;
+  aspect-ratio: 1 / 1;
+  z-index: 2;
+  /* Never steals a tap: the whole card is one target. */
+  pointer-events: none;
+  background-repeat: no-repeat;
+  background-position: top left;
+  background-size: contain;
+}
+
+.dogFlashLearn {
+  background-image: url("/history/flash-learn.svg");
+}
+
+.dogFlashPlay {
+  background-image: url("/history/flash-learn-play.svg");
 }
 
 /* The flip control on the picture side. Same masked artwork as the one on the
