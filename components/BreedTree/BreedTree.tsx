@@ -3650,6 +3650,32 @@ export default function BreedTree({
           acc -= STEP;
           stepped++;
         }
+        // ESCAPE NET. Anything that ends up below the floor is put back.
+        //
+        // Objects have been seen passing through the floor and continuing down,
+        // usually while moving fast. It should not be possible: the floor slabs
+        // are 600 thick, the opening shoves are about 3px per step, and the blast
+        // is capped at 16, so a body would need to travel 600px in one step to
+        // tunnel. The only bodies that pass through anything are the clinging
+        // circles, and they are static while they are sensors, so they cannot
+        // fall. I could not find the cause by reading.
+        //
+        // So rather than keep hunting a rare path, the failure is made
+        // recoverable. Below the floor's midline means it has escaped, whatever
+        // the reason, and it is returned to the top of the pit with its motion
+        // cleared. A player sees an object come back rather than vanish, which is
+        // the difference between a quirk and a lost round.
+        {
+          const escapeY = pL.y + T * 0.5;
+          for (const mb of Composite.allBodies(world) as { isStatic?: boolean; position: { x: number; y: number } }[]) {
+            if (mb.isStatic) continue;
+            if (mb.position.y <= escapeY) continue;
+            const backX = pL.x + 30 + Math.random() * Math.max(1, wPx - 60);
+            MBody.setPosition(mb as never, { x: backX, y: pTop.y - 40 });
+            MBody.setVelocity(mb as never, { x: 0, y: 0 });
+            MBody.setAngularVelocity(mb as never, 0);
+          }
+        }
         // Clinging circles ride their word exactly: position and angle taken
         // straight off it, rotated into place. Nothing here is negotiated with
         // the solver, so there is no wobble to pass on.
