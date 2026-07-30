@@ -1296,8 +1296,12 @@
    wins. Anything added to the first would be overwritten. */
 .backLink {
   right: 14px;
-  background: var(--blue-deep, #0c5b92);
-  border: 3px solid #ffffff;
+  /* NO DISC HERE. The button used to draw a blue circle with a white ring for
+     the letter to sit in. The artwork is that badge already, so drawing one
+     underneath put a second ring around the first.
+     The rule above sets both, and this one wins, so they are cleared here. */
+  background: none;
+  border: 0;
   color: #ffffff;
   /* Nothing left to set type for: the letter has gone. Kept only so a missing
      file falls back to something rather than an empty disc. */
@@ -1309,20 +1313,19 @@
   position: relative;
 }
 
-/* The outbound mark itself. 46% of the disc, centred. */
+/* The outbound mark. THE FILE IS THE WHOLE BADGE: it already carries its own
+   blue, its own ring and its own padding, so it is drawn as an image rather
+   than a mask. A mask would have thrown all of that away and repainted the
+   artwork as a flat silhouette, which is what it was doing.
+   Fills the button, because the padding is inside the file. */
 .backLinkIcon {
   position: absolute;
-  inset: 27%;
-  background: #ffffff;
+  inset: 0;
   pointer-events: none;
-  -webkit-mask-image: url("/outboundlink-icon.svg");
-  mask-image: url("/outboundlink-icon.svg");
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-  -webkit-mask-position: center;
-  mask-position: center;
-  -webkit-mask-size: contain;
-  mask-size: contain;
+  background-image: url("/outboundlink-icon.svg");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
 }
 
 /* ---- Leaving the site -------------------------------------------------- */
