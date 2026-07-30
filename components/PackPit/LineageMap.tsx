@@ -2041,7 +2041,19 @@ export default function LineageMap({
                 transform: `rotate(${(cardDeg + stackTilt).toFixed(2)}deg)`,
                 transformOrigin: "center",
                 pointerEvents: "none",
-                zIndex: 63 + i,
+                // BEHIND the primary card, which sits at 62, not on top of it.
+                //
+                // These were at 63 + i, so a stacked frame's duplicates covered
+                // the primary's percentage pill, its info badge and its
+                // magnifier. The pill was never missing: it was underneath.
+                // Raising the pill could not fix it either, because the card
+                // carries its own z-index and therefore its own stacking
+                // context, so a child can never climb out past 62.
+                //
+                // Behind also reads better: the primary stays whole and the
+                // duplicates fan out from under it, which is what a pile of
+                // cards actually looks like.
+                zIndex: 61 - i,
                 boxShadow: "0 3px 3px rgba(0,0,0,0.32)",
                 userSelect: "none",
               }}
