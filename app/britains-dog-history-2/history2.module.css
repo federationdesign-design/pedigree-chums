@@ -795,24 +795,23 @@
   display: block;
 }
 
-/* The corner flash, top left of the photo face. Clipped by .dogFront's own
-   overflow and radius, so it follows the card's rounded corner exactly.
+/* The corner flash, top left of the card.
 
-   TWO PIECES. The supplied SVGs carry the words only, as white paths, so the
-   yellow ground is drawn here. They are not one element because the lettering
-   deliberately overhangs the diagonal onto the photograph: clipping the words
-   to the wedge would slice them.
+   TWO PIECES IN TWO PLACES, and that is the point.
 
-   Everything is a share of the card, never pixels, so it holds when the card
-   shrinks on a short phone. */
-.dogFlash {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  /* Never steals a tap: the whole card is one target. */
-  pointer-events: none;
-}
+   .dogFlashWedge is the yellow ground. It stays inside .dogFront so that face's
+   overflow and radius clip it to the card's rounded corner.
 
+   .dogFlash is the lettering, and it is a third layer in .dogFlipInner's single
+   grid cell instead. The words break out past the card's top and left edges, so
+   anything left inside .dogFront would be sliced by the very clip the wedge
+   needs. It is still inside .dogFlipInner, so it turns away with the card. A
+   layer parked on .dogCard would sit there while the card flipped.
+
+   The SVGs carry the words only. Their white paths are the white letters and
+   their unclassed paths take the SVG default fill, which is black, so the
+   keyline and the solid PLAY come out of the file. Only the yellow is drawn
+   here. */
 .dogFlashWedge {
   position: absolute;
   top: 0;
@@ -825,16 +824,40 @@
   background: #feee08;
   /* Corner to corner, so the hypotenuse runs top right to bottom left. */
   clip-path: polygon(0 0, 100% 0, 0 100%);
+  pointer-events: none;
+}
+
+.dogFlash {
+  grid-area: 1 / 1;
+  position: relative;
+  /* Turns away with the picture, exactly as the two faces do. */
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  /* A hair in front, so painting order cannot depend on how the browser sorts
+     three layers sitting at the same depth. */
+  transform: translateZ(1px);
+  /* Never steals a tap: the whole card is one target. */
+  pointer-events: none;
 }
 
 /* The two files are DIFFERENT SHAPES, 720 x 416.7 and 720 x 665, so one size
-   could never suit both. Each carries its own ratio and its own width, both
-   measured off the concepts. These two numbers are the ones to nudge. */
+   could never suit both. Each carries its own width and its own overhang.
+
+   THE OVERHANG IS A MARGIN, NOT `top`. A percentage `top` resolves against the
+   containing block's HEIGHT, and that height is whichever card face is taller,
+   so it differs from dog to dog and the breakout would never be the same twice.
+   Percentage margins resolve against WIDTH, the card's own fixed measure, which
+   is the same unit the widths below use. Artwork and overhang then scale
+   together.
+
+   Measured off the live render at 16ad1f8: the words were sitting 2.1% of the
+   card width inside the top edge and 1.1% inside the left. THESE ARE THE
+   NUMBERS TO NUDGE. */
 .dogFlashLearn,
 .dogFlashPlay {
   position: absolute;
-  top: 2%;
-  left: 1%;
+  top: 0;
+  left: 0;
   background-repeat: no-repeat;
   background-position: top left;
   background-size: 100% auto;
@@ -843,12 +866,18 @@
 .dogFlashLearn {
   width: 40%;
   aspect-ratio: 720 / 416.7;
+  /* Sat about right vertically already. Only the left edge moves, out to just
+     past the card, as the learn concept shows. */
+  margin: 2% 0 0 -0.6%;
   background-image: url("/history/flash-learn.svg");
 }
 
 .dogFlashPlay {
-  width: 33%;
+  width: 34%;
   aspect-ratio: 720 / 665;
+  /* Clears the card's top edge by about 5% of the card width and its left edge
+     by about 1%, which is what the concept close-up showed. */
+  margin: -5.7% 0 0 -1.3%;
   background-image: url("/history/flash-learn-play.svg");
 }
 

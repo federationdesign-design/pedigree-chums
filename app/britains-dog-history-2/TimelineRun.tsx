@@ -350,14 +350,12 @@ export default function TimelineRun({
                           Inside the photo face, so the card's rounded corner
                           clips the wedge and the whole thing turns away with
                           the picture. */}
-                      {kind && (
-                        <span className={styles.dogFlash} aria-hidden="true">
-                          <span className={styles.dogFlashWedge} />
-                          <span
-                            className={kind === "play" ? styles.dogFlashPlay : styles.dogFlashLearn}
-                          />
-                        </span>
-                      )}
+                      {/* The yellow ground. STAYS INSIDE the photo face, so
+                          .dogFront's overflow and radius clip it to the card's
+                          rounded corner. The lettering does NOT live here, see
+                          .dogFlash further down: it breaks out past the card
+                          edges and would be sliced by that same clip. */}
+                      {kind && <span className={styles.dogFlashWedge} aria-hidden="true" />}
                       {/* The family tree glyph, copied from .lineageBadge */}
                       {/* Turns the card over. Replaces the tree glyph that
                           used to sit here, which did nothing. */}
@@ -428,6 +426,20 @@ export default function TimelineRun({
                         discover them here
                       </span>
                     </span>
+                    {/* THE FLASH LETTERING, a third layer in the same grid cell
+                        as the two faces. It sits here rather than inside the
+                        photo face because it deliberately breaks out past the
+                        card's top and left edges, and .dogFront clips anything
+                        inside it to the rounded corner.
+                        Being a child of .dogFlipInner it still turns away with
+                        the card, which a layer parked on .dogCard would not. */}
+                    {kind && (
+                      <span className={styles.dogFlash} aria-hidden="true">
+                        <span
+                          className={kind === "play" ? styles.dogFlashPlay : styles.dogFlashLearn}
+                        />
+                      </span>
+                    )}
                   </span>
                 </button>
 
