@@ -201,11 +201,10 @@
 
 .slideTitle {
   font-family: var(--font-display, "Luckiest Guy", cursive);
-  /* Two points up on the original clamp(1.7rem, 7.5vw, 2.4rem). Added with
-     calc rather than folded into the three values, because the middle term is
-     viewport-relative: baking the increase into it would give 2pt on one
-     screen width and something else on every other. This is 2pt everywhere. */
-  font-size: calc(clamp(1.7rem, 7.5vw, 2.4rem) + 2pt);
+  /* 50pt flat, as asked. This replaces clamp(1.7rem, 7.5vw, 2.4rem), so the
+     title no longer scales with the viewport: it is the same 66.67px on a
+     360px phone as on a 430px one. */
+  font-size: 50pt;
   color: #ffffff;
   letter-spacing: 0.03em;
   line-height: 1.05;
