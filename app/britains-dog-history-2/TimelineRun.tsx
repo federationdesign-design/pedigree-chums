@@ -50,6 +50,8 @@ export default function TimelineRun({
 }) {
   const breeds = ukBreeds.filter((b) => b.strip === era).sort((a, b) => a.anchor - b.anchor);
   const [flipped, setFlipped] = useState<string | null>(null);
+  /* True once the reader has moved at all. Turns the head of the rail green. */
+  const [moved, setMoved] = useState(false);
   const runRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -67,6 +69,7 @@ export default function TimelineRun({
       // 2px of slack: sub-pixel scroll positions never land exactly on the end.
       const atBottom = run.scrollTop >= run.scrollHeight - run.clientHeight - 2;
       carousel.setAttribute("data-pc-vlock", onThisPanel && !atBottom ? "1" : "0");
+      if (run.scrollTop > 4) setMoved(true);
     };
 
     const queue = () => {
@@ -102,7 +105,7 @@ export default function TimelineRun({
               in the concept. Its line reaches the foot of the screen and the
               rail below continues from exactly that edge. */}
           <span className={styles.railStart} aria-hidden="true">
-            <span className={styles.railDot} />
+            <span className={`${styles.railDot} ${moved ? styles.railDotGo : ""}`} />
           </span>
         </div>
 
@@ -129,7 +132,7 @@ export default function TimelineRun({
                     className={styles.dogFlipInner}
                     style={isFlipped ? { transform: "rotateY(180deg)" } : undefined}
                   >
-                    <span className={styles.dogFront}>
+                    <span className={`${styles.dogFront} ${isFlipped ? styles.dogFrontOff : ""}`}>
                       {b.image ? (
                         /* eslint-disable-next-line @next/next/no-img-element */
                         <img src={b.image} alt={b.name} className={styles.dogThumb} draggable={false} />
@@ -155,7 +158,10 @@ export default function TimelineRun({
                     </span>
                     <span className={styles.dogBack}>
                       <span className={styles.dogNote}>{b.note}</span>
-                      <span className={styles.dogHint}>Tap to see the family tree</span>
+                      <span className={styles.dogHint}>
+                        Tap to learn about the dogs you know today that come from
+                        this lineage root
+                      </span>
                     </span>
                   </span>
                 </button>

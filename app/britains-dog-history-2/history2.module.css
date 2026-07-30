@@ -159,11 +159,11 @@
 .eraWord {
   display: block;
   font-family: var(--font-display, "Luckiest Guy", system-ui);
-  font-size: clamp(3.4rem, 12vw, 8rem);
+  /* Doubled from clamp(3.4rem, 12vw, 8rem). No shadow, by request. */
+  font-size: clamp(6.8rem, 24vw, 16rem);
   color: #ffffff;
   line-height: 1;
   text-align: center;
-  text-shadow: 0 4px 40px rgba(0, 0, 0, 0.6);
 }
 
 /* ---- Section groups: sticky top, panels beneath --------------------- */
@@ -558,6 +558,20 @@
   border: 5px solid #ffffff;
   box-sizing: border-box;
   pointer-events: none;
+  /* Held back 1.3s. `backwards` applies the opening frame during the delay,
+     so the disc is genuinely absent rather than shown and then animated. */
+  animation: pcDotIn 0.35s cubic-bezier(0.2, 1.4, 0.4, 1) 1.3s backwards;
+  transition: background 0.4s ease;
+}
+
+/* Once the reader has started moving. */
+.railDotGo {
+  background: #22c55e;
+}
+
+@keyframes pcDotIn {
+  from { opacity: 0; transform: translateX(-50%) scale(0.4); }
+  to { opacity: 1; transform: translateX(-50%) scale(1); }
 }
 
 /* Card geometry copied from .node / .flipCard in history.module.css, so the
@@ -608,6 +622,15 @@
   background: #ffffff;
 }
 
+/* Hidden outright once the card turns, the same trick the desktop page uses on
+   hover. `backface-visibility` alone does not reliably hide an absolutely
+   positioned child, which is why the name stayed while the status bar went.
+   The delay lets the flip reach halfway first. */
+.dogFrontOff {
+  visibility: hidden;
+  transition: visibility 0s linear 0.26s;
+}
+
 .dogThumb {
   width: 100%;
   height: 100%;
@@ -624,6 +647,8 @@
   height: 34px;
   border-radius: 50%;
   background: var(--yellow, #ffd23e);
+  border: 3px solid var(--navy, #0a3a57);
+  box-sizing: border-box;
   color: var(--navy, #0a3a57);
   display: flex;
   align-items: center;
@@ -701,7 +726,8 @@
 .dogNote {
   font-family: var(--font-body), system-ui, sans-serif;
   font-weight: 600;
-  font-size: 1rem;
+  /* Doubled from 1rem. */
+  font-size: 2rem;
   line-height: 1.35;
 }
 
@@ -755,9 +781,9 @@
   justify-content: center;
   gap: 20px;
   padding: 0;
-  /* Breathing room around the card and the next screen, added as margin so it
-     sits OUTSIDE the leg calculation rather than eating into it. */
-  margin: 0;
+  /* 40px clear of the card. Margin rather than padding: padding would sit
+     inside the row and reopen the break in the line above the disc. */
+  margin: 40px 0 0;
 }
 
 /* MEASURED: a 35px yellow disc. Ringed white, like the head of the rail. */
@@ -801,7 +827,9 @@
 
 /* Navy disc, white ring, white italic i. Same treatment as .relCardInfo. */
 .markerInfo {
-  background: var(--navy, #0a3a57);
+  /* Same blue as the icon on the card, which is .relCardInfo's own colour.
+     The two were on different blues. */
+  background: var(--blue-deep, #0c5b92);
   border: 3px solid #ffffff;
   color: #ffffff;
   font-family: Georgia, serif;
