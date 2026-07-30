@@ -41,6 +41,11 @@ const OUTBOUND: { href: string; tone: "blue" | "green" | "black" }[] = [
   { href: "https://en.wikipedia.org/wiki/List_of_extinct_dog_breeds", tone: "black" },
 ];
 
+/* Which runs show the three links above. They are ancient-medieval sources, so
+   they show on ancient-medieval and nowhere else until the other eras have
+   links of their own. Add an era to this list, do not widen OUTBOUND. */
+const OUTBOUND_ERAS = ["ancient-medieval"];
+
 /* How far down a dog screen the card sits. The line is drawn to exactly this
    depth, so the two meet. */
 const CARD_INSET = 125;
@@ -105,6 +110,16 @@ export default function TimelineRun({
     const run = runRef.current;
     if (!carousel || !run) return;
     let queued = false;
+    /* ONE OWNER AT A TIME. Every run on the page listens to the same carousel
+       and writes the same attribute and the same overflow. With nine of them
+       the last listener to fire wins, which is whichever mounted last, so
+       eight runs would have their lock stamped out by a run that is nowhere
+       near the screen.
+
+       A run touches the carousel only while it is the live panel, plus the one
+       frame it takes to hand back. Everything else returns immediately, which
+       also keeps ninety marker rows from being measured on every scroll. */
+    let owns = false;
 
     const sync = () => {
       queued = false;
@@ -121,9 +136,12 @@ export default function TimelineRun({
          uses to decide a panel has arrived. Keep the two in step. */
       const pos = carousel.scrollLeft / w;
       const onThisPanel = Math.abs(pos - panelIndex) < 0.02;
+      // Not our panel and never was: touch nothing, measure nothing.
+      if (!onThisPanel && !owns) return;
       // 2px of slack: sub-pixel scroll positions never land exactly on the end.
       const atBottom = run.scrollTop >= run.scrollHeight - run.clientHeight - 2;
       const lock = onThisPanel && !atBottom;
+      owns = onThisPanel;
       carousel.setAttribute("data-pc-vlock", lock ? "1" : "0");
       /* The attribute alone only stops TOUCH: the script reads it in its
          touchmove handler. A trackpad, a mouse wheel or a keyboard scrolls the
@@ -179,9 +197,13 @@ export default function TimelineRun({
     return () => {
       carousel.removeEventListener("scroll", queue);
       run.removeEventListener("scroll", queue);
-      // Never leave the rest of the page locked if this unmounts mid-scroll.
-      carousel.setAttribute("data-pc-vlock", "0");
-      carousel.style.overflowX = "";
+      /* Never leave the rest of the page locked if this unmounts mid-scroll.
+         Guarded by ownership: a run unmounting while a different one holds the
+         lock must not release it on that run's behalf. */
+      if (owns) {
+        carousel.setAttribute("data-pc-vlock", "0");
+        carousel.style.overflowX = "";
+      }
     };
   }, [panelIndex]);
 
@@ -282,7 +304,17 @@ export default function TimelineRun({
                     <span className={`${styles.dogFront} ${isFlipped ? styles.dogFrontOff : ""}`}>
                       {b.image ? (
                         /* eslint-disable-next-line @next/next/no-img-element */
-                        <img src={b.image} alt={b.name} className={styles.dogThumb} draggable={false} />
+                        <img
+                          src={b.image}
+                          alt={b.name}
+                          className={styles.dogThumb}
+                          draggable={false}
+                          /* Ninety of these across the nine runs. Without this
+                             every one downloads on page open, whether or not
+                             the reader ever swipes to that era. */
+                          loading="lazy"
+                          decoding="async"
+                        />
                       ) : (
                         <span className={styles.dogThumb} />
                       )}
@@ -327,26 +359,32 @@ export default function TimelineRun({
                       {/* Top right: away to other sites, each with a warning
                           first. A native confirm rather than a panel of our
                           own: it cannot be missed and it cannot be clipped by
-                          the card's 3D transform. */}
-                      <span className={styles.backLinks}>
-                        {OUTBOUND.map((o) => (
-                          <span
-                            key={o.href}
-                            className={`${styles.backLink} ${styles[`backLink_${o.tone}`]}`}
-                            role="button"
-                            tabIndex={0}
-                            aria-label="Read more on another site"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setLeaving(o.href);
-                            }}
-                          >
-                            i
-                          </span>
-                        ))}
-                      </span>
+                          the card's 3D transform.
+                          ANCIENT-MEDIEVAL ONLY. Strabo, Gutenberg and a list of
+                          extinct breeds are that era's sources. On the other
+                          eight runs they would be sitting on a Cockapoo. Add an
+                          era here once it has links of its own. */}
+                      {OUTBOUND_ERAS.includes(era) && (
+                        <span className={styles.backLinks}>
+                          {OUTBOUND.map((o) => (
+                            <span
+                              key={o.href}
+                              className={`${styles.backLink} ${styles[`backLink_${o.tone}`]}`}
+                              role="button"
+                              tabIndex={0}
+                              aria-label="Read more on another site"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setLeaving(o.href);
+                              }}
+                            >
+                              i
+                            </span>
+                          ))}
+                        </span>
+                      )}
                       <span className={styles.dogSub}>
-                        There dogs you know today came from this lineage route,
+                        These dogs you know today came from this lineage route,
                         discover them here
                       </span>
                     </span>

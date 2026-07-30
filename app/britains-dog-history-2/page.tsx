@@ -64,21 +64,64 @@ type Entry =
   | { type: "timeline"; era: string; words: string[]; note: string }
   | { type: "section"; si: number };
 
+/* The era screen at the head of each vertical run: the title, one word per
+   line, and the line underneath it.
+
+   Keyed by era, which sections.ts already carries on all nine sections, so a
+   run appears wherever its section does and the two can never fall out of
+   step. An era with no entry here simply gets no run, which is the switch to
+   use if one is ever pulled. */
+const TIMELINE_COPY: Record<string, { words: string[]; note: string }> = {
+  "ancient-medieval": {
+    words: ["Ancient\u2192", "Medieval", "Dogs"],
+    note: "At the start of time we did not have writing, so we can only really tell what has happened after we started writing stuff down",
+  },
+  c1500: {
+    words: ["Tudor", "Times", "Dogs"],
+    note: "The Tudors kept dogs for work and for show, and started writing down which was which",
+  },
+  c1700: {
+    words: ["The", "1700s", "Dogs"],
+    note: "Farms, hunts and city streets each wanted a different dog, so Britain started building them",
+  },
+  early1800: {
+    words: ["The Early", "1800s", "Dogs"],
+    note: "Britain was changing fast, and the dogs changed with it",
+  },
+  spaniels: {
+    words: ["The Spaniel", "Explosion"],
+    note: "One kind of dog split into many, and the spaniel family got very big very quickly",
+  },
+  mid1800: {
+    words: ["The", "Mid-1800s", "Dogs"],
+    note: "Dog shows arrived, and how a dog looked started to matter as much as what it did",
+  },
+  late1800: {
+    words: ["The Late", "1800s", "Dogs"],
+    note: "The Kennel Club began writing the rules, and breeds became official",
+  },
+  c1900: {
+    words: ["The", "1900s", "Dogs"],
+    note: "Dogs moved off the farm and into the front room",
+  },
+  crosses: {
+    words: ["Today's", "Crossbreeds"],
+    note: "Two breeds, one dog, and a lot of arguments about what to call it",
+  },
+};
+
+/* Each section, then its own run. Written as a loop rather than nine listed
+   pairs so inserting or reordering a section cannot leave a run behind on the
+   wrong one. The running index below is computed from this, not from
+   arithmetic, so the count stays right whatever this produces. */
 const SEQUENCE: Entry[] = [
   { type: "intro" },
-  { type: "section", si: 0 },
-  // Sits directly after Medieval and Tudor, which is where the
-  // ancient-medieval strip sits on the desktop page.
-  // The vertical run: the era title, then eleven dogs, scrolled downwards
-  // inside a single panel. The title is the top of this run rather than a
-  // slide beside it.
-  {
-    type: "timeline",
-    era: "ancient-medieval",
-    words: ["Ancient\u2192", "Medieval", "Dogs"],
-    note: "At the the start of time we did not have writing, so we can only really tell what has happened after we started writing stuff down",
-  },
-  ...SECTIONS.slice(1).map((_, i) => ({ type: "section" as const, si: i + 1 })),
+  ...SECTIONS.flatMap((s, si): Entry[] => {
+    const copy = s.era ? TIMELINE_COPY[s.era] : undefined;
+    return copy && s.era
+      ? [{ type: "section", si }, { type: "timeline", era: s.era, ...copy }]
+      : [{ type: "section", si }];
+  }),
 ];
 
 function panelsFor(s: (typeof SECTIONS)[number]): Panel[] {
