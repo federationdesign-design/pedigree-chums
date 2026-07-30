@@ -39,6 +39,7 @@ const { skipTheatre, buildTypingPlan, TYPING_PROFILES, THEATRE_MAX_MS, isTypoEli
   pathToFileURL(join(LIB, 'theatre.ts')).href
 );
 const { buildRow } = await import(pathToFileURL(join(ROOT, 'app/pick-a-chum/dev/recorder-store.ts')).href);
+const { recorderEnabled } = await import(pathToFileURL(join(ROOT, 'app/pick-a-chum/lib/turn-tap.ts')).href);
 const { SAFETY_TRIGGER_PHRASES } = await import(pathToFileURL(join(LIB, 'safety.ts')).href);
 
 let pass = 0;
@@ -1754,6 +1755,30 @@ check('where can I get the deck?', { action: 'open_discount_popup' }); // get ve
     se.candidateSubject === 'dogs' ? null : `candidate not stored on fallback-family turn: ${JSON.stringify(se.candidateSubject)}` });
   check('tell me about labradors', { action: 'breed_page' }, { session: s, assert: (r, resp, se) =>
     se.candidateSubject === null ? null : `candidate not cleared on a successful route: ${JSON.stringify(se.candidateSubject)}` });
+})();
+
+// ---- Task 72: recorder opt-in via ?rec=1, denylist otherwise ----
+(() => {
+  const check72 = (hostname, search, want, label) => {
+    globalThis.window = { location: { hostname, search } };
+    const got = recorderEnabled();
+    delete globalThis.window;
+    const ok = got === want;
+    ok ? pass++ : fail++;
+    rows.push({ ok, input: `Task72: ${label}`, layer: '-', bucket: '-', action: 'recorder', note: ok ? '' : `got ${got} want ${want}` });
+  };
+  // Production hosts: OFF by default, ON only with ?rec=1.
+  check72('pedigreechums.co.uk', '', false, 'bare domain records nothing');
+  check72('www.pedigreechums.co.uk', '', false, 'bare www records nothing');
+  check72('pedigreechums.co.uk', '?rec=1', true, 'prod + ?rec=1 runs');
+  check72('www.pedigreechums.co.uk', '?utm=x&rec=1', true, 'prod + rec=1 among params runs');
+  check72('pedigreechums.co.uk', '?rec=0', false, 'rec=0 stays off');
+  check72('pedigreechums.co.uk', '?rec=', false, 'empty rec stays off');
+  // Non-production (preview / localhost): unchanged, on by default.
+  check72('pick-a-chum-git-preview.vercel.app', '', true, 'preview still on by default');
+  check72('localhost', '', true, 'localhost still on');
+  // Server-side (no window): off.
+  { const got = recorderEnabled(); const ok = got === false; ok ? pass++ : fail++; rows.push({ ok, input: 'Task72: no window (SSR) off', layer: '-', bucket: '-', action: 'recorder', note: ok ? '' : `got ${got}` }); }
 })();
 
 // ---- Report ----

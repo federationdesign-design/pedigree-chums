@@ -37,9 +37,14 @@ export function emitTurn(e: TurnEvent): void {
   }
 }
 
-// Hosts where the recorder must never run. Everything else (Vercel branch
+// Hosts where the recorder must never run by default. Everything else (Vercel branch
 // previews, localhost) is a test surface where recording is allowed.
 const PROD_HOSTS = new Set(['www.pedigreechums.co.uk', 'pedigreechums.co.uk']);
 export function recorderEnabled(): boolean {
-  return typeof window !== 'undefined' && !PROD_HOSTS.has(window.location.hostname);
+  if (typeof window === 'undefined') return false;
+  // Task 72: explicit opt-in. `?rec=1` in the URL turns the recorder on ANYWHERE, including
+  // production, so it can be run on the live domain without exposing it to visitors. A normal
+  // visit (no `?rec=1`) is unchanged: on a production host the recorder and its panel stay off.
+  if (new URLSearchParams(window.location.search).get('rec') === '1') return true;
+  return !PROD_HOSTS.has(window.location.hostname);
 }
