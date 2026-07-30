@@ -479,10 +479,12 @@
   /* Extra room on the left for the rail, which the cards must not sit on.
      Written into the shorthand rather than as a longhand above it: a
      `padding-left` there would be silently wiped by this line. */
-  /* Side padding cut to 12px so a 95vw card actually fits: at 24px each side
-     the content box tops out near 90vw. The 60px left inset is gone with the
-     left-hand rail, which is now centred. */
-  padding: 24px 12px;
+  /* NO VERTICAL PADDING. The rail legs are flex children, so any padding on
+     the top or bottom shortens them and leaves a gap where two screens meet:
+     24px above plus 24px below measured as a 50px break in the line.
+     Side padding is 12px so a 95vw card fits; at 24px each side the content
+     box tops out near 90vw and the card can never reach 95. */
+  padding: 0 12px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -743,12 +745,19 @@
 }
 
 /* The marker and its two buttons, sitting across the line. */
+/* The row sits BETWEEN the two legs, so its height is the break in the line.
+   No vertical padding: with 18px the line stopped short of the disc top and
+   bottom and read as two more gaps. The row is now exactly as tall as the
+   disc, so the legs meet it edge to edge. */
 .markerRow {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 20px;
-  padding: 18px 0;
+  padding: 0;
+  /* Breathing room around the card and the next screen, added as margin so it
+     sits OUTSIDE the leg calculation rather than eating into it. */
+  margin: 0;
 }
 
 /* MEASURED: a 35px yellow disc. Ringed white, like the head of the rail. */
