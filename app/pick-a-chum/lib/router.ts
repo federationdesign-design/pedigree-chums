@@ -263,6 +263,13 @@ const TRANSFER_VERBS = [
 ];
 
 const GREETING = ['hi', 'hiya', 'hello', 'hey', 'morning', 'good morning', 'evening', 'afternoon', 'anyone there', 'how are you', 'yo'];
+// Task 76: the greeting the visitor actually used, to echo back (mirror) instead of a B09 pool
+// line. Returns the LONGEST matching GREETING entry, so "good morning" mirrors the phrase (not the
+// "morning" inside it) and "i said hi" mirrors just "hi", never the whole sentence.
+function matchedGreeting(n: Normalised): string | null {
+  const matches = GREETING.filter((g) => hasAny(n, [g]));
+  return matches.length ? matches.reduce((a, b) => (b.length > a.length ? b : a)) : null;
+}
 // Functional "is this on" testing only; identity/scepticism ("are you real / AI")
 // now belongs to the identity bucket (B16) below.
 const TESTING = ['test', 'testing', 'does this work', 'is this working', 'hello test'];
@@ -1107,7 +1114,12 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
   }
 
   // Layer 9: recognised conversation.
-  if (hasAny(N, GREETING)) return conv('B09');
+  {
+    // Task 76: a greeting is mirrored — echo the greeting word back (see the assembler), rather
+    // than serving a B09 pool line. Same GREETING list that already triggers B09.
+    const g = matchedGreeting(N);
+    if (g) return { ...conv('B09'), mirror: g };
+  }
   if (hasAny(N, TESTING)) return conv('B10');
   if (hasAny(N, COMMAND)) return conv('B11');
   if (hasAny(N, PERSONAL)) return conv('B12');

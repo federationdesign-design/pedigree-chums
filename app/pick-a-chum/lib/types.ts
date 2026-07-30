@@ -187,4 +187,5 @@ export interface Resolution {
   breedTitle?: string; // breed_page: the matched breed's display title (for placeholder copy)
   breedOptions?: { title: string; slug: string; url: string }[]; // breed_choice: the two options
   griefCategory?: string; // Task 58: which grief scenario matched (GRIEF-01 died / GRIEF-02 lost / GRIEF-03 old-unwell); all serve the same ':(' line
+  mirror?: string; // Task 76: the greeting word to echo back for a B09 greeting (the only response built from the input)
 }

@@ -862,19 +862,32 @@ for (const q of ['How old are you?', 'What is your age?']) check(q, {}, { assert
 for (const q of ['Who is your owner?', 'Do you have an owner?', 'Who owns you?']) check(q, {}, { assert: canonCheck('owner') });
 
 // ---- No exact response repetition within a session when alternatives exist ----
+// Task 76: greetings now MIRROR the greeting word instead of rotating a B09 pool, so repeating
+// "Hello." echoes "hello" every time (mirror, not rotation).
 (() => {
   const s = newSession();
-  const seen = new Set();
-  let dup = null;
+  let ok = true, note = '';
   for (let i = 0; i < 6; i++) {
     const { response } = submit(data, s, 'Hello.');
-    if (seen.has(response.responseId)) dup = response.responseId;
-    seen.add(response.responseId);
+    if (response.responseId !== 'B09-MIRROR' || response.text !== 'hello') { ok = false; note = `${response.responseId} "${response.text}"`; }
   }
-  const ok = !dup;
   ok ? pass++ : fail++;
-  rows.push({ ok, input: '6x "Hello." (rotation)', layer: 9, bucket: 'B09', action: 'converse', note: ok ? '' : `repeated ${dup}` });
+  rows.push({ ok, input: '6x "Hello." mirrors the greeting', layer: 9, bucket: 'B09', action: 'converse', note });
 })();
+// ---- Task 76: mirror the greeting word ----
+(() => {
+  const cases = [['hi', 'hi'], ['yo', 'yo'], ['hey', 'hey'], ['hello', 'hello'], ['i said hi', 'hi'], ['good morning', 'good morning']];
+  let ok = true, note = '';
+  for (const [inp, want] of cases) {
+    const { resolution: r, response } = submit(data, newSession(), inp);
+    if (r.action !== 'converse' || r.bucket !== 'B09' || response.responseId !== 'B09-MIRROR' || response.text !== want) { ok = false; note += `"${inp}"->${response.responseId}"${response.text}" `; }
+  }
+  ok ? pass++ : fail++;
+  rows.push({ ok, input: 'Task76: greeting word mirrored (i said hi -> hi)', layer: 9, bucket: 'B09', action: 'converse', note });
+})();
+// A non-greeting is unaffected (still library-served, no mirror).
+check('how much is it', { action: 'price_answer' }, { assert: (_r, resp) => resp.responseId !== 'B09-MIRROR' ? null : 'non-greeting was mirrored' });
+check('tell me about labradors', { action: 'breed_page' }, { assert: (_r, resp) => resp.responseId !== 'B09-MIRROR' ? null : 'non-greeting was mirrored' });
 
 // ---- No dog speaks before the visitor ----
 (() => {

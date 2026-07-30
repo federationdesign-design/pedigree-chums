@@ -347,6 +347,11 @@ export function assemble(res: Resolution, data: ChumData, n: Normalised, session
 
     case 'converse': {
       const bucket = res.bucket ?? 'B09';
+      if (res.mirror) {
+        // Task 76: mirror the greeting — echo the greeting word the visitor used, verbatim. This
+        // is the ONLY response built from the input; every other answer comes from the library.
+        return { responseId: 'B09-MIRROR', text: res.mirror, dog };
+      }
       if (bucket === 'B12') {
         // Approved B12 repair line (replaces the old personal-statement pool).
         return { responseId: 'B12-REPAIR', text: 'All right. What would you like to do next: talk about dogs, play something or find a page?', dog };
