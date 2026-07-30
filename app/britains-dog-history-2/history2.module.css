@@ -510,10 +510,11 @@
      is LEFT and the disc can no longer land on the paragraph.
      Written into the shorthand: a padding-bottom above this line would be
      silently wiped by it. */
-  padding: 24px;
+  padding: 300px 24px 24px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  /* 300px from the top, to sit where the section titles do. */
+  justify-content: flex-start;
   gap: 4px;
 }
 

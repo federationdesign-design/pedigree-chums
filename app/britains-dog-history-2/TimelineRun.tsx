@@ -168,7 +168,7 @@ export default function TimelineRun({
           </span>
         </div>
 
-        {breeds.map((b) => {
+        {breeds.map((b, bi) => {
           const isFlipped = flipped === b.name;
           return (
             <div key={b.name} className={styles.dogScreen}>
@@ -176,7 +176,10 @@ export default function TimelineRun({
                   the marker. Both legs are flex children that take the
                   leftover space, so they meet the card and the row exactly
                   with nothing measured. */}
-              <span className={styles.railLeg} aria-hidden="true" />
+              {/* No leg above the FIRST dog: the title screen's own line already
+                  runs down to here, and two of them read as two separate
+                  lines rather than one. */}
+              {bi > 0 && <span className={styles.railLeg} aria-hidden="true" />}
               <div className={styles.dogCard}>
                 {/* The whole card is the target: tapping anywhere opens the
                     level. The information icon sits OUTSIDE this button rather
@@ -301,7 +304,12 @@ export default function TimelineRun({
                   i
                 </span>
               </div>
-              <span className={styles.railLeg} aria-hidden="true" />
+              {/* Nothing below the first marker until the reader moves. */}
+              <span
+                className={styles.railLeg}
+                style={bi === 0 && !moved ? { visibility: "hidden" } : undefined}
+                aria-hidden="true"
+              />
             </div>
           );
         })}
