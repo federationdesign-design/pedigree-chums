@@ -707,7 +707,7 @@
 
 .eraCountNum,
 .eraCountWord {
-  font-family: var(--font-arrow), var(--font-display), system-ui, sans-serif;
+  font-family: var(--font-display), system-ui, sans-serif;
 }
 
 .eraCountNum {
@@ -797,29 +797,55 @@
 
 /* The corner flash, top left of the photo face. Clipped by .dogFront's own
    overflow and radius, so it follows the card's rounded corner exactly.
-   A background image rather than an <img>: a missing file then shows nothing
-   instead of a broken-image glyph.
-   Sized as a share of the card, not in pixels, so it holds when the card
+
+   TWO PIECES. The supplied SVGs carry the words only, as white paths, so the
+   yellow ground is drawn here. They are not one element because the lettering
+   deliberately overhangs the diagonal onto the photograph: clipping the words
+   to the wedge would slice them.
+
+   Everything is a share of the card, never pixels, so it holds when the card
    shrinks on a short phone. */
 .dogFlash {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 46%;
-  aspect-ratio: 1 / 1;
+  inset: 0;
   z-index: 2;
   /* Never steals a tap: the whole card is one target. */
   pointer-events: none;
+}
+
+.dogFlashWedge {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 44%;
+  aspect-ratio: 1 / 1;
+  background: #fdf251;
+  /* Corner to corner, so the hypotenuse runs top right to bottom left. */
+  clip-path: polygon(0 0, 100% 0, 0 100%);
+}
+
+/* The two files are DIFFERENT SHAPES, 720 x 416.7 and 720 x 665, so one size
+   could never suit both. Each carries its own ratio and its own width, both
+   measured off the concepts. These two numbers are the ones to nudge. */
+.dogFlashLearn,
+.dogFlashPlay {
+  position: absolute;
+  top: 2%;
+  left: 1%;
   background-repeat: no-repeat;
   background-position: top left;
-  background-size: contain;
+  background-size: 100% auto;
 }
 
 .dogFlashLearn {
+  width: 40%;
+  aspect-ratio: 720 / 416.7;
   background-image: url("/history/flash-learn.svg");
 }
 
 .dogFlashPlay {
+  width: 33%;
+  aspect-ratio: 720 / 665;
   background-image: url("/history/flash-learn-play.svg");
 }
 

@@ -82,28 +82,19 @@ export default function TimelineRun({
   const runRef = useRef<HTMLDivElement | null>(null);
   const lineRef = useRef<HTMLSpanElement | null>(null);
   const dotRef = useRef<HTMLSpanElement | null>(null);
-  /* Marker rows that have arrived on screen. An observer rather than a timer:
-     a CSS delay would fire on all eleven at once when the page loads, so ten
-     of them would have popped long before the reader got there. */
+  /* Marker rows that have arrived on screen, so their three icons pop in as
+     the reader reaches them rather than all at once on load.
+
+     DRIVEN BY SCROLL POSITION, NOT AN INTERSECTION OBSERVER. The observer
+     version never fired and the icons stayed at opacity 0, which read as the
+     marker row being missing entirely. `passed` below has always worked off
+     scrollTop, so arrival now uses the same proven measure a few lines away
+     rather than a second mechanism that can fail on its own. */
   const [arrived, setArrived] = useState<Record<string, boolean>>({});
   /* Rows the reader has scrolled on from. Their node turns green, exactly as
      the one at the head of the timeline does. */
   const [passed, setPassed] = useState<Record<string, boolean>>({});
   const rowRefs = useRef<Record<string, HTMLDivElement | null>>({});
-
-  useEffect(() => {
-    const io = new IntersectionObserver(
-      (entries) => {
-        for (const e of entries) {
-          const key = (e.target as HTMLElement).dataset.dog;
-          if (e.isIntersecting && key) setArrived((a) => (a[key] ? a : { ...a, [key]: true }));
-        }
-      },
-      { threshold: 0.6 }
-    );
-    Object.values(rowRefs.current).forEach((el) => el && io.observe(el));
-    return () => io.disconnect();
-  }, []);
 
   useEffect(() => {
     const carousel = document.getElementById("mobile-carousel");
@@ -167,7 +158,13 @@ export default function TimelineRun({
       const rows = rowRefs.current;
       for (const key of Object.keys(rows)) {
         const el = rows[key];
-        if (el && run.scrollTop > el.offsetTop - run.clientHeight * 0.35) {
+        if (!el) continue;
+        /* Arrived: the row's top has come up into the bottom of the view. The
+           icons pop from here. */
+        if (el.offsetTop < run.scrollTop + run.clientHeight * 0.92) {
+          setArrived((av) => (av[key] ? av : { ...av, [key]: true }));
+        }
+        if (run.scrollTop > el.offsetTop - run.clientHeight * 0.35) {
           setPassed((pv) => (pv[key] ? pv : { ...pv, [key]: true }));
         }
       }
@@ -299,6 +296,9 @@ export default function TimelineRun({
              their own breed page instead, which is the live page's rule and
              not something decided here. */
           const openLevel = open(b);
+          /* Learn, play or neither. The flash and the tap read the same answer,
+             so a card cannot advertise a level it will not open. */
+          const kind = breedCardKind(b.name);
           return (
             <div key={b.name} className={styles.dogScreen}>
               {/* The rail arrives, stops at the card, and begins again below
@@ -341,20 +341,22 @@ export default function TimelineRun({
                       ) : (
                         <span className={styles.dogThumb} />
                       )}
-                      {/* The corner flash. Reads its state from the SAME
-                          function the tap handler uses, so it cannot promise a
-                          level the card will not open. Inside the photo face,
-                          so the card's rounded corner clips it and it turns
-                          away with the picture. Drawn as a background image, so
-                          a missing file shows nothing rather than a broken
-                          graphic. */}
-                      {breedCardKind(b.name) && (
-                        <span
-                          className={`${styles.dogFlash} ${
-                            breedCardKind(b.name) === "play" ? styles.dogFlashPlay : styles.dogFlashLearn
-                          }`}
-                          aria-hidden="true"
-                        />
+                      {/* The corner flash. The supplied SVGs are the LETTERING
+                          ONLY, white paths with no ground, so the yellow wedge
+                          is drawn here and the words are laid over it. They are
+                          separate elements on purpose: the words overhang the
+                          diagonal onto the photograph, so clipping them to the
+                          wedge would cut them off.
+                          Inside the photo face, so the card's rounded corner
+                          clips the wedge and the whole thing turns away with
+                          the picture. */}
+                      {kind && (
+                        <span className={styles.dogFlash} aria-hidden="true">
+                          <span className={styles.dogFlashWedge} />
+                          <span
+                            className={kind === "play" ? styles.dogFlashPlay : styles.dogFlashLearn}
+                          />
+                        </span>
                       )}
                       {/* The family tree glyph, copied from .lineageBadge */}
                       {/* Turns the card over. Replaces the tree glyph that
