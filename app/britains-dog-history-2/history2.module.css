@@ -508,10 +508,12 @@
   touch-action: pan-y;
   /* Second layer under .footerOff. Keeps a drag that reaches either end of the
      run inside the run instead of chaining out to whatever scrolls behind it.
-     Safari 16 and up, so it does nothing on an iPhone 12 left on iOS 14 or 15,
-     which is exactly why .footerOff carries the fix and this only backs it up.
+     Y ONLY: the run does not scroll sideways, and containing x sits directly
+     against a horizontal carousel that does. Safari 16 and up, so it does
+     nothing on an iPhone 12 left on iOS 14 or 15, which is exactly why
+     .footerOff carries the fix and this only backs it up.
      Costs the rubber-band bounce at the two ends. */
-  overscroll-behavior: contain;
+  overscroll-behavior-y: contain;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
 }

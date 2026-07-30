@@ -104,8 +104,17 @@ export default function TimelineRun({
       queued = false;
       const w = carousel.clientWidth;
       if (!w) return;
-      const here = Math.round(carousel.scrollLeft / w);
-      const onThisPanel = here === panelIndex;
+      /* SETTLED, NOT MERELY NEAREST. This was Math.round, which reports THIS
+         panel from the moment a sideways swipe is half done. The lock then
+         engaged mid-move, clamped overflowX and wrote scrollLeft back, which
+         pinned the carousel exactly halfway between two panels. It could not
+         recover: releasing needs either a different panel or the run scrolled
+         to its last dog, and neither can happen while it is pinned.
+
+         0.02 of a panel is the same tolerance the roll script in page.tsx
+         uses to decide a panel has arrived. Keep the two in step. */
+      const pos = carousel.scrollLeft / w;
+      const onThisPanel = Math.abs(pos - panelIndex) < 0.02;
       // 2px of slack: sub-pixel scroll positions never land exactly on the end.
       const atBottom = run.scrollTop >= run.scrollHeight - run.clientHeight - 2;
       const lock = onThisPanel && !atBottom;
@@ -115,10 +124,15 @@ export default function TimelineRun({
          carousel natively and never reaches that handler, which is how the
          reader could slide sideways out of the run before reaching the last
          dog. Clamping overflow is what actually holds them. scrollLeft is
-         written back because changing overflow can reset it. */
-      const keep = carousel.scrollLeft;
+         written back because changing overflow can reset it.
+
+         Locking pins to the panel's EXACT position rather than to wherever it
+         had reached. Within the tolerance above that is a correction of a few
+         pixels at most, and it means a lock can never freeze the carousel
+         part way between two panels however it was entered. */
+      const keep = lock ? panelIndex * w : carousel.scrollLeft;
       const want = lock ? "hidden" : "";
-      if (carousel.style.overflowX !== want) {
+      if (carousel.style.overflowX !== want || (lock && carousel.scrollLeft !== keep)) {
         carousel.style.overflowX = want;
         carousel.scrollLeft = keep;
       }
