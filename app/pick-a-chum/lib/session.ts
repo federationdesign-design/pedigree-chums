@@ -54,6 +54,11 @@ export interface Session {
   // session. Both reset on a new session.
   candidateEverFound: boolean;
   orientServed: boolean;
+  // Task 71: whether the loop's repeat (LOOP-01) has already fired in the CURRENT loop. LOOP-01
+  // fires on the first candidate-bearing turn of a loop, once, rather than at a fixed counter
+  // position, so a blank opening turn no longer spends the repeat. Reset whenever the loop resets
+  // (the counter rolls over at 4, or a non-fallback turn breaks the loop) and on a new session.
+  loopRepeatUsed: boolean;
   // Task 68: the subject the previous turn offered via LOOP-01 (repeat) or LOOP-02 (destination),
   // awaiting a yes/no. A bare affirmation next turn routes to this subject's destination; anything
   // else (including "no") clears it and lets the loop advance. Set only when LOOP-01/LOOP-02 is
@@ -88,6 +93,7 @@ export function newSession(activeDog: Dog = 'collie'): Session {
     candidateSubject: null,
     candidateEverFound: false,
     orientServed: false,
+    loopRepeatUsed: false,
     pendingConfirm: null,
     topic: null,
     previousTopic: null,

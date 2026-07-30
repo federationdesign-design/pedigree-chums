@@ -1512,15 +1512,15 @@ check('cost', { action: 'price_answer' });
     se.noActionCount === 0 ? null : `no-action not reset by a successful route: ${se.noActionCount}` });
 })();
 // The loop counter uses the BROADER fallback family: four consecutive gk_unknown turns advance
-// the counter and complete a loop WITHOUT climbing the repair ladder (repairCount stays 0). The
-// loop serves LOOP-03 here: the candidates found ("dog") have no destination mapping, so LOOP-02
-// is skipped at count 2.
+// the counter and complete a loop WITHOUT climbing the repair ladder (repairCount stays 0). g1 is
+// no-candidate (LOOP-03); g2 is the FIRST candidate-bearing turn, so it repeats (LOOP-01, Task 71),
+// not LOOP-03; g3 is a later candidate with the repeat spent, so LOOP-03.
 (() => {
   const s = newSession();
   check('whats up', { action: 'gk_unknown' }, { session: s, assert: (r, resp, se) =>
     se.noActionCount === 1 && se.completedLoops === 0 && se.repairCount === 0 && resp.responseId === 'LOOP-03' ? null : `g1 noAction=${se.noActionCount} loops=${se.completedLoops} repair=${se.repairCount} rid=${resp.responseId}` });
   check('why do dogs sniff other dogs bums', { action: 'gk_unknown' }, { session: s, assert: (r, resp, se) =>
-    se.noActionCount === 2 && resp.responseId === 'LOOP-03' ? null : `g2 noAction=${se.noActionCount} rid=${resp.responseId}` });
+    se.noActionCount === 2 && resp.responseId === 'LOOP-01' ? null : `g2 noAction=${se.noActionCount} rid=${resp.responseId}` });
   check('what type of jobs do dogs do', { action: 'gk_unknown' }, { session: s, assert: (r, resp, se) =>
     se.noActionCount === 3 && resp.responseId === 'LOOP-03' ? null : `g3 noAction=${se.noActionCount} rid=${resp.responseId}` });
   check('whats your name', { action: 'gk_unknown' }, { session: s, assert: (r, resp, se) =>
@@ -1548,17 +1548,17 @@ check('cost', { action: 'price_answer' });
 // count 2 -> LOOP-02 names the destination; count 3 -> LOOP-03; count 4 -> LOOP-04 (Ok./Right.).
 (() => {
   const s = newSession();
-  check('game', { action: 'fallback' }, { session: s, assert: (r, resp) => resp.responseId === 'LOOP-01' && resp.text === 'game?' ? null : `c1 ${resp.responseId} "${resp.text}"` });
+  check('game', { action: 'fallback' }, { session: s, assert: (r, resp) => resp.responseId === 'LOOP-01' && resp.text === 'Game?' ? null : `c1 ${resp.responseId} "${resp.text}"` });
   check('game', { action: 'fallback' }, { session: s, assert: (r, resp) => resp.responseId === 'LOOP-02' && resp.text === 'The card game rules?' ? null : `c2 ${resp.responseId} "${resp.text}"` });
   check('game', { action: 'fallback' }, { session: s, assert: (r, resp) => resp.responseId === 'LOOP-03' && ['Huh.', 'Hmm.'].includes(resp.text) ? null : `c3 ${resp.responseId} "${resp.text}"` });
   check('game', { action: 'fallback' }, { session: s, assert: (r, resp, se) => resp.responseId === 'LOOP-04' && ['Ok.', 'Right.'].includes(resp.text) && se.completedLoops === 1 ? null : `c4 ${resp.responseId} "${resp.text}" loops=${se.completedLoops}` });
 })();
-// LOOP-02 is candidate-driven: a candidate with NO destination ("dog") skips LOOP-02, so count 2
-// goes straight to LOOP-03. And ':)' is never served by the loop (only grief's ':(').
+// Task 71: a dog candidate repeats on the first candidate turn ("Dogs?", capitalised), then
+// offers the breed hub at LOOP-02 (Fault 2: dog words now map to the hub, agreeing with confirm).
 (() => {
   const s = newSession();
-  check('why do dogs yawn', { action: 'gk_unknown' }, { session: s, assert: (r, resp) => resp.responseId === 'LOOP-01' && resp.text === 'dog?' ? null : `s1 ${resp.responseId} "${resp.text}"` });
-  check('why do dogs yawn', { action: 'gk_unknown' }, { session: s, assert: (r, resp) => resp.responseId === 'LOOP-03' ? null : `s2 should skip LOOP-02: ${resp.responseId}` });
+  check('why do dogs yawn', { action: 'gk_unknown' }, { session: s, assert: (r, resp) => resp.responseId === 'LOOP-01' && resp.text === 'Dogs?' ? null : `s1 ${resp.responseId} "${resp.text}"` });
+  check('why do dogs yawn', { action: 'gk_unknown' }, { session: s, assert: (r, resp) => resp.responseId === 'LOOP-02' && resp.text === 'The dog breeds?' ? null : `s2 ${resp.responseId} "${resp.text}"` });
 })();
 // GRIEF ROUTE. The bereavement sequence "I used to have a dog" -> "it ran away" -> "I miss her"
 // ends on the grief line every turn, never Huh./Ok./a goodbye, and never enters the loop
@@ -1684,6 +1684,30 @@ check('where can I get it?', { action: 'gk_unknown' });
 check('how do I get the cards', { action: 'open_discount_popup' }); // get verb + "cards"
 check('where can I get the game?', { action: 'open_discount_popup' }); // get verb + "game" (the gap the rule closes)
 check('where can I get the deck?', { action: 'open_discount_popup' }); // get verb + "deck"
+
+// ---- Task 71: LOOP-01 fires on the first candidate turn, and dog subjects agree with confirm ----
+// The traced session: a blank opening (LOOP-03) no longer spends the repeat; the first
+// candidate-bearing turn repeats the subject (LOOP-01 "Dogs?"), then a yes routes to the hub.
+(() => {
+  const s = newSession();
+  check('learn', {}, { session: s, assert: (_r, resp) => resp.responseId === 'LOOP-03' && resp.text === 'Huh.' ? null : `t1 ${resp.responseId} "${resp.text}"` });
+  check('I wa to know about dogs', {}, { session: s, assert: (_r, resp) => resp.responseId === 'LOOP-01' && resp.text === 'Dogs?' ? null : `t2 ${resp.responseId} "${resp.text}"` });
+  check('yes', { action: 'breed_hub' }, { session: s });
+})();
+// Second session: a no after the repeat advances the loop rather than routing to the hub.
+(() => {
+  const s = newSession();
+  check('learn', {}, { session: s, assert: (_r, resp) => resp.responseId === 'LOOP-03' ? null : `t1 ${resp.responseId}` });
+  check('I wa to know about dogs', {}, { session: s, assert: (_r, resp) => resp.responseId === 'LOOP-01' && resp.text === 'Dogs?' ? null : `t2 ${resp.responseId} "${resp.text}"` });
+  check('no', {}, { session: s, assert: (r, resp) => resp.responseId === 'LOOP-03' && r.action !== 'breed_hub' ? null : `t3 advanced wrong: ${resp.responseId}/${r.action}` });
+})();
+// The repeat is once per loop and resets with the loop: two candidate turns in a row give
+// LOOP-01 then LOOP-02 (offer), not LOOP-01 twice.
+(() => {
+  const s = newSession();
+  check('why do dogs yawn', {}, { session: s, assert: (_r, resp, se) => resp.responseId === 'LOOP-01' && se.loopRepeatUsed === true ? null : `r1 ${resp.responseId} used=${se.loopRepeatUsed}` });
+  check('why do dogs yawn', {}, { session: s, assert: (_r, resp) => resp.responseId === 'LOOP-02' ? null : `r2 ${resp.responseId}` });
+})();
 // All the accepted affirmation forms confirm after a loop offer; an unrelated reply does not.
 (() => {
   let ok = true, note = '';
@@ -1709,7 +1733,7 @@ check('where can I get the deck?', { action: 'open_discount_popup' }); // get ve
     ['labrador', 'Labrador'], // a known breed -> canonical
     ['tell me about labradors', 'Labrador'], // plural, still canonical
     ['staffy', 'Staffordshire Bull Terrier'], // an alias -> canonical breed
-    ['why do dogs yawn', 'dog'], // dogs is now on the list
+    ['why do dogs yawn', 'dogs'], // dog-family candidate canonicalises to the plural "dogs" (Task 71)
     ['games', 'game'], // plural game word, inside-world
     ['I want a Six pack', null], // pack is EXCLUDED, no other entity -> no candidate
     ['whats up', null], // no inside-world entity -> no candidate
@@ -1727,7 +1751,7 @@ check('where can I get the deck?', { action: 'open_discount_popup' }); // get ve
 (() => {
   const s = newSession();
   check('why do dogs yawn', { action: 'gk_unknown' }, { session: s, assert: (r, resp, se) =>
-    se.candidateSubject === 'dog' ? null : `candidate not stored on fallback-family turn: ${JSON.stringify(se.candidateSubject)}` });
+    se.candidateSubject === 'dogs' ? null : `candidate not stored on fallback-family turn: ${JSON.stringify(se.candidateSubject)}` });
   check('tell me about labradors', { action: 'breed_page' }, { session: s, assert: (r, resp, se) =>
     se.candidateSubject === null ? null : `candidate not cleared on a successful route: ${JSON.stringify(se.candidateSubject)}` });
 })();

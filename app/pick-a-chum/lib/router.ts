@@ -690,8 +690,9 @@ function matchDogName(c: string): Dog | null {
 // as whole words only (no fuzz), like the other bare-word sets in this file, so a longer
 // word is never fuzzed into a false entity.
 const INSIDE_WORLD_WORDS = [
-  // Dogs
-  'dog', 'dogs', 'doggy', 'puppy', 'pup', 'breed', 'breeds',
+  // Dogs. 'dogs' before 'dog' so the dog-family candidate canonicalises to the plural "dogs"
+  // (Task 71), the way 'cards' is the canonical game word; both "dog" and "dogs" resolve to it.
+  'dogs', 'dog', 'doggy', 'puppy', 'pup', 'breeds', 'breed',
   // Game
   'cards', 'deck', 'set', 'rules', 'play', 'chums', 'game',
   // Site

@@ -119,10 +119,20 @@ const ORIENT_LINE = 'Ask about the game or a dog. I know both departments.';
 // LOOP-02 is skipped and the turn serves LOOP-03 instead. PLACEHOLDER: the exact offer wording
 // is logged in PLACEHOLDERS.md.
 const LOOP_02_GAME_WORDS = new Set(['cards', 'deck', 'set', 'rules', 'play', 'chums', 'game']);
+// Task 71 (Fault 2): the generic dog words map to the breed hub for LOOP-02, exactly as the
+// confirmation path (confirmResolution in router.ts) maps them, so the offer and the yes-route
+// agree. Keep this set in step with CONFIRM_DOG_WORDS.
+const LOOP_02_DOG_WORDS = new Set(['dog', 'dogs', 'doggy', 'puppy', 'pup', 'breed', 'breeds']);
 function loopRouteFor(candidate: string): string | null {
   if (/^[A-Z]/.test(candidate)) return `The ${candidate} page?`; // a resolved breed candidate is a Title-Case breed name
   if (LOOP_02_GAME_WORDS.has(candidate)) return 'The card game rules?';
+  if (LOOP_02_DOG_WORDS.has(candidate)) return 'The dog breeds?'; // -> breed hub (agrees with confirmResolution)
   return null; // no destination -> skip LOOP-02
+}
+// Task 71: LOOP-01 repeats the subject as a one-word question, first letter capitalised
+// ("dogs" -> "Dogs?", "game" -> "Game?"); a breed title is already capitalised.
+function capitalise(s: string): string {
+  return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
 export function submit(data: ChumData, session: Session, input: string): Turn {
@@ -280,16 +290,19 @@ export function submit(data: ChumData, session: Session, input: string): Turn {
     session.noActionCount += 1;
     const count = session.noActionCount;
     const subject = session.candidateSubject;
-    // LOOP-02 fires at count 2 only when the candidate maps to a destination; otherwise the
-    // turn falls through to LOOP-03 ("skip to Huh.").
+    // LOOP-02 (the destination offer) fires at count 2 when the candidate maps to a destination.
     const loopRoute = count === 2 && subject ? loopRouteFor(subject) : null;
     if (session.completedLoops >= 2 && !session.candidateEverFound && !session.orientServed) {
       response.text = ORIENT_LINE;
       response.responseId = 'ORIENT';
       session.orientServed = true;
-    } else if (count === 1 && subject) {
-      response.text = `${subject}?`;
+    } else if (subject && !session.loopRepeatUsed) {
+      // Task 71 (Fault 1): the repeat fires on the FIRST candidate-bearing turn of the loop, once,
+      // not at count === 1. A blank opening turn no longer spends it, so a subject found on a later
+      // turn is still repeated rather than downgraded to the puzzled line.
+      response.text = `${capitalise(subject)}?`;
       response.responseId = 'LOOP-01';
+      session.loopRepeatUsed = true;
     } else if (count === 2 && loopRoute) {
       response.text = loopRoute;
       response.responseId = 'LOOP-02';
@@ -306,9 +319,11 @@ export function submit(data: ChumData, session: Session, input: string): Turn {
     if (count >= 4) {
       session.noActionCount = 0;
       session.completedLoops += 1;
+      session.loopRepeatUsed = false; // Task 71: a new loop begins, so the repeat is available again
     }
   } else {
     session.noActionCount = 0;
+    session.loopRepeatUsed = false; // Task 71: a non-fallback turn breaks the loop, resetting the repeat
     session.pendingConfirm = null;
   }
 
