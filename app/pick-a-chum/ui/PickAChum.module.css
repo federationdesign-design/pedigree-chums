@@ -62,6 +62,14 @@
   outline: 3px solid var(--pc-ui-yellow);
   outline-offset: 3px;
 }
+/* Launcher icon (Task 62): Steve's approved SVG mark, sized to the same 60% box
+   the previous inline placeholder svg used, so the launcher's size and position
+   are unchanged. object-fit keeps the art's aspect ratio inside that box. */
+.launcherIcon {
+  width: 60%;
+  height: 60%;
+  object-fit: contain;
+}
 
 /* ---- Overlay root ----
    Same stacking band as the launcher (below cookie 55 / nav 100 / offer 120):
