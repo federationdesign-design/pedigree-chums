@@ -2010,7 +2010,18 @@ export default function BreedTree({
     // is deliberately unchanged: it is so much bigger that 0.09 already draws
     // about the same number of pixels as a chip. Deeper rings still taper, so
     // a ring never swallows a small picture, but far more gently than before.
-    const fracPit = [0.09, 0.19, 0.17, 0.155, 0.145];
+    // TAPERED, 30 July. Was [0.09, 0.19, 0.17, 0.155, 0.145], which barely
+    // tapered at all: from depth 1 to depth 2 the fraction fell 2 points where
+    // the chum page's table falls a quarter. A ring is a fraction of its own
+    // radius, so a nearly flat table means a small circle wears a ring that is
+    // absolutely thinner but PROPORTIONALLY just as heavy, and a screenshot of
+    // one dropped on top of another showed the two the same width.
+    //
+    // Depth 1 is left at 0.19 deliberately. That figure exists so a nested
+    // circle does not read thin beside a percentage chip of similar size, which
+    // wears 0.19 of its own radius, and depth 1 is where the two sit as a pair.
+    // Below that the pair no longer applies and the taper is free to be real.
+    const fracPit = [0.09, 0.19, 0.13, 0.1, 0.085];
     let base = (dockAside ? fracPit[d.depth - 1] ?? 0.145 : frac[d.depth - 1] ?? 0.043);
     // The ring still grows and shrinks with the circle, which is the part that
     // works. This only shaves the top of the slider, where the circles are so
