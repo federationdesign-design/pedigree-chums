@@ -1707,9 +1707,16 @@ export default function BreedTree({
   const cdTickRef = useRef<number | null>(null);
   const cdElRef = useRef<HTMLDivElement | null>(null);
   const cdGraceRef = useRef(0);
+  // Set the moment the round is handed back to the shell. The occupancy poll
+  // in the sim effect deliberately outlives the physics loop, so without this
+  // it would carry on testing a pit whose round is already over.
+  const pitEndedRef = useRef(false);
+  // Handle for the occupancy poll. A ref rather than a local because the
+  // effect's cleanup sits outside the block the sim is built in.
+  const fullPollRef = useRef(0);
   const runCountdown = () => {
     const st = stageRef.current;
-    if (!st) { onPitFull?.(); return; }
+    if (!st) { pitEndedRef.current = true; onPitFull?.(); return; }
     const el = document.createElement("div");
     // MOBILE: top right, out of the middle of the pit, so the digits do not sit
     // over the thing you are trying to play. Desktop keeps the centre, where
@@ -1767,7 +1774,7 @@ export default function BreedTree({
         el.style.background =
           "radial-gradient(120% 120% at 50% 40%, rgba(15,65,165,0.31), rgba(8,34,100,0.43))";
         el.style.transition = "background 0.35s ease";
-        window.setTimeout(() => { el.remove(); cdElRef.current = null; onPitFull?.(); }, 1400);
+        window.setTimeout(() => { el.remove(); cdElRef.current = null; pitEndedRef.current = true; onPitFull?.(); }, 1400);
       }, 1200);
     }, 1000);
     cdTickRef.current = tick;
@@ -3635,8 +3642,99 @@ export default function BreedTree({
       let acc = 0;
       let lastT: number | null = null;
       let started = performance.now();
+      // The physics loop's own clock is reset by every wake, so it cannot be
+      // used to hold the settle-in window open: anything nudged in the pit
+      // would restart the four seconds and the poll below would almost never
+      // be allowed to run. This one is set once per level and never reset.
+      const fullClock = performance.now();
+      pitEndedRef.current = false; // fresh sim, the poll is live again
       let stillFrames = 0;
       const SETTLE_PS = vps(0.012);
+      // pit-full: settled bodies whose tops reach the spawn zone, pit-style.
+      //
+      // LIFTED OUT OF THE PHYSICS LOOP. This used to sit inside step(), which
+      // exits once everything has settled: exactly the state a full pit ends
+      // in. So a pit that filled and came to rest was never tested and the
+      // countdown never started, and a pit that was cleared and came to rest
+      // was never re-tested, so the digits kept running. Both halves of the
+      // test needed a caller that is not tied to motion. It now has two: the
+      // loop, unchanged, and the poll below.
+      const checkFull = (now: number) => {
+        if (now - fullClock < 4000 || now <= cdGraceRef.current) return;
+        const zoneY = v[1] + (-vbHf / 2 + 150 * uppW) / k;
+        // "Full" used to mean five settled bodies reaching the top zone, a
+        // count borrowed from the main pit, which always holds dozens of
+        // cards. Half the mini pit trees have two or three circles, so the pit
+        // could be visibly stuffed while the count sat at 2 and the round
+        // never ended: the top of the difficulty slider did nothing on those
+        // trees, because the game could not see it had run out of room.
+        //
+        // Occupancy is what full actually means. Take every settled body whose
+        // top reaches the zone, merge their horizontal spans so two circles
+        // side by side are not counted twice, and compare against the width
+        // between the pit walls. Tree size stops mattering.
+        const spans: [number, number][] = [];
+        let inZone = 0;
+        const occupy = (x: number, y: number, r: number, vx: number, vy: number, held?: boolean) => {
+          if (held) return;
+          if (Math.hypot(vx, vy) > worldH * 0.03) return;
+          if (y - r < zoneY) { inZone++; spans.push([x - r, x + r]); }
+        };
+        for (const b of all) occupy(b.x, b.y, b.r, b.vx, b.vy, b.held);
+        // The CHUM CARDS count too. They never did, because `all` is only the
+        // level's own dogs and their chips, and the chums live in their own
+        // list. On a two-circle level that left the test looking at four
+        // objects while the screen filled with seventeen chum cards, so a pit
+        // that was visibly stuffed never reached the threshold and the
+        // countdown never started. Their body is a square of side `dia`, so
+        // half of that is the radius the span wants. Their world radius is
+        // recovered from the drawn size the same way everything else here is.
+        for (const c of chumBodiesRef.current) {
+          const cr = ((c.mb?.bounds?.max?.x ?? 0) - (c.mb?.bounds?.min?.x ?? 0)) / 2 / pxPerWorld;
+          if (cr > 0) occupy(c.x, c.y, cr, c.vx, c.vy, c.held);
+        }
+        let covered = 0;
+        if (spans.length) {
+          spans.sort((p1, p2) => p1[0] - p2[0]);
+          let cs = spans[0][0], ce = spans[0][1];
+          for (let si = 1; si < spans.length; si++) {
+            const [s2, e2] = spans[si];
+            if (s2 > ce) { covered += ce - cs; cs = s2; ce = e2; }
+            else if (e2 > ce) ce = e2;
+          }
+          covered += ce - cs;
+        }
+        // the real distance between the walls, not the viewBox, which reaches
+        // well past the visible stage
+        const pitW = (xR - xL) || 1;
+        const blocked = spans.length > 0 && covered / pitW >= PIT_FULL_COVER;
+        const full = blocked || inZone >= 5;
+        if (full && !fullTriggeredRef.current) {
+          fullTriggeredRef.current = true;
+          runCountdown();
+        } else if (!full && fullTriggeredRef.current && !floorTriggeredRef.current) {
+          // ROOM AGAIN, so the countdown is called off mid-count, exactly as
+          // the main pit does it: collect the dogs or throw the toys out and
+          // the digits go away.
+          //
+          // Written out here rather than as a helper on purpose. A plain
+          // function in the COMPONENT BODY that touches refs and setState
+          // reads as render work to the compiler. This is safe because it
+          // lives inside the sim effect, not the body, and is only ever
+          // reached from the loop or the poll, both of which are effects.
+          if (cdTickRef.current !== null) { window.clearInterval(cdTickRef.current); cdTickRef.current = null; }
+          if (cdElRef.current) { cdElRef.current.remove(); cdElRef.current = null; }
+          setFullAlpha(0);
+          fullTriggeredRef.current = false;
+          // Paired with the flag above: this branch only runs for a pit-full
+          // countdown, but clearing both keeps the two in step if the cancel
+          // ever gets another caller.
+          floorTriggeredRef.current = false;
+          // The same 2.5s grace the main pit allows, so clearing one object
+          // cannot leave the digits flickering on and off at the threshold.
+          cdGraceRef.current = now + 2500;
+        }
+      };
       const step = (nowRaf: number) => {
         const now = performance.now();
         if (lastT === null) lastT = nowRaf;
@@ -3818,81 +3916,7 @@ export default function BreedTree({
         }
         zoomTo(viewRef.current, now);
         drawNumbers(now, viewRef.current);
-        // pit-full: settled bodies whose tops reach the spawn zone, pit-style
-        if (now - started > 4000 && now > cdGraceRef.current) {
-          const zoneY = v[1] + (-vbHf / 2 + 150 * uppW) / k;
-          // "Full" used to mean five settled bodies reaching the top zone, a
-          // count borrowed from the main pit, which always holds dozens of
-          // cards. Half the mini pit trees have two or three circles, so the pit
-          // could be visibly stuffed while the count sat at 2 and the round
-          // never ended: the top of the difficulty slider did nothing on those
-          // trees, because the game could not see it had run out of room.
-          //
-          // Occupancy is what full actually means. Take every settled body whose
-          // top reaches the zone, merge their horizontal spans so two circles
-          // side by side are not counted twice, and compare against the width
-          // between the pit walls. Tree size stops mattering.
-          const spans: [number, number][] = [];
-          let inZone = 0;
-          const occupy = (x: number, y: number, r: number, vx: number, vy: number, held?: boolean) => {
-            if (held) return;
-            if (Math.hypot(vx, vy) > worldH * 0.03) return;
-            if (y - r < zoneY) { inZone++; spans.push([x - r, x + r]); }
-          };
-          for (const b of all) occupy(b.x, b.y, b.r, b.vx, b.vy, b.held);
-          // The CHUM CARDS count too. They never did, because `all` is only the
-          // level's own dogs and their chips, and the chums live in their own
-          // list. On a two-circle level that left the test looking at four
-          // objects while the screen filled with seventeen chum cards, so a pit
-          // that was visibly stuffed never reached the threshold and the
-          // countdown never started. Their body is a square of side `dia`, so
-          // half of that is the radius the span wants. Their world radius is
-          // recovered from the drawn size the same way everything else here is.
-          for (const c of chumBodiesRef.current) {
-            const cr = ((c.mb?.bounds?.max?.x ?? 0) - (c.mb?.bounds?.min?.x ?? 0)) / 2 / pxPerWorld;
-            if (cr > 0) occupy(c.x, c.y, cr, c.vx, c.vy, c.held);
-          }
-          let covered = 0;
-          if (spans.length) {
-            spans.sort((p1, p2) => p1[0] - p2[0]);
-            let cs = spans[0][0], ce = spans[0][1];
-            for (let si = 1; si < spans.length; si++) {
-              const [s2, e2] = spans[si];
-              if (s2 > ce) { covered += ce - cs; cs = s2; ce = e2; }
-              else if (e2 > ce) ce = e2;
-            }
-            covered += ce - cs;
-          }
-          // the real distance between the walls, not the viewBox, which reaches
-          // well past the visible stage
-          const pitW = (xR - xL) || 1;
-          const blocked = spans.length > 0 && covered / pitW >= PIT_FULL_COVER;
-          const full = blocked || inZone >= 5;
-          if (full && !fullTriggeredRef.current) {
-            fullTriggeredRef.current = true;
-            runCountdown();
-          } else if (!full && fullTriggeredRef.current && !floorTriggeredRef.current) {
-            // ROOM AGAIN, so the countdown is called off mid-count, exactly as
-            // the main pit does it: collect the dogs or throw the toys out and
-            // the digits go away.
-            //
-            // Written out here rather than as a helper on purpose. A plain
-            // function in the component body that touches refs and setState
-            // reads as render work to the compiler, and this runs inside the
-            // physics loop, which is the opposite of render.
-            if (cdTickRef.current !== null) { window.clearInterval(cdTickRef.current); cdTickRef.current = null; }
-            if (cdElRef.current) { cdElRef.current.remove(); cdElRef.current = null; }
-            setFullAlpha(0);
-            fullTriggeredRef.current = false;
-            // Paired with the flag above: this branch only runs for a pit-full
-            // countdown, but clearing both keeps the two in step if the cancel
-            // ever gets another caller.
-            floorTriggeredRef.current = false;
-            // The same 2.5s grace the main pit allows, so clearing one object
-            // cannot leave the digits flickering on and off at the threshold.
-            cdGraceRef.current = now + 2500;
-          }
-        }
+        checkFull(now);
         stillFrames = still ? stillFrames + 1 : 0;
         if ((stillFrames < 12 || numbers.length > 0) && now - started < 30000) {
           fallRafRef.current = requestAnimationFrame(step);
@@ -3910,6 +3934,19 @@ export default function BreedTree({
         started = performance.now(); // fresh time budget each wake
         fallRafRef.current = requestAnimationFrame(step);
       };
+      // The second caller for checkFull, and the reason the bug is fixed. It
+      // re-arms itself on a timer and is not tied to motion, which is the main
+      // pit's own answer to the same problem: `scheduleIdleCheck` in
+      // PackPit.tsx. 400ms is fast enough that the digits appear promptly on a
+      // pit that has just come to rest, and cheap enough to leave running.
+      const FULL_POLL_MS = 400;
+      const fullPoll = () => {
+        if (pitEndedRef.current) return; // round handed to the shell, stop
+        checkFull(performance.now());
+        fullPollRef.current = window.setTimeout(fullPoll, FULL_POLL_MS);
+      };
+      window.clearTimeout(fullPollRef.current);
+      fullPollRef.current = window.setTimeout(fullPoll, FULL_POLL_MS);
       // Shake: pit-style jolt of everything in the mini pit (pit velocities, verbatim px/step).
       shakeInnerRef.current = () => {
         for (const b of all) if (b.mb && b.mbIn && !b.held) {
@@ -4046,7 +4083,7 @@ export default function BreedTree({
       shakeInnerRef.current?.();
     });
     // No timer: the circles hang until the visitor presses START.
-    return () => { cancelAnimationFrame(fallRafRef.current); matterCleanupRef.current?.(); matterCleanupRef.current = null; };
+    return () => { cancelAnimationFrame(fallRafRef.current); window.clearTimeout(fullPollRef.current); matterCleanupRef.current?.(); matterCleanupRef.current = null; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gravity, entered, nodes]);
 
