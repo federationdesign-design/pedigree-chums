@@ -5202,7 +5202,7 @@ export default function BreedTree({
                     // behind the glyph so the letterforms stay clean.
                     fill: "#ffffff",
                     stroke: "#000000",
-                    strokeWidth: `${7 * upp}px`, // 4, up three points by request
+                    strokeWidth: `${9 * upp}px`, // 4, then 7, now 9: two rounds of +3 and +2
                     paintOrder: "stroke",
                     strokeLinejoin: "round",
                     fontFamily: "var(--font-display), system-ui, sans-serif",
@@ -5244,7 +5244,7 @@ export default function BreedTree({
                 style={{
                   fill: "#000000",
                   stroke: "#ffffff",
-                  strokeWidth: `${7 * upp}px`, // 4, up three points by request
+                  strokeWidth: `${9 * upp}px`, // 4, then 7, now 9: two rounds of +3 and +2
                   paintOrder: "stroke",
                   strokeLinejoin: "round",
                   fontFamily: "var(--font-display), system-ui, sans-serif",
