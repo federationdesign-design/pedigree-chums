@@ -746,6 +746,7 @@
   /* 20px clear of the row of links above. */
   /* Tighter under the text. */
   margin: 20px 0 -6px;
+  order: 3;
 }
 
 /* White type on the blue, not blue type on the yellow. White alone would not
@@ -761,9 +762,16 @@
   color: #ffffff;
   background: #22c55e;
   border-radius: var(--radius-pill, 999px);
+  /* Only as wide as its words. It was stretching to the full card width
+     because a flex item in a column stretches unless told otherwise. */
+  align-self: center;
+  width: fit-content;
+  /* Straight under the button. */
+  order: 1;
   /* 10% more top and bottom, 12 to 13.2. */
   /* Wider than it is tall: 26px to 42px on the sides, top and bottom held. */
-  padding: 18px 42px;
+  /* 10px more at the top only, bottom held at 18. */
+  padding: 28px 42px 18px;
 }
 
 /* The smaller line under the button. */
@@ -775,6 +783,7 @@
   color: #0a3a57;
   text-align: center;
   max-width: 30ch;
+  order: 2;
 }
 
 /* ---- Dog screen: rail leg, card, marker row, rail leg ------------------ */
@@ -882,6 +891,7 @@
   flex-direction: row;
   justify-content: center;
   gap: 14px;
+  order: 4;
 }
 
 /* 33% down from 80. */
@@ -911,7 +921,8 @@
    dark blue whatever colours the SVG itself carries. An <img> cannot be
    recoloured from CSS; a mask can. */
 .backFlip {
-  left: 14px;
+  /* Top right, matching where it sits on the picture side. */
+  right: 14px;
   /* 20% down from 80. NO border-radius: the round frame was cropping the
      artwork. The mask is `contain`, so the whole SVG shows. */
   width: 64px;
