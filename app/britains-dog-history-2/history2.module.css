@@ -322,10 +322,16 @@
   font-weight: 600;
   color: #ffffff;
   line-height: 1.1;
-  /* 15px from the title. The panel's own flex gap is 12, so this adds the
-     remaining 3. Shorthand rather than a margin-top longhand, so a later
-     `margin` of equal specificity cannot silently wipe it. */
-  margin: 3px 0 0;
+  /* 22px from the title on screen, half what it was.
+     MEASURED, not estimated. In a 908x1516 screenshot at a device pixel ratio
+     of 2, the bottom of the GREEDY glyphs sat at y1039 and the top of this
+     line at y1128: 88 device pixels, so 44 CSS px. Only 15 of that was CSS.
+     The other 29 is empty space inside the two line boxes, most of it the
+     descender room Luckiest Guy reserves under a word in capitals.
+     So the visible gap is `margin-top + 41`, and 22px needs -19.
+     Shorthand rather than a longhand, so a later `margin` of equal
+     specificity cannot silently wipe it. */
+  margin: -19px 0 0;
 }
 
 /* Round, centred, half the panel width, above the words. aspect-ratio keeps
