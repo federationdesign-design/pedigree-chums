@@ -616,7 +616,6 @@
   z-index: 1;
   /* 95vw, up from 78. Cap raised in proportion, 340 x 95/78. */
   width: min(95vw, 414px);
-  aspect-ratio: 1 / 1;
 }
 
 .dogFlipCard {
@@ -634,17 +633,20 @@
 
 .dogFlipInner {
   position: relative;
-  display: block;
+  /* Both faces occupy the SAME grid cell, so this box is automatically as tall
+     as whichever face is taller. That is what makes the yellow side fit its own
+     words on every dog without a fixed height or any measuring: a long note
+     simply makes the card taller, a short one leaves it square. */
+  display: grid;
   width: 100%;
-  height: 100%;
   transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
   transform-style: preserve-3d;
 }
 
 .dogFront,
 .dogBack {
-  position: absolute;
-  inset: 0;
+  grid-area: 1 / 1;
+  min-width: 0;
   border-radius: var(--radius-card, 22px);
   overflow: hidden;
   backface-visibility: hidden;
@@ -653,6 +655,9 @@
 
 .dogFront {
   background: #ffffff;
+  /* The picture holds the square. The back face is free to be taller. */
+  aspect-ratio: 1 / 1;
+  position: relative;
 }
 
 /* Hidden outright once the card turns, the same trick the desktop page uses on
