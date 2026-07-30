@@ -25,9 +25,18 @@ import styles from "./history2.module.css";
   roll is: a timer fires at the wrong moment on a slow swipe.
 */
 
-/* The outbound reference on the back of a card. */
-const OUTBOUND =
-  "https://penelope.uchicago.edu/Thayer/e/roman/texts/strabo/4e%2A.html";
+/* Outbound references on the back of a card, top to bottom.
+   The utm_source=chatgpt.com parameter has been stripped from the two new
+   links: it is an artefact of where they were found and would send a false
+   referrer. Say if you want it kept. */
+const OUTBOUND: { href: string; tone: "blue" | "green" | "black" }[] = [
+  { href: "https://penelope.uchicago.edu/Thayer/e/roman/texts/strabo/4e%2A.html", tone: "blue" },
+  { href: "https://www.gutenberg.org/cache/epub/78013/pg78013-images.html", tone: "green" },
+  { href: "https://en.wikipedia.org/wiki/List_of_extinct_dog_breeds", tone: "black" },
+];
+
+const WARNING =
+  "You are about to be linked to another site (and dogs), and we can't control anything from this point. Remember to come back and carry on exploring";
 
 const TAG_LABEL: Record<string, string> = {
   extinct: "Extinct",
@@ -174,29 +183,33 @@ export default function TimelineRun({
                         }}
                       >
                       </span>
-                      {/* Top right: away to another site, with a warning first.
-                          A native confirm rather than a panel of our own: it
-                          cannot be missed, it cannot be styled away by the
-                          card's 3D transform, and it works with no extra
-                          state. Say if you would rather have a designed one. */}
-                      <span
-                        className={styles.backLink}
-                        role="button"
-                        tabIndex={0}
-                        aria-label="Read more about this dog on another site"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          const ok = window.confirm(
-                            "You are about to be linked to another site (and dogs), and we can't control anything from this point. Remember to come back and carry on exploring"
-                          );
-                          if (ok) window.open(OUTBOUND, "_blank", "noopener,noreferrer");
-                        }}
-                      >
-                        i
+                      {/* Top right: away to other sites, each with a warning
+                          first. A native confirm rather than a panel of our
+                          own: it cannot be missed and it cannot be clipped by
+                          the card's 3D transform. */}
+                      <span className={styles.backLinks}>
+                        {OUTBOUND.map((o) => (
+                          <span
+                            key={o.href}
+                            className={`${styles.backLink} ${styles[`backLink_${o.tone}`]}`}
+                            role="button"
+                            tabIndex={0}
+                            aria-label="Read more on another site"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (window.confirm(WARNING)) window.open(o.href, "_blank", "noopener,noreferrer");
+                            }}
+                          >
+                            i
+                          </span>
+                        ))}
                       </span>
                       <span className={styles.dogHint}>
-                        Tap to learn about the dogs you know today that come from
-                        this lineage root
+                        Tap to learn about this dog
+                      </span>
+                      <span className={styles.dogSub}>
+                        There dogs you know today came from this lineage route,
+                        discover them here
                       </span>
                     </span>
                   </span>

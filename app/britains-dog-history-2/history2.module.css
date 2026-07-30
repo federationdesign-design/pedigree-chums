@@ -721,8 +721,8 @@
 .dogNote {
   font-family: var(--font-body), system-ui, sans-serif;
   font-weight: 600;
-  /* Doubled from 1rem, then 2pt off. */
-  font-size: calc(2rem - 2pt);
+  /* Doubled from 1rem, then 4pt off. */
+  font-size: calc(2rem - 4pt);
   line-height: 1.1em;
 }
 
@@ -738,6 +738,17 @@
   background: var(--blue-deep, #0b78bd);
   border-radius: var(--radius-pill, 999px);
   padding: 12px 18px;
+}
+
+/* The smaller line under the button. */
+.dogSub {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--blue-deep, #0b78bd);
+  text-align: center;
+  max-width: 30ch;
 }
 
 /* ---- Dog screen: rail leg, card, marker row, rail leg ------------------ */
@@ -847,26 +858,49 @@
    information icon sat on the card itself and therefore showed on both faces,
    where it collided with the tree glyph in the same corner. */
 .backFlip,
-.backLink {
+/* The three outbound buttons, stacked down the right. */
+.backLinks {
   position: absolute;
   top: 14px;
-  /* Up from 60. */
-  width: 80px;
-  height: 80px;
+  right: 14px;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* 33% down from 80. */
+.backLink {
+  width: 54px;
+  height: 54px;
   border-radius: 50%;
+  border: 3px solid #ffffff;
+  box-sizing: border-box;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-sizing: border-box;
-  z-index: 2;
+  color: #ffffff;
+  font-family: Georgia, serif;
+  font-style: italic;
+  font-weight: 700;
+  font-size: 27px;
+  line-height: 1;
 }
+
+.backLink_blue { background: var(--blue-deep, #0c5b92); }
+.backLink_green { background: #22c55e; }
+.backLink_black { background: #111111; }
 
 /* The artwork is used as a MASK rather than an image, so it renders in the
    dark blue whatever colours the SVG itself carries. An <img> cannot be
    recoloured from CSS; a mask can. */
 .backFlip {
   left: 14px;
+  /* 20% down from 80. NO border-radius: the round frame was cropping the
+     artwork. The mask is `contain`, so the whole SVG shows. */
+  width: 64px;
+  height: 64px;
   background: var(--blue-deep, #0c5b92);
   -webkit-mask-image: url("/flip-icon.svg");
   mask-image: url("/flip-icon.svg");
