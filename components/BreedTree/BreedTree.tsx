@@ -259,6 +259,16 @@ const COOKIE_CONSENT_KEY = "pc-cookie-consent";
 function cookieConsentGiven(): boolean {
   try { return !!localStorage.getItem(COOKIE_CONSENT_KEY); } catch { return false; }
 }
+// The bone, brought over from the main pit. Its artboard is 205 x 100, and the
+// body it needs is a COMPOUND one: two end lobes and a shaft. A single capsule
+// the size of the bounding box leaves air above and below the shaft, which is
+// exactly the fault the stick's own three-part body was built to avoid.
+const TOY_BONE_SRC = "/big-bone.svg";
+const BONE_ASPECT = 205 / 100;
+const TOY_BONE_GONE_KEY = "pc-minipit-bone-gone";
+// Dropped after the rock and before the chums, so it lands on a floor that has
+// something on it rather than into an empty pit.
+const TOY_BONE_GAP = 900;
 const STICK_ASPECT = 1368 / 299.7;
 const ROCK_ASPECT = 756.3 / 659.2;
 // Used-up toys stay gone for the rest of the session: the flag once its message
@@ -318,11 +328,12 @@ const CHUM_VW = 0.1;
 const CHUM_BAND: Record<string, number> = { small: 5 / 6, medium: 1, large: 4 / 3, giant: 5 / 3 };
 // stickBig is the same artwork half again as large, so the pair reads as two
 // sticks of different sizes rather than one drawn twice
-type ToyKind = "ball" | "flag" | "stick" | "stickBig" | "rock" | "ballPink" | "cookies";
+type ToyKind = "ball" | "flag" | "stick" | "stickBig" | "rock" | "ballPink" | "cookies" | "bone";
 const TOY_SRC: Record<ToyKind, string> = {
   ball: TOY_BALL_SRC, flag: TOY_FLAG_SRC, stick: TOY_STICK_SRC,
   stickBig: TOY_STICK_SRC, rock: TOY_ROCK_SRC, ballPink: TOY_BALL_SRC,
   cookies: TOY_COOKIES_SRC,
+  bone: TOY_BONE_SRC,
 };
 // every prop except the flag leaves for good once it is thrown clear of the pit
 const TOY_GONE_KEY: Record<ToyKind, string> = {
@@ -330,6 +341,7 @@ const TOY_GONE_KEY: Record<ToyKind, string> = {
   stick: TOY_STICK_GONE_KEY, stickBig: TOY_STICK_BIG_GONE_KEY,
   rock: TOY_ROCK_GONE_KEY, ballPink: TOY_BALL_PINK_GONE_KEY,
   cookies: TOY_COOKIES_SEEN_KEY,
+  bone: TOY_BONE_GONE_KEY,
 };
 function toyRetired(key: string): boolean {
   try { return sessionStorage.getItem(key) === "1"; } catch { return false; }
@@ -2912,8 +2924,12 @@ export default function BreedTree({
           : kind === "stick" ? ballDia * 1.6
           : kind === "stickBig" ? ballDia * 1.6 * 1.5
           : kind === "cookies" ? BIGT * 3.2
+          // the bone reads at the stick's width: both are elongated props, and
+          // its 2.05 aspect makes it twice the stick's depth, so it lands as a
+          // substantial object rather than a twig
+          : kind === "bone" ? ballDia * 1.6
           : BIGT * 0.6 * 2;
-        const hgt = kind === "stick" || kind === "stickBig" ? dia / STICK_ASPECT : kind === "rock" ? dia / ROCK_ASPECT : kind === "cookies" ? dia / COOKIES_ASPECT : dia;
+        const hgt = kind === "stick" || kind === "stickBig" ? dia / STICK_ASPECT : kind === "rock" ? dia / ROCK_ASPECT : kind === "cookies" ? dia / COOKIES_ASPECT : kind === "bone" ? dia / BONE_ASPECT : dia;
         const r = dia / 2;
         // ball drops anywhere across the pit, flag comes in at 70% like the pit
         const px = kind === "flag"
@@ -2936,6 +2952,8 @@ export default function BreedTree({
           : kind === "rock" ? { restitution: 0.12, friction: 0.75, frictionStatic: 1.2, frictionAir: 0.006, density: 0.02 }
           : kind === "cookies" ? { restitution: 0.3, friction: 0.4, frictionAir: 0.012, density: 0.004 } // the main pit's own panel figures
           : kind === "stick" ? { restitution: 0.35, friction: 0.35, frictionAir: 0.004, density: 0.002 }
+          // the main pit's own bone figures, PackPit line 405
+          : kind === "bone" ? { restitution: 0.3, friction: 0.3, frictionAir: 0.012, density: 0.0008 }
           : { restitution: 0.5, friction: 0.3, frictionAir: 0.004, density: 0.006 };
         // A long thin body needs a real rectangle or it spins like a propeller.
         // Chamfered, so it reads as a rounded stick and cannot catch on a corner.
@@ -2971,6 +2989,23 @@ export default function BreedTree({
                 MBody.setAngle(body, startAngle);
                 return body;
               })()
+            : kind === "bone"
+              ? (() => {
+                  // Two end lobes and a shaft, the main pit's construction
+                  // scaled to this pit's pixels. Its artboard is 205 x 100 with
+                  // the lobes centred at x 25 and 180, radius 38, and a shaft
+                  // 130 x 28 through the middle: PackPit lines 406 to 412.
+                  const k4 = dia / 205;
+                  const lobe = 38 * k4;
+                  const parts = [
+                    Bodies.circle(px + (25 - 102.5) * k4, py, lobe, opts),
+                    Bodies.circle(px + (180 - 102.5) * k4, py, lobe, opts),
+                    Bodies.rectangle(px, py, 130 * k4, 28 * k4, { ...opts, chamfer: { radius: 14 * k4 } }),
+                  ];
+                  const body = MBody.create({ parts, ...opts });
+                  MBody.setAngle(body, (Math.random() - 0.5) * 0.6);
+                  return body;
+                })()
             : kind === "rock"
               ? Bodies.polygon(px, py, 7, r, { ...opts, chamfer: { radius: r * 0.12 } })
               : kind === "cookies"
@@ -3046,7 +3081,9 @@ export default function BreedTree({
         toyTimers.push(window.setTimeout(() => spawnToy("stick"), propsAt));
         toyTimers.push(window.setTimeout(() => spawnToy("stickBig"), propsAt));
         toyTimers.push(window.setTimeout(() => spawnToy("rock"), propsAt + TOY_ROCK_GAP));
-        toyTimers.push(window.setTimeout(spawnChums, propsAt + TOY_ROCK_GAP + CHUM_GAP));
+        const boneAt = propsAt + TOY_ROCK_GAP + TOY_BONE_GAP;
+        toyTimers.push(window.setTimeout(() => spawnToy("bone"), boneAt));
+        toyTimers.push(window.setTimeout(spawnChums, boneAt + CHUM_GAP));
       };
       spawnRodRef.current = (x1: number, y1: number, x2: number, y2: number, lit: boolean) => {
         const lenPx = Math.max(10, Math.hypot(x2 - x1, y2 - y1));
