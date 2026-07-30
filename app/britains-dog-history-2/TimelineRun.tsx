@@ -37,9 +37,12 @@ export default function TimelineRun({
   era,
   panelIndex,
   words,
+  note,
 }: {
   era: string;
   panelIndex: number;
+  /* The line that sits between the title and the head of the timeline. */
+  note: string;
   /* The era title, one word per line. It is the first SCREEN OF THIS RUN, not
      a horizontal slide of its own, so the reader scrolls down from it into
      the dogs rather than swiping sideways. */
@@ -86,14 +89,24 @@ export default function TimelineRun({
   return (
     <div className={styles.timelinePanel} data-pc-panel={panelIndex}>
       <div ref={runRef} className={styles.timelineRun}>
-        {/* Screen one: the era title and nothing else. */}
+        {/* Screen one: the era title, then the line that introduces the
+            timeline below it. */}
         <div className={styles.eraScreen}>
           {words.map((w, wi) => (
             <span key={wi} className={styles.eraWord}>
               {w}
             </span>
           ))}
+          <p className={styles.eraNote}>{note}</p>
         </div>
+
+        {/* Everything from here down carries the timeline. The rail is a child
+            of this wrapper rather than of the scroller, so it spans exactly
+            the dogs and starts where the title screen ends: the wrapper's own
+            height is the line's length, with no measuring involved. */}
+        <div className={styles.railWrap}>
+          <span className={styles.railDot} aria-hidden="true" />
+          <span className={styles.rail} aria-hidden="true" />
         {breeds.map((b) => {
           const isFlipped = flipped === b.name;
           return (
@@ -169,6 +182,7 @@ export default function TimelineRun({
             </div>
           );
         })}
+        </div>
       </div>
     </div>
   );

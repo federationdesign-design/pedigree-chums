@@ -471,7 +471,10 @@
      compiles clean for Safari 15 and Chrome, so no sticky element is needed. */
   scroll-snap-stop: always;
   box-sizing: border-box;
-  padding: 24px;
+  /* Extra room on the left for the rail, which the cards must not sit on.
+     Written into the shorthand rather than as a longhand above it: a
+     `padding-left` there would be silently wiped by this line. */
+  padding: 24px 24px 24px 60px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -491,6 +494,61 @@
   flex-direction: column;
   justify-content: center;
   gap: 4px;
+}
+
+/* The line between the title and the head of the timeline. */
+.eraNote {
+  margin: 22px 0 0;
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: #ffffff;
+  text-align: center;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
+}
+
+/* ---- The timeline rail ------------------------------------------------ */
+
+/* Wraps the dogs, not the whole scroller, so the rail's length is simply this
+   element's height. The line therefore starts where the title screen ends and
+   finishes with the last dog, with nothing measured in JavaScript. */
+.railWrap {
+  position: relative;
+}
+
+/* The vertical line. Copied from .stripRail::before in history.module.css,
+   which is the horizontal version on the desktop page: same 4px, same
+   rgba(255, 255, 255, 0.32), same pill radius. Turned on its side. */
+.rail {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 32px;
+  width: 4px;
+  background: rgba(255, 255, 255, 0.32);
+  border-radius: var(--radius-pill, 999px);
+  pointer-events: none;
+}
+
+/* The head of the timeline. Geometry copied from .node::before on the desktop
+   page: a 16px yellow disc with a 4px ring.
+   ONE DELIBERATE DIFFERENCE: the ring is WHITE here because that is what you
+   asked for. On the desktop page it is #008eff, which matches the background
+   and reads as a gap rather than an outline. */
+.railDot {
+  position: absolute;
+  top: 0;
+  left: 32px;
+  width: 16px;
+  height: 16px;
+  margin-left: -6px;
+  border-radius: 50%;
+  background: var(--yellow, #ffd23e);
+  border: 4px solid #ffffff;
+  box-sizing: border-box;
+  z-index: 1;
+  pointer-events: none;
 }
 
 /* Card geometry copied from .node / .flipCard in history.module.css, so the

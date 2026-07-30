@@ -61,7 +61,7 @@ const FACT_LIFT_PX = 60;
    put every counter after it out by one. */
 type Entry =
   | { type: "intro" }
-  | { type: "timeline"; era: string; words: string[] }
+  | { type: "timeline"; era: string; words: string[]; note: string }
   | { type: "section"; si: number };
 
 const SEQUENCE: Entry[] = [
@@ -72,7 +72,12 @@ const SEQUENCE: Entry[] = [
   // The vertical run: the era title, then eleven dogs, scrolled downwards
   // inside a single panel. The title is the top of this run rather than a
   // slide beside it.
-  { type: "timeline", era: "ancient-medieval", words: ["Ancient", "to", "medieval", "dogs"] },
+  {
+    type: "timeline",
+    era: "ancient-medieval",
+    words: ["Ancient", "to", "medieval", "dogs"],
+    note: "At the the start of time we did not have writing, so we can only really tell what has happened after we started writing stuff down",
+  },
   ...SECTIONS.slice(1).map((_, i) => ({ type: "section" as const, si: i + 1 })),
 ];
 
@@ -142,7 +147,13 @@ export default function HistoryV2Page() {
 
               if (entry.type === "timeline") {
                 return (
-                  <TimelineRun key={`t${ei}`} era={entry.era} panelIndex={first} words={entry.words} />
+                  <TimelineRun
+                    key={`t${ei}`}
+                    era={entry.era}
+                    panelIndex={first}
+                    words={entry.words}
+                    note={entry.note}
+                  />
                 );
               }
 
