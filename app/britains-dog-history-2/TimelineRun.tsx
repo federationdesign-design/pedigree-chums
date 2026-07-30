@@ -148,11 +148,16 @@ export default function TimelineRun({
         {/* Screen one: the era title, then the line that introduces the
             timeline below it. */}
         <div className={styles.eraScreen}>
-          {words.map((w, wi) => (
-            <span key={wi} className={styles.eraWord}>
-              {w}
-            </span>
-          ))}
+          {/* Held in a band exactly as deep as a section's photograph, and
+              bottom aligned inside it, so this title lands where the section
+              titles land instead of at a fixed distance from the top. */}
+          <span className={styles.eraTitleBand}>
+            {words.map((w, wi) => (
+              <span key={wi} className={styles.eraWord}>
+                {w}
+              </span>
+            ))}
+          </span>
           <p className={styles.eraNote}>{note}</p>
           {/* The head of the timeline sits on THIS screen, under the text, as
               in the concept. Its line reaches the foot of the screen and the

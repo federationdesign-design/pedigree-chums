@@ -151,6 +151,19 @@
 
 /* ---- Era title, the first screen of the vertical run ----------------- */
 
+/* The same band the section photograph occupies: .stickyTop is `flex: 0 0 52%`
+   and its title sits at the foot with 14px of padding. Matching both here puts
+   this title on exactly the same line as MEDIEVAL AND TUDOR BRITAIN, on any
+   screen height, rather than at a fixed 300px which only matched one. */
+.eraTitleBand {
+  flex: 0 0 52%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding-bottom: 14px;
+}
+
 /* One word per line, EXACTLY the section title's treatment: same 50pt, same
    0.9em leading, same 0.03em tracking, and left aligned on the same 24px edge
    the section titles sit on. It was 6rem less 5pt, which is why MEDIEVAL kept
@@ -510,7 +523,7 @@
      is LEFT and the disc can no longer land on the paragraph.
      Written into the shorthand: a padding-bottom above this line would be
      silently wiped by it. */
-  padding: 300px 24px 24px;
+  padding: 0 24px 24px;
   display: flex;
   flex-direction: column;
   /* 300px from the top, to sit where the section titles do. */
