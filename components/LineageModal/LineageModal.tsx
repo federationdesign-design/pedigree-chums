@@ -72,13 +72,6 @@ type Props = {
   lineage: LineageNode;
   onClose: () => void;
   nextLevelLabel?: string;
-  /* THE ERA JOIN. Set only when the next level sits in a different era from the
-     one just won, and only by a host that has somewhere to send the player.
-     When it is set the win screen offers the era rather than the next dog, and
-     the button hands back instead of loading another round.
-     The live history page never passes it, so nothing there changes. */
-  onNextEra?: () => void;
-  nextEraLabel?: string;
   initialScore?: number;
   onScoreChange?: (s: number) => void;
   onNextLevel?: () => void;
@@ -102,7 +95,7 @@ type Props = {
   era?: string;
 };
 
-export default function LineageModal({ name, image, character, lineage, onClose, nextLevelLabel, onNextLevel, onStartOver, initialScore, onScoreChange, era, lives, livesMax = 6, onLost, onSpendLife, onResetRun, nextLevelImage, levelNo, onNextEra, nextEraLabel }: Props) {
+export default function LineageModal({ name, image, character, lineage, onClose, nextLevelLabel, onNextLevel, onStartOver, initialScore, onScoreChange, era, lives, livesMax = 6, onLost, onSpendLife, onResetRun, nextLevelImage, levelNo }: Props) {
   const theme = levelThemeFor(era);
   // The close X asks before it closes. A round can take a couple of minutes to
   // build up, and losing it to a mis-tap in the corner is a rotten exit.
@@ -499,19 +492,7 @@ export default function LineageModal({ name, image, character, lineage, onClose,
               </div>
               <div className={css.winScore}>Your Round Score: {score.toLocaleString()}</div>
               <div className={css.winFlash}>Round Won</div>
-              {/* THE ERA IS DONE. Checked before the next-level block, because
-                  at a join both could be true and the era has to win: rolling
-                  straight into the next era's first dog is the thing this
-                  screen exists to stop. */}
-              {onNextEra ? (
-                <>
-                  <div className={css.winNextLead}>Era complete</div>
-                  <div className={css.winNextName}>{nextEraLabel}</div>
-                  <button type="button" className={`${css.endBtnGo} ${css.winGo}`} onClick={onNextEra}>
-                    Continue
-                  </button>
-                </>
-              ) : nextLevelLabel && onNextLevel ? (
+              {nextLevelLabel && onNextLevel ? (
                 <>
                   <div className={css.winNextLead}>Next Level Up...</div>
                   <div className={css.winNextName}>{nextLevelLabel}</div>
