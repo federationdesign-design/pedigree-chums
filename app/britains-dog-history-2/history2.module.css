@@ -557,19 +557,14 @@
   pointer-events: none;
 }
 
-/* The head of the timeline. Geometry copied from .node::before on the desktop
-   page: a 16px yellow disc with a 4px ring.
-   ONE DELIBERATE DIFFERENCE: the ring is WHITE here because that is what you
-   asked for. On the desktop page it is #008eff, which matches the background
-   and reads as a gap rather than an outline. */
+/* The head of the timeline. Positioned against the SCREEN, not against the
+   line: it was a child of the line, and the line is scaled to draw itself as
+   the reader scrolls, so the disc was scaled with it and came out as a flat
+   ellipse. `bottom: 22vh` is the line's own top edge, so it still sits on it. */
 .railDot {
   position: absolute;
-  bottom: 100%;
   left: 50%;
-  transform: translateX(-50%);
-  /* MEASURED: a 37px yellow disc inside a 5px white ring, 47px overall. Much
-     bigger than the desktop page's 16px dot, and ringed white not #008eff.
-     Sits on top of the line, so the line starts at the marker's foot. */
+  bottom: 22vh;
   width: 47px;
   height: 47px;
   border-radius: 50%;
@@ -577,11 +572,11 @@
   border: 5px solid #ffffff;
   box-sizing: border-box;
   pointer-events: none;
-  /* Held back 1.3s. `backwards` applies the opening frame during the delay,
-     so the disc is genuinely absent rather than shown and then animated. */
-  /* Nothing on screen until 1.2s. `both` keeps the opening frame during the
-     delay AND the closing frame after, so there is no flash at either end. */
+  z-index: 1;
+  transform: translateX(-50%);
   opacity: 0;
+  /* Pops rather than fades. Opacity snaps to full inside the first 1% of the
+     run, so only the scale is animated and there is no ramp. */
   animation: pcDotIn 0.35s cubic-bezier(0.2, 1.4, 0.4, 1) 1.2s both;
   transition: background 0.4s ease;
 }
@@ -592,8 +587,9 @@
 }
 
 @keyframes pcDotIn {
-  from { opacity: 0; transform: translateX(-50%) scale(0.4); }
-  to { opacity: 1; transform: translateX(-50%) scale(1); }
+  0% { opacity: 0; transform: translateX(-50%) scale(0.2); }
+  1% { opacity: 1; transform: translateX(-50%) scale(0.2); }
+  100% { opacity: 1; transform: translateX(-50%) scale(1); }
 }
 
 /* Card geometry copied from .node / .flipCard in history.module.css, so the

@@ -154,9 +154,11 @@ export default function TimelineRun({
           {/* The head of the timeline sits on THIS screen, under the text, as
               in the concept. Its line reaches the foot of the screen and the
               rail below continues from exactly that edge. */}
-          <span ref={startRef} className={styles.railStart} aria-hidden="true">
-            <span className={`${styles.railDot} ${moved ? styles.railDotGo : ""}`} />
-          </span>
+          {/* Disc and line are SIBLINGS. The disc used to sit inside the line,
+              and the line is scaled to draw it as you scroll, so the disc was
+              scaled with it and rendered as a flat ellipse. */}
+          <span className={`${styles.railDot} ${moved ? styles.railDotGo : ""}`} aria-hidden="true" />
+          <span ref={startRef} className={styles.railStart} aria-hidden="true" />
         </div>
 
         {breeds.map((b) => {
