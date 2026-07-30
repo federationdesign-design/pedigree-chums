@@ -472,12 +472,7 @@ export default function LineageModal({ name, image, character, lineage, onClose,
             </div>
           ) : (
             <>
-              <button type="button" className={css.endClose} onClick={onClose} aria-label="Close the pit">
-                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                  <line x1="7" y1="7" x2="17" y2="17" />
-                  <line x1="17" y1="7" x2="7" y2="17" />
-                </svg>
-              </button>
+              {/* The close X has moved down into the button row. */}
               <div className={css.endFlash} style={{ fontSize: "clamp(6.8rem, 24vw, 16rem)" }}>
                 <span className={css.endFlashWord}>GAME</span>
                 <span className={css.endFlashWord}>OVER</span>
@@ -501,7 +496,7 @@ export default function LineageModal({ name, image, character, lineage, onClose,
                 {(onStartOver || onResetRun) && (
                   <button
                     type="button"
-                    className={`${css.endBtn} ${css.endBtnIcon}`}
+                    className={`${css.endBtn} ${css.endBtnIcon} ${css.endBtnGreen}`}
                     onClick={() => {
                       if (lives !== undefined && lives <= 0) { onResetRun?.(); replay(); return; }
                       onStartOver?.();
@@ -515,9 +510,46 @@ export default function LineageModal({ name, image, character, lineage, onClose,
                     <span className={`${css.endIcon} ${css.endIconReplay}`} aria-hidden="true" />
                   </button>
                 )}
-                <button type="button" className={`${css.endBtn} ${css.endBtnAlt} ${css.endBtnIcon}`} onClick={() => goLearn(false)} aria-label="Go to the learn area" title="Learn">
+                <button type="button" className={`${css.endBtn} ${css.endBtnIcon} ${css.endBtnYellow}`} onClick={() => goLearn(false)} aria-label="Go to the learn area" title="Learn">
                   <svg className={css.endIcon} viewBox={`0 0 ${BRAIN_ARTBOARD.w} ${BRAIN_ARTBOARD.h}`} aria-hidden="true" focusable="false">
                     <path d={BRAIN_PATH} fill="currentColor" />
+                  </svg>
+                </button>
+                {/* REWIND, back to this level's start screen with LEARN and PLAY
+                    on it. Not a retry: it does not spend a life and does not
+                    reset the score, because the life for this round is already
+                    gone and the score is what you keep. */}
+                <button
+                  type="button"
+                  className={`${css.endBtn} ${css.endBtnIcon} ${css.endBtnYellow}`}
+                  onClick={() => {
+                    setPhase("play");
+                    setResumeInLearn(false);
+                    setSlowmo(false);
+                    setCaptionOpen(false);
+                    setRunKey((k) => k + 1);
+                  }}
+                  aria-label="Back to the start screen"
+                  title="Start screen"
+                >
+                  <svg className={css.endIcon} viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <path d="M12 5 L4 12 L12 19 Z" fill="currentColor" />
+                    <path d="M21 5 L13 12 L21 19 Z" fill="currentColor" />
+                  </svg>
+                </button>
+                {/* The close X, moved out of the top-right corner so every way
+                    out of this screen sits in one row. */}
+                <button
+                  type="button"
+                  className={`${css.endBtn} ${css.endBtnIcon} ${css.endBtnYellow}`}
+                  onClick={onClose}
+                  aria-label="Leave the game"
+                  title="Leave"
+                >
+                  <svg className={css.endIcon} viewBox="0 0 24 24" aria-hidden="true" focusable="false"
+                    stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" fill="none">
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                    <line x1="18" y1="6" x2="6" y2="18" />
                   </svg>
                 </button>
               </div>

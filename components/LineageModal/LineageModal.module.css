@@ -274,6 +274,9 @@
 }
 .endBtns {
   display: flex;
+  /* four buttons now, not two, so they wrap rather than run off a phone */
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 14px;
 }
 .endBtn {
@@ -298,12 +301,37 @@
 /* Icon-only versions of the end buttons: square rather than a text pill, so the
    glyph sits in the middle instead of being letterboxed. Sized off the shake and
    slowmo buttons, which are the pit's own icon family. */
+/* RECTANGULAR with a navy border, matching the pit's own icon squares rather
+   than the 999px pill the text buttons wear. The pit draws its squares with a
+   5px navy rim and a corner radius of 0.3 of the side, so 20 on a 67.5 square,
+   and those are the figures here. */
 .endBtnIcon {
   width: 100.8px;
   height: 100.8px;
   padding: 0;
   display: grid;
   place-items: center;
+  border-radius: 30px;
+  border: 5px solid var(--navy, #0a3a57);
+  box-sizing: border-box;
+}
+/* The site's green, the same #22c55e .endBtnGo uses, on the primary action. */
+.endBtnGreen {
+  background: #22c55e;
+  color: #ffffff;
+}
+.endBtnGreen:hover {
+  background: #22c55e;
+  color: #ffffff;
+}
+/* The pit's yellow with a navy glyph, which is what every pit control wears. */
+.endBtnYellow {
+  background: var(--yellow, #ffd23e);
+  color: var(--navy, #0a3a57);
+}
+.endBtnYellow:hover {
+  background: var(--yellow, #ffd23e);
+  color: var(--navy, #0a3a57);
 }
 .endIcon {
   width: 52%;
@@ -321,6 +349,7 @@
   .endBtnIcon {
     width: 67.5px;
     height: 67.5px;
+    border-radius: 20px;
   }
 }
 .endBtnAlt {
