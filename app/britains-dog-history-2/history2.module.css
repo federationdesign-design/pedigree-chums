@@ -833,6 +833,12 @@
   border: 5px solid #ffffff;
   box-sizing: border-box;
   flex: 0 0 auto;
+  transition: background 0.4s ease;
+}
+
+/* Green once the reader has moved past this dog. */
+.markerDotGo {
+  background: #22c55e;
 }
 
 .markerTree,

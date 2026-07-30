@@ -75,6 +75,9 @@ export default function TimelineRun({
      a CSS delay would fire on all eleven at once when the page loads, so ten
      of them would have popped long before the reader got there. */
   const [arrived, setArrived] = useState<Record<string, boolean>>({});
+  /* Rows the reader has scrolled on from. Their node turns green, exactly as
+     the one at the head of the timeline does. */
+  const [passed, setPassed] = useState<Record<string, boolean>>({});
   const rowRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   useEffect(() => {
@@ -120,6 +123,16 @@ export default function TimelineRun({
         carousel.scrollLeft = keep;
       }
       if (run.scrollTop > 4) setMoved(true);
+      /* A node goes green once the reader has moved past its own row, which is
+         the same rule as the head of the timeline: yellow on arrival, green
+         once you are on your way again. */
+      const rows = rowRefs.current;
+      for (const key of Object.keys(rows)) {
+        const el = rows[key];
+        if (el && run.scrollTop > el.offsetTop - run.clientHeight * 0.35) {
+          setPassed((pv) => (pv[key] ? pv : { ...pv, [key]: true }));
+        }
+      }
       /* ONE line for the whole run. Its top is pinned to the disc and its
          length is simply how far you have scrolled plus the card's own inset,
          so its end always sits exactly where the next card's top edge is.
@@ -330,7 +343,7 @@ export default function TimelineRun({
                     <path d="M12 7v3.2M6 15.6V12h12v3.6" fill="none" stroke="currentColor" strokeWidth="1.6" />
                   </svg>
                 </button>
-                <span className={styles.markerDot} aria-hidden="true" />
+                <span className={`${styles.markerDot} ${passed[b.name] ? styles.markerDotGo : ""}`} aria-hidden="true" />
                 {/* Turns the card over. Nothing else. */}
                 <span
                   className={styles.markerInfo}

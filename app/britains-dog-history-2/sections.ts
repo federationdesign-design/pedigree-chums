@@ -87,7 +87,7 @@ export const SECTIONS: Section[] = [
       "Sighthounds such as the Greyhound and Whippet were built for speed and the chase.",
       "Guarding and droving breeds protected homes and moved cattle to market.",
     ],
-    bulletTitles: ["Herding", "Rating", "Catching", "Guarding"],
+    bulletTitles: ["Herding", "Ratting", "Catching", "Guarding"],
     detail:
       "A dog's looks are rarely an accident. The Collie's tireless energy, the terrier's boldness, the sighthound's lean frame: each was honed for a purpose over many generations. Understanding that working past is the key to understanding why breeds behave the way they do, a thread that runs right through the pack.",
     facts: [
@@ -111,7 +111,7 @@ export const SECTIONS: Section[] = [
       "A national ban on the public highways followed in 1854.",
       "The campaign against dog-carts helped shape Britain's early animal-welfare laws.",
     ],
-    bulletTitles: ["Dog taxis, dog carriages, dog sleds", "London dog ban", "More bans on dogs stopping them from working", "It was for the money"],
+    bulletTitles: ["Dog taxis, dog carriages", "London dog ban", "More bans on dogs", "It was for the money"],
     detail:
       "The ban was meant to spare dogs from cruelty and to stop carts spooking horses in crowded streets, but it had a heartbreaking side. With the dogs no longer able to earn their keep, many traders could not afford to feed them, and thousands of working dogs were lost. It was a grim chapter, yet it pushed Britain toward treating dogs as animals deserving of protection.",
     facts: [
