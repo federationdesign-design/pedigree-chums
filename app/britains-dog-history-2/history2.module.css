@@ -755,8 +755,8 @@
 .dogHint {
   font-family: var(--font-display, "Luckiest Guy", cursive);
   /* Bigger button, bigger label. */
-  /* Up one point. calc, so it is a true 1pt at any width. */
-  font-size: calc(1.5rem + 1pt);
+  /* Up three points on the 1.5rem base. calc, so it is a true 1pt at any width. */
+  font-size: calc(1.5rem + 3pt);
   letter-spacing: 0.03em;
   line-height: 0.9em;
   color: #ffffff;
@@ -921,7 +921,11 @@
    dark blue whatever colours the SVG itself carries. An <img> cannot be
    recoloured from CSS; a mask can. */
 .backFlip {
-  /* Top right, matching where it sits on the picture side. */
+  /* Bottom right. `top: auto` is required: the shared rule above sets
+     top: 14px, and without clearing it the element would be stretched
+     between the two edges. */
+  top: auto;
+  bottom: 14px;
   right: 14px;
   /* 20% down from 80. NO border-radius: the round frame was cropping the
      artwork. The mask is `contain`, so the whole SVG shows. */
