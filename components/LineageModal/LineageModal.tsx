@@ -489,8 +489,26 @@ export default function LineageModal({ name, image, character, lineage, onClose,
                   The labels move to aria-label: an icon-only control with no
                   accessible name is unusable with a screen reader. */}
               <div className={css.endBtns}>
-                {onStartOver && (lives === undefined || lives > 0) && (
-                  <button type="button" className={`${css.endBtn} ${css.endBtnIcon}`} onClick={onStartOver} aria-label="Restart this level" title="Restart">
+                {/* RESTART, and it is offered whether or not lives remain.
+                    It used to be gated on lives > 0, so a spent run had no way
+                    back into the level at all: the only controls left were Learn
+                    and the close X, and the X drops you out to the level strip.
+                    That reads as "restart sent me back to the beginning" even
+                    though Restart was never on screen.
+                    With lives left it costs one and replays the level. With none
+                    left it restores the run first, so you come back here with a
+                    full set rather than being sent out to find your way in. */}
+                {(onStartOver || onResetRun) && (
+                  <button
+                    type="button"
+                    className={`${css.endBtn} ${css.endBtnIcon}`}
+                    onClick={() => {
+                      if (lives !== undefined && lives <= 0) { onResetRun?.(); replay(); return; }
+                      onStartOver?.();
+                    }}
+                    aria-label={lives !== undefined && lives <= 0 ? "Start again on this level" : "Restart this level"}
+                    title={lives !== undefined && lives <= 0 ? "Start again" : "Restart"}
+                  >
                     {/* A background rather than an <img>: Next flags img elements,
                         and for a decorative icon with the label on the button
                         there is nothing an img gives us here. */}
