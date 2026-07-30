@@ -293,11 +293,25 @@
   text-align: center;
 }
 
+/* The text panel and the bullet panels. Both start their content 25px below
+   the split rather than floating in the middle of the panel.
+   `justify-content: flex-start` is not optional here: with the panel's default
+   centring, a top padding is invisible, because the block is positioned by the
+   leftover height rather than by the top edge. The fact panels are untouched
+   and stay centred. */
+.panelTop {
+  padding-top: 25px;
+  justify-content: flex-start;
+}
+
 /* ---- Panel content ---------------------------------------------------- */
 
 .bulletTitle {
   font-family: var(--font-display, "Luckiest Guy", cursive);
-  font-size: 30pt;
+  /* 40pt, which is 20% below the section title's 50pt, so the section title
+     stays the dominant word on screen. It was 60pt, ie 20% ABOVE it, which is
+     why GREEDY read louder than MEDIEVAL AND TUDOR BRITAIN. */
+  font-size: 40pt;
   color: var(--yellow, #ffd23e);
   letter-spacing: 0.03em;
   line-height: 1.05;
@@ -311,7 +325,18 @@
   font-weight: 600;
   color: #ffffff;
   line-height: 1.1;
-  margin: 0;
+  /* 22px from the title on screen.
+     DECOMPOSED FROM A SCREENSHOT, not estimated. At 60pt the visible gap was
+     44px and only 15 of that was CSS. The rest is empty space inside the two
+     line boxes: 25px of descender room below the capitals, which a word in
+     caps never uses, and 4.5px above the italic line.
+     That 25px is 0.3125 of the font size, so it SHRINKS with the type. The
+     title is now 40pt, where the slack is 16.7px, and 16.7 + 12 + 4.5 = 33.2,
+     so -11 lands on 22. At 60pt the same 22px needed -19.
+     RECALCULATE THIS WHENEVER .bulletTitle CHANGES SIZE.
+     Shorthand rather than a longhand, so a later `margin` of equal
+     specificity cannot silently wipe it. */
+  margin: -11px 0 0;
 }
 
 /* Round, centred, half the panel width, above the words. aspect-ratio keeps
@@ -328,7 +353,46 @@
      where they were. z-index clears the sticky header, which sits at 3. */
   position: relative;
   z-index: 4;
-  transform: translateY(-50px);
+  transform: translate(0, -50px);
+  /* Invisible until the carousel settles. The script adds one of the two
+     classes below, and `forwards` holds the finished state. */
+  opacity: 0;
+}
+
+/* Rolling, not sliding. A circle covering this distance turns a fixed amount:
+   it travels one panel width, and its circumference is pi times its diameter,
+   which is half a panel width. 1 / (pi x 0.5) is 0.637 of a turn, so 229deg.
+   Rolling leftwards is anticlockwise, so the angle counts down to zero; coming
+   the other way it counts up. That is what stops it looking like a sticker
+   being dragged across the screen. */
+.rollFromRight {
+  animation: pcRollLeftward 700ms cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+}
+
+.rollFromLeft {
+  animation: pcRollRightward 700ms cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+}
+
+@keyframes pcRollLeftward {
+  from {
+    opacity: 1;
+    transform: translate(100vw, -50px) rotate(229deg);
+  }
+  to {
+    opacity: 1;
+    transform: translate(0, -50px) rotate(0deg);
+  }
+}
+
+@keyframes pcRollRightward {
+  from {
+    opacity: 1;
+    transform: translate(-100vw, -50px) rotate(-229deg);
+  }
+  to {
+    opacity: 1;
+    transform: translate(0, -50px) rotate(0deg);
+  }
 }
 
 .factLabel {
@@ -337,7 +401,12 @@
   color: var(--yellow, #ffd23e);
   letter-spacing: 0.03em;
   line-height: 1.05;
-  margin: 0;
+  /* 30px between the circle's visible bottom edge and this line. The circle is
+     drawn 50px above where it is laid out, so the gap on screen is the panel's
+     12px flex gap plus that 50px, which is 62. Taking 32 back off leaves 30.
+     Written as the shorthand deliberately: a longhand here would be wiped by
+     any later `margin` of equal specificity. */
+  margin: -32px 0 0;
 }
 
 .factText {
