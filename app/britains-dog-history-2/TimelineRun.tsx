@@ -2,6 +2,12 @@
 
 import { useEffect, useRef, useState } from "react";
 import { ukBreeds } from "../../data/uk-breeds";
+/* THE GAME IS BORROWED, NOT COPIED. BreedStrip owns lives, streak, campaign
+   score, the running order across all nine eras and the level window itself.
+   Passing it our own markup means the slider and the live page can never hold
+   two versions of those rules. Nothing about the game is written in this file.
+   See the renderLevels note in BreedStrip.tsx. */
+import BreedStrip from "../britains-dog-history/BreedStrip";
 import styles from "./history2.module.css";
 
 /*
@@ -239,8 +245,15 @@ export default function TimelineRun({
             </span>
         </div>
 
-        {breeds.map((b) => {
+        {/* A fragment comes back from BreedStrip, so these screens stay DIRECT
+            children of the scroller. They are height: 100% of it and a wrapper
+            here would collapse every one of them. */}
+        <BreedStrip era={era} renderLevels={(open) => breeds.map((b) => {
           const isFlipped = flipped === b.name;
+          /* undefined for a dog with no level. 62 of the 90 open one, 28 go to
+             their own breed page instead, which is the live page's rule and
+             not something decided here. */
+          const openLevel = open(b);
           return (
             <div key={b.name} className={styles.dogScreen}>
               {/* The rail arrives, stops at the card, and begins again below
@@ -251,11 +264,16 @@ export default function TimelineRun({
                 {/* The whole card is the target: tapping anywhere opens the
                     level. The information icon sits OUTSIDE this button rather
                     than inside it, because a button inside a button is invalid
-                    and browsers resolve it unpredictably. */}
+                    and browsers resolve it unpredictably.
+                    The photograph, the name and the green pill are all inside
+                    this one button, so all three open the level with a single
+                    handler. The flip controls and the three outbound circles
+                    each stop the event, so they still do only their own job. */}
                 <button
                   type="button"
                   className={styles.dogFlipCard}
-                  aria-label={`View ${b.name} family tree`}
+                  onClick={openLevel}
+                  aria-label={openLevel ? `Open the ${b.name} level` : undefined}
                 >
                   <span
                     className={styles.dogFlipInner}
@@ -377,7 +395,7 @@ export default function TimelineRun({
               </div>
             </div>
           );
-        })}
+        })} />
       </div>
     </div>
   );
