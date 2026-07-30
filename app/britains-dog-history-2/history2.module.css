@@ -1285,17 +1285,44 @@
   mask-size: contain;
 }
 
-/* Same blue and white ring as every other information icon on the page. */
+/* Same blue and white ring as every other information icon on the page.
+
+   THE GLYPH IS ARTWORK NOW, not a letter. The three circles carried a Georgia
+   italic "i", which said "information" rather than "this leaves the site".
+   Drawn as a mask with white behind it, the same way the card's flip control
+   and the timeline nodes are, so it comes out white whatever the file's own
+   colours are.
+   Two rules carry .backLink and this is the second, so it is the one that
+   wins. Anything added to the first would be overwritten. */
 .backLink {
   right: 14px;
   background: var(--blue-deep, #0c5b92);
   border: 3px solid #ffffff;
   color: #ffffff;
+  /* Nothing left to set type for: the letter has gone. Kept only so a missing
+     file falls back to something rather than an empty disc. */
   font-family: Georgia, serif;
   font-style: italic;
   font-weight: 700;
   font-size: 40px;
   line-height: 1;
+  position: relative;
+}
+
+/* The outbound mark itself. 46% of the disc, centred. */
+.backLinkIcon {
+  position: absolute;
+  inset: 27%;
+  background: #ffffff;
+  pointer-events: none;
+  -webkit-mask-image: url("/outboundlink-icon.svg");
+  mask-image: url("/outboundlink-icon.svg");
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
 }
 
 /* ---- Leaving the site -------------------------------------------------- */

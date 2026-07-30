@@ -437,7 +437,7 @@ export default function TimelineRun({
                                 setLeaving(o.href);
                               }}
                             >
-                              i
+                              <span className={styles.backLinkIcon} aria-hidden="true" />
                             </span>
                           ))}
                         </span>
