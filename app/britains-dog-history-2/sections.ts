@@ -64,6 +64,7 @@ export const SECTIONS: Section[] = [
       "He is often remembered as the first official British Army dog.",
       "Judy, a pointer, survived Japanese prisoner-of-war camps and is the only dog ever officially registered as a POW.",
     ],
+    bulletTitles: ["Bravery", "In England", "Glorified", "The 1st dog", "POW WOW BOW"],
     detail:
       "Boy was so well known that enemy pamphlets spread wild rumours about him, claiming the dog had magical powers and could not be harmed by weapons. It was propaganda, of course, and at Marston Moor it proved sadly untrue. Yet the little white poodle had already secured his place in British military memory, the first in a long line of dogs to serve the nation.",
     facts: [
@@ -86,6 +87,7 @@ export const SECTIONS: Section[] = [
       "Sighthounds such as the Greyhound and Whippet were built for speed and the chase.",
       "Guarding and droving breeds protected homes and moved cattle to market.",
     ],
+    bulletTitles: ["Herding", "Ratting", "Catching", "Guarding"],
     detail:
       "A dog's looks are rarely an accident. The Collie's tireless energy, the terrier's boldness, the sighthound's lean frame: each was honed for a purpose over many generations. Understanding that working past is the key to understanding why breeds behave the way they do, a thread that runs right through the pack.",
     facts: [
@@ -109,6 +111,7 @@ export const SECTIONS: Section[] = [
       "A national ban on the public highways followed in 1854.",
       "The campaign against dog-carts helped shape Britain's early animal-welfare laws.",
     ],
+    bulletTitles: ["Dog taxis, dog carriages", "London dog ban", "More bans on dogs", "It was for the money"],
     detail:
       "The ban was meant to spare dogs from cruelty and to stop carts spooking horses in crowded streets, but it had a heartbreaking side. With the dogs no longer able to earn their keep, many traders could not afford to feed them, and thousands of working dogs were lost. It was a grim chapter, yet it pushed Britain toward treating dogs as animals deserving of protection.",
     facts: [
@@ -132,6 +135,7 @@ export const SECTIONS: Section[] = [
       "Britain held the world's first organised dog show in Newcastle in 1859.",
       "Battersea Dogs Home opened in 1860 and the Kennel Club followed in 1873.",
     ],
+    bulletTitles: ["Queeny", "Spaniel", "Dog Show", "Dog Home"],
     detail:
       "Victoria's very public affection for her dogs helped make pet keeping fashionable across society. As the middle classes grew, a well-bred dog became a mark of taste and gentility. The first dog show, the founding of Battersea and the arrival of the Kennel Club all came within a single generation, the moment dogs became companions to be celebrated rather than simply animals to be used.",
     facts: [
@@ -155,6 +159,7 @@ export const SECTIONS: Section[] = [
       "The story says he kept watch over the grave for fourteen years until his own death in 1872.",
       "A statue and fountain were raised in his honour, and still draw visitors today.",
     ],
+    bulletTitles: ["Terrier", "Loyalty", "Legendary", "Immortalised"],
     detail:
       "Historians gently point out that the tale has grown in the telling, and the details are hard to prove. But whether legend or fact, Bobby became a symbol of the devotion a dog can show, retold in books and films ever since. His statue in Edinburgh remains one of Scotland's best-loved landmarks, a monument to the bond between people and their dogs.",
     facts: [
@@ -178,6 +183,7 @@ export const SECTIONS: Section[] = [
       "The first ever Best in Show winner was a Greyhound named Primley Sceptre.",
       "Crufts is now recognised as the largest dog show in the world.",
     ],
+    bulletTitles: ["He wanted to sell more dog biscuits", "Greyhound", "Tonnes of dogs all in 1 place"],
     detail:
       "Charles Cruft had a genius for promotion, and his show quickly became the highlight of the canine calendar. The arrival of the Best in Show award in 1928 gave the event its crowning moment, and that first winner, a Greyhound chosen from nearly ten thousand competitors, set the tone for a contest that still captivates the nation every spring.",
     facts: [
@@ -201,6 +207,7 @@ export const SECTIONS: Section[] = [
       "Breeds rose and fell in popularity as fashions and lifestyles changed.",
       "The dog moved from the yard to the hearth, and often to the foot of the bed.",
     ],
+    bulletTitles: ["Dogs upstairs", "Dog Doctors", "Dogs as Fashion", "A Dogs Life"],
     detail:
       "As Britain became more urban and homes grew more comfortable, dogs came indoors for good. The relationship deepened from usefulness into genuine companionship. By the end of the century, the question was no longer what a dog could do for you, but simply the pleasure of its company, a shift that set the stage for the boom still unfolding today.",
     facts: [
@@ -225,6 +232,7 @@ export const SECTIONS: Section[] = [
       "Designer crossbreeds like the Cockapoo and Labradoodle have surged in popularity.",
       "The pet-tech market alone, covering smart feeders, cameras and GPS trackers, is now worth over 400 million pounds.",
     ],
+    bulletTitles: ["Loads of dogs", "More dogs", "Young pups", "Doo's and Poo's", "Dog Tracking"],
     detail:
       "The most common breeds tell the story of changing tastes. Among dogs of all ages the classic Labrador still leads, but among puppies the French Bulldog and the Cockapoo have raced to the top, a clear sign of the designer-crossbreed boom. The pack brings both worlds together, the old favourites and the new, each with centuries of history behind them.",
     facts: [

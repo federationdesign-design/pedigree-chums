@@ -37,7 +37,47 @@ const ERA_LABELS: Record<string, string> = {
   crosses: "Today's crossbreeds",
 };
 
-export default function BreedStrip({ era }: { era: string }) {
+/* `renderLevels` is how the history slider borrows this component.
+
+   THE GAME LIVES HERE AND ONLY HERE. Lives, streak, campaign score, the
+   running order across all nine eras, retry and play again: every rule is in
+   this file, and the slider must not own a second copy of any of it, or the
+   two pages will drift the moment one is edited.
+
+   So the slider does not copy the rules out. It passes its own markup in.
+   Given the `open` builder, it renders the dogs however it likes and calls
+   `open(breed)` on a tap. This component still owns the state and still
+   renders the modal.
+
+   HARD RULE: the branch is at the RENDER only. Nothing above the return may
+   ever depend on which presentation is in use. The live page's behaviour has
+   to be untouchable from the slider. */
+export type BreedStripOpen = (b: UKBreed) => (() => void) | undefined;
+
+/* WHAT A CARD IS. One answer, read by both the tap and any badge drawn on the
+   card, so a card can never advertise PLAY and then fail to play.
+
+   "learn" means the breed has a page of its own and the tap navigates there.
+   "play" means it has no page but has a lineage, so the tap opens a level.
+   null means neither, and the card is not tappable.
+
+   Measured across all 90 dogs on the history pages: 62 play, 28 learn, none
+   null. Pure and stateless, so it is safe to call from anywhere. */
+export type BreedCardKind = "play" | "learn";
+
+export function breedCardKind(name: string): BreedCardKind | null {
+  const packName = resolveLineageName(name);
+  if (packBreeds.find((x) => x.name === packName)?.slug) return "learn";
+  return getLineage(packName) ? "play" : null;
+}
+
+export default function BreedStrip({
+  era,
+  renderLevels,
+}: {
+  era: string;
+  renderLevels?: (open: BreedStripOpen) => React.ReactNode;
+}) {
   const router = useRouter();
   const wrapRef = useRef<HTMLDivElement>(null);
   const railRef = useRef<HTMLDivElement>(null);
@@ -85,6 +125,33 @@ export default function BreedStrip({ era }: { era: string }) {
   const nextLevelOf = (name: string): UKBreed | null => {
     const i = levelList.findIndex((b) => b.name === name);
     return i >= 0 && i + 1 < levelList.length ? levelList[i + 1] : null;
+  };
+
+  /* What a tap on a dog does. Lifted out of the rail's own map so the slider
+     gets the identical rule rather than a second version of it. The three
+     outcomes are unchanged: a breed with its own page navigates there, a breed
+     with a lineage opens a level as a fresh run, and anything else is not
+     tappable. Measured across all 90 dogs: 62 open a level, 28 navigate, none
+     fall through. */
+  const openFor: BreedStripOpen = (b) => {
+    const kind = breedCardKind(b.name);
+    const packName = resolveLineageName(b.name);
+    const lineage = getLineage(packName);
+    const pack = packBreeds.find((x) => x.name === packName);
+    if (kind === "learn" && pack?.slug) return () => router.push(`/chums/${pack.slug}`);
+    if (kind !== "play" || !lineage) return undefined;
+    return () => {
+      // opening a level from the page is a fresh run
+      setLives(LIVES_START);
+      setStreak(0);
+      setActive({
+        name: b.name,
+        image: pack?.image ?? b.image ?? "",
+        character: pack?.character ?? b.note,
+        fact: pack?.fact,
+        lineage,
+      });
+    };
   };
 
   const breeds: UKBreed[] = ukBreeds
@@ -287,6 +354,80 @@ export default function BreedStrip({ era }: { era: string }) {
       ? styles.nodeTagDecline
       : styles.nodeTagEndangered;
 
+  /* The level window, built once and used by both presentations. It is the
+     whole reason the slider borrows this component rather than copying it:
+     every rule below is written here and nowhere else. */
+  const modal = active && (
+    <LineageModal
+      key={`${active.name}:${runKey}`}
+      era={era}
+      initialScore={campaignScore}
+      onScoreChange={setCampaignScore}
+      nextLevelLabel={nextLevelOf(active.name)?.name}
+      nextLevelImage={(() => { const nb = nextLevelOf(active.name); return nb ? buildActive(nb)?.image : undefined; })()}
+      lives={lives}
+      livesMax={LIVES_MAX}
+      onNextLevel={() => {
+        // a level completed: three in a row earns a life back
+        setStreak((st) => {
+          const next = st + 1;
+          if (next % LIVES_STREAK === 0) setLives((l) => Math.min(LIVES_MAX, l + 1));
+          return next;
+        });
+        const nb = nextLevelOf(active.name);
+        const na = nb ? buildActive(nb) : null;
+        if (na) setActive(na);
+      }}
+      onLost={() => setStreak(0)} // a loss breaks the run toward the next life
+      onSpendLife={() => {
+        // Leaving a live round to go and read costs a life, exactly like a
+        // retry does, and breaks the streak for the same reason.
+        setLives((l) => Math.max(0, l - 1));
+        setStreak(0);
+      }}
+      onResetRun={() => {
+        // PLAY AGAIN on a spent run: lives and the campaign total go back
+        // to the start, but the player keeps their place in the level.
+        setLives(LIVES_START);
+        setStreak(0);
+        setCampaignScore(0);
+      }}
+      onStartOver={() => {
+        // A retry costs a life and replays THIS level. It used to rebuild
+        // level one and wipe the campaign total, so failing level two threw
+        // away every level already cleared as well as the score. Losing your
+        // place is what running out of lives is for, and the modal only
+        // offers Restart while lives remain.
+        setLives((l) => Math.max(0, l - 1));
+        setStreak(0);
+        // The modal is keyed on the level name, so replaying the same one
+        // would not remount and the round would not reset. The run counter
+        // is what forces it.
+        setRunKey((k) => k + 1);
+      }}
+      levelNo={Math.max(0, levelList.findIndex((b) => b.name === active.name))}
+      name={active.name}
+      image={active.image}
+      character={active.character}
+      fact={active.fact}
+      lineage={active.lineage}
+      onClose={() => setActive(null)}
+    />
+  );
+
+  /* THE SLIDER'S BRANCH. A fragment, deliberately: the history slider's dog
+     screens are `height: 100%` of their scroller and only resolve while they
+     are its DIRECT children. A wrapper here would collapse every one of them.
+     Nothing above this line knows which branch is taken. */
+  if (renderLevels) {
+    return (
+      <>
+        {renderLevels(openFor)}
+        {modal}
+      </>
+    );
+  }
+
   return (
     <div className={styles.strip} aria-label={`Breeds: ${ERA_LABELS[era]}`}>
       <span className={styles.stripLabel}>{ERA_LABELS[era]}</span>
@@ -294,25 +435,10 @@ export default function BreedStrip({ era }: { era: string }) {
       <div ref={wrapRef} className={styles.stripWrap}>
         <div ref={railRef} className={styles.stripRail} role="list">
           {breeds.map((b) => {
-            const packName = resolveLineageName(b.name);
-            const lineage = getLineage(packName);
-            const pack = packBreeds.find((x) => x.name === packName);
-            const open = pack?.slug
-              ? () => router.push(`/chums/${pack.slug}`)
-              : lineage
-              ? () => {
-                  // opening a level from the page is a fresh run
-                  setLives(LIVES_START);
-                  setStreak(0);
-                  setActive({
-                    name: b.name,
-                    image: pack?.image ?? b.image ?? "",
-                    character: pack?.character ?? b.note,
-                    fact: pack?.fact,
-                    lineage,
-                  });
-                }
-              : undefined;
+            /* packName, lineage and pack used to be resolved here purely to
+               build the tap handler inline. openFor does that now, and nothing
+               else in this markup used them. */
+            const open = openFor(b);
             return (
               <div key={b.name} data-node className={styles.node} role="listitem">
                 <span className={styles.nodeEra}>{b.era}</span>
@@ -380,63 +506,7 @@ export default function BreedStrip({ era }: { era: string }) {
         <div ref={thumbRef} className={styles.stripThumb} />
       </div>
 
-      {active && (
-        <LineageModal
-          key={`${active.name}:${runKey}`}
-          era={era}
-          initialScore={campaignScore}
-          onScoreChange={setCampaignScore}
-          nextLevelLabel={nextLevelOf(active.name)?.name}
-          nextLevelImage={(() => { const nb = nextLevelOf(active.name); return nb ? buildActive(nb)?.image : undefined; })()}
-          lives={lives}
-          livesMax={LIVES_MAX}
-          onNextLevel={() => {
-            // a level completed: three in a row earns a life back
-            setStreak((st) => {
-              const next = st + 1;
-              if (next % LIVES_STREAK === 0) setLives((l) => Math.min(LIVES_MAX, l + 1));
-              return next;
-            });
-            const nb = nextLevelOf(active.name);
-            const na = nb ? buildActive(nb) : null;
-            if (na) setActive(na);
-          }}
-          onLost={() => setStreak(0)} // a loss breaks the run toward the next life
-          onSpendLife={() => {
-            // Leaving a live round to go and read costs a life, exactly like a
-            // retry does, and breaks the streak for the same reason.
-            setLives((l) => Math.max(0, l - 1));
-            setStreak(0);
-          }}
-          onResetRun={() => {
-            // PLAY AGAIN on a spent run: lives and the campaign total go back
-            // to the start, but the player keeps their place in the level.
-            setLives(LIVES_START);
-            setStreak(0);
-            setCampaignScore(0);
-          }}
-          onStartOver={() => {
-            // A retry costs a life and replays THIS level. It used to rebuild
-            // level one and wipe the campaign total, so failing level two threw
-            // away every level already cleared as well as the score. Losing your
-            // place is what running out of lives is for, and the modal only
-            // offers Restart while lives remain.
-            setLives((l) => Math.max(0, l - 1));
-            setStreak(0);
-            // The modal is keyed on the level name, so replaying the same one
-            // would not remount and the round would not reset. The run counter
-            // is what forces it.
-            setRunKey((k) => k + 1);
-          }}
-          levelNo={Math.max(0, levelList.findIndex((b) => b.name === active.name))}
-          name={active.name}
-          image={active.image}
-          character={active.character}
-          fact={active.fact}
-          lineage={active.lineage}
-          onClose={() => setActive(null)}
-        />
-      )}
+      {modal}
     </div>
   );
 }

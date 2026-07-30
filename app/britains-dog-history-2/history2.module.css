@@ -15,6 +15,29 @@
   min-height: 100dvh;
 }
 
+/* THE FOOTER IS WHY THE PAGE JARRED.
+
+   Nav is position: fixed and every layout-level widget is fixed too, so the
+   footer was the only thing adding height below a 100dvh wrap. That made the
+   DOCUMENT a second, vertical scroller.
+
+   On every other panel that was harmless: .carousel is touch-action: pan-x,
+   which refuses vertical dragging outright. .timelineRun sets pan-y to get the
+   dog run scrolling, and at the top or bottom of the run that drag chained
+   straight through to the document. The page slid, Safari collapsed its bars,
+   100dvh changed by about 117px on a 414 x 896 phone, and all twelve screens
+   resized mid-scroll. That resize is the drift, not a layout bug in the run.
+
+   Hidden rather than removed: it stays in the markup for crawlers, and it
+   comes back with the desktop layout. MOVE THIS INSIDE THE MOBILE MEDIA QUERY
+   when v2 gains one, or the desktop layout will lose its footer too.
+
+   display: none rather than overscroll-behavior alone because that property
+   only landed in Safari 16, and an iPhone 12 can still be running iOS 14. */
+.footerOff {
+  display: none;
+}
+
 /* Outer wrap: full viewport, clips overflow */
 .carouselWrap {
   display: block;
@@ -149,6 +172,35 @@
 
 /* ---- Section slides --------------------------------------------------- */
 
+/* ---- Era title, the first screen of the vertical run ----------------- */
+
+/* The same band the section photograph occupies: .stickyTop is `flex: 0 0 52%`
+   and its title sits at the foot with 14px of padding. Matching both here puts
+   this title on exactly the same line as MEDIEVAL AND TUDOR BRITAIN, on any
+   screen height, rather than at a fixed 300px which only matched one. */
+.eraTitleBand {
+  flex: 0 0 52%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding-bottom: 14px;
+}
+
+/* One word per line, EXACTLY the section title's treatment: same 50pt, same
+   0.9em leading, same 0.03em tracking, and left aligned on the same 24px edge
+   the section titles sit on. It was 6rem less 5pt, which is why MEDIEVAL kept
+   running off the page. */
+.eraWord {
+  display: block;
+  font-family: var(--font-display, "Luckiest Guy", system-ui);
+  font-size: 50pt;
+  letter-spacing: 0.03em;
+  line-height: 0.9em;
+  color: #ffffff;
+  text-align: center;
+}
+
 /* ---- Section groups: sticky top, panels beneath --------------------- */
 
 /* One group per section, nine panels wide. It is a column so the image can
@@ -212,6 +264,9 @@
   height: 100%;
   object-fit: cover;
   display: block;
+  /* Mirrored. Applies to the video and the still that stands in for it, so the
+     poster and the footage cannot face opposite ways while it loads. */
+  transform: scaleX(-1);
 }
 
 .slideCount {
@@ -251,6 +306,10 @@
   letter-spacing: 0.03em;
   line-height: 0.9em;
   margin: 0;
+  /* Copied verbatim from .essayHeroTitle in good-dog-bad-dog.module.css, which
+     is the same job on the same site: a Luckiest Guy display title sitting
+     over an arbitrary photograph. Tight offset, wide blur. Not invented. */
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.5);
 }
 
 .slideIntro {
@@ -320,7 +379,7 @@
 
 .bulletText {
   font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: 30px;
+  font-size: 27px; /* 10% down from 30px */
   font-style: italic;
   font-weight: 600;
   color: #ffffff;
@@ -348,52 +407,32 @@
   border-radius: 50%;
   display: block;
   margin: 0 auto;
-  /* Up 50px, over the photograph. A transform rather than a negative margin
-     so nothing else in the panel moves: the label and the text stay exactly
-     where they were. z-index clears the sticky header, which sits at 3. */
+  /* Up 60px, over the photograph, 10 more than before so more of the circle
+     clears the top of the blue. Measured at 50px it broke the edge by only
+     5.5px, so this takes it to about 15.5px.
+     THE AUTHORITATIVE VALUE IS `FACT_LIFT_PX` IN page.tsx. The roll script
+     rewrites this transform on every scroll frame, so changing it here alone
+     has no effect. Keep the two in step.
+     A transform rather than a negative margin, so nothing else in the panel
+     moves: the label and the text stay exactly where they were.
+     z-index clears the sticky header, which sits at 3. */
   position: relative;
   z-index: 4;
-  transform: translate(0, -50px);
-  /* Invisible until the carousel settles. The script adds one of the two
-     classes below, and `forwards` holds the finished state. */
+  transform: translate(0, -60px);
+  /* Copied verbatim from .titlePortrait in LineageModal.module.css, which is
+     the same thing in the same place: a round dog photograph on this page.
+     Not invented. */
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+  /* Both of these are overwritten by the script every frame. They are the
+     off-screen starting state, so nothing flashes into view before the first
+     scroll event. */
   opacity: 0;
 }
 
-/* Rolling, not sliding. A circle covering this distance turns a fixed amount:
-   it travels one panel width, and its circumference is pi times its diameter,
-   which is half a panel width. 1 / (pi x 0.5) is 0.637 of a turn, so 229deg.
-   Rolling leftwards is anticlockwise, so the angle counts down to zero; coming
-   the other way it counts up. That is what stops it looking like a sticker
-   being dragged across the screen. */
-.rollFromRight {
-  animation: pcRollLeftward 700ms cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
-}
-
-.rollFromLeft {
-  animation: pcRollRightward 700ms cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
-}
-
-@keyframes pcRollLeftward {
-  from {
-    opacity: 1;
-    transform: translate(100vw, -50px) rotate(229deg);
-  }
-  to {
-    opacity: 1;
-    transform: translate(0, -50px) rotate(0deg);
-  }
-}
-
-@keyframes pcRollRightward {
-  from {
-    opacity: 1;
-    transform: translate(-100vw, -50px) rotate(-229deg);
-  }
-  to {
-    opacity: 1;
-    transform: translate(0, -50px) rotate(0deg);
-  }
-}
+/* The roll is driven from scroll position by the script, which writes both
+   `transform` and `opacity` directly. There are no keyframes any more: a
+   timed animation could only start after the swipe had finished, which is
+   what made the circle arrive late and vanish on the way out. */
 
 .factLabel {
   font-family: var(--font-display, "Luckiest Guy", cursive);
@@ -401,12 +440,16 @@
   color: var(--yellow, #ffd23e);
   letter-spacing: 0.03em;
   line-height: 1.05;
-  /* 30px between the circle's visible bottom edge and this line. The circle is
-     drawn 50px above where it is laid out, so the gap on screen is the panel's
-     12px flex gap plus that 50px, which is 62. Taking 32 back off leaves 30.
-     Written as the shorthand deliberately: a longhand here would be wiped by
-     any later `margin` of equal specificity. */
-  margin: -32px 0 0;
+  /* MEASURED, not computed. In a 902x1662 screenshot at a device pixel ratio
+     of 2, the circle's bottom edge sat at y1255 and the top of these capitals
+     at y1323: 67 device pixels, so 33.5 CSS px, with this margin at -47.
+     When you asked for it halved the margin was -32 and the gap was 48.5, so
+     the target was 24.25. Margin moves the gap one for one, hence -56.
+     NOTE: the circle now rides 10px higher than when that was measured, so the
+     gap on screen is 10px wider than this figure. See .factImg.
+     Shorthand deliberately: a longhand here would be wiped by any later
+     `margin` of equal specificity. */
+  margin: -56px 0 0;
 }
 
 .factText {
@@ -415,6 +458,873 @@
   font-weight: 600;
   color: #ffffff;
   line-height: 1.35;
-  /* The panel's own 12px flex gap, less 5. */
-  margin: -5px 0 0;
+  /* MEASURED, same screenshot. The capitals ended at y1378 and this
+     paragraph began at y1428: 49 device pixels, so 24.5 CSS px, with this
+     margin at -17. At -5, when you asked for it halved, it was 36.5, so the
+     target was 18.25. Hence -23. Unaffected by the circle's height. */
+  margin: -23px 0 0;
 }
+
+/* ---- The vertical dog run --------------------------------------------- */
+
+/* Deliberately transparent, so the site's own fixed background shows through:
+   the diagonal gradient on `body` and the paw pattern on `body::before`. Every
+   other panel paints an opaque blue over both. */
+.timelinePanel {
+  flex: 0 0 100vw;
+  width: 100vw;
+  height: 100%;
+  scroll-snap-align: start;
+  overflow: hidden;
+}
+
+/* THE line. One element for the whole run, so there is no second line to
+   disagree with the first. Its top and height are written by the script: top
+   is the disc's foot, height is the scroll position plus the card's inset, so
+   the end of the line always lands on the next card's top edge. Behind the
+   cards, whose front face is opaque, so it simply disappears under them. */
+.runLine {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 7px;
+  height: 0;
+  background: #ffffff;
+  border-radius: var(--radius-pill, 999px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.timelineRun {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-snap-type: y mandatory;
+  /* Vertical panning handed back to the browser for touches that start in
+     here. The carousel around it is pan-x. See TimelineRun.tsx: this is only
+     half the fix, the script also has to stand down. */
+  touch-action: pan-y;
+  /* Second layer under .footerOff. Keeps a drag that reaches either end of the
+     run inside the run instead of chaining out to whatever scrolls behind it.
+     Y ONLY: the run does not scroll sideways, and containing x sits directly
+     against a horizontal carousel that does. Safari 16 and up, so it does
+     nothing on an iPhone 12 left on iOS 14 or 15, which is exactly why
+     .footerOff carries the fix and this only backs it up.
+     Costs the rubber-band bounce at the two ends. */
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.timelineRun::-webkit-scrollbar {
+  display: none;
+}
+
+.dogScreen {
+  /* 100% of the SCROLLER, which is only true while these are its direct
+     children. They were briefly nested inside a wrapper that had no height of
+     its own, so this resolved to auto, every screen shrank to its content and
+     both rail legs collapsed to nothing. Do not reintroduce a wrapper here
+     without giving it a height. */
+  height: 100%;
+  scroll-snap-align: start;
+  /* THE NOTCH. `y mandatory` on its own still lets a hard flick fly past
+     several dogs: it only decides where momentum finally settles. `always`
+     forces the scroll to stop at every snap point, so each dog has to be
+     pushed past deliberately. A real CSS feature rather than a trick, and it
+     compiles clean for Safari 15 and Chrome, so no sticky element is needed. */
+  scroll-snap-stop: always;
+  box-sizing: border-box;
+  /* Extra room on the left for the rail, which the cards must not sit on.
+     Written into the shorthand rather than as a longhand above it: a
+     `padding-left` there would be silently wiped by this line. */
+  /* NO VERTICAL PADDING. The rail legs are flex children, so any padding on
+     the top or bottom shortens them and leaves a gap where two screens meet:
+     24px above plus 24px below measured as a 50px break in the line.
+     Side padding is 12px so a 95vw card fits; at 24px each side the content
+     box tops out near 90vw and the card can never reach 95. */
+  /* The card sits 200px down, clear of the menu. The line is drawn to the
+     same depth, so the two meet exactly. */
+  /* 125px down, 75 up from 200. CARD_INSET in TimelineRun.tsx carries the
+     same figure and the line is drawn to it, so keep the two in step. */
+  padding: 125px 12px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* No centring: the two rail legs take the slack instead, which is what makes
+     the line meet the card exactly. */
+  justify-content: flex-start;
+  gap: 0;
+}
+
+/* The title screen is a notch too, so the reader stops on it rather than
+   flying straight into the first dog. */
+/* The bottom padding is what keeps the text off the rail head. The rail is
+   absolutely positioned and 22vh tall, so reserving 24vh here means the
+   centred block is centred in what is LEFT, and the disc can no longer land
+   on the last line of the paragraph. */
+.eraScreen {
+  position: relative;
+  height: 100%;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  box-sizing: border-box;
+  /* The bottom band is what keeps the text off the rail head. The rail is
+     absolute and 22vh tall, so reserving 24vh here centres the block in what
+     is LEFT and the disc can no longer land on the paragraph.
+     Written into the shorthand: a padding-bottom above this line would be
+     silently wiped by it. */
+  padding: 0 24px 24px;
+  display: flex;
+  flex-direction: column;
+  /* 300px from the top, to sit where the section titles do. */
+  justify-content: flex-start;
+  gap: 4px;
+}
+
+/* The line between the title and the head of the timeline. */
+.eraNote {
+  /* Tight under the title: the band already carries 14px below the words. */
+  margin: 0;
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: #ffffff;
+  text-align: center;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
+}
+
+/* ---- The timeline rail ------------------------------------------------ */
+
+/* The head of the timeline. In the flow inside .railHead, so it cannot be
+   placed over the paragraph, and not a child of the line, so the line's scale
+   cannot squash it. */
+.railDot {
+  flex: 0 0 auto;
+  width: 47px;
+  height: 47px;
+  border-radius: 50%;
+  background: var(--yellow, #ffd23e);
+  border: 5px solid #ffffff;
+  box-sizing: border-box;
+  pointer-events: none;
+  opacity: 0;
+  /* Pops rather than fades: opacity snaps to full inside the first 1%. */
+  animation: pcDotIn 0.35s cubic-bezier(0.2, 1.4, 0.4, 1) 1.2s both;
+  transition: background 0.4s ease;
+}
+
+/* Takes whatever height the words leave, and holds the disc and the line. */
+.railHead {
+  flex: 0 0 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 26px;
+}
+
+/* Once the reader has started moving. */
+.railDotGo {
+  background: #22c55e;
+}
+
+/* The scroll-down cue under the disc: a short stem with an arrowhead. Sized
+   from the disc rather than in loose pixels, so the three pieces keep their
+   proportions if the disc is ever resized. */
+.railCue {
+  flex: 0 0 auto;
+  width: 7px;
+  height: 56px;
+  background: #ffffff;
+  border-radius: var(--radius-pill, 999px);
+  position: relative;
+  opacity: 0;
+  /* Lands just after the disc has popped, never before it. */
+  animation: pcCueIn 0.4s ease 1.55s both;
+}
+
+/* The arrowhead. A child of the stem, so it can never drift away from it. */
+.railCue::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  transform: translateX(-50%);
+  border-left: 20px solid transparent;
+  border-right: 20px solid transparent;
+  border-top: 38px solid #ffffff;
+}
+
+/* Gone the moment the reader moves, before .runLine can grow past it. */
+.railCueOff {
+  animation: none;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+@keyframes pcCueIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* How many dogs are in this run. Bottom right of the era screen only. */
+.eraCount {
+  position: absolute;
+  right: 18px;
+  bottom: 10px;
+  z-index: 2;
+  pointer-events: none;
+  display: block;
+}
+
+.eraCountOutline,
+.eraCountFill {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  /* Tight, so the word tucks under the numeral as in the concept. */
+  line-height: 0.78;
+}
+
+/* The white behind. Fill AND stroke are white, so this copy is a fattened
+   silhouette of the letterform with nothing showing through. */
+/* The white behind. Fill AND stroke are white, so this copy is a fattened
+   silhouette of the letterform with nothing showing through.
+
+   MATCHED TO THE PIT'S LEVEL NUMBER. That one is SVG text with a 9 unit white
+   stroke and paint-order: stroke, which puts the whole halo outside the letter.
+   Measured off the two screens side by side, this rendered a 13px halo at 14px
+   of stroke while the pit's read 9px, so the stroke comes down by the same
+   ratio. Not halved on theory: a centred stroke and a stacked copy do not
+   thicken alike, so the number is taken from what actually rendered. */
+.eraCountOutline {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  color: #ffffff;
+  -webkit-text-stroke: 10px #ffffff;
+}
+
+.eraCountFill {
+  position: relative;
+  color: #0b0b0b;
+}
+
+/* Half the numeral's stroke on the word beneath it. The stroke is set on the
+   outline copy as a whole and inherited, so the word needs its own value or it
+   takes the numeral's. It is a much smaller face, and the same absolute weight
+   read far heavier on it. */
+.eraCountOutline .eraCountWord {
+  -webkit-text-stroke: 5px #ffffff;
+}
+
+.eraCountNum,
+.eraCountWord {
+  font-family: var(--font-display), system-ui, sans-serif;
+}
+
+.eraCountNum {
+  font-size: clamp(3.4rem, 18vw, 5rem);
+}
+
+.eraCountWord {
+  font-size: clamp(1.1rem, 6vw, 1.6rem);
+}
+
+@keyframes pcDotIn {
+  0% { opacity: 0; transform: scale(0.2); }
+  1% { opacity: 1; transform: scale(0.2); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* Card geometry copied from .node / .flipCard in history.module.css, so the
+   two pages cannot drift apart. Sized for a phone rather than the desktop
+   clamp, which tops out at 260px. */
+.dogCard {
+  position: relative;
+  /* Over the rail, which runs down the middle of the screen. */
+  z-index: 1;
+  /* 95vw, up from 78. Cap raised in proportion, 340 x 95/78. */
+  width: min(95vw, 414px);
+}
+
+.dogFlipCard {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+  perspective: 900px;
+  border-radius: var(--radius-card, 22px);
+}
+
+.dogFlipInner {
+  position: relative;
+  /* Both faces occupy the SAME grid cell, so this box is automatically as tall
+     as whichever face is taller. That is what makes the yellow side fit its own
+     words on every dog without a fixed height or any measuring: a long note
+     simply makes the card taller, a short one leaves it square. */
+  display: grid;
+  width: 100%;
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  transform-style: preserve-3d;
+}
+
+.dogFront,
+.dogBack {
+  grid-area: 1 / 1;
+  min-width: 0;
+  border-radius: var(--radius-card, 22px);
+  overflow: hidden;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.dogFront {
+  background: #ffffff;
+  /* The picture holds the square. The back face is free to be taller. */
+  aspect-ratio: 1 / 1;
+  position: relative;
+}
+
+/* Hidden outright once the card turns, the same trick the desktop page uses on
+   hover. `backface-visibility` alone does not reliably hide an absolutely
+   positioned child, which is why the name stayed while the status bar went.
+   The delay lets the flip reach halfway first. */
+.dogFrontOff {
+  visibility: hidden;
+  /* The flip runs 0.5s, so hiding at 0.2s clears the name a full 0.3s
+     before it lands, which is what stops it showing mirrored mid-turn. */
+  transition: visibility 0s linear 0.2s;
+}
+
+.dogThumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* The corner flash, top left of the card.
+
+   TWO PIECES IN TWO PLACES, and that is the point.
+
+   .dogFlashWedge is the yellow ground. It stays inside .dogFront so that face's
+   overflow and radius clip it to the card's rounded corner.
+
+   .dogFlash is the lettering, and it is a third layer in .dogFlipInner's single
+   grid cell instead. The words break out past the card's top and left edges, so
+   anything left inside .dogFront would be sliced by the very clip the wedge
+   needs. It is still inside .dogFlipInner, so it turns away with the card. A
+   layer parked on .dogCard would sit there while the card flipped.
+
+   The SVGs carry the words only. Their white paths are the white letters and
+   their unclassed paths take the SVG default fill, which is black, so the
+   keyline and the solid PLAY come out of the file. Only the yellow is drawn
+   here. */
+.dogFlashWedge {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 44%;
+  aspect-ratio: 1 / 1;
+  /* #feee08, chosen by eye against the concept. The concept file itself
+     samples as #fdf251, which was the first value here, but side by side it
+     read as the weaker of the two. Sampled, not guessed. */
+  background: #feee08;
+  /* Corner to corner, so the hypotenuse runs top right to bottom left. */
+  clip-path: polygon(0 0, 100% 0, 0 100%);
+  pointer-events: none;
+}
+
+.dogFlash {
+  grid-area: 1 / 1;
+  position: relative;
+  /* Turns away with the picture, exactly as the two faces do. */
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  /* A hair in front, so painting order cannot depend on how the browser sorts
+     three layers sitting at the same depth. */
+  transform: translateZ(1px);
+  /* Never steals a tap: the whole card is one target. */
+  pointer-events: none;
+}
+
+/* The two files are DIFFERENT SHAPES, 720 x 416.7 and 720 x 665, so one size
+   could never suit both. Each carries its own width and its own overhang.
+
+   THE OVERHANG IS A MARGIN, NOT `top`. A percentage `top` resolves against the
+   containing block's HEIGHT, and that height is whichever card face is taller,
+   so it differs from dog to dog and the breakout would never be the same twice.
+   Percentage margins resolve against WIDTH, the card's own fixed measure, which
+   is the same unit the widths below use. Artwork and overhang then scale
+   together.
+
+   Measured off the live render at 16ad1f8: the words were sitting 2.1% of the
+   card width inside the top edge and 1.1% inside the left. THESE ARE THE
+   NUMBERS TO NUDGE. */
+.dogFlashLearn,
+.dogFlashPlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-repeat: no-repeat;
+  background-position: top left;
+  background-size: 100% auto;
+}
+
+.dogFlashLearn {
+  /* 40% plus a tenth. Grows from the top left anchor, so the words spread down
+     and right and the left edge stays put. */
+  width: 44%;
+  aspect-ratio: 720 / 416.7;
+  /* Up 10px from the 2% that was here, which is 2.7% of a 373px card. Kept as
+     a percentage rather than a flat value so it stays in proportion when the
+     card shrinks. */
+  margin: -0.7% 0 0 -0.6%;
+  background-image: url("/history/flash-learn.svg");
+}
+
+.dogFlashPlay {
+  /* 34% plus a fifth. Growing from the top left anchor, so the words spread
+     down and right and their top edge stays where the margin puts it. */
+  width: 40.8%;
+  aspect-ratio: 720 / 665;
+  /* Clears the card's top edge by about 4% of the card width and its left edge
+     by about 1%. Down 5px from the 5.7% that was here, as a percentage rather
+     than a flat value so the overhang stays in proportion when the card
+     shrinks. 5px on a 393px card is 1.3%. */
+  margin: -4.4% 0 0 -1.3%;
+  background-image: url("/history/flash-learn-play.svg");
+}
+
+/* The flip control on the picture side. Same masked artwork as the one on the
+   yellow face, in white so it reads against a photograph. */
+.frontFlip {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 52px;
+  height: 52px;
+  z-index: 2;
+  cursor: pointer;
+  background: #ffffff;
+  filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.45));
+  -webkit-mask-image: url("/flip-icon.svg");
+  mask-image: url("/flip-icon.svg");
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+}
+
+/* Status tag across the foot of the card. Copied from .nodeTag. */
+.dogTag {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-align: center;
+  padding: 7px 0;
+  color: #ffffff;
+}
+
+.dogTag_extinct { background: #d64545; }
+.dogTag_trending { background: #2e9e5b; }
+.dogTag_popular { background: #2e9e5b; }
+.dogTag_indecline { background: #e08a1e; }
+.dogTag_endangered { background: #e08a1e; }
+
+/* The back of the card: yellow ground, blue words. */
+.dogBack {
+  transform: rotateY(180deg);
+  background: var(--yellow, #ffd23e);
+  color: var(--navy, #0a3a57);
+  padding: 22px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  text-align: center;
+}
+
+.dogNote {
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-weight: 600;
+  /* Doubled from 1rem, then 4pt off. */
+  font-size: calc(2rem - 4pt);
+  line-height: 1.1em;
+  /* THE GAP UNDER THE SMALL LINE. It was 36px: .dogBack's own 16px flex gap
+     plus a 20px margin here, while every other element on the card had a level
+     16. Now 8px, so the note reads as belonging to the line above it.
+     A negative margin because the 16 is a flex gap and applies between every
+     pair, so it cannot be changed for one pair on its own. */
+  margin: -8px 0 -6px;
+  order: 3;
+}
+
+/* White type on the blue, not blue type on the yellow. White alone would not
+   hold against the yellow ground, so the blue moves from the letters to a pill
+   behind them. */
+.dogHint {
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  /* Bigger button, bigger label. */
+  /* Up three points on the 1.5rem base. calc, so it is a true 1pt at any width. */
+  font-size: calc(1.5rem + 3pt);
+  letter-spacing: 0.03em;
+  line-height: 0.9em;
+  color: #ffffff;
+  background: #22c55e;
+  border-radius: var(--radius-pill, 999px);
+  /* Only as wide as its words. It was stretching to the full card width
+     because a flex item in a column stretches unless told otherwise. */
+  align-self: center;
+  width: fit-content;
+  /* Straight under the button. */
+  order: 1;
+  /* 10% more top and bottom, 12 to 13.2. */
+  /* Wider than it is tall: 26px to 42px on the sides, top and bottom held. */
+  /* 10px more at the top only, bottom held at 18. */
+  padding: 28px 42px 18px;
+}
+
+/* The smaller line under the button. */
+.dogSub {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: #0a3a57;
+  text-align: center;
+  max-width: 30ch;
+  order: 2;
+}
+
+/* ---- Dog screen: rail leg, card, marker row, rail leg ------------------ */
+
+/* The name, over the picture and above the status bar. MEASURED from the
+   concept: caps about 32.5 CSS px tall, which is roughly a 45px face. */
+.dogNameOver {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 62px;
+  z-index: 1;
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: clamp(2rem, 10vw, 3.2rem);
+  line-height: 0.95;
+  color: #ffffff;
+  text-align: center;
+  letter-spacing: 0.03em;
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+}
+
+/* The marker and its two buttons, sitting across the line. */
+/* The row sits BETWEEN the two legs, so its height is the break in the line.
+   No vertical padding: with 18px the line stopped short of the disc top and
+   bottom and read as two more gaps. The row is now exactly as tall as the
+   disc, so the legs meet it edge to edge. */
+.markerRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 0;
+  /* 12px clear of the card, measured off the concept: the gap there is 3.4% of
+     the card width, which is about 12px at this size. It was 40.
+     Margin rather than padding: padding would sit inside the row and reopen
+     the break in the line above the disc. */
+  margin: 12px 0 0;
+}
+
+/* THE CARD IS SQUARE WHILE THE PICTURE IS SHOWING.
+
+   Both faces share one grid cell, so the taller of the two set the card's
+   height even when it was turned away. On a long note the yellow face hung up
+   to 311px below the picture, invisible, and the marker row sat under THAT
+   rather than under the photograph. The gap then differed on every dog
+   according to how many words its note had, and no margin could win.
+
+   An absolutely positioned grid item does not size its row. So while the
+   picture is showing, the yellow face is taken out of the flow and the row is
+   left to the square. When the card turns, it comes back into the flow and the
+   card grows to fit its words, which is what makes the yellow always fit.
+
+   The marker row therefore moves when a long card is turned over. That is what
+   .markerHopA and B are for. */
+.dogBackFolded {
+  position: absolute;
+  inset: 0;
+}
+
+/* THE HOP. The icons drop to nothing and come back, so the reader never sees
+   the row travel. Out fast, held through the middle of the turn while the card
+   resizes, back on the tail of it.
+
+   Two identical animations because re-applying one class does not replay a CSS
+   animation. The markup alternates between them on every turn.
+
+   Timed against .dogFlipInner's 0.5s flip, and it sits on the ROW rather than
+   its three children, which carry their own arrival animation. */
+.markerHopA,
+.markerHopB {
+  animation: pcMarkerHop 0.5s ease both;
+}
+
+@keyframes pcMarkerHop {
+  0% { opacity: 1; transform: scale(1); }
+  20% { opacity: 0; transform: scale(0); }
+  60% { opacity: 0; transform: scale(0); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .markerHopA,
+  .markerHopB {
+    animation: none;
+  }
+}
+
+/* MEASURED: a 35px yellow disc. Ringed white, like the head of the rail. */
+.markerDot {
+  position: relative;
+  z-index: 1;
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  background: var(--yellow, #ffd23e);
+  border: 5px solid #ffffff;
+  box-sizing: border-box;
+  flex: 0 0 auto;
+  transition: background 0.4s ease;
+}
+
+/* Green once the reader has moved past this dog. */
+.markerDotGo {
+  background: #22c55e;
+}
+
+.markerTree,
+.markerInfo {
+  appearance: none;
+  padding: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-sizing: border-box;
+  flex: 0 0 auto;
+}
+
+/* Yellow disc, navy ring and navy glyph, as in the concept. */
+.markerTree {
+  background: var(--yellow, #ffd23e);
+  border: 3px solid var(--navy, #0a3a57);
+  color: var(--navy, #0a3a57);
+}
+
+/* A dog with no level. HIDDEN, NOT REMOVED, and the difference matters: the
+   row is centred, so taking a 40px button out of it would slide the yellow
+   disc 30px to the left of the timeline line that runs down the middle of
+   every screen. visibility keeps the box and the balance. */
+.markerTreeOff {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.markerTree svg {
+  width: 22px;
+  height: 22px;
+  fill: currentColor;
+}
+
+/* Navy disc, white ring, white italic i. Same treatment as .relCardInfo. */
+.markerInfo {
+  /* Same blue as the icon on the card, which is .relCardInfo's own colour.
+     The two were on different blues. */
+  background: var(--blue-deep, #0c5b92);
+  border: 3px solid #ffffff;
+  color: #ffffff;
+  font-family: Georgia, serif;
+  font-style: italic;
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 1;
+}
+
+/* ---- Buttons on the yellow face --------------------------------------- */
+
+/* Inside .dogBack, so they appear only once the card has turned. The old
+   information icon sat on the card itself and therefore showed on both faces,
+   where it collided with the tree glyph in the same corner. */
+.backFlip,
+/* The three outbound buttons, in a ROW across the card. They were stacked and
+   absolutely positioned, which pushed them over the text and off the edge.
+   In the flow now, so the words can never run under them. */
+.backLinks {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 14px;
+  order: 4;
+}
+
+/* 33% down from 80. */
+.backLink {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  border: 3px solid #ffffff;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #ffffff;
+  font-family: Georgia, serif;
+  font-style: italic;
+  font-weight: 700;
+  font-size: 27px;
+  line-height: 1;
+}
+
+.backLink_blue { background: var(--blue-deep, #0c5b92); }
+.backLink_green { background: #22c55e; }
+.backLink_black { background: #111111; }
+
+/* The artwork is used as a MASK rather than an image, so it renders in the
+   dark blue whatever colours the SVG itself carries. An <img> cannot be
+   recoloured from CSS; a mask can. */
+.backFlip {
+  /* Bottom right. `top: auto` is required: the shared rule above sets
+     top: 14px, and without clearing it the element would be stretched
+     between the two edges. */
+  top: auto;
+  bottom: 14px;
+  right: 14px;
+  /* 20% down from 80. NO border-radius: the round frame was cropping the
+     artwork. The mask is `contain`, so the whole SVG shows. */
+  width: 64px;
+  height: 64px;
+  background: var(--blue-deep, #0c5b92);
+  -webkit-mask-image: url("/flip-icon.svg");
+  mask-image: url("/flip-icon.svg");
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+}
+
+/* Same blue and white ring as every other information icon on the page. */
+.backLink {
+  right: 14px;
+  background: var(--blue-deep, #0c5b92);
+  border: 3px solid #ffffff;
+  color: #ffffff;
+  font-family: Georgia, serif;
+  font-style: italic;
+  font-weight: 700;
+  font-size: 40px;
+  line-height: 1;
+}
+
+/* ---- Leaving the site -------------------------------------------------- */
+
+.leaveWrap {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(10, 58, 87, 0.55);
+}
+
+.leaveCard {
+  max-width: 34ch;
+  border-radius: var(--radius-card, 22px);
+  background: var(--yellow, #ffd23e);
+  color: #0a3a57;
+  padding: 26px 22px;
+  text-align: center;
+  box-shadow: 0 10px 40px rgba(10, 58, 87, 0.45);
+}
+
+.leaveText {
+  margin: 0 0 20px;
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.leaveRow {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.leaveGo,
+.leaveStay {
+  appearance: none;
+  border: 0;
+  cursor: pointer;
+  border-radius: var(--radius-pill, 999px);
+  padding: 13px 20px;
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: 1rem;
+  letter-spacing: 0.03em;
+  color: #ffffff;
+}
+
+.leaveGo { background: #22c55e; }
+.leaveStay { background: var(--blue-deep, #0b78bd); }
+
+/* The marker's three pieces arrive when the row does, not when the page loads.
+   Staggered: disc first, then the buttons either side. */
+/* DECORATION MUST NOT GATE CONTENT. This rule used to set opacity: 0 here, so
+   the three icons were invisible until a pop-in animation ran. Whenever the
+   arrival trigger failed, the whole marker row disappeared rather than simply
+   not popping, and it read as the row being missing from the page.
+
+   That failed under an IntersectionObserver and then again under a scroll
+   test, which was the tell: the fault was never the trigger, it was that
+   anything visible depended on one at all.
+
+   The icons now rest visible. The pop still runs when arrival fires, because
+   the animation carries its own opening frame. */
+.markerRow > * {
+  opacity: 1;
+}
+
+.markerIn > * {
+  animation: pcDotIn 0.32s cubic-bezier(0.2, 1.4, 0.4, 1) both;
+}
+
+.markerIn > *:nth-child(2) { animation-delay: 0s; }
+.markerIn > *:nth-child(1) { animation-delay: 0.16s; }
+.markerIn > *:nth-child(3) { animation-delay: 0.16s; }

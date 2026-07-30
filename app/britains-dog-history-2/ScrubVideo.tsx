@@ -25,14 +25,17 @@ export default function ScrubVideo({
   src,
   poster,
   className,
-  sectionIndex,
-  panelsPerSection,
+  firstPanel,
+  panelCount,
 }: {
   src: string;
   poster: string;
   className?: string;
-  sectionIndex: number;
-  panelsPerSection: number;
+  /* Global index of this section's first panel, and how many it has. Passed in
+     rather than derived: the carousel is no longer a fixed nine panels per
+     section, so there is nothing to derive it from. */
+  firstPanel: number;
+  panelCount: number;
 }) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const queued = useRef(false);
@@ -57,13 +60,12 @@ export default function ScrubVideo({
       if (!v || !duration || !carousel) return;
       const w = carousel.clientWidth;
       if (!w) return;
-      /* Fractional panel index across the whole carousel: panel 0 is the page
-         intro, then panelsPerSection panels for each section in turn. */
+      /* Fractional panel index across the whole carousel. */
       const g = carousel.scrollLeft / w;
-      const first = 1 + sectionIndex * panelsPerSection;
+      const first = firstPanel;
       /* Nine panels means eight gaps between them, so the video reaches its
          last frame exactly as the last panel arrives. */
-      const span = panelsPerSection - 1;
+      const span = panelCount - 1;
       const p = Math.min(1, Math.max(0, (g - first) / span));
       const t = p * duration;
       if (Math.abs(v.currentTime - t) > 0.02) v.currentTime = t;
@@ -81,7 +83,7 @@ export default function ScrubVideo({
       carousel.removeEventListener("scroll", onScroll);
       video.removeEventListener("loadedmetadata", onMeta);
     };
-  }, [sectionIndex, panelsPerSection]);
+  }, [firstPanel, panelCount]);
 
   return (
     <video

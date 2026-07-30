@@ -3,6 +3,7 @@ import Nav from "../../components/Nav/Nav";
 import Footer from "../../components/Footer/Footer";
 import { SECTIONS } from "./sections";
 import ScrubVideo from "./ScrubVideo";
+import TimelineRun from "./TimelineRun";
 import styles from "./history2.module.css";
 
 export const metadata: Metadata = {
@@ -29,22 +30,127 @@ export const metadata: Metadata = {
    the progress bar and the snap index reading the same single sequence. */
 
 type Panel =
-  | { kind: "text"; intro: string; detail: string }
+  /* `lead` is the section's opening paragraph, which gets the larger face.
+     The two paragraphs used to share one slide. They are now a slide each,
+     because on a phone the pair ran well past a screenful. */
+  | { kind: "text"; text: string; lead: boolean }
   | { kind: "bullet"; text: string; title?: string }
   | { kind: "fact"; text: string; image: string };
 
-/* Nine panels per section: the text panel, then the four bullets, then the
-   four facts. Shared with the counter script and the video scrub, both of
-   which convert a global panel index into a section and a position within it. */
-const PANELS_PER_SECTION = 9;
+/* TEN panels per section: the opening paragraph, the second paragraph, then
+   the four bullets and the four facts. Shared with the counter script and the
+   video scrub, both of which convert a global panel index into a section and a
+   position within it, so this is the only place the figure is written.
+   It was nine until the text panel was split in two. */
+const PANELS_PER_SECTION = 10;
+
+/* How far the fact circle rides above where it is laid out, so it breaks the
+   top edge of the blue panel.
+   THIS IS THE AUTHORITATIVE VALUE. The roll script rewrites the circle's
+   transform on every scroll frame, so a figure changed only in the CSS is
+   overwritten before anyone sees it. That is exactly what happened when this
+   went from 50 to 60. The CSS carries the same number as the pre-script
+   starting state and points here. */
+const FACT_LIFT_PX = 60;
+
+/* THE SEQUENCE OF SLIDES.
+
+   Panels used to be addressed with arithmetic: section k started at
+   1 + k * 9. That only held while every entry in the carousel was either the
+   single intro slide or a nine-panel section. The era title slide breaks it,
+   and so will every one after it.
+
+   So the running index is computed here once, at render, and written onto each
+   panel as `data-pc-panel`. The counter reads that attribute instead of
+   recalculating, which means adding a slide anywhere can no longer silently
+   put every counter after it out by one. */
+type Entry =
+  | { type: "intro" }
+  | { type: "timeline"; era: string; words: string[]; note: string }
+  | { type: "section"; si: number };
+
+/* The era screen at the head of each vertical run: the title, one word per
+   line, and the line underneath it.
+
+   Keyed by era, which sections.ts already carries on all nine sections, so a
+   run appears wherever its section does and the two can never fall out of
+   step. An era with no entry here simply gets no run, which is the switch to
+   use if one is ever pulled. */
+const TIMELINE_COPY: Record<string, { words: string[]; note: string }> = {
+  "ancient-medieval": {
+    words: ["Ancient\u2192", "Medieval", "Dogs"],
+    note: "At the start of time we did not have writing, so we can only really tell what has happened after we started writing stuff down",
+  },
+  c1500: {
+    words: ["Tudor", "Times", "Dogs"],
+    note: "The Tudors kept dogs for work and for show, and started writing down which was which",
+  },
+  c1700: {
+    words: ["The", "1700s", "Dogs"],
+    note: "Farms, hunts and city streets each wanted a different dog, so Britain started building them",
+  },
+  early1800: {
+    words: ["The Early", "1800s", "Dogs"],
+    note: "Britain was changing fast, and the dogs changed with it",
+  },
+  spaniels: {
+    words: ["The Spaniel", "Explosion"],
+    note: "One kind of dog split into many, and the spaniel family got very big very quickly",
+  },
+  mid1800: {
+    words: ["The", "Mid-1800s", "Dogs"],
+    note: "Dog shows arrived, and how a dog looked started to matter as much as what it did",
+  },
+  late1800: {
+    words: ["The Late", "1800s", "Dogs"],
+    note: "The Kennel Club began writing the rules, and breeds became official",
+  },
+  c1900: {
+    words: ["The", "1900s", "Dogs"],
+    note: "Dogs moved off the farm and into the front room",
+  },
+  crosses: {
+    words: ["Today's", "Crossbreeds"],
+    note: "Two breeds, one dog, and a lot of arguments about what to call it",
+  },
+};
+
+/* Each section, then its own run. Written as a loop rather than nine listed
+   pairs so inserting or reordering a section cannot leave a run behind on the
+   wrong one. The running index below is computed from this, not from
+   arithmetic, so the count stays right whatever this produces. */
+const SEQUENCE: Entry[] = [
+  { type: "intro" },
+  ...SECTIONS.flatMap((s, si): Entry[] => {
+    const copy = s.era ? TIMELINE_COPY[s.era] : undefined;
+    return copy && s.era
+      ? [{ type: "section", si }, { type: "timeline", era: s.era, ...copy }]
+      : [{ type: "section", si }];
+  }),
+];
 
 function panelsFor(s: (typeof SECTIONS)[number]): Panel[] {
   return [
-    { kind: "text", intro: s.intro, detail: s.detail },
+    { kind: "text", text: s.intro, lead: true },
+    { kind: "text", text: s.detail, lead: false },
     ...s.bullets.map((b, i) => ({ kind: "bullet" as const, text: b, title: s.bulletTitles?.[i] })),
     ...s.facts.map((f) => ({ kind: "fact" as const, text: f.text, image: f.image || s.image })),
   ];
 }
+
+/* The sequence laid out with its running panel index. Module scope, not inside
+   the component: the sequence never changes, so this is computed once at
+   import rather than on every render. It also keeps a mutable accumulator out
+   of render, which the compiler correctly refuses. */
+const LAID_OUT = (() => {
+  let cursor = 0;
+  return SEQUENCE.map((entry) => {
+    const count = entry.type === "section" ? PANELS_PER_SECTION : 1;
+    const first = cursor;
+    cursor += count;
+    return { entry, first, count };
+  });
+})();
 
 export default function HistoryV2Page() {
   return (
@@ -59,7 +165,7 @@ export default function HistoryV2Page() {
                 rather than the blue gradient good-dog-bad-dog uses. A tint
                 sits over it because the source image is light in the upper
                 half and white display type was unreadable on it. */}
-            <div className={styles.slide}>
+            <div className={styles.slide} data-pc-panel="0">
               <div className={styles.introSlide}>
                 <div className={styles.introImg} aria-hidden="true" />
                 <div className={styles.introTint} aria-hidden="true" />
@@ -82,17 +188,30 @@ export default function HistoryV2Page() {
               </div>
             </div>
 
-            {/* One group per section. The image and title are STICKY at the
-                left edge, so they hold their position while the group's nine
-                panels scroll past beneath them, then slide out when the next
-                section's group arrives. This is why there is no second scroll
-                container: the whole page is still one horizontal scroller and
-                a swipe anywhere moves it. */}
-            {SECTIONS.map((s, si) => {
+            {/* Everything after the intro, in order. A section renders as a
+                sticky-topped group of nine panels; an era title renders as a
+                single full-screen slide with no photograph. */}
+            {LAID_OUT.map(({ entry, first }, ei) => {
+              if (entry.type === "intro") return null;
+
+              if (entry.type === "timeline") {
+                return (
+                  <TimelineRun
+                    key={`t${ei}`}
+                    era={entry.era}
+                    panelIndex={first}
+                    words={entry.words}
+                    note={entry.note}
+                  />
+                );
+              }
+
+              const s = SECTIONS[entry.si];
+              const si = entry.si;
               const prefix = s.title.slice(0, s.title.length - s.accent.length);
               const panels = panelsFor(s);
               return (
-                <div key={si} className={styles.sectionGroup}>
+                <div key={`s${si}`} className={styles.sectionGroup}>
                   <div className={styles.stickyTop}>
                     <div className={styles.slideImg}>
                       {s.video ? (
@@ -100,8 +219,8 @@ export default function HistoryV2Page() {
                           src={s.video}
                           poster={s.image}
                           className={styles.topMedia}
-                          sectionIndex={si}
-                          panelsPerSection={PANELS_PER_SECTION}
+                          firstPanel={first}
+                          panelCount={PANELS_PER_SECTION}
                         />
                       ) : (
                         /* eslint-disable-next-line @next/next/no-img-element */
@@ -128,6 +247,9 @@ export default function HistoryV2Page() {
                     {panels.map((p, pi) => (
                       <div
                         key={pi}
+                        data-pc-panel={first + pi}
+                        data-pc-sec={si}
+                        data-pc-sub={pi}
                         className={[
                           styles.panel,
                           p.kind === "fact" ? styles.panelFact : "",
@@ -135,10 +257,9 @@ export default function HistoryV2Page() {
                         ].filter(Boolean).join(" ")}
                       >
                         {p.kind === "text" && (
-                          <>
-                            <p className={styles.slideIntro}>{p.intro}</p>
-                            <p className={styles.slideDetail}>{p.detail}</p>
-                          </>
+                          <p className={p.lead ? styles.slideIntro : styles.slideDetail}>
+                            {p.text}
+                          </p>
                         )}
                         {p.kind === "bullet" && (
                           <>
@@ -153,7 +274,7 @@ export default function HistoryV2Page() {
                               className={styles.factImg}
                               src={p.image}
                               alt=""
-                              data-pc-roll={1 + si * PANELS_PER_SECTION + pi}
+                              data-pc-roll={first + pi}
                             />
                             <p className={styles.factLabel}>Did you know?</p>
                             <p className={styles.factText}>{p.text}</p>
@@ -183,80 +304,91 @@ export default function HistoryV2Page() {
             var max = carousel.scrollWidth - carousel.clientWidth;
             bar.style.width = (max > 0 ? (carousel.scrollLeft / max) * 100 : 0) + '%';
           }
-          /* Sub-slide counter. Nine panels per section: index 0 is the
-             section's own text panel and is not a sub-slide, so it shows
-             nothing there, then 1 to 8 across the four bullets and the four
-             facts. Only the current section's counter is touched, so a
-             neighbouring one cannot flash the wrong figure mid-transition. */
-          var PANELS_PER_SECTION = ${PANELS_PER_SECTION};
+          /* Sub-slide counter. It reads the settled panel's own attributes
+             rather than deriving them from a modulus. The modulus was only
+             correct while every carousel child was one slide or nine, which
+             stopped being true the moment an era title was inserted. Panels
+             that are not part of a section carry no data-pc-sec, so the
+             counters are left alone on those. */
           var counters = document.querySelectorAll('[data-pc-count]');
           function updateCount() {
             var w = carousel.clientWidth;
             if (!w) return;
             var g = Math.round(carousel.scrollLeft / w);
-            if (g < 1) return;                       /* the intro slide */
-            var si = Math.floor((g - 1) / PANELS_PER_SECTION);
-            var sub = (g - 1) % PANELS_PER_SECTION;
-            var el = counters[si];
+            var panel = document.querySelector('[data-pc-panel="' + g + '"]');
+            if (!panel) return;
+            var sec = panel.getAttribute('data-pc-sec');
+            if (sec === null) return;
+            var el = counters[parseInt(sec, 10)];
             if (!el) return;
-            if (sub === 0) { el.style.visibility = 'hidden'; return; }
+            var sub = parseInt(panel.getAttribute('data-pc-sub'), 10);
+            /* Subs 0 and 1 are the section's two text slides. The counter is
+               about the EIGHT content cards after them, four bullets and four
+               facts, so it stays hidden on both and starts at one on the first
+               bullet. It tested sub against 0 while the text was one slide.
+               NO BACKTICKS IN HERE: this whole script is a template literal
+               and a backtick in a comment closes it. */
+            if (sub <= 1) { el.style.visibility = 'hidden'; return; }
             el.style.visibility = '';
-            el.textContent = sub + ' / 8';
+            el.textContent = (sub - 1) + ' / 8';
           }
 
-          /* CIRCLE ROLL-IN. The circles are invisible until the carousel has
-             come to rest, then the one on the settled panel rolls in from the
-             side the reader has just come from, so it reads as being carried
-             along by the swipe. Class names are interpolated from the CSS
-             module because the built names are hashed and cannot be typed as
-             literals here. */
-          var ROLL_SETTLE_MS = 140;
-          var CLS_FROM_RIGHT = '${styles.rollFromRight}';
-          var CLS_FROM_LEFT = '${styles.rollFromLeft}';
-          var rollTimer = null;
-          var lastLeft = carousel.scrollLeft;
-          var rollDir = 1;                       /* 1 = going forward */
+          /* CIRCLE ROLL-IN, driven by scroll POSITION rather than by a timer.
+             The old version waited for the carousel to settle and then ran a
+             keyframe animation, which meant the circle arrived after the swipe
+             had already finished, and it was cleared to nothing the moment the
+             next swipe began, so it vanished rather than leaving with its own
+             panel. Position-driven fixes both: the roll is a function of how
+             far the panel is from centre, so it starts the instant the finger
+             moves and is complete the instant the panel lands.
 
-          function clearRolls() {
-            var all = document.querySelectorAll('[data-pc-roll]');
-            for (var i = 0; i < all.length; i++) {
-              all[i].classList.remove(CLS_FROM_RIGHT);
-              all[i].classList.remove(CLS_FROM_LEFT);
-            }
-          }
+             It rolls IN from the left on approach, and once it has arrived it
+             stays put and simply travels off with the rest of the panel. That
+             is why the arrived flag exists: without it the roll would run
+             on the way out, and the circle would slide the wrong way against
+             the text beside it. */
+          var ROLL_TURN_DEG = 229;   /* one panel of travel for a circle half a
+                                        panel wide: 1 / (pi x 0.5) of a turn */
+          var rollEls = document.querySelectorAll('[data-pc-roll]');
 
-          function settleRoll() {
+          function updateRoll() {
             var w = carousel.clientWidth;
             if (!w) return;
-            var g = Math.round(carousel.scrollLeft / w);
-            var el = document.querySelector('[data-pc-roll="' + g + '"]');
-            if (!el) return;
-            /* Reading a layout property flushes the class removal, so coming
-               back to a panel replays the roll instead of the browser deciding
-               nothing changed. */
-            void el.offsetWidth;
-            /* Forward swipes bring the circle in from the LEFT, and going
-               back brings it in from the right. */
-            el.classList.add(rollDir >= 0 ? CLS_FROM_LEFT : CLS_FROM_RIGHT);
-          }
-
-          function onRollScroll() {
-            var now = carousel.scrollLeft;
-            if (now !== lastLeft) {
-              rollDir = now > lastLeft ? 1 : -1;
-              lastLeft = now;
+            var here = carousel.scrollLeft / w;
+            for (var i = 0; i < rollEls.length; i++) {
+              var el = rollEls[i];
+              var off = here - parseFloat(el.getAttribute('data-pc-roll'));
+              var d = Math.abs(off);
+              var t;
+              if (d >= 1) {
+                el.removeAttribute('data-pc-arrived');   /* off screen, re-arm */
+                t = 0;
+              } else if (el.hasAttribute('data-pc-arrived')) {
+                t = 1;                                    /* riding with the panel */
+              } else {
+                t = 1 - d;
+                if (d < 0.02) el.setAttribute('data-pc-arrived', '1');
+              }
+              var x = -(1 - t) * w;                       /* enters from the LEFT */
+              var a = -(1 - t) * ROLL_TURN_DEG;           /* clockwise, ie rolling right */
+              el.style.transform = 'translate(' + x.toFixed(1) + 'px, -${FACT_LIFT_PX}px) rotate(' + a.toFixed(1) + 'deg)';
+              el.style.opacity = t.toFixed(3);
             }
-            clearRolls();
-            if (rollTimer) clearTimeout(rollTimer);
-            rollTimer = setTimeout(settleRoll, ROLL_SETTLE_MS);
           }
 
+          var rollQueued = false;
           carousel.addEventListener('scroll', function(){
-            update(); updateCount(); onRollScroll();
+            update(); updateCount();
+            /* The roll writes styles on up to 36 elements, so it is thrown onto
+               the next frame rather than run inside the scroll event. */
+            if (!rollQueued) {
+              rollQueued = true;
+              requestAnimationFrame(function(){ rollQueued = false; updateRoll(); });
+            }
           }, { passive: true });
           update();
           updateCount();
-          settleRoll();
+          updateRoll();
 
           function goTo(idx) {
             /* Re-queried each time so the handler still works if React has
@@ -318,6 +450,11 @@ export default function HistoryV2Page() {
               if (axis === 'v') carousel.style.scrollSnapType = 'none';
             }
             if (axis !== 'v') return;                    /* horizontal: native handles it */
+            /* The vertical run has the wheel. Without this the drag would be
+               converted to horizontal movement and the dogs could not be
+               scrolled at all: touch-action alone does not stop this listener,
+               because it is bound to the carousel and the touch bubbles. */
+            if (carousel.getAttribute('data-pc-vlock') === '1') return;
             var now = Date.now();
             if (now > lastT) vel = (lastY - t.clientY) / (now - lastT);
             lastY = t.clientY; lastT = now;
@@ -326,6 +463,7 @@ export default function HistoryV2Page() {
 
           carousel.addEventListener('touchend', function(){
             if (axis !== 'v') return;
+            if (carousel.getAttribute('data-pc-vlock') === '1') { axis = null; return; }
             axis = null;
             var w = carousel.clientWidth;
             var idx;
@@ -344,7 +482,13 @@ export default function HistoryV2Page() {
         })();` }} />
 
       </main>
-      <Footer />
+      {/* Kept in the markup, taken out of the layout. See .footerOff: it was
+          the only element adding height below the 100dvh wrap, which made the
+          document a second vertical scroller and let a drag inside the dog run
+          chain out to it. */}
+      <div className={styles.footerOff}>
+        <Footer />
+      </div>
     </>
   );
 }

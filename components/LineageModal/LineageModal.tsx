@@ -285,7 +285,12 @@ export default function LineageModal({ name, image, character, lineage, onClose,
           registerShake={(fn) => { shakeFnRef.current = fn; }}
           registerSlowmo={(fn) => { slowmoFnRef.current = fn; }}
           onToggleCaption={() => setCaptionOpen((o) => !o)}
-          onPitClose={() => setExitAsk(true)}
+          /* NOTHING TO PAUSE, NOTHING TO CONFIRM. The X used to raise the
+             PAUSED panel unconditionally, including on the learn and start
+             screens where no round exists and there is nothing at stake. It
+             only earns its place mid-round, where a stray tap in the corner
+             would throw away a live game. */
+          onPitClose={() => (running ? setExitAsk(true) : onClose())}
           onRoundWon={() => {
             setPhase("won");
             // celebration: confetti over the flash (canvas-confetti, CDN pattern)
