@@ -159,8 +159,11 @@
 .eraWord {
   display: block;
   font-family: var(--font-display, "Luckiest Guy", system-ui);
-  /* Doubled from clamp(3.4rem, 12vw, 8rem). No shadow, by request. */
-  font-size: clamp(6.8rem, 24vw, 16rem);
+  /* Doubled from clamp(3.4rem, 12vw, 8rem), then 3pt off. Subtracted with
+     calc rather than folded into the three values, because the middle term is
+     viewport-relative: baking it in would give 3pt on one screen width and
+     something else on every other. No shadow, by request. */
+  font-size: calc(clamp(6.8rem, 24vw, 16rem) - 3pt);
   color: #ffffff;
   line-height: 1;
   text-align: center;
@@ -496,13 +499,22 @@
 
 /* The title screen is a notch too, so the reader stops on it rather than
    flying straight into the first dog. */
+/* The bottom padding is what keeps the text off the rail head. The rail is
+   absolutely positioned and 22vh tall, so reserving 24vh here means the
+   centred block is centred in what is LEFT, and the disc can no longer land
+   on the last line of the paragraph. */
 .eraScreen {
   position: relative;
   height: 100%;
   scroll-snap-align: start;
   scroll-snap-stop: always;
   box-sizing: border-box;
-  padding: 24px;
+  /* The bottom band is what keeps the text off the rail head. The rail is
+     absolute and 22vh tall, so reserving 24vh here centres the block in what
+     is LEFT and the disc can no longer land on the paragraph.
+     Written into the shorthand: a padding-bottom above this line would be
+     silently wiped by it. */
+  padding: 24px 24px 24vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -536,6 +548,14 @@
   background: #ffffff;
   border-radius: var(--radius-pill, 999px);
   pointer-events: none;
+  /* Nothing until the reader moves. The disc arrives on its own timer and the
+     line follows the first scroll. */
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
+.railStartOn {
+  opacity: 1;
 }
 
 /* The head of the timeline. Geometry copied from .node::before on the desktop

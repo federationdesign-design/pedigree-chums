@@ -108,7 +108,7 @@ export default function TimelineRun({
           {/* The head of the timeline sits on THIS screen, under the text, as
               in the concept. Its line reaches the foot of the screen and the
               rail below continues from exactly that edge. */}
-          <span className={styles.railStart} aria-hidden="true">
+          <span className={`${styles.railStart} ${moved ? styles.railStartOn : ""}`} aria-hidden="true">
             <span className={`${styles.railDot} ${moved ? styles.railDotGo : ""}`} />
           </span>
         </div>
