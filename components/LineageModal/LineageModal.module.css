@@ -257,10 +257,30 @@
   /* The wash the chum family tree wore until now, moved here by request:
      a radial gradient at 50% 40%, rgba(15,65,165,0.62) to rgba(8,34,100,0.86).
      It was a flat rgba(10,58,87,0.45). Only .endOverlay changes: the same value
-     appears again further down on another element and is left alone. */
+     appears again further down on another element and is left alone.
+     It lives on a ::before rather than on the element itself so it can FADE IN.
+     A gradient cannot be transitioned directly; an opacity can. The words and
+     buttons sit above it and arrive at full strength, so only the background
+     builds. 0.5s, which is long enough to read as a transition from the "Oh
+     no..." wash rather than a cut. */
+}
+.endOverlay::before {
+  content: "";
+  position: absolute;
+  inset: 0;
   background: radial-gradient(120% 120% at 50% 40%, rgba(15, 65, 165, 0.62), rgba(8, 34, 100, 0.86));
+  animation: lmEndWash 0.5s ease both;
+  pointer-events: none;
+  z-index: 0;
+}
+@keyframes lmEndWash {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 .endFlash {
+  /* above the fading ::before wash */
+  position: relative;
+  z-index: 1;
   font-family: var(--font-display, "Luckiest Guy", system-ui);
   font-size: clamp(3.4rem, 12vw, 8rem);
   color: #ffffff;
@@ -277,6 +297,9 @@
   to { transform: scale(1); opacity: 1; }
 }
 .endBtns {
+  /* above the fading ::before wash */
+  position: relative;
+  z-index: 1;
   display: flex;
   /* four buttons now, not two, so they wrap rather than run off a phone */
   flex-wrap: wrap;
@@ -639,10 +662,15 @@
 /* Lives sit under the title portrait, on the left, so they read as part of
    the dog's own block. The offset is the portrait's own clamp plus the
    titleWrap top, which keeps them tucked under it at every width. */
+/* BOTTOM CENTRE. It sat under the level portrait at the top left, on the same
+   axis as the score and the slider. Moved by request: the top left is now three
+   things deep and the foot of the pit is empty.
+   env(safe-area-inset-bottom) keeps it off a phone's home indicator. */
 .lives {
   position: absolute;
-  top: calc(24px + clamp(56px, 11vw, 78px) + 10px);
-  left: 30px;
+  bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 40;
   display: flex;
   align-items: center;

@@ -1761,6 +1761,12 @@ export default function BreedTree({
         el.style.fontSize = "clamp(6.8rem, 24vw, 16rem)";
         el.style.textShadow = "0 4px 40px rgba(0,0,0,0.6)";
         el.style.lineHeight = "1";
+        // The game over screen's own wash at HALF strength, so the two read as
+        // one build rather than two screens: this one comes up at 50%, then the
+        // shell's fades in over it to full. Its alphas are 0.62 and 0.86 there.
+        el.style.background =
+          "radial-gradient(120% 120% at 50% 40%, rgba(15,65,165,0.31), rgba(8,34,100,0.43))";
+        el.style.transition = "background 0.35s ease";
         window.setTimeout(() => { el.remove(); cdElRef.current = null; onPitFull?.(); }, 1400);
       }, 1200);
     }, 1000);
