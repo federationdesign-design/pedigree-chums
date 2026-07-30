@@ -24,7 +24,13 @@ export interface Assembled {
   // surface carries a shared header and hides the dog name/avatar/character label.
   header?: string; // e.g. 'HELP AND SUPPORT' above a protected safety response
   hideDogIdentity?: boolean; // true: no dog name, avatar or character label above the response
+  ariaLabel?: string; // Task 58: screen-reader label for a non-verbal response (the ':(' / ':)' faces). The UI must render this as the accessible name.
 }
+
+// Task 58: screen-reader label for the sad-face emoticon (grief ':(' and the loop's ':)'
+// close). Approved by Steve. An emoticon has no useful spoken form, so the UI renders this
+// as the accessible name instead.
+export const SAD_FACE_SR_LABEL = 'the Collie looks sad';
 
 const DOG_LABEL: Record<Dog, string> = {
   collie: 'Collie',
@@ -197,6 +203,11 @@ export function assemble(res: Resolution, data: ChumData, n: Normalised, session
 
     case 'health_answer':
       return { responseId: HEALTH_DIAGNOSIS_BOUNDARY.id, text: HEALTH_DIAGNOSIS_BOUNDARY.response, dog };
+
+    case 'grief':
+      // Task 58: a dog bereavement. The dog just looks sad; it does not try to fix it or say
+      // something clumsy. All three scenarios (GRIEF-01/02/03) share this one gentle line.
+      return { responseId: res.griefCategory ?? 'GRIEF', text: ':(', ariaLabel: SAD_FACE_SR_LABEL, dog };
 
     case 'open_discount_popup': {
       const r = pickResponse(data, 'B01', session.usedResponseIds);

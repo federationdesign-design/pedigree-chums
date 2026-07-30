@@ -103,6 +103,28 @@ const REPAIR_LADDER: Record<number, { id: string; text: string }> = {
   3: { id: 'REPAIR-L3', text: 'I could not sort that out, and I am sorry. Come back another time with a different question. Goodbye.' },
 };
 
+// Task 58: the dog-led loop copy. Approved by Steve, verbatim. Held as code constants and
+// flagged for workbook migration per PD-01 (logged in PLACEHOLDERS.md), exactly like the
+// repair ladder above. LOOP-01 fills [SUBJECT] from session.candidateSubject at serve time.
+// LOOP-03/04 rotate their variants so a repeat within one loop does not show the same line.
+const LOOP_03_VARIANTS = ['Huh.', 'Hmm.'];
+// ':)' is deliberately NOT here (Task 58 fix): it is a smile, and labelling it "the Collie
+// looks sad" for a screen reader gives the opposite of what is on screen. The only sad face is
+// grief's ':('. LOOP-04 uses Ok. and Right. only.
+const LOOP_04_VARIANTS = ['Ok.', 'Right.'];
+const ORIENT_LINE = 'Ask about the game or a dog. I know both departments.';
+// LOOP-02 is candidate-driven (Task 58): it names the specific destination the candidate maps
+// to, so it stays distinct from ORIENT's generic nudge. A breed candidate (a Title-Case breed
+// name) -> its page; a game-family word -> the card game rules; anything else -> no mapping, so
+// LOOP-02 is skipped and the turn serves LOOP-03 instead. PLACEHOLDER: the exact offer wording
+// is logged in PLACEHOLDERS.md.
+const LOOP_02_GAME_WORDS = new Set(['cards', 'deck', 'set', 'rules', 'play', 'chums', 'game']);
+function loopRouteFor(candidate: string): string | null {
+  if (/^[A-Z]/.test(candidate)) return `The ${candidate} page?`; // a resolved breed candidate is a Title-Case breed name
+  if (LOOP_02_GAME_WORDS.has(candidate)) return 'The card game rules?';
+  return null; // no destination -> skip LOOP-02
+}
+
 export function submit(data: ChumData, session: Session, input: string): Turn {
   session.submissionCount += 1;
   const n = normalise(input);
@@ -232,33 +254,58 @@ export function submit(data: ChumData, session: Session, input: string): Turn {
     session.repairCount = 0;
   }
 
-  // Task 56: the dog-led loop's no-action counter. It uses the BROADER fallback family
-  // (the B13/repair catch-all AND the GK refuse-to-guess), not the narrow repair-ladder
-  // trigger above: gk_unknown is where the inside-world questions actually land ("why do
-  // dogs sniff other dogs bums", "what type of jobs do dogs do"), so the loop must count
-  // those too or it would never fire on the questions it exists for. Capped at 4: the
-  // fourth consecutive fire rolls the counter over (reset to 0) and completes one loop.
-  // Reset to 0 by any non-fallback-family resolution (a successful route, game start,
-  // safety route, stop or goodbye). Not read by anything yet; no served response changes.
-  if (session.protectedState === null && FALLBACK_FAMILY.has(resolution.action)) {
+  // Task 57: the dog-led loop's candidate subject, computed BEFORE the loop serving below
+  // (which reads it). On a fallback-family turn outside a protected state (the fallback
+  // catch-all, or the GK refuse-to-guess), extract the canonical inside-world entity; else
+  // clear it. Held null in a protected state, like the dialogue topic (Task 27, a safety
+  // requirement). candidateEverFound latches for the D3 ORIENT rule.
+  const inLoopTurn = session.protectedState === null && FALLBACK_FAMILY.has(resolution.action);
+  session.candidateSubject = inLoopTurn ? extractCandidateSubject(n, data) : null;
+  if (session.candidateSubject !== null) session.candidateEverFound = true;
+
+  // Task 56/58: the dog-led loop. On a fallback-family turn (the B13/repair catch-all or the GK
+  // refuse-to-guess) the no-action counter advances and the loop serves its line IN PLACE OF the
+  // REPAIR ladder / GK-UNKNOWN written above (those stay in the code for now; Task 59 retires
+  // them). count 1 -> LOOP-01 (repeat the candidate subject); count 2 -> LOOP-02 (route offer,
+  // only when a candidate gives a route to point at); count 3 -> LOOP-03 (puzzled); count 4 ->
+  // LOOP-04 (close), then the counter rolls over and one loop completes. With NO candidate the
+  // repeat and the route-offer are skipped and the turn serves LOOP-03 (start at the puzzled
+  // line). D3: after two completed loops, a single ORIENT nudge, but ONLY if no candidate has
+  // been found anywhere this session (if one has, the visitor is exploring, so keep looping).
+  // SAFETY: the whole block is guarded by protectedState === null and never assigns
+  // session.protectedState, so a loop line can neither serve in a protected state nor enter or
+  // clear one; grief and urgent safety resolve above, so they never reach here.
+  if (inLoopTurn) {
     session.noActionCount += 1;
-    if (session.noActionCount >= 4) {
+    const count = session.noActionCount;
+    const subject = session.candidateSubject;
+    // LOOP-02 fires at count 2 only when the candidate maps to a destination; otherwise the
+    // turn falls through to LOOP-03 ("skip to Huh.").
+    const loopRoute = count === 2 && subject ? loopRouteFor(subject) : null;
+    if (session.completedLoops >= 2 && !session.candidateEverFound && !session.orientServed) {
+      response.text = ORIENT_LINE;
+      response.responseId = 'ORIENT';
+      session.orientServed = true;
+    } else if (count === 1 && subject) {
+      response.text = `${subject}?`;
+      response.responseId = 'LOOP-01';
+    } else if (count === 2 && loopRoute) {
+      response.text = loopRoute;
+      response.responseId = 'LOOP-02';
+    } else if (count === 4) {
+      response.text = LOOP_04_VARIANTS[session.completedLoops % LOOP_04_VARIANTS.length];
+      response.responseId = 'LOOP-04';
+    } else {
+      response.text = LOOP_03_VARIANTS[(count - 1) % LOOP_03_VARIANTS.length];
+      response.responseId = 'LOOP-03';
+    }
+    if (count >= 4) {
       session.noActionCount = 0;
       session.completedLoops += 1;
     }
   } else {
     session.noActionCount = 0;
   }
-
-  // Task 57: the dog-led loop's candidate subject. On a fallback-family turn outside a protected
-  // state (the fallback catch-all, or the GK refuse-to-guess: the Task-55 fallback set), extract
-  // the canonical inside-world entity from the input and carry it for one turn; otherwise clear it.
-  // Reuses the entity matcher only (no new language processing) and is read by nothing yet, so no
-  // served response changes. Held null during a protected state, like the dialogue topic (Task 27).
-  session.candidateSubject =
-    session.protectedState === null && FALLBACK_FAMILY.has(resolution.action)
-      ? extractCandidateSubject(n, data)
-      : null;
 
   session.lastWasComplaint = resolution.faqId === 'FAQ015'; // complaint follow-up context (Task 18)
   if (!session.lastWasComplaint) session.complaintOpened = false; // Task 25b: a clear topic change ends the complaint context, so the next complaint gets the full answer again

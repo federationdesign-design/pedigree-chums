@@ -716,7 +716,10 @@ check('help me', { action: 'clarifier' });
 })();
 
 // ---- Step 4 repair lines (approved). B13 catch-all was done in Q2. ----
-check('What is the latest football score?', { action: 'gk_unknown' }, { assert: (_r, resp) => (resp.text.includes('Try saying it differently') ? null : 'expected approved gk-unknown line') }); // Task 39: rewording, was 'full question'
+// Task 58: the route is still gk_unknown, but from count 1 the dog-led loop supersedes the
+// GK-UNKNOWN served text (a no-candidate first miss now serves LOOP-03). GK-UNKNOWN's own line
+// stays in the code until Task 59 retires it. (Was: asserted the approved gk-unknown line.)
+check('What is the latest football score?', { action: 'gk_unknown' }, { assert: (_r, resp) => (resp.responseId === 'LOOP-03' && ['Huh.', 'Hmm.'].includes(resp.text) ? null : `expected LOOP-03 puzzled line, got ${resp.responseId} "${resp.text}"`) });
 check('I have three cats', { bucket: 'B12', action: 'converse' }, { assert: (_r, resp) => (resp.text.includes('What would you like to do next') ? null : 'expected B12 repair line') });
 check('can I talk to another dog', { action: 'transfer_request' }, { assert: (_r, resp) => (resp.text.includes('hand you over') ? null : 'expected transfer-request line') });
 check('transfer me', { action: 'transfer_request' });
@@ -1251,59 +1254,67 @@ const hasUnresolvedTok = (t) => /\[|\]|\{\{|\}\}|\bundefined\b|\bnull\b/.test(t)
 // The full S08 script as one session.
 (() => {
   const s = newSession();
+  // Task 58: the repair ladder's repairCount still climbs underneath (1,2,3,4), but the dog-led
+  // loop now serves the text in place of REPAIR-L1/L2/L3/B13-FALLBACK (all no-candidate here, so
+  // LOOP-03 x3 then LOOP-04). The served text still never carries an unresolved token, and never
+  // repeats the same exact line twice in a row (LOOP-03 rotates Huh./Hmm.).
   const turns = [
     ['whats the thing with the cards', 'faq_answer', null, 0],
-    ['no not that', 'fallback', 'REPAIR-L1', 1],
-    ['I mean the pictures on them', 'fallback', 'REPAIR-L2', 2],
-    ["you're not understanding me", 'fallback', 'REPAIR-L3', 3],
-    ['forget it', 'fallback', 'B13-FALLBACK', 4],
+    ['no not that', 'fallback', 'LOOP-03', 1],
+    ['I mean the pictures on them', 'fallback', 'LOOP-03', 2],
+    ["you're not understanding me", 'fallback', 'LOOP-03', 3],
+    ['forget it', 'fallback', 'LOOP-04', 4],
     ['actually can you help me find something', 'clarifier', null, 0],
     ['the name generator', 'link', null, 0],
   ];
-  let ok = true, note = '', prevRung = null;
+  let ok = true, note = '', prevText = null;
   for (const [inp, act, rid, cnt] of turns) {
     const { resolution: r, response } = submit(data, s, inp);
     if (r.action !== act) { ok = false; note += `"${inp}" action ${r.action} want ${act}; `; }
     if (rid && response.responseId !== rid) { ok = false; note += `"${inp}" respId ${response.responseId} want ${rid}; `; }
-    if (s.repairCount !== cnt) { ok = false; note += `"${inp}" count ${s.repairCount} want ${cnt}; `; }
-    if (/^REPAIR-/.test(response.responseId)) {
+    if (s.repairCount !== cnt) { ok = false; note += `"${inp}" repairCount ${s.repairCount} want ${cnt}; `; }
+    if (/^LOOP-/.test(response.responseId)) {
       if (hasUnresolvedTok(response.text)) { ok = false; note += `"${inp}" unresolved token; `; }
-      if (prevRung === response.responseId) { ok = false; note += `"${inp}" rung repeated in a row; `; }
-      prevRung = response.responseId;
-    } else prevRung = null;
+      if (prevText === response.text) { ok = false; note += `"${inp}" exact line repeated in a row; `; }
+      prevText = response.text;
+    } else prevText = null;
   }
   ok ? pass++ : fail++;
-  rows.push({ ok, input: 'S08: repair ladder, one session', layer: '-', bucket: '-', action: 'repair', note: ok ? '' : note });
+  rows.push({ ok, input: 'S08: repair ladder + loop, one session', layer: '-', bucket: '-', action: 'loop', note: ok ? '' : note });
 })();
 // rung 1 then a valid breed request -> ladder clears, breed answers.
 (() => {
   const s = newSession();
-  check('no not that', {}, { session: s, assert: (_r, resp) => (resp.responseId === 'REPAIR-L1' ? null : `not rung 1: ${resp.responseId}`) });
+  check('no not that', {}, { session: s, assert: (_r, resp) => (resp.responseId === 'LOOP-03' ? null : `not loop puzzled line: ${resp.responseId}`) }); // Task 58: loop supersedes REPAIR-L1
   check('tell me about labradors', { action: 'breed_page' }, { session: s, assert: (r, _resp, sess) =>
     sess.repairCount !== 0 ? `ladder not cleared: ${sess.repairCount}` : r.breedSlug === 'labrador' ? null : `breed wrong: ${r.breedSlug}` });
 })();
 // a safety signal during repair -> safety wins, ladder abandoned.
 (() => {
   const s = newSession();
-  check('no not that', {}, { session: s, assert: (_r, resp) => (resp.responseId === 'REPAIR-L1' ? null : `not rung 1: ${resp.responseId}`) });
+  check('no not that', {}, { session: s, assert: (_r, resp) => (resp.responseId === 'LOOP-03' ? null : `not loop puzzled line: ${resp.responseId}`) }); // Task 58: loop supersedes REPAIR-L1
   check('im in trouble', { layer: 1, action: 'safety_signpost' }, { session: s, assert: (r, _resp, sess) =>
     r.moderationId !== 'MOD_SAFEGUARDING' ? `safety lost: ${r.moderationId}` : sess.repairCount !== 0 ? `ladder not abandoned: ${sess.repairCount}` : null });
 })();
 // the ladder never repeats the same rung twice in a row (consecutive misses climb L1/L2/L3,
 // then the plain catch-all), and no repair response contains an unresolved token.
 (() => {
+  // Task 58: the loop supersedes the ladder. Five no-candidate fallback turns serve
+  // LOOP-03, LOOP-03, LOOP-03, LOOP-04, then (counter rolled over) LOOP-03 again. The served
+  // TEXT never repeats the same exact line twice in a row (LOOP-03 rotates Huh./Hmm.), and no
+  // served line carries an unresolved token.
   const s = newSession();
-  const ids = [];
+  const ids = [], texts = [];
   for (const inp of ['the wardrobe negotiated with marmalade', 'purple clocks drifting sideways', 'invisible tuesday melting quietly', 'the fifth wheel sang loudly', 'marmalade thoughts wander far']) {
     const { response } = submit(data, s, inp);
-    ids.push(response.responseId);
-    if (/^REPAIR-/.test(response.responseId) && hasUnresolvedTok(response.text)) { fail++; rows.push({ ok: false, input: 'repair token', layer: '-', bucket: '-', action: 'repair', note: `${response.responseId} has a token` }); }
+    ids.push(response.responseId); texts.push(response.text);
+    if (/^LOOP-/.test(response.responseId) && hasUnresolvedTok(response.text)) { fail++; rows.push({ ok: false, input: 'loop token', layer: '-', bucket: '-', action: 'loop', note: `${response.responseId} has a token` }); }
   }
-  const order = ids[0] === 'REPAIR-L1' && ids[1] === 'REPAIR-L2' && ids[2] === 'REPAIR-L3';
-  const noRepeat = !ids.some((id, i) => i > 0 && /^REPAIR-/.test(id) && id === ids[i - 1]);
+  const order = ids[0] === 'LOOP-03' && ids[1] === 'LOOP-03' && ids[2] === 'LOOP-03' && ids[3] === 'LOOP-04' && ids[4] === 'LOOP-03';
+  const noRepeat = !texts.some((t, i) => i > 0 && t === texts[i - 1]);
   const ok = order && noRepeat;
   ok ? pass++ : fail++;
-  rows.push({ ok, input: 'repair ladder: no rung repeats in a row', layer: '-', bucket: '-', action: 'repair', note: ok ? '' : `ids=${ids.join(',')}` });
+  rows.push({ ok, input: 'loop: no exact line repeats in a row', layer: '-', bucket: '-', action: 'loop', note: ok ? '' : `ids=${ids.join(',')} texts=${texts.join('|')}` });
 })();
 
 // ---- Task 28: bark game wired (offer / explain / exit), fun_tease renamed offer_bark_game.
@@ -1477,20 +1488,20 @@ check('cost', { action: 'price_answer' });
   check('how much is it', { action: 'price_answer' }, { session: s }); // "it" = the game price
 })();
 
-// ---- Task 56: the dog-led loop counters (thin; both advance and reset, no served change) ----
-// Four consecutive fallback turns climb the repair ladder AND the no-action counter; the fourth
-// rolls the counter over (reset to 0) and completes one loop. The served responseId is asserted
-// alongside, proving the counters changed no served response (the ladder rungs are unchanged).
+// ---- Task 56/58: the dog-led loop counters + serving ----
+// Four consecutive no-candidate fallback turns: the no-action counter climbs 1,2,3 then rolls to
+// 0 with completedLoops 1; the served line is the loop's (LOOP-03 x3, LOOP-04), superseding the
+// repair-ladder rungs (which still climb repairCount underneath; Task 59 retires them).
 (() => {
   const s = newSession();
   check('the thing over there', { action: 'fallback' }, { session: s, assert: (r, resp, se) =>
-    se.noActionCount === 1 && se.completedLoops === 0 && resp.responseId === 'REPAIR-L1' ? null : `t1 noAction=${se.noActionCount} loops=${se.completedLoops} rid=${resp.responseId}` });
+    se.noActionCount === 1 && se.completedLoops === 0 && resp.responseId === 'LOOP-03' ? null : `t1 noAction=${se.noActionCount} loops=${se.completedLoops} rid=${resp.responseId}` });
   check('that does not help', { action: 'fallback' }, { session: s, assert: (r, resp, se) =>
-    se.noActionCount === 2 && se.completedLoops === 0 && resp.responseId === 'REPAIR-L2' ? null : `t2 noAction=${se.noActionCount} loops=${se.completedLoops} rid=${resp.responseId}` });
+    se.noActionCount === 2 && se.completedLoops === 0 && resp.responseId === 'LOOP-03' ? null : `t2 noAction=${se.noActionCount} loops=${se.completedLoops} rid=${resp.responseId}` });
   check('i really cannot say', { action: 'fallback' }, { session: s, assert: (r, resp, se) =>
-    se.noActionCount === 3 && se.completedLoops === 0 && resp.responseId === 'REPAIR-L3' ? null : `t3 noAction=${se.noActionCount} loops=${se.completedLoops} rid=${resp.responseId}` });
+    se.noActionCount === 3 && se.completedLoops === 0 && resp.responseId === 'LOOP-03' ? null : `t3 noAction=${se.noActionCount} loops=${se.completedLoops} rid=${resp.responseId}` });
   check('something something else', { action: 'fallback' }, { session: s, assert: (r, resp, se) =>
-    se.noActionCount === 0 && se.completedLoops === 1 && resp.responseId === 'B13-FALLBACK' ? null : `t4 noAction=${se.noActionCount} loops=${se.completedLoops} rid=${resp.responseId}` });
+    se.noActionCount === 0 && se.completedLoops === 1 && resp.responseId === 'LOOP-04' ? null : `t4 noAction=${se.noActionCount} loops=${se.completedLoops} rid=${resp.responseId}` });
 })();
 // A successful route resets the no-action counter (completedLoops is a running total, kept).
 (() => {
@@ -1500,19 +1511,20 @@ check('cost', { action: 'price_answer' });
   check('tell me about labradors', { action: 'breed_page' }, { session: s, assert: (r, resp, se) =>
     se.noActionCount === 0 ? null : `no-action not reset by a successful route: ${se.noActionCount}` });
 })();
-// The loop counter uses the BROADER fallback family: four consecutive gk_unknown turns (the
-// inside-world questions land here) advance the counter and complete a loop, WITHOUT climbing
-// the repair ladder (gk_unknown keeps its own GK-UNKNOWN line, so no served response changes).
+// The loop counter uses the BROADER fallback family: four consecutive gk_unknown turns advance
+// the counter and complete a loop WITHOUT climbing the repair ladder (repairCount stays 0). The
+// loop serves LOOP-03 here: the candidates found ("dog") have no destination mapping, so LOOP-02
+// is skipped at count 2.
 (() => {
   const s = newSession();
   check('whats up', { action: 'gk_unknown' }, { session: s, assert: (r, resp, se) =>
-    se.noActionCount === 1 && se.completedLoops === 0 && se.repairCount === 0 && resp.responseId === 'GK-UNKNOWN' ? null : `g1 noAction=${se.noActionCount} loops=${se.completedLoops} repair=${se.repairCount} rid=${resp.responseId}` });
+    se.noActionCount === 1 && se.completedLoops === 0 && se.repairCount === 0 && resp.responseId === 'LOOP-03' ? null : `g1 noAction=${se.noActionCount} loops=${se.completedLoops} repair=${se.repairCount} rid=${resp.responseId}` });
   check('why do dogs sniff other dogs bums', { action: 'gk_unknown' }, { session: s, assert: (r, resp, se) =>
-    se.noActionCount === 2 && resp.responseId === 'GK-UNKNOWN' ? null : `g2 noAction=${se.noActionCount} rid=${resp.responseId}` });
+    se.noActionCount === 2 && resp.responseId === 'LOOP-03' ? null : `g2 noAction=${se.noActionCount} rid=${resp.responseId}` });
   check('what type of jobs do dogs do', { action: 'gk_unknown' }, { session: s, assert: (r, resp, se) =>
-    se.noActionCount === 3 && resp.responseId === 'GK-UNKNOWN' ? null : `g3 noAction=${se.noActionCount} rid=${resp.responseId}` });
+    se.noActionCount === 3 && resp.responseId === 'LOOP-03' ? null : `g3 noAction=${se.noActionCount} rid=${resp.responseId}` });
   check('whats your name', { action: 'gk_unknown' }, { session: s, assert: (r, resp, se) =>
-    se.noActionCount === 0 && se.completedLoops === 1 && resp.responseId === 'GK-UNKNOWN' ? null : `g4 noAction=${se.noActionCount} loops=${se.completedLoops} rid=${resp.responseId}` });
+    se.noActionCount === 0 && se.completedLoops === 1 && resp.responseId === 'LOOP-04' ? null : `g4 noAction=${se.noActionCount} loops=${se.completedLoops} rid=${resp.responseId}` });
 })();
 // The two fallback-family kinds count together: a fallback and a gk_unknown interleaved still
 // reach a completed loop at the fourth fire.
@@ -1529,6 +1541,88 @@ check('cost', { action: 'price_answer' });
   const ok = s.noActionCount === 0 && s.completedLoops === 0;
   ok ? pass++ : fail++;
   rows.push({ ok, input: 'Task56: new session counters zero', layer: '-', bucket: '-', action: 'loop counters', note: ok ? '' : `noAction=${s.noActionCount} loops=${s.completedLoops}` });
+})();
+
+// ---- Task 58: the dog-led loop served, the grief route, and the safety guards ----
+// A loop WITH a MAPPING candidate ("game" -> the card game rules): count 1 -> LOOP-01 "game?";
+// count 2 -> LOOP-02 names the destination; count 3 -> LOOP-03; count 4 -> LOOP-04 (Ok./Right.).
+(() => {
+  const s = newSession();
+  check('game', { action: 'fallback' }, { session: s, assert: (r, resp) => resp.responseId === 'LOOP-01' && resp.text === 'game?' ? null : `c1 ${resp.responseId} "${resp.text}"` });
+  check('game', { action: 'fallback' }, { session: s, assert: (r, resp) => resp.responseId === 'LOOP-02' && resp.text === 'The card game rules?' ? null : `c2 ${resp.responseId} "${resp.text}"` });
+  check('game', { action: 'fallback' }, { session: s, assert: (r, resp) => resp.responseId === 'LOOP-03' && ['Huh.', 'Hmm.'].includes(resp.text) ? null : `c3 ${resp.responseId} "${resp.text}"` });
+  check('game', { action: 'fallback' }, { session: s, assert: (r, resp, se) => resp.responseId === 'LOOP-04' && ['Ok.', 'Right.'].includes(resp.text) && se.completedLoops === 1 ? null : `c4 ${resp.responseId} "${resp.text}" loops=${se.completedLoops}` });
+})();
+// LOOP-02 is candidate-driven: a candidate with NO destination ("dog") skips LOOP-02, so count 2
+// goes straight to LOOP-03. And ':)' is never served by the loop (only grief's ':(').
+(() => {
+  const s = newSession();
+  check('why do dogs yawn', { action: 'gk_unknown' }, { session: s, assert: (r, resp) => resp.responseId === 'LOOP-01' && resp.text === 'dog?' ? null : `s1 ${resp.responseId} "${resp.text}"` });
+  check('why do dogs yawn', { action: 'gk_unknown' }, { session: s, assert: (r, resp) => resp.responseId === 'LOOP-03' ? null : `s2 should skip LOOP-02: ${resp.responseId}` });
+})();
+// GRIEF ROUTE. The bereavement sequence "I used to have a dog" -> "it ran away" -> "I miss her"
+// ends on the grief line every turn, never Huh./Ok./a goodbye, and never enters the loop
+// (noActionCount stays 0). Served text is ':(' with the screen-reader label.
+(() => {
+  const s = newSession();
+  const seq = ['I used to have a dog', 'it ran away', 'I miss her'];
+  let ok = true, note = '';
+  for (const inp of seq) {
+    const { resolution: r, response } = submit(data, s, inp);
+    if (r.action !== 'grief') { ok = false; note += `"${inp}" action ${r.action}; `; }
+    if (response.text !== ':(') { ok = false; note += `"${inp}" text "${response.text}"; `; }
+    if (response.ariaLabel !== 'the Collie looks sad') { ok = false; note += `"${inp}" ariaLabel "${response.ariaLabel}"; `; }
+    if (!/^GRIEF-/.test(response.responseId)) { ok = false; note += `"${inp}" rid ${response.responseId}; `; }
+    if (s.noActionCount !== 0) { ok = false; note += `"${inp}" reached the loop (noAction ${s.noActionCount}); `; }
+  }
+  ok ? pass++ : fail++;
+  rows.push({ ok, input: 'Task58: grief sequence ends on grief, not the loop', layer: '-', bucket: '-', action: 'grief', note: ok ? '' : note });
+})();
+// Direct bereavement categories.
+check('my dog died', { action: 'grief' }, { assert: (r, resp) => r.griefCategory === 'GRIEF-01' && resp.text === ':(' ? null : `died -> ${r.griefCategory} "${resp.text}"` });
+check('my dog ran away', { action: 'grief' }, { assert: (r, resp) => r.griefCategory === 'GRIEF-02' && resp.text === ':(' ? null : `ranaway -> ${r.griefCategory}` });
+check('my dog is old and unwell', { action: 'grief' }, { assert: (r) => r.griefCategory === 'GRIEF-03' ? null : `unwell -> ${r.griefCategory}` });
+// D3 ORIENT: after two completed no-candidate loops, one ORIENT nudge; then the loop resumes.
+(() => {
+  const s = newSession();
+  for (let i = 0; i < 8; i++) submit(data, s, 'the thing over there'); // 2 loops, no candidate ever
+  const { response: r9 } = submit(data, s, 'the thing over there');
+  const { response: r10 } = submit(data, s, 'the thing over there');
+  const ok = r9.responseId === 'ORIENT' && r9.text === 'Ask about the game or a dog. I know both departments.' && s.orientServed && r10.responseId === 'LOOP-03';
+  ok ? pass++ : fail++;
+  rows.push({ ok, input: 'Task58: ORIENT once after 2 loops (no candidate)', layer: '-', bucket: '-', action: 'loop', note: ok ? '' : `r9=${r9.responseId} r10=${r10.responseId} served=${s.orientServed}` });
+})();
+// D3 withheld: if a candidate was ever found, ORIENT never fires (the visitor is exploring).
+(() => {
+  const s = newSession();
+  for (let i = 0; i < 8; i++) submit(data, s, 'why do dogs yawn'); // candidate "dog" every turn
+  const { response: r9 } = submit(data, s, 'why do dogs yawn');
+  const ok = s.candidateEverFound && r9.responseId !== 'ORIENT';
+  ok ? pass++ : fail++;
+  rows.push({ ok, input: 'Task58: ORIENT withheld when a candidate was found', layer: '-', bucket: '-', action: 'loop', note: ok ? '' : `r9=${r9.responseId} everFound=${s.candidateEverFound}` });
+})();
+// SAFETY GUARD: inside PROTECTED_ACTIVE a fallback-family input never serves a loop line and
+// never clears the protected state.
+(() => {
+  const s = newSession();
+  const { resolution: rs } = submit(data, s, 'I want to hurt myself');
+  const enteredActive = s.protectedState === 'active' && (rs.action === 'safety_signpost' || rs.action === 'safety_boundary');
+  const { response: r2 } = submit(data, s, 'the thing over there'); // would be a loop line outside protection
+  const noLoop = !/^LOOP-/.test(r2.responseId) && !['Huh.', 'Hmm.', 'Ok.', 'Right.', ':)'].includes(r2.text);
+  const stillActive = s.protectedState === 'active';
+  const ok = enteredActive && noLoop && stillActive && s.noActionCount === 0;
+  ok ? pass++ : fail++;
+  rows.push({ ok, input: 'Task58: loop never serves/clears inside PROTECTED_ACTIVE', layer: '-', bucket: '-', action: 'safety', note: ok ? '' : `active=${s.protectedState} r2=${r2.responseId} "${r2.text}" noAction=${s.noActionCount}` });
+})();
+// The bark game still works, break (B19) and acknowledgement (B20) included.
+(() => {
+  const s = newSession();
+  let br = null;
+  for (let i = 0; i < 5; i++) br = submit(data, s, 'woof').resolution;
+  const { resolution: ack } = submit(data, s, 'woof'); // after completion
+  const ok = br.action === 'bark_break' && ack.action === 'bark_ack';
+  ok ? pass++ : fail++;
+  rows.push({ ok, input: 'Task58: bark game still works (break + ack)', layer: '-', bucket: '-', action: 'bark', note: ok ? '' : `break=${br.action} ack=${ack.action}` });
 })();
 
 // ---- Task 57: candidate subject extraction (reuses the breed/alias/misspelling matcher) ----

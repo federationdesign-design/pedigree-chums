@@ -48,6 +48,12 @@ export interface Session {
   // canonical inside-world entity found in the input, or null when none is present. Cleared to
   // null on every other turn. Not read by anything yet (no served change).
   candidateSubject: string | null;
+  // Task 58: the dog-led loop's session-level flags. candidateEverFound latches true the first
+  // time any candidate subject is found this session (D3: the ORIENT nudge is withheld if the
+  // visitor is exploring rather than stuck). orientServed caps the ORIENT nudge at once per
+  // session. Both reset on a new session.
+  candidateEverFound: boolean;
+  orientServed: boolean;
   topic: Topic | null; // Task 27: the current subject + kind (folds in the old lastBreedSlug)
   previousTopic: Topic | null; // Task 27: the prior subject, so an explicit return has something to restore
   // The bark game: consecutive bark exchanges and completion, tracked per dog by
@@ -75,6 +81,8 @@ export function newSession(activeDog: Dog = 'collie'): Session {
     noActionCount: 0,
     completedLoops: 0,
     candidateSubject: null,
+    candidateEverFound: false,
+    orientServed: false,
     topic: null,
     previousTopic: null,
     barkStreakByDog: {},

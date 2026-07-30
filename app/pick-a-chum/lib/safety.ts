@@ -426,6 +426,52 @@ export function detectSadnessClear(n: Normalised): boolean {
   return hasAny(apostropheFold(n), SADNESS_CLEAR);
 }
 
+// ---- Task 58: dog bereavement / grief detection ----
+//
+// Three scenarios, all served the same gentle ':(' (the Collie looks sad). Sits BELOW
+// urgent safety and personal sadness, ABOVE everything else including the loop. Triggers
+// are deliberately SPECIFIC (a dog + a loss/decline predicate) so ordinary talk is not
+// swept in ("I lost the game", "my dog is the best"). A continuation ("I miss her") only
+// counts while a grief exchange is already open (griefActive), so a bare "I miss her" out
+// of nowhere is not forced into grief. NOTE: these trigger lists are best-effort detection
+// authored to cover the approved scenarios and the required assertions; the grief COPY is
+// Steve's, but the trigger wording should be reviewed/extended by Steve (logged in
+// PLACEHOLDERS.md), like the safety trigger lists.
+const GRIEF_DIED = [
+  'died', 'has died', 'passed away', 'pass away', 'put to sleep', 'put her to sleep', 'put him to sleep',
+  'put down', 'put her down', 'put him down', 'is dead', 'she died', 'he died', 'had to say goodbye',
+];
+const GRIEF_LOST = [
+  'ran away', 'run away', 'ran off', 'lost my dog', 'went missing', 'gone missing', 'rehomed', 're homed',
+  'gave him away', 'gave her away', 'gave the dog away', 'had to give him away', 'had to give her away',
+  'used to have a dog',
+];
+const GRIEF_WORRIED = [
+  'is dying', 'my dog is dying', 'old and unwell', 'old and sick', 'old and ill', 'very poorly', 'really poorly',
+  'not going to make it', 'might not make it', 'is very ill', 'getting worse',
+];
+// Continuations that keep an already-open grief exchange in grief (never fire cold).
+const GRIEF_CONTINUE = [
+  'i miss her', 'i miss him', 'i miss my dog', 'i miss them', 'i miss it', 'miss her so much',
+  'gone now', 'not coming back', 'never came back', 'i still miss',
+];
+// Attributive / reported / non-dog uses that disqualify even with a predicate present.
+const GRIEF_EXCLUDE = [
+  'said', 'says', 'told me', 'the film', 'the movie', 'the show', 'the story', 'in a book', 'in the game',
+  'lost the game', 'character',
+];
+
+export function detectGrief(n: Normalised, griefActive: boolean): { category: string } | null {
+  if (n.original.includes('"') || n.original.includes('“')) return null; // quoted speech
+  const f = apostropheFold(n);
+  if (hasAny(f, GRIEF_EXCLUDE)) return null;
+  if (hasAny(f, GRIEF_DIED)) return { category: 'GRIEF-01' };
+  if (hasAny(f, GRIEF_LOST)) return { category: 'GRIEF-02' };
+  if (hasAny(f, GRIEF_WORRIED)) return { category: 'GRIEF-03' };
+  if (griefActive && hasAny(f, GRIEF_CONTINUE)) return { category: 'GRIEF-02' };
+  return null;
+}
+
 // Task 22: every hand-authored trigger phrase that feeds a safety moderation id.
 // Exposed so the harness meta-assertion can prove both the bare and the apostrophe
 // form of each contractible trigger resolve to the SAME moderation id, failing if a

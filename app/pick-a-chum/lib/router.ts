@@ -8,7 +8,7 @@
 
 import { ChumData, Resolution, Dog, ActionType } from './types';
 import { Normalised, isGibberish, isSingleWord, isEmojiOnly, isBarkOnly, barkUnitCount, hasAny, buildAliasMap, applyAliases } from './normalise';
-import { detectSafety, isDogHealthQuestion, detectProtectedContinuation, detectPersonalSadness } from './safety';
+import { detectSafety, isDogHealthQuestion, detectProtectedContinuation, detectPersonalSadness, detectGrief } from './safety';
 import { Topic } from './session';
 
 const HIDDEN_CEILING = 20;
@@ -776,6 +776,19 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
       action: 'safety_signpost',
       moderationId: l2 ? 'MOD_PERSONAL_SADNESS_L2' : 'MOD_PERSONAL_SADNESS_L1',
     };
+  }
+
+  // Task 58: dog bereavement / grief. Sits BELOW urgent safety and personal sadness (both
+  // checked above) and ABOVE everything else, including the loop. Served as a gentle ':('
+  // in the ordinary Collie voice, NOT the protected support surface: the action is 'grief',
+  // not a safety signpost, so it never enters or clears a protected state; and it is not a
+  // fallback-family action, so it never reaches the loop and it resets the loop counter. A
+  // continuation ("I miss her") only counts while a grief exchange is already open.
+  if (!state.protectedState) {
+    const grief = detectGrief(N, state.lastAction === 'grief');
+    if (grief) {
+      return { layer: 1, layerName: 'Safety and unsuitable content', bucket: null, action: 'grief', griefCategory: grief.category };
+    }
   }
 
   // Task 27: explicit topic return. A generic return ("you were saying", "what were you
