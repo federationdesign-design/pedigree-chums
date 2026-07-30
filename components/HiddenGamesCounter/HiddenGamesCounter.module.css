@@ -63,8 +63,15 @@
 
 .preludeClose {
   position: absolute;
-  top: 8px;
-  right: 8px;
+  top: 11px;
+  right: 11px;
+}
+
+/* C04: the prelude's close icon scales up ~1/3. Card-scoped so the shared
+   .redIcon (completion, storage-blocked) is unchanged. */
+.prelude .redIcon {
+  width: 27px;
+  height: 27px;
 }
 
 /* Minimised: a compact pill in campaign styling. */
@@ -105,21 +112,24 @@
 }
 
 /* Prelude card (C03): icon left, two lines of text, red close top-right. */
+/* C04: prelude scaled up ~1/3. max-width capped at calc(100vw - 40px) so it
+   fits a 390px viewport (350px there) without touching the edges. */
 .prelude {
   composes: chipBase;
   position: fixed;
   display: flex;
   align-items: center;
-  gap: 12px;
-  max-width: min(340px, calc(100vw - 24px));
-  padding: 14px 40px 14px 16px;
-  border-radius: 16px;
+  gap: 16px;
+  max-width: min(452px, calc(100vw - 40px));
+  padding: 19px 53px 19px 21px;
+  border-radius: 21px;
 }
 
+/* SVG icon: scale the rendered width/height, not by stretching (C04). */
 .preludeIcon {
   flex: none;
-  width: 44px;
-  height: 44px;
+  width: 59px;
+  height: 59px;
   display: block;
 }
 
@@ -131,6 +141,7 @@
 .preludeWarning {
   margin: 0;
   font-family: var(--font-unica), system-ui, sans-serif;
+  font-size: 1.3rem;
   color: var(--navy);
   line-height: 1.1;
 }
@@ -143,22 +154,24 @@
   margin: 0;
   font-family: var(--font-display), system-ui, sans-serif;
   font-weight: 400;
+  font-size: 1.9rem;
   color: var(--hg-accent);
   line-height: 1.05;
 }
 
-/* Introduction card (D10), campaign palette. */
+/* Introduction card (D10), campaign palette. C04: scaled up ~1/3, max-width
+   capped at calc(100vw - 40px) so it fits a 390px viewport. */
 .intro {
   composes: chipBase;
-  max-width: min(300px, calc(100vw - 24px));
-  padding: 14px 16px;
-  border-radius: 16px;
+  max-width: min(399px, calc(100vw - 40px));
+  padding: 19px 21px;
+  border-radius: 21px;
 }
 
 .introLine {
-  margin: 0 0 10px;
+  margin: 0 0 13px;
   font-weight: 700;
-  font-size: 0.9rem;
+  font-size: 1.2rem;
   line-height: 1.35;
   color: var(--navy);
 }
@@ -167,7 +180,13 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
+  gap: 13px;
+}
+
+/* C04: the intro's count scales with the card. Card-scoped so the shared
+   .label (the counter chip) is unchanged. */
+.intro .label {
+  font-size: 1.2rem;
 }
 
 /* Completion (D11), campaign palette. One brief non-blocking pop, removed under
@@ -240,11 +259,11 @@
 }
 
 @media (max-width: 480px) {
+  /* Prelude and intro (C04) are omitted: their own max-width already caps at
+     calc(100vw - 40px), so they scale up on mobile without overflowing. */
   .notice,
   .blocked,
-  .intro,
-  .completed,
-  .prelude {
+  .completed {
     max-width: min(280px, calc(100vw - 24px));
   }
 }
