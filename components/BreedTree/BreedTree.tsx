@@ -5588,6 +5588,11 @@ export default function BreedTree({
         <div
           aria-hidden="true"
           className={`${styles.learnWash}${!started && learning ? " " + styles.learnWashOn : !started && learnPeek ? " " + styles.learnWashPeek : ""}`}
+          /* The wash takes its colour from the level's theme when it has one.
+             Set inline rather than through a class, because it is a value per
+             era, not a state. An era with no theme, or a theme with no wash,
+             keeps the stylesheet's own pink. */
+          style={levelTheme?.wash ? { background: levelTheme.wash } : undefined}
         />
       )}
       {/* The white-to-yellow word sweep has gone with the word. The level

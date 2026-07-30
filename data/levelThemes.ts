@@ -34,6 +34,10 @@ export type LevelTheme = {
   // does its uneven floor (see commit 770173e: a fromVertices floor came out
   // jagged and was replaced with stepped rectangles).
   floorProfile: number[];
+  // The LEARN wash, the tilted slab that slides across the start screen. It is
+  // mix-blend-mode: overlay, so it tints the backdrop rather than painting over
+  // it. Optional: an era without one keeps the stylesheet's pink.
+  wash?: string;
 };
 
 const THEMES: Record<string, LevelTheme> = {
@@ -49,6 +53,26 @@ const THEMES: Record<string, LevelTheme> = {
       0.0696, 0.0696, 0.0609, 0.0609, 0.0522, 0.0522, 0.0435, 0.0435,
       0.0348, 0.0261, 0.0261, 0.0174, 0.0174, 0.0087, 0.0087, 0.0,
     ],
+  },
+  // Tudor times. The wall is a JPEG and the ground a PNG, which is fine: both
+  // are loaded through an <img> exactly as the ancient SVGs are, and a painted
+  // texture is smaller and truer as a raster than as traced vectors.
+  c1500: {
+    bg: "/levels/tudor-bg.jpg",
+    // Sampled from the top and bottom 24 rows of the artwork, so the band the
+    // crop cannot reach meets the picture without a seam.
+    sky: ["#3e200d", "#58391e"],
+    floor: "/levels/tudor-floor.png",
+    floorAspect: 1600 / 223,
+    // This strip's top edge is dead flat. Measured at 24 points across the
+    // artwork and every one reads zero, so the physics floor is a straight
+    // line. Nothing is wrong: there is simply no relief in this ground to
+    // follow, unlike the ancient one.
+    floorProfile: [
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    ],
+    wash: "#fdf251",
   },
 };
 
