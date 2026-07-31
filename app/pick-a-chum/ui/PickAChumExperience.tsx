@@ -55,6 +55,26 @@ const POP_IN_SETTLE = 380;
 // Fixed selector order so returning visitors learn where each dog lives.
 const SELECT_ORDER: Dog[] = ['collie', 'labrador', 'terrier', 'boxer'];
 
+// Task 121: the selector arc, parametric. Dogs sit on a circle of ARC_RADIUS around the centre anchor
+// (64,64 in selector space), starting at ARC_START_DEG (clockwise from the 3 o'clock/right axis) and
+// spaced ARC_SPREAD_DEG apart. Rotated down off the top row so the first dog clears the top-right
+// hamburger; the spread is tightened so the last dog stays on screen at 768px. To re-aim the whole
+// arc, change ARC_START_DEG alone (one number, was four hardcoded left/top pairs). The dog positions
+// AND the connector lines both derive from here, so they can never drift. The mobile fan is shrunk via
+// --pc-selector-scale (CSS), not here, so these selector-space coordinates are breakpoint-independent.
+const ARC_RADIUS = 300;
+const ARC_CENTER = 64; // the "pick for me" anchor centre, in selector space
+const ARC_START_DEG = 35;
+const ARC_SPREAD_DEG = 25;
+const ARC_BODY_R = 26; // icon circular-body radius: lines start here, not at the centre (Task 113)
+const dogAngleRad = (i: number) => ((ARC_START_DEG + i * ARC_SPREAD_DEG) * Math.PI) / 180;
+// Dog button top-left (its box is 128px, centred on the ARC point): left/top = radius * cos/sin.
+const dogPos = (i: number) => ({ left: ARC_RADIUS * Math.cos(dogAngleRad(i)), top: ARC_RADIUS * Math.sin(dogAngleRad(i)) });
+// Dog centre (connector far end) and the near end on the icon's body edge.
+const dogCentre = (i: number) => ({ x: ARC_CENTER + ARC_RADIUS * Math.cos(dogAngleRad(i)), y: ARC_CENTER + ARC_RADIUS * Math.sin(dogAngleRad(i)) });
+const lineStart = (i: number) => ({ x: ARC_CENTER + ARC_BODY_R * Math.cos(dogAngleRad(i)), y: ARC_CENTER + ARC_BODY_R * Math.sin(dogAngleRad(i)) });
+const round1 = (n: number) => Math.round(n * 10) / 10;
+
 function dogInfo(dog: Dog): { name: string; image: string } {
   const rec = CHUM_DATA.dogs.find((d) => d.slug === DOG_SLUGS[dog]);
   return { name: rec?.name ?? dog, image: rec ? encodeURI(rec.image) : '' };
@@ -543,27 +563,38 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
         <div className={styles.selectorWrap}>
           <div className={styles.selector}>
             <svg className={styles.connectors} viewBox="0 0 440 440" aria-hidden="true" focusable="false">
-              {/* Task 113: radials start at the icon's circular-body EDGE, not the anchor centre, so they
-                  no longer run under the icon. Each origin = the anchor centre (64,64) pushed out along
-                  its ray by the body radius r=26 (icon body ~=260 in the 720-wide viewBox, rendered 0.1x
-                  into the 72px anchor). viewBox is square (440) so x and y map uniformly and the far ends
-                  land on the dog centres. */}
-              <line className={styles.connectorLine} style={{ animationDelay: '0.15s' }} x1="90" y1="64" x2="364" y2="64" />
-              <line className={styles.connectorLine} style={{ animationDelay: '0.45s' }} x1="86.5" y1="77" x2="324" y2="214" />
-              <line className={styles.connectorLine} style={{ animationDelay: '0.75s' }} x1="77" y1="86.5" x2="214" y2="324" />
-              <line className={styles.connectorLine} style={{ animationDelay: '1.05s' }} x1="64" y1="90" x2="64" y2="364" />
+              {/* Task 113 + 121: each radial starts at the icon's circular-body edge (ARC_BODY_R from the
+                  anchor centre) and runs to its dog's centre. Both ends are derived from the ARC_* arc, so
+                  the lines always track the dogs. viewBox is square (440), overflow visible, so a dog that
+                  fans past the left edge still gets its line drawn. */}
+              {SELECT_ORDER.map((_d, i) => {
+                const s = lineStart(i);
+                const c = dogCentre(i);
+                return (
+                  <line
+                    key={i}
+                    className={styles.connectorLine}
+                    style={{ animationDelay: `${0.15 + i * 0.3}s` }}
+                    x1={round1(s.x)}
+                    y1={round1(s.y)}
+                    x2={round1(c.x)}
+                    y2={round1(c.y)}
+                  />
+                );
+              })}
             </svg>
             {SELECT_ORDER.map((d, i) => {
               const info = dogInfo(d);
+              const p = dogPos(i);
               return (
                 <button
                   key={d}
                   type="button"
-                  className={`${styles.dogBtn} ${styles[`dog${i}`]}`}
+                  className={styles.dogBtn}
                   onClick={() => selectDog(d)}
                   title={info.name}
                   aria-label={info.name}
-                  style={{ backgroundImage: `url("${info.image}")`, animationDelay: `${0.15 + i * 0.3}s` }}
+                  style={{ backgroundImage: `url("${info.image}")`, left: `${round1(p.left)}px`, top: `${round1(p.top)}px`, animationDelay: `${0.15 + i * 0.3}s` }}
                 />
               );
             })}

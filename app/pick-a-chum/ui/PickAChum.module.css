@@ -201,13 +201,9 @@
   outline-offset: 3px;
   z-index: 4;
 }
-/* Task 81: clock face centred on the launcher's top-left anchor (centre 64,64), all four dogs at
-   radius 300 and 30deg apart, now fanning DOWN-right: Collie 3 o'clock, Labrador 4, Terrier 5,
-   Boxer 6. Equal radius + equal angle keeps the four connectors clean radials that never cross. */
-.dog0 { left: 300px; top: 0; }     /* Collie, 3 o'clock */
-.dog1 { left: 260px; top: 150px; } /* Labrador, 4 o'clock */
-.dog2 { left: 150px; top: 260px; } /* Border Terrier, 5 o'clock */
-.dog3 { left: 0; top: 300px; }     /* Boxer, 6 o'clock */
+/* Task 121: dog positions are now computed in the component from the ARC_* constants (start angle +
+   even spread) and applied as inline left/top, so the arc re-aims with one number instead of four
+   drifting pairs. The old .dog0-.dog3 left/top rules were removed. */
 .randomBtn {
   position: absolute;
   left: 28px;
@@ -570,7 +566,9 @@
     --pc-anchor-size: 60px;
     --pc-anchor-cx: calc(clamp(18px, 4vw, 48px) + clamp(112px, 16vw, 150px) + 2px + 30px);
     --pc-anchor-cy: calc(clamp(112px, 16vw, 150px) * 0.3 - 12px + 30px);
-    --pc-selector-scale: 0.72;
+    /* Task 121: shrunk from 0.72 so the whole rotated arc (all four dogs) fits inside a 320px phone
+       with a margin, rather than the first two fanning off the right edge. */
+    --pc-selector-scale: 0.48;
   }
   .panel {
     left: 16px;
