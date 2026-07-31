@@ -655,7 +655,8 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
                   do not go black or rotate with her. */}
               <div
                 className={`${styles.dogFace} ${dead ? styles.anchorDead : ''} ${roll ? styles.anchorRoll : ''}`}
-                style={{ backgroundImage: `url("${dogImage}")` }}
+                // Task 111: the anchor uses the same -img2 profile photo as the dog's messages, so they match.
+                style={{ backgroundImage: `url("${PROFILE_IMG[dog]}")` }}
                 onAnimationEnd={() => setRoll(false)}
               />
               <button type="button" className={styles.close} aria-label="Close Pick a Chum" onClick={onClose}>
