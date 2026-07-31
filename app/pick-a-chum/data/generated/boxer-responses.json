@@ -13,6 +13,21 @@
     "status": "Approved"
   },
   {
+    "responseId": "BOX-B14-01",
+    "bucketId": "B14",
+    "subtag": "gibberish",
+    "triggers": [
+      "keyboard mash",
+      "symbols only",
+      "unreadable"
+    ],
+    "template": "is that a joke?",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
     "responseId": "BOX-B23-01",
     "bucketId": "B23",
     "subtag": "identity",
@@ -66,6 +81,107 @@
       "thats rubbish"
     ],
     "template": "one more",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "BOX-B30-01",
+    "bucketId": "B30",
+    "subtag": "joke",
+    "triggers": [
+      "joke",
+      "tell me a joke",
+      "make me laugh"
+    ],
+    "template": "knock kncok",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "BOX-B30-02",
+    "bucketId": "B30",
+    "subtag": "joke",
+    "triggers": [
+      "whos there",
+      "who is there"
+    ],
+    "template": "Bow",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "BOX-B30-03",
+    "bucketId": "B30",
+    "subtag": "joke",
+    "triggers": [
+      "bow who"
+    ],
+    "template": "Not bow who! i mean Bow wow!",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "BOX-B30-04",
+    "bucketId": "B30",
+    "subtag": "joke",
+    "triggers": [
+      "another",
+      "again",
+      "more",
+      "go on"
+    ],
+    "template": "What do you call a dog rock star?",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "BOX-B30-05",
+    "bucketId": "B30",
+    "subtag": "joke",
+    "triggers": [
+      "i dont know",
+      "dunno",
+      "what"
+    ],
+    "template": "A sue-paw star",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "BOX-B30-06",
+    "bucketId": "B30",
+    "subtag": "joke",
+    "triggers": [
+      "another one",
+      "one more"
+    ],
+    "template": "How can you tell dogs are having a good time?",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "BOX-B30-07",
+    "bucketId": "B30",
+    "subtag": "joke",
+    "triggers": [
+      "how",
+      "tell me how"
+    ],
+    "template": "we are having a ball",
     "factSource": "",
     "defaultRoute": "",
     "animationCue": "",

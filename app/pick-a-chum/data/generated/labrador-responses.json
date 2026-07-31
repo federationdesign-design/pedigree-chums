@@ -13,6 +13,21 @@
     "status": "Approved"
   },
   {
+    "responseId": "LAB-B14-01",
+    "bucketId": "B14",
+    "subtag": "gibberish",
+    "triggers": [
+      "keyboard mash",
+      "symbols only",
+      "unreadable"
+    ],
+    "template": "wot?",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
     "responseId": "LAB-B23-01",
     "bucketId": "B23",
     "subtag": "identity",

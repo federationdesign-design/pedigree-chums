@@ -13,6 +13,21 @@
     "status": "Approved"
   },
   {
+    "responseId": "TER-B14-01",
+    "bucketId": "B14",
+    "subtag": "gibberish",
+    "triggers": [
+      "keyboard mash",
+      "symbols only",
+      "unreadable"
+    ],
+    "template": "whats that supposed to be?",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
     "responseId": "TER-B23-01",
     "bucketId": "B23",
     "subtag": "identity",
