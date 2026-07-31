@@ -402,6 +402,14 @@ export default function TimelineRun({
                       />
                       {/* The name sits ON the picture, above the status bar. */}
                       <span className={styles.dogNameOver}>{b.name}</span>
+                      {/* The last dog of the era, and only that one. It sits in
+                          the band between the name and the status bar. */}
+                      {isLast && (
+                        <span className={styles.dogEraEnd} aria-hidden="true">
+                          {/* eslint-disable-next-line @next/next/no-img-element -- a small fixed-height SVG, next/image buys nothing */}
+                          <img src="/endofanera-icon.svg" alt="" className={styles.dogEraEndImg} />
+                        </span>
+                      )}
                       {b.tag && (
                         <span className={`${styles.dogTag} ${styles[`dogTag_${b.tag.replace("-", "")}`] ?? ""}`}>
                           {TAG_LABEL[b.tag] ?? b.tag}

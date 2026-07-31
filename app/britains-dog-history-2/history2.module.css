@@ -1122,6 +1122,32 @@
 
 /* The name, over the picture and above the status bar. MEASURED from the
    concept: caps about 32.5 CSS px tall, which is roughly a 45px face. */
+/* END OF AN ERA, on the final dog of a run.
+
+   The band it lives in is measured, not chosen: the status bar sits at the
+   bottom and is about 26px tall, and the name is anchored at 62px. So there is
+   roughly 36px between them and the mark is 30px to sit inside it.
+
+   If the supplied artwork needs more room the honest fix is to lift the name,
+   not to shrink this until it cannot be read. Two numbers: `bottom` here and
+   `bottom` on .dogNameOver. */
+.dogEraEnd {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 32px;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+.dogEraEndImg {
+  height: 30px;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+}
+
 .dogNameOver {
   position: absolute;
   left: 12px;
