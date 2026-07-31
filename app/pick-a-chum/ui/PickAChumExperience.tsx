@@ -124,6 +124,15 @@ function readChat(): { messages: Message[]; session: Session; dog: Dog; phase: P
   }
 }
 
+// Task 108: per-dog chat profile image, shown beside that dog's messages. Cached per URL, so it is
+// fetched once per dog, not per message. (Resized JPEGs to be dropped in with the same names.)
+const PROFILE_IMG: Record<Dog, string> = {
+  collie: '/collie-chat-profile-img2.jpg',
+  labrador: '/lab-chat-profile-img2.jpg',
+  boxer: '/boxer-chat-profile-img2.jpg',
+  terrier: '/terrier-chat-profile-img2.jpg',
+};
+
 export default function PickAChumExperience({ onClose }: { onClose: () => void }) {
   const restoredRef = useRef<ReturnType<typeof readChat> | undefined>(undefined);
   if (restoredRef.current === undefined) restoredRef.current = readChat();
@@ -133,6 +142,10 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
   const [phase, setPhase] = useState<Phase>(restored ? restored.phase || 'idle' : 'selecting');
   const [dog, setDog] = useState<Dog>(restored ? restored.dog || 'collie' : 'collie'); // active dog (the anchor medallion)
   const [swap, setSwap] = useState<Swap>('none');
+  // Task 78: the two visual tricks on the dog image. dead persists (black image) until the next submit;
+  // roll is a one-off rotation that clears itself when the animation ends.
+  const [dead, setDead] = useState(false);
+  const [roll, setRoll] = useState(false);
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<Message[]>(restored ? restored.messages || [] : []);
   const [announce, setAnnounce] = useState(''); // aria-live: whole messages, once
@@ -334,6 +347,7 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
     const session = sessionRef.current;
     const text = (textArg ?? input).trim();
     if (!session || !text || session.closed) return;
+    setDead(false); // Task 78: any submit, whatever it is, revives the Collie (play dead lasts one turn)
     // Task 82: the dog is still performing. Never block or disable the input -- queue the message and
     // process it when the reply lands (see the drain effect below). textArg is set only when draining
     // the queue, so a live submit still clears the box and keeps focus while a queued one does not.
@@ -372,6 +386,23 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
     if (textArg === undefined) {
       setInput('');
       inputRef.current?.focus();
+    }
+
+    // Task 78: the visual tricks. play_dead just blacks the image out (no bubble; the black image is
+    // the answer) until the next submit. roll_over rolls the image over then lands on ':)'; under
+    // reduced motion the rotation is skipped and only the ':)' end state shows. Both are instant.
+    if (result.resolution.action === 'play_dead') {
+      setMessages((m) => [...m, userMsg]);
+      setDead(true);
+      setAnnounce('the Collie plays dead');
+      return;
+    }
+    if (result.resolution.action === 'roll_over') {
+      const rollMsg: Message = { id: idRef.current++, who: 'dog', text: ':)', display: ':)', done: true, dog: toDog, name: dogInfo(toDog).name };
+      setMessages((m) => [...m, userMsg, rollMsg]);
+      if (!reducedMotion) setRoll(true);
+      setAnnounce('the Collie rolls over');
+      return;
     }
 
     // A specialist handoff: the current dog announces it (using the workbook
@@ -566,6 +597,21 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
                   </div>
                 ) : (
                   <div key={msg.id} className={`${styles.msgRow} ${styles.rowDog}`}>
+                    {/* Task 108: the dog's profile picture beside its message; hidden on the support
+                        surface, which conceals the dog identity. aria-hidden -- the nameplate names it. */}
+                    {!msg.support && msg.dog && (
+                      <img
+                        className={styles.dogProfile}
+                        src={PROFILE_IMG[msg.dog]}
+                        alt=""
+                        aria-hidden="true"
+                        // Task 108: until the (resized) JPEGs land in public/, a missing file hides
+                        // gracefully instead of showing a broken-image icon.
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                        }}
+                      />
+                    )}
                     <div className={styles.bubbleDog}>
                       <div className={`${styles.nameplate}${msg.support ? ` ${styles.nameplateSupport}` : ''}`}>{msg.name}</div>
                       {msg.typing ? (
@@ -601,10 +647,11 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
 
           <div className={styles.composerRow}>
             <div
-              className={`${styles.dogAnchor} ${anchorSwap}`}
+              className={`${styles.dogAnchor} ${anchorSwap} ${dead ? styles.anchorDead : ''} ${roll ? styles.anchorRoll : ''}`}
               style={{ backgroundImage: `url("${dogImage}")` }}
               role="img"
-              aria-label={dogInfo(dog).name}
+              aria-label={dead ? 'the Collie plays dead' : roll ? 'the Collie rolls over' : dogInfo(dog).name}
+              onAnimationEnd={() => setRoll(false)}
             >
               <button type="button" className={styles.close} aria-label="Close Pick a Chum" onClick={onClose}>
                 <span aria-hidden="true">×</span>

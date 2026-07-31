@@ -166,6 +166,8 @@ export type ActionType =
   | 'breed_choice' // two breeds within the confidence gap: offer both
   | 'breed_hub' // a breed question with no breed named: the shared hub line
   | 'breed_best' // a superlative "best dog" question: the shared refuse-to-pick line
+  | 'play_dead' // Task 78: visual trick -- the Collie image goes black until the next message
+  | 'roll_over' // Task 78: visual trick -- the Collie image rotates 180deg, then :)
   | 'boxer_cutoff'; // hidden ceiling reached
 
 export interface Resolution {

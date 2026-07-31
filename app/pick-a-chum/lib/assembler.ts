@@ -212,6 +212,14 @@ export function assemble(res: Resolution, data: ChumData, n: Normalised, session
       // something clumsy. All three scenarios (GRIEF-01/02/03) share this one gentle line.
       return { responseId: res.griefCategory ?? 'GRIEF', text: ':(', ariaLabel: SAD_FACE_SR_LABEL, dog };
 
+    // Task 78: the two visual tricks. The response text is minimal -- the effect is the image going
+    // black / rolling over, driven by the resolution action in the experience. play_dead has no bubble
+    // (the black image is the answer); roll_over lands on ':)' after the rotation.
+    case 'play_dead':
+      return { responseId: 'PLAY-DEAD', text: '', dog };
+    case 'roll_over':
+      return { responseId: 'ROLL-OVER', text: ':)', dog };
+
     case 'canned': {
       // Task 80: a conversational bucket (B21-B39) matched on its column-D triggers. Serve the
       // exact matched row's template verbatim. The faces ':(' and ':)' are non-verbal, so they get

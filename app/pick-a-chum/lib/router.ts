@@ -786,6 +786,17 @@ export function resolveCanned(n0: Normalised, data: ChumData): Resolution | null
   return m ? cannedResolution(m) : null;
 }
 
+// Task 78: the two visual tricks. Matched on the WHOLE input only (exact), so a grief/safety message
+// that merely contains "dead" (e.g. "my dog is dead") is never a trick -- those resolve above this in
+// the safety block. Placed in resolve() below safety/grief and the known routes, above the fallback.
+const PLAY_DEAD = new Set(['play dead', 'playdead', 'dead']);
+const ROLL_OVER = new Set(['roll over', 'rollover', 'roll']);
+function matchTrick(c: string): 'play_dead' | 'roll_over' | null {
+  if (PLAY_DEAD.has(c)) return 'play_dead';
+  if (ROLL_OVER.has(c)) return 'roll_over';
+  return null;
+}
+
 export function resolve(n0: Normalised, data: ChumData, state: RouterState): Resolution {
   // Apply curated misspelling aliases first, so both the safety gate and every
   // downstream layer see the canonical word. Fuzzy matching (in hasAny) then
@@ -882,6 +893,14 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
     if (grief) {
       return { layer: 1, layerName: 'Safety and unsuitable content', bucket: null, action: 'grief', griefCategory: grief.category };
     }
+  }
+
+  // Task 78: the two visual tricks. Below safety/grief (so "my dog is dead" is grief, never a trick)
+  // and ABOVE every content route (so "play dead" is not swallowed by the how-to-play FAQ). Exact-match
+  // on the whole input, so nothing that merely contains "dead"/"roll" is caught.
+  {
+    const trick = matchTrick(c);
+    if (trick) return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: trick };
   }
 
   // Task 68: confirmation after a loop offer. If the previous turn served LOOP-01 or LOOP-02

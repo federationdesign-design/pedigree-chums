@@ -240,6 +240,18 @@
 }
 .rowDog {
   justify-content: flex-start;
+  align-items: flex-start;
+  gap: 10px;
+}
+/* Task 108: round profile picture beside a dog's message. */
+.dogProfile {
+  flex: none;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--pc-ui-blue);
+  box-shadow: var(--pc-shadow);
 }
 .rowUser {
   justify-content: flex-end;
@@ -383,6 +395,23 @@
 }
 .anchorIn {
   animation: pcPop 440ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+/* Task 78: play dead -- the image goes black, held by the `dead` state until the next message. */
+.anchorDead {
+  filter: brightness(0);
+}
+/* Task 78: roll over -- a one-off full rotation (through 180, returning upright), then the ':)' lands.
+   It rotates, it does not mirror (a horizontal flip would look like nothing happened). */
+.anchorRoll {
+  animation: pcRoll 700ms cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+@keyframes pcRoll {
+  from {
+    transform: rotate(0);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 /* Close: the only close control, restyled as a traditional icon (red, white X)
    and sitting on the top corner of the dog medallion. */
@@ -546,6 +575,7 @@
   .composerRow,
   .anchorOut,
   .anchorIn,
+  .anchorRoll,
   .randomBtn {
     animation: none;
     opacity: 1;
