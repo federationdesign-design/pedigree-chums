@@ -40,6 +40,9 @@ function expand(p) {
 const read = (f) => JSON.parse(readFileSync(join(GEN, f), 'utf8'));
 const data = {
   collieResponses: read('collie-responses.json'),
+  labradorResponses: read('labrador-responses.json'),
+  boxerResponses: read('boxer-responses.json'),
+  terrierResponses: read('terrier-responses.json'),
   destinations: read('destinations.json'),
   faq: read('faq.json'),
   generalKnowledge: read('general-knowledge.json'),

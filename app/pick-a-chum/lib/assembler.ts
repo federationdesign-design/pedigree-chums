@@ -4,6 +4,7 @@
 // avoids repeating an exact line or destination within a session.
 
 import { ChumData, Resolution, Dog, CollieResponse } from './types';
+import { effectiveBank } from './banks';
 import { Normalised } from './normalise';
 import { Session } from './session';
 import { CAMPAIGN } from '../data/campaign';
@@ -192,8 +193,13 @@ function navHandoff(data: ChumData, dog: Dog, session: Session): string {
   return pool[session.submissionCount % pool.length].line.replace(/\s*\[LINK\]\s*$/i, '').trim();
 }
 
-export function assemble(res: Resolution, data: ChumData, n: Normalised, session: Session): Assembled {
+export function assemble(res: Resolution, data0: ChumData, n: Normalised, session: Session): Assembled {
   const dog = session.activeDog;
+  // Per-dog architecture: swap in the active dog's effective response bank (its own rows per owned
+  // bucket, Collie otherwise; protected buckets always Collie). Every pickResponse, the canned find and
+  // pickBark below read data.collieResponses, so they all become dog-aware here with no per-call change.
+  // Only the response bank is scoped; every other array (faq, gk, destinations, dogs...) is shared.
+  const data: ChumData = dog === 'collie' ? data0 : { ...data0, collieResponses: effectiveBank(data0, dog) };
 
   switch (res.action) {
     case 'safety_signpost':

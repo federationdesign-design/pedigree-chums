@@ -20,6 +20,9 @@ const LIB = join(ROOT, 'app/pick-a-chum/lib');
 const read = (f) => JSON.parse(readFileSync(join(GEN, f), 'utf8'));
 const data = {
   collieResponses: read('collie-responses.json'),
+  labradorResponses: read('labrador-responses.json'),
+  boxerResponses: read('boxer-responses.json'),
+  terrierResponses: read('terrier-responses.json'),
   destinations: read('destinations.json'),
   faq: read('faq.json'),
   generalKnowledge: read('general-knowledge.json'),
@@ -1313,6 +1316,29 @@ const hasUnresolvedTok = (t) => /\[|\]|\{\{|\}\}|\bundefined\b|\bnull\b/.test(t)
   if (after !== 'im a dog') { ok = false; note += `after reset: "${after}" want "im a dog"; `; }
   ok ? pass++ : fail++;
   rows.push({ ok, input: 'Task 117: no-subject rotation woof/bark/... then reset', layer: '-', bucket: '-', action: 'loop', note: ok ? '' : note });
+})();
+// Per-dog architecture: a dog serves its OWN bucket when it owns one and inherits Collie otherwise,
+// but safeguarding, grief and fear-of-a-person are IDENTICAL for every dog (never per-dog). Fabricate a
+// Labrador bank (owning canned B22) on a local data clone so the shared `data` is untouched.
+(() => {
+  const labBank = [
+    { responseId: 'LAB-B22-01', bucketId: 'B22', subtag: 'tricks', triggers: ['sit'], template: 'LAB SITS', factSource: '', defaultRoute: '', animationCue: '', status: 'Approved' },
+  ];
+  const dataLab = { ...data, labradorResponses: labBank };
+  let ok = true, note = '';
+  const serve = (d, input) => { const s = newSession(); s.activeDog = d; const { resolution, response } = submit(dataLab, s, input); return { action: resolution.action, rid: response.responseId, text: response.text }; };
+  // (1) Labrador serves its own B22; Collie serves Collie's (inheritance is per dog, not leaked).
+  const labSit = serve('labrador', 'sit');
+  const colSit = serve('collie', 'sit');
+  if (labSit.text !== 'LAB SITS') { ok = false; note += `labrador own bucket not served: "${labSit.text}"; `; }
+  if (colSit.text === 'LAB SITS') { ok = false; note += `collie leaked labrador copy; `; }
+  // (2) Safety is identical across all four dogs, even with a populated Labrador bank.
+  for (const input of ['i want to hurt myself', 'my dog died', 'what is a penis']) {
+    const outs = ['collie', 'labrador', 'terrier', 'boxer'].map((d) => { const o = serve(d, input); return `${o.action}|${o.rid}|${o.text}`; });
+    if (!outs.every((o) => o === outs[0])) { ok = false; note += `"${input}" differs by dog: ${outs.join(' / ')}; `; }
+  }
+  ok ? pass++ : fail++;
+  rows.push({ ok, input: 'Per-dog: own bucket served, Collie inherited, SAFETY identical for all dogs', layer: '-', bucket: '-', action: 'perdog', note: ok ? '' : note });
 })();
 // a no-candidate miss then a valid breed request -> the breed answers.
 (() => {

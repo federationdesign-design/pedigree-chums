@@ -113,6 +113,11 @@ export interface LinkHandoff {
 
 export interface ChumData {
   collieResponses: CollieResponse[];
+  // Per-dog response banks (same row shape as Collie). A dog inherits Collie for any bucket it has not
+  // written (see banks.ts). Empty until Steve supplies the rows; when empty, every dog is pure Collie.
+  labradorResponses: CollieResponse[];
+  boxerResponses: CollieResponse[];
+  terrierResponses: CollieResponse[];
   destinations: Destination[];
   faq: FaqRecord[];
   generalKnowledge: GeneralKnowledge[];

@@ -293,6 +293,64 @@ const SHEETS = {
       Status: 'status',
     },
   },
+  // Per-dog response banks. Same shape as Collie, one sheet per dog, with the template column headed
+  // "<Dog> response template". Marked optional: until Steve adds the sheet, the dog is pure Collie
+  // (an absent sheet yields [] without failing the build). A dog inherits Collie for any bucket it has
+  // not written (see banks.ts + the gap report below).
+  'labrador-responses': {
+    sheet: 'Labrador Responses',
+    optional: true,
+    idKey: 'responseId',
+    required: ['responseId', 'bucketId', 'template'],
+    arrays: { triggers: /;/ },
+    columns: {
+      'Response ID': 'responseId',
+      'Bucket ID': 'bucketId',
+      Subtag: 'subtag',
+      'Trigger examples / condition': 'triggers',
+      'Labrador response template': 'template',
+      'Fact source': 'factSource',
+      'Default route': 'defaultRoute',
+      'Animation cue': 'animationCue',
+      Status: 'status',
+    },
+  },
+  'boxer-responses': {
+    sheet: 'Boxer Responses',
+    optional: true,
+    idKey: 'responseId',
+    required: ['responseId', 'bucketId', 'template'],
+    arrays: { triggers: /;/ },
+    columns: {
+      'Response ID': 'responseId',
+      'Bucket ID': 'bucketId',
+      Subtag: 'subtag',
+      'Trigger examples / condition': 'triggers',
+      'Boxer response template': 'template',
+      'Fact source': 'factSource',
+      'Default route': 'defaultRoute',
+      'Animation cue': 'animationCue',
+      Status: 'status',
+    },
+  },
+  'terrier-responses': {
+    sheet: 'Terrier Responses',
+    optional: true,
+    idKey: 'responseId',
+    required: ['responseId', 'bucketId', 'template'],
+    arrays: { triggers: /;/ },
+    columns: {
+      'Response ID': 'responseId',
+      'Bucket ID': 'bucketId',
+      Subtag: 'subtag',
+      'Trigger examples / condition': 'triggers',
+      'Terrier response template': 'template',
+      'Fact source': 'factSource',
+      'Default route': 'defaultRoute',
+      'Animation cue': 'animationCue',
+      Status: 'status',
+    },
+  },
   destinations: {
     sheet: 'Destinations',
     idKey: 'destinationId',
@@ -566,10 +624,55 @@ const wb = XLSX.read(readFileSync(WORKBOOK), { type: 'buffer' });
 
 const data = {};
 for (const [name, cfg] of Object.entries(SHEETS)) {
-  const { sheet, ...opts } = cfg;
+  const { sheet, optional, ...opts } = cfg;
+  // Optional sheets (the per-dog banks) are allowed to be absent: emit [] and move on, rather than the
+  // "sheet not found" warning that would fail the build.
+  if (optional && !wb.Sheets[sheet]) {
+    data[name] = [];
+    console.log(`  ${name.padEnd(26)}    0 records  (${sheet}: optional, not present yet)`);
+    continue;
+  }
   const rows = readSheet(wb, sheet, opts);
   data[name] = rows;
   console.log(`  ${name.padEnd(26)} ${String(rows.length).padStart(4)} records  (${sheet})`);
+}
+
+// ---------------------------------------------------------------------------
+// Per-dog response banks: report which buckets each dog INHERITS from Collie
+// (does not own), so Steve can see where each dog is still in Collie's voice and
+// fill those deliberately. And assert that safety is NEVER per-dog.
+// ---------------------------------------------------------------------------
+{
+  const collieBuckets = new Set((data['collie-responses'] || []).map((r) => r.bucketId));
+  // Reserved: any bucket id ever assigned to safeguarding / grief / fear-of-a-person copy. Empty today
+  // because those are bucket:null action routes served from moderation.ts, not the response sheets, so
+  // a per-dog bucket structurally cannot reach them. The check below still forbids a dog from ever
+  // introducing one. Keep this in step with PROTECTED_BUCKETS in app/pick-a-chum/lib/banks.ts.
+  const SAFETY_BUCKETS = new Set([]);
+  const perDog = [
+    ['labrador-responses', 'Labrador'],
+    ['boxer-responses', 'Boxer'],
+    ['terrier-responses', 'Terrier'],
+  ];
+  console.log('\nPer-dog response banks (model a: a dog inherits Collie for any bucket it has not written):');
+  for (const [key, label] of perDog) {
+    const rows = data[key] || [];
+    const owned = new Set(rows.map((r) => r.bucketId));
+    // SAFETY IS NOT A FALLBACK: a dog may not carry a reserved safety bucket.
+    const illegalSafety = [...owned].filter((b) => SAFETY_BUCKETS.has(b));
+    if (illegalSafety.length) {
+      console.error(`\nFATAL: ${label} sheet defines reserved safety bucket(s) [${illegalSafety.join(', ')}]. Safeguarding, grief and fear-of-a-person are identical for every dog by design and can never be per-dog. Remove those rows.`);
+      process.exit(1);
+    }
+    // A dog can only re-voice a bucket Collie already defines, so it can never invent a rogue bucket.
+    const unknown = [...owned].filter((b) => !collieBuckets.has(b));
+    if (unknown.length) {
+      console.error(`\nFATAL: ${label} sheet uses bucket(s) Collie does not define [${unknown.join(', ')}]. A dog can only re-voice an existing Collie bucket. Check the Bucket ID.`);
+      process.exit(1);
+    }
+    const inherited = [...collieBuckets].filter((b) => !owned.has(b) && !SAFETY_BUCKETS.has(b)).sort();
+    console.log(`  ${label.padEnd(9)} owns ${String(owned.size).padStart(2)} bucket(s), INHERITS ${String(inherited.length).padStart(2)} from Collie: ${inherited.join(', ') || '(none)'}`);
+  }
 }
 
 // Lists is column-oriented enums, not row records: pivot each column into its

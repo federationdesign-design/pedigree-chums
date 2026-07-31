@@ -147,7 +147,7 @@ export function submit(data: ChumData, session: Session, input: string): Turn {
   // orientation, the bare-help clarifier, FAQ). Only outside a protected state: in a protected
   // state the S12 machine below owns the turn, so canned never surfaces there.
   if (wasProtected === null && CANNED_OVERRIDABLE.has(resolution.action)) {
-    const canned = resolveCanned(n, data);
+    const canned = resolveCanned(n, data, dog);
     if (canned) resolution = canned;
   }
 

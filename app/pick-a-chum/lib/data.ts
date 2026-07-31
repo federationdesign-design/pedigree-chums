@@ -3,6 +3,9 @@
 // imports JSON directly and runs identically in both environments.
 
 import collieResponses from '../data/generated/collie-responses.json';
+import labradorResponses from '../data/generated/labrador-responses.json';
+import boxerResponses from '../data/generated/boxer-responses.json';
+import terrierResponses from '../data/generated/terrier-responses.json';
 import destinations from '../data/generated/destinations.json';
 import faq from '../data/generated/faq.json';
 import generalKnowledge from '../data/generated/general-knowledge.json';
@@ -28,6 +31,9 @@ import {
 
 export const CHUM_DATA: ChumData = {
   collieResponses: collieResponses as unknown as CollieResponse[],
+  labradorResponses: labradorResponses as unknown as CollieResponse[],
+  boxerResponses: boxerResponses as unknown as CollieResponse[],
+  terrierResponses: terrierResponses as unknown as CollieResponse[],
   destinations: destinations as unknown as Destination[],
   faq: faq as unknown as FaqRecord[],
   generalKnowledge: generalKnowledge as unknown as GeneralKnowledge[],

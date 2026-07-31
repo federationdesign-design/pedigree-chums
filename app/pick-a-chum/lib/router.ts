@@ -7,6 +7,7 @@
 // (layer 8). All matching is deterministic local code.
 
 import { ChumData, Resolution, Dog, ActionType } from './types';
+import { effectiveBank } from './banks';
 import { Normalised, normalise, isGibberish, isSingleWord, isEmojiOnly, isBarkOnly, barkUnitCount, hasAny, buildAliasMap, applyAliases } from './normalise';
 import { detectSafety, isDogHealthQuestion, detectProtectedContinuation, detectPersonalSadness, detectGrief } from './safety';
 import { Topic } from './session';
@@ -755,11 +756,13 @@ function cannedTriggerHits(c: string, hay: string, trig: string, exactOnly: bool
 // / clarifier / FAQ): a substring hit is too loose there ("what do you do when a dog barks" is a
 // real FAQ, not B27), so only a full-input match overrides. The in-router fall-through check (over
 // the non-answer zone) leaves it false, so a phrase can still match inside a longer stray message.
-function matchCanned(c: string, data: ChumData, exactOnly = false): { bucket: string; responseId: string } | null {
+function matchCanned(c: string, data: ChumData, exactOnly = false, dog: Dog = 'collie'): { bucket: string; responseId: string } | null {
   const cc = c.replace(/'/g, ''); // apostrophe-insensitive: the workbook triggers are written without them, so "what's this" matches "whats this"
   const hay = ` ${cc} `;
   let best: { bucket: string; responseId: string; len: number } | null = null;
-  for (const r of data.collieResponses) {
+  // Per-dog: match against the active dog's effective bank (its own canned rows first, Collie for any
+  // bucket it has not written), the same view the assembler serves from, so a match and its serve agree.
+  for (const r of effectiveBank(data, dog)) {
     if (!CANNED_BUCKETS.test(r.bucketId)) continue;
     for (const t of r.triggers) {
       const trig = normalise(t).compact.replace(/'/g, '');
@@ -780,9 +783,9 @@ function cannedResolution(m: { bucket: string; responseId: string }): Resolution
 // override the four "old voice" routes Steve named (identity, orientation, the bare-help clarifier
 // and soft FAQ matches) that otherwise resolve above the in-router canned check below. Safety,
 // grief, breed pages, the bark game and every hard answer keep priority; only safety outranks it.
-export function resolveCanned(n0: Normalised, data: ChumData): Resolution | null {
+export function resolveCanned(n0: Normalised, data: ChumData, dog: Dog = 'collie'): Resolution | null {
   const n = applyAliases(n0, buildAliasMap(data.misspellings));
-  const m = matchCanned(n.compact, data, true); // exact-only: overriding a real answer needs a full match
+  const m = matchCanned(n.compact, data, true, dog); // exact-only: overriding a real answer needs a full match
   return m ? cannedResolution(m) : null;
 }
 
@@ -1162,7 +1165,7 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
   // record" non-answer, while every real answer (safety, breed, FAQ, identity, known GK, ...) that
   // resolves earlier still wins. B34's first row hands over the ChumDrop page as a link.
   {
-    const canned = matchCanned(c, data);
+    const canned = matchCanned(c, data, false, state.activeDog);
     if (canned) return cannedResolution(canned);
   }
 
