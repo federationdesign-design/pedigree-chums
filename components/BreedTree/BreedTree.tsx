@@ -290,6 +290,11 @@ const TOY_SHOE_ASPECT = 520 / 343;
    86 and 94 degrees sit either side of upright, so the pair leans apart.
    Rotated, a 400px newspaper is only 176px across and a 500px shoe 330px, which
    is what lets them be this big in a pit about 390px wide. */
+/* Which prop waits and lands INTO the flood of dogs rather than before it, so
+   some of the pack is already down and the rest comes in on top of it. One word
+   to move it to another prop, or "" to send them all in together as before. */
+const PROP_IN_FLOOD: string = "shoe";
+
 const TOY_NEWSPAPER_W = 400;
 const TOY_NEWSPAPER_DEG = 86;
 const TOY_SHOE_W = 500;
@@ -3271,14 +3276,25 @@ export default function BreedTree({
            other side next time a pit arms. */
         const firstLeft = propStartLeft;
         propStartLeft = !propStartLeft;
+        /* THE FLOOD'S MIDDLE, worked out rather than guessed. The dogs start at
+           chumsAt and arrive one every CHUM_STAGGER, so the halfway point is the
+           count times the stagger, halved. A level with more dogs floods for
+           longer and the prop waits longer to suit, which a fixed delay could
+           never do. If the images are not counted yet, it falls back to the
+           front of the flood rather than landing at some invented time. */
+        const boneAt = propsAt + TOY_ROCK_GAP + TOY_BONE_GAP;
+        const chumsAt = boneAt + CHUM_GAP;
+        const floodMid = chumsAt + ((chumImagesRef.current?.length ?? 0) * CHUM_STAGGER) / 2;
         props.forEach((kind: ToyKind, i: number) => {
-          const at = i < 2 ? propsAt : propsAt + TOY_ROCK_GAP * (i - 1);
+          const at =
+            kind === PROP_IN_FLOOD ? floodMid
+            : i < 2 ? propsAt
+            : propsAt + TOY_ROCK_GAP * (i - 1);
           const left = i % 2 === 0 ? firstLeft : !firstLeft;
           toyTimers.push(window.setTimeout(() => spawnToy(kind, left ? -1 : 1), at));
         });
-        const boneAt = propsAt + TOY_ROCK_GAP + TOY_BONE_GAP;
         toyTimers.push(window.setTimeout(() => spawnToy("bone"), boneAt));
-        toyTimers.push(window.setTimeout(spawnChums, boneAt + CHUM_GAP));
+        toyTimers.push(window.setTimeout(spawnChums, chumsAt));
       };
       spawnRodRef.current = (x1: number, y1: number, x2: number, y2: number, lit: boolean) => {
         const lenPx = Math.max(10, Math.hypot(x2 - x1, y2 - y1));
