@@ -1,6 +1,7 @@
 // Shared session state (brief section 13). Browser-session lifetime; no account.
 
-import { Dog, ActionType } from './types';
+import { Dog, ActionType, GameId } from './types';
+import { GameState } from './games';
 
 // S12 protected-state machine (Task 15). Two states only:
 //   'active'    a safety state is live: only safety responses route (games, sales,
@@ -60,6 +61,13 @@ export interface Session {
   // stable Dog id (a visitor can discover a version for each of the four dogs).
   barkStreakByDog: Partial<Record<Dog, number>>;
   barkCompletedByDog: Partial<Record<Dog, boolean>>;
+  // Task 115: the three in-chat games. `activeGame` is the game that currently owns the input (null
+  // when none is running); `game` is its state; `gamesPlayed` is a monotonic counter used to pick the
+  // Missing Sheep word deterministically. A safety, grief or any non-move turn ends the game (the
+  // engine clears activeGame), so a disclosure mid-game is never swallowed as a move.
+  activeGame: GameId | null;
+  game: GameState | null;
+  gamesPlayed: number;
 }
 
 export function newSession(activeDog: Dog = 'collie'): Session {
@@ -85,5 +93,8 @@ export function newSession(activeDog: Dog = 'collie'): Session {
     previousTopic: null,
     barkStreakByDog: {},
     barkCompletedByDog: {},
+    activeGame: null,
+    game: null,
+    gamesPlayed: 0,
   };
 }

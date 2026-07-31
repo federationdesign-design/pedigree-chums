@@ -6,7 +6,7 @@
 // (layer 9); "Can dogs eat chocolate?" is safety (layer 1), not a food transfer
 // (layer 8). All matching is deterministic local code.
 
-import { ChumData, Resolution, Dog, ActionType } from './types';
+import { ChumData, Resolution, Dog, ActionType, GameId } from './types';
 import { effectiveBank } from './banks';
 import { Normalised, normalise, isGibberish, isSingleWord, isEmojiOnly, isBarkOnly, barkUnitCount, hasAny, buildAliasMap, applyAliases } from './normalise';
 import { detectSafety, isDogHealthQuestion, detectProtectedContinuation, detectPersonalSadness, detectGrief } from './safety';
@@ -476,6 +476,7 @@ export interface RouterState {
   protectedState?: 'active' | 'aftercare' | null; // S12 protected-state machine (Task 15)
   personalSadnessCount?: number; // Task 20: qualifying personal-sadness statements so far this session
   pendingConfirm?: string | null; // Task 68: subject offered by LOOP-01/LOOP-02 last turn, awaiting yes/no
+  activeGame?: GameId | null; // Task 115: the in-chat game that currently owns the input, if any
 }
 
 // Task 68: bare affirmations that confirm a loop offer. Whole-message forms only, so "yes but
@@ -805,6 +806,20 @@ function matchTrick(c: string): 'play_dead' | 'roll_over' | null {
 const FETCH_CMD = new Set(['fetch', 'go fetch']);
 const GAME_CMD = new Set(['shake', 'paw', 'shake hands', 'give paw', 'high five']);
 
+// Task 115: the three in-chat games. Entered by name; exited by a whole-input exit word (EXACT match,
+// not the fuzzy bark exit, so a Kennel Sketch guess like "bone" is never mistaken for "done"). While a
+// game is active every other input is a move.
+const GAME_STARTS: [RegExp, GameId][] = [
+  [/nine ?squares?/, 'ninesquare'],
+  [/missing sheep/, 'missingsheep'],
+  [/kennel sketch/, 'kennelsketch'],
+];
+const GAME_EXIT = new Set(['stop', 'enough', 'finished', 'finish', 'done']);
+function matchGameStart(c: string): GameId | null {
+  for (const [re, id] of GAME_STARTS) if (re.test(c)) return id;
+  return null;
+}
+
 export function resolve(n0: Normalised, data: ChumData, state: RouterState): Resolution {
   // Apply curated misspelling aliases first, so both the safety gate and every
   // downstream layer see the canonical word. Fuzzy matching (in hasAny) then
@@ -936,6 +951,22 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
   // Hidden ceiling: after safety, a session at the ceiling ends via the Boxer.
   if (state.submissionCount >= HIDDEN_CEILING) {
     return { layer: 8, layerName: 'Specialist handoff', bucket: 'B08', action: 'boxer_cutoff', transferTo: 'boxer' };
+  }
+
+  // Task 115: the three in-chat games. Placed AFTER safety, personal sadness, grief and the ceiling
+  // (all of which return above), and before every content route. So a disclosure, a bereavement or a
+  // fear-of-a-person message mid-game is caught by the safety/grief layers above and NEVER reaches here
+  // as a move; the engine then ends the game. While a game is active, an exact exit word leaves it and
+  // anything else is a move. Cold, a game name starts it.
+  if (state.activeGame) {
+    if (GAME_EXIT.has(c)) {
+      return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: 'game_exit', game: state.activeGame };
+    }
+    return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: 'game_move', game: state.activeGame };
+  }
+  {
+    const start = matchGameStart(c);
+    if (start) return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: 'game_start', game: start };
   }
 
   // The bark game (after safety and the ceiling, before everything else). A

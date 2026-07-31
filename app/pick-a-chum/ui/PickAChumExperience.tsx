@@ -104,6 +104,7 @@ interface Message {
   display?: string; // text revealed so far (typing theatre)
   done?: boolean; // performance finished (show the action link, allow the next)
   contextualLink?: boolean; // a contextual link allowed mid-chat (breed_page only)
+  gameOutput?: string; // Task 115: the game board / sheep tiles / drawing, rendered in a monospace block
 }
 
 // The response-specific action link (if any). Navigation links (a destination or
@@ -488,6 +489,7 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
       // exceptions to "nav links at the very end"; every other action's link stays
       // gated below. Not a general loosening.
       contextualLink: result.resolution.action === 'breed_page' || result.resolution.action === 'breed_hub',
+      gameOutput: r.gameOutput,
     };
     setDog(toDog);
     setMessages((m) => [...m, userMsg, dogMsg]);
@@ -662,6 +664,12 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
                         <p className={styles.dialogue} aria-hidden={!msg.done}>
                           {msg.display ?? msg.text}
                         </p>
+                      )}
+
+                      {/* Task 115: the game board / sheep tiles / drawing. MONOSPACE + pre so the ASCII
+                          keeps its shape (a proportional font collapses it). Not typed; it appears whole. */}
+                      {msg.gameOutput && (
+                        <pre className={styles.gameOutput}>{msg.gameOutput}</pre>
                       )}
 
                       {msg.done && msg.action && (msg.action.kind === 'popup' || msg.closed || msg.contextualLink) && (

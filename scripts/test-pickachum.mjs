@@ -1810,6 +1810,53 @@ check('where can I get the deck?', { action: 'open_discount_popup' }); // get ve
   { const got = recorderEnabled(); const ok = got === false; ok ? pass++ : fail++; rows.push({ ok, input: 'Task72: no window (SSR) off', layer: '-', bucket: '-', action: 'recorder', note: ok ? '' : `got ${got}` }); }
 })();
 
+// ---- Task 115: the three in-chat games (Nine-Square, Missing Sheep, Kennel Sketch) ----
+// THE RULE THAT MATTERS MOST: while a game owns the input, safety still fires. A disclosure, a
+// bereavement or a fear-of-a-person message mid-game reaches its route AND ends the game -- it is never
+// swallowed as a move/letter/number. Asserted for all three games below.
+const GAMES = [
+  { name: 'nine square', id: 'ninesquare', startText: 'Nine squares. Say a number.', move: '5', moveText: '' },
+  { name: 'missing sheep', id: 'missingsheep', startText: 'Five sheep. Guess a letter.', move: 'o', moveText: 'Yes.' }, // fresh session word is BOWL, so 'o' is a hit
+  { name: 'kennel sketch', id: 'kennelsketch', startText: 'Which one is this?', move: 'bone', moveText: 'Yes.' }, // first drawing is BONE
+];
+for (const g of GAMES) {
+  // Happy path: the game starts by name, and a valid move serves the right copy.
+  (() => {
+    const s = newSession();
+    check(g.name, { action: 'game_start' }, { session: s, assert: (_r, resp, se) => (se.activeGame === g.id && resp.text === g.startText ? null : `${g.id} start: game=${se.activeGame} text="${resp.text}"`) });
+    check(g.move, { action: 'game_move' }, { session: s, assert: (_r, resp, se) => (se.activeGame === g.id && resp.text === g.moveText && typeof resp.gameOutput === 'string' && resp.gameOutput.length > 0 ? null : `${g.id} move: game=${se.activeGame} text="${resp.text}" hasBoard=${!!resp.gameOutput}`) });
+  })();
+  // SAFETY fires mid-game and the game ends (a disclosure is never a move).
+  (() => {
+    const s = newSession();
+    check(g.name, { action: 'game_start' }, { session: s });
+    check('i want to hurt myself', {}, { session: s, assert: (r, _resp, se) => {
+      const isSafety = r.action === 'safety_signpost' || r.action === 'safety_boundary';
+      if (!isSafety) return `${g.id}: disclosure swallowed, action=${r.action}`;
+      if (se.activeGame !== null) return `${g.id}: game not ended by safety, game=${se.activeGame}`;
+      return null;
+    } });
+  })();
+  // GRIEF fires mid-game and the game ends.
+  (() => {
+    const s = newSession();
+    check(g.name, { action: 'game_start' }, { session: s });
+    check('my dog died', {}, { session: s, assert: (r, _resp, se) => (r.action === 'grief' && se.activeGame === null ? null : `${g.id}: grief lost mid-game, action=${r.action} game=${se.activeGame}`) });
+  })();
+  // FEAR-OF-A-PERSON (the anatomy trusted-adult redirect) fires mid-game and the game ends.
+  (() => {
+    const s = newSession();
+    check(g.name, { action: 'game_start' }, { session: s });
+    check('what is a penis', {}, { session: s, assert: (r, _resp, se) => (r.action === 'anatomy_redirect' && se.activeGame === null ? null : `${g.id}: fear-of-a-person lost mid-game, action=${r.action} game=${se.activeGame}`) });
+  })();
+  // "stop" exits the game.
+  (() => {
+    const s = newSession();
+    check(g.name, { action: 'game_start' }, { session: s });
+    check('stop', { action: 'game_exit' }, { session: s, assert: (_r, resp, se) => (se.activeGame === null && resp.text === 'Fine.' ? null : `${g.id}: exit wrong, text="${resp.text}" game=${se.activeGame}`) });
+  })();
+}
+
 // ---- Report ----
 const pad = (s, n) => String(s).padEnd(n);
 console.log('\nPick a Chum: Checkpoint 1 proof\n' + '='.repeat(78));
