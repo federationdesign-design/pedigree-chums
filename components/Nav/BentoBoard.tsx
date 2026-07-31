@@ -1,29 +1,19 @@
 "use client";
-import { useRef } from "react";
 import Link from "next/link";
 import ChumDropTile from "./ChumDropTile";
-import useInViewPlay from "./useInViewPlay";
 import VideoTile from "./VideoTile";
 import HeroCarousel from "./HeroCarousel";
 import styles from "./Nav.module.css";
-
-/* A tile's background video. Module scope, not defined inside the render
-   function below: a component declared in there would be a new type on every
-   render and remount its video each time. */
-function FitVideo({ src }: { src: string }) {
-  const vref = useRef<HTMLVideoElement | null>(null);
-  useInViewPlay(vref);
-  /* No autoplay attribute. It fetches the whole file whatever preload says,
-     which is what made opening the menu so expensive. metadata keeps the first
-     frame, so a tile that has not played yet is a still and not a blank. */
-  return <video ref={vref} className={styles.tileImgTag} src={src} muted playsInline preload="metadata" />;
-}
 
 // ── Launcher tiles. Titles are two-tone: labelA yellow, labelB white. ──
 type TileData = { href: string; labelA: string; labelB?: string; cta: string; img?: string; emoji?: string; size?: string; video?: string; videoAspect?: string };
 const NAV_TILES: Record<string, TileData> = {
   nameGen: { href: "/name-generator", labelA: "Try the Dog", labelB: "Name Generator", cta: "Name your chum", video: "/podium-video-menu.mp4", videoAspect: "650 / 542" },
-  product: { href: "/", labelA: "The Card", labelB: "Game", cta: "Get yours", img: "/product-img.jpg" },
+  /* `/` is the pit itself, which is where this used to land: a tile saying
+     "Get yours" dropped you into the game. It goes to the marketing page now.
+     Note the Home tile below also points at /home, so the two now share a
+     destination. */
+  product: { href: "/home", labelA: "The Card", labelB: "Game", cta: "Get yours", img: "/product-img.jpg" },
   chumFinder: { href: "/chum-calculator", labelA: "Chum", labelB: "Finder", cta: "Find your perfect dog", emoji: "🔍" },
   britains: { href: "/britains-dog-history", labelA: "Britain's", labelB: "Dog History", cta: "Travel back", img: "/history-hero.jpg" },
   about: { href: "/about", labelA: "About", cta: "Who we are", img: "/initial-preload-hero-img.jpg" },
@@ -81,7 +71,7 @@ export default function BentoBoard({
     <Link href={t.href} className={`${styles.tile} ${styles.tileFit}`} onClick={navigate}>
       {t.video ? (
         <span className={styles.fitVideoBox} style={{ aspectRatio: t.videoAspect }} aria-hidden>
-          <FitVideo src={t.video} />
+          <video className={styles.tileImgTag} src={t.video} muted autoPlay playsInline preload="auto" />
           {revealAccent && <span className={`${styles.fitAccent} ${styles.accentReveal}`}>{t.labelA}</span>}
         </span>
       ) : (

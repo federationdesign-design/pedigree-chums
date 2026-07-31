@@ -95,10 +95,7 @@ export default function ChumDropTile({
             src={src}
             muted
             playsInline
-            /* The cut happens 0.1s before a clip ends, so the NEXT one has to
-               be ready. The other two do not, and used to load anyway: four
-               clips at once is the single heaviest thing the menu did. */
-            preload={i === active || i === (active + 1) % CLIPS.length ? "auto" : "none"}
+            preload="auto"
             onTimeUpdate={() => onTimeUpdate(i)}
             onEnded={() => onEnded(i)}
           />

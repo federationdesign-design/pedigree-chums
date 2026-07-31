@@ -1,0 +1,41 @@
+/* The loading screen. Brand blue, never dark, and the mark rests VISIBLE:
+   the animation only moves it. A resting state of opacity 0 would mean a
+   failed animation showed nothing at all. */
+.wrap {
+  position: fixed;
+  inset: 0;
+  z-index: 400;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(to top right, var(--blue-sky, #5cc4ee), var(--blue-deep, #0b78bd));
+}
+.dots {
+  display: flex;
+  gap: 14px;
+}
+.dot {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--yellow, #ffd23e);
+  box-shadow: 0 3px 0 rgba(10, 58, 87, 0.3);
+  animation: pcLoadBounce 0.9s ease-in-out infinite;
+}
+.dot:nth-child(2) { animation-delay: 0.15s; }
+.dot:nth-child(3) { animation-delay: 0.3s; }
+@keyframes pcLoadBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-14px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dot { animation: none; }
+}
+/* Screen-reader only. */
+.sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

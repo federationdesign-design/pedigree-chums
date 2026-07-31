@@ -166,7 +166,10 @@
 .introBtn {
   flex: 1 1 0;
   min-width: 0;
-  padding: 16px 10px;
+  /* 21 top against 16 bottom. Luckiest Guy sits high in its em box, so an even
+     padding reads as text pushed toward the top of the button. The extra 5px
+     puts it back on the optical middle. */
+  padding: 21px 10px 16px;
   border: none;
   border-radius: 14px;
   background: #22c55e;
