@@ -27,9 +27,36 @@ export type Section = {
 
 export const SECTIONS: Section[] = [
   {
+    title: "Britain's First Dogs",
+    accent: "First Dogs",
+    era: "ancient-medieval",
+    intro:
+      "Britain's earliest dogs did not come with breed standards, pedigrees or neat family trees. They were shaped by the jobs people needed them to do. Some guarded homes and livestock, some followed scents, and others chased deer and hares across open ground. Classical writers took notice. Strabo recorded British hunting dogs being exported overseas, while Celtic peoples were also said to use dogs in war.",
+    bullets: [
+      "Swift Celtic hounds and greyhound-like dogs pursued deer, hares and other fast-moving game by sight.",
+      "Medieval scent hounds followed an animal's trail by nose, sometimes working together in organised packs.",
+      "Dogs protected settlements, livestock, food stores and property, while some helped control cattle and other farm animals. Roman-period evidence also shows dogs being used to chase vermin from buildings.",
+      "Hunting with carefully trained hounds became strongly associated with wealthy landowners, although ordinary households also kept practical working dogs.",
+    ],
+    bulletTitles: ["Chasers", "Trackers", "Guards", "Status"],
+    detail:
+      "Several generations later, the Roman writer Arrian described swift Celtic coursing hounds that hunted by sight rather than scent. Medieval Britain developed an even wider world of working hounds. Fast dogs chased deer and hares, powerful dogs guarded homes and animals, and scent hounds followed trails in organised packs. These were dog types, rather than standardised modern breeds, and their names, appearance and purpose could change between regions and centuries.",
+    facts: [
+      { text: "British hunting dogs were valuable enough to be exported across the Channel almost 2,000 years ago.", image: "/history/breeds/celtic-hound-remake.jpg" },
+      { text: "Arrian, writing in the Roman period, praised Celtic hounds for speed, spirit and their enthusiasm for chasing hares.", image: "/history/greek-harehound.jpg" },
+      { text: "Archaeologists have found dogs of very different sizes in early British settlements, from small animals to dogs approaching wolf size.", image: "/history/breeds/Mastiff-and-Alaunt-war-dogs.jpg" },
+      { text: "Medieval pictures often show different dogs doing different jobs, including scent hounds hunting in packs and greyhounds held on leads before the chase.", image: "/history/master-of-the-game.jpg" },
+    ],
+    image: "/history/breeds/celtic-hound-remake.jpg",
+    imageAlt: "A Celtic hound on open ground, the kind of working dog found in early Britain",
+  },
+  {
     title: "Medieval and Tudor Britain",
     accent: "Tudor Britain",
-    era: "ancient-medieval",
+    /* NO `era`. Britain's First Dogs above now introduces the ancient and
+       medieval dogs and carries their run, so this section follows the carousel
+       instead of preceding it. Giving it an era again would put a second run of
+       the same dogs on the page. */
     intro:
       "Britain's bond with dogs stretches back deep into the Middle Ages, when hounds were prized hunting partners of kings and nobles. By the Tudor age, dogs had also become beloved companions, doted on at the royal court itself.",
     bullets: [
