@@ -30,6 +30,7 @@ const ICON_FRAMES = [
 ];
 const FRAME_MS = 200;
 const CYCLES = 3; // Task 97: play the four-frame sequence this many times on appearance, then rest
+const APPEAR_HOLD_MS = 2000; // Task (JS hold): wait this long after the logo becomes visible, then reveal
 
 export default function PickAChumLauncher() {
   const [open, setOpen] = useState(false);
@@ -39,6 +40,9 @@ export default function PickAChumLauncher() {
   // state and publishes it as data-pc-logo on its header; we watch that attribute
   // rather than re-deriving it from scroll.
   const [logoShowing, setLogoShowing] = useState(false);
+  // Task (JS hold): whether the launcher has been revealed yet. Gated behind APPEAR_HOLD_MS after the
+  // logo becomes visible, so the reveal (fade + icon cycles) is a reliable hold, not a soft CSS delay.
+  const [shown, setShown] = useState(false);
   const buttonRef = useRef<HTMLButtonElement | null>(null);
   const wasOpen = useRef(false);
 
@@ -82,11 +86,23 @@ export default function PickAChumLauncher() {
     });
   }, []);
 
-  // Task 84/97: on appearance the four-frame sequence plays CYCLES times through (12 frames, ~2.4s at
-  // 0.2s each), then rests on full (frame 0). Skipped entirely under prefers-reduced-motion (a rattle
-  // reads as a bark; it rests on full instead). Cleared if the launcher hides mid-cycle.
+  // Task (JS hold): reveal the launcher APPEAR_HOLD_MS after the logo becomes visible, so it arrives
+  // after the visitor has looked at the page rather than with it -- a reliable JS hold, not a soft
+  // CSS delay. If the logo hides before the hold elapses, the reveal is cancelled and reset.
   useEffect(() => {
     if (!logoShowing) {
+      setShown(false);
+      return;
+    }
+    const id = window.setTimeout(() => setShown(true), APPEAR_HOLD_MS);
+    return () => window.clearTimeout(id);
+  }, [logoShowing]);
+
+  // Task 84/97: once revealed (after the hold), the four-frame sequence plays CYCLES times through
+  // (12 frames, ~2.4s at 0.2s each), then rests on full (frame 0). Skipped entirely under
+  // prefers-reduced-motion (a rattle reads as a bark; it rests on full instead).
+  useEffect(() => {
+    if (!shown) {
       setFrame(0);
       return;
     }
@@ -107,7 +123,7 @@ export default function PickAChumLauncher() {
       }
     }, FRAME_MS);
     return () => window.clearInterval(id);
-  }, [logoShowing]);
+  }, [shown]);
 
   return (
     <>
@@ -117,7 +133,7 @@ export default function PickAChumLauncher() {
         <button
           ref={buttonRef}
           type="button"
-          className={`${styles.launcher} ${logoShowing ? styles.launcherOn : ''}`}
+          className={`${styles.launcher} ${shown ? styles.launcherOn : ''}`}
           aria-label="Pick a Chum"
           onClick={() => setOpen(true)}
         >

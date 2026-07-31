@@ -53,7 +53,9 @@
   opacity: 0;
   transform: translateY(-8px) scale(0.92);
   pointer-events: none;
-  transition: opacity 0.3s ease 0.12s, transform 0.3s ease 0.12s;
+  /* Task (JS hold): the 120ms transition-delay is gone; a JS setTimeout now holds the reveal (see
+     PickAChumLauncher), so only the 300ms fade remains here. */
+  transition: opacity 0.3s ease, transform 0.3s ease;
 }
 .launcherOn {
   opacity: 1;
