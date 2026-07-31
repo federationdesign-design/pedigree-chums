@@ -2651,6 +2651,17 @@ export default function BreedTree({
 
   function onCircle(e: React.MouseEvent, d: Node) {
     e.stopPropagation();
+    // START SCREEN ONLY. Tapping any dog goes straight to the learn area,
+    // by request. It replaces the two-tap come-loose-then-zoom grammar
+    // HERE only: the same tap still previews and zooms during a round and
+    // inside learn. Sits above every other branch so nothing else can
+    // claim the tap first.
+    if (dockAside && gravity && entered && !started && !learning && focusRef.current === nodes[0]) {
+      setLearnPeek(false);
+      setStartPeek(false);
+      setLearning(true);
+      return;
+    }
     // TOUCH: the first tap on a first-ring circle does what a hover does on a
     // mouse, which is come loose and show you what is inside. The second tap
     // goes in. Same grammar as desktop, where hover previews and click enters,
@@ -5815,7 +5826,7 @@ export default function BreedTree({
                   const hv = wordHover === w.key ? 1.06 : 1;
                   return (
                     <g transform={`translate(${cx},${cy}) scale(${hv}) translate(${-cx},${-cy})`}>
-                      {/* START SCREEN ONLY. Green for go, white glyph, white
+                      {/* Green for go, white glyph, white rim, and the learn
                           rim. This square exists only here: the learn area has
                           its own PLAY and the pit has its own corner set, and
                           both keep the pit's yellow and navy. */}
@@ -6111,11 +6122,11 @@ export default function BreedTree({
             const w = S * 0.30;
             return (
               <svg width={B} height={B} viewBox={`0 0 ${B} ${B}`} aria-hidden="true" focusable="false">
-                <rect x={2.5} y={2.5} width={S} height={S} rx={S * 0.3} fill="var(--yellow, #ffd23e)" stroke="var(--navy, #0a3a57)" strokeWidth={5} />
+                <rect x={2.5} y={2.5} width={S} height={S} rx={S * 0.3} fill="#22c55e" stroke="#ffffff" strokeWidth={5} />
                 <path
                   d={`M${c - w * 0.3},${c - g / 2} L${c + w * 0.7},${c} L${c - w * 0.3},${c + g / 2} Z`}
-                  fill="var(--navy, #0a3a57)"
-                  stroke="var(--navy, #0a3a57)"
+                  fill="#ffffff"
+                  stroke="#ffffff"
                   strokeWidth={S * 0.07}
                   strokeLinejoin="round"
                 />
