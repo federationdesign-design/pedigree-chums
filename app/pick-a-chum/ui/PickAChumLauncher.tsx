@@ -23,10 +23,10 @@ const PickAChumExperience = dynamic(() => import('./PickAChumExperience'), { ssr
 // cache. ROUTINE: bump the suffix (-v3, -v4, ...) every time the art changes; same-name overwrites
 // are served stale.
 const ICON_FRAMES = [
-  '/shout-launcher-icon-1-v2.svg', // 0 full (resting)
-  '/shout-launcher-icon-2-v2.svg', // 1 mid
-  '/shout-launcher-icon-3-v2.svg', // 2 minimal
-  '/shout-launcher-icon-4-v2.svg', // 3 none
+  '/shout-launcher-icon-1-v3.svg', // 0 full (resting)
+  '/shout-launcher-icon-2-v3.svg', // 1 mid
+  '/shout-launcher-icon-3-v3.svg', // 2 minimal
+  '/shout-launcher-icon-4-v3.svg', // 3 none
 ];
 const FRAME_MS = 200;
 const CYCLES = 3; // Task 97: play the four-frame sequence this many times on appearance, then rest

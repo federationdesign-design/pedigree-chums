@@ -33,7 +33,9 @@
      tracks the logo's vertical centre, which scales with the logo (rendered height ~0.6 * width, so
      centre ~ nav-top + 0.3 * width), holding the row alignment as the logo resizes. */
   top: calc(clamp(112px, 16vw, 150px) * 0.3 - 15px);
-  left: calc(clamp(18px, 4vw, 48px) + clamp(112px, 16vw, 150px) + 16px);
+  /* Task 102: nudged 10px left (gap 16px -> 6px). Size, vertical position and the from-logo-right-edge
+     anchoring are unchanged; only the horizontal gap shrinks by 10px. */
+  left: calc(clamp(18px, 4vw, 48px) + clamp(112px, 16vw, 150px) + 6px);
   width: 72px;
   height: 72px;
   /* Task 74: no background fill, no white stroke, no ring — the icon carries everything. */
@@ -477,7 +479,7 @@
   .launcher {
     /* Task 83: to the right of the (smaller) mobile logo, same row, from its right edge; top tracks
        the logo centre (constant tuned for the 60px mobile launcher). */
-    left: calc(clamp(18px, 4vw, 48px) + clamp(112px, 16vw, 150px) + 12px);
+    left: calc(clamp(18px, 4vw, 48px) + clamp(112px, 16vw, 150px) + 2px); /* Task 102: 10px left (was +12px) */
     top: calc(clamp(112px, 16vw, 150px) * 0.3 - 12px);
     width: 60px;
     height: 60px;
