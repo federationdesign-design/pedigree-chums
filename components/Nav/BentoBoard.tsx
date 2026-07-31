@@ -9,7 +9,11 @@ import styles from "./Nav.module.css";
 type TileData = { href: string; labelA: string; labelB?: string; cta: string; img?: string; emoji?: string; size?: string; video?: string; videoAspect?: string };
 const NAV_TILES: Record<string, TileData> = {
   nameGen: { href: "/name-generator", labelA: "Try the Dog", labelB: "Name Generator", cta: "Name your chum", video: "/podium-video-menu.mp4", videoAspect: "650 / 542" },
-  product: { href: "/", labelA: "The Card", labelB: "Game", cta: "Get yours", img: "/product-img.jpg" },
+  /* `/` is the pit itself, which is where this used to land: a tile saying
+     "Get yours" dropped you into the game. It goes to the marketing page now.
+     Note the Home tile below also points at /home, so the two now share a
+     destination. */
+  product: { href: "/home", labelA: "The Card", labelB: "Game", cta: "Get yours", img: "/product-img.jpg" },
   chumFinder: { href: "/chum-calculator", labelA: "Chum", labelB: "Finder", cta: "Find your perfect dog", emoji: "🔍" },
   britains: { href: "/britains-dog-history", labelA: "Britain's", labelB: "Dog History", cta: "Travel back", img: "/history-hero.jpg" },
   about: { href: "/about", labelA: "About", cta: "Who we are", img: "/initial-preload-hero-img.jpg" },
