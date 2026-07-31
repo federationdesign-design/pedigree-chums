@@ -150,19 +150,46 @@
 
 /* Green CTA -- matches the name selector's "Go" button and the
    good-dog-bad-dog intro button, same colours and same drop shadow. */
-.introBtn {
-  align-self: flex-start;
+/* Two buttons on ONE row. .introBody has 28px of padding each side, so a 390px
+   phone leaves 334px for the pair. At the old 1.3rem with 44px of side padding,
+   DOG HISTORY alone wanted about 240px, so the row could never have fitted.
+   Each button takes half the row and the type rides a clamp instead, which fits
+   an SE at 320px and returns to full size on anything wide. */
+.introBtnRow {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  gap: 12px;
   margin-top: 8px;
-  padding: 16px 44px;
+  width: 100%;
+}
+.introBtn {
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 16px 10px;
   border: none;
   border-radius: 14px;
   background: #22c55e;
   color: #ffffff;
   font-family: var(--font-display, "Luckiest Guy", cursive);
-  font-size: 1.3rem;
+  font-size: clamp(0.85rem, 4.2vw, 1.3rem);
   letter-spacing: 0.04em;
+  white-space: nowrap;
   cursor: pointer;
   box-shadow: 0 4px 0 #16a34a;
+}
+/* The blue is the learn button's, lifted from LineageMap: #1497d6 face over a
+   #0c6a9c base. Not a new blue. */
+.introBtnAlt {
+  background: #1497d6;
+  box-shadow: 0 4px 0 #0c6a9c;
+}
+.introBtnAlt:active {
+  box-shadow: 0 2px 0 #0c6a9c;
+}
+.introBtn:disabled {
+  opacity: 0.55;
+  cursor: default;
 }
 
 .introBtn:active {
