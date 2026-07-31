@@ -362,15 +362,42 @@
 
 /* ---- Progress bar ------------------------------------------------------ */
 
+/* ON THE SEAM, NOT THE FLOOR. The bar sits on the line between the photograph
+   and the blue text below it, rather than at the foot of the page.
+
+   52% is not a chosen number. `.carouselWrap` is 100dvh, `.carousel`, `.slide`
+   and `.sectionGroup` are all height 100% of it, and `.stickyTop` is
+   `flex: 0 0 52%` of the group. So 52% of this box IS the seam, and the two
+   move together if that split is ever changed.
+
+   `top` rather than a centred offset, so the bar sits entirely in the blue and
+   never crops the bottom of the photograph.
+
+   Note the seam only exists on SECTION slides. The intro, the era screens and
+   the timeline runs are laid out differently, so on those the bar holds the
+   same line across open artwork. */
 .progress {
   position: absolute;
   left: 0;
-  bottom: 0;
+  top: 52%;
   height: 5px;
   width: 0;
   z-index: 5;
   background: var(--yellow, #ffd23e);
   pointer-events: none;
+  /* Both positions are a `top`, so the move between them animates. A swap
+     between `top` and `bottom` would jump. */
+  transition: top 0.25s ease;
+}
+/* Slides with NO seam: the intro, the era screens and the vertical runs. The
+   bar sits on the floor there rather than ruling a line across open artwork.
+   Which slides those are is not listed here: the script reads the settled
+   panel's own data-pc-sec, the same attribute the dog counter reads. */
+.progressFloor {
+  top: calc(100% - 5px);
+}
+@media (prefers-reduced-motion: reduce) {
+  .progress { transition: none; }
 }
 
 /* Fact panels only. `overflow: visible` undoes the scroll clipping every

@@ -267,6 +267,21 @@ export default function HistoryV2Page() {
             var max = carousel.scrollWidth - carousel.clientWidth;
             bar.style.width = (max > 0 ? (carousel.scrollLeft / max) * 100 : 0) + '%';
           }
+          /* THE SEAM ONLY EXISTS ON SECTION SLIDES. A section is a photograph
+             over blue text and the bar sits on the join. The intro, the era
+             screens and the runs have no such join, so on those the bar drops
+             back to the floor rather than ruling a line across open artwork.
+             It reads the settled panel the same way the dog counter does: no
+             data-pc-sec means the panel is not part of a section. */
+          function placeBar() {
+            var w = carousel.clientWidth;
+            if (!w) return;
+            var g = Math.round(carousel.scrollLeft / w);
+            var panel = document.querySelector('[data-pc-panel="' + g + '"]');
+            if (!panel) return;
+            var onSeam = panel.getAttribute('data-pc-sec') !== null;
+            bar.classList.toggle('${styles.progressFloor}', !onSeam);
+          }
           /* Sub-slide counter. It reads the settled panel's own attributes
              rather than deriving them from a modulus. The modulus was only
              correct while every carousel child was one slide or nine, which
@@ -341,7 +356,7 @@ export default function HistoryV2Page() {
 
           var rollQueued = false;
           carousel.addEventListener('scroll', function(){
-            update(); updateCount();
+            update(); updateCount(); placeBar();
             /* The roll writes styles on up to 36 elements, so it is thrown onto
                the next frame rather than run inside the scroll event. */
             if (!rollQueued) {
@@ -351,6 +366,7 @@ export default function HistoryV2Page() {
           }, { passive: true });
           update();
           updateCount();
+          placeBar();
           updateRoll();
 
           function goTo(idx) {
