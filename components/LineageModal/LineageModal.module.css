@@ -519,29 +519,43 @@
    The wrapper holds the height so the block below it cannot jump when the
    second message arrives: the second is absolutely positioned over the first
    rather than following it in the flow. */
+/* ONE SLOT, TWO MESSAGES, AND THE SLOT IS AS TALL AS THE TALLER OF THEM.
+   A grid with both children in cell 1/1 stacks them without taking either out
+   of flow, so the block reserves the room the second message actually needs.
+   It used to hold the second one absolutely inside a 3.4em box, which was fine
+   until an era name wrapped to two lines: TUDOR TIMES then spilled over the
+   next level line below. Nothing here is a measured height, so a longer name
+   cannot break it again. */
 .eraJoin {
   position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: grid;
+  place-items: center;
   min-height: 3.4em;
   margin: 2px 0 6px;
   z-index: 2;
 }
 
 .eraJoinDone {
+  grid-area: 1 / 1;
   font-family: var(--font-body, Montserrat, system-ui);
   font-weight: 700;
   font-size: clamp(0.95rem, 3.2vw, 1.3rem);
   color: #ffffff;
+  text-align: center;
   opacity: 0;
-  animation: pcEraDone 0.34s cubic-bezier(0.2, 1.4, 0.4, 1) 0.25s both;
+  /* In, then OUT as the second one arrives. It used to stay at full opacity
+     underneath, and the second message was expected to cover it. Type has holes
+     in it, so it never did: the two read as one unreadable block.
+     The exit runs `forwards`, not `both`. With `both` it would fill backwards
+     through its own delay and wipe out the entrance. */
+  animation:
+    pcEraDone 0.34s cubic-bezier(0.2, 1.4, 0.4, 1) 0.25s both,
+    pcEraDoneOut 0.3s ease 1.45s forwards;
 }
 
-/* Over the top of the first, not after it. */
+/* In the same cell as the first, not on top of it. */
 .eraJoinNext {
-  position: absolute;
-  inset: 0;
+  grid-area: 1 / 1;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -574,8 +588,13 @@
   to { opacity: 1; transform: scale(1); }
 }
 
-/* The first message is still underneath, so this one comes in opaque and
-   slightly oversized to cover it cleanly. */
+@keyframes pcEraDoneOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+/* The first message is on its way out as this arrives, so the two cross over
+   rather than one hiding the other. */
 @keyframes pcEraNext {
   0% { opacity: 0; transform: scale(0.7); }
   100% { opacity: 1; transform: scale(1); }
