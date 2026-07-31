@@ -121,9 +121,25 @@
      underneath is clickable/scrollable. The old click-the-wash-to-close is intentionally gone -- the
      X and Escape still close. */
 }
+/* Task 116: the panel and selector CONTAINERS are large, mostly-empty rectangles laid over the page
+   (the panel is ~460px wide and nearly full height; on mobile it is ~full width). Task 105 gave the
+   CONTAINERS pointer-events: auto, so their transparent areas swallowed every click and scroll over
+   that column -- that was the interception. Now the containers are transparent to pointer events and
+   only the solid interactive surfaces inside opt back in, so the page beneath stays clickable and
+   scrollable everywhere the chat is not actually drawn. The panel's onMouseDown refocus handler still
+   fires via event bubbling from these auto children, so clicking back into the chat restores input
+   focus. The X and Escape still close (unchanged); clicking the transparent area now reaches the page
+   rather than doing nothing. */
 .panel,
 .selectorWrap {
-  /* Task 105: re-enable interaction on the actual chat surfaces while the overlay passes clicks through. */
+  pointer-events: none;
+}
+.bubbleDog,
+.bubbleUser,
+.dogAnchor,
+.composer,
+.dogBtn,
+.randomBtn {
   pointer-events: auto;
 }
 
