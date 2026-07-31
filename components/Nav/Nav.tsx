@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Montserrat } from "next/font/google";
 import BentoBoard from "./BentoBoard";
 import styles from "./Nav.module.css";
@@ -25,6 +26,34 @@ const tradeNavLinks = [
 ];
 
 export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo = false, tradeLinks = false }: { hideLogo?: boolean; dockBottomLeft?: boolean; showLogo?: boolean; tradeLinks?: boolean }) {
+  const router = useRouter();
+  /* PREFETCH ON INTENT, NOT ON OPEN.
+
+     next/link only prefetches once a link has scrolled into view, and this menu
+     is a board you scroll, so most tiles are never prefetched at all. That is
+     part of why tapping one sits there.
+
+     Prefetching every destination the moment the menu opens would fix that and
+     recreate the problem underneath it: several page payloads racing the tiles
+     for the same connection. So it happens on intent instead. A pointer over a
+     tile, or a finger down on it, is a good enough signal, and touchstart fires
+     a beat before the tap completes.
+
+     Each href is fetched once per mount. router.prefetch is a no-op on repeats
+     anyway, but the set keeps it honest. */
+  const prefetched = useRef<Set<string>>(new Set());
+  const prefetchNow = (href: string) => {
+    if (!href.startsWith("/") || prefetched.current.has(href)) return;
+    prefetched.current.add(href);
+    try { router.prefetch(href); } catch { /* not fatal: the tap still works */ }
+  };
+  /* One listener for the whole overlay rather than a prop threaded through
+     every tile, board and link. It reads the href off whatever was touched. */
+  const onIntent = (e: React.PointerEvent<HTMLDivElement>) => {
+    const t = e.target as HTMLElement | null;
+    const a = t && t.closest ? t.closest("a[href]") : null;
+    if (a) prefetchNow(a.getAttribute("href") || "");
+  };
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   // Set only when the menu is closing because the visitor picked a link. The
@@ -131,7 +160,13 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
       )}
 
       {open && (
-        <div className={`${styles.overlay} ${!tradeLinks ? styles.overlayScroll : ""}`} role="dialog" aria-modal="true">
+        <div
+          className={`${styles.overlay} ${!tradeLinks ? styles.overlayScroll : ""}`}
+          role="dialog"
+          aria-modal="true"
+          onPointerDown={onIntent}
+          onPointerOver={onIntent}
+        >
           {tradeLinks ? (
             <button type="button" className={styles.close} onClick={() => setOpen(false)} aria-label="Close menu">{"×"}</button>
           ) : (
