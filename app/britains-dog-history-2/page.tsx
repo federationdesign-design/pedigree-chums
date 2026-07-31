@@ -112,10 +112,10 @@ const LAID_OUT = (() => {
   });
 })();
 
-/* The first era screen, which is the head of the first vertical run. Read out
-   of the laid-out sequence rather than counted by hand, so inserting a slide
-   ahead of it cannot leave the button pointing at the wrong screen. */
-const FIRST_ERA_PANEL = LAID_OUT.find((l) => l.entry.type === "timeline")?.first ?? 1;
+/* The slide straight after the intro, which is where the blue button goes.
+   Read out of the laid-out sequence rather than typed as 1, so inserting a
+   slide ahead of it cannot leave the button pointing at the wrong screen. */
+const NEXT_PANEL = LAID_OUT.find((l) => l.entry.type !== "intro")?.first ?? 1;
 
 export default function HistoryV2Page() {
   return (
@@ -146,7 +146,7 @@ export default function HistoryV2Page() {
                     story of how they went from tools and outcasts to the treasured
                     companions ruling our sofas today.
                   </p>
-                  <IntroButtons historyPanel={FIRST_ERA_PANEL} />
+                  <IntroButtons nextPanel={NEXT_PANEL} />
                 </div>
               </div>
             </div>
