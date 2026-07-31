@@ -212,7 +212,12 @@ export const SECTIONS: Section[] = [
       "The first ever Best in Show winner was a Greyhound named Primley Sceptre.",
       "Crufts is now recognised as the largest dog show in the world.",
     ],
-    bulletTitles: ["He wanted to sell more dog biscuits", "Greyhound", "Tonnes of dogs all in 1 place"],
+    /* Four now, and the new one is SECOND. Titles pair with bullets by position,
+       so three against four had shifted every one up a slot: "Greyhound" was
+       sitting on the 1928 fact and the largest-show bullet rendered bare.
+       This is the only section that was short. Two others carry five titles and
+       they are correct: those have five bullets. */
+    bulletTitles: ["He wanted to sell more dog biscuits", "Dog Mecca", "Greyhound", "Tonnes of dogs all in 1 place"],
     detail:
       "Charles Cruft had a genius for promotion, and his show quickly became the highlight of the canine calendar. The arrival of the Best in Show award in 1928 gave the event its crowning moment, and that first winner, a Greyhound chosen from nearly ten thousand competitors, set the tone for a contest that still captivates the nation every spring.",
     facts: [
