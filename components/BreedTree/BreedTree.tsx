@@ -413,6 +413,22 @@ function retireToyForEra(key: string, era?: string) {
 /* The two balls, and only these, retire per era. Everything else is spent for
    the session as it always was. */
 const ERA_SCOPED_TOYS: string[] = ["ball", "ballPink"];
+
+/* ---- Retiring for GOOD ----------------------------------------------------
+   The flag carries a message, and once it has been read there is nothing left
+   to say. Session storage put it back on the next visit, which meant showing
+   the same notice to the same reader over and over.
+
+   Local storage, so it survives the tab closing. This is the same treatment the
+   cookie panel already gets, and for the same reason: it is a thing answered
+   once, not a toy. */
+function toyRetiredForever(key: string): boolean {
+  try { return localStorage.getItem(key) === "1"; } catch { return false; }
+}
+function retireToyForever(key: string) {
+  try { localStorage.setItem(key, "1"); } catch { /* private mode */ }
+}
+const PERMANENT_TOYS: string[] = ["flag"];
 // ?toys=reset un-retires every toy on load, so a testing session does not have
 // to reach for the browser console. sessionStorage is per tab and survives a
 // reload, so once you have thrown the ball clear or read the flag's message
@@ -424,6 +440,10 @@ function resetToysIfAsked() {
   if (window.location.search.indexOf("toys=reset") < 0) return;
   try {
     for (const k of Object.values(TOY_GONE_KEY)) sessionStorage.removeItem(k);
+    // The permanent ones live in localStorage, so clearing the session leaves
+    // them retired. Without this, ?toys=reset could never bring the flag back
+    // and it would look like the reset was broken.
+    for (const k of PERMANENT_TOYS) localStorage.removeItem(TOY_GONE_KEY[k as ToyKind]);
     sessionStorage.removeItem(TOY_BALL_PINK_THROWS_KEY);
     // the cookie panel is gated on consent, which is localStorage and permanent,
     // so clearing only the toy key would leave it shut and the reset look broken
@@ -3104,9 +3124,13 @@ export default function BreedTree({
       const spawnToy = (kind: ToyKind, side?: -1 | 1) => {
         // the flag never returns once its message has been read; the ball never
         // returns once the player has thrown it clear of the pit
-        if (ERA_SCOPED_TOYS.includes(kind)
-          ? toyRetiredInEra(TOY_GONE_KEY[kind], era)
-          : toyRetired(TOY_GONE_KEY[kind])) return;
+        /* Three scopes now: gone for good, gone for this era, gone for this
+           visit. Read in that order, most permanent first. */
+        if (PERMANENT_TOYS.includes(kind)
+          ? toyRetiredForever(TOY_GONE_KEY[kind])
+          : ERA_SCOPED_TOYS.includes(kind)
+            ? toyRetiredInEra(TOY_GONE_KEY[kind], era)
+            : toyRetired(TOY_GONE_KEY[kind])) return;
         // answered once, gone for good, so the pit never nags
         if (kind === "cookies" && cookieConsentGiven()) return;
         const isNarrow = window.matchMedia("(max-width: 768px)").matches;
@@ -5147,7 +5171,7 @@ export default function BreedTree({
                         const cb = toyBodiesRef.current[i2]?.mb;
                         if (cb) cookieBtnsRef.current?.(cb.position.x, cb.position.y);
                       } else {
-                        retireToy(TOY_FLAG_SEEN_KEY);
+                        retireToyForever(TOY_FLAG_SEEN_KEY);
                         setBritainOpen(true);
                       }
                     };
@@ -5844,7 +5868,7 @@ export default function BreedTree({
             setBritainOpen(false);
             // the tick poofs the flag, exactly as it does in the main pit, and
             // a flag whose message has been read does not come back next round
-            retireToy(TOY_FLAG_SEEN_KEY);
+            retireToyForever(TOY_FLAG_SEEN_KEY);
             if (flagIdxRef.current !== null) killToyRef.current?.(flagIdxRef.current);
           }}
         />
