@@ -97,6 +97,25 @@ export default function BreedStrip({
   // as it was lost.
   const [runKey, setRunKey] = useState(0);
   const [campaignScore, setCampaignScore] = useState(0); // carries across levels, resets on start over
+  /* Every completed level's chum catch, as a percentage. Kept here rather than
+     in the modal because the modal is keyed per level and remounts on each one.
+     A list rather than a running mean, so the average is of the levels and not
+     of the chums: a level with three chums counts the same as one with twenty,
+     which is what was asked for. */
+  const [chumRates, setChumRates] = useState<number[]>([]);
+  /* How many times each dog has been caught this run, by name. The picture is
+     resolved from the pack data rather than carried through two components,
+     because the pack is already the source of truth for it here. */
+  const [chumCounts, setChumCounts] = useState<Record<string, number>>({});
+  const topChum = (() => {
+    let best: string | null = null;
+    for (const [n, c] of Object.entries(chumCounts)) {
+      if (!best || c > chumCounts[best]) best = n;
+    }
+    if (!best) return null;
+    const b = packBreeds.find((x) => x.name === best);
+    return { name: best, image: b?.image || "", count: chumCounts[best] };
+  })();
   // Lives run alongside the score and last for one run at the pit, not for ever:
   // opening a level from the page starts you at three again. A retry spends one.
   // Three levels completed in a row earns one back, up to a ceiling of six, and
@@ -381,6 +400,11 @@ export default function BreedStrip({
       era={era}
       initialScore={campaignScore}
       onScoreChange={setCampaignScore}
+      onLevelChumRate={(pct) => setChumRates((r) => [...r, pct])}
+      onChumCaught={(n) => setChumCounts((c) => ({ ...c, [n]: (c[n] ?? 0) + 1 }))}
+      topChum={topChum}
+      runChumRate={chumRates.length ? chumRates.reduce((a, b) => a + b, 0) / chumRates.length : null}
+      runLevels={chumRates.length}
       eraJoinLabel={eraJoinLabel}
       nextLevelLabel={nextUp?.name}
       nextLevelImage={(() => { const nb = nextLevelOf(active.name); return nb ? buildActive(nb)?.image : undefined; })()}
@@ -410,6 +434,8 @@ export default function BreedStrip({
         setLives(LIVES_START);
         setStreak(0);
         setCampaignScore(0);
+        setChumRates([]);
+        setChumCounts({});
       }}
       onStartOver={() => {
         // A retry costs a life and replays THIS level. It used to rebuild

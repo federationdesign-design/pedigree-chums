@@ -818,3 +818,54 @@
 .lifePipSpent {
   background: rgba(10, 58, 87, 0.45);
 }
+
+/* This round's catch, shown on every game over rather than only a spent run. */
+.endRound {
+  position: relative;
+  z-index: 2;
+  margin: 2px 0 0;
+  text-align: center;
+  font-family: var(--font-body, Montserrat, system-ui);
+  font-weight: 800;
+  font-size: clamp(0.95rem, 3.4vw, 1.35rem);
+  color: #ffffff;
+}
+/* The most caught dog of the run: square picture, name, and how many times. */
+.endTopChum {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+}
+.endTopChumImg {
+  width: clamp(52px, 14vw, 76px);
+  height: clamp(52px, 14vw, 76px);
+  border-radius: 16px;
+  object-fit: cover;
+  background: #ffffff;
+  border: 3px solid #ffffff;
+  box-shadow: 0 3px 0 rgba(10, 58, 87, 0.3);
+}
+.endTopChumText {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.1;
+}
+.endTopChumLead {
+  font-family: var(--font-body, Montserrat, system-ui);
+  font-weight: 700;
+  font-size: clamp(0.7rem, 2.6vw, 0.95rem);
+  color: #ffffff;
+}
+.endTopChumName {
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: clamp(1.1rem, 4.6vw, 1.7rem);
+  color: var(--yellow, #ffd23e);
+}
+.endTopChumCount {
+  font-family: var(--font-body, Montserrat, system-ui);
+  font-weight: 700;
+  font-size: clamp(0.7rem, 2.6vw, 0.95rem);
+  color: #ffffff;
+}
