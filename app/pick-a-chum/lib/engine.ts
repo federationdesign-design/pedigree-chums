@@ -51,7 +51,11 @@ const AFTERCARE_BLOCKED = new Set(['offer_bark_game', 'open_discount_popup', 'tr
 // in-router canned check, so a matching canned trigger overrides them here. Safety, grief, breed
 // pages, the bark game, commercial and every hard answer are NOT in this set, so they keep
 // priority. Never applied in a protected state (the S12 machine owns those turns).
-const CANNED_OVERRIDABLE = new Set(['orientation', 'identity', 'clarifier', 'faq_answer']);
+// Task 90 adds breed_choice / breed_page / the bark-game offer, so the exact canned triggers
+// "whats better a labrador or a pug", "shes a spaniel", "say something funny" and "do you get bored"
+// answer in the terse voice. breed_hub is deliberately NOT here: "show me a dog" keeps reaching Know
+// Your Chums, the right destination. Still exact-match only, so a real breed/offer query is untouched.
+const CANNED_OVERRIDABLE = new Set(['orientation', 'identity', 'clarifier', 'faq_answer', 'breed_choice', 'breed_page', 'offer_bark_game']);
 // Weak routes that, after a complaint answer, should stay in the complaint context.
 const WEAK_AFTER_COMPLAINT = new Set(['fallback', 'gk_unknown', 'gibberish', 'clarifier']);
 

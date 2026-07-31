@@ -16,14 +16,14 @@ import DevRecorder from '../dev/DevRecorder';
 
 const PickAChumExperience = dynamic(() => import('./PickAChumExperience'), { ssr: false });
 
-// Task 84: the launcher icon plays a one-shot four-frame "shout" when it appears, then rests on
-// full. Placeholders all point at the current icon; swap each filename to the real variant (marks at
-// full, mid, minimal, none). Frame 0 (full) is the resting state; the cycle holds 0.2s per frame.
+// Task 84/89: the launcher icon plays a one-shot four-frame "shout" when it appears, then rests on
+// full (frame 0). The four real variants (marks at full, mid, minimal, none); the cycle holds 0.2s
+// per frame.
 const ICON_FRAMES = [
-  '/shout-launcher-icon.svg', // 0 full (resting)
-  '/shout-launcher-icon.svg', // 1 mid
-  '/shout-launcher-icon.svg', // 2 minimal
-  '/shout-launcher-icon.svg', // 3 none
+  '/shout-launcher-icon-1.svg', // 0 full (resting)
+  '/shout-launcher-icon-2.svg', // 1 mid
+  '/shout-launcher-icon-3.svg', // 2 minimal
+  '/shout-launcher-icon-4.svg', // 3 none
 ];
 const FRAME_MS = 200;
 

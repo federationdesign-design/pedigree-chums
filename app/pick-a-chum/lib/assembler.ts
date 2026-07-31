@@ -89,8 +89,10 @@ const BREED_FACTS: Record<string, string> = {
 // Shared lines (Steve's approved copy, no character variation) for a breed question
 // with no breed named. BREED_HUB attaches the /chums index page as its [LINK];
 // BREED_BEST has no destination.
-const BREED_HUB_LINE =
-  'There are 54 Chums, so it is easier if you name one. Tell me a breed you like, or I can show you the whole pack.';
+// Task 91: shortened to match BREED_BEST's terse shape (was 26 words after two one-word turns).
+// NOTE: this is an assembler constant, not a workbook row (it predates the workbook, flagged for
+// migration with the other constants); Steve expected a workbook row.
+const BREED_HUB_LINE = 'We are a pack of 54. Name one.';
 const BREED_BEST_LINE =
   "There are 54 Chums. Name a breed and I'll explain its original job.";
 
