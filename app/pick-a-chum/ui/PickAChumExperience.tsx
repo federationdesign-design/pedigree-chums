@@ -112,6 +112,9 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
   const [messages, setMessages] = useState<Message[]>([]);
   const [announce, setAnnounce] = useState(''); // aria-live: whole messages, once
   const inputRef = useRef<HTMLInputElement | null>(null);
+  // Task 82: messages the visitor sent while a reply was still performing. The input is never
+  // disabled, so they can type ahead; each queued line is processed when the dog finishes, in order.
+  const queueRef = useRef<string[]>([]);
   const threadRef = useRef<HTMLDivElement | null>(null);
   const idRef = useRef(0);
   const timersRef = useRef<number[]>([]);
@@ -289,10 +292,21 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
     window.setTimeout(() => inputRef.current?.focus(), 60);
   }, [clearTimers]);
 
-  const send = useCallback(() => {
+  const send = useCallback((textArg?: string) => {
     const session = sessionRef.current;
-    const text = input.trim();
-    if (!session || !text || session.closed || phase === 'transferring') return;
+    const text = (textArg ?? input).trim();
+    if (!session || !text || session.closed) return;
+    // Task 82: the dog is still performing. Never block or disable the input -- queue the message and
+    // process it when the reply lands (see the drain effect below). textArg is set only when draining
+    // the queue, so a live submit still clears the box and keeps focus while a queued one does not.
+    if (phase === 'transferring') {
+      queueRef.current.push(text);
+      if (textArg === undefined) {
+        setInput('');
+        inputRef.current?.focus();
+      }
+      return;
+    }
 
     const fromDog = session.activeDog;
     const result = submit(CHUM_DATA, session, text);
@@ -312,7 +326,12 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
       candidateSubject: session.candidateSubject, // Task 57: set by submit on the mutated session
     });
     const userMsg: Message = { id: idRef.current++, who: 'user', text };
-    setInput('');
+    // Task 82: clear + keep focus only for a live submit; a queued/drained line must not wipe what
+    // the visitor has since typed ahead into the box.
+    if (textArg === undefined) {
+      setInput('');
+      inputRef.current?.focus();
+    }
 
     // A specialist handoff: the current dog announces it (using the workbook
     // handover line), a beat passes, the medallion pops the old dog out and the
@@ -402,11 +421,25 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
     performTheatre(dogMsg.id, r.text, toDog, result.resolution.action, r.closed);
   }, [input, phase, runSwap, after, clearTimers, reducedMotion, performTheatre, setMsg]);
 
-  // Escape closes the interface; Enter while a message is typing completes it.
+  // Task 82: drain the type-ahead queue. When a reply finishes (phase returns to idle) the next
+  // queued line is sent, which starts its own performance; this effect re-runs when that lands, so
+  // the queue empties in order. sendRef holds the latest send without re-subscribing per keystroke.
+  const sendRef = useRef(send);
+  sendRef.current = send;
+  useEffect(() => {
+    if (phase === 'idle' && queueRef.current.length > 0) {
+      const next = queueRef.current.shift();
+      if (next) sendRef.current(next);
+    }
+  }, [phase]);
+
+  // Escape closes the interface; a BARE Enter while a message is typing completes it (skips the
+  // reveal). Task 82: if the visitor has typed something, do NOT steal the Enter -- let the form
+  // submit it (queued) so type-ahead works, keyboard and focus intact.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
-      else if (e.key === 'Enter' && playbackRef.current && !playbackRef.current.done) {
+      else if (e.key === 'Enter' && playbackRef.current && !playbackRef.current.done && !inputRef.current?.value.trim()) {
         e.preventDefault();
         completeTheatre();
       }
@@ -423,7 +456,9 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
   }, [phase, onClose, reducedMotion]);
 
   const { image: dogImage } = dogInfo(dog);
-  const inputLocked = phase === 'ending' || phase === 'transferring' || !!sessionRef.current?.closed;
+  // Task 82: the input is NEVER disabled. Disabling it dropped focus (and closed the mobile
+  // keyboard) between turns; instead the visitor types freely and send() queues while the dog
+  // performs, and no-ops after the session closes.
   const anchorSwap = swap === 'out' ? styles.anchorOut : swap === 'in' ? styles.anchorIn : '';
 
   return (
@@ -434,11 +469,11 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
         <div className={styles.selectorWrap}>
           <div className={styles.selector}>
             <svg className={styles.connectors} viewBox="0 0 440 420" aria-hidden="true" focusable="false">
-              {/* Launcher centre is (64,376); clean radials out to each clock position. */}
-              <line className={styles.connectorLine} style={{ animationDelay: '0.15s' }} x1="64" y1="376" x2="364" y2="376" />
-              <line className={styles.connectorLine} style={{ animationDelay: '0.45s' }} x1="64" y1="376" x2="324" y2="226" />
-              <line className={styles.connectorLine} style={{ animationDelay: '0.75s' }} x1="64" y1="376" x2="214" y2="116" />
-              <line className={styles.connectorLine} style={{ animationDelay: '1.05s' }} x1="64" y1="376" x2="64" y2="76" />
+              {/* Task 81: launcher centre is now (64,64) top-left; clean radials fan down-right. */}
+              <line className={styles.connectorLine} style={{ animationDelay: '0.15s' }} x1="64" y1="64" x2="364" y2="64" />
+              <line className={styles.connectorLine} style={{ animationDelay: '0.45s' }} x1="64" y1="64" x2="324" y2="214" />
+              <line className={styles.connectorLine} style={{ animationDelay: '0.75s' }} x1="64" y1="64" x2="214" y2="324" />
+              <line className={styles.connectorLine} style={{ animationDelay: '1.05s' }} x1="64" y1="64" x2="64" y2="364" />
             </svg>
             {SELECT_ORDER.map((d, i) => {
               const info = dogInfo(d);
@@ -534,10 +569,9 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
                 aria-label="Type something here"
                 placeholder="Type something here"
                 value={input}
-                disabled={inputLocked}
                 onChange={(e) => setInput(e.target.value)}
               />
-              <button type="submit" className={styles.go} aria-label="Send" disabled={inputLocked}>
+              <button type="submit" className={styles.go} aria-label="Send">
                 GO
               </button>
             </form>

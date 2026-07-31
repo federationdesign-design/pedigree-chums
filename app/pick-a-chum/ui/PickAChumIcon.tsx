@@ -5,6 +5,9 @@
 // ratio inside that box.
 import styles from './PickAChum.module.css';
 
-export default function PickAChumIcon() {
-  return <img className={styles.launcherIcon} src="/shout-launcher-icon.svg" alt="" aria-hidden="true" />;
+// Task 84: the launcher cycles four icon variants (full/mid/minimal/none) once on appearance, so the
+// mark is a swappable src. Defaults to the full-marks resting frame; the "pick for me" anchor, which
+// reuses this icon, gets the default and never animates.
+export default function PickAChumIcon({ src = '/shout-launcher-icon.svg' }: { src?: string }) {
+  return <img className={styles.launcherIcon} src={src} alt="" aria-hidden="true" />;
 }

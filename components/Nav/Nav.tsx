@@ -48,6 +48,17 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
     return () => window.removeEventListener("pc:open-menu", openMenu);
   }, []);
 
+  // The logo is visible when the page opted in (showLogo) or once scrolled, and
+  // never on a page that hides it. This is the one source of truth for the Pick a
+  // Chum launcher, which anchors to the logo -- it must not re-derive it from the
+  // scroll position. Exposed as data-pc-logo on the header (below) and announced on
+  // change so the launcher (which lives in the root layout, outside this tree, and
+  // persists across navigations) can react without polling scroll.
+  const logoShowing = !hideLogo && !open && (showLogo || scrolled);
+  useEffect(() => {
+    window.dispatchEvent(new CustomEvent("pc:logo", { detail: logoShowing }));
+  }, [logoShowing]);
+
   // Preload the menu images on page load so the launcher opens without pop-in.
   useEffect(() => {
     PRELOAD_IMAGES.forEach((s) => { const im = new window.Image(); im.src = s; });
@@ -104,7 +115,7 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
   const closeForNav = () => { navigatingRef.current = true; setOpen(false); };
 
   return (
-    <header className={`pc-nav ${styles.bar} ${dockBottomLeft ? styles.barDock : ""} ${scrolled ? styles.scrolled : ""} ${showLogo ? styles.showLogo : ""}`}>
+    <header className={`pc-nav ${styles.bar} ${dockBottomLeft ? styles.barDock : ""} ${scrolled ? styles.scrolled : ""} ${showLogo ? styles.showLogo : ""}`} data-pc-logo={logoShowing ? "true" : "false"}>
       {/* Header contents hide while the menu is open -- no logo, no hamburger. */}
       {!open && !hideLogo && (
         <Link href="/" className={styles.logo} aria-label="Pedigree Chums™ home">
