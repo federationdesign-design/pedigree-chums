@@ -31,7 +31,7 @@ export const SECTIONS: Section[] = [
     accent: "First Dogs",
     era: "ancient-medieval",
     intro:
-      "Britain's earliest dogs did not come with breed standards, pedigrees or neat family trees. They were shaped by the jobs people needed them to do. Some guarded homes and livestock, some followed scents, and others chased deer and hares across open ground. Classical writers took notice. Strabo recorded British hunting dogs being exported overseas, while Celtic peoples were also said to use dogs in war.",
+      "Britain's earliest dogs came without breed standards or pedigrees. They were shaped by the jobs people needed doing. Some guarded homes and livestock, some followed scents, others chased deer and hares. Classical writers noticed. Strabo recorded British hunting dogs exported overseas, and Celts were said to use dogs in war.",
     bullets: [
       "Swift Celtic hounds and greyhound-like dogs pursued deer, hares and other fast-moving game by sight.",
       "Medieval scent hounds followed an animal's trail by nose, sometimes working together in organised packs.",

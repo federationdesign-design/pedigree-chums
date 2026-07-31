@@ -13,10 +13,8 @@ export type EraIntro = { words: string[]; note: string };
 
 export const ERA_INTRO: Record<string, EraIntro> = {
   "ancient-medieval": {
-    /* Four lines, because the words are long and this title sits in the same
-       band as the section titles. "Meet Britain's Ancient and Medieval Dogs"
-       on three lines overran it. */
-    words: ["Meet", "Britain's Ancient", "and Medieval", "Dogs"],
+    /* Back to the original three lines. The arrow is the word "to". */
+    words: ["Ancient\u2192", "Medieval", "Dogs"],
     note: "At the start of time we did not have writing, so we can only really tell what has happened after we started writing stuff down",
   },
   c1500: {
