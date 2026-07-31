@@ -29,11 +29,15 @@ export interface TypingProfile {
 // (never on factual or safety copy, see NO_TYPO), and there is never a standing
 // uncorrected typo. Profiles apply from the active dog onward, so the feel changes
 // on a transfer.
+// Task 88: the thinking-dots duration (thinkMin/thinkMax) is 5x the original so the dots are
+// properly visible before the reply. Typing tempo (charMin/charMax, pauses) is unchanged. The cap
+// (THEATRE_MAX_MS) and its thinking trim below are scaled 5x to match, so the 5x holds on long
+// replies too rather than being trimmed away.
 export const TYPING_PROFILES: Record<Dog, TypingProfile> = {
-  terrier: { thinkMin: 500, thinkMax: 1500, charMin: 20, charMax: 60, midPauseChance: 0.08, midPauseMin: 200, midPauseMax: 500, correctedPerWords: 32, correctedCap: 2 },
-  collie: { thinkMin: 300, thinkMax: 800, charMin: 12, charMax: 32, midPauseChance: 0.04, midPauseMin: 150, midPauseMax: 300, correctedPerWords: 64, correctedCap: 1 },
-  labrador: { thinkMin: 400, thinkMax: 1200, charMin: 14, charMax: 44, midPauseChance: 0.07, midPauseMin: 200, midPauseMax: 450, correctedPerWords: 21, correctedCap: 2 },
-  boxer: { thinkMin: 700, thinkMax: 2000, charMin: 22, charMax: 72, midPauseChance: 0.16, midPauseMin: 300, midPauseMax: 800, correctedPerWords: 20, correctedCap: 2 },
+  terrier: { thinkMin: 2500, thinkMax: 7500, charMin: 20, charMax: 60, midPauseChance: 0.08, midPauseMin: 200, midPauseMax: 500, correctedPerWords: 32, correctedCap: 2 },
+  collie: { thinkMin: 1500, thinkMax: 4000, charMin: 12, charMax: 32, midPauseChance: 0.04, midPauseMin: 150, midPauseMax: 300, correctedPerWords: 64, correctedCap: 1 },
+  labrador: { thinkMin: 2000, thinkMax: 6000, charMin: 14, charMax: 44, midPauseChance: 0.07, midPauseMin: 200, midPauseMax: 450, correctedPerWords: 21, correctedCap: 2 },
+  boxer: { thinkMin: 3500, thinkMax: 10000, charMin: 22, charMax: 72, midPauseChance: 0.16, midPauseMin: 300, midPauseMax: 800, correctedPerWords: 20, correctedCap: 2 },
 };
 
 // Responses that render instantly and completely: no dots, no typing, no typos.
@@ -72,7 +76,7 @@ export function allowsTypos(action: string): boolean {
   return !NO_TYPO.has(action as ActionType);
 }
 
-export const THEATRE_MAX_MS = 8000;
+export const THEATRE_MAX_MS = 40000; // Task 88: 5x, so the 5x-longer thinking dots are not trimmed away on long replies
 
 // Which words are eligible to typo: plain lowercase, 4+ letters (excludes numbers,
 // prices, URLs, the discount command, dog/breed names and proper nouns (any
@@ -177,7 +181,7 @@ export function buildTypingPlan(text: string, profile: TypingProfile, rng: Rng =
   let stepsMs = steps.reduce((s, x) => s + x.delay, 0);
   let usedThink = think;
   if (think + stepsMs > THEATRE_MAX_MS) {
-    usedThink = Math.min(think, 800);
+    usedThink = Math.min(think, 4000); // Task 88: 5x the thinking floor (was 800)
     const scale = (THEATRE_MAX_MS - usedThink) / stepsMs;
     for (const s of steps) s.delay *= scale;
     stepsMs = steps.reduce((s, x) => s + x.delay, 0);
