@@ -596,7 +596,7 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
                   onClick={() => selectDog(d)}
                   title={info.name}
                   aria-label={info.name}
-                  style={{ backgroundImage: `url("${info.image}")`, left: `${round1(p.left)}px`, top: `${round1(p.top)}px`, animationDelay: `${0.15 + i * 0.3}s` }}
+                  style={{ backgroundImage: `url("${PROFILE_IMG[d]}")`, left: `${round1(p.left)}px`, top: `${round1(p.top)}px`, animationDelay: `${0.15 + i * 0.3}s` }}
                 />
               );
             })}
