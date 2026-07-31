@@ -42,13 +42,15 @@ export const SECTIONS: Section[] = [
     detail:
       "Several generations later, the Roman writer Arrian described swift Celtic coursing hounds that hunted by sight rather than scent. Medieval Britain developed an even wider world of working hounds. Fast dogs chased deer and hares, powerful dogs guarded homes and animals, and scent hounds followed trails in organised packs. These were dog types, rather than standardised modern breeds, and their names, appearance and purpose could change between regions and centuries.",
     facts: [
-      { text: "British hunting dogs were valuable enough to be exported across the Channel almost 2,000 years ago.", image: "/history/breeds/celtic-hound-remake.jpg" },
+      { text: "British hunting dogs were valuable enough to be exported across the Channel almost 2,000 years ago.", image: "/history/acident-main-img.jpg" },
       { text: "Arrian, writing in the Roman period, praised Celtic hounds for speed, spirit and their enthusiasm for chasing hares.", image: "/history/greek-harehound.jpg" },
       { text: "Archaeologists have found dogs of very different sizes in early British settlements, from small animals to dogs approaching wolf size.", image: "/history/breeds/Mastiff-and-Alaunt-war-dogs.jpg" },
       { text: "Medieval pictures often show different dogs doing different jobs, including scent hounds hunting in packs and greyhounds held on leads before the chase.", image: "/history/master-of-the-game.jpg" },
     ],
-    image: "/history/breeds/celtic-hound-remake.jpg",
-    imageAlt: "A Celtic hound on open ground, the kind of working dog found in early Britain",
+    // Supplied artwork. The filename says "acident": it is spelled that way on
+    // disk, so it is spelled that way here.
+    image: "/history/acident-main-img.jpg",
+    imageAlt: "Early British working dogs, the hunting and guarding types found before breeds were standardised",
   },
   {
     title: "Medieval and Tudor Britain",
