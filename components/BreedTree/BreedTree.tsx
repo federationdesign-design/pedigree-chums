@@ -5394,8 +5394,6 @@ export default function BreedTree({
                   <rect x={-half} y={-half} width={cm.size} height={cm.size} rx={rx} style={{ fill: "#ffffff" }} />
                   <image href={encodeURI(bust(cm.image))} x={-half} y={-half} width={cm.size} height={cm.size}
                     preserveAspectRatio="xMidYMid slice" clipPath={`url(#bt-chum-${i2})`} />
-                  <rect x={-half} y={-half} width={cm.size} height={cm.size} rx={rx}
-                    style={{ fill: "none", stroke: "var(--yellow, #ffd23e)", strokeWidth: Math.max(2, cm.size * 0.055) }} />
                 </g>
               );
             })}
