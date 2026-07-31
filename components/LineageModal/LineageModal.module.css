@@ -287,7 +287,9 @@
   text-shadow: 0 4px 40px rgba(0, 0, 0, 0.6);
   animation: lmEndPop 0.45s cubic-bezier(0.2, 1.4, 0.4, 1);
   text-align: center;
-  line-height: 1;
+  /* GAME over OVER, closed up. Luckiest Guy carries its own headroom, so at 1
+     the two words sat further apart than they look in the type. */
+  line-height: 0.9em;
 }
 .endFlashWord {
   display: block;
@@ -819,16 +821,29 @@
   background: rgba(10, 58, 87, 0.45);
 }
 
-/* This round's catch, shown on every game over rather than only a spent run. */
+/* This round's catch, shown on every game over rather than only a spent run.
+   Sizes are as specified: 20pt title, value at twice that. Both are real `pt`
+   rather than a conversion, so what is here is what was asked for. Note they
+   are fixed, so they do not shrink on a narrow phone; say the word and they
+   become a clamp. */
 .endRound {
   position: relative;
   z-index: 2;
   margin: 2px 0 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   text-align: center;
-  font-family: var(--font-body, Montserrat, system-ui);
-  font-weight: 800;
-  font-size: clamp(0.95rem, 3.4vw, 1.35rem);
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  line-height: 1;
+}
+.endRoundTitle {
+  font-size: 20pt;
   color: #ffffff;
+}
+.endRoundValue {
+  font-size: 40pt;
+  color: var(--yellow, #ffd23e);
 }
 /* The most caught dog of the run: square picture, name, and how many times. */
 .endTopChum {

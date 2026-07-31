@@ -602,8 +602,11 @@ export default function LineageModal({ name, image, character, lineage, onClose,
                   way. Hidden when the level had no chums in it. */}
               {packSize > 0 && (
                 <div className={css.endRound}>
-                  Chums caught this round: {collectedChums.size} of {Math.max(packSize, collectedChums.size)}
-                  {" "}({Math.min(100, Math.round((collectedChums.size / packSize) * 100))}%)
+                  <span className={css.endRoundTitle}>Chum rate:</span>
+                  <span className={css.endRoundValue}>
+                    {Math.min(100, Math.round((collectedChums.size / packSize) * 100))}%
+                    {" "}({collectedChums.size} from {Math.max(packSize, collectedChums.size)})
+                  </span>
                 </div>
               )}
               {/* THE RUN, not the round. Only when the lives are actually gone:
