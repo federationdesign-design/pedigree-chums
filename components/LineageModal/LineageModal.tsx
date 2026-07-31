@@ -120,6 +120,11 @@ export default function LineageModal({ name, image, character, lineage, onClose,
   // Chums collected on this level. Per level by decision, so no storage and no
   // reset: this component already unmounts when the level changes.
   const [collectedChums, setCollectedChums] = useState<Set<string>>(new Set());
+  /* The size of this level's pack, so the count can be read as a share.
+     The flood reports what it tipped in, and anything already taken before it
+     ran is added back, because the flood is handed a list with those already
+     filtered out. Reset per level for free: this modal remounts on every one. */
+  const [packSize, setPackSize] = useState(0);
   const [isNarrow, setIsNarrow] = useState(false);
   useEffect(() => { exitAskRef.current = exitAsk; }, [exitAsk]);
   useEffect(() => {
@@ -300,6 +305,7 @@ export default function LineageModal({ name, image, character, lineage, onClose,
           levelNo={levelNo}
           collectedChums={collectedChums}
           onChumCollected={(n) => setCollectedChums((prev) => (prev.has(n) ? prev : new Set(prev).add(n)))}
+          onChumsDropped={(n) => setPackSize(n + collectedChums.size)}
           hideCaption={!captionOpen}
           onCaptionClose={() => setCaptionOpen(false)}
           onScore={addScore}
@@ -548,6 +554,9 @@ export default function LineageModal({ name, image, character, lineage, onClose,
                 {collectedChums.size > 0 && (
                   <div className={css.winChums}>
                     Chums collected: {collectedChums.size}
+                    {packSize > 0
+                      ? ` of ${Math.max(packSize, collectedChums.size)} (${Math.min(100, Math.round((collectedChums.size / packSize) * 100))}%)`
+                      : ""}
                   </div>
                 )}
                 {goReady && (nextLevelLabel && onNextLevel ? (

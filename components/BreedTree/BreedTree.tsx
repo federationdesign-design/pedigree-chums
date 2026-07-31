@@ -1008,6 +1008,7 @@ export default function BreedTree({
   levelNo,
   collectedChums,
   onChumCollected,
+  onChumsDropped,
   hideLabels = false,
   disableZoom = false,
   fill = false,
@@ -1055,6 +1056,11 @@ export default function BreedTree({
   levelNo?: number;
   collectedChums?: Set<string>;
   onChumCollected?: (name: string) => void;
+  /* How many cards the flood actually tipped in, reported once when it runs.
+     The win screen needs a denominator and this is the only place that knows
+     it: the level list is filtered by what has already been taken, so nothing
+     downstream can count the pack for itself. */
+  onChumsDropped?: (n: number) => void;
   hideLabels?: boolean;
   disableZoom?: boolean;
   fill?: boolean;
@@ -1923,7 +1929,33 @@ export default function BreedTree({
   // Handle for the occupancy poll. A ref rather than a local because the
   // effect's cleanup sits outside the block the sim is built in.
   const fullPollRef = useRef(0);
+  /* THE ROUND IS OVER. STOP THE CLOCK.
+
+     `pitEndedRef` used to be set only when the pit-full countdown itself
+     handed over. Winning left it false, so the occupancy poll, which
+     deliberately outlives the physics loop, carried on testing a pit whose
+     round was already decided. A chum card resting on the floor would then
+     start a fresh countdown UNDER the win screen and hand back GAME OVER ten
+     seconds later.
+
+     Worse, a floor-triggered countdown sets `floorTriggeredRef`, which exists
+     to stop the pit emptying from calling it off. So once started it could not
+     be cancelled by anything. Hence this: one place that ends the round, takes
+     down whatever is on screen, and clears both flags. */
+  const endPitRound = () => {
+    pitEndedRef.current = true;
+    if (cdTickRef.current !== null) { window.clearInterval(cdTickRef.current); cdTickRef.current = null; }
+    if (cdElRef.current) { cdElRef.current.remove(); cdElRef.current = null; }
+    if (cdMidElRef.current) { cdMidElRef.current.remove(); cdMidElRef.current = null; }
+    setFullAlpha(0);
+    fullTriggeredRef.current = false;
+    floorTriggeredRef.current = false;
+  };
   const runCountdown = () => {
+    // Guarded at the source, not at each caller. The floor collision starts a
+    // countdown directly and never consulted the poll, so a guard on the poll
+    // alone would have left that path open.
+    if (pitEndedRef.current) return;
     const st = stageRef.current;
     if (!st) { pitEndedRef.current = true; onPitFull?.(); return; }
     const el = document.createElement("div");
@@ -3204,6 +3236,7 @@ export default function BreedTree({
       const spawnChums = () => {
         const imgs = chumImagesRef.current;
         if (!imgs.length) return;
+        onChumsDropped?.(imgs.length);
         const vw = typeof window !== "undefined" ? window.innerWidth : 390;
         // The medium dog's size. Every other band is a multiple of it, so a
         // giant drops in noticeably bigger than a terrier, exactly as in the
@@ -6142,6 +6175,9 @@ export default function BreedTree({
                 const fb = pitBodiesRef.current?.find(learnNode);
                 window.setTimeout(() => {
                   const total = chainRef.current ? chainRef.current(fb?.x ?? 0, fb?.y ?? 0) : 0;
+                  // Freeze first. Any countdown in flight comes down, and none
+                  // can start, before the screen is handed to the shell.
+                  endPitRound();
                   window.setTimeout(() => onRoundWon?.(), total + 420); // flash lands after the chain
                 }, 700);
               }
