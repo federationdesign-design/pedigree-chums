@@ -46,6 +46,11 @@ export type LevelTheme = {
      Typed loosely on purpose: the kinds themselves are the pit's business, and
      naming them here would make this data file depend on the component. */
   props?: string[];
+  /* Props for ONE level, keyed by the dog's name, overriding the era's set
+     above. Some levels want fewer objects on the floor than their era does.
+     Most specific wins: this, then the era's props, then the pit's default
+     three. A name with no entry simply takes the era's set. */
+  propsByLevel?: Record<string, string[]>;
 };
 
 const THEMES: Record<string, LevelTheme> = {
@@ -83,6 +88,15 @@ const THEMES: Record<string, LevelTheme> = {
     wash: "#fdf251",
     // Tudor swaps the woodland props for household ones.
     props: ["newspaper", "fork", "shoe"],
+    /* Three levels in the middle of the Tudor run keep the fork alone. The
+       newspaper and the shoe are the two big ones, and on these the floor was
+       too crowded to play on. Turnspit Dog and Bearded Collie, either side of
+       them, keep all three. */
+    propsByLevel: {
+      "English Foxhound": ["fork"],
+      Otterhound: ["fork"],
+      Staghound: ["fork"],
+    },
   },
 };
 

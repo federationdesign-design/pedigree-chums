@@ -1032,6 +1032,7 @@ export default function BreedTree({
   rootNote,
   levelTheme = null,
   era,
+  levelName,
   onStartedChange,
   onLearningChange,
   onRelativeTap,
@@ -1082,6 +1083,9 @@ export default function BreedTree({
   /* Which era this level belongs to. Used to scope a retired toy: the balls
      come back when the reader reaches a different era. */
   era?: string;
+  /* The dog this level is built on. Only used to look up a per-level prop set,
+     so one level can carry fewer objects than the rest of its era. */
+  levelName?: string;
   onStartedChange?: (started: boolean) => void;
   onLearningChange?: (learning: boolean) => void;
   onRelativeTap?: (slug: string, name: string) => void;
@@ -3350,9 +3354,14 @@ export default function BreedTree({
            The first two arrive together and the rest follow at the rock's gap,
            so a set of any length keeps the original rhythm: a pair thumps in,
            then the stragglers land one after another rather than in a heap. */
-        const props: ToyKind[] = levelTheme?.props?.length
-          ? (levelTheme.props as ToyKind[])
-          : DEFAULT_PROPS;
+        /* Most specific wins: this level's own set, then the era's, then the
+           pit's default three. */
+        const byLevel = levelName ? levelTheme?.propsByLevel?.[levelName] : undefined;
+        const props: ToyKind[] = byLevel?.length
+          ? (byLevel as ToyKind[])
+          : levelTheme?.props?.length
+            ? (levelTheme.props as ToyKind[])
+            : DEFAULT_PROPS;
         /* SIDES ALTERNATE, AND THE FIRST SIDE ALTERNATES TOO. Each prop lands on
            the opposite side to the one before it, so two can never come down
            together in the same corner, and the whole sequence starts on the

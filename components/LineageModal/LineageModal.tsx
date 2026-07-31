@@ -262,6 +262,7 @@ export default function LineageModal({ name, image, character, lineage, onClose,
           /* The pit needs the era by name as well as by theme: a thrown ball is
              retired for this era and returns in the next one. */
           era={era}
+          levelName={name}
           root={lineage}
           rootImage={image}
           centred
