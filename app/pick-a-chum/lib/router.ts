@@ -796,6 +796,11 @@ function matchTrick(c: string): 'play_dead' | 'roll_over' | null {
   if (ROLL_OVER.has(c)) return 'roll_over';
   return null;
 }
+// Task 111: two more dog commands, out of the old B11 "Sit? I am running the session." voice. "fetch"
+// hands back a rotating Play/Learn/Discover link; "shake"/"paw" offer the bark game (the three Collie
+// games are not built yet). Exact-match, same placement as the tricks (below safety/grief).
+const FETCH_CMD = new Set(['fetch', 'go fetch']);
+const GAME_CMD = new Set(['shake', 'paw', 'shake hands', 'give paw', 'high five']);
 
 export function resolve(n0: Normalised, data: ChumData, state: RouterState): Resolution {
   // Apply curated misspelling aliases first, so both the safety gate and every
@@ -901,6 +906,8 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
   {
     const trick = matchTrick(c);
     if (trick) return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: trick };
+    if (GAME_CMD.has(c)) return { layer: 13, layerName: 'Play and entertainment', bucket: 'B17', action: 'offer_bark_game' };
+    if (FETCH_CMD.has(c)) return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: 'random_link' };
   }
 
   // Task 68: confirmation after a loop offer. If the previous turn served LOOP-01 or LOOP-02

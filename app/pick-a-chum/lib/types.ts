@@ -168,6 +168,7 @@ export type ActionType =
   | 'breed_best' // a superlative "best dog" question: the shared refuse-to-pick line
   | 'play_dead' // Task 78: visual trick -- the Collie image goes black until the next message
   | 'roll_over' // Task 78: visual trick -- the Collie image rotates 180deg, then :)
+  | 'random_link' // Task 111: "fetch" -> a rotating Play/Learn/Discover destination link
   | 'boxer_cutoff'; // hidden ceiling reached
 
 export interface Resolution {

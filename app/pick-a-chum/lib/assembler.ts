@@ -220,6 +220,17 @@ export function assemble(res: Resolution, data: ChumData, n: Normalised, session
     case 'roll_over':
       return { responseId: 'ROLL-OVER', text: ':)', dog };
 
+    // Task 111: "fetch" hands back a rotating Play/Learn/Discover link (deterministic rotation via the
+    // session's offered set), instead of the old B11 command voice. The line comes from the B03 link
+    // bank, filled with the destination name.
+    case 'random_link': {
+      const dest = pickDestination(data, session.offeredDestinationIds);
+      const name = dest?.name ?? 'the site';
+      const r = pickResponse(data, 'B03', session.usedResponseIds);
+      const text = r ? fill(r.template, baseContext(n, name)) : `${name} is here.`;
+      return { responseId: r?.responseId ?? 'FETCH-LINK', text, dog, destinationId: dest?.id, url: dest?.url ?? null };
+    }
+
     case 'canned': {
       // Task 80: a conversational bucket (B21-B39) matched on its column-D triggers. Serve the
       // exact matched row's template verbatim. The faces ':(' and ':)' are non-verbal, so they get
