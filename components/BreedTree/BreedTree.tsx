@@ -5668,8 +5668,16 @@ export default function BreedTree({
                        reads before the glyph does: red leaves, green goes back.
                        Everything else stays the pit's yellow. */
                     fill:
-                      d.kind === "leave" ? "#ef4444" : d.kind === "restart" ? "#22c55e" : "var(--yellow, #ffd23e)",
-                    stroke: "var(--navy, #0a3a57)",
+                      d.kind === "leave" ? "#ef4444"
+                        : d.kind === "restart" ? "#22c55e"
+                        /* START SCREEN ONLY, which is neither learning nor
+                           started. There the X really does close the pit, so it
+                           reads red against the green PLAY. In learn it goes
+                           back and during a round it opens the menu, and in both
+                           of those it stays the pit's yellow. */
+                        : d.kind === "close" && !learning && !started ? "#ef4444"
+                        : "var(--yellow, #ffd23e)",
+                    stroke: d.kind === "close" && !learning && !started ? "#ffffff" : "var(--navy, #0a3a57)",
                     strokeWidth: 5 * upp,
                   }} />
                 {d.kind === "leave" ? (
@@ -5697,7 +5705,7 @@ export default function BreedTree({
                       strokeLinejoin="round"
                     />
                   ) : (
-                    <g stroke="var(--navy, #0a3a57)" strokeWidth={iconStroke} strokeLinecap="round">
+                    <g stroke={!started ? "#ffffff" : "var(--navy, #0a3a57)"} strokeWidth={iconStroke} strokeLinecap="round">
                       <line x1={-half * 0.34} y1={-half * 0.34} x2={half * 0.34} y2={half * 0.34} />
                       <line x1={half * 0.34} y1={-half * 0.34} x2={-half * 0.34} y2={half * 0.34} />
                     </g>
@@ -5807,11 +5815,15 @@ export default function BreedTree({
                   const hv = wordHover === w.key ? 1.06 : 1;
                   return (
                     <g transform={`translate(${cx},${cy}) scale(${hv}) translate(${-cx},${-cy})`}>
+                      {/* START SCREEN ONLY. Green for go, white glyph, white
+                          rim. This square exists only here: the learn area has
+                          its own PLAY and the pit has its own corner set, and
+                          both keep the pit's yellow and navy. */}
                       <rect x={w.x} y={cy - S / 2} width={S} height={S} rx={S * 0.3}
-                        fill="var(--yellow, #ffd23e)" stroke="var(--navy, #0a3a57)" strokeWidth={rim} />
+                        fill="#22c55e" stroke="#ffffff" strokeWidth={rim} />
                       <path
                         d={`M${cx - gw * 0.3},${cy - gh / 2} L${cx + gw * 0.7},${cy} L${cx - gw * 0.3},${cy + gh / 2} Z`}
-                        fill="var(--navy, #0a3a57)" stroke="var(--navy, #0a3a57)"
+                        fill="#ffffff" stroke="#ffffff"
                         strokeWidth={S * 0.07} strokeLinejoin="round"
                       />
                     </g>
