@@ -26,6 +26,7 @@ export interface Assembled {
   header?: string; // e.g. 'HELP AND SUPPORT' above a protected safety response
   hideDogIdentity?: boolean; // true: no dog name, avatar or character label above the response
   ariaLabel?: string; // Task 58: screen-reader label for a non-verbal response (the ':(' / ':)' faces). The UI must render this as the accessible name.
+  gameOutput?: string; // Task 115: the game's monospace board / sheep tiles / drawing, rendered pre-formatted below the line.
 }
 
 // Task 58: screen-reader label for the sad-face emoticon (grief ':(' and the loop's ':)'
@@ -229,6 +230,14 @@ export function assemble(res: Resolution, data0: ChumData, n: Normalised, sessio
       return { responseId: 'PLAY-DEAD', text: '', dog };
     case 'roll_over':
       return { responseId: 'ROLL-OVER', text: ':)', dog };
+
+    // Task 115: the three in-chat games. The engine has already processed the move and put the copy
+    // (with {{WORD}}/{{ANSWER}} substituted) and the monospace display on the resolution; the assembler
+    // just packages them. The display renders in a monospace, pre-formatted block (the UI's .gameOutput).
+    case 'game_start':
+    case 'game_move':
+    case 'game_exit':
+      return { responseId: res.gameLine ?? res.action, text: res.gameText ?? '', gameOutput: res.gameDisplay ?? undefined, dog };
 
     // Task 111: "fetch" hands back a rotating Play/Learn/Discover link (deterministic rotation via the
     // session's offered set), instead of the old B11 command voice. The line comes from the B03 link

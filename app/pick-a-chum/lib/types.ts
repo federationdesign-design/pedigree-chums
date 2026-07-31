@@ -174,7 +174,13 @@ export type ActionType =
   | 'play_dead' // Task 78: visual trick -- the Collie image goes black until the next message
   | 'roll_over' // Task 78: visual trick -- the Collie image rotates 180deg, then :)
   | 'random_link' // Task 111: "fetch" -> a rotating Play/Learn/Discover destination link
+  | 'game_start' // Task 115: enter one of the three in-chat games by name
+  | 'game_move' // Task 115: a move inside the active game (a number / letter / guess)
+  | 'game_exit' // Task 115: leave the active game ("stop"/"enough"/...)
   | 'boxer_cutoff'; // hidden ceiling reached
+
+// Task 115: the three in-chat games.
+export type GameId = 'ninesquare' | 'missingsheep' | 'kennelsketch';
 
 export interface Resolution {
   layer: number; // 1..10 priority layer that won
@@ -198,4 +204,11 @@ export interface Resolution {
   griefCategory?: string; // Task 58: which grief scenario matched (GRIEF-01 died / GRIEF-02 lost / GRIEF-03 old-unwell); all serve the same ':(' line
   mirror?: string; // Task 76: the greeting word to echo back for a B09 greeting (the only response built from the input)
   responseId?: string; // Task 80: the specific canned-conversation row (B21-B39) the input matched; the assembler serves that row's template
+  // Task 115: game routing. `game` is the game a start/move/exit targets. The engine processes the move
+  // before assembly and fills `gameLine` (the B4x responseId to serve), `gameText` (that copy, with
+  // {{WORD}}/{{ANSWER}} substituted) and `gameDisplay` (the monospace board / tiles / drawing).
+  game?: GameId;
+  gameLine?: string;
+  gameText?: string;
+  gameDisplay?: string;
 }

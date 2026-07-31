@@ -50,6 +50,10 @@ const INSTANT: ReadonlySet<ActionType> = new Set<ActionType>([
   'bark',
   'bark_break',
   'bark_ack',
+  // Task 115: a game board / sheep tiles / drawing must appear whole and instantly, never typed out.
+  'game_start',
+  'game_move',
+  'game_exit',
 ]);
 export function skipTheatre(action: ActionType): boolean {
   return INSTANT.has(action);

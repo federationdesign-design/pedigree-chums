@@ -1,1 +1,278 @@
-[]
+[
+  {
+    "responseId": "LAB-B40-01",
+    "bucketId": "B40",
+    "subtag": "nosubject",
+    "triggers": [
+      "ANY unrecognised input, no candidate subject"
+    ],
+    "template": "food?",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "LAB-B14-01",
+    "bucketId": "B14",
+    "subtag": "gibberish",
+    "triggers": [
+      "keyboard mash",
+      "symbols only",
+      "unreadable"
+    ],
+    "template": "wot?",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "LAB-B23-01",
+    "bucketId": "B23",
+    "subtag": "identity",
+    "triggers": [
+      "are you the labrador",
+      "are you a lab"
+    ],
+    "template": "yes!",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "LAB-B23-02",
+    "bucketId": "B23",
+    "subtag": "identity",
+    "triggers": [
+      "are you a real dog",
+      "are you real"
+    ],
+    "template": "i am a dog",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "LAB-B21-01",
+    "bucketId": "B21",
+    "subtag": "cats",
+    "triggers": [
+      "cats",
+      "cat",
+      "do you chase cats"
+    ],
+    "template": "yes!",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "LAB-B22-01",
+    "bucketId": "B22",
+    "subtag": "tricks",
+    "triggers": [
+      "sit",
+      "sit down"
+    ],
+    "template": "i am sitting",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "LAB-B22-02",
+    "bucketId": "B22",
+    "subtag": "tricks",
+    "triggers": [
+      "speak",
+      "beg"
+    ],
+    "template": "no",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "LAB-B32-01",
+    "bucketId": "B32",
+    "subtag": "self",
+    "triggers": [
+      "what do you like to eat",
+      "whats your favourite food"
+    ],
+    "template": "human food is my fav!!!",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "LAB-B32-02",
+    "bucketId": "B32",
+    "subtag": "self",
+    "triggers": [
+      "like what",
+      "what human food"
+    ],
+    "template": "hotdogs",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "LAB-B32-03",
+    "bucketId": "B32",
+    "subtag": "self",
+    "triggers": [
+      "do you eat dog food",
+      "do you eat anything else"
+    ],
+    "template": "i eat anything even things that are not food",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "LAB-B32-04",
+    "bucketId": "B32",
+    "subtag": "self",
+    "triggers": [
+      "whats your favourite dog"
+    ],
+    "template": "hotdogs",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "LAB-B32-05",
+    "bucketId": "B32",
+    "subtag": "self",
+    "triggers": [
+      "do you like walks"
+    ],
+    "template": "YES!",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "LAB-B32-06",
+    "bucketId": "B32",
+    "subtag": "self",
+    "triggers": [
+      "how far",
+      "how long"
+    ],
+    "template": "to the big water",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "LAB-B32-07",
+    "bucketId": "B32",
+    "subtag": "self",
+    "triggers": [
+      "do you like the rain"
+    ],
+    "template": "yes",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "LAB-B32-08",
+    "bucketId": "B32",
+    "subtag": "self",
+    "triggers": [
+      "do you like baths",
+      "what about baths"
+    ],
+    "template": "no!!!!",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "LAB-B32-09",
+    "bucketId": "B32",
+    "subtag": "self",
+    "triggers": [
+      "do you get told off"
+    ],
+    "template": "yes",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "LAB-B32-10",
+    "bucketId": "B32",
+    "subtag": "self",
+    "triggers": [
+      "what for",
+      "why do you get told off"
+    ],
+    "template": "im greedy",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "LAB-B33-01",
+    "bucketId": "B33",
+    "subtag": "pack",
+    "triggers": [
+      "do you know any other dogs",
+      "do you have friends"
+    ],
+    "template": "loads!",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "LAB-B35-01",
+    "bucketId": "B35",
+    "subtag": "nofact",
+    "triggers": [
+      "any fact he does not hold"
+    ],
+    "template": "dunno but collie knows stuff like that",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "LAB-B35-02",
+    "bucketId": "B35",
+    "subtag": "nofact",
+    "triggers": [
+      "black hole",
+      "anything with the word hole"
+    ],
+    "template": "i dig holes",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  }
+]

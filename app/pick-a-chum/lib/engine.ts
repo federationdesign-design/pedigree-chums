@@ -5,6 +5,7 @@
 import { ChumData, Resolution } from './types';
 import { normalise } from './normalise';
 import { resolve, resolveCanned, extractCandidateSubject } from './router';
+import { startGame, applyMove, exitLine, GameResult } from './games';
 import { assemble, Assembled } from './assembler';
 import { Session, Topic } from './session';
 import { detectSadnessClear } from './safety';
@@ -45,7 +46,7 @@ const MEANINGFUL_TOPIC = new Set(['breed_answer', 'rules_answer', 'faq_answer', 
 // non-meaningful is held as the safeguarding continuation, so this set only gates aftercare. The
 // bark game (bark / bark_break / bark_ack) and a comic transfer (joke -> Boxer) are
 // the comedy; open_discount_popup is sales; fun_tease is the games tease.
-const AFTERCARE_BLOCKED = new Set(['offer_bark_game', 'open_discount_popup', 'transfer', 'bark', 'bark_break', 'bark_ack', 'price_answer', 'canned']);
+const AFTERCARE_BLOCKED = new Set(['offer_bark_game', 'open_discount_popup', 'transfer', 'bark', 'bark_break', 'bark_ack', 'price_answer', 'canned', 'game_start', 'game_move', 'game_exit']);
 // The "old voice" routes a canned answer is allowed to override (Steve's decision): the identity
 // spiel, the orientation nudge, the bare-help clarifier and any FAQ match. These resolve above the
 // in-router canned check, so a matching canned trigger overrides them here. Safety, grief, breed
@@ -103,6 +104,22 @@ const COMPLAINT_REPEAT_LINE = 'Noted. Put that in the email too and someone will
 // refuse-to-guess (gk_unknown). The repair ladder, the loop counter, LOOP-03/04 and the ORIENT
 // nudge were all retired in Task 79.
 const FALLBACK_FAMILY = new Set(['fallback', 'gk_unknown']);
+
+// Task 115: a game B4x line's template text, or '' (an ongoing board has no line).
+function gameCopy(data: ChumData, line: string): string {
+  const row = data.collieResponses.find((r) => r.responseId === line);
+  return row ? row.template : '';
+}
+// Task 115: fold a computed game result onto the resolution for the assembler: the responseId to serve,
+// its copy with {{WORD}}/{{ANSWER}} substituted, and the monospace display block.
+function serveGameResult(resolution: Resolution, data: ChumData, result: GameResult): void {
+  let text = gameCopy(data, result.line);
+  if (result.word) text = text.replace(/\{\{\s*WORD\s*\}\}/g, result.word);
+  if (result.answer) text = text.replace(/\{\{\s*ANSWER\s*\}\}/g, result.answer);
+  resolution.gameLine = result.line;
+  resolution.gameText = text;
+  resolution.gameDisplay = result.display;
+}
 // LOOP-02 is candidate-driven: it names the specific destination the candidate maps to. A breed
 // candidate (a Title-Case breed name) -> its page; a game-family word -> the card game rules;
 // anything else -> no mapping, so LOOP-02 is skipped. PLACEHOLDER: the exact offer wording is
@@ -141,6 +158,7 @@ export function submit(data: ChumData, session: Session, input: string): Turn {
     protectedState: wasProtected,
     personalSadnessCount: session.personalSadnessCount,
     pendingConfirm: session.pendingConfirm,
+    activeGame: session.activeGame,
   });
 
   // A canned answer (B21-B39) overrides the four old-voice routes Steve named (identity,
@@ -181,6 +199,39 @@ export function submit(data: ChumData, session: Session, input: string): Turn {
   // applied inside a protected state (the S12 machine owns those turns).
   if (session.lastWasComplaint && !wasProtected && WEAK_AFTER_COMPLAINT.has(resolution.action)) {
     resolution = { layer: 4, layerName: 'FAQ knowledge', bucket: 'B04', action: 'faq_answer', faqId: 'FAQ015' };
+  }
+
+  // Task 115: the three in-chat games. Processed BEFORE assembly so the served copy and the board/tiles/
+  // drawing reflect this move. The router places game routing BELOW safety/grief, and the S12 machine
+  // above converts a game turn in a protected state, so a disclosure/bereavement/fear-of-a-person never
+  // arrives here as a move: it arrives as a safety/grief action, and the final branch ENDS the game.
+  // Safety is never swallowed. {{WORD}}/{{ANSWER}} are substituted from the just-computed game result.
+  if (resolution.action === 'game_start' && resolution.game) {
+    const { state, result } = startGame(resolution.game, session.gamesPlayed);
+    session.activeGame = resolution.game;
+    session.game = state;
+    session.gamesPlayed += 1;
+    serveGameResult(resolution, data, result);
+  } else if (resolution.action === 'game_move' && session.activeGame && session.game) {
+    const { state, result } = applyMove(session.activeGame, session.game, n.compact);
+    session.game = state;
+    if (result.ended) {
+      session.activeGame = null;
+      session.game = null;
+    }
+    serveGameResult(resolution, data, result);
+  } else if (resolution.action === 'game_exit') {
+    const g = session.activeGame ?? 'ninesquare';
+    const line = exitLine(g);
+    resolution.gameLine = line;
+    resolution.gameText = gameCopy(data, line);
+    resolution.gameDisplay = '';
+    session.activeGame = null;
+    session.game = null;
+  } else if (session.activeGame) {
+    // Any other resolution (safety, grief, a real answer) while a game is active ENDS the game.
+    session.activeGame = null;
+    session.game = null;
   }
 
   const response = assemble(resolution, data, n, session);

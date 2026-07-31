@@ -1,1 +1,190 @@
-[]
+[
+  {
+    "responseId": "BOX-B40-01",
+    "bucketId": "B40",
+    "subtag": "nosubject",
+    "triggers": [
+      "ANY unrecognised input, no candidate subject"
+    ],
+    "template": "joke?",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "BOX-B14-01",
+    "bucketId": "B14",
+    "subtag": "gibberish",
+    "triggers": [
+      "keyboard mash",
+      "symbols only",
+      "unreadable"
+    ],
+    "template": "is that a joke?",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "BOX-B23-01",
+    "bucketId": "B23",
+    "subtag": "identity",
+    "triggers": [
+      "are you the boxer",
+      "are you a boxer"
+    ],
+    "template": "yepper",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "BOX-B27-01",
+    "bucketId": "B27",
+    "subtag": "capability",
+    "triggers": [
+      "can you do something other than jokes",
+      "what else"
+    ],
+    "template": "yes, you want to play my mini game? or the proper game?",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "BOX-B29-01",
+    "bucketId": "B29",
+    "subtag": "nice",
+    "triggers": [
+      "lol",
+      "haha",
+      "ha",
+      "thats funny"
+    ],
+    "template": "hhaaww",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "BOX-B24-01",
+    "bucketId": "B24",
+    "subtag": "rude",
+    "triggers": [
+      "thats terrible",
+      "not funny",
+      "thats rubbish"
+    ],
+    "template": "one more",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "BOX-B30-01",
+    "bucketId": "B30",
+    "subtag": "joke",
+    "triggers": [
+      "joke",
+      "tell me a joke",
+      "make me laugh"
+    ],
+    "template": "knock kncok",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "BOX-B30-02",
+    "bucketId": "B30",
+    "subtag": "joke",
+    "triggers": [
+      "whos there",
+      "who is there"
+    ],
+    "template": "Bow",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "BOX-B30-03",
+    "bucketId": "B30",
+    "subtag": "joke",
+    "triggers": [
+      "bow who"
+    ],
+    "template": "Not bow who! i mean Bow wow!",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "BOX-B30-04",
+    "bucketId": "B30",
+    "subtag": "joke",
+    "triggers": [
+      "another",
+      "again",
+      "more",
+      "go on"
+    ],
+    "template": "What do you call a dog rock star?",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "BOX-B30-05",
+    "bucketId": "B30",
+    "subtag": "joke",
+    "triggers": [
+      "i dont know",
+      "dunno",
+      "what"
+    ],
+    "template": "A sue-paw star",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "BOX-B30-06",
+    "bucketId": "B30",
+    "subtag": "joke",
+    "triggers": [
+      "another one",
+      "one more"
+    ],
+    "template": "How can you tell dogs are having a good time?",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "BOX-B30-07",
+    "bucketId": "B30",
+    "subtag": "joke",
+    "triggers": [
+      "how",
+      "tell me how"
+    ],
+    "template": "we are having a ball",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  }
+]
