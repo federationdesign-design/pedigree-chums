@@ -482,6 +482,19 @@
   color: var(--yellow, #ffd23e);
   z-index: 2;
 }
+/* The chums taken out of this level. Same voice as the score above it, tilted
+   the other way so the pair reads as two lines rather than one block, and a
+   step smaller because the score is the headline of the two. */
+.winChums {
+  transform: rotate(3deg);
+  font-family: var(--font-body, Montserrat, system-ui);
+  font-weight: 800;
+  font-size: clamp(0.95rem, 3.6vw, 1.6rem);
+  color: #ffffff;
+  margin-top: 2px;
+  z-index: 2;
+}
+
 /* Tilted, like the mock. Sits above the photo. */
 .winFlash {
   position: relative;

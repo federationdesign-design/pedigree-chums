@@ -499,6 +499,16 @@ export default function LineageModal({ name, image, character, lineage, onClose,
                 <span className={css.winBanner}>Ancestor discovered</span>
               </div>
               <div className={css.winScore}>Your Round Score: {score.toLocaleString()}</div>
+              {/* The chums taken out of this level. The set already exists and
+                  already resets per level, because the modal remounts on every
+                  one, so this is only the reporting.
+                  Hidden at zero rather than showing "0 chums": a level where the
+                  reader collected nothing should not be told so. */}
+              {collectedChums.size > 0 && (
+                <div className={css.winChums}>
+                  Chums collected: {collectedChums.size}
+                </div>
+              )}
               <div className={css.winFlash}>Round Won</div>
               {/* THE ERA JOIN. Two messages in one slot: the first lands with
                   the screen, the second pops over the top of it a beat later.

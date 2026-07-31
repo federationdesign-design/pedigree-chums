@@ -1778,6 +1778,9 @@ export default function BreedTree({
   // cleared the floor. The main pit does not work that way, and this is its rule.
   const cdTickRef = useRef<number | null>(null);
   const cdElRef = useRef<HTMLDivElement | null>(null);
+  // The centre set of digits. Mobile only, and torn down everywhere the corner
+  // set is, or a cancelled countdown would leave a number sitting on the pit.
+  const cdMidElRef = useRef<HTMLDivElement | null>(null);
   const cdGraceRef = useRef(0);
   // Set the moment the round is handed back to the shell. The occupancy poll
   // in the sim effect deliberately outlives the physics loop, so without this
@@ -1807,14 +1810,35 @@ export default function BreedTree({
         ? "align-items:flex-start;justify-content:flex-end;padding:18px 18px 0 0;font-size:clamp(3.4rem,13vw,7rem);"
         : "align-items:center;justify-content:center;font-size:clamp(5rem,18vw,12rem);");
     st.appendChild(el);
+    /* A SECOND SET OF DIGITS, IN THE MIDDLE. The corner pair keeps the count
+       clear of the play; this one puts it where the reader is actually looking.
+       Two elements driven by ONE ticker, so they cannot disagree.
+       Mobile only: on desktop the corner set is already centred and a second
+       would land exactly on top of it. Held back and behind, so it reads as an
+       echo of the corner rather than competing with it. */
+    const elMid = cdMobile ? document.createElement("div") : null;
+    if (elMid) {
+      elMid.style.cssText =
+        "position:absolute;inset:0;z-index:199;display:flex;align-items:center;justify-content:center;" +
+        "font-family:var(--font-display,'Luckiest Guy',system-ui);color:#fff;pointer-events:none;" +
+        "text-shadow:0 4px 40px rgba(0,0,0,0.6);opacity:0.5;font-size:clamp(6rem,34vw,16rem);";
+      st.appendChild(elMid);
+    }
     const steps = ["10","9","8","7","6","5","4","3","2","1","0"];
     let i = 0;
     el.textContent = steps[i];
+    if (elMid) elMid.textContent = steps[i];
     setFullAlpha(0);
     cdElRef.current = el;
+    cdMidElRef.current = elMid;
     const tick = window.setInterval(() => {
       i++;
-      if (i < steps.length) { el.textContent = steps[i]; setFullAlpha(i / 10); return; }
+      if (i < steps.length) {
+        el.textContent = steps[i];
+        if (cdMidElRef.current) cdMidElRef.current.textContent = steps[i];
+        setFullAlpha(i / 10);
+        return;
+      }
       window.clearInterval(tick);
       cdTickRef.current = null;
       // hold on 0, then GAME OVER, then hand over
@@ -1834,6 +1858,9 @@ export default function BreedTree({
         // shell's own screen and belongs in the same place on it.
         el.textContent = "Oh no...";
         el.style.alignItems = "center";
+        /* The corner set re-centres itself to say this, so the middle set has
+           to go or there would be two things in the same place. */
+        if (cdMidElRef.current) { cdMidElRef.current.remove(); cdMidElRef.current = null; }
         el.style.justifyContent = "center";
         el.style.padding = "0";
         el.style.textAlign = "center";
@@ -1846,7 +1873,11 @@ export default function BreedTree({
         el.style.background =
           "radial-gradient(120% 120% at 50% 40%, rgba(15,65,165,0.31), rgba(8,34,100,0.43))";
         el.style.transition = "background 0.35s ease";
-        window.setTimeout(() => { el.remove(); cdElRef.current = null; pitEndedRef.current = true; onPitFull?.(); }, 1400);
+        window.setTimeout(() => {
+          el.remove(); cdElRef.current = null;
+          if (cdMidElRef.current) { cdMidElRef.current.remove(); cdMidElRef.current = null; }
+          pitEndedRef.current = true; onPitFull?.();
+        }, 1400);
       }, 1200);
     }, 1000);
     cdTickRef.current = tick;
@@ -3897,6 +3928,7 @@ export default function BreedTree({
           // reached from the loop or the poll, both of which are effects.
           if (cdTickRef.current !== null) { window.clearInterval(cdTickRef.current); cdTickRef.current = null; }
           if (cdElRef.current) { cdElRef.current.remove(); cdElRef.current = null; }
+          if (cdMidElRef.current) { cdMidElRef.current.remove(); cdMidElRef.current = null; }
           setFullAlpha(0);
           fullTriggeredRef.current = false;
           // Paired with the flag above: this branch only runs for a pit-full
