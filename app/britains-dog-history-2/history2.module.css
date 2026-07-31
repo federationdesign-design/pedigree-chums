@@ -385,6 +385,19 @@
   z-index: 5;
   background: var(--yellow, #ffd23e);
   pointer-events: none;
+  /* Both positions are a `top`, so the move between them animates. A swap
+     between `top` and `bottom` would jump. */
+  transition: top 0.25s ease;
+}
+/* Slides with NO seam: the intro, the era screens and the vertical runs. The
+   bar sits on the floor there rather than ruling a line across open artwork.
+   Which slides those are is not listed here: the script reads the settled
+   panel's own data-pc-sec, the same attribute the dog counter reads. */
+.progressFloor {
+  top: calc(100% - 5px);
+}
+@media (prefers-reduced-motion: reduce) {
+  .progress { transition: none; }
 }
 
 /* Fact panels only. `overflow: visible` undoes the scroll clipping every
