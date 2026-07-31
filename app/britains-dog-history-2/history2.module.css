@@ -739,15 +739,40 @@
   z-index: 2;
   pointer-events: none;
   display: block;
+  /* THE TWO SIZES, ONCE. Both figures read from these, and the smaller column
+     just changes the scale, so the ratio between them is one number rather than
+     a second set of clamps to keep in step. */
+  --era-num: clamp(3.4rem, 18vw, 5rem);
+  --era-word: clamp(1.1rem, 6vw, 1.6rem);
+  --era-scale: 1;
 }
 
+/* Two figures side by side, split by a slash. Baseline alignment, so the two
+   numerals and the slash sit on one line and the words hang under them without
+   any of it being measured by hand. */
 .eraCountOutline,
 .eraCountFill {
   display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  gap: 10px;
+}
+.eraCountCol {
+  display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: center;
   /* Tight, so the word tucks under the numeral as in the concept. */
   line-height: 0.78;
+}
+.eraCountSlash {
+  font-family: var(--font-display), system-ui, sans-serif;
+  /* Belongs to the smaller half, so it takes the same 0.75. */
+  font-size: calc(clamp(2.2rem, 11vw, 3.2rem) * 0.75);
+}
+/* A quarter smaller: the playable figure is the qualifier, the total is the
+   headline. */
+.eraCountSmall {
+  --era-scale: 0.75;
 }
 
 /* The white behind. Fill AND stroke are white, so this copy is a fattened
@@ -788,11 +813,11 @@
 }
 
 .eraCountNum {
-  font-size: clamp(3.4rem, 18vw, 5rem);
+  font-size: calc(var(--era-num) * var(--era-scale));
 }
 
 .eraCountWord {
-  font-size: clamp(1.1rem, 6vw, 1.6rem);
+  font-size: calc(var(--era-word) * var(--era-scale));
 }
 
 @keyframes pcDotIn {
@@ -1122,6 +1147,32 @@
 
 /* The name, over the picture and above the status bar. MEASURED from the
    concept: caps about 32.5 CSS px tall, which is roughly a 45px face. */
+/* END OF AN ERA, on the final dog of a run.
+
+   The band it lives in is measured, not chosen: the status bar sits at the
+   bottom and is about 26px tall, and the name is anchored at 62px. So there is
+   roughly 36px between them and the mark is 30px to sit inside it.
+
+   If the supplied artwork needs more room the honest fix is to lift the name,
+   not to shrink this until it cannot be read. Two numbers: `bottom` here and
+   `bottom` on .dogNameOver. */
+.dogEraEnd {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 32px;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+.dogEraEndImg {
+  height: 30px;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+}
+
 .dogNameOver {
   position: absolute;
   left: 12px;
@@ -1144,7 +1195,13 @@
    bottom and read as two more gaps. The row is now exactly as tall as the
    disc, so the legs meet it edge to edge. */
 .markerRow {
-  /* The end node on the last dog is positioned against this. */
+  /* The end node on the last dog is positioned against this, so this box has to
+     be the width of the card and not the width of its own contents.
+     .dogScreen is a flex COLUMN with align-items: center, which shrink-wraps
+     every child. So this row was about 165px wide, the three icons and their
+     gaps, and `right: 0` on the end node landed it on top of the information
+     icon rather than out at the edge. */
+  width: 100%;
   position: relative;
   display: flex;
   align-items: center;

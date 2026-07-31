@@ -95,12 +95,28 @@ type Props = {
   onSpendLife?: () => void;
   // PLAY AGAIN on a spent run: the page restores lives and the campaign total.
   onResetRun?: () => void;
+  /* This level's chum catch, as a percentage, reported once when the level is
+     completed. The modal is keyed per level and remounts on every one, so the
+     figure has to leave here or it goes with it. Silent when the level had no
+     chums to catch: a level with nothing to collect is not a level you caught
+     none of, and averaging in a nought would say it was. */
+  onLevelChumRate?: (pct: number) => void;
+  // The run so far, handed back down for the game over screen. Mean of every
+  // completed level's percentage, and how many levels went into it.
+  runChumRate?: number | null;
+  runLevels?: number;
+  /* Each catch as it happens, so the run can count which dog turns up most.
+     A chum leaves this level's flood once taken, but the sets reset per level,
+     so the same breed can be caught again in a later one. */
+  onChumCaught?: (name: string) => void;
+  // The most caught dog of the run, with its picture, for the spent screen.
+  topChum?: { name: string; image: string; count: number } | null;
   // history-page era strip, e.g. "ancient-medieval". Picks the pit's themed
   // background; an era with no artwork keeps the plain blue gradient.
   era?: string;
 };
 
-export default function LineageModal({ name, image, character, lineage, onClose, nextLevelLabel, onNextLevel, onStartOver, initialScore, onScoreChange, era, lives, livesMax = 6, onLost, onSpendLife, onResetRun, nextLevelImage, levelNo, eraJoinLabel }: Props) {
+export default function LineageModal({ name, image, character, lineage, onClose, nextLevelLabel, onNextLevel, onStartOver, initialScore, onScoreChange, era, lives, livesMax = 6, onLost, onSpendLife, onResetRun, nextLevelImage, levelNo, eraJoinLabel, onLevelChumRate, runChumRate, runLevels, onChumCaught, topChum }: Props) {
   const theme = levelThemeFor(era);
   // The close X asks before it closes. A round can take a couple of minutes to
   // build up, and losing it to a mis-tap in the corner is a rotten exit.
@@ -304,7 +320,10 @@ export default function LineageModal({ name, image, character, lineage, onClose,
           onRelativeTap={(slug, nm) => setLeavePage({ slug, name: nm })}
           levelNo={levelNo}
           collectedChums={collectedChums}
-          onChumCollected={(n) => setCollectedChums((prev) => (prev.has(n) ? prev : new Set(prev).add(n)))}
+          onChumCollected={(n) => {
+            setCollectedChums((prev) => (prev.has(n) ? prev : new Set(prev).add(n)));
+            onChumCaught?.(n);
+          }}
           onChumsDropped={(n) => setPackSize(n + collectedChums.size)}
           hideCaption={!captionOpen}
           onCaptionClose={() => setCaptionOpen(false)}
@@ -327,6 +346,8 @@ export default function LineageModal({ name, image, character, lineage, onClose,
           onBackToStart={backToStart}
           onRoundWon={() => {
             setPhase("won");
+            // Completed, so this level's catch counts toward the run.
+            if (packSize > 0) onLevelChumRate?.((collectedChums.size / packSize) * 100);
             // celebration: confetti over the flash (canvas-confetti, CDN pattern)
             const fire = () => (window as any).confetti?.({ particleCount: 180, spread: 110, origin: { x: 0.5, y: 0.45 }, colors: ["#ffe227", "#ffffff", "#22c55e", "#ff6b6b"], startVelocity: 45 });
             if ((window as any).confetti) fire();
@@ -515,7 +536,25 @@ export default function LineageModal({ name, image, character, lineage, onClose,
                     ))}
                   </span>
                 </span>
-                <span className={css.winBanner}>Ancestor discovered</span>
+                <span className={css.winTopRight}>
+                  <span className={css.winBanner}>Ancestor discovered</span>
+                  {/* THE RATE, under the banner. Shown whenever the level had
+                      chums in it, INCLUDING a round where none were caught: nought
+                      per cent is a rate, and hiding it is why you could not find
+                      it on a round where you caught nothing. */}
+                  {packSize > 0 && (
+                    <span className={css.winRate}>
+                      <span className={css.winRateTitle}>Chum rate:</span>
+                      <span className={css.winRateValue}>
+                        {Math.min(100, Math.round((collectedChums.size / packSize) * 100))}%
+                      </span>
+                      <span className={css.winRateDetail}>
+                        {collectedChums.size} found from potentially{" "}
+                        {Math.max(packSize, collectedChums.size)} chums
+                      </span>
+                    </span>
+                  )}
+                </span>
               </div>
               <div className={css.winScore}>Your Round Score: {score.toLocaleString()}</div>
               {/* The chums taken out of this level. The set already exists and
@@ -551,14 +590,6 @@ export default function LineageModal({ name, image, character, lineage, onClose,
                   screen without a hand-worked offset chasing the button's own
                   clamps. */}
               <div className={css.winFoot}>
-                {collectedChums.size > 0 && (
-                  <div className={css.winChums}>
-                    Chums collected: {collectedChums.size}
-                    {packSize > 0
-                      ? ` of ${Math.max(packSize, collectedChums.size)} (${Math.min(100, Math.round((collectedChums.size / packSize) * 100))}%)`
-                      : ""}
-                  </div>
-                )}
                 {goReady && (nextLevelLabel && onNextLevel ? (
                   <button type="button" className={`${css.endBtnGo} ${css.winGo}`} onClick={onNextLevel}>Next Level</button>
                 ) : (
@@ -575,6 +606,48 @@ export default function LineageModal({ name, image, character, lineage, onClose,
                 <span className={css.endFlashWord}>GAME</span>
                 <span className={css.endFlashWord}>OVER</span>
               </div>
+              {/* THIS ROUND, on every life lost. The pack it was measured
+                  against is the flood this level dropped, so it is the same
+                  figure the win screen would have shown had it gone the other
+                  way. Hidden when the level had no chums in it. */}
+              {packSize > 0 && (
+                <div className={css.endRound}>
+                  <span className={css.endRoundTitle}>Chum rate:</span>
+                  <span className={css.endRoundValue}>
+                    {Math.min(100, Math.round((collectedChums.size / packSize) * 100))}%
+                  </span>
+                  <span className={css.endRoundDetail}>
+                    {collectedChums.size} found from potentially{" "}
+                    {Math.max(packSize, collectedChums.size)} chums
+                  </span>
+                </div>
+              )}
+              {/* THE RUN, not the round. Only when the lives are actually gone:
+                  on a loss you can still come back from, a campaign total would
+                  be reporting the end of something that is not over. */}
+              {lives !== undefined && lives <= 0 && (
+                <div className={css.endSummary}>
+                  <div className={css.endSummaryScore}>Total score: {score.toLocaleString()}</div>
+                  {runChumRate !== null && runChumRate !== undefined && (runLevels ?? 0) > 0 && (
+                    <div className={css.endSummaryChums}>
+                      Chums caught: {Math.round(runChumRate)}% average over {runLevels} level{runLevels === 1 ? "" : "s"}
+                    </div>
+                  )}
+                  {topChum && (
+                    <div className={css.endTopChum}>
+                      {/* eslint-disable-next-line @next/next/no-img-element -- a fixed-size square from the pack data */}
+                      <img className={css.endTopChumImg} src={topChum.image} alt="" aria-hidden="true" />
+                      <span className={css.endTopChumText}>
+                        <span className={css.endTopChumLead}>Most caught</span>
+                        <span className={css.endTopChumName}>{topChum.name}</span>
+                        <span className={css.endTopChumCount}>
+                          {topChum.count} time{topChum.count === 1 ? "" : "s"}
+                        </span>
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )}
               {/* ICONS, not words. Restart wears the replay mark, Learn wears the
                   pit's own brain, imported rather than copied so the two cannot
                   drift apart. Both keep the button shapes they already had, so

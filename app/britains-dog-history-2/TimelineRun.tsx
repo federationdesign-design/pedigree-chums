@@ -216,6 +216,26 @@ export default function TimelineRun({
     };
   }, [panelIndex]);
 
+  /* How many of this run's dogs open a level. breedCardKind is pure, so it is
+     safe to call here, and it is the same answer the card itself uses. */
+  const playable = breeds.filter((b) => breedCardKind(b.name) === "play").length;
+  /* Written once and drawn twice, by the outline copy and the solid one. Two
+     hand-kept copies of the same markup would drift, and the halo would stop
+     lining up with the letters it is meant to sit behind. */
+  const countLockup = (
+    <>
+      <span className={`${styles.eraCountCol} ${styles.eraCountSmall}`}>
+        <span className={styles.eraCountNum}>{playable}</span>
+        <span className={styles.eraCountWord}>Playable</span>
+      </span>
+      <span className={styles.eraCountSlash}>/</span>
+      <span className={styles.eraCountCol}>
+        <span className={styles.eraCountNum}>{breeds.length}</span>
+        <span className={styles.eraCountWord}>Dogs</span>
+      </span>
+    </>
+  );
+
   return (
     <div className={styles.timelinePanel} data-pc-panel={panelIndex}>
       {/* Our own leave notice. The browser's confirm cannot be branded, and a
@@ -281,21 +301,23 @@ export default function TimelineRun({
             <span className={`${styles.railCue} ${moved ? styles.railCueOff : ""}`} />
             </span>
 
-          {/* How many dogs are in this run. Read from the data, so it cannot go
-              stale when a breed is added. Era screen only. */}
-          <span className={styles.eraCount} aria-label={`${breeds.length} dogs`}>
+          {/* TWO FIGURES: how many of this run's dogs open a level, and how
+              many there are in total. Both read from the data, so neither can go
+              stale when a breed is added, and the playable one asks
+              breedCardKind, the same answer the card itself uses, so the count
+              and the cards can never disagree. Era screen only. */}
+          <span
+            className={styles.eraCount}
+            aria-label={`${playable} playable of ${breeds.length} dogs`}
+          >
             {/* The outline is a second copy sitting behind the solid one.
                 -webkit-text-stroke on its own draws the stroke CENTRED on the
                 letter edge, which eats half the black away. Two copies keep the
-                letterform at full weight with the white entirely outside it. */}
-            <span className={styles.eraCountOutline} aria-hidden="true">
-              <span className={styles.eraCountNum}>{breeds.length}</span>
-              <span className={styles.eraCountWord}>dogs</span>
-            </span>
-            <span className={styles.eraCountFill} aria-hidden="true">
-              <span className={styles.eraCountNum}>{breeds.length}</span>
-              <span className={styles.eraCountWord}>dogs</span>
-            </span>
+                letterform at full weight with the white entirely outside it.
+                Both copies carry the SAME markup, or the halo drifts off the
+                letters it is meant to sit behind. */}
+            <span className={styles.eraCountOutline} aria-hidden="true">{countLockup}</span>
+            <span className={styles.eraCountFill} aria-hidden="true">{countLockup}</span>
           </span>
         </div>
 
@@ -402,6 +424,14 @@ export default function TimelineRun({
                       />
                       {/* The name sits ON the picture, above the status bar. */}
                       <span className={styles.dogNameOver}>{b.name}</span>
+                      {/* The last dog of the era, and only that one. It sits in
+                          the band between the name and the status bar. */}
+                      {isLast && (
+                        <span className={styles.dogEraEnd} aria-hidden="true">
+                          {/* eslint-disable-next-line @next/next/no-img-element -- a small fixed-height SVG, next/image buys nothing */}
+                          <img src="/endofanera-icon.svg" alt="" className={styles.dogEraEndImg} />
+                        </span>
+                      )}
                       {b.tag && (
                         <span className={`${styles.dogTag} ${styles[`dogTag_${b.tag.replace("-", "")}`] ?? ""}`}>
                           {TAG_LABEL[b.tag] ?? b.tag}

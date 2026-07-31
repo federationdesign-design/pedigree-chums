@@ -287,7 +287,9 @@
   text-shadow: 0 4px 40px rgba(0, 0, 0, 0.6);
   animation: lmEndPop 0.45s cubic-bezier(0.2, 1.4, 0.4, 1);
   text-align: center;
-  line-height: 1;
+  /* GAME over OVER, closed up. Luckiest Guy carries its own headroom, so at 1
+     the two words sat further apart than they look in the type. */
+  line-height: 0.9em;
 }
 .endFlashWord {
   display: block;
@@ -464,6 +466,41 @@
 }
 .winDoneLine {
   display: block;
+}
+/* The top right column: the banner, and the round's chum rate under it. The
+   column hugs the right edge; the rate's own three lines are left aligned with
+   each other, which is what was asked for.
+   Sizes are half the game over screen's 20/40/10. At full size a 40pt figure in
+   this corner outweighs ROUND WON underneath it. Three numbers if you want them
+   back up. */
+.winTopRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+.winRate {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  text-align: right;
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  line-height: 1;
+}
+.winRateTitle {
+  font-size: 10pt;
+  color: #ffffff;
+}
+.winRateValue {
+  font-size: 20pt;
+  color: var(--yellow, #ffd23e);
+}
+.winRateDetail {
+  margin-top: 3px;
+  font-family: var(--font-body, Montserrat, system-ui);
+  font-weight: 700;
+  font-size: 7pt;
+  color: #ffffff;
 }
 .winBanner {
   font-family: var(--font-display, "Luckiest Guy", system-ui);
@@ -817,4 +854,78 @@
 }
 .lifePipSpent {
   background: rgba(10, 58, 87, 0.45);
+}
+
+/* This round's catch, shown on every game over rather than only a spent run.
+   Sizes are as specified: 20pt title, value at twice that. Both are real `pt`
+   rather than a conversion, so what is here is what was asked for. Note they
+   are fixed, so they do not shrink on a narrow phone; say the word and they
+   become a clamp. */
+.endRound {
+  position: relative;
+  z-index: 2;
+  margin: 2px 0 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  line-height: 1;
+}
+.endRoundTitle {
+  font-size: 20pt;
+  color: #ffffff;
+}
+.endRoundValue {
+  font-size: 40pt;
+  color: var(--yellow, #ffd23e);
+}
+/* A quarter of the figure above it, and the only line here that is not display
+   type: it is a sentence rather than a number. Halved again from 20pt, which
+   read as a second headline rather than a caption. */
+.endRoundDetail {
+  margin-top: 4px;
+  font-family: var(--font-body, Montserrat, system-ui);
+  font-weight: 700;
+  font-size: 10pt;
+  color: #ffffff;
+}
+/* The most caught dog of the run: square picture, name, and how many times. */
+.endTopChum {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+}
+.endTopChumImg {
+  width: clamp(52px, 14vw, 76px);
+  height: clamp(52px, 14vw, 76px);
+  border-radius: 16px;
+  object-fit: cover;
+  background: #ffffff;
+  border: 3px solid #ffffff;
+  box-shadow: 0 3px 0 rgba(10, 58, 87, 0.3);
+}
+.endTopChumText {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.1;
+}
+.endTopChumLead {
+  font-family: var(--font-body, Montserrat, system-ui);
+  font-weight: 700;
+  font-size: clamp(0.7rem, 2.6vw, 0.95rem);
+  color: #ffffff;
+}
+.endTopChumName {
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: clamp(1.1rem, 4.6vw, 1.7rem);
+  color: var(--yellow, #ffd23e);
+}
+.endTopChumCount {
+  font-family: var(--font-body, Montserrat, system-ui);
+  font-weight: 700;
+  font-size: clamp(0.7rem, 2.6vw, 0.95rem);
+  color: #ffffff;
 }
