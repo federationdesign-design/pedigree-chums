@@ -384,9 +384,16 @@
   border-radius: 50%;
   border: 5px solid var(--pc-ui-blue);
   background-color: var(--pc-ui-blue);
+  box-shadow: 0 0 0 4px #ffffff, var(--pc-shadow);
+}
+/* Task 78 fix: the dog image is its own circular layer inside the anchor, so play dead / roll over
+   affect it alone -- the ring (.dogAnchor) and the red X (.close, a sibling) stay full colour/upright. */
+.dogFace {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
   background-size: cover;
   background-position: center;
-  box-shadow: 0 0 0 4px #ffffff, var(--pc-shadow);
 }
 /* Handover: the whole medallion (outline included) spins and shrinks out of
    existence, then the new dog pops in with the selector's scale-overshoot. */

@@ -647,12 +647,17 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
 
           <div className={styles.composerRow}>
             <div
-              className={`${styles.dogAnchor} ${anchorSwap} ${dead ? styles.anchorDead : ''} ${roll ? styles.anchorRoll : ''}`}
-              style={{ backgroundImage: `url("${dogImage}")` }}
+              className={`${styles.dogAnchor} ${anchorSwap}`}
               role="img"
               aria-label={dead ? 'the Collie plays dead' : roll ? 'the Collie rolls over' : dogInfo(dog).name}
-              onAnimationEnd={() => setRoll(false)}
             >
+              {/* Task 78 fix: the tricks apply to the dog image layer ONLY, so the red X and the ring
+                  do not go black or rotate with her. */}
+              <div
+                className={`${styles.dogFace} ${dead ? styles.anchorDead : ''} ${roll ? styles.anchorRoll : ''}`}
+                style={{ backgroundImage: `url("${dogImage}")` }}
+                onAnimationEnd={() => setRoll(false)}
+              />
               <button type="button" className={styles.close} aria-label="Close Pick a Chum" onClick={onClose}>
                 <span aria-hidden="true">×</span>
               </button>
