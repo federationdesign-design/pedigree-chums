@@ -5931,8 +5931,13 @@ export default function BreedTree({
             const startTopFrac = 0.5 + WORD_START_Y - btnHalf / vbHc;
             // nudged 20px down, and the track shortens by the same so its foot
             // stays on the cap of the P
+            /* Up 5px. The foot was landing ON the PLAY square rather than
+               above it: startTopFrac is the top of the button exactly, so the
+               track had no clearance at all. The 5 comes off `top` and the
+               height is left alone, which lifts the whole control and takes the
+               foot with it. */
             return {
-              top: `calc(${topFrac * 100}% + 100px)`,
+              top: `calc(${topFrac * 100}% + 95px)`,
               height: `calc(${Math.max(18, (startTopFrac - topFrac) * 100)}% - 100px)`,
             };
           })()}
