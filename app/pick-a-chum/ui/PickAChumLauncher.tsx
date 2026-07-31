@@ -26,6 +26,7 @@ const ICON_FRAMES = [
   '/shout-launcher-icon-4.svg', // 3 none
 ];
 const FRAME_MS = 200;
+const CYCLES = 3; // Task 97: play the four-frame sequence this many times on appearance, then rest
 
 export default function PickAChumLauncher() {
   const [open, setOpen] = useState(false);
@@ -78,9 +79,9 @@ export default function PickAChumLauncher() {
     });
   }, []);
 
-  // Task 84: one-shot four-frame rattle each time the launcher appears, then settle on full (frame
-  // 0). Skipped entirely under prefers-reduced-motion (a four-frame rattle reads as a bark; it rests
-  // on full instead). Cleared if the launcher hides mid-cycle.
+  // Task 84/97: on appearance the four-frame sequence plays CYCLES times through (12 frames, ~2.4s at
+  // 0.2s each), then rests on full (frame 0). Skipped entirely under prefers-reduced-motion (a rattle
+  // reads as a bark; it rests on full instead). Cleared if the launcher hides mid-cycle.
   useEffect(() => {
     if (!logoShowing) {
       setFrame(0);
@@ -90,15 +91,16 @@ export default function PickAChumLauncher() {
       setFrame(0);
       return;
     }
-    let i = 0;
+    const total = ICON_FRAMES.length * CYCLES;
+    let step = 0;
     setFrame(0);
     const id = window.setInterval(() => {
-      i += 1;
-      if (i >= ICON_FRAMES.length) {
-        setFrame(0); // settle on full
+      step += 1;
+      if (step >= total) {
+        setFrame(0); // rest on full
         window.clearInterval(id);
       } else {
-        setFrame(i);
+        setFrame(step % ICON_FRAMES.length);
       }
     }, FRAME_MS);
     return () => window.clearInterval(id);
