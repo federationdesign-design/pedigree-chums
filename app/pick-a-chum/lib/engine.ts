@@ -268,15 +268,29 @@ export function submit(data: ChumData, session: Session, input: string): Turn {
       response.text = `${capitalise(subject)}?`;
       response.responseId = 'LOOP-01';
       session.loopRepeatUsed = true;
+      session.noSubjectStreak = 0; // Task 117: a subject was served, so the no-subject run is broken
     } else if (subject && loopRoute) {
       // LOOP-02: the destination offer, when the (already-repeated) candidate maps to a route.
       response.text = loopRoute;
       response.responseId = 'LOOP-02';
+      session.noSubjectStreak = 0; // Task 117: a subject was served, so the no-subject run is broken
     } else {
       // B40: no subject (or a repeated subject with no route) -> the workbook "im a dog" line.
-      const b40 = data.collieResponses.find((r) => r.bucketId === 'B40');
-      response.text = b40?.template ?? 'im a dog';
-      response.responseId = b40?.responseId ?? 'B40-NOSUBJECT-01';
+      // Task 117: after two "im a dog"s in a row, the third and further consecutive no-subject turns
+      // rotate through the B46 bank (woof, bark, games?, learn?, play?, yawn) instead of repeating.
+      if (session.noSubjectStreak >= 2) {
+        const rot = data.collieResponses
+          .filter((r) => r.bucketId === 'B46')
+          .sort((a, b) => a.responseId.localeCompare(b.responseId));
+        const pick = rot.length ? rot[(session.noSubjectStreak - 2) % rot.length] : null;
+        response.text = pick?.template ?? 'woof';
+        response.responseId = pick?.responseId ?? 'B46-NOSUBJECT-ROT';
+      } else {
+        const b40 = data.collieResponses.find((r) => r.bucketId === 'B40');
+        response.text = b40?.template ?? 'im a dog';
+        response.responseId = b40?.responseId ?? 'B40-NOSUBJECT-01';
+      }
+      session.noSubjectStreak += 1; // one more consecutive no-subject serve
     }
     // Task 68: only LOOP-01 (repeat) and LOOP-02 (destination offer) pose a yes/no; remember the
     // offered subject so a bare affirmation next turn can route to its destination.
@@ -284,6 +298,7 @@ export function submit(data: ChumData, session: Session, input: string): Turn {
   } else {
     session.loopRepeatUsed = false; // a non-fallback turn breaks the run, re-arming the repeat
     session.pendingConfirm = null;
+    session.noSubjectStreak = 0; // Task 117: anything else served resets the no-subject rotation
   }
 
   session.lastWasComplaint = resolution.faqId === 'FAQ015'; // complaint follow-up context (Task 18)

@@ -1269,10 +1269,11 @@ check('can someone help me', { action: 'safety_signpost' }, { assert: (r, resp) 
   check('ok', {}, { session: s, assert: (_r, _resp, sess) => (sess.topic === null ? null : `topic survived the protected exchange: ${JSON.stringify(sess.topic)}`) });
 })();
 
-// ---- Task 79: the fallback has two outcomes and never escalates. A no-candidate miss serves
-// B40 "im a dog" every time; there is no ladder, no rung rotation, no counter. A valid new intent
-// (including safety) still resolves normally. (The repair ladder, LOOP-03/04, the ORIENT nudge and
-// the loop counter were all retired in Task 79.) ----
+// ---- Task 79 + Task 117: the fallback never escalates into a repair ladder. A no-candidate miss
+// serves B40 "im a dog"; Task 117 adds one refinement: after TWO "im a dog"s in a row, the third and
+// further consecutive no-subject turns rotate through B46 (woof, bark, games?, learn?, play?, yawn),
+// then start again. A valid new intent (including safety) still resets the run and resolves normally.
+// (The repair ladder, LOOP-03/04 and the ORIENT nudge were all retired in Task 79.) ----
 const hasUnresolvedTok = (t) => /\[|\]|\{\{|\}\}|\bundefined\b|\bnull\b/.test(t);
 // The full S08 script as one session: repeated no-candidate misses all serve B40; a real intent
 // resolves plainly.
@@ -1282,8 +1283,8 @@ const hasUnresolvedTok = (t) => /\[|\]|\{\{|\}\}|\bundefined\b|\bnull\b/.test(t)
     ['whats the thing with the cards', 'faq_answer', null],
     ['no not that', 'fallback', 'B40-NOSUBJECT-01'],
     ['I mean the pictures on them', 'fallback', 'B40-NOSUBJECT-01'],
-    ["you're not understanding me", 'fallback', 'B40-NOSUBJECT-01'],
-    ['forget it', 'fallback', 'B40-NOSUBJECT-01'],
+    ["you're not understanding me", 'fallback', 'B46-NOSUBJECT-ROT-01'], // Task 117: 3rd in a row rotates -> woof
+    ['forget it', 'fallback', 'B46-NOSUBJECT-ROT-02'], // Task 117: 4th -> bark
     ['actually can you help me find something', 'clarifier', null],
     ['the name generator', 'link', null],
   ];
@@ -1296,6 +1297,22 @@ const hasUnresolvedTok = (t) => /\[|\]|\{\{|\}\}|\bundefined\b|\bnull\b/.test(t)
   }
   ok ? pass++ : fail++;
   rows.push({ ok, input: 'S08: fallback serves im a dog, a real intent resolves', layer: '-', bucket: '-', action: 'loop', note: ok ? '' : note });
+})();
+// Task 117: two "im a dog"s, then rotate B46 in order, then start again; a real intent resets the run.
+(() => {
+  const s = newSession();
+  const miss = 'What is the latest football score?'; // gk_unknown, no candidate -> B40 no-subject fallback
+  const expect = ['im a dog', 'im a dog', 'woof', 'bark', 'games?', 'learn?', 'play?', 'yawn', 'woof'];
+  let ok = true, note = '';
+  for (let i = 0; i < expect.length; i++) {
+    const { response } = submit(data, s, miss);
+    if (response.text !== expect[i]) { ok = false; note += `turn ${i + 1}: "${response.text}" want "${expect[i]}"; `; }
+  }
+  submit(data, s, 'tell me about the border collie'); // a real answer resets noSubjectStreak
+  const after = submit(data, s, miss).response.text;
+  if (after !== 'im a dog') { ok = false; note += `after reset: "${after}" want "im a dog"; `; }
+  ok ? pass++ : fail++;
+  rows.push({ ok, input: 'Task 117: no-subject rotation woof/bark/... then reset', layer: '-', bucket: '-', action: 'loop', note: ok ? '' : note });
 })();
 // a no-candidate miss then a valid breed request -> the breed answers.
 (() => {
@@ -1310,9 +1327,9 @@ const hasUnresolvedTok = (t) => /\[|\]|\{\{|\}\}|\bundefined\b|\bnull\b/.test(t)
   check('im in trouble', { layer: 1, action: 'safety_signpost' }, { session: s, assert: (r) =>
     (r.moderationId !== 'MOD_SAFEGUARDING' ? `safety lost: ${r.moderationId}` : null) });
 })();
-// Task 79: with no candidate the fallback serves the SAME line every time -- no rotation, no
-// escalation, no unresolved token. (This deliberately inverts the old "no exact line repeats"
-// invariant: she says "im a dog" however many times it happens.)
+// Task 79 + 117: with no candidate the fallback never escalates into a repair ladder and never emits
+// an unresolved token. It says "im a dog" for the first two misses in a row, then rotates through B46
+// (woof, bark, games?, ...). (This still inverts the old "no exact line repeats" invariant.)
 (() => {
   const s = newSession();
   const ids = [], texts = [];
@@ -1320,12 +1337,12 @@ const hasUnresolvedTok = (t) => /\[|\]|\{\{|\}\}|\bundefined\b|\bnull\b/.test(t)
     const { response } = submit(data, s, inp);
     ids.push(response.responseId); texts.push(response.text);
   }
-  const allB40 = ids.every((id) => id === 'B40-NOSUBJECT-01');
-  const allSame = texts.every((t) => t === 'im a dog');
+  const expectText = ['im a dog', 'im a dog', 'woof', 'bark', 'games?'];
+  const okText = texts.every((t, i) => t === expectText[i]);
   const noTok = !texts.some((t) => hasUnresolvedTok(t));
-  const ok = allB40 && allSame && noTok;
+  const ok = okText && noTok;
   ok ? pass++ : fail++;
-  rows.push({ ok, input: 'Task79: no-candidate fallback serves im a dog every time', layer: '-', bucket: '-', action: 'loop', note: ok ? '' : `ids=${ids.join(',')} texts=${texts.join('|')}` });
+  rows.push({ ok, input: 'Task79+117: fallback serves im a dog twice, then rotates B46', layer: '-', bucket: '-', action: 'loop', note: ok ? '' : `texts=${texts.join('|')}` });
 })();
 
 // ---- Task 28: bark game wired (offer / explain / exit), fun_tease renamed offer_bark_game.
@@ -1497,13 +1514,19 @@ check('cost', { action: 'price_answer' });
   check('how much is it', { action: 'price_answer' }, { session: s }); // "it" = the game price
 })();
 
-// ---- Task 79: the two-outcome fallback (no counter, no ladder, no escalation) ----
-// Consecutive no-candidate fallback turns all serve B40 "im a dog"; nothing climbs or changes.
+// ---- Task 79 + 117: the fallback never climbs into a repair ladder. First two no-candidate misses
+// serve B40 "im a dog"; the third and further rotate through B46 (woof, bark, ...). ----
 (() => {
   const s = newSession();
-  for (const inp of ['the thing over there', 'that does not help', 'i really cannot say', 'something something else']) {
+  const seq = [
+    ['the thing over there', 'B40-NOSUBJECT-01', 'im a dog'],
+    ['that does not help', 'B40-NOSUBJECT-01', 'im a dog'],
+    ['i really cannot say', 'B46-NOSUBJECT-ROT-01', 'woof'],
+    ['something something else', 'B46-NOSUBJECT-ROT-02', 'bark'],
+  ];
+  for (const [inp, rid, txt] of seq) {
     check(inp, { action: 'fallback' }, { session: s, assert: (_r, resp) =>
-      resp.responseId === 'B40-NOSUBJECT-01' && resp.text === 'im a dog' ? null : `${inp} -> ${resp.responseId} "${resp.text}"` });
+      resp.responseId === rid && resp.text === txt ? null : `${inp} -> ${resp.responseId} "${resp.text}"` });
   }
 })();
 // A successful route breaks the run and re-arms the repeat (loopRepeatUsed back to false).
@@ -1566,14 +1589,16 @@ check('cost', { action: 'price_answer' });
 check('my dog died', { action: 'grief' }, { assert: (r, resp) => r.griefCategory === 'GRIEF-01' && resp.text === ':(' ? null : `died -> ${r.griefCategory} "${resp.text}"` });
 check('my dog ran away', { action: 'grief' }, { assert: (r, resp) => r.griefCategory === 'GRIEF-02' && resp.text === ':(' ? null : `ranaway -> ${r.griefCategory}` });
 check('my dog is old and unwell', { action: 'grief' }, { assert: (r) => r.griefCategory === 'GRIEF-03' ? null : `unwell -> ${r.griefCategory}` });
-// Task 79: the ORIENT-after-two-loops nudge was retired. Ten no-candidate misses in a row all
-// serve B40 "im a dog" -- no ORIENT, no counter, no escalation, ever.
+// Task 79 + 117: the ORIENT-after-two-loops nudge stays retired -- no ORIENT and no repair ladder.
+// Ten no-candidate misses in a row serve "im a dog" twice, then rotate B46 (woof, bark, games?,
+// learn?, play?, yawn), then start again. Copy varies; the flat no-escalation behaviour does not.
 (() => {
   const s = newSession();
+  const expect = ['im a dog', 'im a dog', 'woof', 'bark', 'games?', 'learn?', 'play?', 'yawn', 'woof', 'bark'];
   let ok = true, note = '';
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < expect.length; i++) {
     const { response } = submit(data, s, 'the thing over there');
-    if (response.responseId !== 'B40-NOSUBJECT-01') { ok = false; note = `turn ${i} served ${response.responseId}`; break; }
+    if (response.text !== expect[i]) { ok = false; note = `turn ${i} "${response.text}" want "${expect[i]}"`; break; }
   }
   ok ? pass++ : fail++;
   rows.push({ ok, input: 'Task79: no-candidate misses never escalate (no ORIENT)', layer: '-', bucket: '-', action: 'loop', note });

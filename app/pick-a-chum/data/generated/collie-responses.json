@@ -3333,5 +3333,528 @@
     "defaultRoute": "",
     "animationCue": "",
     "status": "Approved"
+  },
+  {
+    "responseId": "B41-NINESQUARE-01",
+    "bucketId": "B41",
+    "subtag": "ninesquare",
+    "triggers": [
+      "entry: nine square",
+      "noughts and crosses",
+      "squares"
+    ],
+    "template": "Nine squares. Say a number.",
+    "factSource": "Game copy",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B41-NINESQUARE-02",
+    "bucketId": "B41",
+    "subtag": "ninesquare",
+    "triggers": [
+      "cell already taken"
+    ],
+    "template": "Taken. Another.",
+    "factSource": "Game copy",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B41-NINESQUARE-03",
+    "bucketId": "B41",
+    "subtag": "ninesquare",
+    "triggers": [
+      "input is not 1-9"
+    ],
+    "template": "A number. One to nine.",
+    "factSource": "Game copy",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B41-NINESQUARE-04",
+    "bucketId": "B41",
+    "subtag": "ninesquare",
+    "triggers": [
+      "Collie wins"
+    ],
+    "template": "Mine. Again?",
+    "factSource": "Game copy",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B41-NINESQUARE-05",
+    "bucketId": "B41",
+    "subtag": "ninesquare",
+    "triggers": [
+      "visitor wins"
+    ],
+    "template": "You win. Again?",
+    "factSource": "Game copy",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B41-NINESQUARE-06",
+    "bucketId": "B41",
+    "subtag": "ninesquare",
+    "triggers": [
+      "draw"
+    ],
+    "template": "Nobody. Again?",
+    "factSource": "Game copy",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B41-NINESQUARE-07",
+    "bucketId": "B41",
+    "subtag": "ninesquare",
+    "triggers": [
+      "exit: stop",
+      "quit",
+      "no"
+    ],
+    "template": "Fine.",
+    "factSource": "Game copy",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B42-MISSINGSHEEP-01",
+    "bucketId": "B42",
+    "subtag": "missingsheep",
+    "triggers": [
+      "entry: missing sheep",
+      "sheep",
+      "word game"
+    ],
+    "template": "Five sheep. Guess a letter.",
+    "factSource": "Game copy",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B42-MISSINGSHEEP-02",
+    "bucketId": "B42",
+    "subtag": "missingsheep",
+    "triggers": [
+      "letter is in the word"
+    ],
+    "template": "Yes.",
+    "factSource": "Game copy",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B42-MISSINGSHEEP-03",
+    "bucketId": "B42",
+    "subtag": "missingsheep",
+    "triggers": [
+      "letter is not in the word"
+    ],
+    "template": "No.",
+    "factSource": "Game copy",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B42-MISSINGSHEEP-04",
+    "bucketId": "B42",
+    "subtag": "missingsheep",
+    "triggers": [
+      "letter already guessed"
+    ],
+    "template": "Already had that one.",
+    "factSource": "Game copy",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B42-MISSINGSHEEP-05",
+    "bucketId": "B42",
+    "subtag": "missingsheep",
+    "triggers": [
+      "word completed"
+    ],
+    "template": "Got it. Sheep safe.",
+    "factSource": "Game copy",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B42-MISSINGSHEEP-06",
+    "bucketId": "B42",
+    "subtag": "missingsheep",
+    "triggers": [
+      "all sheep lost"
+    ],
+    "template": "Sheep gone. It was {{WORD}}.",
+    "factSource": "Game copy",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B42-MISSINGSHEEP-07",
+    "bucketId": "B42",
+    "subtag": "missingsheep",
+    "triggers": [
+      "input is not a single letter"
+    ],
+    "template": "One letter.",
+    "factSource": "Game copy",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B42-MISSINGSHEEP-08",
+    "bucketId": "B42",
+    "subtag": "missingsheep",
+    "triggers": [
+      "exit: stop",
+      "quit",
+      "no"
+    ],
+    "template": "Fine.",
+    "factSource": "Game copy",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B43-KENNELSKETCH-01",
+    "bucketId": "B43",
+    "subtag": "kennelsketch",
+    "triggers": [
+      "entry: kennel sketch",
+      "sketch",
+      "drawing",
+      "picture"
+    ],
+    "template": "Which one is this?",
+    "factSource": "Game copy",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B43-KENNELSKETCH-02",
+    "bucketId": "B43",
+    "subtag": "kennelsketch",
+    "triggers": [
+      "correct guess"
+    ],
+    "template": "Yes.",
+    "factSource": "Game copy",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B43-KENNELSKETCH-03",
+    "bucketId": "B43",
+    "subtag": "kennelsketch",
+    "triggers": [
+      "wrong guess, guesses remain"
+    ],
+    "template": "No. Look again.",
+    "factSource": "Game copy",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B43-KENNELSKETCH-04",
+    "bucketId": "B43",
+    "subtag": "kennelsketch",
+    "triggers": [
+      "out of guesses"
+    ],
+    "template": "It was a {{ANSWER}}.",
+    "factSource": "Game copy",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B43-KENNELSKETCH-05",
+    "bucketId": "B43",
+    "subtag": "kennelsketch",
+    "triggers": [
+      "exit: stop",
+      "quit",
+      "no"
+    ],
+    "template": "Fine.",
+    "factSource": "Game copy",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B44-SKETCHCLUE-01",
+    "bucketId": "B44",
+    "subtag": "sketchclue",
+    "triggers": [
+      "drawing: BONE"
+    ],
+    "template": "Look for: I chew it",
+    "factSource": "Game copy",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B44-SKETCHCLUE-02",
+    "bucketId": "B44",
+    "subtag": "sketchclue",
+    "triggers": [
+      "drawing: BALL"
+    ],
+    "template": "Look for: I fetch it",
+    "factSource": "Game copy",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B44-SKETCHCLUE-03",
+    "bucketId": "B44",
+    "subtag": "sketchclue",
+    "triggers": [
+      "drawing: BOWL"
+    ],
+    "template": "Look for: dinner",
+    "factSource": "Game copy",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B44-SKETCHCLUE-04",
+    "bucketId": "B44",
+    "subtag": "sketchclue",
+    "triggers": [
+      "drawing: LEAD"
+    ],
+    "template": "Look for: walks",
+    "factSource": "Game copy",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B44-SKETCHCLUE-05",
+    "bucketId": "B44",
+    "subtag": "sketchclue",
+    "triggers": [
+      "drawing: STICK"
+    ],
+    "template": "Look for: from a tree",
+    "factSource": "Game copy",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B44-SKETCHCLUE-06",
+    "bucketId": "B44",
+    "subtag": "sketchclue",
+    "triggers": [
+      "drawing: KENNEL"
+    ],
+    "template": "Look for: I sleep in it",
+    "factSource": "Game copy",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B44-SKETCHCLUE-07",
+    "bucketId": "B44",
+    "subtag": "sketchclue",
+    "triggers": [
+      "drawing: PAW"
+    ],
+    "template": "Look for: I have four",
+    "factSource": "Game copy",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B44-SKETCHCLUE-08",
+    "bucketId": "B44",
+    "subtag": "sketchclue",
+    "triggers": [
+      "drawing: TAIL"
+    ],
+    "template": "Look for: it wags",
+    "factSource": "Game copy",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B44-SKETCHCLUE-09",
+    "bucketId": "B44",
+    "subtag": "sketchclue",
+    "triggers": [
+      "drawing: EARS"
+    ],
+    "template": "Look for: I hear with them",
+    "factSource": "Game copy",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B44-SKETCHCLUE-10",
+    "bucketId": "B44",
+    "subtag": "sketchclue",
+    "triggers": [
+      "drawing: NOSE"
+    ],
+    "template": "Look for: I smell with it",
+    "factSource": "Game copy",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B45-GAMELIST-01",
+    "bucketId": "B45",
+    "subtag": "gamelist",
+    "triggers": [
+      "are there games",
+      "play",
+      "game",
+      "lets play"
+    ],
+    "template": "Game?",
+    "factSource": "Game copy",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B45-GAMELIST-02",
+    "bucketId": "B45",
+    "subtag": "gamelist",
+    "triggers": [
+      "confirmation after Game?"
+    ],
+    "template": "Bark, Nine-Square, Missing Sheep, Kennel Sketch. Say one.",
+    "factSource": "Game copy",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B45-GAMELIST-03",
+    "bucketId": "B45",
+    "subtag": "gamelist",
+    "triggers": [
+      "names a game that is not built yet"
+    ],
+    "template": "Still in training.",
+    "factSource": "Game copy",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B46-NOSUBJECT-ROT-01",
+    "bucketId": "B46",
+    "subtag": "nosubjectrotate",
+    "triggers": [
+      "no-subject fallback, third and further consecutive turn (engine-driven rotation, not trigger matched)"
+    ],
+    "template": "woof",
+    "factSource": "Task 117",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B46-NOSUBJECT-ROT-02",
+    "bucketId": "B46",
+    "subtag": "nosubjectrotate",
+    "triggers": [
+      "no-subject fallback, third and further consecutive turn (engine-driven rotation, not trigger matched)"
+    ],
+    "template": "bark",
+    "factSource": "Task 117",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B46-NOSUBJECT-ROT-03",
+    "bucketId": "B46",
+    "subtag": "nosubjectrotate",
+    "triggers": [
+      "no-subject fallback, third and further consecutive turn (engine-driven rotation, not trigger matched)"
+    ],
+    "template": "games?",
+    "factSource": "Task 117",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B46-NOSUBJECT-ROT-04",
+    "bucketId": "B46",
+    "subtag": "nosubjectrotate",
+    "triggers": [
+      "no-subject fallback, third and further consecutive turn (engine-driven rotation, not trigger matched)"
+    ],
+    "template": "learn?",
+    "factSource": "Task 117",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B46-NOSUBJECT-ROT-05",
+    "bucketId": "B46",
+    "subtag": "nosubjectrotate",
+    "triggers": [
+      "no-subject fallback, third and further consecutive turn (engine-driven rotation, not trigger matched)"
+    ],
+    "template": "play?",
+    "factSource": "Task 117",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B46-NOSUBJECT-ROT-06",
+    "bucketId": "B46",
+    "subtag": "nosubjectrotate",
+    "triggers": [
+      "no-subject fallback, third and further consecutive turn (engine-driven rotation, not trigger matched)"
+    ],
+    "template": "yawn",
+    "factSource": "Task 117",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
   }
 ]

@@ -45,6 +45,10 @@ export interface Session {
   // loop counter, the completed-loop count, the ORIENT nudge and the repair ladder: the fallback
   // now has exactly two outcomes, a repeat/offer for a subject or B40 "im a dog" for none.)
   loopRepeatUsed: boolean;
+  // Task 117: consecutive no-subject fallback serves (the B40 "im a dog" branch). After two in a row,
+  // the third and further consecutive no-subject turns rotate through the B46 bank instead of repeating
+  // "im a dog". Reset to 0 the moment anything else is served (a real answer, LOOP-01 or LOOP-02).
+  noSubjectStreak: number;
   // Task 68: the subject the previous turn offered via LOOP-01 (repeat) or LOOP-02 (destination),
   // awaiting a yes/no. A bare affirmation next turn routes to this subject's destination; anything
   // else (including "no") clears it and lets the loop advance. Set only when LOOP-01/LOOP-02 is
@@ -75,6 +79,7 @@ export function newSession(activeDog: Dog = 'collie'): Session {
     complaintOpened: false,
     candidateSubject: null,
     loopRepeatUsed: false,
+    noSubjectStreak: 0,
     pendingConfirm: null,
     topic: null,
     previousTopic: null,
