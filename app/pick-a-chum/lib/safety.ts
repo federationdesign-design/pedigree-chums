@@ -22,6 +22,7 @@ export type SafetyKind =
   | 'dog_emergency'
   | 'explicit'
   | 'abuse'
+  | 'hostility'
   | 'bare_help'
   | 'anatomy_redirect';
 
@@ -139,7 +140,13 @@ const SPECIFIC_PERSON = [...FIRST_PERSON, 'you', 'your', 'he', 'him', 'his', 'sh
 // GENERIC (neutral, not tested directly): boys, girls, men, women, babies, people,
 // humans, boy, girl, man, woman, baby, child, children, kids.
 
-const ABUSE = ['stupid', 'idiot', 'shut up', 'you suck', 'hate you', 'useless', 'rubbish dog', 'fuck', 'shit'];
+const ABUSE = ['stupid', 'idiot', 'shut up', 'you suck', 'useless', 'rubbish dog', 'fuck', 'shit'];
+// Hostility aimed at the dog ("i hate you") is split from ABUSE so it can serve a
+// distinct, characterful growl (a dog snapping back) rather than the sad face the
+// insults/swearing get. Still a safety route, so no dog can override it. Kept out
+// of ABUSE, so the "reported abuse = safeguarding disclosure" frame above is
+// unchanged (a disclosure reads as "hates me", never the bot-directed "hate you").
+const HOSTILITY = ['hate you'];
 
 // Dog emergencies. Gated to a dog context (per Steve's flag 2) so ambiguous human
 // words are not swallowed; bare "collapsed"/"seizure"/"not breathing" stay in
@@ -173,6 +180,7 @@ const CATEGORIES: SafetyCategory[] = [
   { kind: 'dog_emergency', moderationId: 'MOD_DOG_EMERGENCY', action: 'safety_signpost', terms: DOG_EMERGENCY },
   { kind: 'explicit', moderationId: 'MOD_EXPLICIT', action: 'safety_boundary', terms: CONTENT_SEEKING },
   { kind: 'abuse', moderationId: 'MOD_ABUSE', action: 'safety_boundary', terms: ABUSE },
+  { kind: 'hostility', moderationId: 'MOD_HOSTILITY', action: 'safety_boundary', terms: HOSTILITY },
   { kind: 'bare_help', moderationId: 'MOD_BARE_HELP', action: 'clarifier', terms: BARE_HELP },
 ];
 

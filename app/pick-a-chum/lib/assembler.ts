@@ -201,7 +201,11 @@ export function assemble(res: Resolution, data: ChumData, n: Normalised, session
       const cat = MODERATION.find((m) => m.id === res.moderationId) ?? MODERATION[0];
       const idx = session.usedResponseIds.filter((id) => id.startsWith(cat.id)).length % cat.responses.length;
       const text = cat.responses[idx].replace('{{safety_signpost_copy}}', SAFETY_SIGNPOST).replace(/\s{2,}/g, ' ').trim();
-      return { responseId: `${cat.id}-${idx}`, text, dog };
+      const rid = `${cat.id}-${idx}`;
+      // A bare ':(' safety line (MOD_ABUSE) is non-verbal, so it gets the same accessible
+      // name grief and the canned faces use, rather than being read as punctuation.
+      if (text === ':(') return { responseId: rid, text, ariaLabel: SAD_FACE_SR_LABEL, dog };
+      return { responseId: rid, text, dog };
     }
 
     case 'health_answer':

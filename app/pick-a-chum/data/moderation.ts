@@ -77,13 +77,22 @@ export const MODERATION: ModerationCategory[] = [
   },
   {
     id: 'MOD_ABUSE',
-    scenario: 'Abusive input (mild handled dryly; persistent abuse closes the session)',
+    scenario: 'Swearing and insults: the dog just looks sad, the same as a plain insult',
     action: 'redirect',
-    escalateOnRepeat: true,
-    responses: [
-      'I have been spoken to worse by sheep, and they at least had a reason. Let us move on.',
-      'Noted, and ignored. There is better work to be done here.',
-    ],
+    escalateOnRepeat: false,
+    // The sad face, matching an insult. No dry put-down and no darkening: a hurt
+    // look, not a punishment. Still a safety route, so no dog can override it.
+    responses: [':('],
+    status: 'APPROVED',
+  },
+  {
+    id: 'MOD_HOSTILITY',
+    scenario: 'Hostility aimed at the dog ("i hate you"): the dog growls back',
+    action: 'redirect',
+    escalateOnRepeat: false,
+    // A low growl: the dog snaps back rather than looking sad. A single word, so it
+    // reads as a growl in the panel and does not collide with "bark" (the bark game).
+    responses: ['grr'],
     status: 'APPROVED',
   },
   // ---- Step 4 safety-net categories. Approved by Steve, verbatim, self-contained
