@@ -314,7 +314,10 @@
 
 .slideIntro {
   font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: 0.95rem;
+  /* Up from 0.95. This is the opening paragraph of every era, and it is the
+     first thing read on a section, so it carries more weight than the detail
+     slide that follows it. */
+  font-size: 1.2rem;
   font-weight: 600;
   color: #ffffff;
   line-height: 1.35;
@@ -857,6 +860,48 @@
   pointer-events: none;
 }
 
+/* ---- The flash arriving --------------------------------------------------
+
+   Both halves are keyed off the SAME `arrived` flag the marker row uses, which
+   latches from scroll position as the reader settles on a dog. A fifth of a
+   second later the yellow slides in from behind the top left corner and the
+   words pop on over it.
+
+   NEITHER RESTS HIDDEN. The opening frame lives inside the animation, so a card
+   whose arrival never fires still shows its flash, just without the entrance.
+   That is the same fault the marker icons had, where a resting opacity of zero
+   meant a missed trigger took the whole row with it. */
+.dogFlashWedgeIn {
+  /* Slides a full width and height, so it comes from beyond the corner rather
+     than sliding out of thin air. .dogFront's overflow hides the journey. */
+  animation: pcWedgeIn 0.52s cubic-bezier(0.22, 0.9, 0.3, 1) 0.2s both;
+}
+
+@keyframes pcWedgeIn {
+  from { transform: translate(-100%, -100%); }
+  to { transform: translate(0, 0); }
+}
+
+/* The words. Grown from the card's own top left corner, so they open out along
+   the wedge rather than swelling from the middle of the picture.
+   translateZ is carried through every frame: .dogFlash sits a hair forward to
+   fix its paint order among the three faces, and a transform here would drop
+   it back into the pack. */
+.dogFlashPop {
+  transform-origin: top left;
+  animation: pcFlashPop 0.36s cubic-bezier(0.2, 1.5, 0.4, 1) 0.2s both;
+}
+
+@keyframes pcFlashPop {
+  0% { opacity: 0; transform: translateZ(1px) scale(0.35); }
+  100% { opacity: 1; transform: translateZ(1px) scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dogFlashWedgeIn,
+  .dogFlashPop { animation: none; }
+}
+
 /* The two files are DIFFERENT SHAPES, 720 x 416.7 and 720 x 665, so one size
    could never suit both. Each carries its own width and its own overhang.
 
@@ -1042,6 +1087,8 @@
    bottom and read as two more gaps. The row is now exactly as tall as the
    disc, so the legs meet it edge to edge. */
 .markerRow {
+  /* The end node on the last dog is positioned against this. */
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1119,6 +1166,49 @@
 /* Green once the reader has moved past this dog. */
 .markerDotGo {
   background: #22c55e;
+}
+
+/* THE ARROW INSIDE EVERY NODE. Drawn as a mask with white behind it, the same
+   way the card's flip control works, so it comes out white whatever colours the
+   file itself carries and the artwork never needs editing.
+   Pointing down, because down is where the reader goes next. */
+.markerDot::after {
+  content: "";
+  position: absolute;
+  inset: 24%;
+  background: #ffffff;
+  -webkit-mask-image: url("/node-arrow.svg");
+  mask-image: url("/node-arrow.svg");
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+}
+
+/* The last dog keeps its box so the two icons either side do not move. */
+.markerDotOff {
+  visibility: hidden;
+}
+
+/* THE END NODE. At the foot of a run the timeline has finished, so a node in
+   the middle pointing down is telling the reader to do something there is no
+   longer anywhere to do. This one sits at the right edge and faces the way they
+   actually have to go, which is sideways to the next section.
+   Absolute, so it takes no space in the centred row. */
+.markerDotEnd {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  visibility: visible;
+}
+
+/* Quarter turn anticlockwise: the file is drawn pointing down, so this is the
+   one number to change if it is drawn some other way. */
+.markerDotEnd::after {
+  transform: rotate(-90deg);
 }
 
 .markerTree,
@@ -1237,17 +1327,47 @@
   mask-size: contain;
 }
 
-/* Same blue and white ring as every other information icon on the page. */
+/* Same blue and white ring as every other information icon on the page.
+
+   THE GLYPH IS ARTWORK NOW, not a letter. The three circles carried a Georgia
+   italic "i", which said "information" rather than "this leaves the site".
+   Drawn as a mask with white behind it, the same way the card's flip control
+   and the timeline nodes are, so it comes out white whatever the file's own
+   colours are.
+   Two rules carry .backLink and this is the second, so it is the one that
+   wins. Anything added to the first would be overwritten. */
 .backLink {
   right: 14px;
-  background: var(--blue-deep, #0c5b92);
-  border: 3px solid #ffffff;
+  /* NO DISC HERE. The button used to draw a blue circle with a white ring for
+     the letter to sit in. The artwork is that badge already, so drawing one
+     underneath put a second ring around the first.
+     The rule above sets both, and this one wins, so they are cleared here. */
+  background: none;
+  border: 0;
   color: #ffffff;
+  /* Nothing left to set type for: the letter has gone. Kept only so a missing
+     file falls back to something rather than an empty disc. */
   font-family: Georgia, serif;
   font-style: italic;
   font-weight: 700;
   font-size: 40px;
   line-height: 1;
+  position: relative;
+}
+
+/* The outbound mark. THE FILE IS THE WHOLE BADGE: it already carries its own
+   blue, its own ring and its own padding, so it is drawn as an image rather
+   than a mask. A mask would have thrown all of that away and repainted the
+   artwork as a flat silhouette, which is what it was doing.
+   Fills the button, because the padding is inside the file. */
+.backLinkIcon {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: url("/outboundlink-icon.svg");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
 }
 
 /* ---- Leaving the site -------------------------------------------------- */

@@ -269,6 +269,41 @@ const TOY_BONE_GONE_KEY = "pc-minipit-bone-gone";
 // Dropped after the rock and before the chums, so it lands on a floor that has
 // something on it rather than into an empty pit.
 const TOY_BONE_GAP = 900;
+/* ---- Era props -------------------------------------------------------------
+   Objects that belong to one era rather than to the pit as a whole. They take
+   the place of the stick, big stick and rock in the props slot, and an era with
+   no set of its own keeps those three.
+
+   PNG WITH ALPHA, NOT SVG. A toy is drawn with an SVG <image href>, which takes
+   any format: the flag has been a JPEG since the beginning. What matters is
+   transparency, or the object lands as a white box. Aspects are the artwork's
+   own trimmed dimensions. */
+const TOY_NEWSPAPER_SRC = "/toy-newspaper.png";
+const TOY_NEWSPAPER_ASPECT = 560 / 247;
+const TOY_FORK_SRC = "/toy-fork.png";
+const TOY_FORK_ASPECT = 420 / 596;
+const TOY_SHOE_SRC = "/toy-shoe.png";
+const TOY_SHOE_ASPECT = 520 / 343;
+/* Drawn WIDTH in px, and the angle each drops at. Flat pixels on purpose: these
+   two are sized against the pit itself rather than against the ball like every
+   other prop, because near-vertical they are read as height, not width.
+   86 and 94 degrees sit either side of upright, so the pair leans apart.
+   Rotated, a 400px newspaper is only 176px across and a 500px shoe 330px, which
+   is what lets them be this big in a pit about 390px wide. */
+/* Which prop waits and lands INTO the flood of dogs rather than before it, so
+   some of the pack is already down and the rest comes in on top of it. One word
+   to move it to another prop, or "" to send them all in together as before. */
+const PROP_IN_FLOOD: string = "shoe";
+
+const TOY_NEWSPAPER_W = 400;
+const TOY_NEWSPAPER_DEG = 86;
+const TOY_SHOE_W = 500;
+const TOY_SHOE_DEG = 94;
+
+const TOY_NEWSPAPER_GONE_KEY = "pc-minipit-newspaper-gone";
+const TOY_FORK_GONE_KEY = "pc-minipit-fork-gone";
+const TOY_SHOE_GONE_KEY = "pc-minipit-shoe-gone";
+
 const STICK_ASPECT = 1368 / 299.7;
 const ROCK_ASPECT = 756.3 / 659.2;
 // Used-up toys stay gone for the rest of the session: the flag once its message
@@ -328,12 +363,22 @@ const CHUM_VW = 0.1;
 const CHUM_BAND: Record<string, number> = { small: 5 / 6, medium: 1, large: 4 / 3, giant: 5 / 3 };
 // stickBig is the same artwork half again as large, so the pair reads as two
 // sticks of different sizes rather than one drawn twice
-type ToyKind = "ball" | "flag" | "stick" | "stickBig" | "rock" | "ballPink" | "cookies" | "bone";
+type ToyKind = "ball" | "flag" | "stick" | "stickBig" | "rock" | "ballPink" | "cookies" | "bone"
+  | "newspaper" | "fork" | "shoe";
+/* The props slot: the three objects that arrive together part way through the
+   drop. A theme can replace them, which is how an era gets its own things to
+   knock about. */
+export const DEFAULT_PROPS: ToyKind[] = ["stick", "stickBig", "rock"];
+/* Which side the first prop falls on. Flipped every time a pit arms its props,
+   so a reader playing several levels does not watch the same object land in the
+   same corner every time. Module scope, so it survives a pit remounting. */
+let propStartLeft = true;
 const TOY_SRC: Record<ToyKind, string> = {
   ball: TOY_BALL_SRC, flag: TOY_FLAG_SRC, stick: TOY_STICK_SRC,
   stickBig: TOY_STICK_SRC, rock: TOY_ROCK_SRC, ballPink: TOY_BALL_SRC,
   cookies: TOY_COOKIES_SRC,
   bone: TOY_BONE_SRC,
+  newspaper: TOY_NEWSPAPER_SRC, fork: TOY_FORK_SRC, shoe: TOY_SHOE_SRC,
 };
 // every prop except the flag leaves for good once it is thrown clear of the pit
 const TOY_GONE_KEY: Record<ToyKind, string> = {
@@ -342,6 +387,7 @@ const TOY_GONE_KEY: Record<ToyKind, string> = {
   rock: TOY_ROCK_GONE_KEY, ballPink: TOY_BALL_PINK_GONE_KEY,
   cookies: TOY_COOKIES_SEEN_KEY,
   bone: TOY_BONE_GONE_KEY,
+  newspaper: TOY_NEWSPAPER_GONE_KEY, fork: TOY_FORK_GONE_KEY, shoe: TOY_SHOE_GONE_KEY,
 };
 function toyRetired(key: string): boolean {
   try { return sessionStorage.getItem(key) === "1"; } catch { return false; }
@@ -349,6 +395,40 @@ function toyRetired(key: string): boolean {
 function retireToy(key: string) {
   try { sessionStorage.setItem(key, "1"); } catch { /* private mode */ }
 }
+
+/* ---- Retiring for an ERA rather than for the session ----------------------
+   The balls come back when the reader reaches a new era. Throwing one clear
+   costs you it for the rest of that era's levels and no longer, which keeps the
+   loss meaningful without spending the toy for the whole visit.
+
+   The era string is the value rather than a flag, so the check is simply "was
+   it retired in the era I am in now". Nothing has to be cleared on the way out
+   of an era: arriving somewhere else makes the old entry stop matching. */
+function toyRetiredInEra(key: string, era?: string): boolean {
+  try { return !!era && sessionStorage.getItem(key) === era; } catch { return false; }
+}
+function retireToyForEra(key: string, era?: string) {
+  try { if (era) sessionStorage.setItem(key, era); } catch { /* private mode */ }
+}
+/* The two balls, and only these, retire per era. Everything else is spent for
+   the session as it always was. */
+const ERA_SCOPED_TOYS: string[] = ["ball", "ballPink"];
+
+/* ---- Retiring for GOOD ----------------------------------------------------
+   The flag carries a message, and once it has been read there is nothing left
+   to say. Session storage put it back on the next visit, which meant showing
+   the same notice to the same reader over and over.
+
+   Local storage, so it survives the tab closing. This is the same treatment the
+   cookie panel already gets, and for the same reason: it is a thing answered
+   once, not a toy. */
+function toyRetiredForever(key: string): boolean {
+  try { return localStorage.getItem(key) === "1"; } catch { return false; }
+}
+function retireToyForever(key: string) {
+  try { localStorage.setItem(key, "1"); } catch { /* private mode */ }
+}
+const PERMANENT_TOYS: string[] = ["flag"];
 // ?toys=reset un-retires every toy on load, so a testing session does not have
 // to reach for the browser console. sessionStorage is per tab and survives a
 // reload, so once you have thrown the ball clear or read the flag's message
@@ -360,6 +440,10 @@ function resetToysIfAsked() {
   if (window.location.search.indexOf("toys=reset") < 0) return;
   try {
     for (const k of Object.values(TOY_GONE_KEY)) sessionStorage.removeItem(k);
+    // The permanent ones live in localStorage, so clearing the session leaves
+    // them retired. Without this, ?toys=reset could never bring the flag back
+    // and it would look like the reset was broken.
+    for (const k of PERMANENT_TOYS) localStorage.removeItem(TOY_GONE_KEY[k as ToyKind]);
     sessionStorage.removeItem(TOY_BALL_PINK_THROWS_KEY);
     // the cookie panel is gated on consent, which is localStorage and permanent,
     // so clearing only the toy key would leave it shut and the reset look broken
@@ -947,6 +1031,8 @@ export default function BreedTree({
   onPitFull,
   rootNote,
   levelTheme = null,
+  era,
+  levelName,
   onStartedChange,
   onLearningChange,
   onRelativeTap,
@@ -994,6 +1080,12 @@ export default function BreedTree({
   onPitFull?: () => void;
   rootNote?: string;
   levelTheme?: LevelTheme | null;
+  /* Which era this level belongs to. Used to scope a retired toy: the balls
+     come back when the reader reaches a different era. */
+  era?: string;
+  /* The dog this level is built on. Only used to look up a per-level prop set,
+     so one level can carry fewer objects than the rest of its era. */
+  levelName?: string;
   onStartedChange?: (started: boolean) => void;
   onLearningChange?: (learning: boolean) => void;
   onRelativeTap?: (slug: string, name: string) => void;
@@ -1710,6 +1802,9 @@ export default function BreedTree({
   // cleared the floor. The main pit does not work that way, and this is its rule.
   const cdTickRef = useRef<number | null>(null);
   const cdElRef = useRef<HTMLDivElement | null>(null);
+  // The centre set of digits. Mobile only, and torn down everywhere the corner
+  // set is, or a cancelled countdown would leave a number sitting on the pit.
+  const cdMidElRef = useRef<HTMLDivElement | null>(null);
   const cdGraceRef = useRef(0);
   // Set the moment the round is handed back to the shell. The occupancy poll
   // in the sim effect deliberately outlives the physics loop, so without this
@@ -1739,14 +1834,35 @@ export default function BreedTree({
         ? "align-items:flex-start;justify-content:flex-end;padding:18px 18px 0 0;font-size:clamp(3.4rem,13vw,7rem);"
         : "align-items:center;justify-content:center;font-size:clamp(5rem,18vw,12rem);");
     st.appendChild(el);
+    /* A SECOND SET OF DIGITS, IN THE MIDDLE. The corner pair keeps the count
+       clear of the play; this one puts it where the reader is actually looking.
+       Two elements driven by ONE ticker, so they cannot disagree.
+       Mobile only: on desktop the corner set is already centred and a second
+       would land exactly on top of it. Held back and behind, so it reads as an
+       echo of the corner rather than competing with it. */
+    const elMid = cdMobile ? document.createElement("div") : null;
+    if (elMid) {
+      elMid.style.cssText =
+        "position:absolute;inset:0;z-index:199;display:flex;align-items:center;justify-content:center;" +
+        "font-family:var(--font-display,'Luckiest Guy',system-ui);color:#fff;pointer-events:none;" +
+        "text-shadow:0 4px 40px rgba(0,0,0,0.6);opacity:0.5;font-size:clamp(6rem,34vw,16rem);";
+      st.appendChild(elMid);
+    }
     const steps = ["10","9","8","7","6","5","4","3","2","1","0"];
     let i = 0;
     el.textContent = steps[i];
+    if (elMid) elMid.textContent = steps[i];
     setFullAlpha(0);
     cdElRef.current = el;
+    cdMidElRef.current = elMid;
     const tick = window.setInterval(() => {
       i++;
-      if (i < steps.length) { el.textContent = steps[i]; setFullAlpha(i / 10); return; }
+      if (i < steps.length) {
+        el.textContent = steps[i];
+        if (cdMidElRef.current) cdMidElRef.current.textContent = steps[i];
+        setFullAlpha(i / 10);
+        return;
+      }
       window.clearInterval(tick);
       cdTickRef.current = null;
       // hold on 0, then GAME OVER, then hand over
@@ -1766,6 +1882,9 @@ export default function BreedTree({
         // shell's own screen and belongs in the same place on it.
         el.textContent = "Oh no...";
         el.style.alignItems = "center";
+        /* The corner set re-centres itself to say this, so the middle set has
+           to go or there would be two things in the same place. */
+        if (cdMidElRef.current) { cdMidElRef.current.remove(); cdMidElRef.current = null; }
         el.style.justifyContent = "center";
         el.style.padding = "0";
         el.style.textAlign = "center";
@@ -1778,7 +1897,11 @@ export default function BreedTree({
         el.style.background =
           "radial-gradient(120% 120% at 50% 40%, rgba(15,65,165,0.31), rgba(8,34,100,0.43))";
         el.style.transition = "background 0.35s ease";
-        window.setTimeout(() => { el.remove(); cdElRef.current = null; pitEndedRef.current = true; onPitFull?.(); }, 1400);
+        window.setTimeout(() => {
+          el.remove(); cdElRef.current = null;
+          if (cdMidElRef.current) { cdMidElRef.current.remove(); cdMidElRef.current = null; }
+          pitEndedRef.current = true; onPitFull?.();
+        }, 1400);
       }, 1200);
     }, 1000);
     cdTickRef.current = tick;
@@ -3000,10 +3123,18 @@ export default function BreedTree({
           }, i * CHUM_STAGGER));
         });
       };
-      const spawnToy = (kind: ToyKind) => {
+      /* `side` is -1 for the left half of the pit and 1 for the right. Only the
+         era props pass it; everything else keeps its own placement. */
+      const spawnToy = (kind: ToyKind, side?: -1 | 1) => {
         // the flag never returns once its message has been read; the ball never
         // returns once the player has thrown it clear of the pit
-        if (toyRetired(TOY_GONE_KEY[kind])) return;
+        /* Three scopes now: gone for good, gone for this era, gone for this
+           visit. Read in that order, most permanent first. */
+        if (PERMANENT_TOYS.includes(kind)
+          ? toyRetiredForever(TOY_GONE_KEY[kind])
+          : ERA_SCOPED_TOYS.includes(kind)
+            ? toyRetiredInEra(TOY_GONE_KEY[kind], era)
+            : toyRetired(TOY_GONE_KEY[kind])) return;
         // answered once, gone for good, so the pit never nags
         if (kind === "cookies" && cookieConsentGiven()) return;
         const isNarrow = window.matchMedia("(max-width: 768px)").matches;
@@ -3020,13 +3151,36 @@ export default function BreedTree({
           // its 2.05 aspect makes it twice the stick's depth, so it lands as a
           // substantial object rather than a twig
           : kind === "bone" ? ballDia * 1.6
+          // Era props. The newspaper is a long roll so it takes the stick's
+          // length; the fork and the shoe are hand-sized, so they read at the
+          // ball's width like the rock does.
+          : kind === "newspaper" ? TOY_NEWSPAPER_W
+          : kind === "fork" ? ballDia * 1.15
+          : kind === "shoe" ? TOY_SHOE_W
           : BIGT * 0.6 * 2;
-        const hgt = kind === "stick" || kind === "stickBig" ? dia / STICK_ASPECT : kind === "rock" ? dia / ROCK_ASPECT : kind === "cookies" ? dia / COOKIES_ASPECT : kind === "bone" ? dia / BONE_ASPECT : dia;
+        const hgt = kind === "stick" || kind === "stickBig" ? dia / STICK_ASPECT : kind === "rock" ? dia / ROCK_ASPECT : kind === "cookies" ? dia / COOKIES_ASPECT : kind === "bone" ? dia / BONE_ASPECT
+          : kind === "newspaper" ? dia / TOY_NEWSPAPER_ASPECT
+          : kind === "fork" ? dia / TOY_FORK_ASPECT
+          : kind === "shoe" ? dia / TOY_SHOE_ASPECT
+          : dia;
         const r = dia / 2;
         // ball drops anywhere across the pit, flag comes in at 70% like the pit
+        /* THE FOOTPRINT, NOT THE WIDTH. Turned near upright these two are far
+           narrower than they are long, so placing them by `dia` would treat a
+           400px newspaper as 400px of floor and shove it into one spot. What
+           they actually occupy across the pit is the OTHER dimension. */
+        const upright = kind === "newspaper" || kind === "shoe";
+        const foot = upright ? hgt : dia;
         const px = kind === "flag"
           ? pL.x + wPx * 0.7
-          : pL.x + r + 20 + Math.random() * Math.max(1, wPx - dia - 40);
+          : side
+            ? (() => {
+                // Half the pit each, so two props can never share a side.
+                const half = Math.max(foot + 20, wPx / 2);
+                const lo = side < 0 ? pL.x : pL.x + wPx - half;
+                return lo + foot / 2 + 10 + Math.random() * Math.max(1, half - foot - 20);
+              })()
+            : pL.x + r + 20 + Math.random() * Math.max(1, wPx - dia - 40);
         // Spawn ABOVE the visible top so the toy is already falling when it
         // enters, exactly as the main pit does. Take the top edge from the stage
         // rectangle, not from the viewBox mapping: the viewBox can reach well
@@ -3046,6 +3200,14 @@ export default function BreedTree({
           : kind === "stick" ? { restitution: 0.35, friction: 0.35, frictionAir: 0.004, density: 0.002 }
           // the main pit's own bone figures, PackPit line 405
           : kind === "bone" ? { restitution: 0.3, friction: 0.3, frictionAir: 0.012, density: 0.0008 }
+          // A rolled newspaper and a wooden-soled shoe land dead and stay put.
+          // The fork is lighter and skitters a little, so it keeps some bounce.
+          // Newspaper halved to 0.002 and shoe doubled to 0.016: rolled paper
+          // should be light enough to be shoved about, a wooden-soled shoe
+          // should not. They are now eight times apart rather than two.
+          : kind === "newspaper" ? { restitution: 0.16, friction: 0.6, frictionStatic: 1.0, frictionAir: 0.008, density: 0.002 }
+          : kind === "shoe" ? { restitution: 0.14, friction: 0.7, frictionStatic: 1.1, frictionAir: 0.008, density: 0.016 }
+          : kind === "fork" ? { restitution: 0.32, friction: 0.4, frictionAir: 0.005, density: 0.003 }
           : { restitution: 0.5, friction: 0.3, frictionAir: 0.004, density: 0.006 };
         // A long thin body needs a real rectangle or it spins like a propeller.
         // Chamfered, so it reads as a rounded stick and cannot catch on a corner.
@@ -3102,6 +3264,24 @@ export default function BreedTree({
               ? Bodies.polygon(px, py, 7, r, { ...opts, chamfer: { radius: r * 0.12 } })
               : kind === "cookies"
                 ? Bodies.rectangle(px, py, dia, hgt, { ...opts, chamfer: { radius: hgt * 0.16 } })
+              /* The era props are all oblongs rather than balls, so each gets a
+                 chamfered rectangle at its own drawn proportions. A circle would
+                 roll a newspaper down the slope like a barrel, and it would put
+                 a fork's body miles outside its handle. */
+              : kind === "newspaper" || kind === "fork" || kind === "shoe"
+                ? (() => {
+                    const b = Bodies.rectangle(px, py, dia, hgt, { ...opts, chamfer: { radius: Math.min(dia, hgt) * 0.22 } });
+                    /* The newspaper and the shoe drop near upright, a few
+                       degrees either side of vertical so the pair leans apart.
+                       The fork keeps a random tilt: it is small enough that a
+                       fixed angle would read as a repeat. */
+                    const deg =
+                      kind === "newspaper" ? TOY_NEWSPAPER_DEG
+                      : kind === "shoe" ? TOY_SHOE_DEG
+                      : null;
+                    MBody.setAngle(b, deg === null ? (Math.random() - 0.5) * 0.9 : (deg * Math.PI) / 180);
+                    return b;
+                  })()
                 : Bodies.circle(px, py, r, opts);
         // fromVertices is avoided deliberately: it produced a ragged body when
         // it was tried on the pit floor. A plain polygon squashed to the
@@ -3149,11 +3329,12 @@ export default function BreedTree({
             const spent = pinkThrows() + 1;
             setPinkThrows(spent);
             killProp(pr, "toy", performance.now());
-            if (spent >= BALL_PINK_LIVES) retireToy(TOY_BALL_PINK_GONE_KEY);
+            if (spent >= BALL_PINK_LIVES) retireToyForEra(TOY_BALL_PINK_GONE_KEY, era);
             else toyTimers.push(window.setTimeout(() => spawnToy("ballPink"), BALL_PINK_BACK));
             return;
           }
-          retireToy(TOY_GONE_KEY[pr.toyKind as ToyKind]);
+          if (ERA_SCOPED_TOYS.includes(pr.toyKind)) retireToyForEra(TOY_GONE_KEY[pr.toyKind as ToyKind], era);
+          else retireToy(TOY_GONE_KEY[pr.toyKind as ToyKind]);
           killProp(pr, "toy", performance.now());
         }
       };
@@ -3168,14 +3349,44 @@ export default function BreedTree({
         toyTimers.push(window.setTimeout(() => spawnToy("ballPink"), TOY_BALL_DELAY + BALL_PINK_GAP));
         toyTimers.push(window.setTimeout(() => spawnToy("flag"), TOY_BALL_DELAY + TOY_FLAG_GAP));
         const propsAt = TOY_BALL_DELAY + TOY_FLAG_GAP + TOY_PROP_GAP;
-        // both sticks together, then the rock half a second later so it gets
-        // its own thump rather than landing under them
-        toyTimers.push(window.setTimeout(() => spawnToy("stick"), propsAt));
-        toyTimers.push(window.setTimeout(() => spawnToy("stickBig"), propsAt));
-        toyTimers.push(window.setTimeout(() => spawnToy("rock"), propsAt + TOY_ROCK_GAP));
+        /* THE PROPS SLOT, from the level's theme. An era with no set of its own
+           gets the stick, big stick and rock, which is what every era had.
+           The first two arrive together and the rest follow at the rock's gap,
+           so a set of any length keeps the original rhythm: a pair thumps in,
+           then the stragglers land one after another rather than in a heap. */
+        /* Most specific wins: this level's own set, then the era's, then the
+           pit's default three. */
+        const byLevel = levelName ? levelTheme?.propsByLevel?.[levelName] : undefined;
+        const props: ToyKind[] = byLevel?.length
+          ? (byLevel as ToyKind[])
+          : levelTheme?.props?.length
+            ? (levelTheme.props as ToyKind[])
+            : DEFAULT_PROPS;
+        /* SIDES ALTERNATE, AND THE FIRST SIDE ALTERNATES TOO. Each prop lands on
+           the opposite side to the one before it, so two can never come down
+           together in the same corner, and the whole sequence starts on the
+           other side next time a pit arms. */
+        const firstLeft = propStartLeft;
+        propStartLeft = !propStartLeft;
+        /* THE FLOOD'S MIDDLE, worked out rather than guessed. The dogs start at
+           chumsAt and arrive one every CHUM_STAGGER, so the halfway point is the
+           count times the stagger, halved. A level with more dogs floods for
+           longer and the prop waits longer to suit, which a fixed delay could
+           never do. If the images are not counted yet, it falls back to the
+           front of the flood rather than landing at some invented time. */
         const boneAt = propsAt + TOY_ROCK_GAP + TOY_BONE_GAP;
+        const chumsAt = boneAt + CHUM_GAP;
+        const floodMid = chumsAt + ((chumImagesRef.current?.length ?? 0) * CHUM_STAGGER) / 2;
+        props.forEach((kind: ToyKind, i: number) => {
+          const at =
+            kind === PROP_IN_FLOOD ? floodMid
+            : i < 2 ? propsAt
+            : propsAt + TOY_ROCK_GAP * (i - 1);
+          const left = i % 2 === 0 ? firstLeft : !firstLeft;
+          toyTimers.push(window.setTimeout(() => spawnToy(kind, left ? -1 : 1), at));
+        });
         toyTimers.push(window.setTimeout(() => spawnToy("bone"), boneAt));
-        toyTimers.push(window.setTimeout(spawnChums, boneAt + CHUM_GAP));
+        toyTimers.push(window.setTimeout(spawnChums, chumsAt));
       };
       spawnRodRef.current = (x1: number, y1: number, x2: number, y2: number, lit: boolean) => {
         const lenPx = Math.max(10, Math.hypot(x2 - x1, y2 - y1));
@@ -3753,6 +3964,7 @@ export default function BreedTree({
           // reached from the loop or the poll, both of which are effects.
           if (cdTickRef.current !== null) { window.clearInterval(cdTickRef.current); cdTickRef.current = null; }
           if (cdElRef.current) { cdElRef.current.remove(); cdElRef.current = null; }
+          if (cdMidElRef.current) { cdMidElRef.current.remove(); cdMidElRef.current = null; }
           setFullAlpha(0);
           fullTriggeredRef.current = false;
           // Paired with the flag above: this branch only runs for a pit-full
@@ -4968,7 +5180,7 @@ export default function BreedTree({
                         const cb = toyBodiesRef.current[i2]?.mb;
                         if (cb) cookieBtnsRef.current?.(cb.position.x, cb.position.y);
                       } else {
-                        retireToy(TOY_FLAG_SEEN_KEY);
+                        retireToyForever(TOY_FLAG_SEEN_KEY);
                         setBritainOpen(true);
                       }
                     };
@@ -5588,6 +5800,11 @@ export default function BreedTree({
         <div
           aria-hidden="true"
           className={`${styles.learnWash}${!started && learning ? " " + styles.learnWashOn : !started && learnPeek ? " " + styles.learnWashPeek : ""}`}
+          /* The wash takes its colour from the level's theme when it has one.
+             Set inline rather than through a class, because it is a value per
+             era, not a state. An era with no theme, or a theme with no wash,
+             keeps the stylesheet's own pink. */
+          style={levelTheme?.wash ? { background: levelTheme.wash } : undefined}
         />
       )}
       {/* The white-to-yellow word sweep has gone with the word. The level
@@ -5660,7 +5877,7 @@ export default function BreedTree({
             setBritainOpen(false);
             // the tick poofs the flag, exactly as it does in the main pit, and
             // a flag whose message has been read does not come back next round
-            retireToy(TOY_FLAG_SEEN_KEY);
+            retireToyForever(TOY_FLAG_SEEN_KEY);
             if (flagIdxRef.current !== null) killToyRef.current?.(flagIdxRef.current);
           }}
         />

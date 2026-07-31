@@ -34,6 +34,23 @@ export type LevelTheme = {
   // does its uneven floor (see commit 770173e: a fromVertices floor came out
   // jagged and was replaced with stepped rectangles).
   floorProfile: number[];
+  // The LEARN wash, the tilted slab that slides across the start screen. It is
+  // mix-blend-mode: overlay, so it tints the backdrop rather than painting over
+  // it. Optional: an era without one keeps the stylesheet's pink.
+  wash?: string;
+  /* The props slot: the objects that drop in together part way through, in
+     place of the pit's stick, big stick and rock. Any length. The first two
+     arrive together and the rest follow one after another, so the original
+     rhythm holds however many there are.
+     Omit it and the era keeps the default three.
+     Typed loosely on purpose: the kinds themselves are the pit's business, and
+     naming them here would make this data file depend on the component. */
+  props?: string[];
+  /* Props for ONE level, keyed by the dog's name, overriding the era's set
+     above. Some levels want fewer objects on the floor than their era does.
+     Most specific wins: this, then the era's props, then the pit's default
+     three. A name with no entry simply takes the era's set. */
+  propsByLevel?: Record<string, string[]>;
 };
 
 const THEMES: Record<string, LevelTheme> = {
@@ -49,6 +66,37 @@ const THEMES: Record<string, LevelTheme> = {
       0.0696, 0.0696, 0.0609, 0.0609, 0.0522, 0.0522, 0.0435, 0.0435,
       0.0348, 0.0261, 0.0261, 0.0174, 0.0174, 0.0087, 0.0087, 0.0,
     ],
+  },
+  // Tudor times. The wall is a JPEG and the ground a PNG, which is fine: both
+  // are loaded through an <img> exactly as the ancient SVGs are, and a painted
+  // texture is smaller and truer as a raster than as traced vectors.
+  c1500: {
+    bg: "/levels/tudor-bg.jpg",
+    // Sampled from the top and bottom 24 rows of the artwork, so the band the
+    // crop cannot reach meets the picture without a seam.
+    sky: ["#3e200d", "#58391e"],
+    floor: "/levels/tudor-floor.png",
+    floorAspect: 1600 / 223,
+    // This strip's top edge is dead flat. Measured at 24 points across the
+    // artwork and every one reads zero, so the physics floor is a straight
+    // line. Nothing is wrong: there is simply no relief in this ground to
+    // follow, unlike the ancient one.
+    floorProfile: [
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    ],
+    wash: "#fdf251",
+    // Tudor swaps the woodland props for household ones.
+    props: ["newspaper", "fork", "shoe"],
+    /* Three levels in the middle of the Tudor run keep the fork alone. The
+       newspaper and the shoe are the two big ones, and on these the floor was
+       too crowded to play on. Turnspit Dog and Bearded Collie, either side of
+       them, keep all three. */
+    propsByLevel: {
+      "English Foxhound": ["fork"],
+      Otterhound: ["fork"],
+      Staghound: ["fork"],
+    },
   },
 };
 

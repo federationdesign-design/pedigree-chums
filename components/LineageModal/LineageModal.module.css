@@ -482,6 +482,19 @@
   color: var(--yellow, #ffd23e);
   z-index: 2;
 }
+/* The chums taken out of this level. Same voice as the score above it, tilted
+   the other way so the pair reads as two lines rather than one block, and a
+   step smaller because the score is the headline of the two. */
+.winChums {
+  transform: rotate(3deg);
+  font-family: var(--font-body, Montserrat, system-ui);
+  font-weight: 800;
+  font-size: clamp(0.95rem, 3.6vw, 1.6rem);
+  color: #ffffff;
+  margin-top: 2px;
+  z-index: 2;
+}
+
 /* Tilted, like the mock. Sits above the photo. */
 .winFlash {
   position: relative;
@@ -498,6 +511,81 @@
   z-index: 2;
   animation: lmEndPop 0.45s cubic-bezier(0.2, 1.4, 0.4, 1);
 }
+/* ---- The era join ------------------------------------------------------
+   Two messages sharing one slot. "Era complete" lands with the screen, then
+   "Next era ..." pops over the top of it a beat later.
+
+   The wrapper holds the height so the block below it cannot jump when the
+   second message arrives: the second is absolutely positioned over the first
+   rather than following it in the flow. */
+.eraJoin {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3.4em;
+  margin: 2px 0 6px;
+  z-index: 2;
+}
+
+.eraJoinDone {
+  font-family: var(--font-body, Montserrat, system-ui);
+  font-weight: 700;
+  font-size: clamp(0.95rem, 3.2vw, 1.3rem);
+  color: #ffffff;
+  opacity: 0;
+  animation: pcEraDone 0.34s cubic-bezier(0.2, 1.4, 0.4, 1) 0.25s both;
+}
+
+/* Over the top of the first, not after it. */
+.eraJoinNext {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  opacity: 0;
+  /* 1.5s in: long enough to read the first line, short enough not to stall
+     the screen. */
+  animation: pcEraNext 0.4s cubic-bezier(0.2, 1.5, 0.4, 1) 1.5s both;
+}
+
+.eraJoinNextLead {
+  font-family: var(--font-body, Montserrat, system-ui);
+  font-weight: 600;
+  font-size: clamp(0.8rem, 2.7vw, 1.05rem);
+  color: #ffffff;
+}
+
+.eraJoinNextName {
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: clamp(1.4rem, 6vw, 2.2rem);
+  line-height: 1;
+  letter-spacing: 0.02em;
+  color: var(--yellow, #ffd23e);
+  text-transform: uppercase;
+}
+
+@keyframes pcEraDone {
+  from { opacity: 0; transform: scale(0.86); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* The first message is still underneath, so this one comes in opaque and
+   slightly oversized to cover it cleanly. */
+@keyframes pcEraNext {
+  0% { opacity: 0; transform: scale(0.7); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .eraJoinDone,
+  .eraJoinNext { animation-duration: 0.01s; }
+  .eraJoinNext { animation-delay: 1.5s; }
+}
+
 .winNextLead {
   /* Directly under ROUND WON, which lands it on the top of the photo. It was
      pushed to the foot of the column, which put it down by the dog's feet. */
