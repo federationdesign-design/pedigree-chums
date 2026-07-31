@@ -741,13 +741,26 @@
   display: block;
 }
 
+/* Two figures side by side, split by a slash. Baseline alignment, so the two
+   numerals and the slash sit on one line and the words hang under them without
+   any of it being measured by hand. */
 .eraCountOutline,
 .eraCountFill {
   display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  gap: 10px;
+}
+.eraCountCol {
+  display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: center;
   /* Tight, so the word tucks under the numeral as in the concept. */
   line-height: 0.78;
+}
+.eraCountSlash {
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: clamp(2.2rem, 11vw, 3.2rem);
 }
 
 /* The white behind. Fill AND stroke are white, so this copy is a fattened
