@@ -1,1 +1,74 @@
-[]
+[
+  {
+    "responseId": "BOX-B40-01",
+    "bucketId": "B40",
+    "subtag": "nosubject",
+    "triggers": [
+      "ANY unrecognised input, no candidate subject"
+    ],
+    "template": "joke?",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "BOX-B23-01",
+    "bucketId": "B23",
+    "subtag": "identity",
+    "triggers": [
+      "are you the boxer",
+      "are you a boxer"
+    ],
+    "template": "yepper",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "BOX-B27-01",
+    "bucketId": "B27",
+    "subtag": "capability",
+    "triggers": [
+      "can you do something other than jokes",
+      "what else"
+    ],
+    "template": "yes, you want to play my mini game? or the proper game?",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "BOX-B29-01",
+    "bucketId": "B29",
+    "subtag": "nice",
+    "triggers": [
+      "lol",
+      "haha",
+      "ha",
+      "thats funny"
+    ],
+    "template": "hhaaww",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "BOX-B24-01",
+    "bucketId": "B24",
+    "subtag": "rude",
+    "triggers": [
+      "thats terrible",
+      "not funny",
+      "thats rubbish"
+    ],
+    "template": "one more",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  }
+]

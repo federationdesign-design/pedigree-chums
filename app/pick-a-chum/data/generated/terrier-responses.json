@@ -1,1 +1,211 @@
-[]
+[
+  {
+    "responseId": "TER-B40-01",
+    "bucketId": "B40",
+    "subtag": "nosubject",
+    "triggers": [
+      "ANY unrecognised input, no candidate subject"
+    ],
+    "template": "dig?",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "TER-B23-01",
+    "bucketId": "B23",
+    "subtag": "identity",
+    "triggers": [
+      "are you the terrier",
+      "are you a terrier"
+    ],
+    "template": "why you want to know?",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "TER-B23-02",
+    "bucketId": "B23",
+    "subtag": "identity",
+    "triggers": [
+      "the collie sent me",
+      "yes really"
+    ],
+    "template": "oh righty, yea thats me, im the border terrier",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "TER-B21-01",
+    "bucketId": "B21",
+    "subtag": "cats",
+    "triggers": [
+      "cats",
+      "cat",
+      "do you chase cats"
+    ],
+    "template": "where????",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "TER-B22-01",
+    "bucketId": "B22",
+    "subtag": "tricks",
+    "triggers": [
+      "sit",
+      "sit down"
+    ],
+    "template": "why?",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "TER-B22-02",
+    "bucketId": "B22",
+    "subtag": "tricks",
+    "triggers": [
+      "because i asked",
+      "just do it"
+    ],
+    "template": "whats the magic word?",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "TER-B22-03",
+    "bucketId": "B22",
+    "subtag": "tricks",
+    "triggers": [
+      "please"
+    ],
+    "template": "no",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "TER-B27-01",
+    "bucketId": "B27",
+    "subtag": "capability",
+    "triggers": [
+      "what do you do",
+      "what can you do"
+    ],
+    "template": "dig and find",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "TER-B27-02",
+    "bucketId": "B27",
+    "subtag": "capability",
+    "triggers": [
+      "find what",
+      "what do you find"
+    ],
+    "template": "stuff like this",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "TER-B32-01",
+    "bucketId": "B32",
+    "subtag": "self",
+    "triggers": [
+      "do you like walks"
+    ],
+    "template": "why you ask?",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "TER-B32-02",
+    "bucketId": "B32",
+    "subtag": "self",
+    "triggers": [
+      "i just wondered",
+      "no reason"
+    ],
+    "template": "yes",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "TER-B32-03",
+    "bucketId": "B32",
+    "subtag": "self",
+    "triggers": [
+      "do you like baths",
+      "what about baths"
+    ],
+    "template": "no",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "TER-B33-01",
+    "bucketId": "B33",
+    "subtag": "pack",
+    "triggers": [
+      "do you know any other dogs",
+      "do you have friends"
+    ],
+    "template": "yes",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "TER-B33-02",
+    "bucketId": "B33",
+    "subtag": "pack",
+    "triggers": [
+      "who",
+      "who are they",
+      "whos your best friend"
+    ],
+    "template": "53, too many to name",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "TER-B35-01",
+    "bucketId": "B35",
+    "subtag": "nofact",
+    "triggers": [
+      "black hole",
+      "anything with the word hole"
+    ],
+    "template": "a deep hole i dug?",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  }
+]
