@@ -132,6 +132,18 @@ export default function LineageModal({ name, image, character, lineage, onClose,
   const [score, setScore] = useState(initialScore ?? 0); // campaign total rides in across levels
   useEffect(() => { onScoreChange?.(score); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [score]);
   const [phase, setPhase] = useState<"play" | "won" | "lost">("play");
+  /* The win screen's way on holds back for a beat. Pressed the instant the
+     screen lands it did nothing, because the screen arrives before everything
+     behind it has settled, so the press was going nowhere and reading as a dead
+     button. It is a real timer rather than a CSS reveal on purpose: this is the
+     only way off the screen, and decoration must never gate content. */
+  const WIN_GO_DELAY_MS = 1200;
+  const [goReady, setGoReady] = useState(false);
+  useEffect(() => {
+    if (phase !== "won") return;
+    const t = window.setTimeout(() => setGoReady(true), WIN_GO_DELAY_MS);
+    return () => window.clearTimeout(t);
+  }, [phase]);
   // The start screen is bare: no shake, no slow motion. They arrive with the
   // round, so nothing is offered that cannot do anything yet.
   const [running, setRunning] = useState(false);
@@ -505,11 +517,6 @@ export default function LineageModal({ name, image, character, lineage, onClose,
                   one, so this is only the reporting.
                   Hidden at zero rather than showing "0 chums": a level where the
                   reader collected nothing should not be told so. */}
-              {collectedChums.size > 0 && (
-                <div className={css.winChums}>
-                  Chums collected: {collectedChums.size}
-                </div>
-              )}
               <div className={css.winFlash}>Round Won</div>
               {/* THE ERA JOIN. Two messages in one slot: the first lands with
                   the screen, the second pops over the top of it a beat later.
@@ -531,13 +538,26 @@ export default function LineageModal({ name, image, character, lineage, onClose,
                   {nextLevelImage ? (
                     <img className={css.winNextImg} src={nextLevelImage} alt="" aria-hidden="true" />
                   ) : null}
-                  <button type="button" className={`${css.endBtnGo} ${css.winGo}`} onClick={onNextLevel}>Next Level</button>
                 </>
-              ) : (
-                // Last level, so there is nothing to go on to. The way out has
-                // to come back, or the player is stuck on this screen.
-                <button type="button" className={`${css.endBtn} ${css.endBtnAlt} ${css.winGo}`} onClick={onClose}>Close</button>
-              )}
+              ) : null}
+              {/* THE FOOT. The count and the way on are one block pinned to the
+                  bottom, so the count sits directly above the button on every
+                  screen without a hand-worked offset chasing the button's own
+                  clamps. */}
+              <div className={css.winFoot}>
+                {collectedChums.size > 0 && (
+                  <div className={css.winChums}>
+                    Chums collected: {collectedChums.size}
+                  </div>
+                )}
+                {goReady && (nextLevelLabel && onNextLevel ? (
+                  <button type="button" className={`${css.endBtnGo} ${css.winGo}`} onClick={onNextLevel}>Next Level</button>
+                ) : (
+                  // Last level, so there is nothing to go on to. The way out has
+                  // to come back, or the player is stuck on this screen.
+                  <button type="button" className={`${css.endBtn} ${css.endBtnAlt} ${css.winGo}`} onClick={onClose}>Close</button>
+                ))}
+              </div>
             </div>
           ) : (
             <>

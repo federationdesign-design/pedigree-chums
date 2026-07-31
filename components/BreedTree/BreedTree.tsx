@@ -1763,6 +1763,93 @@ export default function BreedTree({
   // Cards taken out of the flood, by index, so the card can go the instant it
   // is collected rather than waiting for the level list to be rebuilt.
   const [chumGone, setChumGone] = useState<Set<number>>(new Set());
+  /* THE COLLECT FLIGHT, ported from the main pit's collectXf.
+
+     A collected card does not blink out. It tumbles into the bottom-left
+     corner, shrinking and fading, and only then leaves the list. Same 520ms and
+     the same curved fall: x slides to the corner while y accelerates, so it
+     arcs instead of travelling in a straight line.
+
+     The target is measured off the tally itself on the first frame of each
+     flight, so it stays right if the number is resized later, and it is
+     converted through the SVG's own screen matrix because the cards are drawn
+     in viewBox units, not pixels. That conversion is what keeps it correct
+     under pan and zoom. */
+  const CHUM_FLY_MS = 520;
+  const tallyRef = useRef<HTMLDivElement>(null);
+  /* THE CORNER IS A FLASH, NOT A FIXTURE. The box and the number show for one
+     collect, fade, and leave. The next double tap brings them back with the new
+     total. Counted up per collect rather than read off the count itself, so two
+     cards taken in quick succession each get their own showing. */
+  const CORNER_HOLD_MS = 1600;
+  const [cornerShot, setCornerShot] = useState(0);
+  const cornerTimerRef = useRef<number | null>(null);
+  const flashCorner = () => {
+    if (cornerTimerRef.current != null) window.clearTimeout(cornerTimerRef.current);
+    setCornerShot((n) => n + 1);
+    cornerTimerRef.current = window.setTimeout(() => { setCornerShot(0); cornerTimerRef.current = null; }, CORNER_HOLD_MS);
+  };
+  const chumFlyRef = useRef<Map<number, { t0: number; spin: number; tx: number; ty: number; got: boolean }>>(new Map());
+  const chumFlyRaf = useRef<number | null>(null);
+  const chumFlyTarget = () => {
+    const st = stageRef.current;
+    const svg = st ? st.querySelector("svg") : null;
+    if (!svg) return null;
+    const ctm = (svg as SVGSVGElement).getScreenCTM();
+    if (!ctm) return null;
+    const r = tallyRef.current ? tallyRef.current.getBoundingClientRect() : null;
+    // The big number sits on the bottom-left of its own square, so aim at that
+    // and not at the middle of what is mostly empty space.
+    const cx = r ? r.left + r.width * 0.3 : 60;
+    const cy = r ? r.bottom - r.height * 0.3 : window.innerHeight - 60;
+    const inv = ctm.inverse();
+    // `real` says the tally was actually on screen to measure. The first collect
+    // mounts it in the same render that starts the flight, so the first frame
+    // can arrive a beat early; the caller waits rather than locking on to the
+    // fallback corner.
+    return { x: inv.a * cx + inv.c * cy + inv.e, y: inv.b * cx + inv.d * cy + inv.f, real: !!r };
+  };
+  const stepChumFly = (now: number) => {
+    const m = chumFlyRef.current;
+    const gg = chumsGRef.current;
+    if (!m.size || !gg) { chumFlyRaf.current = null; return; }
+    // Measured once per frame for the whole batch, not once per card.
+    const tgt = chumFlyTarget();
+    const v2 = viewRef.current;
+    const kk2 = SIZE / v2[2];
+    const landed: number[] = [];
+    m.forEach((f, i) => {
+      const pr = chumBodiesRef.current[i];
+      const el = gg.children[i] as SVGGElement | undefined;
+      if (!pr || !el) { landed.push(i); return; }
+      const t = Math.min(1, (now - f.t0) / CHUM_FLY_MS);
+      // Locked once, so the card flies a smooth arc instead of chasing a target
+      // that moves as the number grows a digit.
+      if (tgt && !f.got && (tgt.real || t > 0.25)) { f.tx = tgt.x; f.ty = tgt.y; f.got = true; }
+      // Its body is out of the world, so this start point is frozen. The view
+      // is read fresh, so a zoom mid-flight moves the card with everything else.
+      const sx = (pr.x - v2[0]) * kk2, sy = (pr.y - v2[1]) * kk2;
+      const tx = f.got ? f.tx : sx, ty = f.got ? f.ty : sy;
+      const x = sx + (tx - sx) * t;         // x slides toward the corner
+      const y = sy + (ty - sy) * (t * t);   // y accelerates, a curved fall
+      const sc = Math.max(0.04, 1 - t);     // shrinks into the tally
+      el.setAttribute("transform", `translate(${x},${y}) rotate(${pr.a * 57.2958 + f.spin * t}) scale(${sc})`);
+      el.style.opacity = t > 0.72 ? String(Math.max(0, (1 - t) / 0.28)) : "1";
+      if (t >= 1) landed.push(i);
+    });
+    landed.forEach((i) => {
+      m.delete(i);
+      const el = gg.children[i] as SVGGElement | undefined;
+      if (el) el.style.opacity = "";
+    });
+    if (landed.length) setChumGone((g) => { const s = new Set(g); landed.forEach((i) => s.add(i)); return s; });
+    chumFlyRaf.current = m.size ? requestAnimationFrame(stepChumFly) : null;
+  };
+  // The loop owns a frame handle, so it has to be given back on unmount.
+  useEffect(() => () => {
+    if (chumFlyRaf.current != null) cancelAnimationFrame(chumFlyRaf.current);
+    if (cornerTimerRef.current != null) window.clearTimeout(cornerTimerRef.current);
+  }, []);
   // The cookie panel's two answers. They are pit objects, not UI: they squeeze
   // out of the panel, tumble, can be dragged and barge like anything else.
   const btnBodiesRef = useRef<PropBody[]>([]);
@@ -2396,7 +2483,12 @@ export default function BreedTree({
     for (const [listRef, gRef] of [[rodBodiesRef, rodsGRef], [pillBodiesRef, pillsGRef], [toyBodiesRef, toysGRef], [chumBodiesRef, chumsGRef], [btnBodiesRef, btnsGRef]] as const) {
       const list = (listRef as typeof rodBodiesRef).current;
       const gg = (gRef as typeof rodsGRef).current;
+      // A collected chum card is flying to the corner under its own animation.
+      // Its transform belongs to that flight until it lands, so this writer
+      // steps over it rather than snapping it back to its frozen body.
+      const flying = gRef === chumsGRef ? chumFlyRef.current : null;
       if (list && gg) for (const pr of list) {
+        if (flying && flying.has(pr.idx)) continue;
         const el = gg.children[pr.idx] as SVGGElement | undefined;
         if (el) el.setAttribute("transform", `translate(${(pr.x - v[0]) * k},${(pr.y - v[1]) * k}) rotate(${pr.a * 57.2958})`);
       }
@@ -4362,6 +4454,8 @@ export default function BreedTree({
         setChumList([]);
         // Indices are per flood, so a new one must not inherit the old holes.
         setChumGone(new Set());
+        if (chumFlyRaf.current != null) { cancelAnimationFrame(chumFlyRaf.current); chumFlyRaf.current = null; }
+        chumFlyRef.current = new Map();
         Composite.clear(engine.world, false);
         Engine.clear(engine);
       };
@@ -4578,6 +4672,9 @@ export default function BreedTree({
       .map((b) => ({ image: b.image, band: b.sizeBand as string, name: b.name }));
   }, [nodes, collectedChums]);
   useEffect(() => { chumImagesRef.current = levelChums; }, [levelChums]);
+  // The running total for the corner. It lives in LineageModal, which is keyed
+  // per level and remounts, so it starts each level at nothing.
+  const chumsCollected = collectedChums?.size ?? 0;
   // That dog's ancestry breakdown, the same figures as its own page.
   const ancestryRows = useMemo(
     () => (ancestryFor ? ancestryBreakdown(ancestryFor.name) : []),
@@ -5246,10 +5343,15 @@ export default function BreedTree({
               const kk2 = SIZE / v2[2];
               const half = cm.size / 2;
               const rx = cm.size * 0.22;
-              if (chumGone.has(i2)) return null;
+              /* A COLLECTED CARD IS HIDDEN, NEVER UNMOUNTED. Every prop group
+                 in this pit is addressed by position: the physics writer sets
+                 gg.children[pr.idx]. Removing one element would shift every
+                 card after it onto the wrong body, which is how the toys and
+                 the pills already work: they hide, they do not go. */
+              const collected = chumGone.has(i2);
               return (
                 <g key={i2} transform={pr ? `translate(${(pr.x - v2[0]) * kk2},${(pr.y - v2[1]) * kk2}) rotate(${pr.a * 57.2958})` : undefined}
-                  style={{ cursor: "pointer" }}
+                  style={{ display: collected ? "none" : undefined, cursor: "pointer", pointerEvents: collected ? "none" : "auto" }}
                   onPointerDown={(e) => {
                     // Its own gesture, its own bookkeeping. Nothing here calls
                     // startDrag, so the card cannot be dragged and cannot take
@@ -5266,12 +5368,24 @@ export default function BreedTree({
                       return;
                     }
                     chumTapRef.current = null;
+                    // Already on its way, so leave it alone.
+                    if (chumFlyRef.current.has(i2)) return;
                     // Out of the physics world first, so nothing can knock a
                     // card that is already on its way to being collected.
                     const b = chumBodiesRef.current[i2];
                     if (b?.mb) { try { removeChumBodyRef.current?.(b.mb); } catch { /* already gone */ } }
-                    setChumGone((g) => (g.has(i2) ? g : new Set(g).add(i2)));
+                    // Off it goes to the corner. It leaves the list when it
+                    // lands, not now, so the flight has something to draw.
+                    chumFlyRef.current.set(i2, {
+                      t0: performance.now(),
+                      spin: (Math.random() < 0.5 ? -1 : 1) * (200 + Math.random() * 160),
+                      tx: 0, ty: 0, got: false,
+                    });
+                    if (chumFlyRaf.current == null) chumFlyRaf.current = requestAnimationFrame(stepChumFly);
+                    // Counted straight away, so the box pops and the number
+                    // climbs as the card sets off, not when it lands.
                     onChumCollected?.(cm.name);
+                    flashCorner();
                   }}
                 >
                   <clipPath id={`bt-chum-${i2}`}>
@@ -5280,8 +5394,6 @@ export default function BreedTree({
                   <rect x={-half} y={-half} width={cm.size} height={cm.size} rx={rx} style={{ fill: "#ffffff" }} />
                   <image href={encodeURI(bust(cm.image))} x={-half} y={-half} width={cm.size} height={cm.size}
                     preserveAspectRatio="xMidYMid slice" clipPath={`url(#bt-chum-${i2})`} />
-                  <rect x={-half} y={-half} width={cm.size} height={cm.size} rx={rx}
-                    style={{ fill: "none", stroke: "var(--yellow, #ffd23e)", strokeWidth: Math.max(2, cm.size * 0.055) }} />
                 </g>
               );
             })}
@@ -5948,6 +6060,43 @@ export default function BreedTree({
           has something to reveal. Drawing that as a node with a connector says
           the dog descends from itself. soloLeaf tells the layer to skip the node
           entirely and reveal straight out of the big circle instead. */}
+      {/* THE CORNER, ported whole from the main pit: the card-pack box and the
+          big white tally. Both are keyed on the count, so both replay their pop
+          on every collect. The number sits above the box, the way it does in
+          the main pit, so the count stays readable.
+
+          Display only, deliberately. In the main pit the chip is a button that
+          opens the My Chums dock. A tappable thing sat over the pit floor could
+          take a press from an object underneath it, which is not a trade worth
+          making for a number. Shown in the pit only, not in the learn area. */}
+      {dockAside && dropped && cornerShot > 0 && chumsCollected > 0 && (
+        // eslint-disable-next-line @next/next/no-img-element -- a fixed-size decorative SVG, next/image buys nothing here
+        <img key={`chumbox-${cornerShot}`} className={styles.cardBox} src="/card-pack-box.svg" alt="" aria-hidden="true" />
+      )}
+      {dockAside && dropped && cornerShot > 0 && chumsCollected > 0 && (
+        <div
+          ref={tallyRef}
+          key={`chumtally-${cornerShot}`}
+          className={styles.tally}
+          aria-live="polite"
+          aria-label={`${chumsCollected} chums collected`}
+        >
+          <div className={styles.tallyChip}>
+            <svg className={styles.tallyBurst} viewBox="-60 -60 120 120" aria-hidden="true">
+              {Array.from({ length: 16 }).map((_, i) => {
+                const a = (i / 16) * Math.PI * 2, r1 = 24, r2 = i % 2 === 0 ? 52 : 38;
+                return <line key={i} x1={Math.cos(a) * r1} y1={Math.sin(a) * r1} x2={Math.cos(a) * r2} y2={Math.sin(a) * r2} stroke="#ff2d78" strokeWidth={3.5} strokeLinecap="round" />;
+              })}
+              {Array.from({ length: 5 }).map((_, i) => {
+                const a = (i / 5) * Math.PI * 2 + 0.4, rr = 46;
+                return <circle key={`s${i}`} cx={Math.cos(a) * rr} cy={Math.sin(a) * rr} r={4.5} fill="#ff5d97" />;
+              })}
+            </svg>
+            <span className={styles.tallyNum}>{chumsCollected}</span>
+            <span className={styles.tallyPlusOne} aria-hidden="true">+1</span>
+          </div>
+        </div>
+      )}
       {/* The chum's own family tree, drawn the way the MAIN PIT draws one: no
           circular flag. That single flag is what carries the rectangular card,
           the name pill under it, the green Collect button, the flight into the
