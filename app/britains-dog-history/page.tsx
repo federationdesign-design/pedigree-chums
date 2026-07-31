@@ -7,6 +7,7 @@ import Triangles, { type Tri } from "../../components/Parallax/Triangles";
 import ParallaxShape from "../../components/Parallax/ParallaxShape";
 import Announce from "../../components/Announce/Announce";
 import BreedStrip from "./BreedStrip";
+import HistoryCarousel from "../britains-dog-history-2/HistoryCarousel";
 import styles from "./history.module.css";
 
 const pageTriangles: Tri[] = [
@@ -261,6 +262,10 @@ export default function HistoryPage() {
     <>
       <Nav />
       <main className={styles.page}>
+        {/* Desktop layout (v1): floating glow panels and breed strips. Hidden
+            on phones, where the carousel below takes over. Only two viewports
+            meet at the 721px seam, so nothing renders between them. */}
+        <div className={styles.desktopView}>
         <section className={styles.hero} aria-label="Britain's dog history">
           <div className={styles.heroImg} aria-hidden="true" />
           <div className={styles.heroTint} aria-hidden="true" />
@@ -354,8 +359,21 @@ export default function HistoryPage() {
             that vary by source.
           </p>
         </section>
+        </div>
+
+        {/* Mobile layout (v2): the horizontal carousel, the same component the
+            /britains-dog-history-2 route renders. Hidden above 720px. */}
+        <div className={styles.mobileView}>
+          <HistoryCarousel />
+        </div>
       </main>
-      <Footer />
+      {/* Footer holder: taken out of the layout under 721px so the carousel's
+          100dvh wrap is the only thing below the fixed Nav. Otherwise the footer
+          adds height, the document becomes a second vertical scroller, and a
+          drag inside the dog run chains out to it. */}
+      <div className={styles.footerHolder}>
+        <Footer />
+      </div>
     </>
   );
 }

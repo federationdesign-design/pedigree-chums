@@ -7,6 +7,35 @@
   overflow: hidden;
 }
 
+/* ---- Merged page: two viewports meet at the 721px seam ----
+   Above 720px the v1 desktop grid shows and the carousel is hidden. At 720px
+   and below the carousel shows, and the desktop grid AND the footer are taken
+   out of the layout so the carousel's 100dvh wrap is the only thing in flow
+   below the fixed Nav. If the footer stayed, the document would become a second
+   vertical scroller and a drag inside the dog run would chain out to it, the
+   exact bug .footerOff fixes on /britains-dog-history-2.
+   Only these two states exist: there is no third viewport between them. */
+.desktopView {
+  display: block;
+}
+.mobileView {
+  display: none;
+}
+.footerHolder {
+  display: block;
+}
+@media (max-width: 720px) {
+  .desktopView {
+    display: none;
+  }
+  .mobileView {
+    display: block;
+  }
+  .footerHolder {
+    display: none;
+  }
+}
+
 /* full-bleed hero banner, like the homepage hero: a cover image with a soft
    tint and drifting parallax triangles. The global fixed Nav sits over it and
    fades its logo in on scroll, so no logo logic is needed here. */
