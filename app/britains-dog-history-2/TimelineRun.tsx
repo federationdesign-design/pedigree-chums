@@ -224,7 +224,7 @@ export default function TimelineRun({
      lining up with the letters it is meant to sit behind. */
   const countLockup = (
     <>
-      <span className={styles.eraCountCol}>
+      <span className={`${styles.eraCountCol} ${styles.eraCountSmall}`}>
         <span className={styles.eraCountNum}>{playable}</span>
         <span className={styles.eraCountWord}>Playable</span>
       </span>

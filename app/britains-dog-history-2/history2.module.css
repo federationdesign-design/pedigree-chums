@@ -739,6 +739,12 @@
   z-index: 2;
   pointer-events: none;
   display: block;
+  /* THE TWO SIZES, ONCE. Both figures read from these, and the smaller column
+     just changes the scale, so the ratio between them is one number rather than
+     a second set of clamps to keep in step. */
+  --era-num: clamp(3.4rem, 18vw, 5rem);
+  --era-word: clamp(1.1rem, 6vw, 1.6rem);
+  --era-scale: 1;
 }
 
 /* Two figures side by side, split by a slash. Baseline alignment, so the two
@@ -760,7 +766,13 @@
 }
 .eraCountSlash {
   font-family: var(--font-display), system-ui, sans-serif;
-  font-size: clamp(2.2rem, 11vw, 3.2rem);
+  /* Belongs to the smaller half, so it takes the same 0.75. */
+  font-size: calc(clamp(2.2rem, 11vw, 3.2rem) * 0.75);
+}
+/* A quarter smaller: the playable figure is the qualifier, the total is the
+   headline. */
+.eraCountSmall {
+  --era-scale: 0.75;
 }
 
 /* The white behind. Fill AND stroke are white, so this copy is a fattened
@@ -801,11 +813,11 @@
 }
 
 .eraCountNum {
-  font-size: clamp(3.4rem, 18vw, 5rem);
+  font-size: calc(var(--era-num) * var(--era-scale));
 }
 
 .eraCountWord {
-  font-size: clamp(1.1rem, 6vw, 1.6rem);
+  font-size: calc(var(--era-word) * var(--era-scale));
 }
 
 @keyframes pcDotIn {
