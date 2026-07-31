@@ -2,6 +2,7 @@
 import { useEffect, useRef } from "react";
 import Link from "next/link";
 import styles from "./Nav.module.css";
+import useInViewPlay from "./useInViewPlay";
 
 // A background video tile. loop controls whether it repeats; reverseOnHover
 // plays the clip backwards while the pointer is over it (forward again on leave).
@@ -33,10 +34,9 @@ export default function VideoTile({
   const reversingRef = useRef(false);
   const lastTsRef = useRef(0);
 
-  useEffect(() => {
-    vref.current?.play().catch(() => {});
-    return () => cancelAnimationFrame(rafRef.current);
-  }, []);
+  // Plays when the tile is actually on screen, not the moment the menu opens.
+  useInViewPlay(vref);
+  useEffect(() => () => cancelAnimationFrame(rafRef.current), []);
 
   const step = (ts: number) => {
     const v = vref.current;
@@ -75,7 +75,10 @@ export default function VideoTile({
       onMouseLeave={handleLeave}
     >
       <span className={styles.tileImg} aria-hidden>
-        <video ref={vref} className={styles.tileImgTag} src={src} muted playsInline loop={loop} autoPlay preload="auto" />
+        {/* No autoplay attribute: it fetches the whole file whatever preload
+            says. The hook above starts it when the tile is seen. metadata keeps
+            the first frame, so an unplayed tile is a still, not a blank. */}
+        <video ref={vref} className={styles.tileImgTag} src={src} muted playsInline loop={loop} preload="metadata" />
       </span>
       <span className={styles.tileMeta}>
         <span className={styles.tileLabel}>

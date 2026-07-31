@@ -77,7 +77,12 @@ export const SECTIONS: Section[] = [
       { text: "One of the first books written in English, 'The Master of Game' from around 1406, was a guide to hunting hounds and their care.", image: "/history/master-of-the-game.jpg" },
     ],
     image: "/history/medieveal-dogs.jpg",
-    video: "/history/medieval-tudor-opt.mp4",
+    /* The scroll-scrubbed video is off. It was 9MB, and every frame of it had
+       to be a keyframe for the scrub to track, so it could never be made small.
+       The still it falls back to is the image it already used as its poster,
+       so the first frame on screen is unchanged.
+       ScrubVideo and the `video` field both stay: putting it back is this one
+       line. */
     imageAlt: "Medieval hunting hounds and a Tudor lapdog",
   },
   {
