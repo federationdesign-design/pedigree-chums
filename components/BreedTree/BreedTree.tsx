@@ -1635,7 +1635,7 @@ export default function BreedTree({
   const [pillList, setPillList] = useState<{ lines: string[]; w: number; h: number; rx: number }[]>([]);
   const [deadPills, setDeadPills] = useState<Set<number>>(new Set());
   const [toyList, setToyList] = useState<{ kind: ToyKind; size: number; h: number; src: string; filter?: string }[]>([]);
-  const [chumList, setChumList] = useState<{ image: string; size: number }[]>([]);
+  const [chumList, setChumList] = useState<{ image: string; size: number; name: string }[]>([]);
   const [deadToys, setDeadToys] = useState<Set<number>>(new Set());
   const [britainOpen, setBritainOpen] = useState(false);
   const killToyRef = useRef<((idx: number) => void) | null>(null);
@@ -1739,7 +1739,30 @@ export default function BreedTree({
   const chumBodiesRef = useRef<any[]>([]);
   // Filled by an effect below. The spawn runs several seconds after the drop,
   // so it is always populated by the time it is read.
-  const chumImagesRef = useRef<{ image: string; band: string }[]>([]);
+  const chumImagesRef = useRef<{ image: string; band: string; name: string }[]>([]);
+  /* DOUBLE TAP ON A FLOOD CARD, ON ITS OWN AND NOWHERE NEAR THE SHARED RULE.
+
+     Every other object in the pit is judged by one rule: press, and if the
+     finger stays still and lifts quickly it was a tap, otherwise a drag. Adding
+     "is a second tap coming" to that rule would put a wait on EVERY tap in the
+     pit, including opening a dog circle, and would make a slow drag start
+     reading as a tap.
+
+     So the cards keep their own count instead. Nothing above knows about it,
+     the shared rule is not touched, and the worst case if this is wrong is that
+     a card does not collect. */
+  const chumTapRef = useRef<{ i: number; t: number; x: number; y: number } | null>(null);
+  /* Takes a body out of the physics world. The world itself only exists inside
+     the sim effect, so the handler outside cannot reach it directly. This is
+     the same pattern killToyRef and spawnBadgeRef already use. */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const removeChumBodyRef = useRef<((mb: any) => void) | null>(null);
+  // Two taps within this, each landing near the last, is a double.
+  const CHUM_DBL_MS = 340;
+  const CHUM_DBL_PX = 24;
+  // Cards taken out of the flood, by index, so the card can go the instant it
+  // is collected rather than waiting for the level list to be rebuilt.
+  const [chumGone, setChumGone] = useState<Set<number>>(new Set());
   // The cookie panel's two answers. They are pit objects, not UI: they squeeze
   // out of the panel, tumble, can be dragged and barge like anything else.
   const btnBodiesRef = useRef<PropBody[]>([]);
@@ -3096,7 +3119,7 @@ export default function BreedTree({
         // their ratios instead of being flattened by the ceiling.
         const diaMed = Math.max(CHUM_MIN, Math.min(CHUM_MAX, vw * CHUM_VW));
         const stageTopPx = st ? st.getBoundingClientRect().top : 0;
-        imgs.forEach(({ image, band }, i) => {
+        imgs.forEach(({ image, band, name: chumName }, i) => {
           const dia = diaMed * (CHUM_BAND[band] ?? 1);
           const r = dia / 2;
           toyTimers.push(window.setTimeout(() => {
@@ -3118,7 +3141,7 @@ export default function BreedTree({
             pr.mb = mb;
             Composite.add(world, mb);
             chumBodiesRef.current.push(pr);
-            setChumList((l) => [...l, { image, size: dia * fxScale }]);
+            setChumList((l) => [...l, { image, size: dia * fxScale, name: chumName }]);
             wake();
           }, i * CHUM_STAGGER));
         });
@@ -3338,6 +3361,7 @@ export default function BreedTree({
           killProp(pr, "toy", performance.now());
         }
       };
+      removeChumBodyRef.current = (mb) => { Composite.remove(world, mb); };
       killToyRef.current = (idx: number) => {
         const pr = toyBodiesRef.current[idx];
         if (pr && !pr.dead) killProp(pr, "toy", performance.now());
@@ -4336,6 +4360,8 @@ export default function BreedTree({
         for (const t of ghostTimers) window.clearTimeout(t);
         chumBodiesRef.current = [];
         setChumList([]);
+        // Indices are per flood, so a new one must not inherit the old holes.
+        setChumGone(new Set());
         Composite.clear(engine.world, false);
         Engine.clear(engine);
       };
@@ -4542,10 +4568,14 @@ export default function BreedTree({
   // lists; the rail follows nested circles, so now it actually is.
   const levelChums = useMemo(() => {
     const names = [...new Set(nodes.filter((n) => n.depth > 0).map((n) => n.data.name))];
-    if (!names.length) return [] as { image: string; band: string }[];
+    if (!names.length) return [] as { image: string; band: string; name: string }[];
     return descendantPackBreeds(names)
       .filter((b) => !!b.image && !collectedChums?.has(b.name))
-      .map((b) => ({ image: b.image, band: b.sizeBand as string }));
+      // The NAME rides along now. It was dropped here, which is why a card in
+      // the flood could not say what it was when it was collected. The tally is
+      // keyed by name and the filter above already reads it, so it was the one
+      // piece missing between a card on the floor and a chum in the set.
+      .map((b) => ({ image: b.image, band: b.sizeBand as string, name: b.name }));
   }, [nodes, collectedChums]);
   useEffect(() => { chumImagesRef.current = levelChums; }, [levelChums]);
   // That dog's ancestry breakdown, the same figures as its own page.
@@ -5204,15 +5234,46 @@ export default function BreedTree({
           </g>
           {/* The chum flood. pointerEvents none on the whole group, so none of
               them can be grabbed, tapped or opened: they are scenery. */}
-          <g ref={chumsGRef} style={{ display: dockAside ? "inline" : "none", pointerEvents: "none" }}>
+          {/* THE FLOOD IS NO LONGER SCENERY. The group used to carry
+              pointerEvents none so nothing here could be touched at all. The
+              cards now take a double tap to collect, and only that: they are
+              still not draggable and they still do not open anything, so the
+              pit's own press-and-move rule is untouched by them. */}
+          <g ref={chumsGRef} style={{ display: dockAside ? "inline" : "none" }}>
             {chumList.map((cm, i2) => {
               const pr = chumBodiesRef.current[i2];
               const v2 = viewRef.current;
               const kk2 = SIZE / v2[2];
               const half = cm.size / 2;
               const rx = cm.size * 0.22;
+              if (chumGone.has(i2)) return null;
               return (
-                <g key={i2} transform={pr ? `translate(${(pr.x - v2[0]) * kk2},${(pr.y - v2[1]) * kk2}) rotate(${pr.a * 57.2958})` : undefined}>
+                <g key={i2} transform={pr ? `translate(${(pr.x - v2[0]) * kk2},${(pr.y - v2[1]) * kk2}) rotate(${pr.a * 57.2958})` : undefined}
+                  style={{ cursor: "pointer" }}
+                  onPointerDown={(e) => {
+                    // Its own gesture, its own bookkeeping. Nothing here calls
+                    // startDrag, so the card cannot be dragged and cannot take
+                    // a press away from anything that can.
+                    e.stopPropagation();
+                    const now = performance.now();
+                    const last = chumTapRef.current;
+                    const near = !!last
+                      && last.i === i2
+                      && now - last.t < CHUM_DBL_MS
+                      && Math.hypot(e.clientX - last.x, e.clientY - last.y) < CHUM_DBL_PX;
+                    if (!near) {
+                      chumTapRef.current = { i: i2, t: now, x: e.clientX, y: e.clientY };
+                      return;
+                    }
+                    chumTapRef.current = null;
+                    // Out of the physics world first, so nothing can knock a
+                    // card that is already on its way to being collected.
+                    const b = chumBodiesRef.current[i2];
+                    if (b?.mb) { try { removeChumBodyRef.current?.(b.mb); } catch { /* already gone */ } }
+                    setChumGone((g) => (g.has(i2) ? g : new Set(g).add(i2)));
+                    onChumCollected?.(cm.name);
+                  }}
+                >
                   <clipPath id={`bt-chum-${i2}`}>
                     <rect x={-half} y={-half} width={cm.size} height={cm.size} rx={rx} />
                   </clipPath>
