@@ -3174,8 +3174,11 @@ export default function BreedTree({
           : kind === "bone" ? { restitution: 0.3, friction: 0.3, frictionAir: 0.012, density: 0.0008 }
           // A rolled newspaper and a wooden-soled shoe land dead and stay put.
           // The fork is lighter and skitters a little, so it keeps some bounce.
-          : kind === "newspaper" ? { restitution: 0.16, friction: 0.6, frictionStatic: 1.0, frictionAir: 0.008, density: 0.004 }
-          : kind === "shoe" ? { restitution: 0.14, friction: 0.7, frictionStatic: 1.1, frictionAir: 0.008, density: 0.008 }
+          // Newspaper halved to 0.002 and shoe doubled to 0.016: rolled paper
+          // should be light enough to be shoved about, a wooden-soled shoe
+          // should not. They are now eight times apart rather than two.
+          : kind === "newspaper" ? { restitution: 0.16, friction: 0.6, frictionStatic: 1.0, frictionAir: 0.008, density: 0.002 }
+          : kind === "shoe" ? { restitution: 0.14, friction: 0.7, frictionStatic: 1.1, frictionAir: 0.008, density: 0.016 }
           : kind === "fork" ? { restitution: 0.32, friction: 0.4, frictionAir: 0.005, density: 0.003 }
           : { restitution: 0.5, friction: 0.3, frictionAir: 0.004, density: 0.006 };
         // A long thin body needs a real rectangle or it spins like a propeller.
