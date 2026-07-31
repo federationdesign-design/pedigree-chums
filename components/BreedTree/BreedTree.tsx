@@ -1757,15 +1757,30 @@ export default function BreedTree({
      So the cards keep their own count instead. Nothing above knows about it,
      the shared rule is not touched, and the worst case if this is wrong is that
      a card does not collect. */
-  const chumTapRef = useRef<{ i: number; t: number; x: number; y: number } | null>(null);
+  /* ARMED, THEN TAKEN. The card's edge is the state.
+
+     White at rest. One tap arms it and turns it yellow. A second tap on the
+     SAME card turns it green and collects it. Only one card is ever armed, so
+     tapping another moves the arming across rather than leaving a trail of
+     yellow behind you.
+
+     This replaces a 340ms double tap. The timing was invisible: a card had a
+     third of a second to be tapped again and nothing on screen said so. The
+     gesture is still two taps and it is still entirely the cards' own, nowhere
+     near the pit's shared press-and-move rule, which is the thing that must not
+     be touched. */
+  const [armedChum, setArmedChum] = useState<number | null>(null);
+  /* The card taken most recently. The flight itself lives in a ref, because it
+     writes the DOM directly rather than re-rendering thirty times, so the green
+     needs its own piece of state to render from. */
+  const [takenChum, setTakenChum] = useState<number | null>(null);
   /* Takes a body out of the physics world. The world itself only exists inside
      the sim effect, so the handler outside cannot reach it directly. This is
      the same pattern killToyRef and spawnBadgeRef already use. */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const removeChumBodyRef = useRef<((mb: any) => void) | null>(null);
-  // Two taps within this, each landing near the last, is a double.
-  const CHUM_DBL_MS = 340;
-  const CHUM_DBL_PX = 24;
+  // How long the green shows before the card leaves, so the state is readable.
+  const CHUM_TAKE_MS = 140;
   // Cards taken out of the flood, by index, so the card can go the instant it
   // is collected rather than waiting for the level list to be rebuilt.
   const [chumGone, setChumGone] = useState<Set<number>>(new Set());
@@ -4489,6 +4504,8 @@ export default function BreedTree({
         setChumGone(new Set());
         if (chumFlyRaf.current != null) { cancelAnimationFrame(chumFlyRaf.current); chumFlyRaf.current = null; }
         chumFlyRef.current = new Map();
+        setArmedChum(null);
+        setTakenChum(null);
         Composite.clear(engine.world, false);
         Engine.clear(engine);
       };
@@ -5390,19 +5407,13 @@ export default function BreedTree({
                     // startDrag, so the card cannot be dragged and cannot take
                     // a press away from anything that can.
                     e.stopPropagation();
-                    const now = performance.now();
-                    const last = chumTapRef.current;
-                    const near = !!last
-                      && last.i === i2
-                      && now - last.t < CHUM_DBL_MS
-                      && Math.hypot(e.clientX - last.x, e.clientY - last.y) < CHUM_DBL_PX;
-                    if (!near) {
-                      chumTapRef.current = { i: i2, t: now, x: e.clientX, y: e.clientY };
-                      return;
-                    }
-                    chumTapRef.current = null;
                     // Already on its way, so leave it alone.
                     if (chumFlyRef.current.has(i2)) return;
+                    // First tap on this card: arm it, and disarm any other.
+                    if (armedChum !== i2) { setArmedChum(i2); return; }
+                    // Second tap on the armed card: taken.
+                    setArmedChum(null);
+                    setTakenChum(i2);
                     // Out of the physics world first, so nothing can knock a
                     // card that is already on its way to being collected.
                     const b = chumBodiesRef.current[i2];
@@ -5414,7 +5425,9 @@ export default function BreedTree({
                       spin: (Math.random() < 0.5 ? -1 : 1) * (200 + Math.random() * 160),
                       tx: 0, ty: 0, got: false,
                     });
-                    if (chumFlyRaf.current == null) chumFlyRaf.current = requestAnimationFrame(stepChumFly);
+                    window.setTimeout(() => {
+                      if (chumFlyRaf.current == null) chumFlyRaf.current = requestAnimationFrame(stepChumFly);
+                    }, CHUM_TAKE_MS);
                     // Counted straight away, so the box pops and the number
                     // climbs as the card sets off, not when it lands.
                     onChumCollected?.(cm.name);
@@ -5427,12 +5440,17 @@ export default function BreedTree({
                   <rect x={-half} y={-half} width={cm.size} height={cm.size} rx={rx} style={{ fill: "#ffffff" }} />
                   <image href={encodeURI(bust(cm.image))} x={-half} y={-half} width={cm.size} height={cm.size}
                     preserveAspectRatio="xMidYMid slice" clipPath={`url(#bt-chum-${i2})`} />
-                  {/* The card's edge. White, not the yellow it used to be. Same
-                      width as before, so the card reads at the size it always
-                      did: an SVG stroke is centred on the edge, so half of it
-                      sits inside the image either way. */}
+                  {/* THE EDGE IS THE STATE. White at rest, yellow armed, green
+                      taken. An SVG stroke is centred on the edge, so half of it
+                      sits inside the image whatever colour it is: the card reads
+                      at the same size in all three. */}
                   <rect x={-half} y={-half} width={cm.size} height={cm.size} rx={rx}
-                    style={{ fill: "none", stroke: "#ffffff", strokeWidth: Math.max(2, cm.size * 0.055) }} />
+                    style={{
+                      fill: "none",
+                      stroke: takenChum === i2 ? "#22c55e" : armedChum === i2 ? "var(--yellow, #ffd23e)" : "#ffffff",
+                      strokeWidth: Math.max(2, cm.size * 0.055),
+                      transition: "stroke 0.12s ease",
+                    }} />
                 </g>
               );
             })}
