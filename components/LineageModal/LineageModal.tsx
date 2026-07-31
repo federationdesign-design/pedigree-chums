@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import BreedTree from "../BreedTree/BreedTree";
 import CookieBanner from "../CookieBanner/CookieBanner";
+import ScoreTable from "../ScoreTable/ScoreTable";
 import { BRAIN_PATH, BRAIN_ARTBOARD } from "../icons/brain";
 import type { LineageNode } from "../../data/lineage";
 import { levelThemeFor } from "../../data/levelThemes";
@@ -648,6 +649,7 @@ export default function LineageModal({ name, image, character, lineage, onClose,
                   )}
                 </div>
               )}
+              <ScoreTable score={score} dogs={3} />
               {/* ICONS, not words. Restart wears the replay mark, Learn wears the
                   pit's own brain, imported rather than copied so the two cannot
                   drift apart. Both keep the button shapes they already had, so
