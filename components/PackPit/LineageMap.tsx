@@ -169,7 +169,10 @@ export default function LineageMap({
   onClose: () => void;
   onRemove?: (name: string) => void;
   onScatter?: (data: {
-    circles: { x: number; y: number; r: number; share: number; name: string }[];
+    /* `green` says this node had been placed in a frame, so it was drawn green
+       rather than yellow. Carried across so the chip lands in the pit wearing
+       the colour it wore a moment before. */
+    circles: { x: number; y: number; r: number; share: number; name: string; green?: boolean }[];
     rods: { x1: number; y1: number; x2: number; y2: number; lit: boolean }[];
     pills: { x: number; y: number; w: number; name: string }[];
     big?: { x: number; y: number; r: number; name: string };
@@ -849,7 +852,9 @@ export default function LineageMap({
     const shareOf = (n: Node) => Math.round((n._leaves / (n._parent as Node)._leaves) * 100);
     const circles = vis.slice(0, 60).map((n) => {
       const share = shareOf(n);
-      return { x: n._x + pan.x, y: n._y + pan.y, r: nodeR(share), share, name: n.name };
+      // Same test the node's own fill uses, so the chip cannot disagree with it.
+      const green = !!n.img && (placedImgs.has(n.img as string) || packed);
+      return { x: n._x + pan.x, y: n._y + pan.y, r: nodeR(share), share, name: n.name, green };
     });
     const rods = vis.slice(0, 70).map((n) => {
       const p = n._parent as Node;
@@ -1182,7 +1187,9 @@ export default function LineageMap({
     const shareOf = (n: Node) => Math.round((n._leaves / (n._parent as Node)._leaves) * 100);
     const circles = INSTR_NAMES.has(breed.name) ? [] : vis.slice(0, 60).map((n) => {
       const share = shareOf(n);
-      return { x: n._x + pan.x, y: n._y + pan.y, r: nodeR(share), share, name: n.name };
+      // Same test the node's own fill uses, so the chip cannot disagree with it.
+      const green = !!n.img && (placedImgs.has(n.img as string) || packed);
+      return { x: n._x + pan.x, y: n._y + pan.y, r: nodeR(share), share, name: n.name, green };
     });
     const rods = vis.slice(0, 70).map((n) => {
       const p = n._parent as Node;

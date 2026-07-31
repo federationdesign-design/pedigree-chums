@@ -1631,7 +1631,10 @@ export default function BreedTree({
   // dog leaves behind a full-size blank circle wearing its breed name instead.
   // Both ride the same bodies, hit counting and inert state: only the radius,
   // the face and the charge count differ.
-  type BadgeItem = { pct: number; r: number; label?: string; bomb?: boolean };
+  // `green` is a chip that was already learnt on the layer it came from. It
+  // keeps that colour in the pit rather than reverting to the yellow a fresh
+  // chip wears.
+  type BadgeItem = { pct: number; r: number; label?: string; bomb?: boolean; green?: boolean };
   const [badgePcts, setBadgePcts] = useState<BadgeItem[]>([]);
   // rods and name pills scattered in from the learn layer, pit-style props:
   // sizes are view units frozen at the drop; dead ones keep their slot so the
@@ -1733,7 +1736,7 @@ export default function BreedTree({
   const [learnNode, setLearnNode] = useState<Node | null>(null);
   const [learnCard, setLearnCard] = useState<{ name: string; image: string; x: number; y: number; angle: number; r: number; ring: string } | null>(null);
   const removedNodesRef = useRef<Set<Node>>(new Set());
-  const spawnBadgeRef = useRef<((x: number, y: number, r: number, pct: number, opts?: { r?: number; label?: string; charges?: number }) => void) | null>(null);
+  const spawnBadgeRef = useRef<((x: number, y: number, r: number, pct: number, opts?: { r?: number; label?: string; charges?: number; green?: boolean }) => void) | null>(null);
   const spawnRodRef = useRef<((x1: number, y1: number, x2: number, y2: number, lit: boolean) => void) | null>(null);
   const spawnPillRef = useRef<((x: number, y: number, w: number, name: string) => void) | null>(null);
   type PropBody = { x: number; y: number; vx: number; vy: number; a: number; idx: number; hits: number; maxHits: number; dead?: boolean; lastKnock?: number; mb?: any };
@@ -3652,7 +3655,7 @@ export default function BreedTree({
         sy: number,
         rPx: number,
         pctVal: number,
-        opts?: { r?: number; label?: string; charges?: number }
+        opts?: { r?: number; label?: string; charges?: number; green?: boolean }
       ) => {
         // client px in, which is the physics space itself now
         const bl = badgeBodiesRef.current;
@@ -3670,7 +3673,7 @@ export default function BreedTree({
         all.push(nb);
         const mb = mkCircle(nb, "badge", BADGE_OPTS);
         MBody.setVelocity(mb, { x: (Math.random() - 0.5) * 3, y: 3 }); // pit scatter contract, verbatim
-        setBadgePcts((l) => [...l, { pct: pctVal, r: rDraw, label: opts?.label, bomb: isBomb }]);
+        setBadgePcts((l) => [...l, { pct: pctVal, r: rDraw, label: opts?.label, bomb: isBomb, green: opts?.green }]);
         wake();
       };
 
@@ -5279,7 +5282,10 @@ export default function BreedTree({
                    measuring the ring off the level-0 screen: 5 * upp against a
                    radius of about 41 to 46 units, which is 0.19. The label
                    variant keeps the same 18% extra it always had. */
-                <circle cx={0} cy={0} r={item.r} style={{ fill: inert ? "#0c5b92" : item.label ? "#5cc4ee" : "#ffd23e", stroke: "#0a3a57", strokeWidth: item.r * (item.label ? 0.225 : 0.19) }} />
+                /* A learnt chip keeps the green it wore on the learn layer, and
+                   takes a white ring and white figure with it. Yellow chips are
+                   untouched: white on yellow would not be readable. */
+                <circle cx={0} cy={0} r={item.r} style={{ fill: inert ? "#0c5b92" : item.green ? "#22c55e" : item.label ? "#5cc4ee" : "#ffd23e", stroke: item.green ? "#ffffff" : "#0a3a57", strokeWidth: item.r * (item.label ? 0.225 : 0.19) }} />
                 )}
                 {!item.bomb && !inert && (item.label ? (
                   // solo dog circle: the breed name it wore before the round
@@ -5296,7 +5302,7 @@ export default function BreedTree({
                     );
                   })()
                 ) : (
-                  <text x={0} y={0} dominantBaseline="central" style={{ fill: "#0a3a57", fontFamily: "Montserrat, var(--font-body), system-ui, sans-serif", fontWeight: 800, fontSize: `${item.r * 0.7}px`, pointerEvents: "none", userSelect: "none" }}>
+                  <text x={0} y={0} dominantBaseline="central" style={{ fill: item.green ? "#ffffff" : "#0a3a57", fontFamily: "Montserrat, var(--font-body), system-ui, sans-serif", fontWeight: 800, fontSize: `${item.r * 0.7}px`, pointerEvents: "none", userSelect: "none" }}>
                     {`${item.pct}%`}
                   </text>
                 ))}
@@ -6205,7 +6211,19 @@ export default function BreedTree({
             // the learnt % circles, their rods and the name pill tip into the
             // pit as live objects at the very instant the layer drops them
             for (const c of data.circles ?? []) {
-              spawnBadgeRef.current?.(c.x, c.y, c.r, Math.round(c.share));
+              /* THE SIZE AND THE COLOUR IT HAD ON SCREEN.
+
+                 The radius came through as `c.r` and was thrown away: the chip
+                 was then sized by badgeRFor against the pit's badge scale, which
+                 has nothing to do with how big the node looked a moment earlier
+                 on the learn layer. That is why a 50% node the size of a coin
+                 landed in the pit the size of a plum.
+
+                 opts.r is the escape hatch that already exists for a solo dog
+                 circle bringing its own radius, so no other caller changes and
+                 the pit's own badge rule is untouched for chips that really do
+                 belong to it. */
+              spawnBadgeRef.current?.(c.x, c.y, c.r, Math.round(c.share), { r: c.r, green: c.green });
             }
             for (const rd of data.rods ?? []) {
               spawnRodRef.current?.(rd.x1, rd.y1, rd.x2, rd.y2, !!rd.lit);
