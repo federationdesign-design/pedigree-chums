@@ -395,6 +395,24 @@ function toyRetired(key: string): boolean {
 function retireToy(key: string) {
   try { sessionStorage.setItem(key, "1"); } catch { /* private mode */ }
 }
+
+/* ---- Retiring for an ERA rather than for the session ----------------------
+   The balls come back when the reader reaches a new era. Throwing one clear
+   costs you it for the rest of that era's levels and no longer, which keeps the
+   loss meaningful without spending the toy for the whole visit.
+
+   The era string is the value rather than a flag, so the check is simply "was
+   it retired in the era I am in now". Nothing has to be cleared on the way out
+   of an era: arriving somewhere else makes the old entry stop matching. */
+function toyRetiredInEra(key: string, era?: string): boolean {
+  try { return !!era && sessionStorage.getItem(key) === era; } catch { return false; }
+}
+function retireToyForEra(key: string, era?: string) {
+  try { if (era) sessionStorage.setItem(key, era); } catch { /* private mode */ }
+}
+/* The two balls, and only these, retire per era. Everything else is spent for
+   the session as it always was. */
+const ERA_SCOPED_TOYS: string[] = ["ball", "ballPink"];
 // ?toys=reset un-retires every toy on load, so a testing session does not have
 // to reach for the browser console. sessionStorage is per tab and survives a
 // reload, so once you have thrown the ball clear or read the flag's message
@@ -993,6 +1011,7 @@ export default function BreedTree({
   onPitFull,
   rootNote,
   levelTheme = null,
+  era,
   onStartedChange,
   onLearningChange,
   onRelativeTap,
@@ -1040,6 +1059,9 @@ export default function BreedTree({
   onPitFull?: () => void;
   rootNote?: string;
   levelTheme?: LevelTheme | null;
+  /* Which era this level belongs to. Used to scope a retired toy: the balls
+     come back when the reader reaches a different era. */
+  era?: string;
   onStartedChange?: (started: boolean) => void;
   onLearningChange?: (learning: boolean) => void;
   onRelativeTap?: (slug: string, name: string) => void;
@@ -3051,7 +3073,9 @@ export default function BreedTree({
       const spawnToy = (kind: ToyKind, side?: -1 | 1) => {
         // the flag never returns once its message has been read; the ball never
         // returns once the player has thrown it clear of the pit
-        if (toyRetired(TOY_GONE_KEY[kind])) return;
+        if (ERA_SCOPED_TOYS.includes(kind)
+          ? toyRetiredInEra(TOY_GONE_KEY[kind], era)
+          : toyRetired(TOY_GONE_KEY[kind])) return;
         // answered once, gone for good, so the pit never nags
         if (kind === "cookies" && cookieConsentGiven()) return;
         const isNarrow = window.matchMedia("(max-width: 768px)").matches;
@@ -3243,11 +3267,12 @@ export default function BreedTree({
             const spent = pinkThrows() + 1;
             setPinkThrows(spent);
             killProp(pr, "toy", performance.now());
-            if (spent >= BALL_PINK_LIVES) retireToy(TOY_BALL_PINK_GONE_KEY);
+            if (spent >= BALL_PINK_LIVES) retireToyForEra(TOY_BALL_PINK_GONE_KEY, era);
             else toyTimers.push(window.setTimeout(() => spawnToy("ballPink"), BALL_PINK_BACK));
             return;
           }
-          retireToy(TOY_GONE_KEY[pr.toyKind as ToyKind]);
+          if (ERA_SCOPED_TOYS.includes(pr.toyKind)) retireToyForEra(TOY_GONE_KEY[pr.toyKind as ToyKind], era);
+          else retireToy(TOY_GONE_KEY[pr.toyKind as ToyKind]);
           killProp(pr, "toy", performance.now());
         }
       };

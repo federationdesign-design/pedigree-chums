@@ -259,6 +259,9 @@ export default function LineageModal({ name, image, character, lineage, onClose,
       <div className={css.stageArea}>
         <BreedTree
           key={runKey}
+          /* The pit needs the era by name as well as by theme: a thrown ball is
+             retired for this era and returns in the next one. */
+          era={era}
           root={lineage}
           rootImage={image}
           centred
