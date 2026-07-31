@@ -467,6 +467,41 @@
 .winDoneLine {
   display: block;
 }
+/* The top right column: the banner, and the round's chum rate under it. The
+   column hugs the right edge; the rate's own three lines are left aligned with
+   each other, which is what was asked for.
+   Sizes are half the game over screen's 20/40/10. At full size a 40pt figure in
+   this corner outweighs ROUND WON underneath it. Three numbers if you want them
+   back up. */
+.winTopRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+.winRate {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  line-height: 1;
+}
+.winRateTitle {
+  font-size: 10pt;
+  color: #ffffff;
+}
+.winRateValue {
+  font-size: 20pt;
+  color: var(--yellow, #ffd23e);
+}
+.winRateDetail {
+  margin-top: 3px;
+  font-family: var(--font-body, Montserrat, system-ui);
+  font-weight: 700;
+  font-size: 8pt;
+  color: #ffffff;
+}
 .winBanner {
   font-family: var(--font-display, "Luckiest Guy", system-ui);
   font-size: clamp(1rem, 3.4vw, 1.7rem);

@@ -536,7 +536,25 @@ export default function LineageModal({ name, image, character, lineage, onClose,
                     ))}
                   </span>
                 </span>
-                <span className={css.winBanner}>Ancestor discovered</span>
+                <span className={css.winTopRight}>
+                  <span className={css.winBanner}>Ancestor discovered</span>
+                  {/* THE RATE, under the banner. Shown whenever the level had
+                      chums in it, INCLUDING a round where none were caught: nought
+                      per cent is a rate, and hiding it is why you could not find
+                      it on a round where you caught nothing. */}
+                  {packSize > 0 && (
+                    <span className={css.winRate}>
+                      <span className={css.winRateTitle}>Chum rate:</span>
+                      <span className={css.winRateValue}>
+                        {Math.min(100, Math.round((collectedChums.size / packSize) * 100))}%
+                      </span>
+                      <span className={css.winRateDetail}>
+                        {collectedChums.size} found from potentially{" "}
+                        {Math.max(packSize, collectedChums.size)} chums
+                      </span>
+                    </span>
+                  )}
+                </span>
               </div>
               <div className={css.winScore}>Your Round Score: {score.toLocaleString()}</div>
               {/* The chums taken out of this level. The set already exists and
@@ -572,14 +590,6 @@ export default function LineageModal({ name, image, character, lineage, onClose,
                   screen without a hand-worked offset chasing the button's own
                   clamps. */}
               <div className={css.winFoot}>
-                {collectedChums.size > 0 && (
-                  <div className={css.winChums}>
-                    Chums collected: {collectedChums.size}
-                    {packSize > 0
-                      ? ` of ${Math.max(packSize, collectedChums.size)} (${Math.min(100, Math.round((collectedChums.size / packSize) * 100))}%)`
-                      : ""}
-                  </div>
-                )}
                 {goReady && (nextLevelLabel && onNextLevel ? (
                   <button type="button" className={`${css.endBtnGo} ${css.winGo}`} onClick={onNextLevel}>Next Level</button>
                 ) : (
