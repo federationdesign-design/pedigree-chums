@@ -1777,6 +1777,18 @@ export default function BreedTree({
      under pan and zoom. */
   const CHUM_FLY_MS = 520;
   const tallyRef = useRef<HTMLDivElement>(null);
+  /* THE CORNER IS A FLASH, NOT A FIXTURE. The box and the number show for one
+     collect, fade, and leave. The next double tap brings them back with the new
+     total. Counted up per collect rather than read off the count itself, so two
+     cards taken in quick succession each get their own showing. */
+  const CORNER_HOLD_MS = 1600;
+  const [cornerShot, setCornerShot] = useState(0);
+  const cornerTimerRef = useRef<number | null>(null);
+  const flashCorner = () => {
+    if (cornerTimerRef.current != null) window.clearTimeout(cornerTimerRef.current);
+    setCornerShot((n) => n + 1);
+    cornerTimerRef.current = window.setTimeout(() => { setCornerShot(0); cornerTimerRef.current = null; }, CORNER_HOLD_MS);
+  };
   const chumFlyRef = useRef<Map<number, { t0: number; spin: number; tx: number; ty: number; got: boolean }>>(new Map());
   const chumFlyRaf = useRef<number | null>(null);
   const chumFlyTarget = () => {
@@ -1791,7 +1803,11 @@ export default function BreedTree({
     const cx = r ? r.left + r.width * 0.3 : 60;
     const cy = r ? r.bottom - r.height * 0.3 : window.innerHeight - 60;
     const inv = ctm.inverse();
-    return { x: inv.a * cx + inv.c * cy + inv.e, y: inv.b * cx + inv.d * cy + inv.f };
+    // `real` says the tally was actually on screen to measure. The first collect
+    // mounts it in the same render that starts the flight, so the first frame
+    // can arrive a beat early; the caller waits rather than locking on to the
+    // fallback corner.
+    return { x: inv.a * cx + inv.c * cy + inv.e, y: inv.b * cx + inv.d * cy + inv.f, real: !!r };
   };
   const stepChumFly = (now: number) => {
     const m = chumFlyRef.current;
@@ -1803,11 +1819,13 @@ export default function BreedTree({
     const kk2 = SIZE / v2[2];
     const landed: number[] = [];
     m.forEach((f, i) => {
-      if (tgt && !f.got) { f.tx = tgt.x; f.ty = tgt.y; f.got = true; }
       const pr = chumBodiesRef.current[i];
       const el = gg.children[i] as SVGGElement | undefined;
       if (!pr || !el) { landed.push(i); return; }
       const t = Math.min(1, (now - f.t0) / CHUM_FLY_MS);
+      // Locked once, so the card flies a smooth arc instead of chasing a target
+      // that moves as the number grows a digit.
+      if (tgt && !f.got && (tgt.real || t > 0.25)) { f.tx = tgt.x; f.ty = tgt.y; f.got = true; }
       // Its body is out of the world, so this start point is frozen. The view
       // is read fresh, so a zoom mid-flight moves the card with everything else.
       const sx = (pr.x - v2[0]) * kk2, sy = (pr.y - v2[1]) * kk2;
@@ -1828,7 +1846,10 @@ export default function BreedTree({
     chumFlyRaf.current = m.size ? requestAnimationFrame(stepChumFly) : null;
   };
   // The loop owns a frame handle, so it has to be given back on unmount.
-  useEffect(() => () => { if (chumFlyRaf.current != null) cancelAnimationFrame(chumFlyRaf.current); }, []);
+  useEffect(() => () => {
+    if (chumFlyRaf.current != null) cancelAnimationFrame(chumFlyRaf.current);
+    if (cornerTimerRef.current != null) window.clearTimeout(cornerTimerRef.current);
+  }, []);
   // The cookie panel's two answers. They are pit objects, not UI: they squeeze
   // out of the panel, tumble, can be dragged and barge like anything else.
   const btnBodiesRef = useRef<PropBody[]>([]);
@@ -5362,8 +5383,9 @@ export default function BreedTree({
                     });
                     if (chumFlyRaf.current == null) chumFlyRaf.current = requestAnimationFrame(stepChumFly);
                     // Counted straight away, so the box pops and the number
-                    // climbs as the card sets off, the way the main pit does it.
+                    // climbs as the card sets off, not when it lands.
                     onChumCollected?.(cm.name);
+                    flashCorner();
                   }}
                 >
                   <clipPath id={`bt-chum-${i2}`}>
@@ -6049,14 +6071,14 @@ export default function BreedTree({
           opens the My Chums dock. A tappable thing sat over the pit floor could
           take a press from an object underneath it, which is not a trade worth
           making for a number. Shown in the pit only, not in the learn area. */}
-      {dockAside && dropped && chumsCollected > 0 && (
+      {dockAside && dropped && cornerShot > 0 && chumsCollected > 0 && (
         // eslint-disable-next-line @next/next/no-img-element -- a fixed-size decorative SVG, next/image buys nothing here
-        <img key={`chumbox-${chumsCollected}`} className={styles.cardBox} src="/card-pack-box.svg" alt="" aria-hidden="true" />
+        <img key={`chumbox-${cornerShot}`} className={styles.cardBox} src="/card-pack-box.svg" alt="" aria-hidden="true" />
       )}
-      {dockAside && dropped && chumsCollected > 0 && (
+      {dockAside && dropped && cornerShot > 0 && chumsCollected > 0 && (
         <div
           ref={tallyRef}
-          key={`chumtally-${chumsCollected}`}
+          key={`chumtally-${cornerShot}`}
           className={styles.tally}
           aria-live="polite"
           aria-label={`${chumsCollected} chums collected`}

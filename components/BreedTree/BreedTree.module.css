@@ -1337,7 +1337,7 @@
   z-index: 40;
   pointer-events: none;
   transform-origin: 50% 100%;
-  animation: btCardBoxPop 0.7s ease-in-out 0.2s both;
+  animation: btCardBoxPop 0.7s ease-in-out 0.2s both, btCornerGo 0.35s ease-in 1.25s forwards;
   filter: drop-shadow(0 10px 16px rgba(10, 58, 87, 0.35));
 }
 @keyframes btCardBoxPop {
@@ -1362,6 +1362,14 @@
   display: grid;
   place-items: end start; /* number sits on the bottom edge, level with the buttons */
   pointer-events: none;
+  animation: btCornerGo 0.35s ease-in 1.25s forwards;
+}
+/* The corner shows for one collect and goes. Opacity only: the box is already
+   running a transform animation and a second one on the same property would
+   fight it. */
+@keyframes btCornerGo {
+  from { opacity: 1; }
+  to { opacity: 0; }
 }
 .tallyBurst {
   position: absolute;
