@@ -5,6 +5,7 @@ import { SECTIONS } from "./sections";
 import { ERA_INTRO } from "../../data/eraIntros";
 import ScrubVideo from "./ScrubVideo";
 import TimelineRun from "./TimelineRun";
+import IntroButtons from "./IntroButtons";
 import styles from "./history2.module.css";
 
 export const metadata: Metadata = {
@@ -111,6 +112,11 @@ const LAID_OUT = (() => {
   });
 })();
 
+/* The slide straight after the intro, which is where the blue button goes.
+   Read out of the laid-out sequence rather than typed as 1, so inserting a
+   slide ahead of it cannot leave the button pointing at the wrong screen. */
+const NEXT_PANEL = LAID_OUT.find((l) => l.entry.type !== "intro")?.first ?? 1;
+
 export default function HistoryV2Page() {
   return (
     <>
@@ -140,9 +146,7 @@ export default function HistoryV2Page() {
                     story of how they went from tools and outcasts to the treasured
                     companions ruling our sofas today.
                   </p>
-                  <button type="button" id="intro-next-btn" className={styles.introBtn}>
-                    Go to first dog
-                  </button>
+                  <IntroButtons nextPanel={NEXT_PANEL} />
                 </div>
               </div>
             </div>
@@ -379,7 +383,15 @@ export default function HistoryV2Page() {
              even if its node is re-created after this script has run. */
           document.addEventListener('click', function(e){
             var t = e.target;
-            if (t && t.closest && t.closest('#intro-next-btn')) goTo(1);
+            if (!t || !t.closest) return;
+            if (t.closest('#intro-next-btn')) { goTo(1); return; }
+            /* Any button carrying a target index scrolls to it. The index is
+               worked out from the laid-out sequence, not typed in here. */
+            var g = t.closest('[data-goto]');
+            if (g) {
+              var n = parseInt(g.getAttribute('data-goto'), 10);
+              if (!isNaN(n)) goTo(n);
+            }
           });
 
           /* Continuous vertical drag -> horizontal movement.

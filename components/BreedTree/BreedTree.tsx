@@ -5394,6 +5394,12 @@ export default function BreedTree({
                   <rect x={-half} y={-half} width={cm.size} height={cm.size} rx={rx} style={{ fill: "#ffffff" }} />
                   <image href={encodeURI(bust(cm.image))} x={-half} y={-half} width={cm.size} height={cm.size}
                     preserveAspectRatio="xMidYMid slice" clipPath={`url(#bt-chum-${i2})`} />
+                  {/* The card's edge. White, not the yellow it used to be. Same
+                      width as before, so the card reads at the size it always
+                      did: an SVG stroke is centred on the edge, so half of it
+                      sits inside the image either way. */}
+                  <rect x={-half} y={-half} width={cm.size} height={cm.size} rx={rx}
+                    style={{ fill: "none", stroke: "#ffffff", strokeWidth: Math.max(2, cm.size * 0.055) }} />
                 </g>
               );
             })}
