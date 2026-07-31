@@ -103,13 +103,38 @@ function actionFor(r: Turn['response']): Command | undefined {
   return undefined;
 }
 
+// Task 105: the open chat + transcript persist across page navigations in sessionStorage, so a link
+// reopens the panel intact. SAFETY (not optional): a session that has EVER entered a protected state
+// (active/aftercare) is never persisted -- a child's disclosure must not sit in sessionStorage raw.
+// Cleared on tab close (sessionStorage) and on an explicit close (the launcher removes the key).
+export const CHAT_KEY = 'pc-chat';
+function readChat(): { messages: Message[]; session: Session; dog: Dog; phase: Phase; recSessionId: string } | null {
+  try {
+    const raw = typeof window !== 'undefined' ? window.sessionStorage.getItem(CHAT_KEY) : null;
+    if (!raw) return null;
+    const s = JSON.parse(raw);
+    if (!s || !s.session || s.session.protectedState) {
+      // never restore a protected session; scrub it if one somehow landed there
+      if (typeof window !== 'undefined') window.sessionStorage.removeItem(CHAT_KEY);
+      return null;
+    }
+    return s;
+  } catch {
+    return null;
+  }
+}
+
 export default function PickAChumExperience({ onClose }: { onClose: () => void }) {
-  const sessionRef = useRef<Session | null>(null);
-  const [phase, setPhase] = useState<Phase>('selecting');
-  const [dog, setDog] = useState<Dog>('collie'); // active dog (the anchor medallion)
+  const restoredRef = useRef<ReturnType<typeof readChat> | undefined>(undefined);
+  if (restoredRef.current === undefined) restoredRef.current = readChat();
+  const restored = restoredRef.current;
+  const everProtectedRef = useRef(false); // latches once the session enters a protected state
+  const sessionRef = useRef<Session | null>(restored ? restored.session : null);
+  const [phase, setPhase] = useState<Phase>(restored ? restored.phase || 'idle' : 'selecting');
+  const [dog, setDog] = useState<Dog>(restored ? restored.dog || 'collie' : 'collie'); // active dog (the anchor medallion)
   const [swap, setSwap] = useState<Swap>('none');
   const [input, setInput] = useState('');
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<Message[]>(restored ? restored.messages || [] : []);
   const [announce, setAnnounce] = useState(''); // aria-live: whole messages, once
   const inputRef = useRef<HTMLInputElement | null>(null);
   // Task 82: messages the visitor sent while a reply was still performing. The input is never
@@ -121,7 +146,7 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
   const rafRef = useRef<number | null>(null);
   // Recorder session id: one per engine session (a dog pick / page load reset).
   // Inert in production (the turn tap has no sink there); see lib/turn-tap.ts.
-  const recSessionRef = useRef('');
+  const recSessionRef = useRef(restored ? restored.recSessionId || '' : '');
   // The active typing performance, so a tap or Enter can complete it instantly.
   const playbackRef = useRef<{ id: number; plan: TypingPlan; closed?: boolean; done: boolean } | null>(null);
 
@@ -260,14 +285,8 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
     [reducedMotion, clearTimers, after, performTheatre]
   );
 
-  // Lock background scroll for the lifetime of the open experience.
-  useEffect(() => {
-    if (typeof document === 'undefined') return;
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, []);
+  // Task 105: background scroll is NO LONGER locked -- the page beneath stays scrollable while the
+  // chat is open (the overlay is pointer-events:none). (Was: document.body.style.overflow = 'hidden'.)
 
   // Cancel any in-flight handover timers when the experience unmounts.
   useEffect(() => clearTimers, [clearTimers]);
@@ -278,8 +297,27 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
     if (el) el.scrollTop = el.scrollHeight;
   }, [messages, phase]);
 
+  // Task 105: persist the open chat on every change, UNLESS the session has entered a protected state,
+  // in which case the key is scrubbed and never written again (a child's disclosure must not persist).
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const session = sessionRef.current;
+    if (phase === 'selecting' || !session) return; // nothing to persist until a dog is picked
+    if (everProtectedRef.current || session.protectedState) {
+      everProtectedRef.current = true;
+      try {
+        window.sessionStorage.removeItem(CHAT_KEY);
+      } catch {}
+      return;
+    }
+    try {
+      window.sessionStorage.setItem(CHAT_KEY, JSON.stringify({ messages, session, dog, phase, recSessionId: recSessionRef.current }));
+    } catch {}
+  }, [messages, phase, dog]);
+
   const selectDog = useCallback((d: Dog) => {
     clearTimers();
+    everProtectedRef.current = false; // Task 105: a fresh engine session starts un-protected and persistable
     sessionRef.current = newSession(d);
     // A fresh engine session starts a fresh recorded conversation. Time-prefixed
     // so exported rows sort into conversation order.
@@ -310,6 +348,9 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
 
     const fromDog = session.activeDog;
     const result = submit(CHUM_DATA, session, text);
+    // Task 105 SAFETY: the moment a turn enters a protected state, latch it so this session is never
+    // persisted (the save effect also checks, but latch early, before the message is even added).
+    if (session.protectedState) everProtectedRef.current = true;
     const r = result.response;
     const toDog = session.activeDog; // submit applied any transfer in place
     const swapped = toDog !== fromDog; // the active dog actually changed
@@ -462,8 +503,10 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
   const anchorSwap = swap === 'out' ? styles.anchorOut : swap === 'in' ? styles.anchorIn : '';
 
   return (
-    <div className={styles.root} role="dialog" aria-label="Pick a Chum" aria-modal="true">
-      <div className={styles.wash} onClick={phase === 'selecting' ? onClose : undefined} />
+    <div className={styles.root} role="dialog" aria-label="Pick a Chum" aria-modal="false">
+      {/* Task 105: the wash dims but no longer captures clicks (pointer-events via .wash/.root), so the
+          page beneath stays usable; it no longer closes on click (X and Escape still close). */}
+      <div className={styles.wash} />
 
       {phase === 'selecting' ? (
         <div className={styles.selectorWrap}>
@@ -501,7 +544,18 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
           </div>
         </div>
       ) : (
-        <div className={styles.panel}>
+        <div
+          className={styles.panel}
+          onMouseDown={(e) => {
+            // Task 105: clicking the now-usable page blurs the input; when the visitor clicks back into
+            // a non-interactive part of the panel, keep focus in the input (else Task 82's fix is undone).
+            const t = e.target as HTMLElement;
+            if (!t.closest('button, a, input, textarea, [tabindex]')) {
+              e.preventDefault();
+              inputRef.current?.focus();
+            }
+          }}
+        >
           {/* Tap anywhere in the thread to complete an in-progress performance. */}
           <div className={styles.thread} ref={threadRef} onClick={completeTheatre}>
             <div className={styles.threadInner}>

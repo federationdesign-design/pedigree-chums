@@ -91,16 +91,25 @@
 .root {
   position: fixed;
   inset: 0;
-  /* Task 83: the open experience sits ABOVE the nav bar (z-index 300). The panel and picker now open
-     in the top-left where the logo lives; without this the nav would intercept clicks on them (the
-     logo was literally swallowing taps on the picker). The wash dims the nav too, as a modal should. */
+  /* Task 83: the open experience sits ABOVE the nav bar (z-index 300). */
   z-index: 301;
+  /* Task 105: the overlay lets clicks/scroll through to the page beneath; only the panel and picker
+     (below) opt back in. So the page stays usable while the chat is open. */
+  pointer-events: none;
 }
 .wash {
   position: absolute;
   inset: 0;
   background: var(--pc-focus-wash);
   z-index: 0;
+  /* Task 105: the dimming layer no longer captures clicks (it inherits none from .root); the page
+     underneath is clickable/scrollable. The old click-the-wash-to-close is intentionally gone -- the
+     X and Escape still close. */
+}
+.panel,
+.selectorWrap {
+  /* Task 105: re-enable interaction on the actual chat surfaces while the overlay passes clicks through. */
+  pointer-events: auto;
 }
 
 /* ---- Radial selector ----

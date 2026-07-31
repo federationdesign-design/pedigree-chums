@@ -52,6 +52,24 @@ export default function PickAChumLauncher() {
     wasOpen.current = open;
   }, [open]);
 
+  // Task 105: an open chat persists across navigation. If one was persisted (and not a protected
+  // session -- the experience never writes those), reopen it on mount. This OVERRIDES the logo rule:
+  // an open panel stays open even on a page where the launcher itself would be hidden.
+  useEffect(() => {
+    try {
+      if (window.sessionStorage.getItem('pc-chat')) setOpen(true);
+    } catch {}
+  }, []);
+
+  // Task 105: an explicit close (X / Escape) clears the persisted chat, so a deliberately-closed panel
+  // does not reopen on the next page. (Navigating with it open keeps the key and reopens it.)
+  const closeExperience = () => {
+    setOpen(false);
+    try {
+      window.sessionStorage.removeItem('pc-chat');
+    } catch {}
+  };
+
   // Watch the nav's data-pc-logo. A MutationObserver catches same-header changes
   // (scroll toggling the logo); the nav's pc:logo signal re-runs attach() so we
   // re-find and re-read the header after a client navigation (this launcher lives
@@ -128,7 +146,7 @@ export default function PickAChumLauncher() {
   return (
     <>
       {open ? (
-        <PickAChumExperience onClose={() => setOpen(false)} />
+        <PickAChumExperience onClose={closeExperience} />
       ) : (
         <button
           ref={buttonRef}
