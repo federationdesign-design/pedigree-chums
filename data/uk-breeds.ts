@@ -19,9 +19,9 @@ export type UKBreed = {
 export const ukBreeds: UKBreed[] = [
   // Ancient to medieval
   { name: "Irish Wolfhound", strip: "ancient-medieval", era: "Ancient", anchor: 100, note: "Towering ancient Irish hound, bred to hunt wolves and guard halls.", image: "/history/breeds/irish-wolfhound-photo.jpg", tag: "endangered" },
-  { name: "Mastiff", strip: "ancient-medieval", era: "Ancient", anchor: 150, note: "Britain's ancient war and guard dog, prized as far back as Roman times.", image: "/history/breeds/english-mastiff-photo.jpg", tag: "endangered" },
+  { name: "Mastiff", strip: "ancient-medieval", era: "Ancient", anchor: 150, note: "Britain's ancient war and guard dog, known since Roman times.", image: "/history/breeds/english-mastiff-photo.jpg", tag: "endangered" },
   { name: "Greyhound", strip: "ancient-medieval", era: "Ancient", anchor: 200, note: "The fastest of all dogs, a sighthound in Britain since antiquity.", image: "/history/breeds/original-greyhound.jpg", tag: "in-decline" },
-  { name: "Talbot", strip: "ancient-medieval", era: "Medieval", anchor: 1200, note: "White medieval hunting hound, ancestor of the beagle and bloodhound.", image: "/history/breeds/talbot-hound.jpg", tag: "extinct" },
+  { name: "Talbot", strip: "ancient-medieval", era: "Medieval", anchor: 1200, note: "White medieval hound, ancestor of the beagle and bloodhound.", image: "/history/breeds/talbot-hound.jpg", tag: "extinct" },
 
   { name: "Bloodhound", strip: "ancient-medieval", era: "Medieval", anchor: 1100, note: "Scent hound famed for a nose that can follow a trail days old.", image: "/history/breeds/Medieval-Bloodhound.jpg", tag: "endangered" },
   { name: "Scottish Deerhound", strip: "ancient-medieval", era: "Medieval", anchor: 1150, note: "Tall, rough-coated Highland hound bred to course red deer.", image: "/history/breeds/Medieval-Scottish-Deerhound.jpg", tag: "endangered" },
@@ -31,7 +31,7 @@ export const ukBreeds: UKBreed[] = [
   { name: "Skye Terrier", strip: "c1500", era: "1500s", anchor: 1560, note: "Long-bodied, long-coated terrier from Scotland's Isle of Skye.", image: "/history/breeds/skye-terrier-photo.webp", tag: "endangered" },
   { name: "English Foxhound", strip: "c1500", era: "1500s", anchor: 1570, note: "Pack hound bred on great estates for the fox hunt.", image: "/history/breeds/english-foxhound.jpg", tag: "in-decline" },
   { name: "Otterhound", strip: "c1500", era: "1500s", anchor: 1575, note: "Web-footed otter-hunting hound, now the rarest native breed.", image: "/history/breeds/otterhound-photo.jpg", tag: "endangered" },
-  { name: "Turnspit Dog", strip: "c1500", era: "c. 1576", anchor: 1576, note: "Short-legged dog bred to run inside a wheel and turn the roasting spit.", image: "/history/breeds/Turnspitdog-drawing-remake.jpg", tag: "extinct" },
+  { name: "Turnspit Dog", strip: "c1500", era: "c. 1576", anchor: 1576, note: "Short-legged dog bred to run in a wheel and turn the spit.", image: "/history/breeds/Turnspitdog-drawing-remake.jpg", tag: "extinct" },
   { name: "Staghound", strip: "c1500", era: "1600s", anchor: 1650, note: "English pack hound used to hunt red deer.", image: "/history/breeds/staghound.jpg", tag: "extinct" },
 
   // The 1700s
@@ -42,7 +42,7 @@ export const ukBreeds: UKBreed[] = [
   { name: "English Setter", strip: "c1700", era: "1700s", anchor: 1730, note: "Feathered bird dog that 'sets' low before the gun.", image: "/history/breeds/english_setter-photo.jpg", tag: "endangered" },
   { name: "Dandie Dinmont Terrier", strip: "c1700", era: "1700s", anchor: 1740, note: "Distinctive terrier with a soft top-knot, from the Borders.", image: "/history/breeds/dandie-dinmont-terrier-photo.jpeg", tag: "endangered" },
   { name: "Clumber Spaniel", strip: "c1700", era: "1700s", anchor: 1750, note: "Heavy, stately gundog spaniel of the English aristocracy.", image: "/history/breeds/clumber-spaniel-photo.jpg", tag: "endangered" },
-  { name: "Cur", strip: "c1700", era: "1700s", anchor: 1760, note: "Stumpy-tailed drover's dog that nipped cattle heels and ducked the kick.", image: "/history/breeds/cur-dog.jpg", tag: "extinct" },
+  { name: "Cur", strip: "c1700", era: "1700s", anchor: 1760, note: "Stumpy-tailed drover's dog that nipped heels and ducked the kick.", image: "/history/breeds/cur-dog.jpg", tag: "extinct" },
 
   // The early 1800s
   { name: "Beagle", strip: "c1500", era: "1500s", anchor: 1555, note: "Small, merry scent hound bred to hunt rabbit and hare.", image: "/history/breeds/beagle.jpg" , tag: "popular" },
@@ -118,7 +118,7 @@ export const ukBreeds: UKBreed[] = [
   { name: "Buckhound", strip: "ancient-medieval", era: "Medieval", anchor: 1220, note: "Medieval pack hound bred to hunt the smaller fallow buck.", tag: "extinct", image: "/history/breeds/Buckhound-illustration.jpg" },
   { name: "Southern Hound", strip: "ancient-medieval", era: "Medieval", anchor: 1300, note: "Heavy, deep-voiced scent hound descended from the Talbot.", tag: "extinct", image: "/history/breeds/Southern-Hound.jpg" },
   { name: "Black and Tan Terrier", strip: "c1700", era: "1700s", anchor: 1710, note: "One of the earliest terriers, ancestor of the fell terriers.", tag: "extinct", image: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg" },
-  { name: "North Country Beagle", strip: "c1700", era: "1700s", anchor: 1720, note: "Swift northern hunting hound bred away into the modern Beagle by the early 1800s.", tag: "extinct", image: "/history/breeds/North-Country-Beagle.jpg" },
+  { name: "North Country Beagle", strip: "c1700", era: "1700s", anchor: 1720, note: "Swift northern hound, bred away into the modern Beagle by 1800.", tag: "extinct", image: "/history/breeds/North-Country-Beagle.jpg" },
   { name: "Old Welsh Grey Sheepdog", strip: "c1700", era: "1700s", anchor: 1740, note: "Shaggy grey Welsh hill herder, kin to the Bearded Collie.", tag: "extinct", image: "/history/breeds/Old-Welsh-Grey-Sheepdog.jpg" },
   { name: "Paisley Terrier", strip: "mid1800", era: "1860s", anchor: 1865, note: "Silky Scottish show terrier, forerunner of the Yorkshire Terrier.", tag: "extinct", image: "/history/breeds/Paisley-Terrier=photo.jpg" },
   { name: "Toy Trawler Spaniel", strip: "spaniels", era: "1800s", anchor: 1878, note: "Small Victorian companion spaniel bred from the King Charles.", tag: "extinct", image: "/history/breeds/Toy-Trawler-Spaniel.jpg" },
