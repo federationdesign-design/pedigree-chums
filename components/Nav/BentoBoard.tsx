@@ -1,9 +1,23 @@
 "use client";
+import { useRef } from "react";
 import Link from "next/link";
 import ChumDropTile from "./ChumDropTile";
+import useInViewPlay from "./useInViewPlay";
 import VideoTile from "./VideoTile";
 import HeroCarousel from "./HeroCarousel";
 import styles from "./Nav.module.css";
+
+/* A tile's background video. Module scope, not defined inside the render
+   function below: a component declared in there would be a new type on every
+   render and remount its video each time. */
+function FitVideo({ src }: { src: string }) {
+  const vref = useRef<HTMLVideoElement | null>(null);
+  useInViewPlay(vref);
+  /* No autoplay attribute. It fetches the whole file whatever preload says,
+     which is what made opening the menu so expensive. metadata keeps the first
+     frame, so a tile that has not played yet is a still and not a blank. */
+  return <video ref={vref} className={styles.tileImgTag} src={src} muted playsInline preload="metadata" />;
+}
 
 // ── Launcher tiles. Titles are two-tone: labelA yellow, labelB white. ──
 type TileData = { href: string; labelA: string; labelB?: string; cta: string; img?: string; emoji?: string; size?: string; video?: string; videoAspect?: string };
@@ -67,7 +81,7 @@ export default function BentoBoard({
     <Link href={t.href} className={`${styles.tile} ${styles.tileFit}`} onClick={navigate}>
       {t.video ? (
         <span className={styles.fitVideoBox} style={{ aspectRatio: t.videoAspect }} aria-hidden>
-          <video className={styles.tileImgTag} src={t.video} muted autoPlay playsInline preload="auto" />
+          <FitVideo src={t.video} />
           {revealAccent && <span className={`${styles.fitAccent} ${styles.accentReveal}`}>{t.labelA}</span>}
         </span>
       ) : (
