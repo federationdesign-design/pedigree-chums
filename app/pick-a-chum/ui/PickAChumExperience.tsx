@@ -542,12 +542,16 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
       {phase === 'selecting' ? (
         <div className={styles.selectorWrap}>
           <div className={styles.selector}>
-            <svg className={styles.connectors} viewBox="0 0 440 420" aria-hidden="true" focusable="false">
-              {/* Task 81: launcher centre is now (64,64) top-left; clean radials fan down-right. */}
-              <line className={styles.connectorLine} style={{ animationDelay: '0.15s' }} x1="64" y1="64" x2="364" y2="64" />
-              <line className={styles.connectorLine} style={{ animationDelay: '0.45s' }} x1="64" y1="64" x2="324" y2="214" />
-              <line className={styles.connectorLine} style={{ animationDelay: '0.75s' }} x1="64" y1="64" x2="214" y2="324" />
-              <line className={styles.connectorLine} style={{ animationDelay: '1.05s' }} x1="64" y1="64" x2="64" y2="364" />
+            <svg className={styles.connectors} viewBox="0 0 440 440" aria-hidden="true" focusable="false">
+              {/* Task 113: radials start at the icon's circular-body EDGE, not the anchor centre, so they
+                  no longer run under the icon. Each origin = the anchor centre (64,64) pushed out along
+                  its ray by the body radius r=26 (icon body ~=260 in the 720-wide viewBox, rendered 0.1x
+                  into the 72px anchor). viewBox is square (440) so x and y map uniformly and the far ends
+                  land on the dog centres. */}
+              <line className={styles.connectorLine} style={{ animationDelay: '0.15s' }} x1="90" y1="64" x2="364" y2="64" />
+              <line className={styles.connectorLine} style={{ animationDelay: '0.45s' }} x1="86.5" y1="77" x2="324" y2="214" />
+              <line className={styles.connectorLine} style={{ animationDelay: '0.75s' }} x1="77" y1="86.5" x2="214" y2="324" />
+              <line className={styles.connectorLine} style={{ animationDelay: '1.05s' }} x1="64" y1="90" x2="64" y2="364" />
             </svg>
             {SELECT_ORDER.map((d, i) => {
               const info = dogInfo(d);

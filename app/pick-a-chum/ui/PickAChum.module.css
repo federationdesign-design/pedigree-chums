@@ -14,6 +14,17 @@
   --pc-focus-wash: rgba(0, 169, 239, 0.7);
   --pc-dialogue: #0a5b8f;
   --pc-shadow: 4px 4px 0 rgba(17, 34, 66, 0.22);
+  /* Task 113: ONE source of truth for the anchor point. The closed launcher and
+     the open selector's centre both derive from these, so the picker spreads out
+     of the exact spot the launcher sits: the centre never jumps on open.
+       --pc-anchor-cx / --pc-anchor-cy  the launcher/anchor CENTRE in the viewport
+       --pc-anchor-size                 the launcher/anchor diameter
+       --pc-selector-scale              the picker's scale here (fan and lines scale with it)
+     cx/cy = launcher top-left (from the logo's right edge + gap) plus half the size. */
+  --pc-anchor-size: 72px;
+  --pc-anchor-cx: calc(clamp(18px, 4vw, 48px) + clamp(112px, 16vw, 150px) + 6px + 36px);
+  --pc-anchor-cy: calc(clamp(112px, 16vw, 150px) * 0.3 - 15px + 36px);
+  --pc-selector-scale: 1;
 }
 
 /* ---- Closed launcher (bottom-left, global) ----
@@ -32,12 +43,13 @@
      track the viewport) + a 16px gap, so the gap holds and never overlaps as the logo resizes. top
      tracks the logo's vertical centre, which scales with the logo (rendered height ~0.6 * width, so
      centre ~ nav-top + 0.3 * width), holding the row alignment as the logo resizes. */
-  top: calc(clamp(112px, 16vw, 150px) * 0.3 - 15px);
-  /* Task 102: nudged 10px left (gap 16px -> 6px). Size, vertical position and the from-logo-right-edge
-     anchoring are unchanged; only the horizontal gap shrinks by 10px. */
-  left: calc(clamp(18px, 4vw, 48px) + clamp(112px, 16vw, 150px) + 6px);
-  width: 72px;
-  height: 72px;
+  /* Task 113: derived from the shared anchor vars (top-left = centre minus half the size), so the
+     launcher and the selector centre can never drift apart. The from-logo-right-edge + 6px gap math
+     now lives in --pc-anchor-cx / --pc-anchor-cy above. */
+  top: calc(var(--pc-anchor-cy) - var(--pc-anchor-size) / 2);
+  left: calc(var(--pc-anchor-cx) - var(--pc-anchor-size) / 2);
+  width: var(--pc-anchor-size);
+  height: var(--pc-anchor-size);
   /* Task 74: no background fill, no white stroke, no ring — the icon carries everything. */
   border-radius: 50%;
   display: flex;
@@ -65,9 +77,12 @@
 .launcherOn:hover {
   transform: scale(1.1);
 }
+/* Task 113: the closed launcher is the icon alone. The old yellow ring read as a stray
+   artifact (it surfaced when focus returned to the button as the chat closed), so no ring
+   is drawn. NOTE: this drops the keyboard focus indicator on the closed launcher; a
+   non-ring affordance can be added back on request (see report). */
 .launcher:focus-visible {
-  outline: 3px solid var(--pc-ui-yellow);
-  outline-offset: 3px;
+  outline: none;
 }
 /* Launcher icon (Task 62): Steve's approved SVG mark, sized to the same 60% box
    the previous inline placeholder svg used, so the launcher's size and position
@@ -117,10 +132,11 @@
    fanning up and to the right from the bottom-left "pick for me" anchor. */
 .selectorWrap {
   position: absolute;
-  left: clamp(18px, 4vw, 48px);
-  /* Task 81: the picker now fans DOWN-right out of the launcher's top-left home (was bottom-left).
-     44px puts the "pick for me" anchor (box 28,28) on the launcher (top 72). */
-  top: 44px;
+  /* Task 113: place the wrap so the "pick for me" anchor's centre (selector-space 64,64, scaled)
+     lands exactly on the shared anchor centre. Same vars as the launcher, so opening the picker is
+     a pure spread from the closed launcher's centre: nothing jumps. */
+  left: calc(var(--pc-anchor-cx) - 64px * var(--pc-selector-scale));
+  top: calc(var(--pc-anchor-cy) - 64px * var(--pc-selector-scale));
   z-index: 2;
 }
 .selector {
@@ -128,6 +144,8 @@
   width: 440px;
   height: 440px;
   transform-origin: top left;
+  /* Task 113: the whole picker (centre anchor, dog fan and connector lines) scales together. */
+  transform: scale(var(--pc-selector-scale));
 }
 .connectors {
   position: absolute;
@@ -140,7 +158,8 @@
 .connectorLine {
   /* Task 104: yellow to match the icon (was white). Brand token, not a new hex. */
   stroke: var(--pc-ui-yellow);
-  stroke-width: 5;
+  /* Task 113: halved (was 5) to match the icon's stroke weight. */
+  stroke-width: 2.5;
   stroke-linecap: round;
   opacity: 0;
   animation: pcFade 240ms ease forwards;
@@ -527,21 +546,15 @@
 
 /* ---- Mobile ---- */
 @media (max-width: 480px) {
-  .launcher {
-    /* Task 83: to the right of the (smaller) mobile logo, same row, from its right edge; top tracks
-       the logo centre (constant tuned for the 60px mobile launcher). */
-    left: calc(clamp(18px, 4vw, 48px) + clamp(112px, 16vw, 150px) + 2px); /* Task 102: 10px left (was +12px) */
-    top: calc(clamp(112px, 16vw, 150px) * 0.3 - 12px);
-    width: 60px;
-    height: 60px;
-  }
-  .selectorWrap {
-    left: 16px;
-    /* Task 81: fans down-right from the mobile launcher (32 = launcher top 60 - the 28px anchor inset). */
-    top: 32px;
-  }
-  .selector {
-    transform: scale(0.72);
+  /* Task 113: mobile only re-points the shared anchor vars; the launcher AND the selector centre both
+     follow, so they stay locked together (was two hand-tuned rule sets kept in step by hand). 60px
+     launcher, +2px gap, -12px top; centre = those + 30 (half of 60). */
+  .launcher,
+  .root {
+    --pc-anchor-size: 60px;
+    --pc-anchor-cx: calc(clamp(18px, 4vw, 48px) + clamp(112px, 16vw, 150px) + 2px + 30px);
+    --pc-anchor-cy: calc(clamp(112px, 16vw, 150px) * 0.3 - 12px + 30px);
+    --pc-selector-scale: 0.72;
   }
   .panel {
     left: 16px;
