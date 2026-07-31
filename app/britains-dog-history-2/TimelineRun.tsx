@@ -315,6 +315,16 @@ export default function TimelineRun({
              starts meaning "carry on sideways", so it moves to the right edge
              and turns to face that way. */
           const isLast = bi === breeds.length - 1;
+          /* THE FLASH ONLY ANIMATES ON A CHANGE. Running the slide and pop on
+             every card made it wallpaper: seven play cards in a row all did the
+             same thing and it stopped meaning anything. It now fires only when
+             this card's badge differs from the one above it, so the movement
+             marks the moment the answer changes from "learn and play" to
+             "learn" or back.
+             The first card of a run always animates: there is nothing above it
+             to be the same as. */
+          const flashChanged = bi === 0 || breedCardKind(breeds[bi - 1].name) !== kind;
+          const flashIn = arrived[b.name] && flashChanged;
           return (
             <div key={b.name} className={styles.dogScreen}>
               {/* The rail arrives, stops at the card, and begins again below
@@ -373,7 +383,7 @@ export default function TimelineRun({
                           edges and would be sliced by that same clip. */}
                       {kind && (
                         <span
-                          className={`${styles.dogFlashWedge} ${arrived[b.name] ? styles.dogFlashWedgeIn : ""}`}
+                          className={`${styles.dogFlashWedge} ${flashIn ? styles.dogFlashWedgeIn : ""}`}
                           aria-hidden="true"
                         />
                       )}
@@ -461,7 +471,7 @@ export default function TimelineRun({
                         the card, which a layer parked on .dogCard would not. */}
                     {kind && (
                       <span
-                        className={`${styles.dogFlash} ${arrived[b.name] ? styles.dogFlashPop : ""}`}
+                        className={`${styles.dogFlash} ${flashIn ? styles.dogFlashPop : ""}`}
                         aria-hidden="true"
                       >
                         <span
