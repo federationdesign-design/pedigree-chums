@@ -845,6 +845,15 @@
   font-size: 40pt;
   color: var(--yellow, #ffd23e);
 }
+/* Half the size of the figure above it, and the only line here that is not
+   display type: it is a sentence rather than a number. */
+.endRoundDetail {
+  margin-top: 4px;
+  font-family: var(--font-body, Montserrat, system-ui);
+  font-weight: 700;
+  font-size: 20pt;
+  color: #ffffff;
+}
 /* The most caught dog of the run: square picture, name, and how many times. */
 .endTopChum {
   display: flex;

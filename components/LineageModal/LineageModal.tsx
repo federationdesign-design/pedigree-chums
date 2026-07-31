@@ -605,7 +605,10 @@ export default function LineageModal({ name, image, character, lineage, onClose,
                   <span className={css.endRoundTitle}>Chum rate:</span>
                   <span className={css.endRoundValue}>
                     {Math.min(100, Math.round((collectedChums.size / packSize) * 100))}%
-                    {" "}({collectedChums.size} from {Math.max(packSize, collectedChums.size)})
+                  </span>
+                  <span className={css.endRoundDetail}>
+                    {collectedChums.size} found from potentially{" "}
+                    {Math.max(packSize, collectedChums.size)} chums
                   </span>
                 </div>
               )}
