@@ -19,7 +19,9 @@ import PickAChumIcon from './PickAChumIcon';
 import { CHUM_DATA } from '../lib/data';
 import { submit, Turn } from '../lib/engine';
 import { newSession, Session } from '../lib/session';
-import { Dog } from '../lib/types';
+import { Dog, GameId } from '../lib/types';
+import { reportHiddenGame } from '../../../lib/hiddenGames/browserEngine';
+import type { GameId as HiddenGameId } from '../../../lib/hiddenGames/registry';
 import { openDiscountPopup } from '../data/discount-popup';
 import { skipTheatre, buildTypingPlan, TYPING_PROFILES, TypingPlan } from '../lib/theatre';
 import { emitTurn } from '../lib/turn-tap';
@@ -153,6 +155,11 @@ const PROFILE_IMG: Record<Dog, string> = {
   boxer: '/boxer-chat-profile-img2.jpg',
   terrier: '/terrier-chat-profile-img2.jpg',
 };
+
+// Task 123: each in-chat game is a Hidden Games find, awarded the moment its opening surface (the
+// board / masked word / drawing) is SERVED -- i.e. on game_start, before any move or guess. The bark
+// game is deliberately NOT here: a single "woof" is a turn, not finding a game.
+const HIDDEN_GAME_ID: Record<GameId, HiddenGameId> = { ninesquare: 'G03', missingsheep: 'G04', kennelsketch: 'G05' };
 
 export default function PickAChumExperience({ onClose }: { onClose: () => void }) {
   const restoredRef = useRef<ReturnType<typeof readChat> | undefined>(undefined);
@@ -493,6 +500,12 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
     };
     setDog(toDog);
     setMessages((m) => [...m, userMsg, dogMsg]);
+
+    // Task 123: the in-chat game qualifies as a Hidden Games find the moment its opening surface is
+    // served (game_start carries the board / masked word / drawing in gameOutput), before any move.
+    if (result.resolution.action === 'game_start' && result.resolution.game) {
+      reportHiddenGame(HIDDEN_GAME_ID[result.resolution.game]);
+    }
 
     // Bark-game break: the volley is instant (a bark action skips theatre); the
     // English line follows as a separate message after a short pause.
