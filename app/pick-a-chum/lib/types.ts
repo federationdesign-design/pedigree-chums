@@ -164,6 +164,7 @@ export type ActionType =
   | 'out_of_scope' // Task 37: a valid question on a topic the site does not cover -> the approved out-of-scope line (never the repair ladder)
   | 'grief' // Task 58: a dog bereavement (died / lost / old-unwell) -> the gentle ':(' line; below urgent safety, above the loop, never reaches the loop
   | 'canned' // Task 80: a conversational bucket (B21-B39) matched on its column-D triggers; serves the specific responseId. Sits above the non-answer zone (gk_unknown / fallback), below every real route.
+  | 'games_menu' // Task 123 fix: the B45 games menu. "are there games"/"play" serve B45-GAMELIST-01 ("Game?"); a following "yes" serves B45-GAMELIST-02 (the list). Serves the specific responseId, like canned.
   | 'price_answer' // Task 49: a price question -> FAQ008's text in chat; NOT a MEANINGFUL_TOPIC, so the safety machine holds/refuses it like buying
   | 'transfer_request' // visitor asks to switch to a different dog
   | 'anatomy_redirect' // general anatomy question (no disclosure): redirect to a safe grown-up

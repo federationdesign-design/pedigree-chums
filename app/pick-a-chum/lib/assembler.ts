@@ -250,6 +250,7 @@ export function assemble(res: Resolution, data0: ChumData, n: Normalised, sessio
       return { responseId: r?.responseId ?? 'FETCH-LINK', text, dog, destinationId: dest?.id, url: dest?.url ?? null };
     }
 
+    case 'games_menu': // Task 123 fix: B45 games menu (GAMELIST-01 question / -02 list); serves res.responseId like canned.
     case 'canned': {
       // Task 80: a conversational bucket (B21-B39) matched on its column-D triggers. Serve the
       // exact matched row's template verbatim. The faces ':(' and ':)' are non-verbal, so they get

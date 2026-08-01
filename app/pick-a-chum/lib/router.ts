@@ -485,6 +485,11 @@ const CONFIRM_YES = new Set(['yes', 'yeah', 'yep', 'yup', 'aye', 'that one', 'co
 function isConfirmYes(compact: string): boolean {
   return CONFIRM_YES.has(compact.trim());
 }
+// Task 123 fix: whole-message phrases that open the B45 games menu (serve B45-GAMELIST-01 "Game?").
+// Deliberately NARROW: bare "game" is left to the dog-led loop (correct by design) and "lets play" to
+// the bark-game offer. A following "yes" is caught by the games_menu confirmation (below) and serves
+// B45-GAMELIST-02's list, which was orphaned before this.
+const GAMES_MENU_TRIGGERS = new Set(['are there games', 'play']);
 // Route a confirmed loop subject to its destination. Mirrors the loop's offer mapping: a breed
 // title -> that breed's page; a game-family word -> the card game rules; a generic dog word -> the
 // breed hub. Returns null when the subject has no destination (the confirmation then falls through
@@ -926,6 +931,17 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
     if (trick) return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: trick };
     if (GAME_CMD.has(c)) return { layer: 13, layerName: 'Play and entertainment', bucket: 'B17', action: 'offer_bark_game' };
     if (FETCH_CMD.has(c)) return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: 'random_link' };
+  }
+
+  // Task 123 fix: the B45 games menu. Placed here (below safety/grief and the clarifier/transfer
+  // follow-ups, above the FAQ / loop / bark routes that used to swallow these phrases) so it wins.
+  // A "yes" right after the menu question serves B45-GAMELIST-02's list; because the menu action is
+  // 'games_menu' (not LOOP-01/02), pendingConfirm stays null, so the Task 68 confirm never fires here.
+  if (state.lastAction === 'games_menu' && isConfirmYes(c)) {
+    return { layer: 13, layerName: 'Play and entertainment', bucket: 'B45', action: 'games_menu', responseId: 'B45-GAMELIST-02' };
+  }
+  if (GAMES_MENU_TRIGGERS.has(c)) {
+    return { layer: 13, layerName: 'Play and entertainment', bucket: 'B45', action: 'games_menu', responseId: 'B45-GAMELIST-01' };
   }
 
   // Task 68: confirmation after a loop offer. If the previous turn served LOOP-01 or LOOP-02
