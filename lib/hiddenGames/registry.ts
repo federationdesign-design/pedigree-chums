@@ -5,7 +5,7 @@
 // of the games list, so it can never disagree with the list it counts.
 // Nothing else defines the campaign version, mode or the qualifying games.
 
-export const GAME_IDS = ["G01", "G02"] as const;
+export const GAME_IDS = ["G01", "G02", "G03", "G04", "G05"] as const;
 export type GameId = (typeof GAME_IDS)[number];
 
 export interface GameDef {
@@ -49,6 +49,28 @@ export const REGISTRY: Registry = {
       name: "The Lineage Game",
       threshold:
         "LineageModal running state transitions to true, any start path",
+    },
+    // Task 123: the three in-chat Collie games (Pick a Chum). Each qualifies the
+    // moment its opening surface is SERVED in the chat (game entered by name),
+    // not on the first move. The bark game is deliberately NOT a qualifying game
+    // (a single "woof" is a turn, not finding a game), so it has no row here.
+    {
+      id: "G03",
+      name: "Nine-Square Sheep Management",
+      threshold:
+        "The Nine-Square board is served in the Pick a Chum chat (game entered by name), before any move",
+    },
+    {
+      id: "G04",
+      name: "Missing Sheep",
+      threshold:
+        "The Missing Sheep word is set and its masked tiles are served in the Pick a Chum chat, before any guess",
+    },
+    {
+      id: "G05",
+      name: "Kennel Sketch Recognition",
+      threshold:
+        "The Kennel Sketch drawing is served in the Pick a Chum chat, before the first guess",
     },
   ],
 };
