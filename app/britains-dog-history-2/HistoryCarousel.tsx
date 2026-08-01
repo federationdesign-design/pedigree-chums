@@ -72,6 +72,7 @@ type Entry =
 const SEQUENCE: Entry[] = [
   { type: "intro" },
   ...SECTIONS.flatMap((s, si): Entry[] => {
+    if (s.title === "Dogs in the armed forces") return [];
     const copy = s.era ? ERA_INTRO[s.era] : undefined;
     return copy && s.era
       ? [{ type: "section", si }, { type: "timeline", era: s.era, ...copy }]

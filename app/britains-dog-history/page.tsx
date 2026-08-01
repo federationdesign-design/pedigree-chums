@@ -313,7 +313,7 @@ export default function HistoryPage() {
 
         <div className={styles.sections}>
           <Triangles items={pageTriangles} z={3} />
-          {SECTIONS.map((s, i) => {
+          {SECTIONS.filter((s) => s.title !== "Dogs in the armed forces").map((s, i) => {
             const prefix = s.title.slice(0, s.title.length - s.accent.length);
             return (
               <div key={i}>
@@ -355,12 +355,14 @@ export default function HistoryPage() {
                   </ul>
                   {s.facts.map((f, k) => (
                     <div className={styles.fact} key={k}>
-                      <div className={styles.factImg}>
-                        <Image src={f.image || s.image} alt="" width={120} height={120} unoptimized />
-                      </div>
-                      <div className={styles.factBody}>
-                        <span className={styles.factLabel}>Did you know?</span>
-                        <span className={styles.factText}>{f.text}</span>
+                      <span className={styles.factLabel}>Did you know?</span>
+                      <div className={styles.factRow}>
+                        <div className={styles.factImg}>
+                          <Image src={f.image || s.image} alt="" width={120} height={120} unoptimized />
+                        </div>
+                        <div className={styles.factBody}>
+                          <span className={styles.factText}>{f.text}</span>
+                        </div>
                       </div>
                     </div>
                   ))}
