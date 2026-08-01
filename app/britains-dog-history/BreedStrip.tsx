@@ -484,6 +484,7 @@ export default function BreedStrip({
                build the tap handler inline. openFor does that now, and nothing
                else in this markup used them. */
             const open = openFor(b);
+            const kind = breedCardKind(b.name);
             return (
               <div key={b.name} data-node className={styles.node} role="listitem">
                 <span className={styles.nodeEra}>{b.era}</span>
@@ -509,6 +510,9 @@ export default function BreedStrip({
                           <DogIcon />
                         )}
                       </span>
+                      {kind && (
+                        <span className={styles.deskWedge} aria-hidden="true" />
+                      )}
                       {open && (
                         <span className={styles.lineageBadge} aria-hidden="true">
                           <svg viewBox="0 0 24 24">
@@ -538,6 +542,12 @@ export default function BreedStrip({
                         )}
                       </span>
                     </span>
+                    {kind && (
+                      <span
+                        className={`${styles.deskFlash} ${kind === "play" ? styles.deskFlashPlay : styles.deskFlashLearn}`}
+                        aria-hidden="true"
+                      />
+                    )}
                   </span>
                 </button>
                 <span className={styles.nodeName}>{b.name}</span>
