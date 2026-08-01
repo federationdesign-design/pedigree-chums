@@ -820,3 +820,16 @@
   align-items: center;
   gap: clamp(12px, 2vw, 18px);
 }
+
+/* Below 1200px the era description text runs too large, so scale the title,
+   intro and detail paragraphs, bullets and did-you-know down to 75% (a 25%
+   reduction). Desktop grid only: under 721px it is display:none and the mobile
+   carousel takes over, so these never touch the phone layout. */
+@media (max-width: 1199px) {
+  .sectionTitle { font-size: clamp(38.25px, 6vw, 76.5px); }
+  .sectionIntro { font-size: clamp(1.45rem, 3.3vw, 1.75rem); }
+  .detail { font-size: clamp(1.37rem, 3vw, 1.55rem); }
+  .bullets li { font-size: clamp(18px, 2.1vw, 22.5px); }
+  .factLabel { font-size: clamp(1.63rem, 3.3vw, 2.08rem); }
+  .factText { font-size: clamp(1.19rem, 2.85vw, 1.39rem); }
+}
