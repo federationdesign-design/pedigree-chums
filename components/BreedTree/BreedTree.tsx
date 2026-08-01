@@ -1152,7 +1152,7 @@ export default function BreedTree({
       .sort((a, b) => (b.value ?? 0) - (a.value ?? 0));
     const ns = pack<LineageNode>().size([SIZE, SIZE]).padding(8)(h).descendants();
     normalizeTop(ns);
-    if (isMobile) relayoutMobile(ns, aspectKey, dockAside ? level : null);
+    if (isMobile || dockAside) relayoutMobile(ns, aspectKey, dockAside ? level : null);
     return ns;
   }, [root, isMobile, aspectKey, dockAside, level]);
 
@@ -1558,7 +1558,7 @@ export default function BreedTree({
   // of the risk. A level change re-packs and resets focus to the root, so being
   // zoomed and touching the slider would have thrown you out of the circle you
   // were reading. It cannot happen, because there is nothing to touch.
-  const showDiff = dockAside && gravity && isMobile && entered && !started && focus.depth === 0;
+  const showDiff = dockAside && gravity && entered && !started && focus.depth === 0;
   // LEARN ONLY: the top-right square goes back to the level's start screen, the
   // one with LEARN and PLAY on it. No confirmation, by request: nothing is at
   // stake in learn, so a prompt would only be in the way. The pit keeps its X and
