@@ -1857,6 +1857,41 @@ for (const g of GAMES) {
   })();
 }
 
+// ---- B45 games menu confirmation (Task 123 fix) ----
+// The bug this covers: after the menu's "Game?", a "yes" was swallowed by the Task 68 loop confirm
+// (pendingConfirm "game" -> the card-game rules), so B45-GAMELIST-02's list was never reached. The
+// flow was entirely untested, which is how it survived. Assert the whole path, and that the fix does
+// not disturb the loop, the bark offer or the three direct triggers.
+const b45Q = (_r, resp) => (resp.responseId === 'B45-GAMELIST-01' && resp.text === 'Game?' ? null : `not the B45 question: ${resp.responseId} "${resp.text}"`);
+const b45List = (_r, resp) =>
+  resp.responseId === 'B45-GAMELIST-02' && resp.text === 'Bark, Nine-Square, Missing Sheep, Kennel Sketch. Say one.'
+    ? null
+    : `not the B45 list: ${resp.responseId} "${resp.text}"`;
+// "are there games" -> "Game?" -> "yes" -> the list.
+(() => {
+  const s = newSession();
+  check('are there games', { action: 'games_menu', bucket: 'B45' }, { session: s, assert: b45Q });
+  check('yes', { action: 'games_menu', bucket: 'B45' }, { session: s, assert: b45List });
+})();
+// "play" -> the same menu and confirmation.
+(() => {
+  const s = newSession();
+  check('play', { action: 'games_menu', bucket: 'B45' }, { session: s, assert: b45Q });
+  check('yes', { action: 'games_menu', bucket: 'B45' }, { session: s, assert: b45List });
+})();
+// Unchanged by the fix: bare "game" stays on the dog-led loop (LOOP-01 "Game?", then LOOP-02).
+(() => {
+  const s = newSession();
+  check('game', { action: 'fallback' }, { session: s, assert: (_r, resp) => (resp.responseId === 'LOOP-01' && resp.text === 'Game?' ? null : `game not LOOP-01: ${resp.responseId} "${resp.text}"`) });
+  check('game', { action: 'fallback' }, { session: s, assert: (_r, resp) => (resp.responseId === 'LOOP-02' ? null : `second game not LOOP-02: ${resp.responseId}`) });
+})();
+// Unchanged: "lets play" stays the bark-game offer.
+check('lets play', { action: 'offer_bark_game', bucket: 'B17' });
+// The three direct triggers still enter their games (the menu must not shadow them).
+check('nine square', { action: 'game_start' });
+check('missing sheep', { action: 'game_start' });
+check('kennel sketch', { action: 'game_start' });
+
 // ---- Report ----
 const pad = (s, n) => String(s).padEnd(n);
 console.log('\nPick a Chum: Checkpoint 1 proof\n' + '='.repeat(78));
