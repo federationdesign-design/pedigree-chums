@@ -929,3 +929,12 @@
   font-size: clamp(0.7rem, 2.6vw, 0.95rem);
   color: #ffffff;
 }
+
+/* Desktop win screen (min-width 769px), first pass: the blue band is about a
+   quarter of the height, the next-level photo takes the other three quarters,
+   and the text is pulled up toward the top rather than centred down the middle.
+   Mobile keeps its own layout. Tune these two once we see it on screen. */
+@media (min-width: 769px) {
+  .winNextImg { height: 75%; }
+  .winWrap { padding-top: clamp(24px, 3.5vw, 54px); }
+}
