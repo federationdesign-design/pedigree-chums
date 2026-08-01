@@ -55,10 +55,10 @@ export const SECTIONS: Section[] = [
   {
     title: "Medieval and Tudor Britain",
     accent: "Tudor Britain",
-    /* NO `era`. Britain's First Dogs above now introduces the ancient and
-       medieval dogs and carries their run, so this section follows the carousel
-       instead of preceding it. Giving it an era again would put a second run of
-       the same dogs on the page. */
+    /* c1500, the Tudor-times dog strip re-homed here after "Dogs in the armed
+       forces" was hidden. NOT ancient-medieval: Britain's First Dogs carries
+       that run, so repeating it would double the same dogs. */
+    era: "c1500",
     intro:
       "Britain's bond with dogs stretches back deep into the Middle Ages, when hounds were prized hunting partners of kings and nobles. By the Tudor age, dogs had also become beloved companions, doted on at the royal court itself.",
     bullets: [
