@@ -935,6 +935,29 @@
    and the text is pulled up toward the top rather than centred down the middle.
    Mobile keeps its own layout. Tune these two once we see it on screen. */
 @media (min-width: 769px) {
-  .winNextImg { height: 75%; }
-  .winWrap { padding-top: clamp(24px, 3.5vw, 54px); }
+  /* Photo takes three quarters (blue band ~25%), shown from its TOP so the
+     dog's head is not cropped off. */
+  .winNextImg {
+    height: 75%;
+    object-position: center top;
+  }
+  /* ROUND WON and the score above it pushed DOWN off the very top, into the
+     blue band and the seam, instead of overflowing above the page. */
+  .winWrap { padding-top: 16vh; }
+  .winFlash { font-size: clamp(4rem, 11vw, 8.5rem); margin: 6px 0 0; }
+  /* The next-level name dropped to just above the Next Level button. */
+  .winNextLead {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: clamp(210px, 21vh, 290px);
+    margin: 0;
+  }
+  .winNextName {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: clamp(150px, 15vh, 220px);
+    margin: 0;
+  }
 }
