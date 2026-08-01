@@ -113,7 +113,7 @@
   font-family: var(--font-body), system-ui, sans-serif;
   font-weight: 600;
   font-size: clamp(28px, 3.6vw, 36px);
-  line-height: 1.3em;
+  line-height: 1.1;
   color: var(--white);
   max-width: 56ch;
   margin: 16px auto 0;
@@ -236,6 +236,8 @@
 }
 
 .sectionTitle {
+  grid-column: 1 / -1;
+  text-align: center;
   font-size: clamp(51px, 8vw, 102px);
   color: var(--white);
   margin: 0 0 clamp(12px, 2vw, 20px);
@@ -246,7 +248,7 @@
   font-family: var(--font-body), system-ui, sans-serif;
   font-weight: 600;
   font-size: clamp(2.1rem, 4.4vw, 2.5rem);
-  line-height: 1.3em;
+  line-height: 1.1;
   color: var(--white);
   margin: 0 0 clamp(14px, 2.4vw, 22px);
 }
@@ -255,7 +257,7 @@
   font-family: var(--font-body), system-ui, sans-serif;
   font-weight: 400;
   font-size: clamp(2rem, 4vw, 2.24rem);
-  line-height: 1.3em;
+  line-height: 1.1;
   color: var(--white);
   margin: 0;
 }
@@ -270,7 +272,7 @@
   font-family: var(--font-body), system-ui, sans-serif;
   font-weight: 500;
   font-size: clamp(28px, 2.8vw, 34px);
-  line-height: 1.3em;
+  line-height: 1.1;
   color: var(--white);
   padding: 6px 0;
 }
@@ -285,7 +287,7 @@
   gap: clamp(12px, 2vw, 18px);
   background: rgba(255, 255, 255, 0.16);
   border-radius: 18px;
-  padding: clamp(14px, 2.2vw, 20px);
+  padding: clamp(22px, 3.2vw, 34px);
 }
 .fact + .fact {
   margin-top: clamp(12px, 2vw, 16px);
@@ -311,7 +313,7 @@
 }
 .factLabel {
   font-family: var(--font-display), system-ui, sans-serif;
-  font-size: clamp(2rem, 4.4vw, 2.6rem);
+  font-size: clamp(2.17rem, 4.4vw, 2.77rem);
   color: var(--yellow);
   line-height: 1;
 }
@@ -319,7 +321,7 @@
   font-family: var(--font-body), system-ui, sans-serif;
   font-weight: 600;
   font-size: clamp(1.84rem, 3.8vw, 2.1rem);
-  line-height: 1.3em;
+  line-height: 1.1;
   color: var(--white);
 }
 
@@ -337,7 +339,7 @@
   font-size: 0.82rem;
   color: var(--white);
   text-align: center;
-  line-height: 1.3em;
+  line-height: 1.1;
   margin: 0;
 }
 
@@ -362,7 +364,7 @@
 .stripLabel {
   display: block;
   font-family: var(--font-display), system-ui, sans-serif;
-  font-size: clamp(3.1rem, 7vw, 4.375rem);
+  font-size: clamp(3.35rem, 7vw, 4.625rem);
   color: var(--white);
   text-align: center;
   margin-bottom: clamp(20px, 3vw, 34px);
@@ -642,6 +644,6 @@
 /* Era labels match the Good Dog Bad Dog essay hero title on wide screens. */
 @media (min-width: 1300px) {
   .stripLabel {
-    font-size: clamp(3.5rem, 8vw, 4.625rem);
+    font-size: clamp(3.75rem, 8vw, 4.875rem);
   }
 }

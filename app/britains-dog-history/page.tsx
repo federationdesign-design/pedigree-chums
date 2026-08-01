@@ -329,11 +329,11 @@ export default function HistoryPage() {
                   <div className={`${styles.glowCircle} ${styles.glowTop}`} />
                   <div className={`${styles.glowCircle} ${styles.glowBottom}`} />
                 </div>
+                <h2 className={`display ${styles.sectionTitle}`}>
+                  {prefix}
+                  <span className="display-yellow">{s.accent}</span>
+                </h2>
                 <div className={styles.colLeft}>
-                  <h2 className={`display ${styles.sectionTitle}`}>
-                    {prefix}
-                    <span className="display-yellow">{s.accent}</span>
-                  </h2>
                   <div className={styles.imageSlot}>
                     <Image
                       src={s.image}
