@@ -536,11 +536,17 @@ export default function BreedStrip({
                     </span>
                     <span className={styles.flipBack}>
                       <span className={styles.flipBackInner}>
+                        {open && (
+                          <span className={styles.deskBackHint}>Tap to learn about this dog</span>
+                        )}
                         <span className={styles.flipNote}>{b.note}</span>
                         {open && (
-                          <span className={styles.flipHint}>Tap to see the family tree</span>
+                          <span className={styles.deskBackSub}>
+                            These dogs you know today came from this lineage route, discover them here
+                          </span>
                         )}
                       </span>
+                      <span className={styles.deskBackFlip} aria-hidden="true" />
                     </span>
                     {kind && (
                       <span
