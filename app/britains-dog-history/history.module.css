@@ -125,7 +125,7 @@
   width: 100%;
   max-width: none;
   margin: 0 auto;
-  padding: clamp(20px, 4vw, 40px) clamp(18px, 4vw, 40px) clamp(8px, 1.5vw, 16px);
+  padding: clamp(20px, 4vw, 40px) calc(clamp(18px, 4vw, 40px) + 30px) clamp(8px, 1.5vw, 16px);
   z-index: 1;
 }
 /* the final breed strip has no following section, so drop its trailing gap */
@@ -236,6 +236,8 @@
 }
 
 .sectionTitle {
+  position: relative;
+  z-index: 1;
   grid-column: 1 / -1;
   text-align: center;
   font-size: clamp(51px, 8vw, 102px);
@@ -271,10 +273,11 @@
 .bullets li {
   font-family: var(--font-body), system-ui, sans-serif;
   font-weight: 500;
-  font-size: clamp(28px, 2.8vw, 34px);
+  font-size: clamp(26.7px, 2.8vw, 32.7px);
   line-height: 1.1;
   color: var(--white);
   padding: 6px 0;
+  margin-bottom: 15px;
 }
 .bullets li::marker {
   color: var(--yellow);
@@ -287,7 +290,7 @@
   gap: clamp(12px, 2vw, 18px);
   background: rgba(255, 255, 255, 0.16);
   border-radius: 18px;
-  padding: clamp(22px, 3.2vw, 34px);
+  padding: calc(clamp(22px, 3.2vw, 34px) + 10px) clamp(22px, 3.2vw, 34px);
 }
 .fact + .fact {
   margin-top: clamp(12px, 2vw, 16px);
@@ -644,6 +647,6 @@
 /* Era labels match the Good Dog Bad Dog essay hero title on wide screens. */
 @media (min-width: 1300px) {
   .stripLabel {
-    font-size: clamp(3.75rem, 8vw, 4.875rem);
+    font-size: clamp(3.75rem, 8vw, 6.875rem);
   }
 }
