@@ -10,6 +10,15 @@ import { resolveLineageName } from "../../data/lineageNames";
 import LineageModal from "../../components/LineageModal/LineageModal";
 import styles from "./history.module.css";
 
+/* Outbound sources shown on the ancient-medieval card back, matched to the
+   mobile card. Ancient-medieval only, so they never sit on a Cockapoo. */
+const OUTBOUND: { href: string; tone: "blue" | "green" | "black" }[] = [
+  { href: "https://penelope.uchicago.edu/Thayer/e/roman/texts/strabo/4e%2A.html", tone: "blue" },
+  { href: "https://www.gutenberg.org/cache/epub/78013/pg78013-images.html", tone: "green" },
+  { href: "https://en.wikipedia.org/wiki/List_of_extinct_dog_breeds", tone: "black" },
+];
+const OUTBOUND_ERAS = ["ancient-medieval"];
+
 // Bigger dog silhouette for breeds with no square art.
 function DogIcon() {
   return (
@@ -122,6 +131,7 @@ export default function BreedStrip({
   // a loss breaks the streak, which is what "in a row" has to mean.
   const [lives, setLives] = useState(LIVES_START);
   const [streak, setStreak] = useState(0);
+  const [leaving, setLeaving] = useState<string | null>(null);
 
   // The mini pits are levels: every popup-capable breed, in timeline order
   // across all eras. Round Won advances to the next; Game Over restarts at
@@ -539,10 +549,29 @@ export default function BreedStrip({
                         {open && (
                           <span className={styles.deskBackHint}>Tap to learn about this dog</span>
                         )}
-                        <span className={styles.flipNote}>{b.note}</span>
                         {open && (
                           <span className={styles.deskBackSub}>
                             These dogs you know today came from this lineage route, discover them here
+                          </span>
+                        )}
+                        <span className={styles.flipNote}>{b.note}</span>
+                        {kind === "play" && OUTBOUND_ERAS.includes(era) && (
+                          <span className={styles.backLinks}>
+                            {OUTBOUND.map((o) => (
+                              <span
+                                key={o.href}
+                                className={styles.backLink}
+                                role="button"
+                                tabIndex={0}
+                                aria-label="Read more on another site"
+                                onClick={(e) => { e.stopPropagation(); setLeaving(o.href); }}
+                                onKeyDown={(e) => {
+                                  if (e.key === "Enter" || e.key === " ") { e.preventDefault(); e.stopPropagation(); setLeaving(o.href); }
+                                }}
+                              >
+                                <span className={styles.backLinkIcon} aria-hidden="true" />
+                              </span>
+                            ))}
                           </span>
                         )}
                       </span>
@@ -566,6 +595,33 @@ export default function BreedStrip({
       <div ref={trackRef} className={styles.stripScrollbar} aria-hidden="true">
         <div ref={thumbRef} className={styles.stripThumb} />
       </div>
+
+      {leaving && (
+        <div className={styles.leaveWrap} role="dialog" aria-modal="true">
+          <div className={styles.leaveCard}>
+            <p className={styles.leaveText}>
+              You are about to be linked to another site (and dogs), and we can&apos;t
+              control anything from this point. Remember to come back and carry on
+              exploring
+            </p>
+            <div className={styles.leaveRow}>
+              <button
+                type="button"
+                className={styles.leaveGo}
+                onClick={() => {
+                  window.open(leaving, "_blank", "noopener,noreferrer");
+                  setLeaving(null);
+                }}
+              >
+                Off we go
+              </button>
+              <button type="button" className={styles.leaveStay} onClick={() => setLeaving(null)}>
+                Stay here
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {modal}
     </div>
