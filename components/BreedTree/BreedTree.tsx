@@ -801,7 +801,7 @@ function normalizeTop(nodes: Node[]) {
 
 // How much of the available stage the mobile masonry fills. The mini pit runs at
 // 0.85 so the circles sit 15% smaller; the breed page keeps the full fill.
-function relayoutMobile(nodes: Node[], aspect: number, level: number | null = null) {
+function relayoutMobile(nodes: Node[], aspect: number, level: number | null = null, sizeMul = 1) {
   const root = nodes[0];
   const kids = root.children ?? [];
   const n = kids.length;
@@ -816,7 +816,7 @@ function relayoutMobile(nodes: Node[], aspect: number, level: number | null = nu
       Math.min(FW * 0.5, FH * 0.46) / kids[0].r,
       pit.w / (2 * kids[0].r * (1 + DIFF_RING)),
       level
-    );
+    ) * sizeMul;
     // sat on the floor gap, free to run off the top
     const shift1 = level === null ? 0 : pit.restY - kids[0].r * s;
     pts.forEach((p) => {
@@ -861,7 +861,7 @@ function relayoutMobile(nodes: Node[], aspect: number, level: number | null = nu
     // has to fit between the walls as well as the circle itself
     pit.w / (bw * (1 + DIFF_RING)),
     level
-  );
+  ) * sizeMul;
   // The cluster used to sit dead centre, which left the lower third of the pit
   // empty. Drop it toward the words, but never further than the slack actually
   // available: at the hardest difficulty the pack already fills the height, so
@@ -1152,7 +1152,7 @@ export default function BreedTree({
       .sort((a, b) => (b.value ?? 0) - (a.value ?? 0));
     const ns = pack<LineageNode>().size([SIZE, SIZE]).padding(8)(h).descendants();
     normalizeTop(ns);
-    if (isMobile || dockAside) relayoutMobile(ns, aspectKey, dockAside ? level : null);
+    if (isMobile || dockAside) relayoutMobile(ns, aspectKey, dockAside ? level : null, isMobile ? 1 : 0.6);
     return ns;
   }, [root, isMobile, aspectKey, dockAside, level]);
 
