@@ -56,8 +56,14 @@ export function ancestryBreakdown(breedName: string): { name: string; pct: numbe
   const walk = (n: LineageNode) => {
     if (!n.children?.length) return;
     n.children.forEach((c) => {
-      const pct = Math.round((sumLeaves(c) / rootLeaves) * 100);
-      if (pct > 0) results.push({ name: c.name, pct });
+      // A child sharing its parent's name is the Celtic Heeler pattern's
+      // self-duplicate: the remainder of the SAME stock, drawn again so an
+      // ancestor can nest inside it. Counting it would add the stock to its
+      // own total, so it is skipped; its parent already carries the share.
+      if (c.name !== n.name) {
+        const pct = Math.round((sumLeaves(c) / rootLeaves) * 100);
+        if (pct > 0) results.push({ name: c.name, pct });
+      }
       walk(c);
     });
   };
@@ -87,7 +93,9 @@ export function ancestorShareOf(
   const walk = (n: LineageNode) => {
     if (!n.children?.length) return;
     n.children.forEach((c) => {
-      if (c.name === ancestorName) {
+      // Same self-duplicate rule as ancestryBreakdown: a child named after
+      // its parent is the same stock's remainder, not a second helping.
+      if (c.name === ancestorName && c.name !== n.name) {
         pct += Math.round((sumLeaves(c) / rootLeaves) * 100);
         found = true;
       }
