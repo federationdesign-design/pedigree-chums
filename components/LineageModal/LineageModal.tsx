@@ -283,6 +283,17 @@ export default function LineageModal({ name, image, character, lineage, onClose,
         {shownName !== name && (
           <TitleRow img={shownImg} name={shownName} status={shownStatus} isNarrow={isNarrow} />
         )}
+        {/* The global explanation (owner placement, option A): rides in the
+            title wrap so it is on screen before any break panel opens.
+            Verbatim from docs/lineage/BRIEF.md section 7. On narrow screens
+            it appears only once the round is running (owner ruling,
+            4 August): the LEARN title owns that band on the start screen,
+            and the note still precedes any break panel. */}
+        {(!isNarrow || running) && (
+          <p className={css.globalNote}>
+            These family trees show likely historical influences. Ancient and medieval dogs were working types, not modern standardised breeds, so the percentages are illustrative rather than measured genetic results.
+          </p>
+        )}
       </div>
 
       {/* The diagram owns everything below the header. BreedTree runs in

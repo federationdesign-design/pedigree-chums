@@ -189,7 +189,7 @@ export default function BreedMobile({ name, slug, image, info, lineage, breed }:
 
       {/* ── Ancestry ── */}
       {ancestry.length > 0 && (
-        <Section title="Ancestry">
+        <Section title="Historical influence">
           <p className={styles.bodyText}>The breeds and types that shaped {name}.</p>
           <div className={styles.ancestryList}>
             {ancestry.map(({ name: aName, pct }) => (

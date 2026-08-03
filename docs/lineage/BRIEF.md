@@ -332,7 +332,7 @@ Each batch ends in a stop and a report. Nothing merges without approval.
 | 3 | The five foundation records, strip rows and tree entries. COMPLETE | All five render and flip, referenced by no tree; level list byte-identical at 62; percentage fixture gains exactly five root rows; tsc clean |
 | 4 | The Rache, Talbot and Cur trees. BUILT, two follow-ups gated | Grafts in and fixture clean (four new rows, nothing moved); levels render the new deepest generation. Gated: the Cur bandog removal (proposal below, owner sign-off) and the single-child nest label collision (owner review of the screenshots) |
 | 5 | Old Welsh Grey Sheepdog, Scottish Terrier, Black and Tan Terrier. COMPLETE | Six trees carry their foundations; fixture additions-only at every step; the engine re-baseline and self-duplicate skip landed as their own commits; Boxer normalisation queued |
-| 6 | The global disclosure and the "Historical influence" naming | Visible before any detail panel |
+| 6 | The global disclosure and the "Historical influence" naming. COMPLETE | Owner rulings 4 August: the global note lives in the level modal header ALONE (removed from the breed page card, where the four in-panel disclosures still qualify every figure); on narrow screens it appears only after Play, when the LEARN title has gone, still preceding any break panel; the heading rename to "Historical influence" stays on breed desktop and mobile; break panel label reads "X% historical influence" |
 
 **Mobile review after every batch that touches a tree.** Text wrapping,
 circle labels and the vertical lineage control.
@@ -391,7 +391,8 @@ this work.
 
 ## 11 Owner decisions still open
 
-- [ ] Where the global disclosure sits, from the RECON Q5 options.
+- [x] Where the global disclosure sits: settled 4 August, the level modal
+      header alone, shown on narrow screens only after Play.
 - [ ] Whether any of the six trees leads with "Main influence" and
       "Supporting influence" copy instead of visible numbers.
 - [ ] The Cur "Old working bandogs" removal (fixture-gated, section 5).
