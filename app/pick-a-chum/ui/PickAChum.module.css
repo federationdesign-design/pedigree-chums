@@ -103,6 +103,23 @@
    Same stacking band as the launcher (below cookie 55 / nav 100 / offer 120):
    the wash dims page content but the cookie banner, nav and the discount modal
    (opened from a > command) all render above it. */
+
+/* Task 118: a graduated brand-blue scrim behind the chat UI. Strongest in the TOP LEFT, where the
+   launcher, selector and panel live, and fading to fully transparent across and down. It lifts the
+   icon, the dogs and the yellow lines off busy photographic pages without dimming the page (it clears
+   to transparent so the page shows through). Rendered only while the chat UI is present (launcher
+   shown or experience open). DECORATION ONLY: pointer-events:none, so it can never catch a click --
+   Task 116 fixed exactly that and this must not undo it. Sits above the nav (z 300, by later DOM
+   order) and below the launcher/experience (z 301). Brand blue (--pc-ui-blue #00a9ef), never black. */
+.scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  pointer-events: none;
+  /* Task 118: extent widened (peak unchanged) so the tint still has meaningful alpha ~400px across and
+     down, where the selector fans out -- not just the logo corner. */
+  background: radial-gradient(880px 880px at top left, rgba(0, 169, 239, 0.42) 0%, rgba(0, 169, 239, 0.26) 32%, rgba(0, 169, 239, 0.12) 55%, rgba(0, 169, 239, 0) 100%);
+}
 .root {
   position: fixed;
   inset: 0;
@@ -139,7 +156,8 @@
 .dogAnchor,
 .composer,
 .dogBtn,
-.randomBtn {
+.randomBtn,
+.selectorClose {
   pointer-events: auto;
 }
 
@@ -466,28 +484,49 @@
 }
 /* Close: the only close control, restyled as a traditional icon (red, white X)
    and sitting on the top corner of the dog medallion. */
-.close {
+/* Task 126/127: the red X close controls -- the red-icon.svg mark itself, with NO circle, ring or
+   background. A 44x44 tap area, but the visible mark is smaller than the box so it does not dominate.
+   Shared by the chat medallion (.close, top-left) and the selector centre icon (.selectorClose,
+   top-right), so one control means the same thing in both states: back to the closed launcher. */
+.close,
+.selectorClose {
   position: absolute;
-  top: -8px;
-  left: -8px;
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  border: 3px solid #ffffff;
-  background: var(--pc-ui-red);
-  color: #ffffff;
-  font-size: 20px;
-  line-height: 1;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: none;
+  background: none;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 5;
-  box-shadow: var(--pc-shadow);
+  z-index: 6;
 }
-.close:focus-visible {
+.close img,
+.selectorClose img {
+  width: 26px;
+  height: 26px;
+  display: block;
+  pointer-events: none;
+}
+/* Chat medallion X: top-left of the ring. Not scaled (the panel does not scale), so it is a full 44px
+   tap area at every breakpoint. */
+.close {
+  top: -12px;
+  left: -12px;
+}
+/* Selector centre-icon X: top-right of the 72px "pick for me" anchor (left:28, top:28 in selector
+   space). Full 44px on desktop/tablet; eased on mobile (see the 480px block) so it neither shrinks
+   with the 0.48 fan nor stands full-size and dwarfs it (Task 127). */
+.selectorClose {
+  left: 82px;
+  top: 6px;
+}
+.close:focus-visible,
+.selectorClose:focus-visible {
   outline: 3px solid var(--pc-ui-yellow);
   outline-offset: 2px;
+  border-radius: 8px;
 }
 /* Height matches the dog medallion (96px); radius stays a capsule (half the
    height), the chat area widened so the input keeps those proportions. */
@@ -582,6 +621,12 @@
     /* Task 121: shrunk from 0.72 so the whole rotated arc (all four dogs) fits inside a 320px phone
        with a margin, rather than the first two fanning off the right edge. */
     --pc-selector-scale: 0.48;
+  }
+  /* Task 127: the selector is scaled to 0.48 here, which would shrink the close X to ~21px. Ease it
+     back up -- but not to the full 44px, which would dwarf the shrunk fan -- to roughly a 38px box. */
+  .selectorClose {
+    transform: scale(1.8);
+    transform-origin: center;
   }
   .panel {
     left: 16px;
