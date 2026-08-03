@@ -46,9 +46,10 @@ const LEVELS_FILE = join(FIXTURE_DIR, "level-list.txt");
 // ---- tree keys, parsed from source ----------------------------------------
 const lineageSource = readFileSync(join(ROOT, "data", "lineage.ts"), "utf8");
 const keys = [...lineageSource.matchAll(/^  "([^"]+)": \{$/gm)].map((m) => m[1]);
-if (keys.length !== 123) {
+// 125 = the 123 baseline entries plus the two Batch 2 ancient additions.
+if (keys.length !== 125) {
   console.error(
-    `expected 123 top-level LINEAGE keys, parsed ${keys.length}; ` +
+    `expected 125 top-level LINEAGE keys, parsed ${keys.length}; ` +
       "data/lineage.ts layout changed, update the parser before trusting this fixture"
   );
   process.exit(1);
@@ -108,11 +109,11 @@ for (const name of packNames) {
 }
 
 // ---- the derived campaign level list --------------------------------------
-// Replicates BreedStrip.tsx:129,137-147: strip order, anchor order, keep rows
-// with a lineage and no pack page. At Batch 2 this file gains exactly two
-// rows and every index after the insertion point shifts; that diff is the
-// accepted, intended change (owner decision, option B) and nothing else in
-// this file may move.
+// Replicates BreedStrip.tsx: strip order, anchor order, keep rows whose
+// lineage has ancestors and which have no pack page (breedCardKind "play").
+// Root-only records are flip-only cards, never levels (owner decision,
+// 3 August), so this file must match the 62-level baseline exactly until a
+// future batch deliberately adds an ancestored level.
 const STRIP_ORDER = [
   "ancient-medieval",
   "c1500",
@@ -132,7 +133,10 @@ const levelRows = ukBreeds
   )
   .filter((b) => {
     const pn = resolveLineageName(b.name);
-    return !breeds.find((x) => x.name === pn)?.slug && !!getLineage(pn);
+    const lineage = getLineage(pn);
+    // Mirrors breedCardKind: only an ancestored lineage makes a level, so a
+    // root-only record (flip-only card) never joins the campaign.
+    return !breeds.find((x) => x.name === pn)?.slug && !!lineage?.children?.length;
   })
   .map((b, i) => `[level] ${String(i).padStart(2, "0")} ${b.strip} ${b.name}`);
 

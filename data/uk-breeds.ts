@@ -21,6 +21,11 @@ export const ukBreeds: UKBreed[] = [
   { name: "Irish Wolfhound", strip: "ancient-medieval", era: "Ancient", anchor: 100, note: "Towering ancient Irish hound, bred to hunt wolves and guard halls.", image: "/history/breeds/irish-wolfhound-photo.jpg", tag: "endangered" },
   { name: "Mastiff", strip: "ancient-medieval", era: "Ancient", anchor: 150, note: "Britain's ancient war and guard dog, known since Roman times.", image: "/history/breeds/english-mastiff-photo.jpg", tag: "endangered" },
   { name: "Greyhound", strip: "ancient-medieval", era: "Ancient", anchor: 200, note: "The fastest of all dogs, a sighthound in Britain since antiquity.", image: "/history/breeds/original-greyhound.jpg", tag: "in-decline" },
+  // The two ancient additions (docs/lineage/BRIEF.md section 4): extinct
+  // historical types placed beside their modern descendants. The Mastiff and
+  // Greyhound rows above are deliberately untouched.
+  { name: "Ancient British Mastiff Type", strip: "ancient-medieval", era: "Ancient", anchor: 140, note: "Powerful British guard and hunting dog praised by Roman writers for courage and strength.", image: "/history/breeds/ancient-british-mastiff-type.jpg", tag: "extinct" },
+  { name: "Ancient Celtic Coursing Hound", strip: "ancient-medieval", era: "Ancient", anchor: 190, note: "Swift Celtic sight-hunting dog described by classical writers, an early root of later British and Irish sighthounds.", image: "/history/breeds/ancient-celtic-coursing-hound.jpg", tag: "extinct" },
   { name: "Talbot", strip: "ancient-medieval", era: "Medieval", anchor: 1200, note: "White medieval hound, ancestor of the beagle and bloodhound.", image: "/history/breeds/talbot-hound.jpg", tag: "extinct" },
 
   { name: "Bloodhound", strip: "ancient-medieval", era: "Medieval", anchor: 1100, note: "Scent hound famed for a nose that can follow a trail days old.", image: "/history/breeds/Medieval-Bloodhound.jpg", tag: "endangered" },

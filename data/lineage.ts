@@ -954,6 +954,20 @@ const LINEAGE: Record<string, LineageNode> = {
     ]
   },
 
+  // The two ancient additions (docs/lineage/BRIEF.md sections 3 and 4).
+  // Roots by design: they are the deepest recorded types, so they carry no
+  // ancestor children and no invented weights. The modern English Mastiff
+  // and Greyhound trees below are untouched; hanging these records beneath
+  // later trees is Batch 4+ work, gated by the percentage fixture.
+  "Ancient British Mastiff Type": {
+    name: "Ancient British Mastiff Type",
+    note: "Powerful British guard and hunting dog praised by Roman writers for courage and strength. An extinct historical type.",
+  },
+  "Ancient Celtic Coursing Hound": {
+    name: "Ancient Celtic Coursing Hound",
+    note: "Swift Celtic sight-hunting dog described by classical writers, an early root of later British and Irish sighthounds. An extinct historical type.",
+  },
+
   "English Mastiff": {
     name: "English Mastiff",
     note: "Britain's ancient war and guard dog, a giant Molosser prized here since Roman times.",

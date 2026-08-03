@@ -11,6 +11,8 @@
 [tree] Airedale Terrier > Otterhound > Southern Hound > Talbot hounds | leafPct=7 d3Pct=4
 [tree] Airedale Terrier > Otterhound > Southern Hound > St Hubert Hound | leafPct=5 d3Pct=3
 [tree] Airedale Terrier > Otterhound > Rough water dogs | leafPct=10 d3Pct=6
+[tree] Ancient British Mastiff Type | leafPct=100 d3Pct=na
+[tree] Ancient Celtic Coursing Hound | leafPct=100 d3Pct=na
 [tree] Basset Hound | leafPct=100 d3Pct=100
 [tree] Basset Hound > Bloodhound | leafPct=55 d3Pct=71
 [tree] Basset Hound > Bloodhound > St Hubert Hound | leafPct=33 d3Pct=21

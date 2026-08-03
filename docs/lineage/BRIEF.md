@@ -149,18 +149,18 @@ Instead, Ancient British Mastiff Type and Ancient Celtic Coursing Hound are
 ADDED to the Ancient-to-medieval strip alongside them, as extinct historical
 types with their own imagery and copy.
 
-**Two new campaign levels, accepted (owner decision, option B, 3 August).**
-The campaign level list is derived automatically: any strip row that has a
-lineage and no pack page becomes a playable level (`BreedStrip.tsx:137-147`).
-The two new rows qualify, and that is intended: they are added as normal
-strip rows with trees, no exclusion mechanism is built, the derived level
-list grows by two and the campaign numbering shifts across both history
-pages. The earlier no-new-level rule is withdrawn. The Batch 2 exit check is:
-**the derived level list grows by exactly two, and by nothing else**, proven
-by the committed level-list fixture (`tests/lineage/level-list.txt`,
-62 rows at baseline; the Batch 2 diff is the two new rows plus the index
-shift from the insertion points, with every name otherwise unchanged and in
-the same relative order).
+**Flip-only cards, not levels (owner decision, 3 August, reversing the
+earlier option B).** Batch 2 build evidence showed a root record cannot be a
+playable level: the round works by revealing what sits below a dog, these are
+the deepest recorded types, and inventing ancestry is forbidden, so their
+rounds were empty. The two records are therefore strip cards that flip to
+show their copy and open nothing. The mechanism is general, not a name list:
+`breedCardKind` (`BreedStrip.tsx`) returns "play" only when a record's
+lineage has children, and the level list reads the same answer, so any
+root-only record (including the five medieval foundation roots in later
+batches) is flip-only automatically. The campaign stays at 62 levels and the
+level-list fixture (`tests/lineage/level-list.txt`) must match its committed
+baseline exactly.
 
 Two verified facts that make the renumbering safe (Batch 1 recon):
 
@@ -309,7 +309,7 @@ Each batch ends in a stop and a report. Nothing merges without approval.
 |---|---|---|
 | 0 | Reconnaissance, read-only. COMPLETE | `docs/lineage/RECON.md` |
 | 1 | The percentage fixture: capture, commit, wire the regeneration script. COMPLETE | `scripts/lineage-percentage-fixture.mts`; fixtures committed (1959 percentage rows, 62 levels); rerun verified byte-identical |
-| 2 | The two ancient strip additions, as normal rows with trees | Both render in the strip; Mastiff and Greyhound rows provably untouched; derived level list grows by exactly two and by nothing else; percentage fixture clean; the three count comments updated |
+| 2 | The two ancient strip additions, as flip-only cards. COMPLETE | Both render and flip (desktop and touch verified); Mastiff and Greyhound rows untouched; level-list fixture identical to baseline (62); percentage fixture gains only the two root rows; count comments read 92 dogs, 62 play, 28 learn, 2 flip-only |
 | 3 | The five foundation records as top-level tree entries | Created, unreferenced by any tree; fixture clean; carousel membership question raised, not chosen |
 | 4 | The Rache, Talbot and Cur trees | Three trees render with their new deepest generation; fixture clean except new rows; the Cur bandog removal separately signed off |
 | 5 | Old Welsh Grey Sheepdog, Scottish Terrier, Black and Tan Terrier | Six trees complete; fixture clean except new rows, Manchester Terrier verified |
@@ -385,9 +385,9 @@ this work.
 - [ ] The Cur "Old working bandogs" removal (fixture-gated, section 5).
 
 Settled: D1 percentages frozen and fixture-verified. D2 additions, not
-replacements, and (option B, 3 August) the two additions are normal strip
-rows whose two new campaign levels and renumbering are intended; the
-no-new-level rule is withdrawn. D3 display-name keying stays, no new fields
+replacements; after the Batch 2 build evidence the two additions are
+flip-only cards, not levels (3 August, reversing option B), under the
+general root-only rule in section 4, and the campaign stays at 62. D3 display-name keying stays, no new fields
 beyond genuine need. The seven images are present in
 `public/history/breeds/`, byte-exact lowercase names, staged in git. The
 Batch 1 fixture is built and committed: no test or stored visitor state
