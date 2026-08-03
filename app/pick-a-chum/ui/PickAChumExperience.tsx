@@ -622,6 +622,11 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
             >
               <PickAChumIcon />
             </button>
+            {/* Task 126: the selector's close control -- a readable red X on the centre icon's top-right,
+                closing the selector back to the closed launcher (same onClose as the chat medallion X). */}
+            <button type="button" className={styles.selectorClose} aria-label="Close Pick a Chum" onClick={onClose}>
+              <img src="/red-icon.svg" alt="" aria-hidden="true" />
+            </button>
           </div>
         </div>
       ) : (
@@ -716,7 +721,7 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
                 onAnimationEnd={() => setRoll(false)}
               />
               <button type="button" className={styles.close} aria-label="Close Pick a Chum" onClick={onClose}>
-                <span aria-hidden="true">×</span>
+                <img src="/red-icon.svg" alt="" aria-hidden="true" />
               </button>
             </div>
             <form
