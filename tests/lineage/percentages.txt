@@ -2,60 +2,60 @@
 [tree] Afghan Hound > Ancient eastern sighthounds | leafPct=65 d3Pct=65
 [tree] Afghan Hound > Mountain coursing hounds | leafPct=35 d3Pct=35
 [tree] Airedale Terrier | leafPct=100 d3Pct=100
-[tree] Airedale Terrier > Old English Black and Tan Terrier | leafPct=60 d3Pct=35
-[tree] Airedale Terrier > Otterhound | leafPct=40 d3Pct=65
-[tree] Airedale Terrier > Otterhound > Bloodhound | leafPct=18 d3Pct=21
-[tree] Airedale Terrier > Otterhound > Bloodhound > St Hubert Hound | leafPct=11 d3Pct=6
-[tree] Airedale Terrier > Otterhound > Bloodhound > Old scenting hounds | leafPct=7 d3Pct=4
-[tree] Airedale Terrier > Otterhound > Southern Hound | leafPct=12 d3Pct=14
-[tree] Airedale Terrier > Otterhound > Southern Hound > Talbot hounds | leafPct=7 d3Pct=4
-[tree] Airedale Terrier > Otterhound > Southern Hound > St Hubert Hound | leafPct=5 d3Pct=3
-[tree] Airedale Terrier > Otterhound > Rough water dogs | leafPct=10 d3Pct=6
+[tree] Airedale Terrier > Old English Black and Tan Terrier | leafPct=60 d3Pct=60
+[tree] Airedale Terrier > Otterhound | leafPct=40 d3Pct=40
+[tree] Airedale Terrier > Otterhound > Bloodhound | leafPct=18 d3Pct=18
+[tree] Airedale Terrier > Otterhound > Bloodhound > St Hubert Hound | leafPct=11 d3Pct=11
+[tree] Airedale Terrier > Otterhound > Bloodhound > Old scenting hounds | leafPct=7 d3Pct=7
+[tree] Airedale Terrier > Otterhound > Southern Hound | leafPct=12 d3Pct=12
+[tree] Airedale Terrier > Otterhound > Southern Hound > Talbot hounds | leafPct=7 d3Pct=7
+[tree] Airedale Terrier > Otterhound > Southern Hound > St Hubert Hound | leafPct=5 d3Pct=5
+[tree] Airedale Terrier > Otterhound > Rough water dogs | leafPct=10 d3Pct=10
 [tree] Ancient British Mastiff Type | leafPct=100 d3Pct=na
 [tree] Ancient Celtic Coursing Hound | leafPct=100 d3Pct=na
 [tree] Ancient Celtic Scent Hound | leafPct=100 d3Pct=na
 [tree] Ancient Livestock Dog | leafPct=100 d3Pct=na
 [tree] Basset Hound | leafPct=100 d3Pct=100
-[tree] Basset Hound > Bloodhound | leafPct=55 d3Pct=71
-[tree] Basset Hound > Bloodhound > St Hubert Hound | leafPct=33 d3Pct=21
-[tree] Basset Hound > Bloodhound > Old scenting hounds | leafPct=22 d3Pct=14
-[tree] Basset Hound > Basset Artesien Normand | leafPct=45 d3Pct=29
+[tree] Basset Hound > Bloodhound | leafPct=55 d3Pct=55
+[tree] Basset Hound > Bloodhound > St Hubert Hound | leafPct=33 d3Pct=33
+[tree] Basset Hound > Bloodhound > Old scenting hounds | leafPct=22 d3Pct=22
+[tree] Basset Hound > Basset Artesien Normand | leafPct=45 d3Pct=45
 [tree] Beagle | leafPct=100 d3Pct=100
-[tree] Beagle > Talbot hound | leafPct=40 d3Pct=23
-[tree] Beagle > Southern Hound | leafPct=35 d3Pct=40
-[tree] Beagle > Southern Hound > Talbot hounds | leafPct=21 d3Pct=12
-[tree] Beagle > Southern Hound > St Hubert Hound | leafPct=14 d3Pct=8
-[tree] Beagle > Greyhound | leafPct=25 d3Pct=37
-[tree] Beagle > Greyhound > Celtic Hound | leafPct=15 d3Pct=17
-[tree] Beagle > Greyhound > Celtic Hound > Ancient eastern sighthounds | leafPct=8 d3Pct=5
-[tree] Beagle > Greyhound > Celtic Hound > Old hunting dogs of the Celts | leafPct=7 d3Pct=4
-[tree] Beagle > Greyhound > Ancient eastern sighthounds | leafPct=10 d3Pct=6
+[tree] Beagle > Talbot hound | leafPct=40 d3Pct=40
+[tree] Beagle > Southern Hound | leafPct=35 d3Pct=35
+[tree] Beagle > Southern Hound > Talbot hounds | leafPct=21 d3Pct=21
+[tree] Beagle > Southern Hound > St Hubert Hound | leafPct=14 d3Pct=14
+[tree] Beagle > Greyhound | leafPct=25 d3Pct=25
+[tree] Beagle > Greyhound > Celtic Hound | leafPct=15 d3Pct=15
+[tree] Beagle > Greyhound > Celtic Hound > Ancient eastern sighthounds | leafPct=8 d3Pct=8
+[tree] Beagle > Greyhound > Celtic Hound > Old hunting dogs of the Celts | leafPct=7 d3Pct=7
+[tree] Beagle > Greyhound > Ancient eastern sighthounds | leafPct=10 d3Pct=10
 [tree] Bearded Collie | leafPct=100 d3Pct=100
 [tree] Bearded Collie > Shaggy lowland herders | leafPct=50 d3Pct=50
 [tree] Bearded Collie > Old working collies | leafPct=50 d3Pct=50
 [tree] Bedlington Terrier | leafPct=100 d3Pct=100
-[tree] Bedlington Terrier > Old Border terriers | leafPct=50 d3Pct=26
-[tree] Bedlington Terrier > Whippet | leafPct=30 d3Pct=50
-[tree] Bedlington Terrier > Whippet > Greyhound | leafPct=19 d3Pct=26
-[tree] Bedlington Terrier > Whippet > Greyhound > Celtic Hound | leafPct=11 d3Pct=12
-[tree] Bedlington Terrier > Whippet > Greyhound > Celtic Hound > Ancient eastern sighthounds | leafPct=6 d3Pct=3
-[tree] Bedlington Terrier > Whippet > Greyhound > Celtic Hound > Old hunting dogs of the Celts | leafPct=5 d3Pct=3
-[tree] Bedlington Terrier > Whippet > Greyhound > Ancient eastern sighthounds | leafPct=7 d3Pct=4
-[tree] Bedlington Terrier > Whippet > Old English Black and Tan Terrier | leafPct=7 d3Pct=4
+[tree] Bedlington Terrier > Old Border terriers | leafPct=50 d3Pct=50
+[tree] Bedlington Terrier > Whippet | leafPct=30 d3Pct=30
+[tree] Bedlington Terrier > Whippet > Greyhound | leafPct=19 d3Pct=19
+[tree] Bedlington Terrier > Whippet > Greyhound > Celtic Hound | leafPct=11 d3Pct=11
+[tree] Bedlington Terrier > Whippet > Greyhound > Celtic Hound > Ancient eastern sighthounds | leafPct=6 d3Pct=6
+[tree] Bedlington Terrier > Whippet > Greyhound > Celtic Hound > Old hunting dogs of the Celts | leafPct=5 d3Pct=5
+[tree] Bedlington Terrier > Whippet > Greyhound > Ancient eastern sighthounds | leafPct=7 d3Pct=7
+[tree] Bedlington Terrier > Whippet > Old English Black and Tan Terrier | leafPct=7 d3Pct=7
 [tree] Bedlington Terrier > Whippet > Italian Greyhound | leafPct=5 d3Pct=5
-[tree] Bedlington Terrier > Whippet > Italian Greyhound > Ancient eastern sighthounds | leafPct=2 d3Pct=1
-[tree] Bedlington Terrier > Whippet > Italian Greyhound > Mediterranean miniature sighthounds | leafPct=2 d3Pct=1
-[tree] Bedlington Terrier > Dandie Dinmont Terrier | leafPct=20 d3Pct=24
-[tree] Bedlington Terrier > Dandie Dinmont Terrier > Old Border terriers | leafPct=13 d3Pct=7
-[tree] Bedlington Terrier > Dandie Dinmont Terrier > Skye terrier stock | leafPct=4 d3Pct=2
-[tree] Bedlington Terrier > Dandie Dinmont Terrier > Otterhound | leafPct=3 d3Pct=4
+[tree] Bedlington Terrier > Whippet > Italian Greyhound > Ancient eastern sighthounds | leafPct=2 d3Pct=2
+[tree] Bedlington Terrier > Whippet > Italian Greyhound > Mediterranean miniature sighthounds | leafPct=2 d3Pct=2
+[tree] Bedlington Terrier > Dandie Dinmont Terrier | leafPct=20 d3Pct=20
+[tree] Bedlington Terrier > Dandie Dinmont Terrier > Old Border terriers | leafPct=13 d3Pct=13
+[tree] Bedlington Terrier > Dandie Dinmont Terrier > Skye terrier stock | leafPct=4 d3Pct=4
+[tree] Bedlington Terrier > Dandie Dinmont Terrier > Otterhound | leafPct=3 d3Pct=3
 [tree] Bedlington Terrier > Dandie Dinmont Terrier > Otterhound > Bloodhound | leafPct=1 d3Pct=1
-[tree] Bedlington Terrier > Dandie Dinmont Terrier > Otterhound > Bloodhound > St Hubert Hound | leafPct=1 d3Pct=0
-[tree] Bedlington Terrier > Dandie Dinmont Terrier > Otterhound > Bloodhound > Old scenting hounds | leafPct=1 d3Pct=0
+[tree] Bedlington Terrier > Dandie Dinmont Terrier > Otterhound > Bloodhound > St Hubert Hound | leafPct=1 d3Pct=1
+[tree] Bedlington Terrier > Dandie Dinmont Terrier > Otterhound > Bloodhound > Old scenting hounds | leafPct=1 d3Pct=1
 [tree] Bedlington Terrier > Dandie Dinmont Terrier > Otterhound > Southern Hound | leafPct=1 d3Pct=1
-[tree] Bedlington Terrier > Dandie Dinmont Terrier > Otterhound > Southern Hound > Talbot hounds | leafPct=1 d3Pct=0
+[tree] Bedlington Terrier > Dandie Dinmont Terrier > Otterhound > Southern Hound > Talbot hounds | leafPct=1 d3Pct=1
 [tree] Bedlington Terrier > Dandie Dinmont Terrier > Otterhound > Southern Hound > St Hubert Hound | leafPct=0 d3Pct=0
-[tree] Bedlington Terrier > Dandie Dinmont Terrier > Otterhound > Rough water dogs | leafPct=1 d3Pct=0
+[tree] Bedlington Terrier > Dandie Dinmont Terrier > Otterhound > Rough water dogs | leafPct=1 d3Pct=1
 [tree] Bichon Frise | leafPct=100 d3Pct=100
 [tree] Bichon Frise > Barbet water dogs | leafPct=50 d3Pct=50
 [tree] Bichon Frise > Mediterranean bichon lapdogs | leafPct=50 d3Pct=50
@@ -70,20 +70,20 @@
 [tree] Border Collie > Welsh herding dogs | leafPct=25 d3Pct=25
 [tree] Border Collie > Cumberland sheepdogs | leafPct=25 d3Pct=25
 [tree] Border Terrier | leafPct=100 d3Pct=100
-[tree] Border Terrier > Bedlington Terrier | leafPct=34 d3Pct=48
-[tree] Border Terrier > Bedlington Terrier > Old Border terriers | leafPct=17 d3Pct=8
-[tree] Border Terrier > Bedlington Terrier > Whippet | leafPct=10 d3Pct=16
-[tree] Border Terrier > Bedlington Terrier > Whippet > Greyhound | leafPct=6 d3Pct=8
+[tree] Border Terrier > Bedlington Terrier | leafPct=34 d3Pct=34
+[tree] Border Terrier > Bedlington Terrier > Old Border terriers | leafPct=17 d3Pct=17
+[tree] Border Terrier > Bedlington Terrier > Whippet | leafPct=10 d3Pct=10
+[tree] Border Terrier > Bedlington Terrier > Whippet > Greyhound | leafPct=6 d3Pct=6
 [tree] Border Terrier > Bedlington Terrier > Whippet > Greyhound > Celtic Hound | leafPct=4 d3Pct=4
-[tree] Border Terrier > Bedlington Terrier > Whippet > Greyhound > Celtic Hound > Ancient eastern sighthounds | leafPct=2 d3Pct=1
-[tree] Border Terrier > Bedlington Terrier > Whippet > Greyhound > Celtic Hound > Old hunting dogs of the Celts | leafPct=2 d3Pct=1
-[tree] Border Terrier > Bedlington Terrier > Whippet > Greyhound > Ancient eastern sighthounds | leafPct=3 d3Pct=1
-[tree] Border Terrier > Bedlington Terrier > Whippet > Old English Black and Tan Terrier | leafPct=2 d3Pct=1
-[tree] Border Terrier > Bedlington Terrier > Whippet > Italian Greyhound | leafPct=2 d3Pct=1
-[tree] Border Terrier > Bedlington Terrier > Whippet > Italian Greyhound > Ancient eastern sighthounds | leafPct=1 d3Pct=0
-[tree] Border Terrier > Bedlington Terrier > Whippet > Italian Greyhound > Mediterranean miniature sighthounds | leafPct=1 d3Pct=0
+[tree] Border Terrier > Bedlington Terrier > Whippet > Greyhound > Celtic Hound > Ancient eastern sighthounds | leafPct=2 d3Pct=2
+[tree] Border Terrier > Bedlington Terrier > Whippet > Greyhound > Celtic Hound > Old hunting dogs of the Celts | leafPct=2 d3Pct=2
+[tree] Border Terrier > Bedlington Terrier > Whippet > Greyhound > Ancient eastern sighthounds | leafPct=3 d3Pct=3
+[tree] Border Terrier > Bedlington Terrier > Whippet > Old English Black and Tan Terrier | leafPct=2 d3Pct=2
+[tree] Border Terrier > Bedlington Terrier > Whippet > Italian Greyhound | leafPct=2 d3Pct=2
+[tree] Border Terrier > Bedlington Terrier > Whippet > Italian Greyhound > Ancient eastern sighthounds | leafPct=1 d3Pct=1
+[tree] Border Terrier > Bedlington Terrier > Whippet > Italian Greyhound > Mediterranean miniature sighthounds | leafPct=1 d3Pct=1
 [tree] Border Terrier > Bedlington Terrier > Dandie Dinmont Terrier | leafPct=7 d3Pct=7
-[tree] Border Terrier > Bedlington Terrier > Dandie Dinmont Terrier > Old Border terriers | leafPct=4 d3Pct=2
+[tree] Border Terrier > Bedlington Terrier > Dandie Dinmont Terrier > Old Border terriers | leafPct=4 d3Pct=4
 [tree] Border Terrier > Bedlington Terrier > Dandie Dinmont Terrier > Skye terrier stock | leafPct=1 d3Pct=1
 [tree] Border Terrier > Bedlington Terrier > Dandie Dinmont Terrier > Otterhound | leafPct=1 d3Pct=1
 [tree] Border Terrier > Bedlington Terrier > Dandie Dinmont Terrier > Otterhound > Bloodhound | leafPct=0 d3Pct=0
@@ -93,65 +93,65 @@
 [tree] Border Terrier > Bedlington Terrier > Dandie Dinmont Terrier > Otterhound > Southern Hound > Talbot hounds | leafPct=0 d3Pct=0
 [tree] Border Terrier > Bedlington Terrier > Dandie Dinmont Terrier > Otterhound > Southern Hound > St Hubert Hound | leafPct=0 d3Pct=0
 [tree] Border Terrier > Bedlington Terrier > Dandie Dinmont Terrier > Otterhound > Rough water dogs | leafPct=0 d3Pct=0
-[tree] Border Terrier > Dandie Dinmont Terrier | leafPct=33 d3Pct=36
-[tree] Border Terrier > Dandie Dinmont Terrier > Old Border terriers | leafPct=21 d3Pct=10
-[tree] Border Terrier > Dandie Dinmont Terrier > Skye terrier stock | leafPct=7 d3Pct=3
-[tree] Border Terrier > Dandie Dinmont Terrier > Otterhound | leafPct=5 d3Pct=7
+[tree] Border Terrier > Dandie Dinmont Terrier | leafPct=33 d3Pct=33
+[tree] Border Terrier > Dandie Dinmont Terrier > Old Border terriers | leafPct=21 d3Pct=21
+[tree] Border Terrier > Dandie Dinmont Terrier > Skye terrier stock | leafPct=7 d3Pct=7
+[tree] Border Terrier > Dandie Dinmont Terrier > Otterhound | leafPct=5 d3Pct=5
 [tree] Border Terrier > Dandie Dinmont Terrier > Otterhound > Bloodhound | leafPct=2 d3Pct=2
 [tree] Border Terrier > Dandie Dinmont Terrier > Otterhound > Bloodhound > St Hubert Hound | leafPct=1 d3Pct=1
-[tree] Border Terrier > Dandie Dinmont Terrier > Otterhound > Bloodhound > Old scenting hounds | leafPct=1 d3Pct=0
+[tree] Border Terrier > Dandie Dinmont Terrier > Otterhound > Bloodhound > Old scenting hounds | leafPct=1 d3Pct=1
 [tree] Border Terrier > Dandie Dinmont Terrier > Otterhound > Southern Hound | leafPct=1 d3Pct=1
-[tree] Border Terrier > Dandie Dinmont Terrier > Otterhound > Southern Hound > Talbot hounds | leafPct=1 d3Pct=0
-[tree] Border Terrier > Dandie Dinmont Terrier > Otterhound > Southern Hound > St Hubert Hound | leafPct=1 d3Pct=0
+[tree] Border Terrier > Dandie Dinmont Terrier > Otterhound > Southern Hound > Talbot hounds | leafPct=1 d3Pct=1
+[tree] Border Terrier > Dandie Dinmont Terrier > Otterhound > Southern Hound > St Hubert Hound | leafPct=1 d3Pct=1
 [tree] Border Terrier > Dandie Dinmont Terrier > Otterhound > Rough water dogs | leafPct=1 d3Pct=1
-[tree] Border Terrier > Old fell terriers | leafPct=33 d3Pct=16
+[tree] Border Terrier > Old fell terriers | leafPct=33 d3Pct=33
 [tree] Boston Terrier | leafPct=100 d3Pct=100
-[tree] Boston Terrier > Bulldog | leafPct=55 d3Pct=79
-[tree] Boston Terrier > Bulldog > Old English Bulldog | leafPct=33 d3Pct=31
-[tree] Boston Terrier > Bulldog > Old English Bulldog > Mastiff and Alaunt war dogs | leafPct=20 d3Pct=9
-[tree] Boston Terrier > Bulldog > Old English Bulldog > Old British bandogs | leafPct=13 d3Pct=6
-[tree] Boston Terrier > Bulldog > Mastiff | leafPct=14 d3Pct=13
-[tree] Boston Terrier > Bulldog > Mastiff > Ancient Molossers | leafPct=8 d3Pct=4
-[tree] Boston Terrier > Bulldog > Mastiff > Old British bandogs | leafPct=6 d3Pct=3
+[tree] Boston Terrier > Bulldog | leafPct=55 d3Pct=55
+[tree] Boston Terrier > Bulldog > Old English Bulldog | leafPct=33 d3Pct=33
+[tree] Boston Terrier > Bulldog > Old English Bulldog > Mastiff and Alaunt war dogs | leafPct=20 d3Pct=20
+[tree] Boston Terrier > Bulldog > Old English Bulldog > Old British bandogs | leafPct=13 d3Pct=13
+[tree] Boston Terrier > Bulldog > Mastiff | leafPct=14 d3Pct=14
+[tree] Boston Terrier > Bulldog > Mastiff > Ancient Molossers | leafPct=8 d3Pct=8
+[tree] Boston Terrier > Bulldog > Mastiff > Old British bandogs | leafPct=6 d3Pct=6
 [tree] Boston Terrier > Bulldog > Pug | leafPct=8 d3Pct=8
-[tree] Boston Terrier > Bulldog > Pug > Ancient Chinese toy dogs | leafPct=5 d3Pct=2
-[tree] Boston Terrier > Bulldog > Pug > Eastern lion and lap dogs | leafPct=3 d3Pct=2
-[tree] Boston Terrier > White English Terrier | leafPct=45 d3Pct=21
+[tree] Boston Terrier > Bulldog > Pug > Ancient Chinese toy dogs | leafPct=5 d3Pct=5
+[tree] Boston Terrier > Bulldog > Pug > Eastern lion and lap dogs | leafPct=3 d3Pct=3
+[tree] Boston Terrier > White English Terrier | leafPct=45 d3Pct=45
 [tree] Boxer | leafPct=100 d3Pct=100
-[tree] Boxer > Brabant Bullenbeisser | leafPct=70 d3Pct=72
-[tree] Boxer > Brabant Bullenbeisser > Great Bullenbeisser (Danziger Bullenbeisser) | leafPct=30 d3Pct=24
-[tree] Boxer > Brabant Bullenbeisser > Great Bullenbeisser (Danziger Bullenbeisser) > Medieval Alaunts and catch dogs | leafPct=16 d3Pct=8
-[tree] Boxer > Brabant Bullenbeisser > Great Bullenbeisser (Danziger Bullenbeisser) > Early Germanic boar hunting dogs | leafPct=13 d3Pct=7
-[tree] Boxer > Brabant Bullenbeisser > Old English Bulldog | leafPct=12 d3Pct=12
+[tree] Boxer > Brabant Bullenbeisser | leafPct=70 d3Pct=78
+[tree] Boxer > Brabant Bullenbeisser > Great Bullenbeisser (Danziger Bullenbeisser) | leafPct=30 d3Pct=29
+[tree] Boxer > Brabant Bullenbeisser > Great Bullenbeisser (Danziger Bullenbeisser) > Medieval Alaunts and catch dogs | leafPct=16 d3Pct=10
+[tree] Boxer > Brabant Bullenbeisser > Great Bullenbeisser (Danziger Bullenbeisser) > Early Germanic boar hunting dogs | leafPct=13 d3Pct=8
+[tree] Boxer > Brabant Bullenbeisser > Old English Bulldog | leafPct=12 d3Pct=7
 [tree] Boxer > Brabant Bullenbeisser > Old English Bulldog > Mastiff and Alaunt war dogs | leafPct=7 d3Pct=4
-[tree] Boxer > Brabant Bullenbeisser > Old English Bulldog > Old British bandogs | leafPct=5 d3Pct=2
-[tree] Boxer > Brabant Bullenbeisser > German Bullenbeisser types | leafPct=28 d3Pct=24
-[tree] Boxer > Brabant Bullenbeisser > German Bullenbeisser types > Medieval Alaunts and catch dogs | leafPct=18 d3Pct=9
-[tree] Boxer > Brabant Bullenbeisser > German Bullenbeisser types > Old German farm guards | leafPct=10 d3Pct=5
-[tree] Boxer > Old English Bulldog | leafPct=30 d3Pct=28
-[tree] Boxer > Old English Bulldog > English Mastiff | leafPct=18 d3Pct=18
-[tree] Boxer > Old English Bulldog > English Mastiff > Ancient Molossers | leafPct=11 d3Pct=5
+[tree] Boxer > Brabant Bullenbeisser > Old English Bulldog > Old British bandogs | leafPct=5 d3Pct=3
+[tree] Boxer > Brabant Bullenbeisser > German Bullenbeisser types | leafPct=28 d3Pct=29
+[tree] Boxer > Brabant Bullenbeisser > German Bullenbeisser types > Medieval Alaunts and catch dogs | leafPct=18 d3Pct=11
+[tree] Boxer > Brabant Bullenbeisser > German Bullenbeisser types > Old German farm guards | leafPct=10 d3Pct=6
+[tree] Boxer > Old English Bulldog | leafPct=30 d3Pct=22
+[tree] Boxer > Old English Bulldog > English Mastiff | leafPct=18 d3Pct=11
+[tree] Boxer > Old English Bulldog > English Mastiff > Ancient Molossers | leafPct=11 d3Pct=6
 [tree] Boxer > Old English Bulldog > English Mastiff > Old British bandogs | leafPct=7 d3Pct=4
-[tree] Boxer > Old English Bulldog > Ancient Molossers | leafPct=12 d3Pct=6
+[tree] Boxer > Old English Bulldog > Ancient Molossers | leafPct=12 d3Pct=7
 [tree] Buckhound | leafPct=100 d3Pct=100
 [tree] Buckhound > Old scenting hounds | leafPct=60 d3Pct=60
 [tree] Buckhound > Talbot hounds | leafPct=40 d3Pct=40
 [tree] Bull Terrier | leafPct=100 d3Pct=100
-[tree] Bull Terrier > Bulldog | leafPct=45 d3Pct=63
-[tree] Bull Terrier > Bulldog > Old English Bulldog | leafPct=27 d3Pct=25
-[tree] Bull Terrier > Bulldog > Old English Bulldog > Mastiff and Alaunt war dogs | leafPct=16 d3Pct=8
-[tree] Bull Terrier > Bulldog > Old English Bulldog > Old British bandogs | leafPct=11 d3Pct=5
-[tree] Bull Terrier > Bulldog > Mastiff | leafPct=11 d3Pct=10
-[tree] Bull Terrier > Bulldog > Mastiff > Ancient Molossers | leafPct=7 d3Pct=3
-[tree] Bull Terrier > Bulldog > Mastiff > Old British bandogs | leafPct=5 d3Pct=2
-[tree] Bull Terrier > Bulldog > Pug | leafPct=7 d3Pct=6
-[tree] Bull Terrier > Bulldog > Pug > Ancient Chinese toy dogs | leafPct=4 d3Pct=2
-[tree] Bull Terrier > Bulldog > Pug > Eastern lion and lap dogs | leafPct=3 d3Pct=1
-[tree] Bull Terrier > White English Terrier | leafPct=40 d3Pct=19
-[tree] Bull Terrier > Dalmatian | leafPct=15 d3Pct=19
-[tree] Bull Terrier > Dalmatian > Ancient spotted hounds | leafPct=8 d3Pct=4
-[tree] Bull Terrier > Dalmatian > Pointer | leafPct=5 d3Pct=7
-[tree] Bull Terrier > Dalmatian > Pointer > English Foxhound | leafPct=1 d3Pct=2
+[tree] Bull Terrier > Bulldog | leafPct=45 d3Pct=45
+[tree] Bull Terrier > Bulldog > Old English Bulldog | leafPct=27 d3Pct=27
+[tree] Bull Terrier > Bulldog > Old English Bulldog > Mastiff and Alaunt war dogs | leafPct=16 d3Pct=16
+[tree] Bull Terrier > Bulldog > Old English Bulldog > Old British bandogs | leafPct=11 d3Pct=11
+[tree] Bull Terrier > Bulldog > Mastiff | leafPct=11 d3Pct=11
+[tree] Bull Terrier > Bulldog > Mastiff > Ancient Molossers | leafPct=7 d3Pct=7
+[tree] Bull Terrier > Bulldog > Mastiff > Old British bandogs | leafPct=5 d3Pct=5
+[tree] Bull Terrier > Bulldog > Pug | leafPct=7 d3Pct=7
+[tree] Bull Terrier > Bulldog > Pug > Ancient Chinese toy dogs | leafPct=4 d3Pct=4
+[tree] Bull Terrier > Bulldog > Pug > Eastern lion and lap dogs | leafPct=3 d3Pct=3
+[tree] Bull Terrier > White English Terrier | leafPct=40 d3Pct=40
+[tree] Bull Terrier > Dalmatian | leafPct=15 d3Pct=15
+[tree] Bull Terrier > Dalmatian > Ancient spotted hounds | leafPct=8 d3Pct=8
+[tree] Bull Terrier > Dalmatian > Pointer | leafPct=5 d3Pct=5
+[tree] Bull Terrier > Dalmatian > Pointer > English Foxhound | leafPct=1 d3Pct=1
 [tree] Bull Terrier > Dalmatian > Pointer > English Foxhound > Southern Hound | leafPct=1 d3Pct=1
 [tree] Bull Terrier > Dalmatian > Pointer > English Foxhound > Southern Hound > Talbot hounds | leafPct=0 d3Pct=0
 [tree] Bull Terrier > Dalmatian > Pointer > English Foxhound > Southern Hound > St Hubert Hound | leafPct=0 d3Pct=0
@@ -165,27 +165,27 @@
 [tree] Bull Terrier > Dalmatian > Pointer > Greyhound > Celtic Hound > Old hunting dogs of the Celts | leafPct=0 d3Pct=0
 [tree] Bull Terrier > Dalmatian > Pointer > Greyhound > Ancient eastern sighthounds | leafPct=0 d3Pct=0
 [tree] Bull Terrier > Dalmatian > Pointer > Bloodhound | leafPct=1 d3Pct=1
-[tree] Bull Terrier > Dalmatian > Pointer > Bloodhound > St Hubert Hound | leafPct=1 d3Pct=0
+[tree] Bull Terrier > Dalmatian > Pointer > Bloodhound > St Hubert Hound | leafPct=1 d3Pct=1
 [tree] Bull Terrier > Dalmatian > Pointer > Bloodhound > Old scenting hounds | leafPct=0 d3Pct=0
-[tree] Bull Terrier > Dalmatian > Pointer > Setter | leafPct=1 d3Pct=0
-[tree] Bull Terrier > Dalmatian > Carriage guard dogs | leafPct=2 d3Pct=1
+[tree] Bull Terrier > Dalmatian > Pointer > Setter | leafPct=1 d3Pct=1
+[tree] Bull Terrier > Dalmatian > Carriage guard dogs | leafPct=2 d3Pct=2
 [tree] Bulldog | leafPct=100 d3Pct=100
 [tree] Bulldog > Old English Bulldog | leafPct=60 d3Pct=60
-[tree] Bulldog > Old English Bulldog > Mastiff and Alaunt war dogs | leafPct=36 d3Pct=18
-[tree] Bulldog > Old English Bulldog > Old British bandogs | leafPct=24 d3Pct=12
+[tree] Bulldog > Old English Bulldog > Mastiff and Alaunt war dogs | leafPct=36 d3Pct=36
+[tree] Bulldog > Old English Bulldog > Old British bandogs | leafPct=24 d3Pct=24
 [tree] Bulldog > Mastiff | leafPct=25 d3Pct=25
-[tree] Bulldog > Mastiff > Ancient Molossers | leafPct=15 d3Pct=8
-[tree] Bulldog > Mastiff > Old British bandogs | leafPct=10 d3Pct=5
+[tree] Bulldog > Mastiff > Ancient Molossers | leafPct=15 d3Pct=15
+[tree] Bulldog > Mastiff > Old British bandogs | leafPct=10 d3Pct=10
 [tree] Bulldog > Pug | leafPct=15 d3Pct=15
-[tree] Bulldog > Pug > Ancient Chinese toy dogs | leafPct=9 d3Pct=5
-[tree] Bulldog > Pug > Eastern lion and lap dogs | leafPct=6 d3Pct=3
+[tree] Bulldog > Pug > Ancient Chinese toy dogs | leafPct=9 d3Pct=9
+[tree] Bulldog > Pug > Eastern lion and lap dogs | leafPct=6 d3Pct=6
 [tree] Bullmastiff | leafPct=100 d3Pct=100
 [tree] Bullmastiff > English Mastiff | leafPct=60 d3Pct=60
-[tree] Bullmastiff > English Mastiff > Ancient Molossers | leafPct=36 d3Pct=18
-[tree] Bullmastiff > English Mastiff > Old British bandogs | leafPct=24 d3Pct=12
+[tree] Bullmastiff > English Mastiff > Ancient Molossers | leafPct=36 d3Pct=36
+[tree] Bullmastiff > English Mastiff > Old British bandogs | leafPct=24 d3Pct=24
 [tree] Bullmastiff > Old English Bulldog | leafPct=40 d3Pct=40
-[tree] Bullmastiff > Old English Bulldog > Mastiff and Alaunt war dogs | leafPct=24 d3Pct=12
-[tree] Bullmastiff > Old English Bulldog > Old British bandogs | leafPct=16 d3Pct=8
+[tree] Bullmastiff > Old English Bulldog > Mastiff and Alaunt war dogs | leafPct=24 d3Pct=24
+[tree] Bullmastiff > Old English Bulldog > Old British bandogs | leafPct=16 d3Pct=16
 [tree] Cairn Terrier | leafPct=100 d3Pct=100
 [tree] Cairn Terrier > Skye terrier stock | leafPct=55 d3Pct=55
 [tree] Cairn Terrier > Highland mainland terriers | leafPct=45 d3Pct=45
@@ -193,28 +193,28 @@
 [tree] Cardigan Welsh Corgi > Early badger hunting dogs | leafPct=55 d3Pct=55
 [tree] Cardigan Welsh Corgi > Welsh herding dogs | leafPct=45 d3Pct=45
 [tree] Cavachon | leafPct=100 d3Pct=100
-[tree] Cavachon > Cavalier King Charles Spaniel | leafPct=50 d3Pct=57
-[tree] Cavachon > Cavalier King Charles Spaniel > King Charles Spaniel | leafPct=35 d3Pct=30
-[tree] Cavachon > Cavalier King Charles Spaniel > King Charles Spaniel > Old toy spaniels | leafPct=21 d3Pct=9
-[tree] Cavachon > Cavalier King Charles Spaniel > King Charles Spaniel > Asian flat-faced toys | leafPct=14 d3Pct=6
-[tree] Cavachon > Cavalier King Charles Spaniel > Old sporting toy spaniels | leafPct=15 d3Pct=6
-[tree] Cavachon > Bichon Frise | leafPct=50 d3Pct=43
-[tree] Cavachon > Bichon Frise > Barbet water dogs | leafPct=25 d3Pct=11
-[tree] Cavachon > Bichon Frise > Mediterranean bichon lapdogs | leafPct=25 d3Pct=11
+[tree] Cavachon > Cavalier King Charles Spaniel | leafPct=50 d3Pct=50
+[tree] Cavachon > Cavalier King Charles Spaniel > King Charles Spaniel | leafPct=35 d3Pct=35
+[tree] Cavachon > Cavalier King Charles Spaniel > King Charles Spaniel > Old toy spaniels | leafPct=21 d3Pct=21
+[tree] Cavachon > Cavalier King Charles Spaniel > King Charles Spaniel > Asian flat-faced toys | leafPct=14 d3Pct=14
+[tree] Cavachon > Cavalier King Charles Spaniel > Old sporting toy spaniels | leafPct=15 d3Pct=15
+[tree] Cavachon > Bichon Frise | leafPct=50 d3Pct=50
+[tree] Cavachon > Bichon Frise > Barbet water dogs | leafPct=25 d3Pct=25
+[tree] Cavachon > Bichon Frise > Mediterranean bichon lapdogs | leafPct=25 d3Pct=25
 [tree] Cavalier King Charles Spaniel | leafPct=100 d3Pct=100
-[tree] Cavalier King Charles Spaniel > King Charles Spaniel | leafPct=70 d3Pct=82
-[tree] Cavalier King Charles Spaniel > King Charles Spaniel > Old toy spaniels | leafPct=42 d3Pct=25
-[tree] Cavalier King Charles Spaniel > King Charles Spaniel > Asian flat-faced toys | leafPct=28 d3Pct=16
-[tree] Cavalier King Charles Spaniel > Old sporting toy spaniels | leafPct=30 d3Pct=18
+[tree] Cavalier King Charles Spaniel > King Charles Spaniel | leafPct=70 d3Pct=70
+[tree] Cavalier King Charles Spaniel > King Charles Spaniel > Old toy spaniels | leafPct=42 d3Pct=42
+[tree] Cavalier King Charles Spaniel > King Charles Spaniel > Asian flat-faced toys | leafPct=28 d3Pct=28
+[tree] Cavalier King Charles Spaniel > Old sporting toy spaniels | leafPct=30 d3Pct=30
 [tree] Cavapoo | leafPct=100 d3Pct=100
-[tree] Cavapoo > Cavalier King Charles Spaniel | leafPct=50 d3Pct=57
-[tree] Cavapoo > Cavalier King Charles Spaniel > King Charles Spaniel | leafPct=35 d3Pct=30
-[tree] Cavapoo > Cavalier King Charles Spaniel > King Charles Spaniel > Old toy spaniels | leafPct=21 d3Pct=9
-[tree] Cavapoo > Cavalier King Charles Spaniel > King Charles Spaniel > Asian flat-faced toys | leafPct=14 d3Pct=6
-[tree] Cavapoo > Cavalier King Charles Spaniel > Old sporting toy spaniels | leafPct=15 d3Pct=6
-[tree] Cavapoo > Poodle | leafPct=50 d3Pct=43
-[tree] Cavapoo > Poodle > Old European water dogs | leafPct=28 d3Pct=12
-[tree] Cavapoo > Poodle > Barbet and water spaniels | leafPct=23 d3Pct=10
+[tree] Cavapoo > Cavalier King Charles Spaniel | leafPct=50 d3Pct=50
+[tree] Cavapoo > Cavalier King Charles Spaniel > King Charles Spaniel | leafPct=35 d3Pct=35
+[tree] Cavapoo > Cavalier King Charles Spaniel > King Charles Spaniel > Old toy spaniels | leafPct=21 d3Pct=21
+[tree] Cavapoo > Cavalier King Charles Spaniel > King Charles Spaniel > Asian flat-faced toys | leafPct=14 d3Pct=14
+[tree] Cavapoo > Cavalier King Charles Spaniel > Old sporting toy spaniels | leafPct=15 d3Pct=15
+[tree] Cavapoo > Poodle | leafPct=50 d3Pct=50
+[tree] Cavapoo > Poodle > Old European water dogs | leafPct=28 d3Pct=28
+[tree] Cavapoo > Poodle > Barbet and water spaniels | leafPct=23 d3Pct=23
 [tree] Celtic Heeler | leafPct=100 d3Pct=100
 [tree] Celtic Heeler > Early badger hunting dogs | leafPct=55 d3Pct=55
 [tree] Celtic Heeler > Early badger hunting dogs > Ancient Celtic earth dogs | leafPct=28 d3Pct=28
@@ -232,41 +232,41 @@
 [tree] Clumber Spaniel > Land spaniels | leafPct=55 d3Pct=55
 [tree] Clumber Spaniel > Basset and heavy hounds | leafPct=45 d3Pct=45
 [tree] Cockapoo | leafPct=100 d3Pct=100
-[tree] Cockapoo > Cocker Spaniel | leafPct=50 d3Pct=56
-[tree] Cockapoo > Cocker Spaniel > Land spaniels | leafPct=28 d3Pct=12
-[tree] Cockapoo > Cocker Spaniel > Field Spaniel | leafPct=13 d3Pct=14
-[tree] Cockapoo > Cocker Spaniel > Field Spaniel > Land spaniels | leafPct=6 d3Pct=2
+[tree] Cockapoo > Cocker Spaniel | leafPct=50 d3Pct=50
+[tree] Cockapoo > Cocker Spaniel > Land spaniels | leafPct=28 d3Pct=28
+[tree] Cockapoo > Cocker Spaniel > Field Spaniel | leafPct=13 d3Pct=13
+[tree] Cockapoo > Cocker Spaniel > Field Spaniel > Land spaniels | leafPct=6 d3Pct=6
 [tree] Cockapoo > Cocker Spaniel > Field Spaniel > Sussex Spaniel | leafPct=4 d3Pct=4
-[tree] Cockapoo > Cocker Spaniel > Field Spaniel > Sussex Spaniel > Land spaniels | leafPct=3 d3Pct=1
-[tree] Cockapoo > Cocker Spaniel > Field Spaniel > Sussex Spaniel > Heavier working spaniels | leafPct=2 d3Pct=1
-[tree] Cockapoo > Cocker Spaniel > Field Spaniel > Clumber Spaniel | leafPct=3 d3Pct=2
+[tree] Cockapoo > Cocker Spaniel > Field Spaniel > Sussex Spaniel > Land spaniels | leafPct=3 d3Pct=3
+[tree] Cockapoo > Cocker Spaniel > Field Spaniel > Sussex Spaniel > Heavier working spaniels | leafPct=2 d3Pct=2
+[tree] Cockapoo > Cocker Spaniel > Field Spaniel > Clumber Spaniel | leafPct=3 d3Pct=3
 [tree] Cockapoo > Cocker Spaniel > Field Spaniel > Clumber Spaniel > Land spaniels | leafPct=1 d3Pct=1
-[tree] Cockapoo > Cocker Spaniel > Field Spaniel > Clumber Spaniel > Basset and heavy hounds | leafPct=1 d3Pct=0
-[tree] Cockapoo > Cocker Spaniel > Sussex Spaniel | leafPct=10 d3Pct=9
-[tree] Cockapoo > Cocker Spaniel > Sussex Spaniel > Land spaniels | leafPct=6 d3Pct=3
-[tree] Cockapoo > Cocker Spaniel > Sussex Spaniel > Heavier working spaniels | leafPct=4 d3Pct=2
-[tree] Cockapoo > Poodle | leafPct=50 d3Pct=44
-[tree] Cockapoo > Poodle > Old European water dogs | leafPct=28 d3Pct=12
-[tree] Cockapoo > Poodle > Barbet and water spaniels | leafPct=23 d3Pct=10
+[tree] Cockapoo > Cocker Spaniel > Field Spaniel > Clumber Spaniel > Basset and heavy hounds | leafPct=1 d3Pct=1
+[tree] Cockapoo > Cocker Spaniel > Sussex Spaniel | leafPct=10 d3Pct=10
+[tree] Cockapoo > Cocker Spaniel > Sussex Spaniel > Land spaniels | leafPct=6 d3Pct=6
+[tree] Cockapoo > Cocker Spaniel > Sussex Spaniel > Heavier working spaniels | leafPct=4 d3Pct=4
+[tree] Cockapoo > Poodle | leafPct=50 d3Pct=50
+[tree] Cockapoo > Poodle > Old European water dogs | leafPct=28 d3Pct=28
+[tree] Cockapoo > Poodle > Barbet and water spaniels | leafPct=23 d3Pct=23
 [tree] Cocker Spaniel | leafPct=100 d3Pct=100
-[tree] Cocker Spaniel > Land spaniels | leafPct=55 d3Pct=35
-[tree] Cocker Spaniel > Field Spaniel | leafPct=25 d3Pct=40
-[tree] Cocker Spaniel > Field Spaniel > Land spaniels | leafPct=11 d3Pct=7
-[tree] Cocker Spaniel > Field Spaniel > Sussex Spaniel | leafPct=9 d3Pct=11
-[tree] Cocker Spaniel > Field Spaniel > Sussex Spaniel > Land spaniels | leafPct=5 d3Pct=3
-[tree] Cocker Spaniel > Field Spaniel > Sussex Spaniel > Heavier working spaniels | leafPct=4 d3Pct=2
-[tree] Cocker Spaniel > Field Spaniel > Clumber Spaniel | leafPct=5 d3Pct=6
-[tree] Cocker Spaniel > Field Spaniel > Clumber Spaniel > Land spaniels | leafPct=3 d3Pct=2
-[tree] Cocker Spaniel > Field Spaniel > Clumber Spaniel > Basset and heavy hounds | leafPct=2 d3Pct=1
-[tree] Cocker Spaniel > Sussex Spaniel | leafPct=20 d3Pct=25
-[tree] Cocker Spaniel > Sussex Spaniel > Land spaniels | leafPct=12 d3Pct=8
-[tree] Cocker Spaniel > Sussex Spaniel > Heavier working spaniels | leafPct=8 d3Pct=5
+[tree] Cocker Spaniel > Land spaniels | leafPct=55 d3Pct=55
+[tree] Cocker Spaniel > Field Spaniel | leafPct=25 d3Pct=25
+[tree] Cocker Spaniel > Field Spaniel > Land spaniels | leafPct=11 d3Pct=11
+[tree] Cocker Spaniel > Field Spaniel > Sussex Spaniel | leafPct=9 d3Pct=9
+[tree] Cocker Spaniel > Field Spaniel > Sussex Spaniel > Land spaniels | leafPct=5 d3Pct=5
+[tree] Cocker Spaniel > Field Spaniel > Sussex Spaniel > Heavier working spaniels | leafPct=4 d3Pct=4
+[tree] Cocker Spaniel > Field Spaniel > Clumber Spaniel | leafPct=5 d3Pct=5
+[tree] Cocker Spaniel > Field Spaniel > Clumber Spaniel > Land spaniels | leafPct=3 d3Pct=3
+[tree] Cocker Spaniel > Field Spaniel > Clumber Spaniel > Basset and heavy hounds | leafPct=2 d3Pct=2
+[tree] Cocker Spaniel > Sussex Spaniel | leafPct=20 d3Pct=20
+[tree] Cocker Spaniel > Sussex Spaniel > Land spaniels | leafPct=12 d3Pct=12
+[tree] Cocker Spaniel > Sussex Spaniel > Heavier working spaniels | leafPct=8 d3Pct=8
 [tree] Corgi | leafPct=100 d3Pct=100
-[tree] Corgi > Spitz-type dogs | leafPct=40 d3Pct=30
-[tree] Corgi > Cardigan Welsh Corgi | leafPct=35 d3Pct=52
-[tree] Corgi > Cardigan Welsh Corgi > Early badger hunting dogs | leafPct=19 d3Pct=14
-[tree] Corgi > Cardigan Welsh Corgi > Welsh herding dogs | leafPct=16 d3Pct=12
-[tree] Corgi > Welsh herding dogs | leafPct=25 d3Pct=19
+[tree] Corgi > Spitz-type dogs | leafPct=40 d3Pct=40
+[tree] Corgi > Cardigan Welsh Corgi | leafPct=35 d3Pct=35
+[tree] Corgi > Cardigan Welsh Corgi > Early badger hunting dogs | leafPct=19 d3Pct=19
+[tree] Corgi > Cardigan Welsh Corgi > Welsh herding dogs | leafPct=16 d3Pct=16
+[tree] Corgi > Welsh herding dogs | leafPct=25 d3Pct=25
 [tree] Cumberland Sheepdog | leafPct=100 d3Pct=100
 [tree] Cumberland Sheepdog > Old working collies | leafPct=60 d3Pct=60
 [tree] Cumberland Sheepdog > Welsh herding dogs | leafPct=40 d3Pct=40
@@ -278,160 +278,160 @@
 [tree] Cur > Old working collies > Old working collies | leafPct=28 d3Pct=28
 [tree] Cur > Old heeler stock | leafPct=45 d3Pct=45
 [tree] Curly-Coated Retriever | leafPct=100 d3Pct=100
-[tree] Curly-Coated Retriever > English Water Spaniel | leafPct=35 d3Pct=26
-[tree] Curly-Coated Retriever > St John's Water Dog | leafPct=30 d3Pct=22
-[tree] Curly-Coated Retriever > Irish Water Spaniel | leafPct=20 d3Pct=30
-[tree] Curly-Coated Retriever > Irish Water Spaniel > Old Irish water dogs | leafPct=11 d3Pct=8
-[tree] Curly-Coated Retriever > Irish Water Spaniel > Poodle and Barbet water dogs | leafPct=9 d3Pct=7
-[tree] Curly-Coated Retriever > Poodle | leafPct=15 d3Pct=22
-[tree] Curly-Coated Retriever > Poodle > Old European water dogs | leafPct=8 d3Pct=6
-[tree] Curly-Coated Retriever > Poodle > Barbet and water spaniels | leafPct=7 d3Pct=5
+[tree] Curly-Coated Retriever > English Water Spaniel | leafPct=35 d3Pct=35
+[tree] Curly-Coated Retriever > St John's Water Dog | leafPct=30 d3Pct=30
+[tree] Curly-Coated Retriever > Irish Water Spaniel | leafPct=20 d3Pct=20
+[tree] Curly-Coated Retriever > Irish Water Spaniel > Old Irish water dogs | leafPct=11 d3Pct=11
+[tree] Curly-Coated Retriever > Irish Water Spaniel > Poodle and Barbet water dogs | leafPct=9 d3Pct=9
+[tree] Curly-Coated Retriever > Poodle | leafPct=15 d3Pct=15
+[tree] Curly-Coated Retriever > Poodle > Old European water dogs | leafPct=8 d3Pct=8
+[tree] Curly-Coated Retriever > Poodle > Barbet and water spaniels | leafPct=7 d3Pct=7
 [tree] Dachshund | leafPct=100 d3Pct=100
-[tree] Dachshund > German bracke scenthounds | leafPct=60 d3Pct=52
-[tree] Dachshund > Old earth terriers | leafPct=25 d3Pct=22
-[tree] Dachshund > Bloodhound | leafPct=15 d3Pct=26
-[tree] Dachshund > Bloodhound > St Hubert Hound | leafPct=9 d3Pct=8
-[tree] Dachshund > Bloodhound > Old scenting hounds | leafPct=6 d3Pct=5
+[tree] Dachshund > German bracke scenthounds | leafPct=60 d3Pct=60
+[tree] Dachshund > Old earth terriers | leafPct=25 d3Pct=25
+[tree] Dachshund > Bloodhound | leafPct=15 d3Pct=15
+[tree] Dachshund > Bloodhound > St Hubert Hound | leafPct=9 d3Pct=9
+[tree] Dachshund > Bloodhound > Old scenting hounds | leafPct=6 d3Pct=6
 [tree] Dalmatian | leafPct=100 d3Pct=100
-[tree] Dalmatian > Ancient spotted hounds | leafPct=55 d3Pct=33
-[tree] Dalmatian > Pointer | leafPct=30 d3Pct=58
-[tree] Dalmatian > Pointer > English Foxhound | leafPct=9 d3Pct=16
+[tree] Dalmatian > Ancient spotted hounds | leafPct=55 d3Pct=55
+[tree] Dalmatian > Pointer | leafPct=30 d3Pct=30
+[tree] Dalmatian > Pointer > English Foxhound | leafPct=9 d3Pct=9
 [tree] Dalmatian > Pointer > English Foxhound > Southern Hound | leafPct=5 d3Pct=5
-[tree] Dalmatian > Pointer > English Foxhound > Southern Hound > Talbot hounds | leafPct=3 d3Pct=2
-[tree] Dalmatian > Pointer > English Foxhound > Southern Hound > St Hubert Hound | leafPct=2 d3Pct=1
-[tree] Dalmatian > Pointer > English Foxhound > Greyhound | leafPct=3 d3Pct=4
+[tree] Dalmatian > Pointer > English Foxhound > Southern Hound > Talbot hounds | leafPct=3 d3Pct=3
+[tree] Dalmatian > Pointer > English Foxhound > Southern Hound > St Hubert Hound | leafPct=2 d3Pct=2
+[tree] Dalmatian > Pointer > English Foxhound > Greyhound | leafPct=3 d3Pct=3
 [tree] Dalmatian > Pointer > English Foxhound > Greyhound > Celtic Hound | leafPct=2 d3Pct=2
 [tree] Dalmatian > Pointer > English Foxhound > Greyhound > Celtic Hound > Ancient eastern sighthounds | leafPct=1 d3Pct=1
-[tree] Dalmatian > Pointer > English Foxhound > Greyhound > Celtic Hound > Old hunting dogs of the Celts | leafPct=1 d3Pct=0
+[tree] Dalmatian > Pointer > English Foxhound > Greyhound > Celtic Hound > Old hunting dogs of the Celts | leafPct=1 d3Pct=1
 [tree] Dalmatian > Pointer > English Foxhound > Greyhound > Ancient eastern sighthounds | leafPct=1 d3Pct=1
-[tree] Dalmatian > Pointer > English Foxhound > Talbot hound | leafPct=2 d3Pct=1
-[tree] Dalmatian > Pointer > Greyhound | leafPct=8 d3Pct=12
+[tree] Dalmatian > Pointer > English Foxhound > Talbot hound | leafPct=2 d3Pct=2
+[tree] Dalmatian > Pointer > Greyhound | leafPct=8 d3Pct=8
 [tree] Dalmatian > Pointer > Greyhound > Celtic Hound | leafPct=5 d3Pct=5
-[tree] Dalmatian > Pointer > Greyhound > Celtic Hound > Ancient eastern sighthounds | leafPct=2 d3Pct=1
-[tree] Dalmatian > Pointer > Greyhound > Celtic Hound > Old hunting dogs of the Celts | leafPct=2 d3Pct=1
-[tree] Dalmatian > Pointer > Greyhound > Ancient eastern sighthounds | leafPct=3 d3Pct=2
-[tree] Dalmatian > Pointer > Bloodhound | leafPct=8 d3Pct=9
-[tree] Dalmatian > Pointer > Bloodhound > St Hubert Hound | leafPct=5 d3Pct=3
-[tree] Dalmatian > Pointer > Bloodhound > Old scenting hounds | leafPct=3 d3Pct=2
-[tree] Dalmatian > Pointer > Setter | leafPct=6 d3Pct=4
-[tree] Dalmatian > Carriage guard dogs | leafPct=15 d3Pct=9
+[tree] Dalmatian > Pointer > Greyhound > Celtic Hound > Ancient eastern sighthounds | leafPct=2 d3Pct=2
+[tree] Dalmatian > Pointer > Greyhound > Celtic Hound > Old hunting dogs of the Celts | leafPct=2 d3Pct=2
+[tree] Dalmatian > Pointer > Greyhound > Ancient eastern sighthounds | leafPct=3 d3Pct=3
+[tree] Dalmatian > Pointer > Bloodhound | leafPct=8 d3Pct=8
+[tree] Dalmatian > Pointer > Bloodhound > St Hubert Hound | leafPct=5 d3Pct=5
+[tree] Dalmatian > Pointer > Bloodhound > Old scenting hounds | leafPct=3 d3Pct=3
+[tree] Dalmatian > Pointer > Setter | leafPct=6 d3Pct=6
+[tree] Dalmatian > Carriage guard dogs | leafPct=15 d3Pct=15
 [tree] Dandie Dinmont Terrier | leafPct=100 d3Pct=100
-[tree] Dandie Dinmont Terrier > Old Border terriers | leafPct=65 d3Pct=51
-[tree] Dandie Dinmont Terrier > Skye terrier stock | leafPct=20 d3Pct=16
-[tree] Dandie Dinmont Terrier > Otterhound | leafPct=15 d3Pct=33
-[tree] Dandie Dinmont Terrier > Otterhound > Bloodhound | leafPct=7 d3Pct=11
-[tree] Dandie Dinmont Terrier > Otterhound > Bloodhound > St Hubert Hound | leafPct=4 d3Pct=3
-[tree] Dandie Dinmont Terrier > Otterhound > Bloodhound > Old scenting hounds | leafPct=3 d3Pct=2
-[tree] Dandie Dinmont Terrier > Otterhound > Southern Hound | leafPct=5 d3Pct=7
-[tree] Dandie Dinmont Terrier > Otterhound > Southern Hound > Talbot hounds | leafPct=3 d3Pct=2
-[tree] Dandie Dinmont Terrier > Otterhound > Southern Hound > St Hubert Hound | leafPct=2 d3Pct=1
-[tree] Dandie Dinmont Terrier > Otterhound > Rough water dogs | leafPct=4 d3Pct=3
+[tree] Dandie Dinmont Terrier > Old Border terriers | leafPct=65 d3Pct=65
+[tree] Dandie Dinmont Terrier > Skye terrier stock | leafPct=20 d3Pct=20
+[tree] Dandie Dinmont Terrier > Otterhound | leafPct=15 d3Pct=15
+[tree] Dandie Dinmont Terrier > Otterhound > Bloodhound | leafPct=7 d3Pct=7
+[tree] Dandie Dinmont Terrier > Otterhound > Bloodhound > St Hubert Hound | leafPct=4 d3Pct=4
+[tree] Dandie Dinmont Terrier > Otterhound > Bloodhound > Old scenting hounds | leafPct=3 d3Pct=3
+[tree] Dandie Dinmont Terrier > Otterhound > Southern Hound | leafPct=5 d3Pct=5
+[tree] Dandie Dinmont Terrier > Otterhound > Southern Hound > Talbot hounds | leafPct=3 d3Pct=3
+[tree] Dandie Dinmont Terrier > Otterhound > Southern Hound > St Hubert Hound | leafPct=2 d3Pct=2
+[tree] Dandie Dinmont Terrier > Otterhound > Rough water dogs | leafPct=4 d3Pct=4
 [tree] Deal the cards | leafPct=100 d3Pct=100
 [tree] Deal the cards > Find pack | leafPct=100 d3Pct=100
 [tree] Deal the cards > Find pack > Gather players | leafPct=100 d3Pct=90
 [tree] Deal the cards > Find pack > Gather players > Shuffle well | leafPct=100 d3Pct=70
 [tree] Deal the cards > Find pack > Gather players > Shuffle well > Deal cards | leafPct=100 d3Pct=40
 [tree] Doberman Pinscher | leafPct=100 d3Pct=100
-[tree] Doberman Pinscher > German Pinscher | leafPct=38 d3Pct=28
-[tree] Doberman Pinscher > German Pinscher > Old German ratting terriers | leafPct=22 d3Pct=16
-[tree] Doberman Pinscher > German Pinscher > Schnauzer-type farm dogs | leafPct=16 d3Pct=12
-[tree] Doberman Pinscher > Rottweiler | leafPct=27 d3Pct=20
-[tree] Doberman Pinscher > Rottweiler > Roman drover dogs | leafPct=17 d3Pct=12
-[tree] Doberman Pinscher > Rottweiler > Local German cattle dogs | leafPct=10 d3Pct=7
-[tree] Doberman Pinscher > Manchester Terrier | leafPct=22 d3Pct=28
-[tree] Doberman Pinscher > Manchester Terrier > Old English Black and Tan Terrier | leafPct=14 d3Pct=10
-[tree] Doberman Pinscher > Manchester Terrier > Whippet | leafPct=8 d3Pct=18
-[tree] Doberman Pinscher > Manchester Terrier > Whippet > Greyhound | leafPct=5 d3Pct=9
-[tree] Doberman Pinscher > Manchester Terrier > Whippet > Greyhound > Celtic Hound | leafPct=3 d3Pct=4
-[tree] Doberman Pinscher > Manchester Terrier > Whippet > Greyhound > Celtic Hound > Ancient eastern sighthounds | leafPct=2 d3Pct=1
+[tree] Doberman Pinscher > German Pinscher | leafPct=38 d3Pct=38
+[tree] Doberman Pinscher > German Pinscher > Old German ratting terriers | leafPct=22 d3Pct=22
+[tree] Doberman Pinscher > German Pinscher > Schnauzer-type farm dogs | leafPct=16 d3Pct=16
+[tree] Doberman Pinscher > Rottweiler | leafPct=27 d3Pct=27
+[tree] Doberman Pinscher > Rottweiler > Roman drover dogs | leafPct=17 d3Pct=17
+[tree] Doberman Pinscher > Rottweiler > Local German cattle dogs | leafPct=10 d3Pct=10
+[tree] Doberman Pinscher > Manchester Terrier | leafPct=22 d3Pct=22
+[tree] Doberman Pinscher > Manchester Terrier > Old English Black and Tan Terrier | leafPct=14 d3Pct=14
+[tree] Doberman Pinscher > Manchester Terrier > Whippet | leafPct=8 d3Pct=8
+[tree] Doberman Pinscher > Manchester Terrier > Whippet > Greyhound | leafPct=5 d3Pct=5
+[tree] Doberman Pinscher > Manchester Terrier > Whippet > Greyhound > Celtic Hound | leafPct=3 d3Pct=3
+[tree] Doberman Pinscher > Manchester Terrier > Whippet > Greyhound > Celtic Hound > Ancient eastern sighthounds | leafPct=2 d3Pct=2
 [tree] Doberman Pinscher > Manchester Terrier > Whippet > Greyhound > Celtic Hound > Old hunting dogs of the Celts | leafPct=1 d3Pct=1
-[tree] Doberman Pinscher > Manchester Terrier > Whippet > Greyhound > Ancient eastern sighthounds | leafPct=2 d3Pct=1
-[tree] Doberman Pinscher > Manchester Terrier > Whippet > Old English Black and Tan Terrier | leafPct=2 d3Pct=1
-[tree] Doberman Pinscher > Manchester Terrier > Whippet > Italian Greyhound | leafPct=1 d3Pct=2
-[tree] Doberman Pinscher > Manchester Terrier > Whippet > Italian Greyhound > Ancient eastern sighthounds | leafPct=1 d3Pct=0
-[tree] Doberman Pinscher > Manchester Terrier > Whippet > Italian Greyhound > Mediterranean miniature sighthounds | leafPct=1 d3Pct=0
-[tree] Doberman Pinscher > Greyhound | leafPct=13 d3Pct=25
-[tree] Doberman Pinscher > Greyhound > Celtic Hound | leafPct=8 d3Pct=11
-[tree] Doberman Pinscher > Greyhound > Celtic Hound > Ancient eastern sighthounds | leafPct=4 d3Pct=3
-[tree] Doberman Pinscher > Greyhound > Celtic Hound > Old hunting dogs of the Celts | leafPct=4 d3Pct=3
-[tree] Doberman Pinscher > Greyhound > Ancient eastern sighthounds | leafPct=5 d3Pct=4
+[tree] Doberman Pinscher > Manchester Terrier > Whippet > Greyhound > Ancient eastern sighthounds | leafPct=2 d3Pct=2
+[tree] Doberman Pinscher > Manchester Terrier > Whippet > Old English Black and Tan Terrier | leafPct=2 d3Pct=2
+[tree] Doberman Pinscher > Manchester Terrier > Whippet > Italian Greyhound | leafPct=1 d3Pct=1
+[tree] Doberman Pinscher > Manchester Terrier > Whippet > Italian Greyhound > Ancient eastern sighthounds | leafPct=1 d3Pct=1
+[tree] Doberman Pinscher > Manchester Terrier > Whippet > Italian Greyhound > Mediterranean miniature sighthounds | leafPct=1 d3Pct=1
+[tree] Doberman Pinscher > Greyhound | leafPct=13 d3Pct=13
+[tree] Doberman Pinscher > Greyhound > Celtic Hound | leafPct=8 d3Pct=8
+[tree] Doberman Pinscher > Greyhound > Celtic Hound > Ancient eastern sighthounds | leafPct=4 d3Pct=4
+[tree] Doberman Pinscher > Greyhound > Celtic Hound > Old hunting dogs of the Celts | leafPct=4 d3Pct=4
+[tree] Doberman Pinscher > Greyhound > Ancient eastern sighthounds | leafPct=5 d3Pct=5
 [tree] Dumfriesshire Hound | leafPct=100 d3Pct=100
-[tree] Dumfriesshire Hound > English Foxhound | leafPct=50 d3Pct=75
+[tree] Dumfriesshire Hound > English Foxhound | leafPct=50 d3Pct=50
 [tree] Dumfriesshire Hound > English Foxhound > Southern Hound | leafPct=25 d3Pct=25
-[tree] Dumfriesshire Hound > English Foxhound > Southern Hound > Talbot hounds | leafPct=15 d3Pct=8
-[tree] Dumfriesshire Hound > English Foxhound > Southern Hound > St Hubert Hound | leafPct=10 d3Pct=5
-[tree] Dumfriesshire Hound > English Foxhound > Greyhound | leafPct=15 d3Pct=20
+[tree] Dumfriesshire Hound > English Foxhound > Southern Hound > Talbot hounds | leafPct=15 d3Pct=15
+[tree] Dumfriesshire Hound > English Foxhound > Southern Hound > St Hubert Hound | leafPct=10 d3Pct=10
+[tree] Dumfriesshire Hound > English Foxhound > Greyhound | leafPct=15 d3Pct=15
 [tree] Dumfriesshire Hound > English Foxhound > Greyhound > Celtic Hound | leafPct=9 d3Pct=9
-[tree] Dumfriesshire Hound > English Foxhound > Greyhound > Celtic Hound > Ancient eastern sighthounds | leafPct=5 d3Pct=2
-[tree] Dumfriesshire Hound > English Foxhound > Greyhound > Celtic Hound > Old hunting dogs of the Celts | leafPct=4 d3Pct=2
-[tree] Dumfriesshire Hound > English Foxhound > Greyhound > Ancient eastern sighthounds | leafPct=6 d3Pct=3
-[tree] Dumfriesshire Hound > English Foxhound > Talbot hound | leafPct=10 d3Pct=5
-[tree] Dumfriesshire Hound > Bloodhound and Gascon hounds | leafPct=50 d3Pct=25
+[tree] Dumfriesshire Hound > English Foxhound > Greyhound > Celtic Hound > Ancient eastern sighthounds | leafPct=5 d3Pct=5
+[tree] Dumfriesshire Hound > English Foxhound > Greyhound > Celtic Hound > Old hunting dogs of the Celts | leafPct=4 d3Pct=4
+[tree] Dumfriesshire Hound > English Foxhound > Greyhound > Ancient eastern sighthounds | leafPct=6 d3Pct=6
+[tree] Dumfriesshire Hound > English Foxhound > Talbot hound | leafPct=10 d3Pct=10
+[tree] Dumfriesshire Hound > Bloodhound and Gascon hounds | leafPct=50 d3Pct=50
 [tree] English Foxhound | leafPct=100 d3Pct=100
-[tree] English Foxhound > Southern Hound | leafPct=50 d3Pct=51
-[tree] English Foxhound > Southern Hound > Talbot hounds | leafPct=30 d3Pct=15
-[tree] English Foxhound > Southern Hound > St Hubert Hound | leafPct=20 d3Pct=10
-[tree] English Foxhound > Greyhound | leafPct=30 d3Pct=39
+[tree] English Foxhound > Southern Hound | leafPct=50 d3Pct=50
+[tree] English Foxhound > Southern Hound > Talbot hounds | leafPct=30 d3Pct=30
+[tree] English Foxhound > Southern Hound > St Hubert Hound | leafPct=20 d3Pct=20
+[tree] English Foxhound > Greyhound | leafPct=30 d3Pct=30
 [tree] English Foxhound > Greyhound > Celtic Hound | leafPct=18 d3Pct=18
-[tree] English Foxhound > Greyhound > Celtic Hound > Ancient eastern sighthounds | leafPct=10 d3Pct=5
-[tree] English Foxhound > Greyhound > Celtic Hound > Old hunting dogs of the Celts | leafPct=8 d3Pct=4
-[tree] English Foxhound > Greyhound > Ancient eastern sighthounds | leafPct=12 d3Pct=6
-[tree] English Foxhound > Talbot hound | leafPct=20 d3Pct=10
+[tree] English Foxhound > Greyhound > Celtic Hound > Ancient eastern sighthounds | leafPct=10 d3Pct=10
+[tree] English Foxhound > Greyhound > Celtic Hound > Old hunting dogs of the Celts | leafPct=8 d3Pct=8
+[tree] English Foxhound > Greyhound > Ancient eastern sighthounds | leafPct=12 d3Pct=12
+[tree] English Foxhound > Talbot hound | leafPct=20 d3Pct=20
 [tree] English Mastiff | leafPct=100 d3Pct=100
 [tree] English Mastiff > Ancient Molossers | leafPct=60 d3Pct=60
 [tree] English Mastiff > Old British bandogs | leafPct=40 d3Pct=40
 [tree] English Setter | leafPct=100 d3Pct=100
-[tree] English Setter > Old setting spaniels | leafPct=50 d3Pct=30
-[tree] English Setter > Pointer | leafPct=30 d3Pct=58
-[tree] English Setter > Pointer > English Foxhound | leafPct=9 d3Pct=16
+[tree] English Setter > Old setting spaniels | leafPct=50 d3Pct=50
+[tree] English Setter > Pointer | leafPct=30 d3Pct=30
+[tree] English Setter > Pointer > English Foxhound | leafPct=9 d3Pct=9
 [tree] English Setter > Pointer > English Foxhound > Southern Hound | leafPct=5 d3Pct=5
-[tree] English Setter > Pointer > English Foxhound > Southern Hound > Talbot hounds | leafPct=3 d3Pct=2
-[tree] English Setter > Pointer > English Foxhound > Southern Hound > St Hubert Hound | leafPct=2 d3Pct=1
-[tree] English Setter > Pointer > English Foxhound > Greyhound | leafPct=3 d3Pct=4
+[tree] English Setter > Pointer > English Foxhound > Southern Hound > Talbot hounds | leafPct=3 d3Pct=3
+[tree] English Setter > Pointer > English Foxhound > Southern Hound > St Hubert Hound | leafPct=2 d3Pct=2
+[tree] English Setter > Pointer > English Foxhound > Greyhound | leafPct=3 d3Pct=3
 [tree] English Setter > Pointer > English Foxhound > Greyhound > Celtic Hound | leafPct=2 d3Pct=2
 [tree] English Setter > Pointer > English Foxhound > Greyhound > Celtic Hound > Ancient eastern sighthounds | leafPct=1 d3Pct=1
-[tree] English Setter > Pointer > English Foxhound > Greyhound > Celtic Hound > Old hunting dogs of the Celts | leafPct=1 d3Pct=0
+[tree] English Setter > Pointer > English Foxhound > Greyhound > Celtic Hound > Old hunting dogs of the Celts | leafPct=1 d3Pct=1
 [tree] English Setter > Pointer > English Foxhound > Greyhound > Ancient eastern sighthounds | leafPct=1 d3Pct=1
-[tree] English Setter > Pointer > English Foxhound > Talbot hound | leafPct=2 d3Pct=1
-[tree] English Setter > Pointer > Greyhound | leafPct=8 d3Pct=12
+[tree] English Setter > Pointer > English Foxhound > Talbot hound | leafPct=2 d3Pct=2
+[tree] English Setter > Pointer > Greyhound | leafPct=8 d3Pct=8
 [tree] English Setter > Pointer > Greyhound > Celtic Hound | leafPct=5 d3Pct=5
-[tree] English Setter > Pointer > Greyhound > Celtic Hound > Ancient eastern sighthounds | leafPct=2 d3Pct=1
-[tree] English Setter > Pointer > Greyhound > Celtic Hound > Old hunting dogs of the Celts | leafPct=2 d3Pct=1
-[tree] English Setter > Pointer > Greyhound > Ancient eastern sighthounds | leafPct=3 d3Pct=2
-[tree] English Setter > Pointer > Bloodhound | leafPct=8 d3Pct=9
-[tree] English Setter > Pointer > Bloodhound > St Hubert Hound | leafPct=5 d3Pct=3
-[tree] English Setter > Pointer > Bloodhound > Old scenting hounds | leafPct=3 d3Pct=2
-[tree] English Setter > Pointer > Setter | leafPct=6 d3Pct=4
-[tree] English Setter > Water spaniels | leafPct=20 d3Pct=12
+[tree] English Setter > Pointer > Greyhound > Celtic Hound > Ancient eastern sighthounds | leafPct=2 d3Pct=2
+[tree] English Setter > Pointer > Greyhound > Celtic Hound > Old hunting dogs of the Celts | leafPct=2 d3Pct=2
+[tree] English Setter > Pointer > Greyhound > Ancient eastern sighthounds | leafPct=3 d3Pct=3
+[tree] English Setter > Pointer > Bloodhound | leafPct=8 d3Pct=8
+[tree] English Setter > Pointer > Bloodhound > St Hubert Hound | leafPct=5 d3Pct=5
+[tree] English Setter > Pointer > Bloodhound > Old scenting hounds | leafPct=3 d3Pct=3
+[tree] English Setter > Pointer > Setter | leafPct=6 d3Pct=6
+[tree] English Setter > Water spaniels | leafPct=20 d3Pct=20
 [tree] English Toy Terrier | leafPct=100 d3Pct=100
-[tree] English Toy Terrier > Manchester Terrier | leafPct=70 d3Pct=80
-[tree] English Toy Terrier > Manchester Terrier > Black and Tan Terrier | leafPct=46 d3Pct=31
-[tree] English Toy Terrier > Manchester Terrier > Black and Tan Terrier > Old British ratting terriers | leafPct=27 d3Pct=9
-[tree] English Toy Terrier > Manchester Terrier > Black and Tan Terrier > Earth and hunt terriers | leafPct=18 d3Pct=6
-[tree] English Toy Terrier > Manchester Terrier > Whippet | leafPct=24 d3Pct=26
-[tree] English Toy Terrier > Manchester Terrier > Whippet > Greyhound | leafPct=15 d3Pct=13
-[tree] English Toy Terrier > Manchester Terrier > Whippet > Greyhound > Celtic Hound | leafPct=9 d3Pct=6
-[tree] English Toy Terrier > Manchester Terrier > Whippet > Greyhound > Celtic Hound > Ancient eastern sighthounds | leafPct=5 d3Pct=2
-[tree] English Toy Terrier > Manchester Terrier > Whippet > Greyhound > Celtic Hound > Old hunting dogs of the Celts | leafPct=4 d3Pct=1
-[tree] English Toy Terrier > Manchester Terrier > Whippet > Greyhound > Ancient eastern sighthounds | leafPct=6 d3Pct=2
-[tree] English Toy Terrier > Manchester Terrier > Whippet > Old English Black and Tan Terrier | leafPct=6 d3Pct=2
-[tree] English Toy Terrier > Manchester Terrier > Whippet > Italian Greyhound | leafPct=4 d3Pct=2
-[tree] English Toy Terrier > Manchester Terrier > Whippet > Italian Greyhound > Ancient eastern sighthounds | leafPct=2 d3Pct=1
-[tree] English Toy Terrier > Manchester Terrier > Whippet > Italian Greyhound > Mediterranean miniature sighthounds | leafPct=2 d3Pct=1
-[tree] English Toy Terrier > Black and Tan Terrier | leafPct=30 d3Pct=20
-[tree] English Toy Terrier > Black and Tan Terrier > Old British ratting terriers | leafPct=18 d3Pct=6
-[tree] English Toy Terrier > Black and Tan Terrier > Earth and hunt terriers | leafPct=12 d3Pct=4
+[tree] English Toy Terrier > Manchester Terrier | leafPct=70 d3Pct=70
+[tree] English Toy Terrier > Manchester Terrier > Black and Tan Terrier | leafPct=46 d3Pct=46
+[tree] English Toy Terrier > Manchester Terrier > Black and Tan Terrier > Old British ratting terriers | leafPct=27 d3Pct=27
+[tree] English Toy Terrier > Manchester Terrier > Black and Tan Terrier > Earth and hunt terriers | leafPct=18 d3Pct=18
+[tree] English Toy Terrier > Manchester Terrier > Whippet | leafPct=24 d3Pct=24
+[tree] English Toy Terrier > Manchester Terrier > Whippet > Greyhound | leafPct=15 d3Pct=15
+[tree] English Toy Terrier > Manchester Terrier > Whippet > Greyhound > Celtic Hound | leafPct=9 d3Pct=9
+[tree] English Toy Terrier > Manchester Terrier > Whippet > Greyhound > Celtic Hound > Ancient eastern sighthounds | leafPct=5 d3Pct=5
+[tree] English Toy Terrier > Manchester Terrier > Whippet > Greyhound > Celtic Hound > Old hunting dogs of the Celts | leafPct=4 d3Pct=4
+[tree] English Toy Terrier > Manchester Terrier > Whippet > Greyhound > Ancient eastern sighthounds | leafPct=6 d3Pct=6
+[tree] English Toy Terrier > Manchester Terrier > Whippet > Old English Black and Tan Terrier | leafPct=6 d3Pct=6
+[tree] English Toy Terrier > Manchester Terrier > Whippet > Italian Greyhound | leafPct=4 d3Pct=4
+[tree] English Toy Terrier > Manchester Terrier > Whippet > Italian Greyhound > Ancient eastern sighthounds | leafPct=2 d3Pct=2
+[tree] English Toy Terrier > Manchester Terrier > Whippet > Italian Greyhound > Mediterranean miniature sighthounds | leafPct=2 d3Pct=2
+[tree] English Toy Terrier > Black and Tan Terrier | leafPct=30 d3Pct=30
+[tree] English Toy Terrier > Black and Tan Terrier > Old British ratting terriers | leafPct=18 d3Pct=18
+[tree] English Toy Terrier > Black and Tan Terrier > Earth and hunt terriers | leafPct=12 d3Pct=12
 [tree] English White Terrier | leafPct=100 d3Pct=100
 [tree] English White Terrier > Old English White Terrier | leafPct=60 d3Pct=60
 [tree] English White Terrier > Old English Black and Tan Terrier | leafPct=40 d3Pct=40
 [tree] Field Spaniel | leafPct=100 d3Pct=100
-[tree] Field Spaniel > Land spaniels | leafPct=45 d3Pct=29
-[tree] Field Spaniel > Sussex Spaniel | leafPct=35 d3Pct=45
-[tree] Field Spaniel > Sussex Spaniel > Land spaniels | leafPct=21 d3Pct=14
-[tree] Field Spaniel > Sussex Spaniel > Heavier working spaniels | leafPct=14 d3Pct=9
-[tree] Field Spaniel > Clumber Spaniel | leafPct=20 d3Pct=26
-[tree] Field Spaniel > Clumber Spaniel > Land spaniels | leafPct=11 d3Pct=7
-[tree] Field Spaniel > Clumber Spaniel > Basset and heavy hounds | leafPct=9 d3Pct=6
+[tree] Field Spaniel > Land spaniels | leafPct=45 d3Pct=45
+[tree] Field Spaniel > Sussex Spaniel | leafPct=35 d3Pct=35
+[tree] Field Spaniel > Sussex Spaniel > Land spaniels | leafPct=21 d3Pct=21
+[tree] Field Spaniel > Sussex Spaniel > Heavier working spaniels | leafPct=14 d3Pct=14
+[tree] Field Spaniel > Clumber Spaniel | leafPct=20 d3Pct=20
+[tree] Field Spaniel > Clumber Spaniel > Land spaniels | leafPct=11 d3Pct=11
+[tree] Field Spaniel > Clumber Spaniel > Basset and heavy hounds | leafPct=9 d3Pct=9
 [tree] Find more chums | leafPct=100 d3Pct=100
 [tree] Find more chums > Explore more | leafPct=100 d3Pct=100
 [tree] Find more chums > Explore more > Find more | leafPct=100 d3Pct=67
@@ -440,33 +440,33 @@
 [tree] Flat-Coated Retriever > Setter | leafPct=30 d3Pct=30
 [tree] Flat-Coated Retriever > Water spaniel and Collie | leafPct=20 d3Pct=20
 [tree] Fox Terrier | leafPct=100 d3Pct=100
-[tree] Fox Terrier > Old English Black and Tan Terrier | leafPct=45 d3Pct=25
-[tree] Fox Terrier > English White Terrier | leafPct=25 d3Pct=27
-[tree] Fox Terrier > English White Terrier > Old English White Terrier | leafPct=15 d3Pct=8
-[tree] Fox Terrier > English White Terrier > Old English Black and Tan Terrier | leafPct=10 d3Pct=5
-[tree] Fox Terrier > Beagle | leafPct=15 d3Pct=23
-[tree] Fox Terrier > Beagle > Talbot hound | leafPct=6 d3Pct=3
-[tree] Fox Terrier > Beagle > Southern Hound | leafPct=5 d3Pct=6
-[tree] Fox Terrier > Beagle > Southern Hound > Talbot hounds | leafPct=3 d3Pct=2
-[tree] Fox Terrier > Beagle > Southern Hound > St Hubert Hound | leafPct=2 d3Pct=1
-[tree] Fox Terrier > Beagle > Greyhound | leafPct=4 d3Pct=5
+[tree] Fox Terrier > Old English Black and Tan Terrier | leafPct=45 d3Pct=45
+[tree] Fox Terrier > English White Terrier | leafPct=25 d3Pct=25
+[tree] Fox Terrier > English White Terrier > Old English White Terrier | leafPct=15 d3Pct=15
+[tree] Fox Terrier > English White Terrier > Old English Black and Tan Terrier | leafPct=10 d3Pct=10
+[tree] Fox Terrier > Beagle | leafPct=15 d3Pct=15
+[tree] Fox Terrier > Beagle > Talbot hound | leafPct=6 d3Pct=6
+[tree] Fox Terrier > Beagle > Southern Hound | leafPct=5 d3Pct=5
+[tree] Fox Terrier > Beagle > Southern Hound > Talbot hounds | leafPct=3 d3Pct=3
+[tree] Fox Terrier > Beagle > Southern Hound > St Hubert Hound | leafPct=2 d3Pct=2
+[tree] Fox Terrier > Beagle > Greyhound | leafPct=4 d3Pct=4
 [tree] Fox Terrier > Beagle > Greyhound > Celtic Hound | leafPct=2 d3Pct=2
 [tree] Fox Terrier > Beagle > Greyhound > Celtic Hound > Ancient eastern sighthounds | leafPct=1 d3Pct=1
 [tree] Fox Terrier > Beagle > Greyhound > Celtic Hound > Old hunting dogs of the Celts | leafPct=1 d3Pct=1
-[tree] Fox Terrier > Beagle > Greyhound > Ancient eastern sighthounds | leafPct=2 d3Pct=1
-[tree] Fox Terrier > Bull Terrier | leafPct=15 d3Pct=26
-[tree] Fox Terrier > Bull Terrier > Bulldog | leafPct=7 d3Pct=11
+[tree] Fox Terrier > Beagle > Greyhound > Ancient eastern sighthounds | leafPct=2 d3Pct=2
+[tree] Fox Terrier > Bull Terrier | leafPct=15 d3Pct=15
+[tree] Fox Terrier > Bull Terrier > Bulldog | leafPct=7 d3Pct=7
 [tree] Fox Terrier > Bull Terrier > Bulldog > Old English Bulldog | leafPct=4 d3Pct=4
-[tree] Fox Terrier > Bull Terrier > Bulldog > Old English Bulldog > Mastiff and Alaunt war dogs | leafPct=2 d3Pct=1
-[tree] Fox Terrier > Bull Terrier > Bulldog > Old English Bulldog > Old British bandogs | leafPct=2 d3Pct=1
+[tree] Fox Terrier > Bull Terrier > Bulldog > Old English Bulldog > Mastiff and Alaunt war dogs | leafPct=2 d3Pct=2
+[tree] Fox Terrier > Bull Terrier > Bulldog > Old English Bulldog > Old British bandogs | leafPct=2 d3Pct=2
 [tree] Fox Terrier > Bull Terrier > Bulldog > Mastiff | leafPct=2 d3Pct=2
 [tree] Fox Terrier > Bull Terrier > Bulldog > Mastiff > Ancient Molossers | leafPct=1 d3Pct=1
-[tree] Fox Terrier > Bull Terrier > Bulldog > Mastiff > Old British bandogs | leafPct=1 d3Pct=0
+[tree] Fox Terrier > Bull Terrier > Bulldog > Mastiff > Old British bandogs | leafPct=1 d3Pct=1
 [tree] Fox Terrier > Bull Terrier > Bulldog > Pug | leafPct=1 d3Pct=1
-[tree] Fox Terrier > Bull Terrier > Bulldog > Pug > Ancient Chinese toy dogs | leafPct=1 d3Pct=0
+[tree] Fox Terrier > Bull Terrier > Bulldog > Pug > Ancient Chinese toy dogs | leafPct=1 d3Pct=1
 [tree] Fox Terrier > Bull Terrier > Bulldog > Pug > Eastern lion and lap dogs | leafPct=0 d3Pct=0
-[tree] Fox Terrier > Bull Terrier > White English Terrier | leafPct=6 d3Pct=3
-[tree] Fox Terrier > Bull Terrier > Dalmatian | leafPct=2 d3Pct=3
+[tree] Fox Terrier > Bull Terrier > White English Terrier | leafPct=6 d3Pct=6
+[tree] Fox Terrier > Bull Terrier > Dalmatian | leafPct=2 d3Pct=2
 [tree] Fox Terrier > Bull Terrier > Dalmatian > Ancient spotted hounds | leafPct=1 d3Pct=1
 [tree] Fox Terrier > Bull Terrier > Dalmatian > Pointer | leafPct=1 d3Pct=1
 [tree] Fox Terrier > Bull Terrier > Dalmatian > Pointer > English Foxhound | leafPct=0 d3Pct=0
@@ -482,17 +482,17 @@
 [tree] Fox Terrier > Bull Terrier > Dalmatian > Pointer > Setter | leafPct=0 d3Pct=0
 [tree] Fox Terrier > Bull Terrier > Dalmatian > Carriage guard dogs | leafPct=0 d3Pct=0
 [tree] French Bulldog | leafPct=100 d3Pct=100
-[tree] French Bulldog > Bulldog | leafPct=65 d3Pct=85
-[tree] French Bulldog > Bulldog > Old English Bulldog | leafPct=39 d3Pct=34
-[tree] French Bulldog > Bulldog > Old English Bulldog > Mastiff and Alaunt war dogs | leafPct=23 d3Pct=10
-[tree] French Bulldog > Bulldog > Old English Bulldog > Old British bandogs | leafPct=16 d3Pct=7
-[tree] French Bulldog > Bulldog > Mastiff | leafPct=16 d3Pct=14
-[tree] French Bulldog > Bulldog > Mastiff > Ancient Molossers | leafPct=10 d3Pct=4
-[tree] French Bulldog > Bulldog > Mastiff > Old British bandogs | leafPct=7 d3Pct=3
-[tree] French Bulldog > Bulldog > Pug | leafPct=10 d3Pct=8
-[tree] French Bulldog > Bulldog > Pug > Ancient Chinese toy dogs | leafPct=6 d3Pct=3
-[tree] French Bulldog > Bulldog > Pug > Eastern lion and lap dogs | leafPct=4 d3Pct=2
-[tree] French Bulldog > Parisian ratters and terriers | leafPct=35 d3Pct=15
+[tree] French Bulldog > Bulldog | leafPct=65 d3Pct=65
+[tree] French Bulldog > Bulldog > Old English Bulldog | leafPct=39 d3Pct=39
+[tree] French Bulldog > Bulldog > Old English Bulldog > Mastiff and Alaunt war dogs | leafPct=23 d3Pct=23
+[tree] French Bulldog > Bulldog > Old English Bulldog > Old British bandogs | leafPct=16 d3Pct=16
+[tree] French Bulldog > Bulldog > Mastiff | leafPct=16 d3Pct=16
+[tree] French Bulldog > Bulldog > Mastiff > Ancient Molossers | leafPct=10 d3Pct=10
+[tree] French Bulldog > Bulldog > Mastiff > Old British bandogs | leafPct=7 d3Pct=7
+[tree] French Bulldog > Bulldog > Pug | leafPct=10 d3Pct=10
+[tree] French Bulldog > Bulldog > Pug > Ancient Chinese toy dogs | leafPct=6 d3Pct=6
+[tree] French Bulldog > Bulldog > Pug > Eastern lion and lap dogs | leafPct=4 d3Pct=4
+[tree] French Bulldog > Parisian ratters and terriers | leafPct=35 d3Pct=35
 [tree] German Shepherd | leafPct=100 d3Pct=100
 [tree] German Shepherd > Thuringian herding dogs | leafPct=45 d3Pct=45
 [tree] German Shepherd > Wurttemberg sheepdogs | leafPct=40 d3Pct=40
@@ -501,15 +501,15 @@
 [tree] Glen of Imaal Terrier > Native Irish terriers | leafPct=60 d3Pct=60
 [tree] Glen of Imaal Terrier > Low-slung soldiers' dogs | leafPct=40 d3Pct=40
 [tree] Golden Retriever | leafPct=100 d3Pct=100
-[tree] Golden Retriever > Wavy-Coated Retriever | leafPct=45 d3Pct=25
-[tree] Golden Retriever > Tweed Water Spaniel | leafPct=30 d3Pct=34
-[tree] Golden Retriever > Tweed Water Spaniel > Water spaniels | leafPct=17 d3Pct=9
-[tree] Golden Retriever > Tweed Water Spaniel > St John's Water Dog | leafPct=14 d3Pct=8
-[tree] Golden Retriever > Irish Setter | leafPct=15 d3Pct=29
-[tree] Golden Retriever > Irish Setter > English Setter | leafPct=5 d3Pct=8
-[tree] Golden Retriever > Irish Setter > English Setter > Old setting spaniels | leafPct=3 d3Pct=1
+[tree] Golden Retriever > Wavy-Coated Retriever | leafPct=45 d3Pct=45
+[tree] Golden Retriever > Tweed Water Spaniel | leafPct=30 d3Pct=30
+[tree] Golden Retriever > Tweed Water Spaniel > Water spaniels | leafPct=17 d3Pct=17
+[tree] Golden Retriever > Tweed Water Spaniel > St John's Water Dog | leafPct=14 d3Pct=14
+[tree] Golden Retriever > Irish Setter | leafPct=15 d3Pct=15
+[tree] Golden Retriever > Irish Setter > English Setter | leafPct=5 d3Pct=5
+[tree] Golden Retriever > Irish Setter > English Setter > Old setting spaniels | leafPct=3 d3Pct=3
 [tree] Golden Retriever > Irish Setter > English Setter > Pointer | leafPct=2 d3Pct=2
-[tree] Golden Retriever > Irish Setter > English Setter > Pointer > English Foxhound | leafPct=0 d3Pct=1
+[tree] Golden Retriever > Irish Setter > English Setter > Pointer > English Foxhound | leafPct=0 d3Pct=0
 [tree] Golden Retriever > Irish Setter > English Setter > Pointer > English Foxhound > Southern Hound | leafPct=0 d3Pct=0
 [tree] Golden Retriever > Irish Setter > English Setter > Pointer > English Foxhound > Greyhound | leafPct=0 d3Pct=0
 [tree] Golden Retriever > Irish Setter > English Setter > Pointer > English Foxhound > Talbot hound | leafPct=0 d3Pct=0
@@ -522,17 +522,17 @@
 [tree] Golden Retriever > Irish Setter > English Setter > Pointer > Setter | leafPct=0 d3Pct=0
 [tree] Golden Retriever > Irish Setter > English Setter > Water spaniels | leafPct=1 d3Pct=1
 [tree] Golden Retriever > Irish Setter > Irish Water Spaniel | leafPct=4 d3Pct=4
-[tree] Golden Retriever > Irish Setter > Irish Water Spaniel > Old Irish water dogs | leafPct=2 d3Pct=1
-[tree] Golden Retriever > Irish Setter > Irish Water Spaniel > Poodle and Barbet water dogs | leafPct=2 d3Pct=1
-[tree] Golden Retriever > Irish Setter > Gordon Setter | leafPct=3 d3Pct=4
-[tree] Golden Retriever > Irish Setter > Gordon Setter > Old black-and-tan setters | leafPct=2 d3Pct=1
+[tree] Golden Retriever > Irish Setter > Irish Water Spaniel > Old Irish water dogs | leafPct=2 d3Pct=2
+[tree] Golden Retriever > Irish Setter > Irish Water Spaniel > Poodle and Barbet water dogs | leafPct=2 d3Pct=2
+[tree] Golden Retriever > Irish Setter > Gordon Setter | leafPct=3 d3Pct=3
+[tree] Golden Retriever > Irish Setter > Gordon Setter > Old black-and-tan setters | leafPct=2 d3Pct=2
 [tree] Golden Retriever > Irish Setter > Gordon Setter > Bloodhound | leafPct=1 d3Pct=1
 [tree] Golden Retriever > Irish Setter > Gordon Setter > Bloodhound > St Hubert Hound | leafPct=0 d3Pct=0
 [tree] Golden Retriever > Irish Setter > Gordon Setter > Bloodhound > Old scenting hounds | leafPct=0 d3Pct=0
 [tree] Golden Retriever > Irish Setter > Gordon Setter > Collie | leafPct=0 d3Pct=0
-[tree] Golden Retriever > Irish Setter > Pointer | leafPct=3 d3Pct=5
+[tree] Golden Retriever > Irish Setter > Pointer | leafPct=3 d3Pct=3
 [tree] Golden Retriever > Irish Setter > Pointer > English Foxhound | leafPct=1 d3Pct=1
-[tree] Golden Retriever > Irish Setter > Pointer > English Foxhound > Southern Hound | leafPct=0 d3Pct=1
+[tree] Golden Retriever > Irish Setter > Pointer > English Foxhound > Southern Hound | leafPct=0 d3Pct=0
 [tree] Golden Retriever > Irish Setter > Pointer > English Foxhound > Southern Hound > Talbot hounds | leafPct=0 d3Pct=0
 [tree] Golden Retriever > Irish Setter > Pointer > English Foxhound > Southern Hound > St Hubert Hound | leafPct=0 d3Pct=0
 [tree] Golden Retriever > Irish Setter > Pointer > English Foxhound > Greyhound | leafPct=0 d3Pct=0
@@ -540,24 +540,24 @@
 [tree] Golden Retriever > Irish Setter > Pointer > English Foxhound > Greyhound > Ancient eastern sighthounds | leafPct=0 d3Pct=0
 [tree] Golden Retriever > Irish Setter > Pointer > English Foxhound > Talbot hound | leafPct=0 d3Pct=0
 [tree] Golden Retriever > Irish Setter > Pointer > Greyhound | leafPct=1 d3Pct=1
-[tree] Golden Retriever > Irish Setter > Pointer > Greyhound > Celtic Hound | leafPct=0 d3Pct=1
+[tree] Golden Retriever > Irish Setter > Pointer > Greyhound > Celtic Hound | leafPct=0 d3Pct=0
 [tree] Golden Retriever > Irish Setter > Pointer > Greyhound > Celtic Hound > Ancient eastern sighthounds | leafPct=0 d3Pct=0
 [tree] Golden Retriever > Irish Setter > Pointer > Greyhound > Celtic Hound > Old hunting dogs of the Celts | leafPct=0 d3Pct=0
 [tree] Golden Retriever > Irish Setter > Pointer > Greyhound > Ancient eastern sighthounds | leafPct=0 d3Pct=0
 [tree] Golden Retriever > Irish Setter > Pointer > Bloodhound | leafPct=1 d3Pct=1
 [tree] Golden Retriever > Irish Setter > Pointer > Bloodhound > St Hubert Hound | leafPct=0 d3Pct=0
 [tree] Golden Retriever > Irish Setter > Pointer > Bloodhound > Old scenting hounds | leafPct=0 d3Pct=0
-[tree] Golden Retriever > Irish Setter > Pointer > Setter | leafPct=1 d3Pct=0
-[tree] Golden Retriever > Bloodhound | leafPct=10 d3Pct=11
-[tree] Golden Retriever > Bloodhound > St Hubert Hound | leafPct=6 d3Pct=3
-[tree] Golden Retriever > Bloodhound > Old scenting hounds | leafPct=4 d3Pct=2
+[tree] Golden Retriever > Irish Setter > Pointer > Setter | leafPct=1 d3Pct=1
+[tree] Golden Retriever > Bloodhound | leafPct=10 d3Pct=10
+[tree] Golden Retriever > Bloodhound > St Hubert Hound | leafPct=6 d3Pct=6
+[tree] Golden Retriever > Bloodhound > Old scenting hounds | leafPct=4 d3Pct=4
 [tree] Goldendoodle | leafPct=100 d3Pct=100
-[tree] Goldendoodle > Golden Retriever | leafPct=50 d3Pct=58
-[tree] Goldendoodle > Golden Retriever > Wavy-Coated Retriever | leafPct=23 d3Pct=9
-[tree] Goldendoodle > Golden Retriever > Tweed Water Spaniel | leafPct=15 d3Pct=13
-[tree] Goldendoodle > Golden Retriever > Tweed Water Spaniel > Water spaniels | leafPct=8 d3Pct=3
-[tree] Goldendoodle > Golden Retriever > Tweed Water Spaniel > St John's Water Dog | leafPct=7 d3Pct=3
-[tree] Goldendoodle > Golden Retriever > Irish Setter | leafPct=8 d3Pct=10
+[tree] Goldendoodle > Golden Retriever | leafPct=50 d3Pct=50
+[tree] Goldendoodle > Golden Retriever > Wavy-Coated Retriever | leafPct=23 d3Pct=23
+[tree] Goldendoodle > Golden Retriever > Tweed Water Spaniel | leafPct=15 d3Pct=15
+[tree] Goldendoodle > Golden Retriever > Tweed Water Spaniel > Water spaniels | leafPct=8 d3Pct=8
+[tree] Goldendoodle > Golden Retriever > Tweed Water Spaniel > St John's Water Dog | leafPct=7 d3Pct=7
+[tree] Goldendoodle > Golden Retriever > Irish Setter | leafPct=8 d3Pct=8
 [tree] Goldendoodle > Golden Retriever > Irish Setter > English Setter | leafPct=3 d3Pct=3
 [tree] Goldendoodle > Golden Retriever > Irish Setter > English Setter > Old setting spaniels | leafPct=1 d3Pct=1
 [tree] Goldendoodle > Golden Retriever > Irish Setter > English Setter > Pointer | leafPct=1 d3Pct=1
@@ -565,12 +565,12 @@
 [tree] Goldendoodle > Golden Retriever > Irish Setter > English Setter > Pointer > Greyhound | leafPct=0 d3Pct=0
 [tree] Goldendoodle > Golden Retriever > Irish Setter > English Setter > Pointer > Bloodhound | leafPct=0 d3Pct=0
 [tree] Goldendoodle > Golden Retriever > Irish Setter > English Setter > Pointer > Setter | leafPct=0 d3Pct=0
-[tree] Goldendoodle > Golden Retriever > Irish Setter > English Setter > Water spaniels | leafPct=1 d3Pct=0
+[tree] Goldendoodle > Golden Retriever > Irish Setter > English Setter > Water spaniels | leafPct=1 d3Pct=1
 [tree] Goldendoodle > Golden Retriever > Irish Setter > Irish Water Spaniel | leafPct=2 d3Pct=2
-[tree] Goldendoodle > Golden Retriever > Irish Setter > Irish Water Spaniel > Old Irish water dogs | leafPct=1 d3Pct=0
-[tree] Goldendoodle > Golden Retriever > Irish Setter > Irish Water Spaniel > Poodle and Barbet water dogs | leafPct=1 d3Pct=0
-[tree] Goldendoodle > Golden Retriever > Irish Setter > Gordon Setter | leafPct=2 d3Pct=1
-[tree] Goldendoodle > Golden Retriever > Irish Setter > Gordon Setter > Old black-and-tan setters | leafPct=1 d3Pct=0
+[tree] Goldendoodle > Golden Retriever > Irish Setter > Irish Water Spaniel > Old Irish water dogs | leafPct=1 d3Pct=1
+[tree] Goldendoodle > Golden Retriever > Irish Setter > Irish Water Spaniel > Poodle and Barbet water dogs | leafPct=1 d3Pct=1
+[tree] Goldendoodle > Golden Retriever > Irish Setter > Gordon Setter | leafPct=2 d3Pct=2
+[tree] Goldendoodle > Golden Retriever > Irish Setter > Gordon Setter > Old black-and-tan setters | leafPct=1 d3Pct=1
 [tree] Goldendoodle > Golden Retriever > Irish Setter > Gordon Setter > Bloodhound | leafPct=0 d3Pct=0
 [tree] Goldendoodle > Golden Retriever > Irish Setter > Gordon Setter > Bloodhound > St Hubert Hound | leafPct=0 d3Pct=0
 [tree] Goldendoodle > Golden Retriever > Irish Setter > Gordon Setter > Bloodhound > Old scenting hounds | leafPct=0 d3Pct=0
@@ -587,86 +587,86 @@
 [tree] Goldendoodle > Golden Retriever > Irish Setter > Pointer > Bloodhound > St Hubert Hound | leafPct=0 d3Pct=0
 [tree] Goldendoodle > Golden Retriever > Irish Setter > Pointer > Bloodhound > Old scenting hounds | leafPct=0 d3Pct=0
 [tree] Goldendoodle > Golden Retriever > Irish Setter > Pointer > Setter | leafPct=0 d3Pct=0
-[tree] Goldendoodle > Golden Retriever > Bloodhound | leafPct=5 d3Pct=4
-[tree] Goldendoodle > Golden Retriever > Bloodhound > St Hubert Hound | leafPct=3 d3Pct=1
-[tree] Goldendoodle > Golden Retriever > Bloodhound > Old scenting hounds | leafPct=2 d3Pct=1
-[tree] Goldendoodle > Poodle | leafPct=50 d3Pct=42
-[tree] Goldendoodle > Poodle > Old European water dogs | leafPct=28 d3Pct=12
-[tree] Goldendoodle > Poodle > Barbet and water spaniels | leafPct=23 d3Pct=9
+[tree] Goldendoodle > Golden Retriever > Bloodhound | leafPct=5 d3Pct=5
+[tree] Goldendoodle > Golden Retriever > Bloodhound > St Hubert Hound | leafPct=3 d3Pct=3
+[tree] Goldendoodle > Golden Retriever > Bloodhound > Old scenting hounds | leafPct=2 d3Pct=2
+[tree] Goldendoodle > Poodle | leafPct=50 d3Pct=50
+[tree] Goldendoodle > Poodle > Old European water dogs | leafPct=28 d3Pct=28
+[tree] Goldendoodle > Poodle > Barbet and water spaniels | leafPct=23 d3Pct=23
 [tree] Gordon Setter | leafPct=100 d3Pct=100
-[tree] Gordon Setter > Old black-and-tan setters | leafPct=65 d3Pct=54
-[tree] Gordon Setter > Bloodhound | leafPct=20 d3Pct=33
-[tree] Gordon Setter > Bloodhound > St Hubert Hound | leafPct=12 d3Pct=10
-[tree] Gordon Setter > Bloodhound > Old scenting hounds | leafPct=8 d3Pct=7
-[tree] Gordon Setter > Collie | leafPct=15 d3Pct=13
+[tree] Gordon Setter > Old black-and-tan setters | leafPct=65 d3Pct=65
+[tree] Gordon Setter > Bloodhound | leafPct=20 d3Pct=20
+[tree] Gordon Setter > Bloodhound > St Hubert Hound | leafPct=12 d3Pct=12
+[tree] Gordon Setter > Bloodhound > Old scenting hounds | leafPct=8 d3Pct=8
+[tree] Gordon Setter > Collie | leafPct=15 d3Pct=15
 [tree] Great Dane | leafPct=100 d3Pct=100
-[tree] Great Dane > Mastiff and Alaunt war dogs | leafPct=50 d3Pct=34
-[tree] Great Dane > Irish Wolfhound | leafPct=30 d3Pct=53
-[tree] Great Dane > Irish Wolfhound > Celtic Hound | leafPct=18 d3Pct=24
-[tree] Great Dane > Irish Wolfhound > Celtic Hound > Ancient eastern sighthounds | leafPct=10 d3Pct=7
-[tree] Great Dane > Irish Wolfhound > Celtic Hound > Old hunting dogs of the Celts | leafPct=8 d3Pct=5
-[tree] Great Dane > Irish Wolfhound > Ancient Molossers | leafPct=12 d3Pct=8
-[tree] Great Dane > Old German boarhounds | leafPct=20 d3Pct=14
+[tree] Great Dane > Mastiff and Alaunt war dogs | leafPct=50 d3Pct=50
+[tree] Great Dane > Irish Wolfhound | leafPct=30 d3Pct=30
+[tree] Great Dane > Irish Wolfhound > Celtic Hound | leafPct=18 d3Pct=18
+[tree] Great Dane > Irish Wolfhound > Celtic Hound > Ancient eastern sighthounds | leafPct=10 d3Pct=10
+[tree] Great Dane > Irish Wolfhound > Celtic Hound > Old hunting dogs of the Celts | leafPct=8 d3Pct=8
+[tree] Great Dane > Irish Wolfhound > Ancient Molossers | leafPct=12 d3Pct=12
+[tree] Great Dane > Old German boarhounds | leafPct=20 d3Pct=20
 [tree] Greyhound | leafPct=100 d3Pct=100
-[tree] Greyhound > Celtic Hound | leafPct=60 d3Pct=75
-[tree] Greyhound > Celtic Hound > Ancient eastern sighthounds | leafPct=33 d3Pct=21
-[tree] Greyhound > Celtic Hound > Old hunting dogs of the Celts | leafPct=27 d3Pct=17
-[tree] Greyhound > Ancient eastern sighthounds | leafPct=40 d3Pct=25
+[tree] Greyhound > Celtic Hound | leafPct=60 d3Pct=60
+[tree] Greyhound > Celtic Hound > Ancient eastern sighthounds | leafPct=33 d3Pct=33
+[tree] Greyhound > Celtic Hound > Old hunting dogs of the Celts | leafPct=27 d3Pct=27
+[tree] Greyhound > Ancient eastern sighthounds | leafPct=40 d3Pct=40
 [tree] Head outside | leafPct=100 d3Pct=100
 [tree] Head outside > Head outside | leafPct=100 d3Pct=100
 [tree] Head outside > Head outside > Cards near | leafPct=100 d3Pct=83
 [tree] Head outside > Head outside > Cards near > Eyes peeled | leafPct=100 d3Pct=50
 [tree] Irish Setter | leafPct=100 d3Pct=100
-[tree] Irish Setter > English Setter | leafPct=35 d3Pct=37
-[tree] Irish Setter > English Setter > Old setting spaniels | leafPct=18 d3Pct=7
-[tree] Irish Setter > English Setter > Pointer | leafPct=10 d3Pct=13
-[tree] Irish Setter > English Setter > Pointer > English Foxhound | leafPct=3 d3Pct=4
-[tree] Irish Setter > English Setter > Pointer > English Foxhound > Southern Hound | leafPct=2 d3Pct=1
-[tree] Irish Setter > English Setter > Pointer > English Foxhound > Southern Hound > Talbot hounds | leafPct=1 d3Pct=0
-[tree] Irish Setter > English Setter > Pointer > English Foxhound > Southern Hound > St Hubert Hound | leafPct=1 d3Pct=0
+[tree] Irish Setter > English Setter | leafPct=35 d3Pct=35
+[tree] Irish Setter > English Setter > Old setting spaniels | leafPct=18 d3Pct=18
+[tree] Irish Setter > English Setter > Pointer | leafPct=10 d3Pct=10
+[tree] Irish Setter > English Setter > Pointer > English Foxhound | leafPct=3 d3Pct=3
+[tree] Irish Setter > English Setter > Pointer > English Foxhound > Southern Hound | leafPct=2 d3Pct=2
+[tree] Irish Setter > English Setter > Pointer > English Foxhound > Southern Hound > Talbot hounds | leafPct=1 d3Pct=1
+[tree] Irish Setter > English Setter > Pointer > English Foxhound > Southern Hound > St Hubert Hound | leafPct=1 d3Pct=1
 [tree] Irish Setter > English Setter > Pointer > English Foxhound > Greyhound | leafPct=1 d3Pct=1
-[tree] Irish Setter > English Setter > Pointer > English Foxhound > Greyhound > Celtic Hound | leafPct=1 d3Pct=0
+[tree] Irish Setter > English Setter > Pointer > English Foxhound > Greyhound > Celtic Hound | leafPct=1 d3Pct=1
 [tree] Irish Setter > English Setter > Pointer > English Foxhound > Greyhound > Ancient eastern sighthounds | leafPct=0 d3Pct=0
-[tree] Irish Setter > English Setter > Pointer > English Foxhound > Talbot hound | leafPct=1 d3Pct=0
+[tree] Irish Setter > English Setter > Pointer > English Foxhound > Talbot hound | leafPct=1 d3Pct=1
 [tree] Irish Setter > English Setter > Pointer > Greyhound | leafPct=3 d3Pct=3
-[tree] Irish Setter > English Setter > Pointer > Greyhound > Celtic Hound | leafPct=2 d3Pct=1
-[tree] Irish Setter > English Setter > Pointer > Greyhound > Celtic Hound > Ancient eastern sighthounds | leafPct=1 d3Pct=0
-[tree] Irish Setter > English Setter > Pointer > Greyhound > Celtic Hound > Old hunting dogs of the Celts | leafPct=1 d3Pct=0
-[tree] Irish Setter > English Setter > Pointer > Greyhound > Ancient eastern sighthounds | leafPct=1 d3Pct=0
-[tree] Irish Setter > English Setter > Pointer > Bloodhound | leafPct=3 d3Pct=2
-[tree] Irish Setter > English Setter > Pointer > Bloodhound > St Hubert Hound | leafPct=2 d3Pct=1
-[tree] Irish Setter > English Setter > Pointer > Bloodhound > Old scenting hounds | leafPct=1 d3Pct=0
-[tree] Irish Setter > English Setter > Pointer > Setter | leafPct=2 d3Pct=1
-[tree] Irish Setter > English Setter > Water spaniels | leafPct=7 d3Pct=3
-[tree] Irish Setter > Irish Water Spaniel | leafPct=25 d3Pct=20
-[tree] Irish Setter > Irish Water Spaniel > Old Irish water dogs | leafPct=14 d3Pct=5
-[tree] Irish Setter > Irish Water Spaniel > Poodle and Barbet water dogs | leafPct=11 d3Pct=4
-[tree] Irish Setter > Gordon Setter | leafPct=20 d3Pct=17
-[tree] Irish Setter > Gordon Setter > Old black-and-tan setters | leafPct=13 d3Pct=5
-[tree] Irish Setter > Gordon Setter > Bloodhound | leafPct=4 d3Pct=3
-[tree] Irish Setter > Gordon Setter > Bloodhound > St Hubert Hound | leafPct=2 d3Pct=1
-[tree] Irish Setter > Gordon Setter > Bloodhound > Old scenting hounds | leafPct=2 d3Pct=1
-[tree] Irish Setter > Gordon Setter > Collie | leafPct=3 d3Pct=1
-[tree] Irish Setter > Pointer | leafPct=20 d3Pct=26
-[tree] Irish Setter > Pointer > English Foxhound | leafPct=6 d3Pct=7
-[tree] Irish Setter > Pointer > English Foxhound > Southern Hound | leafPct=3 d3Pct=2
-[tree] Irish Setter > Pointer > English Foxhound > Southern Hound > Talbot hounds | leafPct=2 d3Pct=1
-[tree] Irish Setter > Pointer > English Foxhound > Southern Hound > St Hubert Hound | leafPct=1 d3Pct=0
+[tree] Irish Setter > English Setter > Pointer > Greyhound > Celtic Hound | leafPct=2 d3Pct=2
+[tree] Irish Setter > English Setter > Pointer > Greyhound > Celtic Hound > Ancient eastern sighthounds | leafPct=1 d3Pct=1
+[tree] Irish Setter > English Setter > Pointer > Greyhound > Celtic Hound > Old hunting dogs of the Celts | leafPct=1 d3Pct=1
+[tree] Irish Setter > English Setter > Pointer > Greyhound > Ancient eastern sighthounds | leafPct=1 d3Pct=1
+[tree] Irish Setter > English Setter > Pointer > Bloodhound | leafPct=3 d3Pct=3
+[tree] Irish Setter > English Setter > Pointer > Bloodhound > St Hubert Hound | leafPct=2 d3Pct=2
+[tree] Irish Setter > English Setter > Pointer > Bloodhound > Old scenting hounds | leafPct=1 d3Pct=1
+[tree] Irish Setter > English Setter > Pointer > Setter | leafPct=2 d3Pct=2
+[tree] Irish Setter > English Setter > Water spaniels | leafPct=7 d3Pct=7
+[tree] Irish Setter > Irish Water Spaniel | leafPct=25 d3Pct=25
+[tree] Irish Setter > Irish Water Spaniel > Old Irish water dogs | leafPct=14 d3Pct=14
+[tree] Irish Setter > Irish Water Spaniel > Poodle and Barbet water dogs | leafPct=11 d3Pct=11
+[tree] Irish Setter > Gordon Setter | leafPct=20 d3Pct=20
+[tree] Irish Setter > Gordon Setter > Old black-and-tan setters | leafPct=13 d3Pct=13
+[tree] Irish Setter > Gordon Setter > Bloodhound | leafPct=4 d3Pct=4
+[tree] Irish Setter > Gordon Setter > Bloodhound > St Hubert Hound | leafPct=2 d3Pct=2
+[tree] Irish Setter > Gordon Setter > Bloodhound > Old scenting hounds | leafPct=2 d3Pct=2
+[tree] Irish Setter > Gordon Setter > Collie | leafPct=3 d3Pct=3
+[tree] Irish Setter > Pointer | leafPct=20 d3Pct=20
+[tree] Irish Setter > Pointer > English Foxhound | leafPct=6 d3Pct=6
+[tree] Irish Setter > Pointer > English Foxhound > Southern Hound | leafPct=3 d3Pct=3
+[tree] Irish Setter > Pointer > English Foxhound > Southern Hound > Talbot hounds | leafPct=2 d3Pct=2
+[tree] Irish Setter > Pointer > English Foxhound > Southern Hound > St Hubert Hound | leafPct=1 d3Pct=1
 [tree] Irish Setter > Pointer > English Foxhound > Greyhound | leafPct=2 d3Pct=2
 [tree] Irish Setter > Pointer > English Foxhound > Greyhound > Celtic Hound | leafPct=1 d3Pct=1
-[tree] Irish Setter > Pointer > English Foxhound > Greyhound > Celtic Hound > Ancient eastern sighthounds | leafPct=1 d3Pct=0
+[tree] Irish Setter > Pointer > English Foxhound > Greyhound > Celtic Hound > Ancient eastern sighthounds | leafPct=1 d3Pct=1
 [tree] Irish Setter > Pointer > English Foxhound > Greyhound > Celtic Hound > Old hunting dogs of the Celts | leafPct=0 d3Pct=0
-[tree] Irish Setter > Pointer > English Foxhound > Greyhound > Ancient eastern sighthounds | leafPct=1 d3Pct=0
-[tree] Irish Setter > Pointer > English Foxhound > Talbot hound | leafPct=1 d3Pct=0
+[tree] Irish Setter > Pointer > English Foxhound > Greyhound > Ancient eastern sighthounds | leafPct=1 d3Pct=1
+[tree] Irish Setter > Pointer > English Foxhound > Talbot hound | leafPct=1 d3Pct=1
 [tree] Irish Setter > Pointer > Greyhound | leafPct=5 d3Pct=5
-[tree] Irish Setter > Pointer > Greyhound > Celtic Hound | leafPct=3 d3Pct=2
-[tree] Irish Setter > Pointer > Greyhound > Celtic Hound > Ancient eastern sighthounds | leafPct=2 d3Pct=1
+[tree] Irish Setter > Pointer > Greyhound > Celtic Hound | leafPct=3 d3Pct=3
+[tree] Irish Setter > Pointer > Greyhound > Celtic Hound > Ancient eastern sighthounds | leafPct=2 d3Pct=2
 [tree] Irish Setter > Pointer > Greyhound > Celtic Hound > Old hunting dogs of the Celts | leafPct=1 d3Pct=1
-[tree] Irish Setter > Pointer > Greyhound > Ancient eastern sighthounds | leafPct=2 d3Pct=1
-[tree] Irish Setter > Pointer > Bloodhound | leafPct=5 d3Pct=4
-[tree] Irish Setter > Pointer > Bloodhound > St Hubert Hound | leafPct=3 d3Pct=1
-[tree] Irish Setter > Pointer > Bloodhound > Old scenting hounds | leafPct=2 d3Pct=1
-[tree] Irish Setter > Pointer > Setter | leafPct=4 d3Pct=2
+[tree] Irish Setter > Pointer > Greyhound > Ancient eastern sighthounds | leafPct=2 d3Pct=2
+[tree] Irish Setter > Pointer > Bloodhound | leafPct=5 d3Pct=5
+[tree] Irish Setter > Pointer > Bloodhound > St Hubert Hound | leafPct=3 d3Pct=3
+[tree] Irish Setter > Pointer > Bloodhound > Old scenting hounds | leafPct=2 d3Pct=2
+[tree] Irish Setter > Pointer > Setter | leafPct=4 d3Pct=4
 [tree] Irish Terrier | leafPct=100 d3Pct=100
 [tree] Irish Terrier > Native Irish terriers | leafPct=60 d3Pct=60
 [tree] Irish Terrier > Old English Black and Tan Terrier | leafPct=40 d3Pct=40
@@ -674,99 +674,99 @@
 [tree] Irish Water Spaniel > Old Irish water dogs | leafPct=55 d3Pct=55
 [tree] Irish Water Spaniel > Poodle and Barbet water dogs | leafPct=45 d3Pct=45
 [tree] Irish Wolfhound | leafPct=100 d3Pct=100
-[tree] Irish Wolfhound > Celtic Hound | leafPct=60 d3Pct=75
-[tree] Irish Wolfhound > Celtic Hound > Ancient eastern sighthounds | leafPct=33 d3Pct=21
-[tree] Irish Wolfhound > Celtic Hound > Old hunting dogs of the Celts | leafPct=27 d3Pct=17
-[tree] Irish Wolfhound > Ancient Molossers | leafPct=40 d3Pct=25
+[tree] Irish Wolfhound > Celtic Hound | leafPct=60 d3Pct=60
+[tree] Irish Wolfhound > Celtic Hound > Ancient eastern sighthounds | leafPct=33 d3Pct=33
+[tree] Irish Wolfhound > Celtic Hound > Old hunting dogs of the Celts | leafPct=27 d3Pct=27
+[tree] Irish Wolfhound > Ancient Molossers | leafPct=40 d3Pct=40
 [tree] Italian Greyhound | leafPct=100 d3Pct=100
 [tree] Italian Greyhound > Ancient eastern sighthounds | leafPct=55 d3Pct=55
 [tree] Italian Greyhound > Mediterranean miniature sighthounds | leafPct=45 d3Pct=45
 [tree] Jack Russell Terrier | leafPct=100 d3Pct=100
-[tree] Jack Russell Terrier > Fox Terrier | leafPct=55 d3Pct=78
-[tree] Jack Russell Terrier > Fox Terrier > Old English Black and Tan Terrier | leafPct=25 d3Pct=12
+[tree] Jack Russell Terrier > Fox Terrier | leafPct=55 d3Pct=55
+[tree] Jack Russell Terrier > Fox Terrier > Old English Black and Tan Terrier | leafPct=25 d3Pct=25
 [tree] Jack Russell Terrier > Fox Terrier > English White Terrier | leafPct=14 d3Pct=14
-[tree] Jack Russell Terrier > Fox Terrier > English White Terrier > Old English White Terrier | leafPct=8 d3Pct=4
-[tree] Jack Russell Terrier > Fox Terrier > English White Terrier > Old English Black and Tan Terrier | leafPct=6 d3Pct=3
-[tree] Jack Russell Terrier > Fox Terrier > Beagle | leafPct=8 d3Pct=11
-[tree] Jack Russell Terrier > Fox Terrier > Beagle > Talbot hound | leafPct=3 d3Pct=2
+[tree] Jack Russell Terrier > Fox Terrier > English White Terrier > Old English White Terrier | leafPct=8 d3Pct=8
+[tree] Jack Russell Terrier > Fox Terrier > English White Terrier > Old English Black and Tan Terrier | leafPct=6 d3Pct=6
+[tree] Jack Russell Terrier > Fox Terrier > Beagle | leafPct=8 d3Pct=8
+[tree] Jack Russell Terrier > Fox Terrier > Beagle > Talbot hound | leafPct=3 d3Pct=3
 [tree] Jack Russell Terrier > Fox Terrier > Beagle > Southern Hound | leafPct=3 d3Pct=3
-[tree] Jack Russell Terrier > Fox Terrier > Beagle > Southern Hound > Talbot hounds | leafPct=2 d3Pct=1
+[tree] Jack Russell Terrier > Fox Terrier > Beagle > Southern Hound > Talbot hounds | leafPct=2 d3Pct=2
 [tree] Jack Russell Terrier > Fox Terrier > Beagle > Southern Hound > St Hubert Hound | leafPct=1 d3Pct=1
-[tree] Jack Russell Terrier > Fox Terrier > Beagle > Greyhound | leafPct=2 d3Pct=3
+[tree] Jack Russell Terrier > Fox Terrier > Beagle > Greyhound | leafPct=2 d3Pct=2
 [tree] Jack Russell Terrier > Fox Terrier > Beagle > Greyhound > Celtic Hound | leafPct=1 d3Pct=1
-[tree] Jack Russell Terrier > Fox Terrier > Beagle > Greyhound > Celtic Hound > Ancient eastern sighthounds | leafPct=1 d3Pct=0
-[tree] Jack Russell Terrier > Fox Terrier > Beagle > Greyhound > Celtic Hound > Old hunting dogs of the Celts | leafPct=1 d3Pct=0
-[tree] Jack Russell Terrier > Fox Terrier > Beagle > Greyhound > Ancient eastern sighthounds | leafPct=1 d3Pct=0
-[tree] Jack Russell Terrier > Fox Terrier > Bull Terrier | leafPct=8 d3Pct=13
-[tree] Jack Russell Terrier > Fox Terrier > Bull Terrier > Bulldog | leafPct=4 d3Pct=6
+[tree] Jack Russell Terrier > Fox Terrier > Beagle > Greyhound > Celtic Hound > Ancient eastern sighthounds | leafPct=1 d3Pct=1
+[tree] Jack Russell Terrier > Fox Terrier > Beagle > Greyhound > Celtic Hound > Old hunting dogs of the Celts | leafPct=1 d3Pct=1
+[tree] Jack Russell Terrier > Fox Terrier > Beagle > Greyhound > Ancient eastern sighthounds | leafPct=1 d3Pct=1
+[tree] Jack Russell Terrier > Fox Terrier > Bull Terrier | leafPct=8 d3Pct=8
+[tree] Jack Russell Terrier > Fox Terrier > Bull Terrier > Bulldog | leafPct=4 d3Pct=4
 [tree] Jack Russell Terrier > Fox Terrier > Bull Terrier > Bulldog > Old English Bulldog | leafPct=2 d3Pct=2
 [tree] Jack Russell Terrier > Fox Terrier > Bull Terrier > Bulldog > Old English Bulldog > Mastiff and Alaunt war dogs | leafPct=1 d3Pct=1
-[tree] Jack Russell Terrier > Fox Terrier > Bull Terrier > Bulldog > Old English Bulldog > Old British bandogs | leafPct=1 d3Pct=0
+[tree] Jack Russell Terrier > Fox Terrier > Bull Terrier > Bulldog > Old English Bulldog > Old British bandogs | leafPct=1 d3Pct=1
 [tree] Jack Russell Terrier > Fox Terrier > Bull Terrier > Bulldog > Mastiff | leafPct=1 d3Pct=1
-[tree] Jack Russell Terrier > Fox Terrier > Bull Terrier > Bulldog > Mastiff > Ancient Molossers | leafPct=1 d3Pct=0
+[tree] Jack Russell Terrier > Fox Terrier > Bull Terrier > Bulldog > Mastiff > Ancient Molossers | leafPct=1 d3Pct=1
 [tree] Jack Russell Terrier > Fox Terrier > Bull Terrier > Bulldog > Mastiff > Old British bandogs | leafPct=0 d3Pct=0
 [tree] Jack Russell Terrier > Fox Terrier > Bull Terrier > Bulldog > Pug | leafPct=1 d3Pct=1
 [tree] Jack Russell Terrier > Fox Terrier > Bull Terrier > Bulldog > Pug > Ancient Chinese toy dogs | leafPct=0 d3Pct=0
 [tree] Jack Russell Terrier > Fox Terrier > Bull Terrier > Bulldog > Pug > Eastern lion and lap dogs | leafPct=0 d3Pct=0
-[tree] Jack Russell Terrier > Fox Terrier > Bull Terrier > White English Terrier | leafPct=3 d3Pct=2
+[tree] Jack Russell Terrier > Fox Terrier > Bull Terrier > White English Terrier | leafPct=3 d3Pct=3
 [tree] Jack Russell Terrier > Fox Terrier > Bull Terrier > Dalmatian | leafPct=1 d3Pct=1
-[tree] Jack Russell Terrier > Fox Terrier > Bull Terrier > Dalmatian > Ancient spotted hounds | leafPct=1 d3Pct=0
+[tree] Jack Russell Terrier > Fox Terrier > Bull Terrier > Dalmatian > Ancient spotted hounds | leafPct=1 d3Pct=1
 [tree] Jack Russell Terrier > Fox Terrier > Bull Terrier > Dalmatian > Pointer | leafPct=0 d3Pct=0
 [tree] Jack Russell Terrier > Fox Terrier > Bull Terrier > Dalmatian > Pointer > English Foxhound | leafPct=0 d3Pct=0
 [tree] Jack Russell Terrier > Fox Terrier > Bull Terrier > Dalmatian > Pointer > Greyhound | leafPct=0 d3Pct=0
 [tree] Jack Russell Terrier > Fox Terrier > Bull Terrier > Dalmatian > Pointer > Bloodhound | leafPct=0 d3Pct=0
 [tree] Jack Russell Terrier > Fox Terrier > Bull Terrier > Dalmatian > Pointer > Setter | leafPct=0 d3Pct=0
 [tree] Jack Russell Terrier > Fox Terrier > Bull Terrier > Dalmatian > Carriage guard dogs | leafPct=0 d3Pct=0
-[tree] Jack Russell Terrier > Old English White Terrier | leafPct=30 d3Pct=15
-[tree] Jack Russell Terrier > Working hunt terriers | leafPct=15 d3Pct=7
+[tree] Jack Russell Terrier > Old English White Terrier | leafPct=30 d3Pct=30
+[tree] Jack Russell Terrier > Working hunt terriers | leafPct=15 d3Pct=15
 [tree] Jackapoo | leafPct=100 d3Pct=100
-[tree] Jackapoo > Jack Russell Terrier | leafPct=50 d3Pct=60
-[tree] Jackapoo > Jack Russell Terrier > Fox Terrier | leafPct=28 d3Pct=30
-[tree] Jackapoo > Jack Russell Terrier > Fox Terrier > Old English Black and Tan Terrier | leafPct=12 d3Pct=5
-[tree] Jackapoo > Jack Russell Terrier > Fox Terrier > English White Terrier | leafPct=7 d3Pct=6
-[tree] Jackapoo > Jack Russell Terrier > Fox Terrier > English White Terrier > Old English White Terrier | leafPct=4 d3Pct=2
-[tree] Jackapoo > Jack Russell Terrier > Fox Terrier > English White Terrier > Old English Black and Tan Terrier | leafPct=3 d3Pct=1
+[tree] Jackapoo > Jack Russell Terrier | leafPct=50 d3Pct=50
+[tree] Jackapoo > Jack Russell Terrier > Fox Terrier | leafPct=28 d3Pct=28
+[tree] Jackapoo > Jack Russell Terrier > Fox Terrier > Old English Black and Tan Terrier | leafPct=12 d3Pct=12
+[tree] Jackapoo > Jack Russell Terrier > Fox Terrier > English White Terrier | leafPct=7 d3Pct=7
+[tree] Jackapoo > Jack Russell Terrier > Fox Terrier > English White Terrier > Old English White Terrier | leafPct=4 d3Pct=4
+[tree] Jackapoo > Jack Russell Terrier > Fox Terrier > English White Terrier > Old English Black and Tan Terrier | leafPct=3 d3Pct=3
 [tree] Jackapoo > Jack Russell Terrier > Fox Terrier > Beagle | leafPct=4 d3Pct=4
-[tree] Jackapoo > Jack Russell Terrier > Fox Terrier > Beagle > Talbot hound | leafPct=2 d3Pct=1
+[tree] Jackapoo > Jack Russell Terrier > Fox Terrier > Beagle > Talbot hound | leafPct=2 d3Pct=2
 [tree] Jackapoo > Jack Russell Terrier > Fox Terrier > Beagle > Southern Hound | leafPct=1 d3Pct=1
-[tree] Jackapoo > Jack Russell Terrier > Fox Terrier > Beagle > Southern Hound > Talbot hounds | leafPct=1 d3Pct=0
-[tree] Jackapoo > Jack Russell Terrier > Fox Terrier > Beagle > Southern Hound > St Hubert Hound | leafPct=1 d3Pct=0
+[tree] Jackapoo > Jack Russell Terrier > Fox Terrier > Beagle > Southern Hound > Talbot hounds | leafPct=1 d3Pct=1
+[tree] Jackapoo > Jack Russell Terrier > Fox Terrier > Beagle > Southern Hound > St Hubert Hound | leafPct=1 d3Pct=1
 [tree] Jackapoo > Jack Russell Terrier > Fox Terrier > Beagle > Greyhound | leafPct=1 d3Pct=1
-[tree] Jackapoo > Jack Russell Terrier > Fox Terrier > Beagle > Greyhound > Celtic Hound | leafPct=1 d3Pct=0
+[tree] Jackapoo > Jack Russell Terrier > Fox Terrier > Beagle > Greyhound > Celtic Hound | leafPct=1 d3Pct=1
 [tree] Jackapoo > Jack Russell Terrier > Fox Terrier > Beagle > Greyhound > Ancient eastern sighthounds | leafPct=0 d3Pct=0
 [tree] Jackapoo > Jack Russell Terrier > Fox Terrier > Bull Terrier | leafPct=4 d3Pct=4
-[tree] Jackapoo > Jack Russell Terrier > Fox Terrier > Bull Terrier > Bulldog | leafPct=2 d3Pct=1
-[tree] Jackapoo > Jack Russell Terrier > Fox Terrier > Bull Terrier > Bulldog > Old English Bulldog | leafPct=1 d3Pct=0
+[tree] Jackapoo > Jack Russell Terrier > Fox Terrier > Bull Terrier > Bulldog | leafPct=2 d3Pct=2
+[tree] Jackapoo > Jack Russell Terrier > Fox Terrier > Bull Terrier > Bulldog > Old English Bulldog | leafPct=1 d3Pct=1
 [tree] Jackapoo > Jack Russell Terrier > Fox Terrier > Bull Terrier > Bulldog > Mastiff | leafPct=0 d3Pct=0
 [tree] Jackapoo > Jack Russell Terrier > Fox Terrier > Bull Terrier > Bulldog > Pug | leafPct=0 d3Pct=0
-[tree] Jackapoo > Jack Russell Terrier > Fox Terrier > Bull Terrier > White English Terrier | leafPct=2 d3Pct=1
-[tree] Jackapoo > Jack Russell Terrier > Fox Terrier > Bull Terrier > Dalmatian | leafPct=1 d3Pct=0
+[tree] Jackapoo > Jack Russell Terrier > Fox Terrier > Bull Terrier > White English Terrier | leafPct=2 d3Pct=2
+[tree] Jackapoo > Jack Russell Terrier > Fox Terrier > Bull Terrier > Dalmatian | leafPct=1 d3Pct=1
 [tree] Jackapoo > Jack Russell Terrier > Fox Terrier > Bull Terrier > Dalmatian > Ancient spotted hounds | leafPct=0 d3Pct=0
 [tree] Jackapoo > Jack Russell Terrier > Fox Terrier > Bull Terrier > Dalmatian > Pointer | leafPct=0 d3Pct=0
 [tree] Jackapoo > Jack Russell Terrier > Fox Terrier > Bull Terrier > Dalmatian > Carriage guard dogs | leafPct=0 d3Pct=0
-[tree] Jackapoo > Jack Russell Terrier > Old English White Terrier | leafPct=15 d3Pct=6
-[tree] Jackapoo > Jack Russell Terrier > Working hunt terriers | leafPct=8 d3Pct=3
-[tree] Jackapoo > Poodle | leafPct=50 d3Pct=40
-[tree] Jackapoo > Poodle > Old European water dogs | leafPct=28 d3Pct=11
-[tree] Jackapoo > Poodle > Barbet and water spaniels | leafPct=23 d3Pct=9
+[tree] Jackapoo > Jack Russell Terrier > Old English White Terrier | leafPct=15 d3Pct=15
+[tree] Jackapoo > Jack Russell Terrier > Working hunt terriers | leafPct=8 d3Pct=8
+[tree] Jackapoo > Poodle | leafPct=50 d3Pct=50
+[tree] Jackapoo > Poodle > Old European water dogs | leafPct=28 d3Pct=28
+[tree] Jackapoo > Poodle > Barbet and water spaniels | leafPct=23 d3Pct=23
 [tree] Kerry Blue Terrier | leafPct=100 d3Pct=100
-[tree] Kerry Blue Terrier > Soft-Coated Wheaten Terrier | leafPct=60 d3Pct=75
-[tree] Kerry Blue Terrier > Soft-Coated Wheaten Terrier > Native Irish terriers | leafPct=60 d3Pct=38
-[tree] Kerry Blue Terrier > Native Irish terriers | leafPct=40 d3Pct=25
+[tree] Kerry Blue Terrier > Soft-Coated Wheaten Terrier | leafPct=60 d3Pct=60
+[tree] Kerry Blue Terrier > Soft-Coated Wheaten Terrier > Native Irish terriers | leafPct=60 d3Pct=60
+[tree] Kerry Blue Terrier > Native Irish terriers | leafPct=40 d3Pct=40
 [tree] King Charles Spaniel | leafPct=100 d3Pct=100
 [tree] King Charles Spaniel > Old toy spaniels | leafPct=60 d3Pct=60
 [tree] King Charles Spaniel > Asian flat-faced toys | leafPct=40 d3Pct=40
 [tree] Labradoodle | leafPct=100 d3Pct=100
-[tree] Labradoodle > Labrador | leafPct=68 d3Pct=61
-[tree] Labradoodle > Labrador > St John's Water Dog | leafPct=35 d3Pct=22
-[tree] Labradoodle > Labrador > St John's Water Dog > Fishermen's water dogs | leafPct=22 d3Pct=13
-[tree] Labradoodle > Labrador > St John's Water Dog > Newfoundland landrace dogs | leafPct=14 d3Pct=8
-[tree] Labradoodle > Labrador > British Pointers | leafPct=12 d3Pct=7
-[tree] Labradoodle > Labrador > British Setters | leafPct=11 d3Pct=7
-[tree] Labradoodle > Labrador > Water spaniels | leafPct=9 d3Pct=6
-[tree] Labradoodle > Poodle | leafPct=32 d3Pct=39
-[tree] Labradoodle > Poodle > Old European water dogs | leafPct=18 d3Pct=11
-[tree] Labradoodle > Poodle > Barbet and water spaniels | leafPct=15 d3Pct=9
+[tree] Labradoodle > Labrador | leafPct=68 d3Pct=68
+[tree] Labradoodle > Labrador > St John's Water Dog | leafPct=35 d3Pct=35
+[tree] Labradoodle > Labrador > St John's Water Dog > Fishermen's water dogs | leafPct=22 d3Pct=22
+[tree] Labradoodle > Labrador > St John's Water Dog > Newfoundland landrace dogs | leafPct=14 d3Pct=14
+[tree] Labradoodle > Labrador > British Pointers | leafPct=12 d3Pct=12
+[tree] Labradoodle > Labrador > British Setters | leafPct=11 d3Pct=11
+[tree] Labradoodle > Labrador > Water spaniels | leafPct=9 d3Pct=9
+[tree] Labradoodle > Poodle | leafPct=32 d3Pct=32
+[tree] Labradoodle > Poodle > Old European water dogs | leafPct=18 d3Pct=18
+[tree] Labradoodle > Poodle > Barbet and water spaniels | leafPct=15 d3Pct=15
 [tree] Labrador | leafPct=100 d3Pct=100
 [tree] Labrador > St John's Water Dog | leafPct=55 d3Pct=55
 [tree] Labrador > St John's Water Dog > Fishermen's water dogs | leafPct=34 d3Pct=34
@@ -775,22 +775,22 @@
 [tree] Labrador > British Setters | leafPct=15 d3Pct=15
 [tree] Labrador > Water spaniels | leafPct=13 d3Pct=13
 [tree] Lakeland Terrier | leafPct=100 d3Pct=100
-[tree] Lakeland Terrier > Old fell terriers | leafPct=30 d3Pct=20
-[tree] Lakeland Terrier > Old wirehaired fell terriers | leafPct=20 d3Pct=14
-[tree] Lakeland Terrier > Bedlington Terrier | leafPct=25 d3Pct=49
-[tree] Lakeland Terrier > Bedlington Terrier > Old Border terriers | leafPct=13 d3Pct=8
-[tree] Lakeland Terrier > Bedlington Terrier > Whippet | leafPct=8 d3Pct=16
-[tree] Lakeland Terrier > Bedlington Terrier > Whippet > Greyhound | leafPct=5 d3Pct=8
-[tree] Lakeland Terrier > Bedlington Terrier > Whippet > Greyhound > Celtic Hound | leafPct=3 d3Pct=4
-[tree] Lakeland Terrier > Bedlington Terrier > Whippet > Greyhound > Celtic Hound > Ancient eastern sighthounds | leafPct=2 d3Pct=1
+[tree] Lakeland Terrier > Old fell terriers | leafPct=30 d3Pct=30
+[tree] Lakeland Terrier > Old wirehaired fell terriers | leafPct=20 d3Pct=20
+[tree] Lakeland Terrier > Bedlington Terrier | leafPct=25 d3Pct=25
+[tree] Lakeland Terrier > Bedlington Terrier > Old Border terriers | leafPct=13 d3Pct=13
+[tree] Lakeland Terrier > Bedlington Terrier > Whippet | leafPct=8 d3Pct=8
+[tree] Lakeland Terrier > Bedlington Terrier > Whippet > Greyhound | leafPct=5 d3Pct=5
+[tree] Lakeland Terrier > Bedlington Terrier > Whippet > Greyhound > Celtic Hound | leafPct=3 d3Pct=3
+[tree] Lakeland Terrier > Bedlington Terrier > Whippet > Greyhound > Celtic Hound > Ancient eastern sighthounds | leafPct=2 d3Pct=2
 [tree] Lakeland Terrier > Bedlington Terrier > Whippet > Greyhound > Celtic Hound > Old hunting dogs of the Celts | leafPct=1 d3Pct=1
-[tree] Lakeland Terrier > Bedlington Terrier > Whippet > Greyhound > Ancient eastern sighthounds | leafPct=2 d3Pct=1
-[tree] Lakeland Terrier > Bedlington Terrier > Whippet > Old English Black and Tan Terrier | leafPct=2 d3Pct=1
-[tree] Lakeland Terrier > Bedlington Terrier > Whippet > Italian Greyhound | leafPct=1 d3Pct=2
-[tree] Lakeland Terrier > Bedlington Terrier > Whippet > Italian Greyhound > Ancient eastern sighthounds | leafPct=1 d3Pct=0
-[tree] Lakeland Terrier > Bedlington Terrier > Whippet > Italian Greyhound > Mediterranean miniature sighthounds | leafPct=1 d3Pct=0
-[tree] Lakeland Terrier > Bedlington Terrier > Dandie Dinmont Terrier | leafPct=5 d3Pct=8
-[tree] Lakeland Terrier > Bedlington Terrier > Dandie Dinmont Terrier > Old Border terriers | leafPct=3 d3Pct=2
+[tree] Lakeland Terrier > Bedlington Terrier > Whippet > Greyhound > Ancient eastern sighthounds | leafPct=2 d3Pct=2
+[tree] Lakeland Terrier > Bedlington Terrier > Whippet > Old English Black and Tan Terrier | leafPct=2 d3Pct=2
+[tree] Lakeland Terrier > Bedlington Terrier > Whippet > Italian Greyhound | leafPct=1 d3Pct=1
+[tree] Lakeland Terrier > Bedlington Terrier > Whippet > Italian Greyhound > Ancient eastern sighthounds | leafPct=1 d3Pct=1
+[tree] Lakeland Terrier > Bedlington Terrier > Whippet > Italian Greyhound > Mediterranean miniature sighthounds | leafPct=1 d3Pct=1
+[tree] Lakeland Terrier > Bedlington Terrier > Dandie Dinmont Terrier | leafPct=5 d3Pct=5
+[tree] Lakeland Terrier > Bedlington Terrier > Dandie Dinmont Terrier > Old Border terriers | leafPct=3 d3Pct=3
 [tree] Lakeland Terrier > Bedlington Terrier > Dandie Dinmont Terrier > Skye terrier stock | leafPct=1 d3Pct=1
 [tree] Lakeland Terrier > Bedlington Terrier > Dandie Dinmont Terrier > Otterhound | leafPct=1 d3Pct=1
 [tree] Lakeland Terrier > Bedlington Terrier > Dandie Dinmont Terrier > Otterhound > Bloodhound | leafPct=0 d3Pct=0
@@ -800,100 +800,100 @@
 [tree] Lakeland Terrier > Bedlington Terrier > Dandie Dinmont Terrier > Otterhound > Southern Hound > Talbot hounds | leafPct=0 d3Pct=0
 [tree] Lakeland Terrier > Bedlington Terrier > Dandie Dinmont Terrier > Otterhound > Southern Hound > St Hubert Hound | leafPct=0 d3Pct=0
 [tree] Lakeland Terrier > Bedlington Terrier > Dandie Dinmont Terrier > Otterhound > Rough water dogs | leafPct=0 d3Pct=0
-[tree] Lakeland Terrier > Wire Fox Terrier | leafPct=25 d3Pct=17
+[tree] Lakeland Terrier > Wire Fox Terrier | leafPct=25 d3Pct=25
 [tree] Lancashire Heeler | leafPct=100 d3Pct=100
-[tree] Lancashire Heeler > Welsh Corgi | leafPct=55 d3Pct=26
-[tree] Lancashire Heeler > Manchester Terrier | leafPct=45 d3Pct=74
-[tree] Lancashire Heeler > Manchester Terrier > Black and Tan Terrier | leafPct=29 d3Pct=28
-[tree] Lancashire Heeler > Manchester Terrier > Black and Tan Terrier > Old British ratting terriers | leafPct=18 d3Pct=8
-[tree] Lancashire Heeler > Manchester Terrier > Black and Tan Terrier > Earth and hunt terriers | leafPct=12 d3Pct=6
-[tree] Lancashire Heeler > Manchester Terrier > Whippet | leafPct=16 d3Pct=24
-[tree] Lancashire Heeler > Manchester Terrier > Whippet > Greyhound | leafPct=10 d3Pct=12
+[tree] Lancashire Heeler > Welsh Corgi | leafPct=55 d3Pct=55
+[tree] Lancashire Heeler > Manchester Terrier | leafPct=45 d3Pct=45
+[tree] Lancashire Heeler > Manchester Terrier > Black and Tan Terrier | leafPct=29 d3Pct=29
+[tree] Lancashire Heeler > Manchester Terrier > Black and Tan Terrier > Old British ratting terriers | leafPct=18 d3Pct=18
+[tree] Lancashire Heeler > Manchester Terrier > Black and Tan Terrier > Earth and hunt terriers | leafPct=12 d3Pct=12
+[tree] Lancashire Heeler > Manchester Terrier > Whippet | leafPct=16 d3Pct=16
+[tree] Lancashire Heeler > Manchester Terrier > Whippet > Greyhound | leafPct=10 d3Pct=10
 [tree] Lancashire Heeler > Manchester Terrier > Whippet > Greyhound > Celtic Hound | leafPct=6 d3Pct=6
-[tree] Lancashire Heeler > Manchester Terrier > Whippet > Greyhound > Celtic Hound > Ancient eastern sighthounds | leafPct=3 d3Pct=2
-[tree] Lancashire Heeler > Manchester Terrier > Whippet > Greyhound > Celtic Hound > Old hunting dogs of the Celts | leafPct=3 d3Pct=1
-[tree] Lancashire Heeler > Manchester Terrier > Whippet > Greyhound > Ancient eastern sighthounds | leafPct=4 d3Pct=2
-[tree] Lancashire Heeler > Manchester Terrier > Whippet > Old English Black and Tan Terrier | leafPct=4 d3Pct=2
+[tree] Lancashire Heeler > Manchester Terrier > Whippet > Greyhound > Celtic Hound > Ancient eastern sighthounds | leafPct=3 d3Pct=3
+[tree] Lancashire Heeler > Manchester Terrier > Whippet > Greyhound > Celtic Hound > Old hunting dogs of the Celts | leafPct=3 d3Pct=3
+[tree] Lancashire Heeler > Manchester Terrier > Whippet > Greyhound > Ancient eastern sighthounds | leafPct=4 d3Pct=4
+[tree] Lancashire Heeler > Manchester Terrier > Whippet > Old English Black and Tan Terrier | leafPct=4 d3Pct=4
 [tree] Lancashire Heeler > Manchester Terrier > Whippet > Italian Greyhound | leafPct=2 d3Pct=2
 [tree] Lancashire Heeler > Manchester Terrier > Whippet > Italian Greyhound > Ancient eastern sighthounds | leafPct=1 d3Pct=1
 [tree] Lancashire Heeler > Manchester Terrier > Whippet > Italian Greyhound > Mediterranean miniature sighthounds | leafPct=1 d3Pct=1
 [tree] Longdog | leafPct=100 d3Pct=100
-[tree] Longdog > Greyhound | leafPct=50 d3Pct=56
-[tree] Longdog > Greyhound > Celtic Hound | leafPct=30 d3Pct=26
-[tree] Longdog > Greyhound > Celtic Hound > Ancient eastern sighthounds | leafPct=17 d3Pct=7
-[tree] Longdog > Greyhound > Celtic Hound > Old hunting dogs of the Celts | leafPct=14 d3Pct=6
-[tree] Longdog > Greyhound > Ancient eastern sighthounds | leafPct=20 d3Pct=9
-[tree] Longdog > Whippet | leafPct=25 d3Pct=34
-[tree] Longdog > Whippet > Greyhound | leafPct=16 d3Pct=17
-[tree] Longdog > Whippet > Greyhound > Celtic Hound | leafPct=9 d3Pct=8
-[tree] Longdog > Whippet > Greyhound > Celtic Hound > Ancient eastern sighthounds | leafPct=5 d3Pct=2
-[tree] Longdog > Whippet > Greyhound > Celtic Hound > Old hunting dogs of the Celts | leafPct=4 d3Pct=2
-[tree] Longdog > Whippet > Greyhound > Ancient eastern sighthounds | leafPct=6 d3Pct=3
-[tree] Longdog > Whippet > Old English Black and Tan Terrier | leafPct=6 d3Pct=2
-[tree] Longdog > Whippet > Italian Greyhound | leafPct=4 d3Pct=3
-[tree] Longdog > Whippet > Italian Greyhound > Ancient eastern sighthounds | leafPct=2 d3Pct=1
-[tree] Longdog > Whippet > Italian Greyhound > Mediterranean miniature sighthounds | leafPct=2 d3Pct=1
-[tree] Longdog > Deerhound | leafPct=25 d3Pct=11
+[tree] Longdog > Greyhound | leafPct=50 d3Pct=50
+[tree] Longdog > Greyhound > Celtic Hound | leafPct=30 d3Pct=30
+[tree] Longdog > Greyhound > Celtic Hound > Ancient eastern sighthounds | leafPct=17 d3Pct=17
+[tree] Longdog > Greyhound > Celtic Hound > Old hunting dogs of the Celts | leafPct=14 d3Pct=14
+[tree] Longdog > Greyhound > Ancient eastern sighthounds | leafPct=20 d3Pct=20
+[tree] Longdog > Whippet | leafPct=25 d3Pct=25
+[tree] Longdog > Whippet > Greyhound | leafPct=16 d3Pct=16
+[tree] Longdog > Whippet > Greyhound > Celtic Hound | leafPct=9 d3Pct=9
+[tree] Longdog > Whippet > Greyhound > Celtic Hound > Ancient eastern sighthounds | leafPct=5 d3Pct=5
+[tree] Longdog > Whippet > Greyhound > Celtic Hound > Old hunting dogs of the Celts | leafPct=4 d3Pct=4
+[tree] Longdog > Whippet > Greyhound > Ancient eastern sighthounds | leafPct=6 d3Pct=6
+[tree] Longdog > Whippet > Old English Black and Tan Terrier | leafPct=6 d3Pct=6
+[tree] Longdog > Whippet > Italian Greyhound | leafPct=4 d3Pct=4
+[tree] Longdog > Whippet > Italian Greyhound > Ancient eastern sighthounds | leafPct=2 d3Pct=2
+[tree] Longdog > Whippet > Italian Greyhound > Mediterranean miniature sighthounds | leafPct=2 d3Pct=2
+[tree] Longdog > Deerhound | leafPct=25 d3Pct=25
 [tree] Lucas Terrier | leafPct=100 d3Pct=100
-[tree] Lucas Terrier > Sealyham Terrier | leafPct=50 d3Pct=48
-[tree] Lucas Terrier > Sealyham Terrier > Dandie Dinmont Terrier | leafPct=18 d3Pct=15
-[tree] Lucas Terrier > Sealyham Terrier > Dandie Dinmont Terrier > Old Border terriers | leafPct=11 d3Pct=4
-[tree] Lucas Terrier > Sealyham Terrier > Dandie Dinmont Terrier > Skye terrier stock | leafPct=4 d3Pct=1
+[tree] Lucas Terrier > Sealyham Terrier | leafPct=50 d3Pct=50
+[tree] Lucas Terrier > Sealyham Terrier > Dandie Dinmont Terrier | leafPct=18 d3Pct=18
+[tree] Lucas Terrier > Sealyham Terrier > Dandie Dinmont Terrier > Old Border terriers | leafPct=11 d3Pct=11
+[tree] Lucas Terrier > Sealyham Terrier > Dandie Dinmont Terrier > Skye terrier stock | leafPct=4 d3Pct=4
 [tree] Lucas Terrier > Sealyham Terrier > Dandie Dinmont Terrier > Otterhound | leafPct=3 d3Pct=3
 [tree] Lucas Terrier > Sealyham Terrier > Dandie Dinmont Terrier > Otterhound > Bloodhound | leafPct=1 d3Pct=1
-[tree] Lucas Terrier > Sealyham Terrier > Dandie Dinmont Terrier > Otterhound > Bloodhound > St Hubert Hound | leafPct=1 d3Pct=0
+[tree] Lucas Terrier > Sealyham Terrier > Dandie Dinmont Terrier > Otterhound > Bloodhound > St Hubert Hound | leafPct=1 d3Pct=1
 [tree] Lucas Terrier > Sealyham Terrier > Dandie Dinmont Terrier > Otterhound > Bloodhound > Old scenting hounds | leafPct=0 d3Pct=0
 [tree] Lucas Terrier > Sealyham Terrier > Dandie Dinmont Terrier > Otterhound > Southern Hound | leafPct=1 d3Pct=1
 [tree] Lucas Terrier > Sealyham Terrier > Dandie Dinmont Terrier > Otterhound > Southern Hound > Talbot hounds | leafPct=0 d3Pct=0
 [tree] Lucas Terrier > Sealyham Terrier > Dandie Dinmont Terrier > Otterhound > Southern Hound > St Hubert Hound | leafPct=0 d3Pct=0
-[tree] Lucas Terrier > Sealyham Terrier > Dandie Dinmont Terrier > Otterhound > Rough water dogs | leafPct=1 d3Pct=0
-[tree] Lucas Terrier > Sealyham Terrier > West Highland White Terrier | leafPct=18 d3Pct=7
-[tree] Lucas Terrier > Sealyham Terrier > Wire Fox Terrier | leafPct=15 d3Pct=6
-[tree] Lucas Terrier > Norfolk Terrier | leafPct=50 d3Pct=52
-[tree] Lucas Terrier > Norfolk Terrier > Norwich terrier stock | leafPct=25 d3Pct=10
-[tree] Lucas Terrier > Norfolk Terrier > Irish Terrier | leafPct=13 d3Pct=10
-[tree] Lucas Terrier > Norfolk Terrier > Irish Terrier > Native Irish terriers | leafPct=8 d3Pct=3
-[tree] Lucas Terrier > Norfolk Terrier > Irish Terrier > Old English Black and Tan Terrier | leafPct=5 d3Pct=2
+[tree] Lucas Terrier > Sealyham Terrier > Dandie Dinmont Terrier > Otterhound > Rough water dogs | leafPct=1 d3Pct=1
+[tree] Lucas Terrier > Sealyham Terrier > West Highland White Terrier | leafPct=18 d3Pct=18
+[tree] Lucas Terrier > Sealyham Terrier > Wire Fox Terrier | leafPct=15 d3Pct=15
+[tree] Lucas Terrier > Norfolk Terrier | leafPct=50 d3Pct=50
+[tree] Lucas Terrier > Norfolk Terrier > Norwich terrier stock | leafPct=25 d3Pct=25
+[tree] Lucas Terrier > Norfolk Terrier > Irish Terrier | leafPct=13 d3Pct=13
+[tree] Lucas Terrier > Norfolk Terrier > Irish Terrier > Native Irish terriers | leafPct=8 d3Pct=8
+[tree] Lucas Terrier > Norfolk Terrier > Irish Terrier > Old English Black and Tan Terrier | leafPct=5 d3Pct=5
 [tree] Lucas Terrier > Norfolk Terrier > Yorkshire Terrier | leafPct=13 d3Pct=13
-[tree] Lucas Terrier > Norfolk Terrier > Yorkshire Terrier > Paisley Terrier | leafPct=6 d3Pct=4
-[tree] Lucas Terrier > Norfolk Terrier > Yorkshire Terrier > Paisley Terrier > Skye terrier stock | leafPct=4 d3Pct=1
-[tree] Lucas Terrier > Norfolk Terrier > Yorkshire Terrier > Paisley Terrier > Old Highland terriers | leafPct=2 d3Pct=1
-[tree] Lucas Terrier > Norfolk Terrier > Yorkshire Terrier > Skye Terrier | leafPct=4 d3Pct=3
-[tree] Lucas Terrier > Norfolk Terrier > Yorkshire Terrier > Skye Terrier > Old Highland terriers | leafPct=2 d3Pct=1
-[tree] Lucas Terrier > Norfolk Terrier > Yorkshire Terrier > Skye Terrier > Skye terrier stock | leafPct=2 d3Pct=1
-[tree] Lucas Terrier > Norfolk Terrier > Yorkshire Terrier > Old English Black and Tan Terrier | leafPct=3 d3Pct=1
+[tree] Lucas Terrier > Norfolk Terrier > Yorkshire Terrier > Paisley Terrier | leafPct=6 d3Pct=6
+[tree] Lucas Terrier > Norfolk Terrier > Yorkshire Terrier > Paisley Terrier > Skye terrier stock | leafPct=4 d3Pct=4
+[tree] Lucas Terrier > Norfolk Terrier > Yorkshire Terrier > Paisley Terrier > Old Highland terriers | leafPct=2 d3Pct=2
+[tree] Lucas Terrier > Norfolk Terrier > Yorkshire Terrier > Skye Terrier | leafPct=4 d3Pct=4
+[tree] Lucas Terrier > Norfolk Terrier > Yorkshire Terrier > Skye Terrier > Old Highland terriers | leafPct=2 d3Pct=2
+[tree] Lucas Terrier > Norfolk Terrier > Yorkshire Terrier > Skye Terrier > Skye terrier stock | leafPct=2 d3Pct=2
+[tree] Lucas Terrier > Norfolk Terrier > Yorkshire Terrier > Old English Black and Tan Terrier | leafPct=3 d3Pct=3
 [tree] Lurcher | leafPct=100 d3Pct=100
-[tree] Lurcher > Greyhound | leafPct=50 d3Pct=72
-[tree] Lurcher > Greyhound > Celtic Hound | leafPct=30 d3Pct=33
-[tree] Lurcher > Greyhound > Celtic Hound > Ancient eastern sighthounds | leafPct=17 d3Pct=9
-[tree] Lurcher > Greyhound > Celtic Hound > Old hunting dogs of the Celts | leafPct=14 d3Pct=8
-[tree] Lurcher > Greyhound > Ancient eastern sighthounds | leafPct=20 d3Pct=11
-[tree] Lurcher > Collie or working dog | leafPct=30 d3Pct=17
-[tree] Lurcher > Old English Black and Tan Terrier | leafPct=20 d3Pct=11
+[tree] Lurcher > Greyhound | leafPct=50 d3Pct=50
+[tree] Lurcher > Greyhound > Celtic Hound | leafPct=30 d3Pct=30
+[tree] Lurcher > Greyhound > Celtic Hound > Ancient eastern sighthounds | leafPct=17 d3Pct=17
+[tree] Lurcher > Greyhound > Celtic Hound > Old hunting dogs of the Celts | leafPct=14 d3Pct=14
+[tree] Lurcher > Greyhound > Ancient eastern sighthounds | leafPct=20 d3Pct=20
+[tree] Lurcher > Collie or working dog | leafPct=30 d3Pct=30
+[tree] Lurcher > Old English Black and Tan Terrier | leafPct=20 d3Pct=20
 [tree] Maltese | leafPct=100 d3Pct=100
 [tree] Maltese > Ancient Spitz-type dogs | leafPct=55 d3Pct=55
 [tree] Maltese > Mediterranean bichon lapdogs | leafPct=45 d3Pct=45
 [tree] Maltipoo | leafPct=100 d3Pct=100
 [tree] Maltipoo > Maltese | leafPct=50 d3Pct=50
-[tree] Maltipoo > Maltese > Ancient Spitz-type dogs | leafPct=28 d3Pct=14
-[tree] Maltipoo > Maltese > Mediterranean bichon lapdogs | leafPct=23 d3Pct=11
+[tree] Maltipoo > Maltese > Ancient Spitz-type dogs | leafPct=28 d3Pct=28
+[tree] Maltipoo > Maltese > Mediterranean bichon lapdogs | leafPct=23 d3Pct=23
 [tree] Maltipoo > Poodle | leafPct=50 d3Pct=50
-[tree] Maltipoo > Poodle > Old European water dogs | leafPct=28 d3Pct=14
-[tree] Maltipoo > Poodle > Barbet and water spaniels | leafPct=23 d3Pct=11
+[tree] Maltipoo > Poodle > Old European water dogs | leafPct=28 d3Pct=28
+[tree] Maltipoo > Poodle > Barbet and water spaniels | leafPct=23 d3Pct=23
 [tree] Manchester Terrier | leafPct=100 d3Pct=100
-[tree] Manchester Terrier > Black and Tan Terrier | leafPct=65 d3Pct=54
-[tree] Manchester Terrier > Black and Tan Terrier > Old British ratting terriers | leafPct=39 d3Pct=16
-[tree] Manchester Terrier > Black and Tan Terrier > Earth and hunt terriers | leafPct=26 d3Pct=11
-[tree] Manchester Terrier > Whippet | leafPct=35 d3Pct=46
-[tree] Manchester Terrier > Whippet > Greyhound | leafPct=22 d3Pct=24
-[tree] Manchester Terrier > Whippet > Greyhound > Celtic Hound | leafPct=13 d3Pct=11
-[tree] Manchester Terrier > Whippet > Greyhound > Celtic Hound > Ancient eastern sighthounds | leafPct=7 d3Pct=3
-[tree] Manchester Terrier > Whippet > Greyhound > Celtic Hound > Old hunting dogs of the Celts | leafPct=6 d3Pct=2
-[tree] Manchester Terrier > Whippet > Greyhound > Ancient eastern sighthounds | leafPct=9 d3Pct=4
-[tree] Manchester Terrier > Whippet > Old English Black and Tan Terrier | leafPct=8 d3Pct=3
-[tree] Manchester Terrier > Whippet > Italian Greyhound | leafPct=5 d3Pct=4
-[tree] Manchester Terrier > Whippet > Italian Greyhound > Ancient eastern sighthounds | leafPct=3 d3Pct=1
-[tree] Manchester Terrier > Whippet > Italian Greyhound > Mediterranean miniature sighthounds | leafPct=2 d3Pct=1
+[tree] Manchester Terrier > Black and Tan Terrier | leafPct=65 d3Pct=65
+[tree] Manchester Terrier > Black and Tan Terrier > Old British ratting terriers | leafPct=39 d3Pct=39
+[tree] Manchester Terrier > Black and Tan Terrier > Earth and hunt terriers | leafPct=26 d3Pct=26
+[tree] Manchester Terrier > Whippet | leafPct=35 d3Pct=35
+[tree] Manchester Terrier > Whippet > Greyhound | leafPct=22 d3Pct=22
+[tree] Manchester Terrier > Whippet > Greyhound > Celtic Hound | leafPct=13 d3Pct=13
+[tree] Manchester Terrier > Whippet > Greyhound > Celtic Hound > Ancient eastern sighthounds | leafPct=7 d3Pct=7
+[tree] Manchester Terrier > Whippet > Greyhound > Celtic Hound > Old hunting dogs of the Celts | leafPct=6 d3Pct=6
+[tree] Manchester Terrier > Whippet > Greyhound > Ancient eastern sighthounds | leafPct=9 d3Pct=9
+[tree] Manchester Terrier > Whippet > Old English Black and Tan Terrier | leafPct=8 d3Pct=8
+[tree] Manchester Terrier > Whippet > Italian Greyhound | leafPct=5 d3Pct=5
+[tree] Manchester Terrier > Whippet > Italian Greyhound > Ancient eastern sighthounds | leafPct=3 d3Pct=3
+[tree] Manchester Terrier > Whippet > Italian Greyhound > Mediterranean miniature sighthounds | leafPct=2 d3Pct=2
 [tree] Match to your chum | leafPct=100 d3Pct=100
 [tree] Match to your chum > Call out | leafPct=100 d3Pct=100
 [tree] Match to your chum > Call out > Claim chum | leafPct=100 d3Pct=67
@@ -901,11 +901,11 @@
 [tree] Medieval Earth Dog | leafPct=100 d3Pct=na
 [tree] Medieval Shepherd's Dog | leafPct=100 d3Pct=na
 [tree] Miniature Schnauzer | leafPct=100 d3Pct=100
-[tree] Miniature Schnauzer > Standard Schnauzer farm dogs | leafPct=60 d3Pct=52
-[tree] Miniature Schnauzer > Affenpinscher | leafPct=25 d3Pct=22
-[tree] Miniature Schnauzer > Poodle | leafPct=15 d3Pct=26
-[tree] Miniature Schnauzer > Poodle > Old European water dogs | leafPct=8 d3Pct=7
-[tree] Miniature Schnauzer > Poodle > Barbet and water spaniels | leafPct=7 d3Pct=6
+[tree] Miniature Schnauzer > Standard Schnauzer farm dogs | leafPct=60 d3Pct=60
+[tree] Miniature Schnauzer > Affenpinscher | leafPct=25 d3Pct=25
+[tree] Miniature Schnauzer > Poodle | leafPct=15 d3Pct=15
+[tree] Miniature Schnauzer > Poodle > Old European water dogs | leafPct=8 d3Pct=8
+[tree] Miniature Schnauzer > Poodle > Barbet and water spaniels | leafPct=7 d3Pct=7
 [tree] Most chums wins | leafPct=100 d3Pct=100
 [tree] Most chums wins > Finished exploring | leafPct=100 d3Pct=100
 [tree] Most chums wins > Finished exploring > Count up | leafPct=100 d3Pct=83
@@ -914,47 +914,47 @@
 [tree] Norfolk Spaniel > Land spaniels | leafPct=65 d3Pct=65
 [tree] Norfolk Spaniel > Water spaniels | leafPct=35 d3Pct=35
 [tree] Norfolk Terrier | leafPct=100 d3Pct=100
-[tree] Norfolk Terrier > Norwich terrier stock | leafPct=50 d3Pct=30
-[tree] Norfolk Terrier > Irish Terrier | leafPct=25 d3Pct=30
-[tree] Norfolk Terrier > Irish Terrier > Native Irish terriers | leafPct=15 d3Pct=9
-[tree] Norfolk Terrier > Irish Terrier > Old English Black and Tan Terrier | leafPct=10 d3Pct=6
-[tree] Norfolk Terrier > Yorkshire Terrier | leafPct=25 d3Pct=41
-[tree] Norfolk Terrier > Yorkshire Terrier > Paisley Terrier | leafPct=11 d3Pct=13
-[tree] Norfolk Terrier > Yorkshire Terrier > Paisley Terrier > Skye terrier stock | leafPct=7 d3Pct=4
-[tree] Norfolk Terrier > Yorkshire Terrier > Paisley Terrier > Old Highland terriers | leafPct=4 d3Pct=2
-[tree] Norfolk Terrier > Yorkshire Terrier > Skye Terrier | leafPct=8 d3Pct=9
-[tree] Norfolk Terrier > Yorkshire Terrier > Skye Terrier > Old Highland terriers | leafPct=5 d3Pct=3
-[tree] Norfolk Terrier > Yorkshire Terrier > Skye Terrier > Skye terrier stock | leafPct=3 d3Pct=2
-[tree] Norfolk Terrier > Yorkshire Terrier > Old English Black and Tan Terrier | leafPct=6 d3Pct=4
+[tree] Norfolk Terrier > Norwich terrier stock | leafPct=50 d3Pct=50
+[tree] Norfolk Terrier > Irish Terrier | leafPct=25 d3Pct=25
+[tree] Norfolk Terrier > Irish Terrier > Native Irish terriers | leafPct=15 d3Pct=15
+[tree] Norfolk Terrier > Irish Terrier > Old English Black and Tan Terrier | leafPct=10 d3Pct=10
+[tree] Norfolk Terrier > Yorkshire Terrier | leafPct=25 d3Pct=25
+[tree] Norfolk Terrier > Yorkshire Terrier > Paisley Terrier | leafPct=11 d3Pct=11
+[tree] Norfolk Terrier > Yorkshire Terrier > Paisley Terrier > Skye terrier stock | leafPct=7 d3Pct=7
+[tree] Norfolk Terrier > Yorkshire Terrier > Paisley Terrier > Old Highland terriers | leafPct=4 d3Pct=4
+[tree] Norfolk Terrier > Yorkshire Terrier > Skye Terrier | leafPct=8 d3Pct=8
+[tree] Norfolk Terrier > Yorkshire Terrier > Skye Terrier > Old Highland terriers | leafPct=5 d3Pct=5
+[tree] Norfolk Terrier > Yorkshire Terrier > Skye Terrier > Skye terrier stock | leafPct=3 d3Pct=3
+[tree] Norfolk Terrier > Yorkshire Terrier > Old English Black and Tan Terrier | leafPct=6 d3Pct=6
 [tree] North Country Beagle | leafPct=100 d3Pct=100
-[tree] North Country Beagle > Southern Hound | leafPct=60 d3Pct=75
-[tree] North Country Beagle > Southern Hound > Talbot hounds | leafPct=36 d3Pct=23
-[tree] North Country Beagle > Southern Hound > St Hubert Hound | leafPct=24 d3Pct=15
-[tree] North Country Beagle > Talbot hound | leafPct=40 d3Pct=25
+[tree] North Country Beagle > Southern Hound | leafPct=60 d3Pct=60
+[tree] North Country Beagle > Southern Hound > Talbot hounds | leafPct=36 d3Pct=36
+[tree] North Country Beagle > Southern Hound > St Hubert Hound | leafPct=24 d3Pct=24
+[tree] North Country Beagle > Talbot hound | leafPct=40 d3Pct=40
 [tree] Northern Inuit Dog | leafPct=100 d3Pct=100
 [tree] Northern Inuit Dog > Arctic sled dogs | leafPct=55 d3Pct=55
 [tree] Northern Inuit Dog > German Shepherd Dog | leafPct=45 d3Pct=45
 [tree] Norwich Terrier | leafPct=100 d3Pct=100
-[tree] Norwich Terrier > Irish Terrier | leafPct=40 d3Pct=42
-[tree] Norwich Terrier > Irish Terrier > Native Irish terriers | leafPct=24 d3Pct=12
-[tree] Norwich Terrier > Irish Terrier > Old English Black and Tan Terrier | leafPct=16 d3Pct=8
-[tree] Norwich Terrier > Yorkshire Terrier | leafPct=30 d3Pct=43
+[tree] Norwich Terrier > Irish Terrier | leafPct=40 d3Pct=40
+[tree] Norwich Terrier > Irish Terrier > Native Irish terriers | leafPct=24 d3Pct=24
+[tree] Norwich Terrier > Irish Terrier > Old English Black and Tan Terrier | leafPct=16 d3Pct=16
+[tree] Norwich Terrier > Yorkshire Terrier | leafPct=30 d3Pct=30
 [tree] Norwich Terrier > Yorkshire Terrier > Paisley Terrier | leafPct=14 d3Pct=14
-[tree] Norwich Terrier > Yorkshire Terrier > Paisley Terrier > Skye terrier stock | leafPct=9 d3Pct=5
-[tree] Norwich Terrier > Yorkshire Terrier > Paisley Terrier > Old Highland terriers | leafPct=5 d3Pct=2
+[tree] Norwich Terrier > Yorkshire Terrier > Paisley Terrier > Skye terrier stock | leafPct=9 d3Pct=9
+[tree] Norwich Terrier > Yorkshire Terrier > Paisley Terrier > Old Highland terriers | leafPct=5 d3Pct=5
 [tree] Norwich Terrier > Yorkshire Terrier > Skye Terrier | leafPct=9 d3Pct=9
-[tree] Norwich Terrier > Yorkshire Terrier > Skye Terrier > Old Highland terriers | leafPct=5 d3Pct=3
-[tree] Norwich Terrier > Yorkshire Terrier > Skye Terrier > Skye terrier stock | leafPct=4 d3Pct=2
-[tree] Norwich Terrier > Yorkshire Terrier > Old English Black and Tan Terrier | leafPct=8 d3Pct=4
-[tree] Norwich Terrier > Local red ratting terriers | leafPct=30 d3Pct=16
+[tree] Norwich Terrier > Yorkshire Terrier > Skye Terrier > Old Highland terriers | leafPct=5 d3Pct=5
+[tree] Norwich Terrier > Yorkshire Terrier > Skye Terrier > Skye terrier stock | leafPct=4 d3Pct=4
+[tree] Norwich Terrier > Yorkshire Terrier > Old English Black and Tan Terrier | leafPct=8 d3Pct=8
+[tree] Norwich Terrier > Local red ratting terriers | leafPct=30 d3Pct=30
 [tree] Old English Bulldog | leafPct=100 d3Pct=100
 [tree] Old English Bulldog > Mastiff and Alaunt war dogs | leafPct=60 d3Pct=60
 [tree] Old English Bulldog > Old British bandogs | leafPct=40 d3Pct=40
 [tree] Old English Sheepdog | leafPct=100 d3Pct=100
-[tree] Old English Sheepdog > Bearded Collie | leafPct=55 d3Pct=71
-[tree] Old English Sheepdog > Bearded Collie > Shaggy lowland herders | leafPct=28 d3Pct=18
-[tree] Old English Sheepdog > Bearded Collie > Old working collies | leafPct=28 d3Pct=18
-[tree] Old English Sheepdog > Welsh herding dogs | leafPct=45 d3Pct=29
+[tree] Old English Sheepdog > Bearded Collie | leafPct=55 d3Pct=55
+[tree] Old English Sheepdog > Bearded Collie > Shaggy lowland herders | leafPct=28 d3Pct=28
+[tree] Old English Sheepdog > Bearded Collie > Old working collies | leafPct=28 d3Pct=28
+[tree] Old English Sheepdog > Welsh herding dogs | leafPct=45 d3Pct=45
 [tree] Old Welsh Grey Sheepdog | leafPct=100 d3Pct=100
 [tree] Old Welsh Grey Sheepdog > Welsh herding dogs | leafPct=60 d3Pct=60
 [tree] Old Welsh Grey Sheepdog > Welsh herding dogs > Medieval Shepherd's Dog | leafPct=30 d3Pct=30
@@ -963,13 +963,13 @@
 [tree] Old Welsh Grey Sheepdog > Shaggy upland herders > Medieval Shepherd's Dog | leafPct=20 d3Pct=20
 [tree] Old Welsh Grey Sheepdog > Shaggy upland herders > Shaggy upland herders | leafPct=20 d3Pct=20
 [tree] Otterhound | leafPct=100 d3Pct=100
-[tree] Otterhound > Bloodhound | leafPct=45 d3Pct=51
-[tree] Otterhound > Bloodhound > St Hubert Hound | leafPct=27 d3Pct=15
-[tree] Otterhound > Bloodhound > Old scenting hounds | leafPct=18 d3Pct=10
-[tree] Otterhound > Southern Hound | leafPct=30 d3Pct=34
-[tree] Otterhound > Southern Hound > Talbot hounds | leafPct=18 d3Pct=10
-[tree] Otterhound > Southern Hound > St Hubert Hound | leafPct=12 d3Pct=7
-[tree] Otterhound > Rough water dogs | leafPct=25 d3Pct=14
+[tree] Otterhound > Bloodhound | leafPct=45 d3Pct=45
+[tree] Otterhound > Bloodhound > St Hubert Hound | leafPct=27 d3Pct=27
+[tree] Otterhound > Bloodhound > Old scenting hounds | leafPct=18 d3Pct=18
+[tree] Otterhound > Southern Hound | leafPct=30 d3Pct=30
+[tree] Otterhound > Southern Hound > Talbot hounds | leafPct=18 d3Pct=18
+[tree] Otterhound > Southern Hound > St Hubert Hound | leafPct=12 d3Pct=12
+[tree] Otterhound > Rough water dogs | leafPct=25 d3Pct=25
 [tree] Paisley Terrier | leafPct=100 d3Pct=100
 [tree] Paisley Terrier > Skye terrier stock | leafPct=65 d3Pct=65
 [tree] Paisley Terrier > Old Highland terriers | leafPct=35 d3Pct=35
@@ -977,15 +977,15 @@
 [tree] Papillon > Continental toy spaniels | leafPct=70 d3Pct=70
 [tree] Papillon > Old European lapdogs | leafPct=30 d3Pct=30
 [tree] Patterdale Terrier | leafPct=100 d3Pct=100
-[tree] Patterdale Terrier > Old fell terriers | leafPct=60 d3Pct=34
-[tree] Patterdale Terrier > Border Terrier | leafPct=25 d3Pct=42
-[tree] Patterdale Terrier > Border Terrier > Bedlington Terrier | leafPct=9 d3Pct=13
-[tree] Patterdale Terrier > Border Terrier > Bedlington Terrier > Old Border terriers | leafPct=4 d3Pct=2
-[tree] Patterdale Terrier > Border Terrier > Bedlington Terrier > Whippet | leafPct=3 d3Pct=4
+[tree] Patterdale Terrier > Old fell terriers | leafPct=60 d3Pct=60
+[tree] Patterdale Terrier > Border Terrier | leafPct=25 d3Pct=25
+[tree] Patterdale Terrier > Border Terrier > Bedlington Terrier | leafPct=9 d3Pct=9
+[tree] Patterdale Terrier > Border Terrier > Bedlington Terrier > Old Border terriers | leafPct=4 d3Pct=4
+[tree] Patterdale Terrier > Border Terrier > Bedlington Terrier > Whippet | leafPct=3 d3Pct=3
 [tree] Patterdale Terrier > Border Terrier > Bedlington Terrier > Whippet > Greyhound | leafPct=2 d3Pct=2
 [tree] Patterdale Terrier > Border Terrier > Bedlington Terrier > Whippet > Greyhound > Celtic Hound | leafPct=1 d3Pct=1
-[tree] Patterdale Terrier > Border Terrier > Bedlington Terrier > Whippet > Greyhound > Ancient eastern sighthounds | leafPct=1 d3Pct=0
-[tree] Patterdale Terrier > Border Terrier > Bedlington Terrier > Whippet > Old English Black and Tan Terrier | leafPct=1 d3Pct=0
+[tree] Patterdale Terrier > Border Terrier > Bedlington Terrier > Whippet > Greyhound > Ancient eastern sighthounds | leafPct=1 d3Pct=1
+[tree] Patterdale Terrier > Border Terrier > Bedlington Terrier > Whippet > Old English Black and Tan Terrier | leafPct=1 d3Pct=1
 [tree] Patterdale Terrier > Border Terrier > Bedlington Terrier > Whippet > Italian Greyhound | leafPct=0 d3Pct=0
 [tree] Patterdale Terrier > Border Terrier > Bedlington Terrier > Whippet > Italian Greyhound > Ancient eastern sighthounds | leafPct=0 d3Pct=0
 [tree] Patterdale Terrier > Border Terrier > Bedlington Terrier > Whippet > Italian Greyhound > Mediterranean miniature sighthounds | leafPct=0 d3Pct=0
@@ -996,10 +996,10 @@
 [tree] Patterdale Terrier > Border Terrier > Bedlington Terrier > Dandie Dinmont Terrier > Otterhound > Bloodhound | leafPct=0 d3Pct=0
 [tree] Patterdale Terrier > Border Terrier > Bedlington Terrier > Dandie Dinmont Terrier > Otterhound > Southern Hound | leafPct=0 d3Pct=0
 [tree] Patterdale Terrier > Border Terrier > Bedlington Terrier > Dandie Dinmont Terrier > Otterhound > Rough water dogs | leafPct=0 d3Pct=0
-[tree] Patterdale Terrier > Border Terrier > Dandie Dinmont Terrier | leafPct=8 d3Pct=10
-[tree] Patterdale Terrier > Border Terrier > Dandie Dinmont Terrier > Old Border terriers | leafPct=5 d3Pct=3
-[tree] Patterdale Terrier > Border Terrier > Dandie Dinmont Terrier > Skye terrier stock | leafPct=2 d3Pct=1
-[tree] Patterdale Terrier > Border Terrier > Dandie Dinmont Terrier > Otterhound | leafPct=1 d3Pct=2
+[tree] Patterdale Terrier > Border Terrier > Dandie Dinmont Terrier | leafPct=8 d3Pct=8
+[tree] Patterdale Terrier > Border Terrier > Dandie Dinmont Terrier > Old Border terriers | leafPct=5 d3Pct=5
+[tree] Patterdale Terrier > Border Terrier > Dandie Dinmont Terrier > Skye terrier stock | leafPct=2 d3Pct=2
+[tree] Patterdale Terrier > Border Terrier > Dandie Dinmont Terrier > Otterhound | leafPct=1 d3Pct=1
 [tree] Patterdale Terrier > Border Terrier > Dandie Dinmont Terrier > Otterhound > Bloodhound | leafPct=1 d3Pct=1
 [tree] Patterdale Terrier > Border Terrier > Dandie Dinmont Terrier > Otterhound > Bloodhound > St Hubert Hound | leafPct=0 d3Pct=0
 [tree] Patterdale Terrier > Border Terrier > Dandie Dinmont Terrier > Otterhound > Bloodhound > Old scenting hounds | leafPct=0 d3Pct=0
@@ -1007,23 +1007,23 @@
 [tree] Patterdale Terrier > Border Terrier > Dandie Dinmont Terrier > Otterhound > Southern Hound > Talbot hounds | leafPct=0 d3Pct=0
 [tree] Patterdale Terrier > Border Terrier > Dandie Dinmont Terrier > Otterhound > Southern Hound > St Hubert Hound | leafPct=0 d3Pct=0
 [tree] Patterdale Terrier > Border Terrier > Dandie Dinmont Terrier > Otterhound > Rough water dogs | leafPct=0 d3Pct=0
-[tree] Patterdale Terrier > Border Terrier > Old fell terriers | leafPct=8 d3Pct=5
-[tree] Patterdale Terrier > Bedlington Terrier | leafPct=15 d3Pct=24
-[tree] Patterdale Terrier > Bedlington Terrier > Old Border terriers | leafPct=8 d3Pct=4
-[tree] Patterdale Terrier > Bedlington Terrier > Whippet | leafPct=5 d3Pct=8
-[tree] Patterdale Terrier > Bedlington Terrier > Whippet > Greyhound | leafPct=3 d3Pct=4
+[tree] Patterdale Terrier > Border Terrier > Old fell terriers | leafPct=8 d3Pct=8
+[tree] Patterdale Terrier > Bedlington Terrier | leafPct=15 d3Pct=15
+[tree] Patterdale Terrier > Bedlington Terrier > Old Border terriers | leafPct=8 d3Pct=8
+[tree] Patterdale Terrier > Bedlington Terrier > Whippet | leafPct=5 d3Pct=5
+[tree] Patterdale Terrier > Bedlington Terrier > Whippet > Greyhound | leafPct=3 d3Pct=3
 [tree] Patterdale Terrier > Bedlington Terrier > Whippet > Greyhound > Celtic Hound | leafPct=2 d3Pct=2
 [tree] Patterdale Terrier > Bedlington Terrier > Whippet > Greyhound > Celtic Hound > Ancient eastern sighthounds | leafPct=1 d3Pct=1
-[tree] Patterdale Terrier > Bedlington Terrier > Whippet > Greyhound > Celtic Hound > Old hunting dogs of the Celts | leafPct=1 d3Pct=0
+[tree] Patterdale Terrier > Bedlington Terrier > Whippet > Greyhound > Celtic Hound > Old hunting dogs of the Celts | leafPct=1 d3Pct=1
 [tree] Patterdale Terrier > Bedlington Terrier > Whippet > Greyhound > Ancient eastern sighthounds | leafPct=1 d3Pct=1
 [tree] Patterdale Terrier > Bedlington Terrier > Whippet > Old English Black and Tan Terrier | leafPct=1 d3Pct=1
 [tree] Patterdale Terrier > Bedlington Terrier > Whippet > Italian Greyhound | leafPct=1 d3Pct=1
 [tree] Patterdale Terrier > Bedlington Terrier > Whippet > Italian Greyhound > Ancient eastern sighthounds | leafPct=0 d3Pct=0
 [tree] Patterdale Terrier > Bedlington Terrier > Whippet > Italian Greyhound > Mediterranean miniature sighthounds | leafPct=0 d3Pct=0
-[tree] Patterdale Terrier > Bedlington Terrier > Dandie Dinmont Terrier | leafPct=3 d3Pct=4
-[tree] Patterdale Terrier > Bedlington Terrier > Dandie Dinmont Terrier > Old Border terriers | leafPct=2 d3Pct=1
-[tree] Patterdale Terrier > Bedlington Terrier > Dandie Dinmont Terrier > Skye terrier stock | leafPct=1 d3Pct=0
-[tree] Patterdale Terrier > Bedlington Terrier > Dandie Dinmont Terrier > Otterhound | leafPct=0 d3Pct=1
+[tree] Patterdale Terrier > Bedlington Terrier > Dandie Dinmont Terrier | leafPct=3 d3Pct=3
+[tree] Patterdale Terrier > Bedlington Terrier > Dandie Dinmont Terrier > Old Border terriers | leafPct=2 d3Pct=2
+[tree] Patterdale Terrier > Bedlington Terrier > Dandie Dinmont Terrier > Skye terrier stock | leafPct=1 d3Pct=1
+[tree] Patterdale Terrier > Bedlington Terrier > Dandie Dinmont Terrier > Otterhound | leafPct=0 d3Pct=0
 [tree] Patterdale Terrier > Bedlington Terrier > Dandie Dinmont Terrier > Otterhound > Bloodhound | leafPct=0 d3Pct=0
 [tree] Patterdale Terrier > Bedlington Terrier > Dandie Dinmont Terrier > Otterhound > Bloodhound > St Hubert Hound | leafPct=0 d3Pct=0
 [tree] Patterdale Terrier > Bedlington Terrier > Dandie Dinmont Terrier > Otterhound > Bloodhound > Old scenting hounds | leafPct=0 d3Pct=0
@@ -1032,25 +1032,25 @@
 [tree] Patterdale Terrier > Bedlington Terrier > Dandie Dinmont Terrier > Otterhound > Southern Hound > St Hubert Hound | leafPct=0 d3Pct=0
 [tree] Patterdale Terrier > Bedlington Terrier > Dandie Dinmont Terrier > Otterhound > Rough water dogs | leafPct=0 d3Pct=0
 [tree] Pointer | leafPct=100 d3Pct=100
-[tree] Pointer > English Foxhound | leafPct=30 d3Pct=40
-[tree] Pointer > English Foxhound > Southern Hound | leafPct=15 d3Pct=13
-[tree] Pointer > English Foxhound > Southern Hound > Talbot hounds | leafPct=9 d3Pct=4
-[tree] Pointer > English Foxhound > Southern Hound > St Hubert Hound | leafPct=6 d3Pct=3
-[tree] Pointer > English Foxhound > Greyhound | leafPct=9 d3Pct=10
+[tree] Pointer > English Foxhound | leafPct=30 d3Pct=30
+[tree] Pointer > English Foxhound > Southern Hound | leafPct=15 d3Pct=15
+[tree] Pointer > English Foxhound > Southern Hound > Talbot hounds | leafPct=9 d3Pct=9
+[tree] Pointer > English Foxhound > Southern Hound > St Hubert Hound | leafPct=6 d3Pct=6
+[tree] Pointer > English Foxhound > Greyhound | leafPct=9 d3Pct=9
 [tree] Pointer > English Foxhound > Greyhound > Celtic Hound | leafPct=5 d3Pct=5
-[tree] Pointer > English Foxhound > Greyhound > Celtic Hound > Ancient eastern sighthounds | leafPct=3 d3Pct=1
-[tree] Pointer > English Foxhound > Greyhound > Celtic Hound > Old hunting dogs of the Celts | leafPct=2 d3Pct=1
-[tree] Pointer > English Foxhound > Greyhound > Ancient eastern sighthounds | leafPct=4 d3Pct=2
-[tree] Pointer > English Foxhound > Talbot hound | leafPct=6 d3Pct=3
-[tree] Pointer > Greyhound | leafPct=25 d3Pct=29
-[tree] Pointer > Greyhound > Celtic Hound | leafPct=15 d3Pct=13
-[tree] Pointer > Greyhound > Celtic Hound > Ancient eastern sighthounds | leafPct=8 d3Pct=4
-[tree] Pointer > Greyhound > Celtic Hound > Old hunting dogs of the Celts | leafPct=7 d3Pct=3
-[tree] Pointer > Greyhound > Ancient eastern sighthounds | leafPct=10 d3Pct=4
-[tree] Pointer > Bloodhound | leafPct=25 d3Pct=22
-[tree] Pointer > Bloodhound > St Hubert Hound | leafPct=15 d3Pct=7
-[tree] Pointer > Bloodhound > Old scenting hounds | leafPct=10 d3Pct=4
-[tree] Pointer > Setter | leafPct=20 d3Pct=9
+[tree] Pointer > English Foxhound > Greyhound > Celtic Hound > Ancient eastern sighthounds | leafPct=3 d3Pct=3
+[tree] Pointer > English Foxhound > Greyhound > Celtic Hound > Old hunting dogs of the Celts | leafPct=2 d3Pct=2
+[tree] Pointer > English Foxhound > Greyhound > Ancient eastern sighthounds | leafPct=4 d3Pct=4
+[tree] Pointer > English Foxhound > Talbot hound | leafPct=6 d3Pct=6
+[tree] Pointer > Greyhound | leafPct=25 d3Pct=25
+[tree] Pointer > Greyhound > Celtic Hound | leafPct=15 d3Pct=15
+[tree] Pointer > Greyhound > Celtic Hound > Ancient eastern sighthounds | leafPct=8 d3Pct=8
+[tree] Pointer > Greyhound > Celtic Hound > Old hunting dogs of the Celts | leafPct=7 d3Pct=7
+[tree] Pointer > Greyhound > Ancient eastern sighthounds | leafPct=10 d3Pct=10
+[tree] Pointer > Bloodhound | leafPct=25 d3Pct=25
+[tree] Pointer > Bloodhound > St Hubert Hound | leafPct=15 d3Pct=15
+[tree] Pointer > Bloodhound > Old scenting hounds | leafPct=10 d3Pct=10
+[tree] Pointer > Setter | leafPct=20 d3Pct=20
 [tree] Pomeranian | leafPct=100 d3Pct=100
 [tree] Pomeranian > Arctic sled spitz | leafPct=55 d3Pct=55
 [tree] Pomeranian > German farm spitz | leafPct=45 d3Pct=45
@@ -1061,19 +1061,19 @@
 [tree] Pug > Ancient Chinese toy dogs | leafPct=60 d3Pct=60
 [tree] Pug > Eastern lion and lap dogs | leafPct=40 d3Pct=40
 [tree] Puggle | leafPct=100 d3Pct=100
-[tree] Puggle > Pug | leafPct=50 d3Pct=42
-[tree] Puggle > Pug > Ancient Chinese toy dogs | leafPct=30 d3Pct=13
-[tree] Puggle > Pug > Eastern lion and lap dogs | leafPct=20 d3Pct=8
-[tree] Puggle > Beagle | leafPct=50 d3Pct=58
-[tree] Puggle > Beagle > Talbot hound | leafPct=20 d3Pct=8
-[tree] Puggle > Beagle > Southern Hound | leafPct=18 d3Pct=15
-[tree] Puggle > Beagle > Southern Hound > Talbot hounds | leafPct=11 d3Pct=4
-[tree] Puggle > Beagle > Southern Hound > St Hubert Hound | leafPct=7 d3Pct=3
-[tree] Puggle > Beagle > Greyhound | leafPct=13 d3Pct=14
-[tree] Puggle > Beagle > Greyhound > Celtic Hound | leafPct=8 d3Pct=6
-[tree] Puggle > Beagle > Greyhound > Celtic Hound > Ancient eastern sighthounds | leafPct=4 d3Pct=2
-[tree] Puggle > Beagle > Greyhound > Celtic Hound > Old hunting dogs of the Celts | leafPct=3 d3Pct=1
-[tree] Puggle > Beagle > Greyhound > Ancient eastern sighthounds | leafPct=5 d3Pct=2
+[tree] Puggle > Pug | leafPct=50 d3Pct=50
+[tree] Puggle > Pug > Ancient Chinese toy dogs | leafPct=30 d3Pct=30
+[tree] Puggle > Pug > Eastern lion and lap dogs | leafPct=20 d3Pct=20
+[tree] Puggle > Beagle | leafPct=50 d3Pct=50
+[tree] Puggle > Beagle > Talbot hound | leafPct=20 d3Pct=20
+[tree] Puggle > Beagle > Southern Hound | leafPct=18 d3Pct=18
+[tree] Puggle > Beagle > Southern Hound > Talbot hounds | leafPct=11 d3Pct=11
+[tree] Puggle > Beagle > Southern Hound > St Hubert Hound | leafPct=7 d3Pct=7
+[tree] Puggle > Beagle > Greyhound | leafPct=13 d3Pct=13
+[tree] Puggle > Beagle > Greyhound > Celtic Hound | leafPct=8 d3Pct=8
+[tree] Puggle > Beagle > Greyhound > Celtic Hound > Ancient eastern sighthounds | leafPct=4 d3Pct=4
+[tree] Puggle > Beagle > Greyhound > Celtic Hound > Old hunting dogs of the Celts | leafPct=3 d3Pct=3
+[tree] Puggle > Beagle > Greyhound > Ancient eastern sighthounds | leafPct=5 d3Pct=5
 [tree] Rache | leafPct=100 d3Pct=100
 [tree] Rache > St Hubert and Talbot hounds | leafPct=60 d3Pct=60
 [tree] Rache > Old scenting hounds | leafPct=40 d3Pct=40
@@ -1090,27 +1090,27 @@
 [tree] Saint Bernard > Newfoundland landrace dogs | leafPct=25 d3Pct=25
 [tree] Saint Bernard > Ancient Molossers | leafPct=20 d3Pct=20
 [tree] Scottish Deerhound | leafPct=100 d3Pct=100
-[tree] Scottish Deerhound > Celtic Hound | leafPct=60 d3Pct=75
-[tree] Scottish Deerhound > Celtic Hound > Ancient eastern sighthounds | leafPct=33 d3Pct=21
-[tree] Scottish Deerhound > Celtic Hound > Old hunting dogs of the Celts | leafPct=27 d3Pct=17
-[tree] Scottish Deerhound > Rough northern sighthounds | leafPct=40 d3Pct=25
+[tree] Scottish Deerhound > Celtic Hound | leafPct=60 d3Pct=60
+[tree] Scottish Deerhound > Celtic Hound > Ancient eastern sighthounds | leafPct=33 d3Pct=33
+[tree] Scottish Deerhound > Celtic Hound > Old hunting dogs of the Celts | leafPct=27 d3Pct=27
+[tree] Scottish Deerhound > Rough northern sighthounds | leafPct=40 d3Pct=40
 [tree] Scottish Terrier | leafPct=100 d3Pct=100
 [tree] Scottish Terrier > Old Highland terriers | leafPct=60 d3Pct=60
 [tree] Scottish Terrier > Skye terrier stock | leafPct=40 d3Pct=40
 [tree] Sealyham Terrier | leafPct=100 d3Pct=100
-[tree] Sealyham Terrier > Dandie Dinmont Terrier | leafPct=35 d3Pct=55
-[tree] Sealyham Terrier > Dandie Dinmont Terrier > Old Border terriers | leafPct=23 d3Pct=16
-[tree] Sealyham Terrier > Dandie Dinmont Terrier > Skye terrier stock | leafPct=7 d3Pct=5
-[tree] Sealyham Terrier > Dandie Dinmont Terrier > Otterhound | leafPct=5 d3Pct=10
-[tree] Sealyham Terrier > Dandie Dinmont Terrier > Otterhound > Bloodhound | leafPct=2 d3Pct=3
+[tree] Sealyham Terrier > Dandie Dinmont Terrier | leafPct=35 d3Pct=35
+[tree] Sealyham Terrier > Dandie Dinmont Terrier > Old Border terriers | leafPct=23 d3Pct=23
+[tree] Sealyham Terrier > Dandie Dinmont Terrier > Skye terrier stock | leafPct=7 d3Pct=7
+[tree] Sealyham Terrier > Dandie Dinmont Terrier > Otterhound | leafPct=5 d3Pct=5
+[tree] Sealyham Terrier > Dandie Dinmont Terrier > Otterhound > Bloodhound | leafPct=2 d3Pct=2
 [tree] Sealyham Terrier > Dandie Dinmont Terrier > Otterhound > Bloodhound > St Hubert Hound | leafPct=1 d3Pct=1
 [tree] Sealyham Terrier > Dandie Dinmont Terrier > Otterhound > Bloodhound > Old scenting hounds | leafPct=1 d3Pct=1
 [tree] Sealyham Terrier > Dandie Dinmont Terrier > Otterhound > Southern Hound | leafPct=2 d3Pct=2
 [tree] Sealyham Terrier > Dandie Dinmont Terrier > Otterhound > Southern Hound > Talbot hounds | leafPct=1 d3Pct=1
-[tree] Sealyham Terrier > Dandie Dinmont Terrier > Otterhound > Southern Hound > St Hubert Hound | leafPct=1 d3Pct=0
+[tree] Sealyham Terrier > Dandie Dinmont Terrier > Otterhound > Southern Hound > St Hubert Hound | leafPct=1 d3Pct=1
 [tree] Sealyham Terrier > Dandie Dinmont Terrier > Otterhound > Rough water dogs | leafPct=1 d3Pct=1
-[tree] Sealyham Terrier > West Highland White Terrier | leafPct=35 d3Pct=24
-[tree] Sealyham Terrier > Wire Fox Terrier | leafPct=30 d3Pct=21
+[tree] Sealyham Terrier > West Highland White Terrier | leafPct=35 d3Pct=35
+[tree] Sealyham Terrier > Wire Fox Terrier | leafPct=30 d3Pct=30
 [tree] Shih Tzu | leafPct=100 d3Pct=100
 [tree] Shih Tzu > Tibetan temple dogs | leafPct=55 d3Pct=55
 [tree] Shih Tzu > Ancient Chinese toy dogs | leafPct=45 d3Pct=45
@@ -1129,42 +1129,42 @@
 [tree] Spot real dogs > Look carefully | leafPct=100 d3Pct=100
 [tree] Spot real dogs > Look carefully > Check card | leafPct=100 d3Pct=67
 [tree] Springer Spaniel | leafPct=100 d3Pct=100
-[tree] Springer Spaniel > Norfolk Spaniel | leafPct=45 d3Pct=53
-[tree] Springer Spaniel > Norfolk Spaniel > Land spaniels | leafPct=29 d3Pct=17
-[tree] Springer Spaniel > Norfolk Spaniel > Water spaniels | leafPct=16 d3Pct=9
-[tree] Springer Spaniel > Water spaniels | leafPct=30 d3Pct=18
-[tree] Springer Spaniel > Welsh Springer Spaniel | leafPct=25 d3Pct=29
-[tree] Springer Spaniel > Welsh Springer Spaniel > Old Welsh land spaniels | leafPct=15 d3Pct=9
-[tree] Springer Spaniel > Welsh Springer Spaniel > Land spaniels | leafPct=10 d3Pct=6
+[tree] Springer Spaniel > Norfolk Spaniel | leafPct=45 d3Pct=45
+[tree] Springer Spaniel > Norfolk Spaniel > Land spaniels | leafPct=29 d3Pct=29
+[tree] Springer Spaniel > Norfolk Spaniel > Water spaniels | leafPct=16 d3Pct=16
+[tree] Springer Spaniel > Water spaniels | leafPct=30 d3Pct=30
+[tree] Springer Spaniel > Welsh Springer Spaniel | leafPct=25 d3Pct=25
+[tree] Springer Spaniel > Welsh Springer Spaniel > Old Welsh land spaniels | leafPct=15 d3Pct=15
+[tree] Springer Spaniel > Welsh Springer Spaniel > Land spaniels | leafPct=10 d3Pct=10
 [tree] Staffordshire Bull Terrier | leafPct=100 d3Pct=100
-[tree] Staffordshire Bull Terrier > Bulldog | leafPct=55 d3Pct=79
-[tree] Staffordshire Bull Terrier > Bulldog > Old English Bulldog | leafPct=33 d3Pct=31
-[tree] Staffordshire Bull Terrier > Bulldog > Old English Bulldog > Mastiff and Alaunt war dogs | leafPct=20 d3Pct=9
-[tree] Staffordshire Bull Terrier > Bulldog > Old English Bulldog > Old British bandogs | leafPct=13 d3Pct=6
-[tree] Staffordshire Bull Terrier > Bulldog > Mastiff | leafPct=14 d3Pct=13
-[tree] Staffordshire Bull Terrier > Bulldog > Mastiff > Ancient Molossers | leafPct=8 d3Pct=4
-[tree] Staffordshire Bull Terrier > Bulldog > Mastiff > Old British bandogs | leafPct=6 d3Pct=3
+[tree] Staffordshire Bull Terrier > Bulldog | leafPct=55 d3Pct=55
+[tree] Staffordshire Bull Terrier > Bulldog > Old English Bulldog | leafPct=33 d3Pct=33
+[tree] Staffordshire Bull Terrier > Bulldog > Old English Bulldog > Mastiff and Alaunt war dogs | leafPct=20 d3Pct=20
+[tree] Staffordshire Bull Terrier > Bulldog > Old English Bulldog > Old British bandogs | leafPct=13 d3Pct=13
+[tree] Staffordshire Bull Terrier > Bulldog > Mastiff | leafPct=14 d3Pct=14
+[tree] Staffordshire Bull Terrier > Bulldog > Mastiff > Ancient Molossers | leafPct=8 d3Pct=8
+[tree] Staffordshire Bull Terrier > Bulldog > Mastiff > Old British bandogs | leafPct=6 d3Pct=6
 [tree] Staffordshire Bull Terrier > Bulldog > Pug | leafPct=8 d3Pct=8
-[tree] Staffordshire Bull Terrier > Bulldog > Pug > Ancient Chinese toy dogs | leafPct=5 d3Pct=2
-[tree] Staffordshire Bull Terrier > Bulldog > Pug > Eastern lion and lap dogs | leafPct=3 d3Pct=2
-[tree] Staffordshire Bull Terrier > Old English Black and Tan Terrier | leafPct=45 d3Pct=21
+[tree] Staffordshire Bull Terrier > Bulldog > Pug > Ancient Chinese toy dogs | leafPct=5 d3Pct=5
+[tree] Staffordshire Bull Terrier > Bulldog > Pug > Eastern lion and lap dogs | leafPct=3 d3Pct=3
+[tree] Staffordshire Bull Terrier > Old English Black and Tan Terrier | leafPct=45 d3Pct=45
 [tree] Staghound | leafPct=100 d3Pct=100
-[tree] Staghound > Southern Hound | leafPct=45 d3Pct=38
-[tree] Staghound > Southern Hound > Talbot hounds | leafPct=27 d3Pct=12
-[tree] Staghound > Southern Hound > St Hubert Hound | leafPct=18 d3Pct=8
-[tree] Staghound > English Foxhound | leafPct=35 d3Pct=45
-[tree] Staghound > English Foxhound > Southern Hound | leafPct=18 d3Pct=15
-[tree] Staghound > English Foxhound > Southern Hound > Talbot hounds | leafPct=11 d3Pct=4
-[tree] Staghound > English Foxhound > Southern Hound > St Hubert Hound | leafPct=7 d3Pct=3
-[tree] Staghound > English Foxhound > Greyhound | leafPct=11 d3Pct=12
-[tree] Staghound > English Foxhound > Greyhound > Celtic Hound | leafPct=6 d3Pct=5
-[tree] Staghound > English Foxhound > Greyhound > Celtic Hound > Ancient eastern sighthounds | leafPct=3 d3Pct=1
-[tree] Staghound > English Foxhound > Greyhound > Celtic Hound > Old hunting dogs of the Celts | leafPct=3 d3Pct=1
-[tree] Staghound > English Foxhound > Greyhound > Ancient eastern sighthounds | leafPct=4 d3Pct=2
-[tree] Staghound > English Foxhound > Talbot hound | leafPct=7 d3Pct=3
-[tree] Staghound > Buckhound | leafPct=20 d3Pct=17
-[tree] Staghound > Buckhound > Old scenting hounds | leafPct=12 d3Pct=5
-[tree] Staghound > Buckhound > Talbot hounds | leafPct=8 d3Pct=3
+[tree] Staghound > Southern Hound | leafPct=45 d3Pct=45
+[tree] Staghound > Southern Hound > Talbot hounds | leafPct=27 d3Pct=27
+[tree] Staghound > Southern Hound > St Hubert Hound | leafPct=18 d3Pct=18
+[tree] Staghound > English Foxhound | leafPct=35 d3Pct=35
+[tree] Staghound > English Foxhound > Southern Hound | leafPct=18 d3Pct=18
+[tree] Staghound > English Foxhound > Southern Hound > Talbot hounds | leafPct=11 d3Pct=11
+[tree] Staghound > English Foxhound > Southern Hound > St Hubert Hound | leafPct=7 d3Pct=7
+[tree] Staghound > English Foxhound > Greyhound | leafPct=11 d3Pct=11
+[tree] Staghound > English Foxhound > Greyhound > Celtic Hound | leafPct=6 d3Pct=6
+[tree] Staghound > English Foxhound > Greyhound > Celtic Hound > Ancient eastern sighthounds | leafPct=3 d3Pct=3
+[tree] Staghound > English Foxhound > Greyhound > Celtic Hound > Old hunting dogs of the Celts | leafPct=3 d3Pct=3
+[tree] Staghound > English Foxhound > Greyhound > Ancient eastern sighthounds | leafPct=4 d3Pct=4
+[tree] Staghound > English Foxhound > Talbot hound | leafPct=7 d3Pct=7
+[tree] Staghound > Buckhound | leafPct=20 d3Pct=20
+[tree] Staghound > Buckhound > Old scenting hounds | leafPct=12 d3Pct=12
+[tree] Staghound > Buckhound > Talbot hounds | leafPct=8 d3Pct=8
 [tree] Sussex Spaniel | leafPct=100 d3Pct=100
 [tree] Sussex Spaniel > Land spaniels | leafPct=60 d3Pct=60
 [tree] Sussex Spaniel > Heavier working spaniels | leafPct=40 d3Pct=40
@@ -1174,17 +1174,17 @@
 [tree] Talbot > Old scenting hounds > Ancient Celtic Scent Hound | leafPct=20 d3Pct=20
 [tree] Talbot > Old scenting hounds > Old scenting hounds | leafPct=20 d3Pct=20
 [tree] Toy Bulldog | leafPct=100 d3Pct=100
-[tree] Toy Bulldog > Old English Bulldog | leafPct=65 d3Pct=79
-[tree] Toy Bulldog > Old English Bulldog > Mastiff and Alaunt war dogs | leafPct=39 d3Pct=24
-[tree] Toy Bulldog > Old English Bulldog > Old British bandogs | leafPct=26 d3Pct=16
-[tree] Toy Bulldog > Pug-type toy dogs | leafPct=35 d3Pct=21
+[tree] Toy Bulldog > Old English Bulldog | leafPct=65 d3Pct=65
+[tree] Toy Bulldog > Old English Bulldog > Mastiff and Alaunt war dogs | leafPct=39 d3Pct=39
+[tree] Toy Bulldog > Old English Bulldog > Old British bandogs | leafPct=26 d3Pct=26
+[tree] Toy Bulldog > Pug-type toy dogs | leafPct=35 d3Pct=35
 [tree] Toy Trawler Spaniel | leafPct=100 d3Pct=100
 [tree] Toy Trawler Spaniel > King Charles Spaniel | leafPct=60 d3Pct=60
-[tree] Toy Trawler Spaniel > King Charles Spaniel > Old toy spaniels | leafPct=36 d3Pct=18
-[tree] Toy Trawler Spaniel > King Charles Spaniel > Asian flat-faced toys | leafPct=24 d3Pct=12
+[tree] Toy Trawler Spaniel > King Charles Spaniel > Old toy spaniels | leafPct=36 d3Pct=36
+[tree] Toy Trawler Spaniel > King Charles Spaniel > Asian flat-faced toys | leafPct=24 d3Pct=24
 [tree] Toy Trawler Spaniel > Sussex Spaniel | leafPct=40 d3Pct=40
-[tree] Toy Trawler Spaniel > Sussex Spaniel > Land spaniels | leafPct=24 d3Pct=12
-[tree] Toy Trawler Spaniel > Sussex Spaniel > Heavier working spaniels | leafPct=16 d3Pct=8
+[tree] Toy Trawler Spaniel > Sussex Spaniel > Land spaniels | leafPct=24 d3Pct=24
+[tree] Toy Trawler Spaniel > Sussex Spaniel > Heavier working spaniels | leafPct=16 d3Pct=16
 [tree] Turnspit Dog | leafPct=100 d3Pct=100
 [tree] Turnspit Dog > Old short-legged working dogs | leafPct=60 d3Pct=60
 [tree] Turnspit Dog > Farm and kitchen curs | leafPct=40 d3Pct=40
@@ -1192,30 +1192,30 @@
 [tree] Tweed Water Spaniel > Water spaniels | leafPct=55 d3Pct=55
 [tree] Tweed Water Spaniel > St John's Water Dog | leafPct=45 d3Pct=45
 [tree] Weimaraner | leafPct=100 d3Pct=100
-[tree] Weimaraner > Bloodhound | leafPct=40 d3Pct=35
-[tree] Weimaraner > Bloodhound > St Hubert Hound | leafPct=24 d3Pct=10
-[tree] Weimaraner > Bloodhound > Old scenting hounds | leafPct=16 d3Pct=7
-[tree] Weimaraner > Pointer | leafPct=40 d3Pct=56
-[tree] Weimaraner > Pointer > English Foxhound | leafPct=12 d3Pct=16
-[tree] Weimaraner > Pointer > English Foxhound > Southern Hound | leafPct=6 d3Pct=5
-[tree] Weimaraner > Pointer > English Foxhound > Southern Hound > Talbot hounds | leafPct=4 d3Pct=2
-[tree] Weimaraner > Pointer > English Foxhound > Southern Hound > St Hubert Hound | leafPct=2 d3Pct=1
+[tree] Weimaraner > Bloodhound | leafPct=40 d3Pct=40
+[tree] Weimaraner > Bloodhound > St Hubert Hound | leafPct=24 d3Pct=24
+[tree] Weimaraner > Bloodhound > Old scenting hounds | leafPct=16 d3Pct=16
+[tree] Weimaraner > Pointer | leafPct=40 d3Pct=40
+[tree] Weimaraner > Pointer > English Foxhound | leafPct=12 d3Pct=12
+[tree] Weimaraner > Pointer > English Foxhound > Southern Hound | leafPct=6 d3Pct=6
+[tree] Weimaraner > Pointer > English Foxhound > Southern Hound > Talbot hounds | leafPct=4 d3Pct=4
+[tree] Weimaraner > Pointer > English Foxhound > Southern Hound > St Hubert Hound | leafPct=2 d3Pct=2
 [tree] Weimaraner > Pointer > English Foxhound > Greyhound | leafPct=4 d3Pct=4
 [tree] Weimaraner > Pointer > English Foxhound > Greyhound > Celtic Hound | leafPct=2 d3Pct=2
 [tree] Weimaraner > Pointer > English Foxhound > Greyhound > Celtic Hound > Ancient eastern sighthounds | leafPct=1 d3Pct=1
-[tree] Weimaraner > Pointer > English Foxhound > Greyhound > Celtic Hound > Old hunting dogs of the Celts | leafPct=1 d3Pct=0
+[tree] Weimaraner > Pointer > English Foxhound > Greyhound > Celtic Hound > Old hunting dogs of the Celts | leafPct=1 d3Pct=1
 [tree] Weimaraner > Pointer > English Foxhound > Greyhound > Ancient eastern sighthounds | leafPct=1 d3Pct=1
-[tree] Weimaraner > Pointer > English Foxhound > Talbot hound | leafPct=2 d3Pct=1
-[tree] Weimaraner > Pointer > Greyhound | leafPct=10 d3Pct=11
-[tree] Weimaraner > Pointer > Greyhound > Celtic Hound | leafPct=6 d3Pct=5
-[tree] Weimaraner > Pointer > Greyhound > Celtic Hound > Ancient eastern sighthounds | leafPct=3 d3Pct=1
-[tree] Weimaraner > Pointer > Greyhound > Celtic Hound > Old hunting dogs of the Celts | leafPct=3 d3Pct=1
-[tree] Weimaraner > Pointer > Greyhound > Ancient eastern sighthounds | leafPct=4 d3Pct=2
-[tree] Weimaraner > Pointer > Bloodhound | leafPct=10 d3Pct=9
-[tree] Weimaraner > Pointer > Bloodhound > St Hubert Hound | leafPct=6 d3Pct=3
-[tree] Weimaraner > Pointer > Bloodhound > Old scenting hounds | leafPct=4 d3Pct=2
-[tree] Weimaraner > Pointer > Setter | leafPct=8 d3Pct=3
-[tree] Weimaraner > Old German hunting dogs | leafPct=20 d3Pct=9
+[tree] Weimaraner > Pointer > English Foxhound > Talbot hound | leafPct=2 d3Pct=2
+[tree] Weimaraner > Pointer > Greyhound | leafPct=10 d3Pct=10
+[tree] Weimaraner > Pointer > Greyhound > Celtic Hound | leafPct=6 d3Pct=6
+[tree] Weimaraner > Pointer > Greyhound > Celtic Hound > Ancient eastern sighthounds | leafPct=3 d3Pct=3
+[tree] Weimaraner > Pointer > Greyhound > Celtic Hound > Old hunting dogs of the Celts | leafPct=3 d3Pct=3
+[tree] Weimaraner > Pointer > Greyhound > Ancient eastern sighthounds | leafPct=4 d3Pct=4
+[tree] Weimaraner > Pointer > Bloodhound | leafPct=10 d3Pct=10
+[tree] Weimaraner > Pointer > Bloodhound > St Hubert Hound | leafPct=6 d3Pct=6
+[tree] Weimaraner > Pointer > Bloodhound > Old scenting hounds | leafPct=4 d3Pct=4
+[tree] Weimaraner > Pointer > Setter | leafPct=8 d3Pct=8
+[tree] Weimaraner > Old German hunting dogs | leafPct=20 d3Pct=20
 [tree] Welsh Springer Spaniel | leafPct=100 d3Pct=100
 [tree] Welsh Springer Spaniel > Old Welsh land spaniels | leafPct=60 d3Pct=60
 [tree] Welsh Springer Spaniel > Land spaniels | leafPct=40 d3Pct=40
@@ -1224,32 +1224,32 @@
 [tree] Welsh Terrier > Old fell terriers | leafPct=25 d3Pct=25
 [tree] West Highland Terrier | leafPct=100 d3Pct=100
 [tree] West Highland Terrier > Cairn Terrier | leafPct=64 d3Pct=64
-[tree] West Highland Terrier > Cairn Terrier > Skye terrier stock | leafPct=35 d3Pct=18
-[tree] West Highland Terrier > Cairn Terrier > Highland mainland terriers | leafPct=29 d3Pct=14
+[tree] West Highland Terrier > Cairn Terrier > Skye terrier stock | leafPct=35 d3Pct=35
+[tree] West Highland Terrier > Cairn Terrier > Highland mainland terriers | leafPct=29 d3Pct=29
 [tree] West Highland Terrier > Scottish Terrier | leafPct=22 d3Pct=22
-[tree] West Highland Terrier > Scottish Terrier > Old Highland terriers | leafPct=13 d3Pct=7
-[tree] West Highland Terrier > Scottish Terrier > Skye terrier stock | leafPct=9 d3Pct=4
+[tree] West Highland Terrier > Scottish Terrier > Old Highland terriers | leafPct=13 d3Pct=13
+[tree] West Highland Terrier > Scottish Terrier > Skye terrier stock | leafPct=9 d3Pct=9
 [tree] West Highland Terrier > Skye Terrier | leafPct=14 d3Pct=14
-[tree] West Highland Terrier > Skye Terrier > Old Highland terriers | leafPct=8 d3Pct=4
-[tree] West Highland Terrier > Skye Terrier > Skye terrier stock | leafPct=6 d3Pct=3
+[tree] West Highland Terrier > Skye Terrier > Old Highland terriers | leafPct=8 d3Pct=8
+[tree] West Highland Terrier > Skye Terrier > Skye terrier stock | leafPct=6 d3Pct=6
 [tree] Whippet | leafPct=100 d3Pct=100
-[tree] Whippet > Greyhound | leafPct=62 d3Pct=75
-[tree] Whippet > Greyhound > Celtic Hound | leafPct=37 d3Pct=35
-[tree] Whippet > Greyhound > Celtic Hound > Ancient eastern sighthounds | leafPct=20 d3Pct=10
-[tree] Whippet > Greyhound > Celtic Hound > Old hunting dogs of the Celts | leafPct=17 d3Pct=8
-[tree] Whippet > Greyhound > Ancient eastern sighthounds | leafPct=25 d3Pct=12
-[tree] Whippet > Old English Black and Tan Terrier | leafPct=23 d3Pct=11
-[tree] Whippet > Italian Greyhound | leafPct=15 d3Pct=14
-[tree] Whippet > Italian Greyhound > Ancient eastern sighthounds | leafPct=8 d3Pct=4
-[tree] Whippet > Italian Greyhound > Mediterranean miniature sighthounds | leafPct=7 d3Pct=3
+[tree] Whippet > Greyhound | leafPct=62 d3Pct=62
+[tree] Whippet > Greyhound > Celtic Hound | leafPct=37 d3Pct=37
+[tree] Whippet > Greyhound > Celtic Hound > Ancient eastern sighthounds | leafPct=20 d3Pct=20
+[tree] Whippet > Greyhound > Celtic Hound > Old hunting dogs of the Celts | leafPct=17 d3Pct=17
+[tree] Whippet > Greyhound > Ancient eastern sighthounds | leafPct=25 d3Pct=25
+[tree] Whippet > Old English Black and Tan Terrier | leafPct=23 d3Pct=23
+[tree] Whippet > Italian Greyhound | leafPct=15 d3Pct=15
+[tree] Whippet > Italian Greyhound > Ancient eastern sighthounds | leafPct=8 d3Pct=8
+[tree] Whippet > Italian Greyhound > Mediterranean miniature sighthounds | leafPct=7 d3Pct=7
 [tree] Yorkshire Terrier | leafPct=100 d3Pct=100
-[tree] Yorkshire Terrier > Paisley Terrier | leafPct=45 d3Pct=51
-[tree] Yorkshire Terrier > Paisley Terrier > Skye terrier stock | leafPct=29 d3Pct=17
-[tree] Yorkshire Terrier > Paisley Terrier > Old Highland terriers | leafPct=16 d3Pct=9
-[tree] Yorkshire Terrier > Skye Terrier | leafPct=30 d3Pct=34
-[tree] Yorkshire Terrier > Skye Terrier > Old Highland terriers | leafPct=18 d3Pct=10
-[tree] Yorkshire Terrier > Skye Terrier > Skye terrier stock | leafPct=12 d3Pct=7
-[tree] Yorkshire Terrier > Old English Black and Tan Terrier | leafPct=25 d3Pct=14
+[tree] Yorkshire Terrier > Paisley Terrier | leafPct=45 d3Pct=45
+[tree] Yorkshire Terrier > Paisley Terrier > Skye terrier stock | leafPct=29 d3Pct=29
+[tree] Yorkshire Terrier > Paisley Terrier > Old Highland terriers | leafPct=16 d3Pct=16
+[tree] Yorkshire Terrier > Skye Terrier | leafPct=30 d3Pct=30
+[tree] Yorkshire Terrier > Skye Terrier > Old Highland terriers | leafPct=18 d3Pct=18
+[tree] Yorkshire Terrier > Skye Terrier > Skye terrier stock | leafPct=12 d3Pct=12
+[tree] Yorkshire Terrier > Old English Black and Tan Terrier | leafPct=25 d3Pct=25
 [breakdown] Afghan Hound | Ancient eastern sighthounds = 65
 [breakdown] Afghan Hound | Mountain coursing hounds = 35
 [breakdown] Basset Hound | Bloodhound = 55

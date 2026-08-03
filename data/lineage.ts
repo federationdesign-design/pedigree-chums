@@ -1552,7 +1552,12 @@ function expandNode(
     const kids = sub.children.map((c) =>
       expandNode({ ...c, value: ((c.value ?? 0) * share) / total }, depth + 1, next),
     );
-    return { ...node, children: kids };
+    // A grafted node drops its own value: its children carry its share, so
+    // the d3 sum measure counts the branch once rather than twice and the
+    // break-panel share agrees with the leaf-sum breakdown (owner-sanctioned
+    // re-baseline, 3 August). Pack geometry is untouched: d3.pack sizes
+    // circles from leaves only.
+    return { ...node, value: undefined, children: kids };
   }
 
   if (node.children && node.children.length) {
