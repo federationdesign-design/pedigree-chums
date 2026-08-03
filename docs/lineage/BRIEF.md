@@ -249,14 +249,22 @@ change.**
 
 - Every dog shown in a diagram carries a weight and is accounted for in the
   calculation, foundations included. No unweighted circles.
-- A foundation inserted beneath an existing label inherits that label's
-  weight, so the branch total is unchanged: the label's former leaf `value`
-  moves to the foundation child, and the label follows the existing
-  internal-node convention of not carrying its own value on top of its
-  children (the Celtic Heeler precedent and its double-count warning,
-  `data/lineage.ts:989-1001`). Displayed figures for existing dogs must come
-  out identical; the foundation appears as a new row with its inherited
-  share.
+- A foundation inserted beneath an existing label follows the Celtic Heeler
+  pattern: the label's former leaf `value` splits between the foundation and
+  a same-name self-child, the label drops its own value (the double-count
+  warning at `data/lineage.ts:989-1001`), and the branch total is unchanged,
+  so displayed figures for existing dogs come out identical. Scaling a whole
+  tree by a constant to keep splits in whole numbers is permitted, since it
+  moves no percentage (the Cur is scaled by four).
+- **The split rule (owner decision, 3 August), for this and every future
+  graft:** a foundation takes HALF its branch where the source is plausible,
+  and a QUARTER where it is speculative. Nothing among the seven foundations
+  is strong. The four Batch 4 grafts are all assessed plausible and take
+  half: Ancient Celtic Scent Hound beneath the Rache's Old scenting hounds,
+  Ancient Celtic Scent Hound beneath the Talbot's Old scenting hounds,
+  Medieval Drover's Dog beneath the Cur's Old working collies, and Ancient
+  Livestock Dog beneath Medieval Drover's Dog. Batch 5 and any later graft
+  applies this rule rather than re-deciding it.
 - **The fixture. BUILT (Batch 1).** `scripts/lineage-percentage-fixture.mts`
   captures every displayed percentage across every tree on the site: all 123
   top-level tree entries (117 dog trees plus the six how-to-play entries),
@@ -311,7 +319,7 @@ Each batch ends in a stop and a report. Nothing merges without approval.
 | 1 | The percentage fixture: capture, commit, wire the regeneration script. COMPLETE | `scripts/lineage-percentage-fixture.mts`; fixtures committed (1959 percentage rows, 62 levels); rerun verified byte-identical |
 | 2 | The two ancient strip additions, as flip-only cards. COMPLETE | Both render and flip (desktop and touch verified); Mastiff and Greyhound rows untouched; level-list fixture identical to baseline (62); percentage fixture gains only the two root rows; count comments read 92 dogs, 62 play, 28 learn, 2 flip-only |
 | 3 | The five foundation records, strip rows and tree entries. COMPLETE | All five render and flip, referenced by no tree; level list byte-identical at 62; percentage fixture gains exactly five root rows; tsc clean |
-| 4 | The Rache, Talbot and Cur trees | Three trees render with their new deepest generation; fixture clean except new rows; the Cur bandog removal separately signed off |
+| 4 | The Rache, Talbot and Cur trees. BUILT, two follow-ups gated | Grafts in and fixture clean (four new rows, nothing moved); levels render the new deepest generation. Gated: the Cur bandog removal (proposal below, owner sign-off) and the single-child nest label collision (owner review of the screenshots) |
 | 5 | Old Welsh Grey Sheepdog, Scottish Terrier, Black and Tan Terrier | Six trees complete; fixture clean except new rows, Manchester Terrier verified |
 | 6 | The global disclosure and the "Historical influence" naming | Visible before any detail panel |
 
@@ -394,6 +402,13 @@ The proposal rests on written references, historical terminology and the
 structure already on the site. The sources support the presence and function
 of broad dog types. They rarely prove a modern-style direct pedigree, so the
 relationships remain informed reconstructions.
+
+**Why the split is editorial (owner search, 3 August):** no sourced figures
+exist for these connections. The genetic literature covers wolf admixture
+and modern breed clustering, and where it reaches pre-Victorian populations
+it can only identify a closest living link to an extinct population, never a
+share. The half and quarter splits in section 7 are therefore an editorial
+visualisation, consistent with the global explanation, not measurements.
 
 1. Strabo, *Geography*, Book IV chapter 5, on British dogs exported for
    hunting and Celtic use of dogs in war.

@@ -1016,7 +1016,20 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "A white medieval scent hound, slow but sure-nosed, and an ancestor of the beagle, foxhound and bloodhound.",
     children: [
       { name: "St Hubert Hound", note: "The monks' scent hound brought over by the Normans.", img: "/history/breeds/St-Hubert-Hound.jpg", value: 60 },
-      { name: "Old scenting hounds", note: "The tracking hounds of medieval lords.", img: "/history/breeds/Old-scenting-hounds.jpg", value: 40 }
+      {
+        name: "Old scenting hounds",
+        note: "The tracking hounds of medieval lords.",
+        img: "/history/breeds/Old-scenting-hounds.jpg",
+        // Batch 4, Celtic Heeler pattern (owner-directed): the branch's former
+        // 40 splits evenly between the foundation and a same-name self-child,
+        // so the ancestor renders as a small circle inside the stock rather
+        // than filling it. Branch total stays 40; no displayed figure moves.
+        // The self-duplicate must be kept in step with this node by hand.
+        children: [
+          { name: "Ancient Celtic Scent Hound", note: "Early Celtic tracking hound that followed game by scent, representing the roots of later European scent hounds. An extinct historical type.", img: "/history/breeds/ancient-celtic-scent-hound.jpg", value: 20 },
+          { name: "Old scenting hounds", note: "The tracking hounds of medieval lords.", img: "/history/breeds/Old-scenting-hounds.jpg", value: 20 },
+        ],
+      }
     ]
   },
 
@@ -1097,7 +1110,18 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "A medieval hound that hunted by scent in a pack, as opposed to the sight-hunting gazehound.",
     children: [
       { name: "St Hubert and Talbot hounds", note: "The Norman scent hounds behind the running pack.", img: "/history/breeds/talbot-hound.jpg", value: 60 },
-      { name: "Old scenting hounds", note: "The native pack hounds of medieval Britain.", img: "/history/breeds/Old-scenting-hounds.jpg", value: 40 }
+      {
+        name: "Old scenting hounds",
+        note: "The native pack hounds of medieval Britain.",
+        img: "/history/breeds/Old-scenting-hounds.jpg",
+        // Batch 4, Celtic Heeler pattern: even split of the former 40 between
+        // the foundation and the same-name self-child. See the Talbot tree
+        // for the same pattern; keep the self-duplicate in step by hand.
+        children: [
+          { name: "Ancient Celtic Scent Hound", note: "Early Celtic tracking hound that followed game by scent, representing the roots of later European scent hounds. An extinct historical type.", img: "/history/breeds/ancient-celtic-scent-hound.jpg", value: 20 },
+          { name: "Old scenting hounds", note: "The native pack hounds of medieval Britain.", img: "/history/breeds/Old-scenting-hounds.jpg", value: 20 },
+        ],
+      }
     ]
   },
 
@@ -1238,8 +1262,31 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Cur",
     note: "Not a breed but a type: the everyday working mongrel of the old farm, used for droving cattle and general work.",
     children: [
-      { name: "Old working collies", note: "The old northern hill-collie landrace of Scotland and the borders, the shared working stock the Rough, Smooth and Border collies all grew from. Now extinct.", img: "/history/breeds/Old-working-collies-cluster.jpg", value: 55 },
-      { name: "Old working bandogs", note: "Tougher guarding and yard-dog stock. Now extinct.", img: "/history/breeds/Old-British-bandogs.jpg", value: 45 }
+      {
+        name: "Old working collies",
+        note: "The old northern hill-collie landrace of Scotland and the borders, the shared working stock the Rough, Smooth and Border collies all grew from. Now extinct.",
+        img: "/history/breeds/Old-working-collies-cluster.jpg",
+        // Batch 4, Celtic Heeler pattern at both depths (owner-directed): each
+        // generation splits evenly between the older type and a same-name
+        // self-child, so each ancestor is a small circle inside its stock.
+        // The whole Cur tree is scaled by four (bandogs 45 -> 180) purely to
+        // keep the two halvings in whole numbers: every ratio, and so every
+        // displayed percentage, is unchanged. Branch shares: collies 55,
+        // Drover's 28, Livestock 14. Keep the self-duplicates in step by hand.
+        children: [
+          {
+            name: "Medieval Drover's Dog",
+            note: "Tough working dog that helped move cattle and sheep over long distances to markets and towns. An extinct historical type.",
+            img: "/history/breeds/medieval-drover-dog.jpg",
+            children: [
+              { name: "Ancient Livestock Dog", note: "Broad early working-dog population used to guard, move and control livestock before named British breeds existed. An extinct historical type.", img: "/history/breeds/ancient-livestock-dog.jpg", value: 55 },
+              { name: "Medieval Drover's Dog", note: "Tough working dog that helped move cattle and sheep over long distances to markets and towns. An extinct historical type.", img: "/history/breeds/medieval-drover-dog.jpg", value: 55 },
+            ],
+          },
+          { name: "Old working collies", note: "The old northern hill-collie landrace of Scotland and the borders, the shared working stock the Rough, Smooth and Border collies all grew from. Now extinct.", img: "/history/breeds/Old-working-collies-cluster.jpg", value: 110 },
+        ],
+      },
+      { name: "Old working bandogs", note: "Tougher guarding and yard-dog stock. Now extinct.", img: "/history/breeds/Old-British-bandogs.jpg", value: 180 }
     ]
   },
 

@@ -272,6 +272,10 @@
 [tree] Cumberland Sheepdog > Welsh herding dogs | leafPct=40 d3Pct=40
 [tree] Cur | leafPct=100 d3Pct=100
 [tree] Cur > Old working collies | leafPct=55 d3Pct=55
+[tree] Cur > Old working collies > Medieval Drover's Dog | leafPct=28 d3Pct=28
+[tree] Cur > Old working collies > Medieval Drover's Dog > Ancient Livestock Dog | leafPct=14 d3Pct=14
+[tree] Cur > Old working collies > Medieval Drover's Dog > Medieval Drover's Dog | leafPct=14 d3Pct=14
+[tree] Cur > Old working collies > Old working collies | leafPct=28 d3Pct=28
 [tree] Cur > Old working bandogs | leafPct=45 d3Pct=45
 [tree] Curly-Coated Retriever | leafPct=100 d3Pct=100
 [tree] Curly-Coated Retriever > English Water Spaniel | leafPct=35 d3Pct=26
@@ -1069,6 +1073,8 @@
 [tree] Rache | leafPct=100 d3Pct=100
 [tree] Rache > St Hubert and Talbot hounds | leafPct=60 d3Pct=60
 [tree] Rache > Old scenting hounds | leafPct=40 d3Pct=40
+[tree] Rache > Old scenting hounds > Ancient Celtic Scent Hound | leafPct=20 d3Pct=20
+[tree] Rache > Old scenting hounds > Old scenting hounds | leafPct=20 d3Pct=20
 [tree] Rottweiler | leafPct=100 d3Pct=100
 [tree] Rottweiler > Ancient Molossers | leafPct=60 d3Pct=60
 [tree] Rottweiler > Local German cattle dogs | leafPct=40 d3Pct=40
@@ -1161,6 +1167,8 @@
 [tree] Talbot | leafPct=100 d3Pct=100
 [tree] Talbot > St Hubert Hound | leafPct=60 d3Pct=60
 [tree] Talbot > Old scenting hounds | leafPct=40 d3Pct=40
+[tree] Talbot > Old scenting hounds > Ancient Celtic Scent Hound | leafPct=20 d3Pct=20
+[tree] Talbot > Old scenting hounds > Old scenting hounds | leafPct=20 d3Pct=20
 [tree] Toy Bulldog | leafPct=100 d3Pct=100
 [tree] Toy Bulldog > Old English Bulldog | leafPct=65 d3Pct=79
 [tree] Toy Bulldog > Old English Bulldog > Mastiff and Alaunt war dogs | leafPct=39 d3Pct=24
