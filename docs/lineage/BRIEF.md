@@ -208,11 +208,16 @@ used, because names are keys.
 | Black and Tan Terrier | Medieval Earth Dog beneath "Old British ratting terriers" and "Earth and hunt terriers" | Existing labels remain beneath the new foundation. This tree is grafted into Manchester Terrier (`data/lineage.ts:586`), so the fixture must cover Manchester too |
 
 **Do not touch any other tree directly.** Grafting means an edit here can
-surface in trees outside the six (Manchester Terrier is the known case;
-"Old Highland terriers" also appears in Skye Terrier and Paisley Terrier,
-`data/lineage.ts:549, 692`). That is exactly what the section 7 fixture
-exists to police: indirect surfacing is allowed only where the displayed
-figures are proven unchanged. Twelve further trees are deferred in section 9.
+surface in trees outside the six, and for Medieval Earth Dog that scope is
+an owner decision, not an overrun (4 August): the Highland and ratting
+stocks are genuinely shared, so the foundation surfaces in twelve trees
+(Scottish Terrier, Black and Tan Terrier, Skye, Paisley, Yorkshire,
+Norfolk, Norwich, Lucas, West Highland Terrier, Manchester Terrier,
+English Toy Terrier, Lancashire Heeler) plus the three shared stock
+entries themselves. The section 7 fixture polices it as ever: indirect
+surfacing is allowed only where the displayed figures are proven
+unchanged, with the breakdown functions skipping self-duplicate children
+so the pattern cannot inflate a stock's own total. Twelve further trees are deferred in section 9.
 
 ---
 
@@ -320,7 +325,7 @@ Each batch ends in a stop and a report. Nothing merges without approval.
 | 2 | The two ancient strip additions, as flip-only cards. COMPLETE | Both render and flip (desktop and touch verified); Mastiff and Greyhound rows untouched; level-list fixture identical to baseline (62); percentage fixture gains only the two root rows; count comments read 92 dogs, 62 play, 28 learn, 2 flip-only |
 | 3 | The five foundation records, strip rows and tree entries. COMPLETE | All five render and flip, referenced by no tree; level list byte-identical at 62; percentage fixture gains exactly five root rows; tsc clean |
 | 4 | The Rache, Talbot and Cur trees. BUILT, two follow-ups gated | Grafts in and fixture clean (four new rows, nothing moved); levels render the new deepest generation. Gated: the Cur bandog removal (proposal below, owner sign-off) and the single-child nest label collision (owner review of the screenshots) |
-| 5 | Old Welsh Grey Sheepdog, Scottish Terrier, Black and Tan Terrier | Six trees complete; fixture clean except new rows, Manchester Terrier verified |
+| 5 | Old Welsh Grey Sheepdog, Scottish Terrier, Black and Tan Terrier. COMPLETE | Six trees carry their foundations; fixture additions-only at every step; the engine re-baseline and self-duplicate skip landed as their own commits; Boxer normalisation queued |
 | 6 | The global disclosure and the "Historical influence" naming | Visible before any detail panel |
 
 **Mobile review after every batch that touches a tree.** Text wrapping,

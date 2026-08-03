@@ -574,7 +574,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Black and Tan Terrier",
     note: "The Old English Terrier, the extinct rough working terrier that nearly every British terrier descends from.",
     children: [
-      { name: "Old British ratting terriers", note: "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.", img: "/history/breeds/Local-red-ratting-terriers.jpg", value: 60 },
+      { name: "Old British ratting terriers", note: "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.", img: "/history/breeds/Old-British-ratting-terriers.jpg", value: 60 },
       { name: "Earth and hunt terriers", note: "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.", img: "/history/breeds/Earth-and-hunt-terrier.jpg", value: 40 }
     ]
   },
@@ -972,6 +972,38 @@ const LINEAGE: Record<string, LineageNode> = {
   // children, no invented weights, flip-only cards. Referenced by no tree
   // yet; hanging them beneath the six approved trees is Batch 4 and 5 work,
   // gated by the percentage fixture.
+  // Batch 5 shared stock entries (owner-approved notes and images,
+  // 4 August): top-level so every tree naming these labels grafts the
+  // foundation with correct per-host rescaling. Medieval Earth Dog is
+  // assessed plausible beneath each (the medieval earth dog is the
+  // documented functional category terriers continue), so it takes half of
+  // each stock per the split rule, Celtic Heeler pattern. The owner accepted
+  // the surfacing scope deliberately: these stocks are shared, so the
+  // foundation appears in twelve trees (docs/lineage/BRIEF.md section 5).
+  "Old Highland terriers": {
+    name: "Old Highland terriers",
+    note: "The old working-terrier stock of the Highlands that every Scottish terrier springs from. Now extinct.",
+    children: [
+      { name: "Medieval Earth Dog", note: "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.", img: "/history/breeds/medieval-earth-dog.jpg", value: 30 },
+      { name: "Old Highland terriers", note: "The old working-terrier stock of the Highlands that every Scottish terrier springs from. Now extinct.", img: "/history/breeds/Old-Highland-terriers.jpg", value: 30 },
+    ],
+  },
+  "Old British ratting terriers": {
+    name: "Old British ratting terriers",
+    note: "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.",
+    children: [
+      { name: "Medieval Earth Dog", note: "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.", img: "/history/breeds/medieval-earth-dog.jpg", value: 30 },
+      { name: "Old British ratting terriers", note: "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.", img: "/history/breeds/Old-British-ratting-terriers.jpg", value: 30 },
+    ],
+  },
+  "Earth and hunt terriers": {
+    name: "Earth and hunt terriers",
+    note: "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.",
+    children: [
+      { name: "Medieval Earth Dog", note: "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.", img: "/history/breeds/medieval-earth-dog.jpg", value: 20 },
+      { name: "Earth and hunt terriers", note: "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.", img: "/history/breeds/Earth-and-hunt-terrier.jpg", value: 20 },
+    ],
+  },
   "Ancient Celtic Scent Hound": {
     name: "Ancient Celtic Scent Hound",
     note: "Early Celtic tracking hound that followed game by scent, representing the roots of later European scent hounds. An extinct historical type.",

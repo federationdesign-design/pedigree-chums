@@ -48,9 +48,9 @@ const lineageSource = readFileSync(join(ROOT, "data", "lineage.ts"), "utf8");
 const keys = [...lineageSource.matchAll(/^  "([^"]+)": \{$/gm)].map((m) => m[1]);
 // 130 = the 123 baseline entries plus the two Batch 2 ancient additions and
 // the five Batch 3 foundation records.
-if (keys.length !== 130) {
+if (keys.length !== 133) {
   console.error(
-    `expected 130 top-level LINEAGE keys, parsed ${keys.length}; ` +
+    `expected 133 top-level LINEAGE keys, parsed ${keys.length}; ` +
       "data/lineage.ts layout changed, update the parser before trusting this fixture"
   );
   process.exit(1);
