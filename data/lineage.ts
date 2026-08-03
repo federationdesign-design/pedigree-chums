@@ -967,6 +967,31 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Ancient Celtic Coursing Hound",
     note: "Swift Celtic sight-hunting dog described by classical writers, an early root of later British and Irish sighthounds. An extinct historical type.",
   },
+  // The five foundation records (docs/lineage/BRIEF.md section 3, Batch 3).
+  // Roots by design like the two ancient additions above: no ancestor
+  // children, no invented weights, flip-only cards. Referenced by no tree
+  // yet; hanging them beneath the six approved trees is Batch 4 and 5 work,
+  // gated by the percentage fixture.
+  "Ancient Celtic Scent Hound": {
+    name: "Ancient Celtic Scent Hound",
+    note: "Early Celtic tracking hound that followed game by scent, representing the roots of later European scent hounds. An extinct historical type.",
+  },
+  "Ancient Livestock Dog": {
+    name: "Ancient Livestock Dog",
+    note: "Broad early working-dog population used to guard, move and control livestock before named British breeds existed. An extinct historical type.",
+  },
+  "Medieval Shepherd's Dog": {
+    name: "Medieval Shepherd's Dog",
+    note: "Practical medieval working dog used to move and protect sheep, forming an early root of Britain's collie families. An extinct historical type.",
+  },
+  "Medieval Drover's Dog": {
+    name: "Medieval Drover's Dog",
+    note: "Tough working dog that helped move cattle and sheep over long distances to markets and towns. An extinct historical type.",
+  },
+  "Medieval Earth Dog": {
+    name: "Medieval Earth Dog",
+    note: "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+  },
 
   "English Mastiff": {
     name: "English Mastiff",

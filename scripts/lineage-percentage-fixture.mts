@@ -46,10 +46,11 @@ const LEVELS_FILE = join(FIXTURE_DIR, "level-list.txt");
 // ---- tree keys, parsed from source ----------------------------------------
 const lineageSource = readFileSync(join(ROOT, "data", "lineage.ts"), "utf8");
 const keys = [...lineageSource.matchAll(/^  "([^"]+)": \{$/gm)].map((m) => m[1]);
-// 125 = the 123 baseline entries plus the two Batch 2 ancient additions.
-if (keys.length !== 125) {
+// 130 = the 123 baseline entries plus the two Batch 2 ancient additions and
+// the five Batch 3 foundation records.
+if (keys.length !== 130) {
   console.error(
-    `expected 125 top-level LINEAGE keys, parsed ${keys.length}; ` +
+    `expected 130 top-level LINEAGE keys, parsed ${keys.length}; ` +
       "data/lineage.ts layout changed, update the parser before trusting this fixture"
   );
   process.exit(1);

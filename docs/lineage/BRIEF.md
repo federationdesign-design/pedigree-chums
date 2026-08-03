@@ -76,11 +76,11 @@ to a key and reruns the section 7 fixture.
 |---|---|---|
 | Ancient Celtic Coursing Hound | Ancient | strip row + top-level tree entry |
 | Ancient British Mastiff Type | Ancient | strip row + top-level tree entry |
-| Ancient Celtic Scent Hound | Ancient | tree entry only (section 9 decision pending) |
-| Ancient Livestock Dog | Ancient | tree entry only (section 9 decision pending) |
-| Medieval Shepherd's Dog | Medieval | tree entry only (section 9 decision pending) |
-| Medieval Drover's Dog | Medieval | tree entry only (section 9 decision pending) |
-| Medieval Earth Dog | Medieval | tree entry only (section 9 decision pending) |
+| Ancient Celtic Scent Hound | Ancient | strip row + top-level tree entry, flip-only |
+| Ancient Livestock Dog | Ancient | strip row + top-level tree entry, flip-only |
+| Medieval Shepherd's Dog | Medieval | strip row + top-level tree entry, flip-only |
+| Medieval Drover's Dog | Medieval | strip row + top-level tree entry, flip-only |
+| Medieval Earth Dog | Medieval | strip row + top-level tree entry, flip-only |
 
 All seven are extinct historical types. Status is carried the way the code
 already carries it: the `note` ends with the sentence "An extinct historical
@@ -310,7 +310,7 @@ Each batch ends in a stop and a report. Nothing merges without approval.
 | 0 | Reconnaissance, read-only. COMPLETE | `docs/lineage/RECON.md` |
 | 1 | The percentage fixture: capture, commit, wire the regeneration script. COMPLETE | `scripts/lineage-percentage-fixture.mts`; fixtures committed (1959 percentage rows, 62 levels); rerun verified byte-identical |
 | 2 | The two ancient strip additions, as flip-only cards. COMPLETE | Both render and flip (desktop and touch verified); Mastiff and Greyhound rows untouched; level-list fixture identical to baseline (62); percentage fixture gains only the two root rows; count comments read 92 dogs, 62 play, 28 learn, 2 flip-only |
-| 3 | The five foundation records as top-level tree entries | Created, unreferenced by any tree; fixture clean; carousel membership question raised, not chosen |
+| 3 | The five foundation records, strip rows and tree entries. COMPLETE | All five render and flip, referenced by no tree; level list byte-identical at 62; percentage fixture gains exactly five root rows; tsc clean |
 | 4 | The Rache, Talbot and Cur trees | Three trees render with their new deepest generation; fixture clean except new rows; the Cur bandog removal separately signed off |
 | 5 | Old Welsh Grey Sheepdog, Scottish Terrier, Black and Tan Terrier | Six trees complete; fixture clean except new rows, Manchester Terrier verified |
 | 6 | The global disclosure and the "Historical influence" naming | Visible before any detail panel |
@@ -332,12 +332,9 @@ Foxhound, Otterhound, Staghound, Old English Bulldog, Bearded Collie, Welsh
 Terrier, Norfolk Spaniel, Welsh Springer Spaniel, Tweed Water Spaniel.
 (Indirect surfacing through grafts is governed by the section 7 fixture.)
 
-**Not decided:** which of the five foundation records appear in the strip and
-which stay tree-only. The owner has confirmed the principle, that the
-strongest and most useful types appear in the strip and specialist bridge
-records stay tree-only, but has not named which is which. Batch 3 raises this
-rather than choosing. Any future strip addition is bound by the section 4
-no-new-level constraint.
+**Decided, 3 August:** all seven records appear in the strip as flip-only
+cards; none stays tree-only. The root-only rule in section 4 keeps every one
+of them out of the campaign automatically.
 
 **Not in scope but recorded:** `relativesForLevel` in `data/lineageArchive.ts`
 is dead code (no callers). Removing it is a separate cleanup, not part of
@@ -375,10 +372,6 @@ this work.
 
 ## 11 Owner decisions still open
 
-- [ ] Which foundation records appear in the strip and which stay tree-only
-      (Batch 3 raises it). Any that joins the strip with a tree becomes a
-      further campaign level; after option B that is a numbering note, not a
-      blocker, but each addition is still named to the owner first.
 - [ ] Where the global disclosure sits, from the RECON Q5 options.
 - [ ] Whether any of the six trees leads with "Main influence" and
       "Supporting influence" copy instead of visible numbers.

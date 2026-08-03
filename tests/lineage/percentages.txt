@@ -13,6 +13,8 @@
 [tree] Airedale Terrier > Otterhound > Rough water dogs | leafPct=10 d3Pct=6
 [tree] Ancient British Mastiff Type | leafPct=100 d3Pct=na
 [tree] Ancient Celtic Coursing Hound | leafPct=100 d3Pct=na
+[tree] Ancient Celtic Scent Hound | leafPct=100 d3Pct=na
+[tree] Ancient Livestock Dog | leafPct=100 d3Pct=na
 [tree] Basset Hound | leafPct=100 d3Pct=100
 [tree] Basset Hound > Bloodhound | leafPct=55 d3Pct=71
 [tree] Basset Hound > Bloodhound > St Hubert Hound | leafPct=33 d3Pct=21
@@ -891,6 +893,9 @@
 [tree] Match to your chum | leafPct=100 d3Pct=100
 [tree] Match to your chum > Call out | leafPct=100 d3Pct=100
 [tree] Match to your chum > Call out > Claim chum | leafPct=100 d3Pct=67
+[tree] Medieval Drover's Dog | leafPct=100 d3Pct=na
+[tree] Medieval Earth Dog | leafPct=100 d3Pct=na
+[tree] Medieval Shepherd's Dog | leafPct=100 d3Pct=na
 [tree] Miniature Schnauzer | leafPct=100 d3Pct=100
 [tree] Miniature Schnauzer > Standard Schnauzer farm dogs | leafPct=60 d3Pct=52
 [tree] Miniature Schnauzer > Affenpinscher | leafPct=25 d3Pct=22

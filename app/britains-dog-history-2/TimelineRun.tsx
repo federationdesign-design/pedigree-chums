@@ -326,8 +326,8 @@ export default function TimelineRun({
             here would collapse every one of them. */}
         <BreedStrip era={era} renderLevels={(open) => breeds.map((b, bi) => {
           const isFlipped = flipped === b.name;
-          /* undefined for a dog with no level. 62 of the 92 open one, 28 go to
-             their own breed page, and 2 flip only, which is the live page's
+          /* undefined for a dog with no level. 62 of the 97 open one, 28 go to
+             their own breed page, and 7 flip only, which is the live page's
              rule and not something decided here. */
           const openLevel = open(b);
           /* Learn, play or neither. The flash and the tap read the same answer,

@@ -67,7 +67,7 @@ export type BreedStripOpen = (b: UKBreed) => (() => void) | undefined;
    and will do the same for the medieval foundation roots in later batches
    (docs/lineage/BRIEF.md section 4).
 
-   Measured across all 92 dogs on the history pages: 62 play, 28 learn, 2
+   Measured across all 97 dogs on the history pages: 62 play, 28 learn, 7
    flip-only. Pure and stateless, so it is safe to call from anywhere. */
 export type BreedCardKind = "play" | "learn";
 
@@ -157,7 +157,7 @@ export default function BreedStrip({
      gets the identical rule rather than a second version of it. The three
      outcomes are unchanged: a breed with its own page navigates there, a breed
      with an ancestored lineage opens a level as a fresh run, and anything else
-     only flips. Measured across all 92 dogs: 62 open a level, 28 navigate, 2
+     only flips. Measured across all 97 dogs: 62 open a level, 28 navigate, 7
      flip only. */
   const openFor: BreedStripOpen = (b) => {
     const kind = breedCardKind(b.name);
