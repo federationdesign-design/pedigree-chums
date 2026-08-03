@@ -1286,7 +1286,12 @@ const LINEAGE: Record<string, LineageNode> = {
           { name: "Old working collies", note: "The old northern hill-collie landrace of Scotland and the borders, the shared working stock the Rough, Smooth and Border collies all grew from. Now extinct.", img: "/history/breeds/Old-working-collies-cluster.jpg", value: 110 },
         ],
       },
-      { name: "Old working bandogs", note: "Tougher guarding and yard-dog stock. Now extinct.", img: "/history/breeds/Old-British-bandogs.jpg", value: 180 }
+      // Owner decision, option B (3 August): the bandog branch is replaced by
+      // heeler stock at the same weight (180 = the scaled 45), since heelers
+      // are documented as cur-type drovers' dogs. No foundation grafts inside
+      // it, so it takes the full branch value and the split rule does not
+      // apply.
+      { name: "Old heeler stock", note: "Low, hard-bitten cattle dogs that drove stock by nipping at the heels and ducking the kick. Now extinct as a type.", img: "/history/breeds/old-heeler-stock.jpg", value: 180 }
     ]
   },
 
@@ -1303,8 +1308,28 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Old Welsh Grey Sheepdog",
     note: "An old shaggy grey herding dog of the Welsh hills, a hardy native worker now largely lost. Now extinct.",
     children: [
-      { name: "Welsh herding dogs", note: "The old Welsh herding and droving dogs, a long-legged, loose-eyed landrace and the parallel Welsh branch behind the region's sheep-working breeds. Now extinct.", img: "/history/breeds/Welsh-herding-dogs-cluster.jpg", value: 60 },
-      { name: "Shaggy upland herders", note: "Rough-coated hill dogs of the same old type. Now extinct.", img: "/history/breeds/Old-working-collies-cluster.jpg", value: 40 }
+      {
+        name: "Welsh herding dogs",
+        note: "The old Welsh herding and droving dogs, a long-legged, loose-eyed landrace and the parallel Welsh branch behind the region's sheep-working breeds. Now extinct.",
+        img: "/history/breeds/Welsh-herding-dogs-cluster.jpg",
+        // Batch 5, Celtic Heeler pattern, split rule: Medieval Shepherd's Dog
+        // assessed plausible (AElfric documents the shepherd's dog directly),
+        // so it takes half the former 60. Keep the self-duplicate in step.
+        children: [
+          { name: "Medieval Shepherd's Dog", note: "Practical medieval working dog used to move and protect sheep, forming an early root of Britain's collie families. An extinct historical type.", img: "/history/breeds/medieval-shepherds-dog.jpg", value: 30 },
+          { name: "Welsh herding dogs", note: "The old Welsh herding and droving dogs, a long-legged, loose-eyed landrace and the parallel Welsh branch behind the region's sheep-working breeds. Now extinct.", img: "/history/breeds/Welsh-herding-dogs-cluster.jpg", value: 30 },
+        ],
+      },
+      {
+        name: "Shaggy upland herders",
+        note: "Rough-coated hill dogs of the same old type. Now extinct.",
+        img: "/history/breeds/Old-working-collies-cluster.jpg",
+        // Same pattern and assessment: half of the former 40.
+        children: [
+          { name: "Medieval Shepherd's Dog", note: "Practical medieval working dog used to move and protect sheep, forming an early root of Britain's collie families. An extinct historical type.", img: "/history/breeds/medieval-shepherds-dog.jpg", value: 20 },
+          { name: "Shaggy upland herders", note: "Rough-coated hill dogs of the same old type. Now extinct.", img: "/history/breeds/Old-working-collies-cluster.jpg", value: 20 },
+        ],
+      }
     ]
   },
 

@@ -276,7 +276,7 @@
 [tree] Cur > Old working collies > Medieval Drover's Dog > Ancient Livestock Dog | leafPct=14 d3Pct=14
 [tree] Cur > Old working collies > Medieval Drover's Dog > Medieval Drover's Dog | leafPct=14 d3Pct=14
 [tree] Cur > Old working collies > Old working collies | leafPct=28 d3Pct=28
-[tree] Cur > Old working bandogs | leafPct=45 d3Pct=45
+[tree] Cur > Old heeler stock | leafPct=45 d3Pct=45
 [tree] Curly-Coated Retriever | leafPct=100 d3Pct=100
 [tree] Curly-Coated Retriever > English Water Spaniel | leafPct=35 d3Pct=26
 [tree] Curly-Coated Retriever > St John's Water Dog | leafPct=30 d3Pct=22
@@ -957,7 +957,11 @@
 [tree] Old English Sheepdog > Welsh herding dogs | leafPct=45 d3Pct=29
 [tree] Old Welsh Grey Sheepdog | leafPct=100 d3Pct=100
 [tree] Old Welsh Grey Sheepdog > Welsh herding dogs | leafPct=60 d3Pct=60
+[tree] Old Welsh Grey Sheepdog > Welsh herding dogs > Medieval Shepherd's Dog | leafPct=30 d3Pct=30
+[tree] Old Welsh Grey Sheepdog > Welsh herding dogs > Welsh herding dogs | leafPct=30 d3Pct=30
 [tree] Old Welsh Grey Sheepdog > Shaggy upland herders | leafPct=40 d3Pct=40
+[tree] Old Welsh Grey Sheepdog > Shaggy upland herders > Medieval Shepherd's Dog | leafPct=20 d3Pct=20
+[tree] Old Welsh Grey Sheepdog > Shaggy upland herders > Shaggy upland herders | leafPct=20 d3Pct=20
 [tree] Otterhound | leafPct=100 d3Pct=100
 [tree] Otterhound > Bloodhound | leafPct=45 d3Pct=51
 [tree] Otterhound > Bloodhound > St Hubert Hound | leafPct=27 d3Pct=15
