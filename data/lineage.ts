@@ -377,13 +377,11 @@ const LINEAGE: Record<string, LineageNode> = {
         name: "Brabant Bullenbeisser",
         note: "The Brabant Bullenbeisser was the smaller, athletic German catch dog whose broad bite, square build and slightly upturned muzzle formed the immediate foundation of the modern Boxer. The FCI explicitly identifies it as the Boxer's direct ancestor. Now extinct.",
         img: "/brabant-bullenbeisser.jpg",
-        value: 75,
         children: [
           {
             name: "Great Bullenbeisser (Danziger Bullenbeisser)",
             note: "The larger, heavier northern German bull-baiting dog from which the smaller Brabant variant descended. Standing around 60-65cm and 40-50kg, it was used to seize and hold boar, bear and bull by the muzzle. The Brabant line emerged as a smaller, more agile regional type. Now extinct.",
             img: "/history/breeds/great-bullenbeisser.jpg",
-            value: 60,
             children: [
               {
                 name: "Medieval Alaunts and catch dogs",
@@ -409,7 +407,6 @@ const LINEAGE: Record<string, LineageNode> = {
             name: "German Bullenbeisser types",
             note: "A group of regional German catch and hunting dogs bred to seize and hold large prey — boar, bear, bull — by the muzzle. The larger types worked as boarhounds; the smaller Brabant line became the Boxer. Distinct from the taller, rangier German boarhound. Now extinct.",
             img: "/history/breeds/Old-German-boarhounds.jpg",
-            value: 65,
             children: [
               {
                 name: "Medieval Alaunts and catch dogs",
@@ -431,7 +428,6 @@ const LINEAGE: Record<string, LineageNode> = {
         name: "Old English Bulldog",
         note: "The athletic bull-baiting Bulldog of the early 19th century — leaner and more active than today's breed. Crossed into the early Boxer to further shorten the muzzle and soften temperament. Now extinct.",
         img: "/history/breeds/Old-English-Bulldog.jpg",
-        value: 25,
         children: [
           {
             name: "English Mastiff",

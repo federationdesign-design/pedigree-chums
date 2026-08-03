@@ -122,21 +122,21 @@
 [tree] Boston Terrier > Bulldog > Pug > Eastern lion and lap dogs | leafPct=3 d3Pct=3
 [tree] Boston Terrier > White English Terrier | leafPct=45 d3Pct=45
 [tree] Boxer | leafPct=100 d3Pct=100
-[tree] Boxer > Brabant Bullenbeisser | leafPct=70 d3Pct=78
-[tree] Boxer > Brabant Bullenbeisser > Great Bullenbeisser (Danziger Bullenbeisser) | leafPct=30 d3Pct=29
-[tree] Boxer > Brabant Bullenbeisser > Great Bullenbeisser (Danziger Bullenbeisser) > Medieval Alaunts and catch dogs | leafPct=16 d3Pct=10
-[tree] Boxer > Brabant Bullenbeisser > Great Bullenbeisser (Danziger Bullenbeisser) > Early Germanic boar hunting dogs | leafPct=13 d3Pct=8
-[tree] Boxer > Brabant Bullenbeisser > Old English Bulldog | leafPct=12 d3Pct=7
-[tree] Boxer > Brabant Bullenbeisser > Old English Bulldog > Mastiff and Alaunt war dogs | leafPct=7 d3Pct=4
-[tree] Boxer > Brabant Bullenbeisser > Old English Bulldog > Old British bandogs | leafPct=5 d3Pct=3
-[tree] Boxer > Brabant Bullenbeisser > German Bullenbeisser types | leafPct=28 d3Pct=29
-[tree] Boxer > Brabant Bullenbeisser > German Bullenbeisser types > Medieval Alaunts and catch dogs | leafPct=18 d3Pct=11
-[tree] Boxer > Brabant Bullenbeisser > German Bullenbeisser types > Old German farm guards | leafPct=10 d3Pct=6
-[tree] Boxer > Old English Bulldog | leafPct=30 d3Pct=22
-[tree] Boxer > Old English Bulldog > English Mastiff | leafPct=18 d3Pct=11
-[tree] Boxer > Old English Bulldog > English Mastiff > Ancient Molossers | leafPct=11 d3Pct=6
-[tree] Boxer > Old English Bulldog > English Mastiff > Old British bandogs | leafPct=7 d3Pct=4
-[tree] Boxer > Old English Bulldog > Ancient Molossers | leafPct=12 d3Pct=7
+[tree] Boxer > Brabant Bullenbeisser | leafPct=70 d3Pct=70
+[tree] Boxer > Brabant Bullenbeisser > Great Bullenbeisser (Danziger Bullenbeisser) | leafPct=30 d3Pct=30
+[tree] Boxer > Brabant Bullenbeisser > Great Bullenbeisser (Danziger Bullenbeisser) > Medieval Alaunts and catch dogs | leafPct=16 d3Pct=16
+[tree] Boxer > Brabant Bullenbeisser > Great Bullenbeisser (Danziger Bullenbeisser) > Early Germanic boar hunting dogs | leafPct=13 d3Pct=13
+[tree] Boxer > Brabant Bullenbeisser > Old English Bulldog | leafPct=12 d3Pct=12
+[tree] Boxer > Brabant Bullenbeisser > Old English Bulldog > Mastiff and Alaunt war dogs | leafPct=7 d3Pct=7
+[tree] Boxer > Brabant Bullenbeisser > Old English Bulldog > Old British bandogs | leafPct=5 d3Pct=5
+[tree] Boxer > Brabant Bullenbeisser > German Bullenbeisser types | leafPct=28 d3Pct=28
+[tree] Boxer > Brabant Bullenbeisser > German Bullenbeisser types > Medieval Alaunts and catch dogs | leafPct=18 d3Pct=18
+[tree] Boxer > Brabant Bullenbeisser > German Bullenbeisser types > Old German farm guards | leafPct=10 d3Pct=10
+[tree] Boxer > Old English Bulldog | leafPct=30 d3Pct=30
+[tree] Boxer > Old English Bulldog > English Mastiff | leafPct=18 d3Pct=18
+[tree] Boxer > Old English Bulldog > English Mastiff > Ancient Molossers | leafPct=11 d3Pct=11
+[tree] Boxer > Old English Bulldog > English Mastiff > Old British bandogs | leafPct=7 d3Pct=7
+[tree] Boxer > Old English Bulldog > Ancient Molossers | leafPct=12 d3Pct=12
 [tree] Buckhound | leafPct=100 d3Pct=100
 [tree] Buckhound > Old scenting hounds | leafPct=60 d3Pct=60
 [tree] Buckhound > Talbot hounds | leafPct=40 d3Pct=40

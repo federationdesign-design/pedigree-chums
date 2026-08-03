@@ -289,6 +289,12 @@ change.**
   number, but the underlying weight still exists (the layout engine and the
   percentage maths require it; RECON Q8 point 12). Whether any of the six
   trees hides its numbers in copy is an open owner decision (section 11).
+- **Boxer top split settled at 70/30 (owner decision, 4 August).** The
+  hand-authored internal values implied Brabant 75 / Old English Bulldog 25,
+  but the leaf structure has always summed to 70/30 and the breed page has
+  always displayed 70/30, so the normalisation makes the break panel agree
+  rather than changing the story. Restoring 75/25 would need leaf
+  rebalancing, a visible breed-page change requiring its own D1 exception.
 - "Historical influence" is an INTRODUCTION, not a rename: no current label
   uses the word "influence" (RECON Q5). Where the measure is named in these
   early trees, name it "Historical influence". Percentages are an editorial
