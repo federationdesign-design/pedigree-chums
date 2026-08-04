@@ -487,10 +487,6 @@ export default function TimelineRun({
                           ))}
                         </span>
                       )}
-                      <span className={styles.dogSub}>
-                        These dogs you know today came from this lineage route,
-                        discover them here
-                      </span>
                     </span>
                     {/* THE FLASH LETTERING, a third layer in the same grid cell
                         as the two faces. It sits here rather than inside the

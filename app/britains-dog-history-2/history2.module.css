@@ -1094,8 +1094,8 @@
 .dogNote {
   font-family: var(--font-body), system-ui, sans-serif;
   font-weight: 600;
-  /* Doubled from 1rem, then 4pt off. */
-  font-size: calc(2rem - 4pt);
+  /* Doubled from 1rem, then 4pt off, then another 2pt (owner, 4 August). */
+  font-size: calc(2rem - 6pt);
   line-height: 1.1em;
   /* THE GAP UNDER THE SMALL LINE. It was 36px: .dogBack's own 16px flex gap
      plus a 20px margin here, while every other element on the card had a level
@@ -1132,17 +1132,6 @@
 }
 
 /* The smaller line under the button. */
-.dogSub {
-  font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: 0.9rem;
-  font-weight: 600;
-  line-height: 1.25;
-  color: #0a3a57;
-  text-align: center;
-  max-width: 30ch;
-  order: 2;
-}
-
 /* ---- Dog screen: rail leg, card, marker row, rail leg ------------------ */
 
 /* The name, over the picture and above the status bar. MEASURED from the
@@ -1395,8 +1384,9 @@
 
 /* 33% down from 80. */
 .backLink {
-  width: 54px;
-  height: 54px;
+  /* 33% down from 54px (owner, 4 August). */
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   border: 3px solid #ffffff;
   box-sizing: border-box;

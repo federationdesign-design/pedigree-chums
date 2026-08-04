@@ -565,11 +565,6 @@ export default function BreedStrip({
                         {open && (
                           <span className={styles.deskBackHint}>Tap to learn about this dog</span>
                         )}
-                        {open && (
-                          <span className={styles.deskBackSub}>
-                            These dogs you know today came from this lineage route, discover them here
-                          </span>
-                        )}
                         <span className={styles.flipNote}>{b.note}</span>
                         {kind === "play" && OUTBOUND_ERAS.includes(era) && (
                           <span className={styles.backLinks}>

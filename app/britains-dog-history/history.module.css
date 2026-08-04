@@ -559,7 +559,8 @@
 .flipNote {
   font-family: var(--font-body), system-ui, sans-serif;
   font-weight: 600;
-  font-size: calc(2rem - 4pt);
+  /* Doubled from 1rem, then 4pt off, then another 2pt (owner, 4 August). */
+  font-size: calc(2rem - 6pt);
   line-height: 1.1;
   color: var(--navy);
   text-align: center;
@@ -730,15 +731,6 @@
   align-self: center;
   width: fit-content;
 }
-.deskBackSub {
-  font-family: var(--font-body), system-ui, sans-serif;
-  font-weight: 600;
-  font-size: 0.9rem;
-  line-height: 1.25;
-  color: #0a3a57;
-  text-align: center;
-  max-width: 30ch;
-}
 .deskBackFlip {
   position: absolute;
   top: 10px;
@@ -769,8 +761,9 @@
 }
 .backLink {
   position: relative;
-  width: 48px;
-  height: 48px;
+  /* 33% down from 48px (owner, 4 August). */
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   cursor: pointer;
   border: 0;
