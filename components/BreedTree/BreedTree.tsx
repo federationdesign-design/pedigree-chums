@@ -6362,7 +6362,7 @@ export default function BreedTree({
               in, and the same best-guess caveat. Only when a circle is picked. */}
           {!ancestryFor && dockAside && shown.parent && shownNorm !== null && (
             <div className={styles.cBreak}>
-              <div className={styles.cBreakBig}>{shownNorm < 1 ? "<1%" : `${shownNorm}%`} of this dog</div>
+              <div className={styles.cBreakBig}>{shownNorm < 1 ? "<1%" : `${shownNorm}%`} historical influence</div>
               <div className={styles.cBreakRow}>As {genLabel(shown.depth)}: {shownShare === null ? "" : shownShare < 1 ? "<1%" : `${shownShare}%`}</div>
               <div className={styles.cBreakRow}>Share of this dog: {shownNorm < 1 ? "<1%" : `${shownNorm}%`}</div>
               <div className={styles.cBreakTitle}>Our best guess, not hard science.</div>

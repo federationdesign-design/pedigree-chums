@@ -377,13 +377,11 @@ const LINEAGE: Record<string, LineageNode> = {
         name: "Brabant Bullenbeisser",
         note: "The Brabant Bullenbeisser was the smaller, athletic German catch dog whose broad bite, square build and slightly upturned muzzle formed the immediate foundation of the modern Boxer. The FCI explicitly identifies it as the Boxer's direct ancestor. Now extinct.",
         img: "/brabant-bullenbeisser.jpg",
-        value: 75,
         children: [
           {
             name: "Great Bullenbeisser (Danziger Bullenbeisser)",
             note: "The larger, heavier northern German bull-baiting dog from which the smaller Brabant variant descended. Standing around 60-65cm and 40-50kg, it was used to seize and hold boar, bear and bull by the muzzle. The Brabant line emerged as a smaller, more agile regional type. Now extinct.",
             img: "/history/breeds/great-bullenbeisser.jpg",
-            value: 60,
             children: [
               {
                 name: "Medieval Alaunts and catch dogs",
@@ -409,7 +407,6 @@ const LINEAGE: Record<string, LineageNode> = {
             name: "German Bullenbeisser types",
             note: "A group of regional German catch and hunting dogs bred to seize and hold large prey — boar, bear, bull — by the muzzle. The larger types worked as boarhounds; the smaller Brabant line became the Boxer. Distinct from the taller, rangier German boarhound. Now extinct.",
             img: "/history/breeds/Old-German-boarhounds.jpg",
-            value: 65,
             children: [
               {
                 name: "Medieval Alaunts and catch dogs",
@@ -431,7 +428,6 @@ const LINEAGE: Record<string, LineageNode> = {
         name: "Old English Bulldog",
         note: "The athletic bull-baiting Bulldog of the early 19th century — leaner and more active than today's breed. Crossed into the early Boxer to further shorten the muzzle and soften temperament. Now extinct.",
         img: "/history/breeds/Old-English-Bulldog.jpg",
-        value: 25,
         children: [
           {
             name: "English Mastiff",
@@ -574,7 +570,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Black and Tan Terrier",
     note: "The Old English Terrier, the extinct rough working terrier that nearly every British terrier descends from.",
     children: [
-      { name: "Old British ratting terriers", note: "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.", img: "/history/breeds/Local-red-ratting-terriers.jpg", value: 60 },
+      { name: "Old British ratting terriers", note: "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.", img: "/history/breeds/Old-British-ratting-terriers.jpg", value: 60 },
       { name: "Earth and hunt terriers", note: "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.", img: "/history/breeds/Earth-and-hunt-terrier.jpg", value: 40 }
     ]
   },
@@ -954,6 +950,77 @@ const LINEAGE: Record<string, LineageNode> = {
     ]
   },
 
+  // The two ancient additions (docs/lineage/BRIEF.md sections 3 and 4).
+  // Roots by design: they are the deepest recorded types, so they carry no
+  // ancestor children and no invented weights. The modern English Mastiff
+  // and Greyhound trees below are untouched; hanging these records beneath
+  // later trees is Batch 4+ work, gated by the percentage fixture.
+  "Ancient British Mastiff Type": {
+    name: "Ancient British Mastiff Type",
+    note: "Powerful British guard and hunting dog praised by Roman writers for courage and strength. An extinct historical type.",
+  },
+  "Ancient Celtic Coursing Hound": {
+    name: "Ancient Celtic Coursing Hound",
+    note: "Swift Celtic sight-hunting dog described by classical writers, an early root of later British and Irish sighthounds. An extinct historical type.",
+  },
+  // The five foundation records (docs/lineage/BRIEF.md section 3, Batch 3).
+  // Roots by design like the two ancient additions above: no ancestor
+  // children, no invented weights, flip-only cards. Referenced by no tree
+  // yet; hanging them beneath the six approved trees is Batch 4 and 5 work,
+  // gated by the percentage fixture.
+  // Batch 5 shared stock entries (owner-approved notes and images,
+  // 4 August): top-level so every tree naming these labels grafts the
+  // foundation with correct per-host rescaling. Medieval Earth Dog is
+  // assessed plausible beneath each (the medieval earth dog is the
+  // documented functional category terriers continue), so it takes half of
+  // each stock per the split rule, Celtic Heeler pattern. The owner accepted
+  // the surfacing scope deliberately: these stocks are shared, so the
+  // foundation appears in twelve trees (docs/lineage/BRIEF.md section 5).
+  "Old Highland terriers": {
+    name: "Old Highland terriers",
+    note: "The old working-terrier stock of the Highlands that every Scottish terrier springs from. Now extinct.",
+    children: [
+      { name: "Medieval Earth Dog", note: "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.", img: "/history/breeds/medieval-earth-dog.jpg", value: 30 },
+      { name: "Old Highland terriers", note: "The old working-terrier stock of the Highlands that every Scottish terrier springs from. Now extinct.", img: "/history/breeds/Old-Highland-terriers.jpg", value: 30 },
+    ],
+  },
+  "Old British ratting terriers": {
+    name: "Old British ratting terriers",
+    note: "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.",
+    children: [
+      { name: "Medieval Earth Dog", note: "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.", img: "/history/breeds/medieval-earth-dog.jpg", value: 30 },
+      { name: "Old British ratting terriers", note: "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.", img: "/history/breeds/Old-British-ratting-terriers.jpg", value: 30 },
+    ],
+  },
+  "Earth and hunt terriers": {
+    name: "Earth and hunt terriers",
+    note: "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.",
+    children: [
+      { name: "Medieval Earth Dog", note: "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.", img: "/history/breeds/medieval-earth-dog.jpg", value: 20 },
+      { name: "Earth and hunt terriers", note: "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.", img: "/history/breeds/Earth-and-hunt-terrier.jpg", value: 20 },
+    ],
+  },
+  "Ancient Celtic Scent Hound": {
+    name: "Ancient Celtic Scent Hound",
+    note: "Early Celtic tracking hound that followed game by scent, representing the roots of later European scent hounds. An extinct historical type.",
+  },
+  "Ancient Livestock Dog": {
+    name: "Ancient Livestock Dog",
+    note: "Broad early working-dog population used to guard, move and control livestock before named British breeds existed. An extinct historical type.",
+  },
+  "Medieval Shepherd's Dog": {
+    name: "Medieval Shepherd's Dog",
+    note: "Practical medieval working dog used to move and protect sheep, forming an early root of Britain's collie families. An extinct historical type.",
+  },
+  "Medieval Drover's Dog": {
+    name: "Medieval Drover's Dog",
+    note: "Tough working dog that helped move cattle and sheep over long distances to markets and towns. An extinct historical type.",
+  },
+  "Medieval Earth Dog": {
+    name: "Medieval Earth Dog",
+    note: "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+  },
+
   "English Mastiff": {
     name: "English Mastiff",
     note: "Britain's ancient war and guard dog, a giant Molosser prized here since Roman times.",
@@ -977,7 +1044,20 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "A white medieval scent hound, slow but sure-nosed, and an ancestor of the beagle, foxhound and bloodhound.",
     children: [
       { name: "St Hubert Hound", note: "The monks' scent hound brought over by the Normans.", img: "/history/breeds/St-Hubert-Hound.jpg", value: 60 },
-      { name: "Old scenting hounds", note: "The tracking hounds of medieval lords.", img: "/history/breeds/Old-scenting-hounds.jpg", value: 40 }
+      {
+        name: "Old scenting hounds",
+        note: "The tracking hounds of medieval lords.",
+        img: "/history/breeds/Old-scenting-hounds.jpg",
+        // Batch 4, Celtic Heeler pattern (owner-directed): the branch's former
+        // 40 splits evenly between the foundation and a same-name self-child,
+        // so the ancestor renders as a small circle inside the stock rather
+        // than filling it. Branch total stays 40; no displayed figure moves.
+        // The self-duplicate must be kept in step with this node by hand.
+        children: [
+          { name: "Ancient Celtic Scent Hound", note: "Early Celtic tracking hound that followed game by scent, representing the roots of later European scent hounds. An extinct historical type.", img: "/history/breeds/ancient-celtic-scent-hound.jpg", value: 20 },
+          { name: "Old scenting hounds", note: "The tracking hounds of medieval lords.", img: "/history/breeds/Old-scenting-hounds.jpg", value: 20 },
+        ],
+      }
     ]
   },
 
@@ -1058,7 +1138,18 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "A medieval hound that hunted by scent in a pack, as opposed to the sight-hunting gazehound.",
     children: [
       { name: "St Hubert and Talbot hounds", note: "The Norman scent hounds behind the running pack.", img: "/history/breeds/talbot-hound.jpg", value: 60 },
-      { name: "Old scenting hounds", note: "The native pack hounds of medieval Britain.", img: "/history/breeds/Old-scenting-hounds.jpg", value: 40 }
+      {
+        name: "Old scenting hounds",
+        note: "The native pack hounds of medieval Britain.",
+        img: "/history/breeds/Old-scenting-hounds.jpg",
+        // Batch 4, Celtic Heeler pattern: even split of the former 40 between
+        // the foundation and the same-name self-child. See the Talbot tree
+        // for the same pattern; keep the self-duplicate in step by hand.
+        children: [
+          { name: "Ancient Celtic Scent Hound", note: "Early Celtic tracking hound that followed game by scent, representing the roots of later European scent hounds. An extinct historical type.", img: "/history/breeds/ancient-celtic-scent-hound.jpg", value: 20 },
+          { name: "Old scenting hounds", note: "The native pack hounds of medieval Britain.", img: "/history/breeds/Old-scenting-hounds.jpg", value: 20 },
+        ],
+      }
     ]
   },
 
@@ -1199,8 +1290,36 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Cur",
     note: "Not a breed but a type: the everyday working mongrel of the old farm, used for droving cattle and general work.",
     children: [
-      { name: "Old working collies", note: "The old northern hill-collie landrace of Scotland and the borders, the shared working stock the Rough, Smooth and Border collies all grew from. Now extinct.", img: "/history/breeds/Old-working-collies-cluster.jpg", value: 55 },
-      { name: "Old working bandogs", note: "Tougher guarding and yard-dog stock. Now extinct.", img: "/history/breeds/Old-British-bandogs.jpg", value: 45 }
+      {
+        name: "Old working collies",
+        note: "The old northern hill-collie landrace of Scotland and the borders, the shared working stock the Rough, Smooth and Border collies all grew from. Now extinct.",
+        img: "/history/breeds/Old-working-collies-cluster.jpg",
+        // Batch 4, Celtic Heeler pattern at both depths (owner-directed): each
+        // generation splits evenly between the older type and a same-name
+        // self-child, so each ancestor is a small circle inside its stock.
+        // The whole Cur tree is scaled by four (bandogs 45 -> 180) purely to
+        // keep the two halvings in whole numbers: every ratio, and so every
+        // displayed percentage, is unchanged. Branch shares: collies 55,
+        // Drover's 28, Livestock 14. Keep the self-duplicates in step by hand.
+        children: [
+          {
+            name: "Medieval Drover's Dog",
+            note: "Tough working dog that helped move cattle and sheep over long distances to markets and towns. An extinct historical type.",
+            img: "/history/breeds/medieval-drover-dog.jpg",
+            children: [
+              { name: "Ancient Livestock Dog", note: "Broad early working-dog population used to guard, move and control livestock before named British breeds existed. An extinct historical type.", img: "/history/breeds/ancient-livestock-dog.jpg", value: 55 },
+              { name: "Medieval Drover's Dog", note: "Tough working dog that helped move cattle and sheep over long distances to markets and towns. An extinct historical type.", img: "/history/breeds/medieval-drover-dog.jpg", value: 55 },
+            ],
+          },
+          { name: "Old working collies", note: "The old northern hill-collie landrace of Scotland and the borders, the shared working stock the Rough, Smooth and Border collies all grew from. Now extinct.", img: "/history/breeds/Old-working-collies-cluster.jpg", value: 110 },
+        ],
+      },
+      // Owner decision, option B (3 August): the bandog branch is replaced by
+      // heeler stock at the same weight (180 = the scaled 45), since heelers
+      // are documented as cur-type drovers' dogs. No foundation grafts inside
+      // it, so it takes the full branch value and the split rule does not
+      // apply.
+      { name: "Old heeler stock", note: "Low, hard-bitten cattle dogs that drove stock by nipping at the heels and ducking the kick. Now extinct as a type.", img: "/history/breeds/old-heeler-stock.jpg", value: 180 }
     ]
   },
 
@@ -1217,8 +1336,28 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Old Welsh Grey Sheepdog",
     note: "An old shaggy grey herding dog of the Welsh hills, a hardy native worker now largely lost. Now extinct.",
     children: [
-      { name: "Welsh herding dogs", note: "The old Welsh herding and droving dogs, a long-legged, loose-eyed landrace and the parallel Welsh branch behind the region's sheep-working breeds. Now extinct.", img: "/history/breeds/Welsh-herding-dogs-cluster.jpg", value: 60 },
-      { name: "Shaggy upland herders", note: "Rough-coated hill dogs of the same old type. Now extinct.", img: "/history/breeds/Old-working-collies-cluster.jpg", value: 40 }
+      {
+        name: "Welsh herding dogs",
+        note: "The old Welsh herding and droving dogs, a long-legged, loose-eyed landrace and the parallel Welsh branch behind the region's sheep-working breeds. Now extinct.",
+        img: "/history/breeds/Welsh-herding-dogs-cluster.jpg",
+        // Batch 5, Celtic Heeler pattern, split rule: Medieval Shepherd's Dog
+        // assessed plausible (AElfric documents the shepherd's dog directly),
+        // so it takes half the former 60. Keep the self-duplicate in step.
+        children: [
+          { name: "Medieval Shepherd's Dog", note: "Practical medieval working dog used to move and protect sheep, forming an early root of Britain's collie families. An extinct historical type.", img: "/history/breeds/medieval-shepherds-dog.jpg", value: 30 },
+          { name: "Welsh herding dogs", note: "The old Welsh herding and droving dogs, a long-legged, loose-eyed landrace and the parallel Welsh branch behind the region's sheep-working breeds. Now extinct.", img: "/history/breeds/Welsh-herding-dogs-cluster.jpg", value: 30 },
+        ],
+      },
+      {
+        name: "Shaggy upland herders",
+        note: "Rough-coated hill dogs of the same old type. Now extinct.",
+        img: "/history/breeds/Old-working-collies-cluster.jpg",
+        // Same pattern and assessment: half of the former 40.
+        children: [
+          { name: "Medieval Shepherd's Dog", note: "Practical medieval working dog used to move and protect sheep, forming an early root of Britain's collie families. An extinct historical type.", img: "/history/breeds/medieval-shepherds-dog.jpg", value: 20 },
+          { name: "Shaggy upland herders", note: "Rough-coated hill dogs of the same old type. Now extinct.", img: "/history/breeds/Old-working-collies-cluster.jpg", value: 20 },
+        ],
+      }
     ]
   },
 
@@ -1441,7 +1580,12 @@ function expandNode(
     const kids = sub.children.map((c) =>
       expandNode({ ...c, value: ((c.value ?? 0) * share) / total }, depth + 1, next),
     );
-    return { ...node, children: kids };
+    // A grafted node drops its own value: its children carry its share, so
+    // the d3 sum measure counts the branch once rather than twice and the
+    // break-panel share agrees with the leaf-sum breakdown (owner-sanctioned
+    // re-baseline, 3 August). Pack geometry is untouched: d3.pack sizes
+    // circles from leaves only.
+    return { ...node, value: undefined, children: kids };
   }
 
   if (node.children && node.children.length) {

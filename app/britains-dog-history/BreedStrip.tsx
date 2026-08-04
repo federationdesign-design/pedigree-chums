@@ -67,17 +67,24 @@ export type BreedStripOpen = (b: UKBreed) => (() => void) | undefined;
    card, so a card can never advertise PLAY and then fail to play.
 
    "learn" means the breed has a page of its own and the tap navigates there.
-   "play" means it has no page but has a lineage, so the tap opens a level.
-   null means neither, and the card is not tappable.
+   "play" means it has no page but has a lineage WITH ANCESTORS, so the tap
+   opens a level. null means neither, and the card only flips.
 
-   Measured across all 90 dogs on the history pages: 62 play, 28 learn, none
-   null. Pure and stateless, so it is safe to call from anywhere. */
+   A lineage with no children cannot be a level: the round works by revealing
+   what sits below a dog, and a deepest root has nothing below it. That rule is
+   general, not a name list: it keeps the two ancient additions flip-only today
+   and will do the same for the medieval foundation roots in later batches
+   (docs/lineage/BRIEF.md section 4).
+
+   Measured across all 97 dogs on the history pages: 62 play, 28 learn, 7
+   flip-only. Pure and stateless, so it is safe to call from anywhere. */
 export type BreedCardKind = "play" | "learn";
 
 export function breedCardKind(name: string): BreedCardKind | null {
   const packName = resolveLineageName(name);
   if (packBreeds.find((x) => x.name === packName)?.slug) return "learn";
-  return getLineage(packName) ? "play" : null;
+  const lineage = getLineage(packName);
+  return lineage?.children?.length ? "play" : null;
 }
 
 export default function BreedStrip({
@@ -147,10 +154,10 @@ export default function BreedStrip({
   const levelList = ukBreeds
     .slice()
     .sort((a, b) => (STRIP_ORDER.indexOf(a.strip) - STRIP_ORDER.indexOf(b.strip)) || (a.anchor - b.anchor))
-    .filter((b) => {
-      const pn = resolveLineageName(b.name);
-      return !packBreeds.find((x) => x.name === pn)?.slug && !!getLineage(pn);
-    });
+    // The same single answer the tap and the badge read: only "play" cards are
+    // levels, so a root-only record (flip-only card) can never join the
+    // campaign or shift its numbering.
+    .filter((b) => breedCardKind(b.name) === "play");
   const nextLevelOf = (name: string): UKBreed | null => {
     const i = levelList.findIndex((b) => b.name === name);
     return i >= 0 && i + 1 < levelList.length ? levelList[i + 1] : null;
@@ -159,9 +166,9 @@ export default function BreedStrip({
   /* What a tap on a dog does. Lifted out of the rail's own map so the slider
      gets the identical rule rather than a second version of it. The three
      outcomes are unchanged: a breed with its own page navigates there, a breed
-     with a lineage opens a level as a fresh run, and anything else is not
-     tappable. Measured across all 90 dogs: 62 open a level, 28 navigate, none
-     fall through. */
+     with an ancestored lineage opens a level as a fresh run, and anything else
+     only flips. Measured across all 97 dogs: 62 open a level, 28 navigate, 7
+     flip only. */
   const openFor: BreedStripOpen = (b) => {
     const kind = breedCardKind(b.name);
     const packName = resolveLineageName(b.name);

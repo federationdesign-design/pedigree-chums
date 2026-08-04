@@ -147,7 +147,7 @@ export default function PickAChumLauncher() {
     <>
       {/* Task 118: brand-blue graduated scrim behind the chat UI, only while it is present. Decoration
           only (pointer-events:none in CSS); never intercepts a click. */}
-      {(shown || open) && <div className={styles.scrim} aria-hidden="true" />}
+      {open && <div className={styles.scrim} aria-hidden="true" />}
       {open ? (
         <PickAChumExperience onClose={closeExperience} />
       ) : (

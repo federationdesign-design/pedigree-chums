@@ -266,7 +266,7 @@ const [zOrders, setZOrders] = useState({ infoBox: 112, ancestry: 113, lifespanCh
         <DragCard id="ancestry" initialX={TREE_LEFT - 200} initialY={CARD_TOP - 75} zIndex={zOrders.ancestry}
           onBringToFront={bringToFront} onClose={() => closeCard("ancestry")}
           style={{ width: ANCESTRY_W, padding: "0 0 16px" }}>
-          <p className={styles.infoHeading}>Ancestry</p>
+          <p className={styles.infoHeading}>Historical influence</p>
           {ancestryBreakdown.map((a) => (
             <div key={a.name}>
               <div className={styles.ancestryRow}>
