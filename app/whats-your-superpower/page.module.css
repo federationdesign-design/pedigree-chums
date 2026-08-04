@@ -1,0 +1,8 @@
+/* What's Your Superpower: page shell. The global body gradient shows
+   through; no page background is set. */
+
+.page {
+  min-height: 100vh;
+  padding-top: clamp(112px, 20vw, 140px);
+  padding-bottom: 60px;
+}

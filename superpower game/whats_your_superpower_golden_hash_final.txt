@@ -1,0 +1,13 @@
+What's Your Superpower, configuration MVP-4.1, result-contract schema 1.0, name set final-1.0
+
+Canonical input: one JSON record per answer array, M01 to M15 in fixed order, answer A before
+answer B, power arrays in fixed power order, sorted object keys, UTF-8, LF, no presentation markup.
+
+header:  config=MVP-4.1;schema=result-contract-1.0;arrays=32768;nameset=final-1.0
+SHA-256: 962ab2422f902db0c507b4c321791b1dbe87f6ec9f58ff72a3900eedd9bae329
+
+Audit log
+  MVP-4.0 + errata 4.0.2, main-power titles (pre-result-contract):
+  def21fc20e42201cc121353f960f2179f3587dbc61d47bdbf59001f214779559
+  MVP-4.1, result contract, provisional name set:
+  7ed0478570bb69dae75ac9cc89982597a6139256fdb80ff2341b300b47a5198e

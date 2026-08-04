@@ -1,0 +1,398 @@
+/* What's Your Superpower: game styles.
+   The global body gradient shows through: no page background is set here.
+   Minimum supported width is 320px. */
+
+.stage {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 0 16px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+/* ------------------------------------------------------------- entry */
+
+.gameTitle {
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: clamp(2.1rem, 8vw, 3.6rem);
+  line-height: 1.05;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--yellow, #ffd23e);
+  margin: 0 0 12px;
+}
+
+.promise {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--white, #ffffff);
+  line-height: 1.55;
+  margin: 0 0 6px;
+  max-width: 460px;
+}
+
+.time {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--white, #ffffff);
+  margin: 0 0 14px;
+}
+
+.boundary {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.85rem;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--navy, #0a3a57);
+  background: var(--cream, #fbf7ec);
+  border: 2px solid var(--navy, #0a3a57);
+  border-radius: 14px;
+  padding: 10px 14px;
+  margin: 0 0 18px;
+  max-width: 440px;
+}
+
+.primaryButton {
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: 1.4rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--navy, #0a3a57);
+  background: var(--yellow, #ffd23e);
+  border: 3px solid var(--navy, #0a3a57);
+  border-radius: var(--radius-pill, 999px);
+  padding: 12px 38px 8px;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.primaryButton:hover {
+  transform: scale(1.05);
+}
+
+.primaryButton:focus-visible,
+.answerButton:focus-visible,
+.backButton:focus-visible {
+  outline: 4px solid var(--yellow, #ffd23e);
+  outline-offset: 3px;
+}
+
+/* ------------------------------------------------------------- questions */
+
+.progress {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--white, #ffffff);
+  margin: 0 0 8px;
+}
+
+.progressTrack {
+  width: 100%;
+  max-width: 420px;
+  height: 10px;
+  background: var(--blue-deep, #0b78bd);
+  border: 2px solid var(--cream, #fbf7ec);
+  border-radius: var(--radius-pill, 999px);
+  overflow: hidden;
+  margin: 0 0 22px;
+}
+
+.progressFill {
+  height: 100%;
+  background: var(--yellow, #ffd23e);
+  transition: width 0.25s ease;
+}
+
+.question {
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: clamp(1.35rem, 5.5vw, 2rem);
+  line-height: 1.2;
+  letter-spacing: 0.03em;
+  color: var(--white, #ffffff);
+  margin: 0 0 22px;
+  max-width: 560px;
+}
+
+.question:focus {
+  outline: none;
+}
+
+.answers {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+  max-width: 480px;
+  margin: 0 0 20px;
+}
+
+.answerButton {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 1.02rem;
+  font-weight: 700;
+  line-height: 1.45;
+  color: var(--navy, #0a3a57);
+  background: var(--cream, #fbf7ec);
+  border: 3px solid var(--blue-deep, #0b78bd);
+  border-radius: var(--radius-card, 22px);
+  padding: 18px 20px;
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.answerButton:hover {
+  transform: scale(1.02);
+  border-color: var(--yellow, #ffd23e);
+}
+
+.answerChosen {
+  border-color: var(--yellow, #ffd23e);
+  background: var(--white, #ffffff);
+}
+
+.backButton {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--navy, #0a3a57);
+  background: var(--cream, #fbf7ec);
+  border: 2px solid var(--navy, #0a3a57);
+  border-radius: var(--radius-pill, 999px);
+  padding: 8px 24px;
+  cursor: pointer;
+}
+
+/* ------------------------------------------------------------- chart */
+
+.chartCard {
+  width: 100%;
+  max-width: 460px;
+  background: var(--cream, #fbf7ec);
+  border: 3px solid var(--blue-deep, #0b78bd);
+  border-radius: var(--radius-card, 22px);
+  padding: 12px;
+  margin: 0 0 20px;
+}
+
+.chart {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.chartRing {
+  fill: none;
+  stroke: var(--blue-sky, #5cc4ee);
+  stroke-width: 1;
+}
+
+.chartSpoke {
+  stroke: var(--blue-sky, #5cc4ee);
+  stroke-width: 1;
+}
+
+.chartSpokePrimary {
+  stroke: var(--blue-deep, #0b78bd);
+  stroke-width: 3;
+}
+
+.chartSpokeSecondary {
+  stroke: var(--blue-deep, #0b78bd);
+  stroke-width: 2;
+}
+
+.chartShape {
+  fill: var(--blue-sky, #5cc4ee);
+  fill-opacity: 0.45;
+  stroke: var(--blue-deep, #0b78bd);
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+}
+
+.chartMarker {
+  fill: var(--blue-deep, #0b78bd);
+}
+
+.chartMarkerPrimary {
+  fill: var(--navy, #0a3a57);
+  stroke: var(--yellow, #ffd23e);
+  stroke-width: 3;
+}
+
+.chartMarkerSecondary {
+  fill: var(--cream, #fbf7ec);
+  stroke: var(--navy, #0a3a57);
+  stroke-width: 2.5;
+}
+
+.chartLabel {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 15px;
+  font-weight: 600;
+  fill: var(--navy, #0a3a57);
+}
+
+.chartLabelPrimary {
+  font-weight: 800;
+  font-size: 16px;
+}
+
+.chartLabelSecondary {
+  font-weight: 700;
+}
+
+/* ------------------------------------------------------------- result */
+
+.resultTitle {
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: clamp(1.9rem, 7vw, 3rem);
+  line-height: 1.1;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--yellow, #ffd23e);
+  margin: 0 0 8px;
+}
+
+.resultTitle:focus {
+  outline: none;
+}
+
+.resultLine {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--white, #ffffff);
+  line-height: 1.5;
+  margin: 0 0 10px;
+  max-width: 480px;
+}
+
+.summary {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.98rem;
+  font-weight: 600;
+  color: var(--white, #ffffff);
+  line-height: 1.5;
+  margin: 0 0 22px;
+  max-width: 480px;
+}
+
+.mainBlock {
+  width: 100%;
+  max-width: 480px;
+  background: var(--cream, #fbf7ec);
+  border: 3px solid var(--yellow, #ffd23e);
+  border-radius: var(--radius-card, 22px);
+  padding: 18px 20px;
+  margin: 0 0 14px;
+}
+
+.mainBlockTitle {
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: 1.35rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--blue-deep, #0b78bd);
+  margin: 0 0 8px;
+}
+
+.blockRow {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 14px;
+  width: 100%;
+  margin: 0 0 14px;
+}
+
+.compactBlock {
+  width: 100%;
+  max-width: 480px;
+  background: var(--cream, #fbf7ec);
+  border: 2px solid var(--blue-deep, #0b78bd);
+  border-radius: var(--radius-card, 22px);
+  padding: 14px 16px;
+  margin: 0 0 14px;
+}
+
+.blockRow .compactBlock {
+  flex: 1 1 200px;
+  width: auto;
+  margin: 0;
+}
+
+.compactPower {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.8rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--blue-deep, #0b78bd);
+  margin: 0 0 4px;
+}
+
+.compactTitle {
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: 1.05rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--navy, #0a3a57);
+  margin: 0 0 6px;
+}
+
+.blockBody {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--navy, #0a3a57);
+  line-height: 1.5;
+  margin: 0 0 4px;
+}
+
+.relativeExplanation {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--white, #ffffff);
+  line-height: 1.5;
+  margin: 8px 0 12px;
+  max-width: 440px;
+}
+
+.restartRow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.replay {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--white, #ffffff);
+  margin: 0;
+}
+
+/* ------------------------------------------------------------- motion */
+
+@media (prefers-reduced-motion: reduce) {
+  .primaryButton,
+  .answerButton,
+  .progressFill {
+    transition: none;
+  }
+
+  .primaryButton:hover,
+  .answerButton:hover {
+    transform: none;
+  }
+}
