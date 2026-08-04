@@ -231,7 +231,37 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
   const fanAnchorRef = useRef<HTMLDivElement | null>(null);
   const [colBox, setColBox] = useState<{ left: number; top: number; bottom: number } | null>(null);
   const COL_W = 380;
-  const COL_TOP_CLEAR = 84; // stay below the fixed nav
+  // Owner review: the chat reaches the TOP of the window, so a long history
+  // slides off the window edge rather than vanishing at an invisible line.
+  const COL_TOP_CLEAR = 8;
+  // Owner review: once chatting, the visitor can pick the chat up and move
+  // it. The offset shifts the column's anchor point (its bottom edge, where
+  // the newest message sits): placed low, the window above is tall and shows
+  // more messages; placed high, it shows fewer. Resets on a dog change.
+  const [dragOffset, setDragOffset] = useState<{ dx: number; dy: number }>({ dx: 0, dy: 0 });
+  useEffect(() => { setDragOffset({ dx: 0, dy: 0 }); }, [dog]);
+  const startColumnDrag = useCallback((e: React.PointerEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    const el = e.currentTarget;
+    el.setPointerCapture(e.pointerId);
+    const sx = e.clientX;
+    const sy = e.clientY;
+    const start = { ...dragOffsetRef.current };
+    const move = (ev: PointerEvent) => {
+      dragOffsetRef.current = { dx: start.dx + (ev.clientX - sx), dy: start.dy + (ev.clientY - sy) };
+      setDragOffset(dragOffsetRef.current);
+    };
+    const up = () => {
+      el.removeEventListener('pointermove', move);
+      el.removeEventListener('pointerup', up);
+      el.removeEventListener('pointercancel', up);
+    };
+    el.addEventListener('pointermove', move);
+    el.addEventListener('pointerup', up);
+    el.addEventListener('pointercancel', up);
+  }, []);
+  const dragOffsetRef = useRef(dragOffset);
+  useEffect(() => { dragOffsetRef.current = dragOffset; }, [dragOffset]);
   useEffect(() => {
     if (!wide || phase === 'selecting') return;
     const measure = () => {
@@ -838,10 +868,29 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
         <>
           <div
             className={styles.chatColumn}
-            style={colBox ? { left: `${Math.round(colBox.left)}px`, top: `${Math.round(colBox.top)}px`, bottom: `${Math.round(colBox.bottom)}px` } : undefined}
+            style={
+              colBox
+                ? {
+                    left: `${Math.round(Math.min(Math.max(colBox.left + dragOffset.dx, 8), vw - COL_W - 8))}px`,
+                    top: `${Math.round(colBox.top)}px`,
+                    bottom: `${Math.round(Math.min(Math.max(colBox.bottom - dragOffset.dy, 112), (typeof window !== 'undefined' ? window.innerHeight : 800) - 180))}px`,
+                  }
+                : undefined
+            }
             onMouseDown={keepFocus}
           >
             {threadEl}
+            {/* Owner review: the grab handle. Dragging moves the chat's anchor
+                point; the window above it grows or shrinks with where it sits. */}
+            <button
+              type="button"
+              className={styles.dragHandle}
+              aria-label="Move the chat"
+              title="Move the chat"
+              onPointerDown={startColumnDrag}
+            >
+              <span aria-hidden="true" />
+            </button>
           </div>
           <div className={styles.visitorBar} onMouseDown={keepFocus}>
             {composerEl}
