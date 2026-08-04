@@ -53,8 +53,8 @@ export const SECTIONS: Section[] = [
     imageAlt: "Early British working dogs, the hunting and guarding types found before breeds were standardised",
   },
   {
-    title: "Medieval and Tudor Britain",
-    accent: "Tudor Britain",
+    title: "Tudor Britain",
+    accent: "Britain",
     /* c1500, the Tudor-times dog strip re-homed here after "Dogs in the armed
        forces" was hidden. NOT ancient-medieval: Britain's First Dogs carries
        that run, so repeating it would double the same dogs. */

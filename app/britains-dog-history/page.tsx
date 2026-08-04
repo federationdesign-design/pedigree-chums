@@ -100,8 +100,8 @@ const SECTIONS: Section[] = [
     imageAlt: "Medieval working dogs at their jobs, from pack hounds to herders",
   },
   {
-    title: "Medieval and Tudor Britain",
-    accent: "Tudor Britain",
+    title: "Tudor Britain",
+    accent: "Britain",
     era: "c1500",
     intro:
       "Britain's bond with dogs stretches back deep into the Middle Ages, when hounds were prized hunting partners of kings and nobles. By the Tudor age, dogs had also become beloved companions, doted on at the royal court itself.",
