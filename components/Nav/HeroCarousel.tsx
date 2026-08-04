@@ -24,7 +24,7 @@ type Slide = {
 const SLIDES: Slide[] = [
   {
     href: "/good-dog-bad-dog/argos",
-    video: "/menuflash-argos-opt.mp4",
+    img: "/history/Argos-hero.jpg",
     tagGood: "Good dog",
     tags: ["Homer", "The Odyssey"],
     titleAccent: "Argos:",
@@ -33,7 +33,7 @@ const SLIDES: Slide[] = [
   },
   {
     href: "/good-dog-bad-dog/anubis",
-    video: "/history/Anubis-hero-vid.mp4",
+    img: "/history/Anubis-hero.jpg",
     tagBad: "Bad dog",
     tags: ["Egypt", "Myth"],
     titleAccent: "Anubis:",

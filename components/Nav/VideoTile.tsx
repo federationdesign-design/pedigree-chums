@@ -75,7 +75,7 @@ export default function VideoTile({
       onMouseLeave={handleLeave}
     >
       <span className={styles.tileImg} aria-hidden>
-        <video ref={vref} className={styles.tileImgTag} src={src} muted playsInline loop={loop} autoPlay preload="auto" />
+        <video ref={vref} className={styles.tileImgTag} src={src} muted playsInline loop={loop} autoPlay preload="metadata" />
       </span>
       <span className={styles.tileMeta}>
         <span className={styles.tileLabel}>
