@@ -95,7 +95,7 @@ export default function ChumDropTile({
             src={src}
             muted
             playsInline
-            preload="auto"
+            preload="metadata"
             onTimeUpdate={() => onTimeUpdate(i)}
             onEnded={() => onEnded(i)}
           />
