@@ -185,9 +185,13 @@
 .overlayScroll {
   justify-content: flex-start;
   align-items: stretch;
-  overflow-y: auto;
+  /* Rebuild: the overlay is the scroll container and nothing else touches it.
+     display:block, not flex -- a flex column with align-items:stretch was the
+     one thing never ruled out, and iOS treats an overflowing flex child
+     differently from an overflowing block child. */
+  display: block;
+  overflow-y: scroll;
   -webkit-overflow-scrolling: touch;
-  overscroll-behavior: contain;
   /* Header + hamburger are hidden while open, so content sits near the top.
      Top pad only clears the floating close button. */
   padding: clamp(64px, 8vh, 96px) clamp(12px, 3vw, 32px) 60px;

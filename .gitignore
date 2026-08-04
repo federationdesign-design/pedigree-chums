@@ -51,3 +51,6 @@ agent/
 # Playwright
 /test-results/
 /playwright-report/
+
+.claude/
+*.psd
