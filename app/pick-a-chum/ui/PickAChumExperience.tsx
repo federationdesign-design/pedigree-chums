@@ -269,8 +269,10 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
       if (!r) return;
       const gap = 12;
       const roomRight = window.innerWidth - (r.right + gap);
-      const left = roomRight >= COL_W + 12 ? r.right + gap : Math.max(12, r.left - gap - COL_W);
-      setColBox({ left, top: COL_TOP_CLEAR, bottom: Math.max(0, window.innerHeight - r.bottom) });
+      const rawLeft = roomRight >= COL_W + 12 ? r.right + gap : Math.max(12, r.left - gap - COL_W);
+      const left = Math.min(Math.max(rawLeft, 8), window.innerWidth - COL_W - 8);
+      const bottom = Math.min(Math.max(window.innerHeight - r.bottom, 112), window.innerHeight - 180);
+      setColBox({ left, top: COL_TOP_CLEAR, bottom });
     };
     measure();
     const settle = window.setTimeout(measure, 600); // after the pop-in lands
@@ -279,7 +281,7 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
       window.clearTimeout(settle);
       window.removeEventListener('resize', measure);
     };
-  }, [wide, phase, dog, vw, swap, minimised]);
+  }, [wide, phase, dog, vw, swap, minimised, dragOffset]);
 
   const clearTimers = useCallback(() => {
     timersRef.current.forEach((id) => window.clearTimeout(id));
@@ -795,7 +797,7 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
                     key={d}
                     ref={fanAnchorRef}
                     className={`${styles.dogAnchor} ${styles.anchorFan} ${anchorSwap}`}
-                    style={{ left: `${round1(p.left)}px`, top: `${round1(p.top)}px` }}
+                    style={{ left: `${round1(p.left + dragOffset.dx)}px`, top: `${round1(p.top + dragOffset.dy)}px` }}
                     role="img"
                     aria-label={dead ? 'the Collie plays dead' : roll ? 'the Collie rolls over' : dogInfo(dog).name}
                   >
@@ -868,15 +870,7 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
         <>
           <div
             className={styles.chatColumn}
-            style={
-              colBox
-                ? {
-                    left: `${Math.round(Math.min(Math.max(colBox.left + dragOffset.dx, 8), vw - COL_W - 8))}px`,
-                    top: `${Math.round(colBox.top)}px`,
-                    bottom: `${Math.round(Math.min(Math.max(colBox.bottom - dragOffset.dy, 112), (typeof window !== 'undefined' ? window.innerHeight : 800) - 180))}px`,
-                  }
-                : undefined
-            }
+            style={colBox ? { left: `${Math.round(colBox.left)}px`, top: `${Math.round(colBox.top)}px`, bottom: `${Math.round(colBox.bottom)}px` } : undefined}
             onMouseDown={keepFocus}
           >
             {threadEl}
@@ -889,7 +883,13 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
               title="Move the chat"
               onPointerDown={startColumnDrag}
             >
-              <span aria-hidden="true" />
+              {/* The standard four-arrow move glyph, inline (no asset). */}
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path
+                  d="M12 2l3 3h-2v5h5V8l3 3-3 3v-2h-5v5h2l-3 3-3-3h2v-5H6v2l-3-3 3-3v2h5V5H9l3-3z"
+                  fill="currentColor"
+                />
+              </svg>
             </button>
           </div>
           <div className={styles.visitorBar} onMouseDown={keepFocus}>

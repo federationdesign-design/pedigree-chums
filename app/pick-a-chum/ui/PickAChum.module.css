@@ -727,13 +727,13 @@
 .dragHandle {
   position: absolute;
   right: -6px;
-  bottom: -38px;
+  bottom: -42px;
   width: 44px;
-  height: 32px;
+  height: 44px;
   padding: 0;
   border: none;
   background: none;
-  cursor: grab;
+  cursor: move;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -743,17 +743,16 @@
 .dragHandle:active {
   cursor: grabbing;
 }
-.dragHandle span {
-  width: 28px;
-  height: 14px;
-  border-radius: 7px;
+/* The four-arrow move glyph on a yellow disc, navy stroke, house tokens. */
+.dragHandle svg {
+  width: 32px;
+  height: 32px;
+  padding: 5px;
+  box-sizing: border-box;
+  border-radius: 50%;
   background: var(--pc-ui-yellow);
   border: 2px solid var(--pc-ui-navy);
-  /* Three grip dots drawn with a gradient, no asset. */
-  background-image: radial-gradient(circle 1.6px, var(--pc-ui-navy) 1.5px, transparent 1.6px);
-  background-size: 7px 14px;
-  background-position: 3px center;
-  background-repeat: repeat-x;
+  color: var(--pc-ui-navy);
 }
 .dragHandle:focus-visible {
   outline: 3px solid var(--pc-ui-yellow);
