@@ -218,12 +218,14 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
     return () => document.body.removeAttribute('data-pc-min');
   }, [minimised]);
 
-  // Task 130: the conversation column sits ADJACENT to the chosen dog, who
-  // stays exactly where the fan put her. It starts beside her (top just above
-  // her centre) and runs down past her toward the visitor bar; right of the
-  // dog when there is room, flipped to the left when the viewport narrows.
-  // Positioned from the anchor medallion's measured rect, so it tracks the
-  // arc, the selector scale, any resize and the handover pops.
+  // Task 130/131: the conversation column sits at the chosen dog's side (right
+  // when there is room, flipped left when the viewport narrows), and uses the
+  // FULL height: from just below the nav down to a generous clearance above
+  // the visitor bar (Task 131 -- the space above the dog was wasted, and the
+  // white bubbles ran into the white bar). The dog stays where she is; the
+  // content hugs the bottom of the window and rises toward the top as the
+  // conversation grows. Left position is measured from the anchor medallion's
+  // rect, so it tracks the arc, the selector scale, resizes and handover pops.
   const fanAnchorRef = useRef<HTMLDivElement | null>(null);
   const [colBox, setColBox] = useState<{ left: number; top: number } | null>(null);
   const COL_W = 380;
@@ -236,8 +238,7 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
       const gap = 12;
       const roomRight = window.innerWidth - (r.right + gap);
       const left = roomRight >= COL_W + 12 ? r.right + gap : Math.max(12, r.left - gap - COL_W);
-      const top = Math.max(COL_TOP_CLEAR, r.top + r.height / 2 - 40);
-      setColBox({ left, top });
+      setColBox({ left, top: COL_TOP_CLEAR });
     };
     measure();
     const settle = window.setTimeout(measure, 600); // after the pop-in lands
@@ -640,23 +641,18 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
             </div>
           ) : (
             <div key={msg.id} className={`${styles.msgRow} ${styles.rowDog}`}>
-              {/* Task 108: the dog's profile picture beside its message; hidden on the support
-                  surface, which conceals the dog identity. aria-hidden -- the nameplate names it. */}
-              {!msg.support && msg.dog && (
-                <img
-                  className={styles.dogProfile}
-                  src={PROFILE_IMG[msg.dog]}
-                  alt=""
-                  aria-hidden="true"
-                  // Task 108: until the (resized) JPEGs land in public/, a missing file hides
-                  // gracefully instead of showing a broken-image icon.
-                  onError={(e) => {
-                    e.currentTarget.style.display = 'none';
-                  }}
-                />
-              )}
+              {/* Task 132: no per-bubble avatar or nameplate -- the dog's face
+                  and name live once, on the medallion at the top of the
+                  column. A visually hidden speaker label keeps each bubble
+                  attributed for screen readers. */}
               <div className={styles.bubbleDog}>
-                <div className={`${styles.nameplate}${msg.support ? ` ${styles.nameplateSupport}` : ''}`}>{msg.name}</div>
+                {/* S12: the support surface keeps its VISIBLE header -- it is
+                    the safety surface's label, not name repetition. */}
+                {msg.support ? (
+                  <div className={styles.supportPlate}>{msg.name}</div>
+                ) : (
+                  msg.name && <span className={styles.srOnly}>{msg.name} says</span>
+                )}
                 {msg.typing ? (
                   <div className={styles.typingDots} aria-hidden="true">
                     <span />
@@ -786,6 +782,9 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
                     <button type="button" className={styles.minimise} aria-label="Minimise the chat" onClick={() => setMinimised(true)}>
                       <span aria-hidden="true" />
                     </button>
+                    {/* Task 132: the dog's name, once, beside her medallion.
+                        Reads the active dog, so a switch renames it. */}
+                    <div className={styles.anchorName} aria-hidden="true">{dogInfo(dog).name}</div>
                   </div>
                 );
               }
@@ -896,6 +895,8 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
               <button type="button" className={styles.close} aria-label="Close Pick a Chum" onClick={onClose}>
                 <img src="/red-icon.svg" alt="" aria-hidden="true" />
               </button>
+              {/* Task 132: the name once, on the medallion (mobile too). */}
+              <div className={styles.anchorName} aria-hidden="true">{dogInfo(dog).name}</div>
             </div>
             {composerEl}
           </div>
