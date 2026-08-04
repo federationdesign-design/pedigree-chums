@@ -118,7 +118,7 @@
   pointer-events: none;
   /* Task 118: extent widened (peak unchanged) so the tint still has meaningful alpha ~400px across and
      down, where the selector fans out -- not just the logo corner. */
-  background: radial-gradient(880px 880px at top left, rgba(0, 169, 239, 0.42) 0%, rgba(0, 169, 239, 0.26) 32%, rgba(0, 169, 239, 0.12) 55%, rgba(0, 169, 239, 0) 100%);
+  background: radial-gradient(1350px 1140px at 0 0, rgba(0, 169, 239, 0.85) 0%, rgba(0, 169, 239, 0.55) 30%, rgba(0, 169, 239, 0.22) 60%, rgba(0, 169, 239, 0) 100%);
 }
 .root {
   position: fixed;
@@ -132,7 +132,7 @@
 .wash {
   position: absolute;
   inset: 0;
-  background: var(--pc-focus-wash);
+  background: transparent;
   z-index: 0;
   /* Task 105: the dimming layer no longer captures clicks (it inherits none from .root); the page
      underneath is clickable/scrollable. The old click-the-wash-to-close is intentionally gone -- the
@@ -680,6 +680,86 @@
     transform: none;
   }
   .typingDots span {
+    animation: none;
+  }
+}
+
+/* ---- Task 129: the conversation hangs off the dog ----
+   After a pick the fan (the Task 121 arc, restored) STAYS. The chosen dog
+   becomes the anchor in place, the other three recede but stay clickable,
+   the thread hangs in a column beneath the chosen dog (or grows UPWARD for
+   the two low dogs, newest message nearest her), and the input is the
+   visitor's own bar, fixed at the bottom centre of the viewport. Above 480px
+   only: mobile keeps the stacked .panel until Task 120. */
+
+/* The other three dogs, receded: smaller and quieter but present, so a child
+   can see them and switch without going back a step. */
+.dogReceded {
+  transform: scale(0.58);
+  filter: saturate(0.55) brightness(0.92);
+  animation: none;
+  transition: transform 0.18s ease, filter 0.18s ease;
+}
+.dogReceded:hover,
+.dogReceded:focus-visible {
+  transform: scale(0.72);
+  filter: saturate(1) brightness(1);
+}
+
+/* The chosen dog's medallion, sitting exactly in her fan slot: same box as
+   the .dogBtn she replaces (128px), so nothing moves on pick. */
+.anchorFan {
+  position: absolute;
+  width: 128px;
+  height: 128px;
+  z-index: 3;
+}
+
+/* The conversation column beneath the chosen dog. Position is set inline from
+   the anchor's measured rect. pointer-events: none keeps the page beneath
+   clickable (Task 116); bubbles and controls opt back in above. The bottom
+   stops above the visitor bar. */
+.chatColumn {
+  position: fixed;
+  width: 380px;
+  bottom: 96px;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  pointer-events: none;
+}
+/* The upward variant (Terrier and Boxer): bottom-anchored just above the dog
+   via inline top/bottom, content stuck to the BOTTOM edge so the newest
+   message sits nearest her and older ones stack above. */
+.chatColumnUp .threadInner {
+  margin-bottom: 0;
+  margin-top: auto;
+}
+
+/* The visitor's input: fixed, bottom centre, attached to no dog. Centred with
+   insets + auto margins, NOT translateX: the pcGrow entrance animates
+   transform with fill both, which would replace a translate and shove the bar
+   off centre. */
+.visitorBar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  margin-inline: auto;
+  bottom: 16px;
+  width: min(560px, calc(100vw - 32px));
+  z-index: 4;
+  pointer-events: none;
+  animation: pcGrow 340ms cubic-bezier(0.34, 1.4, 0.64, 1) both;
+}
+.visitorBar .composer {
+  width: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dogReceded {
+    transition: none;
+  }
+  .visitorBar {
     animation: none;
   }
 }

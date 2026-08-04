@@ -64,6 +64,8 @@ const SELECT_ORDER: Dog[] = ['collie', 'labrador', 'terrier', 'boxer'];
 // arc, change ARC_START_DEG alone (one number, was four hardcoded left/top pairs). The dog positions
 // AND the connector lines both derive from here, so they can never drift. The mobile fan is shrunk via
 // --pc-selector-scale (CSS), not here, so these selector-space coordinates are breakpoint-independent.
+// (Task 129 briefly re-laid this as a level row; the owner restored the arc. The dogs stay in these
+// exact positions when one is picked, and the two LOW dogs get upward-growing columns instead.)
 const ARC_RADIUS = 300;
 const ARC_CENTER = 64; // the "pick for me" anchor centre, in selector space
 const ARC_START_DEG = 35;
@@ -75,6 +77,10 @@ const dogPos = (i: number) => ({ left: ARC_RADIUS * Math.cos(dogAngleRad(i)), to
 // Dog centre (connector far end) and the near end on the icon's body edge.
 const dogCentre = (i: number) => ({ x: ARC_CENTER + ARC_RADIUS * Math.cos(dogAngleRad(i)), y: ARC_CENTER + ARC_RADIUS * Math.sin(dogAngleRad(i)) });
 const lineStart = (i: number) => ({ x: ARC_CENTER + ARC_BODY_R * Math.cos(dogAngleRad(i)), y: ARC_CENTER + ARC_BODY_R * Math.sin(dogAngleRad(i)) });
+// Task 129: the Terrier and Boxer sit low on the arc with little room beneath,
+// so their conversation columns grow UPWARD from the dog (owner ruling);
+// newest message nearest her, older ones above.
+const UP_COLUMN_DOGS: ReadonlySet<Dog> = new Set(['terrier', 'boxer']);
 const round1 = (n: number) => Math.round(n * 10) / 10;
 
 function dogInfo(dog: Dog): { name: string; image: string } {
@@ -190,6 +196,47 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
   const recSessionRef = useRef(restored ? restored.recSessionId || '' : '');
   // The active typing performance, so a tap or Enter can complete it instantly.
   const playbackRef = useRef<{ id: number; plan: TypingPlan; closed?: boolean; done: boolean } | null>(null);
+
+  // Task 129 targets above 480px only; at or below, the pre-129 stacked panel
+  // renders unchanged and mobile stays Task 120's problem.
+  const [vw, setVw] = useState(() => (typeof window === 'undefined' ? 1280 : window.innerWidth));
+  useEffect(() => {
+    const onResize = () => setVw(window.innerWidth);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+  const wide = vw > 480;
+
+  // Task 129: the conversation column hangs off the chosen dog, who stays
+  // exactly where the fan put her. Downward for the high dogs; UPWARD for the
+  // low two (UP_COLUMN_DOGS), bottom-anchored just above the dog so the
+  // newest message sits nearest her. Positioned from the anchor medallion's
+  // measured rect, so it tracks the arc, the selector scale, any resize and
+  // the handover pops (re-measured after the pop settles).
+  const fanAnchorRef = useRef<HTMLDivElement | null>(null);
+  const [colBox, setColBox] = useState<{ left: number; top?: number; bottom?: number; up: boolean } | null>(null);
+  const COL_W = 380;
+  const COL_TOP_CLEAR = 84; // stay below the fixed nav
+  useEffect(() => {
+    if (!wide || phase === 'selecting') return;
+    const measure = () => {
+      const r = fanAnchorRef.current?.getBoundingClientRect();
+      if (!r) return;
+      const left = Math.min(Math.max(r.left + r.width / 2 - COL_W / 2, 12), window.innerWidth - COL_W - 12);
+      if (UP_COLUMN_DOGS.has(dog)) {
+        setColBox({ left, top: COL_TOP_CLEAR, bottom: window.innerHeight - (r.top - 10), up: true });
+      } else {
+        setColBox({ left, top: r.bottom + 10, up: false });
+      }
+    };
+    measure();
+    const settle = window.setTimeout(measure, 600); // after the pop-in lands
+    window.addEventListener('resize', measure);
+    return () => {
+      window.clearTimeout(settle);
+      window.removeEventListener('resize', measure);
+    };
+  }, [wide, phase, dog, vw, swap]);
 
   const clearTimers = useCallback(() => {
     timersRef.current.forEach((id) => window.clearTimeout(id));
@@ -568,139 +615,238 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
   // performs, and no-ops after the session closes.
   const anchorSwap = swap === 'out' ? styles.anchorOut : swap === 'in' ? styles.anchorIn : '';
 
+  // Task 129: the thread and composer render in two homes -- the >480px
+  // column-under-the-dog plus fixed visitor bar, or the pre-129 stacked panel
+  // at mobile widths -- so both are built once here. Only one home mounts at
+  // a time, so the shared refs stay unique.
+  const threadEl = (
+    /* Tap anywhere in the thread to complete an in-progress performance. */
+    <div className={styles.thread} ref={threadRef} onClick={completeTheatre}>
+      <div className={styles.threadInner}>
+        {messages.map((msg) =>
+          msg.who === 'user' ? (
+            <div key={msg.id} className={`${styles.msgRow} ${styles.rowUser}`}>
+              <div className={styles.bubbleUser}>{msg.text}</div>
+            </div>
+          ) : (
+            <div key={msg.id} className={`${styles.msgRow} ${styles.rowDog}`}>
+              {/* Task 108: the dog's profile picture beside its message; hidden on the support
+                  surface, which conceals the dog identity. aria-hidden -- the nameplate names it. */}
+              {!msg.support && msg.dog && (
+                <img
+                  className={styles.dogProfile}
+                  src={PROFILE_IMG[msg.dog]}
+                  alt=""
+                  aria-hidden="true"
+                  // Task 108: until the (resized) JPEGs land in public/, a missing file hides
+                  // gracefully instead of showing a broken-image icon.
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                  }}
+                />
+              )}
+              <div className={styles.bubbleDog}>
+                <div className={`${styles.nameplate}${msg.support ? ` ${styles.nameplateSupport}` : ''}`}>{msg.name}</div>
+                {msg.typing ? (
+                  <div className={styles.typingDots} aria-hidden="true">
+                    <span />
+                    <span />
+                    <span />
+                  </div>
+                ) : (
+                  // aria-hidden while still typing so the character stream is
+                  // never announced; the completed text is announced once via
+                  // the live region below.
+                  <p className={styles.dialogue} aria-hidden={!msg.done}>
+                    {msg.display ?? msg.text}
+                  </p>
+                )}
+
+                {/* Task 115: the game board / sheep tiles / drawing. MONOSPACE + pre so the ASCII
+                    keeps its shape (a proportional font collapses it). Not typed; it appears whole. */}
+                {msg.gameOutput && (
+                  <pre className={styles.gameOutput}>{msg.gameOutput}</pre>
+                )}
+
+                {msg.done && msg.action && (msg.action.kind === 'popup' || msg.closed || msg.contextualLink) && (
+                  <div className={styles.actionWrap}>
+                    <ActionLink command={msg.action} />
+                  </div>
+                )}
+              </div>
+            </div>
+          )
+        )}
+      </div>
+    </div>
+  );
+  const composerEl = (
+    <form
+      className={styles.composer}
+      onSubmit={(e) => {
+        e.preventDefault();
+        send();
+      }}
+    >
+      <input
+        ref={inputRef}
+        className={styles.input}
+        aria-label="Type something here"
+        placeholder="Type something here"
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+      />
+      <button type="submit" className={styles.go} aria-label="Send">
+        GO
+      </button>
+    </form>
+  );
+  // Task 105: clicking the now-usable page blurs the input; when the visitor
+  // clicks back into a non-interactive part of the chat, keep focus in the
+  // input (else Task 82's fix is undone).
+  const keepFocus = (e: { target: unknown; preventDefault: () => void }) => {
+    const t = e.target as HTMLElement;
+    if (!t.closest('button, a, input, textarea, [tabindex]')) {
+      e.preventDefault();
+      inputRef.current?.focus();
+    }
+  };
+
   return (
     <div className={styles.root} role="dialog" aria-label="Pick a Chum" aria-modal="false">
       {/* Task 105: the wash dims but no longer captures clicks (pointer-events via .wash/.root), so the
           page beneath stays usable; it no longer closes on click (X and Escape still close). */}
       <div className={styles.wash} />
 
-      {phase === 'selecting' ? (
+      {(phase === 'selecting' || wide) && (
         <div className={styles.selectorWrap}>
           <div className={styles.selector}>
-            <svg className={styles.connectors} viewBox="0 0 440 440" aria-hidden="true" focusable="false">
-              {/* Task 113 + 121: each radial starts at the icon's circular-body edge (ARC_BODY_R from the
-                  anchor centre) and runs to its dog's centre. Both ends are derived from the ARC_* arc, so
-                  the lines always track the dogs. viewBox is square (440), overflow visible, so a dog that
-                  fans past the left edge still gets its line drawn. */}
-              {SELECT_ORDER.map((_d, i) => {
-                const s = lineStart(i);
-                const c = dogCentre(i);
-                return (
-                  <line
-                    key={i}
-                    className={styles.connectorLine}
-                    style={{ animationDelay: `${0.15 + i * 0.3}s` }}
-                    x1={round1(s.x)}
-                    y1={round1(s.y)}
-                    x2={round1(c.x)}
-                    y2={round1(c.y)}
-                  />
-                );
-              })}
-            </svg>
+            {phase === 'selecting' && (
+              <svg className={styles.connectors} viewBox="0 0 440 440" aria-hidden="true" focusable="false">
+                {/* Task 113 + 121: each radial starts at the icon's circular-body edge (ARC_BODY_R from
+                    the anchor centre) and runs to its dog's centre. Both ends derive from the arc, so
+                    the lines always track the dogs. viewBox is square (440), overflow visible, so a dog
+                    that fans past its edge still gets its line drawn. */}
+                {SELECT_ORDER.map((_d, i) => {
+                  const s = lineStart(i);
+                  const c = dogCentre(i);
+                  return (
+                    <line
+                      key={i}
+                      className={styles.connectorLine}
+                      style={{ animationDelay: `${0.15 + i * 0.3}s` }}
+                      x1={round1(s.x)}
+                      y1={round1(s.y)}
+                      x2={round1(c.x)}
+                      y2={round1(c.y)}
+                    />
+                  );
+                })}
+              </svg>
+            )}
             {SELECT_ORDER.map((d, i) => {
               const info = dogInfo(d);
               const p = dogPos(i);
+              // Task 129: after a pick the fan STAYS. The chosen dog becomes the
+              // conversation anchor IN PLACE (she never moves); the medallion
+              // markup is reused wholesale so play dead, roll over and the
+              // handover pops all still ride on her.
+              if (phase !== 'selecting' && d === dog) {
+                return (
+                  <div
+                    key={d}
+                    ref={fanAnchorRef}
+                    className={`${styles.dogAnchor} ${styles.anchorFan} ${anchorSwap}`}
+                    style={{ left: `${round1(p.left)}px`, top: `${round1(p.top)}px` }}
+                    role="img"
+                    aria-label={dead ? 'the Collie plays dead' : roll ? 'the Collie rolls over' : dogInfo(dog).name}
+                  >
+                    {/* Task 78 fix: the tricks apply to the dog image layer ONLY, so the red X and the
+                        ring do not go black or rotate with her. */}
+                    <div
+                      className={`${styles.dogFace} ${dead ? styles.anchorDead : ''} ${roll ? styles.anchorRoll : ''}`}
+                      style={{ backgroundImage: `url("${PROFILE_IMG[dog]}")` }}
+                      onAnimationEnd={() => setRoll(false)}
+                    />
+                    <button type="button" className={styles.close} aria-label="Close Pick a Chum" onClick={onClose}>
+                      <img src="/red-icon.svg" alt="" aria-hidden="true" />
+                    </button>
+                  </div>
+                );
+              }
+              // Task 129: the other three RECEDE rather than disappear (owner
+              // ruling): still visible, still clickable. Clicking one starts a
+              // FRESH conversation with that dog (selectDog semantics); a
+              // mid-conversation handover that keeps history is engine
+              // territory and stays with the typed transfer flow.
+              const receded = phase !== 'selecting';
               return (
                 <button
                   key={d}
                   type="button"
-                  className={styles.dogBtn}
+                  className={`${styles.dogBtn}${receded ? ` ${styles.dogReceded}` : ''}`}
                   onClick={() => selectDog(d)}
-                  title={info.name}
-                  aria-label={info.name}
-                  style={{ backgroundImage: `url("${PROFILE_IMG[d]}")`, left: `${round1(p.left)}px`, top: `${round1(p.top)}px`, animationDelay: `${0.15 + i * 0.3}s` }}
+                  title={receded ? `Start again with ${info.name}` : info.name}
+                  aria-label={receded ? `Start again with ${info.name}` : info.name}
+                  style={{ backgroundImage: `url("${PROFILE_IMG[d]}")`, left: `${round1(p.left)}px`, top: `${round1(p.top)}px`, animationDelay: receded ? '0s' : `${0.15 + i * 0.3}s` }}
                 />
               );
             })}
-            <button
-              type="button"
-              className={styles.randomBtn}
-              onClick={() => selectDog(SELECT_ORDER[Math.floor(Math.random() * SELECT_ORDER.length)])}
-              aria-label="Pick for me"
-              title="Pick for me"
-            >
-              <PickAChumIcon />
-            </button>
-            {/* Task 126: the selector's close control -- a readable red X on the centre icon's top-right,
-                closing the selector back to the closed launcher (same onClose as the chat medallion X). */}
-            <button type="button" className={styles.selectorClose} aria-label="Close Pick a Chum" onClick={onClose}>
-              <img src="/red-icon.svg" alt="" aria-hidden="true" />
-            </button>
+            {phase === 'selecting' && (
+              <>
+                <button
+                  type="button"
+                  className={styles.randomBtn}
+                  onClick={() => selectDog(SELECT_ORDER[Math.floor(Math.random() * SELECT_ORDER.length)])}
+                  aria-label="Pick for me"
+                  title="Pick for me"
+                >
+                  <PickAChumIcon />
+                </button>
+                {/* Task 126: the selector's close control -- a readable red X on the centre icon's
+                    top-right, closing the selector back to the closed launcher (same onClose as the
+                    chat medallion X). */}
+                <button type="button" className={styles.selectorClose} aria-label="Close Pick a Chum" onClick={onClose}>
+                  <img src="/red-icon.svg" alt="" aria-hidden="true" />
+                </button>
+              </>
+            )}
           </div>
         </div>
-      ) : (
-        <div
-          className={styles.panel}
-          onMouseDown={(e) => {
-            // Task 105: clicking the now-usable page blurs the input; when the visitor clicks back into
-            // a non-interactive part of the panel, keep focus in the input (else Task 82's fix is undone).
-            const t = e.target as HTMLElement;
-            if (!t.closest('button, a, input, textarea, [tabindex]')) {
-              e.preventDefault();
-              inputRef.current?.focus();
+      )}
+
+      {/* Task 129 (>480px): the conversation hangs in a column beneath the
+          chosen dog, and the input is the visitor's own, fixed at the bottom
+          centre of the viewport, attached to no dog. */}
+      {phase !== 'selecting' && wide && (
+        <>
+          <div
+            className={`${styles.chatColumn}${colBox?.up ? ` ${styles.chatColumnUp}` : ''}`}
+            style={
+              colBox
+                ? colBox.up
+                  ? { left: `${Math.round(colBox.left)}px`, top: `${Math.round(colBox.top ?? 0)}px`, bottom: `${Math.round(colBox.bottom ?? 0)}px` }
+                  : { left: `${Math.round(colBox.left)}px`, top: `${Math.round(colBox.top ?? 0)}px` }
+                : undefined
             }
-          }}
-        >
-          {/* Tap anywhere in the thread to complete an in-progress performance. */}
-          <div className={styles.thread} ref={threadRef} onClick={completeTheatre}>
-            <div className={styles.threadInner}>
-              {messages.map((msg) =>
-                msg.who === 'user' ? (
-                  <div key={msg.id} className={`${styles.msgRow} ${styles.rowUser}`}>
-                    <div className={styles.bubbleUser}>{msg.text}</div>
-                  </div>
-                ) : (
-                  <div key={msg.id} className={`${styles.msgRow} ${styles.rowDog}`}>
-                    {/* Task 108: the dog's profile picture beside its message; hidden on the support
-                        surface, which conceals the dog identity. aria-hidden -- the nameplate names it. */}
-                    {!msg.support && msg.dog && (
-                      <img
-                        className={styles.dogProfile}
-                        src={PROFILE_IMG[msg.dog]}
-                        alt=""
-                        aria-hidden="true"
-                        // Task 108: until the (resized) JPEGs land in public/, a missing file hides
-                        // gracefully instead of showing a broken-image icon.
-                        onError={(e) => {
-                          e.currentTarget.style.display = 'none';
-                        }}
-                      />
-                    )}
-                    <div className={styles.bubbleDog}>
-                      <div className={`${styles.nameplate}${msg.support ? ` ${styles.nameplateSupport}` : ''}`}>{msg.name}</div>
-                      {msg.typing ? (
-                        <div className={styles.typingDots} aria-hidden="true">
-                          <span />
-                          <span />
-                          <span />
-                        </div>
-                      ) : (
-                        // aria-hidden while still typing so the character stream is
-                        // never announced; the completed text is announced once via
-                        // the live region below.
-                        <p className={styles.dialogue} aria-hidden={!msg.done}>
-                          {msg.display ?? msg.text}
-                        </p>
-                      )}
-
-                      {/* Task 115: the game board / sheep tiles / drawing. MONOSPACE + pre so the ASCII
-                          keeps its shape (a proportional font collapses it). Not typed; it appears whole. */}
-                      {msg.gameOutput && (
-                        <pre className={styles.gameOutput}>{msg.gameOutput}</pre>
-                      )}
-
-                      {msg.done && msg.action && (msg.action.kind === 'popup' || msg.closed || msg.contextualLink) && (
-                        <div className={styles.actionWrap}>
-                          <ActionLink command={msg.action} />
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )
-              )}
+            onMouseDown={keepFocus}
+          >
+            {threadEl}
+            {/* Screen-reader announcements: each dog message once, whole, when done. */}
+            <div className={styles.srOnly} aria-live="polite" aria-atomic="true">
+              {announce}
             </div>
           </div>
+          <div className={styles.visitorBar} onMouseDown={keepFocus}>
+            {composerEl}
+          </div>
+        </>
+      )}
+
+      {phase !== 'selecting' && !wide && (
+        <div className={styles.panel} onMouseDown={keepFocus}>
+          {/* The pre-129 stacked layout, kept verbatim for mobile until Task 120. */}
+          {threadEl}
           {/* Screen-reader announcements: each dog message once, whole, when done. */}
           <div className={styles.srOnly} aria-live="polite" aria-atomic="true">
             {announce}
@@ -724,25 +870,7 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
                 <img src="/red-icon.svg" alt="" aria-hidden="true" />
               </button>
             </div>
-            <form
-              className={styles.composer}
-              onSubmit={(e) => {
-                e.preventDefault();
-                send();
-              }}
-            >
-              <input
-                ref={inputRef}
-                className={styles.input}
-                aria-label="Type something here"
-                placeholder="Type something here"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-              />
-              <button type="submit" className={styles.go} aria-label="Send">
-                GO
-              </button>
-            </form>
+            {composerEl}
           </div>
         </div>
       )}
