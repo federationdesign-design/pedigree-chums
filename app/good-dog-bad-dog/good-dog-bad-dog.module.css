@@ -626,8 +626,8 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
-  position: sticky;
-  top: 120px;
+  /* Not sticky: there is enough content down the right-hand column that it
+     does not need to follow the reader. */
 }
 
 .sidebarCard {
@@ -1009,7 +1009,7 @@
 
 /* Desktop keeps the plain version of choreographed content */
 .desktopOnly {
-  display: block;
+  display: none;
 }
 
 /* Mobile-only back link at the top of the article panel */
@@ -1188,7 +1188,7 @@
 
 /* ── Phase 2: inline scenes (mobile) ────────────────────────── */
 .sceneMobile {
-  display: none;
+  display: block;
 }
 
 @media (max-width: 768px) {
@@ -1380,4 +1380,93 @@
     margin-top: -42svh;
     padding: 0 20px 40px;
   }
+}
+
+@media (min-width: 769px) {
+  .sidebarCard { padding: 2.5rem; }
+  .essayBullets li::marker, .evidenceList li::marker { font-size: 1.4em; }
+  .essayBullets li { font-size: 1.05rem; }
+}
+
+@media (min-width: 769px) {
+  /* Size & Build: measurements stack in one column beside the bullets. */
+  .sizeBuildCardWrap { display: grid; grid-template-columns: auto 1fr; }
+  .sizeBuildGrid { grid-template-columns: 1fr !important; }
+  .sizeBuildBullets { padding-left: 0 !important; }
+}
+
+@media (min-width: 769px) {
+  /* Desktop review 2.12-2.15: the parallax and timeline scenes were only
+     styled inside the mobile query, so on desktop the ancestor image was not
+     full width, the card did not sit above it, and the timeline had no panel.
+     These mirror the mobile rules at desktop widths. */
+  .parallaxScene { position: relative; }
+  .parallaxImgWrap {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+    z-index: 0;
+    overflow: hidden;
+  }
+  .parallaxImgWrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .parallaxImgWrap .driftImg { height: 125%; will-change: transform; }
+  .parallaxScene.driftScene::after { content: ""; display: block; height: 38svh; }
+  .parallaxContent {
+    position: relative;
+    z-index: 1;
+    margin-top: -42svh;
+    padding: 0 20px 40px;
+  }
+  .parallaxScene.tightBottom { margin-bottom: 0; }
+  .tightBottom .parallaxContent { padding-bottom: 0; }
+
+  .timelineScene {
+    padding: 26px 20px 20px;
+    background: var(--navy, #0a3a57);
+    border-radius: 16px;
+  }
+  .timelineScene.tightTop { margin-top: -25px; position: relative; z-index: 3; }
+  .tlBody { position: relative; }
+}
+
+@media (min-width: 769px) {
+  /* Scenes that only make sense on a phone. */
+  .hideOnDesktop { display: none !important; }
+}
+
+@media (min-width: 769px) {
+  /* 4, 11: choreographed bullet text matches body copy. */
+  .essayBody :global(.choreoBullets) li { font-size: 1.55rem !important; line-height: 1.5; }
+  /* 14: the sidebar Argos card gets tighter side padding. */
+  .sidebar .sidebarCard { padding-left: 1rem; padding-right: 1rem; }
+}
+
+@media (min-width: 769px) {
+  /* 5: the choreographed caption matches the other captions -- inset in a
+     navy box rather than sitting bare under the image. */
+  .choreoCaption {
+    font-family: var(--font-body, "Montserrat", sans-serif);
+    font-size: calc(0.78rem + 2pt);
+    font-weight: 500;
+    font-style: italic;
+    color: #ffffff;
+    line-height: 1.4;
+    margin: 0;
+    background: var(--navy, #0a3a57);
+    padding: 1.75rem;
+    border-radius: 0 0 12px 12px;
+    display: block;
+  }
+}
+
+@media (min-width: 769px) {
+  /* Blue card titles: tighter leading. */
+  .sidebarCard p[style*="27px"], .sidebarCard p[style*="54px"] { line-height: 0.9 !important; }
+  /* Nolan h3 left aligned. */
+  .essayBody h3.h3Navy { text-align: left; }
 }

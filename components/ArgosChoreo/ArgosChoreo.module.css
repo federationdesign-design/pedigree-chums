@@ -372,3 +372,20 @@
   from { opacity: 0; transform: translateY(4px); }
   to   { opacity: 1; transform: none; }
 }
+
+@media (min-width: 769px) {
+  .statueCaption, .pinnedCaption { font-size: calc(1em + 2pt); }
+  .wipeStage .wipeCaption { font-size: calc(1em + 2pt); }
+  .choreoBullets li { font-size: 1.55rem !important; line-height: 1.5; }
+}
+
+@media (min-width: 769px) {
+  /* Show more of the bust's vertical height. */
+  .homerStage img { max-height: 60svh; }
+}
+
+@media (min-width: 769px) {
+  /* 4, 11: bullets and wipe captions match the article's body size. */
+  .choreoBullets li { font-size: 1.55rem !important; line-height: 1.5; }
+  .wipeStage .wipeCaption { font-size: 1.55rem !important; line-height: 1.4; }
+}

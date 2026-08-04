@@ -84,3 +84,13 @@
   color: var(--yellow, #ffd23e);
   opacity: 0.8;
 }
+
+@media (min-width: 769px) {
+  .caption { padding: 1.75rem; font-size: calc(1em + 2pt); }
+  .credit { font-size: calc(1em + 2pt); }
+}
+
+@media (min-width: 769px) {
+  /* 10: coin credit line down 2pt. */
+  .credit { font-size: calc(1em - 2pt); }
+}

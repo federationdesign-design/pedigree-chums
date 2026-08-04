@@ -96,3 +96,9 @@
   opacity: 1;
   filter: blur(0px);
 }
+
+@media (min-width: 769px) {
+  .quoteHolder { align-items: flex-start; }
+  .quoteLineTrack { margin-top: 0; }
+  .quoteMarkFx { display: inline-block; line-height: 1; vertical-align: top; }
+}

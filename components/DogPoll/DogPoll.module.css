@@ -172,3 +172,27 @@
   animation: dogPollFallAway 0.65s cubic-bezier(0.4, 0, 1, 1) forwards !important;
   pointer-events: none;
 }
+
+@media (min-width: 769px) {
+  .wrap { min-height: 3in; padding: 2.5rem; }
+  .option, .optionRed { padding-top: 1.6rem; padding-bottom: 1.6rem; }
+}
+
+@media (min-width: 769px) {
+  /* 6, 7, 8: taller box, taller buttons, larger button text. */
+  .wrap { min-height: 6in; }
+  .option, .optionRed { padding-top: 2.4rem; padding-bottom: 2.4rem; font-size: calc(1em + 2pt); }
+}
+
+@media (min-width: 769px) {
+  /* Poll: bigger everything, more inset, more breathing room. */
+  .wrap { padding: 8.5rem 5rem; }
+  .wrap .kicker { font-size: 2em; margin-bottom: 15px; }
+  .wrap .question { font-size: 2em; margin-bottom: 15px; }
+  .options { gap: 15px; margin-top: 15px; }
+  .option, .optionRed {
+    padding-top: 3.2rem;
+    padding-bottom: 3.2rem;
+    font-size: 2em;
+  }
+}
