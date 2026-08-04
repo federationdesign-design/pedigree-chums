@@ -1,0 +1,524 @@
+{
+  "configVersion": "MVP-4.1",
+  "schemaVersion": "result-contract-1.0",
+  "nameSet": "final-1.0",
+  "powers": [
+    "Focus",
+    "Vision",
+    "Zoom",
+    "Ideas",
+    "Energy"
+  ],
+  "powerMeta": {
+    "Focus": {
+      "mainTitle": "The Mission Keeper",
+      "relativeDescription": "In this round, you kept choosing the route that stayed with the mission and returned after distractions.",
+      "packContribution": "You bring steadiness and follow-through to the pack.",
+      "interpretation": "Stays with the mission."
+    },
+    "Vision": {
+      "mainTitle": "The Pathfinder",
+      "relativeDescription": "In this round, you kept choosing the route that saw the arrangement, system and destination.",
+      "packContribution": "You help the pack see where it is going.",
+      "interpretation": "Sees where the trail leads."
+    },
+    "Zoom": {
+      "mainTitle": "The Clue Hound",
+      "relativeDescription": "In this round, small changes, exact features and unusual details caught your attention first.",
+      "packContribution": "You notice the clues the rest of the pack walks past.",
+      "interpretation": "Finds the clue everyone else missed."
+    },
+    "Ideas": {
+      "mainTitle": "The Spark Inventor",
+      "relativeDescription": "In this round, you kept choosing unusual connections, new possibilities and alternative solutions.",
+      "packContribution": "You give the pack possibilities it had not considered.",
+      "interpretation": "Creates a route nobody else considered."
+    },
+    "Energy": {
+      "mainTitle": "The Launch Hound",
+      "relativeDescription": "In this round, you kept choosing movement, quick responses and the route that started now.",
+      "packContribution": "You get the pack off the sofa and into the adventure.",
+      "interpretation": "Gets the pack moving."
+    }
+  },
+  "questions": [
+    {
+      "id": "M01",
+      "copy": "A small sound happens somewhere in the house. What grabs you first?",
+      "answers": {
+        "A": {
+          "copy": "The sound itself, even if nobody else reacts",
+          "primary": "Zoom",
+          "primaryPoints": 2,
+          "secondary": "Focus",
+          "secondaryPoints": 1
+        },
+        "B": {
+          "copy": "The way the whole room responds",
+          "primary": "Vision",
+          "primaryPoints": 2,
+          "secondary": "Energy",
+          "secondaryPoints": 1
+        }
+      }
+    },
+    {
+      "id": "M02",
+      "copy": "If you were a dog arriving at a busy park, what would hit you first?",
+      "answers": {
+        "A": {
+          "copy": "The whole park and everything going on",
+          "primary": "Vision",
+          "primaryPoints": 2,
+          "secondary": "Energy",
+          "secondaryPoints": 1
+        },
+        "B": {
+          "copy": "All the little details, toys and pawprints",
+          "primary": "Zoom",
+          "primaryPoints": 2,
+          "secondary": "Focus",
+          "secondaryPoints": 1
+        }
+      }
+    },
+    {
+      "id": "M03",
+      "copy": "You are busy with important dog business when a letter drops through the door. What happens?",
+      "answers": {
+        "A": {
+          "copy": "I go straight back to my dog business",
+          "primary": "Focus",
+          "primaryPoints": 2,
+          "secondary": "Zoom",
+          "secondaryPoints": 1
+        },
+        "B": {
+          "copy": "The new arrival sends me onto a different mission",
+          "primary": "Energy",
+          "primaryPoints": 2,
+          "secondary": "Ideas",
+          "secondaryPoints": 1
+        }
+      }
+    },
+    {
+      "id": "M04",
+      "copy": "If you were a dog, how would you dig?",
+      "answers": {
+        "A": {
+          "copy": "One enormous, committed hole",
+          "primary": "Focus",
+          "primaryPoints": 2,
+          "secondary": "Vision",
+          "secondaryPoints": 1
+        },
+        "B": {
+          "copy": "Lots of little holes all over the place",
+          "primary": "Energy",
+          "primaryPoints": 2,
+          "secondary": "Ideas",
+          "secondaryPoints": 1
+        }
+      }
+    },
+    {
+      "id": "M05",
+      "copy": "Somebody has moved the dog's favourite toy by only a few inches. What do you notice?",
+      "answers": {
+        "A": {
+          "copy": "The tiny change jumps out at me",
+          "primary": "Zoom",
+          "primaryPoints": 2,
+          "secondary": "Focus",
+          "secondaryPoints": 1
+        },
+        "B": {
+          "copy": "I start wondering who moved it and why",
+          "primary": "Ideas",
+          "primaryPoints": 2,
+          "secondary": "Vision",
+          "secondaryPoints": 1
+        }
+      }
+    },
+    {
+      "id": "M06",
+      "copy": "How would you remember a brand-new dog walk?",
+      "answers": {
+        "A": {
+          "copy": "As the shape of the whole route",
+          "primary": "Vision",
+          "primaryPoints": 2,
+          "secondary": "Ideas",
+          "secondaryPoints": 1
+        },
+        "B": {
+          "copy": "By each sign, tree and little landmark",
+          "primary": "Zoom",
+          "primaryPoints": 2,
+          "secondary": "Focus",
+          "secondaryPoints": 1
+        }
+      }
+    },
+    {
+      "id": "M07",
+      "copy": "Before building the perfect dog den, what is in your head?",
+      "answers": {
+        "A": {
+          "copy": "A clear picture of the finished den",
+          "primary": "Vision",
+          "primaryPoints": 2,
+          "secondary": "Zoom",
+          "secondaryPoints": 1
+        },
+        "B": {
+          "copy": "Lots of unusual things the den could become",
+          "primary": "Ideas",
+          "primaryPoints": 2,
+          "secondary": "Energy",
+          "secondaryPoints": 1
+        }
+      }
+    },
+    {
+      "id": "M08",
+      "copy": "A trail of pawprints has one strange print in it. What happens?",
+      "answers": {
+        "A": {
+          "copy": "My eyes go straight to the odd one",
+          "primary": "Zoom",
+          "primaryPoints": 2,
+          "secondary": "Focus",
+          "secondaryPoints": 1
+        },
+        "B": {
+          "copy": "I want to know what made the strange print",
+          "primary": "Ideas",
+          "primaryPoints": 2,
+          "secondary": "Vision",
+          "secondaryPoints": 1
+        }
+      }
+    },
+    {
+      "id": "M09",
+      "copy": "The usual dog-walk route is suddenly closed. What is your first reaction?",
+      "answers": {
+        "A": {
+          "copy": "I work out a new plan before moving",
+          "primary": "Vision",
+          "primaryPoints": 2,
+          "secondary": "Focus",
+          "secondaryPoints": 1
+        },
+        "B": {
+          "copy": "Excellent, we are going somewhere new",
+          "primary": "Ideas",
+          "primaryPoints": 2,
+          "secondary": "Energy",
+          "secondaryPoints": 1
+        }
+      }
+    },
+    {
+      "id": "M10",
+      "copy": "You are halfway through a dog job when something exciting appears. What do you do?",
+      "answers": {
+        "A": {
+          "copy": "Finish the job I have already started",
+          "primary": "Focus",
+          "primaryPoints": 2,
+          "secondary": "Zoom",
+          "secondaryPoints": 1
+        },
+        "B": {
+          "copy": "Follow the exciting thing and see where it leads",
+          "primary": "Energy",
+          "primaryPoints": 2,
+          "secondary": "Ideas",
+          "secondaryPoints": 1
+        }
+      }
+    },
+    {
+      "id": "M11",
+      "copy": "Someone starts saying 'walkies'. When do you move?",
+      "answers": {
+        "A": {
+          "copy": "I am ready before the word is finished",
+          "primary": "Energy",
+          "primaryPoints": 2,
+          "secondary": "Zoom",
+          "secondaryPoints": 1
+        },
+        "B": {
+          "copy": "I wait to hear the whole plan before moving",
+          "primary": "Focus",
+          "primaryPoints": 2,
+          "secondary": "Vision",
+          "secondaryPoints": 1
+        }
+      }
+    },
+    {
+      "id": "M12",
+      "copy": "While waiting for a treat, what are you like?",
+      "answers": {
+        "A": {
+          "copy": "Still and completely locked onto the mission",
+          "primary": "Focus",
+          "primaryPoints": 2,
+          "secondary": "Zoom",
+          "secondaryPoints": 1
+        },
+        "B": {
+          "copy": "Full of movement and ready to spring",
+          "primary": "Energy",
+          "primaryPoints": 2,
+          "secondary": "Ideas",
+          "secondaryPoints": 1
+        }
+      }
+    },
+    {
+      "id": "M13",
+      "copy": "Your thoughts chase a squirrel halfway through a story. What happens next?",
+      "answers": {
+        "A": {
+          "copy": "I find my way back to the exact point",
+          "primary": "Focus",
+          "primaryPoints": 2,
+          "secondary": "Vision",
+          "secondaryPoints": 1
+        },
+        "B": {
+          "copy": "The squirrel leads me into a better new story",
+          "primary": "Ideas",
+          "primaryPoints": 2,
+          "secondary": "Energy",
+          "secondaryPoints": 1
+        }
+      }
+    },
+    {
+      "id": "M14",
+      "copy": "A dog toy lands upside down. How do you work out its proper shape?",
+      "answers": {
+        "A": {
+          "copy": "I turn it around in my head",
+          "primary": "Vision",
+          "primaryPoints": 2,
+          "secondary": "Zoom",
+          "secondaryPoints": 1
+        },
+        "B": {
+          "copy": "I pick it up and test how the pieces fit",
+          "primary": "Energy",
+          "primaryPoints": 2,
+          "secondary": "Ideas",
+          "secondaryPoints": 1
+        }
+      }
+    },
+    {
+      "id": "M15",
+      "copy": "A strange automatic ball-thrower appears. What interests you first?",
+      "answers": {
+        "A": {
+          "copy": "Working out how the machine works",
+          "primary": "Ideas",
+          "primaryPoints": 2,
+          "secondary": "Vision",
+          "secondaryPoints": 1
+        },
+        "B": {
+          "copy": "Watching every little thing it does",
+          "primary": "Zoom",
+          "primaryPoints": 2,
+          "secondary": "Energy",
+          "secondaryPoints": 1
+        }
+      }
+    }
+  ],
+  "plot": {
+    "rawMin": 0,
+    "rawMax": 18,
+    "displayMin": 1,
+    "displayMax": 5
+  },
+  "closeGapMax": 3,
+  "resultStates": {
+    "SINGLE_CLOSE": {
+      "predicate": "One leader, raw gap 1 to 3",
+      "titleSource": "Directional combination title",
+      "summary": "Your answers leaned most towards [MAIN], with [SUPPORTING] close behind.",
+      "supportingRule": "Highest remaining power"
+    },
+    "SINGLE_CLEAR": {
+      "predicate": "One leader, raw gap 4 or more",
+      "titleSource": "Directional combination title",
+      "summary": "Your answers leaned most towards [MAIN], with [SUPPORTING] next.",
+      "supportingRule": "Highest remaining power"
+    },
+    "TIE_TWO": {
+      "predicate": "Exactly two leaders",
+      "titleSource": "Unordered joint-pair title",
+      "summary": "Your answers split between [POWER_1] and [POWER_2], with [SUPPORTING] next.",
+      "supportingRule": "Highest power outside the pair, then the tie-breaks in section 6"
+    },
+    "TIE_THREE": {
+      "predicate": "Exactly three leaders",
+      "titleSource": "The Power Pack",
+      "summary": "Your answers split across [POWER_1], [POWER_2] and [POWER_3].",
+      "supportingRule": "None"
+    },
+    "TIE_FOUR": {
+      "predicate": "Exactly four leaders",
+      "titleSource": "The Power Pack",
+      "summary": "Your answers split across [POWER_1], [POWER_2], [POWER_3] and [POWER_4].",
+      "supportingRule": "None"
+    },
+    "TIE_FIVE": {
+      "predicate": "All five leaders",
+      "titleSource": "The Power Pack",
+      "summary": "Your answers divided evenly across all five powers this round.",
+      "supportingRule": "None"
+    }
+  },
+  "directionalTitles": {
+    "Focus>Vision": {
+      "title": "Trail Finisher",
+      "line": "You finish the mission while keeping the whole trail clearly in sight."
+    },
+    "Focus>Zoom": {
+      "title": "Detail Watchdog",
+      "line": "You stay with the mission and hold onto every useful detail."
+    },
+    "Focus>Ideas": {
+      "title": "Spark Builder",
+      "line": "You turn fresh ideas into missions that actually get finished."
+    },
+    "Focus>Energy": {
+      "title": "Onward Finisher",
+      "line": "You keep the mission moving and carry its energy to the finish."
+    },
+    "Vision>Focus": {
+      "title": "Steady Wayfinder",
+      "line": "You spot the route ahead and patiently follow it all the way."
+    },
+    "Vision>Zoom": {
+      "title": "Cluewise Trail Scout",
+      "line": "You see the whole route and notice exactly where it changes."
+    },
+    "Vision>Ideas": {
+      "title": "Wonder Route Scout",
+      "line": "You see where the trail could go and map a bold route."
+    },
+    "Vision>Energy": {
+      "title": "Swift Trail Guide",
+      "line": "You choose the route ahead and move the pack towards it."
+    },
+    "Zoom>Focus": {
+      "title": "Steady Spotter",
+      "line": "You spot the smallest clue and follow it until the job is done."
+    },
+    "Zoom>Vision": {
+      "title": "Trailwise Spotter",
+      "line": "You catch the odd detail and understand where it fits."
+    },
+    "Zoom>Ideas": {
+      "title": "Oddity Finder",
+      "line": "You notice the strangest detail and imagine what it might mean."
+    },
+    "Zoom>Energy": {
+      "title": "Flash Finder",
+      "line": "You catch the clue instantly and react before it disappears."
+    },
+    "Ideas>Focus": {
+      "title": "Steady Wonder Maker",
+      "line": "You create surprising possibilities and stay with them until they work."
+    },
+    "Ideas>Vision": {
+      "title": "Story Trail Maker",
+      "line": "You invent surprising routes and see how every piece connects."
+    },
+    "Ideas>Zoom": {
+      "title": "Curious Clue Maker",
+      "line": "You turn tiny oddities into surprising ideas and fresh possibilities."
+    },
+    "Ideas>Energy": {
+      "title": "Rocket Maker",
+      "line": "You fire up new ideas and send them straight into action."
+    },
+    "Energy>Focus": {
+      "title": "Steady Starter",
+      "line": "You spring into action and keep the mission moving afterwards."
+    },
+    "Energy>Vision": {
+      "title": "Compass Runner",
+      "line": "You leap into motion with a clear destination already chosen."
+    },
+    "Energy>Zoom": {
+      "title": "Sharp Dasher",
+      "line": "You charge into action and still catch the important details."
+    },
+    "Energy>Ideas": {
+      "title": "Wild Trailblazer",
+      "line": "You start the adventure fast and fill it with unexpected possibilities."
+    }
+  },
+  "jointTitles": {
+    "Focus+Vision": {
+      "title": "Route Navigator",
+      "line": "You see where the trail leads and keep the mission moving."
+    },
+    "Focus+Zoom": {
+      "title": "Careful Tracker",
+      "line": "You follow every clue patiently and never lose the trail."
+    },
+    "Focus+Ideas": {
+      "title": "Workshop Hound",
+      "line": "You bring imagination and patience together to build something worth keeping."
+    },
+    "Focus+Energy": {
+      "title": "Pack Mover",
+      "line": "You bring lasting momentum and keep the whole pack on task."
+    },
+    "Vision+Zoom": {
+      "title": "Whole Trail Reader",
+      "line": "You hold the full picture and every important clue together."
+    },
+    "Vision+Ideas": {
+      "title": "World Builder",
+      "line": "You imagine new worlds and understand how all their parts belong."
+    },
+    "Vision+Energy": {
+      "title": "First Scout",
+      "line": "You spot the way forward and start moving without delay."
+    },
+    "Zoom+Ideas": {
+      "title": "Puzzle Explorer",
+      "line": "You follow strange clues wherever your imagination decides to roam."
+    },
+    "Zoom+Energy": {
+      "title": "Lightning Tracker",
+      "line": "You move quickly, catch small changes and stay ready for the trail."
+    },
+    "Ideas+Energy": {
+      "title": "Bright Dash",
+      "line": "You bring fresh ideas and the energy to set them moving."
+    }
+  },
+  "powerPackTitle": "The Power Pack",
+  "copy": {
+    "gameTitle": "What's Your Superpower?",
+    "promise": "Answer a collection of strange dog-themed questions and reveal your power mix.",
+    "completionTime": "It takes about two minutes.",
+    "relativeExplanation": "This is your power mix for this round. It compares your five answers with each other, not with anyone else.",
+    "boundary": "This is a game about different ways of thinking and doing. It is not a medical test or assessment.",
+    "replay": "A different set of choices may make a different shape."
+  }
+}

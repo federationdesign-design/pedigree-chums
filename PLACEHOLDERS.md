@@ -19,6 +19,12 @@ final copy.
 | LOOP-02 route offer | `engine.ts` (`LOOP_02_ROUTE_OFFER = 'the game or a dog?'`) | The `[ROUTE A] or [ROUTE B]?` fill is my best-effort using ORIENT's two departments; the exact copy, and whether it should adapt to the candidate's specific route ("close to a supported route"), is unspecified. It also overlaps ORIENT's wording | Steve supplies the LOOP-02 route-offer copy and the adapt-to-candidate rule |
 | Grief detection trigger lists | `safety.ts` (`GRIEF_DIED`/`GRIEF_LOST`/`GRIEF_WORRIED`/`GRIEF_CONTINUE`/`GRIEF_EXCLUDE`) | Task 58 grief COPY (`:(`) is approved; the DETECTION wording is best-effort, authored to cover the three scenarios and the required assertions, conservative to avoid false positives. As a safety route it should be reviewed/extended by Steve like the other safety trigger lists | Steve reviews and extends the grief triggers |
 
+## What's Your Superpower (MVP-4.1 prototype)
+
+| Placeholder | Location | Meaning | Resolve via |
+|---|---|---|---|
+| `PLACEHOLDER_COMPLETION_TIME` ("It takes about two minutes.") | `scripts/superpower-generate-config.mjs` (emitted into `app/whats-your-superpower/data/config.mvp-4.1.json` `copy.completionTime`) | The entry screen must show an approximate completion time (spec section 3) but no document specifies the value; this is a best-effort stand-in, not approved copy | Steve confirms the wording, then rerun the generator |
+
 ## Resolved (no longer placeholders)
 
 - Per-breed aliases: WIRED from Steve's list into `router.ts`
