@@ -36,8 +36,8 @@ const LIVES_STREAK = 3;
 
 const ERA_LABELS: Record<string, string> = {
   "ancient-medieval": "Ancient to medieval",
-  ancient: "Ancient",
-  medieval: "Medieval",
+  ancient: "Ancient times",
+  medieval: "Medieval times",
   c1500: "Tudor times",
   c1700: "The 1700s",
   early1800: "The early 1800s",
