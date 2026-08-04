@@ -219,7 +219,7 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
             </div>
           )}
           <button type="button" className={styles.close} onClick={() => setOpen(false)} aria-label="Close menu">{"\u00d7"}</button>
-          <div style={{position:'fixed',top:0,left:0,zIndex:99999,background:'#000',color:'#0f0',font:'11px monospace',padding:'4px',pointerEvents:'none'}} ref={(el)=>{if(!el)return;requestAnimationFrame(()=>{const o=el.parentElement;const h=document.documentElement;el.textContent=`sh${o.scrollHeight} ch${o.clientHeight} ov${getComputedStyle(o).overflowY} htmlOv${getComputedStyle(h).overflowY} bodyPos${getComputedStyle(document.body).position}`;});}} />
+          <div style={{position:'fixed',top:0,left:0,zIndex:99999,background:'#000',color:'#0f0',font:'11px monospace',padding:'4px',pointerEvents:'none'}} ref={(el)=>{if(!el)return;requestAnimationFrame(()=>{const o=el.parentElement;if(!o)return;const h=document.documentElement;el.textContent=`sh${o.scrollHeight} ch${o.clientHeight} ov${getComputedStyle(o).overflowY} htmlOv${getComputedStyle(h).overflowY} bodyPos${getComputedStyle(document.body).position}`;});}} />
           <nav className={styles.textMenu} aria-label="Site menu">
             <Link href="/home" onClick={closeForNav}>Home</Link>
             <Link href="/about" onClick={closeForNav}>About</Link>
