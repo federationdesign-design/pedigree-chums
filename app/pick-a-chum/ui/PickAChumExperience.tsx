@@ -218,16 +218,18 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
     return () => document.body.removeAttribute('data-pc-min');
   }, [minimised]);
 
-  // Task 130/131: the conversation column sits at the chosen dog's side (right
-  // when there is room, flipped left when the viewport narrows), and uses the
-  // FULL height: from just below the nav down to a generous clearance above
-  // the visitor bar (Task 131 -- the space above the dog was wasted, and the
-  // white bubbles ran into the white bar). The dog stays where she is; the
-  // content hugs the bottom of the window and rises toward the top as the
-  // conversation grows. Left position is measured from the anchor medallion's
-  // rect, so it tracks the arc, the selector scale, resizes and handover pops.
+  // Task 130/131 + review fix: the conversation column sits at the chosen
+  // dog's side (right when there is room, flipped left when the viewport
+  // narrows), ANCHORED AT HER LEVEL: the column's bottom edge rides her
+  // circle's bottom, so the newest message lands next to her face and the
+  // older ones move UP into the space below the nav as the conversation
+  // grows (owner review, inverting the bottom-of-screen stack). Content
+  // pins to the bottom of the window; the visitor bar keeps its own spot
+  // and the bubbles never come near it. Left and bottom are measured from
+  // the anchor medallion's rect, so they track the arc, the selector scale,
+  // resizes and handover pops.
   const fanAnchorRef = useRef<HTMLDivElement | null>(null);
-  const [colBox, setColBox] = useState<{ left: number; top: number } | null>(null);
+  const [colBox, setColBox] = useState<{ left: number; top: number; bottom: number } | null>(null);
   const COL_W = 380;
   const COL_TOP_CLEAR = 84; // stay below the fixed nav
   useEffect(() => {
@@ -238,7 +240,7 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
       const gap = 12;
       const roomRight = window.innerWidth - (r.right + gap);
       const left = roomRight >= COL_W + 12 ? r.right + gap : Math.max(12, r.left - gap - COL_W);
-      setColBox({ left, top: COL_TOP_CLEAR });
+      setColBox({ left, top: COL_TOP_CLEAR, bottom: Math.max(0, window.innerHeight - r.bottom) });
     };
     measure();
     const settle = window.setTimeout(measure, 600); // after the pop-in lands
@@ -836,7 +838,7 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
         <>
           <div
             className={styles.chatColumn}
-            style={colBox ? { left: `${Math.round(colBox.left)}px`, top: `${Math.round(colBox.top)}px` } : undefined}
+            style={colBox ? { left: `${Math.round(colBox.left)}px`, top: `${Math.round(colBox.top)}px`, bottom: `${Math.round(colBox.bottom)}px` } : undefined}
             onMouseDown={keepFocus}
           >
             {threadEl}
