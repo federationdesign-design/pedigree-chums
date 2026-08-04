@@ -299,8 +299,11 @@
 }
 .factImg {
   flex: 0 0 auto;
-  width: clamp(112px, 18vw, 168px);
-  height: clamp(112px, 18vw, 168px);
+  /* Full 168px circle on wide windows, then a steady shrink below ~1240px so
+     the fact text keeps at least three or four words per line. The floor is
+     84px: any smaller reads as clutter rather than a picture. */
+  width: clamp(84px, calc(24vw - 130px), 168px);
+  height: clamp(84px, calc(24vw - 130px), 168px);
   border-radius: 50%;
   overflow: hidden;
   background: rgba(255, 255, 255, 0.2);
@@ -354,6 +357,12 @@
   .section {
     grid-template-columns: 1fr;
     gap: clamp(14px, 3vw, 22px);
+  }
+  /* Single column again, so the fact text has the full width and the circle
+     can go back to its roomier size. */
+  .factImg {
+    width: clamp(112px, 18vw, 168px);
+    height: clamp(112px, 18vw, 168px);
   }
   }
 
@@ -829,6 +838,14 @@
   flex-direction: row;
   align-items: center;
   gap: clamp(12px, 2vw, 18px);
+}
+
+/* In the narrow two-column band even the smallest circle squeezes the fact
+   text to a word or two per line, so the picture stands down and the text
+   takes the whole row. Below 761px the section stacks to one column and the
+   text is wide again, so the circle returns there. */
+@media (min-width: 761px) and (max-width: 880px) {
+  .factImg { display: none; }
 }
 
 /* Below 1200px the era description text runs too large, so scale the title,
