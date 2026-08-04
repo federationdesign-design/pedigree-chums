@@ -114,7 +114,10 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
     // menu could not be scrolled on a real device. The overlay is a fixed
     // full-viewport layer with its own overflow-y, so the page behind it
     // cannot be reached anyway and the lock is not needed.
-    body.style.overflow = "hidden";
+    // Nothing is set on body: the overlay is a fixed full-viewport layer with
+    // its own overflow-y, so the page behind it cannot be reached, and any
+    // body-level lock stops iOS scrolling the overlay itself.
+
     return () => {
       body.style.position = prev.position;
       body.style.top = prev.top;
