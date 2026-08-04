@@ -703,6 +703,63 @@
   margin-bottom: 0;
   margin-top: auto;
 }
+/* Owner review: the history must be SCROLLABLE by hand, so the thread opts
+   back into pointer events inside the column (the column wrapper itself
+   stays transparent to clicks), and the scrollbar is the brand yellow. */
+.chatColumn .thread {
+  pointer-events: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--pc-ui-yellow) transparent;
+}
+.chatColumn .thread::-webkit-scrollbar {
+  width: 8px;
+}
+.chatColumn .thread::-webkit-scrollbar-track {
+  background: transparent;
+}
+.chatColumn .thread::-webkit-scrollbar-thumb {
+  background: var(--pc-ui-yellow);
+  border-radius: 4px;
+}
+
+/* Owner review: the grab handle at the column's bottom corner. Dragging it
+   moves the chat's anchor point around the page. */
+.dragHandle {
+  position: absolute;
+  right: -6px;
+  bottom: -38px;
+  width: 44px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: grab;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+  touch-action: none;
+}
+.dragHandle:active {
+  cursor: grabbing;
+}
+.dragHandle span {
+  width: 28px;
+  height: 14px;
+  border-radius: 7px;
+  background: var(--pc-ui-yellow);
+  border: 2px solid var(--pc-ui-navy);
+  /* Three grip dots drawn with a gradient, no asset. */
+  background-image: radial-gradient(circle 1.6px, var(--pc-ui-navy) 1.5px, transparent 1.6px);
+  background-size: 7px 14px;
+  background-position: 3px center;
+  background-repeat: repeat-x;
+}
+.dragHandle:focus-visible {
+  outline: 3px solid var(--pc-ui-yellow);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
 
 /* The visitor's input: fixed, bottom centre, attached to no dog. Centred with
    insets + auto margins, NOT translateX: the pcGrow entrance animates
