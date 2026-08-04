@@ -44,7 +44,7 @@ const OUTBOUND: { href: string; tone: "blue" | "green" | "black" }[] = [
 /* Which runs show the three links above. They are ancient-medieval sources, so
    they show on ancient-medieval and nowhere else until the other eras have
    links of their own. Add an era to this list, do not widen OUTBOUND. */
-const OUTBOUND_ERAS = ["ancient-medieval"];
+const OUTBOUND_ERAS = ["ancient-medieval", "ancient", "medieval"];
 
 /* How far down a dog screen the card sits. The line is drawn to exactly this
    depth, so the two meet. */

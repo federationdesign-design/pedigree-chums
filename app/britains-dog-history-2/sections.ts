@@ -26,31 +26,58 @@ export type Section = {
 };
 
 export const SECTIONS: Section[] = [
+  /* Owner request (4 August): the combined First Dogs section is split into
+     the same two era cards the live page carries, so mobile shows Ancient
+     and Medieval as separate runs. Copy mirrors page.tsx exactly. */
   {
-    title: "Britain's First Dogs",
-    accent: "First Dogs",
-    era: "ancient-medieval",
+    title: "Ancient Dogs",
+    accent: "Dogs",
+    era: "ancient",
     intro:
       "Britain's earliest dogs had no breed standards or pedigrees. They were shaped by the jobs people needed doing: guarding homes and livestock, following scents, chasing deer and hares. Classical writers noticed. Strabo recorded British hunting dogs exported overseas, and Celts reportedly used dogs in war.",
     bullets: [
       "Swift Celtic hounds and greyhound-like dogs pursued deer, hares and other fast-moving game by sight.",
-      "Medieval scent hounds followed an animal's trail by nose, sometimes working together in organised packs.",
+      "Early tracking hounds followed game by scent, the deep root of Britain's later scent-hound families.",
       "Protected people, livestock and property, and helped control cattle. Roman-period evidence shows dogs chasing vermin from buildings.",
       "Hunting with carefully trained hounds signalled wealth, while ordinary households kept practical working dogs.",
     ],
     bulletTitles: ["Chasers", "Trackers", "Guards", "Status"],
     detail:
-      "Several generations later, the Roman writer Arrian described swift Celtic coursing hounds that hunted by sight rather than scent. Medieval Britain developed an even wider world of working hounds. Fast dogs chased deer and hares, powerful dogs guarded homes and animals, and scent hounds followed trails in organised packs. These were dog types, rather than standardised modern breeds, and their names, appearance and purpose could change between regions and centuries.",
+      "Several generations later, the Roman writer Arrian described swift Celtic coursing hounds that hunted by sight rather than scent. These early dogs were types shaped by work and place rather than standardised breeds: the same island held fast coursing hounds, powerful guard dogs and small practical workers, and their names, appearance and purpose could change between regions and centuries.",
     facts: [
       { text: "British hunting dogs were valuable enough to be exported across the Channel almost 2,000 years ago.", image: "/history/acident-main-img.jpg" },
       { text: "Arrian, writing in the Roman period, praised Celtic hounds for speed, spirit and their enthusiasm for chasing hares.", image: "/history/greek-harehound.jpg" },
       { text: "Archaeologists have found dogs of very different sizes in early British settlements, from small animals to dogs approaching wolf size.", image: "/history/breeds/Mastiff-and-Alaunt-war-dogs.jpg" },
-      { text: "Medieval pictures often show different dogs doing different jobs, including scent hounds hunting in packs and greyhounds held on leads before the chase.", image: "/history/master-of-the-game.jpg" },
+      { text: "The swift coursing hound of the Celts was famous enough in the ancient world to be described in Roman hunting manuals.", image: "/history/breeds/celtic-hound-drawing.jpg" },
     ],
     // Supplied artwork. The filename says "acident": it is spelled that way on
     // disk, so it is spelled that way here.
     image: "/history/acident-main-img.jpg",
     imageAlt: "Early British working dogs, the hunting and guarding types found before breeds were standardised",
+  },
+  {
+    title: "Medieval Dogs",
+    accent: "Dogs",
+    era: "medieval",
+    intro:
+      "Medieval Britain ran on working dogs. Great households kept organised packs of hounds for the hunt, drovers walked cattle to market with tough farm dogs at their heels, and shepherds relied on quick, biddable herders. A dog's name described its job rather than its breed, and the law took dogs seriously enough to regulate them.",
+    bullets: [
+      "Medieval scent hounds followed an animal's trail by nose, sometimes working together in organised packs.",
+      "Shepherds' and drovers' dogs moved sheep and cattle across the hills and along the long drove roads to market.",
+      "Small, determined earth dogs followed fox and badger underground, the working root of Britain's terriers.",
+      "The organised hunt gave hounds their names and their jobs, from the rache that ran by scent to the greyhound slipped from its lead.",
+    ],
+    bulletTitles: ["Trackers", "Drovers", "Earth dogs", "The hunt"],
+    detail:
+      "By the Middle Ages Britain's dogs had settled into recognisable working kinds. Hunting treatises described each type and its task, household records listed hounds by the work they did, and forest law regulated which dogs could live near the royal deer. These were still types rather than breeds: a talbot or a rache was a job and a look, not a pedigree, and the same name could cover different dogs in different counties.",
+    facts: [
+      { text: "Medieval pictures often show different dogs doing different jobs, including scent hounds hunting in packs and greyhounds held on leads before the chase.", image: "/history/master-of-the-game.jpg" },
+      { text: "The Master of Game, an English hunting book from the early 1400s, describes running hounds, greyhounds, alaunts, spaniels and mastiffs, each with its own work.", image: "/history/master-of-the-game.jpg" },
+      { text: "Under medieval forest law, large dogs kept near royal forests could be required to have claws removed so they could not chase the deer.", image: "/history/medieval-law.jpg" },
+      { text: "The drove roads that dogs and drovers used to walk cattle to market were in use for centuries, and stretches of them can still be walked today.", image: "/history/drovers-dogs.jpg" },
+    ],
+    image: "/history/medieveal-dogs.jpg",
+    imageAlt: "Medieval working dogs at their jobs, from pack hounds to herders",
   },
   {
     title: "Tudor Britain",
