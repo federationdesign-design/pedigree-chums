@@ -18,13 +18,13 @@ export type UKBreed = {
 
 export const ukBreeds: UKBreed[] = [
   // Ancient, then Medieval: split into two strips (owner request, 4 August)
-  { name: "Irish Wolfhound", strip: "ancient", era: "Ancient", anchor: 100, note: "Towering ancient Irish hound, bred to hunt wolves and guard halls.", image: "/history/breeds/irish-wolfhound-photo.jpg", tag: "endangered" },
+  { name: "Irish Wolfhound", strip: "ancient", era: "Ancient", anchor: 100, note: "Towering ancient Irish hound, bred to hunt wolves and guard halls.", image: "/woldhound-square.jpg", tag: "endangered" },
   // Owner research (4 August): the modern Mastiff and Greyhound are living
   // breeds superseded on the early timelines by the ancient-type records.
   // Each moves to its modern formalisation point: the Mastiff to 1883, when
   // the standard type was refined, and the Greyhound to the 1700s.
-  { name: "Mastiff", strip: "late1800", era: "1883", anchor: 1883, note: "Britain's ancient war and guard dog, known since Roman times.", image: "/history/breeds/english-mastiff-photo.jpg", tag: "endangered" },
-  { name: "Greyhound", strip: "c1700", era: "1700s", anchor: 1745, note: "The fastest of all dogs, a sighthound in Britain since antiquity.", image: "/history/breeds/original-greyhound.jpg", tag: "in-decline" },
+  { name: "Mastiff", strip: "late1800", era: "1883", anchor: 1883, note: "Britain's ancient war and guard dog, known since Roman times.", image: "/mastiff-square.jpg", tag: "endangered" },
+  { name: "Greyhound", strip: "c1700", era: "1700s", anchor: 1745, note: "The fastest of all dogs, a sighthound in Britain since antiquity.", image: "/greyhound-square.jpg", tag: "in-decline" },
   // The two ancient additions (docs/lineage/BRIEF.md section 4): extinct
   // historical types placed beside their modern descendants. The Mastiff and
   // Greyhound rows above are deliberately untouched.
@@ -40,7 +40,7 @@ export const ukBreeds: UKBreed[] = [
   { name: "Earth Dog", strip: "medieval", era: "Medieval", anchor: 1070, note: "Small, determined hunting and vermin dog that followed quarry underground.", image: "/history/breeds/medieval-earth-dog.jpg", tag: "extinct" },
   { name: "Talbot", strip: "medieval", era: "Medieval", anchor: 1200, note: "White medieval hound, ancestor of the beagle and bloodhound.", image: "/history/breeds/talbot-hound.jpg", tag: "extinct" },
 
-  { name: "Bloodhound", strip: "medieval", era: "Medieval", anchor: 1100, note: "Scent hound famed for a nose that can follow a trail days old.", image: "/history/breeds/Medieval-Bloodhound.jpg", tag: "endangered" },
+  { name: "Bloodhound", strip: "medieval", era: "Medieval", anchor: 1100, note: "Scent hound famed for a nose that can follow a trail days old.", image: "/bloodhound-square.jpg", tag: "endangered" },
   { name: "Scottish Deerhound", strip: "medieval", era: "Medieval", anchor: 1150, note: "Tall, rough-coated Highland hound bred to course red deer.", image: "/history/breeds/Medieval-Scottish-Deerhound.jpg", tag: "endangered" },
 
   // The 1500s and 1600s
@@ -52,7 +52,7 @@ export const ukBreeds: UKBreed[] = [
   { name: "Staghound", strip: "c1500", era: "1600s", anchor: 1650, note: "English pack hound used to hunt red deer.", image: "/history/breeds/staghound.jpg", tag: "extinct" },
 
   // The 1700s
-  { name: "Old English Sheepdog", strip: "c1700", era: "1700s", anchor: 1700, note: "Shaggy West-Country drover, once known as the Bobtail.", image: "/history/breeds/Old-English-Sheepdog.jpg", tag: "endangered" },
+  { name: "Old English Sheepdog", strip: "c1700", era: "1700s", anchor: 1700, note: "Shaggy West-Country drover, once known as the Bobtail.", image: "/old-english-square.jpg", tag: "endangered" },
   { name: "Scottish Terrier", strip: "c1700", era: "1700s", anchor: 1700, note: "Sturdy Highland earth-dog with a determined streak.", image: "/history/breeds/scottish-terrier-image.jpg", tag: "in-decline" },
   { name: "King Charles Spaniel", strip: "c1700", era: "1700s", anchor: 1710, note: "Royal toy spaniel beloved at the Stuart court.", image: "/history/breeds/king-charles-spaniel-photo.jpg", tag: "endangered" },
   { name: "Pointer", strip: "c1700", era: "1700s", anchor: 1720, note: "Gundog that freezes and 'points' to hidden game birds.", image: "/history/breeds/pointer-photo.jpg", tag: "in-decline" },
@@ -62,36 +62,36 @@ export const ukBreeds: UKBreed[] = [
   { name: "Cur", strip: "c1700", era: "1700s", anchor: 1760, note: "Stumpy-tailed drover's dog that nipped heels and ducked the kick.", image: "/history/breeds/cur-dog.jpg", tag: "extinct" },
 
   // The early 1800s
-  { name: "Beagle", strip: "c1500", era: "1500s", anchor: 1555, note: "Small, merry scent hound bred to hunt rabbit and hare.", image: "/history/breeds/beagle.jpg" , tag: "popular" },
+  { name: "Beagle", strip: "c1500", era: "1500s", anchor: 1555, note: "Small, merry scent hound bred to hunt rabbit and hare.", image: "/beagle-square.jpg" , tag: "popular" },
   { name: "Tweed Water Spaniel", strip: "early1800", era: "early 1800s", anchor: 1810, note: "Border water dog absorbed into the Golden Retriever.", image: "/history/breeds/tweed-water-spaniel.jpg", tag: "extinct" },
   { name: "Manchester Terrier", strip: "early1800", era: "early 1800s", anchor: 1820, note: "Sleek black-and-tan terrier bred to clear city rats.", image: "/history/breeds/manchester-terrior.jpg", tag: "endangered" },
   { name: "Bedlington Terrier", strip: "early1800", era: "early 1800s", anchor: 1825, note: "Lamb-like terrier with surprising grit.", image: "/history/breeds/Bedlington Terrier-photo.jpg", tag: "endangered" },
 
   // The spaniel explosion
-  { name: "English Springer Spaniel", strip: "spaniels", era: "1800s", anchor: 1870, note: "Tireless gundog that springs game from cover.", image: "/history/breeds/english-springer-spaniel-photo.jpg", tag: "popular" },
+  { name: "English Springer Spaniel", strip: "spaniels", era: "1800s", anchor: 1870, note: "Tireless gundog that springs game from cover.", image: "/springer-square.jpg", tag: "popular" },
   { name: "Welsh Springer Spaniel", strip: "spaniels", era: "1800s", anchor: 1872, note: "Red-and-white Welsh flushing spaniel.", image: "/history/breeds/welsh-springer-spaniel-photo.jpg", tag: "endangered" },
-  { name: "Cocker Spaniel", strip: "spaniels", era: "1800s", anchor: 1874, note: "Merry spaniel named for flushing woodcock.", image: "/history/breeds/cocker_spaniel-photo.jpg", tag: "popular" },
+  { name: "Cocker Spaniel", strip: "spaniels", era: "1800s", anchor: 1874, note: "Merry spaniel named for flushing woodcock.", image: "/cooker-square.jpg", tag: "popular" },
   { name: "Field Spaniel", strip: "spaniels", era: "1800s", anchor: 1876, note: "Elegant working gundog spaniel.", image: "/history/breeds/field-spaniel-photo.jpg", tag: "endangered" },
   { name: "Sussex Spaniel", strip: "spaniels", era: "1800s", anchor: 1878, note: "Golden-liver spaniel that works slow and gives tongue.", image: "/history/breeds/Sussex-Spaniel.jpg", tag: "endangered" },
   { name: "Irish Water Spaniel", strip: "mid1800", era: "1830s", anchor: 1834, note: "Curly-coated water retriever with a rat-like tail.", image: "/history/breeds/irish-water-spaniel-photo.jpg", tag: "endangered" },
   { name: "Norfolk Spaniel", strip: "spaniels", era: "1800s", anchor: 1882, note: "Springer-type spaniel later folded into the English Springer.", image: "/history/breeds/norfolk-spaniel-painting.jpg", tag: "extinct" },
 
   // The mid-1800s
-  { name: "Jack Russell Terrier", strip: "mid1800", era: "c. 1820s", anchor: 1820, note: "Bold fox-bolting terrier bred by the Reverend John Russell.", image: "/history/breeds/jack_russell_terrier_photo.jpg", tag: "trending" },
+  { name: "Jack Russell Terrier", strip: "mid1800", era: "c. 1820s", anchor: 1820, note: "Bold fox-bolting terrier bred by the Reverend John Russell.", image: "/jack-russel-square.jpg", tag: "trending" },
   { name: "Kerry Blue Terrier", strip: "mid1800", era: "1847", anchor: 1847, note: "Blue-coated Irish all-rounder, first documented in 1847.", image: "/history/breeds/Kerry_Blue_Terrier_photo.jpg", tag: "endangered" },
-  { name: "Bull Terrier", strip: "early1800", era: "early 1800s", anchor: 1830, note: "Egg-headed dog from crossing bulldogs with terriers.", image: "/history/breeds/Bull-Terrier-photo.jpg" , tag: "in-decline" },
-  { name: "Staffordshire Bull Terrier", strip: "early1800", era: "early 1800s", anchor: 1832, note: "Bull-and-terrier fighting dog turned devoted family friend.", image: "/history/breeds/staffordshire-bull-terrier-photo.jpg", tag: "popular" },
+  { name: "Bull Terrier", strip: "early1800", era: "early 1800s", anchor: 1830, note: "Egg-headed dog from crossing bulldogs with terriers.", image: "/bull-terrier-square37.jpg" , tag: "in-decline" },
+  { name: "Staffordshire Bull Terrier", strip: "early1800", era: "early 1800s", anchor: 1832, note: "Bull-and-terrier fighting dog turned devoted family friend.", image: "/staffy-square.jpg", tag: "popular" },
   { name: "Bullmastiff", strip: "mid1800", era: "1860s", anchor: 1866, note: "Powerful night dog bred to pin poachers on Victorian estates.", image: "/history/breeds/Bullmastiff-photo.jpg", tag: "endangered" },
-  { name: "Whippet", strip: "mid1800", era: "1880s", anchor: 1880, note: "The 'poor man's racehorse', a miniature coursing sighthound.", image: "/history/breeds/whippet-photo.jpg" , tag: "popular" },
-  { name: "Lurcher", strip: "early1800", era: "1800s", anchor: 1802, note: "Sighthound crossed with a working dog, the poacher's companion.", image: "/history/breeds/lurcher-photo.jpg" , tag: "popular" },
+  { name: "Whippet", strip: "mid1800", era: "1880s", anchor: 1880, note: "The 'poor man's racehorse', a miniature coursing sighthound.", image: "/Whippet-square.jpg" , tag: "popular" },
+  { name: "Lurcher", strip: "early1800", era: "1800s", anchor: 1802, note: "Sighthound crossed with a working dog, the poacher's companion.", image: "/lercher-square.jpg" , tag: "popular" },
   { name: "Longdog", strip: "early1800", era: "1800s", anchor: 1803, note: "A cross of two sighthounds, bred purely for speed.", image: "/history/breeds/long-dog-photo.jpg" , tag: "endangered" },
   { name: "English White Terrier", strip: "mid1800", era: "1860s", anchor: 1860, note: "Show terrier of the 1860s that died out within decades.", image: "/history/breeds/english-white-terrier-painting.jpg", tag: "extinct" },
-  { name: "Yorkshire Terrier", strip: "mid1800", era: "1860s", anchor: 1863, note: "Mill-town ratter that became a glamorous toy.", image: "/history/breeds/yorkshire-terrier-photo.jpg" , tag: "in-decline" },
-  { name: "West Highland White Terrier", strip: "late1800", era: "late 1800s", anchor: 1870, note: "The plucky white terrier of the Scottish Highlands.", image: "/history/breeds/west-highland-white-terrier-photo.jpg" , tag: "in-decline" },
+  { name: "Yorkshire Terrier", strip: "mid1800", era: "1860s", anchor: 1863, note: "Mill-town ratter that became a glamorous toy.", image: "/yorkshire-square.jpg" , tag: "in-decline" },
+  { name: "West Highland White Terrier", strip: "late1800", era: "late 1800s", anchor: 1870, note: "The plucky white terrier of the Scottish Highlands.", image: "/west-highland-square.jpg" , tag: "in-decline" },
   { name: "Airedale Terrier", strip: "mid1800", era: "1850s", anchor: 1853, note: "The 'King of Terriers', largest of the terrier breeds.", image: "/history/breeds/airedale-terrier-photo.jpg", tag: "in-decline" },
   { name: "Sealyham Terrier", strip: "mid1800", era: "1870s", anchor: 1875, note: "White Welsh terrier bred to take on badgers.", image: "/history/breeds/sealyham-terrier-photo.jpg", tag: "endangered" },
   { name: "Cairn Terrier", strip: "late1800", era: "late 1800s", anchor: 1871, note: "Highland vermin-hunter that flushed prey from rock cairns.", image: "/history/breeds/cairn-terrier-photo.jpg", tag: "in-decline" },
-  { name: "Border Terrier", strip: "late1800", era: "late 1800s", anchor: 1874, note: "Tough little fell terrier from the English-Scottish border.", image: "/history/breeds/border-terrier-photo.jpg" , tag: "popular" },
+  { name: "Border Terrier", strip: "late1800", era: "late 1800s", anchor: 1874, note: "Tough little fell terrier from the English-Scottish border.", image: "/border terrier-square.jpg" , tag: "popular" },
   { name: "Lakeland Terrier", strip: "late1800", era: "late 1800s", anchor: 1872, note: "Fell-pack terrier from the Lake District.", image: "/history/breeds/lakeland-terrier-photo.jpg", tag: "endangered" },
   { name: "Welsh Terrier", strip: "early1800", era: "early 1800s", anchor: 1805, note: "Black-and-tan Welsh terrier for fox and badger.", image: "/history/breeds/welsh-terrier-photo.jpg", tag: "endangered" },
   { name: "Fox Terrier", strip: "mid1800", era: "1870s", anchor: 1872, note: "Smart white terrier with a full pedigree kept from 1870.", image: "/history/breeds/fox_terrier-img.jpg", tag: "in-decline" },
@@ -102,34 +102,41 @@ export const ukBreeds: UKBreed[] = [
   { name: "Soft-Coated Wheaten Terrier", strip: "late1800", era: "late 1800s", anchor: 1876, note: "Silky-coated Irish farm terrier.", image: "/history/breeds/soft-coated--wheaten-terrier-photo.jpg", tag: "endangered" },
   { name: "Glen of Imaal Terrier", strip: "late1800", era: "late 1800s", anchor: 1877, note: "Low-slung Wicklow terrier of great strength.", image: "/history/breeds/glen-of-Imaal-terrier.jpg", tag: "endangered" },
   { name: "Gordon Setter", strip: "late1800", era: "late 1800s", anchor: 1878, note: "Black-and-tan setter from the Scottish Highlands.", image: "/history/breeds/gordon-setter-photo.jpg", tag: "endangered" },
-  { name: "Irish Setter", strip: "late1800", era: "late 1800s", anchor: 1879, note: "Flashy red gundog full of energy.", image: "/history/breeds/irish-setter-photo.jpg" , tag: "in-decline" },
-  { name: "Basset Hound", strip: "late1800", era: "late 1800s", anchor: 1880, note: "Low-slung scenthound refined in Victorian England.", image: "/history/breeds/basset-hound.jpg" , tag: "in-decline" },
+  { name: "Irish Setter", strip: "late1800", era: "late 1800s", anchor: 1879, note: "Flashy red gundog full of energy.", image: "/irish-square.png" , tag: "in-decline" },
+  { name: "Basset Hound", strip: "late1800", era: "late 1800s", anchor: 1880, note: "Low-slung scenthound refined in Victorian England.", image: "/basset-square.jpg" , tag: "in-decline" },
   { name: "Curly-Coated Retriever", strip: "mid1800", era: "1850s", anchor: 1850, note: "The oldest retriever breed, with a coat of tight curls.", image: "/history/breeds/Curly-Coated-Retriever-photo.jpg", tag: "endangered" },
   { name: "Flat-Coated Retriever", strip: "mid1800", era: "1850s", anchor: 1854, note: "Glossy gamekeeper's retriever, ever cheerful.", image: "/history/breeds/flatcoated_retriever-photo.jpg" , tag: "endangered" },
-  { name: "Labrador Retriever", strip: "late1800", era: "1800s", anchor: 1882, note: "From Newfoundland's water dogs to Britain's favourite breed.", image: "/history/breeds/Labrador-retriever-photo.jpg", tag: "popular" },
+  { name: "Labrador Retriever", strip: "late1800", era: "1800s", anchor: 1882, note: "From Newfoundland's water dogs to Britain's favourite breed.", image: "/lab-square.jpg", tag: "popular" },
   { name: "Bearded Collie", strip: "c1500", era: "1600s", anchor: 1660, note: "Shaggy, bouncing Scottish herding dog.", image: "/history/breeds/bearded-collie-photo.jpg", tag: "endangered" },
   { name: "Rough Collie", strip: "mid1800", era: "1860s", anchor: 1862, note: "The classic Scottish collie of film and fame.", image: "/history/breeds/rough-collie-photo.jpg", tag: "in-decline" },
-  { name: "Border Collie", strip: "late1800", era: "1800s", anchor: 1885, note: "The supreme sheepdog, all focus and crouching 'eye'.", image: "/history/breeds/Border_Collie_photo.jpg" , tag: "popular" },
-  { name: "Golden Retriever", strip: "late1800", era: "late 1800s", anchor: 1890, note: "Bred in the Scottish Highlands by Lord Tweedmouth.", image: "/history/breeds/golden-retriever-photo.jpg", tag: "popular" },
+  { name: "Border Collie", strip: "late1800", era: "1800s", anchor: 1885, note: "The supreme sheepdog, all focus and crouching 'eye'.", image: "/border-collie-square.png" , tag: "popular" },
+  { name: "Golden Retriever", strip: "late1800", era: "late 1800s", anchor: 1890, note: "Bred in the Scottish Highlands by Lord Tweedmouth.", image: "/golden-square.jpg", tag: "popular" },
   { name: "Celtic Heeler", strip: "ancient", era: "Ancient", anchor: 900, note: "Low-slung Celtic cattle heeler, forerunner of both Welsh Corgis.", image: "/history/breeds/medieval-corgi.jpg", tag: "extinct" },
   { name: "Cardigan Welsh Corgi", strip: "late1800", era: "late 1800s", anchor: 1919, note: "The older, long-tailed corgi, first shown in 1919.", image: "/history/breeds/Welsh_Corgi_Cardigan-photo.jpg", tag: "endangered" },
-  { name: "Pembroke Welsh Corgi", strip: "late1800", era: "late 1800s", anchor: 1891, note: "Short-legged Welsh cattle dog, beloved of the Crown.", image: "/history/breeds/Pembroke-Welsh-Corgi-photo.jpg", tag: "trending" },
+  { name: "Pembroke Welsh Corgi", strip: "late1800", era: "late 1800s", anchor: 1891, note: "Short-legged Welsh cattle dog, beloved of the Crown.", image: "/corgi-square.jpg", tag: "trending" },
   { name: "Lancashire Heeler", strip: "late1800", era: "1800s", anchor: 1892, note: "Small, agile droving heeler from northern England.", image: "/history/breeds/lancashire-heelers-photo.jpg", tag: "endangered" },
 
   // The 1900s
   { name: "Norwich Terrier", strip: "c1900", era: "early 1900s", anchor: 1900, note: "Small, hardy red terrier with prick ears.", image: "/history/breeds/norwich-terrier-photo.jpg", tag: "endangered" },
-  { name: "Bulldog", strip: "mid1800", era: "mid-1800s", anchor: 1858, note: "The wrinkled national symbol, bred down from bull-baiting dogs.", image: "/history/breeds/bulldog-image.jpg", tag: "popular" },
-  { name: "Cavalier King Charles Spaniel", strip: "c1900", era: "1920s", anchor: 1925, note: "Sweet-natured toy spaniel reconstructed from old portraits.", image: "/history/breeds/cavalier_king_charles_spaniel-photo.jpg" , tag: "popular" },
+  { name: "Bulldog", strip: "mid1800", era: "mid-1800s", anchor: 1858, note: "The wrinkled national symbol, bred down from bull-baiting dogs.", image: "/bulldog-square.jpg", tag: "popular" },
+  { name: "Cavalier King Charles Spaniel", strip: "c1900", era: "1920s", anchor: 1925, note: "Sweet-natured toy spaniel reconstructed from old portraits.", image: "/cav-spaniel-square.jpg" , tag: "popular" },
   { name: "Patterdale Terrier", strip: "c1900", era: "1900s", anchor: 1950, note: "Hard-as-nails working fell terrier.", image: "/history/breeds/Patterdale-Terrier-photo.jpg" , tag: "popular" },
   { name: "Lucas Terrier", strip: "c1900", era: "1900s", anchor: 1950, note: "Gentle terrier from crossing the Sealyham and Norfolk.", image: "/history/breeds/Lucas-Terrier-photo.jpg" , tag: "endangered" },
   { name: "Norfolk Terrier", strip: "c1900", era: "1964", anchor: 1964, note: "Drop-eared cousin of the Norwich, split off in 1964.", image: "/history/breeds/Norfolk-Terrier-photo.jpg", tag: "in-decline" },
   { name: "Northern Inuit Dog", strip: "c1900", era: "1980s", anchor: 1985, note: "Wolf-look companion breed developed in the UK.", image: "/history/breeds/Northern Inuit Dog-photo.jpg" , tag: "endangered" },
 
   // Today's crossbreeds
-  { name: "Cockapoo", strip: "crosses", era: "1950s", anchor: 2000, note: "Cocker Spaniel crossed with a Poodle; the original 'designer dog'.", image: "/cockapoo-square.png", tag: "trending" },
-  { name: "Labradoodle", strip: "crosses", era: "1980s", anchor: 2005, note: "Labrador crossed with a Poodle, first bred as a guide dog.", image: "/Labradoodle-square.png", tag: "trending" },
-  { name: "Goldendoodle", strip: "crosses", era: "1990s", anchor: 2010, note: "Golden Retriever crossed with a Poodle.", image: "/goldendoodle-square.png", tag: "trending" },
-  { name: "Cavapoo", strip: "crosses", era: "1990s", anchor: 2012, note: "Cavalier King Charles Spaniel crossed with a Poodle.", image: "/Cavapoo-square.png", tag: "trending" },
+  { name: "Cockapoo", strip: "crosses", era: "1950s", anchor: 2000, note: "Cocker Spaniel crossed with a Poodle; the original 'designer dog'.", image: "/Cockapoo-square.jpg", tag: "trending" },
+  { name: "Labradoodle", strip: "crosses", era: "1980s", anchor: 2005, note: "Labrador crossed with a Poodle, first bred as a guide dog.", image: "/Labradoodle-square.jpg", tag: "trending" },
+  { name: "Goldendoodle", strip: "crosses", era: "1990s", anchor: 2010, note: "Golden Retriever crossed with a Poodle.", image: "/Goldendoodle-square.jpg", tag: "trending" },
+  { name: "Cavapoo", strip: "crosses", era: "1990s", anchor: 2012, note: "Cavalier King Charles Spaniel crossed with a Poodle.", image: "/Cavapoo-square.jpg", tag: "trending" },
+  /* The other three crosses that have chum pages of their own (owner request,
+     5 August). Notes follow the existing pattern and restate each cross from
+     the pack record's own "cross Bred from" line; the era and anchor are a
+     best-effort ordering after the four above and are flagged for approval. */
+  { name: "Cavachon", strip: "crosses", era: "1990s", anchor: 2013, note: "Cavalier King Charles Spaniel crossed with a Bichon Frise.", image: "/Cavachon-square.jpg", tag: "trending" },
+  { name: "Maltipoo", strip: "crosses", era: "1990s", anchor: 2014, note: "Maltese crossed with a Poodle.", image: "/multipoo-square.jpg", tag: "trending" },
+  { name: "Jackapoo", strip: "crosses", era: "2000s", anchor: 2015, note: "Jack Russell Terrier crossed with a Poodle.", image: "/jackapoo-square.jpg", tag: "trending" },
   { name: "Celtic Hound", strip: "ancient", era: "Ancient", anchor: 80, note: "Ancient Celtic war and hunting hound, forebear of the Wolfhound.", tag: "extinct", image: "/history/breeds/celtic-hound-remake.jpg" },
   { name: "Rache", strip: "medieval", era: "Medieval", anchor: 1150, note: "Medieval scenting hound that hunted by nose in the pack.", tag: "extinct", image: "/history/breeds/rache.jpg" },
   { name: "Buckhound", strip: "medieval", era: "Medieval", anchor: 1220, note: "Medieval pack hound bred to hunt the smaller fallow buck.", tag: "extinct", image: "/history/breeds/Buckhound-illustration.jpg" },
