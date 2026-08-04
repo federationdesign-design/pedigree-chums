@@ -488,7 +488,7 @@
    tap area at every breakpoint. */
 .close {
   top: -12px;
-  left: -12px;
+  left: -8px;
 }
 /* Selector centre-icon X: top-right of the 72px "pick for me" anchor (left:28, top:28 in selector
    space). Full 44px on desktop/tablet; eased on mobile (see the 480px block) so it neither shrinks
@@ -726,8 +726,11 @@
    moves the chat's anchor point around the page. */
 .dragHandle {
   position: absolute;
-  right: -6px;
-  bottom: -42px;
+  /* Owner review: centred on the medallion's bottom rim, dropped so the
+     disc sits on the white ring like the X and the minimise disc do. */
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: -30px;
   width: 44px;
   height: 44px;
   padding: 0;
@@ -743,6 +746,24 @@
 .dragHandle:active {
   cursor: grabbing;
 }
+/* Owner review: the handle grows on hover and grows again while dragging. */
+.dragHandle svg {
+  transition: transform 0.12s ease;
+  transform-origin: center;
+}
+.dragHandle:hover svg,
+.dragHandle:focus-visible svg {
+  transform: scale(1.5);
+}
+.dragHandle:active svg,
+.dragHandleActive svg {
+  transform: scale(2);
+}
+@media (prefers-reduced-motion: reduce) {
+  .dragHandle svg {
+    transition: none;
+  }
+}
 /* The four-arrow move glyph on a yellow disc, navy stroke, house tokens. */
 .dragHandle svg {
   width: 32px;
@@ -751,7 +772,8 @@
   box-sizing: border-box;
   border-radius: 50%;
   background: var(--pc-ui-yellow);
-  border: 2px solid var(--pc-ui-navy);
+  /* Owner review: white 3px stroke (the earlier navy outline stays gone). */
+  border: 3px solid #ffffff;
   color: var(--pc-ui-navy);
 }
 .dragHandle:focus-visible {
@@ -785,7 +807,7 @@
 .minimise {
   position: absolute;
   top: -12px;
-  right: -12px;
+  right: -8px;
   width: 44px;
   height: 44px;
   padding: 0;
@@ -798,21 +820,26 @@
   z-index: 6;
 }
 .minimise span {
-  width: 26px;
-  height: 26px;
+  /* Owner review: sized to match the red X mark (26px within the 44 box was
+     reading smaller than the X glyph; the disc now fills the same optical
+     footprint). */
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
-  background: var(--pc-ui-yellow);
-  border: 2px solid var(--pc-ui-navy);
+  /* Owner review: dark blue fill (owner-supplied #193955), white line and
+     stroke. */
+  background: #193955;
+  border: 3px solid #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 .minimise span::before {
   content: "";
-  width: 12px;
-  height: 3px;
+  width: 16px;
+  height: 4px;
   border-radius: 2px;
-  background: var(--pc-ui-navy);
+  background: #ffffff;
 }
 .minimise:focus-visible {
   outline: 3px solid var(--pc-ui-yellow);
@@ -838,44 +865,56 @@
    per-bubble nameplates are gone. */
 .anchorName {
   position: absolute;
-  top: calc(100% + 6px);
+  top: calc(100% + 12px);
   left: 50%;
   transform: translateX(-50%);
   font-family: var(--font-display, 'Luckiest Guy', cursive);
-  font-size: 15px;
+  /* Owner review: grown again (+25%), two-word names stack one word per
+     line, Luckiest Guy line spacing 0.9em. */
+  font-size: 27.5px;
+  line-height: 0.9;
+  text-align: center;
+  z-index: 7;
+  /* Owner review: dropped clear of the drag disc. */
+  margin-top: 25px;
   letter-spacing: 0.05em;
   text-transform: uppercase;
   color: #ffffff;
   text-shadow: 0 1px 2px rgba(17, 34, 66, 0.6);
   white-space: nowrap;
   pointer-events: none;
-  z-index: 6;
 }
 
-/* Task 130: the minimised chip. Bottom RIGHT (the hidden games counter owns
-   bottom left); while it shows, body[data-pc-min] hides the scrim and the
-   offer card so the corner holds one floating thing only. */
-.miniChip {
+/* Owner review: the minimised dock, TOP LEFT, with the dog at her FULL size
+   (owner: persist the same size, just none of the chat). While it shows,
+   body[data-pc-min] hides the scrim and the offer card. */
+.miniDock {
   position: fixed;
-  right: 18px;
-  bottom: 18px;
-  width: 72px;
-  height: 72px;
+  /* Owner review: even padding to the corner, matching the 18px left. */
+  left: 18px;
+  top: 18px;
+  width: 128px;
+  height: 128px;
+  z-index: 301;
+  pointer-events: none;
+}
+.miniFace {
+  width: 128px;
+  height: 128px;
   padding: 0;
   border-radius: 50%;
-  border: 4px solid var(--pc-ui-blue);
-  box-shadow: 0 0 0 3px #ffffff, var(--pc-shadow);
+  border: 5px solid var(--pc-ui-blue);
+  box-shadow: 0 0 0 4px #ffffff, var(--pc-shadow);
   background-color: var(--pc-ui-blue);
   background-size: cover;
   background-position: center;
   cursor: pointer;
-  z-index: 301;
   pointer-events: auto;
   transition: transform 0.15s ease;
 }
-.miniChip:hover,
-.miniChip:focus-visible {
-  transform: scale(1.08);
+.miniFace:hover,
+.miniFace:focus-visible {
+  transform: scale(1.05);
   outline: 3px solid var(--pc-ui-yellow);
   outline-offset: 2px;
 }
@@ -893,4 +932,34 @@
   .miniChip {
     transition: none;
   }
+}
+
+
+/* Owner review: the three medallion icons drawn a third smaller (the 44px
+   tap areas are unchanged, Tasks 126/127). Scoped to the dog unit: the
+   selector X and the mobile panel keep their existing sizes. */
+.anchorFan .close img,
+.miniDock .close img {
+  width: 17px;
+  height: 17px;
+  /* Owner review: ~3px white stroke around the red mark, built from stacked
+     hard drop-shadows since an img glyph cannot take a border. */
+  filter:
+    drop-shadow(1.5px 0 0 #ffffff) drop-shadow(-1.5px 0 0 #ffffff)
+    drop-shadow(0 1.5px 0 #ffffff) drop-shadow(0 -1.5px 0 #ffffff)
+    drop-shadow(1px 1px 0 #ffffff) drop-shadow(-1px 1px 0 #ffffff)
+    drop-shadow(1px -1px 0 #ffffff) drop-shadow(-1px -1px 0 #ffffff);
+}
+.anchorFan .minimise span {
+  width: 23px;
+  height: 23px;
+}
+.anchorFan .minimise span::before {
+  width: 11px;
+  height: 3px;
+}
+.anchorFan .dragHandle svg {
+  width: 21px;
+  height: 21px;
+  padding: 3px;
 }

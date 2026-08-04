@@ -79,6 +79,18 @@ const dogCentre = (i: number) => ({ x: ARC_CENTER + ARC_RADIUS * Math.cos(dogAng
 const lineStart = (i: number) => ({ x: ARC_CENTER + ARC_BODY_R * Math.cos(dogAngleRad(i)), y: ARC_CENTER + ARC_BODY_R * Math.sin(dogAngleRad(i)) });
 const round1 = (n: number) => Math.round(n * 10) / 10;
 
+// Owner review: the medallion name breaks after each word, so a two-word
+// dog stacks her name on two lines.
+function nameLines(name: string) {
+  const words = name.split(' ');
+  return words.map((w, i) => (
+    <span key={i}>
+      {w}
+      {i < words.length - 1 && <br />}
+    </span>
+  ));
+}
+
 function dogInfo(dog: Dog): { name: string; image: string } {
   const rec = CHUM_DATA.dogs.find((d) => d.slug === DOG_SLUGS[dog]);
   return { name: rec?.name ?? dog, image: rec ? encodeURI(rec.image) : '' };
@@ -239,6 +251,7 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
   // the newest message sits): placed low, the window above is tall and shows
   // more messages; placed high, it shows fewer. Resets on a dog change.
   const [dragOffset, setDragOffset] = useState<{ dx: number; dy: number }>({ dx: 0, dy: 0 });
+  const [dragging, setDragging] = useState(false); // grows the handle while moving
   useEffect(() => { setDragOffset({ dx: 0, dy: 0 }); }, [dog]);
   const startColumnDrag = useCallback((e: React.PointerEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -247,11 +260,13 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
     const sx = e.clientX;
     const sy = e.clientY;
     const start = { ...dragOffsetRef.current };
+    setDragging(true);
     const move = (ev: PointerEvent) => {
       dragOffsetRef.current = { dx: start.dx + (ev.clientX - sx), dy: start.dy + (ev.clientY - sy) };
       setDragOffset(dragOffsetRef.current);
     };
     const up = () => {
+      setDragging(false);
       el.removeEventListener('pointermove', move);
       el.removeEventListener('pointerup', up);
       el.removeEventListener('pointercancel', up);
@@ -818,7 +833,25 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
                     </button>
                     {/* Task 132: the dog's name, once, beside her medallion.
                         Reads the active dog, so a switch renames it. */}
-                    <div className={styles.anchorName} aria-hidden="true">{dogInfo(dog).name}</div>
+                    <div className={styles.anchorName} aria-hidden="true">{nameLines(dogInfo(dog).name)}</div>
+                    {/* Owner review: the move handle rides the medallion,
+                        centred on her bottom rim; dragging moves the whole
+                        dog-and-chat unit. */}
+                    <button
+                      type="button"
+                      className={`${styles.dragHandle}${dragging ? ` ${styles.dragHandleActive}` : ''}`}
+                      aria-label="Move the chat"
+                      title="Move the chat"
+                      onPointerDown={startColumnDrag}
+                    >
+                      {/* The standard four-arrow move glyph, inline (no asset). */}
+                      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                        <path
+                          d="M12 2l3 3h-2v5h5V8l3 3-3 3v-2h-5v5h2l-3 3-3-3h2v-5H6v2l-3-3 3-3v2h5V5H9l3-3z"
+                          fill="currentColor"
+                        />
+                      </svg>
+                    </button>
                   </div>
                 );
               }
@@ -874,43 +907,34 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
             onMouseDown={keepFocus}
           >
             {threadEl}
-            {/* Owner review: the grab handle. Dragging moves the chat's anchor
-                point; the window above it grows or shrinks with where it sits. */}
-            <button
-              type="button"
-              className={styles.dragHandle}
-              aria-label="Move the chat"
-              title="Move the chat"
-              onPointerDown={startColumnDrag}
-            >
-              {/* The standard four-arrow move glyph, inline (no asset). */}
-              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                <path
-                  d="M12 2l3 3h-2v5h5V8l3 3-3 3v-2h-5v5h2l-3 3-3-3h2v-5H6v2l-3-3 3-3v2h5V5H9l3-3z"
-                  fill="currentColor"
-                />
-              </svg>
-            </button>
           </div>
           <div className={styles.visitorBar} onMouseDown={keepFocus}>
             {composerEl}
           </div>
         </>
       )}
-      {/* Task 130: the minimised chip, bottom right (the counter owns bottom
-          left). The scrim and the offer card hide via body[data-pc-min]. */}
+      {/* Owner review: while minimised the dog persists at her full size,
+          parked TOP LEFT, with none of the chat showing. Her face restores
+          the conversation; the X still closes. The scrim and the offer card
+          hide via body[data-pc-min] as before. */}
       {phase !== 'selecting' && wide && minimised && (
-        <button
-          type="button"
-          className={styles.miniChip}
-          aria-label={`Reopen the chat with the ${dogInfo(dog).name}`}
-          title={`Reopen the chat with the ${dogInfo(dog).name}`}
-          style={{ backgroundImage: `url("${PROFILE_IMG[dog]}")` }}
-          onClick={() => {
-            setMinimised(false);
-            window.setTimeout(() => inputRef.current?.focus(), 60); // Task 82
-          }}
-        />
+        <div className={styles.miniDock}>
+          <button
+            type="button"
+            className={styles.miniFace}
+            aria-label={`Reopen the chat with the ${dogInfo(dog).name}`}
+            title={`Reopen the chat with the ${dogInfo(dog).name}`}
+            style={{ backgroundImage: `url("${PROFILE_IMG[dog]}")` }}
+            onClick={() => {
+              setMinimised(false);
+              window.setTimeout(() => inputRef.current?.focus(), 60); // Task 82
+            }}
+          />
+          <button type="button" className={styles.close} aria-label="Close Pick a Chum" onClick={onClose}>
+            <img src="/red-icon.svg" alt="" aria-hidden="true" />
+          </button>
+          <div className={styles.anchorName} aria-hidden="true">{nameLines(dogInfo(dog).name)}</div>
+        </div>
       )}
       {/* Screen-reader announcements stay mounted through minimise, so a
           reply that lands while collapsed is still announced once. */}
@@ -947,7 +971,7 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
                 <img src="/red-icon.svg" alt="" aria-hidden="true" />
               </button>
               {/* Task 132: the name once, on the medallion (mobile too). */}
-              <div className={styles.anchorName} aria-hidden="true">{dogInfo(dog).name}</div>
+              <div className={styles.anchorName} aria-hidden="true">{nameLines(dogInfo(dog).name)}</div>
             </div>
             {composerEl}
           </div>
