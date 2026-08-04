@@ -170,3 +170,11 @@
     transform: translate(0, -50%);
   }
 }
+
+
+/* Task 130 (owner ruling): the offer card and the minimised chat chip must
+   not co-exist in the corner. body[data-pc-min] is set while the chat is
+   minimised; the card returns the moment the chat is restored or closed. */
+:global(body[data-pc-min]) .card {
+  display: none;
+}
