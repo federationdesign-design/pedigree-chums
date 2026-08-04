@@ -206,7 +206,6 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
           className={`${styles.overlay} ${!tradeLinks ? styles.overlayScroll : ""}`}
           role="dialog"
           aria-modal="true"
-          onPointerDown={onIntent}
           onPointerOver={onIntent}
           onClick={onOverlayClick}
         >
