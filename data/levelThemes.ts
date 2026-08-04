@@ -53,6 +53,11 @@ export type LevelTheme = {
   propsByLevel?: Record<string, string[]>;
 };
 
+/* The ancient-era pit artwork, shared three ways since the strip split:
+   the live page's "ancient" and "medieval" strips and the slider's combined
+   "ancient-medieval" run all use it, so no level's look changed with the
+   split. Medieval gets its own artwork whenever one lands: give the key its
+   own entry and delete the alias below. */
 const THEMES: Record<string, LevelTheme> = {
   "ancient-medieval": {
     bg: "/levels/ancient-bg.svg",
@@ -99,6 +104,8 @@ const THEMES: Record<string, LevelTheme> = {
     },
   },
 };
+THEMES["ancient"] = THEMES["ancient-medieval"];
+THEMES["medieval"] = THEMES["ancient-medieval"];
 
 export function levelThemeFor(era?: string): LevelTheme | null {
   return (era && THEMES[era]) || null;

@@ -12,7 +12,7 @@
    index that the page's own carousel script reads, so the two buttons stay side
    by side in one row without one of them needing a second mechanism. */
 
-import BreedStrip from "../britains-dog-history/BreedStrip";
+import BreedStrip, { stripMatches } from "../britains-dog-history/BreedStrip";
 import { ukBreeds } from "../../data/uk-breeds";
 import styles from "./history2.module.css";
 
@@ -23,7 +23,7 @@ const FIRST_ERA = "ancient-medieval";
 
 export default function IntroButtons({ nextPanel }: { nextPanel: number }) {
   const firstBreed = ukBreeds
-    .filter((b) => b.strip === FIRST_ERA)
+    .filter((b) => stripMatches(b.strip, FIRST_ERA))
     .sort((a, b) => a.anchor - b.anchor)[0];
 
   return (

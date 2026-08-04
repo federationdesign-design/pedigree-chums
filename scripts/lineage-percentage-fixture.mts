@@ -116,7 +116,8 @@ for (const name of packNames) {
 // 3 August), so this file must match the 62-level baseline exactly until a
 // future batch deliberately adds an ancestored level.
 const STRIP_ORDER = [
-  "ancient-medieval",
+  "ancient",
+  "medieval",
   "c1500",
   "c1700",
   "early1800",
