@@ -35,7 +35,7 @@ export function usePinnedTrigger(pinOffset = 130) {
       const el = sceneRef.current;
       if (!el) return;
       const r = el.getBoundingClientRect();
-      const isPinned = r.top <= pinOffset && r.bottom > window.innerHeight * 0.35;
+      const isPinned = r.top <= window.innerHeight * 0.7 && r.bottom > 0;
 
       if (isPinned && !wasPinned.current) {
         wasPinned.current = true;
@@ -43,9 +43,6 @@ export function usePinnedTrigger(pinOffset = 130) {
         // one tick so the "reset" state paints before the "active" state,
         // guaranteeing the CSS transition actually plays on replay
         requestAnimationFrame(() => setActive(true));
-      } else if (!isPinned && wasPinned.current) {
-        wasPinned.current = false;
-        setActive(false);
       }
     };
 
