@@ -26,20 +26,20 @@ export const BREED_SOURCES: Record<string, BreedSource[]> = {
   ],
 
   // Ancient.
-  "Ancient British Mastiff Type": [
+  "Ancient Mastiff": [
     { href: "https://en.wikipedia.org/wiki/Dogs_of_Roman_Britain", tone: "blue" },
     { href: "https://en.wikipedia.org/wiki/Molossus_(dog)", tone: "green" },
   ],
-  "Ancient Celtic Coursing Hound": [
+  "Celtic Coursing Hound": [
     // The Greyhound article carries the vertragus, Arrian's Celtic coursing dog.
     { href: "https://en.wikipedia.org/wiki/Greyhound", tone: "blue" },
     { href: "https://penelope.uchicago.edu/encyclopaedia_romana/miscellanea/canes/canes.html", tone: "green" },
   ],
-  "Ancient Celtic Scent Hound": [
+  "Celtic Scent Hound": [
     // Covers Arrian on the Segusiae, the Gaulish trailing hounds.
     { href: "https://en.wikipedia.org/wiki/Scent_hound", tone: "blue" },
   ],
-  "Ancient Livestock Dog": [
+  "Livestock Dog": [
     // Varro, De Re Rustica book 2, on the shepherd's dog.
     { href: "https://penelope.uchicago.edu/Thayer/E/Roman/Texts/Varro/de_Re_Rustica/2*.html", tone: "blue" },
     { href: "https://en.wikipedia.org/wiki/Sheep_dog", tone: "green" },
@@ -49,13 +49,13 @@ export const BREED_SOURCES: Record<string, BreedSource[]> = {
   ],
 
   // Medieval.
-  "Medieval Shepherd's Dog": [
+  "Shepherd's Dog": [
     { href: "https://en.wikipedia.org/wiki/Welsh_Sheepdog", tone: "blue" },
   ],
-  "Medieval Drover's Dog": [
+  "Drover's Dog": [
     { href: "https://en.wikipedia.org/wiki/Drovers%27_road", tone: "blue" },
   ],
-  "Medieval Earth Dog": [
+  "Earth Dog": [
     { href: "https://en.wikipedia.org/wiki/Terrier", tone: "blue" },
   ],
   Talbot: [

@@ -223,8 +223,8 @@ Yes, in three distinct ways.**
 
 1. **New names enter the index.** A foundation node added inside any pack
    breed's tree becomes an ancestor of that breed. Because section 5 gives one
-   foundation to several trees (Medieval Earth Dog to both Scottish Terrier
-   and Black and Tan Terrier), `descendantPackBreeds(["Medieval Earth Dog"])`
+   foundation to several trees (Earth Dog to both Scottish Terrier
+   and Black and Tan Terrier), `descendantPackBreeds(["Earth Dog"])`
    returns the UNION of families that today share no rail. When a visitor
    hovers the foundation circle, the rail (`BreedTree.tsx:4682-4691`) shows
    that union, and the level's falling-chum cast (`BreedTree.tsx:4717-4725`)
@@ -232,7 +232,7 @@ Yes, in three distinct ways.**
 2. **Grafting propagates beyond the six named trees.** "Black and Tan
    Terrier" is a top-level tree (`data/lineage.ts:573-580`) grafted into
    Manchester Terrier as a childless child (`data/lineage.ts:586`), and
-   Manchester's tree flows into the pack index. Adding Medieval Earth Dog
+   Manchester's tree flows into the pack index. Adding Earth Dog
    under Black and Tan Terrier therefore changes Manchester Terrier's expanded
    tree, its rails and its percentages, although Manchester is not one of the
    six trees. The same applies to any tree whose childless node names match a

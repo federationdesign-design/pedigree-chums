@@ -74,13 +74,13 @@ to a key and reruns the section 7 fixture.
 
 | Display name | Era | Kind of record |
 |---|---|---|
-| Ancient Celtic Coursing Hound | Ancient | strip row + top-level tree entry |
-| Ancient British Mastiff Type | Ancient | strip row + top-level tree entry |
-| Ancient Celtic Scent Hound | Ancient | strip row + top-level tree entry, flip-only |
-| Ancient Livestock Dog | Ancient | strip row + top-level tree entry, flip-only |
-| Medieval Shepherd's Dog | Medieval | strip row + top-level tree entry, flip-only |
-| Medieval Drover's Dog | Medieval | strip row + top-level tree entry, flip-only |
-| Medieval Earth Dog | Medieval | strip row + top-level tree entry, flip-only |
+| Celtic Coursing Hound | Ancient | strip row + top-level tree entry |
+| Ancient Mastiff | Ancient | strip row + top-level tree entry |
+| Celtic Scent Hound | Ancient | strip row + top-level tree entry, flip-only |
+| Livestock Dog | Ancient | strip row + top-level tree entry, flip-only |
+| Shepherd's Dog | Medieval | strip row + top-level tree entry, flip-only |
+| Drover's Dog | Medieval | strip row + top-level tree entry, flip-only |
+| Earth Dog | Medieval | strip row + top-level tree entry, flip-only |
 
 All seven are extinct historical types. Status is carried the way the code
 already carries it: the `note` ends with the sentence "An extinct historical
@@ -93,13 +93,13 @@ classes it extinct via its substring check, and any strip row carries
 
 | Record | Short description |
 |---|---|
-| Ancient Celtic Coursing Hound | Swift Celtic sight-hunting dog described by classical writers, an early root of later British and Irish sighthounds. |
-| Ancient British Mastiff Type | Powerful British guard and hunting dog praised by Roman writers for courage and strength. |
-| Ancient Celtic Scent Hound | Early Celtic tracking hound that followed game by scent, representing the roots of later European scent hounds. |
-| Ancient Livestock Dog | Broad early working-dog population used to guard, move and control livestock before named British breeds existed. |
-| Medieval Shepherd's Dog | Practical medieval working dog used to move and protect sheep, forming an early root of Britain's collie families. |
-| Medieval Drover's Dog | Tough working dog that helped move cattle and sheep over long distances to markets and towns. |
-| Medieval Earth Dog | Small, determined hunting and vermin dog that followed quarry underground. |
+| Celtic Coursing Hound | Swift Celtic sight-hunting dog described by classical writers, an early root of later British and Irish sighthounds. |
+| Ancient Mastiff | Powerful British guard and hunting dog praised by Roman writers for courage and strength. |
+| Celtic Scent Hound | Early Celtic tracking hound that followed game by scent, representing the roots of later European scent hounds. |
+| Livestock Dog | Broad early working-dog population used to guard, move and control livestock before named British breeds existed. |
+| Shepherd's Dog | Practical medieval working dog used to move and protect sheep, forming an early root of Britain's collie families. |
+| Drover's Dog | Tough working dog that helped move cattle and sheep over long distances to markets and towns. |
+| Earth Dog | Small, determined hunting and vermin dog that followed quarry underground. |
 
 The optional longer historical term "Vertragus" is dropped: the record shape
 has no alternate-name field and none is invented (Batch 0 confirmed, D3
@@ -115,13 +115,13 @@ rename any file.
 
 | Record | Image |
 |---|---|
-| Ancient Celtic Coursing Hound | `ancient-celtic-coursing-hound.jpg` |
-| Ancient British Mastiff Type | `ancient-british-mastiff-type.jpg` |
-| Ancient Celtic Scent Hound | `ancient-celtic-scent-hound.jpg` |
-| Ancient Livestock Dog | `ancient-livestock-dog.jpg` |
-| Medieval Shepherd's Dog | `medieval-shepherds-dog.jpg` |
-| Medieval Drover's Dog | `medieval-drover-dog.jpg` |
-| Medieval Earth Dog | `medieval-earth-dog.jpg` |
+| Celtic Coursing Hound | `ancient-celtic-coursing-hound.jpg` |
+| Ancient Mastiff | `ancient-british-mastiff-type.jpg` |
+| Celtic Scent Hound | `ancient-celtic-scent-hound.jpg` |
+| Livestock Dog | `ancient-livestock-dog.jpg` |
+| Shepherd's Dog | `medieval-shepherds-dog.jpg` |
+| Drover's Dog | `medieval-drover-dog.jpg` |
+| Earth Dog | `medieval-earth-dog.jpg` |
 
 The Drover's Dog image is singular, `drover`, while the record name is
 possessive. That is intentional and the file is not renamed to match.
@@ -145,7 +145,7 @@ strip rows (`data/uk-breeds.ts:22-23`), their pack records, their pages, their
 conservation status, photography and copy all stay exactly as they are. This
 remains the single most important constraint in the brief.
 
-Instead, Ancient British Mastiff Type and Ancient Celtic Coursing Hound are
+Instead, Ancient Mastiff and Celtic Coursing Hound are
 ADDED to the Ancient-to-medieval strip alongside them, as extinct historical
 types with their own imagery and copy.
 
@@ -184,9 +184,9 @@ Direction of linkage:
 - The ancient records inherit nothing forwards: no modern status, no modern
   imagery, no modern breed-standard copy.
 
-Forward links, for the trees that use them later: Ancient Celtic Coursing
-Hound to Greyhound, Scottish Deerhound, Irish Wolfhound and other coursing
-lines. Ancient British Mastiff Type to Mastiff, Alaunt, bandog, Old English
+Forward links, for the trees that use them later: Celtic Coursing Hound
+to Greyhound, Scottish Deerhound, Irish Wolfhound and other coursing
+lines. Ancient Mastiff to Mastiff, Alaunt, bandog, Old English
 Bulldog and related branches.
 
 ---
@@ -200,15 +200,15 @@ used, because names are keys.
 
 | Tree | Structure (oldest first) | Note |
 |---|---|---|
-| Rache | Ancient Celtic Scent Hound beneath Medieval Rache | Treat "rache" as a broad medieval scent-hunting category |
-| Talbot | Ancient Celtic Scent Hound beneath the Talbot's scenting stock | Do not present the Talbot as the proven direct ancestor of every later scent hound |
-| Cur | Ancient Livestock Dog and Medieval Drover's Dog beneath the Cur's working stock ("Old working collies") | Remove "Old working bandogs" (`data/lineage.ts:1203`) as a main parent unless separate evidence supports it. Its removal changes displayed figures, so it is its own fixture-gated step with owner sign-off, not a side effect |
-| Old Welsh Grey Sheepdog | Medieval Shepherd's Dog beneath "Welsh herding dogs" and "Shaggy upland herders" | Regional development, not precise percentages |
-| Scottish Terrier | Medieval Earth Dog beneath "Old Highland terriers" | The new record supplies the missing early root |
-| Black and Tan Terrier | Medieval Earth Dog beneath "Old British ratting terriers" and "Earth and hunt terriers" | Existing labels remain beneath the new foundation. This tree is grafted into Manchester Terrier (`data/lineage.ts:586`), so the fixture must cover Manchester too |
+| Rache | Celtic Scent Hound beneath Medieval Rache | Treat "rache" as a broad medieval scent-hunting category |
+| Talbot | Celtic Scent Hound beneath the Talbot's scenting stock | Do not present the Talbot as the proven direct ancestor of every later scent hound |
+| Cur | Livestock Dog and Drover's Dog beneath the Cur's working stock ("Old working collies") | Remove "Old working bandogs" (`data/lineage.ts:1203`) as a main parent unless separate evidence supports it. Its removal changes displayed figures, so it is its own fixture-gated step with owner sign-off, not a side effect |
+| Old Welsh Grey Sheepdog | Shepherd's Dog beneath "Welsh herding dogs" and "Shaggy upland herders" | Regional development, not precise percentages |
+| Scottish Terrier | Earth Dog beneath "Old Highland terriers" | The new record supplies the missing early root |
+| Black and Tan Terrier | Earth Dog beneath "Old British ratting terriers" and "Earth and hunt terriers" | Existing labels remain beneath the new foundation. This tree is grafted into Manchester Terrier (`data/lineage.ts:586`), so the fixture must cover Manchester too |
 
 **Do not touch any other tree directly.** Grafting means an edit here can
-surface in trees outside the six, and for Medieval Earth Dog that scope is
+surface in trees outside the six, and for Earth Dog that scope is
 an owner decision, not an overrun (4 August): the Highland and ratting
 stocks are genuinely shared, so the foundation surfaces in twelve trees
 (Scottish Terrier, Black and Tan Terrier, Skye, Paisley, Yorkshire,
@@ -265,10 +265,10 @@ change.**
   graft:** a foundation takes HALF its branch where the source is plausible,
   and a QUARTER where it is speculative. Nothing among the seven foundations
   is strong. The four Batch 4 grafts are all assessed plausible and take
-  half: Ancient Celtic Scent Hound beneath the Rache's Old scenting hounds,
-  Ancient Celtic Scent Hound beneath the Talbot's Old scenting hounds,
-  Medieval Drover's Dog beneath the Cur's Old working collies, and Ancient
-  Livestock Dog beneath Medieval Drover's Dog. Batch 5 and any later graft
+  half: Celtic Scent Hound beneath the Rache's Old scenting hounds,
+  Celtic Scent Hound beneath the Talbot's Old scenting hounds,
+  Drover's Dog beneath the Cur's Old working collies, and Ancient
+  Livestock Dog beneath Drover's Dog. Batch 5 and any later graft
   applies this rule rather than re-deciding it.
 - **The fixture. BUILT (Batch 1).** `scripts/lineage-percentage-fixture.mts`
   captures every displayed percentage across every tree on the site: all 123
@@ -437,8 +437,8 @@ visualisation, consistent with the global explanation, not measurements.
 
 ## 13 Ancient playable levels (owner instruction, 4 August)
 
-The four ancient extinct records (Ancient British Mastiff Type, Ancient
-Celtic Coursing Hound, Ancient Celtic Scent Hound, Ancient Livestock Dog)
+The four ancient extinct records (Ancient Mastiff, Ancient
+Celtic Coursing Hound, Celtic Scent Hound, Livestock Dog)
 became playable levels. Each takes the Celtic Heeler shape the owner pointed
 to on screen: two stock branches, each an even split between one deeper
 ancestor (rendered as the half-size nested circle) and a same-name
@@ -450,17 +450,17 @@ Trees (owner approved the Mastiff pair by name; the substitution of the
 existing "Ancient Molossers" node for the proposed "Ancient Molosser War
 Dogs", and the other three trees, are agent-authored and flagged for review):
 
-- Ancient British Mastiff Type: Ancient Molossers (nested: Old mastiffs of
+- Ancient Mastiff: Ancient Molossers (nested: Old mastiffs of
   the ancient East) + Alaunt war dogs (nested: Dogs of the Alan horsemen).
   The owner accepted the Alaunt with the dating caution noted (most accounts
   put the Alaunt cross in the Norman period).
-- Ancient Celtic Coursing Hound: Gaulish coursing hounds, Arrian's vertragus
+- Celtic Coursing Hound: Gaulish coursing hounds, Arrian's vertragus
   (nested: Old hunting dogs of the Celts) + Ancient eastern sighthounds
   (nested: Old desert coursing dogs).
-- Ancient Celtic Scent Hound: Segusian tracking hounds (nested: Old hunting
+- Celtic Scent Hound: Segusian tracking hounds (nested: Old hunting
   dogs of the Celts) + Laconian tracking hounds (nested: Old trail dogs of
   the ancient East).
-- Ancient Livestock Dog: Celtic herdsmen's dogs (nested: Old hunting dogs of
+- Livestock Dog: Celtic herdsmen's dogs (nested: Old hunting dogs of
   the Celts) + Roman shepherd dogs (nested: Ancient Molossers as the
   flock-guarding stock).
 
@@ -470,7 +470,7 @@ Consequences, all fixture-proven additions-only:
   the ancient run and every later level renumbers by four (the accepted
   option B renumbering).
 - These records were already grafted beneath Talbot, Rache (Ancient Celtic
-  Scent Hound) and Cur (Ancient Livestock Dog); those circles now show the
+  Scent Hound) and Cur (Livestock Dog); those circles now show the
   nested structure, rescaled, with no displayed figure moved.
 - Engine: the graft rescale gained a leaf-sum path for records whose
   children are valueless branches (this shape). The direct-value path every
@@ -481,3 +481,25 @@ Consequences, all fixture-proven additions-only:
 - Six circle images do not exist yet; their nodes carry the shared
   placeholder-circle.svg stand-in, logged in PLACEHOLDERS.md at the repo
   root.
+
+## 14 Names shortened (owner instruction, 5 August)
+
+Seven records were renamed. Names are lookup keys (section 3), so this is a
+content change to a key: every `LINEAGE` entry, every grafted child node,
+`data/uk-breeds.ts`, `data/breedSources.ts` and these documents were changed
+together, and the section 7 fixture was rerun. This brief now reads in the
+NEW names throughout; the originals are recorded here only.
+
+| Was | Now |
+|---|---|
+| Ancient British Mastiff Type | Ancient Mastiff |
+| Ancient Celtic Coursing Hound | Celtic Coursing Hound |
+| Ancient Celtic Scent Hound | Celtic Scent Hound |
+| Ancient Livestock Dog | Livestock Dog |
+| Medieval Shepherd's Dog | Shepherd's Dog |
+| Medieval Drover's Dog | Drover's Dog |
+| Medieval Earth Dog | Earth Dog |
+
+Image filenames are NOT renamed to match (section 3 rule: never derive a
+filename from a display name), so `ancient-british-mastiff-type.jpg` and the
+other six keep their original names on disk.

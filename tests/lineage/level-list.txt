@@ -1,8 +1,8 @@
 [level] 00 ancient Celtic Hound
-[level] 01 ancient Ancient British Mastiff Type
-[level] 02 ancient Ancient Celtic Coursing Hound
-[level] 03 ancient Ancient Celtic Scent Hound
-[level] 04 ancient Ancient Livestock Dog
+[level] 01 ancient Ancient Mastiff
+[level] 02 ancient Celtic Coursing Hound
+[level] 03 ancient Celtic Scent Hound
+[level] 04 ancient Livestock Dog
 [level] 05 ancient Celtic Heeler
 [level] 06 medieval Scottish Deerhound
 [level] 07 medieval Rache

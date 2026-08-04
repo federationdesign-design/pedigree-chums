@@ -28,16 +28,16 @@ export const ukBreeds: UKBreed[] = [
   // The two ancient additions (docs/lineage/BRIEF.md section 4): extinct
   // historical types placed beside their modern descendants. The Mastiff and
   // Greyhound rows above are deliberately untouched.
-  { name: "Ancient British Mastiff Type", strip: "ancient", era: "Ancient", anchor: 140, note: "Powerful British guard and hunting dog praised by Roman writers for courage and strength.", image: "/history/breeds/ancient-british-mastiff-type.jpg", tag: "extinct" },
-  { name: "Ancient Celtic Coursing Hound", strip: "ancient", era: "Ancient", anchor: 190, note: "Swift Celtic sight-hunting dog described by classical writers, an early root of later British and Irish sighthounds.", image: "/history/breeds/ancient-celtic-coursing-hound.jpg", tag: "extinct" },
+  { name: "Ancient Mastiff", strip: "ancient", era: "Ancient", anchor: 140, note: "Powerful British guard and hunting dog praised by Roman writers for courage and strength.", image: "/history/breeds/ancient-british-mastiff-type.jpg", tag: "extinct" },
+  { name: "Celtic Coursing Hound", strip: "ancient", era: "Ancient", anchor: 190, note: "Swift Celtic sight-hunting dog described by classical writers, an early root of later British and Irish sighthounds.", image: "/history/breeds/ancient-celtic-coursing-hound.jpg", tag: "extinct" },
   // The five foundation records (docs/lineage/BRIEF.md section 3, Batch 3):
   // extinct historical types, flip-only cards under the root-only rule.
   // Referenced by no tree yet; Batches 4 and 5 do the grafting.
-  { name: "Ancient Celtic Scent Hound", strip: "ancient", era: "Ancient", anchor: 210, note: "Early Celtic tracking hound that followed game by scent, representing the roots of later European scent hounds.", image: "/history/breeds/ancient-celtic-scent-hound.jpg", tag: "extinct" },
-  { name: "Ancient Livestock Dog", strip: "ancient", era: "Ancient", anchor: 220, note: "Broad early working-dog population used to guard, move and control livestock before named British breeds existed.", image: "/history/breeds/ancient-livestock-dog.jpg", tag: "extinct" },
-  { name: "Medieval Shepherd's Dog", strip: "medieval", era: "Medieval", anchor: 1050, note: "Practical medieval working dog used to move and protect sheep, forming an early root of Britain's collie families.", image: "/history/breeds/medieval-shepherds-dog.jpg", tag: "extinct" },
-  { name: "Medieval Drover's Dog", strip: "medieval", era: "Medieval", anchor: 1060, note: "Tough working dog that helped move cattle and sheep over long distances to markets and towns.", image: "/history/breeds/medieval-drover-dog.jpg", tag: "extinct" },
-  { name: "Medieval Earth Dog", strip: "medieval", era: "Medieval", anchor: 1070, note: "Small, determined hunting and vermin dog that followed quarry underground.", image: "/history/breeds/medieval-earth-dog.jpg", tag: "extinct" },
+  { name: "Celtic Scent Hound", strip: "ancient", era: "Ancient", anchor: 210, note: "Early Celtic tracking hound that followed game by scent, representing the roots of later European scent hounds.", image: "/history/breeds/ancient-celtic-scent-hound.jpg", tag: "extinct" },
+  { name: "Livestock Dog", strip: "ancient", era: "Ancient", anchor: 220, note: "Broad early working-dog population used to guard, move and control livestock before named British breeds existed.", image: "/history/breeds/ancient-livestock-dog.jpg", tag: "extinct" },
+  { name: "Shepherd's Dog", strip: "medieval", era: "Medieval", anchor: 1050, note: "Practical medieval working dog used to move and protect sheep, forming an early root of Britain's collie families.", image: "/history/breeds/medieval-shepherds-dog.jpg", tag: "extinct" },
+  { name: "Drover's Dog", strip: "medieval", era: "Medieval", anchor: 1060, note: "Tough working dog that helped move cattle and sheep over long distances to markets and towns.", image: "/history/breeds/medieval-drover-dog.jpg", tag: "extinct" },
+  { name: "Earth Dog", strip: "medieval", era: "Medieval", anchor: 1070, note: "Small, determined hunting and vermin dog that followed quarry underground.", image: "/history/breeds/medieval-earth-dog.jpg", tag: "extinct" },
   { name: "Talbot", strip: "medieval", era: "Medieval", anchor: 1200, note: "White medieval hound, ancestor of the beagle and bloodhound.", image: "/history/breeds/talbot-hound.jpg", tag: "extinct" },
 
   { name: "Bloodhound", strip: "medieval", era: "Medieval", anchor: 1100, note: "Scent hound famed for a nose that can follow a trail days old.", image: "/history/breeds/Medieval-Bloodhound.jpg", tag: "endangered" },

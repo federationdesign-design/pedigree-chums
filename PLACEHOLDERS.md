@@ -29,12 +29,12 @@ asset, then delete the SVG.
 
 | Node awaiting artwork | Level |
 |---|---|
-| Dogs of the Alan horsemen (nested) | Ancient British Mastiff Type |
-| Old desert coursing dogs (nested) | Ancient Celtic Coursing Hound |
-| Segusian tracking hounds (big circle) | Ancient Celtic Scent Hound |
-| Old trail dogs of the ancient East (nested) | Ancient Celtic Scent Hound |
-| Celtic herdsmen's dogs (big circle) | Ancient Livestock Dog |
-| Roman shepherd dogs (big circle) | Ancient Livestock Dog |
+| Dogs of the Alan horsemen (nested) | Ancient Mastiff |
+| Old desert coursing dogs (nested) | Celtic Coursing Hound |
+| Segusian tracking hounds (big circle) | Celtic Scent Hound |
+| Old trail dogs of the ancient East (nested) | Celtic Scent Hound |
+| Celtic herdsmen's dogs (big circle) | Livestock Dog |
+| Roman shepherd dogs (big circle) | Livestock Dog |
 
 ## What's Your Superpower (MVP-4.1 prototype)
 
