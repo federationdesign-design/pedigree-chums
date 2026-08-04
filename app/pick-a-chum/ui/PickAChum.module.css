@@ -292,16 +292,6 @@
   align-items: flex-start;
   gap: 10px;
 }
-/* Task 108: round profile picture beside a dog's message. */
-.dogProfile {
-  flex: none;
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 3px solid var(--pc-ui-blue);
-  box-shadow: var(--pc-shadow);
-}
 .rowUser {
   justify-content: flex-end;
 }
@@ -325,21 +315,6 @@
   font-size: 16px;
   line-height: 1.4;
   animation: pcRise 260ms ease both;
-}
-.nameplate {
-  font-family: var(--font-display, sans-serif);
-  font-size: 30px;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  color: var(--pc-ui-blue);
-  margin-bottom: 0;
-}
-/* S12 (Task 15): a protected safety response drops the dog name for a calm, shared
-   HELP AND SUPPORT header, in navy rather than the character blue. */
-.nameplateSupport {
-  font-size: 22px;
-  letter-spacing: 0.08em;
-  color: var(--pc-ui-navy);
 }
 .dialogue {
   margin: 0;
@@ -708,11 +683,23 @@
 .chatColumn {
   position: fixed;
   width: 380px;
-  bottom: 96px;
+  /* Task 131: a GENEROUS clearance above the visitor bar. The bar and the
+     bubbles are both white, so the gap does all the separating work: the
+     composer is 96px tall over a 16px inset, so 168 leaves ~56px of clear
+     page between the bar's top and the column's last bubble. */
+  bottom: 168px;
   z-index: 2;
   display: flex;
   flex-direction: column;
   pointer-events: none;
+}
+/* Task 131: the desktop column pins its content to the BOTTOM of the window
+   (nearest the input) and grows upward to the top as the conversation fills,
+   so the full viewport height is used. Scoped to the column: the mobile
+   panel's threadInner keeps its own top-pinned behaviour. */
+.chatColumn .threadInner {
+  margin-bottom: 0;
+  margin-top: auto;
 }
 
 /* The visitor's input: fixed, bottom centre, attached to no dog. Centred with
@@ -773,6 +760,38 @@
   outline: 3px solid var(--pc-ui-yellow);
   outline-offset: 2px;
   border-radius: 8px;
+}
+
+/* S12 (Task 15), kept through Task 132: a protected safety response is served
+   under the shared support surface, so its bubble KEEPS a visible header
+   (HELP AND SUPPORT, navy, calm) while ordinary dog bubbles carry no name.
+   This is the safety surface's label, not name repetition. */
+.supportPlate {
+  font-family: var(--font-display, sans-serif);
+  font-size: 22px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--pc-ui-navy);
+  margin-bottom: 0;
+}
+
+/* Task 132: the dog's name, once, under her medallion (fan anchor and the
+   mobile panel's medallion both). White display face over the page; the
+   per-bubble nameplates are gone. */
+.anchorName {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-display, 'Luckiest Guy', cursive);
+  font-size: 15px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #ffffff;
+  text-shadow: 0 1px 2px rgba(17, 34, 66, 0.6);
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 6;
 }
 
 /* Task 130: the minimised chip. Bottom RIGHT (the hidden games counter owns
