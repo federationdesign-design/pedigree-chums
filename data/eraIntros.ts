@@ -12,6 +12,17 @@
 export type EraIntro = { words: string[]; note: string };
 
 export const ERA_INTRO: Record<string, EraIntro> = {
+  /* The split eras (owner request, 4 August). The combined key below stays
+     for anything still passing the old era; the ancient run inherits its
+     note, and the medieval note is new copy flagged for owner review. */
+  ancient: {
+    words: ["Ancient", "Times", "Dogs"],
+    note: "At the start of time we did not have writing, so we can only really tell what has happened after we started writing stuff down",
+  },
+  medieval: {
+    words: ["Medieval", "Times", "Dogs"],
+    note: "By now people were writing things down, so we know which dogs did which jobs",
+  },
   "ancient-medieval": {
     /* Back to the original three lines. The arrow is the word "to". */
     words: ["Ancient\u2192", "Medieval", "Dogs"],
