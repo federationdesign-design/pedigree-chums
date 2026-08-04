@@ -19,8 +19,12 @@ export type UKBreed = {
 export const ukBreeds: UKBreed[] = [
   // Ancient, then Medieval: split into two strips (owner request, 4 August)
   { name: "Irish Wolfhound", strip: "ancient", era: "Ancient", anchor: 100, note: "Towering ancient Irish hound, bred to hunt wolves and guard halls.", image: "/history/breeds/irish-wolfhound-photo.jpg", tag: "endangered" },
-  { name: "Mastiff", strip: "ancient", era: "Ancient", anchor: 150, note: "Britain's ancient war and guard dog, known since Roman times.", image: "/history/breeds/english-mastiff-photo.jpg", tag: "endangered" },
-  { name: "Greyhound", strip: "ancient", era: "Ancient", anchor: 200, note: "The fastest of all dogs, a sighthound in Britain since antiquity.", image: "/history/breeds/original-greyhound.jpg", tag: "in-decline" },
+  // Owner research (4 August): the modern Mastiff and Greyhound are living
+  // breeds superseded on the early timelines by the ancient-type records.
+  // Each moves to its modern formalisation point: the Mastiff to 1883, when
+  // the standard type was refined, and the Greyhound to the 1700s.
+  { name: "Mastiff", strip: "late1800", era: "1883", anchor: 1883, note: "Britain's ancient war and guard dog, known since Roman times.", image: "/history/breeds/english-mastiff-photo.jpg", tag: "endangered" },
+  { name: "Greyhound", strip: "c1700", era: "1700s", anchor: 1745, note: "The fastest of all dogs, a sighthound in Britain since antiquity.", image: "/history/breeds/original-greyhound.jpg", tag: "in-decline" },
   // The two ancient additions (docs/lineage/BRIEF.md section 4): extinct
   // historical types placed beside their modern descendants. The Mastiff and
   // Greyhound rows above are deliberately untouched.

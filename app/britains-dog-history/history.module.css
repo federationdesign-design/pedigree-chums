@@ -571,6 +571,14 @@
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
 }
+/* Owner review: on desktop the bottom flash is three times taller with text
+   twice the size; mobile keeps the base sizes above. */
+@media (min-width: 721px) {
+  .nodeTag {
+    font-size: 1.4rem;
+    padding: 12px 0;
+  }
+}
 .nodeTagExtinct {
   background: #d64545;
   color: var(--white);
