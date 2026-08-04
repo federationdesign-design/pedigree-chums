@@ -9,15 +9,10 @@ import { getLineage, type LineageNode } from "../../data/lineage";
 import { resolveLineageName } from "../../data/lineageNames";
 import LineageModal from "../../components/LineageModal/LineageModal";
 import styles from "./history.module.css";
+import { sourcesFor } from "../../data/breedSources";
 
-/* Outbound sources shown on the ancient-medieval card back, matched to the
-   mobile card. Ancient-medieval only, so they never sit on a Cockapoo. */
-const OUTBOUND: { href: string; tone: "blue" | "green" | "black" }[] = [
-  { href: "https://penelope.uchicago.edu/Thayer/e/roman/texts/strabo/4e%2A.html", tone: "blue" },
-  { href: "https://www.gutenberg.org/cache/epub/78013/pg78013-images.html", tone: "green" },
-  { href: "https://en.wikipedia.org/wiki/List_of_extinct_dog_breeds", tone: "black" },
-];
-const OUTBOUND_ERAS = ["ancient", "medieval"];
+/* Outbound sources are per dog now (data/breedSources.ts), so the era gate has
+   gone: a dog with no sources of its own shows no links, wherever it sits. */
 
 // Bigger dog silhouette for breeds with no square art.
 function DogIcon() {
@@ -566,9 +561,9 @@ export default function BreedStrip({
                           <span className={styles.deskBackHint}>Tap to learn about this dog</span>
                         )}
                         <span className={styles.flipNote}>{b.note}</span>
-                        {kind === "play" && OUTBOUND_ERAS.includes(era) && (
+                        {sourcesFor(b.name).length > 0 && (
                           <span className={styles.backLinks}>
-                            {OUTBOUND.map((o) => (
+                            {sourcesFor(b.name).map((o) => (
                               <span
                                 key={o.href}
                                 className={styles.backLink}

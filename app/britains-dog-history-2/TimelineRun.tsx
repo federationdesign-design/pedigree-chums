@@ -9,6 +9,7 @@ import { ukBreeds } from "../../data/uk-breeds";
    See the renderLevels note in BreedStrip.tsx. */
 import BreedStrip, { breedCardKind, stripMatches } from "../britains-dog-history/BreedStrip";
 import styles from "./history2.module.css";
+import { sourcesFor } from "../../data/breedSources";
 
 /*
   The vertical run. One dog per screen, scrolled downwards, inside a carousel
@@ -32,19 +33,9 @@ import styles from "./history2.module.css";
 */
 
 /* Outbound references on the back of a card, top to bottom.
-   The utm_source=chatgpt.com parameter has been stripped from the two new
-   links: it is an artefact of where they were found and would send a false
-   referrer. Say if you want it kept. */
-const OUTBOUND: { href: string; tone: "blue" | "green" | "black" }[] = [
-  { href: "https://penelope.uchicago.edu/Thayer/e/roman/texts/strabo/4e%2A.html", tone: "blue" },
-  { href: "https://www.gutenberg.org/cache/epub/78013/pg78013-images.html", tone: "green" },
-  { href: "https://en.wikipedia.org/wiki/List_of_extinct_dog_breeds", tone: "black" },
-];
-
-/* Which runs show the three links above. They are ancient-medieval sources, so
-   they show on ancient-medieval and nowhere else until the other eras have
-   links of their own. Add an era to this list, do not widen OUTBOUND. */
-const OUTBOUND_ERAS = ["ancient-medieval", "ancient", "medieval"];
+   PER DOG NOW (data/breedSources.ts, owner instruction 4 August): each extinct
+   dog names its own sources, so there is no era gate here any more. A dog with
+   no sources of its own simply shows no links. */
 
 /* How far down a dog screen the card sits. The line is drawn to exactly this
    depth, so the two meet. */
@@ -461,16 +452,13 @@ export default function TimelineRun({
                           first. A native confirm rather than a panel of our
                           own: it cannot be missed and it cannot be clipped by
                           the card's 3D transform.
-                          ANCIENT-MEDIEVAL ONLY. Strabo, Gutenberg and a list of
-                          extinct breeds are that era's sources. On the other
-                          eight runs they would be sitting on a Cockapoo. Add an
-                          era here once it has links of its own. */}
-                      {/* Ancient-medieval only, and only on a dog that has a level.
-                          A dog that sends you to its own breed page has no
-                          lineage to read around. */}
-                      {kind === "play" && OUTBOUND_ERAS.includes(era) && (
+                          THE SOURCE MAP IS THE GATE: a dog only shows links it
+                          owns, so nothing here can end up sitting on a
+                          Cockapoo. Add a dog to data/breedSources.ts to give
+                          it links. */}
+                      {sourcesFor(b.name).length > 0 && (
                         <span className={styles.backLinks}>
-                          {OUTBOUND.map((o) => (
+                          {sourcesFor(b.name).map((o) => (
                             <span
                               key={o.href}
                               className={`${styles.backLink} ${styles[`backLink_${o.tone}`]}`}
