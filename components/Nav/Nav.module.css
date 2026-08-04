@@ -628,3 +628,19 @@
 @media (prefers-reduced-motion: reduce) {
   .navBusyDots span { animation: none; }
 }
+
+/* Plain text menu. The bento board is kept in the file, unused, for later. */
+.textMenu {
+  display: block;
+  padding: 90px 24px 80px;
+  max-width: 560px;
+  margin: 0 auto;
+}
+.textMenu a {
+  display: block;
+  padding: 18px 4px;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #fff;
+  border-bottom: 1px solid rgba(255,255,255,0.18);
+}
