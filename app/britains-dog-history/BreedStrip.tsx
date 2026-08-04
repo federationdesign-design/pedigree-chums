@@ -17,7 +17,7 @@ const OUTBOUND: { href: string; tone: "blue" | "green" | "black" }[] = [
   { href: "https://www.gutenberg.org/cache/epub/78013/pg78013-images.html", tone: "green" },
   { href: "https://en.wikipedia.org/wiki/List_of_extinct_dog_breeds", tone: "black" },
 ];
-const OUTBOUND_ERAS = ["ancient-medieval"];
+const OUTBOUND_ERAS = ["ancient", "medieval"];
 
 // Bigger dog silhouette for breeds with no square art.
 function DogIcon() {
@@ -36,6 +36,8 @@ const LIVES_STREAK = 3;
 
 const ERA_LABELS: Record<string, string> = {
   "ancient-medieval": "Ancient to medieval",
+  ancient: "Ancient",
+  medieval: "Medieval",
   c1500: "Tudor times",
   c1700: "The 1700s",
   early1800: "The early 1800s",
@@ -79,6 +81,13 @@ export type BreedStripOpen = (b: UKBreed) => (() => void) | undefined;
    Measured across all 97 dogs on the history pages: 62 play, 28 learn, 7
    flip-only. Pure and stateless, so it is safe to call from anywhere. */
 export type BreedCardKind = "play" | "learn";
+
+/* The ancient-medieval strip is SPLIT into "ancient" and "medieval" on the
+   live page (owner request). The slider still shows the combined run, so a
+   caller passing the old combined era matches both new strips. */
+export function stripMatches(rowStrip: string, era: string): boolean {
+  return rowStrip === era || (era === "ancient-medieval" && (rowStrip === "ancient" || rowStrip === "medieval"));
+}
 
 export function breedCardKind(name: string): BreedCardKind | null {
   const packName = resolveLineageName(name);
@@ -143,7 +152,7 @@ export default function BreedStrip({
   // The mini pits are levels: every popup-capable breed, in timeline order
   // across all eras. Round Won advances to the next; Game Over restarts at
   // the very first.
-  const STRIP_ORDER = ["ancient-medieval", "c1500", "c1700", "early1800", "spaniels", "mid1800", "late1800", "c1900", "crosses"];
+  const STRIP_ORDER = ["ancient", "medieval", "c1500", "c1700", "early1800", "spaniels", "mid1800", "late1800", "c1900", "crosses"];
   const buildActive = (b: UKBreed): Active | null => {
     const pn = resolveLineageName(b.name);
     const lin = getLineage(pn);
@@ -191,7 +200,7 @@ export default function BreedStrip({
   };
 
   const breeds: UKBreed[] = ukBreeds
-    .filter((b) => b.strip === era)
+    .filter((b) => stripMatches(b.strip, era))
     .sort((a, b) => a.anchor - b.anchor);
 
   // Homepage-style scroll: convert vertical wheel into horizontal scroll for

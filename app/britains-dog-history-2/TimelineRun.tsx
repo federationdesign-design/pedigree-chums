@@ -7,7 +7,7 @@ import { ukBreeds } from "../../data/uk-breeds";
    Passing it our own markup means the slider and the live page can never hold
    two versions of those rules. Nothing about the game is written in this file.
    See the renderLevels note in BreedStrip.tsx. */
-import BreedStrip, { breedCardKind } from "../britains-dog-history/BreedStrip";
+import BreedStrip, { breedCardKind, stripMatches } from "../britains-dog-history/BreedStrip";
 import styles from "./history2.module.css";
 
 /*
@@ -73,7 +73,7 @@ export default function TimelineRun({
      the dogs rather than swiping sideways. */
   words: string[];
 }) {
-  const breeds = ukBreeds.filter((b) => b.strip === era).sort((a, b) => a.anchor - b.anchor);
+  const breeds = ukBreeds.filter((b) => stripMatches(b.strip, era)).sort((a, b) => a.anchor - b.anchor);
   const [flipped, setFlipped] = useState<string | null>(null);
   /* Bumped every time a card turns. The marker row's hop animation is keyed off
      whether this is odd or even, which is what restarts it: re-applying the

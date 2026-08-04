@@ -1,10 +1,10 @@
-[level] 00 ancient-medieval Celtic Hound
-[level] 01 ancient-medieval Celtic Heeler
-[level] 02 ancient-medieval Scottish Deerhound
-[level] 03 ancient-medieval Rache
-[level] 04 ancient-medieval Talbot
-[level] 05 ancient-medieval Buckhound
-[level] 06 ancient-medieval Southern Hound
+[level] 00 ancient Celtic Hound
+[level] 01 ancient Celtic Heeler
+[level] 02 medieval Scottish Deerhound
+[level] 03 medieval Rache
+[level] 04 medieval Talbot
+[level] 05 medieval Buckhound
+[level] 06 medieval Southern Hound
 [level] 07 c1500 Old English Bulldog
 [level] 08 c1500 Skye Terrier
 [level] 09 c1500 English Foxhound
