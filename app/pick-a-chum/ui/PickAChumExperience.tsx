@@ -77,10 +77,6 @@ const dogPos = (i: number) => ({ left: ARC_RADIUS * Math.cos(dogAngleRad(i)), to
 // Dog centre (connector far end) and the near end on the icon's body edge.
 const dogCentre = (i: number) => ({ x: ARC_CENTER + ARC_RADIUS * Math.cos(dogAngleRad(i)), y: ARC_CENTER + ARC_RADIUS * Math.sin(dogAngleRad(i)) });
 const lineStart = (i: number) => ({ x: ARC_CENTER + ARC_BODY_R * Math.cos(dogAngleRad(i)), y: ARC_CENTER + ARC_BODY_R * Math.sin(dogAngleRad(i)) });
-// Task 129: the Terrier and Boxer sit low on the arc with little room beneath,
-// so their conversation columns grow UPWARD from the dog (owner ruling);
-// newest message nearest her, older ones above.
-const UP_COLUMN_DOGS: ReadonlySet<Dog> = new Set(['terrier', 'boxer']);
 const round1 = (n: number) => Math.round(n * 10) / 10;
 
 function dogInfo(dog: Dog): { name: string; image: string } {
@@ -137,7 +133,7 @@ function actionFor(r: Turn['response']): Command | undefined {
 // (active/aftercare) is never persisted -- a child's disclosure must not sit in sessionStorage raw.
 // Cleared on tab close (sessionStorage) and on an explicit close (the launcher removes the key).
 export const CHAT_KEY = 'pc-chat';
-function readChat(): { messages: Message[]; session: Session; dog: Dog; phase: Phase; recSessionId: string } | null {
+function readChat(): { messages: Message[]; session: Session; dog: Dog; phase: Phase; recSessionId: string; minimised?: boolean } | null {
   try {
     const raw = typeof window !== 'undefined' ? window.sessionStorage.getItem(CHAT_KEY) : null;
     if (!raw) return null;
@@ -207,14 +203,29 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
   }, []);
   const wide = vw > 480;
 
-  // Task 129: the conversation column hangs off the chosen dog, who stays
-  // exactly where the fan put her. Downward for the high dogs; UPWARD for the
-  // low two (UP_COLUMN_DOGS), bottom-anchored just above the dog so the
-  // newest message sits nearest her. Positioned from the anchor medallion's
-  // measured rect, so it tracks the arc, the selector scale, any resize and
-  // the handover pops (re-measured after the pop settles).
+  // Task 130: minimise collapses the chat to a dog-face chip bottom right;
+  // restore brings the conversation back exactly where it was. The flag rides
+  // the persistence payload so a minimised chat survives page navigation.
+  const [minimised, setMinimised] = useState<boolean>(restored ? !!restored.minimised : false);
+  // One body-level signal drives everything that must not co-exist with the
+  // chip: the scrim (owner ruling: no chat UI left to lift) and the offer
+  // card (owner ruling: two floating things in one corner is worse than
+  // either). CSS reads it; nothing else needs wiring.
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    if (minimised) document.body.setAttribute('data-pc-min', '1');
+    else document.body.removeAttribute('data-pc-min');
+    return () => document.body.removeAttribute('data-pc-min');
+  }, [minimised]);
+
+  // Task 130: the conversation column sits ADJACENT to the chosen dog, who
+  // stays exactly where the fan put her. It starts beside her (top just above
+  // her centre) and runs down past her toward the visitor bar; right of the
+  // dog when there is room, flipped to the left when the viewport narrows.
+  // Positioned from the anchor medallion's measured rect, so it tracks the
+  // arc, the selector scale, any resize and the handover pops.
   const fanAnchorRef = useRef<HTMLDivElement | null>(null);
-  const [colBox, setColBox] = useState<{ left: number; top?: number; bottom?: number; up: boolean } | null>(null);
+  const [colBox, setColBox] = useState<{ left: number; top: number } | null>(null);
   const COL_W = 380;
   const COL_TOP_CLEAR = 84; // stay below the fixed nav
   useEffect(() => {
@@ -222,12 +233,11 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
     const measure = () => {
       const r = fanAnchorRef.current?.getBoundingClientRect();
       if (!r) return;
-      const left = Math.min(Math.max(r.left + r.width / 2 - COL_W / 2, 12), window.innerWidth - COL_W - 12);
-      if (UP_COLUMN_DOGS.has(dog)) {
-        setColBox({ left, top: COL_TOP_CLEAR, bottom: window.innerHeight - (r.top - 10), up: true });
-      } else {
-        setColBox({ left, top: r.bottom + 10, up: false });
-      }
+      const gap = 12;
+      const roomRight = window.innerWidth - (r.right + gap);
+      const left = roomRight >= COL_W + 12 ? r.right + gap : Math.max(12, r.left - gap - COL_W);
+      const top = Math.max(COL_TOP_CLEAR, r.top + r.height / 2 - 40);
+      setColBox({ left, top });
     };
     measure();
     const settle = window.setTimeout(measure, 600); // after the pop-in lands
@@ -236,7 +246,7 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
       window.clearTimeout(settle);
       window.removeEventListener('resize', measure);
     };
-  }, [wide, phase, dog, vw, swap]);
+  }, [wide, phase, dog, vw, swap, minimised]);
 
   const clearTimers = useCallback(() => {
     timersRef.current.forEach((id) => window.clearTimeout(id));
@@ -399,9 +409,9 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
       return;
     }
     try {
-      window.sessionStorage.setItem(CHAT_KEY, JSON.stringify({ messages, session, dog, phase, recSessionId: recSessionRef.current }));
+      window.sessionStorage.setItem(CHAT_KEY, JSON.stringify({ messages, session, dog, phase, recSessionId: recSessionRef.current, minimised }));
     } catch {}
-  }, [messages, phase, dog]);
+  }, [messages, phase, dog, minimised]);
 
   const selectDog = useCallback((d: Dog) => {
     clearTimers();
@@ -718,7 +728,7 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
           page beneath stays usable; it no longer closes on click (X and Escape still close). */}
       <div className={styles.wash} />
 
-      {(phase === 'selecting' || wide) && (
+      {(phase === 'selecting' || (wide && !minimised)) && (
         <div className={styles.selectorWrap}>
           <div className={styles.selector}>
             {phase === 'selecting' && (
@@ -771,24 +781,29 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
                     <button type="button" className={styles.close} aria-label="Close Pick a Chum" onClick={onClose}>
                       <img src="/red-icon.svg" alt="" aria-hidden="true" />
                     </button>
+                    {/* Task 130: minimise to a corner chip; restore brings the
+                        conversation back exactly as it was. */}
+                    <button type="button" className={styles.minimise} aria-label="Minimise the chat" onClick={() => setMinimised(true)}>
+                      <span aria-hidden="true" />
+                    </button>
                   </div>
                 );
               }
-              // Task 129: the other three RECEDE rather than disappear (owner
-              // ruling): still visible, still clickable. Clicking one starts a
-              // FRESH conversation with that dog (selectDog semantics); a
-              // mid-conversation handover that keeps history is engine
-              // territory and stays with the typed transfer flow.
-              const receded = phase !== 'selecting';
+              // Task 130 (owner ruling, reversing 129): the other three
+              // disappear completely on a pick. They were visual noise over a
+              // busy page, and switching started a fresh conversation anyway;
+              // closing with the X and reopening the launcher is the way back
+              // to the fan.
+              if (phase !== 'selecting') return null;
               return (
                 <button
                   key={d}
                   type="button"
-                  className={`${styles.dogBtn}${receded ? ` ${styles.dogReceded}` : ''}`}
+                  className={styles.dogBtn}
                   onClick={() => selectDog(d)}
-                  title={receded ? `Start again with ${info.name}` : info.name}
-                  aria-label={receded ? `Start again with ${info.name}` : info.name}
-                  style={{ backgroundImage: `url("${PROFILE_IMG[d]}")`, left: `${round1(p.left)}px`, top: `${round1(p.top)}px`, animationDelay: receded ? '0s' : `${0.15 + i * 0.3}s` }}
+                  title={info.name}
+                  aria-label={info.name}
+                  style={{ backgroundImage: `url("${PROFILE_IMG[d]}")`, left: `${round1(p.left)}px`, top: `${round1(p.top)}px`, animationDelay: `${0.15 + i * 0.3}s` }}
                 />
               );
             })}
@@ -818,29 +833,41 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
       {/* Task 129 (>480px): the conversation hangs in a column beneath the
           chosen dog, and the input is the visitor's own, fixed at the bottom
           centre of the viewport, attached to no dog. */}
-      {phase !== 'selecting' && wide && (
+      {phase !== 'selecting' && wide && !minimised && (
         <>
           <div
-            className={`${styles.chatColumn}${colBox?.up ? ` ${styles.chatColumnUp}` : ''}`}
-            style={
-              colBox
-                ? colBox.up
-                  ? { left: `${Math.round(colBox.left)}px`, top: `${Math.round(colBox.top ?? 0)}px`, bottom: `${Math.round(colBox.bottom ?? 0)}px` }
-                  : { left: `${Math.round(colBox.left)}px`, top: `${Math.round(colBox.top ?? 0)}px` }
-                : undefined
-            }
+            className={styles.chatColumn}
+            style={colBox ? { left: `${Math.round(colBox.left)}px`, top: `${Math.round(colBox.top)}px` } : undefined}
             onMouseDown={keepFocus}
           >
             {threadEl}
-            {/* Screen-reader announcements: each dog message once, whole, when done. */}
-            <div className={styles.srOnly} aria-live="polite" aria-atomic="true">
-              {announce}
-            </div>
           </div>
           <div className={styles.visitorBar} onMouseDown={keepFocus}>
             {composerEl}
           </div>
         </>
+      )}
+      {/* Task 130: the minimised chip, bottom right (the counter owns bottom
+          left). The scrim and the offer card hide via body[data-pc-min]. */}
+      {phase !== 'selecting' && wide && minimised && (
+        <button
+          type="button"
+          className={styles.miniChip}
+          aria-label={`Reopen the chat with the ${dogInfo(dog).name}`}
+          title={`Reopen the chat with the ${dogInfo(dog).name}`}
+          style={{ backgroundImage: `url("${PROFILE_IMG[dog]}")` }}
+          onClick={() => {
+            setMinimised(false);
+            window.setTimeout(() => inputRef.current?.focus(), 60); // Task 82
+          }}
+        />
+      )}
+      {/* Screen-reader announcements stay mounted through minimise, so a
+          reply that lands while collapsed is still announced once. */}
+      {phase !== 'selecting' && wide && (
+        <div className={styles.srOnly} aria-live="polite" aria-atomic="true">
+          {announce}
+        </div>
       )}
 
       {phase !== 'selecting' && !wide && (

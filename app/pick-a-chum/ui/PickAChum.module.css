@@ -692,20 +692,6 @@
    visitor's own bar, fixed at the bottom centre of the viewport. Above 480px
    only: mobile keeps the stacked .panel until Task 120. */
 
-/* The other three dogs, receded: smaller and quieter but present, so a child
-   can see them and switch without going back a step. */
-.dogReceded {
-  transform: scale(0.58);
-  filter: saturate(0.55) brightness(0.92);
-  animation: none;
-  transition: transform 0.18s ease, filter 0.18s ease;
-}
-.dogReceded:hover,
-.dogReceded:focus-visible {
-  transform: scale(0.72);
-  filter: saturate(1) brightness(1);
-}
-
 /* The chosen dog's medallion, sitting exactly in her fan slot: same box as
    the .dogBtn she replaces (128px), so nothing moves on pick. */
 .anchorFan {
@@ -728,13 +714,6 @@
   flex-direction: column;
   pointer-events: none;
 }
-/* The upward variant (Terrier and Boxer): bottom-anchored just above the dog
-   via inline top/bottom, content stuck to the BOTTOM edge so the newest
-   message sits nearest her and older ones stack above. */
-.chatColumnUp .threadInner {
-  margin-bottom: 0;
-  margin-top: auto;
-}
 
 /* The visitor's input: fixed, bottom centre, attached to no dog. Centred with
    insets + auto margins, NOT translateX: the pcGrow entrance animates
@@ -755,11 +734,86 @@
   width: 100%;
 }
 
+/* Task 130: the minimise control on the chosen dog's circle, mirroring the
+   X on the opposite corner: a 44px hit area, a small yellow disc with a navy
+   bar as the glyph (house tokens, no new asset). */
+.minimise {
+  position: absolute;
+  top: -12px;
+  right: -12px;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 6;
+}
+.minimise span {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--pc-ui-yellow);
+  border: 2px solid var(--pc-ui-navy);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.minimise span::before {
+  content: "";
+  width: 12px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--pc-ui-navy);
+}
+.minimise:focus-visible {
+  outline: 3px solid var(--pc-ui-yellow);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+/* Task 130: the minimised chip. Bottom RIGHT (the hidden games counter owns
+   bottom left); while it shows, body[data-pc-min] hides the scrim and the
+   offer card so the corner holds one floating thing only. */
+.miniChip {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  width: 72px;
+  height: 72px;
+  padding: 0;
+  border-radius: 50%;
+  border: 4px solid var(--pc-ui-blue);
+  box-shadow: 0 0 0 3px #ffffff, var(--pc-shadow);
+  background-color: var(--pc-ui-blue);
+  background-size: cover;
+  background-position: center;
+  cursor: pointer;
+  z-index: 301;
+  pointer-events: auto;
+  transition: transform 0.15s ease;
+}
+.miniChip:hover,
+.miniChip:focus-visible {
+  transform: scale(1.08);
+  outline: 3px solid var(--pc-ui-yellow);
+  outline-offset: 2px;
+}
+
+/* Task 130 (owner ruling): no scrim while minimised -- there is no chat UI
+   left to lift off the page. Returns on restore. */
+:global(body[data-pc-min]) .scrim {
+  display: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .dogReceded {
-    transition: none;
-  }
   .visitorBar {
     animation: none;
+  }
+  .miniChip {
+    transition: none;
   }
 }
