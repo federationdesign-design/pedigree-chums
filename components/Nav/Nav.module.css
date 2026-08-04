@@ -89,6 +89,11 @@
 .overlay {
   position: fixed;
   inset: 0;
+  /* iOS: inset:0 alone leaves the height tied to a viewport that changes as
+     Safari's toolbars collapse, so overflow-y never resolves and the menu
+     will not scroll on a real device. A dynamic viewport height fixes it. */
+  height: 100dvh;
+  max-height: 100dvh;
   z-index: 100;
   background: var(--blue-deep);
   /* Stop iOS Safari from auto-inflating the menu's small text (e.g. the hero
