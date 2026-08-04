@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef, useTransition } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { Montserrat } from "next/font/google";
 import BentoBoard from "./BentoBoard";
@@ -201,7 +202,7 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
         </button>
       )}
 
-      {open && (
+      {open && createPortal(
         <div
           className={`${styles.overlay} ${!tradeLinks ? styles.overlayScroll : ""}`}
           role="dialog"
@@ -236,7 +237,7 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
             <Link href="/whats-your-superpower" onClick={closeForNav}>What&apos;s Your Superpower</Link>
           </nav>
         </div>
-      )}
+      , document.body)}
     </header>
   );
 }
