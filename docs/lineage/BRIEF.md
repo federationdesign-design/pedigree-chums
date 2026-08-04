@@ -434,3 +434,50 @@ visualisation, consistent with the global explanation, not measurements.
 7. Etymological background for terrier as an earth dog, to be supported by a
    recognised dictionary source. Used as a functional category, not a claim
    of one fixed medieval breed.
+
+## 13 Ancient playable levels (owner instruction, 4 August)
+
+The four ancient extinct records (Ancient British Mastiff Type, Ancient
+Celtic Coursing Hound, Ancient Celtic Scent Hound, Ancient Livestock Dog)
+became playable levels. Each takes the Celtic Heeler shape the owner pointed
+to on screen: two stock branches, each an even split between one deeper
+ancestor (rendered as the half-size nested circle) and a same-name
+self-child kept in step by hand. All branches are assessed plausible under
+the section 7 rules; per section 12 no sourced figures exist, so the splits
+are the editorial visualisation.
+
+Trees (owner approved the Mastiff pair by name; the substitution of the
+existing "Ancient Molossers" node for the proposed "Ancient Molosser War
+Dogs", and the other three trees, are agent-authored and flagged for review):
+
+- Ancient British Mastiff Type: Ancient Molossers (nested: Old mastiffs of
+  the ancient East) + Alaunt war dogs (nested: Dogs of the Alan horsemen).
+  The owner accepted the Alaunt with the dating caution noted (most accounts
+  put the Alaunt cross in the Norman period).
+- Ancient Celtic Coursing Hound: Gaulish coursing hounds, Arrian's vertragus
+  (nested: Old hunting dogs of the Celts) + Ancient eastern sighthounds
+  (nested: Old desert coursing dogs).
+- Ancient Celtic Scent Hound: Segusian tracking hounds (nested: Old hunting
+  dogs of the Celts) + Laconian tracking hounds (nested: Old trail dogs of
+  the ancient East).
+- Ancient Livestock Dog: Celtic herdsmen's dogs (nested: Old hunting dogs of
+  the Celts) + Roman shepherd dogs (nested: Ancient Molossers as the
+  flock-guarding stock).
+
+Consequences, all fixture-proven additions-only:
+
+- The campaign grew 62 to 66 levels; the four slot in after Celtic Hound in
+  the ancient run and every later level renumbers by four (the accepted
+  option B renumbering).
+- These records were already grafted beneath Talbot, Rache (Ancient Celtic
+  Scent Hound) and Cur (Ancient Livestock Dog); those circles now show the
+  nested structure, rescaled, with no displayed figure moved.
+- Engine: the graft rescale gained a leaf-sum path for records whose
+  children are valueless branches (this shape). The direct-value path every
+  pre-existing graft takes is untouched, byte-identical arithmetic; the new
+  path only fires when the direct-value total reads zero, which no earlier
+  record hit. Without it the first fixture run showed the leaves entering
+  hosts unscaled (Talbot's St Hubert Hound 60 to 33).
+- Six circle images do not exist yet; their nodes carry the shared
+  placeholder-circle.svg stand-in, logged in PLACEHOLDERS.md at the repo
+  root.

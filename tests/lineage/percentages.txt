@@ -11,10 +11,34 @@
 [tree] Airedale Terrier > Otterhound > Southern Hound > Talbot hounds | leafPct=7 d3Pct=7
 [tree] Airedale Terrier > Otterhound > Southern Hound > St Hubert Hound | leafPct=5 d3Pct=5
 [tree] Airedale Terrier > Otterhound > Rough water dogs | leafPct=10 d3Pct=10
-[tree] Ancient British Mastiff Type | leafPct=100 d3Pct=na
-[tree] Ancient Celtic Coursing Hound | leafPct=100 d3Pct=na
-[tree] Ancient Celtic Scent Hound | leafPct=100 d3Pct=na
-[tree] Ancient Livestock Dog | leafPct=100 d3Pct=na
+[tree] Ancient British Mastiff Type | leafPct=100 d3Pct=100
+[tree] Ancient British Mastiff Type > Ancient Molossers | leafPct=50 d3Pct=50
+[tree] Ancient British Mastiff Type > Ancient Molossers > Old mastiffs of the ancient East | leafPct=25 d3Pct=25
+[tree] Ancient British Mastiff Type > Ancient Molossers > Ancient Molossers | leafPct=25 d3Pct=25
+[tree] Ancient British Mastiff Type > Alaunt war dogs | leafPct=50 d3Pct=50
+[tree] Ancient British Mastiff Type > Alaunt war dogs > Dogs of the Alan horsemen | leafPct=25 d3Pct=25
+[tree] Ancient British Mastiff Type > Alaunt war dogs > Alaunt war dogs | leafPct=25 d3Pct=25
+[tree] Ancient Celtic Coursing Hound | leafPct=100 d3Pct=100
+[tree] Ancient Celtic Coursing Hound > Gaulish coursing hounds | leafPct=50 d3Pct=50
+[tree] Ancient Celtic Coursing Hound > Gaulish coursing hounds > Old hunting dogs of the Celts | leafPct=25 d3Pct=25
+[tree] Ancient Celtic Coursing Hound > Gaulish coursing hounds > Gaulish coursing hounds | leafPct=25 d3Pct=25
+[tree] Ancient Celtic Coursing Hound > Ancient eastern sighthounds | leafPct=50 d3Pct=50
+[tree] Ancient Celtic Coursing Hound > Ancient eastern sighthounds > Old desert coursing dogs | leafPct=25 d3Pct=25
+[tree] Ancient Celtic Coursing Hound > Ancient eastern sighthounds > Ancient eastern sighthounds | leafPct=25 d3Pct=25
+[tree] Ancient Celtic Scent Hound | leafPct=100 d3Pct=100
+[tree] Ancient Celtic Scent Hound > Segusian tracking hounds | leafPct=50 d3Pct=50
+[tree] Ancient Celtic Scent Hound > Segusian tracking hounds > Old hunting dogs of the Celts | leafPct=25 d3Pct=25
+[tree] Ancient Celtic Scent Hound > Segusian tracking hounds > Segusian tracking hounds | leafPct=25 d3Pct=25
+[tree] Ancient Celtic Scent Hound > Laconian tracking hounds | leafPct=50 d3Pct=50
+[tree] Ancient Celtic Scent Hound > Laconian tracking hounds > Old trail dogs of the ancient East | leafPct=25 d3Pct=25
+[tree] Ancient Celtic Scent Hound > Laconian tracking hounds > Laconian tracking hounds | leafPct=25 d3Pct=25
+[tree] Ancient Livestock Dog | leafPct=100 d3Pct=100
+[tree] Ancient Livestock Dog > Celtic herdsmen's dogs | leafPct=50 d3Pct=50
+[tree] Ancient Livestock Dog > Celtic herdsmen's dogs > Old hunting dogs of the Celts | leafPct=25 d3Pct=25
+[tree] Ancient Livestock Dog > Celtic herdsmen's dogs > Celtic herdsmen's dogs | leafPct=25 d3Pct=25
+[tree] Ancient Livestock Dog > Roman shepherd dogs | leafPct=50 d3Pct=50
+[tree] Ancient Livestock Dog > Roman shepherd dogs > Ancient Molossers | leafPct=25 d3Pct=25
+[tree] Ancient Livestock Dog > Roman shepherd dogs > Roman shepherd dogs | leafPct=25 d3Pct=25
 [tree] Basset Hound | leafPct=100 d3Pct=100
 [tree] Basset Hound > Bloodhound | leafPct=55 d3Pct=55
 [tree] Basset Hound > Bloodhound > St Hubert Hound | leafPct=33 d3Pct=33
@@ -278,6 +302,12 @@
 [tree] Cur > Old working collies | leafPct=55 d3Pct=55
 [tree] Cur > Old working collies > Medieval Drover's Dog | leafPct=28 d3Pct=28
 [tree] Cur > Old working collies > Medieval Drover's Dog > Ancient Livestock Dog | leafPct=14 d3Pct=14
+[tree] Cur > Old working collies > Medieval Drover's Dog > Ancient Livestock Dog > Celtic herdsmen's dogs | leafPct=7 d3Pct=7
+[tree] Cur > Old working collies > Medieval Drover's Dog > Ancient Livestock Dog > Celtic herdsmen's dogs > Old hunting dogs of the Celts | leafPct=3 d3Pct=3
+[tree] Cur > Old working collies > Medieval Drover's Dog > Ancient Livestock Dog > Celtic herdsmen's dogs > Celtic herdsmen's dogs | leafPct=3 d3Pct=3
+[tree] Cur > Old working collies > Medieval Drover's Dog > Ancient Livestock Dog > Roman shepherd dogs | leafPct=7 d3Pct=7
+[tree] Cur > Old working collies > Medieval Drover's Dog > Ancient Livestock Dog > Roman shepherd dogs > Ancient Molossers | leafPct=3 d3Pct=3
+[tree] Cur > Old working collies > Medieval Drover's Dog > Ancient Livestock Dog > Roman shepherd dogs > Roman shepherd dogs | leafPct=3 d3Pct=3
 [tree] Cur > Old working collies > Medieval Drover's Dog > Medieval Drover's Dog | leafPct=14 d3Pct=14
 [tree] Cur > Old working collies > Old working collies | leafPct=28 d3Pct=28
 [tree] Cur > Old heeler stock | leafPct=45 d3Pct=45
@@ -1121,6 +1151,12 @@
 [tree] Rache > St Hubert and Talbot hounds | leafPct=60 d3Pct=60
 [tree] Rache > Old scenting hounds | leafPct=40 d3Pct=40
 [tree] Rache > Old scenting hounds > Ancient Celtic Scent Hound | leafPct=20 d3Pct=20
+[tree] Rache > Old scenting hounds > Ancient Celtic Scent Hound > Segusian tracking hounds | leafPct=10 d3Pct=10
+[tree] Rache > Old scenting hounds > Ancient Celtic Scent Hound > Segusian tracking hounds > Old hunting dogs of the Celts | leafPct=5 d3Pct=5
+[tree] Rache > Old scenting hounds > Ancient Celtic Scent Hound > Segusian tracking hounds > Segusian tracking hounds | leafPct=5 d3Pct=5
+[tree] Rache > Old scenting hounds > Ancient Celtic Scent Hound > Laconian tracking hounds | leafPct=10 d3Pct=10
+[tree] Rache > Old scenting hounds > Ancient Celtic Scent Hound > Laconian tracking hounds > Old trail dogs of the ancient East | leafPct=5 d3Pct=5
+[tree] Rache > Old scenting hounds > Ancient Celtic Scent Hound > Laconian tracking hounds > Laconian tracking hounds | leafPct=5 d3Pct=5
 [tree] Rache > Old scenting hounds > Old scenting hounds | leafPct=20 d3Pct=20
 [tree] Rottweiler | leafPct=100 d3Pct=100
 [tree] Rottweiler > Ancient Molossers | leafPct=60 d3Pct=60
@@ -1219,6 +1255,12 @@
 [tree] Talbot > St Hubert Hound | leafPct=60 d3Pct=60
 [tree] Talbot > Old scenting hounds | leafPct=40 d3Pct=40
 [tree] Talbot > Old scenting hounds > Ancient Celtic Scent Hound | leafPct=20 d3Pct=20
+[tree] Talbot > Old scenting hounds > Ancient Celtic Scent Hound > Segusian tracking hounds | leafPct=10 d3Pct=10
+[tree] Talbot > Old scenting hounds > Ancient Celtic Scent Hound > Segusian tracking hounds > Old hunting dogs of the Celts | leafPct=5 d3Pct=5
+[tree] Talbot > Old scenting hounds > Ancient Celtic Scent Hound > Segusian tracking hounds > Segusian tracking hounds | leafPct=5 d3Pct=5
+[tree] Talbot > Old scenting hounds > Ancient Celtic Scent Hound > Laconian tracking hounds | leafPct=10 d3Pct=10
+[tree] Talbot > Old scenting hounds > Ancient Celtic Scent Hound > Laconian tracking hounds > Old trail dogs of the ancient East | leafPct=5 d3Pct=5
+[tree] Talbot > Old scenting hounds > Ancient Celtic Scent Hound > Laconian tracking hounds > Laconian tracking hounds | leafPct=5 d3Pct=5
 [tree] Talbot > Old scenting hounds > Old scenting hounds | leafPct=20 d3Pct=20
 [tree] Toy Bulldog | leafPct=100 d3Pct=100
 [tree] Toy Bulldog > Old English Bulldog | leafPct=65 d3Pct=65

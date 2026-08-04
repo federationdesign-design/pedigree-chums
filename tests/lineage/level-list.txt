@@ -1,62 +1,66 @@
 [level] 00 ancient Celtic Hound
-[level] 01 ancient Celtic Heeler
-[level] 02 medieval Scottish Deerhound
-[level] 03 medieval Rache
-[level] 04 medieval Talbot
-[level] 05 medieval Buckhound
-[level] 06 medieval Southern Hound
-[level] 07 c1500 Old English Bulldog
-[level] 08 c1500 Skye Terrier
-[level] 09 c1500 English Foxhound
-[level] 10 c1500 Otterhound
-[level] 11 c1500 Turnspit Dog
-[level] 12 c1500 Staghound
-[level] 13 c1500 Bearded Collie
-[level] 14 c1700 Scottish Terrier
-[level] 15 c1700 King Charles Spaniel
-[level] 16 c1700 Black and Tan Terrier
-[level] 17 c1700 Pointer
-[level] 18 c1700 North Country Beagle
-[level] 19 c1700 English Setter
-[level] 20 c1700 Dandie Dinmont Terrier
-[level] 21 c1700 Old Welsh Grey Sheepdog
-[level] 22 c1700 Clumber Spaniel
-[level] 23 c1700 Cur
-[level] 24 early1800 Longdog
-[level] 25 early1800 Welsh Terrier
-[level] 26 early1800 Tweed Water Spaniel
-[level] 27 early1800 Manchester Terrier
-[level] 28 early1800 Bedlington Terrier
-[level] 29 spaniels Welsh Springer Spaniel
-[level] 30 spaniels Field Spaniel
-[level] 31 spaniels Sussex Spaniel
-[level] 32 spaniels Toy Trawler Spaniel
-[level] 33 spaniels Norfolk Spaniel
-[level] 34 mid1800 Irish Water Spaniel
-[level] 35 mid1800 Kerry Blue Terrier
-[level] 36 mid1800 Curly-Coated Retriever
-[level] 37 mid1800 Airedale Terrier
-[level] 38 mid1800 Flat-Coated Retriever
-[level] 39 mid1800 English Toy Terrier
-[level] 40 mid1800 English White Terrier
-[level] 41 mid1800 Rough Collie
-[level] 42 mid1800 Paisley Terrier
-[level] 43 mid1800 Bullmastiff
-[level] 44 mid1800 Fox Terrier
-[level] 45 mid1800 Sealyham Terrier
-[level] 46 late1800 Cairn Terrier
-[level] 47 late1800 Lakeland Terrier
-[level] 48 late1800 Irish Terrier
-[level] 49 late1800 Soft-Coated Wheaten Terrier
-[level] 50 late1800 Glen of Imaal Terrier
-[level] 51 late1800 Gordon Setter
-[level] 52 late1800 Lancashire Heeler
-[level] 53 late1800 Cardigan Welsh Corgi
-[level] 54 c1900 Norwich Terrier
-[level] 55 c1900 Cumberland Sheepdog
-[level] 56 c1900 Toy Bulldog
-[level] 57 c1900 Dumfriesshire Hound
-[level] 58 c1900 Patterdale Terrier
-[level] 59 c1900 Lucas Terrier
-[level] 60 c1900 Norfolk Terrier
-[level] 61 c1900 Northern Inuit Dog
+[level] 01 ancient Ancient British Mastiff Type
+[level] 02 ancient Ancient Celtic Coursing Hound
+[level] 03 ancient Ancient Celtic Scent Hound
+[level] 04 ancient Ancient Livestock Dog
+[level] 05 ancient Celtic Heeler
+[level] 06 medieval Scottish Deerhound
+[level] 07 medieval Rache
+[level] 08 medieval Talbot
+[level] 09 medieval Buckhound
+[level] 10 medieval Southern Hound
+[level] 11 c1500 Old English Bulldog
+[level] 12 c1500 Skye Terrier
+[level] 13 c1500 English Foxhound
+[level] 14 c1500 Otterhound
+[level] 15 c1500 Turnspit Dog
+[level] 16 c1500 Staghound
+[level] 17 c1500 Bearded Collie
+[level] 18 c1700 Scottish Terrier
+[level] 19 c1700 King Charles Spaniel
+[level] 20 c1700 Black and Tan Terrier
+[level] 21 c1700 Pointer
+[level] 22 c1700 North Country Beagle
+[level] 23 c1700 English Setter
+[level] 24 c1700 Dandie Dinmont Terrier
+[level] 25 c1700 Old Welsh Grey Sheepdog
+[level] 26 c1700 Clumber Spaniel
+[level] 27 c1700 Cur
+[level] 28 early1800 Longdog
+[level] 29 early1800 Welsh Terrier
+[level] 30 early1800 Tweed Water Spaniel
+[level] 31 early1800 Manchester Terrier
+[level] 32 early1800 Bedlington Terrier
+[level] 33 spaniels Welsh Springer Spaniel
+[level] 34 spaniels Field Spaniel
+[level] 35 spaniels Sussex Spaniel
+[level] 36 spaniels Toy Trawler Spaniel
+[level] 37 spaniels Norfolk Spaniel
+[level] 38 mid1800 Irish Water Spaniel
+[level] 39 mid1800 Kerry Blue Terrier
+[level] 40 mid1800 Curly-Coated Retriever
+[level] 41 mid1800 Airedale Terrier
+[level] 42 mid1800 Flat-Coated Retriever
+[level] 43 mid1800 English Toy Terrier
+[level] 44 mid1800 English White Terrier
+[level] 45 mid1800 Rough Collie
+[level] 46 mid1800 Paisley Terrier
+[level] 47 mid1800 Bullmastiff
+[level] 48 mid1800 Fox Terrier
+[level] 49 mid1800 Sealyham Terrier
+[level] 50 late1800 Cairn Terrier
+[level] 51 late1800 Lakeland Terrier
+[level] 52 late1800 Irish Terrier
+[level] 53 late1800 Soft-Coated Wheaten Terrier
+[level] 54 late1800 Glen of Imaal Terrier
+[level] 55 late1800 Gordon Setter
+[level] 56 late1800 Lancashire Heeler
+[level] 57 late1800 Cardigan Welsh Corgi
+[level] 58 c1900 Norwich Terrier
+[level] 59 c1900 Cumberland Sheepdog
+[level] 60 c1900 Toy Bulldog
+[level] 61 c1900 Dumfriesshire Hound
+[level] 62 c1900 Patterdale Terrier
+[level] 63 c1900 Lucas Terrier
+[level] 64 c1900 Norfolk Terrier
+[level] 65 c1900 Northern Inuit Dog

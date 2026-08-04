@@ -19,6 +19,23 @@ final copy.
 | LOOP-02 route offer | `engine.ts` (`LOOP_02_ROUTE_OFFER = 'the game or a dog?'`) | The `[ROUTE A] or [ROUTE B]?` fill is my best-effort using ORIENT's two departments; the exact copy, and whether it should adapt to the candidate's specific route ("close to a supported route"), is unspecified. It also overlaps ORIENT's wording | Steve supplies the LOOP-02 route-offer copy and the adapt-to-candidate rule |
 | Grief detection trigger lists | `safety.ts` (`GRIEF_DIED`/`GRIEF_LOST`/`GRIEF_WORRIED`/`GRIEF_CONTINUE`/`GRIEF_EXCLUDE`) | Task 58 grief COPY (`:(`) is approved; the DETECTION wording is best-effort, authored to cover the three scenarios and the required assertions, conservative to avoid false positives. As a safety route it should be reviewed/extended by Steve like the other safety trigger lists | Steve reviews and extends the grief triggers |
 
+## Ancient playable levels (4 August)
+
+Six circle images do not exist yet. All six nodes point at the shared
+stand-in `/history/breeds/placeholder-circle.svg` (a cream "IMAGE COMING
+SOON" disc) until Steve supplies the artwork (same process as the eight
+Batch images). Swap each node's `img` in `data/lineage.ts` to its real
+asset, then delete the SVG.
+
+| Node awaiting artwork | Level |
+|---|---|
+| Dogs of the Alan horsemen (nested) | Ancient British Mastiff Type |
+| Old desert coursing dogs (nested) | Ancient Celtic Coursing Hound |
+| Segusian tracking hounds (big circle) | Ancient Celtic Scent Hound |
+| Old trail dogs of the ancient East (nested) | Ancient Celtic Scent Hound |
+| Celtic herdsmen's dogs (big circle) | Ancient Livestock Dog |
+| Roman shepherd dogs (big circle) | Ancient Livestock Dog |
+
 ## What's Your Superpower (MVP-4.1 prototype)
 
 | Placeholder | Location | Meaning | Resolve via |

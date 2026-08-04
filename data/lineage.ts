@@ -950,18 +950,64 @@ const LINEAGE: Record<string, LineageNode> = {
     ]
   },
 
-  // The two ancient additions (docs/lineage/BRIEF.md sections 3 and 4).
-  // Roots by design: they are the deepest recorded types, so they carry no
-  // ancestor children and no invented weights. The modern English Mastiff
-  // and Greyhound trees below are untouched; hanging these records beneath
-  // later trees is Batch 4+ work, gated by the percentage fixture.
+  // The four ancient extinct types below became playable levels on the
+  // owner's instruction (4 August): each takes the Celtic Heeler shape, two
+  // stock branches, each an even split between one deeper ancestor (the
+  // half-size nested circle) and a same-name self-child kept in step by
+  // hand. No sourced figures exist for any of this (docs/lineage/BRIEF.md
+  // section 12), so the splits follow the section 7 rules. Because these
+  // records are also grafted beneath later trees, giving them children
+  // makes those host circles sprout the same nested structure, rescaled so
+  // no displayed percentage moves.
   "Ancient British Mastiff Type": {
     name: "Ancient British Mastiff Type",
     note: "Powerful British guard and hunting dog praised by Roman writers for courage and strength. An extinct historical type.",
+    img: "/history/breeds/ancient-british-mastiff-type.jpg",
+    children: [
+      {
+        name: "Ancient Molossers",
+        note: "The huge eastern war and guard dogs at the root of every mastiff. Now extinct.",
+        img: "/history/breeds/Ancient-Molossers.jpg",
+        children: [
+          { name: "Old mastiffs of the ancient East", note: "The huge guard and hunting mastiffs of the ancient East, carved on palace walls thousands of years ago. Now extinct.", img: "/history/acident-main-img.jpg", value: 25 },
+          { name: "Ancient Molossers", note: "The huge eastern war and guard dogs at the root of every mastiff. Now extinct.", img: "/history/breeds/Ancient-Molossers.jpg", value: 25 },
+        ],
+      },
+      {
+        name: "Alaunt war dogs",
+        note: "The fierce war and catch dogs that rode west with mounted warriors. Now extinct.",
+        img: "/history/breeds/Mastiff-and-Alaunt-war-dogs.jpg",
+        children: [
+          { name: "Dogs of the Alan horsemen", note: "The big steppe dogs of the Alan horsemen, guarding their camps and herds across the plains. Now extinct.", img: "/history/breeds/placeholder-circle.svg", value: 25 },
+          { name: "Alaunt war dogs", note: "The fierce war and catch dogs that rode west with mounted warriors. Now extinct.", img: "/history/breeds/Mastiff-and-Alaunt-war-dogs.jpg", value: 25 },
+        ],
+      },
+    ],
   },
   "Ancient Celtic Coursing Hound": {
     name: "Ancient Celtic Coursing Hound",
     note: "Swift Celtic sight-hunting dog described by classical writers, an early root of later British and Irish sighthounds. An extinct historical type.",
+    img: "/history/breeds/ancient-celtic-coursing-hound.jpg",
+    children: [
+      {
+        name: "Gaulish coursing hounds",
+        note: "The swift vertragus hounds of Gaul that Roman writers admired for pure speed. Now extinct.",
+        img: "/history/breeds/celtic-hound-drawing.jpg",
+        children: [
+          { name: "Old hunting dogs of the Celts", note: "The native running dogs of Iron Age Europe. Now extinct.", img: "/history/breeds/Old-hunting-dogs-of-the-Celts.jpg", value: 25 },
+          { name: "Gaulish coursing hounds", note: "The swift vertragus hounds of Gaul that Roman writers admired for pure speed. Now extinct.", img: "/history/breeds/celtic-hound-drawing.jpg", value: 25 },
+        ],
+      },
+      {
+        name: "Ancient eastern sighthounds",
+        note: "The slender desert coursing dogs of the old world. Now extinct.",
+        img: "/history/breeds/Ancient-eastern-sighthounds.jpg",
+        children: [
+          { name: "Old desert coursing dogs", note: "The first slender chasing dogs of the old desert lands. Now extinct.", img: "/history/breeds/placeholder-circle.svg", value: 25 },
+          { name: "Ancient eastern sighthounds", note: "The slender desert coursing dogs of the old world. Now extinct.", img: "/history/breeds/Ancient-eastern-sighthounds.jpg", value: 25 },
+        ],
+      },
+    ],
   },
   // The five foundation records (docs/lineage/BRIEF.md section 3, Batch 3).
   // Roots by design like the two ancient additions above: no ancestor
@@ -1000,13 +1046,63 @@ const LINEAGE: Record<string, LineageNode> = {
       { name: "Earth and hunt terriers", note: "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.", img: "/history/breeds/Earth-and-hunt-terrier.jpg", value: 20 },
     ],
   },
+  // Playable like the two ancient additions above (owner instruction,
+  // 4 August), same Celtic Heeler shape and section 7 rules. This record is
+  // grafted inside the Talbot and Rache "Old scenting hounds" branches,
+  // which now show this structure nested, rescaled, no displayed figure
+  // moves.
   "Ancient Celtic Scent Hound": {
     name: "Ancient Celtic Scent Hound",
     note: "Early Celtic tracking hound that followed game by scent, representing the roots of later European scent hounds. An extinct historical type.",
+    img: "/history/breeds/ancient-celtic-scent-hound.jpg",
+    children: [
+      {
+        name: "Segusian tracking hounds",
+        note: "The shaggy Gaulish trail hounds the Romans knew by name, famous for following a scent. Now extinct.",
+        img: "/history/breeds/placeholder-circle.svg",
+        children: [
+          { name: "Old hunting dogs of the Celts", note: "The native running dogs of Iron Age Europe. Now extinct.", img: "/history/breeds/Old-hunting-dogs-of-the-Celts.jpg", value: 25 },
+          { name: "Segusian tracking hounds", note: "The shaggy Gaulish trail hounds the Romans knew by name, famous for following a scent. Now extinct.", img: "/history/breeds/placeholder-circle.svg", value: 25 },
+        ],
+      },
+      {
+        name: "Laconian tracking hounds",
+        note: "The keen-nosed hare-tracking hounds of ancient Greece, praised by Greek hunting writers. Now extinct.",
+        img: "/history/greek-harehound.jpg",
+        children: [
+          { name: "Old trail dogs of the ancient East", note: "The early trail-following hunting dogs of the ancient East. Now extinct.", img: "/history/breeds/placeholder-circle.svg", value: 25 },
+          { name: "Laconian tracking hounds", note: "The keen-nosed hare-tracking hounds of ancient Greece, praised by Greek hunting writers. Now extinct.", img: "/history/greek-harehound.jpg", value: 25 },
+        ],
+      },
+    ],
   },
+  // Playable (owner instruction, 4 August), same shape and rules. Grafted
+  // inside the Cur tree's Medieval Drover's Dog branch, which now shows
+  // this structure nested, rescaled, no displayed figure moves.
   "Ancient Livestock Dog": {
     name: "Ancient Livestock Dog",
     note: "Broad early working-dog population used to guard, move and control livestock before named British breeds existed. An extinct historical type.",
+    img: "/history/breeds/ancient-livestock-dog.jpg",
+    children: [
+      {
+        name: "Celtic herdsmen's dogs",
+        note: "The all-round farm dogs of the Celtic tribes, guarding and driving the herds. Now extinct.",
+        img: "/history/breeds/placeholder-circle.svg",
+        children: [
+          { name: "Old hunting dogs of the Celts", note: "The native running dogs of Iron Age Europe. Now extinct.", img: "/history/breeds/Old-hunting-dogs-of-the-Celts.jpg", value: 25 },
+          { name: "Celtic herdsmen's dogs", note: "The all-round farm dogs of the Celtic tribes, guarding and driving the herds. Now extinct.", img: "/history/breeds/placeholder-circle.svg", value: 25 },
+        ],
+      },
+      {
+        name: "Roman shepherd dogs",
+        note: "The flock-guarding sheepdogs the Roman farm writers described, kept white so the shepherd knew dog from wolf. Now extinct.",
+        img: "/history/breeds/placeholder-circle.svg",
+        children: [
+          { name: "Ancient Molossers", note: "The big flock-guarding stock of the ancient world. Now extinct.", img: "/history/breeds/Ancient-Molossers.jpg", value: 25 },
+          { name: "Roman shepherd dogs", note: "The flock-guarding sheepdogs the Roman farm writers described, kept white so the shepherd knew dog from wolf. Now extinct.", img: "/history/breeds/placeholder-circle.svg", value: 25 },
+        ],
+      },
+    ],
   },
   "Medieval Shepherd's Dog": {
     name: "Medieval Shepherd's Dog",
@@ -1574,12 +1670,34 @@ function expandNode(
 
   if (canGraft && sub.children) {
     const share = node.value ?? 0;
-    const total = sub.children.reduce((sum, c) => sum + (c.value ?? 0), 0) || 1;
+    const directTotal = sub.children.reduce((sum, c) => sum + (c.value ?? 0), 0);
     const next = new Set(visited);
     next.add(key);
-    const kids = sub.children.map((c) =>
-      expandNode({ ...c, value: ((c.value ?? 0) * share) / total }, depth + 1, next),
-    );
+    let kids: LineageNode[];
+    if (directTotal > 0) {
+      // Every record grafted before 4 August takes this path unchanged: the
+      // frozen fixture figures depend on this exact arithmetic.
+      kids = sub.children.map((c) =>
+        expandNode({ ...c, value: ((c.value ?? 0) * share) / directTotal }, depth + 1, next),
+      );
+    } else {
+      // A record whose children are valueless branches (the Celtic Heeler
+      // shape, first grafted with the four ancient playable levels) carries
+      // its weight in the grandchildren. The direct-value total above reads
+      // 0 for it, which used to let the leaves through unscaled and move
+      // every figure in the host tree, so this shape scales by leaf sum.
+      const leafSum = (n: LineageNode): number =>
+        n.children && n.children.length
+          ? n.children.reduce((s, c) => s + leafSum(c), 0)
+          : n.value ?? 0;
+      const total = sub.children.reduce((sum, c) => sum + leafSum(c), 0) || 1;
+      const scale = share / total;
+      const scaleLeaves = (n: LineageNode): LineageNode =>
+        n.children && n.children.length
+          ? { ...n, value: undefined, children: n.children.map(scaleLeaves) }
+          : { ...n, value: (n.value ?? 0) * scale };
+      kids = sub.children.map((c) => expandNode(scaleLeaves(c), depth + 1, next));
+    }
     // A grafted node drops its own value: its children carry its share, so
     // the d3 sum measure counts the branch once rather than twice and the
     // break-panel share agrees with the leaf-sum breakdown (owner-sanctioned
