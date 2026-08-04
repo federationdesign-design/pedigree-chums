@@ -1470,3 +1470,54 @@
   /* Nolan h3 left aligned. */
   .essayBody h3.h3Navy { text-align: left; }
 }
+
+@media (min-width: 769px) {
+  /* 2, 3: What We Know and Living Descendant body copy up 3pt. */
+  /* Body copy only -- the yellow title keeps its 54px inline size. */
+  .whatWeKnowCard p:not([style*="54px"]),
+  .whatWeKnowCard a,
+  .livingDescCard p:not([style*="54px"]),
+  .livingDescCard a {
+    font-size: calc(1em + 2pt) !important;
+  }
+  /* 4, 5, 6: timeline year, event name and description. */
+  .tlItem > div:last-child > p:first-child { font-size: calc(0.72rem + 5pt) !important; }
+  .tlItem > div:last-child > p:nth-child(2),
+  .tlItem > div:last-child > a { font-size: calc(0.95rem + 3pt) !important; }
+  .tlItem > div:last-child > p:last-child { font-size: calc(0.82rem + 2pt) !important; }
+}
+
+@media (min-width: 769px) {
+  /* The four panels read as one connected block: What We Know sits on the
+     dog image, which the Living Descendant card overlaps, which runs into
+     the timeline. No gaps between them. */
+  .essayBody.essayBody > #wwk-scene { margin-bottom: 0; }
+  .essayBody.essayBody > #harehound-scene { margin-top: 0 !important; }
+  .essayBody.essayBody > #tl-scene { margin-top: 0 !important; }
+}
+
+@media (min-width: 769px) {
+  /* Pull the dog image up under the What We Know card. */
+  .essayBody.essayBody > .sceneMobile#harehound-scene {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+    position: relative;
+    z-index: 0;
+  }
+  .essayBody.essayBody > .sceneMobile#wwk-scene {
+    margin-bottom: 0 !important;
+    position: relative;
+    z-index: 2;
+  }
+}
+
+@media (min-width: 769px) {
+  /* Mobile zeroes the scene margins inside its own query; desktop never did,
+     so the --gap-l sibling rule was still spacing these apart. */
+  .essayBody.essayBody > #wwk-scene,
+  .essayBody.essayBody > #harehound-scene,
+  .essayBody.essayBody > #tl-scene {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+  }
+}

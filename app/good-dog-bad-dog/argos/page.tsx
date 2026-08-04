@@ -780,53 +780,6 @@ export default function ArgosPage() {
                 />
               </div>
 
-              <div className={`${styles.sceneMobile} ${styles.overlapNext}`} id="wwk-scene">
-                <WhatWeKnowCard />
-              </div>
-
-              <div className={`${styles.sceneMobile} ${styles.parallaxScene} ${styles.tightBottom} ${styles.driftScene}`} id="harehound-scene">
-                <div className={styles.parallaxImgWrap}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src="/history/Greek-Harehound-photo.jpg" alt="Greek Harehound (Hellinikos Ichnilatis)" loading="lazy" id="hound-img" className={styles.driftImg} />
-                </div>
-                <div className={styles.parallaxContent} id="ld-card">
-                  <LivingDescendantCard />
-                </div>
-              </div>
-
-              <div className={`${styles.sceneMobile} ${styles.timelineScene} ${styles.tightTop}`} id="tl-scene">
-                <p style={{ fontFamily: "var(--font-display)", fontSize: "54px", textAlign: "center", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: "0 0 18px" }}>Ancestral Lineage</p>
-                <div className={styles.tlBody} id="tl-body">
-                  <div className={styles.tlTrack} />
-                  <div className={styles.tlFill} id="tl-fill" />
-                {TIMELINE.map(({ era, name, context, highlight, end, isBreed, slug }) => (
-                  <div key={"tl-" + era + name} data-tl-item className={styles.tlItem} style={{ display: "flex", gap: 14 }}>
-                    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: 16, flexShrink: 0 }}>
-                      <div style={{
-                        width: highlight ? 14 : isBreed ? 12 : 11,
-                        height: highlight ? 14 : isBreed ? 12 : 11,
-                        borderRadius: "50%",
-                        background: isBreed ? "#22c55e" : highlight ? "var(--yellow)" : "#fff",
-                        marginTop: 4,
-                        flexShrink: 0,
-                        boxShadow: highlight ? "0 0 0 3px rgba(255,210,62,0.3)" : "none",
-                      }} />
-                      {!end && <div style={{ width: 2, flex: 1, minHeight: 48 }} />}
-                    </div>
-                    <div style={{ paddingBottom: end ? 0 : 28 }}>
-                      <p style={{ fontFamily: "var(--font-body)", fontSize: "0.72rem", fontWeight: 700, color: "#fff", letterSpacing: "0.05em", marginBottom: 3, textTransform: "uppercase" }}>{era}</p>
-                      {isBreed && slug ? (
-                        <a href={"/chums/" + slug} style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 700, color: "#22c55e", textDecoration: "underline", textUnderlineOffset: "3px", display: "block", marginBottom: 4 }}>{name}</a>
-                      ) : (
-                        <p style={{ fontFamily: "var(--font-body)", fontSize: highlight ? "1rem" : "0.95rem", fontWeight: highlight ? 700 : 600, color: highlight ? "var(--yellow)" : "#fff", marginBottom: 4 }}>{name}</p>
-                      )}
-                      <p style={{ fontFamily: "var(--font-body)", fontSize: "0.82rem", fontWeight: 500, color: "#fff", lineHeight: 1.3 }}>{context}</p>
-                    </div>
-                  </div>
-                ))}
-                </div>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.78rem", fontWeight: 500, color: "#fff", lineHeight: 1.3, fontStyle: "italic", opacity: 0.85, margin: "20px 0 0", paddingTop: 16, borderTop: "1px solid rgba(255,255,255,0.2)" }}>{RESEARCH_NOTE}</p>
-              </div>
 
 
               <h2 className={styles.subhead}>The smell of home</h2>
@@ -1129,6 +1082,47 @@ export default function ArgosPage() {
               </div>
             </div>
             </div>
+
+            {/* Moved from the main column, plain stacked, no parallax */}
+            <div className={styles.sidebarOnly}><WhatWeKnowCard /></div>
+            <div className={styles.sidebarOnly}><LivingDescendantCard /></div>
+            <div className={styles.sidebarOnly}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/history/Greek-Harehound-photo.jpg" alt="Greek Harehound (Hellinikos Ichnilatis)" loading="lazy" style={{ width: "100%", display: "block", borderRadius: 12 }} />
+            </div>
+              <div className={`${styles.sceneMobile} ${styles.timelineScene} ${styles.tightTop}`} id="tl-scene">
+                <p style={{ fontFamily: "var(--font-display)", fontSize: "54px", textAlign: "center", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", lineHeight: 0.9, margin: "0 0 18px" }}>Ancestral Lineage</p>
+                <div className={styles.tlBody} id="tl-body">
+                  <div className={styles.tlTrack} />
+                  <div className={styles.tlFill} id="tl-fill" />
+                {TIMELINE.map(({ era, name, context, highlight, end, isBreed, slug }) => (
+                  <div key={"tl-" + era + name} data-tl-item className={styles.tlItem} style={{ display: "flex", gap: 14 }}>
+                    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: 16, flexShrink: 0 }}>
+                      <div style={{
+                        width: highlight ? 14 : isBreed ? 12 : 11,
+                        height: highlight ? 14 : isBreed ? 12 : 11,
+                        borderRadius: "50%",
+                        background: isBreed ? "#22c55e" : highlight ? "var(--yellow)" : "#fff",
+                        marginTop: 4,
+                        flexShrink: 0,
+                        boxShadow: highlight ? "0 0 0 3px rgba(255,210,62,0.3)" : "none",
+                      }} />
+                      {!end && <div style={{ width: 2, flex: 1, minHeight: 48 }} />}
+                    </div>
+                    <div style={{ paddingBottom: end ? 0 : 28 }}>
+                      <p style={{ fontFamily: "var(--font-body)", fontSize: "0.72rem", fontWeight: 700, color: "#fff", letterSpacing: "0.05em", marginBottom: 3, textTransform: "uppercase" }}>{era}</p>
+                      {isBreed && slug ? (
+                        <a href={"/chums/" + slug} style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 700, color: "#22c55e", textDecoration: "underline", textUnderlineOffset: "3px", display: "block", marginBottom: 4 }}>{name}</a>
+                      ) : (
+                        <p style={{ fontFamily: "var(--font-body)", fontSize: highlight ? "1rem" : "0.95rem", fontWeight: highlight ? 700 : 600, color: highlight ? "var(--yellow)" : "#fff", marginBottom: 4 }}>{name}</p>
+                      )}
+                      <p style={{ fontFamily: "var(--font-body)", fontSize: "0.82rem", fontWeight: 500, color: "#fff", lineHeight: 1.3 }}>{context}</p>
+                    </div>
+                  </div>
+                ))}
+                </div>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "0.78rem", fontWeight: 500, color: "#fff", lineHeight: 1.3, fontStyle: "italic", opacity: 0.85, margin: "20px 0 0", paddingTop: 16, borderTop: "1px solid rgba(255,255,255,0.2)" }}>{RESEARCH_NOTE}</p>
+              </div>
 
             {/* Card 12: What We Know */}
             {/* WhatWeKnowCard: kept in main */}

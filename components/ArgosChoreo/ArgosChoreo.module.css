@@ -389,3 +389,9 @@
   .choreoBullets li { font-size: 1.55rem !important; line-height: 1.5; }
   .wipeStage .wipeCaption { font-size: 1.55rem !important; line-height: 1.4; }
 }
+
+@media (min-width: 769px) {
+  /* 1, 7: the galleries pin 150px down rather than hard against the top. */
+  .stage { top: 150px; }
+  .wipeStage { top: 150px; }
+}
