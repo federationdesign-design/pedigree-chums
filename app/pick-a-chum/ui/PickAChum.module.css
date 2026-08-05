@@ -1236,3 +1236,20 @@
     z-index: 1;
   }
 }
+
+/* Owner correction: the launcher was the right size all along. Back to 60px;
+   it is the centre icon INSIDE the opened fan that needs to keep its size,
+   which is a counter-scale rather than a bigger anchor. */
+@media (max-width: 480px) {
+  .launcher,
+  .root {
+    --pc-anchor-size: 60px;
+    --pc-anchor-cx: calc(clamp(18px, 4vw, 48px) + clamp(112px, 16vw, 150px) + 2px + 30px);
+    --pc-anchor-cy: calc(clamp(112px, 16vw, 150px) * 0.3 - 12px + 30px);
+  }
+  /* Her face when minimised matches the mobile medallion, not the desktop. */
+  .miniDock .miniFace {
+    width: 64px !important;
+    height: 64px !important;
+  }
+}
