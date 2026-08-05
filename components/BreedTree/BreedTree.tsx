@@ -5875,9 +5875,7 @@ export default function BreedTree({
             const st = stageRef.current;
             const stW = st ? st.clientWidth : 390;
             const upp = (aspect >= 1 ? SIZE : SIZE / Math.max(aspect, 0.01)) / Math.max(st ? st.clientHeight : 844, 1);
-            // Owner review: LEARN is half START's size. Its own line, so START
-            // is unaffected.
-            const fsL = Math.min(Math.min(Math.max(54.4, stW * 0.12), 128) * START_SCALE, (stW * 0.92) / 3.17) * 0.5;
+            const fsL = Math.min(Math.min(Math.max(54.4, stW * 0.12), 128) * START_SCALE, (stW * 0.92) / 3.17);
             const vbWc = aspect >= 1 ? SIZE * aspect : SIZE;
             const vbHc = aspect >= 1 ? SIZE : SIZE / aspect;
             const xMinC = -vbWc / 2;
