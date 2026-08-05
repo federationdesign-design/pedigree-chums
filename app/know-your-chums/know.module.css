@@ -320,7 +320,8 @@
 .rowRail {
   display: flex;
   flex-wrap: nowrap;
-  gap: clamp(12px, 2vw, 24px);
+  /* The history strip's own gap, so the two rails space their cards alike. */
+  gap: clamp(16px, 2.2vw, 30px);
   align-items: flex-start;
   overflow-x: auto;
   overflow-y: hidden;
@@ -333,11 +334,12 @@
 .rowRail::-webkit-scrollbar {
   display: none;
 }
-/* One card's worth of rail. Four across on a wide window, matching the grid
-   this replaced, and progressively fewer as the window narrows. */
+/* One card's worth of rail, the same width as a node on Britain's dog
+   history (.node there), so both pages show the same number of cards at the
+   same size on any given window. */
 .rowItem {
   flex: 0 0 auto;
-  width: clamp(150px, 22vw, 250px);
+  width: clamp(285px, 35vw, 415px);
 }
 .rowScrollbar {
   position: relative;

@@ -90,6 +90,17 @@ const CATCH_ALL = { title: "The rest of the pack", accent: "pack" };
 
 const byName = (name: string): Breed | undefined => breeds.find((b) => b.name === name);
 
+/* The write-ups are stored to read mid-sentence, because BreedDialog says
+   "Did you know? {fact}." On the card the same line starts the sentence, so
+   it is capitalised HERE rather than in data/breeds.ts: changing the stored
+   copy would put a capital in the middle of the dialog's sentence.
+   "cross Bred from ..." also carries a stray capital, which the second rule
+   settles. */
+function sentenceCase(text: string): string {
+  const t = text.trim().replace(/^cross Bred\b/, "cross bred");
+  return t.charAt(0).toUpperCase() + t.slice(1);
+}
+
 function ChumCard({ breed }: { breed: Breed }) {
   return (
     <Link href={`/chums/${breed.slug}`} className={styles.chumCard} aria-label={`Explore ${breed.name}`}>
@@ -107,7 +118,7 @@ function ChumCard({ breed }: { breed: Breed }) {
         <div className={styles.flipBack}>
           <span className={styles.flipHint}>Tap to learn about this dog</span>
           <span className={styles.flipName}>{breed.name}</span>
-          <span className={styles.flipNote}>{breed.fact}</span>
+          <span className={styles.flipNote}>{sentenceCase(breed.fact)}</span>
         </div>
       </div>
     </Link>
