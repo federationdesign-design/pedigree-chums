@@ -1293,3 +1293,13 @@
       drop-shadow(0 1.5px 0 #fff) drop-shadow(0 -1.5px 0 #fff);
   }
 }
+
+/* The selector's close sits inside the 0.48-scaled fan, so removing its
+   counter-scale left it rendering at roughly 8.6px while the other two were a
+   true 18. Scale it back so all three match optically. */
+@media (max-width: 480px) {
+  .selectorClose {
+    transform: scale(2.08);
+    transform-origin: center;
+  }
+}
