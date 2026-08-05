@@ -1177,3 +1177,28 @@
     --pc-anchor-cy: calc(clamp(112px, 16vw, 150px) * 0.3 - 12px + 44px);
   }
 }
+
+/* Mobile minimised chip: her face takes the mobile medallion size rather than
+   the desktop one, and the close mark gets the white outline, a third smaller,
+   nudged down and left. */
+@media (max-width: 480px) {
+  .miniDock .miniFace {
+    width: 78px;
+    height: 78px;
+  }
+  .miniDock .close {
+    width: 24px;
+    height: 24px;
+    top: 2px;
+    left: -18px;
+    right: auto;
+  }
+  .miniDock .close img {
+    width: 12px;
+    height: 12px;
+    filter:
+      drop-shadow(1.5px 0 0 #fff) drop-shadow(-1.5px 0 0 #fff)
+      drop-shadow(0 1.5px 0 #fff) drop-shadow(0 -1.5px 0 #fff);
+  }
+  .miniDock .anchorName { display: none; }
+}
