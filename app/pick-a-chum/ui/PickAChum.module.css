@@ -1056,3 +1056,22 @@
 @media (max-width: 480px) {
   .anchorName { display: none; }
 }
+
+/* The medallion controls moved out of .panel during the drag work, so the
+   descendant selectors above never matched. Target the classes directly. */
+@media (max-width: 480px) {
+  .close.close {
+    right: 4px;
+    top: 4px;
+    width: 26px;
+    height: 26px;
+    padding: 0;
+  }
+  .close.close img {
+    width: 22px;
+    height: 22px;
+    filter:
+      drop-shadow(1.5px 0 0 #fff) drop-shadow(-1.5px 0 0 #fff)
+      drop-shadow(0 1.5px 0 #fff) drop-shadow(0 -1.5px 0 #fff);
+  }
+}

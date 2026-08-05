@@ -977,6 +977,12 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
               <button type="button" className={styles.close} aria-label="Close Pick a Chum" onClick={onClose}>
                 <img src="/red-icon.svg" alt="" aria-hidden="true" />
               </button>
+              {/* Task 130 on mobile: the desktop medallion block is gated on
+                  `wide`, so the minimise never rendered here. Same control,
+                  same state. */}
+              <button type="button" className={styles.minimise} aria-label="Minimise the chat" onClick={() => setMinimised(true)}>
+                <span aria-hidden="true" />
+              </button>
               {/* Task 132: the name once, on the medallion (mobile too). */}
               <div className={styles.anchorName} aria-hidden="true">{nameLines(dogInfo(dog).name)}</div>
             </div>
