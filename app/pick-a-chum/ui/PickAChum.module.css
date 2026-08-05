@@ -963,3 +963,23 @@
   height: 21px;
   padding: 3px;
 }
+
+/* The action link reads as text, not a button: bold and underlined, keeping
+   the chevron and the destination name so it is still obviously a link and
+   still says where it goes. The yellow hover block is what made it look like
+   a control. */
+.command.command {
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 2px;
+  padding: 0;
+  border-radius: 0;
+}
+.command.command:hover,
+.command.command:focus-visible {
+  background: none;
+  color: var(--pc-ui-navy);
+  text-decoration-thickness: 3px;
+  outline: none;
+}
