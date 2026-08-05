@@ -5851,7 +5851,9 @@ export default function BreedTree({
                     paintOrder: "stroke",
                     strokeLinejoin: "round",
                     fontFamily: "var(--font-display), system-ui, sans-serif",
-                    fontSize: `${fs * upp * (wordHover === w.key ? 1.08 : 1)}px`,
+                    // Owner review: LEARN is half the size it was. This branch
+                    // only ever draws LEARN -- START renders as a square above.
+                    fontSize: `${fs * 0.5 * upp * (wordHover === w.key ? 1.08 : 1)}px`,
                     letterSpacing: `${2 * upp}px`,
                     filter:
                       wordHover === w.key
