@@ -1253,3 +1253,14 @@
     height: 64px !important;
   }
 }
+
+/* The fan's centre icon is .randomBtn. It sits inside .selectorWrap, so the
+   0.48 mobile scale shrinks it along with the dogs -- which is why the icon
+   appeared to halve on click. Counter-scale it back, exactly as .selectorClose
+   already does, leaving the dogs where they are. */
+@media (max-width: 480px) {
+  .randomBtn {
+    transform: scale(2.08);
+    transform-origin: center;
+  }
+}
