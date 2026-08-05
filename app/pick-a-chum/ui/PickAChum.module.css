@@ -1050,3 +1050,9 @@
     box-shadow: 0 0 0 1.5px #fff;
   }
 }
+
+/* Mobile: hide the dog's name entirely. Her face is on screen and the name
+   crowded the medallion at this size. */
+@media (max-width: 480px) {
+  .anchorName { display: none; }
+}
