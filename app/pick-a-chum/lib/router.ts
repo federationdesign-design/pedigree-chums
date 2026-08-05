@@ -494,6 +494,9 @@ const GAMES_MENU_TRIGGERS = new Set(['are there games', 'play']);
 // Task 134. Four Collie buckets from the workbook. Each is a whole-message
 // match, and each that asks a question sets its own lastAction so a following
 // "yes" is caught by its own confirm rather than the loop's.
+// Task 135: fetch is a game, so the natural phrasings must reach it rather
+// than the bark-game offer or the rules FAQ.
+const FETCH_TRIGGERS = new Set(['fetch', 'can we play fetch', 'play fetch', 'lets play fetch', 'throw it', 'go fetch', 'can we play catch']);
 const DOGS_TRIGGERS = new Set(['dogs', 'dog']);
 const TRICKS_TRIGGERS = new Set(['tricks', 'can you do tricks', 'show me a trick', 'do a trick', 'any tricks', 'do tricks', 'can you do a trick']);
 const GENERAL_TRIGGERS: Record<string, string> = {
@@ -975,6 +978,10 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
   }
   if (DOGS_TRIGGERS.has(c)) {
     return { layer: 13, layerName: 'Play and entertainment', bucket: 'B55', action: 'ask_dogs', responseId: 'COL-B55-CONFIRM-01' };
+  }
+
+  if (FETCH_TRIGGERS.has(c)) {
+    return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: 'random_link' };
   }
 
   // Task 134: tricks. The question, then the list on a following yes.

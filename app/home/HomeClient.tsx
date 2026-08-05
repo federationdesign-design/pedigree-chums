@@ -28,7 +28,7 @@ export default function HomeClient() {
       </div>
 
       {/* Search hero */}
-      <section className={styles.searchHero}>
+      <section id="preorder" className={styles.searchHero}>
         <p className={styles.searchEyebrow}>54 breeds to discover</p>
         <h1 className={styles.searchTitle}>
           Explore Britain&apos;s most <span>popular breeds</span>

@@ -247,7 +247,10 @@ export function assemble(res: Resolution, data0: ChumData, n: Normalised, sessio
       const name = dest?.name ?? 'the site';
       const r = pickResponse(data, 'B03', session.usedResponseIds);
       const text = r ? fill(r.template, baseContext(n, name)) : `${name} is here.`;
-      return { responseId: r?.responseId ?? 'FETCH-LINK', text, dog, destinationId: dest?.id, url: dest?.url ?? null };
+      // Task 135: fetch is a game, so it invites another go. The chat is not
+      // minimised on this link (see fetchGame in the experience), so the
+      // follow-up still has somewhere to land.
+      return { responseId: r?.responseId ?? 'FETCH-LINK', text, dog, destinationId: dest?.id, url: dest?.url ?? null, followUp: 'play again?' };
     }
 
     case 'dog_fact': {

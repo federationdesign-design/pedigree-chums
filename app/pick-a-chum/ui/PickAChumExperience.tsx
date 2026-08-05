@@ -120,6 +120,7 @@ interface Message {
   display?: string; // text revealed so far (typing theatre)
   done?: boolean; // performance finished (show the action link, allow the next)
   contextualLink?: boolean; // a contextual link allowed mid-chat (breed_page only)
+  fetchGame?: boolean; // Task 135: the fetch game's link keeps the chat open so 'play again?' can follow
   gameOutput?: string; // Task 115: the game board / sheep tiles / drawing, rendered in a monospace block
 }
 
@@ -603,6 +604,7 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
       // exceptions to "nav links at the very end"; every other action's link stays
       // gated below. Not a general loosening.
       contextualLink: result.resolution.action === 'breed_page' || result.resolution.action === 'breed_hub',
+      fetchGame: result.resolution.action === 'random_link',
       gameOutput: r.gameOutput,
     };
     setDog(toDog);
@@ -612,6 +614,11 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
     // served (game_start carries the board / masked word / drawing in gameOutput), before any move.
     if (result.resolution.action === 'game_start' && result.resolution.game) {
       reportHiddenGame(HIDDEN_GAME_ID[result.resolution.game]);
+    }
+    // Task 135: fetch is a hidden game too. It has no game state, so it reports
+    // on the turn that throws the link rather than on a game_start.
+    if (result.resolution.action === 'random_link') {
+      reportHiddenGame('G06');
     }
 
     // Bark-game break: the volley is instant (a bark action skips theatre); the
@@ -723,9 +730,9 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
                   <pre className={styles.gameOutput}>{msg.gameOutput}</pre>
                 )}
 
-                {msg.done && msg.action && (msg.action.kind === 'popup' || msg.closed || msg.contextualLink) && (
+                {msg.done && msg.action && (
                   <div className={styles.actionWrap}>
-                    <ActionLink command={msg.action} />
+                    <ActionLink command={msg.action} onNavigate={msg.fetchGame ? undefined : () => setMinimised(true)} />
                   </div>
                 )}
               </div>
@@ -989,7 +996,7 @@ function destinationName(id?: string): string {
   return a ? a.title : '';
 }
 
-function ActionLink({ command }: { command: Command }) {
+function ActionLink({ command, onNavigate }: { command: Command; onNavigate?: () => void }) {
   const label = (
     <>
       <span className={styles.pointer} aria-hidden="true">
@@ -1001,7 +1008,7 @@ function ActionLink({ command }: { command: Command }) {
   const cls = styles.command;
   if (command.kind === 'internal' && command.href) {
     return (
-      <Link href={command.href} className={cls}>
+      <Link href={command.href} className={cls} onClick={onNavigate}>
         {label}
       </Link>
     );

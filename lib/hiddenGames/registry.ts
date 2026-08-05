@@ -5,7 +5,7 @@
 // of the games list, so it can never disagree with the list it counts.
 // Nothing else defines the campaign version, mode or the qualifying games.
 
-export const GAME_IDS = ["G01", "G02", "G03", "G04", "G05"] as const;
+export const GAME_IDS = ["G01", "G02", "G03", "G04", "G05", "G06"] as const;
 export type GameId = (typeof GAME_IDS)[number];
 
 export interface GameDef {
@@ -35,6 +35,12 @@ export const REGISTRY: Registry = {
   opens_at: null,
   closes_at: null,
   games: [
+    {
+      id: "G06",
+      name: "Fetch",
+      threshold:
+        "The Collie is asked to play fetch and throws a random page link",
+    },
     {
       id: "G01",
       // Renamed from "Off Exploring" per CHANGE-LIST C01. This is a placeholder
