@@ -297,5 +297,47 @@
     "resolvedUrl": "mailto:hello@Pedigree-Chums.co.uk",
     "embedded": false,
     "routeNote": "Contact = email link (confirmed by Steve). No /contact route; the site uses hello@Pedigree-Chums.co.uk."
+  },
+  {
+    "destinationId": "DST014",
+    "name": "Home",
+    "family": "Discover",
+    "action": "Open exact interactive page",
+    "description": "The Pedigree Chums home page",
+    "triggerTags": [
+      "homepage",
+      "home",
+      "start"
+    ],
+    "campaignState": "Any",
+    "weight": "High",
+    "preferredDog": [
+      "Collie"
+    ],
+    "workbookUrl": "/home",
+    "resolvedUrl": "/home",
+    "embedded": false,
+    "routeNote": null
+  },
+  {
+    "destinationId": "DST015",
+    "name": "Bull's-eye",
+    "family": "Discover",
+    "action": "Open exact interactive page",
+    "description": "The Bull's-eye essay in Good Dog, Bad Dog",
+    "triggerTags": [
+      "worst dog",
+      "bad dog",
+      "bullseye"
+    ],
+    "campaignState": "Any",
+    "weight": "Medium",
+    "preferredDog": [
+      "Collie"
+    ],
+    "workbookUrl": "/good-dog-bad-dog/bulls-eye",
+    "resolvedUrl": "/good-dog-bad-dog/bulls-eye",
+    "embedded": false,
+    "routeNote": null
   }
 ]

@@ -152,6 +152,7 @@ export function submit(data: ChumData, session: Session, input: string): Turn {
     barkStreak: session.barkStreakByDog[dog] ?? 0,
     barkCompleted: session.barkCompletedByDog[dog] ?? false,
     lastAction: session.lastAction,
+    safetyAskStreak: session.safetyAskStreak,
     anatomyRedirectUsed: session.anatomyRedirectUsed,
     topic: session.topic,
     lastWasComplaint: session.lastWasComplaint,
@@ -369,6 +370,8 @@ export function submit(data: ChumData, session: Session, input: string): Turn {
     }
   }
   session.lastAction = resolution.action; // for the next turn's clarifier follow-up
+  // Task 139: the streak counts consecutive safety questions only.
+  session.safetyAskStreak = resolution.bucket === 'B58' ? (session.safetyAskStreak ?? 0) + 1 : 0;
 
   return { input, resolution, response };
 }

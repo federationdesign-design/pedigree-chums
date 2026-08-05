@@ -26,6 +26,7 @@ export interface Assembled {
   header?: string; // e.g. 'HELP AND SUPPORT' above a protected safety response
   hideDogIdentity?: boolean; // true: no dog name, avatar or character label above the response
   ariaLabel?: string; // Task 58: screen-reader label for a non-verbal response (the ':(' / ':)' faces). The UI must render this as the accessible name.
+  media?: { src: string; alt: string }; // Task 138: a short looping clip served with the line. Local files only -- nothing fetched at runtime, so what a child sees is what was approved.
   gameOutput?: string; // Task 115: the game's monospace board / sheep tiles / drawing, rendered pre-formatted below the line.
 }
 
@@ -262,6 +263,11 @@ export function assemble(res: Resolution, data0: ChumData, n: Normalised, sessio
       // minimised on this link (see fetchGame in the experience), so the
       // follow-up still has somewhere to land.
       return { responseId: r?.responseId ?? 'FETCH-LINK', text, dog, destinationId: dest?.id, url: dest?.url ?? null, followUp: 'play again? just say fetch' };
+    }
+
+    case 'paw': {
+      // Task 138: the paw from the identity game, as a short loop.
+      return { responseId: 'PAW-01', text: 'paw', dog, media: { src: '/chat-media/paw.mp4', alt: 'A dog offering its paw' } };
     }
 
     case 'dog_fact': {

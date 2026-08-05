@@ -30,6 +30,7 @@ export interface Session {
   safetyState: string | null; // last moderation id, if any
   closed: boolean; // Boxer cut-off performed
   lastAction: ActionType | null; // the previous turn's resolved action (for clarifier follow-up)
+  safetyAskStreak: number; // Task 139: consecutive safety questions. Three in a row hands to a human; any other turn resets it.
   anatomyRedirectUsed: boolean; // ANATOMY_GENERAL_REDIRECT fires at most once per session
   protectedState: ProtectedState; // S12 protected-state machine (Task 15)
   personalSadnessCount: number; // Task 20: qualifying personal-sadness statements this session (L1 at 1, L2 at 2)
@@ -80,6 +81,7 @@ export function newSession(activeDog: Dog = 'collie'): Session {
     safetyState: null,
     closed: false,
     lastAction: null,
+    safetyAskStreak: 0,
     anatomyRedirectUsed: false,
     protectedState: null,
     personalSadnessCount: 0,

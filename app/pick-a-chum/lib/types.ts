@@ -169,6 +169,7 @@ export type ActionType =
   | 'ask_breeds' // Task 134b: B55. "breeds" asks; a following yes goes to the breed hub.
   | 'ask_games' // Task 134b: B56. "games" asks; a following yes serves the B45 list.
   | 'tricks_menu' // Task 134: B54. "tricks" serves COL-B54-TRICKS-01 ("I do tricks"); a following "yes" serves TRICKS-02 (the list). Serves the specific responseId, like canned.
+  | 'paw' // Task 138: she offers a paw, served as a short clip rather than a line.
   | 'dog_fact' // Task 134: B57. A dog fact chosen AT RANDOM, not by rotation, and not repeated until the session has used all twenty.
   | 'price_answer' // Task 49: a price question -> FAQ008's text in chat; NOT a MEANINGFUL_TOPIC, so the safety machine holds/refuses it like buying
   | 'transfer_request' // visitor asks to switch to a different dog

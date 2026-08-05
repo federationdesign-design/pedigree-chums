@@ -1317,3 +1317,13 @@
     transform-origin: center;
   }
 }
+
+/* Task 138: a short clip served inside a bubble, sized like an image reply
+   rather than filling the panel. */
+.bubbleMedia {
+  display: block;
+  width: 100%;
+  max-width: 220px;
+  border-radius: 14px;
+  margin-top: 8px;
+}

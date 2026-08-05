@@ -122,6 +122,7 @@ interface Message {
   contextualLink?: boolean; // a contextual link allowed mid-chat (breed_page only)
   fetchGame?: boolean; // Task 135: the fetch game's link keeps the chat open so 'play again?' can follow
   gameOutput?: string; // Task 115: the game board / sheep tiles / drawing, rendered in a monospace block
+  media?: { src: string; alt: string }; // Task 138: a short looping clip served with the line
 }
 
 // The response-specific action link (if any). Navigation links (a destination or
@@ -606,6 +607,7 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
       contextualLink: result.resolution.action === 'breed_page' || result.resolution.action === 'breed_hub',
       fetchGame: result.resolution.action === 'random_link',
       gameOutput: r.gameOutput,
+      media: r.media,
     };
     setDog(toDog);
     setMessages((m) => [...m, userMsg, dogMsg]);
@@ -726,6 +728,18 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
 
                 {/* Task 115: the game board / sheep tiles / drawing. MONOSPACE + pre so the ASCII
                     keeps its shape (a proportional font collapses it). Not typed; it appears whole. */}
+                {msg.media && (
+                  <video
+                    className={styles.bubbleMedia}
+                    src={msg.media.src}
+                    aria-label={msg.media.alt}
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    preload="metadata"
+                  />
+                )}
                 {msg.gameOutput && (
                   <pre className={styles.gameOutput}>{msg.gameOutput}</pre>
                 )}

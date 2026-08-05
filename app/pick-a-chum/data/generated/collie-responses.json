@@ -4398,5 +4398,160 @@
     "defaultRoute": "",
     "animationCue": "",
     "status": "Approved"
+  },
+  {
+    "responseId": "COL-B58-SAFE-01",
+    "bucketId": "B58",
+    "subtag": "safe",
+    "triggers": [
+      "is it safe",
+      "is this safe",
+      "is this game safe",
+      "is the game safe for kids",
+      "are the cards safe",
+      "is it safe for children",
+      "safety"
+    ],
+    "template": "The cards are made in the UK from recycled paper. Fully biodegradable, no plastic.",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "COL-B58-SAFE-02",
+    "bucketId": "B58",
+    "subtag": "safe",
+    "triggers": [
+      "third safety question in a row -> hand to a human"
+    ],
+    "template": "That needs a person, not a dog. Email hello@Pedigree-Chums.co.uk and someone will look at it.",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "COL-B59-FRIENDS-01",
+    "bucketId": "B59",
+    "subtag": "friends",
+    "triggers": [
+      "do you have friends",
+      "do you have a best friend",
+      "do you have dog friends",
+      "who are your friends",
+      "any friends",
+      "have you got friends"
+    ],
+    "template": "Three of them. A labrador, a border terrier and a boxer.",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "COL-B59-FRIENDS-02",
+    "bucketId": "B59",
+    "subtag": "friends",
+    "triggers": [
+      "different dog friends",
+      "other dog friends",
+      "friends that are dogs",
+      "tell me about your friends",
+      "no friends that are dogs"
+    ],
+    "template": "They are here too. Say their name and you will get them instead of me.",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "COL-B60-PEDIGREE-01",
+    "bucketId": "B60",
+    "subtag": "pedigree",
+    "triggers": [
+      "what is a pedigree",
+      "whats a pedigree",
+      "what does pedigree mean",
+      "what are pedigree dogs",
+      "pedigree",
+      "what is a pedigree dog"
+    ],
+    "template": "It means your family is written down. Mine goes back to the working collies of the borders.",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "COL-B61-NAV-01",
+    "bucketId": "B61",
+    "subtag": "nav",
+    "triggers": [
+      "where is the homepage",
+      "take me home",
+      "go home",
+      "the homepage",
+      "find the homepage",
+      "wheres the homepage"
+    ],
+    "template": "Here",
+    "factSource": "",
+    "defaultRoute": "DST014",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "COL-B61-NAV-02",
+    "bucketId": "B61",
+    "subtag": "nav",
+    "triggers": [
+      "tell me my options",
+      "what can i do",
+      "what are my options",
+      "what else can i do",
+      "my options"
+    ],
+    "template": "play, learn, buy, explore",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "COL-B62-MADE-01",
+    "bucketId": "B62",
+    "subtag": "made",
+    "triggers": [
+      "who made you",
+      "who built you",
+      "who created you",
+      "who wrote you",
+      "who owns you",
+      "who designed you"
+    ],
+    "template": "A human",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "COL-B63-WORST-01",
+    "bucketId": "B63",
+    "subtag": "worst",
+    "triggers": [
+      "worst dog",
+      "whats the worst dog",
+      "worst dog ever",
+      "worst breed",
+      "whats the worst breed"
+    ],
+    "template": "Worst dog I know is Bull's-eye",
+    "factSource": "",
+    "defaultRoute": "DST015",
+    "animationCue": "",
+    "status": "Approved"
   }
 ]

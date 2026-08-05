@@ -465,6 +465,7 @@ function isActiveBreedQuestion(compact: string): boolean {
 }
 
 export interface RouterState {
+  safetyAskStreak?: number; // Task 139: consecutive safety questions; three in a row hands to a human.
   submissionCount: number; // count AFTER this submission (1-based)
   activeDog?: Dog; // whose bark game this is
   barkStreak?: number; // the active dog's consecutive bark exchanges BEFORE this message
@@ -496,6 +497,18 @@ const GAMES_MENU_TRIGGERS = new Set(['are there games', 'play']);
 // "yes" is caught by its own confirm rather than the loop's.
 // Task 135: fetch is a game, so the natural phrasings must reach it rather
 // than the bark-game offer or the rules FAQ.
+// Task 139: six buckets from the 5 August log. Each is a whole-message match.
+const SAFE_TRIGGERS = new Set(['is it safe', 'is this safe', 'is this game safe', 'is the game safe', 'is the game safe for kids', 'are the cards safe', 'is it safe for children', 'is it safe for kids', 'safety', 'is this safe for kids']);
+const FRIENDS_TRIGGERS = new Set(['do you have friends', 'do you have a best friend', 'do you have dog friends', 'who are your friends', 'any friends', 'have you got friends', 'do you have any friends']);
+const FRIENDS_MORE_TRIGGERS = new Set(['different dog friends', 'other dog friends', 'friends that are dogs', 'tell me about your friends', 'no friends that are dogs']);
+const PEDIGREE_TRIGGERS = new Set(['what is a pedigree', 'whats a pedigree', 'what does pedigree mean', 'what are pedigree dogs', 'pedigree', 'what is a pedigree dog']);
+const HOME_TRIGGERS = new Set(['where is the homepage', 'take me home', 'go home', 'the homepage', 'find the homepage', 'wheres the homepage', 'homepage']);
+// 'what are my options' stays with orientation (B15), which owned it first and
+// gives a fuller answer than a four-word list.
+const OPTIONS_TRIGGERS = new Set(['tell me my options', 'what can i do', 'what else can i do', 'my options']);
+const MADE_TRIGGERS = new Set(['who made you', 'who built you', 'who created you', 'who wrote you', 'who owns you', 'who designed you']);
+const WORST_TRIGGERS = new Set(['worst dog', 'whats the worst dog', 'worst dog ever', 'worst breed', 'whats the worst breed']);
+const PAW_TRIGGERS = new Set(['paw', 'give me your paw', 'shake', 'shake hands', 'give paw', 'can i have your paw', 'high five']);
 const FETCH_TRIGGERS = new Set(['fetch', 'can we play fetch', 'play fetch', 'lets play fetch', 'throw it', 'go fetch', 'can we play catch']);
 const DOGS_TRIGGERS = new Set(['dogs', 'dog']);
 const TRICKS_TRIGGERS = new Set(['tricks', 'can you do tricks', 'show me a trick', 'do a trick', 'any tricks', 'do tricks', 'can you do a trick']);
@@ -953,6 +966,24 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
   {
     const trick = matchTrick(c);
     if (trick) return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: trick };
+    // Task 138: the paw is answered before GAME_CMD, which was claiming
+    // 'paw' and 'shake' for the bark-game offer.
+    const L13 = (bucket: string, responseId: string, destinationId?: string) => ({ layer: 13, layerName: 'Play and entertainment', bucket, action: 'canned' as const, responseId, ...(destinationId ? { destinationId } : {}) });
+    // Safety: the cards answer first. THREE in a row hands to a human, which is
+    // FAQ015's line -- a parent asking twice is curious, three times wants a
+    // person.
+    if (SAFE_TRIGGERS.has(c)) {
+      const n = (state.safetyAskStreak ?? 0) + 1;
+      return L13('B58', n >= 3 ? 'COL-B58-SAFE-02' : 'COL-B58-SAFE-01');
+    }
+    if (FRIENDS_MORE_TRIGGERS.has(c)) return L13('B59', 'COL-B59-FRIENDS-02');
+    if (FRIENDS_TRIGGERS.has(c)) return L13('B59', 'COL-B59-FRIENDS-01');
+    if (PEDIGREE_TRIGGERS.has(c)) return L13('B60', 'COL-B60-PEDIGREE-01');
+    if (HOME_TRIGGERS.has(c)) return L13('B61', 'COL-B61-NAV-01', 'DST014');
+    if (OPTIONS_TRIGGERS.has(c)) return L13('B61', 'COL-B61-NAV-02');
+    if (MADE_TRIGGERS.has(c)) return L13('B62', 'COL-B62-MADE-01');
+    if (WORST_TRIGGERS.has(c)) return L13('B63', 'COL-B63-WORST-01', 'DST015');
+    if (PAW_TRIGGERS.has(c)) return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: 'paw' };
     if (GAME_CMD.has(c)) return { layer: 13, layerName: 'Play and entertainment', bucket: 'B17', action: 'offer_bark_game' };
     if (FETCH_CMD.has(c)) return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: 'random_link' };
   }
