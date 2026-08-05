@@ -1593,7 +1593,12 @@ export default function LineageMap({
                     </text>
                     {(hasKids || !autoExposed.has(n._id)) && !(circular && n.name === breed.name) ? (() => {
                       const nmW = n.name.length * 7.4 + 22; // pill hugs the name
-                      const nmY = -r - 13;
+                      // Owner review: the name sat above the circle, so the
+                      // topmost one ran off the screen. It now sits inside,
+                      // near the top of the circle, which is how it reads on a
+                      // phone where the circles are small enough for the old
+                      // position to stay on screen.
+                      const nmY = -r + 22;
                       return (
                         <g>
                           <rect className={styles.nmPill} x={-nmW / 2} y={nmY - 11} width={nmW} height={22} rx={11} />
