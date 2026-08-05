@@ -9,9 +9,9 @@ const STEPS: Step[] = [
   { n: 1, caption: "DEAL 3-6 CHUMS EACH", img: "/step1-redue.jpg", video: "/step1-video-animation.mp4" },
   { n: 2, caption: "HEAD OUTSIDE",         img: "/step2-redue.jpg", video: "/step2-video-animation.mp4" },
   { n: 3, caption: "SPOT REAL DOGS",       img: "/step3-redue.jpg", video: "/step3-video-animation.mp4" },
-  { n: 4, caption: "MATCH TO YOUR CHUM",   img: "/step4-redue.jpg", video: null },
+  { n: 4, caption: "MATCH TO YOUR CHUM",   img: "/instruction-step4.jpg", video: null },
   { n: 5, caption: "FIND MORE CHUMS",      img: "/step5-redue.jpg", video: null },
-  { n: 6, caption: "MOST CHUMS WINS",      img: "/step6-redue.jpg", video: null },
+  { n: 6, caption: "MOST CHUMS WINS",      img: "/step6-redue.jpg", video: "/step6-video-animation.mp4" },
 ];
 
 export default function HowItPlays() {
