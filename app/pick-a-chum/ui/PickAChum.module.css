@@ -1303,3 +1303,17 @@
     transform-origin: center;
   }
 }
+
+/* The fan is at 0.6 (line 1160), not the 0.48 the counter-scale assumed, so
+   the selector close rendered larger than the other two. 1/0.6 is the correct
+   factor. */
+@media (max-width: 480px) {
+  .selectorClose {
+    transform: scale(1.667);
+    transform-origin: center;
+  }
+  .randomBtn {
+    transform: scale(1.667);
+    transform-origin: center;
+  }
+}
