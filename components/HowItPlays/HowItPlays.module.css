@@ -170,3 +170,15 @@
     left: -32px;
   }
 }
+
+/* The number sits high because the display font carries a tall ascender above
+   the digits. line-height 1 removes that slack, and the padding pushes the
+   optical centre down without changing the circle's size or shape. */
+.badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  padding-top: 14px;
+  box-sizing: border-box;
+}
