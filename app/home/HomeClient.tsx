@@ -1,52 +1,13 @@
 "use client";
-import { useState, useRef, useEffect } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
 import VideoGrid from "../../components/VideoGrid/VideoGrid";
 import AnubisFeature from "../../components/AnubisFeature/AnubisFeature";
+/* The search moved out to components/ChumSearch so Know Your Chums can use the
+   same one (owner instruction, 5 August). The markup and behaviour are
+   unchanged: they were moved whole, not rewritten. */
+import ChumSearch from "../../components/ChumSearch/ChumSearch";
 import styles from "./home.module.css";
-import { breeds } from "../../data/breeds";
 
 export default function HomeClient() {
-  const router = useRouter();
-  const [query, setQuery] = useState("");
-  const [open, setOpen] = useState(false);
-  const [placeholder, setPlaceholder] = useState("Labrador...");
-  const wrapRef = useRef<HTMLDivElement>(null);
-
-  // Mobile shows a single example breed; wider screens show the full list.
-  useEffect(() => {
-    const mq = window.matchMedia("(max-width: 768px)");
-    const apply = () =>
-      setPlaceholder(mq.matches ? "Labrador" : "Labrador...");
-    apply();
-    mq.addEventListener("change", apply);
-    return () => mq.removeEventListener("change", apply);
-  }, []);
-
-  const goToTopMatch = () => {
-    if (filtered.length > 0) {
-      router.push(`/chums/${filtered[0].slug}`);
-      setOpen(false);
-    }
-  };
-
-  const filtered = query.trim().length === 0
-    ? []
-    : breeds.filter((b) =>
-        b.name.toLowerCase().startsWith(query.trim().toLowerCase())
-      ).slice(0, 8);
-
-  useEffect(() => {
-    const onClick = (e: MouseEvent) => {
-      if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", onClick);
-    return () => document.removeEventListener("mousedown", onClick);
-  }, []);
-
   return (
     <>
       {/* Hero image */}
@@ -75,51 +36,7 @@ export default function HomeClient() {
         <p className={styles.searchSub}>
           Type a breed to explore its family tree, history, and personality
         </p>
-        <div className={styles.searchWrap} ref={wrapRef}>
-          <input
-            className={styles.searchInput}
-            type="text"
-            placeholder={placeholder}
-            value={query}
-            onChange={(e) => { setQuery(e.target.value); setOpen(true); }}
-            onFocus={() => setOpen(true)}
-            onKeyDown={(e) => { if (e.key === "Enter") goToTopMatch(); }}
-            autoComplete="off"
-            spellCheck={false}
-          />
-          {query.trim().length > 0 && (
-            <button
-              type="button"
-              className={styles.searchGo}
-              onClick={goToTopMatch}
-              aria-label="Go"
-            >
-              GO
-            </button>
-          )}
-          {open && query.trim().length > 0 && (
-            <div className={styles.dropdown}>
-              {filtered.length > 0 ? filtered.map((b) => (
-                <Link
-                  key={b.slug}
-                  href={`/chums/${b.slug}`}
-                  className={styles.dropdownItem}
-                  onClick={() => { setOpen(false); setQuery(""); }}
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={b.image}
-                    alt={b.name}
-                    className={styles.dropdownThumb}
-                  />
-                  {b.name}
-                </Link>
-              )) : (
-                <div className={styles.dropdownEmpty}>No chums found for &ldquo;{query}&rdquo;</div>
-              )}
-            </div>
-          )}
-        </div>
+        <ChumSearch />
       </section>
 
 

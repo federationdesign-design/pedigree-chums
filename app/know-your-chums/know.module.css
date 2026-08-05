@@ -310,10 +310,58 @@
   color: var(--white);
   margin: 0 0 clamp(14px, 2.5vw, 22px);
 }
-.rowGrid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+/* HORIZONTAL RAIL, copied from app/britains-dog-history/history.module.css
+   (.stripWrap / .stripRail / .stripScrollbar / .stripThumb) so the two pages
+   scroll the same way. The native bar is hidden and the yellow thumb below is
+   drawn instead, driven by the rail's own scroll position. */
+.rowWrap {
+  position: relative;
+}
+.rowRail {
+  display: flex;
+  flex-wrap: nowrap;
   gap: clamp(12px, 2vw, 24px);
+  align-items: flex-start;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding: 4px 2px 8px;
+  justify-content: flex-start;
+  position: relative;
+  scrollbar-width: none;
+}
+.rowRail::-webkit-scrollbar {
+  display: none;
+}
+/* One card's worth of rail. Four across on a wide window, matching the grid
+   this replaced, and progressively fewer as the window narrows. */
+.rowItem {
+  flex: 0 0 auto;
+  width: clamp(150px, 22vw, 250px);
+}
+.rowScrollbar {
+  position: relative;
+  height: 12px;
+  margin: 10px 0 0;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.22);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+.rowThumb {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 30%;
+  min-width: 44px;
+  border-radius: var(--radius-pill);
+  background: var(--yellow);
+  cursor: grab;
+  touch-action: none;
+}
+.rowThumb:active {
+  cursor: grabbing;
 }
 
 /* flip card (themed rows + search results): no frame, no name below.
@@ -324,6 +372,11 @@
   background: transparent;
   padding: 0;
   cursor: pointer;
+  /* The card is a link. As a grid item it was blockified for free; on the
+     horizontal rail it is a flex item's child, so it has to say so itself or
+     the aspect-ratio below never applies and the card renders zero-high. */
+  display: block;
+  width: 100%;
   aspect-ratio: 1 / 1;
   perspective: 900px;
   border-radius: var(--radius-card);
@@ -356,12 +409,16 @@
   height: 100%;
   object-fit: cover;
 }
+/* The yellow reverse, matching the card back on Britain's dog history: the
+   name over the dog's own line of copy, navy on yellow, no opacity. */
 .flipBack {
   transform: rotateY(180deg);
   background: var(--yellow);
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 6px;
   padding: 14px;
 }
 .flipName {
@@ -370,6 +427,14 @@
   color: var(--navy);
   text-align: center;
   line-height: 1.05;
+}
+.flipNote {
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-weight: 600;
+  font-size: clamp(0.72rem, 1.15vw, 0.92rem);
+  line-height: 1.15;
+  color: var(--navy);
+  text-align: center;
 }
 
 /* ------------------------------------------------------------- breed modal */

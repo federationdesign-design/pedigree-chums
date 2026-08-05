@@ -1,0 +1,114 @@
+/* Lifted verbatim from app/home/home.module.css (owner instruction, 5 August:
+   lift the home search, do not remake it). The home page now imports this file
+   instead of holding its own copy, so the two can never drift apart.
+   Only the surrounding hero styling stayed behind on the home page. */
+
+.searchWrap {
+  position: relative;
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 40px clamp(96px, 12vw, 150px) 40px 56px;
+  font-family: var(--font-display, 'Luckiest Guy', system-ui);
+  font-size: clamp(32px, 4.4vw, 44px);
+  letter-spacing: 0.04em;
+  background: rgba(255,255,255,0.08);
+  border: 2.5px solid #ffffff;
+  border-radius: 50px;
+  color: #fff;
+  outline: none;
+  transition: border-color 0.2s, background 0.2s;
+  box-sizing: border-box;
+}
+
+.searchInput::placeholder {
+  color: #ffffff;
+}
+
+.searchInput:focus::placeholder {
+  color: transparent;
+}
+
+.searchInput:focus {
+  border-color: var(--yellow, #ffd23e);
+  background: rgba(255,255,255,0.12);
+}
+
+.searchGo {
+  position: absolute;
+  right: clamp(22px, 3vw, 44px);
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-display, 'Luckiest Guy', system-ui);
+  font-size: clamp(26px, 3.2vw, 42px);
+  letter-spacing: 0.06em;
+  color: #22c55e;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.3);
+  padding: 4px 8px;
+  transition: opacity 0.15s ease, transform 0.1s ease;
+}
+
+.searchGo:hover { opacity: 0.8; }
+
+.searchGo:active { transform: translateY(-50%) scale(0.94); }
+
+.searchGo:disabled { opacity: 0.4; cursor: default; }
+
+.dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  background: var(--blue-deep, #0c5b92);
+  border: 2px solid var(--yellow, #ffd23e);
+  border-radius: 20px;
+  overflow: hidden;
+  z-index: 100;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.dropdownItem {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 24px;
+  cursor: pointer;
+  transition: background 0.15s;
+  text-decoration: none;
+  color: #fff;
+  font-family: var(--font-display, 'Luckiest Guy', system-ui);
+  font-size: clamp(14px, 1.8vw, 18px);
+  letter-spacing: 0.03em;
+}
+
+.dropdownItem:hover {
+  background: rgba(255,255,255,0.12);
+}
+
+.dropdownItem + .dropdownItem {
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+
+.dropdownThumb {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  object-fit: cover;
+  background: rgba(255,255,255,0.1);
+  flex-shrink: 0;
+}
+
+.dropdownEmpty {
+  padding: 20px 24px;
+  color: rgba(255,255,255,0.5);
+  font-size: 15px;
+  font-style: italic;
+}
