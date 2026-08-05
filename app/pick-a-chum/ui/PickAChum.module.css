@@ -1075,3 +1075,30 @@
       drop-shadow(0 1.5px 0 #fff) drop-shadow(0 -1.5px 0 #fff);
   }
 }
+
+/* Mobile: keep the desktop disc, just smaller. The earlier rule replaced the
+   span with a bare bar, which lost the blue circle and white ring. Close sits
+   left, minimise right, both overhanging her rim. */
+@media (max-width: 480px) {
+  .minimise.minimise {
+    top: -8px;
+    right: -8px;
+    left: auto;
+    width: 30px;
+    height: 30px;
+  }
+  .minimise.minimise span {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #193955;
+    box-shadow: none;
+  }
+  .close.close {
+    right: auto;
+    left: -8px;
+    top: -8px;
+    width: 30px;
+    height: 30px;
+  }
+}
