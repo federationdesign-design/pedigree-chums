@@ -73,3 +73,21 @@
   width: max-content;
   white-space: nowrap;
 }
+
+/* The discovery toast moves to the bottom right, clear of the counter, and
+   scales down a third on mobile. */
+.toast.toast {
+  top: auto;
+  left: auto;
+  right: clamp(12px, 3vw, 22px);
+  bottom: calc(clamp(12px, 3vw, 22px) + env(safe-area-inset-bottom, 0px));
+}
+@media (max-width: 768px) {
+  .toast.toast {
+    font-size: 0.7rem;
+    padding: 9px 14px;
+    border-width: 2px;
+    white-space: normal;
+    max-width: calc(100vw - 24px);
+  }
+}

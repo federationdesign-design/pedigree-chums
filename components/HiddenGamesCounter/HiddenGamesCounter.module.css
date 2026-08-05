@@ -702,3 +702,12 @@
     right: -5px;
   }
 }
+
+/* Mobile nudge: 10px further left, 20px higher. */
+@media (max-width: 768px) {
+  .counter.counter,
+  .reveal.reveal {
+    left: 2px;
+    top: calc(clamp(76px, 12vh, 112px) + env(safe-area-inset-top, 0px));
+  }
+}
