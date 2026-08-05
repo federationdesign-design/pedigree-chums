@@ -980,6 +980,12 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
     return { layer: 13, layerName: 'Play and entertainment', bucket: 'B55', action: 'ask_dogs', responseId: 'COL-B55-CONFIRM-01' };
   }
 
+  // Task 137: a yes straight after a fetch throws again, and fetch itself is
+  // checked before the games-menu confirm so a second "fetch" is never read as
+  // an answer to "which game?".
+  if (state.lastAction === 'random_link' && isConfirmYes(c)) {
+    return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: 'random_link' };
+  }
   if (FETCH_TRIGGERS.has(c)) {
     return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: 'random_link' };
   }

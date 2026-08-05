@@ -178,7 +178,9 @@ function copy(data: ChumData, type: string, subgroup?: string): string {
 function pickDestination(data: ChumData, offered: string[]): { id: string; name: string; url: string | null } | null {
   const families = ['Play', 'Learn', 'Discover'];
   const pool = data.destinations.filter(
-    (d) => families.some((f) => d.family.includes(f)) && (d.resolvedUrl || d.embedded)
+    // Task 137: a real page only. Embedded destinations have no resolvedUrl,
+    // so the text named one place while the link went somewhere else.
+    (d) => families.some((f) => d.family.includes(f)) && !!d.resolvedUrl
   );
   const choice = pool.find((d) => !offered.includes(d.destinationId)) ?? pool[0];
   return choice ? { id: choice.destinationId, name: choice.name, url: choice.resolvedUrl } : null;
@@ -243,14 +245,23 @@ export function assemble(res: Resolution, data0: ChumData, n: Normalised, sessio
     // session's offered set), instead of the old B11 command voice. The line comes from the B03 link
     // bank, filled with the destination name.
     case 'random_link': {
-      const dest = pickDestination(data, session.offeredDestinationIds);
-      const name = dest?.name ?? 'the site';
+      // Task 137: the destination follows the LINE, not the other way round.
+      // Five of the six B03 templates name a specific place in their text, so
+      // choosing a response and a destination independently guaranteed a
+      // mismatch -- "The Dog Name Generator is ready" linking to Know Your
+      // Chums. Match the named place to its destination; only R01, which uses
+      // the token, gets a free pick.
       const r = pickResponse(data, 'B03', session.usedResponseIds);
+      const named = r ? data.destinations.find((d) => !!d.resolvedUrl && r.template.includes(d.name)) : null;
+      const dest = named
+        ? { id: named.destinationId, name: named.name, url: named.resolvedUrl }
+        : pickDestination(data, session.offeredDestinationIds);
+      const name = dest?.name ?? 'the site';
       const text = r ? fill(r.template, baseContext(n, name)) : `${name} is here.`;
       // Task 135: fetch is a game, so it invites another go. The chat is not
       // minimised on this link (see fetchGame in the experience), so the
       // follow-up still has somewhere to land.
-      return { responseId: r?.responseId ?? 'FETCH-LINK', text, dog, destinationId: dest?.id, url: dest?.url ?? null, followUp: 'play again?' };
+      return { responseId: r?.responseId ?? 'FETCH-LINK', text, dog, destinationId: dest?.id, url: dest?.url ?? null, followUp: 'play again? just say fetch' };
     }
 
     case 'dog_fact': {
