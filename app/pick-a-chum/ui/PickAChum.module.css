@@ -1264,3 +1264,32 @@
     transform-origin: center;
   }
 }
+
+/* All three red marks on mobile are 18px with the same white outline, in a box
+   large enough that the outline is never clipped. The selector one no longer
+   counter-scales, since it is now sized directly. */
+@media (max-width: 480px) {
+  .selectorClose,
+  .close.close,
+  .miniDock .close {
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    overflow: visible;
+    transform: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .selectorClose img,
+  .close.close img,
+  .miniDock .close img {
+    width: 18px;
+    height: 18px;
+    display: block;
+    overflow: visible;
+    filter:
+      drop-shadow(1.5px 0 0 #fff) drop-shadow(-1.5px 0 0 #fff)
+      drop-shadow(0 1.5px 0 #fff) drop-shadow(0 -1.5px 0 #fff);
+  }
+}
