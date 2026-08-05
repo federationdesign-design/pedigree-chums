@@ -924,7 +924,7 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
           parked TOP LEFT, with none of the chat showing. Her face restores
           the conversation; the X still closes. The scrim and the offer card
           hide via body[data-pc-min] as before. */}
-      {phase !== 'selecting' && wide && minimised && (
+      {phase !== 'selecting' && minimised && (
         <div className={styles.miniDock}>
           <button
             type="button"
@@ -951,7 +951,7 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
         </div>
       )}
 
-      {phase !== 'selecting' && !wide && (
+      {phase !== 'selecting' && !wide && !minimised && (
         <div className={styles.panel} onMouseDown={keepFocus}>
           {/* The pre-129 stacked layout, kept verbatim for mobile until Task 120. */}
           {threadEl}
