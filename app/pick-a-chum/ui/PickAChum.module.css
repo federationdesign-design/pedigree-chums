@@ -1164,3 +1164,16 @@
     transform-origin: center;
   }
 }
+
+/* Owner review: the shout icon grows back toward its desktop size while the
+   dogs stay as they are. The centre coordinates derive from the anchor size,
+   so they move with it -- cx and cy carry half the new size, as the original
+   comment describes. */
+@media (max-width: 480px) {
+  .launcher,
+  .root {
+    --pc-anchor-size: 88px;
+    --pc-anchor-cx: calc(clamp(18px, 4vw, 48px) + clamp(112px, 16vw, 150px) + 2px + 44px);
+    --pc-anchor-cy: calc(clamp(112px, 16vw, 150px) * 0.3 - 12px + 44px);
+  }
+}
