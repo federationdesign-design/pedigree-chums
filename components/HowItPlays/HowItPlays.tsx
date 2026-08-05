@@ -20,22 +20,63 @@ export default function HowItPlays() {
   const thumbRef = useRef<HTMLDivElement>(null);
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
 
-  // Auto-play each step video while it is on screen (looping), pause off screen.
+  // Owner review: the videos no longer loop independently. They play ONCE, in
+  // order, and each one starts the next when it has a second left, so the
+  // sequence reads as one run rather than several loops out of step.
+  //
+  // The on-screen gate is unchanged and deliberate: nothing plays until it is
+  // actually visible. The chain only advances to a video that is on screen; if
+  // the next one is not, it starts when it scrolls into view instead.
   useEffect(() => {
     const vids = videoRefs.current.filter(Boolean) as HTMLVideoElement[];
     if (!vids.length) return;
+
+    const visible = new Set<HTMLVideoElement>();
+    const played = new Set<HTMLVideoElement>();
+    const HANDOVER = 1; // seconds before the end that the next one starts
+
+    const start = (v: HTMLVideoElement) => {
+      if (played.has(v) || !visible.has(v)) return;
+      played.add(v);
+      v.currentTime = 0;
+      v.play().catch(() => {});
+    };
+
+    const onTime = (e: Event) => {
+      const v = e.target as HTMLVideoElement;
+      if (!v.duration || Number.isNaN(v.duration)) return;
+      if (v.duration - v.currentTime > HANDOVER) return;
+      const next = vids[vids.indexOf(v) + 1];
+      if (next) start(next);
+    };
+
     const io = new IntersectionObserver(
       (entries) => {
         entries.forEach((e) => {
           const v = e.target as HTMLVideoElement;
-          if (e.isIntersecting) v.play().catch(() => {});
-          else v.pause();
+          if (e.isIntersecting) {
+            visible.add(v);
+            // The first video begins the chain; a later one only starts here
+            // if the chain already reached it while it was off screen.
+            if (v === vids[0] || played.has(vids[vids.indexOf(v) - 1])) start(v);
+          } else {
+            visible.delete(v);
+            if (!v.ended) v.pause();
+          }
         });
       },
       { threshold: 0.35 }
     );
-    vids.forEach((v) => io.observe(v));
-    return () => io.disconnect();
+
+    vids.forEach((v) => {
+      v.loop = false;
+      v.addEventListener('timeupdate', onTime);
+      io.observe(v);
+    });
+    return () => {
+      io.disconnect();
+      vids.forEach((v) => v.removeEventListener('timeupdate', onTime));
+    };
   }, []);
 
   // Desktop: convert a vertical wheel into horizontal scroll of the card rail,
@@ -153,7 +194,6 @@ export default function HowItPlays() {
                       src={s.video}
                       poster={s.img}
                       muted
-                      loop
                       playsInline
                       preload="auto"
                       className={styles.mediaInner}
