@@ -20,6 +20,12 @@ export default function WhatsYourSuperpowerPage() {
     <>
       <Nav />
       <main className={styles.page}>
+        <section className={styles.hero} aria-label="What's Your Superpower?">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/superhero-power.jpg" alt="" className={styles.heroImg} />
+          <div className={styles.heroTint} aria-hidden="true" />
+          <h1 className={`display ${styles.heroTitle}`}>What&apos;s Your <span className="display-yellow">Superpower?</span></h1>
+        </section>
         <SuperpowerGame />
       </main>
       <Footer />
