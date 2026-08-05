@@ -1102,3 +1102,25 @@
     height: 30px;
   }
 }
+
+/* Mobile: restore the white ring and the bar inside the disc, both scaled to
+   match, and bring the red X down 20% so the two read the same height. */
+@media (max-width: 480px) {
+  .minimise.minimise span {
+    border: 2px solid #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .minimise.minimise span::before {
+    content: "";
+    width: 12px;
+    height: 3px;
+    border-radius: 2px;
+    background: #ffffff;
+  }
+  .close.close img {
+    width: 18px;
+    height: 18px;
+  }
+}
