@@ -677,3 +677,28 @@
 .toast {
   top: auto;
 }
+
+/* Mobile: align the counter to the logo's own left edge, and a third smaller
+   than desktop. The nav pads to 12px there, while the counter was using its
+   own clamp, so the two did not line up. */
+@media (max-width: 768px) {
+  .counter.counter,
+  .reveal.reveal {
+    left: 12px;
+    font-size: 0.7rem;
+    padding: 7px 12px 6px 12px;
+    border-width: 2px;
+  }
+  .counter.counter .label,
+  .reveal.reveal {
+    font-size: 0.7rem;
+  }
+  .counter.counter .minimiseIcon {
+    width: 10px;
+    height: 10px;
+  }
+  .counter.counter .minimiseBtn {
+    top: -6px;
+    right: -5px;
+  }
+}
