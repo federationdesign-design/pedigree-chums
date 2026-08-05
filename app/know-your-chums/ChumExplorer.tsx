@@ -96,10 +96,16 @@ function ChumCard({ breed }: { breed: Breed }) {
       <div className={styles.flipInner}>
         <div className={styles.flipFront}>
           <Image src={breed.image} alt={breed.name} width={300} height={300} className={styles.chumImg} unoptimized />
+          {/* The corner flash from Britain's dog history: the yellow wedge with
+              the LEARN artwork over it. Always LEARN here, because every dog on
+              this page has a chum page of its own to go to. */}
+          <span className={styles.chumWedge} aria-hidden="true" />
+          <span className={styles.chumFlash} aria-hidden="true" />
         </div>
-        {/* The yellow reverse, matching Britain's dog history: the dog's name
-            in the display face over its own line of copy. */}
+        {/* The yellow reverse, matching Britain's dog history: the green tap
+            pill, the dog's name and its write-up. */}
         <div className={styles.flipBack}>
+          <span className={styles.flipHint}>Tap to learn about this dog</span>
           <span className={styles.flipName}>{breed.name}</span>
           <span className={styles.flipNote}>{breed.fact}</span>
         </div>

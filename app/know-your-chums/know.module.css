@@ -404,6 +404,38 @@
 .flipFront {
   background: linear-gradient(to top right, #00e2ff, #008eff);
 }
+/* The corner flash, copied from app/britains-dog-history/history.module.css
+   (.deskWedge and .deskFlashLearn). Same yellow triangle and the same LEARN
+   artwork sitting on it, at the same proportions, so it scales with whatever
+   width the rail gives the card. */
+.chumWedge {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 44%;
+  aspect-ratio: 1 / 1;
+  background: #feee08;
+  clip-path: polygon(0 0, 100% 0, 0 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+.chumFlash {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 44%;
+  aspect-ratio: 720 / 416.7;
+  margin: -0.7% 0 0 -0.6%;
+  background-image: url("/history/flash-learn.svg");
+  background-repeat: no-repeat;
+  background-position: top left;
+  background-size: 100% auto;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: translateZ(1px);
+  pointer-events: none;
+  z-index: 2;
+}
 .chumImg {
   width: 100%;
   height: 100%;
@@ -421,9 +453,24 @@
   gap: 6px;
   padding: 14px;
 }
+/* The green tap pill from the history card back (.deskBackHint), scaled to
+   this card: the rail card is narrower than the history strip card. */
+.flipHint {
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: clamp(0.72rem, 1.15vw, 0.95rem);
+  letter-spacing: 0.03em;
+  line-height: 0.9em;
+  color: #ffffff;
+  background: #22c55e;
+  border-radius: 999px;
+  padding: 10px 14px 7px;
+  text-align: center;
+  align-self: center;
+  width: fit-content;
+}
 .flipName {
   font-family: var(--font-display), system-ui, sans-serif;
-  font-size: clamp(1.1rem, 2.4vw, 1.7rem);
+  font-size: clamp(1rem, 2vw, 1.35rem);
   color: var(--navy);
   text-align: center;
   line-height: 1.05;
