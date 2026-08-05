@@ -5170,7 +5170,7 @@ export default function BreedTree({
                       // the ceiling the fitter may grow to. Raised with
                       // LABEL_SAFE so short names are not capped before they
                       // reach the rim.
-                      const cap = isMobile ? 132 : 44;
+                      const cap = 132 /* owner review: desktop takes the mobile fit, so the name wraps and sits inside its circle */;
                       const fit = fitLabel(d.data.name.toUpperCase(), rFit, cap, labelFont);
                       const lines = fit.lines;
                       const fs = Math.max(10, Math.min(cap, fit.fs + TITLE_BOOST));
