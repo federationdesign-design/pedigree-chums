@@ -425,3 +425,231 @@
 .prelude.prelude {
   transform: translate(30px, -50px);
 }
+
+/* ── Intro card matched to the prelude ──────────────────────────
+   Same three layers, same footprint, same shift off the corner. */
+.intro.intro {
+  position: fixed;
+  overflow: hidden;
+  isolation: isolate;
+  background: linear-gradient(45deg, #001ae0 0%, #62c9f3 100%);
+  border: 3px solid #141544;
+  box-shadow: 0 14px 34px rgba(10, 58, 87, 0.35);
+  border-radius: 21px;
+  max-width: min(542px, calc(100vw - 40px));
+  padding: 22px 30px 22px 26px;
+  transform: translate(30px, -50px);
+}
+.intro.intro::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 21px;
+  background-image: url("/paw-pattern2.svg");
+  background-repeat: repeat;
+  background-size: 120px auto;
+  opacity: 0.28;
+  pointer-events: none;
+  z-index: 0;
+}
+.intro.intro > * {
+  position: relative;
+  z-index: 1;
+}
+.intro.intro .introLine {
+  font-family: var(--font-mohave), var(--font-body), system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 1.55rem;
+  line-height: 1.15;
+  color: #ffffff;
+  text-align: right;
+}
+.intro.intro .introFoot {
+  justify-content: flex-end;
+}
+.intro.intro .label {
+  color: #ffffff;
+}
+
+/* Intro v2: same footprint as the prelude, black emphasis, right-aligned count. */
+.intro.intro {
+  width: min(542px, calc(100vw - 40px));
+  min-height: 152px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.intro.intro .introEmphasis { color: #141544; }
+.intro.intro .introFoot { justify-content: flex-end; }
+.intro.intro .label { text-align: right; }
+
+/* Intro v3: the count sits left while the message stays right. */
+.intro.intro .introFoot { justify-content: flex-start; }
+.intro.intro .label { text-align: left; }
+
+/* Intro v4: matched height, Mohave on the count, pattern clipped to the card. */
+.intro.intro {
+  min-height: 0;
+  padding: 22px 30px 22px 26px;
+  overflow: hidden;
+}
+.intro.intro .label {
+  font-family: var(--font-mohave), var(--font-body), system-ui, sans-serif;
+  font-weight: 700;
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+/* Intro v5: matched to the prelude's rendered box, 431 x 127. */
+.intro.intro {
+  width: 431px;
+  max-width: calc(100vw - 40px);
+  height: 127px;
+  box-sizing: border-box;
+  padding: 18px 26px;
+}
+
+/* Intro v6: content centred in the fixed box, pattern clipped to the radius. */
+.intro.intro {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+}
+.intro.intro .introLine { margin: 0; }
+.intro.intro .introFoot { margin: 0; }
+.intro.intro::before {
+  border-radius: 18px;
+  inset: 0;
+  background-size: 100px auto;
+}
+
+/* Intro v7: the prelude's structure exactly -- a centred two-column row with
+   the score occupying the icon's place. */
+.intro.intro {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 19px;
+  justify-content: space-between;
+}
+.intro.intro .introScore {
+  flex: none;
+  font-family: var(--font-mohave), var(--font-body), system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 1.55rem;
+  line-height: 1.05;
+  color: #ffffff;
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+/* Intro v8: the count stacks, big number over a smaller label. */
+.intro.intro .introScore {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1;
+}
+.intro.intro .introScoreNum { font-size: 3.1rem; line-height: 1; }
+.intro.intro .introScoreWord { font-size: calc(1.55rem - 2pt); line-height: 1.1; }
+
+/* Intro close: same corner treatment as the prelude. */
+.intro.intro { position: relative; overflow: visible; }
+.intro.intro::before { overflow: hidden; }
+.intro.intro .preludeClose {
+  position: absolute;
+  top: -14px;
+  right: -18px;
+  background: transparent;
+  padding: 0;
+  z-index: 3;
+}
+.intro.intro .redIcon {
+  width: 36px;
+  height: 36px;
+  filter:
+    drop-shadow(2px 0 0 #fff) drop-shadow(-2px 0 0 #fff)
+    drop-shadow(0 2px 0 #fff) drop-shadow(0 -2px 0 #fff);
+}
+
+/* ── Counter pill in the campaign style ───────────────────────── */
+.counter.counter {
+  background: linear-gradient(45deg, #001ae0 0%, #62c9f3 100%);
+  border: 3px solid #141544;
+  box-shadow: 0 10px 24px rgba(10, 58, 87, 0.3);
+  padding: 10px 12px 10px 18px;
+}
+.counter.counter .label {
+  font-family: var(--font-mohave), var(--font-body), system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: #ffffff;
+}
+
+/* ── The minimised pill (4th state) in the campaign style ─────── */
+.reveal.reveal {
+  background: linear-gradient(45deg, #001ae0 0%, #62c9f3 100%);
+  border: 3px solid #141544;
+  box-shadow: 0 10px 24px rgba(10, 58, 87, 0.3);
+  padding: 10px 16px;
+  font-family: var(--font-mohave), var(--font-body), system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: #ffffff;
+}
+
+/* Counter: more room above the text, and the mark straddles the corner with
+   the same white outline as the two cards. */
+.counter.counter {
+  position: relative;
+  overflow: visible;
+  padding: 12px 18px 10px 18px;
+}
+.counter.counter .minimiseBtn {
+  position: absolute;
+  top: -14px;
+  right: -16px;
+  background: transparent;
+  padding: 0;
+  z-index: 3;
+}
+.counter.counter .minimiseIcon {
+  width: 30px;
+  height: 30px;
+  filter:
+    drop-shadow(2px 0 0 #fff) drop-shadow(-2px 0 0 #fff)
+    drop-shadow(0 2px 0 #fff) drop-shadow(0 -2px 0 #fff);
+}
+
+/* Align the pills to the same left edge as the two cards, which sit 30px in. */
+.counter.counter, .reveal.reveal {
+  transform: translateX(30px);
+}
+
+/* All three close marks at half size. */
+.prelude.prelude .redIcon,
+.intro.intro .redIcon {
+  width: 18px;
+  height: 18px;
+}
+.counter.counter .minimiseIcon {
+  width: 15px;
+  height: 15px;
+}
+.prelude.prelude .preludeClose { top: -10px; right: -10px; }
+.intro.intro .preludeClose { top: -10px; right: -10px; }
+.counter.counter .minimiseBtn { top: -9px; right: -9px; }
+
+/* Nudge every close mark 3px down and 2px left. */
+.prelude.prelude .preludeClose { top: -7px; right: -8px; }
+.intro.intro .preludeClose { top: -7px; right: -8px; }
+.counter.counter .minimiseBtn { top: -6px; right: -7px; }
+
+/* The pattern layer clipped the close mark once it moved down. Give the button
+   its own stacking level above everything in the card. */
+.prelude.prelude { overflow: visible; }
+.prelude.prelude .preludeClose { z-index: 5; overflow: visible; }
+.prelude.prelude .redIcon { overflow: visible; }

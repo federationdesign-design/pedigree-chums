@@ -21,7 +21,9 @@ export function closedMessage(count: number, total: number): string {
 // BRIEF 7, "Campaign introduction". Shown once, expanded, on a visitor's first
 // view (D10).
 export const CAMPAIGN_INTRO =
-  "There are hidden games across the Pedigree Chums website. Find them all.";
+  "There are hidden games across the website";
+
+export const CAMPAIGN_INTRO_EMPHASIS = "Find them all";
 
 // BRIEF 7, "Completion heading" and "Completion body". The two lines the
 // completed counter shows at 2/2 (D11).

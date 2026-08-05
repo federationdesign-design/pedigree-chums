@@ -24,6 +24,7 @@ import {
   STORAGE_BLOCKED,
   closedMessage,
   CAMPAIGN_INTRO,
+  CAMPAIGN_INTRO_EMPHASIS,
   COMPLETION_HEADING,
   COMPLETION_BODY,
   PRELUDE_WARNING,
@@ -173,10 +174,12 @@ export default function HiddenGamesCounter() {
   if (phase === "intro") {
     return (
       <div className={styles.intro} role="status" aria-live="polite">
-        <p className={styles.introLine}>{CAMPAIGN_INTRO}</p>
-        <div className={styles.introFoot}>
-          <span className={styles.label}>{state.label}</span>
-        </div>
+        <span className={styles.introScore}><span className={styles.introScoreNum}>{state.count}/{state.total}</span><span className={styles.introScoreWord}>games found</span></span>
+        <p className={styles.introLine}>{CAMPAIGN_INTRO}<br /><span className={styles.introEmphasis}>{CAMPAIGN_INTRO_EMPHASIS}</span></p>
+        <button type="button" className={styles.preludeClose} onClick={() => { setIntroClosed(true); getHiddenGamesEngine().markIntroSeen(); }} aria-label="Close">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img className={styles.redIcon} src="/red-icon.svg" alt="" />
+        </button>
       </div>
     );
   }
