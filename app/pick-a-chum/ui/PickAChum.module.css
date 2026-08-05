@@ -983,3 +983,49 @@
   text-decoration-thickness: 3px;
   outline: none;
 }
+
+/* ── Mobile chat, owner review ──────────────────────────────────
+   The panel opened 60px down, so the composer sat well below the logo. It now
+   starts at the top and covers it. The name comes down, the gap between the
+   medallion and the name closes, and the two controls take the desktop
+   treatment: the close mark straddling the corner with its white outline, and
+   the minimise beside it. */
+@media (max-width: 480px) {
+  .panel {
+    top: 8px;
+  }
+
+  /* The dog's name: half the size, tucked closer to the medallion. */
+  .dialogue { font-size: 11px; }
+  .name,
+  .dogName {
+    font-size: 0.62rem !important;
+    margin-top: 2px;
+  }
+  .dogAnchor { margin-bottom: 0; }
+
+  /* Both controls, matching the desktop corners. */
+  .panel .close,
+  .panel .minimise {
+    position: absolute;
+    z-index: 5;
+    background: transparent;
+    padding: 0;
+  }
+  .panel .close {
+    top: -8px;
+    right: -8px;
+  }
+  .panel .minimise {
+    top: -8px;
+    right: 26px;
+  }
+  .panel .close img,
+  .panel .redIcon {
+    width: 22px;
+    height: 22px;
+    filter:
+      drop-shadow(1.5px 0 0 #fff) drop-shadow(-1.5px 0 0 #fff)
+      drop-shadow(0 1.5px 0 #fff) drop-shadow(0 -1.5px 0 #fff);
+  }
+}
