@@ -140,7 +140,12 @@ check('lab', { action: 'breed_page' }, { url: '/chums/labrador' });
 // Breed hub (no breed named) and breed best (superlative): the two shared lines.
 // Must NOT outrank a named breed.
 check('dog breeds', { action: 'breed_hub' });
-check('dogs', { action: 'breed_hub' });
+// Task 134b: "dogs" now asks before answering. A following yes reaches the hub.
+(() => {
+  const s = newSession();
+  check('dogs', { action: 'ask_dogs', bucket: 'B55' }, { session: s });
+  check('yes', { action: 'breed_hub' }, { session: s });
+})();
 check('whats the best dog breed', { action: 'breed_best' });
 check('tell me about labradors', { action: 'breed_page' }, { url: '/chums/labrador' });
 check('tell me about border collies', { action: 'breed_page' }, { url: '/chums/border-collie' });

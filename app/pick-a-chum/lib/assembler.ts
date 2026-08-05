@@ -261,6 +261,9 @@ export function assemble(res: Resolution, data0: ChumData, n: Normalised, sessio
       return { responseId: pick?.responseId ?? 'B57', text: pick?.template ?? '', dog };
     }
 
+    case 'ask_dogs':
+    case 'ask_breeds':
+    case 'ask_games':
     case 'tricks_menu': // Task 134: B54, the question then the list. Serves res.responseId like canned.
     case 'games_menu': // Task 123 fix: B45 games menu (GAMELIST-01 question / -02 list); serves res.responseId like canned.
     case 'canned': {

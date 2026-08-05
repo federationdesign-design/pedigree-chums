@@ -165,6 +165,9 @@ export type ActionType =
   | 'grief' // Task 58: a dog bereavement (died / lost / old-unwell) -> the gentle ':(' line; below urgent safety, above the loop, never reaches the loop
   | 'canned' // Task 80: a conversational bucket (B21-B39) matched on its column-D triggers; serves the specific responseId. Sits above the non-answer zone (gk_unknown / fallback), below every real route.
   | 'games_menu' // Task 123 fix: the B45 games menu. "are there games"/"play" serve B45-GAMELIST-01 ("Game?"); a following "yes" serves B45-GAMELIST-02 (the list). Serves the specific responseId, like canned.
+  | 'ask_dogs' // Task 134b: B55. "dogs" asks rather than answering; a following yes goes to the breed hub.
+  | 'ask_breeds' // Task 134b: B55. "breeds" asks; a following yes goes to the breed hub.
+  | 'ask_games' // Task 134b: B56. "games" asks; a following yes serves the B45 list.
   | 'tricks_menu' // Task 134: B54. "tricks" serves COL-B54-TRICKS-01 ("I do tricks"); a following "yes" serves TRICKS-02 (the list). Serves the specific responseId, like canned.
   | 'dog_fact' // Task 134: B57. A dog fact chosen AT RANDOM, not by rotation, and not repeated until the session has used all twenty.
   | 'price_answer' // Task 49: a price question -> FAQ008's text in chat; NOT a MEANINGFUL_TOPIC, so the safety machine holds/refuses it like buying

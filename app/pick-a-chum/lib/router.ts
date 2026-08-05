@@ -494,12 +494,14 @@ const GAMES_MENU_TRIGGERS = new Set(['are there games', 'play']);
 // Task 134. Four Collie buckets from the workbook. Each is a whole-message
 // match, and each that asks a question sets its own lastAction so a following
 // "yes" is caught by its own confirm rather than the loop's.
+const DOGS_TRIGGERS = new Set(['dogs', 'dog']);
 const TRICKS_TRIGGERS = new Set(['tricks', 'can you do tricks', 'show me a trick', 'do a trick', 'any tricks', 'do tricks', 'can you do a trick']);
 const GENERAL_TRIGGERS: Record<string, string> = {
   // 'are there games' stays with B45, which owned it first and has the list on confirm.
   'games': 'COL-B56-GENERAL-01', 'show me a game': 'COL-B56-GENERAL-01',
   'play a game': 'COL-B56-GENERAL-02', 'which game': 'COL-B56-GENERAL-02', 'what games': 'COL-B56-GENERAL-02',
-  'breeds': 'COL-B56-GENERAL-03', 'what breeds': 'COL-B56-GENERAL-03', 'how many breeds': 'COL-B56-GENERAL-03',
+  // 'breeds' asks B55's plain yes/no question, so the confirm below can answer it.
+  'breeds': 'COL-B55-CONFIRM-03', 'what breeds': 'COL-B55-CONFIRM-03', 'how many breeds': 'COL-B55-CONFIRM-03',
   'what is the game': 'COL-B56-GENERAL-04', 'tell about the game': 'COL-B56-GENERAL-04',
   'how do i play games here': 'COL-B56-GENERAL-05', 'how do the games work': 'COL-B56-GENERAL-05',
   'what do you like to do': 'COL-B56-GENERAL-06', 'what do you do all day': 'COL-B56-GENERAL-06',
@@ -959,6 +961,22 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
   if (state.lastAction === 'games_menu' && isConfirmYes(c)) {
     return { layer: 13, layerName: 'Play and entertainment', bucket: 'B45', action: 'games_menu', responseId: 'B45-GAMELIST-02' };
   }
+  // Task 134b: the three questions that needed a yes. Each sets its own
+  // lastAction, so the confirm below is unambiguous and the loop's own
+  // pendingConfirm is never involved.
+  if (state.lastAction === 'ask_dogs' && isConfirmYes(c)) {
+    return { layer: 5, layerName: 'Dog, breed and website content', bucket: 'B05', action: 'breed_hub' };
+  }
+  if (state.lastAction === 'ask_breeds' && isConfirmYes(c)) {
+    return { layer: 5, layerName: 'Dog, breed and website content', bucket: 'B05', action: 'breed_hub' };
+  }
+  if (state.lastAction === 'ask_games' && isConfirmYes(c)) {
+    return { layer: 13, layerName: 'Play and entertainment', bucket: 'B45', action: 'games_menu', responseId: 'B45-GAMELIST-02' };
+  }
+  if (DOGS_TRIGGERS.has(c)) {
+    return { layer: 13, layerName: 'Play and entertainment', bucket: 'B55', action: 'ask_dogs', responseId: 'COL-B55-CONFIRM-01' };
+  }
+
   // Task 134: tricks. The question, then the list on a following yes.
   if (state.lastAction === 'tricks_menu' && isConfirmYes(c)) {
     return { layer: 13, layerName: 'Play and entertainment', bucket: 'B54', action: 'tricks_menu', responseId: 'COL-B54-TRICKS-02' };
@@ -975,7 +993,10 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
 
   // Task 134: eight corrections to live answers, matched whole-message.
   if (GENERAL_TRIGGERS[c]) {
-    return { layer: 13, layerName: 'Play and entertainment', bucket: 'B56', action: 'canned', responseId: GENERAL_TRIGGERS[c] };
+    const rid = GENERAL_TRIGGERS[c];
+    if (rid === 'COL-B55-CONFIRM-03') return { layer: 13, layerName: 'Play and entertainment', bucket: 'B55', action: 'ask_breeds', responseId: rid };
+    if (rid === 'COL-B56-GENERAL-01') return { layer: 13, layerName: 'Play and entertainment', bucket: 'B56', action: 'ask_games', responseId: rid };
+    return { layer: 13, layerName: 'Play and entertainment', bucket: 'B56', action: 'canned', responseId: rid };
   }
 
   if (GAMES_MENU_TRIGGERS.has(c)) {
