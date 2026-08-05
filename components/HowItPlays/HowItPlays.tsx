@@ -58,7 +58,13 @@ export default function HowItPlays() {
             visible.add(v);
             // The first video begins the chain; a later one only starts here
             // if the chain already reached it while it was off screen.
-            if (v === vids[0] || played.has(vids[vids.indexOf(v) - 1])) start(v);
+            if (played.has(v) && !v.ended) {
+              // Started earlier, then paused when it scrolled away. Resume
+              // rather than restart, so it still reaches its final frame.
+              v.play().catch(() => {});
+            } else if (v === vids[0] || played.has(vids[vids.indexOf(v) - 1])) {
+              start(v);
+            }
           } else {
             visible.delete(v);
             if (!v.ended) v.pause();
@@ -68,14 +74,25 @@ export default function HowItPlays() {
       { threshold: 0.35 }
     );
 
+    // A finished video holds its last frame, which is the frame that matters --
+    // the beginning only sets the scene.
+    const onEnded = (e: Event) => {
+      const v = e.target as HTMLVideoElement;
+      if (v.duration) v.currentTime = Math.max(0, v.duration - 0.05);
+    };
+
     vids.forEach((v) => {
       v.loop = false;
+      v.addEventListener('ended', onEnded);
       v.addEventListener('timeupdate', onTime);
       io.observe(v);
     });
     return () => {
       io.disconnect();
-      vids.forEach((v) => v.removeEventListener('timeupdate', onTime));
+      vids.forEach((v) => {
+        v.removeEventListener('timeupdate', onTime);
+        v.removeEventListener('ended', onEnded);
+      });
     };
   }, []);
 
