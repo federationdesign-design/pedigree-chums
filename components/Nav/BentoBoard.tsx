@@ -23,6 +23,7 @@ const NAV_TILES: Record<string, TileData> = {
   home: { href: "/home", labelA: "Home", cta: "Back to start", img: "/home-hero.jpg" },
   hotDogs: { href: "/hot-dogs", labelA: "Hot/Dogs", cta: "What??", img: "/hot-dog-hearo-img.jpg" },
   smarter: { href: "/smarter-than-the-test", labelA: "Smarter Than", labelB: "the Test", cta: "Learn", img: "/inteligent-dogs.jpg" },
+  superpower: { href: "/whats-your-superpower", labelA: "What's Your", labelB: "Superpower", cta: "Find out", img: "/superhero-power.jpg" },
 };
 
 // The bento launcher board. Used both inside the menu overlay and as a section
@@ -142,7 +143,7 @@ export default function BentoBoard({
                 <span className={styles.tileCta}>Grab your code →</span>
               </span>
             </button>
-            {coverTile(NAV_TILES.home, `${styles.miniCell} ${styles.homeLabel} ${styles.labelHover}`, false, true)}
+            {coverTile(NAV_TILES.superpower, `${styles.miniCell} ${styles.homeLabel} ${styles.labelHover}`, false, true)}
           </div>
         </div>
       </div>
