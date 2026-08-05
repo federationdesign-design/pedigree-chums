@@ -1202,3 +1202,20 @@
   }
   .miniDock .anchorName { display: none; }
 }
+
+/* The chip's close: a bigger box so the white outline is not clipped, nudged
+   right, and lifted above the face so the tap actually lands on it -- the
+   face button was sitting over it. */
+@media (max-width: 480px) {
+  .miniDock .close {
+    width: 34px;
+    height: 34px;
+    left: -11px;
+    overflow: visible;
+    z-index: 10;
+    pointer-events: auto;
+  }
+  .miniDock .miniFace {
+    z-index: 1;
+  }
+}
