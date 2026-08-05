@@ -1029,3 +1029,24 @@
       drop-shadow(0 1.5px 0 #fff) drop-shadow(0 -1.5px 0 #fff);
   }
 }
+
+/* The minimise button draws its mark with CSS on an empty span, so the mobile
+   rule that cleared backgrounds erased it. Give the span its own size and
+   colour back, and shift the close mark 12px left. */
+@media (max-width: 480px) {
+  .panel .close {
+    right: 4px;
+  }
+  .panel .minimise {
+    right: 38px;
+    background: transparent;
+  }
+  .panel .minimise span {
+    display: block;
+    width: 16px;
+    height: 3px;
+    border-radius: 999px;
+    background: var(--pc-ui-navy, #0a3a57);
+    box-shadow: 0 0 0 1.5px #fff;
+  }
+}
