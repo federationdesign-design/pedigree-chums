@@ -66,9 +66,7 @@ export default function About() {
         </PhotoSplit>
 
         <section style={{ padding: "48px 0 0" }}>
-          <div style={{ textAlign: "center", marginBottom: 8 }}>
-            <PopHeading className="display">How it plays</PopHeading>
-          </div>
+          {/* The old heading is gone: HowItPlays carries its own. */}
           <HowItPlays />
         </section>
 
