@@ -813,3 +813,219 @@
     transition: none;
   }
 }
+
+/* ── Uniformed against Britain's Dog History ────────────────────
+   Sizes and widths taken from history.module.css so the two pages read as
+   one series rather than two designs. */
+
+/* Page title and lead. */
+.title { font-size: clamp(4.8rem, 14vw, 11rem) !important; line-height: 0.95; }
+.lead { font-size: clamp(28px, 3.6vw, 36px) !important; max-width: 56ch; }
+
+/* The blue gradient container runs full bleed, as it does on history. */
+.factsPanel {
+  max-width: none;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  border-radius: 0;
+}
+
+/* The sliders match the history strip: full bleed, centred heading at the
+   same size. */
+.statsSection { max-width: none; }
+.explorer,
+.statsSection {
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  padding-left: clamp(20px, 5vw, 56px);
+  padding-right: clamp(20px, 5vw, 56px);
+}
+.panelTitle,
+.statsHeading {
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: clamp(3.35rem, 7vw, 4.625rem);
+  text-align: center;
+  line-height: 1;
+}
+
+/* Trends and stats: the label inside the yellow bar goes navy. */
+.barFill .barName,
+.barName { color: #093a58; }
+
+/* The facts panel: bullet text navy, icons yellow, titles stay white. */
+.fact { color: #093a58; }
+.factIcon { color: #feed00; fill: #feed00; }
+.factLabel { color: #ffffff; }
+
+/* ── Round two, matched to the history strip ────────────────────
+
+   The rails full-bleed the way .strip does, rather than being centred in a
+   column with space to the right. */
+.explorer { padding-left: 0; padding-right: 0; }
+.row {
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+}
+.rowRail { padding: 24px clamp(20px, 6vw, 90px) 16px; }
+.rowScrollbar { margin: 0 clamp(20px, 6vw, 90px); }
+
+/* Slider headings: the .stripLabel treatment. */
+.rowTitle {
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: clamp(3.35rem, 7vw, 4.625rem) !important;
+  text-align: center;
+  line-height: 1;
+  margin-bottom: clamp(20px, 3vw, 34px);
+}
+
+/* The blue container takes the history page's own padding. */
+.factsPanel {
+  padding: clamp(20px, 4vw, 40px) calc(clamp(18px, 4vw, 40px) + 30px) clamp(8px, 1.5vw, 16px);
+}
+
+/* The nine stat lines: navy, sentence case, twice the size. */
+.factLabel {
+  color: #093a58 !important;
+  text-transform: none;
+  font-size: clamp(1.56rem, 3.2vw, 1.9rem) !important;
+}
+
+/* The two stats paragraphs and the source line, doubled. */
+.statsIntro { font-size: clamp(1.5rem, 3vw, 1.9rem) !important; }
+.statCaption {
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: clamp(2.4rem, 5vw, 3.4rem) !important;
+  line-height: 1.05;
+}
+.statsSection .source { font-size: clamp(1.1rem, 2.2vw, 1.4rem) !important; }
+
+/* ── Round three ────────────────────────────────────────────────
+   History does not use negative margins: .sections is width 100% with
+   max-width none, and its own padding gives the inset. Doing the same here
+   fixes both the rail sitting too far left and the panel losing its sides. */
+
+/* The rails: the parent goes full width, so the row needs no pulling. */
+.explorer {
+  max-width: none;
+  padding-left: 0;
+  padding-right: 0;
+}
+.row {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+/* The blue panel fills its column and keeps its own padding, rather than
+   being dragged to the window edges. */
+.factsPanel {
+  width: 100%;
+  max-width: none;
+  margin-left: auto;
+  margin-right: auto;
+  padding: clamp(20px, 4vw, 40px) calc(clamp(18px, 4vw, 40px) + 30px) clamp(8px, 1.5vw, 16px);
+}
+.statsSection {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+/* ── Card backs matched to the history strip ────────────────────
+   Values copied from history.module.css: .deskBackHint for the button,
+   .flipNote for the description, and backface-visibility so the corner flash
+   turns away with the card instead of showing through. */
+.flipHint {
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: calc(1.5rem + 3pt) !important;
+  letter-spacing: 0.03em;
+  line-height: 0.9em;
+  text-transform: none;
+  color: #ffffff;
+  background: #22c55e;
+  border-radius: 999px;
+  padding: 22px 34px 16px;
+  text-align: center;
+  align-self: center;
+  width: fit-content;
+}
+.flipNote {
+  font-size: calc(2rem - 6pt) !important;
+  line-height: 1.1;
+  color: var(--navy);
+  text-align: center;
+}
+.chumFlash,
+.chumWedge {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* ── Round four: the panel is the CARD, not the wrapper ─────────
+   History nests them: .sections is full width and carries the outer padding,
+   .section is the blue card inside it with the radius. I had been applying
+   the wrapper's padding to the card, so the card had inner space and no inset
+   from the window. Give it the wrapper's padding as margin instead. */
+.factsPanel {
+  width: auto;
+  max-width: none;
+  margin: clamp(20px, 4vw, 40px) calc(clamp(18px, 4vw, 40px) + 30px);
+  padding: clamp(24px, 3.5vw, 48px);
+  border-radius: 40px;
+  box-shadow: 0 24px 60px rgba(10, 58, 87, 0.32);
+}
+
+/* The wedge and flash live inside .flipFront, so it is the FRONT FACE that
+   needs to hide its back -- putting it on the children did nothing, because
+   the parent was still painting. */
+.flipFront,
+.flipBack {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* The dog name, doubled. */
+.flipName { font-size: calc(2rem + 4pt) !important; line-height: 1; }
+
+/* ── Round five ─────────────────────────────────────────────────
+   The panel title takes the history .sectionTitle spacing, and body copy on
+   this page drops from 1.5 to the 1.1 leading used there. */
+.panelTitle {
+  padding-top: 10px;
+  margin: clamp(12px, 1.75vw, 24px) 0 clamp(3px, 0.5vw, 5px);
+  line-height: 1.05;
+}
+
+/* Montserrat throughout this page matches history's tighter leading. */
+.lead,
+.statsIntro,
+.statCaption,
+.factLabel,
+.flipNote,
+.source,
+.familyText,
+.familyTextDim {
+  line-height: 1.1;
+}
+
+/* Copied from history.module.css. Its own comment explains why
+   backface-visibility is not enough on its own: the wedge and flash are
+   absolutely positioned with a z-index, so they bleed through the back
+   mirrored. Hiding the whole front face once the card has turned past
+   edge-on is what stops that; the delay keeps the front visible while it is
+   still turning toward us. */
+.flipFront {
+  transition: visibility 0s;
+}
+.chumCard:hover .flipFront,
+.chumCard:focus-visible .flipFront {
+  visibility: hidden;
+  transition: visibility 0s linear 0.26s;
+}
+
+/* The missing piece, from history's .deskFlash line 701. backface-visibility
+   only engages on an element the browser is compositing in 3D; a flat
+   absolutely-positioned span is not, so it kept facing the viewer through the
+   turn. translateZ gives it depth and the backface rule then applies. */
+.chumFlash,
+.chumWedge {
+  transform: translateZ(1px);
+}
