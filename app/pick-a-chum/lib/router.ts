@@ -490,6 +490,25 @@ function isConfirmYes(compact: string): boolean {
 // the bark-game offer. A following "yes" is caught by the games_menu confirmation (below) and serves
 // B45-GAMELIST-02's list, which was orphaned before this.
 const GAMES_MENU_TRIGGERS = new Set(['are there games', 'play']);
+
+// Task 134. Four Collie buckets from the workbook. Each is a whole-message
+// match, and each that asks a question sets its own lastAction so a following
+// "yes" is caught by its own confirm rather than the loop's.
+const TRICKS_TRIGGERS = new Set(['tricks', 'can you do tricks', 'show me a trick', 'do a trick', 'any tricks', 'do tricks', 'can you do a trick']);
+const GENERAL_TRIGGERS: Record<string, string> = {
+  // 'are there games' stays with B45, which owned it first and has the list on confirm.
+  'games': 'COL-B56-GENERAL-01', 'show me a game': 'COL-B56-GENERAL-01',
+  'play a game': 'COL-B56-GENERAL-02', 'which game': 'COL-B56-GENERAL-02', 'what games': 'COL-B56-GENERAL-02',
+  'breeds': 'COL-B56-GENERAL-03', 'what breeds': 'COL-B56-GENERAL-03', 'how many breeds': 'COL-B56-GENERAL-03',
+  'what is the game': 'COL-B56-GENERAL-04', 'tell about the game': 'COL-B56-GENERAL-04',
+  'how do i play games here': 'COL-B56-GENERAL-05', 'how do the games work': 'COL-B56-GENERAL-05',
+  'what do you like to do': 'COL-B56-GENERAL-06', 'what do you do all day': 'COL-B56-GENERAL-06',
+  'a real dog': 'COL-B56-GENERAL-07', 'is this a real dog': 'COL-B56-GENERAL-07',
+  'what are dogs': 'COL-B56-GENERAL-08', 'what is a dog': 'COL-B56-GENERAL-08',
+};
+const FACT_TRIGGERS = new Set(['tell me something', 'tell me a fact', 'a dog fact', 'say something interesting', 'tell me more', 'tell me a dog fact']);
+
+
 // Route a confirmed loop subject to its destination. Mirrors the loop's offer mapping: a breed
 // title -> that breed's page; a game-family word -> the card game rules; a generic dog word -> the
 // breed hub. Returns null when the subject has no destination (the confirmation then falls through
@@ -940,6 +959,25 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
   if (state.lastAction === 'games_menu' && isConfirmYes(c)) {
     return { layer: 13, layerName: 'Play and entertainment', bucket: 'B45', action: 'games_menu', responseId: 'B45-GAMELIST-02' };
   }
+  // Task 134: tricks. The question, then the list on a following yes.
+  if (state.lastAction === 'tricks_menu' && isConfirmYes(c)) {
+    return { layer: 13, layerName: 'Play and entertainment', bucket: 'B54', action: 'tricks_menu', responseId: 'COL-B54-TRICKS-02' };
+  }
+  if (TRICKS_TRIGGERS.has(c)) {
+    return { layer: 13, layerName: 'Play and entertainment', bucket: 'B54', action: 'tricks_menu', responseId: 'COL-B54-TRICKS-01' };
+  }
+
+  // Task 134: a random dog fact. Rotation is handled in the assembler so the
+  // session does not repeat one until all twenty have been used.
+  if (FACT_TRIGGERS.has(c)) {
+    return { layer: 13, layerName: 'Play and entertainment', bucket: 'B57', action: 'dog_fact' };
+  }
+
+  // Task 134: eight corrections to live answers, matched whole-message.
+  if (GENERAL_TRIGGERS[c]) {
+    return { layer: 13, layerName: 'Play and entertainment', bucket: 'B56', action: 'canned', responseId: GENERAL_TRIGGERS[c] };
+  }
+
   if (GAMES_MENU_TRIGGERS.has(c)) {
     return { layer: 13, layerName: 'Play and entertainment', bucket: 'B45', action: 'games_menu', responseId: 'B45-GAMELIST-01' };
   }

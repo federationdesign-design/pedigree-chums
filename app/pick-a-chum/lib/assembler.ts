@@ -250,6 +250,18 @@ export function assemble(res: Resolution, data0: ChumData, n: Normalised, sessio
       return { responseId: r?.responseId ?? 'FETCH-LINK', text, dog, destinationId: dest?.id, url: dest?.url ?? null };
     }
 
+    case 'dog_fact': {
+      // Task 134: B57. Chosen AT RANDOM rather than by rotation, and not
+      // repeated until the session has used all twenty. usedResponseIds is the
+      // session's own record, so the pool empties and refills on its own.
+      const pool = data.collieResponses.filter((x) => x.bucketId === 'B57');
+      const unseen = pool.filter((x) => !session.usedResponseIds.includes(x.responseId));
+      const from = unseen.length > 0 ? unseen : pool;
+      const pick = from[Math.floor(Math.random() * from.length)];
+      return { responseId: pick?.responseId ?? 'B57', text: pick?.template ?? '', dog };
+    }
+
+    case 'tricks_menu': // Task 134: B54, the question then the list. Serves res.responseId like canned.
     case 'games_menu': // Task 123 fix: B45 games menu (GAMELIST-01 question / -02 list); serves res.responseId like canned.
     case 'canned': {
       // Task 80: a conversational bucket (B21-B39) matched on its column-D triggers. Serve the

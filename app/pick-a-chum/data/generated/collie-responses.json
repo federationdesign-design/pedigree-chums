@@ -3856,5 +3856,547 @@
     "defaultRoute": "",
     "animationCue": "",
     "status": "Approved"
+  },
+  {
+    "responseId": "COL-B54-TRICKS-01",
+    "bucketId": "B54",
+    "subtag": "tricks",
+    "triggers": [
+      "tricks",
+      "can you do tricks",
+      "show me a trick",
+      "do a trick",
+      "any tricks",
+      "do tricks"
+    ],
+    "template": "I do tricks",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "COL-B54-TRICKS-02",
+    "bucketId": "B54",
+    "subtag": "tricks",
+    "triggers": [
+      "confirmation after \"I do tricks\""
+    ],
+    "template": "play dead, roll over",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "COL-B55-CONFIRM-01",
+    "bucketId": "B55",
+    "subtag": "confirm",
+    "triggers": [
+      "dogs",
+      "dog (subject repeat, second turn)"
+    ],
+    "template": "Do you want to know about dogs?",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "COL-B55-CONFIRM-02",
+    "bucketId": "B55",
+    "subtag": "confirm",
+    "triggers": [
+      "games",
+      "game (second turn)"
+    ],
+    "template": "You want to play a game?",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "COL-B55-CONFIRM-03",
+    "bucketId": "B55",
+    "subtag": "confirm",
+    "triggers": [
+      "breeds (second turn)"
+    ],
+    "template": "Do you want to know about one breed?",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "COL-B55-CONFIRM-04",
+    "bucketId": "B55",
+    "subtag": "confirm",
+    "triggers": [
+      "tell me a dog fact (second turn)"
+    ],
+    "template": "A breed fact, or just a dog fact?",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "COL-B56-GENERAL-01",
+    "bucketId": "B56",
+    "subtag": "general",
+    "triggers": [
+      "games",
+      "show me a game",
+      "are there games"
+    ],
+    "template": "You want to play a game?",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "COL-B56-GENERAL-02",
+    "bucketId": "B56",
+    "subtag": "general",
+    "triggers": [
+      "play a game",
+      "which game",
+      "what games"
+    ],
+    "template": "Bark, Nine-Square, Missing Sheep, Kennel Sketch. Say one.",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "COL-B56-GENERAL-03",
+    "bucketId": "B56",
+    "subtag": "general",
+    "triggers": [
+      "breeds",
+      "what breeds",
+      "how many breeds"
+    ],
+    "template": "We are a pack of 54. Do you want to know about Collies like me or a different breed?",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "COL-B56-GENERAL-04",
+    "bucketId": "B56",
+    "subtag": "general",
+    "triggers": [
+      "what is the game",
+      "whats the game",
+      "tell about the game"
+    ],
+    "template": "The card game?",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "COL-B56-GENERAL-05",
+    "bucketId": "B56",
+    "subtag": "general",
+    "triggers": [
+      "how do i play games here",
+      "how do the games work"
+    ],
+    "template": "You want to play a game?",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "COL-B56-GENERAL-06",
+    "bucketId": "B56",
+    "subtag": "general",
+    "triggers": [
+      "what do you like to do",
+      "what do you do all day"
+    ],
+    "template": "Work and play",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "COL-B56-GENERAL-07",
+    "bucketId": "B56",
+    "subtag": "general",
+    "triggers": [
+      "a real dog",
+      "are you a real dog",
+      "is this a real dog"
+    ],
+    "template": "I am a Border Collie character inside a game, not a live animal hiding behind your screen.",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "COL-B56-GENERAL-08",
+    "bucketId": "B56",
+    "subtag": "general",
+    "triggers": [
+      "what are dogs",
+      "what is a dog"
+    ],
+    "template": "4 legged friends with wet noses",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "COL-B57-FACT-01",
+    "bucketId": "B57",
+    "subtag": "fact",
+    "triggers": [
+      "tell me something",
+      "tell me a fact",
+      "a dog fact",
+      "say something interesting",
+      "tell me more (rotate at random)"
+    ],
+    "template": "A Border Collie called Chaser learned 1,022 toy names",
+    "factSource": "Pilley & Reid 2011, Behavioural Processes",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "COL-B57-FACT-02",
+    "bucketId": "B57",
+    "subtag": "fact",
+    "triggers": [
+      "tell me something",
+      "tell me a fact",
+      "a dog fact",
+      "say something interesting",
+      "tell me more (rotate at random)"
+    ],
+    "template": "We tilt our heads more at words we actually know",
+    "factSource": "Sommese et al. 2021, Animal Cognition",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "COL-B57-FACT-03",
+    "bucketId": "B57",
+    "subtag": "fact",
+    "triggers": [
+      "tell me something",
+      "tell me a fact",
+      "a dog fact",
+      "say something interesting",
+      "tell me more (rotate at random)"
+    ],
+    "template": "I have about 220 million scent receptors. You have 5 million",
+    "factSource": "Walker et al. 2006",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "COL-B57-FACT-04",
+    "bucketId": "B57",
+    "subtag": "fact",
+    "triggers": [
+      "tell me something",
+      "tell me a fact",
+      "a dog fact",
+      "say something interesting",
+      "tell me more (rotate at random)"
+    ],
+    "template": "We were bred to move sheep, not to fight anything",
+    "factSource": "Kennel Club breed standard",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "COL-B57-FACT-05",
+    "bucketId": "B57",
+    "subtag": "fact",
+    "triggers": [
+      "tell me something",
+      "tell me a fact",
+      "a dog fact",
+      "say something interesting",
+      "tell me more (rotate at random)"
+    ],
+    "template": "We sleep about half the day, in short goes",
+    "factSource": "Adams & Johnson 1993",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "COL-B57-FACT-06",
+    "bucketId": "B57",
+    "subtag": "fact",
+    "triggers": [
+      "tell me something",
+      "tell me a fact",
+      "a dog fact",
+      "say something interesting",
+      "tell me more (rotate at random)"
+    ],
+    "template": "We can learn a new word from one hearing, sometimes",
+    "factSource": "Fugazza et al. 2021",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "COL-B57-FACT-07",
+    "bucketId": "B57",
+    "subtag": "fact",
+    "triggers": [
+      "tell me something",
+      "tell me a fact",
+      "a dog fact",
+      "say something interesting",
+      "tell me more (rotate at random)"
+    ],
+    "template": "We smell in stereo. Each nostril works on its own",
+    "factSource": "Craven et al. 2010",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "COL-B57-FACT-08",
+    "bucketId": "B57",
+    "subtag": "fact",
+    "triggers": [
+      "tell me something",
+      "tell me a fact",
+      "a dog fact",
+      "say something interesting",
+      "tell me more (rotate at random)"
+    ],
+    "template": "We can hear about twice as high as you can",
+    "factSource": "Heffner 1983",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "COL-B57-FACT-09",
+    "bucketId": "B57",
+    "subtag": "fact",
+    "triggers": [
+      "tell me something",
+      "tell me a fact",
+      "a dog fact",
+      "say something interesting",
+      "tell me more (rotate at random)"
+    ],
+    "template": "Our nose prints are all different, like your fingertips",
+    "factSource": "Kennel Club",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "COL-B57-FACT-10",
+    "bucketId": "B57",
+    "subtag": "fact",
+    "triggers": [
+      "tell me something",
+      "tell me a fact",
+      "a dog fact",
+      "say something interesting",
+      "tell me more (rotate at random)"
+    ],
+    "template": "We sweat through our paws, not our skin",
+    "factSource": "Merck Veterinary Manual",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "COL-B57-FACT-11",
+    "bucketId": "B57",
+    "subtag": "fact",
+    "triggers": [
+      "tell me something",
+      "tell me a fact",
+      "a dog fact",
+      "say something interesting",
+      "tell me more (rotate at random)"
+    ],
+    "template": "A wet nose helps us catch smells",
+    "factSource": "Merck Veterinary Manual",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "COL-B57-FACT-12",
+    "bucketId": "B57",
+    "subtag": "fact",
+    "triggers": [
+      "tell me something",
+      "tell me a fact",
+      "a dog fact",
+      "say something interesting",
+      "tell me more (rotate at random)"
+    ],
+    "template": "We see blue and yellow. Red looks muddy to us",
+    "factSource": "Neitz et al. 1989",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "COL-B57-FACT-13",
+    "bucketId": "B57",
+    "subtag": "fact",
+    "triggers": [
+      "tell me something",
+      "tell me a fact",
+      "a dog fact",
+      "say something interesting",
+      "tell me more (rotate at random)"
+    ],
+    "template": "We can smell a teaspoon of sugar in two olympic pools",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "COL-B57-FACT-14",
+    "bucketId": "B57",
+    "subtag": "fact",
+    "triggers": [
+      "tell me something",
+      "tell me a fact",
+      "a dog fact",
+      "say something interesting",
+      "tell me more (rotate at random)"
+    ],
+    "template": "Border Collies are usually rated the cleverest breed",
+    "factSource": "Coren 1994, The Intelligence of Dogs",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "COL-B57-FACT-15",
+    "bucketId": "B57",
+    "subtag": "fact",
+    "triggers": [
+      "tell me something",
+      "tell me a fact",
+      "a dog fact",
+      "say something interesting",
+      "tell me more (rotate at random)"
+    ],
+    "template": "We understand about as many words as a two year old",
+    "factSource": "Coren 2009",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "COL-B57-FACT-16",
+    "bucketId": "B57",
+    "subtag": "fact",
+    "triggers": [
+      "tell me something",
+      "tell me a fact",
+      "a dog fact",
+      "say something interesting",
+      "tell me more (rotate at random)"
+    ],
+    "template": "We yawn when you yawn. It spreads",
+    "factSource": "Romero et al. 2013",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "COL-B57-FACT-17",
+    "bucketId": "B57",
+    "subtag": "fact",
+    "triggers": [
+      "tell me something",
+      "tell me a fact",
+      "a dog fact",
+      "say something interesting",
+      "tell me more (rotate at random)"
+    ],
+    "template": "Our whiskers feel air moving, not just touching",
+    "factSource": "Merck Veterinary Manual",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "COL-B57-FACT-18",
+    "bucketId": "B57",
+    "subtag": "fact",
+    "triggers": [
+      "tell me something",
+      "tell me a fact",
+      "a dog fact",
+      "say something interesting",
+      "tell me more (rotate at random)"
+    ],
+    "template": "We can find your smell on a track a week old",
+    "factSource": "Jezierski et al. 2014",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "COL-B57-FACT-19",
+    "bucketId": "B57",
+    "subtag": "fact",
+    "triggers": [
+      "tell me something",
+      "tell me a fact",
+      "a dog fact",
+      "say something interesting",
+      "tell me more (rotate at random)"
+    ],
+    "template": "Some of us are trained to smell illness before a test can",
+    "factSource": "Pirrone & Albertini 2017",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "COL-B57-FACT-20",
+    "bucketId": "B57",
+    "subtag": "fact",
+    "triggers": [
+      "tell me something",
+      "tell me a fact",
+      "a dog fact",
+      "say something interesting",
+      "tell me more (rotate at random)"
+    ],
+    "template": "Puppies are born deaf and blind. We catch up fast",
+    "factSource": "Merck Veterinary Manual",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
   }
 ]

@@ -248,7 +248,6 @@
           "name": "Celtic Hound",
           "note": "The ancient sighthound stock the Celts brought across Europe.",
           "img": "/history/breeds/celtic-hound-remake.jpg",
-          "value": 60,
           "children": [
             {
               "name": "Ancient eastern sighthounds",
@@ -1043,13 +1042,11 @@
           "name": "Irish Wolfhound",
           "note": "Tall coursing hounds crossed in for height, reach and the speed to pull down boar.",
           "img": "/history/breeds/irish-wolfhound-photo.jpg",
-          "value": 30,
           "children": [
             {
               "name": "Celtic Hound",
               "note": "The ancient sighthound stock the Celts brought across Europe.",
               "img": "/history/breeds/celtic-hound-remake.jpg",
-              "value": 18,
               "children": [
                 {
                   "name": "Ancient eastern sighthounds",
@@ -1375,13 +1372,11 @@
           "name": "Bulldog",
           "note": "Brought the power, the broad chest and the determined grip.",
           "img": "/history/breeds/bulldog-photo.jpg",
-          "value": 45,
           "children": [
             {
               "name": "Old English Bulldog",
               "note": "The athletic bull-baiting dog at the root of it all, leaner and fiercer than today's Bulldog. Now extinct.",
               "img": "/history/breeds/Old-English-Bulldog.jpg",
-              "value": 27,
               "children": [
                 {
                   "name": "Mastiff and Alaunt war dogs",
@@ -1401,7 +1396,6 @@
               "name": "Mastiff",
               "note": "The old Molosser guard-and-war dogs that gave the breed its bulk and broad head.",
               "img": "/history/breeds/medieval-british-mastiff.jpg",
-              "value": 11.25,
               "children": [
                 {
                   "name": "Ancient Molossers",
@@ -1421,7 +1415,6 @@
               "name": "Pug",
               "note": "Crossed in during the 1800s to shorten the face and soften the temperament.",
               "img": "/history/breeds/Asian-flat-faced-toys.jpg",
-              "value": 6.75,
               "children": [
                 {
                   "name": "Ancient Chinese toy dogs",
@@ -1449,7 +1442,6 @@
           "name": "Dalmatian",
           "note": "Crossed in for size, substance and a pure white finish.",
           "img": "/Dalmatian-square.jpg",
-          "value": 15,
           "children": [
             {
               "name": "Ancient spotted hounds",
@@ -1461,19 +1453,16 @@
               "name": "Pointer",
               "note": "Pointing and hound blood that shaped its build and steady working head.",
               "img": "/history/breeds/british-pointers.jpg",
-              "value": 4.5,
               "children": [
                 {
                   "name": "English Foxhound",
                   "note": "Stamina, drive and a steady temperament.",
                   "img": "/history/breeds/english-foxhound.jpg",
-                  "value": 1.35,
                   "children": [
                     {
                       "name": "Southern Hound",
                       "note": "The deep-nosed scent hound at its foundation.",
                       "img": "/history/breeds/Southern-Hound.jpg",
-                      "value": 0.675,
                       "children": [
                         {
                           "name": "Talbot hounds",
@@ -1493,7 +1482,6 @@
                       "name": "Greyhound",
                       "note": "Added for speed and a cleaner, racier build.",
                       "img": "/history/breeds/original-greyhound.jpg",
-                      "value": 0.405,
                       "children": [
                         {
                           "name": "Celtic Hound",
@@ -1521,13 +1509,11 @@
                   "name": "Greyhound",
                   "note": "Speed and a racy, galloping build.",
                   "img": "/history/breeds/original-greyhound.jpg",
-                  "value": 1.125,
                   "children": [
                     {
                       "name": "Celtic Hound",
                       "note": "The old running hounds the Celts brought west.",
                       "img": "/history/breeds/celtic-hound-remake.jpg",
-                      "value": 0.675,
                       "children": [
                         {
                           "name": "Ancient eastern sighthounds",
@@ -1555,7 +1541,6 @@
                   "name": "Bloodhound",
                   "note": "A deeper nose for finding game.",
                   "img": "/history/breeds/Medieval-Bloodhound.jpg",
-                  "value": 1.125,
                   "children": [
                     {
                       "name": "St Hubert Hound",
@@ -1914,19 +1899,16 @@
               "name": "Whippet",
               "note": "Slipped into some lines for a touch more refinement and speed.",
               "img": "/Whippet-square.jpg",
-              "value": 8,
               "children": [
                 {
                   "name": "Greyhound",
                   "note": "The core of the breed, scaled down for speed in a smaller, cheaper-to-keep package.",
                   "img": "/greyhound-square.jpg",
-                  "value": 4.96,
                   "children": [
                     {
                       "name": "Celtic Hound",
                       "note": "The old running hounds the Celts brought west.",
                       "img": "/history/breeds/celtic-hound-remake.jpg",
-                      "value": 2.9760000000000004,
                       "children": [
                         {
                           "name": "Ancient eastern sighthounds",
@@ -1960,7 +1942,6 @@
                   "name": "Italian Greyhound",
                   "note": "A later refinement for the elegant, fine-boned outline.",
                   "img": "/italian-greyhound-square.jpg",
-                  "value": 1.2,
                   "children": [
                     {
                       "name": "Ancient eastern sighthounds",
@@ -1984,13 +1965,11 @@
           "name": "Greyhound",
           "note": "A dash of sighthound for speed and a clean, elegant outline. We stop the trail here for now.",
           "img": "/greyhound square.jpg",
-          "value": 13,
           "children": [
             {
               "name": "Celtic Hound",
               "note": "The old running hounds the Celts brought west.",
               "img": "/history/breeds/celtic-hound-remake.jpg",
-              "value": 7.8,
               "children": [
                 {
                   "name": "Ancient eastern sighthounds",
@@ -2843,7 +2822,6 @@
           "name": "Bloodhound",
           "note": "The heavy German scent trailing hounds, the leithund, behind its nose and tracking drive.",
           "img": "/history/breeds/Medieval-Bloodhound.jpg",
-          "value": 40,
           "children": [
             {
               "name": "St Hubert Hound",
@@ -2863,19 +2841,16 @@
           "name": "Pointer",
           "note": "Continental pointing dogs crossed in for the upright, birdy hunting style.",
           "img": "/history/breeds/british-pointers.jpg",
-          "value": 40,
           "children": [
             {
               "name": "English Foxhound",
               "note": "Stamina, drive and a steady temperament.",
               "img": "/history/breeds/english-foxhound.jpg",
-              "value": 12,
               "children": [
                 {
                   "name": "Southern Hound",
                   "note": "The deep-nosed scent hound at its foundation.",
                   "img": "/history/breeds/Southern-Hound.jpg",
-                  "value": 6,
                   "children": [
                     {
                       "name": "Talbot hounds",
@@ -2895,13 +2870,11 @@
                   "name": "Greyhound",
                   "note": "Added for speed and a cleaner, racier build.",
                   "img": "/history/breeds/original-greyhound.jpg",
-                  "value": 3.6,
                   "children": [
                     {
                       "name": "Celtic Hound",
                       "note": "The old running hounds the Celts brought west.",
                       "img": "/history/breeds/celtic-hound-remake.jpg",
-                      "value": 2.16,
                       "children": [
                         {
                           "name": "Ancient eastern sighthounds",
@@ -2937,13 +2910,11 @@
               "name": "Greyhound",
               "note": "Speed and a racy, galloping build.",
               "img": "/history/breeds/original-greyhound.jpg",
-              "value": 10,
               "children": [
                 {
                   "name": "Celtic Hound",
                   "note": "The old running hounds the Celts brought west.",
                   "img": "/history/breeds/celtic-hound-remake.jpg",
-                  "value": 6,
                   "children": [
                     {
                       "name": "Ancient eastern sighthounds",
@@ -2971,7 +2942,6 @@
               "name": "Bloodhound",
               "note": "A deeper nose for finding game.",
               "img": "/history/breeds/Medieval-Bloodhound.jpg",
-              "value": 10,
               "children": [
                 {
                   "name": "St Hubert Hound",
@@ -3316,19 +3286,16 @@
           "name": "Pointer",
           "note": "Pointing and hound blood that shaped its build and steady working head.",
           "img": "/history/breeds/british-pointers.jpg",
-          "value": 30,
           "children": [
             {
               "name": "English Foxhound",
               "note": "Stamina, drive and a steady temperament.",
               "img": "/history/breeds/english-foxhound.jpg",
-              "value": 9,
               "children": [
                 {
                   "name": "Southern Hound",
                   "note": "The deep-nosed scent hound at its foundation.",
                   "img": "/history/breeds/Southern-Hound.jpg",
-                  "value": 4.5,
                   "children": [
                     {
                       "name": "Talbot hounds",
@@ -3348,13 +3315,11 @@
                   "name": "Greyhound",
                   "note": "Added for speed and a cleaner, racier build.",
                   "img": "/history/breeds/original-greyhound.jpg",
-                  "value": 2.7,
                   "children": [
                     {
                       "name": "Celtic Hound",
                       "note": "The old running hounds the Celts brought west.",
                       "img": "/history/breeds/celtic-hound-remake.jpg",
-                      "value": 1.62,
                       "children": [
                         {
                           "name": "Ancient eastern sighthounds",
@@ -3390,13 +3355,11 @@
               "name": "Greyhound",
               "note": "Speed and a racy, galloping build.",
               "img": "/history/breeds/original-greyhound.jpg",
-              "value": 7.5,
               "children": [
                 {
                   "name": "Celtic Hound",
                   "note": "The old running hounds the Celts brought west.",
                   "img": "/history/breeds/celtic-hound-remake.jpg",
-                  "value": 4.5,
                   "children": [
                     {
                       "name": "Ancient eastern sighthounds",
@@ -3424,7 +3387,6 @@
               "name": "Bloodhound",
               "note": "A deeper nose for finding game.",
               "img": "/history/breeds/Medieval-Bloodhound.jpg",
-              "value": 7.5,
               "children": [
                 {
                   "name": "St Hubert Hound",
@@ -4024,7 +3986,6 @@
           "name": "Bearded Collie",
           "note": "The shaggy Scottish herder in its make-up.",
           "img": "/history/breeds/bearded-collie-photo.jpg",
-          "value": 55,
           "children": [
             {
               "name": "Shaggy lowland herders",
@@ -4347,7 +4308,6 @@
           "name": "Bloodhound",
           "note": "The St Hubert scent trailing line behind its nose, long ears and deep voice.",
           "img": "/history/breeds/modern-bloodhound.jpg",
-          "value": 55,
           "children": [
             {
               "name": "St Hubert Hound",
@@ -4652,7 +4612,6 @@
           "name": "King Charles Spaniel",
           "note": "The modern flat-faced toy spaniel it was bred back from.",
           "img": "/history/breeds/king-charles-spaniel-photo.jpg",
-          "value": 70,
           "children": [
             {
               "name": "Old toy spaniels",
@@ -4963,7 +4922,6 @@
           "name": "Old English Bulldog",
           "note": "The athletic bull-baiting dog at the root of it all, leaner and fiercer than today's Bulldog. Now extinct.",
           "img": "/history/breeds/Old-English-Bulldog.jpg",
-          "value": 60,
           "children": [
             {
               "name": "Mastiff and Alaunt war dogs",
@@ -4983,7 +4941,6 @@
           "name": "Mastiff",
           "note": "The old Molosser guard-and-war dogs that gave the breed its bulk and broad head.",
           "img": "/history/breeds/medieval-british-mastiff.jpg",
-          "value": 25,
           "children": [
             {
               "name": "Ancient Molossers",
@@ -5003,7 +4960,6 @@
           "name": "Pug",
           "note": "Crossed in during the 1800s to shorten the face and soften the temperament.",
           "img": "/history/breeds/Asian-flat-faced-toys.jpg",
-          "value": 15,
           "children": [
             {
               "name": "Ancient Chinese toy dogs",
@@ -5945,7 +5901,6 @@
           "name": "Cardigan Welsh Corgi",
           "note": "Its close cousin and the older of the two Welsh corgis. The pair share deep Welsh roots and were briefly crossed in the 1930s.",
           "img": "/history/breeds/Welsh_Corgi_Cardigan-photo.jpg",
-          "value": 35,
           "children": [
             {
               "name": "Early badger hunting dogs",
@@ -6824,13 +6779,11 @@
           "name": "Bulldog",
           "note": "Brought the stocky frame and the easy-going, affectionate streak.",
           "img": "/history/breeds/bulldog-photo.jpg",
-          "value": 55,
           "children": [
             {
               "name": "Old English Bulldog",
               "note": "The athletic bull-baiting dog at the root of it all, leaner and fiercer than today's Bulldog. Now extinct.",
               "img": "/history/breeds/Old-English-Bulldog.jpg",
-              "value": 33,
               "children": [
                 {
                   "name": "Mastiff and Alaunt war dogs",
@@ -6850,7 +6803,6 @@
               "name": "Mastiff",
               "note": "The old Molosser guard-and-war dogs that gave the breed its bulk and broad head.",
               "img": "/history/breeds/medieval-british-mastiff.jpg",
-              "value": 13.75,
               "children": [
                 {
                   "name": "Ancient Molossers",
@@ -6870,7 +6822,6 @@
               "name": "Pug",
               "note": "Crossed in during the 1800s to shorten the face and soften the temperament.",
               "img": "/history/breeds/Asian-flat-faced-toys.jpg",
-              "value": 8.25,
               "children": [
                 {
                   "name": "Ancient Chinese toy dogs",
@@ -7189,7 +7140,6 @@
           "name": "Southern Hound",
           "note": "Deep-nosed scent-hound blood.",
           "img": "/history/breeds/Southern-Hound.jpg",
-          "value": 35,
           "children": [
             {
               "name": "Talbot hounds",
@@ -7209,13 +7159,11 @@
           "name": "Greyhound",
           "note": "A little sighthound for speed and a tidy build.",
           "img": "/history/breeds/original-greyhound.jpg",
-          "value": 25,
           "children": [
             {
               "name": "Celtic Hound",
               "note": "The old running hounds the Celts brought west.",
               "img": "/history/breeds/celtic-hound-remake.jpg",
-              "value": 15,
               "children": [
                 {
                   "name": "Ancient eastern sighthounds",
@@ -8093,13 +8041,11 @@
           "name": "Jack Russell Terrier",
           "note": "Brings the bold, bouncy, terrier spirit.",
           "img": "/history/breeds/jack_russell_terrier_photo.jpg",
-          "value": 50,
           "children": [
             {
               "name": "Fox Terrier",
               "note": "The old white-bodied fox-working terriers that are the breed's direct foundation.",
               "img": "/history/breeds/fox_terrier-img.jpg",
-              "value": 27.5,
               "children": [
                 {
                   "name": "Old English Black and Tan Terrier",
@@ -8111,7 +8057,6 @@
                   "name": "English White Terrier",
                   "note": "Lent the predominantly white, easy-to-see coat.",
                   "img": "/history/breeds/english-white-terrier-painting.jpg",
-                  "value": 6.875,
                   "children": [
                     {
                       "name": "Old English White Terrier",
@@ -8131,7 +8076,6 @@
                   "name": "Beagle",
                   "note": "A dash of hound for nose and cry.",
                   "img": "/history/breeds/beagle.jpg",
-                  "value": 4.125,
                   "children": [
                     {
                       "name": "Talbot hound",
@@ -8143,7 +8087,6 @@
                       "name": "Southern Hound",
                       "note": "Deep-nosed scent-hound blood.",
                       "img": "/history/breeds/Southern-Hound.jpg",
-                      "value": 1.44375,
                       "children": [
                         {
                           "name": "Talbot hounds",
@@ -8163,7 +8106,6 @@
                       "name": "Greyhound",
                       "note": "A little sighthound for speed and a tidy build.",
                       "img": "/history/breeds/original-greyhound.jpg",
-                      "value": 1.03125,
                       "children": [
                         {
                           "name": "Celtic Hound",
@@ -8185,13 +8127,11 @@
                   "name": "Bull Terrier",
                   "note": "A touch of bull blood for grit.",
                   "img": "/bull-terrier-square.jpg",
-                  "value": 4.125,
                   "children": [
                     {
                       "name": "Bulldog",
                       "note": "Brought the power, the broad chest and the determined grip.",
                       "img": "/history/breeds/bulldog-photo.jpg",
-                      "value": 1.85625,
                       "children": [
                         {
                           "name": "Old English Bulldog",
@@ -8223,7 +8163,6 @@
                       "name": "Dalmatian",
                       "note": "Crossed in for size, substance and a pure white finish.",
                       "img": "/Dalmatian-square.jpg",
-                      "value": 0.61875,
                       "children": [
                         {
                           "name": "Ancient spotted hounds",
@@ -8267,7 +8206,6 @@
           "name": "Poodle",
           "note": "Brings the low-shedding coat and the trainability.",
           "img": "/poodle-square.jpg",
-          "value": 50,
           "children": [
             {
               "name": "Old European water dogs",
@@ -8557,13 +8495,11 @@
           "name": "Cavalier King Charles Spaniel",
           "note": "Brings the affectionate, easy-going lap-dog nature.",
           "img": "/Cavalier King Charles Spaniel-square.jpg",
-          "value": 50,
           "children": [
             {
               "name": "King Charles Spaniel",
               "note": "The modern flat-faced toy spaniel it was bred back from.",
               "img": "/history/breeds/king-charles-spaniel-photo.jpg",
-              "value": 35,
               "children": [
                 {
                   "name": "Old toy spaniels",
@@ -8591,7 +8527,6 @@
           "name": "Bichon Frise",
           "note": "Brings the cheerful personality and the fluffy, low-shedding coat.",
           "img": "/bichon-square.jpg",
-          "value": 50,
           "children": [
             {
               "name": "Barbet water dogs",
@@ -8881,13 +8816,11 @@
           "name": "Cavalier King Charles Spaniel",
           "note": "Brings the sweet, affectionate, easy-going nature.",
           "img": "/Cavalier King Charles Spaniel-square.jpg",
-          "value": 50,
           "children": [
             {
               "name": "King Charles Spaniel",
               "note": "The modern flat-faced toy spaniel it was bred back from.",
               "img": "/history/breeds/king-charles-spaniel-photo.jpg",
-              "value": 35,
               "children": [
                 {
                   "name": "Old toy spaniels",
@@ -8915,7 +8848,6 @@
           "name": "Poodle",
           "note": "Brings the low-shedding coat and a quick, trainable brain.",
           "img": "/poodle-square.jpg",
-          "value": 50,
           "children": [
             {
               "name": "Old European water dogs",
@@ -9232,7 +9164,6 @@
           "name": "Poodle",
           "note": "A touch of poodle thought to be added for coat and a clever, obedient temperament.",
           "img": "/history/breeds/Poodle-and-Barbet-water-dogs.jpg",
-          "value": 15,
           "children": [
             {
               "name": "Old European water dogs",
@@ -9531,7 +9462,6 @@
           "name": "Celtic Hound",
           "note": "The old running hounds the Celts brought west.",
           "img": "/history/breeds/celtic-hound-remake.jpg",
-          "value": 60,
           "children": [
             {
               "name": "Ancient eastern sighthounds",
@@ -9820,13 +9750,11 @@
           "name": "Greyhound",
           "note": "A sighthound for speed and a silent, sweeping run.",
           "img": "/history/breeds/original-greyhound.jpg",
-          "value": 50,
           "children": [
             {
               "name": "Celtic Hound",
               "note": "The old running hounds the Celts brought west.",
               "img": "/history/breeds/celtic-hound-remake.jpg",
-              "value": 30,
               "children": [
                 {
                   "name": "Ancient eastern sighthounds",
@@ -10146,13 +10074,11 @@
           "name": "Greyhound",
           "note": "The core of the breed, scaled down for speed in a smaller, cheaper-to-keep package.",
           "img": "/greyhound-square.jpg",
-          "value": 62,
           "children": [
             {
               "name": "Celtic Hound",
               "note": "The old running hounds the Celts brought west.",
               "img": "/history/breeds/celtic-hound-remake.jpg",
-              "value": 37.2,
               "children": [
                 {
                   "name": "Ancient eastern sighthounds",
@@ -10186,7 +10112,6 @@
           "name": "Italian Greyhound",
           "note": "A later refinement for the elegant, fine-boned outline.",
           "img": "/italian-greyhound-square.jpg",
-          "value": 15,
           "children": [
             {
               "name": "Ancient eastern sighthounds",
@@ -10476,7 +10401,6 @@
           "name": "Maltese",
           "note": "Brings the small size and the gentle, devoted lap-dog nature.",
           "img": "/matlese-square.jpg",
-          "value": 50,
           "children": [
             {
               "name": "Ancient Spitz-type dogs",
@@ -10496,7 +10420,6 @@
           "name": "Poodle",
           "note": "Brings the soft, low-shedding coat and cleverness.",
           "img": "/poodle-square.jpg",
-          "value": 50,
           "children": [
             {
               "name": "Old European water dogs",
@@ -10786,7 +10709,6 @@
           "name": "Golden Retriever",
           "note": "Brings the gentle, eager-to-please golden temperament.",
           "img": "/golden-square.jpg",
-          "value": 50,
           "children": [
             {
               "name": "Wavy-Coated Retriever",
@@ -10798,7 +10720,6 @@
               "name": "Tweed Water Spaniel",
               "note": "A now-extinct local water dog that gave the gentle nature and love of water.",
               "img": "/history/breeds/tweed-water-spaniel.jpg",
-              "value": 15,
               "children": [
                 {
                   "name": "Water spaniels",
@@ -10818,13 +10739,11 @@
               "name": "Irish Setter",
               "note": "A dash of setter for the rich golden colour.",
               "img": "/history/breeds/irish-setter-photo.jpg",
-              "value": 7.5,
               "children": [
                 {
                   "name": "English Setter",
                   "note": "The base setter type behind the breed's style and stance.",
                   "img": "/history/breeds/british-setters.jpg",
-                  "value": 2.625,
                   "children": [
                     {
                       "name": "Old setting spaniels",
@@ -10836,7 +10755,6 @@
                       "name": "Pointer",
                       "note": "Spanish pointer blood for nose and a firm point.",
                       "img": "/history/breeds/british-pointers.jpg",
-                      "value": 0.7875,
                       "children": [
                         {
                           "name": "English Foxhound",
@@ -10876,7 +10794,6 @@
                   "name": "Irish Water Spaniel",
                   "note": "Native Irish spaniel blood for coat and a love of water.",
                   "img": "/history/breeds/irish-water-spaniel.jpg",
-                  "value": 1.875,
                   "children": [
                     {
                       "name": "Old Irish water dogs",
@@ -10896,7 +10813,6 @@
                   "name": "Gordon Setter",
                   "note": "Another setter in the mix, adding substance and steadiness.",
                   "img": "/history/breeds/gordon-setter-photo.jpg",
-                  "value": 1.5,
                   "children": [
                     {
                       "name": "Old black-and-tan setters",
@@ -10908,7 +10824,6 @@
                       "name": "Bloodhound",
                       "note": "Thought to have deepened the nose and the black-and-tan.",
                       "img": "/history/breeds/modern-bloodhound.jpg",
-                      "value": 0.3,
                       "children": [
                         {
                           "name": "St Hubert Hound",
@@ -10936,13 +10851,11 @@
                   "name": "Pointer",
                   "note": "A touch of pointer for nose and a wide-ranging hunt.",
                   "img": "/history/breeds/british-pointers.jpg",
-                  "value": 1.5,
                   "children": [
                     {
                       "name": "English Foxhound",
                       "note": "Stamina, drive and a steady temperament.",
                       "img": "/history/breeds/english-foxhound.jpg",
-                      "value": 0.45,
                       "children": [
                         {
                           "name": "Southern Hound",
@@ -10968,7 +10881,6 @@
                       "name": "Greyhound",
                       "note": "Speed and a racy, galloping build.",
                       "img": "/history/breeds/original-greyhound.jpg",
-                      "value": 0.375,
                       "children": [
                         {
                           "name": "Celtic Hound",
@@ -10988,7 +10900,6 @@
                       "name": "Bloodhound",
                       "note": "A deeper nose for finding game.",
                       "img": "/history/breeds/Medieval-Bloodhound.jpg",
-                      "value": 0.375,
                       "children": [
                         {
                           "name": "St Hubert Hound",
@@ -11018,7 +10929,6 @@
               "name": "Bloodhound",
               "note": "A little hound blood for tracking power and a good nose.",
               "img": "/history/breeds/modern-bloodhound.jpg",
-              "value": 5,
               "children": [
                 {
                   "name": "St Hubert Hound",
@@ -11040,7 +10950,6 @@
           "name": "Poodle",
           "note": "Brings the curly, low-shedding coat and the smarts.",
           "img": "/poodle-square.jpg",
-          "value": 50,
           "children": [
             {
               "name": "Old European water dogs",
@@ -11330,7 +11239,6 @@
           "name": "Cocker Spaniel",
           "note": "Brings the merry, people-loving temperament and those soft spaniel looks.",
           "img": "/cocker-square.jpg",
-          "value": 50,
           "children": [
             {
               "name": "Land spaniels",
@@ -11342,7 +11250,6 @@
               "name": "Field Spaniel",
               "note": "A close gundog cousin from the same spaniel family.",
               "img": "/history/breeds/field-spaniel-photo.jpg",
-              "value": 12.5,
               "children": [
                 {
                   "name": "Land spaniels",
@@ -11354,7 +11261,6 @@
                   "name": "Sussex Spaniel",
                   "note": "Lent weight, bone and a longer body.",
                   "img": "/history/breeds/Sussex-Spaniel.jpg",
-                  "value": 4.375,
                   "children": [
                     {
                       "name": "Land spaniels",
@@ -11374,7 +11280,6 @@
                   "name": "Clumber Spaniel",
                   "note": "Heavier spaniel blood for substance.",
                   "img": "/history/breeds/clumber-spaniel-photo.jpg",
-                  "value": 2.5,
                   "children": [
                     {
                       "name": "Land spaniels",
@@ -11396,7 +11301,6 @@
               "name": "Sussex Spaniel",
               "note": "A heavier, golden-liver spaniel that lent bone and a rich coat.",
               "img": "/history/breeds/Sussex-Spaniel.jpg",
-              "value": 10,
               "children": [
                 {
                   "name": "Land spaniels",
@@ -11418,7 +11322,6 @@
           "name": "Poodle",
           "note": "Brings the curly, low-shedding coat and a lot of cleverness.",
           "img": "/poodle-square.jpg",
-          "value": 50,
           "children": [
             {
               "name": "Old European water dogs",
@@ -11731,7 +11634,6 @@
           "name": "Cairn Terrier",
           "note": "The closest cousin, and the main source of the Westie's plucky working type.",
           "img": "/history/breeds/cairns-terrier.jpg",
-          "value": 64,
           "children": [
             {
               "name": "Skye terrier stock",
@@ -11751,13 +11653,25 @@
           "name": "Scottish Terrier",
           "note": "Another of the old Highland terriers sharing the same rugged roots.",
           "img": "/history/breeds/Scottish-Terrier.jpg",
-          "value": 22,
           "children": [
             {
               "name": "Old Highland terriers",
               "note": "The shared Highland working-terrier stock, once all just called Scottish terriers. Now extinct.",
               "img": "/history/breeds/Old-Highland-terriers.jpg",
-              "value": 13.2
+              "children": [
+                {
+                  "name": "Earth Dog",
+                  "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+                  "img": "/history/breeds/medieval-earth-dog.jpg",
+                  "value": 6.6
+                },
+                {
+                  "name": "Old Highland terriers",
+                  "note": "The old working-terrier stock of the Highlands that every Scottish terrier springs from. Now extinct.",
+                  "img": "/history/breeds/Old-Highland-terriers.jpg",
+                  "value": 6.6
+                }
+              ]
             },
             {
               "name": "Skye terrier stock",
@@ -11771,13 +11685,25 @@
           "name": "Skye Terrier",
           "note": "Part of the same west-coast terrier family that shaped the breed.",
           "img": "/history/breeds/skye-terrier-photo.webp",
-          "value": 14,
           "children": [
             {
               "name": "Old Highland terriers",
               "note": "The old working-terrier stock of the Highlands that every Scottish terrier springs from. Now extinct.",
               "img": "/history/breeds/Old-Highland-terriers.jpg",
-              "value": 8.4
+              "children": [
+                {
+                  "name": "Earth Dog",
+                  "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+                  "img": "/history/breeds/medieval-earth-dog.jpg",
+                  "value": 4.2
+                },
+                {
+                  "name": "Old Highland terriers",
+                  "note": "The old working-terrier stock of the Highlands that every Scottish terrier springs from. Now extinct.",
+                  "img": "/history/breeds/Old-Highland-terriers.jpg",
+                  "value": 4.2
+                }
+              ]
             },
             {
               "name": "Skye terrier stock",
@@ -12348,13 +12274,11 @@
           "name": "Bulldog",
           "note": "The English toy bulldogs the Nottingham lace workers carried across to Normandy.",
           "img": "/history/breeds/Old-English-Bulldog.jpg",
-          "value": 65,
           "children": [
             {
               "name": "Old English Bulldog",
               "note": "The athletic bull-baiting dog at the root of it all, leaner and fiercer than today's Bulldog. Now extinct.",
               "img": "/history/breeds/Old-English-Bulldog.jpg",
-              "value": 39,
               "children": [
                 {
                   "name": "Mastiff and Alaunt war dogs",
@@ -12374,7 +12298,6 @@
               "name": "Mastiff",
               "note": "The old Molosser guard-and-war dogs that gave the breed its bulk and broad head.",
               "img": "/history/breeds/medieval-british-mastiff.jpg",
-              "value": 16.25,
               "children": [
                 {
                   "name": "Ancient Molossers",
@@ -12394,7 +12317,6 @@
               "name": "Pug",
               "note": "Crossed in during the 1800s to shorten the face and soften the temperament.",
               "img": "/history/breeds/Asian-flat-faced-toys.jpg",
-              "value": 9.75,
               "children": [
                 {
                   "name": "Ancient Chinese toy dogs",
@@ -12689,13 +12611,11 @@
           "name": "Bulldog",
           "note": "The old, athletic bull-baiting type, not the modern show dog, for strength and courage.",
           "img": "/history/breeds/Old-English-Bulldog.jpg",
-          "value": 55,
           "children": [
             {
               "name": "Old English Bulldog",
               "note": "The athletic bull-baiting dog at the root of it all, leaner and fiercer than today's Bulldog. Now extinct.",
               "img": "/history/breeds/Old-English-Bulldog.jpg",
-              "value": 33,
               "children": [
                 {
                   "name": "Mastiff and Alaunt war dogs",
@@ -12715,7 +12635,6 @@
               "name": "Mastiff",
               "note": "The old Molosser guard-and-war dogs that gave the breed its bulk and broad head.",
               "img": "/history/breeds/medieval-british-mastiff.jpg",
-              "value": 13.75,
               "children": [
                 {
                   "name": "Ancient Molossers",
@@ -12735,7 +12654,6 @@
               "name": "Pug",
               "note": "Crossed in during the 1800s to shorten the face and soften the temperament.",
               "img": "/history/breeds/Asian-flat-faced-toys.jpg",
-              "value": 8.25,
               "children": [
                 {
                   "name": "Ancient Chinese toy dogs",
@@ -13938,7 +13856,6 @@
           "name": "Labrador",
           "note": "Brings the steady, friendly working temperament.",
           "img": "/lab-square.jpg",
-          "value": 50,
           "children": [
             {
               "name": "St John's Water Dog",
@@ -13984,7 +13901,6 @@
           "name": "Poodle",
           "note": "Brings the low-shedding coat that started the whole idea.",
           "img": "/poodle-square.jpg",
-          "value": 50,
           "children": [
             {
               "name": "Old European water dogs",
@@ -14294,7 +14210,6 @@
           "name": "Paisley Terrier",
           "note": "A long-coated Scottish terrier that gave the silky, flowing coat.",
           "img": "/history/breeds/Paisley-Terrier=photo.jpg",
-          "value": 45,
           "children": [
             {
               "name": "Skye terrier stock",
@@ -14306,7 +14221,20 @@
               "name": "Old Highland terriers",
               "note": "The working Scottish terriers behind the silky Clydeside strains. Now extinct.",
               "img": "/history/breeds/Old-Highland-terriers.jpg",
-              "value": 15.75
+              "children": [
+                {
+                  "name": "Earth Dog",
+                  "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+                  "img": "/history/breeds/medieval-earth-dog.jpg",
+                  "value": 7.875
+                },
+                {
+                  "name": "Old Highland terriers",
+                  "note": "The old working-terrier stock of the Highlands that every Scottish terrier springs from. Now extinct.",
+                  "img": "/history/breeds/Old-Highland-terriers.jpg",
+                  "value": 7.875
+                }
+              ]
             }
           ]
         },
@@ -14314,13 +14242,25 @@
           "name": "Skye Terrier",
           "note": "Another Scottish terrier behind the long, fine hair.",
           "img": "/history/breeds/skye-terrier-photo.webp",
-          "value": 30,
           "children": [
             {
               "name": "Old Highland terriers",
               "note": "The old working-terrier stock of the Highlands that every Scottish terrier springs from. Now extinct.",
               "img": "/history/breeds/Old-Highland-terriers.jpg",
-              "value": 18
+              "children": [
+                {
+                  "name": "Earth Dog",
+                  "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+                  "img": "/history/breeds/medieval-earth-dog.jpg",
+                  "value": 9
+                },
+                {
+                  "name": "Old Highland terriers",
+                  "note": "The old working-terrier stock of the Highlands that every Scottish terrier springs from. Now extinct.",
+                  "img": "/history/breeds/Old-Highland-terriers.jpg",
+                  "value": 9
+                }
+              ]
             },
             {
               "name": "Skye terrier stock",
@@ -14975,7 +14915,6 @@
           "name": "Bloodhound",
           "note": "A thread of heavy scent hound blood behind the long nose and dogged tracking.",
           "img": "/history/breeds/Medieval-Bloodhound.jpg",
-          "value": 15,
           "children": [
             {
               "name": "St Hubert Hound",
@@ -15294,7 +15233,6 @@
           "name": "Norfolk Spaniel",
           "note": "A springer-type spaniel later folded into the breed.",
           "img": "/history/breeds/Norfolk-Spaniel.jpg",
-          "value": 45,
           "children": [
             {
               "name": "Land spaniels",
@@ -15320,7 +15258,6 @@
           "name": "Welsh Springer Spaniel",
           "note": "A close cousin from the same springing-spaniel root.",
           "img": "/history/breeds/welsh-springer-spaniel-photo.jpg",
-          "value": 25,
           "children": [
             {
               "name": "Old Welsh land spaniels",
@@ -15623,7 +15560,6 @@
           "name": "Bedlington Terrier",
           "note": "Shares the same old Border terrier stock and a common working ancestor.",
           "img": "/history/breeds/Bedlington Terrier-photo.jpg",
-          "value": 34,
           "children": [
             {
               "name": "Old Border terriers",
@@ -15635,19 +15571,16 @@
               "name": "Whippet",
               "note": "Brought in for speed and the arched, racy back.",
               "img": "/history/breeds/whippet-photo.jpg",
-              "value": 10.2,
               "children": [
                 {
                   "name": "Greyhound",
                   "note": "The core of the breed, scaled down for speed in a smaller, cheaper-to-keep package.",
                   "img": "/greyhound-square.jpg",
-                  "value": 6.324,
                   "children": [
                     {
                       "name": "Celtic Hound",
                       "note": "The old running hounds the Celts brought west.",
                       "img": "/history/breeds/celtic-hound-remake.jpg",
-                      "value": 3.7944,
                       "children": [
                         {
                           "name": "Ancient eastern sighthounds",
@@ -15681,7 +15614,6 @@
                   "name": "Italian Greyhound",
                   "note": "A later refinement for the elegant, fine-boned outline.",
                   "img": "/italian-greyhound-square.jpg",
-                  "value": 1.53,
                   "children": [
                     {
                       "name": "Ancient eastern sighthounds",
@@ -15703,7 +15635,6 @@
               "name": "Dandie Dinmont Terrier",
               "note": "A close relative from the same border rootstock, sharing the crisp coat and topknot.",
               "img": "/history/breeds/dandie-dinmont-terrier-photo.jpeg",
-              "value": 6.8,
               "children": [
                 {
                   "name": "Old Border terriers",
@@ -15721,13 +15652,11 @@
                   "name": "Otterhound",
                   "note": "A little hound blood is thought to have added size and the soft coat.",
                   "img": "/history/breeds/otterhound-photo.jpg",
-                  "value": 1.02,
                   "children": [
                     {
                       "name": "Bloodhound",
                       "note": "Tracking power and a tremendous nose.",
                       "img": "/history/breeds/Medieval-Bloodhound.jpg",
-                      "value": 0.45899999999999996,
                       "children": [
                         {
                           "name": "St Hubert Hound",
@@ -15747,7 +15676,6 @@
                       "name": "Southern Hound",
                       "note": "Old deep-voiced scent-hound stock.",
                       "img": "/history/breeds/Southern-Hound.jpg",
-                      "value": 0.306,
                       "children": [
                         {
                           "name": "Talbot hounds",
@@ -15779,7 +15707,6 @@
           "name": "Dandie Dinmont Terrier",
           "note": "Another Border breed from the same root, raised in the same hills.",
           "img": "/history/breeds/dandie-dinmont-terrier-photo.jpeg",
-          "value": 33,
           "children": [
             {
               "name": "Old Border terriers",
@@ -15797,13 +15724,11 @@
               "name": "Otterhound",
               "note": "A little hound blood is thought to have added size and the soft coat.",
               "img": "/history/breeds/otterhound-photo.jpg",
-              "value": 4.95,
               "children": [
                 {
                   "name": "Bloodhound",
                   "note": "Tracking power and a tremendous nose.",
                   "img": "/history/breeds/Medieval-Bloodhound.jpg",
-                  "value": 2.2275,
                   "children": [
                     {
                       "name": "St Hubert Hound",
@@ -15823,7 +15748,6 @@
                   "name": "Southern Hound",
                   "note": "Old deep-voiced scent-hound stock.",
                   "img": "/history/breeds/Southern-Hound.jpg",
-                  "value": 1.485,
                   "children": [
                     {
                       "name": "Talbot hounds",
@@ -16485,7 +16409,6 @@
           "name": "Field Spaniel",
           "note": "A close gundog cousin from the same spaniel family.",
           "img": "/history/breeds/field-spaniel-photo.jpg",
-          "value": 25,
           "children": [
             {
               "name": "Land spaniels",
@@ -16497,7 +16420,6 @@
               "name": "Sussex Spaniel",
               "note": "Lent weight, bone and a longer body.",
               "img": "/history/breeds/Sussex-Spaniel.jpg",
-              "value": 8.75,
               "children": [
                 {
                   "name": "Land spaniels",
@@ -16517,7 +16439,6 @@
               "name": "Clumber Spaniel",
               "note": "Heavier spaniel blood for substance.",
               "img": "/history/breeds/clumber-spaniel-photo.jpg",
-              "value": 5,
               "children": [
                 {
                   "name": "Land spaniels",
@@ -16539,7 +16460,6 @@
           "name": "Sussex Spaniel",
           "note": "A heavier, golden-liver spaniel that lent bone and a rich coat.",
           "img": "/history/breeds/Sussex-Spaniel.jpg",
-          "value": 20,
           "children": [
             {
               "name": "Land spaniels",
@@ -16884,7 +16804,6 @@
           "name": "Tweed Water Spaniel",
           "note": "A now-extinct local water dog that gave the gentle nature and love of water.",
           "img": "/history/breeds/tweed-water-spaniel.jpg",
-          "value": 30,
           "children": [
             {
               "name": "Water spaniels",
@@ -16904,13 +16823,11 @@
           "name": "Irish Setter",
           "note": "A dash of setter for the rich golden colour.",
           "img": "/history/breeds/irish-setter-photo.jpg",
-          "value": 15,
           "children": [
             {
               "name": "English Setter",
               "note": "The base setter type behind the breed's style and stance.",
               "img": "/history/breeds/british-setters.jpg",
-              "value": 5.25,
               "children": [
                 {
                   "name": "Old setting spaniels",
@@ -16922,13 +16839,11 @@
                   "name": "Pointer",
                   "note": "Spanish pointer blood for nose and a firm point.",
                   "img": "/history/breeds/british-pointers.jpg",
-                  "value": 1.575,
                   "children": [
                     {
                       "name": "English Foxhound",
                       "note": "Stamina, drive and a steady temperament.",
                       "img": "/history/breeds/english-foxhound.jpg",
-                      "value": 0.4725,
                       "children": [
                         {
                           "name": "Southern Hound",
@@ -16954,7 +16869,6 @@
                       "name": "Greyhound",
                       "note": "Speed and a racy, galloping build.",
                       "img": "/history/breeds/original-greyhound.jpg",
-                      "value": 0.39375,
                       "children": [
                         {
                           "name": "Celtic Hound",
@@ -16974,7 +16888,6 @@
                       "name": "Bloodhound",
                       "note": "A deeper nose for finding game.",
                       "img": "/history/breeds/Medieval-Bloodhound.jpg",
-                      "value": 0.39375,
                       "children": [
                         {
                           "name": "St Hubert Hound",
@@ -17010,7 +16923,6 @@
               "name": "Irish Water Spaniel",
               "note": "Native Irish spaniel blood for coat and a love of water.",
               "img": "/history/breeds/irish-water-spaniel.jpg",
-              "value": 3.75,
               "children": [
                 {
                   "name": "Old Irish water dogs",
@@ -17030,7 +16942,6 @@
               "name": "Gordon Setter",
               "note": "Another setter in the mix, adding substance and steadiness.",
               "img": "/history/breeds/gordon-setter-photo.jpg",
-              "value": 3,
               "children": [
                 {
                   "name": "Old black-and-tan setters",
@@ -17042,7 +16953,6 @@
                   "name": "Bloodhound",
                   "note": "Thought to have deepened the nose and the black-and-tan.",
                   "img": "/history/breeds/modern-bloodhound.jpg",
-                  "value": 0.6,
                   "children": [
                     {
                       "name": "St Hubert Hound",
@@ -17070,19 +16980,16 @@
               "name": "Pointer",
               "note": "A touch of pointer for nose and a wide-ranging hunt.",
               "img": "/history/breeds/british-pointers.jpg",
-              "value": 3,
               "children": [
                 {
                   "name": "English Foxhound",
                   "note": "Stamina, drive and a steady temperament.",
                   "img": "/history/breeds/english-foxhound.jpg",
-                  "value": 0.9,
                   "children": [
                     {
                       "name": "Southern Hound",
                       "note": "The deep-nosed scent hound at its foundation.",
                       "img": "/history/breeds/Southern-Hound.jpg",
-                      "value": 0.45,
                       "children": [
                         {
                           "name": "Talbot hounds",
@@ -17102,7 +17009,6 @@
                       "name": "Greyhound",
                       "note": "Added for speed and a cleaner, racier build.",
                       "img": "/history/breeds/original-greyhound.jpg",
-                      "value": 0.27,
                       "children": [
                         {
                           "name": "Celtic Hound",
@@ -17130,13 +17036,11 @@
                   "name": "Greyhound",
                   "note": "Speed and a racy, galloping build.",
                   "img": "/history/breeds/original-greyhound.jpg",
-                  "value": 0.75,
                   "children": [
                     {
                       "name": "Celtic Hound",
                       "note": "The old running hounds the Celts brought west.",
                       "img": "/history/breeds/celtic-hound-remake.jpg",
-                      "value": 0.45,
                       "children": [
                         {
                           "name": "Ancient eastern sighthounds",
@@ -17164,7 +17068,6 @@
                   "name": "Bloodhound",
                   "note": "A deeper nose for finding game.",
                   "img": "/history/breeds/Medieval-Bloodhound.jpg",
-                  "value": 0.75,
                   "children": [
                     {
                       "name": "St Hubert Hound",
@@ -17194,7 +17097,6 @@
           "name": "Bloodhound",
           "note": "A little hound blood for tracking power and a good nose.",
           "img": "/history/breeds/modern-bloodhound.jpg",
-          "value": 10,
           "children": [
             {
               "name": "St Hubert Hound",
@@ -17819,7 +17721,6 @@
           "name": "Fox Terrier",
           "note": "The old white-bodied fox-working terriers that are the breed's direct foundation.",
           "img": "/history/breeds/fox_terrier-img.jpg",
-          "value": 55,
           "children": [
             {
               "name": "Old English Black and Tan Terrier",
@@ -17831,7 +17732,6 @@
               "name": "English White Terrier",
               "note": "Lent the predominantly white, easy-to-see coat.",
               "img": "/history/breeds/english-white-terrier-painting.jpg",
-              "value": 13.75,
               "children": [
                 {
                   "name": "Old English White Terrier",
@@ -17851,7 +17751,6 @@
               "name": "Beagle",
               "note": "A dash of hound for nose and cry.",
               "img": "/history/breeds/beagle.jpg",
-              "value": 8.25,
               "children": [
                 {
                   "name": "Talbot hound",
@@ -17863,7 +17762,6 @@
                   "name": "Southern Hound",
                   "note": "Deep-nosed scent-hound blood.",
                   "img": "/history/breeds/Southern-Hound.jpg",
-                  "value": 2.8875,
                   "children": [
                     {
                       "name": "Talbot hounds",
@@ -17883,13 +17781,11 @@
                   "name": "Greyhound",
                   "note": "A little sighthound for speed and a tidy build.",
                   "img": "/history/breeds/original-greyhound.jpg",
-                  "value": 2.0625,
                   "children": [
                     {
                       "name": "Celtic Hound",
                       "note": "The old running hounds the Celts brought west.",
                       "img": "/history/breeds/celtic-hound-remake.jpg",
-                      "value": 1.2375,
                       "children": [
                         {
                           "name": "Ancient eastern sighthounds",
@@ -17919,19 +17815,16 @@
               "name": "Bull Terrier",
               "note": "A touch of bull blood for grit.",
               "img": "/bull-terrier-square.jpg",
-              "value": 8.25,
               "children": [
                 {
                   "name": "Bulldog",
                   "note": "Brought the power, the broad chest and the determined grip.",
                   "img": "/history/breeds/bulldog-photo.jpg",
-                  "value": 3.7125,
                   "children": [
                     {
                       "name": "Old English Bulldog",
                       "note": "The athletic bull-baiting dog at the root of it all, leaner and fiercer than today's Bulldog. Now extinct.",
                       "img": "/history/breeds/Old-English-Bulldog.jpg",
-                      "value": 2.2275,
                       "children": [
                         {
                           "name": "Mastiff and Alaunt war dogs",
@@ -17951,7 +17844,6 @@
                       "name": "Mastiff",
                       "note": "The old Molosser guard-and-war dogs that gave the breed its bulk and broad head.",
                       "img": "/history/breeds/medieval-british-mastiff.jpg",
-                      "value": 0.928125,
                       "children": [
                         {
                           "name": "Ancient Molossers",
@@ -17971,7 +17863,6 @@
                       "name": "Pug",
                       "note": "Crossed in during the 1800s to shorten the face and soften the temperament.",
                       "img": "/history/breeds/Asian-flat-faced-toys.jpg",
-                      "value": 0.556875,
                       "children": [
                         {
                           "name": "Ancient Chinese toy dogs",
@@ -17999,7 +17890,6 @@
                   "name": "Dalmatian",
                   "note": "Crossed in for size, substance and a pure white finish.",
                   "img": "/Dalmatian-square.jpg",
-                  "value": 1.2375,
                   "children": [
                     {
                       "name": "Ancient spotted hounds",
@@ -18011,7 +17901,6 @@
                       "name": "Pointer",
                       "note": "Pointing and hound blood that shaped its build and steady working head.",
                       "img": "/history/breeds/british-pointers.jpg",
-                      "value": 0.37125,
                       "children": [
                         {
                           "name": "English Foxhound",
@@ -18286,13 +18175,11 @@
           "name": "Brabant Bullenbeisser",
           "note": "The Brabant Bullenbeisser was the smaller, athletic German catch dog whose broad bite, square build and slightly upturned muzzle formed the immediate foundation of the modern Boxer. The FCI explicitly identifies it as the Boxer's direct ancestor. Now extinct.",
           "img": "/brabant-bullenbeisser.jpg",
-          "value": 75,
           "children": [
             {
               "name": "Great Bullenbeisser (Danziger Bullenbeisser)",
               "note": "The larger, heavier northern German bull-baiting dog from which the smaller Brabant variant descended. Standing around 60-65cm and 40-50kg, it was used to seize and hold boar, bear and bull by the muzzle. The Brabant line emerged as a smaller, more agile regional type. Now extinct.",
               "img": "/history/breeds/great-bullenbeisser.jpg",
-              "value": 60,
               "children": [
                 {
                   "name": "Medieval Alaunts and catch dogs",
@@ -18312,7 +18199,6 @@
               "name": "Old English Bulldog",
               "note": "The stocky bull-baiting dog of England, crossed into the Brabant line via documented cross-channel exchange of bull-baiting dogs in the 16th and 17th centuries. Contributed the shortened muzzle and broader head. Now extinct.",
               "img": "/history/breeds/Old-English-Bulldog.jpg",
-              "value": 40,
               "children": [
                 {
                   "name": "Mastiff and Alaunt war dogs",
@@ -18332,7 +18218,6 @@
               "name": "German Bullenbeisser types",
               "note": "A group of regional German catch and hunting dogs bred to seize and hold large prey — boar, bear, bull — by the muzzle. The larger types worked as boarhounds; the smaller Brabant line became the Boxer. Distinct from the taller, rangier German boarhound. Now extinct.",
               "img": "/history/breeds/Old-German-boarhounds.jpg",
-              "value": 65,
               "children": [
                 {
                   "name": "Medieval Alaunts and catch dogs",
@@ -18354,13 +18239,11 @@
           "name": "Old English Bulldog",
           "note": "The athletic bull-baiting Bulldog of the early 19th century — leaner and more active than today's breed. Crossed into the early Boxer to further shorten the muzzle and soften temperament. Now extinct.",
           "img": "/history/breeds/Old-English-Bulldog.jpg",
-          "value": 25,
           "children": [
             {
               "name": "English Mastiff",
               "note": "The ancient Molosser line of Britain. Gave the Bulldog its bone, bulk and broad head.",
               "img": "/history/breeds/english-mastiff-photo.jpg",
-              "value": 60,
               "children": [
                 {
                   "name": "Ancient Molossers",
@@ -18677,7 +18560,6 @@
           "name": "English Setter",
           "note": "The base setter type behind the breed's style and stance.",
           "img": "/history/breeds/british-setters.jpg",
-          "value": 35,
           "children": [
             {
               "name": "Old setting spaniels",
@@ -18689,19 +18571,16 @@
               "name": "Pointer",
               "note": "Spanish pointer blood for nose and a firm point.",
               "img": "/history/breeds/british-pointers.jpg",
-              "value": 10.5,
               "children": [
                 {
                   "name": "English Foxhound",
                   "note": "Stamina, drive and a steady temperament.",
                   "img": "/history/breeds/english-foxhound.jpg",
-                  "value": 3.15,
                   "children": [
                     {
                       "name": "Southern Hound",
                       "note": "The deep-nosed scent hound at its foundation.",
                       "img": "/history/breeds/Southern-Hound.jpg",
-                      "value": 1.575,
                       "children": [
                         {
                           "name": "Talbot hounds",
@@ -18721,7 +18600,6 @@
                       "name": "Greyhound",
                       "note": "Added for speed and a cleaner, racier build.",
                       "img": "/history/breeds/original-greyhound.jpg",
-                      "value": 0.945,
                       "children": [
                         {
                           "name": "Celtic Hound",
@@ -18749,13 +18627,11 @@
                   "name": "Greyhound",
                   "note": "Speed and a racy, galloping build.",
                   "img": "/history/breeds/original-greyhound.jpg",
-                  "value": 2.625,
                   "children": [
                     {
                       "name": "Celtic Hound",
                       "note": "The old running hounds the Celts brought west.",
                       "img": "/history/breeds/celtic-hound-remake.jpg",
-                      "value": 1.575,
                       "children": [
                         {
                           "name": "Ancient eastern sighthounds",
@@ -18783,7 +18659,6 @@
                   "name": "Bloodhound",
                   "note": "A deeper nose for finding game.",
                   "img": "/history/breeds/Medieval-Bloodhound.jpg",
-                  "value": 2.625,
                   "children": [
                     {
                       "name": "St Hubert Hound",
@@ -18819,7 +18694,6 @@
           "name": "Irish Water Spaniel",
           "note": "Native Irish spaniel blood for coat and a love of water.",
           "img": "/history/breeds/irish-water-spaniel.jpg",
-          "value": 25,
           "children": [
             {
               "name": "Old Irish water dogs",
@@ -18839,7 +18713,6 @@
           "name": "Gordon Setter",
           "note": "Another setter in the mix, adding substance and steadiness.",
           "img": "/history/breeds/gordon-setter-photo.jpg",
-          "value": 20,
           "children": [
             {
               "name": "Old black-and-tan setters",
@@ -18851,7 +18724,6 @@
               "name": "Bloodhound",
               "note": "Thought to have deepened the nose and the black-and-tan.",
               "img": "/history/breeds/modern-bloodhound.jpg",
-              "value": 4,
               "children": [
                 {
                   "name": "St Hubert Hound",
@@ -18879,19 +18751,16 @@
           "name": "Pointer",
           "note": "A touch of pointer for nose and a wide-ranging hunt.",
           "img": "/history/breeds/british-pointers.jpg",
-          "value": 20,
           "children": [
             {
               "name": "English Foxhound",
               "note": "Stamina, drive and a steady temperament.",
               "img": "/history/breeds/english-foxhound.jpg",
-              "value": 6,
               "children": [
                 {
                   "name": "Southern Hound",
                   "note": "The deep-nosed scent hound at its foundation.",
                   "img": "/history/breeds/Southern-Hound.jpg",
-                  "value": 3,
                   "children": [
                     {
                       "name": "Talbot hounds",
@@ -18911,13 +18780,11 @@
                   "name": "Greyhound",
                   "note": "Added for speed and a cleaner, racier build.",
                   "img": "/history/breeds/original-greyhound.jpg",
-                  "value": 1.8,
                   "children": [
                     {
                       "name": "Celtic Hound",
                       "note": "The old running hounds the Celts brought west.",
                       "img": "/history/breeds/celtic-hound-remake.jpg",
-                      "value": 1.08,
                       "children": [
                         {
                           "name": "Ancient eastern sighthounds",
@@ -18953,13 +18820,11 @@
               "name": "Greyhound",
               "note": "Speed and a racy, galloping build.",
               "img": "/history/breeds/original-greyhound.jpg",
-              "value": 5,
               "children": [
                 {
                   "name": "Celtic Hound",
                   "note": "The old running hounds the Celts brought west.",
                   "img": "/history/breeds/celtic-hound-remake.jpg",
-                  "value": 3,
                   "children": [
                     {
                       "name": "Ancient eastern sighthounds",
@@ -18987,7 +18852,6 @@
               "name": "Bloodhound",
               "note": "A deeper nose for finding game.",
               "img": "/history/breeds/Medieval-Bloodhound.jpg",
-              "value": 5,
               "children": [
                 {
                   "name": "St Hubert Hound",
