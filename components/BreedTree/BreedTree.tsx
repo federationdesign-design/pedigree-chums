@@ -2920,7 +2920,10 @@ export default function BreedTree({
       // thing that decided the size in the first place, so asking it directly
       // cannot disagree with what was drawn.
       const wordFits = d1.map((n) => {
-        const fit = fitLabel(n.data.name.toUpperCase(), n.r * k * LABEL_SAFE, isMobile ? 132 : 44, labelFont);
+        // Owner review: desktop takes the mobile fitter width, so the name
+        // wraps into short lines and sits inside its circle rather than
+        // running wide across the top of the stage.
+        const fit = fitLabel(n.data.name.toUpperCase(), n.r * k * LABEL_SAFE, 132, labelFont);
         const fs = Math.max(10, fit.fs + TITLE_BOOST) * PIT_WORD_SCALE;
         const wv = Math.max(...fit.lines.map((l) => measureEm(l, labelFont))) * fs;
         const hv = fit.lines.length * fs * LABEL_LINE_H;
