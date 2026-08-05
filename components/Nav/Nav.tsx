@@ -190,7 +190,7 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
     <header className={`pc-nav ${styles.bar} ${dockBottomLeft ? styles.barDock : ""} ${scrolled ? styles.scrolled : ""} ${showLogo ? styles.showLogo : ""}`} data-pc-logo={logoShowing ? "true" : "false"}>
       {/* Header contents hide while the menu is open -- no logo, no hamburger. */}
       {!open && !hideLogo && (
-        <Link href="/" className={styles.logo} aria-label="Pedigree Chums™ home">
+        <Link href="/home" className={styles.logo} aria-label="Pedigree Chums™ home">
           <Image src="/dogbingo.svg" alt="Pedigree Chums™" width={150} height={64} priority />
         </Link>
       )}
