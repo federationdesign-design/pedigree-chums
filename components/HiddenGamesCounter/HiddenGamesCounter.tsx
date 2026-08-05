@@ -176,7 +176,7 @@ export default function HiddenGamesCounter() {
       <div className={styles.intro} role="status" aria-live="polite">
         <span className={styles.introScore}><span className={styles.introScoreNum}>{state.count}/{state.total}</span><span className={styles.introScoreWord}>games found</span></span>
         <p className={styles.introLine}>{CAMPAIGN_INTRO}<br /><span className={styles.introEmphasis}>{CAMPAIGN_INTRO_EMPHASIS}</span></p>
-        <button type="button" className={styles.preludeClose} onClick={() => { setIntroClosed(true); getHiddenGamesEngine().markIntroSeen(); }} aria-label="Close">
+        <button type="button" className={styles.preludeClose} onClick={() => { setPhase("counter"); getHiddenGamesEngine().markIntroSeen(); }} aria-label="Close">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img className={styles.redIcon} src="/red-icon.svg" alt="" />
         </button>
