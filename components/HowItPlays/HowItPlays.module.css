@@ -153,3 +153,20 @@
     padding-top: clamp(30px, 8vw, 44px);
   }
 }
+
+/* Owner review: the badge was #1497d6 rather than the brand blue; the number
+   sat high in the circle; and the circle needs to overlap the card's corner
+   more than it did. */
+.badge {
+  background: #00a0e1;
+  top: -50px;
+  left: -38px;
+  padding-top: 5px;
+  box-sizing: border-box;
+}
+@media (max-width: 760px) {
+  .badge {
+    top: -40px;
+    left: -32px;
+  }
+}
