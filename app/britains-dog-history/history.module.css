@@ -853,12 +853,3 @@
   .factLabel { font-size: clamp(1.63rem, 3.3vw, 2.08rem); }
   .factText { font-size: clamp(0.95rem, 2.28vw, 1.11rem); }
 }
-
-/* Owner review: the LEARN flash on the strip cards halves on desktop. Mobile
-   is untouched, since the cards are already much smaller there. */
-@media (min-width: 761px) {
-  .deskFlashLearn,
-  .deskFlashPlay {
-    width: 22%;
-  }
-}
