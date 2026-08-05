@@ -290,7 +290,9 @@ export default function LineageModal({ name, image, character, lineage, onClose,
             it appears only once the round is running (owner ruling,
             4 August): the LEARN title owns that band on the start screen,
             and the note still precedes any break panel. */}
-        {(!isNarrow || running) && (
+        {/* Owner review: the note is off the start screen and the learn area
+            entirely -- it belongs to a running round only. */}
+        {running && !learningActive && (
           <p className={css.globalNote}>
             These family trees show likely historical influences. Ancient and medieval dogs were working types, not modern standardised breeds, so the percentages are illustrative rather than measured genetic results.
           </p>
