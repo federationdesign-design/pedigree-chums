@@ -1136,3 +1136,17 @@
       rgba(0, 169, 239, 0) 100%);
   }
 }
+
+/* Owner review: the mobile fan returns to full size. Task 121 shrank it to
+   0.48 so all four dogs fit a 320px phone; at 1 the outer ones may run off,
+   which is the trade being made here deliberately. */
+@media (max-width: 480px) {
+  .launcher,
+  .root {
+    --pc-selector-scale: 1;
+  }
+  /* The close X counter-scaled against 0.48, so it no longer needs to. */
+  .selectorClose {
+    transform: none;
+  }
+}
