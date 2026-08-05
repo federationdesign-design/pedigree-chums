@@ -7,7 +7,7 @@ import PitchPanel from "../../components/PitchPanel/PitchPanel";
 import PhotoSplit from "../../components/PhotoSplit/PhotoSplit";
 import PopHeading from "../../components/PopHeading/PopHeading";
 import Footer from "../../components/Footer/Footer";
-import StepCards from "../../components/StepCards/StepCards";
+import HowItPlays from "../../components/HowItPlays/HowItPlays";
 import SocialFeed from "../../components/SocialFeed/SocialFeed";
 import styles from "../page.module.css";
 
@@ -69,7 +69,7 @@ export default function About() {
           <div style={{ textAlign: "center", marginBottom: 8 }}>
             <PopHeading className="display">How it plays</PopHeading>
           </div>
-          <StepCards />
+          <HowItPlays />
         </section>
 
         <section className={styles.feedSection}>
