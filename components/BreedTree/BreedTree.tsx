@@ -2571,23 +2571,22 @@ export default function BreedTree({
           l.setAttribute("transform", "translate(0,0)");
         } else {
           const childR = d.r * k;
-          if (isMobileRef.current) {
-            // circles touch and vary in size, so the label sits centred on its
-            // circle and scales with it (small circle, small label)
+          {
+            // Circles touch and vary in size, so the label sits centred on its
+            // circle and scales with it: small circle, small label.
+            //
+            // DESKTOP USES THIS TOO now. It used to have its own branch that put
+            // the label ABOVE or BELOW the circle, `ty - childR - 70`, clamped
+            // into the canvas. That is why desktop names sat outside their
+            // circles and ran across the top of the stage.
+            //
+            // Worth recording, because it was attacked twice from the wrong end:
+            // two earlier commits raised the fitter's font cap from 44 to 132 and
+            // both were reverted. The cap was never the cause. The fitter picks
+            // four lines that fit inside the circle on desktop already; the
+            // label was simply being positioned somewhere else afterwards.
             const ls = Math.max(0.4, Math.min(1.25, childR / 250));
             l.setAttribute("transform", `translate(${tx},${ty}) scale(${ls})`);
-          } else {
-            // Desktop: labels sit above or below their circle (never to the side,
-            // so they do not run off the narrow horizontal edges), centred and
-            // clamped to stay inside the canvas.
-            const vbWl = aspect >= 1 ? SIZE * aspect : SIZE;
-            const vbHl = aspect >= 1 ? SIZE : SIZE / aspect;
-            const xMinl = aspect >= 1 ? -vbWl * shift : -vbWl / 2;
-            const margin = 120;
-            const lx = Math.max(xMinl + margin, Math.min(xMinl + vbWl - margin, tx));
-            let ly = ty < 0 ? ty - childR - 70 : ty + childR + 70;
-            ly = Math.max(-vbHl / 2 + 60, Math.min(vbHl / 2 - 110, ly));
-            l.setAttribute("transform", `translate(${lx},${ly})`);
           }
         }
       }
@@ -5151,7 +5150,10 @@ export default function BreedTree({
                       // third too large and long names ran over the rim.
                       const vL = viewRef.current;
                       const kL = SIZE / vL[2];
-                      const ls = isMobile ? Math.max(0.4, Math.min(1.25, (d.r * kL) / 250)) : 1;
+                      // No longer gated on isMobile: zoomTo scales EVERY label
+                      // group by ls now, so the fit has to allow for it on both.
+                      // Leaving this at 1 on desktop was half the mismatch.
+                      const ls = Math.max(0.4, Math.min(1.25, (d.r * kL) / 250));
                       // Fit inside the ring's INNER EDGE, not to the packed
                       // radius and not merely to the drawn one. A ring eats into
                       // the picture from the rim inwards, so anything fitted
@@ -5166,11 +5168,17 @@ export default function BreedTree({
                       const ringPx = strokeWidthFor(d) * strokeK(vL);
                       const clearWorld = (ringInset(d, vL) + ringPx / 2) / kL;
                       const rDrawn = Math.max(1, d.r - clearWorld);
-                      const rFit = isMobile ? (rDrawn * kL) / ls : rDrawn;
+                      // Screen units on both now. Desktop fitted against the
+                      // WORLD radius while the text was drawn in a group scaled
+                      // to screen, so the two disagreed by a factor of k.
+                      const rFit = (rDrawn * kL) / ls;
                       // the ceiling the fitter may grow to. Raised with
                       // LABEL_SAFE so short names are not capped before they
                       // reach the rim.
-                      const cap = isMobile ? 132 : 44;
+                      // 132 on both, because both now fit in screen units. 44
+                      // belonged to the old world-unit desktop path and would
+                      // clamp the type hard in this space.
+                      const cap = 132;
                       const fit = fitLabel(d.data.name.toUpperCase(), rFit, cap, labelFont);
                       const lines = fit.lines;
                       const fs = Math.max(10, Math.min(cap, fit.fs + TITLE_BOOST));
