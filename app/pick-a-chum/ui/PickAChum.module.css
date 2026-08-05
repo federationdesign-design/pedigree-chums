@@ -1150,3 +1150,17 @@
     transform: none;
   }
 }
+
+/* Owner review: the dogs and the arc shrink to fit a 360px screen, while the
+   shout icon at the centre keeps its full size -- it is the launcher showing
+   through rather than part of the scaled fan. */
+@media (max-width: 480px) {
+  .launcher,
+  .root {
+    --pc-selector-scale: 0.6;
+  }
+  .selectorClose {
+    transform: scale(1.67);
+    transform-origin: center;
+  }
+}
