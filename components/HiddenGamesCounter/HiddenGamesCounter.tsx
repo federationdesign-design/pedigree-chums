@@ -150,10 +150,10 @@ export default function HiddenGamesCounter() {
     if (preludeClosed) return null;
     return (
       <div className={styles.prelude} role="status" aria-live="polite">
-        <img className={styles.preludeIcon} src="/prelude-icon2.svg" alt="" />
+        <img className={styles.preludeIcon} src="/prelude-icon-redux.svg" alt="" />
         <div className={styles.preludeText}>
           <p className={styles.preludeWarning}>{PRELUDE_WARNING}</p>
-          <p className={styles.preludeHeading} data-hg-aa-exception>{PRELUDE_HEADING}</p>
+          <p className={styles.preludeHeading} style={{ whiteSpace: "pre-line" }} data-hg-aa-exception>{PRELUDE_HEADING}</p>
         </div>
         <button
           type="button"

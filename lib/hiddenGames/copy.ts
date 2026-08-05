@@ -32,7 +32,7 @@ export const COMPLETION_BODY =
 // CHANGE-LIST C03 prelude card, owner-approved verbatim. Line 1 renders in
 // Unica One, line 2 in Luckiest Guy (the display font).
 export const PRELUDE_WARNING = "Warning:";
-export const PRELUDE_HEADING = "THIS WEBSITE MAY CONTAIN GAMES";
+export const PRELUDE_HEADING = "This website may\ncontain games";
 
 // CHANGE-LIST C02 discovery toast, owner-approved verbatim. {remaining} is
 // resolved from the registry (total - count), never written into the copy as a

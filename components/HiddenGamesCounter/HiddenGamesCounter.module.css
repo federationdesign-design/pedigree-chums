@@ -269,3 +269,159 @@
     max-width: min(280px, calc(100vw - 24px));
   }
 }
+
+/* ── Prelude restyle: three layers ──────────────────────────────
+   1. a 45deg gradient, dark blue 001ae0 to light blue 62c9f3
+   2. the paw pattern over it
+   3. a dark navy stroke, 141544
+   The card is the stacking context; the pattern rides in ::before so the
+   content sits above it untouched. */
+.prelude.prelude {
+  position: fixed;
+  overflow: hidden;
+  isolation: isolate;
+  background: linear-gradient(45deg, #001ae0 0%, #62c9f3 100%);
+  border: 3px solid #141544;
+  box-shadow: 0 14px 34px rgba(10, 58, 87, 0.35);
+}
+.prelude.prelude::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("/paw-pattern2.svg");
+  background-repeat: repeat;
+  background-size: 120px auto;
+  opacity: 0.28;
+  pointer-events: none;
+  z-index: 0;
+}
+.prelude.prelude > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* The icon sits slightly off-axis. */
+.preludeIcon {
+  transform: rotate(-6deg);
+  transform-origin: center;
+}
+
+/* Mohave for the warning and the heading. */
+.prelude .preludeWarning,
+.prelude .preludeHeading {
+  font-family: var(--font-mohave), var(--font-body), system-ui, sans-serif;
+  font-weight: 700;
+}
+
+/* ── Prelude v2: smaller card, right-aligned text, icon breaks the frame ── */
+.prelude.prelude {
+  max-width: min(542px, calc(100vw - 40px));
+  padding: 22px 64px 22px 26px;
+  gap: 19px;
+  /* The icon overhangs the top-left corner, so the card cannot clip it. */
+  overflow: visible;
+}
+/* The pattern still needs clipping, so it takes the radius itself. */
+.prelude.prelude::before {
+  border-radius: 21px;
+  overflow: hidden;
+}
+/* Out of the box, top and left, like the reference. */
+.preludeIcon {
+  width: 250px;
+  margin-top: -64px;
+  margin-left: -60px;
+  margin-bottom: -20px;
+  transform: rotate(-6deg);
+  transform-origin: center;
+  position: relative;
+  z-index: 2;
+}
+.preludeText {
+  align-items: flex-end;
+  text-align: right;
+}
+.prelude .preludeWarning,
+.prelude .preludeHeading {
+  font-family: var(--font-mohave), var(--font-body), system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 1.55rem;
+  line-height: 1.05;
+  color: #ffffff;
+  text-transform: none;
+  margin: 0;
+  text-align: right;
+}
+
+/* Prelude v3: the whole card shifts up and right; warning in navy. */
+.prelude.prelude {
+  transform: translate(50px, -50px);
+}
+.prelude .preludeWarning {
+  color: #141544;
+}
+
+/* Prelude v4: text sits closer to the right edge; the close mark gets a
+   white ring so it reads against the gradient. */
+.prelude.prelude {
+  padding-right: 30px;
+}
+.prelude .preludeClose {
+  top: 12px;
+  right: 12px;
+  background: #ffffff;
+  border-radius: 999px;
+  padding: 5px;
+  box-shadow: 0 2px 8px rgba(10, 58, 87, 0.3);
+}
+
+/* Prelude v5: the close mark straddles the top-right corner, outlined in
+   white rather than sitting on a white disc. */
+.prelude .preludeClose {
+  top: -18px;
+  right: -14px;
+  background: transparent;
+  border-radius: 0;
+  padding: 0;
+  box-shadow: none;
+  z-index: 3;
+}
+.prelude .redIcon {
+  width: 52px;
+  height: 52px;
+  filter:
+    drop-shadow(2px 0 0 #fff) drop-shadow(-2px 0 0 #fff)
+    drop-shadow(0 2px 0 #fff) drop-shadow(0 -2px 0 #fff);
+}
+
+/* v6: the corner rule above set position:relative on every child, which
+   demoted the close button out of absolute positioning. Restore it. */
+.prelude.prelude .preludeClose {
+  position: absolute;
+  top: -20px;
+  right: -18px;
+}
+
+/* v7: smaller close mark, card nudged left, heading breaks two-and-two. */
+.prelude .redIcon {
+  width: 36px;
+  height: 36px;
+}
+.prelude.prelude {
+  transform: translate(40px, -50px);
+}
+.prelude .preludeHeading {
+  max-width: 11ch;
+  margin-left: auto;
+}
+
+/* v8: card back to full width with an explicit line break, close mark down 6. */
+.prelude .preludeHeading {
+  max-width: none;
+}
+.prelude.prelude .preludeClose {
+  top: -14px;
+}
+.prelude.prelude {
+  transform: translate(30px, -50px);
+}

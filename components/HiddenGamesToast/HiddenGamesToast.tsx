@@ -31,6 +31,8 @@ export default function HiddenGamesToast() {
   // Auto-dismiss.
   useEffect(() => {
     if (!toast) return;
+    // ?toast=hold pins it open for design review. No effect otherwise.
+    if (typeof window !== "undefined" && new URLSearchParams(window.location.search).get("toast") === "hold") return;
     const t = window.setTimeout(() => setToast(null), TOAST_MS);
     return () => window.clearTimeout(t);
   }, [toast]);

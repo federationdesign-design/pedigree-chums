@@ -1521,3 +1521,11 @@
     margin-bottom: 0 !important;
   }
 }
+
+/* Bull's-eye: breathing room around the inline figures and the timeline title. */
+.essayBody.essayBody > * + figure,
+.essayBody.essayBody > figure + * { margin-top: 48px !important; }
+.timelineScene { padding-top: 40px; }
+
+/* Bad-dog essays get a red verdict strip rather than the green. */
+.verdict.verdictBad { background: #ef4444; }
