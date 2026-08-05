@@ -1029,3 +1029,11 @@
 .chumWedge {
   transform: translateZ(1px);
 }
+
+/* Mobile: the card back has too little room for the write-up, so it cropped.
+   The green button and the dog's name carry it instead. */
+@media (max-width: 640px) {
+  .flipNote { display: none; }
+  .flipHint { font-size: 1.05rem !important; padding: 14px 20px 10px; }
+  .flipName { font-size: 1.3rem !important; }
+}

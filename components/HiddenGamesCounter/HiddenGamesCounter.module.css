@@ -653,3 +653,27 @@
 .prelude.prelude { overflow: visible; }
 .prelude.prelude .preludeClose { z-index: 5; overflow: visible; }
 .prelude.prelude .redIcon { overflow: visible; }
+
+/* The counter moves from the bottom-left corner to just below the logo,
+   top left. The launcher sits beside the logo, so this tucks under both. */
+.counter.counter, .reveal.reveal {
+  bottom: auto;
+  top: calc(clamp(96px, 12vh, 132px) + env(safe-area-inset-top, 0px));
+  left: clamp(12px, 3vw, 22px);
+}
+
+/* The corner work set position:relative on the counter so the close mark could
+   sit against its edge. That demoted it out of fixed positioning, so the move
+   below the logo never applied. Fixed again, with the mark absolute inside it. */
+.counter.counter {
+  position: fixed;
+  top: calc(clamp(96px, 12vh, 132px) + env(safe-area-inset-top, 0px));
+  bottom: auto;
+  left: clamp(12px, 3vw, 22px);
+}
+
+/* The discovery toast joins them: top left, below the counter, in the same
+   campaign styling rather than a bare navy chip. */
+.toast {
+  top: auto;
+}

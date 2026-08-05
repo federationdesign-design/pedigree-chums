@@ -46,7 +46,36 @@ export default function HiddenGamesCounter() {
     () => null
   );
 
-  const [minimised, setMinimised] = useState(false);
+  // Task 136: the counter now sits under the logo, so it follows the logo.
+  // Same signal the chat launcher uses: the nav publishes data-pc-logo on its
+  // header. Pages with no logo never set it true, so the counter stays hidden.
+  const [logoShowing, setLogoShowing] = useState(false);
+  useEffect(() => {
+    let current: Element | null = null;
+    const sync = () => setLogoShowing(current?.getAttribute('data-pc-logo') === 'true');
+    const obs = new MutationObserver(sync);
+    const attach = () => {
+      const header = document.querySelector('header.pc-nav');
+      if (header && header !== current) {
+        obs.disconnect();
+        current = header;
+        obs.observe(header, { attributes: true, attributeFilter: ['data-pc-logo'] });
+      }
+      sync();
+    };
+    attach();
+    window.addEventListener('pc:logo', attach as EventListener);
+    return () => {
+      obs.disconnect();
+      window.removeEventListener('pc:logo', attach as EventListener);
+    };
+  }, []);
+
+  // Task 136: condensed by DEFAULT. Desktop expands on hover and collapses when
+  // the cursor leaves; mobile has no hover, so a tap toggles it and it stays
+  // open until tapped again.
+  const [minimised, setMinimised] = useState(true);
+  const [pinned, setPinned] = useState(false);
   const [blockedDismissed, setBlockedDismissed] = useState(false);
   const [completionCollapsed, setCompletionCollapsed] = useState(false);
   const [phase, setPhase] = useState<Phase>("pending");
@@ -184,13 +213,21 @@ export default function HiddenGamesCounter() {
     );
   }
 
+  if (!logoShowing) return null;
+
   // phase === "counter"
+  const expand = () => setMinimised(false);
+  const collapse = () => { if (!pinned) setMinimised(true); };
+  const toggle = () => { setPinned((p) => !p); setMinimised((m) => !m); };
+
   if (minimised) {
     return (
       <button
         type="button"
         className={styles.reveal}
-        onClick={() => setMinimised(false)}
+        onMouseEnter={expand}
+        onFocus={expand}
+        onClick={toggle}
         aria-label={`Show hidden games progress, ${state.label}`}
       >
         {state.count}/{state.total}
@@ -200,7 +237,7 @@ export default function HiddenGamesCounter() {
 
   return (
     <>
-      <div className={styles.counter} role="status" aria-live="polite">
+      <div className={styles.counter} role="status" aria-live="polite" onMouseLeave={collapse}>
         <span className={styles.label}>{state.label}</span>
         <button
           type="button"

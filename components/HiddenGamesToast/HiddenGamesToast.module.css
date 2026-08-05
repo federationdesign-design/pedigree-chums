@@ -39,3 +39,37 @@
     animation: none;
   }
 }
+
+/* Campaign styling, and it sits below the counter rather than top-centre. */
+.toast.toast {
+  top: calc(clamp(152px, 18vh, 196px) + env(safe-area-inset-top, 0px));
+  left: clamp(12px, 3vw, 22px);
+  transform: none;
+  background: linear-gradient(45deg, #001ae0 0%, #62c9f3 100%);
+  border: 3px solid #141544;
+  color: #ffffff;
+  font-family: var(--font-mohave), var(--font-body), system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 1.05rem;
+  text-align: left;
+  padding: 14px 20px;
+  border-radius: 21px;
+}
+@keyframes hgToastIn {
+  from { opacity: 0; transform: translateY(-12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Sits exactly where the counter sits, covering it, rather than below. */
+.toast.toast {
+  top: calc(clamp(96px, 12vh, 132px) + env(safe-area-inset-top, 0px));
+  left: clamp(12px, 3vw, 22px);
+}
+
+/* Match the counter's pill radius, and let the line run rather than wrapping. */
+.toast.toast {
+  border-radius: 999px;
+  max-width: none;
+  width: max-content;
+  white-space: nowrap;
+}
