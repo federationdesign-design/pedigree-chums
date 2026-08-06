@@ -370,6 +370,21 @@ export default function ShareCard(props: ShareCardProps) {
         </svg>
       </button>
 
+      {/* The site menu, in the place it sits on every other mobile screen. This
+          overlay is above the nav, so the real burger is covered; rather than
+          rebuild the menu, this dispatches the pc:open-menu event Nav already
+          listens for, so there is one menu and one source of truth. */}
+      <button
+        type="button"
+        className={css.menuBtn}
+        onClick={() => window.dispatchEvent(new CustomEvent("pc:open-menu"))}
+        aria-label="Open menu"
+      >
+        <span />
+        <span />
+        <span />
+      </button>
+
       <div className={css.inner}>
         {/* Which card to post. Two options, so a segmented pair rather than a
             dropdown: both are one tap and the choice stays visible. */}
