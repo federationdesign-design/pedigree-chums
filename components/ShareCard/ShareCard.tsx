@@ -268,28 +268,47 @@ export default function ShareCard(props: ShareCardProps) {
             tracks the artwork at any display size. */}
         <div className={css.cardWrap}>
           <canvas ref={canvasRef} width={W} height={H} className={css.canvas} />
-          {!picking && (
-            <button
-              type="button"
-              className={css.shareThis}
-              onClick={() => setPicking(true)}
-              aria-label="Share this"
-              title="Share this"
-            />
+          {/* The button is drawn INTO the card, because the card is what gets
+              posted. This takes the tap, sized as a percentage of the canvas so
+              it tracks the artwork at any display size. */}
+          <button
+            type="button"
+            className={css.shareThis}
+            onClick={() => setPicking((o) => !o)}
+            aria-expanded={picking}
+            aria-label="Share this"
+            title="Share this"
+          />
+
+          {picking && (
+            <>
+              {/* A tap anywhere else closes it, the way the name generator's
+                  popout does. */}
+              <div className={css.backdrop} onClick={() => setPicking(false)} />
+              <div role="menu" className={css.menu}>
+                <p className={css.menuTitle}>Pick a caption to share</p>
+                <div className={css.menuScroll}>
+                  {captionsFor(rate).map((fn, i) => (
+                    <button
+                      key={i}
+                      type="button"
+                      role="menuitem"
+                      className={css.caption}
+                      disabled={busy}
+                      onClick={() => { setPicking(false); shareWith(fn(props)); }}
+                    >
+                      <span className={css.captionText}>{fn(props)}</span>
+                      <span className={css.captionTags}>{TAG}</span>
+                    </button>
+                  ))}
+                </div>
+                <span className={css.menuTail} aria-hidden="true" />
+              </div>
+            </>
           )}
         </div>
 
-        {picking && (
-        <div className={css.picker}>
-          <p className={css.pickerTitle}>Pick a caption</p>
-          {captionsFor(rate).map((fn, i) => (
-            <button key={i} type="button" className={css.caption} disabled={busy} onClick={() => shareWith(fn(props))}>
-              {fn(props)}
-            </button>
-          ))}
-          {note && <p className={css.note}>{note}</p>}
-        </div>
-        )}
+        {note && <p className={css.note}>{note}</p>}
       </div>
     </div>
   );

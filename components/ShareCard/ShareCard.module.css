@@ -84,45 +84,88 @@
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.45);
 }
 
-.picker {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+/* THE CAPTION POPOUT, copied from the name generator's podium share so the two
+   behave the same way: a navy panel above the button with a tail pointing down
+   at it, and a backdrop that closes it on any tap outside.
+   It is anchored to the card rather than the page, because the button it belongs
+   to is drawn INTO the card at 64.46% down, so the panel sits just above that. */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 4;
 }
-.pickerTitle {
-  margin: 0 0 2px;
-  text-align: center;
-  font-family: var(--font-display, "Luckiest Guy", system-ui), sans-serif;
-  font-size: 1.5rem;
-  color: #ffffff;
-  letter-spacing: 0.02em;
+.menu {
+  position: absolute;
+  bottom: calc(35.54% + 14px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 5;
+  width: min(360px, 86vw);
+  background: var(--navy, #0a3a57);
+  border-radius: 16px;
+  box-shadow: 0 14px 44px rgba(10, 58, 87, 0.45);
+  padding: 12px 10px 10px;
+  text-align: left;
+  line-height: normal;
 }
-
-/* Five captions, not five platforms: the phone's own share sheet picks the app.
-   Left aligned because they are sentences, not labels. */
+.menuTitle {
+  margin: 2px 8px 10px;
+  font-family: var(--font-body, Montserrat, system-ui), sans-serif;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--yellow, #ffd23e);
+}
+/* Scrollable, because five captions on a small phone are taller than the space
+   above the button. Momentum scrolling so it feels native rather than stuck. */
+.menuScroll {
+  max-height: min(46vh, 320px);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
 .caption {
+  display: block;
   width: 100%;
   text-align: left;
-  font-family: var(--font-body, Montserrat, system-ui), sans-serif;
-  font-size: 0.95rem;
-  font-weight: 600;
-  line-height: 1.3;
-  color: var(--navy, #0a3a57);
-  background: var(--cream, #fff8e6);
-  border: 4px solid var(--navy, #0a3a57);
-  border-radius: 14px;
-  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-bottom: 6px;
   cursor: pointer;
-}
-.caption:hover {
-  background: var(--yellow, #ffd23e);
+  font-family: var(--font-body, Montserrat, system-ui), sans-serif;
+  font-size: 0.8rem;
+  line-height: 1.4;
 }
 .caption:disabled {
   opacity: 0.6;
   cursor: default;
 }
-
+.captionText {
+  display: block;
+  color: #ffffff;
+  font-weight: 700;
+}
+.captionTags {
+  display: block;
+  margin-top: 4px;
+  color: var(--yellow, #ffd23e);
+  font-weight: 600;
+}
+/* The tail, pointing down at the button it came from. */
+.menuTail {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 9px solid transparent;
+  border-right: 9px solid transparent;
+  border-top: 9px solid var(--navy, #0a3a57);
+}
 .note {
   margin: 2px 0 0;
   text-align: center;
