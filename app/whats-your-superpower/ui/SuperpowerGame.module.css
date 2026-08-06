@@ -61,21 +61,6 @@
   background: var(--sp-ground) url("/superhero-power.jpg") center / cover no-repeat;
 }
 
-/* Legibility, not decoration. Weakest at the top where the photograph is
-   worth seeing, strongest at the foot where the text and button sit. */
-.introTint {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  background: linear-gradient(
-    180deg,
-    rgba(11, 18, 32, 0.25) 0%,
-    rgba(11, 18, 32, 0.72) 45%,
-    rgba(11, 18, 32, 0.94) 100%
-  );
-}
-
 .introBody {
   position: relative;
   z-index: 2;
@@ -115,7 +100,7 @@
 .introTime {
   font-family: var(--font-body, "Montserrat", sans-serif);
   font-size: 0.85rem;
-  color: var(--sp-ink-soft);
+  color: #ffffff;
   margin: 0;
 }
 
@@ -140,7 +125,7 @@
   background: var(--sp-green);
   color: #ffffff;
   font-family: var(--font-display, "Luckiest Guy", cursive);
-  font-size: clamp(0.85rem, 4.2vw, 1.3rem);
+  font-size: clamp(1.7rem, 8.4vw, 2.6rem);
   letter-spacing: 0.04em;
   white-space: nowrap;
   cursor: pointer;
@@ -189,21 +174,27 @@
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   box-sizing: border-box;
-  padding: 18px 24px 42px;
+  padding: 20px 24px 42px;
   background: var(--sp-ground);
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  gap: 12px;
+  justify-content: flex-start;
+  gap: 14px;
 }
 
+ /* Sits over the foot of the image band, not in the text panel. The tint
+    beneath it is what keeps it legible on a light photograph. */
 .progress {
+  position: absolute;
+  left: 24px;
+  bottom: 12px;
+  z-index: 2;
   font-family: var(--font-body, "Montserrat", sans-serif);
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--sp-ink-mute);
+  color: #ffffff;
   margin: 0;
 }
 
@@ -211,14 +202,14 @@
   font-family: var(--font-body, "Montserrat", sans-serif);
   font-size: clamp(1.05rem, 4.6vw, 1.35rem);
   font-weight: 700;
-  line-height: 1.3;
+  line-height: 1.1em;
   color: var(--sp-ink);
   margin: 0;
 }
 
 .answers {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 12px;
   margin-top: 4px;
 }
@@ -233,10 +224,11 @@
   background: var(--sp-green);
   color: #ffffff;
   font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: 1rem;
+  /* One point down from 1rem: 16px is 12pt, so 11pt is 14.67px. */
+  font-size: 0.917rem;
   font-weight: 700;
   line-height: 1.3;
-  text-align: left;
+  text-align: center;
   cursor: pointer;
   box-shadow: 0 4px 0 var(--sp-green-deep);
 }
@@ -295,31 +287,21 @@
   gap: 10px;
 }
 
-.resultTitle {
-  font-family: var(--font-display, "Luckiest Guy", cursive);
-  font-size: clamp(1.8rem, 8vw, 2.6rem);
-  letter-spacing: 0.03em;
-  line-height: 1.05;
-  color: var(--yellow, #ffd23e);
-  margin: 0;
+/* Hidden from view but left in the accessibility tree: it is the slide's
+   only heading, and the result must stand up without the chart. */
+.resultTitleHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
-.resultLine {
-  font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: 1rem;
-  font-weight: 600;
-  line-height: 1.4;
-  color: var(--sp-ink);
-  margin: 0;
-}
 
-.summary {
-  font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: 0.95rem;
-  line-height: 1.45;
-  color: var(--sp-ink-soft);
-  margin: 0;
-}
 
 .mainBlock {
   border: 1px solid var(--sp-line);
@@ -331,10 +313,12 @@
 
 .mainBlockTitle {
   font-family: var(--font-display, "Luckiest Guy", cursive);
-  font-size: 1.15rem;
+  font-size: 2.3rem;
+  line-height: 1.05;
   letter-spacing: 0.03em;
+  text-align: center;
   color: var(--sp-ink);
-  margin: 0 0 6px;
+  margin: 0 0 8px;
 }
 
 .blockRow {
@@ -353,26 +337,23 @@
 
 .compactPower {
   font-family: var(--font-display, "Luckiest Guy", cursive);
-  font-size: 1rem;
+  font-size: 2rem;
+  line-height: 1.05;
   letter-spacing: 0.03em;
+  text-align: center;
   color: var(--yellow, #ffd23e);
-  margin: 0 0 4px;
+  margin: 0 0 6px;
 }
 
-.compactTitle {
-  font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: var(--sp-ink);
-  margin: 0 0 4px;
-}
 
 .blockBody {
   font-family: var(--font-body, "Montserrat", sans-serif);
   font-size: 0.88rem;
-  line-height: 1.45;
-  color: var(--sp-ink-soft);
-  margin: 0 0 6px;
+  font-weight: 500;
+  line-height: 1.1em;
+  text-align: center;
+  color: var(--sp-ink);
+  margin: 0 0 8px;
 }
 .blockBody:last-child {
   margin-bottom: 0;
@@ -407,13 +388,6 @@
   background: var(--yellow, #ffd23e);
 }
 
-.relativeExplanation {
-  font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: 0.8rem;
-  line-height: 1.45;
-  color: var(--sp-ink-mute);
-  margin: 8px 0 0;
-}
 
 .restartRow {
   display: flex;
@@ -422,33 +396,6 @@
   margin-top: 10px;
 }
 
-.replay {
-  font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: 0.8rem;
-  color: var(--sp-ink-mute);
-  margin: 0;
-  text-align: center;
-}
-
-/* ------------------------------------------------------- boundary statement */
-
-/* Required before Start and on the result screen, visible without scrolling
-   at 320px (spec section 2). */
-.boundary {
-  font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: 0.78rem;
-  line-height: 1.4;
-  color: var(--sp-ink-mute);
-  margin: 6px 0 0;
-}
-
-.boundaryLight {
-  font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: 0.78rem;
-  line-height: 1.4;
-  color: rgba(255, 255, 255, 0.82);
-  margin: 0;
-}
 
 /* ------------------------------------------------------------- progress bar */
 

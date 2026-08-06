@@ -43,29 +43,10 @@ const freshState = (): GameState => ({
   started: false,
 });
 
-function BoundaryStatement({ tone }: { tone?: "light" }) {
-  return (
-    <p className={tone === "light" ? styles.boundaryLight : styles.boundary}>
-      {config.copy.boundary}
-    </p>
-  );
-}
-
-function CompactBlock({
-  power,
-  showMainTitle,
-  bodyText,
-}: {
-  power: Power;
-  showMainTitle: boolean;
-  bodyText: string;
-}) {
+function CompactBlock({ power, bodyText }: { power: Power; bodyText: string }) {
   return (
     <div className={styles.compactBlock}>
       <h3 className={styles.compactPower}>{power}</h3>
-      {showMainTitle ? (
-        <p className={styles.compactTitle}>{config.powerMeta[power].mainTitle}</p>
-      ) : null}
       <p className={styles.blockBody}>{bodyText}</p>
     </div>
   );
@@ -126,6 +107,19 @@ export default function SuperpowerGame() {
     return resolveResult(answersByQuestion as AnswerLetter[], config);
   }, [complete, answersByQuestion]);
 
+  // The result slide does not exist until every question is answered, so the
+  // scroll to it must wait for the render that adds it to the rail.
+  const settledRef = useRef(false);
+  useEffect(() => {
+    if (!complete) {
+      settledRef.current = false;
+      return;
+    }
+    if (settledRef.current) return;
+    settledRef.current = true;
+    goTo(resultSlide);
+  }, [complete, goTo, resultSlide]);
+
   const start = () => {
     trackEvent("game_start");
     setState((prev) => ({ ...prev, started: true }));
@@ -149,7 +143,9 @@ export default function SuperpowerGame() {
       }
       return { ...prev, answersByQuestion: answers };
     });
-    goTo(index + 2);
+    // Every question but the last. The last is handled by the effect above,
+    // once the result slide exists.
+    if (index < QUESTION_COUNT - 1) goTo(index + 2);
   };
 
   const progressPct = (100 * Math.min(slide, resultSlide)) / resultSlide;
@@ -159,7 +155,6 @@ export default function SuperpowerGame() {
       {/* ---- Slide 0: the intro ------------------------------------------ */}
       <section className={styles.slide} aria-label="Start">
         <div className={styles.introImg} />
-        <div className={styles.introTint} />
         <div className={styles.introBody}>
           <h1 className={styles.introTitle}>
             What&apos;s Your
@@ -168,7 +163,6 @@ export default function SuperpowerGame() {
           </h1>
           <p className={styles.introText}>{config.copy.promise}</p>
           <p className={styles.introTime}>{config.copy.completionTime}</p>
-          <BoundaryStatement tone="light" />
           <div className={styles.introBtnRow}>
             <button type="button" className={styles.introBtn} onClick={start}>
               Start
@@ -195,12 +189,12 @@ export default function SuperpowerGame() {
                 loading={index < 2 ? "eager" : "lazy"}
               />
               <div className={styles.qMediaTint} />
-            </div>
-
-            <div className={styles.qBody}>
               <p className={styles.progress}>
                 Question {index + 1} of {QUESTION_COUNT}
               </p>
+            </div>
+
+            <div className={styles.qBody}>
               <h2 className={styles.question}>{q.copy}</h2>
               <div className={styles.answers}>
                 {(["A", "B"] as const).map((letter) => {
@@ -251,11 +245,7 @@ export default function SuperpowerGame() {
           </div>
 
           <div className={styles.rBody}>
-            <h1 className={styles.resultTitle}>{result.title}</h1>
-            {result.line !== null ? (
-              <p className={styles.resultLine}>{result.line}</p>
-            ) : null}
-            <p className={styles.summary}>{result.summary}</p>
+            <h1 className={styles.resultTitleHidden}>{result.title}</h1>
 
             {result.layout === "single" && result.supportingPower !== null ? (
               <>
@@ -272,7 +262,6 @@ export default function SuperpowerGame() {
                 </div>
                 <CompactBlock
                   power={result.supportingPower}
-                  showMainTitle={false}
                   bodyText={config.powerMeta[result.supportingPower].packContribution}
                 />
               </>
@@ -285,14 +274,12 @@ export default function SuperpowerGame() {
                     <CompactBlock
                       key={p}
                       power={p}
-                      showMainTitle
                       bodyText={config.powerMeta[p].packContribution}
                     />
                   ))}
                 </div>
                 <CompactBlock
                   power={result.supportingPower}
-                  showMainTitle={false}
                   bodyText={config.powerMeta[result.supportingPower].packContribution}
                 />
               </>
@@ -311,16 +298,10 @@ export default function SuperpowerGame() {
               </ul>
             ) : null}
 
-            <p className={styles.relativeExplanation}>
-              {config.copy.relativeExplanation}
-            </p>
-            <BoundaryStatement />
-
             <div className={styles.restartRow}>
               <button type="button" className={styles.introBtn} onClick={restart}>
                 Play again
               </button>
-              <p className={styles.replay}>{config.copy.replay}</p>
             </div>
           </div>
         </section>
