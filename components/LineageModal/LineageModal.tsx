@@ -630,7 +630,9 @@ export default function LineageModal({ name, image, character, lineage, onClose,
                 onClick={() => setSharing(true)}
                 aria-label="Share your score"
                 title="Share your score"
-              />
+              >
+                <span className={css.endShareFlashText} aria-hidden="true" />
+              </button>
               {/* The size lives in the stylesheet now, not here. An inline style
                   beats a media query, so desktop could never override it. */}
               <div className={css.endFlash}>

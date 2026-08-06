@@ -313,11 +313,29 @@
   cursor: pointer;
   z-index: 3;
   background-color: #f8577d;
+  clip-path: polygon(0 0, 100% 0, 100% 100%);
+  overflow: hidden;
+}
+/* The artwork is the TEXT ONLY: white paths on a 720 x 210.1 canvas, no pink and
+   no rotation of its own. So the flash body is the clip-path triangle above and
+   this lays the words along its hypotenuse.
+   It was briefly set as the button's own background at 100% 100%, which stretched
+   a 3.4:1 banner into a square and squashed it more than three times over.
+   Placed at two thirds across and one third down, which is about the triangle's
+   centroid, so the words sit inside the ink rather than half off the diagonal.
+   background-size contain, never 100% 100%, so the letterforms cannot distort. */
+.endShareFlashText {
+  position: absolute;
+  top: 33%;
+  left: 67%;
+  width: 86%;
+  aspect-ratio: 720 / 210.1;
+  transform: translate(-50%, -50%) rotate(45deg);
   background-image: url("/flash-share-score.svg");
   background-repeat: no-repeat;
-  background-position: top right;
-  background-size: 100% 100%;
-  clip-path: polygon(0 0, 100% 0, 100% 100%);
+  background-position: center;
+  background-size: contain;
+  pointer-events: none;
 }
 .endFlashWord {
   display: block;
