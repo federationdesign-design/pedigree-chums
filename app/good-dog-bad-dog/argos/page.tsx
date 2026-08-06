@@ -19,11 +19,18 @@ export const metadata: Metadata = {
     title: "Argos: The Dog Who Knew His Master",
     description:
       "He simply lifts his head, recognises the man he has waited for, wags his tail, and dies. Nearly three thousand years later, that is enough.",
-    url: "https://pedigree-chums.co.uk/good-dog-bad-dog/argos",
+    // Relative, so it resolves against metadataBase in the root layout and
+    // follows the real domain rather than a hard-coded guess at it.
+    url: "/good-dog-bad-dog/argos",
     siteName: "Pedigree Chums",
     images: [
       {
-        url: "https://pedigree-chums.co.uk/og/argos-og.jpg",
+        // THIS WAS WRONG THREE WAYS and the card has never rendered: the
+        // domain was pedigree-chums.co.uk with a hyphen, the folder was /og
+        // when the real one is /OG, which matters because Vercel serves from a
+        // case-sensitive filesystem, and the extension was .jpg when the file
+        // is a .png. Relative now, so the domain looks after itself.
+        url: "/OG/argos-og.png",
         width: 1200,
         height: 630,
         alt: "Argos: The Dog Who Knew His Master — Pedigree Chums Good Dog Bad Dog",
@@ -37,7 +44,7 @@ export const metadata: Metadata = {
     title: "Argos: The Dog Who Knew His Master",
     description:
       "He simply lifts his head, recognises the man he has waited for, wags his tail, and dies. Nearly three thousand years later, that is enough.",
-    images: ["https://pedigree-chums.co.uk/og/argos-og.jpg"],
+    images: ["/OG/argos-og.png"],
   },
 };
 
