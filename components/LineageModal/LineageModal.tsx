@@ -620,6 +620,17 @@ export default function LineageModal({ name, image, character, lineage, onClose,
           ) : (
             <>
               {/* The close X has moved down into the button row. */}
+              {/* SHARE, as a corner flash rather than a fifth icon. The row is
+                  four ways out of the round; sharing is not one of them, and it
+                  reads better as the card flashes on the history page do.
+                  One SVG as a background, the same as flash-learn.svg. */}
+              <button
+                type="button"
+                className={css.endShareFlash}
+                onClick={() => setSharing(true)}
+                aria-label="Share your score"
+                title="Share your score"
+              />
               {/* The size lives in the stylesheet now, not here. An inline style
                   beats a media query, so desktop could never override it. */}
               <div className={css.endFlash}>
@@ -680,24 +691,6 @@ export default function LineageModal({ name, image, character, lineage, onClose,
                     learn. Learn is inverted, a blue box with a yellow glyph,
                     which is the only one that reads as a different kind of
                     action rather than a way out. */}
-                {/* SHARE, first in the row: it is the one thing here that is
-                    not a way out of the round. */}
-                <button
-                  type="button"
-                  className={`${css.endBtn} ${css.endBtnIcon} ${css.endBtnBlue}`}
-                  onClick={() => setSharing(true)}
-                  aria-label="Share your score"
-                  title="Share"
-                >
-                  <svg className={css.endIcon} viewBox="0 0 24 24" aria-hidden="true" focusable="false"
-                    fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="18" cy="5" r="3" />
-                    <circle cx="6" cy="12" r="3" />
-                    <circle cx="18" cy="19" r="3" />
-                    <line x1="8.6" y1="10.5" x2="15.4" y2="6.5" />
-                    <line x1="8.6" y1="13.5" x2="15.4" y2="17.5" />
-                  </svg>
-                </button>
                 <button
                   type="button"
                   className={`${css.endBtn} ${css.endBtnIcon} ${css.endBtnRed}`}

@@ -293,6 +293,32 @@
      the two words sat further apart than they look in the type. */
   line-height: 0.9em;
 }
+/* THE SHARE FLASH. Top right corner of the game over screen, built the way the
+   history page's card flashes are: one SVG as a background, sized by percentage
+   with an aspect ratio rather than fixed pixels.
+   The clip-path does two jobs. It gives the pink fallback its triangle shape, so
+   the control is visible and tappable even before the artwork lands, and it
+   makes the HIT AREA the triangle rather than the whole corner square, so it
+   cannot swallow taps meant for the screen behind it. */
+.endShareFlash {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 46%;
+  max-width: 300px;
+  aspect-ratio: 1 / 1;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  z-index: 3;
+  background-color: #ff5fa2;
+  background-image: url("/flash-share-score.svg");
+  background-repeat: no-repeat;
+  background-position: top right;
+  background-size: 100% 100%;
+  clip-path: polygon(0 0, 100% 0, 100% 100%);
+}
 .endFlashWord {
   display: block;
 }
