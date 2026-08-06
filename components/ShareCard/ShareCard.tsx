@@ -27,9 +27,13 @@ import css from "./ShareCard.module.css";
 const W = 1080;
 const H = 1345; // the artwork's own size
 type Design = "table" | "score";
-const CARD_BG: Record<Design, string> = {
-  table: "/sharescreen-empty.jpg",
-  score: "/myscorecard-empty.jpg",
+// TWO ARTWORKS FOR THE SCORE CARD, and that is deliberate.
+// The one on screen carries the SHARE THIS button, which sits across the band
+// the chum rate panel occupies. The one that gets POSTED has the button removed
+// so the chum rate is visible instead. Same card, different job.
+const CARD_BG: Record<Design, { screen: string; share: string }> = {
+  table: { screen: "/sharescreen-empty.jpg", share: "/sharescreen-empty.jpg" },
+  score: { screen: "/myscorecard-empty.jpg", share: "/myscorecard-empty-nobutton.jpg" },
 };
 // The SCORE card's own measurements, taken the same way as the table's: the
 // filled design diffed against its own empty version.
@@ -154,6 +158,8 @@ export default function ShareCard(props: ShareCardProps) {
   // chum rate panel occupies exactly that band, so there the trigger is a pill
   // below the card instead.
   const [design, setDesign] = useState<Design>("table");
+  // Kept so the share repaint does not have to reload anything.
+  const imgsRef = useRef<{ screen: HTMLImageElement | null; share: HTMLImageElement | null; btn: HTMLImageElement | null }>({ screen: null, share: null, btn: null });
   const [note, setNote] = useState<string | null>(null);
 
   useEffect(() => {
@@ -176,28 +182,36 @@ export default function ShareCard(props: ShareCardProps) {
         // is drawn first and everything else lands on top of it. It is painted
         // once without it too, so a failed image leaves a readable card rather
         // than a blank one.
+        imgsRef.current = { screen: null, share: null, btn: null };
         draw(null, null);
-        // Two images, and the card is redrawn as each arrives rather than
-        // waiting on both: a missing one leaves a readable card instead of a
-        // blank one.
-        let bgImg: HTMLImageElement | null = null;
-        let btnImg: HTMLImageElement | null = null;
-        const bg = new window.Image();
-        bg.onload = () => { bgImg = bg; if (!dead) draw(bgImg, btnImg); };
-        bg.src = CARD_BG[design];
-        const btn = new window.Image();
-        btn.onload = () => { btnImg = btn; if (!dead) draw(bgImg, btnImg); };
-        btn.src = SHARE_BTN;
+        // Each image redraws the card as it arrives rather than the card waiting
+        // on all of them: a missing one leaves something readable instead of a
+        // blank rectangle.
+        const load = (src: string, key: "screen" | "share" | "btn") => {
+          const im = new window.Image();
+          im.onload = () => {
+            imgsRef.current[key] = im;
+            if (!dead) draw(imgsRef.current.screen, imgsRef.current.btn);
+          };
+          im.src = src;
+        };
+        load(CARD_BG[design].screen, "screen");
+        // Only fetched when it differs, so the table card does not pull the same
+        // file twice.
+        if (CARD_BG[design].share !== CARD_BG[design].screen) load(CARD_BG[design].share, "share");
+        else imgsRef.current.share = null;
+        load(SHARE_BTN, "btn");
       });
     return () => { dead = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [score, rate, chums, level, design, topChum?.image]);
 
-  function draw(bg: HTMLImageElement | null, btn: HTMLImageElement | null) {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+  /**
+   * forShare paints the version that gets POSTED rather than the one on screen.
+   * For the score card that is a different background and a different set of
+   * pieces: no button, and the chum rate panel drawn in the space it frees.
+   */
+  function paint(ctx: CanvasRenderingContext2D, bg: HTMLImageElement | null, btn: HTMLImageElement | null, forShare: boolean) {
     const DISP = "Luckiest Guy, system-ui, sans-serif";
     const BODY = "Montserrat, system-ui, sans-serif";
 
@@ -209,8 +223,8 @@ export default function ShareCard(props: ShareCardProps) {
     }
 
     if (design === "score") {
-      // THE SCORE CARD. Its own layout, and no share button drawn into it: the
-      // chum rate panel sits across the band the button would need.
+      // THE SCORE CARD. The chum rate panel is drawn only on the posted version:
+      // on screen the artwork's own SHARE THIS button occupies that band.
       ctx.textAlign = "center";
       ctx.textBaseline = "alphabetic";
       const scoreTxt = score.toLocaleString();
@@ -228,17 +242,19 @@ export default function ShareCard(props: ShareCardProps) {
       ctx.font = `700 ${lls}px ${BODY}`;
       ctx.fillText(lvl, 540, SC.levelName);
 
-      ctx.fillStyle = BLUE_DEEP;
-      roundRect(ctx, SC.panel.x, SC.panel.y, SC.panel.w, SC.panel.h, SC.panel.r);
-      ctx.fill();
-      ctx.fillStyle = BLUE_SKY;
-      ctx.font = `700 36px ${BODY}`;
-      ctx.fillText("CHUM RATE", 540, SC.panelLabel);
-      ctx.fillStyle = CREAM;
-      const rateTxt = `${rate}%`;
-      const rs = fitText(ctx, rateTxt, 440, 112, DISP);
-      ctx.font = `${rs}px ${DISP}`;
-      ctx.fillText(rateTxt, 540, SC.panelValue);
+      if (forShare) {
+        ctx.fillStyle = BLUE_DEEP;
+        roundRect(ctx, SC.panel.x, SC.panel.y, SC.panel.w, SC.panel.h, SC.panel.r);
+        ctx.fill();
+        ctx.fillStyle = BLUE_SKY;
+        ctx.font = `700 36px ${BODY}`;
+        ctx.fillText("CHUM RATE", 540, SC.panelLabel);
+        ctx.fillStyle = CREAM;
+        const rateTxt = `${rate}%`;
+        const rs = fitText(ctx, rateTxt, 440, 112, DISP);
+        ctx.font = `${rs}px ${DISP}`;
+        ctx.fillText(rateTxt, 540, SC.panelValue);
+      }
       return;
     }
 
@@ -271,13 +287,39 @@ export default function ShareCard(props: ShareCardProps) {
     ctx.textAlign = "center";
   }
 
+  function draw(bg: HTMLImageElement | null, btn: HTMLImageElement | null) {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    paint(ctx, bg, btn, false);
+  }
+
+  /**
+   * The posted card, painted off screen. It is a separate canvas rather than a
+   * repaint of the visible one, so the card the player is looking at never
+   * flickers into a different state while the share sheet opens.
+   */
+  function shareCanvas(): HTMLCanvasElement | null {
+    const src = canvasRef.current;
+    if (!src) return null;
+    const off = document.createElement("canvas");
+    off.width = W;
+    off.height = H;
+    const ctx = off.getContext("2d");
+    if (!ctx) return null;
+    const { screen: scr, share: shr, btn } = imgsRef.current;
+    paint(ctx, shr ?? scr, btn, true);
+    return off;
+  }
+
   async function shareWith(caption: string) {
     if (busy) return;
     setBusy(true);
     setNote(null);
     const text = `${caption}\n\n${TAG}`;
     try {
-      const canvas = canvasRef.current;
+      const canvas = shareCanvas();
       const blob = canvas
         ? await new Promise<Blob | null>((res) => canvas.toBlob((b) => res(b), "image/png"))
         : null;
@@ -346,23 +388,23 @@ export default function ShareCard(props: ShareCardProps) {
           {/* The button is drawn INTO the card, because the card is what gets
               posted. This takes the tap, sized as a percentage of the canvas so
               it tracks the artwork at any display size. */}
-          {design === "table" && (
-            <button
-              type="button"
-              className={css.shareThis}
-              onClick={() => setPicking((o) => !o)}
-              aria-expanded={picking}
-              aria-label="Share this"
-              title="Share this"
-            />
-          )}
+          {/* Both cards now carry the SHARE THIS button in their artwork, at the
+              same place, so one overlay serves both. */}
+          <button
+            type="button"
+            className={css.shareThis}
+            onClick={() => setPicking((o) => !o)}
+            aria-expanded={picking}
+            aria-label="Share this"
+            title="Share this"
+          />
 
           {picking && (
             <>
               {/* A tap anywhere else closes it, the way the name generator's
                   popout does. */}
               <div className={css.backdrop} onClick={() => setPicking(false)} />
-              <div role="menu" className={`${css.menu}${design === "score" ? " " + css.menuLow : ""}`}>
+              <div role="menu" className={css.menu}>
                 <p className={css.menuTitle}>Pick a caption to share</p>
                 <div className={css.menuScroll}>
                   {captionsFor(rate).map((fn, i) => (
@@ -384,19 +426,6 @@ export default function ShareCard(props: ShareCardProps) {
             </>
           )}
         </div>
-
-        {/* The score card carries no button in the picture, so it gets a real
-            one here. Same handler and same popout, just a different anchor. */}
-        {design === "score" && (
-          <button
-            type="button"
-            className={css.sharePill}
-            onClick={() => setPicking((o) => !o)}
-            aria-expanded={picking}
-          >
-            Share this
-          </button>
-        )}
 
         {note && <p className={css.note}>{note}</p>}
       </div>
