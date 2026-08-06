@@ -345,9 +345,9 @@
    replaces the transform outright, so leaving the rotate out of it would spin
    them flat on the first frame. */
 @keyframes shareTextPop {
-  from { opacity: 0; transform: translate(-50%, -50%) rotate(48deg) scale(0.4); }
-  62% { opacity: 1; transform: translate(-50%, -50%) rotate(48deg) scale(1.12); }
-  to { opacity: 1; transform: translate(-50%, -50%) rotate(48deg) scale(1); }
+  from { opacity: 0; transform: translate(-50%, -50%) rotate(44deg) scale(0.4); }
+  62% { opacity: 1; transform: translate(-50%, -50%) rotate(44deg) scale(1.12); }
+  to { opacity: 1; transform: translate(-50%, -50%) rotate(44deg) scale(1); }
 }
 /* The artwork is the TEXT ONLY: white paths on a 720 x 210.1 canvas, no pink and
    no rotation of its own. So the flash body is the clip-path triangle above and
@@ -370,14 +370,16 @@
      stopped well short and read as a label rather than a flash. */
   width: 106%;
   aspect-ratio: 720 / 210.1;
-  /* 48deg. 45 is parallel to the hypotenuse and still read as short of it by
-     eye, so this goes three past: the words now cut very slightly across the
-     pink edge rather than running dead level with it.
+  /* 44deg, one back from parallel.
+     The history here is worth keeping, because the direction was guessed wrong
+     twice: 45 to 43 to 42, then back up to 45, then 48. 48 was the wrong way.
+     Counter-clockwise is the SMALLER number, so anything past 45 tips the words
+     the opposite way to the pink edge.
      It went 45 to 43 to 42 on the way here, and that is the thing the side by
      side shows: at 42 the words are three degrees off the pink edge they sit
      on, so they read as slightly askew rather than as part of the flash. The
      concept is parallel. */
-  transform: translate(-50%, -50%) rotate(48deg);
+  transform: translate(-50%, -50%) rotate(44deg);
   z-index: 1;
   animation: shareTextPop 0.4s cubic-bezier(0.2, 1.5, 0.4, 1) 0.5s both;
   background-image: url("/flash-share-score.svg");
