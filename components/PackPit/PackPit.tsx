@@ -165,7 +165,7 @@ export default function PackPit() {
       const stageEl = document.querySelector(".stage") as HTMLElement | null;
       if (stageEl) {
         const flash = document.createElement("div");
-        flash.style.cssText = "position:absolute;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;font-family:var(--font-display,'Luckiest Guy',system-ui);font-size:clamp(6.8rem,24vw,16rem);line-height:1;color:#fff;pointer-events:none;text-shadow:0 4px 40px rgba(0,0,0,0.6)";
+        flash.style.cssText = "position:absolute;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;font-family:var(--font-display,'Luckiest Guy',system-ui);font-size:clamp(6.8rem,24vw,16rem);line-height:1;text-align:center;color:#fff;pointer-events:none;text-shadow:0 4px 40px rgba(0,0,0,0.6)";
         flash.textContent = "Oh no...";
         stageEl.appendChild(flash);
         window.setTimeout(() => flash.remove(), 1800);

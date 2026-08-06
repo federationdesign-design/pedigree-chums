@@ -168,9 +168,6 @@ export default function ShareCard(props: ShareCardProps) {
   // because that is how it was designed; the score one has no room for it, its
   // chum rate panel occupies exactly that band, so there the trigger is a pill
   // below the card instead.
-  // The score card prints a level, so it is only offered when there is one. The
-  // main pit has no levels and gets the table card alone.
-  const canPickDesign = !!level;
   const [design, setDesign] = useState<Design>("table");
   // Kept so the share repaint does not have to reload anything.
   const imgsRef = useRef<{ screen: HTMLImageElement | null; share: HTMLImageElement | null; btn: HTMLImageElement | null }>({ screen: null, share: null, btn: null });
@@ -251,15 +248,20 @@ export default function ShareCard(props: ShareCardProps) {
       // artwork's own SHARE THIS button sits across the lower half, so the
       // preview shows the score alone rather than type behind a button.
       if (forShare) {
-        ctx.font = `50px ${DISP}`;
-        ctx.fillStyle = "#ffffff";
-        ctx.fillText("LEVEL", 540, SC.levelLabel);
+        // The level is printed only when there is one. The main pit has no
+        // levels, so it gets the same card without those two lines rather than
+        // being denied the card altogether.
+        if (level) {
+          ctx.font = `50px ${DISP}`;
+          ctx.fillStyle = "#ffffff";
+          ctx.fillText("LEVEL", 540, SC.levelLabel);
 
-        ctx.fillStyle = NAVY;
-        const lvl = (level ?? "").toUpperCase();
-        const lls = fitText(ctx, lvl, 760, 38, BODY, "700");
-        ctx.font = `700 ${lls}px ${BODY}`;
-        ctx.fillText(lvl, 540, SC.levelName);
+          ctx.fillStyle = NAVY;
+          const lvl = level.toUpperCase();
+          const lls = fitText(ctx, lvl, 760, 38, BODY, "700");
+          ctx.font = `700 ${lls}px ${BODY}`;
+          ctx.fillText(lvl, 540, SC.levelName);
+        }
 
         ctx.fillStyle = BLUE_DEEP;
         roundRect(ctx, SC.panel.x, SC.panel.y, SC.panel.w, SC.panel.h, SC.panel.r);
@@ -399,7 +401,6 @@ export default function ShareCard(props: ShareCardProps) {
       <div className={css.inner}>
         {/* Which card to post. Two options, so a segmented pair rather than a
             dropdown: both are one tap and the choice stays visible. */}
-        {canPickDesign && (
         <div className={css.designPick} role="group" aria-label="Choose a card">
           <button
             type="button"
@@ -418,7 +419,6 @@ export default function ShareCard(props: ShareCardProps) {
             My score
           </button>
         </div>
-        )}
 
         {/* The button is drawn INTO the card, because the card is what gets
             posted. This takes the tap, sized as a percentage of the canvas so it
