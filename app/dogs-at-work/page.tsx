@@ -83,6 +83,13 @@ export default function DogsAtWorkPage() {
         <section className={styles.grid}>
           {ARTICLES.map((a) => (
             <article key={a.slug} className={styles.card}>
+              {/* Owner review: the hero image joins the desktop card, matching
+                  Good Dog, Bad Dog. The data already carried it. */}
+              <div className={styles.cardImgWrap}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={(a as { image: string }).image} alt="" className={styles.cardImg} loading="lazy" />
+              </div>
+              <div className={styles.cardBody}>
               <div className={styles.cardMeta}>
                 <span className={`${styles.tag} ${styles.tagGood}`}>{a.tag}</span>
                 <span className={styles.cardBreed}>{a.breed}</span>
@@ -92,6 +99,7 @@ export default function DogsAtWorkPage() {
               <Link href={`/dogs-at-work/${a.slug}`} className={styles.readMore}>
                 Read the essay →
               </Link>
+              </div>
             </article>
           ))}
         </section>

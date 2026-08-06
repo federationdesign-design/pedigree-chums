@@ -102,6 +102,13 @@ export default function GoodDogBadDogPage() {
         <section className={styles.grid}>
           {ESSAYS.map((essay) => (
             <article key={essay.slug} className={styles.card}>
+              {/* Owner review: the hero image joins the desktop card. The data
+                  already carried it -- only the mobile carousel used it. */}
+              <div className={styles.cardImgWrap}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={essay.image} alt="" className={styles.cardImg} loading="lazy" />
+              </div>
+              <div className={styles.cardBody}>
               <div className={styles.cardMeta}>
                 <span className={`${styles.tag} ${styles[essay.tagStyle as keyof typeof styles]}`}>{essay.tag}</span>
                 {"author" in essay && <span className={`${styles.tag} ${styles.tagLit}`}>{essay.author}</span>}
@@ -113,6 +120,7 @@ export default function GoodDogBadDogPage() {
               <Link href={`/good-dog-bad-dog/${essay.slug}`} className={styles.readMore}>
                 Read the essay →
               </Link>
+              </div>
             </article>
           ))}
         </section>
