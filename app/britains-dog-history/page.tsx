@@ -29,10 +29,38 @@ const heroTriangles: Tri[] = [
   { size: 92, bottom: "16%", left: "42%", speed: 0.16, spin: 0.14 },
 ];
 
+const OG_TITLE = "Britain's Dog History | Pedigree Chums\u2122";
+const OG_DESC =
+  "How Britain became a nation of dog lovers: from working dogs and war mascots to Greyfriars Bobby, Crufts and the Victorian pet boom, right up to today's designer crossbreeds.";
+
 export const metadata: Metadata = {
   title: "Britain's Dog History",
-  description:
-    "How Britain became a nation of dog lovers: from working dogs and war mascots to Greyfriars Bobby, Crufts and the Victorian pet boom, right up to today's designer crossbreeds.",
+  description: OG_DESC,
+  // Its own share card. Without this the page inherited the site-wide /og.png
+  // from the root layout, so anyone posting the game got the generic homepage
+  // image. Both blocks are set: openGraph covers Facebook, LinkedIn, WhatsApp
+  // and Slack, twitter is read by X and a few others, and neither falls back to
+  // the other.
+  openGraph: {
+    title: OG_TITLE,
+    description: OG_DESC,
+    type: "website",
+    url: "/britains-dog-history",
+    images: [
+      {
+        url: "/minipit-OG.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Britain's Dog History, a Pedigree Chums\u2122 game",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: OG_TITLE,
+    description: OG_DESC,
+    images: ["/minipit-OG.jpg"],
+  },
 };
 
 type Section = {
