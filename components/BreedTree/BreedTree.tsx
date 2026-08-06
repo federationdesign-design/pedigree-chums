@@ -15,7 +15,7 @@ import { bust } from "../../data/imgVersion";
 import { breedInfo } from "../../data/breedInfo";
 import breedTraits from "../../data/breed-info.json";
 import styles from "./BreedTree.module.css";
-import { BRAIN_PATH } from "../icons/brain";
+import { BRAIN_PATH, BRAIN_ARTBOARD } from "../icons/brain";
 import LineageMap from "../PackPit/LineageMap";
 import type { LevelTheme } from "../../data/levelThemes";
 import BritainMessage from "../PackPit/BritainMessage";
@@ -224,7 +224,6 @@ const START_SCALE = 2;
 // was sitting under it, while leaving room for the ground band and the shake and
 // slow-motion buttons. LEARN comes down from 20% to 38%.
 const WORD_START_Y = 0.41; // 91% down
-const WORD_LEARN_Y = 0.24; // 26% down
 // How far the circle cluster drops from centre, as a fraction of the frame
 // height. Clamped at runtime by whatever slack the packing leaves.
 const CLUSTER_DROP = 0.05;
@@ -2650,17 +2649,10 @@ export default function BreedTree({
 
   function onCircle(e: React.MouseEvent, d: Node) {
     e.stopPropagation();
-    // START SCREEN ONLY. Tapping any dog goes straight to the learn area,
-    // by request. It replaces the two-tap come-loose-then-zoom grammar
-    // HERE only: the same tap still previews and zooms during a round and
-    // inside learn. Sits above every other branch so nothing else can
-    // claim the tap first.
-    if (dockAside && gravity && entered && !started && !learning && focusRef.current === nodes[0]) {
-      setLearnPeek(false);
-      setStartPeek(false);
-      setLearning(true);
-      return;
-    }
+    // The start screen used to send any tap on a dog straight into the learn
+    // area, above every other branch. That is gone: the circles are the diagram,
+    // not a doorway, so a tap now does what it does everywhere else in this
+    // component. LEARN is a button of its own beside PLAY.
     // TOUCH: the first tap on a first-ring circle does what a hover does on a
     // mouse, which is come loose and show you what is inside. The second tap
     // goes in. Same grammar as desktop, where hover previews and click enters,
@@ -5759,24 +5751,26 @@ export default function BreedTree({
           {dockAside && gravity && entered && !started && !learning && focus.depth === 0 && (() => {
             const st = stageRef.current;
             const upp = st ? (aspect >= 1 ? SIZE : SIZE / Math.max(aspect, 0.01)) / Math.max(st.clientHeight, 1) : 1;
-            // same size ramp as the GAME OVER / ROUND WON flash: clamp(3.4rem, 12vw, 8rem)
-            const stW = st ? st.clientWidth : 390;
-            // the words measure about 3.17x their font size across, so cap the
-            // size to keep them inside the stage on a narrow phone
-            const fs = Math.min(Math.min(Math.max(54.4, stW * 0.12), 128) * START_SCALE, (stW * 0.92) / 3.17);
+            // Both controls are squares now, so nothing here measures a word.
             const vbWc = aspect >= 1 ? SIZE * aspect : SIZE;
             const vbHc = aspect >= 1 ? SIZE : SIZE / aspect;
             const xMinC = aspect >= 1 ? -vbWc * shift : -vbWc / 2;
             const m = 18 * upp; // side margin
-            const hitW = fs * 5.2 * upp;
-            const hitH = fs * 1.6 * upp;
             // LEARN sits right and high, START sits left and low. Both were
             // pulled toward the middle, which left roughly a third of the stage
             // empty beneath START. They now sit lower and use the room: START
             // near the foot of the pit, LEARN a little above centre.
+            // BOTH ARE SQUARES NOW, side by side at the foot.
+            // LEARN was a word anchored to the right edge, high up, and it
+            // carried an invisible tap rect of fs * 5.2 by fs * 1.6: on a 460px
+            // phone that is 287 x 88, sixty per cent of the screen width, lying
+            // across the diagram. Taps meant for the dogs underneath it were
+            // being taken by the word.
+            const SQ = 84 * pitScale * 1.2 * upp;
+            const SQ_GAP = 16 * upp;
             const words: { key: "learn" | "start"; label: string; x: number; y: number; anchor: "start" | "end" }[] = [
-              { key: "learn", label: "LEARN", x: xMinC + vbWc - m, y: -vbHc * WORD_LEARN_Y, anchor: "end" },
               { key: "start", label: "PLAY", x: xMinC + m, y: vbHc * WORD_START_Y, anchor: "start" },
+              { key: "learn", label: "LEARN", x: xMinC + m + SQ + SQ_GAP, y: vbHc * WORD_START_Y, anchor: "start" },
             ];
             return words.map((w) => (
               <g
@@ -5817,66 +5811,44 @@ export default function BreedTree({
                 }}
               >
                 {/* invisible hit area, so the tap target is not just the glyphs */}
-                <rect
-                  x={w.anchor === "end" ? w.x - hitW : w.x}
-                  y={w.y - (w.key === "start" ? 84 * pitScale * 1.2 * upp : hitH) / 2}
-                  width={w.key === "start" ? 84 * pitScale * 1.2 * upp : hitW}
-                  height={w.key === "start" ? 84 * pitScale * 1.2 * upp : hitH}
-                  fill="transparent"
-                />
-                {w.key === "start" ? (() => {
-                  // The same square as the close X, the info square and the
-                  // learn PLAY: uSz = 84 * pitScale * 1.2, rx 0.3 of it, a 5px
-                  // navy rim. Those figures are in CSS pixels there and this is
-                  // drawn in svg units, so each is multiplied by upp. Anchored
-                  // by its left edge at w.x, which is where the word started.
-                  const S = 84 * pitScale * 1.2 * upp;
+                <rect x={w.x} y={w.y - SQ / 2} width={SQ} height={SQ} fill="transparent" />
+                {(() => {
+                  // ONE SQUARE EACH, matched: the same box as the close X, the
+                  // info square and the learn PLAY. uSz = 84 * pitScale * 1.2,
+                  // rx 0.3 of it, a 5px rim. Those figures are CSS pixels there
+                  // and this is drawn in svg units, so each is multiplied by upp.
+                  const S = SQ;
                   const rim = 5 * upp;
-                  const gh = S * 0.34, gw = S * 0.30;
                   const cx = w.x + S / 2, cy = w.y;
                   const hv = wordHover === w.key ? 1.06 : 1;
+                  const isPlay = w.key === "start";
+                  const gh = S * 0.34, gw = S * 0.30;
                   return (
                     <g transform={`translate(${cx},${cy}) scale(${hv}) translate(${-cx},${-cy})`}>
-                      {/* Green for go, white glyph, white rim, and the learn
-                          rim. This square exists only here: the learn area has
-                          its own PLAY and the pit has its own corner set, and
-                          both keep the pit's yellow and navy. */}
+                      {/* Green for go, yellow for learn, both on a white rim so
+                          they read as a pair. The pit's own corner set keeps its
+                          yellow and navy; this pair exists only here. */}
                       <rect x={w.x} y={cy - S / 2} width={S} height={S} rx={S * 0.3}
-                        fill="#22c55e" stroke="#ffffff" strokeWidth={rim} />
-                      <path
-                        d={`M${cx - gw * 0.3},${cy - gh / 2} L${cx + gw * 0.7},${cy} L${cx - gw * 0.3},${cy + gh / 2} Z`}
-                        fill="#ffffff" stroke="#ffffff"
-                        strokeWidth={S * 0.07} strokeLinejoin="round"
-                      />
+                        fill={isPlay ? "#22c55e" : "var(--yellow, #ffd23e)"}
+                        stroke="#ffffff" strokeWidth={rim} />
+                      {isPlay ? (
+                        <path
+                          d={`M${cx - gw * 0.3},${cy - gh / 2} L${cx + gw * 0.7},${cy} L${cx - gw * 0.3},${cy + gh / 2} Z`}
+                          fill="#ffffff" stroke="#ffffff"
+                          strokeWidth={S * 0.07} strokeLinejoin="round"
+                        />
+                      ) : (
+                        // The pit's own brain, imported rather than redrawn, so
+                        // the two cannot drift apart. Its artboard is 217.1 wide,
+                        // so it scales by S * 0.52 / 217.1 and translates by its
+                        // own centre to sit in the middle of the square.
+                        <g transform={`translate(${cx},${cy}) scale(${(S * 0.52) / BRAIN_ARTBOARD.w}) translate(${-BRAIN_ARTBOARD.cx},${-BRAIN_ARTBOARD.cy})`}>
+                          <path d={BRAIN_PATH} fill="var(--navy, #0a3a57)" />
+                        </g>
+                      )}
                     </g>
                   );
-                })() : (
-                <text x={w.x} y={w.y} textAnchor={w.anchor} dominantBaseline="central"
-                  style={{
-                    // White with a black outline, the circles' treatment with the
-                    // halo colour swapped. paint-order stroke keeps the stroke
-                    // behind the glyph so the letterforms stay clean.
-                    fill: "#ffffff",
-                    stroke: "#000000",
-                    strokeWidth: `${9 * upp}px`, // 4, then 7, now 9: two rounds of +3 and +2
-                    paintOrder: "stroke",
-                    strokeLinejoin: "round",
-                    fontFamily: "var(--font-display), system-ui, sans-serif",
-                    // Owner review: LEARN is half the size it was. This branch
-                    // only ever draws LEARN -- START renders as a square above.
-                    fontSize: `${fs * 0.5 * upp * (wordHover === w.key ? 1.08 : 1)}px`,
-                    letterSpacing: `${2 * upp}px`,
-                    filter:
-                      wordHover === w.key
-                        ? "drop-shadow(0 6px 26px rgba(0,0,0,0.85))"
-                        : "drop-shadow(0 4px 40px rgba(0,0,0,0.6))",
-                    transition: "font-size 160ms ease, filter 160ms ease",
-                    pointerEvents: "none",
-                    userSelect: "none",
-                  }}>
-                  {w.label}
-                </text>
-                )}
+                })()}
               </g>
             ));
           })()}
