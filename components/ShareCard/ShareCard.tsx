@@ -26,7 +26,21 @@ import css from "./ShareCard.module.css";
 
 const W = 1080;
 const H = 1345; // the artwork's own size
-const CARD_BG = "/sharescreen-empty.jpg";
+type Design = "table" | "score";
+const CARD_BG: Record<Design, string> = {
+  table: "/sharescreen-empty.jpg",
+  score: "/myscorecard-empty.jpg",
+};
+// The SCORE card's own measurements, taken the same way as the table's: the
+// filled design diffed against its own empty version.
+const SC = {
+  scoreBaseline: 828,
+  levelLabel: 906,
+  levelName: 954,
+  panel: { x: 272, y: 998, w: 520, h: 281, r: 30 },
+  panelLabel: 1090,
+  panelValue: 1211,
+};
 const SHARE_BTN = "/sharethisbutton.png";
 // Measured off the supplied design, not estimated. Rows sit on an even 69px
 // pitch, names left at 144, scores right at 859, and the button sits over the
@@ -135,6 +149,11 @@ export default function ShareCard(props: ShareCardProps) {
   // posted, so it has to read as the finished card first; the picker is a second
   // step rather than a list sitting under it.
   const [picking, setPicking] = useState(false);
+  // Which card. The table one carries the SHARE THIS button inside the picture,
+  // because that is how it was designed; the score one has no room for it, its
+  // chum rate panel occupies exactly that band, so there the trigger is a pill
+  // below the card instead.
+  const [design, setDesign] = useState<Design>("table");
   const [note, setNote] = useState<string | null>(null);
 
   useEffect(() => {
@@ -165,20 +184,21 @@ export default function ShareCard(props: ShareCardProps) {
         let btnImg: HTMLImageElement | null = null;
         const bg = new window.Image();
         bg.onload = () => { bgImg = bg; if (!dead) draw(bgImg, btnImg); };
-        bg.src = CARD_BG;
+        bg.src = CARD_BG[design];
         const btn = new window.Image();
         btn.onload = () => { btnImg = btn; if (!dead) draw(bgImg, btnImg); };
         btn.src = SHARE_BTN;
       });
     return () => { dead = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [score, rate, chums, level, topChum?.image]);
+  }, [score, rate, chums, level, design, topChum?.image]);
 
   function draw(bg: HTMLImageElement | null, btn: HTMLImageElement | null) {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
+    const DISP = "Luckiest Guy, system-ui, sans-serif";
     const BODY = "Montserrat, system-ui, sans-serif";
 
     if (bg) {
@@ -186,6 +206,40 @@ export default function ShareCard(props: ShareCardProps) {
     } else {
       ctx.fillStyle = BLUE_DEEP;
       ctx.fillRect(0, 0, W, H);
+    }
+
+    if (design === "score") {
+      // THE SCORE CARD. Its own layout, and no share button drawn into it: the
+      // chum rate panel sits across the band the button would need.
+      ctx.textAlign = "center";
+      ctx.textBaseline = "alphabetic";
+      const scoreTxt = score.toLocaleString();
+      const ss = fitText(ctx, scoreTxt, 810, 382, DISP);
+      ctx.font = `${ss}px ${DISP}`;
+      ctx.fillStyle = "#ffffff";
+      ctx.fillText(scoreTxt, 540, SC.scoreBaseline);
+
+      ctx.font = `50px ${DISP}`;
+      ctx.fillText("LEVEL", 540, SC.levelLabel);
+
+      ctx.fillStyle = NAVY;
+      const lvl = level.toUpperCase();
+      const lls = fitText(ctx, lvl, 760, 38, BODY, "700");
+      ctx.font = `700 ${lls}px ${BODY}`;
+      ctx.fillText(lvl, 540, SC.levelName);
+
+      ctx.fillStyle = BLUE_DEEP;
+      roundRect(ctx, SC.panel.x, SC.panel.y, SC.panel.w, SC.panel.h, SC.panel.r);
+      ctx.fill();
+      ctx.fillStyle = BLUE_SKY;
+      ctx.font = `700 36px ${BODY}`;
+      ctx.fillText("CHUM RATE", 540, SC.panelLabel);
+      ctx.fillStyle = CREAM;
+      const rateTxt = `${rate}%`;
+      const rs = fitText(ctx, rateTxt, 440, 112, DISP);
+      ctx.font = `${rs}px ${DISP}`;
+      ctx.fillText(rateTxt, 540, SC.panelValue);
+      return;
     }
 
     // The SAME rows the on-screen table shows. buildBoard is the one source, so
@@ -263,6 +317,27 @@ export default function ShareCard(props: ShareCardProps) {
       </button>
 
       <div className={css.inner}>
+        {/* Which card to post. Two options, so a segmented pair rather than a
+            dropdown: both are one tap and the choice stays visible. */}
+        <div className={css.designPick} role="group" aria-label="Choose a card">
+          <button
+            type="button"
+            className={`${css.designBtn}${design === "table" ? " " + css.designOn : ""}`}
+            onClick={() => { setDesign("table"); setPicking(false); }}
+            aria-pressed={design === "table"}
+          >
+            Top scores
+          </button>
+          <button
+            type="button"
+            className={`${css.designBtn}${design === "score" ? " " + css.designOn : ""}`}
+            onClick={() => { setDesign("score"); setPicking(false); }}
+            aria-pressed={design === "score"}
+          >
+            My score
+          </button>
+        </div>
+
         {/* The button is drawn INTO the card, because the card is what gets
             posted. This takes the tap, sized as a percentage of the canvas so it
             tracks the artwork at any display size. */}
@@ -271,21 +346,23 @@ export default function ShareCard(props: ShareCardProps) {
           {/* The button is drawn INTO the card, because the card is what gets
               posted. This takes the tap, sized as a percentage of the canvas so
               it tracks the artwork at any display size. */}
-          <button
-            type="button"
-            className={css.shareThis}
-            onClick={() => setPicking((o) => !o)}
-            aria-expanded={picking}
-            aria-label="Share this"
-            title="Share this"
-          />
+          {design === "table" && (
+            <button
+              type="button"
+              className={css.shareThis}
+              onClick={() => setPicking((o) => !o)}
+              aria-expanded={picking}
+              aria-label="Share this"
+              title="Share this"
+            />
+          )}
 
           {picking && (
             <>
               {/* A tap anywhere else closes it, the way the name generator's
                   popout does. */}
               <div className={css.backdrop} onClick={() => setPicking(false)} />
-              <div role="menu" className={css.menu}>
+              <div role="menu" className={`${css.menu}${design === "score" ? " " + css.menuLow : ""}`}>
                 <p className={css.menuTitle}>Pick a caption to share</p>
                 <div className={css.menuScroll}>
                   {captionsFor(rate).map((fn, i) => (
@@ -307,6 +384,19 @@ export default function ShareCard(props: ShareCardProps) {
             </>
           )}
         </div>
+
+        {/* The score card carries no button in the picture, so it gets a real
+            one here. Same handler and same popout, just a different anchor. */}
+        {design === "score" && (
+          <button
+            type="button"
+            className={css.sharePill}
+            onClick={() => setPicking((o) => !o)}
+            aria-expanded={picking}
+          >
+            Share this
+          </button>
+        )}
 
         {note && <p className={css.note}>{note}</p>}
       </div>

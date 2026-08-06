@@ -84,6 +84,41 @@
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.45);
 }
 
+/* Which card to post. A segmented pair: two options, both one tap, and the
+   choice stays on screen rather than hiding in a dropdown. */
+.designPick {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 2px;
+}
+.designBtn {
+  font-family: var(--font-body, Montserrat, system-ui), sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.28);
+  border-radius: 999px;
+  padding: 8px 16px;
+  cursor: pointer;
+}
+.designOn {
+  background: var(--yellow, #ffd23e);
+  border-color: var(--navy, #0a3a57);
+  color: var(--navy, #0a3a57);
+}
+/* The score card has no button drawn into it, so it gets a real one. */
+.sharePill {
+  font-family: var(--font-display, "Luckiest Guy", system-ui), sans-serif;
+  font-size: 1.4rem;
+  letter-spacing: 0.03em;
+  color: var(--navy, #0a3a57);
+  background: var(--yellow, #ffd23e);
+  border: 5px solid var(--navy, #0a3a57);
+  border-radius: 999px;
+  padding: 10px 34px;
+  cursor: pointer;
+}
 /* THE CAPTION POPOUT, copied from the name generator's podium share so the two
    behave the same way: a navy panel above the button with a tail pointing down
    at it, and a backdrop that closes it on any tap outside.
@@ -107,6 +142,11 @@
   padding: 12px 10px 10px;
   text-align: left;
   line-height: normal;
+}
+/* The score card's trigger sits BELOW the card, so its popout drops to the foot
+   of the card rather than floating halfway up it. */
+.menuLow {
+  bottom: 8px;
 }
 .menuTitle {
   margin: 2px 8px 10px;
