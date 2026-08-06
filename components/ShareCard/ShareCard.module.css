@@ -28,8 +28,9 @@
   height: 67.5px;
   border-radius: 20px;
   border: 5px solid var(--navy, #0a3a57);
-  background: var(--yellow, #ffd23e);
-  color: var(--navy, #0a3a57);
+  /* Red, matching the close on the game over row: this leaves the game. */
+  background: #ef4444;
+  color: #ffffff;
   display: grid;
   place-items: center;
   cursor: pointer;

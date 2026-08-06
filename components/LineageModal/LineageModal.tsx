@@ -760,6 +760,7 @@ export default function LineageModal({ name, image, character, lineage, onClose,
           level={name}
           topChum={topChum}
           onClose={() => setSharing(false)}
+          onExit={() => { setSharing(false); onClose(); }}
         />
       )}
 

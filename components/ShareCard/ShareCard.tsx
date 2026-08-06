@@ -75,7 +75,10 @@ export type ShareCardProps = {
   chums: number;
   level: string;
   topChum?: { name: string; image: string; count: number } | null;
+  /** closes the share overlay only */
   onClose: () => void;
+  /** leaves the pit entirely, back to the Britain's Dog History start screen */
+  onExit: () => void;
 };
 
 /**
@@ -146,7 +149,7 @@ function fitText(ctx: CanvasRenderingContext2D, text: string, max: number, size:
 }
 
 export default function ShareCard(props: ShareCardProps) {
-  const { score, rate, chums, level, topChum, onClose } = props;
+  const { score, rate, chums, level, topChum, onExit } = props;
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [busy, setBusy] = useState(false);
   // The captions are behind the button now. The screen is the thing being
@@ -356,9 +359,14 @@ export default function ShareCard(props: ShareCardProps) {
 
   return (
     <div className={css.wrap} role="dialog" aria-label="Share your score">
-      <button type="button" className={css.back} onClick={onClose} aria-label="Back">
-        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <path d="M17 4 L7 12 L17 20 Z" fill="currentColor" stroke="currentColor" strokeWidth="3" strokeLinejoin="round" />
+      {/* A red X, and it leaves the pit rather than stepping back a screen: the
+          share view is the end of the round, so the way out of it is the way out
+          of the game. Matches the close button on the game over row. */}
+      <button type="button" className={css.back} onClick={onExit} aria-label="Close">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"
+          stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" fill="none">
+          <line x1="6" y1="6" x2="18" y2="18" />
+          <line x1="18" y1="6" x2="6" y2="18" />
         </svg>
       </button>
 
