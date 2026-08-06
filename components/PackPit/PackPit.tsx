@@ -13,6 +13,7 @@ import { startFixedTimestep } from "./fixedTimestep";
 import styles from "./PackPit.module.css";
 import BritainMessage from "./BritainMessage";
 import { reportHiddenGame } from "../../lib/hiddenGames/browserEngine";
+import PitEnd from "../PitEnd/PitEnd";
 
 // Score milestones: crossing one fires a centre-screen celebration with confetti.
 // Score milestones: every 5,000 (5k, 10k, 15k ...). Crossing one fires a
@@ -156,24 +157,23 @@ export default function PackPit() {
     if (!activeBreed && !howToPlay && !shelfOpen && !cookiesOpenRef.current && pendingGameOver.current && !gameOver) {
       pendingGameOver.current = false;
       gameOverRef.current = true;
-      // Show GAME OVER flash before navigating
+      // "Oh no..." over the pit, then the end screen. It used to be a GAME OVER
+      // flash followed by window.location.href = "/about?gameover=1": a full
+      // page navigation that destroyed the pit and carried three strings through
+      // sessionStorage. The screen is rendered here now, so nothing is
+      // serialised and nothing is lost.
       const stageEl = document.querySelector(".stage") as HTMLElement | null;
       if (stageEl) {
         const flash = document.createElement("div");
-        flash.style.cssText = "position:absolute;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;font-family:var(--font-display,'Luckiest Guy',system-ui);font-size:clamp(5rem,18vw,12rem);color:#fff;pointer-events:none;text-shadow:0 4px 40px rgba(0,0,0,0.6)";
-        flash.textContent = "GAME OVER";
+        flash.style.cssText = "position:absolute;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;font-family:var(--font-display,'Luckiest Guy',system-ui);font-size:clamp(6.8rem,24vw,16rem);line-height:1;color:#fff;pointer-events:none;text-shadow:0 4px 40px rgba(0,0,0,0.6)";
+        flash.textContent = "Oh no...";
         stageEl.appendChild(flash);
+        window.setTimeout(() => flash.remove(), 1800);
       }
       window.setTimeout(() => {
         const canvas = document.querySelector(".stage > canvas") as HTMLElement | null;
         if (canvas) canvas.style.pointerEvents = "none";
-        try {
-          sessionStorage.setItem("pc-gameover-score", String(scoreRef.current));
-          sessionStorage.setItem("pc-gameover-chums", String(collectedRef.current));
-          const breedImgMap = Object.fromEntries(breeds.map((b: any) => [b.name, breedCard[b.slug] || b.image || ""]));
-          sessionStorage.setItem("pc-gameover-breeds", JSON.stringify(collectedChumsRef.current.map((n: string) => ({ name: n, img: breedImgMap[n] || "" }))));
-        } catch {}
-        window.location.href = "/about?gameover=1";
+        setGameOver(true);
       }, 1800);
     }
   }, [activeBreed, howToPlay, shelfOpen, gameOver]);
@@ -2091,13 +2091,9 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
                           stage.style.setProperty("--fill-opacity", "0");
                           countdown.remove(); countdownEl = null;
                           gameOverRef.current = true;
-                          try {
-                            sessionStorage.setItem("pc-gameover-score", String(scoreRef.current));
-                            sessionStorage.setItem("pc-gameover-chums", String(collectedRef.current));
-                            const breedImgMap = Object.fromEntries(breeds.map((b: any) => [b.name, breedCard[b.slug] || b.image || ""]));
-                            sessionStorage.setItem("pc-gameover-breeds", JSON.stringify(collectedChumsRef.current.map((n: string) => ({ name: n, img: breedImgMap[n] || "" }))));
-                          } catch {}
-                          window.location.href = "/about?gameover=1";
+                          // The end screen, in place. Nothing to serialise and
+                          // nothing to navigate to: it reads live state.
+                          setGameOver(true);
                         }, 800);
                       }, 1500);
                     }
@@ -3110,6 +3106,15 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
       </button>
 
       {activeBreed && <LineageMap breed={activeBreed} onClose={() => setActiveBreed(null)} onRemove={(name) => { removeBreedRef.current(name); if (!["Deal the cards","Head outside","Spot real dogs","Match to your chum","Find more chums","Most chums wins"].includes(name)) { setCollected((c) => { const next = c + 1; if (next >= 54) { pendingGameOver.current = true; }; return next; }); setCollectedChums((cs) => [...cs, name]); } }} onScatter={(c) => scatterRef.current(c)} onScore={(v) => setScore((s) => s + v)} currentScore={score}  />}
+      {/* THE END SCREEN, rendered here rather than on /about. Everything it needs
+          is live state on this page, which is why it can be self-contained. */}
+      {gameOver && (
+        <PitEnd
+          score={score}
+          chums={collected}
+          onExit={() => { window.location.href = "/about"; }}
+        />
+      )}
       <HowToPlay open={howToPlay} onClose={() => { setHowToPlay(false); }} />
       {milestone && (
         <div className={styles.milestone} key={milestone.id} aria-hidden="true">
