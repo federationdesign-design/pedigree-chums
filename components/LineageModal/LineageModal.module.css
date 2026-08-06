@@ -284,14 +284,15 @@
   font-family: var(--font-display, "Luckiest Guy", system-ui);
   /* Moved off an inline style so the desktop rule below can win. Unchanged from
      what the inline one set, so mobile is exactly as it was. */
-  font-size: clamp(6.8rem, 24vw, 16rem);
+  /* a point off each end: 1pt is 0.083rem */
+  font-size: clamp(6.717rem, 24vw, 15.917rem);
   color: #ffffff;
   text-shadow: 0 4px 40px rgba(0, 0, 0, 0.6);
   animation: lmEndPop 0.45s cubic-bezier(0.2, 1.4, 0.4, 1);
   text-align: center;
   /* GAME over OVER, closed up. Luckiest Guy carries its own headroom, so at 1
      the two words sat further apart than they look in the type. */
-  line-height: 0.9em;
+  line-height: 0.8em;
   /* Down 25px. Done with top rather than a margin because this is a centred
      flex column: a margin grows the column, so the whole stack re-centres and
      the word only moves half of what was asked. The element is already
@@ -317,9 +318,35 @@
   margin: 0;
   cursor: pointer;
   z-index: 3;
-  background-color: #f8577d;
+  background: transparent;
+}
+/* The pink triangle is a ::before, not the button itself, and that is what makes
+   the other two requests possible.
+   With the clip-path on the button, ANY overhang of the text was cut off, and
+   the pink and the words could only ever share one animation. As a pseudo
+   element the triangle clips only itself, so the words can hang over its edges
+   and the two arrive on their own timings. */
+.endShareFlash::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: #f8577d;
   clip-path: polygon(0 0, 100% 0, 100% 100%);
-  overflow: hidden;
+  animation: shareFlashSlide 0.45s cubic-bezier(0.2, 1, 0.3, 1) 0.6s both;
+}
+/* Slides in from off the corner it belongs to, so it reads as arriving rather
+   than fading up. */
+@keyframes shareFlashSlide {
+  from { opacity: 0; transform: translate(38%, -38%); }
+  to { opacity: 1; transform: translate(0, 0); }
+}
+/* The words pop, and the full transform is repeated in every frame: a keyframe
+   replaces the transform outright, so leaving the rotate out of it would spin
+   them flat on the first frame. */
+@keyframes shareTextPop {
+  from { opacity: 0; transform: translate(-50%, -50%) rotate(43deg) scale(0.4); }
+  62% { opacity: 1; transform: translate(-50%, -50%) rotate(43deg) scale(1.12); }
+  to { opacity: 1; transform: translate(-50%, -50%) rotate(43deg) scale(1); }
 }
 /* The artwork is the TEXT ONLY: white paths on a 720 x 210.1 canvas, no pink and
    no rotation of its own. So the flash body is the clip-path triangle above and
@@ -333,9 +360,14 @@
   position: absolute;
   top: 33%;
   left: 67%;
-  width: 86%;
+  /* 86% sat inside the triangle. At 100% the band is longer than the chord it
+     lies on, so it overhangs each edge by a few pixels, which is the point. */
+  width: 100%;
   aspect-ratio: 720 / 210.1;
-  transform: translate(-50%, -50%) rotate(45deg);
+  /* 43deg, two degrees back from the 45 of the diagonal. */
+  transform: translate(-50%, -50%) rotate(43deg);
+  z-index: 1;
+  animation: shareTextPop 0.4s cubic-bezier(0.2, 1.5, 0.4, 1) 0.5s both;
   background-image: url("/flash-share-score.svg");
   background-repeat: no-repeat;
   background-position: center;
@@ -358,7 +390,7 @@
        88% of the screen between 769 and 1069px, and with nowrap that is one
        wide font away from running off the edge. 13vw holds it near 70% there
        and changes nothing above 1320px. */
-    font-size: clamp(4.55rem, 13vw, 10.7rem);
+    font-size: clamp(4.467rem, 13vw, 10.617rem);
     white-space: nowrap;
   }
   .endFlashWord {
