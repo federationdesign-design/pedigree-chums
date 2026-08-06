@@ -24,10 +24,17 @@
   position: fixed;
   top: 18px;
   left: 18px;
+  /* MATCHED TO THE MENU BUTTON, figure for figure, including the one that was
+     making it look smaller: the menu uses OUTLINE, which is drawn outside the
+     box, and this used BORDER, which box-sizing draws inside it. At 67.5 that is
+     a 77.5px button next to a 67.5px one. Outline here too, plus the same
+     radius and the same drop shadow. */
   width: 67.5px;
   height: 67.5px;
-  border-radius: 20px;
-  border: 5px solid var(--navy, #0a3a57);
+  border-radius: 20.25px;
+  outline: 5px solid var(--navy, #0a3a57);
+  border: none;
+  box-shadow: 0 4px 0 rgba(10, 58, 87, 0.3);
   /* Red, matching the close on the game over row: this leaves the game. */
   background: #ef4444;
   color: #ffffff;
@@ -250,8 +257,9 @@
     max-width: 360px;
   }
   .back {
-    width: 100.8px;
-    height: 100.8px;
+    /* 100, not 100.8: the menu's desktop size. */
+    width: 100px;
+    height: 100px;
     border-radius: 30px;
   }
 }
