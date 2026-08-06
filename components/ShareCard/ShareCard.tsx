@@ -13,19 +13,23 @@ import css from "./ShareCard.module.css";
  * real bug surface. A genuine URL was priced separately and rejected: nobody
  * deep-links to their own game over screen.
  *
- * THE CARD IS DRAWN ENTIRELY IN CODE. No background jpg, so there is no asset to
- * ship, nothing to wait on, it stays crisp at any size and it can never fall
- * back to a broken image. 1080 x 1350, four by five portrait, which is the
- * biggest footprint on an Instagram feed and crops square safely.
+ * THE CARD IS PAINTED ONTO SUPPLIED ARTWORK, /myscorecard-empty.jpg, which
+ * carries the logo, MY SCORE, the paw pattern and the rounded corners. Only the
+ * five live pieces are drawn: the score, the LEVEL label, the level name, the
+ * chum rate panel and its value.
+ *
+ * It began drawn entirely in code and was replaced when the designed card
+ * arrived. The positions are not estimates: the filled card was diffed against
+ * its own empty version, so every block sits where the artwork put it.
  */
 
 const W = 1080;
-const H = 1350;
+const H = 1345; // the artwork's own size
+const CARD_BG = "/myscorecard-empty.jpg";
 
 // Brand tokens, hard-coded because a canvas cannot read a CSS variable.
 const NAVY = "#0a3a57";
 const CREAM = "#fff8e6";
-const YELLOW = "#ffd23e";
 const BLUE_SKY = "#5cc4ee";
 const BLUE_DEEP = "#0b78bd";
 
@@ -130,21 +134,20 @@ export default function ShareCard(props: ShareCardProps) {
       .catch(() => {})
       .finally(() => {
         if (dead) return;
-        // The portrait is optional, so the card draws either way: it is painted
-        // in an onload and again immediately, rather than the draw waiting on an
-        // image that may never arrive.
+        // The background carries the logo, MY SCORE and the paw pattern, so it
+        // is drawn first and everything else lands on top of it. It is painted
+        // once without it too, so a failed image leaves a readable card rather
+        // than a blank one.
         draw(null);
-        if (topChum?.image) {
-          const img = new window.Image();
-          img.onload = () => { if (!dead) draw(img); };
-          img.src = topChum.image;
-        }
+        const bg = new window.Image();
+        bg.onload = () => { if (!dead) draw(bg); };
+        bg.src = CARD_BG;
       });
     return () => { dead = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [score, rate, chums, level, topChum?.image]);
 
-  function draw(portrait: HTMLImageElement | null) {
+  function draw(bg: HTMLImageElement | null) {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
@@ -152,101 +155,56 @@ export default function ShareCard(props: ShareCardProps) {
     const DISP = "Luckiest Guy, system-ui, sans-serif";
     const BODY = "Montserrat, system-ui, sans-serif";
 
-    ctx.fillStyle = NAVY;
-    ctx.fillRect(0, 0, W, H);
+    // EVERY FIGURE BELOW WAS MEASURED, not eyeballed: the supplied card was
+    // diffed against its own empty version, so each block sits exactly where the
+    // filled artwork put it.
+    //   score      y 553 to 855, x 137 to 941
+    //   LEVEL      y 871 to 906
+    //   level name y 927 to 954
+    //   panel      x 272 to 792, y 998 to 1278
+    //   0%         y 1124 to 1211
+    const CX = 540;
 
-    // yellow top rule
-    ctx.fillStyle = YELLOW;
-    ctx.fillRect(0, 0, W, 20);
-
-    // eyebrow, and the level opposite it
-    ctx.textBaseline = "alphabetic";
-    ctx.fillStyle = BLUE_SKY;
-    ctx.font = `700 30px ${BODY}`;
-    ctx.textAlign = "left";
-    ctx.fillText("PEDIGREE CHUMS", 72, 116);
-    ctx.textAlign = "right";
-    ctx.fillStyle = YELLOW;
-    const lvl = level.toUpperCase();
-    const lvlSize = fitText(ctx, lvl, 560, 30, BODY, "700");
-    ctx.font = `700 ${lvlSize}px ${BODY}`;
-    ctx.fillText(lvl, W - 72, 116);
-
-    // FINAL SCORE
-    ctx.textAlign = "center";
-    ctx.fillStyle = BLUE_SKY;
-    ctx.font = `700 40px ${BODY}`;
-    ctx.fillText("FINAL SCORE", W / 2, 300);
-
-    // the score, the thing people actually share
-    const scoreTxt = score.toLocaleString();
-    const scoreSize = fitText(ctx, scoreTxt, W - 160, 210, DISP);
-    ctx.font = `${scoreSize}px ${DISP}`;
-    ctx.fillStyle = CREAM;
-    ctx.fillText(scoreTxt, W / 2, 480);
-
-    // two stat blocks
-    const bw = 456, bh = 190, by = 560;
-    const blocks: [number, string, string][] = [
-      [72, "CHUM RATE", `${rate}%`],
-      [W - 72 - bw, "CHUMS FOUND", String(chums)],
-    ];
-    for (const [bx, label, value] of blocks) {
+    if (bg) {
+      ctx.drawImage(bg, 0, 0, W, H);
+    } else {
       ctx.fillStyle = BLUE_DEEP;
-      roundRect(ctx, bx, by, bw, bh, 28);
-      ctx.fill();
-      ctx.fillStyle = BLUE_SKY;
-      ctx.font = `700 28px ${BODY}`;
-      ctx.fillText(label, bx + bw / 2, by + 62);
-      ctx.fillStyle = CREAM;
-      const vs = fitText(ctx, value, bw - 60, 92, DISP);
-      ctx.font = `${vs}px ${DISP}`;
-      ctx.fillText(value, bx + bw / 2, by + 152);
+      ctx.fillRect(0, 0, W, H);
     }
 
-    // the most-caught dog
-    if (topChum) {
-      const cx = W / 2, cy = 1000, r = 132;
-      if (portrait) {
-        ctx.save();
-        ctx.beginPath();
-        ctx.arc(cx, cy, r, 0, Math.PI * 2);
-        ctx.clip();
-        // cover, not stretch
-        const s = Math.max((r * 2) / portrait.width, (r * 2) / portrait.height);
-        const dw = portrait.width * s, dh = portrait.height * s;
-        ctx.drawImage(portrait, cx - dw / 2, cy - dh / 2, dw, dh);
-        ctx.restore();
-      } else {
-        ctx.fillStyle = BLUE_DEEP;
-        ctx.beginPath();
-        ctx.arc(cx, cy, r, 0, Math.PI * 2);
-        ctx.fill();
-      }
-      ctx.strokeStyle = YELLOW;
-      ctx.lineWidth = 10;
-      ctx.beginPath();
-      ctx.arc(cx, cy, r, 0, Math.PI * 2);
-      ctx.stroke();
-
-      ctx.fillStyle = BLUE_SKY;
-      ctx.font = `700 26px ${BODY}`;
-      ctx.fillText("MOST CAUGHT", cx, cy + r + 60);
-      ctx.fillStyle = CREAM;
-      const nm = topChum.name.toUpperCase();
-      const ns = fitText(ctx, nm, W - 200, 58, DISP);
-      ctx.font = `${ns}px ${DISP}`;
-      ctx.fillText(nm, cx, cy + r + 130);
-    }
-
-    // footer
-    ctx.fillStyle = YELLOW;
-    ctx.fillRect(0, H - 74, W, 74);
-    ctx.fillStyle = NAVY;
-    ctx.font = `700 34px ${BODY}`;
-    ctx.textBaseline = "middle";
-    ctx.fillText("pedigreechums.co.uk", W / 2, H - 74 / 2 + 2);
+    ctx.textAlign = "center";
     ctx.textBaseline = "alphabetic";
+
+    // the score, white, sitting on a baseline of 828
+    const scoreTxt = score.toLocaleString();
+    const ss = fitText(ctx, scoreTxt, 810, 382, DISP);
+    ctx.font = `${ss}px ${DISP}`;
+    ctx.fillStyle = "#ffffff";
+    ctx.fillText(scoreTxt, CX, 828);
+
+    // LEVEL, small and white
+    ctx.font = `50px ${DISP}`;
+    ctx.fillText("LEVEL", CX, 906);
+
+    // the level itself, navy
+    ctx.fillStyle = NAVY;
+    const lvl = level.toUpperCase();
+    const ls = fitText(ctx, lvl, 760, 38, BODY, "700");
+    ctx.font = `700 ${ls}px ${BODY}`;
+    ctx.fillText(lvl, CX, 954);
+
+    // the chum rate panel
+    ctx.fillStyle = BLUE_DEEP;
+    roundRect(ctx, 272, 998, 520, 281, 30);
+    ctx.fill();
+    ctx.fillStyle = BLUE_SKY;
+    ctx.font = `700 36px ${BODY}`;
+    ctx.fillText("CHUM RATE", CX, 1090);
+    ctx.fillStyle = CREAM;
+    const rateTxt = `${rate}%`;
+    const rs = fitText(ctx, rateTxt, 440, 112, DISP);
+    ctx.font = `${rs}px ${DISP}`;
+    ctx.fillText(rateTxt, CX, 1211);
   }
 
   async function shareWith(caption: string) {
