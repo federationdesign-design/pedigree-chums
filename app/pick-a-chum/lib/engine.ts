@@ -46,7 +46,10 @@ const MEANINGFUL_TOPIC = new Set(['breed_answer', 'rules_answer', 'faq_answer', 
 // non-meaningful is held as the safeguarding continuation, so this set only gates aftercare. The
 // bark game (bark / bark_break / bark_ack) and a comic transfer (joke -> Boxer) are
 // the comedy; open_discount_popup is sales; fun_tease is the games tease.
-const AFTERCARE_BLOCKED = new Set(['offer_bark_game', 'open_discount_popup', 'transfer', 'bark', 'bark_break', 'bark_ack', 'price_answer', 'canned', 'game_start', 'game_move', 'game_exit']);
+// Task 140: 'page_bio' is added so the new page-bio route never serves inside PROTECTED_AFTERCARE
+// (brief section 8). In PROTECTED_ACTIVE it is already held: it is not a MEANINGFUL_TOPIC, so it
+// becomes the safeguarding continuation there.
+const AFTERCARE_BLOCKED = new Set(['offer_bark_game', 'open_discount_popup', 'transfer', 'bark', 'bark_break', 'bark_ack', 'price_answer', 'canned', 'game_start', 'game_move', 'game_exit', 'page_bio']);
 // The "old voice" routes a canned answer is allowed to override (Steve's decision): the identity
 // spiel, the orientation nudge, the bare-help clarifier and any FAQ match. These resolve above the
 // in-router canned check, so a matching canned trigger overrides them here. Safety, grief, breed
@@ -160,6 +163,7 @@ export function submit(data: ChumData, session: Session, input: string): Turn {
     personalSadnessCount: session.personalSadnessCount,
     pendingConfirm: session.pendingConfirm,
     activeGame: session.activeGame,
+    route: session.route, // Task 140: the page the visitor is on, for the page-bio route
   });
 
   // A canned answer (B21-B39) overrides the four old-voice routes Steve named (identity,

@@ -14,6 +14,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import styles from './PickAChum.module.css';
 import PickAChumIcon from './PickAChumIcon';
 import { CHUM_DATA } from '../lib/data';
@@ -136,7 +137,9 @@ function actionFor(r: Turn['response']): Command | undefined {
   if (r.openPopup) return { label: 'Get the 30% discount code', kind: 'popup' };
   if (r.url) {
     const external = /^https?:/.test(r.url) || r.url.startsWith('mailto:');
-    const name = destinationName(r.destinationId) || 'Open it';
+    // Task 140: the fetch-to-bio fall-through carries its own label (many bio pages have no
+    // destination record, so destinationName would return nothing and read as "Open it").
+    const name = r.linkLabel || destinationName(r.destinationId) || 'Open it';
     return { label: name, kind: external ? 'external' : 'internal', href: r.url };
   }
   return undefined;
@@ -178,6 +181,9 @@ const PROFILE_IMG: Record<Dog, string> = {
 const HIDDEN_GAME_ID: Record<GameId, HiddenGameId> = { ninesquare: 'G03', missingsheep: 'G04', kennelsketch: 'G05' };
 
 export default function PickAChumExperience({ onClose }: { onClose: () => void }) {
+  // Task 140: the page the visitor is on, carried into the engine as session state (like lastAction)
+  // so "what is this page" answers with that page's bio. Always a string on a real route.
+  const pathname = usePathname();
   const restoredRef = useRef<ReturnType<typeof readChat> | undefined>(undefined);
   if (restoredRef.current === undefined) restoredRef.current = readChat();
   const restored = restoredRef.current;
@@ -498,6 +504,7 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
     }
 
     const fromDog = session.activeDog;
+    session.route = pathname ?? undefined; // Task 140: the page context for the page-bio route
     const result = submit(CHUM_DATA, session, text);
     // Task 105 SAFETY: the moment a turn enters a protected state, latch it so this session is never
     // persisted (the save effect also checks, but latch early, before the message is even added).
@@ -642,7 +649,7 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
     }
 
     performTheatre(dogMsg.id, r.text, toDog, result.resolution.action, r.closed);
-  }, [input, phase, runSwap, after, clearTimers, reducedMotion, performTheatre, setMsg]);
+  }, [input, phase, runSwap, after, clearTimers, reducedMotion, performTheatre, setMsg, pathname]);
 
   // Task 82: drain the type-ahead queue. When a reply finishes (phase returns to idle) the next
   // queued line is sent, which starts its own performance; this effect re-runs when that lands, so

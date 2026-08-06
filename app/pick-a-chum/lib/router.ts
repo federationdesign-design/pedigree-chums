@@ -11,6 +11,7 @@ import { effectiveBank } from './banks';
 import { Normalised, normalise, isGibberish, isSingleWord, isEmojiOnly, isBarkOnly, barkUnitCount, hasAny, buildAliasMap, applyAliases } from './normalise';
 import { detectSafety, isDogHealthQuestion, detectProtectedContinuation, detectPersonalSadness, detectGrief } from './safety';
 import { Topic } from './session';
+import { bioForRoute } from '../data/page-bios';
 
 const HIDDEN_CEILING = 20;
 // The bark game breaks into English on the fifth consecutive bark exchange.
@@ -231,6 +232,14 @@ const ORIENTATION = [
 // inside "know what" (an identity phrasing), so it is matched on the whole input only.
 const ORIENTATION_EXACT = new Set(['what is this', 'now what']);
 
+// Task 140: page bios, route 1 -- "what is this page" answers with the bio for wherever the
+// visitor is standing. Whole-message triggers only (a Set, not substrings), so "what is this dog"
+// stays the breed hub and only these exact messages match. "whats this" is deliberately ABSENT:
+// it belongs to orientation / B28, which give a fuller answer (brief section 4). "what is this"
+// IS here, but the check is gated on a live page context (state.route), so with no context (the
+// harness) it falls through to ORIENTATION_EXACT unchanged.
+const PAGE_BIO_TRIGGERS = new Set(['what is this page', 'tell me about this page', 'where am i', 'what is this', 'what page is this', 'whats this page']);
+
 const JOKE = ['joke', 'make me laugh', 'knock knock', 'funny', 'tell me something funny', 'be funny'];
 const FOOD = ['food', 'snack', 'snacks', 'biscuit', 'sausage', 'sausages', 'bacon', 'cheese', 'hungry', 'pizza', 'treat', 'treats', 'dinner', 'meat', 'bone'];
 const INVESTIGATE = ['investigate', 'dig', 'ratting', 'mystery', 'strange history', 'good dog bad dog', 'suspicious'];
@@ -360,7 +369,9 @@ interface ToolMatch {
 }
 
 const TOOL_ALIASES: Record<string, string[]> = {
-  DST002: ['chumdrop', 'chum drop'],
+  // Task 140: DST002 (ChumDrop, url '/') IS the pit -- the root PackPit physics game. A child
+  // calls it "the mini pit" or "a gravity game"; those names reached nothing before.
+  DST002: ['chumdrop', 'chum drop', 'mini pit', 'gravity game'],
   DST006: ['know your chum', 'know your chums'],
   DST007: ["britain's dog history", 'britains dog history', 'dog history'],
   DST008: ['name generator', 'dog name generator'],
@@ -478,6 +489,7 @@ export interface RouterState {
   personalSadnessCount?: number; // Task 20: qualifying personal-sadness statements so far this session
   pendingConfirm?: string | null; // Task 68: subject offered by LOOP-01/LOOP-02 last turn, awaiting yes/no
   activeGame?: GameId | null; // Task 115: the in-chat game that currently owns the input, if any
+  route?: string; // Task 140: the page the visitor is standing on (usePathname), for the page-bio route
 }
 
 // Task 68: bare affirmations that confirm a loop offer. Whole-message forms only, so "yes but
@@ -490,7 +502,8 @@ function isConfirmYes(compact: string): boolean {
 // Deliberately NARROW: bare "game" is left to the dog-led loop (correct by design) and "lets play" to
 // the bark-game offer. A following "yes" is caught by the games_menu confirmation (below) and serves
 // B45-GAMELIST-02's list, which was orphaned before this.
-const GAMES_MENU_TRIGGERS = new Set(['are there games', 'play']);
+// Task 140: 'get me to the games' reached nothing; it is a plain request for the menu.
+const GAMES_MENU_TRIGGERS = new Set(['are there games', 'play', 'get me to the games']);
 
 // Task 134. Four Collie buckets from the workbook. Each is a whole-message
 // match, and each that asks a question sets its own lastAction so a following
@@ -511,7 +524,10 @@ const WORST_TRIGGERS = new Set(['worst dog', 'whats the worst dog', 'worst dog e
 const PAW_TRIGGERS = new Set(['paw', 'give me your paw', 'shake', 'shake hands', 'give paw', 'can i have your paw', 'high five']);
 const FETCH_TRIGGERS = new Set(['fetch', 'can we play fetch', 'play fetch', 'lets play fetch', 'throw it', 'go fetch', 'can we play catch']);
 const DOGS_TRIGGERS = new Set(['dogs', 'dog']);
-const TRICKS_TRIGGERS = new Set(['tricks', 'can you do tricks', 'show me a trick', 'do a trick', 'any tricks', 'do tricks', 'can you do a trick']);
+// Task 140: widen to phrasings from the real log that missed B54. 'performa' is a genuine
+// typo a child typed; the 'u'/'you do tricks' and 'for me' forms are the other observed misses.
+// ('any tricks?' already normalises to 'any tricks', so it is covered above.)
+const TRICKS_TRIGGERS = new Set(['tricks', 'can you do tricks', 'show me a trick', 'do a trick', 'any tricks', 'do tricks', 'can you do a trick', 'u do tricks', 'you do tricks', 'performa trick', 'perform a trick for me', 'do a trick for me']);
 const GENERAL_TRIGGERS: Record<string, string> = {
   // 'are there games' stays with B45, which owned it first and has the list on confirm.
   'games': 'COL-B56-GENERAL-01', 'show me a game': 'COL-B56-GENERAL-01',
@@ -852,7 +868,8 @@ const GAME_CMD = new Set(['shake', 'paw', 'shake hands', 'give paw', 'high five'
 // not the fuzzy bark exit, so a Kennel Sketch guess like "bone" is never mistaken for "done"). While a
 // game is active every other input is a move.
 const GAME_STARTS: [RegExp, GameId][] = [
-  [/nine ?squares?/, 'ninesquare'],
+  // Task 140: a child types the digit ("9 square"/"9square"), so accept it alongside the word.
+  [/(?:nine|9) ?squares?/, 'ninesquare'],
   [/missing sheep/, 'missingsheep'],
   [/kennel sketch/, 'kennelsketch'],
 ];
@@ -1164,6 +1181,18 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
       const streak = (state.barkStreak ?? 0) + 1;
       if (streak === BARK_BREAK) return { layer: 15, layerName: 'The bark game', bucket: 'B19', action: 'bark_break', barkCount: 1 };
       return { layer: 15, layerName: 'The bark game', bucket: null, action: 'bark', barkCount: 1 };
+    }
+  }
+
+  // Task 140: page bios, route 1. "what is this page" (and the other whole-message triggers)
+  // answers with the bio for the page the visitor is standing on. Placed just ABOVE orientation
+  // so it intercepts the exact "what is this" when a page context exists; with no context
+  // (state.route unset, e.g. the harness) it is skipped and orientation keeps that input. The
+  // engine holds this action in both protected states (brief section 8), so it never serves there.
+  if (state.route) {
+    const bio = bioForRoute(state.route);
+    if (bio && PAGE_BIO_TRIGGERS.has(c)) {
+      return { layer: 3, layerName: 'Gameplay and website navigation', bucket: 'B03', action: 'page_bio', pageBioRoute: state.route };
     }
   }
 

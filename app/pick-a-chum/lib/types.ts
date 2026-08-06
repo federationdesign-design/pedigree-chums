@@ -170,6 +170,7 @@ export type ActionType =
   | 'ask_games' // Task 134b: B56. "games" asks; a following yes serves the B45 list.
   | 'tricks_menu' // Task 134: B54. "tricks" serves COL-B54-TRICKS-01 ("I do tricks"); a following "yes" serves TRICKS-02 (the list). Serves the specific responseId, like canned.
   | 'paw' // Task 138: she offers a paw, served as a short clip rather than a line.
+  | 'page_bio' // Task 140: "what is this page" -> the bio for the page the visitor is standing on (from usePathname). Fires only with a page context; never inside a protected state.
   | 'dog_fact' // Task 134: B57. A dog fact chosen AT RANDOM, not by rotation, and not repeated until the session has used all twenty.
   | 'price_answer' // Task 49: a price question -> FAQ008's text in chat; NOT a MEANINGFUL_TOPIC, so the safety machine holds/refuses it like buying
   | 'transfer_request' // visitor asks to switch to a different dog
@@ -209,6 +210,7 @@ export interface Resolution {
   breedTitle?: string; // breed_page: the matched breed's display title (for placeholder copy)
   breedOptions?: { title: string; slug: string; url: string }[]; // breed_choice: the two options
   griefCategory?: string; // Task 58: which grief scenario matched (GRIEF-01 died / GRIEF-02 lost / GRIEF-03 old-unwell); all serve the same ':(' line
+  pageBioRoute?: string; // Task 140: the pathname the page-bio answer is for; the assembler resolves the bio and substitutes {{BREED}} from the slug
   mirror?: string; // Task 76: the greeting word to echo back for a B09 greeting (the only response built from the input)
   responseId?: string; // Task 80: the specific canned-conversation row (B21-B39) the input matched; the assembler serves that row's template
   // Task 115: game routing. `game` is the game a start/move/exit targets. The engine processes the move

@@ -19,6 +19,36 @@ final copy.
 | LOOP-02 route offer | `engine.ts` (`LOOP_02_ROUTE_OFFER = 'the game or a dog?'`) | The `[ROUTE A] or [ROUTE B]?` fill is my best-effort using ORIENT's two departments; the exact copy, and whether it should adapt to the candidate's specific route ("close to a supported route"), is unspecified. It also overlaps ORIENT's wording | Steve supplies the LOOP-02 route-offer copy and the adapt-to-candidate rule |
 | Grief detection trigger lists | `safety.ts` (`GRIEF_DIED`/`GRIEF_LOST`/`GRIEF_WORRIED`/`GRIEF_CONTINUE`/`GRIEF_EXCLUDE`) | Task 58 grief COPY (`:(`) is approved; the DETECTION wording is best-effort, authored to cover the three scenarios and the required assertions, conservative to avoid false positives. As a safety route it should be reviewed/extended by Steve like the other safety trigger lists | Steve reviews and extends the grief triggers |
 
+## Task 140 media clips (four of five NOT wired)
+
+The five clips in `public/chat-media/` (birthday, car, cats, hotdog, ball) were
+briefed to attach to existing answers. Only **cats** has a real target in the
+current workbook; it is wired (the clip joins `B21-CATS-01` "Where?"). The other
+four reference answers/routes that do not exist in `agent/data/workbook.xlsx`
+(confirmed: `build:chumdata` regenerates with zero changes, so the JSON is in
+sync with the workbook). Wiring them would mean inventing character copy and/or
+new routes, which the house rules forbid. They are left unwired, pending content.
+
+| Clip | Briefed target | Reality (probed via the live engine) | Resolve via |
+|---|---|---|---|
+| `cats.mp4` | join B21 "Where?" | WIRED: `assembler.ts` `case 'canned'`, `B21-CATS-01` | done |
+| `hotdog.mp4` | "after the transfer to the Labrador" | `hot dog`/`hot dogs` -> FAQ007 (the card-game Hot Dogs memory variant); there is no Labrador food-transfer for hot dogs | Steve adds a hot-dog Labrador transfer (or confirms attaching to FAQ007) |
+| `car.mp4` | "existing car answer in B32" | B32 is bored/sleep/walks/postman; no car answer exists (`car` -> fallback) | Steve adds a car answer bucket + triggers to the workbook |
+| `ball.mp4` | "existing ball answers" | no ball answer exists (`ball`/`balls`/`tennis balls` -> fallback; only a Kennel-Sketch drawing clue) | Steve adds a ball answer bucket + triggers |
+| `birthday.mp4` | "any birthday mention" | no birthday route or copy exists anywhere (`its my birthday` -> fallback) | Steve supplies a birthday response (copy + triggers) |
+
+The five `public/chat-media/*.mp4` files are untracked; `git add public/` before
+any commit or they 404 on Vercel.
+
+## Task 140 page bios, route 2 (not implemented)
+
+`page-bios.ts` was briefed to serve three routes. Routes 1 ("what is this page")
+and 3 (fetch fall-through to bios) are built. Route 2 ("where do I find X" -> the
+bio plus that page's link) is NOT built: how the bio composes with the existing
+navigation answer (replace the B03 nav copy? append to it? only for the ~10 bio
+pages that have no destination record?) is unspecified, and any of those changes
+the served text of existing nav answers broadly. Left for a composition decision.
+
 ## Ancient playable levels (4 August)
 
 Six circle images do not exist yet. All six nodes point at the shared

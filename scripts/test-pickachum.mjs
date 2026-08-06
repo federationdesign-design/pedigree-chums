@@ -1897,6 +1897,97 @@ check('nine square', { action: 'game_start' });
 check('missing sheep', { action: 'game_start' });
 check('kennel sketch', { action: 'game_start' });
 
+// ==== Task 140: page bios, media responses, trigger widening, fetch fall-through ====
+
+// ---- Task 140 C: trigger widening (no new copy, existing buckets) ----
+// Tricks (B54): the real-log misses, including the 'performa' typo. 'any tricks?' already normalised.
+for (const inp of ['performa trick', 'u do tricks?', 'you do tricks?', 'perform a trick for me', 'do a trick for me']) {
+  check(inp, { action: 'tricks_menu', bucket: 'B54' }, { assert: (_r, resp) => (resp.responseId === 'COL-B54-TRICKS-01' ? null : `not the tricks question: ${resp.responseId}`) });
+}
+// Game names: a child types the digit for Nine-Square; "mini pit"/"a gravity game" are the pit
+// (DST002 ChumDrop, url '/'); "get me to the games" is the games menu.
+check('9 square', { action: 'game_start' }, { assert: (r) => (r.game === 'ninesquare' ? null : `9 square not ninesquare: ${r.game}`) });
+check('9square', { action: 'game_start' }, { assert: (r) => (r.game === 'ninesquare' ? null : `9square not ninesquare: ${r.game}`) });
+check('mini pit', { action: 'link', bucket: 'B03' }, { destinationId: 'DST002', url: '/' });
+check('a gravity game', { action: 'link', bucket: 'B03' }, { destinationId: 'DST002', url: '/' });
+check('get me to the games', { action: 'games_menu', bucket: 'B45' }, { assert: (_r, resp) => (resp.responseId === 'B45-GAMELIST-01' ? null : `not the games menu: ${resp.responseId}`) });
+
+// ---- Task 140 A: page bios, route 1 ("what is this page") ----
+// The bio for the page the visitor is standing on. Fires only with a page context (session.route).
+const withRoute = (route) => { const s = newSession(); s.route = route; return s; };
+check('what is this page', { action: 'page_bio' }, { session: withRoute('/hot-dogs'), assert: (_r, resp) => (resp.text === 'Advise on all kinds of hotdogs' ? null : `wrong bio: "${resp.text}"`) });
+check('where am i', { action: 'page_bio' }, { session: withRoute('/name-generator'), assert: (_r, resp) => (resp.text.includes('generate a name') ? null : `wrong bio: "${resp.text}"`) });
+// {{BREED}} substitutes from the slug at runtime and must never serve literally.
+check('what is this', { action: 'page_bio' }, { session: withRoute('/chums/labrador'), assert: (_r, resp) =>
+  resp.text.includes('{{') ? 'unfilled {{BREED}} token served literally'
+    : resp.text.includes('Labrador') ? null : `breed name not substituted: "${resp.text}"` });
+check('what is this page', { action: 'page_bio' }, { session: withRoute('/chums/border-collie'), assert: (_r, resp) => (resp.text.includes('Border Collie') && !resp.text.includes('{{') ? null : `breed bio wrong: "${resp.text}"`) });
+// A dynamic sub-route resolves by longest prefix.
+check('what is this page', { action: 'page_bio' }, { session: withRoute('/good-dog-bad-dog/bulls-eye'), assert: (_r, resp) => (resp.text.includes('good boys') ? null : `sub-route bio wrong: "${resp.text}"`) });
+// Guards: "whats this" is orientation/B28's, not the page bio; "what is this dog" stays the breed hub.
+check('whats this', { bucket: 'B28', action: 'canned' }, { session: withRoute('/hot-dogs'), assert: (r) => (r.action === 'page_bio' ? 'page bio stole "whats this"' : null) });
+check('what is this dog', { bucket: 'B05', action: 'breed_hub' }, { session: withRoute('/hot-dogs'), assert: (r) => (r.action === 'page_bio' ? 'page bio stole "what is this dog"' : null) });
+// No page context (the default session): "what is this" stays orientation, unchanged.
+check('what is this', { action: 'orientation', bucket: 'B15' });
+// An unknown route has no bio, so it falls through (never serves an empty/literal bio).
+check('what is this page', {}, { session: withRoute('/no-such-page'), assert: (r) => (r.action === 'page_bio' ? 'page bio served for an unknown route' : null) });
+// Section 8: the page-bio route must NOT serve inside either protected state (assert on served text).
+(() => {
+  const s = withRoute('/hot-dogs');
+  check('im in trouble', { action: 'safety_signpost' }, { session: s });
+  check('what is this page', {}, { session: s, assert: (r, resp) =>
+    r.action === 'page_bio' ? 'page bio served in PROTECTED_ACTIVE'
+      : resp.text.includes('hotdogs') ? 'the hot-dogs bio leaked in PROTECTED_ACTIVE' : null });
+})();
+(() => {
+  const s = withRoute('/hot-dogs');
+  check('im in trouble', { action: 'safety_signpost' }, { session: s });
+  check('how do I play?', { action: 'rules_answer' }, { session: s }); // -> aftercare
+  check('what is this page', { action: 'neutral_refusal' }, { session: s, assert: (r, resp) =>
+    r.action === 'page_bio' ? 'page bio served in PROTECTED_AFTERCARE'
+      : resp.text.includes('hotdogs') ? 'the hot-dogs bio leaked in PROTECTED_AFTERCARE' : null });
+})();
+
+// ---- Task 140 D: fetch falls through to the page bios once B03's lines are all used ----
+(() => {
+  const s = newSession();
+  const seen = new Set();
+  let firstBioAt = 0;
+  for (let i = 1; i <= 16; i++) {
+    const { response } = submit(data, s, 'fetch');
+    if (response.responseId?.startsWith('FETCH-BIO-') && !firstBioAt) firstBioAt = i;
+    if (response.responseId?.startsWith('FETCH-BIO-')) seen.add(response.responseId);
+  }
+  // B03 has ten lines, so the bios begin at turn 11; every bio link carries a real internal url + label.
+  const ok = firstBioAt === 11 && seen.size >= 5;
+  ok ? pass++ : fail++;
+  rows.push({ ok, input: 'T140: fetch -> B03 then bios', layer: 13, bucket: '-', action: 'random_link', note: ok ? '' : `firstBioAt=${firstBioAt} bios=${seen.size}` });
+})();
+// A fetch-bio carries a real page link and a readable label (never a bare "Open it").
+(() => {
+  const s = newSession();
+  let last;
+  for (let i = 0; i < 11; i++) last = submit(data, s, 'fetch').response;
+  const ok = last.responseId.startsWith('FETCH-BIO-') && typeof last.url === 'string' && last.url.startsWith('/') && !!last.linkLabel;
+  ok ? pass++ : fail++;
+  rows.push({ ok, input: 'T140: fetch-bio has link + label', layer: 13, bucket: '-', action: 'random_link', note: ok ? '' : `url=${last.url} label=${last.linkLabel}` });
+})();
+
+// ---- Task 140 B: the cats clip joins B21's existing answer (the only wireable clip) ----
+check('cats', { action: 'canned', bucket: 'B21' }, { assert: (_r, resp) =>
+  resp.responseId !== 'B21-CATS-01' ? `cats not B21-CATS-01: ${resp.responseId}`
+    : resp.text !== 'Where?' ? `existing copy lost: "${resp.text}"`
+      : resp.media?.src !== '/chat-media/cats.mp4' ? `cats clip not attached: ${JSON.stringify(resp.media)}` : null });
+
+// ---- Task 140: section 8 guards (served text unchanged for the confirmed routes) ----
+check('im in trouble', { action: 'safety_signpost' }, { assert: (r) => (r.moderationId === 'MOD_SAFEGUARDING' ? null : `guard: safeguarding moved: ${r.moderationId}`) });
+check('my dog died', { action: 'grief' }, { assert: (_r, resp) => (resp.text === ':(' ? null : `guard: grief moved: "${resp.text}"`) });
+check('i want to hurt myself', { action: 'safety_signpost' }, { assert: (r) => (r.moderationId === 'MOD_SELF_HARM' ? null : `guard: self-harm moved: ${r.moderationId}`) });
+check('how much is it', { action: 'price_answer', bucket: 'B04' });
+check('where can I get the cards', { action: 'open_discount_popup', bucket: 'B01' });
+check('paw', { action: 'paw' }, { assert: (_r, resp) => (resp.media?.src === '/chat-media/paw.mp4' ? null : `guard: paw clip moved: ${JSON.stringify(resp.media)}`) });
+check('tricks', { action: 'tricks_menu' }, { assert: (_r, resp) => (resp.responseId === 'COL-B54-TRICKS-01' && resp.text === 'I do tricks' ? null : `guard: tricks moved: "${resp.text}"`) });
+
 // ---- Report ----
 const pad = (s, n) => String(s).padEnd(n);
 console.log('\nPick a Chum: Checkpoint 1 proof\n' + '='.repeat(78));

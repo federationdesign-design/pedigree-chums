@@ -9,6 +9,7 @@ import { Normalised } from './normalise';
 import { Session } from './session';
 import { CAMPAIGN } from '../data/campaign';
 import { RULES } from '../data/rules';
+import { bioForRoute, PAGE_BIOS } from '../data/page-bios';
 import { MODERATION, HEALTH_DIAGNOSIS_BOUNDARY, SAFETY_SIGNPOST } from '../data/moderation';
 
 export interface Assembled {
@@ -27,6 +28,7 @@ export interface Assembled {
   hideDogIdentity?: boolean; // true: no dog name, avatar or character label above the response
   ariaLabel?: string; // Task 58: screen-reader label for a non-verbal response (the ':(' / ':)' faces). The UI must render this as the accessible name.
   media?: { src: string; alt: string }; // Task 138: a short looping clip served with the line. Local files only -- nothing fetched at runtime, so what a child sees is what was approved.
+  linkLabel?: string; // Task 140: an explicit label for the action link when the target is not a destination/article record (the fetch fall-through to a page bio); actionFor prefers this over destinationName.
   gameOutput?: string; // Task 115: the game's monospace board / sheep tiles / drawing, rendered pre-formatted below the line.
 }
 
@@ -246,6 +248,20 @@ export function assemble(res: Resolution, data0: ChumData, n: Normalised, sessio
     // session's offered set), instead of the old B11 command voice. The line comes from the B03 link
     // bank, filled with the destination name.
     case 'random_link': {
+      // Task 140: fetch falls through to the page bios once B03's lines are all used this session.
+      // B03's lines were written to be thrown and are funnier, so they go first; the bios cover
+      // everywhere else and never run short. Concrete routes only (the dynamic breed route has no
+      // single link), rotated by usedResponseIds so a bio is not repeated until all have been used.
+      // The bio carries its own link label (many bio pages have no destination record).
+      const b03pool = data.collieResponses.filter((x) => x.bucketId === 'B03');
+      const b03unused = b03pool.filter((x) => !session.usedResponseIds.includes(x.responseId));
+      if (b03pool.length > 0 && b03unused.length === 0) {
+        const bios = PAGE_BIOS.filter((b) => !b.route.includes('['));
+        const unusedBios = bios.filter((b) => !session.usedResponseIds.includes(`FETCH-BIO-${b.route}`));
+        const pick = (unusedBios.length ? unusedBios : bios)[0];
+        const dest = data.destinations.find((x) => x.resolvedUrl === pick.route);
+        return { responseId: `FETCH-BIO-${pick.route}`, text: pick.bio, dog, destinationId: dest?.destinationId, url: pick.route, linkLabel: dest?.name ?? pick.name, followUp: 'play again? just say fetch' };
+      }
       // Task 137: the destination follows the LINE, not the other way round.
       // Five of the six B03 templates name a specific place in their text, so
       // choosing a response and a destination independently guaranteed a
@@ -268,6 +284,23 @@ export function assemble(res: Resolution, data0: ChumData, n: Normalised, sessio
     case 'paw': {
       // Task 138: the paw from the identity game, as a short loop.
       return { responseId: 'PAW-01', text: 'paw', dog, media: { src: '/chat-media/paw.mp4', alt: 'A dog offering its paw' } };
+    }
+
+    case 'page_bio': {
+      // Task 140: the bio for the page the visitor is standing on (owner copy, page-bios.ts). On
+      // the breed page the line carries {{BREED}}, substituted from the slug at runtime (the dog's
+      // display name, else the slug title-cased); it must never serve the literal token.
+      const route = res.pageBioRoute ?? '/';
+      const bio = bioForRoute(route);
+      if (!bio) return { responseId: 'PAGE-BIO', text: '', dog };
+      let text = bio.bio;
+      if (bio.route.includes('[')) {
+        const slug = route.split('?')[0].replace(/\/+$/, '').split('/').pop() ?? '';
+        const breed = data.dogs.find((d) => d.slug === slug)?.name
+          ?? slug.replace(/-/g, ' ').replace(/\b\w/g, (ch) => ch.toUpperCase());
+        text = text.replace(/\{\{\s*BREED\s*\}\}/gi, breed);
+      }
+      return { responseId: `PAGE-BIO-${bio.route}`, text, dog };
     }
 
     case 'dog_fact': {
@@ -295,6 +328,13 @@ export function assemble(res: Resolution, data0: ChumData, n: Normalised, sessio
       const rid = res.responseId ?? res.bucket ?? 'B21';
       if (text === ':(') return { responseId: rid, text, ariaLabel: SAD_FACE_SR_LABEL, dog };
       if (text === ':)') return { responseId: rid, text, ariaLabel: SMILE_FACE_SR_LABEL, dog };
+      // Task 140: the cats clip joins B21's existing "Where?" answer (it does not replace it, and
+      // it is not a new route). Local file only. The other four Task 140 clips are NOT wired: their
+      // target answers (car/ball/birthday, and a hot-dog Labrador transfer) do not exist in the
+      // workbook, so wiring them would mean inventing copy or routes. See PLACEHOLDERS.md.
+      if (rid === 'B21-CATS-01') {
+        return { responseId: rid, text, dog, media: { src: '/chat-media/cats.mp4', alt: 'A cat looking back' } };
+      }
       if (res.destinationId) {
         const dest = data.destinations.find((d) => d.destinationId === res.destinationId);
         return { responseId: rid, text, dog, destinationId: res.destinationId, url: res.url ?? dest?.resolvedUrl ?? null };

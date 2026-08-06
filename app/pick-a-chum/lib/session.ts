@@ -69,6 +69,10 @@ export interface Session {
   activeGame: GameId | null;
   game: GameState | null;
   gamesPlayed: number;
+  // Task 140: the page the visitor is standing on, from usePathname in the experience, carried
+  // as session state the same way lastAction is. Lets "what is this page" answer with that page's
+  // bio. Undefined outside the browser (the harness), so the page-bio route only fires live.
+  route?: string;
 }
 
 export function newSession(activeDog: Dog = 'collie'): Session {
