@@ -37,20 +37,29 @@
   background: var(--blue-deep);
 }
 .pos {
-  font-family: var(--font-display), system-ui, sans-serif;
+  /* Montserrat, not Luckiest Guy: the table was redesigned to read as data
+     rather than as display type, and figures line up far better in it. */
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-weight: 700;
   font-size: clamp(13px, 1.8vw, 16px);
   color: var(--yellow);
   text-align: center;
 }
 .name {
-  font-family: var(--font-display), system-ui, sans-serif;
+  /* Montserrat, not Luckiest Guy: the table was redesigned to read as data
+     rather than as display type, and figures line up far better in it. */
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-weight: 700;
   font-size: clamp(13px, 1.6vw, 16px);
   color: var(--cream);
   text-align: left;
   letter-spacing: 0.03em;
 }
 .score {
-  font-family: var(--font-display), system-ui, sans-serif;
+  /* Montserrat, not Luckiest Guy: the table was redesigned to read as data
+     rather than as display type, and figures line up far better in it. */
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-weight: 700;
   font-size: clamp(13px, 1.6vw, 16px);
   color: var(--yellow);
   text-align: right;
