@@ -1,234 +1,536 @@
-/* What's Your Superpower: game styles.
-   The global body gradient shows through: no page background is set here.
-   Minimum supported width is 320px. */
+/* What's Your Superpower: the game.
 
-.stage {
-  max-width: 640px;
-  margin: 0 auto;
-  padding: 0 16px 40px;
+   Night theme. The page is a horizontal carousel of 17 slides, built on the
+   same mechanism as britains-dog-history-2: native CSS scroll-snap,
+   touch-action pan-x, no hijacking. Class names and structure follow that
+   file so the two pages stay readable side by side.
+
+   RULE ORDER MATTERS. Rules of equal specificity resolve last-one-wins, so
+   every override sits BELOW the rule it overrides. */
+
+/* ---------------------------------------------------------------- the rail */
+
+.rail {
+  display: flex;
+  flex-direction: row;
+  width: 100vw;
+  height: 100dvh;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  touch-action: pan-x;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  background: var(--sp-ground);
+  position: relative;
+}
+.rail::-webkit-scrollbar {
+  display: none;
+}
+
+.slide {
+  flex: 0 0 100%;
+  width: 100%;
+  height: 100%;
+  scroll-snap-align: start;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  text-align: center;
+  overflow: hidden;
+  position: relative;
 }
 
-/* ------------------------------------------------------------- entry */
+/* Night palette. Local to this page: the site tokens stay untouched so the
+   rest of the build is unaffected. */
+.rail {
+  --sp-ground: #0b1220;
+  --sp-panel: #121c2e;
+  --sp-line: #223349;
+  --sp-ink: #eef4fb;
+  --sp-ink-soft: #b3c2d4;
+  --sp-ink-mute: #7d8ea3;
+  --sp-green: #22c55e;
+  --sp-green-deep: #16a34a;
+}
 
-.gameTitle {
+/* ------------------------------------------------------------ slide 0, intro */
+
+.introImg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: var(--sp-ground) url("/superhero-power.jpg") center / cover no-repeat;
+}
+
+/* Legibility, not decoration. Weakest at the top where the photograph is
+   worth seeing, strongest at the foot where the text and button sit. */
+.introTint {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(11, 18, 32, 0.25) 0%,
+    rgba(11, 18, 32, 0.72) 45%,
+    rgba(11, 18, 32, 0.94) 100%
+  );
+}
+
+.introBody {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  padding: 60px 28px 68px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 14px;
+  box-sizing: border-box;
+}
+
+.introTitle {
   font-family: var(--font-display, "Luckiest Guy", cursive);
-  font-size: clamp(2.1rem, 8vw, 3.6rem);
-  line-height: 1.05;
+  font-size: clamp(2.6rem, 12vw, 4.4rem);
+  color: #ffffff;
   letter-spacing: 0.04em;
   text-transform: uppercase;
+  line-height: 1;
+  margin: 0;
+}
+
+.titleAccent {
   color: var(--yellow, #ffd23e);
-  margin: 0 0 12px;
 }
 
-.promise {
+.introText {
   font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: 1.05rem;
-  font-weight: 600;
-  color: var(--white, #ffffff);
-  line-height: 1.55;
-  margin: 0 0 6px;
-  max-width: 460px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #ffffff;
+  line-height: 1.35;
+  margin: 0;
 }
 
-.time {
-  font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--white, #ffffff);
-  margin: 0 0 14px;
-}
-
-.boundary {
+.introTime {
   font-family: var(--font-body, "Montserrat", sans-serif);
   font-size: 0.85rem;
-  font-weight: 600;
-  line-height: 1.5;
-  color: var(--navy, #0a3a57);
-  background: var(--cream, #fbf7ec);
-  border: 2px solid var(--navy, #0a3a57);
+  color: var(--sp-ink-soft);
+  margin: 0;
+}
+
+.introBtnRow {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  gap: 12px;
+  margin-top: 8px;
+  width: 100%;
+}
+
+/* Green CTA, the same face and drop shadow as the Britain's Dog History
+   intro button. 21 top against 16 bottom because Luckiest Guy sits high in
+   its em box and even padding reads as text pushed to the top. */
+.introBtn {
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 21px 10px 16px;
+  border: none;
   border-radius: 14px;
-  padding: 10px 14px;
-  margin: 0 0 18px;
-  max-width: 440px;
-}
-
-.primaryButton {
+  background: var(--sp-green);
+  color: #ffffff;
   font-family: var(--font-display, "Luckiest Guy", cursive);
-  font-size: 1.4rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--navy, #0a3a57);
-  background: var(--yellow, #ffd23e);
-  border: 3px solid var(--navy, #0a3a57);
-  border-radius: var(--radius-pill, 999px);
-  padding: 12px 38px 8px;
+  font-size: clamp(0.85rem, 4.2vw, 1.3rem);
+  letter-spacing: 0.04em;
+  white-space: nowrap;
   cursor: pointer;
-  transition: transform 0.15s ease;
+  box-shadow: 0 4px 0 var(--sp-green-deep);
+}
+.introBtn:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 var(--sp-green-deep);
 }
 
-.primaryButton:hover {
-  transform: scale(1.05);
+/* ------------------------------------------------- slides 1..15, questions */
+
+/* 52% is the seam the Britain's Dog History section photographs sit on, so
+   the two pages cut at the same line on any screen height. */
+.qMedia {
+  flex: 0 0 52%;
+  min-height: 0;
+  position: relative;
+  overflow: hidden;
+  background: var(--sp-panel);
 }
 
-.primaryButton:focus-visible,
-.answerButton:focus-visible,
-.backButton:focus-visible {
-  outline: 4px solid var(--yellow, #ffd23e);
-  outline-offset: 3px;
+.qImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
-/* ------------------------------------------------------------- questions */
+/* Blends the foot of the photograph into the panel below it, so a missing
+   image degrades to flat colour rather than a hard edge. */
+.qMediaTint {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(11, 18, 32, 0) 55%,
+    rgba(11, 18, 32, 0.85) 100%
+  );
+}
+
+.qBody {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  box-sizing: border-box;
+  padding: 18px 24px 42px;
+  background: var(--sp-ground);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 12px;
+}
 
 .progress {
   font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: 0.85rem;
-  font-weight: 700;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--white, #ffffff);
-  margin: 0 0 8px;
-}
-
-.progressTrack {
-  width: 100%;
-  max-width: 420px;
-  height: 10px;
-  background: var(--blue-deep, #0b78bd);
-  border: 2px solid var(--cream, #fbf7ec);
-  border-radius: var(--radius-pill, 999px);
-  overflow: hidden;
-  margin: 0 0 22px;
-}
-
-.progressFill {
-  height: 100%;
-  background: var(--yellow, #ffd23e);
-  transition: width 0.25s ease;
+  color: var(--sp-ink-mute);
+  margin: 0;
 }
 
 .question {
-  font-family: var(--font-display, "Luckiest Guy", cursive);
-  font-size: clamp(1.35rem, 5.5vw, 2rem);
-  line-height: 1.2;
-  letter-spacing: 0.03em;
-  color: var(--white, #ffffff);
-  margin: 0 0 22px;
-  max-width: 560px;
-}
-
-.question:focus {
-  outline: none;
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: clamp(1.05rem, 4.6vw, 1.35rem);
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--sp-ink);
+  margin: 0;
 }
 
 .answers {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+/* The answer buttons take the intro button's treatment, as asked. Text is
+   left aligned and wraps, because answer copy is a sentence not a label. */
+.answerBtn {
   width: 100%;
-  max-width: 480px;
-  margin: 0 0 20px;
-}
-
-.answerButton {
+  padding: 18px 18px 15px;
+  border: none;
+  border-radius: 14px;
+  background: var(--sp-green);
+  color: #ffffff;
   font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: 1.02rem;
+  font-size: 1rem;
   font-weight: 700;
-  line-height: 1.45;
-  color: var(--navy, #0a3a57);
-  background: var(--cream, #fbf7ec);
-  border: 3px solid var(--blue-deep, #0b78bd);
-  border-radius: var(--radius-card, 22px);
-  padding: 18px 20px;
+  line-height: 1.3;
+  text-align: left;
   cursor: pointer;
-  transition: transform 0.15s ease, border-color 0.15s ease;
+  box-shadow: 0 4px 0 var(--sp-green-deep);
+}
+.answerBtn:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 var(--sp-green-deep);
 }
 
-.answerButton:hover {
-  transform: scale(1.02);
-  border-color: var(--yellow, #ffd23e);
-}
-
+/* Chosen: a ring rather than a colour change, so the state survives a
+   colour-blind reading and neither option ever looks like the right one. */
 .answerChosen {
-  border-color: var(--yellow, #ffd23e);
-  background: var(--white, #ffffff);
+  outline: 3px solid var(--yellow, #ffd23e);
+  outline-offset: 2px;
 }
 
 .backButton {
+  align-self: flex-start;
+  margin-top: 2px;
+  padding: 8px 4px;
+  border: none;
+  background: none;
+  color: var(--sp-ink-mute);
   font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: 0.9rem;
-  font-weight: 700;
-  color: var(--navy, #0a3a57);
-  background: var(--cream, #fbf7ec);
-  border: 2px solid var(--navy, #0a3a57);
-  border-radius: var(--radius-pill, 999px);
-  padding: 8px 24px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: underline;
   cursor: pointer;
 }
 
-/* ------------------------------------------------------------- chart */
+/* ------------------------------------------------------ slide 16, the result */
 
-.chartCard {
-  width: 100%;
-  max-width: 460px;
-  background: var(--cream, #fbf7ec);
-  border: 3px solid var(--blue-deep, #0b78bd);
-  border-radius: var(--radius-card, 22px);
-  padding: 12px;
-  margin: 0 0 20px;
+/* The chart takes the image band, so the result slide cuts on the same 52%
+   seam as the fifteen questions. No card, no cream: the shape sits straight
+   on the ground. */
+.rMedia {
+  flex: 0 0 52%;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 16px 0;
+  box-sizing: border-box;
+  background: var(--sp-ground);
 }
+
+.rBody {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  box-sizing: border-box;
+  padding: 4px 24px 42px;
+  background: var(--sp-ground);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.resultTitle {
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: clamp(1.8rem, 8vw, 2.6rem);
+  letter-spacing: 0.03em;
+  line-height: 1.05;
+  color: var(--yellow, #ffd23e);
+  margin: 0;
+}
+
+.resultLine {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--sp-ink);
+  margin: 0;
+}
+
+.summary {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.95rem;
+  line-height: 1.45;
+  color: var(--sp-ink-soft);
+  margin: 0;
+}
+
+.mainBlock {
+  border: 1px solid var(--sp-line);
+  border-radius: 14px;
+  background: var(--sp-panel);
+  padding: 14px 16px;
+  margin-top: 4px;
+}
+
+.mainBlockTitle {
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: 1.15rem;
+  letter-spacing: 0.03em;
+  color: var(--sp-ink);
+  margin: 0 0 6px;
+}
+
+.blockRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.compactBlock {
+  border: 1px solid var(--sp-line);
+  border-radius: 14px;
+  background: var(--sp-panel);
+  padding: 12px 14px;
+}
+
+.compactPower {
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: 1rem;
+  letter-spacing: 0.03em;
+  color: var(--yellow, #ffd23e);
+  margin: 0 0 4px;
+}
+
+.compactTitle {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--sp-ink);
+  margin: 0 0 4px;
+}
+
+.blockBody {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.88rem;
+  line-height: 1.45;
+  color: var(--sp-ink-soft);
+  margin: 0 0 6px;
+}
+.blockBody:last-child {
+  margin-bottom: 0;
+}
+
+/* Sidekick reasons: three bullets under the role summary, shown only when
+   the result awards no power (spec section 10, sidekick layout). */
+.reasonList {
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+.reason {
+  margin: 0;
+  padding-left: 26px;
+  position: relative;
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.92rem;
+  line-height: 1.45;
+  color: var(--sp-ink);
+}
+.reason::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.5em;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--yellow, #ffd23e);
+}
+
+.relativeExplanation {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: var(--sp-ink-mute);
+  margin: 8px 0 0;
+}
+
+.restartRow {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.replay {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.8rem;
+  color: var(--sp-ink-mute);
+  margin: 0;
+  text-align: center;
+}
+
+/* ------------------------------------------------------- boundary statement */
+
+/* Required before Start and on the result screen, visible without scrolling
+   at 320px (spec section 2). */
+.boundary {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.78rem;
+  line-height: 1.4;
+  color: var(--sp-ink-mute);
+  margin: 6px 0 0;
+}
+
+.boundaryLight {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.78rem;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.82);
+  margin: 0;
+}
+
+/* ------------------------------------------------------------- progress bar */
+
+.progressTrack {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 5px;
+  background: var(--sp-line);
+  z-index: 5;
+}
+
+.progressFill {
+  height: 100%;
+  background: var(--yellow, #ffd23e);
+  transition: width 260ms ease;
+}
+@media (prefers-reduced-motion: reduce) {
+  .progressFill {
+    transition: none;
+  }
+  .rail {
+    scroll-behavior: auto;
+  }
+}
+
+/* ------------------------------------------------------------- the chart */
 
 .chart {
   width: 100%;
-  height: auto;
+  height: 100%;
+  max-height: 100%;
   display: block;
 }
 
 .chartRing {
   fill: none;
-  stroke: var(--blue-sky, #5cc4ee);
+  stroke: var(--sp-line);
   stroke-width: 1;
 }
 
 .chartSpoke {
-  stroke: var(--blue-sky, #5cc4ee);
+  stroke: var(--sp-line);
   stroke-width: 1;
 }
 
 .chartSpokePrimary {
-  stroke: var(--blue-deep, #0b78bd);
+  stroke: var(--blue-sky, #5cc4ee);
   stroke-width: 3;
 }
 
 .chartSpokeSecondary {
-  stroke: var(--blue-deep, #0b78bd);
+  stroke: var(--blue-sky, #5cc4ee);
   stroke-width: 2;
 }
 
+/* Dark blue line, light blue fill, as asked. On the night ground the line
+   is lifted to the sky blue so it clears contrast against the panel. */
 .chartShape {
   fill: var(--blue-sky, #5cc4ee);
-  fill-opacity: 0.45;
-  stroke: var(--blue-deep, #0b78bd);
+  fill-opacity: 0.28;
+  stroke: var(--blue-sky, #5cc4ee);
   stroke-width: 2.5;
   stroke-linejoin: round;
 }
 
 .chartMarker {
-  fill: var(--blue-deep, #0b78bd);
+  fill: var(--blue-sky, #5cc4ee);
 }
 
+/* Emphasis never rests on colour alone: the leading marker is larger and
+   ringed, and its label is heavier (spec section 9). */
 .chartMarkerPrimary {
-  fill: var(--navy, #0a3a57);
-  stroke: var(--yellow, #ffd23e);
+  fill: var(--yellow, #ffd23e);
+  stroke: var(--sp-ground);
   stroke-width: 3;
 }
 
 .chartMarkerSecondary {
-  fill: var(--cream, #fbf7ec);
-  stroke: var(--navy, #0a3a57);
+  fill: var(--sp-ground);
+  stroke: var(--yellow, #ffd23e);
   stroke-width: 2.5;
 }
 
@@ -236,163 +538,19 @@
   font-family: var(--font-body, "Montserrat", sans-serif);
   font-size: 15px;
   font-weight: 600;
-  fill: var(--navy, #0a3a57);
+  fill: var(--sp-ink-soft);
 }
 
 .chartLabelPrimary {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 15px;
   font-weight: 800;
-  font-size: 16px;
+  fill: var(--sp-ink);
 }
 
 .chartLabelSecondary {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 15px;
   font-weight: 700;
-}
-
-/* ------------------------------------------------------------- result */
-
-.resultTitle {
-  font-family: var(--font-display, "Luckiest Guy", cursive);
-  font-size: clamp(1.9rem, 7vw, 3rem);
-  line-height: 1.1;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--yellow, #ffd23e);
-  margin: 0 0 8px;
-}
-
-.resultTitle:focus {
-  outline: none;
-}
-
-.resultLine {
-  font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: 1.05rem;
-  font-weight: 600;
-  color: var(--white, #ffffff);
-  line-height: 1.5;
-  margin: 0 0 10px;
-  max-width: 480px;
-}
-
-.summary {
-  font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: 0.98rem;
-  font-weight: 600;
-  color: var(--white, #ffffff);
-  line-height: 1.5;
-  margin: 0 0 22px;
-  max-width: 480px;
-}
-
-.mainBlock {
-  width: 100%;
-  max-width: 480px;
-  background: var(--cream, #fbf7ec);
-  border: 3px solid var(--yellow, #ffd23e);
-  border-radius: var(--radius-card, 22px);
-  padding: 18px 20px;
-  margin: 0 0 14px;
-}
-
-.mainBlockTitle {
-  font-family: var(--font-display, "Luckiest Guy", cursive);
-  font-size: 1.35rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--blue-deep, #0b78bd);
-  margin: 0 0 8px;
-}
-
-.blockRow {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 14px;
-  width: 100%;
-  margin: 0 0 14px;
-}
-
-.compactBlock {
-  width: 100%;
-  max-width: 480px;
-  background: var(--cream, #fbf7ec);
-  border: 2px solid var(--blue-deep, #0b78bd);
-  border-radius: var(--radius-card, 22px);
-  padding: 14px 16px;
-  margin: 0 0 14px;
-}
-
-.blockRow .compactBlock {
-  flex: 1 1 200px;
-  width: auto;
-  margin: 0;
-}
-
-.compactPower {
-  font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: 0.8rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  color: var(--blue-deep, #0b78bd);
-  margin: 0 0 4px;
-}
-
-.compactTitle {
-  font-family: var(--font-display, "Luckiest Guy", cursive);
-  font-size: 1.05rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--navy, #0a3a57);
-  margin: 0 0 6px;
-}
-
-.blockBody {
-  font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: 0.92rem;
-  font-weight: 500;
-  color: var(--navy, #0a3a57);
-  line-height: 1.5;
-  margin: 0 0 4px;
-}
-
-.relativeExplanation {
-  font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--white, #ffffff);
-  line-height: 1.5;
-  margin: 8px 0 12px;
-  max-width: 440px;
-}
-
-.restartRow {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  margin-top: 4px;
-}
-
-.replay {
-  font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--white, #ffffff);
-  margin: 0;
-}
-
-/* ------------------------------------------------------------- motion */
-
-@media (prefers-reduced-motion: reduce) {
-  .primaryButton,
-  .answerButton,
-  .progressFill {
-    transition: none;
-  }
-
-  .primaryButton:hover,
-  .answerButton:hover {
-    transform: none;
-  }
+  fill: var(--sp-ink);
 }

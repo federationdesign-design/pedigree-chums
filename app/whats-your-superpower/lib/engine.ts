@@ -1,4 +1,4 @@
-// What's Your Superpower: result-contract engine (schema result-contract-1.0).
+// What's Your Superpower: result-contract engine (schema result-contract-2.0).
 //
 // Pure, deterministic functions over the stored answer array. No content
 // lives here: every title, line and summary template comes from the generated
@@ -41,6 +41,7 @@ export interface GameConfig {
   configVersion: string;
   schemaVersion: string;
   nameSet: string;
+  sidekickSet: string;
   powers: readonly Power[];
   powerMeta: Record<Power, PowerMeta>;
   questions: Question[];
@@ -52,7 +53,10 @@ export interface GameConfig {
   >;
   directionalTitles: Record<string, { title: string; line: string }>;
   jointTitles: Record<string, { title: string; line: string }>;
-  powerPackTitle: string;
+  // Three, four and five-way ties award no power. Each gets a sidekick role
+  // instead (spec section 7). The roles are keyed by state id, not by which
+  // powers tied: the tied set is not a qualification for the role.
+  sidekickRoles: Record<"TIE_THREE" | "TIE_FOUR" | "TIE_FIVE", { title: string; reasons: string[] }>;
   copy: {
     gameTitle: string;
     promise: string;
@@ -63,11 +67,15 @@ export interface GameConfig {
   };
 }
 
-export type ResultLayout = "single" | "pair" | "pack";
+export type ResultLayout = "single" | "pair" | "sidekick";
 
 export interface ResolvedResult {
   stateId: StateId;
   layout: ResultLayout;
+  /** False for the three sidekick states. Drives every award-only branch. */
+  awardsPower: boolean;
+  /** Empty unless layout is "sidekick". */
+  reasons: string[];
   leadingPowers: Power[];
   supportingPower: Power | null;
   titleKey: string;
@@ -158,6 +166,8 @@ export function resolveResult(
   let titleKey: string;
   let title: string;
   let line: string | null;
+  let awardsPower: boolean;
+  let reasons: string[] = [];
   if (n === 1) {
     stateId = gap <= config.closeGapMax ? "SINGLE_CLOSE" : "SINGLE_CLEAR";
     layout = "single";
@@ -165,6 +175,7 @@ export function resolveResult(
     const t = config.directionalTitles[`${leadingPowers[0]}>${supportingPower}`];
     title = t.title;
     line = t.line;
+    awardsPower = true;
   } else if (n === 2) {
     stateId = "TIE_TWO";
     layout = "pair";
@@ -172,12 +183,16 @@ export function resolveResult(
     const t = config.jointTitles[leadingPowers.join("+")];
     title = t.title;
     line = t.line;
+    awardsPower = true;
   } else {
     stateId = n === 3 ? "TIE_THREE" : n === 4 ? "TIE_FOUR" : "TIE_FIVE";
-    layout = "pack";
-    titleKey = "GENERIC:power_pack";
-    title = config.powerPackTitle;
+    layout = "sidekick";
+    titleKey = `SIDEKICK:${stateId}`;
+    const role = config.sidekickRoles[stateId];
+    title = role.title;
     line = null;
+    reasons = role.reasons;
+    awardsPower = false;
   }
 
   const summary = substitute(
@@ -198,6 +213,8 @@ export function resolveResult(
   return {
     stateId,
     layout,
+    awardsPower,
+    reasons,
     leadingPowers,
     supportingPower,
     titleKey,
@@ -206,7 +223,10 @@ export function resolveResult(
     summary,
     raw,
     plot,
-    chartPrimaryEmphasisSet: leadingPowers,
-    chartSecondaryEmphasisSet: supportingPower !== null ? [supportingPower] : [],
+    // Sidekick states award no power, so nothing is emphasised. The shape is
+    // still plotted in full (spec section 9).
+    chartPrimaryEmphasisSet: awardsPower ? leadingPowers : [],
+    chartSecondaryEmphasisSet: awardsPower && supportingPower !== null ? [supportingPower] : [],
   };
 }
+
