@@ -54,9 +54,30 @@
 
 /* The canvas is 1080x1350. It is shown small and shared full size, so the card
    is never limited by the screen it was made on. */
-.canvas {
+/* The canvas, and the tap target laid on top of it. */
+.cardWrap {
+  position: relative;
   width: 100%;
   max-width: 320px;
+  line-height: 0;
+}
+/* Over the SHARE THIS artwork that is drawn INTO the card. Every figure is that
+   region as a percentage of the 1080 x 1345 canvas, so it tracks the button at
+   any display size: x 241, y 867, w 587, h 317. */
+.shareThis {
+  position: absolute;
+  left: 22.31%;
+  top: 64.46%;
+  width: 54.35%;
+  height: 23.57%;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.canvas {
+  width: 100%;
   height: auto;
   display: block;
   border-radius: 16px;
@@ -114,7 +135,7 @@
   .inner {
     max-width: 520px;
   }
-  .canvas {
+  .cardWrap {
     max-width: 360px;
   }
   .back {

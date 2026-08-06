@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { buildBoard } from "../../data/dogLeaderboard";
 import css from "./ShareCard.module.css";
 
 /**
@@ -25,12 +26,26 @@ import css from "./ShareCard.module.css";
 
 const W = 1080;
 const H = 1345; // the artwork's own size
-const CARD_BG = "/myscorecard-empty.jpg";
+const CARD_BG = "/sharescreen-empty.jpg";
+const SHARE_BTN = "/sharethisbutton.png";
+// Measured off the supplied design, not estimated. Rows sit on an even 69px
+// pitch, names left at 144, scores right at 859, and the button sits over the
+// lower rows exactly as the artwork composites it.
+const ROW_BASELINES = [761, 830, 899, 968];
+const ROW_LEFT = 144;
+const ROW_RIGHT = 859;
+const BTN = { x: 241, y: 867, w: 587, h: 317 };
+// The separator rules were taken out of the artwork, so they are drawn here.
+// Measured off the original: x 155 to 911, 2px, and sitting a consistent 21px
+// below each baseline, which matches the even 69px row pitch. Three of them, not
+// four: nothing separates the last row from the url bar.
+const RULE = { x0: 155, x1: 911, h: 2, drop: 21 };
 
 // Brand tokens, hard-coded because a canvas cannot read a CSS variable.
 const NAVY = "#0a3a57";
 const CREAM = "#fff8e6";
 const BLUE_SKY = "#5cc4ee";
+const YELLOW = "#ffd23e";
 const BLUE_DEEP = "#0b78bd";
 
 const TAG = "#PedigreeChums #DogsOfBritain pedigreechums.co.uk";
@@ -116,6 +131,10 @@ export default function ShareCard(props: ShareCardProps) {
   const { score, rate, chums, level, topChum, onClose } = props;
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [busy, setBusy] = useState(false);
+  // The captions are behind the button now. The screen is the thing being
+  // posted, so it has to read as the finished card first; the picker is a second
+  // step rather than a list sitting under it.
+  const [picking, setPicking] = useState(false);
   const [note, setNote] = useState<string | null>(null);
 
   useEffect(() => {
@@ -138,32 +157,29 @@ export default function ShareCard(props: ShareCardProps) {
         // is drawn first and everything else lands on top of it. It is painted
         // once without it too, so a failed image leaves a readable card rather
         // than a blank one.
-        draw(null);
+        draw(null, null);
+        // Two images, and the card is redrawn as each arrives rather than
+        // waiting on both: a missing one leaves a readable card instead of a
+        // blank one.
+        let bgImg: HTMLImageElement | null = null;
+        let btnImg: HTMLImageElement | null = null;
         const bg = new window.Image();
-        bg.onload = () => { if (!dead) draw(bg); };
+        bg.onload = () => { bgImg = bg; if (!dead) draw(bgImg, btnImg); };
         bg.src = CARD_BG;
+        const btn = new window.Image();
+        btn.onload = () => { btnImg = btn; if (!dead) draw(bgImg, btnImg); };
+        btn.src = SHARE_BTN;
       });
     return () => { dead = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [score, rate, chums, level, topChum?.image]);
 
-  function draw(bg: HTMLImageElement | null) {
+  function draw(bg: HTMLImageElement | null, btn: HTMLImageElement | null) {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
-    const DISP = "Luckiest Guy, system-ui, sans-serif";
     const BODY = "Montserrat, system-ui, sans-serif";
-
-    // EVERY FIGURE BELOW WAS MEASURED, not eyeballed: the supplied card was
-    // diffed against its own empty version, so each block sits exactly where the
-    // filled artwork put it.
-    //   score      y 553 to 855, x 137 to 941
-    //   LEVEL      y 871 to 906
-    //   level name y 927 to 954
-    //   panel      x 272 to 792, y 998 to 1278
-    //   0%         y 1124 to 1211
-    const CX = 540;
 
     if (bg) {
       ctx.drawImage(bg, 0, 0, W, H);
@@ -172,39 +188,33 @@ export default function ShareCard(props: ShareCardProps) {
       ctx.fillRect(0, 0, W, H);
     }
 
-    ctx.textAlign = "center";
+    // The SAME rows the on-screen table shows. buildBoard is the one source, so
+    // the card can never disagree with the board the player just read.
+    const rows = buildBoard(score, "YOU", 3);
     ctx.textBaseline = "alphabetic";
+    rows.slice(0, ROW_BASELINES.length).forEach((entry, i2) => {
+      const y = ROW_BASELINES[i2];
+      ctx.fillStyle = entry.isDog ? NAVY : YELLOW;
+      const nm = entry.name.toUpperCase();
+      const ns = fitText(ctx, nm, 460, 40, BODY, "700");
+      ctx.font = `700 ${ns}px ${BODY}`;
+      ctx.textAlign = "left";
+      ctx.fillText(nm, ROW_LEFT, y);
+      ctx.font = `700 40px ${BODY}`;
+      ctx.textAlign = "right";
+      ctx.fillText(entry.score.toLocaleString(), ROW_RIGHT, y);
+    });
 
-    // the score, white, sitting on a baseline of 828
-    const scoreTxt = score.toLocaleString();
-    const ss = fitText(ctx, scoreTxt, 810, 382, DISP);
-    ctx.font = `${ss}px ${DISP}`;
-    ctx.fillStyle = "#ffffff";
-    ctx.fillText(scoreTxt, CX, 828);
+    // the separators, under every row but the last
+    ctx.fillStyle = "rgba(255,255,255,0.92)";
+    ROW_BASELINES.slice(0, -1).forEach((y) => {
+      ctx.fillRect(RULE.x0, y + RULE.drop, RULE.x1 - RULE.x0, RULE.h);
+    });
 
-    // LEVEL, small and white
-    ctx.font = `50px ${DISP}`;
-    ctx.fillText("LEVEL", CX, 906);
-
-    // the level itself, navy
-    ctx.fillStyle = NAVY;
-    const lvl = level.toUpperCase();
-    const ls = fitText(ctx, lvl, 760, 38, BODY, "700");
-    ctx.font = `700 ${ls}px ${BODY}`;
-    ctx.fillText(lvl, CX, 954);
-
-    // the chum rate panel
-    ctx.fillStyle = BLUE_DEEP;
-    roundRect(ctx, 272, 998, 520, 281, 30);
-    ctx.fill();
-    ctx.fillStyle = BLUE_SKY;
-    ctx.font = `700 36px ${BODY}`;
-    ctx.fillText("CHUM RATE", CX, 1090);
-    ctx.fillStyle = CREAM;
-    const rateTxt = `${rate}%`;
-    const rs = fitText(ctx, rateTxt, 440, 112, DISP);
-    ctx.font = `${rs}px ${DISP}`;
-    ctx.fillText(rateTxt, CX, 1211);
+    // The button is part of the picture, because the picture is what gets
+    // posted. The tap is taken by an HTML button laid over this same box.
+    if (btn) ctx.drawImage(btn, BTN.x, BTN.y, BTN.w, BTN.h);
+    ctx.textAlign = "center";
   }
 
   async function shareWith(caption: string) {
@@ -253,8 +263,23 @@ export default function ShareCard(props: ShareCardProps) {
       </button>
 
       <div className={css.inner}>
-        <canvas ref={canvasRef} width={W} height={H} className={css.canvas} />
+        {/* The button is drawn INTO the card, because the card is what gets
+            posted. This takes the tap, sized as a percentage of the canvas so it
+            tracks the artwork at any display size. */}
+        <div className={css.cardWrap}>
+          <canvas ref={canvasRef} width={W} height={H} className={css.canvas} />
+          {!picking && (
+            <button
+              type="button"
+              className={css.shareThis}
+              onClick={() => setPicking(true)}
+              aria-label="Share this"
+              title="Share this"
+            />
+          )}
+        </div>
 
+        {picking && (
         <div className={css.picker}>
           <p className={css.pickerTitle}>Pick a caption</p>
           {captionsFor(rate).map((fn, i) => (
@@ -264,6 +289,7 @@ export default function ShareCard(props: ShareCardProps) {
           ))}
           {note && <p className={css.note}>{note}</p>}
         </div>
+        )}
       </div>
     </div>
   );
