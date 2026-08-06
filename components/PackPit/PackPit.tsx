@@ -1126,14 +1126,12 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
           return true;
         }
         if (hit.plugin?.kind === "preorder") { startCheckout().catch(() => window.dispatchEvent(new Event("pc:open-offer"))); return true; }
-        if (hit.plugin?.kind === "entersite") {
-            try {
-              sessionStorage.setItem("pc-gameover-score", String(scoreRef.current));
-              sessionStorage.setItem("pc-gameover-chums", String(collectedRef.current));
-              const breedImgMap = Object.fromEntries(breeds.map((b: any) => [b.name, breedCard[b.slug] || b.image || ""]));
-              sessionStorage.setItem("pc-gameover-breeds", JSON.stringify(collectedChumsRef.current.map((n: string) => ({ name: n, img: breedImgMap[n] || "" }))));
-            } catch {}
-            window.location.href = "/about?gameover=1"; return true; }
+        // ENTER SITE IS NOT A GAME OVER. It used to stash the score and go to
+        // /about?gameover=1, so anyone who tapped it was shown a game over
+        // screen for a game they had not finished, or in most cases not really
+        // started. Someone arriving for the first time should just get into the
+        // site.
+        if (hit.plugin?.kind === "entersite") { window.location.href = "/about"; return true; }
         if (hit.plugin?.kind === "howtoplay") { if (!hit.plugin.scored) { hit.plugin.scored = true; numAt(hit.position.x, hit.position.y, 2000); } window.dispatchEvent(new Event("pc:open-howtoplay")); return true; }
         if (hit.plugin?.prop === "logopiece" && !hit.plugin.knockPiece) {
           // HTP step cards tapped in the pit -- open in sequential order only
