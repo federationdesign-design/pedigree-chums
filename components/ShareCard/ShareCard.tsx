@@ -73,7 +73,8 @@ export type ShareCardProps = {
   /** whole number, no percent sign: the captions add their own */
   rate: number;
   chums: number;
-  level: string;
+  /** Optional: the main pit has no levels, so it passes nothing. */
+  level?: string;
   topChum?: { name: string; image: string; count: number } | null;
   /** closes the share overlay only */
   onClose: () => void;
@@ -92,13 +93,20 @@ export type ShareCardProps = {
 const RATE_HIGH = 79; // above this, the bragging set
 const RATE_OK = 40; // at or above this, the positive set; below it, the rueful one
 
-type Caption = (p: ShareCardProps) => string;
+type Caption = ((p: ShareCardProps) => string) & { needsLevel?: boolean };
+
+/** Marks a caption that names the level, so it can be dropped when there is none. */
+function lvl(fn: (p: ShareCardProps) => string): Caption {
+  const c = fn as Caption;
+  c.needsLevel = true;
+  return c;
+}
 
 const POSITIVE: Caption[] = [
   (p) => `I got ${p.score.toLocaleString()} and collected ${p.chums} dogs. Beat that.`,
   (p) => `I don't really know what went on but I got a chum rate of ${p.rate}%`,
   (p) => `I like dogs, I know because I scored ${p.score.toLocaleString()}. BTW my chum rate was ${p.rate}%`,
-  (p) => `Turns out the sausage dog's granny is a ${p.level}. Points for me.`,
+  lvl((p) => `Turns out the sausage dog's granny is a ${p.level}. Points for me.`),
   (p) => `${p.rate}% chum rate. I am basically a professional dog spotter now.`,
 ];
 
@@ -106,7 +114,7 @@ const NEGATIVE: Caption[] = [
   (p) => `I am bad at this! got ${p.score.toLocaleString()} and collected ${p.chums} dogs. Beat that if you can`,
   (p) => `I don't really know what went on but I got a chum rate of ${p.rate}%`,
   (p) => `I like dogs, but clicking them is not for me, I scored ${p.score.toLocaleString()}. BTW my chum rate was ${p.rate}%`,
-  (p) => `Turns out the sausage dog's granny is a ${p.level}. Points for me.`,
+  lvl((p) => `Turns out the sausage dog's granny is a ${p.level}. Points for me.`),
   (p) => `${p.rate}% chum rate. I have to up them rookie numbers`,
 ];
 
@@ -117,10 +125,10 @@ const HIGH: Caption[] = [
   (p) => `I clicked some dogs and the game ended. I had ${p.rate}% chum rate.`,
 ];
 
-function captionsFor(rate: number): Caption[] {
-  if (rate > RATE_HIGH) return HIGH;
-  if (rate >= RATE_OK) return POSITIVE;
-  return NEGATIVE;
+function captionsFor(rate: number, level?: string): Caption[] {
+  const set = rate > RATE_HIGH ? HIGH : rate >= RATE_OK ? POSITIVE : NEGATIVE;
+  // Without a level, the caption that names one would read "is a undefined".
+  return level ? set : set.filter((c) => !c.needsLevel);
 }
 
 function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
@@ -160,6 +168,9 @@ export default function ShareCard(props: ShareCardProps) {
   // because that is how it was designed; the score one has no room for it, its
   // chum rate panel occupies exactly that band, so there the trigger is a pill
   // below the card instead.
+  // The score card prints a level, so it is only offered when there is one. The
+  // main pit has no levels and gets the table card alone.
+  const canPickDesign = !!level;
   const [design, setDesign] = useState<Design>("table");
   // Kept so the share repaint does not have to reload anything.
   const imgsRef = useRef<{ screen: HTMLImageElement | null; share: HTMLImageElement | null; btn: HTMLImageElement | null }>({ screen: null, share: null, btn: null });
@@ -245,7 +256,7 @@ export default function ShareCard(props: ShareCardProps) {
         ctx.fillText("LEVEL", 540, SC.levelLabel);
 
         ctx.fillStyle = NAVY;
-        const lvl = level.toUpperCase();
+        const lvl = (level ?? "").toUpperCase();
         const lls = fitText(ctx, lvl, 760, 38, BODY, "700");
         ctx.font = `700 ${lls}px ${BODY}`;
         ctx.fillText(lvl, 540, SC.levelName);
@@ -388,6 +399,7 @@ export default function ShareCard(props: ShareCardProps) {
       <div className={css.inner}>
         {/* Which card to post. Two options, so a segmented pair rather than a
             dropdown: both are one tap and the choice stays visible. */}
+        {canPickDesign && (
         <div className={css.designPick} role="group" aria-label="Choose a card">
           <button
             type="button"
@@ -406,6 +418,7 @@ export default function ShareCard(props: ShareCardProps) {
             My score
           </button>
         </div>
+        )}
 
         {/* The button is drawn INTO the card, because the card is what gets
             posted. This takes the tap, sized as a percentage of the canvas so it
@@ -434,7 +447,7 @@ export default function ShareCard(props: ShareCardProps) {
               <div role="menu" className={css.menu}>
                 <p className={css.menuTitle}>Pick a caption to share</p>
                 <div className={css.menuScroll}>
-                  {captionsFor(rate).map((fn, i) => (
+                  {captionsFor(rate, level).map((fn, i) => (
                     <button
                       key={i}
                       type="button"
