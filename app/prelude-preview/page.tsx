@@ -26,7 +26,7 @@ export default function PreludePreview() {
         </button>
       </div>
 
-      <div className={styles.intro} role="status" aria-live="polite" style={{ position: "static", transform: "none", marginTop: 60 }}>
+      <div className={styles.intro} role="status" aria-live="polite" style={{ marginTop: 60 }}>
         <span className={styles.introScore}><span className={styles.introScoreNum}>0/5</span><span className={styles.introScoreWord}>games found</span></span>
         <p className={styles.introLine}>{CAMPAIGN_INTRO}<br /><span className={styles.introEmphasis}>{CAMPAIGN_INTRO_EMPHASIS}</span></p>
         <button type="button" className={styles.preludeClose}  aria-label="Close">

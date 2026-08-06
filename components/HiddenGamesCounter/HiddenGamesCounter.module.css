@@ -711,3 +711,130 @@
     top: calc(clamp(76px, 12vh, 112px) + env(safe-area-inset-top, 0px));
   }
 }
+
+/* Mobile: the prelude is 30% smaller. It already carries a transform for its
+   offset, so the scale joins that rather than replacing it, and the origin is
+   the bottom-left corner it is pinned to. */
+@media (max-width: 480px) {
+  .prelude.prelude {
+    transform: translate(30px, -50px) scale(0.7);
+    transform-origin: bottom left;
+  }
+}
+
+/* Prelude, mobile round 2: smaller icon and type, a wider box, no left inset,
+   and the text centred rather than ranged right. */
+@media (max-width: 480px) {
+  .prelude.prelude {
+    width: calc((100vw - 20px) / 0.7);
+    max-width: none;
+    padding-left: 0;
+  }
+  .preludeIcon {
+    width: 200px;
+    margin-left: -30px;
+  }
+  .prelude .preludeWarning,
+  .prelude .preludeHeading {
+    font-size: calc(1.55rem - 1pt);
+    text-align: center;
+  }
+  .preludeText {
+    align-items: center;
+    text-align: center;
+  }
+}
+
+/* The width compensation for the 0.7 scale overshot and ran off the screen.
+   Back to the original max-width plus 50px, and the scale handles the rest. */
+@media (max-width: 480px) {
+  .prelude.prelude {
+    width: auto;
+    max-width: calc(min(542px, 100vw - 40px) + 50px);
+  }
+}
+
+/* The card itself centres on screen. The 30px offset was what held it left, so
+   it goes and the transform centres instead. The text inside stays ranged
+   right -- only the card moved. */
+@media (max-width: 480px) {
+  .prelude.prelude {
+    left: 50%;
+    right: auto;
+    transform: translate(-50%, -50px) scale(0.7);
+    transform-origin: bottom center;
+  }
+  .prelude .preludeWarning,
+  .prelude .preludeHeading {
+    text-align: right;
+  }
+  .preludeText {
+    align-items: flex-end;
+    text-align: right;
+  }
+}
+
+/* The card was collapsing to its content once centred. An explicit width fills
+   the screen properly, and the text block gets room for more than one word a
+   line. The 0.7 scale is compensated for, so this reads as full width.
+   Both the outer max-width and the heading's own cap have to go. */
+@media (max-width: 480px) {
+  .prelude.prelude {
+    width: calc((100vw - 24px) / 0.7);
+    max-width: none;
+    min-width: 0;
+  }
+  .preludeText {
+    flex: 1;
+    min-width: 0;
+  }
+  .prelude .preludeHeading {
+    max-width: none;
+    white-space: normal;
+  }
+}
+
+/* 20% narrower. */
+@media (max-width: 480px) {
+  .prelude.prelude {
+    width: calc(((100vw - 24px) / 0.7) * 0.8);
+  }
+}
+
+/* The intro card takes the prelude's mobile treatment: 30% smaller, centred
+   on screen, and the same width. Its text stays ranged as it is. */
+@media (max-width: 480px) {
+  .intro.intro {
+    left: 50%;
+    right: auto;
+    transform: translate(-50%, -50px) scale(0.7);
+    transform-origin: bottom center;
+    width: calc(((100vw - 24px) / 0.7) * 0.8);
+    max-width: none;
+    min-width: 0;
+    height: auto;
+    padding-left: 0;
+  }
+  .intro.intro .introLine,
+  .intro.intro .introScore {
+    max-width: none;
+  }
+}
+
+/* The intro carried a fixed 431px from the desktop match, which was beating
+   the mobile width. Same value as the prelude, forced. */
+@media (max-width: 480px) {
+  .intro.intro.intro {
+    width: calc(((100vw - 24px) / 0.7) * 0.8) !important;
+    max-width: none !important;
+  }
+}
+
+/* The score sat against the edge once the card's left padding went. Give it
+   its own inset rather than putting the padding back, which would break the
+   centring. */
+@media (max-width: 480px) {
+  .intro.intro .introScore {
+    margin-left: 14px;
+  }
+}
