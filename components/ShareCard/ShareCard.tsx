@@ -280,7 +280,10 @@ export default function ShareCard(props: ShareCardProps) {
 
     // The SAME rows the on-screen table shows. buildBoard is the one source, so
     // the card can never disagree with the board the player just read.
-    const rows = buildBoard(score, "YOU", 3);
+    // "YOU" on screen, "ME!" on the posted card. The player is reading the
+    // preview, so YOU is right there; everyone else is reading it in a feed,
+    // where a row labelled YOU points at the wrong person.
+    const rows = buildBoard(score, forShare ? "ME!" : "YOU", 3);
     ctx.textBaseline = "alphabetic";
     rows.slice(0, ROW_BASELINES.length).forEach((entry, i2) => {
       const y = ROW_BASELINES[i2];

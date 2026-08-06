@@ -7,7 +7,6 @@ import { bust } from "../../data/imgVersion";
 import LineageMap from "./LineageMap";
 import { createPitEffects } from "./pitEffects";
 import HowToPlay from "../HowToPlay/HowToPlay";
-import GameOver from "../GameOver/GameOver";
 import { startCheckout } from "../Offer/startCheckout";
 import { startFixedTimestep } from "./fixedTimestep";
 import styles from "./PackPit.module.css";
@@ -124,7 +123,8 @@ export default function PackPit() {
   const [howToPlayStep, setHowToPlayStep] = useState<number | null>(null); // which step card was tapped (0-4); null = show intro
   const [gameOver, setGameOver] = useState(false);
   // true only when the game-over trigger fired because all 54 were collected
-  // (rather than the pit filling up) -- passed to GameOver for the celebration variant
+  // (rather than the pit filling up). It was passed to the old GameOver for its
+  // celebration variant; PitEnd has no such variant, so it is unused for now.
 
   useEffect(() => { if (!howToPlay) window.dispatchEvent(new Event("pc:close-howtoplay")); }, [howToPlay]);
   useEffect(() => {
@@ -3244,16 +3244,6 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
         );
       })()}
 
-      {false && <GameOver  // moved to about page
-        chums={collected}
-        score={score}
-        allCollected={collected >= 54}
-        collectedBreeds={collectedChums.map((name) => {
-          const b = breeds.find((x) => x.name === name);
-          const card = b ? breedCard[b.slug] : undefined;
-          return { name, img: card ?? (b ? b.image : "") };
-        })}
-      />}
       <div className={styles.rotateGuard} aria-hidden="true">
         <div className={styles.rotateInner}>
           <span className={styles.rotatePhone} />

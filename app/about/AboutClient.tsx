@@ -1,21 +1,22 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
-import GameOver from "../../components/GameOver/GameOver";
+import { useEffect } from "react";
 
+/**
+ * The about page's client bit. It plays the hero video once the Vimeo iframe
+ * reports ready, and nothing else.
+ *
+ * IT USED TO HOST THE GAME OVER SCREEN. The main pit sent players here with
+ * ?gameover=1 after stashing their score in sessionStorage, and this read those
+ * keys back, froze the body scroll, paused the video and rendered GameOver over
+ * the page. All of that is gone: the pit shows its own end screen in place, so
+ * nothing arrives here with a score to display and nothing sets that parameter.
+ *
+ * The video effect kept a `gameover` guard that skipped autoplay on that path.
+ * That has gone too, because the path has.
+ */
 export default function AboutClient() {
-  const router = useRouter();
-  const [showGameOver, setShowGameOver] = useState(false);
-  const [score, setScore] = useState(0);
-  const [chums, setChums] = useState(0);
-  const [breeds, setBreeds] = useState<{ name: string; img: string }[]>([]);
-  const scrollPos = useRef(0);
-
-  // Normal page load (no gameover) - trigger video play once ready
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const params = new URLSearchParams(window.location.search);
-    if (params.get("gameover") === "1") return; // gameover path handles its own play
     const onReady = (e: MessageEvent) => {
       try {
         const data = typeof e.data === "string" ? JSON.parse(e.data) : e.data;
@@ -24,70 +25,11 @@ export default function AboutClient() {
           if (iframe) iframe.contentWindow?.postMessage('{"method":"play"}', "*");
           window.removeEventListener("message", onReady);
         }
-      } catch {}
+      } catch { /* not a Vimeo message */ }
     };
     window.addEventListener("message", onReady);
     return () => window.removeEventListener("message", onReady);
   }, []);
 
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const params = new URLSearchParams(window.location.search);
-    if (params.get("gameover") !== "1") return;
-    // Read state from sessionStorage
-    try {
-      setScore(Number(sessionStorage.getItem("pc-gameover-score") || "0"));
-      setChums(Number(sessionStorage.getItem("pc-gameover-chums") || "0"));
-      const raw = sessionStorage.getItem("pc-gameover-breeds") || "[]";
-      setBreeds(JSON.parse(raw));
-      sessionStorage.removeItem("pc-gameover-score");
-      sessionStorage.removeItem("pc-gameover-chums");
-      sessionStorage.removeItem("pc-gameover-breeds");
-    } catch {}
-    // Lock scroll
-    scrollPos.current = window.scrollY;
-    document.body.style.overflow = "hidden";
-    document.body.style.top = `-${scrollPos.current}px`;
-    document.body.style.position = "fixed";
-    document.body.style.width = "100%";
-    // Pause Vimeo
-    const onVimeoMsg = (e: MessageEvent) => {
-      try {
-        const data = typeof e.data === "string" ? JSON.parse(e.data) : e.data;
-        if (data.event === "ready") {
-          const iframe = document.querySelector("iframe[src*=vimeo]") as HTMLIFrameElement | null;
-          if (iframe) iframe.contentWindow?.postMessage('{"method":"pause"}', "*");
-          window.removeEventListener("message", onVimeoMsg);
-        }
-      } catch {}
-    };
-    window.addEventListener("message", onVimeoMsg);
-    const iframe0 = document.querySelector("iframe[src*=vimeo]") as HTMLIFrameElement | null;
-    if (iframe0) iframe0.contentWindow?.postMessage('{"method":"pause"}', "*");
-    setShowGameOver(true);
-    return () => window.removeEventListener("message", onVimeoMsg);
-  }, []);
-
-  const handleClose = () => {
-    setShowGameOver(false);
-    document.body.style.overflow = "";
-    document.body.style.top = "";
-    document.body.style.position = "";
-    document.body.style.width = "";
-    window.scrollTo(0, scrollPos.current);
-    router.replace("/about", { scroll: false });
-    const iframe = document.querySelector("iframe[src*=vimeo]") as HTMLIFrameElement | null;
-    if (iframe) iframe.contentWindow?.postMessage('{"method":"play"}', "*");
-  };
-
-  if (!showGameOver) return null;
-
-  return (
-    <GameOver
-      score={score}
-      chums={chums}
-      collectedBreeds={breeds}
-      onClose={handleClose}
-    />
-  );
+  return null;
 }
