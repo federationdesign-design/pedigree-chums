@@ -19,26 +19,28 @@ final copy.
 | LOOP-02 route offer | `engine.ts` (`LOOP_02_ROUTE_OFFER = 'the game or a dog?'`) | The `[ROUTE A] or [ROUTE B]?` fill is my best-effort using ORIENT's two departments; the exact copy, and whether it should adapt to the candidate's specific route ("close to a supported route"), is unspecified. It also overlaps ORIENT's wording | Steve supplies the LOOP-02 route-offer copy and the adapt-to-candidate rule |
 | Grief detection trigger lists | `safety.ts` (`GRIEF_DIED`/`GRIEF_LOST`/`GRIEF_WORRIED`/`GRIEF_CONTINUE`/`GRIEF_EXCLUDE`) | Task 58 grief COPY (`:(`) is approved; the DETECTION wording is best-effort, authored to cover the three scenarios and the required assertions, conservative to avoid false positives. As a safety route it should be reviewed/extended by Steve like the other safety trigger lists | Steve reviews and extends the grief triggers |
 
-## Task 140 media clips (four of five NOT wired)
+## Task 140 media clips (all five wired; three lines pending workbook migration)
 
-The five clips in `public/chat-media/` (birthday, car, cats, hotdog, ball) were
-briefed to attach to existing answers. Only **cats** has a real target in the
-current workbook; it is wired (the clip joins `B21-CATS-01` "Where?"). The other
-four reference answers/routes that do not exist in `agent/data/workbook.xlsx`
-(confirmed: `build:chumdata` regenerates with zero changes, so the JSON is in
-sync with the workbook). Wiring them would mean inventing character copy and/or
-new routes, which the house rules forbid. They are left unwired, pending content.
+All five clips in `public/chat-media/` are wired. The clip is ADDED to its
+response, never replacing the copy. cats and hotdog join genuinely existing
+responses. birthday, car and balls had no response in the workbook, so Steve
+supplied the exact triggers and copy (6 August); that copy is held as code
+constants (`MEDIA_REPLIES` in `assembler.ts`), the same pattern the goodbye /
+out-of-scope / bark-game lines use, flagged here for later workbook migration.
 
-| Clip | Briefed target | Reality (probed via the live engine) | Resolve via |
+| Clip | Trigger | Response (unchanged copy) + clip | Where |
 |---|---|---|---|
-| `cats.mp4` | join B21 "Where?" | WIRED: `assembler.ts` `case 'canned'`, `B21-CATS-01` | done |
-| `hotdog.mp4` | "after the transfer to the Labrador" | `hot dog`/`hot dogs` -> FAQ007 (the card-game Hot Dogs memory variant); there is no Labrador food-transfer for hot dogs | Steve adds a hot-dog Labrador transfer (or confirms attaching to FAQ007) |
-| `car.mp4` | "existing car answer in B32" | B32 is bored/sleep/walks/postman; no car answer exists (`car` -> fallback) | Steve adds a car answer bucket + triggers to the workbook |
-| `ball.mp4` | "existing ball answers" | no ball answer exists (`ball`/`balls`/`tennis balls` -> fallback; only a Kennel-Sketch drawing clue) | Steve adds a ball answer bucket + triggers |
-| `birthday.mp4` | "any birthday mention" | no birthday route or copy exists anywhere (`its my birthday` -> fallback) | Steve supplies a birthday response (copy + triggers) |
+| `cats.mp4` | `cats`/`cat` | existing `B21-CATS-01` "Where?" | `assembler.ts` `case 'canned'` |
+| `hotdog.mp4` | `hot dogs`/`hot dog` | existing `FAQ007` answer (unchanged) | `assembler.ts` `case 'faq_answer'` (FAQ007 only) |
+| `birthday.mp4` | any birthday mention | ":)" (the existing smile face) | `MEDIA_REPLIES['BIRTHDAY-01']` |
+| `car.mp4` | "do you like going in the car" | "yes" | `MEDIA_REPLIES['CAR-01']` |
+| `ball.mp4` | "can you lick your balls" | "Tennis balls?" | `MEDIA_REPLIES['BALLS-01']` |
 
-The five `public/chat-media/*.mp4` files are untracked; `git add public/` before
-any commit or they 404 on Vercel.
+Migration: move the three `MEDIA_REPLIES` lines (birthday/car/balls) into the
+workbook (car and balls as B32-style canned rows, birthday as its own row), then
+attach the clips there and retire the code constants. No clip surfaces inside a
+protected state (the hotdog clip is suppressed when `session.protectedState`
+is set; the other four routes are held/refused by the S12 machine).
 
 ## Task 140 page bios, route 2 (not implemented)
 

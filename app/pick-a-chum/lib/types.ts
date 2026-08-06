@@ -171,6 +171,7 @@ export type ActionType =
   | 'tricks_menu' // Task 134: B54. "tricks" serves COL-B54-TRICKS-01 ("I do tricks"); a following "yes" serves TRICKS-02 (the list). Serves the specific responseId, like canned.
   | 'paw' // Task 138: she offers a paw, served as a short clip rather than a line.
   | 'page_bio' // Task 140: "what is this page" -> the bio for the page the visitor is standing on (from usePathname). Fires only with a page context; never inside a protected state.
+  | 'media_reply' // Task 140: a short owner-approved line served with a clip (birthday/car/balls). The specific line + clip is selected by responseId; never inside a protected state.
   | 'dog_fact' // Task 134: B57. A dog fact chosen AT RANDOM, not by rotation, and not repeated until the session has used all twenty.
   | 'price_answer' // Task 49: a price question -> FAQ008's text in chat; NOT a MEANINGFUL_TOPIC, so the safety machine holds/refuses it like buying
   | 'transfer_request' // visitor asks to switch to a different dog

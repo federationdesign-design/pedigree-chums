@@ -522,6 +522,12 @@ const OPTIONS_TRIGGERS = new Set(['tell me my options', 'what can i do', 'what e
 const MADE_TRIGGERS = new Set(['who made you', 'who built you', 'who created you', 'who wrote you', 'who owns you', 'who designed you']);
 const WORST_TRIGGERS = new Set(['worst dog', 'whats the worst dog', 'worst dog ever', 'worst breed', 'whats the worst breed']);
 const PAW_TRIGGERS = new Set(['paw', 'give me your paw', 'shake', 'shake hands', 'give paw', 'can i have your paw', 'high five']);
+// Task 140: two clip replies that had no home. Owner copy: the car question answers "yes", the
+// balls question answers "Tennis balls?" (see MEDIA_REPLIES in the assembler); the clip joins each.
+// Whole-message forms only, so "i left my toy in the car" is not swept in. Safety runs first, so
+// "lick your balls" never reaches here as anything but the harmless play reply (it is not explicit).
+const CAR_TRIGGERS = new Set(['do you like going in the car', 'do you like the car', 'do you like going in cars', 'do you like car rides', 'do you like the car ride']);
+const BALLS_TRIGGERS = new Set(['can you lick your balls', 'can you lick your own balls', 'do you lick your balls', 'lick your balls']);
 const FETCH_TRIGGERS = new Set(['fetch', 'can we play fetch', 'play fetch', 'lets play fetch', 'throw it', 'go fetch', 'can we play catch']);
 const DOGS_TRIGGERS = new Set(['dogs', 'dog']);
 // Task 140: widen to phrasings from the real log that missed B54. 'performa' is a genuine
@@ -1001,6 +1007,12 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
     if (MADE_TRIGGERS.has(c)) return L13('B62', 'COL-B62-MADE-01');
     if (WORST_TRIGGERS.has(c)) return L13('B63', 'COL-B63-WORST-01', 'DST015');
     if (PAW_TRIGGERS.has(c)) return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: 'paw' };
+    // Task 140: three clip replies. Below safety/grief/personal-sadness (all above), so a birthday
+    // named alongside a disclosure is never caught here. birthday is ANY birthday mention; car and
+    // balls are whole-message. Each serves an owner line + its clip (MEDIA_REPLIES in the assembler).
+    if (hasAny(N, ['birthday'])) return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: 'media_reply', responseId: 'BIRTHDAY-01' };
+    if (CAR_TRIGGERS.has(c)) return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: 'media_reply', responseId: 'CAR-01' };
+    if (BALLS_TRIGGERS.has(c)) return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: 'media_reply', responseId: 'BALLS-01' };
     if (GAME_CMD.has(c)) return { layer: 13, layerName: 'Play and entertainment', bucket: 'B17', action: 'offer_bark_game' };
     if (FETCH_CMD.has(c)) return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: 'random_link' };
   }

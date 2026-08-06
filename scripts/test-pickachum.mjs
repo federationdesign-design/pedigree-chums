@@ -1973,11 +1973,47 @@ check('what is this page', {}, { session: withRoute('/no-such-page'), assert: (r
   rows.push({ ok, input: 'T140: fetch-bio has link + label', layer: 13, bucket: '-', action: 'random_link', note: ok ? '' : `url=${last.url} label=${last.linkLabel}` });
 })();
 
-// ---- Task 140 B: the cats clip joins B21's existing answer (the only wireable clip) ----
+// ---- Task 140 B: the five clips join their responses (the clip is added, never replaces the copy) ----
+// cats -> the existing B21 "Where?" answer.
 check('cats', { action: 'canned', bucket: 'B21' }, { assert: (_r, resp) =>
   resp.responseId !== 'B21-CATS-01' ? `cats not B21-CATS-01: ${resp.responseId}`
     : resp.text !== 'Where?' ? `existing copy lost: "${resp.text}"`
       : resp.media?.src !== '/chat-media/cats.mp4' ? `cats clip not attached: ${JSON.stringify(resp.media)}` : null });
+// birthday -> ":)" + clip (any birthday mention). ":)" is the existing smile face, so it keeps that accessible name.
+for (const inp of ['its my birthday', 'when is your birthday', 'its my dads birthday', 'happy birthday']) {
+  check(inp, { action: 'media_reply' }, { assert: (_r, resp) =>
+    resp.text !== ':)' ? `birthday text not ":)": "${resp.text}"`
+      : resp.media?.src !== '/chat-media/birthday.mp4' ? `birthday clip missing: ${JSON.stringify(resp.media)}`
+        : resp.ariaLabel !== 'the Collie smiles' ? `smile a11y label missing: ${resp.ariaLabel}` : null });
+}
+// car -> "yes" + clip.
+check('do you like going in the car', { action: 'media_reply' }, { assert: (_r, resp) =>
+  resp.text !== 'yes' ? `car text not "yes": "${resp.text}"` : resp.media?.src !== '/chat-media/car.mp4' ? `car clip missing: ${JSON.stringify(resp.media)}` : null });
+// balls -> "Tennis balls?" + clip. Safety runs first and does NOT treat this as explicit.
+check('can you lick your balls?', { action: 'media_reply' }, { notAction: 'safety_boundary', assert: (_r, resp) =>
+  resp.text !== 'Tennis balls?' ? `balls text wrong: "${resp.text}"` : resp.media?.src !== '/chat-media/ball.mp4' ? `ball clip missing: ${JSON.stringify(resp.media)}` : null });
+// hotdog -> the EXISTING FAQ007 answer, unchanged, with the clip joined.
+check('hot dogs', { action: 'faq_answer', bucket: 'B04' }, { assert: (r, resp) =>
+  r.faqId !== 'FAQ007' ? `hotdog not FAQ007: ${r.faqId}`
+    : !resp.text.startsWith('Hot Dogs is a memory version') ? `FAQ007 answer changed: "${resp.text}"`
+      : resp.media?.src !== '/chat-media/hotdog.mp4' ? `hotdog clip missing: ${JSON.stringify(resp.media)}` : null });
+
+// Section 8: no Task 140 clip may surface inside a protected state (assert on served text/media).
+for (const clip of ['cats', 'its my birthday', 'do you like going in the car', 'can you lick your balls', 'hot dogs']) {
+  // PROTECTED_ACTIVE
+  (() => {
+    const s = newSession();
+    check('im in trouble', { action: 'safety_signpost' }, { session: s });
+    check(clip, {}, { session: s, assert: (_r, resp) => (resp.media ? `clip leaked in PROTECTED_ACTIVE: ${clip} ${resp.media.src}` : null) });
+  })();
+  // PROTECTED_AFTERCARE
+  (() => {
+    const s = newSession();
+    check('im in trouble', { action: 'safety_signpost' }, { session: s });
+    check('how do I play?', { action: 'rules_answer' }, { session: s });
+    check(clip, {}, { session: s, assert: (_r, resp) => (resp.media ? `clip leaked in PROTECTED_AFTERCARE: ${clip} ${resp.media.src}` : null) });
+  })();
+}
 
 // ---- Task 140: section 8 guards (served text unchanged for the confirmed routes) ----
 check('im in trouble', { action: 'safety_signpost' }, { assert: (r) => (r.moderationId === 'MOD_SAFEGUARDING' ? null : `guard: safeguarding moved: ${r.moderationId}`) });

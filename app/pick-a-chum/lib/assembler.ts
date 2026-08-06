@@ -38,6 +38,16 @@ export interface Assembled {
 export const SAD_FACE_SR_LABEL = 'the Collie looks sad';
 export const SMILE_FACE_SR_LABEL = 'the Collie smiles';
 
+// Task 140: the three clip replies that had no workbook home. Owner-approved copy, held as code
+// constants (like the goodbye / out-of-scope / bark-game lines) and flagged for workbook migration
+// in PLACEHOLDERS.md. Each is a short line served with its clip; the clip joins the line, it does
+// not replace it. birthday's line is the existing smile face, so it carries the smile accessible name.
+const MEDIA_REPLIES: Record<string, { text: string; media: { src: string; alt: string }; ariaLabel?: string }> = {
+  'BIRTHDAY-01': { text: ':)', media: { src: '/chat-media/birthday.mp4', alt: 'A birthday celebration' }, ariaLabel: SMILE_FACE_SR_LABEL },
+  'CAR-01': { text: 'yes', media: { src: '/chat-media/car.mp4', alt: 'A dog enjoying a car ride' } },
+  'BALLS-01': { text: 'Tennis balls?', media: { src: '/chat-media/ball.mp4', alt: 'A tennis ball' } },
+};
+
 const DOG_LABEL: Record<Dog, string> = {
   collie: 'Collie',
   labrador: 'Labrador',
@@ -286,6 +296,14 @@ export function assemble(res: Resolution, data0: ChumData, n: Normalised, sessio
       return { responseId: 'PAW-01', text: 'paw', dog, media: { src: '/chat-media/paw.mp4', alt: 'A dog offering its paw' } };
     }
 
+    case 'media_reply': {
+      // Task 140: an owner line plus its clip (birthday/car/balls). Selected by responseId.
+      const m = MEDIA_REPLIES[res.responseId ?? ''] ?? MEDIA_REPLIES['BIRTHDAY-01'];
+      const out: Assembled = { responseId: res.responseId ?? 'MEDIA-REPLY', text: m.text, dog, media: m.media };
+      if (m.ariaLabel) out.ariaLabel = m.ariaLabel;
+      return out;
+    }
+
     case 'page_bio': {
       // Task 140: the bio for the page the visitor is standing on (owner copy, page-bios.ts). On
       // the breed page the line carries {{BREED}}, substituted from the slug at runtime (the dog's
@@ -377,7 +395,14 @@ export function assemble(res: Resolution, data0: ChumData, n: Normalised, sessio
       // in the answer text.
       const dest = data.destinations.find((d) => d.name === f?.cta || d.destinationId === f?.cta);
       const url = dest?.resolvedUrl ?? (f?.cta && f.cta.startsWith('/') ? f.cta : null);
-      return { responseId: f ? `B04-${f.faqId}` : 'B04', text, dog, url, destinationId: dest?.destinationId };
+      const out: Assembled = { responseId: f ? `B04-${f.faqId}` : 'B04', text, dog, url, destinationId: dest?.destinationId };
+      // Task 140: the hot-dog clip joins the existing FAQ007 answer (the answer text is unchanged).
+      // Suppressed inside a protected state so no new clip surfaces during a safeguarding exchange
+      // (FAQ007 is a meaningful topic, so it can serve there; the clip must not).
+      if (res.faqId === 'FAQ007' && session.protectedState === null) {
+        out.media = { src: '/chat-media/hotdog.mp4', alt: 'Hot dogs' };
+      }
+      return out;
     }
 
     case 'price_answer': {
