@@ -233,16 +233,20 @@ export default function ShareCard(props: ShareCardProps) {
       ctx.fillStyle = "#ffffff";
       ctx.fillText(scoreTxt, 540, SC.scoreBaseline);
 
-      ctx.font = `50px ${DISP}`;
-      ctx.fillText("LEVEL", 540, SC.levelLabel);
-
-      ctx.fillStyle = NAVY;
-      const lvl = level.toUpperCase();
-      const lls = fitText(ctx, lvl, 760, 38, BODY, "700");
-      ctx.font = `700 ${lls}px ${BODY}`;
-      ctx.fillText(lvl, 540, SC.levelName);
-
+      // The level and the chum rate are on the POSTED card only. On screen the
+      // artwork's own SHARE THIS button sits across the lower half, so the
+      // preview shows the score alone rather than type behind a button.
       if (forShare) {
+        ctx.font = `50px ${DISP}`;
+        ctx.fillStyle = "#ffffff";
+        ctx.fillText("LEVEL", 540, SC.levelLabel);
+
+        ctx.fillStyle = NAVY;
+        const lvl = level.toUpperCase();
+        const lls = fitText(ctx, lvl, 760, 38, BODY, "700");
+        ctx.font = `700 ${lls}px ${BODY}`;
+        ctx.fillText(lvl, 540, SC.levelName);
+
         ctx.fillStyle = BLUE_DEEP;
         roundRect(ctx, SC.panel.x, SC.panel.y, SC.panel.w, SC.panel.h, SC.panel.r);
         ctx.fill();
