@@ -155,8 +155,10 @@ function readChat(): { messages: Message[]; session: Session; dog: Dog; phase: P
     const raw = typeof window !== 'undefined' ? window.sessionStorage.getItem(CHAT_KEY) : null;
     if (!raw) return null;
     const s = JSON.parse(raw);
-    if (!s || !s.session || s.session.protectedState) {
-      // never restore a protected session; scrub it if one somehow landed there
+    if (!s || !s.session || s.session.protectedState || s.session.closed) {
+      // Never restore a protected session; scrub it if one somehow landed there. Task 142 (3.4): a
+      // closed (Boxer cut-off) session is never restored either -- she has left, so reopening starts
+      // fresh at the selector rather than a dead input box.
       if (typeof window !== 'undefined') window.sessionStorage.removeItem(CHAT_KEY);
       return null;
     }
@@ -459,7 +461,9 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
     if (typeof window === 'undefined') return;
     const session = sessionRef.current;
     if (phase === 'selecting' || !session) return; // nothing to persist until a dog is picked
-    if (everProtectedRef.current || session.protectedState) {
+    // Task 142 (3.4): a closed (cut-off) session is scrubbed and never persisted, so it cannot be
+    // restored as a dead input box; reopening the launcher starts a fresh conversation.
+    if (everProtectedRef.current || session.protectedState || session.closed) {
       everProtectedRef.current = true;
       try {
         window.sessionStorage.removeItem(CHAT_KEY);

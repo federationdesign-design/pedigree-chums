@@ -2076,6 +2076,139 @@ for (const inp of ['biggest dog', 'why are there so many', 'do you like going in
   })();
 }
 
+// ==== Task 142: four bugs + three rules + two gaps ====
+
+// ---- Rule 1: any of the 54 breeds -> its page (not just the 10 proof breeds) ----
+check('Corgie', { action: 'breed_page' }, { url: '/chums/corgi' }); // misspelling -> corgi
+check('Jack russel', { action: 'breed_page' }, { url: '/chums/jack-russell-terrier' }); // fuzzy russell
+check('dachshund', { action: 'breed_page' }, { url: '/chums/dachshund' });
+check('dalmatian', { action: 'breed_page' }, { url: '/chums/dalmatian' });
+check('great dane', { action: 'breed_page' }, { url: '/chums/great-dane' });
+check('irish wolfhound', { action: 'breed_page' }, { url: '/chums/irish-wolfhound' });
+// A 44-breed page uses the real dog description, never the old placeholder.
+check('rottweiler', { action: 'breed_page' }, { assert: (_r, resp) => (resp.text.includes('PLACEHOLDER') ? 'placeholder breed line served' : null) });
+// The proof breeds and the chatbot-dog transfer are unchanged.
+check('tell me about labradors', { action: 'breed_page' }, { url: '/chums/labrador' });
+check('can I talk to the boxer', { action: 'transfer' }, { transferTo: 'boxer' });
+
+// ---- Bug 3.1: breed context does not stick on a general question ----
+(() => {
+  const s = newSession();
+  check('What work do collie dogs do?', { action: 'breed_page' }, { session: s, url: '/chums/border-collie' });
+  check('Why not do boxers cheat?', { action: 'breed_page' }, { session: s, url: '/chums/boxer' });
+  check('How long do dogs live?', {}, { session: s, assert: (r, resp) =>
+    r.action === 'breed_page' ? `general question reused the breed topic (${resp.url})`
+      : resp.text.includes('Boxers were bred') ? 'served the last breed paragraph' : null });
+})();
+// The genuine follow-up ("how long do they live", no generic dog word) still works.
+(() => {
+  const s = newSession();
+  check('I have a cocker spaniel', { action: 'breed_page' }, { session: s, url: '/chums/cocker-spaniel' });
+  check('how long do they live', { action: 'breed_page' }, { session: s, url: '/chums/cocker-spaniel' });
+})();
+
+// ---- Bug 3.2: no placeholder in a breed choice ----
+check('Tell me about terriers', { action: 'breed_choice' }, { assert: (_r, resp) => (resp.text.includes('PLACEHOLDER') ? 'placeholder framing served' : resp.text.includes('or') ? null : `choice text: "${resp.text}"`) });
+check('Border', { action: 'breed_choice' }, { assert: (_r, resp) => (resp.text.includes('PLACEHOLDER') ? 'placeholder framing served' : null) });
+
+// ---- Bug 3.3: sausage dogs is the breed, not food; a genuine food question reaches the food answer ----
+check('Sausage dogs', { action: 'breed_page' }, { url: '/chums/dachshund', assert: (r) => (r.transferTo === 'labrador' ? 'sausage dogs went to the food transfer' : null) });
+check('Yes do you like sausage dogs?', { action: 'breed_page' }, { url: '/chums/dachshund' });
+check('What food do dogs eat', { action: 'transfer' }, { transferTo: 'labrador' });
+
+// ---- Rule 2: name statements (acknowledge once, then dropped) ----
+check('my name is charles', { action: 'name_ack' }, { assert: (_r, resp) => (resp.text === 'Do you want to play a game, Charles?' ? null : `name_ack: "${resp.text}"`) });
+check('im charles', { action: 'name_ack' });
+check('call me sam', { action: 'name_ack' }, { assert: (_r, resp) => (resp.text.includes('Sam') ? null : `name not Sam: "${resp.text}"`) });
+// Alternating; the second offers the superpower quiz. And the name is never stored on the session.
+(() => {
+  const s = newSession();
+  check('my name is charles', { action: 'name_ack' }, { session: s, assert: (_r, resp) => (resp.responseId === 'NAME-ACK-1' ? null : `first not ACK-1: ${resp.responseId}`) });
+  check('my name is charles', { action: 'name_ack' }, { session: s, assert: (_r, resp, sess) =>
+    resp.responseId !== 'NAME-ACK-2' ? `second not ACK-2: ${resp.responseId}`
+      : resp.url !== '/whats-your-superpower' ? `no superpower link: ${resp.url}`
+        : sess.route && sess.route.includes('charles') ? 'name stored on the session' : null });
+})();
+// Stop-list guard: feelings/states are never a name, and safety still wins.
+check('im scared', { action: 'safety_signpost' }, { assert: (r) => (r.action === 'name_ack' ? 'im scared read as a name' : null) });
+check('im bored', {}, { assert: (r) => (r.action === 'name_ack' ? 'im bored read as a name' : null) });
+check('im a dog', {}, { assert: (r) => (r.action === 'name_ack' ? 'im a dog read as a name' : null) });
+check('im happy', {}, { assert: (r) => (r.action === 'name_ack' ? 'im happy read as a name' : null) });
+
+// ---- Naming her: she deflects, taking no name ----
+for (const inp of ['are you dave', 'hello dave', 'is i rover', 'can i give you a name']) {
+  check(inp, { action: 'name_deflect' }, { assert: (_r, resp) => (/answer to anything|call me what you like/i.test(resp.text) ? null : `deflect text: "${resp.text}"`) });
+}
+check('whats your name', {}, { assert: (r) => (r.action === 'name_deflect' ? 'whats your name deflected instead of "im a dog"' : null) });
+// Identity/attribute questions are NOT naming attempts.
+check('are you real', { action: 'identity' });
+check('are you software', { action: 'identity' });
+check('are you intelligent', { action: 'identity' });
+
+// ---- Rule 3: personal questions -> a deflection clip (only the ones that were broken) ----
+for (const inp of ['how are you', 'Hiw are you', 'how old are you', 'i am a human', 'are you human']) {
+  check(inp, { action: 'how_are_you' }, { assert: (_r, resp) => (/\/chat-media\/howareyou[123]\.mp4/.test(resp.media?.src ?? '') ? null : `no clip: ${JSON.stringify(resp.media)}`) });
+}
+// No repeat until all three clips are used (the B57 pattern).
+(() => {
+  const s = newSession();
+  const seen = new Set();
+  for (let i = 0; i < 3; i++) { const { response } = submit(data, s, 'how are you'); seen.add(response.responseId); }
+  const ok = seen.size === 3;
+  ok ? pass++ : fail++;
+  rows.push({ ok, input: 'T142: how-are-you no repeat', layer: 13, bucket: '-', action: 'how_are_you', note: ok ? '' : `only ${seen.size} distinct` });
+})();
+// The substantive answers are kept (per Steve).
+check('what do you do', { action: 'canned', bucket: 'B27' });
+
+// ---- Good boy cluster -> the wagging-tail clip ----
+for (const inp of ['good boy', 'good girl', 'clever girl', 'well done', 'are you a good dog']) {
+  check(inp, { action: 'good_boy' }, { assert: (_r, resp) => (resp.media?.src === '/chat-media/goodboy.mp4' ? null : `no goodboy clip: ${JSON.stringify(resp.media)}`) });
+}
+
+// ---- Reactions -> the existing B29 ":)" acknowledgement (not a clip) ----
+for (const inp of ['wow', 'wowee', 'oh wowe']) {
+  check(inp, { action: 'canned', bucket: 'B29' }, { assert: (_r, resp) => (resp.text === ':)' ? null : `reaction text: "${resp.text}"`) });
+}
+
+// ---- §7: prizes -> /chumspot; referral -> the offer ----
+check('Can I win prizes', { action: 'link' }, { destinationId: 'DST012', url: '/chumspot' });
+check('I want to refer my friends', { action: 'open_discount_popup', bucket: 'B01' });
+
+// ---- §8: the rules answer no longer dangles a "here" link (no rules page exists) ----
+check('how do I play', { action: 'rules_answer' }, { assert: (_r, resp) => (/full rules are here/i.test(resp.text) ? 'rules answer still dangles a "here" link' : null) });
+
+// ---- §9 guards (asserted on served text) ----
+check('im in trouble', { action: 'safety_signpost' }, { assert: (r) => (r.moderationId === 'MOD_SAFEGUARDING' ? null : `safeguarding moved: ${r.moderationId}`) });
+check('my dog died', { action: 'grief' }, { assert: (_r, resp) => (resp.text === ':(' ? null : `grief moved: "${resp.text}"`) });
+check('i want to hurt myself', { action: 'safety_signpost' }, { assert: (r) => (r.moderationId === 'MOD_SELF_HARM' ? null : `self-harm moved: ${r.moderationId}`) });
+check('im scared', { action: 'safety_signpost' }, { assert: (r) => ((r.moderationId || '').startsWith('MOD_') ? null : `fear moved: ${r.moderationId}`) });
+check('how much is it', { action: 'price_answer', bucket: 'B04' });
+check('where can I get the cards', { action: 'open_discount_popup', bucket: 'B01' });
+check('nine square', { action: 'game_start' });
+check('paw', { action: 'paw' }, { assert: (_r, resp) => (resp.media?.src === '/chat-media/paw.mp4' ? null : 'paw clip moved') });
+check('fetch', { action: 'random_link' });
+check('tricks', { action: 'tricks_menu' });
+check('cats', { action: 'canned', bucket: 'B21' }, { assert: (_r, resp) => (resp.media?.src === '/chat-media/cats.mp4' ? null : 'cats clip lost') });
+check('hot dogs', { action: 'faq_answer' }, { assert: (r, resp) => (r.faqId === 'FAQ007' && resp.media?.src === '/chat-media/hotdog.mp4' ? null : 'hot dogs lost FAQ007/clip') });
+
+// ---- Protected states: no new Task 142 route (clip / name) serves inside either state ----
+for (const inp of ['how are you', 'good boy', 'my name is charles', 'are you dave']) {
+  (() => { // PROTECTED_ACTIVE
+    const s = newSession();
+    check('im in trouble', { action: 'safety_signpost' }, { session: s });
+    check(inp, {}, { session: s, assert: (r, resp) =>
+      ['how_are_you', 'good_boy', 'name_ack', 'name_deflect'].includes(r.action) ? `new route served in PROTECTED_ACTIVE: ${inp}`
+        : resp.media ? `clip leaked in PROTECTED_ACTIVE: ${inp}` : null });
+  })();
+  (() => { // PROTECTED_AFTERCARE
+    const s = newSession();
+    check('im in trouble', { action: 'safety_signpost' }, { session: s });
+    check('how do I play?', { action: 'rules_answer' }, { session: s });
+    check(inp, { action: 'neutral_refusal' }, { session: s, assert: (_r, resp) => (resp.media ? `clip leaked in PROTECTED_AFTERCARE: ${inp}` : null) });
+  })();
+}
+
 // ---- Report ----
 const pad = (s, n) => String(s).padEnd(n);
 console.log('\nPick a Chum: Checkpoint 1 proof\n' + '='.repeat(78));

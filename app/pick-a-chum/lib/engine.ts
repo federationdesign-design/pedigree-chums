@@ -49,7 +49,10 @@ const MEANINGFUL_TOPIC = new Set(['breed_answer', 'rules_answer', 'faq_answer', 
 // Task 140: 'page_bio' is added so the new page-bio route never serves inside PROTECTED_AFTERCARE
 // (brief section 8). In PROTECTED_ACTIVE it is already held: it is not a MEANINGFUL_TOPIC, so it
 // becomes the safeguarding continuation there.
-const AFTERCARE_BLOCKED = new Set(['offer_bark_game', 'open_discount_popup', 'transfer', 'bark', 'bark_break', 'bark_ack', 'price_answer', 'canned', 'game_start', 'game_move', 'game_exit', 'page_bio', 'media_reply']);
+// Task 142: the new play/deflection routes (clips, name acknowledgement/deflection) join the blocked
+// set so none serves inside PROTECTED_AFTERCARE; in PROTECTED_ACTIVE they are not meaningful and are
+// held as the safeguarding continuation.
+const AFTERCARE_BLOCKED = new Set(['offer_bark_game', 'open_discount_popup', 'transfer', 'bark', 'bark_break', 'bark_ack', 'price_answer', 'canned', 'game_start', 'game_move', 'game_exit', 'page_bio', 'media_reply', 'how_are_you', 'good_boy', 'name_ack', 'name_deflect']);
 // The "old voice" routes a canned answer is allowed to override (Steve's decision): the identity
 // spiel, the orientation nudge, the bare-help clarifier and any FAQ match. These resolve above the
 // in-router canned check, so a matching canned trigger overrides them here. Safety, grief, breed

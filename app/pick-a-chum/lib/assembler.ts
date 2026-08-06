@@ -308,6 +308,47 @@ export function assemble(res: Resolution, data0: ChumData, n: Normalised, sessio
       return out;
     }
 
+    case 'good_boy':
+      // Task 142: praise -> the wagging-tail clip. The clip is the answer, so there is no line.
+      return { responseId: 'GOOD-BOY-01', text: '', dog, media: { src: '/chat-media/goodboy.mp4', alt: 'A dog wagging its tail' } };
+
+    case 'how_are_you': {
+      // Task 142: a personal question with no in-world answer -> one of three deflection clips, chosen
+      // AT RANDOM and not repeated until all three have been used this session (the B57 fact pattern).
+      const clips = [
+        { responseId: 'HOWAREYOU-1', src: '/chat-media/howareyou1.mp4', alt: 'A dog typing at a computer' },
+        { responseId: 'HOWAREYOU-2', src: '/chat-media/howareyou2.mp4', alt: 'A dog with a weary stare' },
+        { responseId: 'HOWAREYOU-3', src: '/chat-media/howareyou3.mp4', alt: 'A corgi looking busy' },
+      ];
+      const unseen = clips.filter((x) => !session.usedResponseIds.includes(x.responseId));
+      const from = unseen.length > 0 ? unseen : clips;
+      const pick = from[Math.floor(Math.random() * from.length)];
+      return { responseId: pick.responseId, text: '', dog, media: { src: pick.src, alt: pick.alt } };
+    }
+
+    case 'name_ack': {
+      // Task 142: acknowledge the visitor's name ONCE, then drop it (the name is never stored on the
+      // session). Two lines, alternating by how often each has been used; the second offers the
+      // superpower quiz. The name comes from the resolution, capitalised in the router.
+      const name = res.personName ?? 'you';
+      const used1 = session.usedResponseIds.filter((id) => id === 'NAME-ACK-1').length;
+      const used2 = session.usedResponseIds.filter((id) => id === 'NAME-ACK-2').length;
+      if (used2 < used1) {
+        return { responseId: 'NAME-ACK-2', text: `Do you want to see if you have super powers, ${name}?`, dog, destinationId: 'superpower', url: '/whats-your-superpower', linkLabel: "What's Your Superpower" };
+      }
+      return { responseId: 'NAME-ACK-1', text: `Do you want to play a game, ${name}?`, dog };
+    }
+
+    case 'name_deflect': {
+      // Task 142: someone tried to name her. She deflects, accepts nothing, stores nothing. Two lines,
+      // alternating. Owner copy.
+      const usedA = session.usedResponseIds.filter((id) => id === 'NAME-DEFLECT-1').length;
+      const usedB = session.usedResponseIds.filter((id) => id === 'NAME-DEFLECT-2').length;
+      return usedB < usedA
+        ? { responseId: 'NAME-DEFLECT-2', text: 'Call me what you like.', dog }
+        : { responseId: 'NAME-DEFLECT-1', text: 'I answer to anything.', dog };
+    }
+
     case 'page_bio': {
       // Task 140: the bio for the page the visitor is standing on (owner copy, page-bios.ts). On
       // the breed page the line carries {{BREED}}, substituted from the slug at runtime (the dog's
@@ -575,8 +616,10 @@ export function assemble(res: Resolution, data0: ChumData, n: Normalised, sessio
       // six show a marked placeholder. The handoff line ends with the literal [LINK]
       // token: strip it here, since the UI renders the page link as the action
       // button. The link (url) is real.
-      const fact = BREED_FACTS[res.breedSlug ?? ''];
-      const factText = fact ?? `[PLACEHOLDER breed line for ${res.breedTitle}, Steve to supply]`;
+      // Task 142 (Rule 1): the ten proof breeds have a curated one-liner; the other 44 pack breeds
+      // use their real description from the dog database (never the old placeholder).
+      const fact = BREED_FACTS[res.breedSlug ?? ''] ?? data.dogs.find((d) => d.slug === res.breedSlug)?.character?.trim();
+      const factText = fact ?? `${res.breedTitle} is one of the pack.`;
       const handoff = navHandoff(data, dog, session);
       const text = handoff ? `${factText} ${handoff}` : factText;
       return { responseId: `BREED-${res.breedSlug}`, text, dog, destinationId: res.breedSlug, url: res.url ?? null };
@@ -601,11 +644,10 @@ export function assemble(res: Resolution, data0: ChumData, n: Normalised, sessio
     }
 
     case 'breed_choice': {
-      // PLACEHOLDER framing; the breed titles are real data. One option means a
-      // bare cross-family word ("spaniel"): we ask which breed rather than guess.
+      // Task 142 (bug 3.2): no more placeholder. The two real breed titles are offered as a plain
+      // question ("Border Collie or Border Terrier?"), which is the whole answer.
       const titles = (res.breedOptions ?? []).map((o) => o.title);
-      const text = `[PLACEHOLDER breed choice framing] ${titles.join(' or ')}?`;
-      return { responseId: 'BREED-CHOICE', text, dog };
+      return { responseId: 'BREED-CHOICE', text: `${titles.join(' or ')}?`, dog };
     }
 
     case 'boxer_cutoff': {

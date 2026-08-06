@@ -12,8 +12,7 @@ final copy.
 | ART010 interim mapping | `route-map.json` | 'The Power of Smell' unbuilt; points at the teaching-medicine article for now | NEEDS_STEVE item 4 |
 | Random-dog control treatment | (styled build, Checkpoint 2) | To be proposed for approval | NEEDS_STEVE item 5 |
 | Labrador / Terrier / Boxer bark presentations + B19/B20 lines | `assembler.ts` (`BARK_PRESENTATION` wires the Collie only) + parked deck rows | The non-Collie bark words and English break/ack lines are PARKED with the Phase 3 voice package; the per-dog state machine runs but their responses render a parked marker | Phase 3 per-dog build wires the presentations and merges the LAB/TER/BOX B19/B20 lines |
-| `BREED-<slug>` per-breed page lines | `assembler.ts` (`BREED_FACTS`, `case 'breed_page'`) | Shared factual one-liner (no dog voice) shown when a named breed resolves to its page. ALL TEN now filled but DRAFT-UNVERIFIED, NOT approved: the historical claims still need checking against the breed pages and a Kennel Club source before this branch merges | Steve verifies all ten (breed pages + a Kennel Club source); the per-breed character-handoff line that follows each factual answer is a separate item |
-| `BREED-CHOICE` framing | `assembler.ts` (`case 'breed_choice'`) | The line that offers two breeds when an ambiguous word (e.g. "terrier") is within the confidence gap. Currently `[PLACEHOLDER breed choice framing] A or B?` | Steve supplies the choice framing sentence |
+| `BREED-<slug>` per-breed page lines (10 proof breeds) | `assembler.ts` (`BREED_FACTS`, `case 'breed_page'`) | Shared factual one-liner for the ten proof breeds: DRAFT-UNVERIFIED, NOT approved, claims still need checking against a Kennel Club source. Task 142: the OTHER 44 pack breeds now use their real description from the dog database (no placeholder). | Steve verifies the ten proof one-liners (breed pages + a Kennel Club source) |
 | Breed hub answer | `router.ts` (`BREED_HUB` -> `fallback`) | "tell me about dog breeds" / "best dog breed" has no specific breed; routed to the approved fallback for now, NOT a placeholder line | Steve supplies a proper narrowing/hub line, then wire a dedicated action |
 | LOOP-01..04 / ORIENT copy | `engine.ts` (`LOOP_03_VARIANTS`, `LOOP_04_VARIANTS`, `ORIENT_LINE`) | Task 58 dog-led loop copy, approved by Steve, held as engine constants (like the repair ladder) rather than in the workbook. Migrate into the workbook per PD-01 with the other loop copy | Steve confirms the workbook bucket, then migrate |
 | LOOP-02 route offer | `engine.ts` (`LOOP_02_ROUTE_OFFER = 'the game or a dog?'`) | The `[ROUTE A] or [ROUTE B]?` fill is my best-effort using ORIENT's two departments; the exact copy, and whether it should adapt to the candidate's specific route ("close to a supported route"), is unspecified. It also overlaps ORIENT's wording | Steve supplies the LOOP-02 route-offer copy and the adapt-to-candidate rule |
@@ -48,6 +47,30 @@ bio plus that page's link) is NOT built: how the bio composes with the existing
 navigation answer (replace the B03 nav copy? append to it? only for the ~10 bio
 pages that have no destination record?) is unspecified, and any of those changes
 the served text of existing nav answers broadly. Left for a composition decision.
+
+## Task 142 conversational copy held as code constants
+
+Owner-approved copy from Task 142, held in code (the goodbye / out-of-scope
+pattern), flagged for later workbook migration:
+
+| What | Where | Copy |
+|---|---|---|
+| Name acknowledgement (2 lines, alternating) | `assembler.ts` `case 'name_ack'` | "Do you want to play a game, {name}?" / "Do you want to see if you have super powers, {name}?" (2nd links `/whats-your-superpower`). The name is used once and never stored. |
+| Naming-her deflection (2 lines, alternating) | `assembler.ts` `case 'name_deflect'` | "I answer to anything." / "Call me what you like." |
+| How-are-you clips | `assembler.ts` `case 'how_are_you'` | `howareyou1/2/3.mp4`, random no-repeat |
+| Good-boy clip | `assembler.ts` `case 'good_boy'` | `goodboy.mp4` |
+
+Decisions taken (Steve, 6-7 August): the how-are-you clip catches only the
+personal questions that were broken (`are you real` keeps identity; `what do you
+do` keeps B27). `Oh wowe` / `wowee` are reactions, routed to the existing B29
+":)" acknowledgement, not a clip. A referral question ("refer my friends") points
+at the offer (no referral scheme exists). The rules answer no longer promises
+"the full rules are here" (no rules page exists; B02-R01 edited in the workbook).
+The turn-20 hidden-ceiling cutoff is unchanged; the chat now closes cleanly on it
+(a closed session is never persisted or restored, so reopening starts fresh).
+
+The four new `public/chat-media/*.mp4` (howareyou1/2/3, goodboy) are untracked;
+`git add public/` before any commit or they 404 on Vercel.
 
 ## Ancient playable levels (4 August)
 

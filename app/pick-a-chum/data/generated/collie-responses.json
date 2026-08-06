@@ -151,7 +151,7 @@
       "how do I play",
       "rules"
     ],
-    "template": "{{approved_rule_summary}} Simple enough for humans, active enough for dogs. The full rules are here.",
+    "template": "{{approved_rule_summary}} Simple enough for humans, active enough for dogs.",
     "factSource": "Rules library",
     "defaultRoute": "Full game rules",
     "animationCue": "EARS_UP",

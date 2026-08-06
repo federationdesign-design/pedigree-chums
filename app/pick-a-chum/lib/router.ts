@@ -6,7 +6,7 @@
 // (layer 9); "Can dogs eat chocolate?" is safety (layer 1), not a food transfer
 // (layer 8). All matching is deterministic local code.
 
-import { ChumData, Resolution, Dog, ActionType, GameId } from './types';
+import { ChumData, Resolution, Dog, ActionType, GameId, DogRecord } from './types';
 import { effectiveBank } from './banks';
 import { Normalised, normalise, isGibberish, isSingleWord, isEmojiOnly, isBarkOnly, barkUnitCount, hasAny, buildAliasMap, applyAliases } from './normalise';
 import { detectSafety, isDogHealthQuestion, detectProtectedContinuation, detectPersonalSadness, detectGrief } from './safety';
@@ -272,7 +272,9 @@ const TRANSFER_VERBS = [
   'i want the', 'can i have the',
 ];
 
-const GREETING = ['hi', 'hiya', 'hello', 'hey', 'morning', 'good morning', 'evening', 'afternoon', 'anyone there', 'how are you', 'yo'];
+// Task 142: 'how are you' removed -- it is a personal question with no in-world answer and is now
+// deflected with a clip (see HOW_ARE_YOU), not mirrored back as a greeting.
+const GREETING = ['hi', 'hiya', 'hello', 'hey', 'morning', 'good morning', 'evening', 'afternoon', 'anyone there', 'yo'];
 // Task 76: the greeting the visitor actually used, to echo back (mirror) instead of a B09 pool
 // line. Returns the LONGEST matching GREETING entry, so "good morning" mirrors the phrase (not the
 // "morning" inside it) and "i said hi" mirrors just "hi", never the whole sentence.
@@ -378,7 +380,8 @@ const TOOL_ALIASES: Record<string, string[]> = {
   DST009: ['chum finder', 'chum calculator', 'find my chum', 'which chum'],
   // 'competition' (the generic word) belongs to FAQ011, which answers in chat
   // with the close date and a contextual link; 'chumspot' stays direct nav.
-  DST012: ['chumspot', 'chum spot'],
+  // Task 142 (§7): "can I win prizes" was a routing miss; /chumspot is the competitions page.
+  DST012: ['chumspot', 'chum spot', 'win prizes', 'win a prize', 'win prize', 'prizes'],
   DST013: ['contact you', 'contact page', 'get in touch', 'contact us'],
 };
 
@@ -522,6 +525,63 @@ const OPTIONS_TRIGGERS = new Set(['tell me my options', 'what can i do', 'what e
 const MADE_TRIGGERS = new Set(['who made you', 'who built you', 'who created you', 'who wrote you', 'who owns you', 'who designed you']);
 const WORST_TRIGGERS = new Set(['worst dog', 'whats the worst dog', 'worst dog ever', 'worst breed', 'whats the worst breed']);
 const PAW_TRIGGERS = new Set(['paw', 'give me your paw', 'shake', 'shake hands', 'give paw', 'can i have your paw', 'high five']);
+
+// Task 142: praise -> the wagging-tail clip. Whole-message forms (a Set), so "are you a good dog"
+// gets the clip instead of the B12 "what would you like to do next" non-answer.
+const GOOD_BOY_TRIGGERS = new Set(['good boy', 'good girl', 'good dog', 'goodboy', 'good doggy', 'good pup', 'good puppy', 'whos a good boy', 'who is a good boy', 'whos a good girl', 'who is a good girl', 'clever girl', 'clever boy', 'clever dog', 'well done', 'good job', 'are you a good dog', 'are you a good boy', 'such a good boy', 'such a good girl', 'what a good boy']);
+// Task 142: personal questions with no answer inside her world -> a deflection clip. The substantive
+// "are you real" stays identity and "what do you do" stays B27 (Steve). "hiw are you" is a real
+// observed typo of a three-letter word that fuzzy matching cannot reach, so it is listed explicitly.
+const HOW_ARE_YOU = ['how are you', 'how are u', 'how r you', 'how r u', 'hiw are you', 'how are ya', 'how you doing', 'how are things', 'how is your day', 'how was your day', 'how do you feel', 'how are you feeling', 'are you ok', 'are you okay', 'hows it going', 'how is it going', 'how old are you', 'what age are you', 'how old r you', 'how old are u'];
+const HUMAN_STATEMENT = ['i am a human', 'im a human', 'i am human', 'are you a human', 'are you human', 'you are a human', 'youre a human', 'you a human'];
+// Task 142: excited reactions, not questions -> the existing B29 ":)" acknowledgement, not a clip.
+const REACTION_TRIGGERS = new Set(['wow', 'woah', 'whoa', 'wowee', 'oh wow', 'oh wowe', 'wowe', 'omg', 'no way', 'cool', 'amazing', 'awesome', 'incredible']);
+// Task 142 (§7.2): no referral scheme exists. A referral question points at the offer (Steve's call)
+// rather than guessing at a scheme.
+const REFERRAL_TRIGGERS = ['refer a friend', 'refer my friend', 'refer my friends', 'refer friends', 'referral', 'invite my friends', 'invite a friend', 'invite my friend', 'recommend to my friends', 'recommend it to my friends', 'tell my friends about', 'share with my friends'];
+
+// Task 142: trying to give HER a name. She deflects, accepts nothing, stores nothing. Words that are
+// NOT a name in "are you X" / "hello X" (so "are you real/ok", "hello there/dog" are not naming).
+// The stop set the name rules need (brief: "the pattern needs a stop list"): feelings/states so
+// "im scared" is never a name, and identity/attribute words so "are you real / software / intelligent"
+// stay identity rather than being read as "are you [name]".
+const NAME_STOP = new Set([
+  'real', 'ok', 'okay', 'sure', 'there', 'here', 'alive', 'ai', 'human', 'dog', 'dogs', 'serious', 'kidding', 'joking',
+  'sad', 'happy', 'mad', 'busy', 'free', 'ready', 'fine', 'good', 'well', 'back', 'done', 'new', 'you', 'it', 'that',
+  'this', 'stupid', 'clever', 'nice', 'mean', 'bored', 'scared', 'lost', 'right', 'wrong', 'awake', 'asleep', 'listening',
+  'robot', 'fake', 'still', 'on', 'off', 'stuck', 'lonely', 'hungry', 'tired', 'cold', 'hot', 'angry', 'a', 'an', 'the',
+  'my', 'your', 'sorry', 'safe', 'sick', 'ill', 'crying', 'afraid', 'worried', 'upset', 'confused', 'nervous', 'excited',
+  // identity / attribute words -> keep the substantive identity or attribute answer
+  'software', 'intelligent', 'computer', 'sentient', 'conscious', 'chatbot', 'smart', 'brainy', 'automatic', 'programmed',
+  'cartoon', 'pretending', 'magic', 'digital', 'virtual', 'online', 'coded', 'old', 'young', 'big', 'small', 'tall',
+  'fast', 'slow', 'cute', 'cool', 'boring', 'funny', 'silly', 'weird', 'strange', 'single', 'married', 'thirsty', 'sleepy',
+]);
+const NAME_HER_PHRASES = ['can i give you a name', 'can i name you', 'can i call you', 'i will call you', 'ill call you', 'i am going to call you', 'im going to call you', 'shall i call you', 'let me name you', 'i name you', 'i shall call you'];
+const GREET_WORDS = new Set(['hello', 'hi', 'hey', 'hiya', 'hullo', 'yo']);
+function looksLikeName(tok: string): boolean {
+  return !!tok && tok.length >= 2 && !NAME_STOP.has(tok) && !STOP.has(tok);
+}
+// True when the message is trying to assign HER a name (not asking her name, which keeps "im a dog").
+function isNamingHer(c: string): boolean {
+  if (NAME_HER_PHRASES.some((p) => c.includes(p))) return true;
+  const toks = c.match(/[a-z]+/g) ?? [];
+  // "hello NAME" / "hi NAME": a greeting plus exactly one trailing name-like token.
+  if (toks.length === 2 && GREET_WORDS.has(toks[0]) && looksLikeName(toks[1])) return true;
+  // "are you NAME" / "is i NAME" (as in "is I Rover") / "is your name NAME": a single trailing name.
+  let m = c.match(/^are you ([a-z]+)$/) || c.match(/^is i ([a-z]+)$/) || c.match(/^is your name ([a-z]+)$/) || c.match(/^are you called ([a-z]+)$/);
+  return !!(m && looksLikeName(m[1]));
+}
+// Task 142: a name statement -> the visitor's name, capitalised, for a one-off acknowledgement.
+// Rule not list: five openers, the name is whatever single token follows. Returns null when the
+// captured word is a feeling/state (the stop set), so "im scared" / "im a dog" are never a name.
+const NAME_STATEMENT_RES = [/^my name is ([a-z]+)$/, /^my names ([a-z]+)$/, /^the names ([a-z]+)$/, /^names ([a-z]+)$/, /^call me ([a-z]+)$/, /^you can call me ([a-z]+)$/, /^im ([a-z]+)$/, /^i am ([a-z]+)$/, /^i'm ([a-z]+)$/];
+function nameStatement(c: string): string | null {
+  for (const re of NAME_STATEMENT_RES) {
+    const m = c.match(re);
+    if (m && looksLikeName(m[1])) return m[1].charAt(0).toUpperCase() + m[1].slice(1);
+  }
+  return null;
+}
 const FETCH_TRIGGERS = new Set(['fetch', 'can we play fetch', 'play fetch', 'lets play fetch', 'throw it', 'go fetch', 'can we play catch']);
 const DOGS_TRIGGERS = new Set(['dogs', 'dog']);
 // Task 140: widen to phrasings from the real log that missed B54. 'performa' is a genuine
@@ -677,13 +737,44 @@ function matchBreed(c: string, n: Normalised, state: RouterState): Resolution | 
   // Breed follow-up: no new breed named, but a breed topic is established and this reads
   // as a question about it ("how long do they live"). Reads the topic slot (Task 27).
   const breedTopic = state.topic?.kind === 'breed' ? state.topic.subject : null;
+  // Task 142 (bug 3.1): a follow-up is about THEM, the established breed. A GENERAL question that
+  // names "dog"/"dogs" ("how long do dogs live") is not a follow-up: it must not be answered with the
+  // last breed's paragraph. So the topic is only reused when the message carries no generic dog word.
+  const generalDogQuestion = /\bdogs?\b/.test(c);
   // A breed follow-up ("how long do they live") OR an explicit "show me the page" request
   // (Task 35), when a breed topic is established, resolves to that breed's page.
-  if (breedTopic && (hasAny(n, BREED_FOLLOWUP) || hasAny(n, SHOW_PAGE_TRIGGERS))) {
+  if (breedTopic && !generalDogQuestion && (hasAny(n, BREED_FOLLOWUP) || hasAny(n, SHOW_PAGE_TRIGGERS))) {
     const p = BREED_PAGES.find((x) => x.slug === breedTopic);
     if (p) return breedPageRes(p);
   }
   return null;
+}
+
+// Task 142 (Rule 1): any of the 54 pack breeds, not just the 10 proof breeds. Checked AFTER the
+// proof matcher (so the proof breeds keep their nuanced confidence-gap handling and the four chatbot
+// dogs keep their transfer routing). A breed's distinctive name tokens (its title minus the generic
+// family word) must all be present; matching is fuzzy (hasAny), so "jack russel" reads as "jack
+// russell". Exactly one breed must match: zero or an ambiguous family word falls through to the hub.
+const BREED_GENERIC = new Set(['terrier', 'hound', 'spaniel', 'retriever', 'bulldog', 'sheepdog', 'dog', 'dogs']);
+// Nicknames and short-word misspellings fuzz cannot reach (a five-letter word is matched exact).
+const EXTRA_BREED_ALIASES: Record<string, string> = { 'sausage dog': 'dachshund', 'sausage dogs': 'dachshund', corgie: 'corgi', corgies: 'corgi', corgy: 'corgi' };
+function breedPageResFromDog(d: DogRecord): Resolution {
+  return { layer: 5, layerName: 'Dog, breed and website content', bucket: 'B05', action: 'breed_page', breedSlug: d.slug, breedTitle: d.name, url: d.detailUrl || `/chums/${d.slug}`, destinationId: d.slug };
+}
+function matchExtraBreed(c: string, n: Normalised, data: ChumData): Resolution | null {
+  for (const [phrase, slug] of Object.entries(EXTRA_BREED_ALIASES)) {
+    if (c.includes(phrase)) {
+      const d = data.dogs.find((x) => x.slug === slug);
+      if (d) return breedPageResFromDog(d);
+    }
+  }
+  const matches: DogRecord[] = [];
+  for (const d of data.dogs) {
+    const key = (d.name.toLowerCase().match(/[a-z]+/g) ?? []).filter((t) => !BREED_GENERIC.has(t));
+    if (!key.length) continue;
+    if (hasAny(n, [key.join(' ')])) matches.push(d);
+  }
+  return matches.length === 1 ? breedPageResFromDog(matches[0]) : null;
 }
 
 // Task 27: generic explicit-return triggers. Named returns ("back to beagles", "the
@@ -1023,6 +1114,23 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
     // smile face + clip (MEDIA_REPLIES in the assembler). (Task 141: car and balls moved to the
     // workbook as B64 / B52-MISC-09 and now route through the generic canned matcher.)
     if (hasAny(N, ['birthday'])) return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: 'media_reply', responseId: 'BIRTHDAY-01' };
+    // Task 142: praise -> the wagging-tail clip (checked before the naming/how-are-you rules so
+    // "are you a good dog" is praise, not a name attempt or a personal question).
+    if (GOOD_BOY_TRIGGERS.has(c)) return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: 'good_boy' };
+    // Task 142: an excited reaction -> the existing B29 ":)" acknowledgement (not a how-are-you clip).
+    if (REACTION_TRIGGERS.has(c)) return { layer: 9, layerName: 'Recognised conversation', bucket: 'B29', action: 'canned', responseId: 'B29-NICE-01' };
+    // Task 142: trying to NAME her -> she deflects, taking no name. "whats your name" is deliberately
+    // not here, so it keeps its existing "im a dog".
+    if (isNamingHer(c)) return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: 'name_deflect' };
+    // Task 142: a name statement -> acknowledge once with the (capitalised) name, then drop it. Safety
+    // is checked far above, so "im scared" is a safety route and never reaches here as a name.
+    {
+      const nm = nameStatement(c);
+      if (nm) return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: 'name_ack', personName: nm };
+    }
+    // Task 142: a personal question with no answer inside her world (how are you / how old are you /
+    // are you human) -> a deflection clip.
+    if (hasAny(N, HOW_ARE_YOU) || hasAny(N, HUMAN_STATEMENT)) return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: 'how_are_you' };
     if (GAME_CMD.has(c)) return { layer: 13, layerName: 'Play and entertainment', bucket: 'B17', action: 'offer_bark_game' };
     if (FETCH_CMD.has(c)) return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: 'random_link' };
   }
@@ -1170,6 +1278,13 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
     if (hasAny(N, PRICE_INTENT)) {
       return { layer: 4, layerName: 'FAQ knowledge', bucket: 'B04', action: 'price_answer', faqId: 'FAQ008' };
     }
+    return { layer: 2, layerName: 'Buying, launch and 30% discount', bucket: 'B01', action: 'open_discount_popup', destinationId: 'DST001' };
+  }
+
+  // Task 142 (§7.2): a referral question. No referral scheme exists, so rather than guess, point it
+  // at the offer (Steve's call). Below the commercial block so a real buying phrase still opens the
+  // modal on its own terms.
+  if (hasAny(N, REFERRAL_TRIGGERS)) {
     return { layer: 2, layerName: 'Buying, launch and 30% discount', bucket: 'B01', action: 'open_discount_popup', destinationId: 'DST001' };
   }
 
@@ -1334,6 +1449,10 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
   if (!state.lastWasComplaint) {
     const breed = matchBreed(c, N, state);
     if (breed) return breed;
+    // Task 142 (Rule 1): any of the other 54 pack breeds (corgi, dachshund, jack russell, ...). Above
+    // food (layer 8), so a breed named with a food word ("sausage dogs") is the breed, never food.
+    const extra = matchExtraBreed(c, N, data);
+    if (extra) return extra;
     // Superlative "best dog" question: the shared refuse-to-pick line. Checked before
     // the hub so "whats the best dog breed" is BREED_BEST, not BREED_HUB.
     if (hasAny(N, BREED_BEST)) {
@@ -1373,7 +1492,10 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
   // Layer 6 (continued): a general-knowledge-shaped question with no approved
   // record is refused here rather than guessed. Checked after the active-breed
   // layer so an explicit breed question is not swallowed as unknown GK.
-  if (hasAny(N, CURRENT_DATA) || GK_SHAPE.test(c)) {
+  // Task 142 (bug 3.3): a genuine food question ("what food do dogs eat") is GK-shaped, so it was
+  // refused here before reaching the food specialist. A message carrying a food word skips the
+  // refuse and falls through to the Labrador food transfer below.
+  if ((hasAny(N, CURRENT_DATA) || GK_SHAPE.test(c)) && !hasAny(N, FOOD)) {
     return { layer: 6, layerName: 'General knowledge', bucket: 'B06', action: 'gk_unknown', note: 'No approved record. The Collie does not guess.' };
   }
 

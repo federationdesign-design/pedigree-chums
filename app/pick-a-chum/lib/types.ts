@@ -172,6 +172,10 @@ export type ActionType =
   | 'paw' // Task 138: she offers a paw, served as a short clip rather than a line.
   | 'page_bio' // Task 140: "what is this page" -> the bio for the page the visitor is standing on (from usePathname). Fires only with a page context; never inside a protected state.
   | 'media_reply' // Task 140: a short owner-approved line served with a clip (birthday/car/balls). The specific line + clip is selected by responseId; never inside a protected state.
+  | 'how_are_you' // Task 142: a personal question with no in-world answer (how are you / how old are you / are you human) -> one of three deflection clips at random.
+  | 'good_boy' // Task 142: praise (good boy/girl/dog, clever girl, well done) -> the wagging-tail clip.
+  | 'name_ack' // Task 142: a name statement (my name is X) -> acknowledge once with the visitor's name, then drop it (never stored).
+  | 'name_deflect' // Task 142: an attempt to name HER (are you Dave / hello Dave / can I name you) -> she deflects without accepting or storing a name.
   | 'dog_fact' // Task 134: B57. A dog fact chosen AT RANDOM, not by rotation, and not repeated until the session has used all twenty.
   | 'price_answer' // Task 49: a price question -> FAQ008's text in chat; NOT a MEANINGFUL_TOPIC, so the safety machine holds/refuses it like buying
   | 'transfer_request' // visitor asks to switch to a different dog
@@ -212,6 +216,7 @@ export interface Resolution {
   breedOptions?: { title: string; slug: string; url: string }[]; // breed_choice: the two options
   griefCategory?: string; // Task 58: which grief scenario matched (GRIEF-01 died / GRIEF-02 lost / GRIEF-03 old-unwell); all serve the same ':(' line
   pageBioRoute?: string; // Task 140: the pathname the page-bio answer is for; the assembler resolves the bio and substitutes {{BREED}} from the slug
+  personName?: string; // Task 142: the visitor's name from a name statement, capitalised for a one-off acknowledgement. NEVER stored on the session.
   mirror?: string; // Task 76: the greeting word to echo back for a B09 greeting (the only response built from the input)
   responseId?: string; // Task 80: the specific canned-conversation row (B21-B39) the input matched; the assembler serves that row's template
   // Task 115: game routing. `game` is the game a start/move/exit targets. The engine processes the move
