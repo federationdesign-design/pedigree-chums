@@ -6,6 +6,7 @@ import BreedTree from "../BreedTree/BreedTree";
 import CookieBanner from "../CookieBanner/CookieBanner";
 import ScoreTable from "../ScoreTable/ScoreTable";
 import { BRAIN_PATH, BRAIN_ARTBOARD } from "../icons/brain";
+import ShareCard from "../ShareCard/ShareCard";
 import type { LineageNode } from "../../data/lineage";
 import { levelThemeFor } from "../../data/levelThemes";
 import css from "./LineageModal.module.css";
@@ -137,6 +138,9 @@ export default function LineageModal({ name, image, character, lineage, onClose,
   // Chums collected on this level. Per level by decision, so no storage and no
   // reset: this component already unmounts when the level changes.
   const [collectedChums, setCollectedChums] = useState<Set<string>>(new Set());
+  // The share overlay. Opened from the game over row, closed by its own back
+  // arrow. Nothing navigates, so score, rate and topChum stay in scope.
+  const [sharing, setSharing] = useState(false);
   /* The size of this level's pack, so the count can be read as a share.
      The flood reports what it tipped in, and anything already taken before it
      ran is added back, because the flood is handed a list with those already
@@ -676,6 +680,24 @@ export default function LineageModal({ name, image, character, lineage, onClose,
                     learn. Learn is inverted, a blue box with a yellow glyph,
                     which is the only one that reads as a different kind of
                     action rather than a way out. */}
+                {/* SHARE, first in the row: it is the one thing here that is
+                    not a way out of the round. */}
+                <button
+                  type="button"
+                  className={`${css.endBtn} ${css.endBtnIcon} ${css.endBtnBlue}`}
+                  onClick={() => setSharing(true)}
+                  aria-label="Share your score"
+                  title="Share"
+                >
+                  <svg className={css.endIcon} viewBox="0 0 24 24" aria-hidden="true" focusable="false"
+                    fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="18" cy="5" r="3" />
+                    <circle cx="6" cy="12" r="3" />
+                    <circle cx="18" cy="19" r="3" />
+                    <line x1="8.6" y1="10.5" x2="15.4" y2="6.5" />
+                    <line x1="8.6" y1="13.5" x2="15.4" y2="17.5" />
+                  </svg>
+                </button>
                 <button
                   type="button"
                   className={`${css.endBtn} ${css.endBtnIcon} ${css.endBtnRed}`}
@@ -733,6 +755,17 @@ export default function LineageModal({ name, image, character, lineage, onClose,
             </>
           )}
         </div>
+      )}
+
+      {sharing && (
+        <ShareCard
+          score={score}
+          rate={packSize > 0 ? Math.min(100, Math.round((collectedChums.size / packSize) * 100)) : 0}
+          chums={collectedChums.size}
+          level={name}
+          topChum={topChum}
+          onClose={() => setSharing(false)}
+        />
       )}
 
       {/* The cookie notice must be reachable above this overlay */}
