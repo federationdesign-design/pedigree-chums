@@ -310,8 +310,9 @@
   position: absolute;
   top: 0;
   right: 0;
-  width: 46%;
-  max-width: 300px;
+  /* 15% off 46% and 300. */
+  width: 39.1%;
+  max-width: 255px;
   aspect-ratio: 1 / 1;
   border: 0;
   padding: 0;
@@ -363,8 +364,9 @@
      repeated in all three frames and would drift the moment either is touched. */
   top: calc(33% + 20px);
   left: calc(67% - 20px);
-  /* 100% overhung the chord by about 9px each end. 80% is a fifth off that. */
-  width: 80%;
+  /* 100% overhung the chord by about 9px each end, 80% pulled it inside, and
+     this is 5% back on top of that. */
+  width: 84%;
   aspect-ratio: 720 / 210.1;
   /* 42deg, three back from the 45 of the diagonal. */
   transform: translate(-50%, -50%) rotate(42deg);

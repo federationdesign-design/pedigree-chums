@@ -41,14 +41,47 @@ export type ShareCardProps = {
   onClose: () => void;
 };
 
-/** Steve's own five, shipped as written. */
-const CAPTIONS: ((p: ShareCardProps) => string)[] = [
+/**
+ * Three sets, picked by how the round went. Steve's own copy, shipped as
+ * written, casual spelling and all.
+ *
+ * The thresholds are the only invented part. HIGH is his: over 79. The line
+ * between doing well and doing badly was not specified, so it sits at 40 and is
+ * one number to move.
+ */
+const RATE_HIGH = 79; // above this, the bragging set
+const RATE_OK = 40; // at or above this, the positive set; below it, the rueful one
+
+type Caption = (p: ShareCardProps) => string;
+
+const POSITIVE: Caption[] = [
   (p) => `I got ${p.score.toLocaleString()} and collected ${p.chums} dogs. Beat that.`,
   (p) => `I don't really know what went on but I got a chum rate of ${p.rate}%`,
   (p) => `I like dogs, I know because I scored ${p.score.toLocaleString()}. BTW my chum rate was ${p.rate}%`,
   (p) => `Turns out the sausage dog's granny is a ${p.level}. Points for me.`,
   (p) => `${p.rate}% chum rate. I am basically a professional dog spotter now.`,
 ];
+
+const NEGATIVE: Caption[] = [
+  (p) => `I am bad at this! got ${p.score.toLocaleString()} and collected ${p.chums} dogs. Beat that if you can`,
+  (p) => `I don't really know what went on but I got a chum rate of ${p.rate}%`,
+  (p) => `I like dogs, but clicking them is not for me, I scored ${p.score.toLocaleString()}. BTW my chum rate was ${p.rate}%`,
+  (p) => `Turns out the sausage dog's granny is a ${p.level}. Points for me.`,
+  (p) => `${p.rate}% chum rate. I have to up them rookie numbers`,
+];
+
+const HIGH: Caption[] = [
+  (p) => `${p.rate}% chum rate. Im popular with dogs`,
+  (p) => `I am good at this! got ${p.score.toLocaleString()} and collected ${p.chums} chums. Beat that if you can`,
+  (p) => `whats a chum rate... im not sure but I got ${p.rate}%`,
+  (p) => `I clicked some dogs and the game ended. I had ${p.rate}% chum rate.`,
+];
+
+function captionsFor(rate: number): Caption[] {
+  if (rate > RATE_HIGH) return HIGH;
+  if (rate >= RATE_OK) return POSITIVE;
+  return NEGATIVE;
+}
 
 function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
   ctx.beginPath();
@@ -266,7 +299,7 @@ export default function ShareCard(props: ShareCardProps) {
 
         <div className={css.picker}>
           <p className={css.pickerTitle}>Pick a caption</p>
-          {CAPTIONS.map((fn, i) => (
+          {captionsFor(rate).map((fn, i) => (
             <button key={i} type="button" className={css.caption} disabled={busy} onClick={() => shareWith(fn(props))}>
               {fn(props)}
             </button>
