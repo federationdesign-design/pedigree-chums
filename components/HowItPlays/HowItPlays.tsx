@@ -78,7 +78,10 @@ export default function HowItPlays() {
     // the beginning only sets the scene.
     const onEnded = (e: Event) => {
       const v = e.target as HTMLVideoElement;
-      if (v.duration) v.currentTime = Math.max(0, v.duration - 0.05);
+      // Owner review: the last frame of some clips is blank, so the card ended
+      // white. Land a third of a second early, which is comfortably past the
+      // action and clear of the empty tail.
+      if (v.duration) v.currentTime = Math.max(0, v.duration - 0.35);
     };
 
     vids.forEach((v) => {
