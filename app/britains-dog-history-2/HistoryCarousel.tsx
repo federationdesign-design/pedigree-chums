@@ -385,6 +385,12 @@ export default function HistoryCarousel() {
 
         /* Delegated rather than bound directly, so the button keeps working
            even if its node is re-created after this script has run. */
+        /* Leaving the pit from its share screen comes back to the very first
+           slide, the title and the two ways in, rather than to whatever panel
+           the player happened to open the level from. LineageModal fires this as
+           it closes; on any page without this carousel it is simply ignored. */
+        window.addEventListener('pc:history-home', function(){ goTo(0); });
+
         document.addEventListener('click', function(e){
           var t = e.target;
           if (!t || !t.closest) return;

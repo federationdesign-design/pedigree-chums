@@ -760,7 +760,16 @@ export default function LineageModal({ name, image, character, lineage, onClose,
           level={name}
           topChum={topChum}
           onClose={() => setSharing(false)}
-          onExit={() => { setSharing(false); onClose(); }}
+          onExit={() => {
+            // Out of the pit AND back to the top of the history page: the share
+            // view is the end of the round, so it returns to the title slide
+            // with its two ways in rather than to the panel the level was
+            // opened from. The carousel listens for this; pages without one
+            // ignore it.
+            setSharing(false);
+            onClose();
+            window.dispatchEvent(new CustomEvent("pc:history-home"));
+          }}
         />
       )}
 
