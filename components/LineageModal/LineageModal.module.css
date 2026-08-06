@@ -292,6 +292,11 @@
   /* GAME over OVER, closed up. Luckiest Guy carries its own headroom, so at 1
      the two words sat further apart than they look in the type. */
   line-height: 0.9em;
+  /* Down 25px. Done with top rather than a margin because this is a centred
+     flex column: a margin grows the column, so the whole stack re-centres and
+     the word only moves half of what was asked. The element is already
+     position relative, and top shifts it without disturbing anything else. */
+  top: 25px;
 }
 /* THE SHARE FLASH. Top right corner of the game over screen, built the way the
    history page's card flashes are: one SVG as a background, sized by percentage
