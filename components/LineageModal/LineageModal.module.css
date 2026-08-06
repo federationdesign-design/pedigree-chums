@@ -345,9 +345,9 @@
    replaces the transform outright, so leaving the rotate out of it would spin
    them flat on the first frame. */
 @keyframes shareTextPop {
-  from { opacity: 0; transform: translate(-50%, -50%) rotate(42deg) scale(0.4); }
-  62% { opacity: 1; transform: translate(-50%, -50%) rotate(42deg) scale(1.12); }
-  to { opacity: 1; transform: translate(-50%, -50%) rotate(42deg) scale(1); }
+  from { opacity: 0; transform: translate(-50%, -50%) rotate(38deg) scale(0.4); }
+  62% { opacity: 1; transform: translate(-50%, -50%) rotate(38deg) scale(1.12); }
+  to { opacity: 1; transform: translate(-50%, -50%) rotate(38deg) scale(1); }
 }
 /* The artwork is the TEXT ONLY: white paths on a 720 x 210.1 canvas, no pink and
    no rotation of its own. So the flash body is the clip-path triangle above and
@@ -367,10 +367,10 @@
   top: 37%;
   left: calc(63% - 5px);
   /* Longer. In the concept the words run most of the diagonal; at 84% they
-     stopped well short and read as a label rather than a flash. */
-  width: 106%;
+     stopped well short and read as a label rather than a flash. 106, up 15%. */
+  width: 121.9%;
   aspect-ratio: 720 / 210.1;
-  /* 42deg, three back from parallel.
+  /* 38deg, seven back from parallel.
      The history here is worth keeping, because the direction was guessed wrong
      twice: 45 to 43 to 42, then back up to 45, then 48. 48 was the wrong way.
      Counter-clockwise is the SMALLER number, so anything past 45 tips the words
@@ -379,7 +379,7 @@
      side shows: at 42 the words are three degrees off the pink edge they sit
      on, so they read as slightly askew rather than as part of the flash. The
      concept is parallel. */
-  transform: translate(-50%, -50%) rotate(42deg);
+  transform: translate(-50%, -50%) rotate(38deg);
   z-index: 1;
   animation: shareTextPop 0.4s cubic-bezier(0.2, 1.5, 0.4, 1) 0.5s both;
   background-image: url("/flash-share-score.svg");
@@ -427,6 +427,8 @@
   flex-wrap: wrap;
   justify-content: center;
   gap: 14px;
+  /* 10px closer to the board above. */
+  margin-top: -10px;
 }
 .endBtn {
   appearance: none;
@@ -455,8 +457,9 @@
    5px navy rim and a corner radius of 0.3 of the side, so 20 on a 67.5 square,
    and those are the figures here. */
 .endBtnIcon {
-  width: 100.8px;
-  height: 100.8px;
+  /* 15% off 100.8 and, in the query below, off 67.5. */
+  width: 85.7px;
+  height: 85.7px;
   padding: 0;
   display: grid;
   place-items: center;
@@ -516,9 +519,9 @@
 }
 @media (max-width: 768px) {
   .endBtnIcon {
-    width: 67.5px;
-    height: 67.5px;
-    border-radius: 20px;
+    width: 57.4px;
+    height: 57.4px;
+    border-radius: 17px;
   }
 }
 .endBtnAlt {
@@ -981,23 +984,29 @@
    rather than a conversion, so what is here is what was asked for. Note they
    are fixed, so they do not shrink on a narrow phone; say the word and they
    become a clamp. */
+/* ONE LINE now, not two stacked. It was a column with the label at 20pt over
+   the value at 40pt; both sit on the same row at the same size, and only the
+   colours still tell them apart. */
 .endRound {
   position: relative;
   z-index: 2;
   margin: 2px 0 0;
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  flex-direction: row;
+  align-items: baseline;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
   text-align: center;
   font-family: var(--font-display, "Luckiest Guy", cursive);
   line-height: 1;
 }
 .endRoundTitle {
-  font-size: 20pt;
+  font-size: 30pt;
   color: #ffffff;
 }
 .endRoundValue {
-  font-size: 40pt;
+  font-size: 30pt;
   color: var(--yellow, #ffd23e);
 }
 /* A quarter of the figure above it, and the only line here that is not display
