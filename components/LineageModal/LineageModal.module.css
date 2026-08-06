@@ -282,7 +282,9 @@
   position: relative;
   z-index: 1;
   font-family: var(--font-display, "Luckiest Guy", system-ui);
-  font-size: clamp(3.4rem, 12vw, 8rem);
+  /* Moved off an inline style so the desktop rule below can win. Unchanged from
+     what the inline one set, so mobile is exactly as it was. */
+  font-size: clamp(6.8rem, 24vw, 16rem);
   color: #ffffff;
   text-shadow: 0 4px 40px rgba(0, 0, 0, 0.6);
   animation: lmEndPop 0.45s cubic-bezier(0.2, 1.4, 0.4, 1);
@@ -293,6 +295,29 @@
 }
 .endFlashWord {
   display: block;
+}
+/* DESKTOP ONLY: a third smaller, and GAME OVER on one line.
+   Mobile keeps the two stacked blocks at full size, which is what the narrow
+   column wants. 769px is the breakpoint the rest of this file uses.
+   The words are separate spans, and JSX drops the newline between them, so the
+   space has to be put back as a margin rather than assumed. */
+@media (min-width: 769px) {
+  .endFlash {
+    /* 10.7rem is the exact third off 16rem, and it is what a normal desktop
+       gets: the clamp reaches its ceiling at about 1320px wide.
+       The middle term is 13vw rather than 16. At 16 the one-line word came to
+       88% of the screen between 769 and 1069px, and with nowrap that is one
+       wide font away from running off the edge. 13vw holds it near 70% there
+       and changes nothing above 1320px. */
+    font-size: clamp(4.55rem, 13vw, 10.7rem);
+    white-space: nowrap;
+  }
+  .endFlashWord {
+    display: inline;
+  }
+  .endFlashWord + .endFlashWord {
+    margin-left: 0.22em;
+  }
 }
 @keyframes lmEndPop {
   from { transform: scale(0.6); opacity: 0; }

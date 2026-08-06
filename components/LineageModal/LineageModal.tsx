@@ -616,7 +616,9 @@ export default function LineageModal({ name, image, character, lineage, onClose,
           ) : (
             <>
               {/* The close X has moved down into the button row. */}
-              <div className={css.endFlash} style={{ fontSize: "clamp(6.8rem, 24vw, 16rem)" }}>
+              {/* The size lives in the stylesheet now, not here. An inline style
+                  beats a media query, so desktop could never override it. */}
+              <div className={css.endFlash}>
                 <span className={css.endFlashWord}>GAME</span>
                 <span className={css.endFlashWord}>OVER</span>
               </div>
