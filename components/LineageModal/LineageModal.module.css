@@ -344,9 +344,9 @@
    replaces the transform outright, so leaving the rotate out of it would spin
    them flat on the first frame. */
 @keyframes shareTextPop {
-  from { opacity: 0; transform: translate(-50%, -50%) rotate(43deg) scale(0.4); }
-  62% { opacity: 1; transform: translate(-50%, -50%) rotate(43deg) scale(1.12); }
-  to { opacity: 1; transform: translate(-50%, -50%) rotate(43deg) scale(1); }
+  from { opacity: 0; transform: translate(-50%, -50%) rotate(42deg) scale(0.4); }
+  62% { opacity: 1; transform: translate(-50%, -50%) rotate(42deg) scale(1.12); }
+  to { opacity: 1; transform: translate(-50%, -50%) rotate(42deg) scale(1); }
 }
 /* The artwork is the TEXT ONLY: white paths on a 720 x 210.1 canvas, no pink and
    no rotation of its own. So the flash body is the clip-path triangle above and
@@ -358,14 +358,16 @@
    background-size contain, never 100% 100%, so the letterforms cannot distort. */
 .endShareFlashText {
   position: absolute;
-  top: 33%;
-  left: 67%;
-  /* 86% sat inside the triangle. At 100% the band is longer than the chord it
-     lies on, so it overhangs each edge by a few pixels, which is the point. */
-  width: 100%;
+  /* The nudge lives in top and left, NOT in the transform. The keyframes below
+     replace transform outright, so a translate put there would have to be
+     repeated in all three frames and would drift the moment either is touched. */
+  top: calc(33% + 20px);
+  left: calc(67% - 20px);
+  /* 100% overhung the chord by about 9px each end. 80% is a fifth off that. */
+  width: 80%;
   aspect-ratio: 720 / 210.1;
-  /* 43deg, two degrees back from the 45 of the diagonal. */
-  transform: translate(-50%, -50%) rotate(43deg);
+  /* 42deg, three back from the 45 of the diagonal. */
+  transform: translate(-50%, -50%) rotate(42deg);
   z-index: 1;
   animation: shareTextPop 0.4s cubic-bezier(0.2, 1.5, 0.4, 1) 0.5s both;
   background-image: url("/flash-share-score.svg");
