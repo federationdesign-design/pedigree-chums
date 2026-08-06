@@ -94,7 +94,15 @@
      will not scroll on a real device. A dynamic viewport height fixes it. */
   height: 100dvh;
   max-height: 100dvh;
-  z-index: 100;
+  /* 1200, above the pit.
+     Both this and LineageModal are portalled to <body>, so they stack against
+     each other directly: the pit sits at 900 and the share view inside it, and
+     at 100 the menu opened genuinely behind them. It could be tapped and it
+     could not be seen.
+     A menu belongs on top of whatever it was opened from, so this is the right
+     way round rather than a special case for the pit. It stays below the few
+     four and five figure z-indexes in the app, which are third party. */
+  z-index: 1200;
   background: var(--blue-deep);
   /* Stop iOS Safari from auto-inflating the menu's small text (e.g. the hero
      pill tags) so mobile matches desktop sizing. */
