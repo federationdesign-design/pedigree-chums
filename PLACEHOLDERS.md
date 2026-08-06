@@ -19,28 +19,26 @@ final copy.
 | LOOP-02 route offer | `engine.ts` (`LOOP_02_ROUTE_OFFER = 'the game or a dog?'`) | The `[ROUTE A] or [ROUTE B]?` fill is my best-effort using ORIENT's two departments; the exact copy, and whether it should adapt to the candidate's specific route ("close to a supported route"), is unspecified. It also overlaps ORIENT's wording | Steve supplies the LOOP-02 route-offer copy and the adapt-to-candidate rule |
 | Grief detection trigger lists | `safety.ts` (`GRIEF_DIED`/`GRIEF_LOST`/`GRIEF_WORRIED`/`GRIEF_CONTINUE`/`GRIEF_EXCLUDE`) | Task 58 grief COPY (`:(`) is approved; the DETECTION wording is best-effort, authored to cover the three scenarios and the required assertions, conservative to avoid false positives. As a safety route it should be reviewed/extended by Steve like the other safety trigger lists | Steve reviews and extends the grief triggers |
 
-## Task 140 media clips (all five wired; three lines pending workbook migration)
+## Task 140/141 media clips (all five wired)
 
 All five clips in `public/chat-media/` are wired. The clip is ADDED to its
-response, never replacing the copy. cats and hotdog join genuinely existing
-responses. birthday, car and balls had no response in the workbook, so Steve
-supplied the exact triggers and copy (6 August); that copy is held as code
-constants (`MEDIA_REPLIES` in `assembler.ts`), the same pattern the goodbye /
-out-of-scope / bark-game lines use, flagged here for later workbook migration.
+response, never replacing the copy. Task 141 moved car and balls into the
+workbook (B64 / B52-MISC-09), so their clips now attach by responseId in the
+assembler's `CANNED_MEDIA` map, like cats. Only **birthday** remains a code
+constant (`MEDIA_REPLIES['BIRTHDAY-01']`), because it still has no workbook row.
 
 | Clip | Trigger | Response (unchanged copy) + clip | Where |
 |---|---|---|---|
-| `cats.mp4` | `cats`/`cat` | existing `B21-CATS-01` "Where?" | `assembler.ts` `case 'canned'` |
-| `hotdog.mp4` | `hot dogs`/`hot dog` | existing `FAQ007` answer (unchanged) | `assembler.ts` `case 'faq_answer'` (FAQ007 only) |
+| `cats.mp4` | `cats`/`cat` | `B21-CATS-01` "Where?" | `CANNED_MEDIA` |
+| `hotdog.mp4` | `hot dogs`/`hot dog` | `FAQ007` answer (unchanged) | `case 'faq_answer'` (FAQ007 only) |
+| `car.mp4` | "do you like going in the car" | `COL-B64-CAR-01` "yes" | `CANNED_MEDIA` |
+| `ball.mp4` | "can you lick your balls" / "balls" / "tennis balls" | `COL-B52-MISC-09` "Tennis balls?" | `CANNED_MEDIA` |
 | `birthday.mp4` | any birthday mention | ":)" (the existing smile face) | `MEDIA_REPLIES['BIRTHDAY-01']` |
-| `car.mp4` | "do you like going in the car" | "yes" | `MEDIA_REPLIES['CAR-01']` |
-| `ball.mp4` | "can you lick your balls" | "Tennis balls?" | `MEDIA_REPLIES['BALLS-01']` |
 
-Migration: move the three `MEDIA_REPLIES` lines (birthday/car/balls) into the
-workbook (car and balls as B32-style canned rows, birthday as its own row), then
-attach the clips there and retire the code constants. No clip surfaces inside a
-protected state (the hotdog clip is suppressed when `session.protectedState`
-is set; the other four routes are held/refused by the S12 machine).
+Only birthday is left to migrate: move it into the workbook as its own row, then
+attach the clip via `CANNED_MEDIA` and retire the constant. No clip surfaces
+inside a protected state (the hotdog clip is suppressed when
+`session.protectedState` is set; the others are held/refused by the S12 machine).
 
 ## Task 140 page bios, route 2 (not implemented)
 
@@ -72,7 +70,7 @@ asset, then delete the SVG.
 
 | Placeholder | Location | Meaning | Resolve via |
 |---|---|---|---|
-| `PLACEHOLDER_COMPLETION_TIME` ("It takes about two minutes.") | `scripts/superpower-generate-config.mjs` (emitted into `app/whats-your-superpower/data/config.mvp-4.1.json` `copy.completionTime`) | The entry screen must show an approximate completion time (spec section 3) but no document specifies the value; this is a best-effort stand-in, not approved copy | Steve confirms the wording, then rerun the generator |
+| `PLACEHOLDER_COMPLETION_TIME` ("It takes about two minutes.") | `scripts/superpower-generate-config.mjs` (emitted into `app/whats-your-superpower/data/config.mvp-4.2.json` `copy.completionTime`) | The entry screen must show an approximate completion time (spec section 3) but no document specifies the value; this is a best-effort stand-in, not approved copy | Steve confirms the wording, then rerun the generator |
 
 ## Resolved (no longer placeholders)
 

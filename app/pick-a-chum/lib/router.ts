@@ -522,12 +522,6 @@ const OPTIONS_TRIGGERS = new Set(['tell me my options', 'what can i do', 'what e
 const MADE_TRIGGERS = new Set(['who made you', 'who built you', 'who created you', 'who wrote you', 'who owns you', 'who designed you']);
 const WORST_TRIGGERS = new Set(['worst dog', 'whats the worst dog', 'worst dog ever', 'worst breed', 'whats the worst breed']);
 const PAW_TRIGGERS = new Set(['paw', 'give me your paw', 'shake', 'shake hands', 'give paw', 'can i have your paw', 'high five']);
-// Task 140: two clip replies that had no home. Owner copy: the car question answers "yes", the
-// balls question answers "Tennis balls?" (see MEDIA_REPLIES in the assembler); the clip joins each.
-// Whole-message forms only, so "i left my toy in the car" is not swept in. Safety runs first, so
-// "lick your balls" never reaches here as anything but the harmless play reply (it is not explicit).
-const CAR_TRIGGERS = new Set(['do you like going in the car', 'do you like the car', 'do you like going in cars', 'do you like car rides', 'do you like the car ride']);
-const BALLS_TRIGGERS = new Set(['can you lick your balls', 'can you lick your own balls', 'do you lick your balls', 'lick your balls']);
 const FETCH_TRIGGERS = new Set(['fetch', 'can we play fetch', 'play fetch', 'lets play fetch', 'throw it', 'go fetch', 'can we play catch']);
 const DOGS_TRIGGERS = new Set(['dogs', 'dog']);
 // Task 140: widen to phrasings from the real log that missed B54. 'performa' is a genuine
@@ -811,7 +805,18 @@ export function extractCandidateSubject(n0: Normalised, data: ChumData): string 
 // more words). That keeps short generic triggers ("who", "how long", "cats") from hijacking real
 // questions ("who is the prime minister", "how long does a game take") while still letting a
 // multi-word phrase ("do you like cats") match inside a longer message.
-const CANNED_BUCKETS = /^B(2[1-9]|3[0-9])$/;
+// Task 141: eight new conversational buckets join the generic canned matcher. B47-B53 and B64 are
+// the same "recognised conversation" shape as B21-B39 (triggers -> template), so they route the same
+// way. B40-B46 (fallback loop / games / rotation) and B54-B63 (wired explicitly, with their own
+// ask/confirm/paw/fact behaviours) stay OUT of this range.
+const CANNED_BUCKETS = /^B(2[1-9]|3[0-9]|4[7-9]|5[0-3]|64)$/;
+// Task 141: only the original B21-B39 buckets may OVERRIDE a real answer (identity / orientation /
+// clarifier / FAQ / breed page) on an exact match, which is the deliberate "old voice" decision. The
+// eight new buckets must NOT hijack those: e.g. "how long do they live" (B48) has to stay the breed
+// follow-up when a breed topic is live, and "how many people can play" (B52) has to stay FAQ001. So
+// the exact-override path (resolveCanned, exactOnly) is scoped to this narrower range; the new buckets
+// are only reachable at the low in-router position, below FAQ/breed/GK.
+const OVERRIDE_CANNED_BUCKETS = /^B(2[1-9]|3[0-9])$/;
 function cannedTriggerHits(c: string, hay: string, trig: string, exactOnly: boolean): boolean {
   if (c === trig) return true; // exact full-input match, any length
   if (exactOnly) return false; // the override path (beating a real answer) demands an exact match
@@ -821,27 +826,33 @@ function cannedTriggerHits(c: string, hay: string, trig: string, exactOnly: bool
 // / clarifier / FAQ): a substring hit is too loose there ("what do you do when a dog barks" is a
 // real FAQ, not B27), so only a full-input match overrides. The in-router fall-through check (over
 // the non-answer zone) leaves it false, so a phrase can still match inside a longer stray message.
-function matchCanned(c: string, data: ChumData, exactOnly = false, dog: Dog = 'collie'): { bucket: string; responseId: string } | null {
+function matchCanned(c: string, data: ChumData, exactOnly = false, dog: Dog = 'collie'): { bucket: string; responseId: string; route: string } | null {
   const cc = c.replace(/'/g, ''); // apostrophe-insensitive: the workbook triggers are written without them, so "what's this" matches "whats this"
   const hay = ` ${cc} `;
-  let best: { bucket: string; responseId: string; len: number } | null = null;
+  let best: { bucket: string; responseId: string; len: number; route: string } | null = null;
+  // Task 141: the override path (exactOnly, from resolveCanned) is scoped to B21-B39; the low-priority
+  // in-router path sees the full extended range (which includes the eight new buckets).
+  const bucketRe = exactOnly ? OVERRIDE_CANNED_BUCKETS : CANNED_BUCKETS;
   // Per-dog: match against the active dog's effective bank (its own canned rows first, Collie for any
   // bucket it has not written), the same view the assembler serves from, so a match and its serve agree.
   for (const r of effectiveBank(data, dog)) {
-    if (!CANNED_BUCKETS.test(r.bucketId)) continue;
+    if (!bucketRe.test(r.bucketId)) continue;
     for (const t of r.triggers) {
       const trig = normalise(t).compact.replace(/'/g, '');
       if (!trig || trig.startsWith('any ')) continue; // skip the "ANY unrecognised input" pseudo-trigger
       if (cannedTriggerHits(cc, hay, trig, exactOnly) && (!best || trig.length > best.len)) {
-        best = { bucket: r.bucketId, responseId: r.responseId, len: trig.length };
+        best = { bucket: r.bucketId, responseId: r.responseId, len: trig.length, route: r.defaultRoute ?? '' };
       }
     }
   }
-  return best ? { bucket: best.bucket, responseId: best.responseId } : null;
+  return best ? { bucket: best.bucket, responseId: best.responseId, route: best.route } : null;
 }
-function cannedResolution(m: { bucket: string; responseId: string }): Resolution {
+function cannedResolution(m: { bucket: string; responseId: string; route?: string }): Resolution {
   const res: Resolution = { layer: 9, layerName: 'Recognised conversation', bucket: m.bucket, action: 'canned', responseId: m.responseId };
   if (m.responseId === 'B34-CHUMDROP-01') res.destinationId = 'DST002'; // ChumDrop; the assembler resolves its URL
+  // Task 141: a canned row may carry a defaultRoute (B51 superlatives -> DST006 the breed explorer;
+  // B52-MISC-01 -> DST007 Britain's Dog History). Attach it so the assembler resolves the page link.
+  else if (m.route && /^DST/.test(m.route)) res.destinationId = m.route;
   return res;
 }
 // The canned resolution for an input, or null. Exported so the engine can let a canned answer
@@ -1007,12 +1018,11 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
     if (MADE_TRIGGERS.has(c)) return L13('B62', 'COL-B62-MADE-01');
     if (WORST_TRIGGERS.has(c)) return L13('B63', 'COL-B63-WORST-01', 'DST015');
     if (PAW_TRIGGERS.has(c)) return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: 'paw' };
-    // Task 140: three clip replies. Below safety/grief/personal-sadness (all above), so a birthday
-    // named alongside a disclosure is never caught here. birthday is ANY birthday mention; car and
-    // balls are whole-message. Each serves an owner line + its clip (MEDIA_REPLIES in the assembler).
+    // Task 140: the birthday clip reply. Below safety/grief/personal-sadness (all above), so a
+    // birthday named alongside a disclosure is never caught here. ANY birthday mention. Serves the
+    // smile face + clip (MEDIA_REPLIES in the assembler). (Task 141: car and balls moved to the
+    // workbook as B64 / B52-MISC-09 and now route through the generic canned matcher.)
     if (hasAny(N, ['birthday'])) return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: 'media_reply', responseId: 'BIRTHDAY-01' };
-    if (CAR_TRIGGERS.has(c)) return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: 'media_reply', responseId: 'CAR-01' };
-    if (BALLS_TRIGGERS.has(c)) return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: 'media_reply', responseId: 'BALLS-01' };
     if (GAME_CMD.has(c)) return { layer: 13, layerName: 'Play and entertainment', bucket: 'B17', action: 'offer_bark_game' };
     if (FETCH_CMD.has(c)) return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: 'random_link' };
   }

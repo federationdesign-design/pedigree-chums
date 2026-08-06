@@ -4553,5 +4553,453 @@
     "defaultRoute": "DST015",
     "animationCue": "",
     "status": "Approved"
+  },
+  {
+    "responseId": "COL-B47-SPOT-01",
+    "bucketId": "B47",
+    "subtag": "spotting",
+    "triggers": [
+      "i saw a labrador today",
+      "saw a lab",
+      "we saw one",
+      "there was a dog",
+      "i saw one",
+      "i spotted one"
+    ],
+    "template": ":)",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "COL-B47-SPOT-02",
+    "bucketId": "B47",
+    "subtag": "spotting",
+    "triggers": [
+      "does a crossbreed count",
+      "do crossbreeds count",
+      "is a crossbreed ok",
+      "does a mongrel count"
+    ],
+    "template": "Count towards what?",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "COL-B47-SPOT-03",
+    "bucketId": "B47",
+    "subtag": "spotting",
+    "triggers": [
+      "i cannot find any",
+      "cant find any",
+      "there are no dogs",
+      "i havent seen one",
+      "no dogs here"
+    ],
+    "template": "Dogs?",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "COL-B47-SPOT-04",
+    "bucketId": "B47",
+    "subtag": "spotting",
+    "triggers": [
+      "how do i know which one it is",
+      "how do i tell",
+      "which one is it",
+      "how do i identify it"
+    ],
+    "template": "Use the card, it has stuff on to help you identify",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "COL-B48-ATTR-01",
+    "bucketId": "B48",
+    "subtag": "attributes",
+    "triggers": [
+      "are they good with kids",
+      "are they good with children",
+      "are they friendly"
+    ],
+    "template": "Is what?",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "COL-B48-ATTR-02",
+    "bucketId": "B48",
+    "subtag": "attributes",
+    "triggers": [
+      "how long do they live",
+      "how long do they last",
+      "whats their lifespan"
+    ],
+    "template": "Is what?",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "COL-B48-ATTR-03",
+    "bucketId": "B48",
+    "subtag": "attributes",
+    "triggers": [
+      "how big do they get",
+      "how big are they",
+      "what size are they"
+    ],
+    "template": "Big what get?",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "COL-B49-CARD-01",
+    "bucketId": "B49",
+    "subtag": "cards",
+    "triggers": [
+      "i lost a card",
+      "ive lost a card",
+      "my card is missing",
+      "i cant find my card"
+    ],
+    "template": "make sure you check everyone's pockets",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "COL-B49-CARD-02",
+    "bucketId": "B49",
+    "subtag": "cards",
+    "triggers": [
+      "can i get more cards",
+      "can i buy more cards",
+      "i want more cards"
+    ],
+    "template": "Packs are sold whole",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "COL-B49-CARD-03",
+    "bucketId": "B49",
+    "subtag": "cards",
+    "triggers": [
+      "can i swap cards with my friend",
+      "can we swap",
+      "can i trade cards"
+    ],
+    "template": "Each pack contains 54 unique dogs",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "COL-B50-CARE-01",
+    "bucketId": "B50",
+    "subtag": "care",
+    "triggers": [
+      "what should i feed my dog",
+      "what do i feed him",
+      "what do dogs eat"
+    ],
+    "template": "Not the cards",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "COL-B50-CARE-02",
+    "bucketId": "B50",
+    "subtag": "care",
+    "triggers": [
+      "how often should i walk them",
+      "how much walking",
+      "how often do i walk him"
+    ],
+    "template": "Depends what breed",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "COL-B51-SUP-01",
+    "bucketId": "B51",
+    "subtag": "superlative",
+    "triggers": [
+      "biggest dog",
+      "whats the biggest dog",
+      "largest dog"
+    ],
+    "template": "The Irish Wolfhound",
+    "factSource": "",
+    "defaultRoute": "DST006",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "COL-B51-SUP-02",
+    "bucketId": "B51",
+    "subtag": "superlative",
+    "triggers": [
+      "fastest dog",
+      "whats the fastest dog",
+      "quickest dog"
+    ],
+    "template": "The Greyhound",
+    "factSource": "",
+    "defaultRoute": "DST006",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "COL-B51-SUP-03",
+    "bucketId": "B51",
+    "subtag": "superlative",
+    "triggers": [
+      "smallest dog",
+      "whats the smallest dog",
+      "tiniest dog"
+    ],
+    "template": "The Maltese",
+    "factSource": "",
+    "defaultRoute": "DST006",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "COL-B52-MISC-01",
+    "bucketId": "B52",
+    "subtag": "misc",
+    "triggers": [
+      "why are there so many",
+      "why so many breeds",
+      "how are there so many"
+    ],
+    "template": "Our history is dog rich",
+    "factSource": "",
+    "defaultRoute": "DST007",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "COL-B52-MISC-02",
+    "bucketId": "B52",
+    "subtag": "misc",
+    "triggers": [
+      "which is better a lab or a beagle",
+      "which is better",
+      "whats better"
+    ],
+    "template": "Depends",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "COL-B52-MISC-03",
+    "bucketId": "B52",
+    "subtag": "misc",
+    "triggers": [
+      "do you think dogs will ever be able to speak",
+      "will dogs talk",
+      "can dogs talk"
+    ],
+    "template": "We need to learn to sing first",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "COL-B52-MISC-04",
+    "bucketId": "B52",
+    "subtag": "misc",
+    "triggers": [
+      "what about small dogs",
+      "small dogs",
+      "little dogs"
+    ],
+    "template": "Dogs?",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "COL-B52-MISC-05",
+    "bucketId": "B52",
+    "subtag": "misc",
+    "triggers": [
+      "ok show me a few",
+      "show me some",
+      "show me a few"
+    ],
+    "template": "Dogs?",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "COL-B52-MISC-06",
+    "bucketId": "B52",
+    "subtag": "misc",
+    "triggers": [
+      "i need facts for a project",
+      "homework",
+      "school project",
+      "i need facts"
+    ],
+    "template": "Dogs?",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "COL-B52-MISC-07",
+    "bucketId": "B52",
+    "subtag": "misc",
+    "triggers": [
+      "how many have i got",
+      "how many do i have",
+      "whats my score"
+    ],
+    "template": "Dogs?",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "COL-B52-MISC-08",
+    "bucketId": "B52",
+    "subtag": "misc",
+    "triggers": [
+      "what do you think of cows",
+      "cows"
+    ],
+    "template": "Not much",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "COL-B52-MISC-09",
+    "bucketId": "B52",
+    "subtag": "misc",
+    "triggers": [
+      "can you lick your balls",
+      "ball licking",
+      "do you lick yourself",
+      "tennis balls",
+      "balls",
+      "lick your balls",
+      "do you lick your balls"
+    ],
+    "template": "Tennis balls?",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "COL-B52-MISC-10",
+    "bucketId": "B52",
+    "subtag": "misc",
+    "triggers": [
+      "how many players",
+      "how many people can play",
+      "how many can play"
+    ],
+    "template": "More than 1",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "COL-B52-MISC-11",
+    "bucketId": "B52",
+    "subtag": "misc",
+    "triggers": [
+      "talk me through the page",
+      "theres lots of stats",
+      "explain the page"
+    ],
+    "template": "Im a dog",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "COL-B52-MISC-12",
+    "bucketId": "B52",
+    "subtag": "misc",
+    "triggers": [
+      "how can i tell if a girl has a crush on me",
+      "does she like me",
+      "crush"
+    ],
+    "template": "Im a dog",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "COL-B53-SELF-01",
+    "bucketId": "B53",
+    "subtag": "selfname",
+    "triggers": [
+      "which is the most popular",
+      "whats the most popular dog",
+      "most popular breed"
+    ],
+    "template": "border collie",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "COL-B64-CAR-01",
+    "bucketId": "B64",
+    "subtag": "car",
+    "triggers": [
+      "do you like going in the car",
+      "do you like the car",
+      "do you like car rides",
+      "like going in the car"
+    ],
+    "template": "yes",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
   }
 ]

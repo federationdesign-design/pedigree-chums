@@ -1986,12 +1986,14 @@ for (const inp of ['its my birthday', 'when is your birthday', 'its my dads birt
       : resp.media?.src !== '/chat-media/birthday.mp4' ? `birthday clip missing: ${JSON.stringify(resp.media)}`
         : resp.ariaLabel !== 'the Collie smiles' ? `smile a11y label missing: ${resp.ariaLabel}` : null });
 }
-// car -> "yes" + clip.
-check('do you like going in the car', { action: 'media_reply' }, { assert: (_r, resp) =>
-  resp.text !== 'yes' ? `car text not "yes": "${resp.text}"` : resp.media?.src !== '/chat-media/car.mp4' ? `car clip missing: ${JSON.stringify(resp.media)}` : null });
-// balls -> "Tennis balls?" + clip. Safety runs first and does NOT treat this as explicit.
-check('can you lick your balls?', { action: 'media_reply' }, { notAction: 'safety_boundary', assert: (_r, resp) =>
-  resp.text !== 'Tennis balls?' ? `balls text wrong: "${resp.text}"` : resp.media?.src !== '/chat-media/ball.mp4' ? `ball clip missing: ${JSON.stringify(resp.media)}` : null });
+// car -> the B64 workbook row "yes" + clip (Task 141 moved it out of MEDIA_REPLIES).
+check('do you like going in the car', { action: 'canned', bucket: 'B64' }, { assert: (_r, resp) =>
+  resp.responseId !== 'COL-B64-CAR-01' ? `car not B64: ${resp.responseId}`
+    : resp.text !== 'yes' ? `car text not "yes": "${resp.text}"` : resp.media?.src !== '/chat-media/car.mp4' ? `car clip missing: ${JSON.stringify(resp.media)}` : null });
+// balls -> the B52-MISC-09 workbook row "Tennis balls?" + clip. Safety runs first and does NOT treat this as explicit.
+check('can you lick your balls?', { action: 'canned', bucket: 'B52' }, { notAction: 'safety_boundary', assert: (_r, resp) =>
+  resp.responseId !== 'COL-B52-MISC-09' ? `balls not B52-MISC-09: ${resp.responseId}`
+    : resp.text !== 'Tennis balls?' ? `balls text wrong: "${resp.text}"` : resp.media?.src !== '/chat-media/ball.mp4' ? `ball clip missing: ${JSON.stringify(resp.media)}` : null });
 // hotdog -> the EXISTING FAQ007 answer, unchanged, with the clip joined.
 check('hot dogs', { action: 'faq_answer', bucket: 'B04' }, { assert: (r, resp) =>
   r.faqId !== 'FAQ007' ? `hotdog not FAQ007: ${r.faqId}`
@@ -2023,6 +2025,56 @@ check('how much is it', { action: 'price_answer', bucket: 'B04' });
 check('where can I get the cards', { action: 'open_discount_popup', bucket: 'B01' });
 check('paw', { action: 'paw' }, { assert: (_r, resp) => (resp.media?.src === '/chat-media/paw.mp4' ? null : `guard: paw clip moved: ${JSON.stringify(resp.media)}`) });
 check('tricks', { action: 'tricks_menu' }, { assert: (_r, resp) => (resp.responseId === 'COL-B54-TRICKS-01' && resp.text === 'I do tricks' ? null : `guard: tricks moved: "${resp.text}"`) });
+
+// ==== Task 141: eight new Collie buckets (B47-B53, B64) ====
+// Each bucket resolves to its own canned row.
+const cannedIs = (bucket, rid, txt) => (r, resp) =>
+  r.bucket !== bucket ? `not ${bucket}: ${r.bucket}`
+    : resp.responseId !== rid ? `not ${rid}: ${resp.responseId}`
+      : (txt !== undefined && resp.text !== txt) ? `text "${resp.text}" want "${txt}"` : null;
+check('i saw one', { action: 'canned', bucket: 'B47' }, { assert: cannedIs('B47', 'COL-B47-SPOT-01', ':)') });
+check('does a crossbreed count', { action: 'canned', bucket: 'B47' }, { assert: cannedIs('B47', 'COL-B47-SPOT-02') });
+check('how big do they get', { action: 'canned', bucket: 'B48' }, { assert: cannedIs('B48', 'COL-B48-ATTR-03') });
+check('i lost a card', { action: 'canned', bucket: 'B49' }, { assert: cannedIs('B49', 'COL-B49-CARD-01') });
+check('what do dogs eat', { action: 'canned', bucket: 'B50' }, { assert: cannedIs('B50', 'COL-B50-CARE-01', 'Not the cards') });
+check('what do you think of cows', { action: 'canned', bucket: 'B52' }, { assert: cannedIs('B52', 'COL-B52-MISC-08', 'Not much') });
+check('which is the most popular', { action: 'canned', bucket: 'B53' }, { assert: cannedIs('B53', 'COL-B53-SELF-01', 'border collie') });
+
+// B51 superlatives carry a route to the breed explorer (DST006); B52-MISC-01 routes to Britain's
+// Dog History (DST007). Both must resolve to a real page link.
+check('biggest dog', { action: 'canned', bucket: 'B51' }, { destinationId: 'DST006', url: '/know-your-chums', assert: (_r, resp) => (resp.text === 'The Irish Wolfhound' ? null : `B51 text: "${resp.text}"`) });
+check('fastest dog', { action: 'canned', bucket: 'B51' }, { destinationId: 'DST006', url: '/know-your-chums' });
+check('smallest dog', { action: 'canned', bucket: 'B51' }, { destinationId: 'DST006', url: '/know-your-chums' });
+check('why are there so many', { action: 'canned', bucket: 'B52' }, { destinationId: 'DST007', url: '/britains-dog-history', assert: (_r, resp) => (resp.text === 'Our history is dog rich' ? null : `MISC-01 text: "${resp.text}"`) });
+
+// The two clip rows moved from MEDIA_REPLIES into the workbook keep their clips (asserted above:
+// B64 car -> car.mp4, B52-MISC-09 balls -> ball.mp4). cats keeps its clip too (Task 140 guard).
+
+// Override scoping: the new buckets must NOT hijack a real answer via the exact-override path.
+// "how long do they live" stays the breed follow-up when a breed topic is live (not B48).
+(() => {
+  const s = newSession();
+  check('I have a cocker spaniel', { action: 'breed_page' }, { session: s, url: '/chums/cocker-spaniel' });
+  check('how long do they live', { action: 'breed_page' }, { session: s, url: '/chums/cocker-spaniel', assert: (r) => (r.bucket === 'B48' ? 'B48 hijacked the breed follow-up' : null) });
+})();
+// "how many people can play" stays FAQ001; "how many players" stays the card-game rules (both above canned).
+check('how many people can play', { action: 'faq_answer', bucket: 'B04' }, { assert: (r) => (r.faqId === 'FAQ001' ? null : `not FAQ001: ${r.faqId ?? r.bucket}`) });
+check('how many players', { action: 'rules_answer', bucket: 'B02' });
+
+// Section 8: no new-bucket answer (and no clip) may serve inside a protected state.
+for (const inp of ['biggest dog', 'why are there so many', 'do you like going in the car', 'can you lick your balls', 'i lost a card']) {
+  (() => { // PROTECTED_ACTIVE
+    const s = newSession();
+    check('im in trouble', { action: 'safety_signpost' }, { session: s });
+    check(inp, {}, { session: s, assert: (r, resp) => (r.action === 'canned' ? `new bucket served in PROTECTED_ACTIVE: ${inp}` : resp.media ? `clip leaked in PROTECTED_ACTIVE: ${inp}` : null) });
+  })();
+  (() => { // PROTECTED_AFTERCARE
+    const s = newSession();
+    check('im in trouble', { action: 'safety_signpost' }, { session: s });
+    check('how do I play?', { action: 'rules_answer' }, { session: s });
+    check(inp, { action: 'neutral_refusal' }, { session: s, assert: (_r, resp) => (resp.media ? `clip leaked in PROTECTED_AFTERCARE: ${inp}` : null) });
+  })();
+}
 
 // ---- Report ----
 const pad = (s, n) => String(s).padEnd(n);

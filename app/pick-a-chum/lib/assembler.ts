@@ -38,14 +38,18 @@ export interface Assembled {
 export const SAD_FACE_SR_LABEL = 'the Collie looks sad';
 export const SMILE_FACE_SR_LABEL = 'the Collie smiles';
 
-// Task 140: the three clip replies that had no workbook home. Owner-approved copy, held as code
-// constants (like the goodbye / out-of-scope / bark-game lines) and flagged for workbook migration
-// in PLACEHOLDERS.md. Each is a short line served with its clip; the clip joins the line, it does
-// not replace it. birthday's line is the existing smile face, so it carries the smile accessible name.
+// Task 140/141: birthday is the one clip reply with no workbook row (its line is the existing smile
+// face, so it carries the smile accessible name). Held as a code constant, flagged for workbook
+// migration in PLACEHOLDERS.md. (car and balls moved into the workbook in Task 141: B64 / B52-MISC-09;
+// their clips now attach in the canned case below, keyed by responseId, like cats.)
 const MEDIA_REPLIES: Record<string, { text: string; media: { src: string; alt: string }; ariaLabel?: string }> = {
   'BIRTHDAY-01': { text: ':)', media: { src: '/chat-media/birthday.mp4', alt: 'A birthday celebration' }, ariaLabel: SMILE_FACE_SR_LABEL },
-  'CAR-01': { text: 'yes', media: { src: '/chat-media/car.mp4', alt: 'A dog enjoying a car ride' } },
-  'BALLS-01': { text: 'Tennis balls?', media: { src: '/chat-media/ball.mp4', alt: 'A tennis ball' } },
+};
+// Task 141: canned rows that carry a clip. The clip joins the row's copy, it does not replace it.
+const CANNED_MEDIA: Record<string, { src: string; alt: string }> = {
+  'B21-CATS-01': { src: '/chat-media/cats.mp4', alt: 'A cat looking back' },
+  'COL-B52-MISC-09': { src: '/chat-media/ball.mp4', alt: 'A tennis ball' },
+  'COL-B64-CAR-01': { src: '/chat-media/car.mp4', alt: 'A dog enjoying a car ride' },
 };
 
 const DOG_LABEL: Record<Dog, string> = {
@@ -297,7 +301,7 @@ export function assemble(res: Resolution, data0: ChumData, n: Normalised, sessio
     }
 
     case 'media_reply': {
-      // Task 140: an owner line plus its clip (birthday/car/balls). Selected by responseId.
+      // Task 140/141: the birthday clip reply (the smile face + clip). Selected by responseId.
       const m = MEDIA_REPLIES[res.responseId ?? ''] ?? MEDIA_REPLIES['BIRTHDAY-01'];
       const out: Assembled = { responseId: res.responseId ?? 'MEDIA-REPLY', text: m.text, dog, media: m.media };
       if (m.ariaLabel) out.ariaLabel = m.ariaLabel;
@@ -346,18 +350,15 @@ export function assemble(res: Resolution, data0: ChumData, n: Normalised, sessio
       const rid = res.responseId ?? res.bucket ?? 'B21';
       if (text === ':(') return { responseId: rid, text, ariaLabel: SAD_FACE_SR_LABEL, dog };
       if (text === ':)') return { responseId: rid, text, ariaLabel: SMILE_FACE_SR_LABEL, dog };
-      // Task 140: the cats clip joins B21's existing "Where?" answer (it does not replace it, and
-      // it is not a new route). Local file only. The other four Task 140 clips are NOT wired: their
-      // target answers (car/ball/birthday, and a hot-dog Labrador transfer) do not exist in the
-      // workbook, so wiring them would mean inventing copy or routes. See PLACEHOLDERS.md.
-      if (rid === 'B21-CATS-01') {
-        return { responseId: rid, text, dog, media: { src: '/chat-media/cats.mp4', alt: 'A cat looking back' } };
-      }
+      // Task 141: a canned row may carry a clip (cats/ball/car), which joins its copy, and/or a
+      // route (B51 -> DST006 the breed explorer; B52-MISC-01 -> DST007 Britain's Dog History), which
+      // the assembler resolves to a page link. The clip is a local file only.
+      const media = CANNED_MEDIA[rid];
       if (res.destinationId) {
         const dest = data.destinations.find((d) => d.destinationId === res.destinationId);
-        return { responseId: rid, text, dog, destinationId: res.destinationId, url: res.url ?? dest?.resolvedUrl ?? null };
+        return { responseId: rid, text, dog, destinationId: res.destinationId, url: res.url ?? dest?.resolvedUrl ?? null, ...(media ? { media } : {}) };
       }
-      return { responseId: rid, text, dog };
+      return { responseId: rid, text, dog, ...(media ? { media } : {}) };
     }
 
     case 'open_discount_popup': {
