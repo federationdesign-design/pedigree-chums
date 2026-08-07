@@ -5136,7 +5136,15 @@ export default function BreedTree({
                   // shoved about. A press that does not travel is still a tap
                   // and still lifts the dog to the learn layer.
                   onPointerDown={
-                    frozen || hidden || disableZoom
+                    // `frozen` is NOT in this gate, and that is the whole reason
+                    // push and pull did nothing: frozen is
+                    // `dockAside && gravity && !started && !learning`, which is
+                    // exactly the start screen, so the handler was undefined in
+                    // the one place the pull needs it.
+                    // Attaching it there is safe: the pull branch returns, and
+                    // everything after it is behind `if (!fellRef.current)`,
+                    // which is false until the round drops.
+                    hidden || disableZoom
                       ? undefined
                       : (e) => {
                           // START SCREEN: grab it. The circle can be pushed and
