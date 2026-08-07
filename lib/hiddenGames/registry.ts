@@ -5,7 +5,7 @@
 // of the games list, so it can never disagree with the list it counts.
 // Nothing else defines the campaign version, mode or the qualifying games.
 
-export const GAME_IDS = ["G01", "G02", "G03", "G04", "G05", "G06"] as const;
+export const GAME_IDS = ["G01", "G02", "G03", "G04", "G05", "G06", "G07"] as const;
 export type GameId = (typeof GAME_IDS)[number];
 
 export interface GameDef {
@@ -77,6 +77,15 @@ export const REGISTRY: Registry = {
       name: "Kennel Sketch Recognition",
       threshold:
         "The Kennel Sketch drawing is served in the Pick a Chum chat, before the first guess",
+    },
+    // Task 146: the Labrador's game. Qualifies the moment its opening surface (the START line + the
+    // first object's first clue) is served in the chat, on game_start, before any guess -- exactly
+    // like the Collie's three. This takes the campaign TOTAL from 6 to 7.
+    {
+      id: "G07",
+      name: "Treat Trail",
+      threshold:
+        "The Treat Trail first clue is served in the Pick a Chum chat (the Labrador's game entered by name), before any guess",
     },
   ],
 };

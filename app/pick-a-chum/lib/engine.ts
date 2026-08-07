@@ -136,9 +136,20 @@ function serveGameResult(resolution: Resolution, data: ChumData, result: GameRes
   let text = gameCopy(data, result.line);
   if (result.word) text = text.replace(/\{\{\s*WORD\s*\}\}/g, result.word);
   if (result.answer) text = text.replace(/\{\{\s*ANSWER\s*\}\}/g, result.answer);
+  // Task 146 (Treat Trail): a turn serves a reaction line plus the next clue, both workbook B65 rows,
+  // combined here so all the copy stays in the workbook (games.ts holds only responseIds).
+  if (result.clueId) {
+    const clue = gameCopy(data, result.clueId);
+    if (clue) text = text ? `${text}\n\n${clue}` : clue;
+  }
   resolution.gameLine = result.line;
   resolution.gameText = text;
   resolution.gameDisplay = result.display;
+  // Task 146: the SAUSAGE finale links to /hot-dogs (DST016, the sausage gag).
+  if (result.link) {
+    resolution.url = result.link;
+    resolution.destinationId = 'DST016';
+  }
 }
 // LOOP-02 is candidate-driven: it names the specific destination the candidate maps to. A breed
 // candidate (a Title-Case breed name) -> its page; a game-family word -> the card game rules;

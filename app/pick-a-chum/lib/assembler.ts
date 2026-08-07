@@ -256,7 +256,8 @@ export function assemble(res: Resolution, data0: ChumData, n: Normalised, sessio
     case 'game_start':
     case 'game_move':
     case 'game_exit':
-      return { responseId: res.gameLine ?? res.action, text: res.gameText ?? '', gameOutput: res.gameDisplay ?? undefined, dog };
+      // Task 146: a Treat Trail finale carries the /hot-dogs link (res.url / destinationId).
+      return { responseId: res.gameLine ?? res.action, text: res.gameText ?? '', gameOutput: res.gameDisplay ?? undefined, dog, ...(res.url ? { url: res.url, destinationId: res.destinationId } : {}) };
 
     // Task 111: "fetch" hands back a rotating Play/Learn/Discover link (deterministic rotation via the
     // session's offered set), instead of the old B11 command voice. The line comes from the B03 link

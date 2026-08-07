@@ -180,7 +180,7 @@ const PROFILE_IMG: Record<Dog, string> = {
 // Task 123: each in-chat game is a Hidden Games find, awarded the moment its opening surface (the
 // board / masked word / drawing) is SERVED -- i.e. on game_start, before any move or guess. The bark
 // game is deliberately NOT here: a single "woof" is a turn, not finding a game.
-const HIDDEN_GAME_ID: Record<GameId, HiddenGameId> = { ninesquare: 'G03', missingsheep: 'G04', kennelsketch: 'G05' };
+const HIDDEN_GAME_ID: Record<GameId, HiddenGameId> = { ninesquare: 'G03', missingsheep: 'G04', kennelsketch: 'G05', treattrail: 'G07' };
 
 export default function PickAChumExperience({ onClose }: { onClose: () => void }) {
   // Task 140: the page the visitor is on, carried into the engine as session state (like lastAction)

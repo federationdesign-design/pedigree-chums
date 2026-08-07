@@ -199,7 +199,7 @@ export type ActionType =
   | 'boxer_cutoff'; // hidden ceiling reached
 
 // Task 115: the three in-chat games.
-export type GameId = 'ninesquare' | 'missingsheep' | 'kennelsketch';
+export type GameId = 'ninesquare' | 'missingsheep' | 'kennelsketch' | 'treattrail';
 
 export interface Resolution {
   layer: number; // 1..10 priority layer that won

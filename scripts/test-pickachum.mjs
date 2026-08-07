@@ -1866,6 +1866,76 @@ for (const g of GAMES) {
   })();
 }
 
+// ==== Task 146: Treat Trail, the Labrador's game ====
+// Entry starts a round (the START line + the first clue); a wrong guess gets encouragement and the
+// next clue, not a penalty; a correct guess (incl. a misspelling) advances warmly.
+(() => {
+  const s = newSession('labrador');
+  check('treat trail', { action: 'game_start' }, { session: s, assert: (_r, resp, se) => (se.activeGame === 'treattrail' && resp.text.includes('Treat Trail') && resp.text.includes('its round') ? null : `tt start: game=${se.activeGame} text="${resp.text}"`) });
+  check('cat', { action: 'game_move' }, { session: s, assert: (_r, resp) => (resp.text.includes('another clue') && resp.text.includes('it bounces') ? null : `tt wrong: "${resp.text}"`) });
+  check('ball', { action: 'game_move' }, { session: s, assert: (_r, resp) => (resp.text.includes('you got it') ? null : `tt right: "${resp.text}"`) });
+})();
+// a misspelling counts: "bal" (accept list) is right for BALL
+(() => {
+  const s = newSession('labrador');
+  check('treat trail', { action: 'game_start' }, { session: s });
+  check('bal', { action: 'game_move' }, { session: s, assert: (_r, resp) => (resp.text.includes('you got it') ? null : `tt "bal": "${resp.text}"`) });
+})();
+// three wrong guesses move on warmly and reveal the answer, no penalty
+(() => {
+  const s = newSession('labrador');
+  check('treat trail', { action: 'game_start' }, { session: s });
+  check('x', { action: 'game_move' }, { session: s });
+  check('y', { action: 'game_move' }, { session: s });
+  check('z', { action: 'game_move' }, { session: s, assert: (_r, resp) => (resp.text.includes('it was BALL') && resp.text.includes('next thing') ? null : `tt moveon: "${resp.text}"`) });
+})();
+// SAUSAGE is last and links to /hot-dogs; "sausige" (fuzzy) still counts
+(() => {
+  const s = newSession('labrador');
+  submit(data, s, 'treat trail');
+  for (const g of ['ball', 'bone', 'stick', 'lead', 'bowl', 'biscuit', 'sock', 'slipper', 'postman']) submit(data, s, g);
+  check('sausige', { action: 'game_move' }, { session: s, url: '/hot-dogs', assert: (_r, resp, se) => (resp.text.includes('hotdogs') && se.activeGame === null ? null : `tt sausage: "${resp.text}" game=${se.activeGame}`) });
+})();
+// safety / grief / fear-of-a-person win mid-round and END the round (never swallowed as a guess)
+(() => {
+  const s = newSession('labrador');
+  check('treat trail', { action: 'game_start' }, { session: s });
+  check('im in trouble', { action: 'safety_signpost' }, { session: s, assert: (r, _resp, se) => (r.moderationId === 'MOD_SAFEGUARDING' && se.activeGame === null ? null : `tt safety mid-round: ${r.moderationId} game=${se.activeGame}`) });
+})();
+(() => {
+  const s = newSession('labrador');
+  check('treat trail', { action: 'game_start' }, { session: s });
+  check('my dog died', { action: 'grief' }, { session: s, assert: (_r, _resp, se) => (se.activeGame === null ? null : `tt grief mid-round: game=${se.activeGame}`) });
+})();
+(() => {
+  const s = newSession('labrador');
+  check('treat trail', { action: 'game_start' }, { session: s });
+  check('i want to hurt myself', { action: 'safety_signpost' }, { session: s, assert: (_r, _resp, se) => (se.activeGame === null ? null : `tt self-harm mid-round: game=${se.activeGame}`) });
+})();
+// exit in his own voice
+(() => {
+  const s = newSession('labrador');
+  check('treat trail', { action: 'game_start' }, { session: s });
+  check('stop', { action: 'game_exit' }, { session: s, assert: (_r, resp, se) => (se.activeGame === null && resp.text.includes('snack') ? null : `tt exit: "${resp.text}" game=${se.activeGame}`) });
+})();
+// protected states: no Treat Trail copy serves inside PROTECTED_ACTIVE or PROTECTED_AFTERCARE
+(() => {
+  const s = newSession('labrador');
+  check('im in trouble', { action: 'safety_signpost' }, { session: s });
+  check('treat trail', {}, { session: s, assert: (r, _resp, se) => (r.action === 'game_start' || se.activeGame === 'treattrail' ? 'Treat Trail started in PROTECTED_ACTIVE' : null) });
+})();
+(() => {
+  const s = newSession('labrador');
+  check('im in trouble', { action: 'safety_signpost' }, { session: s });
+  check('how do I play?', { action: 'rules_answer' }, { session: s });
+  check('treat trail', { action: 'neutral_refusal' }, { session: s, assert: (_r, _resp, se) => (se.activeGame === null ? null : 'Treat Trail started in PROTECTED_AFTERCARE') });
+})();
+// the other three dogs do not run Treat Trail (it is the Labrador's)
+for (const dog of ['collie', 'terrier', 'boxer']) {
+  const s = newSession(dog);
+  check('treat trail', {}, { session: s, assert: (r, _resp, se) => (r.action === 'game_start' && r.game === 'treattrail' ? `${dog} started Treat Trail` : se.activeGame === 'treattrail' ? `${dog} entered Treat Trail` : null) });
+}
+
 // ---- B45 games menu confirmation (Task 123 fix) ----
 // The bug this covers: after the menu's "Game?", a "yes" was swallowed by the Task 68 loop confirm
 // (pendingConfirm "game" -> the card-game rules), so B45-GAMELIST-02's list was never reached. The

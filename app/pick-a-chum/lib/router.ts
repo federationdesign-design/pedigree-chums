@@ -1042,6 +1042,9 @@ const GAME_STARTS: [RegExp, GameId][] = [
   [/kennel sketch/, 'kennelsketch'],
 ];
 const GAME_EXIT = new Set(['stop', 'enough', 'finished', 'finish', 'done']);
+// Task 146: Treat Trail entry phrases (the Labrador's game only). "treat trail" is the name; the rest
+// are what a child would actually type. Gated on the active dog being the Labrador in resolve().
+const TREAT_TRAIL_START = /(treat trail|treattrail|treat game|treat hunt|find the treat|find a treat|guess the treat|hunt for treats|play a treat game)/;
 function matchGameStart(c: string): GameId | null {
   for (const [re, id] of GAME_STARTS) if (re.test(c)) return id;
   return null;
@@ -1159,6 +1162,15 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
         return { layer: 1, layerName: 'Safety and unsuitable content', bucket: null, action: 'safety_signpost', moderationId: 'MOD_SAFEGUARDING' };
       }
       return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: 'death_answer' };
+    }
+    // Task 146: while Treat Trail is running, every non-safety input is a guess. Placed directly below
+    // the safety / grief / death cluster (which still wins mid-round and ends it) and ABOVE every
+    // word-route below (maths, the god cluster, ask_dogs / breeds / games, breed pages, canned), so a
+    // guess like "dog", "games" or "5 x 5" is never swallowed as something else. The Collie games keep
+    // their own handler lower down (their inputs are letters / digits, so they never reach those routes).
+    if (state.activeGame === 'treattrail') {
+      if (GAME_EXIT.has(c)) return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: 'game_exit', game: 'treattrail' };
+      return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: 'game_move', game: 'treattrail' };
     }
     // Task 145: the Terrier's sit gag runs as a sequence (the deathAskStreak shape). Once he has
     // asked "why?" (TER-B22-01 -> terrierSitStep 1), the NEXT input, whatever it is, gets the
@@ -1340,6 +1352,11 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
       return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: 'game_exit', game: state.activeGame };
     }
     return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: 'game_move', game: state.activeGame };
+  }
+  // Task 146: Treat Trail is the Labrador's game -- start it only when the Labrador is active (the
+  // Collie/Terrier/Boxer keep their own games). Below safety and the active-game move handler above.
+  if (state.activeDog === 'labrador' && !state.activeGame && TREAT_TRAIL_START.test(c)) {
+    return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: 'game_start', game: 'treattrail' };
   }
   {
     const start = matchGameStart(c);
