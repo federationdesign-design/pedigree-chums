@@ -339,5 +339,26 @@
     "resolvedUrl": "/good-dog-bad-dog/bulls-eye",
     "embedded": false,
     "routeNote": null
+  },
+  {
+    "destinationId": "DST016",
+    "name": "Hot Dogs",
+    "family": "Utility",
+    "action": "Open the Hot Dogs page",
+    "description": "The Hot Dogs game-mode page: sausages, hotdogs, and dogs who are too hot",
+    "triggerTags": [
+      "hot dogs",
+      "hotdogs",
+      "sausages"
+    ],
+    "campaignState": "Any",
+    "weight": "Medium",
+    "preferredDog": [
+      "Labrador"
+    ],
+    "workbookUrl": "/hot-dogs",
+    "resolvedUrl": "/hot-dogs",
+    "embedded": false,
+    "routeNote": null
   }
 ]

@@ -52,5 +52,8 @@ agent/
 /test-results/
 /playwright-report/
 
+# scratch scripts
+.scratch/
+
 .claude/
 *.psd

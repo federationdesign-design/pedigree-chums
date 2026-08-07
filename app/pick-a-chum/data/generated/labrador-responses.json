@@ -103,8 +103,7 @@
     "bucketId": "B32",
     "subtag": "self",
     "triggers": [
-      "what do you like to eat",
-      "whats your favourite food"
+      "what do you like to eat"
     ],
     "template": "human food is my fav!!!",
     "factSource": "",
@@ -272,6 +271,52 @@
     "template": "i dig holes",
     "factSource": "",
     "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "LAB-B32-11",
+    "bucketId": "B32",
+    "subtag": "self",
+    "triggers": [
+      "whats your favourite food",
+      "whats your favorite food",
+      "favourite food",
+      "favorite food",
+      "whats your fav food",
+      "food",
+      "what food",
+      "i like food",
+      "do you like food"
+    ],
+    "template": "hotdogs",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "LAB-B32-12",
+    "bucketId": "B32",
+    "subtag": "self",
+    "triggers": [
+      "sausages",
+      "sausage",
+      "hotdog",
+      "hotdogs",
+      "hot dog",
+      "hot dogs",
+      "i like sausages",
+      "i love sausages",
+      "you mean sausages",
+      "those are sausages",
+      "do you mean sausages",
+      "i said sausages",
+      "thats a sausage"
+    ],
+    "template": "hotdogs",
+    "factSource": "",
+    "defaultRoute": "DST016",
     "animationCue": "",
     "status": "Approved"
   }

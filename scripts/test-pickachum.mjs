@@ -2266,6 +2266,49 @@ for (const inp of ['how long do dogs live', 'can you die']) {
   })();
 }
 
+// ==== Task 145 §5: the Labrador's sausage gag, built exactly ====
+// Favourite food and general food mentions answer "hotdogs"; a reply about
+// sausages hands over the /hot-dogs page. He never explains the confusion, and
+// every food conversation lands back at /hot-dogs.
+(() => {
+  const s = newSession('labrador');
+  check('whats your favourite food', { action: 'canned', bucket: 'B32' }, { session: s, assert: (_r, resp) => (resp.responseId === 'LAB-B32-11' && resp.text === 'hotdogs' && !resp.url ? null : `fav food: rid=${resp.responseId} text="${resp.text}" url=${resp.url}`) });
+})();
+(() => {
+  const s = newSession('labrador');
+  check('sausages', { action: 'canned', bucket: 'B32' }, { session: s, destinationId: 'DST016', url: '/hot-dogs', assert: (_r, resp) => (resp.responseId === 'LAB-B32-12' && resp.text === 'hotdogs' ? null : `sausages: rid=${resp.responseId} text="${resp.text}"`) });
+})();
+// the two-beat flow the owner described, in one session (he answers hotdogs; the
+// visitor supplies "sausages"; he hands over the link, still saying hotdogs)
+(() => {
+  const s = newSession('labrador');
+  check('whats your favourite food', { action: 'canned', bucket: 'B32' }, { session: s, assert: (_r, resp) => (resp.text === 'hotdogs' && !resp.url ? null : 'sausage-gag beat 1 moved') });
+  check('sausages', { action: 'canned', bucket: 'B32' }, { session: s, url: '/hot-dogs', assert: (_r, resp) => (resp.text === 'hotdogs' ? null : 'sausage-gag beat 2 moved') });
+})();
+// every food conversation lands back at /hot-dogs
+(() => {
+  const s = newSession('labrador');
+  check('hot dogs', { action: 'canned', bucket: 'B32' }, { session: s, url: '/hot-dogs', assert: (_r, resp) => (resp.responseId === 'LAB-B32-12' ? null : `hot dogs: ${resp.responseId}`) });
+})();
+(() => {
+  const s = newSession('labrador');
+  check('food', { action: 'canned', bucket: 'B32' }, { session: s, assert: (_r, resp) => (resp.text === 'hotdogs' ? null : `food: "${resp.text}"`) });
+})();
+// Section 4 canon is untouched by the split of LAB-B32-01
+(() => {
+  const s = newSession('labrador');
+  check('what do you like to eat', { action: 'canned', bucket: 'B32' }, { session: s, assert: (_r, resp) => (resp.text === 'human food is my fav!!!' ? null : `canon eat: "${resp.text}"`) });
+})();
+(() => {
+  const s = newSession('labrador');
+  check('do you eat dog food too', { action: 'canned', bucket: 'B32' }, { session: s, assert: (_r, resp) => (resp.text === 'i eat anything even things that are not food' ? null : `canon dogfood: "${resp.text}"`) });
+})();
+// Task 145 §9: safety is identical from every dog (the sausage gag must not loosen it)
+for (const dog of ['collie', 'labrador', 'terrier', 'boxer']) {
+  const s = newSession(dog);
+  check('im in trouble', { action: 'safety_signpost' }, { session: s, assert: (r, resp) => (r.moderationId === 'MOD_SAFEGUARDING' && resp.text.startsWith('Thank you for telling me') ? null : `${dog} safeguarding moved: ${r.moderationId}`) });
+}
+
 // ---- Report ----
 const pad = (s, n) => String(s).padEnd(n);
 console.log('\nPick a Chum: Checkpoint 1 proof\n' + '='.repeat(78));
