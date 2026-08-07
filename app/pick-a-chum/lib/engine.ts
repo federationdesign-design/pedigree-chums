@@ -52,7 +52,7 @@ const MEANINGFUL_TOPIC = new Set(['breed_answer', 'rules_answer', 'faq_answer', 
 // Task 142: the new play/deflection routes (clips, name acknowledgement/deflection) join the blocked
 // set so none serves inside PROTECTED_AFTERCARE; in PROTECTED_ACTIVE they are not meaningful and are
 // held as the safeguarding continuation.
-const AFTERCARE_BLOCKED = new Set(['offer_bark_game', 'open_discount_popup', 'transfer', 'bark', 'bark_break', 'bark_ack', 'price_answer', 'canned', 'game_start', 'game_move', 'game_exit', 'page_bio', 'media_reply', 'how_are_you', 'good_boy', 'name_ack', 'name_deflect']);
+const AFTERCARE_BLOCKED = new Set(['offer_bark_game', 'open_discount_popup', 'transfer', 'bark', 'bark_break', 'bark_ack', 'price_answer', 'canned', 'game_start', 'game_move', 'game_exit', 'page_bio', 'media_reply', 'how_are_you', 'good_boy', 'name_ack', 'name_deflect', 'dog_lifespan', 'death_answer']);
 // The "old voice" routes a canned answer is allowed to override (Steve's decision): the identity
 // spiel, the orientation nudge, the bare-help clarifier and any FAQ match. These resolve above the
 // in-router canned check, so a matching canned trigger overrides them here. Safety, grief, breed
@@ -111,6 +111,20 @@ const COMPLAINT_REPEAT_LINE = 'Noted. Put that in the email too and someone will
 // nudge were all retired in Task 79.
 const FALLBACK_FAMILY = new Set(['fallback', 'gk_unknown']);
 
+// Task 142 (change 3): the diversions. On the third consecutive no-subject turn, offer ONE of these
+// (rotating), each a real place to go, with an action link. The four history offers deep-link to the
+// anchors added on that page. Owner copy, flagged in PLACEHOLDERS.md for workbook migration.
+const DIVERSIONS: { id: string; text: string; url: string; label: string }[] = [
+  { id: 'DIVERSION-01', text: 'Ancient dogs of Britain?', url: '/britains-dog-history#ancient-dogs', label: 'Ancient dogs of Britain' },
+  { id: 'DIVERSION-02', text: 'Medieval dogs?', url: '/britains-dog-history#medieval-dogs', label: 'Medieval dogs' },
+  { id: 'DIVERSION-03', text: 'Tudor dogs?', url: '/britains-dog-history#tudor-britain', label: 'Tudor dogs' },
+  { id: 'DIVERSION-04', text: 'Dogs in London?', url: '/britains-dog-history#dogs-in-london', label: 'Dogs in London' },
+  { id: 'DIVERSION-05', text: 'What jobs we can do?', url: '/dogs-at-work', label: 'Dogs at Work' },
+  { id: 'DIVERSION-06', text: 'Which chum suits you?', url: '/chum-calculator', label: 'Chum Finder' },
+  { id: 'DIVERSION-07', text: 'Shall I name a dog?', url: '/name-generator', label: 'Name Generator' },
+  { id: 'DIVERSION-08', text: 'The whole pack?', url: '/know-your-chums', label: 'Know Your Chums' },
+];
+
 // Task 115: a game B4x line's template text, or '' (an ongoing board has no line).
 function gameCopy(data: ChumData, line: string): string {
   const row = data.collieResponses.find((r) => r.responseId === line);
@@ -159,6 +173,7 @@ export function submit(data: ChumData, session: Session, input: string): Turn {
     barkCompleted: session.barkCompletedByDog[dog] ?? false,
     lastAction: session.lastAction,
     safetyAskStreak: session.safetyAskStreak,
+    deathAskStreak: session.deathAskStreak,
     anatomyRedirectUsed: session.anatomyRedirectUsed,
     topic: session.topic,
     lastWasComplaint: session.lastWasComplaint,
@@ -334,16 +349,17 @@ export function submit(data: ChumData, session: Session, input: string): Turn {
       response.responseId = 'LOOP-02';
       session.noSubjectStreak = 0; // Task 117: a subject was served, so the no-subject run is broken
     } else {
-      // B40: no subject (or a repeated subject with no route) -> the workbook "im a dog" line.
-      // Task 117: after two "im a dog"s in a row, the third and further consecutive no-subject turns
-      // rotate through the B46 bank (woof, bark, games?, learn?, play?, yawn) instead of repeating.
-      if (session.noSubjectStreak >= 2) {
-        const rot = data.collieResponses
-          .filter((r) => r.bucketId === 'B46')
-          .sort((a, b) => a.responseId.localeCompare(b.responseId));
-        const pick = rot.length ? rot[(session.noSubjectStreak - 2) % rot.length] : null;
-        response.text = pick?.template ?? 'woof';
-        response.responseId = pick?.responseId ?? 'B46-NOSUBJECT-ROT';
+      // B40: no subject -> the workbook "im a dog" line. Task 142 (change 3): after two "im a dog"s
+      // in a row, the THIRD consecutive no-subject turn offers ONE diversion -- somewhere to go -- and
+      // then it is back to "im a dog" (three offers in a row is pestering). Each session rotates to the
+      // next of the eight offers. The old B46 single-word rotation (woof/bark/games?) is retired.
+      if (session.noSubjectStreak === 2) {
+        const d = DIVERSIONS[(session.diversionsShown ?? 0) % DIVERSIONS.length];
+        response.text = d.text;
+        response.responseId = d.id;
+        response.url = d.url;
+        response.linkLabel = d.label;
+        session.diversionsShown = (session.diversionsShown ?? 0) + 1;
       } else {
         const b40 = data.collieResponses.find((r) => r.bucketId === 'B40');
         response.text = b40?.template ?? 'im a dog';
@@ -379,6 +395,10 @@ export function submit(data: ChumData, session: Session, input: string): Turn {
   session.lastAction = resolution.action; // for the next turn's clarifier follow-up
   // Task 139: the streak counts consecutive safety questions only.
   session.safetyAskStreak = resolution.bucket === 'B58' ? (session.safetyAskStreak ?? 0) + 1 : 0;
+  // Task 142: the death streak. The first death question is answered (streak -> 1); a second in a row
+  // is escalated to safeguarding by the router. Any non-death turn resets it, so "persistence" means
+  // consecutive.
+  session.deathAskStreak = resolution.action === 'death_answer' ? (session.deathAskStreak ?? 0) + 1 : 0;
 
   return { input, resolution, response };
 }

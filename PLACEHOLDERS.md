@@ -57,8 +57,11 @@ pattern), flagged for later workbook migration:
 |---|---|---|
 | Name acknowledgement (2 lines, alternating) | `assembler.ts` `case 'name_ack'` | "Do you want to play a game, {name}?" / "Do you want to see if you have super powers, {name}?" (2nd links `/whats-your-superpower`). The name is used once and never stored. |
 | Naming-her deflection (2 lines, alternating) | `assembler.ts` `case 'name_deflect'` | "I answer to anything." / "Call me what you like." |
-| How-are-you clips | `assembler.ts` `case 'how_are_you'` | `howareyou1/2/3.mp4`, random no-repeat |
+| How-are-you clips | `assembler.ts` `case 'how_are_you'` | `howareyou1/2/3.mp4`, one picked per session and kept |
 | Good-boy clip | `assembler.ts` `case 'good_boy'` | `goodboy.mp4` |
+| Dog-lifespan answer | `assembler.ts` `case 'dog_lifespan'` | "About 10 to 13 years. Small dogs longer, big dogs less." + the breed explorer link |
+| Death-cluster answer | `assembler.ts` `case 'death_answer'` | "I cannot die as im not alive in the same way as real dogs" (persistence escalates to safeguarding) |
+| Diversions (8 destination offers) | `engine.ts` `DIVERSIONS` | Ancient/Medieval/Tudor/London dogs, jobs, chum finder, name generator, the whole pack. One offered on the third consecutive no-subject turn, then back to "im a dog". Replaces the retired B46 single-word rotation (those B46 rows are now orphaned in the workbook). |
 
 Decisions taken (Steve, 6-7 August): the how-are-you clip catches only the
 personal questions that were broken (`are you real` keeps identity; `what do you

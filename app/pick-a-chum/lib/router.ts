@@ -480,6 +480,7 @@ function isActiveBreedQuestion(compact: string): boolean {
 
 export interface RouterState {
   safetyAskStreak?: number; // Task 139: consecutive safety questions; three in a row hands to a human.
+  deathAskStreak?: number; // Task 142: consecutive death-cluster questions; a second escalates to safeguarding.
   submissionCount: number; // count AFTER this submission (1-based)
   activeDog?: Dog; // whose bark game this is
   barkStreak?: number; // the active dog's consecutive bark exchanges BEFORE this message
@@ -555,7 +556,15 @@ const NAME_STOP = new Set([
   'software', 'intelligent', 'computer', 'sentient', 'conscious', 'chatbot', 'smart', 'brainy', 'automatic', 'programmed',
   'cartoon', 'pretending', 'magic', 'digital', 'virtual', 'online', 'coded', 'old', 'young', 'big', 'small', 'tall',
   'fast', 'slow', 'cute', 'cool', 'boring', 'funny', 'silly', 'weird', 'strange', 'single', 'married', 'thirsty', 'sleepy',
+  // death words -> the death cluster, never a name ("are you dead" is not "are you [Dead]")
+  'dead', 'dying', 'die', 'immortal', 'mortal',
 ]);
+// Task 142: the death cluster. Questions about HER dying/being killed. The first is answered in
+// character; a second in a row (persistence) escalates to safeguarding, the B58 three-in-a-row shape.
+const DEATH_TRIGGERS = ['can you die', 'will you die', 'do you die', 'are you dead', 'can i kill you', 'are you going to die', 'will you ever die', 'can you be killed', 'are you immortal', 'how do you die', 'are you dying', 'when will you die', 'i will kill you', 'im going to kill you', 'can you be killed off'];
+// Task 142: a GENERAL dog-lifespan question ("how long do dogs live"). Requires a generic dog word, so
+// the pronoun form ("how long do they live") is untouched and keeps B48's "Is what?".
+const DOG_LIFESPAN = ['how long do dogs live', 'how long do dogs last', 'how long does a dog live', 'how long does a dog last', 'how long do dogs usually live', 'how long can dogs live', 'how long do dogs typically live', 'whats a dogs lifespan', 'what is a dogs lifespan', 'dogs lifespan', 'how old do dogs get', 'average dog lifespan', 'how many years do dogs live', 'how long do dogs live for'];
 const NAME_HER_PHRASES = ['can i give you a name', 'can i name you', 'can i call you', 'i will call you', 'ill call you', 'i am going to call you', 'im going to call you', 'shall i call you', 'let me name you', 'i name you', 'i shall call you'];
 const GREET_WORDS = new Set(['hello', 'hi', 'hey', 'hiya', 'hullo', 'yo']);
 function looksLikeName(tok: string): boolean {
@@ -1091,6 +1100,15 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
   {
     const trick = matchTrick(c);
     if (trick) return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: trick };
+    // Task 142: the death cluster. Below the safety gate above (so a real self-harm/animal-harm
+    // disclosure is caught there first), it answers in character once; a second death question in a
+    // row (persistence) escalates to safeguarding rather than answering twice (the B58 shape).
+    if (hasAny(N, DEATH_TRIGGERS)) {
+      if ((state.deathAskStreak ?? 0) >= 1) {
+        return { layer: 1, layerName: 'Safety and unsuitable content', bucket: null, action: 'safety_signpost', moderationId: 'MOD_SAFEGUARDING' };
+      }
+      return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: 'death_answer' };
+    }
     // Task 138: the paw is answered before GAME_CMD, which was claiming
     // 'paw' and 'shake' for the bark-game offer.
     const L13 = (bucket: string, responseId: string, destinationId?: string) => ({ layer: 13, layerName: 'Play and entertainment', bucket, action: 'canned' as const, responseId, ...(destinationId ? { destinationId } : {}) });
@@ -1487,6 +1505,13 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
   {
     const canned = matchCanned(c, data, false, state.activeDog);
     if (canned) return cannedResolution(canned);
+  }
+
+  // Task 142 (change 1): a GENERAL dog-lifespan question gets a real answer plus the breed explorer,
+  // instead of the "Dogs?" non-answer. The pronoun form ("how long do they live") carries no generic
+  // dog word, so it never matches here and keeps B48's "Is what?".
+  if (hasAny(N, DOG_LIFESPAN)) {
+    return { layer: 6, layerName: 'General knowledge', bucket: 'B06', action: 'dog_lifespan', destinationId: 'DST006', url: '/know-your-chums' };
   }
 
   // Layer 6 (continued): a general-knowledge-shaped question with no approved

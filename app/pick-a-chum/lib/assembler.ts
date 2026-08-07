@@ -320,9 +320,11 @@ export function assemble(res: Resolution, data0: ChumData, n: Normalised, sessio
         { responseId: 'HOWAREYOU-2', src: '/chat-media/howareyou2.mp4', alt: 'A dog with a weary stare' },
         { responseId: 'HOWAREYOU-3', src: '/chat-media/howareyou3.mp4', alt: 'A corgi looking busy' },
       ];
-      const unseen = clips.filter((x) => !session.usedResponseIds.includes(x.responseId));
-      const from = unseen.length > 0 ? unseen : clips;
-      const pick = from[Math.floor(Math.random() * from.length)];
+      // Task 142 (change 2): the three clips convey completely different feelings, so a visitor who
+      // sees one gets the SAME one again. Pick one per session and keep it (reuse the one already
+      // served this session; otherwise choose at random).
+      const prior = clips.find((x) => session.usedResponseIds.includes(x.responseId));
+      const pick = prior ?? clips[Math.floor(Math.random() * clips.length)];
       return { responseId: pick.responseId, text: '', dog, media: { src: pick.src, alt: pick.alt } };
     }
 
@@ -348,6 +350,16 @@ export function assemble(res: Resolution, data0: ChumData, n: Normalised, sessio
         ? { responseId: 'NAME-DEFLECT-2', text: 'Call me what you like.', dog }
         : { responseId: 'NAME-DEFLECT-1', text: 'I answer to anything.', dog };
     }
+
+    case 'dog_lifespan':
+      // Task 142 (change 1): a real general lifespan answer + the breed explorer link (DST006). The
+      // pronoun form "how long do they live" stays B48 ("Is what?").
+      return { responseId: 'DOG-LIFESPAN', text: 'About 10 to 13 years. Small dogs longer, big dogs less.', dog, destinationId: 'DST006', url: '/know-your-chums' };
+
+    case 'death_answer':
+      // Task 142 (change 4): the death cluster, answered in character once. Persistence is escalated
+      // to safeguarding by the router/engine, so this line never serves twice in a row.
+      return { responseId: 'DEATH-01', text: 'I cannot die as im not alive in the same way as real dogs', dog };
 
     case 'page_bio': {
       // Task 140: the bio for the page the visitor is standing on (owner copy, page-bios.ts). On

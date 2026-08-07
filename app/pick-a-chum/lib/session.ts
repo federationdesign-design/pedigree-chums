@@ -31,6 +31,7 @@ export interface Session {
   closed: boolean; // Boxer cut-off performed
   lastAction: ActionType | null; // the previous turn's resolved action (for clarifier follow-up)
   safetyAskStreak: number; // Task 139: consecutive safety questions. Three in a row hands to a human; any other turn resets it.
+  deathAskStreak: number; // Task 142: consecutive death-cluster questions. The first is answered; a second (persistence) escalates to safeguarding. Any other turn resets it.
   anatomyRedirectUsed: boolean; // ANATOMY_GENERAL_REDIRECT fires at most once per session
   protectedState: ProtectedState; // S12 protected-state machine (Task 15)
   personalSadnessCount: number; // Task 20: qualifying personal-sadness statements this session (L1 at 1, L2 at 2)
@@ -51,6 +52,10 @@ export interface Session {
   // the third and further consecutive no-subject turns rotate through the B46 bank instead of repeating
   // "im a dog". Reset to 0 the moment anything else is served (a real answer, LOOP-01 or LOOP-02).
   noSubjectStreak: number;
+  // Task 142: how many diversions (destination offers) have been shown this session, to rotate through
+  // the eight offers. One diversion fires on the third consecutive no-subject turn, then it is back to
+  // "im a dog" (three offers in a row is pestering).
+  diversionsShown: number;
   // Task 68: the subject the previous turn offered via LOOP-01 (repeat) or LOOP-02 (destination),
   // awaiting a yes/no. A bare affirmation next turn routes to this subject's destination; anything
   // else (including "no") clears it and lets the loop advance. Set only when LOOP-01/LOOP-02 is
@@ -86,6 +91,7 @@ export function newSession(activeDog: Dog = 'collie'): Session {
     closed: false,
     lastAction: null,
     safetyAskStreak: 0,
+    deathAskStreak: 0,
     anatomyRedirectUsed: false,
     protectedState: null,
     personalSadnessCount: 0,
@@ -94,6 +100,7 @@ export function newSession(activeDog: Dog = 'collie'): Session {
     candidateSubject: null,
     loopRepeatUsed: false,
     noSubjectStreak: 0,
+    diversionsShown: 0,
     pendingConfirm: null,
     topic: null,
     previousTopic: null,

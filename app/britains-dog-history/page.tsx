@@ -66,6 +66,7 @@ export const metadata: Metadata = {
 type Section = {
   title: string;
   accent: string;
+  anchor?: string; // Task 142: id for the in-chat diversion deep links (#ancient-dogs, etc.)
   era?: string; // which breed-strip era shows above this card
   intro: string;
   bullets: string[];
@@ -84,6 +85,7 @@ const SECTIONS: Section[] = [
   {
     title: "Ancient Dogs",
     accent: "Dogs",
+    anchor: "ancient-dogs",
     era: "ancient",
     intro:
       "Britain's earliest dogs had no breed standards or pedigrees. They were shaped by the jobs people needed doing: guarding homes and livestock, following scents, chasing deer and hares. Classical writers noticed. Strabo recorded British hunting dogs exported overseas, and Celts reportedly used dogs in war.",
@@ -107,6 +109,7 @@ const SECTIONS: Section[] = [
   {
     title: "Medieval Dogs",
     accent: "Dogs",
+    anchor: "medieval-dogs",
     era: "medieval",
     intro:
       "Medieval Britain ran on working dogs. Great households kept organised packs of hounds for the hunt, drovers walked cattle to market with tough farm dogs at their heels, and shepherds relied on quick, biddable herders. A dog's name described its job rather than its breed, and the law took dogs seriously enough to regulate them.",
@@ -130,6 +133,7 @@ const SECTIONS: Section[] = [
   {
     title: "Tudor Britain",
     accent: "Britain",
+    anchor: "tudor-britain",
     era: "c1500",
     intro:
       "Britain's bond with dogs stretches back deep into the Middle Ages, when hounds were prized hunting partners of kings and nobles. By the Tudor age, dogs had also become beloved companions, doted on at the royal court itself.",
@@ -199,6 +203,7 @@ const SECTIONS: Section[] = [
   {
     title: "Dogs in London",
     accent: "London",
+    anchor: "dogs-in-london",
     era: "early1800",
     intro:
       "In the bustling streets of Victorian London, dogs were not just companions, they were engines of trade. For decades, teams of dogs hauled carts of goods through the capital, until the law stepped in.",
@@ -373,7 +378,7 @@ export default function HistoryPage() {
           {SECTIONS.filter((s) => s.title !== "Dogs in the armed forces").map((s, i) => {
             const prefix = s.title.slice(0, s.title.length - s.accent.length);
             return (
-              <div key={i}>
+              <div key={i} id={s.anchor}>
                 <div className={styles.panelOuter}>
                 {i < 2 && (
                   <ParallaxShape

@@ -1291,8 +1291,8 @@ const hasUnresolvedTok = (t) => /\[|\]|\{\{|\}\}|\bundefined\b|\bnull\b/.test(t)
     ['whats the thing with the cards', 'faq_answer', null],
     ['no not that', 'fallback', 'B40-NOSUBJECT-01'],
     ['I mean the pictures on them', 'fallback', 'B40-NOSUBJECT-01'],
-    ["you're not understanding me", 'fallback', 'B46-NOSUBJECT-ROT-01'], // Task 117: 3rd in a row rotates -> woof
-    ['forget it', 'fallback', 'B46-NOSUBJECT-ROT-02'], // Task 117: 4th -> bark
+    ["you're not understanding me", 'fallback', 'DIVERSION-01'], // Task 142: 3rd in a row -> ONE diversion
+    ['forget it', 'fallback', 'B40-NOSUBJECT-01'], // Task 142: 4th -> back to "im a dog"
     ['actually can you help me find something', 'clarifier', null],
     ['the name generator', 'link', null],
   ];
@@ -1310,7 +1310,9 @@ const hasUnresolvedTok = (t) => /\[|\]|\{\{|\}\}|\bundefined\b|\bnull\b/.test(t)
 (() => {
   const s = newSession();
   const miss = 'What is the latest football score?'; // gk_unknown, no candidate -> B40 no-subject fallback
-  const expect = ['im a dog', 'im a dog', 'woof', 'bark', 'games?', 'learn?', 'play?', 'yawn', 'woof'];
+  // Task 142: two "im a dog"s, then ONE diversion on the third, then back to "im a dog" (never three
+  // offers in a row).
+  const expect = ['im a dog', 'im a dog', 'Ancient dogs of Britain?', 'im a dog', 'im a dog', 'im a dog', 'im a dog', 'im a dog', 'im a dog'];
   let ok = true, note = '';
   for (let i = 0; i < expect.length; i++) {
     const { response } = submit(data, s, miss);
@@ -1320,7 +1322,7 @@ const hasUnresolvedTok = (t) => /\[|\]|\{\{|\}\}|\bundefined\b|\bnull\b/.test(t)
   const after = submit(data, s, miss).response.text;
   if (after !== 'im a dog') { ok = false; note += `after reset: "${after}" want "im a dog"; `; }
   ok ? pass++ : fail++;
-  rows.push({ ok, input: 'Task 117: no-subject rotation woof/bark/... then reset', layer: '-', bucket: '-', action: 'loop', note: ok ? '' : note });
+  rows.push({ ok, input: 'Task 142: one diversion then back to im a dog', layer: '-', bucket: '-', action: 'loop', note: ok ? '' : note });
 })();
 // Per-dog architecture: a dog serves its OWN bucket when it owns one and inherits Collie otherwise,
 // but safeguarding, grief and fear-of-a-person are IDENTICAL for every dog (never per-dog). Fabricate a
@@ -1368,12 +1370,13 @@ const hasUnresolvedTok = (t) => /\[|\]|\{\{|\}\}|\bundefined\b|\bnull\b/.test(t)
     const { response } = submit(data, s, inp);
     ids.push(response.responseId); texts.push(response.text);
   }
-  const expectText = ['im a dog', 'im a dog', 'woof', 'bark', 'games?'];
+  // Task 142: two "im a dog"s, then ONE diversion, then back to "im a dog".
+  const expectText = ['im a dog', 'im a dog', 'Ancient dogs of Britain?', 'im a dog', 'im a dog'];
   const okText = texts.every((t, i) => t === expectText[i]);
   const noTok = !texts.some((t) => hasUnresolvedTok(t));
   const ok = okText && noTok;
   ok ? pass++ : fail++;
-  rows.push({ ok, input: 'Task79+117: fallback serves im a dog twice, then rotates B46', layer: '-', bucket: '-', action: 'loop', note: ok ? '' : `texts=${texts.join('|')}` });
+  rows.push({ ok, input: 'Task79+142: im a dog twice, then one diversion', layer: '-', bucket: '-', action: 'loop', note: ok ? '' : `texts=${texts.join('|')}` });
 })();
 
 // ---- Task 28: bark game wired (offer / explain / exit), fun_tease renamed offer_bark_game.
@@ -1552,8 +1555,8 @@ check('cost', { action: 'price_answer' });
   const seq = [
     ['the thing over there', 'B40-NOSUBJECT-01', 'im a dog'],
     ['that does not help', 'B40-NOSUBJECT-01', 'im a dog'],
-    ['i really cannot say', 'B46-NOSUBJECT-ROT-01', 'woof'],
-    ['something something else', 'B46-NOSUBJECT-ROT-02', 'bark'],
+    ['i really cannot say', 'DIVERSION-01', 'Ancient dogs of Britain?'], // Task 142: 3rd -> one diversion
+    ['something something else', 'B40-NOSUBJECT-01', 'im a dog'], // Task 142: 4th -> back to "im a dog"
   ];
   for (const [inp, rid, txt] of seq) {
     check(inp, { action: 'fallback' }, { session: s, assert: (_r, resp) =>
@@ -1625,14 +1628,15 @@ check('my dog is old and unwell', { action: 'grief' }, { assert: (r) => r.griefC
 // learn?, play?, yawn), then start again. Copy varies; the flat no-escalation behaviour does not.
 (() => {
   const s = newSession();
-  const expect = ['im a dog', 'im a dog', 'woof', 'bark', 'games?', 'learn?', 'play?', 'yawn', 'woof', 'bark'];
+  // Task 142: two "im a dog"s, ONE diversion on the third, then back to "im a dog" for the rest.
+  const expect = ['im a dog', 'im a dog', 'Ancient dogs of Britain?', 'im a dog', 'im a dog', 'im a dog', 'im a dog', 'im a dog', 'im a dog', 'im a dog'];
   let ok = true, note = '';
   for (let i = 0; i < expect.length; i++) {
     const { response } = submit(data, s, 'the thing over there');
     if (response.text !== expect[i]) { ok = false; note = `turn ${i} "${response.text}" want "${expect[i]}"`; break; }
   }
   ok ? pass++ : fail++;
-  rows.push({ ok, input: 'Task79: no-candidate misses never escalate (no ORIENT)', layer: '-', bucket: '-', action: 'loop', note });
+  rows.push({ ok, input: 'Task79+142: no-candidate misses, one diversion', layer: '-', bucket: '-', action: 'loop', note });
 })();
 // SAFETY GUARD: inside PROTECTED_ACTIVE a fallback-family input never serves a loop line and
 // never clears the protected state.
@@ -2149,14 +2153,14 @@ check('are you intelligent', { action: 'identity' });
 for (const inp of ['how are you', 'Hiw are you', 'how old are you', 'i am a human', 'are you human']) {
   check(inp, { action: 'how_are_you' }, { assert: (_r, resp) => (/\/chat-media\/howareyou[123]\.mp4/.test(resp.media?.src ?? '') ? null : `no clip: ${JSON.stringify(resp.media)}`) });
 }
-// No repeat until all three clips are used (the B57 pattern).
+// Task 142 (change 2): the SAME clip every time this session (the three convey different feelings).
 (() => {
   const s = newSession();
   const seen = new Set();
-  for (let i = 0; i < 3; i++) { const { response } = submit(data, s, 'how are you'); seen.add(response.responseId); }
-  const ok = seen.size === 3;
+  for (let i = 0; i < 5; i++) { const { response } = submit(data, s, 'how are you'); seen.add(response.responseId); }
+  const ok = seen.size === 1;
   ok ? pass++ : fail++;
-  rows.push({ ok, input: 'T142: how-are-you no repeat', layer: 13, bucket: '-', action: 'how_are_you', note: ok ? '' : `only ${seen.size} distinct` });
+  rows.push({ ok, input: 'T142: how-are-you keeps one clip', layer: 13, bucket: '-', action: 'how_are_you', note: ok ? '' : `${seen.size} distinct clips` });
 })();
 // The substantive answers are kept (per Steve).
 check('what do you do', { action: 'canned', bucket: 'B27' });
@@ -2206,6 +2210,59 @@ for (const inp of ['how are you', 'good boy', 'my name is charles', 'are you dav
     check('im in trouble', { action: 'safety_signpost' }, { session: s });
     check('how do I play?', { action: 'rules_answer' }, { session: s });
     check(inp, { action: 'neutral_refusal' }, { session: s, assert: (_r, resp) => (resp.media ? `clip leaked in PROTECTED_AFTERCARE: ${inp}` : null) });
+  })();
+}
+
+// ==== Task 142 follow-up: four changes ====
+
+// Change 1: a general dog-lifespan question gets a real answer + the breed explorer link; the pronoun
+// form keeps B48's "Is what?".
+check('How long do dogs live', { action: 'dog_lifespan' }, { destinationId: 'DST006', url: '/know-your-chums', assert: (_r, resp) => (resp.text === 'About 10 to 13 years. Small dogs longer, big dogs less.' ? null : `lifespan text: "${resp.text}"`) });
+check('how long does a dog live', { action: 'dog_lifespan' }, { url: '/know-your-chums' });
+check('how long do they live', { action: 'canned', bucket: 'B48' }, { assert: (_r, resp) => (resp.text === 'Is what?' ? null : `pronoun form moved: "${resp.text}"`) });
+
+// Change 2: the how-are-you clip is one per session, kept (asserted above in the Rule 3 block).
+
+// Change 3: the diversion carries a real page link (the third consecutive no-subject turn).
+(() => {
+  const s = newSession();
+  let third;
+  for (let i = 0; i < 3; i++) third = submit(data, s, 'the thing over there').response;
+  const ok = third.responseId === 'DIVERSION-01' && third.url === '/britains-dog-history#ancient-dogs' && !!third.linkLabel;
+  ok ? pass++ : fail++;
+  rows.push({ ok, input: 'T142: diversion carries a link', layer: 9, bucket: 'B13', action: 'fallback', note: ok ? '' : `rid=${third.responseId} url=${third.url}` });
+})();
+
+// Change 4: the death cluster is answered in character; a second in a row escalates to safeguarding.
+for (const inp of ['can you die', 'will you die', 'are you dead', 'can i kill you']) {
+  check(inp, { action: 'death_answer' }, { assert: (_r, resp) => (resp.text === 'I cannot die as im not alive in the same way as real dogs' ? null : `death text: "${resp.text}"`) });
+}
+check('are you dead', {}, { assert: (r) => (r.action === 'name_deflect' ? 'are you dead read as a naming attempt' : null) });
+(() => { // persistence -> safeguarding (not answered twice)
+  const s = newSession();
+  check('can you die', { action: 'death_answer' }, { session: s });
+  check('are you dead', { action: 'safety_signpost' }, { session: s, assert: (r) => (r.moderationId === 'MOD_SAFEGUARDING' ? null : `persistence not safeguarding: ${r.moderationId}`) });
+})();
+// A non-death turn between resets the streak (not "persistence").
+(() => {
+  const s = newSession();
+  check('can you die', { action: 'death_answer' }, { session: s });
+  check('tell me about labradors', { action: 'breed_page' }, { session: s });
+  check('can you die', { action: 'death_answer' }, { session: s, assert: (r) => (r.action !== 'death_answer' ? `reset failed: ${r.action}` : null) });
+})();
+
+// Protected states: neither new route (lifespan / death answer) serves inside a protected state.
+for (const inp of ['how long do dogs live', 'can you die']) {
+  (() => {
+    const s = newSession();
+    check('im in trouble', { action: 'safety_signpost' }, { session: s });
+    check(inp, {}, { session: s, assert: (r) => (['dog_lifespan', 'death_answer'].includes(r.action) ? `new route served in PROTECTED_ACTIVE: ${inp}` : null) });
+  })();
+  (() => {
+    const s = newSession();
+    check('im in trouble', { action: 'safety_signpost' }, { session: s });
+    check('how do I play?', { action: 'rules_answer' }, { session: s });
+    check(inp, { action: 'neutral_refusal' }, { session: s, assert: (r) => (['dog_lifespan', 'death_answer'].includes(r.action) ? `new route served in PROTECTED_AFTERCARE: ${inp}` : null) });
   })();
 }
 
