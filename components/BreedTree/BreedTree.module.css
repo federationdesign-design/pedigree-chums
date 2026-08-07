@@ -772,6 +772,40 @@
    the second dog's picture ends. Change the portrait clamp there and this needs
    to change with it. The lives bar sits at the same left but only renders while
    a round is running, and the rail is learn only, so they never meet. */
+/* The way back out of a zoom. Bottom right, where nothing else sits in the
+   learn area: the pit's squares are top right, the rail starts below them, the
+   slider is on the left and the life bar only renders during a round.
+   Same box as those squares, 84px with a 5px navy rim and a corner radius of
+   0.3, so it belongs to the same family. */
+.zoomOutBtn {
+  position: fixed;
+  right: 18px;
+  bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+  z-index: 14;
+  width: 84px;
+  height: 84px;
+  border-radius: 25.2px;
+  border: none;
+  outline: 5px solid var(--navy, #0a3a57);
+  background: var(--yellow, #ffd23e);
+  color: var(--navy, #0a3a57);
+  display: grid;
+  place-items: center;
+  padding: 0;
+  cursor: pointer;
+  box-shadow: 0 4px 0 rgba(10, 58, 87, 0.3);
+  pointer-events: auto;
+}
+.zoomOutBtn svg {
+  width: 46%;
+  height: 46%;
+  display: block;
+}
+/* Mobile only, by request. */
+@media (min-width: 769px) {
+  .zoomOutBtn { display: none; }
+}
+
 .relRailHome {
   position: fixed;
   /* RIGHT, under the pit's own squares. It used to sit at left 30px beneath the

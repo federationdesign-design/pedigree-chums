@@ -6835,6 +6835,29 @@ export default function BreedTree({
           {/* Related pack dogs, part of the box: they open and close with it
               and ride along when it is dragged. The 54-pack breeds that descend
               from this level's ancestors, as square cards down one side. */}
+          {/* ZOOM OUT, bottom right, only while zoomed in.
+              A tap on the background already does this, but since the background
+              also pans there is no longer anything on screen saying so. This is
+              the visible way back out. Mobile only, by request: on desktop the
+              cursor already turns to a zoom-out over the background. */}
+          {dockAside && learning && !dropped && focus !== nodes[0] && (
+            <button
+              type="button"
+              className={styles.zoomOutBtn}
+              onPointerDown={(e) => e.stopPropagation()}
+              onClick={(e) => { e.stopPropagation(); zoom(nodes[0]); }}
+              aria-label="Zoom out"
+              title="Zoom out"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"
+                fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="10.5" cy="10.5" r="6.5" />
+                <line x1="7.5" y1="10.5" x2="13.5" y2="10.5" />
+                <line x1="15.5" y1="15.5" x2="21" y2="21" />
+              </svg>
+            </button>
+          )}
+
           {dockAside && learning && !railHidden && renderRail.length > 0 && (
             <div
               ref={railRef}
