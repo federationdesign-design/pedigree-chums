@@ -1295,7 +1295,13 @@ export default function BreedTree({
   const KNOCK_K = 0.22;        // pull toward home
   const KNOCK_DAMP = 0.55;     // how quickly it stops arguing with itself
   const KNOCK_REST = 0.35;     // world units below which it is home
-  const KNOCK_POINTS = 5;      // a nudge is worth almost nothing, by design
+  const KNOCK_POINTS = 1;      // a nudge is worth almost nothing, by design
+  /* An IMPULSE, not just an overlap correction. Resolving the overlap alone was
+     invisible: the spring cancelled the shove on the frame it was applied, so
+     the neighbour sat about eight units from home and never travelled. Contact
+     now hands it velocity, which is what makes it move off and come back. */
+  const KNOCK_IMPULSE = 1.6;
+  const KNOCK_VMAX = 26;       // so a fast drag cannot fire one across the pit
   type Knock = { els: number[]; chip: { i: number; bx: number; by: number } | null; ox: number; oy: number; vx: number; vy: number; hit: boolean };
   const knocksRef = useRef<Map<number, Knock>>(new Map());
   const knockRafRef = useRef<number | null>(null);
@@ -2818,6 +2824,9 @@ export default function BreedTree({
 
   function onCircle(e: React.MouseEvent, d: Node) {
     e.stopPropagation();
+    // A drag ends in a click. Without this, letting go after pushing a circle
+    // around would also open it.
+    if (pullRef.current?.moved) return;
     // START SCREEN. The circles are the diagram, not a doorway: they are pushed
     // and pulled by the pointer handlers above and spring back.
     //
@@ -5211,6 +5220,11 @@ export default function BreedTree({
                       const push = min - dist;
                       kn.ox += (gx / dist) * push;
                       kn.oy += (gy / dist) * push;
+                      // and the shove it feels, capped
+                      kn.vx += (gx / dist) * push * KNOCK_IMPULSE;
+                      kn.vy += (gy / dist) * push * KNOCK_IMPULSE;
+                      const sp = Math.hypot(kn.vx, kn.vy);
+                      if (sp > KNOCK_VMAX) { kn.vx = (kn.vx / sp) * KNOCK_VMAX; kn.vy = (kn.vy / sp) * KNOCK_VMAX; }
                       if (!kn.hit) {
                         kn.hit = true;
                         // On the rim between them, where the contact reads.
@@ -5291,7 +5305,11 @@ export default function BreedTree({
                           // START SCREEN: grab it. The circle can be pushed and
                           // pulled and springs back when let go. Handled before
                           // the fellRef guard below, which exists for the round.
-                          if (dockAside && gravity && entered && !started && !learning && focusRef.current === nodes[0]) {
+                          // Also in the learn area, by request: the same push and
+                          // pull, and a tap still goes in. A tap that moved is
+                          // ignored by onCircle, so dragging cannot open a dog by
+                          // accident on the way back up.
+                          if (dockAside && gravity && entered && !started && focusRef.current === nodes[0]) {
                             const st = stageRef.current;
                             const vbH = aspect >= 1 ? SIZE : SIZE / aspect;
                             const uppL = vbH / Math.max(st ? st.clientHeight : 1, 1);
