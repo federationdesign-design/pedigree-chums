@@ -3447,72 +3447,60 @@ export default function BreedTree({
       // nodes that have their own body: their subtrees no longer ride a parent
       const owned = new Set<Node>(bodies.map((b) => b.n as Node));
 
-      // ---- the clinging children ------------------------------------------
-      // A dog's own circles ride on its name from the moment it lands, stuck to
-      // the underside so gravity works with the link rather than against it.
-      // The word is marked popped, which makes popChildren early-return, so the
-      // old rule where a hard enough knock burst a dog open no longer applies to
-      // the level's dogs. Lifting the word is the only release, by decision.
+      // ghost immunity: freshly freed bodies share a negative collision group
+      // with their parent so a drop-time or pop-time overlap resolves without an
+      // explosion; cleared on a 650ms timer. popChildren uses it too. Declared
+      // here because the drop below is now its first caller.
+      let ghostSeq = 1;
+      const ghostTimers: number[] = [];
+      const ghost = (mbs: any[]) => {
+        const g = -(ghostSeq++);
+        for (const m of mbs) m.collisionFilter.group = g;
+        ghostTimers.push(window.setTimeout(() => {
+          for (const m of mbs) if (m.collisionFilter.group === g) m.collisionFilter.group = 0;
+        }, 650));
+      };
+
+      // ---- the dog's own circles, freed at the drop -----------------------
+      // A level dog IS its name. Its circles used to cling to the name: static,
+      // sensor, pinned in the word's collision group and teleported onto it
+      // every frame. That is gone. Each circle now drops as an ordinary dynamic
+      // body at its packed position and is a pit object from the start, so it is
+      // draggable and it shoves and is shoved like anything else.
       //
-      // length 0 with high stiffness is a rigid pin rather than a spring: the
-      // child sits exactly where it is put and turns with the word instead of
-      // swinging off it.
+      // A name and its circles are placed overlapping on purpose, so the word
+      // and its freed circles get temporary mutual immunity (ghost) for that
+      // overlap to resolve without the old rocket motor, plus a small outward
+      // burst so they spread the way popChildren's circles do.
+      //
+      // Everything else the old cling loop did stays: each child is registered
+      // in `owned`, pushed to `all`, given its yellow % chip (deliberately in no
+      // shared group, so its own dog can knock it about), and the word is marked
+      // popped so popChildren early-returns and cannot double the circles.
       for (const b of bodies) {
         if (!b.n || !b.mb) continue;
         const kids = (b.n.children ?? []).filter((ch) => !isEcho(ch));
         if (!kids.length) { b.popped = true; continue; }
-        const f = wordFits[b.idx];
-        const wpx = (f ? f.wv : b.r * 2 * k) / k * pxPerWorld;
-        const hpx = (f ? f.hv : b.r * k) / k * pxPerWorld;
-        b.cling = [];
-        // A word and its own circles must never collide with each other. They
-        // are placed overlapping on purpose, and the circles are static, so
-        // without this the solver reads a dynamic body sunk inside an infinite
-        // mass and fires the word out of it at speed, every frame. That was a
-        // rocket motor: press PLAY and the names left through the top of the
-        // screen. Matter's rule is that bodies sharing a NEGATIVE group never
-        // collide, so each dog gets its own, and everything else in the pit
-        // still hits them normally.
-        const clingGroup = -(b.idx + 1);
-        b.mb.collisionFilter = { ...b.mb.collisionFilter, group: clingGroup };
-        kids.forEach((ch, ci) => {
+        const wmb = b.mb; // narrowed and stable for the closure below
+        // the word plus everything freed under it, immune to each other briefly
+        const newMbs = [wmb];
+        kids.forEach((ch) => {
           const nb: Body = { n: ch, x: ch.x, y: ch.y, vx: 0, vy: 0, r: ch.r, pct: pctOf(ch), idx: -1, lastFx: 0, popped: false, a: 0, va: 0, ia: 0, iva: 0 };
           owned.add(ch);
           all.push(nb);
           const cmb = mkCircle(nb, "circle", CIRCLE_OPTS);
-          const rpx = ch.r * pxPerWorld;
-          // Spread along the width and sitting ON the lower edge rather than
-          // hanging clear of it, so a circle reads as stuck to its name rather
-          // than dangling off it.
-          const ax = (-0.5 + (ci + 0.5) / kids.length) * wpx;
-          const ay = hpx / 2 + rpx * 0.4;
-          MBody.setPosition(cmb, { x: b.mb.position.x + ax, y: b.mb.position.y + ay });
-          // STATIC while attached, and driven off the word every frame further
-          // down. A Matter constraint was tried first and is a spring however
-          // stiff it is set, so the circles jittered against the word and rang
-          // through everything they touched. A static body cannot be moved by
-          // the solver at all, and still collides properly, so the chums bounce
-          // off it exactly as they would off the dog.
-          cmb.collisionFilter = { ...cmb.collisionFilter, group: clingGroup };
-          MBody.setStatic(cmb, true);
-          // A sensor while it clings: it reports contact but resolves nothing.
-          //
-          // Static alone was not enough. A static body has infinite mass and
-          // this one is TELEPORTED every frame to follow its word, which makes
-          // it a sweeper: as the name tumbles, its circles plough through
-          // whatever is beside them and win every contact, because nothing can
-          // push a static body back. On a deep level that quietly shovelled the
-          // whole pit up and out through the top over about a minute.
-          //
-          // As a sensor it still rides the word and is still drawn, but it
-          // pushes nothing until it is cut loose.
-          cmb.isSensor = true;
+          // a small upward-outward burst, the same recipe popChildren uses
+          MBody.setVelocity(cmb, {
+            x: wmb.velocity.x * 0.4 + (Math.random() - 0.5) * vps(0.7),
+            y: wmb.velocity.y * 0.3 - vps(0.45 + Math.random() * 0.35),
+          });
+          MBody.setAngularVelocity(cmb, (Math.random() - 0.5) * 0.8 / 60);
+          newMbs.push(cmb);
           // The child's own percentage chip, spawned here at the drop. It used
           // to be made by popChildren, which no longer runs for a level dog now
-          // that its children are out from the start, so the 50% chips had
-          // simply stopped existing. Not clinging: it falls free like the chips
-          // the outer dogs bring, and it is NOT in the cling group, so it can be
-          // knocked about by everything including its own dog.
+          // that its children are out from the start, so without this the chips
+          // would simply stop existing. It falls free and is NOT in any shared
+          // group, so everything including its own dog can knock it about.
           const bl = badgeBodiesRef.current;
           if (bl) {
             const kidBomb = rollBomb();
@@ -3524,11 +3512,14 @@ export default function BreedTree({
             };
             bl.push(kb);
             all.push(kb);
-            mkCircle(kb, "badge", BADGE_OPTS);
+            const mbb = mkCircle(kb, "badge", BADGE_OPTS);
+            MBody.setVelocity(mbb, { x: cmb.velocity.x * 0.8 + (Math.random() - 0.5) * vps(0.3), y: cmb.velocity.y * 0.8 });
+            newMbs.push(mbb);
             setBadgePcts((l) => [...l, { pct: kb.pct, r: badgeRFor(kb.pct, badgeDrawRRef.current), bomb: kidBomb }]);
           }
-          (b.cling as unknown[]).push({ mb: cmb, nb, ax, ay });
         });
+        // resolve the deliberate word/circle overlap without an explosion
+        if (newMbs.length > 1) ghost(newMbs);
         b.popped = true; // its children are already out, so a knock cannot pop it
       }
 
@@ -3543,18 +3534,6 @@ export default function BreedTree({
           d.x += dxm; d.y += dym;
           for (const ch of d.children ?? []) if (!owned.has(ch)) stack.push(ch);
         }
-      };
-
-      // ghost immunity: a fresh pop shares a negative collision group with its
-      // parent so it escapes without an explosion; cleared on a 650ms timer
-      let ghostSeq = 1;
-      const ghostTimers: number[] = [];
-      const ghost = (mbs: any[]) => {
-        const g = -(ghostSeq++);
-        for (const m of mbs) m.collisionFilter.group = g;
-        ghostTimers.push(window.setTimeout(() => {
-          for (const m of mbs) if (m.collisionFilter.group === g) m.collisionFilter.group = 0;
-        }, 650));
       };
 
       // First solid hit pops a circle's direct children out as their own
@@ -4568,22 +4547,6 @@ export default function BreedTree({
             MBody.setPosition(mb as never, { x: backX, y: pTop.y - 40 });
             MBody.setVelocity(mb as never, { x: 0, y: 0 });
             MBody.setAngularVelocity(mb as never, 0);
-          }
-        }
-        // Clinging circles ride their word exactly: position and angle taken
-        // straight off it, rotated into place. Nothing here is negotiated with
-        // the solver, so there is no wobble to pass on.
-        for (const w of bodies) {
-          const cl = w.cling as { mb: { position: { x: number; y: number } }; ax: number; ay: number }[] | undefined;
-          if (!cl || !cl.length || !w.mb) continue;
-          const wa = w.mb.angle as number;
-          const cs = Math.cos(wa), sn = Math.sin(wa);
-          for (const c of cl) {
-            MBody.setPosition(c.mb, {
-              x: w.mb.position.x + c.ax * cs - c.ay * sn,
-              y: w.mb.position.y + c.ax * sn + c.ay * cs,
-            });
-            MBody.setAngle(c.mb, wa);
           }
         }
         const dt = Math.max(0.004, Math.min(0.032, (stepped * STEP) / 1000 || 0.0166));
