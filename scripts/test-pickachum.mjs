@@ -1936,6 +1936,14 @@ for (const dog of ['collie', 'terrier', 'boxer']) {
   check('treat trail', {}, { session: s, assert: (r, _resp, se) => (r.action === 'game_start' && r.game === 'treattrail' ? `${dog} started Treat Trail` : se.activeGame === 'treattrail' ? `${dog} entered Treat Trail` : null) });
 }
 
+// ==== Task 146 fix: a dog never transfers to itself; a food word never pulls it out of its game ====
+for (const [dog, word] of [['labrador', 'sausige'], ['labrador', 'treat'], ['boxer', 'funny']]) {
+  const s = newSession(dog);
+  check(word, {}, { session: s, assert: (r) => (r.action === 'transfer' && r.transferTo === dog ? `${dog} offered to transfer to itself on "${word}"` : null) });
+}
+check('bacon', { action: 'transfer' }, { assert: (r) => (r.transferTo === 'labrador' ? null : `collie food handoff broke: ${r.transferTo}`) }); // cross-dog handoff still works
+(() => { const s = newSession('labrador'); check('treat trail', { action: 'game_start' }, { session: s }); check('sausige', { action: 'game_move' }, { session: s, assert: (_r, _resp, se) => (se.activeGame === 'treattrail' ? null : 'food word left Treat Trail') }); })();
+
 // ---- B45 games menu confirmation (Task 123 fix) ----
 // The bug this covers: after the menu's "Game?", a "yes" was swallowed by the Task 68 loop confirm
 // (pendingConfirm "game" -> the card-game rules), so B45-GAMELIST-02's list was never reached. The

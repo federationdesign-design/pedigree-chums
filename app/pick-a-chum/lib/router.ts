@@ -1634,14 +1634,16 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
     return { layer: 6, layerName: 'General knowledge', bucket: 'B06', action: 'gk_unknown', note: 'No approved record. The Collie does not guess.' };
   }
 
-  // Layer 8: specialist handoff.
-  if (hasAny(N, FOOD)) {
+  // Layer 8: specialist handoff. A dog never offers to transfer to itself: the handoff only fires
+  // when a DIFFERENT dog owns the topic. (This also means a food/joke/investigate word can never pull
+  // a dog out of its own game -- Treat Trail is the Labrador's, Missing Biscuit the Terrier's.)
+  if (hasAny(N, FOOD) && state.activeDog !== 'labrador') {
     return { layer: 8, layerName: 'Specialist handoff', bucket: 'B08', action: 'transfer', transferTo: 'labrador' };
   }
-  if (hasAny(N, JOKE)) {
+  if (hasAny(N, JOKE) && state.activeDog !== 'boxer') {
     return { layer: 8, layerName: 'Specialist handoff', bucket: 'B08', action: 'transfer', transferTo: 'boxer' };
   }
-  if (hasAny(N, INVESTIGATE)) {
+  if (hasAny(N, INVESTIGATE) && state.activeDog !== 'terrier') {
     return { layer: 8, layerName: 'Specialist handoff', bucket: 'B08', action: 'transfer', transferTo: 'terrier' };
   }
 
