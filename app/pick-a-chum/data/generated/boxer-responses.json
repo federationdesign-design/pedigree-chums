@@ -241,5 +241,18 @@
     "defaultRoute": "",
     "animationCue": "",
     "status": "Approved"
+  },
+  {
+    "responseId": "BOX-B24-02",
+    "bucketId": "B24",
+    "subtag": "rude",
+    "triggers": [
+      "ANY third stop (served by the stop sequence)"
+    ],
+    "template": "ok",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
   }
 ]

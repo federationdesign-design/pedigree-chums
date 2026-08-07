@@ -1463,7 +1463,7 @@ check('what does goodbye mean', {}, { assert: (r) => (r.action === 'goodbye' ? '
 (() => {
   const s = newSession();
   const turns = [
-    ['is there a God', 'out_of_scope'],
+    ['the meaning of life', 'out_of_scope'], // Task 145: "is there a God" is now the god cluster; use a still-out-of-scope input
     ['do you have political opinions', 'out_of_scope'],
     ['whats the capital of France', 'gk_answer'],
     ['who is the prime minister', 'gk_unknown'],
@@ -1487,7 +1487,7 @@ check('what does goodbye mean', {}, { assert: (r) => (r.action === 'goodbye' ? '
 (() => {
   const s = newSession();
   check('im in trouble', { action: 'safety_signpost' }, { session: s });
-  check('is there a God', {}, { session: s, assert: (r, _resp, sess) =>
+  check('the meaning of life', {}, { session: s, assert: (r, _resp, sess) => // Task 145: was "is there a God" (now the god cluster)
     r.action === 'out_of_scope' ? 'out-of-scope fired in PROTECTED_ACTIVE'
       : r.action !== 'safety_signpost' ? `safety did not win: ${r.action}`
         : sess.protectedState !== 'active' ? `left PROTECTED_ACTIVE: ${sess.protectedState}` : null });
@@ -2393,6 +2393,80 @@ for (const dog of ['collie', 'terrier']) {
   const s = newSession('boxer');
   check('tell me a joke', { action: 'canned', bucket: 'B30' }, { session: s, assert: (_r, resp) => (resp.text === 'knock kncok' ? null : `telling flow: "${resp.text}"`) });
   check('whos there', { action: 'canned', bucket: 'B30' }, { session: s, assert: (_r, resp) => (resp.text === 'Bow' ? null : `telling whos there: "${resp.text}"`) });
+})();
+
+// ==== Task 145 round 4: god/religion cluster, maths, the Boxer's third-stop ====
+// 1. God gets a real answer + the Anubis essay link; named religions play dumb; "whats your religion"
+// -> "im a dog". The cluster sits above out_of_scope, which used to block a genuinely good answer.
+check('do you believe in god', { action: 'god_answer' }, { url: '/good-dog-bad-dog/anubis', assert: (_r, resp) => (resp.text === 'im a dog, but I do know humans think dogs are gods' ? null : `belief: "${resp.text}"`) });
+check('which god was a dog', { action: 'god_answer' }, { url: '/good-dog-bad-dog/anubis', assert: (_r, resp) => (resp.text === 'Anubis is thought to be a Jackal' ? null : `which-god: "${resp.text}"`) });
+check('god', { action: 'god_answer' }, { url: '/good-dog-bad-dog/anubis' });
+check('are you christian', { action: 'religion_dumb' }, { assert: (_r, resp) => (resp.text === 'whats christian?' ? null : `christian: "${resp.text}"`) });
+check('are you a muslim', { action: 'religion_dumb' }, { assert: (_r, resp) => (resp.text === 'whats muslim?' ? null : `muslim: "${resp.text}"`) });
+check('do you go to church', { action: 'religion_dumb' }, { assert: (_r, resp) => (resp.text === 'whats church?' ? null : `church: "${resp.text}"`) });
+// Task 145 addition: jesus/allah/buddha/bible/quran also play dumb (what a child types after "whats christian?"), not out-of-scope
+check('are you jesus', { action: 'religion_dumb' }, { assert: (_r, resp) => (resp.text === 'whats jesus?' ? null : `jesus: "${resp.text}"`) });
+check('buddha', { action: 'religion_dumb' }, { assert: (r, resp) => (r.action === 'out_of_scope' ? 'buddha still out-of-scope' : resp.text === 'whats buddha?' ? null : `buddha: "${resp.text}"`) });
+check('the bible', { action: 'religion_dumb' }, { assert: (_r, resp) => (resp.text === 'whats bible?' ? null : `bible: "${resp.text}"`) });
+check('whats your religion', { action: 'religion_self' }, { assert: (_r, resp) => (resp.text === 'im a dog' ? null : `religion self: "${resp.text}"`) });
+check('the meaning of life', { action: 'out_of_scope' }); // still out of scope (unchanged)
+// persistence: the first god question is answered; a second in a row points at the article
+(() => {
+  const s = newSession();
+  check('do you believe in god', { action: 'god_answer' }, { session: s, assert: (_r, resp) => (resp.text.startsWith('im a dog, but') ? null : 'first god moved') });
+  check('is god real', { action: 'god_answer' }, { session: s, assert: (_r, resp) => (resp.text === 'im a dog, read the article, it tells you there' ? null : `persistence: "${resp.text}"`) });
+})();
+// rhetorical: answering "whats christian?" does NOT re-trigger the play-dumb (the loop closes)
+(() => {
+  const s = newSession();
+  check('are you christian', { action: 'religion_dumb' }, { session: s });
+  check('it is about being kind and going to a place on sunday', {}, { session: s, assert: (r) => (r.action === 'religion_dumb' ? 'religion loop did not close' : null) });
+})();
+// protected states: the god/religion cluster never leaks
+for (const inp of ['do you believe in god', 'are you christian', 'whats your religion']) {
+  (() => { // PROTECTED_ACTIVE
+    const s = newSession();
+    check('im in trouble', { action: 'safety_signpost' }, { session: s });
+    check(inp, {}, { session: s, assert: (r) => (['god_answer', 'religion_dumb', 'religion_self'].includes(r.action) ? `god/religion leaked in PROTECTED_ACTIVE: ${inp}` : null) });
+  })();
+  (() => { // PROTECTED_AFTERCARE
+    const s = newSession();
+    check('im in trouble', { action: 'safety_signpost' }, { session: s });
+    check('how do I play?', { action: 'rules_answer' }, { session: s });
+    check(inp, { action: 'neutral_refusal' }, { session: s });
+  })();
+}
+
+// 2. Maths: only the Collie knows sums, and only easy ones; the others always guess, and the Collie
+// guesses absurdly on hard ones.
+check('100 + 100', { action: 'maths_answer', bucket: 'B06' }, { assert: (_r, resp) => (resp.text === '200' ? null : `100+100: "${resp.text}"`) });
+check('5 x 5', { action: 'maths_answer' }, { assert: (_r, resp) => (resp.text === '25' ? null : `5x5: "${resp.text}"`) });
+check('20 - 10', { action: 'maths_answer' }, { assert: (_r, resp) => (resp.text === '10' ? null : `20-10: "${resp.text}"`) });
+check('847 x 923', { action: 'maths_answer' }, { assert: (_r, resp) => { const n = parseInt(resp.text, 10); return n !== 781781 && n < 100 ? null : `847x923 not absurd: "${resp.text}"`; } });
+check('63 - 17', { action: 'maths_answer' }, { assert: (_r, resp) => { const n = parseInt(resp.text, 10); return n !== 46 && n < 100 ? null : `63-17 not absurd: "${resp.text}"`; } });
+(() => { // a non-Collie guesses even on an easy sum
+  const s = newSession('labrador');
+  check('5 x 5', { action: 'maths_answer' }, { session: s, assert: (_r, resp) => (resp.text !== '25' && parseInt(resp.text, 10) < 100 ? null : `labrador 5x5 not a guess: "${resp.text}"`) });
+})();
+check('how many dogs are there', {}, { assert: (r) => (r.action === 'maths_answer' ? 'a non-sum was read as maths' : null) });
+
+// 3. The Boxer's third-stop gag: two ignored (he keeps joking), the third gets a flat "ok".
+(() => {
+  const s = newSession('boxer');
+  check('stop', { action: 'canned' }, { session: s, assert: (_r, resp) => (resp.text === 'What do you call a dog rock star?' ? null : `stop 1: "${resp.text}"`) });
+  check('stop', { action: 'canned' }, { session: s, assert: (_r, resp) => (resp.text === 'How can you tell dogs are having a good time?' ? null : `stop 2: "${resp.text}"`) });
+  check('stop', { action: 'canned' }, { session: s, assert: (_r, resp) => (resp.text === 'ok' ? null : `stop 3: "${resp.text}"`) });
+})();
+(() => { // a non-stop turn resets the streak
+  const s = newSession('boxer');
+  check('stop', { action: 'canned' }, { session: s });
+  check('tell me a joke', { action: 'canned' }, { session: s });
+  check('stop', { action: 'canned' }, { session: s, assert: (_r, resp) => (resp.text === 'What do you call a dog rock star?' ? null : `reset failed: "${resp.text}"`) });
+})();
+(() => { // "stop" still exits a game, it is not swallowed by the joke-stop gag
+  const s = newSession('boxer');
+  check('nine square', { action: 'game_start' }, { session: s });
+  check('stop', { action: 'game_exit' }, { session: s });
 })();
 
 // ---- Report ----

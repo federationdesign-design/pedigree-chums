@@ -178,6 +178,10 @@ export type ActionType =
   | 'name_deflect' // Task 142: an attempt to name HER (are you Dave / hello Dave / can I name you) -> she deflects without accepting or storing a name.
   | 'dog_lifespan' // Task 142: "how long do dogs live" (generic) -> a real general lifespan answer + the breed explorer link. ("how long do they live" stays B48.)
   | 'death_answer' // Task 142: the death cluster (can you die / are you dead / can i kill you) -> the in-character "I cannot die" line; persistence escalates to safeguarding.
+  | 'god_answer' // Task 145: the god cluster (belief / which-god / generic) -> a real answer + the Anubis essay link. responseId selects GOD-BELIEF / GOD-WHICH / GOD-READ.
+  | 'religion_dumb' // Task 145: a named religion (christian/hindu/...) -> she plays dumb, "whats <religion>?" (the matched word rides on `mirror`). Rhetorical, no state.
+  | 'religion_self' // Task 145: "whats your religion" -> "im a dog".
+  | 'maths_answer' // Task 145: an arithmetic expression -> the Collie answers easy sums correctly and hard ones absurdly wrong; the other three always guess absurdly. Computed in the assembler from the input and active dog.
   | 'dog_fact' // Task 134: B57. A dog fact chosen AT RANDOM, not by rotation, and not repeated until the session has used all twenty.
   | 'price_answer' // Task 49: a price question -> FAQ008's text in chat; NOT a MEANINGFUL_TOPIC, so the safety machine holds/refuses it like buying
   | 'transfer_request' // visitor asks to switch to a different dog

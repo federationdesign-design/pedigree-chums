@@ -34,6 +34,8 @@ export interface Session {
   deathAskStreak: number; // Task 142: consecutive death-cluster questions. The first is answered; a second (persistence) escalates to safeguarding. Any other turn resets it.
   terrierSitStep: number; // Task 145: the Terrier's sit-gag step (0 none, 1 he has asked "why?", 2 he has asked the magic word). Same shape as deathAskStreak: "sit" starts it, the next input advances it, anything else resets it.
   boxerKnockStep: number; // Task 145: the Boxer's visitor-initiated knock-knock step (0 none, 1 he has asked "whos there?"). The next input, whatever it is, gets the punchline. Same shape.
+  boxerStopStreak: number; // Task 145: consecutive "stop"s to the Boxer while he is telling jokes. The first two are ignored (he keeps joking); the third gets a flat "ok" and resets. Same shape as deathAskStreak.
+  godAskStreak: number; // Task 145: consecutive god questions. The first is answered (belief / which-god + Anubis link); persistence points at the article. Any other turn resets it. Same shape as deathAskStreak.
   anatomyRedirectUsed: boolean; // ANATOMY_GENERAL_REDIRECT fires at most once per session
   protectedState: ProtectedState; // S12 protected-state machine (Task 15)
   personalSadnessCount: number; // Task 20: qualifying personal-sadness statements this session (L1 at 1, L2 at 2)
@@ -96,6 +98,8 @@ export function newSession(activeDog: Dog = 'collie'): Session {
     deathAskStreak: 0,
     terrierSitStep: 0,
     boxerKnockStep: 0,
+    boxerStopStreak: 0,
+    godAskStreak: 0,
     anatomyRedirectUsed: false,
     protectedState: null,
     personalSadnessCount: 0,

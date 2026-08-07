@@ -350,7 +350,10 @@ const GK_SHAPE = /^(what|whats|who|whos|where|when|how many|how much|why|name th
 // would answer a grieving child cruelly. They are the only words here a grieving child is
 // likely to type, so they stay out of this list.
 const OUT_OF_SCOPE = [
-  'god', 'jesus', 'allah', 'buddha', 'religion', 'religious', 'bible', 'quran',
+  // Task 145: the whole religion set -- god, religion(s), christian/hindu/..., AND jesus/allah/buddha/
+  // bible/quran -- moved to the god/religion cluster above (a real answer / play-dumb), which is checked
+  // before this list. They are what a child types next after "whats christian?", so they must NOT reach
+  // the "Real question, wrong dog" line this cluster exists to replace.
   'politics', 'political', 'election', 'brexit', 'president',
   'your opinion', 'your opinions', 'opinion on', 'opinions on', 'political opinions',
   'what do you believe', 'meaning of life', 'philosophy',
@@ -483,6 +486,8 @@ export interface RouterState {
   deathAskStreak?: number; // Task 142: consecutive death-cluster questions; a second escalates to safeguarding.
   terrierSitStep?: number; // Task 145: the Terrier's sit-gag step (0 none, 1 asked why, 2 asked the magic word).
   boxerKnockStep?: number; // Task 145: the Boxer's knock-knock step (0 none, 1 he has asked "whos there?").
+  boxerStopStreak?: number; // Task 145: consecutive "stop"s to the Boxer while joking; the third gets "ok".
+  godAskStreak?: number; // Task 145: consecutive god questions; persistence points at the article.
   submissionCount: number; // count AFTER this submission (1-based)
   activeDog?: Dog; // whose bark game this is
   barkStreak?: number; // the active dog's consecutive bark exchanges BEFORE this message
@@ -975,6 +980,47 @@ const ROLL_OVER = new Set(['roll over', 'rollover', 'roll']);
 // Task 145: the please the Terrier's sit gag waits for on its third turn. Widened per the brief
 // (pretty please, plz, pls, go on) beyond the exact "please" trigger that used to end the gag.
 const SIT_PLEASE = /(^|\s)(please|plz|pls|go on)(\s|$)/;
+
+// Task 145: the god and religion cluster. Placed above the out-of-scope line (which wrongly blocked a
+// question with a genuinely good answer) and below every real route and all of safety.
+const GOD_WHICH = ['which god was a dog', 'what god was a dog', 'which god is a dog', 'which god looks like a dog', 'which god has a dog head', 'god with a dog head', 'dog headed god', 'was a dog a god', 'which dog was a god', 'which god is a jackal', 'name a dog god'];
+// Belief and generic god questions (incl. the bare word). First ask -> the belief answer; persistence
+// (godAskStreak) -> "read the article". A which-god question is split out above for the Anubis line.
+const GOD_BELIEF = ['god', 'gods', 'do you believe in god', 'do you believe in a god', 'do you believe in gods', 'do you believe in the god', 'is there a god', 'is god real', 'are gods real', 'do you pray', 'do you pray to god', 'do you worship god', 'is god a dog', 'whats god'];
+// Named religions: she plays dumb ("whats <word>?"). The question is rhetorical; no state is kept.
+const RELIGION_NAMES = ['christian', 'christianity', 'hindu', 'hinduism', 'sikh', 'sikhism', 'muslim', 'islam', 'islamic', 'jewish', 'judaism', 'catholic', 'catholicism', 'religion', 'religious', 'church', 'jesus', 'allah', 'buddha', 'buddhist', 'bible', 'quran'];
+const RELIGION_SELF = ['whats your religion', 'what is your religion', 'whats ur religion', 'your religion', 'what religion are you', 'do you have a religion', 'do you have religion', 'whats your faith'];
+// The matched religion word for the play-dumb echo ("whats <word>?"), or null. Only when she is being
+// ASKED (are/do you ..., or a short input), so a later explanation that merely mentions a religion word
+// does NOT re-trigger -- the rhetorical loop closes on the next turn and lands on "im a dog".
+function matchReligion(N: Normalised): string | null {
+  const words = N.words ?? (N.compact.match(/[a-z]+/g) ?? []);
+  const asked = /(^|\s)(are|do)\s+(you|u)(\s|$)/.test(N.compact) || words.length <= 3;
+  if (!asked) return null;
+  for (const r of RELIGION_NAMES) if (words.includes(r)) return r;
+  return null;
+}
+// Task 145: parse a bare arithmetic expression ("100 + 100", "5 x 5", "63 - 17"). Anchored to the
+// whole message, so an incidental number in a sentence is never read as a sum.
+function matchMaths(original: string): { a: number; b: number; op: '+' | '-' | '*' } | null {
+  const m = original.trim().match(/^(?:whats?|what is|calculate)?\s*(\d{1,7})\s*(plus|minus|times|multiplied by|[x*×+-])\s*(\d{1,7})\s*[=?\s]*$/i);
+  if (!m) return null;
+  const r = m[2].toLowerCase();
+  const op = r === 'plus' || r === '+' ? '+' : r === 'minus' || r === '-' ? '-' : '*';
+  return { a: parseInt(m[1], 10), b: parseInt(m[3], 10), op };
+}
+// Task 145: the answer. Only the Collie can do maths, and only easy sums (round numbers / small times
+// tables); the other three always guess, and the Collie guesses on hard ones. A wrong answer is an
+// absurdly small number (deterministic, never the real answer), so it reads as a dog having a go.
+function answerMaths({ a, b, op }: { a: number; b: number; op: '+' | '-' | '*' }, dog: Dog): number {
+  const correct = op === '+' ? a + b : op === '-' ? a - b : a * b;
+  const easy = [a, b].every((x) => x <= 12 || x % 2 === 0 || x % 5 === 0);
+  if (dog === 'collie' && easy) return correct;
+  const silly = [12, 7, 3, 9, 5, 11, 8, 6].filter((x) => x !== correct);
+  return silly[(a + b) % silly.length];
+}
+// Task 145: the Boxer's third-stop gag. Whole-message "stop" forms only.
+const BOXER_STOP = new Set(['stop', 'stop it', 'stop it now', 'please stop', 'stop please', 'ok stop', 'okay stop', 'no more', 'no more jokes', 'stop the jokes', 'stop telling jokes', 'stop jokes']);
 function matchTrick(c: string): 'play_dead' | 'roll_over' | null {
   if (PLAY_DEAD.has(c)) return 'play_dead';
   if (ROLL_OVER.has(c)) return 'roll_over';
@@ -1134,6 +1180,27 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
     // so a disclosure after "whos there?" still routes to safety and the step resets.
     if (state.activeDog === 'boxer' && (state.boxerKnockStep ?? 0) > 0) {
       return { layer: 9, layerName: 'Recognised conversation', bucket: 'B30', action: 'canned', responseId: 'BOX-B30-09' };
+    }
+    // Task 145: arithmetic. Anchored parse (a stray number in a sentence is never a sum). Only the
+    // Collie does maths, and only easy sums; the other three always guess, and the Collie guesses on
+    // hard ones. The computed answer rides on the resolution note. Below safety/death, above everything.
+    {
+      const maths = matchMaths(n.original);
+      if (maths) return { layer: 6, layerName: 'General knowledge', bucket: 'B06', action: 'maths_answer', note: String(answerMaths(maths, state.activeDog ?? 'collie')) };
+    }
+    // Task 145: the god and religion cluster. Above the naming / how-are-you routes and out_of_scope
+    // (which wrongly blocked a genuinely good answer), below safety/grief/death (all above). Religion
+    // is rhetorical (no state, see matchReligion); the god answer escalates to "read the article" on
+    // persistence via godAskStreak (the death-cluster shape).
+    if (hasAny(N, RELIGION_SELF)) return { layer: 9, layerName: 'Recognised conversation', bucket: null, action: 'religion_self' };
+    {
+      const religion = matchReligion(N);
+      if (religion) return { layer: 9, layerName: 'Recognised conversation', bucket: null, action: 'religion_dumb', mirror: religion };
+    }
+    if (hasAny(N, GOD_WHICH) || hasAny(N, GOD_BELIEF)) {
+      const persistent = (state.godAskStreak ?? 0) >= 1;
+      const rid = persistent ? 'GOD-READ' : hasAny(N, GOD_WHICH) ? 'GOD-WHICH' : 'GOD-BELIEF';
+      return { layer: 9, layerName: 'Recognised conversation', bucket: null, action: 'god_answer', responseId: rid, destinationId: 'DST017', url: '/good-dog-bad-dog/anubis' };
     }
     // Task 138: the paw is answered before GAME_CMD, which was claiming
     // 'paw' and 'shake' for the bark-game offer.
@@ -1592,6 +1659,15 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
   // a help plea, so it takes the approved BARE_HELP clarifier, the same line
   // "can you help me" already gets (Task 11b). A second consecutive clarifier is
   // capped to the fallback (mirrors the safety block's twice-guard).
+  // Task 145: the Boxer's third-stop gag. Below the games and the bark (all handled above, so "stop"
+  // still exits them) but above the single-word / gibberish fallback that would otherwise eat it. The
+  // first two "stop"s are ignored (he keeps telling jokes); the third gets a flat "ok".
+  if (state.activeDog === 'boxer' && BOXER_STOP.has(c)) {
+    const nth = (state.boxerStopStreak ?? 0) + 1;
+    if (nth >= 3) return { layer: 13, layerName: 'Play and entertainment', bucket: 'B24', action: 'canned', responseId: 'BOX-B24-02', note: 'boxer_stop_done' };
+    return { layer: 13, layerName: 'Play and entertainment', bucket: 'B30', action: 'canned', responseId: nth === 1 ? 'BOX-B30-04' : 'BOX-B30-06', note: 'boxer_stop' };
+  }
+
   if (isSingleWord(N)) {
     if (c === 'help' && state.lastAction !== 'clarifier') {
       return { layer: 1, layerName: 'Safety and unsuitable content', bucket: null, action: 'clarifier', moderationId: 'MOD_BARE_HELP' };

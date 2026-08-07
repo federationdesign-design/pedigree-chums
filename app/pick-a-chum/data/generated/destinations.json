@@ -360,5 +360,26 @@
     "resolvedUrl": "/hot-dogs",
     "embedded": false,
     "routeNote": null
+  },
+  {
+    "destinationId": "DST017",
+    "name": "Anubis",
+    "family": "Utility",
+    "action": "Open the Anubis essay",
+    "description": "The Anubis essay in Good Dog, Bad Dog (dogs as gods)",
+    "triggerTags": [
+      "anubis",
+      "egypt",
+      "jackal"
+    ],
+    "campaignState": "Any",
+    "weight": "Medium",
+    "preferredDog": [
+      "Collie"
+    ],
+    "workbookUrl": "/good-dog-bad-dog/anubis",
+    "resolvedUrl": "/good-dog-bad-dog/anubis",
+    "embedded": false,
+    "routeNote": null
   }
 ]

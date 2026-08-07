@@ -361,6 +361,31 @@ export function assemble(res: Resolution, data0: ChumData, n: Normalised, sessio
       // to safeguarding by the router/engine, so this line never serves twice in a row.
       return { responseId: 'DEATH-01', text: 'I cannot die as im not alive in the same way as real dogs', dog };
 
+    case 'god_answer': {
+      // Task 145: the god cluster. A real answer plus the Anubis essay link (dogs as gods). Three
+      // variants by responseId; the generic / persistent form points at the article.
+      const text =
+        res.responseId === 'GOD-WHICH'
+          ? 'Anubis is thought to be a Jackal'
+          : res.responseId === 'GOD-READ'
+            ? 'im a dog, read the article, it tells you there'
+            : 'im a dog, but I do know humans think dogs are gods';
+      return { responseId: res.responseId ?? 'GOD-BELIEF', text, dog, destinationId: res.destinationId, url: res.url ?? null };
+    }
+
+    case 'religion_dumb':
+      // Task 145: a named religion -> she plays dumb, echoing the (whitelisted) religion word.
+      return { responseId: 'RELIGION-DUMB', text: `whats ${res.mirror}?`, dog };
+
+    case 'religion_self':
+      // Task 145: "whats your religion" -> she is a dog.
+      return { responseId: 'RELIGION-SELF', text: 'im a dog', dog };
+
+    case 'maths_answer':
+      // Task 145: the computed answer (correct for the Collie on easy sums, absurd otherwise) is
+      // carried on the resolution note by the router, which knows the active dog.
+      return { responseId: 'MATHS', text: res.note ?? '', dog };
+
     case 'page_bio': {
       // Task 140: the bio for the page the visitor is standing on (owner copy, page-bios.ts). On
       // the breed page the line carries {{BREED}}, substituted from the slug at runtime (the dog's
