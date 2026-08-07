@@ -2,7 +2,7 @@
 
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { hierarchy, pack, packSiblings, packEnclose, type HierarchyCircularNode } from "d3-hierarchy";
-import { radius as pctRadius } from "../PackPit/LineageMap";
+import { radius as pctRadius, ringFrac } from "../PackPit/LineageMap";
 import { createPitEffects } from "../PackPit/pitEffects";
 import { interpolateZoom } from "d3-interpolate";
 import type { LineageNode } from "../../data/lineage";
@@ -2687,8 +2687,12 @@ export default function BreedTree({
     // circle does not read thin beside a percentage chip of similar size, which
     // wears 0.19 of its own radius, and depth 1 is where the two sit as a pair.
     // Below that the pair no longer applies and the taper is free to be real.
-    const fracPit = [0.09, 0.19, 0.13, 0.1, 0.085];
-    let base = (dockAside ? fracPit[d.depth - 1] ?? 0.145 : frac[d.depth - 1] ?? 0.043);
+    // MOVED. This table now lives in LineageMap as RING_FRAC and is read through
+    // ringFrac, so the pit and the layer a dog is lifted onto cannot disagree.
+    // The numbers are unchanged and the reasoning above still stands. It went
+    // there rather than the other way because BreedTree already imports from
+    // that file and the reverse would be a circular import.
+    let base = (dockAside ? ringFrac(d.depth) : frac[d.depth - 1] ?? 0.043);
     // The ring still grows and shrinks with the circle, which is the part that
     // works. This only shaves the top of the slider, where the circles are so
     // large that the same fraction reads as a much heavier line.

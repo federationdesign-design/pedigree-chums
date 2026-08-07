@@ -85,23 +85,28 @@
 .disc {
   fill: var(--yellow);
   stroke: var(--navy);
-  stroke-width: 3;
+  /* --ring is set inline in the PIT LIFT only, as a fraction of this circle's
+     own radius, which is the rule the pit itself uses. The fallbacks below are
+     the flat numbers the main pit and the chum tree were signed off on and keep.
+     It rides in a variable rather than an inline stroke-width so the hover rules
+     can still thicken it. */
+  stroke-width: var(--ring, 3px);
   transition: r 0.18s ease;
 }
 .disc.has {
   stroke-dasharray: 5 5;
 }
 .node:hover .disc {
-  stroke-width: 5;
+  stroke-width: calc(var(--ring, 3px) * 1.67);
 }
 /* Mini pit only. 3 was out of language beside a pit whose UI squares wear a 5px
    navy rim and whose circles are heavier still, so the nodes read as thin. The
    main pit keeps the original. */
 .discPit {
-  stroke-width: 5;
+  stroke-width: var(--ring, 5px);
 }
 .node:hover .discPit {
-  stroke-width: 7;
+  stroke-width: calc(var(--ring, 5px) * 1.4);
 }
 .pct {
   font-family: var(--font-body), system-ui, sans-serif;

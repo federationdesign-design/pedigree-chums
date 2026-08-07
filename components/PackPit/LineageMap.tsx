@@ -168,6 +168,35 @@ const PIT_NODE_SCALE = 0.78;
 export function radius(share: number) {
   return Math.max(21, 5 * Math.sqrt(share));
 }
+
+/* ONE RING RULE, FOR THE PIT AND FOR THE LAYER A DOG IS LIFTED ONTO.
+
+   There were two, and they disagreed. In the pit a ring has always been a
+   FRACTION of its own circle's radius, so it scales with the difficulty slider,
+   the zoom and everything else. On this layer every ring was a flat pixel
+   count: 5 for a child, 11 for the big card, neither reading the radius.
+
+   Audited on a 390px phone. At difficulty 5 a small circle's ring went from 9%
+   of its radius in the pit to 20% once lifted, more than doubling. A depth-2
+   child went the other way, from 19% to 17% while its radius nearly halved, so
+   the ring came out at 0.48x. Same tap, opposite results, and the 31% viewport
+   cap made the big card's case worse by shrinking the circle while the 11px
+   stayed put.
+
+   The table below is the pit's own, moved here because BreedTree already
+   imports from this file and the reverse would be a circular import. Depth is
+   the PIT's depth: this layer's root is the pit's depth-1 dog, so a node here
+   is one deeper than it looks.
+
+   ONE DELIBERATE DIFFERENCE. The pit tapers this table by up to a tenth above
+   difficulty 5, because at that size the stroke is what reads as heavy. That
+   taper is not applied here: it would mean threading the difficulty through as
+   a prop for a change of at most 10%, only at the top of the slider. If it ever
+   matters, that is the one thing to add. */
+export const RING_FRAC = [0.09, 0.19, 0.13, 0.1, 0.085];
+export function ringFrac(pitDepth: number): number {
+  return RING_FRAC[pitDepth - 1] ?? 0.145;
+}
 function lean(a: number) {
   let x = a;
   while (x > Math.PI) x -= Math.PI * 2;
@@ -250,10 +279,15 @@ export default function LineageMap({
      1326 cases. It stays as a guard against a very narrow viewport, where 31%
      of 320px would otherwise give 44px and keep falling. */
   const LIFT_MAX_SHARE = 0.31;
-  const liftRingW = circular && ringColor ? 11 : 5;
+  /* The ring is a share of the radius now, so it cannot be subtracted before the
+     radius is known. Solved the other way instead: the object is 2R wide plus
+     one ring, and the ring is R * frac, so the whole thing is R * (2 + frac).
+     Divide the budget by that and the total still lands on 31% exactly. */
+  const liftRingFrac = ringFrac(1);
   const liftR = circular && rootRadius
-    ? Math.max(40, Math.min(rootRadius, (vp.w * LIFT_MAX_SHARE - liftRingW) / 2))
+    ? Math.max(40, Math.min(rootRadius, (vp.w * LIFT_MAX_SHARE) / (2 + liftRingFrac)))
     : ROOT;
+  const liftRingW = circular && ringColor ? liftR * liftRingFrac : 5;
   const [rootGone, setRootGone] = useState(false);
   const confettiRef = useRef<((opts: Record<string, unknown>) => void) | null>(null);
   useEffect(() => {
@@ -1725,7 +1759,22 @@ export default function LineageMap({
                       }
                     }}
                   >
-                    <circle className={`${styles.disc} ${circular ? styles.discPit : ""} ${hasKids && !isOpen ? styles.has : ""} ${idleHint && !seen.has(n._id) && (n._parent as Node)?._id === "0" ? styles.hint : ""}`.trim()} r={r} style={(n.img && (placedImgs.has(n.img as string) || packed)) ? { fill: "#22c55e" } : seen.has(n._id) ? { fill: "#0c5b92" } : undefined} />
+                    {(() => {
+                      /* --ring carries the computed width into the stylesheet so
+                         the hover rule can still thicken it. An inline
+                         stroke-width would win outright and kill the hover.
+                         Only set in the pit lift: the main pit and the chum
+                         tree keep the flat CSS numbers they were signed off on,
+                         because neither was asked for. */
+                      let pd = 1; // this layer's root IS the pit's depth 1
+                      for (let a = n._parent as Node | null; a; a = a._parent as Node | null) pd += 1;
+                      const fill = (n.img && (placedImgs.has(n.img as string) || packed)) ? "#22c55e" : seen.has(n._id) ? "#0c5b92" : undefined;
+                      const st: React.CSSProperties = {
+                        ...(fill ? { fill } : null),
+                        ...(circular ? { ["--ring" as string]: `${(r * ringFrac(pd)).toFixed(2)}px` } : null),
+                      };
+                      return <circle className={`${styles.disc} ${circular ? styles.discPit : ""} ${hasKids && !isOpen ? styles.has : ""} ${idleHint && !seen.has(n._id) && (n._parent as Node)?._id === "0" ? styles.hint : ""}`.trim()} r={r} style={Object.keys(st).length ? st : undefined} />;
+                    })()}
                     <text className={styles.pct} textAnchor="middle" dominantBaseline="central"
                       fontSize={INSTR_NAMES.has(breed.name) ? Math.max(13, r * 0.75) : Math.max(13, r * (circular ? 0.625 : 0.5))}
                       style={(n.img && (placedImgs.has(n.img as string) || packed)) || seen.has(n._id) ? {fill:"#ffffff",...(INSTR_NAMES.has(breed.name)?{fontFamily:'"Luckiest Guy",system-ui,sans-serif',fontWeight:400}:{})} : INSTR_NAMES.has(breed.name)?{fontFamily:'"Luckiest Guy",system-ui,sans-serif',fontWeight:400}:undefined}>
