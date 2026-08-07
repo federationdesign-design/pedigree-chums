@@ -2705,12 +2705,14 @@ export default function BreedTree({
   }
 
   // A zoom multiplies every world unit by k, rings included, so flying into a
-  // circle used to thicken its ring on screen in step with the circle. In the
-  // mini pit the ring is now drawn at the k of the FULL-PIT view instead, so it
-  // is the same number of pixels zoomed in as it is zoomed out. The chum page
-  // is deliberately left on the old behaviour: it was not what was asked for.
+  // circle scales its ring on screen in step with the circle: the ring stays the
+  // same FRACTION of its own radius at every zoom. The mini pit once pinned its
+  // rings to the k of the FULL-PIT view instead, holding them at a constant pixel
+  // width across zoom. That was asked for at the time, but it is now reversed by
+  // decision: a deep zoom made the ring read thin against its circle. The mini
+  // pit now scales like the chum page and everything else.
   function strokeK(v: View): number {
-    return dockAside ? SIZE / Math.max(homeWRef.current, 1) : SIZE / v[2];
+    return SIZE / v[2];
   }
 
   // Rings on NESTED circles are drawn inside their own radius rather than
