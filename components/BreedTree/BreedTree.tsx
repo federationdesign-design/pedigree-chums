@@ -6175,12 +6175,14 @@ export default function BreedTree({
                   const gh = S * 0.34, gw = S * 0.30;
                   return (
                     <g transform={`translate(${cx},${cy}) scale(${hv}) translate(${-cx},${-cy})`}>
-                      {/* Green for go, yellow for learn, both on a white rim so
-                          they read as a pair. The pit's own corner set keeps its
-                          yellow and navy; this pair exists only here. */}
+                      {/* Green for go with a white rim, yellow for learn with a
+                          navy one. The learn square now matches the pit's own
+                          corner set, which is yellow on navy, so the brain reads
+                          the same here as it does inside the pit. PLAY keeps
+                          white: on green a navy rim goes muddy. */}
                       <rect x={w.x} y={cy - S / 2} width={S} height={S} rx={S * 0.3}
                         fill={isPlay ? "#22c55e" : "var(--yellow, #ffd23e)"}
-                        stroke="#ffffff" strokeWidth={rim} />
+                        stroke={isPlay ? "#ffffff" : "var(--navy, #0a3a57)"} strokeWidth={rim} />
                       {isPlay ? (
                         <path
                           d={`M${cx - gw * 0.3},${cy - gh / 2} L${cx + gw * 0.7},${cy} L${cx - gw * 0.3},${cy + gh / 2} Z`}
