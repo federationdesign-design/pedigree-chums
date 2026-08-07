@@ -124,17 +124,40 @@ const CARD_TILT = (2 * Math.PI) / 180;
    Across all 63 distinct solo names at 67px: worst 8.3px, median 11.8px. */
 const SOLO_CHAR_W = 0.62;  // fallback glyph width in ems, same figure BreedTree uses
 const SOLO_LINE_H = 0.95;
-function soloWordFit(name: string, R: number): { lines: string[]; fs: number } {
+/* THE WORD IS NOT IN THE CARD. THE WORD IS THE CARD.
+
+   First attempt fitted the name inside the round card, which meant a 67px
+   circle on a phone and 8 to 12px type. Steve's Photoshop comparison settled it
+   in one message: no small circle at all, and the text as tall as that circle
+   was, free to run as wide as it needs.
+
+   Measured off his mockup against the current screen:
+     the small card ring was     198 x 204px
+     his text block is           304 x 226px
+   So the block is 111% of the card's HEIGHT and 154% of its width. Height is
+   therefore the rule and width is whatever falls out, which is what he said.
+
+   Height is the whole budget, so the type is simply the budget divided by the
+   line count. One word per line, so a six word name gets half the type a three
+   word one does. That is the cost of breaking per word and it is his call. */
+const SOLO_TILT_DEG = 15;   // leans DOWN to the right, the opposite way to the circle labels
+function soloWordFit(name: string, H: number): { lines: string[]; fs: number } {
+  const lines = name.split(/\s+/).filter(Boolean);
+  return { lines, fs: H / (lines.length * SOLO_LINE_H) };
+}
+/* Fitted INSIDE a circle of radius R instead, for the copy that lands in a
+   frame. A frame is a small round hole in a five-across grid, so the placed
+   copy has to behave itself even though the loose one does not. */
+function soloWordFitIn(name: string, R: number): { lines: string[]; fs: number } {
   const lines = name.split(/\s+/).filter(Boolean);
   const w = lines.map((l) => l.length * SOLO_CHAR_W);
-  // Largest size at which every line's box corners stay inside the card.
   let lo = 2, hi = 60;
   for (let i = 0; i < 36; i++) {
     const fs = (lo + hi) / 2;
-    const H = (lines.length * SOLO_LINE_H * fs) / 2;
+    const HH = (lines.length * SOLO_LINE_H * fs) / 2;
     let ok = true;
     for (let j = 0; j < lines.length; j++) {
-      const top = -H + j * SOLO_LINE_H * fs, bot = top + SOLO_LINE_H * fs;
+      const top = -HH + j * SOLO_LINE_H * fs, bot = top + SOLO_LINE_H * fs;
       if (Math.hypot((w[j] * fs) / 2, Math.max(Math.abs(top), Math.abs(bot))) > R) { ok = false; break; }
     }
     if (ok) lo = fs; else hi = fs;
@@ -1948,11 +1971,12 @@ export default function LineageMap({
                 >
                   <g className={styles.pickWobble}>
                   {soloWord ? (() => {
-                    // Inside the ring, which is 5px and drawn centred on the rim.
-                    const f = soloWordFit(c.name, CW / 2 - 5);
+                    // The block is as tall as the card was, and as wide as it likes.
+                    const f = soloWordFit(c.name, CW);
                     const y0 = -((f.lines.length - 1) * SOLO_LINE_H * f.fs) / 2;
                     return (
                       <text x={c.cardX} y={c.cardY} textAnchor="middle" dominantBaseline="central"
+                        transform={`rotate(${SOLO_TILT_DEG} ${c.cardX} ${c.cardY})`}
                         style={{
                           fill: "#ffffff",
                           stroke: "var(--navy, #0a3a57)",
@@ -1971,7 +1995,10 @@ export default function LineageMap({
                       </text>
                     );
                   })() : (() => { const p = INSTR_NAMES.has(breed.name) ? CW*0.20 : 0; return (<><clipPath id={clipId}><rect x={c.cardX-CW/2+p} y={c.cardY-CW/2+p} width={CW-p*2} height={CW-p*2} rx={circular ? (CW-p*2)/2 : 15} /></clipPath><image href={encodeURI(bust(c.img))} x={c.cardX-CW/2+p} y={c.cardY-CW/2+p} width={CW-p*2} height={CW-p*2} clipPath={`url(#${clipId})`} preserveAspectRatio={INSTR_NAMES.has(breed.name)?"xMidYMid meet":"xMidYMid slice"} /></>); })()}
-                  {!INSTR_NAMES.has(breed.name) && <rect x={c.cardX-CW/2} y={c.cardY-CW/2} width={CW} height={CW} rx={circular ? CW/2 : 15} vectorEffect="non-scaling-stroke" className={isDupImg(c.img) && !isTopOfStack(c) && !PACK_BREEDS.has(c.name) ? `${styles.pickCard} ${styles.pickCardStack}` : styles.pickCard}
+                  {/* No ring on a solo word. The word IS the object, exactly as
+                      it is in the pit, so a circle round it would be the small
+                      card coming back. */}
+                  {!INSTR_NAMES.has(breed.name) && !soloWord && <rect x={c.cardX-CW/2} y={c.cardY-CW/2} width={CW} height={CW} rx={circular ? CW/2 : 15} vectorEffect="non-scaling-stroke" className={isDupImg(c.img) && !isTopOfStack(c) && !PACK_BREEDS.has(c.name) ? `${styles.pickCard} ${styles.pickCardStack}` : styles.pickCard}
                     /* Mini pit: a circle that popped out of a dog wears that
                        dog's ring colour, so it is obvious where it came from.
                        The main pit keeps its own blue and white scheme. */
@@ -2251,7 +2278,7 @@ export default function LineageMap({
                 // Same fitter as the loose card, so the name does not resize as
                 // it lands. This copy is HTML because a placed card is drawn
                 // outside the svg, over the frames.
-                const f = soloWordFit(c.name, CW / 2 - 5);
+                const f = soloWordFitIn(c.name, CW / 2 - 5);
                 return (
                   <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", width: "100%", height: "100%", pointerEvents: "none", userSelect: "none" }}>
                     {f.lines.map((ln, li) => (
