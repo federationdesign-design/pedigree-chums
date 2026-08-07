@@ -103,6 +103,45 @@ const FLASH_SIZE = 15;
 // the popped breed cards lean only slightly, capped at this angle (2 degrees)
 const CARD_TILT = (2 * Math.PI) / 180;
 
+/* SOLO DOGS SHOW THEIR NAME, NOT THEIR PICTURE.
+
+   A dog with no ancestors of its own is handed a synthetic child by BreedTree:
+   itself, copied, purely so this layer has something to reveal. That meant the
+   card popping out of the big circle was the same photo in the same coloured
+   ring, only smaller, which said nothing. It is now the dog's NAME, drawn the
+   way the pit draws a word: Luckiest Guy in white over a navy halo.
+
+   This is not a rare case. Of the 221 circles that drop into the pit across all
+   96 levels, 108 are solo. Twenty-seven levels are entirely solo.
+
+   ONE WORD PER LINE, by owner ruling, and the measurement agrees. The circle
+   labels in BreedTree balance their words across up to four lines and keep
+   whichever allows the biggest type. Inside a CARD that loses, because a card is
+   a circle 67px across on a phone and a narrow line fits a circle better than a
+   wide one even when there are more of them. "Poodle and Barbet water dogs"
+   reads at 11.1px broken per word against 8.9px balanced.
+
+   Across all 63 distinct solo names at 67px: worst 8.3px, median 11.8px. */
+const SOLO_CHAR_W = 0.62;  // fallback glyph width in ems, same figure BreedTree uses
+const SOLO_LINE_H = 0.95;
+function soloWordFit(name: string, R: number): { lines: string[]; fs: number } {
+  const lines = name.split(/\s+/).filter(Boolean);
+  const w = lines.map((l) => l.length * SOLO_CHAR_W);
+  // Largest size at which every line's box corners stay inside the card.
+  let lo = 2, hi = 60;
+  for (let i = 0; i < 36; i++) {
+    const fs = (lo + hi) / 2;
+    const H = (lines.length * SOLO_LINE_H * fs) / 2;
+    let ok = true;
+    for (let j = 0; j < lines.length; j++) {
+      const top = -H + j * SOLO_LINE_H * fs, bot = top + SOLO_LINE_H * fs;
+      if (Math.hypot((w[j] * fs) / 2, Math.max(Math.abs(top), Math.abs(bot))) > R) { ok = false; break; }
+    }
+    if (ok) lo = fs; else hi = fs;
+  }
+  return { lines, fs: lo };
+}
+
 function sumLeaves(n: LineageNode): number {
   const c = n.children || [];
   return c.length ? c.reduce((s, x) => s + sumLeaves(x), 0) : n.value ?? 0;
@@ -1455,6 +1494,10 @@ export default function LineageMap({
   // Built ONCE. It is needed either in the main svg or in the lifted layer above
   // the cards, never both, and rootCard reads refs: calling it twice would add a
   // second read during render for no gain.
+  /* The card shows the dog's NAME rather than its picture. Only the solo case in
+     the pit lift: everywhere else the picture IS the puzzle, and replacing it
+     would remove the thing you are matching. See soloWordFit above for why. */
+  const soloWord = soloLeaf && circular;
   const treeRoot = soloLeaf ? null : rootCard(breed.x, breed.y - (liftRoot ? 75 : 0));
 
   return (
@@ -1904,7 +1947,30 @@ export default function LineageMap({
                   onPointerCancel={() => { cardDrag.current = null; setDragCat(null); setDragImg(null); setDragXY(null); }}
                 >
                   <g className={styles.pickWobble}>
-                  {(() => { const p = INSTR_NAMES.has(breed.name) ? CW*0.20 : 0; return (<><clipPath id={clipId}><rect x={c.cardX-CW/2+p} y={c.cardY-CW/2+p} width={CW-p*2} height={CW-p*2} rx={circular ? (CW-p*2)/2 : 15} /></clipPath><image href={encodeURI(bust(c.img))} x={c.cardX-CW/2+p} y={c.cardY-CW/2+p} width={CW-p*2} height={CW-p*2} clipPath={`url(#${clipId})`} preserveAspectRatio={INSTR_NAMES.has(breed.name)?"xMidYMid meet":"xMidYMid slice"} /></>); })()}
+                  {soloWord ? (() => {
+                    // Inside the ring, which is 5px and drawn centred on the rim.
+                    const f = soloWordFit(c.name, CW / 2 - 5);
+                    const y0 = -((f.lines.length - 1) * SOLO_LINE_H * f.fs) / 2;
+                    return (
+                      <text x={c.cardX} y={c.cardY} textAnchor="middle" dominantBaseline="central"
+                        style={{
+                          fill: "#ffffff",
+                          stroke: "var(--navy, #0a3a57)",
+                          // The pit's own expression, so the two read as the same object.
+                          strokeWidth: Math.max(2, f.fs * 0.16),
+                          paintOrder: "stroke",
+                          strokeLinejoin: "round",
+                          fontFamily: "var(--font-display), 'Luckiest Guy', system-ui, sans-serif",
+                          fontSize: `${f.fs}px`,
+                          pointerEvents: "none",
+                          userSelect: "none",
+                        }}>
+                        {f.lines.map((ln, li) => (
+                          <tspan key={li} x={c.cardX} y={c.cardY + y0 + li * SOLO_LINE_H * f.fs}>{ln}</tspan>
+                        ))}
+                      </text>
+                    );
+                  })() : (() => { const p = INSTR_NAMES.has(breed.name) ? CW*0.20 : 0; return (<><clipPath id={clipId}><rect x={c.cardX-CW/2+p} y={c.cardY-CW/2+p} width={CW-p*2} height={CW-p*2} rx={circular ? (CW-p*2)/2 : 15} /></clipPath><image href={encodeURI(bust(c.img))} x={c.cardX-CW/2+p} y={c.cardY-CW/2+p} width={CW-p*2} height={CW-p*2} clipPath={`url(#${clipId})`} preserveAspectRatio={INSTR_NAMES.has(breed.name)?"xMidYMid meet":"xMidYMid slice"} /></>); })()}
                   {!INSTR_NAMES.has(breed.name) && <rect x={c.cardX-CW/2} y={c.cardY-CW/2} width={CW} height={CW} rx={circular ? CW/2 : 15} vectorEffect="non-scaling-stroke" className={isDupImg(c.img) && !isTopOfStack(c) && !PACK_BREEDS.has(c.name) ? `${styles.pickCard} ${styles.pickCardStack}` : styles.pickCard}
                     /* Mini pit: a circle that popped out of a dog wears that
                        dog's ring colour, so it is obvious where it came from.
@@ -2181,13 +2247,34 @@ export default function LineageMap({
             onPointerCancel={(e) => { e.stopPropagation(); if (isMobile) endGridDrag(e); }}
           >
             <div style={{ width: "100%", height: "100%", borderRadius: circular ? "50%" : 13, overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center", background: INSTR_NAMES.has(breed.name) ? "rgba(10,58,87,0.08)" : "transparent" }}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={encodeURI(bust(c.img))}
-                alt={c.name}
-                draggable={false}
-                style={{ width: INSTR_NAMES.has(breed.name) ? "65%" : "100%", height: INSTR_NAMES.has(breed.name) ? "65%" : "100%", objectFit: INSTR_NAMES.has(breed.name) ? "contain" : "cover", display: "block" }}
-              />
+              {soloWord ? (() => {
+                // Same fitter as the loose card, so the name does not resize as
+                // it lands. This copy is HTML because a placed card is drawn
+                // outside the svg, over the frames.
+                const f = soloWordFit(c.name, CW / 2 - 5);
+                return (
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", width: "100%", height: "100%", pointerEvents: "none", userSelect: "none" }}>
+                    {f.lines.map((ln, li) => (
+                      <span key={li} style={{
+                        fontFamily: "var(--font-display), 'Luckiest Guy', system-ui, sans-serif",
+                        fontSize: f.fs, lineHeight: `${SOLO_LINE_H}`, color: "#ffffff",
+                        WebkitTextStroke: `${Math.max(2, f.fs * 0.16)}px var(--navy, #0a3a57)`,
+                        paintOrder: "stroke", whiteSpace: "nowrap",
+                      }}>{ln}</span>
+                    ))}
+                  </div>
+                );
+              })() : (
+                <>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={encodeURI(bust(c.img))}
+                    alt={c.name}
+                    draggable={false}
+                    style={{ width: INSTR_NAMES.has(breed.name) ? "65%" : "100%", height: INSTR_NAMES.has(breed.name) ? "65%" : "100%", objectFit: INSTR_NAMES.has(breed.name) ? "contain" : "cover", display: "block" }}
+                  />
+                </>
+              )}
             </div>
             {INSTR_NAMES.has(breed.name) && (
               <div style={{ position: "absolute", bottom: -20, left: 0, right: 0, textAlign: "center", fontFamily: "'Luckiest Guy', system-ui, sans-serif", fontSize: 10, color: "#ffffff", pointerEvents: "none", lineHeight: 1.2 }}>
