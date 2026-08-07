@@ -1282,6 +1282,91 @@ export default function BreedTree({
   const pulledEverRef = useRef(false);
   const lastTapRef = useRef(0);
 
+  /* ── KNOCKS ──────────────────────────────────────────────────────────────
+     A pulled circle shoves its neighbours. Each shoved circle springs back on
+     its own, so several can be moving at once and none waits for the others.
+     There is no physics engine on this screen, which is what `frozen` means, so
+     this is a spring per circle rather than a solver: displacement, a restoring
+     force toward home, and damping. */
+  // Tuned rather than guessed: at 0.16 and 0.76 a shoved circle overshot by 29%
+  // and rang for half a second, which reads as a bounce. These give a 3%
+  // overshoot settling in about 280ms, which is the slow knock you get between
+  // two heavy balls: it starts, thinks better of it, and comes back.
+  const KNOCK_K = 0.22;        // pull toward home
+  const KNOCK_DAMP = 0.55;     // how quickly it stops arguing with itself
+  const KNOCK_REST = 0.35;     // world units below which it is home
+  const KNOCK_POINTS = 5;      // a nudge is worth almost nothing, by design
+  type Knock = { els: number[]; chip: { i: number; bx: number; by: number } | null; ox: number; oy: number; vx: number; vy: number; hit: boolean };
+  const knocksRef = useRef<Map<number, Knock>>(new Map());
+  const knockRafRef = useRef<number | null>(null);
+
+  const paintOffset = (els: number[], chip: { i: number; bx: number; by: number } | null, ox: number, oy: number) => {
+    const cg = circlesRef.current;
+    const v = viewRef.current;
+    const k = SIZE / v[2];
+    if (cg) {
+      for (const j of els) {
+        const w = cg.children[j] as SVGGElement | undefined;
+        if (w) w.setAttribute("transform", ox === 0 && oy === 0 ? "" : `translate(${ox * k},${oy * k})`);
+      }
+    }
+    if (chip) {
+      const el = badgesRef.current?.children[chip.i] as SVGGElement | undefined;
+      if (el) el.setAttribute("transform", `translate(${(chip.bx - v[0] + ox) * k},${(chip.by - v[1] + oy) * k}) rotate(0)`);
+    }
+  };
+
+  /* A white number, rising and fading, the same treatment the pit gives a
+     collision. The pit's own numAt lives inside its physics loop and cannot be
+     reached from here, so this is the same effect written to stand alone. */
+  const knockNum = (x: number, y: number, val: number) => {
+    const fx = fxRef.current;
+    if (!fx) return;
+    const v = viewRef.current;
+    const k = SIZE / v[2];
+    const el = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    el.textContent = String(val);
+    el.setAttribute("text-anchor", "middle");
+    el.style.fontFamily = "var(--font-pct), system-ui, sans-serif";
+    el.style.fontSize = `${15 * Math.max(1, k)}px`;
+    el.style.fill = "#ffffff";
+    el.style.pointerEvents = "none";
+    fx.appendChild(el);
+    let t0 = -1;
+    const LIFE = 650;
+    const tick = (now: number) => {
+      if (t0 < 0) t0 = now;
+      const t = Math.min(1, (now - t0) / LIFE);
+      const vv = viewRef.current;
+      const kk = SIZE / vv[2];
+      el.setAttribute("x", String((x - vv[0]) * kk));
+      el.setAttribute("y", String((y - vv[1]) * kk - (22 + t * 34)));
+      el.style.opacity = String(1 - t);
+      if (t < 1) requestAnimationFrame(tick);
+      else el.remove();
+    };
+    requestAnimationFrame(tick);
+  };
+
+  const knockStep = () => {
+    const map = knocksRef.current;
+    let alive = false;
+    for (const [, kn] of map) {
+      kn.vx = (kn.vx - kn.ox * KNOCK_K) * KNOCK_DAMP;
+      kn.vy = (kn.vy - kn.oy * KNOCK_K) * KNOCK_DAMP;
+      kn.ox += kn.vx;
+      kn.oy += kn.vy;
+      if (Math.hypot(kn.ox, kn.oy) < KNOCK_REST && Math.hypot(kn.vx, kn.vy) < KNOCK_REST) {
+        kn.ox = 0; kn.oy = 0; kn.vx = 0; kn.vy = 0; kn.hit = false;
+        paintOffset(kn.els, kn.chip, 0, 0);
+      } else {
+        alive = true;
+        paintOffset(kn.els, kn.chip, kn.ox, kn.oy);
+      }
+    }
+    knockRafRef.current = alive ? requestAnimationFrame(knockStep) : null;
+  };
+
   const pullPaint = (pl: PullState, ox: number, oy: number) => {
     const cg = circlesRef.current;
     const v = viewRef.current;
@@ -5096,6 +5181,44 @@ export default function BreedTree({
                     pl.ox = pullEase(dx, pl.max);
                     pl.oy = pullEase(dy, pl.max);
                     pullPaint(pl, pl.ox, pl.oy);
+
+                    // SHOVE THE NEIGHBOURS. Only siblings: a circle inside this
+                    // one is already travelling with it, and its parent is the
+                    // thing it lives in, so neither is something to collide
+                    // with. Overlap is resolved by moving the neighbour, never
+                    // the dragged circle, which stays under the thumb.
+                    const cxD = d.x + pl.ox, cyD = d.y + pl.oy;
+                    const sibs = (d.parent?.children ?? []).filter((n) => n !== d);
+                    for (const n of sibs) {
+                      const ni = nodes.indexOf(n);
+                      if (ni < 0) continue;
+                      let kn = knocksRef.current.get(ni);
+                      if (!kn) {
+                        const d1s2 = nodes.filter((x) => x.depth === 1);
+                        const ci2 = d1s2.indexOf(n);
+                        kn = {
+                          els: n.descendants().map((x) => nodes.indexOf(x)).filter((j) => j >= 0),
+                          chip: ci2 >= 0 ? { i: ci2, bx: n.x - n.r * 0.707, by: n.y + n.r * 0.707 } : null,
+                          ox: 0, oy: 0, vx: 0, vy: 0, hit: false,
+                        };
+                        knocksRef.current.set(ni, kn);
+                      }
+                      const nx = n.x + kn.ox, ny = n.y + kn.oy;
+                      const gx = nx - cxD, gy = ny - cyD;
+                      const dist = Math.hypot(gx, gy) || 0.0001;
+                      const min = d.r + n.r;
+                      if (dist >= min) continue;
+                      const push = min - dist;
+                      kn.ox += (gx / dist) * push;
+                      kn.oy += (gy / dist) * push;
+                      if (!kn.hit) {
+                        kn.hit = true;
+                        // On the rim between them, where the contact reads.
+                        knockNum(cxD + (gx / dist) * d.r, cyD + (gy / dist) * d.r, KNOCK_POINTS);
+                        onScore?.(KNOCK_POINTS);
+                      }
+                      if (knockRafRef.current === null) knockRafRef.current = requestAnimationFrame(knockStep);
+                    }
                   }}
                   onPointerUp={(e) => {
                     if (!pullRef.current) return;
