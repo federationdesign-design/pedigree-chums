@@ -734,3 +734,15 @@
     padding: 9px;
   }
 }
+
+/* DRAG FOCUS, chum family tree only. While a card is in hand the scenery fades
+   out and the wash goes heavier so the lit frame is the only thing left to look
+   at. Same 0.12s as the pieces that fade, so the whole screen settles together.
+
+   AT THE END OF THE FILE on purpose, for the same reason as the block above:
+   .overlay's own background is declared near the top, and same specificity means
+   the last rule wins. Anywhere above it this is silently ignored. */
+.overlayFocus {
+  background: radial-gradient(120% 120% at 50% 40%, rgba(9, 74, 112, 0.78), rgba(5, 40, 66, 0.92));
+  transition: background 0.12s ease-out;
+}

@@ -501,6 +501,20 @@ export default function LineageMap({
   const [bubbles, setBubbles] = useState<{ id: number; sx: number; sy: number }[]>([]); // blue bubble trail as a card glides to its frame
   const bubbleSeq = useRef(0);
   const [dragXY, setDragXY] = useState<{ x: number; y: number } | null>(null); // live pointer while dragging a card, for the proximity glow
+  /* DRAG FOCUS. While a card is in hand the scenery steps out of the way so the
+     only two things on screen are the card and the one box it belongs in: the
+     family tree, the root chum card, the Learn and Collect buttons and every
+     frame but the lit one all go to zero.
+
+     The loose cards stay, by decision. They are the pile you are working
+     through, so hiding them would hide the job.
+
+     CHUM FAMILY TREE ONLY. Everything here shares one svg with the pit lift and
+     the main pit, and neither of those was asked for. `strongBg` is set by the
+     chum tree call site alone and `circular` by the pit lift, so the pair of
+     them is the gate. Declared above rootCard because rootCard reads it. */
+  const dragFocus = strongBg && !circular && dragImg != null;
+  const DRAG_FADE = "opacity 0.12s ease-out";
   useEffect(() => {
     if (totalNodes > 0 && seen.size >= totalNodes) {
       const t = setTimeout(() => setShowRemove(true), 0); // show immediately when all nodes are seen
@@ -1267,7 +1281,7 @@ export default function LineageMap({
       <g
         className={canDragRoot ? `${styles.rootHit} ${styles.grab}` : styles.rootHit}
         transform={rootXf.transform}
-        style={{ opacity: rootXf.opacity }}
+        style={{ opacity: dragFocus ? 0 : rootXf.opacity, transition: DRAG_FADE, pointerEvents: dragFocus ? "none" : undefined }}
         onClick={(e) => e.stopPropagation()}
         onDoubleClick={(e) => {
           e.stopPropagation();
@@ -1325,7 +1339,7 @@ export default function LineageMap({
         </>)}
         {/* the root card carries no status dot; only the ancestor cards show one */}
       </g>
-      <g className={styles.rootHit} transform={`translate(${rx},${circular ? ry + R : ry + ROOT + 26})`} style={{ opacity: groupFade }} onClick={(e) => e.stopPropagation()}>
+      <g className={styles.rootHit} transform={`translate(${rx},${circular ? ry + R : ry + ROOT + 26})`} style={{ opacity: dragFocus ? 0 : groupFade, transition: DRAG_FADE, pointerEvents: dragFocus ? "none" : undefined }} onClick={(e) => e.stopPropagation()}>
         {!INSTR_NAMES.has(breed.name) && !circular && (<g transform={undefined}><rect className={styles.tag} x={-tagW/2} y={-tagH/2} width={tagW} height={tagH} rx={tagH / 2} />{tagLines.map((ln, li) => (<text key={li} className={styles.tagText} textAnchor="middle" dominantBaseline="central" y={tagLines.length > 1 ? (li === 0 ? -13 : 13) : 0}>{ln}</text>))}</g>)}
         {/* the 3-D Collect button sits on top; it orders the pack into the grid */}
         {/* Blue Learn button - on ALL cards including instructional */}
@@ -1458,7 +1472,7 @@ export default function LineageMap({
       // now marks "this is the mini pit" for the lifted root, the five-across
       // frames, the smaller nodes, the back button's size and the hidden pack
       // header. Removing it here would quietly undo all five.
-      className={`${styles.overlay}${circular ? " " + styles.overlayStrong : ""}`}
+      className={`${styles.overlay}${circular ? " " + styles.overlayStrong : ""}${dragFocus ? " " + styles.overlayFocus : ""}`}
       onClick={closeIfTap}
       onPointerDown={onPanDown}
       onPointerMove={onPanMove}
@@ -1548,7 +1562,7 @@ export default function LineageMap({
         <g style={removing ? { pointerEvents: "none" } : undefined}>
         {hasTree ? (
           <>
-            <g style={{ opacity: removing || scattered ? 0 : 1, display: scattered ? "none" : undefined, transition: "opacity 0.12s ease-out" }}>
+            <g style={{ opacity: removing || scattered || dragFocus ? 0 : 1, display: scattered ? "none" : undefined, transition: DRAG_FADE, pointerEvents: dragFocus ? "none" : undefined }}>
             {/* A solo dog's card pops out of the big circle, so the circle has
                 to be painted first or it covers the card. Every other dog keeps
                 the original order, with the root drawn last. */}
@@ -1668,7 +1682,18 @@ export default function LineageMap({
                   onPointerMove={isMobile ? moveGridDrag : undefined}
                   onPointerUp={isMobile ? endGridDrag : undefined}
                   onPointerCancel={isMobile ? endGridDrag : undefined}
-                  style={isMobile ? { touchAction: "none", pointerEvents: "auto" } : undefined}
+                  /* Unlit frames fade out under drag focus. `wobbleHere` is kept
+                     visible on purpose: it is the filled frame greeting a
+                     duplicate, and it is never `lit`, so a literal reading would
+                     have left a duplicate drop with nothing on screen at all.
+                     Opacity only, no pointer-events change: the drop is hit
+                     tested geometrically against clientX/clientY, not by the DOM,
+                     so a faded frame still accepts a card. */
+                  style={{
+                    ...(isMobile ? { touchAction: "none" as const, pointerEvents: "auto" as const } : {}),
+                    ...(dragFocus && !lit && !wobbleHere ? { opacity: 0 } : {}),
+                    transition: DRAG_FADE,
+                  }}
                 >
                   <rect
                     className={`${styles.frame} ${lit || correctFlash === f.id ? styles.frameLit : ""} ${filledHere ? styles.frameFilled : ""} ${shakeFrame === f.id ? styles.frameShake : ""} ${wobbleHere ? styles.frameExpect : ""} ${dimHere ? styles.frameDim : ""}`.trim()}
