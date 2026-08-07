@@ -482,6 +482,7 @@ export interface RouterState {
   safetyAskStreak?: number; // Task 139: consecutive safety questions; three in a row hands to a human.
   deathAskStreak?: number; // Task 142: consecutive death-cluster questions; a second escalates to safeguarding.
   terrierSitStep?: number; // Task 145: the Terrier's sit-gag step (0 none, 1 asked why, 2 asked the magic word).
+  boxerKnockStep?: number; // Task 145: the Boxer's knock-knock step (0 none, 1 he has asked "whos there?").
   submissionCount: number; // count AFTER this submission (1-based)
   activeDog?: Dog; // whose bark game this is
   barkStreak?: number; // the active dog's consecutive bark exchanges BEFORE this message
@@ -1126,6 +1127,13 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
         return { layer: 9, layerName: 'Recognised conversation', bucket: 'B22', action: 'canned', responseId: 'TER-B22-03' };
       }
       // Not a please: the gag ends here and this turn falls through to ordinary routing.
+    }
+    // Task 145: the Boxer's visitor-initiated knock-knock. "knock knock" is served "whos there?"
+    // by the canned matcher below (BOX-B30-08), which the engine records as boxerKnockStep 1; the
+    // NEXT input, whatever it is, gets the punchline (BOX-B30-09). Below every safety route above,
+    // so a disclosure after "whos there?" still routes to safety and the step resets.
+    if (state.activeDog === 'boxer' && (state.boxerKnockStep ?? 0) > 0) {
+      return { layer: 9, layerName: 'Recognised conversation', bucket: 'B30', action: 'canned', responseId: 'BOX-B30-09' };
     }
     // Task 138: the paw is answered before GAME_CMD, which was claiming
     // 'paw' and 'shake' for the bark-game offer.

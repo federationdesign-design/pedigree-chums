@@ -175,6 +175,7 @@ export function submit(data: ChumData, session: Session, input: string): Turn {
     safetyAskStreak: session.safetyAskStreak,
     deathAskStreak: session.deathAskStreak,
     terrierSitStep: session.terrierSitStep,
+    boxerKnockStep: session.boxerKnockStep,
     anatomyRedirectUsed: session.anatomyRedirectUsed,
     topic: session.topic,
     lastWasComplaint: session.lastWasComplaint,
@@ -404,6 +405,9 @@ export function submit(data: ChumData, session: Session, input: string): Turn {
   // (TER-B22-02) advances it to the please turn; anything else ends it. Same shape as deathAskStreak.
   session.terrierSitStep =
     resolution.responseId === 'TER-B22-01' ? 1 : resolution.responseId === 'TER-B22-02' ? 2 : 0;
+  // Task 145: the Boxer's knock-knock step. "whos there?" (BOX-B30-08) starts it; the next turn
+  // serves the punchline and anything else ends it.
+  session.boxerKnockStep = resolution.responseId === 'BOX-B30-08' ? 1 : 0;
 
   return { input, resolution, response };
 }

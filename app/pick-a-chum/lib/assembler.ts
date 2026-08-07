@@ -602,10 +602,16 @@ export function assemble(res: Resolution, data0: ChumData, n: Normalised, sessio
       return { responseId: cat.id, text: cat.responses[0], dog };
     }
 
-    case 'goodbye':
-      // Task 36: the approved goodbye line. Held here as a constant, verbatim (NOT yet in the
-      // generated Collie Responses, so migrate into the workbook later), like the bark-game lines.
-      return { responseId: 'GOODBYE', text: 'Right. Off you go, then. Come back when you need a dog.', dog };
+    case 'goodbye': {
+      // Task 36: the Collie's approved goodbye constant. Task 145: a dog with its own goodbye line
+      // (Copy Components "<Dog> goodbye", e.g. Boxer "see ya", Labrador "byeeeee") speaks it instead;
+      // the Collie and any dog without one keep the constant. The greeting stays the shared Task 76
+      // mirror by design (Steve): only goodbye is per-dog.
+      const ownGoodbye = copy(data, `${DOG_LABEL[dog]} goodbye`);
+      return ownGoodbye
+        ? { responseId: `${DOG_PREFIX[dog]}-GOODBYE`, text: ownGoodbye, dog }
+        : { responseId: 'GOODBYE', text: 'Right. Off you go, then. Come back when you need a dog.', dog };
+    }
 
     case 'out_of_scope':
       // Task 37: the approved out-of-scope line. Held here as a constant, verbatim (NOT yet in the

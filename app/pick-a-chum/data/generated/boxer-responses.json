@@ -216,16 +216,27 @@
     "status": "Approved"
   },
   {
-    "responseId": "BOX-B20-01",
-    "bucketId": "B20",
-    "subtag": "goodbye",
+    "responseId": "BOX-B30-08",
+    "bucketId": "B30",
+    "subtag": "joke",
     "triggers": [
-      "goodbye",
-      "bye",
-      "see you",
-      "see ya"
+      "knock knock",
+      "knock knock knock"
     ],
-    "template": "see ya",
+    "template": "whos there?",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "BOX-B30-09",
+    "bucketId": "B30",
+    "subtag": "joke",
+    "triggers": [
+      "ANY input after whos there (served by the knock-knock sequence)"
+    ],
+    "template": "Bow wow!",
     "factSource": "",
     "defaultRoute": "",
     "animationCue": "",

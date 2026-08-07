@@ -2356,6 +2356,45 @@ for (const please of ['plz', 'pls', 'go on', 'please']) {
   check('tell me a joke', { action: 'canned', bucket: 'B30' }, { session: s, assert: (_r, resp) => (resp.text === 'knock kncok' ? null : `boxer joke: "${resp.text}"`) });
 })();
 
+// ==== Task 145 round 3: per-dog goodbye + the Boxer's visitor-initiated knock-knock ====
+// Goodbye is now per-dog (the greeting stays the shared Task 76 mirror by design).
+(() => {
+  const s = newSession('boxer');
+  check('bye', { action: 'goodbye' }, { session: s, assert: (_r, resp) => (resp.text === 'see ya' ? null : `boxer goodbye: "${resp.text}"`) });
+})();
+(() => {
+  const s = newSession('labrador');
+  check('bye', { action: 'goodbye' }, { session: s, assert: (_r, resp) => (resp.text === 'byeeeee' ? null : `labrador goodbye: "${resp.text}"`) });
+})();
+for (const dog of ['collie', 'terrier']) {
+  const s = newSession(dog);
+  check('bye', { action: 'goodbye' }, { session: s, assert: (_r, resp) => (resp.text.startsWith('Right. Off you go') ? null : `${dog} goodbye changed: "${resp.text}"`) });
+}
+// The visitor-initiated knock-knock: "knock knock" -> "whos there?", then the punchline on whatever
+// they say next (the deathAskStreak/sit-gag shape).
+(() => {
+  const s = newSession('boxer');
+  check('knock knock', { action: 'canned', bucket: 'B30' }, { session: s, assert: (_r, resp) => (resp.responseId === 'BOX-B30-08' && resp.text === 'whos there?' ? null : `knock: rid=${resp.responseId} "${resp.text}"`) });
+  check('boo', { action: 'canned', bucket: 'B30' }, { session: s, assert: (_r, resp) => (resp.responseId === 'BOX-B30-09' && resp.text === 'Bow wow!' ? null : `punchline: rid=${resp.responseId} "${resp.text}"`) });
+})();
+(() => {
+  const s = newSession('boxer');
+  check('knock knock', { action: 'canned', bucket: 'B30' }, { session: s });
+  check('banana milkshake', { action: 'canned', bucket: 'B30' }, { session: s, assert: (_r, resp) => (resp.text === 'Bow wow!' ? null : `punchline moved: "${resp.text}"`) });
+})();
+// SAFETY WINS after "whos there?": a disclosure routes to safeguarding, not the punchline
+(() => {
+  const s = newSession('boxer');
+  check('knock knock', { action: 'canned', bucket: 'B30' }, { session: s });
+  check('im in trouble', { action: 'safety_signpost' }, { session: s, assert: (r) => (r.moderationId === 'MOD_SAFEGUARDING' ? null : `safety lost mid-knock: ${r.moderationId}`) });
+})();
+// his TELLING knock-knock is unchanged (different entry: "tell me a joke"), the step is not set
+(() => {
+  const s = newSession('boxer');
+  check('tell me a joke', { action: 'canned', bucket: 'B30' }, { session: s, assert: (_r, resp) => (resp.text === 'knock kncok' ? null : `telling flow: "${resp.text}"`) });
+  check('whos there', { action: 'canned', bucket: 'B30' }, { session: s, assert: (_r, resp) => (resp.text === 'Bow' ? null : `telling whos there: "${resp.text}"`) });
+})();
+
 // ---- Report ----
 const pad = (s, n) => String(s).padEnd(n);
 console.log('\nPick a Chum: Checkpoint 1 proof\n' + '='.repeat(78));

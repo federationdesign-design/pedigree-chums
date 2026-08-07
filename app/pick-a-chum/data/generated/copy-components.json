@@ -142,5 +142,21 @@
     "line": "*Canine claim independently verified by a very good boy.",
     "usageRule": "Use on deliberately exaggerated claims, not safety information.",
     "status": "Active"
+  },
+  {
+    "componentId": "CP019",
+    "type": "Boxer goodbye",
+    "subgroup": "Standard",
+    "line": "see ya",
+    "usageRule": "Per-dog goodbye line, served by the goodbye action.",
+    "status": "Active"
+  },
+  {
+    "componentId": "CP020",
+    "type": "Labrador goodbye",
+    "subgroup": "Standard",
+    "line": "byeeeee",
+    "usageRule": "Per-dog goodbye line, served by the goodbye action.",
+    "status": "Active"
   }
 ]
