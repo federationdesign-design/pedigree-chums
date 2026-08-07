@@ -308,19 +308,20 @@ export default function LineageModal({ name, image, character, lineage, onClose,
             shownName !== name && (
               <TitleRow img={shownImg} name={shownName} status={shownStatus} isNarrow={isNarrow} />
             )}
-        {/* The global explanation (owner placement, option A): rides in the
-            title wrap so it is on screen before any break panel opens.
-            Verbatim from docs/lineage/BRIEF.md section 7. On narrow screens
-            it appears only once the round is running (owner ruling,
-            4 August): the LEARN title owns that band on the start screen,
-            and the note still precedes any break panel. */}
-        {/* Owner review: the note is off the start screen and the learn area
-            entirely -- it belongs to a running round only. */}
-        {running && !learningActive && (
-          <p className={css.globalNote}>
-            These family trees show likely historical influences. Ancient and medieval dogs were working types, not modern standardised breeds, so the percentages are illustrative rather than measured genetic results.
-          </p>
-        )}
+        {/* THE GLOBAL EXPLANATION IS GONE from the title band. Owner ruling.
+
+            Its history, since it moved twice before this: it began on every
+            screen, was then cut from the start screen and the learn area so it
+            belonged to a running round only, and is now off the round as well.
+            It sat directly under the title ladder, and once that ladder could
+            run to several rows the paragraph was the only block of body copy on
+            a screen that is otherwise pictures and names.
+
+            The same caveat is still said where it is actually needed: the learn
+            info box carries "Our best guess, not hard science." under every
+            percentage breakdown, which is the place a reader meets a figure and
+            might take it literally. Nothing has been lost, only moved off a
+            screen that was not asking the question. */}
       </div>
 
       {/* The diagram owns everything below the header. BreedTree runs in

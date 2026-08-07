@@ -1154,6 +1154,8 @@
    option A). Rides inside .titleWrap, so it inherits the float and
    pointer-events: none; kept narrow and small so it reads as a caption
    rather than competing with the pit. */
+/* UNUSED since the paragraph was taken off the title band. Kept rather than
+   deleted: it has been moved twice already and may be wanted somewhere else. */
 .globalNote {
   font-family: var(--font-body, 'Montserrat', system-ui);
   font-size: 11px;
