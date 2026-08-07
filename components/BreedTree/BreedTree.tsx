@@ -1251,6 +1251,72 @@ export default function BreedTree({
     from: { ox: number; oy: number }[];
   };
   const unlockRef = useRef<UnlockState | null>(null);
+
+  /* ── PUSH AND PULL, start screen only ────────────────────────────────────
+     A circle can be dragged with a thumb and springs back when let go.
+     It writes a translate onto the node's own wrapper <g> and onto every
+     descendant's, which is exactly how the hover unlock moves things: zoomTo
+     positions the circle and the label INSIDE each wrapper, so the wrapper
+     itself is free to carry an offset and nothing fights over it. */
+  const PULL_SNAP_MS = 170;      // the way back, quick enough to read as a snap
+  const PULL_MAX_R = 0.9;        // how far it can be dragged, as a share of its own radius
+  type PullState = {
+    els: number[];
+    sx: number; sy: number;      // where the finger went down, in client px
+    ox: number; oy: number;      // current offset, world units
+    max: number;                 // this circle's own pull limit
+    perPx: number;               // world units per client pixel, frozen at grab
+    moved: boolean;
+    raf: number | null;
+  };
+  const pullRef = useRef<PullState | null>(null);
+  // Double tap opens learn, but only once something has actually been pulled.
+  // Until then a double tap is just two taps, so nobody is thrown into the learn
+  // area before they have touched the diagram at all.
+  const pulledEverRef = useRef(false);
+  const lastTapRef = useRef(0);
+
+  const pullPaint = (els: number[], ox: number, oy: number) => {
+    const cg = circlesRef.current;
+    if (!cg) return;
+    const k = SIZE / viewRef.current[2];
+    for (const j of els) {
+      const w = cg.children[j] as SVGGElement | undefined;
+      if (w) w.setAttribute("transform", ox === 0 && oy === 0 ? "" : `translate(${ox * k},${oy * k})`);
+    }
+  };
+
+  /* Rubber band: the first millimetre moves nearly one to one, and it stiffens
+     the further it goes, stopping at max. A straight multiplier felt slack and a
+     hard clamp felt broken; this gives resistance you can feel. */
+  const pullEase = (d: number, max: number) =>
+    max * (1 - Math.exp(-Math.abs(d) / max)) * Math.sign(d);
+
+  const pullRelease = () => {
+    const pl = pullRef.current;
+    if (!pl) return;
+    const fromX = pl.ox, fromY = pl.oy;
+    // The clock comes from requestAnimationFrame's own argument, not from
+    // performance.now(). This is a plain function in the component body, and the
+    // compiler reads a call like that as render work: it is one of the recurring
+    // lint traps in this file.
+    let t0 = -1;
+    const step = (now: number) => {
+      const cur = pullRef.current;
+      if (!cur) return;
+      if (t0 < 0) t0 = now;
+      const t = Math.min(1, (now - t0) / PULL_SNAP_MS);
+      // ease out cubic: fast off the mark, settling rather than stopping dead
+      const e = 1 - Math.pow(1 - t, 3);
+      cur.ox = fromX * (1 - e);
+      cur.oy = fromY * (1 - e);
+      pullPaint(cur.els, cur.ox, cur.oy);
+      if (t < 1) { cur.raf = requestAnimationFrame(step); return; }
+      pullPaint(cur.els, 0, 0);
+      pullRef.current = null;
+    };
+    pl.raf = requestAnimationFrame(step);
+  };
   // Paint the current offsets. View units, so it survives any zoom.
   const unlockPaint = () => {
     const u = unlockRef.current;
@@ -2649,10 +2715,25 @@ export default function BreedTree({
 
   function onCircle(e: React.MouseEvent, d: Node) {
     e.stopPropagation();
-    // The start screen used to send any tap on a dog straight into the learn
-    // area, above every other branch. That is gone: the circles are the diagram,
-    // not a doorway, so a tap now does what it does everywhere else in this
-    // component. LEARN is a button of its own beside PLAY.
+    // START SCREEN. The circles are the diagram, not a doorway: they are pushed
+    // and pulled by the pointer handlers above and spring back.
+    //
+    // A DOUBLE TAP opens the learn area, and only once something has actually
+    // been pulled. Until then two taps are just two taps, so nobody is thrown
+    // into learn before they have touched the diagram at all. A drag ends in a
+    // tap too, so a tap that moved is ignored here rather than counted.
+    if (dockAside && gravity && entered && !started && !learning && focusRef.current === nodes[0]) {
+      if (pullRef.current?.moved) return;
+      const now = e.timeStamp;
+      const quick = now - lastTapRef.current < 320;
+      lastTapRef.current = quick ? 0 : now;
+      if (quick && pulledEverRef.current) {
+        setLearnPeek(false);
+        setStartPeek(false);
+        setLearning(true);
+      }
+      return;
+    }
     // TOUCH: the first tap on a first-ring circle does what a hover does on a
     // mouse, which is come loose and show you what is inside. The second tap
     // goes in. Same grammar as desktop, where hover previews and click enters,
@@ -4983,6 +5064,27 @@ export default function BreedTree({
                     pointerEvents: hidden || heldHidden ? "none" : "auto",
                     opacity: buried ? 0 : undefined,
                   }}
+                  onPointerMove={(e) => {
+                    const pl = pullRef.current;
+                    if (!pl) return;
+                    const dx = (e.clientX - pl.sx) * pl.perPx;
+                    const dy = (e.clientY - pl.sy) * pl.perPx;
+                    if (!pl.moved && Math.hypot(e.clientX - pl.sx, e.clientY - pl.sy) > 4) {
+                      pl.moved = true;
+                      // Double tap only opens learn once something has been
+                      // pulled, so this is the moment that unlocks it.
+                      pulledEverRef.current = true;
+                    }
+                    pl.ox = pullEase(dx, pl.max);
+                    pl.oy = pullEase(dy, pl.max);
+                    pullPaint(pl.els, pl.ox, pl.oy);
+                  }}
+                  onPointerUp={(e) => {
+                    if (!pullRef.current) return;
+                    try { (e.currentTarget as Element).releasePointerCapture(e.pointerId); } catch { /* none held */ }
+                    pullRelease();
+                  }}
+                  onPointerCancel={() => { if (pullRef.current) pullRelease(); }}
                   onMouseEnter={hidden || frozen ? undefined : () => {
                     if (touchRef.current) return; // touch drives this from the tap
 
@@ -5037,6 +5139,34 @@ export default function BreedTree({
                     frozen || hidden || disableZoom
                       ? undefined
                       : (e) => {
+                          // START SCREEN: grab it. The circle can be pushed and
+                          // pulled and springs back when let go. Handled before
+                          // the fellRef guard below, which exists for the round.
+                          if (dockAside && gravity && entered && !started && !learning && focusRef.current === nodes[0]) {
+                            const st = stageRef.current;
+                            const vbH = aspect >= 1 ? SIZE : SIZE / aspect;
+                            const uppL = vbH / Math.max(st ? st.clientHeight : 1, 1);
+                            const kL = SIZE / viewRef.current[2];
+                            const prev = pullRef.current;
+                            if (prev?.raf !== null && prev?.raf !== undefined) cancelAnimationFrame(prev.raf);
+                            pullRef.current = {
+                              els: d.descendants().map((x) => nodes.indexOf(x)).filter((j) => j >= 0),
+                              sx: e.clientX,
+                              sy: e.clientY,
+                              ox: 0,
+                              oy: 0,
+                              max: d.r * PULL_MAX_R,
+                              // frozen at the grab: the view does not move while
+                              // a finger is down, and reading it every frame
+                              // would make the circle drift under the thumb
+                              perPx: uppL / kL,
+                              moved: false,
+                              raf: null,
+                            };
+                            try { (e.currentTarget as Element).setPointerCapture(e.pointerId); } catch { /* no capture */ }
+                            e.stopPropagation();
+                            return;
+                          }
                           // fellRef is a ref, so it cannot be read at render
                           // time: the component does not re-render when the
                           // drop finishes, and the handler would be frozen as
