@@ -481,6 +481,7 @@ function isActiveBreedQuestion(compact: string): boolean {
 export interface RouterState {
   safetyAskStreak?: number; // Task 139: consecutive safety questions; three in a row hands to a human.
   deathAskStreak?: number; // Task 142: consecutive death-cluster questions; a second escalates to safeguarding.
+  terrierSitStep?: number; // Task 145: the Terrier's sit-gag step (0 none, 1 asked why, 2 asked the magic word).
   submissionCount: number; // count AFTER this submission (1-based)
   activeDog?: Dog; // whose bark game this is
   barkStreak?: number; // the active dog's consecutive bark exchanges BEFORE this message
@@ -970,6 +971,9 @@ export function resolveCanned(n0: Normalised, data: ChumData, dog: Dog = 'collie
 // the safety block. Placed in resolve() below safety/grief and the known routes, above the fallback.
 const PLAY_DEAD = new Set(['play dead', 'playdead', 'dead']);
 const ROLL_OVER = new Set(['roll over', 'rollover', 'roll']);
+// Task 145: the please the Terrier's sit gag waits for on its third turn. Widened per the brief
+// (pretty please, plz, pls, go on) beyond the exact "please" trigger that used to end the gag.
+const SIT_PLEASE = /(^|\s)(please|plz|pls|go on)(\s|$)/;
 function matchTrick(c: string): 'play_dead' | 'roll_over' | null {
   if (PLAY_DEAD.has(c)) return 'play_dead';
   if (ROLL_OVER.has(c)) return 'roll_over';
@@ -1108,6 +1112,20 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
         return { layer: 1, layerName: 'Safety and unsuitable content', bucket: null, action: 'safety_signpost', moderationId: 'MOD_SAFEGUARDING' };
       }
       return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: 'death_answer' };
+    }
+    // Task 145: the Terrier's sit gag runs as a sequence (the deathAskStreak shape). Once he has
+    // asked "why?" (TER-B22-01 -> terrierSitStep 1), the NEXT input, whatever it is, gets the
+    // magic-word line; the one after gets "no" when it is a please (widened: pretty please / plz /
+    // pls / go on). Below every safety route above (hard safety, sadness, grief, the death cluster),
+    // so a disclosure mid-gag is never swallowed. The engine advances/resets the step by responseId.
+    if (state.activeDog === 'terrier' && (state.terrierSitStep ?? 0) > 0) {
+      if ((state.terrierSitStep ?? 0) === 1) {
+        return { layer: 9, layerName: 'Recognised conversation', bucket: 'B22', action: 'canned', responseId: 'TER-B22-02' };
+      }
+      if (SIT_PLEASE.test(c)) {
+        return { layer: 9, layerName: 'Recognised conversation', bucket: 'B22', action: 'canned', responseId: 'TER-B22-03' };
+      }
+      // Not a please: the gag ends here and this turn falls through to ordinary routing.
     }
     // Task 138: the paw is answered before GAME_CMD, which was claiming
     // 'paw' and 'shake' for the bark-game offer.

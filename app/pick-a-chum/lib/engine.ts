@@ -174,6 +174,7 @@ export function submit(data: ChumData, session: Session, input: string): Turn {
     lastAction: session.lastAction,
     safetyAskStreak: session.safetyAskStreak,
     deathAskStreak: session.deathAskStreak,
+    terrierSitStep: session.terrierSitStep,
     anatomyRedirectUsed: session.anatomyRedirectUsed,
     topic: session.topic,
     lastWasComplaint: session.lastWasComplaint,
@@ -399,6 +400,10 @@ export function submit(data: ChumData, session: Session, input: string): Turn {
   // is escalated to safeguarding by the router. Any non-death turn resets it, so "persistence" means
   // consecutive.
   session.deathAskStreak = resolution.action === 'death_answer' ? (session.deathAskStreak ?? 0) + 1 : 0;
+  // Task 145: the Terrier's sit-gag step. "why?" (TER-B22-01) starts it; the magic-word line
+  // (TER-B22-02) advances it to the please turn; anything else ends it. Same shape as deathAskStreak.
+  session.terrierSitStep =
+    resolution.responseId === 'TER-B22-01' ? 1 : resolution.responseId === 'TER-B22-02' ? 2 : 0;
 
   return { input, resolution, response };
 }

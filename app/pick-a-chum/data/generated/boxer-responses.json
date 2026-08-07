@@ -186,5 +186,49 @@
     "defaultRoute": "",
     "animationCue": "",
     "status": "Approved"
+  },
+  {
+    "responseId": "BOX-B09-01",
+    "bucketId": "B09",
+    "subtag": "greeting",
+    "triggers": [
+      "hello",
+      "hey",
+      "hello there"
+    ],
+    "template": "hiya",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "BOX-B09-02",
+    "bucketId": "B09",
+    "subtag": "greeting",
+    "triggers": [
+      "hi"
+    ],
+    "template": "hihi",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "BOX-B20-01",
+    "bucketId": "B20",
+    "subtag": "goodbye",
+    "triggers": [
+      "goodbye",
+      "bye",
+      "see you",
+      "see ya"
+    ],
+    "template": "see ya",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
   }
 ]

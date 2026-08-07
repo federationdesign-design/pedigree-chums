@@ -2309,6 +2309,53 @@ for (const dog of ['collie', 'labrador', 'terrier', 'boxer']) {
   check('im in trouble', { action: 'safety_signpost' }, { session: s, assert: (r, resp) => (r.moderationId === 'MOD_SAFEGUARDING' && resp.text.startsWith('Thank you for telling me') ? null : `${dog} safeguarding moved: ${r.moderationId}`) });
 }
 
+// ==== Task 145 §7: the Terrier's sit gag as a sequence (the deathAskStreak shape) ====
+// The middle turn used to need the exact phrase "because i asked"; anything else fell to "im a
+// dog" and the joke died. Now once he has asked "why?", the next input (whatever it is) gets the
+// magic-word line, and the one after gets "no" when it is a please.
+(() => {
+  const s = newSession('terrier');
+  check('sit', { action: 'canned', bucket: 'B22' }, { session: s, assert: (_r, resp) => (resp.text === 'why?' ? null : `sit: "${resp.text}"`) });
+  check('i wont', { action: 'canned', bucket: 'B22' }, { session: s, assert: (_r, resp) => (resp.text === 'whats the magic word?' ? null : `arbitrary middle did not advance: "${resp.text}"`) });
+  check('pretty please', { action: 'canned', bucket: 'B22' }, { session: s, assert: (_r, resp) => (resp.text === 'no' ? null : `please turn: "${resp.text}"`) });
+})();
+// widened third: plz / pls / go on / please all count as the please
+for (const please of ['plz', 'pls', 'go on', 'please']) {
+  const s = newSession('terrier');
+  check('sit', { action: 'canned', bucket: 'B22' }, { session: s });
+  check('anything', { action: 'canned', bucket: 'B22' }, { session: s, assert: (_r, resp) => (resp.text === 'whats the magic word?' ? null : 'no magic word') });
+  check(please, { action: 'canned', bucket: 'B22' }, { session: s, assert: (_r, resp) => (resp.text === 'no' ? null : `${please}: "${resp.text}"`) });
+}
+// a third turn that is NOT a please ends the gag (falls through to normal routing), it does not loop
+(() => {
+  const s = newSession('terrier');
+  check('sit', { action: 'canned', bucket: 'B22' }, { session: s });
+  check('whatever', { action: 'canned', bucket: 'B22' }, { session: s });
+  check('tell me about labradors', { action: 'breed_page' }, { session: s, assert: (r) => (r.action === 'breed_page' ? null : `gag did not end: ${r.action}`) });
+})();
+// SAFETY WINS mid-gag: a disclosure after "why?" routes to safeguarding, not the magic-word line
+(() => {
+  const s = newSession('terrier');
+  check('sit', { action: 'canned', bucket: 'B22' }, { session: s });
+  check('im in trouble', { action: 'safety_signpost' }, { session: s, assert: (r) => (r.moderationId === 'MOD_SAFEGUARDING' ? null : `safety lost mid-gag: ${r.moderationId}`) });
+})();
+// the sequence is Terrier-only: the Labrador's single-turn sit is unchanged
+(() => {
+  const s = newSession('labrador');
+  check('sit', { action: 'canned', bucket: 'B22' }, { session: s, assert: (_r, resp) => (resp.text === 'i am sitting' ? null : `labrador sit: "${resp.text}"`) });
+  check('i wont', {}, { session: s, assert: (r) => (r.action === 'canned' && r.bucket === 'B22' ? 'labrador gained a sit sequence' : null) });
+})();
+
+// ==== Task 145 §8: the Boxer's own voice (his transcribed lines serve when he is active) ====
+(() => {
+  const s = newSession('boxer');
+  check('are you the boxer', { action: 'canned', bucket: 'B23' }, { session: s, assert: (_r, resp) => (resp.text === 'yepper' ? null : `boxer identity: "${resp.text}"`) });
+})();
+(() => {
+  const s = newSession('boxer');
+  check('tell me a joke', { action: 'canned', bucket: 'B30' }, { session: s, assert: (_r, resp) => (resp.text === 'knock kncok' ? null : `boxer joke: "${resp.text}"`) });
+})();
+
 // ---- Report ----
 const pad = (s, n) => String(s).padEnd(n);
 console.log('\nPick a Chum: Checkpoint 1 proof\n' + '='.repeat(78));

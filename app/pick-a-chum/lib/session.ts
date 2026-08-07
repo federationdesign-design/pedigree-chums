@@ -32,6 +32,7 @@ export interface Session {
   lastAction: ActionType | null; // the previous turn's resolved action (for clarifier follow-up)
   safetyAskStreak: number; // Task 139: consecutive safety questions. Three in a row hands to a human; any other turn resets it.
   deathAskStreak: number; // Task 142: consecutive death-cluster questions. The first is answered; a second (persistence) escalates to safeguarding. Any other turn resets it.
+  terrierSitStep: number; // Task 145: the Terrier's sit-gag step (0 none, 1 he has asked "why?", 2 he has asked the magic word). Same shape as deathAskStreak: "sit" starts it, the next input advances it, anything else resets it.
   anatomyRedirectUsed: boolean; // ANATOMY_GENERAL_REDIRECT fires at most once per session
   protectedState: ProtectedState; // S12 protected-state machine (Task 15)
   personalSadnessCount: number; // Task 20: qualifying personal-sadness statements this session (L1 at 1, L2 at 2)
@@ -92,6 +93,7 @@ export function newSession(activeDog: Dog = 'collie'): Session {
     lastAction: null,
     safetyAskStreak: 0,
     deathAskStreak: 0,
+    terrierSitStep: 0,
     anatomyRedirectUsed: false,
     protectedState: null,
     personalSadnessCount: 0,
