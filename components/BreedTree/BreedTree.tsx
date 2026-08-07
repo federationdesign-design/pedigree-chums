@@ -6736,7 +6736,9 @@ export default function BreedTree({
               onPointerCancel={railUp}
               className={`${styles.relRail} ${
                 hideCaption && !railPin
-                  ? `${styles.relRailHome}${showDiff ? " " + styles.relRailHomeDiff : ""}`
+                  // No slider nudge any more: the rail starts on the right and
+                  // the slider is on the left, so they cannot meet.
+                  ? styles.relRailHome
                   : railSide === "left"
                   ? styles.relRailLeft
                   : styles.relRailRight

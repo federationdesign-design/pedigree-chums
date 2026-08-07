@@ -774,19 +774,19 @@
    a round is running, and the rail is learn only, so they never meet. */
 .relRailHome {
   position: fixed;
-  left: 30px;
-  top: calc(42px + 2 * clamp(56px, 11vw, 78px));
-  right: auto;
+  /* RIGHT, under the pit's own squares. It used to sit at left 30px beneath the
+     second portrait in the stacked title, which put it beside the difficulty
+     slider and needed a nudge to clear it. That nudge has gone with it.
+     The figures are the squares' own: BreedTree draws them 84px, 18px in from
+     the top and right, stacked 14px apart, and the learn area shows two. So
+     18 + 84 + 14 + 84 is where the second ends, and 14 more is the same gap
+     again. Change the square size there and this changes with it. */
+  right: 18px;
+  top: 214px;
+  left: auto;
   bottom: auto;
 }
-/* Clear of the difficulty slider, which shares this edge whenever it is on
-   screen. The slider sits at left 24 and its thumb is 38 across, so it reaches
-   about 50; this starts past that with room to breathe. Only applied when the
-   slider is actually there, so a desktop, where it never renders, keeps the
-   rail where it was. */
-.relRailHomeDiff {
-  left: 82px;
-}
+
 .relCard {
   width: clamp(38px, 7.5vw, 56px);
   height: clamp(38px, 7.5vw, 56px);
