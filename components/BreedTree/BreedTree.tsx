@@ -3879,8 +3879,18 @@ export default function BreedTree({
       const armToys = () => {
         if (toyTimers.length) return; // first landing only
         toyTimers.push(window.setTimeout(() => spawnToy("cookies"), TOY_COOKIES_DELAY));
-        toyTimers.push(window.setTimeout(() => spawnToy("ball"), TOY_BALL_DELAY));
-        toyTimers.push(window.setTimeout(() => spawnToy("ballPink"), TOY_BALL_DELAY + BALL_PINK_GAP));
+        // Both tennis balls are hidden on the first seven levels. levelNo is the
+        // 0-based findIndex into the play-card list (BreedStrip), so the on-screen
+        // levels 1 to 7 are levelNo 0 to 6 here. NOT `level`, which in this file is
+        // the difficulty slider. TOY_BALL_DELAY is left alone: the flag and the era
+        // props are timed off it, so skipping the balls shifts nothing else. With
+        // no pink ball spawned its return path (BALL_PINK_BACK, above) never runs,
+        // because that only fires for a pink body that was thrown out the top.
+        const hideBalls = levelNo !== undefined && levelNo <= 6;
+        if (!hideBalls) {
+          toyTimers.push(window.setTimeout(() => spawnToy("ball"), TOY_BALL_DELAY));
+          toyTimers.push(window.setTimeout(() => spawnToy("ballPink"), TOY_BALL_DELAY + BALL_PINK_GAP));
+        }
         toyTimers.push(window.setTimeout(() => spawnToy("flag"), TOY_BALL_DELAY + TOY_FLAG_GAP));
         const propsAt = TOY_BALL_DELAY + TOY_FLAG_GAP + TOY_PROP_GAP;
         /* THE PROPS SLOT, from the level's theme. An era with no set of its own
