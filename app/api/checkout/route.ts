@@ -3,16 +3,22 @@ import { NextResponse } from "next/server";
 
 // POST /api/checkout
 //
-// Creates a Stripe Checkout Session for a single pre-order of the game and
-// returns its hosted URL. The client redirects the visitor to that URL.
-// Everything sensitive is read from environment variables (set in Vercel,
-// nothing committed):
+// Creates an EMBEDDED Stripe Checkout Session for a single pre-order of the
+// game and returns its client secret. The /preorder page mounts Stripe's
+// EmbeddedCheckout with that secret, so the card fields render inside Stripe's
+// iframe on our page (no redirect to a hosted page). Everything sensitive is
+// read from environment variables (set in Vercel, nothing committed):
 //
 //   STRIPE_SECRET_KEY         - Stripe secret key (required)
 //   STRIPE_PREORDER_PRICE_ID  - the Price id for the pre-order (required), e.g. price_...
 //   STRIPE_SHIPPING_RATE_ID   - the £0 "Free UK mainland delivery" shipping rate (optional), e.g. shr_...
 //   STRIPE_AUTOMATIC_TAX      - "true" to enable Stripe Tax (only if Tax + an origin address are set up)
 //   PREORDER_DISPATCH_NOTE    - the expected-dispatch line shown before payment
+//
+// Embedded mode needs a return_url (where Stripe sends the top window once the
+// visitor finishes), not the success_url / cancel_url pair the hosted redirect
+// used. The webhook remains the record of truth for an order; the return lands
+// on /preorder/success with the session id purely for the visitor's benefit.
 //
 // The Price should have its tax behaviour set to "inclusive" so the £6.99 the
 // customer sees is exactly what they pay (VAT is the 1/6 inside it).
@@ -42,6 +48,10 @@ export async function POST(req: Request) {
 
   try {
     const session = await stripe.checkout.sessions.create({
+      // stripe@22 pins a newer API version whose ui_mode value is "embedded_page"
+      // (not the older "embedded"); it yields the client_secret used by Stripe.js
+      // EmbeddedCheckout on /preorder.
+      ui_mode: "embedded_page",
       mode: "payment",
       line_items: [{ price: priceId, quantity: 1 }],
       shipping_address_collection: { allowed_countries: ["GB"] },
@@ -55,11 +65,12 @@ export async function POST(req: Request) {
           message: dispatchNote.slice(0, 1200),
         },
       },
-      success_url: `${origin}/preorder/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${origin}/preorder/cancelled`,
+      // Embedded mode uses return_url in place of success_url/cancel_url. Stripe
+      // appends the session id, which the success page confirms from.
+      return_url: `${origin}/preorder/success?session_id={CHECKOUT_SESSION_ID}`,
     });
 
-    return NextResponse.json({ url: session.url });
+    return NextResponse.json({ clientSecret: session.client_secret });
   } catch (err) {
     console.error("Stripe checkout session error:", err);
     return NextResponse.json(

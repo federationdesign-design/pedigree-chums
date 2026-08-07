@@ -1,0 +1,143 @@
+/* Join-the-list page. No page background: the global body gradient shows
+   through. Solid colours only (no text opacity, no rgba on text). */
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(24px, 6vw, 64px) clamp(16px, 5vw, 48px);
+}
+
+.card {
+  width: min(92vw, 620px);
+  background: var(--cream);
+  border-radius: var(--radius-card);
+  padding: clamp(28px, 5vw, 48px) clamp(22px, 5vw, 44px);
+  box-shadow: var(--shadow-card);
+  text-align: center;
+}
+
+.title {
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-weight: 400;
+  color: var(--navy);
+  font-size: clamp(2rem, 6vw, 3rem);
+  line-height: 1.05;
+  margin: 0 0 12px;
+}
+.accent {
+  color: var(--blue);
+}
+
+.sub {
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-weight: 600;
+  color: var(--navy);
+  font-size: clamp(0.98rem, 2.3vw, 1.12rem);
+  line-height: 1.4;
+  margin: 0 0 22px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  text-align: left;
+}
+
+.input {
+  width: 100%;
+  padding: 15px 18px;
+  border-radius: 999px;
+  border: 2px solid var(--blue);
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: 1rem;
+  color: var(--navy);
+  background: var(--white);
+}
+.input:focus {
+  outline: none;
+  border-color: var(--yellow);
+  box-shadow: 0 0 0 3px rgba(255, 210, 62, 0.45);
+}
+
+.check {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-weight: 600;
+  color: var(--navy);
+  font-size: 0.95rem;
+  line-height: 1.35;
+  cursor: pointer;
+}
+.check input {
+  margin: 3px 0 0;
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+  accent-color: var(--blue);
+  cursor: pointer;
+}
+
+.gdpr {
+  background: var(--white);
+  border: 1px solid var(--blue-sky);
+  border-radius: 14px;
+  padding: 12px 14px;
+}
+.gdpr .check {
+  font-size: 0.82rem;
+  font-weight: 500;
+}
+
+.link {
+  color: var(--blue-deep);
+  font-weight: 700;
+  text-decoration: underline;
+}
+.link:hover {
+  text-decoration: none;
+}
+
+.submit {
+  margin-top: 4px;
+  padding: 15px 20px;
+  border-radius: 999px;
+  border: 0;
+  background: var(--yellow);
+  color: var(--navy);
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 1.05rem;
+  cursor: pointer;
+  box-shadow: 0 6px 0 rgba(10, 58, 87, 0.22);
+  transition: transform 0.15s ease;
+}
+.submit:hover {
+  transform: translateY(-2px);
+}
+.submit:disabled {
+  cursor: default;
+  transform: none;
+}
+
+.error {
+  color: var(--navy);
+  background: var(--yellow);
+  border-radius: 10px;
+  padding: 9px 12px;
+  margin: 12px 0 0;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.thanks {
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-weight: 700;
+  color: var(--navy);
+  font-size: clamp(1.1rem, 2.6vw, 1.3rem);
+  margin: 8px 0 0;
+}

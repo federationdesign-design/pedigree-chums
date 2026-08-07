@@ -1,9 +1,8 @@
 {
   "_readme": "Resolves each workbook Destination (DST###) and Article (ART###) to a real route in app/. Hand-maintained from the repo; merged into generated/destinations.json and generated/articles.json as resolvedUrl by scripts/build-chumdata.mjs. A real URL typed into the workbook wins over this overlay. 'embedded: true' marks destinations that have no route by design (in-chat games, the popup action). Entries with resolvedUrl null and no embedded flag are genuine gaps for Steve, listed in agent/NEEDS_STEVE.md.",
   "DST001": {
-    "resolvedUrl": null,
-    "embedded": true,
-    "note": "Not a route. Opens the pre-order / discount OfferModal via window.dispatchEvent(new CustomEvent('pc:open-offer')). See app/pick-a-chum/data/discount-popup.ts."
+    "resolvedUrl": "/discount-code",
+    "note": "Task 144: now a real route. The chat sends buyers to the /discount-code email-capture page (she has done her job and the chat ends there), rather than opening the OfferModal in place. The popup still exists for its other triggers."
   },
   "DST002": {
     "resolvedUrl": "/",

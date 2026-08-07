@@ -417,7 +417,18 @@ export function assemble(res: Resolution, data0: ChumData, n: Normalised, sessio
     case 'open_discount_popup': {
       const r = pickResponse(data, 'B01', session.usedResponseIds);
       const text = r ? fill(r.template, baseContext(n)) : CAMPAIGN.answers.discount_answer;
-      return { responseId: r?.responseId ?? 'B01', text, dog, destinationId: 'DST001', openPopup: true };
+      // Task 144: DST001 is now a real route. She sends the visitor to the
+      // /discount-code capture page (a nav link that ends the chat) rather than
+      // opening the OfferModal in place. Falls back to the literal route if the
+      // generated record has not picked up the resolvedUrl.
+      const dest = data.destinations.find((d) => d.destinationId === 'DST001');
+      return {
+        responseId: r?.responseId ?? 'B01',
+        text,
+        dog,
+        destinationId: 'DST001',
+        url: dest?.resolvedUrl ?? '/discount-code',
+      };
     }
 
     case 'rules_answer': {

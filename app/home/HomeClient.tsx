@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import VideoGrid from "../../components/VideoGrid/VideoGrid";
 import AnubisFeature from "../../components/AnubisFeature/AnubisFeature";
 /* The search moved out to components/ChumSearch so Know Your Chums can use the
@@ -67,13 +68,9 @@ export default function HomeClient() {
             </div>
           </div>
           <div className={styles.productCta}>
-            <button
-              className={styles.btnPrimary}
-              type="button"
-              onClick={() => window.dispatchEvent(new CustomEvent("pc:open-offer"))}
-            >
+            <Link className={styles.btnPrimary} href="/preorder">
               Pre-order now
-            </button>
+            </Link>
           </div>
         </div>
       </section>

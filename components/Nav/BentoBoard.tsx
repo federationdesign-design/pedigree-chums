@@ -31,15 +31,15 @@ const NAV_TILES: Record<string, TileData> = {
 // the overlay; a no-op on the page). onOffer opens the discount offer.
 export default function BentoBoard({
   onNavigate,
-  onOffer,
   animateIn = false,
 }: {
   onNavigate?: () => void;
+  // Kept for call-site compatibility (Nav still passes it); the discount tile now
+  // navigates to /discount-code rather than opening the popup, so it is unused.
   onOffer?: () => void;
   animateIn?: boolean;
 }) {
   const navigate = onNavigate ?? (() => {});
-  const offer = onOffer ?? (() => window.dispatchEvent(new CustomEvent("pc:open-offer")));
 
   // Two-tone title: first word(s) yellow, remainder white.
   const twoTone = (a: string, b?: string) => (
@@ -135,14 +135,14 @@ export default function BentoBoard({
         <div className={styles.cluster}>
           {coverTile(NAV_TILES.knowYourChums, styles.sqTile, true)}
           <div className={styles.miniRow}>
-            <button type="button" className={`${styles.tile} ${styles.tileStrip} ${styles.miniCell}`} onClick={offer}>
+            <Link href="/discount-code" className={`${styles.tile} ${styles.tileStrip} ${styles.miniCell}`} onClick={navigate}>
               <span className={styles.tileMeta}>
                 <span className={styles.tileLabel}>
                   <span className={styles.tileLabelAccent}>Discount</span> code
                 </span>
                 <span className={styles.tileCta}>Grab your code →</span>
               </span>
-            </button>
+            </Link>
             {coverTile(NAV_TILES.superpower, `${styles.miniCell} ${styles.homeLabel} ${styles.labelHover}`, false, true)}
           </div>
         </div>
