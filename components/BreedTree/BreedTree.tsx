@@ -556,11 +556,24 @@ function measureEm(line: string, font: string | null): number {
 }
 // Steve: names two point sizes larger than the fitted size. Single tunable.
 const TITLE_BOOST = 2;
-// A name in the pit is drawn 30% larger than it was inside its circle. It has
-// no ring or picture around it any more, so at the circle's own size it read as
-// small print rather than as an object. Only in the pit: lift it out and it goes
-// back to the circle it always was, at the circle's size.
-const PIT_WORD_SCALE = 1.95; // 1.3, then half as much again by request
+// How much larger a name is drawn in the pit than it was inside its circle. It
+// has no ring or picture around it any more, so a little more weight is fair.
+// Only in the pit: lift it out and it goes back to the circle it always was.
+//
+// 1.3, then 1.95, now 1.05. The audit is why. Difficulty does not touch this
+// number at all: it resizes the CIRCLES, and a name is fitted to its circle, so
+// the word follows. Level 5 to level 10 grows a circle's radius 74%, and at 1.95
+// that carried the widest word to 103% of the stage on Bulldog and 110% on Jack
+// Russell. A word wider than the pit cannot fit however it tumbles.
+//
+// At 1.05 nothing overflows at any difficulty: the widest case falls to 59%.
+// Measured on Border Collie, Bulldog and Jack Russell across all eleven slider
+// positions, by running the real fitter against the real layout.
+//
+// The trade, honestly: this puts the pit word within 5% of the size the label
+// was inside its circle, which is the situation the constant was raised to fix
+// in the first place. 1.3 is the middle if that reads too quiet.
+const PIT_WORD_SCALE = 1.05;
 // The pop as the circles go. Starts at nothing, overshoots to 115%, settles.
 // Timed off the drop rather than off each body, so the names arrive together.
 const WORD_POP_MS = 380;
