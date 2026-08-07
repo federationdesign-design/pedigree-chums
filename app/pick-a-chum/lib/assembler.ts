@@ -554,8 +554,20 @@ export function assemble(res: Resolution, data0: ChumData, n: Normalised, sessio
     // Task 28: the bark-game offer, explanation and exit. Three approved lines, wired as
     // constants (provided by Steve directly; NOT yet in the generated Collie Responses, so
     // move them into the workbook later). No character variation.
-    case 'offer_bark_game':
+    // Task 154: each dog now offers its OWN game via its B17 row (the Labrador's treat trail, the
+    // Terrier's missing biscuit, the Boxer's mini game). Served from the swapped per-dog bank, so it only
+    // fires for a dog that has WRITTEN B17; the Collie keeps the bark-game offer (her B17 is the old
+    // "not ready" tease, and she is the bark game's home). offer_bark_game is blocked in protected states
+    // (AFTERCARE_BLOCKED), so a game offer never surfaces after a disclosure.
+    case 'offer_bark_game': {
+      if (dog !== 'collie') {
+        const r = pickResponse(data, 'B17', session.usedResponseIds);
+        if (r && r.responseId !== 'FUN-TEASE-v1' && r.responseId !== 'FUN-TEASE-v2' && r.responseId !== 'FUN-TEASE-v3') {
+          return { responseId: r.responseId, text: fill(r.template, baseContext(n)), dog };
+        }
+      }
       return { responseId: 'OFFER_BARK_GAME', text: 'Type woof to start the bark game. The others are still in training.', dog };
+    }
     case 'bark_explain':
       return { responseId: 'BARK_GAME_EXPLAIN', text: 'Type one or more woofs and I will always bark once more than you do. Type stop when you have finished.', dog };
     case 'bark_exit':

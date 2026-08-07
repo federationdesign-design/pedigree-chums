@@ -2708,6 +2708,55 @@ check('how many dogs are there', {}, { assert: (r) => (r.action === 'maths_answe
   check('stop', { action: 'game_exit' }, { session: s });
 })();
 
+// ==== Task 154: the three dogs get their own B14/B15/B17 fallbacks ====
+// B14 (gibberish) and B15 (orientation) are per-dog buckets that DO serve (each dog owns them now); B17
+// (offering a game) is added but NOT reachable -- offer_bark_game serves a hardcoded constant, so the dog
+// rows are dormant (reported as the section-6 reachability finding, asserted here so a future wiring shows).
+// A keyboard mash serves the dog's OWN B14 line; the Collie's is unchanged.
+for (const [dog, needle] of [['collie', 'beyond me'], ['labrador', 'is that a food word?'], ['terrier', 'thats not word'], ['boxer', 'I cant spell either']]) {
+  const s = newSession(dog);
+  check('asdfghjkl', { action: 'gibberish', bucket: 'B14' }, { session: s, assert: (_r, resp) => (resp.text.includes(needle) ? null : `${dog} B14: "${resp.text}"`) });
+}
+// The Terrier answers nonsense with nonsense: his three B14 lines rotate and serve VERBATIM (dtrvyubty /
+// Iytwr56ft are gibberish-back, not typos or placeholders -- they must survive exactly).
+(() => {
+  const s = newSession('terrier');
+  const got = ['asdfghjkl', 'qwerty', 'nnnnnn'].map((inp) => submit(data, s, inp).response.text);
+  const ok = got[0] === 'thats not word' && got[1] === 'dtrvyubty' && got[2] === 'Iytwr56ft';
+  ok ? pass++ : fail++;
+  rows.push({ ok, input: 'Terrier B14 gibberish-back verbatim', layer: 10, bucket: 'B14', action: 'gibberish', note: ok ? '' : got.join(' | ') });
+})();
+// Orientation ("what can I do") serves the dog's OWN B15 line; the Collie keeps hers.
+for (const [dog, rid] of [['labrador', 'LAB-B15-01'], ['terrier', 'TER-B15-01'], ['boxer', 'BOX-B15-01']]) {
+  const s = newSession(dog);
+  check('what do I do here', { action: 'orientation' }, { session: s, assert: (_r, resp) => (resp.responseId === rid ? null : `${dog} B15 rid: ${resp.responseId}`) });
+}
+check('what do I do here', { action: 'orientation' }, { assert: (_r, resp) => (/^B15-R/.test(resp.responseId) ? null : `Collie B15 changed: ${resp.responseId}`) });
+// B17 (offering a game) is wired: asking to play serves the dog's OWN game offer, not the hardcoded
+// bark-game line. The Collie keeps the bark-game offer (her B17 is the old "not ready" tease).
+for (const [dog, rid] of [['labrador', 'LAB-B17-01'], ['terrier', 'TER-B17-01'], ['boxer', 'BOX-B17-01']]) {
+  const s = newSession(dog);
+  check('can we play a game', { action: 'offer_bark_game' }, { session: s, assert: (_r, resp) => (resp.responseId === rid ? null : `${dog} B17: ${resp.responseId}`) });
+}
+check('can we play a game', { action: 'offer_bark_game' }, { assert: (_r, resp) => (resp.responseId === 'OFFER_BARK_GAME' ? null : `Collie B17 changed: ${resp.responseId}`) });
+// Section 4: the Labrador's food-mash lines are ANSWERS, not entries. A keyboard mash (which serves them)
+// must not start a game or fire the /hot-dogs link -- the action stays gibberish.
+(() => {
+  const s = newSession('labrador');
+  for (const inp of ['asdfghjkl', 'qwerty', 'nnnnnn']) {
+    check(inp, { action: 'gibberish' }, { session: s, assert: (r, resp) => (r.action === 'game_start' || r.game ? `lab mash started a game: "${resp.text}"` : null) });
+  }
+})();
+// Protected states: NONE of these serve inside PROTECTED_ACTIVE/AFTERCARE. A mash or "what do I do" after
+// a disclosure reaches safeguarding, not the dog's B14/B15 line. Asserted on served text, per dog.
+for (const dog of ['labrador', 'terrier', 'boxer']) {
+  const s = newSession(dog);
+  check('im in trouble', { action: 'safety_signpost' }, { session: s });
+  check('asdfghjkl', {}, { session: s, assert: (r, resp) => (r.action === 'gibberish' || /B14/.test(resp.responseId) ? `${dog} B14 leaked in protected: ${r.action} ${resp.responseId}` : null) });
+  check('what do I do here', {}, { session: s, assert: (r, resp) => (r.action === 'orientation' || /B15/.test(resp.responseId) ? `${dog} B15 leaked in protected: ${r.action} ${resp.responseId}` : null) });
+  check('can we play a game', {}, { session: s, assert: (r, resp) => (r.action === 'offer_bark_game' || /B17/.test(resp.responseId) ? `${dog} B17 leaked in protected: ${r.action} ${resp.responseId}` : null) });
+}
+
 // ---- Report ----
 const pad = (s, n) => String(s).padEnd(n);
 console.log('\nPick a Chum: Checkpoint 1 proof\n' + '='.repeat(78));

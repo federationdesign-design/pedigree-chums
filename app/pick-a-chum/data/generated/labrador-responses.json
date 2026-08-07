@@ -21,7 +21,7 @@
       "symbols only",
       "unreadable"
     ],
-    "template": "wot?",
+    "template": "is that a food word?",
     "factSource": "",
     "defaultRoute": "",
     "animationCue": "",
@@ -317,6 +317,58 @@
     "template": "hotdogs",
     "factSource": "",
     "defaultRoute": "DST016",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "LAB-B14-02",
+    "bucketId": "B14",
+    "subtag": "gibberish",
+    "triggers": [
+      "keyboard mash",
+      "symbols only",
+      "unreadable"
+    ],
+    "template": "Did you say sausages?",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "LAB-B14-03",
+    "bucketId": "B14",
+    "subtag": "gibberish",
+    "triggers": [
+      "keyboard mash",
+      "symbols only",
+      "unreadable"
+    ],
+    "template": "You have Cookies?",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "LAB-B15-01",
+    "bucketId": "B15",
+    "subtag": "orientation",
+    "triggers": [],
+    "template": "eat? walk? Play? Learn? i can show you the hotdogs page too",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "LAB-B17-01",
+    "bucketId": "B17",
+    "subtag": "offering a game",
+    "triggers": [],
+    "template": "I have a game to play... treat trail!!",
+    "factSource": "",
+    "defaultRoute": "",
     "animationCue": "",
     "status": "Approved"
   }
