@@ -1303,6 +1303,12 @@ export default function BreedTree({
      now hands it velocity, which is what makes it move off and come back. */
   const KNOCK_IMPULSE = 1.6;
   const KNOCK_VMAX = 26;       // so a fast drag cannot fire one across the pit
+  /* How far the pair must SEPARATE before another contact can score.
+     Without this a knocked circle scores again on every oscillation as it
+     settles: it rings back through contact, the flag clears, and it scores
+     again. A double tap next to a still-settling neighbour was collecting
+     about fifteen points that way. */
+  const KNOCK_REARM = 10;
   type Knock = { els: number[]; chip: { i: number; bx: number; by: number } | null; ox: number; oy: number; vx: number; vy: number; hit: boolean };
   const knocksRef = useRef<Map<number, Knock>>(new Map());
   const knockRafRef = useRef<number | null>(null);
@@ -1392,7 +1398,11 @@ export default function BreedTree({
       const gx = (n.x + kn.ox) - cxD, gy = (n.y + kn.oy) - cyD;
       const dist = Math.hypot(gx, gy) || 0.0001;
       const min = d.r + n.r;
-      if (dist >= min) continue;
+      if (dist >= min) {
+        // Clear apart, so the next touch is a genuinely new one.
+        if (dist > min + KNOCK_REARM) kn.hit = false;
+        continue;
+      }
       const push = min - dist;
       kn.ox += (gx / dist) * push;
       kn.oy += (gy / dist) * push;
@@ -1418,7 +1428,10 @@ export default function BreedTree({
       kn.ox += kn.vx;
       kn.oy += kn.vy;
       if (Math.hypot(kn.ox, kn.oy) < KNOCK_REST && Math.hypot(kn.vx, kn.vy) < KNOCK_REST) {
-        kn.ox = 0; kn.oy = 0; kn.vx = 0; kn.vy = 0; kn.hit = false;
+        // hit is NOT cleared here. Coming to rest is not the same as being
+        // clear of the other circle, and clearing it here is what let a
+        // settling neighbour score over and over.
+        kn.ox = 0; kn.oy = 0; kn.vx = 0; kn.vy = 0;
         paintOffset(kn.els, kn.chip, 0, 0);
       } else {
         alive = true;
@@ -1480,7 +1493,9 @@ export default function BreedTree({
       cur.ox = fromX * (1 - e);
       cur.oy = fromY * (1 - e);
       pullPaint(cur, cur.ox, cur.oy);
-      knockAgainst(cur.node, cur.ox, cur.oy);
+      // Only if it actually travelled. A tap releases from zero, so there is
+      // nothing coming home and nothing to bump.
+      if (fromX !== 0 || fromY !== 0) knockAgainst(cur.node, cur.ox, cur.oy);
       if (t < 1) { cur.raf = requestAnimationFrame(step); return; }
       pullPaint(cur, 0, 0);
       pullRef.current = null;
@@ -5242,7 +5257,11 @@ export default function BreedTree({
                     if (!pl) return;
                     const dx = (e.clientX - pl.sx) * pl.perPx;
                     const dy = (e.clientY - pl.sy) * pl.perPx;
-                    if (!pl.moved && Math.hypot(e.clientX - pl.sx, e.clientY - pl.sy) > 4) {
+                    // 8px, the same threshold every other tap in the pit uses.
+                    // At 4 a perfectly ordinary tap on a phone counted as a
+                    // drag, and onCircle then swallowed it: the double tap was
+                    // being thrown away before it could reach the learn area.
+                    if (!pl.moved && Math.hypot(e.clientX - pl.sx, e.clientY - pl.sy) > 8) {
                       pl.moved = true;
                       // Double tap only opens learn once something has been
                       // pulled, so this is the moment that unlocks it.
