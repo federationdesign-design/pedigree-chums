@@ -1045,6 +1045,9 @@ const GAME_EXIT = new Set(['stop', 'enough', 'finished', 'finish', 'done']);
 // Task 146: Treat Trail entry phrases (the Labrador's game only). "treat trail" is the name; the rest
 // are what a child would actually type. Gated on the active dog being the Labrador in resolve().
 const TREAT_TRAIL_START = /(treat trail|treattrail|treat game|treat hunt|find the treat|find a treat|guess the treat|hunt for treats|play a treat game)/;
+// Task 147: The Case of the Missing Biscuit entry phrases (the Border Terrier's game only). Gated on
+// the active dog being the Terrier in resolve(). "the case" is deliberately specific (not bare "case").
+const MISSING_BISCUIT_START = /(missing biscuit|the case of the missing biscuit|the missing biscuit|whodunnit|whodunit|solve a case|solve the case|solve a mystery|solve the mystery|a mystery|the mystery|be a detective|detective game)/;
 function matchGameStart(c: string): GameId | null {
   for (const [re, id] of GAME_STARTS) if (re.test(c)) return id;
   return null;
@@ -1163,14 +1166,16 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
       }
       return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: 'death_answer' };
     }
-    // Task 146: while Treat Trail is running, every non-safety input is a guess. Placed directly below
-    // the safety / grief / death cluster (which still wins mid-round and ends it) and ABOVE every
-    // word-route below (maths, the god cluster, ask_dogs / breeds / games, breed pages, canned), so a
-    // guess like "dog", "games" or "5 x 5" is never swallowed as something else. The Collie games keep
-    // their own handler lower down (their inputs are letters / digits, so they never reach those routes).
-    if (state.activeGame === 'treattrail') {
-      if (GAME_EXIT.has(c)) return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: 'game_exit', game: 'treattrail' };
-      return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: 'game_move', game: 'treattrail' };
+    // Task 146/147: while a word-guessing game is running (Treat Trail, the Labrador's; Missing
+    // Biscuit, the Terrier's), every non-safety input is a guess/clue. Placed directly below the
+    // safety / grief / death cluster (which still wins mid-round and ends it) and ABOVE every word-route
+    // below (the specialist transfers, maths, the god cluster, ask_dogs / breeds / games, breed pages,
+    // canned), so a guess like "dog", "games", "sausige" or "5 x 5" is never swallowed as something
+    // else. The Collie games keep their own handler lower down (letter/digit inputs, so they never
+    // reach those routes).
+    if (state.activeGame === 'treattrail' || state.activeGame === 'missingbiscuit') {
+      if (GAME_EXIT.has(c)) return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: 'game_exit', game: state.activeGame };
+      return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: 'game_move', game: state.activeGame };
     }
     // Task 145: the Terrier's sit gag runs as a sequence (the deathAskStreak shape). Once he has
     // asked "why?" (TER-B22-01 -> terrierSitStep 1), the NEXT input, whatever it is, gets the
@@ -1357,6 +1362,11 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
   // Collie/Terrier/Boxer keep their own games). Below safety and the active-game move handler above.
   if (state.activeDog === 'labrador' && !state.activeGame && TREAT_TRAIL_START.test(c)) {
     return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: 'game_start', game: 'treattrail' };
+  }
+  // Task 147: The Case of the Missing Biscuit is the Border Terrier's game -- start it only when the
+  // Terrier is active. The other three keep their own games and routes.
+  if (state.activeDog === 'terrier' && !state.activeGame && MISSING_BISCUIT_START.test(c)) {
+    return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: 'game_start', game: 'missingbiscuit' };
   }
   {
     const start = matchGameStart(c);

@@ -5,7 +5,7 @@
 // of the games list, so it can never disagree with the list it counts.
 // Nothing else defines the campaign version, mode or the qualifying games.
 
-export const GAME_IDS = ["G01", "G02", "G03", "G04", "G05", "G06", "G07"] as const;
+export const GAME_IDS = ["G01", "G02", "G03", "G04", "G05", "G06", "G07", "G08"] as const;
 export type GameId = (typeof GAME_IDS)[number];
 
 export interface GameDef {
@@ -86,6 +86,15 @@ export const REGISTRY: Registry = {
       name: "Treat Trail",
       threshold:
         "The Treat Trail first clue is served in the Pick a Chum chat (the Labrador's game entered by name), before any guess",
+    },
+    // Task 147: the Border Terrier's game. Qualifies the moment its opening surface (the first case's
+    // opening line + the three suspects) is served in the chat, on game_start, before any guess. This
+    // takes the campaign TOTAL from 7 to 8.
+    {
+      id: "G08",
+      name: "The Case of the Missing Biscuit",
+      threshold:
+        "The Missing Biscuit first case is served in the Pick a Chum chat (the Border Terrier's game entered by name), before any guess",
     },
   ],
 };

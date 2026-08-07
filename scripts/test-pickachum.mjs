@@ -1936,6 +1936,51 @@ for (const dog of ['collie', 'terrier', 'boxer']) {
   check('treat trail', {}, { session: s, assert: (r, _resp, se) => (r.action === 'game_start' && r.game === 'treattrail' ? `${dog} started Treat Trail` : se.activeGame === 'treattrail' ? `${dog} entered Treat Trail` : null) });
 }
 
+// ==== Task 147: The Case of the Missing Biscuit, the Terrier's game ====
+// Entry starts case 1 (opening + suspects); clues come one at a time on request; wrong is blunt,
+// correct closes the case; three wrong reveals the guilty suspect (never a literal {{ANSWER}}).
+(() => {
+  const s = newSession('terrier');
+  check('missing biscuit', { action: 'game_start' }, { session: s, assert: (_r, resp, se) => (se.activeGame === 'missingbiscuit' && resp.text.includes('a biscuit is missing') && resp.text.includes('the cat, the puppy or grandad') ? null : `mb start: game=${se.activeGame} text="${resp.text}"`) });
+  check('clue', { action: 'game_move' }, { session: s, assert: (_r, resp) => (resp.text.includes('right. heres one') && resp.text.includes('high shelf') && !resp.text.includes('sofa') ? null : `mb clue1 (one at a time): "${resp.text}"`) });
+  check('the puppy', { action: 'game_move' }, { session: s, assert: (_r, resp) => (resp.text === 'why would it be them?' ? null : `mb wrong1: "${resp.text}"`) });
+  check('the cat', { action: 'game_move' }, { session: s, assert: (_r, resp) => (resp.text.includes('aye. thats the one') ? null : `mb correct: "${resp.text}"`) });
+})();
+(() => { // second wrong then reveal, with the real name substituted (never literal {{ANSWER}})
+  const s = newSession('terrier');
+  check('missing biscuit', { action: 'game_start' }, { session: s });
+  check('grandad', { action: 'game_move' }, { session: s, assert: (_r, resp) => (resp.text === 'why would it be them?' ? null : `wrong1: ${resp.text}`) });
+  check('the puppy', { action: 'game_move' }, { session: s, assert: (_r, resp) => (resp.text === 'no. think again' ? null : `wrong2: ${resp.text}`) });
+  check('nobody', { action: 'game_move' }, { session: s, assert: (_r, resp) => (resp.text.includes('it was the cat') && !resp.text.includes('{{') ? null : `reveal: "${resp.text}"`) });
+})();
+(() => { // clues run out after three
+  const s = newSession('terrier');
+  check('missing biscuit', { action: 'game_start' }, { session: s });
+  for (let i = 0; i < 3; i++) check('clue', { action: 'game_move' }, { session: s });
+  check('clue', { action: 'game_move' }, { session: s, assert: (_r, resp) => (resp.text === 'thats all i have. name someone' ? null : `out of clues: "${resp.text}"`) });
+})();
+(() => { // EVERY case solvable from its clues (fair-clue rule): walk all five, solving each; case 5 ends it
+  const s = newSession('terrier');
+  check('missing biscuit', { action: 'game_start' }, { session: s });
+  const cases = [['the cat', 'The Muddy Pawprints'], ['the labrador', 'The Chewed Slipper'], ['the puppy', 'The Open Gate'], ['the boy next door', 'The Empty Bowl'], ['the labrador', null]];
+  for (const [guess, nextTitle] of cases) {
+    check(guess, { action: 'game_move' }, { session: s, assert: (_r, resp) => (resp.text.includes('aye. thats the one') ? null : `case not solved by "${guess}": "${resp.text}"`) });
+    if (nextTitle) check('yes', { action: 'game_move' }, { session: s, assert: (_r, resp) => (resp.text.includes(nextTitle) ? null : `next case not "${nextTitle}": "${resp.text}"`) });
+  }
+  check('anything', {}, { session: s, assert: (_r, _resp, se) => (se.activeGame === null ? null : `game did not end after case 5: ${se.activeGame}`) });
+})();
+// safety / grief / fear-of-a-person win mid-case and END it
+(() => { const s = newSession('terrier'); check('missing biscuit', { action: 'game_start' }, { session: s }); check('im in trouble', { action: 'safety_signpost' }, { session: s, assert: (r, _resp, se) => (r.moderationId === 'MOD_SAFEGUARDING' && se.activeGame === null ? null : `mb safety: ${r.moderationId} game=${se.activeGame}`) }); })();
+(() => { const s = newSession('terrier'); check('missing biscuit', { action: 'game_start' }, { session: s }); check('my dog died', { action: 'grief' }, { session: s, assert: (_r, _resp, se) => (se.activeGame === null ? null : `mb grief: game=${se.activeGame}`) }); })();
+(() => { const s = newSession('terrier'); check('missing biscuit', { action: 'game_start' }, { session: s }); check('what is a penis', { action: 'anatomy_redirect' }, { session: s, assert: (_r, _resp, se) => (se.activeGame === null ? null : `mb fear-of-a-person: game=${se.activeGame}`) }); })();
+// exit in his own blunt voice
+(() => { const s = newSession('terrier'); check('missing biscuit', { action: 'game_start' }, { session: s }); check('stop', { action: 'game_exit' }, { session: s, assert: (_r, resp, se) => (se.activeGame === null && resp.text === 'ok' ? null : `mb exit: "${resp.text}" game=${se.activeGame}`) }); })();
+// protected states: no Missing Biscuit copy serves
+(() => { const s = newSession('terrier'); check('im in trouble', { action: 'safety_signpost' }, { session: s }); check('missing biscuit', {}, { session: s, assert: (r, _resp, se) => (r.action === 'game_start' || se.activeGame === 'missingbiscuit' ? 'Missing Biscuit started in PROTECTED_ACTIVE' : null) }); })();
+(() => { const s = newSession('terrier'); check('im in trouble', { action: 'safety_signpost' }, { session: s }); check('how do I play?', { action: 'rules_answer' }, { session: s }); check('missing biscuit', { action: 'neutral_refusal' }, { session: s, assert: (_r, _resp, se) => (se.activeGame === null ? null : 'started in PROTECTED_AFTERCARE') }); })();
+// the other three dogs do not run it
+for (const dog of ['collie', 'labrador', 'boxer']) { const s = newSession(dog); check('missing biscuit', {}, { session: s, assert: (r, _resp, se) => (r.game === 'missingbiscuit' || se.activeGame === 'missingbiscuit' ? `${dog} started Missing Biscuit` : null) }); }
+
 // ==== Task 146 fix: a dog never transfers to itself; a food word never pulls it out of its game ====
 for (const [dog, word] of [['labrador', 'sausige'], ['labrador', 'treat'], ['boxer', 'funny']]) {
   const s = newSession(dog);

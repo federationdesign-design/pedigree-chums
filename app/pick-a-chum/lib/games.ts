@@ -11,6 +11,7 @@
 import { GameId } from './types';
 import { KENNEL_SKETCHES } from '../data/kennel-sketches';
 import { TREAT_TRAIL_OBJECTS } from '../data/treat-trail';
+import { BISCUIT_CASES } from '../data/missing-biscuit';
 import { wordFuzzyEq } from './normalise';
 
 export interface GameState {
@@ -21,15 +22,19 @@ export interface GameState {
   sketchIndex: number; // kennel-sketch: current drawing index
   objectIndex: number; // treat-trail: current object (0..9)
   clueIndex: number; // treat-trail: current clue shown (0..2)
-  guesses: number; // treat-trail: wrong guesses on the current object (0..3)
+  guesses: number; // treat-trail / missing-biscuit: wrong guesses on the current object/case (0..3)
+  caseIndex: number; // missing-biscuit: current case (0..4)
+  cluesGiven: number; // missing-biscuit: clues revealed on the current case (0..3), given on request
+  awaitingAnother: boolean; // missing-biscuit: a case just closed, waiting for "another one?" yes/no
 }
 
 export interface GameResult {
-  line: string; // the B4x/B65 responseId to serve (or a synthetic id for an ongoing board, served as no text)
+  line: string; // the B4x/B65/B66 responseId to serve (or a synthetic id for an ongoing board, served as no text)
   display: string; // the monospace block rendered above/with the response
   word?: string; // {{WORD}} substitution (missing-sheep loss)
-  answer?: string; // {{ANSWER}} substitution (kennel-sketch reveal / treat-trail move-on)
-  clueId?: string; // treat-trail: the workbook clue row to append after the reaction line
+  answer?: string; // {{ANSWER}} substitution (kennel-sketch reveal / treat-trail move-on / biscuit reveal)
+  clueId?: string; // treat-trail / missing-biscuit: a workbook row to append after the reaction line (clue, or "another one?")
+  suffix?: string; // missing-biscuit: a composed line to append (the suspect list for a case presentation)
   link?: string; // treat-trail: a finale link (SAUSAGE -> /hot-dogs)
   ended: boolean; // true: the game is over, clear session.activeGame
 }
@@ -40,7 +45,7 @@ const MISSING_SHEEP_WORDS = ['BOWL', 'NOSE', 'EARS', 'LEAD', 'FETCH', 'PAW', 'TA
 const START_SHEEP = 5;
 
 function freshState(): GameState {
-  return { board: Array(9).fill(' '), word: '', guessed: [], wrong: 0, sketchIndex: 0, objectIndex: 0, clueIndex: 0, guesses: 0 };
+  return { board: Array(9).fill(' '), word: '', guessed: [], wrong: 0, sketchIndex: 0, objectIndex: 0, clueIndex: 0, guesses: 0, caseIndex: 0, cluesGiven: 0, awaitingAnother: false };
 }
 
 // ---- Nine-Square (noughts and crosses on nine numbered cells) ----
@@ -198,6 +203,77 @@ function treatMove(state: GameState, input: string): { state: GameState; result:
   return { state: ns, result: { line: 'B65-TREATTRAIL-MOVEON', answer: obj.answer, clueId: TREAT_TRAIL_OBJECTS[ns.objectIndex].clueIds[0], display: '', ended: false } };
 }
 
+// ---- The Case of the Missing Biscuit (a mystery; the Border Terrier's game) ----
+//
+// Five cases, three suspects each, three clues each given ONE AT A TIME ON REQUEST, three guesses.
+// Blunt and never encouraging (his verbatim lines). Each case presents its opening (case 1 = his
+// OPENING line; 2-5 = the title) plus the three suspects; the child asks for clues and names a suspect.
+// Matching reuses the fuzzy matcher plus each suspect's accept list. A closed case offers "another
+// one?"; case 5 is last. Safety wins mid-case above this (the engine ends the game on any non-move).
+
+const BISCUIT_CLUE_REQUEST = new Set(['clue', 'a clue', 'another clue', 'next clue', 'give me a clue', 'give us a clue', 'can i have a clue', 'clue please', 'hint', 'a hint', 'more', 'another']);
+const BISCUIT_YES = new Set(['yes', 'yeah', 'yep', 'yes please', 'ok', 'okay', 'sure', 'go on', 'aye', 'another', 'another one', 'more', 'next', 'go']);
+
+function suspectLine(caseIndex: number): string {
+  const names = BISCUIT_CASES[caseIndex].suspects.map((s) => s.name);
+  return names.slice(0, -1).join(', ') + ' or ' + names[names.length - 1];
+}
+
+// The index of the suspect the guess names, or -1. Reuses the fuzzy matcher (per accept word) plus a
+// whole-phrase accept check, so "the boy next door", "boy" or "next door" all reach the same suspect.
+function matchBiscuitSuspect(caseIndex: number, input: string): number {
+  const whole = input.trim().toLowerCase();
+  const words: string[] = whole.match(/[a-z]+/g) ?? [];
+  const suspects = BISCUIT_CASES[caseIndex].suspects;
+  for (let i = 0; i < suspects.length; i++) {
+    const accept = suspects[i].accept;
+    if (accept.includes(whole)) return i;
+    if (accept.some((a) => !a.includes(' ') && (words.includes(a) || words.some((w) => wordFuzzyEq(w, a))))) return i;
+  }
+  return -1;
+}
+
+// Present a case: its opening line (case 1 = his OPENING; 2-5 = the title) plus the three suspects.
+function biscuitPresent(caseIndex: number): GameResult {
+  return { line: BISCUIT_CASES[caseIndex].introId, suffix: suspectLine(caseIndex), display: '', ended: false };
+}
+
+function biscuitMove(state: GameState, input: string): { state: GameState; result: GameResult } {
+  const compact = input.trim().toLowerCase();
+
+  // Between cases: "another one?" -> yes presents the next case; anything else ends the game.
+  if (state.awaitingAnother) {
+    if (BISCUIT_YES.has(compact)) {
+      const ns = { ...state, caseIndex: state.caseIndex + 1, cluesGiven: 0, guesses: 0, awaitingAnother: false };
+      return { state: ns, result: biscuitPresent(ns.caseIndex) };
+    }
+    return { state, result: { line: 'B66-MISSINGBISCUIT-EXIT', display: '', ended: true } };
+  }
+
+  const c = BISCUIT_CASES[state.caseIndex];
+  const isLast = state.caseIndex >= BISCUIT_CASES.length - 1;
+  // Close a case: case 5 ends the game; earlier cases offer "another one?" and wait.
+  const closeCase = (line: string, answer?: string): { state: GameState; result: GameResult } =>
+    isLast
+      ? { state, result: { line, answer, display: '', ended: true } }
+      : { state: { ...state, awaitingAnother: true }, result: { line, answer, clueId: 'B66-MISSINGBISCUIT-ANOTHER', display: '', ended: false } };
+
+  // A clue on request: one at a time. When all three are out, he tells the child to name someone.
+  if (BISCUIT_CLUE_REQUEST.has(compact)) {
+    if (state.cluesGiven >= 3) return { state, result: { line: 'B66-MISSINGBISCUIT-OUTOFCLUES', display: '', ended: false } };
+    return { state: { ...state, cluesGiven: state.cluesGiven + 1 }, result: { line: 'B66-MISSINGBISCUIT-CLUE', clueId: c.clueIds[state.cluesGiven], display: '', ended: false } };
+  }
+
+  // Otherwise it is a guess (naming a suspect).
+  if (matchBiscuitSuspect(state.caseIndex, input) === c.answer) return closeCase('B66-MISSINGBISCUIT-CORRECT');
+  const guesses = state.guesses + 1;
+  if (guesses < 3) {
+    return { state: { ...state, guesses }, result: { line: guesses === 1 ? 'B66-MISSINGBISCUIT-WRONG' : 'B66-MISSINGBISCUIT-WRONG2', display: '', ended: false } };
+  }
+  // Third wrong: the reveal, with the guilty suspect substituted for {{ANSWER}}.
+  return closeCase('B66-MISSINGBISCUIT-REVEAL', c.suspects[c.answer].name);
+}
+
 // ---- Public API ----
 
 export function startGame(game: GameId, counter: number): { state: GameState; result: GameResult } {
@@ -214,6 +290,10 @@ export function startGame(game: GameId, counter: number): { state: GameState; re
     // The Labrador's game: start at the first object's first clue.
     return { state: freshState(), result: treatStartResult() };
   }
+  if (game === 'missingbiscuit') {
+    // The Border Terrier's game: present the first case (his opening line + the three suspects).
+    return { state: freshState(), result: biscuitPresent(0) };
+  }
   // kennelsketch: fixed order from the drawings file, starting at the first.
   const state: GameState = { ...freshState(), sketchIndex: 0 };
   return { state, result: { line: 'B43-KENNELSKETCH-01', display: sketchDisplay(0), ended: false } };
@@ -223,6 +303,7 @@ export function applyMove(game: GameId, state: GameState, input: string): { stat
   if (game === 'ninesquare') return nineMove(state, input);
   if (game === 'missingsheep') return sheepMove(state, input);
   if (game === 'treattrail') return treatMove(state, input);
+  if (game === 'missingbiscuit') return biscuitMove(state, input);
   return sketchMove(state, input);
 }
 
@@ -230,5 +311,6 @@ export function exitLine(game: GameId): string {
   if (game === 'ninesquare') return 'B41-NINESQUARE-07';
   if (game === 'missingsheep') return 'B42-MISSINGSHEEP-08';
   if (game === 'treattrail') return 'B65-TREATTRAIL-EXIT';
+  if (game === 'missingbiscuit') return 'B66-MISSINGBISCUIT-EXIT';
   return 'B43-KENNELSKETCH-05';
 }

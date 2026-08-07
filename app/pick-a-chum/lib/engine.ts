@@ -142,6 +142,9 @@ function serveGameResult(resolution: Resolution, data: ChumData, result: GameRes
     const clue = gameCopy(data, result.clueId);
     if (clue) text = text ? `${text}\n\n${clue}` : clue;
   }
+  // Task 147 (Missing Biscuit): a case presentation appends the composed suspect list (data-driven,
+  // the suspect names) after the opening line.
+  if (result.suffix) text = text ? `${text}\n${result.suffix}` : result.suffix;
   resolution.gameLine = result.line;
   resolution.gameText = text;
   resolution.gameDisplay = result.display;
