@@ -1019,6 +1019,7 @@ export default function BreedTree({
   onShownChange,
   onShownImageChange,
   onShownStatusChange,
+  onShownPathChange,
   hideCaption = false,
   onCaptionClose,
   onScore,
@@ -1071,6 +1072,13 @@ export default function BreedTree({
   onShownChange?: (name: string) => void;
   onShownImageChange?: (img: string | null) => void;
   onShownStatusChange?: (tag: BreedTag | null) => void;
+  /* THE TITLE LADDER. The three callbacks above describe one circle. This one
+     describes the whole line down to it, root first, so the shell can stack a
+     portrait per step instead of a single "you are here".
+     Emitted from the same effect and on the same trigger, so it can never
+     disagree with them. d3 gives the chain for free: every circle is a
+     hierarchy node and already knows its own ancestors. */
+  onShownPathChange?: (path: { name: string; img: string | null; status: BreedTag | null }[]) => void;
   hideCaption?: boolean;
   onCaptionClose?: () => void;
   onScore?: (v: number) => void;
@@ -3161,6 +3169,17 @@ export default function BreedTree({
     onShownImageChange?.(shImg ? bust(shImg) : null);
     const shNote = sh === nodes[0] ? (rootNote ?? sh.data.note ?? "") : (sh.data.note ?? "");
     onShownStatusChange?.(nodeStatus(sh.data.name, shNote));
+    /* Root first, which is the order it is read in. The root step takes the
+       level's own image and note, exactly as the single-circle callbacks above
+       do, so the top of the ladder matches the title that was already there. */
+    onShownPathChange?.(
+      (sh.ancestors() as Node[]).reverse().map((n) => {
+        const isRoot = n === nodes[0];
+        const img = isRoot ? (rootImage ?? n.data.img) : n.data.img;
+        const note = isRoot ? (rootNote ?? n.data.note ?? "") : (n.data.note ?? "");
+        return { name: n.data.name, img: img ? bust(img) : null, status: nodeStatus(n.data.name, note) };
+      }),
+    );
     setBoxAlt((v) => !v);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hovered, focus]);

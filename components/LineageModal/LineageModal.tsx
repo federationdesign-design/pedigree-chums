@@ -146,6 +146,11 @@ export default function LineageModal({ name, image, character, lineage, onClose,
      ran is added back, because the flood is handed a list with those already
      filtered out. Reset per level for free: this modal remounts on every one. */
   const [packSize, setPackSize] = useState(0);
+  /* THE TITLE LADDER. The line from the level's own dog down to the circle
+     being looked at, root first. Two steps deep it is level > parent > circle,
+     which is the case this was built for. Deeper than that it does not fit, so
+     the middle collapses into a count: see LADDER_ROWS below. */
+  const [shownPath, setShownPath] = useState<{ name: string; img: string | null; status: BreedTag | null }[]>([]);
   const [isNarrow, setIsNarrow] = useState(false);
   useEffect(() => { exitAskRef.current = exitAsk; }, [exitAsk]);
   useEffect(() => {
@@ -285,9 +290,41 @@ export default function LineageModal({ name, image, character, lineage, onClose,
           as a single title. */}
       <div className={css.titleWrap}>
         <TitleRow img={image} name={name} status={levelStatus} isNarrow={isNarrow} />
-        {shownName !== name && (
-          <TitleRow img={shownImg} name={shownName} status={shownStatus} isNarrow={isNarrow} />
-        )}
+        {(() => {
+          /* THREE ROWS IS THE CEILING, and it is a measured one, not a taste.
+             The learn info box sits at clamp(112px, 17vh, 190px) plus 60 on a
+             phone and plus 100 on desktop. With the portrait at its new size a
+             fourth row runs into it on every viewport tested, including a
+             1440x900 desktop. So: the level's dog holds the top, the circle
+             being looked at holds the bottom, and anything between them
+             collapses into a single count.
+
+             The old two-row behaviour is unchanged at depth 0 and 1. A tree
+             only reaches depth 2 or more when a circle has circles inside it,
+             which is the case this was asked for. */
+          const rest = shownPath.slice(1);
+          if (rest.length === 0) {
+            // Nothing below the root. Fall back to the old comparison so the
+            // title still updates if the path callback has not arrived yet.
+            return shownName !== name ? (
+              <TitleRow img={shownImg} name={shownName} status={shownStatus} isNarrow={isNarrow} />
+            ) : null;
+          }
+          const last = rest[rest.length - 1];
+          const skipped = rest.length - 1;
+          return (
+            <>
+              {skipped === 1 ? (
+                <TitleRow img={rest[0].img} name={rest[0].name} status={rest[0].status} isNarrow={isNarrow} />
+              ) : skipped > 1 ? (
+                <div className={css.titleRow}>
+                  <span className={css.titleSkip} aria-label={`${skipped} steps not shown`}>+{skipped}</span>
+                </div>
+              ) : null}
+              <TitleRow img={last.img} name={last.name} status={last.status} isNarrow={isNarrow} />
+            </>
+          );
+        })()}
         {/* The global explanation (owner placement, option A): rides in the
             title wrap so it is on screen before any break panel opens.
             Verbatim from docs/lineage/BRIEF.md section 7. On narrow screens
@@ -325,6 +362,7 @@ export default function LineageModal({ name, image, character, lineage, onClose,
           onShownChange={setShownName}
           onShownImageChange={setShownImg}
           onShownStatusChange={setShownStatus}
+          onShownPathChange={setShownPath}
           levelTheme={theme}
           onBackToLearn={backToLearn}
           startInLearn={resumeInLearn}
