@@ -969,17 +969,17 @@ const LINEAGE: Record<string, LineageNode> = {
         note: "The huge eastern war and guard dogs at the root of every mastiff. Now extinct.",
         img: "/history/breeds/Ancient-Molossers.jpg",
         children: [
-          { name: "Old mastiffs of the ancient East", note: "The huge guard and hunting mastiffs of the ancient East, carved on palace walls thousands of years ago. Now extinct.", img: "/history/acident-main-img.jpg", value: 25 },
+          { name: "Old mastiffs of the ancient East", note: "The huge guard and hunting mastiffs of the ancient East, carved on palace walls thousands of years ago. Now extinct.", img: "/history/breeds/old-mastiffs-of-the-ancient-east.jpg", value: 25 },
           { name: "Ancient Molossers", note: "The huge eastern war and guard dogs at the root of every mastiff. Now extinct.", img: "/history/breeds/Ancient-Molossers.jpg", value: 25 },
         ],
       },
       {
         name: "Alaunt war dogs",
         note: "The fierce war and catch dogs that rode west with mounted warriors. Now extinct.",
-        img: "/history/breeds/Mastiff-and-Alaunt-war-dogs.jpg",
+        img: "/history/breeds/alunt-war-dogs.jpg",
         children: [
           { name: "Dogs of the Alan horsemen", note: "The big steppe dogs of the Alan horsemen, guarding their camps and herds across the plains. Now extinct.", img: "/history/breeds/placeholder-circle.svg", value: 25 },
-          { name: "Alaunt war dogs", note: "The fierce war and catch dogs that rode west with mounted warriors. Now extinct.", img: "/history/breeds/Mastiff-and-Alaunt-war-dogs.jpg", value: 25 },
+          { name: "Alaunt war dogs", note: "The fierce war and catch dogs that rode west with mounted warriors. Now extinct.", img: "/history/breeds/alunt-war-dogs.jpg", value: 25 },
         ],
       },
     ],
@@ -992,10 +992,10 @@ const LINEAGE: Record<string, LineageNode> = {
       {
         name: "Gaulish coursing hounds",
         note: "The swift vertragus hounds of Gaul that Roman writers admired for pure speed. Now extinct.",
-        img: "/history/breeds/celtic-hound-drawing.jpg",
+        img: "/history/breeds/old-gaulish-coursinghounds.jpg",
         children: [
           { name: "Old hunting dogs of the Celts", note: "The native running dogs of Iron Age Europe. Now extinct.", img: "/history/breeds/Old-hunting-dogs-of-the-Celts.jpg", value: 25 },
-          { name: "Gaulish coursing hounds", note: "The swift vertragus hounds of Gaul that Roman writers admired for pure speed. Now extinct.", img: "/history/breeds/celtic-hound-drawing.jpg", value: 25 },
+          { name: "Gaulish coursing hounds", note: "The swift vertragus hounds of Gaul that Roman writers admired for pure speed. Now extinct.", img: "/history/breeds/old-gaulish-coursinghounds.jpg", value: 25 },
         ],
       },
       {
@@ -1003,7 +1003,7 @@ const LINEAGE: Record<string, LineageNode> = {
         note: "The slender desert coursing dogs of the old world. Now extinct.",
         img: "/history/breeds/Ancient-eastern-sighthounds.jpg",
         children: [
-          { name: "Old desert coursing dogs", note: "The first slender chasing dogs of the old desert lands. Now extinct.", img: "/history/breeds/placeholder-circle.svg", value: 25 },
+          { name: "Old desert coursing dogs", note: "The first slender chasing dogs of the old desert lands. Now extinct.", img: "/history/breeds/old-desert-coursing-dogs.jpg", value: 25 },
           { name: "Ancient eastern sighthounds", note: "The slender desert coursing dogs of the old world. Now extinct.", img: "/history/breeds/Ancient-eastern-sighthounds.jpg", value: 25 },
         ],
       },
@@ -1059,10 +1059,10 @@ const LINEAGE: Record<string, LineageNode> = {
       {
         name: "Segusian tracking hounds",
         note: "The shaggy Gaulish trail hounds the Romans knew by name, famous for following a scent. Now extinct.",
-        img: "/history/breeds/placeholder-circle.svg",
+        img: "/history/breeds/segusian-hounds.jpg",
         children: [
           { name: "Old hunting dogs of the Celts", note: "The native running dogs of Iron Age Europe. Now extinct.", img: "/history/breeds/Old-hunting-dogs-of-the-Celts.jpg", value: 25 },
-          { name: "Segusian tracking hounds", note: "The shaggy Gaulish trail hounds the Romans knew by name, famous for following a scent. Now extinct.", img: "/history/breeds/placeholder-circle.svg", value: 25 },
+          { name: "Segusian tracking hounds", note: "The shaggy Gaulish trail hounds the Romans knew by name, famous for following a scent. Now extinct.", img: "/history/breeds/segusian-hounds.jpg", value: 25 },
         ],
       },
       {
