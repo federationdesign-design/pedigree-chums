@@ -25,6 +25,7 @@ import { reportHiddenGame } from '../../../lib/hiddenGames/browserEngine';
 import type { GameId as HiddenGameId } from '../../../lib/hiddenGames/registry';
 import { openDiscountPopup } from '../data/discount-popup';
 import { FEED_COOKIES, RED_TOOLTIP, CookiePill } from '../data/feed-cookie';
+import { breeds } from '../../../data/breeds';
 import { skipTheatre, buildTypingPlan, TYPING_PROFILES, TypingPlan } from '../lib/theatre';
 import { emitTurn } from '../lib/turn-tap';
 import { CHAT_KEY, PROTECTED_FLAG } from './pcKeys';
@@ -188,11 +189,32 @@ const HIDDEN_GAME_ID: Record<GameId, HiddenGameId> = { ninesquare: 'G03', missin
 // Task 148: an unbidden Terrier appearance. When passed (and there is no restored chat), the
 // experience mounts with the Terrier already chosen and MINIMISED, seeded with his `offer` line; on
 // the first open (engage), his `reveal` (the page's extended bio, or a game hint) is appended.
-export type AutoAppear = { dog: Dog; offer: string; reveal: string; route: string };
+// Task 152/153: an appearance may carry a SEQUENCE -- `offer` is the first message (the chip line), and
+// `followUps` are the extras that arrive whole, spaced by `gapMs` (playSequence). `chums` marks the one
+// dynamic case (the Collie naming three random breeds on /know-your-chums): the lines are generated in
+// the experience so the lightweight launcher never pulls the breed data.
+export type AutoAppear = { dog: Dog; offer: string; reveal: string; route: string; followUps?: string[]; gapMs?: number; chums?: boolean };
 
 // Task 151 Case A: the Labrador's thread pickup on /hot-dogs. He speaks FIRST (new: every message so far
 // has been a reply) into an existing chat, and arms the cookie ask so a "yes" feeds him. Owner copy, verbatim.
 const LAB_HOTDOG_PICKUP = 'you made it, I got here first. can you get me a cookie?';
+
+// Task 153: the Collie's chum-naming lines for /know-your-chums. THREE DISTINCT breeds, PICKED AT RANDOM
+// (a different three each session), drawn from each breed's OWN `fact` and `character` in her register
+// rather than 54 authored lines. Every one of the 54 has both fields, so no guard is needed; a missing
+// field simply drops out of the line. SHAPE (reported for approval): "The <Name>. <fact>. <first
+// sentence of character>." Generated here, not in the launcher, so the launcher stays lightweight.
+function collieChumLines(): string[] {
+  const pool = [...breeds];
+  const picks: typeof breeds = [];
+  for (let i = 0; i < 3 && pool.length; i++) picks.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0]);
+  return picks.map((b) => {
+    const fact = (b.fact || '').trim().replace(/[.\s]+$/, '');
+    const factSentence = fact ? `${fact[0].toUpperCase()}${fact.slice(1)}.` : '';
+    const charFirst = (b.character || '').split(/(?<=[.!?])\s+/)[0].replace(/&/g, 'and').trim();
+    return [`The ${b.name}.`, factSentence, charFirst].filter(Boolean).join(' ');
+  });
+}
 
 export default function PickAChumExperience({ onClose, autoAppear, pickupRoute }: { onClose: () => void; autoAppear?: AutoAppear; pickupRoute?: string | null }) {
   // Task 140: the page the visitor is on, carried into the engine as session state (like lastAction)
@@ -223,7 +245,7 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute }
   const [messages, setMessages] = useState<Message[]>(
     restored
       ? restored.messages || []
-      : auto
+      : auto && auto.offer // Task 153: a dynamic (chums) sequence has no static offer -- its first line is injected on mount, so seed nothing here
         ? [{ id: 0, who: 'dog', text: auto.offer, dog: auto.dog, name: dogInfo(auto.dog).name, display: auto.offer, done: true }]
         : []
   );
@@ -518,6 +540,27 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute }
     seqRef.current = null;
     clearTimers();
   }, [clearTimers]);
+
+  // Task 153: the Collie's sequence pages. Her extra messages arrive AUTOMATICALLY, spaced, a beat (or
+  // twenty seconds on /know-your-chums) apart -- the beat is where the joke sits, so they do not wait for
+  // the visitor to open the chip. The offer (message one) is already seeded; playSequence plays the rest
+  // with the Task 152 guards (abandon on type, stop on navigation, stop on a protected state). For the
+  // dynamic /know-your-chums case the three lines are generated here and the first is injected.
+  const seqStartedRef = useRef(false);
+  useEffect(() => {
+    if (!auto || seqStartedRef.current) return;
+    if (auto.chums) {
+      seqStartedRef.current = true;
+      const lines = collieChumLines();
+      if (!lines.length) return;
+      setMessages((m) => [...m, { id: idRef.current++, who: 'dog', text: lines[0], display: lines[0], done: true, dog: auto.dog, name: dogInfo(auto.dog).name }]);
+      setAnnounce(lines[0]);
+      playSequence(lines.slice(1), auto.dog, auto.gapMs ?? 20000);
+    } else if (auto.followUps?.length) {
+      seqStartedRef.current = true;
+      playSequence(auto.followUps, auto.dog, auto.gapMs ?? 2500);
+    }
+  }, [auto, playSequence]);
 
   // Drive a handover: post the user line (and any handover line), pause, pop the
   // old dog out and the new dog in, then land the new dog's reply.

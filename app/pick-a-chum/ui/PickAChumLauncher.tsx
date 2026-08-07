@@ -191,9 +191,26 @@ export default function PickAChumLauncher() {
   // suppression (canDogAppear) is the caller's responsibility -- this only builds the appearance.
   const appear = useCallback((app: DogAppearance, route: string) => {
     const bio = bioForRoute(route);
-    // Each dog's own voice: the Terrier's blunt extended bio, the Boxer's confidently-wrong misread, the
-    // Labrador's plain hunger. The Labrador's Case B line is short and stands alone, so it is the opener
-    // with no second reveal beat.
+    // Task 153: /know-your-chums is the one DYNAMIC appearance -- the Collie names three RANDOM breeds. The
+    // lines are generated in the experience (so this lightweight launcher never pulls the breed data), so
+    // here it is just flagged with `chums`.
+    if (app.dog === 'collie' && app.trigger === 'section') {
+      setAutoAppear({ dog: 'collie', offer: '', reveal: '', route, chums: true, gapMs: app.gapMs });
+      setOpen(true);
+      return;
+    }
+    // Task 152/153: a page with a `sequence` sends its messages one after another (the first is the chip
+    // line, the rest arrive whole, spaced by the page's gap). The Collie's warning/listing, and the Boxer's
+    // /home and /smarter reads that shipped as one block before the sequence player existed.
+    const seq = bio?.sequence;
+    if (seq && seq.length) {
+      setAutoAppear({ dog: app.dog, offer: seq[0], reveal: '', followUps: seq.slice(1), gapMs: app.gapMs, route });
+      setOpen(true);
+      return;
+    }
+    // Otherwise a single reveal-on-open appearance: the Terrier's blunt extended bio, the Boxer's misread
+    // (his /about stat list stays one block -- ten items overflow the three-message cap), or the Labrador's
+    // plain hunger opener with no second beat.
     const offer = app.dog === 'boxer' ? BOXER_OPENER : app.dog === 'labrador' ? bio?.craving ?? 'I like hotdogs' : OI_OI;
     const reveal = app.dog === 'boxer' ? bio?.misread ?? '' : app.dog === 'labrador' ? '' : bio?.extended ?? bio?.bio ?? '';
     setAutoAppear({ dog: app.dog, offer, reveal, route });
@@ -237,6 +254,32 @@ export default function PickAChumLauncher() {
     };
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
+  }, [shown, pathname, open, appear]);
+
+  // Task 153: the SECTION-GATE (the Collie on /know-your-chums). She appears only when a specific section
+  // scrolls into view -- the image rails, marked with data-pc-appear. NOT a percentage: the rails sit near
+  // the foot of a long page, so "when they reach that section" needs the element, not a number. Same
+  // suppression and per-page dismissal as the others. The rails are in the DOM from render (just below the
+  // fold), so by the time the launcher has revealed (`shown`) the element exists to observe.
+  useEffect(() => {
+    if (!shown || open) return;
+    const route = pathname ?? '';
+    const app = appearanceForRoute(route);
+    if (!app || app.trigger !== 'section' || !app.selector) return;
+    if (isDismissed(route)) return;
+    const el = document.querySelector(app.selector);
+    if (!el) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((e) => e.isIntersecting)) return;
+        if (!canDogAppear() || isDismissed(route)) return;
+        appear(app, route);
+        io.disconnect();
+      },
+      { threshold: 0.01 }
+    );
+    io.observe(el);
+    return () => io.disconnect();
   }, [shown, pathname, open, appear]);
 
   // Task 151 Case A: on /hot-dogs, decide the thread pickup purely by whether a chat exists (brief

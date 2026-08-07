@@ -51,13 +51,18 @@ export function markDismissed(route: string): void {
   } catch {}
 }
 
-// The pages a dog appears on unbidden, and how (brief section 11 -- the allocation is settled).
-//   'arrival'  after the reveal hold, the moment the page settles (the Terrier's two).
+// The pages a dog appears on unbidden, and how (brief section 8 -- the allocation is settled, the set is
+// now complete).
+//   'arrival'  after the reveal hold, the moment the page settles (the Terrier's two, two of the Collie's).
 //   'scroll'   only once the visitor has scrolled halfway down -- a real commitment signal, and it
-//              stops a dog meeting every /home visitor at the door (the Boxer's three, section 3).
-// Do NOT extend this without the owner asking, or the dogs become wallpaper.
-export type AppearTrigger = 'arrival' | 'scroll';
-export type DogAppearance = { route: string; dog: Dog; trigger: AppearTrigger };
+//              stops a dog meeting every /home visitor at the door (the Boxer's three).
+//   'section'  only once a specific SECTION scrolls into view (Task 153: the Collie names dogs on
+//              /know-your-chums, but not until the visitor reaches the image rails). The `selector` finds
+//              the element to watch; a plain percentage would be wrong (the rails sit near the foot).
+// `gapMs` is the pause between a sequence's messages (Task 152). A beat for a joke; twenty seconds for the
+// ambient chum-naming. Do NOT extend this list without the owner asking, or the dogs become wallpaper.
+export type AppearTrigger = 'arrival' | 'scroll' | 'section';
+export type DogAppearance = { route: string; dog: Dog; trigger: AppearTrigger; selector?: string; gapMs?: number };
 export const DOG_APPEARANCES: DogAppearance[] = [
   { route: '/britains-dog-history', dog: 'terrier', trigger: 'arrival' },
   { route: '/name-generator', dog: 'terrier', trigger: 'arrival' },
@@ -68,6 +73,13 @@ export const DOG_APPEARANCES: DogAppearance[] = [
   // ON ARRIVAL, not scroll -- the Boxer's 50% gate is his own. When a chat DOES exist he is already there
   // and the launcher's thread-pickup listener speaks for him instead (no appearance); that is Case A.
   { route: '/hot-dogs', dog: 'labrador', trigger: 'arrival' },
+  // Task 153: the Collie, the last dog. She ASSESSES. good-dog-bad-dog is a warning about length, so it
+  // comes a few seconds after load (before they commit to 3,000 words), NOT on scroll. dogs-at-work is
+  // her professional listing. know-your-chums is ambient naming, gated on reaching the rails, twenty
+  // seconds apart. The first two are 'arrival'; their sequence gap is a beat.
+  { route: '/good-dog-bad-dog', dog: 'collie', trigger: 'arrival' },
+  { route: '/dogs-at-work', dog: 'collie', trigger: 'arrival' },
+  { route: '/know-your-chums', dog: 'collie', trigger: 'section', selector: '[data-pc-appear="rails"]', gapMs: 20000 },
 ];
 export function appearanceForRoute(route: string): DogAppearance | null {
   return DOG_APPEARANCES.find((a) => a.route === (route || '')) ?? null;
