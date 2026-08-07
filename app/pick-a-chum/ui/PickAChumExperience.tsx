@@ -241,6 +241,10 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute }
   const recSessionRef = useRef(restored ? restored.recSessionId || '' : auto ? `s${Date.now().toString(36)}-auto` : '');
   // The active typing performance, so a tap or Enter can complete it instantly.
   const playbackRef = useRef<{ id: number; plan: TypingPlan; closed?: boolean; done: boolean } | null>(null);
+  // Task 152: the in-flight consecutive-message sequence (a dog sending two or three in a row), or null.
+  // Its token guards the abandon rule: the visitor typing, navigation, or a protected state all set
+  // `aborted` and drop it, so the remaining messages never fire.
+  const seqRef = useRef<{ aborted: boolean } | null>(null);
 
   // Task 129 targets above 480px only; at or below, the pre-129 stacked panel
   // renders unchanged and mobile stays Task 120's problem.
@@ -466,6 +470,55 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute }
     finishTheatre(p.id, p.plan.final, p.closed);
   }, [clearTimers, finishTheatre]);
 
+  // Task 152 section 2: play a short run of extra dog messages after the main reply, without waiting for
+  // a reply -- generalising the fetch/cookie follow-up. Each lands whole, spaced by `gapMs`, and the run
+  // is capped at TWO extras (three messages total, a beat, not a monologue). THE ABANDON RULE: the run
+  // holds a token in seqRef; the visitor typing, navigating, or the session entering a protected state
+  // all drop it, so the rest never fire (see send(), the pathname effect, and the protected checks here).
+  // The extras appear whole (no per-message typing), so there is no theatre to stack -- the 40s ceiling
+  // is never approached by a sequence, only by the single main message that precedes it.
+  const SEQ_MAX_EXTRAS = 2;
+  const playSequence = useCallback(
+    (lines: string[], seqDog: Dog, gapMs: number) => {
+      const items = lines.filter((l) => l && l.trim()).slice(0, SEQ_MAX_EXTRAS);
+      if (!items.length) return;
+      const s = sessionRef.current;
+      // Never BEGIN a sequence in a protected session: a child who disclosed something must not have a
+      // dog carry on with more messages.
+      if (!s || s.protectedState || everProtectedRef.current) return;
+      const token = { aborted: false };
+      seqRef.current = token;
+      const play = (i: number) => {
+        if (token.aborted || seqRef.current !== token) return;
+        // Stop in flight if the session has since become protected.
+        const sess = sessionRef.current;
+        if (!sess || sess.protectedState || everProtectedRef.current) {
+          seqRef.current = null;
+          return;
+        }
+        const line = items[i];
+        setMessages((m) => [...m, { id: idRef.current++, who: 'dog', text: line, display: line, done: true, dog: seqDog, name: dogInfo(seqDog).name }]);
+        setAnnounce(line);
+        if (i + 1 < items.length) {
+          after(gapMs, () => play(i + 1));
+        } else {
+          seqRef.current = null; // the run is complete
+        }
+      };
+      after(gapMs, () => play(0));
+    },
+    [after]
+  );
+
+  // Task 152 section 2: abandon any in-flight sequence. Shared by the visitor's reply (send), navigation
+  // (the pathname effect), and disclosure. Cancels the pending message timers and drops the token.
+  const abandonSequence = useCallback(() => {
+    if (!seqRef.current) return;
+    seqRef.current.aborted = true;
+    seqRef.current = null;
+    clearTimers();
+  }, [clearTimers]);
+
   // Drive a handover: post the user line (and any handover line), pause, pop the
   // old dog out and the new dog in, then land the new dog's reply.
   const runSwap = useCallback(
@@ -560,10 +613,16 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute }
     const text = (textArg ?? input).trim();
     if (!session || !text || session.closed) return;
     setDead(false); // Task 78: any submit, whatever it is, revives the Collie (play dead lasts one turn)
+    // Task 152 section 2: THE ABANDON RULE. If a consecutive-message sequence is in flight, the visitor's
+    // reply WINS IMMEDIATELY -- drop the remaining messages and process this input now, never queue it. A
+    // dog that keeps talking over you is a fault, not a gag. (A live submit only reaches here when a real
+    // sequence is running, which plays at phase 'idle', so this precedes the type-ahead queue below.)
+    const abandonedSeq = !!seqRef.current;
+    abandonSequence();
     // Task 82: the dog is still performing. Never block or disable the input -- queue the message and
     // process it when the reply lands (see the drain effect below). textArg is set only when draining
     // the queue, so a live submit still clears the box and keeps focus while a queued one does not.
-    if (phase === 'transferring') {
+    if (!abandonedSeq && phase === 'transferring') {
       queueRef.current.push(text);
       if (textArg === undefined) {
         setInput('');
@@ -704,26 +763,29 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute }
       reportHiddenGame('G06');
     }
 
-    // Bark-game break: the volley is instant (a bark action skips theatre); the
-    // English line follows as a separate message after a short pause.
+    // Bark-game break / fetch / the cookie give-up: the main lands instantly, then a follow-up message.
+    // Task 152 section 2: the follow-up now flows through the general sequence player, so it inherits the
+    // abandon rule, the stop-on-navigation and the protected guard. Phase stays 'idle' during the gap so a
+    // reply in that window wins immediately (abandons the follow-up) rather than queuing behind it.
     if (r.followUp) {
       const followUp = r.followUp;
       setMsg(dogMsg.id, { display: r.text, typing: false, done: true });
       setAnnounce(r.text);
-      const followUpMsg: Message = { id: idRef.current++, who: 'dog', text: followUp, display: followUp, done: true, dog: toDog, name: dogInfo(toDog).name };
-      setPhase('transferring');
-      clearTimers();
-      after(reducedMotion ? 0 : 500, () => {
-        setMessages((m) => [...m, followUpMsg]);
-        setAnnounce(followUp);
-        setPhase('idle');
-        inputRef.current?.focus();
-      });
+      setPhase('idle');
+      window.setTimeout(() => inputRef.current?.focus(), 0);
+      playSequence([followUp], toDog, reducedMotion ? 0 : 500);
       return;
     }
 
     performTheatre(dogMsg.id, r.text, toDog, result.resolution.action, r.closed);
-  }, [input, phase, runSwap, after, clearTimers, reducedMotion, performTheatre, setMsg, pathname]);
+  }, [input, phase, runSwap, after, clearTimers, reducedMotion, performTheatre, setMsg, pathname, playSequence, abandonSequence]);
+
+  // Task 152 section 2: stop a consecutive-message sequence on navigation. If the visitor leaves the
+  // page, the remaining messages do not fire. Guarded on an active sequence so ordinary theatre in
+  // progress on other pages is untouched.
+  useEffect(() => {
+    if (seqRef.current) abandonSequence();
+  }, [pathname, abandonSequence]);
 
   // Task 82: drain the type-ahead queue. When a reply finishes (phase returns to idle) the next
   // queued line is sent, which starts its own performance; this effect re-runs when that lands, so
@@ -866,7 +928,10 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute }
 
                 {/* Task 115: the game board / sheep tiles / drawing. MONOSPACE + pre so the ASCII
                     keeps its shape (a proportional font collapses it). Not typed; it appears whole. */}
-                {msg.media && (() => {
+                {/* Task 152 section 3: hold the clip until the typing theatre has finished, so it lands
+                    WITH the completed message rather than before the text. INSTANT messages (safety,
+                    games) are `done` at once, so their clip still appears immediately. */}
+                {msg.done && msg.media && (() => {
                   // Task 149: honour prefers-reduced-motion for the COOKIE-GAME clips only -- they are
                   // decoration (a reaction to a feed), so a reduced-motion visitor gets controls instead
                   // of autoplay. Every other clip (how-are-you, paw, good boy, ...) is CONTENT: it is the

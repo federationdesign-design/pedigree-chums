@@ -1074,6 +1074,21 @@ const lcg = (seed) => () => ((seed = (seed * 1103515245 + 12345) & 0x7fffffff) /
   ok ? pass++ : fail++;
   rows.push({ ok, input: 'typing plan: 8s cap, ends whole', layer: '-', bucket: '-', action: 'theatre plan', note: ok ? '' : `total=${Math.round(plan.totalMs)} whole=${endsWhole} len=${lenOk}` });
 })();
+// Task 152 section 4: per-dog speed. NOTHING SLOWER than the Boxer (today's maximum); the others quicker,
+// in order. Same text and seed for each so only the profile differs; typos off (a clean factual action) so
+// the comparison is pure tempo. Also confirms the cap still holds for every dog and the Boxer stays at 1.0.
+(() => {
+  const line = 'the border collie answers almost before you have finished asking the question';
+  const dur = (d) => buildTypingPlan(line, TYPING_PROFILES[d], lcg(11), 'breed_answer').totalMs;
+  const [c, l, t, b] = [dur('collie'), dur('labrador'), dur('terrier'), dur('boxer')];
+  const ordered = c < l && l < t && t < b; // Collie fastest, Boxer slowest
+  const boxerUnchanged = TYPING_PROFILES.boxer.speed === 1.0;
+  const nothingSlower = TYPING_PROFILES.collie.speed <= 1 && TYPING_PROFILES.labrador.speed <= 1 && TYPING_PROFILES.terrier.speed <= 1;
+  const capOk = [c, l, t, b].every((x) => x <= THEATRE_MAX_MS + 1);
+  const ok = ordered && boxerUnchanged && nothingSlower && capOk;
+  ok ? pass++ : fail++;
+  rows.push({ ok, input: 'typing speed: per-dog, Collie<Labrador<Terrier<Boxer', layer: '-', bucket: '-', action: 'theatre speed', note: ok ? '' : `c=${Math.round(c)} l=${Math.round(l)} t=${Math.round(t)} b=${Math.round(b)} boxer1=${boxerUnchanged}` });
+})();
 // Typo eligibility excludes numbers, capitals and short words.
 (() => {
   const ok = isTypoEligible('remarkable') && !isTypoEligible('Collie') && !isTypoEligible('6.99') && !isTypoEligible('the');

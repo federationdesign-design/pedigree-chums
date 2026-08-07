@@ -20,6 +20,10 @@ export interface TypingProfile {
   midPauseMax: number;
   correctedPerWords: number; // ~1 self-correcting typo per this many words
   correctedCap: number; // hard cap of self-correcting typos per message
+  // Task 152 section 4: per-dog speed. A multiplier on the WHOLE performance duration (thinking + every
+  // keystroke). The Boxer is 1.0, today's maximum -- nothing gets slower; the others are faster, so who
+  // is typing reads from the tempo before the words do. The Collie (the clever one) answers almost at once.
+  speed: number;
 }
 
 // Border Terrier is the base profile. Collie is fast and precise (short thinking,
@@ -33,11 +37,14 @@ export interface TypingProfile {
 // properly visible before the reply. Typing tempo (charMin/charMax, pauses) is unchanged. The cap
 // (THEATRE_MAX_MS) and its thinking trim below are scaled 5x to match, so the 5x holds on long
 // replies too rather than being trimmed away.
+// Task 152 section 4: the speed multiplier. Boxer 1.0 (unchanged, the current maximum -- he takes ages,
+// which is the joke), Terrier 0.83, Labrador 0.67, Collie 0.5 (half the duration, almost at once). These
+// scale each profile's OWN timing, so nothing gets slower than it is today.
 export const TYPING_PROFILES: Record<Dog, TypingProfile> = {
-  terrier: { thinkMin: 2500, thinkMax: 7500, charMin: 20, charMax: 60, midPauseChance: 0.08, midPauseMin: 200, midPauseMax: 500, correctedPerWords: 32, correctedCap: 2 },
-  collie: { thinkMin: 1500, thinkMax: 4000, charMin: 12, charMax: 32, midPauseChance: 0.04, midPauseMin: 150, midPauseMax: 300, correctedPerWords: 64, correctedCap: 1 },
-  labrador: { thinkMin: 2000, thinkMax: 6000, charMin: 14, charMax: 44, midPauseChance: 0.07, midPauseMin: 200, midPauseMax: 450, correctedPerWords: 21, correctedCap: 2 },
-  boxer: { thinkMin: 3500, thinkMax: 10000, charMin: 22, charMax: 72, midPauseChance: 0.16, midPauseMin: 300, midPauseMax: 800, correctedPerWords: 20, correctedCap: 2 },
+  terrier: { thinkMin: 2500, thinkMax: 7500, charMin: 20, charMax: 60, midPauseChance: 0.08, midPauseMin: 200, midPauseMax: 500, correctedPerWords: 32, correctedCap: 2, speed: 0.83 },
+  collie: { thinkMin: 1500, thinkMax: 4000, charMin: 12, charMax: 32, midPauseChance: 0.04, midPauseMin: 150, midPauseMax: 300, correctedPerWords: 64, correctedCap: 1, speed: 0.5 },
+  labrador: { thinkMin: 2000, thinkMax: 6000, charMin: 14, charMax: 44, midPauseChance: 0.07, midPauseMin: 200, midPauseMax: 450, correctedPerWords: 21, correctedCap: 2, speed: 0.67 },
+  boxer: { thinkMin: 3500, thinkMax: 10000, charMin: 22, charMax: 72, midPauseChance: 0.16, midPauseMin: 300, midPauseMax: 800, correctedPerWords: 20, correctedCap: 2, speed: 1.0 },
 };
 
 // Responses that render instantly and completely: no dots, no typing, no typos.
@@ -179,9 +186,15 @@ export function buildTypingPlan(text: string, profile: TypingProfile, rng: Rng =
     }
   }
 
+  // Task 152 section 4: scale the whole performance by the dog's speed BEFORE the cap, so the tempo is
+  // per-dog and the 40s ceiling still holds on the scaled duration. The Boxer's 1.0 is a no-op; the
+  // others shrink. Nothing here makes anything slower than today.
+  const speed = profile.speed;
+  for (const s of steps) s.delay *= speed;
+
   // Cap the whole performance at THEATRE_MAX_MS by scaling the typing delays
   //    (thinking time is trimmed first so the message always finishes in time).
-  const think = between(rng, profile.thinkMin, profile.thinkMax);
+  const think = between(rng, profile.thinkMin, profile.thinkMax) * speed;
   let stepsMs = steps.reduce((s, x) => s + x.delay, 0);
   let usedThink = think;
   if (think + stepsMs > THEATRE_MAX_MS) {
