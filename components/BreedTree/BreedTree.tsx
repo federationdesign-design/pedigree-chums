@@ -1354,6 +1354,27 @@ export default function BreedTree({
     requestAnimationFrame(tick);
   };
 
+  /* TEMPORARY, remove once the knock is confirmed on a device.
+     ?knockdebug=1 puts a readout in the corner: how many contacts have fired and
+     what each shoved circle's offset currently is. The maths says a drag can
+     overlap a sibling by up to 166 world units on Celtic Hound, and the impulse
+     should send it a long way, so if the readout shows numbers and the screen
+     shows nothing the fault is in the paint; if the readout stays at zero the
+     contact is not firing at all. Either way it stops the guessing. */
+  const knockDbg = (msg: string) => {
+    if (typeof window === "undefined") return;
+    if (!window.location.search.includes("knockdebug=1")) return;
+    let box = document.getElementById("pc-knock-dbg");
+    if (!box) {
+      box = document.createElement("div");
+      box.id = "pc-knock-dbg";
+      box.style.cssText = "position:fixed;left:6px;bottom:6px;z-index:99999;background:rgba(0,0,0,0.75);color:#0f0;font:11px/1.35 monospace;padding:6px 8px;border-radius:6px;pointer-events:none;white-space:pre;max-width:70vw";
+      document.body.appendChild(box);
+    }
+    box.textContent = msg;
+  };
+  const knockHitsRef = useRef(0);
+
   const knockStep = () => {
     const map = knocksRef.current;
     let alive = false;
@@ -1370,6 +1391,9 @@ export default function BreedTree({
         paintOffset(kn.els, kn.chip, kn.ox, kn.oy);
       }
     }
+    const parts: string[] = [`contacts ${knockHitsRef.current}`, `moving ${map.size}`];
+    for (const [i, kn] of map) parts.push(`  node ${i}: ${kn.ox.toFixed(1)}, ${kn.oy.toFixed(1)}`);
+    knockDbg(parts.join("\n"));
     knockRafRef.current = alive ? requestAnimationFrame(knockStep) : null;
   };
 
@@ -5228,6 +5252,7 @@ export default function BreedTree({
                       if (!kn.hit) {
                         kn.hit = true;
                         // On the rim between them, where the contact reads.
+                        knockHitsRef.current += 1;
                         knockNum(cxD + (gx / dist) * d.r, cyD + (gy / dist) * d.r, KNOCK_POINTS);
                         onScore?.(KNOCK_POINTS);
                       }
