@@ -223,6 +223,37 @@ export default function LineageMap({
   currentScore?: number;
 }) {
   const [vp, setVp] = useState({ w: 1280, h: 800 });
+
+  /* THE SIZE OF THE DOG LIFTED OUT OF THE PIT.
+
+     BreedTree measures the circle in real screen pixels at the moment it is
+     tapped and hands that over as rootRadius. There is no growth on top: the
+     card is the circle, at the size it was. The only thing added is the ring,
+     11px drawn centred, so the object you see is 5.5px wider than the radius.
+
+     The old ceiling was a flat 220px and that was the whole problem. An
+     absolute pixel figure cannot serve screens that differ by four times.
+     Audited across every level, three difficulty settings, phone and desktop,
+     1326 lifts in all: 68% hit that ceiling, and on tablet and desktop it was
+     every single one. The raw radius reaches 658px at the default difficulty on
+     a 1440 desktop and 1145px at the hardest, so everything large was pinned to
+     the same 220 and came out identical. Meanwhile the SAME 220 was 94% of a
+     390px phone at the default difficulty and overflowed it at 116% by the top
+     of the slider.
+
+     Now a share of the viewport instead. 31%, owner's figure, measured as the
+     DIAMETER including the ring, which is how the audit reported it. So a 390px
+     phone caps at 55px radius and a 1440px desktop at 218px, and both read the
+     same size to the eye.
+
+     The 40px floor is kept and is still dead: it did not fire once in those
+     1326 cases. It stays as a guard against a very narrow viewport, where 31%
+     of 320px would otherwise give 44px and keep falling. */
+  const LIFT_MAX_SHARE = 0.31;
+  const liftRingW = circular && ringColor ? 11 : 5;
+  const liftR = circular && rootRadius
+    ? Math.max(40, Math.min(rootRadius, (vp.w * LIFT_MAX_SHARE - liftRingW) / 2))
+    : ROOT;
   const [rootGone, setRootGone] = useState(false);
   const confettiRef = useRef<((opts: Record<string, unknown>) => void) | null>(null);
   useEffect(() => {
@@ -823,7 +854,7 @@ export default function LineageMap({
       // sits clear whatever size the dog is, rather than hiding dead centre.
       // circR is declared further down, so use the same expression it does:
       // the dog's own radius, clamped, falling back to ROOT off the mini pit
-      const bigR = circular && rootRadius ? Math.max(40, Math.min(220, rootRadius)) : ROOT;
+      const bigR = liftR;
       const soloOff = bigR * 0.72;
       const baseX = soloLeaf ? breed.x + soloOff : live ? live._x + Math.cos(live._dir) * d : 0;
       const baseY = soloLeaf ? breed.y - soloOff : live ? live._y + Math.sin(live._dir) * d : 0;
@@ -900,7 +931,7 @@ export default function LineageMap({
   // Mini pit: the tag pill (and on Complete, every node and rod) tips into the
   // pit as live physics objects, main-pit style. Positions are CURRENT layer
   // positions in client px; the pit gives pills a hit limit once they land.
-  const circR = circular && rootRadius ? Math.max(40, Math.min(220, rootRadius)) : ROOT;
+  const circR = liftR;
   const emitCircularScatter = (includeNodes: boolean) => {
     const pills = [{ x: breed.x + pan.x, y: breed.y + pan.y + circR, w: tagW, name: breed.name }];
     if (!includeNodes) { onScatter?.({ circles: [], rods: [], pills }); return; }
@@ -1308,10 +1339,10 @@ export default function LineageMap({
   // the dog card, drawn at a given point, leaning to match the pile angle
   const rootCard = (cx: number, cy: number) => {
     if (rootGone) return null;
-    const R = circular && rootRadius ? Math.max(40, Math.min(220, rootRadius)) : ROOT;
+    const R = liftR;
     // One band, not a stroke over a contrasting fill. Heavier in the mini pit so
     // it carries the weight the pit's own rings have.
-    const rootRingW = circular && ringColor ? 11 : 5;
+    const rootRingW = liftRingW;
     const rx = cx, ry = cy; // root card stays in SVG content space; pan moves the whole tree including it
     const baseDeg = (cardLean * 180) / Math.PI;
     const rootXf = collecting && collectRef.current
