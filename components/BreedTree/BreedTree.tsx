@@ -3262,7 +3262,7 @@ export default function BreedTree({
       // old world-units-per-second speeds (in worldH multiples) -> px per 16.66ms step
       const vps = (x: number) => (stagePxH * x) / 60;
 
-      type Body = { n: Node | null; x: number; y: number; vx: number; vy: number; r: number; pct: number; idx: number; lastFx: number; popped: boolean; a: number; va: number; ia: number; iva: number; held?: boolean; charges?: number; lastKnock?: number; inert?: boolean; mb?: any; mbIn?: boolean; bomb?: boolean; blown?: boolean; bursting?: number; fuseCur?: number; rDraw?: number; hits?: number; heldSince?: number; heldHits?: number; clickPending?: boolean; cling?: unknown[] };
+      type Body = { n: Node | null; x: number; y: number; vx: number; vy: number; r: number; pct: number; idx: number; lastFx: number; popped: boolean; a: number; va: number; ia: number; iva: number; held?: boolean; charges?: number; lastKnock?: number; inert?: boolean; mb?: any; mbIn?: boolean; bomb?: boolean; blown?: boolean; bursting?: number; fuseCur?: number; rDraw?: number; hits?: number; heldSince?: number; heldHits?: number; clickPending?: boolean };
       const d1 = nodes.filter((n) => n.depth === 1);
       const pctOf = (n: Node) => (n.parent ? Math.round(((n.value ?? 0) / (n.parent.value || 1)) * 100) : 0);
       const bodies: Body[] = d1.map((n, i) => ({ n, x: n.x, y: n.y, vx: 0, vy: 0, r: n.r, pct: pctOf(n), idx: i, lastFx: 0, popped: false, a: 0, va: 0, ia: 0, iva: 0 }));
@@ -4554,23 +4554,9 @@ export default function BreedTree({
         for (const b of all) {
           if (!b.mb) continue;
           if (b.held && b.mbIn) {
-            // Lifted: the children stop clinging and are simply pit objects from
-            // here on. They keep whatever the word was doing at the moment it
-            // left, so they fall away rather than dropping dead still.
-            const cl = b.cling as { mb: { collisionFilter: Record<string, unknown>; isSensor: boolean }; ax: number; ay: number }[] | undefined;
-            if (cl && cl.length) {
-              const wv = b.mb.velocity;
-              const wav = b.mb.angularVelocity as number;
-              for (const c of cl) {
-                MBody.setStatic(c.mb, false);
-                // back to colliding with everything, their own dog included
-                c.mb.collisionFilter = { ...c.mb.collisionFilter, group: 0 };
-                c.mb.isSensor = false;
-                MBody.setVelocity(c.mb, { x: wv.x, y: wv.y });
-                MBody.setAngularVelocity(c.mb, wav);
-              }
-              b.cling = [];
-            }
+            // Lifted: a word's circles are already free pit objects since the
+            // drop, so there is nothing to cut loose here. The word just leaves
+            // the world; its circles carry on under their own physics.
             Composite.remove(world, b.mb); b.mbIn = false;
           }
           else if (!b.held && !b.mbIn) {
