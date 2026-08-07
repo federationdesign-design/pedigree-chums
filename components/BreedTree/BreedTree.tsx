@@ -1282,6 +1282,10 @@ export default function BreedTree({
   // area before they have touched the diagram at all.
   const pulledEverRef = useRef(false);
   const lastTapRef = useRef(0);
+  // Which circle was tapped last and when, so a second quick tap on the SAME
+  // one zooms. Tracking the node as well as the clock matters: two quick taps on
+  // two different circles is not a double tap.
+  const zoomTapRef = useRef<{ n: Node | null; t: number }>({ n: null, t: 0 });
 
   /* ── KNOCKS ──────────────────────────────────────────────────────────────
      A pulled circle shoves its neighbours. Each shoved circle springs back on
@@ -2922,21 +2926,28 @@ export default function BreedTree({
       }
       return;
     }
-    // TOUCH: the first tap on a first-ring circle does what a hover does on a
-    // mouse, which is come loose and show you what is inside. The second tap
-    // goes in. Same grammar as desktop, where hover previews and click enters,
-    // and it fails safely: two quick taps zoom, exactly as before.
+    // TOUCH: a DOUBLE tap zooms in. A single tap does what a hover does on a
+    // mouse, which is come loose and show you what is inside.
+    //
+    // It used to be tap-to-preview then tap-again-to-enter, with no time limit,
+    // so a second tap minutes later still went in. Now the two taps have to be
+    // quick, which leaves a single tap free to preview and to push the circle
+    // about without ever walking you somewhere you did not mean to go.
     if (
       touchRef.current &&
       dockAside &&
       !dropped &&
       !frozen &&
       d.parent === focusRef.current &&
-      !!d.children?.length &&
-      hovered !== d
+      !!d.children?.length
     ) {
-      setHovered(d);
-      return;
+      const now = e.timeStamp;
+      const quick = zoomTapRef.current.n === d && now - zoomTapRef.current.t < 320;
+      zoomTapRef.current = quick ? { n: null, t: 0 } : { n: d, t: now };
+      if (!quick) {
+        setHovered(d);
+        return;
+      }
     }
     // once dropped, a circle that owns a body lifts out to the learn layer
     if (fellRef.current) {
@@ -2981,8 +2992,9 @@ export default function BreedTree({
     if (dockAside) { setAncestryFor(null); setAncHidden(true); setTrainHidden(true); setTempHidden(true); }
     if (focusRef.current !== d) {
       zoom(d);
-      // Clicking a circle to zoom in also opens the info box if it was closed.
-      if (dockAside && hideCaption && d !== nodes[0]) onToggleCaption?.();
+      // The info box no longer opens itself here. Zooming in used to force it
+      // open, which covered the thing you had just gone in to look at. It stays
+      // behind its own icon and opens when asked for.
     } else if (d.parent) zoom(d.parent);
   }
   function onBackground(e?: { clientX: number; clientY: number; timeStamp: number }) {
