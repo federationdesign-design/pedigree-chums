@@ -18,6 +18,7 @@ import DevRecorder from '../dev/DevRecorder';
 // helper + registry + page-bios are lightweight (no chatbot engine), so the launcher stays cheap.
 import type { AutoAppear } from './PickAChumExperience';
 import { canDogAppear, isDismissed, markDismissed, unfoundGameHint, appearanceForRoute, type DogAppearance } from './dogAppearance';
+import { CHAT_KEY, PROTECTED_FLAG } from './pcKeys';
 import { bioForRoute } from '../data/page-bios';
 import { getHiddenGamesEngine } from '../../../lib/hiddenGames/browserEngine';
 
@@ -49,6 +50,10 @@ const HINT_OFFER = 'you found a game. you want a hint for where another is?';
 // Task 150 section 3: the Boxer's scroll gate. He appears only once the visitor is halfway down -- a
 // commitment signal, not a greeter at the door. Half the scrollable height.
 const SCROLL_GATE = 0.5;
+// Task 151 Case A: the Labrador picks up a thread on /hot-dogs when a chat already exists (he often sent
+// the visitor there himself). He speaks first, from the minimised chip -- new in the product, every line
+// so far has been a reply. Owner copy, verbatim. The experience injects it; the launcher only decides.
+const LAB_HOTDOG_ROUTE = '/hot-dogs';
 const HINT_DELAY_MS = 10000; // ten seconds after a game is found (brief section 7)
 const PULSE_MS = 700; // dead-click launcher pulse duration (matches the CSS keyframe)
 
@@ -70,6 +75,9 @@ export default function PickAChumLauncher() {
   const pathname = usePathname();
   const [autoAppear, setAutoAppear] = useState<AutoAppear | null>(null);
   const [pulse, setPulse] = useState(false);
+  // Task 151 Case A: the route to hand the experience for a thread pickup (the Labrador speaking into an
+  // existing /hot-dogs chat), or null. Decided by whether a chat exists, not by detecting the link.
+  const [pickupRoute, setPickupRoute] = useState<string | null>(null);
   const openRef = useRef(open);
   const pathnameRef = useRef(pathname);
   openRef.current = open;
@@ -183,8 +191,11 @@ export default function PickAChumLauncher() {
   // suppression (canDogAppear) is the caller's responsibility -- this only builds the appearance.
   const appear = useCallback((app: DogAppearance, route: string) => {
     const bio = bioForRoute(route);
-    const offer = app.dog === 'boxer' ? BOXER_OPENER : OI_OI;
-    const reveal = app.dog === 'boxer' ? bio?.misread ?? '' : bio?.extended ?? bio?.bio ?? '';
+    // Each dog's own voice: the Terrier's blunt extended bio, the Boxer's confidently-wrong misread, the
+    // Labrador's plain hunger. The Labrador's Case B line is short and stands alone, so it is the opener
+    // with no second reveal beat.
+    const offer = app.dog === 'boxer' ? BOXER_OPENER : app.dog === 'labrador' ? bio?.craving ?? 'I like hotdogs' : OI_OI;
+    const reveal = app.dog === 'boxer' ? bio?.misread ?? '' : app.dog === 'labrador' ? '' : bio?.extended ?? bio?.bio ?? '';
     setAutoAppear({ dog: app.dog, offer, reveal, route });
     setOpen(true);
   }, []);
@@ -228,6 +239,24 @@ export default function PickAChumLauncher() {
     return () => window.removeEventListener('scroll', onScroll);
   }, [shown, pathname, open, appear]);
 
+  // Task 151 Case A: on /hot-dogs, decide the thread pickup purely by whether a chat exists (brief
+  // section 3). Chat present -> hand /hot-dogs to the experience so the Labrador speaks from the chip;
+  // no chat -> null, and the Case B arrival appearance above handles it instead. Never into a protected
+  // session: a child who disclosed something and then followed a link must not have a dog start chatting.
+  useEffect(() => {
+    if ((pathname ?? '') !== LAB_HOTDOG_ROUTE) {
+      setPickupRoute(null);
+      return;
+    }
+    try {
+      const hasChat = !!window.sessionStorage.getItem(CHAT_KEY);
+      const wasProtected = !!window.sessionStorage.getItem(PROTECTED_FLAG);
+      setPickupRoute(hasChat && !wasProtected ? LAB_HOTDOG_ROUTE : null);
+    } catch {
+      setPickupRoute(null);
+    }
+  }, [pathname]);
+
   // Task 148 section 7: ten seconds after a game is found, if still on the same page and nothing open,
   // he offers a hint at a game not yet found (derived from the registry; null when all eight are found,
   // so he says nothing). Suppression applies. subscribeDiscovery does not fire on the eighth find, which
@@ -267,7 +296,7 @@ export default function PickAChumLauncher() {
           only (pointer-events:none in CSS); never intercepts a click. */}
       {open && <div className={styles.scrim} aria-hidden="true" />}
       {open ? (
-        <PickAChumExperience onClose={closeExperience} autoAppear={autoAppear ?? undefined} />
+        <PickAChumExperience onClose={closeExperience} autoAppear={autoAppear ?? undefined} pickupRoute={pickupRoute} />
       ) : (
         <button
           ref={buttonRef}

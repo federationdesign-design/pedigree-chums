@@ -190,7 +190,11 @@ const HIDDEN_GAME_ID: Record<GameId, HiddenGameId> = { ninesquare: 'G03', missin
 // the first open (engage), his `reveal` (the page's extended bio, or a game hint) is appended.
 export type AutoAppear = { dog: Dog; offer: string; reveal: string; route: string };
 
-export default function PickAChumExperience({ onClose, autoAppear }: { onClose: () => void; autoAppear?: AutoAppear }) {
+// Task 151 Case A: the Labrador's thread pickup on /hot-dogs. He speaks FIRST (new: every message so far
+// has been a reply) into an existing chat, and arms the cookie ask so a "yes" feeds him. Owner copy, verbatim.
+const LAB_HOTDOG_PICKUP = 'you made it, I got here first. can you get me a cookie?';
+
+export default function PickAChumExperience({ onClose, autoAppear, pickupRoute }: { onClose: () => void; autoAppear?: AutoAppear; pickupRoute?: string | null }) {
   // Task 140: the page the visitor is on, carried into the engine as session state (like lastAction)
   // so "what is this page" answers with that page's bio. Always a string on a real route.
   const pathname = usePathname();
@@ -252,14 +256,40 @@ export default function PickAChumExperience({ onClose, autoAppear }: { onClose: 
   // restore brings the conversation back exactly where it was. The flag rides
   // the persistence payload so a minimised chat survives page navigation.
   const [minimised, setMinimised] = useState<boolean>(restored ? !!restored.minimised : auto ? true : false);
+  // Task 151 Case A: a small pulse on the minimised chip when the Labrador speaks unprompted, so an
+  // unread line is noticed rather than sitting in the corner. Cleared the moment the visitor opens the chip.
+  const [spoke, setSpoke] = useState(false);
   // Task 148: on the first open of an unbidden appearance (the visitor engages), append his reveal --
   // the page's extended bio, or a game hint -- as a second message. revealedRef guards it to once.
   const revealedRef = useRef(false);
   useEffect(() => {
     if (!auto || minimised || revealedRef.current) return;
-    revealedRef.current = true;
-    setMessages((m) => [...m, { id: idRef.current++, who: 'dog', text: auto.reveal, dog: auto.dog, name: dogInfo(auto.dog).name, display: auto.reveal, done: true }]);
+    revealedRef.current = true; // first open: stop the chip pulse whether or not there is a reveal to add
+    // Task 151: the Labrador's Case B line is the opener alone (empty reveal), so append no second bubble
+    // rather than a blank one; the Terrier and Boxer always carry a reveal.
+    if (auto.reveal.trim()) {
+      setMessages((m) => [...m, { id: idRef.current++, who: 'dog', text: auto.reveal, dog: auto.dog, name: dogInfo(auto.dog).name, display: auto.reveal, done: true }]);
+    }
   }, [minimised, auto]);
+  // Task 151 Case A: the Labrador picks up the thread on /hot-dogs. He is already here (a chat exists), so
+  // this is a MESSAGE, not an arrival -- no suppression, no appearance. He becomes the active dog, speaks
+  // his line, and arms the cookie ask so a "yes" starts the feed game. NEVER into a protected session
+  // (the launcher checks pc-protected too, but guard here as well): a disclosure must not be chatted at.
+  // Once per page visit (pickupDoneRef), and not while a game is already running.
+  const pickupDoneRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (pickupRoute !== '/hot-dogs' || pickupDoneRef.current === pickupRoute) return;
+    const session = sessionRef.current;
+    if (!session || session.protectedState || everProtectedRef.current || session.activeGame) return;
+    pickupDoneRef.current = pickupRoute;
+    session.activeDog = 'labrador';
+    session.cookieAskPending = true;
+    if (!session.previousDogs.includes('labrador')) session.previousDogs.push('labrador');
+    setDog('labrador');
+    setMessages((m) => [...m, { id: idRef.current++, who: 'dog', text: LAB_HOTDOG_PICKUP, dog: 'labrador', name: dogInfo('labrador').name, display: LAB_HOTDOG_PICKUP, done: true }]);
+    setAnnounce(LAB_HOTDOG_PICKUP);
+    if (minimised) setSpoke(true);
+  }, [pickupRoute, minimised]);
   // One body-level signal drives everything that must not co-exist with the
   // chip: the scrim (owner ruling: no chat UI left to lift) and the offer
   // card (owner ruling: two floating things in one corner is worse than
@@ -1062,12 +1092,13 @@ export default function PickAChumExperience({ onClose, autoAppear }: { onClose: 
         <div className={styles.miniDock}>
           <button
             type="button"
-            className={`${styles.miniFace} ${auto && !revealedRef.current ? styles.miniAuto : ''}`}
+            className={`${styles.miniFace} ${(auto && !revealedRef.current) || spoke ? styles.miniAuto : ''}`}
             aria-label={`Reopen the chat with the ${dogInfo(dog).name}`}
             title={`Reopen the chat with the ${dogInfo(dog).name}`}
             style={{ backgroundImage: `url("${PROFILE_IMG[dog]}")` }}
             onClick={() => {
               setMinimised(false);
+              setSpoke(false); // Task 151: opening the chip clears the "he said something" pulse
               window.setTimeout(() => inputRef.current?.focus(), 60); // Task 82
             }}
           />

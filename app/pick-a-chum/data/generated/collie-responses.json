@@ -5914,5 +5914,27 @@
     "defaultRoute": "",
     "animationCue": "",
     "status": "Approved"
+  },
+  {
+    "responseId": "B67-FEEDCOOKIE-FULL",
+    "bucketId": "B67",
+    "subtag": "reaction",
+    "triggers": [],
+    "template": "im so full. i regret nothing",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B67-FEEDCOOKIE-SLEEP",
+    "bucketId": "B67",
+    "subtag": "reaction",
+    "triggers": [],
+    "template": "zzz",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
   }
 ]

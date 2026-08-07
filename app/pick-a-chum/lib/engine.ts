@@ -155,6 +155,8 @@ function serveGameResult(resolution: Resolution, data: ChumData, result: GameRes
   }
   // Task 149: a clip on a game turn (feed-cookie, every fifth cookie).
   if (result.media) resolution.gameMedia = result.media;
+  // Task 151: a follow-up beat served as a second message after a pause (the cookie give-up "zzz").
+  if (result.followUpId) resolution.gameFollowUp = gameCopy(data, result.followUpId);
 }
 // LOOP-02 is candidate-driven: it names the specific destination the candidate maps to. A breed
 // candidate (a Title-Case breed name) -> its page; a game-family word -> the card game rules;
@@ -201,8 +203,12 @@ export function submit(data: ChumData, session: Session, input: string): Turn {
     personalSadnessCount: session.personalSadnessCount,
     pendingConfirm: session.pendingConfirm,
     activeGame: session.activeGame,
+    cookieAskPending: session.cookieAskPending ?? false, // Task 151: the Labrador's armed cookie ask
     route: session.route, // Task 140: the page the visitor is on, for the page-bio route
   });
+  // Task 151: the cookie ask is a one-turn window. resolve() has just read it above; clear it now so a
+  // "yes" that does not follow the ask never starts the game, and the ask never lingers past its turn.
+  session.cookieAskPending = false;
 
   // A canned answer (B21-B39) overrides the four old-voice routes Steve named (identity,
   // orientation, the bare-help clarifier, FAQ). Only outside a protected state: in a protected

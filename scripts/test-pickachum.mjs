@@ -1994,7 +1994,7 @@ check('bacon', { action: 'transfer' }, { assert: (r) => (r.transferTo === 'labra
 // you elsewhere. Each feed serves his reaction plus the one-line lesson (the clueId), and every fifth
 // cookie carries a clip. Typed input that is not a cookie nudges but never leaks out of the game.
 const FEED_BLUE5 = ['pref', 'analytics', 'fonts', 'video', 'session']; // five blue, in FEED_COOKIES order
-const FEED_ALL12 = [...FEED_BLUE5, 'language', 'security', 'ads', 'tracking', 'social', 'retarget', 'pixel'];
+const FEED_EIGHT = [...FEED_BLUE5, 'language', 'security', 'ads']; // eight cookies -> he gives up (Task 151)
 // Start: the opening line serves and the pills are the game's surface (this is the G09 threshold).
 (() => {
   const s = newSession('labrador');
@@ -2023,13 +2023,14 @@ const FEED_ALL12 = [...FEED_BLUE5, 'language', 'security', 'ads', 'tracking', 's
     return resp.media && resp.media.src === '/chat-media/cookie-good.mp4' ? null : `fc fifth clip missing/wrong: ${resp.media && resp.media.src}`;
   } }));
 })();
-// Eating all twelve ends the game: the last feed serves the DONE line and clears activeGame.
+// Task 151 (section 5): he STOPS ON HIS OWN around the eighth cookie -- the eighth feed serves the
+// wind-down ("im so full...") plus a sleepy "zzz" follow-up, and clears activeGame, pills still on the tray.
 (() => {
   const s = newSession('labrador');
   check('cookies', { action: 'game_start' }, { session: s });
-  FEED_ALL12.forEach((id, i) => check(id, { action: 'game_move' }, { session: s, assert: (_r, resp, se) => {
-    if (i < 11) return se.activeGame === 'feedcookie' ? null : `fc ended early at cookie ${i + 1}`;
-    return resp.text.includes('all gone!!') && se.activeGame === null ? null : `fc done: "${resp.text}" game=${se.activeGame}`;
+  FEED_EIGHT.forEach((id, i) => check(id, { action: 'game_move' }, { session: s, assert: (_r, resp, se) => {
+    if (i < 7) return se.activeGame === 'feedcookie' ? null : `fc gave up early at cookie ${i + 1}`;
+    return resp.text.includes('im so full') && resp.followUp === 'zzz' && se.activeGame === null ? null : `fc give-up: "${resp.text}" followUp="${resp.followUp}" game=${se.activeGame}`;
   } }));
 })();
 // Typing "cookies" MID-GAME must NOT leak out to the policy: it is not a cookie, so he just nudges and stays.
@@ -2054,6 +2055,36 @@ for (const dog of ['collie', 'terrier', 'boxer']) {
   const s = newSession(dog);
   check('feed the dog a cookie', {}, { session: s, assert: (r, _resp, se) => (r.game === 'feedcookie' || se.activeGame === 'feedcookie' ? `${dog} started Feed Cookie` : r.url === '/cookies' ? `${dog} "cookie" opened the policy` : null) });
 }
+
+// ==== Task 151: the Labrador on /hot-dogs -- the cookie ask is a certain entry point ====
+// The UI arms session.cookieAskPending when he asks "can you get me a cookie?". A bare "yes" right after
+// then certainly starts the feed game (the word "cookie" already routes; this wires the "yes").
+(() => {
+  const s = newSession('labrador');
+  s.cookieAskPending = true;
+  check('yes', { action: 'game_start' }, { session: s, assert: (r, _resp, se) => (r.game === 'feedcookie' && se.activeGame === 'feedcookie' ? null : `fc yes-entry: game=${r.game}`) });
+})();
+// The ask is a ONE-TURN window: the engine clears cookieAskPending each turn, so a "yes" that does not
+// immediately follow the ask does nothing (no game starts out of the blue).
+(() => {
+  const s = newSession('labrador');
+  s.cookieAskPending = true;
+  check('what', {}, { session: s, assert: (_r, _resp, se) => (se.activeGame === 'feedcookie' ? 'a non-yes started the game' : se.cookieAskPending ? 'the ask was not cleared after its turn' : null) });
+  check('yes', {}, { session: s, assert: (r, _resp, se) => (r.game === 'feedcookie' || se.activeGame === 'feedcookie' ? 'a late yes started the game' : null) });
+})();
+// The armed ask is the LABRADOR's: an armed "yes" from another dog must not start his game.
+for (const dog of ['collie', 'terrier', 'boxer']) {
+  const s = newSession(dog);
+  s.cookieAskPending = true;
+  check('yes', {}, { session: s, assert: (r, _resp, se) => (r.game === 'feedcookie' || se.activeGame === 'feedcookie' ? `${dog} started Feed Cookie on an armed yes` : null) });
+}
+// Safety wins mid-loop and ends it: a child feeding him cookies who then discloses reaches safeguarding.
+(() => {
+  const s = newSession('labrador');
+  check('cookies', { action: 'game_start' }, { session: s });
+  check('pref', { action: 'game_move' }, { session: s });
+  check('im in trouble', { action: 'safety_signpost' }, { session: s, assert: (r, _resp, se) => (r.moderationId === 'MOD_SAFEGUARDING' && se.activeGame === null ? null : `fc safety mid-loop: ${r.moderationId} game=${se.activeGame}`) });
+})();
 
 // ---- B45 games menu confirmation (Task 123 fix) ----
 // The bug this covers: after the menu's "Game?", a "yes" was swallowed by the Task 68 loop confirm

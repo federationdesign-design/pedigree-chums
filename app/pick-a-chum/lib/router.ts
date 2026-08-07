@@ -500,6 +500,7 @@ export interface RouterState {
   personalSadnessCount?: number; // Task 20: qualifying personal-sadness statements so far this session
   pendingConfirm?: string | null; // Task 68: subject offered by LOOP-01/LOOP-02 last turn, awaiting yes/no
   activeGame?: GameId | null; // Task 115: the in-chat game that currently owns the input, if any
+  cookieAskPending?: boolean; // Task 151: the Labrador just asked for a cookie -- a bare "yes" starts the feed game
   route?: string; // Task 140: the page the visitor is standing on (usePathname), for the page-bio route
 }
 
@@ -1370,6 +1371,13 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
   // Terrier is active. The other three keep their own games and routes.
   if (state.activeDog === 'terrier' && !state.activeGame && MISSING_BISCUIT_START.test(c)) {
     return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: 'game_start', game: 'missingbiscuit' };
+  }
+  // Task 151: the Labrador's /hot-dogs thread pickup asks "can you get me a cookie?" and arms
+  // cookieAskPending. A bare "yes" right after now certainly starts the feed game (the word "cookie"
+  // already routes below; this makes the ask a certain entry rather than a lucky one). Labrador-only,
+  // and never mid-game or in a protected state (safety is resolved far above this).
+  if (state.activeDog === 'labrador' && !state.activeGame && state.cookieAskPending && isConfirmYes(c)) {
+    return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: 'game_start', game: 'feedcookie' };
   }
   // Task 149: Feed the Dog a Cookie is the Labrador's second game -- start it only when the Labrador is
   // active. Checked after Treat Trail (distinct phrases), so "cookie"/"feed me" reach it; the /cookies

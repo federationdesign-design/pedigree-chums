@@ -39,6 +39,7 @@ export interface GameResult {
   suffix?: string; // missing-biscuit: a composed line to append (the suspect list for a case presentation)
   link?: string; // treat-trail: a finale link (SAUSAGE -> /hot-dogs)
   media?: { src: string; alt: string }; // feed-cookie: a clip shown every fifth cookie (good/queasy)
+  followUpId?: string; // Task 151: a workbook row served as a SECOND message after a beat (the cookie give-up "zzz")
   ended: boolean; // true: the game is over, clear session.activeGame
 }
 
@@ -290,6 +291,12 @@ const COOKIE_CLIP = {
   red: { src: '/chat-media/cookie-bad.mp4', alt: 'The Labrador looks queasy' },
 };
 
+// Task 151 (section 5): the number of cookies before he gives up on his own (too full, then asleep).
+// The owner's rule from the Boxer's third-stop gag: never stopping is a fault, not a gag. The brief
+// wants somewhere between six and ten; eight, reported for approval. Below the twelve pills, so some
+// are always left uneaten -- that is the point, his appetite outruns the bowl and then quits.
+const COOKIE_GIVE_UP = 8;
+
 function feedCookieMove(state: GameState, input: string): { state: GameState; result: GameResult } {
   const guess = input.trim().toLowerCase();
   const cookie = FEED_COOKIES.find((c) => !state.fed.includes(c.id) && (c.id === guess || c.label.toLowerCase() === guess));
@@ -300,8 +307,13 @@ function feedCookieMove(state: GameState, input: string): { state: GameState; re
   const fed = [...state.fed, cookie.id];
   const media = fed.length % 5 === 0 ? (cookie.red ? COOKIE_CLIP.red : COOKIE_CLIP.blue) : undefined;
   const ns = { ...state, fed };
-  const line = fed.length >= FEED_COOKIES.length ? 'B67-FEEDCOOKIE-DONE' : cookie.red ? 'B67-FEEDCOOKIE-RED' : 'B67-FEEDCOOKIE-BLUE';
-  return { state: ns, result: { line, clueId: cookie.teachId, media, display: '', ended: fed.length >= FEED_COOKIES.length } };
+  // Task 151 (section 5): he STOPS ON HIS OWN. A bottomless-greed loop the visitor has to escape is a
+  // loop with no punchline, so around the eighth cookie he is too full and falls asleep -- the game ends
+  // even though pills remain. On that give-up feed he is past teaching (no lesson), just the wind-down.
+  const ended = fed.length >= COOKIE_GIVE_UP || fed.length >= FEED_COOKIES.length;
+  const line = ended ? 'B67-FEEDCOOKIE-FULL' : cookie.red ? 'B67-FEEDCOOKIE-RED' : 'B67-FEEDCOOKIE-BLUE';
+  // The give-up is two beats: "im so full. i regret nothing", a pause, then "zzz" (served as a follow-up).
+  return { state: ns, result: { line, clueId: ended ? undefined : cookie.teachId, media, followUpId: ended ? 'B67-FEEDCOOKIE-SLEEP' : undefined, display: '', ended } };
 }
 
 // ---- Public API ----

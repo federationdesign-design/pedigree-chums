@@ -14,7 +14,10 @@
 // (the reader does the arithmetic he cannot); he never jokes about the illness itself, and every figure
 // matches /chums/boxer exactly (brief section 7.1 / 7.2). Served only when the Boxer appears; only the
 // three pages he is allocated carry one. PLACEHOLDER copy, pending owner rewrite (section 6/7/8).
-export type PageBio = { route: string; name: string; bio: string; extended?: string; misread?: string };
+// Task 151: `craving` is the Labrador's line on his page. He is not blunt like the Terrier or wrong like
+// the Boxer -- he is just hungry, and hot dogs are food. It is served as his Case B appearance line (when
+// he did NOT send the visitor). Only /hot-dogs needs it. PLACEHOLDER, owner copy verbatim (section 3/6).
+export type PageBio = { route: string; name: string; bio: string; extended?: string; misread?: string; craving?: string };
 
 export const PAGE_BIOS: PageBio[] = [
   { route: '/', name: 'The pit', bio: 'A pit full of chums. Tip them out.', extended: 'A pit full of us. Grab one, chuck it back, grab another. Keep going till one sticks.' },
@@ -27,7 +30,7 @@ export const PAGE_BIOS: PageBio[] = [
   { route: '/good-dog-bad-dog', name: 'Good Dog, Bad Dog', bio: 'Learn about why some dogs get called bad, some are good boys', extended: 'Stories of dogs who went good and dogs who went bad. Pick one and read it.' },
   { route: '/name-generator', name: 'Name Generator', bio: 'Where you can generate a name for a real or imaginary dog.', extended: 'Need a name? Press the button till one fits. Works for a real dog or a made-up one.' },
   { route: '/chum-calculator', name: 'Chum Finder', bio: 'Answer questions about your life and we will see which breeds suit you', extended: 'Answer a few questions and it tells you which of us you would get on with. Answer honest.' },
-  { route: '/hot-dogs', name: 'Hot Dogs', bio: 'Advise on all kinds of hotdogs', extended: 'Hot dogs. The food and the game flavour, all in one place. Do not overthink it.' },
+  { route: '/hot-dogs', name: 'Hot Dogs', bio: 'Advise on all kinds of hotdogs', extended: 'Hot dogs. The food and the game flavour, all in one place. Do not overthink it.', craving: 'I like hotdogs' },
   { route: '/dogs-at-work', name: 'Dogs at Work', bio: 'We work, here you can learn about some jobs we have', extended: 'The jobs dogs actually do. Sniffing, herding, guarding. Proper work, not tricks.' },
   { route: '/smarter-than-the-test', name: 'Smarter Than the Test', bio: 'Learn about dog intelligence', extended: 'A test of dog brains. See if we beat it. We usually do.', misread: 'oh this is the clever test. they put us dogs in ORDER of how clever we are\ni came somewhere in the middle. which is the BEST place. exactly averagely clever\nthe ones at the top just do what theyre told. thats not clever, thats obedient\nask me anything. maths, capitals, i know the lot. go on, test me' },
   { route: '/whats-your-superpower', name: 'What\'s Your Superpower', bio: 'Questions that work out if you have a super power', extended: 'Questions that decide your power. Answer them and find out what you have got.' },

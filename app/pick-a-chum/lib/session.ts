@@ -78,6 +78,10 @@ export interface Session {
   activeGame: GameId | null;
   game: GameState | null;
   gamesPlayed: number;
+  // Task 151: set by the UI when the Labrador asks "can you get me a cookie?" (his /hot-dogs thread
+  // pickup). It arms a one-turn window in which a bare "yes" starts the feed-cookie game, so the ask is
+  // a certain entry point rather than relying on the visitor typing the word "cookie". Cleared each turn.
+  cookieAskPending?: boolean;
   // Task 140: the page the visitor is standing on, from usePathname in the experience, carried
   // as session state the same way lastAction is. Lets "what is this page" answer with that page's
   // bio. Undefined outside the browser (the harness), so the page-bio route only fires live.
@@ -117,5 +121,6 @@ export function newSession(activeDog: Dog = 'collie'): Session {
     activeGame: null,
     game: null,
     gamesPlayed: 0,
+    cookieAskPending: false,
   };
 }

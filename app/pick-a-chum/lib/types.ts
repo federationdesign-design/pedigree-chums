@@ -233,4 +233,5 @@ export interface Resolution {
   gameText?: string;
   gameDisplay?: string;
   gameMedia?: { src: string; alt: string }; // Task 149: a clip served with a game turn (feed-cookie, every fifth)
+  gameFollowUp?: string; // Task 151: a second message served after a beat (the cookie give-up "zzz")
 }

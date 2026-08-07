@@ -258,7 +258,8 @@ export function assemble(res: Resolution, data0: ChumData, n: Normalised, sessio
     case 'game_exit':
       // Task 146: a Treat Trail finale carries the /hot-dogs link (res.url / destinationId).
       // Task 149: a Feed the Dog a Cookie turn carries a clip every fifth cookie (res.gameMedia).
-      return { responseId: res.gameLine ?? res.action, text: res.gameText ?? '', gameOutput: res.gameDisplay ?? undefined, dog, ...(res.url ? { url: res.url, destinationId: res.destinationId } : {}), ...(res.gameMedia ? { media: res.gameMedia } : {}) };
+      // Task 151: the cookie give-up carries a follow-up beat, the sleepy "zzz" (res.gameFollowUp).
+      return { responseId: res.gameLine ?? res.action, text: res.gameText ?? '', gameOutput: res.gameDisplay ?? undefined, dog, ...(res.url ? { url: res.url, destinationId: res.destinationId } : {}), ...(res.gameMedia ? { media: res.gameMedia } : {}), ...(res.gameFollowUp ? { followUp: res.gameFollowUp } : {}) };
 
     // Task 111: "fetch" hands back a rotating Play/Learn/Discover link (deterministic rotation via the
     // session's offered set), instead of the old B11 command voice. The line comes from the B03 link

@@ -64,6 +64,10 @@ export const DOG_APPEARANCES: DogAppearance[] = [
   { route: '/home', dog: 'boxer', trigger: 'scroll' },
   { route: '/about', dog: 'boxer', trigger: 'scroll' },
   { route: '/smarter-than-the-test', dog: 'boxer', trigger: 'scroll' },
+  // Task 151: the Labrador on /hot-dogs, but ONLY the Case B path (he did not send them, no chat exists).
+  // ON ARRIVAL, not scroll -- the Boxer's 50% gate is his own. When a chat DOES exist he is already there
+  // and the launcher's thread-pickup listener speaks for him instead (no appearance); that is Case A.
+  { route: '/hot-dogs', dog: 'labrador', trigger: 'arrival' },
 ];
 export function appearanceForRoute(route: string): DogAppearance | null {
   return DOG_APPEARANCES.find((a) => a.route === (route || '')) ?? null;
