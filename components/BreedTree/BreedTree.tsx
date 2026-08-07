@@ -1286,6 +1286,10 @@ export default function BreedTree({
   // one zooms. Tracking the node as well as the clock matters: two quick taps on
   // two different circles is not a double tap.
   const zoomTapRef = useRef<{ n: Node | null; t: number }>({ n: null, t: 0 });
+  // Bumped when a zoom or a pan has settled, purely to force one more render so
+  // anything measured from viewRef during render is measured against the view
+  // that is actually on screen.
+  const [, setViewTick] = useState(0);
 
   /* ── PAN, zoomed in only ─────────────────────────────────────────────────
      At the root the whole tree already fits, so panning there would only let
@@ -2885,6 +2889,8 @@ export default function BreedTree({
     cancelAnimationFrame(rafRef.current);
     if (reduce) {
       zoomTo(target);
+      // Same refit as the animated path below, for the same reason.
+      setViewTick((n) => n + 1);
       return;
     }
     const interp = interpolateZoom(viewRef.current, target);
@@ -2893,7 +2899,14 @@ export default function BreedTree({
     const step = (now: number) => {
       const t = Math.min(1, (now - start) / dur);
       zoomTo(interp(t) as View);
-      if (t < 1) rafRef.current = requestAnimationFrame(step);
+      if (t < 1) { rafRef.current = requestAnimationFrame(step); return; }
+      // REFIT THE LABELS. Their size is worked out during render from
+      // viewRef.current, and the only render in this whole journey is the
+      // setFocus above, which runs before the flight has started. So the labels
+      // were sized for the view being LEFT and kept that size on arrival: zoom
+      // into a small circle and back out and every name came back too big for
+      // its circle. One more render once the view has actually settled.
+      setViewTick((n) => n + 1);
     };
     rafRef.current = requestAnimationFrame(step);
   }
@@ -5209,7 +5222,11 @@ export default function BreedTree({
             viewRef.current = panBounds([pn.vx - dx * pn.per, pn.vy - dy * pn.per, v[2]]);
             zoomTo(viewRef.current);
           }}
-          onPointerUp={() => { panRef.current = null; }}
+          onPointerUp={() => {
+            const panned = panRef.current?.moved;
+            panRef.current = null;
+            if (panned) setViewTick((n) => n + 1);
+          }}
           onPointerCancel={() => { panRef.current = null; }}
           onClick={disableZoom ? undefined : onBackground}
           // Zoomed in, a click on the background goes back to the top, so say
