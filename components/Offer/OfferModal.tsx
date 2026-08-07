@@ -29,10 +29,14 @@ export default function OfferModal({
     };
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
+    // Task 148: a global signal that the offer is open, so the Terrier's unbidden appearances stay
+    // suppressed while it is (brief section 2, "nothing fires during checkout or the offer").
+    document.body.setAttribute("data-offer-open", "1");
     window.addEventListener("keydown", onKey);
     return () => {
       window.removeEventListener("keydown", onKey);
       document.body.style.overflow = prevOverflow;
+      document.body.removeAttribute("data-offer-open");
     };
   }, [onClose]);
 

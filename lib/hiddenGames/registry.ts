@@ -12,6 +12,10 @@ export interface GameDef {
   id: GameId;
   name: string;
   threshold: string;
+  // Task 148: the Terrier's warmer-or-colder hint at where this game is -- vague on purpose (a theme
+  // or a dog, never "click the third card"), so finding stays finding. A new game brings its own hint.
+  // AUTHORED BY THE AGENT, pending owner approval (brief section 7 / 10).
+  hint: string;
 }
 
 export interface Registry {
@@ -40,6 +44,7 @@ export const REGISTRY: Registry = {
       name: "Fetch",
       threshold:
         "The Collie is asked to play fetch and throws a random page link",
+      hint: "one of us likes chasing things you throw. see what comes back",
     },
     {
       id: "G01",
@@ -49,12 +54,14 @@ export const REGISTRY: Registry = {
       name: "The Main Pit",
       threshold:
         "First deliberate pointer interaction with the Main Pit on the home route",
+      hint: "theres one right on the front, hiding in the pile of us",
     },
     {
       id: "G02",
       name: "The Lineage Game",
       threshold:
         "LineageModal running state transitions to true, any start path",
+      hint: "theres one tangled up in the family trees",
     },
     // Task 123: the three in-chat Collie games (Pick a Chum). Each qualifies the
     // moment its opening surface is SERVED in the chat (game entered by name),
@@ -65,18 +72,21 @@ export const REGISTRY: Registry = {
       name: "Nine-Square Sheep Management",
       threshold:
         "The Nine-Square board is served in the Pick a Chum chat (game entered by name), before any move",
+      hint: "the collie has a squares game going, if you get her started",
     },
     {
       id: "G04",
       name: "Missing Sheep",
       threshold:
         "The Missing Sheep word is set and its masked tiles are served in the Pick a Chum chat, before any guess",
+      hint: "someone round here keeps losing sheep. help find them",
     },
     {
       id: "G05",
       name: "Kennel Sketch Recognition",
       threshold:
         "The Kennel Sketch drawing is served in the Pick a Chum chat, before the first guess",
+      hint: "theres one where you have to name a rough drawing",
     },
     // Task 146: the Labrador's game. Qualifies the moment its opening surface (the START line + the
     // first object's first clue) is served in the chat, on game_start, before any guess -- exactly
@@ -86,6 +96,7 @@ export const REGISTRY: Registry = {
       name: "Treat Trail",
       threshold:
         "The Treat Trail first clue is served in the Pick a Chum chat (the Labrador's game entered by name), before any guess",
+      hint: "the labrador will play if you so much as mention food",
     },
     // Task 147: the Border Terrier's game. Qualifies the moment its opening surface (the first case's
     // opening line + the three suspects) is served in the chat, on game_start, before any guess. This
@@ -95,6 +106,7 @@ export const REGISTRY: Registry = {
       name: "The Case of the Missing Biscuit",
       threshold:
         "The Missing Biscuit first case is served in the Pick a Chum chat (the Border Terrier's game entered by name), before any guess",
+      hint: "a biscuit went missing. that ones mine",
     },
   ],
 };

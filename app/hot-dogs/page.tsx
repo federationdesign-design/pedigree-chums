@@ -89,19 +89,19 @@ export default function HotDogs() {
             <div className={styles.safetyCards}>
               <div className={styles.safetyCard}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/a-dog-never-died-from-missing-a-walk.jpg" alt="" className={styles.safetyCardImg} />
+                <img src="/a-dog-never-died-from-missing-a-walk.jpg" alt="" data-pc-dead className={styles.safetyCardImg} />
                 <h3>A dog never died from missing a walk.</h3>
                 <p>Dogs do die from being too hot.</p>
               </div>
               <div className={styles.safetyCard}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/a-car-is-not-a-kennel.jpg" alt="" className={styles.safetyCardImg} />
+                <img src="/a-car-is-not-a-kennel.jpg" alt="" data-pc-dead className={styles.safetyCardImg} />
                 <h3>A car is not a kennel.</h3>
                 <p>It is an oven with cup holders.</p>
               </div>
               <div className={styles.safetyCard}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/if-the-pavement-is-too-hot-for-your-hand.jpg" alt="" className={styles.safetyCardImg} />
+                <img src="/if-the-pavement-is-too-hot-for-your-hand.jpg" alt="" data-pc-dead className={styles.safetyCardImg} />
                 <h3>If the pavement is too hot for your hand,</h3>
                 <p>it is too hot for paws.</p>
               </div>
@@ -177,7 +177,7 @@ export default function HotDogs() {
         <section id="cooking" className={styles.cookingSection}>
           <div className={styles.cookingInner}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/the-edible-kind.jpg" alt="" style={{width:"100%",borderRadius:"16px",display:"block",marginBottom:"clamp(20px, 3vw, 36px)"}} />
+            <img src="/the-edible-kind.jpg" alt="" data-pc-dead style={{width:"100%",borderRadius:"16px",display:"block",marginBottom:"clamp(20px, 3vw, 36px)"}} />
             <p className={styles.sectionEyebrow}>The edible kind</p>
             <h2 className={styles.sectionTitle}>How do I cook hot dogs?</h2>
             <p className={styles.lead}>Carefully. And preferably without involving a dachshund.</p>

@@ -2051,6 +2051,10 @@ check('what is this', { action: 'page_bio' }, { session: withRoute('/chums/labra
 check('what is this page', { action: 'page_bio' }, { session: withRoute('/chums/border-collie'), assert: (_r, resp) => (resp.text.includes('Border Collie') && !resp.text.includes('{{') ? null : `breed bio wrong: "${resp.text}"`) });
 // A dynamic sub-route resolves by longest prefix.
 check('what is this page', { action: 'page_bio' }, { session: withRoute('/good-dog-bad-dog/bulls-eye'), assert: (_r, resp) => (resp.text.includes('good boys') ? null : `sub-route bio wrong: "${resp.text}"`) });
+// Task 148: the Terrier serves the blunt, practical EXTENDED bio; every other dog keeps the owner's short bio.
+(() => { const s = newSession('terrier'); s.route = '/britains-dog-history'; check('what is this page', { action: 'page_bio' }, { session: s, assert: (_r, resp) => (resp.text.startsWith('Where the old dogs are') ? null : `terrier extended wrong: "${resp.text}"`) }); })();
+(() => { const s = newSession('terrier'); s.route = '/hot-dogs'; check('what is this page', { action: 'page_bio' }, { session: s, assert: (_r, resp) => (resp.text.startsWith('Hot dogs. The food and the game') ? null : `terrier extended wrong: "${resp.text}"`) }); })();
+(() => { const s = newSession('labrador'); s.route = '/hot-dogs'; check('what is this page', { action: 'page_bio' }, { session: s, assert: (_r, resp) => (resp.text === 'Advise on all kinds of hotdogs' ? null : `non-terrier must keep the short bio: "${resp.text}"`) }); })();
 // Guards: "whats this" is orientation/B28's, not the page bio; "what is this dog" stays the breed hub.
 check('whats this', { bucket: 'B28', action: 'canned' }, { session: withRoute('/hot-dogs'), assert: (r) => (r.action === 'page_bio' ? 'page bio stole "whats this"' : null) });
 check('what is this dog', { bucket: 'B05', action: 'breed_hub' }, { session: withRoute('/hot-dogs'), assert: (r) => (r.action === 'page_bio' ? 'page bio stole "what is this dog"' : null) });

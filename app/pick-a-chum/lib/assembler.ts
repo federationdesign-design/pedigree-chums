@@ -394,7 +394,9 @@ export function assemble(res: Resolution, data0: ChumData, n: Normalised, sessio
       const route = res.pageBioRoute ?? '/';
       const bio = bioForRoute(route);
       if (!bio) return { responseId: 'PAGE-BIO', text: '', dog };
-      let text = bio.bio;
+      // Task 148: the Terrier gives the blunt, practical extended version ("what it is for, what to do
+      // when you get there"); every other dog keeps the owner's short bio.
+      let text = dog === 'terrier' && bio.extended ? bio.extended : bio.bio;
       if (bio.route.includes('[')) {
         const slug = route.split('?')[0].replace(/\/+$/, '').split('/').pop() ?? '';
         const breed = data.dogs.find((d) => d.slug === slug)?.name

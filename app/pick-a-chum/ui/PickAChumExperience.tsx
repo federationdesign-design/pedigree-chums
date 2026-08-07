@@ -26,6 +26,7 @@ import type { GameId as HiddenGameId } from '../../../lib/hiddenGames/registry';
 import { openDiscountPopup } from '../data/discount-popup';
 import { skipTheatre, buildTypingPlan, TYPING_PROFILES, TypingPlan } from '../lib/theatre';
 import { emitTurn } from '../lib/turn-tap';
+import { CHAT_KEY, PROTECTED_FLAG } from './pcKeys';
 
 type Phase = 'selecting' | 'idle' | 'transferring' | 'ending';
 
@@ -149,7 +150,8 @@ function actionFor(r: Turn['response']): Command | undefined {
 // reopens the panel intact. SAFETY (not optional): a session that has EVER entered a protected state
 // (active/aftercare) is never persisted -- a child's disclosure must not sit in sessionStorage raw.
 // Cleared on tab close (sessionStorage) and on an explicit close (the launcher removes the key).
-export const CHAT_KEY = 'pc-chat';
+// CHAT_KEY / PROTECTED_FLAG live in ./pcKeys (imported at the top) so the lightweight launcher and the
+// appearance helper can read them without pulling in this heavy, code-split module.
 function readChat(): { messages: Message[]; session: Session; dog: Dog; phase: Phase; recSessionId: string; minimised?: boolean } | null {
   try {
     const raw = typeof window !== 'undefined' ? window.sessionStorage.getItem(CHAT_KEY) : null;
@@ -182,36 +184,50 @@ const PROFILE_IMG: Record<Dog, string> = {
 // game is deliberately NOT here: a single "woof" is a turn, not finding a game.
 const HIDDEN_GAME_ID: Record<GameId, HiddenGameId> = { ninesquare: 'G03', missingsheep: 'G04', kennelsketch: 'G05', treattrail: 'G07', missingbiscuit: 'G08' };
 
-export default function PickAChumExperience({ onClose }: { onClose: () => void }) {
+// Task 148: an unbidden Terrier appearance. When passed (and there is no restored chat), the
+// experience mounts with the Terrier already chosen and MINIMISED, seeded with his `offer` line; on
+// the first open (engage), his `reveal` (the page's extended bio, or a game hint) is appended.
+export type AutoAppear = { dog: Dog; offer: string; reveal: string; route: string };
+
+export default function PickAChumExperience({ onClose, autoAppear }: { onClose: () => void; autoAppear?: AutoAppear }) {
   // Task 140: the page the visitor is on, carried into the engine as session state (like lastAction)
   // so "what is this page" answers with that page's bio. Always a string on a real route.
   const pathname = usePathname();
   const restoredRef = useRef<ReturnType<typeof readChat> | undefined>(undefined);
   if (restoredRef.current === undefined) restoredRef.current = readChat();
   const restored = restoredRef.current;
+  // Task 148: an unbidden appearance only takes effect when there is no chat to restore (the launcher
+  // already guarantees that via the suppression rule; this is belt-and-braces).
+  const auto = !restored && autoAppear ? autoAppear : null;
   const everProtectedRef = useRef(false); // latches once the session enters a protected state
-  const sessionRef = useRef<Session | null>(restored ? restored.session : null);
-  const [phase, setPhase] = useState<Phase>(restored ? restored.phase || 'idle' : 'selecting');
-  const [dog, setDog] = useState<Dog>(restored ? restored.dog || 'collie' : 'collie'); // active dog (the anchor medallion)
+  const sessionRef = useRef<Session | null>(restored ? restored.session : auto ? newSession(auto.dog) : null);
+  const [phase, setPhase] = useState<Phase>(restored ? restored.phase || 'idle' : auto ? 'idle' : 'selecting');
+  const [dog, setDog] = useState<Dog>(restored ? restored.dog || 'collie' : auto ? auto.dog : 'collie'); // active dog (the anchor medallion)
   const [swap, setSwap] = useState<Swap>('none');
   // Task 78: the two visual tricks on the dog image. dead persists (black image) until the next submit;
   // roll is a one-off rotation that clears itself when the animation ends.
   const [dead, setDead] = useState(false);
   const [roll, setRoll] = useState(false);
   const [input, setInput] = useState('');
-  const [messages, setMessages] = useState<Message[]>(restored ? restored.messages || [] : []);
+  const [messages, setMessages] = useState<Message[]>(
+    restored
+      ? restored.messages || []
+      : auto
+        ? [{ id: 0, who: 'dog', text: auto.offer, dog: auto.dog, name: dogInfo(auto.dog).name, display: auto.offer, done: true }]
+        : []
+  );
   const [announce, setAnnounce] = useState(''); // aria-live: whole messages, once
   const inputRef = useRef<HTMLInputElement | null>(null);
   // Task 82: messages the visitor sent while a reply was still performing. The input is never
   // disabled, so they can type ahead; each queued line is processed when the dog finishes, in order.
   const queueRef = useRef<string[]>([]);
   const threadRef = useRef<HTMLDivElement | null>(null);
-  const idRef = useRef(0);
+  const idRef = useRef(auto ? 1 : 0);
   const timersRef = useRef<number[]>([]);
   const rafRef = useRef<number | null>(null);
   // Recorder session id: one per engine session (a dog pick / page load reset).
   // Inert in production (the turn tap has no sink there); see lib/turn-tap.ts.
-  const recSessionRef = useRef(restored ? restored.recSessionId || '' : '');
+  const recSessionRef = useRef(restored ? restored.recSessionId || '' : auto ? `s${Date.now().toString(36)}-auto` : '');
   // The active typing performance, so a tap or Enter can complete it instantly.
   const playbackRef = useRef<{ id: number; plan: TypingPlan; closed?: boolean; done: boolean } | null>(null);
 
@@ -228,7 +244,15 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
   // Task 130: minimise collapses the chat to a dog-face chip bottom right;
   // restore brings the conversation back exactly where it was. The flag rides
   // the persistence payload so a minimised chat survives page navigation.
-  const [minimised, setMinimised] = useState<boolean>(restored ? !!restored.minimised : false);
+  const [minimised, setMinimised] = useState<boolean>(restored ? !!restored.minimised : auto ? true : false);
+  // Task 148: on the first open of an unbidden appearance (the visitor engages), append his reveal --
+  // the page's extended bio, or a game hint -- as a second message. revealedRef guards it to once.
+  const revealedRef = useRef(false);
+  useEffect(() => {
+    if (!auto || minimised || revealedRef.current) return;
+    revealedRef.current = true;
+    setMessages((m) => [...m, { id: idRef.current++, who: 'dog', text: auto.reveal, dog: auto.dog, name: dogInfo(auto.dog).name, display: auto.reveal, done: true }]);
+  }, [minimised, auto]);
   // One body-level signal drives everything that must not co-exist with the
   // chip: the scrim (owner ruling: no chat UI left to lift) and the offer
   // card (owner ruling: two floating things in one corner is worse than
@@ -467,6 +491,10 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
       everProtectedRef.current = true;
       try {
         window.sessionStorage.removeItem(CHAT_KEY);
+        // Task 148: the chat content is scrubbed (a disclosure must never sit in sessionStorage), but
+        // leave a CONTENT-FREE flag so the Terrier's unbidden appearances stay suppressed for the rest
+        // of the session -- a child who has disclosed something must not have a dog pop out at them.
+        if (session.protectedState) window.sessionStorage.setItem(PROTECTED_FLAG, '1');
       } catch {}
       return;
     }
@@ -953,7 +981,7 @@ export default function PickAChumExperience({ onClose }: { onClose: () => void }
         <div className={styles.miniDock}>
           <button
             type="button"
-            className={styles.miniFace}
+            className={`${styles.miniFace} ${auto && !revealedRef.current ? styles.miniAuto : ''}`}
             aria-label={`Reopen the chat with the ${dogInfo(dog).name}`}
             title={`Reopen the chat with the ${dogInfo(dog).name}`}
             style={{ backgroundImage: `url("${PROFILE_IMG[dog]}")` }}

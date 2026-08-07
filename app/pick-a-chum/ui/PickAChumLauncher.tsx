@@ -8,11 +8,18 @@
 
 import { useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
+import { usePathname } from 'next/navigation';
 import styles from './PickAChum.module.css';
 import PickAChumIcon from './PickAChumIcon';
 // DEV-RECORDER (strip for production): preview-only conversation recorder. It is
 // inert on production hosts anyway (see lib/turn-tap.ts recorderEnabled).
 import DevRecorder from '../dev/DevRecorder';
+// Task 148: the Terrier's job. Type-only import (erased) keeps the heavy experience code-split; the
+// helper + registry + page-bios are lightweight (no chatbot engine), so the launcher stays cheap.
+import type { AutoAppear } from './PickAChumExperience';
+import { canTerrierAppear, isDismissed, markDismissed, unfoundGameHint, AUTO_APPEAR_ROUTES } from './terrierAppearance';
+import { bioForRoute } from '../data/page-bios';
+import { getHiddenGamesEngine } from '../../../lib/hiddenGames/browserEngine';
 
 const PickAChumExperience = dynamic(() => import('./PickAChumExperience'), { ssr: false });
 
@@ -31,6 +38,13 @@ const ICON_FRAMES = [
 const FRAME_MS = 200;
 const CYCLES = 3; // Task 97: play the four-frame sequence this many times on appearance, then rest
 const APPEAR_HOLD_MS = 2000; // Task (JS hold): wait this long after the logo becomes visible, then reveal
+// Task 148: the Terrier's unbidden lines. His two auto-appear pages carry OI_OI; a game find, ten
+// seconds on, carries HINT_OFFER. Both open MINIMISED (his chip), and section 2's suppression rule
+// (canTerrierAppear) is checked before either fires.
+const OI_OI = 'oi oi I know all about this page if you want help';
+const HINT_OFFER = 'you found a game. you want a hint for where another is?';
+const HINT_DELAY_MS = 10000; // ten seconds after a game is found (brief section 7)
+const PULSE_MS = 700; // dead-click launcher pulse duration (matches the CSS keyframe)
 
 export default function PickAChumLauncher() {
   const [open, setOpen] = useState(false);
@@ -45,6 +59,15 @@ export default function PickAChumLauncher() {
   const [shown, setShown] = useState(false);
   const buttonRef = useRef<HTMLButtonElement | null>(null);
   const wasOpen = useRef(false);
+  // Task 148: the Terrier's unbidden appearance (auto-appear page bio, or a game hint) and the
+  // dead-click pulse. Live refs so the 10s hint timer and the dead-click listener read current values.
+  const pathname = usePathname();
+  const [autoAppear, setAutoAppear] = useState<AutoAppear | null>(null);
+  const [pulse, setPulse] = useState(false);
+  const openRef = useRef(open);
+  const pathnameRef = useRef(pathname);
+  openRef.current = open;
+  pathnameRef.current = pathname;
 
   // Restore focus to the launcher when the experience closes.
   useEffect(() => {
@@ -65,6 +88,12 @@ export default function PickAChumLauncher() {
   // does not reopen on the next page. (Navigating with it open keeps the key and reopens it.)
   const closeExperience = () => {
     setOpen(false);
+    // Task 148 section 8: closing an unbidden appearance dismisses him for that page for the session --
+    // he does not reappear on the same page. (An ordinary chat close just clears the key, as before.)
+    if (autoAppear) {
+      markDismissed(autoAppear.route);
+      setAutoAppear(null);
+    }
     try {
       window.sessionStorage.removeItem('pc-chat');
     } catch {}
@@ -143,18 +172,64 @@ export default function PickAChumLauncher() {
     return () => window.clearInterval(id);
   }, [shown]);
 
+  // Task 148 section 4: on his two pages he appears MINIMISED and unbidden, after the same reveal hold
+  // the launcher uses. Section 2 removes the whole problem -- a chat already open, a protected session,
+  // the offer or checkout all veto via canTerrierAppear(); a per-page dismissal keeps him gone once shut.
+  useEffect(() => {
+    if (!shown || open) return;
+    const route = pathname ?? '';
+    if (!AUTO_APPEAR_ROUTES.includes(route)) return;
+    if (!canTerrierAppear() || isDismissed(route)) return;
+    const bio = bioForRoute(route);
+    setAutoAppear({ dog: 'terrier', offer: OI_OI, reveal: bio?.extended ?? bio?.bio ?? '', route });
+    setOpen(true);
+  }, [shown, pathname, open]);
+
+  // Task 148 section 7: ten seconds after a game is found, if still on the same page and nothing open,
+  // he offers a hint at a game not yet found (derived from the registry; null when all eight are found,
+  // so he says nothing). Suppression applies. subscribeDiscovery does not fire on the eighth find, which
+  // is fine -- there is nothing left to hint.
+  useEffect(() => {
+    return getHiddenGamesEngine().subscribeDiscovery(() => {
+      const route = pathnameRef.current ?? '';
+      window.setTimeout(() => {
+        if (openRef.current || (pathnameRef.current ?? '') !== route) return;
+        if (!canTerrierAppear() || isDismissed(route)) return;
+        const hint = unfoundGameHint();
+        if (!hint) return;
+        setAutoAppear({ dog: 'terrier', offer: HINT_OFFER, reveal: hint, route });
+        setOpen(true);
+      }, HINT_DELAY_MS);
+    });
+  }, []);
+
+  // Task 148 section 6: a click on an explicitly marked dead element (data-pc-dead) summons NOTHING --
+  // it pulses the launcher already on screen. No guessing, no false positives. Only while the launcher
+  // (not the open chat) is showing. Capture phase, so it fires even if the element stops propagation.
+  useEffect(() => {
+    const onClick = (e: MouseEvent) => {
+      if (openRef.current) return;
+      const t = e.target as Element | null;
+      if (!t || !t.closest?.('[data-pc-dead]')) return;
+      setPulse(true);
+      window.setTimeout(() => setPulse(false), PULSE_MS);
+    };
+    document.addEventListener('click', onClick, true);
+    return () => document.removeEventListener('click', onClick, true);
+  }, []);
+
   return (
     <>
       {/* Task 118: brand-blue graduated scrim behind the chat UI, only while it is present. Decoration
           only (pointer-events:none in CSS); never intercepts a click. */}
       {open && <div className={styles.scrim} aria-hidden="true" />}
       {open ? (
-        <PickAChumExperience onClose={closeExperience} />
+        <PickAChumExperience onClose={closeExperience} autoAppear={autoAppear ?? undefined} />
       ) : (
         <button
           ref={buttonRef}
           type="button"
-          className={`${styles.launcher} ${shown ? styles.launcherOn : ''}`}
+          className={`${styles.launcher} ${shown ? styles.launcherOn : ''} ${pulse ? styles.launcherPulse : ''}`}
           aria-label="Pick a Chum"
           onClick={() => setOpen(true)}
         >

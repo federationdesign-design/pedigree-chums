@@ -582,6 +582,29 @@
   0% { transform: scale(0.6) translateY(12px); opacity: 0; }
   100% { transform: none; opacity: 1; }
 }
+/* Task 148: the unbidden Terrier chip. Pop in, then a slow pulse (quick up, easing back to a stop)
+   that runs a few cycles and then rests for good. NO flashing/flicker -- scale only, never opacity --
+   and each cycle is 1.4s, well under 1Hz. A dead click pulses the launcher once via pcLauncherPulse. */
+@keyframes pcTerrierPulse {
+  0% { transform: scale(1); }
+  14% { transform: scale(1.09); }
+  55% { transform: scale(1); }
+  100% { transform: scale(1); }
+}
+@keyframes pcLauncherPulse {
+  0% { transform: scale(1); }
+  35% { transform: scale(1.12); }
+  100% { transform: scale(1); }
+}
+/* The auto-appeared chip: pop in immediately, then pulse three times (starting once it settles), then
+   rest. The pop-in already draws the eye; the pulse offers rather than interrupts. */
+.miniAuto {
+  animation: pcPop 440ms cubic-bezier(0.34, 1.56, 0.64, 1), pcTerrierPulse 1.4s ease-out 3 0.6s;
+}
+/* Dead click: the launcher already on screen gives one gentle pulse; nothing new appears. */
+.launcherPulse {
+  animation: pcLauncherPulse 600ms ease-out;
+}
 
 /* ---- Mobile ---- */
 @media (max-width: 480px) {
@@ -655,6 +678,11 @@
     transform: none;
   }
   .typingDots span {
+    animation: none;
+  }
+  /* Task 148: the unbidden Terrier chip appears, nothing moves; the dead-click pulse is stilled too. */
+  .miniAuto,
+  .launcherPulse {
     animation: none;
   }
 }
