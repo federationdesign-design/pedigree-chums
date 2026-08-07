@@ -1287,6 +1287,29 @@ export default function BreedTree({
   // two different circles is not a double tap.
   const zoomTapRef = useRef<{ n: Node | null; t: number }>({ n: null, t: 0 });
 
+  /* ── PAN, zoomed in only ─────────────────────────────────────────────────
+     At the root the whole tree already fits, so panning there would only let
+     someone push it off screen for nothing. Zoomed in there is more tree than
+     view, and this is how you reach the rest of it.
+     It moves viewRef directly rather than animating: a pan should track the
+     finger, not chase it. */
+  const panRef = useRef<{ x: number; y: number; vx: number; vy: number; per: number; moved: boolean } | null>(null);
+  /* 8px, the SAME figure onBackground uses to tell a tap from a drag. At 6 a
+     seven pixel movement panned and then also read as a background tap, which
+     zooms out to the root: you would pan a little and be thrown back to the top. */
+  const PAN_SLOP = 8;
+  const panBounds = (v: View): View => {
+    // Never further than the root's own circle plus a screen's worth of margin,
+    // so the tree can always be found again.
+    const root = nodes[0];
+    const lim = root.r + v[2] * 0.5;
+    return [
+      Math.max(root.x - lim, Math.min(root.x + lim, v[0])),
+      Math.max(root.y - lim, Math.min(root.y + lim, v[1])),
+      v[2],
+    ];
+  };
+
   /* ── KNOCKS ──────────────────────────────────────────────────────────────
      A pulled circle shoves its neighbours. Each shoved circle springs back on
      its own, so several can be moving at once and none waits for the others.
@@ -2933,13 +2956,17 @@ export default function BreedTree({
     // so a second tap minutes later still went in. Now the two taps have to be
     // quick, which leaves a single tap free to preview and to push the circle
     // about without ever walking you somewhere you did not mean to go.
+    // EVERY circle, not just the children of the one you are in. The gate used
+    // to be `d.parent === focusRef.current`, so a sibling fell past this branch
+    // and zoomed on a SINGLE tap while a child needed two. Nobody saw it while
+    // siblings were off screen; the moment panning lets you reach them it would
+    // read as a bug.
     if (
       touchRef.current &&
       dockAside &&
       !dropped &&
       !frozen &&
-      d.parent === focusRef.current &&
-      !!d.children?.length
+      d !== focusRef.current
     ) {
       const now = e.timeStamp;
       const quick = zoomTapRef.current.n === d && now - zoomTapRef.current.t < 320;
@@ -5152,7 +5179,38 @@ export default function BreedTree({
             // reliably sees the pointer type before any tap is acted on.
             touchRef.current = ev.pointerType === "touch";
             bgPressRef.current = { x: ev.clientX, y: ev.clientY, t: ev.timeStamp };
+            // Arm a pan. Zoomed in only, and never once the round has dropped,
+            // where the pit owns the pointer.
+            if (dockAside && !dropped && !disableZoom && focusRef.current !== nodes[0]) {
+              const st = stageRef.current;
+              const vbH = aspect >= 1 ? SIZE : SIZE / aspect;
+              const uppL = vbH / Math.max(st ? st.clientHeight : 1, 1);
+              const v = viewRef.current;
+              panRef.current = {
+                x: ev.clientX, y: ev.clientY, vx: v[0], vy: v[1],
+                // World units per client pixel, frozen at the press, the same
+                // conversion the pull uses: view units per px divided by the
+                // world-to-view scale.
+                per: uppL / (SIZE / v[2]),
+                moved: false,
+              };
+            } else {
+              panRef.current = null;
+            }
           }}
+          onPointerMove={(ev) => {
+            const pn = panRef.current;
+            if (!pn) return;
+            const dx = ev.clientX - pn.x, dy = ev.clientY - pn.y;
+            if (!pn.moved && Math.hypot(dx, dy) < PAN_SLOP) return;
+            pn.moved = true;
+            // Dragging right moves the view left, so the tree follows the finger.
+            const v = viewRef.current;
+            viewRef.current = panBounds([pn.vx - dx * pn.per, pn.vy - dy * pn.per, v[2]]);
+            zoomTo(viewRef.current);
+          }}
+          onPointerUp={() => { panRef.current = null; }}
+          onPointerCancel={() => { panRef.current = null; }}
           onClick={disableZoom ? undefined : onBackground}
           // Zoomed in, a click on the background goes back to the top, so say
           // so. At the top it does nothing in LEARN, so it keeps the plain arrow
