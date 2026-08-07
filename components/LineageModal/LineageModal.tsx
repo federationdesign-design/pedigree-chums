@@ -288,43 +288,26 @@ export default function LineageModal({ name, image, character, lineage, onClose,
           see where you are as well as what you are on. The second row is only
           drawn once the two differ, which is why the resting state still reads
           as a single title. */}
-      <div className={css.titleWrap}>
+      {/* EVERY STEP SHOWS. An earlier pass collapsed the middle into a "+N"
+          chip because a fourth row ran into the learn info box. Owner ruling:
+          show them all. So instead of dropping rows the portrait shrinks
+          itself, and --rows is how the stylesheet knows how far it has to go.
+          One to three steps are unaffected, which is nearly every case; only
+          the deepest circles of the deepest levels ever shrink. */}
+      <div
+        className={css.titleWrap}
+        style={{ ["--rows" as string]: Math.max(1, shownPath.length || (shownName !== name ? 2 : 1)) }}
+      >
         <TitleRow img={image} name={name} status={levelStatus} isNarrow={isNarrow} />
-        {(() => {
-          /* THREE ROWS IS THE CEILING, and it is a measured one, not a taste.
-             The learn info box sits at clamp(112px, 17vh, 190px) plus 60 on a
-             phone and plus 100 on desktop. With the portrait at its new size a
-             fourth row runs into it on every viewport tested, including a
-             1440x900 desktop. So: the level's dog holds the top, the circle
-             being looked at holds the bottom, and anything between them
-             collapses into a single count.
-
-             The old two-row behaviour is unchanged at depth 0 and 1. A tree
-             only reaches depth 2 or more when a circle has circles inside it,
-             which is the case this was asked for. */
-          const rest = shownPath.slice(1);
-          if (rest.length === 0) {
-            // Nothing below the root. Fall back to the old comparison so the
-            // title still updates if the path callback has not arrived yet.
-            return shownName !== name ? (
+        {shownPath.length > 1
+          ? shownPath.slice(1).map((step, i) => (
+              <TitleRow key={`${i}-${step.name}`} img={step.img} name={step.name} status={step.status} isNarrow={isNarrow} />
+            ))
+          : /* The path callback has not arrived yet: fall back to the old
+               single-row comparison so the title is never blank. */
+            shownName !== name && (
               <TitleRow img={shownImg} name={shownName} status={shownStatus} isNarrow={isNarrow} />
-            ) : null;
-          }
-          const last = rest[rest.length - 1];
-          const skipped = rest.length - 1;
-          return (
-            <>
-              {skipped === 1 ? (
-                <TitleRow img={rest[0].img} name={rest[0].name} status={rest[0].status} isNarrow={isNarrow} />
-              ) : skipped > 1 ? (
-                <div className={css.titleRow}>
-                  <span className={css.titleSkip} aria-label={`${skipped} steps not shown`}>+{skipped}</span>
-                </div>
-              ) : null}
-              <TitleRow img={last.img} name={last.name} status={last.status} isNarrow={isNarrow} />
-            </>
-          );
-        })()}
+            )}
         {/* The global explanation (owner placement, option A): rides in the
             title wrap so it is on screen before any break panel opens.
             Verbatim from docs/lineage/BRIEF.md section 7. On narrow screens

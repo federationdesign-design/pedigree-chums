@@ -29,14 +29,30 @@
 
 .titleWrap {
   position: absolute;
-  /* Was 24. The ladder can now run to three rows, so the whole stack starts
-     higher to buy the third one room. */
+  /* Was 24. The ladder can run to six rows, so the stack starts higher. */
   top: 12px;
-  /* Centred on the pit's left axis, with the slider, the score and PLAY. The
-     row is a flex line, so shifting the wrapper carries the name with it.
-     This clamp MUST track .titlePortrait's, or the column stops being centred
-     on the axis the moment the portrait size changes. */
-  left: calc(var(--pit-axis, 51.8px) - clamp(44.8px, 8.8vw, 62.4px) / 2);
+
+  /* THE ONE SIZE EVERYTHING IN THE TITLE IS BUILT FROM.
+     --rows is set inline by the component: how many portraits are stacked.
+     --push is the learn info box's own offset, 60 on a phone and 100 above it.
+
+     --ceil is therefore the exact y the box's top edge sits at, copied from
+     .asideDocked in BreedTree.module.css. Change it there and change it here.
+
+     The portrait is then whichever is smaller: the size it would like to be,
+     or the largest size that still clears the box. At one to three rows the
+     first wins and nothing has changed. Only a deep ladder shrinks, and it
+     shrinks exactly as far as it must and no further. */
+  --rows: 1;
+  --push: 100px;
+  --ceil: calc(clamp(112px, 17vh, 190px) + var(--push));
+  --tp: min(
+    clamp(44.8px, 8.8vw, 62.4px),
+    calc((var(--ceil) - 12px - (var(--rows) - 1) * 5px) / var(--rows))
+  );
+
+  /* Centred on the pit's left axis, with the slider, the score and PLAY. */
+  left: calc(var(--pit-axis, 51.8px) - var(--tp) / 2);
   max-width: 82%;
   z-index: 15;
   pointer-events: none;
@@ -46,9 +62,17 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  /* Was 8. One pixel per gap, 2px across three rows. Small, but the third row
-     was over its ceiling by single figures, so it is not free money. */
-  gap: 7px;
+  /* 8, then 7, now 5. Worth 25px across a six-row ladder, which is a whole
+     extra portrait's worth of room. */
+  gap: 5px;
+}
+/* The info box sits 40px higher on a narrow screen, so the ceiling does too.
+   900px, NOT 768: that is the breakpoint BreedTree.module.css uses for
+   .asideDocked's own +60px, and it is also where the title starts splitting
+   names over two lines. Getting this wrong puts the whole ladder 40px out on
+   every tablet-width screen. */
+@media (max-width: 900px) {
+  .titleWrap { --push: 60px; }
 }
 .titleRow {
   display: flex;
@@ -64,13 +88,12 @@
   /* Was clamp(40px, 8vw, 54px), the same figure the learn box uses for its own
      head portrait. Grown so the level's dog reads at title weight rather than
      as a bullet beside it. Change this one clamp and the two below follow. */
-  /* 20% off the figures above: 56 -> 44.8, 11vw -> 8.8vw, 78 -> 62.4. THIS is
-     what buys the third row, not the type. The portrait is taller than the
-     name on every viewport, phone and desktop alike, so it alone sets the row
-     height and the name rides inside it. Changing this clamp means changing
-     .titleWrap's left and .titleSkip to match. */
-  width: clamp(44.8px, 8.8vw, 62.4px);
-  height: clamp(44.8px, 8.8vw, 62.4px);
+  /* Sized by --tp on .titleWrap, which is where the reasoning lives. The
+     portrait is taller than the name on every viewport, so it alone sets the
+     row height: this is the single number that decides whether the ladder
+     fits. */
+  width: var(--tp);
+  height: var(--tp);
   border-radius: 50%;
   object-fit: cover;
   flex: none;
@@ -80,8 +103,11 @@
   position: absolute;
   right: 2px;
   bottom: 3px;
-  width: 17px;
-  height: 17px;
+  /* 17px was right against a 56px portrait and swamps a 25px one. 0.38 of the
+     portrait IS 17px at the size this used to be, so nothing moves at normal
+     depth and the dot only shrinks once the ladder forces the picture down. */
+  width: min(17px, calc(var(--tp) * 0.38));
+  height: min(17px, calc(var(--tp) * 0.38));
   border-radius: 50%;
   border: 1.5px solid #fff;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
@@ -90,11 +116,15 @@
 .title {
   width: auto;
   font-family: var(--font-display, "Luckiest Guy", system-ui);
-  /* 20% off 1.35 / 3.25vw / 2.95, matching the portrait so the row keeps its
-     proportions. Saves no height on its own, by measurement: the name is
-     shorter than the portrait either way. It is here to keep the type in scale
-     with the smaller picture. */
-  font-size: clamp(1.08rem, 2.6vw, 2.36rem);
+  /* Another 20% off: 1.08 -> 0.86, 2.6vw -> 2.08vw, 2.36 -> 1.89.
+
+     The second min() is the guard, and it matters. A narrow screen splits a
+     name over two lines, so the text block is 2 x font x 1.05 tall. Divided
+     back out, anything above --tp / 2.1 would make the NAME taller than the
+     portrait, which would take the row height off --tp and quietly break the
+     fit the whole ladder depends on. At normal depth the clamp is well under
+     that and wins, so this only bites on a deep, shrunken ladder. */
+  font-size: min(clamp(0.86rem, 2.08vw, 1.89rem), calc(var(--tp) / 2.1));
   color: #ffffff;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -1128,28 +1158,3 @@
   text-shadow: 0 1px 2px rgba(10, 58, 87, 0.55);
 }
 
-/* THE COLLAPSED MIDDLE of the title ladder. Drawn only when the line from the
-   level's dog to the circle you are on is more than two steps, which no longer
-   fits. It stands in a portrait's place and keeps the round shape and the drop
-   shadow, so the ladder still reads as a column of heads.
-
-   AT THE END OF THE FILE, same reason as the block in LineageMap.module.css:
-   same specificity means the last rule wins. */
-.titleSkip {
-  width: clamp(44.8px, 8.8vw, 62.4px);
-  height: clamp(44.8px, 8.8vw, 62.4px);
-  border-radius: 50%;
-  flex: none;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-  background: rgba(10, 58, 87, 0.72);
-  border: 2px solid rgba(255, 255, 255, 0.55);
-  color: #ffffff;
-  font-family: var(--font-body, "Montserrat", system-ui);
-  font-weight: 700;
-  font-size: clamp(0.85rem, 1.9vw, 1.15rem);
-  letter-spacing: 0.02em;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
-}
