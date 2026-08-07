@@ -122,7 +122,6 @@ const CARD_TILT = (2 * Math.PI) / 180;
    reads at 11.1px broken per word against 8.9px balanced.
 
    Across all 63 distinct solo names at 67px: worst 8.3px, median 11.8px. */
-const SOLO_CHAR_W = 0.62;  // fallback glyph width in ems, same figure BreedTree uses
 const SOLO_LINE_H = 0.95;
 /* THE WORD IS NOT IN THE CARD. THE WORD IS THE CARD.
 
@@ -144,25 +143,6 @@ const SOLO_TILT_DEG = 15;   // leans DOWN to the right, the opposite way to the 
 function soloWordFit(name: string, H: number): { lines: string[]; fs: number } {
   const lines = name.split(/\s+/).filter(Boolean);
   return { lines, fs: H / (lines.length * SOLO_LINE_H) };
-}
-/* Fitted INSIDE a circle of radius R instead, for the copy that lands in a
-   frame. A frame is a small round hole in a five-across grid, so the placed
-   copy has to behave itself even though the loose one does not. */
-function soloWordFitIn(name: string, R: number): { lines: string[]; fs: number } {
-  const lines = name.split(/\s+/).filter(Boolean);
-  const w = lines.map((l) => l.length * SOLO_CHAR_W);
-  let lo = 2, hi = 60;
-  for (let i = 0; i < 36; i++) {
-    const fs = (lo + hi) / 2;
-    const HH = (lines.length * SOLO_LINE_H * fs) / 2;
-    let ok = true;
-    for (let j = 0; j < lines.length; j++) {
-      const top = -HH + j * SOLO_LINE_H * fs, bot = top + SOLO_LINE_H * fs;
-      if (Math.hypot((w[j] * fs) / 2, Math.max(Math.abs(top), Math.abs(bot))) > R) { ok = false; break; }
-    }
-    if (ok) lo = fs; else hi = fs;
-  }
-  return { lines, fs: lo };
 }
 
 function sumLeaves(n: LineageNode): number {
@@ -1763,7 +1743,18 @@ export default function LineageMap({
                 >
                   <rect
                     className={`${styles.frame} ${lit || correctFlash === f.id ? styles.frameLit : ""} ${filledHere ? styles.frameFilled : ""} ${shakeFrame === f.id ? styles.frameShake : ""} ${wobbleHere ? styles.frameExpect : ""} ${dimHere ? styles.frameDim : ""}`.trim()}
-                    style={glow}
+                    /* TWO RINGS, and each was right on its own.
+                       .frameFilled turns the dotted hole into a solid YELLOW
+                       ring and leaves it at full opacity. The placed card then
+                       lays its own WHITE ring on top, deliberately white because
+                       yellow is the pit's colour and read as pit furniture over
+                       the learning view. Nobody had looked at the two together.
+                       The card covers the hole completely once it lands, so in
+                       the pit lift the frame steps aside and the card's own ring
+                       is the only one. The main pit and the chum tree are
+                       untouched: there the card's ring is yellow too and the
+                       two sit on top of each other as one. */
+                    style={circular && filledHere ? { ...glow, opacity: 0 } : glow}
                     x={f.sx - pan.x - CW / 2}
                     y={f.sy - pan.y - CW / 2}
                     width={CW}
@@ -2274,34 +2265,18 @@ export default function LineageMap({
             onPointerCancel={(e) => { e.stopPropagation(); if (isMobile) endGridDrag(e); }}
           >
             <div style={{ width: "100%", height: "100%", borderRadius: circular ? "50%" : 13, overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center", background: INSTR_NAMES.has(breed.name) ? "rgba(10,58,87,0.08)" : "transparent" }}>
-              {soloWord ? (() => {
-                // Same fitter as the loose card, so the name does not resize as
-                // it lands. This copy is HTML because a placed card is drawn
-                // outside the svg, over the frames.
-                const f = soloWordFitIn(c.name, CW / 2 - 5);
-                return (
-                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", width: "100%", height: "100%", pointerEvents: "none", userSelect: "none" }}>
-                    {f.lines.map((ln, li) => (
-                      <span key={li} style={{
-                        fontFamily: "var(--font-display), 'Luckiest Guy', system-ui, sans-serif",
-                        fontSize: f.fs, lineHeight: `${SOLO_LINE_H}`, color: "#ffffff",
-                        WebkitTextStroke: `${Math.max(2, f.fs * 0.16)}px var(--navy, #0a3a57)`,
-                        paintOrder: "stroke", whiteSpace: "nowrap",
-                      }}>{ln}</span>
-                    ))}
-                  </div>
-                );
-              })() : (
-                <>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={encodeURI(bust(c.img))}
-                    alt={c.name}
-                    draggable={false}
-                    style={{ width: INSTR_NAMES.has(breed.name) ? "65%" : "100%", height: INSTR_NAMES.has(breed.name) ? "65%" : "100%", objectFit: INSTR_NAMES.has(breed.name) ? "contain" : "cover", display: "block" }}
-                  />
-                </>
-              )}
+              {/* PLACED CARDS ALWAYS SHOW THE PICTURE, solo dogs included.
+                  The word is how a solo dog reads while it is loose and in your
+                  hand: big, tilted, no circle round it. Once it is home the
+                  round card is back, so the frame reads as a filled slot and
+                  the grid stays a grid of dogs. Owner ruling. */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={encodeURI(bust(c.img))}
+                alt={c.name}
+                draggable={false}
+                style={{ width: INSTR_NAMES.has(breed.name) ? "65%" : "100%", height: INSTR_NAMES.has(breed.name) ? "65%" : "100%", objectFit: INSTR_NAMES.has(breed.name) ? "contain" : "cover", display: "block" }}
+              />
             </div>
             {INSTR_NAMES.has(breed.name) && (
               <div style={{ position: "absolute", bottom: -20, left: 0, right: 0, textAlign: "center", fontFamily: "'Luckiest Guy', system-ui, sans-serif", fontSize: 10, color: "#ffffff", pointerEvents: "none", lineHeight: 1.2 }}>
