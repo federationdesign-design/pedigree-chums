@@ -6,7 +6,7 @@
 // is code-split behind next/dynamic and only downloaded when the visitor opens
 // the launcher, so no page pays a bundle cost for a chatbot it never opens.
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { usePathname } from 'next/navigation';
 import styles from './PickAChum.module.css';
@@ -17,7 +17,7 @@ import DevRecorder from '../dev/DevRecorder';
 // Task 148: the Terrier's job. Type-only import (erased) keeps the heavy experience code-split; the
 // helper + registry + page-bios are lightweight (no chatbot engine), so the launcher stays cheap.
 import type { AutoAppear } from './PickAChumExperience';
-import { canTerrierAppear, isDismissed, markDismissed, unfoundGameHint, AUTO_APPEAR_ROUTES } from './terrierAppearance';
+import { canDogAppear, isDismissed, markDismissed, unfoundGameHint, appearanceForRoute, type DogAppearance } from './dogAppearance';
 import { bioForRoute } from '../data/page-bios';
 import { getHiddenGamesEngine } from '../../../lib/hiddenGames/browserEngine';
 
@@ -40,9 +40,15 @@ const CYCLES = 3; // Task 97: play the four-frame sequence this many times on ap
 const APPEAR_HOLD_MS = 2000; // Task (JS hold): wait this long after the logo becomes visible, then reveal
 // Task 148: the Terrier's unbidden lines. His two auto-appear pages carry OI_OI; a game find, ten
 // seconds on, carries HINT_OFFER. Both open MINIMISED (his chip), and section 2's suppression rule
-// (canTerrierAppear) is checked before either fires.
+// (canDogAppear) is checked before either fires.
 const OI_OI = 'oi oi I know all about this page if you want help';
+// Task 150: the Boxer's confidently-wrong opener (his chip line). He is certain he knows what the page
+// is; the reveal (his misread) shows how wrong. PLACEHOLDER, pending owner rewrite.
+const BOXER_OPENER = 'oh! this page? i know this one. i know EXACTLY what this is';
 const HINT_OFFER = 'you found a game. you want a hint for where another is?';
+// Task 150 section 3: the Boxer's scroll gate. He appears only once the visitor is halfway down -- a
+// commitment signal, not a greeter at the door. Half the scrollable height.
+const SCROLL_GATE = 0.5;
 const HINT_DELAY_MS = 10000; // ten seconds after a game is found (brief section 7)
 const PULSE_MS = 700; // dead-click launcher pulse duration (matches the CSS keyframe)
 
@@ -172,18 +178,55 @@ export default function PickAChumLauncher() {
     return () => window.clearInterval(id);
   }, [shown]);
 
-  // Task 148 section 4: on his two pages he appears MINIMISED and unbidden, after the same reveal hold
-  // the launcher uses. Section 2 removes the whole problem -- a chat already open, a protected session,
-  // the offer or checkout all veto via canTerrierAppear(); a per-page dismissal keeps him gone once shut.
+  // Task 148/150: open a dog's unbidden appearance MINIMISED (his chip). The Terrier carries his blunt
+  // `extended` bio, the Boxer his confidently-wrong `misread`; each dog its own opener line. Section 2's
+  // suppression (canDogAppear) is the caller's responsibility -- this only builds the appearance.
+  const appear = useCallback((app: DogAppearance, route: string) => {
+    const bio = bioForRoute(route);
+    const offer = app.dog === 'boxer' ? BOXER_OPENER : OI_OI;
+    const reveal = app.dog === 'boxer' ? bio?.misread ?? '' : bio?.extended ?? bio?.bio ?? '';
+    setAutoAppear({ dog: app.dog, offer, reveal, route });
+    setOpen(true);
+  }, []);
+
+  // Task 148 section 4: the ARRIVAL dogs (the Terrier's two pages) appear the moment the page settles,
+  // after the same reveal hold the launcher uses. Section 2 removes the whole problem -- a chat already
+  // open, a protected session, the offer or checkout all veto via canDogAppear(); a per-page dismissal
+  // keeps him gone once shut.
   useEffect(() => {
     if (!shown || open) return;
     const route = pathname ?? '';
-    if (!AUTO_APPEAR_ROUTES.includes(route)) return;
-    if (!canTerrierAppear() || isDismissed(route)) return;
-    const bio = bioForRoute(route);
-    setAutoAppear({ dog: 'terrier', offer: OI_OI, reveal: bio?.extended ?? bio?.bio ?? '', route });
-    setOpen(true);
-  }, [shown, pathname, open]);
+    const app = appearanceForRoute(route);
+    if (!app || app.trigger !== 'arrival') return;
+    if (!canDogAppear() || isDismissed(route)) return;
+    appear(app, route);
+  }, [shown, pathname, open, appear]);
+
+  // Task 150 section 3: the SCROLL-GATE dogs (the Boxer's three) appear only once the visitor has
+  // scrolled halfway down -- someone that far in is engaged, not just arriving, and it keeps him off the
+  // front door of high-traffic /home. Same suppression and per-page dismissal as arrival. The listener
+  // removes itself the moment he appears; the effect re-runs (and cleans up) on navigation or open.
+  useEffect(() => {
+    if (!shown || open) return;
+    const route = pathname ?? '';
+    const app = appearanceForRoute(route);
+    if (!app || app.trigger !== 'scroll') return;
+    if (isDismissed(route)) return;
+    const check = () => {
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      if (max <= 0) return false; // nothing to scroll yet
+      if (window.scrollY / max < SCROLL_GATE) return false;
+      if (!canDogAppear() || isDismissed(route)) return false;
+      appear(app, route);
+      return true;
+    };
+    if (check()) return; // already past halfway (a restored scroll position, or a short page)
+    const onScroll = () => {
+      if (check()) window.removeEventListener('scroll', onScroll);
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, [shown, pathname, open, appear]);
 
   // Task 148 section 7: ten seconds after a game is found, if still on the same page and nothing open,
   // he offers a hint at a game not yet found (derived from the registry; null when all eight are found,
@@ -194,7 +237,7 @@ export default function PickAChumLauncher() {
       const route = pathnameRef.current ?? '';
       window.setTimeout(() => {
         if (openRef.current || (pathnameRef.current ?? '') !== route) return;
-        if (!canTerrierAppear() || isDismissed(route)) return;
+        if (!canDogAppear() || isDismissed(route)) return;
         const hint = unfoundGameHint();
         if (!hint) return;
         setAutoAppear({ dog: 'terrier', offer: HINT_OFFER, reveal: hint, route });

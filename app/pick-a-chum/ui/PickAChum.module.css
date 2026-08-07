@@ -323,6 +323,10 @@
   font-weight: 500;
   line-height: 1.3;
   color: var(--pc-dialogue);
+  /* Task 150: preserve line breaks so the Boxer's multi-line misread (and any game reaction with a clue
+     on a second line) reads as separate lines. pre-line still wraps and collapses runs of spaces, so
+     single-line messages are unchanged. */
+  white-space: pre-line;
 }
 /* Task 115: game output (noughts-and-crosses grid, Missing Sheep tiles, Kennel Sketch drawing). MUST be
    monospace with preserved whitespace or the ASCII art collapses. Dark navy on the light bubble for
@@ -680,7 +684,7 @@
   .typingDots span {
     animation: none;
   }
-  /* Task 148: the unbidden Terrier chip appears, nothing moves; the dead-click pulse is stilled too. */
+  /* Task 148/150: an unbidden dog chip (Terrier or Boxer) appears, nothing moves; the dead-click pulse is stilled too. */
   .miniAuto,
   .launcherPulse {
     animation: none;
