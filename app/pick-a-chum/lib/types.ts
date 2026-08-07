@@ -145,6 +145,7 @@ export type ActionType =
   | 'gk_answer' // known general-knowledge answer
   | 'gk_unknown' // general knowledge with no approved record: no guess
   | 'breed_answer' // fact about the active breed
+  | 'self_breed' // Task 157: the ACTIVE dog recognises its OWN breed and remarks on it ("what breed are you", "are you a terrier", "tell me about your breed") -- per-dog, in character, never a card recital
   | 'orientation' // onboarding: what is this / what do I do / how does this work
   | 'identity' // sceptical / identity: are you real, are you AI, how can a dog type
   | 'offer_bark_game' // Task 28: play/game request -> offer the ready bark game (was fun_tease)

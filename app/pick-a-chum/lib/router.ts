@@ -481,6 +481,21 @@ function isActiveBreedQuestion(compact: string): boolean {
   return (mentionsCollie && attribute) || (aboutYou && attribute);
 }
 
+// Task 157: is the visitor asking the ACTIVE dog what breed IT is (so it should say so, in character)?
+// Three shapes: "what breed/kind/sort of dog are you", "tell me about your breed", and "are you a <breed>"
+// naming one of the four chatbot breeds. Whole-message-ish; not the attribute questions above (those are
+// B07). The answer is the active dog's own line, so which breed the visitor guessed does not matter.
+const SELF_BREED_PHRASES = [
+  'what breed are you', 'what breed r you', 'whats your breed', 'what is your breed', 'which breed are you',
+  'what kind of dog are you', 'what type of dog are you', 'what sort of dog are you', 'what dog are you',
+  'what kind of dog r you', 'tell me about your breed', 'tell me your breed', 'what breed of dog are you',
+];
+const SELF_BREED_ARE_YOU = /^are (?:you|u) an? (border collie|collie|border terrier|terrier|labrador|lab|retriever|boxer)\??$/;
+function isSelfBreedQuestion(compact: string): boolean {
+  const c = compact.trim();
+  return hasAny({ compact: c } as Normalised, SELF_BREED_PHRASES) || SELF_BREED_ARE_YOU.test(c);
+}
+
 export interface RouterState {
   safetyAskStreak?: number; // Task 139: consecutive safety questions; three in a row hands to a human.
   deathAskStreak?: number; // Task 142: consecutive death-cluster questions; a second escalates to safeguarding.
@@ -1602,6 +1617,15 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
     if (faq) {
       return { layer: 4, layerName: 'FAQ knowledge', bucket: 'B04', action: 'faq_answer', faqId: faq.faqId, faqMatchStrength: faq.strength };
     }
+  }
+
+  // Task 157: the ACTIVE dog recognises its OWN breed. "what breed are you", "are you a terrier", "tell
+  // me about your breed" and the like must get that dog's own take, not the breed-origin history LINK
+  // (the bug: these fell to the B05 content layer below and served "Human history becomes clearer...").
+  // Above B07 (Collie attributes), matchBreed (so "are you a terrier" is not the terrier PAGE) and the
+  // B05 content layer. The per-dog line is served by the assembler.
+  if (isSelfBreedQuestion(c)) {
+    return { layer: 12, layerName: 'Identity and scepticism', bucket: 'B16', action: 'self_breed' };
   }
 
   // Layer 7: facts about the active breed (the Collie itself). Checked before

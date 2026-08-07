@@ -119,21 +119,38 @@ const BREED_BEST_LINE =
 // words and their B19/B20 English lines are PARKED with the Phase 3 voice
 // package; the per-dog state machine still runs for them, but their responses
 // render a parked marker until Phase 3.
+const COLLIE_BARK = { word: 'Woof', end: '.' };
 const BARK_PRESENTATION: Partial<Record<Dog, { word: string; end: string }>> = {
-  collie: { word: 'Woof', end: '.' },
+  collie: COLLIE_BARK,
 };
 const DOG_PREFIX: Record<Dog, string> = { collie: 'COL', labrador: 'LAB', terrier: 'TER', boxer: 'BOX' };
 
+// Task 157 (§3): each dog's own take on its breed, drawn from that breed's fact + character on its chum
+// page, in that dog's voice. DRAFT COPY -- reported for owner approval, not final (the same data the
+// Boxer's /about misreads came from). The Collie is the dry organiser; the Labrador is food-and-water
+// enthusiasm; the Boxer is confidently boisterous; the Terrier is blunt.
+const SELF_BREED_LINES: Record<Dog, string> = {
+  collie: 'A Border Collie. We hold more world records than any breed going, and yes, I keep count. Bred to work, wired to think. I do not sit still well.',
+  labrador: 'Labrador!! best friend in the country, officially it says so. we can even smell when a person is poorly. also i love water. and food. mostly food.',
+  boxer: 'a Boxer! named after boxing, on account of standing up and sparring with our paws. i have never actually boxed. i wave. big, soft, brilliant with kids.',
+  terrier: 'Border Terrier. bred to go down holes after foxes and rats. small, stubborn, dont back down. dont let the size fool you.',
+};
+
 // The generated bark volley: the dog's own word, count units, e.g. "Woof. Woof.".
+// Task 157: until each dog's own bark voice ships (Phase 3), a dog with no presentation barks the
+// Collie's "Woof." rather than leaking the parked placeholder to a visitor -- same class of fault as
+// the breed-choice placeholder fixed in Task 142.
 function barkVolley(dog: Dog, count: number): string {
-  const p = BARK_PRESENTATION[dog];
-  if (!p) return `[${DOG_LABEL[dog]} bark presentation parked for Phase 3]`;
+  const p = BARK_PRESENTATION[dog] ?? COLLIE_BARK;
   return Array.from({ length: Math.max(1, count) }, () => `${p.word}${p.end}`).join(' ');
 }
 
 // A dog-specific B19/B20 line (COL-/LAB-/TER-/BOX- prefixed), unused first.
+// Task 157: B19/B20 are Collie-only for now, so a dog with no rows of its own FALLS BACK to the Collie's
+// (COL-) lines instead of rendering the "copy pending" placeholder in the bark break / acknowledgement.
 function pickBark(data: ChumData, bucket: string, dog: Dog, used: string[]): CollieResponse | null {
-  const pool = data.collieResponses.filter((r) => r.bucketId === bucket && r.responseId.startsWith(DOG_PREFIX[dog]));
+  const own = data.collieResponses.filter((r) => r.bucketId === bucket && r.responseId.startsWith(DOG_PREFIX[dog]));
+  const pool = own.length ? own : data.collieResponses.filter((r) => r.bucketId === bucket && r.responseId.startsWith('COL'));
   return pool.find((r) => !used.includes(r.responseId)) ?? pool[0] ?? null;
 }
 
@@ -533,6 +550,12 @@ export function assemble(res: Resolution, data0: ChumData, n: Normalised, sessio
         : 'We maintain a strong professional record.';
       return { responseId: 'B07-COLLIE', text: bits.replace(/\s{2,}/g, ' ').trim(), dog };
     }
+
+    // Task 157 (§3): the active dog recognises its OWN breed, in character, drawn from that breed's own
+    // fact + character on its chum page (never a card recital). DRAFT COPY, pending owner approval --
+    // reported for sign-off, not final.
+    case 'self_breed':
+      return { responseId: `SELF-BREED-${DOG_PREFIX[dog]}`, text: SELF_BREED_LINES[dog], dog };
 
     case 'orientation': {
       const r = pickResponse(data, 'B15', session.usedResponseIds);

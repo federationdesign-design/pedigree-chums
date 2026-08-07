@@ -2798,6 +2798,40 @@ check('do you like dick?', {}, { assert: (r) => (/^MOD_/.test(r.moderationId ?? 
 check('do you like wellies?', {}, { assert: (r) => (/^MOD_/.test(r.moderationId ?? '') ? '"wellies" wrongly moderated' : null) });
 check('do you like ducks?', {}, { assert: (r) => (/^MOD_/.test(r.moderationId ?? '') ? '"ducks" wrongly moderated' : null) });
 
+// ==== Task 157: the bark placeholder, and each dog recognising its own breed ====
+// Fault 1: a non-Collie dog barking must serve a real "Woof.", never the parked placeholder -- across all
+// three bark responses (volley, break, acknowledgement). A leak shows as a "[...]" marker in text or the
+// follow-up.
+for (const dog of ['boxer', 'terrier', 'labrador']) {
+  const s = newSession(dog);
+  let leaked = null;
+  for (let i = 0; i < 8; i++) {
+    const { response } = submit(data, s, 'woof');
+    if (/\[|parked|copy pending/i.test(response.text)) leaked = response.text;
+    if (response.followUp && /\[|parked|copy pending/i.test(response.followUp)) leaked = response.followUp;
+  }
+  const ok = leaked === null;
+  ok ? pass++ : fail++;
+  rows.push({ ok, input: `${dog} bark: no placeholder leaks`, layer: 13, bucket: '-', action: 'bark', note: ok ? '' : leaked });
+}
+// Fault 2 / the gap: each dog recognises its OWN breed on "what breed are you", in character -- not the
+// breed-origin history LINK ("Human history becomes clearer...").
+for (const [dog, breed] of [['collie', 'Border Collie'], ['labrador', 'Labrador'], ['boxer', 'Boxer'], ['terrier', 'Border Terrier']]) {
+  const s = newSession(dog);
+  check('what breed are you?', { action: 'self_breed' }, { session: s, assert: (_r, resp) => (resp.text.includes(breed) && !/Human history/.test(resp.text) ? null : `${dog} self_breed: "${resp.text}"`) });
+}
+// All three phrasings reach self_breed with the active dog.
+for (const inp of ['are you a terrier', 'tell me about your breed', 'what kind of dog are you']) {
+  const s = newSession('terrier');
+  check(inp, { action: 'self_breed' }, { session: s, assert: (_r, resp) => (resp.text.includes('Border Terrier') ? null : `"${inp}": "${resp.text}"`) });
+}
+// Protected: the breed take must not serve after a disclosure.
+(() => {
+  const s = newSession('terrier');
+  check('im in trouble', { action: 'safety_signpost' }, { session: s });
+  check('what breed are you?', {}, { session: s, assert: (r, resp) => (r.action === 'self_breed' || /Border Terrier/.test(resp.text) ? `self_breed leaked in protected: ${r.action}` : null) });
+})();
+
 // ---- Report ----
 const pad = (s, n) => String(s).padEnd(n);
 console.log('\nPick a Chum: Checkpoint 1 proof\n' + '='.repeat(78));
