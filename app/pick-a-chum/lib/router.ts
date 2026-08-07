@@ -578,20 +578,33 @@ const GREET_WORDS = new Set(['hello', 'hi', 'hey', 'hiya', 'hullo', 'yo']);
 function looksLikeName(tok: string): boolean {
   return !!tok && tok.length >= 2 && !NAME_STOP.has(tok) && !STOP.has(tok);
 }
+// Task 155 (§2): the naming deflection ("are you Dave?") was firing on ANY "are you X" word, so real
+// questions ("are you gay?", "are you moody?") got the name answer. Tighten it: the candidate must LOOK
+// like a name -- capitalised in what the visitor actually typed. A name given to the dog is capitalised
+// (are you Dave, hello Rex); the ordinary words in a real question are not. We have no dictionary to test
+// "ordinary vocabulary", so capitalisation is the signal; a lowercase name ("are you dave") no longer
+// deflects, which is the safe direction (missing a lowercase name beats answering a real question wrong).
+function capitalisedInOriginal(token: string, original: string): boolean {
+  const re = new RegExp('\\b' + token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'i');
+  const m = re.exec(original);
+  return !!m && /[A-Z]/.test(original.charAt(m.index));
+}
 // True when the message is trying to assign HER a name (not asking her name, which keeps "im a dog").
-function isNamingHer(c: string): boolean {
+function isNamingHer(c: string, original: string): boolean {
   if (NAME_HER_PHRASES.some((p) => c.includes(p))) return true;
   const toks = c.match(/[a-z]+/g) ?? [];
-  // "hello NAME" / "hi NAME": a greeting plus exactly one trailing name-like token.
-  if (toks.length === 2 && GREET_WORDS.has(toks[0]) && looksLikeName(toks[1])) return true;
+  // "hello NAME" / "hi NAME": a greeting plus exactly one trailing name-like, capitalised token.
+  if (toks.length === 2 && GREET_WORDS.has(toks[0]) && looksLikeName(toks[1]) && capitalisedInOriginal(toks[1], original)) return true;
   // "are you NAME" / "is i NAME" (as in "is I Rover") / "is your name NAME": a single trailing name.
-  let m = c.match(/^are you ([a-z]+)$/) || c.match(/^is i ([a-z]+)$/) || c.match(/^is your name ([a-z]+)$/) || c.match(/^are you called ([a-z]+)$/);
-  return !!(m && looksLikeName(m[1]));
+  const m = c.match(/^are you ([a-z]+)$/) || c.match(/^is i ([a-z]+)$/) || c.match(/^is your name ([a-z]+)$/) || c.match(/^are you called ([a-z]+)$/);
+  return !!(m && looksLikeName(m[1]) && capitalisedInOriginal(m[1], original));
 }
 // Task 142: a name statement -> the visitor's name, capitalised, for a one-off acknowledgement.
 // Rule not list: five openers, the name is whatever single token follows. Returns null when the
 // captured word is a feeling/state (the stop set), so "im scared" / "im a dog" are never a name.
-const NAME_STATEMENT_RES = [/^my name is ([a-z]+)$/, /^my names ([a-z]+)$/, /^the names ([a-z]+)$/, /^names ([a-z]+)$/, /^call me ([a-z]+)$/, /^you can call me ([a-z]+)$/, /^im ([a-z]+)$/, /^i am ([a-z]+)$/, /^i'm ([a-z]+)$/];
+// Task 155 (§4): "im called X", "they call me X" and "names X" were the missing phrasings ("names X" was
+// already wired). The stop list (looksLikeName) still applies, so "im called bored" is never a name.
+const NAME_STATEMENT_RES = [/^my name is ([a-z]+)$/, /^my names ([a-z]+)$/, /^the names ([a-z]+)$/, /^names ([a-z]+)$/, /^call me ([a-z]+)$/, /^you can call me ([a-z]+)$/, /^im ([a-z]+)$/, /^i am ([a-z]+)$/, /^i'm ([a-z]+)$/, /^im called ([a-z]+)$/, /^i am called ([a-z]+)$/, /^i'm called ([a-z]+)$/, /^they call me ([a-z]+)$/];
 function nameStatement(c: string): string | null {
   for (const re of NAME_STATEMENT_RES) {
     const m = c.match(re);
@@ -874,6 +887,10 @@ const INSIDE_WORLD_WORDS = [
   'page', 'link', 'website', 'site', 'generator',
   // Dog bits
   'bark', 'woof', 'paw', 'tail', 'walk', 'fetch', 'lead', 'collar', 'bone',
+  // Task 155 (§3): toys are a dog subject (she has the tennis ball line). Without this "do you like
+  // squeaky toys?" produced no candidate, so it counted as a no-subject turn and, at a streak of two,
+  // fired a diversion on a real question. As a subject it now loop-repeats and never diverts.
+  'toy',
   // Names (the four chatbot dogs)
   'collie', 'labrador', 'boxer', 'terrier',
   // History
@@ -1253,7 +1270,7 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
     if (REACTION_TRIGGERS.has(c)) return { layer: 9, layerName: 'Recognised conversation', bucket: 'B29', action: 'canned', responseId: 'B29-NICE-01' };
     // Task 142: trying to NAME her -> she deflects, taking no name. "whats your name" is deliberately
     // not here, so it keeps its existing "im a dog".
-    if (isNamingHer(c)) return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: 'name_deflect' };
+    if (isNamingHer(c, n.original)) return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: 'name_deflect' };
     // Task 142: a name statement -> acknowledge once with the (capitalised) name, then drop it. Safety
     // is checked far above, so "im scared" is a safety route and never reaches here as a name.
     {

@@ -98,7 +98,11 @@ const GENERAL_DISTRESS = [
 const BARE_HELP = ['help me', 'need help', 'i need help'];
 
 const CONTENT_SEEKING = ['sex', 'porn', 'nude'];
-const ANATOMY = ['penis', 'vagina', 'boobs', 'naked', 'willy', 'fanny', 'privates', 'private parts', 'front bottom', 'down there', 'my bits', 'wee wee'];
+// Task 155 (§6): "dick" was missing, so "do you like dick?" fell to the no-subject fallback instead of
+// moderation. Added (with the plural), both length <= 5 so they match EXACTLY -- no fuzzing, so no benign
+// near-neighbour (e.g. duck/deck) is caught. The plural "willies" is deliberately NOT added: at length 7
+// it fuzz-matches "wellies" (boots), which would moderate a child asking about their wellingtons.
+const ANATOMY = ['penis', 'vagina', 'boobs', 'naked', 'willy', 'dick', 'dicks', 'fanny', 'privates', 'private parts', 'front bottom', 'down there', 'my bits', 'wee wee'];
 
 // A body-part word together with a person reference or an action reads as a
 // safeguarding disclosure, not inappropriate content. Lists widened per Steve's

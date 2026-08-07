@@ -2379,9 +2379,14 @@ check('im a dog', {}, { assert: (r) => (r.action === 'name_ack' ? 'im a dog read
 check('im happy', {}, { assert: (r) => (r.action === 'name_ack' ? 'im happy read as a name' : null) });
 
 // ---- Naming her: she deflects, taking no name ----
-for (const inp of ['are you dave', 'hello dave', 'is i rover', 'can i give you a name']) {
+// Task 155 (§2): the name must be CAPITALISED (a proper-noun signal), so "are you Dave" deflects but
+// "are you gay?" / "are you moody?" (ordinary lowercase words) no longer do.
+for (const inp of ['are you Dave', 'hello Dave', 'is i Rover', 'can i give you a name']) {
   check(inp, { action: 'name_deflect' }, { assert: (_r, resp) => (/answer to anything|call me what you like/i.test(resp.text) ? null : `deflect text: "${resp.text}"`) });
 }
+// Task 155 (§2): the over-match is fixed -- a real question in an "are you X" frame no longer deflects.
+check('are you gay?', {}, { assert: (r) => (r.action === 'name_deflect' ? '"are you gay?" still read as a name' : null) });
+check('are you moody?', {}, { assert: (r) => (r.action === 'name_deflect' ? '"are you moody?" still read as a name' : null) });
 check('whats your name', {}, { assert: (r) => (r.action === 'name_deflect' ? 'whats your name deflected instead of "im a dog"' : null) });
 // Identity/attribute questions are NOT naming attempts.
 check('are you real', { action: 'identity' });
@@ -2436,7 +2441,7 @@ check('cats', { action: 'canned', bucket: 'B21' }, { assert: (_r, resp) => (resp
 check('hot dogs', { action: 'faq_answer' }, { assert: (r, resp) => (r.faqId === 'FAQ007' && resp.media?.src === '/chat-media/hotdog.mp4' ? null : 'hot dogs lost FAQ007/clip') });
 
 // ---- Protected states: no new Task 142 route (clip / name) serves inside either state ----
-for (const inp of ['how are you', 'good boy', 'my name is charles', 'are you dave']) {
+for (const inp of ['how are you', 'good boy', 'my name is charles', 'are you Dave']) {
   (() => { // PROTECTED_ACTIVE
     const s = newSession();
     check('im in trouble', { action: 'safety_signpost' }, { session: s });
@@ -2756,6 +2761,42 @@ for (const dog of ['labrador', 'terrier', 'boxer']) {
   check('what do I do here', {}, { session: s, assert: (r, resp) => (r.action === 'orientation' || /B15/.test(resp.responseId) ? `${dog} B15 leaked in protected: ${r.action} ${resp.responseId}` : null) });
   check('can we play a game', {}, { session: s, assert: (r, resp) => (r.action === 'offer_bark_game' || /B17/.test(resp.responseId) ? `${dog} B17 leaked in protected: ${r.action} ${resp.responseId}` : null) });
 }
+
+// ==== Task 155: two routing bugs, a name phrasing, a moderation miss ====
+// §2 is asserted at the naming block above (gay/moody no longer deflect; capitalised Dave still does).
+// Blast-radius spot-checks: the identity and praise frames are untouched.
+check('are you real', { action: 'identity' });
+check('are you a good dog', { action: 'good_boy' });
+// §3: a diversion must not fire on a real question. "do you like squeaky toys?" is a subject now, so even
+// after two no-subject turns it loop-repeats (LOOP-01), never the DIVERSION offer.
+(() => {
+  const s = newSession();
+  submit(data, s, "you're not understanding me");
+  submit(data, s, 'forget it');
+  const r3 = submit(data, s, 'do you like squeaky toys?');
+  const ok = r3.response.responseId === 'LOOP-01' && !/britains-dog-history/.test(r3.response.url ?? '');
+  ok ? pass++ : fail++;
+  rows.push({ ok, input: '§3 toys question is not a diversion', layer: 9, bucket: '-', action: r3.resolution.action, note: ok ? '' : `rid=${r3.response.responseId}` });
+})();
+// §3 guard: two GENUINE no-subject turns still lead to a diversion on the third.
+(() => {
+  const s = newSession();
+  let third;
+  for (let i = 0; i < 3; i++) third = submit(data, s, 'the thing over there').response;
+  const ok = third.responseId === 'DIVERSION-01';
+  ok ? pass++ : fail++;
+  rows.push({ ok, input: '§3 guard: genuine no-subject still diverts', layer: 9, bucket: '-', action: 'fallback', note: ok ? '' : `rid=${third.responseId}` });
+})();
+// §4: the missing name phrasings are acknowledged; the stop list still rejects a non-name.
+check('im called Phil', { action: 'name_ack' }, { assert: (_r, resp) => (/Phil/.test(resp.text) ? null : `im called: "${resp.text}"`) });
+check('they call me Rex', { action: 'name_ack' }, { assert: (_r, resp) => (/Rex/.test(resp.text) ? null : `they call me: "${resp.text}"`) });
+check('im called bored', {}, { assert: (r) => (r.action === 'name_ack' ? '"im called bored" read as a name' : null) });
+for (const inp of ['im scared', 'im bored', 'im a dog']) check(inp, {}, { assert: (r) => (r.action === 'name_ack' || r.action === 'name_deflect' ? `"${inp}" read as a name` : null) });
+// §6: a body-part word reaches moderation, not the no-subject fallback; benign near-words do not (dick is
+// exact-match only, so duck/deck/wellies are safe).
+check('do you like dick?', {}, { assert: (r) => (/^MOD_/.test(r.moderationId ?? '') ? null : `"do you like dick?" missed moderation: ${r.action}`) });
+check('do you like wellies?', {}, { assert: (r) => (/^MOD_/.test(r.moderationId ?? '') ? '"wellies" wrongly moderated' : null) });
+check('do you like ducks?', {}, { assert: (r) => (/^MOD_/.test(r.moderationId ?? '') ? '"ducks" wrongly moderated' : null) });
 
 // ---- Report ----
 const pad = (s, n) => String(s).padEnd(n);
