@@ -3301,6 +3301,15 @@ export default function BreedTree({
       engine.gravity.y = 1; // pit verbatim
       const world = engine.world;
       const CIRCLE_OPTS = { restitution: 0.78, friction: 0.1, frictionAir: 0.01, density: 0.001 }; // tennis-ball lively floor bounce
+      // The freed dog circles use these instead of CIRCLE_OPTS. Job A frees every
+      // circle at the drop, up to about 50 a level where it used to be 2 to 4, and
+      // a round body with friction 0.1 and no frictionStatic rolls almost forever,
+      // so the pit never fully settles. These give a circle the rock's "sit where
+      // it lands" behaviour: less bounce, real friction, a static-friction floor so
+      // a circle at rest stays put, and a little more air drag. The word bodies are
+      // rectangles and settle fine, so they keep CIRCLE_OPTS. Starting values, one
+      // place to tune.
+      const FREED_CIRCLE_OPTS = { restitution: 0.35, friction: 0.5, frictionStatic: 1.0, frictionAir: 0.015, density: 0.001 };
       const BADGE_OPTS = { restitution: 0.48, friction: 0.1, frictionAir: 0.01, density: 0.001 };
       const mkCircle = (b: Body, kind: string, opts: any) => {
         const p = pxFromWorld(b.x, b.y);
@@ -3483,7 +3492,7 @@ export default function BreedTree({
           const nb: Body = { n: ch, x: ch.x, y: ch.y, vx: 0, vy: 0, r: ch.r, pct: pctOf(ch), idx: -1, lastFx: 0, popped: false, a: 0, va: 0, ia: 0, iva: 0 };
           owned.add(ch);
           all.push(nb);
-          const cmb = mkCircle(nb, "circle", CIRCLE_OPTS);
+          const cmb = mkCircle(nb, "circle", FREED_CIRCLE_OPTS);
           // a small upward-outward burst, the same recipe popChildren uses
           MBody.setVelocity(cmb, {
             x: wmb.velocity.x * 0.4 + (Math.random() - 0.5) * vps(0.7),
@@ -3550,7 +3559,7 @@ export default function BreedTree({
           const nb: Body = { n: ch, x: ch.x, y: ch.y, vx: 0, vy: 0, r: ch.r, pct: pctOf(ch), idx: -1, lastFx: 0, popped: false, a: 0, va: 0, ia: 0, iva: 0 };
           owned.add(ch);
           all.push(nb);
-          const mb = mkCircle(nb, "circle", CIRCLE_OPTS);
+          const mb = mkCircle(nb, "circle", FREED_CIRCLE_OPTS);
           MBody.setVelocity(mb, {
             x: (b.mb ? b.mb.velocity.x * 0.4 : 0) + (Math.random() - 0.5) * vps(0.7),
             y: (b.mb ? b.mb.velocity.y * 0.3 : 0) - vps(0.45 + Math.random() * 0.35),
