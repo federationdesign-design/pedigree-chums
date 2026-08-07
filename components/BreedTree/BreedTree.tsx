@@ -1262,6 +1262,12 @@ export default function BreedTree({
   const PULL_MAX_R = 0.9;        // how far it can be dragged, as a share of its own radius
   type PullState = {
     els: number[];
+    // The dog's own yellow chip, so it travels with it. Chips are not inside the
+    // circle's wrapper, they live in their own group, so they are moved by
+    // rewriting their transform from a base position captured at the grab. On
+    // the start screen nothing else writes to them, and the base is restored on
+    // release, so there is nothing to fight over.
+    chip: { i: number; bx: number; by: number } | null;
     sx: number; sy: number;      // where the finger went down, in client px
     ox: number; oy: number;      // current offset, world units
     max: number;                 // this circle's own pull limit
@@ -1276,13 +1282,25 @@ export default function BreedTree({
   const pulledEverRef = useRef(false);
   const lastTapRef = useRef(0);
 
-  const pullPaint = (els: number[], ox: number, oy: number) => {
+  const pullPaint = (pl: PullState, ox: number, oy: number) => {
     const cg = circlesRef.current;
-    if (!cg) return;
-    const k = SIZE / viewRef.current[2];
-    for (const j of els) {
-      const w = cg.children[j] as SVGGElement | undefined;
-      if (w) w.setAttribute("transform", ox === 0 && oy === 0 ? "" : `translate(${ox * k},${oy * k})`);
+    const v = viewRef.current;
+    const k = SIZE / v[2];
+    if (cg) {
+      for (const j of pl.els) {
+        const w = cg.children[j] as SVGGElement | undefined;
+        if (w) w.setAttribute("transform", ox === 0 && oy === 0 ? "" : `translate(${ox * k},${oy * k})`);
+      }
+    }
+    if (pl.chip) {
+      const bg = badgesRef.current;
+      const el = bg?.children[pl.chip.i] as SVGGElement | undefined;
+      if (el) {
+        el.setAttribute(
+          "transform",
+          `translate(${(pl.chip.bx - v[0] + ox) * k},${(pl.chip.by - v[1] + oy) * k}) rotate(0)`
+        );
+      }
     }
   };
 
@@ -1310,9 +1328,9 @@ export default function BreedTree({
       const e = 1 - Math.pow(1 - t, 3);
       cur.ox = fromX * (1 - e);
       cur.oy = fromY * (1 - e);
-      pullPaint(cur.els, cur.ox, cur.oy);
+      pullPaint(cur, cur.ox, cur.oy);
       if (t < 1) { cur.raf = requestAnimationFrame(step); return; }
-      pullPaint(cur.els, 0, 0);
+      pullPaint(cur, 0, 0);
       pullRef.current = null;
     };
     pl.raf = requestAnimationFrame(step);
@@ -5077,7 +5095,7 @@ export default function BreedTree({
                     }
                     pl.ox = pullEase(dx, pl.max);
                     pl.oy = pullEase(dy, pl.max);
-                    pullPaint(pl.els, pl.ox, pl.oy);
+                    pullPaint(pl, pl.ox, pl.oy);
                   }}
                   onPointerUp={(e) => {
                     if (!pullRef.current) return;
@@ -5157,8 +5175,14 @@ export default function BreedTree({
                             const kL = SIZE / viewRef.current[2];
                             const prev = pullRef.current;
                             if (prev?.raf !== null && prev?.raf !== undefined) cancelAnimationFrame(prev.raf);
+                            // The chip belongs to a depth-1 dog. Dragging a
+                            // deeper circle moves no chip, which is right: the
+                            // chip is its parent's and the parent is not moving.
+                            const d1s = nodes.filter((n) => n.depth === 1);
+                            const ci = d1s.indexOf(d);
                             pullRef.current = {
                               els: d.descendants().map((x) => nodes.indexOf(x)).filter((j) => j >= 0),
+                              chip: ci >= 0 ? { i: ci, bx: d.x - d.r * 0.707, by: d.y + d.r * 0.707 } : null,
                               sx: e.clientX,
                               sy: e.clientY,
                               ox: 0,
