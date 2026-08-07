@@ -116,15 +116,22 @@
 .title {
   width: auto;
   font-family: var(--font-display, "Luckiest Guy", system-ui);
-  /* Another 20% off: 1.08 -> 0.86, 2.6vw -> 2.08vw, 2.36 -> 1.89.
+  /* 40% off again: 0.86 -> 0.52, 2.08vw -> 1.25vw, 1.89 -> 1.13. The name is
+     now a caption beside the portrait rather than a title with a picture next
+     to it, which is the point.
+
+     For the record, since the sequence is easy to lose: this started at
+     1.35 / 3.25vw / 2.95 and has come down 20%, 20% and now 40%, so it is at
+     38% of where it began. A phone reads 8.3px.
 
      The second min() is the guard, and it matters. A narrow screen splits a
      name over two lines, so the text block is 2 x font x 1.05 tall. Divided
      back out, anything above --tp / 2.1 would make the NAME taller than the
      portrait, which would take the row height off --tp and quietly break the
-     fit the whole ladder depends on. At normal depth the clamp is well under
-     that and wins, so this only bites on a deep, shrunken ladder. */
-  font-size: min(clamp(0.86rem, 2.08vw, 1.89rem), calc(var(--tp) / 2.1));
+     fit the whole ladder depends on. It has never been the binding term and at
+     this size it never will be, but it stays: it is what stops a future size
+     change from silently costing a rung. */
+  font-size: min(clamp(0.52rem, 1.25vw, 1.13rem), calc(var(--tp) / 2.1));
   color: #ffffff;
   text-transform: uppercase;
   letter-spacing: 0.04em;
