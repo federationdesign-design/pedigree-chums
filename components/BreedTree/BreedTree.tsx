@@ -1980,38 +1980,27 @@ export default function BreedTree({
   // to preserve, so the rail takes its home instead. This flips the moment the
   // box is opened for the first time, after which closing pins as it always did.
   const boxEverShownRef = useRef(false);
+  /* THE RAIL IS NO LONGER TETHERED TO THE BOX. Owner ruling.
+
+     It used to be tied three ways, all of them here or in the className below:
+     it was positioned off the box's own element while the box was open, the box
+     closing measured it and pinned it to fixed coordinates, and the box opening
+     cleared that pin to drag it back to the box's side.
+
+     None of that remains. The rail now takes its own screen position always,
+     and the only thing that moves it is the user dragging it. All this effect
+     still does is forget the box's drag offset when the box shuts, which was
+     always about the box and never about the rail. */
   useEffect(() => {
     if (!hideCaption) {
       boxEverShownRef.current = true;
       setRailHidden(false);
-      // Only reclaim the rail if the user has never moved it. Once they have,
-      // it is theirs and the box has no business dragging it back.
-      if (!railMovedRef.current) setRailPin(null);
-      // Back on show: the box is home again, so pick the side afresh. Without
-      // this a rail sent left during a drag stays left and reopens off-page.
-      const b = asideRef.current?.getBoundingClientRect();
-      const rw = railRef.current?.getBoundingClientRect().width ?? 0;
-      if (b && !(b.left > rw + 20)) setRailSide("right");
       return;
     }
-    // Measure the rail BEFORE clearing the box's drag offset. These were two
-    // separate effects and the reset was declared first, so it ran first: the
-    // rail was pinned to wherever the box's HOME position put it, not where the
-    // user last saw it. With the rail on the left, home sits close to the screen
-    // edge, which is how closing the box threw the cards off the page.
-    // Never opened: leave railPin null and let .relRailHome place it.
-    if (!boxEverShownRef.current) return;
-    const el = railRef.current;
-    const r = el ? el.getBoundingClientRect() : null;
     asideOff.current = { x: 0, y: 0 }; // closed: forget where it was left
     if (asideRef.current) asideRef.current.style.transform = "";
-    if (!r) return;
-    // Last guard. Whatever the measurement says, the rail stays on screen.
-    const pad = 8;
-    const left = Math.max(pad, Math.min(r.left, window.innerWidth - r.width - pad));
-    const top = Math.max(pad, Math.min(r.top, window.innerHeight - r.height - pad));
-    setRailPin({ top, left });
   }, [hideCaption]);
+
   // Item 13, the chum family tree. A rail dog lifted onto its own layer, the
   // same LineageMap the pit lift already uses, fed from the card it grew out of.
   // No tree prop: LineageMap falls back to getLineage(breed.name) on its own, so
@@ -2901,6 +2890,11 @@ export default function BreedTree({
     // START button, and it comes back when the view returns to the full pit.
     focusRef.current = d;
     setFocus(d);
+    /* Zooming always brings the rail back. Its X used to be a one-way door for
+       the rest of the session, and going into a circle is exactly the moment
+       you want to see which pack dogs come out of it. The cards mount fresh, so
+       they play their own relPop and it arrives with a pop rather than a fade. */
+    setRailHidden(false);
     onActiveChange?.(d !== nodes[0]);
     let target: View = [d.x, d.y, dockAside && d !== nodes[0] ? d.r * 2 : d.r * 2 * (isMobileRef.current ? PAD : ZOOM_PAD) * (dockAside && d === nodes[0] ? PIT_SPAN : 1)];
     if (d === nodes[0]) target = clampRootView(target);
@@ -5061,6 +5055,47 @@ export default function BreedTree({
     const t = window.setTimeout(() => setRenderRail((prev) => prev.filter((p) => !p.leaving)), 340);
     return () => window.clearTimeout(t);
   }, [renderRail]);
+
+  /* THE VIEWPORT CLAMP, run on every change rather than only when the box shut.
+
+     Declared HERE, below renderRail, not up with the other rail state: a const
+     cannot be read from above where it is declared and tsc caught it.
+     It rides on a transform, NOT on railPin, and that is the whole point. A pin
+     is permanent: one deep circle with fourteen chums in it would shove the rail
+     somewhere legal and leave it there for the rest of the session. A transform
+     is measured fresh each time, so `nat` below recovers the position the rail
+     WOULD have without it, and the offset falls back to zero the moment the rail
+     fits on its own. Nothing sticks.
+
+     .relRail carries no transform of its own, so this cannot fight an animation.
+     The cards inside it do animate, which is why the observer watches the rail
+     element and not a card. */
+  const [railNudge, setRailNudge] = useState({ dx: 0, dy: 0 });
+  useEffect(() => {
+    const el = railRef.current;
+    if (!el) return;
+    const fit = () => {
+      const node = railRef.current;
+      if (!node) return;
+      const r = node.getBoundingClientRect();
+      if (!r.width || !r.height) return;
+      const pad = 8;
+      const natL = r.left - railNudge.dx;
+      const natT = r.top - railNudge.dy;
+      const dx = Math.max(pad, Math.min(natL, Math.max(pad, window.innerWidth - r.width - pad))) - natL;
+      const dy = Math.max(pad, Math.min(natT, Math.max(pad, window.innerHeight - r.height - pad))) - natT;
+      if (Math.abs(dx - railNudge.dx) < 0.5 && Math.abs(dy - railNudge.dy) < 0.5) return;
+      setRailNudge({ dx: Math.round(dx), dy: Math.round(dy) });
+    };
+    fit();
+    const ro = new ResizeObserver(fit);
+    ro.observe(el);
+    window.addEventListener("resize", fit);
+    return () => { ro.disconnect(); window.removeEventListener("resize", fit); };
+    // renderRail, railHidden and focus are triggers rather than reads: the rail
+    // changes size with its contents, reappears when it is un-hidden, and a zoom
+    // is where this was noticed. No disable needed, the list is complete.
+  }, [renderRail, railHidden, railNudge, focus]);
   // Every pack dog this level produces, across EVERY circle in it, not just the
   // hovered one and not just the big ones. This is the flood's cast: the true
   // union of the rail lists, so it is a subset of the 54, never all of them.
@@ -6885,7 +6920,10 @@ export default function BreedTree({
               onPointerUp={railUp}
               onPointerCancel={railUp}
               className={`${styles.relRail} ${
-                hideCaption && !railPin
+                // Was `hideCaption && !railPin`, which is what tied the rail's
+                // position to the box. Its own screen slot is now the default
+                // and the box has no say in it.
+                !railPin
                   // No slider nudge any more: the rail starts on the right and
                   // the slider is on the left, so they cannot meet.
                   ? styles.relRailHome
@@ -6898,6 +6936,11 @@ export default function BreedTree({
                 visibility: "visible", // shows through even when the box is hidden
                 ...(railPin
                   ? { position: "fixed" as const, top: railPin.top, left: railPin.left, right: "auto" }
+                  : null),
+                // Applied last so it rides on top of either position. Zero
+                // whenever the rail already fits, which is nearly always.
+                ...(railNudge.dx || railNudge.dy
+                  ? { transform: `translate(${railNudge.dx}px, ${railNudge.dy}px)` }
                   : null),
               }}
               aria-label="Pack dogs from this lineage"
