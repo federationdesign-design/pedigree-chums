@@ -5322,11 +5322,15 @@ export default function BreedTree({
                     setHovered((h) => (h === d ? null : h));
                   }}
                   onClick={
-                    frozen
-                      ? (e) => e.stopPropagation() // swallow it: falling through would close the pit
-                      : disableZoom
-                        ? undefined
-                        : (e) => { if (!fellRef.current) onCircle(e, d); else e.stopPropagation(); }
+                    // `frozen` used to swallow this outright, and frozen is
+                    // exactly the start screen, so onCircle was never reached
+                    // there: the double tap had nothing to open the learn area
+                    // with. It still must not fall through to the background,
+                    // which would close the pit, so the click is stopped either
+                    // way and onCircle decides what it means.
+                    disableZoom
+                      ? (e) => e.stopPropagation()
+                      : (e) => { e.stopPropagation(); if (!fellRef.current) onCircle(e, d); }
                   }
                   // Once they have dropped, the dogs are physics bodies like
                   // everything else in the pit, so they can be picked up and
