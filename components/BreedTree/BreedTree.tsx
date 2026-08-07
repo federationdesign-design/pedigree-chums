@@ -2868,6 +2868,18 @@ export default function BreedTree({
             // label was simply being positioned somewhere else afterwards.
             const ls = Math.max(0.4, Math.min(1.25, childR / 250));
             l.setAttribute("transform", `translate(${tx},${ty}) scale(${ls})`);
+            /* A label should stay the same fraction of its circle at every zoom.
+               Drawn size is fs * ls, and it wants to track d.r * k, so when k or
+               ls move away from what the fit assumed, the difference is a plain
+               multiply: no refitting, no re-render, and it holds every frame of
+               the flight rather than snapping at the end. */
+            const t = l.firstElementChild as SVGTextElement | null;
+            const f0 = t ? Number(t.dataset.fs) : NaN;
+            const k0 = t ? Number(t.dataset.kfit) : NaN;
+            const l0 = t ? Number(t.dataset.lsfit) : NaN;
+            if (t && f0 > 0 && k0 > 0 && l0 > 0) {
+              t.style.fontSize = `${f0 * ((k * l0) / (k0 * ls))}px`;
+            }
           }
         }
       }
@@ -5614,6 +5626,15 @@ export default function BreedTree({
                       return (
                         <text
                           x={0}
+                          /* What this size was fitted against, so zoomTo can keep
+                             it right while the view moves. The fit is only redone
+                             on a render, and a zoom renders once at the START of
+                             the flight, so without this the type stays the size
+                             it was in the view being left for the whole 720ms
+                             and only snaps back on arrival. */
+                          data-fs={fs}
+                          data-kfit={kL}
+                          data-lsfit={ls}
                           y={labelFirstY(lines.length, fs, rFit)}
                           transform={`rotate(${TITLE_ANGLE} 0 ${titleDy(rFit)})`}
                           style={{
