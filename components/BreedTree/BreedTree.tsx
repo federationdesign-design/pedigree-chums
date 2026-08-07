@@ -3319,22 +3319,17 @@ export default function BreedTree({
         const p = pxFromWorld(b.x, b.y);
         // view units -> world -> px, the same two hops the rest of the pit uses
         const f = wordFits[b.idx];
-        /* THE BODY MUST ALSO HOLD THE CIRCLE, which is still drawn at this same
-           position at its own radius. It used to, by luck rather than design:
-           at PIT_WORD_SCALE 1.95 a three line name happened to be about as tall
-           as its circle was wide, within a few units. Cutting the scale to 1.05
-           halved the box and left the circle hanging below it, which is why
-           circles started sinking through the floor. Measured at the default
-           difficulty: 137 unit radius against a 70 unit half-height, so 67
-           units of dog below the body doing the colliding.
-
-           The floor of a circle's own diameter fixes it for good and cannot
-           drift again whatever the word scale becomes. This is the stop-gap.
-           The real answer, agreed with the owner, is to give the circle and the
-           word separate bodies so neither has to stand in for the other. */
-        const dia = b.r * 2 * pxPerWorld;
-        const wpx = Math.max(8, dia, ((f ? f.wv : b.r * 2 * k) / k) * pxPerWorld);
-        const hpx = Math.max(8, dia, ((f ? f.hv : b.r * k) / k) * pxPerWorld);
+        /* The name gets a body its own size. It used to be floored to at least
+           the dog's circle diameter, from when the word body had to stand in for
+           the circle as well: at PIT_WORD_SCALE 1.05 a name is shorter than its
+           circle is wide, so an un-floored box left the circle hanging below it
+           and sinking through the floor. That floor was always the stop-gap.
+           The circle now has its own free body, freed at the drop, so nothing
+           has to stand in for anything and the floor has no job. The name
+           collides as the rectangle it actually is. Still at least 8px, so a
+           very short name cannot make a degenerate body. */
+        const wpx = Math.max(8, ((f ? f.wv : b.r * 2 * k) / k) * pxPerWorld);
+        const hpx = Math.max(8, ((f ? f.hv : b.r * k) / k) * pxPerWorld);
         const mb = Bodies.rectangle(p.x, p.y, wpx, hpx, { ...opts, chamfer: { radius: Math.min(wpx, hpx) * 0.18 } });
         mb.plugin = { bridge: b, kind: "circle" };
         b.mb = mb; b.mbIn = true;
