@@ -153,6 +153,8 @@ function serveGameResult(resolution: Resolution, data: ChumData, result: GameRes
     resolution.url = result.link;
     resolution.destinationId = 'DST016';
   }
+  // Task 149: a clip on a game turn (feed-cookie, every fifth cookie).
+  if (result.media) resolution.gameMedia = result.media;
 }
 // LOOP-02 is candidate-driven: it names the specific destination the candidate maps to. A breed
 // candidate (a Title-Case breed name) -> its page; a game-family word -> the card game rules;

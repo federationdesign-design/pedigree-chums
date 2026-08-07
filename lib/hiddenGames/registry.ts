@@ -5,7 +5,7 @@
 // of the games list, so it can never disagree with the list it counts.
 // Nothing else defines the campaign version, mode or the qualifying games.
 
-export const GAME_IDS = ["G01", "G02", "G03", "G04", "G05", "G06", "G07", "G08"] as const;
+export const GAME_IDS = ["G01", "G02", "G03", "G04", "G05", "G06", "G07", "G08", "G09"] as const;
 export type GameId = (typeof GAME_IDS)[number];
 
 export interface GameDef {
@@ -107,6 +107,15 @@ export const REGISTRY: Registry = {
       threshold:
         "The Missing Biscuit first case is served in the Pick a Chum chat (the Border Terrier's game entered by name), before any guess",
       hint: "a biscuit went missing. that ones mine",
+    },
+    // Task 149: the Labrador's second game. Qualifies the moment its opening surface (the cookie pills)
+    // is served in the chat, on game_start, before any cookie is fed. Takes the campaign TOTAL 8 -> 9.
+    {
+      id: "G09",
+      name: "Feed the Dog a Cookie",
+      threshold:
+        "The Feed the Dog a Cookie pills are served in the Pick a Chum chat (the Labrador's second game entered by name), before any cookie is fed",
+      hint: "the labrador eats anything. offer him a cookie, even the not-food kind",
     },
   ],
 };

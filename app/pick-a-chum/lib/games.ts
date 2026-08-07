@@ -12,6 +12,7 @@ import { GameId } from './types';
 import { KENNEL_SKETCHES } from '../data/kennel-sketches';
 import { TREAT_TRAIL_OBJECTS } from '../data/treat-trail';
 import { BISCUIT_CASES } from '../data/missing-biscuit';
+import { FEED_COOKIES } from '../data/feed-cookie';
 import { wordFuzzyEq } from './normalise';
 
 export interface GameState {
@@ -26,16 +27,18 @@ export interface GameState {
   caseIndex: number; // missing-biscuit: current case (0..4)
   cluesGiven: number; // missing-biscuit: clues revealed on the current case (0..3), given on request
   awaitingAnother: boolean; // missing-biscuit: a case just closed, waiting for "another one?" yes/no
+  fed: string[]; // feed-cookie: the cookie ids already eaten (the UI renders the rest as pills)
 }
 
 export interface GameResult {
-  line: string; // the B4x/B65/B66 responseId to serve (or a synthetic id for an ongoing board, served as no text)
+  line: string; // the B4x/B65/B66/B67 responseId to serve (or a synthetic id for an ongoing board, served as no text)
   display: string; // the monospace block rendered above/with the response
   word?: string; // {{WORD}} substitution (missing-sheep loss)
   answer?: string; // {{ANSWER}} substitution (kennel-sketch reveal / treat-trail move-on / biscuit reveal)
-  clueId?: string; // treat-trail / missing-biscuit: a workbook row to append after the reaction line (clue, or "another one?")
+  clueId?: string; // treat-trail / missing-biscuit / feed-cookie: a workbook row to append after the reaction line
   suffix?: string; // missing-biscuit: a composed line to append (the suspect list for a case presentation)
   link?: string; // treat-trail: a finale link (SAUSAGE -> /hot-dogs)
+  media?: { src: string; alt: string }; // feed-cookie: a clip shown every fifth cookie (good/queasy)
   ended: boolean; // true: the game is over, clear session.activeGame
 }
 
@@ -45,7 +48,7 @@ const MISSING_SHEEP_WORDS = ['BOWL', 'NOSE', 'EARS', 'LEAD', 'FETCH', 'PAW', 'TA
 const START_SHEEP = 5;
 
 function freshState(): GameState {
-  return { board: Array(9).fill(' '), word: '', guessed: [], wrong: 0, sketchIndex: 0, objectIndex: 0, clueIndex: 0, guesses: 0, caseIndex: 0, cluesGiven: 0, awaitingAnother: false };
+  return { board: Array(9).fill(' '), word: '', guessed: [], wrong: 0, sketchIndex: 0, objectIndex: 0, clueIndex: 0, guesses: 0, caseIndex: 0, cluesGiven: 0, awaitingAnother: false, fed: [] };
 }
 
 // ---- Nine-Square (noughts and crosses on nine numbered cells) ----
@@ -274,6 +277,33 @@ function biscuitMove(state: GameState, input: string): { state: GameState; resul
   return closeCase('B66-MISSINGBISCUIT-REVEAL', c.suspects[c.answer].name);
 }
 
+// ---- Feed the Dog a Cookie (tap the pills; the Labrador's second game) ----
+//
+// A dozen cookies are shown as tappable pills (the UI renders them from data/feed-cookie.ts, minus the
+// ones eaten). A tap sends the cookie's id as a move; he eats it with delight and a one-line lesson on
+// what it does. Blue cookies help a site work; red ones follow you elsewhere. Every FIFTH cookie gets a
+// clip -- good for a blue one, queasy for a red one. Typed input that is not a cookie just nudges him,
+// so nothing (including "cookies") leaks out of the game. Safety wins above this and ends the game.
+
+const COOKIE_CLIP = {
+  blue: { src: '/chat-media/cookie-good.mp4', alt: 'The Labrador enjoys a cookie' },
+  red: { src: '/chat-media/cookie-bad.mp4', alt: 'The Labrador looks queasy' },
+};
+
+function feedCookieMove(state: GameState, input: string): { state: GameState; result: GameResult } {
+  const guess = input.trim().toLowerCase();
+  const cookie = FEED_COOKIES.find((c) => !state.fed.includes(c.id) && (c.id === guess || c.label.toLowerCase() === guess));
+  if (!cookie) {
+    // Not a cookie (or already eaten): nudge, never leak out of the game (typed "cookies" stays here).
+    return { state, result: { line: 'B67-FEEDCOOKIE-NUDGE', display: '', ended: false } };
+  }
+  const fed = [...state.fed, cookie.id];
+  const media = fed.length % 5 === 0 ? (cookie.red ? COOKIE_CLIP.red : COOKIE_CLIP.blue) : undefined;
+  const ns = { ...state, fed };
+  const line = fed.length >= FEED_COOKIES.length ? 'B67-FEEDCOOKIE-DONE' : cookie.red ? 'B67-FEEDCOOKIE-RED' : 'B67-FEEDCOOKIE-BLUE';
+  return { state: ns, result: { line, clueId: cookie.teachId, media, display: '', ended: fed.length >= FEED_COOKIES.length } };
+}
+
 // ---- Public API ----
 
 export function startGame(game: GameId, counter: number): { state: GameState; result: GameResult } {
@@ -294,6 +324,10 @@ export function startGame(game: GameId, counter: number): { state: GameState; re
     // The Border Terrier's game: present the first case (his opening line + the three suspects).
     return { state: freshState(), result: biscuitPresent(0) };
   }
+  if (game === 'feedcookie') {
+    // The Labrador's second game: his opening line; the UI serves the pills (this is the G09 threshold).
+    return { state: freshState(), result: { line: 'B67-FEEDCOOKIE-OPENING', display: '', ended: false } };
+  }
   // kennelsketch: fixed order from the drawings file, starting at the first.
   const state: GameState = { ...freshState(), sketchIndex: 0 };
   return { state, result: { line: 'B43-KENNELSKETCH-01', display: sketchDisplay(0), ended: false } };
@@ -304,6 +338,7 @@ export function applyMove(game: GameId, state: GameState, input: string): { stat
   if (game === 'missingsheep') return sheepMove(state, input);
   if (game === 'treattrail') return treatMove(state, input);
   if (game === 'missingbiscuit') return biscuitMove(state, input);
+  if (game === 'feedcookie') return feedCookieMove(state, input);
   return sketchMove(state, input);
 }
 
@@ -312,5 +347,6 @@ export function exitLine(game: GameId): string {
   if (game === 'missingsheep') return 'B42-MISSINGSHEEP-08';
   if (game === 'treattrail') return 'B65-TREATTRAIL-EXIT';
   if (game === 'missingbiscuit') return 'B66-MISSINGBISCUIT-EXIT';
+  if (game === 'feedcookie') return 'B67-FEEDCOOKIE-EXIT';
   return 'B43-KENNELSKETCH-05';
 }

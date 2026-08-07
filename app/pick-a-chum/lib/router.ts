@@ -1048,6 +1048,9 @@ const TREAT_TRAIL_START = /(treat trail|treattrail|treat game|treat hunt|find th
 // Task 147: The Case of the Missing Biscuit entry phrases (the Border Terrier's game only). Gated on
 // the active dog being the Terrier in resolve(). "the case" is deliberately specific (not bare "case").
 const MISSING_BISCUIT_START = /(missing biscuit|the case of the missing biscuit|the missing biscuit|whodunnit|whodunit|solve a case|solve the case|solve a mystery|solve the mystery|a mystery|the mystery|be a detective|detective game)/;
+// Task 149: Feed the Dog a Cookie entry phrases (the Labrador's second game only). "cookies" does not
+// route to the /cookies policy (verified), so it is free to use here; gated on the Labrador in resolve().
+const FEED_COOKIE_START = /(feed the dog|feed the lab|feed the labrador|feed me|feed you|give me a cookie|give you a cookie|cookie game|cookies|cookie)/;
 function matchGameStart(c: string): GameId | null {
   for (const [re, id] of GAME_STARTS) if (re.test(c)) return id;
   return null;
@@ -1173,7 +1176,7 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
     // canned), so a guess like "dog", "games", "sausige" or "5 x 5" is never swallowed as something
     // else. The Collie games keep their own handler lower down (letter/digit inputs, so they never
     // reach those routes).
-    if (state.activeGame === 'treattrail' || state.activeGame === 'missingbiscuit') {
+    if (state.activeGame === 'treattrail' || state.activeGame === 'missingbiscuit' || state.activeGame === 'feedcookie') {
       if (GAME_EXIT.has(c)) return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: 'game_exit', game: state.activeGame };
       return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: 'game_move', game: state.activeGame };
     }
@@ -1367,6 +1370,12 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
   // Terrier is active. The other three keep their own games and routes.
   if (state.activeDog === 'terrier' && !state.activeGame && MISSING_BISCUIT_START.test(c)) {
     return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: 'game_start', game: 'missingbiscuit' };
+  }
+  // Task 149: Feed the Dog a Cookie is the Labrador's second game -- start it only when the Labrador is
+  // active. Checked after Treat Trail (distinct phrases), so "cookie"/"feed me" reach it; the /cookies
+  // policy is untouched (typing "cookies" never opened it, and now it starts the game instead).
+  if (state.activeDog === 'labrador' && !state.activeGame && FEED_COOKIE_START.test(c)) {
+    return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: 'game_start', game: 'feedcookie' };
   }
   {
     const start = matchGameStart(c);

@@ -5716,5 +5716,203 @@
     "defaultRoute": "",
     "animationCue": "",
     "status": "Approved"
+  },
+  {
+    "responseId": "B67-FEEDCOOKIE-OPENING",
+    "bucketId": "B67",
+    "subtag": "reaction",
+    "triggers": [],
+    "template": "COOKIES?!! yes yes gimme. tap one and ill eat it!!",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B67-FEEDCOOKIE-BLUE",
+    "bucketId": "B67",
+    "subtag": "reaction",
+    "triggers": [],
+    "template": "NOM!! good one.",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B67-FEEDCOOKIE-RED",
+    "bucketId": "B67",
+    "subtag": "reaction",
+    "triggers": [],
+    "template": "NOM!! ...wait. that one didnt taste right.",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B67-FEEDCOOKIE-DONE",
+    "bucketId": "B67",
+    "subtag": "reaction",
+    "triggers": [],
+    "template": "all gone!! that was a GOOD bowl!!",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B67-FEEDCOOKIE-NUDGE",
+    "bucketId": "B67",
+    "subtag": "reaction",
+    "triggers": [],
+    "template": "tap one!! im waiting!!",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B67-FEEDCOOKIE-EXIT",
+    "bucketId": "B67",
+    "subtag": "reaction",
+    "triggers": [],
+    "template": "ok!! im stuffed. come back and feed me again!!",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B67-FEEDCOOKIE-PREF",
+    "bucketId": "B67",
+    "subtag": "lesson",
+    "triggers": [],
+    "template": "remembers what you picked so it doesnt ask you again",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B67-FEEDCOOKIE-ANALYTICS",
+    "bucketId": "B67",
+    "subtag": "lesson",
+    "triggers": [],
+    "template": "counts visitors so they can make the site better",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B67-FEEDCOOKIE-FONTS",
+    "bucketId": "B67",
+    "subtag": "lesson",
+    "triggers": [],
+    "template": "loads the letters so the words look right",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B67-FEEDCOOKIE-VIDEO",
+    "bucketId": "B67",
+    "subtag": "lesson",
+    "triggers": [],
+    "template": "lets a video play and keeps your place in it",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B67-FEEDCOOKIE-SESSION",
+    "bucketId": "B67",
+    "subtag": "lesson",
+    "triggers": [],
+    "template": "keeps you signed in while you look around",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B67-FEEDCOOKIE-LANGUAGE",
+    "bucketId": "B67",
+    "subtag": "lesson",
+    "triggers": [],
+    "template": "remembers which language you read in",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B67-FEEDCOOKIE-SECURITY",
+    "bucketId": "B67",
+    "subtag": "lesson",
+    "triggers": [],
+    "template": "checks its really you and keeps the site safe",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B67-FEEDCOOKIE-ADS",
+    "bucketId": "B67",
+    "subtag": "lesson",
+    "triggers": [],
+    "template": "shows you ads for things you looked at somewhere else",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B67-FEEDCOOKIE-TRACKING",
+    "bucketId": "B67",
+    "subtag": "lesson",
+    "triggers": [],
+    "template": "follows you from one site to the next",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B67-FEEDCOOKIE-SOCIAL",
+    "bucketId": "B67",
+    "subtag": "lesson",
+    "triggers": [],
+    "template": "tells a social network what pages you visit",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B67-FEEDCOOKIE-RETARGET",
+    "bucketId": "B67",
+    "subtag": "lesson",
+    "triggers": [],
+    "template": "chases you with the thing you nearly bought",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B67-FEEDCOOKIE-PIXEL",
+    "bucketId": "B67",
+    "subtag": "lesson",
+    "triggers": [],
+    "template": "a hidden speck that reports where youve been",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
   }
 ]

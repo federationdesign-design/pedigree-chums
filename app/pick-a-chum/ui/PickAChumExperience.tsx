@@ -24,6 +24,7 @@ import { Dog, GameId } from '../lib/types';
 import { reportHiddenGame } from '../../../lib/hiddenGames/browserEngine';
 import type { GameId as HiddenGameId } from '../../../lib/hiddenGames/registry';
 import { openDiscountPopup } from '../data/discount-popup';
+import { FEED_COOKIES, RED_TOOLTIP, CookiePill } from '../data/feed-cookie';
 import { skipTheatre, buildTypingPlan, TYPING_PROFILES, TypingPlan } from '../lib/theatre';
 import { emitTurn } from '../lib/turn-tap';
 import { CHAT_KEY, PROTECTED_FLAG } from './pcKeys';
@@ -182,7 +183,7 @@ const PROFILE_IMG: Record<Dog, string> = {
 // Task 123: each in-chat game is a Hidden Games find, awarded the moment its opening surface (the
 // board / masked word / drawing) is SERVED -- i.e. on game_start, before any move or guess. The bark
 // game is deliberately NOT here: a single "woof" is a turn, not finding a game.
-const HIDDEN_GAME_ID: Record<GameId, HiddenGameId> = { ninesquare: 'G03', missingsheep: 'G04', kennelsketch: 'G05', treattrail: 'G07', missingbiscuit: 'G08' };
+const HIDDEN_GAME_ID: Record<GameId, HiddenGameId> = { ninesquare: 'G03', missingsheep: 'G04', kennelsketch: 'G05', treattrail: 'G07', missingbiscuit: 'G08', feedcookie: 'G09' };
 
 // Task 148: an unbidden Terrier appearance. When passed (and there is no restored chat), the
 // experience mounts with the Terrier already chosen and MINIMISED, seeded with his `offer` line; on
@@ -209,6 +210,12 @@ export default function PickAChumExperience({ onClose, autoAppear }: { onClose: 
   const [dead, setDead] = useState(false);
   const [roll, setRoll] = useState(false);
   const [input, setInput] = useState('');
+  // Task 149: the Feed the Dog a Cookie tray. `feedFed` mirrors the game's eaten-cookie ids into React
+  // state (sessionRef is a ref, so the tray needs its own reactive copy); it is null whenever the
+  // Labrador's cookie game is not the one running, which also hides the tray the moment a safety turn
+  // ends the game. `armedRed` is the red pill whose "we dont use this" tooltip is currently open.
+  const [feedFed, setFeedFed] = useState<string[] | null>(null);
+  const [armedRed, setArmedRed] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>(
     restored
       ? restored.messages || []
@@ -544,6 +551,11 @@ export default function PickAChumExperience({ onClose, autoAppear }: { onClose: 
     const r = result.response;
     const toDog = session.activeDog; // submit applied any transfer in place
     const swapped = toDog !== fromDog; // the active dog actually changed
+    // Task 149: refresh the cookie tray from the freshly-mutated session. Null unless the Labrador's
+    // cookie game owns the input, so this line alone hides the tray when a safety/grief turn ends the
+    // game, when all twelve are eaten (the engine clears activeGame), or on any transfer away.
+    setFeedFed(session.activeGame === 'feedcookie' && session.game ? [...session.game.fed] : null);
+    setArmedRed(null);
     // Record this turn (no-op in production; the dev recorder is the only sink).
     // submissionCount was just incremented by submit, so it is this turn's number.
     emitTurn({
@@ -723,6 +735,63 @@ export default function PickAChumExperience({ onClose, autoAppear }: { onClose: 
   // performs, and no-ops after the session closes.
   const anchorSwap = swap === 'out' ? styles.anchorOut : swap === 'in' ? styles.anchorIn : '';
 
+  // Task 149: feeding a cookie. Blue pills feed him on the first tap. Red pills warn first: the first
+  // tap opens the "we dont use this" tooltip WITHOUT feeding (tap matters more than hover), and a
+  // second tap on the same red pill then feeds him -- he eats everything, red ones just taste wrong.
+  // A tap anywhere else dismisses the tooltip (the effect below), so a warning is never fed by accident.
+  const feedPill = useCallback((c: CookiePill) => {
+    if (c.red && armedRed !== c.id) {
+      setArmedRed(c.id);
+      return;
+    }
+    setArmedRed(null);
+    send(c.id);
+  }, [armedRed, send]);
+
+  // Task 149: "next tap anywhere dismisses" -- while a red tooltip is open, any pointer down that is not
+  // on that same pill closes it. Capture phase so it runs before the pill's own click (a second tap on
+  // the armed pill is left alone here and feeds via feedPill).
+  useEffect(() => {
+    if (armedRed === null) return;
+    const dismiss = (e: PointerEvent) => {
+      const t = e.target as HTMLElement | null;
+      if (!t?.closest?.(`[data-cookie="${armedRed}"]`)) setArmedRed(null);
+    };
+    document.addEventListener('pointerdown', dismiss, true);
+    return () => document.removeEventListener('pointerdown', dismiss, true);
+  }, [armedRed]);
+
+  // Task 149: the tray of cookies still to feed him. Rendered only while his cookie game owns the input
+  // (feedFed is non-null) and he is not playing dead. Each pill keeps its shape by original index, so a
+  // pill does not change shape as its neighbours are eaten. Red pills are tinted red and carry the
+  // tooltip; blue pills help a site work and carry none.
+  const trayEl = feedFed !== null && !dead ? (
+    <div className={styles.cookieTray} role="group" aria-label="Cookies to feed him">
+      {FEED_COOKIES.map((c, idx) =>
+        feedFed.includes(c.id) ? null : (
+          <span key={c.id} className={styles.cookiePillWrap}>
+            <button
+              type="button"
+              data-cookie={c.id}
+              className={`${styles.cookiePill} ${c.red ? styles.cookieRed : styles.cookieBlue} ${styles[`cookieShape${idx % 5}`]}`}
+              aria-label={c.red ? `${c.label} cookie. ${RED_TOOLTIP}` : `${c.label} cookie`}
+              onClick={() => feedPill(c)}
+            >
+              {c.label}
+            </button>
+            {/* Red-only tip: shown on hover (CSS) and, more importantly, on tap (the open class). The
+                button's aria-label already carries the same words, so screen readers get it either way. */}
+            {c.red && (
+              <span className={`${styles.cookieTip} ${armedRed === c.id ? styles.cookieTipOpen : ''}`} aria-hidden="true">
+                {RED_TOOLTIP}
+              </span>
+            )}
+          </span>
+        )
+      )}
+    </div>
+  ) : null;
+
   // Task 129: the thread and composer render in two homes -- the >480px
   // column-under-the-dog plus fixed visitor bar, or the pre-129 stacked panel
   // at mobile widths -- so both are built once here. Only one home mounts at
@@ -767,18 +836,28 @@ export default function PickAChumExperience({ onClose, autoAppear }: { onClose: 
 
                 {/* Task 115: the game board / sheep tiles / drawing. MONOSPACE + pre so the ASCII
                     keeps its shape (a proportional font collapses it). Not typed; it appears whole. */}
-                {msg.media && (
-                  <video
-                    className={styles.bubbleMedia}
-                    src={msg.media.src}
-                    aria-label={msg.media.alt}
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
-                    preload="metadata"
-                  />
-                )}
+                {msg.media && (() => {
+                  // Task 149: honour prefers-reduced-motion for the COOKIE-GAME clips only -- they are
+                  // decoration (a reaction to a feed), so a reduced-motion visitor gets controls instead
+                  // of autoplay. Every other clip (how-are-you, paw, good boy, ...) is CONTENT: it is the
+                  // whole answer, so it must still autoplay or the visitor would get nothing. A still
+                  // frame for those is its own task.
+                  const decorative = msg.media.src.startsWith('/chat-media/cookie-');
+                  const hold = reducedMotion && decorative;
+                  return (
+                    <video
+                      className={styles.bubbleMedia}
+                      src={msg.media.src}
+                      aria-label={msg.media.alt}
+                      autoPlay={!hold}
+                      controls={hold}
+                      muted
+                      loop
+                      playsInline
+                      preload="metadata"
+                    />
+                  );
+                })()}
                 {msg.gameOutput && (
                   <pre className={styles.gameOutput}>{msg.gameOutput}</pre>
                 )}
@@ -792,6 +871,8 @@ export default function PickAChumExperience({ onClose, autoAppear }: { onClose: 
             </div>
           )
         )}
+        {/* Task 149: the cookie tray sits at the foot of the thread, under his latest line. */}
+        {trayEl}
       </div>
     </div>
   );

@@ -1355,3 +1355,98 @@
   border-radius: 14px;
   margin-top: 8px;
 }
+
+/* Task 149: Feed the Dog a Cookie. The tray of tappable cookie pills sits at the foot of the thread.
+   BLUE pills help a site work; RED pills follow you elsewhere (and carry the "we dont use this" tip).
+   The split is by what a cookie DOES, so the two colours are the whole point -- kept high-contrast and
+   solid (no text opacity, no rgba on text, no dark background: house rules). Shapes vary per pill. */
+.cookieTray {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 12px 0 2px;
+}
+.cookiePillWrap {
+  position: relative;
+  display: inline-flex;
+}
+.cookiePill {
+  font-family: var(--font-body, sans-serif);
+  font-size: 15px;
+  font-weight: 700;
+  padding: 9px 18px;
+  border: 3px solid var(--pc-ui-navy);
+  box-shadow: var(--pc-shadow);
+  cursor: pointer;
+  color: var(--pc-ui-cream);
+  line-height: 1.1;
+  transition: transform 120ms ease;
+}
+.cookiePill:hover {
+  transform: translateY(-2px);
+}
+.cookiePill:focus-visible {
+  outline: 4px solid var(--pc-ui-yellow);
+  outline-offset: 2px;
+}
+.cookieBlue {
+  background: var(--pc-ui-blue);
+}
+.cookieRed {
+  background: var(--pc-ui-red);
+}
+/* Varied shapes so the tray reads as a scattered pile of biscuits, not a button row (brief section 4):
+   a full pill, a soft square, two leaf tilts and a trapezoid. Shape is by original index, so a pill
+   keeps its outline as its neighbours are eaten. */
+.cookieShape0 {
+  border-radius: 999px;
+}
+.cookieShape1 {
+  border-radius: 8px;
+}
+.cookieShape2 {
+  border-radius: 4px 18px 4px 18px;
+}
+.cookieShape3 {
+  border-radius: 18px 4px 18px 4px;
+}
+.cookieShape4 {
+  border-radius: 6px;
+  padding-left: 24px;
+  padding-right: 24px;
+  clip-path: polygon(10% 0, 90% 0, 100% 100%, 0 100%);
+}
+/* The red-only tooltip: the whole reason a red cookie is worth knowing. Light card (never dark),
+   navy text, a red edge to tie it to the pill. Shown on hover and, more importantly, on tap. */
+.cookieTip {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: 220px;
+  padding: 8px 12px;
+  background: var(--pc-ui-cream);
+  color: var(--pc-ui-navy);
+  border: 2px solid var(--pc-ui-red);
+  border-radius: 12px;
+  box-shadow: var(--pc-shadow);
+  font-family: var(--font-body, sans-serif);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.3;
+  z-index: 2;
+}
+.cookiePillWrap:hover .cookieTip,
+.cookieTipOpen {
+  display: block;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cookiePill {
+    transition: none;
+  }
+  .cookiePill:hover {
+    transform: none;
+  }
+}

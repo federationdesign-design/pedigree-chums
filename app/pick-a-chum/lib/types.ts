@@ -199,7 +199,7 @@ export type ActionType =
   | 'boxer_cutoff'; // hidden ceiling reached
 
 // Task 115: the three in-chat games.
-export type GameId = 'ninesquare' | 'missingsheep' | 'kennelsketch' | 'treattrail' | 'missingbiscuit';
+export type GameId = 'ninesquare' | 'missingsheep' | 'kennelsketch' | 'treattrail' | 'missingbiscuit' | 'feedcookie';
 
 export interface Resolution {
   layer: number; // 1..10 priority layer that won
@@ -232,4 +232,5 @@ export interface Resolution {
   gameLine?: string;
   gameText?: string;
   gameDisplay?: string;
+  gameMedia?: { src: string; alt: string }; // Task 149: a clip served with a game turn (feed-cookie, every fifth)
 }

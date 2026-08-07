@@ -1989,6 +1989,72 @@ for (const [dog, word] of [['labrador', 'sausige'], ['labrador', 'treat'], ['box
 check('bacon', { action: 'transfer' }, { assert: (r) => (r.transferTo === 'labrador' ? null : `collie food handoff broke: ${r.transferTo}`) }); // cross-dog handoff still works
 (() => { const s = newSession('labrador'); check('treat trail', { action: 'game_start' }, { session: s }); check('sausige', { action: 'game_move' }, { session: s, assert: (_r, _resp, se) => (se.activeGame === 'treattrail' ? null : 'food word left Treat Trail') }); })();
 
+// ==== Task 149: Feed the Dog a Cookie, the Labrador's second game (G09) ====
+// Entry is Labrador-only, by name. He eats every cookie; blue ones help a site work, red ones follow
+// you elsewhere. Each feed serves his reaction plus the one-line lesson (the clueId), and every fifth
+// cookie carries a clip. Typed input that is not a cookie nudges but never leaks out of the game.
+const FEED_BLUE5 = ['pref', 'analytics', 'fonts', 'video', 'session']; // five blue, in FEED_COOKIES order
+const FEED_ALL12 = [...FEED_BLUE5, 'language', 'security', 'ads', 'tracking', 'social', 'retarget', 'pixel'];
+// Start: the opening line serves and the pills are the game's surface (this is the G09 threshold).
+(() => {
+  const s = newSession('labrador');
+  check('feed the dog a cookie', { action: 'game_start' }, { session: s, assert: (_r, resp, se) => (se.activeGame === 'feedcookie' && resp.text.includes('COOKIES?!!') && resp.text.includes('tap one') ? null : `fc start: game=${se.activeGame} text="${resp.text}"`) });
+})();
+// A single word "cookies" from the Labrador starts the game (not the /cookies policy: chat never opens it).
+(() => { const s = newSession('labrador'); check('cookies', { action: 'game_start' }, { session: s, assert: (r, _resp, se) => (r.game === 'feedcookie' && se.activeGame === 'feedcookie' && r.url !== '/cookies' ? null : `fc "cookies": game=${r.game} url=${r.url}`) }); })();
+// Feeding a BLUE cookie: his blue reaction + that cookie's lesson, no clip (not a fifth), game continues.
+(() => {
+  const s = newSession('labrador');
+  check('feed me a cookie', { action: 'game_start' }, { session: s });
+  check('pref', { action: 'game_move' }, { session: s, assert: (_r, resp, se) => (resp.text.includes('NOM!! good one.') && resp.text.includes('remembers what you picked') && !resp.media && se.activeGame === 'feedcookie' ? null : `fc blue: "${resp.text}" media=${!!resp.media}`) });
+})();
+// Feeding a RED cookie: his "didnt taste right" reaction + that cookie's lesson (he still eats it).
+(() => {
+  const s = newSession('labrador');
+  check('cookie game', { action: 'game_start' }, { session: s });
+  check('ads', { action: 'game_move' }, { session: s, assert: (_r, resp, se) => (resp.text.includes('didnt taste right') && resp.text.includes('shows you ads') && se.activeGame === 'feedcookie' ? null : `fc red: "${resp.text}"`) });
+})();
+// The clip appears on the FIFTH cookie only, not before. Five blue in a row -> the fifth carries the good clip.
+(() => {
+  const s = newSession('labrador');
+  check('cookies', { action: 'game_start' }, { session: s });
+  FEED_BLUE5.forEach((id, i) => check(id, { action: 'game_move' }, { session: s, assert: (_r, resp) => {
+    if (i < 4) return resp.media ? `fc clip too early at cookie ${i + 1}` : null;
+    return resp.media && resp.media.src === '/chat-media/cookie-good.mp4' ? null : `fc fifth clip missing/wrong: ${resp.media && resp.media.src}`;
+  } }));
+})();
+// Eating all twelve ends the game: the last feed serves the DONE line and clears activeGame.
+(() => {
+  const s = newSession('labrador');
+  check('cookies', { action: 'game_start' }, { session: s });
+  FEED_ALL12.forEach((id, i) => check(id, { action: 'game_move' }, { session: s, assert: (_r, resp, se) => {
+    if (i < 11) return se.activeGame === 'feedcookie' ? null : `fc ended early at cookie ${i + 1}`;
+    return resp.text.includes('all gone!!') && se.activeGame === null ? null : `fc done: "${resp.text}" game=${se.activeGame}`;
+  } }));
+})();
+// Typing "cookies" MID-GAME must NOT leak out to the policy: it is not a cookie, so he just nudges and stays.
+(() => {
+  const s = newSession('labrador');
+  check('cookies', { action: 'game_start' }, { session: s });
+  check('cookies', { action: 'game_move' }, { session: s, assert: (r, resp, se) => (resp.text === 'tap one!! im waiting!!' && se.activeGame === 'feedcookie' && r.url !== '/cookies' ? null : `fc typed cookies leaked: "${resp.text}" game=${se.activeGame} url=${r.url}`) });
+})();
+// Any other typed word mid-game also just nudges (never a move that leaks out).
+(() => { const s = newSession('labrador'); check('cookies', { action: 'game_start' }, { session: s }); check('banana', { action: 'game_move' }, { session: s, assert: (_r, resp, se) => (resp.text === 'tap one!! im waiting!!' && se.activeGame === 'feedcookie' ? null : `fc nudge: "${resp.text}"`) }); })();
+// Safety, grief and self-harm all win mid-game and END it (assert on the served route, not just text).
+(() => { const s = newSession('labrador'); check('cookies', { action: 'game_start' }, { session: s }); check('im in trouble', { action: 'safety_signpost' }, { session: s, assert: (r, _resp, se) => (r.moderationId === 'MOD_SAFEGUARDING' && se.activeGame === null ? null : `fc safety: ${r.moderationId} game=${se.activeGame}`) }); })();
+(() => { const s = newSession('labrador'); check('cookies', { action: 'game_start' }, { session: s }); check('my dog died', { action: 'grief' }, { session: s, assert: (_r, _resp, se) => (se.activeGame === null ? null : `fc grief: game=${se.activeGame}`) }); })();
+(() => { const s = newSession('labrador'); check('cookies', { action: 'game_start' }, { session: s }); check('i want to hurt myself', { action: 'safety_signpost' }, { session: s, assert: (_r, _resp, se) => (se.activeGame === null ? null : `fc self-harm: game=${se.activeGame}`) }); })();
+// Exit on "stop": his stuffed line, game cleared.
+(() => { const s = newSession('labrador'); check('cookies', { action: 'game_start' }, { session: s }); check('stop', { action: 'game_exit' }, { session: s, assert: (_r, resp, se) => (se.activeGame === null && resp.text.includes('stuffed') ? null : `fc exit: "${resp.text}" game=${se.activeGame}`) }); })();
+// Started in a protected state? No: it must not begin while safety is live or in aftercare.
+(() => { const s = newSession('labrador'); check('im in trouble', { action: 'safety_signpost' }, { session: s }); check('cookies', {}, { session: s, assert: (r, _resp, se) => (r.action === 'game_start' || se.activeGame === 'feedcookie' ? 'Feed Cookie started in PROTECTED_ACTIVE' : null) }); })();
+(() => { const s = newSession('labrador'); check('im in trouble', { action: 'safety_signpost' }, { session: s }); check('how do I play?', { action: 'rules_answer' }, { session: s }); check('cookies', { action: 'neutral_refusal' }, { session: s, assert: (_r, _resp, se) => (se.activeGame === null ? null : 'Feed Cookie started in PROTECTED_AFTERCARE') }); })();
+// Entry is the LABRADOR's alone: the other three dogs must not start it, and "cookies" must not open the policy for them.
+for (const dog of ['collie', 'terrier', 'boxer']) {
+  const s = newSession(dog);
+  check('feed the dog a cookie', {}, { session: s, assert: (r, _resp, se) => (r.game === 'feedcookie' || se.activeGame === 'feedcookie' ? `${dog} started Feed Cookie` : r.url === '/cookies' ? `${dog} "cookie" opened the policy` : null) });
+}
+
 // ---- B45 games menu confirmation (Task 123 fix) ----
 // The bug this covers: after the menu's "Game?", a "yes" was swallowed by the Task 68 loop confirm
 // (pendingConfirm "game" -> the card-game rules), so B45-GAMELIST-02's list was never reached. The
