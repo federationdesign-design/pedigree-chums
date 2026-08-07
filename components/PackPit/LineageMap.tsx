@@ -1497,10 +1497,28 @@ export default function LineageMap({
   // Built ONCE. It is needed either in the main svg or in the lifted layer above
   // the cards, never both, and rootCard reads refs: calling it twice would add a
   // second read during render for no gain.
-  /* The card shows the dog's NAME rather than its picture. Only the solo case in
-     the pit lift: everywhere else the picture IS the puzzle, and replacing it
-     would remove the thing you are matching. See soloWordFit above for why. */
-  const soloWord = soloLeaf && circular;
+  /* A CARD THAT IS THE SAME DOG AS THE BIG CIRCLE SHOWS ITS NAME, NOT ITS
+     PICTURE. Any other card keeps its picture: a real ancestor is a different
+     animal, and the picture IS the thing you are matching.
+
+     Owner's rule, and it is sharper than the one this started as. The code has
+     two separate reasons for a card to repeat the big circle, and they look
+     identical on screen:
+
+       1. A SOLO dog. It has no ancestors at all, so BreedTree hands this layer
+          a synthetic child: the dog itself, copied, purely so there is
+          something to reveal.
+       2. An ECHO child. A node whose name repeats its parent's, which BreedTree
+          calls "the same dog carrying on: this line, crossed with the one other
+          dog beside it". Here the layer exposes two cards and only one of them
+          is a different animal.
+
+     The first version of this only caught case 1, so a two parent dog still
+     showed its own photograph twice. Matching on the NAME catches both, and it
+     is already the test used a few hundred lines down to suppress the name pill
+     on exactly these nodes. Pit lift only: the main pit and the chum tree were
+     not asked for. */
+  const isSelfCard = (name: string) => circular && name === breed.name;
   const treeRoot = soloLeaf ? null : rootCard(breed.x, breed.y - (liftRoot ? 75 : 0));
 
   return (
@@ -1961,7 +1979,7 @@ export default function LineageMap({
                   onPointerCancel={() => { cardDrag.current = null; setDragCat(null); setDragImg(null); setDragXY(null); }}
                 >
                   <g className={styles.pickWobble}>
-                  {soloWord ? (() => {
+                  {isSelfCard(c.name) ? (() => {
                     // The block is as tall as the card was, and as wide as it likes.
                     const f = soloWordFit(c.name, CW);
                     const y0 = -((f.lines.length - 1) * SOLO_LINE_H * f.fs) / 2;
@@ -1986,10 +2004,10 @@ export default function LineageMap({
                       </text>
                     );
                   })() : (() => { const p = INSTR_NAMES.has(breed.name) ? CW*0.20 : 0; return (<><clipPath id={clipId}><rect x={c.cardX-CW/2+p} y={c.cardY-CW/2+p} width={CW-p*2} height={CW-p*2} rx={circular ? (CW-p*2)/2 : 15} /></clipPath><image href={encodeURI(bust(c.img))} x={c.cardX-CW/2+p} y={c.cardY-CW/2+p} width={CW-p*2} height={CW-p*2} clipPath={`url(#${clipId})`} preserveAspectRatio={INSTR_NAMES.has(breed.name)?"xMidYMid meet":"xMidYMid slice"} /></>); })()}
-                  {/* No ring on a solo word. The word IS the object, exactly as
+                  {/* No ring on a self card. The word IS the object, exactly as
                       it is in the pit, so a circle round it would be the small
                       card coming back. */}
-                  {!INSTR_NAMES.has(breed.name) && !soloWord && <rect x={c.cardX-CW/2} y={c.cardY-CW/2} width={CW} height={CW} rx={circular ? CW/2 : 15} vectorEffect="non-scaling-stroke" className={isDupImg(c.img) && !isTopOfStack(c) && !PACK_BREEDS.has(c.name) ? `${styles.pickCard} ${styles.pickCardStack}` : styles.pickCard}
+                  {!INSTR_NAMES.has(breed.name) && !isSelfCard(c.name) && <rect x={c.cardX-CW/2} y={c.cardY-CW/2} width={CW} height={CW} rx={circular ? CW/2 : 15} vectorEffect="non-scaling-stroke" className={isDupImg(c.img) && !isTopOfStack(c) && !PACK_BREEDS.has(c.name) ? `${styles.pickCard} ${styles.pickCardStack}` : styles.pickCard}
                     /* Mini pit: a circle that popped out of a dog wears that
                        dog's ring colour, so it is obvious where it came from.
                        The main pit keeps its own blue and white scheme. */
