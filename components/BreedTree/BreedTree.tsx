@@ -1261,6 +1261,7 @@ export default function BreedTree({
   const PULL_SNAP_MS = 170;      // the way back, quick enough to read as a snap
   const PULL_MAX_R = 0.9;        // how far it can be dragged, as a share of its own radius
   type PullState = {
+    node: Node;
     els: number[];
     // The dog's own yellow chip, so it travels with it. Chips are not inside the
     // circle's wrapper, they live in their own group, so they are moved by
@@ -1334,9 +1335,20 @@ export default function BreedTree({
     el.textContent = String(val);
     el.setAttribute("text-anchor", "middle");
     el.style.fontFamily = "var(--font-pct), system-ui, sans-serif";
-    el.style.fontSize = `${15 * Math.max(1, k)}px`;
+    // Bigger than the pit's 15: a knock is one number on a still screen, not one
+    // of dozens flying about, so it has to carry on its own.
+    el.style.fontSize = `${26 * Math.max(1, k)}px`;
     el.style.fill = "#ffffff";
+    // The pit's numbers land on a busy floor; these land on a photograph, so
+    // they need an edge to stay legible.
+    el.style.paintOrder = "stroke";
+    el.style.stroke = "rgba(10,58,87,0.55)";
+    el.style.strokeWidth = "3px";
     el.style.pointerEvents = "none";
+    // Placed before it is attached. Without this it renders once at the middle
+    // of the view and jumps to the contact point on the next frame.
+    el.setAttribute("x", String((x - v[0]) * k));
+    el.setAttribute("y", String((y - v[1]) * k - 22));
     fx.appendChild(el);
     let t0 = -1;
     const LIFE = 650;
@@ -1374,6 +1386,49 @@ export default function BreedTree({
     box.textContent = msg;
   };
   const knockHitsRef = useRef(0);
+
+  /* The contact test, used by BOTH the drag and the way home.
+     It only ran during the drag before, so a circle let go could never bump
+     anything on its way back. The circles rest 7.8 units apart on Celtic Hound,
+     so a return that merely reaches home never touches: the snap overshoots
+     slightly, which is what carries it into its neighbour. */
+  const knockAgainst = (d: Node, ox: number, oy: number) => {
+    const cxD = d.x + ox, cyD = d.y + oy;
+    const sibs = (d.parent?.children ?? []).filter((n) => n !== d);
+    for (const n of sibs) {
+      const ni = nodes.indexOf(n);
+      if (ni < 0) continue;
+      let kn = knocksRef.current.get(ni);
+      if (!kn) {
+        const d1s2 = nodes.filter((x) => x.depth === 1);
+        const ci2 = d1s2.indexOf(n);
+        kn = {
+          els: n.descendants().map((x) => nodes.indexOf(x)).filter((j) => j >= 0),
+          chip: ci2 >= 0 ? { i: ci2, bx: n.x - n.r * 0.707, by: n.y + n.r * 0.707 } : null,
+          ox: 0, oy: 0, vx: 0, vy: 0, hit: false,
+        };
+        knocksRef.current.set(ni, kn);
+      }
+      const gx = (n.x + kn.ox) - cxD, gy = (n.y + kn.oy) - cyD;
+      const dist = Math.hypot(gx, gy) || 0.0001;
+      const min = d.r + n.r;
+      if (dist >= min) continue;
+      const push = min - dist;
+      kn.ox += (gx / dist) * push;
+      kn.oy += (gy / dist) * push;
+      kn.vx += (gx / dist) * push * KNOCK_IMPULSE;
+      kn.vy += (gy / dist) * push * KNOCK_IMPULSE;
+      const sp = Math.hypot(kn.vx, kn.vy);
+      if (sp > KNOCK_VMAX) { kn.vx = (kn.vx / sp) * KNOCK_VMAX; kn.vy = (kn.vy / sp) * KNOCK_VMAX; }
+      if (!kn.hit) {
+        kn.hit = true;
+        knockHitsRef.current += 1;
+        knockNum(cxD + (gx / dist) * d.r, cyD + (gy / dist) * d.r, KNOCK_POINTS);
+        onScore?.(KNOCK_POINTS);
+      }
+      if (knockRafRef.current === null) knockRafRef.current = requestAnimationFrame(knockStep);
+    }
+  };
 
   const knockStep = () => {
     const map = knocksRef.current;
@@ -1440,10 +1495,16 @@ export default function BreedTree({
       if (t0 < 0) t0 = now;
       const t = Math.min(1, (now - t0) / PULL_SNAP_MS);
       // ease out cubic: fast off the mark, settling rather than stopping dead
-      const e = 1 - Math.pow(1 - t, 3);
+      // OVERSHOOT, ease out back. A plain ease out stopped dead at home, and
+      // home is 7.8 units clear of the neighbour, so a released circle could
+      // never touch anything. This carries it about a tenth of its travel past
+      // home, which is what bumps the circle it was pulled away from.
+      const c1 = 1.70158, c3 = c1 + 1;
+      const e = 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
       cur.ox = fromX * (1 - e);
       cur.oy = fromY * (1 - e);
       pullPaint(cur, cur.ox, cur.oy);
+      knockAgainst(cur.node, cur.ox, cur.oy);
       if (t < 1) { cur.raf = requestAnimationFrame(step); return; }
       pullPaint(cur, 0, 0);
       pullRef.current = null;
@@ -5215,49 +5276,10 @@ export default function BreedTree({
                     pl.oy = pullEase(dy, pl.max);
                     pullPaint(pl, pl.ox, pl.oy);
 
-                    // SHOVE THE NEIGHBOURS. Only siblings: a circle inside this
-                    // one is already travelling with it, and its parent is the
-                    // thing it lives in, so neither is something to collide
-                    // with. Overlap is resolved by moving the neighbour, never
-                    // the dragged circle, which stays under the thumb.
-                    const cxD = d.x + pl.ox, cyD = d.y + pl.oy;
-                    const sibs = (d.parent?.children ?? []).filter((n) => n !== d);
-                    for (const n of sibs) {
-                      const ni = nodes.indexOf(n);
-                      if (ni < 0) continue;
-                      let kn = knocksRef.current.get(ni);
-                      if (!kn) {
-                        const d1s2 = nodes.filter((x) => x.depth === 1);
-                        const ci2 = d1s2.indexOf(n);
-                        kn = {
-                          els: n.descendants().map((x) => nodes.indexOf(x)).filter((j) => j >= 0),
-                          chip: ci2 >= 0 ? { i: ci2, bx: n.x - n.r * 0.707, by: n.y + n.r * 0.707 } : null,
-                          ox: 0, oy: 0, vx: 0, vy: 0, hit: false,
-                        };
-                        knocksRef.current.set(ni, kn);
-                      }
-                      const nx = n.x + kn.ox, ny = n.y + kn.oy;
-                      const gx = nx - cxD, gy = ny - cyD;
-                      const dist = Math.hypot(gx, gy) || 0.0001;
-                      const min = d.r + n.r;
-                      if (dist >= min) continue;
-                      const push = min - dist;
-                      kn.ox += (gx / dist) * push;
-                      kn.oy += (gy / dist) * push;
-                      // and the shove it feels, capped
-                      kn.vx += (gx / dist) * push * KNOCK_IMPULSE;
-                      kn.vy += (gy / dist) * push * KNOCK_IMPULSE;
-                      const sp = Math.hypot(kn.vx, kn.vy);
-                      if (sp > KNOCK_VMAX) { kn.vx = (kn.vx / sp) * KNOCK_VMAX; kn.vy = (kn.vy / sp) * KNOCK_VMAX; }
-                      if (!kn.hit) {
-                        kn.hit = true;
-                        // On the rim between them, where the contact reads.
-                        knockHitsRef.current += 1;
-                        knockNum(cxD + (gx / dist) * d.r, cyD + (gy / dist) * d.r, KNOCK_POINTS);
-                        onScore?.(KNOCK_POINTS);
-                      }
-                      if (knockRafRef.current === null) knockRafRef.current = requestAnimationFrame(knockStep);
-                    }
+                    // Only siblings: a circle inside this one is already
+                    // travelling with it, and its parent is the thing it lives
+                    // in, so neither is something to collide with.
+                    knockAgainst(d, pl.ox, pl.oy);
                   }}
                   onPointerUp={(e) => {
                     if (!pullRef.current) return;
@@ -5347,6 +5369,7 @@ export default function BreedTree({
                             const d1s = nodes.filter((n) => n.depth === 1);
                             const ci = d1s.indexOf(d);
                             pullRef.current = {
+                              node: d,
                               els: d.descendants().map((x) => nodes.indexOf(x)).filter((j) => j >= 0),
                               chip: ci >= 0 ? { i: ci, bx: d.x - d.r * 0.707, by: d.y + d.r * 0.707 } : null,
                               sx: e.clientX,
