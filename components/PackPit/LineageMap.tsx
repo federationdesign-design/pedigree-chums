@@ -919,6 +919,8 @@ export default function LineageMap({
   // One tap opens every branch, turns all circles blue and pops all cards out, the
   // same as tapping each one, but it costs a flat 1000 off the running total.
   const showAuto = autoArmed && totalNodes > 0 && seen.size < totalNodes && !packed && !collecting && !removing;
+  /* Set when AUTO has popped everything and the cards still need placing. */
+  const autoPlaceRef = useRef(false);
   const autoCollect = () => {
     setOpen(() => { const s = new Set<string>(["0"]); allNodes.forEach((n) => { if (n.hasKids) s.add(n.id); }); return s; });
     setAutoExposed(() => { const s = new Set<string>(); allNodes.forEach((n) => { if (!picked.has(n.id)) s.add(n.id); }); return s; });
@@ -929,12 +931,91 @@ export default function LineageMap({
     });
     imgNodes.forEach((n, i) => { window.setTimeout(() => setPicked((prev) => { const s = new Set(prev); s.add(n.id); return s; }), i * 45); });
     allNodes.forEach((n) => scoredRef.current.add(n.id));
+    /* AND THEN PLACE THEM. Auto used to stop at popping every card out, leaving
+       the last step, dropping each one into its frame, to be done by hand. It
+       now finishes the job.
+       It has to wait: the cards pop on a stagger, so the placement runs after
+       the last of them, and it is flagged rather than called directly because
+       the routine reads pickCards and placedSet, which are only correct once
+       React has rendered the new picked set. The effect below does it. */
+    autoPlaceRef.current = true;
     onScore?.(-2500); // the shortcut costs 2500
     const pk = (fxId.current += 1);
     setPenalty(pk);
     window.setTimeout(() => setPenalty((cur) => (cur === pk ? null : cur)), 1000);
     setAutoArmed(false);
   };
+  /* Placing every loose card into its frame. It was written inline inside
+     revealStep, as the last thing the blue button does once the tree is fully
+     open. AUTO now finishes with the same step, so it is a function rather than
+     two copies that would drift.
+     Returns true if it had anything to place. */
+  const placeAllUnplaced = (): boolean => {
+    const unplaced = pickCards.filter((c) => !placedSet.has(c.id) && !packed && !stackedIds.has(c.id));
+    if (unplaced.length === 0) return false;
+    // Track claimed frame IDs locally so duplicate-breed cards don't all race to the same empty frame
+    const claimedFilled = new Map(filled); // snapshot: frameId -> cardId
+    const claimedStacked = new Map(stacked); // snapshot: frameId -> cardIds[]
+    unplaced.forEach((c, i) => {
+      // Find target using local snapshot so each card claims a unique slot
+      const emptyTarget = frames.find((f) => f.img === c.img && !claimedFilled.has(f.id));
+      const stackTarget = emptyTarget ?? frames.find((f) => f.img === c.img);
+      const target = stackTarget;
+      const isDup = !emptyTarget && !!stackTarget;
+      if (!target) return;
+      // Claim the slot immediately in local snapshot
+      if (isDup) {
+        const arr = claimedStacked.get(target.id) ? [...claimedStacked.get(target.id)!] : [];
+        arr.push(c.id);
+        claimedStacked.set(target.id, arr);
+      } else {
+        claimedFilled.set(target.id, c.id);
+      }
+      window.setTimeout(() => {
+        setPinned((m) => { if (m.has(c.id)) return m; const x = new Map(m); x.set(c.id, { img: c.img, name: c.name, note: c.note, share: c.share, mix: c.mix, status: c.status }); return x; });
+        const sx0 = c.cardX, sy0 = c.cardY;
+        const ex = target.sx - pan.x, ey = target.sy - pan.y;
+        let lastBub = 0;
+        tween(460, (t) => {
+          const e2 = 1 - Math.pow(1 - t, 3);
+          const gx = sx0 + (ex - sx0) * e2, gy = sy0 + (ey - sy0) * e2;
+          setDragPos((m) => { const x = new Map(m); x.set(c.id, { x: gx, y: gy }); return x; });
+          if (t - lastBub > 0.03 && t < 0.95) {
+            lastBub = t;
+            const bid = bubbleSeq.current++;
+            setBubbles((b) => [...b, { id: bid, sx: gx + pan.x + (Math.random() - 0.5) * 14, sy: gy + pan.y + (Math.random() - 0.5) * 14 }]);
+            window.setTimeout(() => setBubbles((b) => b.filter((x) => x.id !== bid)), 620);
+          }
+        }, () => {
+          if (isDup) {
+            setStacked((m) => { const x = new Map(m); const arr = x.get(target.id) ? [...x.get(target.id)!] : []; if (!arr.includes(c.id)) arr.push(c.id); x.set(target.id, arr); return x; });
+          } else {
+            setFilled((m) => { const x = new Map(m); for (const [fid, cid] of x) if (cid === c.id) x.delete(fid); x.set(target.id, c.id); return x; });
+          }
+          setDragPos((m) => { if (!m.has(c.id)) return m; const x = new Map(m); x.delete(c.id); return x; });
+          flashNum(target.sx - pan.x, target.sy - pan.y - CW / 2, -50, FLASH_SIZE);
+          const pid = puffSeq.current++;
+          setPuffs((p) => [...p, { id: pid, sx: target.sx, sy: target.sy }]);
+          window.setTimeout(() => setPuffs((p) => p.filter((x) => x.id !== pid)), 480);
+        });
+      }, i * 80);
+    });
+    return true;
+  };
+
+  /* Below placeAllUnplaced on purpose: it calls it, and a const declared later
+     in the same scope cannot be reached from above it. */
+  useEffect(() => {
+    if (!autoPlaceRef.current) return;
+    // Wait until every image node has actually popped: the stagger is 45ms a
+    // node, so an early run would place the first few and leave the rest loose.
+    const stillPopping = allNodes.some((n) => n.hasImg && !picked.has(n.id));
+    if (stillPopping) return;
+    autoPlaceRef.current = false;
+    placeAllUnplaced();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [picked]);
+
   // Double-clicking the root card walks the tree open one generation at a time,
   // then once everything is exposed folds it back deepest-first. Rings only: any
   // cards already pulled out stay put. Auto-revealed nodes score +50 each, less
@@ -1009,58 +1090,8 @@ export default function LineageMap({
       interacted.current = true; setIdleHint(false);
       return;
     }
-    // fully open: auto-place all unplaced cards into their frames with bubble animation
-    const unplaced = pickCards.filter((c) => !placedSet.has(c.id) && !packed && !stackedIds.has(c.id));
-    if (unplaced.length > 0) {
-      // Track claimed frame IDs locally so duplicate-breed cards don't all race to the same empty frame
-      const claimedFilled = new Map(filled); // snapshot: frameId -> cardId
-      const claimedStacked = new Map(stacked); // snapshot: frameId -> cardIds[]
-      unplaced.forEach((c, i) => {
-        // Find target using local snapshot so each card claims a unique slot
-        const emptyTarget = frames.find((f) => f.img === c.img && !claimedFilled.has(f.id));
-        const stackTarget = emptyTarget ?? frames.find((f) => f.img === c.img);
-        const target = stackTarget;
-        const isDup = !emptyTarget && !!stackTarget;
-        if (!target) return;
-        // Claim the slot immediately in local snapshot
-        if (isDup) {
-          const arr = claimedStacked.get(target.id) ? [...claimedStacked.get(target.id)!] : [];
-          arr.push(c.id);
-          claimedStacked.set(target.id, arr);
-        } else {
-          claimedFilled.set(target.id, c.id);
-        }
-        window.setTimeout(() => {
-          setPinned((m) => { if (m.has(c.id)) return m; const x = new Map(m); x.set(c.id, { img: c.img, name: c.name, note: c.note, share: c.share, mix: c.mix, status: c.status }); return x; });
-          const sx0 = c.cardX, sy0 = c.cardY;
-          const ex = target.sx - pan.x, ey = target.sy - pan.y;
-          let lastBub = 0;
-          tween(460, (t) => {
-            const e2 = 1 - Math.pow(1 - t, 3);
-            const gx = sx0 + (ex - sx0) * e2, gy = sy0 + (ey - sy0) * e2;
-            setDragPos((m) => { const x = new Map(m); x.set(c.id, { x: gx, y: gy }); return x; });
-            if (t - lastBub > 0.03 && t < 0.95) {
-              lastBub = t;
-              const bid = bubbleSeq.current++;
-              setBubbles((b) => [...b, { id: bid, sx: gx + pan.x + (Math.random() - 0.5) * 14, sy: gy + pan.y + (Math.random() - 0.5) * 14 }]);
-              window.setTimeout(() => setBubbles((b) => b.filter((x) => x.id !== bid)), 620);
-            }
-          }, () => {
-            if (isDup) {
-              setStacked((m) => { const x = new Map(m); const arr = x.get(target.id) ? [...x.get(target.id)!] : []; if (!arr.includes(c.id)) arr.push(c.id); x.set(target.id, arr); return x; });
-            } else {
-              setFilled((m) => { const x = new Map(m); for (const [fid, cid] of x) if (cid === c.id) x.delete(fid); x.set(target.id, c.id); return x; });
-            }
-            setDragPos((m) => { if (!m.has(c.id)) return m; const x = new Map(m); x.delete(c.id); return x; });
-            flashNum(target.sx - pan.x, target.sy - pan.y - CW / 2, -50, FLASH_SIZE);
-            const pid = puffSeq.current++;
-            setPuffs((p) => [...p, { id: pid, sx: target.sx, sy: target.sy }]);
-            window.setTimeout(() => setPuffs((p) => p.filter((x) => x.id !== pid)), 480);
-          });
-        }, i * 80);
-      });
-      return;
-    }
+    // fully open: every loose card goes into its frame
+    if (placeAllUnplaced()) return;
     // all placed: fold the deepest ring back
     const openIds = [...open].filter((id) => id !== "0");
     if (!openIds.length) return;
