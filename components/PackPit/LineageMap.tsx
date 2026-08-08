@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { getLineage, type LineageNode } from "../../data/lineage";
 import { bust } from "../../data/imgVersion";
 import { ukBreeds } from "../../data/uk-breeds";
@@ -265,7 +265,16 @@ export default function LineageMap({
   onScore?: (v: number) => void;
   currentScore?: number;
 }) {
-  const [vp, setVp] = useState({ w: 1280, h: 800 });
+  // Read the real viewport on the FIRST render, not a placeholder. This card is
+  // sized as a share of vp.w, so a stale default would size the first painted
+  // frame for the wrong screen: at the old { w: 1280 } a 390px phone drew the
+  // card near full width, then snapped down once the effect measured. This
+  // component only ever mounts client-side (gated behind activeBreed), so window
+  // exists here; the 1280 fallback is for a server render that never happens.
+  const [vp, setVp] = useState(() => ({
+    w: typeof window !== "undefined" ? window.innerWidth : 1280,
+    h: typeof window !== "undefined" ? window.innerHeight : 800,
+  }));
 
   /* THE SIZE OF THE DOG LIFTED OUT OF THE PIT.
 
@@ -331,7 +340,12 @@ export default function LineageMap({
     collect(root);
     imgs.forEach((src) => { const img = new window.Image(); img.src = encodeURI(bust(src)); });
   }, [breed.name]);
-  useEffect(() => {
+  // useLayoutEffect, not useEffect: any correction (a resize, or a belt-and-
+  // braces re-measure) lands before the browser paints rather than a frame
+  // after. With the lazy init above this is mostly redundant on mount, but it is
+  // cheap insurance and safe here because the component never renders on the
+  // server, so useLayoutEffect raises no SSR warning.
+  useLayoutEffect(() => {
     const f = () => setVp({ w: window.innerWidth, h: window.innerHeight });
     f();
     window.addEventListener("resize", f);
