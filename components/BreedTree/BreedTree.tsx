@@ -4094,7 +4094,13 @@ export default function BreedTree({
       spawnPillRef.current = (sx: number, sy: number, wPx: number, name: string) => {
         const w = worldFromPx(sx, sy);
         // wrap long names: pill grows in depth, corner radius stays 13px so the
-        // capsule shape never changes; width hugs the longest line at 12px text
+        // capsule shape never changes; width hugs the longest line at 12px text.
+        // Padding is DELIBERATE and tuned tight: +14px on the width (7 each side,
+        // down from +22 / 11) and 22 / 40px height (down from 26 / 46), so the
+        // pill hugs its text. The max(44) floor and the +10 two-line extra are
+        // kept on purpose. Both pw and ph feed the physics body (Bodies.rectangle
+        // below) AND the drawn rect (via setPillList), so never re-tune one number
+        // without the other, or the collision shape and the picture drift apart.
         const lines = (() => {
           if (name.length <= 16) return [name];
           const mid = Math.floor(name.length / 2);
@@ -4102,9 +4108,9 @@ export default function BreedTree({
           for (let i = 0; i < name.length; i++) if (name[i] === " " && (best === -1 || Math.abs(i - mid) < Math.abs(best - mid))) best = i;
           return best === -1 ? [name] : [name.slice(0, best), name.slice(best + 1)];
         })();
-        const pw = Math.max(44, Math.max(...lines.map((l) => l.length)) * 7.4 + 22 + (lines.length > 1 ? 10 : 0));
-        const ph = lines.length > 1 ? 46 : 26;
-        const pr = { x: w.x, y: w.y, vx: 0, vy: 0, a: 0, idx: pillBodiesRef.current.length, hits: 0, maxHits: 3, mb: null as any };
+        const pw = Math.max(44, Math.max(...lines.map((l) => l.length)) * 7.4 + 14 + (lines.length > 1 ? 10 : 0));
+        const ph = lines.length > 1 ? 40 : 22;
+        const pr = { x: w.x, y: w.y, vx: 0, vy: 0, a: 0, idx: pillBodiesRef.current.length, hits: 0, maxHits: 2, mb: null as any };
         const mb = Bodies.rectangle(sx, sy, pw, ph, { chamfer: { radius: ph / 2 }, restitution: 0.3, friction: 0.1, frictionAir: 0.012, density: 0.0012 });
         mb.plugin = { prop: pr, kind: "pill" };
         pr.mb = mb;
