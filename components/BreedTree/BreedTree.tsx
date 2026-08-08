@@ -2674,9 +2674,27 @@ export default function BreedTree({
   // The ring colour a circle wears in the pit. Pulled out of the render so the
   // learn layer can carry the very same colour through when a dog is lifted,
   // rather than inventing its own.
+  // Lift a ring colour for the circle the player is reading: the SAME hue,
+  // mixed a fixed fraction toward white. Mixing toward an achromatic point
+  // keeps the hue angle exactly and only raises lightness, so the ring reads
+  // as "lighter" without shifting colour or width. 0.4 was chosen so the lift
+  // shows on the hard case: navy over a dark photograph.
+  function liftStroke(hex: string): string {
+    const t = 0.4;
+    const up = [1, 3, 5]
+      .map((i) => parseInt(hex.slice(i, i + 2), 16))
+      .map((v) => Math.round(v + (255 - v) * t));
+    return "#" + up.map((v) => v.toString(16).padStart(2, "0")).join("");
+  }
   function strokeColorFor(d: Node): string {
-    if (dockAside && d !== nodes[0] && d === shown) return "#ffffff";
-    if (strokeByDepth) return ["#ffd23e", "#0a3a57", "#5cc4ee", "#ffffff"][(d.depth - 1 + 4) % 4];
+    if (strokeByDepth) {
+      const base = ["#ffd23e", "#0a3a57", "#5cc4ee", "#ffffff"][(d.depth - 1 + 4) % 4];
+      // The circle the player is reading keeps its DEPTH colour, so it can
+      // never collide with a same-depth sibling. It is lifted in BRIGHTNESS
+      // only: same hue, same width, just lighter.
+      if (dockAside && d !== nodes[0] && d === shown) return liftStroke(base);
+      return base;
+    }
     return stroke;
   }
   function strokeWidthFor(d: Node): number {
