@@ -984,7 +984,7 @@ const LINEAGE: Record<string, LineageNode> = {
         note: "The fierce war and catch dogs that rode west with mounted warriors. Now extinct.",
         img: "/history/breeds/alunt-war-dogs.jpg",
         children: [
-          { name: "Dogs of the Alan horsemen", note: "The big steppe dogs of the Alan horsemen, guarding their camps and herds across the plains. Now extinct.", img: "/history/breeds/placeholder-circle.svg", value: 25 },
+          { name: "Dogs of the Alan horsemen", note: "The big steppe dogs of the Alan horsemen, guarding their camps and herds across the plains. Now extinct.", img: "/history/breeds/dogs-of-the-alan-horsemen.jpg", value: 25 },
           { name: "Alaunt war dogs", note: "The fierce war and catch dogs that rode west with mounted warriors. Now extinct.", img: "/history/breeds/alunt-war-dogs.jpg", value: 25 },
         ],
       },
@@ -1076,7 +1076,7 @@ const LINEAGE: Record<string, LineageNode> = {
         note: "The keen-nosed hare-tracking hounds of ancient Greece, praised by Greek hunting writers. Now extinct.",
         img: "/history/greek-harehound.jpg",
         children: [
-          { name: "Old trail dogs of the ancient East", note: "The early trail-following hunting dogs of the ancient East. Now extinct.", img: "/history/breeds/placeholder-circle.svg", value: 25 },
+          { name: "Old trail dogs of the ancient East", note: "The early trail-following hunting dogs of the ancient East. Now extinct.", img: "/history/breeds/old-trail-dogs-of-the-ancient-east.jpg", value: 25 },
           { name: "Laconian tracking hounds", note: "The keen-nosed hare-tracking hounds of ancient Greece, praised by Greek hunting writers. Now extinct.", img: "/history/greek-harehound.jpg", value: 25 },
         ],
       },
@@ -1093,19 +1093,19 @@ const LINEAGE: Record<string, LineageNode> = {
       {
         name: "Celtic herdsmen's dogs",
         note: "The all-round farm dogs of the Celtic tribes, guarding and driving the herds. Now extinct.",
-        img: "/history/breeds/placeholder-circle.svg",
+        img: "/history/breeds/celtic-herdsmen-dogs.jpg",
         children: [
           { name: "Old hunting dogs of the Celts", note: "The native running dogs of Iron Age Europe. Now extinct.", img: "/history/breeds/Old-hunting-dogs-of-the-Celts.jpg", value: 25 },
-          { name: "Celtic herdsmen's dogs", note: "The all-round farm dogs of the Celtic tribes, guarding and driving the herds. Now extinct.", img: "/history/breeds/placeholder-circle.svg", value: 25 },
+          { name: "Celtic herdsmen's dogs", note: "The all-round farm dogs of the Celtic tribes, guarding and driving the herds. Now extinct.", img: "/history/breeds/celtic-herdsmen-dogs.jpg", value: 25 },
         ],
       },
       {
         name: "Roman shepherd dogs",
         note: "The flock-guarding sheepdogs the Roman farm writers described, kept white so the shepherd knew dog from wolf. Now extinct.",
-        img: "/history/breeds/placeholder-circle.svg",
+        img: "/history/breeds/roman-shepherd-dogs.jpg",
         children: [
           { name: "Ancient Molossers", note: "The big flock-guarding stock of the ancient world. Now extinct.", img: "/history/breeds/Ancient-Molossers.jpg", value: 25 },
-          { name: "Roman shepherd dogs", note: "The flock-guarding sheepdogs the Roman farm writers described, kept white so the shepherd knew dog from wolf. Now extinct.", img: "/history/breeds/placeholder-circle.svg", value: 25 },
+          { name: "Roman shepherd dogs", note: "The flock-guarding sheepdogs the Roman farm writers described, kept white so the shepherd knew dog from wolf. Now extinct.", img: "/history/breeds/roman-shepherd-dogs.jpg", value: 25 },
         ],
       },
     ],
