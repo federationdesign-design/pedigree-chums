@@ -241,7 +241,20 @@ const ORIENTATION_EXACT = new Set(['what is this', 'now what']);
 const PAGE_BIO_TRIGGERS = new Set(['what is this page', 'tell me about this page', 'where am i', 'what is this', 'what page is this', 'whats this page']);
 
 const JOKE = ['joke', 'make me laugh', 'knock knock', 'funny', 'tell me something funny', 'be funny'];
-const FOOD = ['food', 'snack', 'snacks', 'biscuit', 'sausage', 'sausages', 'bacon', 'cheese', 'hungry', 'pizza', 'treat', 'treats', 'dinner', 'meat', 'bone'];
+// Task 158: the Labrador is the food expert. His 32 canonical food words join the transfer trigger
+// list so ANY of them, typed to another dog, hands the visitor over to him (layer 8 below). His own
+// bank (B32) then answers every synonym once he is active. A bare food noun is deliberately NOT a
+// health hit (safety.ts), so "can dogs eat X" still outranks this as the safety answer. Synonyms are
+// wired on his bank only, not here, so cross-dog handover fires on the canonical word. cheese existed.
+const FOOD = [
+  'food', 'snack', 'snacks', 'biscuit', 'sausage', 'sausages', 'bacon', 'cheese', 'hungry', 'pizza', 'treat', 'treats', 'dinner', 'meat', 'bone',
+  // YES tier
+  'burgers', 'carrots', 'apples', 'blueberries', 'cucumber', 'peanut butter', 'chicken', 'pumpkin', 'green beans', 'watermelon',
+  // A BIT tier (cheese already above)
+  'butter', 'cream', 'milk', 'eggs', 'tuna', 'bread',
+  // NEVER tier
+  'chocolate', 'grapes', 'raisins', 'onions', 'garlic', 'macadamia nuts', 'sweets', 'coffee', 'nutmeg', 'raw potato', 'peaches', 'lemon', 'mushrooms', 'avocado', 'alcohol',
+];
 const INVESTIGATE = ['investigate', 'dig', 'ratting', 'mystery', 'strange history', 'good dog bad dog', 'suspicious'];
 // Visitor explicitly asks to switch to a different dog. A transfer REQUEST needs
 // a verb: bare noun phrases ("new dog", "different dog", "another dog") were

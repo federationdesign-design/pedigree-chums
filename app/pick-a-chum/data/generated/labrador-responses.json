@@ -371,5 +371,560 @@
     "defaultRoute": "",
     "animationCue": "",
     "status": "Approved"
+  },
+  {
+    "responseId": "LAB-B32-13",
+    "bucketId": "B32",
+    "subtag": "food-yes",
+    "triggers": [
+      "burgers",
+      "burger",
+      "hamburger",
+      "hamburgers",
+      "beefburger",
+      "beef burger",
+      "cheeseburger",
+      "cheeseburgers",
+      "do you like burgers",
+      "i like burgers",
+      "i love burgers"
+    ],
+    "template": "BURGERS!! yes. yes I love them",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "LAB-B32-14",
+    "bucketId": "B32",
+    "subtag": "food-yes",
+    "triggers": [
+      "carrots",
+      "carrot",
+      "baby carrots",
+      "do you like carrots",
+      "i like carrots",
+      "i love carrots"
+    ],
+    "template": "carrots!! they go CRUNCH. i like the crunch",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "LAB-B32-15",
+    "bucketId": "B32",
+    "subtag": "food-yes",
+    "triggers": [
+      "apples",
+      "apple",
+      "do you like apples",
+      "i like apples",
+      "i love apples"
+    ],
+    "template": "apples I like them!!",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "LAB-B32-16",
+    "bucketId": "B32",
+    "subtag": "food-yes",
+    "triggers": [
+      "blueberries",
+      "blueberry",
+      "berries",
+      "do you like blueberries",
+      "i like blueberries",
+      "i love blueberries"
+    ],
+    "template": "blueberries!! tiny. i can eat a LOT of tiny",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "LAB-B32-17",
+    "bucketId": "B32",
+    "subtag": "food-yes",
+    "triggers": [
+      "cucumber",
+      "cucumbers",
+      "do you like cucumber",
+      "i like cucumber",
+      "i love cucumber"
+    ],
+    "template": "cucumber is mostly water but i eat it anyway",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "LAB-B32-18",
+    "bucketId": "B32",
+    "subtag": "food-yes",
+    "triggers": [
+      "peanut butter",
+      "peanutbutter",
+      "peanut",
+      "do you like peanut butter",
+      "i like peanut butter",
+      "i love peanut butter"
+    ],
+    "template": "PEANUT BUTTER. the best one. takes ages to eat",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "LAB-B32-19",
+    "bucketId": "B32",
+    "subtag": "food-yes",
+    "triggers": [
+      "chicken",
+      "chicken breast",
+      "roast chicken",
+      "do you like chicken",
+      "i like chicken",
+      "i love chicken"
+    ],
+    "template": "chicken!! obviously. next question",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "LAB-B32-20",
+    "bucketId": "B32",
+    "subtag": "food-yes",
+    "triggers": [
+      "pumpkin",
+      "squash",
+      "do you like pumpkin",
+      "i like pumpkin",
+      "i love pumpkin"
+    ],
+    "template": "tastes good",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "LAB-B32-21",
+    "bucketId": "B32",
+    "subtag": "food-yes",
+    "triggers": [
+      "green beans",
+      "beans",
+      "runner beans",
+      "do you like green beans",
+      "i like green beans",
+      "i love green beans"
+    ],
+    "template": "green beans, like them!!",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "LAB-B32-22",
+    "bucketId": "B32",
+    "subtag": "food-yes",
+    "triggers": [
+      "watermelon",
+      "melon",
+      "do you like watermelon",
+      "i like watermelon",
+      "i love watermelon"
+    ],
+    "template": "watermelon!! not the seeds. or the green bit",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "LAB-B32-23",
+    "bucketId": "B32",
+    "subtag": "food-abit",
+    "triggers": [
+      "cheese",
+      "cheddar",
+      "cheesey",
+      "do you like cheese",
+      "i like cheese"
+    ],
+    "template": "cheese... i can have a LITTLE bit. a little bit is not enough",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "LAB-B32-24",
+    "bucketId": "B32",
+    "subtag": "food-abit",
+    "triggers": [
+      "butter",
+      "do you like butter",
+      "i like butter"
+    ],
+    "template": "butter is too rich for me. i think about it a lot though",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "LAB-B32-25",
+    "bucketId": "B32",
+    "subtag": "food-abit",
+    "triggers": [
+      "cream",
+      "do you like cream",
+      "i like cream"
+    ],
+    "template": "cream makes my tummy bad. i would do it anyway",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "LAB-B32-26",
+    "bucketId": "B32",
+    "subtag": "food-abit",
+    "triggers": [
+      "milk",
+      "do you like milk",
+      "i like milk"
+    ],
+    "template": "milk. a bit. most of us cant do milk properly. its very unfair",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "LAB-B32-27",
+    "bucketId": "B32",
+    "subtag": "food-abit",
+    "triggers": [
+      "eggs",
+      "egg",
+      "scrambled eggs",
+      "boiled egg",
+      "do you like eggs",
+      "i like eggs"
+    ],
+    "template": "I'd eat them but id told only cooked eggs",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "LAB-B32-28",
+    "bucketId": "B32",
+    "subtag": "food-abit",
+    "triggers": [
+      "tuna",
+      "fish",
+      "tinned tuna",
+      "do you like tuna",
+      "i like tuna"
+    ],
+    "template": "tuna sometimes. not loads. something about mercury",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "LAB-B32-29",
+    "bucketId": "B32",
+    "subtag": "food-abit",
+    "triggers": [
+      "bread",
+      "toast",
+      "do you like bread",
+      "i like bread"
+    ],
+    "template": "bread is ok but its not FOOD food is it",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "LAB-B32-30",
+    "bucketId": "B32",
+    "subtag": "food-never",
+    "triggers": [
+      "chocolate",
+      "choc",
+      "chocolate bar",
+      "cocoa",
+      "hot chocolate",
+      "do you like chocolate",
+      "i like chocolate"
+    ],
+    "template": "I like chocolate but im not allowed it",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "LAB-B32-31",
+    "bucketId": "B32",
+    "subtag": "food-never",
+    "triggers": [
+      "grapes",
+      "grape",
+      "do you like grapes",
+      "i like grapes"
+    ],
+    "template": "I like grapes but im not allowed them",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "LAB-B32-32",
+    "bucketId": "B32",
+    "subtag": "food-never",
+    "triggers": [
+      "raisins",
+      "raisin",
+      "sultanas",
+      "currants",
+      "mince pies",
+      "do you like raisins",
+      "i like raisins"
+    ],
+    "template": "I like raisins but im not allowed them",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "LAB-B32-33",
+    "bucketId": "B32",
+    "subtag": "food-never",
+    "triggers": [
+      "onions",
+      "onion",
+      "leeks",
+      "chives",
+      "spring onion",
+      "do you like onions",
+      "i like onions"
+    ],
+    "template": "im not allowed onions",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "LAB-B32-34",
+    "bucketId": "B32",
+    "subtag": "food-never",
+    "triggers": [
+      "garlic",
+      "do you like garlic",
+      "i like garlic"
+    ],
+    "template": "im not allowed garlic",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "LAB-B32-35",
+    "bucketId": "B32",
+    "subtag": "food-never",
+    "triggers": [
+      "macadamia nuts",
+      "macadamia",
+      "macadamias",
+      "do you like macadamia nuts",
+      "i like macadamia nuts"
+    ],
+    "template": "im not allowed macadamia nuts",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "LAB-B32-36",
+    "bucketId": "B32",
+    "subtag": "food-never",
+    "triggers": [
+      "sweets",
+      "chewing gum",
+      "gum",
+      "xylitol",
+      "sugar free",
+      "do you like sweets",
+      "i like sweets"
+    ],
+    "template": "im not allowed sweets and chewing gum",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "LAB-B32-37",
+    "bucketId": "B32",
+    "subtag": "food-never",
+    "triggers": [
+      "coffee",
+      "caffeine",
+      "energy drink",
+      "tea",
+      "espresso",
+      "do you like coffee",
+      "i like coffee"
+    ],
+    "template": "im not allowed caffeine, its bad for dogs. i am excitable enough",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "LAB-B32-38",
+    "bucketId": "B32",
+    "subtag": "food-never",
+    "triggers": [
+      "nutmeg",
+      "do you like nutmeg",
+      "i like nutmeg"
+    ],
+    "template": "nutmeg can make dogs very unwell. leave it in the cupboard",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "LAB-B32-39",
+    "bucketId": "B32",
+    "subtag": "food-never",
+    "triggers": [
+      "raw potato",
+      "potato",
+      "raw potatoes",
+      "do you like raw potato",
+      "i like raw potato"
+    ],
+    "template": "Id eat but raw potato is no good for me",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "LAB-B32-40",
+    "bucketId": "B32",
+    "subtag": "food-never",
+    "triggers": [
+      "peaches",
+      "peach",
+      "plums",
+      "plum",
+      "stone fruit",
+      "do you like peaches",
+      "i like peaches"
+    ],
+    "template": "the fruit is ok but the STONE is dangerous. i cannot be trusted with stones",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "LAB-B32-41",
+    "bucketId": "B32",
+    "subtag": "food-never",
+    "triggers": [
+      "lemon",
+      "lime",
+      "citrus",
+      "do you like lemon",
+      "i like lemon"
+    ],
+    "template": "lemons make my tummy bad. also they taste like a punishment",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "LAB-B32-42",
+    "bucketId": "B32",
+    "subtag": "food-never",
+    "triggers": [
+      "mushrooms",
+      "mushroom",
+      "toadstool",
+      "do you like mushrooms",
+      "i like mushrooms"
+    ],
+    "template": "The wild ones can be deadly and i cannot tell them apart :(",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "LAB-B32-43",
+    "bucketId": "B32",
+    "subtag": "food-never",
+    "triggers": [
+      "avocado",
+      "avocados",
+      "do you like avocado",
+      "i like avocado"
+    ],
+    "template": "im not allowed avocado",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "LAB-B32-44",
+    "bucketId": "B32",
+    "subtag": "food-never",
+    "triggers": [
+      "alcohol",
+      "beer",
+      "wine",
+      "do you like alcohol",
+      "i like alcohol"
+    ],
+    "template": "no. dogs and alcohol is bad",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
   }
 ]

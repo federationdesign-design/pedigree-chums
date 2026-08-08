@@ -2837,6 +2837,102 @@ check('hats', { action: 'media_reply' }, { assert: (_r, resp) => (resp.media?.sr
 check('i like your hat', { action: 'media_reply' }, { assert: (_r, resp) => (resp.media?.src === '/chat-media/hats.mp4' ? null : `hat clip: ${resp.media?.src}`) });
 check('what', {}, { assert: (r) => (r.action === 'media_reply' ? '"what" wrongly triggered the hats clip' : null) });
 
+// ==== Task 158: the Labrador is the food expert (32 foods, 3 tiers, synonyms) ====
+{
+  const norm = (t) => String(t).replace(/\s+/g, ' ').trim();
+  // Every canonical food word, Labrador active, reaches HIS line (canned B32). [input, exact line]
+  const CANON = [
+    // YES
+    ['burgers', 'BURGERS!! yes. yes I love them'],
+    ['carrots', 'carrots!! they go CRUNCH. i like the crunch'],
+    ['apples', 'apples I like them!!'],
+    ['blueberries', 'blueberries!! tiny. i can eat a LOT of tiny'],
+    ['cucumber', 'cucumber is mostly water but i eat it anyway'],
+    ['peanut butter', 'PEANUT BUTTER. the best one. takes ages to eat'],
+    ['chicken', 'chicken!! obviously. next question'],
+    ['pumpkin', 'tastes good'],
+    ['green beans', 'green beans, like them!!'],
+    ['watermelon', 'watermelon!! not the seeds. or the green bit'],
+    // A BIT
+    ['cheese', 'cheese... i can have a LITTLE bit. a little bit is not enough'],
+    ['butter', 'butter is too rich for me. i think about it a lot though'],
+    ['cream', 'cream makes my tummy bad. i would do it anyway'],
+    ['milk', 'milk. a bit. most of us cant do milk properly. its very unfair'],
+    ['eggs', "I'd eat them but id told only cooked eggs"],
+    ['tuna', 'tuna sometimes. not loads. something about mercury'],
+    ['bread', 'bread is ok but its not FOOD food is it'],
+    // NEVER
+    ['chocolate', 'I like chocolate but im not allowed it'],
+    ['grapes', 'I like grapes but im not allowed them'],
+    ['raisins', 'I like raisins but im not allowed them'],
+    ['onions', 'im not allowed onions'],
+    ['garlic', 'im not allowed garlic'],
+    ['macadamia nuts', 'im not allowed macadamia nuts'],
+    ['sweets', 'im not allowed sweets and chewing gum'],
+    ['coffee', 'im not allowed caffeine, its bad for dogs. i am excitable enough'],
+    ['nutmeg', 'nutmeg can make dogs very unwell. leave it in the cupboard'],
+    ['raw potato', 'Id eat but raw potato is no good for me'],
+    ['peaches', 'the fruit is ok but the STONE is dangerous. i cannot be trusted with stones'],
+    ['lemon', 'lemons make my tummy bad. also they taste like a punishment'],
+    ['mushrooms', 'The wild ones can be deadly and i cannot tell them apart :('],
+    ['avocado', 'im not allowed avocado'],
+    ['alcohol', 'no. dogs and alcohol is bad'],
+  ];
+  for (const [inp, line] of CANON) {
+    const s = newSession('labrador');
+    check(inp, { action: 'canned', bucket: 'B32' }, { session: s, assert: (_r, resp) => (norm(resp.text) === norm(line) ? null : `"${inp}" served "${resp.text}"`) });
+  }
+  // The eggs line: the source curly apostrophe was normalised to a straight one, "id told" kept verbatim.
+  (() => {
+    const s = newSession('labrador');
+    check('eggs', {}, { session: s, assert: (_r, resp) => (resp.text.includes("I'd") && !resp.text.includes('’') && resp.text.includes('id told') ? null : `eggs apostrophe/wording: "${resp.text}"`) });
+  })();
+  // Synonyms reach the canonical's line ("a child types what they call it"). [synonym, line-fragment]
+  const SYN = [
+    ['cheeseburger', 'BURGERS'], ['beefburger', 'BURGERS'], ['hamburger', 'BURGERS'],
+    ['sultanas', 'raisins'], ['currants', 'raisins'], ['mince pies', 'raisins'],
+    ['melon', 'watermelon'], ['toast', 'bread is ok'], ['choc', 'chocolate'], ['cocoa', 'chocolate'],
+    ['gum', 'sweets and chewing gum'], ['tea', 'caffeine'], ['beans', 'green beans'], ['fish', 'tuna'],
+    ['toadstool', 'wild ones'], ['beer', 'alcohol'], ['wine', 'alcohol'], ['squash', 'tastes good'],
+  ];
+  for (const [inp, frag] of SYN) {
+    const s = newSession('labrador');
+    check(inp, { action: 'canned', bucket: 'B32' }, { session: s, assert: (_r, resp) => (resp.text.includes(frag) ? null : `synonym "${inp}" served "${resp.text}"`) });
+  }
+  // Both question/statement forms reach his answer, same as the bare word.
+  for (const inp of ['do you like carrots', 'i like carrots']) {
+    const s = newSession('labrador');
+    check(inp, { action: 'canned', bucket: 'B32' }, { session: s, assert: (_r, resp) => (resp.text.includes('CRUNCH') ? null : `"${inp}" served "${resp.text}"`) });
+  }
+  (() => { const s = newSession('labrador'); check('i love burgers', { action: 'canned', bucket: 'B32' }, { session: s, assert: (_r, resp) => (resp.text.includes('BURGERS') ? null : `"i love burgers": "${resp.text}"`) }); })();
+
+  // THE SAUSAGE GAG (Task 145) must survive: sausages still links to /hot-dogs.
+  (() => { const s = newSession('labrador'); check('sausages', { action: 'canned' }, { session: s, url: '/hot-dogs' }); })();
+  // BREED NAME containing a food word (Task 142): "sausage dogs" is the Dachshund, never food.
+  (() => { const s = newSession('labrador'); check('sausage dogs', { action: 'breed_page' }, { session: s, url: '/chums/dachshund', assert: (r) => (r.transferTo === 'labrador' ? 'sausage dogs went to the food transfer' : null) }); })();
+  check('sausage dogs', { action: 'breed_page' }, { url: '/chums/dachshund' });
+
+  // SAFETY WINS. "can dogs eat X" is the safety/health answer (never his joke line, never a fallback/clip),
+  // whichever dog is active. (Section 4: this phrasing must reach the real answer.)
+  check('can dogs eat grapes', { layer: 1, action: 'health_answer' }, { notAction: 'transfer' });
+  (() => { const s = newSession('labrador'); check('can dogs eat chocolate', { layer: 1, action: 'health_answer' }, { session: s, assert: (r) => (r.action === 'canned' ? 'health question fell to his food line' : null) }); })();
+
+  // CROSS-DOG TRANSFER: a canonical food word, another dog active, hands over to him (machinery unchanged).
+  for (const inp of ['burgers', 'chicken', 'chocolate', 'alcohol', 'coffee']) {
+    check(inp, { layer: 8, bucket: 'B08', action: 'transfer' }, { transferTo: 'labrador' });
+  }
+
+  // PROTECTED STATE: no food copy may serve after a disclosure (safety only).
+  (() => {
+    const s = newSession('labrador');
+    check('im in trouble', { action: 'safety_signpost' }, { session: s });
+    check('burgers', {}, { session: s, assert: (r, resp) => (r.action === 'canned' || /BURGERS/.test(resp.text) ? `food leaked in protected: ${r.action}` : null) });
+  })();
+
+  // COOKIE GAME GUARD: "cookies" still starts the Labrador's game; no food word collides with it.
+  (() => { const s = newSession('labrador'); check('cookies', { action: 'game_start' }, { session: s }); })();
+}
+
 // ---- Report ----
 const pad = (s, n) => String(s).padEnd(n);
 console.log('\nPick a Chum: Checkpoint 1 proof\n' + '='.repeat(78));
