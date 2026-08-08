@@ -10,7 +10,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import styles from './DevRecorder.module.css';
 import { setTurnTap, recorderEnabled, TurnEvent } from '../lib/turn-tap';
-import { record, getAggregate, downloadBoth, Aggregate } from './recorder-store';
+import { record, recordPendingSync, flushPending, getAggregate, downloadBoth, Aggregate } from './recorder-store';
 
 const EMPTY: Aggregate = { conversations: 0, messages: 0, missed: 0 };
 
@@ -25,8 +25,14 @@ export default function DevRecorder() {
   useEffect(() => {
     setMounted(true);
     if (!recorderEnabled()) return;
-    refresh(); // restore the running totals from earlier sessions
+    // Task 159: flush any turns captured synchronously on a previous page (an external link unloaded before
+    // its async write landed), then restore the running totals from earlier sessions.
+    flushPending().then(refresh).catch(() => {});
     const onTurn = (e: TurnEvent) => {
+      if (e.sync) {
+        recordPendingSync(e, new Date().toISOString()); // synchronous -- survives the imminent navigation
+        return;
+      }
       record(e, new Date().toISOString())
         .then(refresh)
         .catch(() => {});
@@ -36,8 +42,10 @@ export default function DevRecorder() {
   }, [refresh]);
 
   const onExport = useCallback(() => {
-    // Task 159: two sheets -- the per-turn log and the per-session summary.
-    downloadBoth(new Date().toISOString().replace(/[:.]/g, '-')).catch(() => {});
+    // Task 159: flush any synchronously-captured turns into IndexedDB first, then export both sheets.
+    flushPending()
+      .then(() => downloadBoth(new Date().toISOString().replace(/[:.]/g, '-')))
+      .catch(() => {});
   }, []);
 
   if (!mounted || !recorderEnabled()) return null;

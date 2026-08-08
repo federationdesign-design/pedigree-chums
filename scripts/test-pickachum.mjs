@@ -1175,11 +1175,14 @@ const lcg = (seed) => () => ((seed = (seed * 1103515245 + 12345) & 0x7fffffff) /
     row(0, 't0', 'appearance', 'boxer', '', 'appearance', '', '', '', ''), // unbidden appearance -- not a "dog used"
     row(1, 't1', 'reply', 'collie', '', 'converse', 'B09', 'B09-1', '', 'hello'),
     row(2, 't2', 'reply', 'collie', 'labrador', 'transfer', 'B08', 'TR', '', 'burgers'),
+    buildAppearanceRow({ sessionId: 'x', turn: 2, activeDog: 'labrador', input: '', line: '/hot-dogs', route: '/home', trigger: 'link' }, 't2b'), // a link followed
     row(3, 't3', 'reply', 'labrador', '', 'game_start', 'B17', 'FC-START', 'feedcookie', 'cookies'),
     row(4, 't4', 'reply', 'labrador', '', 'game_move', 'B67', 'FC-JOKE', '', 'pref'), // gameActive clears -> finished
-    row(5, 't5', 'reply', 'labrador', '', 'converse', 'B30', 'JOKE-1', '', 'haha'), // a laugh, attributed to FC-JOKE
+    buildAppearanceRow({ sessionId: 'x', turn: 4, activeDog: 'labrador', input: '', line: 'HAT-KENNEL', route: '/home', trigger: 'hat' }, 't4b'), // a hat found (meta row between the joke and the laugh)
+    row(5, 't5', 'reply', 'labrador', '', 'converse', 'B30', 'JOKE-1', '', 'haha'), // a laugh, still attributed to FC-JOKE
   ]);
   const ok = s.firstInput === 'hello' && s.turnCount === 5 && s.dogsUsed === 'collie|labrador' && s.dogSwitched === 'TRUE' &&
+    s.linkFollowed === '/hot-dogs' && s.hatsFound === 1 &&
     s.gamesStarted === 1 && s.gamesFinished === 1 && s.hadAppearance === 'TRUE' && s.laughCount === 1 && s.laughedAt === 'FC-JOKE' && s.endReason === 'abandoned';
   ok ? pass++ : fail++;
   rows.push({ ok, input: 'recorder v2: per-session summary', layer: '-', bucket: '-', action: 'recorder', note: ok ? '' : JSON.stringify(s) });

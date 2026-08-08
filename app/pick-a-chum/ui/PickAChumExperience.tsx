@@ -291,6 +291,18 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
   // Recorder session id: one per engine session (a dog pick / page load reset).
   // Inert in production (the turn tap has no sink there); see lib/turn-tap.ts.
   const recSessionRef = useRef(restored ? restored.recSessionId || '' : auto ? `s${Date.now().toString(36)}-auto` : '');
+  // Task 159: a live pathname ref + a stable meta-logger, so a link-follow or a hat-find can be recorded
+  // from anywhere (a callback, JSX) with the CURRENT route and no stale closure. `line` holds the target
+  // href (link) or the hat id. protectedState is passed so a protected session records none of these.
+  const pathnameRef = useRef(pathname);
+  pathnameRef.current = pathname;
+  const logMeta = useCallback((trigger: string, line: string, sync = false) => {
+    if (!line) return;
+    const session = sessionRef.current;
+    // sync=true for an EXTERNAL link: the page unloads before an async IndexedDB write could land, so it is
+    // captured synchronously to localStorage instead (see DevRecorder / recordPendingSync).
+    emitTurn({ sessionId: recSessionRef.current, turn: session?.submissionCount ?? 0, activeDog: session?.activeDog ?? 'collie', input: '', line, route: pathnameRef.current ?? '', protectedState: session?.protectedState ?? null, trigger, sync });
+  }, []);
   // The active typing performance, so a tap or Enter can complete it instantly.
   const playbackRef = useRef<{ id: number; plan: TypingPlan; closed?: boolean; done: boolean } | null>(null);
   // Task 152: the in-flight consecutive-message sequence (a dog sending two or three in a row), or null.
@@ -464,7 +476,7 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
       const list = PROFILE_CYCLE[dog];
       const variant = list[((next % list.length) + list.length) % list.length];
       const hat = chatHatFor(dog, variant);
-      if (hat && !sessionRef.current?.protectedState && !everProtectedRef.current) reportHat(hat.id);
+      if (hat && !sessionRef.current?.protectedState && !everProtectedRef.current) { reportHat(hat.id); logMeta('hat', hat.id); }
       return { ...prev, [dog]: next };
     });
   }, [dog]);
@@ -957,6 +969,7 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
       sessionRef.current?.activeGame === 'kennelsketch' && sessionRef.current.game?.sketchIndex === KENNEL_HAT_SKETCH_INDEX &&
       !sessionRef.current.protectedState && !everProtectedRef.current) {
       reportHat(KENNEL_SKETCH_HAT_ID);
+      logMeta('hat', KENNEL_SKETCH_HAT_ID);
     }
 
     // Bark-game break / fetch / the cookie give-up: the main lands instantly, then a follow-up message.
@@ -1161,7 +1174,7 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
                       preload="metadata"
                       // Task 156 (§4): the party-hat pug in birthday.mp4 is a hidden hat -- it counts ON
                       // PLAY (seeing the clip finds it), not on tap. reportHat carries the protected guard.
-                      onPlay={msg.media.src.includes('/birthday.mp4') ? () => { if (!sessionRef.current?.protectedState && !everProtectedRef.current) reportHat(BIRTHDAY_HAT_ID); } : undefined}
+                      onPlay={msg.media.src.includes('/birthday.mp4') ? () => { if (!sessionRef.current?.protectedState && !everProtectedRef.current) { reportHat(BIRTHDAY_HAT_ID); logMeta('hat', BIRTHDAY_HAT_ID); } } : undefined}
                     />
                   );
                 })()}
@@ -1171,7 +1184,7 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
 
                 {msg.done && msg.action && (
                   <div className={styles.actionWrap}>
-                    <ActionLink command={msg.action} onNavigate={msg.fetchGame ? undefined : () => setMinimised(true)} />
+                    <ActionLink command={msg.action} onNavigate={msg.fetchGame ? undefined : () => { logMeta('link', msg.action?.href ?? '', msg.action?.kind === 'external'); setMinimised(true); }} />
                   </div>
                 )}
               </div>
@@ -1467,7 +1480,7 @@ function ActionLink({ command, onNavigate }: { command: Command; onNavigate?: ()
   }
   if (command.kind === 'external' && command.href) {
     return (
-      <a href={command.href} className={cls}>
+      <a href={command.href} className={cls} onClick={onNavigate}>
         {label}
       </a>
     );

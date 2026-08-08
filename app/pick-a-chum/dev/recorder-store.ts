@@ -193,7 +193,9 @@ export function buildAppearanceRow(e: TurnEvent, now: string): TurnRow {
     activeDog: e.activeDog,
     route: e.route ?? '',
     trigger: e.trigger ?? 'appearance',
-    action: 'appearance',
+    // A link-follow and a hat-find ride the same appearance channel (no visitor input) but carry their own
+    // action so the per-session sheet can count them; the line holds the target (href) / the hat id.
+    action: e.trigger === 'link' ? 'link_followed' : e.trigger === 'hat' ? 'hat_found' : 'appearance',
     responseText: e.line ?? '',
     gameActive: e.gameActive ?? '',
   };
@@ -229,13 +231,47 @@ export async function record(e: TurnEvent, now: string): Promise<void> {
   await tx('readwrite', (s) => s.add(row));
 }
 
+// SYNCHRONOUS write path for unload-risky turns. An external link navigates the page away before an
+// async IndexedDB write could land, so an external-link click would be silently lost -- worse than no
+// data, since the linkFollowed column would look complete while under-counting exactly the click-throughs
+// you cannot infer anywhere else. localStorage.setItem is synchronous, so the row is safe before the
+// navigation; flushPending() moves the buffer into IndexedDB on the next recorder init / export.
+const PENDING_KEY = 'chum-recorder-pending';
+function readPending(): TurnRow[] {
+  try {
+    return JSON.parse(localStorage.getItem(PENDING_KEY) || '[]') as TurnRow[];
+  } catch {
+    return [];
+  }
+}
+export function recordPendingSync(e: TurnEvent, now: string): void {
+  if (e.protectedState) return; // never buffer a protected turn (it is not recorded at all)
+  try {
+    const row = e.trigger && e.trigger !== 'reply' ? buildAppearanceRow(e, now) : buildRow(e, now);
+    localStorage.setItem(PENDING_KEY, JSON.stringify([...readPending(), row]));
+  } catch {}
+}
+export async function flushPending(): Promise<void> {
+  const pending = readPending();
+  if (!pending.length) return;
+  try {
+    localStorage.removeItem(PENDING_KEY);
+  } catch {}
+  for (const row of pending) {
+    try {
+      await tx('readwrite', (s) => s.add(row));
+    } catch {}
+  }
+}
+
 export async function getAllRows(): Promise<TurnRow[]> {
-  const rows = (await tx<TurnRow[]>('readonly', (s) => s.getAll())) ?? [];
-  // Recompute outcome from action+bucket so a classification change applies retroactively
-  // (marker rows have a blank action and keep a blank outcome). Session order (first-seen,
-  // sessionId is time-prefixed so lexical == chronological) then turn order, then enrich.
+  const idb = (await tx<TurnRow[]>('readonly', (s) => s.getAll())) ?? [];
+  const rows = [...idb, ...readPending()]; // include sync-captured rows not yet flushed to IndexedDB
+  // Recompute outcome from action+bucket so a classification change applies retroactively. Only REPLY
+  // turns have an outcome; appearance / link / hat / protected-marker rows keep a blank one. Session order
+  // (first-seen, sessionId is time-prefixed so lexical == chronological) then turn order, then enrich.
   const sorted = rows
-    .map((r) => ({ ...r, outcome: r.action ? outcomeOf(r.action, r.bucket) : '' }))
+    .map((r) => ({ ...r, outcome: r.trigger && r.trigger !== 'reply' ? '' : r.action ? outcomeOf(r.action, r.bucket) : '' }))
     .sort((a, b) => (a.sessionId === b.sessionId ? a.turn - b.turn : a.sessionId < b.sessionId ? -1 : 1));
   return enrichRows(sorted);
 }
@@ -289,8 +325,10 @@ export interface SessionRow {
   turnCount: number;
   dogsUsed: string; // the dogs they spoke to, e.g. collie|labrador
   dogSwitched: string; // TRUE if more than one dog
+  linkFollowed: string; // the page(s) they clicked through to (the whole point of the chat), or '' if none
   gamesStarted: number;
   gamesFinished: number; // started is not the same as completed
+  hatsFound: number; // distinct hidden-games hats revealed this session
   laughCount: number; // how many of the dog's lines got a laugh
   laughedAt: string; // the responseIds that got one -- after N sessions, a ranked list of what works
   hadAppearance: string; // TRUE if a dog appeared unbidden this session
@@ -298,8 +336,8 @@ export interface SessionRow {
 }
 
 export const SESSION_COLUMNS: (keyof SessionRow)[] = [
-  'sessionId', 'firstInput', 'turnCount', 'dogsUsed', 'dogSwitched',
-  'gamesStarted', 'gamesFinished', 'laughCount', 'laughedAt', 'hadAppearance', 'endReason',
+  'sessionId', 'firstInput', 'turnCount', 'dogsUsed', 'dogSwitched', 'linkFollowed',
+  'gamesStarted', 'gamesFinished', 'hatsFound', 'laughCount', 'laughedAt', 'hadAppearance', 'endReason',
 ];
 
 // A laugh: a visitor reply that is pure amusement, landing right after a dog line -- direct creative
@@ -330,32 +368,39 @@ export function buildSessions(rows: TurnRow[]): SessionRow[] {
     const gamesStarted = srows.filter((r) => r.action === 'game_start').length;
     let gamesFinished = 0;
     let laughCount = 0;
+    let lastResponseId = ''; // the last dog line's responseId, skipping meta rows (link/hat, no responseId)
     const laughedAt: string[] = [];
     for (let i = 0; i < srows.length; i++) {
       const cur = srows[i];
       const prev = srows[i - 1];
       if (prev && prev.gameActive && !cur.gameActive) gamesFinished += 1; // a running game just cleared
-      if (cur.trigger === 'reply' && isLaugh(cur.input) && prev && prev.responseId) {
+      if (cur.trigger === 'reply' && isLaugh(cur.input) && lastResponseId) {
         laughCount += 1;
-        laughedAt.push(prev.responseId);
+        laughedAt.push(lastResponseId); // attribute the laugh to the dog line BEFORE it
       }
+      if (cur.responseId) lastResponseId = cur.responseId;
     }
     const endReason = srows.some((r) => r.action === 'boxer_cutoff')
       ? 'ceiling' // the 20-turn cutoff, NOT a real exit (brief section 8)
       : srows.some((r) => r.protected === 'TRUE')
         ? 'protected'
         : 'abandoned';
+    const linkTargets = [...new Set(srows.filter((r) => r.action === 'link_followed').map((r) => r.responseText).filter(Boolean))];
+    const hatsFound = new Set(srows.filter((r) => r.action === 'hat_found').map((r) => r.responseText).filter(Boolean)).size;
     out.push({
       sessionId,
       firstInput,
       turnCount,
       dogsUsed: [...dogs].join('|'),
       dogSwitched: dogs.size > 1 ? 'TRUE' : '',
+      linkFollowed: linkTargets.join('|'),
       gamesStarted,
       gamesFinished,
+      hatsFound,
       laughCount,
       laughedAt: laughedAt.join('|'),
-      hadAppearance: srows.some((r) => r.trigger && r.trigger !== 'reply') ? 'TRUE' : '',
+      // an appearance is a dog speaking unbidden -- NOT a link-follow or hat-find (those share the channel).
+      hadAppearance: srows.some((r) => r.trigger === 'appearance' || r.trigger === 'sequence' || r.trigger === 'listener') ? 'TRUE' : '',
       endReason,
     });
   }

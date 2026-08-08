@@ -25,7 +25,8 @@ export interface TurnEvent {
   route?: string; // the page pathname the visitor was on
   gameActive?: string | null; // session.activeGame this turn, if any
   protectedState?: string | null; // session.protectedState ('active' | 'aftercare' | null) -- a set value means DO NOT record this turn (only the transition marker)
-  trigger?: string; // why this turn happened: 'reply' (the visitor typed) | 'appearance' | 'sequence' | 'listener'
+  trigger?: string; // why this turn happened: 'reply' (the visitor typed) | 'appearance' | 'sequence' | 'listener' | 'link' | 'hat'
+  sync?: boolean; // Task 159: capture this turn SYNCHRONOUSLY (an external link unloads the page before an async write lands)
 }
 
 type Sink = (e: TurnEvent) => void;
