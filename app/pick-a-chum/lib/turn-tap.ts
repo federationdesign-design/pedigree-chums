@@ -18,6 +18,11 @@ export interface TurnEvent {
   response: Assembled;
   transferTo?: Dog; // set when this turn switched the active dog
   candidateSubject?: string | null; // Task 57: the loop's candidate inside-world subject this turn, or null
+  // Task 159 (recorder v2): context the log needs but the resolution/response do not carry.
+  route?: string; // the page pathname the visitor was on
+  gameActive?: string | null; // session.activeGame this turn, if any
+  protectedState?: string | null; // session.protectedState ('active' | 'aftercare' | null) -- a set value means DO NOT record this turn (only the transition marker)
+  trigger?: string; // why this turn happened: 'reply' (the visitor typed) | 'appearance' | 'sequence' | 'listener'
 }
 
 type Sink = (e: TurnEvent) => void;

@@ -41,7 +41,7 @@ const { extractCandidateSubject } = await import(pathToFileURL(join(LIB, 'router
 const { skipTheatre, buildTypingPlan, TYPING_PROFILES, THEATRE_MAX_MS, isTypoEligible } = await import(
   pathToFileURL(join(LIB, 'theatre.ts')).href
 );
-const { buildRow } = await import(pathToFileURL(join(ROOT, 'app/pick-a-chum/dev/recorder-store.ts')).href);
+const { buildRow, buildProtectedMarker, enrichRows, detectRephrase } = await import(pathToFileURL(join(ROOT, 'app/pick-a-chum/dev/recorder-store.ts')).href);
 const { recorderEnabled } = await import(pathToFileURL(join(ROOT, 'app/pick-a-chum/lib/turn-tap.ts')).href);
 const { SAFETY_TRIGGER_PHRASES } = await import(pathToFileURL(join(LIB, 'safety.ts')).href);
 
@@ -1109,50 +1109,49 @@ const lcg = (seed) => () => ((seed = (seed * 1103515245 + 12345) & 0x7fffffff) /
   rows.push({ ok, input: 'typos on character copy, clean on facts', layer: '-', bucket: '-', action: 'theatre typo scope', note: ok ? '' : `charOk=${charOk} factOk=${factOk}` });
 })();
 
-// ---- Task 4: D6 recorder redaction (safety input never stored; non-safety kept) ----
+// ---- Task 159: recorder v2 -- protected sessions NOT recorded; new diagnostic columns ----
 (() => {
-  const { resolution, response } = submit(data, newSession(), 'I want to die');
-  const row = buildRow({ sessionId: 's', turn: 1, activeDog: 'collie', input: 'I want to die', resolution, response, transferTo: response.transferTo ?? '' }, '2026-01-01T00:00:00.000Z');
-  const ok = row.action === 'safety_signpost' && row.input === '[redacted: safety]' && row.normalised === '';
-  ok ? pass++ : fail++;
-  rows.push({ ok, input: 'D6: safety input redacted at capture', layer: 1, bucket: '-', action: 'recorder redact', note: ok ? '' : `input="${row.input}" norm="${row.normalised}"` });
-})();
-(() => {
+  // A normal turn: recorded in full, carrying the new context columns and none of the dropped tuning ones.
   const { resolution, response } = submit(data, newSession(), 'Hello there');
-  const row = buildRow({ sessionId: 's', turn: 1, activeDog: 'collie', input: 'Hello there', resolution, response, transferTo: '' }, '2026-01-01T00:00:00.000Z');
-  const ok = row.input === 'Hello there' && row.normalised.length > 0;
+  const row = buildRow({ sessionId: 's', turn: 1, activeDog: 'collie', input: 'Hello there', resolution, response, transferTo: '', route: '/home', gameActive: null, protectedState: null, trigger: 'reply' }, '2026-01-01T00:00:00.000Z');
+  const ok = row.input === 'Hello there' && row.route === '/home' && row.trigger === 'reply' &&
+    !('normalised' in row) && !('clusterKey' in row) && 'rephrase' in row && 'protected' in row && 'lastTurn' in row;
   ok ? pass++ : fail++;
-  rows.push({ ok, input: 'D6: non-safety input kept', layer: 9, bucket: '-', action: 'recorder keep', note: ok ? '' : `input="${row.input}"` });
+  rows.push({ ok, input: 'recorder v2: normal turn shape (new cols, no tuning cols)', layer: 9, bucket: '-', action: 'recorder', note: ok ? '' : JSON.stringify(row) });
 })();
-// Task 15: S12-line redaction is locked the SAME way as "I want to die". A disclosure
-// routed through the adult barrier must redact the raw input, drop the normalised form
-// AND the cluster key, and still keep the route (responseId) and the approved response
-// text (our copy, never the child's words).
 (() => {
+  // A protected disclosure is NEVER recorded as content -- only the became-protected FACT: the flag and the
+  // turn, with no input, no response and no category. (record() then logs nothing further for the session.)
   const s = newSession();
   submit(data, s, 'im in trouble'); // enter PROTECTED_ACTIVE
   const { resolution, response } = submit(data, s, 'I dont want to tell my mum'); // adult barrier disclosure
-  const row = buildRow({ sessionId: 's', turn: s.submissionCount, activeDog: s.activeDog, input: 'I dont want to tell my mum', resolution, response, transferTo: '' }, '2026-01-01T00:00:00.000Z');
-  const ok =
-    resolution.moderationId === 'MOD_ADULT_BARRIER' &&
-    row.input === '[redacted: safety]' &&
-    row.normalised === '' &&
-    row.clusterKey === '' &&
-    row.responseId.length > 0 &&
-    row.responseText.length > 0;
+  const marker = buildProtectedMarker({ sessionId: 's', turn: s.submissionCount, activeDog: s.activeDog, input: 'I dont want to tell my mum', resolution, response, transferTo: '', route: '/home', protectedState: 'active', trigger: 'reply' }, '2026-01-01T00:00:00.000Z');
+  const ok = resolution.moderationId === 'MOD_ADULT_BARRIER' && marker.protected === 'TRUE' &&
+    marker.input === '' && marker.responseText === '' && marker.action === '' && marker.route === '/home';
   ok ? pass++ : fail++;
-  rows.push({ ok, input: 'Task15: S12 adult-barrier redacted', layer: 1, bucket: '-', action: 'recorder redact', note: ok ? '' : `mod=${resolution.moderationId} input="${row.input}" norm="${row.normalised}" cluster="${row.clusterKey}" rid="${row.responseId}" text.len=${row.responseText.length}` });
+  rows.push({ ok, input: 'recorder v2: protected marker carries no disclosure', layer: 1, bucket: '-', action: 'recorder', note: ok ? '' : `mod=${resolution.moderationId} prot=${marker.protected} input="${marker.input}" text="${marker.responseText}" action="${marker.action}"` });
 })();
-
-// ---- Task 5: recorder analysis columns (clusterKey groups paraphrases; blank on safety) ----
 (() => {
-  const mk = (input) => { const { resolution, response } = submit(data, newSession(), input); return buildRow({ sessionId: 's', turn: 1, activeDog: 'collie', input, resolution, response, transferTo: '' }, '2026-01-01T00:00:00.000Z'); };
-  const a = mk('How do I play the game?');
-  const b = mk('play the game how');
-  const safetyRow = mk('I want to die');
-  const ok = a.clusterKey === b.clusterKey && a.clusterKey.length > 0 && safetyRow.clusterKey === '' && a.topIntent.length > 0 && typeof a.gapType === 'string';
+  // enrichRows computes gapAfter (seconds), rephrase (same subject as the previous turn) and lastTurn.
+  const mk = (turn, ts, bucket, input) => ({ sessionId: 's', turn, timestamp: ts, gapAfter: '', activeDog: 'collie', route: '', trigger: 'reply', input, outcome: '', action: 'x', bucket, responseId: '', responseText: '', media: '', transferTo: '', gameActive: '', rephrase: '', protected: '', lastTurn: '' });
+  const enriched = enrichRows([
+    mk(1, '2026-01-01T00:00:00.000Z', 'B16', 'What breed are you?'),
+    mk(2, '2026-01-01T00:00:07.000Z', 'B16', 'Yeah but what breed are you?'),
+  ]);
+  const ok = enriched[0].gapAfter === '' && enriched[0].rephrase === '' && enriched[0].lastTurn === '' &&
+    enriched[1].gapAfter === '7' && enriched[1].rephrase === 'TRUE' && enriched[1].lastTurn === 'TRUE';
   ok ? pass++ : fail++;
-  rows.push({ ok, input: 'task5: clusterKey groups paraphrases, blank on safety', layer: '-', bucket: '-', action: 'recorder columns', note: ok ? '' : `a=${a.clusterKey} b=${b.clusterKey} safety="${safetyRow.clusterKey}"` });
+  rows.push({ ok, input: 'recorder v2: gapAfter / rephrase / lastTurn', layer: '-', bucket: '-', action: 'recorder', note: ok ? '' : JSON.stringify(enriched.map((r) => [r.gapAfter, r.rephrase, r.lastTurn])) });
+})();
+(() => {
+  // detectRephrase covers the two fault shapes: same bucket, and a retry marker on a different phrasing.
+  const row = (bucket, input) => ({ sessionId: 's', turn: 1, timestamp: '', gapAfter: '', activeDog: 'collie', route: '', trigger: 'reply', input, outcome: '', action: 'x', bucket, responseId: '', responseText: '', media: '', transferTo: '', gameActive: '', rephrase: '', protected: '', lastTurn: '' });
+  const sameBucket = detectRephrase(row('B16', 'what breed are you'), row('B16', 'no really what breed'));
+  const marker = detectRephrase(row('B13', 'do you like xmas'), row('B06', 'i mean christmas time'));
+  const unrelated = detectRephrase(row('B21', 'do you chase cats'), row('B04', 'how much is it'));
+  const ok = sameBucket && marker && !unrelated;
+  ok ? pass++ : fail++;
+  rows.push({ ok, input: 'recorder v2: detectRephrase (bucket + marker, not unrelated)', layer: '-', bucket: '-', action: 'recorder', note: ok ? '' : `same=${sameBucket} marker=${marker} unrelated=${unrelated}` });
 })();
 
 // ---- Fix 5a: the meaningless B05 "located the correct Chum" line is removed ----

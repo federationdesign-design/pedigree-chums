@@ -822,6 +822,12 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
       response: r,
       transferTo: swapped ? toDog : undefined,
       candidateSubject: session.candidateSubject, // Task 57: set by submit on the mutated session
+      // Task 159 (recorder v2): context off the freshly-mutated session. protectedState set means the
+      // recorder logs only the became-protected marker and nothing more from this session.
+      route: pathname ?? '',
+      gameActive: session.activeGame ?? null,
+      protectedState: session.protectedState ?? null,
+      trigger: 'reply',
     });
     const userMsg: Message = { id: idRef.current++, who: 'user', text };
     // Task 82: clear + keep focus only for a live submit; a queued/drained line must not wipe what

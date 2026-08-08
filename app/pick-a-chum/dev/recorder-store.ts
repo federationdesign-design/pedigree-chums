@@ -1,45 +1,43 @@
 // DEV ONLY (stripped for production). IndexedDB-backed store for the conversation
-// recorder. Persists one row per turn so a whole test session survives reloads
-// and accumulates across sessions until exported. Nothing here runs on the
-// production host (the caller is gated by recorderEnabled()).
+// recorder. Persists one row per turn so a whole test session survives reloads and
+// accumulates across sessions until exported. Nothing here runs on the production
+// host (the caller is gated by recorderEnabled()).
+//
+// Task 159 (recorder v2): 24 tuning columns down to 18 diagnostic ones. The classifier-
+// scoring fields (topScore/runnerUp/matchedSignals/gapType/clusterKey/topIntent) and
+// normalised/layer/layerName/confidence/verdict/candidate are gone -- they were never
+// read; faults are found by READING conversations, not scoring them. New columns carry
+// the signals that actually surfaced faults: rephrase, route, trigger, media, gameActive,
+// gapAfter, lastTurn, protected. gapAfter/rephrase/lastTurn are computed on read from the
+// stored rows (timestamp is kept internally to drive gapAfter but is not itself a column).
+//
+// PROTECTED SESSIONS ARE NOT RECORDED (owner decision, brief section 9). A protected
+// session is a child in distress; logging it puts a disclosure in a CSV, and nothing in
+// that file would improve the product. We record ONLY that a session became protected and
+// at which turn (the fact, no input, no response), then nothing more from that session.
 
-import { normalise } from '../lib/normalise';
 import type { TurnEvent } from '../lib/turn-tap';
 
 export interface TurnRow {
   sessionId: string;
   turn: number;
-  timestamp: string; // ISO
+  timestamp: string; // ISO -- internal only (drives gapAfter); NOT an exported column
+  gapAfter: string; // seconds since the previous turn in this session (computed on read)
   activeDog: string;
-  input: string; // raw
-  normalised: string; // the compact normalised form the engine keys off
-  layer: number;
-  layerName: string;
-  bucket: string;
+  route: string; // the page the visitor was on
+  trigger: string; // reply | appearance | sequence | listener -- why this turn happened
+  input: string; // raw; blank on a protected-marker row
+  outcome: string; // transfer | refusal | unmatched | cutoff | answered
   action: string;
-  confidence: string; // Act 2 field if present, else blank
+  bucket: string;
   responseId: string;
   responseText: string;
+  media: string; // the clip filename, if one served
   transferTo: string;
-  outcome: string; // transfer | refusal | unmatched | cutoff | answered
-  verdict: string; // always empty; Steve tags rows after export
-  // Analysis columns (for ranking real questions later). topIntent and clusterKey
-  // are computable now; the scored fields (topScore, runnerUp, runnerUpScore,
-  // matchedSignals) and the near_miss/ambiguous gapTypes await the scoring/NLU
-  // layer and are left blank until then. clusterKey is blanked on safety turns
-  // (it derives from the raw input, which D6 forbids storing).
-  topIntent: string; // the winning intent (bucket, or action if bucketless)
-  topScore: string; // blank until the scoring layer exists
-  runnerUp: string; // blank until the scoring layer exists
-  runnerUpScore: string; // blank until the scoring layer exists
-  matchedSignals: string; // blank until the router exposes matched triggers
-  gapType: string; // near_miss | no_match | ambiguous (only no_match derivable now)
-  clusterKey: string; // input normalised, stopwords stripped, tokens deduped + sorted
-  // Task 57: the dog-led loop's candidate subject for this turn. On a fallback-family turn it is
-  // the canonical inside-world entity found in the input (or blank when none, in which case the
-  // raw input column IS the content-gap entry); blank on every other turn. Blank on safety turns
-  // (D6: it derives from the raw input, which is never stored for a safety disclosure).
-  candidate: string;
+  gameActive: string; // the game running this turn, if any
+  rephrase: string; // TRUE if this turn covers the same subject as the previous one (computed on read)
+  protected: string; // TRUE only on the turn a session became protected; that session logs nothing else
+  lastTurn: string; // TRUE on the final logged turn of the session (computed on read)
 }
 
 export interface Aggregate {
@@ -48,49 +46,22 @@ export interface Aggregate {
   missed: number; // turns that were unmatched or a refusal
 }
 
-// Column order for export (kept in one place so CSV and any future xlsx agree).
+// Column order for export (kept in one place so CSV and any future xlsx agree). `timestamp`
+// is deliberately excluded -- gapAfter replaces it (a relative gap reads without arithmetic).
 export const COLUMNS: (keyof TurnRow)[] = [
-  'sessionId', 'turn', 'timestamp', 'activeDog', 'input', 'normalised',
-  'layer', 'layerName', 'bucket', 'action', 'confidence', 'responseId',
-  'responseText', 'transferTo', 'outcome', 'verdict',
-  'topIntent', 'topScore', 'runnerUp', 'runnerUpScore', 'matchedSignals', 'gapType', 'clusterKey',
-  'candidate',
+  'sessionId', 'turn', 'gapAfter', 'activeDog', 'route', 'trigger', 'input', 'outcome',
+  'action', 'bucket', 'responseId', 'responseText', 'media', 'transferTo', 'gameActive',
+  'rephrase', 'protected', 'lastTurn',
 ];
-
-// Cluster key: normalise the input, drop very common words, dedupe and sort the
-// tokens, so paraphrases of the same question share a key ("how do i play" and
-// "how to play the game" collapse together). Blank for safety turns (D6).
-const CLUSTER_STOP = new Set([
-  'the', 'a', 'an', 'of', 'is', 'are', 'do', 'does', 'you', 'your', 'to', 'in', 'it', 'this', 'that',
-  'can', 'on', 'and', 'for', 'with', 'me', 'my', 'i', 'what', 'how', 'where', 'when', 'who', 'why', 'which',
-]);
-function clusterKeyOf(input: string): string {
-  const words = normalise(input).words.filter((w) => w.length >= 2 && !CLUSTER_STOP.has(w));
-  return [...new Set(words)].sort().join(' ');
-}
-const gapTypeOf = (outcome: string) => (outcome === 'unmatched' ? 'no_match' : '');
 
 const MIN_MESSAGES = 3; // a conversation counts only at three turns or more
 
-// Catch-all / fallback buckets: the router lands here when it could not map the
-// message to anything meaningful, so a hit is a miss (a generic deflection), not
-// an answer. B13 = single-word + unresolved conversational catch; B14 = gibberish.
-// Add any future fallback bucket here so the miss rate stays honest.
+// Catch-all / fallback buckets: a hit here is a miss (a generic deflection), not an answer.
 const FALLBACK_BUCKETS = new Set(['B13', 'B14']);
-
-// Weak FAQ matches below this strength are misses, not answers (Task 10B). A lone
-// common container token is already blocked at the matcher (strength 0, never
-// routes), so in practice only strength >= 1 faq_answers are ever recorded; this
-// keeps the flag honest by construction if a future phrasing slips through.
+// Weak FAQ matches below this strength are misses, not answers (Task 10B).
 const FAQ_MATCH_THRESHOLD = 1;
 
 // Outcome is a function of the action, the bucket AND (for FAQ) the match strength.
-// Some misses, like the B13 catch-all, share the benign 'converse' action with
-// real greetings, so action alone would call them answers; and a FAQ that matched
-// only weakly is a wrong answer, not a success (Task 10B). faqStrength is optional:
-// undefined means "not a strength-scored FAQ match" (e.g. a deliberate FAQ012
-// complaint route, or a row re-read from storage where it was not persisted), and
-// is treated as answered.
 function outcomeOf(action: string, bucket: string, faqStrength?: number): string {
   if (action === 'transfer') return 'transfer';
   if (action === 'safety_signpost' || action === 'safety_boundary') return 'refusal';
@@ -101,6 +72,56 @@ function outcomeOf(action: string, bucket: string, faqStrength?: number): string
   return 'answered';
 }
 const isMiss = (outcome: string) => outcome === 'unmatched' || outcome === 'refusal';
+
+// ---- Rephrase detection (brief section 5: the strongest fault signal) --------------------
+// TRUE when a turn covers the same subject as the previous one. Multi-signal so it catches
+// both "what breed are you" -> "yeah but what breed are you" (same bucket) and "do you like
+// xmas" -> "I mean christmas time" (a retry marker + a shared word).
+const REPHRASE_MARKERS = ['i mean', 'i meant', 'no i mean', 'what i mean', 'yeah but', 'actually', 'i said', 'no i said'];
+const REPHRASE_STOP = new Set([
+  'the', 'a', 'an', 'of', 'is', 'are', 'do', 'does', 'you', 'your', 'to', 'in', 'it', 'this', 'that',
+  'can', 'on', 'and', 'for', 'with', 'me', 'my', 'i', 'what', 'how', 'where', 'when', 'who', 'why', 'which',
+  'like', 'yes', 'no', 'but', 'so', 'im', 'not', 'have', 'get', 'about',
+]);
+function words(s: string): Set<string> {
+  return new Set(
+    (s || '')
+      .toLowerCase()
+      .split(/[^a-z0-9]+/)
+      .filter((w) => w.length >= 3 && !REPHRASE_STOP.has(w))
+  );
+}
+export function detectRephrase(prev: TurnRow, cur: TurnRow): boolean {
+  const inp = (cur.input || '').toLowerCase().trim();
+  if (!inp) return false; // no input to compare (a protected marker, or an appearance)
+  // (a) same non-empty bucket as the previous turn.
+  if (cur.bucket && prev.bucket && cur.bucket === prev.bucket) return true;
+  // (b) a retry-marker opener ("i mean ...", "yeah but ...").
+  if (REPHRASE_MARKERS.some((m) => inp === m || inp.startsWith(m + ' ') || inp.includes(' ' + m + ' '))) return true;
+  // (c) a shared significant content word with the previous input.
+  const pw = words(prev.input);
+  for (const w of words(cur.input)) if (pw.has(w)) return true;
+  return false;
+}
+
+// ---- Read-time enrichment: gapAfter, rephrase, lastTurn --------------------------------
+// Computed across the session-then-turn sorted rows rather than at capture, so buildRow
+// stays a pure single-turn function and these never need prior-turn state at write time.
+export function enrichRows(rows: TurnRow[]): TurnRow[] {
+  const lastTurnBySession = new Map<string, number>();
+  for (const r of rows) lastTurnBySession.set(r.sessionId, Math.max(lastTurnBySession.get(r.sessionId) ?? 0, r.turn));
+  let prev: TurnRow | null = null;
+  return rows.map((r) => {
+    const sameSession = !!prev && prev.sessionId === r.sessionId;
+    const gapAfter = sameSession
+      ? String(Math.max(0, Math.round((Date.parse(r.timestamp) - Date.parse(prev!.timestamp)) / 1000)))
+      : '';
+    const rephrase = sameSession && detectRephrase(prev!, r) ? 'TRUE' : '';
+    const lastTurn = r.turn === lastTurnBySession.get(r.sessionId) ? 'TRUE' : '';
+    prev = r;
+    return { ...r, gapAfter, rephrase, lastTurn };
+  });
+}
 
 const DB_NAME = 'chum-recorder';
 const STORE = 'turns';
@@ -130,64 +151,75 @@ function tx<T>(mode: IDBTransactionMode, fn: (store: IDBObjectStore) => IDBReque
   );
 }
 
-// Build a row from a raw turn event (recompute the normalised form the same way
-// the engine does, so the log shows exactly what routing saw).
-// D6: never store or export the visitor's raw safety disclosure. A logged
-// disclosure is a child's crisis sitting in a CSV. For a safety turn we keep the
-// category, route and timestamp and REDACT the raw input at capture, so it never
-// reaches IndexedDB. Non-safety turns keep raw input (replay still works for them).
-export const REDACTED_INPUT = '[redacted: safety]';
-const isSafetyTurn = (action: string) => action === 'safety_signpost' || action === 'safety_boundary';
+const EMPTY_ROW: Omit<TurnRow, 'sessionId' | 'turn' | 'timestamp' | 'activeDog' | 'route' | 'trigger'> = {
+  gapAfter: '', input: '', outcome: '', action: '', bucket: '', responseId: '', responseText: '',
+  media: '', transferTo: '', gameActive: '', rephrase: '', protected: '', lastTurn: '',
+};
 
+// A full (non-protected) turn.
 export function buildRow(e: TurnEvent, now: string): TurnRow {
   const r = e.resolution;
   const resp = e.response;
-  const conf = (r as unknown as { confidence?: number | string }).confidence;
   const outcome = outcomeOf(r.action, r.bucket ?? '', r.faqMatchStrength);
   const text = resp.followUp ? `${resp.text}\n${resp.followUp}` : resp.text;
-  const safety = isSafetyTurn(r.action);
   return {
+    ...EMPTY_ROW,
     sessionId: e.sessionId,
     turn: e.turn,
     timestamp: now,
     activeDog: e.activeDog,
-    input: safety ? REDACTED_INPUT : e.input,
-    normalised: safety ? '' : normalise(e.input).compact,
-    layer: r.layer,
-    layerName: r.layerName,
-    bucket: r.bucket ?? '',
+    route: e.route ?? '',
+    trigger: e.trigger ?? 'reply',
+    input: e.input,
+    outcome,
     action: r.action,
-    confidence: conf === undefined || conf === null ? '' : String(conf),
+    bucket: r.bucket ?? '',
     responseId: resp.responseId,
     responseText: text,
+    media: resp.media?.src ?? '',
     transferTo: e.transferTo ?? '',
-    outcome,
-    verdict: '',
-    topIntent: r.bucket ?? r.action,
-    topScore: '',
-    runnerUp: '',
-    runnerUpScore: '',
-    matchedSignals: '',
-    gapType: gapTypeOf(outcome),
-    clusterKey: safety ? '' : clusterKeyOf(e.input),
-    candidate: safety ? '' : e.candidateSubject ?? '',
+    gameActive: e.gameActive ?? '',
   };
 }
 
+// The one row a protected session leaves: the FACT that it became protected, and at which
+// turn. No input, no response, no category -- nothing that reconstructs the disclosure.
+export function buildProtectedMarker(e: TurnEvent, now: string): TurnRow {
+  return {
+    ...EMPTY_ROW,
+    sessionId: e.sessionId,
+    turn: e.turn,
+    timestamp: now,
+    activeDog: e.activeDog,
+    route: e.route ?? '',
+    trigger: e.trigger ?? 'reply',
+    protected: 'TRUE',
+  };
+}
+
+// Sessions already recorded as protected -- module state (single dev tab; protected sessions
+// are never persisted, so they get a fresh id per load and this Set matches their lifetime).
+const protectedSessions = new Set<string>();
+
 export async function record(e: TurnEvent, now: string): Promise<void> {
+  if (e.protectedState) {
+    if (protectedSessions.has(e.sessionId)) return; // already protected: record NOTHING more
+    protectedSessions.add(e.sessionId);
+    await tx('readwrite', (s) => s.add(buildProtectedMarker(e, now))); // the became-protected fact only
+    return;
+  }
   await tx('readwrite', (s) => s.add(buildRow(e, now)));
 }
 
 export async function getAllRows(): Promise<TurnRow[]> {
   const rows = (await tx<TurnRow[]>('readonly', (s) => s.getAll())) ?? [];
-  // Recompute the outcome on read from the stored action + bucket, so a
-  // classification change (like B13 becoming a miss) applies retroactively to
-  // rows already recorded, and the badge and the export always agree.
-  // Session order (first-seen) then turn order, so a conversation reads top to
-  // bottom. sessionId is time-prefixed, so lexical sort is chronological.
-  return rows
-    .map((r) => ({ ...r, outcome: outcomeOf(r.action, r.bucket) }))
+  // Recompute outcome from action+bucket so a classification change applies retroactively
+  // (marker rows have a blank action and keep a blank outcome). Session order (first-seen,
+  // sessionId is time-prefixed so lexical == chronological) then turn order, then enrich.
+  const sorted = rows
+    .map((r) => ({ ...r, outcome: r.action ? outcomeOf(r.action, r.bucket) : '' }))
     .sort((a, b) => (a.sessionId === b.sessionId ? a.turn - b.turn : a.sessionId < b.sessionId ? -1 : 1));
+  return enrichRows(sorted);
 }
 
 export async function getAggregate(): Promise<Aggregate> {
