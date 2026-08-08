@@ -870,7 +870,8 @@ const LINEAGE: Record<string, LineageNode> = {
     children: [
       { name: "St John's Water Dog", note: "The Newfoundland fishing dog behind all the retrievers. Now extinct.", img: "/history/breeds/St-Johns-Water-Dog.jpg", value: 50 },
       { name: "Setter", note: "Setter blood for feathering and a good nose. Now in-decline.", img: "/history/breeds/british-setters.jpg", value: 30 },
-      { name: "Water spaniel and Collie", note: "A little water-spaniel and collie for coat and brains. Now extinct.", img: "/history/breeds/water-spaniel-illustration.jpg", value: 20 }
+      { name: "Water spaniels", note: "Working water spaniels that added drive and a love of wet cover. Now extinct.", img: "/history/breeds/original-water-spaniel.jpg", value: 10 },
+      { name: "Shepherd's Dog", note: "Practical medieval working dog used to move and protect sheep, forming an early root of Britain's collie families. An extinct historical type.", img: "/history/breeds/medieval-shepherds-dog.jpg", value: 10 }
     ]
   },
 
