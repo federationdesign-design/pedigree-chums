@@ -12,7 +12,7 @@ import assert from "node:assert/strict";
 
 import { createEngine } from "../../lib/hiddenGames/engine.ts";
 import { HG_EVENTS } from "../../lib/hiddenGames/measure.ts";
-import { STORAGE_KEY } from "../../lib/hiddenGames/registry.ts";
+import { STORAGE_KEY, GAME_IDS } from "../../lib/hiddenGames/registry.ts";
 import { serializeRecord } from "../../lib/hiddenGames/record.ts";
 
 const NOW = Date.parse("2026-07-29T12:00:00Z");
@@ -67,26 +67,23 @@ test("HG-MEASURE-03 an unknown id emits the unknown-id event with no raw id in t
   assert.equal(events[0].params, undefined, "the raw unknown id is never sent");
 });
 
-test("HG-MEASURE-04 completing the campaign emits the second award then the completion event", () => {
+test("HG-MEASURE-04 completing the campaign emits an award per game then the completion event", () => {
+  // Task 165: drive off GAME_IDS so completion is the LAST find, whatever the campaign size (was G01+G02).
   const { engine, events } = makeEngine();
-  engine.reportHiddenGame("G01");
-  engine.reportHiddenGame("G02"); // completes 2/2
+  for (const id of GAME_IDS) engine.reportHiddenGame(id);
   assert.deepEqual(names(events), [
-    HG_EVENTS.award, // G01
-    HG_EVENTS.award, // G02
+    ...GAME_IDS.map(() => HG_EVENTS.award),
     HG_EVENTS.completion,
   ]);
-  assert.deepEqual(events[1].params, { game_id: "G02" });
+  assert.deepEqual(events[GAME_IDS.length - 1].params, { game_id: GAME_IDS[GAME_IDS.length - 1] });
 });
 
-test("HG-MEASURE-05 a refused write emits storage_blocked once, alongside the award", () => {
+test("HG-MEASURE-05 a refused write emits storage_blocked once, alongside the awards", () => {
   const { engine, events } = makeEngine({ throwOnSet: true });
-  engine.reportHiddenGame("G01"); // write fails
-  engine.reportHiddenGame("G02"); // write fails again, completes
+  for (const id of GAME_IDS) engine.reportHiddenGame(id); // every write fails; the last find completes
   assert.deepEqual(names(events), [
     HG_EVENTS.storageBlocked, // once, on the first refusal
-    HG_EVENTS.award, // G01
-    HG_EVENTS.award, // G02
+    ...GAME_IDS.map(() => HG_EVENTS.award),
     HG_EVENTS.completion,
   ]);
   assert.equal(

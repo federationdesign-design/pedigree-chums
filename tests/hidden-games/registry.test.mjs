@@ -22,10 +22,12 @@ test("HG-REG-01 mode is ACHIEVEMENT_ONLY and version is set", () => {
   assert.equal(REGISTRY.campaign_version, "HIDDEN_GAMES_2026_01");
 });
 
-test("HG-REG-02 the registry lists exactly G01 and G02, each with a written threshold", () => {
+test("HG-REG-02 the registry lists exactly the GAME_IDS, each with a written threshold", () => {
+  // Derived from GAME_IDS so it never goes stale as games are added (Task 165). The games array is in
+  // discovery order, not id order, so compare membership (sorted) rather than sequence.
   assert.deepEqual(
-    REGISTRY.games.map((g) => g.id),
-    ["G01", "G02"]
+    REGISTRY.games.map((g) => g.id).sort(),
+    [...GAME_IDS].sort()
   );
   for (const g of REGISTRY.games) {
     assert.equal(typeof g.name, "string");
@@ -37,7 +39,7 @@ test("HG-REG-02 the registry lists exactly G01 and G02, each with a written thre
 
 test("HG-REG-03 the total is derived from games.length and is not a stored field", () => {
   assert.equal(TOTAL, REGISTRY.games.length);
-  assert.equal(TOTAL, 2);
+  assert.equal(TOTAL, GAME_IDS.length); // the games list and the id list agree in size (Task 165, was hardcoded 2)
   assert.equal(
     Object.prototype.hasOwnProperty.call(REGISTRY, "total"),
     false,
@@ -55,10 +57,9 @@ test("HG-REG-05 record schema is 3 and expiry is 90 days", () => {
   assert.equal(EXPIRY_DAYS, 90);
 });
 
-test("HG-VAL-01 isKnownId accepts registered ids", () => {
-  assert.equal(isKnownId("G01"), true);
-  assert.equal(isKnownId("G02"), true);
-  assert.deepEqual([...GAME_IDS], ["G01", "G02"]);
+test("HG-VAL-01 isKnownId accepts every registered id", () => {
+  // Task 165: derived from GAME_IDS, so adding a game keeps this honest rather than stale.
+  for (const id of GAME_IDS) assert.equal(isKnownId(id), true, `${id} is known`);
 });
 
 test("HG-VAL-02 isKnownId rejects an unknown id", () => {

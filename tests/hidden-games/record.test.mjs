@@ -15,7 +15,7 @@ import {
   serializeRecord,
   counterLabel,
 } from "../../lib/hiddenGames/record.ts";
-import { EXPIRY_MS } from "../../lib/hiddenGames/registry.ts";
+import { EXPIRY_MS, TOTAL } from "../../lib/hiddenGames/registry.ts";
 
 const NOW = Date.parse("2026-07-28T12:00:00Z");
 const DAY = 24 * 60 * 60 * 1000;
@@ -38,7 +38,7 @@ test("HG-REC-01 freshRecord is a zero schema-3 record for the active version", (
   assert.equal(r.campaign_version, "HIDDEN_GAMES_2026_01");
   assert.equal(r.count, 0);
   assert.deepEqual(r.completed_game_ids, []);
-  assert.equal(r.total_at_last_seen, 2);
+  assert.equal(r.total_at_last_seen, TOTAL); // freshRecord stamps the live registry total (Task 165, was 2)
   assert.equal(r.updated_at, new Date(NOW).toISOString());
 });
 

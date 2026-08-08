@@ -10,6 +10,7 @@ import assert from "node:assert/strict";
 
 import { createEngine } from "../../lib/hiddenGames/engine.ts";
 import { discoveryToast } from "../../lib/hiddenGames/copy.ts";
+import { TOTAL, GAME_IDS } from "../../lib/hiddenGames/registry.ts";
 
 const NOW = Date.parse("2026-07-29T12:00:00Z");
 
@@ -29,15 +30,15 @@ function makeEngine() {
 
 test("HG-TOAST-01 a non-final award fires a discovery with the registry-derived remaining", () => {
   const { engine, discoveries } = makeEngine();
-  engine.reportHiddenGame("G01"); // count 1 of total 2 -> remaining 1
-  assert.deepEqual(discoveries, [1]);
+  engine.reportHiddenGame(GAME_IDS[0]); // 1 of TOTAL found -> remaining TOTAL - 1 (Task 165, was 1)
+  assert.deepEqual(discoveries, [TOTAL - 1]);
 });
 
 test("HG-TOAST-02 a duplicate fires no discovery", () => {
   const { engine, discoveries } = makeEngine();
-  engine.reportHiddenGame("G01");
-  engine.reportHiddenGame("G01"); // duplicate
-  assert.deepEqual(discoveries, [1]);
+  engine.reportHiddenGame(GAME_IDS[0]);
+  engine.reportHiddenGame(GAME_IDS[0]); // duplicate
+  assert.deepEqual(discoveries, [TOTAL - 1]);
 });
 
 test("HG-TOAST-03 an unknown id fires no discovery", () => {
@@ -47,10 +48,11 @@ test("HG-TOAST-03 an unknown id fires no discovery", () => {
 });
 
 test("HG-TOAST-04 the final find fires no discovery (the completion card shows instead)", () => {
+  // Task 165: driven off GAME_IDS. Each of the first TOTAL-1 finds fires a countdown discovery
+  // (TOTAL-1, TOTAL-2, ... 1); the last find fires none.
   const { engine, discoveries } = makeEngine();
-  engine.reportHiddenGame("G01"); // non-final -> remaining 1
-  engine.reportHiddenGame("G02"); // final (2/2) -> no discovery
-  assert.deepEqual(discoveries, [1]);
+  for (const id of GAME_IDS) engine.reportHiddenGame(id);
+  assert.deepEqual(discoveries, Array.from({ length: TOTAL - 1 }, (_, i) => TOTAL - 1 - i));
 });
 
 test("HG-TOAST-05 the copy is verbatim and carries the derived remaining, with no hardcoded number", () => {

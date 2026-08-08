@@ -10,7 +10,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 
 import { createEngine } from "../../lib/hiddenGames/engine.ts";
-import { STORAGE_KEY } from "../../lib/hiddenGames/registry.ts";
+import { STORAGE_KEY, TOTAL } from "../../lib/hiddenGames/registry.ts";
 import { serializeRecord } from "../../lib/hiddenGames/record.ts";
 
 const NOW = Date.parse("2026-07-28T12:00:00Z");
@@ -59,20 +59,20 @@ function seededRecord(overrides = {}) {
   });
 }
 
-test("HG-ENG-01 a fresh visitor restores to 0/2", () => {
+test("HG-ENG-01 a fresh visitor restores to 0 of the live total", () => {
   const store = makeStore();
   const { engine } = makeEngine(store);
   const s = engine.getState();
   assert.equal(s.count, 0);
-  assert.equal(s.total, 2);
-  assert.equal(s.label, "0/2 games found");
+  assert.equal(s.total, TOTAL); // Task 165: the live registry total (was hardcoded 2)
+  assert.equal(s.label, `0/${TOTAL} games found`);
 });
 
 test("HG-RESTORE-02 an existing valid record is reflected before any report or render", () => {
   const store = makeStore({ [STORAGE_KEY]: seededRecord() });
   const { engine } = makeEngine(store);
   assert.equal(engine.getState().count, 1);
-  assert.equal(engine.getState().label, "1/2 games found");
+  assert.equal(engine.getState().label, `1/${TOTAL} games found`); // count from the seeded record, total live (Task 165)
   assert.deepEqual(store.setKeys, [], "restore must not write to storage");
 });
 

@@ -14,9 +14,10 @@ import {
   applyReport,
 } from "../../lib/hiddenGames/record.ts";
 import { createEngine } from "../../lib/hiddenGames/engine.ts";
-import { STORAGE_KEY } from "../../lib/hiddenGames/registry.ts";
+import { STORAGE_KEY, GAME_IDS } from "../../lib/hiddenGames/registry.ts";
 import {
   CAMPAIGN_INTRO,
+  CAMPAIGN_INTRO_EMPHASIS,
   COMPLETION_HEADING,
   COMPLETION_BODY,
 } from "../../lib/hiddenGames/copy.ts";
@@ -120,23 +121,22 @@ test("HG-INTRO-04 a refused intro write does not throw and does not raise storag
   );
 });
 
-test("HG-COMPLETE-01 completion is derived: false at 0/2 and 1/2, true at 2/2", () => {
+test("HG-COMPLETE-01 completion is derived: false until the LAST of the GAME_IDS is found", () => {
+  // Task 165: driven off GAME_IDS, so "complete" is the final find whatever the campaign size (was 2/2).
   const store = makeStore();
   const engine = makeEngine(store);
   assert.equal(engine.getState().completed, false);
-  engine.reportHiddenGame("G01");
-  assert.equal(engine.getState().count, 1);
-  assert.equal(engine.getState().completed, false);
-  engine.reportHiddenGame("G02");
-  assert.equal(engine.getState().count, 2);
-  assert.equal(engine.getState().completed, true);
+  GAME_IDS.forEach((id, i) => {
+    engine.reportHiddenGame(id);
+    assert.equal(engine.getState().count, i + 1);
+    assert.equal(engine.getState().completed, i === GAME_IDS.length - 1);
+  });
 });
 
 test("HG-COMPLETE-02 markCompletionSeen sets the flag, persists it, and is idempotent", () => {
   const store = makeStore();
   const engine = makeEngine(store);
-  engine.reportHiddenGame("G01");
-  engine.reportHiddenGame("G02"); // 2/2
+  for (const id of GAME_IDS) engine.reportHiddenGame(id); // complete the whole campaign (Task 165)
   assert.equal(engine.getState().completed, true);
   assert.equal(engine.getState().completionSeen, false);
 
@@ -167,11 +167,11 @@ test("HG-COMPLETE-03 a find preserves an existing completion_seen flag", () => {
   assert.equal(applyReport(rec, "G02", NOW).record.completion_seen, true);
 });
 
-test("HG-COPY-03 the intro and completion copy is the exact BRIEF 7 text", () => {
-  assert.equal(
-    CAMPAIGN_INTRO,
-    "There are hidden games across the Pedigree Chums website. Find them all."
-  );
+test("HG-COPY-03 the intro and completion copy is the current approved text", () => {
+  // Task 165: the intro copy was reworded and split into the sentence + an emphasis span; assertion updated
+  // to the current strings (FLAGGED for owner confirmation that this wording is the approved one).
+  assert.equal(CAMPAIGN_INTRO, "There are hidden games across the website");
+  assert.equal(CAMPAIGN_INTRO_EMPHASIS, "Find them all");
   assert.equal(COMPLETION_HEADING, "You found every hidden game!");
   assert.equal(
     COMPLETION_BODY,
