@@ -192,8 +192,22 @@ export function radius(share: number) {
    difficulty 5, because at that size the stroke is what reads as heavy. That
    taper is not applied here: it would mean threading the difficulty through as
    a prop for a change of at most 10%, only at the top of the slider. If it ever
-   matters, that is the one thing to add. */
-export const RING_FRAC = [0.09, 0.19, 0.13, 0.1, 0.085];
+   matters, that is the one thing to add.
+
+   HIERARCHY RULE, Steve's decision. A ring may never be thicker than the ring
+   of the circle it sits inside, so this table must only ever descend. It used
+   to jump 0.09 -> 0.19 at depth 2: that 0.19 existed so a nested circle did not
+   read thin beside the yellow percentage chip next to it, which wears about
+   0.19 of its own radius. The hierarchy rule wins over that chip-matching, so
+   depth 2 and below are now thinner than depth 1 and thinner than each other. A
+   nested circle now reads lighter than the chip beside it, which is the
+   accepted cost. The fallback stays 0.145 on purpose: ringFrac(0) returns it,
+   and that IS the root circle's own ring in BreedTree (depth 0, the biggest
+   circle, heaviest line), which this change must not touch. So do not read the
+   fallback as a table entry. It is the CLAMP in strokeWidthFor and in the draw
+   below, not the table, that guarantees no ring is ever thicker than its
+   parent's at any depth, whatever the table or the fallback say. */
+export const RING_FRAC = [0.09, 0.082, 0.075, 0.07, 0.065];
 export function ringFrac(pitDepth: number): number {
   return RING_FRAC[pitDepth - 1] ?? 0.145;
 }
@@ -399,6 +413,21 @@ export default function LineageMap({
   // Every node radius in this component goes through here, so the mini pit's
   // smaller nodes cannot get out of step between layout and drawing.
   const nodeR = (share: number) => radius(share) * (circular ? PIT_NODE_SCALE : 1);
+  // The ring a node draws, HARD-CLAMPED so it is never thicker than the ring of
+  // the circle it sits inside (the hierarchy rule). Recursive: each node caps to
+  // its parent's already-clamped ring, so the cap holds all the way up the tree.
+  // On this layer a child can be physically bigger than its parent, because a
+  // radius is a share of leaves and not a nesting, so unlike the pit this
+  // genuinely bites. The root's own ring is liftRingW, the real width of the big
+  // card, so the rule is absolute at the root too rather than assumed away.
+  const clampedRingW = (n: Node): number => {
+    const p = n._parent;
+    if (!p) return liftRingW;
+    let pd = 1;
+    for (let a: Node | null = p; a; a = a._parent) pd += 1;
+    const raw = nodeR(Math.round((n._leaves / p._leaves) * 100)) * ringFrac(pd);
+    return Math.min(raw, clampedRingW(p));
+  };
   const [infoHover, setInfoHover] = useState<string | null>(null);
   const [pctHover, setPctHover] = useState<string | null>(null); // which card's % explainer box is open
   const pctTimer = useRef<number | null>(null); // closes the % box a beat after the cursor leaves /* pct-close */
@@ -1766,12 +1795,11 @@ export default function LineageMap({
                          Only set in the pit lift: the main pit and the chum
                          tree keep the flat CSS numbers they were signed off on,
                          because neither was asked for. */
-                      let pd = 1; // this layer's root IS the pit's depth 1
-                      for (let a = n._parent as Node | null; a; a = a._parent as Node | null) pd += 1;
                       const fill = (n.img && (placedImgs.has(n.img as string) || packed)) ? "#22c55e" : seen.has(n._id) ? "#0c5b92" : undefined;
                       const st: React.CSSProperties = {
                         ...(fill ? { fill } : null),
-                        ...(circular ? { ["--ring" as string]: `${(r * ringFrac(pd)).toFixed(2)}px` } : null),
+                        // clamped so a nested ring can never out-thicken its parent
+                        ...(circular ? { ["--ring" as string]: `${clampedRingW(n).toFixed(2)}px` } : null),
                       };
                       return <circle className={`${styles.disc} ${circular ? styles.discPit : ""} ${hasKids && !isOpen ? styles.has : ""} ${idleHint && !seen.has(n._id) && (n._parent as Node)?._id === "0" ? styles.hint : ""}`.trim()} r={r} style={Object.keys(st).length ? st : undefined} />;
                     })()}

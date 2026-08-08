@@ -2705,31 +2705,16 @@ export default function BreedTree({
     // picture. Tied to d.r it follows both, exactly as the badges do.
     // Fractions keep the old 5 / 4 / 3 / 2.6 / 2.4 relationship between depths.
     const frac = [0.09, 0.072, 0.054, 0.047, 0.043];
-    // The mini pit runs its own table, because a nested circle there sits
-    // right beside a yellow % chip at almost the same size and the chip now
-    // wears 0.19 of its radius. Measured off the Celtic Heeler level: the
-    // depth-1 ring is 19px on a radius of 223, a chip is 22px on a radius of
-    // 108, and a depth-2 circle was only 8px on a radius of 117. So the two
-    // objects a player reads as a pair were nearly three times apart. Depth 1
-    // is deliberately unchanged: it is so much bigger that 0.09 already draws
-    // about the same number of pixels as a chip. Deeper rings still taper, so
-    // a ring never swallows a small picture, but far more gently than before.
-    // TAPERED, 30 July. Was [0.09, 0.19, 0.17, 0.155, 0.145], which barely
-    // tapered at all: from depth 1 to depth 2 the fraction fell 2 points where
-    // the chum page's table falls a quarter. A ring is a fraction of its own
-    // radius, so a nearly flat table means a small circle wears a ring that is
-    // absolutely thinner but PROPORTIONALLY just as heavy, and a screenshot of
-    // one dropped on top of another showed the two the same width.
-    //
-    // Depth 1 is left at 0.19 deliberately. That figure exists so a nested
-    // circle does not read thin beside a percentage chip of similar size, which
-    // wears 0.19 of its own radius, and depth 1 is where the two sit as a pair.
-    // Below that the pair no longer applies and the taper is free to be real.
-    // MOVED. This table now lives in LineageMap as RING_FRAC and is read through
+    // The mini pit's own table lives in LineageMap as RING_FRAC, read through
     // ringFrac, so the pit and the layer a dog is lifted onto cannot disagree.
-    // The numbers are unchanged and the reasoning above still stands. It went
-    // there rather than the other way because BreedTree already imports from
-    // that file and the reverse would be a circular import.
+    // It once put 0.19 at depth 2 so a nested circle did not read thin beside
+    // the yellow % chip, which wears about 0.19 of its own radius. That is over:
+    // the HIERARCHY RULE (a ring may never be thicker than its parent's) now
+    // wins, so RING_FRAC descends from depth 1 and the clamp below enforces it
+    // whatever the table says. Depth 1 stays 0.09; a nested circle now reads
+    // lighter than the chip beside it, the accepted cost. ringFrac(0) is not a
+    // table entry, it returns the 0.145 fallback and that is the ROOT circle's
+    // own ring here, deliberately untouched. See RING_FRAC for the full note.
     let base = (dockAside ? ringFrac(d.depth) : frac[d.depth - 1] ?? 0.043);
     // The ring still grows and shrinks with the circle, which is the part that
     // works. This only shaves the top of the slider, where the circles are so
@@ -2739,7 +2724,15 @@ export default function BreedTree({
     // small, simple lineage reads boldly.
     // The chum page is a quarter of the weight; the mini pit table above is
     // already absolute, so it is used as it stands.
-    return d.r * (dockAside ? base : base / 4);
+    const width = d.r * (dockAside ? base : base / 4);
+    // HIERARCHY CLAMP: a ring is never thicker than the ring of the circle it
+    // sits inside. Recursive, so the cap holds all the way up the tree, reading
+    // the parent's own already-clamped width. The root (d.parent null) has
+    // nothing outside it and keeps its own width. A guard, not a reshaper: here
+    // the pack nests every child inside its parent, so a child radius is always
+    // smaller and with the descending table the clamp never bites in the pit; it
+    // exists so no future table edit can put a child ring above its parent's.
+    return d.parent ? Math.min(width, strokeWidthFor(d.parent)) : width;
   }
 
   // A zoom multiplies every world unit by k, rings included, so flying into a
