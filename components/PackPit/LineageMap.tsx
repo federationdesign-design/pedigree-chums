@@ -284,15 +284,17 @@ export default function LineageMap({
      390px phone at the default difficulty and overflowed it at 116% by the top
      of the slider.
 
-     Now a share of the viewport instead. 31%, owner's figure, measured as the
-     DIAMETER including the ring, which is how the audit reported it. So a 390px
-     phone caps at 55px radius and a 1440px desktop at 218px, and both read the
-     same size to the eye.
+     Now a share of the viewport instead. 0.31 was the owner's figure, measured
+     as the DIAMETER including the ring, and it reads right on desktop (446px at
+     1440). But one number cannot serve a phone: at 0.31 a 390px screen gave a
+     121px card, too small for the Learn button to sit on. So the share now
+     RAMPS with viewport width, 0.45 at 390 easing to 0.31 by 1440 and holding
+     0.31 above. Desktop is unchanged (still 446); the phone card grows to 176.
+     A smooth interpolation, not a breakpoint.
 
-     The 40px floor is kept and is still dead: it did not fire once in those
-     1326 cases. It stays as a guard against a very narrow viewport, where 31%
-     of 320px would otherwise give 44px and keep falling. */
-  const LIFT_MAX_SHARE = 0.31;
+     The 40px floor is kept and is still dead: it did not fire once in the audit
+     of 1326 lifts. It stays as a guard against a very narrow viewport. */
+  const LIFT_MAX_SHARE = 0.31 + 0.14 * (1 - Math.min(1, Math.max(0, (vp.w - 390) / 1050)));
   /* The ring is a share of the radius now, so it cannot be subtracted before the
      radius is known. Solved the other way instead: the object is 2R wide plus
      one ring, and the ring is R * frac, so the whole thing is R * (2 + frac).
@@ -302,6 +304,12 @@ export default function LineageMap({
     ? Math.max(40, Math.min(rootRadius, (vp.w * LIFT_MAX_SHARE) / (2 + liftRingFrac)))
     : ROOT;
   const liftRingW = circular && ringColor ? liftR * liftRingFrac : 5;
+  // The Learn/Complete button is a fixed 200x68. On a small card that swamps
+  // the picture, so it scales WITH the card: width 0.9 * R, capped at 200 so
+  // big cards are unchanged, and NO minimum, a small button on a small card
+  // being correct. Applied as one scale() on the button group; the rim offset
+  // scales with it so the button keeps the same overlap on the rim at any size.
+  const learnBtnScale = circular ? Math.min(1, (0.9 * liftR) / 200) : 1;
   const [rootGone, setRootGone] = useState(false);
   const confettiRef = useRef<((opts: Record<string, unknown>) => void) | null>(null);
   useEffect(() => {
@@ -1505,7 +1513,7 @@ export default function LineageMap({
           return (
           <g
             className={styles.removeBtn}
-            transform={`translate(0,${circular ? 4 : 62})`}
+            transform={`translate(0,${circular ? 4 * learnBtnScale : 62}) scale(${circular ? learnBtnScale : 1})`}
             onClick={(e) => { e.stopPropagation(); revealStep(); }}
             onPointerDown={(e) => e.stopPropagation()}
             role="button"
@@ -1549,7 +1557,7 @@ export default function LineageMap({
         {circular && framesDone && !rootGone && !scattered ? (
           <g
             className={styles.removeBtn}
-            transform={`translate(0,4)`}
+            transform={`translate(0,${4 * learnBtnScale}) scale(${learnBtnScale})`}
             onClick={(e) => { e.stopPropagation(); circularComplete(); }}
             role="button"
             aria-label="Complete"
