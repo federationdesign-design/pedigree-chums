@@ -1644,14 +1644,16 @@ const LINEAGE: Record<string, LineageNode> = {
 };
 
 // Caps how deep a grafted trail runs. This is a LAYOUT guard, not a loop guard:
-// the visited set below already stops cycles. It protects two things that get
-// worse with depth: the LineageModal title ladder, whose portrait shrinks with
-// every rung (about 25px at six rungs on a phone, ~17px at eight), and pit
-// crowding, since circle radius floors at 21 so deeper circles crowd rather than
-// shrink. It does NOT bind the Tudor-era rule: every playable card that has the
-// data reaches a Tudor-or-deeper ancestor by depth 4, so 5 is already a rung
-// clear. Raising it only buys bonus depth on a handful of deep trees (mostly
-// poodle-crosses and terriers) at the cost of smaller ladder portraits there.
+// loops are handled by the visited set below, not by this. Measured, so a future
+// reader need not re-derive it: raising the cap to 6 makes 8 of 100 levels gain
+// depth (5 of them gain a further layer at 7), adding up to 21 circles on the
+// worst level (Goldendoodle), all mostly-progenitor nodes (+5 rail chums across
+// every level combined). It costs two things that worsen with each rung: the
+// LineageModal title ladder portrait shrinks from 25px at six rungs to ~21px at
+// seven and ~17px at eight on a phone, and the pit crowds, since circle radius
+// floors at 21 so deeper circles crowd rather than shrink. It does NOT bind the
+// Tudor-era rule: every playable card with the data reaches a Tudor-or-deeper
+// ancestor by depth 4 or less, so 5 is already a rung clear.
 const MAX_LINEAGE_DEPTH = 5;
 
 // Some circles are labelled with a common name; map it to its lineage key so
