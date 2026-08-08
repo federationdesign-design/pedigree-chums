@@ -3911,8 +3911,16 @@ export default function BreedTree({
           toyTimers.push(window.setTimeout(() => spawnToy("ball"), TOY_BALL_DELAY));
           toyTimers.push(window.setTimeout(() => spawnToy("ballPink"), TOY_BALL_DELAY + BALL_PINK_GAP));
         }
-        toyTimers.push(window.setTimeout(() => spawnToy("flag"), TOY_BALL_DELAY + TOY_FLAG_GAP));
-        const propsAt = TOY_BALL_DELAY + TOY_FLAG_GAP + TOY_PROP_GAP;
+        // With the balls hidden, everything after cookies is pulled earlier to
+        // close the ~3s the two balls left, and the bone moves to AFTER the flood
+        // (see below). Cookies is untouched at 2.0s. The rock keeps its 0.5s gap
+        // after the sticks (TOY_ROCK_GAP) in both cases; the flag and stick times
+        // are what differ.
+        const NOBALLS_FLAG_AT = 3000;    // flag lands at 3.0s, in the balls' old slot
+        const NOBALLS_STICKS_AT = 4300;  // the two sticks at 4.3s
+        const flagAt = hideBalls ? NOBALLS_FLAG_AT : TOY_BALL_DELAY + TOY_FLAG_GAP;
+        toyTimers.push(window.setTimeout(() => spawnToy("flag"), flagAt));
+        const propsAt = hideBalls ? NOBALLS_STICKS_AT : flagAt + TOY_PROP_GAP;
         /* THE PROPS SLOT, from the level's theme. An era with no set of its own
            gets the stick, big stick and rock, which is what every era had.
            The first two arrive together and the rest follow at the rock's gap,
@@ -3938,8 +3946,17 @@ export default function BreedTree({
            longer and the prop waits longer to suit, which a fixed delay could
            never do. If the images are not counted yet, it falls back to the
            front of the flood rather than landing at some invented time. */
-        const boneAt = propsAt + TOY_ROCK_GAP + TOY_BONE_GAP;
-        const chumsAt = boneAt + CHUM_GAP;
+        // The rock's beat: the reference for both the flood and the bone.
+        const rockAt = propsAt + TOY_ROCK_GAP;
+        // The flood is derived from the ROCK, not the bone, because the bone is no
+        // longer always before it. With balls this still lands at 9.0s (rock 7.5 +
+        // bone 0.9 + chum 0.6). With balls hidden the flood arrives on the SAME
+        // beat as the rock, deliberately.
+        const chumsAt = hideBalls ? rockAt : rockAt + TOY_BONE_GAP + CHUM_GAP;
+        // Bone: before the flood with balls, at its old 8.4s. With balls hidden it
+        // moves to 1.5s AFTER the flood, at 6.3s.
+        const NOBALLS_BONE_AFTER_FLOOD = 1500;
+        const boneAt = hideBalls ? chumsAt + NOBALLS_BONE_AFTER_FLOOD : rockAt + TOY_BONE_GAP;
         const floodMid = chumsAt + ((chumImagesRef.current?.length ?? 0) * CHUM_STAGGER) / 2;
         props.forEach((kind: ToyKind, i: number) => {
           const at =
