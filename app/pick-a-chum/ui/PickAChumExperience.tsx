@@ -277,6 +277,13 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
   // ends the game. `armedRed` is the red pill whose "we dont use this" tooltip is currently open.
   const [feedFed, setFeedFed] = useState<string[] | null>(null);
   const [armedRed, setArmedRed] = useState<string | null>(null);
+  // Task 168: the receded dogs (the three non-active) sit stacked beside the medallion while a chat is
+  // open, each an arrow to switch to it. `activeReceded` is the one being pointed at: on a hover-capable
+  // device it is set on hover (and a click switches straight away); on touch the FIRST tap sets it (grey
+  // the active dog, keep this one's arrow) and a SECOND tap on the same dog commits -- mirrors the red
+  // cookie pills. `canHover` decides which. Null when nothing is pointed at.
+  const [activeReceded, setActiveReceded] = useState<Dog | null>(null);
+  const [canHover, setCanHover] = useState(true);
   // Task 164: the Boxer's DO NOT PRESS THAT BUTTON panel. `boxer` mirrors the game state into React (like
   // feedFed): null hides the panel (and, going null, resets every effect), an object shows the panel with
   // the currently-live effect class or null. On a RESTORE after refresh/navigation it starts with no effect
@@ -862,6 +869,35 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
     window.setTimeout(() => inputRef.current?.focus(), 60);
   }, [clearTimers]);
 
+  // Task 168: hover-capable (desktop) vs touch. Decides one-click-switch vs first-tap-reveals / second-
+  // tap-commits, and whether hover drives the pointed-at state. Read once on mount (SSR-safe).
+  useEffect(() => {
+    setCanHover(typeof window !== 'undefined' && !!window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches);
+  }, []);
+  // The three non-active dogs, in the fixed selector order (so the stack is stable across switches).
+  const recededDogs = useMemo(() => SELECT_ORDER.filter((d) => d !== dog), [dog]);
+  // Switch to a receded dog (a fresh conversation, selectDog). Desktop: one click. Touch: the first tap
+  // arms the state (grey the active dog, keep this one's arrow, fade the others), the second tap on the
+  // SAME dog commits. A tap elsewhere disarms (the effect below).
+  const pressReceded = useCallback((d: Dog) => {
+    if (canHover) { selectDog(d); return; }
+    if (activeReceded !== d) { setActiveReceded(d); return; }
+    setActiveReceded(null);
+    selectDog(d);
+  }, [canHover, activeReceded, selectDog]);
+  // Touch only: a pointerdown that is not on a receded dog disarms the revealed state (like the cookie tip).
+  useEffect(() => {
+    if (activeReceded === null || canHover) return;
+    const dismiss = (e: PointerEvent) => {
+      const t = e.target as HTMLElement | null;
+      if (!t?.closest?.('[data-receded]')) setActiveReceded(null);
+    };
+    document.addEventListener('pointerdown', dismiss, true);
+    return () => document.removeEventListener('pointerdown', dismiss, true);
+  }, [activeReceded, canHover]);
+  // A switch (dog change) clears the pointed-at state so the new stack starts at rest.
+  useEffect(() => { setActiveReceded(null); }, [dog]);
+
   const send = useCallback((textArg?: string) => {
     const session = sessionRef.current;
     const text = (textArg ?? input).trim();
@@ -1211,6 +1247,34 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
     </div>
   ) : null;
 
+  // Task 168: the three receded dogs, stacked beside the medallion. Rendered INSIDE the active-dog anchor
+  // (both the desktop selector medallion and the mobile composer medallion) so they track it wherever it
+  // sits. Each is a real <button> that switches to that dog (a fresh conversation); the green arrow points
+  // at the active dog. `recededOn` is the pointed-at dog (keeps colour + a bright arrow); `recededOff` is
+  // the rest while one is pointed at (their arrows fade). Close X and minimise sit above these (z-index).
+  const recededEl = (
+    <div className={styles.recededGroup}>
+      {recededDogs.map((d, i) => (
+        <button
+          key={d}
+          type="button"
+          data-receded={d}
+          className={`${styles.recededDog} ${styles[`receded${i}`]} ${activeReceded === d ? styles.recededOn : ''} ${activeReceded && activeReceded !== d ? styles.recededOff : ''}`}
+          style={{ backgroundImage: `url("${PROFILE_IMG[d]}")` }}
+          aria-label={`Switch to the ${dogInfo(d).name}`}
+          title={`Switch to the ${dogInfo(d).name}`}
+          onClick={() => pressReceded(d)}
+          onMouseEnter={canHover ? () => setActiveReceded(d) : undefined}
+          onMouseLeave={canHover ? () => setActiveReceded(null) : undefined}
+        >
+          <span className={styles.recededArrow} aria-hidden="true">
+            <svg viewBox="0 0 24 24" focusable="false"><path d="M4 12h11l-4-4 1.5-1.5L20 12l-6.5 6.5L12 17l4-4H4z" fill="currentColor" /></svg>
+          </span>
+        </button>
+      ))}
+    </div>
+  );
+
   // Task 129: the thread and composer render in two homes -- the >480px
   // column-under-the-dog plus fixed visitor bar, or the pre-129 stacked panel
   // at mobile widths -- so both are built once here. Only one home mounts at
@@ -1409,6 +1473,7 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
                       : { left: `${round1(p.left + dragOffset.dx)}px`, top: `${round1(p.top + dragOffset.dy)}px` }}
                     role="img"
                     aria-label={dead ? 'the Collie plays dead' : roll ? 'the Collie rolls over' : dogInfo(dog).name}
+                    data-recede={activeReceded ? '1' : undefined}
                   >
                     {/* Task 78 fix: the tricks apply to the dog image layer ONLY, so the red X and the
                         ring do not go black or rotate with her. */}
@@ -1418,6 +1483,8 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
                       onPointerDown={startPortrait}
                       onAnimationEnd={() => setRoll(false)}
                     />
+                    {/* Task 168: the receded dogs, stacked beside this medallion. */}
+                    {recededEl}
                     <button type="button" className={styles.close} aria-label="Close Pick a Chum" onClick={closeChat}>
                       <img src="/red-icon.svg" alt="" aria-hidden="true" />
                     </button>
@@ -1554,6 +1621,7 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
               className={`${styles.dogAnchor} ${anchorSwap}`}
               role="img"
               aria-label={dead ? 'the Collie plays dead' : roll ? 'the Collie rolls over' : dogInfo(dog).name}
+              data-recede={activeReceded ? '1' : undefined}
             >
               {/* Task 78 fix: the tricks apply to the dog image layer ONLY, so the red X and the ring
                   do not go black or rotate with her. */}
@@ -1564,6 +1632,8 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
                 onPointerDown={startPortrait}
                 onAnimationEnd={() => setRoll(false)}
               />
+              {/* Task 168: the receded dogs, stacked beside this medallion (mobile). */}
+              {recededEl}
               <button type="button" className={styles.close} aria-label="Close Pick a Chum" onClick={closeChat}>
                 <img src="/red-icon.svg" alt="" aria-hidden="true" />
               </button>

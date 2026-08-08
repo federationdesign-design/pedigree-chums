@@ -1603,3 +1603,100 @@
     transform: none;
   }
 }
+
+/* Task 168: the receded dogs -- the three non-active dogs stacked beside the medallion while a chat is
+   open, each carrying an arrow to switch to it. Rendered INSIDE the active-dog anchor, so they track it
+   wherever it sits (fan, docked, dragged, mobile bottom bar). Sizes and offsets are % of the anchor, so
+   one rule fits the 128px desktop medallion and the 96px mobile one. */
+.recededGroup {
+  position: absolute;
+  inset: 0;
+  z-index: 4; /* above the dog image, below the close X / minimise (z-index 6), which stay reachable */
+  pointer-events: none; /* the buttons opt back in; the transparent gaps do not swallow page/chat clicks */
+}
+.recededDog {
+  position: absolute;
+  width: 50%;
+  height: 50%;
+  padding: 0;
+  border: 3px solid #ffffff;
+  border-radius: 50%;
+  background-size: cover;
+  background-position: center;
+  background-color: var(--pc-ui-blue);
+  box-shadow: var(--pc-shadow);
+  cursor: pointer;
+  pointer-events: auto;
+  transition: transform 160ms ease;
+}
+.recededDog:hover,
+.recededDog:focus-visible {
+  transform: scale(1.06);
+}
+.recededDog:focus-visible {
+  outline: 3px solid var(--pc-ui-yellow);
+  outline-offset: 2px;
+}
+/* The staggered arc, up and to the LEFT of the medallion (matches the RESTING screenshot). */
+.receded0 { left: -70%; top: 0%; }
+.receded1 { left: -70%; top: 48%; }
+.receded2 { left: -48%; top: 92%; }
+/* The green arrow, on the dog's right, pointing at the active medallion. */
+.recededArrow {
+  position: absolute;
+  right: -22%;
+  top: 26%;
+  width: 46%;
+  height: 46%;
+  color: #2fbf3f;
+  transform: rotate(var(--arrow-rot, -18deg));
+  transition: opacity 160ms ease, transform 160ms ease, color 160ms ease;
+}
+.recededArrow svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+/* HOVER (desktop) / FIRST TAP (mobile): the active medallion desaturates to grey; the pointed-at dog keeps
+   its colour and a bigger, brighter arrow; the other dogs' arrows fade. "this one, not those." */
+.dogAnchor[data-recede] .dogFace {
+  filter: grayscale(1) brightness(0.92);
+}
+.recededOn .recededArrow {
+  color: #1fc63a;
+  transform: rotate(var(--arrow-rot, -18deg)) scale(1.35);
+}
+.recededOff .recededArrow {
+  opacity: 0;
+}
+/* Mobile: the medallion is pinned top-left (the panel is column-reverse), so there is no room up-and-left.
+   The three receded dogs sit in a compact ROW just BELOW it, arrows pointing up at the active dog. Same
+   states (grey / keep / fade), same interaction (first tap reveals, second commits). */
+@media (max-width: 480px) {
+  .recededGroup {
+    --arrow-rot: -90deg;
+  }
+  .receded0 { left: 4%; top: 112%; }
+  .receded1 { left: 56%; top: 112%; }
+  .receded2 { left: 108%; top: 112%; }
+  .recededArrow {
+    right: auto;
+    left: 27%;
+    top: -34%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  /* The state still changes (grey, arrow, fade); nothing animates. */
+  .recededDog,
+  .recededArrow,
+  .dogAnchor[data-recede] .dogFace {
+    transition: none;
+  }
+  .recededDog:hover,
+  .recededDog:focus-visible {
+    transform: none;
+  }
+  .recededOn .recededArrow {
+    transform: rotate(var(--arrow-rot, -18deg));
+  }
+}
