@@ -747,6 +747,16 @@
   height: 128px;
   z-index: 3;
 }
+/* Task 162 (reopen-from-chip): a DOCKED (corner-anchored) chat. .selector normally carries transform: scale(); any
+   transform makes it the containing block for a fixed descendant, so we drop it here (a no-op at scale 1,
+   and the active anchor is .selector's only child when expanded). The anchor then goes position: fixed and
+   lands at the viewport corner (its inline left/top = 18px + drag), exactly where the 128px chip sat. */
+.selector.selectorDocked {
+  transform: none;
+}
+.dogAnchor.anchorDocked {
+  position: fixed;
+}
 
 /* The conversation column beneath the chosen dog. Position is set inline from
    the anchor's measured rect. pointer-events: none keeps the page beneath

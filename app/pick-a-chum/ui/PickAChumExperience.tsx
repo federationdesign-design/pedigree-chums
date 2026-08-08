@@ -312,6 +312,11 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
   // restore brings the conversation back exactly where it was. The flag rides
   // the persistence payload so a minimised chat survives page navigation.
   const [minimised, setMinimised] = useState<boolean>(restored ? !!restored.minimised : auto ? true : false);
+  // Task 162 (reopen-from-chip): once a chat has been minimised (or arrived minimised, as auto-appearances do) it is
+  // DOCKED to the corner -- reopening expands from the chip's corner, not the dog's fan-arc position, so the
+  // dog never leaps across the screen. Sticky: it stays corner-anchored (dragging moves it, minimising
+  // returns it to the corner). A fresh selector pick starts undocked (the dog stays where it was chosen).
+  const [docked, setDocked] = useState<boolean>(restored ? !!restored.minimised : auto ? true : false);
   // Task 151 Case A: a small pulse on the minimised chip when the Labrador speaks unprompted, so an
   // unread line is noticed rather than sitting in the corner. Cleared the moment the visitor opens the chip.
   const [spoke, setSpoke] = useState(false);
@@ -387,6 +392,10 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
   const fanAnchorRef = useRef<HTMLDivElement | null>(null);
   const [colBox, setColBox] = useState<{ left: number; top: number; bottom: number } | null>(null);
   const COL_W = 380;
+  // Task 162 (reopen-from-chip): where a docked (corner-anchored) dog sits -- the same corner the minimised chip uses
+  // (.miniDock left/top 18px). The fan anchor is 128px, matching the chip, so a reopen lands exactly.
+  const DOCK_L = 18;
+  const DOCK_T = 18;
   // Owner review: the chat reaches the TOP of the window, so a long history
   // slides off the window edge rather than vanishing at an invisible line.
   const COL_TOP_CLEAR = 8;
@@ -397,6 +406,13 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
   const [dragOffset, setDragOffset] = useState<{ dx: number; dy: number }>({ dx: 0, dy: 0 });
   const [dragging, setDragging] = useState(false); // grows the handle while moving
   useEffect(() => { setDragOffset({ dx: 0, dy: 0 }); }, [dog]);
+  // Minimise: collapse to the chip AND dock to the corner, resetting any drag so a reopen returns to the
+  // corner (not the last-dragged spot). Shared by the desktop and mobile minimise controls.
+  const minimise = useCallback(() => {
+    setMinimised(true);
+    setDocked(true);
+    setDragOffset({ dx: 0, dy: 0 });
+  }, []);
   // Task 156 (§3): which alternate portrait each dog is showing, in cycle order. Component state, so it
   // STICKS for the session but RESETS on reload (consistent with everything else being stateless); the
   // hats it uncovers persist separately in the Hidden Games record.
@@ -1189,7 +1205,7 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
 
       {(phase === 'selecting' || (wide && !minimised)) && (
         <div className={styles.selectorWrap}>
-          <div className={styles.selector}>
+          <div className={`${styles.selector} ${docked && phase !== 'selecting' ? styles.selectorDocked : ''}`}>
             {phase === 'selecting' && (
               <svg className={styles.connectors} viewBox="0 0 440 440" aria-hidden="true" focusable="false">
                 {/* Task 113 + 121: each radial starts at the icon's circular-body edge (ARC_BODY_R from
@@ -1225,8 +1241,10 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
                   <div
                     key={d}
                     ref={fanAnchorRef}
-                    className={`${styles.dogAnchor} ${styles.anchorFan} ${anchorSwap}`}
-                    style={{ left: `${round1(p.left + dragOffset.dx)}px`, top: `${round1(p.top + dragOffset.dy)}px` }}
+                    className={`${styles.dogAnchor} ${styles.anchorFan} ${docked ? styles.anchorDocked : ''} ${anchorSwap}`}
+                    style={docked
+                      ? { left: `${round1(DOCK_L + dragOffset.dx)}px`, top: `${round1(DOCK_T + dragOffset.dy)}px` }
+                      : { left: `${round1(p.left + dragOffset.dx)}px`, top: `${round1(p.top + dragOffset.dy)}px` }}
                     role="img"
                     aria-label={dead ? 'the Collie plays dead' : roll ? 'the Collie rolls over' : dogInfo(dog).name}
                   >
@@ -1243,7 +1261,7 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
                     </button>
                     {/* Task 130: minimise to a corner chip; restore brings the
                         conversation back exactly as it was. */}
-                    <button type="button" className={styles.minimise} aria-label="Minimise the chat" onClick={() => setMinimised(true)}>
+                    <button type="button" className={styles.minimise} aria-label="Minimise the chat" onClick={minimise}>
                       <span aria-hidden="true" />
                     </button>
                     {/* Task 132: the dog's name, once, beside her medallion.
@@ -1390,7 +1408,7 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
               {/* Task 130 on mobile: the desktop medallion block is gated on
                   `wide`, so the minimise never rendered here. Same control,
                   same state. */}
-              <button type="button" className={styles.minimise} aria-label="Minimise the chat" onClick={() => setMinimised(true)}>
+              <button type="button" className={styles.minimise} aria-label="Minimise the chat" onClick={minimise}>
                 <span aria-hidden="true" />
               </button>
               {/* Task 132: the name once, on the medallion (mobile too). */}
