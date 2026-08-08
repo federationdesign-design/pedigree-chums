@@ -314,13 +314,13 @@ export default function LineageMap({
     : ROOT;
   const liftRingW = circular && ringColor ? liftR * liftRingFrac : 5;
   // The Learn/Complete button is a fixed 200x68. On a small card that swamps
-  // the picture, so it scales WITH the card: width 1.4 * R, tuned so the button
-  // reads as about two thirds of the card (~118px on a 390 phone), capped at
+  // the picture, so it scales WITH the card: width 1.8 * R (~151px on a 390
+  // phone, tuned up from 1.4 by eye on the device), capped at
   // 200, and NO minimum, a small button on a small card being correct. The cap
   // means desktop sits at 200 (was 192 at the old 0.9 multiplier, an accepted
   // 8px). Applied as one scale() on the button group; the rim offset scales with
   // it so the button keeps the same overlap on the rim at any size.
-  const learnBtnScale = circular ? Math.min(1, (1.4 * liftR) / 200) : 1;
+  const learnBtnScale = circular ? Math.min(1, (1.8 * liftR) / 200) : 1;
   const [rootGone, setRootGone] = useState(false);
   const confettiRef = useRef<((opts: Record<string, unknown>) => void) | null>(null);
   useEffect(() => {
