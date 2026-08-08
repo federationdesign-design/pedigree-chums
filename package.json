@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "build:chumdata": "node scripts/build-chumdata.mjs",
+    "build:chumdata": "tsx scripts/build-chumdata.mjs",
     "test:pickachum": "tsx scripts/test-pickachum.mjs",
     "replay:pickachum": "tsx scripts/replay-pickachum.mjs",
     "sim": "tsx scripts/sim-multi-turn.mjs",
