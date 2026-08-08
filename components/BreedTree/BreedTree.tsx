@@ -108,7 +108,7 @@ const ZOOM_PAD = 1.1;
 // the round starts. Bigger circles means less room in the pit and a faster game
 // over, so size IS the difficulty. Three points are pinned:
 //   level 5  the packing signed off as MINI_FILL 0.85, unchanged
-//   level 0  a quarter smaller again than the old easiest setting
+//   level 0  raised to 0.5 from 0.4 (was a quarter), so the deepest circles read
 //   level 10 the widest circle spans the full width of the pit
 // The top end is measured off the widest top-level circle rather than the
 // cluster's bounding box, because that is the thing the eye reads as "as big as
@@ -117,9 +117,17 @@ const ZOOM_PAD = 1.1;
 // has nowhere to land and the slider stays hidden.
 const DIFF_DEFAULT = 5;
 // The three stops, as a fraction of a PIT-FULL cluster. 10 fills the pit, 5 is
-// half of it, 0 a quarter. Two straight segments, so 5 lands exactly on its own
+// half of it, 0 about half now too (raised from a quarter). Two straight
+// segments, so 5 lands exactly on its own
 // number rather than somewhere between the ends.
-const DIFF_STOP_0 = 0.4;
+// RAISED 0.4 -> 0.5 (a quarter larger, ratio 1.25) so difficulty 0 is readable:
+// at 0.4 the deepest circles on levels like Golden Retriever and Irish Setter
+// drew about 20px, under a finger target and too small to read. diffScale
+// multiplies the WHOLE cluster by this, so every circle grows by the same 1.25
+// and the nesting is preserved: the root is fixed at FW/(2*PAD) and a uniform
+// scale cannot make a ring out-thicken its parent. The cost, accepted, is that
+// difficulty 0 feels easier and fuller. Nothing else reads this; only diffScale.
+const DIFF_STOP_0 = 0.5;
 // 0.575, raised 15% from 0.50 by eye. The chips follow on their own: a badge
 // radius is a fraction of the mean circle radius, so growing the circles grows
 // them too. That only holds up to about 0.61, where BADGE_MAX_R takes over and
