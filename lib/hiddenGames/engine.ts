@@ -16,10 +16,12 @@ import {
   type HiddenGamesRecord,
   type ReportOutcome,
   applyReport,
+  applyHat,
   counterLabel,
   readRecord,
   serializeRecord,
 } from "./record";
+import { HAT_GAME_ID, HAT_FOUND_AT, HAT_COUNTDOWN_AT } from "./hatHunt";
 import {
   type LifecycleStatus,
   type CounterView,
@@ -84,6 +86,12 @@ export interface HiddenGamesEngine {
   // count (total - count). Not fired on a duplicate, an unknown id, or the final
   // find (which shows the completion card instead).
   subscribeDiscovery: (listener: (remaining: number) => void) => () => void;
+  // Task 156: report a found hat. Registers G10 as found at HAT_FOUND_AT, and from HAT_COUNTDOWN_AT
+  // notifies the hat-milestone listener (the Terrier's countdown) with the current found count.
+  reportHat: (hatId: string) => EngineOutcome;
+  // Task 156: the Terrier's countdown. The listener receives the found-hat count on each NEW hat from
+  // HAT_COUNTDOWN_AT (6) to the total (10). Never fires on a duplicate or below the countdown threshold.
+  subscribeHatMilestone: (listener: (found: number) => void) => () => void;
 }
 
 export function createEngine(deps: EngineDeps): HiddenGamesEngine {
@@ -143,6 +151,37 @@ export function createEngine(deps: EngineDeps): HiddenGamesEngine {
   const discoveryListeners = new Set<(remaining: number) => void>();
   function emitDiscovery(remaining: number): void {
     for (const listener of discoveryListeners) listener(remaining);
+  }
+
+  const hatMilestoneListeners = new Set<(found: number) => void>();
+  function emitHatMilestone(found: number): void {
+    for (const listener of hatMilestoneListeners) listener(found);
+  }
+
+  // Task 156: apply a found hat. At HAT_FOUND_AT it registers G10 as found (via reportHiddenGame, which
+  // handles the counter + the discovery toast + dedupe); from HAT_COUNTDOWN_AT it notifies the Terrier's
+  // countdown with the running count. Frozen and duplicate/unknown are handled exactly as reportHiddenGame.
+  function reportHat(id: string): EngineOutcome {
+    if (!view.acceptsFinds) return "frozen";
+    const { record: next, outcome } = applyHat(record, id, deps.now());
+    if (outcome === "unknown") {
+      deps.warn(`[hidden-games] unknown hat id ignored: ${id}`);
+      return outcome;
+    }
+    if (outcome === "duplicate") return outcome;
+    record = next;
+    const found = record.hats_found.length;
+    if (!safeSet(serializeRecord(record))) {
+      if (!storageBlocked) {
+        storageBlocked = true;
+        deps.track?.({ name: HG_EVENTS.storageBlocked });
+      }
+    }
+    snapshot = toState(record);
+    emit();
+    if (found >= HAT_FOUND_AT) reportHiddenGame(HAT_GAME_ID); // idempotent after the first time
+    if (found >= HAT_COUNTDOWN_AT) emitHatMilestone(found);
+    return outcome;
   }
 
   function reportHiddenGame(id: string): EngineOutcome {
@@ -237,6 +276,13 @@ export function createEngine(deps: EngineDeps): HiddenGamesEngine {
       discoveryListeners.add(listener);
       return () => {
         discoveryListeners.delete(listener);
+      };
+    },
+    reportHat,
+    subscribeHatMilestone: (listener: (found: number) => void) => {
+      hatMilestoneListeners.add(listener);
+      return () => {
+        hatMilestoneListeners.delete(listener);
       };
     },
   };

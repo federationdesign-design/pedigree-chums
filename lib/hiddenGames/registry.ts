@@ -5,7 +5,7 @@
 // of the games list, so it can never disagree with the list it counts.
 // Nothing else defines the campaign version, mode or the qualifying games.
 
-export const GAME_IDS = ["G01", "G02", "G03", "G04", "G05", "G06", "G07", "G08", "G09"] as const;
+export const GAME_IDS = ["G01", "G02", "G03", "G04", "G05", "G06", "G07", "G08", "G09", "G10"] as const;
 export type GameId = (typeof GAME_IDS)[number];
 
 export interface GameDef {
@@ -116,6 +116,17 @@ export const REGISTRY: Registry = {
       threshold:
         "The Feed the Dog a Cookie pills are served in the Pick a Chum chat (the Labrador's second game entered by name), before any cookie is fed",
       hint: "the labrador eats anything. offer him a cookie, even the not-food kind",
+    },
+    // Task 156: the Hat Hunt. The FIRST game that is FOUND but UNFINISHED -- an internal hat counter
+    // (never shown) drives it: it registers as FOUND at 3 hats (this row's threshold), and COMPLETES at
+    // 10 (derived from the record's hats_found, see hatHunt.ts + record.ts). It joins the campaign like
+    // any other game, so the /N counter simply becomes 10.
+    {
+      id: "G10",
+      name: "The Hat Hunt",
+      threshold:
+        "The internal hat counter reaches THREE found hats (of ten hidden across the site) -- found, though the hunt is not yet complete",
+      hint: "some of us are wearing hats. keep tapping our faces, and look further out",
     },
   ],
 };

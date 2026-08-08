@@ -12,6 +12,7 @@ import {
   EXPIRY_MS,
   isKnownId,
 } from "./registry";
+import { isKnownHat } from "./hatHunt";
 
 export interface HiddenGamesRecord {
   record_schema: typeof RECORD_SCHEMA;
@@ -31,6 +32,10 @@ export interface HiddenGamesRecord {
   // Whether the visitor has seen the first-visit prelude card (C03). Same
   // additive, optional treatment; schema stays 3.
   prelude_seen: boolean;
+  // Task 156: the Hat Hunt (G10) found hats. ADDITIVE optional field, same treatment as intro_seen, so
+  // record_schema stays 3 and no earlier record is invalidated. G10-found is derived (length >= 3);
+  // completion is derived (length >= 10). Persists across reloads (unlike the tap-cycle image).
+  hats_found: string[];
 }
 
 // Why a record read differed from a clean restore. Used only for the
@@ -57,6 +62,7 @@ export function freshRecord(nowMs: number): HiddenGamesRecord {
     intro_seen: false,
     completion_seen: false,
     prelude_seen: false,
+    hats_found: [],
   };
 }
 
@@ -124,6 +130,12 @@ export function readRecord(
       ? obj.total_at_last_seen
       : REGISTRY.games.length;
 
+  // Task 156: keep only hat ids the current hunt still knows, de-duplicated.
+  const rawHats = Array.isArray(obj.hats_found)
+    ? obj.hats_found.filter((h): h is string => typeof h === "string" && isKnownHat(h))
+    : [];
+  const hats = Array.from(new Set(rawHats));
+
   return {
     record: {
       record_schema: RECORD_SCHEMA,
@@ -135,6 +147,7 @@ export function readRecord(
       intro_seen: obj.intro_seen === true,
       completion_seen: obj.completion_seen === true,
       prelude_seen: obj.prelude_seen === true,
+      hats_found: hats,
     },
     note: "restored",
   };
@@ -166,6 +179,30 @@ export function applyReport(
       intro_seen: record.intro_seen, // a find never resets the intro flag
       completion_seen: record.completion_seen,
       prelude_seen: record.prelude_seen,
+      hats_found: record.hats_found,
+    },
+    outcome: "awarded",
+  };
+}
+
+// Task 156: apply a found hat to the record. Deduplication and unknown-id handling here, mirroring
+// applyReport. The engine turns this into the G10 award (at 3) and the Terrier's countdown (from 6).
+export function applyHat(
+  record: HiddenGamesRecord,
+  hatId: string,
+  nowMs: number
+): { record: HiddenGamesRecord; outcome: ReportOutcome } {
+  if (!isKnownHat(hatId)) {
+    return { record, outcome: "unknown" };
+  }
+  if (record.hats_found.includes(hatId)) {
+    return { record, outcome: "duplicate" };
+  }
+  return {
+    record: {
+      ...record,
+      hats_found: [...record.hats_found, hatId],
+      updated_at: new Date(nowMs).toISOString(),
     },
     outcome: "awarded",
   };

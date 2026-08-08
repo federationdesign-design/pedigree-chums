@@ -62,3 +62,19 @@ export function getHiddenGamesEngine(): HiddenGamesEngine {
 export function reportHiddenGame(gameId: GameId): void {
   getHiddenGamesEngine().reportHiddenGame(gameId);
 }
+
+// Task 156: report a found hat. THE PROTECTED GUARD lives here, once, so every surface (the chat tap-
+// cycle, the essay hero image, the Kennel Sketch drawing, the birthday clip) is covered: a session that
+// has ever entered a protected safety state never advances the hat counter, never awards G10, and never
+// triggers the Terrier's countdown -- a child who disclosed something gets no game toast. "pc-protected"
+// is Pick a Chum's content-free protected flag (pcKeys.PROTECTED_FLAG); the literal avoids a UI import.
+export function reportHat(hatId: string): void {
+  if (typeof window !== "undefined") {
+    try {
+      if (window.sessionStorage.getItem("pc-protected")) return;
+    } catch {
+      return;
+    }
+  }
+  getHiddenGamesEngine().reportHat(hatId);
+}
