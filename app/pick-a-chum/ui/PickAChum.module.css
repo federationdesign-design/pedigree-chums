@@ -307,13 +307,13 @@
 .bubbleUser {
   max-width: 82%;
   padding: 11px 18px;
-  /* Task 156 (§7): the visitor's bubbles are now WHITE, whichever dog is active. The Labrador's dog
-     bubbles are yellow, so keeping the visitor yellow would merge the two sides; white stays distinct
-     from all four dog fills. */
-  background: #ffffff;
+  /* Task 156 (§7) shipped the visitor's bubbles WHITE; now BLACK with white text. Black would merge with
+     the Collie's near-black navy (#112242), so the Collie fill is lightened to a clearly-blue mid-navy
+     (see .bubbleCollie) to keep the two sides distinct. */
+  background: #000000;
   border-radius: 20px;
   box-shadow: var(--pc-shadow);
-  color: var(--pc-ui-navy);
+  color: #ffffff;
   font-family: var(--font-body, sans-serif);
   font-size: 16px;
   line-height: 1.4;
@@ -331,7 +331,10 @@
   color: #1a1a1a;
 }
 .bubbleCollie {
-  background: var(--pc-ui-navy);
+  /* Lightened from the near-black --pc-ui-navy (#112242) to a clearly-blue mid-navy so she stays distinct
+     from the black visitor bubbles. Local fill only; the --pc-ui-navy token is unchanged elsewhere. White
+     dialogue on this holds ~9:1. */
+  background: #1e4a7a;
 }
 .bubbleCollie .dialogue {
   color: #ffffff;
@@ -549,7 +552,7 @@
   gap: 8px;
   height: 96px;
   padding: 0 10px 0 26px;
-  background: #ffffff;
+  background: #000000;
   border-radius: 48px;
   box-shadow: var(--pc-shadow);
 }
@@ -561,13 +564,13 @@
   outline: none;
   font-family: var(--font-body, sans-serif);
   font-size: 18px;
-  color: var(--pc-ui-navy);
+  color: #ffffff;
 }
 .input::placeholder {
   color: #7a8aa0;
 }
 .input:disabled {
-  color: var(--pc-ui-navy);
+  color: #ffffff;
 }
 .go {
   border: none;
@@ -682,7 +685,7 @@
     font-size: 16px;
   }
   .bubbleUser {
-    font-size: 15px;
+    font-size: 11px;
   }
   .dialogue {
     font-size: 13px;
