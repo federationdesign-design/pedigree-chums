@@ -1205,6 +1205,19 @@ const lcg = (seed) => () => ((seed = (seed * 1103515245 + 12345) & 0x7fffffff) /
   ok ? pass++ : fail++;
   rows.push({ ok, input: 'recorder v2: closed endReason (left vs abandoned)', layer: '-', bucket: '-', action: 'recorder', note: ok ? '' : JSON.stringify({ endReason: closedSess.endReason, closeAction: close.action, ceiling: ceilingSess.endReason }) });
 })();
+// Task 165: a dismissal ("go away") records a 'closed' marker beside its reply, so endReason is 'closed'
+// (the clearest LEFT signal), not 'abandoned'. The reply row is preserved (firstInput keeps "go away"); the
+// marker alone flips the outcome. The Boxer turn-20 cut-off is unaffected -- it stays 'ceiling' (tested above).
+(() => {
+  const now = '2026-01-01T00:00:00.000Z';
+  const dismissReply = buildRow({ sessionId: 'g', turn: 1, activeDog: 'boxer', input: 'go away', resolution: { action: 'dismiss', bucket: null }, response: { responseId: 'BOX-DISMISS', text: 'see ya', closed: true }, trigger: 'reply' }, now);
+  const marker = buildAppearanceRow({ sessionId: 'g', turn: 1, activeDog: 'boxer', input: '', line: '', route: '/home', trigger: 'closed' }, now);
+  const withMarker = buildSessions([dismissReply, marker])[0];
+  const withoutMarker = buildSessions([dismissReply])[0];
+  const ok = withMarker.endReason === 'closed' && withMarker.firstInput === 'go away' && withoutMarker.endReason === 'abandoned';
+  ok ? pass++ : fail++;
+  rows.push({ ok, input: 'recorder v2: dismissal -> closed endReason', layer: '-', bucket: '-', action: 'recorder', note: ok ? '' : JSON.stringify({ withMarker: withMarker.endReason, firstInput: withMarker.firstInput, withoutMarker: withoutMarker.endReason }) });
+})();
 
 // ---- Task 163: gap-log (unanswerable inputs) -- threshold control, redaction backstop, protected-discard ----
 (() => {

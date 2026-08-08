@@ -968,6 +968,14 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
       protectedState: session.protectedState ?? null,
       trigger: 'reply',
     });
+    // Task 165: a dismissal ("go away" and its kin) is a deliberate leave -- the clearest "left" signal in
+    // the whole dataset. Emit a 'closed' marker right after the reply turn (the same marker the X / Escape
+    // close writes) so the session's endReason reads "closed", not "abandoned". Guarded like closeChat: a
+    // protected (or ever-protected) session records nothing. The Boxer turn-20 cut-off is untouched -- it
+    // records boxer_cutoff, which endReason reads as 'ceiling' (the ceiling, not the visitor leaving).
+    if (result.resolution.action === 'dismiss' && !session.protectedState && !everProtectedRef.current) {
+      emitTurn({ sessionId: recSessionRef.current, turn: session.submissionCount, activeDog: session.activeDog, input: '', line: '', route: pathname ?? '', protectedState: null, trigger: 'closed' });
+    }
     const userMsg: Message = { id: idRef.current++, who: 'user', text };
     // Task 82: clear + keep focus only for a live submit; a queued/drained line must not wipe what
     // the visitor has since typed ahead into the box.
