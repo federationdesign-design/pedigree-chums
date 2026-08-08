@@ -349,6 +349,7 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
     setDog('labrador');
     setMessages((m) => [...m, { id: idRef.current++, who: 'dog', text: LAB_HOTDOG_PICKUP, dog: 'labrador', name: dogInfo('labrador').name, display: LAB_HOTDOG_PICKUP, done: true }]);
     setAnnounce(LAB_HOTDOG_PICKUP);
+    emitTurn({ sessionId: recSessionRef.current, turn: session.submissionCount, activeDog: 'labrador', input: '', line: LAB_HOTDOG_PICKUP, route: pathname ?? '', gameActive: session.activeGame ?? null, protectedState: session.protectedState ?? null, trigger: 'listener' }); // Task 159: the /hot-dogs listener
     if (minimised) setSpoke(true);
   }, [pickupRoute, minimised]);
   // Task 156 (§8): the Terrier's hat-hunt countdown lands IN THE OPEN CHAT (not a toast) -- he speaks it
@@ -366,8 +367,18 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
     setDog('terrier');
     setMessages((m) => [...m, { id: idRef.current++, who: 'dog', text: terrierSay, dog: 'terrier', name: dogInfo('terrier').name, display: terrierSay, done: true, plainSurface: false }]);
     setAnnounce(terrierSay);
+    emitTurn({ sessionId: recSessionRef.current, turn: session.submissionCount, activeDog: 'terrier', input: '', line: terrierSay, route: pathname ?? '', gameActive: session.activeGame ?? null, protectedState: session.protectedState ?? null, trigger: 'appearance' }); // Task 159: the hat countdown
     if (minimised) setSpoke(true);
   }, [terrierSay, minimised]);
+  // Task 159 (recorder v2, stage 2): log an unbidden appearance's chip line so the `trigger` column tells
+  // it from a reply. Suppressed appearances never reach here. The chums case (no static offer) logs in its
+  // seed effect; the /hot-dogs pickup and the Terrier hat line log in their effects above.
+  const appearLoggedRef = useRef(false);
+  useEffect(() => {
+    if (!auto || appearLoggedRef.current || !auto.offer) return;
+    appearLoggedRef.current = true;
+    emitTurn({ sessionId: recSessionRef.current, turn: sessionRef.current?.submissionCount ?? 0, activeDog: auto.dog, input: '', line: auto.offer, route: pathname ?? '', gameActive: sessionRef.current?.activeGame ?? null, protectedState: sessionRef.current?.protectedState ?? null, trigger: 'appearance' });
+  }, [auto]);
   // One body-level signal drives everything that must not co-exist with the
   // chip: the scrim (owner ruling: no chat UI left to lift) and the offer
   // card (owner ruling: two floating things in one corner is worse than
@@ -676,6 +687,7 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
     if (!lines.length) return;
     setMessages((m) => [...m, { id: idRef.current++, who: 'dog', text: lines[0], display: lines[0], done: true, dog: auto.dog, name: dogInfo(auto.dog).name }]);
     setAnnounce(lines[0]);
+    emitTurn({ sessionId: recSessionRef.current, turn: sessionRef.current?.submissionCount ?? 0, activeDog: auto.dog, input: '', line: lines[0], route: pathname ?? '', gameActive: sessionRef.current?.activeGame ?? null, protectedState: sessionRef.current?.protectedState ?? null, trigger: 'appearance' }); // Task 159
   }, [auto]);
   useEffect(() => {
     if (!auto || seqStartedRef.current || minimised) return; // Task 160: hold the extras until the chip is opened

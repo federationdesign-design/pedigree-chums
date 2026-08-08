@@ -41,7 +41,7 @@ const { extractCandidateSubject } = await import(pathToFileURL(join(LIB, 'router
 const { skipTheatre, buildTypingPlan, TYPING_PROFILES, THEATRE_MAX_MS, isTypoEligible } = await import(
   pathToFileURL(join(LIB, 'theatre.ts')).href
 );
-const { buildRow, buildProtectedMarker, enrichRows, detectRephrase } = await import(pathToFileURL(join(ROOT, 'app/pick-a-chum/dev/recorder-store.ts')).href);
+const { buildRow, buildProtectedMarker, buildAppearanceRow, enrichRows, detectRephrase, buildSessions, isLaugh } = await import(pathToFileURL(join(ROOT, 'app/pick-a-chum/dev/recorder-store.ts')).href);
 const { recorderEnabled } = await import(pathToFileURL(join(ROOT, 'app/pick-a-chum/lib/turn-tap.ts')).href);
 const { SAFETY_TRIGGER_PHRASES } = await import(pathToFileURL(join(LIB, 'safety.ts')).href);
 
@@ -1152,6 +1152,37 @@ const lcg = (seed) => () => ((seed = (seed * 1103515245 + 12345) & 0x7fffffff) /
   const ok = sameBucket && marker && !unrelated;
   ok ? pass++ : fail++;
   rows.push({ ok, input: 'recorder v2: detectRephrase (bucket + marker, not unrelated)', layer: '-', bucket: '-', action: 'recorder', note: ok ? '' : `same=${sameBucket} marker=${marker} unrelated=${unrelated}` });
+})();
+(() => {
+  // Stage 2: an unbidden appearance is logged as trigger != reply, carrying the line but no visitor input.
+  const row = buildAppearanceRow({ sessionId: 's', turn: 0, activeDog: 'boxer', input: '', line: 'i know EXACTLY what this is', route: '/about', trigger: 'appearance' }, '2026-01-01T00:00:00.000Z');
+  const ok = row.trigger === 'appearance' && row.action === 'appearance' && row.input === '' && row.responseText === 'i know EXACTLY what this is' && row.bucket === '' && row.outcome === '';
+  ok ? pass++ : fail++;
+  rows.push({ ok, input: 'recorder v2: appearance row (trigger, no input)', layer: '-', bucket: '-', action: 'recorder', note: ok ? '' : JSON.stringify(row) });
+})();
+(() => {
+  // Stage 3: laugh detection -- amusement replies match; ordinary input does not.
+  const yes = ['haha', 'hahaha', 'lol', 'lmao', ':)', 'good one', 'thats funny', 'so funny', 'hehe'].every((x) => isLaugh(x));
+  const no = ['hello', 'what breed are you', 'how much', 'laughing gas'].every((x) => !isLaugh(x));
+  const ok = yes && no;
+  ok ? pass++ : fail++;
+  rows.push({ ok, input: 'recorder v2: isLaugh', layer: '-', bucket: '-', action: 'recorder', note: ok ? '' : `yes=${yes} no=${no}` });
+})();
+(() => {
+  // Stage 3: the per-session summary from the per-turn rows -- firstInput, dogs, games, laughs, appearance.
+  const row = (turn, ts, trigger, activeDog, transferTo, action, bucket, responseId, gameActive, input) => ({ sessionId: 'x', turn, timestamp: ts, gapAfter: '', activeDog, route: '/home', trigger, input, outcome: '', action, bucket, responseId, responseText: '', media: '', transferTo, gameActive, rephrase: '', protected: '', lastTurn: '' });
+  const [s] = buildSessions([
+    row(0, 't0', 'appearance', 'boxer', '', 'appearance', '', '', '', ''), // unbidden appearance -- not a "dog used"
+    row(1, 't1', 'reply', 'collie', '', 'converse', 'B09', 'B09-1', '', 'hello'),
+    row(2, 't2', 'reply', 'collie', 'labrador', 'transfer', 'B08', 'TR', '', 'burgers'),
+    row(3, 't3', 'reply', 'labrador', '', 'game_start', 'B17', 'FC-START', 'feedcookie', 'cookies'),
+    row(4, 't4', 'reply', 'labrador', '', 'game_move', 'B67', 'FC-JOKE', '', 'pref'), // gameActive clears -> finished
+    row(5, 't5', 'reply', 'labrador', '', 'converse', 'B30', 'JOKE-1', '', 'haha'), // a laugh, attributed to FC-JOKE
+  ]);
+  const ok = s.firstInput === 'hello' && s.turnCount === 5 && s.dogsUsed === 'collie|labrador' && s.dogSwitched === 'TRUE' &&
+    s.gamesStarted === 1 && s.gamesFinished === 1 && s.hadAppearance === 'TRUE' && s.laughCount === 1 && s.laughedAt === 'FC-JOKE' && s.endReason === 'abandoned';
+  ok ? pass++ : fail++;
+  rows.push({ ok, input: 'recorder v2: per-session summary', layer: '-', bucket: '-', action: 'recorder', note: ok ? '' : JSON.stringify(s) });
 })();
 
 // ---- Fix 5a: the meaningless B05 "located the correct Chum" line is removed ----

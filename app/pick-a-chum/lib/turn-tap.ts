@@ -13,9 +13,12 @@ export interface TurnEvent {
   sessionId: string; // one id per engine session (a dog pick / page load reset)
   turn: number; // 1-based, within that engine session
   activeDog: Dog; // the dog that received the input
-  input: string; // raw input, exactly as typed
-  resolution: Resolution;
-  response: Assembled;
+  input: string; // raw input, exactly as typed ('' for an unbidden appearance -- no visitor input)
+  // A reply turn carries the engine's resolution + response. An UNBIDDEN appearance (trigger !== 'reply')
+  // has neither -- it just served `line` from a dog, so both are optional and `line` carries the text.
+  resolution?: Resolution;
+  response?: Assembled;
+  line?: string; // Task 159 stage 2: the dog line for an appearance/sequence/listener turn
   transferTo?: Dog; // set when this turn switched the active dog
   candidateSubject?: string | null; // Task 57: the loop's candidate inside-world subject this turn, or null
   // Task 159 (recorder v2): context the log needs but the resolution/response do not carry.

@@ -156,10 +156,10 @@ const EMPTY_ROW: Omit<TurnRow, 'sessionId' | 'turn' | 'timestamp' | 'activeDog' 
   media: '', transferTo: '', gameActive: '', rephrase: '', protected: '', lastTurn: '',
 };
 
-// A full (non-protected) turn.
+// A full REPLY turn (the visitor typed; the engine resolved). resolution/response are always present here.
 export function buildRow(e: TurnEvent, now: string): TurnRow {
-  const r = e.resolution;
-  const resp = e.response;
+  const r = e.resolution!;
+  const resp = e.response!;
   const outcome = outcomeOf(r.action, r.bucket ?? '', r.faqMatchStrength);
   const text = resp.followUp ? `${resp.text}\n${resp.followUp}` : resp.text;
   return {
@@ -178,6 +178,23 @@ export function buildRow(e: TurnEvent, now: string): TurnRow {
     responseText: text,
     media: resp.media?.src ?? '',
     transferTo: e.transferTo ?? '',
+    gameActive: e.gameActive ?? '',
+  };
+}
+
+// An UNBIDDEN appearance turn (trigger = appearance | sequence | listener): a dog spoke `line` without
+// the visitor typing. No input, no bucket/outcome -- just who spoke, what, where, and why (the trigger).
+export function buildAppearanceRow(e: TurnEvent, now: string): TurnRow {
+  return {
+    ...EMPTY_ROW,
+    sessionId: e.sessionId,
+    turn: e.turn,
+    timestamp: now,
+    activeDog: e.activeDog,
+    route: e.route ?? '',
+    trigger: e.trigger ?? 'appearance',
+    action: 'appearance',
+    responseText: e.line ?? '',
     gameActive: e.gameActive ?? '',
   };
 }
@@ -208,7 +225,8 @@ export async function record(e: TurnEvent, now: string): Promise<void> {
     await tx('readwrite', (s) => s.add(buildProtectedMarker(e, now))); // the became-protected fact only
     return;
   }
-  await tx('readwrite', (s) => s.add(buildRow(e, now)));
+  const row = e.trigger && e.trigger !== 'reply' ? buildAppearanceRow(e, now) : buildRow(e, now);
+  await tx('readwrite', (s) => s.add(row));
 }
 
 export async function getAllRows(): Promise<TurnRow[]> {
@@ -247,7 +265,11 @@ export function toCsv(rows: TurnRow[]): string {
 }
 
 export function downloadCsv(rows: TurnRow[], filename: string): void {
-  const blob = new Blob([toCsv(rows)], { type: 'text/csv;charset=utf-8' });
+  triggerDownload(toCsv(rows), filename);
+}
+
+function triggerDownload(text: string, filename: string): void {
+  const blob = new Blob([text], { type: 'text/csv;charset=utf-8' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
@@ -256,4 +278,103 @@ export function downloadCsv(rows: TurnRow[], filename: string): void {
   a.click();
   a.remove();
   URL.revokeObjectURL(url);
+}
+
+// ---- Task 159 stage 3: the SECOND SHEET -- one row per session (the creative half) ------
+// Diagnostic insight is per turn; creative insight is per session: what someone arrived wanting, what
+// they did with it, and where they left. Computed entirely from the per-turn rows (no extra capture).
+export interface SessionRow {
+  sessionId: string;
+  firstInput: string; // what they arrived wanting, before anything prompted them
+  turnCount: number;
+  dogsUsed: string; // the dogs they spoke to, e.g. collie|labrador
+  dogSwitched: string; // TRUE if more than one dog
+  gamesStarted: number;
+  gamesFinished: number; // started is not the same as completed
+  laughCount: number; // how many of the dog's lines got a laugh
+  laughedAt: string; // the responseIds that got one -- after N sessions, a ranked list of what works
+  hadAppearance: string; // TRUE if a dog appeared unbidden this session
+  endReason: string; // ceiling | protected | abandoned
+}
+
+export const SESSION_COLUMNS: (keyof SessionRow)[] = [
+  'sessionId', 'firstInput', 'turnCount', 'dogsUsed', 'dogSwitched',
+  'gamesStarted', 'gamesFinished', 'laughCount', 'laughedAt', 'hadAppearance', 'endReason',
+];
+
+// A laugh: a visitor reply that is pure amusement, landing right after a dog line -- direct creative
+// feedback, attributed to that line's responseId. Protected turns are never recorded, so a nervous laugh
+// after a difficult exchange is already excluded (brief section 8).
+const LAUGH_RE = /^\s*(?:(?:ha){2,}|(?:he){2,}|l(?:o)+l|lmf?ao|rofl|:\)|:-\)|:d|xd|😂|🤣|(?:that'?s|thats|so|too)\s+funny|good\s+one)\s*$/i;
+export function isLaugh(input: string): boolean {
+  return LAUGH_RE.test(input || '');
+}
+
+export function buildSessions(rows: TurnRow[]): SessionRow[] {
+  const bySession = new Map<string, TurnRow[]>();
+  for (const r of rows) {
+    const arr = bySession.get(r.sessionId) ?? [];
+    arr.push(r);
+    bySession.set(r.sessionId, arr);
+  }
+  const out: SessionRow[] = [];
+  for (const [sessionId, srows] of bySession) {
+    const firstInput = srows.find((r) => r.trigger === 'reply' && r.input)?.input ?? '';
+    const turnCount = srows.reduce((m, r) => Math.max(m, r.turn), 0);
+    const dogs = new Set<string>();
+    for (const r of srows) {
+      if (r.trigger !== 'reply') continue; // dogsUsed = dogs the visitor actually conversed with (not merely appeared)
+      if (r.activeDog) dogs.add(r.activeDog);
+      if (r.transferTo) dogs.add(r.transferTo);
+    }
+    const gamesStarted = srows.filter((r) => r.action === 'game_start').length;
+    let gamesFinished = 0;
+    let laughCount = 0;
+    const laughedAt: string[] = [];
+    for (let i = 0; i < srows.length; i++) {
+      const cur = srows[i];
+      const prev = srows[i - 1];
+      if (prev && prev.gameActive && !cur.gameActive) gamesFinished += 1; // a running game just cleared
+      if (cur.trigger === 'reply' && isLaugh(cur.input) && prev && prev.responseId) {
+        laughCount += 1;
+        laughedAt.push(prev.responseId);
+      }
+    }
+    const endReason = srows.some((r) => r.action === 'boxer_cutoff')
+      ? 'ceiling' // the 20-turn cutoff, NOT a real exit (brief section 8)
+      : srows.some((r) => r.protected === 'TRUE')
+        ? 'protected'
+        : 'abandoned';
+    out.push({
+      sessionId,
+      firstInput,
+      turnCount,
+      dogsUsed: [...dogs].join('|'),
+      dogSwitched: dogs.size > 1 ? 'TRUE' : '',
+      gamesStarted,
+      gamesFinished,
+      laughCount,
+      laughedAt: laughedAt.join('|'),
+      hadAppearance: srows.some((r) => r.trigger && r.trigger !== 'reply') ? 'TRUE' : '',
+      endReason,
+    });
+  }
+  return out;
+}
+
+export async function getSessions(): Promise<SessionRow[]> {
+  return buildSessions(await getAllRows());
+}
+
+export function toSessionCsv(sessions: SessionRow[]): string {
+  const head = SESSION_COLUMNS.join(',');
+  const body = sessions.map((r) => SESSION_COLUMNS.map((c) => csvCell(r[c])).join(',')).join('\n');
+  return `${head}\n${body}\n`;
+}
+
+// Export both sheets: the per-turn log and the per-session summary, as two files.
+export async function downloadBoth(stamp: string): Promise<void> {
+  const rows = await getAllRows();
+  triggerDownload(toCsv(rows), `pick-a-chum-turns-${stamp}.csv`);
+  triggerDownload(toSessionCsv(buildSessions(rows)), `pick-a-chum-sessions-${stamp}.csv`);
 }

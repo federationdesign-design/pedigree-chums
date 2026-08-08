@@ -10,7 +10,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import styles from './DevRecorder.module.css';
 import { setTurnTap, recorderEnabled, TurnEvent } from '../lib/turn-tap';
-import { record, getAggregate, getAllRows, downloadCsv, Aggregate } from './recorder-store';
+import { record, getAggregate, downloadBoth, Aggregate } from './recorder-store';
 
 const EMPTY: Aggregate = { conversations: 0, messages: 0, missed: 0 };
 
@@ -36,9 +36,8 @@ export default function DevRecorder() {
   }, [refresh]);
 
   const onExport = useCallback(() => {
-    getAllRows()
-      .then((rows) => downloadCsv(rows, `pick-a-chum-log-${new Date().toISOString().replace(/[:.]/g, '-')}.csv`))
-      .catch(() => {});
+    // Task 159: two sheets -- the per-turn log and the per-session summary.
+    downloadBoth(new Date().toISOString().replace(/[:.]/g, '-')).catch(() => {});
   }, []);
 
   if (!mounted || !recorderEnabled()) return null;
