@@ -642,26 +642,32 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
     clearTimers();
   }, [clearTimers]);
 
-  // Task 153: the Collie's sequence pages. Her extra messages arrive AUTOMATICALLY, spaced, a beat (or
-  // twenty seconds on /know-your-chums) apart -- the beat is where the joke sits, so they do not wait for
-  // the visitor to open the chip. The offer (message one) is already seeded; playSequence plays the rest
-  // with the Task 152 guards (abandon on type, stop on navigation, stop on a protected state). For the
-  // dynamic /know-your-chums case the three lines are generated here and the first is injected.
+  // Task 160: an UNPROMPTED appearance serves ONE message -- the seeded chip line -- and only continues to
+  // its extras once the visitor INTERACTS (opens the chip: `minimised` flips to false). No monologue at
+  // someone who has not replied; it waits. (Typing instead routes through send(), which abandons the run
+  // and gives a real reply -- Task 152.) This reverses Task 153's auto-play: the beat now lands AFTER the
+  // open. REPLY sequences (the interjection and followUps in send()) are unaffected -- they only ever run
+  // while the chat is open. The extras keep the Task 152 guards (abandon on type / navigation / protected)
+  // via playSequence, and once opened the rest arrive as a run (see the report on run-vs-one-per-turn).
   const seqStartedRef = useRef(false);
+  const chumLinesRef = useRef<string[] | null>(null);
+  // The dynamic /know-your-chums (`chums`) case has no seeded offer, so its FIRST line is the unprompted
+  // chip message and is injected here at mount; its rest wait for the open like every other appearance.
   useEffect(() => {
-    if (!auto || seqStartedRef.current) return;
-    if (auto.chums) {
-      seqStartedRef.current = true;
-      const lines = collieChumLines();
-      if (!lines.length) return;
-      setMessages((m) => [...m, { id: idRef.current++, who: 'dog', text: lines[0], display: lines[0], done: true, dog: auto.dog, name: dogInfo(auto.dog).name }]);
-      setAnnounce(lines[0]);
-      playSequence(lines.slice(1), auto.dog, auto.gapMs ?? 20000);
-    } else if (auto.followUps?.length) {
-      seqStartedRef.current = true;
-      playSequence(auto.followUps, auto.dog, auto.gapMs ?? 2500);
-    }
-  }, [auto, playSequence]);
+    if (!auto || !auto.chums || chumLinesRef.current) return;
+    const lines = collieChumLines();
+    chumLinesRef.current = lines;
+    if (!lines.length) return;
+    setMessages((m) => [...m, { id: idRef.current++, who: 'dog', text: lines[0], display: lines[0], done: true, dog: auto.dog, name: dogInfo(auto.dog).name }]);
+    setAnnounce(lines[0]);
+  }, [auto]);
+  useEffect(() => {
+    if (!auto || seqStartedRef.current || minimised) return; // Task 160: hold the extras until the chip is opened
+    const extras = auto.chums ? (chumLinesRef.current ?? []).slice(1) : auto.followUps ?? [];
+    if (!extras.length) return;
+    seqStartedRef.current = true;
+    playSequence(extras, auto.dog, auto.gapMs ?? (auto.chums ? 20000 : 2500));
+  }, [auto, minimised, playSequence]);
 
   // Drive a handover: post the user line (and any handover line), pause, pop the
   // old dog out and the new dog in, then land the new dog's reply.

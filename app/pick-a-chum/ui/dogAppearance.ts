@@ -51,6 +51,29 @@ export function markDismissed(route: string): void {
   } catch {}
 }
 
+// Task 160: pick ONE of the Boxer's ten /about misreads at random, with no repeat until all ten have
+// shown -- the B57-facts rotation (assembler dog_fact), but session-scoped in sessionStorage because the
+// appearance path never runs through the engine (so session.usedResponseIds is not written for it). Once
+// every index has been used the set refills, so a long session keeps cycling; it clears on tab close.
+const MISREAD_KEY = 'pc-boxer-misreads-used';
+export function pickMisread(misreads: string[]): string {
+  if (!misreads.length) return '';
+  let used: number[] = [];
+  try {
+    used = JSON.parse(window.sessionStorage.getItem(MISREAD_KEY) || '[]') as number[];
+  } catch {}
+  let pool = misreads.map((_, i) => i).filter((i) => !used.includes(i));
+  if (!pool.length) {
+    pool = misreads.map((_, i) => i); // all ten seen -> refill
+    used = [];
+  }
+  const idx = pool[Math.floor(Math.random() * pool.length)];
+  try {
+    window.sessionStorage.setItem(MISREAD_KEY, JSON.stringify([...used, idx]));
+  } catch {}
+  return misreads[idx];
+}
+
 // The pages a dog appears on unbidden, and how (brief section 8 -- the allocation is settled, the set is
 // now complete).
 //   'arrival'  after the reveal hold, the moment the page settles (the Terrier's two, two of the Collie's).

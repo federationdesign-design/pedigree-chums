@@ -17,7 +17,7 @@ import DevRecorder from '../dev/DevRecorder';
 // Task 148: the Terrier's job. Type-only import (erased) keeps the heavy experience code-split; the
 // helper + registry + page-bios are lightweight (no chatbot engine), so the launcher stays cheap.
 import type { AutoAppear } from './PickAChumExperience';
-import { canDogAppear, isDismissed, markDismissed, unfoundGameHint, appearanceForRoute, type DogAppearance } from './dogAppearance';
+import { canDogAppear, isDismissed, markDismissed, unfoundGameHint, appearanceForRoute, pickMisread, type DogAppearance } from './dogAppearance';
 import { CHAT_KEY, PROTECTED_FLAG } from './pcKeys';
 import { bioForRoute } from '../data/page-bios';
 import { getHiddenGamesEngine } from '../../../lib/hiddenGames/browserEngine';
@@ -215,8 +215,12 @@ export default function PickAChumLauncher() {
     // Otherwise a single reveal-on-open appearance: the Terrier's blunt extended bio, the Boxer's misread
     // (his /about stat list stays one block -- ten items overflow the three-message cap), or the Labrador's
     // plain hunger opener with no second beat.
-    const offer = app.dog === 'boxer' ? BOXER_OPENER : app.dog === 'labrador' ? bio?.craving ?? 'I like hotdogs' : OI_OI;
-    const reveal = app.dog === 'boxer' ? bio?.misread ?? '' : app.dog === 'labrador' ? '' : bio?.extended ?? bio?.bio ?? '';
+    // Task 160: the Boxer's /about opens with his own line and reveals ONE misread (picked no-repeat), not
+    // all ten in a block. His reveal fires on open (the reveal-on-open effect), so the second message only
+    // arrives once the visitor interacts, per section 2. Falls back to the old single `misread` if present.
+    const boxerMisread = app.dog === 'boxer' && bio?.misreads?.length ? pickMisread(bio.misreads) : null;
+    const offer = app.dog === 'boxer' ? bio?.misreadOpening ?? BOXER_OPENER : app.dog === 'labrador' ? bio?.craving ?? 'I like hotdogs' : OI_OI;
+    const reveal = app.dog === 'boxer' ? boxerMisread ?? bio?.misread ?? '' : app.dog === 'labrador' ? '' : bio?.extended ?? bio?.bio ?? '';
     setAutoAppear({ dog: app.dog, offer, reveal, route });
     setOpen(true);
   }, []);
