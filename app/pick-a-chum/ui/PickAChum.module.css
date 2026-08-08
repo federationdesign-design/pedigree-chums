@@ -1651,9 +1651,12 @@
   outline-offset: 2px;
 }
 /* The staggered arc, up and to the LEFT of the medallion (matches the RESTING screenshot). */
-.receded0 { left: -70%; top: 0%; }
-.receded1 { left: -70%; top: 48%; }
-.receded2 { left: -48%; top: 92%; }
+/* Task 168: the stack sits closer to the medallion. The whole cluster is shifted right by 18 percentage
+   points of the medallion's width (was -70 / -70 / -48); the relative offsets -- the staggered arc -- and
+   the arrow angles are unchanged. On the 128px desktop medallion, 18% is ~23px. */
+.receded0 { left: -52%; top: 0%; }
+.receded1 { left: -52%; top: 48%; }
+.receded2 { left: -30%; top: 92%; }
 /* The green arrow asset (public/green-arrow-short.svg), on the dog's right, pointing at the active
    medallion. It is already green, so no recolour is needed. */
 .recededArrow {
