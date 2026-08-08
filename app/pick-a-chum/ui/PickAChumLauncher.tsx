@@ -21,6 +21,7 @@ import { canDogAppear, isDismissed, markDismissed, unfoundGameHint, appearanceFo
 import { CHAT_KEY, PROTECTED_FLAG } from './pcKeys';
 import { bioForRoute } from '../data/page-bios';
 import { getHiddenGamesEngine } from '../../../lib/hiddenGames/browserEngine';
+import { HAT_COUNTDOWN_LINES } from '../../../lib/hiddenGames/hatHunt';
 
 const PickAChumExperience = dynamic(() => import('./PickAChumExperience'), { ssr: false });
 
@@ -78,6 +79,9 @@ export default function PickAChumLauncher() {
   // Task 151 Case A: the route to hand the experience for a thread pickup (the Labrador speaking into an
   // existing /hot-dogs chat), or null. Decided by whether a chat exists, not by detecting the link.
   const [pickupRoute, setPickupRoute] = useState<string | null>(null);
+  // Task 156 (§8): the Terrier's hat-hunt countdown line to hand the experience. It lands in an open
+  // chat (he speaks it) or, with none open, brings him on as an appearance.
+  const [terrierSay, setTerrierSay] = useState<string | null>(null);
   const openRef = useRef(open);
   const pathnameRef = useRef(pathname);
   openRef.current = open;
@@ -318,6 +322,33 @@ export default function PickAChumLauncher() {
     });
   }, []);
 
+  // Task 156 (§8): the Terrier counts the hats down IN THE CHAT (6 -> 4 to go ... 10 -> congratulations).
+  // Not a toast: if a chat is open the line lands in it (he speaks it, via the terrierSay prop); with none
+  // open he comes on as an appearance. Suppression: a session that has ever been protected gets nothing
+  // (reportHat is already suppressed there, so no milestone fires -- this is belt-and-braces).
+  useEffect(() => {
+    return getHiddenGamesEngine().subscribeHatMilestone((found) => {
+      const line = HAT_COUNTDOWN_LINES[found];
+      if (!line) return;
+      try {
+        if (window.sessionStorage.getItem(PROTECTED_FLAG)) return;
+      } catch {
+        return;
+      }
+      let hasChat = false;
+      try {
+        hasChat = !!window.sessionStorage.getItem(CHAT_KEY);
+      } catch {}
+      if (hasChat || openRef.current) {
+        setTerrierSay(line); // land it in the open chat
+        setOpen(true);
+      } else {
+        setAutoAppear({ dog: 'terrier', offer: line, reveal: '', route: pathnameRef.current ?? '' });
+        setOpen(true);
+      }
+    });
+  }, []);
+
   // Task 148 section 6: a click on an explicitly marked dead element (data-pc-dead) summons NOTHING --
   // it pulses the launcher already on screen. No guessing, no false positives. Only while the launcher
   // (not the open chat) is showing. Capture phase, so it fires even if the element stops propagation.
@@ -339,7 +370,7 @@ export default function PickAChumLauncher() {
           only (pointer-events:none in CSS); never intercepts a click. */}
       {open && <div className={styles.scrim} aria-hidden="true" />}
       {open ? (
-        <PickAChumExperience onClose={closeExperience} autoAppear={autoAppear ?? undefined} pickupRoute={pickupRoute} />
+        <PickAChumExperience onClose={closeExperience} autoAppear={autoAppear ?? undefined} pickupRoute={pickupRoute} terrierSay={terrierSay} />
       ) : (
         <button
           ref={buttonRef}

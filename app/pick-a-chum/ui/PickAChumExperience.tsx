@@ -21,7 +21,8 @@ import { CHUM_DATA } from '../lib/data';
 import { submit, Turn } from '../lib/engine';
 import { newSession, Session } from '../lib/session';
 import { Dog, GameId } from '../lib/types';
-import { reportHiddenGame } from '../../../lib/hiddenGames/browserEngine';
+import { reportHiddenGame, reportHat } from '../../../lib/hiddenGames/browserEngine';
+import { chatHatFor, BIRTHDAY_HAT_ID, KENNEL_SKETCH_HAT_ID } from '../../../lib/hiddenGames/hatHunt';
 import type { GameId as HiddenGameId } from '../../../lib/hiddenGames/registry';
 import { openDiscountPopup } from '../data/discount-popup';
 import { FEED_COOKIES, RED_TOOLTIP, CookiePill } from '../data/feed-cookie';
@@ -120,6 +121,7 @@ interface Message {
   action?: Command;
   closed?: boolean; // this dog turn is the session cut-off
   support?: boolean; // S12: rendered under the shared support surface (no dog identity)
+  plainSurface?: boolean; // Task 156: a safety/grief response -- keep the neutral bubble, never a dog's playful colour
   typing?: boolean; // thinking dots are showing
   display?: string; // text revealed so far (typing theatre)
   done?: boolean; // performance finished (show the action link, allow the next)
@@ -180,11 +182,30 @@ const PROFILE_IMG: Record<Dog, string> = {
   boxer: '/boxer-chat-profile-img2.jpg',
   terrier: '/terrier-chat-profile-img2.jpg',
 };
+// Task 156 (§2/§3): the tappable portrait cycles through each dog's alternate images, IN ORDER. The files
+// follow the pattern `<prefix>-chat-profile-<variant>.jpg` (the Labrador's file prefix is "lab"), so no
+// lookup table maps a logical name to a path -- but the AVAILABLE variants differ per dog (the Boxer has
+// no scarf2, the Collie only hat1), so the set each dog cycles is listed here. Index 0 (`img2`) is the
+// current default portrait, so the cycle starts where it does today.
+const PROFILE_PREFIX: Record<Dog, string> = { collie: 'collie', labrador: 'lab', boxer: 'boxer', terrier: 'terrier' };
+const PROFILE_CYCLE: Record<Dog, string[]> = {
+  collie: ['img2', 'hat1'],
+  labrador: ['img2', 'hat1', 'hat2', 'scarf1', 'scarf2'],
+  boxer: ['img2', 'hat1', 'hat2', 'scarf1'],
+  terrier: ['img2', 'hat1', 'hat2', 'scarf1', 'scarf2'],
+};
+function portraitSrc(dog: Dog, idx: number): string {
+  const list = PROFILE_CYCLE[dog];
+  return `/${PROFILE_PREFIX[dog]}-chat-profile-${list[((idx % list.length) + list.length) % list.length]}.jpg`;
+}
 
 // Task 123: each in-chat game is a Hidden Games find, awarded the moment its opening surface (the
 // board / masked word / drawing) is SERVED -- i.e. on game_start, before any move or guess. The bark
 // game is deliberately NOT here: a single "woof" is a turn, not finding a game.
 const HIDDEN_GAME_ID: Record<GameId, HiddenGameId> = { ninesquare: 'G03', missingsheep: 'G04', kennelsketch: 'G05', treattrail: 'G07', missingbiscuit: 'G08', feedcookie: 'G09' };
+// Task 156 (§4): which Kennel Sketch drawing carries the hidden hat -- the KENNEL sketch, index 5 (BONE,
+// BALL, BOWL, LEAD, STICK, KENNEL, ...). Reached by playing, so the hat is not free with the game find.
+const KENNEL_HAT_SKETCH_INDEX = 9;
 
 // Task 148: an unbidden Terrier appearance. When passed (and there is no restored chat), the
 // experience mounts with the Terrier already chosen and MINIMISED, seeded with his `offer` line; on
@@ -194,6 +215,15 @@ const HIDDEN_GAME_ID: Record<GameId, HiddenGameId> = { ninesquare: 'G03', missin
 // dynamic case (the Collie naming three random breeds on /know-your-chums): the lines are generated in
 // the experience so the lightweight launcher never pulls the breed data.
 export type AutoAppear = { dog: Dog; offer: string; reveal: string; route: string; followUps?: string[]; gapMs?: number; chums?: boolean };
+
+// Task 156: safety and grief responses keep the neutral bubble, never a dog's playful fill. safeguarding
+// already hides the dog identity (support); grief, the health boundary, the anatomy redirect and the bare-
+// help clarifier are the rest of the "this is help, not chat" surface.
+const NEUTRAL_SURFACE = new Set(['grief', 'health_answer', 'anatomy_redirect', 'clarifier', 'safety_signpost', 'safety_boundary']);
+// Task 156 (§7): per-dog dialogue-bubble fills -- another signal of who you are talking to. The class sets
+// the bubble background and its text colour (module CSS). Labrador yellow/black, Collie navy/white, Terrier
+// light blue/black, Boxer light orange/dark blue. Applied to normal messages only.
+const BUBBLE_CLASS: Record<Dog, string> = { labrador: 'bubbleLabrador', collie: 'bubbleCollie', terrier: 'bubbleTerrier', boxer: 'bubbleBoxer' };
 
 // Task 151 Case A: the Labrador's thread pickup on /hot-dogs. He speaks FIRST (new: every message so far
 // has been a reply) into an existing chat, and arms the cookie ask so a "yes" feeds him. Owner copy, verbatim.
@@ -216,7 +246,7 @@ function collieChumLines(): string[] {
   });
 }
 
-export default function PickAChumExperience({ onClose, autoAppear, pickupRoute }: { onClose: () => void; autoAppear?: AutoAppear; pickupRoute?: string | null }) {
+export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, terrierSay }: { onClose: () => void; autoAppear?: AutoAppear; pickupRoute?: string | null; terrierSay?: string | null }) {
   // Task 140: the page the visitor is on, carried into the engine as session state (like lastAction)
   // so "what is this page" answers with that page's bio. Always a string on a real route.
   const pathname = usePathname();
@@ -316,6 +346,23 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute }
     setAnnounce(LAB_HOTDOG_PICKUP);
     if (minimised) setSpoke(true);
   }, [pickupRoute, minimised]);
+  // Task 156 (§8): the Terrier's hat-hunt countdown lands IN THE OPEN CHAT (not a toast) -- he speaks it
+  // unprompted, becoming the active dog, and pulses the chip so it is noticed. Same pattern as the
+  // Labrador's thread pickup. Never into a protected session (double-guarded: the launcher checks
+  // pc-protected before passing a line, and reportHat itself is suppressed there, so no line arrives).
+  const terrierSaidRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!terrierSay || terrierSaidRef.current === terrierSay) return;
+    const session = sessionRef.current;
+    if (!session || session.protectedState || everProtectedRef.current) return;
+    terrierSaidRef.current = terrierSay;
+    session.activeDog = 'terrier';
+    if (!session.previousDogs.includes('terrier')) session.previousDogs.push('terrier');
+    setDog('terrier');
+    setMessages((m) => [...m, { id: idRef.current++, who: 'dog', text: terrierSay, dog: 'terrier', name: dogInfo('terrier').name, display: terrierSay, done: true, plainSurface: false }]);
+    setAnnounce(terrierSay);
+    if (minimised) setSpoke(true);
+  }, [terrierSay, minimised]);
   // One body-level signal drives everything that must not co-exist with the
   // chip: the scrim (owner ruling: no chat UI left to lift) and the offer
   // card (owner ruling: two floating things in one corner is worse than
@@ -350,6 +397,10 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute }
   const [dragOffset, setDragOffset] = useState<{ dx: number; dy: number }>({ dx: 0, dy: 0 });
   const [dragging, setDragging] = useState(false); // grows the handle while moving
   useEffect(() => { setDragOffset({ dx: 0, dy: 0 }); }, [dog]);
+  // Task 156 (§3): which alternate portrait each dog is showing, in cycle order. Component state, so it
+  // STICKS for the session but RESETS on reload (consistent with everything else being stateless); the
+  // hats it uncovers persist separately in the Hidden Games record.
+  const [profileIdx, setProfileIdx] = useState<Record<Dog, number>>({ collie: 0, labrador: 0, boxer: 0, terrier: 0 });
   const startColumnDrag = useCallback((e: React.PointerEvent<HTMLButtonElement>) => {
     e.preventDefault();
     const el = e.currentTarget;
@@ -372,6 +423,56 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute }
     el.addEventListener('pointerup', up);
     el.addEventListener('pointercancel', up);
   }, []);
+  // Task 156 (§3): the WHOLE portrait is now the draggable surface AND the tap-to-cycle surface, told
+  // apart by MOVEMENT. Press and release without moving past the threshold -> the next profile image (on
+  // RELEASE, so a drag never flips the image on its way out). Press and move past the threshold -> drag
+  // the dog and chat, no cycle. Thresholds: 5px mouse, 10px touch (fingers wobble, a phone tap is never
+  // perfectly still). The yellow handle still drags too (startColumnDrag); the close X and minimise are
+  // separate elements, so they never become drag targets.
+  const cyclePortrait = useCallback(() => {
+    setProfileIdx((prev) => {
+      const next = (prev[dog] ?? 0) + 1;
+      // Task 156 (§4): revealing a HAT portrait finds that hat. reportHat carries the protected guard
+      // itself; the extra check here stops it the instant a disclosure lands, before the flag is written.
+      const list = PROFILE_CYCLE[dog];
+      const variant = list[((next % list.length) + list.length) % list.length];
+      const hat = chatHatFor(dog, variant);
+      if (hat && !sessionRef.current?.protectedState && !everProtectedRef.current) reportHat(hat.id);
+      return { ...prev, [dog]: next };
+    });
+  }, [dog]);
+  const startPortrait = useCallback((e: React.PointerEvent<HTMLElement>) => {
+    e.preventDefault();
+    const el = e.currentTarget;
+    el.setPointerCapture(e.pointerId);
+    const sx = e.clientX;
+    const sy = e.clientY;
+    const start = { ...dragOffsetRef.current };
+    const threshold = e.pointerType === 'touch' ? 10 : 5;
+    let moved = false;
+    const move = (ev: PointerEvent) => {
+      const dx = ev.clientX - sx;
+      const dy = ev.clientY - sy;
+      if (!moved && Math.hypot(dx, dy) > threshold) {
+        moved = true;
+        setDragging(true);
+      }
+      if (moved) {
+        dragOffsetRef.current = { dx: start.dx + dx, dy: start.dy + dy };
+        setDragOffset(dragOffsetRef.current);
+      }
+    };
+    const up = () => {
+      el.removeEventListener('pointermove', move);
+      el.removeEventListener('pointerup', up);
+      el.removeEventListener('pointercancel', up);
+      if (moved) setDragging(false);
+      else cyclePortrait(); // a tap (never passed the threshold): cycle on release, silently
+    };
+    el.addEventListener('pointermove', move);
+    el.addEventListener('pointerup', up);
+    el.addEventListener('pointercancel', up);
+  }, [cyclePortrait]);
   const dragOffsetRef = useRef(dragOffset);
   useEffect(() => { dragOffsetRef.current = dragOffset; }, [dragOffset]);
   useEffect(() => {
@@ -781,6 +882,10 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute }
       dog: toDog,
       name: r.hideDogIdentity ? (r.header ?? 'HELP AND SUPPORT') : dogInfo(toDog).name,
       support: r.hideDogIdentity,
+      // Task 156: safety and grief stay on the neutral bubble (never a dog's playful fill), so they read
+      // as help, not chat. safeguarding already hides the dog identity; grief and the anatomy/health
+      // boundaries are added here.
+      plainSurface: r.hideDogIdentity || NEUTRAL_SURFACE.has(result.resolution.action),
       action: actionFor(r),
       closed: r.closed,
       // A breed page link and the breed-hub index link are CONTEXTUAL links (they
@@ -804,6 +909,14 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute }
     // on the turn that throws the link rather than on a game_start.
     if (result.resolution.action === 'random_link') {
       reportHiddenGame('G06');
+    }
+    // Task 156 (§4): the Kennel Sketch hat rides the HAT drawing -- the tenth sketch (index 9), added to
+    // kennel-sketches.ts for exactly this. When the game serves it (reached by playing, not on start), the
+    // hat is found. reportHat is protected-guarded. The drawing is a flat cap, so the hat is really in it.
+    if ((result.resolution.action === 'game_start' || result.resolution.action === 'game_move') &&
+      sessionRef.current?.activeGame === 'kennelsketch' && sessionRef.current.game?.sketchIndex === KENNEL_HAT_SKETCH_INDEX &&
+      !sessionRef.current.protectedState && !everProtectedRef.current) {
+      reportHat(KENNEL_SKETCH_HAT_ID);
     }
 
     // Bark-game break / fetch / the cookie give-up: the main lands instantly, then a follow-up message.
@@ -946,7 +1059,7 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute }
                   and name live once, on the medallion at the top of the
                   column. A visually hidden speaker label keeps each bubble
                   attributed for screen readers. */}
-              <div className={styles.bubbleDog}>
+              <div className={`${styles.bubbleDog} ${!msg.support && !msg.plainSurface && msg.dog ? styles[BUBBLE_CLASS[msg.dog]] : ''}`}>
                 {/* S12: the support surface keeps its VISIBLE header -- it is
                     the safety surface's label, not name repetition. */}
                 {msg.support ? (
@@ -993,6 +1106,9 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute }
                       loop
                       playsInline
                       preload="metadata"
+                      // Task 156 (§4): the party-hat pug in birthday.mp4 is a hidden hat -- it counts ON
+                      // PLAY (seeing the clip finds it), not on tap. reportHat carries the protected guard.
+                      onPlay={msg.media.src.includes('/birthday.mp4') ? () => { if (!sessionRef.current?.protectedState && !everProtectedRef.current) reportHat(BIRTHDAY_HAT_ID); } : undefined}
                     />
                   );
                 })()}
@@ -1099,7 +1215,8 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute }
                         ring do not go black or rotate with her. */}
                     <div
                       className={`${styles.dogFace} ${dead ? styles.anchorDead : ''} ${roll ? styles.anchorRoll : ''}`}
-                      style={{ backgroundImage: `url("${PROFILE_IMG[dog]}")` }}
+                      style={{ backgroundImage: `url("${portraitSrc(dog, profileIdx[dog] ?? 0)}")`, touchAction: 'none', cursor: 'grab' }}
+                      onPointerDown={startPortrait}
                       onAnimationEnd={() => setRoll(false)}
                     />
                     <button type="button" className={styles.close} aria-label="Close Pick a Chum" onClick={onClose}>
@@ -1203,7 +1320,7 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute }
             className={`${styles.miniFace} ${(auto && !revealedRef.current) || spoke ? styles.miniAuto : ''}`}
             aria-label={`Reopen the chat with the ${dogInfo(dog).name}`}
             title={`Reopen the chat with the ${dogInfo(dog).name}`}
-            style={{ backgroundImage: `url("${PROFILE_IMG[dog]}")` }}
+            style={{ backgroundImage: `url("${portraitSrc(dog, profileIdx[dog] ?? 0)}")` }}
             onClick={() => {
               setMinimised(false);
               setSpoke(false); // Task 151: opening the chip clears the "he said something" pulse
@@ -1243,8 +1360,9 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute }
                   do not go black or rotate with her. */}
               <div
                 className={`${styles.dogFace} ${dead ? styles.anchorDead : ''} ${roll ? styles.anchorRoll : ''}`}
-                // Task 111: the anchor uses the same -img2 profile photo as the dog's messages, so they match.
-                style={{ backgroundImage: `url("${PROFILE_IMG[dog]}")` }}
+                // Task 156: the portrait cycles on tap and drags on move (mobile medallion too).
+                style={{ backgroundImage: `url("${portraitSrc(dog, profileIdx[dog] ?? 0)}")`, touchAction: 'none', cursor: 'grab' }}
+                onPointerDown={startPortrait}
                 onAnimationEnd={() => setRoll(false)}
               />
               <button type="button" className={styles.close} aria-label="Close Pick a Chum" onClick={onClose}>

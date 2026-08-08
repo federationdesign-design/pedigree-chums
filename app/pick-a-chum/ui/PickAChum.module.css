@@ -307,7 +307,10 @@
 .bubbleUser {
   max-width: 82%;
   padding: 11px 18px;
-  background: var(--pc-ui-yellow);
+  /* Task 156 (§7): the visitor's bubbles are now WHITE, whichever dog is active. The Labrador's dog
+     bubbles are yellow, so keeping the visitor yellow would merge the two sides; white stays distinct
+     from all four dog fills. */
+  background: #ffffff;
   border-radius: 20px;
   box-shadow: var(--pc-shadow);
   color: var(--pc-ui-navy);
@@ -315,6 +318,35 @@
   font-size: 16px;
   line-height: 1.4;
   animation: pcRise 260ms ease both;
+}
+/* Task 156 (§7): per-dog dialogue-bubble fills, another who-you-are signal. Applied to NORMAL messages
+   only -- safety and grief keep the neutral white bubble (see the gate in the component). Solid colours,
+   no text opacity or rgba (house rules). Navy for the Collie is the site's own colour, reading almost as
+   black; light orange + dark blue (the Boxer) is the closest combination to the contrast line and is
+   comfortable (checked ~9.7:1). */
+.bubbleLabrador {
+  background: var(--pc-ui-yellow);
+}
+.bubbleLabrador .dialogue {
+  color: #1a1a1a;
+}
+.bubbleCollie {
+  background: var(--pc-ui-navy);
+}
+.bubbleCollie .dialogue {
+  color: #ffffff;
+}
+.bubbleTerrier {
+  background: #cdeafe;
+}
+.bubbleTerrier .dialogue {
+  color: #1a1a1a;
+}
+.bubbleBoxer {
+  background: #ffe0b3;
+}
+.bubbleBoxer .dialogue {
+  color: #0a3a57;
 }
 .dialogue {
   margin: 0;
