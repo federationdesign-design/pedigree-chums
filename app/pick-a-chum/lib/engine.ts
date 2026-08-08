@@ -159,6 +159,8 @@ function serveGameResult(resolution: Resolution, data: ChumData, result: GameRes
   if (result.media) resolution.gameMedia = result.media;
   // Task 151: a follow-up beat served as a second message after a pause (the cookie give-up "zzz").
   if (result.followUpId) resolution.gameFollowUp = gameCopy(data, result.followUpId);
+  // Task 166: a red cookie's clip rides the follow-up (reaction first, then clip + reason a beat later).
+  if (result.followUpMedia) resolution.gameFollowUpMedia = result.followUpMedia;
 }
 // LOOP-02 is candidate-driven: it names the specific destination the candidate maps to. A breed
 // candidate (a Title-Case breed name) -> its page; a game-family word -> the card game rules;

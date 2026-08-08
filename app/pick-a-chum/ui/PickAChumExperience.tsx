@@ -702,7 +702,7 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
   // is never approached by a sequence, only by the single main message that precedes it.
   const SEQ_MAX_EXTRAS = 2;
   const playSequence = useCallback(
-    (lines: string[], seqDog: Dog, gapMs: number, showAvatar = false) => {
+    (lines: string[], seqDog: Dog, gapMs: number, showAvatar = false, media?: { src: string; alt: string }) => {
       const items = lines.filter((l) => l && l.trim()).slice(0, SEQ_MAX_EXTRAS);
       if (!items.length) return;
       const s = sessionRef.current;
@@ -720,7 +720,10 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
           return;
         }
         const line = items[i];
-        setMessages((m) => [...m, { id: idRef.current++, who: 'dog', text: line, display: line, done: true, dog: seqDog, name: dogInfo(seqDog).name, avatar: showAvatar }]);
+        // Task 166: the media rides ONLY the last line of the run (a red cookie's clip on its single
+        // follow-up line), so a multi-line sequence never repeats the clip.
+        const withMedia = media && i === items.length - 1 ? media : undefined;
+        setMessages((m) => [...m, { id: idRef.current++, who: 'dog', text: line, display: line, done: true, dog: seqDog, name: dogInfo(seqDog).name, avatar: showAvatar, media: withMedia }]);
         setAnnounce(line);
         if (i + 1 < items.length) {
           after(gapMs, () => play(i + 1));
@@ -1064,7 +1067,10 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
       setAnnounce(r.text);
       setPhase('idle');
       window.setTimeout(() => inputRef.current?.focus(), 0);
-      playSequence([followUp], toDog, reducedMotion ? 0 : 500);
+      // Task 166: a red cookie's follow-up carries the clip + the reason, and lands 1.0s after his reaction
+      // (a deliberate beat, longer than the usual 500ms follow-up). Other follow-ups are unchanged.
+      const gap = r.followUpMedia ? (reducedMotion ? 0 : 1000) : (reducedMotion ? 0 : 500);
+      playSequence([followUp], toDog, gap, false, r.followUpMedia);
       return;
     }
 

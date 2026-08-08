@@ -44,6 +44,7 @@ export interface GameResult {
   link?: string; // treat-trail: a finale link (SAUSAGE -> /hot-dogs)
   media?: { src: string; alt: string }; // feed-cookie: a clip shown every fifth cookie (good/queasy)
   followUpId?: string; // Task 151: a workbook row served as a SECOND message after a beat (the cookie give-up "zzz")
+  followUpMedia?: { src: string; alt: string }; // Task 166: a clip carried ON the follow-up (a red cookie: reaction first, then clip + reason a beat later)
   ended: boolean; // true: the game is over, clear session.activeGame
 }
 
@@ -308,15 +309,20 @@ function feedCookieMove(state: GameState, input: string): { state: GameState; re
     return { state, result: { line: 'B67-FEEDCOOKIE-NUDGE', display: '', ended: false } };
   }
   const fed = [...state.fed, cookie.id];
-  // Task 161: a RED cookie ALWAYS shows the queasy clip (a red cookie is always cookie-bad). A BLUE one
-  // shows the happy clip on the cadence: the FIRST cookie, then every third (cookies 1, 4, 7, 10).
-  const media = cookie.red ? COOKIE_CLIP.red : fed.length % 3 === 1 ? COOKIE_CLIP.blue : undefined;
   const ns = { ...state, fed };
   // Task 161: he NEVER gives up. He is greedy and does not know when he is full, so every pill can be fed
   // (red included) and the game just ends when the tray runs out at twelve -- no "full"/"zzz" wind-down.
   const ended = fed.length >= FEED_COOKIES.length;
-  const line = cookie.red ? 'B67-FEEDCOOKIE-RED' : 'B67-FEEDCOOKIE-BLUE';
-  return { state: ns, result: { line, clueId: cookie.teachId, media, display: '', ended } };
+  if (cookie.red) {
+    // Task 166: SPLIT a red cookie. His reaction lands first; the queasy clip (a red cookie is always
+    // cookie-bad) and the reason (why we do not use this kind) arrive TOGETHER a beat later, not all at
+    // once. The reason moves from an inline clue to the follow-up, and the clip rides the follow-up too.
+    return { state: ns, result: { line: 'B67-FEEDCOOKIE-RED', followUpId: cookie.teachId, followUpMedia: COOKIE_CLIP.red, display: '', ended } };
+  }
+  // BLUE is UNCHANGED: reaction + the one-line lesson (appended) + a happy clip on the cadence (the FIRST
+  // cookie, then every third: 1, 4, 7, 10), all together. Blue pills have no tooltip; that absence is the contrast.
+  const media = fed.length % 3 === 1 ? COOKIE_CLIP.blue : undefined;
+  return { state: ns, result: { line: 'B67-FEEDCOOKIE-BLUE', clueId: cookie.teachId, media, display: '', ended } };
 }
 
 // ---- DO NOT PRESS THAT BUTTON (the Boxer's game; Task 164) ----

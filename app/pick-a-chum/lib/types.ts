@@ -236,4 +236,5 @@ export interface Resolution {
   gameDisplay?: string;
   gameMedia?: { src: string; alt: string }; // Task 149: a clip served with a game turn (feed-cookie, every fifth)
   gameFollowUp?: string; // Task 151: a second message served after a beat (the cookie give-up "zzz")
+  gameFollowUpMedia?: { src: string; alt: string }; // Task 166: a clip carried on the follow-up (a red cookie's clip arrives with the reason, a beat after his reaction)
 }
