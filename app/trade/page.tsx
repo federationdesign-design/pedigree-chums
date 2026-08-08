@@ -119,8 +119,8 @@ export default function TradePage() {
           </div>
           <div className={styles.railSub}>
             <p className={styles.bodyCenter}>
-              54 uniquely illustrated cards — 40 of the UK&apos;s most popular
-              breeds plus 12 designer crossbreeds.
+              54 uniquely illustrated cards — 47 of the UK&apos;s most popular
+              breeds plus 7 designer crossbreeds.
             </p>
           </div>
           <CardRail />
@@ -203,7 +203,7 @@ export default function TradePage() {
               <tbody>
                 <tr>
                   <th scope="row">Cards</th>
-                  <td>54 uniquely illustrated cards (40 breeds + 12 designer crossbreeds)</td>
+                  <td>54 uniquely illustrated cards (47 breeds and 7 crossbreeds)</td>
                 </tr>
                 <tr>
                   <th scope="row">Card size</th>

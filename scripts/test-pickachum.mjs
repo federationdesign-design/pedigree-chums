@@ -2446,7 +2446,9 @@ check('which is the most popular', { action: 'canned', bucket: 'B53' }, { assert
 // Dog History (DST007). Both must resolve to a real page link.
 check('biggest dog', { action: 'canned', bucket: 'B51' }, { destinationId: 'DST006', url: '/know-your-chums', assert: (_r, resp) => (resp.text === 'The Irish Wolfhound' ? null : `B51 text: "${resp.text}"`) });
 check('fastest dog', { action: 'canned', bucket: 'B51' }, { destinationId: 'DST006', url: '/know-your-chums' });
-check('smallest dog', { action: 'canned', bucket: 'B51' }, { destinationId: 'DST006', url: '/know-your-chums' });
+// Stats audit fix 2: the smallest dog is the Chihuahua (data/breeds.ts: 23cm vs the Maltese's 38cm), not
+// the Maltese as B51 was originally drafted.
+check('smallest dog', { action: 'canned', bucket: 'B51' }, { destinationId: 'DST006', url: '/know-your-chums', assert: (_r, resp) => (resp.text === 'The Chihuahua' ? null : `B51 smallest: "${resp.text}"`) });
 check('why are there so many', { action: 'canned', bucket: 'B52' }, { destinationId: 'DST007', url: '/britains-dog-history', assert: (_r, resp) => (resp.text === 'Our history is dog rich' ? null : `MISC-01 text: "${resp.text}"`) });
 
 // The two clip rows moved from MEDIA_REPLIES into the workbook keep their clips (asserted above:

@@ -34,8 +34,8 @@ export default function PitchPanel() {
               <li className="point">Compact size, pocket-friendly, lightweight</li>
               <li className="point">Made in the UK using recycled paper</li>
               <li className="point">Fully biodegradable – no plastic coatings</li>
-              <li className="point">40 of the most popular UK dog breeds</li>
-              <li className="point">Plus 12 designer crossbreeds</li>
+              <li className="point">47 of the most popular UK dog breeds</li>
+              <li className="point">Plus 7 designer crossbreeds</li>
             </ul>
             <OfferCta />
           </div>
