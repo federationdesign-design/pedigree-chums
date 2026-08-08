@@ -5,7 +5,7 @@
 import { ChumData, Resolution } from './types';
 import { normalise } from './normalise';
 import { resolve, resolveCanned, extractCandidateSubject } from './router';
-import { startGame, applyMove, exitLine, GameResult } from './games';
+import { startGame, applyMove, exitLine, gameExitText, GameResult } from './games';
 import { assemble, Assembled } from './assembler';
 import { Session, Topic } from './session';
 import { detectSadnessClear } from './safety';
@@ -133,7 +133,9 @@ function gameCopy(data: ChumData, line: string): string {
 // Task 115: fold a computed game result onto the resolution for the assembler: the responseId to serve,
 // its copy with {{WORD}}/{{ANSWER}} substituted, and the monospace display block.
 function serveGameResult(resolution: Resolution, data: ChumData, result: GameResult): void {
-  let text = gameCopy(data, result.line);
+  // Task 164: a game may carry literal copy (the Boxer's scenario, a data record) rather than a bank
+  // responseId; prefer it. Every other game leaves result.text undefined and is served from the bank.
+  let text = result.text ?? gameCopy(data, result.line);
   if (result.word) text = text.replace(/\{\{\s*WORD\s*\}\}/g, result.word);
   if (result.answer) text = text.replace(/\{\{\s*ANSWER\s*\}\}/g, result.answer);
   // Task 146 (Treat Trail): a turn serves a reaction line plus the next clue, both workbook B65 rows,
@@ -273,7 +275,9 @@ export function submit(data: ChumData, session: Session, input: string): Turn {
     const g = session.activeGame ?? 'ninesquare';
     const line = exitLine(g);
     resolution.gameLine = line;
-    resolution.gameText = gameCopy(data, line);
+    // Task 164: the Boxer game's exit copy is a data record, served directly; every other game's exit
+    // line comes from the bank as before (gameExitText returns '' for them, so the fallback holds).
+    resolution.gameText = gameExitText(g) || gameCopy(data, line);
     resolution.gameDisplay = '';
     session.activeGame = null;
     session.game = null;

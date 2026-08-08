@@ -26,6 +26,8 @@ import { chatHatFor, BIRTHDAY_HAT_ID, KENNEL_SKETCH_HAT_ID } from '../../../lib/
 import type { GameId as HiddenGameId } from '../../../lib/hiddenGames/registry';
 import { openDiscountPopup } from '../data/discount-popup';
 import { FEED_COOKIES, RED_TOOLTIP, CookiePill } from '../data/feed-cookie';
+import { applyBoxerEffect, resetBoxerEffects } from '../lib/boxerEffects';
+import { BOXER_BUTTONS, BoxerButton } from '../data/boxer-button-game';
 import { breeds } from '../../../data/breeds';
 import { skipTheatre, buildTypingPlan, TYPING_PROFILES, TypingPlan } from '../lib/theatre';
 import { emitTurn } from '../lib/turn-tap';
@@ -202,7 +204,9 @@ function portraitSrc(dog: Dog, idx: number): string {
 // Task 123: each in-chat game is a Hidden Games find, awarded the moment its opening surface (the
 // board / masked word / drawing) is SERVED -- i.e. on game_start, before any move or guess. The bark
 // game is deliberately NOT here: a single "woof" is a turn, not finding a game.
-const HIDDEN_GAME_ID: Record<GameId, HiddenGameId> = { ninesquare: 'G03', missingsheep: 'G04', kennelsketch: 'G05', treattrail: 'G07', missingbiscuit: 'G08', feedcookie: 'G09' };
+const HIDDEN_GAME_ID: Record<GameId, HiddenGameId> = { ninesquare: 'G03', missingsheep: 'G04', kennelsketch: 'G05', treattrail: 'G07', missingbiscuit: 'G08', feedcookie: 'G09', buttonpanel: 'G11' };
+// Task 164: the one FIX IT / repair button (effect null), reused by the panel and the emergency reset.
+const BOXER_FIX = BOXER_BUTTONS.find((b) => b.effect === null) as BoxerButton;
 // Task 156 (§4): which Kennel Sketch drawing carries the hidden hat -- the KENNEL sketch, index 5 (BONE,
 // BALL, BOWL, LEAD, STICK, KENNEL, ...). Reached by playing, so the hat is not free with the game find.
 const KENNEL_HAT_SKETCH_INDEX = 9;
@@ -272,6 +276,14 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
   // ends the game. `armedRed` is the red pill whose "we dont use this" tooltip is currently open.
   const [feedFed, setFeedFed] = useState<string[] | null>(null);
   const [armedRed, setArmedRed] = useState<string | null>(null);
+  // Task 164: the Boxer's DO NOT PRESS THAT BUTTON panel. `boxer` mirrors the game state into React (like
+  // feedFed): null hides the panel (and, going null, resets every effect), an object shows the panel with
+  // the currently-live effect class or null. On a RESTORE after refresh/navigation it starts with no effect
+  // (brief section 8: a clean page after refresh), even if the game itself is still active.
+  const [boxer, setBoxer] = useState<{ effect: string | null } | null>(
+    restored?.session?.activeGame === 'buttonpanel' ? { effect: null } : null
+  );
+  const boxerEffect = boxer?.effect ?? null;
   const [messages, setMessages] = useState<Message[]>(
     restored
       ? restored.messages || []
@@ -401,6 +413,43 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
     else document.body.removeAttribute('data-pc-min');
     return () => document.body.removeAttribute('data-pc-min');
   }, [minimised]);
+
+  // Task 164: drive the page from the Boxer game state. A fresh `boxer` object each turn re-runs this, so
+  // applyBoxerEffect (which resets the previous effect first) keeps exactly one effect live; going null
+  // (game ended, transfer away, safety) resets the page. This is the ONLY place the game paints the site.
+  useEffect(() => {
+    if (boxer?.effect) applyBoxerEffect(boxer.effect);
+    else resetBoxerEffects();
+  }, [boxer]);
+
+  // Task 164 section 2.1: a client-side route change does NOT unload the page, so pagehide never fires and
+  // an effect would follow the visitor from one page to the next. Reset on every navigation. Unconditional
+  // (the Task 152 sequence abandon just above is guarded; this must run whether or not a sequence is live).
+  useEffect(() => {
+    resetBoxerEffects();
+  }, [pathname]);
+
+  // Task 164 section 2.2: the reset lives in the dog interface, which shrinks to a chip on minimise. Chosen
+  // behaviour: MINIMISING TRIGGERS A RESET, so the visitor is never left with a dark site and the recovery
+  // tucked into a chip. It does not survive into the chip; on restore the page is already clean, and a
+  // further button press re-applies (the mirror above runs on the fresh object).
+  useEffect(() => {
+    if (minimised) resetBoxerEffects();
+  }, [minimised]);
+
+  // Task 164 section 8: belt-and-braces resets that the mirror cannot cover. A real page unload/refresh
+  // (pagehide) and an uncaught error both strip the effects, and closing/unmounting the chat leaves the
+  // page clean. Client-side navigation and minimise are handled by their own effects above.
+  useEffect(() => {
+    const reset = () => resetBoxerEffects();
+    window.addEventListener('pagehide', reset);
+    window.addEventListener('error', reset);
+    return () => {
+      window.removeEventListener('pagehide', reset);
+      window.removeEventListener('error', reset);
+      resetBoxerEffects();
+    };
+  }, []);
 
   // Task 130/131 + review fix: the conversation column sits at the chosen
   // dog's side (right when there is room, flipped left when the viewport
@@ -835,6 +884,11 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
     // game, when all twelve are eaten (the engine clears activeGame), or on any transfer away.
     setFeedFed(session.activeGame === 'feedcookie' && session.game ? [...session.game.fed] : null);
     setArmedRed(null);
+    // Task 164: refresh the Boxer panel from the freshly-mutated session. Null (panel hidden) unless his
+    // button game owns the input, which also strips every effect the instant a safety/grief turn, a FIX IT
+    // (the engine clears activeGame on ended) or a transfer away ends the game. A fresh object each turn, so
+    // the mirror effect re-asserts the live effect even when the same button is pressed twice.
+    setBoxer(session.activeGame === 'buttonpanel' && session.game ? { effect: session.game.effect } : null);
     // Record this turn (no-op in production; the dev recorder is the only sink).
     // submissionCount was just incremented by submit, so it is this turn's number.
     emitTurn({
@@ -1062,6 +1116,15 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
     send(c.id);
   }, [armedRed, send]);
 
+  // Task 164: press a Boxer control-panel button. Announce the result for screen readers (brief section 9);
+  // for FIX IT (and the emergency reset), strip the page SYNCHRONOUSLY so the site is clean instantly rather
+  // than after the reply's typing theatre, then send the move so his line still lands and the game ends.
+  const pressBoxer = useCallback((btn: BoxerButton) => {
+    setAnnounce(btn.announce);
+    if (btn.effect === null) resetBoxerEffects();
+    send(btn.id);
+  }, [send]);
+
   // Task 149: "next tap anywhere dismisses" -- while a red tooltip is open, any pointer down that is not
   // on that same pill closes it. Capture phase so it runs before the pill's own click (a second tap on
   // the armed pill is left alone here and feeds via feedPill).
@@ -1103,6 +1166,27 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
           </span>
         )
       )}
+    </div>
+  ) : null;
+
+  // Task 164: the Boxer's control panel. Rendered while his button game owns the input (boxer non-null).
+  // Each button submits its id as a move (like a cookie pill); the engine records the effect and the mirror
+  // paints it. Every EFFECT button is tagged data-boxer-wobble so the wobble effect can move them; FIX IT is
+  // NOT tagged, so the way back never moves (Task 164 section 3). Real <button>s, keyboard-accessible.
+  const panelEl = boxer !== null ? (
+    <div className={styles.buttonPanel} role="group" aria-label="The Boxer's control panel">
+      {BOXER_BUTTONS.map((b) => (
+        <button
+          key={b.id}
+          type="button"
+          data-boxer-btn={b.id}
+          {...(b.wobble ? { 'data-boxer-wobble': '' } : {})}
+          className={`${styles.buttonPanelBtn} ${b.effect === null ? styles.buttonPanelFix : ''}`}
+          onClick={() => pressBoxer(b)}
+        >
+          {b.label}
+        </button>
+      ))}
     </div>
   ) : null;
 
@@ -1193,6 +1277,8 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
         )}
         {/* Task 149: the cookie tray sits at the foot of the thread, under his latest line. */}
         {trayEl}
+        {/* Task 164: the Boxer's control panel sits at the foot of the thread, under his latest line. */}
+        {panelEl}
       </div>
     </div>
   );
@@ -1212,7 +1298,10 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
         value={input}
         onChange={(e) => setInput(e.target.value)}
       />
-      <button type="submit" className={styles.go} aria-label="Send">
+      {/* Task 164: the composer Send is the one SITE-side control tagged for the Boxer wobble (it is not a
+          navigation or commerce control, so moving it is safe and on-joke). Every other wobble target is a
+          panel effect button. FIX IT and the emergency reset are never tagged, so the way back stays still. */}
+      <button type="submit" className={styles.go} aria-label="Send" data-boxer-wobble>
         GO
       </button>
     </form>
@@ -1233,6 +1322,18 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
       {/* Task 105: the wash dims but no longer captures clicks (pointer-events via .wash/.root), so the
           page beneath stays usable; it no longer closes on click (X and Escape still close). */}
       <div className={styles.wash} />
+
+      {/* Task 164 (brief section 8): a persistent, visible emergency reset in the dog interface, shown
+          whenever an effect is live and the chat is open. It sits fixed above the effects (it lives in the
+          chat overlay, which stays bright), never wobbles, and restores the page instantly on press. When
+          the chat is minimised the effect is already reset (section 2.2), so it is not needed there. */}
+      {boxerEffect && !minimised && (
+        <div className={styles.boxerResetFloat}>
+          <button type="button" className={styles.boxerReset} onClick={() => pressBoxer(BOXER_FIX)}>
+            RESET THE PAGE
+          </button>
+        </div>
+      )}
 
       {(phase === 'selecting' || (wide && !minimised)) && (
         <div className={styles.selectorWrap}>

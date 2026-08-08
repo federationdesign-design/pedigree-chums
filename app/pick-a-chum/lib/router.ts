@@ -1097,6 +1097,9 @@ const MISSING_BISCUIT_START = /(missing biscuit|the case of the missing biscuit|
 // Task 149: Feed the Dog a Cookie entry phrases (the Labrador's second game only). "cookies" does not
 // route to the /cookies policy (verified), so it is free to use here; gated on the Labrador in resolve().
 const FEED_COOKIE_START = /(feed the dog|feed the lab|feed the labrador|feed me|feed you|give me a cookie|give you a cookie|cookie game|cookies|cookie)/;
+// Task 164: DO NOT PRESS THAT BUTTON entry phrases (the Boxer's game only, gated on the Boxer in
+// resolve()). His B17 offer teaches "mini game"; the rest are what a child types on seeing the panel.
+const BUTTON_PANEL_START = /(mini ?game|do not press|dont press|don't press|press that button|press the button|press a button|button game|the button game|control panel)/;
 function matchGameStart(c: string): GameId | null {
   for (const [re, id] of GAME_STARTS) if (re.test(c)) return id;
   return null;
@@ -1432,6 +1435,11 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
   // policy is untouched (typing "cookies" never opened it, and now it starts the game instead).
   if (state.activeDog === 'labrador' && !state.activeGame && FEED_COOKIE_START.test(c)) {
     return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: 'game_start', game: 'feedcookie' };
+  }
+  // Task 164: DO NOT PRESS THAT BUTTON is the Boxer's game -- start it only when the Boxer is active.
+  // The other three keep their own games; this sits below safety and the active-game move handler above.
+  if (state.activeDog === 'boxer' && !state.activeGame && BUTTON_PANEL_START.test(c)) {
+    return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: 'game_start', game: 'buttonpanel' };
   }
   {
     const start = matchGameStart(c);

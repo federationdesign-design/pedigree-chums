@@ -105,7 +105,13 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${display.variable} ${body.variable} ${pct.variable} ${stackNotch.variable} ${score.variable} ${arrowFont.variable} ${unica.variable}`}>
       <body>
-        {children}
+        {/* Task 164: the SITE layer. The page content is wrapped so the Boxer's DO NOT PRESS THAT BUTTON
+            effects (a brightness filter, a nav fade) can act on the whole site WITHOUT touching the chat:
+            the Pick a Chum overlay is a SIBLING of #pc-site below, at a higher stacking level, so it stays
+            bright and clickable while an effect runs. A CSS filter cannot be escaped by a descendant, which
+            is why the chat must sit outside this wrapper (brief section 7.1). The body gradient and paw
+            pattern live on <body>, outside #pc-site, so they stay bright under "lights out" (dim, not black). */}
+        <div id="pc-site">{children}</div>
         <PickAChumLauncher />
         <OfferLauncher />
         {/* Hidden Games Stage 1 counter. Owner-approved layout mount, 28 Jul

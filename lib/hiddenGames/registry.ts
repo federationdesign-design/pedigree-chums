@@ -5,7 +5,7 @@
 // of the games list, so it can never disagree with the list it counts.
 // Nothing else defines the campaign version, mode or the qualifying games.
 
-export const GAME_IDS = ["G01", "G02", "G03", "G04", "G05", "G06", "G07", "G08", "G09", "G10"] as const;
+export const GAME_IDS = ["G01", "G02", "G03", "G04", "G05", "G06", "G07", "G08", "G09", "G10", "G11"] as const;
 export type GameId = (typeof GAME_IDS)[number];
 
 export interface GameDef {
@@ -127,6 +127,16 @@ export const REGISTRY: Registry = {
       threshold:
         "The internal hat counter reaches THREE found hats (of ten hidden across the site) -- found, though the hunt is not yet complete",
       hint: "some of us are wearing hats. keep tapping our faces, and look further out",
+    },
+    // Task 164: the Boxer's game, DO NOT PRESS THAT BUTTON. Qualifies the moment its control panel is
+    // SERVED in the chat, on game_start, before any button is pressed (brief section 6) -- exactly like
+    // the other in-chat games. This takes the campaign TOTAL from 10 to 11.
+    {
+      id: "G11",
+      name: "Do Not Press That Button",
+      threshold:
+        "The Boxer's control panel is served in the Pick a Chum chat (his game entered by name), before any button is pressed",
+      hint: "the boxer found a panel he was told not to touch. ask him to press the buttons",
     },
   ],
 };

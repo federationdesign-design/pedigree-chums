@@ -168,3 +168,94 @@ body.pc-modal-open .pc-nav {
 }
 
 :root { --font-mohave: "Mohave", sans-serif; }
+
+/* ------------------------------------- The Boxer's DO NOT PRESS THAT BUTTON (Task 164)
+   Five reversible effects, applied as allow-listed classes on <body> by the effect controller
+   (app/pick-a-chum/lib/boxerEffects.ts). They act on the SITE layer (#pc-site wraps the page in
+   layout.tsx) and the nav, never on the chat: the Pick a Chum overlay is a sibling of #pc-site at a
+   higher stacking level (z-index 301), so it stays bright and clickable throughout, which keeps the
+   emergency reset reachable. Every effect that PAINTS a layer carries pointer-events: none (section 2.3)
+   so a joke can never trap a visitor. No flashing anywhere. Motion effects fall back to a small static
+   transform under prefers-reduced-motion (section 9). These selectors are global on purpose: they target
+   <body> and site chrome outside any CSS-module scope, the same way body.pc-modal-open .pc-nav does. */
+
+#pc-site {
+  transition: filter 350ms ease;
+}
+
+/* Lights out. brightness(25%) rather than 10% (Task 164 section 3): obviously wrong, far less alarming
+   to a child in a bright room. Brightness, never opacity, so nothing shows through and layout is untouched
+   (brief section 6). The body gradient and paw pattern sit outside #pc-site, so they stay bright: dim, not
+   black. Filter captures no clicks, so there is no layer to make pointer-events: none here. */
+body.boxer-lights-out #pc-site {
+  filter: brightness(25%);
+}
+
+/* Missing navigation. Fade the header to 20% and LEAVE pointer-events ON (Task 164 section 3): the visitor
+   can still see and click the way out. On mobile the menu is the only navigation, so it must never become
+   unclickable. This is the one effect that would otherwise trap someone, so it deliberately does not. */
+body.boxer-no-nav header.pc-nav {
+  opacity: 0.2;
+  transition: opacity 250ms ease;
+}
+
+/* Wobbly controls. Opt-in ONLY: a small low-frequency rotation on elements the build explicitly tagged
+   data-boxer-wobble (Task 164 section 3). A control that is never tagged simply never moves, so a future
+   checkout button cannot start wobbling by accident. The tagged set is documented in PickAChumExperience
+   (the effect buttons and the composer Send), never the recovery controls. */
+@keyframes boxerWobble {
+  from { transform: rotate(-1.5deg); }
+  to   { transform: rotate(1.5deg); }
+}
+body.boxer-wobble [data-boxer-wobble] {
+  animation: boxerWobble 500ms ease-in-out infinite alternate;
+}
+
+/* Giant logo. A centred overlay drawn on ::after with pointer-events: none (Task 164 sections 2.3 and 3),
+   so the enlarged logo never blocks what is under it. z-index 300 sits below the chat (301), so the panel
+   and the reset stay on top and reachable. It reflows nothing: it is an overlay, not the real logo scaled. */
+body.boxer-giant-logo::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  pointer-events: none;
+  background: center / min(72vw, 72vh) no-repeat url("/dogbingo.svg");
+}
+
+/* Wrong transfer. A brief sweep suggesting another dog took over, then it clears and the Boxer is back.
+   Purely an overlay animation with pointer-events: none (section 2.3); NOTHING here touches the active dog
+   (section 3), it is only paint. The overlay animates once and settles to fully transparent, so the class
+   can linger harmlessly until the next reset. */
+@keyframes boxerTransfer {
+  0%   { opacity: 0; transform: translateX(-100%); }
+  35%  { opacity: 0.92; transform: translateX(0); }
+  65%  { opacity: 0.92; transform: translateX(0); }
+  100% { opacity: 0; transform: translateX(100%); }
+}
+body.boxer-wrong-transfer::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  pointer-events: none;
+  background: linear-gradient(120deg, #0b78bd, #5cc4ee);
+  animation: boxerTransfer 1600ms ease-in-out 1 forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* No repeated movement and no sweeping. A small static tilt stands in for the wobble; a brief still fade
+     (no slide) stands in for the transfer. Neither flashes. */
+  body.boxer-wobble [data-boxer-wobble] {
+    animation: none;
+    transform: rotate(1deg);
+  }
+  body.boxer-wrong-transfer::before {
+    animation: boxerTransferStill 1200ms ease-in-out 1 forwards;
+  }
+}
+@keyframes boxerTransferStill {
+  0%   { opacity: 0; }
+  40%  { opacity: 0.9; }
+  100% { opacity: 0; }
+}

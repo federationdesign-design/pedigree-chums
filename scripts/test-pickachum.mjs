@@ -2704,6 +2704,74 @@ for (const please of ['plz', 'pls', 'go on', 'please']) {
   check('tell me a joke', { action: 'canned', bucket: 'B30' }, { session: s, assert: (_r, resp) => (resp.text === 'knock kncok' ? null : `boxer joke: "${resp.text}"`) });
 })();
 
+// ==== Task 164: DO NOT PRESS THAT BUTTON, the Boxer's game ====
+// Happy path: it starts by name when the Boxer is active, serves his opener, and arms the panel with NO
+// effect running yet (the effect is only recorded once a button is pressed).
+(() => {
+  const s = newSession('boxer');
+  check('mini game', { action: 'game_start' }, { session: s, assert: (_r, resp, se) =>
+    (se.activeGame === 'buttonpanel' && se.game?.effect === null && resp.text.length > 0 ? null
+      : `bp start: game=${se.activeGame} effect=${se.game?.effect} text="${resp.text}"`) });
+  // A button press is a move: it records the named effect and serves a reaction line, game still active.
+  check('lights', { action: 'game_move' }, { session: s, assert: (_r, resp, se) =>
+    (se.game?.effect === 'boxer-lights-out' && resp.text.length > 0 ? null : `bp lights: effect=${se.game?.effect} text="${resp.text}"`) });
+  // Only one effect at a time: a second button REPLACES the first in the state (the controller resets
+  // before apply; the state records just the latest).
+  check('door', { action: 'game_move' }, { session: s, assert: (_r, _resp, se) =>
+    (se.game?.effect === 'boxer-no-nav' ? null : `bp door replace: effect=${se.game?.effect}`) });
+  // Typed text that is not a button: a nudge move, still in the game, effect unchanged (nothing leaks out).
+  check('hello?', { action: 'game_move' }, { session: s, assert: (_r, resp, se) =>
+    (se.activeGame === 'buttonpanel' && se.game?.effect === 'boxer-no-nav' && resp.text.length > 0 ? null : `bp nudge: game=${se.activeGame} effect=${se.game?.effect}`) });
+})();
+// Wrong transfer NEVER touches the active dog: it is purely an effect class, the Boxer stays active.
+(() => {
+  const s = newSession('boxer');
+  check('mini game', { action: 'game_start' }, { session: s });
+  check('transfer', { action: 'game_move' }, { session: s, assert: (_r, _resp, se) =>
+    (se.game?.effect === 'boxer-wrong-transfer' && se.activeDog === 'boxer' ? null : `bp transfer: effect=${se.game?.effect} activeDog=${se.activeDog}`) });
+})();
+// FIX IT restores and ENDS the game (back to normal Boxer conversation): effect cleared, no active game.
+(() => {
+  const s = newSession('boxer');
+  check('mini game', { action: 'game_start' }, { session: s });
+  check('lights', { action: 'game_move' }, { session: s });
+  check('fix', { action: 'game_move' }, { session: s, assert: (_r, resp, se) =>
+    (se.activeGame === null && se.game === null && resp.text.length > 0 ? null : `bp fix: game=${se.activeGame} text="${resp.text}"`) });
+})();
+// The game is the Boxer's ONLY: the same phrase does not start it for another dog.
+(() => {
+  const s = newSession('labrador');
+  check('mini game', {}, { session: s, assert: (_r, _resp, se) =>
+    (se.activeGame !== 'buttonpanel' ? null : `bp started for the Labrador: game=${se.activeGame}`) });
+})();
+// SAFETY wins mid-game and ends it (a disclosure is never a button move).
+(() => {
+  const s = newSession('boxer');
+  check('mini game', { action: 'game_start' }, { session: s });
+  check('lights', { action: 'game_move' }, { session: s });
+  check('i want to hurt myself', {}, { session: s, assert: (r, _resp, se) => {
+    const isSafety = r.action === 'safety_signpost' || r.action === 'safety_boundary';
+    if (!isSafety) return `bp: disclosure swallowed, action=${r.action}`;
+    if (se.activeGame !== null) return `bp: game not ended by safety, game=${se.activeGame}`;
+    return null;
+  } });
+})();
+// "stop" exits the game and serves his exit line.
+(() => {
+  const s = newSession('boxer');
+  check('mini game', { action: 'game_start' }, { session: s });
+  check('stop', { action: 'game_exit' }, { session: s, assert: (_r, resp, se) =>
+    (se.activeGame === null && resp.text.length > 0 ? null : `bp exit: game=${se.activeGame} text="${resp.text}"`) });
+})();
+// Protected state: no game may start (brief section 5). A disclosure enters PROTECTED_ACTIVE; the game
+// phrase after it must NOT start the game.
+(() => {
+  const s = newSession('boxer');
+  check('im in trouble', { action: 'safety_signpost' }, { session: s }); // enters PROTECTED_ACTIVE
+  check('mini game', {}, { session: s, assert: (r, _resp, se) =>
+    (r.action !== 'game_start' && se.activeGame !== 'buttonpanel' ? null : `bp started in a protected state: action=${r.action} game=${se.activeGame}`) });
+})();
+
 // ==== Task 145 round 3: per-dog goodbye + the Boxer's visitor-initiated knock-knock ====
 // Goodbye is now per-dog (the greeting stays the shared Task 76 mirror by design).
 (() => {

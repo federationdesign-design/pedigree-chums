@@ -162,7 +162,13 @@
    cookie-game tray was missing, so the pills were not hit-testable on touch (dead on phones, fine on
    desktop where .chatColumn .thread opts the whole thread back in). Re-enable the tray subtree. */
 .cookieTray,
-.cookiePill {
+.cookiePill,
+/* Task 164: the Boxer's control panel and its emergency reset are solid interactive surfaces on the
+   pointer-events:none panel, so they must opt back in (like the cookie tray) or they are dead on touch. */
+.buttonPanel,
+.buttonPanelBtn,
+.boxerResetFloat,
+.boxerReset {
   pointer-events: auto;
 }
 
@@ -1502,6 +1508,79 @@
     transition: none;
   }
   .cookiePill:hover {
+    transform: none;
+  }
+}
+
+/* Task 164: DO NOT PRESS THAT BUTTON -- the Boxer's control panel at the foot of the thread. Warm orange
+   faces in his palette (matching his bubble), navy text kept solid and high-contrast (no text opacity, no
+   rgba on text, no dark background: house rules). FIX IT stands apart in brand blue as the way back. Real
+   <button>s, chunky and tappable; keyboard focus is a clear yellow ring. */
+.buttonPanel {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0 2px;
+}
+.buttonPanelBtn {
+  font-family: var(--font-body, sans-serif);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  padding: 10px 16px;
+  border: 2px solid var(--pc-ui-navy);
+  border-radius: 10px;
+  background: #ffb861;
+  color: var(--pc-ui-navy);
+  box-shadow: var(--pc-shadow);
+  cursor: pointer;
+  line-height: 1.1;
+  transition: transform 120ms ease;
+}
+.buttonPanelBtn:hover {
+  transform: translateY(-2px);
+}
+.buttonPanelBtn:focus-visible {
+  outline: 4px solid var(--pc-ui-yellow);
+  outline-offset: 2px;
+}
+/* FIX IT / the way back: brand blue, cream text, so the recovery reads differently from the effect buttons. */
+.buttonPanelFix {
+  background: var(--pc-ui-blue);
+  color: var(--pc-ui-cream);
+  border-color: var(--pc-ui-cream);
+}
+/* The persistent emergency reset (brief section 8): fixed low-centre in the chat overlay, above every
+   effect, unmissable. Never tagged for the wobble, so it holds still. */
+.boxerResetFloat {
+  position: fixed;
+  left: 50%;
+  bottom: 88px;
+  transform: translateX(-50%);
+  z-index: 5;
+}
+.boxerReset {
+  font-family: var(--font-display, sans-serif);
+  font-size: 15px;
+  letter-spacing: 0.03em;
+  padding: 12px 22px;
+  border: 3px solid var(--pc-ui-navy);
+  border-radius: 999px;
+  background: var(--pc-ui-yellow);
+  color: var(--pc-ui-navy);
+  box-shadow: var(--pc-shadow);
+  cursor: pointer;
+}
+.boxerReset:focus-visible {
+  outline: 4px solid var(--pc-ui-blue);
+  outline-offset: 2px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .buttonPanelBtn {
+    transition: none;
+  }
+  .buttonPanelBtn:hover {
     transform: none;
   }
 }

@@ -13,6 +13,7 @@ import { KENNEL_SKETCHES } from '../data/kennel-sketches';
 import { TREAT_TRAIL_OBJECTS } from '../data/treat-trail';
 import { BISCUIT_CASES } from '../data/missing-biscuit';
 import { FEED_COOKIES } from '../data/feed-cookie';
+import { BOXER_BUTTONS, BOXER_OPENING_LINES, BOXER_NUDGE_LINE, BOXER_EXIT_LINE } from '../data/boxer-button-game';
 import { wordFuzzyEq } from './normalise';
 
 export interface GameState {
@@ -28,10 +29,13 @@ export interface GameState {
   cluesGiven: number; // missing-biscuit: clues revealed on the current case (0..3), given on request
   awaitingAnother: boolean; // missing-biscuit: a case just closed, waiting for "another one?" yes/no
   fed: string[]; // feed-cookie: the cookie ids already eaten (the UI renders the rest as pills)
+  presses: number; // button-panel: presses so far (drives the deterministic reaction-line variant)
+  effect: string | null; // button-panel: the effect class currently live (the UI mirrors it to the page), or null
 }
 
 export interface GameResult {
   line: string; // the B4x/B65/B66/B67 responseId to serve (or a synthetic id for an ongoing board, served as no text)
+  text?: string; // Task 164: literal copy served AS-IS (the Boxer game, whose scenario copy is a data record, not a bank row)
   display: string; // the monospace block rendered above/with the response
   word?: string; // {{WORD}} substitution (missing-sheep loss)
   answer?: string; // {{ANSWER}} substitution (kennel-sketch reveal / treat-trail move-on / biscuit reveal)
@@ -49,7 +53,7 @@ const MISSING_SHEEP_WORDS = ['BOWL', 'NOSE', 'EARS', 'LEAD', 'FETCH', 'PAW', 'TA
 const START_SHEEP = 5;
 
 function freshState(): GameState {
-  return { board: Array(9).fill(' '), word: '', guessed: [], wrong: 0, sketchIndex: 0, objectIndex: 0, clueIndex: 0, guesses: 0, caseIndex: 0, cluesGiven: 0, awaitingAnother: false, fed: [] };
+  return { board: Array(9).fill(' '), word: '', guessed: [], wrong: 0, sketchIndex: 0, objectIndex: 0, clueIndex: 0, guesses: 0, caseIndex: 0, cluesGiven: 0, awaitingAnother: false, fed: [], presses: 0, effect: null };
 }
 
 // ---- Nine-Square (noughts and crosses on nine numbered cells) ----
@@ -315,6 +319,41 @@ function feedCookieMove(state: GameState, input: string): { state: GameState; re
   return { state: ns, result: { line, clueId: cookie.teachId, media, display: '', ended } };
 }
 
+// ---- DO NOT PRESS THAT BUTTON (the Boxer's game; Task 164) ----
+//
+// A control panel of buttons (the UI renders BOXER_BUTTONS as tappable controls, like the cookie tray).
+// A tap sends the button id as a move; he reacts in character and the UI applies the named reversible
+// effect to the PAGE via lib/boxerEffects.ts, mirrored off state.effect. FIX IT restores the page and
+// ENDS the game, returning to normal Boxer conversation (brief section 5). Every reaction line lives in
+// data/boxer-button-game.ts, never here (brief 7.4); this holds only the flow.
+//
+// The Boxer NEVER touches session.activeDog: "wrong transfer" is purely the overlay animation (Task 164
+// section 3), so it is just another effect class here with no dog change.
+
+function buttonPanelStart(counter: number): { state: GameState; result: GameResult } {
+  const state = { ...freshState(), presses: 0, effect: null };
+  const text = BOXER_OPENING_LINES[counter % BOXER_OPENING_LINES.length];
+  return { state, result: { line: 'BOX-BTN-OPENING', text, display: '', ended: false } };
+}
+
+function buttonPanelMove(state: GameState, input: string): { state: GameState; result: GameResult } {
+  const id = input.trim().toLowerCase();
+  const btn = BOXER_BUTTONS.find((b) => b.id === id);
+  if (!btn) {
+    // Not a panel button (typed text): nudge back to the buttons, stay in the game so nothing leaks out.
+    return { state, result: { line: 'BOX-BTN-NUDGE', text: BOXER_NUDGE_LINE, display: '', ended: false } };
+  }
+  const line = btn.lines[state.presses % btn.lines.length];
+  const presses = state.presses + 1;
+  if (btn.effect === null) {
+    // FIX IT: clear the effect and END the game (page restored; back to normal conversation).
+    return { state: { ...state, effect: null, presses }, result: { line: `BOX-BTN-${btn.analyticsId}`, text: line, display: '', ended: true } };
+  }
+  // An effect button: record which effect is live. The UI mirrors state.effect into applyBoxerEffect,
+  // which resets the previous effect before adding this one (only one at a time, brief section 4).
+  return { state: { ...state, effect: btn.effect, presses }, result: { line: `BOX-BTN-${btn.analyticsId}`, text: line, display: '', ended: false } };
+}
+
 // ---- Public API ----
 
 export function startGame(game: GameId, counter: number): { state: GameState; result: GameResult } {
@@ -339,6 +378,10 @@ export function startGame(game: GameId, counter: number): { state: GameState; re
     // The Labrador's second game: his opening line; the UI serves the pills (this is the G09 threshold).
     return { state: freshState(), result: { line: 'B67-FEEDCOOKIE-OPENING', display: '', ended: false } };
   }
+  if (game === 'buttonpanel') {
+    // The Boxer's game: his opener; the UI serves the control panel (the G11 threshold, Task 164).
+    return buttonPanelStart(counter);
+  }
   // kennelsketch: fixed order from the drawings file, starting at the first.
   const state: GameState = { ...freshState(), sketchIndex: 0 };
   return { state, result: { line: 'B43-KENNELSKETCH-01', display: sketchDisplay(0), ended: false } };
@@ -350,6 +393,7 @@ export function applyMove(game: GameId, state: GameState, input: string): { stat
   if (game === 'treattrail') return treatMove(state, input);
   if (game === 'missingbiscuit') return biscuitMove(state, input);
   if (game === 'feedcookie') return feedCookieMove(state, input);
+  if (game === 'buttonpanel') return buttonPanelMove(state, input);
   return sketchMove(state, input);
 }
 
@@ -359,5 +403,13 @@ export function exitLine(game: GameId): string {
   if (game === 'treattrail') return 'B65-TREATTRAIL-EXIT';
   if (game === 'missingbiscuit') return 'B66-MISSINGBISCUIT-EXIT';
   if (game === 'feedcookie') return 'B67-FEEDCOOKIE-EXIT';
+  if (game === 'buttonpanel') return 'BOX-BTN-EXIT';
   return 'B43-KENNELSKETCH-05';
+}
+
+// Task 164: the Boxer game's exit copy is a data record, not a bank row, so the engine serves it directly
+// (gameCopy would find no row for BOX-BTN-EXIT). Empty for every other game, which keeps their bank-served
+// exit lines exactly as they were.
+export function gameExitText(game: GameId): string {
+  return game === 'buttonpanel' ? BOXER_EXIT_LINE : '';
 }

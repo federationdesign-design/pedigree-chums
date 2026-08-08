@@ -200,8 +200,8 @@ export type ActionType =
   | 'game_exit' // Task 115: leave the active game ("stop"/"enough"/...)
   | 'boxer_cutoff'; // hidden ceiling reached
 
-// Task 115: the three in-chat games.
-export type GameId = 'ninesquare' | 'missingsheep' | 'kennelsketch' | 'treattrail' | 'missingbiscuit' | 'feedcookie';
+// Task 115: the in-chat games. Task 164 adds the Boxer's 'buttonpanel' (DO NOT PRESS THAT BUTTON).
+export type GameId = 'ninesquare' | 'missingsheep' | 'kennelsketch' | 'treattrail' | 'missingbiscuit' | 'feedcookie' | 'buttonpanel';
 
 export interface Resolution {
   layer: number; // 1..10 priority layer that won
