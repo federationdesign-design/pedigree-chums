@@ -331,8 +331,12 @@ function triggerDownload(text: string, filename: string): void {
   a.download = filename;
   document.body.appendChild(a);
   a.click();
-  a.remove();
-  URL.revokeObjectURL(url);
+  // Defer cleanup: revoking the object URL synchronously can cancel the download before it starts. (This
+  // was one reason the two-file export dropped a sheet.) Give the browser a beat.
+  setTimeout(() => {
+    a.remove();
+    URL.revokeObjectURL(url);
+  }, 1500);
 }
 
 // ---- Task 159 stage 3: the SECOND SHEET -- one row per session (the creative half) ------
@@ -440,9 +444,21 @@ export function toSessionCsv(sessions: SessionRow[]): string {
   return `${head}\n${body}\n`;
 }
 
-// Export both sheets: the per-turn log and the per-session summary, as two files.
+// The PER-TURN sheet (the diagnostic half: sessionId, turn, activeDog, route, trigger, INPUT, outcome,
+// action, bucket, responseId, ...). This is where the input column lives.
+export async function downloadTurns(stamp: string): Promise<void> {
+  triggerDownload(toCsv(await getAllRows()), `pick-a-chum-turns-${stamp}.csv`);
+}
+// The PER-SESSION summary sheet (the creative half: firstInput, dogsUsed, games, laughs, endReason, ...).
+export async function downloadSessions(stamp: string): Promise<void> {
+  triggerDownload(toSessionCsv(buildSessions(await getAllRows())), `pick-a-chum-sessions-${stamp}.csv`);
+}
+// Export both sheets. Kept for convenience, but each is now its own panel button (a single click == a
+// single download) so browsers never suppress the second of two instantaneous downloads. The second is
+// staggered so a "Download both" still delivers two files where the browser allows it.
 export async function downloadBoth(stamp: string): Promise<void> {
   const rows = await getAllRows();
   triggerDownload(toCsv(rows), `pick-a-chum-turns-${stamp}.csv`);
+  await new Promise((res) => setTimeout(res, 400));
   triggerDownload(toSessionCsv(buildSessions(rows)), `pick-a-chum-sessions-${stamp}.csv`);
 }

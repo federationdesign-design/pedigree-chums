@@ -10,7 +10,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import styles from './DevRecorder.module.css';
 import { addTurnTap, recorderEnabled, TurnEvent } from '../lib/turn-tap';
-import { record, recordPendingSync, flushPending, getAggregate, downloadBoth, purgeLegacyRows, Aggregate } from './recorder-store';
+import { record, recordPendingSync, flushPending, getAggregate, downloadTurns, downloadSessions, purgeLegacyRows, Aggregate } from './recorder-store';
 
 const EMPTY: Aggregate = { conversations: 0, messages: 0, missed: 0 };
 
@@ -45,11 +45,15 @@ export default function DevRecorder() {
     return () => off();
   }, [refresh]);
 
-  const onExport = useCallback(() => {
-    // Task 159: flush any synchronously-captured turns into IndexedDB first, then export both sheets.
-    flushPending()
-      .then(() => downloadBoth(new Date().toISOString().replace(/[:.]/g, '-')))
-      .catch(() => {});
+  // Two exports, one per sheet, so a single click is a single download (browsers suppress the second of two
+  // instantaneous downloads, which is why the old one-button export only delivered the sessions sheet). The
+  // PER-TURN sheet ("Turns") is where the input column lives; the summary ("Sessions") is the creative half.
+  const stamp = () => new Date().toISOString().replace(/[:.]/g, '-');
+  const onTurns = useCallback(() => {
+    flushPending().then(() => downloadTurns(stamp())).catch(() => {}); // flush sync-captured turns first
+  }, []);
+  const onSessions = useCallback(() => {
+    flushPending().then(() => downloadSessions(stamp())).catch(() => {});
   }, []);
 
   if (!mounted || !recorderEnabled()) return null;
@@ -67,8 +71,11 @@ export default function DevRecorder() {
       <span className={styles.stat}>
         miss <b>{agg.missed}</b>
       </span>
-      <button type="button" className={styles.export} onClick={onExport}>
-        Export
+      <button type="button" className={styles.export} onClick={onTurns}>
+        Turns
+      </button>
+      <button type="button" className={styles.export} onClick={onSessions}>
+        Sessions
       </button>
     </div>
   );
