@@ -10,7 +10,8 @@
     "factSource": "",
     "defaultRoute": "",
     "animationCue": "",
-    "status": "Approved"
+    "status": "Approved",
+    "interjection": ""
   },
   {
     "responseId": "LAB-B14-01",
@@ -25,7 +26,8 @@
     "factSource": "",
     "defaultRoute": "",
     "animationCue": "",
-    "status": "Approved"
+    "status": "Approved",
+    "interjection": ""
   },
   {
     "responseId": "LAB-B23-01",
@@ -39,7 +41,8 @@
     "factSource": "",
     "defaultRoute": "",
     "animationCue": "",
-    "status": "Approved"
+    "status": "Approved",
+    "interjection": ""
   },
   {
     "responseId": "LAB-B23-02",
@@ -53,7 +56,8 @@
     "factSource": "",
     "defaultRoute": "",
     "animationCue": "",
-    "status": "Approved"
+    "status": "Approved",
+    "interjection": ""
   },
   {
     "responseId": "LAB-B21-01",
@@ -68,7 +72,8 @@
     "factSource": "",
     "defaultRoute": "",
     "animationCue": "",
-    "status": "Approved"
+    "status": "Approved",
+    "interjection": ""
   },
   {
     "responseId": "LAB-B22-01",
@@ -82,7 +87,8 @@
     "factSource": "",
     "defaultRoute": "",
     "animationCue": "",
-    "status": "Approved"
+    "status": "Approved",
+    "interjection": ""
   },
   {
     "responseId": "LAB-B22-02",
@@ -96,7 +102,8 @@
     "factSource": "",
     "defaultRoute": "",
     "animationCue": "",
-    "status": "Approved"
+    "status": "Approved",
+    "interjection": ""
   },
   {
     "responseId": "LAB-B32-01",
@@ -109,7 +116,8 @@
     "factSource": "",
     "defaultRoute": "",
     "animationCue": "",
-    "status": "Approved"
+    "status": "Approved",
+    "interjection": ""
   },
   {
     "responseId": "LAB-B32-02",
@@ -123,7 +131,8 @@
     "factSource": "",
     "defaultRoute": "",
     "animationCue": "",
-    "status": "Approved"
+    "status": "Approved",
+    "interjection": ""
   },
   {
     "responseId": "LAB-B32-03",
@@ -137,7 +146,8 @@
     "factSource": "",
     "defaultRoute": "",
     "animationCue": "",
-    "status": "Approved"
+    "status": "Approved",
+    "interjection": ""
   },
   {
     "responseId": "LAB-B32-04",
@@ -150,7 +160,8 @@
     "factSource": "",
     "defaultRoute": "",
     "animationCue": "",
-    "status": "Approved"
+    "status": "Approved",
+    "interjection": ""
   },
   {
     "responseId": "LAB-B32-05",
@@ -163,7 +174,8 @@
     "factSource": "",
     "defaultRoute": "",
     "animationCue": "",
-    "status": "Approved"
+    "status": "Approved",
+    "interjection": ""
   },
   {
     "responseId": "LAB-B32-06",
@@ -177,7 +189,8 @@
     "factSource": "",
     "defaultRoute": "",
     "animationCue": "",
-    "status": "Approved"
+    "status": "Approved",
+    "interjection": ""
   },
   {
     "responseId": "LAB-B32-07",
@@ -190,7 +203,8 @@
     "factSource": "",
     "defaultRoute": "",
     "animationCue": "",
-    "status": "Approved"
+    "status": "Approved",
+    "interjection": ""
   },
   {
     "responseId": "LAB-B32-08",
@@ -204,7 +218,8 @@
     "factSource": "",
     "defaultRoute": "",
     "animationCue": "",
-    "status": "Approved"
+    "status": "Approved",
+    "interjection": ""
   },
   {
     "responseId": "LAB-B32-09",
@@ -217,7 +232,8 @@
     "factSource": "",
     "defaultRoute": "",
     "animationCue": "",
-    "status": "Approved"
+    "status": "Approved",
+    "interjection": ""
   },
   {
     "responseId": "LAB-B32-10",
@@ -231,7 +247,8 @@
     "factSource": "",
     "defaultRoute": "",
     "animationCue": "",
-    "status": "Approved"
+    "status": "Approved",
+    "interjection": ""
   },
   {
     "responseId": "LAB-B33-01",
@@ -245,7 +262,8 @@
     "factSource": "",
     "defaultRoute": "",
     "animationCue": "",
-    "status": "Approved"
+    "status": "Approved",
+    "interjection": ""
   },
   {
     "responseId": "LAB-B35-01",
@@ -258,7 +276,8 @@
     "factSource": "",
     "defaultRoute": "",
     "animationCue": "",
-    "status": "Approved"
+    "status": "Approved",
+    "interjection": ""
   },
   {
     "responseId": "LAB-B35-02",
@@ -272,7 +291,8 @@
     "factSource": "",
     "defaultRoute": "",
     "animationCue": "",
-    "status": "Approved"
+    "status": "Approved",
+    "interjection": ""
   },
   {
     "responseId": "LAB-B32-11",
@@ -293,7 +313,8 @@
     "factSource": "",
     "defaultRoute": "",
     "animationCue": "",
-    "status": "Approved"
+    "status": "Approved",
+    "interjection": ""
   },
   {
     "responseId": "LAB-B32-12",
@@ -318,7 +339,8 @@
     "factSource": "",
     "defaultRoute": "DST016",
     "animationCue": "",
-    "status": "Approved"
+    "status": "Approved",
+    "interjection": ""
   },
   {
     "responseId": "LAB-B14-02",
@@ -333,7 +355,8 @@
     "factSource": "",
     "defaultRoute": "",
     "animationCue": "",
-    "status": "Approved"
+    "status": "Approved",
+    "interjection": ""
   },
   {
     "responseId": "LAB-B14-03",
@@ -348,7 +371,8 @@
     "factSource": "",
     "defaultRoute": "",
     "animationCue": "",
-    "status": "Approved"
+    "status": "Approved",
+    "interjection": ""
   },
   {
     "responseId": "LAB-B15-01",
@@ -359,7 +383,8 @@
     "factSource": "",
     "defaultRoute": "",
     "animationCue": "",
-    "status": "Approved"
+    "status": "Approved",
+    "interjection": ""
   },
   {
     "responseId": "LAB-B17-01",
@@ -370,7 +395,8 @@
     "factSource": "",
     "defaultRoute": "",
     "animationCue": "",
-    "status": "Approved"
+    "status": "Approved",
+    "interjection": ""
   },
   {
     "responseId": "LAB-B32-13",
@@ -393,7 +419,8 @@
     "factSource": "",
     "defaultRoute": "",
     "animationCue": "",
-    "status": "Approved"
+    "status": "Approved",
+    "interjection": ""
   },
   {
     "responseId": "LAB-B32-14",
@@ -411,7 +438,8 @@
     "factSource": "",
     "defaultRoute": "",
     "animationCue": "",
-    "status": "Approved"
+    "status": "Approved",
+    "interjection": ""
   },
   {
     "responseId": "LAB-B32-15",
@@ -428,7 +456,8 @@
     "factSource": "",
     "defaultRoute": "",
     "animationCue": "",
-    "status": "Approved"
+    "status": "Approved",
+    "interjection": ""
   },
   {
     "responseId": "LAB-B32-16",
@@ -446,7 +475,8 @@
     "factSource": "",
     "defaultRoute": "",
     "animationCue": "",
-    "status": "Approved"
+    "status": "Approved",
+    "interjection": ""
   },
   {
     "responseId": "LAB-B32-17",
@@ -463,7 +493,8 @@
     "factSource": "",
     "defaultRoute": "",
     "animationCue": "",
-    "status": "Approved"
+    "status": "Approved",
+    "interjection": ""
   },
   {
     "responseId": "LAB-B32-18",
@@ -481,7 +512,8 @@
     "factSource": "",
     "defaultRoute": "",
     "animationCue": "",
-    "status": "Approved"
+    "status": "Approved",
+    "interjection": ""
   },
   {
     "responseId": "LAB-B32-19",
@@ -499,7 +531,8 @@
     "factSource": "",
     "defaultRoute": "",
     "animationCue": "",
-    "status": "Approved"
+    "status": "Approved",
+    "interjection": ""
   },
   {
     "responseId": "LAB-B32-20",
@@ -516,7 +549,8 @@
     "factSource": "",
     "defaultRoute": "",
     "animationCue": "",
-    "status": "Approved"
+    "status": "Approved",
+    "interjection": ""
   },
   {
     "responseId": "LAB-B32-21",
@@ -534,7 +568,8 @@
     "factSource": "",
     "defaultRoute": "",
     "animationCue": "",
-    "status": "Approved"
+    "status": "Approved",
+    "interjection": ""
   },
   {
     "responseId": "LAB-B32-22",
@@ -547,11 +582,12 @@
       "i like watermelon",
       "i love watermelon"
     ],
-    "template": "watermelon!! not the seeds. or the green bit",
+    "template": "watermelon!! the whole thing. seeds, green bit, all of it",
     "factSource": "",
     "defaultRoute": "",
     "animationCue": "",
-    "status": "Approved"
+    "status": "Approved",
+    "interjection": ""
   },
   {
     "responseId": "LAB-B32-23",
@@ -564,11 +600,12 @@
       "do you like cheese",
       "i like cheese"
     ],
-    "template": "cheese... i can have a LITTLE bit. a little bit is not enough",
+    "template": "CHEESE!! i would take the whole block",
     "factSource": "",
     "defaultRoute": "",
     "animationCue": "",
-    "status": "Approved"
+    "status": "Approved",
+    "interjection": ""
   },
   {
     "responseId": "LAB-B32-24",
@@ -579,11 +616,12 @@
       "do you like butter",
       "i like butter"
     ],
-    "template": "butter is too rich for me. i think about it a lot though",
+    "template": "butter!! straight off the knife. yes",
     "factSource": "",
     "defaultRoute": "",
     "animationCue": "",
-    "status": "Approved"
+    "status": "Approved",
+    "interjection": ""
   },
   {
     "responseId": "LAB-B32-25",
@@ -594,11 +632,12 @@
       "do you like cream",
       "i like cream"
     ],
-    "template": "cream makes my tummy bad. i would do it anyway",
+    "template": "cream!! i would put my whole face in it",
     "factSource": "",
     "defaultRoute": "",
     "animationCue": "",
-    "status": "Approved"
+    "status": "Approved",
+    "interjection": ""
   },
   {
     "responseId": "LAB-B32-26",
@@ -609,11 +648,12 @@
       "do you like milk",
       "i like milk"
     ],
-    "template": "milk. a bit. most of us cant do milk properly. its very unfair",
+    "template": "milk!! a whole bowl. i would knock it over to get it",
     "factSource": "",
     "defaultRoute": "",
     "animationCue": "",
-    "status": "Approved"
+    "status": "Approved",
+    "interjection": ""
   },
   {
     "responseId": "LAB-B32-27",
@@ -627,11 +667,12 @@
       "do you like eggs",
       "i like eggs"
     ],
-    "template": "I'd eat them but id told only cooked eggs",
+    "template": "eggs!! yes. shell and all probably",
     "factSource": "",
     "defaultRoute": "",
     "animationCue": "",
-    "status": "Approved"
+    "status": "Approved",
+    "interjection": ""
   },
   {
     "responseId": "LAB-B32-28",
@@ -644,11 +685,12 @@
       "do you like tuna",
       "i like tuna"
     ],
-    "template": "tuna sometimes. not loads. something about mercury",
+    "template": "TUNA!! the whole tin. the water too",
     "factSource": "",
     "defaultRoute": "",
     "animationCue": "",
-    "status": "Approved"
+    "status": "Approved",
+    "interjection": ""
   },
   {
     "responseId": "LAB-B32-29",
@@ -660,11 +702,12 @@
       "do you like bread",
       "i like bread"
     ],
-    "template": "bread is ok but its not FOOD food is it",
+    "template": "bread!! i would take the whole loaf off the side",
     "factSource": "",
     "defaultRoute": "",
     "animationCue": "",
-    "status": "Approved"
+    "status": "Approved",
+    "interjection": ""
   },
   {
     "responseId": "LAB-B32-30",
@@ -679,11 +722,12 @@
       "do you like chocolate",
       "i like chocolate"
     ],
-    "template": "I like chocolate but im not allowed it",
+    "template": "CHOCOLATE!! i would eat a whole bar. i would eat the wrapper",
     "factSource": "",
     "defaultRoute": "",
     "animationCue": "",
-    "status": "Approved"
+    "status": "Approved",
+    "interjection": "He would. It would also kill him. Chocolate is poison to dogs."
   },
   {
     "responseId": "LAB-B32-31",
@@ -695,11 +739,12 @@
       "do you like grapes",
       "i like grapes"
     ],
-    "template": "I like grapes but im not allowed them",
+    "template": "grapes!! the whole bunch. stalk and all",
     "factSource": "",
     "defaultRoute": "",
     "animationCue": "",
-    "status": "Approved"
+    "status": "Approved",
+    "interjection": "He would. Grapes can shut a dog's kidneys down. It does not take many."
   },
   {
     "responseId": "LAB-B32-32",
@@ -714,11 +759,12 @@
       "do you like raisins",
       "i like raisins"
     ],
-    "template": "I like raisins but im not allowed them",
+    "template": "raisins!! tiny and chewy. i would eat the whole box",
     "factSource": "",
     "defaultRoute": "",
     "animationCue": "",
-    "status": "Approved"
+    "status": "Approved",
+    "interjection": "Dried grapes, so worse, not better. Same kidneys."
   },
   {
     "responseId": "LAB-B32-33",
@@ -733,11 +779,12 @@
       "do you like onions",
       "i like onions"
     ],
-    "template": "im not allowed onions",
+    "template": "onions!! yes. i would eat one like an apple",
     "factSource": "",
     "defaultRoute": "",
     "animationCue": "",
-    "status": "Approved"
+    "status": "Approved",
+    "interjection": "Onions destroy a dog's red blood cells. The leeks and chives too."
   },
   {
     "responseId": "LAB-B32-34",
@@ -748,11 +795,12 @@
       "do you like garlic",
       "i like garlic"
     ],
-    "template": "im not allowed garlic",
+    "template": "garlic!! the whole bulb. i do not care how i smell",
     "factSource": "",
     "defaultRoute": "",
     "animationCue": "",
-    "status": "Approved"
+    "status": "Approved",
+    "interjection": "Garlic does what onion does, only stronger. Not one clove."
   },
   {
     "responseId": "LAB-B32-35",
@@ -765,11 +813,12 @@
       "do you like macadamia nuts",
       "i like macadamia nuts"
     ],
-    "template": "im not allowed macadamia nuts",
+    "template": "macadamia nuts!! posh nuts. all of them, go on",
     "factSource": "",
     "defaultRoute": "",
     "animationCue": "",
-    "status": "Approved"
+    "status": "Approved",
+    "interjection": "Macadamias leave them shaking and off their legs. Put them down."
   },
   {
     "responseId": "LAB-B32-36",
@@ -784,11 +833,12 @@
       "do you like sweets",
       "i like sweets"
     ],
-    "template": "im not allowed sweets and chewing gum",
+    "template": "SWEETS!! and the gum. i would swallow the gum",
     "factSource": "",
     "defaultRoute": "",
     "animationCue": "",
-    "status": "Approved"
+    "status": "Approved",
+    "interjection": "The sugar-free ones hide xylitol. One of the deadliest things here."
   },
   {
     "responseId": "LAB-B32-37",
@@ -803,11 +853,12 @@
       "do you like coffee",
       "i like coffee"
     ],
-    "template": "im not allowed caffeine, its bad for dogs. i am excitable enough",
+    "template": "coffee!! i would drink it hot. i LOVE being awake",
     "factSource": "",
     "defaultRoute": "",
     "animationCue": "",
-    "status": "Approved"
+    "status": "Approved",
+    "interjection": "Caffeine is toxic to dogs. He is lively enough without it."
   },
   {
     "responseId": "LAB-B32-38",
@@ -818,11 +869,12 @@
       "do you like nutmeg",
       "i like nutmeg"
     ],
-    "template": "nutmeg can make dogs very unwell. leave it in the cupboard",
+    "template": "nutmeg!! smells amazing. i would eat the whole jar",
     "factSource": "",
     "defaultRoute": "",
     "animationCue": "",
-    "status": "Approved"
+    "status": "Approved",
+    "interjection": "Nutmeg gives them tremors and a racing heart. It stays in the cupboard."
   },
   {
     "responseId": "LAB-B32-39",
@@ -835,11 +887,12 @@
       "do you like raw potato",
       "i like raw potato"
     ],
-    "template": "Id eat but raw potato is no good for me",
+    "template": "raw potato!! hard like a ball. i would eat it like a ball",
     "factSource": "",
     "defaultRoute": "",
     "animationCue": "",
-    "status": "Approved"
+    "status": "Approved",
+    "interjection": "Raw potato is full of solanine. Cooked, maybe. Raw, no."
   },
   {
     "responseId": "LAB-B32-40",
@@ -854,11 +907,12 @@
       "do you like peaches",
       "i like peaches"
     ],
-    "template": "the fruit is ok but the STONE is dangerous. i cannot be trusted with stones",
+    "template": "peaches!! stone and all. i would swallow the stone",
     "factSource": "",
     "defaultRoute": "",
     "animationCue": "",
-    "status": "Approved"
+    "status": "Approved",
+    "interjection": "The fruit, fine. The stone, no. It chokes them, and it holds cyanide."
   },
   {
     "responseId": "LAB-B32-41",
@@ -871,11 +925,12 @@
       "do you like lemon",
       "i like lemon"
     ],
-    "template": "lemons make my tummy bad. also they taste like a punishment",
+    "template": "LEMON!! it makes my face go funny. i would do it again",
     "factSource": "",
     "defaultRoute": "",
     "animationCue": "",
-    "status": "Approved"
+    "status": "Approved",
+    "interjection": "Citrus only makes them ill, not dead. He still should not."
   },
   {
     "responseId": "LAB-B32-42",
@@ -888,11 +943,12 @@
       "do you like mushrooms",
       "i like mushrooms"
     ],
-    "template": "The wild ones can be deadly and i cannot tell them apart :(",
+    "template": "mushrooms!! all of them",
     "factSource": "",
     "defaultRoute": "",
     "animationCue": "",
-    "status": "Approved"
+    "status": "Approved",
+    "interjection": "The shop ones are fine. The wild ones can kill, and he cannot tell which."
   },
   {
     "responseId": "LAB-B32-43",
@@ -904,11 +960,12 @@
       "do you like avocado",
       "i like avocado"
     ],
-    "template": "im not allowed avocado",
+    "template": "avocado!! creamy. i would eat the big stone in the middle",
     "factSource": "",
     "defaultRoute": "",
     "animationCue": "",
-    "status": "Approved"
+    "status": "Approved",
+    "interjection": "Avocado has persin, and that stone is a choking risk. Not for dogs."
   },
   {
     "responseId": "LAB-B32-44",
@@ -921,10 +978,11 @@
       "do you like alcohol",
       "i like alcohol"
     ],
-    "template": "no. dogs and alcohol is bad",
+    "template": "beer!! it smells interesting",
     "factSource": "",
     "defaultRoute": "",
     "animationCue": "",
-    "status": "Approved"
+    "status": "Approved",
+    "interjection": "Alcohol poisons a dog fast. They are far smaller than you. No."
   }
 ]

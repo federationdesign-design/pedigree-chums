@@ -30,6 +30,7 @@ export interface Assembled {
   media?: { src: string; alt: string }; // Task 138: a short looping clip served with the line. Local files only -- nothing fetched at runtime, so what a child sees is what was approved.
   linkLabel?: string; // Task 140: an explicit label for the action link when the target is not a destination/article record (the fetch fall-through to a page bio); actionFor prefers this over destinationName.
   gameOutput?: string; // Task 115: the game's monospace board / sheep tiles / drawing, rendered pre-formatted below the line.
+  interjection?: { dog: Dog; line: string }; // Task 161: a one-line aside from ANOTHER dog (the Collie), played after the active dog's line WITHOUT changing the active dog.
 }
 
 // Task 58: screen-reader label for the sad-face emoticon (grief ':(' and the loop's ':)'
@@ -456,11 +457,14 @@ export function assemble(res: Resolution, data0: ChumData, n: Normalised, sessio
       // route (B51 -> DST006 the breed explorer; B52-MISC-01 -> DST007 Britain's Dog History), which
       // the assembler resolves to a page link. The clip is a local file only.
       const media = CANNED_MEDIA[rid];
+      // Task 161: a Labrador dangerous-food (NEVER-tier) row carries a Collie interjection -- one line she
+      // cuts in with after his greedy answer. Attached here so send() plays it as an aside, never a transfer.
+      const interjection = r?.interjection ? { dog: 'collie' as Dog, line: r.interjection } : undefined;
       if (res.destinationId) {
         const dest = data.destinations.find((d) => d.destinationId === res.destinationId);
-        return { responseId: rid, text, dog, destinationId: res.destinationId, url: res.url ?? dest?.resolvedUrl ?? null, ...(media ? { media } : {}) };
+        return { responseId: rid, text, dog, destinationId: res.destinationId, url: res.url ?? dest?.resolvedUrl ?? null, ...(media ? { media } : {}), ...(interjection ? { interjection } : {}) };
       }
-      return { responseId: rid, text, dog, ...(media ? { media } : {}) };
+      return { responseId: rid, text, dog, ...(media ? { media } : {}), ...(interjection ? { interjection } : {}) };
     }
 
     case 'open_discount_popup': {

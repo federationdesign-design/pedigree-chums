@@ -17,6 +17,7 @@ export interface CollieResponse {
   defaultRoute: string;
   animationCue: string;
   status: string;
+  interjection?: string; // Task 161: the Collie's one-line cut-in when the Labrador answers a dangerous (NEVER-tier) food; empty on every other row
 }
 
 export interface Destination {

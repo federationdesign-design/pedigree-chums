@@ -282,8 +282,9 @@ function biscuitMove(state: GameState, input: string): { state: GameState; resul
 //
 // A dozen cookies are shown as tappable pills (the UI renders them from data/feed-cookie.ts, minus the
 // ones eaten). A tap sends the cookie's id as a move; he eats it with delight and a one-line lesson on
-// what it does. Blue cookies help a site work; red ones follow you elsewhere. Every FIFTH cookie gets a
-// clip -- good for a blue one, queasy for a red one. Typed input that is not a cookie just nudges him,
+// what it does. Blue cookies help a site work; red ones follow you elsewhere. A blue cookie shows a happy
+// clip on the cadence (cookies 1, 4, 7, 10); a red cookie always shows the queasy clip. Typed input that
+// is not a cookie just nudges him,
 // so nothing (including "cookies") leaks out of the game. Safety wins above this and ends the game.
 
 const COOKIE_CLIP = {
@@ -291,11 +292,9 @@ const COOKIE_CLIP = {
   red: { src: '/chat-media/cookie-bad.mp4', alt: 'The Labrador looks queasy' },
 };
 
-// Task 151 (section 5): the number of cookies before he gives up on his own (too full, then asleep).
-// The owner's rule from the Boxer's third-stop gag: never stopping is a fault, not a gag. The brief
-// wants somewhere between six and ten; eight, reported for approval. Below the twelve pills, so some
-// are always left uneaten -- that is the point, his appetite outruns the bowl and then quits.
-const COOKIE_GIVE_UP = 8;
+// Task 161: the Task 151 give-up (COOKIE_GIVE_UP = 8, "im so full" + "zzz") is REMOVED. He is greedy and
+// does not know when he is full, so he never stops on his own; the tray running out at twelve is the end.
+// The B67-FEEDCOOKIE-FULL and B67-FEEDCOOKIE-SLEEP workbook rows are now dormant.
 
 function feedCookieMove(state: GameState, input: string): { state: GameState; result: GameResult } {
   const guess = input.trim().toLowerCase();
@@ -305,15 +304,15 @@ function feedCookieMove(state: GameState, input: string): { state: GameState; re
     return { state, result: { line: 'B67-FEEDCOOKIE-NUDGE', display: '', ended: false } };
   }
   const fed = [...state.fed, cookie.id];
-  const media = fed.length % 5 === 0 ? (cookie.red ? COOKIE_CLIP.red : COOKIE_CLIP.blue) : undefined;
+  // Task 161: a RED cookie ALWAYS shows the queasy clip (a red cookie is always cookie-bad). A BLUE one
+  // shows the happy clip on the cadence: the FIRST cookie, then every third (cookies 1, 4, 7, 10).
+  const media = cookie.red ? COOKIE_CLIP.red : fed.length % 3 === 1 ? COOKIE_CLIP.blue : undefined;
   const ns = { ...state, fed };
-  // Task 151 (section 5): he STOPS ON HIS OWN. A bottomless-greed loop the visitor has to escape is a
-  // loop with no punchline, so around the eighth cookie he is too full and falls asleep -- the game ends
-  // even though pills remain. On that give-up feed he is past teaching (no lesson), just the wind-down.
-  const ended = fed.length >= COOKIE_GIVE_UP || fed.length >= FEED_COOKIES.length;
-  const line = ended ? 'B67-FEEDCOOKIE-FULL' : cookie.red ? 'B67-FEEDCOOKIE-RED' : 'B67-FEEDCOOKIE-BLUE';
-  // The give-up is two beats: "im so full. i regret nothing", a pause, then "zzz" (served as a follow-up).
-  return { state: ns, result: { line, clueId: ended ? undefined : cookie.teachId, media, followUpId: ended ? 'B67-FEEDCOOKIE-SLEEP' : undefined, display: '', ended } };
+  // Task 161: he NEVER gives up. He is greedy and does not know when he is full, so every pill can be fed
+  // (red included) and the game just ends when the tray runs out at twelve -- no "full"/"zzz" wind-down.
+  const ended = fed.length >= FEED_COOKIES.length;
+  const line = cookie.red ? 'B67-FEEDCOOKIE-RED' : 'B67-FEEDCOOKIE-BLUE';
+  return { state: ns, result: { line, clueId: cookie.teachId, media, display: '', ended } };
 }
 
 // ---- Public API ----

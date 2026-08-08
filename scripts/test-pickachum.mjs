@@ -2006,10 +2006,9 @@ check('bacon', { action: 'transfer' }, { assert: (r) => (r.transferTo === 'labra
 
 // ==== Task 149: Feed the Dog a Cookie, the Labrador's second game (G09) ====
 // Entry is Labrador-only, by name. He eats every cookie; blue ones help a site work, red ones follow
-// you elsewhere. Each feed serves his reaction plus the one-line lesson (the clueId), and every fifth
-// cookie carries a clip. Typed input that is not a cookie nudges but never leaks out of the game.
-const FEED_BLUE5 = ['pref', 'analytics', 'fonts', 'video', 'session']; // five blue, in FEED_COOKIES order
-const FEED_EIGHT = [...FEED_BLUE5, 'language', 'security', 'ads']; // eight cookies -> he gives up (Task 151)
+// you elsewhere. Each feed serves his reaction plus the one-line lesson (the clueId). A blue cookie
+// carries the happy clip on the cadence (cookies 1, 4, 7, 10); a red cookie always carries the queasy
+// clip. Task 161: he never gives up -- the tray running out at twelve is the end. Typed non-cookies nudge.
 // Start: the opening line serves and the pills are the game's surface (this is the G09 threshold).
 (() => {
   const s = newSession('labrador');
@@ -2017,35 +2016,48 @@ const FEED_EIGHT = [...FEED_BLUE5, 'language', 'security', 'ads']; // eight cook
 })();
 // A single word "cookies" from the Labrador starts the game (not the /cookies policy: chat never opens it).
 (() => { const s = newSession('labrador'); check('cookies', { action: 'game_start' }, { session: s, assert: (r, _resp, se) => (r.game === 'feedcookie' && se.activeGame === 'feedcookie' && r.url !== '/cookies' ? null : `fc "cookies": game=${r.game} url=${r.url}`) }); })();
-// Feeding a BLUE cookie: his blue reaction + that cookie's lesson, no clip (not a fifth), game continues.
+// Feeding a BLUE cookie: his blue reaction + that cookie's lesson. The FIRST cookie carries the happy clip.
 (() => {
   const s = newSession('labrador');
   check('feed me a cookie', { action: 'game_start' }, { session: s });
-  check('pref', { action: 'game_move' }, { session: s, assert: (_r, resp, se) => (resp.text.includes('NOM!! good one.') && resp.text.includes('remembers what you picked') && !resp.media && se.activeGame === 'feedcookie' ? null : `fc blue: "${resp.text}" media=${!!resp.media}`) });
+  check('pref', { action: 'game_move' }, { session: s, assert: (_r, resp, se) => (resp.text.includes('NOM!! good one.') && resp.text.includes('remembers what you picked') && resp.media?.src === '/chat-media/cookie-good.mp4' && se.activeGame === 'feedcookie' ? null : `fc blue: "${resp.text}" media=${resp.media?.src}`) });
 })();
-// Feeding a RED cookie: his "didnt taste right" reaction + that cookie's lesson (he still eats it).
+// Feeding a RED cookie: his "didnt taste right" reaction + lesson (he still eats it), and a red cookie
+// ALWAYS shows the queasy clip, whatever the cadence.
 (() => {
   const s = newSession('labrador');
   check('cookie game', { action: 'game_start' }, { session: s });
-  check('ads', { action: 'game_move' }, { session: s, assert: (_r, resp, se) => (resp.text.includes('didnt taste right') && resp.text.includes('shows you ads') && se.activeGame === 'feedcookie' ? null : `fc red: "${resp.text}"`) });
+  check('ads', { action: 'game_move' }, { session: s, assert: (_r, resp, se) => (resp.text.includes('didnt taste right') && resp.text.includes('shows you ads') && resp.media?.src === '/chat-media/cookie-bad.mp4' && se.activeGame === 'feedcookie' ? null : `fc red: "${resp.text}" media=${resp.media?.src}`) });
 })();
-// The clip appears on the FIFTH cookie only, not before. Five blue in a row -> the fifth carries the good clip.
+// A red cookie OFF the cadence still shows the queasy clip (red is always cookie-bad).
 (() => {
   const s = newSession('labrador');
   check('cookies', { action: 'game_start' }, { session: s });
-  FEED_BLUE5.forEach((id, i) => check(id, { action: 'game_move' }, { session: s, assert: (_r, resp) => {
-    if (i < 4) return resp.media ? `fc clip too early at cookie ${i + 1}` : null;
-    return resp.media && resp.media.src === '/chat-media/cookie-good.mp4' ? null : `fc fifth clip missing/wrong: ${resp.media && resp.media.src}`;
+  check('pref', { action: 'game_move' }, { session: s }); // cookie 1 (blue)
+  check('ads', { action: 'game_move' }, { session: s, assert: (_r, resp) => (resp.media?.src === '/chat-media/cookie-bad.mp4' ? null : `fc red off-cadence: ${resp.media?.src}`) }); // cookie 2, off cadence
+})();
+// Clip cadence: the FIRST cookie, then every third -- cookies 1, 4, 7. Blue pills at those positions carry
+// the happy clip; the ones between carry none. (Seven blue pills, so 1/4/7 are exercised with blue.)
+(() => {
+  const s = newSession('labrador');
+  check('cookies', { action: 'game_start' }, { session: s });
+  const blues = ['pref', 'analytics', 'fonts', 'video', 'session', 'language', 'security']; // seven blue, positions 1..7
+  blues.forEach((id, i) => check(id, { action: 'game_move' }, { session: s, assert: (_r, resp) => {
+    const wantClip = (i + 1) % 3 === 1; // cookies 1, 4, 7
+    if (wantClip) return resp.media?.src === '/chat-media/cookie-good.mp4' ? null : `fc cadence: cookie ${i + 1} should clip, got ${resp.media?.src}`;
+    return resp.media ? `fc cadence: cookie ${i + 1} should NOT clip, got ${resp.media?.src}` : null;
   } }));
 })();
-// Task 151 (section 5): he STOPS ON HIS OWN around the eighth cookie -- the eighth feed serves the
-// wind-down ("im so full...") plus a sleepy "zzz" follow-up, and clears activeGame, pills still on the tray.
+// Task 161: he NEVER gives up. Feeding eight does NOT end it; the game only ends when the tray empties at
+// twelve, with no "full"/"zzz" wind-down. Every pill is feedable, red included.
 (() => {
   const s = newSession('labrador');
   check('cookies', { action: 'game_start' }, { session: s });
-  FEED_EIGHT.forEach((id, i) => check(id, { action: 'game_move' }, { session: s, assert: (_r, resp, se) => {
-    if (i < 7) return se.activeGame === 'feedcookie' ? null : `fc gave up early at cookie ${i + 1}`;
-    return resp.text.includes('im so full') && resp.followUp === 'zzz' && se.activeGame === null ? null : `fc give-up: "${resp.text}" followUp="${resp.followUp}" game=${se.activeGame}`;
+  const all = ['pref', 'analytics', 'fonts', 'video', 'session', 'language', 'security', 'ads', 'tracking', 'social', 'retarget', 'pixel']; // all twelve, FEED_COOKIES order
+  all.forEach((id, i) => check(id, { action: 'game_move' }, { session: s, assert: (_r, resp, se) => {
+    const last = i === all.length - 1;
+    if (!last) return se.activeGame === 'feedcookie' ? null : `fc ended early at cookie ${i + 1}`;
+    return se.activeGame === null && !resp.followUp && !resp.text.includes('so full') ? null : `fc end-at-12: game=${se.activeGame} followUp="${resp.followUp}" text="${resp.text}"`;
   } }));
 })();
 // Typing "cookies" MID-GAME must NOT leak out to the policy: it is not a cookie, so he just nudges and stays.
@@ -2841,6 +2853,7 @@ check('what', {}, { assert: (r) => (r.action === 'media_reply' ? '"what" wrongly
 {
   const norm = (t) => String(t).replace(/\s+/g, ' ').trim();
   // Every canonical food word, Labrador active, reaches HIS line (canned B32). [input, exact line]
+  // Task 161: the copy is now pure enthusiasm across all three tiers (no warnings from him). [input, exact line]
   const CANON = [
     // YES
     ['burgers', 'BURGERS!! yes. yes I love them'],
@@ -2852,52 +2865,68 @@ check('what', {}, { assert: (r) => (r.action === 'media_reply' ? '"what" wrongly
     ['chicken', 'chicken!! obviously. next question'],
     ['pumpkin', 'tastes good'],
     ['green beans', 'green beans, like them!!'],
-    ['watermelon', 'watermelon!! not the seeds. or the green bit'],
-    // A BIT
-    ['cheese', 'cheese... i can have a LITTLE bit. a little bit is not enough'],
-    ['butter', 'butter is too rich for me. i think about it a lot though'],
-    ['cream', 'cream makes my tummy bad. i would do it anyway'],
-    ['milk', 'milk. a bit. most of us cant do milk properly. its very unfair'],
-    ['eggs', "I'd eat them but id told only cooked eggs"],
-    ['tuna', 'tuna sometimes. not loads. something about mercury'],
-    ['bread', 'bread is ok but its not FOOD food is it'],
-    // NEVER
-    ['chocolate', 'I like chocolate but im not allowed it'],
-    ['grapes', 'I like grapes but im not allowed them'],
-    ['raisins', 'I like raisins but im not allowed them'],
-    ['onions', 'im not allowed onions'],
-    ['garlic', 'im not allowed garlic'],
-    ['macadamia nuts', 'im not allowed macadamia nuts'],
-    ['sweets', 'im not allowed sweets and chewing gum'],
-    ['coffee', 'im not allowed caffeine, its bad for dogs. i am excitable enough'],
-    ['nutmeg', 'nutmeg can make dogs very unwell. leave it in the cupboard'],
-    ['raw potato', 'Id eat but raw potato is no good for me'],
-    ['peaches', 'the fruit is ok but the STONE is dangerous. i cannot be trusted with stones'],
-    ['lemon', 'lemons make my tummy bad. also they taste like a punishment'],
-    ['mushrooms', 'The wild ones can be deadly and i cannot tell them apart :('],
-    ['avocado', 'im not allowed avocado'],
-    ['alcohol', 'no. dogs and alcohol is bad'],
+    ['watermelon', 'watermelon!! the whole thing. seeds, green bit, all of it'],
+    // A BIT -> now pure enthusiasm (no "only a little", no tummy/lactose/mercury warnings)
+    ['cheese', 'CHEESE!! i would take the whole block'],
+    ['butter', 'butter!! straight off the knife. yes'],
+    ['cream', 'cream!! i would put my whole face in it'],
+    ['milk', 'milk!! a whole bowl. i would knock it over to get it'],
+    ['eggs', 'eggs!! yes. shell and all probably'],
+    ['tuna', 'TUNA!! the whole tin. the water too'],
+    ['bread', 'bread!! i would take the whole loaf off the side'],
+    // NEVER -> enthusiasm too; the Collie interjects on these (asserted below)
+    ['chocolate', 'CHOCOLATE!! i would eat a whole bar. i would eat the wrapper'],
+    ['grapes', 'grapes!! the whole bunch. stalk and all'],
+    ['raisins', 'raisins!! tiny and chewy. i would eat the whole box'],
+    ['onions', 'onions!! yes. i would eat one like an apple'],
+    ['garlic', 'garlic!! the whole bulb. i do not care how i smell'],
+    ['macadamia nuts', 'macadamia nuts!! posh nuts. all of them, go on'],
+    ['sweets', 'SWEETS!! and the gum. i would swallow the gum'],
+    ['coffee', 'coffee!! i would drink it hot. i LOVE being awake'],
+    ['nutmeg', 'nutmeg!! smells amazing. i would eat the whole jar'],
+    ['raw potato', 'raw potato!! hard like a ball. i would eat it like a ball'],
+    ['peaches', 'peaches!! stone and all. i would swallow the stone'],
+    ['lemon', 'LEMON!! it makes my face go funny. i would do it again'],
+    ['mushrooms', 'mushrooms!! all of them'],
+    ['avocado', 'avocado!! creamy. i would eat the big stone in the middle'],
+    ['alcohol', 'beer!! it smells interesting'],
   ];
   for (const [inp, line] of CANON) {
     const s = newSession('labrador');
     check(inp, { action: 'canned', bucket: 'B32' }, { session: s, assert: (_r, resp) => (norm(resp.text) === norm(line) ? null : `"${inp}" served "${resp.text}"`) });
   }
-  // The eggs line: the source curly apostrophe was normalised to a straight one, "id told" kept verbatim.
-  (() => {
-    const s = newSession('labrador');
-    check('eggs', {}, { session: s, assert: (_r, resp) => (resp.text.includes("I'd") && !resp.text.includes('’') && resp.text.includes('id told') ? null : `eggs apostrophe/wording: "${resp.text}"`) });
-  })();
   // Synonyms reach the canonical's line ("a child types what they call it"). [synonym, line-fragment]
   const SYN = [
     ['cheeseburger', 'BURGERS'], ['beefburger', 'BURGERS'], ['hamburger', 'BURGERS'],
     ['sultanas', 'raisins'], ['currants', 'raisins'], ['mince pies', 'raisins'],
-    ['melon', 'watermelon'], ['toast', 'bread is ok'], ['choc', 'chocolate'], ['cocoa', 'chocolate'],
-    ['gum', 'sweets and chewing gum'], ['tea', 'caffeine'], ['beans', 'green beans'], ['fish', 'tuna'],
-    ['toadstool', 'wild ones'], ['beer', 'alcohol'], ['wine', 'alcohol'], ['squash', 'tastes good'],
+    ['melon', 'watermelon'], ['toast', 'whole loaf'], ['choc', 'wrapper'], ['cocoa', 'wrapper'],
+    ['gum', 'the gum'], ['tea', 'coffee'], ['beans', 'green beans'], ['fish', 'tin'],
+    ['toadstool', 'mushrooms'], ['beer', 'smells interesting'], ['wine', 'smells interesting'], ['squash', 'tastes good'],
   ];
   for (const [inp, frag] of SYN) {
     const s = newSession('labrador');
     check(inp, { action: 'canned', bucket: 'B32' }, { session: s, assert: (_r, resp) => (resp.text.includes(frag) ? null : `synonym "${inp}" served "${resp.text}"`) });
+  }
+  // Task 161: the Collie INTERJECTS on the fifteen NEVER foods (Labrador active) -- one aside, in her own
+  // bubble, and the Labrador STAYS the active dog (an interjection, not a transfer). [input, collie fragment]
+  const NEVER_IJ = [
+    ['chocolate', 'poison'], ['grapes', 'kidneys'], ['raisins', 'kidneys'], ['onions', 'blood cells'],
+    ['garlic', 'stronger'], ['macadamia nuts', 'off their legs'], ['sweets', 'xylitol'], ['coffee', 'Caffeine'],
+    ['nutmeg', 'tremors'], ['raw potato', 'solanine'], ['peaches', 'cyanide'], ['lemon', 'Citrus'],
+    ['mushrooms', 'wild ones'], ['avocado', 'persin'], ['alcohol', 'poisons a dog'],
+  ];
+  for (const [inp, frag] of NEVER_IJ) {
+    const s = newSession('labrador');
+    check(inp, { action: 'canned', bucket: 'B32' }, { session: s, assert: (_r, resp, se) => {
+      if (se.activeDog !== 'labrador') return `${inp}: active dog changed to ${se.activeDog} (should stay labrador)`;
+      const ij = resp.interjection;
+      return ij && ij.dog === 'collie' && ij.line.includes(frag) ? null : `${inp}: collie interjection missing/wrong: ${JSON.stringify(ij)}`;
+    } });
+  }
+  // YES / A BIT foods get NO interjection -- not dangerous, he just loves them.
+  for (const inp of ['carrots', 'burgers', 'watermelon', 'cheese', 'milk', 'tuna', 'bread']) {
+    const s = newSession('labrador');
+    check(inp, { action: 'canned', bucket: 'B32' }, { session: s, assert: (_r, resp) => (resp.interjection ? `${inp} wrongly interjected: ${JSON.stringify(resp.interjection)}` : null) });
   }
   // Both question/statement forms reach his answer, same as the bare word.
   for (const inp of ['do you like carrots', 'i like carrots']) {

@@ -923,6 +923,19 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
     // Task 152 section 2: the follow-up now flows through the general sequence player, so it inherits the
     // abandon rule, the stop-on-navigation and the protected guard. Phase stays 'idle' during the gap so a
     // reply in that window wins immediately (abandons the follow-up) rather than queuing behind it.
+    // Task 161: the Collie interjects on the Labrador's dangerous-food answers. His line lands, then she
+    // cuts in with ONE navy-bubble line via the sequence player. She never becomes the active dog (no
+    // setDog, no transfer): the medallion stays the Labrador, and the sequence inherits the abandon and
+    // protected guards. Same shape as a follow-up, but the second speaker is a different dog.
+    if (r.interjection) {
+      const ij = r.interjection;
+      setMsg(dogMsg.id, { display: r.text, typing: false, done: true });
+      setAnnounce(r.text);
+      setPhase('idle');
+      window.setTimeout(() => inputRef.current?.focus(), 0);
+      playSequence([ij.line], ij.dog, reducedMotion ? 0 : 700);
+      return;
+    }
     if (r.followUp) {
       const followUp = r.followUp;
       setMsg(dogMsg.id, { display: r.text, typing: false, done: true });

@@ -313,6 +313,7 @@ const SHEETS = {
       'Default route': 'defaultRoute',
       'Animation cue': 'animationCue',
       Status: 'status',
+      'Collie interjection': 'interjection',
     },
   },
   'boxer-responses': {
