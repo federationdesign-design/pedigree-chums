@@ -163,6 +163,7 @@ export type ActionType =
   | 'clarifier' // bare help-seeking: ask whether it is a site question or a worry
   | 'neutral_refusal' // Task 34: PROTECTED_AFTERCARE decline of a blocked game/sales/comedy request (no safety surface)
   | 'goodbye' // Task 36: a farewell (whole-message match) -> the approved goodbye line
+  | 'dismiss' // Task 165: a dismissal ("go away" / "leave me alone" / "get lost") -> the dog's own goodbye, then the chat closes (session cut-off). Boxer "stop" is excluded (his third-stop gag keeps that word).
   | 'out_of_scope' // Task 37: a valid question on a topic the site does not cover -> the approved out-of-scope line (never the repair ladder)
   | 'grief' // Task 58: a dog bereavement (died / lost / old-unwell) -> the gentle ':(' line; below urgent safety, above the loop, never reaches the loop
   | 'canned' // Task 80: a conversational bucket (B21-B39) matched on its column-D triggers; serves the specific responseId. Sits above the non-answer zone (gk_unknown / fallback), below every real route.

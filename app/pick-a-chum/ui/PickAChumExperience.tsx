@@ -976,11 +976,13 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
       inputRef.current?.focus();
     }
 
-    // Task 78: the visual tricks. play_dead just blacks the image out (no bubble; the black image is
-    // the answer) until the next submit. roll_over rolls the image over then lands on ':)'; under
-    // reduced motion the rotation is skipped and only the ':)' end state shows. Both are instant.
+    // Task 78 / 165: the visual tricks. play_dead blacks the image out AND lands on a non-verbal 'x_x'
+    // face bubble (Task 165: an empty bubble read as broken in live testing, so there is always a visible
+    // reply now). roll_over rolls the image over then lands on ':)'; under reduced motion the rotation is
+    // skipped and only the end-state face shows. Both are instant.
     if (result.resolution.action === 'play_dead') {
-      setMessages((m) => [...m, userMsg]);
+      const deadMsg: Message = { id: idRef.current++, who: 'dog', text: 'x_x', display: 'x_x', done: true, dog: toDog, name: dogInfo(toDog).name };
+      setMessages((m) => [...m, userMsg, deadMsg]);
       setDead(true);
       setAnnounce('the Collie plays dead');
       return;

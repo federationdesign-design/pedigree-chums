@@ -39,6 +39,7 @@ export interface Assembled {
 // as the accessible name instead.
 export const SAD_FACE_SR_LABEL = 'the Collie looks sad';
 export const SMILE_FACE_SR_LABEL = 'the Collie smiles';
+export const DEAD_FACE_SR_LABEL = 'the dog plays dead';
 
 // Task 140/141: birthday is the one clip reply with no workbook row (its line is the existing smile
 // face, so it carries the smile accessible name). Held as a code constant, flagged for workbook
@@ -305,11 +306,13 @@ export function assemble(res: Resolution, data0: ChumData, n: Normalised, sessio
       // something clumsy. All three scenarios (GRIEF-01/02/03) share this one gentle line.
       return { responseId: res.griefCategory ?? 'GRIEF', text: ':(', ariaLabel: SAD_FACE_SR_LABEL, dog };
 
-    // Task 78: the two visual tricks. The response text is minimal -- the effect is the image going
-    // black / rolling over, driven by the resolution action in the experience. play_dead has no bubble
-    // (the black image is the answer); roll_over lands on ':)' after the rotation.
+    // Task 78: the two visual tricks. The effect is the image going black / rolling over, driven by the
+    // resolution action in the experience. roll_over lands on ':)' after the rotation.
+    // Task 165: play_dead used to send an EMPTY bubble (the blackout alone was the answer), which read as a
+    // broken, silent turn in live testing. It now lands on a non-verbal 'x_x' face -- the same convention as
+    // roll_over's ':)' -- so there is always a visible reply, with the blackout still playing behind it.
     case 'play_dead':
-      return { responseId: 'PLAY-DEAD', text: '', dog };
+      return { responseId: 'PLAY-DEAD', text: 'x_x', ariaLabel: DEAD_FACE_SR_LABEL, dog };
     case 'roll_over':
       return { responseId: 'ROLL-OVER', text: ':)', dog };
 
@@ -741,6 +744,16 @@ export function assemble(res: Resolution, data0: ChumData, n: Normalised, sessio
       return ownGoodbye
         ? { responseId: `${DOG_PREFIX[dog]}-GOODBYE`, text: ownGoodbye, dog }
         : { responseId: 'GOODBYE', text: 'Right. Off you go, then. Come back when you need a dog.', dog };
+    }
+
+    case 'dismiss': {
+      // Task 165: "go away" and its kin close the chat, but with the dog's own goodbye first, so the
+      // dismissal reads as the dog taking the hint, not being ignored. Same per-dog goodbye line as above
+      // (Boxer "see ya", Labrador "byeeeee"); the dogs without one get a short "ok" rather than the long
+      // constant. closed: true ends the session (engine sets session.closed), so the panel closes after
+      // the line is read, exactly like the Boxer cut-off.
+      const ownGoodbye = copy(data, `${DOG_LABEL[dog]} goodbye`);
+      return { responseId: `${DOG_PREFIX[dog]}-DISMISS`, text: ownGoodbye || 'ok', dog, closed: true };
     }
 
     case 'out_of_scope':

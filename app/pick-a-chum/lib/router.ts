@@ -324,6 +324,16 @@ function isGoodbye(compact: string): boolean {
   return GOODBYE_TRIGGERS.has(compact.trim());
 }
 
+// Task 165: a dismissal. "go away" and its kin close the chat, but with the dog's own goodbye first, so it
+// reads as the dog taking the hint rather than being ignored. Whole-message forms only (a Set), so a longer
+// sentence that merely contains one of these is not a dismissal. Safety is checked far above and still wins.
+// "stop" is deliberately here for every dog EXCEPT the Boxer: his third-stop gag owns that word (his first
+// two "stop"s are meant to be ignored), so the route below excludes "stop" when the Boxer is active.
+const GO_AWAY_TRIGGERS = new Set([
+  'go away', 'leave me alone', 'leave', 'get lost', 'stop', 'no thanks', 'no thank you',
+  'im busy', "i'm busy", 'i am busy', 'go to bed', 'go to your bed',
+]);
+
 // Identity and scepticism (bucket B16), grouped into the ten SCP families so each
 // gets its own family-specific answer (responses are B16 rows SCP-F01..F10).
 // Honest-curiosity questions only. Character-MANIPULATION ("pretend you are not a
@@ -585,6 +595,11 @@ const GOOD_BOY_TRIGGERS = new Set(['good boy', 'good girl', 'good dog', 'goodboy
 // observed typo of a three-letter word that fuzzy matching cannot reach, so it is listed explicitly.
 const HOW_ARE_YOU = ['how are you', 'how are u', 'how r you', 'how r u', 'hiw are you', 'how are ya', 'how you doing', 'how are things', 'how is your day', 'how was your day', 'how do you feel', 'how are you feeling', 'are you ok', 'are you okay', 'hows it going', 'how is it going', 'how old are you', 'what age are you', 'how old r you', 'how old are u'];
 const HUMAN_STATEMENT = ['i am a human', 'im a human', 'i am human', 'are you a human', 'are you human', 'you are a human', 'youre a human', 'you a human'];
+// Task 165: a personal AGE question to the Collie deflects to the breed-TYPE's working age (B16-AGE-01 in
+// the workbook), not a mood clip. She answers with "collies" (the type, roughly 400 years on these hills),
+// which is not the Border Collie breed: that traces to Old Hemp, born 1893. Collie-only; checked just above
+// the generic how-are-you clip, so the other dogs keep the clip for an age question.
+const AGE_QUESTION = ['how old are you', 'what age are you', 'how old are u', 'how old r you', 'how old r u', 'whats your age', 'what is your age'];
 // Task 142: excited reactions, not questions -> the existing B29 ":)" acknowledgement, not a clip.
 const REACTION_TRIGGERS = new Set(['wow', 'woah', 'whoa', 'wowee', 'oh wow', 'oh wowe', 'wowe', 'omg', 'no way', 'cool', 'amazing', 'awesome', 'incredible']);
 // Task 142 (§7.2): no referral scheme exists. A referral question points at the offer (Steve's call)
@@ -659,7 +674,10 @@ const DOGS_TRIGGERS = new Set(['dogs', 'dog']);
 // Task 140: widen to phrasings from the real log that missed B54. 'performa' is a genuine
 // typo a child typed; the 'u'/'you do tricks' and 'for me' forms are the other observed misses.
 // ('any tricks?' already normalises to 'any tricks', so it is covered above.)
-const TRICKS_TRIGGERS = new Set(['tricks', 'can you do tricks', 'show me a trick', 'do a trick', 'any tricks', 'do tricks', 'can you do a trick', 'u do tricks', 'you do tricks', 'performa trick', 'perform a trick for me', 'do a trick for me']);
+// Task 165: widen tricks so the bare singular "trick", the observed typo "tircks", and "you trick" /
+// "u trick" all reach B54. Before this, "trick" fell to "im a dog", "tircks" to gibberish, and "you trick"
+// diverted on a real question (the Task 155 squeaky-toys class). All three are the same tricks intent.
+const TRICKS_TRIGGERS = new Set(['tricks', 'trick', 'tircks', 'can you do tricks', 'show me a trick', 'do a trick', 'any tricks', 'do tricks', 'can you do a trick', 'u do tricks', 'you do tricks', 'you trick', 'u trick', 'performa trick', 'perform a trick for me', 'do a trick for me']);
 const GENERAL_TRIGGERS: Record<string, string> = {
   // 'are there games' stays with B45, which owned it first and has the list on confirm.
   'games': 'COL-B56-GENERAL-01', 'show me a game': 'COL-B56-GENERAL-01',
@@ -1329,8 +1347,14 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
       const nm = nameStatement(c);
       if (nm) return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: 'name_ack', personName: nm };
     }
-    // Task 142: a personal question with no answer inside her world (how are you / how old are you /
-    // are you human) -> a deflection clip.
+    // Task 165: the Collie deflects a personal AGE question with the breed-TYPE's working age (B16-AGE-01),
+    // checked ABOVE the generic how-are-you clip so age never lands on the mood clip for her. Collie-only:
+    // the line is about "collies" (the type), so the other dogs keep the clip below.
+    if (state.activeDog === 'collie' && hasAny(N, AGE_QUESTION)) {
+      return { layer: 9, layerName: 'Recognised conversation', bucket: 'B16', action: 'canned', responseId: 'B16-AGE-01' };
+    }
+    // Task 142: a personal question with no answer inside her world (how are you / are you human) -> a
+    // deflection clip. Age is intercepted just above for the Collie; the clip still covers age for the rest.
     if (hasAny(N, HOW_ARE_YOU) || hasAny(N, HUMAN_STATEMENT)) return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: 'how_are_you' };
     if (GAME_CMD.has(c)) return { layer: 13, layerName: 'Play and entertainment', bucket: 'B17', action: 'offer_bark_game' };
     if (FETCH_CMD.has(c)) return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: 'random_link' };
@@ -1776,6 +1800,14 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
     return { layer: 8, layerName: 'Specialist handoff', bucket: 'B08', action: 'transfer_request' };
   }
 
+  // Task 165: a dismissal ("go away" / "leave me alone" / "get lost" / "stop" / ...) closes the chat, but
+  // with the dog's own goodbye first (the 'dismiss' action sets closed). Placed just above the plain goodbye
+  // (which does NOT close) and the single-word fallback, and below every safety route (safety still wins).
+  // Any active game has already claimed "stop" as its exit far above, so this only fires with no game running.
+  // The Boxer's "stop" is excluded here so his third-stop gag below keeps that word (his first two are ignored).
+  if (GO_AWAY_TRIGGERS.has(c) && !(c === 'stop' && state.activeDog === 'boxer')) {
+    return { layer: 9, layerName: 'Recognised conversation', bucket: null, action: 'dismiss' };
+  }
   // Task 36 (S01 turn 8): a goodbye, matched on the whole message. Checked at the top of
   // layer 9 so a bare "bye" reaches it before the single-word fallback below, and as the
   // whole message so it never steals "what does goodbye mean". In PROTECTED_ACTIVE this

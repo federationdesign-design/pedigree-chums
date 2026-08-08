@@ -874,7 +874,10 @@ function canonCheck(kind) {
   };
 }
 for (const q of ['What is your name?', 'Do you have a name?', "What's your real name?", 'Do you have a secret name?']) check(q, {}, { assert: canonCheck('name') });
-for (const q of ['How old are you?', 'What is your age?']) check(q, {}, { assert: canonCheck('age') });
+// Task 165: a personal age question to the Collie deflects to the breed-TYPE's working age (B16-AGE-01):
+// "collies have been working these hills for about 400 years" -- the type, not her own age, and not the
+// Border Collie breed (Old Hemp, 1893). The generic how-are-you clip no longer covers age for her.
+for (const q of ['How old are you?', 'What is your age?', 'how old are you today']) check(q, { action: 'canned', bucket: 'B16' }, { assert: (r) => (r.responseId === 'B16-AGE-01' ? null : `age -> ${r.responseId}`) });
 for (const q of ['Who is your owner?', 'Do you have an owner?', 'Who owns you?']) check(q, {}, { assert: canonCheck('owner') });
 
 // ---- No exact response repetition within a session when alternatives exist ----
@@ -2555,7 +2558,7 @@ check('are you software', { action: 'identity' });
 check('are you intelligent', { action: 'identity' });
 
 // ---- Rule 3: personal questions -> a deflection clip (only the ones that were broken) ----
-for (const inp of ['how are you', 'Hiw are you', 'how old are you', 'i am a human', 'are you human']) {
+for (const inp of ['how are you', 'Hiw are you', 'i am a human', 'are you human']) {
   check(inp, { action: 'how_are_you' }, { assert: (_r, resp) => (/\/chat-media\/howareyou[123]\.mp4/.test(resp.media?.src ?? '') ? null : `no clip: ${JSON.stringify(resp.media)}`) });
 }
 // Task 142 (change 2): the SAME clip every time this session (the three convey different feelings).
@@ -3218,6 +3221,29 @@ check('what', {}, { assert: (r) => (r.action === 'media_reply' ? '"what" wrongly
   // COOKIE GAME GUARD: "cookies" still starts the Labrador's game; no food word collides with it.
   (() => { const s = newSession('labrador'); check('cookies', { action: 'game_start' }, { session: s }); })();
 }
+
+// ---- Task 165: live-log fixes + the dismissal ----
+// play dead: a visible non-verbal face, never an empty bubble.
+check('play dead', { action: 'play_dead' }, { assert: (_r, resp) => (resp.text && resp.text.trim() ? null : 'empty play-dead bubble') });
+// tricks widened: the bare singular, the typo, and "you trick" / "u trick" all reach B54.
+for (const q of ['trick', 'tircks', 'you trick', 'u trick']) check(q, { action: 'tricks_menu', bucket: 'B54' });
+// the Collie's age deflection: the breed TYPE's working age (~400 years), not her own, not the breed.
+check('how old are you', { action: 'canned', bucket: 'B16' }, { assert: (r, resp) => (r.responseId === 'B16-AGE-01' && /400 years/.test(resp.text) ? null : `age line: ${resp.text}`) });
+// a non-Collie age question keeps the generic clip (the Collie line is type-specific).
+(() => { const s = newSession('boxer'); check('how old are you', { action: 'how_are_you' }, { session: s }); })();
+// dismissals close the chat with the dog's own goodbye first (never silence, never a fallback).
+for (const q of ['go away', 'leave me alone', 'leave', 'get lost', 'stop', 'no thanks', 'im busy', 'go to bed', 'go to your bed']) {
+  check(q, { action: 'dismiss' }, { assert: (_r, resp) => (resp.closed && resp.text ? null : `dismiss not closed/empty: ${resp.closed}/${resp.text}`) });
+}
+// per-dog goodbye on dismissal (Boxer "see ya", Labrador "byeeeee").
+(() => { const s = newSession('boxer'); check('go away', { action: 'dismiss' }, { session: s, assert: (_r, resp) => (resp.text === 'see ya' ? null : `boxer dismiss: ${resp.text}`) }); })();
+(() => { const s = newSession('labrador'); check('go away', { action: 'dismiss' }, { session: s, assert: (_r, resp) => (resp.text === 'byeeeee' ? null : `lab dismiss: ${resp.text}`) }); })();
+// COLLISION: the Boxer's first three "stop"s keep the third-stop gag and NEVER close the chat.
+(() => { const s = newSession('boxer'); for (let i = 1; i <= 3; i++) check('stop', {}, { session: s, notAction: 'dismiss', assert: (_r, resp) => (resp.closed ? `boxer stop #${i} closed` : null) }); })();
+// but a non-"stop" dismissal to the Boxer still closes.
+(() => { const s = newSession('boxer'); check('leave me alone', { action: 'dismiss' }, { session: s, assert: (_r, resp) => (resp.closed ? null : 'boxer leave-me-alone did not close') }); })();
+// "stop" mid-game exits the game, never a dismiss.
+(() => { const s = newSession('labrador'); s.activeGame = 'treattrail'; check('stop', { action: 'game_exit' }, { session: s }); })();
 
 // ---- Report ----
 const pad = (s, n) => String(s).padEnd(n);

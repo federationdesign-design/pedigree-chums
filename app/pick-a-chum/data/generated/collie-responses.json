@@ -5953,5 +5953,21 @@
     "defaultRoute": "",
     "animationCue": "",
     "status": "Approved"
+  },
+  {
+    "responseId": "B16-AGE-01",
+    "bucketId": "B16",
+    "subtag": "age",
+    "triggers": [
+      "how old are you",
+      "what age are you",
+      "how old are u",
+      "how old r you"
+    ],
+    "template": "collies have been working these hills for about 400 years",
+    "factSource": "Collie-type working age (approx 400 yrs for the type); the Border Collie breed traces to Old Hemp, born 1893",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
   }
 ]
