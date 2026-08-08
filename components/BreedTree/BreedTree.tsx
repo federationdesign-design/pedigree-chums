@@ -2057,7 +2057,7 @@ export default function BreedTree({
   const spawnBadgeRef = useRef<((x: number, y: number, r: number, pct: number, opts?: { r?: number; label?: string; charges?: number; green?: boolean }) => void) | null>(null);
   const spawnRodRef = useRef<((x1: number, y1: number, x2: number, y2: number, lit: boolean) => void) | null>(null);
   const spawnPillRef = useRef<((x: number, y: number, w: number, name: string) => void) | null>(null);
-  type PropBody = { x: number; y: number; vx: number; vy: number; a: number; idx: number; hits: number; maxHits: number; dead?: boolean; lastKnock?: number; mb?: any };
+  type PropBody = { x: number; y: number; vx: number; vy: number; a: number; idx: number; hits: number; maxHits: number; dead?: boolean; lastKnock?: number; mb?: any; onFloor?: boolean; floorLostAt?: number };
   const rodBodiesRef = useRef<PropBody[]>([]);
   const toyBodiesRef = useRef<PropBody[]>([]);
   const toysGRef = useRef<SVGGElement>(null);
@@ -2095,6 +2095,16 @@ export default function BreedTree({
      writes the DOM directly rather than re-rendering thirty times, so the green
      needs its own piece of state to render from. */
   const [takenChum, setTakenChum] = useState<number | null>(null);
+  // Mirrors of the two card states so the per-frame chum paint can read them
+  // without a render, the same reason pitMenuRef exists. The floor state itself
+  // lives on the body (pr.onFloor), set by the collision handlers below.
+  const armedChumRef = useRef<number | null>(null);
+  const takenChumRef = useRef<number | null>(null);
+  useEffect(() => { armedChumRef.current = armedChum; takenChumRef.current = takenChum; }, [armedChum, takenChum]);
+  // How long the outline stays red after the last floor contact. The solver
+  // separates a resting body for the odd frame, which would flicker the edge;
+  // this rides over that. Reported to Steve rather than added silently.
+  const CHUM_FLOOR_GRACE_MS = 120;
   /* Takes a body out of the physics world. The world itself only exists inside
      the sim effect, so the handler outside cannot reach it directly. This is
      the same pattern killToyRef and spawnBadgeRef already use. */
@@ -2889,6 +2899,18 @@ export default function BreedTree({
         if (flying && flying.has(pr.idx)) continue;
         const el = gg.children[pr.idx] as SVGGElement | undefined;
         if (el) el.setAttribute("transform", `translate(${(pr.x - v[0]) * k},${(pr.y - v[1]) * k}) rotate(${pr.a * 57.2958})`);
+        // The chum outline is a STATE, driven here off the physics flag rather
+        // than a per-frame React render. Priority, highest first: taken (green),
+        // armed (yellow), resting on the floor (red), else white. The grace
+        // clears a lifted card only after CHUM_FLOOR_GRACE_MS with no contact.
+        if (el && gRef === chumsGRef) {
+          if (pr.floorLostAt && now - pr.floorLostAt > CHUM_FLOOR_GRACE_MS) { pr.onFloor = false; pr.floorLostAt = 0; }
+          const edge = el.querySelector("[data-chum-edge]") as SVGRectElement | null;
+          if (edge) edge.style.stroke =
+            takenChumRef.current === pr.idx ? "#22c55e"
+            : armedChumRef.current === pr.idx ? "var(--yellow, #ffd23e)"
+            : pr.onFloor ? "#ef4444" : "#ffffff";
+        }
       }
     }
     nodes.forEach((d, i) => {
@@ -3690,7 +3712,7 @@ export default function BreedTree({
             const py = stageTopPx - (260 + Math.random() * 560);
             const w2 = worldFromPx(px, py);
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const pr: any = { x: w2.x, y: w2.y, vx: 0, vy: 0, a: 0, idx: chumBodiesRef.current.length, hits: 0, maxHits: 9999, mb: null, chum: true };
+            const pr: any = { x: w2.x, y: w2.y, vx: 0, vy: 0, a: 0, idx: chumBodiesRef.current.length, hits: 0, maxHits: 9999, mb: null, chum: true, onFloor: false, floorLostAt: 0 };
             const mb = Bodies.rectangle(px, py, dia, dia, {
               chamfer: { radius: dia * 0.22 },
               restitution: 0.4, friction: 0.3, frictionAir: 0.006, density: 0.0012,
@@ -4488,6 +4510,33 @@ export default function BreedTree({
       };
       Events.on(engine, "collisionStart", onCollide);
 
+      // RED WHILE RESTING ON THE FLOOR. A per-chum onFloor flag, kept live off
+      // the very same "chum"/"floor" tags the countdown already uses, not a new
+      // detector. collisionActive refreshes it every frame a card is in contact;
+      // collisionEnd marks the instant it lifts. The paint loop turns the marker
+      // back to white only after CHUM_FLOOR_GRACE_MS, so a one-frame solver
+      // separation does not flicker the edge. Not latched: off the floor, white.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const onFloorActive = (ev: any) => {
+        for (const pair of ev.pairs) {
+          const pa = pair.bodyA.plugin || {}, pb = pair.bodyB.plugin || {};
+          const pr = pa.kind === "chum" && pb.kind === "floor" ? pa.prop
+            : pb.kind === "chum" && pa.kind === "floor" ? pb.prop : null;
+          if (pr) { pr.onFloor = true; pr.floorLostAt = 0; }
+        }
+      };
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const onFloorEnd = (ev: any) => {
+        for (const pair of ev.pairs) {
+          const pa = pair.bodyA.plugin || {}, pb = pair.bodyB.plugin || {};
+          const pr = pa.kind === "chum" && pb.kind === "floor" ? pa.prop
+            : pb.kind === "chum" && pa.kind === "floor" ? pb.prop : null;
+          if (pr && pr.onFloor) pr.floorLostAt = performance.now();
+        }
+      };
+      Events.on(engine, "collisionActive", onFloorActive);
+      Events.on(engine, "collisionEnd", onFloorEnd);
+
       // ---- fixed-timestep loop (same clock discipline as the main pit):
       // accumulate real time, step in exact 16.66ms slices, settle-aware ----
       const STEP = 1000 / 60, MAX_ACC = 100;
@@ -4914,6 +4963,8 @@ export default function BreedTree({
       matterCleanupRef.current = () => {
         mcTeardown?.();
         Events.off(engine, "collisionStart", onCollide);
+        Events.off(engine, "collisionActive", onFloorActive);
+        Events.off(engine, "collisionEnd", onFloorEnd);
         for (const t of toyTimers) window.clearTimeout(t);
         for (const t of ghostTimers) window.clearTimeout(t);
         chumBodiesRef.current = [];
@@ -6049,6 +6100,7 @@ export default function BreedTree({
                       sits inside the image whatever colour it is: the card reads
                       at the same size in all three. */}
                   <rect x={-half} y={-half} width={cm.size} height={cm.size} rx={rx}
+                    data-chum-edge
                     style={{
                       fill: "none",
                       stroke: takenChum === i2 ? "#22c55e" : armedChum === i2 ? "var(--yellow, #ffd23e)" : "#ffffff",
