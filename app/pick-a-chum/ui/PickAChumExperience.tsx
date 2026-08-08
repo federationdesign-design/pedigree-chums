@@ -131,6 +131,7 @@ interface Message {
   fetchGame?: boolean; // Task 135: the fetch game's link keeps the chat open so 'play again?' can follow
   gameOutput?: string; // Task 115: the game board / sheep tiles / drawing, rendered in a monospace block
   media?: { src: string; alt: string }; // Task 138: a short looping clip served with the line
+  avatar?: boolean; // Task 165: show this dog's face beside the bubble -- a second dog cutting in (the Collie's food interjection), where the medallion stays the active dog so colour alone is too subtle a cue
 }
 
 // The response-specific action link (if any). Navigation links (a destination or
@@ -701,7 +702,7 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
   // is never approached by a sequence, only by the single main message that precedes it.
   const SEQ_MAX_EXTRAS = 2;
   const playSequence = useCallback(
-    (lines: string[], seqDog: Dog, gapMs: number) => {
+    (lines: string[], seqDog: Dog, gapMs: number, showAvatar = false) => {
       const items = lines.filter((l) => l && l.trim()).slice(0, SEQ_MAX_EXTRAS);
       if (!items.length) return;
       const s = sessionRef.current;
@@ -719,7 +720,7 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
           return;
         }
         const line = items[i];
-        setMessages((m) => [...m, { id: idRef.current++, who: 'dog', text: line, display: line, done: true, dog: seqDog, name: dogInfo(seqDog).name }]);
+        setMessages((m) => [...m, { id: idRef.current++, who: 'dog', text: line, display: line, done: true, dog: seqDog, name: dogInfo(seqDog).name, avatar: showAvatar }]);
         setAnnounce(line);
         if (i + 1 < items.length) {
           after(gapMs, () => play(i + 1));
@@ -1051,7 +1052,10 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
       setAnnounce(r.text);
       setPhase('idle');
       window.setTimeout(() => inputRef.current?.focus(), 0);
-      playSequence([ij.line], ij.dog, reducedMotion ? 0 : 700);
+      // Task 165: show the interjecting dog's face beside her bubble. She is not the active dog (the
+      // medallion stays the Labrador), so navy alone is too subtle -- the face makes "a second dog spoke"
+      // unmistakable.
+      playSequence([ij.line], ij.dog, reducedMotion ? 0 : 700, true);
       return;
     }
     if (r.followUp) {
@@ -1215,11 +1219,20 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
               <div className={styles.bubbleUser}>{msg.text}</div>
             </div>
           ) : (
-            <div key={msg.id} className={`${styles.msgRow} ${styles.rowDog}`}>
+            <div key={msg.id} className={`${styles.msgRow} ${styles.rowDog} ${msg.avatar ? styles.rowDogAvatar : ''}`}>
               {/* Task 132: no per-bubble avatar or nameplate -- the dog's face
                   and name live once, on the medallion at the top of the
                   column. A visually hidden speaker label keeps each bubble
-                  attributed for screen readers. */}
+                  attributed for screen readers.
+                  Task 165 EXCEPTION: an interjection (msg.avatar) is a DIFFERENT dog cutting in while the
+                  medallion stays the active dog, so it carries a small face to mark the second speaker. */}
+              {msg.avatar && msg.dog && (
+                <span
+                  className={styles.interjectFace}
+                  style={{ backgroundImage: `url("${portraitSrc(msg.dog, 0)}")` }}
+                  aria-hidden="true"
+                />
+              )}
               <div className={`${styles.bubbleDog} ${!msg.support && !msg.plainSurface && msg.dog ? styles[BUBBLE_CLASS[msg.dog]] : ''}`}>
                 {/* S12: the support surface keeps its VISIBLE header -- it is
                     the safety surface's label, not name repetition. */}

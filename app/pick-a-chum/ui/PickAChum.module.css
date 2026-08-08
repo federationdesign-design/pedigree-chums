@@ -306,6 +306,23 @@
 .rowUser {
   justify-content: flex-end;
 }
+/* Task 165: an interjection (a second dog cutting in, e.g. the Collie on a dangerous-food answer) carries a
+   small face. The medallion stays the ACTIVE dog throughout, so the bubble colour alone is a soft cue; the
+   interjecting dog's portrait beside the bubble makes the second speaker unmistakable. */
+.rowDogAvatar {
+  align-items: flex-start;
+}
+.interjectFace {
+  flex: 0 0 auto;
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  background-size: cover;
+  background-position: center top;
+  border: 3px solid var(--pc-ui-navy);
+  box-shadow: var(--pc-shadow);
+  margin-top: 2px;
+}
 .bubbleDog {
   position: relative;
   max-width: 92%;

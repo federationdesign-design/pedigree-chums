@@ -1511,7 +1511,7 @@ const hasUnresolvedTok = (t) => /\[|\]|\{\{|\}\}|\bundefined\b|\bnull\b/.test(t)
     ['lets do it', 'bark', null], // enter the game
     ['woof', 'bark', null],
     ['woof woof', 'bark', null],
-    ['ok stop', 'bark_exit', 'BARK_GAME_EXIT'], // exit while running
+    ['ok stop', 'bark_exit', 'BARK-EXIT-COL'], // exit while running (Task 165: per-dog exit; this is the Collie's)
     ['what else is there', 'orientation', null], // B15
   ];
   let ok = true, note = '';
@@ -2225,10 +2225,13 @@ for (const dog of ['collie', 'terrier', 'boxer']) {
 // flow was entirely untested, which is how it survived. Assert the whole path, and that the fix does
 // not disturb the loop, the bark offer or the three direct triggers.
 const b45Q = (_r, resp) => (resp.responseId === 'B45-GAMELIST-01' && resp.text === 'Game?' ? null : `not the B45 question: ${resp.responseId} "${resp.text}"`);
+// Task 165: the list is now PER-DOG. The default session is the Collie, so this is her list: her three
+// in-chat games plus the bark game, and NONE of the other dogs' games.
 const b45List = (_r, resp) =>
-  resp.responseId === 'B45-GAMELIST-02' && resp.text === 'Bark, Nine-Square, Missing Sheep, Kennel Sketch. Say one.'
+  resp.responseId === 'B45-GAMELIST-02-COL' && resp.text.includes('Nine-Square') && resp.text.includes('Missing Sheep') &&
+  resp.text.includes('Kennel Sketch') && resp.text.includes('woof') && !resp.text.includes('Treat Trail') && !resp.text.includes('BUTTON')
     ? null
-    : `not the B45 list: ${resp.responseId} "${resp.text}"`;
+    : `not the Collie B45 list: ${resp.responseId} "${resp.text}"`;
 // "are there games" -> "Game?" -> "yes" -> the list.
 (() => {
   const s = newSession();
@@ -2253,6 +2256,24 @@ check('lets play', { action: 'offer_bark_game', bucket: 'B17' });
 check('nine square', { action: 'game_start' });
 check('missing sheep', { action: 'game_start' });
 check('kennel sketch', { action: 'game_start' });
+// Task 165: the games menu is PER-DOG -- each dog lists only games it can actually start, never another
+// dog's. Before this every dog served the Collie's list (offering games it could not start).
+(() => {
+  const cases = [
+    { dog: 'labrador', has: ['Treat Trail', 'Feed'], hasnt: ['Nine-Square', 'Missing Biscuit', 'BUTTON'] },
+    { dog: 'terrier', has: ['Missing Biscuit'], hasnt: ['Treat Trail', 'Nine-Square', 'BUTTON'] },
+    { dog: 'boxer', has: ['BUTTON'], hasnt: ['Treat Trail', 'Missing Biscuit', 'Nine-Square'] },
+  ];
+  for (const c of cases) {
+    const s = newSession(c.dog);
+    check('play', { action: 'games_menu', bucket: 'B45' }, { session: s });
+    check('yes', { action: 'games_menu', bucket: 'B45' }, { session: s, assert: (_r, resp) => {
+      for (const h of c.has) if (!resp.text.includes(h)) return `${c.dog} menu missing "${h}": "${resp.text}"`;
+      for (const n of c.hasnt) if (resp.text.includes(n)) return `${c.dog} menu wrongly lists "${n}": "${resp.text}"`;
+      return null;
+    } });
+  }
+})();
 
 // ==== Task 140: page bios, media responses, trigger widening, fetch fall-through ====
 

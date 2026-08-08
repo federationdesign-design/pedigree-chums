@@ -123,8 +123,36 @@ const BREED_BEST_LINE =
 // package; the per-dog state machine still runs for them, but their responses
 // render a parked marker until Phase 3.
 const COLLIE_BARK = { word: 'Woof', end: '.' };
+// Task 165: each dog's own bark word, so a non-Collie no longer barks the Collie's "Woof." DRAFT copy,
+// pending owner approval (same status as SELF_BREED_LINES). The Boxer is a big deep "Ruff", the Terrier a
+// small sharp "Yap", the Labrador an eager "Boof".
 const BARK_PRESENTATION: Partial<Record<Dog, { word: string; end: string }>> = {
   collie: COLLIE_BARK,
+  labrador: { word: 'Boof', end: '!' },
+  terrier: { word: 'Yap', end: '!' },
+  boxer: { word: 'Ruff', end: '!' },
+};
+// Task 165: each non-Collie dog's own bark-game BREAK (the English line after round five) and post-break
+// ACKNOWLEDGEMENT, so they no longer fall back to the Collie's B19/B20 rows (the Task 157 interim, the same
+// class of fault as the Boxer serving her knock-knock). The Collie keeps her real bank rows (COL-B19/B20).
+// DRAFT copy, pending owner approval. No em dashes, no links in the dialogue (house rules).
+const BARK_BREAK_LINES: Partial<Record<Dog, string>> = {
+  labrador: 'ok ok i cant keep this up, my tongue has gone all floppy. that was BRILLIANT though. again? or we could go and find a snack.',
+  terrier: 'right, thats enough of that. my throat is not built for a long shift. you bark alright, for a human.',
+  boxer: 'AH i lost count, i always lose count. that was the best conversation ive ever had and it was all barking. one more? no? ok.',
+};
+const BARK_ACK_LINES: Partial<Record<Dog, string>> = {
+  labrador: 'good barking. best barking. im telling everyone. right, whats next, a walk or some food.',
+  terrier: 'not bad at all. we are done though. ask me something proper, or go and dig about the site.',
+  boxer: 'top barking!! we should start a band. anyway, ask me anything, im full of facts. some of them are even true.',
+};
+// Task 165: each dog's own bark-game EXIT (the "stop" line), so it is no longer the one shared Collie
+// string for every dog (same fault class as the break and the acknowledgement). DRAFT copy.
+const BARK_EXIT_LINES: Record<Dog, string> = {
+  collie: 'Good barking. That is enough for now. Ask me about a dog breed, or how the card game works.',
+  labrador: 'ok im done, im all barked out, that was ACE. ask me anything now, or we could go and find some food.',
+  terrier: 'right, thats us finished. good enough. ask me something proper now, or go and dig about the site.',
+  boxer: 'phew, im done, my bark ran clean out. GREAT game. ask me anything now, im basically an encyclopedia. a wrong one.',
 };
 const DOG_PREFIX: Record<Dog, string> = { collie: 'COL', labrador: 'LAB', terrier: 'TER', boxer: 'BOX' };
 
@@ -135,8 +163,22 @@ const DOG_PREFIX: Record<Dog, string> = { collie: 'COL', labrador: 'LAB', terrie
 const SELF_BREED_LINES: Record<Dog, string> = {
   collie: 'A Border Collie. We hold more world records than any breed going, and yes, I keep count. Bred to work, wired to think. I do not sit still well.',
   labrador: 'Labrador!! best friend in the country, officially it says so. we can even smell when a person is poorly. also i love water. and food. mostly food.',
-  boxer: 'a Boxer! named after boxing, on account of standing up and sparring with our paws. i have never actually boxed. i wave. big, soft, brilliant with kids.',
+  // Task 165: reworded so it no longer repeats his /about misread (the "named after boxing / spar with our
+  // paws" line), which a visitor who read that page would already have seen. Fresh angle, same voice. DRAFT.
+  boxer: 'a Boxer! big, soft, and completely convinced im helping. brilliant with kids, hopeless at sitting still. all heart, all bounce, and not a lot of plan.',
   terrier: 'Border Terrier. bred to go down holes after foxes and rats. small, stubborn, dont back down. dont let the size fool you.',
+};
+
+// Task 165: the games menu LIST is now per-dog. Each dog offers only the games it can actually start
+// (Treat Trail is Labrador-only, Missing Biscuit Terrier-only, DO NOT PRESS THAT BUTTON Boxer-only; the
+// Collie keeps her three plus the bark game). Before this, every dog served the Collie's B45-GAMELIST-02
+// row and so offered games it could not start. The words in each line are the actual start phrases the
+// router accepts. DRAFT copy, pending owner approval (same status as SELF_BREED_LINES).
+const GAMES_MENU_LINES: Record<Dog, string> = {
+  collie: 'Nine-Square, Missing Sheep, or Kennel Sketch. Or say woof for the bark game. Say one.',
+  labrador: 'Treat Trail, or Feed the Dog a Cookie. Say one and we start.',
+  terrier: 'The Case of the Missing Biscuit. Say the word and we crack it.',
+  boxer: 'DO NOT PRESS THAT BUTTON. thats the one. say mini game.',
 };
 
 // The generated bark volley: the dog's own word, count units, e.g. "Woof. Woof.".
@@ -443,7 +485,14 @@ export function assemble(res: Resolution, data0: ChumData, n: Normalised, sessio
     case 'ask_breeds':
     case 'ask_games':
     case 'tricks_menu': // Task 134: B54, the question then the list. Serves res.responseId like canned.
-    case 'games_menu': // Task 123 fix: B45 games menu (GAMELIST-01 question / -02 list); serves res.responseId like canned.
+    case 'games_menu':
+      // Task 123 fix: B45 games menu (GAMELIST-01 question / -02 list); serves res.responseId like canned.
+      // Task 165: the LIST (GAMELIST-02) is now PER-DOG, so a dog offers only games it can start. The
+      // QUESTION (GAMELIST-01) stays shared and falls through to the canned serve below.
+      if (res.responseId === 'B45-GAMELIST-02') {
+        return { responseId: `B45-GAMELIST-02-${DOG_PREFIX[dog]}`, text: GAMES_MENU_LINES[dog], dog };
+      }
+    // falls through
     case 'canned': {
       // Task 80: a conversational bucket (B21-B39) matched on its column-D triggers. Serve the
       // exact matched row's template verbatim. The faces ':(' and ':)' are non-verbal, so they get
@@ -600,7 +649,8 @@ export function assemble(res: Resolution, data0: ChumData, n: Normalised, sessio
     case 'bark_explain':
       return { responseId: 'BARK_GAME_EXPLAIN', text: 'Type one or more woofs and I will always bark once more than you do. Type stop when you have finished.', dog };
     case 'bark_exit':
-      return { responseId: 'BARK_GAME_EXIT', text: 'Good barking. That is enough for now. You can ask me about a dog breed or how the card game works.', dog };
+      // Task 165: per-dog exit line (was one shared Collie string for every dog).
+      return { responseId: `BARK-EXIT-${DOG_PREFIX[dog]}`, text: BARK_EXIT_LINES[dog], dog };
 
     case 'emoji_only': {
       const r = pickResponse(data, 'B18', session.usedResponseIds);
@@ -614,14 +664,22 @@ export function assemble(res: Resolution, data0: ChumData, n: Normalised, sessio
     }
 
     case 'bark_break': {
-      // Round five: the final bark volley, then (after a pause, in the UI) the
-      // English break line as a second message.
+      // Round five: the final bark volley, then (after a pause, in the UI) the English break line as a
+      // second message. Task 165: the Collie keeps her real bank rows (rotating COL-B19); the other three
+      // now speak their OWN break line rather than falling back to hers.
+      if (dog !== 'collie') {
+        return { responseId: `BARK-BREAK-${DOG_PREFIX[dog]}`, text: barkVolley(dog, res.barkCount ?? 2), dog, followUp: BARK_BREAK_LINES[dog] ?? BARK_BREAK_PLACEHOLDER };
+      }
       const r = pickBark(data, 'B19', dog, session.usedResponseIds);
       const followUp = r ? fill(r.template, baseContext(n)) : BARK_BREAK_PLACEHOLDER;
       return { responseId: r?.responseId ?? 'B19', text: barkVolley(dog, res.barkCount ?? 2), dog, followUp };
     }
 
     case 'bark_ack': {
+      // Task 165: each non-Collie dog acknowledges in its own voice; the Collie keeps her bank rows.
+      if (dog !== 'collie') {
+        return { responseId: `BARK-ACK-${DOG_PREFIX[dog]}`, text: BARK_ACK_LINES[dog] ?? BARK_ACK_PLACEHOLDER, dog };
+      }
       const r = pickBark(data, 'B20', dog, session.usedResponseIds);
       const text = r ? fill(r.template, baseContext(n)) : BARK_ACK_PLACEHOLDER;
       return { responseId: r?.responseId ?? 'B20', text, dog };
