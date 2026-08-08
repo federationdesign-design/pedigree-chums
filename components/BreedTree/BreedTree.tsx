@@ -736,18 +736,21 @@ function labelFits(widthEm: number, n: number, fs: number, r: number): boolean {
   return true;
 }
 
-function fitLabel(name: string, r: number, capFs: number, font: string | null): { lines: string[]; fs: number } {
+function fitLabel(name: string, r: number, capFs: number, font: string | null): { lines: string[]; fs: number; fits: boolean } {
   const words = name.split(/\s+/).filter(Boolean);
   const maxN = Math.min(LABEL_MAX_LINES, Math.max(1, words.length));
-  let best = { lines: [name], fs: 0 };
+  // `fits` stays false until an arrangement actually sits inside the circle. If
+  // none ever does, the name cannot fit at any size the fitter will draw, and
+  // the in-circle callers draw NOTHING rather than let their Math.max(10, ...)
+  // floor force a spilling label. `lines`/`fs` still carry the best wrap even
+  // then, so the pit-words body, shaped off the same fit, keeps a real shape.
+  let best = { lines: [name], fs: 0, fits: false };
   // A tie in fitted size means two line counts fit at the very same type size.
   // Prefer MORE lines: a tall narrow block sits inside a round circle where one
-  // long line spills out the sides. This also fixes the degenerate case, where
-  // the circle is too small for any size so every count stays pinned at the lo
-  // floor (6) and ties; without the tie-break the first candidate, n = 1 (the
-  // whole name on one line), won the tie and ran outside the circle. FS_EPS
-  // keeps this to TRUE ties only, so a name that genuinely fits larger on fewer
-  // lines is left exactly as it is today.
+  // long line spills out the sides. A fitting arrangement always beats a
+  // non-fitting one, so a name that fits on fewer lines is never dropped for a
+  // taller arrangement that does not. FS_EPS keeps the line preference to TRUE
+  // ties, so a name that genuinely fits larger on fewer lines is left as it is.
   const FS_EPS = 0.05;
   for (let n = 1; n <= maxN; n++) {
     const lines = balancedWrap(words, n);
@@ -760,9 +763,15 @@ function fitLabel(name: string, r: number, capFs: number, font: string | null): 
       if (labelFits(widthEm, n, mid, r)) lo = mid;
       else hi = mid;
     }
-    if (lo > best.fs + FS_EPS || (lo > best.fs - FS_EPS && lines.length > best.lines.length)) {
-      best = { lines, fs: lo };
-    }
+    // The search never tested the lo = 6 floor, so if nothing bigger fit, lo is
+    // still 6 and only labelFits can say whether even that fits. lo > 6 means a
+    // size passed the search, so it fits by construction.
+    const fits = lo > 6 || labelFits(widthEm, n, lo, r);
+    const better =
+      fits === best.fits
+        ? lo > best.fs + FS_EPS || (lo > best.fs - FS_EPS && lines.length > best.lines.length)
+        : fits;
+    if (better) best = { lines, fs: lo, fits };
   }
   return best;
 }
@@ -5730,6 +5739,11 @@ export default function BreedTree({
                       // clamp the type hard in this space.
                       const cap = 132;
                       const fit = fitLabel(d.data.name.toUpperCase(), rFit, cap, labelFont);
+                      // A name that will not fit its circle is not drawn at all:
+                      // the circle keeps its picture and ring, and the name comes
+                      // back on zoom in, where the larger fit radius lets it fit.
+                      // A spilling label is worse than no label.
+                      if (!fit.fits) return null;
                       const lines = fit.lines;
                       const fs = Math.max(10, Math.min(cap, fit.fs + TITLE_BOOST));
                       return (
@@ -5873,6 +5887,9 @@ export default function BreedTree({
                   // started, measured by the same fitter the pit circles use
                   (() => {
                     const lab = fitLabel(item.label, item.r, item.r * 0.34, labelFont);
+                    // Same rule as the pit circles: a name that will not fit is
+                    // not drawn, the disc stands on its own rather than spilling.
+                    if (!lab.fits) return null;
                     const top = -((lab.lines.length - 1) * lab.fs * LABEL_LINE_H) / 2;
                     return (
                       <text x={0} y={0} dominantBaseline="central" style={{ fill: "#ffffff", fontFamily: "var(--font-display), system-ui, sans-serif", fontSize: `${lab.fs}px`, pointerEvents: "none", userSelect: "none" }}>
