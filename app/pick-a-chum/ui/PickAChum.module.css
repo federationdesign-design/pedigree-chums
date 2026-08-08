@@ -1616,18 +1616,31 @@
 }
 .recededDog {
   position: absolute;
-  width: 50%;
-  height: 50%;
+  /* Task 168: 33% smaller than the first pass (was 50% of the anchor). */
+  width: 33.5%;
+  height: 33.5%;
   padding: 0;
   border: 3px solid #ffffff;
   border-radius: 50%;
-  background-size: cover;
-  background-position: center;
-  background-color: var(--pc-ui-blue);
+  background: var(--pc-ui-blue);
   box-shadow: var(--pc-shadow);
   cursor: pointer;
   pointer-events: auto;
   transition: transform 160ms ease;
+}
+/* The portrait is its OWN circular layer so the greyscale-at-rest filter greys the DOG only, not the green
+   arrow (a sibling). An unselected dog is greyscale; the active dog, and a hovered/armed one, are colour. */
+.recededFace {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background-size: cover;
+  background-position: center;
+  filter: grayscale(1);
+  transition: filter 160ms ease;
+}
+.recededOn .recededFace {
+  filter: none;
 }
 .recededDog:hover,
 .recededDog:focus-visible {
@@ -1641,21 +1654,17 @@
 .receded0 { left: -70%; top: 0%; }
 .receded1 { left: -70%; top: 48%; }
 .receded2 { left: -48%; top: 92%; }
-/* The green arrow, on the dog's right, pointing at the active medallion. */
+/* The green arrow asset (public/green-arrow-short.svg), on the dog's right, pointing at the active
+   medallion. It is already green, so no recolour is needed. */
 .recededArrow {
   position: absolute;
-  right: -22%;
-  top: 26%;
-  width: 46%;
-  height: 46%;
-  color: #2fbf3f;
-  transform: rotate(var(--arrow-rot, -18deg));
-  transition: opacity 160ms ease, transform 160ms ease, color 160ms ease;
-}
-.recededArrow svg {
-  width: 100%;
-  height: 100%;
-  display: block;
+  right: -24%;
+  top: 22%;
+  width: 52%;
+  height: 52%;
+  background: url("/green-arrow-short.svg") center / contain no-repeat;
+  transform: rotate(var(--arrow-rot, 0deg));
+  transition: opacity 160ms ease, transform 160ms ease;
 }
 /* HOVER (desktop) / FIRST TAP (mobile): the active medallion desaturates to grey; the pointed-at dog keeps
    its colour and a bigger, brighter arrow; the other dogs' arrows fade. "this one, not those." */
@@ -1663,8 +1672,8 @@
   filter: grayscale(1) brightness(0.92);
 }
 .recededOn .recededArrow {
-  color: #1fc63a;
-  transform: rotate(var(--arrow-rot, -18deg)) scale(1.35);
+  transform: rotate(var(--arrow-rot, 0deg)) scale(1.3);
+  filter: brightness(1.08);
 }
 .recededOff .recededArrow {
   opacity: 0;
@@ -1674,7 +1683,9 @@
    states (grey / keep / fade), same interaction (first tap reveals, second commits). */
 @media (max-width: 480px) {
   .recededGroup {
-    --arrow-rot: -90deg;
+    /* the arrow asset points up-right natively; on mobile the dogs sit BELOW the medallion, so rotate it
+       to point up at the active dog. */
+    --arrow-rot: -45deg;
   }
   .receded0 { left: 4%; top: 112%; }
   .receded1 { left: 56%; top: 112%; }
@@ -1688,6 +1699,7 @@
 @media (prefers-reduced-motion: reduce) {
   /* The state still changes (grey, arrow, fade); nothing animates. */
   .recededDog,
+  .recededFace,
   .recededArrow,
   .dogAnchor[data-recede] .dogFace {
     transition: none;
@@ -1697,6 +1709,6 @@
     transform: none;
   }
   .recededOn .recededArrow {
-    transform: rotate(var(--arrow-rot, -18deg));
+    transform: rotate(var(--arrow-rot, 0deg));
   }
 }

@@ -854,8 +854,18 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
     } catch {}
   }, [messages, phase, dog, minimised]);
 
+  // Task 168 (point 3): the medallion's position belongs to the CHAT, not to the dog. It is FROZEN when the
+  // chat opens -- the fan slot of the FIRST dog picked (or the restored/auto dog) -- and reused for every
+  // dog after, so switching changes the portrait, NOT the position. Before this, the anchor used the active
+  // dog's own fan slot (dogPos of its SELECT_ORDER index), so the whole cluster relocated on a switch (with
+  // the Boxer active it jumped off the left edge). The fan slots are for the selector only. Same principle
+  // as the Task 162 docked chip: position is the chat's, not the dog's.
+  const chatAnchorRef = useRef<{ left: number; top: number } | null>(
+    restored?.dog ? dogPos(SELECT_ORDER.indexOf(restored.dog)) : auto?.dog ? dogPos(SELECT_ORDER.indexOf(auto.dog)) : null
+  );
   const selectDog = useCallback((d: Dog) => {
     clearTimers();
+    if (chatAnchorRef.current === null) chatAnchorRef.current = dogPos(SELECT_ORDER.indexOf(d)); // freeze on the FIRST pick
     everProtectedRef.current = false; // Task 105: a fresh engine session starts un-protected and persistable
     sessionRef.current = newSession(d);
     // A fresh engine session starts a fresh recorded conversation. Time-prefixed
@@ -1260,16 +1270,16 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
           type="button"
           data-receded={d}
           className={`${styles.recededDog} ${styles[`receded${i}`]} ${activeReceded === d ? styles.recededOn : ''} ${activeReceded && activeReceded !== d ? styles.recededOff : ''}`}
-          style={{ backgroundImage: `url("${PROFILE_IMG[d]}")` }}
           aria-label={`Switch to the ${dogInfo(d).name}`}
           title={`Switch to the ${dogInfo(d).name}`}
           onClick={() => pressReceded(d)}
           onMouseEnter={canHover ? () => setActiveReceded(d) : undefined}
           onMouseLeave={canHover ? () => setActiveReceded(null) : undefined}
         >
-          <span className={styles.recededArrow} aria-hidden="true">
-            <svg viewBox="0 0 24 24" focusable="false"><path d="M4 12h11l-4-4 1.5-1.5L20 12l-6.5 6.5L12 17l4-4H4z" fill="currentColor" /></svg>
-          </span>
+          {/* Task 168: the portrait is its OWN layer so the greyscale-at-rest filter greys the dog but NOT
+              the green arrow (a sibling). The active dog is colour; an unselected dog is grey until hovered. */}
+          <span className={styles.recededFace} style={{ backgroundImage: `url("${PROFILE_IMG[d]}")` }} aria-hidden="true" />
+          <span className={styles.recededArrow} aria-hidden="true" />
         </button>
       ))}
     </div>
@@ -1470,7 +1480,9 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
                     className={`${styles.dogAnchor} ${styles.anchorFan} ${docked ? styles.anchorDocked : ''} ${anchorSwap}`}
                     style={docked
                       ? { left: `${round1(DOCK_L + dragOffset.dx)}px`, top: `${round1(DOCK_T + dragOffset.dy)}px` }
-                      : { left: `${round1(p.left + dragOffset.dx)}px`, top: `${round1(p.top + dragOffset.dy)}px` }}
+                      // Task 168 (point 3): the FROZEN chat position (set on the first pick), NOT the active
+                      // dog's own fan slot -- so a switch changes the portrait, not the position.
+                      : { left: `${round1((chatAnchorRef.current?.left ?? p.left) + dragOffset.dx)}px`, top: `${round1((chatAnchorRef.current?.top ?? p.top) + dragOffset.dy)}px` }}
                     role="img"
                     aria-label={dead ? 'the Collie plays dead' : roll ? 'the Collie rolls over' : dogInfo(dog).name}
                     data-recede={activeReceded ? '1' : undefined}
