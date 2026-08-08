@@ -1661,6 +1661,12 @@ const MAX_LINEAGE_DEPTH = 5;
 const LINEAGE_ALIASES: Record<string, string> = {
   "Jack Russell": "Jack Russell Terrier",
   "Mastiff": "English Mastiff",
+  // Documented spellings of the Talbot, a medieval hound whose key is "Talbot"
+  // and whose tree runs four deep. Both spellings appear as child nodes across
+  // many trees (Talbot hounds, Talbot hound) and neither grafted without this,
+  // so those branches dead-ended a step short of the Talbot's own ancestry.
+  "Talbot hounds": "Talbot",
+  "Talbot hound": "Talbot",
 };
 function aliasName(name: string): string {
   return LINEAGE_ALIASES[name] ?? name;
