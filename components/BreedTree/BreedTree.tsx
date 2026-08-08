@@ -2485,18 +2485,31 @@ export default function BreedTree({
   // tilt a notch on every knock, give way on the fifth, then tumble like
   // anything else. A tap always works, wherever they are.
   type UiKind = "close" | "desc" | "learn" | "leave" | "restart";
-  type UiBody = { x: number; y: number; vx: number; vy: number; r: number; half: number; a: number; va: number; fixed: boolean; hits: number; kind: UiKind };
+  type UiBody = { x: number; y: number; vx: number; vy: number; r: number; half: number; a: number; va: number; fixed: boolean; hits: number; kind: UiKind; mb?: unknown; mbIn?: boolean; id?: number; spawned?: boolean };
   const uiBodiesRef = useRef<UiBody[] | null>(null);
-  /* THE PIT MENU. Two more squares, a red X to leave and a green rewind back to
-     the start screen, dropped into the pit by the corner X and taken away by
-     tapping it again. They replace the PAUSED panel: the two taps are the same
-     protection a confirm gave, without a screen over the game.
-     They are NOT in the physics world while the menu is closed, so nothing can
-     collide with a square that is not on screen. The frame loop below syncs
-     world membership to this ref. */
-  const [pitMenu, setPitMenu] = useState(false);
+  // pitMenuRef is a Stage-1 vestige. The boolean pitMenu it used to mirror is
+  // gone: the corner X now SPAWNS a pair (see the pile-up state below) rather
+  // than toggling one pair in and out. The dead frame-loop sync still reads this
+  // ref, so it stays false here until Stage 2 deletes both the sync and this ref.
   const pitMenuRef = useRef(false);
-  useEffect(() => { pitMenuRef.current = pitMenu; }, [pitMenu]);
+  // THE PIT-MENU PILE-UP. Every tap of the corner X during a round drops another
+  // red-leave + green-restart PAIR into the pit, up to 8; they never leave, and
+  // using one is how you get out. This id-keyed list replaces the pitMenu boolean
+  // (removed once its readers below are rewired): each pair owns its own DOM node,
+  // where the old single leave/restart refs would clobber at eight. The pile
+  // clears on level change for free, since LineageModal remounts this on runKey.
+  const PIT_PAIR_CAP = 8;
+  const [pitPairs, setPitPairs] = useState<number[]>([]);
+  const pitPairSeqRef = useRef(0);
+  const pitPairsRef = useRef<number[]>([]);
+  useEffect(() => { pitPairsRef.current = pitPairs; }, [pitPairs]);
+  // Set inside the sim effect, where the Matter world lives, so a tap can spawn a
+  // pair of bodies straight into the LIVE world (nothing else here does that yet).
+  const spawnPairRef = useRef<((id: number) => void) | null>(null);
+  // One container for all the spawned pair squares; the per-frame loop positions
+  // each by index into its children, the badges pattern, since a single ref per
+  // kind cannot hold eight leave squares.
+  const pairsGRef = useRef<SVGGElement>(null);
   const uiCloseRef = useRef<SVGGElement>(null);
   const uiDescRef = useRef<SVGGElement>(null);
   const uiLearnRef = useRef<SVGGElement>(null);
@@ -2891,8 +2904,14 @@ export default function BreedTree({
     }
     const ub = uiBodiesRef.current;
     if (ub) {
+      // The corner three keep their single refs; the spawned pairs are addressed
+      // by INDEX into pairsGRef (the badges pattern), in the order the render lays
+      // them out: each tap pushes leave then restart, and the render flatMaps
+      // pitPairs to [leave, restart], so this counter and the children line up.
+      const pg = pairsGRef.current;
+      let pairIdx = 0;
       for (const u of ub) {
-        const el = uiRefFor(u.kind).current;
+        const el = u.spawned ? (pg?.children[pairIdx++] as SVGGElement | undefined) : uiRefFor(u.kind).current;
         if (el) el.setAttribute("transform", `translate(${(u.x - v[0]) * k},${(u.y - v[1]) * k}) rotate(${u.a * 57.2958})`);
       }
     }
@@ -3507,13 +3526,33 @@ export default function BreedTree({
           { x: ux, y: v[1] + (-vbHf / 2 + m + uSz / 2) / k, vx: 0, vy: 0, r: (uSz / 2) * 1.1 / k, half: uSz / 2, a: 0, va: 0, fixed: true, hits: 0, kind: "close" },
           { x: ux, y: v[1] + (-vbHf / 2 + m + uSz * 1.5 + 14 * uppW) / k, vx: 0, vy: 0, r: (uSz / 2) * 1.1 / k, half: uSz / 2, a: 0, va: 0, fixed: true, hits: 0, kind: "desc" },
           { x: ux, y: v[1] + (-vbHf / 2 + m + uSz * 1.5 + 14 * uppW) / k, vx: 0, vy: 0, r: (uSz / 2) * 1.1 / k, half: uSz / 2, a: 0, va: 0, fixed: true, hits: 0, kind: "learn" },
-          /* The two menu squares. Loose from the moment they arrive, so they
-             fall and tumble rather than sitting fixed like the corner three.
-             Parked on the corner X until the menu opens, which is where they
-             drop from. */
-          { x: ux, y: v[1] + (-vbHf / 2 + m + uSz / 2) / k, vx: 0, vy: 0, r: (uSz / 2) * 1.1 / k, half: uSz / 2, a: 0, va: 0, fixed: false, hits: 5, kind: "leave" },
-          { x: ux, y: v[1] + (-vbHf / 2 + m + uSz / 2) / k, vx: 0, vy: 0, r: (uSz / 2) * 1.1 / k, half: uSz / 2, a: 0, va: 0, fixed: false, hits: 5, kind: "restart" },
+          // The leave/restart squares are no longer built here. They are spawned
+          // as PAIRS into the live world by spawnPairRef, one pair per corner-X
+          // tap, so they pile up instead of toggling a single pair in and out.
         ];
+        // Spawn one red-leave + green-restart pair into the LIVE world at the
+        // corner-X anchor, with the same sideways nudge the old open-the-menu
+        // drop used. Loose (fixed:false), so they fall and tumble like any freed
+        // body. Set here so it closes over uSz/k/v and the world/Bodies in scope.
+        spawnPairRef.current = (id: number) => {
+          const list = uiBodiesRef.current;
+          if (!list) return;
+          const anchor = list.find((z) => z.kind === "close");
+          const ax = anchor ? anchor.x : ux, ay = anchor ? anchor.y : v[1];
+          const mk = (kind: UiKind, vx: number, av: number): UiBody => {
+            const u: UiBody = { x: ax, y: ay, vx: 0, vy: 0, r: (uSz / 2) * 1.1 / k, half: uSz / 2, a: 0, va: 0, fixed: false, hits: 5, kind, id, spawned: true };
+            const p = pxFromWorld(u.x, u.y);
+            const um = Bodies.circle(p.x, p.y, Math.max(2, u.r * pxPerWorld), { restitution: 0.3, frictionAir: 0.012, density: 0.0012 });
+            um.plugin = { ui: u };
+            u.mb = um;
+            u.mbIn = true;
+            Composite.add(world, um);
+            MBody.setVelocity(um, { x: vx, y: 2.4 });
+            MBody.setAngularVelocity(um, av);
+            return u;
+          };
+          list.push(mk("leave", -3.2, -0.12), mk("restart", -1.1, 0.12));
+        };
       }
       const uiBodies = uiBodiesRef.current;
       /* Which squares belong to the pit menu rather than the corner. Their
@@ -4784,6 +4823,11 @@ export default function BreedTree({
           const want = pitMenuRef.current;
           for (const u of uis) {
             if (u.kind !== "leave" && u.kind !== "restart") continue;
+            // Spawned pairs manage their own world membership at spawn and never
+            // leave, so this dead want-driven add/remove must not touch them. All
+            // leave/restart bodies are spawned now, so this skips every one; the
+            // whole block is deleted in Stage 2, this just keeps it inert.
+            if (u.spawned) continue;
             if (want && !u.mbIn) {
               const anchor = uis.find((z) => z.kind === "close");
               const px0 = pxFromWorld(anchor ? anchor.x : u.x, anchor ? anchor.y : u.y);
@@ -6271,7 +6315,6 @@ export default function BreedTree({
                 : learning && hideCaption
                 ? ["close", "desc"]
                 : ["close"]),
-              ...(pitMenu && started ? ["leave", "restart"] : []),
             ]) as readonly UiKind[];
             const defs: { kind: UiKind; wx: number; wy: number; a: number }[] = kinds.map((kind, idx) => {
               const b = ub?.find((u) => u.kind === kind);
@@ -6284,7 +6327,36 @@ export default function BreedTree({
             });
             const half = uSz / 2;
             const iconStroke = Math.max(4 * upp, uSz * 0.1); // main pit icon weight
-            return defs.map((d) => (
+            // A spawned pair square: same rect + glyph the corner squares wore,
+            // but keyed per instance and positioned by the frame loop via the
+            // pairsGRef container. Any leave leaves, any restart rewinds; there
+            // is no dismiss, so the pile only grows (up to the cap) until you use
+            // one, or the level changes and the whole component remounts.
+            const pairSquare = (id: number, kind: "leave" | "restart") => (
+              <g key={`${kind}${id}`} role="button"
+                aria-label={kind === "leave" ? "Leave the game" : "Back to the start screen"}
+                style={{ cursor: "pointer" }}
+                onClick={(e) => e.stopPropagation()}
+                onPointerDown={(e) => {
+                  const b = uiBodiesRef.current?.find((u) => u.id === id && u.kind === kind);
+                  startDrag(e, b && !b.fixed ? b : null, kind === "leave" ? () => onPitClose?.() : () => onBackToStart?.());
+                }}>
+                <rect x={-half} y={-half} width={uSz} height={uSz} rx={uSz * 0.3}
+                  style={{ fill: kind === "leave" ? "#ef4444" : "#22c55e", stroke: "var(--navy, #0a3a57)", strokeWidth: 5 * upp }} />
+                {kind === "leave" ? (
+                  <g stroke="#ffffff" strokeWidth={iconStroke} strokeLinecap="round">
+                    <line x1={-half * 0.34} y1={-half * 0.34} x2={half * 0.34} y2={half * 0.34} />
+                    <line x1={half * 0.34} y1={-half * 0.34} x2={-half * 0.34} y2={half * 0.34} />
+                  </g>
+                ) : (
+                  <g fill="#ffffff">
+                    <path d={`M${half * 0.04},${-half * 0.42} L${-half * 0.44},0 L${half * 0.04},${half * 0.42} Z`} />
+                    <path d={`M${half * 0.52},${-half * 0.42} L${half * 0.04},0 L${half * 0.52},${half * 0.42} Z`} />
+                  </g>
+                )}
+              </g>
+            );
+            return (<>{defs.map((d) => (
               <g key={d.kind} ref={uiRefFor(d.kind)}
                 role="button"
                 aria-label={
@@ -6310,17 +6382,30 @@ export default function BreedTree({
                 onClick={(e) => e.stopPropagation()}
                 onPointerDown={(e) => {
                   const b = uiBodiesRef.current?.find((u) => u.kind === d.kind);
-                  /* THE CORNER X IS A TOGGLE DURING A ROUND. It drops the two
-                     menu squares in and takes them away again, which is the
-                     "keep playing" option without needing a button for it.
+                  /* THE CORNER X DROPS A PAIR DURING A ROUND. Each tap spawns
+                     another red-leave + green-restart pair into the pit, up to
+                     the cap; they never leave, so using one is how you get out.
                      Outside a round it still closes or goes back outright. */
                   const act =
                     d.kind === "close"
-                      ? (learning ? backToStartScreen : started ? () => setPitMenu((o) => !o) : onPitClose)
-                      : d.kind === "leave"
-                      ? () => { setPitMenu(false); onPitClose?.(); }
-                      : d.kind === "restart"
-                      ? () => { setPitMenu(false); onBackToStart?.(); }
+                      ? (learning
+                          ? backToStartScreen
+                          : started
+                          ? () => {
+                              // The spawn must be OUTSIDE the state updater: React
+                              // can run an updater more than once (StrictMode does
+                              // in dev), and each extra run would spawn a body the
+                              // cap never counted. Decide from the ref, spawn once,
+                              // then a PURE setPitPairs. The ref is bumped here too
+                              // so a second synchronous tap counts before the sync
+                              // effect catches up from state.
+                              if (pitPairsRef.current.length >= PIT_PAIR_CAP) return;
+                              const id = pitPairSeqRef.current++;
+                              spawnPairRef.current?.(id);
+                              pitPairsRef.current = [...pitPairsRef.current, id];
+                              setPitPairs((p) => [...p, id]);
+                            }
+                          : onPitClose)
                       : d.kind === "learn"
                       ? onBackToLearn
                       : onToggleCaption;
@@ -6392,7 +6477,7 @@ export default function BreedTree({
                   </g>
                 )}
               </g>
-            ));
+            ))}<g ref={pairsGRef}>{pitPairs.flatMap((id) => [pairSquare(id, "leave"), pairSquare(id, "restart")])}</g></>);
           })()}
 
           {/* START: the pit hangs still until this is pressed. Screen-space
