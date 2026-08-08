@@ -2128,19 +2128,23 @@ check('bacon', { action: 'transfer' }, { assert: (r) => (r.transferTo === 'labra
   check('feed me a cookie', { action: 'game_start' }, { session: s });
   check('pref', { action: 'game_move' }, { session: s, assert: (_r, resp, se) => (resp.text.includes('NOM!! good one.') && resp.text.includes('remembers what you picked') && resp.media?.src === '/chat-media/cookie-good.mp4' && se.activeGame === 'feedcookie' ? null : `fc blue: "${resp.text}" media=${resp.media?.src}`) });
 })();
-// Feeding a RED cookie: his "didnt taste right" reaction + lesson (he still eats it), and a red cookie
-// ALWAYS shows the queasy clip, whatever the cadence.
+// Task 166: a RED cookie is SPLIT. His reaction ("didnt taste right") lands FIRST in the main text; the
+// reason (the lesson) and the queasy clip arrive together on the FOLLOW-UP a beat later -- not inline, and
+// no clip on the main message. Red always shows the queasy clip, whatever the cadence.
 (() => {
   const s = newSession('labrador');
   check('cookie game', { action: 'game_start' }, { session: s });
-  check('ads', { action: 'game_move' }, { session: s, assert: (_r, resp, se) => (resp.text.includes('didnt taste right') && resp.text.includes('shows you ads') && resp.media?.src === '/chat-media/cookie-bad.mp4' && se.activeGame === 'feedcookie' ? null : `fc red: "${resp.text}" media=${resp.media?.src}`) });
+  check('ads', { action: 'game_move' }, { session: s, assert: (_r, resp, se) =>
+    (resp.text.includes('didnt taste right') && !resp.text.includes('shows you ads') && resp.followUp?.includes('shows you ads') &&
+     resp.followUpMedia?.src === '/chat-media/cookie-bad.mp4' && !resp.media && se.activeGame === 'feedcookie'
+      ? null : `fc red split: text="${resp.text}" followUp="${resp.followUp}" fuMedia=${resp.followUpMedia?.src} media=${resp.media?.src}`) });
 })();
-// A red cookie OFF the cadence still shows the queasy clip (red is always cookie-bad).
+// A red cookie OFF the cadence still carries the queasy clip -- now on the follow-up (red is always cookie-bad).
 (() => {
   const s = newSession('labrador');
   check('cookies', { action: 'game_start' }, { session: s });
   check('pref', { action: 'game_move' }, { session: s }); // cookie 1 (blue)
-  check('ads', { action: 'game_move' }, { session: s, assert: (_r, resp) => (resp.media?.src === '/chat-media/cookie-bad.mp4' ? null : `fc red off-cadence: ${resp.media?.src}`) }); // cookie 2, off cadence
+  check('ads', { action: 'game_move' }, { session: s, assert: (_r, resp) => (resp.followUpMedia?.src === '/chat-media/cookie-bad.mp4' && !resp.media ? null : `fc red off-cadence: fuMedia=${resp.followUpMedia?.src} media=${resp.media?.src}`) }); // cookie 2, off cadence
 })();
 // Clip cadence: the FIRST cookie, then every third -- cookies 1, 4, 7. Blue pills at those positions carry
 // the happy clip; the ones between carry none. (Seven blue pills, so 1/4/7 are exercised with blue.)
@@ -2163,7 +2167,9 @@ check('bacon', { action: 'transfer' }, { assert: (r) => (r.transferTo === 'labra
   all.forEach((id, i) => check(id, { action: 'game_move' }, { session: s, assert: (_r, resp, se) => {
     const last = i === all.length - 1;
     if (!last) return se.activeGame === 'feedcookie' ? null : `fc ended early at cookie ${i + 1}`;
-    return se.activeGame === null && !resp.followUp && !resp.text.includes('so full') ? null : `fc end-at-12: game=${se.activeGame} followUp="${resp.followUp}" text="${resp.text}"`;
+    // The last pill (pixel) is RED, so it carries its reason follow-up (Task 166); the point here is only
+    // that the game ENDS with no "so full"/"zzz" wind-down (Task 161), not that there is no follow-up.
+    return se.activeGame === null && !resp.text.includes('so full') && !(resp.followUp ?? '').includes('zzz') ? null : `fc end-at-12: game=${se.activeGame} followUp="${resp.followUp}" text="${resp.text}"`;
   } }));
 })();
 // Typing "cookies" MID-GAME must NOT leak out to the policy: it is not a cookie, so he just nudges and stays.
@@ -2272,6 +2278,20 @@ check('kennel sketch', { action: 'game_start' });
       for (const n of c.hasnt) if (resp.text.includes(n)) return `${c.dog} menu wrongly lists "${n}": "${resp.text}"`;
       return null;
     } });
+  }
+})();
+
+// Task 167: the orientation-policy line (owner-approved 28 July, imported to the workbook as
+// B16-ORIENTATION-01). "are you gay" / "are you straight" and the same shape serve the wholesome policy
+// answer for EVERY dog (B16 is a Collie-only bucket, inherited by all), never the "im a dog" fallback.
+(() => {
+  const phrases = ['are you gay', 'are you gay?', 'are you straight', 'are you bisexual', 'whats your sexuality'];
+  for (const dog of ['collie', 'labrador', 'terrier', 'boxer']) {
+    for (const phrase of phrases) {
+      const s = newSession(dog);
+      check(phrase, { action: 'canned', bucket: 'B16' }, { session: s, assert: (_r, resp) =>
+        (resp.responseId === 'B16-ORIENTATION-01' && resp.text.includes('All people are people') && resp.text.includes('love people') ? null : `orientation policy ${dog} "${phrase}": ${resp.responseId} "${resp.text.slice(0, 40)}"`) });
+    }
   }
 })();
 

@@ -5936,5 +5936,22 @@
     "defaultRoute": "",
     "animationCue": "",
     "status": "Approved"
+  },
+  {
+    "responseId": "B16-ORIENTATION-01",
+    "bucketId": "B16",
+    "subtag": "orientation",
+    "triggers": [
+      "are you gay",
+      "are you straight",
+      "are you bisexual",
+      "are you homosexual",
+      "whats your sexuality"
+    ],
+    "template": "All people are people, just like all dogs are dogs. And I love people, maybe even more than I love other dogs.",
+    "factSource": "Policy line, owner-approved 28 July",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
   }
 ]

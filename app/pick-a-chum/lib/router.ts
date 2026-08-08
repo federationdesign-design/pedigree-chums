@@ -237,6 +237,11 @@ const ORIENTATION = [
 // inside "know what" (an identity phrasing), so it is matched on the whole input only.
 const ORIENTATION_EXACT = new Set(['what is this', 'now what']);
 
+// Task 167: the orientation-policy question (owner-approved answer, 28 July, imported to the workbook as
+// B16-ORIENTATION-01). Whole-message shapes only, so a longer sentence that merely contains one of these
+// is not caught. "are you gay" and the same shape get the wholesome policy line, not the "im a dog" fallback.
+const ORIENTATION_QUESTION = new Set(['are you gay', 'are you straight', 'are you bi', 'are you bisexual', 'are you homosexual', 'are you lesbian', 'are you queer', 'whats your sexuality', 'what is your sexuality', 'are you lgbt', 'are you gay or straight']);
+
 // Task 140: page bios, route 1 -- "what is this page" answers with the bio for wherever the
 // visitor is standing. Whole-message triggers only (a Set, not substrings), so "what is this dog"
 // stays the breed hub and only these exact messages match. "whats this" is deliberately ABSENT:
@@ -1720,6 +1725,13 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
     }
   }
 
+  // Task 167: the orientation-policy line. B16 is a Collie-only bucket, inherited by every dog's effective
+  // bank, so the ONE approved answer serves whichever dog is active. Routed explicitly (B16 is not in the
+  // canned-match range below), above the fallback and below every real answer -- a wholesome deflection of
+  // a personal question, never the "im a dog" non-answer.
+  if (ORIENTATION_QUESTION.has(c)) {
+    return { layer: 9, layerName: 'Recognised conversation', bucket: 'B16', action: 'canned', responseId: 'B16-ORIENTATION-01' };
+  }
   // Task 80: the canned-conversation buckets (B21-B39). Placed after the known-GK answer above
   // and before the GK refuse-to-guess below, so a specific canned reply beats a "no approved
   // record" non-answer, while every real answer (safety, breed, FAQ, identity, known GK, ...) that
