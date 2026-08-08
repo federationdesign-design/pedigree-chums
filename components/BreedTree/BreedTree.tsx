@@ -455,11 +455,18 @@ function pinkThrows(): number {
 function setPinkThrows(n: number) {
   try { sessionStorage.setItem(TOY_BALL_PINK_THROWS_KEY, String(n)); } catch { /* private mode */ }
 }
-// Level themes: how much of the ground strip shows, as a fraction of the strip's
-// own height. 1 shows the art exactly as drawn, its bottom edge on the bottom of
-// the stage. Every pixel of visible ground is a pixel of pit height given up, so
-// this is the dial to turn if the pit starts filling too fast.
-const LEVEL_FLOOR_SHOW = 1;
+// Level floors: the deepest point of every era's drawn ground must sit the SAME
+// height above the stage bottom, so no era eats more of the play area than the
+// next. That height is a fraction of the stage WIDTH, set here. Each theme's show
+// value (how much of its strip is drawn; the rest hangs off the bottom of the
+// screen, cropped by design) is DERIVED from this target and the theme's own
+// floorAspect and floorProfile max, so a new era lands on the same line with no
+// hand-tuned number. Turn this dial to give the pit more or less height.
+//
+// The value is ancient-medieval's own floor fraction, the line its show of 1
+// produced. Measurements round it to 0.0909; kept exact here so ancient does not
+// move. floorShow() (by the floor helpers) does the per-theme derivation.
+const LEVEL_FLOOR_TARGET = 0.0909116;
 // The level background and the LEARN wash are two halves of one split screen.
 // The wash is a slab tilted by this much, pushed off toward the top right; the
 // level fills everything on the other side of that slab's leading edge. Both
@@ -2506,21 +2513,34 @@ export default function BreedTree({
     if (!levelTheme || !st) return 0;
     return st.clientWidth * pxVU() / levelTheme.floorAspect;
   };
+  // How much of this theme's strip is drawn, derived so its deepest point lands
+  // on LEVEL_FLOOR_TARGET of the stage width, the same line for every era. From
+  // floorLiftPx = bandPx*(show - profileMax) and bandPx = width/floorAspect, the
+  // show that puts floorLiftPx at width*target is target*floorAspect + profileMax.
+  // Clamped to 1: a band too short to reach the line would have to draw more than
+  // its whole height, which is impossible, so it is drawn full and its floor sits
+  // low. Not silent: it warns, so a future era that cannot reach is noticed.
+  const floorShow = () => {
+    if (!levelTheme) return 1;
+    const raw = LEVEL_FLOOR_TARGET * levelTheme.floorAspect + Math.max(...levelTheme.floorProfile);
+    if (raw > 1) console.warn(`[minipit] floor band too short for this era: show ${raw.toFixed(3)} clamped to 1, floor will sit below the target line`);
+    return Math.min(1, raw);
+  };
   // How far the strip's bottom edge sits below the stage bottom, in css px. The
-  // deepest point of the drawn surface lands exactly LEVEL_FLOOR_LIFT above the
-  // stage bottom, and the rest of the art hangs off the screen below it.
+  // deepest point of the drawn surface lands on the target line above the stage
+  // bottom, and the rest of the art hangs off the screen below it, cropped.
   const floorArtBottomPx = () => {
     const st = stageRef.current;
     if (!levelTheme || !st) return 0;
     const bandPx = st.clientWidth / levelTheme.floorAspect;
-    return -bandPx * (1 - LEVEL_FLOOR_SHOW);
+    return -bandPx * (1 - floorShow());
   };
   // the deepest point of the drawn surface, in css px above the stage bottom
   const floorLiftPx = () => {
     const st = stageRef.current;
     if (!levelTheme || !st) return 0;
     const bandPx = st.clientWidth / levelTheme.floorAspect;
-    return bandPx * (LEVEL_FLOOR_SHOW - Math.max(...levelTheme.floorProfile));
+    return bandPx * (floorShow() - Math.max(...levelTheme.floorProfile));
   };
   const floorReserveVU = () => (levelTheme ? floorLiftPx() * pxVU() : 0);
 
