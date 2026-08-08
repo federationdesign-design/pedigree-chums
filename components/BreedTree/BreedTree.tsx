@@ -740,6 +740,15 @@ function fitLabel(name: string, r: number, capFs: number, font: string | null): 
   const words = name.split(/\s+/).filter(Boolean);
   const maxN = Math.min(LABEL_MAX_LINES, Math.max(1, words.length));
   let best = { lines: [name], fs: 0 };
+  // A tie in fitted size means two line counts fit at the very same type size.
+  // Prefer MORE lines: a tall narrow block sits inside a round circle where one
+  // long line spills out the sides. This also fixes the degenerate case, where
+  // the circle is too small for any size so every count stays pinned at the lo
+  // floor (6) and ties; without the tie-break the first candidate, n = 1 (the
+  // whole name on one line), won the tie and ran outside the circle. FS_EPS
+  // keeps this to TRUE ties only, so a name that genuinely fits larger on fewer
+  // lines is left exactly as it is today.
+  const FS_EPS = 0.05;
   for (let n = 1; n <= maxN; n++) {
     const lines = balancedWrap(words, n);
     if (!lines) continue;
@@ -751,7 +760,9 @@ function fitLabel(name: string, r: number, capFs: number, font: string | null): 
       if (labelFits(widthEm, n, mid, r)) lo = mid;
       else hi = mid;
     }
-    if (lo > best.fs) best = { lines, fs: lo };
+    if (lo > best.fs + FS_EPS || (lo > best.fs - FS_EPS && lines.length > best.lines.length)) {
+      best = { lines, fs: lo };
+    }
   }
   return best;
 }
