@@ -8,6 +8,12 @@
 // coloured circle until a picture exists. The root circle uses the breed's own
 // card photo automatically, so it only needs a name and note.
 
+// History-card names (data/uk-breeds.ts) map to lineage keys through
+// resolveLineageName. getLineage now runs it too, so a direct getLineage(card)
+// resolves the same way lineageArchive already does, instead of only via
+// LINEAGE_ALIASES (which stays the source of truth for child-node aliases).
+import { resolveLineageName } from "./lineageNames";
+
 export interface LineageNode {
   name: string;
   note: string;
@@ -1719,7 +1725,7 @@ function expandNode(
 }
 
 export function getLineage(name: string): LineageNode | null {
-  const root = LINEAGE[aliasName(name)];
+  const root = LINEAGE[aliasName(resolveLineageName(name))];
   if (!root) return null;
   return expandNode({ ...root }, 0, new Set<string>());
 }
