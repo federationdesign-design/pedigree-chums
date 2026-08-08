@@ -157,7 +157,12 @@
 .composer,
 .dogBtn,
 .randomBtn,
-.selectorClose {
+.selectorClose,
+/* Task 158 fix: the mobile panel is pointer-events:none and only opts specific surfaces back in. The
+   cookie-game tray was missing, so the pills were not hit-testable on touch (dead on phones, fine on
+   desktop where .chatColumn .thread opts the whole thread back in). Re-enable the tray subtree. */
+.cookieTray,
+.cookiePill {
   pointer-events: auto;
 }
 
@@ -1402,7 +1407,7 @@
 .cookieTray {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 6px;
   margin: 12px 0 2px;
 }
 .cookiePillWrap {
@@ -1411,10 +1416,11 @@
 }
 .cookiePill {
   font-family: var(--font-body, sans-serif);
-  font-size: 15px;
-  font-weight: 700;
+  font-size: 13px;
+  font-weight: 400;
+  text-transform: uppercase;
   padding: 9px 18px;
-  border: 3px solid var(--pc-ui-navy);
+  border: none;
   box-shadow: var(--pc-shadow);
   cursor: pointer;
   color: var(--pc-ui-cream);
