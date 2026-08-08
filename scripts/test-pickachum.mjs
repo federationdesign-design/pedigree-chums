@@ -2832,6 +2832,11 @@ for (const inp of ['are you a terrier', 'tell me about your breed', 'what kind o
   check('what breed are you?', {}, { session: s, assert: (r, resp) => (r.action === 'self_breed' || /Border Terrier/.test(resp.text) ? `self_breed leaked in protected: ${r.action}` : null) });
 })();
 
+// ==== Task 156: the hats clip serves on any hat mention (and is not itself a hat-hunt hat) ====
+check('hats', { action: 'media_reply' }, { assert: (_r, resp) => (resp.media?.src === '/chat-media/hats.mp4' ? null : `hats clip: ${resp.media?.src}`) });
+check('i like your hat', { action: 'media_reply' }, { assert: (_r, resp) => (resp.media?.src === '/chat-media/hats.mp4' ? null : `hat clip: ${resp.media?.src}`) });
+check('what', {}, { assert: (r) => (r.action === 'media_reply' ? '"what" wrongly triggered the hats clip' : null) });
+
 // ---- Report ----
 const pad = (s, n) => String(s).padEnd(n);
 console.log('\nPick a Chum: Checkpoint 1 proof\n' + '='.repeat(78));

@@ -3,6 +3,7 @@ import * as React from "react";
 import Link from "next/link";
 import Nav from "../../../components/Nav/Nav";
 import Footer from "../../../components/Footer/Footer";
+import HeroHat from "./HeroHat";
 import styles from "../dogs-at-work.module.css";
 
 export const metadata: Metadata = {
@@ -56,7 +57,7 @@ export default function BioDetectionPage() {
       <Nav showLogo />
       <main className={styles.essayPage}>
         <div className={styles.essayHero}>
-          <img src="/Bumper-and-peatnut.jpg" alt="Bumper and Peanut, the Parkinson's bio-detection dogs" className={styles.essayHeroImg} />
+          <HeroHat className={styles.essayHeroImg} />
           <div className={styles.essayHeroTint} />
           <div className={styles.essayHeroContent}>
             <Link href="/dogs-at-work" className={styles.backLink}>← Back to Dogs at Work</Link>

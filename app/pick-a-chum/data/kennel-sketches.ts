@@ -1,16 +1,18 @@
 /**
  * Kennel Sketch drawings.
  *
- * Nine ASCII drawings of dog things, drawn by Steve on 31 July 2026.
- * The clue lines mirror the "Look for:" wording on the printed cards.
+ * Ten ASCII drawings of dog things, drawn by Steve (nine on 31 July 2026,
+ * the HAT added 8 August 2026 to give the Kennel Sketch hat somewhere to
+ * live). The clue lines mirror the "Look for:" wording on the printed cards.
  *
  * These live here rather than in the workbook because a spreadsheet cell
  * mangles leading whitespace, and the alignment is the whole picture.
  *
  * The panel must render these in a MONOSPACE font or every one collapses.
  *
- * The tenth clue row in workbook bucket B44 (NOSE) has no drawing and is
- * surplus. Ignore it.
+ * The HAT is the tenth DRAWING here and carries the hat-hunt hat (H09). It
+ * is unrelated to the surplus NOSE clue row in workbook bucket B44, which
+ * still has no drawing and stays ignored -- no art was invented for it.
  */
 
 export type KennelSketch = {
@@ -108,6 +110,19 @@ export const KENNEL_SKETCHES: KennelSketch[] = [
       '   /\\       /\\',
       '  /  \\_____/  \\',
       ' /             \\',
+    ].join('\n'),
+  },
+  {
+    answer: 'HAT',
+    accept: ['hat', 'a hat', 'cap', 'flat cap'],
+    clue: 'Look for: it goes on your head',
+    art: [
+      '         _____',
+      "      .-'     `-.",
+      '     /           \\',
+      '    |-.           |',
+      '    |  \\          |',
+      '    [__|__________|_______',
     ].join('\n'),
   },
 ];

@@ -1278,6 +1278,9 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
     // smile face + clip (MEDIA_REPLIES in the assembler). (Task 141: car and balls moved to the
     // workbook as B64 / B52-MISC-09 and now route through the generic canned matcher.)
     if (hasAny(N, ['birthday'])) return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: 'media_reply', responseId: 'BIRTHDAY-01' };
+    // Task 156: ANY mention of "hat"/"hats" plays the hats clip (a media response like the birthday one).
+    // Below safety/grief. It does NOT count as a hat-hunt hat itself -- it is just a clip.
+    if (hasAny(N, ['hat', 'hats'])) return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: 'media_reply', responseId: 'HATS-01' };
     // Task 142: praise -> the wagging-tail clip (checked before the naming/how-are-you rules so
     // "are you a good dog" is praise, not a name attempt or a personal question).
     if (GOOD_BOY_TRIGGERS.has(c)) return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: 'good_boy' };

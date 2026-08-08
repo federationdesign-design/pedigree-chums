@@ -7,6 +7,7 @@ import Triangles, { type Tri } from "../../components/Parallax/Triangles";
 import ParallaxShape from "../../components/Parallax/ParallaxShape";
 import Announce from "../../components/Announce/Announce";
 import BreedStrip from "./BreedStrip";
+import FactHatImage from "./FactHatImage";
 import HistoryCarousel from "../britains-dog-history-2/HistoryCarousel";
 import styles from "./history.module.css";
 
@@ -420,7 +421,7 @@ export default function HistoryPage() {
                       <span className={styles.factLabel}>Did you know?</span>
                       <div className={styles.factRow}>
                         <div className={styles.factImg}>
-                          <Image src={f.image || s.image} alt="" width={120} height={120} unoptimized />
+                          <FactHatImage src={f.image || s.image} width={120} height={120} />
                         </div>
                         <div className={styles.factBody}>
                           <span className={styles.factText}>{f.text}</span>

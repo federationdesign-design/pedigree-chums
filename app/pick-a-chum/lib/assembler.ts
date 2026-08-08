@@ -44,6 +44,8 @@ export const SMILE_FACE_SR_LABEL = 'the Collie smiles';
 // their clips now attach in the canned case below, keyed by responseId, like cats.)
 const MEDIA_REPLIES: Record<string, { text: string; media: { src: string; alt: string }; ariaLabel?: string }> = {
   'BIRTHDAY-01': { text: ':)', media: { src: '/chat-media/birthday.mp4', alt: 'A birthday celebration' }, ariaLabel: SMILE_FACE_SR_LABEL },
+  // Task 156: any mention of hats plays the hats clip. Not a hat-hunt hat itself.
+  'HATS-01': { text: '', media: { src: '/chat-media/hats.mp4', alt: 'A dog in a hat' } },
 };
 // Task 141: canned rows that carry a clip. The clip joins the row's copy, it does not replace it.
 const CANNED_MEDIA: Record<string, { src: string; alt: string }> = {
