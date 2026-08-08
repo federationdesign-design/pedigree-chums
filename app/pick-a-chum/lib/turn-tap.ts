@@ -30,14 +30,18 @@ export interface TurnEvent {
 }
 
 type Sink = (e: TurnEvent) => void;
-let sink: Sink | null = null;
+// Multiple sinks: the dev recorder AND (Task 163) the gap-log both tap here, each gated by its own flag.
+const sinks = new Set<Sink>();
 
-export function setTurnTap(fn: Sink | null): void {
-  sink = fn;
+export function addTurnTap(fn: Sink): () => void {
+  sinks.add(fn);
+  return () => {
+    sinks.delete(fn);
+  };
 }
 
 export function emitTurn(e: TurnEvent): void {
-  if (sink) {
+  for (const sink of sinks) {
     try {
       sink(e);
     } catch {
@@ -56,4 +60,12 @@ export function recorderEnabled(): boolean {
   // visit (no `?rec=1`) is unchanged: on a production host the recorder and its panel stay off.
   if (new URLSearchParams(window.location.search).get('rec') === '1') return true;
   return !PROD_HOSTS.has(window.location.hostname);
+}
+
+// Task 163: the gap-log flag. OFF BY DEFAULT, EVERYWHERE. It collects free text typed by children (only the
+// unanswerable no-subject fallback), so unlike the recorder it is NEVER host-derived -- it is on ONLY with
+// an explicit `?gaplog=1`. Off => no sink registered => nothing is collected, counted or sent.
+export function gapLogEnabled(): boolean {
+  if (typeof window === 'undefined') return false;
+  return new URLSearchParams(window.location.search).get('gaplog') === '1';
 }

@@ -42,6 +42,7 @@ const { skipTheatre, buildTypingPlan, TYPING_PROFILES, THEATRE_MAX_MS, isTypoEli
   pathToFileURL(join(LIB, 'theatre.ts')).href
 );
 const { buildRow, buildProtectedMarker, buildAppearanceRow, enrichRows, detectRephrase, buildSessions, isLaugh } = await import(pathToFileURL(join(ROOT, 'app/pick-a-chum/dev/recorder-store.ts')).href);
+const { isNoSubjectFallback, redact, ingest, onProtected, rankedItems, emptyStore, newSessionState } = await import(pathToFileURL(join(ROOT, 'app/pick-a-chum/dev/gap-log.ts')).href);
 const { recorderEnabled } = await import(pathToFileURL(join(ROOT, 'app/pick-a-chum/lib/turn-tap.ts')).href);
 const { SAFETY_TRIGGER_PHRASES } = await import(pathToFileURL(join(LIB, 'safety.ts')).href);
 
@@ -1186,6 +1187,64 @@ const lcg = (seed) => () => ((seed = (seed * 1103515245 + 12345) & 0x7fffffff) /
     s.gamesStarted === 1 && s.gamesFinished === 1 && s.hadAppearance === 'TRUE' && s.laughCount === 1 && s.laughedAt === 'FC-JOKE' && s.endReason === 'abandoned';
   ok ? pass++ : fail++;
   rows.push({ ok, input: 'recorder v2: per-session summary', layer: '-', bucket: '-', action: 'recorder', note: ok ? '' : JSON.stringify(s) });
+})();
+
+// ---- Task 163: gap-log (unanswerable inputs) -- threshold control, redaction backstop, protected-discard ----
+(() => {
+  const ok = isNoSubjectFallback('B40-NOSUBJECT-01') && isNoSubjectFallback('LAB-B40-01') &&
+    !isNoSubjectFallback('B30-JOKE-01') && !isNoSubjectFallback('LOOP-01') && !isNoSubjectFallback('');
+  ok ? pass++ : fail++;
+  rows.push({ ok, input: 'gap-log: only the no-subject B40 fallback qualifies', layer: '-', bucket: '-', action: 'gaplog', note: ok ? '' : 'qualifying wrong' });
+})();
+(() => {
+  const r = redact;
+  const ok = r('im called Phil').includes('[redacted: name]') &&
+    r('i live in london').includes('[redacted: location]') && r('im from windsor').includes('[redacted: location]') &&
+    r('im 8').includes('[redacted: age]') && !r('im one of those people').includes('[redacted: age]') &&
+    r('call me on 07700900000').includes('[redacted: contact]') && r('my email is a@b.com').includes('[redacted: contact]') &&
+    r('i go to st marys').includes('[redacted: school]') &&
+    r('do you like the girl dog') === 'do you like the girl dog'; // gender dropped: legit question untouched
+  ok ? pass++ : fail++;
+  rows.push({ ok, input: 'gap-log: redaction (5 reasons, gender dropped, age digits-only)', layer: '-', bucket: '-', action: 'gaplog', note: ok ? '' : `name="${r('im called Phil')}" age="${r('im one of those people')}" girl="${r('do you like the girl dog')}"` });
+})();
+(() => {
+  // Threshold: seen 4 times from different sessions -> not stored; a 5th -> stored, count 5. One session
+  // typing it repeatedly counts ONCE (per-session dedup), so it takes five DIFFERENT sessions.
+  const store = emptyStore();
+  for (let i = 0; i < 4; i++) ingest(store, newSessionState(), 'do you like xmas');
+  const at4 = rankedItems(store).length;
+  ingest(store, newSessionState(), 'do you like xmas');
+  const items = rankedItems(store);
+  const solo = newSessionState();
+  for (let i = 0; i < 5; i++) ingest(store, solo, 'do you like xmas'); // one session, five times -> +1
+  const after = rankedItems(store)[0];
+  const ok = at4 === 0 && items.length === 1 && items[0].count === 5 && items[0].input === 'do you like xmas' &&
+    items[0].bucket === 'B40' && after.count === 6;
+  ok ? pass++ : fail++;
+  rows.push({ ok, input: 'gap-log: threshold (5 different sessions; per-session dedup)', layer: '-', bucket: '-', action: 'gaplog', note: ok ? '' : `at4=${at4} items=${JSON.stringify(items)} after=${after && after.count}` });
+})();
+(() => {
+  const store = emptyStore();
+  const long = 'do you like xmas '.repeat(10); // > 80 chars
+  for (let i = 0; i < 6; i++) ingest(store, newSessionState(), long);
+  const ok = Object.keys(store.counts).length === 0 && rankedItems(store).length === 0;
+  ok ? pass++ : fail++;
+  rows.push({ ok, input: 'gap-log: length cap drops long inputs entirely', layer: '-', bucket: '-', action: 'gaplog', note: ok ? '' : JSON.stringify(store.counts) });
+})();
+(() => {
+  // Protected session: the text it collected is discarded (including the threshold text it supplied), the
+  // count is kept, and it logs nothing further.
+  const store = emptyStore();
+  for (let i = 0; i < 4; i++) ingest(store, newSessionState(), 'can you tell the time');
+  const guilty = newSessionState();
+  ingest(store, guilty, 'can you tell the time'); // the 5th sighting -> text stored by THIS session
+  const hadText = rankedItems(store).length === 1;
+  onProtected(store, guilty);
+  ingest(store, guilty, 'can you tell the time'); // latched: no further logging
+  const key = Object.keys(store.counts)[0];
+  const ok = hadText && rankedItems(store).length === 0 && store.counts[key].count === 5 && !store.texts[key];
+  ok ? pass++ : fail++;
+  rows.push({ ok, input: 'gap-log: protected session discards text, keeps count', layer: '-', bucket: '-', action: 'gaplog', note: ok ? '' : `hadText=${hadText} items=${rankedItems(store).length} count=${store.counts[key] && store.counts[key].count} text=${store.texts[key]}` });
 })();
 
 // ---- Fix 5a: the meaningless B05 "located the correct Chum" line is removed ----

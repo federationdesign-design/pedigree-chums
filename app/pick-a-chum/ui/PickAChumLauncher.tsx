@@ -14,6 +14,9 @@ import PickAChumIcon from './PickAChumIcon';
 // DEV-RECORDER (strip for production): preview-only conversation recorder. It is
 // inert on production hosts anyway (see lib/turn-tap.ts recorderEnabled).
 import DevRecorder from '../dev/DevRecorder';
+// Task 163: the gap-log. OFF by default (renders null unless ?gaplog=1); collects only the unanswerable
+// no-subject fallback, holding nothing about any child. See dev/gap-log.ts for the controls and caveat.
+import GapLog from '../dev/GapLog';
 // Task 148: the Terrier's job. Type-only import (erased) keeps the heavy experience code-split; the
 // helper + registry + page-bios are lightweight (no chatbot engine), so the launcher stays cheap.
 import type { AutoAppear } from './PickAChumExperience';
@@ -388,6 +391,8 @@ export default function PickAChumLauncher() {
       )}
       {/* DEV-RECORDER (strip for production): renders null on production hosts. */}
       <DevRecorder />
+      {/* GAP-LOG (Task 163): renders null unless the ?gaplog=1 flag is on; off by default everywhere. */}
+      <GapLog />
     </>
   );
 }

@@ -9,7 +9,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import styles from './DevRecorder.module.css';
-import { setTurnTap, recorderEnabled, TurnEvent } from '../lib/turn-tap';
+import { addTurnTap, recorderEnabled, TurnEvent } from '../lib/turn-tap';
 import { record, recordPendingSync, flushPending, getAggregate, downloadBoth, Aggregate } from './recorder-store';
 
 const EMPTY: Aggregate = { conversations: 0, messages: 0, missed: 0 };
@@ -37,8 +37,8 @@ export default function DevRecorder() {
         .then(refresh)
         .catch(() => {});
     };
-    setTurnTap(onTurn);
-    return () => setTurnTap(null);
+    const off = addTurnTap(onTurn);
+    return () => off();
   }, [refresh]);
 
   const onExport = useCallback(() => {
