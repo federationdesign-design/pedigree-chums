@@ -10,7 +10,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import styles from './DevRecorder.module.css';
 import { addTurnTap, recorderEnabled, TurnEvent } from '../lib/turn-tap';
-import { record, recordPendingSync, flushPending, getAggregate, downloadBoth, Aggregate } from './recorder-store';
+import { record, recordPendingSync, flushPending, getAggregate, downloadBoth, purgeLegacyRows, Aggregate } from './recorder-store';
 
 const EMPTY: Aggregate = { conversations: 0, messages: 0, missed: 0 };
 
@@ -25,9 +25,13 @@ export default function DevRecorder() {
   useEffect(() => {
     setMounted(true);
     if (!recorderEnabled()) return;
-    // Task 159: flush any turns captured synchronously on a previous page (an external link unloaded before
-    // its async write landed), then restore the running totals from earlier sessions.
-    flushPending().then(refresh).catch(() => {});
+    // Task 164 fix: drop any pre-Task-159 rows (no `trigger`) so stale data cannot keep blanking the
+    // per-session summary. Then flush turns captured synchronously on a previous page (an external link
+    // unloaded before its async write landed), and restore the running totals from earlier sessions.
+    purgeLegacyRows()
+      .then(() => flushPending())
+      .then(refresh)
+      .catch(() => {});
     const onTurn = (e: TurnEvent) => {
       if (e.sync) {
         recordPendingSync(e, new Date().toISOString()); // synchronous -- survives the imminent navigation

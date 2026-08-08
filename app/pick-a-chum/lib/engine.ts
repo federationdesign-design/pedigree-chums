@@ -206,11 +206,13 @@ export function submit(data: ChumData, session: Session, input: string): Turn {
     pendingConfirm: session.pendingConfirm,
     activeGame: session.activeGame,
     cookieAskPending: session.cookieAskPending ?? false, // Task 151: the Labrador's armed cookie ask
+    boxerGameAskPending: session.boxerGameAskPending ?? false, // Task 164: the Boxer's armed game accept
     route: session.route, // Task 140: the page the visitor is on, for the page-bio route
   });
-  // Task 151: the cookie ask is a one-turn window. resolve() has just read it above; clear it now so a
-  // "yes" that does not follow the ask never starts the game, and the ask never lingers past its turn.
+  // Task 151/164: the cookie ask and the Boxer game ask are one-turn windows. resolve() has just read them
+  // above; clear them now so a "yes" that does not follow the ask never starts a game, and neither lingers.
   session.cookieAskPending = false;
+  session.boxerGameAskPending = false;
 
   // A canned answer (B21-B39) overrides the four old-voice routes Steve named (identity,
   // orientation, the bare-help clarifier, FAQ). Only outside a protected state: in a protected
@@ -288,6 +290,13 @@ export function submit(data: ChumData, session: Session, input: string): Turn {
   }
 
   const response = assemble(resolution, data, n, session);
+
+  // Task 164 fix: when the Boxer serves his game offer (B17), arm a one-turn window so the visitor's
+  // natural accept next turn ("yes" / "lets play" / "play") starts DO NOT PRESS THAT BUTTON. Only his own
+  // offer arms it (offer_bark_game surfaces the per-dog B17); it is cleared at the top of the next turn.
+  if (resolution.action === 'offer_bark_game' && session.activeDog === 'boxer') {
+    session.boxerGameAskPending = true;
+  }
 
   // Task 25b: complaint short-repeat. The first FAQ015 turn serves the full answer; while
   // the complaint context holds, subsequent FAQ015 turns get the short repeat line. The

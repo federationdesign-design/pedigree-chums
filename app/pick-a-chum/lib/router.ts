@@ -221,6 +221,11 @@ const ORIENTATION = [
   // "talk about labradors" still reaches the breed page (these all require the "you/we talk
   // about" frame, never a bare "talk about").
   'what can you talk about', 'what do you talk about', 'what can we talk about', 'what else can you talk about',
+  // Task 164 fix: "what can I do (here)" and "what else can I do" are orientation questions and must reach
+  // the PER-DOG B15 line (Task 154), not the shared B61 nav shortcut. They were being grabbed by
+  // OPTIONS_TRIGGERS below (which returns the one Collie line for every dog); removed from there and added
+  // here so each active dog answers in its own voice, exactly like the neighbouring "what do i do".
+  'what can i do', 'what else can i do',
 ];
 
 // Orientation phrasings matched on the WHOLE normalised input only (Task 11a).
@@ -529,6 +534,7 @@ export interface RouterState {
   pendingConfirm?: string | null; // Task 68: subject offered by LOOP-01/LOOP-02 last turn, awaiting yes/no
   activeGame?: GameId | null; // Task 115: the in-chat game that currently owns the input, if any
   cookieAskPending?: boolean; // Task 151: the Labrador just asked for a cookie -- a bare "yes" starts the feed game
+  boxerGameAskPending?: boolean; // Task 164 fix: the Boxer just offered his game -- a bare "yes"/"lets play" starts it
   route?: string; // Task 140: the page the visitor is standing on (usePathname), for the page-bio route
 }
 
@@ -558,7 +564,10 @@ const PEDIGREE_TRIGGERS = new Set(['what is a pedigree', 'whats a pedigree', 'wh
 const HOME_TRIGGERS = new Set(['where is the homepage', 'take me home', 'go home', 'the homepage', 'find the homepage', 'wheres the homepage', 'homepage']);
 // 'what are my options' stays with orientation (B15), which owned it first and
 // gives a fuller answer than a four-word list.
-const OPTIONS_TRIGGERS = new Set(['tell me my options', 'what can i do', 'what else can i do', 'my options']);
+// Task 164 fix: "what can i do" / "what else can i do" moved OUT of here to ORIENTATION (per-dog B15);
+// they were returning the one shared Collie B61 line for every dog. "my options" / "tell me my options"
+// stay as the explicit nav-shortcut answer.
+const OPTIONS_TRIGGERS = new Set(['tell me my options', 'my options']);
 const MADE_TRIGGERS = new Set(['who made you', 'who built you', 'who created you', 'who wrote you', 'who owns you', 'who designed you']);
 const WORST_TRIGGERS = new Set(['worst dog', 'whats the worst dog', 'worst dog ever', 'worst breed', 'whats the worst breed']);
 const PAW_TRIGGERS = new Set(['paw', 'give me your paw', 'shake', 'shake hands', 'give paw', 'can i have your paw', 'high five']);
@@ -1100,6 +1109,10 @@ const FEED_COOKIE_START = /(feed the dog|feed the lab|feed the labrador|feed me|
 // Task 164: DO NOT PRESS THAT BUTTON entry phrases (the Boxer's game only, gated on the Boxer in
 // resolve()). His B17 offer teaches "mini game"; the rest are what a child types on seeing the panel.
 const BUTTON_PANEL_START = /(mini ?game|do not press|dont press|don't press|press that button|press the button|press a button|button game|the button game|control panel)/;
+// Task 164 fix: whole-message accepts that, WHEN his offer has just armed boxerGameAskPending, start his
+// game. "play"/"lets play" normally go to the games menu / re-offer; the armed flag scopes these to the
+// one turn right after he offered, so they cannot hijack anything cold.
+const BOXER_GAME_ACCEPT = new Set(['lets play', 'let us play', 'play', 'play it', 'go on', 'ok lets play', 'yes lets play', 'yes please', 'ready', 'lets go', 'do it']);
 function matchGameStart(c: string): GameId | null {
   for (const [re, id] of GAME_STARTS) if (re.test(c)) return id;
   return null;
@@ -1435,6 +1448,13 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
   // policy is untouched (typing "cookies" never opened it, and now it starts the game instead).
   if (state.activeDog === 'labrador' && !state.activeGame && FEED_COOKIE_START.test(c)) {
     return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: 'game_start', game: 'feedcookie' };
+  }
+  // Task 164 fix: the Boxer's B17 offer ("I have my very own mini game, lets play") arms
+  // boxerGameAskPending. A bare "yes" / "lets play" / "play" / "go on" right after now certainly starts
+  // his game, so the natural accept works (before this, only the game name / "do not press" did). Boxer-
+  // only, never mid-game or protected (resolved far above). Checked before the phrase route below.
+  if (state.activeDog === 'boxer' && !state.activeGame && state.boxerGameAskPending && (isConfirmYes(c) || BOXER_GAME_ACCEPT.has(c))) {
+    return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: 'game_start', game: 'buttonpanel' };
   }
   // Task 164: DO NOT PRESS THAT BUTTON is the Boxer's game -- start it only when the Boxer is active.
   // The other three keep their own games; this sits below safety and the active-game move handler above.

@@ -315,6 +315,17 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
     // captured synchronously to localStorage instead (see DevRecorder / recordPendingSync).
     emitTurn({ sessionId: recSessionRef.current, turn: session?.submissionCount ?? 0, activeDog: session?.activeDog ?? 'collie', input: '', line, route: pathnameRef.current ?? '', protectedState: session?.protectedState ?? null, trigger, sync });
   }, []);
+  // Task 164 fix: a DELIBERATE close (the X or Escape) records a 'closed' marker, so the per-session
+  // summary can tell "left" from "gave up" (endReason: closed vs abandoned). Navigating away or closing the
+  // tab does NOT come through here, so it stays 'abandoned', which is the intended distinction. A protected
+  // (or ever-protected) session leaves no marker -- record() drops it, and this guards as well.
+  const closeChat = useCallback(() => {
+    const session = sessionRef.current;
+    if (session && !session.protectedState && !everProtectedRef.current) {
+      emitTurn({ sessionId: recSessionRef.current, turn: session.submissionCount, activeDog: session.activeDog, input: '', line: '', route: pathnameRef.current ?? '', protectedState: null, trigger: 'closed' });
+    }
+    onClose();
+  }, [onClose]);
   // The active typing performance, so a tap or Enter can complete it instantly.
   const playbackRef = useRef<{ id: number; plan: TypingPlan; closed?: boolean; done: boolean } | null>(null);
   // Task 152: the in-flight consecutive-message sequence (a dog sending two or three in a row), or null.
@@ -1080,7 +1091,7 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
   // submit it (queued) so type-ahead works, keyboard and focus intact.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === 'Escape') closeChat();
       else if (e.key === 'Enter' && playbackRef.current && !playbackRef.current.done && !inputRef.current?.value.trim()) {
         e.preventDefault();
         completeTheatre();
@@ -1088,7 +1099,7 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [onClose, completeTheatre]);
+  }, [closeChat, completeTheatre]);
 
   // Ending: the Boxer cut-off closes the HUD abruptly after the line is read.
   useEffect(() => {
@@ -1388,7 +1399,7 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
                       onPointerDown={startPortrait}
                       onAnimationEnd={() => setRoll(false)}
                     />
-                    <button type="button" className={styles.close} aria-label="Close Pick a Chum" onClick={onClose}>
+                    <button type="button" className={styles.close} aria-label="Close Pick a Chum" onClick={closeChat}>
                       <img src="/red-icon.svg" alt="" aria-hidden="true" />
                     </button>
                     {/* Task 130: minimise to a corner chip; restore brings the
@@ -1452,7 +1463,7 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
                 {/* Task 126: the selector's close control -- a readable red X on the centre icon's
                     top-right, closing the selector back to the closed launcher (same onClose as the
                     chat medallion X). */}
-                <button type="button" className={styles.selectorClose} aria-label="Close Pick a Chum" onClick={onClose}>
+                <button type="button" className={styles.selectorClose} aria-label="Close Pick a Chum" onClick={closeChat}>
                   <img src="/red-icon.svg" alt="" aria-hidden="true" />
                 </button>
               </>
@@ -1496,7 +1507,7 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
               window.setTimeout(() => inputRef.current?.focus(), 60); // Task 82
             }}
           />
-          <button type="button" className={styles.close} aria-label="Close Pick a Chum" onClick={onClose}>
+          <button type="button" className={styles.close} aria-label="Close Pick a Chum" onClick={closeChat}>
             <img src="/red-icon.svg" alt="" aria-hidden="true" />
           </button>
           <div className={styles.anchorName} aria-hidden="true">{nameLines(dogInfo(dog).name)}</div>
@@ -1534,7 +1545,7 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
                 onPointerDown={startPortrait}
                 onAnimationEnd={() => setRoll(false)}
               />
-              <button type="button" className={styles.close} aria-label="Close Pick a Chum" onClick={onClose}>
+              <button type="button" className={styles.close} aria-label="Close Pick a Chum" onClick={closeChat}>
                 <img src="/red-icon.svg" alt="" aria-hidden="true" />
               </button>
               {/* Task 130 on mobile: the desktop medallion block is gated on

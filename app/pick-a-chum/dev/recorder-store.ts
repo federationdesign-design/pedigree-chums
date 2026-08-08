@@ -193,9 +193,11 @@ export function buildAppearanceRow(e: TurnEvent, now: string): TurnRow {
     activeDog: e.activeDog,
     route: e.route ?? '',
     trigger: e.trigger ?? 'appearance',
-    // A link-follow and a hat-find ride the same appearance channel (no visitor input) but carry their own
+    // A link-follow, a hat-find and a deliberate CLOSE ride the same no-input channel but carry their own
     // action so the per-session sheet can count them; the line holds the target (href) / the hat id.
-    action: e.trigger === 'link' ? 'link_followed' : e.trigger === 'hat' ? 'hat_found' : 'appearance',
+    // Task 164 fix: 'closed' marks a deliberate close (X / Escape), which endReason reads as "left" (not
+    // "abandoned"). It is NOT an appearance, so hadAppearance / dogsUsed / firstInput all ignore it.
+    action: e.trigger === 'link' ? 'link_followed' : e.trigger === 'hat' ? 'hat_found' : e.trigger === 'closed' ? 'closed' : 'appearance',
     responseText: e.line ?? '',
     gameActive: e.gameActive ?? '',
   };
@@ -262,6 +264,23 @@ export async function flushPending(): Promise<void> {
       await tx('readwrite', (s) => s.add(row));
     } catch {}
   }
+}
+
+// Task 164 fix: rows written before the Task 159 schema (trigger / activeDog / input) carry no `trigger`,
+// so they blank out the per-session summary -- turnCount and gamesStarted survive (they key on turn /
+// action), but everything keyed on trigger / input / activeDog (firstInput, dogsUsed, laughCount,
+// hadAppearance) and on the no-input actions (hatsFound, linkFollowed) comes out empty. Dropped on load so
+// stale data cannot keep producing empty summaries. Targeted: ONLY rows missing `trigger` go; every valid
+// current row (buildRow / buildAppearanceRow / buildProtectedMarker always set a non-empty trigger) stays.
+export async function purgeLegacyRows(): Promise<number> {
+  const all = (await tx<(TurnRow & { id?: number })[]>('readonly', (s) => s.getAll())) ?? [];
+  const legacyIds = all.filter((r) => !r.trigger).map((r) => r.id).filter((id): id is number => typeof id === 'number');
+  if (!legacyIds.length) return 0;
+  await tx('readwrite', (s) => {
+    for (const id of legacyIds) s.delete(id);
+    return s.count(); // resolves the tx after the deletes queue; they commit together
+  });
+  return legacyIds.length;
 }
 
 export async function getAllRows(): Promise<TurnRow[]> {
@@ -384,7 +403,11 @@ export function buildSessions(rows: TurnRow[]): SessionRow[] {
       ? 'ceiling' // the 20-turn cutoff, NOT a real exit (brief section 8)
       : srows.some((r) => r.protected === 'TRUE')
         ? 'protected'
-        : 'abandoned';
+        // Task 164 fix: a deliberate close (X / Escape) leaves a 'closed' marker. "Left" is a different
+        // outcome from "gave up": abandoned is now only a session that just stopped, with no close.
+        : srows.some((r) => r.trigger === 'closed')
+          ? 'closed'
+          : 'abandoned';
     const linkTargets = [...new Set(srows.filter((r) => r.action === 'link_followed').map((r) => r.responseText).filter(Boolean))];
     const hatsFound = new Set(srows.filter((r) => r.action === 'hat_found').map((r) => r.responseText).filter(Boolean)).size;
     out.push({

@@ -82,6 +82,10 @@ export interface Session {
   // pickup). It arms a one-turn window in which a bare "yes" starts the feed-cookie game, so the ask is
   // a certain entry point rather than relying on the visitor typing the word "cookie". Cleared each turn.
   cookieAskPending?: boolean;
+  // Task 164 fix: the Boxer just offered his mini game (his B17). Arms a one-turn window in which a bare
+  // "yes" / "lets play" / "play" starts DO NOT PRESS THAT BUTTON, so his offer is a certain entry point
+  // rather than relying on the visitor typing the game name. Cleared each turn, exactly like the cookie ask.
+  boxerGameAskPending?: boolean;
   // Task 140: the page the visitor is standing on, from usePathname in the experience, carried
   // as session state the same way lastAction is. Lets "what is this page" answer with that page's
   // bio. Undefined outside the browser (the harness), so the page-bio route only fires live.
@@ -122,5 +126,6 @@ export function newSession(activeDog: Dog = 'collie'): Session {
     game: null,
     gamesPlayed: 0,
     cookieAskPending: false,
+    boxerGameAskPending: false,
   };
 }

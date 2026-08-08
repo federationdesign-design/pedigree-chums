@@ -1188,6 +1188,20 @@ const lcg = (seed) => () => ((seed = (seed * 1103515245 + 12345) & 0x7fffffff) /
   ok ? pass++ : fail++;
   rows.push({ ok, input: 'recorder v2: per-session summary', layer: '-', bucket: '-', action: 'recorder', note: ok ? '' : JSON.stringify(s) });
 })();
+// Task 164 fix: a deliberate close leaves a 'closed' marker -> endReason 'closed' (LEFT, not abandoned).
+// The marker is not an appearance and not a "dog used"; ceiling still outranks it.
+(() => {
+  const now = '2026-01-01T00:00:00.000Z';
+  const reply = buildRow({ sessionId: 'c', turn: 1, activeDog: 'collie', input: 'hello', resolution: { action: 'converse', bucket: 'B09' }, response: { responseId: 'B09-1', text: 'hi' }, trigger: 'reply' }, now);
+  const close = buildAppearanceRow({ sessionId: 'c', turn: 1, activeDog: 'collie', input: '', line: '', route: '/home', trigger: 'closed' }, now);
+  const closedSess = buildSessions([reply, close])[0];
+  const cutoff = buildRow({ sessionId: 'd', turn: 1, activeDog: 'boxer', input: 'x', resolution: { action: 'boxer_cutoff', bucket: null }, response: { responseId: 'X', text: '' }, trigger: 'reply' }, now);
+  const ceilingSess = buildSessions([cutoff, buildAppearanceRow({ sessionId: 'd', turn: 1, activeDog: 'boxer', input: '', line: '', route: '/home', trigger: 'closed' }, now)])[0];
+  const ok = close.action === 'closed' && closedSess.endReason === 'closed' && closedSess.hadAppearance === '' &&
+    closedSess.dogsUsed === 'collie' && ceilingSess.endReason === 'ceiling';
+  ok ? pass++ : fail++;
+  rows.push({ ok, input: 'recorder v2: closed endReason (left vs abandoned)', layer: '-', bucket: '-', action: 'recorder', note: ok ? '' : JSON.stringify({ endReason: closedSess.endReason, closeAction: close.action, ceiling: ceilingSess.endReason }) });
+})();
 
 // ---- Task 163: gap-log (unanswerable inputs) -- threshold control, redaction backstop, protected-discard ----
 (() => {
@@ -2770,6 +2784,46 @@ for (const please of ['plz', 'pls', 'go on', 'please']) {
   check('im in trouble', { action: 'safety_signpost' }, { session: s }); // enters PROTECTED_ACTIVE
   check('mini game', {}, { session: s, assert: (r, _resp, se) =>
     (r.action !== 'game_start' && se.activeGame !== 'buttonpanel' ? null : `bp started in a protected state: action=${r.action} game=${se.activeGame}`) });
+})();
+// Task 164 fix: the Boxer's offer arms a one-turn accept -- "yes" / "lets play" then starts his game.
+(() => {
+  const s = newSession('boxer');
+  check('can we play a game', { action: 'offer_bark_game' }, { session: s });
+  check('yes', { action: 'game_start' }, { session: s, assert: (_r, _resp, se) =>
+    (se.activeGame === 'buttonpanel' ? null : `boxer accept "yes": game=${se.activeGame}`) });
+})();
+(() => {
+  const s = newSession('boxer');
+  check('can we play a game', { action: 'offer_bark_game' }, { session: s });
+  check('lets play', { action: 'game_start' }, { session: s, assert: (_r, _resp, se) =>
+    (se.activeGame === 'buttonpanel' ? null : `boxer accept "lets play": game=${se.activeGame}`) });
+})();
+// The arm is a ONE-TURN window: a bare "yes" with no offer, or a "yes" a turn late, must NOT start it.
+(() => {
+  const s = newSession('boxer');
+  check('yes', {}, { session: s, assert: (r, _resp, se) =>
+    (r.action !== 'game_start' && se.activeGame !== 'buttonpanel' ? null : `bare "yes" started the game cold`) });
+})();
+(() => {
+  const s = newSession('boxer');
+  check('can we play a game', { action: 'offer_bark_game' }, { session: s });
+  check('tell me about labradors', {}, { session: s }); // an unrelated turn clears the one-turn arm
+  check('yes', {}, { session: s, assert: (_r, _resp, se) =>
+    (se.activeGame !== 'buttonpanel' ? null : `a stale (turn-late) "yes" started the game`) });
+})();
+
+// ==== Task 164 fix: "what can I do" serves the PER-DOG B15 orientation, not the shared B61 nav line ====
+(() => {
+  const rids = {};
+  for (const dog of ['collie', 'labrador', 'terrier', 'boxer']) {
+    const s = newSession(dog);
+    const { response } = check('what can i do', { action: 'orientation', bucket: 'B15' }, { session: s });
+    rids[dog] = response.responseId;
+  }
+  const distinct = new Set(Object.values(rids));
+  const ok = distinct.size === 4; // each dog answers in its own voice (a different B15 row)
+  ok ? pass++ : fail++;
+  rows.push({ ok, input: '"what can i do" per-dog B15', layer: 11, bucket: 'B15', action: 'orientation', note: ok ? '' : `not per-dog: ${JSON.stringify(rids)}` });
 })();
 
 // ==== Task 145 round 3: per-dog goodbye + the Boxer's visitor-initiated knock-knock ====
