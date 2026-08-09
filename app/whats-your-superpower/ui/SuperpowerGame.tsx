@@ -30,9 +30,13 @@ import styles from "./SuperpowerGame.module.css";
 const config = configJson as unknown as GameConfig;
 const QUESTION_COUNT = config.questions.length;
 
-/** Question images. Slots exist whether or not the files do. */
-const questionImage = (index: number) =>
-  `/superpower/q${String(index + 1).padStart(2, "0")}.jpg`;
+/** Question images. Slots exist whether or not the files do. Keyed off the
+ * question id, not the array position: q01.jpg to q15.jpg are numbered against
+ * the original fifteen-question set, so M03 always pairs with q03 even after
+ * MVP-4.3 dropped M02, M08, M10, M13 and M14. Deriving from the index would
+ * shift every image onto the wrong (or a dropped) question. */
+const questionImage = (id: string) =>
+  `/superpower/q${id.replace(/^M/, "").padStart(2, "0")}.jpg`;
 
 interface GameState {
   answersByQuestion: (AnswerLetter | null)[];
@@ -185,7 +189,7 @@ export default function SuperpowerGame() {
               {/* Decorative: the question is answerable without it. */}
               <img
                 className={styles.qImg}
-                src={questionImage(index)}
+                src={questionImage(q.id)}
                 alt=""
                 loading={index < 2 ? "eager" : "lazy"}
               />
