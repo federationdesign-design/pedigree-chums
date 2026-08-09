@@ -1979,7 +1979,7 @@ export default function BreedTree({
   // render children stay index-aligned with the bridge lists
   const [rodList, setRodList] = useState<{ len: number; h: number; lit: boolean }[]>([]);
   const [deadRods, setDeadRods] = useState<Set<number>>(new Set());
-  const [pillList, setPillList] = useState<{ lines: string[]; w: number; h: number; rx: number }[]>([]);
+  const [pillList, setPillList] = useState<{ lines: string[]; w: number; h: number; unit: number }[]>([]);
   const [deadPills, setDeadPills] = useState<Set<number>>(new Set());
   const [toyList, setToyList] = useState<{ kind: ToyKind; size: number; h: number; src: string; filter?: string }[]>([]);
   const [chumList, setChumList] = useState<{ image: string; size: number; name: string }[]>([]);
@@ -4155,7 +4155,11 @@ export default function BreedTree({
         Composite.add(world, mb);
         MBody.setVelocity(mb, { x: (Math.random() - 0.5) * 3, y: 3 });
         pillBodiesRef.current.push(pr);
-        setPillList((l) => [...l, { lines, w: pw * fxScale, h: ph * fxScale, rx: 13 * fxScale }]);
+        // `unit` is the pill's text-sizing base (13px scaled), used below for the
+        // stroke width, the two-line text offset and the font size. It is NOT the
+        // corner radius: the drawn rect rounds by pl.h / 2 (a full capsule), so
+        // this number never touches the corners despite its old name `rx`.
+        setPillList((l) => [...l, { lines, w: pw * fxScale, h: ph * fxScale, unit: 13 * fxScale }]);
         wake();
       };
       // opts is how the solo-dog circle arrives: its own radius, its breed name
@@ -6143,10 +6147,10 @@ export default function BreedTree({
                   onClick={(e) => e.stopPropagation()}
                   >
                   <rect x={-pl.w / 2} y={-pl.h / 2} width={pl.w} height={pl.h} rx={pl.h / 2}
-                    style={{ fill: "#0a3a57", stroke: "rgba(255,255,255,0.85)", strokeWidth: pl.rx * 0.154 }} />
+                    style={{ fill: "#0a3a57", stroke: "rgba(255,255,255,0.85)", strokeWidth: pl.unit * 0.154 }} />
                   {pl.lines.map((ln, li) => (
-                    <text key={li} x={0} y={pl.lines.length > 1 ? (li === 0 ? -pl.rx * 0.6 : pl.rx * 0.6) : 0} dominantBaseline="central"
-                      style={{ fill: "#ffffff", fontFamily: "Montserrat, var(--font-body), system-ui, sans-serif", fontWeight: 700, fontSize: `${pl.rx * 0.92}px`, pointerEvents: "none", userSelect: "none" }}>
+                    <text key={li} x={0} y={pl.lines.length > 1 ? (li === 0 ? -pl.unit * 0.6 : pl.unit * 0.6) : 0} dominantBaseline="central"
+                      style={{ fill: "#ffffff", fontFamily: "Montserrat, var(--font-body), system-ui, sans-serif", fontWeight: 700, fontSize: `${pl.unit * 0.92}px`, pointerEvents: "none", userSelect: "none" }}>
                       {ln}
                     </text>
                   ))}
