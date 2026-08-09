@@ -4,7 +4,7 @@
 
 Pedigree Chums product and developer brief. Prepared 28 July 2026.
 
-Companion to `whats_your_superpower_mvp_specification_v4_1`. The specification says what to build. This says in what order, on what evidence, and where the rework risk sits.
+Companion to `whats_your_superpower_mvp_specification_v4_3`. The specification says what to build. This says in what order, on what evidence, and where the rework risk sits.
 
 **What changed since version 1.1**
 
