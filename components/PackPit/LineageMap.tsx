@@ -1921,7 +1921,7 @@ export default function LineageMap({
                       const nmY = -r + 22;
                       return (
                         <g>
-                          <rect className={styles.nmPill} x={-nmW / 2} y={nmY - nmH / 2} width={nmW} height={nmH} rx={11} />
+                          <rect className={styles.nmPill} x={-nmW / 2} y={nmY - nmH / 2} width={nmW} height={nmH} rx={nmH / 2} />
                           {nmLines.map((ln, li) => (
                             <text key={li} className={styles.nm} textAnchor="middle" dominantBaseline="central"
                               y={nmLines.length > 1 ? (li === 0 ? nmY - 8 : nmY + 8) : nmY}>
