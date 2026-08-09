@@ -1842,12 +1842,14 @@ export default function LineageMap({
                       {INSTR_NAMES.has(breed.name) ? (n.value ?? "") : `${share}%`}
                     </text>
                     {(hasKids || !autoExposed.has(n._id)) && !(circular && n.name === breed.name) ? (() => {
-                      // Wrap long names the same way the pit pill does, through
-                      // the shared splitName above: width off the LONGEST line, a
-                      // +10 two-line extra, height 40 wrapped and 22 not, so a
-                      // long name stops running across the card as one line.
+                      // Wrap and size the pill EXACTLY as the pit pill does, so a
+                      // node reads identically whether it is here or dropped in the
+                      // pit: shared splitName, width off the LONGEST line at 7.4 per
+                      // char, +14 padding, +10 two-line extra, floored at 44; height
+                      // 40 wrapped and 22 not. (The root TAG pill stays 9.5/+28, it
+                      // is the card's own name, not a sibling.)
                       const nmLines = splitName(n.name);
-                      const nmW = Math.max(...nmLines.map((l) => l.length)) * 7.4 + 22 + (nmLines.length > 1 ? 10 : 0);
+                      const nmW = Math.max(44, Math.max(...nmLines.map((l) => l.length)) * 7.4 + 14 + (nmLines.length > 1 ? 10 : 0));
                       const nmH = nmLines.length > 1 ? 40 : 22;
                       // Owner review: the name sat above the circle, so the
                       // topmost one ran off the screen. It now sits inside,
