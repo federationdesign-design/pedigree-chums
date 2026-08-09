@@ -6,6 +6,7 @@ import { bust } from "../../data/imgVersion";
 import { ukBreeds } from "../../data/uk-breeds";
 import { breeds } from "../../data/breeds";
 import { breedInfo } from "../../data/breedInfo";
+import { splitName } from "./splitName";
 import styles from "./LineageMap.module.css";
 
 type BreedTag = "extinct" | "trending" | "popular" | "endangered" | "in-decline";
@@ -845,15 +846,8 @@ export default function LineageMap({
     setInfoHover(null);
   };
 
-  // long names wrap to a second line: the pill grows in depth, the corner
-  // radius stays fixed so the capsule shape never changes
-  const splitName = (nm: string): string[] => {
-    if (nm.length <= 16) return [nm];
-    const mid = Math.floor(nm.length / 2);
-    let best = -1;
-    for (let i = 0; i < nm.length; i++) if (nm[i] === " " && (best === -1 || Math.abs(i - mid) < Math.abs(best - mid))) best = i;
-    return best === -1 ? [nm] : [nm.slice(0, best), nm.slice(best + 1)];
-  };
+  // long names wrap to a second line via the shared splitName (see ./splitName):
+  // the pill grows in depth, the corner radius stays fixed so the shape holds.
   const tagLines = circular ? splitName(breed.name) : [breed.name];
   const tagW = Math.max(...tagLines.map((l) => l.length)) * 9.5 + 28 + (tagLines.length > 1 ? 14 : 0);
   const tagH = tagLines.length > 1 ? 60 : 32;

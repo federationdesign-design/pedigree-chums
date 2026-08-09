@@ -4,6 +4,7 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { hierarchy, pack, packSiblings, packEnclose, type HierarchyCircularNode } from "d3-hierarchy";
 import { radius as pctRadius, ringFrac } from "../PackPit/LineageMap";
 import { createPitEffects } from "../PackPit/pitEffects";
+import { splitName } from "../PackPit/splitName";
 import { interpolateZoom } from "d3-interpolate";
 import type { LineageNode } from "../../data/lineage";
 import { nodeStatus, TAG_STYLE, type BreedTag } from "../BreedTreeMap/BreedTreeMap";
@@ -4144,13 +4145,7 @@ export default function BreedTree({
         // kept on purpose. Both pw and ph feed the physics body (Bodies.rectangle
         // below) AND the drawn rect (via setPillList), so never re-tune one number
         // without the other, or the collision shape and the picture drift apart.
-        const lines = (() => {
-          if (name.length <= 16) return [name];
-          const mid = Math.floor(name.length / 2);
-          let best = -1;
-          for (let i = 0; i < name.length; i++) if (name[i] === " " && (best === -1 || Math.abs(i - mid) < Math.abs(best - mid))) best = i;
-          return best === -1 ? [name] : [name.slice(0, best), name.slice(best + 1)];
-        })();
+        const lines = splitName(name);
         const pw = Math.max(44, Math.max(...lines.map((l) => l.length)) * 7.4 + 14 + (lines.length > 1 ? 10 : 0));
         const ph = lines.length > 1 ? 40 : 22;
         const pr = { x: w.x, y: w.y, vx: 0, vy: 0, a: 0, idx: pillBodiesRef.current.length, hits: 0, maxHits: 2, mb: null as any };
