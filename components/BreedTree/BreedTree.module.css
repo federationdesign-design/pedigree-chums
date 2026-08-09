@@ -1464,3 +1464,17 @@
   70%  { transform: translate(-50%, -20px) scale(1); opacity: 1; }
   100% { transform: translate(-50%, -46px) scale(0.9); opacity: 0; }
 }
+
+/* DESKTOP INFO-BOX WIDTH CAP. Parked at the very end so it wins by last-rule
+   over the .asideDocked "max-width: none" above. The docked learn box is a
+   percentage (53.6% container, 80% caption inside it), snug on a phone but
+   ballooning on desktop into a wide empty band past the text. Cap the container
+   at 500px on desktop only: the caption follows to 400px and the chum rail, hung
+   off the container's right edge, moves in with it. Desktop-only via min-width,
+   so the mobile percentages below 900px are untouched. This pairs with the
+   max-width: 900px block that sets this same box's top. */
+@media (min-width: 901px) {
+  .asideDocked {
+    max-width: 500px;
+  }
+}
