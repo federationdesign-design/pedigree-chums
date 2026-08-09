@@ -92,6 +92,12 @@ const RSTEP = 128;
 const SPREAD1 = Math.PI * 1.5;
 // deeper generations fan in a tighter arc out along the branch
 const SPREADN = Math.PI * 0.9;
+// B2, the lift fan only: the widest it opens, tip to tip, before children are
+// pushed outward rather than fanned any wider. The fan is centred straight up,
+// so at PI the outermost pair would reach the parent's horizontal, the geometric
+// ceiling; kept just under it so the outermost pill stays above the card, not
+// level with it. One number to retune the arc-versus-ring trade.
+const MAX_FAN_SPAN = Math.PI * 0.9;
 // how far the whole fan is allowed to lean to match the dog's tilt
 const MAX_LEAN = 0.34;
 // size of the breed image card that pops out beside a clicked circle
@@ -168,6 +174,13 @@ function countProgenitors(n: LineageNode): number {
 const PIT_NODE_SCALE = 0.78;
 export function radius(share: number) {
   return Math.max(21, 5 * Math.sqrt(share));
+}
+// The node name pill's drawn width, matching the pit pill exactly (7.4 per char,
+// +14 padding, +10 for a second line, floored at 44). One definition so the
+// placement that spaces siblings on it and the render that draws it cannot drift.
+// Takes the already-split lines so the caller pays for splitName once.
+function nodePillWidth(lines: string[]): number {
+  return Math.max(44, Math.max(...lines.map((l) => l.length)) * 7.4 + 14 + (lines.length > 1 ? 10 : 0));
 }
 
 /* ONE RING RULE, FOR THE PIT AND FOR THE LAYER A DOG IS LIFTED ONTO.
@@ -776,14 +789,8 @@ export default function LineageMap({
       // connector is drawn only when the ring has been pushed past the parent's
       // edge, so a line appears exactly when there is a gap to justify it and
       // never as a stub between two touching discs.
-      //
-      // A pair also gets a wider fan, so both can sit on the shoulder without
-      // crowding each other.
-      const spreadUsed = circular && cnt === 2 ? Math.max(spread, Math.PI * 1.1) : spread;
-      const step = spreadUsed / Math.max(cnt, 2);
       const kidR = Math.max(...kids.map((k) => rOf(k)), 1);
       const SIB_GAP = 8;
-      const fitD = cnt < 2 ? 0 : (2 * kidR + SIB_GAP) / (2 * Math.max(0.05, Math.sin(step / 2)));
       // Tucked, but poking clear. The root card is painted AFTER these nodes on
       // a multi-child dog, so anything sitting too far in is simply covered by
       // the photograph, which is what was hiding them. The extra 18 is the
@@ -791,7 +798,48 @@ export default function LineageMap({
       // is itself 11 wide.
       const NODE_POKE = 18;
       const shoulderD = rOf(n) + kidR * 0.2 + NODE_POKE;
-      const ringD = Math.max(shoulderD, fitD);
+      // MINI PIT (non-circular): fixed fan, ring is the larger of the shoulder
+      // and the node-width fit, exactly as before.
+      let step = spread / Math.max(cnt, 2);
+      const fitD = cnt < 2 ? 0 : (2 * kidR + SIB_GAP) / (2 * Math.max(0.05, Math.sin(step / 2)));
+      let ringD = Math.max(shoulderD, fitD);
+      // B2, THE LIFT: siblings are spaced on their PILL width, not their disc.
+      // Widen the fan FIRST, holding the ring tucked on the shoulder, and push the
+      // ring outward only once the fan reaches MAX_FAN_SPAN. So children stay as
+      // near the card edge as the arc can keep them and move out only when they
+      // must. Separation is the wider of the pill and the disc, so tiny pills
+      // still cannot let two discs touch. The fan stays centred straight up.
+      if (circular && cnt >= 2) {
+        const maxPill = Math.max(...kids.map((k) => nodePillWidth(splitName(k.name))));
+        const sepNeed = Math.max(maxPill, 2 * kidR) + SIB_GAP;
+        const stepAtShoulder = 2 * Math.asin(Math.min(1, sepNeed / (2 * shoulderD)));
+        if ((cnt - 1) * stepAtShoulder <= MAX_FAN_SPAN) {
+          step = stepAtShoulder; ringD = shoulderD;                        // fan widened, ring tucked
+        } else {
+          step = MAX_FAN_SPAN / (cnt - 1);                                 // fan maxed
+          ringD = Math.max(shoulderD, sepNeed / (2 * Math.sin(step / 2))); // then pushed out
+        }
+        // WALL CLAMP, modelled on the solo path above. If an outermost pill would
+        // run past the viewport edge, narrow the fan one degree at a time, drawing
+        // the children in toward the vertical. That overlaps the pills toward the
+        // centre, which is the ruling: an overlap you can read beats a pill you
+        // cannot see. The ring stays where the arc-first step left it; only the
+        // angle tightens, so the outermost pill walks back on-screen.
+        const vw = typeof window !== "undefined" ? window.innerWidth : 0;
+        if (vw > 0) {
+          const clears = (st: number) => {
+            for (let i = 0; i < cnt; i++) {
+              const a = center + (i - (cnt - 1) / 2) * st;
+              const cx = n._x + Math.cos(a) * ringD;
+              const half = Math.max(rOf(kids[i]), nodePillWidth(splitName(kids[i].name)) / 2);
+              if (cx - half < WALL_PAD || cx + half > vw - WALL_PAD) return false;
+            }
+            return true;
+          };
+          const stepR = (2 * Math.PI) / 180;
+          while (step > 0 && !clears(step)) step = Math.max(0, step - stepR);
+        }
+      }
       kids.forEach((k, i) => {
         const a = center + (i - (cnt - 1) / 2) * step;
         const d2 = circular ? ringD : dist;
@@ -1842,14 +1890,12 @@ export default function LineageMap({
                       {INSTR_NAMES.has(breed.name) ? (n.value ?? "") : `${share}%`}
                     </text>
                     {(hasKids || !autoExposed.has(n._id)) && !(circular && n.name === breed.name) ? (() => {
-                      // Wrap and size the pill EXACTLY as the pit pill does, so a
-                      // node reads identically whether it is here or dropped in the
-                      // pit: shared splitName, width off the LONGEST line at 7.4 per
-                      // char, +14 padding, +10 two-line extra, floored at 44; height
-                      // 40 wrapped and 22 not. (The root TAG pill stays 9.5/+28, it
-                      // is the card's own name, not a sibling.)
+                      // The pill is drawn at nodePillWidth, the SAME width the
+                      // placement spaces siblings on, so the picture and the spacing
+                      // can never drift. It matches the pit pill exactly. (The root
+                      // TAG pill stays 9.5/+28, it is the card's own name.)
                       const nmLines = splitName(n.name);
-                      const nmW = Math.max(44, Math.max(...nmLines.map((l) => l.length)) * 7.4 + 14 + (nmLines.length > 1 ? 10 : 0));
+                      const nmW = nodePillWidth(nmLines);
                       const nmH = nmLines.length > 1 ? 40 : 22;
                       // Owner review: the name sat above the circle, so the
                       // topmost one ran off the screen. It now sits inside,
