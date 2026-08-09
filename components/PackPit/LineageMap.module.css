@@ -108,26 +108,37 @@
 .node:hover .discPit {
   stroke-width: calc(var(--ring, 5px) * 1.4);
 }
+/* The node's text and pill are DECORATION and must never catch the pointer. The
+   node's own circle (.disc, which inherits auto from .node) owns the hover. This
+   matters since change 2 moved the name pill onto a touching side, where it now
+   overlaps a NEIGHBOUR node: if it caught the pointer it would fire its own
+   node's hover instead of the one under it, and the wrong circle stayed selected.
+   pct and the "+N inside" text get the same rule so no decoration can ever steal
+   a hover from the circle beneath it. */
 .pct {
   font-family: var(--font-body), system-ui, sans-serif;
   font-weight: 800;
   fill: var(--navy);
+  pointer-events: none;
 }
 .nm {
   font-family: var(--font-body), system-ui, sans-serif;
   font-weight: 800;
   font-size: 13px;
   fill: var(--white);
+  pointer-events: none;
 }
 .nmPill {
   fill: var(--navy);
   filter: drop-shadow(0 2px 0 rgba(10, 58, 87, 0.35));
+  pointer-events: none;
 }
 .plus {
   font-family: var(--font-body), system-ui, sans-serif;
   font-weight: 800;
   font-size: 11px;
   fill: var(--navy);
+  pointer-events: none;
 }
 
 .rootCard {
