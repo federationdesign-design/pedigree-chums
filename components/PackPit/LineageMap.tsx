@@ -182,6 +182,22 @@ export function radius(share: number) {
 function nodePillWidth(lines: string[]): number {
   return Math.max(44, Math.max(...lines.map((l) => l.length)) * 7.4 + 14 + (lines.length > 1 ? 10 : 0));
 }
+// Does a line segment cross an axis-aligned rectangle? Used by the change-2 pill
+// placement to score a candidate against the connector lines. Inside-either-end
+// short-circuits; otherwise test the segment against the four rect edges.
+function segHitsRect(x1: number, y1: number, x2: number, y2: number, rx: number, ry: number, rw: number, rh: number): boolean {
+  const inside = (x: number, y: number) => x >= rx && x <= rx + rw && y >= ry && y <= ry + rh;
+  if (inside(x1, y1) || inside(x2, y2)) return true;
+  const ss = (ax: number, ay: number, bx: number, by: number, cx: number, cy: number, dx: number, dy: number) => {
+    const d = (bx - ax) * (dy - cy) - (by - ay) * (dx - cx);
+    if (d === 0) return false;
+    const t = ((cx - ax) * (dy - cy) - (cy - ay) * (dx - cx)) / d;
+    const u = ((cx - ax) * (by - ay) - (cy - ay) * (bx - ax)) / d;
+    return t >= 0 && t <= 1 && u >= 0 && u <= 1;
+  };
+  return ss(x1, y1, x2, y2, rx, ry, rx + rw, ry) || ss(x1, y1, x2, y2, rx + rw, ry, rx + rw, ry + rh) ||
+         ss(x1, y1, x2, y2, rx + rw, ry + rh, rx, ry + rh) || ss(x1, y1, x2, y2, rx, ry + rh, rx, ry);
+}
 
 /* ONE RING RULE, FOR THE PIT AND FOR THE LAYER A DOG IS LIFTED ONTO.
 
@@ -899,6 +915,64 @@ export default function LineageMap({
   const tagLines = circular ? splitName(breed.name) : [breed.name];
   const tagW = Math.max(...tagLines.map((l) => l.length)) * 9.5 + 28 + (tagLines.length > 1 ? 14 : 0);
   const tagH = tagLines.length > 1 ? 60 : 32;
+  // CHANGE 2: on the lift, each node pill picks the side of its node with the most
+  // room instead of sitting welded inside it. One pass off `shown`, so every node
+  // position is known before any pill lands. Four candidates, each TOUCHING the
+  // node (above/below/left/right), scored in priority order: the lifted card, the
+  // other nodes, the pills already placed, the connector lines, then last the
+  // viewport edge (the B2 wall check). The pill moves with its node, no leader
+  // line. Off the lift the pill keeps its old welded spot, so nothing else moves.
+  const pillPlacement = useMemo(() => {
+    const place = new Map<string, { ox: number; oy: number }>();
+    if (!circular) return place;
+    const vw = typeof window !== "undefined" ? window.innerWidth : 0;
+    const withPill = shown.filter((n) =>
+      !!n._parent && !soloLeaf &&
+      (!!(n.children && n.children.length) || !autoExposed.has(n._id)) &&
+      n.name !== breed.name
+    );
+    const info = new Map<string, { r: number; w: number; h: number }>();
+    for (const n of withPill) {
+      const share = Math.round((n._leaves / (n._parent as Node)._leaves) * 100);
+      const lines = splitName(n.name);
+      info.set(n._id, { r: nodeR(share), w: nodePillWidth(lines), h: lines.length > 1 ? 40 : 22 });
+    }
+    const cardCx = breed.x, cardCy = breed.y - 75, cardR = liftR; // the root card, drawn 75 up
+    const segs = shown.filter((n) => !!n._parent && !soloLeaf && !n._tucked)
+      .map((n) => { const p = n._parent as Node; return { x1: p._x, y1: p._y, x2: n._x, y2: n._y }; });
+    const rectCircle = (rx: number, ry: number, rw: number, rh: number, cx: number, cy: number, cr: number) => {
+      const nx = Math.max(rx, Math.min(cx, rx + rw)), ny = Math.max(ry, Math.min(cy, ry + rh));
+      return Math.hypot(cx - nx, cy - ny) < cr;
+    };
+    const rectRect = (ax: number, ay: number, aw: number, ah: number, bx: number, by: number, bw: number, bh: number) =>
+      ax < bx + bw && ax + aw > bx && ay < by + bh && ay + ah > by;
+    const GAP = 4;
+    const placed: { x: number; y: number; w: number; h: number }[] = [];
+    for (const n of withPill) {
+      const { r, w, h } = info.get(n._id)!;
+      const cands = [
+        { ox: 0, oy: -(r + h / 2 + GAP) }, // above
+        { ox: 0, oy: (r + h / 2 + GAP) },  // below
+        { ox: -(r + w / 2 + GAP), oy: 0 }, // left
+        { ox: (r + w / 2 + GAP), oy: 0 },  // right
+      ];
+      let best = cands[0], bestPen = Infinity;
+      for (const c of cands) {
+        const rx = n._x + c.ox - w / 2, ry = n._y + c.oy - h / 2;
+        let pen = 0;
+        if (rectCircle(rx, ry, w, h, cardCx, cardCy, cardR)) pen += 100000;                                        // 1 card
+        for (const o of withPill) if (o !== n) { const oi = info.get(o._id)!; if (rectCircle(rx, ry, w, h, o._x, o._y, oi.r)) pen += 10000; } // 2 nodes
+        for (const p of placed) if (rectRect(rx, ry, w, h, p.x, p.y, p.w, p.h)) pen += 1000;                       // 3 pills
+        for (const s of segs) if (segHitsRect(s.x1, s.y1, s.x2, s.y2, rx, ry, w, h)) pen += 100;                   // 4 connectors
+        if (vw > 0 && (rx < WALL_PAD || rx + w > vw - WALL_PAD)) pen += 10;                                        // 5 viewport, lowest
+        if (pen < bestPen) { bestPen = pen; best = c; }
+      }
+      place.set(n._id, best);
+      placed.push({ x: n._x + best.ox - w / 2, y: n._y + best.oy - h / 2, w, h });
+    }
+    return place;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [shown, circular, soloLeaf, breed.x, breed.y, breed.name, autoExposed, liftR]);
   const clip = "lm-clip-root";
   // Mini pit, a dog with a tree: the root card and the Complete button inside it
   // are drawn in a second svg on top of the placed cards. Lifting the cards down
@@ -1913,18 +1987,20 @@ export default function LineageMap({
                       const nmLines = splitName(n.name);
                       const nmW = nodePillWidth(nmLines);
                       const nmH = nmLines.length > 1 ? 40 : 22;
-                      // Owner review: the name sat above the circle, so the
-                      // topmost one ran off the screen. It now sits inside,
-                      // near the top of the circle, which is how it reads on a
-                      // phone where the circles are small enough for the old
-                      // position to stay on screen.
+                      // CHANGE 2: sit the pill where the placement pass put it, the
+                      // clearest of four touching sides on the lift. Off the lift it
+                      // keeps its old spot inside the top of the circle (nmY), how it
+                      // reads on a phone with small circles.
                       const nmY = -r + 22;
+                      const off = circular ? pillPlacement.get(n._id) : undefined;
+                      const pcx = off ? off.ox : 0;
+                      const pcy = off ? off.oy : nmY;
                       return (
                         <g>
-                          <rect className={styles.nmPill} x={-nmW / 2} y={nmY - nmH / 2} width={nmW} height={nmH} rx={nmH / 2} />
+                          <rect className={styles.nmPill} x={pcx - nmW / 2} y={pcy - nmH / 2} width={nmW} height={nmH} rx={nmH / 2} />
                           {nmLines.map((ln, li) => (
                             <text key={li} className={styles.nm} textAnchor="middle" dominantBaseline="central"
-                              y={nmLines.length > 1 ? (li === 0 ? nmY - 8 : nmY + 8) : nmY}>
+                              x={pcx} y={nmLines.length > 1 ? (li === 0 ? pcy - 8 : pcy + 8) : pcy}>
                               {ln}
                             </text>
                           ))}
