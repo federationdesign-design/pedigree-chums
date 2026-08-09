@@ -2104,8 +2104,9 @@ export default function BreedTree({
      needs its own piece of state to render from. */
   const [takenChum, setTakenChum] = useState<number | null>(null);
   // Mirrors of the two card states so the per-frame chum paint can read them
-  // without a render, the same reason pitMenuRef exists. The floor state itself
-  // lives on the body (pr.onFloor), set by the collision handlers below.
+  // without a render, the usual reason a ref shadows state in this file. The
+  // floor state itself lives on the body (pr.onFloor), set by the collision
+  // handlers below.
   const armedChumRef = useRef<number | null>(null);
   const takenChumRef = useRef<number | null>(null);
   useEffect(() => { armedChumRef.current = armedChum; takenChumRef.current = takenChum; }, [armedChum, takenChum]);
@@ -2487,11 +2488,6 @@ export default function BreedTree({
   type UiKind = "close" | "desc" | "learn" | "leave" | "restart";
   type UiBody = { x: number; y: number; vx: number; vy: number; r: number; half: number; a: number; va: number; fixed: boolean; hits: number; kind: UiKind; mb?: unknown; mbIn?: boolean; id?: number; spawned?: boolean };
   const uiBodiesRef = useRef<UiBody[] | null>(null);
-  // pitMenuRef is a Stage-1 vestige. The boolean pitMenu it used to mirror is
-  // gone: the corner X now SPAWNS a pair (see the pile-up state below) rather
-  // than toggling one pair in and out. The dead frame-loop sync still reads this
-  // ref, so it stays false here until Stage 2 deletes both the sync and this ref.
-  const pitMenuRef = useRef(false);
   // THE PIT-MENU PILE-UP. Every tap of the corner X during a round drops another
   // red-leave + green-restart PAIR into the pit, up to 8; they never leave, and
   // using one is how you get out. This id-keyed list replaces the pitMenu boolean
@@ -4815,35 +4811,6 @@ export default function BreedTree({
           }
         }
         const uis = uiBodiesRef.current as any[] | null;
-        /* THE MENU'S IN AND OUT. Driven from the ref rather than from React, so
-           it happens inside the loop that owns the world. Opening drops each
-           square from the corner X with a nudge, so they fall in rather than
-           appearing. Closing takes them straight back out. */
-        if (uis) {
-          const want = pitMenuRef.current;
-          for (const u of uis) {
-            if (u.kind !== "leave" && u.kind !== "restart") continue;
-            // Spawned pairs manage their own world membership at spawn and never
-            // leave, so this dead want-driven add/remove must not touch them. All
-            // leave/restart bodies are spawned now, so this skips every one; the
-            // whole block is deleted in Stage 2, this just keeps it inert.
-            if (u.spawned) continue;
-            if (want && !u.mbIn) {
-              const anchor = uis.find((z) => z.kind === "close");
-              const px0 = pxFromWorld(anchor ? anchor.x : u.x, anchor ? anchor.y : u.y);
-              MBody.setPosition(u.mb, px0);
-              MBody.setAngle(u.mb, 0);
-              // A sideways nudge each, so they do not stack in one column.
-              MBody.setVelocity(u.mb, { x: u.kind === "leave" ? -3.2 : -1.1, y: 2.4 });
-              MBody.setAngularVelocity(u.mb, u.kind === "leave" ? -0.12 : 0.12);
-              Composite.add(world, u.mb);
-              u.mbIn = true;
-            } else if (!want && u.mbIn) {
-              Composite.remove(world, u.mb);
-              u.mbIn = false;
-            }
-          }
-        }
         if (uis) for (const u of uis) {
           if (u.mbIn === false) continue;
           if (!u.fixed && u.mb) {
