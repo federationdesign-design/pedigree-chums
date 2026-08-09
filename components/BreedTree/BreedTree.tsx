@@ -5184,6 +5184,12 @@ export default function BreedTree({
   const [renderRail, setRenderRail] = useState<Array<{ name: string; slug: string; image: string; note: string; leaving?: boolean }>>(() => railDogs);
   useEffect(() => {
     setRenderRail((prev) => {
+      // A zero-chum node clears the rail AT ONCE, no exit animation. Without this
+      // the previous node's cards would animate out on top of it, reading as if
+      // this node owned them (a 12-chum parent's dogs flashing on a zero-chum
+      // child). No cards to leave means no flash, so the empty rail reads as
+      // intentional. Deep ancestors legitimately have zero chums, see lineageArchive.
+      if (!railDogs.length) return [];
       const next = new Set(railDogs.map((d) => d.slug));
       const leaving = prev.filter((p) => !p.leaving && !next.has(p.slug)).map((p) => ({ ...p, leaving: true }));
       return [...railDogs.map((d) => ({ ...d })), ...leaving];
