@@ -24,13 +24,29 @@ Read them at the start of every session and follow them without exception.
 ## The Vercel build trap (critical)
 
 CSS Modules will HARD-FAIL the Vercel build on any bare `:global(.foo)`
-selector with no local class. This passes `./node_modules/.bin/tsc --noEmit` silently, so it
-is invisible until deploy. Always compound: `.localClass:global(.foo)`.
+selector: one with no local class anywhere in it. This passes
+`./node_modules/.bin/tsc --noEmit` silently, so it is invisible until deploy.
+The fix is to give the selector a local class; it does NOT have to be
+compounded.
+
+Both of these are safe, because each carries a local class:
+
+- `.localClass:global(.foo)` (compound) targets one element that has both
+  the local class and `foo`.
+- `.localClass :global(.foo)` (descendant, note the space) targets `foo`
+  elements nested inside a `.localClass` element.
+
+These are different selectors with different meanings. Never convert one
+into the other to satisfy this rule: it changes what the CSS matches and
+will break styling. Both forms build and deploy fine as they are.
+
 Before any commit that touches module CSS, run:
 
     grep -n ":global(\.[a-zA-Z-]*) *{" **/*.module.css
 
-and confirm every hit is compounded.
+and confirm no hit is bare. A hit is fine as long as a local class appears
+somewhere in the same selector, whether compounded or as an ancestor. Only
+a selector with no local class at all is the bug.
 
 ## Verification
 
