@@ -24,6 +24,22 @@ for (const b of breeds) {
   }
 }
 
+// WHY A DEEP ANCESTOR CAN SHOW ZERO CHUMS, so the next reader does not chase the
+// depth cap alone. Two causes compound:
+//   1. The cap. getLineage stops at MAX_LINEAGE_DEPTH = 5, so an ancestor sitting
+//      more than 5 steps from every modern pack dog never appears in a tree above
+//      and never enters this index. Measured: "Ancient Molossers" is a childless
+//      LEAF at the depth-5 edge in all 12 of its chum trees.
+//   2. Missing ancestry. Some of these nodes have NO lineage children of their
+//      own: getLineage("Ancient Molossers") is childless. Its apparent children
+//      ("Old mastiffs of the ancient East", "Alaunt war dogs", "Dogs of the Alan
+//      horsemen") exist only inline in the Ancient Mastiff LEVEL's authored tree,
+//      not as reusable ancestry, so no pack dog can reach them by any path.
+// So a zero-chum deep ancestor is honest, not a bug here. Do NOT inherit a
+// parent's chums downward to fill the gap: measured, 0 of Ancient Molossers' 12
+// descend through that child or any sibling, so it would fabricate connections.
+// Authoring the real ancestry is the Tudor job (tudor-trail-brief-v3.md).
+
 // Pack dogs descending from any of the given ancestor names, in pack order.
 export function descendantPackBreeds(ancestorNames: string[]): Breed[] {
   const out = new Set<string>();
