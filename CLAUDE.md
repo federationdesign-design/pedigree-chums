@@ -24,7 +24,7 @@ Read them at the start of every session and follow them without exception.
 ## The Vercel build trap (critical)
 
 CSS Modules will HARD-FAIL the Vercel build on any bare `:global(.foo)`
-selector with no local class. This passes `npx tsc --noEmit` silently, so it
+selector with no local class. This passes `./node_modules/.bin/tsc --noEmit` silently, so it
 is invisible until deploy. Always compound: `.localClass:global(.foo)`.
 Before any commit that touches module CSS, run:
 
@@ -34,8 +34,8 @@ and confirm every hit is compounded.
 
 ## Verification
 
-- `npx tsc --noEmit` must be clean before every commit.
-- `npx next build` may fail locally if Google Fonts is unreachable; that
+- `./node_modules/.bin/tsc --noEmit` must be clean before every commit.
+- `./node_modules/.bin/next build` may fail locally if Google Fonts is unreachable; that
   alone is not a code failure, but the `:global` audit above still applies.
 - Visual work must be verified by running `npm run dev` and taking
   Playwright screenshots at 390px and 1280px, compared against the mockups
