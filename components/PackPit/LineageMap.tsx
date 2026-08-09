@@ -1072,10 +1072,26 @@ export default function LineageMap({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [circular]);
   const [scattered, setScattered] = useState(false);
-  // Mini pit: the tag pill (and on Complete, every node and rod) tips into the
-  // pit as live physics objects, main-pit style. Positions are CURRENT layer
-  // positions in client px; the pit gives pills a hit limit once they land.
+  // Mini pit: on Complete the tag pill, every node circle and its rod, AND every
+  // node's own name pill tip into the pit as live physics objects, main-pit
+  // style. Positions are CURRENT layer positions in client px; the pit gives
+  // pills a hit limit once they land.
   const circR = liftR;
+  // The child node pills for a scatter: every visible non-root node that carries
+  // a pill on the layer, at its live pit position, drawn at the canonical
+  // nodePillWidth (the one width the layer itself uses). Shared by both scatter
+  // paths so a node tips into the pit as the SAME pill it showed. Capped at 50;
+  // only the two biggest trees (Irish Setter 62, Golden Retriever 54) come near
+  // it. The pit ignores w and re-measures from the name, so w is belt-and-braces.
+  const scatterPills = () =>
+    shown
+      .filter((n) => n._parent)
+      .filter((n) => (n.children && n.children.length) || !autoExposed.has(n._id))
+      .slice(0, 50)
+      .map((n) => {
+        const share = Math.round((n._leaves / (n._parent as Node)._leaves) * 100);
+        return { x: n._x + pan.x, y: n._y - nodeR(share) - 13 + pan.y, w: nodePillWidth(splitName(n.name)), name: n.name };
+      });
   const emitCircularScatter = (includeNodes: boolean) => {
     const pills = [{ x: breed.x + pan.x, y: breed.y + pan.y + circR, w: tagW, name: breed.name }];
     if (!includeNodes) { onScatter?.({ circles: [], rods: [], pills }); return; }
@@ -1098,6 +1114,9 @@ export default function LineageMap({
     const big = soloLeaf
       ? { x: breed.x + pan.x, y: breed.y + pan.y, r: circR, name: breed.name }
       : undefined;
+    // The child pills join the card's tag pill. Skipped for a solo dog, whose
+    // only "child" is a synthetic copy of itself and would just double the tag.
+    if (!soloLeaf) pills.push(...scatterPills());
     onScatter?.({ circles: soloLeaf ? [] : circles, rods: soloLeaf ? [] : rods, pills, big });
   };
   // Green Complete pressed: at the very same instant the layer stops drawing
@@ -1457,10 +1476,7 @@ export default function LineageMap({
       const p = n._parent as Node;
       return { x1: p._x + pan.x, y1: p._y + pan.y, x2: n._x + pan.x, y2: n._y + pan.y, lit: open.has(n._id) };
     });
-    const pills = vis
-      .filter((n) => (n.children && n.children.length) || !autoExposed.has(n._id))
-      .slice(0, 50)
-      .map((n) => ({ x: n._x + pan.x, y: n._y - nodeR(shareOf(n)) - 13 + pan.y, w: n.name.length * 7.4 + 22, name: n.name }));
+    const pills = scatterPills();
     onScatter?.({ circles, rods, pills });
     tween(520, (t) => setCollectT(t), () => {
       burstAt(50 - pan.x, vp.h - 133 - pan.y, ROOT * 1.5); // dot explosion centred on the bottom-left tally number
