@@ -88,7 +88,7 @@ Current configuration is **MVP-4.3**: ten questions, result-contract schema 2.0.
 Two commands prove the state of it:
 
     npm run build
-    npx tsx scripts/superpower-verify-contract.mts
+    ./node_modules/.bin/tsx scripts/superpower-verify-contract.mts
 
 The verifier enumerates all 1,024 answer arrays through the production engine
 and checks the canonical hash, the six state counts, the golden results file
@@ -123,7 +123,7 @@ and writes no trailing newline to match the committed file.
 Content is authored in the workbook, never retyped in code, so any wording
 change goes back to the workbook and reruns the generator. After running it,
 confirm the round trip: `git diff` on the config must be empty and
-`npx tsx scripts/superpower-verify-contract.mts` must still pass against the
+`./node_modules/.bin/tsx scripts/superpower-verify-contract.mts` must still pass against the
 canonical hash.
 
 It was previously broken: it produced the pre-sidekick config shape and had
