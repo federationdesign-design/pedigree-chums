@@ -226,6 +226,14 @@ export default function PackPit() {
   // Cannot fire before 30s to avoid triggering during the opening cascade.
   const gameOverRef = useRef(false);
   const pendingGameOver = useRef(false); // queued game over, fires when all overlays close
+  // TRUE THE MOMENT THE ROUND ENDS, WHICHEVER WAY. A loss sets gameOverRef at
+  // once; a win (pack complete) sets pendingGameOver at once and only flips
+  // gameOverRef later, when the overlays close. Neither ref alone catches both
+  // outcomes early, so this reads both. It is NOT "the PitEnd screen is showing":
+  // that is the gameOver state, which turns true later still, when the overlay
+  // renders. Scoring must stop when the round ends, not when the screen appears,
+  // so every score path gates on this.
+  const roundOver = () => gameOverRef.current || pendingGameOver.current;
   useEffect(() => {
     const startTime = Date.now();
     const onResult = (e: Event) => {
@@ -1018,7 +1026,7 @@ export default function PackPit() {
           lastDraggedBall = null;
           poof(b.position.x, 0, b.plugin.half * 1.5);
           numAt(b.position.x, 20, 250);
-          setScore((s) => s + 500);
+          if (!roundOver()) setScore((s) => s + 500);
           Composite.remove(engine.world, b);
         }
       });
@@ -1173,7 +1181,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
       };
       // little white numbers that flash up on a hit or tap (% circles, cards, buttons)
       const numbers: any[] = [];
-      const numAt = (x: number, y: number, val: number, size = 15, score = true, col?: string) => { numbers.push({ x, y, val, born: performance.now(), life: 650, size, col }); if (score && !gameOverRef.current) setScore((s) => s + val); };
+      const numAt = (x: number, y: number, val: number, size = 15, score = true, col?: string) => { numbers.push({ x, y, val, born: performance.now(), life: 650, size, col }); if (score && !roundOver()) setScore((s) => s + val); };
       // the shake button flashes 75 from its own position and adds it to the running total
       flashShakeRef.current = () => {
         const btn = shakeBtnRef.current; if (!btn) return;
@@ -2550,7 +2558,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
           if (!other || other.isStatic) continue; // the walls, floor and ceiling do not count
           if (!bb.plugin.hits || bb.plugin.hits < 1) continue; // forcefield: ignore until user ignites
           bb.plugin.objHits = (bb.plugin.objHits || 0) + 1;
-          setScore((s) => s + 2);
+          if (!roundOver()) setScore((s) => s + 2);
           if (bb.plugin.objHits >= 100) detonateBomb(bb);
         }
       };
@@ -3105,7 +3113,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
         <span className={styles.shakeText}>Shake</span>
       </button>
 
-      {activeBreed && <LineageMap breed={activeBreed} onClose={() => setActiveBreed(null)} onRemove={(name) => { removeBreedRef.current(name); if (!["Deal the cards","Head outside","Spot real dogs","Match to your chum","Find more chums","Most chums wins"].includes(name)) { setCollected((c) => { const next = c + 1; if (next >= 54) { pendingGameOver.current = true; }; return next; }); setCollectedChums((cs) => [...cs, name]); } }} onScatter={(c) => scatterRef.current(c)} onScore={(v) => setScore((s) => s + v)} currentScore={score}  />}
+      {activeBreed && <LineageMap breed={activeBreed} onClose={() => setActiveBreed(null)} onRemove={(name) => { removeBreedRef.current(name); if (!["Deal the cards","Head outside","Spot real dogs","Match to your chum","Find more chums","Most chums wins"].includes(name)) { setCollected((c) => { const next = c + 1; if (next >= 54) { pendingGameOver.current = true; }; return next; }); setCollectedChums((cs) => [...cs, name]); } }} onScatter={(c) => scatterRef.current(c)} onScore={(v) => { if (!roundOver()) setScore((s) => s + v); }} currentScore={score}  />}
       {/* THE END SCREEN, rendered here rather than on /about. Everything it needs
           is live state on this page, which is why it can be self-contained. */}
       {gameOver && (
