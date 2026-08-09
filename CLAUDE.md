@@ -111,12 +111,24 @@ Not style preferences. Breaking any of these is a bug.
 - Fixed power order is Focus, Vision, Zoom, Ideas, Energy. It governs chart axes,
   every list, placeholder substitution and the final tie-break
 
-### Never run the config generator
+### Regenerating the config
 
-`scripts/superpower-generate-config.mjs` still produces the pre-sidekick config
-shape. It has already silently overwritten the live config once, stripping
-`sidekickRoles` and breaking the verifier while `npm run build` still passed. It
-is on the list to fix and is not fixed yet.
+`scripts/superpower-generate-config.mjs` is the way to rebuild the config from
+the workbook. It reads `whats_your_superpower_question_bank_v4_3.xlsx` and
+reproduces `config.mvp-4.3.json` byte for byte: it emits `sidekickRoles`, keys
+`jointTitles` in fixed power order, derives every count (question count,
+opportunities per power, raw range) from the workbook rather than a literal,
+and writes no trailing newline to match the committed file.
+
+Content is authored in the workbook, never retyped in code, so any wording
+change goes back to the workbook and reruns the generator. After running it,
+confirm the round trip: `git diff` on the config must be empty and
+`npx tsx scripts/superpower-verify-contract.mts` must still pass against the
+canonical hash.
+
+It was previously broken: it produced the pre-sidekick config shape and had
+silently overwritten the live config once, stripping `sidekickRoles` and
+breaking the verifier while `npm run build` still passed. That is fixed.
 
 ### Two traps that have already cost time
 
