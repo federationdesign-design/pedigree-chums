@@ -64,3 +64,64 @@ and confirm every hit is compounded.
   named placeholder and log it in `PLACEHOLDERS.md` at the repo root.
   Never invent campaign values, prices, dates, moderation copy or asset
   paths.
+
+## What's Your Superpower specifics
+
+Current configuration is **MVP-4.3**: ten questions, result-contract schema 2.0.
+
+Two commands prove the state of it:
+
+    npm run build
+    npx tsx scripts/superpower-verify-contract.mts
+
+The verifier enumerates all 1,024 answer arrays through the production engine
+and checks the canonical hash, the six state counts, the golden results file
+and the structural rules. If it passes, the game is correct. If it fails, read
+the failure. Never adjust the expected hash or the expected counts to make it
+pass.
+
+Expected hash:
+`ae249fcd7e5455a72c940604fa52525b261cf7cdcf03bc6ea007cbb9636c682a`
+
+### Structural invariants
+
+Not style preferences. Breaking any of these is a bug.
+
+- Each of the five powers holds exactly 4 primary and 4 secondary opportunities
+- Every question uses exactly 4 distinct powers, so no power scores on both answers
+- Raw range 0 to 12 for every power
+- Every answer array totals exactly 30 raw points
+- A four-way tie is impossible with ten questions, so `TIE_FOUR` is asserted at 0
+- Fixed power order is Focus, Vision, Zoom, Ideas, Energy. It governs chart axes,
+  every list, placeholder substitution and the final tie-break
+
+### Never run the config generator
+
+`scripts/superpower-generate-config.mjs` still produces the pre-sidekick config
+shape. It has already silently overwritten the live config once, stripping
+`sidekickRoles` and breaking the verifier while `npm run build` still passed. It
+is on the list to fix and is not fixed yet.
+
+### Two traps that have already cost time
+
+**Joint title keys.** `engine.ts` builds `titleKey` for a two-way tie with
+`[...leadingPowers].sort()`, which is alphabetical, but looks the config up with
+`leadingPowers.join("+")`, which is fixed power order. Both are deliberate.
+Config `jointTitles` keys must be in fixed power order: `Focus+Vision`,
+`Focus+Zoom`, `Focus+Ideas`, `Focus+Energy`, `Vision+Zoom`, `Vision+Ideas`,
+`Vision+Energy`, `Zoom+Ideas`, `Zoom+Energy`, `Ideas+Energy`.
+
+**Question count.** Anything deriving a length from the question set must read
+`config.questions.length`, never a literal. A hard-coded 15 in the verifier
+handed the engine fifteen answers for a ten-question config.
+
+### Known departure from the house rules
+
+This page is built on a dark ground (`--sp-ground: #0b1220`), which contradicts
+the no-dark-backgrounds rule above. It was requested directly by Steve on
+6 August and is deliberate. Do not "fix" it. Whether it becomes a permanent
+carve-out or the page returns to the body gradient is an open decision, so leave
+it alone until this note says otherwise.
+
+The night palette is scoped to the `.rail` element, so the global tokens are
+untouched and no other page is affected.

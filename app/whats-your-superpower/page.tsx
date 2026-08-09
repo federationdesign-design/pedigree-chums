@@ -4,7 +4,7 @@ import Footer from "../../components/Footer/Footer";
 import SuperpowerGame from "./ui/SuperpowerGame";
 import styles from "./page.module.css";
 
-// Technical prototype (spec MVP-4.2, Phase 1). Deliberately not linked from
+// Technical prototype (spec MVP-4.3, Phase 1). Deliberately not linked from
 // the nav, the home page or any launcher: wiring into the global site layout
 // is gated on a runbook checkpoint approved by Steve.
 //

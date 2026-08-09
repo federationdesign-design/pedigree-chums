@@ -1,16 +1,16 @@
 // What's Your Superpower: result-contract verification harness.
 //
-// Enumerates all 32,768 answer arrays through the production engine and
+// Enumerates all 1,024 answer arrays through the production engine and
 // configuration, emits one canonical semantic record per array (schema
 // result-contract-2.0), and checks:
 //
 //   1. the SHA-256 of the canonical blob matches the approved value in
-//      whats_your_superpower_golden_hash_v4_2.txt
+//      whats_your_superpower_golden_hash_v4_3.txt
 //   2. the six result-state counts match the locked fire rates (spec s15)
 //   3. every rendered title | summary pair matches the approved golden
-//      results file exactly (72 distinct strings)
-//   4. structural criteria: every array totals 45 raw points, raw scores
-//      stay within 0..18, exactly one title from the correct set (T34),
+//      results file exactly (58 distinct strings)
+//   4. structural criteria: every array totals 30 raw points, raw scores
+//      stay within 0..12, exactly one title from the correct set (T34),
 //      chart emphasis sets agree with the text sets (T36), and the three
 //      sidekick states award no power and emphasise nothing (T39)
 //
@@ -27,20 +27,24 @@ import {
   type GameConfig,
   type StateId,
 } from "../app/whats-your-superpower/lib/engine";
-import rawConfig from "../app/whats-your-superpower/data/config.mvp-4.2.json";
+import rawConfig from "../app/whats-your-superpower/data/config.mvp-4.3.json";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const config = rawConfig as unknown as GameConfig;
 
 const EXPECTED_HASH =
-  "ce3437e9f3e326b90e8f67cd9ab93e81064c752cb82de956dddf91fc95da8a5b";
+  "ae249fcd7e5455a72c940604fa52525b261cf7cdcf03bc6ea007cbb9636c682a";
 const EXPECTED_COUNTS: Record<StateId, number> = {
-  SINGLE_CLOSE: 22064,
-  SINGLE_CLEAR: 3901,
-  TIE_TWO: 5959,
-  TIE_THREE: 785,
-  TIE_FOUR: 39,
-  TIE_FIVE: 20,
+  SINGLE_CLOSE: 744,
+  SINGLE_CLEAR: 58,
+  TIE_TWO: 185,
+  TIE_THREE: 33,
+  // Ten questions cannot produce a four-way tie: four powers level would need
+  // 4x >= 8 with a fifth power taking the remainder of 30, and no answer array
+  // reaches it. Asserted at zero so a future map change that reintroduces one
+  // fails loudly rather than passing unnoticed.
+  TIE_FOUR: 0,
+  TIE_FIVE: 4,
 };
 // Three states award a power, three award a sidekick role (spec section 7).
 const SIDEKICK_STATES = new Set<StateId>(["TIE_THREE", "TIE_FOUR", "TIE_FIVE"]);
@@ -67,7 +71,7 @@ const sidekickSet = new Set(
 const mainPowerTitles = new Set(POWERS.map((p) => config.powerMeta[p].mainTitle));
 
 for (let i = 0; i < N; i += 1) {
-  const pattern = i.toString(2).padStart(15, "0");
+  const pattern = i.toString(2).padStart(config.questions.length, "0");
   const answers = [...pattern].map((b) => (b === "0" ? "A" : "B")) as AnswerLetter[];
   const r = resolveResult(answers, config);
   const answerPattern = answers.join("");
@@ -128,7 +132,7 @@ for (let i = 0; i < N; i += 1) {
 
   // Structural criteria, checked on every array.
   const total = POWERS.reduce((s, p) => s + r.raw[p], 0);
-  if (total !== 45) check(false, `${answerPattern} total ${total}`);
+  if (total !== 30) check(false, `${answerPattern} total ${total}`);
   for (const p of POWERS) {
     if (r.raw[p] < config.plot.rawMin || r.raw[p] > config.plot.rawMax)
       check(false, `${answerPattern} ${p} out of range: ${r.raw[p]}`);
@@ -189,14 +193,14 @@ for (const [state, expected] of Object.entries(EXPECTED_COUNTS)) {
 }
 check(
   [...stateCounts.values()].reduce((a, b) => a + b, 0) === N,
-  "state counts total 32768"
+  "state counts total 1024"
 );
 
 // 3: rendered output matches the approved golden results file.
 const goldenPath = join(
   ROOT,
   "superpower game",
-  "whats_your_superpower_golden_results_v4_2.csv"
+  "whats_your_superpower_golden_results_v4_3.csv"
 );
 const golden = new Map<string, number>();
 for (const lineText of readFileSync(goldenPath, "utf8").trim().split("\n").slice(1)) {

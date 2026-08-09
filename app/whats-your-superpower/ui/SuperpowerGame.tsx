@@ -10,12 +10,13 @@
 //
 // LAYOUT. One horizontal scroller, the same mechanism as
 // britains-dog-history-2: native CSS scroll-snap, touch-action pan-x, no
-// hijacking and no preventDefault. Slide 0 is the intro, slides 1..15 are the
-// questions, slide 16 is the result. The result slide is only rendered once
-// every question is answered, so it cannot be swiped to early.
+// hijacking and no preventDefault. Slide 0 is the intro, then one slide per
+// question (driven by config.questions.length), then the result slide. The
+// result slide is only rendered once every question is answered, so it cannot
+// be swiped to early.
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import configJson from "../data/config.mvp-4.2.json";
+import configJson from "../data/config.mvp-4.3.json";
 import {
   resolveResult,
   type AnswerLetter,
@@ -171,7 +172,7 @@ export default function SuperpowerGame() {
         </div>
       </section>
 
-      {/* ---- Slides 1..15: one question each ------------------------------ */}
+      {/* ---- One slide per question --------------------------------------- */}
       {config.questions.map((q, index) => {
         const stored = answersByQuestion[index];
         return (
@@ -230,7 +231,7 @@ export default function SuperpowerGame() {
         );
       })}
 
-      {/* ---- Slide 16: the result. Only exists once every question is
+      {/* ---- The result slide. Only exists once every question is
              answered, so it cannot be reached early by swiping. ---------- */}
       {result ? (
         <section className={styles.slide} aria-label={`${config.copy.gameTitle} result`}>

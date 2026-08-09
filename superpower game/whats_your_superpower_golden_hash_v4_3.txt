@@ -1,0 +1,22 @@
+What's Your Superpower, configuration MVP-4.3, result-contract schema 2.0
+
+Ten questions. 1,024 answer arrays. Twenty answers give four primary and four
+secondary opportunities per power, a raw range of 0 to 12, thirty points per
+playthrough.
+
+Canonical input: one JSON record per answer array, M01 to M15 in fixed order
+(ten enabled), answer A before answer B, power arrays in fixed power order,
+sorted object keys, UTF-8, LF line endings, no presentation markup.
+
+header:  config=MVP-4.3;schema=result-contract-2.0;arrays=1024;nameset=final-1.0;sidekick=1.0
+SHA-256: ae249fcd7e5455a72c940604fa52525b261cf7cdcf03bc6ea007cbb9636c682a
+
+Audit log
+  MVP-4.0 + errata 4.0.2, main-power titles:
+  def21fc20e42201cc121353f960f2179f3587dbc61d47bdbf59001f214779559
+  MVP-4.1, result contract 1.0, provisional name set:
+  7ed0478570bb69dae75ac9cc89982597a6139256fdb80ff2341b300b47a5198e
+  MVP-4.1, result contract 1.0, name set final-1.0:
+  962ab2422f902db0c507b4c321791b1dbe87f6ec9f58ff72a3900eedd9bae329
+  MVP-4.2, sidekick contract, fifteen questions:
+  ce3437e9f3e326b90e8f67cd9ab93e81064c752cb82de956dddf91fc95da8a5b
