@@ -301,16 +301,26 @@ export default function LineageMap({
      0.31 above. Desktop is unchanged (still 446); the phone card grows to 176.
      A smooth interpolation, not a breakpoint.
 
-     The 40px floor is kept and is still dead: it did not fire once in the audit
-     of 1326 lifts. It stays as a guard against a very narrow viewport. */
+     A 250px-wide floor now sits UNDER the min(rootRadius) cap, so tapping a
+     small circle still lifts a usable card rather than a tiny one. The floor is
+     a radius of 250 / (2 + frac) = 119.6, the 250 measured as the diameter
+     including the ring, the same way the share is. It is itself capped by the
+     share, so a phone lifts a small card up to its 176 maximum and no further,
+     never past the viewport share. The old 40px floor is gone: it never bound
+     once across the 1326-lift audit. */
   const LIFT_MAX_SHARE = 0.31 + 0.14 * (1 - Math.min(1, Math.max(0, (vp.w - 390) / 1050)));
   /* The ring is a share of the radius now, so it cannot be subtracted before the
      radius is known. Solved the other way instead: the object is 2R wide plus
      one ring, and the ring is R * frac, so the whole thing is R * (2 + frac).
      Divide the budget by that and the total still lands on 31% exactly. */
   const liftRingFrac = ringFrac(1);
+  // Floor the tapped radius up to the 250-wide minimum, then cap by the share so
+  // a narrow viewport never exceeds its own maximum card (176 at 390). Both the
+  // floor and the share divide the same (2 + frac) width budget.
+  const liftFloorR = 250 / (2 + liftRingFrac);
+  const liftShareR = (vp.w * LIFT_MAX_SHARE) / (2 + liftRingFrac);
   const liftR = circular && rootRadius
-    ? Math.max(40, Math.min(rootRadius, (vp.w * LIFT_MAX_SHARE) / (2 + liftRingFrac)))
+    ? Math.min(liftShareR, Math.max(liftFloorR, rootRadius))
     : ROOT;
   const liftRingW = circular && ringColor ? liftR * liftRingFrac : 5;
   // The Learn/Complete button is a fixed 200x68. On a small card that swamps
@@ -710,7 +720,12 @@ export default function LineageMap({
       // child clears the parent's EDGE by 50px whatever size either circle is
       const rOf = (nd: Node): number => {
         const p = nd._parent;
-        if (!p) return rootRadius ? Math.min(220, Math.max(40, rootRadius)) : ROOT;
+        // Place the children around the radius the root is actually DRAWN at,
+        // liftR, so a floored small card cannot bury its own ancestors and an
+        // enlarged one cannot leave a gap. liftR already folds in the floor, the
+        // share cap and the rootRadius, so the old min(220)/max(40) clamp of the
+        // raw tapped radius is subsumed. (The mini pit uses dist, not this.)
+        if (!p) return liftR;
         return nodeR(Math.round((nd._leaves / Math.max(1, p._leaves)) * 100));
       };
       let center = circular ? -Math.PI / 2 : depth === 0 ? -Math.PI / 2 + base : n._dir;
