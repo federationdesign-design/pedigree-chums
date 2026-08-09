@@ -96,7 +96,7 @@ asset, then delete the SVG.
 
 | Placeholder | Location | Meaning | Resolve via |
 |---|---|---|---|
-| `PLACEHOLDER_COMPLETION_TIME` ("It takes about two minutes.") | `scripts/superpower-generate-config.mjs` (emitted into `app/whats-your-superpower/data/config.mvp-4.2.json` `copy.completionTime`) | The entry screen must show an approximate completion time (spec section 3) but no document specifies the value; this is a best-effort stand-in, not approved copy | Steve confirms the wording, then rerun the generator |
+| Completion time ("Takes about two minutes.") | `app/whats-your-superpower/data/config.mvp-4.3.json` `copy.completionTime` | The entry screen must show an approximate completion time (spec section 3) but no document specifies the value; this is a best-effort stand-in, not approved copy | Steve confirms the wording, then edit `copy.completionTime` in the config directly. Do NOT rerun `scripts/superpower-generate-config.mjs`: it is the broken pre-sidekick generator and must not be run |
 | Question images `q01/q03/q04/q05/q06/q07/q09/q11/q12/q15.jpg` | `public/superpower/` (referenced by `app/whats-your-superpower/ui/SuperpowerGame.tsx` via `questionImage(q.id)`) | The whole `public/superpower/` directory is absent, so every question image is a missing file (404). They are decorative (`alt=""`, the question is answerable without them), and the slot is keyed off the question id, so dropping each named file in pairs it with the right question. The dropped questions' images (q02/q08/q10/q13/q14) are no longer referenced. | Steve supplies the ten question images, numbered against the original set (M03 to q03), into `public/superpower/`; then `git add public/` |
 
 ## Resolved (no longer placeholders)
