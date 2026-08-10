@@ -92,12 +92,6 @@ const RSTEP = 128;
 const SPREAD1 = Math.PI * 1.5;
 // deeper generations fan in a tighter arc out along the branch
 const SPREADN = Math.PI * 0.9;
-// B2, the lift fan only: the widest it opens, tip to tip, before children are
-// pushed outward rather than fanned any wider. The fan is centred straight up,
-// so at PI the outermost pair would reach the parent's horizontal, the geometric
-// ceiling; kept just under it so the outermost pill stays above the card, not
-// level with it. One number to retune the arc-versus-ring trade.
-const MAX_FAN_SPAN = Math.PI * 0.9;
 // how far the whole fan is allowed to lean to match the dog's tilt
 const MAX_LEAN = 0.34;
 // size of the breed image card that pops out beside a clicked circle
@@ -181,22 +175,6 @@ export function radius(share: number) {
 // Takes the already-split lines so the caller pays for splitName once.
 function nodePillWidth(lines: string[]): number {
   return Math.max(44, Math.max(...lines.map((l) => l.length)) * 7.4 + 14 + (lines.length > 1 ? 10 : 0));
-}
-// Does a line segment cross an axis-aligned rectangle? Used by the change-2 pill
-// placement to score a candidate against the connector lines. Inside-either-end
-// short-circuits; otherwise test the segment against the four rect edges.
-function segHitsRect(x1: number, y1: number, x2: number, y2: number, rx: number, ry: number, rw: number, rh: number): boolean {
-  const inside = (x: number, y: number) => x >= rx && x <= rx + rw && y >= ry && y <= ry + rh;
-  if (inside(x1, y1) || inside(x2, y2)) return true;
-  const ss = (ax: number, ay: number, bx: number, by: number, cx: number, cy: number, dx: number, dy: number) => {
-    const d = (bx - ax) * (dy - cy) - (by - ay) * (dx - cx);
-    if (d === 0) return false;
-    const t = ((cx - ax) * (dy - cy) - (cy - ay) * (dx - cx)) / d;
-    const u = ((cx - ax) * (by - ay) - (cy - ay) * (bx - ax)) / d;
-    return t >= 0 && t <= 1 && u >= 0 && u <= 1;
-  };
-  return ss(x1, y1, x2, y2, rx, ry, rx + rw, ry) || ss(x1, y1, x2, y2, rx + rw, ry, rx + rw, ry + rh) ||
-         ss(x1, y1, x2, y2, rx + rw, ry + rh, rx, ry + rh) || ss(x1, y1, x2, y2, rx, ry + rh, rx, ry);
 }
 
 /* ONE RING RULE, FOR THE PIT AND FOR THE LAYER A DOG IS LIFTED ONTO.
@@ -790,76 +768,44 @@ export default function LineageMap({
       }
       if (cnt === 1 && depth > 0 && INSTR_NAMES.has(breed.name)) { center = n._dir + (Math.PI * 0.30); } // gentle curl for instructional
       else if (cnt === 1 && depth > 0) { const side = depth % 2 === 1 ? 1 : -1; center = n._dir + side * (Math.PI * 0.38); }
-      // MINI PIT: children sit on a ring around their parent, and the ring's
-      // radius is whichever is larger of two things.
+      // CLOCK FACE (the lift, 2+ children). Instead of a widening fan tucked onto
+      // the parent's rim, each child sits on a FIXED clock slot in the top
+      // semicircle, just OUTSIDE the parent's edge. Two things fall out of that:
+      // no node ever sits under the card or its Learn button (every slot is at or
+      // above the horizontal; 9 and 3 o'clock sit exactly on it and still clear
+      // the button below), and no node overlaps the parent, so the card painted
+      // on top can no longer cover a child. That overlap was the hover bug.
       //
-      //   the shoulder  the radius that tucks a node onto the parent's rim, so
-      //                 it overlaps and reads like the single-child card, which
-      //                 springs straight out of the big circle with no line
-      //   the fit       the smallest radius at which neighbours do not touch
-      //                 each other, worked out from the fan angle and the node
-      //                 size rather than a guessed constant
-      //
-      // Taking the larger makes it grade itself. Two children tuck onto the
-      // shoulder. Four or five are pushed out because they have to be. And the
-      // connector is drawn only when the ring has been pushed past the parent's
-      // edge, so a line appears exactly when there is a gap to justify it and
-      // never as a stub between two touching discs.
+      // shoulderD / NODE_POKE survive for the SINGLE-CHILD path only: one child
+      // still springs from the rim and reads like the solo card, with no line.
       const kidR = Math.max(...kids.map((k) => rOf(k)), 1);
-      const SIB_GAP = 8;
-      // Tucked, but poking clear. The root card is painted AFTER these nodes on
-      // a multi-child dog, so anything sitting too far in is simply covered by
-      // the photograph, which is what was hiding them. The extra 18 is the
-      // daylight that keeps a node readable against the card's own ring, which
-      // is itself 11 wide.
       const NODE_POKE = 18;
       const shoulderD = rOf(n) + kidR * 0.2 + NODE_POKE;
-      // MINI PIT (non-circular): fixed fan, ring is the larger of the shoulder
-      // and the node-width fit, exactly as before.
-      let step = spread / Math.max(cnt, 2);
-      const fitD = cnt < 2 ? 0 : (2 * kidR + SIB_GAP) / (2 * Math.max(0.05, Math.sin(step / 2)));
-      let ringD = Math.max(shoulderD, fitD);
-      // B2, THE LIFT: siblings are spaced on their PILL width, not their disc.
-      // Widen the fan FIRST, holding the ring tucked on the shoulder, and push the
-      // ring outward only once the fan reaches MAX_FAN_SPAN. So children stay as
-      // near the card edge as the arc can keep them and move out only when they
-      // must. Separation is the wider of the pill and the disc, so tiny pills
-      // still cannot let two discs touch. The fan stays centred straight up.
-      if (circular && cnt >= 2) {
-        const maxPill = Math.max(...kids.map((k) => nodePillWidth(splitName(k.name))));
-        const sepNeed = Math.max(maxPill, 2 * kidR) + SIB_GAP;
-        const stepAtShoulder = 2 * Math.asin(Math.min(1, sepNeed / (2 * shoulderD)));
-        if ((cnt - 1) * stepAtShoulder <= MAX_FAN_SPAN) {
-          step = stepAtShoulder; ringD = shoulderD;                        // fan widened, ring tucked
-        } else {
-          step = MAX_FAN_SPAN / (cnt - 1);                                 // fan maxed
-          ringD = Math.max(shoulderD, sepNeed / (2 * Math.sin(step / 2))); // then pushed out
-        }
-        // WALL CLAMP, modelled on the solo path above. If an outermost pill would
-        // run past the viewport edge, narrow the fan one degree at a time, drawing
-        // the children in toward the vertical. That overlaps the pills toward the
-        // centre, which is the ruling: an overlap you can read beats a pill you
-        // cannot see. The ring stays where the arc-first step left it; only the
-        // angle tightens, so the outermost pill walks back on-screen.
-        const vw = typeof window !== "undefined" ? window.innerWidth : 0;
-        if (vw > 0) {
-          const clears = (st: number) => {
-            for (let i = 0; i < cnt; i++) {
-              const a = center + (i - (cnt - 1) / 2) * st;
-              const cx = n._x + Math.cos(a) * ringD;
-              const half = Math.max(rOf(kids[i]), nodePillWidth(splitName(kids[i].name)) / 2);
-              if (cx - half < WALL_PAD || cx + half > vw - WALL_PAD) return false;
-            }
-            return true;
-          };
-          const stepR = (2 * Math.PI) / 180;
-          while (step > 0 && !clears(step)) step = Math.max(0, step - stepR);
-        }
-      }
+      const step = spread / Math.max(cnt, 2); // non-circular fan only
+      const ringD = shoulderD;                // single-child radius
+      // Slot angles are offsets from straight up (center), 30deg per clock hour:
+      //   2 -> 11 and 1 o'clock, 3 -> 10/12/2, 4 -> 9/11/1/3.
+      // Beyond 4 (the data never reaches it) they spread evenly, 9 through 3.
+      const SLOT_OFF: Record<number, number[]> = {
+        2: [-Math.PI / 6, Math.PI / 6],
+        3: [-Math.PI / 3, 0, Math.PI / 3],
+        4: [-Math.PI / 2, -Math.PI / 6, Math.PI / 6, Math.PI / 2],
+      };
+      const slots = SLOT_OFF[cnt] ??
+        Array.from({ length: cnt }, (_, i) => -Math.PI / 2 + (i * Math.PI) / Math.max(cnt - 1, 1));
       kids.forEach((k, i) => {
-        const a = center + (i - (cnt - 1) / 2) * step;
-        const d2 = circular ? ringD : dist;
-        if (circular) k._tucked = ringD <= rOf(n) + rOf(k);
+        const clock = circular && cnt >= 2;
+        const a = clock ? center + slots[i] : center + (i - (cnt - 1) / 2) * step;
+        // clock: the node sits just outside the parent edge (NODE_POKE daylight),
+        // so it never tucks under the card. Single child keeps the shoulder tuck;
+        // the big pit keeps its own ring (dist).
+        const d2 = clock ? rOf(n) + rOf(k) + NODE_POKE : circular ? ringD : dist;
+        // Deliberate: every clock node is _tucked = false, so it always draws a
+        // connector. Before, a line appeared only once the ring was pushed past
+        // the edge; now there is always the NODE_POKE gap to justify one, so a
+        // short line on every clock child is correct, not a side effect. The
+        // single child can still tuck (no line), keeping its springs-from-rim look.
+        if (circular) k._tucked = clock ? false : ringD <= rOf(n) + rOf(k);
         k._x = n._x + Math.cos(a) * d2;
         k._y = n._y + Math.sin(a) * d2;
         k._dir = a;
@@ -915,13 +861,11 @@ export default function LineageMap({
   const tagLines = circular ? splitName(breed.name) : [breed.name];
   const tagW = Math.max(...tagLines.map((l) => l.length)) * 9.5 + 28 + (tagLines.length > 1 ? 14 : 0);
   const tagH = tagLines.length > 1 ? 60 : 32;
-  // CHANGE 2: on the lift, each node pill picks the side of its node with the most
-  // room instead of sitting welded inside it. One pass off `shown`, so every node
-  // position is known before any pill lands. Four candidates, each TOUCHING the
-  // node (above/below/left/right), scored in priority order: the lifted card, the
-  // other nodes, the pills already placed, the connector lines, then last the
-  // viewport edge (the B2 wall check). The pill moves with its node, no leader
-  // line. Off the lift the pill keeps its old welded spot, so nothing else moves.
+  // CHANGE 2, now the clock face: each node's pill sits just outside its node and
+  // points STRAIGHT AWAY FROM CENTRE along the node's slot direction (_dir). The
+  // old four-candidate scorer (card / nodes / pills / connectors / viewport) is
+  // gone: with slots 60deg apart in the top semicircle a radial pill cannot reach
+  // the card (it points away from it) and neighbours diverge instead of colliding.
   const pillPlacement = useMemo(() => {
     const place = new Map<string, { ox: number; oy: number }>();
     if (!circular) return place;
@@ -931,44 +875,30 @@ export default function LineageMap({
       (!!(n.children && n.children.length) || !autoExposed.has(n._id)) &&
       n.name !== breed.name
     );
-    const info = new Map<string, { r: number; w: number; h: number }>();
+    const GAP = 4;
     for (const n of withPill) {
       const share = Math.round((n._leaves / (n._parent as Node)._leaves) * 100);
       const lines = splitName(n.name);
-      info.set(n._id, { r: nodeR(share), w: nodePillWidth(lines), h: lines.length > 1 ? 40 : 22 });
-    }
-    const cardCx = breed.x, cardCy = breed.y - 75, cardR = liftR; // the root card, drawn 75 up
-    const segs = shown.filter((n) => !!n._parent && !soloLeaf && !n._tucked)
-      .map((n) => { const p = n._parent as Node; return { x1: p._x, y1: p._y, x2: n._x, y2: n._y }; });
-    const rectCircle = (rx: number, ry: number, rw: number, rh: number, cx: number, cy: number, cr: number) => {
-      const nx = Math.max(rx, Math.min(cx, rx + rw)), ny = Math.max(ry, Math.min(cy, ry + rh));
-      return Math.hypot(cx - nx, cy - ny) < cr;
-    };
-    const rectRect = (ax: number, ay: number, aw: number, ah: number, bx: number, by: number, bw: number, bh: number) =>
-      ax < bx + bw && ax + aw > bx && ay < by + bh && ay + ah > by;
-    const GAP = 4;
-    const placed: { x: number; y: number; w: number; h: number }[] = [];
-    for (const n of withPill) {
-      const { r, w, h } = info.get(n._id)!;
-      const cands = [
-        { ox: 0, oy: -(r + h / 2 + GAP) }, // above
-        { ox: 0, oy: (r + h / 2 + GAP) },  // below
-        { ox: -(r + w / 2 + GAP), oy: 0 }, // left
-        { ox: (r + w / 2 + GAP), oy: 0 },  // right
-      ];
-      let best = cands[0], bestPen = Infinity;
-      for (const c of cands) {
-        const rx = n._x + c.ox - w / 2, ry = n._y + c.oy - h / 2;
-        let pen = 0;
-        if (rectCircle(rx, ry, w, h, cardCx, cardCy, cardR)) pen += 100000;                                        // 1 card
-        for (const o of withPill) if (o !== n) { const oi = info.get(o._id)!; if (rectCircle(rx, ry, w, h, o._x, o._y, oi.r)) pen += 10000; } // 2 nodes
-        for (const p of placed) if (rectRect(rx, ry, w, h, p.x, p.y, p.w, p.h)) pen += 1000;                       // 3 pills
-        for (const s of segs) if (segHitsRect(s.x1, s.y1, s.x2, s.y2, rx, ry, w, h)) pen += 100;                   // 4 connectors
-        if (vw > 0 && (rx < WALL_PAD || rx + w > vw - WALL_PAD)) pen += 10;                                        // 5 viewport, lowest
-        if (pen < bestPen) { bestPen = pen; best = c; }
+      const r = nodeR(share), w = nodePillWidth(lines), h = lines.length > 1 ? 40 : 22;
+      // reach clears the node radius, the GAP, and the pill's own half-extent in
+      // the slot direction, so the near edge lands GAP px off the node at any angle.
+      const dir = n._dir;
+      const reach = r + GAP + Math.abs(Math.cos(dir)) * (w / 2) + Math.abs(Math.sin(dir)) * (h / 2);
+      let ox = Math.cos(dir) * reach;
+      const oy = Math.sin(dir) * reach;
+      // EDGE PROTECTION, and now the ONLY one: the wall clamp is deleted, so this
+      // single nudge is all that keeps a pill on screen. It MOVES the pill sideways
+      // (shifts ox), it never shortens the pill and never pulls the node off its
+      // slot. The case that tests it is 3 o'clock on a 390 phone: a ~150px pill
+      // pointing straight right slides left until its right edge clears the wall,
+      // slipping back over its own node, readable. That is the old ruling, an
+      // overlap you can read beats a pill you cannot see.
+      if (vw > 0) {
+        const pl = n._x + ox - w / 2, pr = n._x + ox + w / 2;
+        if (pr > vw - WALL_PAD) ox -= pr - (vw - WALL_PAD);
+        else if (pl < WALL_PAD) ox += WALL_PAD - pl;
       }
-      place.set(n._id, best);
-      placed.push({ x: n._x + best.ox - w / 2, y: n._y + best.oy - h / 2, w, h });
+      place.set(n._id, { ox, oy });
     }
     return place;
     // eslint-disable-next-line react-hooks/exhaustive-deps
