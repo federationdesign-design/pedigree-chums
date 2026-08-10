@@ -1500,6 +1500,36 @@ const LINEAGE: Record<string, LineageNode> = {
     ]
   },
 
+  // Family 7, toy spaniels and lapdogs (Tudor trail, 10 August). The court toy
+  // spaniels are miniaturised sporting spaniels, so they join the land-spaniel
+  // line and reach Tudor at the Rache (Family 1's terminal). Not a three-roots
+  // breach: those were land vs water spaniels vs water dogs, and these are land.
+  // Asian flat-faced toys carries the real oriental blood to the Chinese court
+  // lapdogs; it reaches no era card and is not meant to. Mediterranean bichon
+  // lapdogs is left a bare leaf for the same reason as Spitz-type dogs: no card
+  // to reach, and rooting it in the Barbet line would be a false water-dog claim.
+  "Old toy spaniels": {
+    name: "Old toy spaniels",
+    note: "The small sporting and lap spaniels of Tudor and Stuart England. Now extinct.",
+    children: [
+      { name: "Land spaniels", note: "The old sporting land-spaniel stock the court toy spaniels were bred down from. Now extinct.", img: "/history/breeds/original-land-spaniel.jpg", value: 100 }
+    ]
+  },
+  "Old sporting toy spaniels": {
+    name: "Old sporting toy spaniels",
+    note: "The longer-muzzled toy spaniels of the older paintings. Now extinct.",
+    children: [
+      { name: "Land spaniels", note: "The old sporting land-spaniel stock behind the toy spaniels. Now extinct.", img: "/history/breeds/original-land-spaniel.jpg", value: 100 }
+    ]
+  },
+  "Asian flat-faced toys": {
+    name: "Asian flat-faced toys",
+    note: "The oriental toy blood, pug and eastern lapdog, that shortened the toy spaniel's muzzle. Now extinct.",
+    children: [
+      { name: "Ancient Chinese toy dogs", note: "The old Chinese flat-faced lapdogs kept in the imperial court alongside the Pekingese and lion dogs. Now extinct.", img: "/history/breeds/Ancient-Chinese-toy-dogs.jpg", value: 100 }
+    ]
+  },
+
   "King Charles Spaniel": {
     name: "King Charles Spaniel",
     note: "The flat-faced toy spaniel of the Stuart court, a lapdog favourite long before its longer-nosed Cavalier cousin.",
@@ -1778,7 +1808,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "The lion dog of the Chinese imperial court, made by crossing Tibetan holy dogs with the palace's own toys.",
     children: [
       { name: "Tibetan temple dogs", note: "The small long coated holy dogs of Tibet, the Lhasa line, gifted to the Chinese court. Now extinct.", img: "/history/breeds/Tibetan-temple-dogs.jpg", value: 55 },
-      { name: "Ancient Chinese toy dogs", note: "The flat faced palace lapdogs, the Pekingese side, it was bred with behind the walls. Now extinct.", img: "/history/breeds/Ancient-Chinese-toy-dogs.jpg", value: 45 }
+      { name: "Ancient Chinese toy dogs", note: "The old Chinese flat-faced lapdogs kept in the imperial court alongside the Pekingese and lion dogs. Now extinct.", img: "/history/breeds/Ancient-Chinese-toy-dogs.jpg", value: 45 }
     ]
   },
   "Miniature Schnauzer": {
