@@ -1301,6 +1301,21 @@ const LINEAGE: Record<string, LineageNode> = {
     ]
   },
 
+  // The brief's worked example (section 3): Ancient Molossers appears as a bare
+  // leaf in 11 trees, so each stopped dead at its name. Giving it a real key
+  // extends all 11 at once and makes the ancient-East and Alaunt lines reachable
+  // from the mastiff and bulldog trees. It is ancient, deeper than the Tudor
+  // boundary, so it reaches no era card and moves no count; this is honest tail,
+  // not a count job. Same Celtic-Heeler self-child shape as its inline version.
+  "Ancient Molossers": {
+    name: "Ancient Molossers",
+    note: "The huge eastern war and guard dogs at the root of every mastiff. Now extinct.",
+    children: [
+      { name: "Old mastiffs of the ancient East", note: "The huge guard and hunting mastiffs of the ancient East, carved on palace walls thousands of years ago. Now extinct.", img: "/history/breeds/old-mastiffs-of-the-ancient-east.jpg", value: 25 },
+      { name: "Ancient Molossers", note: "The huge eastern war and guard dogs at the root of every mastiff. Now extinct.", img: "/history/breeds/Ancient-Molossers.jpg", value: 25 }
+    ]
+  },
+
   "English Mastiff": {
     name: "English Mastiff",
     note: "Britain's ancient war and guard dog, a giant Molosser prized here since Roman times.",
