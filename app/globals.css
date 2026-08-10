@@ -18,6 +18,9 @@ html {
   --navy: #0a3a57;        /* dark text */
   --cream: #ffffff;       /* v3.0: was #fbf7ec, now pure white site-wide (see CLAUDE.md) */
   --white: #ffffff;
+  /* Dogs at Work call-to-action button. Named by role, not colour, per Steve.
+     Value is Steve's reading of the concept artwork, pending his confirmation. */
+  --cta: #4cb847;
   /* Hidden Games campaign palette (CHANGE-LIST C03) */
   --hg-container: #4dabe9;
   --hg-accent: #f7ed57;

@@ -3,10 +3,14 @@ import Link from "next/link";
 import Nav from "../../components/Nav/Nav";
 import Footer from "../../components/Footer/Footer";
 import styles from "./dogs-at-work.module.css";
-// Checkpoint 2: importing the slide record runs its build-time validation
-// (budgets, missing pair, missing image/alt). Checkpoint 3 replaces the inline
-// arrays below with this record; for now the render is unchanged.
-import "./data/slides";
+// Checkpoint 3: the desktop mechanic renders from the slide record (its import
+// still runs the build-time validation). The legacy hero and article grid below
+// are hidden on the desktop-tall viewport where the deck shows, and remain as
+// the fallback elsewhere. The "Coming to the workforce" grid and the mobile
+// carousel are untouched here; they are removed and rebuilt at checkpoints 5
+// and 4 respectively.
+import { SLIDES } from "./data/slides";
+import WorkDeck from "./WorkDeck";
 
 export const metadata: Metadata = {
   title: "Dogs at Work | Pedigree Chums™",
@@ -54,10 +58,19 @@ const COMING = [
 ];
 
 export default function DogsAtWorkPage() {
+  // Live slides in editorial order for the desktop mechanic. The pairing is
+  // explicit in the record, so order comes from the `order` field, never array
+  // position (brief section 6).
+  const liveSlides = SLIDES.filter((s) => s.published === "live").sort(
+    (a, b) => a.order - b.order,
+  );
   return (
     <>
       <Nav showLogo />
-      <main className={styles.page}>
+      <main>
+        {/* Desktop mechanic: three regions, counter-motion, dots (checkpoint 3). */}
+        <WorkDeck slides={liveSlides} />
+        <div className={styles.page}>
         <header className={styles.hero}>
           <p className={styles.eyebrow}>An essay series</p>
           <h1 className={styles.title}>
@@ -272,6 +285,7 @@ export default function DogsAtWorkPage() {
           }, { passive: true });
         })();` }} />
 
+        </div>
       </main>
       <Footer />
     </>
