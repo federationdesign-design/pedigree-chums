@@ -1214,7 +1214,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Earth Dog",
     note: "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
     children: [
-      { name: "Ancient Celtic earth dogs", note: "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.", img: "/history/breeds/Ancient-spotted-hounds.jpg", value: 55 },
+      { name: "Ancient Celtic earth dogs", note: "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.", img: "/history/breeds/ancient-celtic-earth-dog.jpg", value: 55 },
       { name: "Early badger hunting dogs", note: "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.", img: "/history/breeds/Teckel---Dachshund-family.jpg", value: 45 }
     ]
   },
@@ -1273,7 +1273,7 @@ const LINEAGE: Record<string, LineageNode> = {
         // line twice and pushed the children down to 32%. The two 55s below are
         // the 55 that used to sit here, split evenly.
         children: [
-          { name: "Ancient Celtic earth dogs", note: "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.", img: "/history/breeds/Ancient-spotted-hounds.jpg", value: 55 },
+          { name: "Ancient Celtic earth dogs", note: "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.", img: "/history/breeds/ancient-celtic-earth-dog.jpg", value: 55 },
           { name: "Early badger hunting dogs", note: "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.", img: "/history/breeds/Teckel---Dachshund-family.jpg", value: 55 },
         ],
       },
