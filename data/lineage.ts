@@ -1215,7 +1215,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
     children: [
       { name: "Ancient Celtic earth dogs", note: "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.", img: "/history/breeds/ancient-celtic-earth-dog.jpg", value: 55 },
-      { name: "Early badger hunting dogs", note: "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.", img: "/history/breeds/Teckel---Dachshund-family.jpg", value: 45 }
+      { name: "Early badger hunting dogs", note: "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.", img: "/history/breeds/early-badger-hunting-dogs.jpg", value: 45 }
     ]
   },
 
@@ -1267,14 +1267,14 @@ const LINEAGE: Record<string, LineageNode> = {
       {
         name: "Early badger hunting dogs",
         note: "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
-        img: "/history/breeds/Teckel---Dachshund-family.jpg",
+        img: "/history/breeds/early-badger-hunting-dogs.jpg",
         // No value of its own. A parent's share is the sum of its children, and
         // d3 adds an owned value ON TOP of them, so carrying both counted this
         // line twice and pushed the children down to 32%. The two 55s below are
         // the 55 that used to sit here, split evenly.
         children: [
           { name: "Ancient Celtic earth dogs", note: "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.", img: "/history/breeds/ancient-celtic-earth-dog.jpg", value: 55 },
-          { name: "Early badger hunting dogs", note: "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.", img: "/history/breeds/Teckel---Dachshund-family.jpg", value: 55 },
+          { name: "Early badger hunting dogs", note: "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.", img: "/history/breeds/early-badger-hunting-dogs.jpg", value: 55 },
         ],
       },
       {
@@ -1299,7 +1299,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Cardigan Welsh Corgi",
     note: "The older of the two corgis, an ancient Welsh cattle dog with a long body and a long tail.",
     children: [
-      { name: "Early badger hunting dogs", note: "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.", img: "/history/breeds/Teckel---Dachshund-family.jpg", value: 55 },
+      { name: "Early badger hunting dogs", note: "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.", img: "/history/breeds/early-badger-hunting-dogs.jpg", value: 55 },
       { name: "Welsh herding dogs", note: "The old Welsh herding and droving dogs, a long-legged, loose-eyed landrace and the parallel Welsh branch behind the region's sheep-working breeds. Now extinct.", img: "/history/breeds/Welsh-herding-dogs-cluster.jpg", value: 45 }
     ]
   },

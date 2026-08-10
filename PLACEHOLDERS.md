@@ -92,18 +92,19 @@ asset, then delete the SVG.
 | Celtic herdsmen's dogs (big circle) | Livestock Dog |
 | Roman shepherd dogs (big circle) | Livestock Dog |
 
-## Medieval dogs made playable (10 August): two wrong-artwork reuses
+## Medieval dogs made playable (10 August): wrong-artwork reuses (RESOLVED)
 
 The three medieval cards (Shepherd's Dog, Drover's Dog, Earth Dog) were given
-children in `data/lineage.ts` so they can be played. To make the trails work
-without new artwork, two ancestor nodes reuse an existing image that belongs to
-a different dog. The trails are correct; only the pictures are wrong. Both need
-new artwork, then swap each node's `img` in `data/lineage.ts`.
+children in `data/lineage.ts` so they can be played. Two ancestor nodes borrowed
+an image belonging to a different dog. Both are now on their own artwork.
 
-| Node | Wrong image in use | Belongs to | Where |
-|---|---|---|---|
-| Ancient Celtic earth dogs | `/history/breeds/Ancient-spotted-hounds.jpg` | a different dog (spotted hounds) | Earth Dog children, `data/lineage.ts` |
-| Early badger hunting dogs | `/history/breeds/Teckel---Dachshund-family.jpg` | a dachshund | Earth Dog children, `data/lineage.ts` |
+- **Ancient Celtic earth dogs: RESOLVED (10 August).** Now on
+  `/history/breeds/ancient-celtic-earth-dog.jpg` (optimized to 89 KB), off the
+  borrowed `Ancient-spotted-hounds.jpg`. Both node occurrences repointed.
+- **Early badger hunting dogs: RESOLVED (10 August).** Now on
+  `/history/breeds/early-badger-hunting-dogs.jpg` (57 KB), off the borrowed
+  `Teckel---Dachshund-family.jpg` (a modern dachshund). All four node
+  occurrences repointed; the dachshund image is now referenced by nothing.
 
 The other three parents reuse correct existing images (Celtic herdsmen's dogs,
 Roman shepherd dogs, Old British bandogs) and need nothing.
@@ -132,6 +133,17 @@ already exists and just needs pointing at. Named starting points:
 `Roman-drover-dog.jpg`, `early-land-spaniel.jpg`. The job: audit every node
 wearing a borrowed image against the unused files, and list the ones where the
 correct picture already exists on disk. Do not act piecemeal; do it as one pass.
+
+**Not a fault, do not flag.** Some dog names carry TWO images by design, one for
+each of two image systems, and this is correct:
+- **Chum image:** the blue-backed cartoon card for the playable card, at the
+  site root, e.g. `/greyhound-square.jpg`.
+- **Historic image:** the painted period picture for the ancestor node in the
+  lineage, in `public/history/breeds/`.
+
+Same dog name, two roles, two pictures, not a duplicate. Bloodhound, Bulldog and
+Greyhound are the known cases. Any node with one chum image (site root) and one
+historic image (`history/breeds`) is fine and must not be reported by the audit.
 
 ## What's Your Superpower (MVP-4.1 prototype)
 
