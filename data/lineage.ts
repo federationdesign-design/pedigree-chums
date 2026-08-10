@@ -535,14 +535,11 @@ const LINEAGE: Record<string, LineageNode> = {
       { name: "Shepherd's Dog", note: "The medieval British herding dog behind the herding breeds, the Colley of Caius. The parallel Welsh branch reaches the same medieval root. Now extinct.", img: "/history/breeds/medieval-shepherds-dog.jpg", value: 100 }
     ]
   },
-  "Early badger hunting dogs": {
-    name: "Early badger hunting dogs",
-    note: "The long, low hunting dogs the Celts are said to have brought to Cardiganshire, short-legged earth dogs bred to pursue badger and fox. Now extinct.",
-    children: [
-      { name: "Earth Dog", note: "The medieval earth-working dog type. Placed here as a functional match for these low, digging badger dogs, not as a documented line of descent. Now extinct.", img: "/history/breeds/medieval-earth-dog.jpg", value: 100 }
-    ]
-  },
-
+  // Early badger hunting dogs is intentionally left a BARE LEAF. It once had a
+  // key here (Family 3) pointing to Earth Dog, but that edge ran backwards in
+  // time (Earth Dog is medieval, the badger dogs are pre-Roman) and closed a
+  // cycle with Earth Dog's own child of the same name. Cardigan Welsh Corgi
+  // reaches Tudor through Welsh herding dogs instead, so no child is needed.
   "Border Collie": {
     name: "Border Collie",
     note: "Widely called the cleverest dog of all, bred purely for the work of gathering and moving sheep on the hills.",
