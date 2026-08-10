@@ -376,6 +376,26 @@ export default function LineageMap({
     const t = tree ?? getLineage(breed.name);
     if (!t) return null;
     const r = JSON.parse(JSON.stringify(t)) as Node;
+    // KEEP-CHILD COLLAPSE, RENDERER ONLY. expandNode leaves every grafted node
+    // valueless (data/lineage.ts, `value: undefined`), so a single-child ancestor
+    // is a redundant wrapper: its one child fills it completely and it only
+    // restates that child. In 132 of 178 such wrappers the child IS the trail-
+    // completing card (Earth Dog, Otterhound, Ancient Mastiff, Shepherd's Dog),
+    // and in 53 trees it is the ONLY route to that card. So we draw the CHILD and
+    // drop the wrapper. Keep-PARENT was rejected on the numbers: it hides those
+    // cards, the whole point of the Tudor trail, and if it ever reached the data
+    // it breaks the era count from 1 to 14. This is display only; getLineage and
+    // the failure measurement are untouched. A CHAIN collapses all the way to the
+    // card in one pass via the recursion below (Welsh Terrier: Old fell terriers
+    // -> Old English Black and Tan Terrier -> Earth Dog draws straight to Earth
+    // Dog). Do NOT move this into expandNode and do NOT switch it to keep-parent:
+    // the intervening-stock argument does not survive the 132/178 and 53-tree count.
+    const collapse = (n: Node): Node => {
+      const kids = ((n.children as Node[] | undefined) ?? []).map(collapse);
+      if (n.value === undefined && kids.length === 1) return kids[0]; // wrapper: keep the child
+      return { ...n, children: kids };
+    };
+    if (r.children) r.children = (r.children as Node[]).map(collapse);
     const assign = (n: Node, id: string, parent: Node | null) => {
       n._id = id;
       n._parent = parent;

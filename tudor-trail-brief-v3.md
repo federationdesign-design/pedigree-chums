@@ -185,6 +185,15 @@ Labrador's dominant 55% St John's water-dog line, which still dead-ends. Do not
 read a drop of 0 here as a failure; the trail completion is the point, not the
 count.
 
+**Written 10 August, terminating on the Otterhound.** `Old European water dogs`
+is the shared continental water-dog root and reaches Tudor at `Otterhound`, the
+same water card the water spaniels use. That convergence is deliberate (there is
+only one water card); the roots stay distinct populations. `Newfoundland
+landrace dogs` is left a bare leaf (local island stock, no era card). **For the
+split job:** the combined-node splits (`Barbet-type` / `Poodle-type water dogs`)
+attach ONTO this `Old European water dogs -> Otterhound` terminal. It was written
+to be that shared root, so the splits do not need it rewritten.
+
 **Write:** St John's Water Dog, Old European water dogs, Fishermen's water dogs, Newfoundland landrace dogs.
 
 **Cards:** Labrador Retriever.

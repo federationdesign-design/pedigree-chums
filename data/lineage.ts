@@ -1744,6 +1744,41 @@ const LINEAGE: Record<string, LineageNode> = {
     ]
   },
 
+  // Family 5, water dogs (Tudor trail, 10 August). Old European water dogs is the
+  // shared continental water-dog root (both the Barbet/poodle line and the St
+  // John's line come off it) and it reaches Tudor at the Otterhound.
+  // CONVERGENCE, DELIBERATE: water spaniels (Family 4) and water dogs both reach
+  // Otterhound. This is NOT a merge of the roots, which stay distinct populations
+  // (Old European water dogs is not Water spaniels); it is the limit of the data,
+  // there being only one water card. A defensible functional route beats leaving
+  // Labrador's principal 55% St John's line dead-ended while it passes on a 13%
+  // branch (the opposite of the Northern Inuit call, where the ancestry had no
+  // British or water link at all). The combined-node split job, when it runs,
+  // attaches its Barbet-type / Poodle-type outputs onto THIS terminal; it does
+  // not need rewriting.
+  "Old European water dogs": {
+    name: "Old European water dogs",
+    note: "The rough water-retrieving dogs of Germany and France that fetched waterfowl for hunters. Now extinct.",
+    children: [
+      { name: "Otterhound", note: "The web-footed water-working hound, the Tudor root shared with the water spaniels: one water card for both water lines. A functional match, not documented descent. Now endangered.", img: "/history/breeds/otterhound-photo.jpg", value: 100 }
+    ]
+  },
+  "Fishermen's water dogs": {
+    name: "Fishermen's water dogs",
+    note: "The working water dogs the European fishing crews brought across the Atlantic. Now extinct.",
+    children: [
+      { name: "Old European water dogs", note: "The old continental water-dog stock they came from. Now extinct.", img: "/history/breeds/Old-European-water-dogs.jpg", value: 100 }
+    ]
+  },
+  "St John's Water Dog": {
+    name: "St John's Water Dog",
+    note: "The fishermen's water dog of Newfoundland, brought to Britain and bred up from there. Now extinct.",
+    children: [
+      { name: "Fishermen's water dogs", note: "The working water dogs the European fishing crews brought across the Atlantic. Now extinct.", img: "/history/breeds/Fishermens-water-dogs.jpg", value: 34 },
+      { name: "Newfoundland landrace dogs", note: "The local island dogs they crossed with once they landed. Now extinct.", img: "/history/breeds/Newfoundland-landrace-dog.jpg", value: 21 }
+    ]
+  },
+
   "Poodle": {
     name: "Poodle",
     note: "Now a clever companion and show dog, but built as a water-retrieving gundog. The name comes from the German 'Pudel', meaning to splash about.",
