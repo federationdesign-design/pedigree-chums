@@ -108,6 +108,31 @@ new artwork, then swap each node's `img` in `data/lineage.ts`.
 The other three parents reuse correct existing images (Celtic herdsmen's dogs,
 Roman shepherd dogs, Old British bandogs) and need nothing.
 
+## Deferred jobs, Tudor trail (logged 10 August, do after the families)
+
+Two known issues found while writing the families. Neither is a placeholder;
+both are their own jobs, deliberately parked so a family patch is not derailed.
+
+**1. The 61-tree duplicate-percentage artifact.** Across 100 trees, 61 show one
+ancestor name at two or more different percentages. It is not a cycle (the cycle
+was fixed in `07f82a5d`) and not an infinite loop (`expandNode` guards on
+`visited`). It is the valueless-branch (Celtic Heeler) shape: when a deep
+ancestor sits under two sibling branches, it renders once under each with
+different scaled shares. Worst in the hound trees (Foxhound, Otterhound,
+Staghound duplicate `St Hubert Hound` and `Old scenting hounds`). Fixing it is a
+structural reshape, not a token change, and risks load-bearing edges (removing
+`Skye terrier stock -> Earth Dog` would cost Cairn Terrier). Owner decision:
+its own job, after the families.
+
+**2. Borrowed-image audit.** 77 of the 228 images in `public/history/breeds/`
+are referenced by nothing, a third of the folder. Several are correctly named
+for nodes that are currently wearing a borrowed picture, so the right artwork
+already exists and just needs pointing at. Named starting points:
+`Old-earth-terrier.jpg`, `celtic-hound-drawing.jpg`, `Southern_Hound-drawing.jpg`,
+`Roman-drover-dog.jpg`, `early-land-spaniel.jpg`. The job: audit every node
+wearing a borrowed image against the unused files, and list the ones where the
+correct picture already exists on disk. Do not act piecemeal; do it as one pass.
+
 ## What's Your Superpower (MVP-4.1 prototype)
 
 | Placeholder | Location | Meaning | Resolve via |
