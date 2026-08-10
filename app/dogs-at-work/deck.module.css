@@ -155,8 +155,15 @@
   margin: 0;
 }
 
-.blueSubheadingAccent {
+/* Emphasis: the --emphasis yellow, on any panel text (subheadings, body,
+   bullets) via the *marker*. A whole yellow line is that line wrapped in *...*. */
+.emph {
   color: var(--emphasis);
+}
+
+/* Bold: the **marker**, for lead-in lines and bullet lead-ins. */
+.blueBold {
+  font-weight: 700;
 }
 
 /* Proportional measure: the copy column is a fixed fraction of the panel width
@@ -175,7 +182,7 @@
      multi-paragraph body was reading looser than the concept. */
   line-height: 1.28;
   color: var(--cream);
-  margin: 0 0 4px;
+  margin: 0 0 6px;
 }
 
 .blueBody:last-child {
@@ -189,11 +196,19 @@
   line-height: 1.28;
   color: var(--cream);
   margin: 0;
+  /* Restore the disc (Tailwind preflight resets ul to list-style: none); the
+     ::marker below colours it yellow. */
+  list-style: disc;
   padding-left: 1.2em;
 }
 
 .blueBullets li {
   margin-bottom: 6px;
+}
+
+/* Yellow bullet markers, uniform on every panel (CSS, never data). */
+.blueBullets li::marker {
+  color: var(--emphasis);
 }
 
 /* ── Forward chevron ──────────────────────────────────────────── */

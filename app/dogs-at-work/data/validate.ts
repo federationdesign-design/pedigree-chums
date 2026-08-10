@@ -29,13 +29,19 @@ export const BUDGETS = {
 
 const WARN_AT = 0.9;
 
+// Budgets measure displayed text, so strip the inline markers (* emphasis, **
+// bold) before counting. The markers are not rendered.
+function displayed(text: string): string {
+  return text.replace(/\*/g, "");
+}
+
 // Total characters of prose and bullet text carried by a blue panel, across
 // every section. Subheadings are budgeted separately.
 function panelBodyLength(slide: Slide): number {
   let total = 0;
   for (const section of slide.panel.sections) {
-    if (section.body) total += section.body.length;
-    if (section.bullets) for (const b of section.bullets) total += b.length;
+    if (section.body) total += displayed(section.body).length;
+    if (section.bullets) for (const b of section.bullets) total += displayed(b).length;
   }
   return total;
 }
@@ -92,7 +98,7 @@ export function validateSlides(slides: Slide[]): void {
       }
       for (const section of slide.panel.sections) {
         if (section.subheading) {
-          check(errors, id, "panel subheading", section.subheading, BUDGETS.panelSubheading);
+          check(errors, id, "panel subheading", displayed(section.subheading), BUDGETS.panelSubheading);
         }
         if (!section.body && !section.bullets) {
           errors.push(`[dogs-at-work] slide "${id}": a blue panel section has neither body nor bullets.`);

@@ -45,20 +45,32 @@ const blueTriangles: Tri[] = [
   { size: 42, bottom: "12%", right: "9%", speed: 0.14, spin: -0.2 },
 ];
 
-// Emphasis markers: text between *asterisks* in a subheading renders in the
-// emphasis colour. Appendix A was supplied as plain text, so the markers are
-// added to the data per the concept artwork (which words are yellow), rather
-// than derived from punctuation.
-function renderEmphasis(text: string) {
-  return text.split("*").map((part, i) =>
-    i % 2 === 1 ? (
-      <span key={i} className={styles.blueSubheadingAccent}>
-        {part}
-      </span>
-    ) : (
-      part
-    ),
-  );
+// Two inline markers, working identically anywhere panel text appears
+// (subheadings, body paragraphs, bullets). Appendix A is plain, so the markers
+// live in the data per the concept artwork:
+//   *text*  -> emphasis, the --emphasis yellow (a whole yellow line is the line
+//              wrapped in *...*).
+//   **text** -> bold.
+// No third marker and no per-section style field: if the concept needs something
+// these two cannot express, it is flagged rather than invented.
+function renderMarked(text: string) {
+  return text.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/g).map((part, i) => {
+    if (part.startsWith("**")) {
+      return (
+        <strong key={i} className={styles.blueBold}>
+          {part.slice(2, -2)}
+        </strong>
+      );
+    }
+    if (part.startsWith("*")) {
+      return (
+        <span key={i} className={styles.emph}>
+          {part.slice(1, -1)}
+        </span>
+      );
+    }
+    return part;
+  });
 }
 
 // A blue panel body may carry blank-line-separated paragraphs (panels 2 and 3).
@@ -88,7 +100,7 @@ function Sections({ slide, withThumbnails }: { slide: Slide; withThumbnails: boo
                 ) : null}
                 {section.subheading ? (
                   <h2 className={styles.blueSubheading}>
-                    {renderEmphasis(section.subheading)}
+                    {renderMarked(section.subheading)}
                   </h2>
                 ) : null}
               </div>
@@ -97,14 +109,14 @@ function Sections({ slide, withThumbnails }: { slide: Slide; withThumbnails: boo
               {section.body
                 ? paragraphs(section.body).map((p, pi) => (
                     <p className={styles.blueBody} key={pi}>
-                      {p}
+                      {renderMarked(p)}
                     </p>
                   ))
                 : null}
               {section.bullets ? (
                 <ul className={styles.blueBullets}>
                   {section.bullets.map((b, bi) => (
-                    <li key={bi}>{b}</li>
+                    <li key={bi}>{renderMarked(b)}</li>
                   ))}
                 </ul>
               ) : null}
