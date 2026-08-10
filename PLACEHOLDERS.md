@@ -145,6 +145,16 @@ Same dog name, two roles, two pictures, not a duplicate. Bloodhound, Bulldog and
 Greyhound are the known cases. Any node with one chum image (site root) and one
 historic image (`history/breeds`) is fine and must not be reported by the audit.
 
+## Deferred cleanups (code, not placeholders)
+
+**Inert inline `--rows` on the title ladder (logged 10 August).** The title
+portrait scaling was removed from `LineageModal.module.css` (owner decision:
+portrait stays full size at every depth). That deleted `--rows`, `--ceil` and
+`--push` from the CSS. The component still SETS `--rows` inline on `.titleWrap`,
+but nothing reads it any more. Left in place deliberately so a component change
+did not ride on a CSS-only patch. Cleanup: drop the inline `--rows` write from
+the LineageModal component.
+
 ## What's Your Superpower (MVP-4.1 prototype)
 
 | Placeholder | Location | Meaning | Resolve via |

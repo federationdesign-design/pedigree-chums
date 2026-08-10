@@ -33,23 +33,14 @@
   top: 12px;
 
   /* THE ONE SIZE EVERYTHING IN THE TITLE IS BUILT FROM.
-     --rows is set inline by the component: how many portraits are stacked.
-     --push is the learn info box's own offset, 60 on a phone and 100 above it.
-
-     --ceil is therefore the exact y the box's top edge sits at, copied from
-     .asideDocked in BreedTree.module.css. Change it there and change it here.
-
-     The portrait is then whichever is smaller: the size it would like to be,
-     or the largest size that still clears the box. At one to three rows the
-     first wins and nothing has changed. Only a deep ladder shrinks, and it
-     shrinks exactly as far as it must and no further. */
-  --rows: 1;
-  --push: 100px;
-  --ceil: calc(clamp(112px, 17vh, 190px) + var(--push));
-  --tp: min(
-    clamp(44.8px, 8.8vw, 62.4px),
-    calc((var(--ceil) - 12px - (var(--rows) - 1) * 5px) / var(--rows))
-  );
+     Fixed at every depth (owner decision, 10 August): 62.4px on desktop, 44.8px
+     on a 390 phone. The old fit-to-box scaling that shrank the portrait as rungs
+     were added is gone, along with --rows, --ceil and --push. A deep ladder now
+     keeps full-size portraits and is allowed to overlap the learn info box; the
+     box docks on the left on desktop too, so that overlap starts around 4 rows
+     on both desktop and phone. One value, trivially revertible. The component
+     still sets --rows inline but nothing reads it now (see PLACEHOLDERS.md). */
+  --tp: clamp(44.8px, 8.8vw, 62.4px);
 
   /* Centred on the pit's left axis, with the slider, the score and PLAY. */
   left: calc(var(--pit-axis, 51.8px) - var(--tp) / 2);
@@ -65,14 +56,6 @@
   /* 8, then 7, now 5. Worth 25px across a six-row ladder, which is a whole
      extra portrait's worth of room. */
   gap: 5px;
-}
-/* The info box sits 40px higher on a narrow screen, so the ceiling does too.
-   900px, NOT 768: that is the breakpoint BreedTree.module.css uses for
-   .asideDocked's own +60px, and it is also where the title starts splitting
-   names over two lines. Getting this wrong puts the whole ladder 40px out on
-   every tablet-width screen. */
-@media (max-width: 900px) {
-  .titleWrap { --push: 60px; }
 }
 .titleRow {
   display: flex;
