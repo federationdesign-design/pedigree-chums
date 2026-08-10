@@ -1,13 +1,14 @@
-# Dogs at Work: page redux, agent brief v2.9
+# Dogs at Work: page redux, agent brief v3.0
 
 Repo: `federationdesign-design/pedigree-chums`
 Clone: `~/pedigree-chums-main`
 Branch: `dogsatwork`
 Date: 10 August 2026
-Supersedes: v1 through v2.8
+Supersedes: v1 through v2.9
 
-Blue panel copy is supplied in Appendix A. The article template already exists
-and is described in Appendix B. Neither was in v2.
+v3.0 corrects five factual errors in v2.9 that the checkpoint 0 inventory found.
+Every correction is marked **CORRECTED IN v3.0**. Where this document and the
+repo still disagree, the repo wins and you report it.
 
 Read this document in full before running any command. Task 0 is read-only.
 Do not write, edit or create any file until Task 0 has been reported and
@@ -73,6 +74,11 @@ component, stop and report instead. Reuse is the default.
 9. If a verification step fails, read the failure. Never adjust an expected
    value, a hash or a count to make a check pass.
 10. File names use underscores, never spaces.
+11. Run one command per bash tool call. Do not chain with `&&`, and do not use
+    `for` loops, shell variables, backticks or `$(...)` in bash commands. If you
+    need four checks, make four calls. Commands whose text depends on shell
+    expansion cannot be matched against the permission allowlist, so every one
+    of them interrupts Steve for an approval he should not have to give.
 
 ---
 
@@ -90,14 +96,31 @@ and had to be restored from git.
    output. Long-form editorial copy in the Dogs at Work articles and panels may
    retain em dashes, because the existing published copy depends on them.
 
-Make both amendments in a single commit, separate from any code change, so the
-diff is legible.
+3. **`--cream` becomes `#FFFFFF`.** The repo defines `--cream: #fbf7ec` in
+   `app/globals.css`. CLAUDE.md states `#fff8e6`. Neither is correct going
+   forward. Change the token to `#FFFFFF` in `app/globals.css` and correct
+   CLAUDE.md to match.
+
+   This is a site-wide token, so it is the one change in this build that reaches
+   beyond Dogs at Work. Before changing it, grep for every use of `--cream`,
+   report the count and the files, and say plainly what else will shift. Then
+   make the change. It stays on the `dogsatwork` branch until Steve merges, so
+   nothing reaches production early.
+
+Make all three amendments in a single commit, separate from any code change, so
+the diff is legible.
 
 ---
 
 ## 4. Reference material
 
-Four source documents are in `~/Downloads`. Two of them have spaces in their
+**CORRECTED IN v3.0.** Whether `agent/` is gitignored in this repo is unsettled:
+`git add` refused a path under it, but `git check-ignore` reports it is not
+ignored and seventeen files under `agent/` are tracked. Either way, follow the
+path override you were given: write to `docs/dogs-at-work/reference/` and
+`docs/dogs-at-work/NEEDS_STEVE.md`. Report the discrepancy once and move on.
+
+Source documents are in `~/Downloads`. Two of them have spaces in their
 names, so quote the paths. Copy them into `agent/reference/`, renamed to
 underscore form, and commit them:
 
@@ -107,7 +130,12 @@ underscore form, and commit them:
 | `~/Downloads/dosg and work-article.pdf` | `agent/reference/dogs_at_work_article_concept.pdf` |
 | `~/Downloads/mobile.pdf` | `agent/reference/dogs_at_work_mobile_concept.pdf` |
 | `~/Downloads/sheepdogs-job.jpg` | `public/sheepdogs_job.jpg`, see section 15 |
-| The v2 project document, if present | `agent/reference/dogs_at_work_project_document_v2.docx` |
+| `~/Downloads/article3-hero.jpg` | `public/article3_hero.jpg`, hero for article 3 |
+| `~/Downloads/pedigree-chums-dogs-at-work-project-document-v2.docx` | `agent/reference/dogs_at_work_project_document_v2.docx` |
+
+The v2 document is canonical. There is an older `...project-document.docx` in
+Downloads; ignore it. Reading the v2 document to build the twelve-article map in
+section 12 is in scope.
 
 Do this as part of Task 0's follow-up commit. Every later reference in this
 brief to reference artwork means these files at these paths.
@@ -312,7 +340,8 @@ already exceeds its budget, report it rather than truncating it.
 ## 10. Tokens, pills and assets
 
 - The existing tokens stand: `--blue-sky` #5cc4ee, `--blue-deep` #0b78bd,
-  `--navy` #0a3a57, `--yellow` #ffd23e, `--cream` #fff8e6.
+  `--navy` #0a3a57, `--yellow` #ffd23e.
+- **CORRECTED IN v3.0.** `--cream` is changing. See section 3.
 - The yellow triangle decoration exists in the repo as `yellow-triangle.svg`.
   Confirm its path in Task 0 and reuse it. Do not recreate it.
 - A token is also needed for the green call-to-action button.
@@ -324,15 +353,19 @@ Settled. Use these values exactly. Name the tokens by family, not by colour.
 | Family | Pill fill | Text | Contrast |
 |---|---|---|---|
 | Medical | #17C138 | `--navy` | 4.97 |
-| Security | #000000 | `--cream` | 19.8 |
-| Emergency | #D71F6C | `--cream` | 4.61 |
-| People | #2B7095 | `--cream` | 5.14 |
+| Security | #000000 | `--cream` | 21.0 |
+| Emergency | #D71F6C | `--cream` | 4.88 |
+| People | #2B7095 | `--cream` | 5.45 |
 | Rural | #97AA31 | `--navy` | 4.62 |
 | Science | #10D1B7 | `--navy` | 6.17 |
 
 The rule behind the text column, which applies to any family added later: a
 light pill takes dark text, a dark pill takes light text. Dark text is `--navy`,
 light text is `--cream`. Every new pill must reach 4.5 against its text.
+
+**CORRECTED IN v3.0.** The contrast figures above are computed against
+`--cream` set to `#FFFFFF`, per the token change in section 3. All six pills
+pass. No fill value changes.
 
 Three of the six values are adjusted from the originals supplied, for stated
 reasons. Do not revert them.
@@ -490,10 +523,14 @@ Seven fields. Two earlier fields have been removed and must not reappear:
 
 Rules:
 
-- The payslip currently on the bio-detection article is a placeholder. Every
-  value on it is wrong and must be replaced. Do not carry any of it forward. In
-  particular, "Blood-sugar bodyguard" is the medical alert dog's job title and
-  has been applied to the wrong article.
+- **CORRECTED IN v3.0.** v2.9 said the existing payslip sits on the
+  bio-detection article and is misapplied. It does not and it is not. The only
+  payslip in the repo is on article 2,
+  `the-colleague-who-never-clocks-off/page.tsx`, and "Blood-sugar bodyguard" is
+  correct there. v2.9 took this from a concept PDF rather than the repo.
+- That existing payslip has nine fields, including the retired Name field and a
+  Bonus scheme field. Replace it wholesale with the seven-field set above and
+  the article 2 values below. Do not preserve either retired field.
 - Shift Pattern is required and carries specific hours and days. This overrides
   the guidance in the v2 project document, which advises against inventing
   precision. That is a deliberate decision.
@@ -734,14 +771,17 @@ sub-label.
 | # | Article | Names a dog? | Button label |
 |---|---|---|---|
 | 1 | The Dogs Teaching Medicine How to Smell Disease | Yes | Bumper and Peanut |
-| 2 | The Colleague Who Never Clocks Off | Verify | see below |
+| 2 | The Colleague Who Never Clocks Off | Yes | Bramble |
 | 3 | The Machine That May Owe Dogs a Biscuit | No | Bio-detection dogs |
 | 4 | The Farm Worker With Four Legs | No | Sheepdogs |
 
-Article 2 must be checked against the live article body, not against the
-concept artwork. The artwork labels its button "Bramble", but the published dek
-names no dog. If the article body names a dog, use that name. If it does not,
-the label is "Medical alert dogs". Report which you found.
+**CORRECTED IN v3.0.** Settled. Bramble is a real dog and the name is used. The
+button reads "Bramble".
+
+The article carries a live editor's note describing Bramble and Sarah as
+illustrative placeholders. That note is now wrong. Flag it in your checkpoint 8
+escalation list with the exact wording and the line number. Do not remove it
+yourself; it is body copy on an editorially unchanged article.
 
 Two cautions:
 
@@ -812,8 +852,9 @@ checkpoint's normal mode, and say clearly which condition tripped.
 
 1. The tallest slide does not fit at 700 pixels of viewport using the real copy
    in Appendix A. Do not solve it by shrinking type or cutting budgets.
-2. The article template turns out to be per-article markup rather than a shared
-   component. That changes the size of checkpoint 7 substantially.
+2. RESOLVED, do not halt on this. The template is per-article markup. See
+   Appendix B, which carries Steve's approval to build real CSS Module
+   components.
 3. A build validation cannot be made to pass without changing an expected value.
 4. Applying a rule in this brief would require you to invent a fact, a figure,
    an image or a line of copy that is not supplied.
@@ -848,9 +889,11 @@ These are recorded so they are not lost, and are answered by Steve, not by you.
 2. The card dek and image alt text for article 4.
 3. The three panel 1 thumbnails and their alt text. Steve is supplying the
    images.
-4. A hero image for article 3. It has none today, and a 50/50 split with no
-   scroll makes an empty half unmissable. Report what your implementation does
-   when an image is absent.
+4. **Settled in v3.0.** Article 3's hero is supplied as
+   `~/Downloads/article3-hero.jpg`. Copy it to `public/article3_hero.jpg`, wire
+   it into the article 3 record, and add it to the existing article 3 page,
+   which currently has no image field at all. Alt text is still needed from
+   Steve.
 5. Whether the blue panel is intended to overlap the top of the article panel,
    as it does in the concept mockup. It affects how the two counter-moving
    tracks cross. Report, do not resolve.
@@ -988,33 +1031,67 @@ blue panel component must support both prose and bulleted content.
 
 ---
 
-## Appendix B: the article template already exists
+## Appendix B: there is no shared article template
 
-Before planning any article work, read
-`/dogs-at-work/the-dogs-teaching-medicine-how-to-smell-disease` in the repo. It
-is fully built and live, and it is the reference execution for the series.
+**CORRECTED IN v3.0.** v2.9 claimed the article template already existed and
+that article 4 would be assembly. The checkpoint 0 inventory disproved it.
 
-What already exists on it:
+What is actually in the repo: three independent `page.tsx` files, roughly 175
+to 185 lines each, that duplicate inline `React.CSSProperties` objects and
+hand-write every sidebar card as inline-styled JSX. There is no article shell,
+no sidebar-module component and no payslip component.
 
-- Back link to the index page.
-- Family and sub-label pills.
-- Headline and long-form body copy with subheadings.
-- Sidebar modules, currently: "The honest version", "The 2025 study" with a
-  paired statistics block, "How a scent line-up works", "What it costs to train
-  a dog" with a three-row cost table, "What the dog thinks it's doing", and
-  "Sources".
+Consequences, all approved by Steve:
 
-The only element missing from that page is the payslip.
+1. **Checkpoint 7 is construction, not assembly.** Plan and estimate
+   accordingly.
+2. **Build real CSS Module components.** A Payslip component and sidebar-module
+   components, per the house rule that new pages use CSS Modules and never
+   inline styles. Do not copy the existing inline style objects onto a new page.
+3. **Do not retrofit the three existing articles' body styling.** They are
+   editorially unchanged and structurally out of scope. The only things that
+   change on them are the payslip, the labels and the mechanical copy
+   corrections. Reuse the design, not the implementation.
+4. **Conditional stop 2 in section 17 has already fired and is resolved by this
+   appendix.** Do not halt on it again.
 
-This changes the shape of the work in two places:
+Also corrected: v2.9 described an existing carousel with a 1/3 counter to
+extend and re-skin. That carousel is mobile only. The desktop counter-motion
+mechanic in section 6 is net new, not a re-skin.
 
-1. **Checkpoint 6 is smaller than it looks.** The payslip is a new module added
-   to an existing, working template. It is not an article redesign.
-2. **Checkpoint 7 is assembly, not construction.** Article 4 reuses the same
-   template and the same module types. The only genuinely new component is the
-   four-stage diagram, which is now deferred and out of scope.
+## Appendix C: payslip design specification
 
-If your inventory finds that the template is per-article markup rather than a
-shared component, say so plainly at Task 0. That single finding changes the
-effort of checkpoint 7 substantially and Steve needs it before checkpoint 7 is
-scheduled, not during it.
+The payslip is a visual signature, not a table. It must match the concept.
+
+**Container**
+
+- Background: `linear-gradient(47deg, #EFD379 0%, #F5E3B9 100%)`
+- Box shadow: `10px 10px 8px #00000029`. This is an eight-digit hex with alpha
+  on a shadow. The no-rgba rule applies to text only, so leave it as written.
+- Aspect ratio roughly 705 by 626, about 1.13:1. The `top`, `left`, `width` and
+  `height` values in the supplied CSS are canvas coordinates from a design tool.
+  Ignore them. Do not hard-code pixel dimensions; the payslip has to sit inside
+  a responsive column.
+- A circular cutout on the top right edge of the container. It must read
+  correctly over both the navy article background and the sky blue. Mask or SVG
+  shape, your choice; report which you used and why.
+
+**Contents**
+
+- Heading "DOG PAYSLIP" in the display font.
+- Seven rows, one per field, in the section 13 order.
+- Field labels bold, values regular weight.
+- A black rule between rows.
+- A tick box at the right of each row. Six carry a black tick; the last is
+  empty.
+- The empty box binds to the last field, Retirement. That is the joke, the dog
+  has not retired yet. Bind it to the field, never to a row index.
+
+Black text on the gradient measures 14.3 at the darker end, so legibility is
+not a concern.
+
+**Not specified, ask before assuming**
+
+The concept artwork shows the payslip tilted a few degrees. The supplied CSS
+contains no transform. Report which you have implemented rather than choosing
+silently.
