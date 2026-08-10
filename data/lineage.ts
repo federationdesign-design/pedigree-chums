@@ -1050,6 +1050,13 @@ const LINEAGE: Record<string, LineageNode> = {
     ]
   },
 
+  // LEFT FAILING ON PURPOSE (Tudor trail, 10 August). A 1980s recreation from
+  // arctic sled dogs and German shepherd stock. Neither ancestry is British and
+  // neither runs through the Tudor record: Arctic sled dogs reach no era card
+  // (there is no arctic or spitz card), and German Shepherd's tree stops at
+  // German herding populations even after the step-2 rename. It honestly cannot
+  // reach Tudor without inventing a British route it does not have, so it stays
+  // failing. That is the correct outcome, not unfinished work.
   "Northern Inuit Dog": {
     name: "Northern Inuit Dog",
     note: "A 1980s British creation, bred to look like a wolf while keeping a gentle, trainable temperament. Famous as the Stark direwolves on screen.",
@@ -1262,7 +1269,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "Tough working dog that helped move cattle and sheep over long distances to markets and towns. An extinct historical type.",
     children: [
       { name: "Celtic herdsmen's dogs", note: "The all-round farm dogs of the Celtic tribes, guarding and driving the herds. Now extinct.", img: "/history/breeds/celtic-herdsmen-dogs.jpg", value: 60 },
-      { name: "Old British bandogs", note: "The heavy butcher's and baiting dogs of old England. Now extinct.", img: "/history/breeds/Old-British-bandogs.jpg", value: 40 }
+      { name: "Old British bandogs", note: "The heavy chained dogs of old England, kept tied by day and set loose at night, and put to work by butchers and baiters alike. Now extinct.", img: "/history/breeds/Old-British-bandogs.jpg", value: 40 }
     ]
   },
   "Earth Dog": {
@@ -1274,12 +1281,32 @@ const LINEAGE: Record<string, LineageNode> = {
     ]
   },
 
+  // Family 8, singletons (Tudor trail, 10 August). Old British bandogs roots the
+  // Mastiff line in the Ancient Mastiff, the Roman-praised ancient British guard
+  // dog: a functional root, not documented descent. Arctic sled dogs wires up the
+  // Spitz-type dogs leaf parked in Family 3; it reaches no era card and is not
+  // meant to (Nordic stock, outside the British record). Single-parent 100.
+  "Old British bandogs": {
+    name: "Old British bandogs",
+    note: "The heavy chained dogs of old England, kept tied by day and set loose at night, and put to work by butchers and baiters alike. Now extinct.",
+    children: [
+      { name: "Ancient Mastiff", note: "The ancient British guard and war dog, praised by Roman writers, that the heavy bandogs descend from. A functional root, not documented descent. An extinct historical type.", img: "/history/breeds/ancient-british-mastiff-type.jpg", value: 100 }
+    ]
+  },
+  "Arctic sled dogs": {
+    name: "Arctic sled dogs",
+    note: "The Siberian and Alaskan sled dogs, Husky and Malamute, behind the wolfish modern recreations.",
+    children: [
+      { name: "Spitz-type dogs", note: "The broad northern spitz family the arctic sled dogs belong to, Nordic stock that sits outside the British Tudor record and reaches no era card.", img: "/history/breeds/Northern-Spitz-landraces.jpg", value: 100 }
+    ]
+  },
+
   "English Mastiff": {
     name: "English Mastiff",
     note: "Britain's ancient war and guard dog, a giant Molosser prized here since Roman times.",
     children: [
       { name: "Ancient Molossers", note: "The huge eastern war and guard dogs at the root of every mastiff. Now extinct.", img: "/history/breeds/Ancient-Molossers.jpg", value: 60 },
-      { name: "Old British bandogs", note: "The heavy chained guard dogs of early Britain. Now extinct.", img: "/history/breeds/Old-British-bandogs.jpg", value: 40 }
+      { name: "Old British bandogs", note: "The heavy chained dogs of old England, kept tied by day and set loose at night, and put to work by butchers and baiters alike. Now extinct.", img: "/history/breeds/Old-British-bandogs.jpg", value: 40 }
     ]
   },
 
@@ -1429,7 +1456,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "The extinct, athletic bull-baiting dog, leaner and fiercer than today's Bulldog, bred down from ancient war dogs.",
     children: [
       { name: "Mastiff and Alaunt war dogs", note: "The big Molossers and the extinct Alaunt that gave it bulk and a broad jaw.", img: "/history/breeds/Mastiff-and-Alaunt-war-dogs.jpg", value: 60 },
-      { name: "Old British bandogs", note: "The heavy butcher's and baiting dogs of old England. Now extinct.", img: "/history/breeds/Old-British-bandogs.jpg", value: 40 }
+      { name: "Old British bandogs", note: "The heavy chained dogs of old England, kept tied by day and set loose at night, and put to work by butchers and baiters alike. Now extinct.", img: "/history/breeds/Old-British-bandogs.jpg", value: 40 }
     ]
   },
 
