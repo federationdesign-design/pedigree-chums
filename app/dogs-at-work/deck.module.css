@@ -18,11 +18,12 @@
   position: relative;
   flex-direction: column;
   width: 100%;
-  /* Clear the fixed site nav (logo top-left, ~82px band). No bottom padding, so
-     the article panel meets the footer cleanly with no sky-blue gap. No flex gap:
-     spacing is set with margins so the article can overlap the blue panel (open
-     question 5). */
-  padding: 88px clamp(20px, 4vw, 56px) 0;
+  /* Clear the fixed site nav: it is 136px tall on this page, so 88px let the
+     title run under the logo and hamburger. 140px is the site's standard nav
+     clearance (the legacy .page uses it). No bottom padding, so the article panel
+     meets the footer cleanly. No flex gap: spacing is set with margins so the
+     article can overlap the blue panel (open question 5). */
+  padding: 140px clamp(20px, 4vw, 56px) 0;
 }
 
 .deck:focus-visible {
@@ -63,10 +64,14 @@
 }
 
 /* ── Blue panel (GlowPanel shell) ─────────────────────────────── */
-/* Sits above the article on the z axis so it overlaps the article's top edge. */
+/* Capped at 1180px centred (matching the intro) so the panel stops widening into
+   empty glow past the copy measure. Sits above the article on the z axis so it
+   overlaps the article's top edge. */
 .blueWrap {
   position: relative;
   z-index: 1;
+  max-width: 1180px;
+  margin-inline: auto;
 }
 
 /* Passed to GlowPanel. The shell paints the gradient, glow and rounded card;
@@ -83,9 +88,9 @@
 
 .blueTrack {
   display: flex;
-  /* Minimum set from the measured natural heights at the 56ch measure cap: the
-     tallest slide (panel 2) needs ~699px, so 705px holds every slide with a
-     little headroom. */
+  /* Minimum set from the measured natural heights at the 56ch cap: the tallest
+     slide (panel 2) needs ~699px, so 705px holds every slide with a little
+     headroom. */
   min-height: 705px;
   transform: translateX(calc(var(--i, 0) * -100%));
   transition: transform 620ms cubic-bezier(0.6, 0.02, 0.2, 1);
@@ -257,10 +262,11 @@
   flex: 0 0 auto;
   position: relative;
   z-index: 0;
-  /* Bleed to the viewport edges past the deck's side padding, and rise 60px
-     behind the blue panel so the panel overlaps the article's top edge and image
-     (open question 5). The article keeps its own natural height. */
-  margin: -60px calc(-1 * clamp(20px, 4vw, 56px)) 0;
+  /* Capped at 1180px centred to match the blue panel, and raised 60px behind it
+     so the panel overlaps the article's top edge and image (open question 5).
+     The article keeps its own natural height. */
+  max-width: 1180px;
+  margin: -60px auto 0;
   overflow: hidden;
 }
 
