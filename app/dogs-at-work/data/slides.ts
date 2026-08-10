@@ -101,7 +101,7 @@ Perhaps that is the remarkable bargain at the heart of our relationship with dog
     panel: {
       sections: [
         {
-          subheading: "What we owe dogs",
+          subheading: "What we *owe dogs*",
           body: `Far more than affection. For centuries they have guarded our homes, protected livestock, carried messages, found the lost, hunted food, controlled vermin, pulled loads, guided people, served in war and rescue, and taken on countless jobs simply because working beside us became part of their lives.
 
 What we owe them is responsible care, patience, safety, companionship and the chance to use the instincts and abilities we deliberately bred into them.
@@ -109,7 +109,7 @@ What we owe them is responsible care, patience, safety, companionship and the ch
 After everything dogs have done for us, the least we can do is make sure their lives are not only useful to humans, but good for them too.`,
         },
         {
-          subheading: "What dogs often get",
+          subheading: "What dogs *often get*",
           body: `They get food, shelter, protection, veterinary care, companionship and a place inside our families. Many live warm, comfortable lives filled with walks, play, affection and jobs chosen for enjoyment rather than survival.
 
 But dogs have not always received a fair return and that is still the case in modern times for some dogs. The same animals bred to work beside us can be neglected, abandoned or treated as just tools, or status symbols and disposable possessions.
