@@ -491,22 +491,17 @@
   display: none;
 }
 
-/* Checkpoint 3: on the desktop-tall viewport the WorkDeck mechanic replaces the
-   legacy hero and the three-card article grid, so they are hidden there. The
-   "Coming to the workforce" grid stays until checkpoint 5 (paired with the
-   forward register), and the mobile carousel until checkpoint 4. Below 700px of
-   height the deck is hidden and this legacy layout is the fallback. */
-@media (min-width: 769px) and (min-height: 700px) {
+/* Checkpoint 3: at desktop width the WorkDeck mechanic replaces the legacy hero
+   and the three-card article grid, so they are hidden. The "Coming to the
+   workforce" grid stays hidden here too until checkpoint 5 (paired with the
+   forward register), and the mobile carousel is the sub-769px fallback until
+   checkpoint 4. The legacy page shell (base min-height 100vh) is collapsed so the
+   footer sits directly below the deck instead of behind a viewport-tall empty
+   gap; the footer stays and the page scrolls to reach it. */
+@media (min-width: 769px) {
   .hero { display: none; }
   .grid { display: none; }
-  /* Also hidden here so the deck fills the viewport and the page never scrolls
-     (step 4). The grid still shows on the sub-700px fallback and is removed for
-     real, with the forward register, at checkpoint 5. */
   .coming { display: none; }
-  /* Collapse the legacy page shell (base min-height is 100vh) so the footer sits
-     directly below the deck rather than behind a viewport-tall empty gap. The
-     footer stays: the page may scroll to reach the site nav and legal line. The
-     deck itself never scrolls while a visitor moves between slides. */
   .page { padding: 0; min-height: 0; }
 }
 

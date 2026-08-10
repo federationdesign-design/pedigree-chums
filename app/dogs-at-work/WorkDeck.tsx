@@ -7,23 +7,31 @@
 // in opposite directions: the blue panel slides one way, the article panel the
 // other. That counter-motion is the signature of the design.
 //
+// The page scrolls normally: there is no fixed-height deck and no internal
+// panel scroll. The blue container sizes to its copy (with a generous minimum
+// height) so nothing is ever clipped, and the article panel sizes to its
+// content with the headline always at full size.
+//
 // Both panels are single-frame viewports over a filmstrip. The blue filmstrip
 // runs in natural order and translates left as the index grows. The article
-// filmstrip is laid out row-reverse and translates the opposite way, so the two
-// tracks cross. Only the current frame of each is interactive; the rest are
+// filmstrip is rendered in reverse order and translates the opposite way, so the
+// two tracks cross. Only the current frame of each is interactive; the rest are
 // marked `inert`, which removes them from tab order and the accessibility tree.
 //
-// Reduced motion is honoured in CSS: the transitions drop out under
-// prefers-reduced-motion and the panels simply change. Dots are the primary
-// navigation and the only route backwards, because the artwork gives a forward
-// chevron only. Left and right arrow keys page while the deck is focused.
+// The blue container reuses the signed-off floating-panel shell via the shared
+// GlowPanel component (extracted from the homepage pitch panel), rather than a
+// hand-rolled style. Reduced motion is honoured in CSS: the transitions drop out
+// under prefers-reduced-motion and the panels simply change. Dots are the
+// primary navigation and the only route backwards, because the artwork gives a
+// forward chevron only. Left and right arrow keys page while the deck is focused.
 //
-// This component is desktop only. It is gated by min-width and min-height in the
-// module CSS; below 700px of viewport height the page falls back to the mobile
-// stack (built at checkpoint 4; currently the legacy carousel).
+// Desktop only: gated by min-width in the module CSS. Narrower viewports fall
+// back to the mobile stack (built at checkpoint 4; currently the legacy carousel).
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import GlowPanel from "../../components/GlowPanel/GlowPanel";
+import Triangles, { type Tri } from "../../components/Parallax/Triangles";
 import type { Slide } from "./data/types";
 import { FAMILY_PILL_LABEL } from "./data/types";
 import styles from "./deck.module.css";
@@ -34,6 +42,13 @@ import styles from "./deck.module.css";
 // checkpoint 3 report rather than invented here.
 const INTRO =
   'Dogs do not know they have jobs. They follow scent, movement, instinct, training and reward. The "work" begins when humans turn those natural abilities into value: safer airports, faster searches, healthier people, protected livestock, better science. Dogs are an invisible workforce whose contribution is felt emotionally but rarely counted economically.';
+
+// Reused parallax triangles (the same shared component the pitch panel uses),
+// echoing the yellow triangles in the concept artwork.
+const blueTriangles: Tri[] = [
+  { size: 34, top: "9%", left: "15%", speed: 0.18, spin: 0.25 },
+  { size: 42, bottom: "12%", right: "9%", speed: 0.14, spin: -0.2 },
+];
 
 // The concept colours the tail of a subheading yellow, from the first `;` or `,`
 // onward ("To the dog;" white, "it's a game." yellow). Panels 2 to 4 carry no
@@ -53,42 +68,7 @@ function paragraphs(body: string): string[] {
 export default function WorkDeck({ slides }: { slides: Slide[] }) {
   const [index, setIndex] = useState(0);
   const rootRef = useRef<HTMLDivElement>(null);
-  const blueViewportRef = useRef<HTMLDivElement>(null);
-  // The blue panel is the one region allowed to scroll internally (step 4 of the
-  // checkpoint 3 fit resolution). The page never scrolls and the article panel
-  // stays pinned. A bottom fade appears while the current panel has more below.
-  const [showFade, setShowFade] = useState(false);
   const count = slides.length;
-
-  function currentBlueEl(): HTMLElement | null {
-    const vp = blueViewportRef.current;
-    return vp ? vp.querySelector<HTMLElement>('[data-current="true"]') : null;
-  }
-  function computeFade(el: HTMLElement | null) {
-    if (!el) {
-      setShowFade(false);
-      return;
-    }
-    const canScroll = el.scrollHeight - el.clientHeight > 2;
-    const atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 2;
-    setShowFade(canScroll && !atBottom);
-  }
-  function onBlueScroll(e: React.UIEvent<HTMLDivElement>) {
-    computeFade(e.currentTarget);
-  }
-
-  // On slide change, return the incoming panel to the top and re-evaluate the
-  // fade. On resize the available height changes, so re-evaluate then too.
-  useEffect(() => {
-    const el = currentBlueEl();
-    if (el) el.scrollTop = 0;
-    computeFade(el);
-  }, [index]);
-  useEffect(() => {
-    const onResize = () => computeFade(currentBlueEl());
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
-  }, []);
 
   // Drive the two filmstrip transforms from a single index custom property.
   // Setting it via the ref keeps all visual rules in the CSS module rather than
@@ -137,67 +117,71 @@ export default function WorkDeck({ slides }: { slides: Slide[] }) {
         <p className={styles.introText}>{INTRO}</p>
       </header>
 
-      {/* Blue panel: a filmstrip that translates left as the index grows. The
-          current frame scrolls internally when its copy is taller than the panel. */}
-      <div className={styles.blueViewport} ref={blueViewportRef}>
-        <div className={styles.blueTrack}>
-          {slides.map((slide, i) => (
-            <article
-              key={slide.id}
-              className={styles.blueSlide}
-              data-current={i === index ? "true" : undefined}
-              onScroll={onBlueScroll}
-              inert={i !== index}
-              aria-hidden={i !== index}
-            >
-              <div className={styles.blueSections}>
-                {slide.panel.sections.map((section, si) => {
-                  const thumb = slide.panel.thumbnails?.[si];
-                  const [head, tail] = section.subheading
-                    ? splitSubheading(section.subheading)
-                    : ["", ""];
-                  return (
-                    <div className={styles.blueSection} key={si}>
-                      {thumb ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          className={styles.thumb}
-                          src={thumb.src}
-                          alt={thumb.alt}
-                          loading="lazy"
-                        />
-                      ) : null}
-                      <div className={styles.blueSectionText}>
-                        {section.subheading ? (
-                          <h2 className={styles.blueSubheading}>
-                            {head}
-                            {tail ? (
-                              <span className={styles.blueSubheadingAccent}>{tail}</span>
+      {/* Blue panel: the signed-off GlowPanel shell holding a filmstrip that
+          translates left as the index grows. It sizes to its copy above a
+          generous minimum, so nothing is clipped and nothing scrolls internally. */}
+      <div className={styles.blueWrap}>
+        <GlowPanel className={styles.blueGlow}>
+          <Triangles items={blueTriangles} z={0} />
+          <div className={styles.blueViewport}>
+            <div className={styles.blueTrack}>
+              {slides.map((slide, i) => (
+                <article
+                  key={slide.id}
+                  className={styles.blueSlide}
+                  inert={i !== index}
+                  aria-hidden={i !== index}
+                >
+                  <div className={styles.blueSections}>
+                    {slide.panel.sections.map((section, si) => {
+                      const thumb = slide.panel.thumbnails?.[si];
+                      const [head, tail] = section.subheading
+                        ? splitSubheading(section.subheading)
+                        : ["", ""];
+                      return (
+                        <div className={styles.blueSection} key={si}>
+                          {thumb ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                              className={styles.thumb}
+                              src={thumb.src}
+                              alt={thumb.alt}
+                              loading="lazy"
+                            />
+                          ) : null}
+                          <div className={styles.blueSectionText}>
+                            {section.subheading ? (
+                              <h2 className={styles.blueSubheading}>
+                                {head}
+                                {tail ? (
+                                  <span className={styles.blueSubheadingAccent}>{tail}</span>
+                                ) : null}
+                              </h2>
                             ) : null}
-                          </h2>
-                        ) : null}
-                        {section.body
-                          ? paragraphs(section.body).map((p, pi) => (
-                              <p className={styles.blueBody} key={pi}>
-                                {p}
-                              </p>
-                            ))
-                          : null}
-                        {section.bullets ? (
-                          <ul className={styles.blueBullets}>
-                            {section.bullets.map((b, bi) => (
-                              <li key={bi}>{b}</li>
-                            ))}
-                          </ul>
-                        ) : null}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </article>
-          ))}
-        </div>
+                            {section.body
+                              ? paragraphs(section.body).map((p, pi) => (
+                                  <p className={styles.blueBody} key={pi}>
+                                    {p}
+                                  </p>
+                                ))
+                              : null}
+                            {section.bullets ? (
+                              <ul className={styles.blueBullets}>
+                                {section.bullets.map((b, bi) => (
+                                  <li key={bi}>{b}</li>
+                                ))}
+                              </ul>
+                            ) : null}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </article>
+              ))}
+            </div>
+          </div>
+        </GlowPanel>
 
         {/* Forward chevron. The artwork provides no back chevron; dots do that. */}
         <button
@@ -218,14 +202,6 @@ export default function WorkDeck({ slides }: { slides: Slide[] }) {
             />
           </svg>
         </button>
-
-        {/* Cue that the panel has more below. Shown only while the current frame
-            can scroll and is not at the bottom. Decorative, so aria-hidden. */}
-        <div
-          className={styles.fade}
-          aria-hidden="true"
-          data-show={showFade ? "true" : "false"}
-        />
       </div>
 
       {/* Pager: dots are the primary navigation and the only route back. Sits in
@@ -243,15 +219,15 @@ export default function WorkDeck({ slides }: { slides: Slide[] }) {
         ))}
       </div>
 
-      {/* Article panel: fixed to the bottom, split 50/50 image and text. The
-          frames are rendered in reverse order over a normal-row filmstrip, so
-          the track translates opposite to the blue panel: advancing slides the
-          blue panel left and the article panel right. */}
+      {/* Article panel: full-width, split 50/50 image and text, sized to its
+          content. The frames are rendered in reverse order over a normal-row
+          filmstrip, so the track translates opposite to the blue panel:
+          advancing slides the blue panel left and the article panel right. */}
       <div className={styles.articleViewport}>
         <div className={styles.articleTrack}>
           {slides.map((_, revI) => {
             // DOM slot 0 holds the last slide; slot n-1 holds the first. The
-            // transform below then lands frame `index` in view moving rightward.
+            // transform then lands frame `index` in view moving rightward.
             const i = count - 1 - revI;
             const slide = slides[i];
             const a = slide.article;
