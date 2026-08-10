@@ -865,6 +865,39 @@ const LINEAGE: Record<string, LineageNode> = {
     ]
   },
 
+  // Family 4, water spaniels (Tudor trail, 10 August). The British and Irish
+  // water spaniels root in the Otterhound, the web-footed otter-hunting Tudor
+  // hound: a functional-match water-working root, deliberately distinct from the
+  // land-spaniel Rache (Family 1) and the continental water dogs (Family 5).
+  // Old Irish water dogs reaches Otterhound in parallel, not through the British
+  // Water spaniels, so no claim is made that the Irish dogs came from them.
+  // Single-parent value 100, matching the shipped Wheaten.
+  "Water spaniels": {
+    name: "Water spaniels",
+    note: "The old rough-coated working water spaniels of Britain's rivers and fens. Now extinct.",
+    // LABRADOR PASSES ON A MINOR BRANCH. Labrador reaches Tudor through its 13%
+    // Water spaniels branch here, so it reads as green. Its dominant 55% St John's
+    // water-dog line still dead-ends until Family 5, which traces its principal
+    // ancestry. A green Labrador does NOT mean its main line is finished.
+    children: [
+      { name: "Otterhound", note: "The web-footed otter-hunting hound, the water-working Tudor root of the water spaniels. A functional match, not documented descent. Now endangered.", img: "/history/breeds/otterhound-photo.jpg", value: 100 }
+    ]
+  },
+  "Old Irish water dogs": {
+    name: "Old Irish water dogs",
+    note: "The southern and northern water spaniels of Ireland. Now extinct.",
+    children: [
+      { name: "Otterhound", note: "The web-footed otter-hunting hound, the same water-working Tudor root, reached in parallel with the British water spaniels. Now endangered.", img: "/history/breeds/otterhound-photo.jpg", value: 100 }
+    ]
+  },
+  "English Water Spaniel": {
+    name: "English Water Spaniel",
+    note: "The extinct native English water spaniel, a working water dog of the fens and rivers. Now extinct.",
+    children: [
+      { name: "Water spaniels", note: "The broad old British water-spaniel population it came from. Now extinct.", img: "/history/breeds/original-water-spaniel.jpg", value: 100 }
+    ]
+  },
+
   "Tweed Water Spaniel": {
     name: "Tweed Water Spaniel",
     note: "An extinct liver-brown water dog from the Scottish Borders and the Tweed valley, famous as a key ancestor of the Golden and Curly-Coated Retrievers.",

@@ -177,6 +177,14 @@ Shepherd's Dog  (medieval)
 
 ### Family 5: water dogs. Drop 1.
 
+**UPDATE (10 August): expected drop is now 0, not 1.** Labrador Retriever, this
+family's only card, already went green in Family 4: it reaches Tudor through its
+13% `Water spaniels` branch (`Water spaniels -> Otterhound`), so the count will
+not move when this family is written. Family 5 STILL MATTERS: it traces
+Labrador's dominant 55% St John's water-dog line, which still dead-ends. Do not
+read a drop of 0 here as a failure; the trail completion is the point, not the
+count.
+
 **Write:** St John's Water Dog, Old European water dogs, Fishermen's water dogs, Newfoundland landrace dogs.
 
 **Cards:** Labrador Retriever.
