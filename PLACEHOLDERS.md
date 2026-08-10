@@ -92,6 +92,22 @@ asset, then delete the SVG.
 | Celtic herdsmen's dogs (big circle) | Livestock Dog |
 | Roman shepherd dogs (big circle) | Livestock Dog |
 
+## Medieval dogs made playable (10 August): two wrong-artwork reuses
+
+The three medieval cards (Shepherd's Dog, Drover's Dog, Earth Dog) were given
+children in `data/lineage.ts` so they can be played. To make the trails work
+without new artwork, two ancestor nodes reuse an existing image that belongs to
+a different dog. The trails are correct; only the pictures are wrong. Both need
+new artwork, then swap each node's `img` in `data/lineage.ts`.
+
+| Node | Wrong image in use | Belongs to | Where |
+|---|---|---|---|
+| Ancient Celtic earth dogs | `/history/breeds/Ancient-spotted-hounds.jpg` | a different dog (spotted hounds) | Earth Dog children, `data/lineage.ts` |
+| Early badger hunting dogs | `/history/breeds/Teckel---Dachshund-family.jpg` | a dachshund | Earth Dog children, `data/lineage.ts` |
+
+The other three parents reuse correct existing images (Celtic herdsmen's dogs,
+Roman shepherd dogs, Old British bandogs) and need nothing.
+
 ## What's Your Superpower (MVP-4.1 prototype)
 
 | Placeholder | Location | Meaning | Resolve via |

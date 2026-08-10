@@ -1114,14 +1114,26 @@ const LINEAGE: Record<string, LineageNode> = {
   "Shepherd's Dog": {
     name: "Shepherd's Dog",
     note: "Practical medieval working dog used to move and protect sheep, forming an early root of Britain's collie families. An extinct historical type.",
+    children: [
+      { name: "Celtic herdsmen's dogs", note: "The all-round farm dogs of the Celtic tribes, guarding and driving the herds. Now extinct.", img: "/history/breeds/celtic-herdsmen-dogs.jpg", value: 60 },
+      { name: "Roman shepherd dogs", note: "The flock-guarding sheepdogs the Roman farm writers described, kept white so the shepherd knew dog from wolf. Now extinct.", img: "/history/breeds/roman-shepherd-dogs.jpg", value: 40 }
+    ]
   },
   "Drover's Dog": {
     name: "Drover's Dog",
     note: "Tough working dog that helped move cattle and sheep over long distances to markets and towns. An extinct historical type.",
+    children: [
+      { name: "Celtic herdsmen's dogs", note: "The all-round farm dogs of the Celtic tribes, guarding and driving the herds. Now extinct.", img: "/history/breeds/celtic-herdsmen-dogs.jpg", value: 60 },
+      { name: "Old British bandogs", note: "The heavy butcher's and baiting dogs of old England. Now extinct.", img: "/history/breeds/Old-British-bandogs.jpg", value: 40 }
+    ]
   },
   "Earth Dog": {
     name: "Earth Dog",
     note: "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+    children: [
+      { name: "Ancient Celtic earth dogs", note: "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.", img: "/history/breeds/Ancient-spotted-hounds.jpg", value: 55 },
+      { name: "Early badger hunting dogs", note: "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.", img: "/history/breeds/Teckel---Dachshund-family.jpg", value: 45 }
+    ]
   },
 
   "English Mastiff": {
