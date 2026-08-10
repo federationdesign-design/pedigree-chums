@@ -1392,6 +1392,46 @@ const LINEAGE: Record<string, LineageNode> = {
     ]
   },
 
+  // Family 1, land and working spaniels (Tudor trail, 10 August). Caius in
+  // 1576 listed the Land spaniel and the Water spaniel as fowling dogs, a
+  // category he kept SEPARATE from the hounds, so the hound roots below are a
+  // functional reconstruction of the deeper stock, not documented descent.
+  // Ranging bird-dog work routes to the Rache (the running scenting hound);
+  // the heavy, low spaniels route to the heavy trailing hounds. Both are
+  // medieval cards, so either satisfies the era rule.
+  "Land spaniels": {
+    name: "Land spaniels",
+    note: "The old English land-spaniel stock that every working spaniel springs from. Now extinct.",
+    children: [
+      { name: "Rache", note: "The medieval running scenting hound that ranged and flushed game, the closest in work to a bird dog. Caius listed the land spaniel among the fowling dogs, separate from the hounds, so this older root is a reconstruction, not recorded descent. Now extinct.", img: "/history/breeds/rache.jpg", value: 60 },
+      { name: "Talbot", note: "Older white finding-hound stock standing behind the medieval scenting hounds. An inferred deeper root, not documented spaniel descent. Now extinct.", img: "/history/breeds/talbot-hound.jpg", value: 40 }
+    ]
+  },
+  "Old Welsh land spaniels": {
+    name: "Old Welsh land spaniels",
+    note: "The native red-and-white working spaniels of Wales. Now extinct.",
+    children: [
+      { name: "Land spaniels", note: "The broader old English land-spaniel stock behind the Welsh variety. Now extinct.", img: "/history/breeds/original-land-spaniel.jpg", value: 60 },
+      { name: "Rache", note: "The medieval ranging scenting hound, an inferred deeper root rather than documented descent. Now extinct.", img: "/history/breeds/rache.jpg", value: 40 }
+    ]
+  },
+  "Heavier working spaniels": {
+    name: "Heavier working spaniels",
+    note: "Lower, stouter spaniels that gave the Sussex and Clumber their weight and bone. Now extinct.",
+    children: [
+      { name: "Land spaniels", note: "The old land-spaniel stock at the base. Now extinct.", img: "/history/breeds/original-land-spaniel.jpg", value: 55 },
+      { name: "Basset and heavy hounds", note: "Low, long, heavy hound blood for build and weight. Now extinct.", img: "/history/breeds/Medieval-Bloodhound.jpg", value: 45 }
+    ]
+  },
+  "Basset and heavy hounds": {
+    name: "Basset and heavy hounds",
+    note: "Low, long, heavy scenting-hound stock that lent weight and bone to the stouter spaniels. Now extinct.",
+    children: [
+      { name: "Southern Hound", note: "The heavy, slow, deep-voiced trailing hound, the right match for the stout, low spaniels. Now extinct.", img: "/history/breeds/Southern-Hound.jpg", value: 60 },
+      { name: "Bloodhound", note: "The supreme heavy trailing hound of the same deep-nosed line, still bred today.", img: "/history/breeds/Medieval-Bloodhound.jpg", value: 40 }
+    ]
+  },
+
   "Clumber Spaniel": {
     name: "Clumber Spaniel",
     note: "The heaviest, slowest spaniel of all, a stocky white gundog built to push through thick cover, developed at Clumber Park.",
