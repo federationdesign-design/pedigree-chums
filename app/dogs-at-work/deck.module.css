@@ -50,7 +50,7 @@
 }
 
 .titleAccent {
-  color: var(--yellow);
+  color: var(--emphasis);
 }
 
 .introText {
@@ -330,7 +330,7 @@
 }
 
 .learnAboutAccent {
-  color: var(--yellow);
+  color: var(--emphasis);
 }
 
 .articleMeta {
