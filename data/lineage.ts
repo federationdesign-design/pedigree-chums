@@ -566,7 +566,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "Bred by a hunting parson, the Reverend John Russell, in the early 1800s for a game little terrier that could bolt a fox and keep up with the hounds.",
     children: [
       { name: "Fox Terrier", note: "The old white-bodied fox-working terriers that are the breed's direct foundation.", img: "/history/breeds/fox_terrier-img.jpg", value: 55 },
-      { name: "Old English White Terrier", note: "A now-extinct terrier behind the mostly white coat.", img: "/history/breeds/english-white-terrier-painting.jpg", value: 30 },
+      { name: "Old English White Terrier", note: "The old white-bodied working terriers of Britain, the stock the named white terriers were drawn from. Now extinct.", img: "/history/breeds/english-white-terrier-painting.jpg", value: 30 },
       { name: "Working hunt terriers", note: "Hardy local terriers kept for going to ground after fox. Now extinct.", img: "/history/breeds/Old-fell-terriers-Patterdale-Terrier-Working-hunt-terriers.jpg", value: 15 }
     ]
   },
@@ -698,6 +698,28 @@ const LINEAGE: Record<string, LineageNode> = {
     children: [
       { name: "Soft-Coated Wheaten Terrier", note: "The older native Irish terrier widely held to be its parent.", img: "/history/breeds/soft-coated--wheaten-terrier-photo.jpg", value: 60 },
       { name: "Native Irish terriers", note: "The shared stock of Ireland's working farm terriers. Now extinct.", img: "/history/breeds/irish-terrier-photo.jpg", value: 40 }
+    ]
+  },
+
+  // Family 6, the old English terrier stock (Tudor trail, 10 August). One
+  // population, one selection event: the white terriers were bred out of the
+  // black-and-tan working stock for coat colour, so only the black and tan needs
+  // to reach Tudor and the white line inherits it. Both were the site's most-used
+  // bare leaves. Single-parent value 100, matching the shipped Wheaten. Earth Dog
+  // is one hop, keeping Kerry Blue's chain (Kerry, Wheaten, Native Irish terriers,
+  // OEBT, Earth Dog) at depth 4, inside MAX_LINEAGE_DEPTH.
+  "Old English Black and Tan Terrier": {
+    name: "Old English Black and Tan Terrier",
+    note: "The old British black-and-tan working terrier, the rough ratting and vermin stock much of Britain's terrier blood was drawn from. Now extinct.",
+    children: [
+      { name: "Earth Dog", note: "The medieval earth-and-vermin dog the black-and-tan working terrier goes back to, a functional match rather than documented descent. Now extinct.", img: "/history/breeds/medieval-earth-dog.jpg", value: 100 }
+    ]
+  },
+  "Old English White Terrier": {
+    name: "Old English White Terrier",
+    note: "The white-bodied working terriers bred out of the black-and-tan stock for coat colour. The split of this line into population and named breed is a useful reconstruction, not a documented distinction: the three white-terrier names all refer to one extinct breed. Now extinct.",
+    children: [
+      { name: "Old English Black and Tan Terrier", note: "The black-and-tan working stock the white terriers were selected out of, for coat colour. Now extinct.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 100 }
     ]
   },
 
