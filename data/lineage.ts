@@ -493,6 +493,56 @@ const LINEAGE: Record<string, LineageNode> = {
     ]
   },
 
+  // Family 3, collies and herders (Tudor trail, 10 August). The collie herding
+  // line converges on Shepherd's Dog, the medieval card, one or two hops below
+  // each named strain, never all flattened onto it directly. Spitz-type dogs is
+  // deliberately left a bare leaf: it is the Corgi's Nordic root, correctly kept
+  // OFF the Shepherd's Dog herding line, with no honest Tudor terminal (its
+  // deeper data is Family 8's Arctic sled dogs). Single-parent value 100 matches
+  // the shipped Soft-Coated Wheaten Terrier.
+  "Old working collies": {
+    name: "Old working collies",
+    note: "The old northern hill-collie landrace of Scotland and the borders, the shared working stock the Rough, Smooth and Border collies all grew from. Now extinct.",
+    children: [
+      { name: "Shepherd's Dog", note: "The medieval British herding dog, the Sheepdog or Colley that Caius wrote of in 1576. Chaucer's black-faced 'Coll' or 'Coaly' of the 1300s gives the name: Coaly became Colley became Collie. Now extinct.", img: "/history/breeds/medieval-shepherds-dog.jpg", value: 100 }
+    ]
+  },
+  "Old Scotch Collie": {
+    name: "Old Scotch Collie",
+    note: "The old Scottish shepherd's collie, the pre-show hill-herding landrace that fed the working border strain long before it had a name. Now extinct.",
+    children: [
+      { name: "Old working collies", note: "The shared old hill-collie landrace it grew from. Now extinct.", img: "/history/breeds/Old-working-collies-cluster.jpg", value: 100 }
+    ]
+  },
+  "Old hill and bearded collies": {
+    name: "Old hill and bearded collies",
+    note: "Shaggy upland herding dogs of the same collie family. Now extinct.",
+    children: [
+      { name: "Old working collies", note: "The shared old hill-collie landrace of the same family. Now extinct.", img: "/history/breeds/Old-working-collies-cluster.jpg", value: 100 }
+    ]
+  },
+  "Cumberland sheepdogs": {
+    name: "Cumberland sheepdogs",
+    note: "Northern English herding dogs from the same border country. Now extinct.",
+    children: [
+      { name: "Old working collies", note: "The shared old hill-collie landrace of the border country. Now extinct.", img: "/history/breeds/Old-working-collies-cluster.jpg", value: 100 }
+    ]
+  },
+  "Welsh herding dogs": {
+    name: "Welsh herding dogs",
+    note: "The old Welsh herding and droving dogs, a long-legged, loose-eyed landrace and the parallel Welsh branch behind the region's sheep-working breeds. Now extinct.",
+    children: [
+      { name: "Shepherd's Dog", note: "The medieval British herding dog behind the herding breeds, the Colley of Caius. The parallel Welsh branch reaches the same medieval root. Now extinct.", img: "/history/breeds/medieval-shepherds-dog.jpg", value: 100 }
+    ]
+  },
+  "Early badger hunting dogs": {
+    name: "Early badger hunting dogs",
+    note: "The long, low hunting dogs the Celts are said to have brought to Cardiganshire, short-legged earth dogs bred to pursue badger and fox. Now extinct.",
+    children: [
+      { name: "Earth Dog", note: "The medieval earth-working dog type. Placed here as a functional match for these low, digging badger dogs, not as a documented line of descent. Now extinct.", img: "/history/breeds/medieval-earth-dog.jpg", value: 100 }
+    ]
+  },
+
   "Border Collie": {
     name: "Border Collie",
     note: "Widely called the cleverest dog of all, bred purely for the work of gathering and moving sheep on the hills.",
