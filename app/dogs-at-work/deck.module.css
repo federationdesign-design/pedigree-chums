@@ -19,8 +19,9 @@
   flex-direction: column;
   gap: clamp(18px, 2.4vh, 32px);
   width: 100%;
-  /* Clear the fixed site nav (logo top-left, ~82px band). */
-  padding: 88px clamp(20px, 4vw, 56px) 64px;
+  /* Clear the fixed site nav (logo top-left, ~82px band). No bottom padding, so
+     the article panel meets the footer cleanly with no sky-blue gap. */
+  padding: 88px clamp(20px, 4vw, 56px) 0;
 }
 
 .deck:focus-visible {
