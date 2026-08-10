@@ -783,12 +783,19 @@ export default function LineageMap({
       const shoulderD = rOf(n) + kidR * 0.2 + NODE_POKE;
       const step = spread / Math.max(cnt, 2); // non-circular fan only
       const ringD = shoulderD;                // single-child radius
-      // Slot angles are offsets from straight up (center), 30deg per clock hour:
-      //   2 -> 11 and 1 o'clock, 3 -> 10/12/2, 4 -> 9/11/1/3.
-      // Beyond 4 (the data never reaches it) they spread evenly, 9 through 3.
+      // Slot angles are offsets from straight up (center). 2 and 3 children BOTH
+      // use a no-zero split with the innermost pair at -36/+36: a 72deg gap centred
+      // on the vertical, so no child spawns straight up under the pointer as the
+      // parent opens. A slot at 0 (the old 3-child middle) dropped a fresh circle
+      // onto the vertical approach and stole the hover, which is why the bug bit at
+      // 3+. The -36/+36 pair clears the corridor by ~7 to 9px even on a node with
+      // two large children (the old 2-child +/-30 left just 0.9px, luck not
+      // clearance). 3's third child sits out at -72. 4 keeps the clock hours
+      // 9/11/1/3; its +/-30 inner pair rides a longer radius and clears by ~10px.
+      // Beyond 4 (never reached) they spread evenly, 9 to 3.
       const SLOT_OFF: Record<number, number[]> = {
-        2: [-Math.PI / 6, Math.PI / 6],
-        3: [-Math.PI / 3, 0, Math.PI / 3],
+        2: [-Math.PI / 5, Math.PI / 5],
+        3: [-2 * Math.PI / 5, -Math.PI / 5, Math.PI / 5],
         4: [-Math.PI / 2, -Math.PI / 6, Math.PI / 6, Math.PI / 2],
       };
       const slots = SLOT_OFF[cnt] ??
