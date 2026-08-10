@@ -20,7 +20,6 @@ const PLACEHOLDER_PANEL1_THUMB_2_ALT = "PLACEHOLDER: alt text for panel 1 thumbn
 const PLACEHOLDER_PANEL1_THUMB_3_ALT = "PLACEHOLDER: alt text for panel 1 thumbnail 3 (British banknotes and coins), outstanding from Steve";
 const PLACEHOLDER_ARTICLE_3_ALT = "PLACEHOLDER: alt text for article 3 hero, outstanding from Steve";
 const PLACEHOLDER_ARTICLE_4_ALT = "PLACEHOLDER: alt text for sheepdogs_job.jpg, outstanding from Steve";
-const PLACEHOLDER_ARTICLE_4_DEK = "PLACEHOLDER: index card dek for article 4, outstanding from Steve";
 
 export const SLIDES: Slide[] = [
   {
@@ -176,7 +175,7 @@ Some spend their lives bored and under-stimulated, while others are pushed into 
       family: "Rural and Traditional",
       subLabel: "Sheepdogs",
       headline: "The Farm Worker With Four Legs",
-      dek: PLACEHOLDER_ARTICLE_4_DEK,
+      dek: `To the shepherd it is labour saved. To the dog it is the best game ever invented: find the sheep, get behind them, bring them home. Nobody has told it otherwise.`,
       image: "/sheepdogs_job.jpg",
       imageAlt: PLACEHOLDER_ARTICLE_4_ALT,
       ctaLabel: "Sheepdogs",
