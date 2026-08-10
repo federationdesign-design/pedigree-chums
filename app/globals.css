@@ -21,6 +21,10 @@ html {
   /* Dogs at Work call-to-action button. Named by role, not colour, per Steve.
      Value confirmed by Steve against the concept artwork. */
   --cta: #4CB847;
+  /* Dogs at Work panel emphasis: the yellow highlight on the blue panel copy.
+     A brighter yellow than --yellow, scoped here so the 32-file --yellow is not
+     disturbed (a site-wide change would be decided separately). */
+  --emphasis: #FFED60;
   /* Dogs at Work family pill fills (brief section 10). Named by family, not
      colour. Emergency, Rural and Science were adjusted from the originals for
      contrast or distinctness; do not revert. */

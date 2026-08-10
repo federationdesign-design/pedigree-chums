@@ -32,17 +32,17 @@ export const SLIDES: Slide[] = [
       // docs/dogs-at-work/NEEDS_STEVE.md.
       sections: [
         {
-          subheading: "To the dog; it's a game.",
+          subheading: "To the dog; *it's a game.*",
           body: `Working dogs do not know they have jobs. To a sheepdog, moving livestock is instinct, training and the best game in the world. To a detection dog, finding the scent is a puzzle with a reward at the end. To a medical alert dog, noticing that their human smells wrong is not a shift pattern. It is just what they do.`,
           thumbnail: {},
         },
         {
-          subheading: "To humans, it's a job.",
+          subheading: "To humans, *it's a job.*",
           body: `It only becomes work when humans benefit from it. This series looks at the dogs that help Britain function — the noses at the border, the paws on the hills, the search dogs in the woods, the assistance dogs beside their people, and the bio-detection dogs helping scientists ask whether disease has a smell.`,
           thumbnail: {},
         },
         {
-          subheading: "The payment; very different",
+          subheading: "The payment; *very different*",
           body: `They are paid in food, shelter, praise, tennis balls, head strokes and the occasional stolen sausage. But their value is measured in time, safety, independence, science and trust. This is about that hidden workforce, and the question behind every wagging tail: if dogs give us this much, what do we owe them back?`,
           thumbnail: {},
         },
@@ -66,7 +66,7 @@ export const SLIDES: Slide[] = [
     panel: {
       sections: [
         {
-          subheading: "Why dogs love doing",
+          subheading: "Why *dogs love* doing",
           body: `Dogs seem happiest when they have something to do.
 
 For thousands of years they have been selected to chase, retrieve, guard, herd, track, dig, carry and solve problems alongside people, so many of those behaviours are deeply rewarding in their own right. A Labrador fetching a ball, a Collie rounding up the family, or a Terrier digging furiously under a hedge may look like play to us, but to the dog they are using the same instincts, senses and problem-solving skills their ancestors relied on for real jobs.
@@ -74,7 +74,7 @@ For thousands of years they have been selected to chase, retrieve, guard, herd, 
 "Work" does not need to mean employment: anything that gives a dog a purpose, a challenge and the chance to use the abilities it was built for can provide the satisfaction of a job well done.`,
         },
         {
-          subheading: "Why we love dogs doing",
+          subheading: "Why *we* love dogs *doing*",
           body: `For thousands of years, their enthusiasm has made our lives easier.
 
 They herd animals we could never control alone, find people we cannot see, retrieve things we cannot reach, guard homes and livestock, guide people through the world and use extraordinary noses to detect drugs, explosives, disease and even signs of some cancers. What looks like a dog happily following its instincts can save humans hours of work, enormous effort and sometimes lives.
@@ -140,7 +140,7 @@ Some spend their lives bored and under-stimulated, while others are pushed into 
       // it largely repeats panel 1. Shipped as written for now.
       sections: [
         {
-          subheading: "Working dogs do not know they have jobs",
+          subheading: "Working dogs *do not* *know* they have jobs",
           bullets: [
             "To a sheepdog, moving livestock is instinct, training and the best game in the world.",
             "To a detection dog, finding the scent is a puzzle and an instinct with a reward at the end.",

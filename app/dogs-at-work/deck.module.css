@@ -153,7 +153,7 @@
 }
 
 .blueSubheadingAccent {
-  color: var(--yellow);
+  color: var(--emphasis);
 }
 
 /* Proportional measure: the copy column is a fixed fraction of the panel width
@@ -168,9 +168,11 @@
   font-family: var(--font-body, "Montserrat", sans-serif);
   font-size: clamp(0.95rem, 1.5cqi, 1.8rem);
   font-weight: 500;
-  line-height: 1.35;
+  /* Tighter leading and paragraph spacing to match panel 1's density; panel 2's
+     multi-paragraph body was reading looser than the concept. */
+  line-height: 1.28;
   color: var(--cream);
-  margin: 0 0 8px;
+  margin: 0 0 4px;
 }
 
 .blueBody:last-child {
@@ -181,7 +183,7 @@
   font-family: var(--font-body, "Montserrat", sans-serif);
   font-size: clamp(0.95rem, 1.5cqi, 1.8rem);
   font-weight: 500;
-  line-height: 1.35;
+  line-height: 1.28;
   color: var(--cream);
   margin: 0;
   padding-left: 1.2em;

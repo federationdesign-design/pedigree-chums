@@ -45,14 +45,20 @@ const blueTriangles: Tri[] = [
   { size: 42, bottom: "12%", right: "9%", speed: 0.14, spin: -0.2 },
 ];
 
-// The concept colours the tail of a subheading yellow, from the first `;` or `,`
-// onward ("To the dog;" white, "it's a game." yellow). Panels 2 to 4 carry no
-// delimiter, so they render in a single colour. Presentation only, derived from
-// the string, never stored on the record.
-function splitSubheading(text: string): [string, string] {
-  const match = text.match(/^(.*?[;,])(.*)$/);
-  if (!match) return [text, ""];
-  return [match[1], match[2]];
+// Emphasis markers: text between *asterisks* in a subheading renders in the
+// emphasis colour. Appendix A was supplied as plain text, so the markers are
+// added to the data per the concept artwork (which words are yellow), rather
+// than derived from punctuation.
+function renderEmphasis(text: string) {
+  return text.split("*").map((part, i) =>
+    i % 2 === 1 ? (
+      <span key={i} className={styles.blueSubheadingAccent}>
+        {part}
+      </span>
+    ) : (
+      part
+    ),
+  );
 }
 
 // A blue panel body may carry blank-line-separated paragraphs (panels 2 and 3).
@@ -67,9 +73,6 @@ function Sections({ slide, withThumbnails }: { slide: Slide; withThumbnails: boo
     <div className={styles.blueSections}>
       {slide.panel.sections.map((section, si) => {
         const thumb = withThumbnails ? section.thumbnail : undefined;
-        const [head, tail] = section.subheading
-          ? splitSubheading(section.subheading)
-          : ["", ""];
         return (
           <div className={styles.blueSection} key={si}>
             {section.subheading || thumb ? (
@@ -85,8 +88,7 @@ function Sections({ slide, withThumbnails }: { slide: Slide; withThumbnails: boo
                 ) : null}
                 {section.subheading ? (
                   <h2 className={styles.blueSubheading}>
-                    {head}
-                    {tail ? <span className={styles.blueSubheadingAccent}>{tail}</span> : null}
+                    {renderEmphasis(section.subheading)}
                   </h2>
                 ) : null}
               </div>
