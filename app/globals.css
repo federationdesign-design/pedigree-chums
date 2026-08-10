@@ -21,6 +21,15 @@ html {
   /* Dogs at Work call-to-action button. Named by role, not colour, per Steve.
      Value confirmed by Steve against the concept artwork. */
   --cta: #4CB847;
+  /* Dogs at Work family pill fills (brief section 10). Named by family, not
+     colour. Emergency, Rural and Science were adjusted from the originals for
+     contrast or distinctness; do not revert. */
+  --family-medical: #17C138;
+  --family-security: #000000;
+  --family-emergency: #D71F6C;
+  --family-people: #2B7095;
+  --family-rural: #97AA31;
+  --family-science: #10D1B7;
   /* Hidden Games campaign palette (CHANGE-LIST C03) */
   --hg-container: #4dabe9;
   --hg-accent: #f7ed57;

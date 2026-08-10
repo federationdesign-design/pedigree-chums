@@ -278,7 +278,9 @@ export default function WorkDeck({ slides }: { slides: Slide[] }) {
                       Learn <span className={styles.learnAboutAccent}>about&hellip;</span>
                     </p>
                     <div className={styles.articleMeta}>
-                      <span className={styles.pill}>{FAMILY_PILL_LABEL[a.family]}</span>
+                      <span className={styles.pill} data-family={a.family}>
+                        {FAMILY_PILL_LABEL[a.family]}
+                      </span>
                       <span className={styles.subLabel}>{a.subLabel}</span>
                     </div>
                     <h2 className={styles.headline}>{a.headline}</h2>
@@ -347,7 +349,9 @@ export default function WorkDeck({ slides }: { slides: Slide[] }) {
             Learn <span className={styles.learnAboutAccent}>about&hellip;</span>
           </p>
           <div className={styles.articleMeta}>
-            <span className={styles.pill}>{FAMILY_PILL_LABEL[mA.family]}</span>
+            <span className={styles.pill} data-family={mA.family}>
+              {FAMILY_PILL_LABEL[mA.family]}
+            </span>
             <span className={styles.subLabel}>{mA.subLabel}</span>
           </div>
           <h2 className={styles.headline}>{mA.headline}</h2>

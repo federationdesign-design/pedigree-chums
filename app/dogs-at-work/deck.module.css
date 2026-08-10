@@ -335,18 +335,48 @@
   flex-wrap: wrap;
 }
 
-/* Neutral placeholder pill. Per-family colours and the cream outline arrive at
-   checkpoint 5 (brief section 10). */
+/* Family pills (brief section 10). Colour comes from the family via data-family;
+   every pill carries a 1px cream outline, because three fills sit too close to
+   navy for the pill shape to read against it without one. */
 .pill {
   font-family: var(--font-body, "Montserrat", sans-serif);
   font-size: 0.72rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--navy);
-  background: var(--cream);
   border-radius: var(--radius-pill, 999px);
   padding: 4px 14px;
+  border: 1px solid var(--cream);
+}
+
+.pill[data-family="Medical"] {
+  background: var(--family-medical);
+  color: var(--navy);
+}
+
+.pill[data-family="Security"] {
+  background: var(--family-security);
+  color: var(--cream);
+}
+
+.pill[data-family="Emergency"] {
+  background: var(--family-emergency);
+  color: var(--cream);
+}
+
+.pill[data-family="People"] {
+  background: var(--family-people);
+  color: var(--cream);
+}
+
+.pill[data-family="Rural and Traditional"] {
+  background: var(--family-rural);
+  color: var(--navy);
+}
+
+.pill[data-family="Science"] {
+  background: var(--family-science);
+  color: var(--navy);
 }
 
 .subLabel {
