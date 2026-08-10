@@ -86,40 +86,41 @@ function Sections({ slide, withThumbnails }: { slide: Slide; withThumbnails: boo
       {slide.panel.sections.map((section, si) => {
         const thumb = withThumbnails ? section.thumbnail : undefined;
         return (
-          <div className={styles.blueSection} key={si}>
-            {section.subheading || thumb ? (
-              <div className={styles.blueHeadingRow}>
-                {thumb ? (
-                  thumb.src ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img className={styles.thumb} src={thumb.src} alt={thumb.alt ?? ""} loading="lazy" />
-                  ) : (
-                    // Pending: reserve the space, render nothing visible.
-                    <span className={styles.thumbPending} aria-hidden="true" />
-                  )
-                ) : null}
-                {section.subheading ? (
-                  <h2 className={styles.blueSubheading}>
-                    {renderMarked(section.subheading)}
-                  </h2>
+          <div
+            className={thumb ? `${styles.blueSection} ${styles.withThumb}` : styles.blueSection}
+            key={si}
+          >
+            {thumb ? (
+              thumb.src ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img className={styles.thumb} src={thumb.src} alt={thumb.alt ?? ""} loading="lazy" />
+              ) : (
+                // Pending: reserve the space, render nothing visible.
+                <span className={styles.thumbPending} aria-hidden="true" />
+              )
+            ) : null}
+            <div className={styles.blueSectionMain}>
+              {section.subheading ? (
+                <h2 className={styles.blueSubheading}>
+                  {renderMarked(section.subheading)}
+                </h2>
+              ) : null}
+              <div className={styles.blueSectionBody}>
+                {section.body
+                  ? paragraphs(section.body).map((p, pi) => (
+                      <p className={styles.blueBody} key={pi}>
+                        {renderMarked(p)}
+                      </p>
+                    ))
+                  : null}
+                {section.bullets ? (
+                  <ul className={styles.blueBullets}>
+                    {section.bullets.map((b, bi) => (
+                      <li key={bi}>{renderMarked(b)}</li>
+                    ))}
+                  </ul>
                 ) : null}
               </div>
-            ) : null}
-            <div className={styles.blueSectionBody}>
-              {section.body
-                ? paragraphs(section.body).map((p, pi) => (
-                    <p className={styles.blueBody} key={pi}>
-                      {renderMarked(p)}
-                    </p>
-                  ))
-                : null}
-              {section.bullets ? (
-                <ul className={styles.blueBullets}>
-                  {section.bullets.map((b, bi) => (
-                    <li key={bi}>{renderMarked(b)}</li>
-                  ))}
-                </ul>
-              ) : null}
             </div>
           </div>
         );

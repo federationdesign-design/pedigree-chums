@@ -12,8 +12,8 @@ redirects that to `docs/dogs-at-work/NEEDS_STEVE.md` per the path override.)
 | Alt text for article 3 hero (`article3_hero.jpg`) | `app/dogs-at-work/data/slides.ts` (electronic-nose) | `PLACEHOLDER_ARTICLE_3_ALT` | Image is wired; alt outstanding (open question 4). |
 | Alt text for `sheepdogs_job.jpg` | `app/dogs-at-work/data/slides.ts` (sheepdogs) | `PLACEHOLDER_ARTICLE_4_ALT` | Article 4 hero; alt outstanding (section 15). |
 | Index card dek for article 4 | `app/dogs-at-work/data/slides.ts` (sheepdogs) | `PLACEHOLDER_ARTICLE_4_DEK` | Article opens with a scene, not a summary, so it cannot be extracted mechanically (section 15). |
-| Panel 1 thumbnail images (3) | `app/dogs-at-work/data/slides.ts` (bio-detection panel) | `/PLACEHOLDER_panel1_thumb_1..3.png` | Steve is supplying the real images; do not source, crop or reuse an article hero (section 6). |
-| Panel 1 thumbnail alt text (3) | same | `PLACEHOLDER:` alt strings | Outstanding (section 6). |
+| Panel 1 thumbnail images (3) | `app/dogs-at-work/data/slides.ts` (bio-detection panel) | WIRED: `/dog_working_img1..3.jpg` | Steve supplied the images (11 Aug); order is game, then job, then payment, mirroring the concept. |
+| Panel 1 thumbnail alt text (3) | same | `PLACEHOLDER_PANEL1_THUMB_1..3_ALT` | Alt strings still outstanding; images now render (section 6). |
 
 ## Decisions carried into the build (open questions, section 18)
 
@@ -22,6 +22,17 @@ redirects that to `docs/dogs-at-work/NEEDS_STEVE.md` per the path override.)
   Shipped as written for now.
 - **Blue panel overlap.** Whether the blue panel overlaps the top of the article
   panel, as in the concept mockup (open question 5). Report, not resolved.
+
+## Flagged for Steve, not this branch's job
+
+- **Know Your Chums has two `.title` rules, both `!important`.**
+  `app/know-your-chums/know.module.css` line 76 sets `.title` to
+  `clamp(3rem, 9vw, 6rem) !important`, and line 822 sets `.title` to
+  `clamp(4.8rem, 14vw, 11rem) !important`. Same specificity, so the later rule
+  (822) wins and line 76 is dead: the page renders at 176px, not 96px. Reported
+  here for Steve; deliberately not fixed on the dogsatwork branch. (This is why
+  matching Dogs at Work "to Know Your Chums" had to target the live 176px rule,
+  not the shadowed 96px one.)
 
 ## Budget discrepancy found at checkpoint 2
 

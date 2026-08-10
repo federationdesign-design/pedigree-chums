@@ -140,5 +140,4 @@ outstanding decisions are in `docs/dogs-at-work/NEEDS_STEVE.md`.
 | `PLACEHOLDER_ARTICLE_3_ALT` | `app/dogs-at-work/data/slides.ts` (electronic-nose) | Alt text for article 3 hero `article3_hero.jpg` | Steve supplies alt text (open question 4) |
 | `PLACEHOLDER_ARTICLE_4_ALT` | `app/dogs-at-work/data/slides.ts` (sheepdogs) | Alt text for `sheepdogs_job.jpg` | Steve supplies alt text (section 15) |
 | `PLACEHOLDER_ARTICLE_4_DEK` | `app/dogs-at-work/data/slides.ts` (sheepdogs) | Index card dek for article 4 | Steve supplies the dek; article opens with a scene, not a summary (section 15) |
-| `/PLACEHOLDER_panel1_thumb_1.png` .. `_3.png` | `app/dogs-at-work/data/slides.ts` (bio-detection panel) | Three panel 1 thumbnail images | Steve supplies real images; do not source or reuse a hero (section 6) |
-| Panel 1 thumbnail alt text (3) | same | Alt text for the three thumbnails | Steve supplies alt text (section 6) |
+| `PLACEHOLDER_PANEL1_THUMB_1..3_ALT` | `app/dogs-at-work/data/slides.ts` (bio-detection panel) | Alt text for the three panel 1 thumbnails (images now wired: `/dog_working_img1..3.jpg`) | Steve supplies alt text (section 6) |

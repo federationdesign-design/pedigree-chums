@@ -41,10 +41,13 @@
 
 .title {
   font-family: var(--font-display, "Luckiest Guy", cursive);
-  /* Matched to the Know Your Chums h1 (.title in know-your-chums/know.module.css:
-     clamp(3rem, 9vw, 6rem), line-height 0.92), reused rather than invented. */
-  font-size: clamp(3rem, 9vw, 6rem);
-  line-height: 0.92;
+  /* Editorial series tier. Dogs at Work is the third page in the Know Your Chums
+     / Britain's Dog History series and reads as one with them, so the h1 is taken
+     from the series source, britains-dog-history/history.module.css (.title:
+     clamp(4.8rem, 14vw, 11rem), line-height 0.95), the same way Know Your Chums
+     points at it. */
+  font-size: clamp(4.8rem, 14vw, 11rem);
+  line-height: 0.95;
   letter-spacing: 0.03em;
   text-transform: uppercase;
   color: var(--cream);
@@ -57,12 +60,17 @@
 
 .introText {
   font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: clamp(0.95rem, 1.4vw, 1.15rem);
-  font-weight: 500;
-  line-height: 1.5;
-  color: var(--cream);
-  margin: 0 auto;
-  max-width: 1120px;
+  /* Editorial series tier: intro matched exactly to the series source,
+     britains-dog-history/history.module.css (.lead): font-size
+     clamp(28px, 3.6vw, 36px), weight 600, line-height 1.1, max-width 56ch,
+     margin 16px auto 0, colour --white. Reused rather than invented so the
+     three pages read as one. */
+  font-size: clamp(28px, 3.6vw, 36px);
+  font-weight: 600;
+  line-height: 1.1;
+  color: var(--white);
+  margin: 16px auto 0;
+  max-width: 56ch;
 }
 
 /* ── Blue panel (GlowPanel shell) ─────────────────────────────── */
@@ -109,7 +117,7 @@
   display: flex;
   /* Container units (cqi = 1% of the panel width): top padding, right room for
      the chevron, bottom room for the dots, left gutter. */
-  padding: clamp(28px, 4cqi, 48px) clamp(96px, 12.7cqi, 150px)
+  padding: clamp(50px, 4.25cqi, 52px) clamp(96px, 12.7cqi, 150px)
     clamp(54px, 6.3cqi, 74px) clamp(28px, 4.4cqi, 52px);
 }
 
@@ -121,19 +129,24 @@
   width: 100%;
 }
 
-/* The thumbnail sits inline with the subheading (concept), not in a column
-   beside the body. Body copy sits below at a capped measure. */
-.blueHeadingRow {
+/* Panel 1 sections with a thumbnail lay out as [thumbnail | column]: the
+   thumbnail is level with the heading (top-aligned), and the heading plus body
+   flow as one column to its right (concept). Sections without a thumbnail render
+   as a plain block, so only panel 1 is affected. */
+.withThumb {
   display: flex;
-  align-items: center;
-  gap: clamp(12px, 1.7cqi, 20px);
-  margin-bottom: 3px;
+  align-items: flex-start;
+  gap: clamp(16px, 2.2cqi, 28px);
+}
+.blueSectionMain {
+  min-width: 0;
+  flex: 1 1 auto;
 }
 
 .thumb {
   flex: 0 0 auto;
-  width: clamp(48px, 5.4cqi, 64px);
-  height: clamp(48px, 5.4cqi, 64px);
+  width: clamp(96px, 10.8cqi, 128px);
+  height: clamp(96px, 10.8cqi, 128px);
   object-fit: cover;
   border-radius: 14px;
   display: block;
@@ -142,8 +155,8 @@
 /* Pending thumbnail: reserves its footprint, renders nothing visible. */
 .thumbPending {
   flex: 0 0 auto;
-  width: clamp(48px, 5.4cqi, 64px);
-  height: clamp(48px, 5.4cqi, 64px);
+  width: clamp(96px, 10.8cqi, 128px);
+  height: clamp(96px, 10.8cqi, 128px);
   visibility: hidden;
 }
 
@@ -154,13 +167,18 @@
   letter-spacing: 0.02em;
   text-transform: uppercase;
   color: var(--cream);
-  margin: 0;
+  /* Small gap to the body below (previously carried by the heading row). */
+  margin: 0 0 3px;
 }
 
 /* Emphasis: the --emphasis yellow, on any panel text (subheadings, body,
    bullets) via the *marker*. A whole yellow line is that line wrapped in *...*. */
 .emph {
   color: var(--emphasis);
+  /* Semi-bold for body emphasis (Montserrat 500 -> 600). Inert on subheadings,
+     which are Luckiest Guy (a single-weight display face), so applying it to
+     every marker is safe and does not thin or thicken a heading span. */
+  font-weight: 600;
 }
 
 /* Bold: the **marker**, for lead-in lines and bullet lead-ins. */
@@ -178,11 +196,15 @@
 
 .blueBody {
   font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: clamp(1.05rem, 2cqi, 2.4rem);
+  /* Font-size deliberately stays in container units (cqi) so panel height does
+     not track window size; NOT copied from History's vw clamp. Leading is taken
+     from history.module.css (.detail: line-height 1.1); weight is 500 (History's
+     .detail is 400, but our multi-paragraph panels read better one step up).
+     The 6px bottom margin is kept: our multi-paragraph bodies (panels 2 and 3) are
+     spaced paragraph-by-paragraph, where History spaces .detail by its container. */
+  font-size: clamp(1.15rem, 2.35cqi, 2.6rem);
   font-weight: 500;
-  /* Tighter leading and paragraph spacing to match panel 1's density; panel 2's
-     multi-paragraph body was reading looser than the concept. */
-  line-height: 1.28;
+  line-height: 1.1;
   color: var(--cream);
   margin: 0 0 6px;
 }
@@ -193,9 +215,11 @@
 
 .blueBullets {
   font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: clamp(1.05rem, 2cqi, 2.4rem);
+  /* Same as .blueBody: cqi font-size kept, weight 500, line-height 1.1 (leading
+     from history.module.css .detail; weight one step up from its 400). */
+  font-size: clamp(1.15rem, 2.35cqi, 2.6rem);
   font-weight: 500;
-  line-height: 1.28;
+  line-height: 1.1;
   color: var(--cream);
   margin: 0;
   /* Restore the disc (Tailwind preflight resets ul to list-style: none); the
