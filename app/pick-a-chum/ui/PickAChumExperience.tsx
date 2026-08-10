@@ -483,9 +483,10 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
   const fanAnchorRef = useRef<HTMLDivElement | null>(null);
   const [colBox, setColBox] = useState<{ left: number; top: number; bottom: number } | null>(null);
   const COL_W = 380;
-  // Task 162 (reopen-from-chip): where a docked (corner-anchored) dog sits -- the same corner the minimised chip uses
-  // (.miniDock left/top 18px). The fan anchor is 128px, matching the chip, so a reopen lands exactly.
-  const DOCK_L = 18;
+  // Task 162 (reopen-from-chip): where a docked (corner-anchored) dog sits -- the same spot the minimised chip uses
+  // (.miniDock left/top). The fan anchor is 128px, matching the chip, so a reopen lands exactly. Keep DOCK_L in sync
+  // with .miniDock's left (168px, shifted right to sit beside the logo) or the reopened chat jumps away from the chip.
+  const DOCK_L = 168;
   const DOCK_T = 18;
   // Owner review: the chat reaches the TOP of the window, so a long history
   // slides off the window edge rather than vanishing at an invisible line.
@@ -1597,10 +1598,12 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
           </div>
         </>
       )}
-      {/* Owner review: while minimised the dog persists at her full size,
-          parked TOP LEFT, with none of the chat showing. Her face restores
-          the conversation; the X still closes. The scrim and the offer card
-          hide via body[data-pc-min] as before. */}
+      {/* While minimised the dog persists at her full size, parked beside the
+          logo, with none of the chat showing. Her face restores the
+          conversation; there is no close on the chip (minimise and close are
+          separate: to end a session, reopen and close from the chat). No name
+          either -- the chip is a face, the name shows only in the active chat.
+          The scrim and the offer card hide via body[data-pc-min] as before. */}
       {phase !== 'selecting' && minimised && (
         <div className={styles.miniDock}>
           <button
@@ -1615,10 +1618,6 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
               window.setTimeout(() => inputRef.current?.focus(), 60); // Task 82
             }}
           />
-          <button type="button" className={styles.close} aria-label="Close Pick a Chum" onClick={closeChat}>
-            <img src="/red-icon.svg" alt="" aria-hidden="true" />
-          </button>
-          <div className={styles.anchorName} aria-hidden="true">{nameLines(dogInfo(dog).name)}</div>
         </div>
       )}
       {/* Screen-reader announcements stay mounted through minimise, so a

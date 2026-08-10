@@ -995,8 +995,11 @@
    body[data-pc-min] hides the scrim and the offer card. */
 .miniDock {
   position: fixed;
-  /* Owner review: even padding to the corner, matching the 18px left. */
-  left: 18px;
+  /* Shifted right so the chip sits BESIDE the logo, not on top of it: the logo's
+     right edge lands near 130px (padding-left + logo width at min clamp), so 168px
+     clears it. top holds at 18px. DOCK_L in PickAChumExperience.tsx tracks this same
+     value so a reopened chat still expands from the chip (Task 162). */
+  left: 168px;
   top: 18px;
   width: 128px;
   height: 128px;
