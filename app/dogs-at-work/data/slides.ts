@@ -154,6 +154,13 @@ Some spend their lives bored and under-stimulated, while others are pushed into 
             "The bio-detection dogs helping identify disease by smell",
           ],
         },
+        // DELIBERATE, do not "fix": the concept renders these two closing lines
+        // ("It is just what they do." and "It only becomes work...") one size
+        // larger than the surrounding body. That size step was declined (Steve,
+        // option 1) to keep exactly two inline markers. Size is NOT an axis the
+        // markers carry: *text* is emphasis (the --emphasis yellow) and **text**
+        // is bold, neither changes size. Do not add a third marker or a
+        // per-section size field to reproduce the step-up.
         {
           body: `It is just what they do. *It only becomes work when humans benefit from it.*`,
         },

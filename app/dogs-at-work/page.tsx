@@ -48,15 +48,6 @@ const ARTICLES = [
   },
 ];
 
-const COMING = [
-  { tag: "Public service", name: "Police & Border Force dogs", desc: "Tracking, searching, and the noses that screen a border before anyone opens a suitcase." },
-  { tag: "Rural", name: "Sheepdogs", desc: "One of the oldest and most economically important dog jobs in Britain -- a farm worker with four legs." },
-  { tag: "Emergency", name: "Search & rescue dogs", desc: "Air-scenting and trailing dogs that find missing people when time is running out." },
-  { tag: "Science", name: "Conservation detection dogs", desc: "Finding newts, invasive species and tree disease that humans simply cannot see." },
-  { tag: "Wildcard", name: "Water-leak detection dogs", desc: "Yes, really -- dogs that sniff out leaks in the water network. Almost nobody knows they exist." },
-  { tag: "Independence", name: "Assistance & guide dogs", desc: "The clearest economic case of all: a life lived independently, measured in more than sentiment." },
-];
-
 export default function DogsAtWorkPage() {
   // Live slides in editorial order for the desktop mechanic. The pairing is
   // explicit in the record, so order comes from the `order` field, never array
@@ -119,19 +110,6 @@ export default function DogsAtWorkPage() {
               </div>
             </article>
           ))}
-        </section>
-
-        <section className={styles.coming}>
-          <h2 className={styles.comingTitle}>Coming to the workforce</h2>
-          <div className={styles.comingGrid}>
-            {COMING.map((c) => (
-              <div key={c.name} className={styles.comingCard}>
-                <span className={styles.comingTag}>{c.tag}</span>
-                <p className={styles.comingName}>{c.name}</p>
-                <p className={styles.comingDesc}>{c.desc}</p>
-              </div>
-            ))}
-          </div>
         </section>
 
         {/* ── Mobile carousel (mirrors Good Dog Bad Dog) ── */}

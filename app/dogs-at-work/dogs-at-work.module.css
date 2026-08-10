@@ -206,88 +206,6 @@
   color: var(--yellow, #ffd23e);
 }
 
-/* ── Coming soon ────────────────────────────────────────────── */
-.coming {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 0 24px;
-}
-
-.comingTitle {
-  font-family: var(--font-display, "Luckiest Guy", cursive);
-  font-size: 1.8rem;
-  color: #ffffff;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  margin: 0 0 24px;
-  border-bottom: 2px solid rgba(255,255,255,0.15);
-  padding-bottom: 16px;
-}
-
-.comingGrid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-}
-
-@media (max-width: 600px) {
-  .comingGrid {
-    grid-template-columns: 1fr;
-  }
-}
-
-.comingCard {
-  background: var(--navy, #0a3a57);
-  border: 1.5px solid rgba(255,255,255,0.1);
-  border-radius: 16px;
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.comingTag {
-  font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: 0.6rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  background: rgba(255,255,255,0.1);
-  color: #ffffff;
-  border-radius: 999px;
-  padding: 3px 12px;
-  align-self: flex-start;
-}
-
-.comingName {
-  font-family: var(--font-display, "Luckiest Guy", cursive);
-  font-size: 1.1rem;
-  color: var(--yellow, #ffd23e);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  margin: 0;
-  line-height: 1.2;
-}
-
-.comingBreed {
-  font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: 0.7rem;
-  font-weight: 700;
-  color: #aac4d4;
-  margin: 0;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-}
-
-.comingDesc {
-  font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: 0.8rem;
-  font-weight: 500;
-  color: #ffffff;
-  line-height: 1.6;
-  margin: 4px 0 0;
-}
-
 /* ── Index grid ─────────────────────────────────────────────── */
 .grid {
   max-width: 1100px;
@@ -493,25 +411,22 @@
 
 /* Checkpoints 3 and 4: the WorkDeck mechanic replaces the legacy layout at every
    width (the desktop deck at >=769px, the mobile stack at <=768px), so the hero
-   and the three-card article grid are hidden. The "Coming to the workforce" grid
-   stays hidden here too until checkpoint 5 (paired with the forward register).
-   The legacy page shell (base min-height 100vh) is collapsed so the footer sits
-   directly below the deck instead of behind a viewport-tall empty gap; the footer
-   stays and the page scrolls to reach it. */
+   and the three-card article grid are hidden. (The "Coming to the workforce"
+   grid was removed at checkpoint 5, its subjects carried into the forward
+   register.) The legacy page shell (base min-height 100vh) is collapsed so the
+   footer sits directly below the deck instead of behind a viewport-tall empty
+   gap; the footer stays and the page scrolls to reach it. */
 @media (min-width: 769px) {
   .hero { display: none; }
   .grid { display: none; }
-  .coming { display: none; }
   .page { padding: 0; min-height: 0; }
 }
 
 @media (max-width: 768px) {
 
-  /* Hide the desktop layout, including the placeholder "Coming to the
-     workforce" block, which has no place in the swipe view. */
+  /* Hide the legacy desktop layout in the swipe view. */
   .hero { display: none; }
   .grid { display: none; }
-  .coming { display: none; }
 
   /* Checkpoint 4: the WorkDeck mobile stack replaces the legacy carousel, so the
      carousel is hidden and the legacy page shell is collapsed to nothing. The
