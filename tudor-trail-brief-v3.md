@@ -189,6 +189,8 @@ Shepherd's Dog  (medieval)
 
 **Write:** Old English Black and Tan Terrier, Old English White Terrier.
 
+**DEPTH CONSTRAINT (added 10 August, carried from Family 2).** `Old English Black and Tan Terrier` must reach a Tudor-or-earlier card in ONE or TWO hops, no more. The Irish terrier line grafts through it and is already deep: Kerry Blue, Soft-Coated Wheaten, Native Irish terriers, Old English Black and Tan Terrier, then this ancestor's own children. That puts Old English Black and Tan Terrier at depth 3. `MAX_LINEAGE_DEPTH` is 5, so a Tudor card must appear by the second hop below it (depth 5) or Kerry Blue will not graft and the Family 2 total will fall short of 6. Keep its tree shallow.
+
 **These are NOT renames.** They are the older working populations the named breeds came out of, exactly like `Old Border terriers` against `Border Terrier`.
 
 - `Old English Black and Tan Terrier` appears as a leaf in **29 trees**, so this is one of the biggest single wins in the data.

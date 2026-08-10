@@ -600,6 +600,42 @@ const LINEAGE: Record<string, LineageNode> = {
     ]
   },
 
+  // Family 2, Irish, fell and highland terriers (Tudor trail, 10 August).
+  // Two roots. The Highland and glen earth dogs go back to the medieval Earth
+  // Dog, so they reach Tudor now. The Irish and fell terriers root in the old
+  // British black-and-tan working terrier (Old English Black and Tan Terrier),
+  // which is a Family 6 writing job, so those lines wait for Family 6. The
+  // single-parent value of 100 is deliberate and honest, matching the shipped
+  // Soft-Coated Wheaten Terrier, not the valueless-branch shape.
+  "Skye terrier stock": {
+    name: "Skye terrier stock",
+    note: "The long-coated Isle of Skye earth dogs at the root of the whole Highland terrier family. Now extinct.",
+    children: [
+      { name: "Earth Dog", note: "The old medieval earth-working dog type the Highland earth dogs go back to. Now extinct.", img: "/history/breeds/medieval-earth-dog.jpg", value: 100 }
+    ]
+  },
+  "Low-slung soldiers' dogs": {
+    name: "Low-slung soldiers' dogs",
+    note: "Short-legged dogs left by Flemish and Hessian soldiers settled in the glen. Now extinct.",
+    children: [
+      { name: "Earth Dog", note: "The old low, earth-working dog type behind these short-legged glen dogs. Now extinct.", img: "/history/breeds/medieval-earth-dog.jpg", value: 100 }
+    ]
+  },
+  "Native Irish terriers": {
+    name: "Native Irish terriers",
+    note: "The old Irish farm-terrier stock shared with the Wheaten and Kerry Blue. Now extinct.",
+    children: [
+      { name: "Old English Black and Tan Terrier", note: "The old British black-and-tan working terrier, the shared ratting stock behind Britain and Ireland's farm terriers. Now extinct.", img: "/history/breeds/Old-British-ratting-terriers.jpg", value: 100 }
+    ]
+  },
+  "Old fell terriers": {
+    name: "Old fell terriers",
+    note: "The hardy black-and-tan fox-working terriers of the northern fells. Now extinct.",
+    children: [
+      { name: "Old English Black and Tan Terrier", note: "The old black-and-tan working terrier stock the fell terriers were bred from. Now extinct.", img: "/history/breeds/Old-British-ratting-terriers.jpg", value: 100 }
+    ]
+  },
+
   "Welsh Terrier": {
     name: "Welsh Terrier",
     note: "A wiry black-and-tan terrier from Wales, bred to face fox, otter and badger underground.",
