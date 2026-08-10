@@ -3,6 +3,10 @@ import Link from "next/link";
 import Nav from "../../components/Nav/Nav";
 import Footer from "../../components/Footer/Footer";
 import styles from "./dogs-at-work.module.css";
+// Checkpoint 2: importing the slide record runs its build-time validation
+// (budgets, missing pair, missing image/alt). Checkpoint 3 replaces the inline
+// arrays below with this record; for now the render is unchanged.
+import "./data/slides";
 
 export const metadata: Metadata = {
   title: "Dogs at Work | Pedigree Chums™",
