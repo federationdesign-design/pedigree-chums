@@ -16,7 +16,7 @@ html {
   --cyan: #45cfef;        /* card / bright accent */
   --yellow: #ffd23e;      /* punchy accent */
   --navy: #0a3a57;        /* dark text */
-  --cream: #fbf7ec;       /* warm off-white */
+  --cream: #ffffff;       /* v3.0: was #fbf7ec, now pure white site-wide (see CLAUDE.md) */
   --white: #ffffff;
   /* Hidden Games campaign palette (CHANGE-LIST C03) */
   --hg-container: #4dabe9;
