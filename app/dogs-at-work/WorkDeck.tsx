@@ -1,32 +1,27 @@
 "use client";
 
-// The Dogs at Work desktop mechanic (brief v3.0, section 6, checkpoint 3).
+// The Dogs at Work mechanic (brief v3.0, section 6, checkpoints 3 and 4).
 //
-// Three stacked regions. The introduction is persistent and never animates.
-// The blue panel and the article panel change together on navigation, but move
-// in opposite directions: the blue panel slides one way, the article panel the
-// other. That counter-motion is the signature of the design.
+// One component, two layouts driven by a single slide index:
 //
-// The page scrolls normally: there is no fixed-height deck and no internal
-// panel scroll. The blue container sizes to its copy (with a generous minimum
-// height) so nothing is ever clipped, and the article panel sizes to its
-// content with the headline always at full size.
+// Desktop (>=769px): three stacked regions. The introduction is persistent. The
+// blue panel and the article panel change together on navigation but move in
+// opposite directions (counter-motion): the blue filmstrip translates left, the
+// article filmstrip, rendered in reverse order, translates right, so the tracks
+// cross. The page scrolls normally; the blue container sizes to its copy above a
+// generous minimum, so nothing is clipped. The blue container reuses the shared
+// GlowPanel shell (extracted from the homepage pitch panel).
 //
-// Both panels are single-frame viewports over a filmstrip. The blue filmstrip
-// runs in natural order and translates left as the index grows. The article
-// filmstrip is rendered in reverse order and translates the opposite way, so the
-// two tracks cross. Only the current frame of each is interactive; the rest are
-// marked `inert`, which removes them from tab order and the accessibility tree.
+// Mobile (<=768px): a single vertical stack that scrolls normally, with no
+// counter-motion. Order: intro, blue panel carrying all its supporting points in
+// one container (no thumbnails), pager (dots and a forward chevron), full-width
+// image, dark article block. Because the pager sits above the image, advancing
+// scrolls the new blue panel to the top so its copy is not left off-screen above.
 //
-// The blue container reuses the signed-off floating-panel shell via the shared
-// GlowPanel component (extracted from the homepage pitch panel), rather than a
-// hand-rolled style. Reduced motion is honoured in CSS: the transitions drop out
-// under prefers-reduced-motion and the panels simply change. Dots are the
-// primary navigation and the only route backwards, because the artwork gives a
-// forward chevron only. Left and right arrow keys page while the deck is focused.
-//
-// Desktop only: gated by min-width in the module CSS. Narrower viewports fall
-// back to the mobile stack (built at checkpoint 4; currently the legacy carousel).
+// Only the current frame is interactive; off-screen desktop frames are `inert`.
+// Dots are the primary navigation and the only route back, because the artwork
+// gives a forward chevron only. Left and right arrow keys page the desktop deck
+// while it is focused. Reduced motion is honoured in CSS.
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
@@ -39,7 +34,7 @@ import styles from "./deck.module.css";
 // Persistent introduction. Transcribed from the concept artwork
 // (dogs_at_work_main_page_concept). Appendix A supplies the blue panels only,
 // not this standing intro, so it is flagged for Steve's confirmation in the
-// checkpoint 3 report rather than invented here.
+// checkpoint report rather than invented here.
 const INTRO =
   'Dogs do not know they have jobs. They follow scent, movement, instinct, training and reward. The "work" begins when humans turn those natural abilities into value: safer airports, faster searches, healthier people, protected livestock, better science. Dogs are an invisible workforce whose contribution is felt emotionally but rarely counted economically.';
 
@@ -65,20 +60,91 @@ function paragraphs(body: string): string[] {
   return body.split(/\n{2,}/).map((p) => p.trim()).filter(Boolean);
 }
 
+// One blue panel's sections. Thumbnails are desktop, panel 1 only; mobile never
+// shows them, so `withThumbnails` gates them.
+function Sections({ slide, withThumbnails }: { slide: Slide; withThumbnails: boolean }) {
+  return (
+    <div className={styles.blueSections}>
+      {slide.panel.sections.map((section, si) => {
+        const thumb = withThumbnails ? section.thumbnail : undefined;
+        const [head, tail] = section.subheading
+          ? splitSubheading(section.subheading)
+          : ["", ""];
+        return (
+          <div className={styles.blueSection} key={si}>
+            {section.subheading || thumb ? (
+              <div className={styles.blueHeadingRow}>
+                {thumb ? (
+                  thumb.src ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img className={styles.thumb} src={thumb.src} alt={thumb.alt ?? ""} loading="lazy" />
+                  ) : (
+                    // Pending: reserve the space, render nothing visible.
+                    <span className={styles.thumbPending} aria-hidden="true" />
+                  )
+                ) : null}
+                {section.subheading ? (
+                  <h2 className={styles.blueSubheading}>
+                    {head}
+                    {tail ? <span className={styles.blueSubheadingAccent}>{tail}</span> : null}
+                  </h2>
+                ) : null}
+              </div>
+            ) : null}
+            <div className={styles.blueSectionBody}>
+              {section.body
+                ? paragraphs(section.body).map((p, pi) => (
+                    <p className={styles.blueBody} key={pi}>
+                      {p}
+                    </p>
+                  ))
+                : null}
+              {section.bullets ? (
+                <ul className={styles.blueBullets}>
+                  {section.bullets.map((b, bi) => (
+                    <li key={bi}>{b}</li>
+                  ))}
+                </ul>
+              ) : null}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 export default function WorkDeck({ slides }: { slides: Slide[] }) {
   const [index, setIndex] = useState(0);
   const rootRef = useRef<HTMLDivElement>(null);
+  const mBlueRef = useRef<HTMLDivElement>(null);
+  const didMount = useRef(false);
   const count = slides.length;
 
-  // Drive the two filmstrip transforms from a single index custom property.
-  // Setting it via the ref keeps all visual rules in the CSS module rather than
-  // inline styles.
+  // Drive the desktop filmstrip transforms from a single index custom property.
+  // Setting it via the ref keeps all visual rules in the CSS module.
   useEffect(() => {
     const el = rootRef.current;
     if (!el) return;
     el.style.setProperty("--i", String(index));
     el.style.setProperty("--n", String(count));
   }, [index, count]);
+
+  // Mobile only: on navigation the pager sits above the image, so bring the new
+  // blue panel to the top rather than leaving its copy scrolled off above. Skips
+  // the initial mount so the page does not jump on load.
+  useEffect(() => {
+    if (!didMount.current) {
+      didMount.current = true;
+      return;
+    }
+    if (typeof window === "undefined") return;
+    if (!window.matchMedia("(max-width: 768px)").matches) return;
+    const el = mBlueRef.current;
+    if (!el) return;
+    const top = el.getBoundingClientRect().top + window.scrollY - 84; // clear the nav
+    window.scrollTo({ top, behavior: "smooth" });
+  }, [index]);
 
   function go(to: number) {
     setIndex((i) => {
@@ -99,185 +165,202 @@ export default function WorkDeck({ slides }: { slides: Slide[] }) {
 
   const atEnd = index >= count - 1;
 
-  return (
-    <section
-      ref={rootRef}
-      className={styles.deck}
-      role="region"
-      aria-roledescription="carousel"
-      aria-label="Dogs at Work"
-      tabIndex={0}
-      onKeyDown={onKeyDown}
-    >
-      {/* Persistent introduction. Identical on every slide, never animates. */}
-      <header className={styles.intro}>
-        <h1 className={styles.title}>
-          Dogs <span className={styles.titleAccent}>at</span> Work
-        </h1>
-        <p className={styles.introText}>{INTRO}</p>
-      </header>
-
-      {/* Blue panel: the signed-off GlowPanel shell holding a filmstrip that
-          translates left as the index grows. It sizes to its copy above a
-          generous minimum, so nothing is clipped and nothing scrolls internally. */}
-      <div className={styles.blueWrap}>
-        <GlowPanel className={styles.blueGlow}>
-          <Triangles items={blueTriangles} z={0} />
-          <div className={styles.blueViewport}>
-            <div className={styles.blueTrack}>
-              {slides.map((slide, i) => (
-                <article
-                  key={slide.id}
-                  className={styles.blueSlide}
-                  inert={i !== index}
-                  aria-hidden={i !== index}
-                >
-                  <div className={styles.blueSections}>
-                    {slide.panel.sections.map((section, si) => {
-                      const thumb = slide.panel.thumbnails?.[si];
-                      const [head, tail] = section.subheading
-                        ? splitSubheading(section.subheading)
-                        : ["", ""];
-                      return (
-                        <div className={styles.blueSection} key={si}>
-                          {thumb ? (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img
-                              className={styles.thumb}
-                              src={thumb.src}
-                              alt={thumb.alt}
-                              loading="lazy"
-                            />
-                          ) : null}
-                          <div className={styles.blueSectionText}>
-                            {section.subheading ? (
-                              <h2 className={styles.blueSubheading}>
-                                {head}
-                                {tail ? (
-                                  <span className={styles.blueSubheadingAccent}>{tail}</span>
-                                ) : null}
-                              </h2>
-                            ) : null}
-                            {section.body
-                              ? paragraphs(section.body).map((p, pi) => (
-                                  <p className={styles.blueBody} key={pi}>
-                                    {p}
-                                  </p>
-                                ))
-                              : null}
-                            {section.bullets ? (
-                              <ul className={styles.blueBullets}>
-                                {section.bullets.map((b, bi) => (
-                                  <li key={bi}>{b}</li>
-                                ))}
-                              </ul>
-                            ) : null}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </article>
-              ))}
-            </div>
-          </div>
-        </GlowPanel>
-
-        {/* Forward chevron. The artwork provides no back chevron; dots do that. */}
+  // Shared controls: the pager (dots) and the forward chevron.
+  const dots = (
+    <div className={styles.pager} role="group" aria-label="Choose a dog">
+      {slides.map((slide, i) => (
         <button
           type="button"
-          className={styles.chevron}
-          onClick={() => go(index + 1)}
-          disabled={atEnd}
-          aria-label="Next dog"
-        >
-          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <path
-              d="M8 4l8 8-8 8"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="3"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </button>
-      </div>
+          key={slide.id}
+          className={styles.dot}
+          aria-label={`${slide.article.subLabel}, ${i + 1} of ${count}`}
+          aria-current={i === index ? "true" : undefined}
+          onClick={() => go(i)}
+        />
+      ))}
+    </div>
+  );
 
-      {/* Pager: dots are the primary navigation and the only route back. Sits in
-          its own bar so it never collides with the blue panel copy. */}
-      <div className={styles.pager} role="group" aria-label="Choose a dog">
-        {slides.map((slide, i) => (
+  const chevronSvg = (
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path
+        d="M8 4l8 8-8 8"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+
+  const mobileSlide = slides[index];
+  const mA = mobileSlide.article;
+
+  return (
+    <>
+      {/* ── Desktop mechanic (>=769px) ─────────────────────────────── */}
+      <section
+        ref={rootRef}
+        className={styles.deck}
+        role="region"
+        aria-roledescription="carousel"
+        aria-label="Dogs at Work"
+        tabIndex={0}
+        onKeyDown={onKeyDown}
+      >
+        <header className={styles.intro}>
+          <h1 className={styles.title}>
+            Dogs <span className={styles.titleAccent}>at</span> Work
+          </h1>
+          <p className={styles.introText}>{INTRO}</p>
+        </header>
+
+        <div className={styles.blueWrap}>
+          <GlowPanel className={styles.blueGlow}>
+            <Triangles items={blueTriangles} z={0} />
+            <div className={styles.blueViewport}>
+              <div className={styles.blueTrack}>
+                {slides.map((slide, i) => (
+                  <article
+                    key={slide.id}
+                    className={styles.blueSlide}
+                    inert={i !== index}
+                    aria-hidden={i !== index}
+                  >
+                    <Sections slide={slide} withThumbnails />
+                  </article>
+                ))}
+              </div>
+            </div>
+          </GlowPanel>
+
           <button
             type="button"
-            key={slide.id}
-            className={styles.dot}
-            aria-label={`${slide.article.subLabel}, ${i + 1} of ${count}`}
-            aria-current={i === index ? "true" : undefined}
-            onClick={() => go(i)}
-          />
-        ))}
-      </div>
+            className={styles.chevron}
+            onClick={() => go(index + 1)}
+            disabled={atEnd}
+            aria-label="Next dog"
+          >
+            {chevronSvg}
+          </button>
 
-      {/* Article panel: full-width, split 50/50 image and text, sized to its
-          content. The frames are rendered in reverse order over a normal-row
-          filmstrip, so the track translates opposite to the blue panel:
-          advancing slides the blue panel left and the article panel right. */}
-      <div className={styles.articleViewport}>
-        <div className={styles.articleTrack}>
-          {slides.map((_, revI) => {
-            // DOM slot 0 holds the last slide; slot n-1 holds the first. The
-            // transform then lands frame `index` in view moving rightward.
-            const i = count - 1 - revI;
-            const slide = slides[i];
-            const a = slide.article;
-            const current = i === index;
-            return (
-              <div
-                key={slide.id}
-                className={styles.articleSlide}
-                inert={!current}
-                aria-hidden={!current}
-              >
-                <div className={styles.articleImgWrap}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    className={styles.articleImg}
-                    src={a.image}
-                    alt={a.imageAlt}
-                    loading={current ? "eager" : "lazy"}
-                  />
-                </div>
-                <div className={styles.articleText}>
-                  <p className={styles.learnAbout}>
-                    Learn <span className={styles.learnAboutAccent}>about&hellip;</span>
-                  </p>
-                  <div className={styles.articleMeta}>
-                    {/* Real per-family pill colours land at checkpoint 5; this is
-                        the neutral placeholder pill. */}
-                    <span className={styles.pill}>{FAMILY_PILL_LABEL[a.family]}</span>
-                    <span className={styles.subLabel}>{a.subLabel}</span>
-                  </div>
-                  <h2 className={styles.headline}>{a.headline}</h2>
-                  <p className={styles.dek}>{a.dek}</p>
-                  <Link
-                    href={a.href}
-                    className={styles.cta}
-                    tabIndex={current ? undefined : -1}
-                  >
-                    {a.ctaLabel}
-                  </Link>
-                </div>
-              </div>
-            );
-          })}
+          {/* Dots live inside the panel (bottom-left); the concept shows only the
+              forward chevron, but dots are the required back route. */}
+          <div className={styles.deckPager}>{dots}</div>
         </div>
-      </div>
 
-      {/* Announce the change for assistive tech without moving focus. */}
-      <p className={styles.srStatus} aria-live="polite">
-        {slides[index].article.subLabel}, {index + 1} of {count}
-      </p>
-    </section>
+        <div className={styles.articleViewport}>
+          <div className={styles.articleTrack}>
+            {slides.map((_, revI) => {
+              const i = count - 1 - revI;
+              const slide = slides[i];
+              const a = slide.article;
+              const current = i === index;
+              return (
+                <div
+                  key={slide.id}
+                  className={styles.articleSlide}
+                  inert={!current}
+                  aria-hidden={!current}
+                >
+                  <div className={styles.articleImgWrap}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      className={styles.articleImg}
+                      src={a.image}
+                      alt={a.imageAlt}
+                      loading={current ? "eager" : "lazy"}
+                    />
+                  </div>
+                  <div className={styles.articleText}>
+                    <p className={styles.learnAbout}>
+                      Learn <span className={styles.learnAboutAccent}>about&hellip;</span>
+                    </p>
+                    <div className={styles.articleMeta}>
+                      <span className={styles.pill}>{FAMILY_PILL_LABEL[a.family]}</span>
+                      <span className={styles.subLabel}>{a.subLabel}</span>
+                    </div>
+                    <h2 className={styles.headline}>{a.headline}</h2>
+                    <p className={styles.dek}>{a.dek}</p>
+                    <Link
+                      href={a.href}
+                      className={styles.cta}
+                      tabIndex={current ? undefined : -1}
+                    >
+                      {a.ctaLabel}
+                    </Link>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        <p className={styles.srStatus} aria-live="polite">
+          {slides[index].article.subLabel}, {index + 1} of {count}
+        </p>
+      </section>
+
+      {/* ── Mobile stack (<=768px) ─────────────────────────────────── */}
+      <section
+        className={styles.mobile}
+        role="region"
+        aria-roledescription="carousel"
+        aria-label="Dogs at Work"
+      >
+        <header className={styles.mIntro}>
+          <h1 className={styles.title}>
+            Dogs <span className={styles.titleAccent}>at</span> Work
+          </h1>
+          <p className={styles.introText}>{INTRO}</p>
+        </header>
+
+        {/* Blue panel: all supporting points in one container, no thumbnails. */}
+        <div className={styles.mBlueWrap} ref={mBlueRef}>
+          <GlowPanel className={styles.mBlue}>
+            <Sections slide={mobileSlide} withThumbnails={false} />
+          </GlowPanel>
+        </div>
+
+        {/* Pager: dots plus the forward chevron, above the image. */}
+        <div className={styles.mPager}>
+          {dots}
+          <button
+            type="button"
+            className={styles.mChevron}
+            onClick={() => go(index + 1)}
+            disabled={atEnd}
+            aria-label="Next dog"
+          >
+            {chevronSvg}
+          </button>
+        </div>
+
+        <div className={styles.mImage}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={mA.image} alt={mA.imageAlt} loading="lazy" />
+        </div>
+
+        <div className={styles.mArticle}>
+          <p className={styles.learnAbout}>
+            Learn <span className={styles.learnAboutAccent}>about&hellip;</span>
+          </p>
+          <div className={styles.articleMeta}>
+            <span className={styles.pill}>{FAMILY_PILL_LABEL[mA.family]}</span>
+            <span className={styles.subLabel}>{mA.subLabel}</span>
+          </div>
+          <h2 className={styles.headline}>{mA.headline}</h2>
+          <p className={styles.dek}>{mA.dek}</p>
+          <Link href={mA.href} className={styles.cta}>
+            {mA.ctaLabel}
+          </Link>
+        </div>
+
+        <p className={styles.srStatus} aria-live="polite">
+          {mA.subLabel}, {index + 1} of {count}
+        </p>
+      </section>
+    </>
   );
 }

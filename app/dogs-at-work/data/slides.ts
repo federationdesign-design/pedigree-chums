@@ -25,26 +25,27 @@ export const SLIDES: Slide[] = [
     order: 1,
     published: "live",
     panel: {
+      // Panel 1 only: each section carries a thumbnail beside its heading. The
+      // three images are still owed by Steve, so each is PENDING (no src): it
+      // reserves its space invisibly and never renders a broken image. Add
+      // { src, alt } when the real images land. Logged in PLACEHOLDERS.md and
+      // docs/dogs-at-work/NEEDS_STEVE.md.
       sections: [
         {
           subheading: "To the dog; it's a game.",
           body: `Working dogs do not know they have jobs. To a sheepdog, moving livestock is instinct, training and the best game in the world. To a detection dog, finding the scent is a puzzle with a reward at the end. To a medical alert dog, noticing that their human smells wrong is not a shift pattern. It is just what they do.`,
+          thumbnail: {},
         },
         {
           subheading: "To humans, it's a job.",
           body: `It only becomes work when humans benefit from it. This series looks at the dogs that help Britain function — the noses at the border, the paws on the hills, the search dogs in the woods, the assistance dogs beside their people, and the bio-detection dogs helping scientists ask whether disease has a smell.`,
+          thumbnail: {},
         },
         {
           subheading: "The payment; very different",
           body: `They are paid in food, shelter, praise, tennis balls, head strokes and the occasional stolen sausage. But their value is measured in time, safety, independence, science and trust. This is about that hidden workforce, and the question behind every wagging tail: if dogs give us this much, what do we owe them back?`,
+          thumbnail: {},
         },
-      ],
-      // Panel 1 only: three square thumbnails, one per supporting point.
-      // Placeholder images; Steve is supplying the real ones. Alt outstanding.
-      thumbnails: [
-        { src: "/PLACEHOLDER_panel1_thumb_1.png", alt: "PLACEHOLDER: panel 1 thumbnail 1 alt, outstanding from Steve" },
-        { src: "/PLACEHOLDER_panel1_thumb_2.png", alt: "PLACEHOLDER: panel 1 thumbnail 2 alt, outstanding from Steve" },
-        { src: "/PLACEHOLDER_panel1_thumb_3.png", alt: "PLACEHOLDER: panel 1 thumbnail 3 alt, outstanding from Steve" },
       ],
     },
     article: {

@@ -491,13 +491,13 @@
   display: none;
 }
 
-/* Checkpoint 3: at desktop width the WorkDeck mechanic replaces the legacy hero
-   and the three-card article grid, so they are hidden. The "Coming to the
-   workforce" grid stays hidden here too until checkpoint 5 (paired with the
-   forward register), and the mobile carousel is the sub-769px fallback until
-   checkpoint 4. The legacy page shell (base min-height 100vh) is collapsed so the
-   footer sits directly below the deck instead of behind a viewport-tall empty
-   gap; the footer stays and the page scrolls to reach it. */
+/* Checkpoints 3 and 4: the WorkDeck mechanic replaces the legacy layout at every
+   width (the desktop deck at >=769px, the mobile stack at <=768px), so the hero
+   and the three-card article grid are hidden. The "Coming to the workforce" grid
+   stays hidden here too until checkpoint 5 (paired with the forward register).
+   The legacy page shell (base min-height 100vh) is collapsed so the footer sits
+   directly below the deck instead of behind a viewport-tall empty gap; the footer
+   stays and the page scrolls to reach it. */
 @media (min-width: 769px) {
   .hero { display: none; }
   .grid { display: none; }
@@ -513,14 +513,17 @@
   .grid { display: none; }
   .coming { display: none; }
 
+  /* Checkpoint 4: the WorkDeck mobile stack replaces the legacy carousel, so the
+     carousel is hidden and the legacy page shell is collapsed to nothing. The
+     carousel markup and its script stay in the tree for now; they are removed
+     with the rest of the legacy layout later. */
   .page {
-    padding-top: 0;
-    padding-bottom: 0;
-    min-height: 100dvh;
+    padding: 0;
+    min-height: 0;
   }
 
   .mobileCarouselWrap {
-    display: block;
+    display: none;
     width: 100vw;
     height: 100dvh;
     position: relative;

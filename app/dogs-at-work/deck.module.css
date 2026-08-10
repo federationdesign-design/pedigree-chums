@@ -17,10 +17,11 @@
 .deck {
   position: relative;
   flex-direction: column;
-  gap: clamp(18px, 2.4vh, 32px);
   width: 100%;
   /* Clear the fixed site nav (logo top-left, ~82px band). No bottom padding, so
-     the article panel meets the footer cleanly with no sky-blue gap. */
+     the article panel meets the footer cleanly with no sky-blue gap. No flex gap:
+     spacing is set with margins so the article can overlap the blue panel (open
+     question 5). */
   padding: 88px clamp(20px, 4vw, 56px) 0;
 }
 
@@ -34,7 +35,7 @@
   flex: 0 0 auto;
   text-align: center;
   max-width: 1180px;
-  margin: 0 auto;
+  margin: 0 auto clamp(18px, 2.4vh, 32px);
 }
 
 .title {
@@ -62,8 +63,10 @@
 }
 
 /* ── Blue panel (GlowPanel shell) ─────────────────────────────── */
+/* Sits above the article on the z axis so it overlaps the article's top edge. */
 .blueWrap {
   position: relative;
+  z-index: 1;
 }
 
 /* Passed to GlowPanel. The shell paints the gradient, glow and rounded card;
@@ -80,11 +83,10 @@
 
 .blueTrack {
   display: flex;
-  /* 60% taller than the concept panel, which at 1280 works out at ~355px, so
-     ~570px here. It grows past this to fit the tallest slide's copy, so nothing
-     is clipped and nothing scrolls internally. The minimum keeps shorter slides
-     from looking starved. */
-  min-height: 570px;
+  /* Minimum set from the measured natural heights at the 56ch measure cap: the
+     tallest slide (panel 2) needs ~699px, so 705px holds every slide with a
+     little headroom. */
+  min-height: 705px;
   transform: translateX(calc(var(--i, 0) * -100%));
   transition: transform 620ms cubic-bezier(0.6, 0.02, 0.2, 1);
   will-change: transform;
@@ -93,57 +95,69 @@
 .blueSlide {
   flex: 0 0 100%;
   display: flex;
-  /* Room on the right for the forward chevron. */
-  padding: clamp(28px, 4vh, 56px) clamp(96px, 9vw, 150px) clamp(28px, 4vh, 56px)
-    clamp(24px, 3vw, 48px);
+  /* Top padding, right room for the chevron, bottom room for the dots. */
+  padding: clamp(28px, 4vh, 48px) clamp(96px, 9vw, 150px) clamp(54px, 7vh, 74px)
+    clamp(28px, 3vw, 52px);
 }
 
 .blueSections {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  gap: clamp(18px, 2.6vh, 34px);
+  justify-content: flex-start;
+  gap: clamp(20px, 3vh, 36px);
   width: 100%;
 }
 
-.blueSection {
+/* The thumbnail sits inline with the subheading (concept), not in a column
+   beside the body. Body copy sits below at a capped measure. */
+.blueHeadingRow {
   display: flex;
-  gap: clamp(14px, 1.6vw, 26px);
-  align-items: flex-start;
+  align-items: center;
+  gap: clamp(12px, 1.4vw, 20px);
+  margin-bottom: 3px;
 }
 
 .thumb {
   flex: 0 0 auto;
-  width: clamp(64px, 6vw, 96px);
-  height: clamp(64px, 6vw, 96px);
+  width: clamp(48px, 4.5vw, 64px);
+  height: clamp(48px, 4.5vw, 64px);
   object-fit: cover;
-  border-radius: 16px;
+  border-radius: 14px;
   display: block;
 }
 
-.blueSectionText {
-  min-width: 0;
+/* Pending thumbnail: reserves its footprint, renders nothing visible. */
+.thumbPending {
+  flex: 0 0 auto;
+  width: clamp(48px, 4.5vw, 64px);
+  height: clamp(48px, 4.5vw, 64px);
+  visibility: hidden;
 }
 
 .blueSubheading {
   font-family: var(--font-display, "Luckiest Guy", cursive);
-  font-size: clamp(1.3rem, 2.1vw, 2rem);
-  line-height: 1.05;
+  font-size: clamp(1.6rem, 2.6vw, 2.4rem);
+  line-height: 1.02;
   letter-spacing: 0.02em;
   text-transform: uppercase;
   color: var(--cream);
-  margin: 0 0 8px;
+  margin: 0;
 }
 
 .blueSubheadingAccent {
   color: var(--yellow);
 }
 
+/* Capped measure so the copy keeps a wide right margin (concept). */
+.blueSectionBody {
+  max-width: 56ch;
+}
+
 .blueBody {
   font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: clamp(0.9rem, 1.15vw, 1.05rem);
+  font-size: clamp(0.95rem, 1.2vw, 1.1rem);
   font-weight: 500;
-  line-height: 1.5;
+  line-height: 1.35;
   color: var(--cream);
   margin: 0 0 8px;
 }
@@ -154,9 +168,9 @@
 
 .blueBullets {
   font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: clamp(0.9rem, 1.15vw, 1.05rem);
+  font-size: clamp(0.95rem, 1.2vw, 1.1rem);
   font-weight: 500;
-  line-height: 1.5;
+  line-height: 1.35;
   color: var(--cream);
   margin: 0;
   padding-left: 1.2em;
@@ -172,8 +186,8 @@
   top: 50%;
   right: clamp(18px, 2vw, 34px);
   transform: translateY(-50%);
-  width: clamp(56px, 6vw, 88px);
-  height: clamp(56px, 6vw, 88px);
+  width: clamp(64px, 7vw, 104px);
+  height: clamp(64px, 7vw, 104px);
   padding: 0;
   border: none;
   background: transparent;
@@ -201,6 +215,15 @@
 }
 
 /* ── Pager dots ───────────────────────────────────────────────── */
+/* Desktop: the dots live inside the blue panel, bottom-left, aligned with the
+   copy. The concept shows only the forward chevron; dots are the back route. */
+.deckPager {
+  position: absolute;
+  left: clamp(28px, 3vw, 52px);
+  bottom: clamp(18px, 2.4vh, 28px);
+  z-index: 3;
+}
+
 .pager {
   flex: 0 0 auto;
   display: flex;
@@ -233,8 +256,11 @@
 .articleViewport {
   flex: 0 0 auto;
   position: relative;
-  /* Bleed to the viewport edges past the deck's side padding. */
-  margin: 0 calc(-1 * clamp(20px, 4vw, 56px));
+  z-index: 0;
+  /* Bleed to the viewport edges past the deck's side padding, and rise 60px
+     behind the blue panel so the panel overlaps the article's top edge and image
+     (open question 5). The article keeps its own natural height. */
+  margin: -60px calc(-1 * clamp(20px, 4vw, 56px)) 0;
   overflow: hidden;
 }
 
@@ -267,10 +293,13 @@
 
 .articleText {
   background: var(--navy);
-  padding: clamp(28px, 3.4vh, 48px) clamp(24px, 3vw, 48px);
+  /* Extra top padding keeps the text column (Learn about, pill, headline, dek,
+     CTA) below the 60px overlap zone, so the blue panel never covers it. Only
+     the image side and the navy top edge sit under the panel. */
+  padding: clamp(70px, 7vh, 88px) clamp(24px, 3vw, 48px) clamp(28px, 3.4vh, 48px);
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   min-width: 0;
 }
 
@@ -375,4 +404,93 @@
   .articleTrack {
     transition: none;
   }
+}
+
+/* ── Mobile stack (<=768px) ───────────────────────────────────────
+   A single vertical scroll: intro, blue panel (all points, no thumbnails),
+   pager (dots + forward chevron), full-width image, dark article block. No
+   counter-motion. The blue panel reuses the GlowPanel shell. */
+.mobile {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .mobile {
+    display: block;
+    padding: 84px 16px 0;
+  }
+}
+
+.mIntro {
+  text-align: center;
+  max-width: 640px;
+  margin: 0 auto clamp(18px, 5vw, 26px);
+}
+
+.mBlueWrap {
+  scroll-margin-top: 84px;
+}
+
+/* Padding sits on the GlowPanel card so the glow still fills it edge to edge. */
+.mBlue {
+  width: 100%;
+  padding: clamp(22px, 6vw, 34px);
+}
+
+.mPager {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: clamp(16px, 5vw, 22px) 0;
+}
+
+.mChevron {
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--cream);
+  cursor: pointer;
+}
+
+.mChevron svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.mChevron:disabled {
+  visibility: hidden;
+  cursor: default;
+}
+
+.mChevron:focus-visible {
+  outline: 3px solid var(--yellow);
+  outline-offset: 3px;
+  border-radius: 10px;
+}
+
+/* Full-width image, bleeding past the stack's side padding. */
+.mImage {
+  margin: 0 -16px;
+}
+
+.mImage img {
+  width: 100%;
+  height: clamp(220px, 62vw, 340px);
+  object-fit: cover;
+  display: block;
+}
+
+/* Dark article block, full width, meeting the footer below it. */
+.mArticle {
+  background: var(--navy);
+  margin: 0 -16px;
+  padding: clamp(26px, 7vw, 40px) clamp(16px, 5vw, 24px) clamp(34px, 9vw, 52px);
 }

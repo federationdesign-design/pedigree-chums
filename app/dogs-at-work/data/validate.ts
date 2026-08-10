@@ -109,14 +109,16 @@ export function validateSlides(slides: Slide[]): void {
         );
       }
 
-      // Panel thumbnails are optional (panel 1 only). A panel without them is
-      // valid and must not fail. When present, each needs a src and alt.
-      if (slide.panel.thumbnails) {
-        slide.panel.thumbnails.forEach((t, i) => {
-          if (!t.src) errors.push(`[dogs-at-work] slide "${id}": panel thumbnail ${i + 1} is missing its src.`);
-          if (!t.alt) errors.push(`[dogs-at-work] slide "${id}": panel thumbnail ${i + 1} is missing its alt text.`);
-        });
-      }
+      // Thumbnails are optional and sit on a section (panel 1 only). A pending
+      // thumbnail (no src) is valid and reserves space, so the missing-image
+      // build failure from section 8 does not apply to it. Once a src is set,
+      // its alt text is required.
+      slide.panel.sections.forEach((section, i) => {
+        const th = section.thumbnail;
+        if (th && th.src && !th.alt) {
+          errors.push(`[dogs-at-work] slide "${id}": section ${i + 1} thumbnail has a src but no alt text.`);
+        }
+      });
     }
 
     const a = slide.article;

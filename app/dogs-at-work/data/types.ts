@@ -28,28 +28,32 @@ export const FAMILY_PILL_LABEL: Record<Family, string> = {
   Science: "Science",
 };
 
-// A small square image beside a supporting point. Panel 1 only carries these
-// (three of them); panels 2 to 4 have none. Optional by design: a panel
-// without thumbnails is valid and must not fail validation.
+// A small square image sitting inline with a section's heading. Panel 1 uses
+// them (one per section); panels 2 to 4 have none. Both fields are optional: a
+// thumbnail with no `src` is PENDING (Steve still owes the image), and renders
+// as reserved, invisible space rather than a broken image, so the layout does
+// not shift when the real image lands. `alt` is required once `src` is set.
 export interface PanelThumbnail {
-  src: string;
-  alt: string;
+  src?: string;
+  alt?: string;
 }
 
-// A blue panel section. It carries a subheading (bold lead-in), and then
-// prose (body), bulleted content (bullets), or both. Panel 4 is the only one
-// that uses bullets, so the component supports both forms.
+// A blue panel section. It carries a subheading (bold lead-in), then prose
+// (body), bulleted content (bullets), or both, and optionally a thumbnail that
+// sits beside its heading. Panel 4 uses bullets, so the component supports both
+// prose and bullets. Structure lives here; styling is uniform in the CSS, so
+// panels 5 to 12 need no code, only data.
 export interface PanelSection {
   subheading?: string;
   body?: string;
   bullets?: string[];
+  thumbnail?: PanelThumbnail;
 }
 
 // The blue panel expands the persistent introduction. It is section-level
 // argument, not a description of the article it is paired with.
 export interface BluePanel {
   sections: PanelSection[];
-  thumbnails?: PanelThumbnail[];
 }
 
 // The article, as shown on the bottom panel and the index card: the same
