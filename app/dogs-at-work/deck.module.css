@@ -64,14 +64,12 @@
 }
 
 /* ── Blue panel (GlowPanel shell) ─────────────────────────────── */
-/* Capped at 1180px centred (matching the intro) so the panel stops widening into
-   empty glow past the copy measure. Sits above the article on the z axis so it
-   overlaps the article's top edge. */
+/* Full width, no maximum. Sits above the article on the z axis so it overlaps
+   the article's top edge. The empty right is solved by the proportional copy
+   measure (blueSectionBody), not by capping the panel. */
 .blueWrap {
   position: relative;
   z-index: 1;
-  max-width: 1180px;
-  margin-inline: auto;
 }
 
 /* Passed to GlowPanel. The shell paints the gradient, glow and rounded card;
@@ -80,18 +78,22 @@
   width: 100%;
 }
 
-/* The filmstrip viewport, clipped to the panel's rounded corners. */
+/* The filmstrip viewport, clipped to the panel's rounded corners. It is the
+   query container for the panel copy, so the type, padding and gaps below scale
+   with the PANEL width (cqi), not the viewport: liquid while the panel narrows,
+   deterministic once the panel hits its 1180px cap. */
 .blueViewport {
   overflow: hidden;
   border-radius: 40px;
+  container-type: inline-size;
 }
 
 .blueTrack {
   display: flex;
-  /* Minimum set from the measured natural heights at the 56ch cap: the tallest
-     slide (panel 2) needs ~699px, so 705px holds every slide with a little
-     headroom. */
-  min-height: 705px;
+  /* Light floor from the narrowest desktop (769px), where the container-scaled
+     copy is shortest (~625px). The panel is full width, so above that it grows
+     with the viewport (content-driven): ~773px at 1280, ~1085px at 1920. */
+  min-height: 630px;
   transform: translateX(calc(var(--i, 0) * -100%));
   transition: transform 620ms cubic-bezier(0.6, 0.02, 0.2, 1);
   will-change: transform;
@@ -100,16 +102,17 @@
 .blueSlide {
   flex: 0 0 100%;
   display: flex;
-  /* Top padding, right room for the chevron, bottom room for the dots. */
-  padding: clamp(28px, 4vh, 48px) clamp(96px, 9vw, 150px) clamp(54px, 7vh, 74px)
-    clamp(28px, 3vw, 52px);
+  /* Container units (cqi = 1% of the panel width): top padding, right room for
+     the chevron, bottom room for the dots, left gutter. */
+  padding: clamp(28px, 4cqi, 48px) clamp(96px, 12.7cqi, 150px)
+    clamp(54px, 6.3cqi, 74px) clamp(28px, 4.4cqi, 52px);
 }
 
 .blueSections {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  gap: clamp(20px, 3vh, 36px);
+  gap: clamp(20px, 3cqi, 36px);
   width: 100%;
 }
 
@@ -118,14 +121,14 @@
 .blueHeadingRow {
   display: flex;
   align-items: center;
-  gap: clamp(12px, 1.4vw, 20px);
+  gap: clamp(12px, 1.7cqi, 20px);
   margin-bottom: 3px;
 }
 
 .thumb {
   flex: 0 0 auto;
-  width: clamp(48px, 4.5vw, 64px);
-  height: clamp(48px, 4.5vw, 64px);
+  width: clamp(48px, 5.4cqi, 64px);
+  height: clamp(48px, 5.4cqi, 64px);
   object-fit: cover;
   border-radius: 14px;
   display: block;
@@ -134,14 +137,14 @@
 /* Pending thumbnail: reserves its footprint, renders nothing visible. */
 .thumbPending {
   flex: 0 0 auto;
-  width: clamp(48px, 4.5vw, 64px);
-  height: clamp(48px, 4.5vw, 64px);
+  width: clamp(48px, 5.4cqi, 64px);
+  height: clamp(48px, 5.4cqi, 64px);
   visibility: hidden;
 }
 
 .blueSubheading {
   font-family: var(--font-display, "Luckiest Guy", cursive);
-  font-size: clamp(1.6rem, 2.6vw, 2.4rem);
+  font-size: clamp(1.6rem, 3.25cqi, 3.75rem);
   line-height: 1.02;
   letter-spacing: 0.02em;
   text-transform: uppercase;
@@ -153,14 +156,17 @@
   color: var(--yellow);
 }
 
-/* Capped measure so the copy keeps a wide right margin (concept). */
+/* Proportional measure: the copy column is a fixed fraction of the panel width
+   (cqi), so it widens as the panel widens instead of stopping at a character
+   count and leaving glow. With the container-scaled type, the line length in
+   characters stays constant at every width. */
 .blueSectionBody {
-  max-width: 56ch;
+  max-width: 52cqi;
 }
 
 .blueBody {
   font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: clamp(0.95rem, 1.2vw, 1.1rem);
+  font-size: clamp(0.95rem, 1.5cqi, 1.8rem);
   font-weight: 500;
   line-height: 1.35;
   color: var(--cream);
@@ -173,7 +179,7 @@
 
 .blueBullets {
   font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: clamp(0.95rem, 1.2vw, 1.1rem);
+  font-size: clamp(0.95rem, 1.5cqi, 1.8rem);
   font-weight: 500;
   line-height: 1.35;
   color: var(--cream);
@@ -262,11 +268,10 @@
   flex: 0 0 auto;
   position: relative;
   z-index: 0;
-  /* Capped at 1180px centred to match the blue panel, and raised 60px behind it
-     so the panel overlaps the article's top edge and image (open question 5).
-     The article keeps its own natural height. */
-  max-width: 1180px;
-  margin: -60px auto 0;
+  /* Full width, bleeding to the viewport edges past the deck's side padding, and
+     raised 60px behind the blue panel so the panel overlaps the article's top
+     edge and image (open question 5). The article keeps its own natural height. */
+  margin: -60px calc(-1 * clamp(20px, 4vw, 56px)) 0;
   overflow: hidden;
 }
 
@@ -433,14 +438,17 @@
   margin: 0 auto clamp(18px, 5vw, 26px);
 }
 
+/* Query container for the mobile panel, so the shared copy type and the padding
+   below track the mobile panel width (cqi), not the viewport. */
 .mBlueWrap {
   scroll-margin-top: 84px;
+  container-type: inline-size;
 }
 
 /* Padding sits on the GlowPanel card so the glow still fills it edge to edge. */
 .mBlue {
   width: 100%;
-  padding: clamp(22px, 6vw, 34px);
+  padding: clamp(22px, 8cqi, 34px);
 }
 
 .mPager {
