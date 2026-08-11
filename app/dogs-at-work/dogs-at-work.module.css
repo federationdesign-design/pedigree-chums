@@ -472,10 +472,25 @@
 }
 
 @media (min-width: 901px) {
-  .payslipOverlay {
-    /* -122 not -170: with .essayLayout top padding now 0 (was 48), this holds the
-       payslip's hero overlap where it was rather than deepening it. */
-    margin-top: -122px;
+  /* Doubled and nudged (Steve): scale(2) from the top-left corner keeps the left
+     edge fixed and grows the payslip right and down; translateX(20px) then nudges
+     it 20px right so it overhangs the right edge of the content margin. rotate is
+     re-included here because this transform replaces the base .payslip tilt; the
+     doubled class name (specificity 0,2,0) outranks .payslip (0,1,0) so it wins
+     regardless of source order. NOTE: transform:scale does not reflow, so the
+     doubled payslip visually overlaps the sidebar cards beneath it. */
+  .payslipOverlay.payslipOverlay {
+    /* Lift: -122 - 75 - 75 - 75 = -347, so the payslip sits high over the hero. */
+    margin-top: -347px;
+    transform-origin: top left;
+    /* scale 1.5 (25% smaller than the earlier 2x). translateX: 20 + 120 - 125 - 125
+       = -110. Overhangs the content margin and bleeds off the right; the overflow is
+       clipped, not scrolled. */
+    transform: translateX(-110px) scale(1.5) rotate(-3deg);
+    /* scale does not reflow, so the scaled payslip's visual bottom (~172px below
+       its layout box) would underlay the first sidebar card. Push the cards down by
+       the overlap plus a gap so the secondary column clears the payslip. */
+    margin-bottom: 200px;
   }
 }
 
