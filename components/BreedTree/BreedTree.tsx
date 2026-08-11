@@ -2009,12 +2009,13 @@ export default function BreedTree({
           return { pct, r: badgeDrawForNode(n.r, k, floorVb) };
         }),
     );
-    // `entered` is the settle signal: it flips true only AFTER zoomTo(v) has fitted the cluster (the end of
-    // the drop entrance, or immediately on the resize-only path), so viewRef.current is the settled view by
-    // then. Without it this effect ran once at mount against the SEED view (PIT_SPAN too small -> k too large
-    // -> badges PIT_SPAN times too big) and never recomputed until `nodes` changed, which is why the badges
-    // were the wrong size on first load and only snapped right when the difficulty slider re-packed them.
-    // Belt-and-braces to the corrected seed above: the seed fixes the mount value, this re-samples on settle.
+    // k reads only viewRef.current[2], the view WIDTH, and the corrected seed above makes that width exact at
+    // mount: clampRootView only shifts y, never the width, so the one number k depends on never needed the
+    // measured stage (which is unavailable at the useRef initialiser). That seed is what sizes the first-load
+    // badges right, killing the PIT_SPAN-too-big flash that used to persist until the slider forced a re-pack.
+    // `entered` is then the genuine net for the settle paths the seed cannot precompute: a resize-only refit,
+    // or any zoomTo(v) that lands on a width the analytic seed did not. It flips true only AFTER zoomTo(v) has
+    // fitted the cluster, so viewRef.current is the settled view by the time this effect re-runs against it.
   }, [nodes, dockAside, entered]);
   // The rail outlives the info box. It is closed only by its own X, and comes
   // back whenever the box is reopened, so the two cycle together.
