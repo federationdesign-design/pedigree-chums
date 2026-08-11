@@ -1062,7 +1062,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "A 1980s British creation, bred to look like a wolf while keeping a gentle, trainable temperament. Famous as the Stark direwolves on screen.",
     children: [
       { name: "Arctic sled dogs", note: "Siberian Husky and Alaskan Malamute for the wolfish looks and coat.", img: "/history/breeds/Arctic-sled-dogs.jpg", value: 55 },
-      { name: "German Shepherd Dog", note: "For size, trainability and a steady working mind.",  img: "/history/breeds/Old-working-collies-cluster.jpg", value: 45 }
+      { name: "German Shepherd Dog", note: "For size, trainability and a steady working mind.",  img: "/history/breeds/German-cattle-dog.jpg", value: 45 }
     ]
   },
 
