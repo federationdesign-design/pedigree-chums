@@ -3,12 +3,12 @@
 // that need immutability (React) pass a clone.
 
 import { ChumData, Resolution } from './types';
-import { normalise } from './normalise';
+import { normalise, applyAliases, buildAliasMap } from './normalise';
 import { resolve, resolveCanned, extractCandidateSubject } from './router';
 import { startGame, applyMove, exitLine, gameExitText, GameResult } from './games';
 import { assemble, Assembled } from './assembler';
 import { Session, Topic } from './session';
-import { detectSadnessClear } from './safety';
+import { detectSadnessClear, detectSafety, detectProtectedContinuation, detectPersonalSadness, detectGrief } from './safety';
 
 // Task 27: classify a resolution's subject KIND for the topic slot. This is a subject
 // classifier, not a rival MEANINGFUL_TOPIC set (which stays in its S12 role only). A
@@ -455,4 +455,21 @@ export function submit(data: ChumData, session: Session, input: string): Turn {
   session.godAskStreak = resolution.action === 'god_answer' ? (session.godAskStreak ?? 0) + 1 : 0;
 
   return { input, resolution, response };
+}
+
+// Task 169: a PURE, non-mutating pre-check answering "does this input need attention NOW, ahead of a dog's
+// monologue?". The opened auto-appearance monologue is allowed to run on and an ordinary reply typed over it
+// is QUEUED behind it -- but three things must not wait: a safeguarding disclosure (it reaches support at
+// once), and a grief or personal-sadness line (four seconds is short, but it is the one moment where any
+// delay reads as not listening). send() consults this before deciding to queue. It reuses the EXACT alias +
+// detector pipeline as resolve() / the S12 continuation classifier, so it can never drift from the real
+// gates: safety and (matching resolve) NOT grief/sadness while a protected state is live, since the S12
+// machine owns those turns. It reads nothing it mutates: submissionCount, the streaks and protectedState
+// are untouched.
+export function isSensitiveInput(data: ChumData, session: Session, input: string): boolean {
+  const n = applyAliases(normalise(input), buildAliasMap(data.misspellings));
+  if (session.protectedState) return detectProtectedContinuation(n) !== null;
+  if (detectSafety(n)) return true;
+  if (detectPersonalSadness(n)) return true;
+  return detectGrief(n, session.lastAction === 'grief') !== null;
 }

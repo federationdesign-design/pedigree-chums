@@ -12,13 +12,13 @@
 // navigation links only on the final interaction; the discount pop-up is the one
 // exception kept in buying replies.
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import styles from './PickAChum.module.css';
 import PickAChumIcon from './PickAChumIcon';
 import { CHUM_DATA } from '../lib/data';
-import { submit, Turn } from '../lib/engine';
+import { submit, isSensitiveInput, Turn } from '../lib/engine';
 import { newSession, Session } from '../lib/session';
 import { Dog, GameId } from '../lib/types';
 import { reportHiddenGame, reportHat } from '../../../lib/hiddenGames/browserEngine';
@@ -338,8 +338,13 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
   const playbackRef = useRef<{ id: number; plan: TypingPlan; closed?: boolean; done: boolean } | null>(null);
   // Task 152: the in-flight consecutive-message sequence (a dog sending two or three in a row), or null.
   // Its token guards the abandon rule: the visitor typing, navigation, or a protected state all set
-  // `aborted` and drop it, so the remaining messages never fire.
-  const seqRef = useRef<{ aborted: boolean } | null>(null);
+  // `aborted` and drop it, so the remaining messages never fire. Task 169: `monologue` marks the ONE run
+  // that now lets the dog FINISH -- the opened auto-appearance beat -- so send() queues a reply typed over
+  // it instead of abandoning it; reply follow-ups leave it unset and keep the old abandon-on-type behaviour.
+  const seqRef = useRef<{ aborted: boolean; monologue?: boolean } | null>(null);
+  // Task 169: bumped when a sequence FINISHES naturally, so the type-ahead drain (which otherwise only wakes
+  // on a phase change) runs a message queued mid-monologue -- the monologue never touches phase, it stays idle.
+  const [seqDone, setSeqDone] = useState(0);
 
   // Task 129 targets above 480px only; at or below, the pre-129 stacked panel
   // renders unchanged and mobile stays Task 120's problem.
@@ -485,8 +490,8 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
   const COL_W = 380;
   // Task 162 (reopen-from-chip): where a docked (corner-anchored) dog sits -- the same spot the minimised chip uses
   // (.miniDock left/top). The fan anchor is 128px, matching the chip, so a reopen lands exactly. Keep DOCK_L in sync
-  // with .miniDock's left (198px, shifted right to sit beside the logo) or the reopened chat jumps away from the chip.
-  const DOCK_L = 198;
+  // with .miniDock's left (192px, shifted right to sit beside the logo) or the reopened chat jumps away from the chip.
+  const DOCK_L = 192;
   const DOCK_T = 18;
   // Owner review: the chat reaches the TOP of the window, so a long history
   // slides off the window edge rather than vanishing at an invisible line.
@@ -583,6 +588,24 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
   }, [cyclePortrait]);
   const dragOffsetRef = useRef(dragOffset);
   useEffect(() => { dragOffsetRef.current = dragOffset; }, [dragOffset]);
+
+  // Task 170: the scrim FOLLOWS the dog (it is a single gradient box moved by transform, see .scrim CSS). Its
+  // centre is the dog medallion's viewport centre, MEASURED only when a layout-affecting state settles (a
+  // switch, dock/undock, restore, resize) -- never per drag frame, which would thrash layout and judder. Once
+  // measured we store the centre AND the drag offset it was read at; during a drag the live centre is that
+  // base plus (current drag - base drag), so the box moves by transform alone with no re-measure. Null while
+  // selecting or minimised (no single medallion): the scrim then falls back to the origin, reproducing the
+  // old top-left glow (and it is hidden outright while minimised via body[data-pc-min]).
+  const [scrimBase, setScrimBase] = useState<{ cx: number; cy: number; dx: number; dy: number } | null>(null);
+  useLayoutEffect(() => {
+    const el = fanAnchorRef.current;
+    if (phase === 'selecting' || minimised || !el) { setScrimBase(null); return; }
+    const r = el.getBoundingClientRect();
+    setScrimBase({ cx: r.left + r.width / 2, cy: r.top + r.height / 2, dx: dragOffsetRef.current.dx, dy: dragOffsetRef.current.dy });
+    // dragOffset is deliberately NOT a dep: the delta below tracks it without a re-measure.
+  }, [phase, dog, docked, minimised, vw]);
+  const scrimX = scrimBase ? scrimBase.cx + (dragOffset.dx - scrimBase.dx) : 0;
+  const scrimY = scrimBase ? scrimBase.cy + (dragOffset.dy - scrimBase.dy) : 0;
   useEffect(() => {
     if (!wide || phase === 'selecting') return;
     const measure = () => {
@@ -710,14 +733,14 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
   // is never approached by a sequence, only by the single main message that precedes it.
   const SEQ_MAX_EXTRAS = 2;
   const playSequence = useCallback(
-    (lines: string[], seqDog: Dog, gapMs: number, showAvatar = false, media?: { src: string; alt: string }) => {
+    (lines: string[], seqDog: Dog, gapMs: number, showAvatar = false, media?: { src: string; alt: string }, monologue = false) => {
       const items = lines.filter((l) => l && l.trim()).slice(0, SEQ_MAX_EXTRAS);
       if (!items.length) return;
       const s = sessionRef.current;
       // Never BEGIN a sequence in a protected session: a child who disclosed something must not have a
       // dog carry on with more messages.
       if (!s || s.protectedState || everProtectedRef.current) return;
-      const token = { aborted: false };
+      const token = { aborted: false, monologue };
       seqRef.current = token;
       const play = (i: number) => {
         if (token.aborted || seqRef.current !== token) return;
@@ -737,6 +760,7 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
           after(gapMs, () => play(i + 1));
         } else {
           seqRef.current = null; // the run is complete
+          setSeqDone((t) => t + 1); // Task 169: wake the drain -- a reply queued during the run waits on this
         }
       };
       after(gapMs, () => play(0));
@@ -778,7 +802,12 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
     const extras = auto.chums ? (chumLinesRef.current ?? []).slice(1) : auto.followUps ?? [];
     if (!extras.length) return;
     seqStartedRef.current = true;
-    playSequence(extras, auto.dog, auto.gapMs ?? (auto.chums ? 20000 : 2500));
+    // Task 169: the beat lands 2s after the visitor opens the chip (was 2.5s), and marks the run a `monologue`
+    // so a reply typed over it QUEUES rather than cutting it short -- the dog finishes, then the reply is answered.
+    // ONLY the fast followUps run (2s beats, at most 4s total) queues. The know-your-chums Collie names breeds
+    // on 20s gaps: making a reply wait up to 40s behind that would be worse than abandoning, so it keeps the
+    // old abandon-on-type (the visitor's reply wins at once).
+    playSequence(extras, auto.dog, auto.gapMs ?? (auto.chums ? 20000 : 2000), false, undefined, !auto.chums);
   }, [auto, minimised, playSequence]);
 
   // Drive a handover: post the user line (and any handover line), pause, pop the
@@ -867,6 +896,8 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
   const selectDog = useCallback((d: Dog) => {
     clearTimers();
     if (chatAnchorRef.current === null) chatAnchorRef.current = dogPos(SELECT_ORDER.indexOf(d)); // freeze on the FIRST pick
+    setDocked(false); // Task 162 comment (line 361): a fresh selector pick starts undocked -- the switched-in dog stays
+                      // at the frozen chat anchor, not the corner. Was never wired up, so a switch snapped to the dock.
     everProtectedRef.current = false; // Task 105: a fresh engine session starts un-protected and persistable
     sessionRef.current = newSession(d);
     // A fresh engine session starts a fresh recorded conversation. Time-prefixed
@@ -914,10 +945,24 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
     const text = (textArg ?? input).trim();
     if (!session || !text || session.closed) return;
     setDead(false); // Task 78: any submit, whatever it is, revives the Collie (play dead lasts one turn)
-    // Task 152 section 2: THE ABANDON RULE. If a consecutive-message sequence is in flight, the visitor's
-    // reply WINS IMMEDIATELY -- drop the remaining messages and process this input now, never queue it. A
-    // dog that keeps talking over you is a fault, not a gag. (A live submit only reaches here when a real
-    // sequence is running, which plays at phase 'idle', so this precedes the type-ahead queue below.)
+    // Task 169: the OPENED auto-appearance monologue now lets the dog FINISH. A reply typed over it is QUEUED
+    // (the Task 82 type-ahead queue) and answered the moment the run ends -- not thrown away. This REVERSES
+    // Task 152's abandon-on-type rule for that ONE case: that rule was written when a monologue could start
+    // UNBIDDEN, but since Task 160 it only plays because the visitor opened the chip, so they asked for it.
+    // SENSITIVE input is the exception: a safeguarding disclosure (reaches support at once), or a grief or
+    // personal-sadness line (any delay there reads as not listening), abandons the rest of the run and is
+    // processed now, never queued (isSensitiveInput is a pure, non-mutating check). Reply follow-ups are NOT
+    // monologues -- they keep the old abandon-on-type behaviour (a fresh reply beats a trailing quip, per the
+    // phase-stays-idle note at the interjection/followUp sites). Guarded to live submits: a drained line
+    // (textArg set) has no live sequence of its own to weigh.
+    if (seqRef.current && seqRef.current.monologue && textArg === undefined && !isSensitiveInput(CHUM_DATA, session, text)) {
+      queueRef.current.push(text);
+      setInput('');
+      inputRef.current?.focus();
+      return; // the run finishes; the drain effect (woken by setSeqDone) answers this once seqRef clears
+    }
+    // Task 152 section 2: a reply over a reply-follow-up, or a disclosure over any run, drops the remaining
+    // messages and processes this input now. A dog that keeps talking over you (uninvited) is a fault.
     const abandonedSeq = !!seqRef.current;
     abandonSequence();
     // Task 82: the dog is still performing. Never block or disable the input -- queue the message and
@@ -937,7 +982,12 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
     const result = submit(CHUM_DATA, session, text);
     // Task 105 SAFETY: the moment a turn enters a protected state, latch it so this session is never
     // persisted (the save effect also checks, but latch early, before the message is even added).
-    if (session.protectedState) everProtectedRef.current = true;
+    // Task 169: a protected turn STOPS EVERYTHING -- drop any type-ahead queued behind a monologue so a
+    // pending "tell me a joke" cannot drain on top of a live safeguarding state.
+    if (session.protectedState) {
+      everProtectedRef.current = true;
+      queueRef.current = [];
+    }
     const r = result.response;
     const toDog = session.activeDog; // submit applied any transfer in place
     const swapped = toDog !== fromDog; // the active dog actually changed
@@ -1144,14 +1194,16 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
   // Task 82: drain the type-ahead queue. When a reply finishes (phase returns to idle) the next
   // queued line is sent, which starts its own performance; this effect re-runs when that lands, so
   // the queue empties in order. sendRef holds the latest send without re-subscribing per keystroke.
+  // Task 169: also wake on seqDone (a monologue completing, which never moves phase off 'idle'), and hold
+  // off while a sequence is still in flight, so a message queued mid-monologue drains only once it ends.
   const sendRef = useRef(send);
   sendRef.current = send;
   useEffect(() => {
-    if (phase === 'idle' && queueRef.current.length > 0) {
+    if (phase === 'idle' && !seqRef.current && queueRef.current.length > 0) {
       const next = queueRef.current.shift();
       if (next) sendRef.current(next);
     }
-  }, [phase]);
+  }, [phase, seqDone]);
 
   // Escape closes the interface; a BARE Enter while a message is typing completes it (skips the
   // reveal). Task 82: if the visitor has typed something, do NOT steal the Enter -- let the form
@@ -1437,6 +1489,12 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
       {/* Task 105: the wash dims but no longer captures clicks (pointer-events via .wash/.root), so the
           page beneath stays usable; it no longer closes on click (X and Escape still close). */}
       <div className={styles.wash} />
+
+      {/* Task 118/170: the brand-blue glow, now living in the experience (where the dog's position is known)
+          rather than the launcher, so it can FOLLOW her. Decoration only (pointer-events:none in CSS); the
+          transform drops the gradient's centre onto her medallion and rides every drag. Hidden while
+          minimised via body[data-pc-min] (unchanged). */}
+      <div className={styles.scrim} aria-hidden="true" style={{ transform: `translate3d(${round1(scrimX)}px, ${round1(scrimY)}px, 0)` }} />
 
       {/* Task 164 (brief section 8): a persistent, visible emergency reset in the dog interface, shown
           whenever an effect is live and the chat is open. It sits fixed above the effects (it lives in the

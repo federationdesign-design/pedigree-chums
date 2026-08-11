@@ -373,9 +373,8 @@ export default function PickAChumLauncher() {
 
   return (
     <>
-      {/* Task 118: brand-blue graduated scrim behind the chat UI, only while it is present. Decoration
-          only (pointer-events:none in CSS); never intercepts a click. */}
-      {open && <div className={styles.scrim} aria-hidden="true" />}
+      {/* Task 118/170: the brand-blue scrim moved INTO the experience so it can follow the dog (it needs her
+          live position). It renders only while the experience is open, exactly as this launcher copy did. */}
       {open ? (
         <PickAChumExperience onClose={closeExperience} autoAppear={autoAppear ?? undefined} pickupRoute={pickupRoute} terrierSay={terrierSay} />
       ) : (
