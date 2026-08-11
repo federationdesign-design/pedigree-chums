@@ -12,6 +12,7 @@ and not applied.
 | 1 | `app/dogs-at-work/the-electronic-nose/page.tsx` (hero sub-label pill, line ~204) | `The machine the dogs built` | `Bio-detection dogs` | Section 11: the sub-label names a kind of working dog, not an editorial phrase. The index card was corrected at checkpoint 5, but the article-page hero pill was missed; section 14 licenses label corrections across all four articles. |
 | 2 | Body copy of articles 1 to 3 and `slides.ts` (deks) | ` -- ` (literal double hyphen, rendered as "--") | ` — ` (em dash, one space each side) | Steve's instruction (11 Aug). 52 conversions in total, all pure `--`->`—`: article 1 = 17, article 2 = 13, article 3 = 20, slide record = 2. A git word-diff confirmed every change is only the dash token; the words and the space either side are unchanged, so the em-dash spacing matches the sidebar cards. **One occurrence held**: article 2's editor's note (line 69), because that note is on hold under escalation 1. |
 | 3 | `the-electronic-nose/page.tsx` metadata `title` (line 12) and `<h1>` (line 206) | `The Electronic Nose: The Machine That May Owe Dogs a Biscuit` | `The Machine That May Owe Dogs a Biscuit` | Steve's instruction (11 Aug). Section 11 retired the prefix for the display title; card and page now read the same. The URL slug (`the-electronic-nose`) is left unchanged. |
+| 4 | `the-colleague-who-never-clocks-off/page.tsx` editor's note (line 69) | `"Bramble" and "Sarah" are illustrative while we finalise a real, currently-working alert dog to feature -- with the organisation's and owner's permission.` | `Bramble and Sarah are real. This account reflects their partnership at the time of writing.` | Steve's decision (11 Aug): Bramble, Graham and Sarah are real people and a real dog, so the identity caveat ("illustrative") was wrong; replaced with a currency caveat. This also clears the one held `--` (the old wording no longer exists). |
 
 ### Already applied in earlier checkpoints (confirmed correct, no new edit)
 
@@ -29,17 +30,20 @@ and not applied.
 (escalation 2) and the article 3 title reconciliation (escalation 3) are now
 recorded in the change log above (rows 2 and 3).
 
-**Still held: article 2's editor's note (line 69).**
-   Bramble is confirmed real, so the note is wrong about him. But it also names
-   **Sarah**, who is not confirmed. Removing the note would leave a named, specific
-   person, with a specific life-saving story, presented as fact throughout the
-   body. So the decision (remove vs reword) is Steve's. The note's own `--` is
-   held from the em-dash sweep until then.
-   File `app/dogs-at-work/the-colleague-who-never-clocks-off/page.tsx`, **line 69**
-   (inside the `CARDS` "editors-note" node). Exact wording:
-   > "Bramble" and "Sarah" are illustrative while we finalise a real, currently-working alert dog to feature -- with the organisation's and owner's permission.
+**Resolved 11 Aug 2026: editor's note replaced (change-log row 4).** Steve
+confirmed Bramble, Graham and Sarah are real, so the "illustrative" identity
+caveat was wrong. It is now a currency caveat: "Bramble and Sarah are real. This
+account reflects their partnership at the time of writing." That clears the one
+held `--` as well.
 
-   Every place the article body presents Sarah, for the fact-check:
+**Still open for Steve: the present tense.** The article describes the
+partnership in the present throughout ("His job is Sarah", "Sarah gets to
+sleep"). The currency caveat time-stamps the account, so these read as true at
+the time of writing; none were retired to past tense (that is Steve's call if he
+confirms the partnership has ended). The present-tense partnership claims are
+listed in the checkpoint report and, for the Sarah references, here:
+
+   Every place the article body presents Sarah:
    - **L22:** His job is Sarah. Just Sarah. Not people in general — one specific human, whose body he knows better than most doctors ever could.
    - **L23:** And when Sarah's blood sugar starts to slide, Bramble knows. Often before Sarah does.
    - **L24** (pronoun, same person): The way she tells it, he has saved her life more times than she can count. And then the line that stays with you: she doesn't lie awake anymore wondering whether she will wake up.
