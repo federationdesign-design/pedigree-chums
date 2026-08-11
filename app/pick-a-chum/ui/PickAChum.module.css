@@ -1010,10 +1010,10 @@
 .miniDock {
   position: fixed;
   /* Shifted right so the chip sits BESIDE the logo, not on top of it: the logo's
-     right edge lands near 130px (padding-left + logo width at min clamp), so 192px
+     right edge lands near 130px (padding-left + logo width at min clamp), so 202px
      clears it. top holds at 18px. DOCK_L in PickAChumExperience.tsx tracks this same
      value so a reopened chat still expands from the chip (Task 162). */
-  left: 192px;
+  left: 202px;
   top: 18px;
   width: 128px;
   height: 128px;

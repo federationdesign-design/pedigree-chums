@@ -490,8 +490,8 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
   const COL_W = 380;
   // Task 162 (reopen-from-chip): where a docked (corner-anchored) dog sits -- the same spot the minimised chip uses
   // (.miniDock left/top). The fan anchor is 128px, matching the chip, so a reopen lands exactly. Keep DOCK_L in sync
-  // with .miniDock's left (192px, shifted right to sit beside the logo) or the reopened chat jumps away from the chip.
-  const DOCK_L = 192;
+  // with .miniDock's left (202px, shifted right to sit beside the logo) or the reopened chat jumps away from the chip.
+  const DOCK_L = 202;
   const DOCK_T = 18;
   // Owner review: the chat reaches the TOP of the window, so a long history
   // slides off the window edge rather than vanishing at an invisible line.
