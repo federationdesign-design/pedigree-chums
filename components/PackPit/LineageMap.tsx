@@ -1881,7 +1881,7 @@ export default function LineageMap({
                     className={styles.node}
                     transform={`translate(${n._x},${n._y})`}
                     style={allBlue ? { pointerEvents: "none" } : undefined}
-                    onMouseEnter={() => { console.log("[hover-diag]", n.name); if (!drag.current?.moved) follow(n); }}
+                    onMouseEnter={() => { if (!drag.current?.moved) follow(n); }}
                     onClick={(e) => {
                       e.stopPropagation();
                       if (suppressClick.current) { suppressClick.current = false; return; }
