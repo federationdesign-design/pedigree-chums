@@ -307,6 +307,12 @@
    outline from section 10 is enforced on the index deck pills, not these hero
    meta tags. */
 .tagRural { background: #97aa31; color: var(--navy, #0a3a57); }
+/* Emergency family pill on the article hero (article 5). Settled fill #D71F6C
+   with --cream text (brief v3.0 section 10). */
+.tagEmergency { background: #d71f6c; color: var(--cream, #ffffff); }
+/* People family pill on the article hero (article 6). Settled fill #2B7095 with
+   --cream text (brief v3.0 section 10). */
+.tagPeople { background: #2b7095; color: var(--cream, #ffffff); }
 .essayPage {
   min-height: 100vh;
   padding-bottom: 80px;
@@ -389,6 +395,14 @@
   grid-template-columns: 1fr 380px;
   gap: 48px;
   align-items: start;
+  /* Query container for the desktop payslip (Steve, 11 Aug): the payslip's
+     font-size, width and drift are driven from this column's inline size via cqi,
+     so the card scales with the content, not the raw viewport. Because the column
+     is capped at --essay-max (1300) and centred, its inline size is fixed above
+     ~1300px viewport, which is why the payslip is identical at 1600/1920/2800 and
+     only responds below 1300. Content box = 1300 - 48 gutter = 1252 at the cap, so
+     100cqi = 1252px there. */
+  container-type: inline-size;
 }
 
 .essayHero {
@@ -466,10 +480,32 @@
 }
 
 @media (min-width: 901px) {
-  .payslipOverlay {
-    /* -122 not -170: with .essayLayout top padding now 0 (was 48), this holds the
-       payslip's hero overlap where it was rather than deepening it. */
-    margin-top: -122px;
+  /* Enlarged and made responsive (Steve, 11 Aug). The size no longer comes from
+     transform:scale (which cannot vary continuously with a container) but from the
+     card's own font-size and width, both driven from the .essayLayout query
+     container via cqi. This gives a real, reflowing layout box: the sidebar cards
+     flow beneath it with no scale-underlay hack.
+
+     Locked at/above the 1300 cap: font-size 24px (=16px base x1.5, the previous
+     look) and width 570px (=380 base x1.5). 100cqi = 1252px at the cap, so:
+       - font-size min(24px, 1.917cqi): 1.917 x 12.52 = 24 at the cap; min() holds
+         it at 24 for any wider container and lets it shrink smoothly below 1300.
+       - width 23.75em: 23.75 x 24 = 570 at the cap, and it tracks font-size down.
+     The doubled class name (0,2,0) outranks base .payslip (0,1,0), so this rotate
+     replaces the base tilt regardless of source order.
+
+     Horizontal drift (requirement 3, the lever holding the <=10px ingress): below
+     the cap the card drifts right so its left edge tracks the narrowing text. The
+     term (1252px - 100cqi) is 0 at the cap and grows as the container narrows
+     (it equals 1300 - viewport below the cap); DRIFT_K scales it. K is set from
+     measurement so ingress stays <=10px at every width down to the mobile break. */
+  .payslipOverlay.payslipOverlay {
+    /* Lift so the card sits high over the hero. */
+    margin-top: -347px;
+    font-size: min(24px, 1.917cqi);
+    width: 23.75em;
+    transform-origin: top left;
+    transform: translateX(calc(-110px + (1252px - 100cqi) * 0)) rotate(-3deg);
   }
 }
 

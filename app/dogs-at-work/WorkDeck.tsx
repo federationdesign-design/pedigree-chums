@@ -129,6 +129,13 @@ function Sections({ slide, withThumbnails, indent }: { slide: Slide; withThumbna
   );
 }
 
+// Swipe tuning. A gesture must travel at least SWIPE_THRESHOLD px horizontally to
+// change slide; any travel past DRAG_SLOP marks it a drag and cancels the click it
+// would otherwise fire (so a tap still opens a link or fires the CTA, a drag never
+// does).
+const SWIPE_THRESHOLD = 50;
+const DRAG_SLOP = 10;
+
 export default function WorkDeck({ slides }: { slides: Slide[] }) {
   const [index, setIndex] = useState(0);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -175,6 +182,73 @@ export default function WorkDeck({ slides }: { slides: Slide[] }) {
     } else if (e.key === "ArrowLeft") {
       e.preventDefault();
       go(index - 1);
+    }
+  }
+
+  // One pointer handler for touch, trackpad and mouse (Pointer Events unify them,
+  // so there is no separate touch/mouse code). It navigates via go(), exactly as
+  // the dots, chevron and arrow keys do, so the desktop counter-motion and
+  // prefers-reduced-motion (both expressed in the CSS track transitions) are reused
+  // unchanged. The move/end listeners live on window per-gesture, so a release that
+  // strays outside the panel is still caught, and they are removed when it ends.
+  const suppressClick = useRef(false);
+
+  function onPointerDown(e: React.PointerEvent<HTMLDivElement>) {
+    // Primary pointer only; ignore right/middle mouse buttons.
+    if (!e.isPrimary || (e.pointerType === "mouse" && e.button !== 0)) return;
+    const startX = e.clientX;
+    const startY = e.clientY;
+    const zone = e.currentTarget;
+    const pointerId = e.pointerId;
+    let dragged = false;
+    // Suppress text selection / native image drag for the whole gesture.
+    zone.classList.add(styles.dragging);
+
+    const move = (ev: PointerEvent) => {
+      if (ev.pointerId !== pointerId) return;
+      if (!dragged && Math.hypot(ev.clientX - startX, ev.clientY - startY) > DRAG_SLOP) {
+        dragged = true;
+      }
+    };
+    const end = (ev: PointerEvent) => {
+      if (ev.pointerId !== pointerId) return;
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", end);
+      window.removeEventListener("pointercancel", end);
+      zone.classList.remove(styles.dragging);
+      const dx = ev.clientX - startX;
+      const dy = ev.clientY - startY;
+      if (dragged) {
+        // A drag must not fire the click it would otherwise dispatch on a link,
+        // the CTA or a dot. Cleared next frame in case no click follows (touch).
+        suppressClick.current = true;
+        requestAnimationFrame(() => {
+          suppressClick.current = false;
+        });
+      }
+      // Change slide only on a real release (not cancel) that is far enough and
+      // more horizontal than vertical, so a nudge or a mostly-vertical scroll is
+      // ignored. Left (dx < 0) advances; right goes back.
+      if (
+        ev.type === "pointerup" &&
+        Math.abs(dx) >= SWIPE_THRESHOLD &&
+        Math.abs(dx) > Math.abs(dy)
+      ) {
+        go(index + (dx < 0 ? 1 : -1));
+      }
+    };
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", end);
+    window.addEventListener("pointercancel", end);
+  }
+
+  // Capture phase, so it runs before the link/CTA/dot handlers and can stop a
+  // drag's click reaching them, while a tap (no drag) passes straight through.
+  function onClickCapture(e: React.MouseEvent<HTMLDivElement>) {
+    if (suppressClick.current) {
+      e.preventDefault();
+      e.stopPropagation();
+      suppressClick.current = false;
     }
   }
 
@@ -265,7 +339,11 @@ export default function WorkDeck({ slides }: { slides: Slide[] }) {
           <div className={styles.deckPager}>{dots}</div>
         </div>
 
-        <div className={styles.articleViewport}>
+        <div
+          className={styles.articleViewport}
+          onPointerDown={onPointerDown}
+          onClickCapture={onClickCapture}
+        >
           <div className={styles.articleTrack}>
             {slides.map((_, revI) => {
               const i = count - 1 - revI;
@@ -287,6 +365,7 @@ export default function WorkDeck({ slides }: { slides: Slide[] }) {
                       className={styles.articleImgLink}
                       aria-label={`Read: ${a.headline}`}
                       tabIndex={current ? undefined : -1}
+                      draggable={false}
                     >
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
@@ -294,6 +373,7 @@ export default function WorkDeck({ slides }: { slides: Slide[] }) {
                         src={a.image}
                         alt={a.imageAlt}
                         loading={current ? "eager" : "lazy"}
+                        draggable={false}
                       />
                     </Link>
                   </div>
@@ -313,6 +393,7 @@ export default function WorkDeck({ slides }: { slides: Slide[] }) {
                       href={a.href}
                       className={styles.cta}
                       tabIndex={current ? undefined : -1}
+                      draggable={false}
                     >
                       {a.ctaLabel}
                     </Link>
@@ -363,29 +444,37 @@ export default function WorkDeck({ slides }: { slides: Slide[] }) {
           </button>
         </div>
 
-        <div className={styles.mImage}>
-          {/* Item 10: image links to the article, own accessible name. */}
-          <Link href={mA.href} className={styles.articleImgLink} aria-label={`Read: ${mA.headline}`}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={mA.image} alt={mA.imageAlt} loading="lazy" />
-          </Link>
-        </div>
-
-        <div className={styles.mArticle}>
-          <p className={styles.learnAbout}>
-            Learn <span className={styles.learnAboutAccent}>about&hellip;</span>
-          </p>
-          <div className={styles.articleMeta}>
-            <span className={styles.pill} data-family={mA.family}>
-              {FAMILY_PILL_LABEL[mA.family]}
-            </span>
-            <span className={styles.subLabel}>{mA.subLabel}</span>
+        {/* Image and article share one swipe zone (dots and chevron sit above it,
+            so they are untouched). */}
+        <div
+          className={styles.mSwipe}
+          onPointerDown={onPointerDown}
+          onClickCapture={onClickCapture}
+        >
+          <div className={styles.mImage}>
+            {/* Item 10: image links to the article, own accessible name. */}
+            <Link href={mA.href} className={styles.articleImgLink} aria-label={`Read: ${mA.headline}`} draggable={false}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={mA.image} alt={mA.imageAlt} loading="lazy" draggable={false} />
+            </Link>
           </div>
-          <h2 className={styles.headline}>{mA.headline}</h2>
-          <p className={styles.dek}>{mA.dek}</p>
-          <Link href={mA.href} className={styles.cta}>
-            {mA.ctaLabel}
-          </Link>
+
+          <div className={styles.mArticle}>
+            <p className={styles.learnAbout}>
+              Learn <span className={styles.learnAboutAccent}>about&hellip;</span>
+            </p>
+            <div className={styles.articleMeta}>
+              <span className={styles.pill} data-family={mA.family}>
+                {FAMILY_PILL_LABEL[mA.family]}
+              </span>
+              <span className={styles.subLabel}>{mA.subLabel}</span>
+            </div>
+            <h2 className={styles.headline}>{mA.headline}</h2>
+            <p className={styles.dek}>{mA.dek}</p>
+            <Link href={mA.href} className={styles.cta} draggable={false}>
+              {mA.ctaLabel}
+            </Link>
+          </div>
         </div>
 
         <p className={styles.srStatus} aria-live="polite">

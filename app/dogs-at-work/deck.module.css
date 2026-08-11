@@ -346,6 +346,10 @@
      edge and image (open question 5). The article keeps its own natural height. */
   margin: -60px calc(-1 * clamp(20px, 4vw, 56px)) 0;
   overflow: hidden;
+  /* Swipe zone: let the browser keep vertical page scroll (pan-y) while horizontal
+     drags are delivered to the pointer handler. grab hints the drag affordance. */
+  touch-action: pan-y;
+  cursor: grab;
 }
 
 .articleTrack {
@@ -610,6 +614,21 @@
   outline: 3px solid var(--yellow);
   outline-offset: 3px;
   border-radius: 10px;
+}
+
+/* Swipe zone wrapping the image and article block (dots and chevron sit above it,
+   so they keep working). pan-y leaves vertical scroll to the browser and delivers
+   horizontal drags to the pointer handler. */
+.mSwipe {
+  touch-action: pan-y;
+}
+
+/* While a drag is in progress (class toggled on the active zone), suppress text
+   selection and show the grabbing cursor. */
+.dragging {
+  cursor: grabbing;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 /* Full-width image, bleeding past the stack's side padding. */

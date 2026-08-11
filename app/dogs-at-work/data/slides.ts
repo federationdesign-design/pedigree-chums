@@ -19,6 +19,25 @@ import { validateSlides } from "./validate";
 // files keep their original names; only which article uses each has changed.
 // Alt text below is agent-suggested from the images, pending Steve's confirmation.
 
+// Article 5 (search and rescue) placeholders, outstanding from Steve and logged in
+// PLACEHOLDERS.md / docs/dogs-at-work/NEEDS_STEVE.md. The slide is now LIVE (Steve,
+// 11 Aug), so these are visible on the deck: the blue panel body and the index card
+// dek render verbatim and the hero alt reaches screen readers. The hero image itself
+// is real (/search_rescue_dogs.jpg). Replace each when the real copy lands.
+const PLACEHOLDER_ARTICLE_5_PANEL = "PLACEHOLDER: blue panel 5 supporting point for the search and rescue article, outstanding from Steve. One panel per article, so article 5 needs its own; this is a stand-in until the real copy lands.";
+const PLACEHOLDER_ARTICLE_5_DEK = "PLACEHOLDER: index card dek for the search and rescue article (two or three sentences), outstanding from Steve.";
+const PLACEHOLDER_ARTICLE_5_ALT = "PLACEHOLDER: alt text for the search and rescue hero, outstanding from Steve.";
+
+// Article 6 (guide dogs) placeholders, outstanding from Steve. LIVE like article 5
+// (Steve, 11 Aug), so these are visible on the deck. The hero is also a placeholder
+// path that 404s, i.e. a broken image on both the deck and the article page: the plan
+// is to move article3_hero.jpg (black Labrador in a guide-dog harness) here, but that
+// leaves article 2 short, so it is held until the hero chain is resolved (per Steve).
+const PLACEHOLDER_ARTICLE_6_PANEL = "PLACEHOLDER: blue panel 6 supporting point for the guide dogs article, outstanding from Steve. One panel per article, so article 6 needs its own; this is a stand-in until the real copy lands.";
+const PLACEHOLDER_ARTICLE_6_DEK = "PLACEHOLDER: index card dek for the guide dogs article (two or three sentences), outstanding from Steve.";
+const PLACEHOLDER_ARTICLE_6_ALT = "PLACEHOLDER: alt text for the guide dogs hero, outstanding from Steve.";
+const PLACEHOLDER_ARTICLE_6_HERO = "/PLACEHOLDER_article6_hero.jpg";
+
 export const SLIDES: Slide[] = [
   {
     id: "bio-detection",
@@ -179,6 +198,61 @@ Some spend their lives bored and under-stimulated, while others are pushed into 
       ctaLabel: "Sheepdogs",
       // Route is built at checkpoint 7; the link resolves once that lands.
       href: "/dogs-at-work/the-farm-worker-with-four-legs",
+    },
+  },
+  {
+    id: "search-rescue",
+    order: 5,
+    // Live with placeholders (Steve, 11 Aug): blue panel 5, the card dek and the
+    // hero alt are still outstanding from Steve and now show on the deck. The hero
+    // image is real; the article route is fully built.
+    published: "live",
+    panel: {
+      sections: [
+        {
+          subheading: "Panel 5 pending",
+          body: PLACEHOLDER_ARTICLE_5_PANEL,
+        },
+      ],
+    },
+    article: {
+      family: "Emergency",
+      subLabel: "Search and rescue dogs",
+      headline: "The Dog That Finds You When Nobody Else Can",
+      dek: PLACEHOLDER_ARTICLE_5_DEK,
+      image: "/search_rescue_dogs.jpg",
+      imageAlt: PLACEHOLDER_ARTICLE_5_ALT,
+      ctaLabel: "Search and rescue dogs",
+      href: "/dogs-at-work/the-dog-that-finds-you-when-nobody-else-can",
+    },
+  },
+  {
+    id: "guide-dogs",
+    order: 6,
+    // Live with placeholders (Steve, 11 Aug): blue panel 6, the card dek and the hero
+    // alt are outstanding, and the hero image path 404s (broken image on the deck and
+    // the article page) until the hero chain is resolved (moving article3_hero.jpg
+    // here leaves article 2 short). All now show on the deck.
+    published: "live",
+    panel: {
+      sections: [
+        {
+          subheading: "Panel 6 pending",
+          body: PLACEHOLDER_ARTICLE_6_PANEL,
+        },
+      ],
+    },
+    article: {
+      family: "People",
+      subLabel: "Guide dogs",
+      headline: "The Dog That Gives You Your World Back",
+      dek: PLACEHOLDER_ARTICLE_6_DEK,
+      // Hero held: article3_hero.jpg is to move here once article 2 has a
+      // replacement, so a placeholder path is used until the chain is resolved.
+      image: PLACEHOLDER_ARTICLE_6_HERO,
+      imageAlt: PLACEHOLDER_ARTICLE_6_ALT,
+      ctaLabel: "Guide dogs",
+      href: "/dogs-at-work/the-dog-that-gives-you-your-world-back",
     },
   },
 ];
