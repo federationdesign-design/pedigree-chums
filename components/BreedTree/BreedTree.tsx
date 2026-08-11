@@ -5535,7 +5535,12 @@ export default function BreedTree({
             const R = enc.r * k * 1.02; // a hair outside the outermost circles
             const swRing = Math.max(2, R * 0.012); // ring weight, tune on its own
             const swLine = Math.max(8, R * 0.048); // line weight, 4x the ring's slope
-            const dash = `${R * 0.05} ${R * 0.045}`; // R-derived, independent of stroke
+            const dash = `${R * 0.05} ${R * 0.045}`; // ring dash, R-derived, left as is
+            // Line dash off its OWN stroke so it scales with the 4x weight. Butt
+            // caps below, not round: round caps at 8px added half the width to
+            // each dash end and closed the gaps into blobs. 2.2 dash, 1.6 gap
+            // reads as a proper dashed line rather than a row of lozenges.
+            const dashLine = `${swLine * 2.2} ${swLine * 1.6}`;
             // The portrait sits near the top-left corner of the pit; anchor there.
             const ax = xMin + vbW * 0.07;
             const ay = -vbH / 2 + vbH * 0.09;
@@ -5545,7 +5550,7 @@ export default function BreedTree({
             const ey = cy + (dy / len) * R;
             return (
               <g pointerEvents="none" aria-hidden="true">
-                <line x1={ax} y1={ay} x2={ex} y2={ey} stroke="#ffffff" strokeWidth={swLine} strokeDasharray={dash} strokeLinecap="round" />
+                <line x1={ax} y1={ay} x2={ex} y2={ey} stroke="#ffffff" strokeWidth={swLine} strokeDasharray={dashLine} />
                 <circle cx={cx} cy={cy} r={R} fill="none" stroke="#ffffff" strokeWidth={swRing} strokeDasharray={dash} />
               </g>
             );
@@ -5925,7 +5930,7 @@ export default function BreedTree({
                             // the name of the circle it sits in: d3 hands the
                             // nodes back shallowest first, so the deeper label is
                             // drawn last. White on white just does not read as
-                            // in front. A navy halo cuts a name cleanly out of
+                            // in front. A black halo cuts a name cleanly out of
                             // whatever is behind it. It goes on the first ring
                             // too now, by request, so the big names and the
                             // nested ones read as one family. paint-order lays
@@ -5935,7 +5940,7 @@ export default function BreedTree({
                             // the first-ring change does not reach them.
                             ...(isInside
                               ? {
-                                  stroke: "var(--navy, #0a3a57)",
+                                  stroke: "#000000",
                                   strokeWidth: Math.max(2, fs * 0.16),
                                   strokeLinejoin: "round" as const,
                                   paintOrder: "stroke" as const,
