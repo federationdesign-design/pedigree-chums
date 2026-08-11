@@ -318,8 +318,12 @@
   padding-bottom: 80px;
   /* Single source for the article's horizontal axis. Both the hero content and
      the essay layout read these, so their left/right edges cannot drift apart:
-     change the gutter or max-width once here and both move together. */
-  --essay-max: 1300px;
+     change the gutter or max-width once here and both move together.
+     Raised 1300 -> 1760 (Steve, 11 Aug) so the article block runs wider before it
+     caps, filling more of a large monitor. The text measure (.essayBody p 720,
+     .essay 900) and the payslip cap (min 24px) are unchanged, so only the block
+     and column widen; the reading line and payslip stay put. */
+  --essay-max: 1760px;
   --essay-gutter: 24px;
 }
 .backLink {
