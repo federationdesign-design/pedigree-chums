@@ -1471,7 +1471,8 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Old English Bulldog",
     note: "The extinct, athletic bull-baiting dog, leaner and fiercer than today's Bulldog, bred down from ancient war dogs.",
     children: [
-      { name: "Mastiff and Alaunt war dogs", note: "The big Molossers and the extinct Alaunt that gave it bulk and a broad jaw.", img: "/history/breeds/Mastiff-and-Alaunt-war-dogs.jpg", value: 60 },
+      { name: "Mastiff", note: "The big Molosser guard dogs that gave it bulk and a broad jaw.", img: "/history/breeds/medieval-british-mastiff.jpg", value: 30 },
+      { name: "Alaunt war dogs", note: "The extinct Alaunt catch dogs crossed in alongside them. A modelled half of the pair, not a recorded mating. Now extinct.", img: "/history/breeds/alunt-war-dogs.jpg", value: 30 },
       { name: "Old British bandogs", note: "The heavy chained dogs of old England, kept tied by day and set loose at night, and put to work by butchers and baiters alike. Now extinct.", img: "/history/breeds/Old-British-bandogs.jpg", value: 40 }
     ]
   },
@@ -1801,7 +1802,8 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Great Dane",
     note: "Germany's giant boarhound, the Deutsche Dogge, built by crossing heavy war mastiffs with tall, fast coursing hounds.",
     children: [
-      { name: "Mastiff and Alaunt war dogs", note: "The heavy Molosser war and hunting dogs that gave it bulk, bone and a fearless front. Now extinct.", img: "/history/breeds/Mastiff-and-Alaunt-war-dogs.jpg", value: 50 },
+      { name: "Mastiff", note: "The heavy Molosser war and hunting dogs that gave it bulk and bone.", img: "/history/breeds/medieval-british-mastiff.jpg", value: 25 },
+      { name: "Alaunt war dogs", note: "The fierce Alaunt catch dogs that gave it a fearless front. A modelled half of the pair, not a recorded mating. Now extinct.", img: "/history/breeds/alunt-war-dogs.jpg", value: 25 },
       { name: "Irish Wolfhound", note: "Tall coursing hounds crossed in for height, reach and the speed to pull down boar.", img: "/history/breeds/irish-wolfhound-photo.jpg", value: 30 },
       { name: "Old German boarhounds", note: "The regional hunting packs that did the real boar work before the breed was fixed. Now extinct.", img: "/history/breeds/Old-German-boarhounds.jpg", value: 20 }
     ]
