@@ -1203,7 +1203,27 @@ export default function BreedTree({
     applyLevel((1 - (clientY - r.top) / Math.max(r.height, 1)) * 10);
   }
   const nodes = useMemo<Node[]>(() => {
-    const h = hierarchy<LineageNode>(root)
+    // KEEP-CHILD COLLAPSE, RENDERER ONLY. The same pass the lift runs
+    // (LineageMap.tsx). expandNode leaves every grafted node valueless
+    // (data/lineage.ts, `value: undefined`), so a single-child ancestor is a
+    // redundant wrapper: in the pack its one child fills it completely and it
+    // only restates that child. In 132 of 178 such wrappers the child IS the
+    // trail-completing card (Earth Dog, Otterhound, Ancient Mastiff, Shepherd's
+    // Dog), and keep-PARENT was rejected on the numbers: it hides those cards,
+    // the whole point of the Tudor trail, and if it ever reached the data it
+    // breaks the era count from 1 to 14. This is display only: `root`,
+    // getLineage and the failure measurement are untouched. A CHAIN collapses
+    // straight to the card in one post-order pass (Welsh Terrier: Old fell
+    // terriers -> Old English Black and Tan Terrier -> Earth Dog draws straight
+    // to Earth Dog, both stacked wrappers gone). Do NOT move this into
+    // expandNode and do NOT switch it to keep-parent.
+    const collapse = (n: LineageNode): LineageNode => {
+      const kids = (n.children ?? []).map(collapse);
+      if (n.value === undefined && kids.length === 1) return kids[0]; // wrapper: keep the child
+      return { ...n, children: kids };
+    };
+    const collapsed: LineageNode = { ...root, children: (root.children ?? []).map(collapse) };
+    const h = hierarchy<LineageNode>(collapsed)
       .sum((d) => d.value ?? 0)
       .sort((a, b) => (b.value ?? 0) - (a.value ?? 0));
     const ns = pack<LineageNode>().size([SIZE, SIZE]).padding(8)(h).descendants();
