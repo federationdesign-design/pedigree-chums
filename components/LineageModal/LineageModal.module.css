@@ -112,10 +112,16 @@
      back out, anything above --tp / 2.1 would make the NAME taller than the
      portrait, which would take the row height off --tp and quietly break the
      fit the whole ladder depends on. --tp / 2.1 is the hard ceiling: going
-     smaller is always safe, going bigger is not. The cap is now --tp / 2.625,
-     20% below that ceiling, further than ever from binding, but it stays: it is
-     what stops a future size change from silently costing a rung. */
-  font-size: min(clamp(0.416rem, 1vw, 0.904rem), calc(var(--tp) / 2.625));
+     smaller is always safe, going bigger is not. The cap was --tp / 2.625,
+     but the ladder text was doubled (owner request): the clamp below is 2x its
+     old terms, maxing at 1.808rem, about 28.9px on desktop. To let that value
+     through, the cap is raised to --tp / 2.15, about 29px, just above the
+     doubled clamp and still under the 2.1 ceiling. Safety is now thin: a
+     two-line name at 28.9px is about 60.8px against a 62.4px portrait, roughly
+     2.6% clearance, down from about half. Do not raise the clamp or --tp
+     without re-checking this. A separate @media (max-width: 640px) rule below
+     overrides this on phones and was NOT doubled. */
+  font-size: min(clamp(0.832rem, 2vw, 1.808rem), calc(var(--tp) / 2.15));
   color: #ffffff;
   text-transform: uppercase;
   letter-spacing: 0.04em;
