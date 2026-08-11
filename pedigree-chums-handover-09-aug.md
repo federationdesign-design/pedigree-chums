@@ -205,3 +205,10 @@ const frozen = dockAside && gravity && !started && !learning;
 - **`POP_MIN_PX` was discussed at length as the fix for tiny circles.** It governs a path that no longer runs for them.
 
 **The procedural rule, unchanged and still the whole game:** establish which view is on screen, measure the real path, then change it. **When three attempts have failed, build a diagnostic instead of a fourth fix.**
+
+## 8. The inner-circle hover bug (open, parked)
+
+- **Symptom:** hovering an inner circle on the lift (e.g. `Ancient eastern sighthounds` on the Scottish Deerhound tree) does not take: the level ladder does not add the rung and the label does not turn yellow. First attempt fails, second works, out-and-back "fixes" it.
+- **Cause 1, real and FIXED:** `BreedTree.tsx` circle `onMouseLeave` called `asideRef.current.contains(rt)` guarded only by `rt &&`. `relatedTarget` can be a non-Node (the window), and `Node.contains()` throws on it. The throw aborted the leave before `setHovered(null)`, latching `hovered` on the parent. Fixed by guarding the TYPE: `rt instanceof Node && ...` (commit `c925b682`). The console TypeError is gone.
+- **Cause 2, still open:** with the throw gone, the hover still fails, so there is a second cause. The circle `onMouseEnter` (BreedTree, around line 5665) has a latch, `if (u && u.raf !== null && d !== u.parent && u.inside.has(d)) return;`, that swallows hovers onto nested circles while the unlock sim is running; if `u.raf` never clears, deep circles stay unhoverable. Not yet confirmed. Next diagnostic should log, in BreedTree, whether `onMouseEnter` fires on the inner circle, the latch decision, and whether `setHovered` runs.
+- **Lesson, do this first next time:** three diagnostics were put in `LineageMap.tsx` and printed nothing, because the learn/lift circle view is rendered by **`BreedTree.tsx`**, not LineageMap (BreedTree's `hovered` drives `onShownPathChange`, hence the ladder). Establish which file renders the thing before instrumenting it. Same trap as the collapse job.
