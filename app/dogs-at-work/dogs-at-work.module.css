@@ -49,8 +49,12 @@
 /* ── Essay ──────────────────────────────────────────────────── */
 .essay {
   max-width: 900px;
-  margin: 0 auto 80px;
-  padding: 0 24px;
+  /* Left-aligned with no horizontal padding: the 24px page gutter is owned once,
+     by .essayLayout (and the hero by .essayHeroContent), so the body's left edge
+     matches the hero's. Previously .essay re-applied `padding: 0 24px`, adding a
+     second gutter that pushed the body 24px right of the hero (one-owner rule). */
+  margin: 0 0 80px;
+  padding: 0;
 }
 
 .essayMeta {
