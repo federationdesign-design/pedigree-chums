@@ -135,11 +135,17 @@ function Sections({ slide, withThumbnails, indent }: { slide: Slide; withThumbna
 // does).
 const SWIPE_THRESHOLD = 50;
 const DRAG_SLOP = 10;
+// Accumulated horizontal wheel distance (a trackpad two-finger swipe) needed to
+// page. The pointer-drag path above never sees a trackpad swipe: macOS Safari
+// delivers it as a horizontal wheel and turns it into back/forward navigation.
+const WHEEL_THRESHOLD = 60;
 
 export default function WorkDeck({ slides }: { slides: Slide[] }) {
   const [index, setIndex] = useState(0);
   const rootRef = useRef<HTMLDivElement>(null);
   const mBlueRef = useRef<HTMLDivElement>(null);
+  const articleViewportRef = useRef<HTMLDivElement>(null);
+  const mSwipeRef = useRef<HTMLDivElement>(null);
   const didMount = useRef(false);
   const count = slides.length;
 
@@ -167,6 +173,43 @@ export default function WorkDeck({ slides }: { slides: Slide[] }) {
     const top = el.getBoundingClientRect().top + window.scrollY - 84; // clear the nav
     window.scrollTo({ top, behavior: "smooth" });
   }, [index]);
+
+  // Trackpad / horizontal-wheel paging. The pointer handler catches press-drags and
+  // touchscreen swipes, but not a macOS trackpad two-finger swipe: Safari delivers
+  // that as a horizontal wheel and turns it into history back/forward, so the deck
+  // never sees it (confirmed in WebKit: a horizontal wheel produced no slide change).
+  // Handle the wheel on the swipe zones directly: page on a predominantly-horizontal
+  // delta and preventDefault so the browser cannot navigate. A non-passive listener
+  // is required for preventDefault to take effect; React's onWheel is passive, so it
+  // is attached natively. A short idle lock keeps one continuous swipe (including its
+  // momentum tail) to a single slide change.
+  useEffect(() => {
+    const zones = [articleViewportRef.current, mSwipeRef.current].filter(Boolean) as HTMLElement[];
+    let locked = false;
+    let accum = 0;
+    let idle: number | undefined;
+    function onWheel(e: WheelEvent) {
+      if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return; // vertical scroll: leave it to the page
+      e.preventDefault(); // stop horizontal overscroll -> Safari's back/forward swipe
+      if (idle) window.clearTimeout(idle);
+      idle = window.setTimeout(() => {
+        locked = false;
+        accum = 0;
+      }, 200);
+      if (locked) return;
+      accum += e.deltaX;
+      if (Math.abs(accum) < WHEEL_THRESHOLD) return;
+      const dir = accum > 0 ? 1 : -1; // swipe left (deltaX > 0) advances, matching the drag
+      locked = true;
+      accum = 0;
+      setIndex((i) => Math.max(0, Math.min(count - 1, i + dir)));
+    }
+    for (const z of zones) z.addEventListener("wheel", onWheel, { passive: false });
+    return () => {
+      if (idle) window.clearTimeout(idle);
+      for (const z of zones) z.removeEventListener("wheel", onWheel);
+    };
+  }, [count]);
 
   function go(to: number) {
     setIndex((i) => {
@@ -340,6 +383,7 @@ export default function WorkDeck({ slides }: { slides: Slide[] }) {
         </div>
 
         <div
+          ref={articleViewportRef}
           className={styles.articleViewport}
           onPointerDown={onPointerDown}
           onClickCapture={onClickCapture}
@@ -447,6 +491,7 @@ export default function WorkDeck({ slides }: { slides: Slide[] }) {
         {/* Image and article share one swipe zone (dots and chevron sit above it,
             so they are untouched). */}
         <div
+          ref={mSwipeRef}
           className={styles.mSwipe}
           onPointerDown={onPointerDown}
           onClickCapture={onClickCapture}
