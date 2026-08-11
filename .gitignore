@@ -59,3 +59,6 @@ agent/
 *.psd
 .screenshots/
 screenshots/
+
+# local throwaway prototypes, never shipped
+prototypes/
