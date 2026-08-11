@@ -458,7 +458,7 @@ const LINEAGE: Record<string, LineageNode> = {
     children: [
       { name: "Old English Bulldog", note: "The athletic bull-baiting dog at the root of it all, leaner and fiercer than today's Bulldog. Now extinct.", img: "/history/breeds/Old-English-Bulldog.jpg", value: 60 },
       { name: "Mastiff", note: "The old Molosser guard-and-war dogs that gave the breed its bulk and broad head.", img: "/history/breeds/medieval-british-mastiff.jpg", value: 25 },
-      { name: "Pug", note: "Crossed in during the 1800s to shorten the face and soften the temperament.", img: "/history/breeds/Asian-flat-faced-toys.jpg", value: 15 }
+      { name: "Pug", note: "Crossed in during the 1800s to shorten the face and soften the temperament.", img: "/pug-square.jpg", value: 15 }
     ]
   },
 
