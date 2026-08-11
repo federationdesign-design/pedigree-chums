@@ -57,3 +57,4 @@ agent/
 
 .claude/
 *.psd
+.screenshots/
