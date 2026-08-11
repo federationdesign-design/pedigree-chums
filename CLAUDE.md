@@ -17,7 +17,8 @@ Read them at the start of every session and follow them without exception.
   through.
 - No text opacity and no `rgba` on text.
 - Design tokens: `--blue-sky: #5cc4ee`, `--blue-deep: #0b78bd`,
-  `--navy: #0a3a57`, `--yellow: #ffd23e`, `--cream: #fff8e6`.
+  `--navy: #0a3a57`, `--yellow: #ffd23e`, `--cream: #ffffff` (see the Dogs at
+  Work amendments at the end of this file; was `#fff8e6`).
   Fonts: Luckiest Guy (`--font-display`), Montserrat (`--font-body`),
   Open Sans (`--font-pct`).
 
@@ -64,3 +65,29 @@ and confirm every hit is compounded.
   named placeholder and log it in `PLACEHOLDERS.md` at the repo root.
   Never invent campaign values, prices, dates, moderation copy or asset
   paths.
+
+## Dogs at Work redux amendments (10 August 2026)
+
+These amendments come from the Dogs at Work redux (brief v3.0,
+`docs/dogs-at-work/BRIEF.md`) and are recorded here, not applied by deleting the
+rules above, so a future agent does not silently undo the work.
+
+1. **No-dark-backgrounds rule: withdrawn (10 August 2026).** The rule "No dark
+   backgrounds on any page" above is retired. Dark backgrounds are already
+   present across the site and are an intentional part of the Dogs at Work
+   design. Do not reintroduce the ban and do not lighten these pages to reveal
+   the body gradient.
+
+2. **No-em-dash rule: editorial copy carved out (10 August 2026).** The
+   no-em-dash rule still applies in full to interface copy, code, comments,
+   documentation and all other output. Long-form editorial copy in the Dogs at
+   Work articles and blue panels may retain em dashes, because the existing
+   published copy depends on them.
+
+3. **`--cream` is now `#ffffff` (10 August 2026).** The token line above once
+   read `--cream: #fff8e6`; `app/globals.css` previously defined `#fbf7ec`.
+   Both are superseded: `--cream` is `#ffffff`. This is a site-wide token, so
+   the change reaches every `var(--cream)` consumer (preorder, privacy,
+   cookies, discount-code, ScoreTable, PackPit and the Pick a Chum dev
+   recorder), shifting warm off-white to pure white. It was made deliberately
+   on the `dogsatwork` branch and stays there until merged by hand.

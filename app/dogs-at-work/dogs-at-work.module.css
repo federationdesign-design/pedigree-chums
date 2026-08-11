@@ -49,8 +49,12 @@
 /* ── Essay ──────────────────────────────────────────────────── */
 .essay {
   max-width: 900px;
-  margin: 0 auto 80px;
-  padding: 0 24px;
+  /* Left-aligned with no horizontal padding: the 24px page gutter is owned once,
+     by .essayLayout (and the hero by .essayHeroContent), so the body's left edge
+     matches the hero's. Previously .essay re-applied `padding: 0 24px`, adding a
+     second gutter that pushed the body 24px right of the hero (one-owner rule). */
+  margin: 0 0 80px;
+  padding: 0;
 }
 
 .essayMeta {
@@ -60,21 +64,23 @@
   flex-wrap: wrap;
 }
 
+/* Hero meta pills, sized up to match the concept (both the family pill and the
+   sub-label pill). */
 .tag {
   font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: 0.65rem;
+  font-size: 0.85rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   background: var(--yellow, #ffd23e);
   color: var(--navy, #0a3a57);
   border-radius: 999px;
-  padding: 4px 14px;
+  padding: 7px 18px;
 }
 
 .tagBreed {
   font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: 0.65rem;
+  font-size: 0.85rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -82,7 +88,7 @@
   color: #ffffff;
   border: 1.5px solid rgba(255,255,255,0.4);
   border-radius: 999px;
-  padding: 4px 14px;
+  padding: 7px 18px;
 }
 
 .tagBad {
@@ -114,25 +120,44 @@
   text-transform: uppercase;
 }
 
-/* ── Essay body ─────────────────────────────────────────────── */
+/* ── Essay body ─────────────────────────────────────────────────
+   Body and intro type match the Good Dog Bad Dog article pages, which are the
+   same article style (values reused verbatim from good-dog-bad-dog.module.css,
+   confirmed by Steve 11 Aug 2026): body 1.25rem/500/1.3, intro 1.625rem/700/1.3.
+   This class is shared by all four Dogs at Work article pages, so the change
+   lands on articles 1 to 3 as well and keeps the set consistent. Dogs at Work
+   keeps its own paragraph spacing (margin-bottom + max-width) rather than GDBD's
+   sibling-gap rhythm system. */
 .essayBody p {
   font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: 1rem;
+  font-size: 1.25rem;
   font-weight: 500;
   color: #ffffff;
-  line-height: 1.8;
+  line-height: 1.3;
   margin: 0 0 18px;
   max-width: 720px;
 }
 
+/* First paragraph treatment, matching GDBD. Every Dogs at Work article opens
+   with a prose paragraph, so its first .essayBody child is a <p>. */
+.essayBody > p:first-child,
+.essayBody .introPara {
+  font-size: 1.625rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
 .subhead {
   font-family: var(--font-display, "Luckiest Guy", cursive);
-  font-size: 2.0rem;
-  color: var(--yellow, #ffd23e);
+  /* Body section headings: 1.5x bigger, tight 0.9 line-height, and the brighter
+     --emphasis yellow, matching the concept. The hero headline is white; the
+     yellow lives on these body headings and the sidebar card titles. */
+  font-size: 3.0rem;
+  color: var(--emphasis, #ffed60);
   letter-spacing: 0.06em;
   text-transform: uppercase;
   margin: 48px 0 16px;
-  line-height: 1.2;
+  line-height: 0.9;
 }
 
 .evidenceList {
@@ -206,88 +231,6 @@
   color: var(--yellow, #ffd23e);
 }
 
-/* ── Coming soon ────────────────────────────────────────────── */
-.coming {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 0 24px;
-}
-
-.comingTitle {
-  font-family: var(--font-display, "Luckiest Guy", cursive);
-  font-size: 1.8rem;
-  color: #ffffff;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  margin: 0 0 24px;
-  border-bottom: 2px solid rgba(255,255,255,0.15);
-  padding-bottom: 16px;
-}
-
-.comingGrid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-}
-
-@media (max-width: 600px) {
-  .comingGrid {
-    grid-template-columns: 1fr;
-  }
-}
-
-.comingCard {
-  background: var(--navy, #0a3a57);
-  border: 1.5px solid rgba(255,255,255,0.1);
-  border-radius: 16px;
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.comingTag {
-  font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: 0.6rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  background: rgba(255,255,255,0.1);
-  color: #ffffff;
-  border-radius: 999px;
-  padding: 3px 12px;
-  align-self: flex-start;
-}
-
-.comingName {
-  font-family: var(--font-display, "Luckiest Guy", cursive);
-  font-size: 1.1rem;
-  color: var(--yellow, #ffd23e);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  margin: 0;
-  line-height: 1.2;
-}
-
-.comingBreed {
-  font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: 0.7rem;
-  font-weight: 700;
-  color: #aac4d4;
-  margin: 0;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-}
-
-.comingDesc {
-  font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: 0.8rem;
-  font-weight: 500;
-  color: #ffffff;
-  line-height: 1.6;
-  margin: 4px 0 0;
-}
-
 /* ── Index grid ─────────────────────────────────────────────── */
 .grid {
   max-width: 1100px;
@@ -355,9 +298,21 @@
 }
 .readMore:hover { background: #ffe566; transform: scale(1.03); }
 .tagGood { background: #22c55e; color: #ffffff; }
+/* Rural and Traditional family pill on the article hero (article 4). Uses the
+   settled family fill #97AA31 with --navy text (brief v3.0 section 10), so the
+   Sheepdogs hero carries the correct family colour rather than the legacy green.
+   Matches the filled tagGood/tagBad hero treatment; the one pixel --cream pill
+   outline from section 10 is enforced on the index deck pills, not these hero
+   meta tags. */
+.tagRural { background: #97aa31; color: var(--navy, #0a3a57); }
 .essayPage {
   min-height: 100vh;
   padding-bottom: 80px;
+  /* Single source for the article's horizontal axis. Both the hero content and
+     the essay layout read these, so their left/right edges cannot drift apart:
+     change the gutter or max-width once here and both move together. */
+  --essay-max: 1300px;
+  --essay-gutter: 24px;
 }
 .backLink {
   font-family: var(--font-body, "Montserrat", sans-serif);
@@ -379,9 +334,10 @@
   position: relative;
   z-index: 2;
   width: 100%;
-  max-width: 1300px;
+  /* Horizontal axis (max-width + gutter) from the single source on .essayPage. */
+  max-width: var(--essay-max);
   margin: auto auto 0;
-  padding: 24px 24px 40px;
+  padding: 24px var(--essay-gutter) 0px;
   align-self: flex-end;
   box-sizing: border-box;
 }
@@ -396,8 +352,10 @@
 
 .essayHeroTitle {
   font-family: var(--font-display, "Luckiest Guy", cursive);
-  font-size: clamp(1.8rem, 4vw, 3rem);
-  color: var(--yellow, #ffd23e);
+  /* White, 1.5x the previous clamp, to match the concept hero (headline is white
+     there, not yellow; the body section headings carry the yellow instead). */
+  font-size: clamp(2.7rem, 6vw, 4.5rem);
+  color: #ffffff;
   margin: 0;
   line-height: 1.1;
   letter-spacing: 0.04em;
@@ -405,11 +363,25 @@
   text-shadow: 0 2px 12px rgba(0,0,0,0.4);
 }
 
+/* Desktop only: hold the headline to 60% of the hero so it does not run under
+   the payslip that overlays the hero's right side. On mobile the hero has no
+   payslip overlay, so the headline keeps the full width. */
+@media (min-width: 901px) {
+  .essayHeroTitle {
+    max-width: 60%;
+  }
+}
+
 /* ── Essay two-column layout ────────────────────────────────── */
 .essayLayout {
-  max-width: 1300px;
+  /* Horizontal axis (max-width + gutter) from the single source on .essayPage,
+     shared with .essayHeroContent so the hero and body cannot drift apart. */
+  max-width: var(--essay-max);
   margin: 0 auto;
-  padding: 48px 24px;
+  /* Vertical padding removed (Steve, 11 Aug): the hero->essay gap is owned solely
+     by the hero's margin-bottom (48), and the essay->footer gap solely by
+     main.essayPage's padding-bottom (80). No double gaps. */
+  padding: 0 var(--essay-gutter);
   display: grid;
   grid-template-columns: 1fr 380px;
   gap: 48px;
@@ -419,7 +391,8 @@
 .essayHero {
   position: relative;
   width: 100%;
-  min-height: clamp(340px, 50vh, 560px);
+  /* Hero min-height increased 20% (Steve, 11 Aug): 340/50vh/560 -> 408/60vh/672. */
+  min-height: clamp(408px, 60vh, 672px);
   overflow: hidden;
   display: flex;
   align-items: flex-end;
@@ -460,6 +433,10 @@
   gap: 20px;
   position: sticky;
   top: 120px;
+  /* Sticky forms a stacking context; raise it above the hero layers (image z0,
+     tint z1, content z2) so the payslip, which overlays the hero bottom, sits
+     above the hero's gradient tint rather than under it. */
+  z-index: 10;
 }
 
 .sidebarCard {
@@ -467,14 +444,64 @@
   border: 1.5px solid rgba(255,255,255,0.12);
   border-radius: 16px;
   overflow: hidden;
+  /* 20px extra padding on top of the article-page info cards (Steve, 11 Aug),
+     added at the container so it is uniform across cards whose inner sections
+     carry different paddings. */
+  padding-top: 20px;
+}
+
+/* Desktop only: lift the payslip so it overlays the bottom of the hero, per the
+   concept, instead of sitting below the hero in the body. The sidebar is tall
+   (several cards), so it scrolls with the page for most of its length and only
+   sticks near its end; the lifted payslip therefore overlaps the hero at the top
+   rather than riding up under the nav. On mobile the sidebar is a normal stacked
+   column after the essay, so the lift must not apply. Applied via the Payslip
+   component's className prop, so the reusable component stays layout-agnostic. */
+.payslipOverlay {
+  position: relative;
+  z-index: 5;
+}
+
+@media (min-width: 901px) {
+  .payslipOverlay {
+    /* -122 not -170: with .essayLayout top padding now 0 (was 48), this holds the
+       payslip's hero overlap where it was rather than deepening it. */
+    margin-top: -122px;
+  }
+}
+
+/* Mobile interleave (Steve, 11 Aug): on mobile the two-column desktop layout is
+   hidden and a single interleaved column is shown instead. The payslip sits in an
+   after-hero slot and each sidebar card renders above the H2 it is paired with
+   (see MobileArticleBody). Desktop is untouched. Both renders read the same body
+   and card data. */
+.articleMobile {
+  display: none;
+}
+
+/* Space above an interleaved card (the previous paragraph's 18px bottom margin
+   collapses into this); the H2 below owns the gap beneath, so no card bottom
+   margin here, keeping each vertical gap single-owned. */
+.mobileCardSlot {
+  margin-top: 24px;
+}
+
+.mobilePayslip {
+  margin-bottom: 24px;
 }
 
 @media (max-width: 900px) {
   .essayLayout {
-    grid-template-columns: 1fr;
+    display: none;
   }
-  .sidebar {
-    position: static;
+  .articleMobile {
+    display: block;
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 0 24px;
+    /* Clip the tilted payslip's rotated corners/shadow so they cannot create a
+       horizontal scrollbar at full width. */
+    overflow-x: clip;
   }
 }
 
@@ -491,22 +518,36 @@
   display: none;
 }
 
-@media (max-width: 768px) {
-
-  /* Hide the desktop layout, including the placeholder "Coming to the
-     workforce" block, which has no place in the swipe view. */
+/* Checkpoints 3 and 4: the WorkDeck mechanic replaces the legacy layout at every
+   width (the desktop deck at >=769px, the mobile stack at <=768px), so the hero
+   and the three-card article grid are hidden. (The "Coming to the workforce"
+   grid was removed at checkpoint 5, its subjects carried into the forward
+   register.) The legacy page shell (base min-height 100vh) is collapsed so the
+   footer sits directly below the deck instead of behind a viewport-tall empty
+   gap; the footer stays and the page scrolls to reach it. */
+@media (min-width: 769px) {
   .hero { display: none; }
   .grid { display: none; }
-  .coming { display: none; }
+  .page { padding: 0; min-height: 0; }
+}
 
+@media (max-width: 768px) {
+
+  /* Hide the legacy desktop layout in the swipe view. */
+  .hero { display: none; }
+  .grid { display: none; }
+
+  /* Checkpoint 4: the WorkDeck mobile stack replaces the legacy carousel, so the
+     carousel is hidden and the legacy page shell is collapsed to nothing. The
+     carousel markup and its script stay in the tree for now; they are removed
+     with the rest of the legacy layout later. */
   .page {
-    padding-top: 0;
-    padding-bottom: 0;
-    min-height: 100dvh;
+    padding: 0;
+    min-height: 0;
   }
 
   .mobileCarouselWrap {
-    display: block;
+    display: none;
     width: 100vw;
     height: 100dvh;
     position: relative;

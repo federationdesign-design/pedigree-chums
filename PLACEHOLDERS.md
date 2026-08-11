@@ -192,3 +192,12 @@ the LineageModal component.
   Canonical answer column. FAQ011 uses the render-time `{{competition_close_date}}`
   token, filled by the assembler to the last day of the current month, mirroring
   `app/chumspot/ChumSpotClient.tsx` exactly.
+
+## Dogs at Work redux (dogsatwork branch)
+
+Placeholders introduced by the Dogs at Work redux (brief v3.0). Details and the
+outstanding decisions are in `docs/dogs-at-work/NEEDS_STEVE.md`.
+
+| Placeholder | Location | Meaning | Resolve via |
+|---|---|---|---|
+| (none currently) | | The Dogs at Work redux has no open placeholders. Article 3's hero was resolved by the 11 Aug hero swap (carousel scene wired); article 4's "From work to sport" copy was supplied and wired. Hero alt text on articles 2 and 3 is agent-suggested and awaiting Steve's confirmation (tracked in `docs/dogs-at-work/NEEDS_STEVE.md`, not a placeholder). | |

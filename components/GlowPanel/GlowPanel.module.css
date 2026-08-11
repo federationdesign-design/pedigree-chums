@@ -1,0 +1,56 @@
+/* The floating-panel shell, values lifted verbatim from
+   components/PitchPanel/PitchPanel.module.css so the look is pixel-identical to
+   the signed-off homepage pitch panel. Homepage-specific rules (the .outer
+   negative margins / hero overlap, the two-column .pitch grid, the .panel
+   padding-top that made room for the Labrador) are deliberately NOT included:
+   they are layout, not shell. Consumers control their own spacing and inner
+   layout via `className` and children. */
+
+.panel {
+  position: relative;
+  z-index: 1;
+  border-radius: 40px;
+  background: transparent;
+  box-shadow: 0 24px 60px rgba(10, 58, 87, 0.32);
+}
+
+/* Clips the two screen-blend circles to the rounded corners and paints the
+   brand gradient. */
+.glowLayer {
+  position: absolute;
+  inset: 0;
+  border-radius: 40px;
+  overflow: hidden;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(to top right, #00e2ff, #008eff);
+}
+
+.glowCircle {
+  position: absolute;
+  border-radius: 50%;
+  background: #09c1f3;
+  mix-blend-mode: screen;
+  opacity: 0.43;
+}
+
+.glowTop {
+  width: clamp(420px, 62%, 1000px);
+  aspect-ratio: 1 / 1;
+  top: -16%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.glowBottom {
+  width: clamp(320px, 48%, 760px);
+  aspect-ratio: 1 / 1;
+  bottom: -20%;
+  left: -10%;
+}
+
+.content {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+}

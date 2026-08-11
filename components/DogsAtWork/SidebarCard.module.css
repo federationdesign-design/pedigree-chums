@@ -1,0 +1,115 @@
+/* Reusable Dogs at Work sidebar modules (brief v3.0 Appendix B: real CSS Module
+   components, never the inline style objects the three existing articles use).
+   The shell matches the legacy .sidebarCard (navy, hairline border, rounded) so
+   article 4 sits beside articles 1 to 3 without a visible seam, but every value
+   here is a class, not an inline style. Reused by articles five to twelve. */
+
+.card {
+  background: var(--navy, #0a3a57);
+  border: 1.5px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  overflow: hidden;
+  /* 20px extra top padding to match the article-page info cards (Steve, 11 Aug),
+     added at the container so it sits above the .pad section padding. */
+  padding-top: 20px;
+}
+
+.pad {
+  padding: 16px 20px;
+}
+
+.title {
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  /* 1.5x (36px) with no letter-spacing and a tight 0.9 line-height, matching the
+     concept card titles; colour is --emphasis (#FFED60). */
+  font-size: 36px;
+  letter-spacing: 0;
+  color: var(--emphasis, #ffed60);
+  line-height: 0.9;
+  text-transform: uppercase;
+  margin: 0 0 10px;
+}
+
+.subtitle {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #ffffff;
+  line-height: 1.5;
+  margin: 0 0 8px;
+}
+
+.text {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: #ffffff;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.text + .text {
+  margin-top: 8px;
+}
+
+.muted {
+  color: #aac4d4;
+}
+
+.small {
+  font-size: 0.82rem;
+}
+
+/* "Built for the job": the statistics/figures module, presented as named
+   attribute rows. No numeric values are supplied, so none are invented; each
+   attribute carries its name and the short descriptor from the copy. */
+.attrList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.attrRow {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 10px;
+}
+
+.attrRow:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.attrName {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--yellow, #ffd23e);
+  margin: 0;
+}
+
+.attrDetail {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #ffffff;
+  line-height: 1.45;
+  margin: 0;
+}
+
+/* Sources module: a small block of newline-separated attributions. */
+.sources {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: #ffffff;
+  line-height: 1.6;
+  margin: 0;
+}

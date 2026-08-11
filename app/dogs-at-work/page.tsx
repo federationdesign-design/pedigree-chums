@@ -3,6 +3,14 @@ import Link from "next/link";
 import Nav from "../../components/Nav/Nav";
 import Footer from "../../components/Footer/Footer";
 import styles from "./dogs-at-work.module.css";
+// Checkpoint 3: the desktop mechanic renders from the slide record (its import
+// still runs the build-time validation). The legacy hero and article grid below
+// are hidden on the desktop-tall viewport where the deck shows, and remain as
+// the fallback elsewhere. The "Coming to the workforce" grid and the mobile
+// carousel are untouched here; they are removed and rebuilt at checkpoints 5
+// and 4 respectively.
+import { SLIDES } from "./data/slides";
+import WorkDeck from "./WorkDeck";
 
 export const metadata: Metadata = {
   title: "Dogs at Work | Pedigree Chums™",
@@ -40,20 +48,20 @@ const ARTICLES = [
   },
 ];
 
-const COMING = [
-  { tag: "Public service", name: "Police & Border Force dogs", desc: "Tracking, searching, and the noses that screen a border before anyone opens a suitcase." },
-  { tag: "Rural", name: "Sheepdogs", desc: "One of the oldest and most economically important dog jobs in Britain -- a farm worker with four legs." },
-  { tag: "Emergency", name: "Search & rescue dogs", desc: "Air-scenting and trailing dogs that find missing people when time is running out." },
-  { tag: "Science", name: "Conservation detection dogs", desc: "Finding newts, invasive species and tree disease that humans simply cannot see." },
-  { tag: "Wildcard", name: "Water-leak detection dogs", desc: "Yes, really -- dogs that sniff out leaks in the water network. Almost nobody knows they exist." },
-  { tag: "Independence", name: "Assistance & guide dogs", desc: "The clearest economic case of all: a life lived independently, measured in more than sentiment." },
-];
-
 export default function DogsAtWorkPage() {
+  // Live slides in editorial order for the desktop mechanic. The pairing is
+  // explicit in the record, so order comes from the `order` field, never array
+  // position (brief section 6).
+  const liveSlides = SLIDES.filter((s) => s.published === "live").sort(
+    (a, b) => a.order - b.order,
+  );
   return (
     <>
       <Nav showLogo />
-      <main className={styles.page}>
+      <main>
+        {/* Desktop mechanic: three regions, counter-motion, dots (checkpoint 3). */}
+        <WorkDeck slides={liveSlides} />
+        <div className={styles.page}>
         <header className={styles.hero}>
           <p className={styles.eyebrow}>An essay series</p>
           <h1 className={styles.title}>
@@ -102,19 +110,6 @@ export default function DogsAtWorkPage() {
               </div>
             </article>
           ))}
-        </section>
-
-        <section className={styles.coming}>
-          <h2 className={styles.comingTitle}>Coming to the workforce</h2>
-          <div className={styles.comingGrid}>
-            {COMING.map((c) => (
-              <div key={c.name} className={styles.comingCard}>
-                <span className={styles.comingTag}>{c.tag}</span>
-                <p className={styles.comingName}>{c.name}</p>
-                <p className={styles.comingDesc}>{c.desc}</p>
-              </div>
-            ))}
-          </div>
         </section>
 
         {/* ── Mobile carousel (mirrors Good Dog Bad Dog) ── */}
@@ -268,6 +263,7 @@ export default function DogsAtWorkPage() {
           }, { passive: true });
         })();` }} />
 
+        </div>
       </main>
       <Footer />
     </>
