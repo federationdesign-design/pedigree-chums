@@ -1348,6 +1348,19 @@ await (async () => {
   rows.push({ ok, input: 'task171: sender buffer drops a protected session (earlier turns too), flushes clean on switch', layer: '-', bucket: '-', action: 'syncbuffer', note: ok ? '' : `droppedAndLatched=${droppedAndLatched} completed=${sw.completed} bBuf=${bBuf && bBuf.length} cur=${b2.currentSession()}` });
 })();
 
+// ---- Task 172 (Section 3): moderation and safety resolve BEFORE any synonym mapping. A rude word still
+// moderates; a synonym only helps the content layers, reaching the canonical route. ----
+(() => {
+  const route = (input) => { const r = submit(data, newSession(), input).resolution; return `${r.action}|${r.bucket ?? '-'}|${r.moderationId ?? '-'}`; };
+  const dickMod = route('do you like dick') === 'safety_signpost|-|MOD_SAFEGUARDING'; // Task 155 anatomy trigger, unbypassed
+  const frontBottom = route('front bottom') === 'anatomy_redirect|-|MOD_ANATOMY_REDIRECT'; // "bottom" NOT softened before safety
+  const weeWee = route('wee wee') === 'anatomy_redirect|-|MOD_ANATOMY_REDIRECT'; // "wee" NOT softened before safety
+  const synonymReaches = route('do you enjoy walks') === route('do you like walks'); // enjoy -> like reaches the same content route
+  const ok = dickMod && frontBottom && weeWee && synonymReaches;
+  ok ? pass++ : fail++;
+  rows.push({ ok, input: 'task172: moderation/anatomy win before synonyms; enjoy->like reaches the canonical route', layer: 1, bucket: '-', action: 'synonyms', note: ok ? '' : `dickMod=${dickMod} frontBottom=${frontBottom} weeWee=${weeWee} synonymReaches=${synonymReaches}` });
+})();
+
 // ---- Fix 5a: the meaningless B05 "located the correct Chum" line is removed ----
 (() => {
   const bad = data.collieResponses.some((r) => r.bucketId === 'B05' && /located the correct chum/i.test(r.template || ''));

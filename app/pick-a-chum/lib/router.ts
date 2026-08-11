@@ -10,6 +10,7 @@ import { ChumData, Resolution, Dog, ActionType, GameId, DogRecord } from './type
 import { effectiveBank } from './banks';
 import { Normalised, normalise, isGibberish, isSingleWord, isEmojiOnly, isBarkOnly, barkUnitCount, hasAny, buildAliasMap, applyAliases } from './normalise';
 import { detectSafety, isDogHealthQuestion, detectProtectedContinuation, detectPersonalSadness, detectGrief } from './safety';
+import { SYNONYM_MAP } from './synonyms';
 import { Topic } from './session';
 import { bioForRoute } from '../data/page-bios';
 
@@ -1145,9 +1146,11 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
   // Apply curated misspelling aliases first, so both the safety gate and every
   // downstream layer see the canonical word. Fuzzy matching (in hasAny) then
   // covers the unpredictable slips on top of these predictable ones.
-  const n = applyAliases(n0, buildAliasMap(data.misspellings));
-  const c = n.compact;
-  const N = n; // for hasAny
+  // Task 172: `n`/`c`/`N` become `let` so synonyms can be applied to them AFTER the safety block below. The
+  // misspelling aliases stay here (before safety), as they always have; synonyms are a SECOND pass, later.
+  let n = applyAliases(n0, buildAliasMap(data.misspellings));
+  let c = n.compact;
+  let N = n; // for hasAny
 
   // Task 15 (S12): while a protected safety state is live, the safety continuation
   // classifier runs first, so only safety routes in PROTECTED_ACTIVE. A safety hit
@@ -1238,6 +1241,15 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
       return { layer: 1, layerName: 'Safety and unsuitable content', bucket: null, action: 'grief', griefCategory: grief.category };
     }
   }
+
+  // Task 172: THE SYNONYM PASS. Every safety, moderation and sensitive route above (protected continuation,
+  // detectSafety, dog-health, personal sadness, grief) has now resolved on the ORIGINAL words, so a synonym
+  // can never soften a rude word past a guard (brief Section 3). Only now do same-meaning words normalise to
+  // one canonical form for the CONTENT layers below, reusing the misspelling mechanism. This fixes vocabulary,
+  // not word order, and never touches the matcher itself.
+  n = applyAliases(n, SYNONYM_MAP);
+  c = n.compact;
+  N = n;
 
   // Task 78: the two visual tricks. Below safety/grief (so "my dog is dead" is grief, never a trick)
   // and ABOVE every content route (so "play dead" is not swallowed by the how-to-play FAQ). Exact-match
