@@ -52,9 +52,15 @@ let pass = 0;
 let fail = 0;
 const rows = [];
 
+// Task 173: PC_MATCHER=on forces the reworded-input matcher on for the WHOLE suite, so the existing 1392
+// assertions double as the blast-radius proof: if every currently-verified route still passes with the
+// matcher live, nothing that answers today changed. Default (unset) leaves the matcher OFF, matching prod.
+// A single check can also force it on via opts.matcher (used by the reworded corpus below).
+const MATCHER_ON = process.env.PC_MATCHER === 'on' ? { rewordedMatch: true } : undefined;
+
 function check(input, expect, opts = {}) {
   const session = opts.session ?? newSession();
-  const { resolution: r, response } = submit(data, session, input);
+  const { resolution: r, response } = submit(data, session, input, opts.matcher ? { rewordedMatch: true } : MATCHER_ON);
   const got = { layer: r.layer, bucket: r.bucket, action: r.action };
   const problems = [];
   for (const k of Object.keys(expect)) {
@@ -3341,6 +3347,56 @@ for (const q of ['go away', 'leave me alone', 'leave', 'get lost', 'stop', 'no t
 (() => { const s = newSession('boxer'); check('leave me alone', { action: 'dismiss' }, { session: s, assert: (_r, resp) => (resp.closed ? null : 'boxer leave-me-alone did not close') }); })();
 // "stop" mid-game exits the game, never a dismiss.
 (() => { const s = newSession('labrador'); s.activeGame = 'treattrail'; check('stop', { action: 'game_exit' }, { session: s }); })();
+
+// ---- Task 173: the reworded-input matcher corpus (matcher forced ON per check) ----
+// Reworded / reordered inputs whose canonical form already answers; each MUST now reach the same approved
+// row. These all fall to the im-a-dog family with the matcher off (verified in the stage-4 report).
+const REWORDED_HITS = [
+  ['dogs wag tails why?', 'B31-FACTS-04'],
+  ['why dogs tail wag?', 'B31-FACTS-04'],
+  ['tails on dogs wag because?', 'B31-FACTS-04'],
+  ['dogs sniff everything why', 'B31-FACTS-06'],
+  ['why everything do dogs sniff', 'B31-FACTS-06'],
+  ['for a 6 year old is this suitable', 'B39-PARENT-01'],
+  ['suitable for young children is it', 'B39-PARENT-01'],
+  ['other dogs do you know any', 'B33-PACK-01'],
+  ['any other dogs you know', 'B33-PACK-01'],
+  ['favourite colour whats yours', 'B32-SELF-10'],
+  ['getting washed do you like', 'B32-SELF-09'],
+  ['baths you like?', 'B32-SELF-09'],
+  ['colour can dogs see', 'B31-FACTS-09'],
+  ['see colours do you', 'B31-FACTS-09'],
+  ['data do you collect', 'B31-FACTS-02'],
+  ['do you store my data', 'B31-FACTS-02'],
+  ['fast how can you run', 'B31-FACTS-10'],
+  ['how fast do you run', 'B31-FACTS-10'],
+  ['good with kids are they', 'COL-B48-ATTR-01'],
+  ['crossbreed does it count', 'COL-B47-SPOT-02'],
+  ['do mongrels count', 'COL-B47-SPOT-02'],
+];
+for (const [input, want] of REWORDED_HITS) {
+  check(input, {}, { matcher: true, assert: (_r, resp) => (resp.responseId === want ? null : `reworded want ${want} got ${resp.responseId}`) });
+}
+// Intended misses: dog-ish or out-of-scope inputs that reach the im-a-dog family and MUST stay there -- the
+// threshold rejects them rather than best-matching to something dog-shaped.
+const REWORDED_MISSES = [
+  'the weather is nice today',
+  'blah blah blah random words here',
+  'how do aeroplanes fly',
+  'my computer is broken',
+  'what time is it',
+  'whats the meaning of life',
+  'why do dogs do that thing with their bum',
+  'tell me about quantum physics',
+  'tail wagging in dogs why', // -ing inflection: content-word matching does not stem it, and stays im a dog
+];
+for (const input of REWORDED_MISSES) {
+  check(input, {}, { matcher: true, assert: (_r, resp) => (/^(LOOP-|B40-)/.test(resp.responseId ?? '') ? null : `should stay im-a-dog, got ${resp.responseId}`) });
+}
+// Above-layer negatives: the matcher must never disturb what resolves before it (gibberish, GK, safety).
+check('asdfghjkl', { action: 'gibberish' }, { matcher: true });
+check('what is the capital of France', { action: 'gk_answer' }, { matcher: true });
+check('im in trouble', { layer: 1, action: 'safety_signpost' }, { matcher: true });
 
 // ---- Report ----
 const pad = (s, n) => String(s).padEnd(n);
