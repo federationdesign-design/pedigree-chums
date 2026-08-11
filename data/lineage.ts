@@ -1432,7 +1432,8 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Rache",
     note: "A medieval hound that hunted by scent in a pack, as opposed to the sight-hunting gazehound.",
     children: [
-      { name: "St Hubert and Talbot hounds", note: "The Norman scent hounds behind the running pack.", img: "/history/breeds/talbot-hound.jpg", value: 60 },
+      { name: "St Hubert Hound", note: "The monks' scent hound the Normans brought over, one strain behind the running pack.", img: "/history/breeds/St-Hubert-Hound.jpg", value: 30 },
+      { name: "Talbot", note: "The older white finding-hound stock, the other strain in that pack. A modelled half of the pair, not a recorded mating.", img: "/history/breeds/talbot-hound.jpg", value: 30 },
       {
         name: "Old scenting hounds",
         note: "The native pack hounds of medieval Britain.",
