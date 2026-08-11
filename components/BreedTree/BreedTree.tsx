@@ -2,7 +2,7 @@
 
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { hierarchy, pack, packSiblings, packEnclose, type HierarchyCircularNode } from "d3-hierarchy";
-import { radius as pctRadius, ringFrac } from "../PackPit/LineageMap";
+import { ringFrac } from "../PackPit/LineageMap";
 import { createPitEffects } from "../PackPit/pitEffects";
 import { splitName } from "../PackPit/splitName";
 import { interpolateZoom } from "d3-interpolate";
@@ -130,9 +130,8 @@ const DIFF_DEFAULT = 5;
 // difficulty 0 feels easier and fuller. Nothing else reads this; only diffScale.
 const DIFF_STOP_0 = 0.5;
 // 0.575, raised 15% from 0.50 by eye. The chips follow on their own: a badge
-// radius is a fraction of the mean circle radius, so growing the circles grows
-// them too. That only holds up to about 0.61, where BADGE_MAX_R takes over and
-// the chips stop tracking.
+// radius is BADGE_FRAC of each dog's own drawn radius, so growing the circles
+// grows their badges with them.
 const DIFF_STOP_5 = 0.575;
 // 1: the top of the slider is the literal full pit width. `fit`, which this
 // multiplies, is already the scale at which the cluster spans wall to wall WITH
@@ -649,63 +648,21 @@ const POP_GROW = 1.5;
 const POP_MIN_PX = 50;
 const BOMB_BURST_MS = 180;    // the squash-and-snap before the blast fires
 const BOMB_CHAIN_MS = 25;     // gap between each object going up in the chain
-// A percentage chip is sized by its own figure, on the MAIN PIT'S OWN CURVE.
-// pctRadius is the very function the main pit uses, imported rather than
-// copied, so the two can never drift apart.
-//
-// The main pit floors at 21px, which is why every share up to about 17% comes
-// out the same size there. That flat bottom is deliberate and is kept.
-//
-// The curve is in the main pit's pixels, so it is normalised against the share
-// below and multiplied by the pit's own badge size. BADGE_SHARE_REF is the
-// share that keeps exactly the size the mini pit draws for everything today,
-// so the middle of the range does not move and only the ends do.
 const rollBomb = () => Math.random() < 1 / BOMB_ODDS;
-const BADGE_SHARE_REF = 25;
-const badgeRFor = (pct: number, base: number) => base * (pctRadius(pct || 0) / pctRadius(BADGE_SHARE_REF));
-const BADGE_DRAW_R = 92;
-// A badge belongs to its circle, so it has to scale with it. BADGE_DRAW_R was a
-// flat 92 in SVG units while the circles are sized by the packing, the level
-// slider and PIT_SHRINK, so shrinking the circles left the badges behind and
-// they read as oversized. This is the badge radius as a fraction of the circle
-// radius it sits on, taken from the proportion the pit had before the shrink.
-// Halved from 0.55 by request: the badges read as almost the same size as the
-// circle they belong to, which made the pair look like two circles rather than
-// a circle wearing a tag.
-// The chip radius as a fraction of the DRAWN circle radius, which is what the
-// eye actually compares. It has to be against the drawn one: a circle is drawn
-// at d.r * k while a chip is drawn at its raw radius with no k, so a fraction
-// taken against the unconverted mean came out PIT_SPAN times too big, 0.7 of
-// the circle instead of the 0.275 it claimed. BADGE_MAX_R then clamped it at
-// the top of the slider and hid the fault, which is why maximum looked right
-// and the default did not.
-//
-// 0.36, down from 0.44 by eye. ?bc= overrides it live.
-const BADGE_OF_CIRCLE = 0.27; // was 0.36, pulled back 25% by request
-// The chips are trimmed at the top of the slider, like the rings. Tapers in
-// from level 5, so nothing at or below the default changes. 0.25 is a quarter
-// smaller at 10.
-//
-// NOTE this is applied AFTER the clamp below, not before. By level 10 the raw
-// figure is around 211 and BADGE_MAX_R has already pulled it back to 140, so a
-// trim applied first would be swallowed by the clamp and do nothing at all.
-const BADGE_TRIM = 0.25;
-const BADGE_MIN_R = 26;
-const BADGE_MAX_R = 140;
-// Owner ruling (badge sizing): every badge is the SAME fixed size regardless of its
-// dog, a flat 15px on-screen radius (30px disc). A percentage is a label, and a
-// label's legibility is a fixed pixel size, not a fraction of the circle it sits on.
-// The old fraction made big circles carry big discs at any sensible value and
-// converged to one size for the small ones anyway. The disc is set in on-screen px
-// and converted to viewBox units per device by the stage short side (badgeFloorVb,
-// name kept: with a fixed radius the disc size IS the floor). NO badge when the dog
-// is smaller than the badge (dog < radiusVb): you cannot label a thing smaller than
-// its own label, so it returns 0 and the render/spawn skip it. Physics radius stays
-// coupled (rDraw / k), so every badge is the same small body.
-const BADGE_R_PX = 15;
-const badgeDrawForNode = (nodeR: number, k: number, radiusVb: number) => {
-  const dog = nodeR * k;
-  return dog < radiusVb ? 0 : radiusVb;
+// Owner ruling (badge sizing): every badge is BADGE_FRAC of ITS OWN dog's drawn
+// radius (nodeR * k), so a big circle carries a big disc and a deep small one a
+// small disc, each proportional to the dog it labels. One guard only: if that disc
+// would be too small to read it shows NOTHING (returns 0, render + spawn skip it)
+// rather than clamping up to a floor, because a floor-sized disc stuck on a tiny dog
+// reads as noise. The cutoff is BADGE_FLOOR_PX on-screen px (the % text is 0.7 of
+// the radius, so below this the number stops reading), converted to viewBox units
+// per device by the stage short side (badgeFloorVb). Physics radius stays coupled
+// (rDraw / k), so a smaller disc also collides smaller.
+const BADGE_FRAC = 0.25;
+const BADGE_FLOOR_PX = 13.5;
+const badgeDrawForNode = (nodeR: number, k: number, floorVb: number) => {
+  const badge = BADGE_FRAC * nodeR * k;
+  return badge < floorVb ? 0 : badge;
 };
 
 // Split words into exactly n lines as evenly as the word lengths allow.
@@ -2024,28 +1981,13 @@ export default function BreedTree({
   const throwWatchRef = useRef<((pr: any) => void) | null>(null);
   const checkEscapeRef = useRef<(() => void) | null>(null);
   const flagIdxRef = useRef<number | null>(null);
-  // The drawn badge radius for this layout. Mean of the depth-1 circles, so a
-  // level with uneven circles gets one consistent badge size rather than a
-  // different one per dog.
-  const badgeDrawR = useMemo(() => {
-    const d1 = nodes.filter((n) => n.depth === 1);
-    if (!d1.length) return BADGE_DRAW_R;
-    const mean = d1.reduce((acc, n) => acc + n.r, 0) / d1.length;
-    // into the space the chip is drawn in, before the fraction means anything
-    const drawn = (dockAside ? mean / PIT_SPAN : mean) * BADGE_OF_CIRCLE;
-    const r = Math.max(BADGE_MIN_R, Math.min(BADGE_MAX_R, drawn));
-    if (!dockAside || level <= 5) return r;
-    return r * (1 - ((Math.min(level, 10) - 5) / 5) * BADGE_TRIM);
-  }, [nodes, dockAside, level]);
-  const badgeDrawRRef = useRef(badgeDrawR);
-  useEffect(() => { badgeDrawRRef.current = badgeDrawR; }, [badgeDrawR]);
-  // The fixed badge radius in viewBox units: BADGE_R_PX drawn px, converted by
-  // the stage's short side so it is the same on-screen size on any device. The name
-  // is kept because with a flat radius this value is also the no-badge floor.
+  // The legibility floor in viewBox units: BADGE_FLOOR_PX drawn px, converted by
+  // the stage's short side so it is the same on-screen size on any device. Below
+  // this a badge shows nothing rather than clamping up (see badgeDrawForNode).
   const badgeFloorVb = () => {
     const st = stageRef.current;
     const short = st ? Math.min(st.clientWidth, st.clientHeight) : SIZE;
-    return (BADGE_R_PX * SIZE) / short;
+    return (BADGE_FLOOR_PX * SIZE) / short;
   };
   useEffect(() => {
     if (!dockAside) return;
@@ -2059,8 +2001,7 @@ export default function BreedTree({
           return { pct, r: badgeDrawForNode(n.r, k, floorVb) };
         }),
     );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [nodes, dockAside, badgeDrawR]);
+  }, [nodes, dockAside]);
   // The rail outlives the info box. It is closed only by its own X, and comes
   // back whenever the box is reopened, so the two cycle together.
   const [railHidden, setRailHidden] = useState(false);
@@ -4225,12 +4166,13 @@ export default function BreedTree({
         if (!bl) return;
         const w = worldFromPx(sx, sy);
         // A solo dog circle (opts.label) brings its own full radius. A percentage
-        // chip takes the flat fixed badge radius, the same disc as every drop and pop
-        // badge, or no badge at all when the circle it arrived on (opts.r) is smaller
-        // than that disc. The badgeRFor branch is the dead pre-opts.r fallback.
-        const chipR = badgeFloorVb();
-        const chipSrc = opts?.r ?? badgeRFor(pctVal, badgeDrawRRef.current);
-        const rDraw = opts?.label ? chipSrc : chipSrc < chipR ? 0 : chipR;
+        // chip is BADGE_FRAC of the radius it arrived on (opts.r, its learn-layer
+        // size), the same rule as every drop and pop badge, and shows nothing when
+        // that disc would fall under the legibility floor.
+        const chipFloor = badgeFloorVb();
+        const chipSrc = opts?.r ?? 0;
+        const chipBadge = BADGE_FRAC * chipSrc;
+        const rDraw = opts?.label ? chipSrc : chipBadge < chipFloor ? 0 : chipBadge;
         // A solo dog circle arrives through this same call carrying a label,
         // and that one is never a bomb: it is a whole breed, not a chip.
         const isBomb = !opts?.label && rollBomb();
@@ -6085,7 +6027,12 @@ export default function BreedTree({
                 /* A learnt chip keeps the green it wore on the learn layer, and
                    takes a white ring and white figure with it. Yellow chips are
                    untouched: white on yellow would not be readable. */
-                <circle cx={0} cy={0} r={item.r} style={{ fill: inert ? "#0c5b92" : item.green ? "#22c55e" : item.label ? "#5cc4ee" : "#ffd23e", stroke: item.green ? "#ffffff" : "#0a3a57", strokeWidth: item.r * (item.label ? 0.225 : 0.19) }} />
+                /* A green badge goes inert WHITE, not the blue every other badge
+                   uses, so a spent green reads as a distinct dead token. Its
+                   active white ring would vanish on the white disc, so the ring
+                   turns navy the moment it goes inert. Yellow badges keep the
+                   blue inert fill (white on white would disappear). */
+                <circle cx={0} cy={0} r={item.r} style={{ fill: inert ? (item.green ? "#ffffff" : "#0c5b92") : item.green ? "#22c55e" : item.label ? "#5cc4ee" : "#ffd23e", stroke: item.green && !inert ? "#ffffff" : "#0a3a57", strokeWidth: item.r * (item.label ? 0.225 : 0.19) }} />
                 )}
                 {!item.bomb && !inert && (item.label ? (
                   // solo dog circle: the breed name it wore before the round
@@ -7060,16 +7007,11 @@ export default function BreedTree({
             for (const c of data.circles ?? []) {
               /* THE SIZE AND THE COLOUR IT HAD ON SCREEN.
 
-                 The radius came through as `c.r` and was thrown away: the chip
-                 was then sized by badgeRFor against the pit's badge scale, which
-                 has nothing to do with how big the node looked a moment earlier
-                 on the learn layer. That is why a 50% node the size of a coin
-                 landed in the pit the size of a plum.
-
-                 opts.r is the escape hatch that already exists for a solo dog
-                 circle bringing its own radius, so no other caller changes and
-                 the pit's own badge rule is untouched for chips that really do
-                 belong to it. */
+                 The radius comes through as `c.r`, the size the node had on the
+                 learn layer a moment earlier. It is passed as opts.r so the chip
+                 is sized BADGE_FRAC of that radius, matching how big it just
+                 looked, rather than being recomputed from scratch and landing in
+                 the pit at some unrelated size. */
               spawnBadgeRef.current?.(c.x, c.y, c.r, Math.round(c.share), { r: c.r, green: c.green });
             }
             for (const rd of data.rods ?? []) {
