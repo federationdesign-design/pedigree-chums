@@ -7,6 +7,7 @@ import styles from "../dogs-at-work.module.css";
 import Payslip from "../../../components/Payslip/Payslip";
 import SidebarCard from "../../../components/DogsAtWork/SidebarCard";
 import sidebar from "../../../components/DogsAtWork/SidebarCard.module.css";
+import MobileArticleBody, { type ArticleCard } from "../../../components/DogsAtWork/MobileArticleBody";
 import { PAYSLIPS } from "../data/payslips";
 
 export const metadata: Metadata = {
@@ -25,14 +26,14 @@ export const metadata: Metadata = {
 // on the required closing beat, "And this, of course, is a job". Headings are
 // stored sentence-cased; the .subhead rule uppercases them, as on the other
 // articles.
-const BODY: (string | { h: string })[] = [
+const BODY: (string | { h: string; id: string })[] = [
   "High on a British hillside, one farmer may be responsible for hundreds of sheep spread across acres of ground that would take a human an age to cross. Then somebody opens a gate, gives a whistle, and a black-and-white dog disappears over the hill.",
   "A few minutes later, the sheep start coming back.",
   "To us, that is agricultural labour. To the sheepdog, it is considerably more exciting. Find the sheep. Get around them. Bring them to the human. Do not let that particularly determined ewe ruin everything.",
   "For generations, farmers have bred working sheepdogs for intelligence, stamina, responsiveness and the ability to control livestock across difficult country. The International Sheep Dog Society still describes sheepdog trials as practical demonstrations of the skills dogs use during everyday work on farms and hills.",
   "And unlike plenty of jobs humans have invented, this is one where the employee often appears absolutely furious about being told to stop.",
 
-  { h: "One dog. A very large field." },
+  { h: "One dog. A very large field.", id: "large-field" },
   "The simplest way to understand the value of a sheepdog is to imagine doing the same job without one.",
   "Sheep do not necessarily live conveniently beside the gate. On upland farms they may be scattered over steep hills, valleys and rough ground. A shepherd on foot would have to cover that distance personally, repeatedly, while somehow persuading an entire flock to travel in the same direction.",
   "A trained sheepdog can range out, locate the animals, get behind them and begin moving them towards the shepherd.",
@@ -40,7 +41,7 @@ const BODY: (string | { h: string })[] = [
   "The dog and handler work as a team. The shepherd reads the livestock and the ground. The dog supplies speed, positioning and pressure at exactly the places a human cannot physically be.",
   "It is less like owning a remote-controlled dog and more like working with a very fast colleague who has opinions.",
 
-  { h: "What the dog is actually doing" },
+  { h: "What the dog is actually doing", id: "actually-doing" },
   "A good sheepdog controls movement.",
   "It uses position, speed, posture and pressure to influence where the flock goes. Border Collies are especially famous for their low, concentrated approach and intense attention to livestock, but the fundamental job is not simply chasing sheep.",
   "Chasing would be disastrous.",
@@ -49,7 +50,7 @@ const BODY: (string | { h: string })[] = [
   "The same basic animal that could scatter a flock has been taught to organise one.",
   "That is quite an upgrade.",
 
-  { h: "The outrun, the fetch and the drive" },
+  { h: "The outrun, the fetch and the drive", id: "outrun" },
   "A sheepdog's work can be broken into jobs within the job.",
   "First comes the outrun. The dog leaves the shepherd and travels wide around the flock rather than charging straight towards it.",
   "Then comes the lift, when the dog makes contact with the sheep and starts them moving.",
@@ -58,7 +59,7 @@ const BODY: (string | { h: string })[] = [
   "These are the same kinds of practical skills tested in organised sheepdog trials. The ISDS says trials are designed to reflect as closely as possible the conditions and work encountered in everyday shepherding.",
   "Which means competitive sheepdogging is essentially the unusual sport where the obstacle course is based on somebody else's Monday morning.",
 
-  { h: "A language made of whistles" },
+  { h: "A language made of whistles", id: "whistles" },
   "One of the strangest things about watching an experienced shepherd and sheepdog is how little apparent conversation takes place.",
   "The handler may be hundreds of metres away.",
   "There is no lead.",
@@ -67,7 +68,7 @@ const BODY: (string | { h: string })[] = [
   "The exact commands vary between handlers, but the principle is extraordinary: humans and dogs have developed a working language capable of directing another species across open countryside.",
   "The sheep do not get a vote in this communication system.",
 
-  { h: "Built by the job" },
+  { h: "Built by the job", id: "built-by-job" },
   "The modern Border Collie did not appear because somebody wanted a handsome black-and-white dog.",
   "Working ability came first.",
   "The Royal Kennel Club describes the Border Collie as a naturally active and intelligent herding specialist whose roots lie in the border regions of Britain, where dogs proved themselves working sheep across hills and mountains.",
@@ -78,7 +79,7 @@ const BODY: (string | { h: string })[] = [
   "Repeat that for generations and eventually you get an animal capable of staring at six hundred kilograms of sheep and apparently thinking:",
   "Yes. I can organise this.",
 
-  { h: "The dog that saves legs" },
+  { h: "The dog that saves legs", id: "saves-legs" },
   "There is an economic story hidden inside all this running.",
   "Every journey the dog makes is potentially a journey the shepherd does not have to make.",
   "Every flock gathered efficiently saves human time.",
@@ -90,7 +91,7 @@ const BODY: (string | { h: string })[] = [
   "Machines do not learn the temperament of a flock.",
   "And very few tractors become visibly offended when somebody else gets sent to collect the sheep.",
 
-  { h: "Not every collie needs a farm" },
+  { h: "Not every collie needs a farm", id: "not-every-collie" },
   "The abilities that make a brilliant sheepdog can create challenges when the same dog lives an entirely different life.",
   "A dog bred to notice movement, react quickly, solve problems and work for long periods does not automatically stop possessing those tendencies because its address is now a semi-detached house.",
   "That does not mean every Border Collie needs sheep.",
@@ -99,7 +100,7 @@ const BODY: (string | { h: string })[] = [
   "The sheep are optional.",
   "The need for a life containing more intellectual stimulation than watching somebody unload the dishwasher generally is not.",
 
-  { h: "And this, of course, is a job" },
+  { h: "And this, of course, is a job", id: "is-a-job" },
   "The sheepdog does not understand agricultural productivity.",
   "It has never seen the farm accounts.",
   "It is not concerned about labour efficiency.",
@@ -117,6 +118,65 @@ const BODY: (string | { h: string })[] = [
 // descriptors or figures are supplied, so none are invented; the module lists
 // the five traits, each grounded in the body copy.
 const ATTRIBUTES = ["Intelligence", "Stamina", "Responsiveness", "Speed", "Stock sense"];
+
+// Sidebar cards as an explicit list. Desktop renders them in the sticky sidebar
+// in this order; mobile renders each above the H2 named in pairWith (or in the
+// tail bucket). Pairing is by heading id, never array order.
+const CARDS: ArticleCard[] = [
+  {
+    id: "dog-thinks",
+    pairWith: "is-a-job",
+    node: (
+      <SidebarCard title="What the dog thinks it's doing">
+        <p className={sidebar.text}>
+          <strong>What humans think:</strong> a highly trained agricultural working dog is gathering and controlling livestock while reducing labour requirements.
+        </p>
+        <p className={sidebar.text}>
+          <strong>What the dog thinks:</strong> there are sheep over there. They should be over here. I have several thoughts about this.
+        </p>
+      </SidebarCard>
+    ),
+  },
+  {
+    id: "built-for-the-job",
+    pairWith: "built-by-job",
+    node: (
+      <SidebarCard title="Built for the job">
+        <div className={sidebar.attrList}>
+          {ATTRIBUTES.map((a) => (
+            <div key={a} className={sidebar.attrRow}>
+              <span className={sidebar.attrName}>{a}</span>
+            </div>
+          ))}
+        </div>
+      </SidebarCard>
+    ),
+  },
+  {
+    id: "from-work-to-sport",
+    pairWith: "outrun",
+    node: (
+      <SidebarCard title="From work to sport">
+        <p className={sidebar.text}>
+          Sheepdog trials turn the real jobs of gathering, fetching, driving and penning sheep into a competitive course, rather than teaching dogs artificial tricks. The dogs are willing participants because the tasks use the same herding instincts, concentration and partnership with their handler that generations of working sheepdogs were bred to enjoy. To us it is a competition; to the dog, it is another chance to work sheep.
+        </p>
+      </SidebarCard>
+    ),
+  },
+  {
+    id: "sources",
+    pairWith: "tail",
+    node: (
+      <SidebarCard title="Sources">
+        <p className={sidebar.sources}>
+          International Sheep Dog Society<br />
+          Royal Kennel Club<br />
+          National Sheep Association
+        </p>
+      </SidebarCard>
+    ),
+  },
+];
 
 export default function SheepdogsPage() {
   return (
@@ -146,7 +206,7 @@ export default function SheepdogsPage() {
               {BODY.map((b, i) =>
                 typeof b === "string"
                   ? <p key={i}>{b}</p>
-                  : <h2 key={i} className={styles.subhead}>{b.h}</h2>
+                  : <h2 key={i} id={b.id} className={styles.subhead}>{b.h}</h2>
               )}
             </div>
           </article>
@@ -157,45 +217,26 @@ export default function SheepdogsPage() {
                 draft printed inside the supplied copy. */}
             <Payslip data={PAYSLIPS["the-farm-worker-with-four-legs"]} className={styles.payslipOverlay} />
 
-            {/* What the dog thinks it's doing (the series device). Content is the
-                published body version, lifted here per section 15. */}
-            <SidebarCard title="What the dog thinks it's doing">
-              <p className={sidebar.text}>
-                <strong>What humans think:</strong> a highly trained agricultural working dog is gathering and controlling livestock while reducing labour requirements.
-              </p>
-              <p className={sidebar.text}>
-                <strong>What the dog thinks:</strong> there are sheep over there. They should be over here. I have several thoughts about this.
-              </p>
-            </SidebarCard>
-
-            {/* Built for the job: the statistics/figures module, presented as the
-                five named attributes from the spec (no figures supplied). */}
-            <SidebarCard title="Built for the job">
-              <div className={sidebar.attrList}>
-                {ATTRIBUTES.map((a) => (
-                  <div key={a} className={sidebar.attrRow}>
-                    <span className={sidebar.attrName}>{a}</span>
-                  </div>
-                ))}
-              </div>
-            </SidebarCard>
-
-            {/* From work to sport: copy supplied by Steve (11 Aug 2026). */}
-            <SidebarCard title="From work to sport">
-              <p className={sidebar.text}>
-                Sheepdog trials turn the real jobs of gathering, fetching, driving and penning sheep into a competitive course, rather than teaching dogs artificial tricks. The dogs are willing participants because the tasks use the same herding instincts, concentration and partnership with their handler that generations of working sheepdogs were bred to enjoy. To us it is a competition; to the dog, it is another chance to work sheep.
-              </p>
-            </SidebarCard>
-
-            {/* Sources */}
-            <SidebarCard title="Sources">
-              <p className={sidebar.sources}>
-                International Sheep Dog Society<br />
-                Royal Kennel Club<br />
-                National Sheep Association
-              </p>
-            </SidebarCard>
+            {CARDS.map((c) => (
+              <React.Fragment key={c.id}>{c.node}</React.Fragment>
+            ))}
           </aside>
+        </div>
+
+        {/* Mobile: single interleaved column. Payslip in the after-hero slot, then
+            each card above its paired H2 (see MobileArticleBody). Desktop uses the
+            two-column layout above; only one is visible at a time. */}
+        <div className={styles.articleMobile}>
+          <div className={styles.mobilePayslip}>
+            <Payslip data={PAYSLIPS["the-farm-worker-with-four-legs"]} />
+          </div>
+          <MobileArticleBody
+            body={BODY}
+            cards={CARDS}
+            bodyClassName={styles.essayBody}
+            subheadClassName={styles.subhead}
+            slotClassName={styles.mobileCardSlot}
+          />
         </div>
       </main>
       <Footer />

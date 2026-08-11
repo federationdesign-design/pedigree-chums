@@ -458,12 +458,38 @@
   }
 }
 
+/* Mobile interleave (Steve, 11 Aug): on mobile the two-column desktop layout is
+   hidden and a single interleaved column is shown instead. The payslip sits in an
+   after-hero slot and each sidebar card renders above the H2 it is paired with
+   (see MobileArticleBody). Desktop is untouched. Both renders read the same body
+   and card data. */
+.articleMobile {
+  display: none;
+}
+
+/* Space above an interleaved card (the previous paragraph's 18px bottom margin
+   collapses into this); the H2 below owns the gap beneath, so no card bottom
+   margin here, keeping each vertical gap single-owned. */
+.mobileCardSlot {
+  margin-top: 24px;
+}
+
+.mobilePayslip {
+  margin-bottom: 24px;
+}
+
 @media (max-width: 900px) {
   .essayLayout {
-    grid-template-columns: 1fr;
+    display: none;
   }
-  .sidebar {
-    position: static;
+  .articleMobile {
+    display: block;
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 0 24px;
+    /* Clip the tilted payslip's rotated corners/shadow so they cannot create a
+       horizontal scrollbar at full width. */
+    overflow-x: clip;
   }
 }
 
