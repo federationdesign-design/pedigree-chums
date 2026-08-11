@@ -51,7 +51,9 @@
   letter-spacing: 0.03em;
   text-transform: uppercase;
   color: var(--cream);
-  margin: 0 0 12px;
+  /* Item 1: h1 text width capped at 70% of the intro, centred. */
+  max-width: 70%;
+  margin: 0 auto 12px;
 }
 
 .titleAccent {
@@ -70,7 +72,8 @@
   line-height: 1.1;
   color: var(--white);
   margin: 16px auto 0;
-  max-width: 56ch;
+  /* Item 2: intro Montserrat text width to 80% (was 56ch). */
+  max-width: 80%;
 }
 
 /* ── Blue panel (GlowPanel shell) ─────────────────────────────── */
@@ -145,8 +148,8 @@
 
 .thumb {
   flex: 0 0 auto;
-  width: clamp(96px, 10.8cqi, 128px);
-  height: clamp(96px, 10.8cqi, 128px);
+  width: clamp(144px, 16.2cqi, 192px);
+  height: clamp(144px, 16.2cqi, 192px);
   object-fit: cover;
   border-radius: 14px;
   display: block;
@@ -155,8 +158,8 @@
 /* Pending thumbnail: reserves its footprint, renders nothing visible. */
 .thumbPending {
   flex: 0 0 auto;
-  width: clamp(96px, 10.8cqi, 128px);
-  height: clamp(96px, 10.8cqi, 128px);
+  width: clamp(144px, 16.2cqi, 192px);
+  height: clamp(144px, 16.2cqi, 192px);
   visibility: hidden;
 }
 
@@ -167,6 +170,8 @@
   letter-spacing: 0.02em;
   text-transform: uppercase;
   color: var(--cream);
+  /* Item 3: 75px above every panel subheading (shared rule). */
+  padding-top: 75px;
   /* Small gap to the body below (previously carried by the heading row). */
   margin: 0 0 3px;
 }
@@ -202,7 +207,8 @@
      .detail is 400, but our multi-paragraph panels read better one step up).
      The 6px bottom margin is kept: our multi-paragraph bodies (panels 2 and 3) are
      spaced paragraph-by-paragraph, where History spaces .detail by its container. */
-  font-size: clamp(1.15rem, 2.35cqi, 2.6rem);
+  /* Item 8: blue body/bullets down 2pt (shared, all four panels). */
+  font-size: calc(clamp(1.15rem, 2.35cqi, 2.6rem) - 2pt);
   font-weight: 500;
   line-height: 1.1;
   color: var(--cream);
@@ -217,7 +223,8 @@
   font-family: var(--font-body, "Montserrat", sans-serif);
   /* Same as .blueBody: cqi font-size kept, weight 500, line-height 1.1 (leading
      from history.module.css .detail; weight one step up from its 400). */
-  font-size: clamp(1.15rem, 2.35cqi, 2.6rem);
+  /* Item 8: blue body/bullets down 2pt (shared, all four panels). */
+  font-size: calc(clamp(1.15rem, 2.35cqi, 2.6rem) - 2pt);
   font-weight: 500;
   line-height: 1.1;
   color: var(--cream);
@@ -235,6 +242,18 @@
 /* Yellow bullet markers, uniform on every panel (CSS, never data). */
 .blueBullets li::marker {
   color: var(--emphasis);
+}
+
+/* Item 9: panel 4 content indented a further 20px - its bullets, the "Results in"
+   list and the two closing paragraphs, but not the subheading. Applied via the
+   .blueIndent modifier (Sections adds it for the order-4 slide). The bullets
+   already carry a 1.2em list indent, so 20px is added to that rather than a
+   second indent; the paragraphs had none, so they gain 20px. */
+.blueBody.blueIndent {
+  padding-left: 20px;
+}
+.blueBullets.blueIndent {
+  padding-left: calc(1.2em + 20px);
 }
 
 /* ── Forward chevron ──────────────────────────────────────────── */
@@ -342,6 +361,14 @@
   overflow: hidden;
 }
 
+/* Item 10: the article panel image is a link to the article. Fills its cell so
+   the image still covers it (desktop cell has a height; on mobile the image sets
+   its own height and this resolves to that). */
+.articleImgLink {
+  display: block;
+  height: 100%;
+}
+
 .articleImg {
   width: 100%;
   height: 100%;
@@ -367,6 +394,8 @@
   letter-spacing: 0.02em;
   text-transform: uppercase;
   color: var(--cream);
+  /* Item 3: 75px above the "Learn about" title (shared rule, desktop and mobile). */
+  padding-top: 75px;
   margin: 0 0 10px;
 }
 
@@ -442,6 +471,8 @@
   letter-spacing: 0.01em;
   text-transform: uppercase;
   color: var(--cream);
+  /* Item 3: 75px above the article panel headline (shared rule). */
+  padding-top: 75px;
   margin: 0 0 12px;
 }
 
@@ -457,15 +488,17 @@
 .cta {
   align-self: flex-start;
   font-family: var(--font-display, "Luckiest Guy", cursive);
-  font-size: clamp(0.9rem, 1.2vw, 1.15rem);
+  /* Item 4: green CTA size x2 - font-size, padding and shadow depth all doubled
+     (was clamp(0.9rem, 1.2vw, 1.15rem), 10px 26px, 0 6px 0). */
+  font-size: clamp(1.8rem, 2.4vw, 2.3rem);
   letter-spacing: 0.03em;
   text-transform: uppercase;
   color: var(--cream);
   background: var(--cta);
   border-radius: var(--radius-pill, 999px);
-  padding: 10px 26px;
+  padding: 20px 52px;
   text-decoration: none;
-  box-shadow: 0 6px 0 #2f8a2c;
+  box-shadow: 0 12px 0 #2f8a2c;
 }
 
 .cta:focus-visible {
