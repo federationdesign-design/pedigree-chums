@@ -212,16 +212,17 @@ body.boxer-no-nav header.pc-nav {
   transition: opacity 250ms ease;
 }
 
-/* Wobbly controls. Opt-in ONLY: a small low-frequency rotation on elements the build explicitly tagged
-   data-boxer-wobble (Task 164 section 3). A control that is never tagged simply never moves, so a future
-   checkout button cannot start wobbling by accident. The tagged set is documented in PickAChumExperience
-   (the effect buttons and the composer Send), never the recovery controls. */
+/* Wobbly controls. Opt-in ONLY: a rotation on elements the build explicitly tagged data-boxer-wobble (Task
+   164 section 3). A control that is never tagged simply never moves, so FIX IT, the emergency reset and any
+   future checkout button never wobble. The tagged set is documented in PickAChumExperience (the effect
+   buttons and the composer Send). Task 171: angle and speed pushed up (was +/-1.5deg at 500ms, too subtle to
+   register) to +/-7deg at 260ms per swing, so it clearly reads as "the buttons have gone nervous". */
 @keyframes boxerWobble {
-  from { transform: rotate(-1.5deg); }
-  to   { transform: rotate(1.5deg); }
+  from { transform: rotate(-7deg); }
+  to   { transform: rotate(7deg); }
 }
 body.boxer-wobble [data-boxer-wobble] {
-  animation: boxerWobble 500ms ease-in-out infinite alternate;
+  animation: boxerWobble 260ms ease-in-out infinite alternate;
 }
 
 /* Giant logo. A centred overlay drawn on ::after with pointer-events: none (Task 164 sections 2.3 and 3),
@@ -260,11 +261,12 @@ body.boxer-wrong-transfer::before {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  /* No repeated movement and no sweeping. A small static tilt stands in for the wobble; a brief still fade
-     (no slide) stands in for the transfer. Neither flashes. */
+  /* No repeated movement and no sweeping. A static tilt stands in for the wobble; a brief still fade
+     (no slide) stands in for the transfer. Neither flashes. Task 171: tilt raised 1deg -> 4deg so the
+     static stand-in still clearly reads as "something changed", without any motion. */
   body.boxer-wobble [data-boxer-wobble] {
     animation: none;
-    transform: rotate(1deg);
+    transform: rotate(4deg);
   }
   body.boxer-wrong-transfer::before {
     animation: boxerTransferStill 1200ms ease-in-out 1 forwards;
