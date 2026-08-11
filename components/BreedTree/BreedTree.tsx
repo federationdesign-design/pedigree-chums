@@ -5689,7 +5689,17 @@ export default function BreedTree({
                     // moved. A real move to another circle or empty space still has
                     // a relatedTarget outside the aside, so it clears as before.
                     const rt = e.relatedTarget as Element | null;
-                    if (rt && asideRef.current?.contains(rt)) return;
+                    // Guard the TYPE, not just truthiness. relatedTarget can be a
+                    // non-Node (the window when the pointer leaves the document), and
+                    // Node.contains() THROWS on a non-Node argument. The old
+                    // `rt && ...contains(rt)` let that through, and the throw aborted
+                    // this handler BEFORE the setHovered(null) below, so `hovered`
+                    // stayed latched on the parent circle. That is why the first hover
+                    // on an inner circle failed and the second worked, and why going
+                    // out to the parent and back in "fixed" it. Four days read as
+                    // geometry; it was this one line. (getAttribute below is already
+                    // guarded for the same non-Node case.)
+                    if (rt instanceof Node && asideRef.current?.contains(rt)) return;
                     // The circles inside this one are SIBLINGS in the SVG, not
                     // descendants, so moving onto one fires a real mouseleave
                     // here. Ignore it, or the unlock stops the moment anything
