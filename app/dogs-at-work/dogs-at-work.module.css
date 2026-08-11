@@ -308,6 +308,11 @@
 .essayPage {
   min-height: 100vh;
   padding-bottom: 80px;
+  /* Single source for the article's horizontal axis. Both the hero content and
+     the essay layout read these, so their left/right edges cannot drift apart:
+     change the gutter or max-width once here and both move together. */
+  --essay-max: 1300px;
+  --essay-gutter: 24px;
 }
 .backLink {
   font-family: var(--font-body, "Montserrat", sans-serif);
@@ -329,9 +334,10 @@
   position: relative;
   z-index: 2;
   width: 100%;
-  max-width: 1300px;
+  /* Horizontal axis (max-width + gutter) from the single source on .essayPage. */
+  max-width: var(--essay-max);
   margin: auto auto 0;
-  padding: 24px 24px 0px;
+  padding: 24px var(--essay-gutter) 0px;
   align-self: flex-end;
   box-sizing: border-box;
 }
@@ -368,12 +374,14 @@
 
 /* ── Essay two-column layout ────────────────────────────────── */
 .essayLayout {
-  max-width: 1300px;
+  /* Horizontal axis (max-width + gutter) from the single source on .essayPage,
+     shared with .essayHeroContent so the hero and body cannot drift apart. */
+  max-width: var(--essay-max);
   margin: 0 auto;
   /* Vertical padding removed (Steve, 11 Aug): the hero->essay gap is owned solely
      by the hero's margin-bottom (48), and the essay->footer gap solely by
      main.essayPage's padding-bottom (80). No double gaps. */
-  padding: 0px 24px;
+  padding: 0 var(--essay-gutter);
   display: grid;
   grid-template-columns: 1fr 380px;
   gap: 48px;
