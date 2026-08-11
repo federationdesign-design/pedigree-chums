@@ -80,7 +80,7 @@ function paragraphs(body: string): string[] {
 
 // One blue panel's sections. Thumbnails are desktop, panel 1 only; mobile never
 // shows them, so `withThumbnails` gates them.
-function Sections({ slide, withThumbnails }: { slide: Slide; withThumbnails: boolean }) {
+function Sections({ slide, withThumbnails, indent }: { slide: Slide; withThumbnails: boolean; indent?: boolean }) {
   return (
     <div className={styles.blueSections}>
       {slide.panel.sections.map((section, si) => {
@@ -108,13 +108,13 @@ function Sections({ slide, withThumbnails }: { slide: Slide; withThumbnails: boo
               <div className={styles.blueSectionBody}>
                 {section.body
                   ? paragraphs(section.body).map((p, pi) => (
-                      <p className={styles.blueBody} key={pi}>
+                      <p className={indent ? `${styles.blueBody} ${styles.blueIndent}` : styles.blueBody} key={pi}>
                         {renderMarked(p)}
                       </p>
                     ))
                   : null}
                 {section.bullets ? (
-                  <ul className={styles.blueBullets}>
+                  <ul className={indent ? `${styles.blueBullets} ${styles.blueIndent}` : styles.blueBullets}>
                     {section.bullets.map((b, bi) => (
                       <li key={bi}>{renderMarked(b)}</li>
                     ))}
@@ -243,7 +243,7 @@ export default function WorkDeck({ slides }: { slides: Slide[] }) {
                     inert={i !== index}
                     aria-hidden={i !== index}
                   >
-                    <Sections slide={slide} withThumbnails />
+                    <Sections slide={slide} withThumbnails indent={slide.order === 4} />
                   </article>
                 ))}
               </div>
@@ -280,13 +280,22 @@ export default function WorkDeck({ slides }: { slides: Slide[] }) {
                   aria-hidden={!current}
                 >
                   <div className={styles.articleImgWrap}>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      className={styles.articleImg}
-                      src={a.image}
-                      alt={a.imageAlt}
-                      loading={current ? "eager" : "lazy"}
-                    />
+                    {/* Item 10: image links to the article (same destination as the
+                        green button), with its own accessible name, not the button's. */}
+                    <Link
+                      href={a.href}
+                      className={styles.articleImgLink}
+                      aria-label={`Read: ${a.headline}`}
+                      tabIndex={current ? undefined : -1}
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        className={styles.articleImg}
+                        src={a.image}
+                        alt={a.imageAlt}
+                        loading={current ? "eager" : "lazy"}
+                      />
+                    </Link>
                   </div>
                   <div className={styles.articleText}>
                     <p className={styles.learnAbout}>
@@ -336,7 +345,7 @@ export default function WorkDeck({ slides }: { slides: Slide[] }) {
         {/* Blue panel: all supporting points in one container, no thumbnails. */}
         <div className={styles.mBlueWrap} ref={mBlueRef}>
           <GlowPanel className={styles.mBlue}>
-            <Sections slide={mobileSlide} withThumbnails={false} />
+            <Sections slide={mobileSlide} withThumbnails={false} indent={mobileSlide.order === 4} />
           </GlowPanel>
         </div>
 
@@ -355,8 +364,11 @@ export default function WorkDeck({ slides }: { slides: Slide[] }) {
         </div>
 
         <div className={styles.mImage}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={mA.image} alt={mA.imageAlt} loading="lazy" />
+          {/* Item 10: image links to the article, own accessible name. */}
+          <Link href={mA.href} className={styles.articleImgLink} aria-label={`Read: ${mA.headline}`}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={mA.image} alt={mA.imageAlt} loading="lazy" />
+          </Link>
         </div>
 
         <div className={styles.mArticle}>
