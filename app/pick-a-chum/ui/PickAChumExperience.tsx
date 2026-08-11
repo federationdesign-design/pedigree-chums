@@ -1374,7 +1374,7 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
                   attributed for screen readers.
                   Task 165 EXCEPTION: an interjection (msg.avatar) is a DIFFERENT dog cutting in while the
                   medallion stays the active dog, so it carries a small face to mark the second speaker. */}
-              {msg.avatar && msg.dog && (
+              {msg.done && msg.avatar && msg.dog && (
                 <span
                   className={styles.interjectFace}
                   style={{ backgroundImage: `url("${portraitSrc(msg.dog, 0)}")` }}
@@ -1404,44 +1404,48 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
                   </p>
                 )}
 
-                {/* Task 115: the game board / sheep tiles / drawing. MONOSPACE + pre so the ASCII
-                    keeps its shape (a proportional font collapses it). Not typed; it appears whole. */}
-                {/* Task 152 section 3: hold the clip until the typing theatre has finished, so it lands
-                    WITH the completed message rather than before the text. INSTANT messages (safety,
-                    games) are `done` at once, so their clip still appears immediately. */}
-                {msg.done && msg.media && (() => {
-                  // Task 149: honour prefers-reduced-motion for the COOKIE-GAME clips only -- they are
-                  // decoration (a reaction to a feed), so a reduced-motion visitor gets controls instead
-                  // of autoplay. Every other clip (how-are-you, paw, good boy, ...) is CONTENT: it is the
-                  // whole answer, so it must still autoplay or the visitor would get nothing. A still
-                  // frame for those is its own task.
-                  const decorative = msg.media.src.startsWith('/chat-media/cookie-');
-                  const hold = reducedMotion && decorative;
-                  return (
-                    <video
-                      className={styles.bubbleMedia}
-                      src={msg.media.src}
-                      aria-label={msg.media.alt}
-                      autoPlay={!hold}
-                      controls={hold}
-                      muted
-                      loop
-                      playsInline
-                      preload="metadata"
-                      // Task 156 (§4): the party-hat pug in birthday.mp4 is a hidden hat -- it counts ON
-                      // PLAY (seeing the clip finds it), not on tap. reportHat carries the protected guard.
-                      onPlay={msg.media.src.includes('/birthday.mp4') ? () => { if (!sessionRef.current?.protectedState && !everProtectedRef.current) { reportHat(BIRTHDAY_HAT_ID); logMeta('hat', BIRTHDAY_HAT_ID); } } : undefined}
-                    />
-                  );
-                })()}
-                {msg.gameOutput && (
-                  <pre className={styles.gameOutput}>{msg.gameOutput}</pre>
-                )}
-
-                {msg.done && msg.action && (
-                  <div className={styles.actionWrap}>
-                    <ActionLink command={msg.action} onNavigate={msg.fetchGame ? undefined : () => { logMeta('link', msg.action?.href ?? '', msg.action?.kind === 'external'); setMinimised(true); }} />
-                  </div>
+                {/* Task 173: ONE msg.done guard around the WHOLE in-bubble attachment cluster -- the clip
+                    (Task 152 section 3), the game board / sheep tiles / drawing (Task 115), and the action /
+                    fetch link -- so every attachment lands WITH the finished message, never before the text.
+                    It was three separate `msg.done` checks (and the board had none), which is three chances
+                    for the next attachment to render on arrival; this single gate is the one place it passes.
+                    INSTANT messages (safety, games) are `done` at once, so theirs still appear immediately. */}
+                {msg.done && (
+                  <>
+                    {msg.media && (() => {
+                      // Task 149: honour prefers-reduced-motion for the COOKIE-GAME clips only -- they are
+                      // decoration (a reaction to a feed), so a reduced-motion visitor gets controls instead
+                      // of autoplay. Every other clip (how-are-you, paw, good boy, ...) is CONTENT: it is the
+                      // whole answer, so it must still autoplay or the visitor would get nothing. A still
+                      // frame for those is its own task.
+                      const decorative = msg.media.src.startsWith('/chat-media/cookie-');
+                      const hold = reducedMotion && decorative;
+                      return (
+                        <video
+                          className={styles.bubbleMedia}
+                          src={msg.media.src}
+                          aria-label={msg.media.alt}
+                          autoPlay={!hold}
+                          controls={hold}
+                          muted
+                          loop
+                          playsInline
+                          preload="metadata"
+                          // Task 156 (§4): the party-hat pug in birthday.mp4 is a hidden hat -- it counts ON
+                          // PLAY (seeing the clip finds it), not on tap. reportHat carries the protected guard.
+                          onPlay={msg.media.src.includes('/birthday.mp4') ? () => { if (!sessionRef.current?.protectedState && !everProtectedRef.current) { reportHat(BIRTHDAY_HAT_ID); logMeta('hat', BIRTHDAY_HAT_ID); } } : undefined}
+                        />
+                      );
+                    })()}
+                    {msg.gameOutput && (
+                      <pre className={styles.gameOutput}>{msg.gameOutput}</pre>
+                    )}
+                    {msg.action && (
+                      <div className={styles.actionWrap}>
+                        <ActionLink command={msg.action} onNavigate={msg.fetchGame ? undefined : () => { logMeta('link', msg.action?.href ?? '', msg.action?.kind === 'external'); setMinimised(true); }} />
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
             </div>
