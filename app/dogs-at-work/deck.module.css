@@ -35,7 +35,8 @@
 .intro {
   flex: 0 0 auto;
   text-align: center;
-  max-width: 1180px;
+  /* No max-width cap: the h1 (70vw) and intro text (80vw) are sized against the
+     viewport, so the container must not re-constrain them to 1180px. */
   margin: 0 auto clamp(18px, 2.4vh, 32px);
 }
 
@@ -51,8 +52,9 @@
   letter-spacing: 0.03em;
   text-transform: uppercase;
   color: var(--cream);
-  /* Item 1: h1 text width capped at 70% of the intro, centred. */
-  max-width: 70%;
+  /* Item 1: h1 text width to 70% of the viewport (vw, not % of the capped
+     parent), centred. */
+  max-width: 70vw;
   margin: 0 auto 12px;
 }
 
@@ -72,8 +74,9 @@
   line-height: 1.1;
   color: var(--white);
   margin: 16px auto 0;
-  /* Item 2: intro Montserrat text width to 80% (was 56ch). */
-  max-width: 80%;
+  /* Item 2: intro Montserrat text width to 80% of the viewport (vw, not % of the
+     capped parent). */
+  max-width: 80vw;
 }
 
 /* ── Blue panel (GlowPanel shell) ─────────────────────────────── */
