@@ -3,6 +3,9 @@
    so no hard-coded pixel dimensions: width fills the column and height follows
    the content. */
 
+/* Upright, no transform. Appendix C shows the concept tilted a few degrees but
+   the supplied CSS carries none; Steve closed the question upright (11 Aug 2026).
+   Do not add a rotate transform to reproduce the concept's tilt. */
 .payslip {
   position: relative;
   background: linear-gradient(47deg, #efd379 0%, #f5e3b9 100%);

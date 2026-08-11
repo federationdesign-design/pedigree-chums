@@ -15,6 +15,11 @@ import { validateSlides } from "./validate";
 
 // Clearly named placeholders for inputs Steve still owes. Logged in
 // PLACEHOLDERS.md and docs/dogs-at-work/NEEDS_STEVE.md. Never invent these.
+// Article 3 hero: the supplied article3_hero.jpg is a black Labrador in a
+// guide-dog harness, wrong for a bio-detection piece about the electronic nose.
+// Withdrawn by Steve (11 Aug 2026); a replacement is owed. This path 404s by
+// design and is logged. Do not point it back at /article3_hero.jpg.
+const PLACEHOLDER_ARTICLE_3_HERO = "/PLACEHOLDER_article3_hero.jpg";
 const PLACEHOLDER_ARTICLE_3_ALT = "PLACEHOLDER: alt text for article 3 hero, outstanding from Steve";
 
 export const SLIDES: Slide[] = [
@@ -121,7 +126,7 @@ Some spend their lives bored and under-stimulated, while others are pushed into 
       subLabel: "Bio-detection dogs",
       headline: "The Machine That May Owe Dogs a Biscuit",
       dek: `In Milton Keynes, scientists are building an electronic nose to sniff out prostate cancer -- trained on data the dogs gathered first. The dog wrote the manual for its own replacement, and it could not care less. It just wants its biscuit. This is the last piece of the medical trilogy.`,
-      image: "/article3_hero.jpg",
+      image: PLACEHOLDER_ARTICLE_3_HERO,
       imageAlt: PLACEHOLDER_ARTICLE_3_ALT,
       ctaLabel: "Bio-detection dogs",
       // Slug unchanged: the retitle does not move the route.

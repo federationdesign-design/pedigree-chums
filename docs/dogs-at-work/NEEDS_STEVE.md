@@ -9,7 +9,8 @@ redirects that to `docs/dogs-at-work/NEEDS_STEVE.md` per the path override.)
 
 | Item | Where | Placeholder | Notes |
 |---|---|---|---|
-| Alt text for article 3 hero (`article3_hero.jpg`) | `app/dogs-at-work/data/slides.ts` (electronic-nose) | `PLACEHOLDER_ARTICLE_3_ALT` | Image is wired; alt outstanding (open question 4). |
+| Replacement hero image for article 3 | `app/dogs-at-work/data/slides.ts` (electronic-nose) | `PLACEHOLDER_ARTICLE_3_HERO` (`/PLACEHOLDER_article3_hero.jpg`, 404s by design) | The supplied `article3_hero.jpg` was a black Labrador in a guide-dog harness, wrong for a bio-detection piece. Withdrawn by Steve (11 Aug 2026); he will supply a replacement. Article 3 ships with no hero until then. The wrong file remains unreferenced in `public/`. |
+| Alt text for article 3 hero | `app/dogs-at-work/data/slides.ts` (electronic-nose) | `PLACEHOLDER_ARTICLE_3_ALT` | Alt for the replacement hero, once supplied (open question 4). |
 | Panel 1 thumbnail images (3) | `app/dogs-at-work/data/slides.ts` (bio-detection panel) | WIRED: `/dog_working_img1..3.jpg`, alt text supplied (11 Aug) | Order is game, then job, then payment, mirroring the concept. |
 
 ## Decisions carried into the build (open questions, section 18)
