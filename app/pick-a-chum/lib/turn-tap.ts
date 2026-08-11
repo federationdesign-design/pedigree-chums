@@ -95,3 +95,19 @@ export async function fetchSheetSyncEnabled(): Promise<boolean> {
     return false;
   }
 }
+
+// Task 173: the runtime on/off for the reworded-input matcher, read from Edge Config via /api/pc-matcher-config.
+// Unlike sheet-sync this is a PRODUCTION feature switch, not a tester gate, so there is no ?rec=1 requirement.
+// DEFAULT IS OFF: server-side, no store connected, a disabled value, or any network/parse error all resolve
+// to false, so with nothing configured every visitor gets exactly today's behaviour.
+export async function fetchMatcherEnabled(): Promise<boolean> {
+  if (typeof window === 'undefined') return false;
+  try {
+    const res = await fetch('/api/pc-matcher-config', { cache: 'no-store' });
+    if (!res.ok) return false;
+    const v: unknown = await res.json();
+    return typeof v === 'object' && v !== null && (v as { enabled?: unknown }).enabled === true;
+  } catch {
+    return false;
+  }
+}
