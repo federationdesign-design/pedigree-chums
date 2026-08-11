@@ -475,6 +475,12 @@ function setPinkThrows(n: number) {
 // produced. Measurements round it to 0.0909; kept exact here so ancient does not
 // move. floorShow() (by the floor helpers) does the per-theme derivation.
 const LEVEL_FLOOR_TARGET = 0.0909116;
+// Warn ONCE per era whose floor band cannot reach the target line. floorShow()
+// runs every render, so an unguarded console.warn flooded the console every frame
+// (and shipped to production). Theme objects are module singletons, so keying the
+// set on the theme itself gives exactly one warning the first time each bad era is
+// seen, then silence, without losing the diagnostic.
+const warnedFloorEras = new WeakSet<LevelTheme>();
 // The level background and the LEARN wash are two halves of one split screen.
 // The wash is a slab tilted by this much, pushed off toward the top right; the
 // level fills everything on the other side of that slab's leading edge. Both
@@ -2572,7 +2578,10 @@ export default function BreedTree({
   const floorShow = () => {
     if (!levelTheme) return 1;
     const raw = LEVEL_FLOOR_TARGET * levelTheme.floorAspect + Math.max(...levelTheme.floorProfile);
-    if (raw > 1) console.warn(`[minipit] floor band too short for this era: show ${raw.toFixed(3)} clamped to 1, floor will sit below the target line`);
+    if (raw > 1 && !warnedFloorEras.has(levelTheme)) {
+      warnedFloorEras.add(levelTheme);
+      console.warn(`[minipit] floor band too short for this era: show ${raw.toFixed(3)} clamped to 1, floor will sit below the target line`);
+    }
     return Math.min(1, raw);
   };
   // How far the strip's bottom edge sits below the stage bottom, in css px. The
