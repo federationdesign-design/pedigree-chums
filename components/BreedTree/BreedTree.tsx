@@ -692,25 +692,20 @@ const BADGE_OF_CIRCLE = 0.27; // was 0.36, pulled back 25% by request
 const BADGE_TRIM = 0.25;
 const BADGE_MIN_R = 26;
 const BADGE_MAX_R = 140;
-// Owner request (badge scaling): size a badge as a fixed fraction of ITS OWN dog's
-// drawn radius (nodeR * k), not the layout-wide badgeDrawR. badgeDrawR was one size
-// for the whole level scaled by local %, so a deep circle that shrinks with depth
-// kept a top-level-sized disc and the pit flooded with yellow. 0.38 keeps the top
-// level as it reads today (measured depth-1 badge/dog on a 390 phone). Floored at
-// the legibility minimum: the % text is 0.7 of the radius, so below ~13.5 drawn px
-// the number stops reading. The floor is a fixed on-screen px, converted to viewBox
-// units per device by the stage short side (badgeFloorVb). Physics radius stays
-// coupled (rDraw / k), so a smaller disc also collides smaller.
-const BADGE_FRAC = 0.28;
-const BADGE_FLOOR_PX = 13.5;
-// Badge radius from the dog's OWN drawn radius (nodeR * k). No badge at all on a
-// circle smaller than the smallest legible disc (dog below the floor): a badge
-// there would have to swallow the dog, so it returns 0 and the render/spawn skip
-// it. Above the floor the badge is BADGE_FRAC of the dog but never less than the
-// floor, and both of those are <= the dog, so a badge never exceeds its own circle.
-const badgeDrawForNode = (nodeR: number, k: number, floorVb: number) => {
+// Owner ruling (badge sizing): every badge is the SAME fixed size regardless of its
+// dog, a flat 15px on-screen radius (30px disc). A percentage is a label, and a
+// label's legibility is a fixed pixel size, not a fraction of the circle it sits on.
+// The old fraction made big circles carry big discs at any sensible value and
+// converged to one size for the small ones anyway. The disc is set in on-screen px
+// and converted to viewBox units per device by the stage short side (badgeFloorVb,
+// name kept: with a fixed radius the disc size IS the floor). NO badge when the dog
+// is smaller than the badge (dog < radiusVb): you cannot label a thing smaller than
+// its own label, so it returns 0 and the render/spawn skip it. Physics radius stays
+// coupled (rDraw / k), so every badge is the same small body.
+const BADGE_R_PX = 15;
+const badgeDrawForNode = (nodeR: number, k: number, radiusVb: number) => {
   const dog = nodeR * k;
-  return dog < floorVb ? 0 : Math.max(floorVb, BADGE_FRAC * dog);
+  return dog < radiusVb ? 0 : radiusVb;
 };
 
 // Split words into exactly n lines as evenly as the word lengths allow.
@@ -2044,12 +2039,13 @@ export default function BreedTree({
   }, [nodes, dockAside, level]);
   const badgeDrawRRef = useRef(badgeDrawR);
   useEffect(() => { badgeDrawRRef.current = badgeDrawR; }, [badgeDrawR]);
-  // The legibility floor in viewBox units: BADGE_FLOOR_PX drawn px, converted by
-  // the stage's short side so it is the same on-screen size on any device.
+  // The fixed badge radius in viewBox units: BADGE_R_PX drawn px, converted by
+  // the stage's short side so it is the same on-screen size on any device. The name
+  // is kept because with a flat radius this value is also the no-badge floor.
   const badgeFloorVb = () => {
     const st = stageRef.current;
     const short = st ? Math.min(st.clientWidth, st.clientHeight) : SIZE;
-    return (BADGE_FLOOR_PX * SIZE) / short;
+    return (BADGE_R_PX * SIZE) / short;
   };
   useEffect(() => {
     if (!dockAside) return;
@@ -3435,8 +3431,9 @@ export default function BreedTree({
       wordBodiesRef.current = bodies;
       wordPopAtRef.current = performance.now();
       // yellow % badges become small bodies, spawned at each circle's lower-right rim.
-      // Sized off each dog's OWN drawn radius (n.r * k) at BADGE_FRAC, floored for
-      // legibility, so a deep small circle gets a small badge, not a top-sized one.
+      // Every badge is the flat fixed radius (badgeFloorVb); a circle whose drawn
+      // radius (n.r * k) is smaller than that disc gets no badge (badgeDrawForNode
+      // returns 0), so a badge never swallows its own dog.
       const badgeFloor = badgeFloorVb();
       const badges: Body[] = d1.map((n, i) => ({
         // bottom LEFT of the circle: the right side is where the level's own
@@ -4228,14 +4225,12 @@ export default function BreedTree({
         if (!bl) return;
         const w = worldFromPx(sx, sy);
         // A solo dog circle (opts.label) brings its own full radius. A percentage
-        // chip is sized like every other pit badge now: BADGE_FRAC of the radius it
-        // arrived on (opts.r, its learn-layer size), floored for legibility, so a
-        // scattered chip matches the drop and pop badges rather than being a second,
-        // full-size badge sizing in the same pit. The badgeRFor branch is the dead
-        // pre-opts.r fallback.
-        const rDraw = opts?.label
-          ? (opts.r ?? badgeRFor(pctVal, badgeDrawRRef.current))
-          : Math.max(badgeFloorVb(), BADGE_FRAC * (opts?.r ?? badgeRFor(pctVal, badgeDrawRRef.current)));
+        // chip takes the flat fixed badge radius, the same disc as every drop and pop
+        // badge, or no badge at all when the circle it arrived on (opts.r) is smaller
+        // than that disc. The badgeRFor branch is the dead pre-opts.r fallback.
+        const chipR = badgeFloorVb();
+        const chipSrc = opts?.r ?? badgeRFor(pctVal, badgeDrawRRef.current);
+        const rDraw = opts?.label ? chipSrc : chipSrc < chipR ? 0 : chipR;
         // A solo dog circle arrives through this same call carrying a label,
         // and that one is never a bomb: it is a whole breed, not a chip.
         const isBomb = !opts?.label && rollBomb();
