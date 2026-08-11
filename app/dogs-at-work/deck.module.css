@@ -401,7 +401,7 @@
 
 .learnAbout {
   font-family: var(--font-display, "Luckiest Guy", cursive);
-  font-size: clamp(1.2rem, 1.8vw, 1.7rem);
+  font-size: clamp(2.6rem, 1.8vw, 1.7rem);
   letter-spacing: 0.02em;
   text-transform: uppercase;
   color: var(--cream);
@@ -427,7 +427,7 @@
    navy for the pill shape to read against it without one. */
 .pill {
   font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: 0.72rem;
+  font-size: 1.2rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -477,7 +477,7 @@
 
 .headline {
   font-family: var(--font-display, "Luckiest Guy", cursive);
-  font-size: clamp(1.3rem, 2vw, 2rem);
+  font-size: clamp(3.5rem, 2vw, 2rem);
   line-height: 1.05;
   letter-spacing: 0.01em;
   text-transform: uppercase;
