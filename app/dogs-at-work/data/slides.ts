@@ -20,18 +20,19 @@ import { validateSlides } from "./validate";
 // Alt text below is agent-suggested from the images, pending Steve's confirmation.
 
 // Article 5 (search and rescue) placeholders, outstanding from Steve and logged in
-// PLACEHOLDERS.md / docs/dogs-at-work/NEEDS_STEVE.md. The slide ships as draft, so
-// page.tsx (which filters to published === "live") keeps this placeholder blue
-// panel and dek off the live deck until the real copy lands. The article route is
-// built and resolves regardless of the slide's publication state.
+// PLACEHOLDERS.md / docs/dogs-at-work/NEEDS_STEVE.md. The slide is now LIVE (Steve,
+// 11 Aug), so these are visible on the deck: the blue panel body and the index card
+// dek render verbatim and the hero alt reaches screen readers. The hero image itself
+// is real (/search_rescue_dogs.jpg). Replace each when the real copy lands.
 const PLACEHOLDER_ARTICLE_5_PANEL = "PLACEHOLDER: blue panel 5 supporting point for the search and rescue article, outstanding from Steve. One panel per article, so article 5 needs its own; this is a stand-in until the real copy lands.";
 const PLACEHOLDER_ARTICLE_5_DEK = "PLACEHOLDER: index card dek for the search and rescue article (two or three sentences), outstanding from Steve.";
 const PLACEHOLDER_ARTICLE_5_ALT = "PLACEHOLDER: alt text for the search and rescue hero, outstanding from Steve.";
 
-// Article 6 (guide dogs) placeholders, outstanding from Steve. Draft, like article
-// 5. The hero is also a placeholder for now: the plan is to move article3_hero.jpg
-// (black Labrador in a guide-dog harness) here, but that leaves article 2 short, so
-// it is held until the hero chain is resolved (reported to Steve).
+// Article 6 (guide dogs) placeholders, outstanding from Steve. LIVE like article 5
+// (Steve, 11 Aug), so these are visible on the deck. The hero is also a placeholder
+// path that 404s, i.e. a broken image on both the deck and the article page: the plan
+// is to move article3_hero.jpg (black Labrador in a guide-dog harness) here, but that
+// leaves article 2 short, so it is held until the hero chain is resolved (per Steve).
 const PLACEHOLDER_ARTICLE_6_PANEL = "PLACEHOLDER: blue panel 6 supporting point for the guide dogs article, outstanding from Steve. One panel per article, so article 6 needs its own; this is a stand-in until the real copy lands.";
 const PLACEHOLDER_ARTICLE_6_DEK = "PLACEHOLDER: index card dek for the guide dogs article (two or three sentences), outstanding from Steve.";
 const PLACEHOLDER_ARTICLE_6_ALT = "PLACEHOLDER: alt text for the guide dogs hero, outstanding from Steve.";
@@ -202,10 +203,10 @@ Some spend their lives bored and under-stimulated, while others are pushed into 
   {
     id: "search-rescue",
     order: 5,
-    // Draft until Steve supplies the real blue panel 5, card dek and hero alt.
-    // page.tsx filters to published === "live", so the placeholders below never
-    // reach the live deck; the article route works regardless.
-    published: "draft",
+    // Live with placeholders (Steve, 11 Aug): blue panel 5, the card dek and the
+    // hero alt are still outstanding from Steve and now show on the deck. The hero
+    // image is real; the article route is fully built.
+    published: "live",
     panel: {
       sections: [
         {
@@ -228,9 +229,11 @@ Some spend their lives bored and under-stimulated, while others are pushed into 
   {
     id: "guide-dogs",
     order: 6,
-    // Draft until Steve supplies the real blue panel 6, card dek and hero, and the
-    // hero chain is resolved (moving article3_hero.jpg here leaves article 2 short).
-    published: "draft",
+    // Live with placeholders (Steve, 11 Aug): blue panel 6, the card dek and the hero
+    // alt are outstanding, and the hero image path 404s (broken image on the deck and
+    // the article page) until the hero chain is resolved (moving article3_hero.jpg
+    // here leaves article 2 short). All now show on the deck.
+    published: "live",
     panel: {
       sections: [
         {
