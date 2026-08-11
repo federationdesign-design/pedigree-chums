@@ -4220,10 +4220,15 @@ export default function BreedTree({
         const bl = badgeBodiesRef.current;
         if (!bl) return;
         const w = worldFromPx(sx, sy);
-        // A solo dog circle brings its own radius. Everything else is a
-        // percentage chip and is sized by its figure, bombs included: in the
-        // main pit a bomb IS a percentage circle and only its sprite differs.
-        const rDraw = opts?.r ?? badgeRFor(pctVal, badgeDrawRRef.current);
+        // A solo dog circle (opts.label) brings its own full radius. A percentage
+        // chip is sized like every other pit badge now: BADGE_FRAC of the radius it
+        // arrived on (opts.r, its learn-layer size), floored for legibility, so a
+        // scattered chip matches the drop and pop badges rather than being a second,
+        // full-size badge sizing in the same pit. The badgeRFor branch is the dead
+        // pre-opts.r fallback.
+        const rDraw = opts?.label
+          ? (opts.r ?? badgeRFor(pctVal, badgeDrawRRef.current))
+          : Math.max(badgeFloorVb(), BADGE_FRAC * (opts?.r ?? badgeRFor(pctVal, badgeDrawRRef.current)));
         // A solo dog circle arrives through this same call carrying a label,
         // and that one is never a bomb: it is a whole breed, not a chip.
         const isBomb = !opts?.label && rollBomb();
