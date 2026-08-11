@@ -156,6 +156,8 @@
   object-fit: cover;
   border-radius: 14px;
   display: block;
+  /* Drop the thumbnail by the subheading's 75px so their top edges line up. */
+  margin-top: 75px;
 }
 
 /* Pending thumbnail: reserves its footprint, renders nothing visible. */
@@ -164,6 +166,8 @@
   width: clamp(144px, 16.2cqi, 192px);
   height: clamp(144px, 16.2cqi, 192px);
   visibility: hidden;
+  /* Match the real thumbnail's drop so a pending slot reserves the same space. */
+  margin-top: 75px;
 }
 
 .blueSubheading {
@@ -173,10 +177,10 @@
   letter-spacing: 0.02em;
   text-transform: uppercase;
   color: var(--cream);
-  /* Item 3: 75px above every panel subheading (shared rule). */
-  padding-top: 75px;
-  /* Small gap to the body below (previously carried by the heading row). */
-  margin: 0 0 3px;
+  /* Item 3: 75px above every panel subheading (shared rule). Carried as
+     margin-top, not padding-top, so the heading element itself drops by 75 and
+     its top edge lines up with the panel-1 thumbnail (which drops the same 75). */
+  margin: 75px 0 3px;
 }
 
 /* Emphasis: the --emphasis yellow, on any panel text (subheadings, body,
