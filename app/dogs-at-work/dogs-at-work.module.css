@@ -327,7 +327,7 @@
   width: 100%;
   max-width: 1300px;
   margin: auto auto 0;
-  padding: 24px 24px 40px;
+  padding: 24px 24px 0px;
   align-self: flex-end;
   box-sizing: border-box;
 }
@@ -376,7 +376,8 @@
 .essayHero {
   position: relative;
   width: 100%;
-  min-height: clamp(340px, 50vh, 560px);
+  /* Hero min-height increased 20% (Steve, 11 Aug): 340/50vh/560 -> 408/60vh/672. */
+  min-height: clamp(408px, 60vh, 672px);
   overflow: hidden;
   display: flex;
   align-items: flex-end;
