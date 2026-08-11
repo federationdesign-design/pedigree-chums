@@ -201,7 +201,7 @@ export default function ElectronicNosePage() {
             <Link href="/dogs-at-work" className={styles.backLink}>← Back to Dogs at Work</Link>
             <div className={styles.essayHeroMeta}>
               <span className={`${styles.tag} ${styles.tagGood}`}>Medical</span>
-              <span className={styles.tagBreed}>The machine the dogs built</span>
+              <span className={styles.tagBreed}>Bio-detection dogs</span>
             </div>
             <h1 className={styles.essayHeroTitle}>The Electronic Nose: The Machine That May Owe Dogs a Biscuit</h1>
           </div>
