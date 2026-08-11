@@ -60,21 +60,23 @@
   flex-wrap: wrap;
 }
 
+/* Hero meta pills, sized up to match the concept (both the family pill and the
+   sub-label pill). */
 .tag {
   font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: 0.65rem;
+  font-size: 0.85rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   background: var(--yellow, #ffd23e);
   color: var(--navy, #0a3a57);
   border-radius: 999px;
-  padding: 4px 14px;
+  padding: 7px 18px;
 }
 
 .tagBreed {
   font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: 0.65rem;
+  font-size: 0.85rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -82,7 +84,7 @@
   color: #ffffff;
   border: 1.5px solid rgba(255,255,255,0.4);
   border-radius: 999px;
-  padding: 4px 14px;
+  padding: 7px 18px;
 }
 
 .tagBad {
@@ -114,25 +116,44 @@
   text-transform: uppercase;
 }
 
-/* ── Essay body ─────────────────────────────────────────────── */
+/* ── Essay body ─────────────────────────────────────────────────
+   Body and intro type match the Good Dog Bad Dog article pages, which are the
+   same article style (values reused verbatim from good-dog-bad-dog.module.css,
+   confirmed by Steve 11 Aug 2026): body 1.25rem/500/1.3, intro 1.625rem/700/1.3.
+   This class is shared by all four Dogs at Work article pages, so the change
+   lands on articles 1 to 3 as well and keeps the set consistent. Dogs at Work
+   keeps its own paragraph spacing (margin-bottom + max-width) rather than GDBD's
+   sibling-gap rhythm system. */
 .essayBody p {
   font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: 1rem;
+  font-size: 1.25rem;
   font-weight: 500;
   color: #ffffff;
-  line-height: 1.8;
+  line-height: 1.3;
   margin: 0 0 18px;
   max-width: 720px;
 }
 
+/* First paragraph treatment, matching GDBD. Every Dogs at Work article opens
+   with a prose paragraph, so its first .essayBody child is a <p>. */
+.essayBody > p:first-child,
+.essayBody .introPara {
+  font-size: 1.625rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
 .subhead {
   font-family: var(--font-display, "Luckiest Guy", cursive);
-  font-size: 2.0rem;
-  color: var(--yellow, #ffd23e);
+  /* Body section headings: 1.5x bigger, tight 0.9 line-height, and the brighter
+     --emphasis yellow, matching the concept. The hero headline is white; the
+     yellow lives on these body headings and the sidebar card titles. */
+  font-size: 3.0rem;
+  color: var(--emphasis, #ffed60);
   letter-spacing: 0.06em;
   text-transform: uppercase;
   margin: 48px 0 16px;
-  line-height: 1.2;
+  line-height: 0.9;
 }
 
 .evidenceList {
@@ -273,6 +294,13 @@
 }
 .readMore:hover { background: #ffe566; transform: scale(1.03); }
 .tagGood { background: #22c55e; color: #ffffff; }
+/* Rural and Traditional family pill on the article hero (article 4). Uses the
+   settled family fill #97AA31 with --navy text (brief v3.0 section 10), so the
+   Sheepdogs hero carries the correct family colour rather than the legacy green.
+   Matches the filled tagGood/tagBad hero treatment; the one pixel --cream pill
+   outline from section 10 is enforced on the index deck pills, not these hero
+   meta tags. */
+.tagRural { background: #97aa31; color: var(--navy, #0a3a57); }
 .essayPage {
   min-height: 100vh;
   padding-bottom: 80px;
@@ -314,13 +342,24 @@
 
 .essayHeroTitle {
   font-family: var(--font-display, "Luckiest Guy", cursive);
-  font-size: clamp(1.8rem, 4vw, 3rem);
-  color: var(--yellow, #ffd23e);
+  /* White, 1.5x the previous clamp, to match the concept hero (headline is white
+     there, not yellow; the body section headings carry the yellow instead). */
+  font-size: clamp(2.7rem, 6vw, 4.5rem);
+  color: #ffffff;
   margin: 0;
   line-height: 1.1;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   text-shadow: 0 2px 12px rgba(0,0,0,0.4);
+}
+
+/* Desktop only: hold the headline to 60% of the hero so it does not run under
+   the payslip that overlays the hero's right side. On mobile the hero has no
+   payslip overlay, so the headline keeps the full width. */
+@media (min-width: 901px) {
+  .essayHeroTitle {
+    max-width: 60%;
+  }
 }
 
 /* ── Essay two-column layout ────────────────────────────────── */
@@ -378,6 +417,10 @@
   gap: 20px;
   position: sticky;
   top: 120px;
+  /* Sticky forms a stacking context; raise it above the hero layers (image z0,
+     tint z1, content z2) so the payslip, which overlays the hero bottom, sits
+     above the hero's gradient tint rather than under it. */
+  z-index: 10;
 }
 
 .sidebarCard {
@@ -385,6 +428,28 @@
   border: 1.5px solid rgba(255,255,255,0.12);
   border-radius: 16px;
   overflow: hidden;
+  /* 20px extra padding on top of the article-page info cards (Steve, 11 Aug),
+     added at the container so it is uniform across cards whose inner sections
+     carry different paddings. */
+  padding-top: 20px;
+}
+
+/* Desktop only: lift the payslip so it overlays the bottom of the hero, per the
+   concept, instead of sitting below the hero in the body. The sidebar is tall
+   (several cards), so it scrolls with the page for most of its length and only
+   sticks near its end; the lifted payslip therefore overlaps the hero at the top
+   rather than riding up under the nav. On mobile the sidebar is a normal stacked
+   column after the essay, so the lift must not apply. Applied via the Payslip
+   component's className prop, so the reusable component stays layout-agnostic. */
+.payslipOverlay {
+  position: relative;
+  z-index: 5;
+}
+
+@media (min-width: 901px) {
+  .payslipOverlay {
+    margin-top: -170px;
+  }
 }
 
 @media (max-width: 900px) {

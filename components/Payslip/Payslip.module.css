@@ -3,29 +3,37 @@
    so no hard-coded pixel dimensions: width fills the column and height follows
    the content. */
 
-/* Upright, no transform. Appendix C shows the concept tilted a few degrees but
-   the supplied CSS carries none; Steve closed the question upright (11 Aug 2026).
-   Do not add a rotate transform to reproduce the concept's tilt. */
+/* Tilted a few degrees, matching the concept. This reverses the earlier upright
+   decision: Appendix C shows the payslip askew and Steve chose the tilt over
+   upright (11 Aug 2026). The rotation is counterclockwise (right edge up); flip
+   the sign if the concept angle reads the other way. Keep the tilt; do not
+   return it to upright. */
 .payslip {
   position: relative;
   background: linear-gradient(47deg, #efd379 0%, #f5e3b9 100%);
+  transform: rotate(-3deg);
   /* Eight-digit hex with alpha, as supplied. The no-rgba rule is for text only
      (Appendix C), so it stands on this shadow. */
   box-shadow: 10px 10px 8px #00000029;
   border-radius: 16px;
-  padding: 20px 22px 22px;
+  /* Base 20/22/22, plus 20px extra top and 10px extra right (Steve, 11 Aug), so
+     the content clears the tilted top edge and the right-hand tick column/cutout:
+     top 40, right 32, bottom 22, left 22. */
+  padding: 40px 32px 22px 22px;
   color: #000;
-  /* Circular cutout on the top right edge. A real transparent punch-out via a
-     CSS mask (radial-gradient), chosen over an SVG shape so the hole reads
-     correctly over both the navy article background and sky blue, rather than an
-     opaque shape matched to only one of them. */
-  -webkit-mask: radial-gradient(circle 27px at calc(100% - 4px) 4px, transparent 0 26px, #000 27px);
-  mask: radial-gradient(circle 27px at calc(100% - 4px) 4px, transparent 0 26px, #000 27px);
+  /* Cutout on the right edge. Centred ON the right edge and inset down from the
+     top corner, so half the circle falls inside the card and it reads as a
+     semicircle rather than the quarter circle a corner-centred cut gives. A real
+     transparent punch-out via a CSS mask (radial-gradient), chosen over an SVG
+     shape so the hole reads correctly over both the navy article background and
+     sky blue. */
+  -webkit-mask: radial-gradient(circle 26px at 100% 74px, transparent 0 25px, #000 26px);
+  mask: radial-gradient(circle 26px at 100% 74px, transparent 0 25px, #000 26px);
 }
 
 .heading {
   font-family: var(--font-display, "Luckiest Guy", cursive);
-  font-size: 1.85rem;
+  font-size: 2.5rem;
   line-height: 1;
   letter-spacing: 0.04em;
   text-transform: uppercase;

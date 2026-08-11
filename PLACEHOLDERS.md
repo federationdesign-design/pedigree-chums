@@ -137,5 +137,4 @@ outstanding decisions are in `docs/dogs-at-work/NEEDS_STEVE.md`.
 
 | Placeholder | Location | Meaning | Resolve via |
 |---|---|---|---|
-| `PLACEHOLDER_ARTICLE_3_HERO` (`/PLACEHOLDER_article3_hero.jpg`) | `app/dogs-at-work/data/slides.ts` (electronic-nose) | Article 3 hero. The supplied `article3_hero.jpg` (black Labrador in a guide-dog harness) was wrong for a bio-detection piece and was withdrawn by Steve (11 Aug 2026). Path 404s by design; article 3 has no hero until a replacement lands. Wrong file left unreferenced in `public/`. | Steve supplies a replacement hero image (open question 4) |
-| `PLACEHOLDER_ARTICLE_3_ALT` | `app/dogs-at-work/data/slides.ts` (electronic-nose) | Alt text for the article 3 replacement hero | Steve supplies alt text (open question 4) |
+| (none currently) | | The Dogs at Work redux has no open placeholders. Article 3's hero was resolved by the 11 Aug hero swap (carousel scene wired); article 4's "From work to sport" copy was supplied and wired. Hero alt text on articles 2 and 3 is agent-suggested and awaiting Steve's confirmation (tracked in `docs/dogs-at-work/NEEDS_STEVE.md`, not a placeholder). | |

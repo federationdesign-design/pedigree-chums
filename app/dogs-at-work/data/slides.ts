@@ -13,14 +13,11 @@
 import type { Slide } from "./types";
 import { validateSlides } from "./validate";
 
-// Clearly named placeholders for inputs Steve still owes. Logged in
-// PLACEHOLDERS.md and docs/dogs-at-work/NEEDS_STEVE.md. Never invent these.
-// Article 3 hero: the supplied article3_hero.jpg is a black Labrador in a
-// guide-dog harness, wrong for a bio-detection piece about the electronic nose.
-// Withdrawn by Steve (11 Aug 2026); a replacement is owed. This path 404s by
-// design and is logged. Do not point it back at /article3_hero.jpg.
-const PLACEHOLDER_ARTICLE_3_HERO = "/PLACEHOLDER_article3_hero.jpg";
-const PLACEHOLDER_ARTICLE_3_ALT = "PLACEHOLDER: alt text for article 3 hero, outstanding from Steve";
+// Hero swap (Steve, 11 Aug 2026): the scent-carousel lab scene that was on
+// article 2 moves to article 3, where it shows the bio-detection subject; and
+// article3_hero.jpg (the black Labrador in a harness) moves to article 2. The
+// files keep their original names; only which article uses each has changed.
+// Alt text below is agent-suggested from the images, pending Steve's confirmation.
 
 export const SLIDES: Slide[] = [
   {
@@ -91,8 +88,8 @@ Perhaps that is the remarkable bargain at the heart of our relationship with dog
       subLabel: "Medical alert dogs",
       headline: "The Colleague Who Never Clocks Off",
       dek: `A medical alert dog learns one person so completely it can warn them their own body is about to go wrong -- often before they know themselves. That's not a pet. That's a colleague. Even if the only wages are dinner and the occasional stolen sausage.`,
-      image: "/never-clocking-off.jpg",
-      imageAlt: "A medical alert dog resting beside its owner",
+      image: "/article3_hero.jpg",
+      imageAlt: "A black Labrador in a white assistance-dog harness standing beside its seated owner indoors",
       ctaLabel: "Bramble",
       href: "/dogs-at-work/the-colleague-who-never-clocks-off",
     },
@@ -126,8 +123,8 @@ Some spend their lives bored and under-stimulated, while others are pushed into 
       subLabel: "Bio-detection dogs",
       headline: "The Machine That May Owe Dogs a Biscuit",
       dek: `In Milton Keynes, scientists are building an electronic nose to sniff out prostate cancer -- trained on data the dogs gathered first. The dog wrote the manual for its own replacement, and it could not care less. It just wants its biscuit. This is the last piece of the medical trilogy.`,
-      image: PLACEHOLDER_ARTICLE_3_HERO,
-      imageAlt: PLACEHOLDER_ARTICLE_3_ALT,
+      image: "/never-clocking-off.jpg",
+      imageAlt: "A detection dog sniffing a stainless-steel scent-sample carousel in a research laboratory as staff observe",
       ctaLabel: "Bio-detection dogs",
       // Slug unchanged: the retitle does not move the route.
       href: "/dogs-at-work/the-electronic-nose",

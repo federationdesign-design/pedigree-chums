@@ -51,7 +51,7 @@ const BODY: (string | { h: string })[] = [
   "Listening. Or rather, smelling. Mostly smelling.",
 ];
 
-const cardTitle: React.CSSProperties = { fontFamily: "var(--font-display)", fontSize: "24px", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: "0 0 6px" };
+const cardTitle: React.CSSProperties = { fontFamily: "var(--font-display)", fontSize: "36px", letterSpacing: "0", color: "var(--emphasis)", lineHeight: 0.9, textTransform: "uppercase", margin: "0 0 6px" };
 const cardBody: React.CSSProperties = { fontFamily: "var(--font-body)", fontSize: "0.92rem", fontWeight: 500, color: "#fff", lineHeight: 1.5, margin: 0 };
 
 export default function AlertDogPage() {
@@ -60,7 +60,7 @@ export default function AlertDogPage() {
       <Nav showLogo />
       <main className={styles.essayPage}>
         <div className={styles.essayHero}>
-          <img src="/never-clocking-off.jpg" alt="A medical alert dog resting beside its owner" className={styles.essayHeroImg} />
+          <img src="/article3_hero.jpg" alt="A black Labrador in a white assistance-dog harness standing beside its seated owner indoors" className={styles.essayHeroImg} />
           <div className={styles.essayHeroTint} />
           <div className={styles.essayHeroContent}>
             <Link href="/dogs-at-work" className={styles.backLink}>← Back to Dogs at Work</Link>
@@ -84,6 +84,12 @@ export default function AlertDogPage() {
           </article>
 
           <aside className={styles.sidebar}>
+            {/* The payslip (brief v3.0 section 13 + Appendix C). Replaces the
+                earlier nine-field payslip, including the retired Name and Bonus
+                scheme fields. It overlays the hero bottom on desktop, so it is
+                the first sidebar item (the editor's note follows it). */}
+            <Payslip data={PAYSLIPS["the-colleague-who-never-clocks-off"]} className={styles.payslipOverlay} />
+
             {/* Editor's note (placeholder hero) */}
             <div className={styles.sidebarCard}>
               <div style={{ padding: "16px 20px 16px" }}>
@@ -91,11 +97,6 @@ export default function AlertDogPage() {
                 <p style={{ ...cardBody, fontStyle: "italic" }}>&quot;Bramble&quot; and &quot;Sarah&quot; are illustrative while we finalise a real, currently-working alert dog to feature -- with the organisation&apos;s and owner&apos;s permission.</p>
               </div>
             </div>
-
-            {/* The payslip (brief v3.0 section 13 + Appendix C). Replaces the
-                earlier nine-field payslip, including the retired Name and Bonus
-                scheme fields. */}
-            <Payslip data={PAYSLIPS["the-colleague-who-never-clocks-off"]} />
 
             {/* What the dog thinks */}
             <div className={styles.sidebarCard}>

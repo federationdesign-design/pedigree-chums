@@ -41,9 +41,11 @@ function Tick() {
   );
 }
 
-export default function Payslip({ data }: { data: PayslipData }) {
+export default function Payslip({ data, className }: { data: PayslipData; className?: string }) {
+  // className lets the article layout add the desktop hero-overlay lift without
+  // baking that layout concern into the reusable component.
   return (
-    <div className={styles.payslip}>
+    <div className={`${styles.payslip}${className ? ` ${className}` : ""}`}>
       <p className={styles.heading}>Dog Payslip</p>
       <div className={styles.rows}>
         {ROWS.map(({ key, label }) => {

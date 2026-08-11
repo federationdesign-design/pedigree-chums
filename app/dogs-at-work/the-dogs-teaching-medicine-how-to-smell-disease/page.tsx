@@ -48,7 +48,7 @@ const BODY: (string | { h: string })[] = [
   "Somewhere, a machine that can smell disease is being invented. And somewhere in that machine's family tree there will be a golden retriever and a black Labrador who once sniffed a row of pots, found the strange one, and looked up for their biscuit -- with absolutely no idea they had just shown medicine where to look.",
 ];
 
-const cardTitle: React.CSSProperties = { fontFamily: "var(--font-display)", fontSize: "24px", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: "0 0 6px" };
+const cardTitle: React.CSSProperties = { fontFamily: "var(--font-display)", fontSize: "36px", letterSpacing: "0", color: "var(--emphasis)", lineHeight: 0.9, textTransform: "uppercase", margin: "0 0 6px" };
 const cardBody: React.CSSProperties = { fontFamily: "var(--font-body)", fontSize: "0.92rem", fontWeight: 500, color: "#fff", lineHeight: 1.5, margin: 0 };
 const statLabel: React.CSSProperties = { fontFamily: "var(--font-body)", fontSize: "0.66rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--yellow)", marginBottom: 4 };
 const statValue: React.CSSProperties = { fontFamily: "var(--font-display)", fontSize: "2rem", color: "#fff", lineHeight: 1 };
@@ -84,7 +84,7 @@ export default function BioDetectionPage() {
 
           <aside className={styles.sidebar}>
             {/* The payslip (brief v3.0 section 13 + Appendix C) */}
-            <Payslip data={PAYSLIPS["the-dogs-teaching-medicine-how-to-smell-disease"]} />
+            <Payslip data={PAYSLIPS["the-dogs-teaching-medicine-how-to-smell-disease"]} className={styles.payslipOverlay} />
 
             {/* The honest version */}
             <div className={styles.sidebarCard}>

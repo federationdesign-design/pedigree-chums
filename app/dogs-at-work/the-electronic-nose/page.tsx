@@ -44,7 +44,7 @@ const BODY: (string | { h: string })[] = [
   "The dog taught the machine to smell. The machine will reach a thousand hospitals the dog never could. And the dog, gloriously, will never know and never care -- because there's a ball by the back door, and the day is young.",
 ];
 
-const cardTitle: React.CSSProperties = { fontFamily: "var(--font-display)", fontSize: "24px", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: "0 0 6px" };
+const cardTitle: React.CSSProperties = { fontFamily: "var(--font-display)", fontSize: "36px", letterSpacing: "0", color: "var(--emphasis)", lineHeight: 0.9, textTransform: "uppercase", margin: "0 0 6px" };
 const cardBody: React.CSSProperties = { fontFamily: "var(--font-body)", fontSize: "0.92rem", fontWeight: 500, color: "#fff", lineHeight: 1.5, margin: 0 };
 const statLabel: React.CSSProperties = { fontFamily: "var(--font-body)", fontSize: "0.66rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--yellow)", marginBottom: 4 };
 const statValue: React.CSSProperties = { fontFamily: "var(--font-display)", fontSize: "2rem", color: "#fff", lineHeight: 1 };
@@ -55,7 +55,7 @@ export default function ElectronicNosePage() {
       <Nav showLogo />
       <main className={styles.essayPage}>
         <div className={styles.essayHero}>
-          <div className={styles.essayHeroImgFallback} />
+          <img src="/never-clocking-off.jpg" alt="A detection dog sniffing a stainless-steel scent-sample carousel in a research laboratory as staff observe" className={styles.essayHeroImg} />
           <div className={styles.essayHeroTint} />
           <div className={styles.essayHeroContent}>
             <Link href="/dogs-at-work" className={styles.backLink}>← Back to Dogs at Work</Link>
@@ -80,7 +80,7 @@ export default function ElectronicNosePage() {
 
           <aside className={styles.sidebar}>
             {/* The payslip (brief v3.0 section 13 + Appendix C) */}
-            <Payslip data={PAYSLIPS["the-electronic-nose"]} />
+            <Payslip data={PAYSLIPS["the-electronic-nose"]} className={styles.payslipOverlay} />
 
             {/* The honest version */}
             <div className={styles.sidebarCard}>
