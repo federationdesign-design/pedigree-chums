@@ -137,4 +137,10 @@ outstanding decisions are in `docs/dogs-at-work/NEEDS_STEVE.md`.
 
 | Placeholder | Location | Meaning | Resolve via |
 |---|---|---|---|
-| (none currently) | | The Dogs at Work redux has no open placeholders. Article 3's hero was resolved by the 11 Aug hero swap (carousel scene wired); article 4's "From work to sport" copy was supplied and wired. Hero alt text on articles 2 and 3 is agent-suggested and awaiting Steve's confirmation (tracked in `docs/dogs-at-work/NEEDS_STEVE.md`, not a placeholder). | |
+| `PLACEHOLDER_ARTICLE_5_PANEL` | `app/dogs-at-work/data/slides.ts` (search-rescue slide) | Blue panel 5 for the index. One panel per article, so article 5 needs its own supporting point. The slide is `draft`, so this is not on the live deck yet. | Steve supplies the blue panel 5 copy, then flip the slide to `live` |
+| `PLACEHOLDER_ARTICLE_5_DEK` | `app/dogs-at-work/data/slides.ts` (search-rescue slide); also the article page metadata description | Index card dek for article 5 (two or three sentences). | Steve supplies the card dek |
+| `PLACEHOLDER_ARTICLE_5_ALT` | `app/dogs-at-work/data/slides.ts` + `the-dog-that-finds-you-when-nobody-else-can/page.tsx` hero | Alt text for the search and rescue hero (`/search_rescue_dogs.jpg`). | Steve supplies the hero alt text |
+| `PLACEHOLDER_ARTICLE_6_HERO` (`/PLACEHOLDER_article6_hero.jpg`) | `slides.ts` (guide-dogs slide) + `the-dog-that-gives-you-your-world-back/page.tsx` hero | Guide dogs hero. Plan: move `article3_hero.jpg` here, but that leaves article 2 short, so it is held until the hero chain is resolved. Path 404s by design. | Resolve the hero chain (give article 2 a new hero), then wire `article3_hero.jpg` here |
+| `PLACEHOLDER_ARTICLE_6_PANEL` | `app/dogs-at-work/data/slides.ts` (guide-dogs slide) | Blue panel 6 for the index. Slide is `draft`. | Steve supplies the blue panel 6 copy |
+| `PLACEHOLDER_ARTICLE_6_DEK` | `slides.ts` (guide-dogs slide); also the article page metadata description | Index card dek for article 6. | Steve supplies the card dek |
+| `PLACEHOLDER_ARTICLE_6_ALT` | `slides.ts` + `the-dog-that-gives-you-your-world-back/page.tsx` hero | Alt text for the guide dogs hero. | Steve supplies the hero alt text |

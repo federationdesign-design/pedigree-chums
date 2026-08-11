@@ -51,4 +51,27 @@ export const PAYSLIPS: Record<string, PayslipData> = {
     paidIn: "A tennis ball, thrown far",
     retirement: "By the farmhouse fire",
   },
+  // Article 5 (search and rescue). Trimmed values from the supplied copy, sentence
+  // cased; the longer originals recorded in the copy are not used (they overflow
+  // the card).
+  "the-dog-that-finds-you-when-nobody-else-can": {
+    jobTitle: "Missing person finder",
+    department: "Emergency search",
+    shiftPattern: "Whenever somebody goes missing",
+    officialDuties: "Search, locate, alert",
+    humanValue: "Search area reduced, people found",
+    paidIn: "Favourite toy and another go",
+    retirement: "Sofa, with garden inspections",
+  },
+  // Article 6 (guide dogs). Trimmed values from the supplied copy, sentence cased;
+  // the longer originals in the copy are not used (they overflow the card).
+  "the-dog-that-gives-you-your-world-back": {
+    jobTitle: "Obstacle avoidance officer",
+    department: "Independence",
+    shiftPattern: "Harness on",
+    officialDuties: "Kerbs, obstacles, ignoring pigeons",
+    humanValue: "Mobility, confidence, independence",
+    paidIn: "Praise, treats, the free run after",
+    retirement: "Sofas, walks, nobody's commute",
+  },
 };

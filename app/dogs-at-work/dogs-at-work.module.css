@@ -307,6 +307,12 @@
    outline from section 10 is enforced on the index deck pills, not these hero
    meta tags. */
 .tagRural { background: #97aa31; color: var(--navy, #0a3a57); }
+/* Emergency family pill on the article hero (article 5). Settled fill #D71F6C
+   with --cream text (brief v3.0 section 10). */
+.tagEmergency { background: #d71f6c; color: var(--cream, #ffffff); }
+/* People family pill on the article hero (article 6). Settled fill #2B7095 with
+   --cream text (brief v3.0 section 10). */
+.tagPeople { background: #2b7095; color: var(--cream, #ffffff); }
 .essayPage {
   min-height: 100vh;
   padding-bottom: 80px;

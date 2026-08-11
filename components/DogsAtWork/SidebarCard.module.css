@@ -52,6 +52,12 @@
   margin-top: 8px;
 }
 
+/* A subtitle that follows body text starts a new labelled item (e.g. the three
+   ways to search), so it gets a clearer gap above it. */
+.text + .subtitle {
+  margin-top: 14px;
+}
+
 .muted {
   color: #aac4d4;
 }
