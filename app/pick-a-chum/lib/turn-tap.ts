@@ -69,3 +69,29 @@ export function gapLogEnabled(): boolean {
   if (typeof window === 'undefined') return false;
   return new URLSearchParams(window.location.search).get('gaplog') === '1';
 }
+
+// ---- Task 171 (Section 0): THE OFF SWITCH for sending tester transcripts to a Google Sheet ----
+//
+// The send path (built later, and only once the owner has answered the children's-data question) will be off
+// unless BOTH are true:
+//   1. the visitor carries `?rec=1` -- the same per-visitor flag the owner hands testers, checked EXPLICITLY
+//      here and NEVER host-derived, so an ordinary visitor and a flagless developer on localhost post nothing;
+//   2. a RUNTIME kill switch reports enabled.
+//
+// The kill switch is RUNTIME, not a build-time env var, so the owner can STOP IT INSTANTLY with no redeploy.
+// It lives in Vercel Edge Config (key `pickachum_sync`, field `enabled`) and is read server-side by the
+// /api/pc-sync-config route; this client helper only asks that route. DEFAULT IS OFF: no `?rec=1`, no Edge
+// Config store connected, a disabled value, or any network/parse error all resolve to false. Nothing here
+// sends transcript data -- it only reports the on/off state the send path will check before it does anything.
+export async function fetchSheetSyncEnabled(): Promise<boolean> {
+  if (typeof window === 'undefined') return false;
+  if (new URLSearchParams(window.location.search).get('rec') !== '1') return false; // gate before any fetch
+  try {
+    const res = await fetch('/api/pc-sync-config', { cache: 'no-store' });
+    if (!res.ok) return false;
+    const v: unknown = await res.json();
+    return typeof v === 'object' && v !== null && (v as { enabled?: unknown }).enabled === true;
+  } catch {
+    return false;
+  }
+}

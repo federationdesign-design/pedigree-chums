@@ -43,7 +43,7 @@ const { skipTheatre, buildTypingPlan, TYPING_PROFILES, THEATRE_MAX_MS, isTypoEli
 );
 const { buildRow, buildProtectedMarker, buildAppearanceRow, enrichRows, detectRephrase, buildSessions, isLaugh } = await import(pathToFileURL(join(ROOT, 'app/pick-a-chum/dev/recorder-store.ts')).href);
 const { isNoSubjectFallback, redact, ingest, onProtected, rankedItems, emptyStore, newSessionState } = await import(pathToFileURL(join(ROOT, 'app/pick-a-chum/dev/gap-log.ts')).href);
-const { recorderEnabled } = await import(pathToFileURL(join(ROOT, 'app/pick-a-chum/lib/turn-tap.ts')).href);
+const { recorderEnabled, fetchSheetSyncEnabled } = await import(pathToFileURL(join(ROOT, 'app/pick-a-chum/lib/turn-tap.ts')).href);
 const { SAFETY_TRIGGER_PHRASES } = await import(pathToFileURL(join(LIB, 'safety.ts')).href);
 
 let pass = 0;
@@ -1275,6 +1275,40 @@ const lcg = (seed) => () => ((seed = (seed * 1103515245 + 12345) & 0x7fffffff) /
   const ok = hadText && rankedItems(store).length === 0 && store.counts[key].count === 5 && !store.texts[key];
   ok ? pass++ : fail++;
   rows.push({ ok, input: 'gap-log: protected session discards text, keeps count', layer: '-', bucket: '-', action: 'gaplog', note: ok ? '' : `hadText=${hadText} items=${rankedItems(store).length} count=${store.counts[key] && store.counts[key].count} text=${store.texts[key]}` });
+})();
+
+// ---- Task 171 (Section 0): the sheet-sync RUNTIME kill switch (client gate). Off unless the visitor carries
+// ?rec=1 AND the runtime config reports enabled. Default OFF: no window, no flag, a disabled value, a non-OK
+// response, or any fetch error. The flag is checked BEFORE any fetch, so an ordinary visitor never calls it. ----
+await (async () => {
+  const savedWin = globalThis.window;
+  const savedFetch = globalThis.fetch;
+  let fetchCalls = 0;
+  const setWin = (search) => { globalThis.window = { location: { search, hostname: 'localhost' } }; };
+  const setFetch = (impl) => { globalThis.fetch = async (...a) => { fetchCalls++; return impl(...a); }; };
+  const jsonRes = (obj, ok = true) => ({ ok, json: async () => obj });
+  let ok = false, note = '';
+  try {
+    delete globalThis.window; // no window (SSR) -> off
+    const offNoWin = (await fetchSheetSyncEnabled()) === false;
+    setWin(''); setFetch(() => jsonRes({ enabled: true })); fetchCalls = 0; // window, no ?rec=1 -> off, no fetch
+    const offNoFlag = (await fetchSheetSyncEnabled()) === false && fetchCalls === 0;
+    setWin('?rec=1'); setFetch(() => jsonRes({ enabled: true })); // ?rec=1 + enabled -> on
+    const onBoth = (await fetchSheetSyncEnabled()) === true;
+    setFetch(() => jsonRes({ enabled: false })); // ?rec=1 + disabled -> off
+    const offDisabled = (await fetchSheetSyncEnabled()) === false;
+    setFetch(() => jsonRes({ enabled: true }, false)); // ?rec=1 + non-OK response -> off
+    const offNotOk = (await fetchSheetSyncEnabled()) === false;
+    setFetch(() => { throw new Error('down'); }); // ?rec=1 + fetch throws -> off
+    const offError = (await fetchSheetSyncEnabled()) === false;
+    ok = offNoWin && offNoFlag && onBoth && offDisabled && offNotOk && offError;
+    note = `offNoWin=${offNoWin} offNoFlag=${offNoFlag} onBoth=${onBoth} offDisabled=${offDisabled} offNotOk=${offNotOk} offError=${offError}`;
+  } finally {
+    if (savedWin === undefined) delete globalThis.window; else globalThis.window = savedWin;
+    globalThis.fetch = savedFetch;
+  }
+  ok ? pass++ : fail++;
+  rows.push({ ok, input: 'task171: sheet-sync off unless ?rec=1 AND runtime config enabled', layer: '-', bucket: '-', action: 'sheetsync', note: ok ? '' : note });
 })();
 
 // ---- Fix 5a: the meaningless B05 "located the correct Chum" line is removed ----
