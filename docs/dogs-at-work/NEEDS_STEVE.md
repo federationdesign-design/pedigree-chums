@@ -39,4 +39,5 @@ redirects that to `docs/dogs-at-work/NEEDS_STEVE.md` per the path override.)
   "The payment; very different"). Appendix A panel 4's bold lead, "Working dogs
   do not know they have jobs", is 39. The copy is supplied and locked, so per
   section 9's own rule (longest real string + ~15%) the budget was set to 45
-  (39 + 15%) rather than truncating the copy. Please confirm.
+  (39 + 15%) rather than truncating the copy. **Confirmed by Steve (11 August
+  2026): 45 is correct; it derives from his own locked copy.**
