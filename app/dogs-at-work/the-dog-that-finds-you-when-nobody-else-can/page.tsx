@@ -12,10 +12,9 @@ import { PAYSLIPS } from "../data/payslips";
 
 export const metadata: Metadata = {
   title: "The Dog That Finds You When Nobody Else Can | Dogs at Work | Pedigree Chums™",
-  // Placeholder: the index card dek is outstanding from Steve, and the meta
-  // description is drawn from it, so this stands in until that lands.
+  // Meta description drawn from the index card dek (supplied by Steve, 11 Aug).
   description:
-    "PLACEHOLDER: meta description for the search and rescue article, pending the index card dek from Steve.",
+    "Air scent, trailing, water. A dog covers ground people cannot, in the dark, in the rain, for a toy and a bit of praise.",
   robots: "noindex",
 };
 
@@ -186,11 +185,10 @@ export default function SearchRescuePage() {
       <Nav showLogo />
       <main className={styles.essayPage}>
         <div className={styles.essayHero}>
-          {/* Hero alt is a placeholder: outstanding from Steve, logged in
-              PLACEHOLDERS.md and docs/dogs-at-work/NEEDS_STEVE.md. */}
+          {/* Hero alt supplied by Steve (11 Aug). */}
           <img
             src="/search_rescue_dogs.jpg"
-            alt="PLACEHOLDER: alt text for the search and rescue hero, outstanding from Steve"
+            alt="a search and rescue dog working across open moorland"
             className={styles.essayHeroImg}
           />
           <div className={styles.essayHeroTint} />

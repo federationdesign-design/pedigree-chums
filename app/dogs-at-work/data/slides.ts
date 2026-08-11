@@ -19,24 +19,20 @@ import { validateSlides } from "./validate";
 // files keep their original names; only which article uses each has changed.
 // Alt text below is agent-suggested from the images, pending Steve's confirmation.
 
-// Article 5 (search and rescue) placeholders, outstanding from Steve and logged in
-// PLACEHOLDERS.md / docs/dogs-at-work/NEEDS_STEVE.md. The slide is now LIVE (Steve,
-// 11 Aug), so these are visible on the deck: the blue panel body and the index card
-// dek render verbatim and the hero alt reaches screen readers. The hero image itself
-// is real (/search_rescue_dogs.jpg). Replace each when the real copy lands.
-const PLACEHOLDER_ARTICLE_5_PANEL = "PLACEHOLDER: blue panel 5 supporting point for the search and rescue article, outstanding from Steve. One panel per article, so article 5 needs its own; this is a stand-in until the real copy lands.";
-const PLACEHOLDER_ARTICLE_5_DEK = "PLACEHOLDER: index card dek for the search and rescue article (two or three sentences), outstanding from Steve.";
-const PLACEHOLDER_ARTICLE_5_ALT = "PLACEHOLDER: alt text for the search and rescue hero, outstanding from Steve.";
+// Article 5 (search and rescue): blue panel 5, the index card dek and the hero
+// alt text were all supplied by Steve (11 Aug 2026) and are inlined on the slide
+// below. The hero image (/search_rescue_dogs.jpg) and the article route were
+// already real. No placeholders remain on this slide.
 
-// Article 6 (guide dogs) placeholders, outstanding from Steve. LIVE like article 5
-// (Steve, 11 Aug), so these are visible on the deck. The hero is also a placeholder
-// path that 404s, i.e. a broken image on both the deck and the article page: the plan
-// is to move article3_hero.jpg (black Labrador in a guide-dog harness) here, but that
-// leaves article 2 short, so it is held until the hero chain is resolved (per Steve).
-const PLACEHOLDER_ARTICLE_6_PANEL = "PLACEHOLDER: blue panel 6 supporting point for the guide dogs article, outstanding from Steve. One panel per article, so article 6 needs its own; this is a stand-in until the real copy lands.";
-const PLACEHOLDER_ARTICLE_6_DEK = "PLACEHOLDER: index card dek for the guide dogs article (two or three sentences), outstanding from Steve.";
+// Article 6 (guide dogs): blue panel 6 and the index card dek were supplied by
+// Steve (11 Aug 2026) and are inlined below. Two placeholders remain. The hero
+// alt is still outstanding. The hero image is now a neutral "image coming soon"
+// stand-in (/hero-coming-soon.svg) in place of the earlier path that 404ed, so
+// the deck and article page no longer show a broken image; the plan to move
+// article3_hero.jpg here still waits on the hero-chain decision (article 2 would
+// be left short), which is Steve's. Swap both when the real hero lands.
 const PLACEHOLDER_ARTICLE_6_ALT = "PLACEHOLDER: alt text for the guide dogs hero, outstanding from Steve.";
-const PLACEHOLDER_ARTICLE_6_HERO = "/PLACEHOLDER_article6_hero.jpg";
+const PLACEHOLDER_ARTICLE_6_HERO = "/hero-coming-soon.svg";
 
 export const SLIDES: Slide[] = [
   {
@@ -203,15 +199,18 @@ Some spend their lives bored and under-stimulated, while others are pushed into 
   {
     id: "search-rescue",
     order: 5,
-    // Live with placeholders (Steve, 11 Aug): blue panel 5, the card dek and the
-    // hero alt are still outstanding from Steve and now show on the deck. The hero
-    // image is real; the article route is fully built.
+    // Fully resolved (Steve, 11 Aug): blue panel 5, the card dek and the hero alt
+    // are supplied and inlined. The hero image is real; the article route is built.
     published: "live",
     panel: {
       sections: [
         {
-          subheading: "Panel 5 pending",
-          body: PLACEHOLDER_ARTICLE_5_PANEL,
+          subheading: "Some jobs cannot be done by *people alone*",
+          body: `There are things a human search team simply cannot do. See through vegetation. Cover a hillside in the dark. Read the air.
+
+A dog does not replace the people. It gives them information they could not otherwise reach, and it works for a toy and a bit of praise.
+
+That is the pattern across every job in this series: not a dog doing a human's work, but a dog doing something we cannot.`,
         },
       ],
     },
@@ -219,9 +218,9 @@ Some spend their lives bored and under-stimulated, while others are pushed into 
       family: "Emergency",
       subLabel: "Search and rescue dogs",
       headline: "The Dog That Finds You When Nobody Else Can",
-      dek: PLACEHOLDER_ARTICLE_5_DEK,
+      dek: `Air scent, trailing, water. A dog covers ground people cannot, in the dark, in the rain, for a toy and a bit of praise.`,
       image: "/search_rescue_dogs.jpg",
-      imageAlt: PLACEHOLDER_ARTICLE_5_ALT,
+      imageAlt: "a search and rescue dog working across open moorland",
       ctaLabel: "Search and rescue dogs",
       href: "/dogs-at-work/the-dog-that-finds-you-when-nobody-else-can",
     },
@@ -229,16 +228,20 @@ Some spend their lives bored and under-stimulated, while others are pushed into 
   {
     id: "guide-dogs",
     order: 6,
-    // Live with placeholders (Steve, 11 Aug): blue panel 6, the card dek and the hero
-    // alt are outstanding, and the hero image path 404s (broken image on the deck and
-    // the article page) until the hero chain is resolved (moving article3_hero.jpg
-    // here leaves article 2 short). All now show on the deck.
+    // Live (Steve, 11 Aug): blue panel 6 and the card dek are supplied and inlined.
+    // Two placeholders remain: the hero alt (outstanding) and the hero image, now a
+    // neutral "image coming soon" stand-in rather than a 404, until the hero chain
+    // is resolved (moving article3_hero.jpg here would leave article 2 short).
     published: "live",
     panel: {
       sections: [
         {
-          subheading: "Panel 6 pending",
-          body: PLACEHOLDER_ARTICLE_6_PANEL,
+          subheading: "What we get back is *bigger than the task*",
+          body: `The job description is always small. Find the scent. Move the sheep. Get to the kerb safely.
+
+What comes back is rarely small. Earlier diagnosis. A working farm. A career, a bus journey, an ordinary life somebody had started avoiding.
+
+The dog does the task. The value shows up somewhere else entirely.`,
         },
       ],
     },
@@ -246,9 +249,9 @@ Some spend their lives bored and under-stimulated, while others are pushed into 
       family: "People",
       subLabel: "Guide dogs",
       headline: "The Dog That Gives You Your World Back",
-      dek: PLACEHOLDER_ARTICLE_6_DEK,
-      // Hero held: article3_hero.jpg is to move here once article 2 has a
-      // replacement, so a placeholder path is used until the chain is resolved.
+      dek: `A guide dog does not give somebody their sight back. It gives them the confidence to go, and that turns out to be almost as valuable.`,
+      // Hero is a neutral stand-in until Steve resolves the hero chain (see the
+      // note by PLACEHOLDER_ARTICLE_6_HERO); no longer a 404.
       image: PLACEHOLDER_ARTICLE_6_HERO,
       imageAlt: PLACEHOLDER_ARTICLE_6_ALT,
       ctaLabel: "Guide dogs",

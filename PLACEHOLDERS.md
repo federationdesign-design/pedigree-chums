@@ -137,10 +137,11 @@ outstanding decisions are in `docs/dogs-at-work/NEEDS_STEVE.md`.
 
 | Placeholder | Location | Meaning | Resolve via |
 |---|---|---|---|
-| `PLACEHOLDER_ARTICLE_5_PANEL` | `app/dogs-at-work/data/slides.ts` (search-rescue slide) | Blue panel 5 for the index. One panel per article, so article 5 needs its own supporting point. The slide is `draft`, so this is not on the live deck yet. | Steve supplies the blue panel 5 copy, then flip the slide to `live` |
-| `PLACEHOLDER_ARTICLE_5_DEK` | `app/dogs-at-work/data/slides.ts` (search-rescue slide); also the article page metadata description | Index card dek for article 5 (two or three sentences). | Steve supplies the card dek |
-| `PLACEHOLDER_ARTICLE_5_ALT` | `app/dogs-at-work/data/slides.ts` + `the-dog-that-finds-you-when-nobody-else-can/page.tsx` hero | Alt text for the search and rescue hero (`/search_rescue_dogs.jpg`). | Steve supplies the hero alt text |
-| `PLACEHOLDER_ARTICLE_6_HERO` (`/PLACEHOLDER_article6_hero.jpg`) | `slides.ts` (guide-dogs slide) + `the-dog-that-gives-you-your-world-back/page.tsx` hero | Guide dogs hero. Plan: move `article3_hero.jpg` here, but that leaves article 2 short, so it is held until the hero chain is resolved. Path 404s by design. | Resolve the hero chain (give article 2 a new hero), then wire `article3_hero.jpg` here |
-| `PLACEHOLDER_ARTICLE_6_PANEL` | `app/dogs-at-work/data/slides.ts` (guide-dogs slide) | Blue panel 6 for the index. Slide is `draft`. | Steve supplies the blue panel 6 copy |
-| `PLACEHOLDER_ARTICLE_6_DEK` | `slides.ts` (guide-dogs slide); also the article page metadata description | Index card dek for article 6. | Steve supplies the card dek |
+| `PLACEHOLDER_ARTICLE_6_HERO` (`/hero-coming-soon.svg`) | `slides.ts` (guide-dogs slide) + `the-dog-that-gives-you-your-world-back/page.tsx` hero | Guide dogs hero. Now a neutral "image coming soon" stand-in (`/hero-coming-soon.svg`), not a 404, so the deck and article page no longer show a broken image. Plan: move `article3_hero.jpg` here, but that leaves article 2 short, so it is held until the hero chain is resolved. | Resolve the hero chain (give article 2 a new hero), then wire `article3_hero.jpg` here and delete `/hero-coming-soon.svg` |
 | `PLACEHOLDER_ARTICLE_6_ALT` | `slides.ts` + `the-dog-that-gives-you-your-world-back/page.tsx` hero | Alt text for the guide dogs hero. | Steve supplies the hero alt text |
+
+Resolved 11 Aug 2026: `PLACEHOLDER_ARTICLE_5_PANEL`, `PLACEHOLDER_ARTICLE_5_DEK`,
+`PLACEHOLDER_ARTICLE_5_ALT`, `PLACEHOLDER_ARTICLE_6_PANEL` and
+`PLACEHOLDER_ARTICLE_6_DEK` are all filled with Steve's supplied copy and inlined
+in `slides.ts` (and the article page meta descriptions / the article 5 hero alt).
+No consts remain for them.
