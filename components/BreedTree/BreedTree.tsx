@@ -5496,6 +5496,55 @@ export default function BreedTree({
             )}
           </defs>
 
+          {/* START-SCREEN MARKER, decoration only. A dashed white ring around
+              the cluster and a dashed line reaching to the level portrait at top
+              left, saying these dogs belong to this level. frozen is exactly the
+              start screen, so it shows here and unmounts the instant the round
+              starts or learn opens, and mounts again on return. It is a SIBLING
+              of the circles group, never a child: zoomTo and the drop-in index
+              circlesRef.current.children by position, so an extra child there
+              would shift every node. Sized with packEnclose over the depth-1
+              circles, the smallest circle that holds the whole cluster, taken
+              from the live packed positions so it follows every difficulty and
+              level re-pack and the start-screen drop. Not nodes[0]: relayoutMobile
+              pins the hidden root to the frame centre, which is not the visible
+              envelope. pointer-events none, and because it unmounts rather than
+              resting at opacity 0 it can never gate content. White only, dash in
+              keeping with the other dashed elements. The portrait lives in
+              LineageModal above this SVG, so the line anchors to a fixed top-left
+              point rather than measuring across components, enough for a mark.
+              The live view is read below, the same access the circles make for
+              their stroke weight: the floor clamp in clampRootView shifts the
+              view's y at runtime, so a constant would misplace the ring on the
+              hard levels where the cluster is pushed up off the floor. */}
+          {/* eslint-disable-next-line react-hooks/refs */}
+          {frozen && (() => {
+            const outer = nodes.filter((d) => d.depth === 1);
+            if (!outer.length) return null;
+            const enc = packEnclose(outer.map((d) => ({ x: d.x, y: d.y, r: d.r })));
+            if (!enc) return null;
+            const v = viewRef.current;
+            const k = SIZE / v[2];
+            const cx = (enc.x - v[0]) * k;
+            const cy = (enc.y - v[1]) * k;
+            const R = enc.r * k * 1.02; // a hair outside the outermost circles
+            const sw = Math.max(2, R * 0.012);
+            const dash = `${R * 0.05} ${R * 0.045}`;
+            // The portrait sits near the top-left corner of the pit; anchor there.
+            const ax = xMin + vbW * 0.07;
+            const ay = -vbH / 2 + vbH * 0.09;
+            const dx = ax - cx, dy = ay - cy;
+            const len = Math.hypot(dx, dy) || 1;
+            const ex = cx + (dx / len) * R;
+            const ey = cy + (dy / len) * R;
+            return (
+              <g pointerEvents="none" aria-hidden="true">
+                <line x1={ax} y1={ay} x2={ex} y2={ey} stroke="#ffffff" strokeWidth={sw} strokeDasharray={dash} strokeLinecap="round" />
+                <circle cx={cx} cy={cy} r={R} fill="none" stroke="#ffffff" strokeWidth={sw} strokeDasharray={dash} />
+              </g>
+            );
+          })()}
+
           {/* Circles and their names are interleaved, one node at a time:
               circle, its label, next circle, its label. They used to be two
               separate groups, all circles then all labels, which put EVERY name
