@@ -2,7 +2,7 @@
 
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { hierarchy, pack, packSiblings, packEnclose, type HierarchyCircularNode } from "d3-hierarchy";
-import { ringFrac } from "../PackPit/LineageMap";
+import { ringFrac, radius as pctRadius } from "../PackPit/LineageMap";
 import { createPitEffects } from "../PackPit/pitEffects";
 import { splitName } from "../PackPit/splitName";
 import { interpolateZoom } from "d3-interpolate";
@@ -4181,13 +4181,18 @@ export default function BreedTree({
         if (!bl) return;
         const w = worldFromPx(sx, sy);
         // A solo dog circle (opts.label) brings its own full radius. A percentage
-        // chip is BADGE_FRAC of the radius it arrived on (opts.r, its learn-layer
-        // size), the same rule as every drop and pop badge, and shows nothing when
-        // that disc would fall under the legibility floor.
+        // chip is sized off the PIT'S dog scale, not the small card chip it arrived
+        // on (opts.r): pitPer is the pit's drawn badge radius per unit of the share
+        // curve, read from the live depth-1 dogs (n.r * kD, viewBox), so a chip of
+        // share s lands at the badge a native pit dog of that share would carry.
+        // All in viewBox units, the same space as chipFloor, so the cutoff compares
+        // like for like; shows nothing only if even that pit-sized disc is under it.
         const chipFloor = badgeFloorVb();
-        const chipSrc = opts?.r ?? 0;
-        const chipBadge = BADGE_FRAC * chipSrc;
-        const rDraw = opts?.label ? chipSrc : chipBadge < chipFloor ? 0 : chipBadge;
+        const shareOf = (n: Node) => (n.parent ? Math.round(((n.value ?? 0) / (n.parent.value || 1)) * 100) : 0);
+        const pitD1 = nodes.filter((n) => n.depth === 1);
+        const pitPer = pitD1.length ? pitD1.reduce((a, n) => a + (n.r * kD) / pctRadius(shareOf(n)), 0) / pitD1.length : 0;
+        const chipBadge = BADGE_FRAC * pitPer * pctRadius(pctVal);
+        const rDraw = opts?.label ? (opts?.r ?? 0) : chipBadge < chipFloor ? 0 : chipBadge;
         // A solo dog circle arrives through this same call carrying a label,
         // and that one is never a bomb: it is a whole breed, not a chip.
         const isBomb = !opts?.label && rollBomb();
