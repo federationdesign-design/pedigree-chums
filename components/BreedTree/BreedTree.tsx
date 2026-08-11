@@ -5533,13 +5533,15 @@ export default function BreedTree({
             const cx = (enc.x - v[0]) * k;
             const cy = (enc.y - v[1]) * k;
             const R = enc.r * k * 1.02; // a hair outside the outermost circles
-            const swRing = Math.max(2, R * 0.012); // ring weight, tune on its own
-            const swLine = Math.max(8, R * 0.048); // line weight, 4x the ring's slope
-            const dash = `${R * 0.05} ${R * 0.045}`; // ring dash, R-derived, left as is
-            // Line dash off its OWN stroke so it scales with the 4x weight. Butt
-            // caps below, not round: round caps at 8px added half the width to
-            // each dash end and closed the gaps into blobs. 2.2 dash, 1.6 gap
-            // reads as a proper dashed line rather than a row of lozenges.
+            const swRing = Math.max(8, R * 0.048); // ring weight, matched to the line
+            const swLine = Math.max(8, R * 0.048); // line weight
+            // Both dashes come off their OWN stroke so they scale with weight, and
+            // both draw with butt caps (the SVG default): round caps at 8px added
+            // half the width to each dash end and closed the gaps into blobs. 2.2
+            // dash, 1.6 gap reads as a proper dashed line rather than lozenges.
+            // Kept as two pairs although identical right now, so ring and line can
+            // still be tuned apart; collapse to one pair if they never diverge.
+            const dashRing = `${swRing * 2.2} ${swRing * 1.6}`;
             const dashLine = `${swLine * 2.2} ${swLine * 1.6}`;
             // The portrait sits near the top-left corner of the pit; anchor there.
             const ax = xMin + vbW * 0.07;
@@ -5551,7 +5553,7 @@ export default function BreedTree({
             return (
               <g pointerEvents="none" aria-hidden="true">
                 <line x1={ax} y1={ay} x2={ex} y2={ey} stroke="#ffffff" strokeWidth={swLine} strokeDasharray={dashLine} />
-                <circle cx={cx} cy={cy} r={R} fill="none" stroke="#ffffff" strokeWidth={swRing} strokeDasharray={dash} />
+                <circle cx={cx} cy={cy} r={R} fill="none" stroke="#ffffff" strokeWidth={swRing} strokeDasharray={dashRing} />
               </g>
             );
           })()}
