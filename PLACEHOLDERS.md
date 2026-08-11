@@ -109,6 +109,24 @@ an image belonging to a different dog. Both are now on their own artwork.
 The other three parents reuse correct existing images (Celtic herdsmen's dogs,
 Roman shepherd dogs, Old British bandogs) and need nothing.
 
+## Borrowed-image repoints (11 August): RESOLVED
+
+Two of the borrowed-image faults from the audit are now on their own artwork.
+
+- **Rough water dogs: RESOLVED (11 August).** Now on
+  `/history/breeds/rough-water-dogs.jpg` (optimised to 63 KB), off the borrowed
+  `water-spaniel-illustration.jpg`. One node occurrence repointed (line 1495, in
+  25 trees). `water-spaniel-illustration.jpg` is now referenced by nothing, and
+  Water spaniels is untouched on its own `original-water-spaniel.jpg`.
+- **Wire Fox Terrier: RESOLVED (11 August).** Now on
+  `/history/breeds/wire-fox-terrier.jpg` (optimised to 86 KB), off the borrowed
+  `fox_terrier-img.jpg`, which is the Fox Terrier's own card art. Two node
+  occurrences repointed (lines 750 and 770, in 3 trees). Fox Terrier keeps
+  `fox_terrier-img.jpg`.
+
+(`barbet.jpg` is on disk for split 3 of the Tudor trail. It has no node yet and
+is deliberately not wired.)
+
 ## Deferred jobs, Tudor trail (logged 10 August, do after the families)
 
 Two known issues found while writing the families. Neither is a placeholder;

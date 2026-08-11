@@ -747,7 +747,7 @@ const LINEAGE: Record<string, LineageNode> = {
     children: [
       { name: "Dandie Dinmont Terrier", note: "Brought in to shorten the leg and add bone.", img: "/history/breeds/dandie-dinmont-terrier-photo.jpeg", value: 35 },
       { name: "West Highland White Terrier", note: "Used to set the white coat that kept it from being mistaken for the quarry.", img: "/history/breeds/West-Highland-White-Terrier.jpg", value: 35 },
-      { name: "Wire Fox Terrier", note: "Added gameness and a sharp working drive. Now endangered.", img: "/history/breeds/fox_terrier-img.jpg", value: 30 }
+      { name: "Wire Fox Terrier", note: "Added gameness and a sharp working drive. Now endangered.", img: "/history/breeds/wire-fox-terrier.jpg", value: 30 }
     ]
   },
 
@@ -767,7 +767,7 @@ const LINEAGE: Record<string, LineageNode> = {
       { name: "Old fell terriers", note: "The hardy black-and-tan working terriers of the northern fells. Now extinct.", img: "/history/breeds/Old-fell-terriers-Patterdale-Terrier-Working-hunt-terriers.jpg", value: 30 },
       { name: "Old wirehaired fell terriers", note: "The wiry-coated strain of fell terrier behind its broken jacket. Now extinct.", img: "/history/breeds/Old-wirehaired-fell-terrier.jpg", value: 20 },
       { name: "Bedlington Terrier", note: "A near neighbour that lent coat and line.", img: "/history/breeds/Bedlington Terrier-photo.jpg", value: 25 },
-      { name: "Wire Fox Terrier", note: "Added smartness and a workmanlike head. Now endangered.", img: "/history/breeds/fox_terrier-img.jpg", value: 25 }
+      { name: "Wire Fox Terrier", note: "Added smartness and a workmanlike head. Now endangered.", img: "/history/breeds/wire-fox-terrier.jpg", value: 25 }
     ]
   },
 
@@ -1492,7 +1492,7 @@ const LINEAGE: Record<string, LineageNode> = {
     children: [
       { name: "Bloodhound", note: "Tracking power and a tremendous nose.", img: "/history/breeds/Medieval-Bloodhound.jpg", value: 45 },
       { name: "Southern Hound", note: "Old deep-voiced scent-hound stock.", img: "/history/breeds/Southern-Hound.jpg", value: 30 },
-      { name: "Rough water dogs", note: "Shaggy, water-loving dogs for the wet work. Now extinct.", img: "/history/breeds/water-spaniel-illustration.jpg", value: 25 }
+      { name: "Rough water dogs", note: "Shaggy, water-loving dogs for the wet work. Now extinct.", img: "/history/breeds/rough-water-dogs.jpg", value: 25 }
     ]
   },
 
