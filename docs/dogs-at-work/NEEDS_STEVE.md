@@ -11,8 +11,7 @@ redirects that to `docs/dogs-at-work/NEEDS_STEVE.md` per the path override.)
 |---|---|---|---|
 | Alt text for article 3 hero (`article3_hero.jpg`) | `app/dogs-at-work/data/slides.ts` (electronic-nose) | `PLACEHOLDER_ARTICLE_3_ALT` | Image is wired; alt outstanding (open question 4). |
 | Alt text for `sheepdogs_job.jpg` | `app/dogs-at-work/data/slides.ts` (sheepdogs) | `PLACEHOLDER_ARTICLE_4_ALT` | Article 4 hero; alt outstanding (section 15). |
-| Panel 1 thumbnail images (3) | `app/dogs-at-work/data/slides.ts` (bio-detection panel) | WIRED: `/dog_working_img1..3.jpg` | Steve supplied the images (11 Aug); order is game, then job, then payment, mirroring the concept. |
-| Panel 1 thumbnail alt text (3) | same | `PLACEHOLDER_PANEL1_THUMB_1..3_ALT` | Alt strings still outstanding; images now render (section 6). |
+| Panel 1 thumbnail images (3) | `app/dogs-at-work/data/slides.ts` (bio-detection panel) | WIRED: `/dog_working_img1..3.jpg`, alt text supplied (11 Aug) | Order is game, then job, then payment, mirroring the concept. |
 
 ## Decisions carried into the build (open questions, section 18)
 

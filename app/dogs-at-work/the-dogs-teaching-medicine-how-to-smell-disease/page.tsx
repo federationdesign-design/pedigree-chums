@@ -5,6 +5,8 @@ import Nav from "../../../components/Nav/Nav";
 import Footer from "../../../components/Footer/Footer";
 import HeroHat from "./HeroHat";
 import styles from "../dogs-at-work.module.css";
+import Payslip from "../../../components/Payslip/Payslip";
+import { PAYSLIPS } from "../data/payslips";
 
 export const metadata: Metadata = {
   title: "The Dogs Teaching Medicine How to Smell Disease | Dogs at Work | Pedigree Chums™",
@@ -81,6 +83,9 @@ export default function BioDetectionPage() {
           </article>
 
           <aside className={styles.sidebar}>
+            {/* The payslip (brief v3.0 section 13 + Appendix C) */}
+            <Payslip data={PAYSLIPS["the-dogs-teaching-medicine-how-to-smell-disease"]} />
+
             {/* The honest version */}
             <div className={styles.sidebarCard}>
               <div style={{ padding: "16px 20px 12px" }}>

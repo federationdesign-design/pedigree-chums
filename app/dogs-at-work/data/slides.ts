@@ -15,9 +15,6 @@ import { validateSlides } from "./validate";
 
 // Clearly named placeholders for inputs Steve still owes. Logged in
 // PLACEHOLDERS.md and docs/dogs-at-work/NEEDS_STEVE.md. Never invent these.
-const PLACEHOLDER_PANEL1_THUMB_1_ALT = "PLACEHOLDER: alt text for panel 1 thumbnail 1 (sheepdog working sheep), outstanding from Steve";
-const PLACEHOLDER_PANEL1_THUMB_2_ALT = "PLACEHOLDER: alt text for panel 1 thumbnail 2 (shepherd watching a flock on a hillside), outstanding from Steve";
-const PLACEHOLDER_PANEL1_THUMB_3_ALT = "PLACEHOLDER: alt text for panel 1 thumbnail 3 (British banknotes and coins), outstanding from Steve";
 const PLACEHOLDER_ARTICLE_3_ALT = "PLACEHOLDER: alt text for article 3 hero, outstanding from Steve";
 const PLACEHOLDER_ARTICLE_4_ALT = "PLACEHOLDER: alt text for sheepdogs_job.jpg, outstanding from Steve";
 
@@ -36,17 +33,17 @@ export const SLIDES: Slide[] = [
         {
           subheading: "To the dog; *it's a game.*",
           body: `Working dogs do not know they have jobs. To a sheepdog, moving livestock is instinct, training and the best game in the world. To a detection dog, finding the scent is a puzzle with a reward at the end. To a medical alert dog, noticing that their human smells wrong is not a shift pattern. It is just what they do.`,
-          thumbnail: { src: "/dog_working_img1.jpg", alt: PLACEHOLDER_PANEL1_THUMB_1_ALT },
+          thumbnail: { src: "/dog_working_img1.jpg", alt: "a working sheepdog moving sheep across a field" },
         },
         {
           subheading: "*To humans,* it's a job.",
           body: `It only becomes work when humans benefit from it. This series looks at the dogs that help Britain function — the noses at the border, the paws on the hills, the search dogs in the woods, the assistance dogs beside their people, and the bio-detection dogs helping scientists ask whether disease has a smell.`,
-          thumbnail: { src: "/dog_working_img2.jpg", alt: PLACEHOLDER_PANEL1_THUMB_2_ALT },
+          thumbnail: { src: "/dog_working_img2.jpg", alt: "a shepherd watching over a flock" },
         },
         {
           subheading: "The payment; *very different*",
           body: `They are paid in food, shelter, praise, tennis balls, head strokes and the occasional stolen sausage. But their value is measured in time, safety, independence, science and trust. This is about that hidden workforce, and the question behind every wagging tail: if dogs give us this much, what do we owe them back?`,
-          thumbnail: { src: "/dog_working_img3.jpg", alt: PLACEHOLDER_PANEL1_THUMB_3_ALT },
+          thumbnail: { src: "/dog_working_img3.jpg", alt: "banknotes and coins" },
         },
       ],
     },

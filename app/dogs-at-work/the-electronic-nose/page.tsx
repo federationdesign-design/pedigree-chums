@@ -4,6 +4,8 @@ import Link from "next/link";
 import Nav from "../../../components/Nav/Nav";
 import Footer from "../../../components/Footer/Footer";
 import styles from "../dogs-at-work.module.css";
+import Payslip from "../../../components/Payslip/Payslip";
+import { PAYSLIPS } from "../data/payslips";
 
 export const metadata: Metadata = {
   title: "The Electronic Nose: The Machine That May Owe Dogs a Biscuit | Dogs at Work | Pedigree Chums™",
@@ -77,6 +79,9 @@ export default function ElectronicNosePage() {
           </article>
 
           <aside className={styles.sidebar}>
+            {/* The payslip (brief v3.0 section 13 + Appendix C) */}
+            <Payslip data={PAYSLIPS["the-electronic-nose"]} />
+
             {/* The honest version */}
             <div className={styles.sidebarCard}>
               <div style={{ padding: "16px 20px 16px" }}>

@@ -4,6 +4,8 @@ import Link from "next/link";
 import Nav from "../../../components/Nav/Nav";
 import Footer from "../../../components/Footer/Footer";
 import styles from "../dogs-at-work.module.css";
+import Payslip from "../../../components/Payslip/Payslip";
+import { PAYSLIPS } from "../data/payslips";
 
 export const metadata: Metadata = {
   title: "The Colleague Who Never Clocks Off | Dogs at Work | Pedigree Chums™",
@@ -52,16 +54,6 @@ const BODY: (string | { h: string })[] = [
 const cardTitle: React.CSSProperties = { fontFamily: "var(--font-display)", fontSize: "24px", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: "0 0 6px" };
 const cardBody: React.CSSProperties = { fontFamily: "var(--font-body)", fontSize: "0.92rem", fontWeight: 500, color: "#fff", lineHeight: 1.5, margin: 0 };
 
-const PAYSLIP: [string, string][] = [
-  ["Name", "Bramble"],
-  ["Job title", "Blood-sugar bodyguard"],
-  ["Department", "Medical alert"],
-  ["Shift pattern", "24/7 — whenever the human smells suspicious"],
-  ["Paid in", "Dinner, praise, walkies, head strokes"],
-  ["Bonus scheme", "Emergency sausage clause"],
-  ["Retirement", "Sofa, blanket, full honours"],
-];
-
 export default function AlertDogPage() {
   return (
     <>
@@ -100,21 +92,10 @@ export default function AlertDogPage() {
               </div>
             </div>
 
-            {/* The payslip */}
-            <div className={styles.sidebarCard}>
-              <div style={{ padding: "16px 20px 8px" }}>
-                <p style={cardTitle}>The payslip</p>
-              </div>
-              <div style={{ padding: "0 20px 16px", display: "flex", flexDirection: "column", gap: 9 }}>
-                {PAYSLIP.map(([k, v]) => (
-                  <div key={k} style={{ display: "flex", justifyContent: "space-between", gap: 12, borderBottom: "1px solid rgba(255,255,255,0.08)", paddingBottom: 8 }}>
-                    <span style={{ fontFamily: "var(--font-body)", fontSize: "0.68rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--yellow)", flexShrink: 0 }}>{k}</span>
-                    <span style={{ fontFamily: "var(--font-body)", fontSize: "0.82rem", fontWeight: 600, color: "#fff", textAlign: "right" }}>{v}</span>
-                  </div>
-                ))}
-                <p style={{ ...cardBody, fontSize: "0.78rem", color: "#aac4d4", marginTop: 2 }}>Signed, one very good boy.</p>
-              </div>
-            </div>
+            {/* The payslip (brief v3.0 section 13 + Appendix C). Replaces the
+                earlier nine-field payslip, including the retired Name and Bonus
+                scheme fields. */}
+            <Payslip data={PAYSLIPS["the-colleague-who-never-clocks-off"]} />
 
             {/* What the dog thinks */}
             <div className={styles.sidebarCard}>
