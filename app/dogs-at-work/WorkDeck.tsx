@@ -2,7 +2,7 @@
 
 // The Dogs at Work mechanic (brief v3.0, section 6, checkpoints 3 and 4).
 //
-// One component, two layouts driven by a single slide index:
+// One component, two layouts driven by a single position:
 //
 // Desktop (>=769px): three stacked regions. The introduction is persistent. The
 // blue panel and the article panel change together on navigation but move in
@@ -18,10 +18,21 @@
 // image, dark article block. Because the pager sits above the image, advancing
 // scrolls the new blue panel to the top so its copy is not left off-screen above.
 //
-// Only the current frame is interactive; off-screen desktop frames are `inert`.
-// Dots are the primary navigation and the only route back, because the artwork
-// gives a forward chevron only. Left and right arrow keys page the desktop deck
-// while it is focused. Reduced motion is honoured in CSS.
+// The deck LOOPS end to end: advancing past the last frame returns to the first
+// and going back from the first goes to the last, in both directions, without a
+// rewind. The counter-motion tracks are single translate strips, so a naive wrap
+// (index n-1 -> 0) would animate the whole strip backwards across every frame. To
+// keep the wrap moving the same way as an ordinary step, each strip carries a clone
+// of the first frame appended and the last frame prepended: a wrap animates INTO
+// the clone (continuous motion), then, on transitionend, the position snaps without
+// transition to the identical real frame. The clone and the real frame show the
+// same content, so the snap is invisible. A timer backstops the snap where
+// transitionend never fires (the hidden track on mobile, reduced motion).
+//
+// Only the current frame is interactive; off-screen frames and both clones are
+// `inert`. Dots are the primary navigation and the only route back. Left and right
+// arrow keys page the desktop deck while it is focused. Reduced motion is honoured
+// in CSS (no transition) and here (an instant wrap, skipping the clone animation).
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
@@ -139,24 +150,113 @@ const DRAG_SLOP = 10;
 // page. The pointer-drag path above never sees a trackpad swipe: macOS Safari
 // delivers it as a horizontal wheel and turns it into back/forward navigation.
 const WHEEL_THRESHOLD = 60;
+// Must match the .blueTrack / .articleTrack transition duration in the CSS module.
+// Used to backstop the wrap snap where transitionend cannot fire (a display:none
+// track on mobile, or reduced motion). A small buffer past the transition.
+const TRANSITION_MS = 620;
 
 export default function WorkDeck({ slides }: { slides: Slide[] }) {
-  const [index, setIndex] = useState(0);
+  const count = slides.length;
+
+  // The deck position. In steady state `pos` is 0..count-1. During a wrap it
+  // takes a transient out-of-range value (count for a forward wrap, -1 for a
+  // backward wrap) so the strip animates into a clone frame; it is then snapped
+  // back to the real frame. `current` is the real slide on screen, valid even
+  // mid-wrap (count % count === 0, and -1 maps to count-1).
+  const [pos, setPos] = useState(0);
+  const current = ((pos % count) + count) % count;
+
+  // True for the single frame after a wrap: the strip is repositioned from the
+  // clone to the identical real frame with the transition suppressed, so the jump
+  // is invisible. Cleared on the next frame to restore the transition.
+  const [instant, setInstant] = useState(false);
+
   const rootRef = useRef<HTMLDivElement>(null);
   const mBlueRef = useRef<HTMLDivElement>(null);
   const articleViewportRef = useRef<HTMLDivElement>(null);
   const mSwipeRef = useRef<HTMLDivElement>(null);
   const didMount = useRef(false);
-  const count = slides.length;
+  // The real frame a pending wrap snaps to (null when no wrap is in flight). Also
+  // the input lock: while a wrap animates, further paging is ignored.
+  const wrapTarget = useRef<number | null>(null);
+  const snapTimer = useRef<number | undefined>(undefined);
+  // A stable handle to the latest step(), so the once-attached wheel listener
+  // always calls the current closure.
+  const stepRef = useRef<(dir: number) => void>(() => {});
 
-  // Drive the desktop filmstrip transforms from a single index custom property.
+  function prefersReducedMotion() {
+    return (
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    );
+  }
+
+  // End a wrap: snap (without transition) from the clone to the identical real
+  // frame. Called by the track's transitionend and by the timer backstop; guarded
+  // so the second caller is a no-op.
+  function finishWrap() {
+    const target = wrapTarget.current;
+    if (target === null) return;
+    wrapTarget.current = null;
+    if (snapTimer.current) window.clearTimeout(snapTimer.current);
+    setInstant(true);
+    setPos(target);
+  }
+
+  // Page by one, wrapping at both ends. dir > 0 advances, dir < 0 goes back.
+  function step(dir: number) {
+    if (wrapTarget.current !== null) return; // a wrap is animating: ignore input
+    const from = current;
+    if (dir > 0 && from === count - 1) {
+      if (prefersReducedMotion()) {
+        setPos(0);
+        return;
+      }
+      wrapTarget.current = 0;
+      setPos(count); // animate forward into the appended clone (shows slide 0)
+      snapTimer.current = window.setTimeout(finishWrap, TRANSITION_MS + 80);
+    } else if (dir < 0 && from === 0) {
+      if (prefersReducedMotion()) {
+        setPos(count - 1);
+        return;
+      }
+      wrapTarget.current = count - 1;
+      setPos(-1); // animate back into the prepended clone (shows the last slide)
+      snapTimer.current = window.setTimeout(finishWrap, TRANSITION_MS + 80);
+    } else {
+      setPos(from + dir);
+    }
+  }
+  stepRef.current = step;
+
+  // Jump straight to a slide (dots). Ignored mid-wrap so pos stays well-defined.
+  function goTo(to: number) {
+    if (wrapTarget.current !== null) return;
+    setPos(to);
+  }
+
+  // Drive the desktop filmstrip transforms from the position custom property.
   // Setting it via the ref keeps all visual rules in the CSS module.
   useEffect(() => {
     const el = rootRef.current;
     if (!el) return;
-    el.style.setProperty("--i", String(index));
+    el.style.setProperty("--i", String(pos));
     el.style.setProperty("--n", String(count));
-  }, [index, count]);
+  }, [pos, count]);
+
+  // Restore the transition the frame after an instant snap. Two rAFs so the
+  // no-transition position is painted before the transition is re-enabled.
+  useEffect(() => {
+    if (!instant) return;
+    let inner = 0;
+    const outer = requestAnimationFrame(() => {
+      inner = requestAnimationFrame(() => setInstant(false));
+    });
+    return () => {
+      cancelAnimationFrame(outer);
+      if (inner) cancelAnimationFrame(inner);
+    };
+  }, [instant]);
 
   // Mobile only: on navigation the pager sits above the image, so bring the new
   // blue panel to the top rather than leaving its copy scrolled off above. Skips
@@ -172,7 +272,7 @@ export default function WorkDeck({ slides }: { slides: Slide[] }) {
     if (!el) return;
     const top = el.getBoundingClientRect().top + window.scrollY - 84; // clear the nav
     window.scrollTo({ top, behavior: "smooth" });
-  }, [index]);
+  }, [current]);
 
   // Trackpad / horizontal-wheel paging. The pointer handler catches press-drags and
   // touchscreen swipes, but not a macOS trackpad two-finger swipe: Safari delivers
@@ -182,7 +282,7 @@ export default function WorkDeck({ slides }: { slides: Slide[] }) {
   // delta and preventDefault so the browser cannot navigate. A non-passive listener
   // is required for preventDefault to take effect; React's onWheel is passive, so it
   // is attached natively. A short idle lock keeps one continuous swipe (including its
-  // momentum tail) to a single slide change.
+  // momentum tail) to a single slide change. It pages through step(), so it wraps.
   useEffect(() => {
     const zones = [articleViewportRef.current, mSwipeRef.current].filter(Boolean) as HTMLElement[];
     let locked = false;
@@ -202,7 +302,7 @@ export default function WorkDeck({ slides }: { slides: Slide[] }) {
       const dir = accum > 0 ? 1 : -1; // swipe left (deltaX > 0) advances, matching the drag
       locked = true;
       accum = 0;
-      setIndex((i) => Math.max(0, Math.min(count - 1, i + dir)));
+      stepRef.current(dir);
     }
     for (const z of zones) z.addEventListener("wheel", onWheel, { passive: false });
     return () => {
@@ -211,29 +311,22 @@ export default function WorkDeck({ slides }: { slides: Slide[] }) {
     };
   }, [count]);
 
-  function go(to: number) {
-    setIndex((i) => {
-      const next = Math.max(0, Math.min(count - 1, to));
-      return next === i ? i : next;
-    });
-  }
-
   function onKeyDown(e: React.KeyboardEvent<HTMLDivElement>) {
     if (e.key === "ArrowRight") {
       e.preventDefault();
-      go(index + 1);
+      step(1);
     } else if (e.key === "ArrowLeft") {
       e.preventDefault();
-      go(index - 1);
+      step(-1);
     }
   }
 
   // One pointer handler for touch, trackpad and mouse (Pointer Events unify them,
-  // so there is no separate touch/mouse code). It navigates via go(), exactly as
-  // the dots, chevron and arrow keys do, so the desktop counter-motion and
-  // prefers-reduced-motion (both expressed in the CSS track transitions) are reused
-  // unchanged. The move/end listeners live on window per-gesture, so a release that
-  // strays outside the panel is still caught, and they are removed when it ends.
+  // so there is no separate touch/mouse code). It pages via step(), exactly as the
+  // dots, chevron, arrow keys and wheel do, so the desktop counter-motion, the loop
+  // wrap and prefers-reduced-motion are all reused unchanged. The move/end listeners
+  // live on window per-gesture, so a release that strays outside the panel is still
+  // caught, and they are removed when it ends.
   const suppressClick = useRef(false);
 
   function onPointerDown(e: React.PointerEvent<HTMLDivElement>) {
@@ -277,7 +370,7 @@ export default function WorkDeck({ slides }: { slides: Slide[] }) {
         Math.abs(dx) >= SWIPE_THRESHOLD &&
         Math.abs(dx) > Math.abs(dy)
       ) {
-        go(index + (dx < 0 ? 1 : -1));
+        step(dx < 0 ? 1 : -1);
       }
     };
     window.addEventListener("pointermove", move);
@@ -295,9 +388,29 @@ export default function WorkDeck({ slides }: { slides: Slide[] }) {
     }
   }
 
-  const atEnd = index >= count - 1;
+  // Blue track frames, plus a clone of the last slide prepended and the first
+  // appended, so a wrap animates into a clone rather than rewinding. Real frame k
+  // sits at DOM position k+1; the transform reads (--i + 1) to account for it.
+  const blueFrames = [
+    { key: "clone-pre", slide: slides[count - 1], i: count - 1, clone: true },
+    ...slides.map((slide, i) => ({ key: slide.id, slide, i, clone: false })),
+    { key: "clone-post", slide: slides[0], i: 0, clone: true },
+  ];
 
-  // Shared controls: the pager (dots) and the forward chevron.
+  // Article track frames, rendered in reverse for the counter-motion, with the
+  // mirrored clones: the first slide prepended and the last appended. The transform
+  // reads (--i - --n) to account for the prepended clone.
+  const reversed = slides.map((_, revI) => {
+    const i = count - 1 - revI;
+    return { slide: slides[i], i };
+  });
+  const articleFrames = [
+    { key: "clone-pre", slide: slides[0], i: 0, clone: true },
+    ...reversed.map((f) => ({ key: f.slide.id, slide: f.slide, i: f.i, clone: false })),
+    { key: "clone-post", slide: slides[count - 1], i: count - 1, clone: true },
+  ];
+
+  // Shared controls: the pager (dots, one per panel) and the forward chevron.
   const dots = (
     <div className={styles.pager} role="group" aria-label="Choose a dog">
       {slides.map((slide, i) => (
@@ -306,8 +419,8 @@ export default function WorkDeck({ slides }: { slides: Slide[] }) {
           key={slide.id}
           className={styles.dot}
           aria-label={`${slide.article.subLabel}, ${i + 1} of ${count}`}
-          aria-current={i === index ? "true" : undefined}
-          onClick={() => go(i)}
+          aria-current={i === current ? "true" : undefined}
+          onClick={() => goTo(i)}
         />
       ))}
     </div>
@@ -326,7 +439,9 @@ export default function WorkDeck({ slides }: { slides: Slide[] }) {
     </svg>
   );
 
-  const mobileSlide = slides[index];
+  const trackClass = (base: string) => (instant ? `${base} ${styles.instant}` : base);
+
+  const mobileSlide = slides[current];
   const mA = mobileSlide.article;
 
   return (
@@ -352,17 +467,25 @@ export default function WorkDeck({ slides }: { slides: Slide[] }) {
           <GlowPanel className={styles.blueGlow}>
             <Triangles items={blueTriangles} z={0} />
             <div className={styles.blueViewport}>
-              <div className={styles.blueTrack}>
-                {slides.map((slide, i) => (
-                  <article
-                    key={slide.id}
-                    className={styles.blueSlide}
-                    inert={i !== index}
-                    aria-hidden={i !== index}
-                  >
-                    <Sections slide={slide} withThumbnails indent={slide.order === 4} />
-                  </article>
-                ))}
+              <div
+                className={trackClass(styles.blueTrack)}
+                onTransitionEnd={(e) => {
+                  if (e.target === e.currentTarget && e.propertyName === "transform") finishWrap();
+                }}
+              >
+                {blueFrames.map((f) => {
+                  const on = !f.clone && f.i === current;
+                  return (
+                    <article
+                      key={f.key}
+                      className={styles.blueSlide}
+                      inert={!on}
+                      aria-hidden={!on}
+                    >
+                      <Sections slide={f.slide} withThumbnails indent={f.slide.order === 4} />
+                    </article>
+                  );
+                })}
               </div>
             </div>
           </GlowPanel>
@@ -370,8 +493,7 @@ export default function WorkDeck({ slides }: { slides: Slide[] }) {
           <button
             type="button"
             className={styles.chevron}
-            onClick={() => go(index + 1)}
-            disabled={atEnd}
+            onClick={() => step(1)}
             aria-label="Next dog"
           >
             {chevronSvg}
@@ -388,18 +510,16 @@ export default function WorkDeck({ slides }: { slides: Slide[] }) {
           onPointerDown={onPointerDown}
           onClickCapture={onClickCapture}
         >
-          <div className={styles.articleTrack}>
-            {slides.map((_, revI) => {
-              const i = count - 1 - revI;
-              const slide = slides[i];
-              const a = slide.article;
-              const current = i === index;
+          <div className={trackClass(styles.articleTrack)}>
+            {articleFrames.map((f) => {
+              const a = f.slide.article;
+              const on = !f.clone && f.i === current;
               return (
                 <div
-                  key={slide.id}
+                  key={f.key}
                   className={styles.articleSlide}
-                  inert={!current}
-                  aria-hidden={!current}
+                  inert={!on}
+                  aria-hidden={!on}
                 >
                   <div className={styles.articleImgWrap}>
                     {/* Item 10: image links to the article (same destination as the
@@ -408,7 +528,7 @@ export default function WorkDeck({ slides }: { slides: Slide[] }) {
                       href={a.href}
                       className={styles.articleImgLink}
                       aria-label={`Read: ${a.headline}`}
-                      tabIndex={current ? undefined : -1}
+                      tabIndex={on ? undefined : -1}
                       draggable={false}
                     >
                       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -416,7 +536,7 @@ export default function WorkDeck({ slides }: { slides: Slide[] }) {
                         className={styles.articleImg}
                         src={a.image}
                         alt={a.imageAlt}
-                        loading={current ? "eager" : "lazy"}
+                        loading={on ? "eager" : "lazy"}
                         draggable={false}
                       />
                     </Link>
@@ -436,7 +556,7 @@ export default function WorkDeck({ slides }: { slides: Slide[] }) {
                     <Link
                       href={a.href}
                       className={styles.cta}
-                      tabIndex={current ? undefined : -1}
+                      tabIndex={on ? undefined : -1}
                       draggable={false}
                     >
                       {a.ctaLabel}
@@ -449,7 +569,7 @@ export default function WorkDeck({ slides }: { slides: Slide[] }) {
         </div>
 
         <p className={styles.srStatus} aria-live="polite">
-          {slides[index].article.subLabel}, {index + 1} of {count}
+          {slides[current].article.subLabel}, {current + 1} of {count}
         </p>
       </section>
 
@@ -480,8 +600,7 @@ export default function WorkDeck({ slides }: { slides: Slide[] }) {
           <button
             type="button"
             className={styles.mChevron}
-            onClick={() => go(index + 1)}
-            disabled={atEnd}
+            onClick={() => step(1)}
             aria-label="Next dog"
           >
             {chevronSvg}
@@ -523,7 +642,7 @@ export default function WorkDeck({ slides }: { slides: Slide[] }) {
         </div>
 
         <p className={styles.srStatus} aria-live="polite">
-          {mA.subLabel}, {index + 1} of {count}
+          {mA.subLabel}, {current + 1} of {count}
         </p>
       </section>
     </>
