@@ -3413,7 +3413,7 @@ export default function BreedTree({
       // rectangles and settle fine, so they keep CIRCLE_OPTS. Starting values, one
       // place to tune.
       const FREED_CIRCLE_OPTS = { restitution: 0.35, friction: 0.5, frictionStatic: 1.0, frictionAir: 0.015, density: 0.001 };
-      const BADGE_OPTS = { restitution: 0.48, friction: 0.1, frictionAir: 0.01, density: 0.001 };
+      const BADGE_OPTS = { restitution: 0.65, friction: 0.1, frictionAir: 0.01, density: 0.001 };
       const mkCircle = (b: Body, kind: string, opts: any) => {
         const p = pxFromWorld(b.x, b.y);
         const mb = Bodies.circle(p.x, p.y, Math.max(2, b.r * pxPerWorld), opts);
