@@ -12,6 +12,7 @@ import {
   isNoSubjectFallback, ingest, onProtected, rankedItems, loadStore, saveStore, emptyStore,
   newSessionState, GapStore, SessionState,
 } from './gap-log';
+import { applyProtection } from './session-protection';
 
 function csvCell(v: string | number): string {
   const s = String(v);
@@ -45,11 +46,13 @@ export default function GapLog() {
     const onTurn = (e: TurnEvent) => {
       const store = storeRef.current;
       const sess = sessionState(e.sessionId);
-      // A session that became -- or was ever -- protected: discard the text it wrote, keep the counts, and
-      // log nothing further from it. (The disclosure turn is a safety turn, not a fallback, so this is how
-      // the gap-log learns a session went protected.)
-      if (e.protectedState) {
-        if (!sess.over) {
+      // Session protection is the shared rule (session-protection.ts, reused by Task 171 sheet-sync): a
+      // protectedState turn latches the session; the FIRST time it does, discard the text it wrote (keep the
+      // counts) and log nothing further. (The disclosure turn is a safety turn, not a fallback, so this is
+      // how the gap-log learns a session went protected.)
+      const p = applyProtection(sess, e);
+      if (p !== 'clean') {
+        if (p === 'just-protected') {
           onProtected(store, sess);
           saveStore(store).then(refresh);
         }

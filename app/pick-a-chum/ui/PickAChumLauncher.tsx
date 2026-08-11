@@ -17,6 +17,7 @@ import DevRecorder from '../dev/DevRecorder';
 // Task 163: the gap-log. OFF by default (renders null unless ?gaplog=1); collects only the unanswerable
 // no-subject fallback, holding nothing about any child. See dev/gap-log.ts for the controls and caveat.
 import GapLog from '../dev/GapLog';
+import SheetSync from '../dev/SheetSync';
 // Task 148: the Terrier's job. Type-only import (erased) keeps the heavy experience code-split; the
 // helper + registry + page-bios are lightweight (no chatbot engine), so the launcher stays cheap.
 import type { AutoAppear } from './PickAChumExperience';
@@ -392,6 +393,9 @@ export default function PickAChumLauncher() {
       <DevRecorder />
       {/* GAP-LOG (Task 163): renders null unless the ?gaplog=1 flag is on; off by default everywhere. */}
       <GapLog />
+      {/* SHEET-SYNC (Task 171): headless. Buffers and posts tester transcripts ONLY when ?rec=1 AND the
+          runtime Edge Config switch is enabled; off by default everywhere, and renders nothing. */}
+      <SheetSync />
     </>
   );
 }

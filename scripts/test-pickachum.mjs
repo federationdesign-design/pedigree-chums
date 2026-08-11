@@ -44,6 +44,8 @@ const { skipTheatre, buildTypingPlan, TYPING_PROFILES, THEATRE_MAX_MS, isTypoEli
 const { buildRow, buildProtectedMarker, buildAppearanceRow, enrichRows, detectRephrase, buildSessions, isLaugh } = await import(pathToFileURL(join(ROOT, 'app/pick-a-chum/dev/recorder-store.ts')).href);
 const { isNoSubjectFallback, redact, ingest, onProtected, rankedItems, emptyStore, newSessionState } = await import(pathToFileURL(join(ROOT, 'app/pick-a-chum/dev/gap-log.ts')).href);
 const { recorderEnabled, fetchSheetSyncEnabled } = await import(pathToFileURL(join(ROOT, 'app/pick-a-chum/lib/turn-tap.ts')).href);
+const { applyProtection, newGuard } = await import(pathToFileURL(join(ROOT, 'app/pick-a-chum/dev/session-protection.ts')).href);
+const { SyncBuffer } = await import(pathToFileURL(join(ROOT, 'app/pick-a-chum/dev/sheet-sync-buffer.ts')).href);
 const { SAFETY_TRIGGER_PHRASES } = await import(pathToFileURL(join(LIB, 'safety.ts')).href);
 
 let pass = 0;
@@ -1309,6 +1311,41 @@ await (async () => {
   }
   ok ? pass++ : fail++;
   rows.push({ ok, input: 'task171: sheet-sync off unless ?rec=1 AND runtime config enabled', layer: '-', bucket: '-', action: 'sheetsync', note: ok ? '' : note });
+})();
+
+// ---- Task 171 (Section 4): the SHARED session-protection rule. A protectedState turn latches the session
+// for good; it can never un-protect. The same rule the gap log uses. ----
+(() => {
+  const g = newGuard();
+  const clean = applyProtection(g, { protectedState: null }) === 'clean' && g.over === false;
+  const just = applyProtection(g, { protectedState: 'active' }) === 'just-protected' && g.over === true;
+  const latched = applyProtection(g, { protectedState: null }) === 'protected'; // a later clean turn stays protected
+  const stillLatched = applyProtection(g, { protectedState: 'active' }) === 'protected';
+  const ok = clean && just && latched && stillLatched;
+  ok ? pass++ : fail++;
+  rows.push({ ok, input: 'task171: applyProtection latches a session on protectedState (shared rule)', layer: '-', bucket: '-', action: 'protection', note: ok ? '' : `clean=${clean} just=${just} latched=${latched} stillLatched=${stillLatched}` });
+})();
+
+// ---- Task 171 (Section 4): the sender buffer never posts a protected session, and drops its EARLIER turns
+// too; a clean session flushes when the next session starts. ----
+(() => {
+  const turn = (sessionId, t, protectedState) => ({ sessionId, turn: t, activeDog: 'collie', input: 'x', trigger: 'reply', resolution: {}, response: {}, protectedState: protectedState ?? null });
+  const b = new SyncBuffer();
+  b.onTurn(turn('A', 1), 't1');
+  b.onTurn(turn('A', 2), 't2');
+  b.onTurn(turn('A', 3), 't3');
+  const r4 = b.onTurn(turn('A', 4, 'active'), 't4'); // disclosure: drop the WHOLE buffer (1-3 included) + latch
+  b.onTurn(turn('A', 5), 't5'); // latched: not buffered
+  const droppedAndLatched = b.take('A') === null && r4.completed === null;
+
+  const b2 = new SyncBuffer();
+  b2.onTurn(turn('B', 1), 't1');
+  b2.onTurn(turn('B', 2), 't2');
+  const sw = b2.onTurn(turn('C', 1), 't3'); // switching to C completes B
+  const bBuf = b2.take('B');
+  const ok = droppedAndLatched && sw.completed === 'B' && !!bBuf && bBuf.length === 2 && b2.currentSession() === 'C';
+  ok ? pass++ : fail++;
+  rows.push({ ok, input: 'task171: sender buffer drops a protected session (earlier turns too), flushes clean on switch', layer: '-', bucket: '-', action: 'syncbuffer', note: ok ? '' : `droppedAndLatched=${droppedAndLatched} completed=${sw.completed} bBuf=${bBuf && bBuf.length} cur=${b2.currentSession()}` });
 })();
 
 // ---- Fix 5a: the meaningless B05 "located the correct Chum" line is removed ----
