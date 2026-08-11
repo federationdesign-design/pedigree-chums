@@ -66,7 +66,7 @@ const CARDS: ArticleCard[] = [
       <div className={styles.sidebarCard}>
         <div style={{ padding: "16px 20px 16px" }}>
           <p style={cardTitle}>Editor&apos;s note</p>
-          <p style={{ ...cardBody, fontStyle: "italic" }}>Bramble and Sarah are real. This account reflects their partnership at the time of writing.</p>
+          <p style={{ ...cardBody, fontStyle: "italic" }}>&quot;Bramble&quot; and &quot;Sarah&quot; are illustrative while we finalise a real, currently-working alert dog to feature — with the organisation&apos;s and owner&apos;s permission.</p>
         </div>
       </div>
     ),

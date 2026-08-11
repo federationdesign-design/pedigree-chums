@@ -10,9 +10,8 @@ and not applied.
 | # | Where | Before | After | Basis |
 |---|---|---|---|---|
 | 1 | `app/dogs-at-work/the-electronic-nose/page.tsx` (hero sub-label pill, line ~204) | `The machine the dogs built` | `Bio-detection dogs` | Section 11: the sub-label names a kind of working dog, not an editorial phrase. The index card was corrected at checkpoint 5, but the article-page hero pill was missed; section 14 licenses label corrections across all four articles. |
-| 2 | Body copy of articles 1 to 3 and `slides.ts` (deks) | ` -- ` (literal double hyphen, rendered as "--") | ` — ` (em dash, one space each side) | Steve's instruction (11 Aug). 52 conversions in total, all pure `--`->`—`: article 1 = 17, article 2 = 13, article 3 = 20, slide record = 2. A git word-diff confirmed every change is only the dash token; the words and the space either side are unchanged, so the em-dash spacing matches the sidebar cards. **One occurrence held**: article 2's editor's note (line 69), because that note is on hold under escalation 1. |
+| 2 | Body copy of articles 1 to 3 and `slides.ts` (deks) | ` -- ` (literal double hyphen, rendered as "--") | ` — ` (em dash, one space each side) | Steve's instruction (11 Aug). The sweep converted 52 occurrences, all pure `--`->`—`: article 1 = 17, article 2 = 13, article 3 = 20, slide record = 2. A git word-diff confirmed every change is only the dash token; the words and the space either side are unchanged. One occurrence was held at the time (article 2's editor's note, line 69); when that note was later restored to its original wording (escalation 1 below), its single `--` was converted to ` — ` as the only change to that line. So **53 occurrences total are now em dashes and none remain held**. |
 | 3 | `the-electronic-nose/page.tsx` metadata `title` (line 12) and `<h1>` (line 206) | `The Electronic Nose: The Machine That May Owe Dogs a Biscuit` | `The Machine That May Owe Dogs a Biscuit` | Steve's instruction (11 Aug). Section 11 retired the prefix for the display title; card and page now read the same. The URL slug (`the-electronic-nose`) is left unchanged. |
-| 4 | `the-colleague-who-never-clocks-off/page.tsx` editor's note (line 69) | `"Bramble" and "Sarah" are illustrative while we finalise a real, currently-working alert dog to feature -- with the organisation's and owner's permission.` | `Bramble and Sarah are real. This account reflects their partnership at the time of writing.` | Steve's decision (11 Aug): Bramble, Graham and Sarah are real people and a real dog, so the identity caveat ("illustrative") was wrong; replaced with a currency caveat. This also clears the one held `--` (the old wording no longer exists). |
 
 ### Already applied in earlier checkpoints (confirmed correct, no new edit)
 
@@ -30,20 +29,22 @@ and not applied.
 (escalation 2) and the article 3 title reconciliation (escalation 3) are now
 recorded in the change log above (rows 2 and 3).
 
-**Resolved 11 Aug 2026: editor's note replaced (change-log row 4).** Steve
-confirmed Bramble, Graham and Sarah are real, so the "illustrative" identity
-caveat was wrong. It is now a currency caveat: "Bramble and Sarah are real. This
-account reflects their partnership at the time of writing." That clears the one
-held `--` as well.
+**Escalation 1: OPEN and unresolved. Steve's decision (11 Aug): the note is
+Steve's to change, not the build's.** The build briefly reworded the note to a
+currency caveat; that change was reverted (`git revert` of the note commit) and
+the article 2 editor's note is restored to its original wording. The only change
+to the restored line is the ` -- ` -> ` — ` conversion, so no double hyphens
+remain. The note stands as written; any change to its wording is Steve's, not the
+build's.
+   File `app/dogs-at-work/the-colleague-who-never-clocks-off/page.tsx`, **line 69**
+   (inside the `CARDS` "editors-note" node). Current wording (original, with the
+   one dash converted):
+   > "Bramble" and "Sarah" are illustrative while we finalise a real, currently-working alert dog to feature — with the organisation's and owner's permission.
 
-**Still open for Steve: the present tense.** The article describes the
-partnership in the present throughout ("His job is Sarah", "Sarah gets to
-sleep"). The currency caveat time-stamps the account, so these read as true at
-the time of writing; none were retired to past tense (that is Steve's call if he
-confirms the partnership has ended). The present-tense partnership claims are
-listed in the checkpoint report and, for the Sarah references, here:
-
-   Every place the article body presents Sarah:
+   Context if the note is ever revisited: Bramble, Graham and Sarah are real
+   (Steve, 11 Aug), so the "illustrative" framing is factually off, but the
+   article text stands as written and the decision is Steve's. Every place the
+   article body presents Sarah:
    - **L22:** His job is Sarah. Just Sarah. Not people in general — one specific human, whose body he knows better than most doctors ever could.
    - **L23:** And when Sarah's blood sugar starts to slide, Bramble knows. Often before Sarah does.
    - **L24** (pronoun, same person): The way she tells it, he has saved her life more times than she can count. And then the line that stays with you: she doesn't lie awake anymore wondering whether she will wake up.
