@@ -5496,11 +5496,16 @@ export default function BreedTree({
             )}
           </defs>
 
-          {/* START-SCREEN MARKER, decoration only. A dashed white ring around
+          {/* CLUSTER MARKER, decoration only. A dashed white ring around
               the cluster and a dashed line reaching to the level portrait at top
-              left, saying these dogs belong to this level. frozen is exactly the
-              start screen, so it shows here and unmounts the instant the round
-              starts or learn opens, and mounts again on return. It is a SIBLING
+              left, saying these dogs belong to this level. Shown whenever the
+              whole cluster is in view and no round is running: the start screen
+              AND the root of the learn area (dockAside && gravity && !started &&
+              focus.depth === 0). The focus.depth === 0 is load-bearing: learn
+              lets you zoom into a single dog, which recentres and rescales the
+              view, and without it the ring would balloon around the now offscreen
+              full cluster. It unmounts the instant a round starts or you dive
+              into a dog, and mounts again at the root view. It is a SIBLING
               of the circles group, never a child: zoomTo and the drop-in index
               circlesRef.current.children by position, so an extra child there
               would shift every node. Sized with packEnclose over the depth-1
@@ -5518,7 +5523,7 @@ export default function BreedTree({
               view's y at runtime, so a constant would misplace the ring on the
               hard levels where the cluster is pushed up off the floor. */}
           {/* eslint-disable-next-line react-hooks/refs */}
-          {frozen && (() => {
+          {dockAside && gravity && !started && focus.depth === 0 && (() => {
             const outer = nodes.filter((d) => d.depth === 1);
             if (!outer.length) return null;
             const enc = packEnclose(outer.map((d) => ({ x: d.x, y: d.y, r: d.r })));
@@ -5528,8 +5533,9 @@ export default function BreedTree({
             const cx = (enc.x - v[0]) * k;
             const cy = (enc.y - v[1]) * k;
             const R = enc.r * k * 1.02; // a hair outside the outermost circles
-            const sw = Math.max(2, R * 0.012);
-            const dash = `${R * 0.05} ${R * 0.045}`;
+            const swRing = Math.max(2, R * 0.012); // ring weight, tune on its own
+            const swLine = Math.max(8, R * 0.048); // line weight, 4x the ring's slope
+            const dash = `${R * 0.05} ${R * 0.045}`; // R-derived, independent of stroke
             // The portrait sits near the top-left corner of the pit; anchor there.
             const ax = xMin + vbW * 0.07;
             const ay = -vbH / 2 + vbH * 0.09;
@@ -5539,8 +5545,8 @@ export default function BreedTree({
             const ey = cy + (dy / len) * R;
             return (
               <g pointerEvents="none" aria-hidden="true">
-                <line x1={ax} y1={ay} x2={ex} y2={ey} stroke="#ffffff" strokeWidth={sw} strokeDasharray={dash} strokeLinecap="round" />
-                <circle cx={cx} cy={cy} r={R} fill="none" stroke="#ffffff" strokeWidth={sw} strokeDasharray={dash} />
+                <line x1={ax} y1={ay} x2={ex} y2={ey} stroke="#ffffff" strokeWidth={swLine} strokeDasharray={dash} strokeLinecap="round" />
+                <circle cx={cx} cy={cy} r={R} fill="none" stroke="#ffffff" strokeWidth={swRing} strokeDasharray={dash} />
               </g>
             );
           })()}
