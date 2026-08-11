@@ -16,7 +16,6 @@ import { validateSlides } from "./validate";
 // Clearly named placeholders for inputs Steve still owes. Logged in
 // PLACEHOLDERS.md and docs/dogs-at-work/NEEDS_STEVE.md. Never invent these.
 const PLACEHOLDER_ARTICLE_3_ALT = "PLACEHOLDER: alt text for article 3 hero, outstanding from Steve";
-const PLACEHOLDER_ARTICLE_4_ALT = "PLACEHOLDER: alt text for sheepdogs_job.jpg, outstanding from Steve";
 
 export const SLIDES: Slide[] = [
   {
@@ -174,7 +173,7 @@ Some spend their lives bored and under-stimulated, while others are pushed into 
       headline: "The Farm Worker With Four Legs",
       dek: `To the shepherd it is labour saved. To the dog it is the best game ever invented: find the sheep, get behind them, bring them home. Nobody has told it otherwise.`,
       image: "/sheepdogs_job.jpg",
-      imageAlt: PLACEHOLDER_ARTICLE_4_ALT,
+      imageAlt: "a black and white Border Collie sitting in long grass in a field",
       ctaLabel: "Sheepdogs",
       // Route is built at checkpoint 7; the link resolves once that lands.
       href: "/dogs-at-work/the-farm-worker-with-four-legs",

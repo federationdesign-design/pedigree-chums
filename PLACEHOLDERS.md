@@ -138,4 +138,3 @@ outstanding decisions are in `docs/dogs-at-work/NEEDS_STEVE.md`.
 | Placeholder | Location | Meaning | Resolve via |
 |---|---|---|---|
 | `PLACEHOLDER_ARTICLE_3_ALT` | `app/dogs-at-work/data/slides.ts` (electronic-nose) | Alt text for article 3 hero `article3_hero.jpg` | Steve supplies alt text (open question 4) |
-| `PLACEHOLDER_ARTICLE_4_ALT` | `app/dogs-at-work/data/slides.ts` (sheepdogs) | Alt text for `sheepdogs_job.jpg` | Steve supplies alt text (section 15) |
