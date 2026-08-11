@@ -1234,11 +1234,19 @@ export default function BreedTree({
   const circlesRef = useRef<SVGGElement>(null);
   const isMobileRef = useRef(false);
   isMobileRef.current = isMobile;
-  const viewRef = useRef<View>([nodes[0].x, nodes[0].y, nodes[0].r * 2 * (isMobile ? PAD : ZOOM_PAD)]);
+  // Seed the view with the SETTLED pit fit, not a placeholder. On the start screen
+  // dockAside widens the root view by PIT_SPAN, and clampRootView only shifts y and
+  // never the width, so this expression is the exact settled width the first render
+  // paints with. Without the PIT_SPAN factor the first render held the pre-pit view
+  // (~2.5x too small a width, so k ~2.5x too big): the ring came in oversized until
+  // the drop finished, and the pre-drop % badges, sized in an effect that only
+  // re-ran on [nodes, dockAside], stayed oversized until the slider forced a
+  // re-pack. Same class as the LineageMap lift-card viewport seed.
+  const viewRef = useRef<View>([nodes[0].x, nodes[0].y, nodes[0].r * 2 * (isMobile ? PAD : ZOOM_PAD) * (dockAside ? PIT_SPAN : 1)]);
   // The width of the full-pit view, kept so a ring can be drawn at the weight it
   // has when you are zoomed out. Seeded with the same expression as viewRef and
   // rewritten by every site that returns the view to the root.
-  const homeWRef = useRef<number>(nodes[0].r * 2 * (isMobile ? PAD : ZOOM_PAD));
+  const homeWRef = useRef<number>(nodes[0].r * 2 * (isMobile ? PAD : ZOOM_PAD) * (dockAside ? PIT_SPAN : 1));
   const focusRef = useRef<Node>(nodes[0]);
   const rafRef = useRef<number>(0);
 
@@ -2001,7 +2009,11 @@ export default function BreedTree({
           return { pct, r: badgeDrawForNode(n.r, k, floorVb) };
         }),
     );
-  }, [nodes, dockAside]);
+    // `entered` is the settle signal: the drop-in entrance flips it true right
+    // after zoomTo(v) writes the fitted view, so keying on it re-samples the badge
+    // sizes against the settled viewRef even when the fit arrived by animation
+    // rather than by a nodes change. Belt-and-braces to the corrected seed above.
+  }, [nodes, dockAside, entered]);
   // The rail outlives the info box. It is closed only by its own X, and comes
   // back whenever the box is reopened, so the two cycle together.
   const [railHidden, setRailHidden] = useState(false);
