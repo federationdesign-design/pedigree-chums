@@ -215,11 +215,9 @@
   pointer-events: none;
 }
 .connectorLine {
-  /* Task 104: yellow to match the icon (was white). Brand token, not a new hex. */
-  stroke: var(--pc-ui-yellow);
-  /* Task 113: halved (was 5) to match the icon's stroke weight. */
-  stroke-width: 2.5;
-  stroke-linecap: round;
+  /* The connector is now a FILLED tapered wedge (see connectorPath in the component), not a stroke -- a
+     stroke is a constant width and cannot taper. Yellow to match the icon (Task 104), brand token. */
+  fill: var(--pc-ui-yellow);
   opacity: 0;
   animation: pcFade 240ms ease forwards;
 }
@@ -238,7 +236,12 @@
   transform-origin: center;
   animation: pcPop 440ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
-.dogBtn:hover,
+/* Hover: the circle's OWN white stroke turns yellow -- no outer ring sitting off the edge (that read as a
+   double ring). Keyboard focus keeps a distinct offset outline for a11y. */
+.dogBtn:hover {
+  border-color: var(--pc-ui-yellow);
+  z-index: 4;
+}
 .dogBtn:focus-visible {
   outline: 4px solid var(--pc-ui-yellow);
   outline-offset: 3px;
@@ -1680,9 +1683,9 @@
    the arrow angles are unchanged. On the 128px desktop medallion, 18% is ~23px. */
 /* Task 171: tops pulled in (was 48 / 92) to tighten the VERTICAL gap BETWEEN the three; the lefts (the arc
    and its distance from the medallion) are unchanged. At 33.5% tall, the gap drops from ~14% to ~6%. */
-.receded0 { left: -52%; top: 0%; }
-.receded1 { left: -52%; top: 40%; }
-.receded2 { left: -30%; top: 80%; }
+.receded0 { left: -42%; top: 0%; }
+.receded1 { left: -42%; top: 33%; }
+.receded2 { left: -22%; top: 66%; }
 /* The green arrow asset (public/green-arrow-short.svg), on the dog's right, pointing at the active
    medallion. It is already green, so no recolour is needed. */
 .recededArrow {
@@ -1693,6 +1696,9 @@
   height: 52%;
   background: url("/green-arrow-short.svg") center / contain no-repeat;
   transform: rotate(var(--arrow-rot, 0deg));
+  /* At rest NO arrow shows -- three sitting dogs with three arrows read as clutter. The arrow belongs to the
+     ONE dog being pointed at (hovered on desktop, first-tapped on touch), so it appears only then. */
+  opacity: 0;
   transition: opacity 160ms ease, transform 160ms ease;
 }
 /* HOVER (desktop) / FIRST TAP (mobile): the active medallion desaturates to grey; the pointed-at dog keeps
@@ -1700,7 +1706,11 @@
 .dogAnchor[data-recede] .dogFace {
   filter: grayscale(1) brightness(0.92);
 }
+/* The arrow shows ONLY on the armed dog (.recededOn = hovered on desktop, first-tapped on touch). This is
+   state-driven, not CSS :hover, so that clearing the state on a switch also clears the arrow -- the pointer
+   sitting over the incoming stack shows nothing until it genuinely moves. */
 .recededOn .recededArrow {
+  opacity: 1;
   transform: rotate(var(--arrow-rot, 0deg)) scale(1.3);
   filter: brightness(1.08);
 }

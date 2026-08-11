@@ -85,6 +85,21 @@ const dogPos = (i: number) => ({ left: ARC_RADIUS * Math.cos(dogAngleRad(i)), to
 const dogCentre = (i: number) => ({ x: ARC_CENTER + ARC_RADIUS * Math.cos(dogAngleRad(i)), y: ARC_CENTER + ARC_RADIUS * Math.sin(dogAngleRad(i)) });
 const lineStart = (i: number) => ({ x: ARC_CENTER + ARC_BODY_R * Math.cos(dogAngleRad(i)), y: ARC_CENTER + ARC_BODY_R * Math.sin(dogAngleRad(i)) });
 const round1 = (n: number) => Math.round(n * 10) / 10;
+// The connector is a TAPERED wedge, not a stroke (a stroke cannot vary its width along its length): thin at
+// the icon body, twice as thick where it meets the dog. Built as a 4-point path from the same arc as the
+// dogs, so it always tracks them; the far edge sits on the dog CENTRE, so the wide end is buried inside the
+// circle and the line can never fall short of it.
+const CONN_HALF_NEAR = 1.25; // 2.5 wide at the icon end (matches the old stroke width)
+const CONN_HALF_FAR = 2.5; // 5 wide at the dog end -- twice the icon end
+const connectorPath = (i: number) => {
+  const s = lineStart(i);
+  const c = dogCentre(i);
+  const len = Math.hypot(c.x - s.x, c.y - s.y) || 1;
+  const px = -(c.y - s.y) / len; // unit perpendicular to the line direction
+  const py = (c.x - s.x) / len;
+  const p = (x: number, y: number) => `${round1(x)},${round1(y)}`;
+  return `M${p(s.x + px * CONN_HALF_NEAR, s.y + py * CONN_HALF_NEAR)} L${p(c.x + px * CONN_HALF_FAR, c.y + py * CONN_HALF_FAR)} L${p(c.x - px * CONN_HALF_FAR, c.y - py * CONN_HALF_FAR)} L${p(s.x - px * CONN_HALF_NEAR, s.y - py * CONN_HALF_NEAR)} Z`;
+};
 
 // Owner review: the medallion name breaks after each word, so a two-word
 // dog stacks her name on two lines.
@@ -944,8 +959,23 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
     document.addEventListener('pointerdown', dismiss, true);
     return () => document.removeEventListener('pointerdown', dismiss, true);
   }, [activeReceded, canHover]);
-  // A switch (dog change) clears the pointed-at state so the new stack starts at rest.
+  // A switch (dog change) clears the pointed-at state so the incoming dog starts un-greyed.
   useEffect(() => { setActiveReceded(null); }, [dog]);
+  // Desktop arming is driven off real pointer MOVEMENT, not onMouseEnter. A switch re-renders the stack under
+  // a stationary cursor, and mouseenter/mouseover can fire from that DOM change alone (and always fire BEFORE
+  // pointermove), which would re-grey the dog just chosen. pointermove only fires on genuine movement, so the
+  // incoming dog stays in colour until the visitor actually moves onto a receded dog. (Touch is unaffected:
+  // it uses the tap-to-arm path in pressReceded.)
+  useEffect(() => {
+    if (!canHover) return;
+    const onMove = (e: PointerEvent) => {
+      const hit = (e.target as HTMLElement | null)?.closest?.('[data-receded]');
+      const d = hit?.getAttribute('data-receded') as Dog | null;
+      setActiveReceded(d && SELECT_ORDER.includes(d) ? d : null);
+    };
+    document.addEventListener('pointermove', onMove);
+    return () => document.removeEventListener('pointermove', onMove);
+  }, [canHover]);
 
   const send = useCallback((textArg?: string) => {
     const session = sessionRef.current;
@@ -1339,8 +1369,6 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
           aria-label={`Switch to the ${dogInfo(d).name}`}
           title={`Switch to the ${dogInfo(d).name}`}
           onClick={() => pressReceded(d)}
-          onMouseEnter={canHover ? () => setActiveReceded(d) : undefined}
-          onMouseLeave={canHover ? () => setActiveReceded(null) : undefined}
         >
           {/* Task 168: the portrait is its OWN layer so the greyscale-at-rest filter greys the dog but NOT
               the green arrow (a sibling). The active dog is colour; an unselected dog is grey until hovered. */}
@@ -1524,21 +1552,14 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
                     the anchor centre) and runs to its dog's centre. Both ends derive from the arc, so
                     the lines always track the dogs. viewBox is square (440), overflow visible, so a dog
                     that fans past its edge still gets its line drawn. */}
-                {SELECT_ORDER.map((_d, i) => {
-                  const s = lineStart(i);
-                  const c = dogCentre(i);
-                  return (
-                    <line
-                      key={i}
-                      className={styles.connectorLine}
-                      style={{ animationDelay: `${0.15 + i * 0.3}s` }}
-                      x1={round1(s.x)}
-                      y1={round1(s.y)}
-                      x2={round1(c.x)}
-                      y2={round1(c.y)}
-                    />
-                  );
-                })}
+                {SELECT_ORDER.map((_d, i) => (
+                  <path
+                    key={i}
+                    className={styles.connectorLine}
+                    style={{ animationDelay: `${0.15 + i * 0.3}s` }}
+                    d={connectorPath(i)}
+                  />
+                ))}
               </svg>
             )}
             {SELECT_ORDER.map((d, i) => {
