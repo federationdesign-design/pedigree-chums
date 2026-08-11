@@ -185,10 +185,23 @@ body.pc-modal-open .pc-nav {
 
 /* Lights out. brightness(25%) rather than 10% (Task 164 section 3): obviously wrong, far less alarming
    to a child in a bright room. Brightness, never opacity, so nothing shows through and layout is untouched
-   (brief section 6). The body gradient and paw pattern sit outside #pc-site, so they stay bright: dim, not
-   black. Filter captures no clicks, so there is no layer to make pointer-events: none here. */
+   (brief section 6). Task 171: it now GREYSCALES too -- the page content (here) and the page background
+   (the body gradient and paw pattern, below, which sit outside #pc-site) both drain of colour, so the
+   whole page reads as lights-off, not just a dimmed-blue one. Filter captures no clicks, so there is no
+   layer to make pointer-events: none here. */
 body.boxer-lights-out #pc-site {
-  filter: brightness(25%);
+  filter: grayscale(1) brightness(25%);
+}
+/* The background lives on <body> (the gradient) and body::before (the paw pattern), outside #pc-site, so a
+   filter there would catch the bright chat overlay too. Instead swap the brand-blue gradient for its
+   greyscale equivalent (the luminance of #00e2ff and #008eff) and desaturate the paw layer directly. The
+   background stays at full brightness (dim the content, not the room), just colourless. */
+body.boxer-lights-out {
+  background-image: linear-gradient(to top right, #a2a2a2, #707070);
+}
+body.boxer-lights-out::before {
+  filter: grayscale(1);
+  transition: filter 350ms ease;
 }
 
 /* Missing navigation. Fade the header to 20% and LEAVE pointer-events ON (Task 164 section 3): the visitor
@@ -220,7 +233,10 @@ body.boxer-giant-logo::after {
   inset: 0;
   z-index: 300;
   pointer-events: none;
-  background: center / min(72vw, 72vh) no-repeat url("/dogbingo.svg");
+  /* Task 171: 1.75x bigger (72 -> 126) and turned upside down. The overlay box stays inset:0 and the image
+     is centred, so rotating 180deg spins it in place; still pointer-events:none and below the chat (z 301). */
+  background: center / min(126vw, 126vh) no-repeat url("/dogbingo.svg");
+  transform: rotate(180deg);
 }
 
 /* Wrong transfer. A brief sweep suggesting another dog took over, then it clears and the Boxer is back.

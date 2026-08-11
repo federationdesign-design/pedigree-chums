@@ -1678,9 +1678,11 @@
 /* Task 168: the stack sits closer to the medallion. The whole cluster is shifted right by 18 percentage
    points of the medallion's width (was -70 / -70 / -48); the relative offsets -- the staggered arc -- and
    the arrow angles are unchanged. On the 128px desktop medallion, 18% is ~23px. */
+/* Task 171: tops pulled in (was 48 / 92) to tighten the VERTICAL gap BETWEEN the three; the lefts (the arc
+   and its distance from the medallion) are unchanged. At 33.5% tall, the gap drops from ~14% to ~6%. */
 .receded0 { left: -52%; top: 0%; }
-.receded1 { left: -52%; top: 48%; }
-.receded2 { left: -30%; top: 92%; }
+.receded1 { left: -52%; top: 40%; }
+.receded2 { left: -30%; top: 80%; }
 /* The green arrow asset (public/green-arrow-short.svg), on the dog's right, pointing at the active
    medallion. It is already green, so no recolour is needed. */
 .recededArrow {

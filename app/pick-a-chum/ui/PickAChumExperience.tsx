@@ -499,10 +499,10 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
   // Owner review: once chatting, the visitor can pick the chat up and move
   // it. The offset shifts the column's anchor point (its bottom edge, where
   // the newest message sits): placed low, the window above is tall and shows
-  // more messages; placed high, it shows fewer. Resets on a dog change.
+  // more messages; placed high, it shows fewer. Task 171: it PERSISTS across a dog change (switch or handover)
+  // so the chat stays exactly where the visitor left it; only minimise resets it (to return to the corner).
   const [dragOffset, setDragOffset] = useState<{ dx: number; dy: number }>({ dx: 0, dy: 0 });
   const [dragging, setDragging] = useState(false); // grows the handle while moving
-  useEffect(() => { setDragOffset({ dx: 0, dy: 0 }); }, [dog]);
   // Minimise: collapse to the chip AND dock to the corner, resetting any drag so a reopen returns to the
   // corner (not the last-dragged spot). Shared by the desktop and mobile minimise controls.
   const minimise = useCallback(() => {
@@ -895,9 +895,18 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
   );
   const selectDog = useCallback((d: Dog) => {
     clearTimers();
+    // Task 171: a switch mid-monologue must ABANDON that run, not just cancel its timers. clearTimers stops the
+    // pending messages but leaves the seqRef token live, and send()'s Task 169 guard reads a live monologue token
+    // as "queue this reply" -- so without this every message to the switched-in dog queued behind a dead run and
+    // never appeared. abandonSequence nulls the token; clearing the queue drops anything the old dog had parked.
+    abandonSequence();
+    queueRef.current = [];
     if (chatAnchorRef.current === null) chatAnchorRef.current = dogPos(SELECT_ORDER.indexOf(d)); // freeze on the FIRST pick
-    setDocked(false); // Task 162 comment (line 361): a fresh selector pick starts undocked -- the switched-in dog stays
-                      // at the frozen chat anchor, not the corner. Was never wired up, so a switch snapped to the dock.
+    // Task 171: a switch must leave the medallion EXACTLY where it is. It changes the portrait and the session,
+    // nothing about position: `docked`, the frozen chatAnchorRef and dragOffset are all left untouched here (and
+    // the drag offset no longer zeroes on a dog change, see below), so a docked corner chat stays in the corner
+    // and a dragged one stays where it was dragged. The earlier setDocked(false) fixed the look but relocated it
+    // to the fan slot, which is the very jump this removes.
     everProtectedRef.current = false; // Task 105: a fresh engine session starts un-protected and persistable
     sessionRef.current = newSession(d);
     // A fresh engine session starts a fresh recorded conversation. Time-prefixed
@@ -909,7 +918,7 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
     setInput('');
     setPhase('idle');
     window.setTimeout(() => inputRef.current?.focus(), 60);
-  }, [clearTimers]);
+  }, [clearTimers, abandonSequence]);
 
   // Task 168: hover-capable (desktop) vs touch. Decides one-click-switch vs first-tap-reveals / second-
   // tap-commits, and whether hover drives the pointed-at state. Read once on mount (SSR-safe).
@@ -1233,18 +1242,14 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
   // performs, and no-ops after the session closes.
   const anchorSwap = swap === 'out' ? styles.anchorOut : swap === 'in' ? styles.anchorIn : '';
 
-  // Task 149: feeding a cookie. Blue pills feed him on the first tap. Red pills warn first: the first
-  // tap opens the "we dont use this" tooltip WITHOUT feeding (tap matters more than hover), and a
-  // second tap on the same red pill then feeds him -- he eats everything, red ones just taste wrong.
-  // A tap anywhere else dismisses the tooltip (the effect below), so a warning is never fed by accident.
+  // Task 149 / 171: feeding a cookie. Every pill feeds him on the FIRST tap now, red included -- he eats
+  // everything, red ones just taste wrong. A red tap also arms the "we dont use this" tooltip (its meaning
+  // still lands in his reply, Task 166, and on hover on desktop); the two-tap warning gate is gone, so a
+  // red pill is no longer a dead first tap. A tap elsewhere still dismisses any open tooltip (effect below).
   const feedPill = useCallback((c: CookiePill) => {
-    if (c.red && armedRed !== c.id) {
-      setArmedRed(c.id);
-      return;
-    }
-    setArmedRed(null);
+    if (c.red) setArmedRed(c.id);
     send(c.id);
-  }, [armedRed, send]);
+  }, [send]);
 
   // Task 164: press a Boxer control-panel button. Announce the result for screen readers (brief section 9);
   // for FIX IT (and the emergency reset), strip the page SYNCHRONOUSLY so the site is clean instantly rather
