@@ -203,7 +203,7 @@ export default function PickAChumLauncher() {
     // lines are generated in the experience (so this lightweight launcher never pulls the breed data), so
     // here it is just flagged with `chums`.
     if (app.dog === 'collie' && app.trigger === 'section') {
-      setAutoAppear({ dog: 'collie', offer: '', reveal: '', route, chums: true, gapMs: app.gapMs });
+      setAutoAppear({ dog: 'collie', offer: '', route, chums: true, gapMs: app.gapMs });
       setOpen(true);
       return;
     }
@@ -212,20 +212,22 @@ export default function PickAChumLauncher() {
     // /home and /smarter reads that shipped as one block before the sequence player existed.
     const seq = bio?.sequence;
     if (seq && seq.length) {
-      setAutoAppear({ dog: app.dog, offer: seq[0], reveal: '', followUps: seq.slice(1), gapMs: app.gapMs, route });
+      setAutoAppear({ dog: app.dog, offer: seq[0], followUps: seq.slice(1), gapMs: app.gapMs, route });
       setOpen(true);
       return;
     }
-    // Otherwise a single reveal-on-open appearance: the Terrier's blunt extended bio, the Boxer's misread
+    // Otherwise a single reveal-after-open appearance: the Terrier's blunt extended bio, the Boxer's misread
     // (his /about stat list stays one block -- ten items overflow the three-message cap), or the Labrador's
-    // plain hunger opener with no second beat.
+    // plain hunger opener with no second beat. The reveal rides `followUps` so it flows through the ONE gated
+    // playSequence in the experience -- it lands as a beat after the open, not instantly alongside the opener.
     // Task 160: the Boxer's /about opens with his own line and reveals ONE misread (picked no-repeat), not
-    // all ten in a block. His reveal fires on open (the reveal-on-open effect), so the second message only
-    // arrives once the visitor interacts, per section 2. Falls back to the old single `misread` if present.
+    // all ten in a block. As a followUp it only arrives once the visitor opens the chip, per section 2, and
+    // the empty case (the Labrador's Case B) simply carries no followUp. Falls back to the old single
+    // `misread` if present.
     const boxerMisread = app.dog === 'boxer' && bio?.misreads?.length ? pickMisread(bio.misreads) : null;
     const offer = app.dog === 'boxer' ? bio?.misreadOpening ?? BOXER_OPENER : app.dog === 'labrador' ? bio?.craving ?? 'I like hotdogs' : OI_OI;
     const reveal = app.dog === 'boxer' ? boxerMisread ?? bio?.misread ?? '' : app.dog === 'labrador' ? '' : bio?.extended ?? bio?.bio ?? '';
-    setAutoAppear({ dog: app.dog, offer, reveal, route });
+    setAutoAppear({ dog: app.dog, offer, followUps: reveal.trim() ? [reveal] : [], route });
     setOpen(true);
   }, []);
 
@@ -324,7 +326,7 @@ export default function PickAChumLauncher() {
         if (!canDogAppear() || isDismissed(route)) return;
         const hint = unfoundGameHint();
         if (!hint) return;
-        setAutoAppear({ dog: 'terrier', offer: HINT_OFFER, reveal: hint, route });
+        setAutoAppear({ dog: 'terrier', offer: HINT_OFFER, followUps: [hint], route });
         setOpen(true);
       }, HINT_DELAY_MS);
     });
@@ -351,7 +353,7 @@ export default function PickAChumLauncher() {
         setTerrierSay(line); // land it in the open chat
         setOpen(true);
       } else {
-        setAutoAppear({ dog: 'terrier', offer: line, reveal: '', route: pathnameRef.current ?? '' });
+        setAutoAppear({ dog: 'terrier', offer: line, route: pathnameRef.current ?? '' });
         setOpen(true);
       }
     });

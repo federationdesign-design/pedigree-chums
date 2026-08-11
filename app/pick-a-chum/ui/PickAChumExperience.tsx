@@ -219,7 +219,7 @@ const KENNEL_HAT_SKETCH_INDEX = 9;
 // `followUps` are the extras that arrive whole, spaced by `gapMs` (playSequence). `chums` marks the one
 // dynamic case (the Collie naming three random breeds on /know-your-chums): the lines are generated in
 // the experience so the lightweight launcher never pulls the breed data.
-export type AutoAppear = { dog: Dog; offer: string; reveal: string; route: string; followUps?: string[]; gapMs?: number; chums?: boolean };
+export type AutoAppear = { dog: Dog; offer: string; route: string; followUps?: string[]; gapMs?: number; chums?: boolean };
 
 // Task 156: safety and grief responses keep the neutral bubble, never a dog's playful fill. safeguarding
 // already hides the dog identity (support); grief, the health boundary, the anatomy redirect and the bare-
@@ -368,17 +368,15 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
   // Task 151 Case A: a small pulse on the minimised chip when the Labrador speaks unprompted, so an
   // unread line is noticed rather than sitting in the corner. Cleared the moment the visitor opens the chip.
   const [spoke, setSpoke] = useState(false);
-  // Task 148: on the first open of an unbidden appearance (the visitor engages), append his reveal --
-  // the page's extended bio, or a game hint -- as a second message. revealedRef guards it to once.
+  // On the first open of an unbidden appearance, quiet the chip pulse (revealedRef guards it to once). The
+  // second message that once appended here on open (Task 148: the Terrier/Boxer extended bio, the game hint)
+  // now rides `followUps` through the ONE gated playSequence -- the launcher's appear() builds it as a
+  // followUp, so every extra (sequence or single reveal) flows through the same run-gate and lands as a beat
+  // after the open, not instantly alongside the opener. One path, not two.
   const revealedRef = useRef(false);
   useEffect(() => {
     if (!auto || minimised || revealedRef.current) return;
-    revealedRef.current = true; // first open: stop the chip pulse whether or not there is a reveal to add
-    // Task 151: the Labrador's Case B line is the opener alone (empty reveal), so append no second bubble
-    // rather than a blank one; the Terrier and Boxer always carry a reveal.
-    if (auto.reveal.trim()) {
-      setMessages((m) => [...m, { id: idRef.current++, who: 'dog', text: auto.reveal, dog: auto.dog, name: dogInfo(auto.dog).name, display: auto.reveal, done: true }]);
-    }
+    revealedRef.current = true; // first open: stop the chip pulse
   }, [minimised, auto]);
   // Task 151 Case A: the Labrador picks up the thread on /hot-dogs. He is already here (a chat exists), so
   // this is a MESSAGE, not an arrival -- no suppression, no appearance. He becomes the active dog, speaks
