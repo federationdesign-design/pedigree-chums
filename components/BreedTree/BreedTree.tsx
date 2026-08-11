@@ -692,6 +692,19 @@ const BADGE_OF_CIRCLE = 0.27; // was 0.36, pulled back 25% by request
 const BADGE_TRIM = 0.25;
 const BADGE_MIN_R = 26;
 const BADGE_MAX_R = 140;
+// Owner request (badge scaling): size a badge as a fixed fraction of ITS OWN dog's
+// drawn radius (nodeR * k), not the layout-wide badgeDrawR. badgeDrawR was one size
+// for the whole level scaled by local %, so a deep circle that shrinks with depth
+// kept a top-level-sized disc and the pit flooded with yellow. 0.38 keeps the top
+// level as it reads today (measured depth-1 badge/dog on a 390 phone). Floored at
+// the legibility minimum: the % text is 0.7 of the radius, so below ~13.5 drawn px
+// the number stops reading. The floor is a fixed on-screen px, converted to viewBox
+// units per device by the stage short side (badgeFloorVb). Physics radius stays
+// coupled (rDraw / k), so a smaller disc also collides smaller.
+const BADGE_FRAC = 0.38;
+const BADGE_FLOOR_PX = 13.5;
+const badgeDrawForNode = (nodeR: number, k: number, floorVb: number) =>
+  Math.max(floorVb, BADGE_FRAC * nodeR * k);
 
 // Split words into exactly n lines as evenly as the word lengths allow.
 // Returns null when n lines are not reachable (a single long word can force
@@ -2024,14 +2037,23 @@ export default function BreedTree({
   }, [nodes, dockAside, level]);
   const badgeDrawRRef = useRef(badgeDrawR);
   useEffect(() => { badgeDrawRRef.current = badgeDrawR; }, [badgeDrawR]);
+  // The legibility floor in viewBox units: BADGE_FLOOR_PX drawn px, converted by
+  // the stage's short side so it is the same on-screen size on any device.
+  const badgeFloorVb = () => {
+    const st = stageRef.current;
+    const short = st ? Math.min(st.clientWidth, st.clientHeight) : SIZE;
+    return (BADGE_FLOOR_PX * SIZE) / short;
+  };
   useEffect(() => {
     if (!dockAside) return;
+    const k = SIZE / viewRef.current[2];
+    const floorVb = badgeFloorVb();
     setBadgePcts(
       nodes
         .filter((n) => n.depth === 1)
         .map((n) => {
           const pct = n.parent ? Math.round(((n.value ?? 0) / (n.parent.value || 1)) * 100) : 0;
-          return { pct, r: badgeRFor(pct, badgeDrawR) };
+          return { pct, r: badgeDrawForNode(n.r, k, floorVb) };
         }),
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -3405,13 +3427,15 @@ export default function BreedTree({
       setWordList(wordFits.map((f) => ({ lines: f.lines, fs: f.fs })));
       wordBodiesRef.current = bodies;
       wordPopAtRef.current = performance.now();
-      // yellow % badges become small bodies, spawned at each circle's lower-right rim
-      const BADGE_R = badgeDrawRRef.current / k;
+      // yellow % badges become small bodies, spawned at each circle's lower-right rim.
+      // Sized off each dog's OWN drawn radius (n.r * k) at BADGE_FRAC, floored for
+      // legibility, so a deep small circle gets a small badge, not a top-sized one.
+      const badgeFloor = badgeFloorVb();
       const badges: Body[] = d1.map((n, i) => ({
         // bottom LEFT of the circle: the right side is where the level's own
         // furniture sits, and a badge there crowded it
         n: null, x: n.x - n.r * 0.707, y: n.y + n.r * 0.707, vx: 0, vy: 0,
-        r: badgeRFor(pctOf(n), BADGE_R), rDraw: badgeRFor(pctOf(n), badgeDrawRRef.current), pct: pctOf(n), idx: i, lastFx: 0, popped: true, a: 0, va: 0, ia: 0, iva: 0, charges: 20,
+        r: badgeDrawForNode(n.r, k, badgeFloor) / k, rDraw: badgeDrawForNode(n.r, k, badgeFloor), pct: pctOf(n), idx: i, lastFx: 0, popped: true, a: 0, va: 0, ia: 0, iva: 0, charges: 20,
       }));
       badgeBodiesRef.current = badges;
 
@@ -3649,7 +3673,7 @@ export default function BreedTree({
             const kidBomb = rollBomb();
             const kb: Body = {
               n: null, x: ch.x - ch.r * 0.6, y: ch.y + ch.r * 0.6, vx: 0, vy: 0,
-              r: badgeRFor(pctOf(ch), BADGE_R), rDraw: badgeRFor(pctOf(ch), badgeDrawRRef.current),
+              r: badgeDrawForNode(ch.r, k, badgeFloor) / k, rDraw: badgeDrawForNode(ch.r, k, badgeFloor),
               pct: pctOf(ch), idx: bl.length, lastFx: 0, popped: true,
               a: 0, va: 0, ia: 0, iva: 0, charges: 20, bomb: kidBomb,
             };
@@ -3658,7 +3682,7 @@ export default function BreedTree({
             const mbb = mkCircle(kb, "badge", BADGE_OPTS);
             MBody.setVelocity(mbb, { x: cmb.velocity.x * 0.8 + (Math.random() - 0.5) * vps(0.3), y: cmb.velocity.y * 0.8 });
             newMbs.push(mbb);
-            setBadgePcts((l) => [...l, { pct: kb.pct, r: badgeRFor(kb.pct, badgeDrawRRef.current), bomb: kidBomb }]);
+            setBadgePcts((l) => [...l, { pct: kb.pct, r: badgeDrawForNode(ch.r, k, badgeFloor), bomb: kidBomb }]);
           }
         });
         // resolve the deliberate word/circle overlap without an explosion
@@ -3711,13 +3735,13 @@ export default function BreedTree({
             // the roll belongs here as much as in the scatter. Without it a bomb
             // only ever arrives from the lineage layer and stays rare.
             const popBomb = rollBomb();
-            const bb: Body = { n: null, x: ch.x - ch.r * 0.6, y: ch.y + ch.r * 0.6, vx: 0, vy: 0, r: badgeRFor(pctOf(ch), BADGE_R), rDraw: badgeRFor(pctOf(ch), badgeDrawRRef.current), pct: pctOf(ch), idx: bl.length, lastFx: 0, popped: true, a: 0, va: 0, ia: 0, iva: 0, charges: 20, bomb: popBomb };
+            const bb: Body = { n: null, x: ch.x - ch.r * 0.6, y: ch.y + ch.r * 0.6, vx: 0, vy: 0, r: badgeDrawForNode(ch.r, k, badgeFloor) / k, rDraw: badgeDrawForNode(ch.r, k, badgeFloor), pct: pctOf(ch), idx: bl.length, lastFx: 0, popped: true, a: 0, va: 0, ia: 0, iva: 0, charges: 20, bomb: popBomb };
             bl.push(bb);
             all.push(bb);
             const mbb = mkCircle(bb, "badge", BADGE_OPTS);
             MBody.setVelocity(mbb, { x: mb.velocity.x * 0.8 + (Math.random() - 0.5) * vps(0.3), y: mb.velocity.y * 0.8 });
             newMbs.push(mbb);
-            setBadgePcts((l) => [...l, { pct: bb.pct, r: badgeRFor(bb.pct, badgeDrawRRef.current), bomb: popBomb }]);
+            setBadgePcts((l) => [...l, { pct: bb.pct, r: badgeDrawForNode(ch.r, k, badgeFloor), bomb: popBomb }]);
           }
         }
         if (newMbs.length > 1) ghost(newMbs);
