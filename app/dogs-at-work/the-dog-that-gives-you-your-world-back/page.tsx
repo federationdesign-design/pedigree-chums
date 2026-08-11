@@ -263,11 +263,10 @@ export default function GuideDogsPage() {
       <Nav showLogo />
       <main className={styles.essayPage}>
         <div className={styles.essayHero}>
-          {/* Hero is a neutral "image coming soon" stand-in, not a 404, until Steve
-              resolves the hero chain (the plan is to move article3_hero.jpg here once
-              article 2 has a replacement). Alt is still a placeholder. */}
+          {/* Hero supplied by Steve (12 Aug 2026). Alt is still a placeholder until
+              Steve sends it. */}
           <img
-            src="/hero-coming-soon.svg"
+            src="/guide_dog_image.jpg"
             alt="PLACEHOLDER: alt text for the guide dogs hero, outstanding from Steve"
             className={styles.essayHeroImg}
           />
