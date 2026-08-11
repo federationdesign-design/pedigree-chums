@@ -13,6 +13,17 @@
 import type { Slide } from "./types";
 import { validateSlides } from "./validate";
 
+// Panel split (Steve, 12 Aug 2026): the deck now carries eight blue panels, not
+// six. This is a reorganisation of the existing Appendix A copy, not new bodies:
+// every heading, body and emphasis marker below is unchanged. The two panels that
+// each carried two headings are split one heading per slide, which is where the
+// two extra slides come from:
+//   - "Why dogs love doing" and "Why we love dogs doing" (was one slide) split.
+//   - "What we owe dogs" and "What dogs often get" (was one slide) split.
+// The six real articles stay in editorial order across the first six slides; the
+// last two slides (7 and 8) reuse articles 1 and 2, as agreed, so every panel has
+// a paired article. Do not merge these back into six: the split is deliberate.
+
 // Hero swap (Steve, 11 Aug 2026): the scent-carousel lab scene that was on
 // article 2 moves to article 3, where it shows the bio-detection subject; and
 // article3_hero.jpg (the black Labrador in a harness) moves to article 2. The
@@ -33,6 +44,31 @@ import { validateSlides } from "./validate";
 // be left short), which is Steve's. Swap both when the real hero lands.
 const PLACEHOLDER_ARTICLE_6_ALT = "PLACEHOLDER: alt text for the guide dogs hero, outstanding from Steve.";
 const PLACEHOLDER_ARTICLE_6_HERO = "/hero-coming-soon.svg";
+
+// Articles 1 and 2, reused by slides 7 and 8 (see the panel-split note above).
+// Declared once and referenced twice so the reuse is literal, not a re-typed copy
+// that could drift.
+const ARTICLE_BIO_DETECTION: Slide["article"] = {
+  family: "Medical",
+  subLabel: "Bio-detection dogs",
+  headline: "The Dogs Teaching Medicine How to Smell Disease",
+  dek: `In 2025, two dogs called Bumper and Peanut sniffed out Parkinson's disease in a double-blind trial with up to 98% specificity. They are not replacing doctors. They may be doing something stranger: proving disease has a smell, so the machines of the future know what to look for. The dog doesn't become the machine. The dog invents it.`,
+  image: "/Bumper-and-peatnut.jpg",
+  imageAlt: "Bumper and Peanut, the golden retriever and black Labrador from the bio-detection study",
+  ctaLabel: "Bumper and Peanut",
+  href: "/dogs-at-work/the-dogs-teaching-medicine-how-to-smell-disease",
+};
+
+const ARTICLE_MEDICAL_ALERT: Slide["article"] = {
+  family: "Medical",
+  subLabel: "Medical alert dogs",
+  headline: "The Colleague Who Never Clocks Off",
+  dek: `A medical alert dog learns one person so completely it can warn them their own body is about to go wrong — often before they know themselves. That's not a pet. That's a colleague. Even if the only wages are dinner and the occasional stolen sausage.`,
+  image: "/article3_hero.jpg",
+  imageAlt: "A black Labrador in a white assistance-dog harness standing beside its seated owner indoors",
+  ctaLabel: "Bramble",
+  href: "/dogs-at-work/the-colleague-who-never-clocks-off",
+};
 
 export const SLIDES: Slide[] = [
   {
@@ -63,16 +99,7 @@ export const SLIDES: Slide[] = [
         },
       ],
     },
-    article: {
-      family: "Medical",
-      subLabel: "Bio-detection dogs",
-      headline: "The Dogs Teaching Medicine How to Smell Disease",
-      dek: `In 2025, two dogs called Bumper and Peanut sniffed out Parkinson's disease in a double-blind trial with up to 98% specificity. They are not replacing doctors. They may be doing something stranger: proving disease has a smell, so the machines of the future know what to look for. The dog doesn't become the machine. The dog invents it.`,
-      image: "/Bumper-and-peatnut.jpg",
-      imageAlt: "Bumper and Peanut, the golden retriever and black Labrador from the bio-detection study",
-      ctaLabel: "Bumper and Peanut",
-      href: "/dogs-at-work/the-dogs-teaching-medicine-how-to-smell-disease",
-    },
+    article: ARTICLE_BIO_DETECTION,
   },
   {
     id: "medical-alert",
@@ -88,26 +115,9 @@ For thousands of years they have been selected to chase, retrieve, guard, herd, 
 
 "Work" does not need to mean employment: anything that gives a dog a purpose, a challenge and the chance to use the abilities it was built for can provide the satisfaction of a job well done.`,
         },
-        {
-          subheading: "Why *we* love dogs *doing*",
-          body: `**For thousands of years, their enthusiasm has made our lives easier.**
-
-They herd animals we could never control alone, find people we cannot see, retrieve things we cannot reach, guard homes and livestock, guide people through the world and use extraordinary noses to detect drugs, explosives, disease and even signs of some cancers. What looks like a dog happily following its instincts can save humans hours of work, enormous effort and sometimes lives.
-
-Perhaps that is the remarkable bargain at the heart of our relationship with dogs: the jobs we desperately need doing are often the very things they absolutely love to do.`,
-        },
       ],
     },
-    article: {
-      family: "Medical",
-      subLabel: "Medical alert dogs",
-      headline: "The Colleague Who Never Clocks Off",
-      dek: `A medical alert dog learns one person so completely it can warn them their own body is about to go wrong — often before they know themselves. That's not a pet. That's a colleague. Even if the only wages are dinner and the occasional stolen sausage.`,
-      image: "/article3_hero.jpg",
-      imageAlt: "A black Labrador in a white assistance-dog harness standing beside its seated owner indoors",
-      ctaLabel: "Bramble",
-      href: "/dogs-at-work/the-colleague-who-never-clocks-off",
-    },
+    article: ARTICLE_MEDICAL_ALERT,
   },
   {
     id: "electronic-nose",
@@ -116,20 +126,12 @@ Perhaps that is the remarkable bargain at the heart of our relationship with dog
     panel: {
       sections: [
         {
-          subheading: "What we *owe dogs*",
-          body: `Far more than affection. For centuries they have guarded our homes, protected livestock, carried messages, found the lost, hunted food, controlled vermin, pulled loads, guided people, served in war and rescue, and taken on countless jobs simply because working beside us became part of their lives.
+          subheading: "Why *we* love dogs *doing*",
+          body: `**For thousands of years, their enthusiasm has made our lives easier.**
 
-What we owe them is responsible care, patience, safety, companionship and the chance to use the instincts and abilities we deliberately bred into them.
+They herd animals we could never control alone, find people we cannot see, retrieve things we cannot reach, guard homes and livestock, guide people through the world and use extraordinary noses to detect drugs, explosives, disease and even signs of some cancers. What looks like a dog happily following its instincts can save humans hours of work, enormous effort and sometimes lives.
 
-After everything dogs have done for us, the least we can do is make sure their lives are not only useful to humans, but good for them too.`,
-        },
-        {
-          subheading: "What dogs *often get*",
-          body: `They get food, shelter, protection, veterinary care, companionship and a place inside our families. Many live warm, comfortable lives filled with walks, play, affection and jobs chosen for enjoyment rather than survival.
-
-But dogs have not always received a fair return and that is still the case in modern times for some dogs. The same animals bred to work beside us can be neglected, abandoned or treated as just tools, or status symbols and disposable possessions.
-
-Some spend their lives bored and under-stimulated, while others are pushed into jobs or environments that damage their welfare.`,
+Perhaps that is the remarkable bargain at the heart of our relationship with dogs: the jobs we desperately need doing are often the very things they absolutely love to do.`,
         },
       ],
     },
@@ -150,9 +152,72 @@ Some spend their lives bored and under-stimulated, while others are pushed into 
     order: 4,
     published: "live",
     panel: {
-      // Panel 4 is the only one that uses a bullet list, so the component
-      // supports both prose and bulleted content. Flagged in open question 1:
-      // it largely repeats panel 1. Shipped as written for now.
+      sections: [
+        {
+          subheading: "What we *owe dogs*",
+          body: `Far more than affection. For centuries they have guarded our homes, protected livestock, carried messages, found the lost, hunted food, controlled vermin, pulled loads, guided people, served in war and rescue, and taken on countless jobs simply because working beside us became part of their lives.
+
+What we owe them is responsible care, patience, safety, companionship and the chance to use the instincts and abilities we deliberately bred into them.
+
+After everything dogs have done for us, the least we can do is make sure their lives are not only useful to humans, but good for them too.`,
+        },
+      ],
+    },
+    article: {
+      family: "Rural and Traditional",
+      subLabel: "Sheepdogs",
+      headline: "The Farm Worker With Four Legs",
+      dek: `To the shepherd it is labour saved. To the dog it is the best game ever invented: find the sheep, get behind them, bring them home. Nobody has told it otherwise.`,
+      image: "/sheepdogs_job.jpg",
+      imageAlt: "a black and white Border Collie sitting in long grass in a field",
+      ctaLabel: "Sheepdogs",
+      // Route is built at checkpoint 7; the link resolves once that lands.
+      href: "/dogs-at-work/the-farm-worker-with-four-legs",
+    },
+  },
+  {
+    id: "search-rescue",
+    order: 5,
+    // Fully resolved (Steve, 11 Aug): blue panel 5, the card dek and the hero alt
+    // are supplied and inlined. The hero image is real; the article route is built.
+    published: "live",
+    panel: {
+      sections: [
+        {
+          subheading: "What dogs *often get*",
+          body: `They get food, shelter, protection, veterinary care, companionship and a place inside our families. Many live warm, comfortable lives filled with walks, play, affection and jobs chosen for enjoyment rather than survival.
+
+But dogs have not always received a fair return and that is still the case in modern times for some dogs. The same animals bred to work beside us can be neglected, abandoned or treated as just tools, or status symbols and disposable possessions.
+
+Some spend their lives bored and under-stimulated, while others are pushed into jobs or environments that damage their welfare.`,
+        },
+      ],
+    },
+    article: {
+      family: "Emergency",
+      subLabel: "Search and rescue dogs",
+      headline: "The Dog That Finds You When Nobody Else Can",
+      dek: `Air scent, trailing, water. A dog covers ground people cannot, in the dark, in the rain, for a toy and a bit of praise.`,
+      image: "/search_rescue_dogs.jpg",
+      imageAlt: "a search and rescue dog working across open moorland",
+      ctaLabel: "Search and rescue dogs",
+      href: "/dogs-at-work/the-dog-that-finds-you-when-nobody-else-can",
+    },
+  },
+  {
+    id: "guide-dogs",
+    order: 6,
+    // Live (Steve, 11 Aug): blue panel 6 and the card dek are supplied and inlined.
+    // Two placeholders remain: the hero alt (outstanding) and the hero image, now a
+    // neutral "image coming soon" stand-in rather than a 404, until the hero chain
+    // is resolved (moving article3_hero.jpg here would leave article 2 short).
+    published: "live",
+    panel: {
+      // This panel is the only one that uses a bullet list, so the component
+      // supports both prose and bulleted content. It is indented a further 20px
+      // (deck.module.css .blueIndent); WorkDeck keys that on the panel carrying
+      // bullets, not on a slide order, so this styling follows the copy if the
+      // deck is reordered again.
       sections: [
         {
           subheading: "Working dogs *do not* *know* they have jobs",
@@ -185,22 +250,23 @@ Some spend their lives bored and under-stimulated, while others are pushed into 
       ],
     },
     article: {
-      family: "Rural and Traditional",
-      subLabel: "Sheepdogs",
-      headline: "The Farm Worker With Four Legs",
-      dek: `To the shepherd it is labour saved. To the dog it is the best game ever invented: find the sheep, get behind them, bring them home. Nobody has told it otherwise.`,
-      image: "/sheepdogs_job.jpg",
-      imageAlt: "a black and white Border Collie sitting in long grass in a field",
-      ctaLabel: "Sheepdogs",
-      // Route is built at checkpoint 7; the link resolves once that lands.
-      href: "/dogs-at-work/the-farm-worker-with-four-legs",
+      family: "People",
+      subLabel: "Guide dogs",
+      headline: "The Dog That Gives You Your World Back",
+      dek: `A guide dog does not give somebody their sight back. It gives them the confidence to go, and that turns out to be almost as valuable.`,
+      // Hero is a neutral stand-in until Steve resolves the hero chain (see the
+      // note by PLACEHOLDER_ARTICLE_6_HERO); no longer a 404.
+      image: PLACEHOLDER_ARTICLE_6_HERO,
+      imageAlt: PLACEHOLDER_ARTICLE_6_ALT,
+      ctaLabel: "Guide dogs",
+      href: "/dogs-at-work/the-dog-that-gives-you-your-world-back",
     },
   },
   {
-    id: "search-rescue",
-    order: 5,
-    // Fully resolved (Steve, 11 Aug): blue panel 5, the card dek and the hero alt
-    // are supplied and inlined. The hero image is real; the article route is built.
+    // Slide 7: the "Some jobs cannot be done by people alone" panel, paired with a
+    // reuse of article 1 (see the panel-split note at the top).
+    id: "some-jobs-people-alone",
+    order: 7,
     published: "live",
     panel: {
       sections: [
@@ -214,24 +280,13 @@ That is the pattern across every job in this series: not a dog doing a human's w
         },
       ],
     },
-    article: {
-      family: "Emergency",
-      subLabel: "Search and rescue dogs",
-      headline: "The Dog That Finds You When Nobody Else Can",
-      dek: `Air scent, trailing, water. A dog covers ground people cannot, in the dark, in the rain, for a toy and a bit of praise.`,
-      image: "/search_rescue_dogs.jpg",
-      imageAlt: "a search and rescue dog working across open moorland",
-      ctaLabel: "Search and rescue dogs",
-      href: "/dogs-at-work/the-dog-that-finds-you-when-nobody-else-can",
-    },
+    article: ARTICLE_BIO_DETECTION,
   },
   {
-    id: "guide-dogs",
-    order: 6,
-    // Live (Steve, 11 Aug): blue panel 6 and the card dek are supplied and inlined.
-    // Two placeholders remain: the hero alt (outstanding) and the hero image, now a
-    // neutral "image coming soon" stand-in rather than a 404, until the hero chain
-    // is resolved (moving article3_hero.jpg here would leave article 2 short).
+    // Slide 8: the "What we get back is bigger than the task" panel, paired with a
+    // reuse of article 2 (see the panel-split note at the top).
+    id: "bigger-than-the-task",
+    order: 8,
     published: "live",
     panel: {
       sections: [
@@ -245,18 +300,7 @@ The dog does the task. The value shows up somewhere else entirely.`,
         },
       ],
     },
-    article: {
-      family: "People",
-      subLabel: "Guide dogs",
-      headline: "The Dog That Gives You Your World Back",
-      dek: `A guide dog does not give somebody their sight back. It gives them the confidence to go, and that turns out to be almost as valuable.`,
-      // Hero is a neutral stand-in until Steve resolves the hero chain (see the
-      // note by PLACEHOLDER_ARTICLE_6_HERO); no longer a 404.
-      image: PLACEHOLDER_ARTICLE_6_HERO,
-      imageAlt: PLACEHOLDER_ARTICLE_6_ALT,
-      ctaLabel: "Guide dogs",
-      href: "/dogs-at-work/the-dog-that-gives-you-your-world-back",
-    },
+    article: ARTICLE_MEDICAL_ALERT,
   },
 ];
 

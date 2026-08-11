@@ -89,6 +89,14 @@ function paragraphs(body: string): string[] {
   return body.split(/\n{2,}/).map((p) => p.trim()).filter(Boolean);
 }
 
+// The bullets panel ("Working dogs do not know they have jobs") gets the extra
+// 20px indent (deck.module.css .blueIndent). It is the only panel with bullets,
+// so key the indent on that, not on a slide order: the deck has been reordered
+// once already and the styling must follow the copy, not its position.
+function panelIsIndented(slide: Slide): boolean {
+  return slide.panel.sections.some((s) => s.bullets && s.bullets.length > 0);
+}
+
 // One blue panel's sections. Thumbnails are desktop, panel 1 only; mobile never
 // shows them, so `withThumbnails` gates them.
 function Sections({ slide, withThumbnails, indent }: { slide: Slide; withThumbnails: boolean; indent?: boolean }) {
@@ -482,7 +490,7 @@ export default function WorkDeck({ slides }: { slides: Slide[] }) {
                       inert={!on}
                       aria-hidden={!on}
                     >
-                      <Sections slide={f.slide} withThumbnails indent={f.slide.order === 4} />
+                      <Sections slide={f.slide} withThumbnails indent={panelIsIndented(f.slide)} />
                     </article>
                   );
                 })}
@@ -590,7 +598,7 @@ export default function WorkDeck({ slides }: { slides: Slide[] }) {
         {/* Blue panel: all supporting points in one container, no thumbnails. */}
         <div className={styles.mBlueWrap} ref={mBlueRef}>
           <GlowPanel className={styles.mBlue}>
-            <Sections slide={mobileSlide} withThumbnails={false} indent={mobileSlide.order === 4} />
+            <Sections slide={mobileSlide} withThumbnails={false} indent={panelIsIndented(mobileSlide)} />
           </GlowPanel>
         </div>
 
