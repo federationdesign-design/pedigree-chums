@@ -10,13 +10,13 @@ redirects that to `docs/dogs-at-work/NEEDS_STEVE.md` per the path override.)
 | Item | Where | Placeholder | Notes |
 |---|---|---|---|
 | Panel 1 thumbnail images (3) | `app/dogs-at-work/data/slides.ts` (bio-detection panel) | WIRED: `/dog_working_img1..3.jpg`, alt text supplied (11 Aug) | Order is game, then job, then payment, mirroring the concept. |
-| Blue panel 5 (search and rescue) | `app/dogs-at-work/data/slides.ts` (search-rescue slide) | `PLACEHOLDER_ARTICLE_5_PANEL` | One panel per article, so article 5 needs its own supporting point. Slide is `draft` until this and the dek land. |
-| Index card dek (article 5) | `app/dogs-at-work/data/slides.ts` (search-rescue slide) | `PLACEHOLDER_ARTICLE_5_DEK` | Two or three sentences. Also stands in for the article page metadata description. |
-| Hero alt text (article 5) | `slides.ts` + `the-dog-that-finds-you-when-nobody-else-can/page.tsx` | `PLACEHOLDER_ARTICLE_5_ALT` | Alt for `/search_rescue_dogs.jpg`. |
+| Blue panel 5 (search and rescue) | `app/dogs-at-work/data/slides.ts` (search-rescue slide) | RESOLVED 11 Aug: supplied and inlined | Heading "Some jobs cannot be done by people alone". |
+| Index card dek (article 5) | `app/dogs-at-work/data/slides.ts` (search-rescue slide) | RESOLVED 11 Aug: supplied and inlined | Also filled the article page meta description. |
+| Hero alt text (article 5) | `slides.ts` + `the-dog-that-finds-you-when-nobody-else-can/page.tsx` | RESOLVED 11 Aug: "a search and rescue dog working across open moorland" | For `/search_rescue_dogs.jpg`. |
 | Article 5 "The honest version" and "Sources" sidebars | `the-dog-that-finds-you-when-nobody-else-can/page.tsx` | Wired from the copy, but marked "drafted for approval" there | Confirm or amend the drafted wording. |
-| Blue panel 6 (guide dogs) | `app/dogs-at-work/data/slides.ts` (guide-dogs slide) | `PLACEHOLDER_ARTICLE_6_PANEL` | One panel per article. Slide is `draft`. |
-| Index card dek (article 6) | `slides.ts` (guide-dogs slide) | `PLACEHOLDER_ARTICLE_6_DEK` | Two or three sentences; also the article page meta description. |
-| Hero image + alt (article 6) | `slides.ts` + `the-dog-that-gives-you-your-world-back/page.tsx` | `PLACEHOLDER_ARTICLE_6_HERO` / `PLACEHOLDER_ARTICLE_6_ALT` | Plan is to move `article3_hero.jpg` here once article 2 has a replacement (see hero-chain note below). |
+| Blue panel 6 (guide dogs) | `app/dogs-at-work/data/slides.ts` (guide-dogs slide) | RESOLVED 11 Aug: supplied and inlined | Heading "What we get back is bigger than the task". |
+| Index card dek (article 6) | `slides.ts` (guide-dogs slide) | RESOLVED 11 Aug: supplied and inlined | Also filled the article page meta description. |
+| Hero image + alt (article 6) | `slides.ts` + `the-dog-that-gives-you-your-world-back/page.tsx` | `PLACEHOLDER_ARTICLE_6_HERO` (now `/hero-coming-soon.svg`, a neutral stand-in, not a 404) / `PLACEHOLDER_ARTICLE_6_ALT` (still outstanding) | Plan is to move `article3_hero.jpg` here once article 2 has a replacement (see hero-chain note below). |
 | Article 6 "What the dog thinks", "The honest version", "Sources" sidebars | `the-dog-that-gives-you-your-world-back/page.tsx` | Wired from the copy, marked "drafted for approval" | Confirm or amend the drafted wording. |
 | **Permission: named case studies in article 6** | `the-dog-that-gives-you-your-world-back/page.tsx` (body) | Published as written | The article names real people and dogs (Trudy Sherwood and Connie, Scott and Milo, Emma and Archie), read as Guide Dogs' own case studies. The campaign brief asks for written permission before using named cases; confirm before publishing. |
 | **Hero chain (article 2 left short)** | article 2 + article 6 | See hero-chain note | Moving `article3_hero.jpg` from article 2 to article 6 leaves article 2 with no hero. Article 2 needs a new medical-alert-dog hero before the move is wired. |

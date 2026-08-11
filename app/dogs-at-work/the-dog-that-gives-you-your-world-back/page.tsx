@@ -12,10 +12,9 @@ import { PAYSLIPS } from "../data/payslips";
 
 export const metadata: Metadata = {
   title: "The Dog That Gives You Your World Back | Dogs at Work | Pedigree Chums™",
-  // Placeholder: the index card dek is outstanding from Steve; the meta
-  // description is drawn from it, so this stands in until that lands.
+  // Meta description drawn from the index card dek (supplied by Steve, 11 Aug).
   description:
-    "PLACEHOLDER: meta description for the guide dogs article, pending the index card dek from Steve.",
+    "A guide dog does not give somebody their sight back. It gives them the confidence to go, and that turns out to be almost as valuable.",
   robots: "noindex",
 };
 
@@ -264,11 +263,11 @@ export default function GuideDogsPage() {
       <Nav showLogo />
       <main className={styles.essayPage}>
         <div className={styles.essayHero}>
-          {/* Hero is a placeholder: the plan is to move article3_hero.jpg here once
-              article 2 has a replacement (hero chain reported to Steve). Path 404s
-              by design until then; alt is also a placeholder. */}
+          {/* Hero is a neutral "image coming soon" stand-in, not a 404, until Steve
+              resolves the hero chain (the plan is to move article3_hero.jpg here once
+              article 2 has a replacement). Alt is still a placeholder. */}
           <img
-            src="/PLACEHOLDER_article6_hero.jpg"
+            src="/hero-coming-soon.svg"
             alt="PLACEHOLDER: alt text for the guide dogs hero, outstanding from Steve"
             className={styles.essayHeroImg}
           />
