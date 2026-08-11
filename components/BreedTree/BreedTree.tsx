@@ -701,10 +701,17 @@ const BADGE_MAX_R = 140;
 // the number stops reading. The floor is a fixed on-screen px, converted to viewBox
 // units per device by the stage short side (badgeFloorVb). Physics radius stays
 // coupled (rDraw / k), so a smaller disc also collides smaller.
-const BADGE_FRAC = 0.38;
+const BADGE_FRAC = 0.28;
 const BADGE_FLOOR_PX = 13.5;
-const badgeDrawForNode = (nodeR: number, k: number, floorVb: number) =>
-  Math.max(floorVb, BADGE_FRAC * nodeR * k);
+// Badge radius from the dog's OWN drawn radius (nodeR * k). No badge at all on a
+// circle smaller than the smallest legible disc (dog below the floor): a badge
+// there would have to swallow the dog, so it returns 0 and the render/spawn skip
+// it. Above the floor the badge is BADGE_FRAC of the dog but never less than the
+// floor, and both of those are <= the dog, so a badge never exceeds its own circle.
+const badgeDrawForNode = (nodeR: number, k: number, floorVb: number) => {
+  const dog = nodeR * k;
+  return dog < floorVb ? 0 : Math.max(floorVb, BADGE_FRAC * dog);
+};
 
 // Split words into exactly n lines as evenly as the word lengths allow.
 // Returns null when n lines are not reachable (a single long word can force
@@ -6039,6 +6046,7 @@ export default function BreedTree({
               const by = b ? b.y : d1n ? d1n.y + d1n.r * 0.707 : v[1] - 99999;
               const inert = inertBadges.has(i);
               if (deadBadges.has(i)) return <g key={i} style={{ display: "none" }} />;
+              if (item.r <= 0) return <g key={i} style={{ display: "none" }} />; // dog below the legibility floor: no badge
               return (
               <g key={i} transform={`translate(${(bx - v[0]) * kk},${(by - v[1]) * kk}) rotate(${(b ? b.a : 0) * 57.2958})`}
                 style={{ cursor: inert ? "default" : "grab", pointerEvents: inert ? "none" : "auto", userSelect: "none" }}
