@@ -3012,7 +3012,7 @@ export default function BreedTree({
        they play their own relPop and it arrives with a pop rather than a fade. */
     setRailHidden(false);
     onActiveChange?.(d !== nodes[0]);
-    let target: View = [d.x, d.y, dockAside && d !== nodes[0] ? d.r * 2 : d.r * 2 * (isMobileRef.current ? PAD : ZOOM_PAD) * (dockAside && d === nodes[0] ? PIT_SPAN : 1)];
+    let target: View = [d.x, d.y, dockAside && d !== nodes[0] ? d.r * 2 * (isMobileRef.current ? PAD : ZOOM_PAD) : d.r * 2 * (isMobileRef.current ? PAD : ZOOM_PAD) * (dockAside && d === nodes[0] ? PIT_SPAN : 1)];
     if (d === nodes[0]) target = clampRootView(target);
     if (d === nodes[0]) homeWRef.current = target[2];
     const reduce = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
