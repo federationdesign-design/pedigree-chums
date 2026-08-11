@@ -2459,7 +2459,7 @@ export default function BreedTree({
   // The render-side view of a badge body. J17 adds the fuse fields, which the
   // rattle in zoomTo reads: rDraw is the chip's own drawn radius, so the shake
   // is always a fraction of the chip rather than a flat pixel count.
-  type BadgeBody = { x: number; y: number; vx: number; vy: number; r: number; pct: number; idx: number; a: number; held?: boolean; bomb?: boolean; blown?: boolean; bursting?: number; rDraw?: number; hits?: number; heldSince?: number; heldHits?: number; clickPending?: boolean };
+  type BadgeBody = { x: number; y: number; vx: number; vy: number; r: number; pct: number; idx: number; a: number; held?: boolean; bomb?: boolean; blown?: boolean; bursting?: number; rDraw?: number; hits?: number; heldSince?: number; heldHits?: number; clickPending?: boolean; green?: boolean };
   const badgeBodiesRef = useRef<BadgeBody[] | null>(null);
   const badgesRef = useRef<SVGGElement>(null);
   const fxRef = useRef<SVGGElement>(null);
@@ -3410,7 +3410,7 @@ export default function BreedTree({
       // old world-units-per-second speeds (in worldH multiples) -> px per 16.66ms step
       const vps = (x: number) => (stagePxH * x) / 60;
 
-      type Body = { n: Node | null; x: number; y: number; vx: number; vy: number; r: number; pct: number; idx: number; lastFx: number; popped: boolean; a: number; va: number; ia: number; iva: number; held?: boolean; charges?: number; lastKnock?: number; inert?: boolean; mb?: any; mbIn?: boolean; bomb?: boolean; blown?: boolean; bursting?: number; fuseCur?: number; rDraw?: number; hits?: number; heldSince?: number; heldHits?: number; clickPending?: boolean };
+      type Body = { n: Node | null; x: number; y: number; vx: number; vy: number; r: number; pct: number; idx: number; lastFx: number; popped: boolean; a: number; va: number; ia: number; iva: number; held?: boolean; charges?: number; lastKnock?: number; inert?: boolean; mb?: any; mbIn?: boolean; bomb?: boolean; blown?: boolean; bursting?: number; fuseCur?: number; rDraw?: number; hits?: number; heldSince?: number; heldHits?: number; clickPending?: boolean; green?: boolean };
       const d1 = nodes.filter((n) => n.depth === 1);
       const pctOf = (n: Node) => (n.parent ? Math.round(((n.value ?? 0) / (n.parent.value || 1)) * 100) : 0);
       const bodies: Body[] = d1.map((n, i) => ({ n, x: n.x, y: n.y, vx: 0, vy: 0, r: n.r, pct: pctOf(n), idx: i, lastFx: 0, popped: false, a: 0, va: 0, ia: 0, iva: 0 }));
@@ -3442,7 +3442,7 @@ export default function BreedTree({
         // bottom LEFT of the circle: the right side is where the level's own
         // furniture sits, and a badge there crowded it
         n: null, x: n.x - n.r * 0.707, y: n.y + n.r * 0.707, vx: 0, vy: 0,
-        r: badgeDrawForNode(n.r, k, badgeFloor) / k, rDraw: badgeDrawForNode(n.r, k, badgeFloor), pct: pctOf(n), idx: i, lastFx: 0, popped: true, a: 0, va: 0, ia: 0, iva: 0, charges: 20,
+        r: badgeDrawForNode(n.r, k, badgeFloor) / k, rDraw: badgeDrawForNode(n.r, k, badgeFloor), pct: pctOf(n), idx: i, lastFx: 0, popped: true, a: 0, va: 0, ia: 0, iva: 0, charges: 10, green: false,
       }));
       badgeBodiesRef.current = badges;
 
@@ -3682,7 +3682,7 @@ export default function BreedTree({
               n: null, x: ch.x - ch.r * 0.6, y: ch.y + ch.r * 0.6, vx: 0, vy: 0,
               r: badgeDrawForNode(ch.r, k, badgeFloor) / k, rDraw: badgeDrawForNode(ch.r, k, badgeFloor),
               pct: pctOf(ch), idx: bl.length, lastFx: 0, popped: true,
-              a: 0, va: 0, ia: 0, iva: 0, charges: 20, bomb: kidBomb,
+              a: 0, va: 0, ia: 0, iva: 0, charges: 10, green: false, bomb: kidBomb,
             };
             bl.push(kb);
             all.push(kb);
@@ -3742,7 +3742,7 @@ export default function BreedTree({
             // the roll belongs here as much as in the scatter. Without it a bomb
             // only ever arrives from the lineage layer and stays rare.
             const popBomb = rollBomb();
-            const bb: Body = { n: null, x: ch.x - ch.r * 0.6, y: ch.y + ch.r * 0.6, vx: 0, vy: 0, r: badgeDrawForNode(ch.r, k, badgeFloor) / k, rDraw: badgeDrawForNode(ch.r, k, badgeFloor), pct: pctOf(ch), idx: bl.length, lastFx: 0, popped: true, a: 0, va: 0, ia: 0, iva: 0, charges: 20, bomb: popBomb };
+            const bb: Body = { n: null, x: ch.x - ch.r * 0.6, y: ch.y + ch.r * 0.6, vx: 0, vy: 0, r: badgeDrawForNode(ch.r, k, badgeFloor) / k, rDraw: badgeDrawForNode(ch.r, k, badgeFloor), pct: pctOf(ch), idx: bl.length, lastFx: 0, popped: true, a: 0, va: 0, ia: 0, iva: 0, charges: 10, green: false, bomb: popBomb };
             bl.push(bb);
             all.push(bb);
             const mbb = mkCircle(bb, "badge", BADGE_OPTS);
@@ -4239,7 +4239,7 @@ export default function BreedTree({
         // A solo dog circle arrives through this same call carrying a label,
         // and that one is never a bomb: it is a whole breed, not a chip.
         const isBomb = !opts?.label && rollBomb();
-        const nb: Body = { n: null, x: w.x, y: w.y, vx: 0, vy: 0, rDraw, r: rDraw / kD, pct: pctVal, idx: bl.length, lastFx: 0, popped: true, a: 0, va: 0, ia: 0, iva: 0, charges: opts?.charges ?? 20, bomb: isBomb };
+        const nb: Body = { n: null, x: w.x, y: w.y, vx: 0, vy: 0, rDraw, r: rDraw / kD, pct: pctVal, idx: bl.length, lastFx: 0, popped: true, a: 0, va: 0, ia: 0, iva: 0, charges: opts?.charges ?? (opts?.green ? 20 : 10), green: opts?.green, bomb: isBomb };
         bl.push(nb);
         all.push(nb);
         const mb = mkCircle(nb, "badge", BADGE_OPTS);
