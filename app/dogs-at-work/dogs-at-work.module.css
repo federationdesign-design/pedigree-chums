@@ -395,6 +395,14 @@
   grid-template-columns: 1fr 380px;
   gap: 48px;
   align-items: start;
+  /* Query container for the desktop payslip (Steve, 11 Aug): the payslip's
+     font-size, width and drift are driven from this column's inline size via cqi,
+     so the card scales with the content, not the raw viewport. Because the column
+     is capped at --essay-max (1300) and centred, its inline size is fixed above
+     ~1300px viewport, which is why the payslip is identical at 1600/1920/2800 and
+     only responds below 1300. Content box = 1300 - 48 gutter = 1252 at the cap, so
+     100cqi = 1252px there. */
+  container-type: inline-size;
 }
 
 .essayHero {
@@ -472,25 +480,32 @@
 }
 
 @media (min-width: 901px) {
-  /* Doubled and nudged (Steve): scale(2) from the top-left corner keeps the left
-     edge fixed and grows the payslip right and down; translateX(20px) then nudges
-     it 20px right so it overhangs the right edge of the content margin. rotate is
-     re-included here because this transform replaces the base .payslip tilt; the
-     doubled class name (specificity 0,2,0) outranks .payslip (0,1,0) so it wins
-     regardless of source order. NOTE: transform:scale does not reflow, so the
-     doubled payslip visually overlaps the sidebar cards beneath it. */
+  /* Enlarged and made responsive (Steve, 11 Aug). The size no longer comes from
+     transform:scale (which cannot vary continuously with a container) but from the
+     card's own font-size and width, both driven from the .essayLayout query
+     container via cqi. This gives a real, reflowing layout box: the sidebar cards
+     flow beneath it with no scale-underlay hack.
+
+     Locked at/above the 1300 cap: font-size 24px (=16px base x1.5, the previous
+     look) and width 570px (=380 base x1.5). 100cqi = 1252px at the cap, so:
+       - font-size min(24px, 1.917cqi): 1.917 x 12.52 = 24 at the cap; min() holds
+         it at 24 for any wider container and lets it shrink smoothly below 1300.
+       - width 23.75em: 23.75 x 24 = 570 at the cap, and it tracks font-size down.
+     The doubled class name (0,2,0) outranks base .payslip (0,1,0), so this rotate
+     replaces the base tilt regardless of source order.
+
+     Horizontal drift (requirement 3, the lever holding the <=10px ingress): below
+     the cap the card drifts right so its left edge tracks the narrowing text. The
+     term (1252px - 100cqi) is 0 at the cap and grows as the container narrows
+     (it equals 1300 - viewport below the cap); DRIFT_K scales it. K is set from
+     measurement so ingress stays <=10px at every width down to the mobile break. */
   .payslipOverlay.payslipOverlay {
-    /* Lift: -122 - 75 - 75 - 75 = -347, so the payslip sits high over the hero. */
+    /* Lift so the card sits high over the hero. */
     margin-top: -347px;
+    font-size: min(24px, 1.917cqi);
+    width: 23.75em;
     transform-origin: top left;
-    /* scale 1.5 (25% smaller than the earlier 2x). translateX: 20 + 120 - 125 - 125
-       = -110. Overhangs the content margin and bleeds off the right; the overflow is
-       clipped, not scrolled. */
-    transform: translateX(-110px) scale(1.5) rotate(-3deg);
-    /* scale does not reflow, so the scaled payslip's visual bottom (~172px below
-       its layout box) would underlay the first sidebar card. Push the cards down by
-       the overlap plus a gap so the secondary column clears the payslip. */
-    margin-bottom: 200px;
+    transform: translateX(calc(-110px + (1252px - 100cqi) * 0)) rotate(-3deg);
   }
 }
 
