@@ -366,7 +366,10 @@
 .essayLayout {
   max-width: 1300px;
   margin: 0 auto;
-  padding: 48px 24px;
+  /* Vertical padding removed (Steve, 11 Aug): the hero->essay gap is owned solely
+     by the hero's margin-bottom (48), and the essay->footer gap solely by
+     main.essayPage's padding-bottom (80). No double gaps. */
+  padding: 0px 24px;
   display: grid;
   grid-template-columns: 1fr 380px;
   gap: 48px;
@@ -449,7 +452,9 @@
 
 @media (min-width: 901px) {
   .payslipOverlay {
-    margin-top: -170px;
+    /* -122 not -170: with .essayLayout top padding now 0 (was 48), this holds the
+       payslip's hero overlap where it was rather than deepening it. */
+    margin-top: -122px;
   }
 }
 
