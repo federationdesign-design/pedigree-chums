@@ -263,11 +263,10 @@ export default function GuideDogsPage() {
       <Nav showLogo />
       <main className={styles.essayPage}>
         <div className={styles.essayHero}>
-          {/* Hero supplied by Steve (12 Aug 2026). Alt is still a placeholder until
-              Steve sends it. */}
+          {/* Hero and alt supplied by Steve (12 Aug 2026). */}
           <img
             src="/guide_dog_image.jpg"
-            alt="PLACEHOLDER: alt text for the guide dogs hero, outstanding from Steve"
+            alt="a man with a white cane sitting on a park bench beside a black Labrador in a yellow guide-dog harness"
             className={styles.essayHeroImg}
           />
           <div className={styles.essayHeroTint} />

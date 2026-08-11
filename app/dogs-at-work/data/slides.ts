@@ -35,12 +35,9 @@ import { validateSlides } from "./validate";
 // below. The hero image (/search_rescue_dogs.jpg) and the article route were
 // already real. No placeholders remain on this slide.
 
-// Article 6 (guide dogs): blue panel 6 and the index card dek were supplied by
-// Steve (11 Aug 2026) and are inlined below. The hero image is now supplied too
-// (/guide_dog_image.jpg, Steve, 12 Aug 2026), replacing the earlier neutral
-// "image coming soon" stand-in. One placeholder remains: the hero alt is still
-// outstanding, so it stays a clearly named placeholder until Steve sends it.
-const PLACEHOLDER_ARTICLE_6_ALT = "PLACEHOLDER: alt text for the guide dogs hero, outstanding from Steve.";
+// Article 6 (guide dogs): blue panel 6, the index card dek, the hero image
+// (/guide_dog_image.jpg) and the hero alt were all supplied by Steve (11 to 12
+// Aug 2026) and are inlined below. No placeholders remain on this slide.
 
 // Articles 1 and 2, reused by slides 7 and 8 (see the panel-split note above).
 // Declared once and referenced twice so the reuse is literal, not a re-typed copy
@@ -250,9 +247,9 @@ Some spend their lives bored and under-stimulated, while others are pushed into 
       subLabel: "Guide dogs",
       headline: "The Dog That Gives You Your World Back",
       dek: `A guide dog does not give somebody their sight back. It gives them the confidence to go, and that turns out to be almost as valuable.`,
-      // Hero supplied by Steve (12 Aug 2026); alt still a placeholder until sent.
+      // Hero and alt supplied by Steve (12 Aug 2026).
       image: "/guide_dog_image.jpg",
-      imageAlt: PLACEHOLDER_ARTICLE_6_ALT,
+      imageAlt: "a man with a white cane sitting on a park bench beside a black Labrador in a yellow guide-dog harness",
       ctaLabel: "Guide dogs",
       href: "/dogs-at-work/the-dog-that-gives-you-your-world-back",
     },

@@ -132,18 +132,21 @@ asset, then delete the SVG.
 
 ## Dogs at Work redux (dogsatwork branch)
 
-Placeholders introduced by the Dogs at Work redux (brief v3.0). Details and the
+Placeholders introduced by the Dogs at Work redux (brief v3.0). Details and any
 outstanding decisions are in `docs/dogs-at-work/NEEDS_STEVE.md`.
 
-| Placeholder | Location | Meaning | Resolve via |
-|---|---|---|---|
-| `PLACEHOLDER_ARTICLE_6_ALT` | `slides.ts` + `the-dog-that-gives-you-your-world-back/page.tsx` hero | Alt text for the guide dogs hero. | Steve supplies the hero alt text |
+No named placeholders remain in the Dogs at Work slides or article pages.
+
+Resolved 12 Aug 2026: the guide dogs hero alt is supplied ("a man with a white
+cane sitting on a park bench beside a black Labrador in a yellow guide-dog
+harness") and inlined in `slides.ts` and the article page, so
+`PLACEHOLDER_ARTICLE_6_ALT` is gone.
 
 Resolved 12 Aug 2026: the guide dogs hero image is supplied (`/guide_dog_image.jpg`),
 wired into `slides.ts` and the article page, replacing the `/hero-coming-soon.svg`
 stand-in (now deleted). `PLACEHOLDER_ARTICLE_6_HERO` is gone; this also makes the
 old hero chain (moving `article3_hero.jpg` off article 2) moot, so article 2 keeps
-its hero. Only the hero alt above remains outstanding.
+its hero.
 
 Resolved 11 Aug 2026: `PLACEHOLDER_ARTICLE_5_PANEL`, `PLACEHOLDER_ARTICLE_5_DEK`,
 `PLACEHOLDER_ARTICLE_5_ALT`, `PLACEHOLDER_ARTICLE_6_PANEL` and
