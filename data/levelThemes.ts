@@ -107,6 +107,14 @@ const THEMES: Record<string, LevelTheme> = {
 THEMES["ancient"] = THEMES["ancient-medieval"];
 THEMES["medieval"] = THEMES["ancient-medieval"];
 
+// REVERTED TO STANDARD (owner request): ancient, medieval and Tudor drop back to
+// the plain body gradient and the flat pit-bottom floor, the same as every other
+// level, art AND physics together. The floor reserve and the stepped physics floor
+// both hang off a non-null theme, so returning null reverts the lot (background,
+// floor height and props). Every THEMES entry and every asset below is kept intact
+// on disk: flip THEMES_ENABLED back to true to bring the themes back.
+const THEMES_ENABLED = false;
 export function levelThemeFor(era?: string): LevelTheme | null {
+  if (!THEMES_ENABLED) return null;
   return (era && THEMES[era]) || null;
 }
