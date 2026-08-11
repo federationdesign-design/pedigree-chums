@@ -54,7 +54,9 @@ const STOP = new Set([
   'then',
 ]);
 
-function keyTokens(s: string): string[] {
+// Exported (Task 173): the reworded-input matcher scores on the same "content words, filler stripped"
+// primitive the router already uses, so the two never diverge on what counts as a significant token.
+export function keyTokens(s: string): string[] {
   return (s.toLowerCase().match(/[a-z]+/g) ?? []).filter((w) => w.length >= 3 && !STOP.has(w));
 }
 
@@ -995,7 +997,10 @@ export function extractCandidateSubject(n0: Normalised, data: ChumData): string 
 // the same "recognised conversation" shape as B21-B39 (triggers -> template), so they route the same
 // way. B40-B46 (fallback loop / games / rotation) and B54-B63 (wired explicitly, with their own
 // ask/confirm/paw/fact behaviours) stay OUT of this range.
-const CANNED_BUCKETS = /^B(2[1-9]|3[0-9]|4[7-9]|5[0-3]|64)$/;
+// Exported (Task 173): the reworded-input matcher draws its candidate universe from EXACTLY these buckets,
+// so it can only ever reach the same approved conversational rows the deterministic canned matcher serves --
+// never a reserved safeguarding/grief/moderation row, never the fallback-loop or wired buckets.
+export const CANNED_BUCKETS = /^B(2[1-9]|3[0-9]|4[7-9]|5[0-3]|64)$/;
 // Task 141: only the original B21-B39 buckets may OVERRIDE a real answer (identity / orientation /
 // clarifier / FAQ / breed page) on an exact match, which is the deliberate "old voice" decision. The
 // eight new buckets must NOT hijack those: e.g. "how long do they live" (B48) has to stay the breed
