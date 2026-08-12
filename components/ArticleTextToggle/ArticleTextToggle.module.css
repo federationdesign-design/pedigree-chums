@@ -10,8 +10,12 @@
      below and cannot drift when the axis changes. */
   width: 100%;
   max-width: var(--essay-max, none);
-  margin: 0 auto;
-  padding: 14px var(--essay-gutter, clamp(18px, 4vw, 48px)) 0;
+  /* Single owner of the hero->body vertical space: margin-top reads the shared
+     --essay-hero-gap (the vertical axis), a small margin-bottom keeps the icon
+     close to the body text it controls. The hero's margin-bottom and .layout's
+     padding-top are both 0, so this is the only contributor. */
+  margin: var(--essay-hero-gap, 36px) auto 12px;
+  padding: 0 var(--essay-gutter, clamp(18px, 4vw, 48px));
   box-sizing: border-box;
   display: flex;
 }
