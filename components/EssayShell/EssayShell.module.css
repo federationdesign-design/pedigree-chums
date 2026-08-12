@@ -23,6 +23,12 @@
   --essay-sidebar: clamp(380px, 30vw, 580px);
   --essay-max: none;
   --essay-gap: 48px;
+  /* Single-source VERTICAL axis: the one value that owns the space between the
+     hero and the body. Read by the text toggle's margin-top; the hero's
+     margin-bottom and .layout's padding-top are 0 so they no longer stack into
+     the band (the toggle used to float in ~110px of dead space made of three
+     separate contributors). */
+  --essay-hero-gap: 36px;
 }
 
 /* Hero content: capped + centred on the shared axis. THE split fix. */
@@ -42,7 +48,10 @@
   width: 100%;
   max-width: var(--essay-max);
   margin: 0 auto;
-  padding: 48px var(--essay-gutter);
+  /* padding-top is 0: the space above the body is owned solely by the text
+     toggle's margin (which reads --essay-hero-gap). Keeps the bottom breathing
+     room. */
+  padding: 0 var(--essay-gutter) 48px;
   display: grid;
   grid-template-columns: minmax(0, 1fr) var(--essay-sidebar);
   gap: var(--essay-gap);

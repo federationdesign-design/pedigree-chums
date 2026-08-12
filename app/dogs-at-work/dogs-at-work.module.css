@@ -414,7 +414,9 @@
   overflow: hidden;
   display: flex;
   align-items: flex-end;
-  margin-bottom: 48px;
+  /* 0: the hero->body space is owned by the text toggle (--essay-hero-gap), not
+     stacked here. */
+  margin-bottom: 0;
 }
 
 .essayHeroImg {
