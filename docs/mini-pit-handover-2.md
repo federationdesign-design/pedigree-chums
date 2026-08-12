@@ -372,3 +372,104 @@ circles). Read from the code, not device.
 
 (Lesson, as with other queued items closed today: a job read smaller or already
 done than the notes said. Check the code before scheduling handover jobs.)
+
+## 14. PER-LEVEL PAGES (A) + CHUM-PAGE REWORK (B): SCOPED, PARKED (2026-08-12)
+
+Two related pieces, scoped read-only and PARKED (not started). Costs are rough,
+as a share of the combined A+B delivery.
+
+A. NEW PER-LEVEL PAGES for non-chum dogs: wide, like the chum pages, showing the
+   start screen (circular diagram) with the information cards exposed. NOT a
+   playable pit, a presentation.
+   - ~60% of delivery, and the real work. Needs: a new ROUTE (`/levels/[slug]`;
+     levels open as a modal from BreedStrip today, no per-level URL); a static
+     "PRESENT" mode on `BreedTree` (its start screen is the `dockAside && gravity
+     && !started` state, deeply physics/interaction-coupled, so rendering it
+     without arming the live pit is the hard part and the main risk); statically
+     PRE-EXPOSED `LineageMap` cards (auto-expose exists but is interaction-
+     triggered, no "mount already open" mode); and a wide page shell.
+   - THE KEY FINDING: the start screen currently CANNOT render without the live
+     pit. A's core is inventing a static present mode over it. `hideLabels`/
+     `disableZoom`/auto-expose are partial ingredients, not a ready mode.
+
+B. REWORK THE CHUM PAGES: the open blue info boxes closed behind their blue
+   icons, the diagram + line graph re-oriented, health moved into a blue card as
+   a closed feature, then the old `centred` diagram replaced by A.
+   - ~40% of delivery, cheaper than it looks. THE KEY FINDING: the card dock
+     ALREADY EXISTS (`closedCards` + `CardDock`, `BreedClient.tsx:123,441`), so
+     "close behind icons" is mostly RE-DEFAULTING the cards to closed, not
+     building the dock. The ~10 blue cards are separate components under one
+     shared `DragCard` shell; the line graph is its own `LifespanChart`. Re-orient
+     is layout-by-eye; health-to-card is `HealthSection` -> a `DockItem`. The
+     diagram swap is mechanical but GATED on A existing.
+
+PLAN: build A as the master, get it right, then replace the chum diagram with it.
+Chum diagram today = `BreedTree` `centred hideLabels disableZoom` (the OLD static
+mode, line 914 "old centred-and-nudged-down rule"); the learn view is a DIFFERENT
+component (`LineageMap`). The suspected "minus out a biggest circle" divergence is
+CLOSED as not real (Steve checked on device 2026-08-12): `isEcho` (:531) and the
+root hide (:5469) skip the same self-child/root on BOTH the pit and the chum
+paths, so there is no extra circle on the chum page. It was the fourth queued
+item that day to turn out already-done or not-real. Do not re-open it.
+
+## 15. TOYS: ROCK REMOVED, BALLS ON ALL LEVELS (2026-08-12)
+
+Two toy changes in `BreedTree.tsx`, one commit.
+
+1. ROCK OUT OF DEFAULT_PROPS. `DEFAULT_PROPS` is now `["stick", "stickBig"]`; the
+   rock no longer drops. The rock's `spawnToy` case, opts and `ToyKind` entry are
+   left in place (harmless, unused) so a future theme could still ask for it.
+   `rockAt` survives as a TIMING ANCHOR only (the bone and the chum flood still
+   key off `propsAt + TOY_ROCK_GAP`), so nothing spawns on that beat but the
+   rhythm is unchanged.
+
+   WHY THIS REACHES EVERY LEVEL, NO EXCEPTIONS: `THEMES_ENABLED` is `false`
+   (`data/levelThemes.ts`), so `levelThemeFor` returns null and no era's `props`
+   override runs, not even Tudor's `["newspaper","fork","shoe"]`. Every level
+   falls through to `DEFAULT_PROPS`, so removing rock there removes it everywhere.
+   If themes are ever re-enabled, re-check the per-era prop sets for rock.
+
+2. hideBalls GATE REMOVED ENTIRELY, against an UNRECORDED decision (Steve,
+   2026-08-12). The gate `levelNo <= 6` hid both tennis balls on the first seven
+   play levels (all 6 ancient + the first medieval, Shepherd's Dog). Its reason
+   was never recorded: the commit `36f13b72 "hide both tennis balls on the first
+   seven levels"` is a bare subject and the code comment explained only the how.
+   Steve removed it knowingly, so balls (yellow + pink) now drop on EVERY level.
+   The no-balls re-timing went with it (`NOBALLS_FLAG_AT/STICKS_AT/BONE_AFTER_
+   FLOOD` gone); the schedule is now always the balls-present timing. Do NOT
+   restore the gate thinking the early-level balls are a regression: the removal
+   is intentional, and the original reason for hiding them is lost, so if a real
+   settle/pile-up problem surfaces on the ancient levels (the ball is restitution
+   0.97, the bounciest thing in the pit) it should be re-solved and RE-RECORDED,
+   not reinstated blind.
+
+## 16. ROUND WON SCREEN FIXES (2026-08-12)
+
+Three fixes in `LineageModal.module.css`, mobile as one commit, desktop as
+another.
+
+- MOBILE: `.winFlash` ("ROUND WON") line-height 0.82 -> 0.6 (0.82 read ~1.3
+  against Luckiest Guy's ink, same effect as the circle labels; Steve wanted the
+  LOOK of 0.9, not the number). And `.winWrap` top padding bumped
+  `clamp(96px,24vw,150px)` -> `clamp(148px,30vw,180px)` so the flow group clears
+  the absolutely-positioned chum-rate block (`.winTop` at top:24px) it overlapped.
+- DESKTOP: went through two passes. First pass anchored the head
+  (`object-position: center center` -> `center top`) and softened the clip-path
+  slant, but that only chose which part to lose: `cover` on a square image in the
+  full-width landscape box still scaled the dog to the WIDTH, so it filled the
+  frame and read as a crop, not a portrait. FINAL fix: `.winNextImg` is now a
+  CENTRED COLUMN on desktop (`width: min(40vw, 460px); margin-inline: auto`), which
+  flips `cover` to scale by HEIGHT and roughly halves the dog to a sensible
+  portrait; the blue overlay gradient fills the sides. Still `cover` + `center top`
+  (immersive, light side-crop, head kept). `contain` was rejected on purpose (it
+  shows the artwork's own edges and reads as a sticker, comment ~839). Clip-path
+  slant retuned `3% -> 1.5%` because its y is a % of the element HEIGHT and the
+  narrower column makes a given % read steeper. Per-breed focal data was rejected
+  as not worth it. Mobile is the base rule (full-bleed cover) and was untouched by
+  any of this.
+
+  ASPIRATIONAL-COMMENT NOTE, worth recording: the desktop comment already SAID "shown
+  from its TOP so the dog's head is not cropped off", but the value was
+  `center center` the whole time. The comment was ASPIRATIONAL, never applied,
+  until this fix. A reminder that a comment describing intent is not proof the
+  code does it, on this screen at least.
