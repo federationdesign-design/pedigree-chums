@@ -18,11 +18,33 @@ const COLORS = ["#00e2ff", "#008eff", "#ffed60"]; // two blues (matched to the p
 
 const RINGS = 40;
 const SPACING = 100;
-const SPEED = 4;
 const MAXZ = RINGS * SPACING;
 const TUNNEL_MS = 2000; // the tunnel run length; the card dive and bg both scale off this
 const CLEAR_MS = 700; // the resolve window: rings rush outward and the canvas fades over this
-const CLEAR_SPEED = 60; // rings rush the camera this fast while clearing (vs SPEED while travelling)
+const CLEAR_SPEED = 60; // rings rush the camera this fast while clearing (vs the ring ramp while travelling)
+
+// Ring travel speed: its OWN dials, independent of the background dials below (tune
+// one without touching the other). The rings used to travel at a flat speed and
+// then jump straight to CLEAR_SPEED at the resolve, which read as a slow run that
+// lurched at the very end. Instead the per-frame speed now ramps from
+// RING_SPEED_START up to RING_SPEED_END across the TUNNEL_MS run, so the tunnel
+// builds gradually and hands off into the clear with no jump. RING_ACCEL curves the
+// ramp: 1 = linear even build, >1 = eases in (calmer start, quicker finish).
+const RING_SPEED_START = 4;
+const RING_SPEED_END = 32;
+const RING_ACCEL = 1.25;
+
+// Background timing: its OWN dials, independent of the ring-speed dials above.
+// BG_HOLD_MS is how long the background stays flat navy; the shift from navy to the
+// pit gradient then runs over BG_SHIFT_MS, curved by BG_SHIFT_EASE (1 = linear,
+// >1 = eases in so navy holds visually and then warms sharply at the very end).
+// The shift MUST finish by TUNNEL_MS (keep BG_HOLD_MS + BG_SHIFT_MS === TUNNEL_MS):
+// the canvas has to already be the pit gradient before the clear-fade, or the fade
+// reveals a navy/blue mismatch. Defaults hold navy for the first 80% and warm over
+// the last 20%, and the ease keeps it reading navy until deep into that window.
+const BG_HOLD_MS = 1600;
+const BG_SHIFT_MS = 400;
+const BG_SHIFT_EASE = 1.8;
 
 // Shapes flying past, on the same perspective as the rings.
 const MOTE_COUNT = 10; // fewer objects flying past
@@ -249,15 +271,23 @@ export default function TimeTunnel({ onDone, onResolve, fromRect }: { onDone?: (
       const t = now - start;
       const running = t < TUNNEL_MS;
       vx = cx + Math.sin((now / SWAY_PERIOD) * 2 * Math.PI) * SWAY_AMOUNT * W;
-      // Background: navy warming to the pit gradient over the run, then held there.
-      const bgP = Math.min(1, t / TUNNEL_MS); // 0 = navy, 1 = pit gradient
+      // Background: navy held, then warming to the pit gradient late in the run and
+      // held there. The linear window is eased in (BG_SHIFT_EASE) so navy keeps
+      // reading through most of the shift and only warms sharply near TUNNEL_MS,
+      // where it must land so the clear-fade reveals a matching gradient (no seam).
+      const bgLinear = Math.max(0, Math.min(1, (t - BG_HOLD_MS) / BG_SHIFT_MS)); // 0 until BG_HOLD, ramps over BG_SHIFT
+      const bgP = Math.pow(bgLinear, BG_SHIFT_EASE);
       const bg = ctx.createLinearGradient(0, H, W, 0); // bottom-left to top-right = "to top right"
       bg.addColorStop(0, mix(NAVY_RGB, PIT_A_RGB, bgP));
       bg.addColorStop(1, mix(NAVY_RGB, PIT_B_RGB, bgP));
       ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
       if (running) {
-        // Travel: rings recede and recycle, motes fly, the card dives in.
-        for (const r of rings) { r.z -= SPEED; if (r.z <= 0) r.z += MAXZ; }
+        // Travel: rings recede and recycle, motes fly, the card dives in. The ring
+        // speed ramps from RING_SPEED_START to RING_SPEED_END across the run so the
+        // tunnel builds gradually instead of running flat then lurching at the clear.
+        const ringRamp = Math.pow(Math.min(1, t / TUNNEL_MS), RING_ACCEL);
+        const ringSpeed = RING_SPEED_START + (RING_SPEED_END - RING_SPEED_START) * ringRamp;
+        for (const r of rings) { r.z -= ringSpeed; if (r.z <= 0) r.z += MAXZ; }
         for (const m of motes) { m.z -= MOTE_SPEED; m.age++; if (m.z <= MOTE_ZNEAR) seedMote(m, MOTE_ZFAR); }
         drawRings();
         drawMotes();
