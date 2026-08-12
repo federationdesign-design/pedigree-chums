@@ -186,7 +186,10 @@
   font-family: var(--font-body, "Montserrat", sans-serif);
   font-size: 1.25rem;
   font-weight: 500;
-  color: #ffffff;
+  /* Body prose sits on the site gradient, where white fails WCAG 1.4.3 (max
+     ~3.3:1). Black clears 4.5:1 across the whole gradient. Headings keep their
+     white/yellow; only paragraphs change (Steve, 12 Aug 2026). */
+  color: #000000;
   line-height: 1.3;
   margin: 0;
 }

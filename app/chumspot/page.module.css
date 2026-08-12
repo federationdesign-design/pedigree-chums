@@ -111,13 +111,16 @@
 .lead {
   font-size: clamp(1.2rem, 2.2vw, 1.55rem);
   font-weight: 600;
-  color: #ffffff;
+  color: #000000; /* prose on gradient -> black, WCAG 1.4.3 (Steve, 12 Aug 2026) */
   line-height: 1.5;
   margin: 50px 0 clamp(16px, 2vw, 24px);
 }
 .inner p:not(.lead):not(.ageNote):not(.closingDate):not(.contactNote):not(.hashtags):not(.termBody) {
   font-size: clamp(0.95rem, 1.6vw, 1.1rem);
-  color: #ffffff;
+  /* Body prose sits on the site gradient -> black for WCAG 1.4.3 (Steve, 12 Aug
+     2026). The hero .ageNote/.closingDate are excluded here (they sit on the hero
+     video) and stay white. */
+  color: #000000;
   line-height: 1.7;
   margin: 0 0 clamp(10px, 1.5vw, 16px);
 }
@@ -356,7 +359,7 @@
 }
 .contactNote {
   font-size: clamp(0.85rem, 1.3vw, 1rem);
-  color: #ffffff;
+  color: #000000; /* prose on gradient -> black, WCAG 1.4.3 (Steve, 12 Aug 2026) */
   text-align: center;
   line-height: 1.6;
 }

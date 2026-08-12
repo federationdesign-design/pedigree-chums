@@ -167,7 +167,7 @@
   font-family: Montserrat, sans-serif;
   font-size: clamp(1.05rem, 2vw, 1.35rem);
   font-weight: 600;
-  color: #ffffff;
+  color: #000000; /* prose on gradient -> black, WCAG 1.4.3 (Steve, 12 Aug 2026) */
   line-height: 1.5;
   margin: 0 0 clamp(16px, 2vw, 24px);
 }
@@ -482,10 +482,25 @@
 .endLine {
   font-family: Montserrat, sans-serif;
   font-size: clamp(0.95rem, 1.8vw, 1.2rem);
-  color: rgba(255,255,255,0.75);
+  color: #000000; /* prose on gradient -> black, WCAG 1.4.3 (Steve, 12 Aug 2026) */
   margin: 0 0 8px;
   line-height: 1.5;
 }
+
+/* Body prose on the site gradient -> black for WCAG 1.4.3 (Steve, 12 Aug 2026).
+   Scoped to the prose containers so headings, the hero (on a photo) and any
+   panel text are untouched. .safetyNote is !important in its own rule. */
+.legal { color: #000000; }
+.noteText p,
+.cookingCol p,
+.cookingInner p,
+.signsList li,
+.ruleStep p,
+.safetyCol p,
+.gameTwoCols p,
+.foodCol p { color: #000000; }
+.safetyNote,
+.safetyNote a { color: #000000 !important; }
 .endBig {
   font-family: var(--font-display, 'Luckiest Guy', system-ui) !important;
   font-size: clamp(4rem, 12vw, 9rem) !important;

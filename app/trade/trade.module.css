@@ -220,7 +220,8 @@
   font-weight: 600;
   font-size: clamp(1.18rem, 2.6vw, 1.38rem);
   line-height: 1.5;
-  color: var(--white);
+  /* Prose on the site gradient -> black for WCAG 1.4.3 (Steve, 12 Aug 2026). */
+  color: #000000;
   max-width: 54ch;
   margin: 14px auto 0;
 }
@@ -229,7 +230,7 @@
   font-weight: 600;
   font-size: clamp(1.18rem, 2.6vw, 1.38rem);
   line-height: 1.5;
-  color: var(--white);
+  color: #000000; /* prose on gradient -> black, WCAG 1.4.3 (Steve, 12 Aug 2026) */
   max-width: 54ch;
   margin: 14px auto clamp(28px, 5vw, 48px);
   text-align: center;

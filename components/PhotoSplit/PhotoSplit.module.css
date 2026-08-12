@@ -97,6 +97,16 @@
   margin-top: 18px;
 }
 
+/* Body prose in the split's text column -> black on the site gradient (WCAG
+   1.4.3, Steve 12 Aug 2026). Scoped to .contentCol (used only by /about), so the
+   GLOBAL .point class used inside PitchPanel stays white. Headings (h1/h2) keep
+   the white base set above. Compounded with .contentCol so the :global does not
+   trip the CSS-Modules build trap. */
+.contentCol :global(.lead),
+.contentCol :global(.point) {
+  color: #000000;
+}
+
 /* Spaniel (reverse) block: copy bumped ~2pt larger than the shared defaults. */
 .reverse .contentCol h2 {
   font-size: clamp(3.8rem, 9.5vw, 6rem);
