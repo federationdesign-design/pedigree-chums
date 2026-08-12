@@ -14,7 +14,7 @@ import styles from "./TimeTunnel.module.css";
 // held in a ref and cancelled on cleanup; reduced motion skips the tunnel and
 // hands straight over.
 const BG = "#0a3a57";
-const COLORS = ["#5cc4ee", "#0b78bd", "#ffd23e"]; // sky, deep blue, yellow
+const COLORS = ["#00e2ff", "#008eff", "#ffed60"]; // two blues (matched to the pit gradient) and yellow
 
 const RINGS = 40;
 const SPACING = 100;
@@ -25,7 +25,7 @@ const CLEAR_MS = 700; // the resolve window: rings rush outward and the canvas f
 const CLEAR_SPEED = 60; // rings rush the camera this fast while clearing (vs SPEED while travelling)
 
 // Shapes flying past, on the same perspective as the rings.
-const MOTE_COUNT = 18;
+const MOTE_COUNT = 10; // fewer objects flying past
 const MOTE_SPEED = 26;
 const MOTE_ZNEAR = 60;
 const MOTE_ZFAR = 3000;
@@ -44,6 +44,7 @@ const SWAY_PERIOD = 6000;
 const CARD_FILL = "#ffd23e";
 const CARD_EDGE = "#0a3a57";
 const CARD_GREEN = "#22c55e"; // the card's green button (globals #22c55e)
+const CARD_LINK = "#0b78bd"; // the small blue link icon
 const CARD_RADIUS = 22; // matches the flip card's --radius-card (globals.css)
 const CARD_MS = TUNNEL_MS - 200; // lands 200ms before the tunnel ends; scales with it
 const CARD_SPINS = 1.5;
@@ -91,13 +92,6 @@ function bonePath(): Path2D {
   p.rect(-ex, -0.3, ex * 2, 0.6);
   return p;
 }
-function pawPath(): Path2D {
-  const p = new Path2D();
-  p.moveTo(0.55, 0.35); p.ellipse(0, 0.35, 0.55, 0.45, 0, 0, Math.PI * 2);
-  const toes: [number, number, number][] = [[-0.55, -0.35, 0.26], [-0.2, -0.6, 0.28], [0.2, -0.6, 0.28], [0.55, -0.35, 0.26]];
-  for (const [tx, ty, tr] of toes) { p.moveTo(tx + tr, ty); p.arc(tx, ty, tr, 0, Math.PI * 2); }
-  return p;
-}
 
 type Mote = { z: number; ang: number; rad: number; shape: number; color: string; spin0: number; spinRate: number; age: number };
 type Rect = { x: number; y: number; w: number; h: number };
@@ -125,7 +119,7 @@ export default function TimeTunnel({ onDone, onResolve, fromRect }: { onDone?: (
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduce) { doneRef.current?.(); return; } // no tunnel: hand straight over
 
-    const SHAPES = [starPath(), bonePath(), pawPath()];
+    const SHAPES = [starPath(), bonePath()]; // bone and star only, the paw dropped
     const dpr = window.devicePixelRatio || 1;
     let W = 0, H = 0, cx = 0, cy = 0, vx = 0;
     const resize = () => {
@@ -212,22 +206,38 @@ export default function TimeTunnel({ onDone, onResolve, fromRect }: { onDone?: (
       ctx.lineWidth = 4 * (1 - p);
       ctx.strokeStyle = CARD_EDGE;
       ctx.stroke();
-      // The green button, a stand-in for the real card's: a rounded rectangle in
-      // the card's green with two white bars for its two lines of text. Not
-      // legible, just recognisable. Rides the same transform, so it tumbles too.
-      const bw = w * 0.72, bh = h * 0.16;
-      const bcy = h / 2 - h * 0.09 - bh / 2; // sits near the card's bottom edge
+      // Match the real card layout, top to bottom: a green button with two white
+      // text bars, three navy description lines, then a small blue link icon. Not
+      // legible, just recognisable. All rides the card transform, so it tumbles.
+      const bw = w * 0.8, bh = h * 0.15;
+      const bcy = -h * 0.3; // green button near the TOP
       ctx.fillStyle = CARD_GREEN;
       ctx.beginPath();
-      ctx.roundRect(-bw / 2, bcy - bh / 2, bw, bh, Math.min(bh * 0.35, bh / 2));
+      ctx.roundRect(-bw / 2, bcy - bh / 2, bw, bh, Math.min(bh * 0.3, bh / 2));
       ctx.fill();
-      const barW = bw * 0.62, barH = bh * 0.15;
+      const barW = bw * 0.6, barH = bh * 0.14;
       ctx.fillStyle = "#ffffff";
       for (const dy of [-bh * 0.2, bh * 0.2]) {
         ctx.beginPath();
         ctx.roundRect(-barW / 2, bcy + dy - barH / 2, barW, barH, barH / 2);
         ctx.fill();
       }
+      // three navy description lines below the button (the last one shorter)
+      const lineH = h * 0.045;
+      const lineW = [w * 0.8, w * 0.8, w * 0.55];
+      const lineY = [-h * 0.06, h * 0.04, h * 0.14];
+      ctx.fillStyle = CARD_EDGE;
+      for (let li = 0; li < 3; li++) {
+        ctx.beginPath();
+        ctx.roundRect(-w * 0.4, lineY[li] - lineH / 2, lineW[li], lineH, lineH / 2);
+        ctx.fill();
+      }
+      // small blue link icon below the description
+      const iconW = w * 0.16, iconH = h * 0.07;
+      ctx.fillStyle = CARD_LINK;
+      ctx.beginPath();
+      ctx.roundRect(-w * 0.4, h * 0.3 - iconH / 2, iconW, iconH, Math.min(iconH * 0.35, iconH / 2));
+      ctx.fill();
       ctx.restore();
     };
 
