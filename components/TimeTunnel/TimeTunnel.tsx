@@ -37,6 +37,19 @@ const MOTE_COLORS = ["#5cc4ee", "#ffd23e", "#fff8e6"]; // sky, yellow, cream on 
 const SWAY_AMOUNT = 0.05;
 const SWAY_PERIOD = 6000;
 
+// The yellow card diving in from the clicked card (stage 2): a plain yellow
+// rounded-rectangle stand-in that tumbles and shrinks into the vanishing point,
+// as the approved prototype. It lands just before the tunnel finishes.
+const CARD_FILL = "#ffd23e";
+const CARD_EDGE = "#0a3a57";
+const CARD_RADIUS = 30;
+const CARD_MS = 1000; // lands ~200ms before the tunnel ends (TUNNEL_MS)
+const CARD_SPINS = 1.5;
+const CARD_SPIN_EASE = 1.6; // spin accel: >1 tightens near the end
+const CARD_TRAVEL_EASE = 1.4; // >1 accelerates the card into the vanishing point
+const CARD_FALLBACK_W = 160;
+const CARD_FALLBACK_H = 200;
+
 function starPath(): Path2D {
   const p = new Path2D();
   const spikes = 5, outer = 1, inner = 0.45;
@@ -68,13 +81,18 @@ function pawPath(): Path2D {
 }
 
 type Mote = { z: number; ang: number; rad: number; shape: number; color: string; spin0: number; spinRate: number; age: number };
+type Rect = { x: number; y: number; w: number; h: number };
 
-export default function TimeTunnel({ onDone }: { onDone?: () => void }) {
+export default function TimeTunnel({ onDone, fromRect }: { onDone?: () => void; fromRect?: Rect }) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   // Keep the latest onDone without re-running the tunnel effect below. Updated in
   // an effect, never during render, so it does not trip the refs rule.
   const doneRef = useRef(onDone);
   useEffect(() => { doneRef.current = onDone; }, [onDone]);
+  // The clicked card's viewport rect: where the card dives from. Captured at mount
+  // and stable for the transition, so it is read from a ref when the loop starts
+  // rather than added to the effect's deps.
+  const rectRef = useRef(fromRect);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -143,6 +161,34 @@ export default function TimeTunnel({ onDone }: { onDone?: () => void }) {
       }
     };
 
+    // The card dives from the clicked card's centre (or the screen centre if the
+    // rect is missing) into the vanishing point, shrinking to nothing as it lands.
+    const rect = rectRef.current;
+    const fx = rect ? rect.x + rect.w / 2 : cx;
+    const fy = rect ? rect.y + rect.h / 2 : cy;
+    const cardW0 = rect ? rect.w : CARD_FALLBACK_W;
+    const cardH0 = rect ? rect.h : CARD_FALLBACK_H;
+    const drawCard = (now: number, startTs: number) => {
+      const p = Math.min(1, (now - startTs) / CARD_MS);
+      if (p >= 1) return; // landed on the vanishing point, gone
+      const ease = Math.pow(p, CARD_TRAVEL_EASE);
+      const px = fx + (vx - fx) * ease;
+      const py = fy + (cy - fy) * ease;
+      const w = cardW0 * (1 - p), h = cardH0 * (1 - p);
+      const spin = CARD_SPINS * 2 * Math.PI * Math.pow(p, CARD_SPIN_EASE);
+      ctx.save();
+      ctx.translate(px, py);
+      ctx.rotate(spin);
+      ctx.fillStyle = CARD_FILL;
+      ctx.beginPath();
+      ctx.roundRect(-w / 2, -h / 2, w, h, Math.min(CARD_RADIUS, Math.min(w, h) / 2));
+      ctx.fill();
+      ctx.lineWidth = 4 * (1 - p);
+      ctx.strokeStyle = CARD_EDGE;
+      ctx.stroke();
+      ctx.restore();
+    };
+
     let start: number | null = null;
     let raf = 0;
     let fadeTimer = 0;
@@ -155,6 +201,7 @@ export default function TimeTunnel({ onDone }: { onDone?: () => void }) {
       ctx.fillStyle = BG; ctx.fillRect(0, 0, W, H);
       drawRings();
       drawMotes();
+      drawCard(now, start);
       if (running) {
         raf = requestAnimationFrame(loop);
       } else {

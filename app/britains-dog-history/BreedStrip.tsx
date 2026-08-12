@@ -58,7 +58,7 @@ const ERA_LABELS: Record<string, string> = {
    HARD RULE: the branch is at the RENDER only. Nothing above the return may
    ever depend on which presentation is in use. The live page's behaviour has
    to be untouchable from the slider. */
-export type BreedStripOpen = (b: UKBreed) => (() => void) | undefined;
+export type BreedStripOpen = (b: UKBreed) => ((e?: { currentTarget?: Element | null }) => void) | undefined;
 
 /* WHAT A CARD IS. One answer, read by both the tap and any badge drawn on the
    card, so a card can never advertise PLAY and then fail to play.
@@ -110,6 +110,8 @@ export default function BreedStrip({
     character?: string;
     fact?: string;
     lineage: LineageNode;
+    // The clicked card's on-screen rect, so the tunnel's card dives from it.
+    fromRect?: { x: number; y: number; w: number; h: number };
   };
   const [active, setActive] = useState<Active | null>(null);
   // Bumped on a retry so the modal remounts even though the level name has not
@@ -180,16 +182,21 @@ export default function BreedStrip({
     const pack = packBreeds.find((x) => x.name === packName);
     if (kind === "learn" && pack?.slug) return () => router.push(`/chums/${pack.slug}`);
     if (kind !== "play" || !lineage) return undefined;
-    return () => {
+    return (e) => {
       // opening a level from the page is a fresh run
       setLives(LIVES_START);
       setStreak(0);
+      // The clicked card's on-screen rect, so the tunnel's card dives from where
+      // it sits. Missing (e.g. a caller that passes no event) falls back to the
+      // screen centre in TimeTunnel.
+      const r = e?.currentTarget?.getBoundingClientRect();
       setActive({
         name: b.name,
         image: pack?.image ?? b.image ?? "",
         character: pack?.character ?? b.note,
         fact: pack?.fact,
         lineage,
+        fromRect: r ? { x: r.x, y: r.y, w: r.width, h: r.height } : undefined,
       });
     };
   };
@@ -477,6 +484,7 @@ export default function BreedStrip({
       character={active.character}
       fact={active.fact}
       lineage={active.lineage}
+      fromRect={active.fromRect}
       onClose={() => setActive(null)}
     />
   );

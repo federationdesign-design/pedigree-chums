@@ -73,6 +73,9 @@ type Props = {
   character?: string;
   fact?: string;
   lineage: LineageNode;
+  /* The clicked history card's viewport rect, so the time tunnel's card dives
+     from where it sat. Optional: absent means the tunnel dives from centre. */
+  fromRect?: { x: number; y: number; w: number; h: number };
   onClose: () => void;
   nextLevelLabel?: string;
   /* The next era's name, set only when the level just won is the last of its
@@ -119,7 +122,7 @@ type Props = {
   era?: string;
 };
 
-export default function LineageModal({ name, image, character, lineage, onClose, nextLevelLabel, onNextLevel, onStartOver, initialScore, onScoreChange, era, lives, livesMax = 6, onLost, onSpendLife, onResetRun, nextLevelImage, levelNo, eraJoinLabel, onLevelChumRate, runChumRate, runLevels, onChumCaught, topChum }: Props) {
+export default function LineageModal({ name, image, character, lineage, fromRect, onClose, nextLevelLabel, onNextLevel, onStartOver, initialScore, onScoreChange, era, lives, livesMax = 6, onLost, onSpendLife, onResetRun, nextLevelImage, levelNo, eraJoinLabel, onLevelChumRate, runChumRate, runLevels, onChumCaught, topChum }: Props) {
   const theme = levelThemeFor(era);
   // The close X asks before it closes. A round can take a couple of minutes to
   // build up, and losing it to a mis-tap in the corner is a rotten exit.
@@ -284,7 +287,7 @@ export default function LineageModal({ name, image, character, lineage, onClose,
   return createPortal(
     <div className={css.overlay} role="dialog" aria-modal="true" aria-label={name}>
       {/* The time tunnel covers the pit while it arrives, then removes itself. */}
-      {tunnelActive && <TimeTunnel onDone={() => setTunnelActive(false)} />}
+      {tunnelActive && <TimeTunnel fromRect={fromRect} onDone={() => setTunnelActive(false)} />}
       {/* Score, fixed top-right beside where the in-pit close object starts.
           Hidden once the round is running: the number belongs to the menu and
           the end screens, and during play it competes with the lives indicator
