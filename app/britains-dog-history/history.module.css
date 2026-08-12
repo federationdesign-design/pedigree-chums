@@ -347,7 +347,7 @@
 .sourceNote p {
   font-family: var(--font-body), system-ui, sans-serif;
   font-size: 0.82rem;
-  color: var(--white);
+  color: #000000; /* prose on gradient -> black, WCAG 1.4.3 (Steve, 12 Aug 2026) */
   text-align: center;
   line-height: 1.1;
   margin: 0;

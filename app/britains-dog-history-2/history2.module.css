@@ -516,7 +516,8 @@
   font-family: var(--font-body, "Montserrat", sans-serif);
   font-size: 1.05rem;
   font-weight: 600;
-  color: #ffffff;
+  /* Prose on the site gradient -> black for WCAG 1.4.3 (Steve, 12 Aug 2026). */
+  color: #000000;
   line-height: 1.35;
   /* MEASURED, same screenshot. The capitals ended at y1378 and this
      paragraph began at y1428: 49 device pixels, so 24.5 CSS px, with this
@@ -652,9 +653,9 @@
   font-size: 1rem;
   font-weight: 600;
   line-height: 1.35;
-  color: #ffffff;
+  /* prose on gradient -> black, WCAG 1.4.3 (Steve, 12 Aug 2026) */
+  color: #000000;
   text-align: center;
-  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
 }
 
 /* ---- The timeline rail ------------------------------------------------ */
