@@ -20,7 +20,7 @@ const RINGS = 40;
 const SPACING = 100;
 const SPEED = 4;
 const MAXZ = RINGS * SPACING;
-const TUNNEL_MS = 1200; // the ~1.2s handover window
+const TUNNEL_MS = 2000; // the tunnel run length; the card dive and bg both scale off this
 const FADE_MS = 260; // the fade-out before it hands over
 
 // Shapes flying past, on the same perspective as the rings.
@@ -42,8 +42,9 @@ const SWAY_PERIOD = 6000;
 // as the approved prototype. It lands just before the tunnel finishes.
 const CARD_FILL = "#ffd23e";
 const CARD_EDGE = "#0a3a57";
-const CARD_RADIUS = 30;
-const CARD_MS = 1000; // lands ~200ms before the tunnel ends (TUNNEL_MS)
+const CARD_GREEN = "#22c55e"; // the card's green button (globals #22c55e)
+const CARD_RADIUS = 22; // matches the flip card's --radius-card (globals.css)
+const CARD_MS = TUNNEL_MS - 200; // lands 200ms before the tunnel ends; scales with it
 const CARD_SPINS = 1.5;
 const CARD_SPIN_EASE = 1.6; // spin accel: >1 tightens near the end
 const CARD_TRAVEL_EASE = 1.4; // >1 accelerates the card into the vanishing point
@@ -198,11 +199,27 @@ export default function TimeTunnel({ onDone, fromRect }: { onDone?: () => void; 
       ctx.rotate(spin);
       ctx.fillStyle = CARD_FILL;
       ctx.beginPath();
-      ctx.roundRect(-w / 2, -h / 2, w, h, Math.min(CARD_RADIUS, Math.min(w, h) / 2));
+      ctx.roundRect(-w / 2, -h / 2, w, h, Math.min(CARD_RADIUS * (1 - p), Math.min(w, h) / 2));
       ctx.fill();
       ctx.lineWidth = 4 * (1 - p);
       ctx.strokeStyle = CARD_EDGE;
       ctx.stroke();
+      // The green button, a stand-in for the real card's: a rounded rectangle in
+      // the card's green with two white bars for its two lines of text. Not
+      // legible, just recognisable. Rides the same transform, so it tumbles too.
+      const bw = w * 0.72, bh = h * 0.16;
+      const bcy = h / 2 - h * 0.09 - bh / 2; // sits near the card's bottom edge
+      ctx.fillStyle = CARD_GREEN;
+      ctx.beginPath();
+      ctx.roundRect(-bw / 2, bcy - bh / 2, bw, bh, Math.min(bh * 0.35, bh / 2));
+      ctx.fill();
+      const barW = bw * 0.62, barH = bh * 0.15;
+      ctx.fillStyle = "#ffffff";
+      for (const dy of [-bh * 0.2, bh * 0.2]) {
+        ctx.beginPath();
+        ctx.roundRect(-barW / 2, bcy + dy - barH / 2, barW, barH, barH / 2);
+        ctx.fill();
+      }
       ctx.restore();
     };
 
