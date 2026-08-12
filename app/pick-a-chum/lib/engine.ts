@@ -184,14 +184,7 @@ function capitalise(s: string): string {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
-// Task 173: per-call options. `rewordedMatch` is the runtime switch for the reworded-input matcher, read
-// from Edge Config by the UI and passed in here (the engine stays pure and offline -- no fetch, no LLM). It
-// is OFF unless explicitly true, so any caller that omits options gets exactly today's behaviour.
-export interface SubmitOptions {
-  rewordedMatch?: boolean;
-}
-
-export function submit(data: ChumData, session: Session, input: string, options?: SubmitOptions): Turn {
+export function submit(data: ChumData, session: Session, input: string): Turn {
   session.submissionCount += 1;
   const n = normalise(input);
   const dog = session.activeDog; // whose bark game this message belongs to
@@ -384,11 +377,13 @@ export function submit(data: ChumData, session: Session, input: string, options?
   // line can neither serve in a protected state nor enter or clear one; grief and urgent safety
   // resolve above, so they never reach here.
   // Task 173: the reworded-input matcher runs EXACTLY here -- only on a fallback-family turn (the im-a-dog
-  // zone: LOOP-01 / LOOP-02 / B40), and only when the switch is on. A confident content-word match serves
-  // the existing approved row and breaks the fallback run like any other real answer; below the threshold it
-  // returns null and the unchanged LOOP/B40 logic below serves im a dog exactly as now. It can never fire in
-  // a protected state, because inLoopTurn already requires protectedState === null (line above).
-  const rewordedHit = inLoopTurn && options?.rewordedMatch ? matchReworded(n, data, dog) : null;
+  // zone: LOOP-01 / LOOP-02 / B40). A confident content-word match serves the existing approved row and
+  // breaks the fallback run like any other real answer; below the threshold it returns null and the
+  // unchanged LOOP/B40 logic below serves im a dog exactly as now. It can never fire in a protected state,
+  // because inLoopTurn already requires protectedState === null (line above). Always on (Task 173: the
+  // Global Config switch was removed -- it only runs where im a dog would have, and tested zero false
+  // positives, so the switch cost more than it protected).
+  const rewordedHit = inLoopTurn ? matchReworded(n, data, dog) : null;
   if (rewordedHit) {
     response.text = rewordedHit.template;
     response.responseId = rewordedHit.responseId;

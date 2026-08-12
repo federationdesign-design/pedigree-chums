@@ -30,7 +30,7 @@ import { applyBoxerEffect, resetBoxerEffects } from '../lib/boxerEffects';
 import { BOXER_BUTTONS, BoxerButton } from '../data/boxer-button-game';
 import { breeds } from '../../../data/breeds';
 import { skipTheatre, buildTypingPlan, TYPING_PROFILES, TypingPlan } from '../lib/theatre';
-import { emitTurn, fetchMatcherEnabled } from '../lib/turn-tap';
+import { emitTurn } from '../lib/turn-tap';
 import { CHAT_KEY, PROTECTED_FLAG } from './pcKeys';
 
 type Phase = 'selecting' | 'idle' | 'transferring' | 'ending';
@@ -326,13 +326,6 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
   // Recorder session id: one per engine session (a dog pick / page load reset).
   // Inert in production (the turn tap has no sink there); see lib/turn-tap.ts.
   const recSessionRef = useRef(restored ? restored.recSessionId || '' : auto ? `s${Date.now().toString(36)}-auto` : '');
-  // Task 173: the reworded-input matcher switch (Edge Config, off by default). Fetched once on mount and read
-  // at submit time; a ref so it never triggers a re-render, and off until the fetch resolves (and off on any
-  // failure). With nothing configured this stays false, so every turn behaves exactly as today.
-  const rewordedMatchRef = useRef(false);
-  useEffect(() => {
-    fetchMatcherEnabled().then((on) => { rewordedMatchRef.current = on; }).catch(() => {});
-  }, []);
   // Task 159: a live pathname ref + a stable meta-logger, so a link-follow or a hat-find can be recorded
   // from anywhere (a callback, JSX) with the CURRENT route and no stale closure. `line` holds the target
   // href (link) or the hat id. protectedState is passed so a protected session records none of these.
@@ -1023,7 +1016,7 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
 
     const fromDog = session.activeDog;
     session.route = pathname ?? undefined; // Task 140: the page context for the page-bio route
-    const result = submit(CHUM_DATA, session, text, { rewordedMatch: rewordedMatchRef.current });
+    const result = submit(CHUM_DATA, session, text);
     // Task 105 SAFETY: the moment a turn enters a protected state, latch it so this session is never
     // persisted (the save effect also checks, but latch early, before the message is even added).
     // Task 169: a protected turn STOPS EVERYTHING -- drop any type-ahead queued behind a monologue so a
