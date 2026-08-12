@@ -1628,9 +1628,12 @@ export default function LineageMap({
               on a straight baseline tilted to match. Stays as long as the card is up. */}
           {rarityTier ? (() => {
             const band = RARITY_BAND[rarityTier];
-            const TILT = -20;                     // degrees; steeper negative rides the right side higher (jauntier)
+            const TILT = -26;                     // degrees; steeper negative rides the right side higher (jauntier)
             const bandTop = R * 0.40;             // top edge of the wedge (chord); LOWER value lifts the band up
-            const labelY = R * 0.55;              // word centre; LOWER value lifts the word (clears the Learn button)
+            // Label position knobs, fractions of R so they scale with the circle.
+            // (In the tilted frame: labelX runs mostly left/right, labelY up/down.)
+            const labelX = R * 0;                 // + moves the word RIGHT, - left
+            const labelY = R * 0.55;              // + moves the word DOWN, - up
             // Fit-to-chord at the WORD's line (narrower than the top of the wedge),
             // so a long label never runs past the rim on the small phone card.
             const chord = 2 * Math.sqrt(Math.max(0, R * R - labelY * labelY));
@@ -1642,7 +1645,7 @@ export default function LineageMap({
               <g clipPath={`url(#${clip})`} style={{ pointerEvents: "none" }}>
                 <g transform={`rotate(${TILT})`}>
                   <rect x={-R * 1.6} y={bandTop} width={R * 3.2} height={R * 1.6} fill={band.bg} />
-                  <text x={0} y={labelY} textAnchor="middle" dominantBaseline="central" style={{ fontFamily: '"Luckiest Guy", system-ui, sans-serif', fontSize: fs, fontWeight: 400, fill: band.fg }}>{band.label}</text>
+                  <text x={labelX} y={labelY} textAnchor="middle" dominantBaseline="central" style={{ fontFamily: '"Luckiest Guy", system-ui, sans-serif', fontSize: fs, fontWeight: 400, fill: band.fg }}>{band.label}</text>
                 </g>
               </g>
             );
