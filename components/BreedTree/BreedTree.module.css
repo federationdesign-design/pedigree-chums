@@ -1505,9 +1505,7 @@
    (a scale-up) before the rise, deliberately not a glow: a pop is the same
    visual language louder, a glow would be a new one. Bigger and held longer. */
 .rarityFlash {
-  position: absolute;
-  left: 50%;
-  top: 42%;
+  position: fixed; /* left/top set inline from the tap point (viewport px) */
   z-index: 999;
   pointer-events: none;
   font-family: var(--font-display, "Luckiest Guy", system-ui);

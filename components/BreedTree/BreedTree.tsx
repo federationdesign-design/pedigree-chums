@@ -1263,17 +1263,18 @@ export default function BreedTree({
   const rarityFlashedRef = useRef<Set<string>>(new Set());
   const rarityIdRef = useRef(0);
   const rarityFlashTimerRef = useRef<number | null>(null);
-  const [rarityFlash, setRarityFlash] = useState<{ id: number; tier: RarityTier; count: number } | null>(null);
+  const [rarityFlash, setRarityFlash] = useState<{ id: number; tier: RarityTier; count: number; x: number; y: number } | null>(null);
   useEffect(() => { rarityFlashedRef.current = new Set(); }, [nodes]); // reset per level
   useEffect(() => () => { if (rarityFlashTimerRef.current) window.clearTimeout(rarityFlashTimerRef.current); }, []);
-  const flashRarity = (name: string) => {
+  // x,y are the tap point (viewport px) so the flash rises off the collected circle.
+  const flashRarity = (name: string, x: number, y: number) => {
     if (rarityFlashedRef.current.has(name)) return; // once per name per level
     const count = rarityCounts.get(name) ?? 0;
     const tier = rarityTier(count);
     if (!tier) return; // 1-2 = common, silent
     rarityFlashedRef.current.add(name);
     if (rarityFlashTimerRef.current) window.clearTimeout(rarityFlashTimerRef.current);
-    setRarityFlash({ id: ++rarityIdRef.current, tier, count });
+    setRarityFlash({ id: ++rarityIdRef.current, tier, count, x, y });
     rarityFlashTimerRef.current = window.setTimeout(() => setRarityFlash(null), tier === "root" ? 1600 : 1100);
   };
 
@@ -5738,6 +5739,11 @@ export default function BreedTree({
                             if (Math.hypot(ev.clientX - p0.x, ev.clientY - p0.y) >= 8) return;
                             mcReleaseRef.current?.(); // let go before the lift freezes the body
                             liftToLearn(el, liftNode);
+                            // Rarity flash: keyed to the circle YOU TAPPED (d), at
+                            // the tap point, as it lifts out. NOT liftNode (the
+                            // walk-up ancestor, which handed onRemove the wrong dog
+                            // and missed the lookup) and NOT the complete moment.
+                            flashRarity(d.data.name, ev.clientX, ev.clientY);
                           };
                           window.addEventListener("pointerup", tapUp);
                           window.addEventListener("pointercancel", tapUp);
@@ -6943,9 +6949,6 @@ export default function BreedTree({
           currentScore={0}
           onScore={onScore}
           onRemove={(name) => {
-            // Rarity flash: punctuates THIS complete press (once per name per level;
-            // common stays silent). Fired before the removal bookkeeping below.
-            flashRarity(name);
             // learnt: the circle leaves the pit for good
             if (learnNode && name === learnNode.data.name) {
               removedNodesRef.current.add(learnNode);
@@ -7004,7 +7007,7 @@ export default function BreedTree({
       {rarityFlash && (() => {
         const cls = { uncommon: styles.rarityUncommon, rare: styles.rarityRare, root: styles.rarityRoot }[rarityFlash.tier];
         return (
-          <div key={rarityFlash.id} className={`${styles.rarityFlash} ${cls}`} aria-hidden="true">
+          <div key={rarityFlash.id} className={`${styles.rarityFlash} ${cls}`} style={{ left: rarityFlash.x, top: rarityFlash.y }} aria-hidden="true">
             {RARITY_LABEL[rarityFlash.tier]} <span className={styles.rarityCount}>×{rarityFlash.count}</span>
           </div>
         );
