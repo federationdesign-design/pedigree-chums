@@ -376,7 +376,7 @@ type ToyKind = "ball" | "flag" | "stick" | "stickBig" | "rock" | "ballPink" | "c
 /* The props slot: the three objects that arrive together part way through the
    drop. A theme can replace them, which is how an era gets its own things to
    knock about. */
-export const DEFAULT_PROPS: ToyKind[] = ["stick", "stickBig", "rock"];
+export const DEFAULT_PROPS: ToyKind[] = ["stick", "stickBig"]; // rock removed 2026-08-12 (no more rocks). NB: THEMES_ENABLED is false, so this default is the ONLY prop set in play on every level.
 /* Which side the first prop falls on. Flipped every time a pit arms its props,
    so a reader playing several levels does not watch the same object land in the
    same corner every time. Module scope, so it survives a pit remounting. */
@@ -3871,28 +3871,16 @@ export default function BreedTree({
       const armToys = () => {
         if (toyTimers.length) return; // first landing only
         toyTimers.push(window.setTimeout(() => spawnToy("cookies"), TOY_COOKIES_DELAY));
-        // Both tennis balls are hidden on the first seven levels. levelNo is the
-        // 0-based findIndex into the play-card list (BreedStrip), so the on-screen
-        // levels 1 to 7 are levelNo 0 to 6 here. NOT `level`, which in this file is
-        // the difficulty slider. TOY_BALL_DELAY is left alone: the flag and the era
-        // props are timed off it, so skipping the balls shifts nothing else. With
-        // no pink ball spawned its return path (BALL_PINK_BACK, above) never runs,
-        // because that only fires for a pink body that was thrown out the top.
-        const hideBalls = levelNo !== undefined && levelNo <= 6;
-        if (!hideBalls) {
-          toyTimers.push(window.setTimeout(() => spawnToy("ball"), TOY_BALL_DELAY));
-          toyTimers.push(window.setTimeout(() => spawnToy("ballPink"), TOY_BALL_DELAY + BALL_PINK_GAP));
-        }
-        // With the balls hidden, everything after cookies is pulled earlier to
-        // close the ~3s the two balls left, and the bone moves to AFTER the flood
-        // (see below). Cookies is untouched at 2.0s. The rock keeps its 0.5s gap
-        // after the sticks (TOY_ROCK_GAP) in both cases; the flag and stick times
-        // are what differ.
-        const NOBALLS_FLAG_AT = 3000;    // flag lands at 3.0s, in the balls' old slot
-        const NOBALLS_STICKS_AT = 4300;  // the two sticks at 4.3s
-        const flagAt = hideBalls ? NOBALLS_FLAG_AT : TOY_BALL_DELAY + TOY_FLAG_GAP;
+        // Both tennis balls drop on EVERY level now (2026-08-12). The old
+        // first-seven-levels `hideBalls` gate and its no-balls re-timing were
+        // removed entirely (see the handover note on the reversal). Ball at
+        // TOY_BALL_DELAY, pink after it, and the flag/props time off the ball as
+        // they always did with the balls present.
+        toyTimers.push(window.setTimeout(() => spawnToy("ball"), TOY_BALL_DELAY));
+        toyTimers.push(window.setTimeout(() => spawnToy("ballPink"), TOY_BALL_DELAY + BALL_PINK_GAP));
+        const flagAt = TOY_BALL_DELAY + TOY_FLAG_GAP;
         toyTimers.push(window.setTimeout(() => spawnToy("flag"), flagAt));
-        const propsAt = hideBalls ? NOBALLS_STICKS_AT : flagAt + TOY_PROP_GAP;
+        const propsAt = flagAt + TOY_PROP_GAP;
         /* THE PROPS SLOT, from the level's theme. An era with no set of its own
            gets the stick, big stick and rock, which is what every era had.
            The first two arrive together and the rest follow at the rock's gap,
@@ -3920,15 +3908,12 @@ export default function BreedTree({
            front of the flood rather than landing at some invented time. */
         // The rock's beat: the reference for both the flood and the bone.
         const rockAt = propsAt + TOY_ROCK_GAP;
-        // The flood is derived from the ROCK, not the bone, because the bone is no
-        // longer always before it. With balls this still lands at 9.0s (rock 7.5 +
-        // bone 0.9 + chum 0.6). With balls hidden the flood arrives on the SAME
-        // beat as the rock, deliberately.
-        const chumsAt = hideBalls ? rockAt : rockAt + TOY_BONE_GAP + CHUM_GAP;
-        // Bone: before the flood with balls, at its old 8.4s. With balls hidden it
-        // moves to 1.5s AFTER the flood, at 6.3s.
-        const NOBALLS_BONE_AFTER_FLOOD = 1500;
-        const boneAt = hideBalls ? chumsAt + NOBALLS_BONE_AFTER_FLOOD : rockAt + TOY_BONE_GAP;
+        // The flood is derived from the ROCK's beat (the reference at rockAt),
+        // landing at 9.0s (rock 7.5 + bone 0.9 + chum 0.6); the bone lands just
+        // before it. rockAt is now only a timing anchor: with rock out of
+        // DEFAULT_PROPS nothing spawns on that beat, but the rhythm is unchanged.
+        const chumsAt = rockAt + TOY_BONE_GAP + CHUM_GAP;
+        const boneAt = rockAt + TOY_BONE_GAP;
         const floodMid = chumsAt + ((chumImagesRef.current?.length ?? 0) * CHUM_STAGGER) / 2;
         props.forEach((kind: ToyKind, i: number) => {
           const at =
