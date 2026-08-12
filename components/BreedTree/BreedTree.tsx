@@ -102,9 +102,10 @@ const SHIFT = 0.66;
 // the diagram reads large beside the text column. Mobile keeps PAD (its masonry
 // layout already fills the screen).
 const ZOOM_PAD = 1.1;
-// Breed-title placement on each circle, relative to its label anchor. TITLE_DY
-// moves it up (more negative) or down toward the circle; TITLE_ANGLE tilts it
-// (negative leans the text up to the right). Tweak these two to taste.
+// Breed-title placement on each circle, relative to its label anchor.
+// TITLE_DY_FRAC sets how far up the circle the block sits, as a fraction of the
+// radius (0.5 = halfway to the top); TITLE_ANGLE tilts it (negative leans the
+// text up to the right). Tweak these two to taste.
 // Mini pit only: the difficulty slider sets how big the dog circles are before
 // the round starts. Bigger circles means less room in the pit and a faster game
 // over, so size IS the difficulty. Three points are pinned:
@@ -497,15 +498,18 @@ const WASH_INSET = 2.2; // .learnWash inset: -60% -> 2.2 viewports wide
 // and because labelFits measures the rotated corners FROM this anchor, the room
 // it had collapsed, so the fitter shrank the type or gave up.
 //
-// Now capped as a fraction of the radius. 0.18 is the share the depth-1 circles
-// already had, so the level's own circles and the root are untouched to the
-// pixel, and only the smaller ones are pulled back toward their middle.
-const TITLE_DY = -42;
-const TITLE_DY_FRAC = 0.18;
+// A fraction of the radius, UNCAPPED (2026-08-12): the label block is now pulled
+// to the TOP of the circle rather than sitting near the middle. 0.5 puts the
+// first baseline half a radius above centre, and dropping the old -42px cap keeps
+// it climbing on big circles too. Paired with the halved label size and the
+// tighter LABEL_LINE_H below, so the smaller block still clears the rim up here.
+// Was -min(42, 0.18r), which deliberately held labels near their middle;
+// superseded on purpose, do not restore it thinking the top placement is a drift.
+const TITLE_DY_FRAC = 0.5;
 function titleDy(r: number): number {
-  return -Math.min(-TITLE_DY, Math.max(0, r) * TITLE_DY_FRAC);
+  return -Math.max(0, r) * TITLE_DY_FRAC;
 }
-const TITLE_ANGLE = -10;
+const TITLE_ANGLE = -1;
 type Node = HierarchyCircularNode<LineageNode>;
 
 // A circle whose name repeats its parent's is not a second animal. It is the
@@ -540,7 +544,7 @@ const LABEL_CHAR_W = 0.62; // fallback glyph width in ems, before the font loads
 // drawn spacing and the spacing the fitter measured can never drift apart.
 // Tightening this also lets the fitter find a larger type size, because the
 // same words now occupy a shorter block, so multi-line names grow a little.
-const LABEL_LINE_H = 0.9;
+const LABEL_LINE_H = 0.6; // baseline-to-baseline in ems; 0.6 reads ~1.0 against Luckiest Guy's ink (was 0.9, which read ~1.5). Shared by circle labels, badge labels and pit words.
 const LABEL_CAP_H = 0.8; // ink above the first baseline, in ems
 const LABEL_DESC = 0.28; // ink below the last baseline, in ems
 // Keep the block inside this fraction of the radius. Raised from 0.9: names are
@@ -5803,9 +5807,15 @@ export default function BreedTree({
                       // the circle keeps its picture and ring, and the name comes
                       // back on zoom in, where the larger fit radius lets it fit.
                       // A spilling label is worse than no label.
-                      if (!fit.fits) return null;
                       const lines = fit.lines;
-                      const fs = Math.max(10, Math.min(cap, fit.fs + TITLE_BOOST));
+                      // HALVED (2026-08-12): draw at 50% of the fitted size, and
+                      // RE-TEST the fit at that halved size so names that spilled at
+                      // full size now show if they fit small. Gating on fit.fits
+                      // (the full-size result) would keep the old, smaller set and
+                      // make the halving pointless.
+                      const fs = Math.max(10, Math.min(cap, fit.fs + TITLE_BOOST)) * 0.5;
+                      const widthEm = Math.max(...lines.map((l) => measureEm(l, labelFont)));
+                      if (!labelFits(widthEm, lines.length, fs, rFit)) return null;
                       return (
                         <text
                           x={0}
