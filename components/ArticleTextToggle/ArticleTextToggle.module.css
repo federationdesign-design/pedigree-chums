@@ -4,9 +4,15 @@
    state inverts to a white chip. */
 
 .wrap {
-  /* Align the control to the article's reading gutter (matches the essay
-     layout's horizontal padding). */
-  padding: 14px clamp(20px, 5vw, 64px) 0;
+  /* Sit on the shared essay axis: read --essay-max / --essay-gutter from the
+     enclosing .essayPage (EssayShell), exactly as the hero content and body
+     layout do, so the toggle lines up with the headline above and the body text
+     below and cannot drift when the axis changes. */
+  width: 100%;
+  max-width: var(--essay-max, none);
+  margin: 0 auto;
+  padding: 14px var(--essay-gutter, clamp(18px, 4vw, 48px)) 0;
+  box-sizing: border-box;
   display: flex;
 }
 
