@@ -109,6 +109,7 @@ export default function HowItPlays() {
     if (!wrap || !el) return;
 
     const onWheel = (e: WheelEvent) => {
+      if (e.ctrlKey) return; // trackpad pinch (ctrl+wheel): let the browser zoom
       const delta = Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
       if (delta === 0) return;
       const max = el.scrollWidth - el.clientWidth;

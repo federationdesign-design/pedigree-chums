@@ -297,6 +297,7 @@ export default function WorkDeck({ slides }: { slides: Slide[] }) {
     let accum = 0;
     let idle: number | undefined;
     function onWheel(e: WheelEvent) {
+      if (e.ctrlKey) return; // trackpad pinch (ctrl+wheel): let the browser zoom
       if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return; // vertical scroll: leave it to the page
       e.preventDefault(); // stop horizontal overscroll -> Safari's back/forward swipe
       if (idle) window.clearTimeout(idle);

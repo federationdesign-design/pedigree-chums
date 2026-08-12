@@ -4,7 +4,7 @@
   z-index: 60;
   background: rgba(3, 87, 245, 0.82);
   animation: scFade 0.22s ease;
-  touch-action: none;
+  touch-action: pinch-zoom;
   cursor: grab;
   overflow: hidden;
 }

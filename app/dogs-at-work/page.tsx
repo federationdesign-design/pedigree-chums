@@ -230,6 +230,7 @@ export default function DogsAtWorkPage() {
           }, { passive: true });
 
           carousel.addEventListener('touchmove', function(e){
+            if (e.touches.length > 1) return; /* pinch: let the browser zoom */
             var t = e.touches[0];
             if (!axis) {
               var adx = Math.abs(t.clientX - startX);
