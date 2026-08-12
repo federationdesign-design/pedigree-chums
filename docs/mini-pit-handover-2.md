@@ -473,3 +473,33 @@ another.
   `center center` the whole time. The comment was ASPIRATIONAL, never applied,
   until this fix. A reminder that a comment describing intent is not proof the
   code does it, on this screen at least.
+
+  (Follow-up: the column ALSO failed on device, reading as a strip of photo pasted
+  on the blue and clashing with the diagonal band. FINAL desktop treatment is a
+  CIRCLE: `.winNextImg` is a square box + `border-radius: 50%` + cover (even crop,
+  matches the game's circle language), clip-path dropped, centred in the free band
+  with a plain yellow `box-shadow` ring, `min(40vw, 400px)`. Still desktop-only;
+  mobile keeps the full-bleed base rule.)
+
+## 17. BALL RETUNED TO FIX THE 30s PIT FREEZE (2026-08-12)
+
+The tennis ball (`ball` + `ballPink`) was `restitution: 0.97` with no
+`frictionStatic` ("super bouncy"). After rock removal put a ball on EVERY level
+(section 15), pits began FREEZING for a beat every ~30 seconds. Cause: the sim
+loop only re-arms while `stillFrames < 12` (or flash numbers exist) AND under a
+30s cap, `now - started < 30000` (BreedTree.tsx). `wake()` early-returns while the
+loop runs, so `started` is a hard 30s wall. A 0.97 ball never reaches 12 still
+frames: it bounces for tens of seconds AND, with friction 0.05 and no
+`frictionStatic`, rolls/creeps on the floor almost forever. So the loop ran the
+full 30s then stopped mid-motion = the freeze (a tap woke it for another 30s).
+
+FIX: `restitution 0.97 -> 0.85` (still the bounciest thing in the pit; the dogs
+are 0.78, and 0.85 keeps a lively bounce while decaying in ~4-6s) PLUS
+`frictionStatic: 0.8` to stop the roll (the same lever FREED_CIRCLE_OPTS uses on
+the dogs). Together the ball reaches 12 still frames and the loop settles.
+
+REJECTED, do not reach for either without re-reading this: raising `frictionAir`
+would settle it too, but reads floaty and weakens the throw-it-out release valve
+on a light body; excluding toys from the settle test would stop the loop when the
+DOGS settle, freezing the ball suspended MID-BOUNCE a few seconds in, worse than
+the 30s freeze.
