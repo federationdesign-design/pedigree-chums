@@ -13,6 +13,7 @@ import trainingDifficulty from "../../../data/trainingDifficulty";
 import groomingNeeds from "../../../data/groomingNeeds";
 import exerciseNeeds from "../../../data/exerciseNeeds";
 import styles from "../good-dog-bad-dog.module.css";
+import ArticleTextToggle from "../../../components/ArticleTextToggle/ArticleTextToggle";
 import { WipeSequence } from "../../../components/ArgosChoreo/ArgosChoreo";
 import { QuoteReveal } from "../../../components/ScrollScenes/QuoteReveal";
 
@@ -52,6 +53,8 @@ export default function BullsEyePage() {
             <Link href="/good-dog-bad-dog" className={styles.backLink}>← Back to Good Dog, Bad Dog</Link>
           </div>
         </div>
+
+        <ArticleTextToggle />
 
         <div className={styles.essayLayout}>
           <article className={styles.essay}>

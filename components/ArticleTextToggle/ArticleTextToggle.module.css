@@ -1,0 +1,54 @@
+/* The per-page article body-text toggle. Sits below the hero, above the body
+   columns (outside the desktop/mobile split, so it shows in both). The pill is
+   solid navy so it stays legible over the site gradient; the pressed (white)
+   state inverts to a white chip. */
+
+.wrap {
+  /* Align the control to the article's reading gutter (matches the essay
+     layout's horizontal padding). */
+  padding: 14px clamp(20px, 5vw, 64px) 0;
+  display: flex;
+}
+
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--navy, #0a3a57);
+  color: #ffffff;
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+  border-radius: 999px;
+  padding: 8px 16px;
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.85rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+}
+
+/* Pressed = white text is active: invert the chip so the control mirrors the
+   state it produces. */
+.toggle[aria-pressed="true"] {
+  background: #ffffff;
+  color: var(--navy, #0a3a57);
+  border-color: var(--navy, #0a3a57);
+}
+
+/* Visible keyboard focus: a yellow ring, clearly legible on the blue gradient. */
+.toggle:focus-visible {
+  outline: 2px solid var(--yellow, #ffd23e);
+  outline-offset: 2px;
+}
+
+.icon {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+/* Precedence hook: while a global contrast scheme is active (the future
+   accessibility toolbar sets data-pc-contrast-scheme on <html>), the per-page
+   toggle has no effect, so hide it rather than leaving a dead control. Compounded
+   with .wrap so the :global-style root selector does not trip the build trap. */
+:root[data-pc-contrast-scheme] .wrap {
+  display: none;
+}

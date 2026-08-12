@@ -182,6 +182,14 @@
 .essayBody.essayBody > .spacer,
 .essayBody.essayBody > .spacer + * { margin-top: 0; }
 
+/* Per-page opt-in (the article text toggle): main[data-pc-textinvert="on"] flips
+   the body paragraphs to white. Gated on :root:not([data-pc-contrast-scheme]) so
+   a future accessibility toolbar wins automatically; paragraphs only, matching
+   the .essayBody p black rule below. Opt-in cost: white bottoms out at ~1.45:1 on
+   the gradient, a deliberate non-compliant state (Steve, 12 Aug 2026). */
+:root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"] .essayBody p {
+  color: #ffffff;
+}
 .essayBody p {
   font-family: var(--font-body, "Montserrat", sans-serif);
   font-size: 1.25rem;

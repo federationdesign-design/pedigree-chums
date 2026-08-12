@@ -5,6 +5,7 @@ import Nav from "../../../components/Nav/Nav";
 import Footer from "../../../components/Footer/Footer";
 import HeroHat from "./HeroHat";
 import styles from "../dogs-at-work.module.css";
+import ArticleTextToggle from "../../../components/ArticleTextToggle/ArticleTextToggle";
 import Payslip from "../../../components/Payslip/Payslip";
 import MobileArticleBody, { type ArticleCard } from "../../../components/DogsAtWork/MobileArticleBody";
 import CostToTrainCard from "../../../components/DogsAtWork/CostToTrainCard";
@@ -165,6 +166,8 @@ export default function BioDetectionPage() {
             <h1 className={styles.essayHeroTitle}>The Dogs Teaching Medicine How to Smell Disease</h1>
           </div>
         </div>
+
+        <ArticleTextToggle />
 
         <div className={styles.essayLayout}>
           <article className={styles.essay}>

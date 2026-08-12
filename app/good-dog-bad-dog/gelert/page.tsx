@@ -13,6 +13,7 @@ import trainingDifficulty from "../../../data/trainingDifficulty";
 import groomingNeeds from "../../../data/groomingNeeds";
 import exerciseNeeds from "../../../data/exerciseNeeds";
 import styles from "../good-dog-bad-dog.module.css";
+import ArticleTextToggle from "../../../components/ArticleTextToggle/ArticleTextToggle";
 
 export const metadata: Metadata = {
   title: "Gelert: The Dog Who Couldn't Explain Himself | Good Dog, Bad Dog",
@@ -41,6 +42,8 @@ export default function GelertPage() {
             <Link href="/good-dog-bad-dog" className={styles.backLink}>← Back to Good Dog, Bad Dog</Link>
           </div>
         </div>
+
+        <ArticleTextToggle />
 
         <div className={styles.essayLayout}>
           {/* Main essay column */}
