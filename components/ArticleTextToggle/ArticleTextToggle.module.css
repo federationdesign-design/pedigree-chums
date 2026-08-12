@@ -4,12 +4,11 @@
    state inverts to a white chip. */
 
 .wrap {
-  /* Sit on the shared essay axis: read --essay-max / --essay-gutter from the
-     enclosing .essayPage (EssayShell), exactly as the hero content and body
+  /* Sit on the shared essay axis: full-width and padded to --essay-gutter from
+     the enclosing .essayPage (EssayShell), exactly as the hero content and body
      layout do, so the toggle lines up with the headline above and the body text
-     below and cannot drift when the axis changes. */
+     below and cannot drift. The layout is liquid (no --essay-max cap). */
   width: 100%;
-  max-width: var(--essay-max, none);
   /* Single owner of the hero->body vertical space: margin-top reads the shared
      --essay-hero-gap (the vertical axis), a small margin-bottom keeps the icon
      close to the body text it controls. The hero's margin-bottom and .layout's

@@ -18,10 +18,12 @@
 .page {
   min-height: 100vh;
   padding-bottom: 0;
-  /* Single-source horizontal axis, read by .heroContent AND .layout. */
+  /* Single-source horizontal axis, read by .heroContent AND .layout. The layout
+     is fully liquid: no --essay-max cap, so the block fills the viewport at every
+     width and the left gutter (matching the nav's clamp(18px,4vw,48px)) is the
+     single left edge for the logo, hero, headline, toggle and body text. */
   --essay-gutter: clamp(18px, 4vw, 48px);
   --essay-sidebar: clamp(380px, 30vw, 700px);
-  --essay-max: none;
   --essay-gap: 48px;
   /* Single-source VERTICAL axis: the one value that owns the space between the
      hero and the body. Read by the text toggle's margin-top; the hero's
@@ -31,23 +33,20 @@
   --essay-hero-gap: 36px;
 }
 
-/* Hero content: capped + centred on the shared axis. THE split fix. */
+/* Hero content: full-width, its content padded to the shared gutter. */
 .heroContent {
   position: relative;
   z-index: 2;
   width: 100%;
-  max-width: var(--essay-max);
-  margin: 0 auto;
   padding: 24px var(--essay-gutter) 40px;
   align-self: flex-end;
   box-sizing: border-box;
 }
 
-/* Body two-column layout: same axis, so its left edge equals the hero's. */
+/* Body two-column layout: full-width, same gutter, so its left edge equals the
+   hero's and the logo's. */
 .layout {
   width: 100%;
-  max-width: var(--essay-max);
-  margin: 0 auto;
   /* padding-top is 0: the space above the body is owned solely by the text
      toggle's margin (which reads --essay-hero-gap). Keeps the bottom breathing
      room. */
@@ -78,14 +77,14 @@
   .layout { container-type: inline-size; }
 }
 
-/* Wide ladder (GDBD look), driven through the single --essay-max token so the
-   hero caps at the same width as the body at every step. */
+/* Wide ladder: the block is liquid (no max-width), so only the gap between the
+   text column and the sidebar grows with width. */
 @media (min-width: 1300px) {
-  .page { --essay-max: 1500px; --essay-gap: 80px; }
+  .page { --essay-gap: 80px; }
 }
 @media (min-width: 1600px) {
-  .page { --essay-max: 1680px; --essay-gap: 100px; }
+  .page { --essay-gap: 100px; }
 }
 @media (min-width: 1900px) {
-  .page { --essay-max: 1856px; --essay-gap: 120px; }
+  .page { --essay-gap: 120px; }
 }

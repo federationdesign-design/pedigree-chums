@@ -173,9 +173,10 @@
   font-size: 1.625rem;
   font-weight: 700;
   line-height: 1.3;
-  /* Intro width: pulled back to 90% of the .essay block (Steve, 12 Aug; was 100%
-     matching the body, 60% before that, and once the shared 720px cap). */
-  max-width: 90%;
+  /* Liquid layout (Steve, 13 Aug): no cap on paragraphs, so the intro fills the
+     column like the body. (Was 90%, and 100%/60%/720px before that.) The payslip
+     ingress is handled on the payslip itself, not by pulling the intro back. */
+  max-width: none;
 }
 
 .subhead {
