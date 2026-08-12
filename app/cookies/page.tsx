@@ -5,7 +5,7 @@ import Footer from "../../components/Footer/Footer";
 import styles from "./cookies.module.css";
 
 export const metadata: Metadata = {
-  title: "Cookie Policy | Pedigree Chums",
+  title: "Cookie Policy",
   description:
     "How Pedigree Chums uses cookies and similar storage, and how you can control them.",
 };

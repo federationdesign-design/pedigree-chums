@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import styles from "../preorder.module.css";
 
 export const metadata: Metadata = {
-  title: "Pre-order confirmed | Pedigree Chums™",
+  title: "Pre-order confirmed",
   robots: { index: false, follow: false },
 };
 

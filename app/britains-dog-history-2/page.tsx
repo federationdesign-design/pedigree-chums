@@ -5,7 +5,7 @@ import HistoryCarousel from "./HistoryCarousel";
 import styles from "./history2.module.css";
 
 export const metadata: Metadata = {
-  title: "Britain's Dog History",
+  title: "Britain's Dog History (Carousel)",
   description:
     "How Britain became a nation of dog lovers: from working dogs and war mascots to Greyfriars Bobby, Crufts and the Victorian pet boom, right up to today's designer crossbreeds.",
   // Version 2 is a working draft alongside the live page. It must not be

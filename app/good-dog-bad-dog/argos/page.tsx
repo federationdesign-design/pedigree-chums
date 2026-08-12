@@ -11,7 +11,7 @@ import { QuoteBuild, QuotePollScene, StatueBulletsChoreo, HomerCrossfade, GatedV
 import { QuoteReveal } from "../../../components/ScrollScenes/QuoteReveal";
 
 export const metadata: Metadata = {
-  title: "Argos: Homer's Dog in The Odyssey — Loyalty, Home and the Nolan Film",
+  title: "Argos: Homer's Dog in The Odyssey | Good Dog, Bad Dog",
   description:
     "The dog from Homer's Odyssey who waited twenty years for his master to return. What Argos tells us about loyalty, home, scent and what we owe the dogs who love us.",
   robots: "index, follow",

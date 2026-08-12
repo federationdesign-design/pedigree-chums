@@ -11,7 +11,7 @@ import MobileArticleBody, { type ArticleCard } from "../../../components/DogsAtW
 import { PAYSLIPS } from "../data/payslips";
 
 export const metadata: Metadata = {
-  title: "The Dog That Finds You When Nobody Else Can | Dogs at Work | Pedigree Chums™",
+  title: "The Dog That Finds You When Nobody Else Can | Dogs at Work",
   // Meta description drawn from the index card dek (supplied by Steve, 11 Aug).
   description:
     "Air scent, trailing, water. A dog covers ground people cannot, in the dark, in the rain, for a toy and a bit of praise.",

@@ -68,12 +68,22 @@ const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL || "https://pedigree-chums.vercel.app";
 
 const TITLE = "Pedigree Chums™ | The Dog Bingo Game";
+// Every page's <title> is page-name first, then this identical site suffix, per
+// WCAG 2.4.2 (Page Titled): each route must be uniquely and descriptively named.
+// The suffix lives here once as a template so it cannot drift; child pages set
+// only their own name (title: "About") and Next composes "About | <suffix>". The
+// template applies to child segments only, so the root page.tsx below keeps the
+// brand default unchanged.
+const TITLE_TEMPLATE = "%s | Pedigree Chums™ The Dog Bingo Game";
 const DESCRIPTION =
   "The ultimate on-the-go dog spotting game. 54 uniquely-illustrated breed cards. Fun, educational and addictive, perfect for families, tourists and dog lovers.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: TITLE,
+  title: {
+    default: TITLE,
+    template: TITLE_TEMPLATE,
+  },
   description: DESCRIPTION,
   openGraph: {
     title: TITLE,

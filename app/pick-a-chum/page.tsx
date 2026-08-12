@@ -3,7 +3,12 @@
 // light landing surface; it does not render its own launcher to avoid a
 // duplicate.
 
+import type { Metadata } from 'next';
 import styles from './page.module.css';
+
+export const metadata: Metadata = {
+  title: 'Pick a Chum',
+};
 
 export default function PickAChumPage() {
   return (

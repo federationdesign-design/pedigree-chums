@@ -4,7 +4,7 @@ import Footer from "../../components/Footer/Footer";
 import styles from "../toy-safety/toy-safety.module.css";
 
 export const metadata: Metadata = {
-  title: "Evidence Register | Pedigree Chums™",
+  title: "Evidence Register",
   description:
     "Status of the supporting compliance evidence for the Pedigree Chums™ dog bingo card game Technical File.",
 };

@@ -13,7 +13,7 @@ import { SLIDES } from "./data/slides";
 import WorkDeck from "./WorkDeck";
 
 export const metadata: Metadata = {
-  title: "Dogs at Work | Pedigree Chums™",
+  title: "Dogs at Work",
   description:
     "Britain's working dogs are an invisible workforce -- felt emotionally, but rarely counted economically. A series on the dogs that help Britain function, and the question behind every wagging tail: if dogs give us this much, what do we owe them back?",
   robots: "noindex",

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { headers } from "next/headers";
 import Nav from "../../../components/Nav/Nav";
 import BreedClient from "./BreedClient";
@@ -10,6 +11,15 @@ import breedInfo from "../../../data/breed-info.json";
 type Props = { params: Promise<{ slug: string }> };
 
 export const dynamic = "force-dynamic";
+
+// Per-breed <title> so each of the 54 breed pages is uniquely named (WCAG 2.4.2),
+// e.g. "Irish Wolfhound | Pedigree Chums™ The Dog Bingo Game". The site suffix is
+// supplied by the root layout's title template.
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
+  const breed = breeds.find((b) => b.slug === slug);
+  return { title: breed ? breed.name : "Chum Not Found" };
+}
 
 function isMobileUA(ua: string): boolean {
   return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile|CriOS/i.test(ua);

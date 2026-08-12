@@ -12,7 +12,7 @@ import SocialFeed from "../../components/SocialFeed/SocialFeed";
 import styles from "../page.module.css";
 
 export const metadata: Metadata = {
-  title: "About - Pedigree Chums™ | The Dog Bingo Game",
+  title: "About",
   description:
     "What Pedigree Chums™ is: the on-the-go dog spotting game. 54 illustrated breed cards with traits, stats and tell-tale features, plus who it's for and how to play.",
 };

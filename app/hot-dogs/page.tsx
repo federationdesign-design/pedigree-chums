@@ -4,7 +4,7 @@ import Footer from "../../components/Footer/Footer";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
-  title: "Hot/Dogs - Pedigree Chums™",
+  title: "Hot/Dogs",
   description: "A hot dog is a sausage. A sausage dog is a dog. A dog can be hot. A hot dog in a car is not funny at all.",
 };
 

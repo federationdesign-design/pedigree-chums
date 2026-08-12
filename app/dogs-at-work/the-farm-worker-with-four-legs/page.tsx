@@ -11,7 +11,7 @@ import MobileArticleBody, { type ArticleCard } from "../../../components/DogsAtW
 import { PAYSLIPS } from "../data/payslips";
 
 export const metadata: Metadata = {
-  title: "The Farm Worker With Four Legs | Dogs at Work | Pedigree Chums™",
+  title: "The Farm Worker With Four Legs | Dogs at Work",
   description:
     "To the shepherd it is labour saved. To the sheepdog it is the best game ever invented: find the sheep, get behind them, bring them home. Nobody has told it otherwise.",
   robots: "noindex",

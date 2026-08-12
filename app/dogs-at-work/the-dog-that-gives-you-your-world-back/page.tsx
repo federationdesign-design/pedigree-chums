@@ -12,7 +12,7 @@ import CostToTrainCard from "../../../components/DogsAtWork/CostToTrainCard";
 import { PAYSLIPS } from "../data/payslips";
 
 export const metadata: Metadata = {
-  title: "The Dog That Gives You Your World Back | Dogs at Work | Pedigree Chums™",
+  title: "The Dog That Gives You Your World Back | Dogs at Work",
   // Meta description drawn from the index card dek (supplied by Steve, 11 Aug).
   description:
     "A guide dog does not give somebody their sight back. It gives them the confidence to go, and that turns out to be almost as valuable.",
