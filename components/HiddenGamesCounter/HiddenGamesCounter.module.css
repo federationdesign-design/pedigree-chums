@@ -594,10 +594,10 @@
   background: linear-gradient(45deg, #001ae0 0%, #62c9f3 100%);
   border: 3px solid #141544;
   box-shadow: 0 10px 24px rgba(10, 58, 87, 0.3);
-  padding: 10px 16px;
+  padding: 8.5px 13.6px; /* 15% smaller: 10/16 x 0.85 */
   font-family: var(--font-mohave), var(--font-body), system-ui, sans-serif;
   font-weight: 700;
-  font-size: 1.05rem;
+  font-size: 0.8925rem; /* 15% smaller: 1.05rem x 0.85 */
   color: #ffffff;
 }
 
@@ -669,6 +669,15 @@
   position: fixed;
   top: calc(clamp(96px, 12vh, 132px) + env(safe-area-inset-top, 0px) - 35px); /* nudge 35px up (10 + 25) */
   bottom: auto;
+  left: calc(clamp(12px, 3vw, 22px) + 15px); /* nudge 15px right */
+}
+
+/* Match .reveal (the default, minimised pill) to .counter so the two stay
+   aligned: same 35px-up / 15px-right nudge. Desktop only; the mobile group
+   rules further down still override at <=768px. The shared translateX(30px)
+   (line 629) is untouched, so both states keep the same 30px card alignment. */
+.reveal.reveal {
+  top: calc(clamp(96px, 12vh, 132px) + env(safe-area-inset-top, 0px) - 35px); /* nudge 35px up */
   left: calc(clamp(12px, 3vw, 22px) + 15px); /* nudge 15px right */
 }
 

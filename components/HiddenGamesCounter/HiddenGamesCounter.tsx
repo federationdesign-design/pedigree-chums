@@ -71,11 +71,10 @@ export default function HiddenGamesCounter() {
     };
   }, []);
 
-  // Task 136: condensed by DEFAULT. Desktop expands on hover and collapses when
-  // the cursor leaves; mobile has no hover, so a tap toggles it and it stays
-  // open until tapped again.
+  // Task 136: condensed by DEFAULT. A click expands it (was desktop hover, now
+  // click on both platforms, matching the mobile tap). There is no minimise
+  // control, so once expanded it stays open until the next page load.
   const [minimised, setMinimised] = useState(true);
-  const [pinned, setPinned] = useState(false);
   const [blockedDismissed, setBlockedDismissed] = useState(false);
   const [completionCollapsed, setCompletionCollapsed] = useState(false);
   const [phase, setPhase] = useState<Phase>("pending");
@@ -216,18 +215,12 @@ export default function HiddenGamesCounter() {
   if (!logoShowing) return null;
 
   // phase === "counter"
-  const expand = () => setMinimised(false);
-  const collapse = () => { if (!pinned) setMinimised(true); };
-  const toggle = () => { setPinned((p) => !p); setMinimised((m) => !m); };
-
   if (minimised) {
     return (
       <button
         type="button"
         className={styles.reveal}
-        onMouseEnter={expand}
-        onFocus={expand}
-        onClick={toggle}
+        onClick={() => setMinimised(false)}
         aria-label={`Show hidden games progress, ${state.label}`}
       >
         {state.count}/{state.total}
@@ -237,16 +230,8 @@ export default function HiddenGamesCounter() {
 
   return (
     <>
-      <div className={styles.counter} role="status" aria-live="polite" onMouseLeave={collapse}>
+      <div className={styles.counter} role="status" aria-live="polite">
         <span className={styles.label}>{state.label}</span>
-        <button
-          type="button"
-          className={styles.minimiseBtn}
-          onClick={() => setMinimised(true)}
-          aria-label="Minimise hidden games progress"
-        >
-          <img className={styles.minimiseIcon} src="/red-icon.svg" alt="" />
-        </button>
       </div>
       {state.storageBlocked && !blockedDismissed && (
         <div className={styles.blocked} role="alert">
