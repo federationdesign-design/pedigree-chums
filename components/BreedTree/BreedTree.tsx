@@ -103,9 +103,9 @@ const SHIFT = 0.66;
 // layout already fills the screen).
 const ZOOM_PAD = 1.1;
 // Breed-title placement on each circle, relative to its label anchor.
-// TITLE_DY_FRAC sets how far up the circle the block sits, as a fraction of the
-// radius (0.5 = halfway to the top); TITLE_ANGLE tilts it (negative leans the
-// text up to the right). Tweak these two to taste.
+// TITLE_DY_FRAC sets how far UP the circle the block sits and TITLE_DX_FRAC how far
+// RIGHT, each as a fraction of the radius; TITLE_ANGLE tilts it (negative leans the
+// text up to the right). labelFits accounts for all three. Tweak to taste.
 // Mini pit only: the difficulty slider sets how big the dog circles are before
 // the round starts. Bigger circles means less room in the pit and a faster game
 // over, so size IS the difficulty. Three points are pinned:
@@ -505,11 +505,16 @@ const WASH_INSET = 2.2; // .learnWash inset: -60% -> 2.2 viewports wide
 // tighter LABEL_LINE_H below, so the smaller block still clears the rim up here.
 // Was -min(42, 0.18r), which deliberately held labels near their middle;
 // superseded on purpose, do not restore it thinking the top placement is a drift.
-const TITLE_DY_FRAC = 0.5;
+const TITLE_DY_FRAC = 0.55;
+// Horizontal companion to TITLE_DY_FRAC: shift the block RIGHT by this fraction of
+// the radius (0.1 = 10% of r). New 2026-08-12; there was no horizontal offset
+// before (the block was centred at x=0). labelFits adds it too, so a label pushed
+// toward the right rim is shrunk or dropped rather than spilling over it.
+const TITLE_DX_FRAC = 0.1;
 function titleDy(r: number): number {
   return -Math.max(0, r) * TITLE_DY_FRAC;
 }
-const TITLE_ANGLE = -1;
+const TITLE_ANGLE = -2;
 type Node = HierarchyCircularNode<LineageNode>;
 
 // A circle whose name repeats its parent's is not a second animal. It is the
@@ -544,7 +549,7 @@ const LABEL_CHAR_W = 0.62; // fallback glyph width in ems, before the font loads
 // drawn spacing and the spacing the fitter measured can never drift apart.
 // Tightening this also lets the fitter find a larger type size, because the
 // same words now occupy a shorter block, so multi-line names grow a little.
-const LABEL_LINE_H = 0.6; // baseline-to-baseline in ems; 0.6 reads ~1.0 against Luckiest Guy's ink (was 0.9, which read ~1.5). Shared by circle labels, badge labels and pit words.
+const LABEL_LINE_H = 0.7; // baseline-to-baseline in ems (0.9 -> 0.6 -> 0.7, Steve's tuned value). Shared by circle labels, badge labels and pit words.
 const LABEL_CAP_H = 0.8; // ink above the first baseline, in ems
 const LABEL_DESC = 0.28; // ink below the last baseline, in ems
 // Keep the block inside this fraction of the radius. Raised from 0.9: names are
@@ -706,9 +711,11 @@ function labelFirstY(n: number, fs: number, r: number): number {
 }
 
 // Does the rotated text block sit inside a circle of radius r? Corners are
-// rotated about (0, titleDy(r)), exactly as the rendered <text> is.
+// rotated about (dxR, titleDy(r)) and shifted right by dxR, exactly as the
+// rendered <text> is, so a block pushed toward the right rim is failed here.
 function labelFits(widthEm: number, n: number, fs: number, r: number): boolean {
   const halfW = (widthEm * fs) / 2;
+  const dxR = TITLE_DX_FRAC * r;
   const dyR = titleDy(r);
   const y0 = labelFirstY(n, fs, r);
   const top = y0 - LABEL_CAP_H * fs;
@@ -719,7 +726,7 @@ function labelFits(widthEm: number, n: number, fs: number, r: number): boolean {
   for (const x of [-halfW, halfW]) {
     for (const y of [top, bot]) {
       const dy = y - dyR;
-      const rx = x * cos - dy * sin;
+      const rx = x * cos - dy * sin + dxR;
       const ry = x * sin + dy * cos + dyR;
       if (Math.hypot(rx, ry) > lim) return false;
     }
@@ -5801,9 +5808,12 @@ export default function BreedTree({
                       const fs = Math.max(10, Math.min(cap, fit.fs + TITLE_BOOST)) * 0.5;
                       const widthEm = Math.max(...lines.map((l) => measureEm(l, labelFont)));
                       if (!labelFits(widthEm, lines.length, fs, rFit)) return null;
+                      // Rightward shift, matched to labelFits' dxR so the draw and
+                      // the fit agree; the block also rotates about this new centre.
+                      const dx = TITLE_DX_FRAC * rFit;
                       return (
                         <text
-                          x={0}
+                          x={dx}
                           /* What this size was fitted against, so zoomTo can keep
                              it right while the view moves. The fit is only redone
                              on a render, and a zoom renders once at the START of
@@ -5814,7 +5824,7 @@ export default function BreedTree({
                           data-kfit={kL}
                           data-lsfit={ls}
                           y={labelFirstY(lines.length, fs, rFit)}
-                          transform={`rotate(${TITLE_ANGLE} 0 ${titleDy(rFit)})`}
+                          transform={`rotate(${TITLE_ANGLE} ${dx} ${titleDy(rFit)})`}
                           style={{
                             fill: d === hovered ? "var(--yellow, #ffd23e)" : "#ffffff",
                             fontFamily: "var(--font-display), system-ui, sans-serif",
@@ -5843,7 +5853,7 @@ export default function BreedTree({
                           }}
                         >
                           {lines.map((line, li) => (
-                            <tspan key={li} x={0} dy={li === 0 ? 0 : `${LABEL_LINE_H}em`}>{line}</tspan>
+                            <tspan key={li} x={dx} dy={li === 0 ? 0 : `${LABEL_LINE_H}em`}>{line}</tspan>
                           ))}
                         </text>
                       );
