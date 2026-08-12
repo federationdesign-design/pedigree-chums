@@ -7,6 +7,7 @@ import HeroHat from "./HeroHat";
 import styles from "../dogs-at-work.module.css";
 import Payslip from "../../../components/Payslip/Payslip";
 import MobileArticleBody, { type ArticleCard } from "../../../components/DogsAtWork/MobileArticleBody";
+import CostToTrainCard from "../../../components/DogsAtWork/CostToTrainCard";
 import { PAYSLIPS } from "../data/payslips";
 
 export const metadata: Metadata = {
@@ -112,31 +113,9 @@ const CARDS: ArticleCard[] = [
   {
     id: "cost-to-train",
     pairWith: "invents",
-    node: (
-      <div className={styles.sidebarCard}>
-        <div style={{ padding: "16px 20px 8px" }}>
-          <p style={cardTitle}>What it costs to train a dog</p>
-        </div>
-        <div style={{ padding: "0 20px 8px", display: "flex", flexDirection: "column", gap: 12 }}>
-          {[
-            { role: "Guide dog", detail: "birth to retirement", value: "£55,000+" },
-            { role: "Medical alert assistance dog", detail: "to fully train", value: "£29,000" },
-            { role: "Ongoing support", detail: "per year, per dog", value: "£1,000" },
-          ].map(({ role, detail, value }) => (
-            <div key={role} style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 10, borderBottom: "1px solid rgba(255,255,255,0.1)", paddingBottom: 10 }}>
-              <div>
-                <p style={{ ...cardBody, fontWeight: 700 }}>{role}</p>
-                <p style={{ ...cardBody, fontSize: "0.72rem", color: "#aac4d4" }}>{detail}</p>
-              </div>
-              <p style={{ fontFamily: "var(--font-display)", fontSize: "1.5rem", color: "var(--yellow)", whiteSpace: "nowrap", lineHeight: 1 }}>{value}</p>
-            </div>
-          ))}
-        </div>
-        <div style={{ padding: "4px 20px 16px" }}>
-          <p style={{ ...cardBody, fontSize: "0.78rem", color: "#aac4d4" }}>These dogs are given free to the people who need them, funded almost entirely by public donations. Sources: Guide Dogs; Medical Detection Dogs.</p>
-        </div>
-      </div>
-    ),
+    // Extracted to a shared component so article 6 reuses the same figures and
+    // sources line instead of a re-typed copy (see CostToTrainCard).
+    node: <CostToTrainCard />,
   },
   {
     id: "dog-thinks",

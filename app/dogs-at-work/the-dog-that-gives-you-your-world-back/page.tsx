@@ -8,6 +8,7 @@ import Payslip from "../../../components/Payslip/Payslip";
 import SidebarCard from "../../../components/DogsAtWork/SidebarCard";
 import sidebar from "../../../components/DogsAtWork/SidebarCard.module.css";
 import MobileArticleBody, { type ArticleCard } from "../../../components/DogsAtWork/MobileArticleBody";
+import CostToTrainCard from "../../../components/DogsAtWork/CostToTrainCard";
 import { PAYSLIPS } from "../data/payslips";
 
 export const metadata: Metadata = {
@@ -208,6 +209,13 @@ const CARDS: ArticleCard[] = [
         <p className={sidebar.text}>It is not a dog leading a passive human. It is two specialists dividing one journey between them.</p>
       </SidebarCard>
     ),
+  },
+  {
+    // Reused verbatim from article 1 (see CostToTrainCard). Paired with the
+    // training section so it lands beside the cost/training copy on mobile.
+    id: "cost-to-train",
+    pairWith: "ordinary-world",
+    node: <CostToTrainCard />,
   },
   {
     id: "what-changes",
