@@ -139,6 +139,15 @@ export default function LineageModal({ name, image, character, lineage, fromRect
     if (typeof window === "undefined") return false;
     return !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   });
+  // The tunnel drives the pit's entrance: the drop-in is held and the cluster ring
+  // stays small until the tunnel signals the resolve. holdEntrance is a stable
+  // mirror of "the tunnel is playing" (so under reduced motion the pit enters
+  // normally, unheld); resolving flips once, when the tunnel begins clearing.
+  const [holdEntrance] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  });
+  const [resolving, setResolving] = useState(false);
   const [shownName, setShownName] = useState(name);
   const [shownImg, setShownImg] = useState<string | null>(image);
   const [shownStatus, setShownStatus] = useState<BreedTag | null>(null);
@@ -287,7 +296,7 @@ export default function LineageModal({ name, image, character, lineage, fromRect
   return createPortal(
     <div className={css.overlay} role="dialog" aria-modal="true" aria-label={name}>
       {/* The time tunnel covers the pit while it arrives, then removes itself. */}
-      {tunnelActive && <TimeTunnel fromRect={fromRect} onDone={() => setTunnelActive(false)} />}
+      {tunnelActive && <TimeTunnel fromRect={fromRect} onResolve={() => setResolving(true)} onDone={() => setTunnelActive(false)} />}
       {/* Score, fixed top-right beside where the in-pit close object starts.
           Hidden once the round is running: the number belongs to the menu and
           the end screens, and during play it competes with the lives indicator
@@ -356,6 +365,8 @@ export default function LineageModal({ name, image, character, lineage, fromRect
           fill
           dockAside
           gravity
+          holdEntrance={holdEntrance}
+          resolve={resolving}
           strokeByDepth
           tinted={false}
           onShownChange={setShownName}

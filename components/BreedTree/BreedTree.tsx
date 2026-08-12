@@ -775,6 +775,17 @@ function easeOutBounce(x: number): number {
   return n1 * (x -= 2.625 / d1) * x + 0.984375;
 }
 
+// Time-tunnel resolve dials (used only when holdEntrance is set). RING_LEAD is how
+// far the tunnel's clearing rings lead before the cluster ring starts to grow;
+// DROP_DELAY is the gap between the ring growing and the dogs falling (raise it if
+// ring and dogs landing together reads busy). RING_GROW is how long the ring takes
+// to bloom into place; RING_START_SCALE is its size at the vanishing point, as a
+// fraction of its real size.
+const RING_LEAD_MS = 300;      // dial 1: how far ahead the tunnel rings lead
+const DROP_DELAY_MS = 250;     // dial 2: ring-grow to dogs-falling gap
+const RING_GROW_MS = 650;
+const RING_START_SCALE = 0.08;
+
 // On mobile the packed circles sit side by side and stay small. We re-lay the
 // top-level circles into a tall-screen arrangement (2 stacked, 3 a triangle, 4 a
 // grid) and scale each subtree to match, so they load far bigger and easier to
@@ -1068,6 +1079,8 @@ export default function BreedTree({
   playLabel = "PLAY",
   onPlayPressed,
   onBackToLearn,
+  holdEntrance = false,
+  resolve = false,
 }: {
   root: LineageNode;
   rootImage?: string;
@@ -1143,6 +1156,11 @@ export default function BreedTree({
   // pit's top-right stack under the close X. Leaving costs a life, so the host
   // decides what that means; the pit only reports the press.
   onBackToLearn?: () => void;
+  // The time-tunnel transition holds the drop-in and keeps the cluster ring small
+  // until `resolve` flips, then grows the ring and drops the dogs. When
+  // holdEntrance is false (reduced motion, no tunnel) the pit enters normally.
+  holdEntrance?: boolean;
+  resolve?: boolean;
 }) {
   const [isMobile, setIsMobile] = useState(false);
   const [aspect, setAspect] = useState(1);
@@ -1544,6 +1562,16 @@ export default function BreedTree({
   const [boxAlt, setBoxAlt] = useState(false); // flips each time the shown circle changes, for the alternating box colour
   const [railSide, setRailSide] = useState<"left" | "right">("right"); // side the related-dogs rail sits, flipped when the box is dragged across
   const [entered, setEntered] = useState(false);
+  // The drop-in runs once this is armed. Without the tunnel (holdEntrance false) it
+  // is armed from the start, so the pit enters as it always did. With the tunnel it
+  // stays false until the resolve signal, then a timer arms it so the dogs fall
+  // after the cluster ring has begun to grow (RING_LEAD + DROP_DELAY).
+  const [dropArmed, setDropArmed] = useState(!holdEntrance);
+  useEffect(() => {
+    if (!holdEntrance || !resolve || dropArmed) return;
+    const id = window.setTimeout(() => setDropArmed(true), RING_LEAD_MS + DROP_DELAY_MS);
+    return () => window.clearTimeout(id);
+  }, [holdEntrance, resolve, dropArmed]);
   const [falling, setFalling] = useState(false);
   const [dropped, setDropped] = useState(false);
 
@@ -2959,6 +2987,24 @@ export default function BreedTree({
     // outer circles land first and the nested ones drop in just after. Labels
     // stay hidden until everything has settled.
     setEntered(false);
+    // Held for the tunnel: the drop-in is armed by the resolve signal, not by
+    // mount. Until then, sit every circle above the pit and run no tween, so the
+    // dogs are ready to fall the instant the ring begins to grow. entered stays
+    // false, so PLAY and the labels stay down behind the tunnel.
+    if (!dropArmed) {
+      const cgHold = circlesRef.current;
+      const kHold = SIZE / v[2];
+      nodes.forEach((d, i) => {
+        const c = (cgHold?.children[i] as SVGGElement | undefined)?.children[0] as SVGCircleElement | undefined;
+        if (!c) return;
+        const tx = (d.x - v[0]) * kHold;
+        const ty = (d.y - v[1]) * kHold;
+        c.setAttribute("transform", `translate(${tx},${ty - SIZE * 1.3})`);
+        c.setAttribute("r", String(drawR(d, v, kHold)));
+        c.setAttribute("stroke-width", String(strokeWidthFor(d) * strokeK(v)));
+      });
+      return () => cancelAnimationFrame(rafRef.current);
+    }
     const cg = circlesRef.current;
     const k = SIZE / v[2];
     const dropFrom = SIZE * 1.3;
@@ -2996,7 +3042,7 @@ export default function BreedTree({
 
     return () => cancelAnimationFrame(rafRef.current);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [nodes]);
+  }, [nodes, dropArmed]);
 
   // Closing the blue box used to be the way out of LEARN. It is not any more:
   // the corner X is the single exit everywhere, on the start screen, in play and
@@ -5274,7 +5320,23 @@ export default function BreedTree({
             const ex = cx + (dx / len) * R;
             const ey = cy + (dy / len) * R;
             return (
-              <g pointerEvents="none" aria-hidden="true">
+              <g
+                pointerEvents="none"
+                aria-hidden="true"
+                style={{
+                  // Grow-into-place resolve: while the tunnel holds, the ring sits
+                  // tiny at its own centre (the vanishing point); on the resolve
+                  // signal it blooms to full size over RING_GROW, after leading by
+                  // RING_LEAD. transform-box view-box puts the origin in SVG units.
+                  // Off the resolve path (reduced motion, no tunnel) it is full at
+                  // once. This is the ONLY dashed circle: nothing is published or
+                  // handed over, so there is no match frame to get wrong.
+                  transformBox: "view-box",
+                  transformOrigin: `${cx}px ${cy}px`,
+                  transform: holdEntrance && !resolve ? `scale(${RING_START_SCALE})` : "none",
+                  transition: `transform ${RING_GROW_MS}ms cubic-bezier(0.2, 0.7, 0.3, 1) ${RING_LEAD_MS}ms`,
+                }}
+              >
                 <line x1={ax} y1={ay} x2={ex} y2={ey} stroke="#ffffff" strokeWidth={swLine} strokeDasharray={dashLine} />
                 <circle cx={cx} cy={cy} r={R} fill="none" stroke="#ffffff" strokeWidth={swRing} strokeDasharray={dashRing} />
               </g>

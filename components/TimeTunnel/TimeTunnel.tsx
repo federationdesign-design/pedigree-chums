@@ -21,7 +21,8 @@ const SPACING = 100;
 const SPEED = 4;
 const MAXZ = RINGS * SPACING;
 const TUNNEL_MS = 2000; // the tunnel run length; the card dive and bg both scale off this
-const FADE_MS = 260; // the fade-out before it hands over
+const CLEAR_MS = 700; // the resolve window: rings rush outward and the canvas fades over this
+const CLEAR_SPEED = 60; // rings rush the camera this fast while clearing (vs SPEED while travelling)
 
 // Shapes flying past, on the same perspective as the rings.
 const MOTE_COUNT = 18;
@@ -101,12 +102,16 @@ function pawPath(): Path2D {
 type Mote = { z: number; ang: number; rad: number; shape: number; color: string; spin0: number; spinRate: number; age: number };
 type Rect = { x: number; y: number; w: number; h: number };
 
-export default function TimeTunnel({ onDone, fromRect }: { onDone?: () => void; fromRect?: Rect }) {
+export default function TimeTunnel({ onDone, onResolve, fromRect }: { onDone?: () => void; onResolve?: () => void; fromRect?: Rect }) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  // Keep the latest onDone without re-running the tunnel effect below. Updated in
-  // an effect, never during render, so it does not trip the refs rule.
+  // Keep the latest callbacks without re-running the tunnel effect below. Updated
+  // in an effect, never during render, so they do not trip the refs rule. onResolve
+  // fires once when the run ends and the clear begins: the pit grows its ring and
+  // drops the dogs off that signal.
   const doneRef = useRef(onDone);
   useEffect(() => { doneRef.current = onDone; }, [onDone]);
+  const onResolveRef = useRef(onResolve);
+  useEffect(() => { onResolveRef.current = onResolve; }, [onResolve]);
   // The clicked card's viewport rect: where the card dives from. Captured at mount
   // and stable for the transition, so it is read from a ref when the loop starts
   // rather than added to the effect's deps.
@@ -152,9 +157,12 @@ export default function TimeTunnel({ onDone, fromRect }: { onDone?: () => void; 
     }
 
     const drawRings = () => {
+      const diag = Math.hypot(W, H);
       for (const r of rings) {
+        if (r.z <= 0) continue; // gone past the camera while clearing
         const persp = 500 / r.z;
         const radius = persp * 200;
+        if (radius > diag * 1.6) continue; // grown off screen while clearing
         ctx.beginPath();
         ctx.arc(vx, cy, radius, 0, Math.PI * 2);
         ctx.strokeStyle = r.c;
@@ -225,34 +233,46 @@ export default function TimeTunnel({ onDone, fromRect }: { onDone?: () => void; 
 
     let start: number | null = null;
     let raf = 0;
-    let fadeTimer = 0;
+    let resolved = false;
     const loop = (now: number) => {
       if (start === null) start = now;
-      const running = now - start < TUNNEL_MS;
-      for (const r of rings) { r.z -= SPEED; if (r.z <= 0) r.z += MAXZ; }
-      for (const m of motes) { m.z -= MOTE_SPEED; m.age++; if (m.z <= MOTE_ZNEAR) seedMote(m, MOTE_ZFAR); }
+      const t = now - start;
+      const running = t < TUNNEL_MS;
       vx = cx + Math.sin((now / SWAY_PERIOD) * 2 * Math.PI) * SWAY_AMOUNT * W;
-      const bgP = Math.min(1, (now - start) / TUNNEL_MS); // 0 = navy, 1 = pit gradient
+      // Background: navy warming to the pit gradient over the run, then held there.
+      const bgP = Math.min(1, t / TUNNEL_MS); // 0 = navy, 1 = pit gradient
       const bg = ctx.createLinearGradient(0, H, W, 0); // bottom-left to top-right = "to top right"
       bg.addColorStop(0, mix(NAVY_RGB, PIT_A_RGB, bgP));
       bg.addColorStop(1, mix(NAVY_RGB, PIT_B_RGB, bgP));
       ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
-      drawRings();
-      drawMotes();
-      drawCard(now, start);
       if (running) {
+        // Travel: rings recede and recycle, motes fly, the card dives in.
+        for (const r of rings) { r.z -= SPEED; if (r.z <= 0) r.z += MAXZ; }
+        for (const m of motes) { m.z -= MOTE_SPEED; m.age++; if (m.z <= MOTE_ZNEAR) seedMote(m, MOTE_ZFAR); }
+        drawRings();
+        drawMotes();
+        drawCard(now, start);
+      } else {
+        // Resolve: fire the signal once (the pit grows its cluster ring and drops
+        // the dogs off it), rush the rings outward past the camera, and fade the
+        // canvas so the pit shows through. The bg is already the pit gradient, so
+        // the fade reveals an identical background and there is no seam.
+        if (!resolved) { resolved = true; canvas.style.transition = "none"; onResolveRef.current?.(); }
+        for (const r of rings) { r.z -= CLEAR_SPEED; }
+        drawRings();
+        canvas.style.opacity = String(Math.max(0, 1 - (t - TUNNEL_MS) / CLEAR_MS));
+      }
+      if (t < TUNNEL_MS + CLEAR_MS) {
         raf = requestAnimationFrame(loop);
       } else {
         raf = 0;
-        canvas.style.opacity = "0"; // CSS transitions this; then we hand over
-        fadeTimer = window.setTimeout(() => doneRef.current?.(), FADE_MS);
+        doneRef.current?.();
       }
     };
     raf = requestAnimationFrame(loop);
 
     return () => {
       if (raf) cancelAnimationFrame(raf);
-      if (fadeTimer) clearTimeout(fadeTimer);
       window.removeEventListener("resize", resize);
     };
   }, []);
