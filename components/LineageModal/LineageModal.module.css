@@ -1120,16 +1120,23 @@
    and the text is pulled up toward the top rather than centred down the middle.
    Mobile keeps its own layout. Tune these two once we see it on screen. */
 @media (min-width: 769px) {
-  /* Photo takes three quarters (blue band ~25%), shown from its TOP so the
-     dog's head is not cropped off. The square image overflows this wide box, so
-     center-top anchors the head (feet run off the bottom instead), and the base
-     clip-path slant is softened here (7% -> 3%) so the diagonal blue band does
-     not nick the head. Was object-position center center, which cropped the head:
-     the "shown from its TOP" comment was aspirational until 2026-08-12. */
+  /* Photo shown as a CENTRED COLUMN, not full-bleed (2026-08-12). cover on a
+     square image in a full-width landscape box scaled it to the WIDTH, so the dog
+     filled the frame at ~2x the band height and read as a crop. Constraining the
+     width to a portrait column flips cover to scale by HEIGHT instead, which
+     halves the dog to a sensible portrait; the blue overlay gradient fills the
+     sides. Still cover + center-top, so it stays immersive (light side-crop) and
+     the head is kept. Contain was rejected on purpose (it shows the artwork's own
+     edges and reads as a sticker, comment ~839). The clip-path slant is retuned:
+     its y is a % of the element HEIGHT (unchanged), but the element is far
+     narrower now, so a given % reads STEEPER than it did full-width; 3% -> 1.5%
+     keeps the diagonal gentle. Width starts at 40vw capped 460px, Steve to judge. */
   .winNextImg {
+    width: min(40vw, 460px);
+    margin-inline: auto; /* centre the column: base left:0 + right:0 + auto margins */
     height: 75%;
     object-position: center top;
-    clip-path: polygon(0 0, 100% 3%, 100% 100%, 0 100%);
+    clip-path: polygon(0 0, 100% 1.5%, 100% 100%, 0 100%);
   }
   /* ROUND WON and the score above it pushed DOWN off the very top, into the
      blue band and the seam, instead of overflowing above the page. */
