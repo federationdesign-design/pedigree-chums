@@ -222,6 +222,22 @@
   opacity: 1;
 }
 
+/* Every circle carries this so the fade to and from the ghost state runs both
+   ways. fill-opacity and stroke-opacity are the only things that animate, and
+   nothing else touches them, so it is inert until a circle is ghosted. */
+.btCircle {
+  transition: fill-opacity 0.3s ease, stroke-opacity 0.3s ease;
+}
+/* Ghosted nest: while a circle is hovered, the circles inside it fade to hollow
+   dashed rings so you can see what is nested without it hiding the parent. The
+   image drops out (fill-opacity 0), the dashes sit at 50%, and a navy drop-shadow
+   gives them a halo so they read over a busy painted image. */
+.ghost {
+  fill-opacity: 0;
+  stroke-opacity: 0.5;
+  filter: drop-shadow(0 0 1.4px var(--navy, #0a3a57)) drop-shadow(0 0 1.4px var(--navy, #0a3a57));
+}
+
 /* A quick, gentle rattle of the diagram when a circle is tapped. */
 .shake {
   animation: bt-shake 0.24s ease;
@@ -242,6 +258,7 @@
   .fullscreen { animation: none; }
   .stage svg { transition: none; }
   .imgCircle { transition: none; }
+  .btCircle { transition: none; }
   .shake { animation: none; }
 }
 

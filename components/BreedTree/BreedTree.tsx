@@ -5079,22 +5079,15 @@ export default function BreedTree({
     top = Math.min(top, Math.max(8, vh - MIN_VISIBLE));
     return { left, top, width: cardW };
   };
-  // While a circle is hovered, hide the circles nested inside it so its own
-  // image comes clear to the front instead of being covered by its progenitors.
-  // Moving onto one of those inner circles re-hovers it and brings it back:
-  // a buried circle goes to opacity 0 but KEEPS its hit area, which is what
-  // makes that return trip possible. It used to lose pointer-events too, so the
-  // pointer could never reach a nested circle once its parent was hovered, and
-  // every click landed on the parent instead. On an already-focused parent that
-  // reads as a zoom out, which is what a nest of children looked like.
-  // Not for a first-ring circle in the mini pit. Hovering one of those is about
-  // to mean "come loose and move", so hiding what is inside it is the opposite
-  // of what we want. Deeper circles keep the old behaviour: hover one and the
-  // circles nested in it get out of the way of its own image.
-  // Keyed on parent === focus rather than depth === 1, so it still means "the
-  // big circles you are looking at" after you have zoomed into one.
-  const firstRingHover = !!hovered && dockAside && hovered.parent === focus;
-  const buriedSet = hovered && !dropped && !firstRingHover ? new Set(hovered.descendants()) : null;
+  // While a circle is hovered, GHOST the circles nested inside it: their image
+  // fades to a hollow dashed ring (see .ghost), so you can always see what is
+  // nested inside without it covering the parent's own picture. A ghosted circle
+  // KEEPS its hit area, so moving onto one re-hovers it and it comes back solid.
+  // It must not lose pointer-events, or the pointer could never reach a nested
+  // circle once its parent was hovered and every click would land on the parent.
+  // Applies to EVERY hovered circle, the big first-ring ones included: the old
+  // first-ring carve-out was there for the hover unlock, which is now gone.
+  const buriedSet = hovered && !dropped ? new Set(hovered.descendants()) : null;
   // Mini pit LEARN only: every circle nested inside the focused one carries its
   // name, not just the first ring. The chum pages keep the single ring they
   // have always had, and PLAY is untouched.
@@ -5334,14 +5327,25 @@ export default function BreedTree({
                     : styles.curZoomInOn;
               const cls = `${tintCls} ${curCls}`.trim() || undefined;
               const heldHidden = (!!learnNode && (d === learnNode || (learnNode.descendants().includes(d) && !pitBodiesRef.current?.owned.has(d)))) || removedNodesRef.current.has(d);
-              const buried = (!!buriedSet && d !== hovered && buriedSet.has(d)) || heldHidden;
+              // Ghost the nest under a hovered circle: hollow dashed ring, hit area
+              // kept so moving onto one re-hovers it. heldHidden (collected or
+              // lifted) stays fully hidden and is never ghosted.
+              const ghosted = !!buriedSet && d !== hovered && buriedSet.has(d) && !heldHidden;
+              const sw = hidden ? 0 : strokeWidthFor(d) * strokeK(viewRef.current);
+              const circleCls = ghosted
+                ? `${styles.btCircle} ${styles.ghost} ${curCls}`.trim()
+                : `${styles.btCircle} ${cls ?? ""}`.trim();
               const circleEl = (
                 <circle
                   data-n={i}
-                  className={cls}
+                  className={circleCls}
                   fill={hidden ? "none" : nodeImg(d) ? `url(#bt-img-${i})` : fillFor(d)}
                   stroke={hidden ? "none" : strokeColorFor(d)}
-                  strokeWidth={hidden ? 0 : strokeWidthFor(d) * strokeK(viewRef.current)}
+                  strokeWidth={sw}
+                  // Dashes proportional to the ring's own width, so they read the
+                  // same at every zoom. The fade to and from this state is pure CSS
+                  // (.btCircle transition); only the dash pattern is set here.
+                  strokeDasharray={ghosted ? `${sw * 1.8} ${sw * 1.2}` : undefined}
                   style={{
                     // Inline would beat the cursor class, so only the two cases
                     // that have no class of their own are set here.
@@ -5350,11 +5354,11 @@ export default function BreedTree({
                     // dogs stay in the DOM at opacity 0, and since J2 they stay
                     // for the rest of the level, so they were littering the pit
                     // with grabbers you could not see.
-                    // heldHidden, not buried: a collected or lifted dog must
-                    // not take the press, but a circle buried under a hovered
+                    // heldHidden, not ghosted: a collected or lifted dog must
+                    // not take the press, but a ghosted circle under a hovered
                     // parent must, or you can never reach it.
                     pointerEvents: hidden || heldHidden ? "none" : "auto",
-                    opacity: buried ? 0 : undefined,
+                    opacity: heldHidden ? 0 : undefined,
                   }}
                   onPointerMove={(e) => {
                     const pl = pullRef.current;
