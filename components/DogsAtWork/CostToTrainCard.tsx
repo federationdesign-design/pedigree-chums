@@ -14,10 +14,10 @@ const cardBody: React.CSSProperties = { fontFamily: "var(--font-body)", fontSize
 export default function CostToTrainCard() {
   return (
     <div className={styles.sidebarCard}>
-      <div style={{ padding: "16px 20px 8px" }}>
+      <div style={{ padding: "32px 40px 16px" }}>
         <p style={cardTitle}>What it costs to train a dog</p>
       </div>
-      <div style={{ padding: "0 20px 8px", display: "flex", flexDirection: "column", gap: 12 }}>
+      <div style={{ padding: "0 40px 16px", display: "flex", flexDirection: "column", gap: 12 }}>
         {[
           { role: "Guide dog", detail: "birth to retirement", value: "£55,000+" },
           { role: "Medical alert assistance dog", detail: "to fully train", value: "£29,000" },
@@ -32,7 +32,7 @@ export default function CostToTrainCard() {
           </div>
         ))}
       </div>
-      <div style={{ padding: "4px 20px 16px" }}>
+      <div style={{ padding: "8px 40px 32px" }}>
         <p style={{ ...cardBody, fontSize: "0.78rem", color: "#aac4d4" }}>These dogs are given free to the people who need them, funded almost entirely by public donations. Sources: Guide Dogs; Medical Detection Dogs.</p>
       </div>
     </div>

@@ -65,7 +65,7 @@ const CARDS: ArticleCard[] = [
     pairWith: "one-dog",
     node: (
       <div className={styles.sidebarCard}>
-        <div style={{ padding: "16px 20px 16px" }}>
+        <div style={{ padding: "32px 40px 32px" }}>
           <p style={cardTitle}>Editor&apos;s note</p>
           <p style={{ ...cardBody, fontStyle: "italic" }}>&quot;Bramble&quot; and &quot;Sarah&quot; are illustrative while we finalise a real, currently-working alert dog to feature — with the organisation&apos;s and owner&apos;s permission.</p>
         </div>
@@ -77,7 +77,7 @@ const CARDS: ArticleCard[] = [
     pairWith: "really-work",
     node: (
       <div className={styles.sidebarCard}>
-        <div style={{ padding: "16px 20px 16px" }}>
+        <div style={{ padding: "32px 40px 32px" }}>
           <p style={cardTitle}>What the dog thinks it&apos;s doing</p>
           <p style={{ ...cardBody, marginBottom: 8 }}><strong>What humans think:</strong> a medical alert dog is detecting the odour change linked to a dangerous drop in blood sugar and warning its owner in time to act.</p>
           <p style={cardBody}><strong>What Bramble thinks:</strong> Sarah smells wrong. Boop Sarah. Receive biscuit. Be brilliant.</p>
@@ -90,7 +90,7 @@ const CARDS: ArticleCard[] = [
     pairWith: "not-magic",
     node: (
       <div className={styles.sidebarCard}>
-        <div style={{ padding: "16px 20px 12px" }}>
+        <div style={{ padding: "32px 40px 24px" }}>
           <p style={cardTitle}>What they can be trained for</p>
           <p style={cardBody}>Medical alert assistance dogs are trained to detect the minute odour changes linked to conditions such as diabetes (blood sugar), PoTS, cardiac arrhythmias, Addison&apos;s disease and severe allergies &mdash; and can be trained to alert to seizure activity. Always alongside, never instead of, medical care.</p>
         </div>
@@ -102,10 +102,10 @@ const CARDS: ArticleCard[] = [
     pairWith: "telling-us",
     node: (
       <div className={styles.sidebarCard}>
-        <div style={{ padding: "16px 20px 8px" }}>
+        <div style={{ padding: "32px 40px 16px" }}>
           <p style={cardTitle}>What it costs to train a dog</p>
         </div>
-        <div style={{ padding: "0 20px 8px", display: "flex", flexDirection: "column", gap: 12 }}>
+        <div style={{ padding: "0 40px 16px", display: "flex", flexDirection: "column", gap: 12 }}>
           {[
             { role: "Guide dog", detail: "birth to retirement", value: "£55,000+" },
             { role: "Medical alert assistance dog", detail: "to fully train", value: "£29,000" },
@@ -120,7 +120,7 @@ const CARDS: ArticleCard[] = [
             </div>
           ))}
         </div>
-        <div style={{ padding: "4px 20px 16px" }}>
+        <div style={{ padding: "8px 40px 32px" }}>
           <p style={{ ...cardBody, fontSize: "0.78rem", color: "#aac4d4" }}>Given free to the people who need them, funded almost entirely by public donations. Sources: Guide Dogs; Medical Detection Dogs.</p>
         </div>
       </div>
@@ -131,7 +131,7 @@ const CARDS: ArticleCard[] = [
     pairWith: "tail",
     node: (
       <div className={styles.sidebarCard}>
-        <div style={{ padding: "16px 20px 16px" }}>
+        <div style={{ padding: "32px 40px 32px" }}>
           <p style={cardTitle}>Read next</p>
           <p style={{ ...cardBody, marginBottom: 10 }}>The other end of the same nose: the dogs helping scientists work out whether disease has a smell.</p>
           <Link href="/dogs-at-work/the-dogs-teaching-medicine-how-to-smell-disease" className={styles.readMore}>The lab dogs →</Link>

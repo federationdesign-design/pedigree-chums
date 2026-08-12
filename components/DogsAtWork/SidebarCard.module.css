@@ -9,13 +9,15 @@
   border: 1.5px solid rgba(255, 255, 255, 0.12);
   border-radius: 16px;
   overflow: hidden;
-  /* 20px extra top padding to match the article-page info cards (Steve, 11 Aug),
-     added at the container so it sits above the .pad section padding. */
-  padding-top: 20px;
+  /* Top padding added at the container so it sits above the .pad section padding.
+     Doubled 20 -> 40 (Steve, 12 Aug) with the rest of the card's internal
+     padding. */
+  padding-top: 40px;
 }
 
 .pad {
-  padding: 16px 20px;
+  /* Internal padding doubled 16/20 -> 32/40 (Steve, 12 Aug), all four sides. */
+  padding: 32px 40px;
 }
 
 .title {

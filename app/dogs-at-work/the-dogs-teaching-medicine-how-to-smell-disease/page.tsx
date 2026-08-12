@@ -65,7 +65,7 @@ const CARDS: ArticleCard[] = [
     pairWith: "no-diagnose",
     node: (
       <div className={styles.sidebarCard}>
-        <div style={{ padding: "16px 20px 12px" }}>
+        <div style={{ padding: "32px 40px 24px" }}>
           <p style={cardTitle}>The honest version</p>
           <p style={cardBody}>Dogs have shown in published studies that they can detect disease odours — including bladder cancer and Parkinson&apos;s — but they are <strong>not</strong> a routine NHS diagnostic service. Think &quot;research&quot; and &quot;scent signatures&quot;, not &quot;your dog can diagnose your cancer&quot;. Their bigger role may be helping humans discover what disease smells like, so future machines can detect it.</p>
         </div>
@@ -77,11 +77,11 @@ const CARDS: ArticleCard[] = [
     pairWith: "what-smelling",
     node: (
       <div className={styles.sidebarCard}>
-        <div style={{ padding: "16px 20px 6px" }}>
+        <div style={{ padding: "32px 40px 12px" }}>
           <p style={cardTitle}>The 2025 study</p>
           <p style={{ ...cardBody, fontWeight: 600 }}>Dogs detect Parkinson&apos;s by smell</p>
         </div>
-        <div style={{ padding: "10px 20px 4px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+        <div style={{ padding: "20px 40px 8px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
           {[
             { label: "Specificity", value: "98%" },
             { label: "Sensitivity", value: "80%" },
@@ -93,7 +93,7 @@ const CARDS: ArticleCard[] = [
             </div>
           ))}
         </div>
-        <div style={{ padding: "12px 20px 16px" }}>
+        <div style={{ padding: "24px 40px 32px" }}>
           <p style={cardBody}><strong>Dogs:</strong> Bumper (Golden Retriever) &amp; Peanut (Black Labrador). <strong>Method:</strong> double-blind, skin swabs. <strong>Partners:</strong> Medical Detection Dogs, University of Bristol &amp; University of Manchester (published 15 July 2025).</p>
         </div>
       </div>
@@ -104,7 +104,7 @@ const CARDS: ArticleCard[] = [
     pairWith: "game-show",
     node: (
       <div className={styles.sidebarCard}>
-        <div style={{ padding: "16px 20px 12px" }}>
+        <div style={{ padding: "32px 40px 24px" }}>
           <p style={cardTitle}>How a scent line-up works</p>
           <p style={cardBody}>A carousel of sample pots. One target hidden among controls. The dog sniffs each for a second or two and freezes at the one that smells different. Do it blind, repeatedly, with fresh samples — and a &quot;that one&quot; becomes data.</p>
         </div>
@@ -123,7 +123,7 @@ const CARDS: ArticleCard[] = [
     pairWith: "is-a-job",
     node: (
       <div className={styles.sidebarCard}>
-        <div style={{ padding: "16px 20px 12px" }}>
+        <div style={{ padding: "32px 40px 24px" }}>
           <p style={cardTitle}>What the dog thinks it&apos;s doing</p>
           <p style={{ ...cardBody, marginBottom: 8 }}><strong>What humans think:</strong> a trained detection dog is screening samples for disease biomarkers.</p>
           <p style={cardBody}><strong>What the dog thinks:</strong> sniff pots, sit near the weird one, receive biscuit, be brilliant.</p>
@@ -136,7 +136,7 @@ const CARDS: ArticleCard[] = [
     pairWith: "tail",
     node: (
       <div className={styles.sidebarCard}>
-        <div style={{ padding: "16px 20px 16px" }}>
+        <div style={{ padding: "32px 40px 32px" }}>
           <p style={cardTitle}>Sources</p>
           <p style={{ ...cardBody, fontSize: "0.82rem" }}>
             Parkinson&apos;s study &mdash; University of Bristol (2025).<br />
