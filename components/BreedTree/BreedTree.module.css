@@ -230,10 +230,13 @@
 }
 /* Ghosted nest: while a circle is hovered, the circles inside it fade to hollow
    dashed rings so you can see what is nested without it hiding the parent. The
-   image drops out (fill-opacity 0), the dashes sit at 50%, and a navy drop-shadow
-   gives them a halo so they read over a busy painted image. */
+   image drops out (fill-opacity 0), the dashes are WHITE at 50% (not the per-depth
+   ring colour, which went navy on some depths and vanished on dark artwork), and a
+   navy drop-shadow halo keeps them readable over any painted image. The white here
+   beats the element's own stroke attribute, which is why it is set in CSS. */
 .ghost {
   fill-opacity: 0;
+  stroke: #ffffff;
   stroke-opacity: 0.5;
   filter: drop-shadow(0 0 1.4px var(--navy, #0a3a57)) drop-shadow(0 0 1.4px var(--navy, #0a3a57));
 }
