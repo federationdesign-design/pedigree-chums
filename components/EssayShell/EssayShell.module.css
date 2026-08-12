@@ -20,7 +20,7 @@
   padding-bottom: 0;
   /* Single-source horizontal axis, read by .heroContent AND .layout. */
   --essay-gutter: clamp(18px, 4vw, 48px);
-  --essay-sidebar: clamp(380px, 30vw, 580px);
+  --essay-sidebar: clamp(380px, 30vw, 700px);
   --essay-max: none;
   --essay-gap: 48px;
   /* Single-source VERTICAL axis: the one value that owns the space between the
