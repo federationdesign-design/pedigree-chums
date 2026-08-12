@@ -1,0 +1,107 @@
+/* Diagnostic contrast-test page (Workstream C). The .panel carries the SAME
+   background as the live site: linear-gradient(#00e2ff -> #008eff) plus the
+   repeating paw-pattern2.svg overlay at opacity 0.5. The live site paints this
+   viewport-fixed; here it is re-anchored vertically (to bottom) so every point
+   of the gradient is visible at once. Stops and overlay are identical, so the
+   set of background colours is identical. */
+
+.page {
+  min-height: 100vh;
+  color: #0a3a57;
+  font-family: var(--font-body), system-ui, sans-serif;
+}
+
+.intro {
+  background: #ffffff;
+  border-bottom: 3px solid #0a3a57;
+  padding: 20px 24px;
+}
+.intro h1 {
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: 34px;
+  margin: 0 0 8px;
+  color: #0a3a57;
+}
+.intro p { margin: 4px 0; font-size: 14px; line-height: 1.5; max-width: 900px; }
+.intro code { background: #eef3f6; padding: 1px 5px; border-radius: 4px; font-size: 13px; }
+
+/* The gradient + overlay stack. */
+.panel {
+  position: relative;
+  background: linear-gradient(to bottom, #008eff 0%, #00e2ff 100%);
+}
+.overlay {
+  position: absolute;
+  inset: 0;
+  background-image: url("/paw-pattern2.svg");
+  background-repeat: repeat;
+  background-size: 144px auto;
+  opacity: 0.5;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.band {
+  position: relative;
+  z-index: 1;
+  padding: 34px 24px;
+}
+.bandLabel {
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: 20px;
+  color: #ffffff;
+  margin: 0 0 18px;
+  text-shadow: 0 1px 3px rgba(10, 58, 87, 0.6);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 18px;
+}
+@media (max-width: 900px) {
+  .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+.cell { min-width: 0; }
+.swatchName {
+  display: inline-block;
+  background: #0a3a57;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-bottom: 8px;
+  white-space: nowrap;
+}
+
+.display {
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: 40px;
+  line-height: 1;
+  margin: 0 0 2px;
+}
+.body {
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.35;
+  margin: 6px 0 2px;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 4px;
+  margin-top: 2px;
+}
+.pass { background: #0a3a57; color: #ffffff; }
+.fail { background: #ffffff; color: #b00020; border: 1.5px solid #b00020; }
+.pending { background: #eef3f6; color: #0a3a57; }
+.threshold { font-weight: 500; opacity: 1; }
