@@ -182,12 +182,18 @@ export function QuotePollScene({
       return false;
     };
 
-    const onWheel = (e: WheelEvent) => guard(e, e.deltaY > 0);
+    const onWheel = (e: WheelEvent) => {
+      if (e.ctrlKey) return; // trackpad pinch (ctrl+wheel): let the browser zoom
+      guard(e, e.deltaY > 0);
+    };
     let touchY = 0;
     const onTouchStart = (e: TouchEvent) => {
       touchY = e.touches[0].clientY;
     };
-    const onTouchMove = (e: TouchEvent) => guard(e, touchY - e.touches[0].clientY > 5);
+    const onTouchMove = (e: TouchEvent) => {
+      if (e.touches.length > 1) return; // pinch: let the browser zoom
+      guard(e, touchY - e.touches[0].clientY > 5);
+    };
 
     window.addEventListener("wheel", onWheel, { passive: false });
     window.addEventListener("touchstart", onTouchStart, { passive: true });

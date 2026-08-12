@@ -863,7 +863,7 @@
   align-items: center;
   justify-content: center;
   pointer-events: auto;
-  touch-action: none;
+  touch-action: pinch-zoom;
 }
 .dragHandle:active {
   cursor: grabbing;

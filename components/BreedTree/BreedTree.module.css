@@ -33,7 +33,7 @@
   transition: opacity 0.3s ease;
   /* The pit owns the gesture, like the main pit does on its cards: without
      this a touch drag on a dog or badge is read as a scroll and fights you. */
-  touch-action: none;
+  touch-action: pinch-zoom;
 }
 
 .aside {
@@ -279,7 +279,7 @@
 .asideDocked {
   /* picked up and moved like a chum-page card: the pointer owns it, so the
      browser must not claim the gesture for scrolling */
-  touch-action: none;
+  touch-action: pinch-zoom;
   cursor: grab;
   position: absolute;
   /* 10px left of centre, so the rail hanging off the right-hand edge has room
@@ -533,7 +533,7 @@
   border: 3px solid var(--navy, #0a3a57);
   box-shadow: 0 3px 10px rgba(10, 58, 87, 0.3);
   /* the pointer owns the gesture: a phone must not read a drag as a scroll */
-  touch-action: none;
+  touch-action: pinch-zoom;
   cursor: pointer;
 }
 .diffTrack:focus-visible {
@@ -1007,7 +1007,7 @@
   right: 4%;
   width: min(88vw, 330px);
   z-index: 21;
-  touch-action: none;
+  touch-action: pinch-zoom;
   background: #0a2a3f;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;
@@ -1136,7 +1136,7 @@
   right: 4%;
   width: min(92vw, 218px);
   z-index: 21;
-  touch-action: none;
+  touch-action: pinch-zoom;
   background: #0a2a3f;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;
@@ -1193,7 +1193,7 @@
   right: 4%;
   width: min(92vw, 218px);
   z-index: 21;
-  touch-action: none;
+  touch-action: pinch-zoom;
   background: #0a2a3f;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;

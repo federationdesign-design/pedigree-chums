@@ -352,7 +352,7 @@
   overflow: hidden;
   /* Swipe zone: let the browser keep vertical page scroll (pan-y) while horizontal
      drags are delivered to the pointer handler. grab hints the drag affordance. */
-  touch-action: pan-y;
+  touch-action: pan-y pinch-zoom;
   cursor: grab;
 }
 
@@ -634,7 +634,7 @@
    so they keep working). pan-y leaves vertical scroll to the browser and delivers
    horizontal drags to the pointer handler. */
 .mSwipe {
-  touch-action: pan-y;
+  touch-action: pan-y pinch-zoom;
 }
 
 /* While a drag is in progress (class toggled on the active zone), suppress text

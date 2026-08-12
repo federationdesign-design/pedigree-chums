@@ -241,6 +241,7 @@ export default function BreedStrip({
     };
 
     const onWheel = (e: WheelEvent) => {
+      if (e.ctrlKey) return; // trackpad pinch (ctrl+wheel): let the browser zoom
       const delta = Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
       driveRail(delta, () => e.preventDefault());
     };

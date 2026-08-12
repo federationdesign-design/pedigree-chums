@@ -5,7 +5,7 @@
   display: inline-block;
   overflow: visible;
   cursor: grab;
-  touch-action: none;
+  touch-action: pinch-zoom;
   user-select: none;
 }
 
@@ -232,7 +232,7 @@
   box-shadow: 0 8px 24px rgba(0,0,0,0.4);
   cursor: grab;
   user-select: none;
-  touch-action: none;
+  touch-action: pinch-zoom;
   position: relative;
   overflow: hidden;
   transition: box-shadow 0.15s, transform 0.15s;

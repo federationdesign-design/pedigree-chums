@@ -54,7 +54,7 @@
   overflow-x: auto;
   overflow-y: hidden;
   scroll-snap-type: x mandatory;
-  touch-action: pan-x;
+  touch-action: pan-x pinch-zoom;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   height: 100%;
@@ -565,7 +565,7 @@
   /* Vertical panning handed back to the browser for touches that start in
      here. The carousel around it is pan-x. See TimelineRun.tsx: this is only
      half the fix, the script also has to stand down. */
-  touch-action: pan-y;
+  touch-action: pan-y pinch-zoom;
   /* Second layer under .footerOff. Keeps a drag that reaches either end of the
      run inside the run instead of chaining out to whatever scrolls behind it.
      Y ONLY: the run does not scroll sideways, and containing x sits directly
