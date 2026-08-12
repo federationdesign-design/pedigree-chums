@@ -340,3 +340,35 @@ start-screen drag, a different phase) and dragRef. Partitioned by kind/phase so
 they do not fight the constraint.
 This is what unblocked J17 bombs: the fuse hangs off the constraint's startdrag/
 enddrag (:4687-4702). J17 stages 1-5 are all built and live.
+
+## 13. CIRCLE/WORD PHYSICS BODY SEPARATION: SUBSTANTIALLY DELIVERED (2026-08-12)
+
+The queued job "separate circle and word physics bodies" is CLOSED as
+substantially delivered, not pending. It was carried as agreed/staged/never
+started, but the code already does it:
+
+- `mkWord` (BreedTree.tsx) builds a dog's body as a NAME-SIZED RECTANGLE
+  (`Bodies.rectangle`, wpx/hpx from the fitted name), not a circle.
+- A depth-1 dog's own `<circle>` is hidden after the fall (`isWordNode`) and
+  never gets a Matter body; its CHILDREN are freed at the drop as their own
+  circle bodies (`mkCircle` + `FREED_CIRCLE_OPTS`).
+- The `mkWord` comment documents the change in the PAST TENSE: the word body
+  "used to stand in for the circle as well ... The circle now has its own free
+  body, freed at the drop." So a word and a circle no longer share a body.
+
+FOUR residual ties remain, and they are NAMING/TYPING ONLY, not behaviour:
+1. `wordBodiesRef.current = bodies` aliases one array as both the word-render
+   source and the depth-1 physics list.
+2. The `Body` type still carries circle fields (`r`, `pct`) on a rectangle word
+   body.
+3. `mkWord` tags the rectangle `plugin.kind = "circle"`, so words classify as
+   circles for drag (`MC_KINDS`) and collision damage (`k2 === "circle"`).
+4. Word bodies use `CIRCLE_OPTS` (the comment admits it).
+
+LOW PRIORITY and NOT worth the risk: untangling these touches the drag
+classification and the collision-damage multipliers for zero visible gain. Leave
+them unless a real need appears (e.g. wanting words to bounce differently from
+circles). Read from the code, not device.
+
+(Lesson, as with other queued items closed today: a job read smaller or already
+done than the notes said. Check the code before scheduling handover jobs.)
