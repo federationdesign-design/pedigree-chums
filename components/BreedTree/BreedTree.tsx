@@ -522,8 +522,8 @@ type Node = HierarchyCircularNode<LineageNode>;
 // half-size circle inside its parent, which reads as "this dog, plus the one
 // other dog". The empty half IS the parent.
 //
-// It is skipped in three places and only three: the drawing, the pop that turns
-// children into physics bodies, and the hover unlock.
+// It is skipped in two places and only two: the drawing, and the pop that turns
+// children into physics bodies.
 function isEcho(d: Node): boolean {
   return !!d.parent && d.data.name === d.parent.data.name;
 }
@@ -1259,66 +1259,10 @@ export default function BreedTree({
   const [focus, setFocus] = useState<Node>(nodes[0]);
   const [hovered, setHovered] = useState<Node | null>(null);
 
-  // ---- C1: the hover unlock ----------------------------------------------
-  // Pointer over one of the big circles and the circles inside it come loose:
-  // they fall, bounce off the inside of the ring they live in, and shove each
-  // other aside. Move off and they go home.
-  //
-  // The one rule that keeps this safe: it writes OFFSETS ONLY. Nothing here
-  // touches d.x or d.y, so the packed layout is never disturbed and PLAY always
-  // drops from it. The offset goes on the wrapper <g>, which zoomTo never
-  // writes to (it writes to the circle and the label inside), so the two
-  // transforms compose instead of fighting.
-  //
-  // The sim runs in WORLD units, the same currency as d.x, d.y and d.r, and is
-  // converted to view units only at the moment of painting. That way a zoom
-  // changes nothing about the physics.
-  // Tuned against a harness that builds the REAL tree, runs the real pack, then
-  // applies relayoutMobile's 90 degree turn and its tilt, and only then picks a
-  // DEPTH-1 circle as the parent. All three of those matter: the root is hidden
-  // so the circles you hover are depth 1, and gravity is not rotation
-  // invariant, so measuring the unrotated layout gives the wrong answer.
-  // At these numbers: overlap 0.000 to 0.016 units, escape under 0.07 on a
-  // ~190 unit parent, apart in 0.45s, settled by 3.8s. Do not change one
-  // without re-running that harness.
-  const UNLOCK_G = 5.0;        // gravity, in parent radii per second squared
-  const UNLOCK_BOUNCE = 0.28;  // how much of the closing speed comes back
-  const UNLOCK_DRAG = 1.3;     // air, per second
-  const UNLOCK_RIM = 0.85;     // rub along the inside of the ring
-  const UNLOCK_POP = 0.45;     // opening shove outwards, in parent radii/sec
-  // The sideways fan. On most levels the circles are stacked one above the
-  // other, and a purely outward pop is straight up and straight down, so they
-  // land on top of each other and take nearly two seconds to roll apart. The
-  // fan shoves the higher one one way and the lower one the other, which is
-  // what actually slides a stack apart. Measured: two-circle levels come apart
-  // in 0.45s with this, against 1.88s without.
-  const UNLOCK_SIDE = 1.3;     // in parent radii per second, at full lean
-  const UNLOCK_ITER = 12;      // constraint passes per frame
-  const UNLOCK_HOME_MS = 260;  // the trip back
-  const UNLOCK_REST = 0.0006;  // moved less than this fraction of R counts as still
-  // `els` is every wrapper index this circle drags with it: its own, then each
-  // of its descendants. Circles are one flat list of sibling <g>s, not nested,
-  // so moving a parent's wrapper does nothing to the circles drawn inside it.
-  // Without this the outer circle came loose and left its own contents standing
-  // exactly where they were. `i` is kept because the fan and the collision pass
-  // still key off the circle itself.
-  type UnlockKid = { n: Node; i: number; els: number[]; ox: number; oy: number; px: number; py: number; vx: number; vy: number };
-  type UnlockState = {
-    parent: Node;
-    kids: UnlockKid[];
-    inside: Set<Node>;
-    raf: number | null;
-    last: number;
-    still: number;
-    home: number | null; // timestamp the trip home began
-    from: { ox: number; oy: number }[];
-  };
-  const unlockRef = useRef<UnlockState | null>(null);
-
   /* ── PUSH AND PULL, start screen only ────────────────────────────────────
      A circle can be dragged with a thumb and springs back when let go.
      It writes a translate onto the node's own wrapper <g> and onto every
-     descendant's, which is exactly how the hover unlock moves things: zoomTo
+     descendant's, the same wrapper-offset trick the collision knock uses: zoomTo
      positions the circle and the label INSIDE each wrapper, so the wrapper
      itself is free to carry an offset and nothing fights over it. */
   const PULL_SNAP_MS = 170;      // the way back, quick enough to read as a snap
@@ -1596,137 +1540,6 @@ export default function BreedTree({
     };
     pl.raf = requestAnimationFrame(step);
   };
-  // Paint the current offsets. View units, so it survives any zoom.
-  const unlockPaint = () => {
-    const u = unlockRef.current;
-    const cg = circlesRef.current;
-    if (!u || !cg) return;
-    const k = SIZE / viewRef.current[2];
-    for (const kd of u.kids) {
-      for (const j of kd.els) {
-        const w = cg.children[j] as SVGGElement | undefined;
-        if (w) w.setAttribute("transform", `translate(${kd.ox * k},${kd.oy * k})`);
-      }
-    }
-  };
-  const unlockStop = () => {
-    const u = unlockRef.current;
-    if (!u) return;
-    if (u.raf !== null) cancelAnimationFrame(u.raf);
-    const cg = circlesRef.current;
-    if (cg) {
-      for (const kd of u.kids) {
-        for (const j of kd.els) {
-          const w = cg.children[j] as SVGGElement | undefined;
-          if (w) w.removeAttribute("transform");
-        }
-      }
-    }
-    unlockRef.current = null;
-  };
-
-  // One frame. dt is real seconds, clamped so a background tab does not launch
-  // everything through the ring on the way back.
-  const unlockStep = (dt: number) => {
-    const u = unlockRef.current;
-    if (!u) return;
-    const P = u.parent;
-    const damp = Math.max(0, 1 - UNLOCK_DRAG * dt);
-    for (const kd of u.kids) {
-      kd.px = kd.ox; kd.py = kd.oy;
-      kd.vy += UNLOCK_G * P.r * dt;
-      kd.vx *= damp;
-      kd.vy *= damp;
-      kd.ox += kd.vx * dt;
-      kd.oy += kd.vy * dt;
-    }
-    // Relaxation. Containment first and collisions last, so the frame ENDS
-    // with the circles separated: the other way round, the ring pushes a
-    // circle straight back into its neighbour and you see them overlap.
-    // Twelve passes is what it took to get overlap to zero on all four level
-    // shapes. Velocity is only answered on the first pass; the rest are pure
-    // position repair.
-    for (let it = 0; it < UNLOCK_ITER; it++) {
-      for (const kd of u.kids) {
-        const cx = kd.n.x + kd.ox - P.x;
-        const cy = kd.n.y + kd.oy - P.y;
-        const maxD = P.r - kd.n.r;
-        const d = Math.hypot(cx, cy);
-        if (d > maxD && d > 0) {
-          const nx = cx / d, ny = cy / d;
-          kd.ox -= (d - maxD) * nx;
-          kd.oy -= (d - maxD) * ny;
-          if (it === 0) {
-            const vn = kd.vx * nx + kd.vy * ny;
-            if (vn > 0) {
-              kd.vx -= (1 + UNLOCK_BOUNCE) * vn * nx;
-              kd.vy -= (1 + UNLOCK_BOUNCE) * vn * ny;
-            }
-            kd.vx *= UNLOCK_RIM;
-            kd.vy *= UNLOCK_RIM;
-          }
-        }
-      }
-      // Never more than four circles, so the naive pair loop is the right one.
-      // The overlap is split evenly: there is no mass model here, and a big
-      // circle shunting a small one across the ring reads wrong.
-      for (let a = 0; a < u.kids.length; a++) {
-        for (let b = a + 1; b < u.kids.length; b++) {
-          const A = u.kids[a], B = u.kids[b];
-          const dx = (B.n.x + B.ox) - (A.n.x + A.ox);
-          const dy = (B.n.y + B.oy) - (A.n.y + A.oy);
-          const d = Math.hypot(dx, dy);
-          const min = A.n.r + B.n.r;
-          if (d >= min || d === 0) continue;
-          const nx = dx / d, ny = dy / d, push = (min - d) / 2;
-          A.ox -= nx * push; A.oy -= ny * push;
-          B.ox += nx * push; B.oy += ny * push;
-          if (it === 0) {
-            const rvn = (B.vx - A.vx) * nx + (B.vy - A.vy) * ny;
-            if (rvn < 0) {
-              const j2 = -(1 + UNLOCK_BOUNCE) * rvn / 2;
-              A.vx -= j2 * nx; A.vy -= j2 * ny;
-              B.vx += j2 * nx; B.vy += j2 * ny;
-            }
-          }
-        }
-      }
-    }
-    // Rest is measured on POSITION, not speed. Gravity re-adds speed every
-    // single frame, so a speed test can never read zero and the loop would run
-    // forever behind a still picture.
-    let moved = 0;
-    for (const kd of u.kids) moved = Math.max(moved, Math.hypot(kd.ox - kd.px, kd.oy - kd.py));
-    u.still = moved < UNLOCK_REST * P.r ? u.still + dt : 0;
-  };
-  // The trip home. Ease the offsets back to zero, then drop them entirely.
-  const unlockHomeStep = (now: number) => {
-    const u = unlockRef.current;
-    if (!u || u.home === null) return false;
-    const t = Math.min(1, (now - u.home) / UNLOCK_HOME_MS);
-    const e = 1 - Math.pow(1 - t, 3);
-    u.kids.forEach((kd, idx) => {
-      kd.ox = u.from[idx].ox * (1 - e);
-      kd.oy = u.from[idx].oy * (1 - e);
-    });
-    return t >= 1;
-  };
-  const unlockFrame = (now: number) => {
-    const u = unlockRef.current;
-    if (!u) return;
-    const dt = Math.max(0.001, Math.min(0.032, (now - u.last) / 1000));
-    u.last = now;
-    if (u.home !== null) {
-      const done = unlockHomeStep(now);
-      unlockPaint();
-      if (done) { unlockStop(); return; }
-    } else {
-      unlockStep(dt);
-      unlockPaint();
-      if (u.still > 0.4) { u.raf = null; return; } // asleep, not stopped
-    }
-    u.raf = requestAnimationFrame(unlockFrame);
-  };
 
   const [boxAlt, setBoxAlt] = useState(false); // flips each time the shown circle changes, for the alternating box colour
   const [railSide, setRailSide] = useState<"left" | "right">("right"); // side the related-dogs rail sits, flipped when the box is dragged across
@@ -1734,91 +1547,6 @@ export default function BreedTree({
   const [falling, setFalling] = useState(false);
   const [dropped, setDropped] = useState(false);
 
-  // Start when the pointer lands on a big circle that has something inside it,
-  // send them home when it leaves. Refs and rAF only, no state, so this cannot
-  // cause a render and cannot fight the zoom.
-  useEffect(() => {
-    const u = unlockRef.current;
-    // Pointing at one of the circles that popped out still counts as being in
-    // the parent. Without this, moving onto a nested circle to read it made the
-    // effect think the hover had left, sent everything home under the pointer,
-    // and dropped it back on the parent, which started the whole thing again.
-    const insideCurrent =
-      !!u && u.home === null && !!hovered && hovered !== u.parent && u.inside.has(hovered);
-    const live =
-      dockAside && !dropped && !!hovered &&
-      ((hovered.parent === focus && !!hovered.children?.length) || insideCurrent);
-    if (!live) {
-      // already home or heading there
-      if (u && u.home === null) {
-        u.home = performance.now();
-        u.last = u.home;
-        u.from = u.kids.map((kd) => ({ ox: kd.ox, oy: kd.oy }));
-        if (u.raf === null) u.raf = requestAnimationFrame(unlockFrame);
-      }
-      return;
-    }
-    // Reading one of the circles inside: leave the unlock exactly as it is.
-    // Starting a fresh one on the nested circle would be wrong, and stopping
-    // this one would throw everything home.
-    if (insideCurrent) return;
-    if (u && u.parent === hovered) {
-      // came back before it finished going home: pick it up where it is
-      if (u.home !== null) {
-        u.home = null;
-        u.still = 0;
-        u.last = performance.now();
-        if (u.raf === null) u.raf = requestAnimationFrame(unlockFrame);
-      }
-      return;
-    }
-    unlockStop();
-    const P = hovered as Node;
-    // Ranked by height, so the fan below knows which one is on top.
-    const shownKids = (P.children ?? []).filter((n) => !isEcho(n));
-    const byHeight = [...shownKids].sort((a, b) => a.y - b.y);
-    const mid = (byHeight.length - 1) / 2;
-    const kids = shownKids.map((n) => {
-      // Two shoves. Outward, along the line from the parent centre through this
-      // circle's own centre. And sideways, the fan: the highest circle goes one
-      // way and the lowest the other, scaled by how far off the middle it is,
-      // so three and four child levels spread rather than needing a rule each.
-      const dx = n.x - P.x, dy = n.y - P.y;
-      const len = Math.hypot(dx, dy) || 1;
-      const sp = UNLOCK_POP * P.r;
-      const lean = byHeight.length < 2 ? 0 : (byHeight.indexOf(n) - mid) / Math.max(mid, 0.5);
-      return {
-        n,
-        i: nodes.indexOf(n),
-        // itself first, then everything nested inside it, so the whole dog
-        // travels as one piece
-        els: n.descendants().map((x) => nodes.indexOf(x)).filter((j) => j >= 0),
-        ox: 0,
-        oy: 0,
-        px: 0,
-        py: 0,
-        vx: (dx / len) * sp - lean * UNLOCK_SIDE * P.r,
-        vy: (dy / len) * sp - sp * 0.35, // a touch of lift, so it reads as a hop
-      };
-    }).filter((kd) => kd.i >= 0);
-    if (!kids.length) return;
-    unlockRef.current = {
-      parent: P,
-      kids,
-      inside: new Set(P.descendants()),
-      raf: null,
-      last: performance.now(),
-      still: 0,
-      home: null,
-      from: [],
-    };
-    unlockRef.current.raf = requestAnimationFrame(unlockFrame);
-    // unlockFrame only ever reads refs, so re-running on it would restart the
-    // sim on every render for nothing.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hovered, focus, dockAside, dropped, nodes]);
-  // Never leave a loop running behind us.
-  useEffect(() => () => unlockStop(), []);
 
   // The main pit sizes every toy off BIG = 84 * SCALE, and its menu square off
   // BIG * 1.2, where SCALE drops to 0.67 below 768px. The mini pit used a flat
@@ -1913,7 +1641,6 @@ export default function BreedTree({
   // from there rather than reinvented: a zoomed-in focus left behind would make
   // the start screen open inside one circle.
   const backToStartScreen = () => {
-    unlockStop();
     setHovered(null);
     setAncestryFor(null);
     setAncHidden(true);
@@ -2256,11 +1983,10 @@ export default function BreedTree({
   const wordBodiesRef = useRef<{ x: number; y: number; a: number; n: Node | null; held?: boolean }[]>([]);
   const [wordList, setWordList] = useState<{ lines: string[]; fs: number }[]>([]);
   const wordPopAtRef = useRef<number>(0);
-  // Whether the last press came from a finger. Touch has no hover, so the whole
-  // unlock was invisible on a phone. It now runs off a first tap instead, and
-  // this flag keeps the two paths apart: browsers fire a synthetic mouseenter on
-  // tap, which would set hovered before the click landed and make the first tap
-  // behave like the second, skipping the pop entirely.
+  // Whether the last press came from a finger. Touch has no hover, so this flag
+  // keeps the tap path and the mouse-hover path apart: browsers fire a synthetic
+  // mouseenter on tap, which would set hovered before the click landed and make
+  // the first tap behave like the second.
   const touchRef = useRef(false);
   // The pit-full wash. Zero when the countdown starts, a tenth more with every
   // second it counts down, solid on nought.
@@ -3165,10 +2891,6 @@ export default function BreedTree({
       void st.offsetWidth; // force reflow so the animation can retrigger
       st.classList.add(styles.shake);
     }
-    // A circle that has come loose is not where the layout says it is, and
-    // zoom() reads d.x and d.y. Put everything back first, or clicking a
-    // fallen circle flies the view to its packed position.
-    unlockStop();
     if (dockAside) { setAncestryFor(null); setAncHidden(true); setTrainHidden(true); setTempHidden(true); }
     if (focusRef.current !== d) {
       zoom(d);
@@ -5666,20 +5388,6 @@ export default function BreedTree({
                   onPointerCancel={() => { if (pullRef.current) pullRelease(); }}
                   onMouseEnter={hidden || frozen ? undefined : () => {
                     if (touchRef.current) return; // touch drives this from the tap
-
-                    // Latched: while a big circle is unlocked, the circles
-                    // tumbling inside it must not steal the hover. One of them
-                    // sliding under a still pointer would end the hover on the
-                    // parent, send everything home, put the pointer back over
-                    // the parent, and start it again. That is an endless loop.
-                    // The latch only holds WHILE they are moving. u.raf goes
-                    // null once the sim reports rest, and nothing can drift
-                    // under a still pointer after that, so a deliberate move
-                    // onto a nested circle has to be let through. Without the
-                    // raf test the title and the rail stayed stuck on the
-                    // parent no matter which circle inside it you pointed at.
-                    const u = unlockRef.current;
-                    if (u && u.raf !== null && d !== u.parent && u.inside.has(d)) return;
                     setHovered(d);
                   }}
                   onMouseLeave={hidden || frozen ? undefined : (e) => {
@@ -5704,8 +5412,8 @@ export default function BreedTree({
                     if (rt instanceof Node && asideRef.current?.contains(rt)) return;
                     // The circles inside this one are SIBLINGS in the SVG, not
                     // descendants, so moving onto one fires a real mouseleave
-                    // here. Ignore it, or the unlock stops the moment anything
-                    // drifts under the pointer.
+                    // here. Ignore it, or the hover would clear the moment you
+                    // moved onto a nested circle to read it.
                     const ri = rt?.getAttribute?.("data-n");
                     if (ri !== null && ri !== undefined) {
                       const rn = nodes[Number(ri)];
@@ -6771,14 +6479,9 @@ export default function BreedTree({
               // array, so the old one would linger as a dog no longer in the
               // tree, driving the box header and the label rules from a ghost.
               //
-              // And the hover unlock writes offsets straight onto the wrappers.
-              // Left running, a circle that had come loose would stay displaced
-              // at its old position while everything around it resized.
-              //
               // Done here rather than in applyLevel: that is a plain function in
               // the component body, so the compiler reads calls like these as
               // render work. A pointer handler is unambiguously not.
-              unlockStop();
               setHovered(null);
               setLearnPeek(false);
               setLevelFromY(e.clientY);
