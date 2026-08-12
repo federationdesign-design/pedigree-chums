@@ -1,5 +1,8 @@
 .card {
-  width: 380px;
+  /* Fills the sidebar column (follows the shared --essay-sidebar axis) rather
+     than carrying a fixed 380px calibrated against the old column. The internals
+     (slider 100%, cost boxes flex:1, labels, text) reflow to the width. */
+  width: 100%;
   background: var(--navy, #0a3a57);
   border-radius: 24px;
   padding: 16px 24px 20px;
