@@ -4484,7 +4484,13 @@ export default function BreedTree({
             // the world; its circles carry on under their own physics.
             Composite.remove(world, b.mb); b.mbIn = false;
           }
-          else if (!b.held && !b.mbIn) {
+          else if (!b.held && !b.mbIn && !b.blown) {
+            // A blown bomb, or a chip killed in a bomb chain, has left the world
+            // for good and its sprite is hidden (deadBadges). It must NOT be
+            // dropped back in, or the invisible body sits there as a dead-space
+            // obstacle that objects fall around. detonate and killChained both
+            // set `blown`, so this one guard covers both. Inert badges never set
+            // `blown`, so they still keep their bodies here, which is correct.
             MBody.setPosition(b.mb, pxFromWorld(b.x, b.y));
             MBody.setVelocity(b.mb, { x: 0, y: 0 });
             Composite.add(world, b.mb);
