@@ -13,7 +13,7 @@ import TradeHowToPlay from "../trade/TradeHowToPlay";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.pedigreechums.co.uk"),
-  title: "Pedigree Chums\u2122 \u2014 Independent Stockists",
+  title: "Independent Stockists",
   description:
     "Stock the on-the-go dog spotting game in your independent shop. Low minimum order, free CDU, made in the UK.",
   robots: { index: false, follow: false },

@@ -8,7 +8,7 @@ import Footer from "../../components/Footer/Footer";
 import styles from "./home.module.css";
 
 export const metadata: Metadata = {
-  title: "Pedigree Chums™ | The Dog Bingo Game",
+  title: "Home",
   description:
     "Find your favourite dog breed and discover their family tree, history and personality. 54 illustrated breed cards for the on-the-go dog spotting game.",
 };

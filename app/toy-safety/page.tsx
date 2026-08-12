@@ -4,7 +4,7 @@ import Footer from "../../components/Footer/Footer";
 import styles from "./toy-safety.module.css";
 
 export const metadata: Metadata = {
-  title: "Toy Safety Technical File | Pedigree Chums",
+  title: "Toy Safety Technical File",
   description:
     "Working draft Toy Safety Technical File for the Pedigree Chums dog bingo card game: product specification, bill of materials, chemical evidence, safety assessment and testing plan.",
 };

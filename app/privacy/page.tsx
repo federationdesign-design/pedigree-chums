@@ -5,7 +5,7 @@ import Footer from "../../components/Footer/Footer";
 import styles from "./privacy.module.css";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy | Pedigree Chums",
+  title: "Privacy Policy",
   description:
     "How Pedigree Chums collects, uses and protects your personal data when you sign up for our launch offers.",
 };

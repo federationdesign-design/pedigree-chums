@@ -13,7 +13,7 @@ import styles from "./page.module.css";
 // above it would have pushed the carousel off a phone screen.
 
 export const metadata: Metadata = {
-  title: "What's Your Superpower? | Pedigree Chums™",
+  title: "What's Your Superpower?",
   description:
     "Answer a collection of strange dog-themed questions and reveal your power mix.",
   robots: { index: false, follow: false },

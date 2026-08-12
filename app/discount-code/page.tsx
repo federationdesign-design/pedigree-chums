@@ -4,7 +4,7 @@ import DiscountCapture from "./DiscountCapture";
 import styles from "./discountCode.module.css";
 
 export const metadata: Metadata = {
-  title: "Get your discount code | Pedigree Chums™",
+  title: "Get your discount code",
   description:
     "Join the pre-launch list and we will email your discount code the day before launch.",
 };

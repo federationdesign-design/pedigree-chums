@@ -4,7 +4,7 @@ import PreorderCheckout from "./PreorderCheckout";
 import styles from "./preorderCheckout.module.css";
 
 export const metadata: Metadata = {
-  title: "Pre-order | Pedigree Chums™",
+  title: "Pre-order",
   description:
     "Pre-order Pedigree Chums™: The Dog Bingo Game at the pre-release price.",
 };

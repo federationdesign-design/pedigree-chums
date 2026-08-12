@@ -14,7 +14,7 @@ import TradeHowToPlay from "./TradeHowToPlay";
 // Keep the trade page out of search and fully separate from the consumer site.
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.pedigreechums.co.uk"),
-  title: "Pedigree Chums — Trade & Wholesale",
+  title: "Trade & Wholesale",
   description:
     "Wholesale the on-the-go dog spotting game. 54 uniquely illustrated cards, made in the UK. Founding stockist enquiries now open.",
   robots: { index: false, follow: false },
