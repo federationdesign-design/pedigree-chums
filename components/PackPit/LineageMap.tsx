@@ -86,10 +86,10 @@ const ROOT = 58;
 const INSTR_NAMES = new Set(["Deal the cards","Head outside","Spot real dogs","Match to your chum","Find more chums","Most chums wins"]);
 // Rarity band across the bottom of a lifted circle. bg is the band, fg the text.
 // White on the orange ROOT DOG band is a deliberate call (contrast is low, kept
-// on request). Navy carries the two light bands; white the two dark ones.
+// on request). Black carries the two light bands; white the two dark ones.
 const RARITY_BAND: Record<"common" | "uncommon" | "rare" | "root", { bg: string; fg: string; label: string }> = {
-  common:   { bg: "#fcee23", fg: "#0a3a57", label: "COMMON" },
-  uncommon: { bg: "#5dbf86", fg: "#0a3a57", label: "UNCOMMON" },
+  common:   { bg: "#fcee23", fg: "#000000", label: "COMMON" },
+  uncommon: { bg: "#5dbf86", fg: "#000000", label: "UNCOMMON" },
   rare:     { bg: "#4d2e91", fg: "#ffffff", label: "RARE" },
   root:     { bg: "#f47421", fg: "#ffffff", label: "ROOT DOG" },
 };
@@ -1620,27 +1620,27 @@ export default function LineageMap({
             style={circular && ringColor ? { fill: ringColor, stroke: ringColor } : undefined} />
           {breed.image ? <image href={bust(breed.image)} x={-R} y={-R} width={R*2} height={R*2} clipPath={`url(#${clip})`} preserveAspectRatio="xMidYMid slice" /> : null}
           {/* Rarity band: a coloured strip across the bottom of the circle, on the
-              artwork just above the Learn button. Clipped to the same circle, so
-              its ends taper into the rim; the label rides a shallow arc concentric
-              with the rim so it follows the curve. Stays as long as the card is up. */}
+              artwork just above the Learn button. Clipped to the same circle so it
+              never spills past the rim, but its top edge is a straight DIAGONAL
+              chord (jaunty, right side higher), not a level segment. The label sits
+              on a straight baseline tilted to match. Stays as long as the card is up. */}
           {rarityTier ? (() => {
             const band = RARITY_BAND[rarityTier];
-            const bandTop = R * 0.5;              // chord where the strip begins
-            const TR = R * 0.82;                  // text baseline arc, concentric with the rim
-            const half = (62 * Math.PI) / 180;    // arc half-angle, generous so text never overflows
-            const ex = TR * Math.sin(half), ey = TR * Math.cos(half);
-            const arcId = `${clip}-rarity`;
+            const TILT = -13;                     // degrees; negative rides the right side higher
+            const bandTop = R * 0.46;             // top edge of the strip before the tilt
             // Fit-to-chord: shrink only if a label would run wider than the circle
             // at the text line (bites for the longest labels on the smallest phone card).
-            const chord = 2 * Math.sqrt(Math.max(0, R * R - (R * 0.72) * (R * 0.72)));
-            const fs = Math.max(9, Math.min(R * 0.2, (chord * 0.92) / (0.6 * band.label.length)));
+            const chord = 2 * Math.sqrt(Math.max(0, R * R - bandTop * bandTop));
+            const fs = Math.max(9, Math.min(R * 0.22, (chord * 0.92) / (0.6 * band.label.length)));
+            // rect and text share one rotate(): the rect's top edge becomes the
+            // diagonal chord, the text baseline tilts with it. The rect is drawn
+            // oversized so the tilt never exposes a corner; the circle clip cuts it.
             return (
               <g clipPath={`url(#${clip})`} style={{ pointerEvents: "none" }}>
-                <rect x={-R} y={bandTop} width={R * 2} height={R - bandTop + 2} fill={band.bg} />
-                <path id={arcId} d={`M ${-ex} ${ey} A ${TR} ${TR} 0 0 0 ${ex} ${ey}`} fill="none" />
-                <text textAnchor="middle" style={{ fontFamily: '"Luckiest Guy", system-ui, sans-serif', fontSize: fs, fontWeight: 400, fill: band.fg }}>
-                  <textPath href={`#${arcId}`} startOffset="50%">{band.label}</textPath>
-                </text>
+                <g transform={`rotate(${TILT})`}>
+                  <rect x={-R * 1.6} y={bandTop} width={R * 3.2} height={R * 1.6} fill={band.bg} />
+                  <text x={0} y={bandTop + (R - bandTop) * 0.5} textAnchor="middle" dominantBaseline="central" style={{ fontFamily: '"Luckiest Guy", system-ui, sans-serif', fontSize: fs, fontWeight: 400, fill: band.fg }}>{band.label}</text>
+                </g>
               </g>
             );
           })() : null}
