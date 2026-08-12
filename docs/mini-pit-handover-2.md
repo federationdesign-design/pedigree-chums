@@ -276,3 +276,26 @@ return`) swallowed hover on the inside circles WHILE the unlock sim animated, so
 rail/ladder mirrors `hovered ?? focus`). `onClick` was never latched, so clicks
 landed. No unlock means no latch, so hover on tucked children now works at once.
 tsc clean, eslint held at 53 errors / 7 warnings.
+
+**It also closed the zoom "overshoot" (2026-08-12).** The long-running complaint
+that zooming from the fully-zoomed-out root landed showing a child's image at full
+size ("legs", the parent ring off frame) was NOT a zoom bug. The static reading was
+right: the view rests at the target. The cause was the unlock system displacing
+circles; removing it fixed the zoom with no change to zoom code. Investigation
+closed, and the planned probe at the old line 3039 is no longer needed.
+
+## 10. NEST GHOSTING (2026-08-12, commit after the unlock removal)
+
+Hovering a circle now GHOSTS the circles nested inside it instead of hiding them:
+image fades out (`fill-opacity: 0`), the ring becomes a dashed hollow outline at
+50% (`stroke-opacity: 0.5`) with a navy `drop-shadow` halo so it reads over a busy
+image, and it keeps its hit area so moving onto one re-hovers it and it comes back
+solid. `BreedTree.tsx`: `buriedSet` (the old hide-the-nest set) now drives a
+`ghosted` flag on the circle; the first-ring carve-out is gone (it only existed for
+the unlock), so hovering a BIG circle ghosts its nest too. `BreedTree.module.css`:
+`.btCircle` carries the 0.3s `fill-opacity`/`stroke-opacity` transition (both ways,
+inert until ghosted), `.ghost` sets the hollow dashed look and the halo; both are
+off under reduced motion. Dashes are proportional to the ring width (a JSX
+attribute), the fade is pure CSS. Note: a depth-2 nest has a navy stroke, so the
+navy halo does nothing for it on dark image areas; flagged to Steve to check on
+device. tsc source clean, eslint 53/7, no bare :global.
