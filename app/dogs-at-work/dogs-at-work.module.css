@@ -596,9 +596,19 @@
   /* 2. Push the payslip up so it overlays the hero's bottom: -188 - 48 = 140px over
      the hero. 3. The card is in normal flow, so lifting it pulls the body up the
      same 140px in one move (no separate body margin that would double the shift);
-     the 24px card-to-body gap below is unchanged. */
+     the 24px card-to-body gap below is unchanged.
+
+     The card only establishes a stacking context via its own transform:rotate,
+     with z-index auto, and nothing between it and the root is a stacking context
+     (articleMobile's flow-root is a BFC, not one), so it competes in the root
+     context against the hero's gradient tint (.essayHeroTint, z-index 1) and
+     loses. Position this wrapper and give it z-index 2 so the overlaid card sits
+     above the tint, matching the desktop sidebar (z-index 10). It clears the hero
+     title/pills/back link by design, so sitting above them covers nothing. */
   .mobilePayslip {
     margin-top: -188px;
+    position: relative;
+    z-index: 2;
   }
 }
 
