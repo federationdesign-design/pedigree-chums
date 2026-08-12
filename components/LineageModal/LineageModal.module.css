@@ -592,7 +592,11 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: clamp(96px, 24vw, 150px) clamp(14px, 3vw, 26px) clamp(118px, 28vw, 180px);
+  /* Top padding bumped 2026-08-12 (96->148 min) so the ROUND WON group clears the
+     absolutely-positioned chum-rate block (top:24px, ~110px tall) it used to
+     overlap on mobile. Desktop overrides padding-top to 16vh below, so this is a
+     mobile-only shift. */
+  padding: clamp(148px, 30vw, 180px) clamp(14px, 3vw, 26px) clamp(118px, 28vw, 180px);
   overflow: hidden;
   text-align: center;
 }
@@ -714,7 +718,7 @@
   padding-top: 10px;
   font-family: var(--font-display, "Luckiest Guy", system-ui);
   font-size: clamp(5.2rem, 26vw, 14rem);
-  line-height: 0.82;
+  line-height: 0.6; /* 0.82 read ~1.3 against Luckiest Guy's ink; 0.6 gives the tight look (Steve to judge) */
   color: #ffffff;
   text-transform: uppercase;
   text-shadow: 0 4px 40px rgba(0, 0, 0, 0.55);
