@@ -56,10 +56,10 @@ export default function ArticleTextToggle() {
         type="button"
         className={styles.toggle}
         aria-pressed={white}
+        aria-label={white ? "Switch to black text" : "Switch to white text"}
         onClick={toggle}
       >
         <span className={styles.icon} aria-hidden="true">◐</span>
-        {white ? "Switch to black text" : "Switch to white text"}
       </button>
     </div>
   );
