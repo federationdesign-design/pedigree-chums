@@ -1120,23 +1120,26 @@
    and the text is pulled up toward the top rather than centred down the middle.
    Mobile keeps its own layout. Tune these two once we see it on screen. */
 @media (min-width: 769px) {
-  /* Photo shown as a CENTRED COLUMN, not full-bleed (2026-08-12). cover on a
-     square image in a full-width landscape box scaled it to the WIDTH, so the dog
-     filled the frame at ~2x the band height and read as a crop. Constraining the
-     width to a portrait column flips cover to scale by HEIGHT instead, which
-     halves the dog to a sensible portrait; the blue overlay gradient fills the
-     sides. Still cover + center-top, so it stays immersive (light side-crop) and
-     the head is kept. Contain was rejected on purpose (it shows the artwork's own
-     edges and reads as a sticker, comment ~839). The clip-path slant is retuned:
-     its y is a % of the element HEIGHT (unchanged), but the element is far
-     narrower now, so a given % reads STEEPER than it did full-width; 3% -> 1.5%
-     keeps the diagonal gentle. Width starts at 40vw capped 460px, Steve to judge. */
+  /* Next-level dog as a CIRCLE (2026-08-12), replacing the column. A circle crops
+     the square photo EVENLY and matches the game's circle language. Square box +
+     border-radius 50% + cover shows the whole dog with the corners rounded off;
+     the clip-path diagonal is DROPPED (it fought the circle, and the column read
+     as a strip pasted on the blue). Centred in the free band between ROUND WON and
+     the Next Level button, with a plain yellow ring (box-shadow, so no layout
+     shift and it is not clipped by the circle). Diameter min(40vw, 400px), Steve
+     to judge. Desktop only; mobile keeps the approved full-bleed base rule. */
   .winNextImg {
-    width: min(40vw, 460px);
-    margin-inline: auto; /* centre the column: base left:0 + right:0 + auto margins */
-    height: 75%;
-    object-position: center top;
-    clip-path: polygon(0 0, 100% 1.5%, 100% 100%, 0 100%);
+    left: 50%;
+    right: auto;
+    top: 50%;
+    bottom: auto;
+    transform: translate(-50%, -50%);
+    width: min(40vw, 400px);
+    height: min(40vw, 400px);
+    border-radius: 50%;
+    object-position: center;
+    clip-path: none;
+    box-shadow: 0 0 0 clamp(6px, 1vw, 14px) var(--yellow, #ffd23e);
   }
   /* ROUND WON and the score above it pushed DOWN off the very top, into the
      blue band and the seam, instead of overflowing above the page. */
