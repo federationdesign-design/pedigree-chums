@@ -61,7 +61,7 @@ const CARDS: ArticleCard[] = [
     pairWith: "owe-blueprint",
     node: (
       <div className={styles.sidebarCard}>
-        <div style={{ padding: "16px 20px 16px" }}>
+        <div style={{ padding: "32px 40px 32px" }}>
           <p style={cardTitle}>The honest version</p>
           <p style={cardBody}>Electronic noses are emerging technology in <strong>trials and research</strong>, not a test you can book at the GP yet. They are being built to scale up what dogs proved is possible — reading disease from its scent — so think &quot;promising and coming&quot;, not &quot;finished and available&quot;.</p>
         </div>
@@ -73,11 +73,11 @@ const CARDS: ArticleCard[] = [
     pairWith: "blueprint",
     node: (
       <div className={styles.sidebarCard}>
-        <div style={{ padding: "16px 20px 6px" }}>
+        <div style={{ padding: "32px 40px 12px" }}>
           <p style={cardTitle}>The dog-built machine</p>
           <p style={{ ...cardBody, fontWeight: 600 }}>UK e-nose prostate-cancer trial</p>
         </div>
-        <div style={{ padding: "10px 20px 4px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+        <div style={{ padding: "20px 40px 8px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
           {[
             { label: "Urine samples", value: "500+" },
             { label: "Began", value: "Nov 2025" },
@@ -88,7 +88,7 @@ const CARDS: ArticleCard[] = [
             </div>
           ))}
         </div>
-        <div style={{ padding: "12px 20px 16px" }}>
+        <div style={{ padding: "24px 40px 32px" }}>
           <p style={cardBody}>Built by quantum physicist <strong>Dr Andreas Mershin</strong> from <strong>Medical Detection Dogs&apos;</strong> own detection data, with the University of Texas at El Paso. Running at <strong>Milton Keynes University Hospital</strong> — the same hospital as the dogs&apos; prostate trial.</p>
         </div>
       </div>
@@ -99,11 +99,11 @@ const CARDS: ArticleCard[] = [
     pairWith: "why-bother",
     node: (
       <div className={styles.sidebarCard}>
-        <div style={{ padding: "16px 20px 6px" }}>
+        <div style={{ padding: "32px 40px 12px" }}>
           <p style={cardTitle}>The dogs&apos; scorecard</p>
           <p style={{ ...cardBody, fontWeight: 600 }}>Prostate screening, by nose</p>
         </div>
-        <div style={{ padding: "10px 20px 4px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+        <div style={{ padding: "20px 40px 8px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
           {[
             { label: "Specificity", value: "74%" },
             { label: "Sensitivity", value: "71%" },
@@ -114,7 +114,7 @@ const CARDS: ArticleCard[] = [
             </div>
           ))}
         </div>
-        <div style={{ padding: "12px 20px 16px" }}>
+        <div style={{ padding: "24px 40px 32px" }}>
           <p style={cardBody}>The dogs could also flag cancer in men whose PSA blood test was misleading — exactly where standard testing struggles.</p>
         </div>
       </div>
@@ -125,7 +125,7 @@ const CARDS: ArticleCard[] = [
     pairWith: "tail",
     node: (
       <div className={styles.sidebarCard}>
-        <div style={{ padding: "16px 20px 16px" }}>
+        <div style={{ padding: "32px 40px 32px" }}>
           <p style={cardTitle}>How an electronic nose works</p>
           <p style={cardBody}>An array of chemical sensors reads the volatile compounds in a sample, and machine learning looks for the pattern linked to disease — trained, reward-style, much like a dog. No wet nose required, but the same job: spot the smell that shouldn&apos;t be there.</p>
         </div>
@@ -137,7 +137,7 @@ const CARDS: ArticleCard[] = [
     pairWith: "breathes",
     node: (
       <div className={styles.sidebarCard}>
-        <div style={{ padding: "16px 20px 16px" }}>
+        <div style={{ padding: "32px 40px 32px" }}>
           <p style={cardTitle}>Other machines that smell</p>
           <p style={cardBody}><strong>Owlstone Medical</strong> (Cambridge) built &quot;Breath Biopsy&quot; — capturing the volatile compounds in your breath to read for disease. Its breathalyser-style tests have run in UK trials for cancers including lung cancer, with NHS hospitals involved.</p>
         </div>
@@ -149,7 +149,7 @@ const CARDS: ArticleCard[] = [
     pairWith: "out-of-job",
     node: (
       <div className={styles.sidebarCard}>
-        <div style={{ padding: "16px 20px 16px" }}>
+        <div style={{ padding: "32px 40px 32px" }}>
           <p style={cardTitle}>What the dog thinks happened</p>
           <p style={{ ...cardBody, marginBottom: 8 }}><strong>What humans think:</strong> a machine is running dog-derived scent data to detect cancer at scale.</p>
           <p style={cardBody}><strong>What the dog thinks:</strong> I found the weird pot. I got a biscuit. Apparently I am now in a science magazine.</p>
@@ -162,7 +162,7 @@ const CARDS: ArticleCard[] = [
     pairWith: "tail",
     node: (
       <div className={styles.sidebarCard}>
-        <div style={{ padding: "16px 20px 16px" }}>
+        <div style={{ padding: "32px 40px 32px" }}>
           <p style={cardTitle}>The medical trilogy</p>
           <p style={{ ...cardBody, marginBottom: 10 }}>Start at the beginning: the dogs that proved disease has a smell, and the dogs that warn one person before their own body does.</p>
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
@@ -178,7 +178,7 @@ const CARDS: ArticleCard[] = [
     pairWith: "tail",
     node: (
       <div className={styles.sidebarCard}>
-        <div style={{ padding: "16px 20px 16px" }}>
+        <div style={{ padding: "32px 40px 32px" }}>
           <p style={cardTitle}>Sources</p>
           <p style={{ ...cardBody, fontSize: "0.82rem" }}>
             Dog-inspired e-nose prostate trial (Nov 2025) &mdash; Medical Detection Dogs; Dr Andreas Mershin; Milton Keynes University Hospital.<br />

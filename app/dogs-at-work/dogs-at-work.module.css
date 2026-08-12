@@ -469,10 +469,10 @@
   border: 1.5px solid rgba(255,255,255,0.12);
   border-radius: 16px;
   overflow: hidden;
-  /* 20px extra padding on top of the article-page info cards (Steve, 11 Aug),
-     added at the container so it is uniform across cards whose inner sections
-     carry different paddings. */
-  padding-top: 20px;
+  /* Top padding added at the container so it is uniform across cards whose inner
+     sections carry different paddings. Doubled 20 -> 40 (Steve, 12 Aug) as part
+     of doubling the whole card's internal padding on all four sides. */
+  padding-top: 40px;
 }
 
 /* Desktop only: lift the payslip so it overlays the bottom of the hero, per the
