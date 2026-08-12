@@ -585,7 +585,7 @@
 .counter.counter .label {
   font-family: var(--font-mohave), var(--font-body), system-ui, sans-serif;
   font-weight: 700;
-  font-size: 1.05rem;
+  font-size: 0.8925rem; /* 15% smaller: 1.05rem x 0.85 */
   color: #ffffff;
 }
 
@@ -606,7 +606,7 @@
 .counter.counter {
   position: relative;
   overflow: visible;
-  padding: 12px 18px 10px 18px;
+  padding: 10.2px 15.3px 8.5px 15.3px; /* 15% smaller: 12/18/10/18 x 0.85 */
 }
 .counter.counter .minimiseBtn {
   position: absolute;
@@ -667,9 +667,9 @@
    below the logo never applied. Fixed again, with the mark absolute inside it. */
 .counter.counter {
   position: fixed;
-  top: calc(clamp(96px, 12vh, 132px) + env(safe-area-inset-top, 0px));
+  top: calc(clamp(96px, 12vh, 132px) + env(safe-area-inset-top, 0px) - 35px); /* nudge 35px up (10 + 25) */
   bottom: auto;
-  left: clamp(12px, 3vw, 22px);
+  left: calc(clamp(12px, 3vw, 22px) + 15px); /* nudge 15px right */
 }
 
 /* The discovery toast joins them: top left, below the counter, in the same
