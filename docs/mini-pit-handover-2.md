@@ -299,3 +299,25 @@ off under reduced motion. Dashes are proportional to the ring width (a JSX
 attribute), the fade is pure CSS. Note: a depth-2 nest has a navy stroke, so the
 navy halo does nothing for it on dark image areas; flagged to Steve to check on
 device. tsc source clean, eslint 53/7, no bare :global.
+(Follow-up 2026-08-12: ghost stroke changed to WHITE at 50% with the navy halo
+kept, so it reads on both dark and light artwork; the depth-2 caveat is resolved.)
+
+## 11. DEEP TREES CLOSED AS A NON-ISSUE (2026-08-12)
+
+The deep-tree worry (the depth-4+ trees, the big ones like Cocker Spaniel at ~104
+nodes) is CLOSED as a non-issue. Reason: the large deep trees all belong to CHUMS,
+which are page/learn cards (they have a /chums/[slug] page), so a player navigates
+to that page and NEVER opens their tree in the pit. Only a "play" card opens a pit
+level: no page AND a lineage with ancestors (breedCardKind, BreedStrip.tsx:87-91).
+
+Measured over EVERY root with a tree, echo-excluded as the pit renders
+(.scratch/deep-trees.mts, a throwaway probe):
+- Largest tree a player can actually open and complete: FIELD SPANIEL, 78 nodes,
+  depth 7. Reviewed on device, renders fine. This is the definitive worst
+  reachable case, from a full enumeration of all reachable levels, not a sample.
+- Next reachable below it: Patterdale Terrier 74/d6, Fox Terrier 68/d7,
+  Curly-Coated Retriever 50/d6, Welsh Springer Spaniel 48/d7. Nothing reachable
+  exceeds 78 nodes.
+- The giants are all unreachable chum pages: Cocker Spaniel 104, Cockapoo 78,
+  Irish Setter 76, Golden Retriever 74, Springer Spaniel 69.
+Since the worst case a player can reach renders fine, no deep-tree work is needed.
