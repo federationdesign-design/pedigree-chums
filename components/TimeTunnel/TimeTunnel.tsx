@@ -30,7 +30,7 @@ const MOTE_SPEED = 26;
 const MOTE_ZNEAR = 60;
 const MOTE_ZFAR = 3000;
 const MOTE_SIZE = 11;
-const MOTE_COLORS = ["#5cc4ee", "#ffd23e", "#fff8e6"]; // sky, yellow, cream on navy
+const MOTE_COLORS = ["#00e2ff", "#008eff", "#ffed60"]; // matched to the new ring colours
 
 // Vanishing-point sway: a slow automatic bend so the tunnel reads as a bending
 // passage. The prototype's pointer-follow makes no sense during a page

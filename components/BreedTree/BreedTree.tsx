@@ -785,6 +785,7 @@ const RING_LEAD_MS = 300;      // dial 1: how far ahead the tunnel rings lead
 const DROP_DELAY_MS = 250;     // dial 2: ring-grow to dogs-falling gap
 const RING_GROW_MS = 650;
 const RING_START_SCALE = 0.08;
+const MARKER_FADE_MS = 500;    // the connector line fades in over this, once the ring has grown
 
 // On mobile the packed circles sit side by side and stay small. We re-lay the
 // top-level circles into a tall-screen arrangement (2 stacked, 3 a triangle, 4 a
@@ -5337,7 +5338,17 @@ export default function BreedTree({
                   transition: `transform ${RING_GROW_MS}ms cubic-bezier(0.2, 0.7, 0.3, 1) ${RING_LEAD_MS}ms`,
                 }}
               >
-                <line x1={ax} y1={ay} x2={ex} y2={ey} stroke="#ffffff" strokeWidth={swLine} strokeDasharray={dashLine} />
+                <line
+                  x1={ax} y1={ay} x2={ex} y2={ey}
+                  stroke="#ffffff" strokeWidth={swLine} strokeDasharray={dashLine}
+                  style={{
+                    // The connector line makes no sense mid-tunnel, so it stays
+                    // invisible while the ring grows and fades in only at the end,
+                    // once the ring has landed (delay = RING_LEAD + RING_GROW).
+                    opacity: holdEntrance && !resolve ? 0 : 1,
+                    transition: `opacity ${MARKER_FADE_MS}ms ease ${RING_LEAD_MS + RING_GROW_MS}ms`,
+                  }}
+                />
                 <circle cx={cx} cy={cy} r={R} fill="none" stroke="#ffffff" strokeWidth={swRing} strokeDasharray={dashRing} />
               </g>
             );
