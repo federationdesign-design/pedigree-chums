@@ -173,8 +173,10 @@ DECISIONS (Steve, 2026-08-12):
 - Lengthen the handover to about 1.2s. Do NOT cut the tunnel to 0.7s (feels
   snatched). The real gap today is ~0.7-1.0s (see timing below); 1.2s is a
   deliberate stretch.
-- Circles arrive OUT OF the centre (vanishing point), not falling from the top.
-  Use the SVG drop-in seam, NOT the Matter scatter path.
+- Dog circles on the start screen: NO CHANGE. They keep dropping in from the
+  top, biggest to smallest, exactly as today (the SVG drop-in at 3235-3273).
+  The earlier "arrive from the centre" idea was WITHDRAWN on 2026-08-12. Do not
+  touch that seam.
 
 CARD CLICK -> MINI PIT (the handover path):
 - Card is a flipCard button, onClick={open} at BreedStrip.tsx:515. open comes
@@ -200,18 +202,15 @@ HANDOVER TIMING TODAY (the gap the tunnel fills):
 - Net with motion: ~0.7-1.0s of entrance. Reduced motion skips BOTH -> instant
   cut. Tunnel target is ~1.2s per the decision above.
 
-CIRCLE ARRIVAL SEAM (use this one):
+CIRCLE DROP-IN (leave exactly as-is):
 - SVG drop-in effect: BreedTree.tsx:3212-3277 (useEffect on [nodes]). NOT
-  physics. Packed pos (tx,ty) at :3252-3253, then y offset by
-  drop=(1-easeOutBounce(lt))*dropFrom and written as translate(tx, ty-drop) at
-  :3255-3256. easeOutBounce at :767. dropFrom=SIZE*1.3 at :3242.
-- Change: interpolate BOTH x and y from a shared centre (the vanishing point)
-  outward to the packed (tx,ty), and swap drop/easeOutBounce for a
-  scale+translate-from-centre. KEEP the stagger loop, the zoomTo(v)+
-  setEntered(true) completion (:3269-3270), and the reduced-motion early-return
-  (:3228-3233) exactly as they are.
-- Do NOT use the Matter scatter path (BreedTree.tsx:3316-5039, doFall) for this;
-  that is the PLAY explosion, a separate concern.
+  physics. Packed pos (tx,ty) at :3252-3253, y offset by
+  drop=(1-easeOutBounce(lt))*dropFrom, written as translate(tx, ty-drop) at
+  :3255-3256. easeOutBounce at :767. This stays UNCHANGED: circles drop from the
+  top, biggest to smallest, as today. Recorded only so it is not disturbed when
+  the tunnel is layered in front.
+- The Matter scatter path (BreedTree.tsx:3316-5039, doFall) is the PLAY
+  explosion, also unrelated. Do not touch either.
 
 CANVAS LAYER (reuse, do not add a new one):
 - Mini pit runs Matter.js HEADLESS: no Render, no Runner, bodies drawn as SVG
@@ -244,13 +243,36 @@ CONSTRAINTS (verified):
   Render.stop/Runner.stop needed (never created). Guard deferred work behind a
   disposed/ref flag; StrictMode double-mount is a known killer (section 5).
 
-COST (as % of tunnel-feature delivery time, largest first):
+COST (as % of the ORIGINAL tunnel-feature scope, largest first). The circle
+arrival change (~30%) was DROPPED on 2026-08-12 (circles keep dropping from the
+top), so the feature is now ~70% of that original scope. Remaining slices
+unchanged in absolute terms:
 - Tunnel on fxCanvas: ~35% - port prototype into the frame loop, pit-pixel
-  space, align vanishing point to pack centre, wake/idle, fit to 1.2s.
-- Circle arrival change: ~30% - rework 3252-3256 to emerge from centre, keep
-  zoomTo/setEntered contract, sync visually to the tunnel end. Highest risk.
+  space, align vanishing point to pack centre, wake/idle, fit to 1.2s. Now also
+  owns the card-dive-from-click-position and the rings-clear-outward end phase
+  (folded in; the tunnel needs a real end state, not just self-terminate).
 - Teardown: ~15% - RAF ref + cleanup, disposed guard, no leak across modal
   open/close, StrictMode-safe.
-- Reduced-motion branch: ~10% - inline matchMedia, static/skip fallback for both
-  tunnel and arrival.
+- Reduced-motion branch: ~10% - inline matchMedia, static/skip fallback.
 - Verification/glue: ~10% - new guard test, tsc, device pass.
+- (WITHDRAWN) Circle arrival change: ~30% - circles keep dropping from the top,
+  no work.
+
+## 9. HOVER UNLOCK REMOVED (2026-08-12)
+
+The "hover unlock" is gone (own commit, `BreedTree.tsx` only). That was the JS
+system where hovering a first-ring circle made its children fan/hop outwards
+(spring sim writing offsets onto the wrapper <g>s). Removed: the C1 constants and
+`UnlockState`/`unlockRef`, the sim functions (`unlockPaint`/`unlockStop`/
+`unlockStep`/`unlockHomeStep`/`unlockFrame`), the two hover effects, and the
+`onMouseEnter` latch. The shared wrapper-offset machinery (`paintOffset`, the
+drag/`pullPaint`, the collision `knockStep`) was NOT touched.
+
+**It closes the tucked-child hover bug, open a while:** tucked child circles did
+not turn their label yellow or gain a breadcrumb ladder rung on hover, though
+clicking worked. Cause: the `onMouseEnter` latch (`if (u && u.raf !== null ...)
+return`) swallowed hover on the inside circles WHILE the unlock sim animated, so
+`setHovered` never fired for them (yellow label at the `d === hovered` test; the
+rail/ladder mirrors `hovered ?? focus`). `onClick` was never latched, so clicks
+landed. No unlock means no latch, so hover on tucked children now works at once.
+tsc clean, eslint held at 53 errors / 7 warnings.
