@@ -321,3 +321,22 @@ Measured over EVERY root with a tree, echo-excluded as the pit renders
 - The giants are all unreachable chum pages: Cocker Spaniel 104, Cockapoo 78,
   Irish Setter 76, Golden Retriever 74, Springer Spaniel 69.
 Since the worst case a player can reach renders fine, no deep-tree work is needed.
+
+## 12. J10b DRAG-ON-MOUSECONSTRAINT: PART DONE, STAGES 1-3 LIVE (recorded 2026-08-12)
+
+Was a documentation gap (absent from this handover). The mini pit's in-round drag
+was migrated onto Matter's own MouseConstraint. State, from the code:
+- Stage 1 (badges): live. Marker BreedTree.tsx:4640.
+- Stage 2 (dog circles, plus a tap that drops the constraint before liftToLearn
+  removes a body from the world): live. Marker :2185 (mcReleaseRef).
+- Stage 3 (pit props): live. MC_KINDS at :4669 = {badge, circle, rod, pill, toy,
+  btn}, so rods/pills/toys/buttons drag via the constraint too. The in-pit control
+  squares (close X, brain) and the chum scenery are deliberately excluded.
+- Stages 4-5 of the original five-stage scope: NOT in the code. The constraint
+  already grabs every in-round draggable kind, so they were descoped or
+  unnecessary once the body scope was complete.
+Old hand-rolled paths still coexist and were NOT deleted: pullRef ("PUSH AND PULL"
+start-screen drag, a different phase) and dragRef. Partitioned by kind/phase so
+they do not fight the constraint.
+This is what unblocked J17 bombs: the fuse hangs off the constraint's startdrag/
+enddrag (:4687-4702). J17 stages 1-5 are all built and live.
