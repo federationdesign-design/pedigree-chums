@@ -537,6 +537,18 @@ function isEcho(d: Node): boolean {
   return !!d.parent && d.data.name === d.parent.data.name;
 }
 
+// Rarity flash tiers, keyed to how many times the collected dog's name appears
+// among the CIRCLES that drop this level (nodes, echo-excluded). 1-2 is common
+// and stays SILENT: a flash on 83% of collects stops being a reward.
+type RarityTier = "uncommon" | "rare" | "root";
+function rarityTier(count: number): RarityTier | null {
+  if (count >= 7) return "root";
+  if (count >= 4) return "rare";
+  if (count >= 3) return "uncommon";
+  return null;
+}
+const RARITY_LABEL: Record<RarityTier, string> = { uncommon: "UNCOMMON", rare: "RARE", root: "ROOT DOG" };
+
 // Breed titles are fitted to the circle they belong to. The name is wrapped
 // across 1 to LABEL_MAX_LINES balanced lines and every option is measured; the
 // wrap that allows the largest type while keeping all four corners of the text
@@ -1239,6 +1251,31 @@ export default function BreedTree({
     if (isMobile || dockAside) relayoutMobile(ns, aspectKey, dockAside ? level : null, isMobile ? 1 : 0.6);
     return ns;
   }, [root, isMobile, aspectKey, dockAside, level]);
+
+  // Rarity flash: per-level count of each dog among the CIRCLES that drop (nodes,
+  // echo-excluded, root excluded, so it matches what a player sees), flashed ONCE
+  // per name per level at the complete moment. See rarityTier above.
+  const rarityCounts = useMemo(() => {
+    const m = new Map<string, number>();
+    for (const n of nodes) { if (n.depth === 0 || isEcho(n)) continue; m.set(n.data.name, (m.get(n.data.name) ?? 0) + 1); }
+    return m;
+  }, [nodes]);
+  const rarityFlashedRef = useRef<Set<string>>(new Set());
+  const rarityIdRef = useRef(0);
+  const rarityFlashTimerRef = useRef<number | null>(null);
+  const [rarityFlash, setRarityFlash] = useState<{ id: number; tier: RarityTier; count: number } | null>(null);
+  useEffect(() => { rarityFlashedRef.current = new Set(); }, [nodes]); // reset per level
+  useEffect(() => () => { if (rarityFlashTimerRef.current) window.clearTimeout(rarityFlashTimerRef.current); }, []);
+  const flashRarity = (name: string) => {
+    if (rarityFlashedRef.current.has(name)) return; // once per name per level
+    const count = rarityCounts.get(name) ?? 0;
+    const tier = rarityTier(count);
+    if (!tier) return; // 1-2 = common, silent
+    rarityFlashedRef.current.add(name);
+    if (rarityFlashTimerRef.current) window.clearTimeout(rarityFlashTimerRef.current);
+    setRarityFlash({ id: ++rarityIdRef.current, tier, count });
+    rarityFlashTimerRef.current = window.setTimeout(() => setRarityFlash(null), tier === "root" ? 1600 : 1100);
+  };
 
   // capture the stage aspect for the layout exactly once, on the first valid read.
   // "Valid" has to mean actually measured: aspect starts at 1, and freezing that
@@ -6906,6 +6943,9 @@ export default function BreedTree({
           currentScore={0}
           onScore={onScore}
           onRemove={(name) => {
+            // Rarity flash: punctuates THIS complete press (once per name per level;
+            // common stays silent). Fired before the removal bookkeeping below.
+            flashRarity(name);
             // learnt: the circle leaves the pit for good
             if (learnNode && name === learnNode.data.name) {
               removedNodesRef.current.add(learnNode);
@@ -6961,6 +7001,14 @@ export default function BreedTree({
           }}
         />
       )}
+      {rarityFlash && (() => {
+        const cls = { uncommon: styles.rarityUncommon, rare: styles.rarityRare, root: styles.rarityRoot }[rarityFlash.tier];
+        return (
+          <div key={rarityFlash.id} className={`${styles.rarityFlash} ${cls}`} aria-hidden="true">
+            {RARITY_LABEL[rarityFlash.tier]} <span className={styles.rarityCount}>×{rarityFlash.count}</span>
+          </div>
+        );
+      })()}
       <div
         ref={asideRef}
         className={`${styles.aside}${dockAside ? " " + styles.asideDocked : ""}`}
