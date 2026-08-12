@@ -1121,10 +1121,15 @@
    Mobile keeps its own layout. Tune these two once we see it on screen. */
 @media (min-width: 769px) {
   /* Photo takes three quarters (blue band ~25%), shown from its TOP so the
-     dog's head is not cropped off. */
+     dog's head is not cropped off. The square image overflows this wide box, so
+     center-top anchors the head (feet run off the bottom instead), and the base
+     clip-path slant is softened here (7% -> 3%) so the diagonal blue band does
+     not nick the head. Was object-position center center, which cropped the head:
+     the "shown from its TOP" comment was aspirational until 2026-08-12. */
   .winNextImg {
     height: 75%;
-    object-position: center center;
+    object-position: center top;
+    clip-path: polygon(0 0, 100% 3%, 100% 100%, 0 100%);
   }
   /* ROUND WON and the score above it pushed DOWN off the very top, into the
      blue band and the seam, instead of overflowing above the page. */
