@@ -162,3 +162,95 @@ pill line gap 0.6*rx (=1.3em) - frames gutter 3px - chumTop 118/168 -
 label font cap 102/34, floor 10 - settle vps(0.012) x 12 frames -
 pit-full: zone 150px, count 5, 4s grace - badge charges 20 - rod hits 2 -
 pill hits 3 - restitution: circles 0.78, badges 0.48, floor 0.4, walls 0.35.
+
+## 8. TIME TUNNEL TRANSITION (integration groundwork, 2026-08-12)
+
+Prototype: prototypes/time-tunnel.html (gitignored, not wired in). Canvas 2D
+only, NO CSS 3D (banned in this tree, confirmed clean below). These findings are
+recorded so the seam and the fxCanvas reuse are NOT re-derived next session.
+
+DECISIONS (Steve, 2026-08-12):
+- Lengthen the handover to about 1.2s. Do NOT cut the tunnel to 0.7s (feels
+  snatched). The real gap today is ~0.7-1.0s (see timing below); 1.2s is a
+  deliberate stretch.
+- Circles arrive OUT OF the centre (vanishing point), not falling from the top.
+  Use the SVG drop-in seam, NOT the Matter scatter path.
+
+CARD CLICK -> MINI PIT (the handover path):
+- Card is a flipCard button, onClick={open} at BreedStrip.tsx:515. open comes
+  from openFor(b) (BreedStrip.tsx:176-195); its closure calls
+  setActive({name,image,character,fact,lineage}) at :187. active non-null builds
+  the modal at :418.
+- LineageModal portals the overlay and mounts <BreedTree fill gravity dockAside>
+  at LineageModal.tsx:332-404. There is NO separate start-screen component: the
+  start screen is BreedTree in its !started state (started at BreedTree.tsx:1836,
+  PLAY button 6558-6609). PLAY -> setStarted(true)+runFallRef (6607-6608) is the
+  NEXT step (round begin), not this handover.
+- Same setActive/mount pattern from BreedDialog.tsx:67 and HistoryCarousel.
+  chums/[slug]/BreedClient.tsx:331 renders BreedTree disableZoom hideLabels =
+  the STATIC diagram, not this path.
+
+HANDOVER TIMING TODAY (the gap the tunnel fills):
+- Click -> setActive -> modal mount: 0ms, synchronous, no timer/await.
+- Overlay rise: lmRise 0.32s = 320ms (LineageModal.module.css:16-21). Off under
+  prefers-reduced-motion (:164-166).
+- Circle drop-in tween (BreedTree.tsx:3235-3273): dur=700ms per circle,
+  stagger=45ms, total = 700 + 45*(n-1). setEntered(true) only fires on
+  completion (:3270); PLAY is gated on entered.
+- Net with motion: ~0.7-1.0s of entrance. Reduced motion skips BOTH -> instant
+  cut. Tunnel target is ~1.2s per the decision above.
+
+CIRCLE ARRIVAL SEAM (use this one):
+- SVG drop-in effect: BreedTree.tsx:3212-3277 (useEffect on [nodes]). NOT
+  physics. Packed pos (tx,ty) at :3252-3253, then y offset by
+  drop=(1-easeOutBounce(lt))*dropFrom and written as translate(tx, ty-drop) at
+  :3255-3256. easeOutBounce at :767. dropFrom=SIZE*1.3 at :3242.
+- Change: interpolate BOTH x and y from a shared centre (the vanishing point)
+  outward to the packed (tx,ty), and swap drop/easeOutBounce for a
+  scale+translate-from-centre. KEEP the stagger loop, the zoomTo(v)+
+  setEntered(true) completion (:3269-3270), and the reduced-motion early-return
+  (:3228-3233) exactly as they are.
+- Do NOT use the Matter scatter path (BreedTree.tsx:3316-5039, doFall) for this;
+  that is the PLAY explosion, a separate concern.
+
+CANVAS LAYER (reuse, do not add a new one):
+- Mini pit runs Matter.js HEADLESS: no Render, no Runner, bodies drawn as SVG
+  (comment "mini pit has no canvas" at :6113).
+- There IS a dedicated 2D effects canvas to reuse: <canvas ref={fxCanvasRef}
+  className={styles.fxCanvas} aria-hidden> at BreedTree.tsx:6703-6704. Custom 2D
+  ctx at :5086, frame loop 5082-5160. z-index:2 ABOVE the SVG (z-index:-1),
+  pointer-events:none (BreedTree.module.css:17-28). Tuned in "pit pixels" via
+  createPitEffects.
+- It only wakes for non-idle effects (:5117-5122); wake it deliberately for the
+  tunnel window, mirroring fxKickRef (:5151). Main pit's equivalent reuse point
+  is the Matter render canvas afterRender hook (PackPit.tsx:348-353), not needed
+  here.
+
+CONSTRAINTS (verified):
+- CSS 3D: NONE in the pit tree. Zero hits for perspective, transform-style,
+  backface-visibility, rotateX/Y, translateZ, preserve-3d, matrix3d across
+  PackPit/BreedTree/PitEnd/LineageModal/LineageMap. Only translate3d(x,y,0) (2D
+  GPU hint). Keep the tunnel canvas-only.
+- Reduced motion: honoured everywhere via inline
+  matchMedia("(prefers-reduced-motion: reduce)"), NO shared hook. Precedent to
+  follow: BreedTree.tsx:3219-3221 (drop-in skip via 3228-3233) and 3316-3319
+  (scatter early return). Tunnel needs its own reduced-motion branch: static or
+  skipped, falling to the settled state, or it reintroduces motion the rest of
+  the pit suppresses. Non-exported prefersReducedMotion() exists at
+  app/dogs-at-work/WorkDeck.tsx:195-199 if a shared util is wanted.
+- Teardown: register RAF in a ref, cancelAnimationFrame in effect cleanup
+  (precedents :3232, :3275, :5153-5159, :5037). If the Matter world is touched:
+  Composite.clear(world,false) then Engine.clear(engine) (:5024-5025). No
+  Render.stop/Runner.stop needed (never created). Guard deferred work behind a
+  disposed/ref flag; StrictMode double-mount is a known killer (section 5).
+
+COST (as % of tunnel-feature delivery time, largest first):
+- Tunnel on fxCanvas: ~35% - port prototype into the frame loop, pit-pixel
+  space, align vanishing point to pack centre, wake/idle, fit to 1.2s.
+- Circle arrival change: ~30% - rework 3252-3256 to emerge from centre, keep
+  zoomTo/setEntered contract, sync visually to the tunnel end. Highest risk.
+- Teardown: ~15% - RAF ref + cleanup, disposed guard, no leak across modal
+  open/close, StrictMode-safe.
+- Reduced-motion branch: ~10% - inline matchMedia, static/skip fallback for both
+  tunnel and arrival.
+- Verification/glue: ~10% - new guard test, tsc, device pass.
