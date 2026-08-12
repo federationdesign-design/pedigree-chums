@@ -3750,7 +3750,7 @@ export default function BreedTree({
         const idx = toyBodiesRef.current.length;
         const pr: any = { x: w2.x, y: w2.y, vx: 0, vy: 0, a: 0, idx, hits: 0, maxHits: kind === "flag" ? TOY_FLAG_HITS : 9999, mb: null, toyKind: kind };
         const opts =
-          kind === "ball" || kind === "ballPink" ? { restitution: 0.85, friction: 0.05, frictionStatic: 0.8, frictionAir: 0.003, density: 0.0006 } // bouncy, but SETTLES: was 0.97 with no frictionStatic, which never reached 12 still frames and froze the pit at 30s (see handover 17)
+          kind === "ball" || kind === "ballPink" ? { restitution: 0.85, friction: 0.05, frictionStatic: 0.4, frictionAir: 0.003, density: 0.0006 } // bouncy, but SETTLES: restitution 0.85 is what kills the freeze (was 0.97, never reached 12 still frames, froze the pit at 30s, see handover 17). frictionStatic 0.8 -> 0.4 (2026-08-12) so a resting ball is easier to flick: 0.8 gripped the launch. Settle re-checked in a headless Matter sim, 2.7-7.1s to still at 0.4, identical to 0.8, so no freeze; if it ever returns do NOT lower this further, raise frictionAir to 0.006 instead.
           : kind === "rock" ? { restitution: 0.12, friction: 0.75, frictionStatic: 1.2, frictionAir: 0.006, density: 0.02 }
           : kind === "cookies" ? { restitution: 0.3, friction: 0.4, frictionAir: 0.012, density: 0.004 } // the main pit's own panel figures
           : kind === "stick" ? { restitution: 0.35, friction: 0.35, frictionAir: 0.004, density: 0.002 }
