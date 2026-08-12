@@ -1,0 +1,82 @@
+/* EssayShell.module.css — the single-source shell for the essay article
+   templates (Good Dog Bad Dog is the reference; Dogs at Work and
+   smarter-than-the-test adopt it). Both local modules `composes` these classes,
+   so pages are untouched and the hero content and body layout read ONE
+   horizontal axis and cannot drift apart.
+
+   Axis mechanism: Dogs at Work's --essay-max / --essay-gutter, read by BOTH the
+   hero content and the body layout, and — the fix — extended to the hero so it
+   caps and centres with the body. GDBD's hero was previously full-bleed, which is
+   why at 2800 its headline sat at 48 while its prose centred at 348.
+
+   Look: GDBD's wider ladder max-widths and gap. Reconciled (Steve, option A):
+   the sidebar is a real column that scales to its 580px authored width (no
+   transform hack), and text is 1fr so it always fills the capped block — no dead
+   space. Body content, hero image, headline colour, cards and the pinned scenes
+   stay local to each module. */
+
+.page {
+  min-height: 100vh;
+  padding-bottom: 0;
+  /* Single-source horizontal axis, read by .heroContent AND .layout. */
+  --essay-gutter: clamp(18px, 4vw, 48px);
+  --essay-sidebar: clamp(380px, 30vw, 580px);
+  --essay-max: none;
+  --essay-gap: 48px;
+}
+
+/* Hero content: capped + centred on the shared axis. THE split fix. */
+.heroContent {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: var(--essay-max);
+  margin: 0 auto;
+  padding: 24px var(--essay-gutter) 40px;
+  align-self: flex-end;
+  box-sizing: border-box;
+}
+
+/* Body two-column layout: same axis, so its left edge equals the hero's. */
+.layout {
+  width: 100%;
+  max-width: var(--essay-max);
+  margin: 0 auto;
+  padding: 48px var(--essay-gutter);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--essay-sidebar);
+  gap: var(--essay-gap);
+  align-items: start;
+  box-sizing: border-box;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Mobile: single column. NO container-type here — the bespoke pinned scenes on
+   bulls-eye/argos live inside .layout and must keep the viewport as their sticky
+   reference. This preserves GDBD's known-good mobile behaviour exactly. */
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+}
+
+/* Desktop only: query container for the Dogs at Work payslip's cqi sizing.
+   Scoped to desktop so mobile (where the scenes pin) gets no containment. */
+@media (min-width: 901px) {
+  .layout { container-type: inline-size; }
+}
+
+/* Wide ladder (GDBD look), driven through the single --essay-max token so the
+   hero caps at the same width as the body at every step. */
+@media (min-width: 1300px) {
+  .page { --essay-max: 1500px; --essay-gap: 80px; }
+}
+@media (min-width: 1600px) {
+  .page { --essay-max: 1680px; --essay-gap: 100px; }
+}
+@media (min-width: 1900px) {
+  .page { --essay-max: 1856px; --essay-gap: 120px; }
+}
