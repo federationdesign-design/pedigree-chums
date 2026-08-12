@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import BreedTree from "../BreedTree/BreedTree";
+import TimeTunnel from "../TimeTunnel/TimeTunnel";
 import CookieBanner from "../CookieBanner/CookieBanner";
 import ScoreTable from "../ScoreTable/ScoreTable";
 import { BRAIN_PATH, BRAIN_ARTBOARD } from "../icons/brain";
@@ -126,6 +127,15 @@ export default function LineageModal({ name, image, character, lineage, onClose,
   // read inside the key handler, which is bound once
   const exitAskRef = useRef(false);
   const [mounted, setMounted] = useState(false);
+  // The time-tunnel transition plays over the arriving pit on open, then removes
+  // itself to reveal the pit (stage 1: rings + motes). Under reduced motion it
+  // never mounts, so there is no flash and the pit is there at once. It stays
+  // down after the first play, so an in-pit retry does not replay it: the tunnel
+  // is the "enter the pit" moment, not a per-round one.
+  const [tunnelActive, setTunnelActive] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  });
   const [shownName, setShownName] = useState(name);
   const [shownImg, setShownImg] = useState<string | null>(image);
   const [shownStatus, setShownStatus] = useState<BreedTag | null>(null);
@@ -273,6 +283,8 @@ export default function LineageModal({ name, image, character, lineage, onClose,
 
   return createPortal(
     <div className={css.overlay} role="dialog" aria-modal="true" aria-label={name}>
+      {/* The time tunnel covers the pit while it arrives, then removes itself. */}
+      {tunnelActive && <TimeTunnel onDone={() => setTunnelActive(false)} />}
       {/* Score, fixed top-right beside where the in-pit close object starts.
           Hidden once the round is running: the number belongs to the menu and
           the end screens, and during play it competes with the lives indicator
