@@ -286,6 +286,8 @@ export default function LineageMap({
   onScore?: (v: number) => void;
   currentScore?: number;
 }) {
+  // TEMP rarity-band instrumentation: does the tier prop reach the lifted card?
+  if (typeof window !== "undefined" && circular) console.log("[rarity-band] LineageMap boundary:", { breed: breed?.name, rarityTier, soloLeaf });
   // Read the real viewport on the FIRST render, not a placeholder. This card is
   // sized as a share of vp.w, so a stale default would size the first painted
   // frame for the wrong screen: at the old { w: 1280 } a 390px phone drew the
@@ -1626,11 +1628,12 @@ export default function LineageMap({
               on a straight baseline tilted to match. Stays as long as the card is up. */}
           {rarityTier ? (() => {
             const band = RARITY_BAND[rarityTier];
-            const TILT = -13;                     // degrees; negative rides the right side higher
-            const bandTop = R * 0.46;             // top edge of the strip before the tilt
-            // Fit-to-chord: shrink only if a label would run wider than the circle
-            // at the text line (bites for the longest labels on the smallest phone card).
-            const chord = 2 * Math.sqrt(Math.max(0, R * R - bandTop * bandTop));
+            const TILT = -20;                     // degrees; steeper negative rides the right side higher (jauntier)
+            const bandTop = R * 0.40;             // top edge of the wedge (chord); LOWER value lifts the band up
+            const labelY = R * 0.55;              // word centre; LOWER value lifts the word (clears the Learn button)
+            // Fit-to-chord at the WORD's line (narrower than the top of the wedge),
+            // so a long label never runs past the rim on the small phone card.
+            const chord = 2 * Math.sqrt(Math.max(0, R * R - labelY * labelY));
             const fs = Math.max(9, Math.min(R * 0.22, (chord * 0.92) / (0.6 * band.label.length)));
             // rect and text share one rotate(): the rect's top edge becomes the
             // diagonal chord, the text baseline tilts with it. The rect is drawn
@@ -1639,7 +1642,7 @@ export default function LineageMap({
               <g clipPath={`url(#${clip})`} style={{ pointerEvents: "none" }}>
                 <g transform={`rotate(${TILT})`}>
                   <rect x={-R * 1.6} y={bandTop} width={R * 3.2} height={R * 1.6} fill={band.bg} />
-                  <text x={0} y={bandTop + (R - bandTop) * 0.5} textAnchor="middle" dominantBaseline="central" style={{ fontFamily: '"Luckiest Guy", system-ui, sans-serif', fontSize: fs, fontWeight: 400, fill: band.fg }}>{band.label}</text>
+                  <text x={0} y={labelY} textAnchor="middle" dominantBaseline="central" style={{ fontFamily: '"Luckiest Guy", system-ui, sans-serif', fontSize: fs, fontWeight: 400, fill: band.fg }}>{band.label}</text>
                 </g>
               </g>
             );
