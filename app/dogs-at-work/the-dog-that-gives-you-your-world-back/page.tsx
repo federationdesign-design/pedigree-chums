@@ -4,6 +4,7 @@ import Link from "next/link";
 import Nav from "../../../components/Nav/Nav";
 import Footer from "../../../components/Footer/Footer";
 import styles from "../dogs-at-work.module.css";
+import ArticleTextToggle from "../../../components/ArticleTextToggle/ArticleTextToggle";
 import Payslip from "../../../components/Payslip/Payslip";
 import SidebarCard from "../../../components/DogsAtWork/SidebarCard";
 import sidebar from "../../../components/DogsAtWork/SidebarCard.module.css";
@@ -287,6 +288,8 @@ export default function GuideDogsPage() {
             <h1 className={styles.essayHeroTitle}>The Dog That Gives You Your World Back</h1>
           </div>
         </div>
+
+        <ArticleTextToggle />
 
         <div className={styles.essayLayout}>
           <article className={styles.essay}>

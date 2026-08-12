@@ -4,6 +4,7 @@ import Link from "next/link";
 import Nav from "../../../components/Nav/Nav";
 import Footer from "../../../components/Footer/Footer";
 import styles from "../dogs-at-work.module.css";
+import ArticleTextToggle from "../../../components/ArticleTextToggle/ArticleTextToggle";
 import Payslip from "../../../components/Payslip/Payslip";
 import MobileArticleBody, { type ArticleCard } from "../../../components/DogsAtWork/MobileArticleBody";
 import { PAYSLIPS } from "../data/payslips";
@@ -157,6 +158,8 @@ export default function AlertDogPage() {
             <h1 className={styles.essayHeroTitle}>The Colleague Who Never Clocks Off</h1>
           </div>
         </div>
+
+        <ArticleTextToggle />
 
         <div className={styles.essayLayout}>
           <article className={styles.essay}>

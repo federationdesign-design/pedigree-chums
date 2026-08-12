@@ -4,6 +4,7 @@ import ScrollVideo from "../../../components/ScrollVideo/ScrollVideo";
 import Nav from "../../../components/Nav/Nav";
 import Footer from "../../../components/Footer/Footer";
 import styles from "../good-dog-bad-dog.module.css";
+import ArticleTextToggle from "../../../components/ArticleTextToggle/ArticleTextToggle";
 import CaptionedCarousel from "../../../components/CaptionedCarousel/CaptionedCarousel";
 import DogPoll from "../../../components/DogPoll/DogPoll";
 import ReadingProgress from "../../../components/ReadingProgress/ReadingProgress";
@@ -473,6 +474,8 @@ export default function ArgosPage() {
 
 
         {/* ── Two-column layout ── */}
+        <ArticleTextToggle />
+
         <div className={styles.essayLayout} id="article-start">
           <Link href="/good-dog-bad-dog" className={styles.backLinkArticle}><span className={styles.backArrow}>←</span> Back to Good Dog, Bad Dog</Link>
           <article className={styles.essay}>

@@ -3,6 +3,7 @@ import Link from "next/link";
 import Nav from "../../components/Nav/Nav";
 import Footer from "../../components/Footer/Footer";
 import styles from "../good-dog-bad-dog/good-dog-bad-dog.module.css";
+import ArticleTextToggle from "../../components/ArticleTextToggle/ArticleTextToggle";
 
 export const metadata: Metadata = {
   title: "Your Dog Is Smarter Than the Test",
@@ -96,6 +97,8 @@ export default function SmarterThanTheTestPage() {
             <h1 className={styles.essayHeroTitle}>Your Dog Is Smarter Than the Test: <span style={{ color: "#ffffff" }}>Why the Maze Isn't the Measure</span></h1>
           </div>
         </div>
+
+        <ArticleTextToggle />
 
         <div className={styles.essayLayout}>
           <article className={styles.essay}>
