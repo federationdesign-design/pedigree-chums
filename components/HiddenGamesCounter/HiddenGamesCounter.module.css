@@ -669,7 +669,7 @@
   position: fixed;
   top: calc(clamp(96px, 12vh, 132px) + env(safe-area-inset-top, 0px) - 35px); /* nudge 35px up (10 + 25) */
   bottom: auto;
-  left: calc(clamp(12px, 3vw, 22px) + 15px); /* nudge 15px right */
+  left: calc(clamp(12px, 3vw, 22px) + 35px); /* nudge 35px right (15 + 10 + 10) */
 }
 
 /* Match .reveal (the default, minimised pill) to .counter so the two stay
@@ -678,7 +678,7 @@
    (line 629) is untouched, so both states keep the same 30px card alignment. */
 .reveal.reveal {
   top: calc(clamp(96px, 12vh, 132px) + env(safe-area-inset-top, 0px) - 35px); /* nudge 35px up */
-  left: calc(clamp(12px, 3vw, 22px) + 15px); /* nudge 15px right */
+  left: calc(clamp(12px, 3vw, 22px) + 35px); /* nudge 35px right (15 + 10 + 10) */
 }
 
 /* The discovery toast joins them: top left, below the counter, in the same

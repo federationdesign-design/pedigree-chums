@@ -215,6 +215,10 @@ export default function HiddenGamesCounter() {
   if (!logoShowing) return null;
 
   // phase === "counter"
+  // Open on click (no hover-to-open); the expanded counter auto-collapses when
+  // the cursor leaves it.
+  const collapse = () => setMinimised(true);
+
   if (minimised) {
     return (
       <button
@@ -230,7 +234,7 @@ export default function HiddenGamesCounter() {
 
   return (
     <>
-      <div className={styles.counter} role="status" aria-live="polite">
+      <div className={styles.counter} role="status" aria-live="polite" onMouseLeave={collapse}>
         <span className={styles.label}>{state.label}</span>
       </div>
       {state.storageBlocked && !blockedDismissed && (
