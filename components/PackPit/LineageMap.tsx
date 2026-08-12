@@ -1633,7 +1633,7 @@ export default function LineageMap({
             // Label position knobs, fractions of R so they scale with the circle.
             // (In the tilted frame: labelX runs mostly left/right, labelY up/down.)
             const labelX = R * 0;                 // + moves the word RIGHT, - left
-            const labelY = R * 0.55;              // + moves the word DOWN, - up
+            const labelY = R * 0.566;             // + moves the word DOWN, - up
             // Fit-to-chord at the WORD's line (narrower than the top of the wedge),
             // so a long label never runs past the rim on the small phone card.
             const chord = 2 * Math.sqrt(Math.max(0, R * R - labelY * labelY));
