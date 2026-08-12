@@ -528,8 +528,7 @@
 
 /* ── Essay page shell ───────────────────────────────────────── */
 .essayPage {
-  min-height: 100vh;
-  padding-bottom: 0;
+  composes: page from "../../components/EssayShell/EssayShell.module.css";
 }
 
 .backLink {
@@ -586,14 +585,10 @@
   z-index: 0;
 }
 
-/* Hero content -- liquid, nav-matched padding */
+/* Hero content -- capped + centred on the shared axis (EssayShell), so the hero
+   headline shares the body's left edge at every width. */
 .essayHeroContent {
-  position: relative;
-  z-index: 2;
-  width: 100%;
-  padding: 24px clamp(18px,4vw,48px) 40px;
-  align-self: flex-end;
-  box-sizing: border-box;
+  composes: heroContent from "../../components/EssayShell/EssayShell.module.css";
 }
 
 /* Title first -- meta + back link below */
@@ -623,22 +618,12 @@
 
 /* ── Essay two-column layout -- liquid ──────────────────────── */
 .essayLayout {
-  width: 100%;
-  margin: 0 auto;
-  padding: 48px clamp(18px,4vw,48px);
-  display: grid;
-  grid-template-columns: 1fr minmax(380px, 28vw);
-  gap: 48px;
-  align-items: start;
-  box-sizing: border-box;
+  composes: layout from "../../components/EssayShell/EssayShell.module.css";
 }
 
 .sidebar {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  /* Not sticky: there is enough content down the right-hand column that it
-     does not need to follow the reader. */
+  composes: sidebar from "../../components/EssayShell/EssayShell.module.css";
+  /* Not sticky: enough content down the right column that it need not follow. */
 }
 
 .sidebarCard {
@@ -649,9 +634,7 @@
 }
 
 @media (max-width: 900px) {
-  .essayLayout {
-    grid-template-columns: 1fr;
-  }
+  /* single-column collapse now lives in the shared shell */
   .sidebar {
     position: static;
   }
@@ -680,47 +663,9 @@
   .essayBody p:first-child {
     font-size: 1.8125rem;
   }
-
-  /* Cap article text column to keep line lengths readable.
-     Sidebar scales via transform-origin top left so it expands
-     rightward into the margin, never leftward into the article. */
-  .essayLayout {
-    grid-template-columns: minmax(0, 860px) 380px;
-    gap: 80px;
-    max-width: 1600px;
-  }
-
-  .sidebar {
-    transform: scale(1.1);
-    transform-origin: top left;
-    overflow: visible;
-  }
-}
-
-@media (min-width: 1600px) {
-  .essayLayout {
-    grid-template-columns: minmax(0, 960px) 420px;
-    gap: 100px;
-    max-width: 1900px;
-  }
-
-  .sidebar {
-    transform: scale(1.15);
-    transform-origin: top left;
-  }
-}
-
-@media (min-width: 1900px) {
-  .essayLayout {
-    grid-template-columns: minmax(0, 1060px) 460px;
-    gap: 120px;
-    max-width: 2200px;
-  }
-
-  .sidebar {
-    transform: scale(1.2);
-    transform-origin: top left;
-  }
+  /* The layout ladder (max-width / grid / gap) and the old transform-scale
+     sidebar now live in the shared EssayShell axis. Only the type bumps stay
+     here (Dogs at Work adopts the same values in its own module). */
 }
 
 /* ── Pull quotes ────────────────────────────────────────────── */
