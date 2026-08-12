@@ -540,14 +540,15 @@ function isEcho(d: Node): boolean {
 // Rarity flash tiers, keyed to how many times the collected dog's name appears
 // among the CIRCLES that drop this level (nodes, echo-excluded). 1-2 is common
 // and stays SILENT: a flash on 83% of collects stops being a reward.
-type RarityTier = "uncommon" | "rare" | "root";
-function rarityTier(count: number): RarityTier | null {
-  if (count >= 7) return "root";
-  if (count >= 4) return "rare";
-  if (count >= 3) return "uncommon";
-  return null;
+// In-pit appearance rate → tier. Root dog appears MOST (foundation stock);
+// common LEAST. No silent tier now: every collected circle carries a band.
+type RarityTier = "common" | "uncommon" | "rare" | "root";
+function rarityTier(count: number): RarityTier {
+  if (count >= 7) return "root";   // 7+  ROOT DOG (orange)
+  if (count >= 4) return "rare";   // 4-6 RARE     (purple)
+  if (count >= 3) return "uncommon"; // 3 UNCOMMON (green)
+  return "common";                 // 1-2 COMMON   (yellow)
 }
-const RARITY_LABEL: Record<RarityTier, string> = { uncommon: "UNCOMMON", rare: "RARE", root: "ROOT DOG" };
 
 // Breed titles are fitted to the circle they belong to. The name is wrapped
 // across 1 to LABEL_MAX_LINES balanced lines and every option is measured; the
@@ -1252,31 +1253,16 @@ export default function BreedTree({
     return ns;
   }, [root, isMobile, aspectKey, dockAside, level]);
 
-  // Rarity flash: per-level count of each dog among the CIRCLES that drop (nodes,
-  // echo-excluded, root excluded, so it matches what a player sees), flashed ONCE
-  // per name per level at the complete moment. See rarityTier above.
+  // Rarity band: per-level count of each dog among the CIRCLES that drop (nodes,
+  // echo-excluded, root excluded, so it matches what a player sees). The band is
+  // painted across the bottom of the lifted circle by LineageMap and stays while
+  // the card is up, so there is no flash state, timer or per-name dedup here: the
+  // tier and count are just handed to the card for the lifted dog. See rarityTier.
   const rarityCounts = useMemo(() => {
     const m = new Map<string, number>();
     for (const n of nodes) { if (n.depth === 0 || isEcho(n)) continue; m.set(n.data.name, (m.get(n.data.name) ?? 0) + 1); }
     return m;
   }, [nodes]);
-  const rarityFlashedRef = useRef<Set<string>>(new Set());
-  const rarityIdRef = useRef(0);
-  const rarityFlashTimerRef = useRef<number | null>(null);
-  const [rarityFlash, setRarityFlash] = useState<{ id: number; tier: RarityTier; count: number; x: number; y: number } | null>(null);
-  useEffect(() => { rarityFlashedRef.current = new Set(); }, [nodes]); // reset per level
-  useEffect(() => () => { if (rarityFlashTimerRef.current) window.clearTimeout(rarityFlashTimerRef.current); }, []);
-  // x,y are the tap point (viewport px) so the flash rises off the collected circle.
-  const flashRarity = (name: string, x: number, y: number) => {
-    if (rarityFlashedRef.current.has(name)) return; // once per name per level
-    const count = rarityCounts.get(name) ?? 0;
-    const tier = rarityTier(count);
-    if (!tier) return; // 1-2 = common, silent
-    rarityFlashedRef.current.add(name);
-    if (rarityFlashTimerRef.current) window.clearTimeout(rarityFlashTimerRef.current);
-    setRarityFlash({ id: ++rarityIdRef.current, tier, count, x, y });
-    rarityFlashTimerRef.current = window.setTimeout(() => setRarityFlash(null), tier === "root" ? 1600 : 1100);
-  };
 
   // capture the stage aspect for the layout exactly once, on the first valid read.
   // "Valid" has to mean actually measured: aspect starts at 1, and freezing that
@@ -5739,11 +5725,6 @@ export default function BreedTree({
                             if (Math.hypot(ev.clientX - p0.x, ev.clientY - p0.y) >= 8) return;
                             mcReleaseRef.current?.(); // let go before the lift freezes the body
                             liftToLearn(el, liftNode);
-                            // Rarity flash: keyed to the circle YOU TAPPED (d), at
-                            // the tap point, as it lifts out. NOT liftNode (the
-                            // walk-up ancestor, which handed onRemove the wrong dog
-                            // and missed the lookup) and NOT the complete moment.
-                            flashRarity(d.data.name, ev.clientX, ev.clientY);
                           };
                           window.addEventListener("pointerup", tapUp);
                           window.addEventListener("pointercancel", tapUp);
@@ -6944,6 +6925,9 @@ export default function BreedTree({
           }
           circular
           ringColor={learnCard.ring}
+          // Rarity band across the lifted circle: tier from the lifted dog's
+          // in-pit appearance count. Every dog gets one (common is not silent).
+          rarityTier={rarityTier(rarityCounts.get(learnNode.data.name) ?? 1)}
           soloLeaf={!(learnNode.data.children && learnNode.data.children.length > 0)}
           rootRadius={learnCard.r}
           currentScore={0}
@@ -7004,14 +6988,6 @@ export default function BreedTree({
           }}
         />
       )}
-      {rarityFlash && (() => {
-        const cls = { uncommon: styles.rarityUncommon, rare: styles.rarityRare, root: styles.rarityRoot }[rarityFlash.tier];
-        return (
-          <div key={rarityFlash.id} className={`${styles.rarityFlash} ${cls}`} style={{ left: rarityFlash.x, top: rarityFlash.y }} aria-hidden="true">
-            {RARITY_LABEL[rarityFlash.tier]} <span className={styles.rarityCount}>×{rarityFlash.count}</span>
-          </div>
-        );
-      })()}
       <div
         ref={asideRef}
         className={`${styles.aside}${dockAside ? " " + styles.asideDocked : ""}`}

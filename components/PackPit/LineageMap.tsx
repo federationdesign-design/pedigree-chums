@@ -84,6 +84,15 @@ const WALL_PAD = 0;
 // half-size of the dog card at the centre of the fan
 const ROOT = 58;
 const INSTR_NAMES = new Set(["Deal the cards","Head outside","Spot real dogs","Match to your chum","Find more chums","Most chums wins"]);
+// Rarity band across the bottom of a lifted circle. bg is the band, fg the text.
+// White on the orange ROOT DOG band is a deliberate call (contrast is low, kept
+// on request). Navy carries the two light bands; white the two dark ones.
+const RARITY_BAND: Record<"common" | "uncommon" | "rare" | "root", { bg: string; fg: string; label: string }> = {
+  common:   { bg: "#fcee23", fg: "#0a3a57", label: "COMMON" },
+  uncommon: { bg: "#5dbf86", fg: "#0a3a57", label: "UNCOMMON" },
+  rare:     { bg: "#4d2e91", fg: "#ffffff", label: "RARE" },
+  root:     { bg: "#f47421", fg: "#ffffff", label: "ROOT DOG" },
+};
 // distance from the dog to its direct ancestors (mirrors the canvas hover-fan)
 const RING1 = ROOT + 96;
 // distance added at each deeper generation
@@ -238,6 +247,7 @@ export default function LineageMap({
   soloLeaf = false,
   rootRadius,
   ringColor,
+  rarityTier,
   strongBg = false,
 }: {
   breed: { name: string; image: string; x: number; y: number; angle: number };
@@ -254,6 +264,9 @@ export default function LineageMap({
   // the circle looks like the one just picked up. Without it the card keeps its
   // own yellow stroke over a blue fill, which reads as two thin rings.
   ringColor?: string;
+  // Mini pit only: the rarity tier of the lifted dog, drawn as a coloured band
+  // across the bottom of the circle. Set for every lifted dog (common included).
+  rarityTier?: "common" | "uncommon" | "rare" | "root";
   // The heavier wash. It used to ride on `circular`, which was fine while the
   // only caller wanting it also wanted round cards. The chum family tree wants
   // the main pit's rectangular card AND the mini pit's darker background, so the
@@ -1606,6 +1619,31 @@ export default function LineageMap({
             className={styles.rootCard}
             style={circular && ringColor ? { fill: ringColor, stroke: ringColor } : undefined} />
           {breed.image ? <image href={bust(breed.image)} x={-R} y={-R} width={R*2} height={R*2} clipPath={`url(#${clip})`} preserveAspectRatio="xMidYMid slice" /> : null}
+          {/* Rarity band: a coloured strip across the bottom of the circle, on the
+              artwork just above the Learn button. Clipped to the same circle, so
+              its ends taper into the rim; the label rides a shallow arc concentric
+              with the rim so it follows the curve. Stays as long as the card is up. */}
+          {rarityTier ? (() => {
+            const band = RARITY_BAND[rarityTier];
+            const bandTop = R * 0.5;              // chord where the strip begins
+            const TR = R * 0.82;                  // text baseline arc, concentric with the rim
+            const half = (62 * Math.PI) / 180;    // arc half-angle, generous so text never overflows
+            const ex = TR * Math.sin(half), ey = TR * Math.cos(half);
+            const arcId = `${clip}-rarity`;
+            // Fit-to-chord: shrink only if a label would run wider than the circle
+            // at the text line (bites for the longest labels on the smallest phone card).
+            const chord = 2 * Math.sqrt(Math.max(0, R * R - (R * 0.72) * (R * 0.72)));
+            const fs = Math.max(9, Math.min(R * 0.2, (chord * 0.92) / (0.6 * band.label.length)));
+            return (
+              <g clipPath={`url(#${clip})`} style={{ pointerEvents: "none" }}>
+                <rect x={-R} y={bandTop} width={R * 2} height={R - bandTop + 2} fill={band.bg} />
+                <path id={arcId} d={`M ${-ex} ${ey} A ${TR} ${TR} 0 0 0 ${ex} ${ey}`} fill="none" />
+                <text textAnchor="middle" style={{ fontFamily: '"Luckiest Guy", system-ui, sans-serif', fontSize: fs, fontWeight: 400, fill: band.fg }}>
+                  <textPath href={`#${arcId}`} startOffset="50%">{band.label}</textPath>
+                </text>
+              </g>
+            );
+          })() : null}
         </>)}
         {/* the root card carries no status dot; only the ancestor cards show one */}
       </g>
