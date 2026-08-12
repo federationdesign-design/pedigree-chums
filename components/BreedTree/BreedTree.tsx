@@ -1883,6 +1883,10 @@ export default function BreedTree({
      the same pattern killToyRef and spawnBadgeRef already use. */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const removeChumBodyRef = useRef<((mb: any) => void) | null>(null);
+  // Set inside the sim effect; called from the chum-collect handler so a rescue
+  // is evaluated the INSTANT a chum is taken, not up to one 400ms poll later.
+  // That immediacy is what lets a clear with half a second of "Oh no" left count.
+  const tryCancelRef = useRef<(() => void) | null>(null);
   // How long the green shows before the card leaves, so the state is readable.
   const CHUM_TAKE_MS = 140;
   // Cards taken out of the flood, by index, so the card can go the instant it
@@ -2022,12 +2026,15 @@ export default function BreedTree({
   const [fullAlpha, setFullAlpha] = useState(0);
   const runFallRef = useRef<(() => void) | null>(null);
   const fullTriggeredRef = useRef(false);
-  // Set when the countdown was started by a CHUM REACHING THE FLOOR rather than
-  // by the pit filling. The two need different endings: a full pit can be
-  // emptied, so that countdown is called off, but a chum has already landed and
-  // no amount of tidying undoes it. Without this flag the occupancy check would
-  // see room in the pit a frame later and cancel a countdown that should stand.
-  const floorTriggeredRef = useRef(false);
+  // FLOOR RESCUE, a DELIBERATE REVERSAL (Steve, 2026-08-12). This countdown used
+  // to be split in two by a `floorTriggeredRef`: a pit-full count could be called
+  // off by emptying the pit, but a floor-triggered one (a chum landed) was made
+  // permanent, on the reasoning that "a chum landing cannot be undone". That was
+  // reversed on purpose: collecting every chum off the floor now cancels the
+  // countdown like any other, and if the count already reached zero the "Oh no"
+  // is replaced by a "Phew!" beat (see cancelCountdown/playPhew). There is no
+  // floor/pit-full distinction any more and no `floorTriggeredRef`. Do NOT
+  // reintroduce it thinking the rescue is a regression: it is the intended design.
   // The pit-full countdown, ported from the main pit: huge sequential digits
   // 10 to 0 over the stage, a pause on 0, then GAME OVER hands to the shell.
   // The handles have to leave this function to be cancellable at all. Before,
@@ -2039,6 +2046,14 @@ export default function BreedTree({
   // The centre set of digits. Mobile only, and torn down everywhere the corner
   // set is, or a cancelled countdown would leave a number sitting on the pit.
   const cdMidElRef = useRef<HTMLDivElement | null>(null);
+  // Post-zero timers, split out of runCountdown so a RESCUE can stop them: the
+  // 1.2s hold on "0", the 1.4s "Oh no" before the hand-off, and the Phew beat's
+  // own two timers. cdPostZeroRef records that the count has reached zero, which
+  // is what makes a rescue play "Phew!" rather than just clearing the digits.
+  const cdHoldRef = useRef<number | null>(null);
+  const cdOverRef = useRef<number | null>(null);
+  const cdPhewRef = useRef<number[]>([]);
+  const cdPostZeroRef = useRef(false);
   const cdGraceRef = useRef(0);
   // Set the moment the round is handed back to the shell. The occupancy poll
   // in the sim effect deliberately outlives the physics loop, so without this
@@ -2056,24 +2071,89 @@ export default function BreedTree({
      start a fresh countdown UNDER the win screen and hand back GAME OVER ten
      seconds later.
 
-     Worse, a floor-triggered countdown sets `floorTriggeredRef`, which exists
-     to stop the pit emptying from calling it off. So once started it could not
-     be cancelled by anything. Hence this: one place that ends the round, takes
-     down whatever is on screen, and clears both flags. */
+     A floor-triggered countdown was once even harder to stop (see the reversal
+     note by the removed `floorTriggeredRef` above); that distinction is gone.
+     This is still the one place that ends the round, takes down whatever is on
+     screen, and clears the countdown state. */
+  // Clear every countdown timer: the ticking interval, the two post-zero timeouts
+  // (the "0" hold and the "Oh no" hand-off) and the Phew beat's two timers. Used
+  // by endPitRound, by cancelCountdown, and defensively at the top of runCountdown.
+  const clearCdTimers = () => {
+    if (cdTickRef.current !== null) { window.clearInterval(cdTickRef.current); cdTickRef.current = null; }
+    if (cdHoldRef.current !== null) { window.clearTimeout(cdHoldRef.current); cdHoldRef.current = null; }
+    if (cdOverRef.current !== null) { window.clearTimeout(cdOverRef.current); cdOverRef.current = null; }
+    for (const t of cdPhewRef.current) window.clearTimeout(t);
+    cdPhewRef.current = [];
+  };
   const endPitRound = () => {
     pitEndedRef.current = true;
-    if (cdTickRef.current !== null) { window.clearInterval(cdTickRef.current); cdTickRef.current = null; }
+    clearCdTimers();
     if (cdElRef.current) { cdElRef.current.remove(); cdElRef.current = null; }
     if (cdMidElRef.current) { cdMidElRef.current.remove(); cdMidElRef.current = null; }
+    cdPostZeroRef.current = false;
     setFullAlpha(0);
     fullTriggeredRef.current = false;
-    floorTriggeredRef.current = false;
+  };
+  // PHEW! A rescue that lands after the count already reached zero. The countdown
+  // element is reused so it reads as the SAME beat resolving, not a new screen:
+  // the word becomes "Phew!" and the danger wash recedes to nothing. "Oh no..."
+  // trails off because bad news arrives; relief is a release, so "Phew!" gets the
+  // exclamation and the wash lets go. The element is pointer-events none and play
+  // is already live the moment the flags reset, so this is a non-blocking flourish
+  // over a running pit. Its own two timers live in cdPhewRef so a fresh countdown
+  // (or teardown) can clear them.
+  const playPhew = (el: HTMLDivElement) => {
+    el.textContent = "Phew!";
+    // Centre and size it like "Oh no...", in case the rescue was caught during the
+    // "0" hold when the corner digits are still top-right on mobile.
+    el.style.alignItems = "center";
+    el.style.justifyContent = "center";
+    el.style.padding = "0";
+    el.style.textAlign = "center";
+    el.style.fontSize = "clamp(6.8rem, 24vw, 16rem)";
+    el.style.textShadow = "0 4px 40px rgba(0,0,0,0.6)";
+    el.style.lineHeight = "1";
+    el.style.transition = "background 0.35s ease";
+    el.style.background = "transparent"; // the danger wash recedes
+    const t1 = window.setTimeout(() => {
+      el.style.transition = "opacity 0.3s ease";
+      el.style.opacity = "0";
+    }, 900);
+    const t2 = window.setTimeout(() => {
+      el.remove();
+      if (cdElRef.current === el) cdElRef.current = null;
+    }, 1200);
+    cdPhewRef.current = [t1, t2];
+  };
+  // Call the countdown off: stop every timer, then either play the Phew beat (the
+  // count had reached zero) or just clear the digits (mid-count, silent, exactly
+  // as the pit-full cancel always did). Resets the trigger and opens the 2.5s
+  // grace so a chum already mid-air cannot restart it the instant a Phew lands.
+  const cancelCountdown = (now: number) => {
+    clearCdTimers();
+    const el = cdElRef.current;
+    if (cdMidElRef.current) { cdMidElRef.current.remove(); cdMidElRef.current = null; }
+    if (cdPostZeroRef.current && el) {
+      playPhew(el); // el lives on through the Phew, which owns its own removal
+    } else if (el) {
+      el.remove(); cdElRef.current = null;
+    }
+    cdPostZeroRef.current = false;
+    setFullAlpha(0);
+    fullTriggeredRef.current = false;
+    cdGraceRef.current = now + 2500;
   };
   const runCountdown = () => {
     // Guarded at the source, not at each caller. The floor collision starts a
     // countdown directly and never consulted the poll, so a guard on the poll
     // alone would have left that path open.
     if (pitEndedRef.current) return;
+    // Defensive: a fresh count always starts clean, tearing down any leftover
+    // digits or an in-flight Phew (the 2.5s grace normally prevents the overlap).
+    clearCdTimers();
+    if (cdElRef.current) { cdElRef.current.remove(); cdElRef.current = null; }
+    if (cdMidElRef.current) { cdMidElRef.current.remove(); cdMidElRef.current = null; }
+    cdPostZeroRef.current = false;
     const st = stageRef.current;
     if (!st) { pitEndedRef.current = true; onPitFull?.(); return; }
     const el = document.createElement("div");
@@ -2125,9 +2205,13 @@ export default function BreedTree({
       }
       window.clearInterval(tick);
       cdTickRef.current = null;
-      // hold on 0, then GAME OVER, then hand over
-      window.setTimeout(() => {
-        // Past the point of rescue: nought has landed, so stop listening.
+      // The count has reached zero: a rescue from here on plays "Phew!" rather
+      // than silently clearing the digits. Still fully rescuable until onPitFull.
+      cdPostZeroRef.current = true;
+      // hold on 0, then "Oh no", then hand over (all cancellable via the refs)
+      cdHoldRef.current = window.setTimeout(() => {
+        cdHoldRef.current = null;
+        // Torn down under us (rescued, or the round ended): stop.
         if (cdElRef.current !== el) return;
         // "Oh no..." rather than GAME OVER: the shell's own screen says that a
         // moment later, and saying it twice made the first one look like a bug.
@@ -2157,15 +2241,20 @@ export default function BreedTree({
         el.style.background =
           "radial-gradient(120% 120% at 50% 40%, rgba(15,65,165,0.31), rgba(8,34,100,0.43))";
         el.style.transition = "background 0.35s ease";
-        window.setTimeout(() => {
+        cdOverRef.current = window.setTimeout(() => {
+          cdOverRef.current = null;
           el.remove(); cdElRef.current = null;
           if (cdMidElRef.current) { cdMidElRef.current.remove(); cdMidElRef.current = null; }
+          cdPostZeroRef.current = false;
           pitEndedRef.current = true; onPitFull?.();
         }, 1400);
       }, 1200);
     }, 1000);
     cdTickRef.current = tick;
   };
+  // Kill any countdown timer if the component unmounts mid-count (e.g. the modal
+  // closes): without this the "Oh no" hand-off could fire onPitFull after teardown.
+  useEffect(() => () => clearCdTimers(), []);
   const shakeInnerRef = useRef<(() => void) | null>(null);
   const fellRef = useRef(false);
   const fallRafRef = useRef(0);
@@ -4291,13 +4380,15 @@ export default function BreedTree({
           // The floor bodies were already tagged kind "floor" and the chums
           // kind "chum", and this listener already existed, so this is the whole
           // change rather than the start of one.
-          if (!fullTriggeredRef.current) {
+          // The 2.5s grace (cdGraceRef) applies here too now: after a rescue, a
+          // chum already mid-air must not restart the count the instant a Phew
+          // lands, or the rescue feels meaningless.
+          if (!fullTriggeredRef.current && now > cdGraceRef.current) {
             const chumHitFloor =
               (pa.kind === "chum" && pb2.kind === "floor") ||
               (pb2.kind === "chum" && pa.kind === "floor");
             if (chumHitFloor) {
               fullTriggeredRef.current = true;
-              floorTriggeredRef.current = true;
               runCountdown();
             }
           }
@@ -4408,20 +4499,19 @@ export default function BreedTree({
       // was never re-tested, so the digits kept running. Both halves of the
       // test needed a caller that is not tied to motion. It now has two: the
       // loop, unchanged, and the poll below.
-      const checkFull = (now: number) => {
-        if (now - fullClock < 4000 || now <= cdGraceRef.current) return;
+      const anyChumOnFloor = () => chumBodiesRef.current.some((c) => c.onFloor);
+      // Occupancy: is the pit "full"? Split out of checkFull so the 400ms poll AND
+      // the immediate rescue check (tryCancelRef, fired the moment a chum is
+      // collected) read the exact same answer.
+      const computeFull = (): boolean => {
         const zoneY = v[1] + (-vbHf / 2 + 150 * uppW) / k;
-        // "Full" used to mean five settled bodies reaching the top zone, a
-        // count borrowed from the main pit, which always holds dozens of
-        // cards. Half the mini pit trees have two or three circles, so the pit
-        // could be visibly stuffed while the count sat at 2 and the round
-        // never ended: the top of the difficulty slider did nothing on those
-        // trees, because the game could not see it had run out of room.
-        //
-        // Occupancy is what full actually means. Take every settled body whose
-        // top reaches the zone, merge their horizontal spans so two circles
-        // side by side are not counted twice, and compare against the width
-        // between the pit walls. Tree size stops mattering.
+        // "Full" used to mean five settled bodies reaching the top zone, a count
+        // borrowed from the main pit, which always holds dozens of cards. Half the
+        // mini pit trees have two or three circles, so the pit could be visibly
+        // stuffed while the count sat at 2 and the round never ended. Occupancy is
+        // what full actually means: take every settled body whose top reaches the
+        // zone, merge their horizontal spans so two circles side by side are not
+        // counted twice, and compare against the width between the pit walls.
         const spans: [number, number][] = [];
         let inZone = 0;
         const occupy = (x: number, y: number, r: number, vx: number, vy: number, held?: boolean) => {
@@ -4430,14 +4520,11 @@ export default function BreedTree({
           if (y - r < zoneY) { inZone++; spans.push([x - r, x + r]); }
         };
         for (const b of all) occupy(b.x, b.y, b.r, b.vx, b.vy, b.held);
-        // The CHUM CARDS count too. They never did, because `all` is only the
-        // level's own dogs and their chips, and the chums live in their own
-        // list. On a two-circle level that left the test looking at four
-        // objects while the screen filled with seventeen chum cards, so a pit
-        // that was visibly stuffed never reached the threshold and the
-        // countdown never started. Their body is a square of side `dia`, so
-        // half of that is the radius the span wants. Their world radius is
-        // recovered from the drawn size the same way everything else here is.
+        // The CHUM CARDS count too: `all` is only the level's own dogs and chips,
+        // and the chums live in their own list, so without this a pit stuffed with
+        // chum cards never reached the threshold. Their body is a square of side
+        // `dia`; half of that is the radius the span wants, recovered from the
+        // drawn size the same way everything else here is.
         for (const c of chumBodiesRef.current) {
           const cr = ((c.mb?.bounds?.max?.x ?? 0) - (c.mb?.bounds?.min?.x ?? 0)) / 2 / pxPerWorld;
           if (cr > 0) occupy(c.x, c.y, cr, c.vx, c.vy, c.held);
@@ -4453,37 +4540,35 @@ export default function BreedTree({
           }
           covered += ce - cs;
         }
-        // the real distance between the walls, not the viewBox, which reaches
-        // well past the visible stage
+        // the real distance between the walls, not the viewBox, which reaches well
+        // past the visible stage
         const pitW = (xR - xL) || 1;
         const blocked = spans.length > 0 && covered / pitW >= PIT_FULL_COVER;
-        const full = blocked || inZone >= 5;
+        return blocked || inZone >= 5;
+      };
+      const checkFull = (now: number) => {
+        if (now - fullClock < 4000 || now <= cdGraceRef.current) return;
+        const full = computeFull();
         if (full && !fullTriggeredRef.current) {
           fullTriggeredRef.current = true;
           runCountdown();
-        } else if (!full && fullTriggeredRef.current && !floorTriggeredRef.current) {
-          // ROOM AGAIN, so the countdown is called off mid-count, exactly as
-          // the main pit does it: collect the dogs or throw the toys out and
-          // the digits go away.
-          //
-          // Written out here rather than as a helper on purpose. A plain
-          // function in the COMPONENT BODY that touches refs and setState
-          // reads as render work to the compiler. This is safe because it
-          // lives inside the sim effect, not the body, and is only ever
-          // reached from the loop or the poll, both of which are effects.
-          if (cdTickRef.current !== null) { window.clearInterval(cdTickRef.current); cdTickRef.current = null; }
-          if (cdElRef.current) { cdElRef.current.remove(); cdElRef.current = null; }
-          if (cdMidElRef.current) { cdMidElRef.current.remove(); cdMidElRef.current = null; }
-          setFullAlpha(0);
-          fullTriggeredRef.current = false;
-          // Paired with the flag above: this branch only runs for a pit-full
-          // countdown, but clearing both keeps the two in step if the cancel
-          // ever gets another caller.
-          floorTriggeredRef.current = false;
-          // The same 2.5s grace the main pit allows, so clearing one object
-          // cannot leave the digits flickering on and off at the threshold.
-          cdGraceRef.current = now + 2500;
+        } else if (!full && fullTriggeredRef.current && !anyChumOnFloor()) {
+          // ROOM AGAIN and no chum left on the floor, so the countdown is called
+          // off. The floor trigger used to be exempt from this (see the reversal
+          // note by the removed floorTriggeredRef); collecting the chums off the
+          // floor now cancels it too, with the Phew beat if the count hit zero.
+          cancelCountdown(now);
         }
+      };
+      // The rescue check, fired straight from the chum-collect handler so it lands
+      // the instant the last floor chum is taken, not up to one poll (400ms) later
+      // (that immediacy is what makes a clear with half a second of "Oh no" left
+      // count). Bypasses the settle-in/grace guard on purpose: fullTriggeredRef
+      // already gates it and a rescue should never be held back.
+      tryCancelRef.current = () => {
+        if (!fullTriggeredRef.current) return;
+        const now = performance.now();
+        if (!computeFull() && !anyChumOnFloor()) cancelCountdown(now);
       };
       const step = (nowRaf: number) => {
         const now = performance.now();
@@ -6002,7 +6087,14 @@ export default function BreedTree({
                     // Out of the physics world first, so nothing can knock a
                     // card that is already on its way to being collected.
                     const b = chumBodiesRef.current[i2];
+                    // CLEAR onFloor BEFORE removing the body. Removing it from the
+                    // world does NOT fire collisionEnd, so onFloor would stay true
+                    // and anyChumOnFloor() would never see the floor empty: the
+                    // rescue would never fire and the whole feature would look
+                    // broken. Clear it, drop the body, then re-test the countdown.
+                    if (b) { b.onFloor = false; b.floorLostAt = 0; }
                     if (b?.mb) { try { removeChumBodyRef.current?.(b.mb); } catch { /* already gone */ } }
+                    tryCancelRef.current?.();
                     // Off it goes to the corner. It leaves the list when it
                     // lands, not now, so the flight has something to draw.
                     chumFlyRef.current.set(i2, {
