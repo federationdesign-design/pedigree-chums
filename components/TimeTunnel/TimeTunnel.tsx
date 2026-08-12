@@ -50,6 +50,23 @@ const CARD_TRAVEL_EASE = 1.4; // >1 accelerates the card into the vanishing poin
 const CARD_FALLBACK_W = 160;
 const CARD_FALLBACK_H = 200;
 
+// Background transition: the tunnel starts flat navy and warms to the pit's own
+// start-screen gradient by the end of the run, so the reveal has no seam. That
+// gradient is the LineageModal overlay's: linear-gradient(to top right, #00e2ff,
+// #008eff). createLinearGradient(0,H, W,0) is exactly "to top right"; each stop is
+// lerped from navy to its target over the run.
+const PIT_A = "#00e2ff"; // gradient start, bottom-left (bright cyan)
+const PIT_B = "#008eff"; // gradient end, top-right (deeper azure)
+const hexToRgb = (h: string): [number, number, number] => {
+  const n = parseInt(h.slice(1), 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+};
+const NAVY_RGB = hexToRgb(BG);
+const PIT_A_RGB = hexToRgb(PIT_A);
+const PIT_B_RGB = hexToRgb(PIT_B);
+const mix = (a: [number, number, number], b: [number, number, number], t: number) =>
+  `rgb(${Math.round(a[0] + (b[0] - a[0]) * t)}, ${Math.round(a[1] + (b[1] - a[1]) * t)}, ${Math.round(a[2] + (b[2] - a[2]) * t)})`;
+
 function starPath(): Path2D {
   const p = new Path2D();
   const spikes = 5, outer = 1, inner = 0.45;
@@ -198,7 +215,11 @@ export default function TimeTunnel({ onDone, fromRect }: { onDone?: () => void; 
       for (const r of rings) { r.z -= SPEED; if (r.z <= 0) r.z += MAXZ; }
       for (const m of motes) { m.z -= MOTE_SPEED; m.age++; if (m.z <= MOTE_ZNEAR) seedMote(m, MOTE_ZFAR); }
       vx = cx + Math.sin((now / SWAY_PERIOD) * 2 * Math.PI) * SWAY_AMOUNT * W;
-      ctx.fillStyle = BG; ctx.fillRect(0, 0, W, H);
+      const bgP = Math.min(1, (now - start) / TUNNEL_MS); // 0 = navy, 1 = pit gradient
+      const bg = ctx.createLinearGradient(0, H, W, 0); // bottom-left to top-right = "to top right"
+      bg.addColorStop(0, mix(NAVY_RGB, PIT_A_RGB, bgP));
+      bg.addColorStop(1, mix(NAVY_RGB, PIT_B_RGB, bgP));
+      ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
       drawRings();
       drawMotes();
       drawCard(now, start);
