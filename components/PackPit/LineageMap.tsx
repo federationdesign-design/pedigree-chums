@@ -301,13 +301,19 @@ export default function LineageMap({
      390px phone at the default difficulty and overflowed it at 116% by the top
      of the slider.
 
-     Now a share of the viewport instead. 0.31 was the owner's figure, measured
-     as the DIAMETER including the ring, and it reads right on desktop (446px at
-     1440). But one number cannot serve a phone: at 0.31 a 390px screen gave a
-     121px card, too small for the Learn button to sit on. So the share now
-     RAMPS with viewport width, 0.45 at 390 easing to 0.31 by 1440 and holding
-     0.31 above. Desktop is unchanged (still 446); the phone card grows to 176.
-     A smooth interpolation, not a breakpoint.
+     Now a share of the viewport instead, measured as the DIAMETER including the
+     ring. One number cannot serve a phone: at the desktop share a 390px screen
+     gave a 121px card, too small for the Learn button to sit on, so the share
+     RAMPS with viewport width, easing from the phone value at 390 to the desktop
+     value by 1440 and holding it above. A smooth interpolation, not a breakpoint.
+
+     DESKTOP REDUCED 0.31 -> 0.21 (2026-08-12). The desktop lift read about a
+     third too big: on desktop every dog clamps to this cap, so the cap IS the
+     size, and 0.21 brings 1440 from 446px to 302px. The PHONE END IS DELIBERATELY
+     HELD at 0.45 (176px at 390): on a phone the share cap sits BELOW the 250px
+     readability floor, so the cap is the binding size and there is no floor to
+     catch a smaller card. That is why the ramp is 0.21 + 0.24*(...) rather than
+     one scaled number: the +0.24 keeps 390 at 0.45 while the base drops to 0.21.
 
      A 250px-wide floor now sits UNDER the min(rootRadius) cap, so tapping a
      small circle still lifts a usable card rather than a tiny one. The floor is
@@ -316,7 +322,7 @@ export default function LineageMap({
      share, so a phone lifts a small card up to its 176 maximum and no further,
      never past the viewport share. The old 40px floor is gone: it never bound
      once across the 1326-lift audit. */
-  const LIFT_MAX_SHARE = 0.31 + 0.14 * (1 - Math.min(1, Math.max(0, (vp.w - 390) / 1050)));
+  const LIFT_MAX_SHARE = 0.21 + 0.24 * (1 - Math.min(1, Math.max(0, (vp.w - 390) / 1050)));
   /* The ring is a share of the radius now, so it cannot be subtracted before the
      radius is known. Solved the other way instead: the object is 2R wide plus
      one ring, and the ring is R * frac, so the whole thing is R * (2 + frac).
