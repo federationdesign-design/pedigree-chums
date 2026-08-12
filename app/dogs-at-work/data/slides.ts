@@ -35,15 +35,9 @@ import { validateSlides } from "./validate";
 // below. The hero image (/search_rescue_dogs.jpg) and the article route were
 // already real. No placeholders remain on this slide.
 
-// Article 6 (guide dogs): blue panel 6 and the index card dek were supplied by
-// Steve (11 Aug 2026) and are inlined below. Two placeholders remain. The hero
-// alt is still outstanding. The hero image is now a neutral "image coming soon"
-// stand-in (/hero-coming-soon.svg) in place of the earlier path that 404ed, so
-// the deck and article page no longer show a broken image; the plan to move
-// article3_hero.jpg here still waits on the hero-chain decision (article 2 would
-// be left short), which is Steve's. Swap both when the real hero lands.
-const PLACEHOLDER_ARTICLE_6_ALT = "PLACEHOLDER: alt text for the guide dogs hero, outstanding from Steve.";
-const PLACEHOLDER_ARTICLE_6_HERO = "/hero-coming-soon.svg";
+// Article 6 (guide dogs): blue panel 6, the index card dek, the hero image
+// (/guide_dog_image.jpg) and the hero alt were all supplied by Steve (11 to 12
+// Aug 2026) and are inlined below. No placeholders remain on this slide.
 
 // Articles 1 and 2, reused by slides 7 and 8 (see the panel-split note above).
 // Declared once and referenced twice so the reuse is literal, not a re-typed copy
@@ -208,9 +202,8 @@ Some spend their lives bored and under-stimulated, while others are pushed into 
     id: "guide-dogs",
     order: 6,
     // Live (Steve, 11 Aug): blue panel 6 and the card dek are supplied and inlined.
-    // Two placeholders remain: the hero alt (outstanding) and the hero image, now a
-    // neutral "image coming soon" stand-in rather than a 404, until the hero chain
-    // is resolved (moving article3_hero.jpg here would leave article 2 short).
+    // The hero image is supplied too (Steve, 12 Aug). One placeholder remains: the
+    // hero alt, outstanding until Steve sends it.
     published: "live",
     panel: {
       // This panel is the only one that uses a bullet list, so the component
@@ -254,10 +247,9 @@ Some spend their lives bored and under-stimulated, while others are pushed into 
       subLabel: "Guide dogs",
       headline: "The Dog That Gives You Your World Back",
       dek: `A guide dog does not give somebody their sight back. It gives them the confidence to go, and that turns out to be almost as valuable.`,
-      // Hero is a neutral stand-in until Steve resolves the hero chain (see the
-      // note by PLACEHOLDER_ARTICLE_6_HERO); no longer a 404.
-      image: PLACEHOLDER_ARTICLE_6_HERO,
-      imageAlt: PLACEHOLDER_ARTICLE_6_ALT,
+      // Hero and alt supplied by Steve (12 Aug 2026).
+      image: "/guide_dog_image.jpg",
+      imageAlt: "a man with a white cane sitting on a park bench beside a black Labrador in a yellow guide-dog harness",
       ctaLabel: "Guide dogs",
       href: "/dogs-at-work/the-dog-that-gives-you-your-world-back",
     },

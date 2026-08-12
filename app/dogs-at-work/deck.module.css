@@ -496,8 +496,8 @@
   letter-spacing: 0.01em;
   text-transform: uppercase;
   color: var(--cream);
-  /* Item 3: 75px above the article panel headline (shared rule). */
-  padding-top: 75px;
+  /* Item 3: 25px above the article panel headline (shared rule). */
+  padding-top: 25px;
   margin: 0 0 12px;
 }
 

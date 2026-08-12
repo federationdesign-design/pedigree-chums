@@ -153,10 +153,9 @@
   font-size: 1.625rem;
   font-weight: 700;
   line-height: 1.3;
-  /* Intro width: 60% read too narrow beside the widened 1150px body, so it now
-     matches the body at 100% of the .essay block (Steve, 12 Aug; was 60%, itself
-     once the shared 720px cap). */
-  max-width: 100%;
+  /* Intro width: pulled back to 90% of the .essay block (Steve, 12 Aug; was 100%
+     matching the body, 60% before that, and once the shared 720px cap). */
+  max-width: 90%;
 }
 
 .subhead {
@@ -555,14 +554,51 @@
   .essayLayout {
     display: none;
   }
+
+  /* Mobile payslip-over-hero treatment (Steve, 12 Aug 2026), the single-column
+     equivalent of the desktop overlay. Baselines computed before changing
+     anything, so nothing doubles up:
+       - hero min-height was clamp(408px, 60vh, 672px);
+       - hero margin-bottom is 48px (the only spacing between hero and the mobile
+         column: the "top spacing" the payslip must clear);
+       - the mobile payslip sat 0px over the hero (its top was hero-bottom + that
+         48px), margin-top 0, margin-bottom 24px.
+     Geometry is all relative to the hero's bottom edge, so it holds at any
+     viewport height:  overlap = |payslip margin-top| - 48;
+                       title clearance = hero-content padding-bottom - overlap. */
+
+  /* 1. Hero twice as tall: every term of the base clamp doubled. */
+  .essayHero {
+    min-height: clamp(816px, 120vh, 1344px);
+  }
+
+  /* Lift the bottom-aligned title, pills and back link off the very bottom so the
+     overlaid payslip below has a clear band to sit in (the mobile stand-in for the
+     desktop 60%-width title cap). 190 - 140 overlap = 50px nominal clearance,
+     comfortably past the tilted card's raised corner. */
+  .essayHeroContent {
+    padding-bottom: 190px;
+  }
+
   .articleMobile {
-    display: block;
+    /* flow-root establishes a block formatting context so the payslip's negative
+       margin-top lifts the card (and pulls the body up in flow with it) instead of
+       collapsing through and dragging the whole column over the hero. */
+    display: flow-root;
     max-width: 1300px;
     margin: 0 auto;
     padding: 0 24px;
     /* Clip the tilted payslip's rotated corners/shadow so they cannot create a
        horizontal scrollbar at full width. */
     overflow-x: clip;
+  }
+
+  /* 2. Push the payslip up so it overlays the hero's bottom: -188 - 48 = 140px over
+     the hero. 3. The card is in normal flow, so lifting it pulls the body up the
+     same 140px in one move (no separate body margin that would double the shift);
+     the 24px card-to-body gap below is unchanged. */
+  .mobilePayslip {
+    margin-top: -188px;
   }
 }
 
