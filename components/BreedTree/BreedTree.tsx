@@ -3970,7 +3970,16 @@ export default function BreedTree({
         const pitD1 = nodes.filter((n) => n.depth === 1);
         const pitPer = pitD1.length ? pitD1.reduce((a, n) => a + (n.r * kD) / pctRadius(shareOf(n)), 0) / pitD1.length : 0;
         const chipBadge = BADGE_FRAC * pitPer * pctRadius(pctVal);
-        const rDraw = opts?.label ? (opts?.r ?? 0) : chipBadge < chipFloor ? 0 : chipBadge;
+        // A green completion circle carries its own on-layer node radius as opts.r
+        // (client px, the size it wore on the learn layer). Convert it to the pit's
+        // viewBox units the SAME way the pills do (* fxScale) so it lands at that
+        // node radius, not the pit-dog chip scale, and always shows: a placed card
+        // is never dropped below the legibility floor. Yellow % chips keep the
+        // pit-dog scale (chipBadge); the solo-dog label branch is left untouched.
+        const rDraw = opts?.green && opts?.r != null
+          ? opts.r * fxScale
+          : opts?.label ? (opts?.r ?? 0)
+          : chipBadge < chipFloor ? 0 : chipBadge;
         // A solo dog circle arrives through this same call carrying a label,
         // and that one is never a bomb: it is a whole breed, not a chip.
         const isBomb = !opts?.label && rollBomb();
@@ -6822,11 +6831,12 @@ export default function BreedTree({
             for (const c of data.circles ?? []) {
               /* THE SIZE AND THE COLOUR IT HAD ON SCREEN.
 
-                 The radius comes through as `c.r`, the size the node had on the
-                 learn layer a moment earlier. It is passed as opts.r so the chip
-                 is sized BADGE_FRAC of that radius, matching how big it just
-                 looked, rather than being recomputed from scratch and landing in
-                 the pit at some unrelated size. */
+                 c.r is the radius the node had on the learn layer a moment earlier,
+                 in client px. For a GREEN placed card it rides through as opts.r and
+                 spawnBadge lands the chip at that node radius (converted to pit
+                 units), so a collected card drops at the size it just looked, not the
+                 pit-dog chip scale. A non-green (unplaced) circle carries no green
+                 flag and stays on the pit-dog scale. */
               spawnBadgeRef.current?.(c.x, c.y, c.r, Math.round(c.share), { r: c.r, green: c.green });
             }
             for (const rd of data.rods ?? []) {
