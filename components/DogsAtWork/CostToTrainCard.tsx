@@ -9,7 +9,7 @@ import styles from "../../app/dogs-at-work/dogs-at-work.module.css";
 // the same legacy .sidebarCard the inline cards use, so it sits beside its
 // neighbours without a seam.
 const cardTitle: React.CSSProperties = { fontFamily: "var(--font-display)", fontSize: "36px", letterSpacing: "0", color: "var(--emphasis)", lineHeight: 0.9, textTransform: "uppercase", margin: "0 0 6px" };
-const cardBody: React.CSSProperties = { fontFamily: "var(--font-body)", fontSize: "0.92rem", fontWeight: 500, color: "#fff", lineHeight: 1.5, margin: 0 };
+const cardBody: React.CSSProperties = { fontFamily: "var(--font-body)", fontSize: "1.087rem", fontWeight: 500, color: "#fff", lineHeight: 1.5, margin: 0 };
 
 export default function CostToTrainCard() {
   return (
@@ -32,7 +32,7 @@ export default function CostToTrainCard() {
           </div>
         ))}
       </div>
-      <div style={{ padding: "8px 40px 32px" }}>
+      <div style={{ padding: "8px 40px 52px" }}>
         <p style={{ ...cardBody, fontSize: "0.78rem", color: "#aac4d4" }}>These dogs are given free to the people who need them, funded almost entirely by public donations. Sources: Guide Dogs; Medical Detection Dogs.</p>
       </div>
     </div>
