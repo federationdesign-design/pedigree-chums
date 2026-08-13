@@ -29,7 +29,7 @@ export default function HoundPage() {
       <Nav showLogo />
       <main className={styles.essayPage}>
         <div className={styles.essayHero}>
-          <img src="/hound-of-the-baskervilles.jpg" alt="The Hound of the Baskervilles" className={styles.essayHeroImg} />
+          <img src="/hound-of-the-baskervilles.jpg" alt="A Victorian-style engraving of a large brindle hound standing over the body of a fallen man on a muddy track, a country house and bare trees behind." className={styles.essayHeroImg} />
           <div className={styles.essayHeroTint} />
           <div className={styles.essayHeroContent}>
             <h1 className={styles.essayHeroTitle}>

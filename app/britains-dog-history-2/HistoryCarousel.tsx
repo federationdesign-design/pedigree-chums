@@ -120,7 +120,7 @@ export default function HistoryCarousel() {
               half and white display type was unreadable on it. */}
           <div className={styles.slide} data-pc-panel="0">
             <div className={styles.introSlide}>
-              <div className={styles.introImg} aria-hidden="true" />
+              <div className={styles.introImg} role="img" aria-label="A black-and-white photograph of a large shepherd-type dog and a smaller sheltie nuzzling together in woodland." />
               <div className={styles.introTint} aria-hidden="true" />
               <div className={styles.introBody}>
                 <h1 className={styles.introTitle}>

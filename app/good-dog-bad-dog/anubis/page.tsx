@@ -187,7 +187,7 @@ export default function AnubisPage() {
       <main className={styles.essayPage}>
         <div className={styles.essayHero}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/history/Anubis-hero.jpg" alt="Anubis — The Scavenger Made Into a God" className={styles.essayHeroImg} />
+          <img src="/history/Anubis-hero.jpg" alt="An ancient Egyptian tomb painting of the jackal-headed god Anubis leaning over a mummy on a lion-shaped bier, canopic jars beneath and hieroglyphs to either side." className={styles.essayHeroImg} />
           <div className={styles.essayHeroTint} />
           <div className={styles.essayHeroContent}>
             <h1 className={styles.essayHeroTitle}>
