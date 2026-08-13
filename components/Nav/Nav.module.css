@@ -41,6 +41,16 @@
   height: auto;
 }
 
+/* The accessibility toolbar rides on the same axis as the menu button (task 8).
+   The wrapper is pointer-events: none like the bar; the toolbar and burger
+   re-enable their own. */
+.headerRight {
+  display: inline-flex;
+  align-items: center;
+  gap: clamp(10px, 2vw, 20px);
+  pointer-events: none;
+}
+
 /* Hamburger, always visible, on both mobile and desktop. The yellow pill is
    legible over the hero and over the page content, so no header fill is needed. */
 .burger {
