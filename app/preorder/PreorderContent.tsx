@@ -32,6 +32,38 @@ export default function PreorderContent() {
       <div className={styles.stage}>
         <div className={styles.col}>
           <PreorderCheckout />
+          {/* Intro copy sits directly below the card, inside the same
+              (absolutely-positioned) column, so it tracks the card's bottom edge
+              and is independent of the in-flow FAQ column. */}
+          <div className={styles.intro}>
+            <h2 className={styles.introTitle}>
+              Pedigree <span>Chums</span>
+            </h2>
+            <p className={styles.introDesc}>
+              The on-the-go <span className={styles.hi}>dog spotting game</span> for
+              curious minds and dog lovers.{" "}
+              <span className={`${styles.white} ${styles.underline}`}>54 illustrated
+              breed cards</span> packed with traits, stats, and tell-tale features.{" "}
+              <span className={styles.hi}>Spot a dog. </span>
+              <span className={styles.white}>Make a friend, </span>
+              <span className={`${styles.yellow} ${styles.underline}`}>you have a new
+              chum.</span>
+            </p>
+            <div className={styles.meta}>
+              <div className={styles.metaItem}>
+                <span className={styles.metaLabel}>Players</span>
+                <span className={styles.metaValue}>2+</span>
+              </div>
+              <div className={styles.metaItem}>
+                <span className={styles.metaLabel}>Age</span>
+                <span className={styles.metaValue}>7+</span>
+              </div>
+              <div className={styles.metaItem}>
+                <span className={styles.metaLabel}>Where</span>
+                <span className={styles.metaValue}>Anywhere</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
