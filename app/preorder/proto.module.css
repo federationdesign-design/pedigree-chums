@@ -239,3 +239,26 @@
   pointer-events: none;
   white-space: pre;
 }
+
+/* ── Mobile, below 721px ──
+   The page stacks. The checkout card comes first (order: -1), above the hero,
+   and the desktop overlap lift is cancelled (the inline margin-top / min-height
+   are overridden with !important). The hero text is hidden. The two column
+   block is already one column here (see the 860px rule above), FAQ then intro
+   from source order. The chum slider is untouched. */
+@media (max-width: 720px) {
+  .wrap {
+    display: flex;
+    flex-direction: column;
+  }
+  .stage {
+    order: -1;
+    margin-top: 0 !important;
+    min-height: 0 !important;
+    justify-content: center;
+    padding-top: clamp(16px, 5vw, 28px);
+  }
+  .heroContent {
+    display: none;
+  }
+}
