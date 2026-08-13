@@ -5,6 +5,7 @@ import {
   EmbeddedCheckoutProvider,
   EmbeddedCheckout,
 } from "@stripe/react-stripe-js";
+import Image from "next/image";
 import styles from "./preorderCheckout.module.css";
 
 // The publishable key is safe to expose (it is the public half of the Stripe
@@ -47,6 +48,17 @@ export default function PreorderCheckout() {
 
   return (
     <div className={styles.checkout}>
+      {/* Brand logo above the iframe. The JPG's background is pure white
+          (#ffffff), the same as the container, so it merges with no visible box.
+          Drawn at 240px (prototype default). */}
+      <Image
+        className={styles.checkoutLogo}
+        src="/PC-logo-black.jpg"
+        alt="Pedigree Chums™"
+        width={240}
+        height={156}
+        priority
+      />
       <EmbeddedCheckoutProvider
         stripe={stripePromise}
         options={{ fetchClientSecret }}
