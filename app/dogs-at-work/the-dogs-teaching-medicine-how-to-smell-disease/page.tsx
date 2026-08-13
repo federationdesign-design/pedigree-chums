@@ -52,7 +52,7 @@ const BODY: (string | { h: string; id: string })[] = [
 ];
 
 const cardTitle: React.CSSProperties = { fontFamily: "var(--font-display)", fontSize: "36px", letterSpacing: "0", color: "var(--emphasis)", lineHeight: 0.9, textTransform: "uppercase", margin: "0 0 6px" };
-const cardBody: React.CSSProperties = { fontFamily: "var(--font-body)", fontSize: "0.92rem", fontWeight: 500, color: "#fff", lineHeight: 1.5, margin: 0 };
+const cardBody: React.CSSProperties = { fontFamily: "var(--font-body)", fontSize: "1.087rem", fontWeight: 500, color: "#fff", lineHeight: 1.5, margin: 0 };
 const statLabel: React.CSSProperties = { fontFamily: "var(--font-body)", fontSize: "0.66rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--yellow)", marginBottom: 4 };
 const statValue: React.CSSProperties = { fontFamily: "var(--font-display)", fontSize: "2rem", color: "#fff", lineHeight: 1 };
 
@@ -65,7 +65,7 @@ const CARDS: ArticleCard[] = [
     pairWith: "no-diagnose",
     node: (
       <div className={styles.sidebarCard}>
-        <div style={{ padding: "32px 40px 24px" }}>
+        <div style={{ padding: "32px 40px 52px" }}>
           <p style={cardTitle}>The honest version</p>
           <p style={cardBody}>Dogs have shown in published studies that they can detect disease odours — including bladder cancer and Parkinson&apos;s — but they are <strong>not</strong> a routine NHS diagnostic service. Think &quot;research&quot; and &quot;scent signatures&quot;, not &quot;your dog can diagnose your cancer&quot;. Their bigger role may be helping humans discover what disease smells like, so future machines can detect it.</p>
         </div>
@@ -93,7 +93,7 @@ const CARDS: ArticleCard[] = [
             </div>
           ))}
         </div>
-        <div style={{ padding: "24px 40px 32px" }}>
+        <div style={{ padding: "24px 40px 52px" }}>
           <p style={cardBody}><strong>Dogs:</strong> Bumper (Golden Retriever) &amp; Peanut (Black Labrador). <strong>Method:</strong> double-blind, skin swabs. <strong>Partners:</strong> Medical Detection Dogs, University of Bristol &amp; University of Manchester (published 15 July 2025).</p>
         </div>
       </div>
@@ -104,7 +104,7 @@ const CARDS: ArticleCard[] = [
     pairWith: "game-show",
     node: (
       <div className={styles.sidebarCard}>
-        <div style={{ padding: "32px 40px 24px" }}>
+        <div style={{ padding: "32px 40px 52px" }}>
           <p style={cardTitle}>How a scent line-up works</p>
           <p style={cardBody}>A carousel of sample pots. One target hidden among controls. The dog sniffs each for a second or two and freezes at the one that smells different. Do it blind, repeatedly, with fresh samples — and a &quot;that one&quot; becomes data.</p>
         </div>
@@ -123,7 +123,7 @@ const CARDS: ArticleCard[] = [
     pairWith: "is-a-job",
     node: (
       <div className={styles.sidebarCard}>
-        <div style={{ padding: "32px 40px 24px" }}>
+        <div style={{ padding: "32px 40px 52px" }}>
           <p style={cardTitle}>What the dog thinks it&apos;s doing</p>
           <p style={{ ...cardBody, marginBottom: 8 }}><strong>What humans think:</strong> a trained detection dog is screening samples for disease biomarkers.</p>
           <p style={cardBody}><strong>What the dog thinks:</strong> sniff pots, sit near the weird one, receive biscuit, be brilliant.</p>
@@ -136,9 +136,9 @@ const CARDS: ArticleCard[] = [
     pairWith: "tail",
     node: (
       <div className={styles.sidebarCard}>
-        <div style={{ padding: "32px 40px 32px" }}>
+        <div style={{ padding: "32px 40px 52px" }}>
           <p style={cardTitle}>Sources</p>
-          <p style={{ ...cardBody, fontSize: "0.82rem" }}>
+          <p style={{ ...cardBody, fontSize: "0.987rem" }}>
             Parkinson&apos;s study &mdash; University of Bristol (2025).<br />
             Cancer detection &amp; NHS trials &mdash; Medical Detection Dogs.<br />
             Bladder-cancer proof of principle &mdash; <em>BMJ</em>, September 2004.

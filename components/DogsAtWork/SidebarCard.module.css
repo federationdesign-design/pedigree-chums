@@ -16,8 +16,10 @@
 }
 
 .pad {
-  /* Internal padding doubled 16/20 -> 32/40 (Steve, 12 Aug), all four sides. */
-  padding: 32px 40px;
+  /* Internal padding doubled 16/20 -> 32/40 (Steve, 12 Aug), all four sides.
+     Bottom then +20 -> 52 (Steve, 13 Aug) for extra breathing room under the
+     text. */
+  padding: 32px 40px 52px;
 }
 
 .title {
@@ -34,7 +36,7 @@
 
 .subtitle {
   font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: 0.92rem;
+  font-size: 1.087rem;
   font-weight: 600;
   color: #ffffff;
   line-height: 1.5;
@@ -43,7 +45,7 @@
 
 .text {
   font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: 0.92rem;
+  font-size: 1.087rem;
   font-weight: 500;
   color: #ffffff;
   line-height: 1.5;
@@ -65,7 +67,7 @@
 }
 
 .small {
-  font-size: 0.82rem;
+  font-size: 0.987rem;
 }
 
 /* "Built for the job": the statistics/figures module, presented as named
@@ -105,7 +107,7 @@
 
 .attrDetail {
   font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: 0.9rem;
+  font-size: 1.067rem;
   font-weight: 500;
   color: #ffffff;
   line-height: 1.45;
@@ -115,7 +117,7 @@
 /* Sources module: a small block of newline-separated attributions. */
 .sources {
   font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: 0.82rem;
+  font-size: 0.987rem;
   font-weight: 500;
   color: #ffffff;
   line-height: 1.6;
