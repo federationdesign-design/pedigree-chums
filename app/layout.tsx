@@ -8,6 +8,10 @@ import HiddenGamesCounter from "../components/HiddenGamesCounter/HiddenGamesCoun
 import HiddenGamesToast from "../components/HiddenGamesToast/HiddenGamesToast";
 import PickAChumLauncher from "./pick-a-chum/ui/PickAChumLauncher";
 import "./globals.css";
+// Task 6: the one scheme-override file. Global by necessity (it targets hashed
+// module classes across components). All rules are scoped under
+// :root[data-pc-contrast-scheme], so it is inert in the default view.
+import "./contrast-schemes.css";
 
 const display = Luckiest_Guy({
   subsets: ["latin"],
