@@ -5,9 +5,14 @@ import CookieBanner from "../components/CookieBanner/CookieBanner";
 import Analytics from "../components/Analytics/Analytics";
 import OfferLauncher from "../components/Offer/OfferLauncher";
 import HiddenGamesCounter from "../components/HiddenGamesCounter/HiddenGamesCounter";
+import HideImages from "../components/HideImages/HideImages";
 import HiddenGamesToast from "../components/HiddenGamesToast/HiddenGamesToast";
 import PickAChumLauncher from "./pick-a-chum/ui/PickAChumLauncher";
 import "./globals.css";
+// Task 6: the one scheme-override file. Global by necessity (it targets hashed
+// module classes across components). All rules are scoped under
+// :root[data-pc-contrast-scheme], so it is inert in the default view.
+import "./contrast-schemes.css";
 
 const display = Luckiest_Guy({
   subsets: ["latin"],
@@ -115,6 +120,24 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${display.variable} ${body.variable} ${pct.variable} ${stackNotch.variable} ${score.variable} ${arrowFont.variable} ${unica.variable}`}>
       <body>
+        {/* Before first paint: mirror the stored contrast scheme onto <html> so
+            a returning scheme user never sees a flash of the default view (brief
+            v5, task 5). Built with string concatenation, NOT a template literal:
+            backticks inside an inline script have broken this build before. Keep
+            the key, attribute name and values in sync with lib/contrastScheme.ts. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "(function(){try{" +
+              "var v=window.localStorage.getItem('pc-contrast-scheme');" +
+              "if(v==='black-on-white'||v==='white-on-black'){" +
+              "document.documentElement.setAttribute('data-pc-contrast-scheme',v);" +
+              "}" +
+              "if(window.localStorage.getItem('pc-hide-images')==='1'){" +
+              "document.documentElement.setAttribute('data-pc-hide-images','');" +
+              "}}catch(e){}})();",
+          }}
+        />
         {/* Task 164: the SITE layer. The page content is wrapped so the Boxer's DO NOT PRESS THAT BUTTON
             effects (a brightness filter, a nav fade) can act on the whole site WITHOUT touching the chat:
             the Pick a Chum overlay is a SIBLING of #pc-site below, at a higher stacking level, so it stays
@@ -122,6 +145,8 @@ export default function RootLayout({
             is why the chat must sit outside this wrapper (brief section 7.1). The body gradient and paw
             pattern live on <body>, outside #pc-site, so they stay bright under "lights out" (dim, not black). */}
         <div id="pc-site">{children}</div>
+        {/* Task 7: draws the alt-text blocks when data-pc-hide-images is set. */}
+        <HideImages />
         <PickAChumLauncher />
         <OfferLauncher />
         {/* Hidden Games Stage 1 counter. Owner-approved layout mount, 28 Jul

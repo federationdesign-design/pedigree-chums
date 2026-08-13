@@ -29,7 +29,7 @@ export default function LassiePage() {
       <Nav showLogo />
       <main className={styles.essayPage}>
         <div className={styles.essayHero}>
-          <img src="/lassie-img.jpg" alt="Lassie" className={styles.essayHeroImg} />
+          <img src="/lassie-img.jpg" alt="Film poster for Lassie: the head of a rough collie against a bright sky, with the title 'Lassie' and the line 'Best Friends Are Forever'." className={styles.essayHeroImg} />
           <div className={styles.essayHeroTint} />
           <div className={styles.essayHeroContent}>
             <h1 className={styles.essayHeroTitle}>

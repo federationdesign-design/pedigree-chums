@@ -19,6 +19,7 @@ const ESSAYS = [
     title: "Argos: The Dog Who Knew His Master",
     summary: "Before Lassie, before Greyfriars Bobby, there was Argos. Homer's dog from The Odyssey waited twenty years for his master to return.",
     image: "/history/Argos-hero.jpg",
+    imageAlt: "An old brindle mastiff-type dog lying in the dirt of a ruined stone courtyard, head raised and watching, an ancient clay jug beside it.",
   },
   {
     slug: "bulls-eye",
@@ -28,6 +29,7 @@ const ESSAYS = [
     title: "Bull's-eye: The Dog as the Owner's Shadow",
     summary: "Bull's-eye belongs to Bill Sikes, one of Dickens's most violent characters. He is not simply a bad dog -- he is a dog made to carry a bad man's reputation.",
     image: "/bulls-eye-img.jpg",
+    imageAlt: "A white-and-brindle bull terrier standing on wet cobblestones in a gaslit Victorian street at night, shadowy top-hatted figures and a watching boy behind.",
   },
   {
     slug: "anubis",
@@ -37,6 +39,7 @@ const ESSAYS = [
     title: "Anubis: The Scavenger Made Into a God",
     summary: "The Egyptians made a dog the god of death -- and it turns out almost everyone did. From a jackal digging up desert graves to a Suffolk hellhound, an essay on the dog we keep posting at the door of the dark, and why we thanked it by turning its name into an insult.",
     image: "/history/Anubis-hero.jpg",
+    imageAlt: "An ancient Egyptian tomb painting of the jackal-headed god Anubis leaning over a mummy on a lion-shaped bier, canopic jars beneath and hieroglyphs to either side.",
   },
   {
     slug: "gelert",
@@ -46,6 +49,7 @@ const ESSAYS = [
     title: "Gelert: The Dog Who Couldn't Explain Himself",
     summary: "Llywelyn the Great returns from the hunt to find his hound covered in blood and the cradle empty. A legend about what happens when a powerful dog cannot defend itself against the story told about it.",
     image: "/gelert-painting.jpg",
+    imageAlt: "A painting of a large wolfhound standing over an unharmed swaddled baby on the floor, the body of a dead wolf nearby, in a dim wood-panelled room.",
   },
   {
     slug: "hound-of-the-baskervilles",
@@ -55,6 +59,7 @@ const ESSAYS = [
     title: "The Hound of the Baskervilles: How a Dog Was Made into a Monster",
     summary: "The hound is eventually revealed to be a real animal -- kept, coated in phosphorus and deliberately released by a human murderer. The dog supplies the teeth. The human supplies the motive.",
     image: "/hound-of-the-baskervilles.jpg",
+    imageAlt: "A Victorian-style engraving of a large brindle hound standing over the body of a fallen man on a muddy track, a country house and bare trees behind.",
   },
   {
     slug: "lassie",
@@ -64,6 +69,7 @@ const ESSAYS = [
     title: "Lassie: The Burden of Being the Perfect Dog",
     summary: "Lassie never makes a mistake. She is not a dog. She is a heroic design. And that is where the real breed pays the price.",
     image: "/lassie-img.jpg",
+    imageAlt: "Film poster for Lassie: the head of a rough collie against a bright sky, with the title 'Lassie' and the line 'Best Friends Are Forever'.",
   },
   {
     slug: "greyfriars-bobby",
@@ -73,6 +79,7 @@ const ESSAYS = [
     title: "Greyfriars Bobby: Loyalty, Legend and the Making of a National Dog",
     summary: "A small terrier lived near Greyfriars Kirkyard for fourteen years after his master's death. An essay on what happens when a real dog is gradually transformed into the perfect good dog.",
     image: "/greyfryers-bobby.jpg",
+    imageAlt: "A shaggy grey terrier in a red tartan neckerchief pressing its nose to the bronze Greyfriars Bobby statue, whose muzzle is worn gold from visitors' touches.",
   },
 ];
 
@@ -157,7 +164,7 @@ export default function GoodDogBadDogPage() {
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={essay.image}
-                    alt={essay.title}
+                    alt={essay.imageAlt}
                     style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
                   />
                   <div className={styles.mobileSlideCount}>{i + 1} / {ESSAYS.length}</div>

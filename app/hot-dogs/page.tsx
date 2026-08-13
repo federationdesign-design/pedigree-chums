@@ -16,7 +16,7 @@ export default function HotDogs() {
 
         {/* ── Hero ─────────────────────────────────────────────────── */}
         <section className={styles.hero}>
-          <div className={styles.heroImg} aria-hidden="true" />
+          <div className={styles.heroImg} role="img" aria-label="A dachshund in pink sunglasses lounging in a pink inflatable ring in a swimming pool." />
           <div className={styles.heroTint} aria-hidden="true" />
           <div className={styles.heroInner}>
             <h1 className={styles.heroTitle}>
@@ -52,7 +52,7 @@ export default function HotDogs() {
           <div className={styles.noteInner}>
             <div className={styles.noteRow}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/eatinghotdog.png" alt="" className={styles.noteImg} />
+              <img src="/eatinghotdog.png" alt="A cartoon of a long-haired dachshund curled into a ring and biting its own tail, its body drawn as a mustard-and-ketchup hot dog." className={styles.noteImg} />
               <div className={styles.noteText}>
                 <p className={styles.noteTitle}>Disclaimer</p>
                 <h2 className={styles.noteTitleMain}>A note about hot dogs</h2>
@@ -89,19 +89,19 @@ export default function HotDogs() {
             <div className={styles.safetyCards}>
               <div className={styles.safetyCard}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/a-dog-never-died-from-missing-a-walk.jpg" alt="" data-pc-dead className={styles.safetyCardImg} />
+                <img src="/a-dog-never-died-from-missing-a-walk.jpg" alt="A pug in a red harness panting hard with its tongue out on dry, sun-baked ground." data-pc-dead className={styles.safetyCardImg} />
                 <h3>A dog never died from missing a walk.</h3>
                 <p>Dogs do die from being too hot.</p>
               </div>
               <div className={styles.safetyCard}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/a-car-is-not-a-kennel.jpg" alt="" data-pc-dead className={styles.safetyCardImg} />
+                <img src="/a-car-is-not-a-kennel.jpg" alt="A large St Bernard looking out through the partly-open window of a dark parked car." data-pc-dead className={styles.safetyCardImg} />
                 <h3>A car is not a kennel.</h3>
                 <p>It is an oven with cup holders.</p>
               </div>
               <div className={styles.safetyCard}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/if-the-pavement-is-too-hot-for-your-hand.jpg" alt="" data-pc-dead className={styles.safetyCardImg} />
+                <img src="/if-the-pavement-is-too-hot-for-your-hand.jpg" alt="An egg frying on hot pavement." data-pc-dead className={styles.safetyCardImg} />
                 <h3>If the pavement is too hot for your hand,</h3>
                 <p>it is too hot for paws.</p>
               </div>
@@ -177,7 +177,7 @@ export default function HotDogs() {
         <section id="cooking" className={styles.cookingSection}>
           <div className={styles.cookingInner}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/the-edible-kind.jpg" alt="" data-pc-dead style={{width:"100%",borderRadius:"16px",display:"block",marginBottom:"clamp(20px, 3vw, 36px)"}} />
+            <img src="/the-edible-kind.jpg" alt="Three grilled sausages on a dark plate beside a bowl of mustard and a sprig of rosemary." data-pc-dead style={{width:"100%",borderRadius:"16px",display:"block",marginBottom:"clamp(20px, 3vw, 36px)"}} />
             <p className={styles.sectionEyebrow}>The edible kind</p>
             <h2 className={styles.sectionTitle}>How do I cook hot dogs?</h2>
             <p className={styles.lead}>Carefully. And preferably without involving a dachshund.</p>

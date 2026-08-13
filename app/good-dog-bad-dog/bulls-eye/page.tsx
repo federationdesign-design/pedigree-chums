@@ -40,7 +40,7 @@ export default function BullsEyePage() {
       <Nav showLogo />
       <main className={styles.essayPage}>
         <div className={styles.essayHero}>
-          <img src="/bulls-eye-img.jpg" alt="Bull's-eye" className={styles.essayHeroImg} />
+          <img src="/bulls-eye-img.jpg" alt="A white-and-brindle bull terrier standing on wet cobblestones in a gaslit Victorian street at night, shadowy top-hatted figures and a watching boy behind." className={styles.essayHeroImg} />
           <div className={styles.essayHeroTint} />
           <div className={styles.essayHeroContent}>
             <h1 className={styles.essayHeroTitle}>

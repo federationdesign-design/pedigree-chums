@@ -29,7 +29,7 @@ export default function GelertPage() {
       <Nav showLogo />
       <main className={styles.essayPage}>
         <div className={styles.essayHero}>
-          <img src="/gelert-painting.jpg" alt="Gelert" className={styles.essayHeroImg} />
+          <img src="/gelert-painting.jpg" alt="A painting of a large wolfhound standing over an unharmed swaddled baby on the floor, the body of a dead wolf nearby, in a dim wood-panelled room." className={styles.essayHeroImg} />
           <div className={styles.essayHeroTint} />
           <div className={styles.essayHeroContent}>
             <h1 className={styles.essayHeroTitle}>

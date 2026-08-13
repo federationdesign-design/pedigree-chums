@@ -29,7 +29,7 @@ export default function GreyfriarsBobbyPage() {
       <Nav showLogo />
       <main className={styles.essayPage}>
         <div className={styles.essayHero}>
-          <img src="/greyfryers-bobby.jpg" alt="Greyfriars Bobby" className={styles.essayHeroImg} />
+          <img src="/greyfryers-bobby.jpg" alt="A shaggy grey terrier in a red tartan neckerchief pressing its nose to the bronze Greyfriars Bobby statue, whose muzzle is worn gold from visitors' touches." className={styles.essayHeroImg} />
           <div className={styles.essayHeroTint} />
           <div className={styles.essayHeroContent}>
             <h1 className={styles.essayHeroTitle}>

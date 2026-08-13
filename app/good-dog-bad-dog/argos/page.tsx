@@ -451,7 +451,7 @@ export default function ArgosPage() {
 
         {/* ── Hero ── */}
         <div className={`${styles.essayHero} ${styles.heroScene}`}>
-          <img src="/history/Argos-hero.jpg" alt="Argos — The Dog Who Knew His Master" className={styles.essayHeroImg} />
+          <img src="/history/Argos-hero.jpg" alt="An old brindle mastiff-type dog lying in the dirt of a ruined stone courtyard, head raised and watching, an ancient clay jug beside it." className={styles.essayHeroImg} />
           <div className={styles.essayHeroTint} />
           <div className={styles.essayHeroContent}>
             <h1 className={styles.essayHeroTitle}>
@@ -556,22 +556,22 @@ export default function ArgosPage() {
                   slides={[
                     {
                       src: "/history/nolans-king-odyssus.webp",
-                      alt: "Nolan's Odysseus",
+                      alt: "Left, a still of a bearded, armoured Odysseus on a rocky shore from Christopher Nolan's film; right, a muted classical engraving of the gaunt dog Argos lying on flagstones before the returning Odysseus.",
                       caption: "Odysseus probably has PTSD, as his core ideology of family, loyalty and legacy has been destroyed",
                     },
                     {
                       src: "/history/nolans-king-odyssus-painting-remake.jpg",
-                      alt: "Odysseus painting remake",
+                      alt: "A painting of a gaunt reddish-brown dog lying on a sunlit stone terrace above the sea, a barefoot man in a dark tunic standing over it and looking down.",
                       caption: "When he fails to get the acknowledgment he needed, and with his colossal old age, he dies",
                     },
                     {
                       src: "/history/odyssusand-argos-painting-remake.jpg",
-                      alt: "Odysseus and Argos painting remake",
+                      alt: "A painting of a robed, bearded man standing barefoot on rocky ground beside a shaggy grey hound sitting and looking up at him, a low stone wall behind.",
                       caption: "A tale as old as time; a dog's love for their human. The original story, remade and remade",
                     },
                     {
                       src: "/history/odysseus-dog-argos-in-death.webp",
-                      alt: "The death of Argos",
+                      alt: "A neoclassical line illustration on a black ground: a robed man leaning on a staff, hand raised to his face, looking down at the dog Argos lying dead at his feet.",
                       caption: "Argos maybe did not die of a broken heart, but he may have been holding on to life for his master",
                     },
                   ]}
@@ -621,7 +621,7 @@ export default function ArgosPage() {
                   pinned={
                     <figure style={{ margin: 0 }}>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src="/history/jurrisicbark-shialebuff.jpg" alt="Jurassic Bark" loading="lazy" />
+                      <img src="/history/jurrisicbark-shialebuff.jpg" alt="A two-panel internet meme: above, the waiting dog Seymour from Futurama's 'Jurassic Bark' episode; below, the tearful Shia LaBeouf reaction shot." loading="lazy" />
                       <figcaption className={styles.choreoCaption}>Jurassic Bark: every good show or story will use this as a trope, some more successfully than others</figcaption>
                     </figure>
                   }
@@ -671,8 +671,8 @@ export default function ArgosPage() {
               <div className={styles.desktopOnly}>
                 <StatueBulletsChoreo
                   slides={[
-                    { src: "/history/odyssusand-argos-statue-2.jpg", alt: "Odysseus and Argos statue", caption: "Nolan is not the only one to think about reimagining the scene with a happier feel." },
-                    { src: "/history/odyssusand-argos-statue-1.jpg", alt: "Odysseus and Argos statue, second view", caption: "Many other artists over the years have indulged the public. Odysseus and Argos: the reunion in stone." },
+                    { src: "/history/odyssusand-argos-statue-2.jpg", alt: "A white marble statue of a seated, bearded Odysseus resting his hand on the head of the dog Argos, who sits at his side and looks up at him.", caption: "Nolan is not the only one to think about reimagining the scene with a happier feel." },
+                    { src: "/history/odyssusand-argos-statue-1.jpg", alt: "A bronze statue of a bearded, muscular Odysseus bending to reach toward the dog Argos, who sits gazing up at him.", caption: "Many other artists over the years have indulged the public. Odysseus and Argos: the reunion in stone." },
                   ]}
                 />
                 <blockquote className={styles.pullquote}><span className={styles.pullquoteMark}>“</span>Both versions can be true. But they tell us different things about dogs, and about ourselves.</blockquote>
@@ -681,8 +681,8 @@ export default function ArgosPage() {
               <div className={styles.sceneMobile}>
                 <StatueBulletsChoreo
                   slides={[
-                    { src: "/history/odyssusand-argos-statue-2.jpg", alt: "Odysseus and Argos statue", caption: "Nolan is not the only one to think about reimagining the scene with a happier feel." },
-                    { src: "/history/odyssusand-argos-statue-1.jpg", alt: "Odysseus and Argos statue, second view", caption: "Many other artists over the years have indulged the public. Odysseus and Argos: the reunion in stone." },
+                    { src: "/history/odyssusand-argos-statue-2.jpg", alt: "A white marble statue of a seated, bearded Odysseus resting his hand on the head of the dog Argos, who sits at his side and looks up at him.", caption: "Nolan is not the only one to think about reimagining the scene with a happier feel." },
+                    { src: "/history/odyssusand-argos-statue-1.jpg", alt: "A bronze statue of a bearded, muscular Odysseus bending to reach toward the dog Argos, who sits gazing up at him.", caption: "Many other artists over the years have indulged the public. Odysseus and Argos: the reunion in stone." },
                   ]}
                   quote="Both versions can be true. But they tell us different things about dogs, and about ourselves."
                   blockClass={styles.pullquote}
@@ -864,7 +864,7 @@ export default function ArgosPage() {
                   hold={1}
                   captionMode="stack"
                   sceneVh={320}
-                  alt="Argos in the world of scent"
+                  alt="An illustration of a curly-haired woman in an orange jumper kneeling to stroke a brown-and-white spaniel in a warm, sunlit kitchen, a full food bowl and dog bed nearby."
                   images={[
                     "/smell/smell-scene-a.jpg",
                     "/smell/smell-scene-b.jpg",
@@ -924,7 +924,7 @@ export default function ArgosPage() {
                     { src: "/home/home-doormat.jpg", alt: "Muddy paw prints on a doormat", caption: "Every family with a dog keeps an honest record of its walks, printed on the doormat in mud." },
                     { src: "/home/home-kitchen.jpg", alt: "A dog waiting in a kitchen doorway while a family cooks", caption: "There is no room in the house a dog would rather be than the one where the family is cooking." },
                     { src: "/home/home-sofa.jpg", alt: "A girl reading on the sofa with a puppy beside her", caption: "A dog will sit through an entire chapter without once asking how the story ends." },
-                    { src: "/dogsinthehome.jpg", alt: "Dogs in the home", caption: "To the grown-ups it is a hallway; to the dog and the children it has always been a racetrack." },
+                    { src: "/dogsinthehome.jpg", alt: "An illustration of a small brown-and-white spaniel puppy trotting down a wooden hallway between the legs of two running children.", caption: "To the grown-ups it is a hallway; to the dog and the children it has always been a racetrack." },
                   ]}
                 />
                 <blockquote className={styles.pullquote}><span className={styles.pullquoteMark}>“</span>Argos is not just a dog at the house. In a way, Argos is the house.</blockquote>
@@ -937,7 +937,7 @@ export default function ArgosPage() {
                     { src: "/home/home-doormat.jpg", alt: "Muddy paw prints on a doormat", caption: "Every family with a dog keeps an honest record of its walks, printed on the doormat in mud." },
                     { src: "/home/home-kitchen.jpg", alt: "A dog waiting in a kitchen doorway while a family cooks", caption: "There is no room in the house a dog would rather be than the one where the family is cooking." },
                     { src: "/home/home-sofa.jpg", alt: "A girl reading on the sofa with a puppy beside her", caption: "A dog will sit through an entire chapter without once asking how the story ends." },
-                    { src: "/dogsinthehome.jpg", alt: "Dogs in the home", caption: "To the grown-ups it is a hallway; to the dog and the children it has always been a racetrack." },
+                    { src: "/dogsinthehome.jpg", alt: "An illustration of a small brown-and-white spaniel puppy trotting down a wooden hallway between the legs of two running children.", caption: "To the grown-ups it is a hallway; to the dog and the children it has always been a racetrack." },
                   ]}
                   quote="Argos is not just a dog at the house. In a way, Argos is the house."
                   blockClass={styles.pullquote}

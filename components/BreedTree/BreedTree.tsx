@@ -1063,6 +1063,7 @@ function TemperamentBody({ pros, cons }: { pros: string[]; cons: string[] }) {
 export default function BreedTree({
   root,
   rootImage,
+  rootLabel,
   onActiveChange,
   onClose,
   centred = false,
@@ -1109,6 +1110,10 @@ export default function BreedTree({
 }: {
   root: LineageNode;
   rootImage?: string;
+  // Display-mode only: the breed page passes the breed name so the root node,
+  // otherwise an unlabelled SVG shape, carries an accessible name via <title>.
+  // The game never passes it, so the game render is unchanged.
+  rootLabel?: string;
   onActiveChange?: (active: boolean) => void;
   onClose?: () => void;
   centred?: boolean;
@@ -5730,7 +5735,9 @@ export default function BreedTree({
                           window.addEventListener("pointercancel", tapUp);
                         }
                   }
-                />
+                >
+                  {i === 0 && rootLabel ? <title>{rootLabel}</title> : null}
+                </circle>
               );
               const isChild = d.parent === focus;
               // Every circle inside the focused one, however deep, not just the

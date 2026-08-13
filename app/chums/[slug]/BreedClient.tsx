@@ -328,7 +328,7 @@ const [zOrders, setZOrders] = useState({ infoBox: 112, ancestry: 113, lifespanCh
             const stage = el.querySelector("[class*=stage]") as HTMLElement | null;
             if (stage) stage.style.zIndex = "1";
           }}>
-          <BreedTree root={lineage} rootImage={image} centred size={760} hideLabels disableZoom />
+          <BreedTree root={lineage} rootImage={image} rootLabel={name} centred size={760} hideLabels disableZoom />
         </div>
       )}
 

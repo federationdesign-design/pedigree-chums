@@ -86,7 +86,7 @@ export default function SmarterThanTheTestPage() {
       <Nav showLogo />
       <main className={styles.essayPage}>
         <div className={styles.essayHero}>
-          <img src="/inteligent-dogs.jpg" alt="Animal intelligence" className={styles.essayHeroImg} />
+          <img src="/inteligent-dogs.jpg" alt="A curly brown dog wearing round green spectacles sitting at a desk behind a laptop, with houseplants and a guitar in the room behind." className={styles.essayHeroImg} />
           <div className={styles.essayHeroTint} />
           <div className={styles.essayHeroContent}>
             <Link href="/home" className={styles.backLink}>← Back to home</Link>
