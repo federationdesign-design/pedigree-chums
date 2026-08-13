@@ -6,6 +6,7 @@ import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { Montserrat } from "next/font/google";
 import BentoBoard from "./BentoBoard";
+import PcContrastToolbar from "../PcContrastToolbar/PcContrastToolbar";
 import styles from "./Nav.module.css";
 
 // Montserrat 900 loaded explicitly -- the global --font-body only ships 400-800,
@@ -195,11 +196,14 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
         </Link>
       )}
       {!open && !dockBottomLeft && (
-        <button type="button" className={styles.burger} onClick={() => setOpen(true)} aria-label="Open menu">
-          <span />
-          <span />
-          <span />
-        </button>
+        <div className={styles.headerRight}>
+          <PcContrastToolbar />
+          <button type="button" className={styles.burger} onClick={() => setOpen(true)} aria-label="Open menu">
+            <span />
+            <span />
+            <span />
+          </button>
+        </div>
       )}
 
       {open && createPortal(

@@ -1,0 +1,80 @@
+/* Task 8 toolbar, styled to match the hamburger (.burger in Nav.module.css).
+   Values read from there, not approximated:
+     fill        var(--yellow)
+     edge        outline: 5px solid var(--navy)   (absolute, not scaled)
+     weight      box-shadow: 0 4px 0 rgba(10,58,87,0.3)
+     radius      0.3 of the element size  (burger is 30px@100px and 20.25px@67.5px,
+                 both = 0.3; a literal 30px on a 44px cell would render circular,
+                 so the ratio is what keeps the burger's rounded-square look)
+
+   Both container boxes and the crossed-photo / refresh cells take the full
+   treatment. The three A cells take the edge and radius but keep their own fills,
+   because the fill is what tells the user which scheme each applies. Cells are
+   44px, 36px on phones (decision 6); glyph ~45% of cell height. */
+
+.toolbar {
+  display: inline-flex;
+  align-items: center;
+  gap: clamp(10px, 2vw, 20px);
+  pointer-events: auto; /* the header bar is pointer-events: none */
+}
+
+.box {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px;
+  background: var(--yellow);
+  outline: 5px solid var(--navy);
+  border: none;
+  border-radius: 18px; /* 0.3 of the ~60px box height */
+  box-shadow: 0 4px 0 rgba(10, 58, 87, 0.3);
+}
+
+.cell {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--yellow);
+  color: var(--navy);
+  outline: 5px solid var(--navy);
+  border: none;
+  border-radius: 13px; /* 0.3 of the 44px cell */
+  box-shadow: 0 4px 0 rgba(10, 58, 87, 0.3);
+  cursor: pointer;
+}
+
+.cell span {
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 20px;
+  line-height: 1;
+}
+.cell svg { width: 20px; height: 20px; display: block; }
+
+/* The three A cells keep their own fills (the exception). */
+.aDefault { background: #ffffff; color: var(--navy); }
+.aBlackOnWhite { background: #ffffff; color: #000000; }
+.aWhiteOnBlack { background: #000000; color: #ffffff; }
+
+/* Active scheme / pressed hide-images: an inset ring in both tones so it reads
+   on a white cell and a black cell. Not colour alone: ring shape + aria-pressed. */
+.cell[aria-pressed="true"] {
+  box-shadow: 0 4px 0 rgba(10, 58, 87, 0.3), inset 0 0 0 2px #0a3a57, inset 0 0 0 4px #ffffff;
+}
+
+.cell:focus-visible {
+  outline: 5px solid var(--navy);
+  box-shadow: 0 4px 0 rgba(10, 58, 87, 0.3), 0 0 0 3px #ffffff, 0 0 0 7px var(--navy);
+}
+
+@media (max-width: 720px) {
+  .toolbar { gap: 8px; }
+  .box { padding: 6px; gap: 5px; border-radius: 14px; } /* 0.3 of the ~48px box */
+  .cell { width: 36px; height: 36px; border-radius: 11px; } /* 0.3 of 36px */
+  .cell span { font-size: 16px; }
+  .cell svg { width: 16px; height: 16px; }
+}
