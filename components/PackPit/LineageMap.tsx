@@ -93,6 +93,10 @@ const RARITY_BAND: Record<"common" | "uncommon" | "rare" | "root", { bg: string;
   rare:     { bg: "#4d2e91", fg: "#ffffff", label: "RARE" },
   root:     { bg: "#f47421", fg: "#ffffff", label: "ROOT DOG" },
 };
+// How long the rarity ring takes to draw itself on around the lifted circle. The
+// lift's own fade is 0.2s; this is deliberately a touch longer so the sweep reads
+// as a trace, not a flash, and nowhere near a loading bar. Dial it here.
+const RARITY_DRAW = "0.5s";
 // distance from the dog to its direct ancestors (mirrors the canvas hover-fan)
 const RING1 = ROOT + 96;
 // distance added at each deeper generation
@@ -1621,6 +1625,30 @@ export default function LineageMap({
             className={styles.rootCard}
             style={circular && ringColor ? { fill: ringColor, stroke: ringColor } : undefined} />
           {breed.image ? <image href={bust(breed.image)} x={-R} y={-R} width={R*2} height={R*2} clipPath={`url(#${clip})`} preserveAspectRatio="xMidYMid slice" /> : null}
+          {/* Rarity ring: a tier-coloured stroke laid OVER the existing ring rect,
+              on the same band (radius R + rootRingW/2, width rootRingW so it covers
+              it exactly). It draws itself on with pathLength 1 and dashoffset 1->0,
+              rotated to start at twelve o'clock, so you see the original ring being
+              overtaken by the rarity colour as the card lifts. Keyed on the dog so
+              a fresh circle (and a fresh draw) mounts on every lift, including a
+              straight card-to-card switch; the layer already unmounts on close.
+              Reduced motion shows it complete, see .rarityRing. */}
+          {rarityTier ? (
+            <circle
+              key={breed.name}
+              cx={0}
+              cy={0}
+              r={R + rootRingW / 2}
+              fill="none"
+              stroke={RARITY_BAND[rarityTier].bg}
+              strokeWidth={rootRingW}
+              strokeLinecap="round"
+              pathLength={1}
+              transform="rotate(-90)"
+              className={styles.rarityRing}
+              style={{ ["--rarity-draw" as string]: RARITY_DRAW }}
+            />
+          ) : null}
           {/* Rarity band: a coloured strip across the bottom of the circle, on the
               artwork just above the Learn button. Clipped to the same circle so it
               never spills past the rim, but its top edge is a straight DIAGONAL

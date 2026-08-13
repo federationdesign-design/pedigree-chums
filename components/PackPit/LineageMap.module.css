@@ -146,6 +146,24 @@
   stroke: var(--yellow);
   stroke-width: 4;
 }
+/* The rarity ring, laid over .rootCard's ring band, draws itself on as the card
+   lifts: pathLength 1 with stroke-dashoffset animating 1 -> 0. Duration is dialled
+   by --rarity-draw, set inline from RARITY_DRAW in LineageMap.tsx. The base state
+   is the COMPLETE ring (dashoffset 0), so reduced motion, which skips the
+   animation below, shows it whole rather than blank. Added 13 August 2026. */
+.rarityRing {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .rarityRing {
+    animation: lm-ring-draw var(--rarity-draw, 0.5s) ease-out both;
+  }
+}
+@keyframes lm-ring-draw {
+  from { stroke-dashoffset: 1; }
+  to { stroke-dashoffset: 0; }
+}
 .pickCard {
   fill: none;
   stroke: var(--blue-deep);
