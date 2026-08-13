@@ -135,6 +135,14 @@
   /* margin-top alone sets the gap; top padding is 0 so the FAQ column's top
      lands exactly 50px below the hero, not 50px + padding. */
   margin-top: 50px;
+  /* Reserve the checkout stage's tallest state so the slider always sits below
+     it and nothing overlaps at any card height. The stage is absolute at
+     top:440px; at the max card (~1308px) plus the intro beneath it (~300px) its
+     bottom reaches ~2050px down the page. The FAQ starts at HERO_H + 50px, so
+     this floor pushes the twoCol bottom (and the slider after it) to ~2090px
+     regardless of how tall the card is. Reset on mobile, where the stage is in
+     normal flow (see the 720px rule). */
+  min-height: calc(2040px - clamp(460px, 80vh, 1000px));
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: clamp(28px, 4vw, 56px);
@@ -258,8 +266,10 @@
     background: rgba(10, 58, 87, 0.72);
     padding: clamp(18px, 5vw, 26px) clamp(18px, 5vw, 26px) clamp(20px, 6vw, 30px);
   }
-  /* No 50px hero offset needed once the column is stacked below the hero. */
+  /* No 50px hero offset, and no reserved height, once the column is stacked
+     below the hero (the stage is in normal flow here, so it can't overlap). */
   .twoCol {
     margin-top: 0;
+    min-height: 0;
   }
 }
