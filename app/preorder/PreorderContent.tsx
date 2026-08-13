@@ -1,18 +1,18 @@
 import PreorderCheckout from "./PreorderCheckout";
-import ProtoFaqLadder from "./ProtoFaqLadder";
+import FaqLadder from "./FaqLadder";
 import CardRail from "../../components/CardRail/CardRail";
-import styles from "./proto.module.css";
+import styles from "./preorderContent.module.css";
 
 /*
  * /preorder layout. Hero up top, Stripe checkout card overlapping the hero from
  * the right, then the FAQ ladder, then the chum card slider.
  *
  * The checkout stage is positioned absolutely with a fixed top of 440px (set in
- * proto.module.css): its top edge sits 440px down the page, overlapping the
- * hero. It is out of flow, so it does not push the sections below. The FAQ block
- * is anchored 50px below the hero's bottom, independent of the checkout height.
+ * preorderContent.module.css): its top edge sits 440px down the page, overlapping
+ * the hero. It is out of flow, so it does not push the sections below. The FAQ
+ * block is anchored 50px below the hero's bottom, independent of the checkout.
  */
-export default function PreorderPrototype() {
+export default function PreorderContent() {
   return (
     <main className={styles.wrap}>
       <section className={styles.hero}>
@@ -42,7 +42,7 @@ export default function PreorderPrototype() {
           <h2 className={styles.faqHeading}>
             Frequently Asked <span>Questions</span>
           </h2>
-          <ProtoFaqLadder />
+          <FaqLadder />
         </div>
       </section>
 

@@ -1,14 +1,13 @@
 "use client";
 import { useState } from "react";
-import styles from "./proto.module.css";
+import styles from "./preorderContent.module.css";
 
 /*
- * THROWAWAY prototype piece (preorder branch only). A single-column copy of the
- * FAQ ladder from components/FAQ. The shared FAQ hard-codes a two-column grid
- * with its own section heading, so it cannot render as one column inside the
- * right-hand column here; per the brief this is an inline copy, not an extract.
- * The FAQS content is copied verbatim from components/FAQ (editorial copy, em
- * dashes and curly quotes left as published).
+ * Single-column FAQ ladder for /preorder. The shared components/FAQ hard-codes a
+ * two-column grid with its own section heading, so it cannot render as one column
+ * here; this is an inline copy, not an extract (kept as duplicated content for
+ * now). The FAQS content is copied verbatim from components/FAQ (editorial copy,
+ * em dashes and curly quotes left as published).
  */
 
 type QA = { q: string; a: React.ReactNode };
@@ -65,7 +64,7 @@ const FAQS: QA[] = [
   },
 ];
 
-export default function ProtoFaqLadder() {
+export default function FaqLadder() {
   const [open, setOpen] = useState<number[]>([]);
   const toggle = (i: number) =>
     setOpen((prev) => (prev.includes(i) ? prev.filter((n) => n !== i) : [...prev, i]));

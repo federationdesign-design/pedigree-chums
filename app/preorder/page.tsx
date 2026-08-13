@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Footer from "../../components/Footer/Footer";
-import PreorderPrototype from "./PreorderPrototype";
+import PreorderContent from "./PreorderContent";
 
 export const metadata: Metadata = {
   title: "Pre-order",
@@ -8,14 +8,13 @@ export const metadata: Metadata = {
     "Pre-order Pedigree Chums™: The Dog Bingo Game at the pre-release price.",
 };
 
-// THROWAWAY layout prototype (preorder branch only): hero up top with the
-// Stripe checkout card poking up into it from the right. See PreorderPrototype
-// for the ?ov overlap-rule switch and ?ovv value knob. The footer sits below
-// the in-flow checkout, so it shifts down as the iframe grows.
+// Hero up top with the Stripe checkout card overlapping it from the right, then
+// the FAQ ladder and the chum card slider (see PreorderContent), with the footer
+// below.
 export default function PreorderPage() {
   return (
     <>
-      <PreorderPrototype />
+      <PreorderContent />
       <Footer />
     </>
   );

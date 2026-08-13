@@ -1,6 +1,6 @@
-/* Throwaway prototype layout for /preorder (preorder branch only).
-   Hero, then the Stripe checkout card poking up into it from the right, then a
-   two column block (intro + FAQ ladder), then the chum card slider.
+/* /preorder layout styles.
+   Hero, then the Stripe checkout card overlapping it from the right, then the
+   FAQ ladder, then the chum card slider.
    No page background: the global body gradient shows through. */
 
 .wrap {
@@ -208,8 +208,14 @@
     justify-content: center;
     padding-top: clamp(16px, 5vw, 28px);
   }
+  /* Show the hero copy on phones (headline + price / delivery / Stripe copy)
+     instead of hiding it. It sits at the bottom of the hero image; a navy scrim
+     background keeps it legible over the busy photo (background tint, not text
+     opacity). */
   .heroContent {
-    display: none;
+    width: 100%;
+    background: rgba(10, 58, 87, 0.72);
+    padding: clamp(18px, 5vw, 26px) clamp(18px, 5vw, 26px) clamp(20px, 6vw, 30px);
   }
   /* No 50px hero offset needed once the column is stacked below the hero. */
   .twoCol {
