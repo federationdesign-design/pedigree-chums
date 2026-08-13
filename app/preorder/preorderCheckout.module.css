@@ -53,6 +53,15 @@
   box-shadow: var(--shadow-card);
 }
 
+/* Brand logo above the iframe, centred. Its own white background merges with the
+   white container, so no framing is needed. */
+.checkoutLogo {
+  display: block;
+  margin: 0 auto clamp(12px, 2.5vw, 20px);
+  max-width: 100%;
+  height: auto;
+}
+
 .notice {
   width: min(92vw, 620px);
   text-align: center;
