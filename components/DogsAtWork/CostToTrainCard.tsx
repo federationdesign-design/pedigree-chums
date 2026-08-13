@@ -8,7 +8,7 @@ import styles from "../../app/dogs-at-work/dogs-at-work.module.css";
 // single source of truth: change them here and both articles follow. The shell is
 // the same legacy .sidebarCard the inline cards use, so it sits beside its
 // neighbours without a seam.
-const cardTitle: React.CSSProperties = { fontFamily: "var(--font-display)", fontSize: "36px", letterSpacing: "0", color: "var(--emphasis)", lineHeight: 0.9, textTransform: "uppercase", margin: "0 0 6px" };
+const cardTitle: React.CSSProperties = { fontFamily: "var(--font-display)", fontSize: "38.67px", letterSpacing: "0", color: "var(--emphasis)", lineHeight: 0.9, textTransform: "uppercase", margin: "0 0 6px" };
 const cardBody: React.CSSProperties = { fontFamily: "var(--font-body)", fontSize: "1.087rem", fontWeight: 500, color: "#fff", lineHeight: 1.5, margin: 0 };
 
 export default function CostToTrainCard() {
@@ -28,7 +28,7 @@ export default function CostToTrainCard() {
               <p style={{ ...cardBody, fontWeight: 700 }}>{role}</p>
               <p style={{ ...cardBody, fontSize: "0.72rem", color: "#aac4d4" }}>{detail}</p>
             </div>
-            <p style={{ fontFamily: "var(--font-display)", fontSize: "1.5rem", color: "var(--yellow)", whiteSpace: "nowrap", lineHeight: 1 }}>{value}</p>
+            <p style={{ fontFamily: "var(--font-display)", fontSize: "1.5rem", color: "#fff", whiteSpace: "nowrap", lineHeight: 1 }}>{value}</p>
           </div>
         ))}
       </div>

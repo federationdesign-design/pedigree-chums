@@ -3,8 +3,9 @@
 // twelve, append entries here; every article needs its own paired panel.
 //
 // Blue panel copy is transcribed verbatim from brief v3.0 Appendix A, which is
-// the cleaned source of truth. Em dashes in this editorial copy are permitted
-// (CLAUDE.md Dogs at Work amendment 2). Article card strings are migrated from
+// the cleaned source of truth. Em dashes were converted to hyphens (Steve, 13 Aug
+// 2026), superseding the earlier "may retain" note (CLAUDE.md Dogs at Work
+// amendment 2). Article card strings are migrated from
 // the former inline ARTICLES array in page.tsx, with the section 11 changes:
 // article 3 retitled and re-sub-labelled, article 4 added.
 //
@@ -57,7 +58,7 @@ const ARTICLE_MEDICAL_ALERT: Slide["article"] = {
   family: "Medical",
   subLabel: "Medical alert dogs",
   headline: "The Colleague Who Never Clocks Off",
-  dek: `A medical alert dog learns one person so completely it can warn them their own body is about to go wrong — often before they know themselves. That's not a pet. That's a colleague. Even if the only wages are dinner and the occasional stolen sausage.`,
+  dek: `A medical alert dog learns one person so completely it can warn them their own body is about to go wrong - often before they know themselves. That's not a pet. That's a colleague. Even if the only wages are dinner and the occasional stolen sausage.`,
   image: "/article3_hero.jpg",
   imageAlt: "A black Labrador in a white assistance-dog harness standing beside its seated owner indoors",
   ctaLabel: "Bramble",
@@ -83,7 +84,7 @@ export const SLIDES: Slide[] = [
         },
         {
           subheading: "*To humans,* it's a job.",
-          body: `It only becomes work when humans benefit from it. This series looks at the dogs that help Britain function — the noses at the border, the paws on the hills, the search dogs in the woods, the assistance dogs beside their people, and the bio-detection dogs helping scientists ask whether disease has a smell.`,
+          body: `It only becomes work when humans benefit from it. This series looks at the dogs that help Britain function - the noses at the border, the paws on the hills, the search dogs in the woods, the assistance dogs beside their people, and the bio-detection dogs helping scientists ask whether disease has a smell.`,
           thumbnail: { src: "/dog_working_img2.jpg", alt: "a shepherd watching over a flock" },
         },
         {
@@ -133,7 +134,7 @@ Perhaps that is the remarkable bargain at the heart of our relationship with dog
       family: "Medical",
       subLabel: "Bio-detection dogs",
       headline: "The Machine That May Owe Dogs a Biscuit",
-      dek: `In Milton Keynes, scientists are building an electronic nose to sniff out prostate cancer — trained on data the dogs gathered first. The dog wrote the manual for its own replacement, and it could not care less. It just wants its biscuit. This is the last piece of the medical trilogy.`,
+      dek: `In Milton Keynes, scientists are building an electronic nose to sniff out prostate cancer - trained on data the dogs gathered first. The dog wrote the manual for its own replacement, and it could not care less. It just wants its biscuit. This is the last piece of the medical trilogy.`,
       image: "/never-clocking-off.jpg",
       imageAlt: "A detection dog sniffing a stainless-steel scent-sample carousel in a research laboratory as staff observe",
       ctaLabel: "Bio-detection dogs",

@@ -26,7 +26,7 @@
   font-family: var(--font-display, "Luckiest Guy", cursive);
   /* 1.5x (36px) with no letter-spacing and a tight 0.9 line-height, matching the
      concept card titles; colour is --emphasis (#FFED60). */
-  font-size: 36px;
+  font-size: 38.67px;
   letter-spacing: 0;
   color: var(--emphasis, #ffed60);
   line-height: 0.9;
