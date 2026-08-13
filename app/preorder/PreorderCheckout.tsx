@@ -50,13 +50,13 @@ export default function PreorderCheckout() {
     <div className={styles.checkout}>
       {/* Brand logo above the iframe. The JPG's background is pure white
           (#ffffff), the same as the container, so it merges with no visible box.
-          Drawn at 240px (prototype default). */}
+          Drawn at 480px wide, centred, aspect ratio preserved (778x505). */}
       <Image
         className={styles.checkoutLogo}
         src="/PC-logo-black.jpg"
         alt="Pedigree Chums™"
-        width={240}
-        height={156}
+        width={480}
+        height={312}
         priority
       />
       <EmbeddedCheckoutProvider
