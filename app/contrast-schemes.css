@@ -147,3 +147,35 @@
 :root[data-pc-contrast-scheme] #pc-site .pc-nav [class*="aDefault"] { background: #ffffff !important; color: var(--navy) !important; }
 :root[data-pc-contrast-scheme] #pc-site .pc-nav [class*="aBlackOnWhite"] { background: #ffffff !important; color: #000000 !important; }
 :root[data-pc-contrast-scheme] #pc-site .pc-nav [class*="aWhiteOnBlack"] { background: #000000 !important; color: #ffffff !important; }
+
+/* ============================================================================
+   FOCUS RINGS IN A SCHEME (root fix, not per-component).
+
+   Focus indicators fail two ways under the sweep: an outline keeps its un-swept
+   colour, and a box-shadow ring is removed outright. A keyboard user in a
+   scheme could not see focus. This gives EVERY focusable element in the scheme a
+   foreground outline with an offset, so the ring sits on the (background)
+   surround and reads at ~21:1, whatever the control did itself. It also wins
+   over the sweep's box-shadow:none by specificity, so nothing can suppress it.
+   ========================================================================== */
+:root[data-pc-contrast-scheme="black-on-white"] #pc-site :focus-visible {
+  outline: 3px solid #000000 !important;
+  outline-offset: 3px !important;
+}
+:root[data-pc-contrast-scheme="white-on-black"] #pc-site :focus-visible {
+  outline: 3px solid #ffffff !important;
+  outline-offset: 3px !important;
+}
+
+/* ============================================================================
+   CONTROL EDGES IN A SCHEME (root fix). The sweep removes box-shadow, so a
+   button that relied on a shadow for its edge loses it and reads as flat text.
+   Give button-like controls a foreground edge that survives, as an inset ring
+   (no layout shift, unlike a border). Applies to any button built later too.
+   ========================================================================== */
+:root[data-pc-contrast-scheme="black-on-white"] #pc-site :is(button, [role="button"], [class*="btn"], [class*="Btn"], [class*="cta"], [class*="Cta"]) {
+  box-shadow: inset 0 0 0 2px #000000 !important;
+}
+:root[data-pc-contrast-scheme="white-on-black"] #pc-site :is(button, [role="button"], [class*="btn"], [class*="Btn"], [class*="cta"], [class*="Cta"]) {
+  box-shadow: inset 0 0 0 2px #ffffff !important;
+}

@@ -6,6 +6,7 @@ import Analytics from "../components/Analytics/Analytics";
 import OfferLauncher from "../components/Offer/OfferLauncher";
 import HiddenGamesCounter from "../components/HiddenGamesCounter/HiddenGamesCounter";
 import HideImages from "../components/HideImages/HideImages";
+import SchemeShapes from "../components/SchemeShapes/SchemeShapes";
 import HiddenGamesToast from "../components/HiddenGamesToast/HiddenGamesToast";
 import PickAChumLauncher from "./pick-a-chum/ui/PickAChumLauncher";
 import "./globals.css";
@@ -147,6 +148,9 @@ export default function RootLayout({
         <div id="pc-site">{children}</div>
         {/* Task 7: draws the alt-text blocks when data-pc-hide-images is set. */}
         <HideImages />
+        {/* Remaps background-drawn indicators (rating dots, bars) to foreground
+            so their state survives a scheme. */}
+        <SchemeShapes />
         <PickAChumLauncher />
         <OfferLauncher />
         {/* Hidden Games Stage 1 counter. Owner-approved layout mount, 28 Jul
