@@ -103,6 +103,27 @@ full panel width. It only reaches the era pages: the history page's desktop view
 is hidden at 720 and below, where the carousel takes over, so the history page is
 unaffected. Verified at 390 (`era-1700s-390-facts.png`).
 
+## Card flip side (yellow face), matched below 480, circles dropped
+
+The strip card's yellow flip side looked looser than the mobile carousel card's.
+Below 480 it now matches the mobile `.dogBack`: face padding 14 to 22, inner gap
+10 to 16, the green "Tap to learn" button 22/34/16 to 28/42/18, and the note
+pulled tight under it with `margin: -8px 0 -6px`. Era pages only (the `.flip*`
+strip card is hidden on the history page at 720 and below, where the `.dog*`
+carousel card takes over).
+
+**The outbound source circles are hidden below 480, not matched, and this is the
+reason:** the era strip card is a fixed 260px square with `overflow: hidden`
+faces, while the mobile card is an auto-height grid (`.dogFlipInner`, both faces
+on `grid-area: 1/1`) that simply grows to fit its content. At the matched sizes
+the circles overflow the square by ~38px and clip. Making the era card grow to
+fit them would leave uneven card heights along the horizontal rail; the mobile
+run is vertical so it never sees that, but the era slider would. That trade is
+not worth it (Steve, 13 August 2026). Only ancient, medieval and tudor carry
+circles at all (6, 7 and 3 cards); 1700s, 1800s and 1900s have none. With the
+circles hidden, the worst-case back content (button + longest note) overflows the
+fixed face by ~7px, which is imperceptible.
+
 ## Commit split (handed to Steve, not committed here)
 
 Two commits, file-level, no hunk splitting:

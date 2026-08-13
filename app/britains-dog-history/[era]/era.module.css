@@ -44,6 +44,14 @@
   padding: 0 calc(clamp(18px, 4vw, 40px) + 30px);
 }
 
+/* Below 480 the outer inset shrinks so the panel copy gets more line width. This
+   file is loaded by the era pages only; the history page never sees it. */
+@media (max-width: 480px) {
+  .sectionHolder {
+    padding: 0 12px;
+  }
+}
+
 /* Visually hidden, still read by screen readers and search. The visible era
    heading is BreedStrip's stripLabel span, kept identical to the history page. */
 .srOnly {

@@ -861,6 +861,20 @@
    720 and below, where the mobile carousel takes over, so it never sees this.
    Added 13 August 2026. */
 @media (max-width: 480px) {
+  /* Phone: give the era write-up panel more line width so the copy reads five or
+     six words a line instead of three or four. The panel's own padding drops and
+     the body paragraphs step down a size. Era pages only: the history page's
+     desktop view is hidden at 720 and below, where the carousel takes over.
+     Added 13 August 2026. */
+  .section {
+    padding: 14px;
+  }
+  .sectionIntro {
+    font-size: 1rem;
+  }
+  .detail {
+    font-size: 0.95rem;
+  }
   .factRow {
     flex-direction: column;
     align-items: stretch;
@@ -868,5 +882,32 @@
   }
   .factImg {
     align-self: center;
+  }
+  /* Bring the strip card's yellow flip side up toward the mobile carousel card
+     (history2.module.css .dogBack): more face padding and gap, a bigger green
+     button, and the note pulled tight under it. Era pages only: the .flip* strip
+     card is hidden on the history page at 720 and below, where the .dog* carousel
+     card takes over.
+     The outbound source circles are HIDDEN here, not matched. The era card is a
+     fixed 260px square with overflow:hidden faces, while the mobile card is an
+     auto-height grid, so at these sizes the circles overflow the square by about
+     38px and get clipped. Growing the card to fit would leave uneven card heights
+     along the horizontal rail (the mobile run is vertical, so it never sees this),
+     and that trade is not worth it. Only ancient, medieval and tudor carry
+     circles; the other three era pages have none. (Steve, 13 August 2026.) */
+  .flipBack {
+    padding: 22px;
+  }
+  .flipBackInner {
+    gap: 16px;
+  }
+  .deskBackHint {
+    padding: 28px 42px 18px;
+  }
+  .flipNote {
+    margin: -8px 0 -6px;
+  }
+  .backLinks {
+    display: none;
   }
 }
