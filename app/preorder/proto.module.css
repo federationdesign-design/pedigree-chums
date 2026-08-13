@@ -63,16 +63,15 @@
 }
 
 /* ── Checkout stage ──
-   Right-aligned card lifted up over the hero. The lift is a NEGATIVE margin-top
-   of `overlap` (set inline from the ?ov rule), which alone would drag the footer
-   and every following section up over the hero. To stop that, the stage also
-   carries min-height: overlap (set inline): the reclaimed space keeps the hero
-   at full height and pins the next section at, or below, the hero's bottom edge.
-   The card is still in normal flow, so once it is taller than the overlap its
-   growth pushes everything below it down. align-items keeps the card its natural
-   height at the top of the stage rather than stretching to the min-height. */
+   Right-aligned card overlapping the hero. It is positioned ABSOLUTELY within
+   .wrap (top = HERO_H - overlap, set inline from the ?ov rule), so it is out of
+   normal flow and no longer pushes the sections below: the checkout and the FAQ
+   column are now independent, and growing the iframe does not move the FAQ. Full
+   bleed via left/right: 0 with the card right-aligned by the flex. */
 .stage {
-  position: relative;
+  position: absolute;
+  left: 0;
+  right: 0;
   z-index: 3;
   display: flex;
   justify-content: flex-end;
@@ -84,70 +83,23 @@
   width: min(92vw, 620px);
 }
 
-/* ── Two column block: intro (left) + FAQ ladder (right) ── */
+/* ── Two column block: FAQ ladder (left) + intro (right) ──
+   Anchored 50px below the hero's bottom edge (margin-top), independent of the
+   absolutely-positioned checkout above it. */
 .twoCol {
   position: relative;
   z-index: 1;
+  /* margin-top alone sets the gap; top padding is 0 so the FAQ column's top
+     lands exactly 50px below the hero, not 50px + padding. */
+  margin-top: 50px;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: clamp(28px, 4vw, 56px);
   align-items: start;
-  padding: clamp(36px, 5vw, 72px) clamp(20px, 6vw, 80px);
+  padding: 0 clamp(20px, 6vw, 80px) clamp(36px, 5vw, 72px);
 }
 @media (max-width: 860px) {
   .twoCol { grid-template-columns: 1fr; }
-}
-
-/* The right (intro) column sticks as the taller FAQ ladder scrolls past it.
-   top clears the site's fixed Nav (~100px logo) for when this page is real.
-   align-self: start keeps the item its natural height (not stretched to the
-   row) so it has room to travel; being a grid item, its sticky travel is bound
-   by the two column block, so it releases at the bottom of the block and never
-   follows into the chum slider. Turned off below 721px where the columns stack
-   (see the mobile rule). */
-.introCol {
-  position: sticky;
-  top: 120px;
-  align-self: start;
-}
-
-/* Intro copy + PLAYERS / AGE / WHERE stats (inlined from HomeClient). */
-.introTitle {
-  font-family: var(--font-display, 'Luckiest Guy', system-ui);
-  font-size: clamp(2.6rem, 5vw, 4rem);
-  line-height: 1;
-  margin: 0 0 18px;
-  color: #fff;
-  letter-spacing: 0.02em;
-}
-.introTitle span { color: var(--yellow, #ffd23e); }
-
-.introDesc {
-  font-size: clamp(18px, 2vw, 24px);
-  font-weight: 600;
-  line-height: 1.35;
-  color: #ffffff;
-  margin: 0 0 28px;
-}
-.hi { font-weight: 800; color: var(--yellow, #ffd23e); }
-.white { font-weight: 800; color: #ffffff; }
-.yellow { color: var(--yellow, #ffd23e); }
-.underline { text-decoration: underline; text-underline-offset: 0.12em; }
-
-.meta { display: flex; gap: 24px; flex-wrap: wrap; }
-.metaItem { display: flex; flex-direction: column; gap: 3px; }
-.metaLabel {
-  font-size: 13px;
-  letter-spacing: 0.12em;
-  color: #ffffff;
-  text-transform: uppercase;
-  font-weight: 600;
-}
-.metaValue {
-  font-family: var(--font-display, 'Luckiest Guy', system-ui);
-  font-size: clamp(18px, 2vw, 24px);
-  color: #fff;
-  letter-spacing: 0.04em;
 }
 
 /* FAQ ladder, single column (inlined copy of components/FAQ). */
@@ -254,28 +206,27 @@
 }
 
 /* ── Mobile, below 721px ──
-   The page stacks. The checkout card comes first (order: -1), above the hero,
-   and the desktop overlap lift is cancelled (the inline margin-top / min-height
-   are overridden with !important). The hero text is hidden. The two column
-   block is already one column here (see the 860px rule above), FAQ then intro
-   from source order. The chum slider is untouched. */
+   The page stacks. The checkout stage returns to normal flow (position: static)
+   and comes first (order: -1), above the hero; the desktop absolute lift and its
+   inline top offset no longer apply once it is static. The hero text is hidden.
+   The two column block is already one column here (see the 860px rule above),
+   FAQ then intro from source order. The chum slider is untouched. */
 @media (max-width: 720px) {
   .wrap {
     display: flex;
     flex-direction: column;
   }
   .stage {
+    position: static;
     order: -1;
-    margin-top: 0 !important;
-    min-height: 0 !important;
     justify-content: center;
     padding-top: clamp(16px, 5vw, 28px);
   }
   .heroContent {
     display: none;
   }
-  /* Columns are stacked here, so the sticky right column is turned off. */
-  .introCol {
-    position: static;
+  /* No 50px hero offset needed once the column is stacked below the hero. */
+  .twoCol {
+    margin-top: 0;
   }
 }

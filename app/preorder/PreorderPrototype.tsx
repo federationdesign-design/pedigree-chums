@@ -18,9 +18,12 @@ import styles from "./proto.module.css";
  *
  *   ?ovv=<n>     the value knob for whichever rule is active (px, or % for pct)
  *
- * The lift is done with margin-top: -overlap PLUS min-height: overlap on the
- * stage, so the hero keeps its full height and the sections below never ride up
- * over it, while the card's growth still pushes those sections down.
+ * The checkout stage is positioned ABSOLUTELY (top = HERO_H - overlap) so it
+ * overlaps the hero from the right but is out of flow: it no longer pushes the
+ * sections below. The two column block is anchored 50px below the hero's bottom
+ * (margin-top: 50px on .twoCol), independent of the checkout's height, so the
+ * FAQ column no longer moves when the iframe grows. Consequence: the checkout
+ * card can overlap the intro column on the right (both are right-aligned).
  */
 
 type OvMode = "fixed" | "pct" | "bottom";
@@ -33,7 +36,7 @@ const DEFAULT_VALUE: Record<OvMode, number> = { fixed: 440, pct: 30, bottom: 200
 
 // The overlap (how far the checkout's top edge pokes up into the hero) as a CSS
 // length, clamped to [0, HERO_H] so a knob can never open a gap below the hero
-// or fling the card above its top. marginTop = -overlap, min-height = overlap.
+// or fling the card above its top. The stage's absolute top = HERO_H - overlap.
 function overlapCss(mode: OvMode, value: number): string {
   const raw =
     mode === "pct"
@@ -94,47 +97,22 @@ export default function PreorderPrototype() {
         </div>
       </section>
 
-      <div className={styles.stage} style={{ marginTop: `calc(-1 * ${overlap})`, minHeight: overlap }}>
+      <div className={styles.stage} style={{ top: `calc(${HERO_H} - ${overlap})` }}>
         <div className={styles.col}>
           <PreorderCheckout />
         </div>
       </div>
 
-      {/* Two column block: intro copy + PLAYERS / AGE / WHERE stats (left,
-          inlined from HomeClient), FAQ ladder in a single column (right). */}
+      {/* One column: the FAQ ladder only. The intro copy + PLAYERS / AGE / WHERE
+          stats have been removed from the page. The grid is deliberately left as
+          two tracks so the FAQ keeps its existing left-hand width rather than
+          expanding to fill the space (width unchanged, see the report). */}
       <section className={styles.twoCol}>
         <div>
           <h2 className={styles.faqHeading}>
             Frequently Asked <span>Questions</span>
           </h2>
           <ProtoFaqLadder />
-        </div>
-        <div className={styles.introCol}>
-          <h2 className={styles.introTitle}>
-            Pedigree <span>Chums</span>
-          </h2>
-          <p className={styles.introDesc}>
-            The on-the-go <span className={styles.hi}>dog spotting game</span> for curious
-            minds and dog lovers. <span className={`${styles.white} ${styles.underline}`}>54
-            illustrated breed cards</span> packed with traits, stats, and tell-tale features.{" "}
-            <span className={styles.hi}>Spot a dog. </span>
-            <span className={styles.white}>Make a friend, </span>
-            <span className={`${styles.yellow} ${styles.underline}`}>you have a new chum.</span>
-          </p>
-          <div className={styles.meta}>
-            <div className={styles.metaItem}>
-              <span className={styles.metaLabel}>Players</span>
-              <span className={styles.metaValue}>2+</span>
-            </div>
-            <div className={styles.metaItem}>
-              <span className={styles.metaLabel}>Age</span>
-              <span className={styles.metaValue}>7+</span>
-            </div>
-            <div className={styles.metaItem}>
-              <span className={styles.metaLabel}>Where</span>
-              <span className={styles.metaValue}>Anywhere</span>
-            </div>
-          </div>
         </div>
       </section>
 
