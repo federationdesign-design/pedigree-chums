@@ -54,3 +54,27 @@ export function setScheme(scheme: ContrastScheme | null): void {
 export function clearScheme(): void {
   setScheme(null);
 }
+
+// ---- Hide images (task 7) --------------------------------------------------
+// Independent of the scheme: it can be on with or without one. The attribute
+// hides content media before first paint (via contrast-schemes.css) and drives
+// the HideImages component that draws the alt-text blocks.
+
+export const HIDE_ATTR = "data-pc-hide-images";
+export const HIDE_KEY = "pc-hide-images";
+
+export function getHideImages(): boolean {
+  if (typeof document === "undefined") return false;
+  return document.documentElement.hasAttribute(HIDE_ATTR);
+}
+
+export function setHideImages(on: boolean): void {
+  if (typeof document === "undefined") return;
+  const root = document.documentElement;
+  if (on) root.setAttribute(HIDE_ATTR, ""); else root.removeAttribute(HIDE_ATTR);
+  try {
+    if (on) window.localStorage.setItem(HIDE_KEY, "1"); else window.localStorage.removeItem(HIDE_KEY);
+  } catch {
+    // localStorage may be unavailable; the attribute still applies this session.
+  }
+}

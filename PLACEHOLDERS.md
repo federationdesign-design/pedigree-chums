@@ -137,6 +137,13 @@ outstanding decisions are in `docs/dogs-at-work/NEEDS_STEVE.md`.
 
 No named placeholders remain in the Dogs at Work slides or article pages.
 
+Task 7 (hide images), 13 Aug 2026: the NO-SCHEME block colours are PLACEHOLDER.
+Steve's instruction read "blocks are [COLOUR] with [TEXT COLOUR] text" with the
+two values left unfilled. `--pc-hb-bg` (`#1a1a1a`) and `--pc-hb-text` (`#ffffff`)
+in `app/contrast-schemes.css` are a high-contrast stand-in so the mechanism is
+demonstrable; replace both when Steve supplies the two colours. Inside a scheme
+the block uses the scheme's own two colours and is not a placeholder.
+
 Resolved 12 Aug 2026: the guide dogs hero alt is supplied ("a man with a white
 cane sitting on a park bench beside a black Labrador in a yellow guide-dog
 harness") and inlined in `slides.ts` and the article page, so

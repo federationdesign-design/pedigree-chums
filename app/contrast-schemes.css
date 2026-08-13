@@ -78,3 +78,41 @@
 :root[data-pc-contrast-scheme="white-on-black"] [class*="essayHeroTint"] {
   display: none !important;
 }
+
+/* ============================================================================
+   HIDE IMAGES (brief v5, task 7). data-pc-hide-images on <html> replaces every
+   content image with a contrast block carrying its alt text (drawn by
+   components/HideImages). This CSS does two things: hides the content media
+   before first paint (so no image flashes in), and defines the block colours.
+
+   Block colour: in a scheme the block uses the scheme's two colours, inverted
+   from the page so it reads as a distinct panel. With NO scheme active the
+   colours are a PLACEHOLDER, because Steve's instruction left [COLOUR] and
+   [TEXT COLOUR] unfilled (see PLACEHOLDERS.md). Replace the two placeholder
+   values below when he supplies them.
+   ========================================================================== */
+:root {
+  --pc-hb-bg: #1a1a1a;   /* PLACEHOLDER, awaiting Steve's [COLOUR] */
+  --pc-hb-text: #ffffff; /* PLACEHOLDER, awaiting Steve's [TEXT COLOUR] */
+}
+:root[data-pc-contrast-scheme="black-on-white"] { --pc-hb-bg: #000000; --pc-hb-text: #ffffff; }
+:root[data-pc-contrast-scheme="white-on-black"] { --pc-hb-bg: #ffffff; --pc-hb-text: #000000; }
+
+/* Hide content media before paint; keep the header's own icons so the page
+   stays operable (the menu button must not vanish). */
+:root[data-pc-hide-images] #pc-site :is(img, video, svg) { opacity: 0 !important; }
+:root[data-pc-hide-images] #pc-site .pc-nav :is(img, video, svg) { opacity: 1 !important; }
+
+#pc-hide-root { position: absolute; top: 0; left: 0; width: 0; height: 0; z-index: 2147483000; pointer-events: none; }
+/* Keep the header above the blocks so its menu button stays visible, not just
+   click-through, while hide images is on. */
+:root[data-pc-hide-images] .pc-nav { z-index: 2147483600 !important; }
+.pc-hide-overlay {
+  position: absolute;
+  display: flex; align-items: center; justify-content: center;
+  text-align: center; padding: 6px; overflow: hidden; box-sizing: border-box;
+  background: var(--pc-hb-bg); color: var(--pc-hb-text); border: 1px solid var(--pc-hb-text);
+  font-family: var(--font-body), system-ui, sans-serif; font-weight: 600; line-height: 1.2;
+  pointer-events: none;
+}
+.pc-hide-overlay > span { display: block; max-height: 100%; overflow: hidden; }
