@@ -504,10 +504,17 @@
      right edge on the page edge without clipping. The doubled class name (0,2,0)
      outranks base .payslip (0,1,0), so this rule's tilt replaces the base one. */
   .payslipOverlay.payslipOverlay {
-    /* Lift so the card sits high over the hero. */
-    margin-top: -347px;
+    /* Lift so the card sits high over the hero, scaled 1.08x the base (was 1.2x,
+       reduced 10% - Steve, 13 Aug). The left edge is anchored (translateX and the
+       sidebar position do not depend on font-size), so scale changes come off the
+       right only. The bottom is held at the base position by subtracting
+       ~(1 - 1/scale) x the ~25em card height (1.86em in the new font) from the
+       lift, so reducing the scale drops the top back down rather than shrinking
+       upward. Extra width past the page edge is clipped by the html/body
+       overflow-x: clip, so there is no horizontal scroll. */
+    margin-top: calc(-347px - 1.86em);
     transform-origin: top left;
-    font-size: calc((var(--essay-sidebar) + var(--essay-gutter) + var(--essay-gap) - 10px) / 25.04);
+    font-size: calc((var(--essay-sidebar) + var(--essay-gutter) + var(--essay-gap) - 10px) * 1.08 / 25.04);
     width: 23.75em;
     /* Shift left out of the sidebar by (gap - 10) so the left edge is 10px off the
        text; the right edge then reaches the page edge. */
