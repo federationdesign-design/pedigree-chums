@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Nav from "../../components/Nav/Nav";
 import Footer from "../../components/Footer/Footer";
 import PopHeading from "../../components/PopHeading/PopHeading";
@@ -7,9 +6,10 @@ import Triangles, { type Tri } from "../../components/Parallax/Triangles";
 import ParallaxShape from "../../components/Parallax/ParallaxShape";
 import Announce from "../../components/Announce/Announce";
 import BreedStrip from "./BreedStrip";
-import FactHatImage from "./FactHatImage";
 import HistoryCarousel from "../britains-dog-history-2/HistoryCarousel";
 import styles from "./history.module.css";
+import HistorySection from "../../components/HistorySection/HistorySection";
+import { SECTIONS } from "../../data/historySections";
 
 const pageTriangles: Tri[] = [
   { size: 34, top: "5%", left: "4%", speed: 0.16, spin: 0.22 },
@@ -64,283 +64,6 @@ export const metadata: Metadata = {
   },
 };
 
-type Section = {
-  title: string;
-  accent: string;
-  anchor?: string; // Task 142: id for the in-chat diversion deep links (#ancient-dogs, etc.)
-  era?: string; // which breed-strip era shows above this card
-  intro: string;
-  bullets: string[];
-  detail: string;
-  facts: { text: string; image?: string }[];
-  image: string; // /history/<name>.jpg image path; drop art in later
-  imageAlt: string;
-};
-
-const SECTIONS: Section[] = [
-  /* Owner request (4 August): the combined First Dogs section is split into
-     two era cards, Ancient Dogs and Medieval Dogs, each above its own strip.
-     Existing approved sentences were dealt to whichever era they describe;
-     the remainder is new copy written to match the two cards' lengths, all
-     flagged for owner review in the task report. */
-  {
-    title: "Ancient Dogs",
-    accent: "Dogs",
-    anchor: "ancient-dogs",
-    era: "ancient",
-    intro:
-      "Britain's earliest dogs had no breed standards or pedigrees. They were shaped by the jobs people needed doing: guarding homes and livestock, following scents, chasing deer and hares. Classical writers noticed. Strabo recorded British hunting dogs exported overseas, and Celts reportedly used dogs in war.",
-    bullets: [
-      "Swift Celtic hounds and greyhound-like dogs pursued deer, hares and other fast-moving game by sight.",
-      "Early tracking hounds followed game by scent, the deep root of Britain's later scent-hound families.",
-      "Protected people, livestock and property, and helped control cattle. Roman-period evidence shows dogs chasing vermin from buildings.",
-      "Hunting with carefully trained hounds signalled wealth, while ordinary households kept practical working dogs.",
-    ],
-    detail:
-      "Several generations later, the Roman writer Arrian described swift Celtic coursing hounds that hunted by sight rather than scent. These early dogs were types shaped by work and place rather than standardised breeds: the same island held fast coursing hounds, powerful guard dogs and small practical workers, and their names, appearance and purpose could change between regions and centuries.",
-    facts: [
-      { text: "British hunting dogs were valuable enough to be exported across the Channel almost 2,000 years ago.", image: "/history/acident-main-img.jpg" },
-      { text: "Arrian, writing in the Roman period, praised Celtic hounds for speed, spirit and their enthusiasm for chasing hares.", image: "/history/greek-harehound.jpg" },
-      { text: "Archaeologists have found dogs of very different sizes in early British settlements, from small animals to dogs approaching wolf size.", image: "/history/breeds/Mastiff-and-Alaunt-war-dogs.jpg" },
-      { text: "The swift coursing hound of the Celts was famous enough in the ancient world to be described in Roman hunting manuals.", image: "/history/breeds/celtic-hound-drawing.jpg" },
-    ],
-    image: "/history/acident-main-img.jpg",
-    imageAlt: "Early British working dogs, the hunting and guarding types found before breeds were standardised",
-  },
-  {
-    title: "Medieval Dogs",
-    accent: "Dogs",
-    anchor: "medieval-dogs",
-    era: "medieval",
-    intro:
-      "Medieval Britain ran on working dogs. Great households kept organised packs of hounds for the hunt, drovers walked cattle to market with tough farm dogs at their heels, and shepherds relied on quick, biddable herders. A dog's name described its job rather than its breed, and the law took dogs seriously enough to regulate them.",
-    bullets: [
-      "Medieval scent hounds followed an animal's trail by nose, sometimes working together in organised packs.",
-      "Shepherds' and drovers' dogs moved sheep and cattle across the hills and along the long drove roads to market.",
-      "Small, determined earth dogs followed fox and badger underground, the working root of Britain's terriers.",
-      "The organised hunt gave hounds their names and their jobs, from the rache that ran by scent to the greyhound slipped from its lead.",
-    ],
-    detail:
-      "By the Middle Ages Britain's dogs had settled into recognisable working kinds. Hunting treatises described each type and its task, household records listed hounds by the work they did, and forest law regulated which dogs could live near the royal deer. These were still types rather than breeds: a talbot or a rache was a job and a look, not a pedigree, and the same name could cover different dogs in different counties.",
-    facts: [
-      { text: "Medieval pictures often show different dogs doing different jobs, including scent hounds hunting in packs and greyhounds held on leads before the chase.", image: "/history/master-of-the-game.jpg" },
-      { text: "The Master of Game, an English hunting book from the early 1400s, describes running hounds, greyhounds, alaunts, spaniels and mastiffs, each with its own work.", image: "/history/master-of-the-game.jpg" },
-      { text: "Under medieval forest law, large dogs kept near royal forests could be required to have claws removed so they could not chase the deer.", image: "/history/medieval-law.jpg" },
-      { text: "The drove roads that dogs and drovers used to walk cattle to market were in use for centuries, and stretches of them can still be walked today.", image: "/history/drovers-dogs.jpg" },
-    ],
-    image: "/history/medieveal-dogs.jpg",
-    imageAlt: "Medieval working dogs at their jobs, from pack hounds to herders",
-  },
-  {
-    title: "Tudor Britain",
-    accent: "Britain",
-    anchor: "tudor-britain",
-    era: "c1500",
-    intro:
-      "Britain's bond with dogs stretches back deep into the Middle Ages, when hounds were prized hunting partners of kings and nobles. By the Tudor age, dogs had also become beloved companions, doted on at the royal court itself.",
-    bullets: [
-      "Norman kings set aside up to a third of England as royal forest, where only the king could hunt.",
-      "Commoners living near a forest had to have their dogs 'lawed', having three toes chopped off, to stop them chasing the king's game.",
-      "By Tudor times, Henry VIII kept spaniels, beagles and greyhounds, and owned sixty-five dog leashes.",
-      "Ladies of the court adored their little lapdogs, which they fondly called 'comforters'.",
-    ],
-    detail:
-      "The forest laws were among the most resented in medieval England, with even a harmless guard dog lamed simply for living near royal land. Yet within a few centuries the mood had utterly changed. At the Tudor court, Henry VIII's pampered lapdogs wore velvet collars stamped with the gold Tudor rose, and Anne Boleyn doted on a little dog named Purkoy. The dog as a treasured companion, not just a working animal, was already taking shape.",
-    facts: [
-      { text: "Anne Boleyn so loved her lapdog Purkoy that when he died in a fall, no one at court dared to tell her the news.", image: "/history/purkoy.jpg" },
-      { text: "Medieval law valued a dog by its job, with a shepherd's dog, a guard dog and a hunting hound each worth a different sum.", image: "/history/medieval-law.jpg" },
-      { text: "Mastiff-type 'bandogs' were chained up by day and let loose at night to guard farms from thieves and even wolves.", image: "/history/bandogs.jpg" },
-      { text: "One of the first books written in English, 'The Master of Game' from around 1406, was a guide to hunting hounds and their care.", image: "/history/master-of-the-game.jpg" },
-    ],
-    image: "/history/medieveal-dogs.jpg",
-    imageAlt: "Medieval hunting hounds and a Tudor lapdog",
-  },
-  {
-    title: "Dogs in the armed forces",
-    accent: "armed forces",
-    era: "c1500",
-    intro:
-      "Dogs have marched alongside British soldiers for centuries, as scouts, messengers, guards and mascots. The most famous of all was a white poodle who became a legend of the English Civil War.",
-    bullets: [
-      "Boy was a white hunting poodle belonging to the Royalist commander Prince Rupert of the Rhine.",
-      "He followed his master onto the battlefield and was killed at the Battle of Marston Moor in 1644.",
-      "Royalist soldiers adored him and reportedly gave him the rank of Sergeant-Major-General.",
-      "He is often remembered as the first official British Army dog.",
-      "Judy, a pointer, survived Japanese prisoner-of-war camps and is the only dog ever officially registered as a POW.",
-    ],
-    detail:
-      "Boy was so well known that enemy pamphlets spread wild rumours about him, claiming the dog had magical powers and could not be harmed by weapons. It was propaganda, of course, and at Marston Moor it proved sadly untrue. Yet the little white poodle had already secured his place in British military memory, the first in a long line of dogs to serve the nation.",
-    facts: [
-      { text: "Parliamentarian propaganda during the Civil War seriously claimed Prince Rupert's poodle was a witch in disguise.", image: "/history/boy.jpg" },
-      { text: "The Dickin Medal, the 'Animal VC', has been awarded to 38 dogs since 1943 for bravery in wartime.", image: "/history/animal-vc.jpg" },
-      { text: "Crumstone Irma, a search dog in the London Blitz, helped find 191 people buried in bombed buildings.", image: "/history/crumstone-irma.jpg" },
-    ],
-    image: "/history/boy-the-poodle.jpg",
-    imageAlt: "A 17th-century white poodle beside a Civil War cavalier",
-  },
-{
-    title: "Working roots",
-    accent: "roots",
-    era: "c1700",
-    intro:
-      "Long before dogs curled up by the fire, they worked for a living. Across Britain, breeds were shaped by the jobs they were needed to do, and you can still see those jobs written into their bodies and behaviour today.",
-    bullets: [
-      "Herding breeds like the Border Collie were bred to gather and move livestock across the hills.",
-      "Terriers were developed to hunt vermin, going to ground after rats, mice and foxes.",
-      "Sighthounds such as the Greyhound and Whippet were built for speed and the chase.",
-      "Guarding and droving breeds protected homes and moved cattle to market.",
-    ],
-    detail:
-      "A dog's looks are rarely an accident. The Collie's tireless energy, the terrier's boldness, the sighthound's lean frame: each was honed for a purpose over many generations. Understanding that working past is the key to understanding why breeds behave the way they do, a thread that runs right through the pack.",
-    facts: [
-      { text: "The word 'terrier' comes from the Latin 'terra', meaning earth, after their habit of digging into burrows to flush out prey.", image: "/history/terra.jpg" },
-      { text: "Turnspit dogs were bred to run inside a wheel that turned meat roasting over the kitchen fire.", image: "/history/breeds/Turnspitdog-drawing.jpg" },
-      { text: "Drovers' dogs walked cattle and sheep hundreds of miles to market, then often found their own way home.", image: "/history/drovers-dogs.jpg" },
-      { text: "Water dogs hauled fishing nets and lines for coastal fishermen, their thick coats built to shrug off the cold.", image: "/history/waterdog.jpg" },
-    ],
-    image: "/history/working-roots.jpeg",
-    imageAlt: "A working sheepdog herding livestock on a British hillside",
-  },
-  {
-    title: "Dogs in London",
-    accent: "London",
-    anchor: "dogs-in-london",
-    era: "early1800",
-    intro:
-      "In the bustling streets of Victorian London, dogs were not just companions, they were engines of trade. For decades, teams of dogs hauled carts of goods through the capital, until the law stepped in.",
-    bullets: [
-      "Working dogs pulled small carts of milk, bread, fish and other goods for street traders.",
-      "The Metropolitan Police Act of 1839 banned dog-drawn carts within 15 miles of Charing Cross.",
-      "A national ban on the public highways followed in 1854.",
-      "The campaign against dog-carts helped shape Britain's early animal-welfare laws.",
-    ],
-    detail:
-      "The ban was meant to spare dogs from cruelty and to stop carts spooking horses in crowded streets, but it had a heartbreaking side. With the dogs no longer able to earn their keep, many traders could not afford to feed them, and thousands of working dogs were lost. It was a grim chapter, yet it pushed Britain toward treating dogs as animals deserving of protection.",
-    facts: [
-      { text: "One estimate suggests the 1839 London ban alone led to the loss of more than 3,000 working dogs almost overnight." },
-      { text: "During the Great Plague of 1665, dogs were wrongly blamed for spreading the disease and the city ordered them destroyed.", image: "/history/plague.jpg" },
-      { text: "London's dog-catcher killed over 4,000 dogs, which likely made things worse by sparing the rats that truly carried the plague.", image: "/history/plague2.jpg" },
-      { text: "Winston Churchill, nicknamed the British Bulldog, in fact kept a brown poodle named Rufus who slept by his bed all through the war.", image: "/history/winston-churchill.jpg" },
-    ],
-    image: "/history/dog-carts.jpg",
-    imageAlt: "A Victorian street trader with a dog-drawn cart in London",
-  },
-  {
-    title: "The Victorian turning point",
-    accent: "turning point",
-    era: "spaniels",
-    intro:
-      "If one era turned the British dog from worker to companion, it is the Victorian age. In just a few decades, dogs moved from the farmyard into the drawing room, and modern pet keeping was born.",
-    bullets: [
-      "Queen Victoria was a devoted dog lover who owned more than eighty dogs across her lifetime.",
-      "Her childhood companion was a Cavalier King Charles Spaniel named Dash, painted by royal artists.",
-      "Britain held the world's first organised dog show in Newcastle in 1859.",
-      "Battersea Dogs Home opened in 1860 and the Kennel Club followed in 1873.",
-    ],
-    detail:
-      "Victoria's very public affection for her dogs helped make pet keeping fashionable across society. As the middle classes grew, a well-bred dog became a mark of taste and gentility. The first dog show, the founding of Battersea and the arrival of the Kennel Club all came within a single generation, the moment dogs became companions to be celebrated rather than simply animals to be used.",
-    facts: [
-      { text: "The first dog show, held in Newcastle in 1859, was tacked on to a poultry show and only allowed Pointers and Setters to compete.", image: "/history/first-dog-show.jpg" },
-      { text: "From 1867 every owner had to buy a yearly dog licence, costing seven shillings and sixpence, just to keep a dog.", image: "/history/dog-licence.jpg" },
-      { text: "Spratt's began selling the first mass-produced dog biscuits around 1860, the very start of the dog-food industry.", image: "/history/dog-biscuit.jpg" },
-      { text: "Dog theft grew so common that thieves snatched pampered pets and sold them back to their owners for a ransom.", image: "/history/Dog-theft.jpg" },
-    ],
-    image: "/history/portrait-of-dash.jpg",
-    imageAlt: "A Victorian lady with a small spaniel companion",
-  },
-  {
-    title: "Dogs in popular culture",
-    accent: "culture",
-    era: "mid1800",
-    intro:
-      "Some dogs become more than pets, they become legends. No British dog story is more beloved than that of Greyfriars Bobby, the little terrier whose loyalty captured a nation's heart.",
-    bullets: [
-      "Bobby was a Skye Terrier belonging to John Gray, a night watchman for the Edinburgh City Police.",
-      "After Gray died in 1858, Bobby reportedly refused to leave his master's grave.",
-      "The story says he kept watch over the grave for fourteen years until his own death in 1872.",
-      "A statue and fountain were raised in his honour, and still draw visitors today.",
-    ],
-    detail:
-      "Historians gently point out that the tale has grown in the telling, and the details are hard to prove. But whether legend or fact, Bobby became a symbol of the devotion a dog can show, retold in books and films ever since. His statue in Edinburgh remains one of Scotland's best-loved landmarks, a monument to the bond between people and their dogs.",
-    facts: [
-      { text: "Greyfriars Bobby's headstone reads: 'Let his loyalty and devotion be a lesson to us all.'", image: "/history/greyfriars-bobby.jpg" },
-      { text: "Charles Dickens gave the villain Bill Sikes a fearful dog called Bull's-eye in Oliver Twist.", image: "/history/dickens.jpg" },
-      { text: "The poet Elizabeth Barrett Browning adored her spaniel Flush, later given his own book by Virginia Woolf.", image: "/history/elizabeth-barrett-browning.jpg" },
-      { text: "In Peter Pan, the Darling children's devoted nursemaid Nana is a Newfoundland dog.", image: "/history/peterpan.jpg" },
-    ],
-    image: "/history/bobby.jpeg",
-    imageAlt: "The Greyfriars Bobby statue in Edinburgh",
-  },
-  {
-    title: "Dog shows",
-    accent: "shows",
-    era: "late1800",
-    intro:
-      "Once dogs became companions worth celebrating, Britain found a new way to honour them: the dog show. From modest beginnings grew Crufts, the most famous dog show in the world.",
-    bullets: [
-      "Crufts was founded by showman Charles Cruft and first held in 1891 in Islington, London.",
-      "The famous Best in Show title was not introduced until 1928.",
-      "The first ever Best in Show winner was a Greyhound named Primley Sceptre.",
-      "Crufts is now recognised as the largest dog show in the world.",
-    ],
-    detail:
-      "Charles Cruft had a genius for promotion, and his show quickly became the highlight of the canine calendar. The arrival of the Best in Show award in 1928 gave the event its crowning moment, and that first winner, a Greyhound chosen from nearly ten thousand competitors, set the tone for a contest that still captivates the nation every spring.",
-    facts: [
-      { text: "Primley Sceptre, the first Best in Show winner, was picked from an entry of 9,466 dogs and described by the judge as 'faultless'." },
-      { text: "Charles Cruft was a travelling salesman for Spratt's dog biscuits, and his show helped sell ever more dog food.", image: "/history/james-spratt.jpg" },
-      { text: "The first Crufts in 1891 drew 2,437 dogs across 36 breeds; today around 24,000 dogs take part each year.", image: "/history/breeds/crufts-dogshow.jpg" },
-      { text: "Charles Cruft never owned a dog himself, for fear of being seen to favour any one breed." },
-    ],
-    image: "/history/primley-sceptre.jpeg",
-    imageAlt: "A Greyhound being presented in a dog show ring",
-  },
-  {
-    title: "Into the modern home",
-    accent: "home",
-    era: "c1900",
-    intro:
-      "Through the twentieth century, the dog's place in British life became firmly domestic. No longer just workers or status symbols, dogs settled in as everyday members of the household.",
-    bullets: [
-      "Dogs became fixtures of family photographs, holidays and daily routines.",
-      "Veterinary care, commercial dog food and training advice grew into established industries.",
-      "Breeds rose and fell in popularity as fashions and lifestyles changed.",
-      "The dog moved from the yard to the hearth, and often to the foot of the bed.",
-    ],
-    detail:
-      "As Britain became more urban and homes grew more comfortable, dogs came indoors for good. The relationship deepened from usefulness into genuine companionship. By the end of the century, the question was no longer what a dog could do for you, but simply the pleasure of its company, a shift that set the stage for the boom still unfolding today.",
-    facts: [
-      { text: "Today around 99 percent of UK dog owners consider their dog to be a full member of the family.", image: "/history/family-dog.jpg" },
-      { text: "Around a third of British dogs are now allowed up onto their owner's bed to sleep.", image: "/history/dog-in-bed.jpg" },
-      { text: "Some 58 percent of owners buy their dog birthday and Christmas presents.", image: "/history/dog-birthday.jpg" },
-      { text: "Pampered pets now enjoy spas, bakeries, dog fashion and even their own social media accounts.", image: "/history/Pampered-pets.jpg" },
-    ],
-    image: "/history/poodle-bed.jpg",
-    imageAlt: "A family relaxing at home with their pet dog",
-  },
-  {
-    title: "Today's boom",
-    accent: "boom",
-    era: "crosses",
-    intro:
-      "Britain's dog population is bigger than ever, and still growing. A new generation of owners, and a global pandemic, have reshaped which dogs we choose and why.",
-    bullets: [
-      "The UK dog population has risen from around 8.2 million in 2011 to between 11 and 13 million today.",
-      "More than three million UK households welcomed a new pet during the pandemic.",
-      "Younger owners now make up a fast-growing share of the dog-loving population.",
-      "Designer crossbreeds like the Cockapoo and Labradoodle have surged in popularity.",
-      "The pet-tech market alone, covering smart feeders, cameras and GPS trackers, is now worth over 400 million pounds.",
-    ],
-    detail:
-      "The most common breeds tell the story of changing tastes. Among dogs of all ages the classic Labrador still leads, but among puppies the French Bulldog and the Cockapoo have raced to the top, a clear sign of the designer-crossbreed boom. The pack brings both worlds together, the old favourites and the new, each with centuries of history behind them.",
-    facts: [
-      { text: "Among dogs under one year old, the French Bulldog and Cockapoo now rank among the three most common breeds in the UK.", image: "/history/cockapoo-circle.jpg" },
-      { text: "British owners now spend around 10 billion pounds a year on their dogs.", image: "/history/10-billion-pounds.jpg" },
-      { text: "There are an estimated 13.5 million pet dogs in the UK, living in roughly a third of all households.", image: "/history/britian.jpg" },
-    ],
-    image: "/history/pappered-dog.jpg",
-    imageAlt: "A modern Cockapoo, one of Britain's most popular dogs today",
-  },
-];
 
 export default function HistoryPage() {
   return (
@@ -377,7 +100,6 @@ export default function HistoryPage() {
         <div className={styles.sections}>
           <Triangles items={pageTriangles} z={3} />
           {SECTIONS.filter((s) => s.title !== "Dogs in the armed forces").map((s, i) => {
-            const prefix = s.title.slice(0, s.title.length - s.accent.length);
             return (
               <div key={i} id={s.anchor}>
                 <div className={styles.panelOuter}>
@@ -387,50 +109,7 @@ export default function HistoryPage() {
                     speed={0.25}
                   />
                 )}
-                <section className={styles.section}>
-                <div className={styles.glowLayer} aria-hidden="true">
-                  <div className={`${styles.glowCircle} ${styles.glowTop}`} />
-                  <div className={`${styles.glowCircle} ${styles.glowBottom}`} />
-                </div>
-                <h2 className={`display ${styles.sectionTitle}`}>
-                  {prefix}
-                  <span className="display-yellow">{s.accent}</span>
-                </h2>
-                <div className={styles.colLeft}>
-                  <div className={styles.imageSlot}>
-                    <Image
-                      src={s.image}
-                      alt={s.imageAlt}
-                      width={600}
-                      height={600}
-                      className={styles.sectionImg}
-                      unoptimized
-                    />
-                  </div>
-                  <p className={styles.sectionIntro}>{s.intro}</p>
-                  <p className={styles.detail}>{s.detail}</p>
-                </div>
-                <div className={styles.colRight}>
-                  <ul className={styles.bullets}>
-                    {s.bullets.map((b, j) => (
-                      <li key={j}>{b}</li>
-                    ))}
-                  </ul>
-                  {s.facts.map((f, k) => (
-                    <div className={styles.fact} key={k}>
-                      <span className={styles.factLabel}>Did you know?</span>
-                      <div className={styles.factRow}>
-                        <div className={styles.factImg}>
-                          <FactHatImage src={f.image || s.image} width={120} height={120} />
-                        </div>
-                        <div className={styles.factBody}>
-                          <span className={styles.factText}>{f.text}</span>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </section>
+                <HistorySection section={s} />
               </div>
               {s.era && <BreedStrip era={s.era} />}
               </div>
