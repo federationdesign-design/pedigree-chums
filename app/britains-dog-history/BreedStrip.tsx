@@ -145,6 +145,11 @@ export default function BreedStrip({
   const [lives, setLives] = useState(LIVES_START);
   const [streak, setStreak] = useState(0);
   const [leaving, setLeaving] = useState<string | null>(null);
+  /* Which card is flipped to its back, by name, or null. Only used below 480,
+     where there is no hover to flip on: the tap controls set it. Above 480 the
+     controls are display:none and the CSS hover flip governs, so this stays null
+     and has no effect there. See the touch-flip rules in history.module.css. */
+  const [flipped, setFlipped] = useState<string | null>(null);
 
   // The mini pits are levels: every popup-capable breed, in timeline order
   // across all eras. Round Won advances to the next; Game Over restarts at
@@ -524,7 +529,10 @@ export default function BreedStrip({
                   onClick={open}
                   aria-label={open ? `View ${b.name} family tree` : undefined}
                 >
-                  <span className={styles.flipInner}>
+                  <span
+                    className={styles.flipInner}
+                    style={flipped === b.name ? { transform: "rotateY(180deg)" } : undefined}
+                  >
                     <span className={styles.flipFront}>
                       <span className={styles.nodeThumb}>
                         {b.image ? (
@@ -563,6 +571,21 @@ export default function BreedStrip({
                           {tagLabel(b.tag)}
                         </span>
                       )}
+                      {/* Touch flip control. Shown only below 480 (display:none
+                          above, see history.module.css), so on the desktop strip
+                          it is not rendered, not tabbable, and cannot flip the
+                          card. A span, not a button, because it lives inside the
+                          card's own button. */}
+                      <span
+                        className={styles.frontFlip}
+                        role="button"
+                        tabIndex={0}
+                        aria-label={`Turn the ${b.name} card over`}
+                        onClick={(e) => { e.stopPropagation(); setFlipped(b.name); }}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") { e.preventDefault(); e.stopPropagation(); setFlipped(b.name); }
+                        }}
+                      />
                     </span>
                     <span className={styles.flipBack}>
                       <span className={styles.flipBackInner}>
@@ -590,7 +613,20 @@ export default function BreedStrip({
                           </span>
                         )}
                       </span>
-                      <span className={styles.deskBackFlip} aria-hidden="true" />
+                      {/* The existing flip icon, now interactive: taps turn the
+                          card back. Below 480 only (pointer-events gated in CSS);
+                          above 480 it stays the decorative icon it was, mouse
+                          blocked, and turning it back to the front is a no-op. */}
+                      <span
+                        className={styles.deskBackFlip}
+                        role="button"
+                        tabIndex={0}
+                        aria-label="Turn the card back"
+                        onClick={(e) => { e.stopPropagation(); setFlipped(null); }}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") { e.preventDefault(); e.stopPropagation(); setFlipped(null); }
+                        }}
+                      />
                     </span>
                     {kind && (
                       <span

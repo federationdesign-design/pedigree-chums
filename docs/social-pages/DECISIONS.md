@@ -124,6 +124,33 @@ circles at all (6, 7 and 3 cards); 1700s, 1800s and 1900s have none. With the
 circles hidden, the worst-case back content (button + longest note) overflows the
 fixed face by ~7px, which is imperceptible.
 
+## Touch flip on the era card, below 480
+
+The strip card only flipped on `:hover`/`:focus-visible`, and a phone has no
+hover, so the yellow back (and all the styling matched above) was unreachable on
+a finger. Added a tap flip, matching the mobile carousel card, below 480 only:
+- `BreedStrip.tsx`: a `flipped` state; a front tap control (`.frontFlip`) that
+  turns the card, and the existing `.deskBackFlip` icon made interactive to turn
+  it back (Steve's call: reuse the icon that is already there rather than add a
+  second control). `.flipInner` gets an inline `rotateY(180deg)` when flipped.
+- `history.module.css` (below 480 only): show `.frontFlip` top-right (the
+  `.lineageBadge` tree glyph steps aside, exactly as the mobile card did with its
+  own glyph), enlarge and un-gate `.deskBackFlip` for touch, and switch off the
+  hover/focus flip so the tap state drives it.
+
+**Desktop history is untouched, and this is how:** `.frontFlip` is `display:none`
+above 480 (not painted, not tabbable, cannot flip), `.deskBackFlip` keeps its
+`pointer-events:none` and its size above 480 (mouse blocked, look unchanged), and
+the `flipped` state can only be set by the below-480 controls, so above 480 it
+stays null and the inline transform is never applied. The hover flip is only
+switched off below 480. Verified: desktop history at 1280 renders identically to
+baseline (both 1280 x 30739). Touch flip verified at 360 with hover disabled
+(inner transform goes none -> rotateY(180deg) on tap; only the tapped card
+flips). One accepted non-visual delta above 480: `.deskBackFlip` gains a
+focusable no-op role in the tab order, alongside the outbound-link circles that
+were already there; activating it there sets the state to null, which does
+nothing.
+
 ## Commit split (handed to Steve, not committed here)
 
 Two commits, file-level, no hunk splitting:

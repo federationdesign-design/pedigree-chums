@@ -750,6 +750,28 @@
   pointer-events: none;
 }
 
+/* Touch flip control on the card front, shown ONLY below 480 (see the media
+   block near the foot of this file). The mobile flip-icon on a white ground; a
+   finger taps it to turn the card, since a phone has no hover. display:none
+   above 480 keeps it off the desktop strip entirely: not painted, not tabbable,
+   cannot flip. Added 13 August 2026. */
+.frontFlip {
+  display: none;
+  position: absolute;
+  z-index: 4;
+  cursor: pointer;
+  background: #ffffff;
+  filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.45));
+  -webkit-mask-image: url("/flip-icon.svg");
+  mask-image: url("/flip-icon.svg");
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+}
+
 /* Outbound link badges on the card back, and the 'leaving another site' warning
    the tap opens. Same artwork and copy as the mobile card. */
 .backLinks {
@@ -909,5 +931,30 @@
   }
   .backLinks {
     display: none;
+  }
+  /* Touch flip: below 480 there is no hover, so the tap controls turn the card
+     and the CSS hover flip is switched off. The front control appears top-right
+     (the tree badge steps aside, as on the mobile card) and the existing
+     .deskBackFlip icon becomes tappable to turn it back. Era pages only; above
+     480 the hover flip and the badge are untouched. Added 13 August 2026. */
+  .flipCard:hover .flipInner,
+  .flipCard:focus-visible .flipInner {
+    transform: none;
+  }
+  .lineageBadge {
+    display: none;
+  }
+  .frontFlip {
+    display: block;
+    top: 12px;
+    right: 12px;
+    width: 44px;
+    height: 44px;
+  }
+  .deskBackFlip {
+    width: 40px;
+    height: 40px;
+    pointer-events: auto;
+    cursor: pointer;
   }
 }
