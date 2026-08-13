@@ -115,6 +115,21 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${display.variable} ${body.variable} ${pct.variable} ${stackNotch.variable} ${score.variable} ${arrowFont.variable} ${unica.variable}`}>
       <body>
+        {/* Before first paint: mirror the stored contrast scheme onto <html> so
+            a returning scheme user never sees a flash of the default view (brief
+            v5, task 5). Built with string concatenation, NOT a template literal:
+            backticks inside an inline script have broken this build before. Keep
+            the key, attribute name and values in sync with lib/contrastScheme.ts. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "(function(){try{" +
+              "var v=window.localStorage.getItem('pc-contrast-scheme');" +
+              "if(v==='black-on-white'||v==='white-on-black'){" +
+              "document.documentElement.setAttribute('data-pc-contrast-scheme',v);" +
+              "}}catch(e){}})();",
+          }}
+        />
         {/* Task 164: the SITE layer. The page content is wrapped so the Boxer's DO NOT PRESS THAT BUTTON
             effects (a brightness filter, a nav fade) can act on the whole site WITHOUT touching the chat:
             the Pick a Chum overlay is a SIBLING of #pc-site below, at a higher stacking level, so it stays
