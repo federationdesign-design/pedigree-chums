@@ -93,10 +93,13 @@ const RARITY_BAND: Record<"common" | "uncommon" | "rare" | "root", { bg: string;
   rare:     { bg: "#4d2e91", fg: "#ffffff", label: "RARE" },
   root:     { bg: "#f47421", fg: "#ffffff", label: "ROOT DOG" },
 };
-// How long the rarity ring takes to draw itself on around the lifted circle. The
-// lift's own fade is 0.2s; this is deliberately a touch longer so the sweep reads
-// as a trace, not a flash, and nowhere near a loading bar. Dial it here.
+// How long the rarity ring takes to draw itself on around the lifted circle, and
+// how long it waits first. The lift's own fade is 0.2s, so the draw holds back
+// that long and only then travels, letting the card arrive before the ring
+// sweeps. The draw is a touch longer than a flash so it reads as a trace, not a
+// loading bar. Dial both here.
 const RARITY_DRAW = "0.5s";
+const RARITY_DRAW_DELAY = "0.2s";
 // distance from the dog to its direct ancestors (mirrors the canvas hover-fan)
 const RING1 = ROOT + 96;
 // distance added at each deeper generation
@@ -1641,12 +1644,18 @@ export default function LineageMap({
               r={R + rootRingW / 2}
               fill="none"
               stroke={RARITY_BAND[rarityTier].bg}
-              strokeWidth={rootRingW}
+              /* +6 over the band so it also covers the rect ring's own 4px CSS
+                 stroke (2px each side) plus a hair of margin, leaving none of the
+                 original ring showing at either edge once the sweep has passed. */
+              strokeWidth={rootRingW + 6}
               strokeLinecap="round"
               pathLength={1}
-              transform="rotate(-90)"
+              /* rotate(90) starts the draw at the BOTTOM (six o'clock); the SVG
+                 circle path begins at three o'clock, so +90 in y-down puts it at
+                 the foot. */
+              transform="rotate(90)"
               className={styles.rarityRing}
-              style={{ ["--rarity-draw" as string]: RARITY_DRAW }}
+              style={{ ["--rarity-draw" as string]: RARITY_DRAW, ["--rarity-delay" as string]: RARITY_DRAW_DELAY }}
             />
           ) : null}
           {/* Rarity band: a coloured strip across the bottom of the circle, on the

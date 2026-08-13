@@ -157,7 +157,9 @@
 }
 @media (prefers-reduced-motion: no-preference) {
   .rarityRing {
-    animation: lm-ring-draw var(--rarity-draw, 0.5s) ease-out both;
+    /* delay holds it invisible (the `from` state, via `both`) while the card
+       lifts, then it sweeps; duration and delay come inline from LineageMap.tsx. */
+    animation: lm-ring-draw var(--rarity-draw, 0.5s) ease-out var(--rarity-delay, 0.2s) both;
   }
 }
 @keyframes lm-ring-draw {
