@@ -13,7 +13,7 @@
 .hero {
   position: relative;
   width: 100%;
-  min-height: clamp(460px, 80vh, 1000px); /* mirrored as HERO_H in the .tsx */
+  min-height: clamp(460px, 80vh, 1000px);
   overflow: hidden;
   display: flex;
   align-items: flex-end;
@@ -63,13 +63,15 @@
 }
 
 /* ── Checkout stage ──
-   Right-aligned card overlapping the hero. It is positioned ABSOLUTELY within
-   .wrap (top = HERO_H - overlap, set inline from the ?ov rule), so it is out of
-   normal flow and no longer pushes the sections below: the checkout and the FAQ
-   column are now independent, and growing the iframe does not move the FAQ. Full
-   bleed via left/right: 0 with the card right-aligned by the flex. */
+   Right-aligned card overlapping the hero. Positioned ABSOLUTELY within .wrap
+   with a fixed top of 440px (its top edge sits 440px down the page, overlapping
+   the hero), so it is out of normal flow and does not push the sections below:
+   the checkout and the FAQ column are independent, and growing the iframe does
+   not move the FAQ. Full bleed via left/right: 0 with the card right-aligned by
+   the flex. */
 .stage {
   position: absolute;
+  top: 440px;
   left: 0;
   right: 0;
   z-index: 3;
@@ -187,22 +189,6 @@
   font-weight: 600;
   line-height: 1.6;
   color: var(--navy, #0a3a57);
-}
-
-/* ── Tuning read-out, styled like the pit's ?simdebug badge ── */
-.badge {
-  position: fixed;
-  top: 8px;
-  left: 8px;
-  z-index: 9999;
-  background: #0a3a57;
-  color: #ffd23e;
-  font: 700 13px/1.4 var(--font-body, 'Montserrat', sans-serif);
-  padding: 8px 11px;
-  border-radius: 8px;
-  border: 2px solid #ffd23e;
-  pointer-events: none;
-  white-space: pre;
 }
 
 /* ── Mobile, below 721px ──
