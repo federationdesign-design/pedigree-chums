@@ -98,6 +98,19 @@
   .twoCol { grid-template-columns: 1fr; }
 }
 
+/* The right (intro) column sticks as the taller FAQ ladder scrolls past it.
+   top clears the site's fixed Nav (~100px logo) for when this page is real.
+   align-self: start keeps the item its natural height (not stretched to the
+   row) so it has room to travel; being a grid item, its sticky travel is bound
+   by the two column block, so it releases at the bottom of the block and never
+   follows into the chum slider. Turned off below 721px where the columns stack
+   (see the mobile rule). */
+.introCol {
+  position: sticky;
+  top: 120px;
+  align-self: start;
+}
+
 /* Intro copy + PLAYERS / AGE / WHERE stats (inlined from HomeClient). */
 .introTitle {
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
@@ -260,5 +273,9 @@
   }
   .heroContent {
     display: none;
+  }
+  /* Columns are stacked here, so the sticky right column is turned off. */
+  .introCol {
+    position: static;
   }
 }

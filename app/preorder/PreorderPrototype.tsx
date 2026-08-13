@@ -109,7 +109,7 @@ export default function PreorderPrototype() {
           </h2>
           <ProtoFaqLadder />
         </div>
-        <div>
+        <div className={styles.introCol}>
           <h2 className={styles.introTitle}>
             Pedigree <span>Chums</span>
           </h2>
