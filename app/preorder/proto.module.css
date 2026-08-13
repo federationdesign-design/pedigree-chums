@@ -1,0 +1,95 @@
+/* Throwaway prototype layout for /preorder (preorder branch only).
+   Hero at the top, Stripe checkout card poking up into it from the right.
+   No page background: the global body gradient shows through below the hero. */
+
+.wrap {
+  position: relative;
+  color: #fff;
+  font-family: var(--font-body, 'Montserrat', system-ui);
+}
+
+/* ── Hero (inlined copy of the /home hero, not the shared component) ── */
+.hero {
+  position: relative;
+  width: 100%;
+  min-height: clamp(460px, 80vh, 1000px); /* mirrored as HERO_H in the .tsx */
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+}
+
+.heroImg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: var(--blue-sky) url("/home-hero.jpg") center / cover no-repeat;
+}
+
+.heroTint {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(10,58,87,0.08) 0%, rgba(10,58,87,0.55) 100%);
+}
+
+.heroContent {
+  position: relative;
+  z-index: 2;
+  padding: clamp(32px, 6vw, 64px) clamp(20px, 6vw, 80px) clamp(24px, 4vw, 48px);
+  max-width: 620px;
+}
+
+.heroTitle {
+  font-family: var(--font-display, 'Luckiest Guy', system-ui);
+  font-size: clamp(2.8rem, 8vw, 6rem);
+  color: #ffffff;
+  line-height: 1;
+  margin: 0 0 14px;
+  letter-spacing: 0.02em;
+  text-shadow: 0 4px 24px rgba(0,0,0,0.3);
+}
+
+.heroTitle span { color: var(--yellow, #ffd23e); }
+
+.heroSub {
+  font-size: clamp(15px, 1.8vw, 19px);
+  color: #ffffff;
+  margin: 0;
+  font-weight: 600;
+  line-height: 1.45;
+  max-width: 520px;
+}
+
+/* ── Checkout stage ──
+   Right-aligned and pulled up over the hero with a NEGATIVE margin-top, which
+   keeps it in normal flow: as the Stripe iframe grows the stage grows, and the
+   footer below it shifts down. The exact pull comes from the ?ov rule (inline
+   style on the element). */
+.stage {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  justify-content: flex-end;
+  padding: 0 clamp(16px, 5vw, 48px);
+}
+
+.col {
+  width: min(92vw, 620px);
+}
+
+/* ── Tuning read-out, styled like the pit's ?simdebug badge ── */
+.badge {
+  position: fixed;
+  top: 8px;
+  left: 8px;
+  z-index: 9999;
+  background: #0a3a57;
+  color: #ffd23e;
+  font: 700 13px/1.4 var(--font-body, 'Montserrat', sans-serif);
+  padding: 8px 11px;
+  border-radius: 8px;
+  border: 2px solid #ffd23e;
+  pointer-events: none;
+  white-space: pre;
+}
