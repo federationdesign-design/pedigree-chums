@@ -116,3 +116,34 @@
   pointer-events: none;
 }
 .pc-hide-overlay > span { display: block; max-height: 100%; overflow: hidden; }
+
+/* ============================================================================
+   HEADER CHROME IN A SCHEME (task 6 follow-up: non-text contrast).
+
+   The monochrome sweep flips text and fill but not outline-color, and the
+   burger's bars are background-coloured divs (not text), so in a scheme the
+   menu icon collapsed into its button (1:1) and every navy outline stayed navy
+   (~1.8:1 on black). These rules give every header stroke and icon the scheme
+   foreground, and keep the three A cells showing their own sample. The #pc-site
+   prefix outspecifies the sweep (which carries an id).
+   ========================================================================== */
+
+/* Burger: bars and outline take the scheme foreground; the button fill is
+   already the scheme background from the sweep. */
+:root[data-pc-contrast-scheme="black-on-white"] #pc-site .pc-nav [class*="burger"] { outline-color: #000000 !important; }
+:root[data-pc-contrast-scheme="black-on-white"] #pc-site .pc-nav [class*="burger"] span { background: #000000 !important; }
+:root[data-pc-contrast-scheme="white-on-black"] #pc-site .pc-nav [class*="burger"] { outline-color: #ffffff !important; }
+:root[data-pc-contrast-scheme="white-on-black"] #pc-site .pc-nav [class*="burger"] span { background: #ffffff !important; }
+
+/* Toolbar boxes and cells: outlines to the scheme foreground. */
+:root[data-pc-contrast-scheme="black-on-white"] #pc-site .pc-nav [class*="__box"],
+:root[data-pc-contrast-scheme="black-on-white"] #pc-site .pc-nav [class*="__cell"] { outline-color: #000000 !important; }
+:root[data-pc-contrast-scheme="white-on-black"] #pc-site .pc-nav [class*="__box"],
+:root[data-pc-contrast-scheme="white-on-black"] #pc-site .pc-nav [class*="__cell"] { outline-color: #ffffff !important; }
+
+/* The three A cells keep their own scheme sample: fill, letter and an outline
+   that contrasts that fill, whichever scheme is active. Placed after the cell
+   rule above so these win. */
+:root[data-pc-contrast-scheme] #pc-site .pc-nav [class*="aDefault"] { background: #ffffff !important; color: var(--navy) !important; }
+:root[data-pc-contrast-scheme] #pc-site .pc-nav [class*="aBlackOnWhite"] { background: #ffffff !important; color: #000000 !important; }
+:root[data-pc-contrast-scheme] #pc-site .pc-nav [class*="aWhiteOnBlack"] { background: #000000 !important; color: #ffffff !important; }
