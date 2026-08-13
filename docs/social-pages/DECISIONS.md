@@ -1,0 +1,124 @@
+# Per-era social pages: decisions
+
+Single-pass review. Built 13 August 2026 to `docs/social-pages/BRIEF.md`. Not
+committed, not pushed. Backup patch at `.scratch/social-pages-overnight.patch`.
+
+## What was built
+
+Six share-only pages at `/britains-dog-history/[era]`, one dynamic route,
+statically generated for six slugs, 404 for anything else.
+
+| Slug | Strips rendered (uk-breeds `strip` keys) |
+|---|---|
+| ancient | ancient |
+| medieval | medieval |
+| tudor | c1500 |
+| 1700s | c1700 |
+| 1800s | early1800, spaniels, mid1800, late1800 (stacked, page order) |
+| 1900s | c1900 |
+
+Each strip renders as: the era heading (BreedStrip's own `stripLabel`), then the
+slider (BreedStrip), then the era write-up panel (`HistorySection`) below it. The
+1800s page stacks four such units.
+
+## Decisions
+
+**1800s strips: all four (Steve chose).** early1800, spaniels, mid1800, late1800
+in page order.
+
+**Era heading: BreedStrip's own `stripLabel`, no box, no note (Steve chose).**
+Matches the history page's era heading exactly (`ERA_LABELS[era]`, e.g. "The
+1700s"). An earlier invented header (blue box + word lockup with a stray "Dogs")
+was scrapped. The one-line eraIntros note is used only for the SEO description,
+not shown.
+
+**Write-up panel below each slider, at all widths (Steve chose, option A).** The
+blue glow `.section` panel from the history page (intro, detail, bullets, Did you
+know facts, image), same component and same copy source. No 720px switch to a
+mobile treatment, because the mobile carousel is not reusable per era (see
+below).
+
+**Why not the mobile carousel on phones.** `HistoryCarousel` renders every era in
+one flat swipe sequence (whole-history, not per-era), and `TimelineRun` is hard-
+wired to that shell (`getElementById("mobile-carousel")`, reads its scroll,
+writes `data-pc-vlock`), so it cannot render standalone. A per-era carousel would
+be a new build touching `britains-dog-history-2`, which Steve is keeping isolated.
+
+**Route, slugs, metadata, nav, back link.** Single dynamic route
+`/britains-dog-history/[era]`; `dynamicParams = false` + `generateStaticParams`
+for the six slugs (`crosses` 404s by design). Title from the era name,
+description from the strips' existing eraIntros notes (no new copywriting).
+Unlisted, not added to any nav or sitemap. One back link to
+`/britains-dog-history`, styled from site tokens.
+
+**No site Nav or Footer (judgement call).** Per "and nothing else": back link,
+strips, panels. Global root-layout chrome (pre-order launcher, effects) still
+wraps the page as on every route.
+
+## The extraction (Steve approved, both parts)
+
+To share one copy source between the history page and the era pages:
+- `data/historySections.ts` (new): the `Section` type + `SECTIONS` array, lifted
+  verbatim from `app/britains-dog-history/page.tsx`.
+- `components/HistorySection/HistorySection.tsx` (new): the `.section` panel
+  markup, lifted verbatim (same classes, same structure).
+- `app/britains-dog-history/page.tsx` (modified): now imports `SECTIONS` and
+  renders `<HistorySection>` instead of the inline array and inline panel. The
+  unused `Image` and `FactHatImage` imports were removed (they moved into the
+  component).
+
+Edit the copy in `data/historySections.ts` and both the history page and the era
+pages update. The mobile carousel keeps its own deliberate duplicate in
+`app/britains-dog-history-2/sections.ts`; that isolation is intentional and was
+NOT reversed (Steve's instruction).
+
+Panel dependencies, all self-contained: `next/image`, `FactHatImage`, the
+`history.module.css` classes, and `/public/history/` assets.
+
+## Files
+
+New: `data/historySections.ts`, `components/HistorySection/HistorySection.tsx`,
+`app/britains-dog-history/[era]/{page.tsx,eraConfig.ts,era.module.css}`,
+`docs/social-pages/{BRIEF.md,DECISIONS.md}`.
+Modified: `app/britains-dog-history/page.tsx` (the extraction only).
+
+## Verification
+
+- `tsc --noEmit` clean; `:global` audit clean; eslint clean on all touched files.
+- Six slugs 200, `crosses` and unknown slugs 404.
+- History page desktop before and after the extraction: both captures are
+  1280 x 30739, identical height and visually indistinguishable (same ten
+  panels, same order, same strips). Renders identically. Screenshots in the
+  session scratchpad: `history-before.png`, `history-after.png`.
+- Era page at 390: heading, slider, then the panel, all render and are legible
+  (`era-1700s-390-full.png`). The panel reflows to a single column via the
+  existing `@media (max-width: 760px)` rule.
+
+## Mobile fact stack (applied, Steve approved)
+
+At 390 the "Did you know?" fact rows kept the image-beside-text layout, squeezing
+the copy into a narrow column. Fixed with a `@media (max-width: 480px)` rule in
+`history.module.css` that stacks the circle above its text so the copy takes the
+full panel width. It only reaches the era pages: the history page's desktop view
+is hidden at 720 and below, where the carousel takes over, so the history page is
+unaffected. Verified at 390 (`era-1700s-390-facts.png`).
+
+## Commit split (handed to Steve, not committed here)
+
+Two commits, file-level, no hunk splitting:
+
+1. **refactor** (history page output-identical): `data/historySections.ts`,
+   `components/HistorySection/HistorySection.tsx`,
+   `app/britains-dog-history/page.tsx`.
+2. **feat** (the new pages plus their mobile polish):
+   `app/britains-dog-history/[era]/`, `app/britains-dog-history/history.module.css`
+   (the 480px fact rule), `docs/social-pages/`.
+
+The 480px CSS rule sits in commit 2, not the refactor, so commit 1 stays a pure
+output-identical extraction.
+
+## Notes
+
+- Dev server left running on port 3123.
+- Nothing committed or pushed. Backup patch at
+  `.scratch/social-pages-overnight.patch` (gitignored).

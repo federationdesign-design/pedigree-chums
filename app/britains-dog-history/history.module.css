@@ -853,3 +853,20 @@
   .factLabel { font-size: clamp(1.63rem, 3.3vw, 2.08rem); }
   .factText { font-size: clamp(0.95rem, 2.28vw, 1.11rem); }
 }
+
+/* At phone width the fact picture beside the text squeezes the copy to a narrow
+   column, so below 480px the circle stands above its text and the copy takes the
+   full panel width. This only reaches the per-era social pages
+   (app/britains-dog-history/[era]): the history page's desktop view is hidden at
+   720 and below, where the mobile carousel takes over, so it never sees this.
+   Added 13 August 2026. */
+@media (max-width: 480px) {
+  .factRow {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  .factImg {
+    align-self: center;
+  }
+}

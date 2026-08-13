@@ -1,0 +1,59 @@
+/* Per-era social pages. Deliberately minimal: a back link, then the reused
+   BreedStrip slider(s). The era heading and every other visible element come
+   from BreedStrip itself, so the treatment matches the history page exactly and
+   nothing is restyled here. No site Nav, Footer or hero, per the brief's "and
+   nothing else" (recorded in docs/social-pages/DECISIONS.md). The body gradient
+   from the root layout shows through, the same backdrop the history page's
+   strips sit on. */
+
+.page {
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding: clamp(20px, 4vw, 48px) 0 clamp(48px, 8vw, 96px);
+  /* The strips break full-bleed on their own (margin: calc(50% - 50vw)), so the
+     page keeps horizontal overflow contained. */
+  overflow-x: hidden;
+}
+
+/* Back link. One link back to the history index, styled from the site tokens to
+   sit on the light body gradient. */
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 clamp(20px, 6vw, 90px);
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--navy);
+  text-decoration: none;
+}
+.back::before {
+  content: "\2039"; /* single left angle quote, a lightweight back chevron */
+  font-size: 1.4em;
+  line-height: 1;
+}
+.back:hover {
+  text-decoration: underline;
+}
+
+/* Holds the write-up panel below each slider, reproducing the horizontal inset
+   the history page's .sections container gives it, so the panel renders at the
+   same width it does there. The slider stays full-bleed on its own. */
+.sectionHolder {
+  padding: 0 calc(clamp(18px, 4vw, 40px) + 30px);
+}
+
+/* Visually hidden, still read by screen readers and search. The visible era
+   heading is BreedStrip's stripLabel span, kept identical to the history page. */
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
