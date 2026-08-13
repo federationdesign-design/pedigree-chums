@@ -104,6 +104,12 @@ export default function PreorderPrototype() {
           inlined from HomeClient), FAQ ladder in a single column (right). */}
       <section className={styles.twoCol}>
         <div>
+          <h2 className={styles.faqHeading}>
+            Frequently Asked <span>Questions</span>
+          </h2>
+          <ProtoFaqLadder />
+        </div>
+        <div>
           <h2 className={styles.introTitle}>
             Pedigree <span>Chums</span>
           </h2>
@@ -129,12 +135,6 @@ export default function PreorderPrototype() {
               <span className={styles.metaValue}>Anywhere</span>
             </div>
           </div>
-        </div>
-        <div>
-          <h2 className={styles.faqHeading}>
-            Frequently Asked <span>Questions</span>
-          </h2>
-          <ProtoFaqLadder />
         </div>
       </section>
 
