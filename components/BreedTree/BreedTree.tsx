@@ -5931,7 +5931,7 @@ export default function BreedTree({
                       // full size now show if they fit small. Gating on fit.fits
                       // (the full-size result) would keep the old, smaller set and
                       // make the halving pointless.
-                      const fs = Math.max(10, Math.min(cap, fit.fs + TITLE_BOOST)) * 0.78125; // 0.5 -> 0.625 -> 0.78125, two +25% steps (14 August 2026). The fit is RE-TESTED at this size below, so a few more names that fit smaller may now drop.
+                      const fs = Math.max(10, Math.min(cap, fit.fs + TITLE_BOOST)) * 0.8984375; // 0.78125 +15% (14 August 2026); 0.5 -> 0.625 -> 0.78125 -> 0.8984375. The fit is RE-TESTED at this size below, so a few more names that fit smaller may now drop.
                       const widthEm = Math.max(...lines.map((l) => measureEm(l, labelFont)));
                       if (!labelFits(widthEm, lines.length, fs, rFit)) return null;
                       // Rightward shift, matched to labelFits' dxR so the draw and
