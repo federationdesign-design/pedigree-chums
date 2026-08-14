@@ -27,7 +27,7 @@ type Panel =
      because on a phone the pair ran well past a screenful. */
   | { kind: "text"; text: string; lead: boolean }
   | { kind: "bullet"; text: string; title?: string }
-  | { kind: "fact"; text: string; image: string };
+  | { kind: "fact"; text: string; image: string; imageAlt?: string };
 
 /* TEN panels per section: the opening paragraph, the second paragraph, then
    the four bullets and the four facts. Shared with the counter script and the
@@ -85,7 +85,7 @@ function panelsFor(s: (typeof SECTIONS)[number]): Panel[] {
     { kind: "text", text: s.intro, lead: true },
     { kind: "text", text: s.detail, lead: false },
     ...s.bullets.map((b, i) => ({ kind: "bullet" as const, text: b, title: s.bulletTitles?.[i] })),
-    ...s.facts.map((f) => ({ kind: "fact" as const, text: f.text, image: f.image || s.image })),
+    ...s.facts.map((f) => ({ kind: "fact" as const, text: f.text, image: f.image || s.image, imageAlt: f.imageAlt })),
   ];
 }
 
@@ -224,7 +224,7 @@ export default function HistoryCarousel() {
                           <img
                             className={styles.factImg}
                             src={p.image}
-                            alt=""
+                            alt={p.imageAlt || ""}
                             data-pc-roll={first + pi}
                           />
                           <p className={styles.factLabel}>Did you know?</p>

@@ -10,12 +10,12 @@ import { BRITAIN_HISTORY_HAT_ID } from '../../lib/hiddenGames/hatHunt';
 
 const HAT_SRC = '/history/dog-birthday.jpg';
 
-export default function FactHatImage({ src, width, height }: { src: string; width: number; height: number }) {
+export default function FactHatImage({ src, alt, width, height }: { src: string; alt?: string; width: number; height: number }) {
   const isHat = src === HAT_SRC;
   return (
     <Image
       src={src}
-      alt=""
+      alt={alt || ""}
       width={width}
       height={height}
       unoptimized

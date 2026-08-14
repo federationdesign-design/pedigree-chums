@@ -199,7 +199,7 @@ export default function BullsEyePage() {
                   hold={1}
                   sceneVh={600}
                   captionMode="stack"
-                  alt="Where Sikes and Bull\u2019s-eye overlap in the reader\u2019s mind"
+                  alt="Where Sikes and Bull's-eye overlap in the reader's mind"
                   images={[
                     "/history/bullseye/venn1.jpg",
                     "/history/bullseye/venn2.jpg",
