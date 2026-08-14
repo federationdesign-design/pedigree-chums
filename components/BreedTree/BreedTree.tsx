@@ -6730,36 +6730,32 @@ export default function BreedTree({
         <div
           className={styles.diff}
           style={(() => {
-            // The track runs from just under the top edge down to the cap of the
-            // S in START, so it uses the full height rather than a guessed 52%.
-            // START's glyph top is worked out with the same numbers the word
-            // itself uses, so the two stay together if either is retuned.
+            // Re-anchored (14 Aug 2026): the track hangs a gap below the top-left
+            // PROFILE image and its foot stops a gap above the PLAY button; the
+            // height is whatever is left between them. The profile position is the
+            // live one LineageModal publishes (portraitAnchor, screen px), turned
+            // into stage px with the stage's own rect. On a short screen the TOP gap
+            // gives first, so the slider keeps a usable MIN_H and its 50px clearance.
             const st = stageRef.current;
             const vbHc = aspect >= 1 ? SIZE : SIZE / aspect;
-            const topFrac = 0.045; // plus a 100px nudge below, applied in css units
-            // 1.24 is the glyph half-height as a multiple of fs/vbHc, measured
-            // off the rendered word rather than assumed: Luckiest Guy at this
-            // scale sits taller in its box than a nominal 0.62 would suggest.
-            // PLAY is a square now, not a word, so the track stops at the top
-            // of the button rather than at the cap of a letter. Half the
-            // square's height, in the same view units, using the same figures
-            // the button itself uses. The old glyph maths and its 1.24 fudge
-            // factor go with the word.
             const stH = st ? st.clientHeight : 844;
             const uppS = (aspect >= 1 ? SIZE : SIZE / Math.max(aspect, 0.01)) / Math.max(stH, 1);
             const btnHalf = (84 * pitScale * 1.2 * uppS) / 2;
-            const startTopFrac = 0.5 + WORD_START_Y - btnHalf / vbHc;
-            // nudged 20px down, and the track shortens by the same so its foot
-            // stays on the cap of the P
-            /* Up 5px. The foot was landing ON the PLAY square rather than
-               above it: startTopFrac is the top of the button exactly, so the
-               track had no clearance at all. The 5 comes off `top` and the
-               height is left alone, which lifts the whole control and takes the
-               foot with it. */
-            return {
-              top: `calc(${topFrac * 100}% + 95px)`,
-              height: `calc(${Math.max(18, (startTopFrac - topFrac) * 100)}% - 100px)`,
-            };
+            const startTopFrac = 0.5 + WORD_START_Y - btnHalf / vbHc; // PLAY button top, fraction of the stage
+            const playTop = startTopFrac * stH;                       // ...in stage px
+            // ---- SLIDER LENGTH DIALS ----
+            const TOP_GAP = Math.min(200, Math.max(90, 0.22 * (typeof window !== "undefined" ? window.innerHeight : 844))); // clamp(90px, 22vh, 200px): profile-bottom -> slider-top
+            const BOTTOM_GAP = 50;   // slider-bottom -> PLAY-top
+            const MIN_H = 120;       // usable slider length; the TOP gap gives on a short screen to hold this
+            const rect = st ? st.getBoundingClientRect() : null;
+            // Profile-image bottom in stage px; falls back to the old top area until
+            // the measure lands.
+            const portraitBottom = (portraitAnchor && rect) ? (portraitAnchor.cy + portraitAnchor.rad - rect.top) : 0.045 * stH;
+            let top = portraitBottom + TOP_GAP;
+            const bottom = playTop - BOTTOM_GAP;
+            let height = bottom - top;
+            if (height < MIN_H) { height = MIN_H; top = bottom - MIN_H; } // short screen: hold the foot + min height, compress the top gap
+            return { top: `${Math.max(0, top)}px`, height: `${Math.max(0, height)}px` };
           })()}
         >
           <div
