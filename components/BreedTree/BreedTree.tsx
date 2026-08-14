@@ -616,7 +616,7 @@ const TITLE_BOOST = 2;
 // The trade, honestly: this puts the pit word within 5% of the size the label
 // was inside its circle, which is the situation the constant was raised to fix
 // in the first place. 1.3 is the middle if that reads too quiet.
-const PIT_WORD_SCALE = 1.05;
+const PIT_WORD_SCALE = 0.84; // was 1.05; -20% (14 August 2026). Play-area pit words only; separate from the learn labels' 0.78125 size factor.
 // The pop as the circles go. Starts at nothing, overshoots to 115%, settles.
 // Timed off the drop rather than off each body, so the names arrive together.
 const WORD_POP_MS = 380;
