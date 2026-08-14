@@ -146,6 +146,8 @@
 :root[data-pc-contrast-scheme] :is(#pc-site, [data-pc-reach]) [data-pc-over-media],
 :root[data-pc-contrast-scheme] :is(#pc-site, [data-pc-reach]) [data-pc-over-media] * {
   color: #ffffff !important;
+  background-color: transparent !important;
+  background-image: none !important;
 }
 /* Inline CONTENT svgs (charts, influence bars, the SVG-wrapped breed portrait)
    are not img/video/iframe, so the rule above misses them and they keep their

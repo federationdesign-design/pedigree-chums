@@ -4,3 +4,11 @@
   transform-origin: center center;
   pointer-events: none;
 }
+
+/* In a contrast scheme the sweep strips this decorative yellow-triangle.svg and
+   fills the box to a white/black square. It is pure decoration, so hide it
+   instead of leaving a flat square. display is not set by the sweep, so this needs
+   no id to win. Compounded with .tri to clear the CSS-Modules build trap. */
+:root[data-pc-contrast-scheme] .tri {
+  display: none !important;
+}
