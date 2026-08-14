@@ -1633,55 +1633,6 @@ export default function LineageMap({
             rx={circular ? R + rootRingW : 24}
             className={styles.rootCard}
             style={circular && ringColor ? { fill: ringColor, stroke: ringColor } : undefined} />
-          {/* Rarity glow: a soft pulsing halo in the rarity colour, sat just OUTSIDE
-              the ring and BEHIND the image + rings. So the halo reads OUTWARD, the
-              crisp ring is untouched, and the blur that bleeds inward is hidden under
-              the ring (never tinting the photo). This replaces the first attempt,
-              which sat ON the ring band and was almost entirely covered by it, so only
-              a faint tail showed. Independent blurred-stroke layers, matching the
-              box-shadow reference. The blurs are STATIC (computed once), so the pulse
-              is a compositor-only group-opacity breath, cheap next to the pit's
-              physics canvas. Hidden until the ring's draw completes (delay =
-              --rarity-delay + --rarity-draw = 1.1s), then breathes; keyed on the dog
-              so it restarts per lift. Reduced motion: static halo.
-
-              INTENSITY DIALS (change here, no investigation needed):
-              - GLOW_BLURS: the four layer blur radii (px). The two smaller are the
-                bright near-halo, the two larger the soft wide bloom. Raise the last
-                for a bigger halo; lower them all for a tighter one.
-              - GLOW_INNER_TINT: how far the inner two layers lighten toward white (0..1).
-              - GLOW_SPREAD: extra px pushing the halo band out past the ring edge.
-              - BRIGHTNESS + PACE: --glow-min / --glow-max opacity and the 2s duration,
-                on .rarityGlow / @keyframes lm-glow-pulse in LineageMap.module.css. */}
-          {rarityTier ? (() => {
-            const GLOW_INNER_TINT = 0.55;                   // inner two layers lightened toward white (0..1)
-            const GLOW_BLURS = [3, 7, 13, 22];              // px; last value = halo reach
-            const GLOW_SPREAD = 0;                          // extra px beyond the ring's outer edge
-            const deep = RARITY_BAND[rarityTier].bg;
-            // mix the tier colour toward white for the inner layers, the reference's
-            // lighter tint. No new dependency; a plain hex lerp toward #ffffff.
-            const lighten = (hex: string, t: number) => {
-              const n = parseInt(hex.slice(1), 16);
-              const r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
-              const m = (c: number) => Math.round(c + (255 - c) * t);
-              return `#${((1 << 24) + (m(r) << 16) + (m(g) << 8) + m(b)).toString(16).slice(1)}`;
-            };
-            const light = lighten(deep, GLOW_INNER_TINT);
-            const gw = rootRingW + 6;                       // halo band width, matches the ring band
-            const rGlow = R + rootRingW + 3 + gw / 2 + GLOW_SPREAD; // inner edge hugs the ring's outer edge
-            const layers = GLOW_BLURS.map((blur, i) => ({ blur, c: i < 2 ? light : deep }));
-            return (
-              <g
-                key={`glow-${breed.name}`}
-                className={styles.rarityGlow}
-                style={{ ["--rarity-draw" as string]: RARITY_DRAW, ["--rarity-delay" as string]: RARITY_DRAW_DELAY, pointerEvents: "none" }}
-              >
-                {layers.map((L, i) => (
-                  <circle key={i} cx={0} cy={0} r={rGlow} fill="none" stroke={L.c} strokeWidth={gw} style={{ filter: `blur(${L.blur}px)` }} />
-                ))}
-              </g>
-            );
-          })() : null}
           {breed.image ? <image href={bust(breed.image)} x={-R} y={-R} width={R*2} height={R*2} clipPath={`url(#${clip})`} preserveAspectRatio="xMidYMid slice" /> : null}
           {/* Rarity ring: a tier-coloured stroke laid OVER the existing ring rect,
               on the same band (radius R + rootRingW/2, width rootRingW so it covers

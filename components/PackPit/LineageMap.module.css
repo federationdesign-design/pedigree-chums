@@ -192,35 +192,6 @@
   from { stroke-dashoffset: 1; }
   to { stroke-dashoffset: var(--green-off, 1); }
 }
-/* Rarity glow: a soft pulsing halo in the rarity colour, layered blurred strokes
-   (independent layers, matching the box-shadow reference; the blurs are static so
-   the pulse is a compositor-only group opacity, cheap next to the pit's physics
-   canvas). Hidden until the ring's draw completes (delay = --rarity-delay +
-   --rarity-draw = 1.1s), then breathes 2s each way. Reduced motion: a static halo,
-   no pulse. Added 14 August 2026. */
-.rarityGlow {
-  /* BRIGHTNESS + PACE dials for the glow. --glow-min / --glow-max are the pulse
-     trough / peak opacity (turn the whole glow down or up); the 2s in the animation
-     below is the pace, each way. Spread, tint and colour are dialled in
-     LineageMap.tsx (GLOW_BLURS, GLOW_INNER_TINT, GLOW_SPREAD). */
-  --glow-min: 0.4;
-  --glow-max: 1;
-  opacity: 0;
-}
-@media (prefers-reduced-motion: no-preference) {
-  .rarityGlow {
-    animation: lm-glow-pulse 2s ease-in-out calc(var(--rarity-delay, 0.2s) + var(--rarity-draw, 0.9s)) infinite alternate;
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .rarityGlow {
-    opacity: var(--glow-max, 1);
-  }
-}
-@keyframes lm-glow-pulse {
-  from { opacity: var(--glow-min, 0.4); }
-  to { opacity: var(--glow-max, 1); }
-}
 /* The rarity band slides up from below the circle to arrive as the ring closes.
    It sits inside the circle clipPath, so the rim reveals it rising into view.
    --band-slide (set inline to R) is how far below it starts; --band-dur and
