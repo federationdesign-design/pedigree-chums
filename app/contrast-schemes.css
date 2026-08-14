@@ -163,9 +163,14 @@
 /* The three A cells keep their own scheme sample: fill, letter and an outline
    that contrasts that fill, whichever scheme is active. Placed after the cell
    rule above so these win. */
-:root[data-pc-contrast-scheme] #pc-site .pc-nav [class*="aDefault"] { background: #ffffff !important; color: var(--navy) !important; }
+/* Background on the cell, glyph colour on both the cell and its <span> (the
+   sweep recolours the span directly, so the span needs its own override). */
+:root[data-pc-contrast-scheme] #pc-site .pc-nav [class*="aDefault"] { background: var(--blue-sky) !important; color: var(--yellow) !important; }
+:root[data-pc-contrast-scheme] #pc-site .pc-nav [class*="aDefault"] span { color: var(--yellow) !important; background: transparent !important; }
 :root[data-pc-contrast-scheme] #pc-site .pc-nav [class*="aBlackOnWhite"] { background: #ffffff !important; color: #000000 !important; }
+:root[data-pc-contrast-scheme] #pc-site .pc-nav [class*="aBlackOnWhite"] span { color: #000000 !important; background: transparent !important; }
 :root[data-pc-contrast-scheme] #pc-site .pc-nav [class*="aWhiteOnBlack"] { background: #000000 !important; color: #ffffff !important; }
+:root[data-pc-contrast-scheme] #pc-site .pc-nav [class*="aWhiteOnBlack"] span { color: #ffffff !important; background: transparent !important; }
 
 /* ============================================================================
    ITEMS 1-2 (seven-changes redesign): header wordmark swaps per scheme.
