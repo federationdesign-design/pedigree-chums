@@ -1730,6 +1730,40 @@ export default function LineageMap({
               </g>
             );
           })() : null}
+          {/* Dog name on the image, above the rarity band. Luckiest Guy, white with
+              a black outline. The band's top edge is a -26deg diagonal that rides UP
+              to about y = -0.05R near the right rim, so the lowest line's baseline is
+              held at NAME_BOTTOM and extra lines stack UPWARD into the open top of
+              the image. 0.9em leading reads looser than the number on Luckiest Guy
+              (the ink sits high in the em box), so two lines still breathe. Fit-to-
+              width so a long name never runs past the rim. NAME_BOTTOM is the knob:
+              less negative drops it toward the band. Added 14 August 2026. */}
+          {circular && breed.image ? (() => {
+            const lines = splitName(breed.name);            // 1-2 lines
+            const longest = Math.max(1, ...lines.map((l) => l.length));
+            const NAME_BOTTOM = -R * 0.2;                   // baseline of the lowest line
+            const nameFs = Math.max(10, Math.min(R * 0.32, (R * 1.5) / (0.6 * longest)));
+            const lineH = nameFs * 0.9;                     // 0.9em leading, per the mock
+            return (
+              <text
+                textAnchor="middle"
+                style={{
+                  fontFamily: '"Luckiest Guy", system-ui, sans-serif',
+                  fontWeight: 400,
+                  fill: "#ffffff",
+                  stroke: "#000000",
+                  strokeWidth: Math.max(2, nameFs * 0.14),
+                  paintOrder: "stroke",
+                  strokeLinejoin: "round",
+                  pointerEvents: "none",
+                }}
+              >
+                {lines.map((ln, i) => (
+                  <tspan key={i} x={0} y={NAME_BOTTOM - (lines.length - 1 - i) * lineH}>{ln}</tspan>
+                ))}
+              </text>
+            );
+          })() : null}
         </>)}
         {/* the root card carries no status dot; only the ancestor cards show one */}
       </g>
@@ -1763,7 +1797,7 @@ export default function LineageMap({
           return (
           <g
             className={styles.removeBtn}
-            transform={`translate(0,${circular ? 4 * learnBtnScale : 62}) scale(${circular ? learnBtnScale : 1})`}
+            transform={`translate(0,${circular ? 4 * learnBtnScale + 2 : 62}) scale(${circular ? learnBtnScale : 1})`}
             onClick={(e) => { e.stopPropagation(); revealStep(); }}
             onPointerDown={(e) => e.stopPropagation()}
             role="button"
