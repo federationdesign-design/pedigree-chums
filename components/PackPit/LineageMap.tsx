@@ -2334,6 +2334,20 @@ export default function LineageMap({
                     const f = soloWordFit(c.name, CW);
                     const y0 = -((f.lines.length - 1) * SOLO_LINE_H * f.fs) / 2;
                     return (
+                      <>
+                      {/* The word draws with pointerEvents:none and carries no ring
+                          rect or image, so on its own it gives the shared cardDrag
+                          handlers nothing to catch: the pointerdown falls through to
+                          the overlay's onPanDown and you pan the whole circle instead
+                          of lifting the card. This invisible square is the card's grab
+                          surface, the same rgba(0,0,0,0.001) + pointerEvents:all trick
+                          the corner buttons use, so the existing handlers on the group
+                          fire. Sized to the card footprint (CW), so it intercepts only
+                          the word's own area, never the empty space you pan by. A self
+                          card only exists for a solo dog, which always has exactly one
+                          matching frame, so there is nowhere it can be picked up with
+                          nothing to drop it into. Added 14 August 2026. */}
+                      <rect x={c.cardX - CW / 2} y={c.cardY - CW / 2} width={CW} height={CW} style={{ fill: "rgba(0,0,0,0.001)", pointerEvents: "all" }} />
                       <text x={c.cardX} y={c.cardY} textAnchor="middle" dominantBaseline="central"
                         transform={`rotate(${SOLO_TILT_DEG} ${c.cardX} ${c.cardY})`}
                         style={{
@@ -2352,6 +2366,7 @@ export default function LineageMap({
                           <tspan key={li} x={c.cardX} y={c.cardY + y0 + li * SOLO_LINE_H * f.fs}>{ln}</tspan>
                         ))}
                       </text>
+                      </>
                     );
                   })() : (() => { const p = INSTR_NAMES.has(breed.name) ? CW*0.20 : 0; return (<><clipPath id={clipId}><rect x={c.cardX-CW/2+p} y={c.cardY-CW/2+p} width={CW-p*2} height={CW-p*2} rx={circular ? (CW-p*2)/2 : 15} /></clipPath><image href={encodeURI(bust(c.img))} x={c.cardX-CW/2+p} y={c.cardY-CW/2+p} width={CW-p*2} height={CW-p*2} clipPath={`url(#${clipId})`} preserveAspectRatio={INSTR_NAMES.has(breed.name)?"xMidYMid meet":"xMidYMid slice"} /></>); })()}
                   {/* No ring on a self card. The word IS the object, exactly as
