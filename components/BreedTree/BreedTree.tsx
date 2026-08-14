@@ -6783,10 +6783,14 @@ export default function BreedTree({
               nothing is hovered (and on touch, where there is no hover). White
               Luckiest Guy via .autoLabel, sized up. Anchored right of the play
               row (one square in learn, two on the start screen). */}
-          {dockAside && gravity && entered && focus.depth === 0 && ((!started && !learning) || learning) && hoverHint !== "" && (() => {
+          {dockAside && gravity && entered && focus.depth === 0 && ((!started && !learning) || learning) && (() => {
+            // On a phone there is no hover, so the line is a static "start playing"
+            // (option b). On desktop it follows the pointer; blank when nothing is
+            // hovered.
+            const text = isMobile ? "start playing" : hoverHint;
+            if (!text) return null;
             const st = stageRef.current;
             const upp = st ? (aspect >= 1 ? SIZE : SIZE / Math.max(aspect, 0.01)) / Math.max(st.clientHeight, 1) : 1;
-            const stW = st ? st.clientWidth : 390;
             const vbWc = aspect >= 1 ? SIZE * aspect : SIZE;
             const vbHc = aspect >= 1 ? SIZE : SIZE / aspect;
             const xMinC = aspect >= 1 ? -vbWc * shift : -vbWc / 2;
@@ -6795,7 +6799,17 @@ export default function BreedTree({
             const SQ_GAP = 16 * upp;
             const x = xMinC + m + (learning ? 1 : 2) * (SQ + SQ_GAP);
             const y = vbHc * WORD_START_Y;
-            const hintFs = Math.min(Math.max(30, stW * 0.05), 54);
+            // Match the profile name (.title) EXACTLY: its own CSS size formula in
+            // px, then scaled to view units by upp. Above 640px it is
+            // min(clamp(0.832rem, 2vw, 1.808rem), --tp / 2.15) with
+            // --tp = clamp(44.8px, 8.8vw, 62.4px); at or below 640px the phone
+            // clamp. rem = 16. If .title's rule changes, change this to match.
+            const winW = typeof window !== "undefined" ? window.innerWidth : 390;
+            const vw = winW / 100;
+            const tp = Math.min(Math.max(44.8, 8.8 * vw), 62.4);
+            const titleFs = winW <= 640
+              ? Math.min(Math.max(0.9 * 16, 5 * vw), 1.6 * 16)
+              : Math.min(Math.min(Math.max(0.832 * 16, 2 * vw), 1.808 * 16), tp / 2.15);
             return (
               <text
                 className={styles.autoLabel}
@@ -6803,9 +6817,9 @@ export default function BreedTree({
                 y={y}
                 textAnchor="start"
                 dominantBaseline="central"
-                style={{ fontSize: `${hintFs * upp}px`, strokeWidth: `${3 * upp}px` }}
+                style={{ fontSize: `${titleFs * upp}px`, strokeWidth: `${2 * upp}px` }}
               >
-                {hoverHint}
+                {text}
               </text>
             );
           })()}
