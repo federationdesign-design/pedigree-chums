@@ -1089,7 +1089,16 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "A pack of big black-and-tan foxhounds bred in Dumfriesshire after the First World War, kept working until the pack was disbanded in 2001.",
     children: [
       { name: "English Foxhound", note: "The foxhound base for the pack.", img: "/history/breeds/english-foxhound.jpg", value: 50 },
-      { name: "Bloodhound and Gascon hounds", note: "Bloodhound and French Grand Bleu de Gascogne for size, nose and the black-and-tan. Now in-decline.", img: "/history/breeds/modern-bloodhound.jpg", value: 50 }
+      // Split 14 August 2026, from one node "Bloodhound and Gascon hounds".
+      // The pack is documented as a three-way cross of English Foxhound,
+      // Bloodhound and Grand Bleu de Gascogne, so the two founders are named
+      // separately and the former 50 divides evenly between them. Bloodhound is
+      // a lineage key in its own right, so that half now grafts its real
+      // ancestry in instead of dead-ending.
+      // TODO artwork: the Gascogne reuses the Bloodhound photo as a stand-in
+      // until its own image exists. Owner-agreed placeholder, replace the img.
+      { name: "Bloodhound", note: "Bloodhound for size, nose and the black-and-tan.", img: "/history/breeds/modern-bloodhound.jpg", value: 25 },
+      { name: "Grand Bleu de Gascogne", note: "The big French blue hound, for scenting power and voice.", img: "/history/breeds/modern-bloodhound.jpg", value: 25 }
     ]
   },
 
