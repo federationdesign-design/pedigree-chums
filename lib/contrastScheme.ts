@@ -14,6 +14,14 @@ export type ContrastScheme = "black-on-white" | "white-on-black";
 export const SCHEME_ATTR = "data-pc-contrast-scheme";
 export const SCHEME_KEY = "pc-contrast-scheme";
 
+// Fired whenever the scheme or hide-images state changes, so components outside
+// the toolbar (the Nav menu swap in accessible mode) can react without polling.
+export const CONTRAST_EVENT = "pc:contrast";
+function emitContrastChange(): void {
+  if (typeof window === "undefined") return;
+  window.dispatchEvent(new Event(CONTRAST_EVENT));
+}
+
 const SCHEMES: ContrastScheme[] = ["black-on-white", "white-on-black"];
 
 export function isScheme(v: unknown): v is ContrastScheme {
@@ -48,6 +56,7 @@ export function setScheme(scheme: ContrastScheme | null): void {
     // localStorage can throw (private mode, quota disabled). The attribute is
     // still applied for this session; only the persistence is lost.
   }
+  emitContrastChange();
 }
 
 // Return to the default view. Reset, in the toolbar's sense.
@@ -77,4 +86,5 @@ export function setHideImages(on: boolean): void {
   } catch {
     // localStorage may be unavailable; the attribute still applies this session.
   }
+  emitContrastChange();
 }

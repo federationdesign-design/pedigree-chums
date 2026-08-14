@@ -1,0 +1,77 @@
+/* Accessibility launcher. Same destinations and the same grid ARRANGEMENT as the
+   Bento board (a featured row of three, then three rows each pairing a big tile
+   or cluster with a two-up cell row), but every tile is a plain outlined box with
+   the page name centred: no images, no video. Because there are no images to give
+   the cells their height, this file owns the heights itself (the Bento classes
+   size from their media and would collapse here). Base colours read on the blue
+   overlay used in hide-images-only mode; a scheme recolours the whole board
+   through contrast-schemes.css (.pc-acc-menu). */
+
+.wrap {
+  pointer-events: auto;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.featured {
+  display: flex;
+  gap: 14px;
+  margin-top: 15px;
+}
+
+.row {
+  display: flex;
+  gap: 14px;
+  align-items: stretch;
+}
+
+/* A cluster: a big box stacked over a two-up row of small boxes. */
+.col {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.pairRow {
+  display: flex;
+  gap: 14px;
+}
+.pairRow > .box { flex: 1 1 0; min-width: 0; }
+
+.box {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  box-sizing: border-box;
+  min-height: clamp(110px, 14vh, 170px);
+  padding: 14px 18px;
+  border-radius: 20px;
+  outline: 3px solid #ffffff; /* the stroke; a scheme overrides the colour */
+  outline-offset: -3px;
+  background: transparent;
+  text-decoration: none;
+  color: #ffffff;
+  transition: transform 0.12s ease;
+}
+.box:hover { transform: translateY(-2px); }
+
+/* The big box in a cluster grows to fill the cluster's height. */
+.colBig { flex: 1 1 auto; min-height: clamp(150px, 20vh, 240px); }
+
+.boxLabel {
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: clamp(1rem, 2.6vw, 1.7rem);
+  line-height: 1.05;
+  letter-spacing: 0.01em;
+}
+
+@media (max-width: 640px) {
+  .featured { flex-direction: column; }
+  .row { flex-direction: column; }
+}

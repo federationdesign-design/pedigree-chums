@@ -7,6 +7,7 @@ import OfferLauncher from "../components/Offer/OfferLauncher";
 import HiddenGamesCounter from "../components/HiddenGamesCounter/HiddenGamesCounter";
 import HideImages from "../components/HideImages/HideImages";
 import SchemeShapes from "../components/SchemeShapes/SchemeShapes";
+import SchemeStrokes from "../components/SchemeStrokes/SchemeStrokes";
 import HiddenGamesToast from "../components/HiddenGamesToast/HiddenGamesToast";
 import PickAChumLauncher from "./pick-a-chum/ui/PickAChumLauncher";
 import "./globals.css";
@@ -151,6 +152,9 @@ export default function RootLayout({
         {/* Remaps background-drawn indicators (rating dots, bars) to foreground
             so their state survives a scheme. */}
         <SchemeShapes />
+        {/* Item 6: strokes every rounded container in a scheme so its boundary
+            stays visible once the sweep flattens its fill. */}
+        <SchemeStrokes />
         <PickAChumLauncher />
         <OfferLauncher />
         {/* Hidden Games Stage 1 counter. Owner-approved layout mount, 28 Jul
