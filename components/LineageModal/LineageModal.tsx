@@ -14,6 +14,8 @@ import css from "./LineageModal.module.css";
 import { TAG_STYLE, nodeStatus, type BreedTag } from "../BreedTreeMap/BreedTreeMap";
 import { useRouter } from "next/navigation";
 import { reportHiddenGame } from "../../lib/hiddenGames/browserEngine";
+import MilestoneMessage from "../Milestone/MilestoneMessage";
+import { MS_STEP, milestoneLabel } from "../Milestone/milestones";
 
 // Plain-language label for the status dot on the title portrait.
 const STATUS_LABEL: Record<BreedTag, string> = {
@@ -184,7 +186,36 @@ export default function LineageModal({ name, image, character, lineage, fromRect
   }, []);
   const [score, setScore] = useState(initialScore ?? 0); // campaign total rides in across levels
   useEffect(() => { onScoreChange?.(score); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [score]);
+  // Score-milestone celebration, ported from the main pit (shared ../Milestone).
+  // The mini pit's score is a CAMPAIGN total that rides in via initialScore, and
+  // this modal remounts per level, so msLast is seeded from initialScore, in the
+  // ref initialiser so it is set BEFORE the trigger effect can run, to the highest
+  // 5k mark already passed. Entering a level part way up the ladder then fires
+  // nothing, and only milestones crossed DURING this level celebrate. Seeding late
+  // (in an effect) would let a carried-in score fire every passed mark at once.
+  const [milestone, setMilestone] = useState<{ value: number; label: string; id: number } | null>(null);
+  const msLast = useRef(Math.floor((initialScore ?? 0) / MS_STEP) * MS_STEP);
   const [phase, setPhase] = useState<"play" | "won" | "lost">("play");
+  // Fire only during play (never over the won/lost screens), and only for a NEW
+  // milestone above the seeded high-water mark. The score can dip mid-play (the
+  // learn shortcut costs points), so msLast is never lowered here: climbing back
+  // past a mark already celebrated must not re-fire it. A fresh run (score reset
+  // to 0) resets msLast at the reset sites instead. Allowed mid-play on purpose:
+  // the running score is otherwise hidden then (it competes with the lives row),
+  // but a one-off celebration is a different thing.
+  useEffect(() => {
+    if (phase !== "play") return;
+    const reached = Math.floor(score / MS_STEP) * MS_STEP;
+    if (reached >= MS_STEP && reached > msLast.current) {
+      msLast.current = reached;
+      setMilestone({ value: reached, label: milestoneLabel(reached), id: performance.now() });
+    }
+  }, [score, phase]);
+  useEffect(() => {
+    if (!milestone) return;
+    const t = window.setTimeout(() => setMilestone(null), 2600); // clears after the pop-out finishes
+    return () => window.clearTimeout(t);
+  }, [milestone]);
   /* The win screen's way on holds back for a beat. Pressed the instant the
      screen lands it did nothing, because the screen arrives before everything
      behind it has settled, so the press was going nowhere and reading as a dead
@@ -238,6 +269,7 @@ export default function LineageModal({ name, image, character, lineage, fromRect
     setPhase("play");
     setResumeInLearn(false);
     setScore(0);
+    msLast.current = 0; // fresh run: milestones celebrate again from the bottom
     setSlowmo(false); // a fresh pit always starts at full speed
     setCaptionOpen(false);
     setRunKey((k) => k + 1); // remounts the pit fresh
@@ -305,6 +337,9 @@ export default function LineageModal({ name, image, character, lineage, fromRect
         <div className={css.scoreTotal + (scorePulse ? " " + css.scorePulse : "")} aria-label={`Score: ${score.toLocaleString("en-GB")}`}>
           {score.toLocaleString("en-GB")}
         </div>
+      )}
+      {milestone && (
+        <MilestoneMessage key={milestone.id} value={milestone.value} label={milestone.label} />
       )}
       {/* Title floats over the pit and never affects its size. The level's own
           dog holds the top row and never moves. Whatever circle is being looked
@@ -379,7 +414,7 @@ export default function LineageModal({ name, image, character, lineage, fromRect
           playLabel={outOfLives ? "PLAY AGAIN" : "PLAY"}
           onPlayPressed={() => {
             // Out of lives, so this press is a fresh run, not a fresh round.
-            if (outOfLives) { onResetRun?.(); setScore(0); }
+            if (outOfLives) { onResetRun?.(); setScore(0); msLast.current = 0; } // fresh run: milestones from the bottom
           }}
           onStartedChange={setRunning}
           onLearningChange={setLearningActive}
