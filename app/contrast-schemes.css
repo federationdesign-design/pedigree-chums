@@ -156,6 +156,10 @@
 :root[data-pc-contrast-scheme="white-on-black"] #pc-site .pc-nav [class*="burger"] { outline-color: #ffffff !important; }
 :root[data-pc-contrast-scheme="white-on-black"] #pc-site .pc-nav [class*="burger"] span { background: #ffffff !important; }
 
+/* The schemes box carries no fill in a scheme either (each A cell has its own),
+   so the sweep must not fill it. */
+:root[data-pc-contrast-scheme] #pc-site .pc-nav [class*="boxSchemes"] { background: transparent !important; }
+
 /* Toolbar boxes and cells: outlines to the scheme foreground. */
 :root[data-pc-contrast-scheme="black-on-white"] #pc-site .pc-nav [class*="__box"],
 :root[data-pc-contrast-scheme="black-on-white"] #pc-site .pc-nav [class*="__cell"] { outline-color: #000000 !important; }
