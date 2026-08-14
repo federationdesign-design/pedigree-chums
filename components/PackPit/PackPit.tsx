@@ -13,13 +13,12 @@ import styles from "./PackPit.module.css";
 import BritainMessage from "./BritainMessage";
 import { reportHiddenGame } from "../../lib/hiddenGames/browserEngine";
 import PitEnd from "../PitEnd/PitEnd";
+import MilestoneMessage from "../Milestone/MilestoneMessage";
+import { MS_STEP, milestoneLabel } from "../Milestone/milestones";
 
-// Score milestones: crossing one fires a centre-screen celebration with confetti.
-// Score milestones: every 5,000 (5k, 10k, 15k ...). Crossing one fires a
-// centre-screen celebration with confetti. Labels escalate then hold at the top.
-const MS_STEP = 5000;
-const MS_LABELS = ["Yapp Yapp Yapp", "Bark Bark Bark", "Woof Woof Woof", "Yapp Bark Woof", "Hoooowwwwllllllll", "Are you done?", "maybe enter the site now?"];
-
+// Score milestones (MS_STEP, MS_LABELS, the label picker) and the celebration
+// treatment now live in ../Milestone, shared with the mini pit (LineageModal) so
+// the two cannot drift. The trigger below stays here: it is the main pit's own.
 const RADIUS: Record<string, number> = { small: 57.5, medium: 62.5, large: 72.5, giant: 82.5 };
 const PALETTE = ["#1497d6", "#2bb4ee", "#0c5b92", "#0a3a57"];
 
@@ -87,7 +86,7 @@ export default function PackPit() {
     const reached = Math.floor(score / MS_STEP) * MS_STEP; // highest 5k mark at or below the score
     if (reached >= MS_STEP && reached > msLast.current) {
       msLast.current = reached;
-      const label = MS_LABELS[Math.min(reached / MS_STEP - 1, MS_LABELS.length - 1)];
+      const label = milestoneLabel(reached);
       if (msBlocked()) {
         pendingMs.current = { value: reached, label }; // hold it: something is on screen, don't cover it (keep the highest)
       } else {
@@ -3125,28 +3124,7 @@ if (hit.plugin?.kind === "cookieaccept") { cookieBannerOpenRef.current = false;
       )}
       <HowToPlay open={howToPlay} onClose={() => { setHowToPlay(false); }} />
       {milestone && (
-        <div className={styles.milestone} key={milestone.id} aria-hidden="true">
-          {Array.from({ length: 30 }).map((_, i) => {
-            const ang = (i / 30) * Math.PI * 2 + (i % 3) * 0.35;
-            const dist = 150 + ((i * 53) % 120);
-            const dx = Math.cos(ang) * dist;
-            const dy = Math.sin(ang) * dist + 50; // a touch of gravity in the splash
-            const colors = ["#1497d6", "#2bb4ee", "#ffd23e", "#fff8e6", "#ff5d97", "#ffffff"];
-            const st = {
-              background: colors[i % colors.length],
-              borderRadius: i % 4 === 0 ? "50%" : "2px",
-              animationDelay: `${(i % 6) * 0.03}s`,
-              "--dx": `${dx.toFixed(0)}px`,
-              "--dy": `${dy.toFixed(0)}px`,
-              "--rot": `${(i % 2 ? 1 : -1) * (180 + ((i * 47) % 360))}deg`,
-            } as CSSProperties;
-            return <span key={i} className={styles.milestoneConf} style={st} />;
-          })}
-          <div className={styles.milestoneCard}>
-            <span className={styles.milestoneLabel}>{milestone.label}</span>
-            <span className={styles.milestoneValue}>{milestone.value.toLocaleString("en-GB")}</span>
-          </div>
-        </div>
+        <MilestoneMessage key={milestone.id} value={milestone.value} label={milestone.label} />
       )}
       {collected > 0 && (
         <div className={styles.tally} key={collected} aria-live="polite" aria-label={`${collected} chums collected`}>
