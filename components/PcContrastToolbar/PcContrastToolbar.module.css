@@ -29,7 +29,7 @@
   background: var(--yellow);
   outline: 5px solid var(--navy); /* the single, shared stroke */
   border: none;
-  border-radius: 18px;
+  border-radius: 30px; /* the hamburger's rendered radius (measured) */
   box-shadow: 0 4px 0 rgba(10, 58, 87, 0.3);
 }
 
@@ -43,6 +43,7 @@
   background: var(--yellow);
   color: var(--navy);
   border: none;
+  border-radius: 30px; /* same radius as the hamburger */
   outline: none;    /* no per-cell outline: one stroke only */
   box-shadow: none;
   cursor: pointer;
@@ -50,13 +51,15 @@
 /* Cells are separated by a divider, not a full outline (segmented control). */
 .cell + .cell { border-left: 3px solid var(--navy); }
 
+/* Glyphs fill the same proportion of their cell as the hamburger's bars fill
+   theirs (measured icon-to-box ratio ~0.5 wide, 0.54 tall). */
 .cell span {
   font-family: var(--font-body), system-ui, sans-serif;
   font-weight: 800;
-  font-size: 22px;
+  font-size: 54px;
   line-height: 1;
 }
-.cell svg { width: 22px; height: 22px; display: block; }
+.cell svg { width: 54px; height: 54px; display: block; }
 
 /* Each A cell demonstrates its own scheme; these fills hold in all three modes
    (in a scheme the sweep is out-specified in contrast-schemes.css). */
@@ -77,11 +80,12 @@
 
 @media (max-width: 768px) {
   .toolbar { gap: 8px; }
-  .box { height: 67.5px; border-radius: 14px; } /* exact mobile hamburger height */
+  .box { height: 67.5px; border-radius: 20.25px; } /* exact mobile hamburger height + radius */
   /* Mobile: cells revert to 36 wide by the full 67.5 tall (not square), so the
      two boxes plus the hamburger fit on one row at 375px, including with the
      reset button present. Desktop keeps the square, hamburger-sized cell. */
-  .cell { width: 36px; height: 67.5px; }
-  .cell span { font-size: 18px; }
-  .cell svg { width: 18px; height: 18px; }
+  .cell { width: 36px; height: 67.5px; border-radius: 20.25px; } /* same radius as the mobile hamburger */
+  /* Glyphs capped to the 36px cell width, keeping the hamburger's ~0.5 proportion. */
+  .cell span { font-size: 34px; }
+  .cell svg { width: 34px; height: 34px; }
 }
