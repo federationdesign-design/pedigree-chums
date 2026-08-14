@@ -43,9 +43,11 @@
   text-shadow: none !important;
   box-shadow: none !important;
 }
-/* the site header bar (global class, not hashed) */
-:root[data-pc-contrast-scheme="black-on-white"] .pc-nav {
-  background: #fff !important;
+/* The site header has no solid fill in a scheme: the page shows through, and the
+   header keeps only its outlines and icons. #pc-site out-specifies the monochrome
+   sweep (which would otherwise fill it white); SchemeShapes skips it too. */
+:root[data-pc-contrast-scheme="black-on-white"] #pc-site .pc-nav {
+  background: transparent !important;
 }
 
 /* ---- white-on-black --------------------------------------------------- */
@@ -66,8 +68,8 @@
   text-shadow: none !important;
   box-shadow: none !important;
 }
-:root[data-pc-contrast-scheme="white-on-black"] .pc-nav {
-  background: #000 !important;
+:root[data-pc-contrast-scheme="white-on-black"] #pc-site .pc-nav {
+  background: transparent !important;
 }
 
 /* ============================================================================
