@@ -6523,14 +6523,15 @@ export default function BreedTree({
                     fill:
                       d.kind === "leave" ? "#ef4444"
                         : d.kind === "restart" ? "#22c55e"
-                        /* START SCREEN ONLY, which is neither learning nor
-                           started. There the X really does close the pit, so it
-                           reads red against the green PLAY. In learn it goes
-                           back and during a round it opens the menu, and in both
-                           of those it stays the pit's yellow. */
-                        : d.kind === "close" && !learning && !started ? "#ef4444"
+                        /* Back-out actions read red: the close square is red both
+                           on the START SCREEN (where it closes to the main page)
+                           and in LEARN (where it goes back to the start screen),
+                           each with a white border and glyph. During a round it
+                           stays the pit's yellow, because there it opens the menu
+                           rather than backing out. */
+                        : d.kind === "close" && (learning || !started) ? "#ef4444"
                         : "var(--yellow, #ffd23e)",
-                    stroke: d.kind === "close" && !learning && !started ? "#ffffff" : "var(--navy, #0a3a57)",
+                    stroke: d.kind === "close" && (learning || !started) ? "#ffffff" : "var(--navy, #0a3a57)",
                     strokeWidth: 5 * upp,
                   }} />
                 {d.kind === "leave" ? (
@@ -6552,8 +6553,8 @@ export default function BreedTree({
                     // back rather than closing anything, so an X would be a lie.
                     <path
                       d={`M${half * 0.30},${-half * 0.40} L${-half * 0.34},0 L${half * 0.30},${half * 0.40} Z`}
-                      fill="var(--navy, #0a3a57)"
-                      stroke="var(--navy, #0a3a57)"
+                      fill="#ffffff"
+                      stroke="#ffffff"
                       strokeWidth={iconStroke * 0.8}
                       strokeLinejoin="round"
                     />
@@ -7395,7 +7396,10 @@ export default function BreedTree({
         </LearnDragCard>
       )}
       {dockAside && ancestryFor && (ancHidden || trainHidden || tempHidden) && (
-        <div className={styles.learnDock}>
+        /* Directly under the back square (top 18 + 84 + 14 gap = 116), pushed below
+           the desc square too (another 84 + 14 = 214) when it is showing. The
+           18/84/14 grid is the menu squares' own, the figures .relRailHome aligns to. */
+        <div className={styles.learnDock} style={{ top: learning && hideCaption && !descGone ? 214 : 116 }}>
           {ancHidden && ancestryRows.length > 0 && (
             <button type="button" className={styles.learnDockBtn} onClick={() => { setAncPos(cardSpot(0)); setAncHidden(false); }} aria-label="Reopen ancestry" title="Ancestry">
               <span className={styles.learnDockIcon}>{ICONS.ancestry}</span>

@@ -1266,17 +1266,18 @@
 /* Reopen dock: a closed learn card drops to an icon on the right, tap to reopen. */
 .learnDock {
   position: fixed;
-  right: 3%;
-  bottom: 4%;
+  right: 18px;   /* the menu squares' own right margin */
+  /* top is set inline in the render: 116 under the back square, 214 when the
+     desc square sits between them. bottom/left stay unset so top governs. */
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 14px;     /* the squares' own 14px stack gap */
   z-index: 22;
 }
 .learnDockBtn {
-  width: 48px;
-  height: 48px;
-  border-radius: 14px;
+  width: 84px;   /* match the back square (uSz = 84) */
+  height: 84px;
+  border-radius: 25px;  /* the square's own rx, uSz * 0.3 */
   background: var(--navy, #0a3a57);
   border: 2px solid var(--yellow, #ffd23e);
   cursor: pointer;
@@ -1290,8 +1291,8 @@
 }
 .learnDockIcon {
   display: inline-flex;
-  width: 26px;
-  height: 26px;
+  width: 46px;   /* scaled up with the 84px button (was 26 in 48) */
+  height: 46px;
   color: var(--yellow, #ffd23e);
 }
 .learnDockIcon svg { width: 100%; height: 100%; stroke: var(--yellow, #ffd23e); }
