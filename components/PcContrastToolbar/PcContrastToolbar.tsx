@@ -64,7 +64,17 @@ export default function PcContrastToolbar() {
 
   return (
     <div className={styles.toolbar}>
-      <div className={styles.box} role="group" aria-label="Colour scheme">
+      <div className={`${styles.box} ${styles.boxSchemes}`} role="group" aria-label="Accessibility scheme">
+        {(scheme !== null || hidden) && (
+          <button
+            type="button"
+            className={styles.cell}
+            aria-label="Reset accessibility settings"
+            onClick={reset}
+          >
+            {Refresh}
+          </button>
+        )}
         <button
           type="button"
           className={`${styles.cell} ${styles.aDefault}`}
@@ -104,16 +114,6 @@ export default function PcContrastToolbar() {
         >
           {CrossedPhoto}
         </button>
-        {(scheme !== null || hidden) && (
-          <button
-            type="button"
-            className={styles.cell}
-            aria-label="Reset accessibility settings"
-            onClick={reset}
-          >
-            {Refresh}
-          </button>
-        )}
       </div>
     </div>
   );

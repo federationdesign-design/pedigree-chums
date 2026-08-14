@@ -32,6 +32,11 @@
   border-radius: 30px; /* the hamburger's rendered radius (measured) */
   box-shadow: 0 4px 0 rgba(10, 58, 87, 0.3);
 }
+/* The schemes box carries no fill: each cell (reset + the three A cells) has its
+   own background, so a box fill would only show as a strip around and between
+   them. Placed after .box so it wins; the sweep is out-specified in
+   contrast-schemes.css for the scheme modes. */
+.boxSchemes { background: transparent; }
 
 .cell {
   width: 100px;     /* square, exactly the hamburger's rendered size */
@@ -59,7 +64,10 @@
   font-size: 54px;
   line-height: 1;
 }
-.cell svg { width: 54px; height: 54px; display: block; }
+/* The crossed-photo / refresh icons draw at ~0.75 of their svg box, so at a
+   matched box they read smaller than the solid A. Enlarged so their drawn width
+   matches the A's optical width (measured). */
+.cell svg { width: 58px; height: 58px; display: block; }
 
 /* Each A cell demonstrates its own scheme; these fills hold in all three modes
    (in a scheme the sweep is out-specified in contrast-schemes.css). */
