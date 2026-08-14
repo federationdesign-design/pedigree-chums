@@ -125,6 +125,9 @@ const PACK_IMG = new Map(breeds.map((b) => [b.name, b.image])); // pack breed ->
 const FLASH_SIZE = 15;
 // the popped breed cards lean only slightly, capped at this angle (2 degrees)
 const CARD_TILT = (2 * Math.PI) / 180;
+// The coloured rarity band's tilt (degrees), shared by the dog name above it so
+// the two sit on one axis. One dial: change it here and both rotate together.
+const RARITY_TILT = -26;
 
 /* SOLO DOGS SHOW THEIR NAME, NOT THEIR PICTURE.
 
@@ -1741,7 +1744,7 @@ export default function LineageMap({
               on a straight baseline tilted to match. Stays as long as the card is up. */}
           {rarityTier ? (() => {
             const band = RARITY_BAND[rarityTier];
-            const TILT = -26;                     // degrees; steeper negative rides the right side higher (jauntier)
+            const TILT = RARITY_TILT;             // shared with the dog name (see RARITY_TILT); steeper negative rides the right side higher (jauntier)
             const bandTop = R * 0.40;             // top edge of the wedge (chord); LOWER value lifts the band up
             // Label position knobs, fractions of R so they scale with the circle.
             // (In the tilted frame: labelX runs mostly left/right, labelY up/down.)
@@ -1794,6 +1797,11 @@ export default function LineageMap({
             const nameFs = Math.max(12, Math.min(R * 0.384, (R * 1.8) / (0.6 * longest))); // +20% on every term (cap 0.32->0.384, fit 1.5->1.8, floor 10->12)
             const lineH = nameFs * 0.9;                     // 0.9em leading, per the mock
             return (
+              // Tilted onto the band's axis (shared RARITY_TILT), rotated about the
+              // circle CENTRE not the name's anchor: the rim is a circle, so rotating
+              // about its centre keeps every point the same distance from the rim and
+              // the horizontal fit is preserved (rotation adds no overflow).
+              <g transform={`rotate(${RARITY_TILT})`}>
               <text
                 textAnchor="middle"
                 style={{
@@ -1817,6 +1825,7 @@ export default function LineageMap({
                   <tspan key={i} x={0} y={NAME_BOTTOM - (lines.length - 1 - i) * lineH}>{ln}</tspan>
                 ))}
               </text>
+              </g>
             );
           })() : null}
         </>)}
