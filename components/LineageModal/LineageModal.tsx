@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type Ref } from "react";
 import { createPortal } from "react-dom";
 import BreedTree from "../BreedTree/BreedTree";
 import TimeTunnel from "../TimeTunnel/TimeTunnel";
@@ -44,12 +44,12 @@ function titleLines(name: string): string[] {
 // One line of the stacked title: round portrait, status dot, name. Pulled out
 // because the level's dog and the circle being looked at are now drawn with the
 // same markup, one above the other.
-function TitleRow({ img, name, status, isNarrow }: { img: string | null; name: string; status: BreedTag | null; isNarrow: boolean }) {
+function TitleRow({ img, name, status, isNarrow, imgRef }: { img: string | null; name: string; status: BreedTag | null; isNarrow: boolean; imgRef?: Ref<HTMLImageElement> }) {
   return (
     <div className={css.titleRow}>
       {img && (
         <span className={css.titlePortraitWrap}>
-          <img className={css.titlePortrait} src={img} alt="" draggable={false} />
+          <img ref={imgRef} className={css.titlePortrait} src={img} alt="" draggable={false} />
           {status && (
             <span
               className={css.titleStatus}
@@ -184,6 +184,29 @@ export default function LineageModal({ name, image, character, lineage, fromRect
     mq.addEventListener("change", apply);
     return () => mq.removeEventListener("change", apply);
   }, []);
+  // Publish the top-left level portrait's live screen position to BreedTree, so its
+  // cluster connector points at the real image on every width, not a fixed guess.
+  // A ResizeObserver is the primary trigger: it fires on mount for the first measure
+  // AND whenever the portrait's rendered SIZE changes, which is exactly the narrow-
+  // screen shrink (the portrait is responsive), so nothing caches a desktop size. A
+  // window resize re-read is added for position-only reflows that keep the same size.
+  // getBoundingClientRect gives the current centre and radius each time.
+  const portraitRef = useRef<HTMLImageElement>(null);
+  const [portraitAnchor, setPortraitAnchor] = useState<{ cx: number; cy: number; rad: number } | null>(null);
+  useEffect(() => {
+    const el = portraitRef.current;
+    if (!el) { setPortraitAnchor(null); return; }
+    const measure = () => {
+      const r = el.getBoundingClientRect();
+      if (!r.width) return;
+      setPortraitAnchor({ cx: r.left + r.width / 2, cy: r.top + r.height / 2, rad: r.width / 2 });
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    window.addEventListener("resize", measure);
+    return () => { ro.disconnect(); window.removeEventListener("resize", measure); };
+  }, [image]);
   const [score, setScore] = useState(initialScore ?? 0); // campaign total rides in across levels
   useEffect(() => { onScoreChange?.(score); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [score]);
   // Score-milestone celebration, ported from the main pit (shared ../Milestone).
@@ -357,7 +380,7 @@ export default function LineageModal({ name, image, character, lineage, fromRect
         className={css.titleWrap}
         style={{ ["--rows" as string]: Math.max(1, shownPath.length || (shownName !== name ? 2 : 1)) }}
       >
-        <TitleRow img={image} name={name} status={levelStatus} isNarrow={isNarrow} />
+        <TitleRow img={image} name={name} status={levelStatus} isNarrow={isNarrow} imgRef={portraitRef} />
         {shownPath.length > 1
           ? shownPath.slice(1).map((step, i) => (
               <TitleRow key={`${i}-${step.name}`} img={step.img} name={step.name} status={step.status} isNarrow={isNarrow} />
@@ -429,6 +452,7 @@ export default function LineageModal({ name, image, character, lineage, fromRect
           hideCaption={!captionOpen}
           onCaptionClose={() => setCaptionOpen(false)}
           onScore={addScore}
+          portraitAnchor={portraitAnchor}
           registerShake={(fn) => { shakeFnRef.current = fn; }}
           registerSlowmo={(fn) => { slowmoFnRef.current = fn; }}
           onToggleCaption={() => setCaptionOpen((o) => !o)}

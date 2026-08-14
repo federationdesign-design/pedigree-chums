@@ -1107,6 +1107,7 @@ export default function BreedTree({
   onBackToLearn,
   holdEntrance = false,
   resolve = false,
+  portraitAnchor = null,
 }: {
   root: LineageNode;
   rootImage?: string;
@@ -1191,6 +1192,11 @@ export default function BreedTree({
   // holdEntrance is false (reduced motion, no tunnel) the pit enters normally.
   holdEntrance?: boolean;
   resolve?: boolean;
+  // The top-left level portrait's live screen position (centre + radius, client px),
+  // measured and published by LineageModal so the cluster connector points at the
+  // real image on every width instead of a fixed viewBox fraction. Mapped into
+  // viewBox units here with the SVG's own getScreenCTM.
+  portraitAnchor?: { cx: number; cy: number; rad: number } | null;
 }) {
   const [isMobile, setIsMobile] = useState(false);
   const [aspect, setAspect] = useState(1);
@@ -5467,13 +5473,50 @@ export default function BreedTree({
             // still be tuned apart; collapse to one pair if they never diverge.
             const dashRing = `${swRing * 2.2} ${swRing * 1.6}`;
             const dashLine = `${swLine * 2.2} ${swLine * 1.6}`;
-            // The portrait sits near the top-left corner of the pit; anchor there.
-            const ax = xMin + vbW * 0.07;
-            const ay = -vbH / 2 + vbH * 0.09;
-            const dx = ax - cx, dy = ay - cy;
+            // WHERE THE LINE POINTS. Prefer the live portrait: LineageModal measures
+            // the top-left level portrait and hands down its screen centre + radius,
+            // and we map that into viewBox units with the SVG's own getScreenCTM (the
+            // same registration the pointer path uses), so the line points at the real
+            // image on every width. If the measure or CTM is not ready (first paint),
+            // fall back to the old fixed top-left fraction and draw no arrowhead, so
+            // the mark is never blank.
+            let target: { x: number; y: number; rad: number } | null = null;
+            if (portraitAnchor) {
+              const svgEl = stageRef.current?.querySelector("svg") as SVGSVGElement | null;
+              const ctm = svgEl ? svgEl.getScreenCTM() : null;
+              if (ctm && ctm.a && ctm.d) {
+                // The viewBox mapping has no rotation or skew, so screen -> viewBox is
+                // just (px - translate) / scale on each axis.
+                target = {
+                  x: (portraitAnchor.cx - ctm.e) / ctm.a,
+                  y: (portraitAnchor.cy - ctm.f) / ctm.d,
+                  rad: portraitAnchor.rad / ctm.a,
+                };
+              }
+            }
+            const aimX = target ? target.x : xMin + vbW * 0.07;
+            const aimY = target ? target.y : -vbH / 2 + vbH * 0.09;
+            const dx = aimX - cx, dy = aimY - cy;
             const len = Math.hypot(dx, dy) || 1;
-            const ex = cx + (dx / len) * R;
-            const ey = cy + (dy / len) * R;
+            const ux = dx / len, uy = dy / len;
+            const sx = cx + ux * R, sy = cy + uy * R; // start: the ring edge, cluster side
+            // ARROW_GAP: how far short of the portrait the arrow TIP stops, measured
+            // from the portrait's EDGE in viewBox units, so it can never overlap the
+            // image. Dial here. The arrowhead is sized from the line weight so it reads
+            // as the same weight, in the site's solid-white-triangle style (.railCue).
+            const ARROW_GAP = swLine * 2;
+            const AH_LEN = swLine * 3;    // arrowhead tip-to-base length
+            const AH_HALF = swLine * 1.8; // half the arrowhead base width
+            const tipX = target ? target.x - ux * (target.rad + ARROW_GAP) : sx;
+            const tipY = target ? target.y - uy * (target.rad + ARROW_GAP) : sy;
+            const baseX = tipX - ux * AH_LEN, baseY = tipY - uy * AH_LEN; // arrowhead base centre
+            const perpX = -uy, perpY = ux;
+            // The line and arrowhead make no sense mid-tunnel, so they stay invisible
+            // while the ring grows and fade in once it has landed.
+            const revealStyle = {
+              opacity: holdEntrance && !resolve ? 0 : 1,
+              transition: `opacity ${MARKER_FADE_MS}ms ease ${RING_LEAD_MS + RING_GROW_MS}ms`,
+            } as const;
             return (
               <g
                 pointerEvents="none"
@@ -5484,25 +5527,33 @@ export default function BreedTree({
                   // signal it blooms to full size over RING_GROW, after leading by
                   // RING_LEAD. transform-box view-box puts the origin in SVG units.
                   // Off the resolve path (reduced motion, no tunnel) it is full at
-                  // once. This is the ONLY dashed circle: nothing is published or
-                  // handed over, so there is no match frame to get wrong.
+                  // once.
                   transformBox: "view-box",
                   transformOrigin: `${cx}px ${cy}px`,
                   transform: holdEntrance && !resolve ? `scale(${RING_START_SCALE})` : "none",
                   transition: `transform ${RING_GROW_MS}ms cubic-bezier(0.2, 0.7, 0.3, 1) ${RING_LEAD_MS}ms`,
                 }}
               >
-                <line
-                  x1={ax} y1={ay} x2={ex} y2={ey}
-                  stroke="#ffffff" strokeWidth={swLine} strokeDasharray={dashLine}
-                  style={{
-                    // The connector line makes no sense mid-tunnel, so it stays
-                    // invisible while the ring grows and fades in only at the end,
-                    // once the ring has landed (delay = RING_LEAD + RING_GROW).
-                    opacity: holdEntrance && !resolve ? 0 : 1,
-                    transition: `opacity ${MARKER_FADE_MS}ms ease ${RING_LEAD_MS + RING_GROW_MS}ms`,
-                  }}
-                />
+                {target ? (
+                  <>
+                    <line
+                      x1={sx} y1={sy} x2={baseX} y2={baseY}
+                      stroke="#ffffff" strokeWidth={swLine} strokeDasharray={dashLine}
+                      style={revealStyle}
+                    />
+                    <polygon
+                      points={`${tipX},${tipY} ${baseX + perpX * AH_HALF},${baseY + perpY * AH_HALF} ${baseX - perpX * AH_HALF},${baseY - perpY * AH_HALF}`}
+                      fill="#ffffff"
+                      style={revealStyle}
+                    />
+                  </>
+                ) : (
+                  <line
+                    x1={aimX} y1={aimY} x2={sx} y2={sy}
+                    stroke="#ffffff" strokeWidth={swLine} strokeDasharray={dashLine}
+                    style={revealStyle}
+                  />
+                )}
                 <circle cx={cx} cy={cy} r={R} fill="none" stroke="#ffffff" strokeWidth={swRing} strokeDasharray={dashRing} />
               </g>
             );
