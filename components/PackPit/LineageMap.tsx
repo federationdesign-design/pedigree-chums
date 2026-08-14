@@ -85,13 +85,15 @@ const WALL_PAD = 0;
 const ROOT = 58;
 const INSTR_NAMES = new Set(["Deal the cards","Head outside","Spot real dogs","Match to your chum","Find more chums","Most chums wins"]);
 // Rarity band across the bottom of a lifted circle. bg is the band, fg the text.
-// White on the orange ROOT DOG band is a deliberate call (contrast is low, kept
-// on request). Black carries the two light bands; white the two dark ones.
-const RARITY_BAND: Record<"common" | "uncommon" | "rare" | "root", { bg: string; fg: string; label: string }> = {
-  common:   { bg: "#fcee23", fg: "#000000", label: "COMMON" },
-  uncommon: { bg: "#5dbf86", fg: "#000000", label: "UNCOMMON" },
-  rare:     { bg: "#4d2e91", fg: "#ffffff", label: "RARE" },
-  root:     { bg: "#f47421", fg: "#ffffff", label: "ROOT DOG" },
+// Dataset-wide rarity bands (fewest trees = rarest). Black carries the two light
+// bands (yellow COMMON, green UNCOMMON); white the two dark ones (purple EXTREMELY
+// RARE, orange RARE). White on the orange band is a deliberate call: its contrast
+// is low but kept on request, and the label is large Luckiest Guy.
+const RARITY_BAND: Record<"extremelyRare" | "rare" | "uncommon" | "common", { bg: string; fg: string; label: string }> = {
+  extremelyRare: { bg: "#4d2e91", fg: "#ffffff", label: "EXTREMELY RARE" }, // purple
+  rare:          { bg: "#f47421", fg: "#ffffff", label: "RARE" },           // orange
+  uncommon:      { bg: "#5dbf86", fg: "#000000", label: "UNCOMMON" },       // green
+  common:        { bg: "#fcee23", fg: "#000000", label: "COMMON" },         // yellow
 };
 // How long the rarity ring takes to draw itself on around the lifted circle, and
 // how long it waits first. The lift's own fade is 0.2s, so the draw holds back
@@ -282,7 +284,7 @@ export default function LineageMap({
   ringColor?: string;
   // Mini pit only: the rarity tier of the lifted dog, drawn as a coloured band
   // across the bottom of the circle. Set for every lifted dog (common included).
-  rarityTier?: "common" | "uncommon" | "rare" | "root";
+  rarityTier?: "extremelyRare" | "rare" | "uncommon" | "common";
   // The heavier wash. It used to ride on `circular`, which was fine while the
   // only caller wanting it also wanted round cards. The chum family tree wants
   // the main pit's rectangular card AND the mini pit's darker background, so the

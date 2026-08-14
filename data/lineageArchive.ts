@@ -2,7 +2,7 @@
 // ancestor breed, which of the 54 pack dogs descend from it. Every level sources
 // its "related pack dogs" rail from here, so the lookup lives in one place.
 import { breeds, type Breed } from "./breeds";
-import { getLineage, type LineageNode } from "./lineage";
+import { getLineage, LINEAGE_ROOTS, type LineageNode } from "./lineage";
 import { resolveLineageName } from "./lineageNames";
 
 const index = new Map<string, Set<string>>();
@@ -39,6 +39,21 @@ for (const b of breeds) {
 // parent's chums downward to fill the gap: measured, 0 of Ancient Molossers' 12
 // descend through that child or any sibling, so it would fabricate connections.
 // Authoring the real ancestry is the Tudor job (tudor-trail-brief-v3.md).
+
+// Dataset-wide rarity: how many distinct lineage TREES each dog appears in,
+// across ALL roots (the whole dataset), not just the current level. An ancient
+// ancestor threaded through many trees is COMMON; a modern terminal breed in one
+// is EXTREMELY RARE. Built once, the same walk as the index above.
+const treeAppearances = new Map<string, number>();
+for (const root of LINEAGE_ROOTS) {
+  const seen = new Set<string>();
+  collectNames(getLineage(root), seen);
+  for (const nm of seen) treeAppearances.set(nm, (treeAppearances.get(nm) ?? 0) + 1);
+}
+// How many distinct trees this dog appears in across the whole dataset.
+export function treesContaining(name: string): number {
+  return treeAppearances.get(name) ?? 0;
+}
 
 // Pack dogs descending from any of the given ancestor names, in pack order.
 export function descendantPackBreeds(ancestorNames: string[]): Breed[] {

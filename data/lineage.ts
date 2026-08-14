@@ -2048,3 +2048,7 @@ export function getLineage(name: string): LineageNode | null {
   if (!root) return null;
   return expandNode({ ...root }, 0, new Set<string>());
 }
+
+// Every root in the whole lineage dataset (one authored tree each). Used to
+// measure a dog's dataset-wide rarity: how many distinct trees it appears in.
+export const LINEAGE_ROOTS: string[] = Object.keys(LINEAGE);

@@ -8,7 +8,7 @@ import { splitName } from "../PackPit/splitName";
 import { interpolateZoom } from "d3-interpolate";
 import type { LineageNode } from "../../data/lineage";
 import { nodeStatus, TAG_STYLE, type BreedTag } from "../BreedTreeMap/BreedTreeMap";
-import { descendantPackBreeds, ancestryBreakdown, ancestorShareOf } from "../../data/lineageArchive";
+import { descendantPackBreeds, ancestryBreakdown, ancestorShareOf, treesContaining } from "../../data/lineageArchive";
 import TrainingCard from "../TrainingCard/TrainingCard";
 import trainingDifficulty from "../../data/trainingDifficulty";
 import { ICONS } from "../CardDock/CardDock";
@@ -537,17 +537,17 @@ function isEcho(d: Node): boolean {
   return !!d.parent && d.data.name === d.parent.data.name;
 }
 
-// Rarity flash tiers, keyed to how many times the collected dog's name appears
-// among the CIRCLES that drop this level (nodes, echo-excluded). 1-2 is common
-// and stays SILENT: a flash on 83% of collects stops being a reward.
-// In-pit appearance rate → tier. Root dog appears MOST (foundation stock);
-// common LEAST. No silent tier now: every collected circle carries a band.
-type RarityTier = "common" | "uncommon" | "rare" | "root";
+// Rarity tiers, keyed to how many distinct lineage TREES the dog appears in
+// across the WHOLE dataset (see treesContaining). Dataset-wide, not per level, so
+// the same dog reads the same tier wherever it is lifted. Fewest trees = rarest:
+// a modern terminal breed sits in one tree; an ancient ancestor threads through
+// many. Every collected circle carries a band.
+type RarityTier = "extremelyRare" | "rare" | "uncommon" | "common";
 function rarityTier(count: number): RarityTier {
-  if (count >= 7) return "root";   // 7+  ROOT DOG (orange)
-  if (count >= 4) return "rare";   // 4-6 RARE     (purple)
-  if (count >= 3) return "uncommon"; // 3 UNCOMMON (green)
-  return "common";                 // 1-2 COMMON   (yellow)
+  if (count >= 7) return "common";        // 7+  COMMON          (yellow)
+  if (count >= 4) return "uncommon";      // 4-6 UNCOMMON        (green)
+  if (count >= 2) return "rare";          // 2-3 RARE            (orange)
+  return "extremelyRare";                 // 1   EXTREMELY RARE  (purple)
 }
 
 // Breed titles are fitted to the circle they belong to. The name is wrapped
@@ -1273,11 +1273,8 @@ export default function BreedTree({
   // painted across the bottom of the lifted circle by LineageMap and stays while
   // the card is up, so there is no flash state, timer or per-name dedup here: the
   // tier and count are just handed to the card for the lifted dog. See rarityTier.
-  const rarityCounts = useMemo(() => {
-    const m = new Map<string, number>();
-    for (const n of nodes) { if (n.depth === 0 || isEcho(n)) continue; m.set(n.data.name, (m.get(n.data.name) ?? 0) + 1); }
-    return m;
-  }, [nodes]);
+  // Rarity is dataset-wide now (treesContaining), so there is no per-level count
+  // map here any more: the lifted dog's tier is the same wherever it is met.
 
   // capture the stage aspect for the layout exactly once, on the first valid read.
   // "Valid" has to mean actually measured: aspect starts at 1, and freezing that
@@ -6609,7 +6606,7 @@ export default function BreedTree({
                   <text
                     className={styles.autoLabel}
                     x={0}
-                    y={half + 8 * upp}
+                    y={half + 18 * upp}
                     textAnchor="middle"
                     dominantBaseline="text-before-edge"
                     style={{ fontSize: `${24 * upp}px`, strokeWidth: `${2 * upp}px` }}
@@ -6828,7 +6825,12 @@ export default function BreedTree({
                 y={y}
                 textAnchor="start"
                 dominantBaseline="central"
-                style={{ fontSize: `${titleFs * upp}px`, strokeWidth: `${2 * upp}px` }}
+                // Black, no outline (this line only; the start-screen captions keep
+                // .autoLabel's white + navy stroke). Inline fill/stroke win over the class.
+                // CONTRAST (on record, no fallback by request 14 Aug 2026): ~13:1 over the
+                // blue body gradient where this line sits, but a DARK themed level
+                // background could drop it below AA. If dark themes spread, revisit.
+                style={{ fontSize: `${titleFs * upp}px`, fill: "#000000", stroke: "none" }}
               >
                 {text}
               </text>
@@ -7140,7 +7142,7 @@ export default function BreedTree({
           ringColor={learnCard.ring}
           // Rarity band across the lifted circle: tier from the lifted dog's
           // in-pit appearance count. Every dog gets one (common is not silent).
-          rarityTier={rarityTier(rarityCounts.get(learnNode.data.name) ?? 1)}
+          rarityTier={rarityTier(treesContaining(learnNode.data.name))}
           soloLeaf={!(learnNode.data.children && learnNode.data.children.length > 0)}
           rootRadius={learnCard.r}
           currentScore={0}
