@@ -166,6 +166,32 @@
   from { stroke-dashoffset: 1; }
   to { stroke-dashoffset: 0; }
 }
+/* Green progress arc over the rarity ring: reveals filled.size/frameTotal of the
+   loop in #22c55e, growing as frames fill so the ring closes to full green when the
+   last frame lands. Same pathLength-1 + dashoffset reveal as .rarityRing, from the
+   same six-o'clock start, so the two read as one ring. --green-off is 1 - progress
+   (1 hides it, 0 fills the loop), set inline from LineageMap.tsx. Reduced motion
+   (base rule only) shows the proportion at once and jumps on each fill. Added 14
+   August 2026. */
+.progressRing {
+  stroke-dasharray: 1;
+  stroke-dashoffset: var(--green-off, 1);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .progressRing {
+    /* transition grows the arc as each card lands. The animation draws it on with
+       the rarity ring on a re-lift (frames already filled), sharing its delay and
+       duration. backwards fill holds it empty through the delay but does NOT hold
+       after, so it releases to the base value (its `to`, so no jump) and later
+       fills are driven by the base value + transition, not the spent animation. */
+    transition: stroke-dashoffset 0.4s ease-out;
+    animation: lm-green-draw var(--rarity-draw, 0.5s) ease-out var(--rarity-delay, 0.2s) backwards;
+  }
+}
+@keyframes lm-green-draw {
+  from { stroke-dashoffset: 1; }
+  to { stroke-dashoffset: var(--green-off, 1); }
+}
 /* The rarity band slides up from below the circle to arrive as the ring closes.
    It sits inside the circle clipPath, so the rim reveals it rising into view.
    --band-slide (set inline to R) is how far below it starts; --band-dur and

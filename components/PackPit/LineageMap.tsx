@@ -1664,6 +1664,33 @@ export default function LineageMap({
               style={{ ["--rarity-draw" as string]: RARITY_DRAW, ["--rarity-delay" as string]: RARITY_DRAW_DELAY }}
             />
           ) : null}
+          {/* Green progress arc: the SAME band, start point and reveal trick as the
+              rarity ring, laid over it so filling frames turn a slice of the ring
+              #22c55e, the app's "placed" green (the one a framed node goes, :2029).
+              It shows filled.size/frameTotal of the loop from six o'clock via the
+              same pathLength-1 + dashoffset, so ring and arc read as one. --green-off
+              is 1 - progress (1 hides it, 0 closes the loop to full green). Rendered
+              hidden from the start (even at zero filled) so it is there to transition
+              as the first card lands. It grows with a transition per landing, and on
+              a re-lift with frames already filled it draws on sharing the rarity
+              ring's 0.2s delay and 0.9s sweep, so the lift replays cleanly. Keyed on
+              the dog, like the rarity ring, so that draw-on remounts per lift. */}
+          {rarityTier && frameTotal > 0 ? (
+            <circle
+              key={`green-${breed.name}`}
+              cx={0}
+              cy={0}
+              r={R + rootRingW / 2}
+              fill="none"
+              stroke="#22c55e"
+              strokeWidth={rootRingW + 6}
+              strokeLinecap="round"
+              pathLength={1}
+              transform="rotate(90)"
+              className={styles.progressRing}
+              style={{ ["--green-off" as string]: `${1 - filled.size / frameTotal}`, ["--rarity-draw" as string]: RARITY_DRAW, ["--rarity-delay" as string]: RARITY_DRAW_DELAY }}
+            />
+          ) : null}
           {/* Rarity band: a coloured strip across the bottom of the circle, on the
               artwork just above the Learn button. Clipped to the same circle so it
               never spills past the rim, but its top edge is a straight DIAGONAL
