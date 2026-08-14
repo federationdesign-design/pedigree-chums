@@ -1634,37 +1634,31 @@ export default function LineageMap({
             className={styles.rootCard}
             style={circular && ringColor ? { fill: ringColor, stroke: ringColor } : undefined} />
           {breed.image ? <image href={bust(breed.image)} x={-R} y={-R} width={R*2} height={R*2} clipPath={`url(#${clip})`} preserveAspectRatio="xMidYMid slice" /> : null}
-          {/* Rarity ring + glow: FOUR copies of the same ring stroke, back to front,
-              stepping out from the ring's own width. The back three are blurred through
-              one shared feGaussianBlur (stdDeviation 2, the pen's value); the top one
-              is crisp and, at width 1x, IS the rarity ring that covers the base rect.
-              All four carry .rarityRing, so they draw on TOGETHER on the same dashoffset
-              sweep from six o'clock (pathLength 1, dashoffset 1->0) and the glow travels
-              WITH the stroke as it traces (the McLaren-F1-line technique), rather than a
-              separate halo pulsing after the draw. Keyed on the dog so a fresh draw
-              mounts per lift. Colours are DERIVED from the tier colour, not hand-picked:
-              the three bright tiers darken toward the back; RARE (already dark purple)
-              lightens toward the back instead, or its widest layer would go near-black
-              and vanish on the navy background. Reduced motion shows it complete, see
-              .rarityRing. Added 14 August 2026. */}
+          {/* Rarity ring + OUTWARD glow. The crisp ring is drawn LAST, on top, in the
+              tier colour. Behind it sit three blurred bands OFFSET OUTWARD so each one's
+              inner edge meets the ring's outer edge and it blooms only outward; the
+              crisp ring covers the blur's small inward spill, so nothing bleeds over the
+              image. (A centred version glowed both ways; hiding it behind the image
+              buried the bright core; this offset keeps the core and throws the glow
+              out.) The glow LIGHTENS toward white for every tier now, because a glow
+              adds light and the old darkening read as a solid black shadow, and it FADES
+              in opacity outward for a soft graduated falloff. All layers carry
+              .rarityRing, so they trace on together from six o'clock on the RARITY_DRAW
+              sweep (McLaren-line technique), no pulse. Keyed per dog. Reworked 14 Aug 2026. */}
           {rarityTier ? (() => {
-            // ---- GLOW DIALS ----
-            // Stroke width as a multiple of the ring's OWN width, back -> top. Raise the
-            // back values for a bigger halo, lower them to tighten it. The last is 1x =
-            // the crisp ring itself.
-            const GLOW_WIDTHS = [3, 2, 1.3, 1];
-            const GLOW_BLUR = 2; // feGaussianBlur stdDeviation, px (this SVG's viewBox is 1:1)
-            const ringW = rootRingW + 6; // the ring's own width (covers the base rect + margin)
-            // Derive a four-step ramp (back -> top) from the tier colour.
+            // ---- GLOW DIALS (three outward bands, back -> front) ----
+            const GLOW_WIDTHS = [3, 2, 1.3];        // band width as a multiple of the ring's own width; raise for a bigger halo, lower to tighten
+            const GLOW_OPACITY = [0.3, 0.55, 0.85]; // faint at the outer edge -> strong at the ring: the falloff
+            const GLOW_TINT = [0.55, 0.38, 0.2];    // how far each band lightens toward white (0..1); the back band is lightest
+            const GLOW_BLUR = 2;                    // shared feGaussianBlur stdDeviation, px (viewBox is 1:1). Raise it for a softer falloff.
+            const ringW = rootRingW + 6;            // the crisp ring's own width
+            const r0 = R + rootRingW / 2;           // the ring's radius
+            const ringOuter = r0 + ringW / 2;       // ...its outer edge, where the glow starts
             const hex = RARITY_BAND[rarityTier].bg;
             const nHex = parseInt(hex.slice(1), 16);
             const cr = (nHex >> 16) & 255, cg = (nHex >> 8) & 255, cb = nHex & 255;
             const toHex = (r: number, g: number, b: number) => `#${((1 << 24) + (Math.round(r) << 16) + (Math.round(g) << 8) + Math.round(b)).toString(16).slice(1)}`;
-            const ramp = rarityTier === "rare"
-              // RARE lightens behind: mix toward white, back = most white
-              ? [0.6, 0.4, 0.2, 0].map((t) => toHex(cr + (255 - cr) * t, cg + (255 - cg) * t, cb + (255 - cb) * t))
-              // the rest darken behind: multiply toward black, back = darkest
-              : [0.18, 0.45, 0.7, 1.0].map((k) => toHex(cr * k, cg * k, cb * k));
+            const lighten = (t: number) => toHex(cr + (255 - cr) * t, cg + (255 - cg) * t, cb + (255 - cb) * t);
             const blurId = "lm-glow-blur";
             return (
               <>
@@ -1673,23 +1667,43 @@ export default function LineageMap({
                     <feGaussianBlur stdDeviation={GLOW_BLUR} />
                   </filter>
                 </defs>
-                {GLOW_WIDTHS.map((w, i) => (
-                  <circle
-                    key={`glow${i}-${breed.name}`}
-                    cx={0}
-                    cy={0}
-                    r={R + rootRingW / 2}
-                    fill="none"
-                    stroke={ramp[i]}
-                    strokeWidth={ringW * w}
-                    strokeLinecap="round"
-                    pathLength={1}
-                    transform="rotate(90)"
-                    className={styles.rarityRing}
-                    filter={i < GLOW_WIDTHS.length - 1 ? `url(#${blurId})` : undefined}
-                    style={{ ["--rarity-draw" as string]: RARITY_DRAW, ["--rarity-delay" as string]: RARITY_DRAW_DELAY }}
-                  />
-                ))}
+                {/* Three outward bands, widest/faintest first (furthest back). */}
+                {GLOW_WIDTHS.map((w, i) => {
+                  const bandW = ringW * w;
+                  return (
+                    <circle
+                      key={`glow${i}-${breed.name}`}
+                      cx={0}
+                      cy={0}
+                      r={ringOuter + bandW / 2}
+                      fill="none"
+                      stroke={lighten(GLOW_TINT[i])}
+                      strokeWidth={bandW}
+                      strokeLinecap="round"
+                      pathLength={1}
+                      transform="rotate(90)"
+                      opacity={GLOW_OPACITY[i]}
+                      filter={`url(#${blurId})`}
+                      className={styles.rarityRing}
+                      style={{ ["--rarity-draw" as string]: RARITY_DRAW, ["--rarity-delay" as string]: RARITY_DRAW_DELAY }}
+                    />
+                  );
+                })}
+                {/* The crisp ring itself, on top, tier colour. */}
+                <circle
+                  key={`glowtop-${breed.name}`}
+                  cx={0}
+                  cy={0}
+                  r={r0}
+                  fill="none"
+                  stroke={hex}
+                  strokeWidth={ringW}
+                  strokeLinecap="round"
+                  pathLength={1}
+                  transform="rotate(90)"
+                  className={styles.rarityRing}
+                  style={{ ["--rarity-draw" as string]: RARITY_DRAW, ["--rarity-delay" as string]: RARITY_DRAW_DELAY }}
+                />
               </>
             );
           })() : null}
