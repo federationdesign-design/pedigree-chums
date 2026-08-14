@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type Ref } from "react";
+import { useCallback, useEffect, useRef, useState, type Ref } from "react";
 import { createPortal } from "react-dom";
 import BreedTree from "../BreedTree/BreedTree";
 import TimeTunnel from "../TimeTunnel/TimeTunnel";
@@ -191,10 +191,16 @@ export default function LineageModal({ name, image, character, lineage, fromRect
   // screen shrink (the portrait is responsive), so nothing caches a desktop size. A
   // window resize re-read is added for position-only reflows that keep the same size.
   // getBoundingClientRect gives the current centre and radius each time.
-  const portraitRef = useRef<HTMLImageElement>(null);
+  // Callback ref: fires exactly when the portrait <img> attaches (and again with
+  // null on detach), so the measure can never run before the node exists. The
+  // RefObject + effect version raced and read null, so measure never ran and the
+  // connector sat in its fixed-anchor fallback. Storing the node in state re-runs
+  // the measure effect on attach.
+  const [portraitEl, setPortraitEl] = useState<HTMLImageElement | null>(null);
+  const portraitRef = useCallback((node: HTMLImageElement | null) => setPortraitEl(node), []);
   const [portraitAnchor, setPortraitAnchor] = useState<{ cx: number; cy: number; rad: number } | null>(null);
   useEffect(() => {
-    const el = portraitRef.current;
+    const el = portraitEl;
     if (!el) { setPortraitAnchor(null); return; }
     const measure = () => {
       const r = el.getBoundingClientRect();
@@ -206,7 +212,7 @@ export default function LineageModal({ name, image, character, lineage, fromRect
     ro.observe(el);
     window.addEventListener("resize", measure);
     return () => { ro.disconnect(); window.removeEventListener("resize", measure); };
-  }, [image]);
+  }, [portraitEl]);
   const [score, setScore] = useState(initialScore ?? 0); // campaign total rides in across levels
   useEffect(() => { onScoreChange?.(score); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [score]);
   // Score-milestone celebration, ported from the main pit (shared ../Milestone).
