@@ -292,9 +292,10 @@
   right: auto;
   top: calc(clamp(112px, 17vh, 190px) + 100px);
   bottom: auto;
-  /* a third narrower than the 80% it was: the write-up reflows, no type
-     changes size, and the rail still hangs off the right-hand edge */
-  width: 53.6%;
+  /* Narrowed to a left column (was 53.6%): the box lives in the room the
+     shift = 0.66 offset already reserves on the left, clear of the circles that
+     sit centre-right. The write-up reflows; no type changes size. */
+  width: 40%;
   max-width: none;
   z-index: 15;
   gap: 12px;
@@ -344,6 +345,36 @@
 }
 .asideDocked .cName {
   font-size: 0.78rem;
+}
+/* Phone: the info box is a bottom SHEET, not a left column (a column can't fit
+   beside the circles at 390px). Fixed to the foot, full width, height capped with
+   internal scroll so a long write-up SCROLLS rather than pushing up into the
+   circles. Applied via the isMobile class, after .asideDocked so it wins. Not
+   draggable on a phone (the drag handlers are gated off isMobile), so the box
+   never takes a transform and its fixed descendant, the chum rail, is never
+   clipped by this overflow. */
+.asideSheet {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: auto;
+  bottom: 0;
+  width: 100%;
+  max-width: none;
+  max-height: 42vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  cursor: default;
+  border-radius: 14px 14px 0 0;
+  z-index: 16;
+}
+/* Its partner: while the sheet is up the pit gives back the bottom 42vh, so the
+   circles re-fit the top band and the sheet never overlaps them. The pit already
+   re-lays-out to its container (ResizeObserver), so shrinking the stage suffices. */
+.stageReserved {
+  bottom: 42vh;
+  height: auto;
 }
 
 /* Small X in the corner of the docked caption. */
@@ -1530,6 +1561,6 @@
    max-width: 900px block that sets this same box's top. */
 @media (min-width: 901px) {
   .asideDocked {
-    max-width: 500px;
+    max-width: 420px;
   }
 }

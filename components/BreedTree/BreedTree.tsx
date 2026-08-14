@@ -5257,6 +5257,13 @@ export default function BreedTree({
   );
   // Close the card when the hovered circle changes or the round begins.
   useEffect(() => { setAncestryFor(null); }, [learning]);
+  // The level-dog info box opens on entering the learn area, so the level dog's
+  // card is there without a tap and then follows whatever circle you look at.
+  // Only when it is currently shut, so a manual close inside learn is respected.
+  useEffect(() => {
+    if (learning && hideCaption) onToggleCaption?.();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [learning]);
   // A card opens next to the main box: to its right if there is room, else its
   // left, cascaded a little per card so two do not land dead on top of each other.
   const cardSpot = (index: number) => {
@@ -5365,7 +5372,7 @@ export default function BreedTree({
           : undefined
       }
     >
-      <div className={`${styles.stage}${dockAside ? " " + styles.stageDocked : ""}`} ref={stageRef}>
+      <div className={`${styles.stage}${dockAside ? " " + styles.stageDocked : ""}${dockAside && learning && !hideCaption && isMobile ? " " + styles.stageReserved : ""}`} ref={stageRef}>
         <svg
           viewBox={viewBox}
           // Records the press only. No stopPropagation: the stage listener above
@@ -6798,7 +6805,11 @@ export default function BreedTree({
             const SQ = 84 * pitScale * 1.2 * upp;
             const SQ_GAP = 16 * upp;
             const x = xMinC + m + (learning ? 1 : 2) * (SQ + SQ_GAP);
-            const y = vbHc * WORD_START_Y;
+            // Beside the play button: the start PLAY sits at WORD_START_Y, but the
+            // learn PLAY is the DOM .learnPlay pinned bottom 3%, near the foot, so
+            // in learn we drop to that line (button centre = half viewport, up 3%,
+            // up half a square) instead of floating above it.
+            const y = learning ? vbHc / 2 - 0.03 * vbHc - SQ / 2 : vbHc * WORD_START_Y;
             // Match the profile name (.title) EXACTLY: its own CSS size formula in
             // px, then scaled to view units by upp. Above 640px it is
             // min(clamp(0.832rem, 2vw, 1.808rem), --tp / 2.15) with
@@ -7192,16 +7203,16 @@ export default function BreedTree({
       )}
       <div
         ref={asideRef}
-        className={`${styles.aside}${dockAside ? " " + styles.asideDocked : ""}`}
+        className={`${styles.aside}${dockAside ? " " + styles.asideDocked : ""}${dockAside && isMobile ? " " + styles.asideSheet : ""}`}
         // visibility, not display. The rail is a descendant positioned off this
         // element's edge, so collapsing it would leave the rail with nothing to
         // hang off. Hidden this way the box keeps its box, the rail keeps its
         // anchor, and the rail turns itself visible again below.
         style={{ position: "relative", visibility: hideCaption ? "hidden" : undefined }}
-        onPointerDown={dockAside ? asideDown : undefined}
-        onPointerMove={dockAside ? asideMove : undefined}
-        onPointerUp={dockAside ? asideUp : undefined}
-        onPointerCancel={dockAside ? asideUp : undefined}
+        onPointerDown={dockAside && !isMobile ? asideDown : undefined}
+        onPointerMove={dockAside && !isMobile ? asideMove : undefined}
+        onPointerUp={dockAside && !isMobile ? asideUp : undefined}
+        onPointerCancel={dockAside && !isMobile ? asideUp : undefined}
       >
         <div className={styles.crumbs}>
           {trail.map((n, i) => (
