@@ -1747,14 +1747,20 @@ export default function LineageMap({
           {circular && breed.image ? (() => {
             const lines = splitName(breed.name);            // 1-2 lines
             const longest = Math.max(1, ...lines.map((l) => l.length));
-            const NAME_BOTTOM = -R * 0.2;                   // baseline of the lowest line
-            const nameFs = Math.max(10, Math.min(R * 0.32, (R * 1.5) / (0.6 * longest)));
+            const NAME_BOTTOM = -R * 0.34;                  // baseline of the lowest line; a fraction of R (was -R*0.2) so the up-move reads the same on phone and desktop
+            const nameFs = Math.max(12, Math.min(R * 0.384, (R * 1.8) / (0.6 * longest))); // +20% on every term (cap 0.32->0.384, fit 1.5->1.8, floor 10->12)
             const lineH = nameFs * 0.9;                     // 0.9em leading, per the mock
             return (
               <text
                 textAnchor="middle"
                 style={{
                   fontFamily: '"Luckiest Guy", system-ui, sans-serif',
+                  // BUG FIX: fontSize was absent, so the text rendered at the inherited
+                  // default while the gap lineH (nameFs * 0.9) scaled with R. A 2-line
+                  // name like "Ancient Molossers" then read ~2.5em leading on a big
+                  // circle. Tying the font to nameFs makes the leading a true 0.9em on
+                  // every name and circle size (and lets the +20% above actually show).
+                  fontSize: `${nameFs}px`,
                   fontWeight: 400,
                   fill: "#ffffff",
                   stroke: "#000000",
