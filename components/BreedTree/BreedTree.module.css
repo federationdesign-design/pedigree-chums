@@ -836,7 +836,7 @@
      18 + 84 + 14 + 84 is where the second ends, and 14 more is the same gap
      again. Change the square size there and this changes with it. */
   right: 18px;
-  top: 234px; /* 214 + 20px (14 Aug 2026): drop the rail clear of the more-info icon it overlapped where it first appears */
+  top: 300px; /* 214 -> 234 -> 300 (14 Aug 2026): dropped a further 66px (more than the last 20px nudge) to clear the more-info icon fully and free the top-right corner for the relocated learn dock. One number, tune to taste. */
   left: auto;
   bottom: auto;
 }
