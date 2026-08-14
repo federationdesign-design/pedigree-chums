@@ -5305,6 +5305,18 @@ export default function BreedTree({
     top = Math.min(top, Math.max(8, vh - MIN_VISIBLE));
     return { left, top, width: cardW };
   };
+  // Arriving at a chum's info (ancestryFor set) opens the TEMPERAMENT box (the
+  // "information card") by default, at the SAME slot its icon uses (cardSpot(2)),
+  // so it is there without a tap. This runs post-render, so the main box is
+  // measured. Ancestry and training stay closed; close still works; re-selecting a
+  // chum re-opens it like a fresh arrival. It pops in via .tempCard's relPop. It
+  // deliberately does NOT force-open on plain zoom (see the 3070 note) -- only when
+  // a chum is actually selected, and at cardSpot(2), which opens clear of the box
+  // and rail exactly as the manual reopen does.
+  useEffect(() => {
+    if (ancestryFor) { setTempPos(cardSpot(2)); setTempHidden(false); }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ancestryFor]);
   // While a circle is hovered, GHOST the circles nested inside it: their image
   // fades to a hollow dashed ring (see .ghost), so you can always see what is
   // nested inside without it covering the parent's own picture. A ghosted circle
