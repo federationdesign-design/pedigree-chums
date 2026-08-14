@@ -503,3 +503,43 @@ would settle it too, but reads floaty and weakens the throw-it-out release valve
 on a light body; excluding toys from the settle test would stop the loop when the
 DOGS settle, freezing the ball suspended MID-BOUNCE a few seconds in, worse than
 the 30s freeze.
+
+## Throwing a ball: what is IDENTICAL between the two pits (do not re-derive)
+
+The ball "will not throw in the mini pit" has taken several passes. To stop the
+next agent re-checking a whole family of theories, these are confirmed the SAME
+in the main pit (PackPit.tsx) and the mini pit (BreedTree.tsx), verified 13 Aug
+2026 by reading both:
+
+- **World scale.** Both are 1 physics unit = 1 screen pixel. Main pit: Matter
+  `Render` at `stage.clientWidth/Height`, `pixelRatio: 1`. Mini pit: bodies live
+  in CLIENT PX via the CT transform ("Matter bodies live in CLIENT PX"). So a
+  given `setVelocity` travels the same distance in either pit.
+- **Timestep.** Both fixed 60Hz. Main: `startFixedTimestep(Engine, engine)`. Mini:
+  accumulator calling `Engine.update(engine, 1000/60)`. Same delta, so px-per-step
+  means the same px-per-second in both.
+- **Gravity.** `engine.gravity.y = 1` in both (main also tilts gravity from device
+  motion; the mini pit does not, but that does not touch a throw).
+
+Because scale, timestep and gravity match, matching the ball's body numbers DOES
+match its behaviour on those grounds. Theories that start "the mini pit's world
+is smaller / faster / heavier-feeling" are dead ends.
+
+## Two drag hypotheses, both RULED OUT (13 Aug 2026)
+
+- **Held ball is position-driven, so velocity is overwritten each step.** No. The
+  per-step `setPosition`+`setVelocity` overwrite for a dragged prop (the `else`
+  branch of the toy sync) fires only when `isDragged(pr)` is true, and
+  `isDragged = dragRef.current?.body === b` is the OLD `startDrag` path.
+  `startDrag` is called only for UI menu squares (leave/restart/learn/pair), never
+  a toy. A dragged ball has `isDragged === false`, so it reads velocity FROM Matter
+  and is never overwritten.
+- **`enddrag` fires before the constraint detaches, so the spring cancels the
+  flick.** No. Matter nulls `constraint.bodyB`/`mouseConstraint.body` BEFORE
+  triggering `enddrag`; the constraint is already released inside `onEndDrag`.
+
+So the release-velocity flick, as written (onDown sets `button=0`, onMove samples
+`flickBuf`, enddrag reads it and `setVelocity`s the toy), should apply and stick.
+It does not, and no reasoning pass has caught why. NEXT STEP is a fenced
+diagnostic readout in `onEndDrag` (does it fire, `flickBuf.length`, computed
+`vx/vy`, body velocity a few steps later), not a fifth blind fix.
