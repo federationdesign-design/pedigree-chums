@@ -836,7 +836,7 @@
      18 + 84 + 14 + 84 is where the second ends, and 14 more is the same gap
      again. Change the square size there and this changes with it. */
   right: 18px;
-  top: 214px;
+  top: 234px; /* 214 + 20px (14 Aug 2026): drop the rail clear of the more-info icon it overlapped where it first appears */
   left: auto;
   bottom: auto;
 }
