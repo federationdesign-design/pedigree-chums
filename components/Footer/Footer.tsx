@@ -16,9 +16,15 @@ const NAV_LINKS = [
 
 export default function Footer({ tradeLinks = false }: { tradeLinks?: boolean }) {
   return (
-    <footer className={styles.footer}>
+    <footer className={`pc-footer ${styles.footer}`}>
       <div className={styles.logoCol}>
-        <Image src="/dogbingo.svg" alt="Pedigree Chums™" width={340} height={148} />
+        <Image src="/dogbingo.svg" alt="Pedigree Chums™" width={340} height={148} className={styles.logoImgDefault} />
+        {/* Items 1-2: the footer wordmark swaps to the monochrome PC logo per
+            scheme, driven by the header's own swap. contrast-schemes.css keys the
+            display switch and the crush-exclusion on :is(.pc-nav, .pc-footer), so
+            there is no second mechanism to keep in step. */}
+        <img src="/PC-logo-B&W footer.svg" alt="Pedigree Chums™" className={styles.logoImgBow} />
+        <img src="/PC-logo-W&B.svg" alt="Pedigree Chums™" className={styles.logoImgWob} />
       </div>
 
       <nav className={styles.nav}>

@@ -8,6 +8,7 @@ import HiddenGamesCounter from "../components/HiddenGamesCounter/HiddenGamesCoun
 import HideImages from "../components/HideImages/HideImages";
 import SchemeShapes from "../components/SchemeShapes/SchemeShapes";
 import SchemeStrokes from "../components/SchemeStrokes/SchemeStrokes";
+import SchemeCrushSvg from "../components/SchemeCrushSvg/SchemeCrushSvg";
 import HiddenGamesToast from "../components/HiddenGamesToast/HiddenGamesToast";
 import PickAChumLauncher from "./pick-a-chum/ui/PickAChumLauncher";
 import "./globals.css";
@@ -120,7 +121,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${display.variable} ${body.variable} ${pct.variable} ${stackNotch.variable} ${score.variable} ${arrowFont.variable} ${unica.variable}`}>
+    <html lang="en" suppressHydrationWarning className={`${display.variable} ${body.variable} ${pct.variable} ${stackNotch.variable} ${score.variable} ${arrowFont.variable} ${unica.variable}`}>
       <body>
         {/* Before first paint: mirror the stored contrast scheme onto <html> so
             a returning scheme user never sees a flash of the default view (brief
@@ -155,6 +156,9 @@ export default function RootLayout({
         {/* Item 6: strokes every rounded container in a scheme so its boundary
             stays visible once the sweep flattens its fill. */}
         <SchemeStrokes />
+        {/* Crush gap: extends the media crush to inline content SVGs (charts,
+            portraits, bars), leaving UI icons alone. */}
+        <SchemeCrushSvg />
         <PickAChumLauncher />
         <OfferLauncher />
         {/* Hidden Games Stage 1 counter. Owner-approved layout mount, 28 Jul

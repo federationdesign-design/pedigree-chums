@@ -101,3 +101,22 @@
   transition: background 0.15s, transform 0.1s, box-shadow 0.1s;
 }
 .slot:hover .btn { background: #2fd46b; }
+
+/* GROUP 4 (over-media): while a contrast scheme is active, the .content overlay
+   and its transparent-author layout wrappers (tags/bottom/title/titleAccent)
+   sit directly over the crushed video (.media, z-index 0). The sweep would give
+   them an opaque fill and hide the video, so force them transparent with white
+   text, which reads over the dark crushed footage. The pills and button
+   (.tagBad/.tagOutline/.btn) keep their own author fills and are left to the
+   sweep. The :global(#pc-site) id is required so this out-specifies the sweep
+   (:root[scheme] #pc-site * ), which carries an id and would otherwise win and
+   refill these white; the local classes keep it scoped and clear of the build
+   trap. */
+:root[data-pc-contrast-scheme] :global(#pc-site) .content,
+:root[data-pc-contrast-scheme] :global(#pc-site) .tags,
+:root[data-pc-contrast-scheme] :global(#pc-site) .bottom,
+:root[data-pc-contrast-scheme] :global(#pc-site) .title,
+:root[data-pc-contrast-scheme] :global(#pc-site) .titleAccent {
+  background-color: transparent !important;
+  color: #ffffff !important;
+}

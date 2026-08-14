@@ -15,6 +15,17 @@
   width: clamp(260px, 36vw, 340px);
   height: auto;
 }
+/* Items 1-2: default full-colour wordmark in the default view; the two monochrome
+   scheme wordmarks are hidden until contrast-schemes.css reveals the matching one
+   inside a scheme (the same swap that drives the header). All three classes must
+   exist here so their hashed names resolve. */
+.logoImgDefault {
+  display: block;
+}
+.logoImgBow,
+.logoImgWob {
+  display: none;
+}
 .legal {
   margin: clamp(28px, 4vw, 48px) auto 0;
   padding-top: 18px;
