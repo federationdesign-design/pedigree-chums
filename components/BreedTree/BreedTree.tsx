@@ -6581,6 +6581,22 @@ export default function BreedTree({
                     <path d="M12 6v4M12 10H5v8M12 10h7v8" />
                   </g>
                 )}
+                {/* Start-screen only: the two-line caption under the red close
+                    square. Forced to two lines by request. Gone the instant PLAY
+                    sets `started`, so it never rides a moving square. */}
+                {d.kind === "close" && !learning && !started ? (
+                  <text
+                    className={styles.autoLabel}
+                    x={0}
+                    y={half + 8 * upp}
+                    textAnchor="middle"
+                    dominantBaseline="text-before-edge"
+                    style={{ fontSize: `${24 * upp}px`, strokeWidth: `${2 * upp}px` }}
+                  >
+                    <tspan x={0}>back to</tspan>
+                    <tspan x={0} dy="1.05em">main page</tspan>
+                  </text>
+                ) : null}
               </g>
             ))}<g ref={pairsGRef}>{pitPairs.flatMap((id) => [pairSquare(id, "leave"), pairSquare(id, "restart")])}</g></>);
           })()}
@@ -6691,6 +6707,19 @@ export default function BreedTree({
                     </g>
                   );
                 })()}
+                {/* Start-screen caption above the square. It renders only in this
+                    block (gated !started), so it is gone the instant PLAY arms
+                    the pit; nothing tracks a moving body. */}
+                <text
+                  className={styles.autoLabel}
+                  x={w.x + SQ / 2}
+                  y={w.y - SQ / 2 - 8 * upp}
+                  textAnchor="middle"
+                  dominantBaseline="text-after-edge"
+                  style={{ fontSize: `${24 * upp}px`, strokeWidth: `${2 * upp}px` }}
+                >
+                  {w.key === "start" ? "play" : "learn"}
+                </text>
               </g>
             ));
           })()}

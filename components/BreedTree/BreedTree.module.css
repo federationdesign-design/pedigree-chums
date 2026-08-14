@@ -1296,6 +1296,20 @@
   color: var(--yellow, #ffd23e);
 }
 .learnDockIcon svg { width: 100%; height: 100%; stroke: var(--yellow, #ffd23e); }
+/* Start-screen SVG captions: "play"/"learn" above the PLAY/LEARN squares and
+   the two-line "back to main page" under the red close square. They render only
+   before the round (gated in the render), so they never track a moving body.
+   Font-size and stroke-width are set inline (upp-scaled) so they stay a constant
+   screen size; the look lives here. */
+.autoLabel {
+  fill: #ffffff;
+  stroke: var(--navy, #0a3a57);
+  paint-order: stroke;
+  stroke-linejoin: round;
+  font-family: var(--font-display), system-ui, sans-serif;
+  pointer-events: none;
+  user-select: none;
+}
 .cardTitleWhite {
   color: #ffffff;
 }
