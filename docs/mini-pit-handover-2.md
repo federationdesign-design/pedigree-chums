@@ -565,3 +565,18 @@ but do not re-open the throw or re-derive the ruled-out theories. If a throw
 regression ever appears, FIRST confirm the flick code (onDown/onMove/`flickBuf`/
 enddrag `setVelocity` in BreedTree.tsx) is actually present in the tree before
 theorising, because a merge eating it is the known failure mode here.
+
+## Ancestor-tree blue pills: nmY reverted -r+22 -> -r-13 (14 Aug 2026)
+
+The blue name pill on each ancestor circle (LineageMap `.nmPill`, the non-circular
+`nmY` path used by the main pit and the chum card) sits ABOVE the circle at
+`nmY = -r - 13`. Commit `93638c46e` (5 Aug 2026) moved it to `-r + 22`, which drops
+it from above the circle to inside its top, so in the main pit it read as sitting
+ON the node rather than clear of it. That was wrong in the main pit (the shared
+component), so it is reverted to `-r - 13`.
+
+Do NOT re-apply `-r + 22` thinking the above-circle placement is a drift: it is the
+intended position, confirmed by Steve on 14 Aug. The circular (learn lift) path is
+separate and unaffected, it uses `pillPlacement` (the clock-face offsets), not `nmY`.
+Hiding the pills in the learn area is done with a dedicated prop (not `!circular`,
+because the chum card is non-circular too and keeps its pills), tracked separately.

@@ -2121,10 +2121,14 @@ export default function LineageMap({
                       const nmW = nodePillWidth(nmLines);
                       const nmH = nmLines.length > 1 ? 40 : 22;
                       // CHANGE 2: sit the pill where the placement pass put it, the
-                      // clearest of four touching sides on the lift. Off the lift it
-                      // keeps its old spot inside the top of the circle (nmY), how it
-                      // reads on a phone with small circles.
-                      const nmY = -r + 22;
+                      // clearest of four touching sides on the lift. Off the lift
+                      // (main pit / chum card) the pill sits ABOVE the circle at nmY.
+                      // REVERTED 14 Aug 2026: commit 93638c46e (5 Aug) moved nmY from
+                      // -r - 13 to -r + 22, which dropped the pill from ABOVE the circle
+                      // to INSIDE its top, so in the main pit it read as sitting ON the
+                      // node. Restored to -r - 13 (clear above the node). Do NOT
+                      // re-apply -r + 22 thinking the above-circle spot is a drift.
+                      const nmY = -r - 13;
                       const off = circular ? pillPlacement.get(n._id) : undefined;
                       const pcx = off ? off.ox : 0;
                       const pcy = off ? off.oy : nmY;
