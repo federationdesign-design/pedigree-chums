@@ -543,3 +543,25 @@ So the release-velocity flick, as written (onDown sets `button=0`, onMove sample
 It does not, and no reasoning pass has caught why. NEXT STEP is a fenced
 diagnostic readout in `onEndDrag` (does it fire, `flickBuf.length`, computed
 `vx/vy`, body velocity a few steps later), not a fifth blind fix.
+
+## RESOLVED: the throw works, the "failure" was a wiped flick (14 Aug 2026)
+
+The throw is FIXED and shipped as `f1cf0072` ("pit: throw the toy on release,
+from the pointer's own flick velocity"). Nothing above was wrong about the
+mechanics: the flick as written applies and sticks. It just was not in the tree
+being tested.
+
+CAUSE OF THE FALSE FAILURE: the flick had been built, then wiped TWICE by merges
+before Steve ever tested it, so every "it will not throw" report above was made
+against a tree with NO flick code in it. The reasoning passes kept looking for a
+bug in code that was not there. Once the flick was re-applied and the diagnostic
+readout run, the throw worked first time and the readout confirmed it (enddrag
+fires, `flickBuf` populated, `vx/vy` computed, velocity present a few steps
+later). The diagnostic was then removed; it is not in `f1cf0072` and is NOT
+needed again.
+
+Lesson for the next agent: the two sections above are kept as an honest record,
+but do not re-open the throw or re-derive the ruled-out theories. If a throw
+regression ever appears, FIRST confirm the flick code (onDown/onMove/`flickBuf`/
+enddrag `setVelocity` in BreedTree.tsx) is actually present in the tree before
+theorising, because a merge eating it is the known failure mode here.
