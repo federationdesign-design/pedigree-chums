@@ -166,6 +166,23 @@
   from { stroke-dashoffset: 1; }
   to { stroke-dashoffset: 0; }
 }
+/* The rarity band slides up from below the circle to arrive as the ring closes.
+   It sits inside the circle clipPath, so the rim reveals it rising into view.
+   --band-slide (set inline to R) is how far below it starts; --band-dur and
+   --band-delay come from LineageMap.tsx. Reduced motion, which skips the
+   animation, shows it already in place. Added 13 August 2026. */
+.bandSlide {
+  transform: translateY(0);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .bandSlide {
+    animation: lm-band-slide var(--band-dur, 0.45s) cubic-bezier(0.2, 1, 0.3, 1) var(--band-delay, 0.65s) both;
+  }
+}
+@keyframes lm-band-slide {
+  from { transform: translateY(var(--band-slide, 0)); }
+  to { transform: translateY(0); }
+}
 .pickCard {
   fill: none;
   stroke: var(--blue-deep);

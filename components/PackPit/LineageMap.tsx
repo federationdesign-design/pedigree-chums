@@ -96,10 +96,16 @@ const RARITY_BAND: Record<"common" | "uncommon" | "rare" | "root", { bg: string;
 // How long the rarity ring takes to draw itself on around the lifted circle, and
 // how long it waits first. The lift's own fade is 0.2s, so the draw holds back
 // that long and only then travels, letting the card arrive before the ring
-// sweeps. The draw is a touch longer than a flash so it reads as a trace, not a
-// loading bar. Dial both here.
-const RARITY_DRAW = "0.5s";
+// sweeps. Slow enough to watch it travel round, not a flash. Dial both here.
+const RARITY_DRAW = "0.9s";
 const RARITY_DRAW_DELAY = "0.2s";
+// The rarity band slides up from below the circle to arrive as the ring closes.
+// Ring closes at RARITY_DRAW_DELAY + RARITY_DRAW = 0.2 + 0.9 = 1.1s, so the 0.45s
+// band waits 0.65s and the two finish together. If you re-dial the ring, move
+// BAND_SLIDE_DELAY with it (delay = ring close - BAND_SLIDE_DUR) so they still
+// land as one.
+const BAND_SLIDE_DUR = "0.45s";
+const BAND_SLIDE_DELAY = "0.65s";
 // distance from the dog to its direct ancestors (mirrors the canvas hover-fan)
 const RING1 = ROOT + 96;
 // distance added at each deeper generation
@@ -1680,9 +1686,19 @@ export default function LineageMap({
             // oversized so the tilt never exposes a corner; the circle clip cuts it.
             return (
               <g clipPath={`url(#${clip})`} style={{ pointerEvents: "none" }}>
-                <g transform={`rotate(${TILT})`}>
-                  <rect x={-R * 1.6} y={bandTop} width={R * 3.2} height={R * 1.6} fill={band.bg} />
-                  <text x={labelX} y={labelY} textAnchor="middle" dominantBaseline="central" style={{ fontFamily: '"Luckiest Guy", system-ui, sans-serif', fontSize: fs, fontWeight: 400, fill: band.fg }}>{band.label}</text>
+                {/* The slide group carries the CSS translate ONLY; the tilt stays
+                    on the inner group, because a CSS transform here would override
+                    that rotate attribute. Sitting inside the clip, the band rises
+                    up from below and the circle rim reveals it entering. --band-slide
+                    is R so it starts a full radius below, clipped out of sight. */}
+                <g
+                  className={styles.bandSlide}
+                  style={{ ["--band-slide" as string]: `${R}px`, ["--band-dur" as string]: BAND_SLIDE_DUR, ["--band-delay" as string]: BAND_SLIDE_DELAY }}
+                >
+                  <g transform={`rotate(${TILT})`}>
+                    <rect x={-R * 1.6} y={bandTop} width={R * 3.2} height={R * 1.6} fill={band.bg} />
+                    <text x={labelX} y={labelY} textAnchor="middle" dominantBaseline="central" style={{ fontFamily: '"Luckiest Guy", system-ui, sans-serif', fontSize: fs, fontWeight: 400, fill: band.fg }}>{band.label}</text>
+                  </g>
                 </g>
               </g>
             );
