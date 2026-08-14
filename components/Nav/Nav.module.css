@@ -40,6 +40,17 @@
   width: clamp(112px, 16vw, 150px);
   height: auto;
 }
+/* Items 1-2: the default full-colour wordmark shows in the default view; the two
+   monochrome scheme wordmarks are hidden until contrast-schemes.css reveals the
+   matching one inside a scheme (and hides the default there). All three classes
+   must exist in this module so their hashed names resolve. */
+.logoImgDefault {
+  display: block;
+}
+.logoImgBow,
+.logoImgWob {
+  display: none;
+}
 
 /* The accessibility toolbar rides on the same axis as the menu button (task 8).
    The wrapper is pointer-events: none like the bar; the toolbar and burger

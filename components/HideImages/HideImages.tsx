@@ -42,17 +42,25 @@ export default function HideImages() {
       return "";
     }
 
+    // A raster <img> is anything not served as SVG. SVGs stay visible (inline
+    // <svg> is never collected; an <img> whose source is a .svg is skipped).
+    const isSvgImg = (e: Element) =>
+      e instanceof HTMLImageElement && /\.svg(\?|$)/i.test(e.getAttribute("src") || "");
+
     function targets(): Element[] {
       const site = document.getElementById("pc-site");
       if (!site) return [];
       const set = new Set<Element>();
-      site.querySelectorAll("img, video, svg").forEach((e) => set.add(e));
-      // Background-image content (hero panels etc), excluding the paw texture
-      // and the gradient.
+      // Raster images only. Inline SVG is never collected and SVG-sourced <img>
+      // is skipped, so both kinds of SVG stay visible. Video also stays visible
+      // (it is not raster), so it is not collected either.
+      site.querySelectorAll("img").forEach((e) => { if (!isSvgImg(e)) set.add(e); });
+      // Raster background-image content (hero panels etc), excluding the paw
+      // texture, the gradient, and any SVG background (SVGs stay visible).
       site.querySelectorAll("*").forEach((e) => {
         if (e.id === "pc-hide-root" || (root && root.contains(e))) return;
         const bg = getComputedStyle(e).backgroundImage;
-        if (bg && bg !== "none" && bg.indexOf("url(") !== -1 && bg.indexOf("paw-pattern") === -1 && bg.indexOf("gradient") === -1) {
+        if (bg && bg !== "none" && bg.indexOf("url(") !== -1 && bg.indexOf("paw-pattern") === -1 && bg.indexOf("gradient") === -1 && bg.toLowerCase().indexOf(".svg") === -1) {
           const r = e.getBoundingClientRect();
           if (r.width > 24 && r.height > 24) set.add(e);
         }
@@ -83,6 +91,10 @@ export default function HideImages() {
         o.style.background = bg;
         o.style.color = text;
         o.style.borderColor = text;
+        // The block inherits the replaced element's own corner radius, read from
+        // that element (not a wrapper): a rounded image becomes a rounded block,
+        // a square image a square block.
+        o.style.borderRadius = getComputedStyle(el).borderRadius;
         o.style.fontSize = Math.max(10, Math.min(20, Math.min(r.width, r.height) / 6)) + "px";
         const name = accessibleName(el);
         if (name) {

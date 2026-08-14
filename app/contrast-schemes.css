@@ -47,11 +47,6 @@
 :root[data-pc-contrast-scheme="black-on-white"] .pc-nav {
   background: #fff !important;
 }
-/* hero photographs hidden; the container stays as a flat panel with its text */
-:root[data-pc-contrast-scheme="black-on-white"] [class*="essayHeroImg"],
-:root[data-pc-contrast-scheme="black-on-white"] [class*="essayHeroTint"] {
-  display: none !important;
-}
 
 /* ---- white-on-black --------------------------------------------------- */
 
@@ -74,8 +69,29 @@
 :root[data-pc-contrast-scheme="white-on-black"] .pc-nav {
   background: #000 !important;
 }
-:root[data-pc-contrast-scheme="white-on-black"] [class*="essayHeroImg"],
-:root[data-pc-contrast-scheme="white-on-black"] [class*="essayHeroTint"] {
+
+/* ============================================================================
+   ITEM 5 (seven-changes redesign): hero photographs BROUGHT BACK, greyscale.
+
+   Supersedes decision 11's "hero photographs hidden". In both schemes the hero
+   photo is shown again, desaturated. The text stays where it is, directly on the
+   photo; the tint (essayHeroTint) is an overlay so it stays hidden (no overlay,
+   by instruction). The hero's text containers lose the fill the sweep gave them
+   so the photo shows through; the rounded ones (pills) still take item 6's
+   stroke. This knowingly reintroduces the hero contrast failures task 3 measured
+   (recorded in .scratch/seven-changes-report.md: 78/78 fail, 1.00 to 2.73). It
+   is built as asked and is NOT fixed.
+   ========================================================================== */
+:root[data-pc-contrast-scheme] #pc-site [class*="essayHero"] {
+  background-color: transparent !important;
+  background-image: none !important;
+}
+:root[data-pc-contrast-scheme] #pc-site [class*="essayHeroImg"] {
+  display: block !important;
+  filter: grayscale(1) !important;
+  -webkit-filter: grayscale(1) !important;
+}
+:root[data-pc-contrast-scheme] #pc-site [class*="essayHeroTint"] {
   display: none !important;
 }
 
@@ -98,10 +114,13 @@
 :root[data-pc-contrast-scheme="black-on-white"] { --pc-hb-bg: #000000; --pc-hb-text: #ffffff; }
 :root[data-pc-contrast-scheme="white-on-black"] { --pc-hb-bg: #ffffff; --pc-hb-text: #000000; }
 
-/* Hide content media before paint; keep the header's own icons so the page
-   stays operable (the menu button must not vanish). */
-:root[data-pc-hide-images] #pc-site :is(img, video, svg) { opacity: 0 !important; }
-:root[data-pc-hide-images] #pc-site .pc-nav :is(img, video, svg) { opacity: 1 !important; }
+/* Hide raster images before paint; keep the header's own icons so the page
+   stays operable (the menu button must not vanish). Raster <img> only: SVGs
+   stay visible (inline <svg> is not matched, and an <img> whose source is a .svg
+   is excluded) and video stays visible (not raster). Background images are
+   handled by the overlay pass (components/HideImages), not here. */
+:root[data-pc-hide-images] #pc-site img:not([src$=".svg"]) { opacity: 0 !important; }
+:root[data-pc-hide-images] #pc-site .pc-nav img { opacity: 1 !important; }
 
 #pc-hide-root { position: absolute; top: 0; left: 0; width: 0; height: 0; z-index: 2147483000; pointer-events: none; }
 /* Keep the header above the blocks so its menu button stays visible, not just
@@ -144,9 +163,61 @@
 /* The three A cells keep their own scheme sample: fill, letter and an outline
    that contrasts that fill, whichever scheme is active. Placed after the cell
    rule above so these win. */
-:root[data-pc-contrast-scheme] #pc-site .pc-nav [class*="aDefault"] { background: #ffffff !important; color: var(--navy) !important; }
+/* Background on the cell, glyph colour on both the cell and its <span> (the
+   sweep recolours the span directly, so the span needs its own override). */
+:root[data-pc-contrast-scheme] #pc-site .pc-nav [class*="aDefault"] { background: var(--blue-sky) !important; color: var(--yellow) !important; }
+:root[data-pc-contrast-scheme] #pc-site .pc-nav [class*="aDefault"] span { color: var(--yellow) !important; background: transparent !important; }
 :root[data-pc-contrast-scheme] #pc-site .pc-nav [class*="aBlackOnWhite"] { background: #ffffff !important; color: #000000 !important; }
+:root[data-pc-contrast-scheme] #pc-site .pc-nav [class*="aBlackOnWhite"] span { color: #000000 !important; background: transparent !important; }
 :root[data-pc-contrast-scheme] #pc-site .pc-nav [class*="aWhiteOnBlack"] { background: #000000 !important; color: #ffffff !important; }
+:root[data-pc-contrast-scheme] #pc-site .pc-nav [class*="aWhiteOnBlack"] span { color: #ffffff !important; background: transparent !important; }
+
+/* ============================================================================
+   ITEMS 1-2 (seven-changes redesign): header wordmark swaps per scheme.
+
+   The default full-colour dogbingo mark is hidden and the matching monochrome
+   PC logo shown, keyed on the pre-paint scheme attribute so there is no flash.
+   Images are media (excluded from the sweep), so only display is switched here.
+   ========================================================================== */
+:root[data-pc-contrast-scheme] .pc-nav [class*="logoImgDefault"] { display: none !important; }
+:root[data-pc-contrast-scheme="black-on-white"] .pc-nav [class*="logoImgBow"] { display: block !important; }
+:root[data-pc-contrast-scheme="white-on-black"] .pc-nav [class*="logoImgWob"] { display: block !important; }
+
+/* ============================================================================
+   ITEM 6 (seven-changes redesign): rounded containers get a stroke.
+
+   SchemeStrokes marks every #pc-site element whose computed border-radius > 0
+   with data-pc-stroke (body text and headings, radius 0, are never marked). The
+   foreground outline follows the radius and adds no layout box. Placed BEFORE
+   the focus rules so a focused element's ring (same specificity, later source)
+   still wins. The header chrome is excluded by the component (already stroked).
+   ========================================================================== */
+:root[data-pc-contrast-scheme="black-on-white"] #pc-site [data-pc-stroke] {
+  outline: 2px solid #000000 !important;
+  outline-offset: -2px !important;
+}
+:root[data-pc-contrast-scheme="white-on-black"] #pc-site [data-pc-stroke] {
+  outline: 2px solid #ffffff !important;
+  outline-offset: -2px !important;
+}
+
+/* ============================================================================
+   ITEM 3 (seven-changes redesign): the accessibility menu, in a scheme.
+
+   Nav swaps the Bento board for the accessibility menu (outlined boxes) whenever
+   a scheme is active or images are hidden, and marks the overlay .pc-acc-menu.
+   The overlay is portalled to <body>, outside #pc-site, so the monochrome sweep
+   cannot reach it; these rules recolour the whole board to the scheme. The blank
+   (hide-images-only, no scheme) case keeps the component's own base colours.
+   ========================================================================== */
+:root[data-pc-contrast-scheme="black-on-white"] .pc-acc-menu,
+:root[data-pc-contrast-scheme="black-on-white"] .pc-acc-menu * { color: #000000 !important; }
+:root[data-pc-contrast-scheme="black-on-white"] .pc-acc-menu { background: #ffffff !important; }
+:root[data-pc-contrast-scheme="black-on-white"] .pc-acc-menu [class*="box"] { outline-color: #000000 !important; }
+:root[data-pc-contrast-scheme="white-on-black"] .pc-acc-menu,
+:root[data-pc-contrast-scheme="white-on-black"] .pc-acc-menu * { color: #ffffff !important; }
+:root[data-pc-contrast-scheme="white-on-black"] .pc-acc-menu { background: #000000 !important; }
+:root[data-pc-contrast-scheme="white-on-black"] .pc-acc-menu [class*="box"] { outline-color: #ffffff !important; }
 
 /* ============================================================================
    FOCUS RINGS IN A SCHEME (root fix, not per-component).

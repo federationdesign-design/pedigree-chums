@@ -6,7 +6,9 @@ import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { Montserrat } from "next/font/google";
 import BentoBoard from "./BentoBoard";
+import AccessibleMenu from "./AccessibleMenu";
 import PcContrastToolbar from "../PcContrastToolbar/PcContrastToolbar";
+import { getScheme, getHideImages, CONTRAST_EVENT } from "../../lib/contrastScheme";
 import styles from "./Nav.module.css";
 
 // Montserrat 900 loaded explicitly -- the global --font-body only ships 400-800,
@@ -58,6 +60,16 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
   };
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  // In a contrast scheme, or with images hidden, the hamburger opens the
+  // accessibility menu (outlined boxes) instead of the Bento board. Read from
+  // the <html> attributes the toolbar sets, kept live via the pc:contrast event.
+  const [accessibleMode, setAccessibleMode] = useState(false);
+  useEffect(() => {
+    const read = () => setAccessibleMode(getScheme() !== null || getHideImages());
+    read();
+    window.addEventListener(CONTRAST_EVENT, read);
+    return () => window.removeEventListener(CONTRAST_EVENT, read);
+  }, []);
   // Set only when the menu is closing because the visitor picked a link. The
   // scroll restore in the body-lock cleanup is then skipped, so the page they
   // are travelling to always opens at the top.
@@ -192,7 +204,16 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
       {/* Header contents hide while the menu is open -- no logo, no hamburger. */}
       {!open && !hideLogo && (
         <Link href="/home" className={styles.logo} aria-label="Pedigree Chums™ home">
-          <Image src="/dogbingo.svg" alt="Pedigree Chums™" width={150} height={64} priority />
+          <Image src="/dogbingo.svg" alt="Pedigree Chums™" width={150} height={64} priority className={styles.logoImgDefault} />
+          {/* Items 1-2: the header wordmark swaps to the monochrome PC logo per
+              scheme. Hidden by default; contrast-schemes.css shows the matching
+              one and hides the default, keyed on the pre-paint scheme attribute
+              so there is no flash. Plain img (not next/image) because the file
+              names carry an ampersand. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/PC-logo-B&W.svg" alt="Pedigree Chums™" className={styles.logoImgBow} />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/PC-logo-W&B.svg" alt="Pedigree Chums™" className={styles.logoImgWob} />
         </Link>
       )}
       {!open && !dockBottomLeft && (
@@ -208,7 +229,7 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
 
       {open && createPortal(
         <div
-          className={`${styles.overlay} ${!tradeLinks ? styles.overlayScroll : ""}`}
+          className={`${styles.overlay} ${!tradeLinks ? styles.overlayScroll : ""} ${accessibleMode && !tradeLinks ? "pc-acc-menu" : ""}`}
           role="dialog"
           aria-modal="true"
           onPointerOver={onIntent}
@@ -260,6 +281,8 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
               ))}
               <Link href="/preorder" className={styles.menuLink} onClick={closeForNav}>Get pre-order discount code</Link>
             </nav>
+          ) : accessibleMode ? (
+            <AccessibleMenu onNavigate={closeForNav} />
           ) : (
             <BentoBoard onNavigate={closeForNav} onOffer={openOffer} animateIn />
           )}
