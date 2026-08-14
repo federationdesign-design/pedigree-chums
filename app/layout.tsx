@@ -8,6 +8,8 @@ import HiddenGamesCounter from "../components/HiddenGamesCounter/HiddenGamesCoun
 import HideImages from "../components/HideImages/HideImages";
 import SchemeShapes from "../components/SchemeShapes/SchemeShapes";
 import SchemeStrokes from "../components/SchemeStrokes/SchemeStrokes";
+import SchemeCrushSvg from "../components/SchemeCrushSvg/SchemeCrushSvg";
+import SchemeLayers from "../components/SchemeLayers/SchemeLayers";
 import HiddenGamesToast from "../components/HiddenGamesToast/HiddenGamesToast";
 import PickAChumLauncher from "./pick-a-chum/ui/PickAChumLauncher";
 import "./globals.css";
@@ -120,7 +122,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${display.variable} ${body.variable} ${pct.variable} ${stackNotch.variable} ${score.variable} ${arrowFont.variable} ${unica.variable}`}>
+    <html lang="en" suppressHydrationWarning className={`${display.variable} ${body.variable} ${pct.variable} ${stackNotch.variable} ${score.variable} ${arrowFont.variable} ${unica.variable}`}>
       <body>
         {/* Before first paint: mirror the stored contrast scheme onto <html> so
             a returning scheme user never sees a flash of the default view (brief
@@ -155,14 +157,26 @@ export default function RootLayout({
         {/* Item 6: strokes every rounded container in a scheme so its boundary
             stays visible once the sweep flattens its fill. */}
         <SchemeStrokes />
+        {/* Crush gap: extends the media crush to inline content SVGs (charts,
+            portraits, bars), leaving UI icons alone. */}
+        <SchemeCrushSvg />
+        {/* Rules A/B: pure overlays covering media go transparent; photo
+            backgrounds behind text are crushed not stripped (general, replaces the
+            per-page hero fixes). Also scans data-pc-reach overlays. */}
+        <SchemeLayers />
+        {/* data-pc-reach brings these body-level overlays into the scheme's reach
+            (they sit outside #pc-site): the sweep flattens their colour and the
+            crush greyscales their icons. display:contents keeps layout unchanged. */}
+        {/* PickAChumLauncher marks only its launcher button internally (the chat
+            experience must not be swept), so it is not wrapped here. */}
         <PickAChumLauncher />
-        <OfferLauncher />
+        <div data-pc-reach style={{ display: "contents" }}><OfferLauncher /></div>
         {/* Hidden Games Stage 1 counter. Owner-approved layout mount, 28 Jul
             2026 (BRIEF 6.1, NEEDS_OWNER Q01). */}
-        <HiddenGamesCounter />
+        <div data-pc-reach style={{ display: "contents" }}><HiddenGamesCounter /></div>
         {/* Discovery toast (C02): confirms each non-final find, above the mini
             pit modal so a G02 find is visible. */}
-        <HiddenGamesToast />
+        <div data-pc-reach style={{ display: "contents" }}><HiddenGamesToast /></div>
         {/* G01 awards on the first pointer interaction with the Main Pit
             (CHANGE-LIST C01), wired inside PackPit. RouteWatcher was removed
             (NEEDS_OWNER Q06). */}

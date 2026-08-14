@@ -73,7 +73,7 @@ export default function OfferModal({
   };
 
   return createPortal(
-    <div className={styles.overlay} role="dialog" aria-modal="true" onClick={onClose}>
+    <div className={styles.overlay} data-pc-reach role="dialog" aria-modal="true" onClick={onClose}>
       <div className={styles.stage} onClick={(e) => e.stopPropagation()}>
         <button type="button" className={styles.close} onClick={onClose} aria-label="Close">
           &times;

@@ -60,10 +60,13 @@
   border-radius: 4px;
 }
 
-/* Precedence hook: while a global contrast scheme is active (the future
-   accessibility toolbar sets data-pc-contrast-scheme on <html>), the per-page
-   toggle has no effect, so hide it rather than leaving a dead control. Compounded
+/* Precedence hook: while a global contrast scheme is active (the accessibility
+   toolbar sets data-pc-contrast-scheme on <html>), the per-page toggle has no
+   effect, so hide the control. visibility:hidden (not display:none) keeps its
+   vertical space -- the toggle is the single owner of the hero->body gap -- so
+   the gap between the hero and the first paragraph matches the default view.
+   It is also removed from the tab order and the accessibility tree. Compounded
    with .wrap so the :global-style root selector does not trip the build trap. */
 :root[data-pc-contrast-scheme] .wrap {
-  display: none;
+  visibility: hidden;
 }

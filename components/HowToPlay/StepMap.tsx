@@ -206,6 +206,7 @@ export default function StepMap({
   return (
     <div
       className={styles.overlay}
+      data-pc-reach
       onPointerDown={onPanDown}
       onPointerMove={onPanMove}
       onPointerUp={onPanUp}

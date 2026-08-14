@@ -26,6 +26,7 @@
   height: 100px;        /* exact hamburger height (measured) */
   box-sizing: border-box;
   padding: 0;
+  overflow: hidden;     /* clip the flush cells to the box's rounded corners */
   background: var(--yellow);
   outline: 5px solid var(--navy); /* the single, shared stroke */
   border: none;
@@ -48,7 +49,7 @@
   background: var(--yellow);
   color: var(--navy);
   border: none;
-  border-radius: 30px; /* same radius as the hamburger */
+  border-radius: 0; /* flush segments; the box owns the rounded outline */
   outline: none;    /* no per-cell outline: one stroke only */
   box-shadow: none;
   cursor: pointer;
@@ -75,11 +76,10 @@
 .aBlackOnWhite { background: #ffffff; color: #000000; }
 .aWhiteOnBlack { background: #000000; color: #ffffff; }
 
-/* Active (aria-pressed): an inset ring that reads on any cell fill. This is the
-   active indicator only, distinct from the removed static outline. */
-.cell[aria-pressed="true"] {
-  box-shadow: inset 0 0 0 3px #0a3a57, inset 0 0 0 6px #ffffff;
-}
+/* No per-cell stroke of any kind: only the container box carries an outline, and
+   the cells are separated by dividers. Active state is carried by aria-pressed
+   (for assistive tech); it no longer draws a ring, which read as a second line
+   around the cell. Keyboard focus still shows via :focus-visible below. */
 
 .cell:focus-visible {
   outline: none;
@@ -92,7 +92,7 @@
   /* Mobile: cells revert to 36 wide by the full 67.5 tall (not square), so the
      two boxes plus the hamburger fit on one row at 375px, including with the
      reset button present. Desktop keeps the square, hamburger-sized cell. */
-  .cell { width: 36px; height: 67.5px; border-radius: 20.25px; } /* same radius as the mobile hamburger */
+  .cell { width: 36px; height: 67.5px; } /* flush segments; box owns the radius */
   /* Glyphs capped to the 36px cell width, keeping the hamburger's ~0.5 proportion. */
   .cell span { font-size: 34px; }
   .cell svg { width: 34px; height: 34px; }

@@ -78,6 +78,7 @@ export default function Hero() {
       <button
         type="button"
         className={styles.announce}
+        data-pc-over-media
         onClick={() => window.dispatchEvent(new CustomEvent("pc:open-offer"))}
       >
         <strong>Released Soon!</strong> Add your email to get a discount code to use on launch day

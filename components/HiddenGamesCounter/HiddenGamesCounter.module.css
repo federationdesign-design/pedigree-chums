@@ -847,3 +847,28 @@
     margin-left: 14px;
   }
 }
+
+/* ============================================================================
+   ACCESSIBILITY SCHEMES. The counter is mounted outside #pc-site, so the
+   monochrome sweep never reaches it. Give the visible pills the scheme colours
+   with a foreground stroke, so a pill on a matching page keeps its boundary:
+     black-on-white -> white pill, black text, black stroke
+     white-on-black -> black pill, white text, white stroke
+   Scoped under the scheme attribute, so the default view is untouched.
+   ========================================================================== */
+:global(:root[data-pc-contrast-scheme="black-on-white"]) .reveal,
+:global(:root[data-pc-contrast-scheme="black-on-white"]) .counter,
+:global(:root[data-pc-contrast-scheme="black-on-white"]) .completeChip {
+  background: #ffffff;
+  color: #000000;
+  border-color: #000000;
+}
+:global(:root[data-pc-contrast-scheme="black-on-white"]) .label { color: #000000; }
+:global(:root[data-pc-contrast-scheme="white-on-black"]) .reveal,
+:global(:root[data-pc-contrast-scheme="white-on-black"]) .counter,
+:global(:root[data-pc-contrast-scheme="white-on-black"]) .completeChip {
+  background: #000000;
+  color: #ffffff;
+  border-color: #ffffff;
+}
+:global(:root[data-pc-contrast-scheme="white-on-black"]) .label { color: #ffffff; }

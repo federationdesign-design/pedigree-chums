@@ -108,7 +108,7 @@ export default function HowToPlay({ open, onClose, onScore, activeStep = null, c
   }
 
   const overviewView = (
-    <div className={styles.overlay} onClick={dropPiecesThenClose}>
+    <div className={styles.overlay} data-pc-reach onClick={dropPiecesThenClose}>
       <div className={styles.stage} ref={stageElRef} onClick={(e: React.MouseEvent) => e.stopPropagation()}>
         <button type="button" className={styles.close} onClick={dropPiecesThenClose} aria-label="Close">
           &times;
