@@ -1634,36 +1634,65 @@ export default function LineageMap({
             className={styles.rootCard}
             style={circular && ringColor ? { fill: ringColor, stroke: ringColor } : undefined} />
           {breed.image ? <image href={bust(breed.image)} x={-R} y={-R} width={R*2} height={R*2} clipPath={`url(#${clip})`} preserveAspectRatio="xMidYMid slice" /> : null}
-          {/* Rarity ring: a tier-coloured stroke laid OVER the existing ring rect,
-              on the same band (radius R + rootRingW/2, width rootRingW so it covers
-              it exactly). It draws itself on with pathLength 1 and dashoffset 1->0,
-              rotated to start at twelve o'clock, so you see the original ring being
-              overtaken by the rarity colour as the card lifts. Keyed on the dog so
-              a fresh circle (and a fresh draw) mounts on every lift, including a
-              straight card-to-card switch; the layer already unmounts on close.
-              Reduced motion shows it complete, see .rarityRing. */}
-          {rarityTier ? (
-            <circle
-              key={breed.name}
-              cx={0}
-              cy={0}
-              r={R + rootRingW / 2}
-              fill="none"
-              stroke={RARITY_BAND[rarityTier].bg}
-              /* +6 over the band so it also covers the rect ring's own 4px CSS
-                 stroke (2px each side) plus a hair of margin, leaving none of the
-                 original ring showing at either edge once the sweep has passed. */
-              strokeWidth={rootRingW + 6}
-              strokeLinecap="round"
-              pathLength={1}
-              /* rotate(90) starts the draw at the BOTTOM (six o'clock); the SVG
-                 circle path begins at three o'clock, so +90 in y-down puts it at
-                 the foot. */
-              transform="rotate(90)"
-              className={styles.rarityRing}
-              style={{ ["--rarity-draw" as string]: RARITY_DRAW, ["--rarity-delay" as string]: RARITY_DRAW_DELAY }}
-            />
-          ) : null}
+          {/* Rarity ring + glow: FOUR copies of the same ring stroke, back to front,
+              stepping out from the ring's own width. The back three are blurred through
+              one shared feGaussianBlur (stdDeviation 2, the pen's value); the top one
+              is crisp and, at width 1x, IS the rarity ring that covers the base rect.
+              All four carry .rarityRing, so they draw on TOGETHER on the same dashoffset
+              sweep from six o'clock (pathLength 1, dashoffset 1->0) and the glow travels
+              WITH the stroke as it traces (the McLaren-F1-line technique), rather than a
+              separate halo pulsing after the draw. Keyed on the dog so a fresh draw
+              mounts per lift. Colours are DERIVED from the tier colour, not hand-picked:
+              the three bright tiers darken toward the back; RARE (already dark purple)
+              lightens toward the back instead, or its widest layer would go near-black
+              and vanish on the navy background. Reduced motion shows it complete, see
+              .rarityRing. Added 14 August 2026. */}
+          {rarityTier ? (() => {
+            // ---- GLOW DIALS ----
+            // Stroke width as a multiple of the ring's OWN width, back -> top. Raise the
+            // back values for a bigger halo, lower them to tighten it. The last is 1x =
+            // the crisp ring itself.
+            const GLOW_WIDTHS = [3, 2, 1.3, 1];
+            const GLOW_BLUR = 2; // feGaussianBlur stdDeviation, px (this SVG's viewBox is 1:1)
+            const ringW = rootRingW + 6; // the ring's own width (covers the base rect + margin)
+            // Derive a four-step ramp (back -> top) from the tier colour.
+            const hex = RARITY_BAND[rarityTier].bg;
+            const nHex = parseInt(hex.slice(1), 16);
+            const cr = (nHex >> 16) & 255, cg = (nHex >> 8) & 255, cb = nHex & 255;
+            const toHex = (r: number, g: number, b: number) => `#${((1 << 24) + (Math.round(r) << 16) + (Math.round(g) << 8) + Math.round(b)).toString(16).slice(1)}`;
+            const ramp = rarityTier === "rare"
+              // RARE lightens behind: mix toward white, back = most white
+              ? [0.6, 0.4, 0.2, 0].map((t) => toHex(cr + (255 - cr) * t, cg + (255 - cg) * t, cb + (255 - cb) * t))
+              // the rest darken behind: multiply toward black, back = darkest
+              : [0.18, 0.45, 0.7, 1.0].map((k) => toHex(cr * k, cg * k, cb * k));
+            const blurId = "lm-glow-blur";
+            return (
+              <>
+                <defs>
+                  <filter id={blurId} x="-50%" y="-50%" width="200%" height="200%">
+                    <feGaussianBlur stdDeviation={GLOW_BLUR} />
+                  </filter>
+                </defs>
+                {GLOW_WIDTHS.map((w, i) => (
+                  <circle
+                    key={`glow${i}-${breed.name}`}
+                    cx={0}
+                    cy={0}
+                    r={R + rootRingW / 2}
+                    fill="none"
+                    stroke={ramp[i]}
+                    strokeWidth={ringW * w}
+                    strokeLinecap="round"
+                    pathLength={1}
+                    transform="rotate(90)"
+                    className={styles.rarityRing}
+                    filter={i < GLOW_WIDTHS.length - 1 ? `url(#${blurId})` : undefined}
+                    style={{ ["--rarity-draw" as string]: RARITY_DRAW, ["--rarity-delay" as string]: RARITY_DRAW_DELAY }}
+                  />
+                ))}
+              </>
+            );
+          })() : null}
           {/* Green progress arc: the SAME band, start point and reveal trick as the
               rarity ring, laid over it so filling frames turn a slice of the ring
               #22c55e, the app's "placed" green (the one a framed node goes, :2029).
