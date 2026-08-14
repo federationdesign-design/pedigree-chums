@@ -1633,17 +1633,30 @@ export default function LineageMap({
             rx={circular ? R + rootRingW : 24}
             className={styles.rootCard}
             style={circular && ringColor ? { fill: ringColor, stroke: ringColor } : undefined} />
-          {/* Rarity glow: a soft pulsing halo in the rarity colour, sat BEHIND the
-              image and rings so only the outward halo shows and the crisp ring reads
-              over it. Independent blurred-stroke layers (matching the box-shadow
-              reference's layering): the two inner layers a lighter tint, the two
-              outer the full tier colour. The blurs are STATIC (computed once), so the
-              pulse is a compositor-only group-opacity breath, cheap next to the pit's
+          {/* Rarity glow: a soft pulsing halo in the rarity colour, sat just OUTSIDE
+              the ring and BEHIND the image + rings. So the halo reads OUTWARD, the
+              crisp ring is untouched, and the blur that bleeds inward is hidden under
+              the ring (never tinting the photo). This replaces the first attempt,
+              which sat ON the ring band and was almost entirely covered by it, so only
+              a faint tail showed. Independent blurred-stroke layers, matching the
+              box-shadow reference. The blurs are STATIC (computed once), so the pulse
+              is a compositor-only group-opacity breath, cheap next to the pit's
               physics canvas. Hidden until the ring's draw completes (delay =
-              --rarity-delay + --rarity-draw = 1.1s), then breathes 2s each way; keyed
-              on the dog so the delay restarts per lift. Reduced motion: static halo,
-              no pulse (see .rarityGlow). Added 14 August 2026. */}
+              --rarity-delay + --rarity-draw = 1.1s), then breathes; keyed on the dog
+              so it restarts per lift. Reduced motion: static halo.
+
+              INTENSITY DIALS (change here, no investigation needed):
+              - GLOW_BLURS: the four layer blur radii (px). The two smaller are the
+                bright near-halo, the two larger the soft wide bloom. Raise the last
+                for a bigger halo; lower them all for a tighter one.
+              - GLOW_INNER_TINT: how far the inner two layers lighten toward white (0..1).
+              - GLOW_SPREAD: extra px pushing the halo band out past the ring edge.
+              - BRIGHTNESS + PACE: --glow-min / --glow-max opacity and the 2s duration,
+                on .rarityGlow / @keyframes lm-glow-pulse in LineageMap.module.css. */}
           {rarityTier ? (() => {
+            const GLOW_INNER_TINT = 0.55;                   // inner two layers lightened toward white (0..1)
+            const GLOW_BLURS = [3, 7, 13, 22];              // px; last value = halo reach
+            const GLOW_SPREAD = 0;                          // extra px beyond the ring's outer edge
             const deep = RARITY_BAND[rarityTier].bg;
             // mix the tier colour toward white for the inner layers, the reference's
             // lighter tint. No new dependency; a plain hex lerp toward #ffffff.
@@ -1653,9 +1666,10 @@ export default function LineageMap({
               const m = (c: number) => Math.round(c + (255 - c) * t);
               return `#${((1 << 24) + (m(r) << 16) + (m(g) << 8) + m(b)).toString(16).slice(1)}`;
             };
-            const light = lighten(deep, 0.55);
-            const gw = rootRingW + 6;                       // hug the rarity ring's band
-            const layers = [{ blur: 3, c: light }, { blur: 7, c: light }, { blur: 13, c: deep }, { blur: 22, c: deep }];
+            const light = lighten(deep, GLOW_INNER_TINT);
+            const gw = rootRingW + 6;                       // halo band width, matches the ring band
+            const rGlow = R + rootRingW + 3 + gw / 2 + GLOW_SPREAD; // inner edge hugs the ring's outer edge
+            const layers = GLOW_BLURS.map((blur, i) => ({ blur, c: i < 2 ? light : deep }));
             return (
               <g
                 key={`glow-${breed.name}`}
@@ -1663,7 +1677,7 @@ export default function LineageMap({
                 style={{ ["--rarity-draw" as string]: RARITY_DRAW, ["--rarity-delay" as string]: RARITY_DRAW_DELAY, pointerEvents: "none" }}
               >
                 {layers.map((L, i) => (
-                  <circle key={i} cx={0} cy={0} r={R + rootRingW / 2} fill="none" stroke={L.c} strokeWidth={gw} style={{ filter: `blur(${L.blur}px)` }} />
+                  <circle key={i} cx={0} cy={0} r={rGlow} fill="none" stroke={L.c} strokeWidth={gw} style={{ filter: `blur(${L.blur}px)` }} />
                 ))}
               </g>
             );
@@ -1758,8 +1772,14 @@ export default function LineageMap({
                   style={{ ["--band-slide" as string]: `${R}px`, ["--band-dur" as string]: BAND_SLIDE_DUR, ["--band-delay" as string]: BAND_SLIDE_DELAY }}
                 >
                   <g transform={`rotate(${TILT})`}>
-                    <rect x={-R * 1.6} y={bandTop} width={R * 3.2} height={R * 1.6} fill={band.bg} />
-                    <text x={labelX} y={labelY} textAnchor="middle" dominantBaseline="central" style={{ fontFamily: '"Luckiest Guy", system-ui, sans-serif', fontSize: fs, fontWeight: 400, fill: band.fg }}>{band.label}</text>
+                    {/* At 100% (every frame filled) the band flips to the done-green
+                        #69d176, softer than the ring's #22c55e by design (a large fill
+                        wants the gentler green; the thin ring stays saturated). The
+                        ring owns partial progress; this is the done state. The label
+                        flips to navy because white (RARE/ROOT fg) on #69d176 is ~1.9:1,
+                        unreadable; navy on it is ~7:1. .bandFill eases the swap. */}
+                    <rect className={styles.bandFill} x={-R * 1.6} y={bandTop} width={R * 3.2} height={R * 1.6} style={{ fill: framesDone ? "#69d176" : band.bg }} />
+                    <text className={styles.bandFill} x={labelX} y={labelY} textAnchor="middle" dominantBaseline="central" style={{ fontFamily: '"Luckiest Guy", system-ui, sans-serif', fontSize: fs, fontWeight: 400, fill: framesDone ? "var(--navy, #0a3a57)" : band.fg }}>{band.label}</text>
                   </g>
                 </g>
               </g>
