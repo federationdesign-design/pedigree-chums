@@ -1,4 +1,4 @@
-/* Per-era social pages: the six share-only routes under
+/* Per-era social pages: the seven share-only routes under
    /britains-dog-history/[era]. Additive only, the history index page is not
    touched. See docs/social-pages/BRIEF.md and docs/social-pages/DECISIONS.md.
 
@@ -7,9 +7,10 @@
    derived from the era name, descriptions from the strips' existing notes.
 
    `strips` are the uk-breeds `strip` keys, in the order they appear on the
-   history page today. Five pages carry one strip; the 1800s page stacks all
+   history page today. Six pages carry one strip; the 1800s page stacks all
    four of its 1800s-region strips (early1800, spaniels, mid1800, late1800),
-   per Steve's call on 13 August 2026. */
+   per Steve's call on 13 August 2026. The crosses page was added on
+   14 August 2026. */
 
 export type EraPage = {
   slug: string;
@@ -28,6 +29,7 @@ export const ERA_PAGES: EraPage[] = [
     strips: ["early1800", "spaniels", "mid1800", "late1800"],
   },
   { slug: "1900s", title: "The 1900s", strips: ["c1900"] },
+  { slug: "crosses", title: "Today's Crossbreeds", strips: ["crosses"] },
 ];
 
 export function eraPageBySlug(slug: string): EraPage | undefined {
