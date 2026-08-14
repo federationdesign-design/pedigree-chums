@@ -7425,10 +7425,10 @@ export default function BreedTree({
         </LearnDragCard>
       )}
       {dockAside && ancestryFor && (ancHidden || trainHidden || tempHidden) && (
-        /* Directly under the back square (top 18 + 84 + 14 gap = 116), pushed below
-           the desc square too (another 84 + 14 = 214) when it is showing. The
-           18/84/14 grid is the menu squares' own, the figures .relRailHome aligns to. */
-        <div className={styles.learnDock} style={{ top: learning && hideCaption && !descGone ? 214 : 116 }}>
+        /* A horizontal row running left from the back square. Position and size
+           (desktop line vs phone one-line-down, and the 768px size breakpoint)
+           all live in .learnDock; nothing here tracks a moving body. */
+        <div className={styles.learnDock}>
           {ancHidden && ancestryRows.length > 0 && (
             <button type="button" className={styles.learnDockBtn} onClick={() => { setAncPos(cardSpot(0)); setAncHidden(false); }} aria-label="Reopen ancestry" title="Ancestry">
               <span className={styles.learnDockIcon}>{ICONS.ancestry}</span>
