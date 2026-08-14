@@ -773,6 +773,16 @@
 .overlayAlt {
   background: radial-gradient(120% 120% at 50% 40%, rgba(15, 65, 165, 0.62), rgba(8, 34, 100, 0.86));
 }
+/* The chum's family tree (strongBg && !circular) alone. Its own dedicated
+   wash so it reads as a distinct, heavier layer than the main pit lineage,
+   which keeps the base .overlay. Both stops are exactly double the base
+   .overlay alpha (0.22 -> 0.44, 0.46 -> 0.92); hue and geometry unchanged.
+   Sits after .overlay so it wins, and before .overlayFocus so a chum drag
+   still darkens further. Do NOT fold this into .overlay: that class also
+   serves the main pit lineage, which must not change. */
+.overlayChum {
+  background: radial-gradient(120% 120% at 50% 40%, rgba(20, 151, 214, 0.44), rgba(12, 91, 146, 0.92));
+}
 
 /* mini pit: overlay close matches the in-pit menu squares (navy, yellow stroke) */
 /* Matches the main pit's menu square exactly: BIG * 1.2 (84 * 0.67 * 1.2 on

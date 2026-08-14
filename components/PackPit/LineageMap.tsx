@@ -1977,7 +1977,7 @@ export default function LineageMap({
       // now marks "this is the mini pit" for the lifted root, the five-across
       // frames, the smaller nodes, the back button's size and the hidden pack
       // header. Removing it here would quietly undo all five.
-      className={`${styles.overlay}${circular ? " " + styles.overlayStrong : ""}${dragFocus ? " " + styles.overlayFocus : ""}`}
+      className={`${styles.overlay}${circular ? " " + styles.overlayStrong : ""}${strongBg && !circular ? " " + styles.overlayChum : ""}${dragFocus ? " " + styles.overlayFocus : ""}`}
       onClick={closeIfTap}
       onPointerDown={onPanDown}
       onPointerMove={onPanMove}
