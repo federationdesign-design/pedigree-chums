@@ -1647,7 +1647,7 @@ export default function LineageMap({
               sweep (McLaren-line technique), no pulse. Keyed per dog. Reworked 14 Aug 2026. */}
           {rarityTier ? (() => {
             // ---- GLOW DIALS (three outward bands, back -> front) ----
-            const GLOW_WIDTHS = [3, 2, 1.3];        // band width as a multiple of the ring's own width; raise for a bigger halo, lower to tighten
+            const GLOW_WIDTHS = [0.2, 0.13, 0.07];  // how far each band reaches PAST the ring, as a fraction of the ring's OWN width (widest ~20%): a rim light, not a halo. Raise for more reach, lower to tighten further.
             const GLOW_OPACITY = [0.3, 0.55, 0.85]; // faint at the outer edge -> strong at the ring: the falloff
             const GLOW_TINT = [0.55, 0.38, 0.2];    // how far each band lightens toward white (0..1); the back band is lightest
             const GLOW_BLUR = 2;                    // shared feGaussianBlur stdDeviation, px (viewBox is 1:1). Raise it for a softer falloff.
