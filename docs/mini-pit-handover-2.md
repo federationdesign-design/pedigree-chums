@@ -580,3 +580,31 @@ intended position, confirmed by Steve on 14 Aug. The circular (learn lift) path 
 separate and unaffected, it uses `pillPlacement` (the clock-face offsets), not `nmY`.
 Hiding the pills in the learn area is done with a dedicated prop (not `!circular`,
 because the chum card is non-circular too and keeps its pills), tracked separately.
+
+## Item 9 (family-tree glyph -> "i"): CLOSED as NOT APPLICABLE (14 Aug 2026)
+
+The queued "swap the family-tree glyph to an 'i'" is CLOSED, nothing changed.
+The request was based on card ARTWORK, not a UI glyph, so there was no code to
+change. Recorded so nobody re-derives it.
+
+What the search established (read-only, all sites checked):
+- The only tree-diagram glyph (one box splitting to two) in code is
+  `ICONS.ancestry` (`CardDock.tsx`). It renders in exactly two places, both the
+  learn dock: the Ancestry card header (`BreedTree.tsx:7361`) and that card's
+  reopen button (`:7408`). It opens the ANCESTRY BREAKDOWN, so a tree is correct
+  and it STAYS a tree.
+- The control that opens the information layer (`chumTree` -> the `strongBg`
+  overlay) is the chum-rail badge (`BreedTree.tsx:7323-7349`, `setChumTree` at
+  `:7338`). It sits top-right of the SELECTED chum card and its glyph is ALREADY
+  an italic serif "i" (`.relCardInfo`). Nothing to swap.
+- The "tree diagram in a circle, top-right of each era card" that prompted this
+  is printed into the CARD ARTWORK image. `CardRail.tsx:212-248` renders each card
+  as a single full-bleed `<Image>` with no code-drawn corner icon (only a hover
+  sheen and, on video cards, a play button). That emblem is not a control and
+  opens nothing. Changing it would be an image edit in `public/`, not a glyph swap.
+
+So there is NO code glyph that both looks like a tree AND opens the information
+layer. A brain->"i" edit to `ICONS.infoBox` (the Temperament card icon) was tried
+mid-investigation and REVERTED; it never committed. Do not re-open this.
+(Lesson, again: a queued icon job turned out to be describing artwork. Check the
+code, and whether the thing is even a control, before scheduling.)
