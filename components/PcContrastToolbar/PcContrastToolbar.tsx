@@ -104,14 +104,16 @@ export default function PcContrastToolbar() {
         >
           {CrossedPhoto}
         </button>
-        <button
-          type="button"
-          className={styles.cell}
-          aria-label="Reset accessibility settings"
-          onClick={reset}
-        >
-          {Refresh}
-        </button>
+        {(scheme !== null || hidden) && (
+          <button
+            type="button"
+            className={styles.cell}
+            aria-label="Reset accessibility settings"
+            onClick={reset}
+          >
+            {Refresh}
+          </button>
+        )}
       </div>
     </div>
   );
