@@ -1,12 +1,27 @@
-// Shared score-milestone constants. Both the main pit (PackPit) and the mini pit
-// (LineageModal) celebrate every 5,000 points with the same escalating labels, so
-// these live here rather than in either pit, to stop the two drifting apart.
-// Extracted from PackPit on 14 August 2026.
-export const MS_STEP = 5000;
-export const MS_LABELS = ["Yapp Yapp Yapp", "Bark Bark Bark", "Woof Woof Woof", "Yapp Bark Woof", "Hoooowwwwllllllll", "Are you done?", "maybe enter the site now?"];
+// Shared score-milestone data. The celebration component (MilestoneMessage) is one
+// shared, pit-agnostic piece; only the thresholds and copy differ between the pits,
+// so each pit imports its own MilestoneScale and they cannot drift the treatment.
+// Split into per-pit configs on 14 August 2026 (was one MS_STEP/MS_LABELS pair).
+export type MilestoneScale = { step: number; labels: string[] };
 
-// The label for a reached milestone: the labels escalate, then hold on the last
-// line for every milestone past the seventh. Shared so both pits index identically.
-export function milestoneLabel(reached: number): string {
-  return MS_LABELS[Math.min(reached / MS_STEP - 1, MS_LABELS.length - 1)];
+// The label for a reached milestone: the labels escalate, then hold on the last for
+// every milestone past the last named one. One implementation, shared by both pits.
+export function milestoneLabel(scale: MilestoneScale, reached: number): string {
+  return scale.labels[Math.min(reached / scale.step - 1, scale.labels.length - 1)];
 }
+
+// Main pit: every 5,000, the original labels. Unchanged.
+export const MAIN_PIT_MILESTONES: MilestoneScale = {
+  step: 5000,
+  labels: ["Yapp Yapp Yapp", "Bark Bark Bark", "Woof Woof Woof", "Yapp Bark Woof", "Hoooowwwwllllllll", "Are you done?", "maybe enter the site now?"],
+};
+
+// Mini pit: every 50,000, an order of magnitude over the main pit. The pit scores
+// each % circle's figure on EVERY collision (throttled 220ms per circle, not once
+// per circle), so a busy level runs to the hundreds of thousands and into the
+// millions; 5,000 would fire hundreds of times. Two labels diverge from the main
+// pit set: "Mad score" and "Crazy points".
+export const MINI_PIT_MILESTONES: MilestoneScale = {
+  step: 50000,
+  labels: ["Yapp Yapp Yapp", "Bark Bark Bark", "Woof Woof Woof", "Yapp Bark Woof", "Hoooowwwwllllllll", "Mad score", "Crazy points"],
+};

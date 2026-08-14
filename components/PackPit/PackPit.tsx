@@ -14,7 +14,7 @@ import BritainMessage from "./BritainMessage";
 import { reportHiddenGame } from "../../lib/hiddenGames/browserEngine";
 import PitEnd from "../PitEnd/PitEnd";
 import MilestoneMessage from "../Milestone/MilestoneMessage";
-import { MS_STEP, milestoneLabel } from "../Milestone/milestones";
+import { MAIN_PIT_MILESTONES as MS, milestoneLabel } from "../Milestone/milestones";
 
 // Score milestones (MS_STEP, MS_LABELS, the label picker) and the celebration
 // treatment now live in ../Milestone, shared with the mini pit (LineageModal) so
@@ -83,10 +83,10 @@ export default function PackPit() {
     || (typeof document !== "undefined" && !!document.querySelector('[role="dialog"][aria-modal="true"]'));
   const msBlocked = anyOverlayOpen;
   useEffect(() => {
-    const reached = Math.floor(score / MS_STEP) * MS_STEP; // highest 5k mark at or below the score
-    if (reached >= MS_STEP && reached > msLast.current) {
+    const reached = Math.floor(score / MS.step) * MS.step; // highest 5k mark at or below the score
+    if (reached >= MS.step && reached > msLast.current) {
       msLast.current = reached;
-      const label = milestoneLabel(reached);
+      const label = milestoneLabel(MS, reached);
       if (msBlocked()) {
         pendingMs.current = { value: reached, label }; // hold it: something is on screen, don't cover it (keep the highest)
       } else {

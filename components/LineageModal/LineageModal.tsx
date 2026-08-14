@@ -15,7 +15,7 @@ import { TAG_STYLE, nodeStatus, type BreedTag } from "../BreedTreeMap/BreedTreeM
 import { useRouter } from "next/navigation";
 import { reportHiddenGame } from "../../lib/hiddenGames/browserEngine";
 import MilestoneMessage from "../Milestone/MilestoneMessage";
-import { MS_STEP, milestoneLabel } from "../Milestone/milestones";
+import { MINI_PIT_MILESTONES as MS, milestoneLabel } from "../Milestone/milestones";
 
 // Plain-language label for the status dot on the title portrait.
 const STATUS_LABEL: Record<BreedTag, string> = {
@@ -194,7 +194,7 @@ export default function LineageModal({ name, image, character, lineage, fromRect
   // nothing, and only milestones crossed DURING this level celebrate. Seeding late
   // (in an effect) would let a carried-in score fire every passed mark at once.
   const [milestone, setMilestone] = useState<{ value: number; label: string; id: number } | null>(null);
-  const msLast = useRef(Math.floor((initialScore ?? 0) / MS_STEP) * MS_STEP);
+  const msLast = useRef(Math.floor((initialScore ?? 0) / MS.step) * MS.step);
   const [phase, setPhase] = useState<"play" | "won" | "lost">("play");
   // Fire only during play (never over the won/lost screens), and only for a NEW
   // milestone above the seeded high-water mark. The score can dip mid-play (the
@@ -205,10 +205,10 @@ export default function LineageModal({ name, image, character, lineage, fromRect
   // but a one-off celebration is a different thing.
   useEffect(() => {
     if (phase !== "play") return;
-    const reached = Math.floor(score / MS_STEP) * MS_STEP;
-    if (reached >= MS_STEP && reached > msLast.current) {
+    const reached = Math.floor(score / MS.step) * MS.step;
+    if (reached >= MS.step && reached > msLast.current) {
       msLast.current = reached;
-      setMilestone({ value: reached, label: milestoneLabel(reached), id: performance.now() });
+      setMilestone({ value: reached, label: milestoneLabel(MS, reached), id: performance.now() });
     }
   }, [score, phase]);
   useEffect(() => {
