@@ -1665,6 +1665,10 @@ export default function BreedTree({
   const [startPeek, setStartPeek] = useState(false);
   // Hovering the learn PLAY button previews the play scene behind the pit.
   const [playPeek, setPlayPeek] = useState(false);
+  // Item 5: the instruction line next to the play button, driven by whatever the
+  // pointer is over. Blank when nothing is hovered (and on touch, where there is
+  // no hover at all).
+  const [hoverHint, setHoverHint] = useState("");
   // Learn rail: the pack dog whose Ancestry card is open below the box.
   const [ancestryFor, setAncestryFor] = useState<{ name: string; slug: string; note?: string; image?: string } | null>(null);
   const [ancHidden, setAncHidden] = useState(false);
@@ -1726,6 +1730,7 @@ export default function BreedTree({
   // the start screen open inside one circle.
   const backToStartScreen = () => {
     setHovered(null);
+    setHoverHint("");
     setAncestryFor(null);
     setAncHidden(true);
     setTrainHidden(true);
@@ -5695,6 +5700,7 @@ export default function BreedTree({
                   onMouseEnter={hidden || frozen ? undefined : () => {
                     if (touchRef.current) return; // touch drives this from the tap
                     setHovered(d);
+                    setHoverHint("tap to zoom and learn");
                   }}
                   onMouseLeave={hidden || frozen ? undefined : (e) => {
                     // Ignore the mouseleave the blue box triggers when its own
@@ -5726,6 +5732,7 @@ export default function BreedTree({
                       if (rn && rn !== d && d.descendants().includes(rn)) return;
                     }
                     setHovered((h) => (h === d ? null : h));
+                    setHoverHint((s) => (s === "tap to zoom and learn" ? "" : s));
                   }}
                   onClick={
                     // `frozen` used to swallow this outright, and frozen is
@@ -6463,6 +6470,13 @@ export default function BreedTree({
             return (<>{defs.map((d) => (
               <g key={d.kind} ref={uiRefFor(d.kind)}
                 role="button"
+                onMouseEnter={() => setHoverHint(
+                  d.kind === "desc" ? "open the info box"
+                    : started ? ""
+                    : learning ? "back to the start screen"
+                    : "back to main page"
+                )}
+                onMouseLeave={() => setHoverHint("")}
                 aria-label={
                   d.kind === "close"
                     ? (learning ? "Back to the start screen" : started ? "Pit menu" : "Close the pit")
@@ -6639,17 +6653,20 @@ export default function BreedTree({
                 onMouseEnter={() => {
                   wordHoverRef.current = true;
                   setWordHover(w.key);
+                  setHoverHint(w.key === "learn" ? "learn about these dogs" : "start playing");
                   if (w.key === "learn") setLearnPeek(true);
                   else setStartPeek(true);
                 }}
                 onMouseLeave={() => {
                   wordHoverRef.current = false;
                   setWordHover((h) => (h === w.key ? null : h));
+                  setHoverHint("");
                   if (w.key === "learn") setLearnPeek(false);
                   else setStartPeek(false);
                 }}
                 onClick={(e) => {
                   e.stopPropagation();
+                  setHoverHint("");
                   if (w.key === "start") {
                     setLearnPeek(false);
                     setStartPeek(false);
@@ -6761,6 +6778,37 @@ export default function BreedTree({
               </text>
             );
           })()}
+          {/* Item 5: the hover instruction, next to the play button. Shows on the
+              start screen and in the learn area, at the root view; blank when
+              nothing is hovered (and on touch, where there is no hover). White
+              Luckiest Guy via .autoLabel, sized up. Anchored right of the play
+              row (one square in learn, two on the start screen). */}
+          {dockAside && gravity && entered && focus.depth === 0 && ((!started && !learning) || learning) && hoverHint !== "" && (() => {
+            const st = stageRef.current;
+            const upp = st ? (aspect >= 1 ? SIZE : SIZE / Math.max(aspect, 0.01)) / Math.max(st.clientHeight, 1) : 1;
+            const stW = st ? st.clientWidth : 390;
+            const vbWc = aspect >= 1 ? SIZE * aspect : SIZE;
+            const vbHc = aspect >= 1 ? SIZE : SIZE / aspect;
+            const xMinC = aspect >= 1 ? -vbWc * shift : -vbWc / 2;
+            const m = 18 * upp;
+            const SQ = 84 * pitScale * 1.2 * upp;
+            const SQ_GAP = 16 * upp;
+            const x = xMinC + m + (learning ? 1 : 2) * (SQ + SQ_GAP);
+            const y = vbHc * WORD_START_Y;
+            const hintFs = Math.min(Math.max(30, stW * 0.05), 54);
+            return (
+              <text
+                className={styles.autoLabel}
+                x={x}
+                y={y}
+                textAnchor="start"
+                dominantBaseline="central"
+                style={{ fontSize: `${hintFs * upp}px`, strokeWidth: `${3 * upp}px` }}
+              >
+                {hoverHint}
+              </text>
+            );
+          })()}
         </svg>
         {/* J17: the canvas effects layer, above the SVG, never takes a pointer. */}
         <canvas ref={fxCanvasRef} className={styles.fxCanvas} aria-hidden="true" />
@@ -6812,6 +6860,8 @@ export default function BreedTree({
             role="slider"
             tabIndex={0}
             aria-label="Difficulty"
+            onMouseEnter={() => setHoverHint("drag to change difficulty")}
+            onMouseLeave={() => setHoverHint("")}
             aria-valuemin={0}
             aria-valuemax={10}
             aria-valuenow={level}
@@ -6928,14 +6978,15 @@ export default function BreedTree({
         <button
           type="button"
           className={styles.learnPlay}
-          onMouseEnter={() => setPlayPeek(true)}
-          onMouseLeave={() => setPlayPeek(false)}
+          onMouseEnter={() => { setPlayPeek(true); setHoverHint("start playing"); }}
+          onMouseLeave={() => { setPlayPeek(false); setHoverHint(""); }}
           onFocus={() => setPlayPeek(true)}
           onBlur={() => setPlayPeek(false)}
           onClick={() => {
             setLearnPeek(false);
             setStartPeek(false);
             setPlayPeek(false);
+            setHoverHint("");
             // Reset any learn-area zoom back to the full pit before the round
             // starts. Otherwise the drop routine sees a zoomed-in focus, bails
             // out, and the round begins stuck inside one circle.
@@ -7315,6 +7366,8 @@ export default function BreedTree({
                   className={`${styles.relCard}${r.leaving ? " " + styles.relCardLeaving : ""}${ancestryFor?.slug === r.slug ? " " + styles.relCardOn : ""}${collectedChums?.has(r.name) ? " " + styles.relCardDone : ""}`}
                   style={{ animationDelay: `${i * 55}ms` }}
                   aria-pressed={ancestryFor?.slug === r.slug}
+                  onMouseEnter={() => setHoverHint(`learn about ${r.name}`)}
+                  onMouseLeave={() => setHoverHint("")}
                   onClick={() => {
                     // Collected: the picture is gone and a tick is in its place,
                     // so a tap has nothing left to select. It toggles the name
@@ -7349,6 +7402,8 @@ export default function BreedTree({
                       role="button"
                       tabIndex={0}
                       aria-label={`Family tree for ${r.name}`}
+                      onMouseEnter={() => setHoverHint("see the family tree")}
+                      onMouseLeave={() => setHoverHint("")}
                       onPointerDown={(e) => e.stopPropagation()}
                       onClick={(e) => {
                         e.stopPropagation();
@@ -7430,17 +7485,17 @@ export default function BreedTree({
            all live in .learnDock; nothing here tracks a moving body. */
         <div className={styles.learnDock}>
           {ancHidden && ancestryRows.length > 0 && (
-            <button type="button" className={styles.learnDockBtn} onClick={() => { setAncPos(cardSpot(0)); setAncHidden(false); }} aria-label="Reopen ancestry" title="Ancestry">
+            <button type="button" className={styles.learnDockBtn} onMouseEnter={() => setHoverHint("open ancestry")} onMouseLeave={() => setHoverHint("")} onClick={() => { setAncPos(cardSpot(0)); setAncHidden(false); }} aria-label="Reopen ancestry" title="Ancestry">
               <span className={styles.learnDockIcon}>{ICONS.ancestry}</span>
             </button>
           )}
           {trainHidden && trainingDifficulty[ancestryFor.slug] && (
-            <button type="button" className={styles.learnDockBtn} onClick={() => { setTrainPos(cardSpot(1)); setTrainHidden(false); }} aria-label="Reopen training" title="Training">
+            <button type="button" className={styles.learnDockBtn} onMouseEnter={() => setHoverHint("open training")} onMouseLeave={() => setHoverHint("")} onClick={() => { setTrainPos(cardSpot(1)); setTrainHidden(false); }} aria-label="Reopen training" title="Training">
               <span className={styles.learnDockIcon}>{ICONS.training}</span>
             </button>
           )}
           {tempHidden && chumTraits && (
-            <button type="button" className={styles.learnDockBtn} onClick={() => { setTempPos(cardSpot(2)); setTempHidden(false); }} aria-label="Reopen temperament" title="Temperament">
+            <button type="button" className={styles.learnDockBtn} onMouseEnter={() => setHoverHint("open temperament")} onMouseLeave={() => setHoverHint("")} onClick={() => { setTempPos(cardSpot(2)); setTempHidden(false); }} aria-label="Reopen temperament" title="Temperament">
               <span className={styles.learnDockIcon}>{ICONS.infoBox}</span>
             </button>
           )}
