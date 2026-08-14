@@ -4823,6 +4823,12 @@ export default function BreedTree({
         const mouse = Mouse.create(document.createElement("div"));
         const mc = MouseConstraint.create(engine, { mouse, constraint: { stiffness: 0.2, render: { visible: false } } });
         Composite.add(world, mc);
+        // Release-velocity throw. FLICK_SCALE tunes it (1.0 = pointer speed);
+        // FLICK_FLOOR is the tap floor in Matter px/step. flickBuf is the pointer
+        // path in physics px, read on release to set the toy's velocity.
+        const FLICK_SCALE = 1.0;
+        const FLICK_FLOOR = 3;
+        const flickBuf: { t: number; x: number; y: number }[] = [];
         // Stage 1 grabs badges only. Everything else keeps the old path, so the
         // two systems can never fight over the same body.
         // Stage 1 was badges only. Stage 2 adds the dog circles, which is the
@@ -4839,9 +4845,24 @@ export default function BreedTree({
         // A thrown toy retires itself once it is clear of the pit. The old path
         // fired this from startDrag's pointer up; the constraint has its own
         // release event, so it hangs off that instead.
-        const onEndDrag = (ev: { body?: { circleRadius?: number; plugin?: { prop?: unknown } } }) => {
-          const prop = ev?.body?.plugin?.prop;
-          if (prop && ev.body?.circleRadius) throwWatchRef.current?.(prop);
+        const onEndDrag = (ev: { body?: { circleRadius?: number; plugin?: { prop?: unknown; kind?: string } } }) => {
+          const b = ev?.body;
+          if (b && b.plugin?.kind === "toy") {
+            const n = flickBuf.length;
+            if (n >= 2) {
+              const last = flickBuf[n - 1];
+              let old = flickBuf[0];
+              for (let i = n - 1; i >= 0; i--) { if (last.t - flickBuf[i].t >= 60) { old = flickBuf[i]; break; } }
+              const dt = (last.t - old.t) / 1000;
+              if (dt > 0) {
+                const vx = (((last.x - old.x) / dt) / 60) * FLICK_SCALE;
+                const vy = (((last.y - old.y) / dt) / 60) * FLICK_SCALE;
+                if (Math.hypot(vx, vy) >= FLICK_FLOOR) MBody.setVelocity(b as never, { x: vx, y: vy });
+              }
+            }
+          }
+          const prop = b?.plugin?.prop;
+          if (prop && b?.circleRadius) throwWatchRef.current?.(prop);
         };
         Events.on(mc, "enddrag", onEndDrag);
         mcReleaseRef.current = () => { mc.constraint.bodyB = null; mc.body = null; mouse.button = -1; };
@@ -4883,8 +4904,22 @@ export default function BreedTree({
           mouse.position.x = p.x;
           mouse.position.y = p.y;
         };
-        const onDown = (e: PointerEvent) => { setPos(e.clientX, e.clientY); mouse.button = 0; wake(); };
-        const onMove = (e: PointerEvent) => { if (mouse.button === 0) { setPos(e.clientX, e.clientY); wake(); } };
+        const onDown = (e: PointerEvent) => {
+          setPos(e.clientX, e.clientY);
+          mouse.button = 0;
+          flickBuf.length = 0;
+          flickBuf.push({ t: performance.now(), x: mouse.position.x, y: mouse.position.y });
+          wake();
+        };
+        const onMove = (e: PointerEvent) => {
+          if (mouse.button === 0) {
+            setPos(e.clientX, e.clientY);
+            const t = performance.now();
+            flickBuf.push({ t, x: mouse.position.x, y: mouse.position.y });
+            while (flickBuf.length > 1 && t - flickBuf[0].t > 120) flickBuf.shift();
+            wake();
+          }
+        };
         const onUp = () => { mouse.button = -1; };
         st.addEventListener("pointerdown", onDown);
         window.addEventListener("pointermove", onMove);
