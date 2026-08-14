@@ -521,8 +521,8 @@ const LINEAGE: Record<string, LineageNode> = {
       { name: "Old working collies", note: "The shared old hill-collie landrace of the same family. Now extinct.", img: "/history/breeds/Old-working-collies-cluster.jpg", value: 100 }
     ]
   },
-  "Cumberland sheepdogs": {
-    name: "Cumberland sheepdogs",
+  "Old Cumberland herding dogs": {
+    name: "Old Cumberland herding dogs",
     note: "Northern English herding dogs from the same border country. Now extinct.",
     children: [
       { name: "Old working collies", note: "The shared old hill-collie landrace of the border country. Now extinct.", img: "/history/breeds/Old-working-collies-cluster.jpg", value: 100 }
@@ -546,7 +546,7 @@ const LINEAGE: Record<string, LineageNode> = {
     children: [
       { name: "Old Scotch Collie", note: "The old Scottish shepherd's collie, the pre-show hill-herding landrace that fed the working border strain long before it had a name. Now extinct.", img: "/history/breeds/Old-Scotch-Collie.jpg", value: 50 },
       { name: "Welsh herding dogs", note: "The old Welsh herding and droving dogs, a long-legged, loose-eyed landrace and the parallel Welsh branch behind the region's sheep-working breeds. Now extinct.", img: "/history/breeds/Welsh-herding-dogs-cluster.jpg", value: 25 },
-      { name: "Cumberland sheepdogs", note: "Northern English herding dogs from the same border country. Now extinct.", img: "/history/breeds/cumberland-sheepdog-photo.jpg", value: 25 }
+      { name: "Old Cumberland herding dogs", note: "Northern English herding dogs from the same border country. Now extinct.", img: "/history/breeds/cumberland-sheepdog-photo.jpg", value: 25 }
     ]
   },
 
@@ -978,7 +978,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "The tallest of the spaniels, a curly liver-brown water dog with a rat-like tail, one of Ireland's old gundog breeds.",
     children: [
       { name: "Old Irish water dogs", note: "The southern and northern water spaniels of Ireland. Now extinct.", img: "/history/breeds/Old-Irish-water-dog.jpg", value: 55 },
-      { name: "Poodle and Barbet water dogs", note: "Continental curly water dogs that shaped the coat. Now extinct.", img: "/history/breeds/Poodle-and-Barbet-water-dogs.jpg", value: 45 }
+      { name: "Continental water dogs", note: "Continental curly water dogs that shaped the coat. Now extinct.", img: "/history/breeds/Poodle-and-Barbet-water-dogs.jpg", value: 45 }
     ]
   },
 
@@ -1454,7 +1454,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "A medieval scenting hound kept to hunt buck and fallow deer, sitting between the staghound and the harrier.",
     children: [
       { name: "Old scenting hounds", note: "The deer-hunting pack hounds of the royal forests.", img: "/history/breeds/Old-scenting-hounds.jpg", value: 60 },
-      { name: "Talbot hounds", note: "The white medieval hound in its background.", img: "/history/breeds/talbot-hound.jpg", value: 40 }
+      { name: "Talbot", note: "The white medieval hound in its background.", img: "/history/breeds/talbot-hound.jpg", value: 40 }
     ]
   },
 
@@ -1462,7 +1462,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Southern Hound",
     note: "A heavy, slow, deep-voiced scent hound of southern England, ancestor of the foxhound, beagle and harrier.",
     children: [
-      { name: "Talbot hounds", note: "The white Norman hound at its root.", img: "/history/breeds/talbot-hound.jpg", value: 60 },
+      { name: "Talbot", note: "The white Norman hound at its root.", img: "/history/breeds/talbot-hound.jpg", value: 60 },
       { name: "St Hubert Hound", note: "The abbey scent hounds brought across the Channel.", img: "/history/breeds/St-Hubert-Hound.jpg", value: 40 }
     ]
   },
@@ -1483,7 +1483,7 @@ const LINEAGE: Record<string, LineageNode> = {
     children: [
       { name: "Southern Hound", note: "The deep-nosed scent hound at its foundation.", img: "/history/breeds/Southern-Hound.jpg", value: 50 },
       { name: "Greyhound", note: "Added for speed and a cleaner, racier build.", img: "/history/breeds/original-greyhound.jpg", value: 30 },
-      { name: "Talbot hound", note: "The old white hound in the deeper background.", img: "/history/breeds/talbot-hound.jpg", value: 20 }
+      { name: "Talbot", note: "The old white hound in the deeper background.", img: "/history/breeds/talbot-hound.jpg", value: 20 }
     ]
   },
 
@@ -1520,7 +1520,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Beagle",
     note: "A small, merry pack hound bred to hunt hare on foot, with a big voice and a busy nose.",
     children: [
-      { name: "Talbot hound", note: "The white Norman hound at the root of the running packs.", img: "/history/breeds/talbot-hound.jpg", value: 40 },
+      { name: "Talbot", note: "The white Norman hound at the root of the running packs.", img: "/history/breeds/talbot-hound.jpg", value: 40 },
       { name: "Southern Hound", note: "Deep-nosed scent-hound blood.", img: "/history/breeds/Southern-Hound.jpg", value: 35 },
       { name: "Greyhound", note: "A little sighthound for speed and a tidy build.", img: "/history/breeds/original-greyhound.jpg", value: 25 }
     ]
@@ -1695,7 +1695,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "An extinct, faster, sharper-nosed beagle of northern England, eventually folded into the modern Beagle.",
     children: [
       { name: "Southern Hound", note: "The deep-nosed southern hare-hound stock at its core.", img: "/history/breeds/Southern-Hound.jpg", value: 60 },
-      { name: "Talbot hound", note: "The white Norman hound in the background.", img: "/history/breeds/talbot-hound.jpg", value: 40 }
+      { name: "Talbot", note: "The white Norman hound in the background.", img: "/history/breeds/talbot-hound.jpg", value: 40 }
     ]
   },
 
@@ -1963,10 +1963,12 @@ const MAX_LINEAGE_DEPTH = 5;
 const LINEAGE_ALIASES: Record<string, string> = {
   "Jack Russell": "Jack Russell Terrier",
   "Mastiff": "English Mastiff",
-  // Documented spellings of the Talbot, a medieval hound whose key is "Talbot"
-  // and whose tree runs four deep. Both spellings appear as child nodes across
-  // many trees (Talbot hounds, Talbot hound) and neither grafted without this,
-  // so those branches dead-ended a step short of the Talbot's own ancestry.
+  // SUPERSEDED 14 August 2026. The two Talbot spellings ("Talbot hounds",
+  // "Talbot hound") used to appear as child nodes across many trees and were
+  // aliased here so their branches grafted onto the Talbot's own ancestry.
+  // Those five child nodes have now been renamed to "Talbot" in the data, so
+  // the aliases are no longer reached. Kept as no-ops in case an older spelling
+  // returns; the rarity tier now reads the merged name, which was the point.
   "Talbot hounds": "Talbot",
   "Talbot hound": "Talbot",
 };
