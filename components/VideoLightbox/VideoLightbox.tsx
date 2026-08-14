@@ -129,7 +129,7 @@ export default function VideoLightbox({ videos, index, onClose, onIndex }: Props
   const next = () => onIndex((index + 1) % videos.length);
 
   return createPortal(
-    <div className={`${styles.overlay} ${minimized ? styles.minimized : ""}`} onClick={onClose}>
+    <div className={`${styles.overlay} ${minimized ? styles.minimized : ""}`} data-pc-reach onClick={onClose}>
       {videos.length > 1 && (
         <button
           type="button"
@@ -151,7 +151,7 @@ export default function VideoLightbox({ videos, index, onClose, onIndex }: Props
       )}
 
       {/* keyed by id so it remounts (and re-runs the pop) on each navigation */}
-      <div key={v.vimeoId} className={styles.stage} onClick={(e) => e.stopPropagation()}>
+      <div key={v.vimeoId} className={styles.stage} data-pc-over-media onClick={(e) => e.stopPropagation()}>
         <button
           type="button"
           className={styles.close}

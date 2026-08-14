@@ -386,6 +386,7 @@ export default function PickAChumLauncher() {
           type="button"
           className={`${styles.launcher} ${shown ? styles.launcherOn : ''} ${pulse ? styles.launcherPulse : ''}`}
           aria-label="Pick a Chum"
+          data-pc-reach
           onClick={() => setOpen(true)}
         >
           <PickAChumIcon src={ICON_FRAMES[frame]} />

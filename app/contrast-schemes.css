@@ -33,9 +33,9 @@
 :root[data-pc-contrast-scheme="black-on-white"] body::before {
   display: none !important; /* paw pattern off: it is what pushes contrast down */
 }
-:root[data-pc-contrast-scheme="black-on-white"] #pc-site,
-:root[data-pc-contrast-scheme="black-on-white"] #pc-site
-  *:not(img):not(svg):not(path):not(video):not(canvas):not(use):not(picture):not(source):not(:where([class*="heroImg"], [class*="productImage"])) {
+:root[data-pc-contrast-scheme="black-on-white"] :is(#pc-site, [data-pc-reach]),
+:root[data-pc-contrast-scheme="black-on-white"] :is(#pc-site, [data-pc-reach])
+  *:not(img):not(svg):not(path):not(video):not(canvas):not(use):not(picture):not(source):not(:where([class*="heroImg"], [class*="productImage"], [data-pc-crushbg])) {
   color: #000 !important;
   background-color: #fff !important;
   background-image: none !important;
@@ -58,9 +58,9 @@
 :root[data-pc-contrast-scheme="white-on-black"] body::before {
   display: none !important;
 }
-:root[data-pc-contrast-scheme="white-on-black"] #pc-site,
-:root[data-pc-contrast-scheme="white-on-black"] #pc-site
-  *:not(img):not(svg):not(path):not(video):not(canvas):not(use):not(picture):not(source):not(:where([class*="heroImg"], [class*="productImage"])) {
+:root[data-pc-contrast-scheme="white-on-black"] :is(#pc-site, [data-pc-reach]),
+:root[data-pc-contrast-scheme="white-on-black"] :is(#pc-site, [data-pc-reach])
+  *:not(img):not(svg):not(path):not(video):not(canvas):not(use):not(picture):not(source):not(:where([class*="heroImg"], [class*="productImage"], [data-pc-crushbg])) {
   color: #fff !important;
   background-color: #000 !important;
   background-image: none !important;
@@ -115,13 +115,37 @@
    follow the scheme instead of staying full colour. The header (.pc-nav) is
    excluded: its logos and icons keep their own scheme treatment.
    ========================================================================== */
-:root[data-pc-contrast-scheme] #pc-site :is(img, video, iframe) {
+:root[data-pc-contrast-scheme] :is(#pc-site, [data-pc-reach]) :is(img, video, iframe) {
   filter: grayscale(1) contrast(1.1) brightness(0.55) !important;
   -webkit-filter: grayscale(1) contrast(1.1) brightness(0.55) !important;
 }
 :root[data-pc-contrast-scheme] #pc-site :is(.pc-nav, .pc-footer) :is(img, video, iframe) {
   filter: none !important;
   -webkit-filter: none !important;
+}
+
+/* RULE A (SchemeLayers marks data-pc-cover): a pure absolute/fixed overlay that
+   covers a media element goes transparent so the crushed media shows through.
+   Replaces the per-page tint / videoWrap / heroContent fixes. The :is() carries
+   #pc-site's id so this out-specifies the sweep that would fill it. */
+:root[data-pc-contrast-scheme] :is(#pc-site, [data-pc-reach]) [data-pc-cover] {
+  background-color: transparent !important;
+  background-image: none !important;
+}
+/* RULE B (SchemeLayers marks data-pc-crushbg): a photo background sitting behind
+   text is kept (excluded from the strip in the sweep selector) and crushed, not
+   stripped. Replaces the per-page background-image restores. */
+:root[data-pc-contrast-scheme] :is(#pc-site, [data-pc-reach]) [data-pc-crushbg] {
+  filter: grayscale(1) contrast(1.1) brightness(0.55) !important;
+  -webkit-filter: grayscale(1) contrast(1.1) brightness(0.55) !important;
+}
+/* Text sitting directly over crushed media (the video lightbox stage) goes white,
+   the same move the hero titles took: the 0.55 crush keeps every pixel behind it
+   dark enough for white to pass. The :is() carries #pc-site's id so this beats the
+   reach sweep that would otherwise colour it to the scheme foreground. */
+:root[data-pc-contrast-scheme] :is(#pc-site, [data-pc-reach]) [data-pc-over-media],
+:root[data-pc-contrast-scheme] :is(#pc-site, [data-pc-reach]) [data-pc-over-media] * {
+  color: #ffffff !important;
 }
 /* Inline CONTENT svgs (charts, influence bars, the SVG-wrapped breed portrait)
    are not img/video/iframe, so the rule above misses them and they keep their
