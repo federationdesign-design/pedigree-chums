@@ -192,7 +192,7 @@ export default function HotDogs() {
               <div className={styles.cookingCol}>
                 <div style={{display:"flex",alignItems:"center",gap:"16px",marginBottom:"8px"}}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src="/Why-are-hot-dogs-called-hot-dogs.jpg" alt="" style={{width:"72px",height:"72px",objectFit:"cover",borderRadius:"50%",flexShrink:0}} />
+                  <img src="/Why-are-hot-dogs-called-hot-dogs.jpg" alt="A close-up of frankfurter sausages grilling on a barbecue with dark grill marks, metal tongs turning one." style={{width:"72px",height:"72px",objectFit:"cover",borderRadius:"50%",flexShrink:0}} />
                   <h3 className={styles.subTitle} style={{margin:0}}>Why are hot dogs called hot dogs?</h3>
                 </div>
                 <p>
@@ -206,7 +206,7 @@ export default function HotDogs() {
 
                 <div style={{display:"flex",alignItems:"center",gap:"16px",marginBottom:"8px"}}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src="/what-is-a-sausage-dog.jpg" alt="" style={{width:"72px",height:"72px",objectFit:"cover",borderRadius:"50%",flexShrink:0}} />
+                  <img src="/what-is-a-sausage-dog.jpg" alt="A small brown dachshund puppy held inside a hot dog bun, like a living hot dog." style={{width:"72px",height:"72px",objectFit:"cover",borderRadius:"50%",flexShrink:0}} />
                   <h3 className={styles.subTitle} style={{margin:0}}>What is a sausage dog?</h3>
                 </div>
                 <p>
@@ -224,7 +224,7 @@ export default function HotDogs() {
               <div className={styles.cookingCol}>
                 <div style={{display:"flex",alignItems:"center",gap:"16px",marginBottom:"8px"}}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src="/cooking-hot-dogs.jpg" alt="" style={{width:"72px",height:"72px",objectFit:"cover",borderRadius:"50%",flexShrink:0}} />
+                  <img src="/cooking-hot-dogs.jpg" alt="An overhead shot of frankfurter sausages simmering in water in a stainless-steel pan on a hob." style={{width:"72px",height:"72px",objectFit:"cover",borderRadius:"50%",flexShrink:0}} />
                   <h3 className={styles.subTitle} style={{margin:0}}>Instructions for tinned hot dogs</h3>
                 </div>
                 <p style={{marginBottom:"20px"}}>Where do you store your dogs? Store in a cool, dry place. Preferably not on the floor where the dog can reach them. The hot dogs, that is. Not the dogs. Although arguably both.</p>

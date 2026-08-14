@@ -46,7 +46,7 @@ export default function HistorySection({ section: s }: { section: Section }) {
             <span className={styles.factLabel}>Did you know?</span>
             <div className={styles.factRow}>
               <div className={styles.factImg}>
-                <FactHatImage src={f.image || s.image} width={120} height={120} />
+                <FactHatImage src={f.image || s.image} alt={f.imageAlt} width={120} height={120} />
               </div>
               <div className={styles.factBody}>
                 <span className={styles.factText}>{f.text}</span>

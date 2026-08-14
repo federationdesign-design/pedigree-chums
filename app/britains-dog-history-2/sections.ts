@@ -16,7 +16,7 @@ export type Section = {
   // One short title per bullet, same order. Only Medieval has these so far.
   bulletTitles?: string[];
   detail: string;
-  facts: { text: string; image?: string }[];
+  facts: { text: string; image?: string; imageAlt?: string }[];
   image: string; // /history/<name>.jpg image path; drop art in later
   // Optional scroll-scrubbed video for the sticky top. `image` stays as the
   // poster, so a section without a video, or one whose video has not landed
@@ -46,9 +46,9 @@ export const SECTIONS: Section[] = [
       "Several generations later, the Roman writer Arrian described swift Celtic coursing hounds that hunted by sight rather than scent. These early dogs were types shaped by work and place rather than standardised breeds: the same island held fast coursing hounds, powerful guard dogs and small practical workers, and their names, appearance and purpose could change between regions and centuries.",
     facts: [
       { text: "British hunting dogs were valuable enough to be exported across the Channel almost 2,000 years ago.", image: "/history/acident-main-img.jpg" },
-      { text: "Arrian, writing in the Roman period, praised Celtic hounds for speed, spirit and their enthusiasm for chasing hares.", image: "/history/greek-harehound.jpg" },
-      { text: "Archaeologists have found dogs of very different sizes in early British settlements, from small animals to dogs approaching wolf size.", image: "/history/breeds/Mastiff-and-Alaunt-war-dogs.jpg" },
-      { text: "The swift coursing hound of the Celts was famous enough in the ancient world to be described in Roman hunting manuals.", image: "/history/breeds/celtic-hound-drawing.jpg" },
+      { text: "Arrian, writing in the Roman period, praised Celtic hounds for speed, spirit and their enthusiasm for chasing hares.", image: "/history/greek-harehound.jpg", imageAlt: "A black-and-tan harehound standing on a muddy grass path in a brown harness, its tail raised." },
+      { text: "Archaeologists have found dogs of very different sizes in early British settlements, from small animals to dogs approaching wolf size.", image: "/history/breeds/Mastiff-and-Alaunt-war-dogs.jpg", imageAlt: "A tall, powerfully built white dog with a black head and pricked ears, standing in profile on open moorland under a grey sky." },
+      { text: "The swift coursing hound of the Celts was famous enough in the ancient world to be described in Roman hunting manuals.", image: "/history/breeds/celtic-hound-drawing.jpg", imageAlt: "An antique engraving of a tall, lean sighthound in a rocky landscape, its long tail curled high, looking back over its shoulder." },
     ],
     // Supplied artwork. The filename says "acident": it is spelled that way on
     // disk, so it is spelled that way here.
@@ -71,10 +71,10 @@ export const SECTIONS: Section[] = [
     detail:
       "By the Middle Ages Britain's dogs had settled into recognisable working kinds. Hunting treatises described each type and its task, household records listed hounds by the work they did, and forest law regulated which dogs could live near the royal deer. These were still types rather than breeds: a talbot or a rache was a job and a look, not a pedigree, and the same name could cover different dogs in different counties.",
     facts: [
-      { text: "Medieval pictures often show different dogs doing different jobs, including scent hounds hunting in packs and greyhounds held on leads before the chase.", image: "/history/master-of-the-game.jpg" },
-      { text: "The Master of Game, an English hunting book from the early 1400s, describes running hounds, greyhounds, alaunts, spaniels and mastiffs, each with its own work.", image: "/history/master-of-the-game.jpg" },
-      { text: "Under medieval forest law, large dogs kept near royal forests could be required to have claws removed so they could not chase the deer.", image: "/history/medieval-law.jpg" },
-      { text: "The drove roads that dogs and drovers used to walk cattle to market were in use for centuries, and stretches of them can still be walked today.", image: "/history/drovers-dogs.jpg" },
+      { text: "Medieval pictures often show different dogs doing different jobs, including scent hounds hunting in packs and greyhounds held on leads before the chase.", image: "/history/master-of-the-game.jpg", imageAlt: "A medieval illuminated-manuscript scene of huntsmen in coloured tunics tending white hunting hounds in a walled garden." },
+      { text: "The Master of Game, an English hunting book from the early 1400s, describes running hounds, greyhounds, alaunts, spaniels and mastiffs, each with its own work.", image: "/history/master-of-the-game.jpg", imageAlt: "A medieval illuminated-manuscript scene of huntsmen in coloured tunics tending white hunting hounds in a walled garden." },
+      { text: "Under medieval forest law, large dogs kept near royal forests could be required to have claws removed so they could not chase the deer.", image: "/history/medieval-law.jpg", imageAlt: "A medieval manuscript illustration of a man in a tunic carrying a spear and leading a white hound through woodland." },
+      { text: "The drove roads that dogs and drovers used to walk cattle to market were in use for centuries, and stretches of them can still be walked today.", image: "/history/drovers-dogs.jpg", imageAlt: "A woodcut of a sturdy drover's dog in the foreground, with a second dog driving cattle along a lane behind, among trees and farmland." },
     ],
     image: "/history/medieveal-dogs.jpg",
     imageAlt: "Medieval working dogs at their jobs, from pack hounds to herders",
@@ -98,10 +98,10 @@ export const SECTIONS: Section[] = [
     detail:
       "The forest laws were among the most resented in medieval England, with even a harmless guard dog lamed simply for living near royal land. Yet within a few centuries the mood had utterly changed. At the Tudor court, Henry VIII's pampered lapdogs wore velvet collars stamped with the gold Tudor rose, and Anne Boleyn doted on a little dog named Purkoy. The dog as a treasured companion, not just a working animal, was already taking shape.",
     facts: [
-      { text: "Anne Boleyn so loved her lapdog Purkoy that when he died in a fall, no one at court dared to tell her the news.", image: "/history/purkoy.jpg" },
-      { text: "Medieval law valued a dog by its job, with a shepherd's dog, a guard dog and a hunting hound each worth a different sum.", image: "/history/medieval-law.jpg" },
-      { text: "Mastiff-type 'bandogs' were chained up by day and let loose at night to guard farms from thieves and even wolves.", image: "/history/bandogs.jpg" },
-      { text: "One of the first books written in English, 'The Master of Game' from around 1406, was a guide to hunting hounds and their care.", image: "/history/master-of-the-game.jpg" },
+      { text: "Anne Boleyn so loved her lapdog Purkoy that when he died in a fall, no one at court dared to tell her the news.", image: "/history/purkoy.jpg", imageAlt: "A detail from an old painting of a small red-and-white toy spaniel held in its owner's arms." },
+      { text: "Medieval law valued a dog by its job, with a shepherd's dog, a guard dog and a hunting hound each worth a different sum.", image: "/history/medieval-law.jpg", imageAlt: "A medieval manuscript illustration of a man in a tunic carrying a spear and leading a white hound through woodland." },
+      { text: "Mastiff-type 'bandogs' were chained up by day and let loose at night to guard farms from thieves and even wolves.", image: "/history/bandogs.jpg", imageAlt: "A close-up of a large fawn mastiff with a black muzzle and heavy jowls, its tongue showing." },
+      { text: "One of the first books written in English, 'The Master of Game' from around 1406, was a guide to hunting hounds and their care.", image: "/history/master-of-the-game.jpg", imageAlt: "A medieval illuminated-manuscript scene of huntsmen in coloured tunics tending white hunting hounds in a walled garden." },
     ],
     image: "/history/medieveal-dogs.jpg",
     /* The scroll-scrubbed video is off. It was 9MB, and every frame of it had
@@ -152,10 +152,10 @@ export const SECTIONS: Section[] = [
     detail:
       "A dog's looks are rarely an accident. The Collie's tireless energy, the terrier's boldness, the sighthound's lean frame: each was honed for a purpose over many generations. Understanding that working past is the key to understanding why breeds behave the way they do, a thread that runs right through the pack.",
     facts: [
-      { text: "The word 'terrier' comes from the Latin 'terra', meaning earth, after their habit of digging into burrows to flush out prey.", image: "/history/terra.jpg" },
-      { text: "Turnspit dogs were bred to run inside a wheel that turned meat roasting over the kitchen fire.", image: "/history/breeds/Turnspitdog-drawing.jpg" },
-      { text: "Drovers' dogs walked cattle and sheep hundreds of miles to market, then often found their own way home.", image: "/history/drovers-dogs.jpg" },
-      { text: "Water dogs hauled fishing nets and lines for coastal fishermen, their thick coats built to shrug off the cold.", image: "/history/waterdog.jpg" },
+      { text: "The word 'terrier' comes from the Latin 'terra', meaning earth, after their habit of digging into burrows to flush out prey.", image: "/history/terra.jpg", imageAlt: "A black-and-white terrier seen from behind with its head down a hole in the grass and its tail up, digging into the earth." },
+      { text: "Turnspit dogs were bred to run inside a wheel that turned meat roasting over the kitchen fire.", image: "/history/breeds/Turnspitdog-drawing.jpg", imageAlt: "An antique engraving of a Turnspit dog, a long-bodied, short-legged breed with a curled tail, shown in profile and labelled 'Turnspit'." },
+      { text: "Drovers' dogs walked cattle and sheep hundreds of miles to market, then often found their own way home.", image: "/history/drovers-dogs.jpg", imageAlt: "A woodcut of a sturdy drover's dog in the foreground, with a second dog driving cattle along a lane behind, among trees and farmland." },
+      { text: "Water dogs hauled fishing nets and lines for coastal fishermen, their thick coats built to shrug off the cold.", image: "/history/waterdog.jpg", imageAlt: "An antique illustration of a shaggy, curly-coated water dog's head in profile." },
     ],
     image: "/history/working-roots.jpeg",
     imageAlt: "A working sheepdog herding livestock on a British hillside",
@@ -177,9 +177,9 @@ export const SECTIONS: Section[] = [
       "The ban was meant to spare dogs from cruelty and to stop carts spooking horses in crowded streets, but it had a heartbreaking side. With the dogs no longer able to earn their keep, many traders could not afford to feed them, and thousands of working dogs were lost. It was a grim chapter, yet it pushed Britain toward treating dogs as animals deserving of protection.",
     facts: [
       { text: "One estimate suggests the 1839 London ban alone led to the loss of more than 3,000 working dogs almost overnight." },
-      { text: "During the Great Plague of 1665, dogs were wrongly blamed for spreading the disease and the city ordered them destroyed.", image: "/history/plague.jpg" },
-      { text: "London's dog-catcher killed over 4,000 dogs, which likely made things worse by sparing the rats that truly carried the plague.", image: "/history/plague2.jpg" },
-      { text: "Winston Churchill, nicknamed the British Bulldog, in fact kept a brown poodle named Rufus who slept by his bed all through the war.", image: "/history/winston-churchill.jpg" },
+      { text: "During the Great Plague of 1665, dogs were wrongly blamed for spreading the disease and the city ordered them destroyed.", image: "/history/plague.jpg", imageAlt: "A dark engraving of a plague-stricken 17th-century London street: cloaked figures, one helping a collapsing man, a body lying in the gutter and a stray dog nearby." },
+      { text: "London's dog-catcher killed over 4,000 dogs, which likely made things worse by sparing the rats that truly carried the plague.", image: "/history/plague2.jpg", imageAlt: "A hand-coloured plague broadsheet woodcut: a skeleton representing Death striding over coffins before a city skyline, with fleeing figures and captions such as 'I follow', 'We fly' and 'Wee dye'." },
+      { text: "Winston Churchill, nicknamed the British Bulldog, in fact kept a brown poodle named Rufus who slept by his bed all through the war.", image: "/history/winston-churchill.jpg", imageAlt: "A black-and-white portrait photograph of a man in a top hat and polka-dot bow tie." },
     ],
     image: "/history/dog-carts.jpg",
     imageAlt: "A Victorian street trader with a dog-drawn cart in London",
@@ -200,10 +200,10 @@ export const SECTIONS: Section[] = [
     detail:
       "Victoria's very public affection for her dogs helped make pet keeping fashionable across society. As the middle classes grew, a well-bred dog became a mark of taste and gentility. The first dog show, the founding of Battersea and the arrival of the Kennel Club all came within a single generation, the moment dogs became companions to be celebrated rather than simply animals to be used.",
     facts: [
-      { text: "The first dog show, held in Newcastle in 1859, was tacked on to a poultry show and only allowed Pointers and Setters to compete.", image: "/history/first-dog-show.jpg" },
-      { text: "From 1867 every owner had to buy a yearly dog licence, costing seven shillings and sixpence, just to keep a dog.", image: "/history/dog-licence.jpg" },
-      { text: "Spratt's began selling the first mass-produced dog biscuits around 1860, the very start of the dog-food industry.", image: "/history/dog-biscuit.jpg" },
-      { text: "Dog theft grew so common that thieves snatched pampered pets and sold them back to their owners for a ransom.", image: "/history/Dog-theft.jpg" },
+      { text: "The first dog show, held in Newcastle in 1859, was tacked on to a poultry show and only allowed Pointers and Setters to compete.", image: "/history/first-dog-show.jpg", imageAlt: "A Victorian engraving of an early dog show in a large glazed hall, top-hatted gentlemen and crinolined ladies viewing rows of dogs tethered along the aisles." },
+      { text: "From 1867 every owner had to buy a yearly dog licence, costing seven shillings and sixpence, just to keep a dog.", image: "/history/dog-licence.jpg", imageAlt: "A scan of an early-20th-century British dog licence, price seven shillings and sixpence, filled in by hand (dated 1918)." },
+      { text: "Spratt's began selling the first mass-produced dog biscuits around 1860, the very start of the dog-food industry.", image: "/history/dog-biscuit.jpg", imageAlt: "A single bone-shaped dog biscuit on a white background." },
+      { text: "Dog theft grew so common that thieves snatched pampered pets and sold them back to their owners for a ransom.", image: "/history/Dog-theft.jpg", imageAlt: "A tongue-in-cheek photo of a masked figure in a balaclava peering over a wall behind a wide-eyed fox-red Labrador." },
     ],
     image: "/history/portrait-of-dash.jpg",
     imageAlt: "A Victorian lady with a small spaniel companion",
@@ -224,10 +224,10 @@ export const SECTIONS: Section[] = [
     detail:
       "Historians gently point out that the tale has grown in the telling, and the details are hard to prove. But whether legend or fact, Bobby became a symbol of the devotion a dog can show, retold in books and films ever since. His statue in Edinburgh remains one of Scotland's best-loved landmarks, a monument to the bond between people and their dogs.",
     facts: [
-      { text: "Greyfriars Bobby's headstone reads: 'Let his loyalty and devotion be a lesson to us all.'", image: "/history/greyfriars-bobby.jpg" },
-      { text: "Charles Dickens gave the villain Bill Sikes a fearful dog called Bull's-eye in Oliver Twist.", image: "/history/dickens.jpg" },
-      { text: "The poet Elizabeth Barrett Browning adored her spaniel Flush, later given his own book by Virginia Woolf.", image: "/history/elizabeth-barrett-browning.jpg" },
-      { text: "In Peter Pan, the Darling children's devoted nursemaid Nana is a Newfoundland dog.", image: "/history/peterpan.jpg" },
+      { text: "Greyfriars Bobby's headstone reads: 'Let his loyalty and devotion be a lesson to us all.'", image: "/history/greyfriars-bobby.jpg", imageAlt: "A close-up of a bronze statue of a shaggy terrier, its nose worn gold from visitors' touches." },
+      { text: "Charles Dickens gave the villain Bill Sikes a fearful dog called Bull's-eye in Oliver Twist.", image: "/history/dickens.jpg", imageAlt: "A painted portrait of a bearded Victorian man in a dark jacket against a muted background." },
+      { text: "The poet Elizabeth Barrett Browning adored her spaniel Flush, later given his own book by Virginia Woolf.", image: "/history/elizabeth-barrett-browning.jpg", imageAlt: "A black-and-white portrait of a woman with long dark ringlets and a white lace collar." },
+      { text: "In Peter Pan, the Darling children's devoted nursemaid Nana is a Newfoundland dog.", image: "/history/peterpan.jpg", imageAlt: "A vintage pen-and-ink illustration of a boy with a feather in his hair playing pan pipes." },
     ],
     image: "/history/bobby.jpeg",
     imageAlt: "The Greyfriars Bobby statue in Edinburgh",
@@ -254,8 +254,8 @@ export const SECTIONS: Section[] = [
       "Charles Cruft had a genius for promotion, and his show quickly became the highlight of the canine calendar. The arrival of the Best in Show award in 1928 gave the event its crowning moment, and that first winner, a Greyhound chosen from nearly ten thousand competitors, set the tone for a contest that still captivates the nation every spring.",
     facts: [
       { text: "Primley Sceptre, the first Best in Show winner, was picked from an entry of 9,466 dogs and described by the judge as 'faultless'." },
-      { text: "Charles Cruft was a travelling salesman for Spratt's dog biscuits, and his show helped sell ever more dog food.", image: "/history/james-spratt.jpg" },
-      { text: "The first Crufts in 1891 drew 2,437 dogs across 36 breeds; today around 24,000 dogs take part each year.", image: "/history/breeds/crufts-dogshow.jpg" },
+      { text: "Charles Cruft was a travelling salesman for Spratt's dog biscuits, and his show helped sell ever more dog food.", image: "/history/james-spratt.jpg", imageAlt: "A black-and-white Victorian portrait photograph of a seated man with mutton-chop sideburns in a dark suit." },
+      { text: "The first Crufts in 1891 drew 2,437 dogs across 36 breeds; today around 24,000 dogs take part each year.", image: "/history/breeds/crufts-dogshow.jpg", imageAlt: "A vintage printed poster for Cruft's Seventh Great Dog Show at the Royal Agricultural Hall, Islington, London, in February 1891." },
       { text: "Charles Cruft never owned a dog himself, for fear of being seen to favour any one breed." },
     ],
     image: "/history/primley-sceptre.jpeg",
@@ -277,10 +277,10 @@ export const SECTIONS: Section[] = [
     detail:
       "As Britain became more urban and homes grew more comfortable, dogs came indoors for good. The relationship deepened from usefulness into genuine companionship. By the end of the century, the question was no longer what a dog could do for you, but simply the pleasure of its company, a shift that set the stage for the boom still unfolding today.",
     facts: [
-      { text: "Today around 99 percent of UK dog owners consider their dog to be a full member of the family.", image: "/history/family-dog.jpg" },
-      { text: "Around a third of British dogs are now allowed up onto their owner's bed to sleep.", image: "/history/dog-in-bed.jpg" },
-      { text: "Some 58 percent of owners buy their dog birthday and Christmas presents.", image: "/history/dog-birthday.jpg" },
-      { text: "Pampered pets now enjoy spas, bakeries, dog fashion and even their own social media accounts.", image: "/history/Pampered-pets.jpg" },
+      { text: "Today around 99 percent of UK dog owners consider their dog to be a full member of the family.", image: "/history/family-dog.jpg", imageAlt: "A sunlit photo of a boy and a young woman making a fuss of a white French Bulldog held between them outdoors." },
+      { text: "Around a third of British dogs are now allowed up onto their owner's bed to sleep.", image: "/history/dog-in-bed.jpg", imageAlt: "A happy tan dog sprawled on its side on a fluffy white blanket, tongue lolling, looking up at the camera." },
+      { text: "Some 58 percent of owners buy their dog birthday and Christmas presents.", image: "/history/dog-birthday.jpg", imageAlt: "A grinning dog in a red polka-dot party hat baring its teeth in a smile over a plate of birthday treats." },
+      { text: "Pampered pets now enjoy spas, bakeries, dog fashion and even their own social media accounts.", image: "/history/Pampered-pets.jpg", imageAlt: "A Corgi being lathered up in the bath, covered in soap suds with foam piled on its head, tongue out and looking blissful." },
     ],
     image: "/history/poodle-bed.jpg",
     imageAlt: "A family relaxing at home with their pet dog",
@@ -302,7 +302,7 @@ export const SECTIONS: Section[] = [
     detail:
       "The most common breeds tell the story of changing tastes. Among dogs of all ages the classic Labrador still leads, but among puppies the French Bulldog and the Cockapoo have raced to the top, a clear sign of the designer-crossbreed boom. The pack brings both worlds together, the old favourites and the new, each with centuries of history behind them.",
     facts: [
-      { text: "Among dogs under one year old, the French Bulldog and Cockapoo now rank among the three most common breeds in the UK.", image: "/history/cockapoo-circle.jpg" },
+      { text: "Among dogs under one year old, the French Bulldog and Cockapoo now rank among the three most common breeds in the UK.", image: "/history/cockapoo-circle.jpg", imageAlt: "A red curly-coated Cockapoo lying on the grass, tongue out, wearing a green collar." },
       { text: "British owners now spend around 10 billion pounds a year on their dogs.", image: "/history/10-billion-pounds.jpg" },
       { text: "There are an estimated 13.5 million pet dogs in the UK, living in roughly a third of all households.", image: "/history/britian.jpg" },
     ],
