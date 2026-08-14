@@ -616,7 +616,7 @@ const TITLE_BOOST = 2;
 // The trade, honestly: this puts the pit word within 5% of the size the label
 // was inside its circle, which is the situation the constant was raised to fix
 // in the first place. 1.3 is the middle if that reads too quiet.
-const PIT_WORD_SCALE = 0.756; // 1.05 -> 0.84 -> 0.756 (-10% more, 14 August 2026). Play-area pit words only; separate from the learn labels' size factor.
+const PIT_WORD_SCALE = 2.268; // 1.05 -> 0.84 -> 0.756 -> 2.268 (3x bigger, 14 August 2026). Play-area pit words only; separate from the learn labels' size factor. Pure multiplier applied AFTER the fit at line 3307, so nothing caps it.
 // A constant lean added to each pit word's LIVE tumble angle, in degrees (negative =
 // counter-clockwise). It rides the physics rotation, so it is imperceptible while a
 // word spins and reads as a fixed lean once the word settles. Play words only.
