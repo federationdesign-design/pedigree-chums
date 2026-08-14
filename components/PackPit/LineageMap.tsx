@@ -1633,6 +1633,41 @@ export default function LineageMap({
             rx={circular ? R + rootRingW : 24}
             className={styles.rootCard}
             style={circular && ringColor ? { fill: ringColor, stroke: ringColor } : undefined} />
+          {/* Rarity glow: a soft pulsing halo in the rarity colour, sat BEHIND the
+              image and rings so only the outward halo shows and the crisp ring reads
+              over it. Independent blurred-stroke layers (matching the box-shadow
+              reference's layering): the two inner layers a lighter tint, the two
+              outer the full tier colour. The blurs are STATIC (computed once), so the
+              pulse is a compositor-only group-opacity breath, cheap next to the pit's
+              physics canvas. Hidden until the ring's draw completes (delay =
+              --rarity-delay + --rarity-draw = 1.1s), then breathes 2s each way; keyed
+              on the dog so the delay restarts per lift. Reduced motion: static halo,
+              no pulse (see .rarityGlow). Added 14 August 2026. */}
+          {rarityTier ? (() => {
+            const deep = RARITY_BAND[rarityTier].bg;
+            // mix the tier colour toward white for the inner layers, the reference's
+            // lighter tint. No new dependency; a plain hex lerp toward #ffffff.
+            const lighten = (hex: string, t: number) => {
+              const n = parseInt(hex.slice(1), 16);
+              const r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+              const m = (c: number) => Math.round(c + (255 - c) * t);
+              return `#${((1 << 24) + (m(r) << 16) + (m(g) << 8) + m(b)).toString(16).slice(1)}`;
+            };
+            const light = lighten(deep, 0.55);
+            const gw = rootRingW + 6;                       // hug the rarity ring's band
+            const layers = [{ blur: 3, c: light }, { blur: 7, c: light }, { blur: 13, c: deep }, { blur: 22, c: deep }];
+            return (
+              <g
+                key={`glow-${breed.name}`}
+                className={styles.rarityGlow}
+                style={{ ["--rarity-draw" as string]: RARITY_DRAW, ["--rarity-delay" as string]: RARITY_DRAW_DELAY, pointerEvents: "none" }}
+              >
+                {layers.map((L, i) => (
+                  <circle key={i} cx={0} cy={0} r={R + rootRingW / 2} fill="none" stroke={L.c} strokeWidth={gw} style={{ filter: `blur(${L.blur}px)` }} />
+                ))}
+              </g>
+            );
+          })() : null}
           {breed.image ? <image href={bust(breed.image)} x={-R} y={-R} width={R*2} height={R*2} clipPath={`url(#${clip})`} preserveAspectRatio="xMidYMid slice" /> : null}
           {/* Rarity ring: a tier-coloured stroke laid OVER the existing ring rect,
               on the same band (radius R + rootRingW/2, width rootRingW so it covers
@@ -1841,7 +1876,7 @@ export default function LineageMap({
         {circular && framesDone && !rootGone && !scattered ? (
           <g
             className={styles.removeBtn}
-            transform={`translate(0,${4 * learnBtnScale}) scale(${learnBtnScale})`}
+            transform={`translate(0,${4 * learnBtnScale + 2}) scale(${learnBtnScale})`}
             onClick={(e) => { e.stopPropagation(); circularComplete(); }}
             role="button"
             aria-label="Complete"
