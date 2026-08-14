@@ -505,16 +505,16 @@ const WASH_INSET = 2.2; // .learnWash inset: -60% -> 2.2 viewports wide
 // tighter LABEL_LINE_H below, so the smaller block still clears the rim up here.
 // Was -min(42, 0.18r), which deliberately held labels near their middle;
 // superseded on purpose, do not restore it thinking the top placement is a drift.
-const TITLE_DY_FRAC = 0.55;
+const TITLE_DY_FRAC = 0.65; // was 0.55; +0.1 = a scaled 10px UP at reference radius 100, proportional on other circles (14 August 2026)
 // Horizontal companion to TITLE_DY_FRAC: shift the block RIGHT by this fraction of
 // the radius (0.1 = 10% of r). New 2026-08-12; there was no horizontal offset
 // before (the block was centred at x=0). labelFits adds it too, so a label pushed
 // toward the right rim is shrunk or dropped rather than spilling over it.
-const TITLE_DX_FRAC = 0.1;
+const TITLE_DX_FRAC = 0.2; // was 0.1; +0.1 = a scaled 10px RIGHT at reference radius 100, proportional on other circles (14 August 2026)
 function titleDy(r: number): number {
   return -Math.max(0, r) * TITLE_DY_FRAC;
 }
-const TITLE_ANGLE = -5; // was -2; 3 degrees more of the up-to-the-right lean (14 August 2026)
+const TITLE_ANGLE = 1; // was -5; +6 degrees clockwise (14 August 2026)
 type Node = HierarchyCircularNode<LineageNode>;
 
 // A circle whose name repeats its parent's is not a second animal. It is the
