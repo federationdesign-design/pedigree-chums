@@ -1362,6 +1362,11 @@ export default function BreedTree({
   // anything measured from viewRef during render is measured against the view
   // that is actually on screen.
   const [, setViewTick] = useState(0);
+  // The cluster marker is React-rendered from viewRef at the two flight renders
+  // (setFocus at the start, setViewTick at the end), so mounting it mid-flight put
+  // it at the wrong, pre-flight size and it snapped on arrival. This flag hides it
+  // while a zoom flight animates and shows it only once the view has settled.
+  const [flighting, setFlighting] = useState(false);
 
   /* ── PAN, zoomed in only ─────────────────────────────────────────────────
      At the root the whole tree already fits, so panning there would only let
@@ -1723,6 +1728,7 @@ export default function BreedTree({
     setTempHidden(true);
     setChumTree(null);
     cancelAnimationFrame(rafRef.current);
+    setFlighting(false); // an interrupted flight must not leave the marker stranded hidden
     focusRef.current = nodes[0];
     setFocus(nodes[0]);
     const rootV = clampRootView([nodes[0].x, nodes[0].y, nodes[0].r * 2 * (isMobileRef.current ? PAD : ZOOM_PAD) * (dockAside ? PIT_SPAN : 1)]);
@@ -2920,6 +2926,7 @@ export default function BreedTree({
     if (reduce) {
       zoomTo(target);
       // Same refit as the animated path below, for the same reason.
+      setFlighting(false);
       setViewTick((n) => n + 1);
       return;
     }
@@ -2936,8 +2943,10 @@ export default function BreedTree({
       // were sized for the view being LEFT and kept that size on arrival: zoom
       // into a small circle and back out and every name came back too big for
       // its circle. One more render once the view has actually settled.
+      setFlighting(false); // flight settled: let the cluster marker mount at the final size
       setViewTick((n) => n + 1);
     };
+    setFlighting(true); // flight starting: hide the cluster marker until it settles
     rafRef.current = requestAnimationFrame(step);
   }
 
@@ -5453,7 +5462,7 @@ export default function BreedTree({
               view's y at runtime, so a constant would misplace the ring on the
               hard levels where the cluster is pushed up off the floor. */}
           {/* eslint-disable-next-line react-hooks/refs */}
-          {dockAside && gravity && !started && focus.depth === 0 && (() => {
+          {dockAside && gravity && !started && focus.depth === 0 && !flighting && (() => {
             const outer = nodes.filter((d) => d.depth === 1);
             if (!outer.length) return null;
             const enc = packEnclose(outer.map((d) => ({ x: d.x, y: d.y, r: d.r })));
