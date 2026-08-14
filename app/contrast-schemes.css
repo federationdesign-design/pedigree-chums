@@ -114,10 +114,13 @@
 :root[data-pc-contrast-scheme="black-on-white"] { --pc-hb-bg: #000000; --pc-hb-text: #ffffff; }
 :root[data-pc-contrast-scheme="white-on-black"] { --pc-hb-bg: #ffffff; --pc-hb-text: #000000; }
 
-/* Hide content media before paint; keep the header's own icons so the page
-   stays operable (the menu button must not vanish). */
-:root[data-pc-hide-images] #pc-site :is(img, video, svg) { opacity: 0 !important; }
-:root[data-pc-hide-images] #pc-site .pc-nav :is(img, video, svg) { opacity: 1 !important; }
+/* Hide raster images before paint; keep the header's own icons so the page
+   stays operable (the menu button must not vanish). Raster <img> only: SVGs
+   stay visible (inline <svg> is not matched, and an <img> whose source is a .svg
+   is excluded) and video stays visible (not raster). Background images are
+   handled by the overlay pass (components/HideImages), not here. */
+:root[data-pc-hide-images] #pc-site img:not([src$=".svg"]) { opacity: 0 !important; }
+:root[data-pc-hide-images] #pc-site .pc-nav img { opacity: 1 !important; }
 
 #pc-hide-root { position: absolute; top: 0; left: 0; width: 0; height: 0; z-index: 2147483000; pointer-events: none; }
 /* Keep the header above the blocks so its menu button stays visible, not just
