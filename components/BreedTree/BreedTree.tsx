@@ -514,7 +514,7 @@ const TITLE_DX_FRAC = 0.1;
 function titleDy(r: number): number {
   return -Math.max(0, r) * TITLE_DY_FRAC;
 }
-const TITLE_ANGLE = -2;
+const TITLE_ANGLE = -5; // was -2; 3 degrees more of the up-to-the-right lean (14 August 2026)
 type Node = HierarchyCircularNode<LineageNode>;
 
 // A circle whose name repeats its parent's is not a second animal. It is the
@@ -5922,7 +5922,7 @@ export default function BreedTree({
                       // full size now show if they fit small. Gating on fit.fits
                       // (the full-size result) would keep the old, smaller set and
                       // make the halving pointless.
-                      const fs = Math.max(10, Math.min(cap, fit.fs + TITLE_BOOST)) * 0.5;
+                      const fs = Math.max(10, Math.min(cap, fit.fs + TITLE_BOOST)) * 0.625; // was 0.5; +25% (14 August 2026). The fit is RE-TESTED at this size below, so a few names that fit at 0.5 may now drop.
                       const widthEm = Math.max(...lines.map((l) => measureEm(l, labelFont)));
                       if (!labelFits(widthEm, lines.length, fs, rFit)) return null;
                       // Rightward shift, matched to labelFits' dxR so the draw and
