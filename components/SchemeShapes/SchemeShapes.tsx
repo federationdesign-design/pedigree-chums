@@ -62,6 +62,11 @@ export default function SchemeShapes() {
       const seen = new Set<HTMLElement>();
       for (const el of Array.from(site.querySelectorAll<HTMLElement>(SHAPE_SEL))) {
         if (seen.has(el) || !candidate(el)) continue;
+        // Never repaint the header or its chrome: the header bar matches the
+        // "bar" shape selector and is elongated, so it would be filled with the
+        // foreground. The header keeps a transparent background (contrast-
+        // schemes.css) and its own outlines/icons; the sweep must not fill it.
+        if (el.closest(".pc-nav")) continue;
         seen.add(el);
         const inlineBg = el.style.backgroundColor;
         const cls = el.getAttribute("class") || "";
