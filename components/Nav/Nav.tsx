@@ -199,8 +199,12 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
   // Kept for the few controls that are not links and close the menu themselves.
   const closeForNav = () => { navigatingRef.current = true; setOpen(false); };
 
+  // data-pc-logo is the logo's LIVE visibility (toggles with scroll); data-pc-has-logo is STATIC per page --
+  // whether this page has a logo at all (a hideLogo page, e.g. the pit, never shows one). The Pick a Chum chip
+  // uses both: on a page that HAS a logo it follows the logo (hidden at the top, shown on scroll); on a
+  // no-logo page it must NOT hide, so the persist-open override there is left intact.
   return (
-    <header className={`pc-nav ${styles.bar} ${dockBottomLeft ? styles.barDock : ""} ${scrolled ? styles.scrolled : ""} ${showLogo ? styles.showLogo : ""}`} data-pc-logo={logoShowing ? "true" : "false"}>
+    <header className={`pc-nav ${styles.bar} ${dockBottomLeft ? styles.barDock : ""} ${scrolled ? styles.scrolled : ""} ${showLogo ? styles.showLogo : ""}`} data-pc-logo={logoShowing ? "true" : "false"} data-pc-has-logo={hideLogo ? "false" : "true"}>
       {/* Header contents hide while the menu is open -- no logo, no hamburger. */}
       {!open && !hideLogo && (
         <Link href="/home" className={styles.logo} aria-label="Pedigree Chums™ home">

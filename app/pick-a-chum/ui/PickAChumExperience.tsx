@@ -266,7 +266,7 @@ function collieChumLines(): string[] {
   });
 }
 
-export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, terrierSay }: { onClose: () => void; autoAppear?: AutoAppear; pickupRoute?: string | null; terrierSay?: string | null }) {
+export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, terrierSay, logoHidden = false }: { onClose: () => void; autoAppear?: AutoAppear; pickupRoute?: string | null; terrierSay?: string | null; logoHidden?: boolean }) {
   // Task 140: the page the visitor is on, carried into the engine as session state (like lastAction)
   // so "what is this page" answers with that page's bio. Always a string on a real route.
   const pathname = usePathname();
@@ -1705,7 +1705,7 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
           separate: to end a session, reopen and close from the chat). No name
           either -- the chip is a face, the name shows only in the active chat.
           The scrim and the offer card hide via body[data-pc-min] as before. */}
-      {phase !== 'selecting' && minimised && (
+      {phase !== 'selecting' && minimised && !logoHidden && (
         <div className={styles.miniDock}>
           <button
             type="button"
