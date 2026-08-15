@@ -162,6 +162,18 @@
   background-color: transparent !important;
   background-image: none !important;
 }
+/* Task 174: data-pc-invert (the Pick a Chum visitor's own message bubble). The sweep would flatten it to the
+   scheme background with foreground text -- white-on-white against the white page cover, so it reads as faint
+   floating text. Invert it instead: the scheme FOREGROUND as fill and the background as text, so the
+   visitor's messages stay a solid, distinct, high-contrast block. (1,3,0) beats the sweep. */
+:root[data-pc-contrast-scheme="black-on-white"] :is(#pc-site, [data-pc-reach]) [data-pc-invert] {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+}
+:root[data-pc-contrast-scheme="white-on-black"] :is(#pc-site, [data-pc-reach]) [data-pc-invert] {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+}
 /* Text sitting directly over crushed media (the video lightbox stage) goes white,
    the same move the hero titles took: the 0.55 crush keeps every pixel behind it
    dark enough for white to pass. The :is() carries #pc-site's id so this beats the

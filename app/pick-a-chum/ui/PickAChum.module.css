@@ -1917,13 +1917,17 @@
   .rootAccessible .bubbleUser {
     font-size: 22px;
   }
-  /* Task 174: cap the chat history so it starts BELOW the header. The desktop column pins its content to the
-     bottom (by the dog) and older messages rise toward the nav as the conversation fills -- with a long
-     history the oldest run up over the logo, menu and toolbar. Floor the column top (overriding the
-     dog-tracking inline top) at a header-clearing value; the thread still scrolls within, newest by the dog,
-     so the header strip stays clear. */
+  /* Task 174: move the history down, clear of the header, and frame it. The desktop column pins its content
+     to the bottom (by the dog) and older messages rise toward the nav as the conversation fills, so a floor
+     on the column top is essential -- without it a long history climbs over the header regardless of where
+     the dog sits. Floored at 200px (a clear gap below the ~136px header, not jammed against it), overriding
+     the dog-tracking inline top. The border frames the history as a contained region rather than text
+     floating on the cover; in a scheme the sweep recolours the border to the scheme foreground. */
   .rootAccessible .chatColumn {
-    top: 150px !important;
+    top: 200px !important;
+    border: 2px solid var(--pc-ui-navy);
+    border-radius: 14px;
+    padding: 6px;
   }
 }
 

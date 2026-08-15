@@ -1457,7 +1457,11 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
         {messages.map((msg) =>
           msg.who === 'user' ? (
             <div key={msg.id} className={`${styles.msgRow} ${styles.rowUser}`}>
-              <div className={styles.bubbleUser}>{msg.text}</div>
+              {/* Task 174: data-pc-invert -- the visitor's own bubble is black with white text by design;
+                  the scheme sweep would flatten it to white-on-white against the page cover (it reads as
+                  faint floating text). Invert it to the scheme FOREGROUND fill with background-colour text,
+                  so it stays a solid, distinct, high-contrast block. */}
+              <div className={styles.bubbleUser} data-pc-invert>{msg.text}</div>
             </div>
           ) : (
             <div key={msg.id} className={`${styles.msgRow} ${styles.rowDog} ${msg.avatar ? styles.rowDogAvatar : ''}`}>
