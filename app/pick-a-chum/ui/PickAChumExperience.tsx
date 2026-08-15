@@ -1601,10 +1601,11 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
     <div className={`${styles.root} ${accessible ? styles.rootAccessible : ''}`} role="dialog" aria-label="Pick a Chum" aria-modal="false" data-pc-reach data-pc-flat>
       {/* Task 105: the wash dims but no longer captures clicks (pointer-events via .wash/.root), so the
           page beneath stays usable; it no longer closes on click (X and Escape still close). */}
-      {/* Task 174: data-pc-flat -- in a scheme the sweep would fill this dim layer with an opaque scheme
-          colour and paint it over the page and the chat; the rule in contrast-schemes.css forces it back to
-          transparent (out-specifying the sweep). */}
-      <div className={styles.wash} data-pc-flat />
+      {/* Task 174: in an accessibility mode the wash becomes the opaque PAGE COVER -- the sweep (no
+          data-pc-flat here, unlike root/scrim) fills it, and .rootAccessible insets it below the header, so
+          the page content is covered while the header (logo, menu, toolbar) stays clear above it. In the
+          default view it is the transparent dim, as before. */}
+      <div className={styles.wash} />
 
       {/* Task 118/170: the brand-blue glow, now living in the experience (where the dog's position is known)
           rather than the launcher, so it can FOLLOW her. Decoration only (pointer-events:none in CSS); the

@@ -152,6 +152,20 @@
      underneath is clickable/scrollable. The old click-the-wash-to-close is intentionally gone -- the
      X and Escape still close. */
 }
+/* Task 174: in an accessibility mode the wash is the opaque PAGE COVER. It is inset from the top so the
+   header strip (logo, menu, toolbar) stays clear above it, while the page content below is hidden behind the
+   chat. In a scheme the monochrome sweep fills it (the wash carries no data-pc-flat, unlike root/scrim); the
+   white here is the hide-images-only (colour) case, overridden by the sweep in a scheme. The inset matches
+   the history cap so the two share one below-the-header line. */
+.rootAccessible .wash {
+  background-color: #ffffff;
+  top: 150px;
+}
+@media (max-width: 480px) {
+  .rootAccessible .wash {
+    top: 72px;
+  }
+}
 /* Task 116: the panel and selector CONTAINERS are large, mostly-empty rectangles laid over the page
    (the panel is ~460px wide and nearly full height; on mobile it is ~full width). Task 105 gave the
    CONTAINERS pointer-events: auto, so their transparent areas swallowed every click and scroll over
@@ -1820,14 +1834,9 @@
   flex-direction: column;
   gap: 6px;
   z-index: 4;
-  /* Task 174: a solid backing (like the control panel) so the switch names never read cluttered over the
-     page text behind the non-modal chat; the sweep fills it opaque in a scheme. It is a solid surface now,
-     so (unlike the transparent portrait group) it does not set pointer-events:none. */
-  padding: 8px;
-  background: var(--pc-ui-cream);
-  border: 2px solid var(--pc-ui-navy);
-  border-radius: 12px;
-  box-shadow: var(--pc-shadow);
+  /* Transparent container; the buttons opt pointer events back in. The header stays clear (the history is
+     capped below it) and the page is covered, so no backing panel is needed. */
+  pointer-events: none;
 }
 .recededName {
   pointer-events: auto;
@@ -1889,10 +1898,11 @@
   .recededName:hover { transform: none; }
 }
 
-/* Task 174 (accessibility sizing, desktop): in any accessibility mode the visitor's input and the dogs'
-   response text are enlarged for readability. The input font doubles (18px -> 36px) in a taller, wider bar,
-   and the dialogue grows (16px -> 22px). Desktop only (the >480px column layout); font-size is untouched by
-   the monochrome sweep, so these hold in a scheme. */
+/* Task 174 (accessibility sizing, desktop): in any accessibility mode the visitor's input and BOTH sides'
+   message text are enlarged for readability. The input font doubles (18px -> 36px) in a taller, wider bar,
+   and the message text grows to 22px -- the dogs' dialogue AND the visitor's own bubbles, so they match
+   (16px -> 22px each). Desktop only (the >480px column layout); font-size is untouched by the monochrome
+   sweep, so these hold in a scheme. */
 @media (min-width: 481px) {
   .rootAccessible .input {
     font-size: 36px;
@@ -1903,16 +1913,25 @@
   .rootAccessible .visitorBar .composer {
     height: 120px;
   }
-  .rootAccessible .dialogue {
+  .rootAccessible .dialogue,
+  .rootAccessible .bubbleUser {
     font-size: 22px;
+  }
+  /* Task 174: cap the chat history so it starts BELOW the header. The desktop column pins its content to the
+     bottom (by the dog) and older messages rise toward the nav as the conversation fills -- with a long
+     history the oldest run up over the logo, menu and toolbar. Floor the column top (overriding the
+     dog-tracking inline top) at a header-clearing value; the thread still scrolls within, newest by the dog,
+     so the header strip stays clear. */
+  .rootAccessible .chatColumn {
+    top: 150px !important;
   }
 }
 
 /* Task 174: control panel. In an accessibility mode the icon controls (the crushed close X, the minimise bar
-   the sweep flattens to invisible, the move glyph) are hidden and replaced by a labelled panel -- CLOSE /
-   MINIMISE / MOVE -- stacked in the left gutter below the medallion (receded names sit above). The panel's
-   own SOLID background is the backing, so the labels never read cluttered over the page text behind the
-   non-modal chat; in a scheme the sweep fills it opaque and SchemeStrokes gives it and its buttons an edge. */
+   the sweep flattens to invisible, the move glyph) are hidden and replaced by labelled text buttons -- CLOSE
+   / MINIMISE / MOVE -- stacked in the left gutter below the medallion (receded names sit above). No backing:
+   the page is covered and the header stays clear, so the buttons sit on the covered page; in a scheme the
+   sweep fills the buttons and SchemeStrokes gives them an edge. */
 .rootAccessible .close,
 .rootAccessible .minimise,
 .rootAccessible .dragHandle {
@@ -1925,11 +1944,6 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
-  padding: 8px;
-  background: var(--pc-ui-cream);
-  border: 2px solid var(--pc-ui-navy);
-  border-radius: 12px;
-  box-shadow: var(--pc-shadow);
   z-index: 6;
 }
 .controlBtn {
