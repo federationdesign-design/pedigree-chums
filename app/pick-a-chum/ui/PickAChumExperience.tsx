@@ -1534,17 +1534,24 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
     }
   };
 
+  // Task 174: data-pc-reach brings the chat into the contrast schemes' reach WITHOUT moving it inside
+  // #pc-site. It stays a sibling of #pc-site, so the Boxer's lights-out filter (scoped to #pc-site) still
+  // cannot dim it and the emergency reset stays bright: the exclusion's original reason is preserved, only
+  // the scheme's selector reach is extended (the same opt-in the offer/games overlays use).
   return (
-    <div className={styles.root} role="dialog" aria-label="Pick a Chum" aria-modal="false">
+    <div className={styles.root} role="dialog" aria-label="Pick a Chum" aria-modal="false" data-pc-reach>
       {/* Task 105: the wash dims but no longer captures clicks (pointer-events via .wash/.root), so the
           page beneath stays usable; it no longer closes on click (X and Escape still close). */}
-      <div className={styles.wash} />
+      {/* Task 174: data-pc-flat -- in a scheme the sweep would fill this dim layer with an opaque scheme
+          colour and paint it over the page and the chat; the rule in contrast-schemes.css forces it back to
+          transparent (out-specifying the sweep). */}
+      <div className={styles.wash} data-pc-flat />
 
       {/* Task 118/170: the brand-blue glow, now living in the experience (where the dog's position is known)
           rather than the launcher, so it can FOLLOW her. Decoration only (pointer-events:none in CSS); the
           transform drops the gradient's centre onto her medallion and rides every drag. Hidden while
           minimised via body[data-pc-min] (unchanged). */}
-      <div className={styles.scrim} aria-hidden="true" style={{ transform: `translate3d(${round1(scrimX)}px, ${round1(scrimY)}px, 0)` }} />
+      <div className={styles.scrim} data-pc-flat aria-hidden="true" style={{ transform: `translate3d(${round1(scrimX)}px, ${round1(scrimY)}px, 0)` }} />
 
       {/* Task 164 (brief section 8): a persistent, visible emergency reset in the dog interface, shown
           whenever an effect is live and the chat is open. It sits fixed above the effects (it lives in the
@@ -1610,7 +1617,7 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
                     {/* Task 168: the receded dogs, stacked beside this medallion. */}
                     {recededEl}
                     <button type="button" className={styles.close} aria-label="Close Pick a Chum" onClick={closeChat}>
-                      <img src="/red-icon.svg" alt="" aria-hidden="true" />
+                      <img src="/red-icon.svg" alt="" aria-hidden="true" data-pc-ctl-icon />
                     </button>
                     {/* Task 130: minimise to a corner chip; restore brings the
                         conversation back exactly as it was. */}
@@ -1674,7 +1681,7 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
                     top-right, closing the selector back to the closed launcher (same onClose as the
                     chat medallion X). */}
                 <button type="button" className={styles.selectorClose} aria-label="Close Pick a Chum" onClick={closeChat}>
-                  <img src="/red-icon.svg" alt="" aria-hidden="true" />
+                  <img src="/red-icon.svg" alt="" aria-hidden="true" data-pc-ctl-icon />
                 </button>
               </>
             )}
@@ -1757,7 +1764,7 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
               {/* Task 168: the receded dogs, stacked beside this medallion (mobile). */}
               {recededEl}
               <button type="button" className={styles.close} aria-label="Close Pick a Chum" onClick={closeChat}>
-                <img src="/red-icon.svg" alt="" aria-hidden="true" />
+                <img src="/red-icon.svg" alt="" aria-hidden="true" data-pc-ctl-icon />
               </button>
               {/* Task 130 on mobile: the desktop medallion block is gated on
                   `wide`, so the minimise never rendered here. Same control,

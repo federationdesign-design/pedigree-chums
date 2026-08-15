@@ -40,16 +40,23 @@ export default function SchemeStrokes() {
       if (!active()) return;
       const site = document.getElementById("pc-site");
       if (!site) return;
+      // Task 174: also stroke the body-level overlays in the scheme's reach (the Pick a Chum chat), the same
+      // roots SchemeLayers scans. They sit outside #pc-site, so a #pc-site-only scan left the chat's rounded
+      // containers (bubbles, pills, medallion) with no boundary once the sweep flattened their fill.
+      const roots: Element[] = [site];
+      document.querySelectorAll("[data-pc-reach]").forEach((e) => roots.push(e));
       // Single read pass (getComputedStyle + rect), then a single write pass, so
       // no layout thrash. Only runs while a scheme is active.
       const mark: HTMLElement[] = [];
-      for (const el of Array.from(site.querySelectorAll<HTMLElement>("*"))) {
-        if (el.closest(".pc-nav")) continue; // header chrome already stroked
-        const cs = getComputedStyle(el);
-        if (!rounded(cs)) continue;
-        const r = el.getBoundingClientRect();
-        if (r.width < 4 || r.height < 4) continue;
-        mark.push(el);
+      for (const root of roots) {
+        for (const el of Array.from(root.querySelectorAll<HTMLElement>("*"))) {
+          if (el.closest(".pc-nav")) continue; // header chrome already stroked
+          const cs = getComputedStyle(el);
+          if (!rounded(cs)) continue;
+          const r = el.getBoundingClientRect();
+          if (r.width < 4 || r.height < 4) continue;
+          mark.push(el);
+        }
       }
       mark.forEach((el) => el.setAttribute(MARK, ""));
     };
