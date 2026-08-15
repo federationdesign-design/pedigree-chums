@@ -1751,3 +1751,129 @@
     transform: rotate(var(--arrow-rot, 0deg));
   }
 }
+
+/* ============================================================================
+   TASK 174: hide-images name-swap. With images hidden, every dog PORTRAIT is
+   replaced by the dog's name as text -- the medallion and fan plate, the 64px
+   chip (initials, since no name fits), the receded switch (a stack of named
+   buttons rather than 32-43px circles), and an interjection. Solid colours only
+   (house rules). These are the DEFAULT-view colours (images hidden, no scheme);
+   inside a scheme the monochrome sweep and SchemeStrokes take them over.
+   ========================================================================== */
+
+/* Medallion / fan plate: the name fills the circle the photo used to. box-shadow
+   inset gives the disc an edge with no layout shift (the face is inset:0). */
+.dogFaceNamed {
+  background-color: var(--pc-ui-cream);
+  background-image: none;
+  box-shadow: inset 0 0 0 4px var(--pc-ui-navy);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.dogBtnNamed {
+  background-color: var(--pc-ui-cream);
+  background-image: none;
+  border-color: var(--pc-ui-navy);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.faceName {
+  font-family: var(--font-display, 'Luckiest Guy', cursive);
+  font-size: 19px;
+  line-height: 0.92;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0;
+  color: var(--pc-ui-navy);
+  padding: 3px;
+  overflow: hidden;
+}
+
+/* The 64px chip: initials (BT / BC / L / B); the aria-label carries the full name. */
+.miniFaceNamed {
+  background-color: var(--pc-ui-cream);
+  background-image: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.chipInitials {
+  font-family: var(--font-display, 'Luckiest Guy', cursive);
+  font-size: 44px;
+  line-height: 1;
+  color: var(--pc-ui-navy);
+  text-transform: uppercase;
+}
+
+/* The receded switch as named text buttons (desktop: a column left of the medallion). */
+.recededTextGroup {
+  position: absolute;
+  top: 0;
+  right: calc(100% + 8px);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  z-index: 4;
+  pointer-events: none;
+}
+.recededName {
+  pointer-events: auto;
+  font-family: var(--font-body, sans-serif);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  padding: 6px 10px;
+  border: 2px solid var(--pc-ui-navy);
+  border-radius: 10px;
+  background: var(--pc-ui-cream);
+  color: var(--pc-ui-navy);
+  box-shadow: var(--pc-shadow);
+  cursor: pointer;
+  transition: transform 120ms ease;
+}
+.recededName:hover {
+  transform: translateY(-1px);
+}
+.recededName:focus-visible {
+  outline: 3px solid var(--pc-ui-yellow);
+  outline-offset: 2px;
+}
+
+/* The interjection: a small nameplate instead of the 38px cutting-in face. */
+.interjectName {
+  flex: 0 0 auto;
+  font-family: var(--font-body, sans-serif);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  padding: 4px 8px;
+  border: 2px solid var(--pc-ui-navy);
+  border-radius: 10px;
+  background: var(--pc-ui-cream);
+  color: var(--pc-ui-navy);
+  box-shadow: var(--pc-shadow);
+  margin-top: 2px;
+  white-space: nowrap;
+}
+
+@media (max-width: 480px) {
+  /* The 96px mobile medallion is smaller, and a single-word name (LABRADOR) does not wrap, so the plate
+     text is smaller here to fit the longest name without clipping. */
+  .faceName { font-size: 12px; }
+  .chipInitials { font-size: 26px; }
+  /* Mobile medallion is pinned top-left, so the named switch sits in a wrapped row below it. */
+  .recededTextGroup {
+    top: calc(100% + 8px);
+    right: auto;
+    left: 0;
+    flex-direction: row;
+    flex-wrap: wrap;
+    max-width: 240px;
+  }
+  .recededName:hover { transform: none; }
+}
