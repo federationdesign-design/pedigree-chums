@@ -755,8 +755,19 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
       if (!s || s.protectedState || everProtectedRef.current) return;
       const token = { aborted: false, monologue };
       seqRef.current = token;
+      // Task 174: the route this run belongs to. A beat is a wall-clock setTimeout that fires whatever page
+      // the visitor is on; the pathname-effect abort below is racy (usePathname commits only when the client
+      // navigation settles, which can land AFTER a beat has already fired). Capturing the start route and
+      // re-checking it at fire time is the deterministic stop: a beat scheduled on the old page refuses to
+      // post once the live route (pathnameRef, updated every render) has moved on.
+      const startRoute = pathnameRef.current;
       const play = (i: number) => {
         if (token.aborted || seqRef.current !== token) return;
+        // Task 174: the visitor has left the page this run was speaking about -- drop it (a leave is a stop).
+        if (pathnameRef.current !== startRoute) {
+          seqRef.current = null;
+          return;
+        }
         // Stop in flight if the session has since become protected.
         const sess = sessionRef.current;
         if (!sess || sess.protectedState || everProtectedRef.current) {
@@ -1226,6 +1237,10 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
   // progress on other pages is untouched.
   useEffect(() => {
     if (seqRef.current) abandonSequence();
+    // Task 174: a reply typed over a monologue is parked on the Task 82 type-ahead queue (Task 169 queues
+    // rather than abandons). Leaving the page must drop it too, or it drains later on the wrong page. A
+    // visitor leaving is a stop, queue included.
+    queueRef.current = [];
   }, [pathname, abandonSequence]);
 
   // Task 82: drain the type-ahead queue. When a reply finishes (phase returns to idle) the next
