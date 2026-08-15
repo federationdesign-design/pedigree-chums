@@ -1589,7 +1589,7 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
   // cannot dim it and the emergency reset stays bright: the exclusion's original reason is preserved, only
   // the scheme's selector reach is extended (the same opt-in the offer/games overlays use).
   return (
-    <div className={styles.root} role="dialog" aria-label="Pick a Chum" aria-modal="false" data-pc-reach>
+    <div className={styles.root} role="dialog" aria-label="Pick a Chum" aria-modal="false" data-pc-reach data-pc-flat>
       {/* Task 105: the wash dims but no longer captures clicks (pointer-events via .wash/.root), so the
           page beneath stays usable; it no longer closes on click (X and Escape still close). */}
       {/* Task 174: data-pc-flat -- in a scheme the sweep would fill this dim layer with an opaque scheme
