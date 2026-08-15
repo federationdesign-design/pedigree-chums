@@ -117,13 +117,6 @@ function nameLines(name: string) {
   ));
 }
 
-// Task 174: the initials for the 64px chip, where a name will not fit. One letter per word, so
-// Labrador -> L, Boxer -> B, Border Collie -> BC, Border Terrier -> BT (all four distinct). The button's
-// aria-label still carries the full name, so a screen reader is unaffected.
-function dogInitials(name: string): string {
-  return name.split(/\s+/).filter(Boolean).map((w) => w[0]).join('').toUpperCase();
-}
-
 function dogInfo(dog: Dog): { name: string; image: string } {
   const rec = CHUM_DATA.dogs.find((d) => d.slug === DOG_SLUGS[dog]);
   return { name: rec?.name ?? dog, image: rec ? encodeURI(rec.image) : '' };
@@ -1437,6 +1430,22 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
     </div>
   );
 
+  // Task 174: in an accessibility mode the icon controls (a crushed X, an invisible minimise bar, a move
+  // glyph) are replaced by a labelled control PANEL beside the medallion -- CLOSE / MINIMISE / MOVE. The
+  // panel's own solid background is the backing, so the labels never sit cluttered over page text (the chat
+  // is non-modal). Same handlers as the icons. `withMove` is false on mobile, where the medallion is pinned
+  // and there is no column drag. Rendered only in accessible mode; default keeps the icon controls.
+  const controlPanelEl = (withMove: boolean) =>
+    accessible ? (
+      <div className={styles.controlPanel} role="group" aria-label="Chat controls">
+        <button type="button" className={styles.controlBtn} aria-label="Close Pick a Chum" onClick={closeChat}>CLOSE</button>
+        <button type="button" className={styles.controlBtn} aria-label="Minimise the chat" onClick={minimise}>MINIMISE</button>
+        {withMove && (
+          <button type="button" className={styles.controlBtn} aria-label="Move the chat" title="Move the chat" onPointerDown={startColumnDrag}>MOVE</button>
+        )}
+      </div>
+    ) : null;
+
   // Task 129: the thread and composer render in two homes -- the >480px
   // column-under-the-dog plus fixed visitor bar, or the pre-129 stacked panel
   // at mobile widths -- so both are built once here. Only one home mounts at
@@ -1459,11 +1468,11 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
                   Task 165 EXCEPTION: an interjection (msg.avatar) is a DIFFERENT dog cutting in while the
                   medallion stays the active dog, so it carries a small face to mark the second speaker. */}
               {msg.done && msg.avatar && msg.dog && (
-                // Task 174: the cutting-in dog's face is a 38px circle -- no name fits, so in any accessibility
-                // mode it becomes a small visible nameplate (initials) instead. The bubble's own "[name] says"
-                // still carries it to a screen reader either way. The portrait renders only in the default view.
+                // Task 174: the cutting-in dog's 38px face becomes a small visible nameplate (the full name,
+                // which fits a pill beside the bubble) in any accessibility mode. The bubble's own "[name]
+                // says" still carries it to a screen reader either way. The portrait renders only in default.
                 accessible ? (
-                  <span className={styles.interjectName} aria-hidden="true">{dogInitials(dogInfo(msg.dog).name)}</span>
+                  <span className={styles.interjectName} aria-hidden="true">{dogInfo(msg.dog).name}</span>
                 ) : (
                   <span
                     className={styles.interjectFace}
@@ -1589,7 +1598,7 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
   // cannot dim it and the emergency reset stays bright: the exclusion's original reason is preserved, only
   // the scheme's selector reach is extended (the same opt-in the offer/games overlays use).
   return (
-    <div className={styles.root} role="dialog" aria-label="Pick a Chum" aria-modal="false" data-pc-reach data-pc-flat>
+    <div className={`${styles.root} ${accessible ? styles.rootAccessible : ''}`} role="dialog" aria-label="Pick a Chum" aria-modal="false" data-pc-reach data-pc-flat>
       {/* Task 105: the wash dims but no longer captures clicks (pointer-events via .wash/.root), so the
           page beneath stays usable; it no longer closes on click (X and Escape still close). */}
       {/* Task 174: data-pc-flat -- in a scheme the sweep would fill this dim layer with an opaque scheme
@@ -1670,6 +1679,10 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
                     </div>
                     {/* Task 168: the receded dogs, stacked beside this medallion. */}
                     {recededEl}
+                    {/* Task 174: the accessibility-mode control panel (desktop has MOVE). */}
+                    {controlPanelEl(true)}
+                    {/* Task 174: in an accessibility mode these icon controls are hidden (a crushed X, an
+                        invisible minimise bar) and replaced by the labelled control panel below. */}
                     <button type="button" className={styles.close} aria-label="Close Pick a Chum" onClick={closeChat}>
                       <img src="/red-icon.svg" alt="" aria-hidden="true" data-pc-ctl-icon />
                     </button>
@@ -1786,9 +1799,9 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
               window.setTimeout(() => inputRef.current?.focus(), 60); // Task 82
             }}
           >
-            {/* Task 174: the 64px chip cannot hold a name, so in any accessibility mode it shows the dog's
-                initials (BT, BC, L, B); the aria-label above still carries the full name. */}
-            {accessible && <span className={styles.chipInitials}>{dogInitials(dogInfo(dog).name)}</span>}
+            {/* Task 174: in any accessibility mode the chip shows the dog's full name, wrapped word-per-line
+                and sized down to fit the 64px circle; the aria-label carries it for a screen reader too. */}
+            {accessible && <span className={styles.chipName}>{nameLines(dogInfo(dog).name)}</span>}
           </button>
         </div>
       )}
@@ -1831,6 +1844,8 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
               </div>
               {/* Task 168: the receded dogs, stacked beside this medallion (mobile). */}
               {recededEl}
+              {/* Task 174: the accessibility-mode control panel (mobile has no MOVE -- the medallion is pinned). */}
+              {controlPanelEl(false)}
               <button type="button" className={styles.close} aria-label="Close Pick a Chum" onClick={closeChat}>
                 <img src="/red-icon.svg" alt="" aria-hidden="true" data-pc-ctl-icon />
               </button>

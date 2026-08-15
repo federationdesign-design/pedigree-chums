@@ -1791,7 +1791,8 @@
   overflow: hidden;
 }
 
-/* The 64px chip: initials (BT / BC / L / B); the aria-label carries the full name. */
+/* The minimised chip: the dog's full name, wrapped word-per-line and sized to fit the circle
+   (128px desktop, 64px mobile). */
 .miniFaceNamed {
   background-color: var(--pc-ui-cream);
   background-image: none;
@@ -1799,12 +1800,15 @@
   align-items: center;
   justify-content: center;
 }
-.chipInitials {
+.chipName {
   font-family: var(--font-display, 'Luckiest Guy', cursive);
-  font-size: 44px;
-  line-height: 1;
+  font-size: 20px;
+  line-height: 0.9;
+  text-align: center;
   color: var(--pc-ui-navy);
   text-transform: uppercase;
+  padding: 4px;
+  overflow: hidden;
 }
 
 /* The receded switch as named text buttons (desktop: a column left of the medallion). */
@@ -1816,7 +1820,14 @@
   flex-direction: column;
   gap: 6px;
   z-index: 4;
-  pointer-events: none;
+  /* Task 174: a solid backing (like the control panel) so the switch names never read cluttered over the
+     page text behind the non-modal chat; the sweep fills it opaque in a scheme. It is a solid surface now,
+     so (unlike the transparent portrait group) it does not set pointer-events:none. */
+  padding: 8px;
+  background: var(--pc-ui-cream);
+  border: 2px solid var(--pc-ui-navy);
+  border-radius: 12px;
+  box-shadow: var(--pc-shadow);
 }
 .recededName {
   pointer-events: auto;
@@ -1865,7 +1876,7 @@
   /* The 96px mobile medallion is smaller, and a single-word name (LABRADOR) does not wrap, so the plate
      text is smaller here to fit the longest name without clipping. */
   .faceName { font-size: 12px; }
-  .chipInitials { font-size: 26px; }
+  .chipName { font-size: 10px; }
   /* Mobile medallion is pinned top-left, so the named switch sits in a wrapped row below it. */
   .recededTextGroup {
     top: calc(100% + 8px);
@@ -1876,4 +1887,79 @@
     max-width: 240px;
   }
   .recededName:hover { transform: none; }
+}
+
+/* Task 174 (accessibility sizing, desktop): in any accessibility mode the visitor's input and the dogs'
+   response text are enlarged for readability. The input font doubles (18px -> 36px) in a taller, wider bar,
+   and the dialogue grows (16px -> 22px). Desktop only (the >480px column layout); font-size is untouched by
+   the monochrome sweep, so these hold in a scheme. */
+@media (min-width: 481px) {
+  .rootAccessible .input {
+    font-size: 36px;
+  }
+  .rootAccessible .visitorBar {
+    width: min(720px, calc(100vw - 32px));
+  }
+  .rootAccessible .visitorBar .composer {
+    height: 120px;
+  }
+  .rootAccessible .dialogue {
+    font-size: 22px;
+  }
+}
+
+/* Task 174: control panel. In an accessibility mode the icon controls (the crushed close X, the minimise bar
+   the sweep flattens to invisible, the move glyph) are hidden and replaced by a labelled panel -- CLOSE /
+   MINIMISE / MOVE -- stacked in the left gutter below the medallion (receded names sit above). The panel's
+   own SOLID background is the backing, so the labels never read cluttered over the page text behind the
+   non-modal chat; in a scheme the sweep fills it opaque and SchemeStrokes gives it and its buttons an edge. */
+.rootAccessible .close,
+.rootAccessible .minimise,
+.rootAccessible .dragHandle {
+  display: none;
+}
+.controlPanel {
+  position: absolute;
+  right: calc(100% + 8px);
+  top: calc(100% + 8px);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px;
+  background: var(--pc-ui-cream);
+  border: 2px solid var(--pc-ui-navy);
+  border-radius: 12px;
+  box-shadow: var(--pc-shadow);
+  z-index: 6;
+}
+.controlBtn {
+  font-family: var(--font-body, sans-serif);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  text-align: left;
+  padding: 7px 12px;
+  border: 2px solid var(--pc-ui-navy);
+  border-radius: 8px;
+  background: var(--pc-ui-cream);
+  color: var(--pc-ui-navy);
+  cursor: pointer;
+}
+.controlBtn:focus-visible {
+  outline: 3px solid var(--pc-ui-yellow);
+  outline-offset: 2px;
+}
+
+/* Task 174: on mobile the medallion is pinned top-left, so the desktop right:100%+8 would push the control
+   panel off-screen. Sit it to the RIGHT of the receded names panel, both below the medallion. */
+@media (max-width: 480px) {
+  .controlPanel {
+    right: auto;
+    left: 160px;
+    top: calc(100% + 8px);
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
 }
