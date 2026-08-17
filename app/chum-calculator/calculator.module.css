@@ -550,3 +550,75 @@
   .stepQuestion { font-size: clamp(1.2rem, 5.5vw, 1.6rem); }
   .infoPopup { width: min(280px, 80vw); }
 }
+
+/* ============================================================================
+   Article text toggle (chum-calculator, 17 Aug 2026). Centred toggle as on /home.
+   When on: white H1 + paragraph text on the body gradient goes dark blue, and the
+   navy step card lightens to #eaf4fb (~11:1 with navy, and clearly lighter than
+   the cyan->blue gradient so the card still reads as a container) with its inner
+   text and controls darkened. Gated on :root:not([data-pc-contrast-scheme]) so an
+   accessibility scheme wins. Self-coloured chrome is deliberately left at rest:
+   the green/red stairs + start buttons, the yellow selected option, the info
+   popup and the result rail (image cards, coloured fit chips, yellow flip panel).
+   Selectors are compounded with a local class per the CSS-module build trap. */
+
+/* -- Outside the card (on the gradient): white -> navy. The yellow accents
+      (.titleAccent, .stepDoneTitle) are left as-is: not white, and pre-existing. */
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .title,
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .headerSub,
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .stepDoneSub {
+  color: var(--navy, #0a3a57);
+}
+
+/* -- The step card: navy -> light. The umbrella colour catches any inner text
+      that inherits white; explicit whites/yellows are re-pointed below. -- */
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .stepCard {
+  background: #eaf4fb;
+  color: var(--navy, #0a3a57);
+  border-color: rgba(10, 58, 87, 0.15);
+}
+
+/* White inner text -> navy. */
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .stepQuestion,
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .stepIntro,
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .stepSub,
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .stepCount,
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .stairsPrompt,
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .backBtn {
+  color: var(--navy, #0a3a57);
+}
+/* The back link's hover was white; keep it visible on the light card. */
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .backBtn:hover {
+  color: var(--blue-deep, #0b78bd);
+}
+
+/* Yellow accents drop to ~1.4:1 on the light card -> navy. */
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .cardKicker,
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .stepPct {
+  color: var(--navy, #0a3a57);
+}
+
+/* Progress bar: the translucent-white track vanishes on light; give it a navy
+   tint and a solid navy fill so it stays legible. */
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .stepBar {
+  background: rgba(10, 58, 87, 0.15);
+}
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .stepBarFill {
+  background: var(--navy, #0a3a57);
+}
+
+/* Option buttons: white text on a translucent-white fill both vanish on light.
+   Solid white fill, navy-tint border, navy text. */
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .option {
+  color: var(--navy, #0a3a57);
+  background: #ffffff;
+  border-color: rgba(10, 58, 87, 0.22);
+}
+/* Keep the selected (yellow) option intact: it must beat the .option rule above,
+   which has equal specificity, so it is placed after it. */
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .optionSelected,
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .optionSelected:hover {
+  color: var(--navy, #0a3a57);
+  background: var(--yellow, #ffd23e);
+  border-color: var(--yellow, #ffd23e);
+}
