@@ -296,18 +296,19 @@ body.boxer-wrong-transfer::before {
 
 /* ============================================================================
    /home article text toggle (17 Aug 2026). The ArticleTextToggle in HomeClient sets
-   data-pc-textinvert on the /home <main>; this blackens the white content that reads
-   on the light site gradient below the hero (headings, paragraphs, lists, the product
+   data-pc-textinvert on the /home <main>; this recolours to dark blue the white content
+   that reads on the light site gradient below the hero (headings, paragraphs, lists, the product
    meta), so the off state is the dark WCAG default and white is the opt-in. Global,
    not a module, because the text spans several modules (home, FAQ, HowItPlays);
    [class*=] matches their hashed names. Gated on :root:not([data-pc-contrast-scheme])
    so a contrast scheme wins. Buttons/CTAs, tag pills, bento tile labels, feature-card
    titles, the yellow heading accents and the footer sit on their own colour, panels or
    images and are deliberately left white/yellow (audited on production, 17 Aug 2026).
-   Black (not navy) is used so the recoloured prose clears WCAG 4.5:1 across the whole
-   gradient, including the deepest blue where navy dips to ~3.6:1 and fails AA. This
-   matches the article essay bodies, which set #000000 for the same reason (Steve, 17
-   Aug 2026). */
+   Dark blue (--navy), not black: navy on the fixed gradient measures ~7.6:1 at the cyan
+   end (bottom-left) and falls to ~3.6:1 at the deep-blue end (top-right, #008eff),
+   crossing below WCAG AA (4.5:1) on roughly the deep-blue third of the gradient. That
+   AA failure at the deep end is a deliberate design decision, accepted for the dark-blue
+   look (Steve, 17 Aug 2026; navy chosen over the earlier black). */
 :root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"] :is(
   [class*="searchTitle"],
   [class*="searchSub"],
@@ -319,5 +320,5 @@ body.boxer-wrong-transfer::before {
   [class*="cardsPoint"],
   [class*="heading" i]:not([class*="Yellow"])
 ) {
-  color: #000000;
+  color: var(--navy, #0a3a57);
 }

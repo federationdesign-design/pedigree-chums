@@ -33,7 +33,7 @@ export default function HomeClient() {
           Anchored above the H1 that follows the video grid (Steve, 17 Aug 2026).
           Same control and per-pathname sessionStorage as the essay pages; it hides
           itself in a contrast scheme. Needs the <main> wrapper added in page.tsx. */}
-      <ArticleTextToggle />
+      <ArticleTextToggle centered />
 
       {/* Search hero */}
       <section id="preorder" className={styles.searchHero}>

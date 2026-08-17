@@ -19,6 +19,17 @@
   display: flex;
 }
 
+/* Centred variant (/home): the page has no essay axis to hug, so centre the
+   control in its full-width row. Re-symmetrise the button padding the base rule
+   zeroes on the left, so the icon glyph itself lands on the centre line, not 6px
+   right of it. */
+.wrapCentered {
+  justify-content: center;
+}
+.wrapCentered .toggle {
+  padding: 6px;
+}
+
 /* Icon-only: no pill, no visible label (the name lives on aria-label). padding
    is 0 on the left so the icon's left edge sits on the shared axis, matching the
    headline and first paragraph; the small right/vertical padding only grows the

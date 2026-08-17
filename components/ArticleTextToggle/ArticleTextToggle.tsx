@@ -22,7 +22,10 @@ import styles from "./ArticleTextToggle.module.css";
 
 const keyFor = () => "pc-textinvert:" + window.location.pathname;
 
-export default function ArticleTextToggle() {
+// `centered` centres the control in its full-width row instead of hugging the
+// shared left essay axis. The essays render it prop-less (left-aligned on that
+// axis); /home opts in because it has no essay axis to line up with.
+export default function ArticleTextToggle({ centered = false }: { centered?: boolean }) {
   const ref = useRef<HTMLDivElement>(null);
   const [white, setWhite] = useState(false);
 
@@ -51,7 +54,7 @@ export default function ArticleTextToggle() {
   };
 
   return (
-    <div ref={ref} className={styles.wrap}>
+    <div ref={ref} className={centered ? styles.wrap + " " + styles.wrapCentered : styles.wrap}>
       <button
         type="button"
         className={styles.toggle}
