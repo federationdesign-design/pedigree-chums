@@ -39,6 +39,27 @@
   padding-top: clamp(56px, 7vw, 96px);
 }
 
+/* Scheme stroke. SchemeStrokes marks both this .panel and the .glowLayer child, but
+   the item-6 inset outline never shows on the panel's edge: the fill and a duplicate
+   radius live on .glowLayer (absolute, inset:0), which the sweep turns into an opaque
+   fill painting over the panel's outline (the same fill-over-outline failure as the
+   Bento tiles), and .glowLayer's own outline sits at the bottom of the paint order.
+   Draw a top-layer ring on the panel that paints above the fill and content, tracing
+   the rounded edge. Colour follows the scheme foreground (verified on production,
+   18 Aug 2026). */
+:global(:root[data-pc-contrast-scheme]) .panel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 2px solid #000000;
+  border-radius: 40px;
+  z-index: 50;
+  pointer-events: none;
+}
+:global(:root[data-pc-contrast-scheme="white-on-black"]) .panel::after {
+  border-color: #ffffff;
+}
+
 .pitch {
   position: relative;
   display: grid;
