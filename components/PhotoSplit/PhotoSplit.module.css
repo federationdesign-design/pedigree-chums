@@ -106,6 +106,15 @@
 .contentCol :global(.point) {
   color: #000000;
 }
+/* The /about article text toggle recolours the page's white prose to navy, but this
+   column's body is already compliant black on the gradient (~6.3:1+), so keep it black
+   in both toggle states: navy would only drop it below AA at the deep end, with no
+   reading benefit to changing compliant text. Out-specifies the global toggle recolour
+   in globals.css (Steve, 18 Aug 2026). */
+:global(:root:not([data-pc-contrast-scheme]) main[data-pc-page="about"][data-pc-textinvert="on"]) .contentCol :global(.lead),
+:global(:root:not([data-pc-contrast-scheme]) main[data-pc-page="about"][data-pc-textinvert="on"]) .contentCol :global(.point) {
+  color: #000000;
+}
 
 /* Spaniel (reverse) block: copy bumped ~2pt larger than the shared defaults. */
 .reverse .contentCol h2 {
