@@ -1858,7 +1858,9 @@
 }
 .faceName {
   font-family: var(--font-display, 'Luckiest Guy', cursive);
-  font-size: 19px;
+  /* Task 174: the medallion now shows a SHORT single-word name (FAN_SHORT_NAME), so it can be larger than the
+     old wrapped full name. 26px on the 128px desktop medallion (mobile drops to 18px on the 96px one). */
+  font-size: 26px;
   line-height: 0.92;
   text-align: center;
   text-transform: uppercase;
@@ -1959,7 +1961,7 @@
 @media (max-width: 480px) {
   /* The 96px mobile medallion is smaller, and a single-word name (LABRADOR) does not wrap, so the plate
      text is smaller here to fit the longest name without clipping. */
-  .faceName { font-size: 12px; }
+  .faceName { font-size: 16px; }
   .chipName { font-size: 10px; }
   /* Task 174 (mobile space + right align): the receded switch and the controls now live at PANEL level (not
      on the medallion), so they are plain flex rows spanning the panel width. RIGHT-align their buttons. The

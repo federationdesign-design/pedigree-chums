@@ -1718,7 +1718,7 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
                       onPointerDown={startPortrait}
                       onAnimationEnd={() => setRoll(false)}
                     >
-                      {accessible && <span className={styles.faceName}>{nameLines(dogInfo(dog).name)}</span>}
+                      {accessible && <span className={styles.faceName}>{FAN_SHORT_NAME[dog]}</span>}
                     </div>
                     {/* Task 168: the receded dogs, stacked beside this medallion. */}
                     {recededEl}
@@ -1890,7 +1890,7 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
                 onPointerDown={startPortrait}
                 onAnimationEnd={() => setRoll(false)}
               >
-                {accessible && <span className={styles.faceName}>{nameLines(dogInfo(dog).name)}</span>}
+                {accessible && <span className={styles.faceName}>{FAN_SHORT_NAME[dog]}</span>}
               </div>
               {/* Task 168: the receded dogs, beside this medallion (mobile). Default (portrait) form only --
                   Task 174 moves the accessibility NAME buttons out to panel level (below) so they right-align
