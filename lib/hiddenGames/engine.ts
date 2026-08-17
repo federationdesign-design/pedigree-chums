@@ -123,8 +123,11 @@ export function createEngine(deps: EngineDeps): HiddenGamesEngine {
   let storageBlocked = false;
 
   function toState(record: HiddenGamesRecord): CounterState {
-    const count = record.count;
-    const total = REGISTRY.games.length;
+    const total = REGISTRY.target;
+    // Cap the visible count at the target: a find beyond the target is still
+    // recorded (record.count can exceed it), but the counter must not read past
+    // TARGET/TARGET, so an 11th find stays 10/10.
+    const count = Math.min(record.count, total);
     return {
       count,
       total,
@@ -134,7 +137,7 @@ export function createEngine(deps: EngineDeps): HiddenGamesEngine {
       render: view.render,
       storageBlocked,
       introSeen: record.intro_seen,
-      completed: total > 0 && count === total,
+      completed: total > 0 && record.count >= total,
       completionSeen: record.completion_seen,
       preludeSeen: record.prelude_seen,
     };
@@ -206,6 +209,10 @@ export function createEngine(deps: EngineDeps): HiddenGamesEngine {
       deps.track?.({ name: HG_EVENTS.duplicate, params: { game_id: id } });
       return outcome;
     }
+    // Whether the set was already complete before this find. A find that lands
+    // on an already-completed record (the 11th, once the target is met) must be
+    // inert: no completion event, no discovery.
+    const wasCompleted = snapshot.completed;
     record = next;
     if (!safeSet(serializeRecord(record))) {
       // The find is kept in memory so play is unaffected, but it could not be
@@ -219,12 +226,15 @@ export function createEngine(deps: EngineDeps): HiddenGamesEngine {
     emit();
     deps.track?.({ name: HG_EVENTS.award, params: { game_id: id } });
     if (snapshot.completed) {
-      // The final find shows the completion card; no discovery toast (C02).
-      deps.track?.({ name: HG_EVENTS.completion });
+      // The find that reaches the target shows the completion card; no discovery
+      // toast (C02). Fire completion once, only on that transition: a further
+      // find beyond the target is inert.
+      if (!wasCompleted) deps.track?.({ name: HG_EVENTS.completion });
     } else {
       // A non-final award: notify the discovery toast with the remaining count,
-      // derived from the registry so it stays correct as games are added (C02).
-      emitDiscovery(REGISTRY.games.length - record.count);
+      // measured against the fixed target (not the growing games list) so it
+      // reads "N more to find" toward completion (C02).
+      emitDiscovery(REGISTRY.target - record.count);
     }
     return outcome;
   }

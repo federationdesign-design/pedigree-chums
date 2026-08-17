@@ -14,7 +14,7 @@ import {
   applyReport,
 } from "../../lib/hiddenGames/record.ts";
 import { createEngine } from "../../lib/hiddenGames/engine.ts";
-import { STORAGE_KEY, GAME_IDS } from "../../lib/hiddenGames/registry.ts";
+import { STORAGE_KEY, GAME_IDS, TARGET } from "../../lib/hiddenGames/registry.ts";
 import {
   CAMPAIGN_INTRO,
   CAMPAIGN_INTRO_EMPHASIS,
@@ -121,16 +121,22 @@ test("HG-INTRO-04 a refused intro write does not throw and does not raise storag
   );
 });
 
-test("HG-COMPLETE-01 completion is derived: false until the LAST of the GAME_IDS is found", () => {
-  // Task 165: driven off GAME_IDS, so "complete" is the final find whatever the campaign size (was 2/2).
+test("HG-COMPLETE-01 completion is derived at the fixed target, and finds beyond it are inert", () => {
+  // The target is fixed (TARGET) and decoupled from the growing games list, so
+  // "complete" is the TARGET-th find, not the last GAME_ID. The visible count
+  // never passes TARGET/TARGET, and a find beyond the target neither moves the
+  // count nor un-completes. Relies on GAME_IDS being longer than TARGET.
   const store = makeStore();
   const engine = makeEngine(store);
   assert.equal(engine.getState().completed, false);
   GAME_IDS.forEach((id, i) => {
     engine.reportHiddenGame(id);
-    assert.equal(engine.getState().count, i + 1);
-    assert.equal(engine.getState().completed, i === GAME_IDS.length - 1);
+    const found = i + 1;
+    assert.equal(engine.getState().count, Math.min(found, TARGET));
+    assert.equal(engine.getState().completed, found >= TARGET);
   });
+  assert.equal(engine.getState().count, TARGET, "count stays at the target after every game is found");
+  assert.equal(engine.getState().completed, true);
 });
 
 test("HG-COMPLETE-02 markCompletionSeen sets the flag, persists it, and is idempotent", () => {

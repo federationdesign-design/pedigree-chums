@@ -11,6 +11,7 @@ import {
   REGISTRY,
   GAME_IDS,
   TOTAL,
+  TARGET,
   RECORD_SCHEMA,
   STORAGE_KEY,
   EXPIRY_DAYS,
@@ -45,6 +46,15 @@ test("HG-REG-03 the total is derived from games.length and is not a stored field
     false,
     "REGISTRY must not carry a stored total"
   );
+});
+
+test("HG-REG-06 the completion target is a fixed, stored field of 10, below the games total", () => {
+  assert.equal(REGISTRY.target, 10);
+  assert.equal(TARGET, REGISTRY.target);
+  assert.equal(TARGET, 10);
+  // Fixed and decoupled from the list: there are already more games than the
+  // target, and the list keeps growing while the target stays put.
+  assert.ok(TOTAL > TARGET, "there are more games than the target");
 });
 
 test("HG-REG-04 the storage key is version-keyed", () => {

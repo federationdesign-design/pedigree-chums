@@ -12,7 +12,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { REGISTRY, TOTAL } from "../../lib/hiddenGames/registry.ts";
+import { REGISTRY, TARGET } from "../../lib/hiddenGames/registry.ts";
 import { createEngine } from "../../lib/hiddenGames/engine.ts";
 
 const NOW = Date.parse("2026-07-29T12:00:00Z");
@@ -45,7 +45,7 @@ test("HG-G01-03 the first G01 report awards once (what a first pit pointer trigg
   const engine = makeEngine();
   assert.equal(engine.reportHiddenGame("G01"), "awarded");
   assert.equal(engine.getState().count, 1);
-  assert.equal(engine.getState().label, `1/${TOTAL} games found`); // Task 165: total is live, was hardcoded 2
+  assert.equal(engine.getState().label, `1/${TARGET} games found`); // total is the fixed target (10), not games.length
 });
 
 test("HG-G01-04 further G01 reports dedup, so repeated pit pointers never double-count", () => {
