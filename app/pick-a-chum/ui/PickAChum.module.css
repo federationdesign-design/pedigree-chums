@@ -165,6 +165,18 @@
 .rootAccessible .scrim {
   display: none;
 }
+
+/* Task 174: the dog's reply bubble must stay a BUBBLE in an accessibility mode. The visitor's bubble carries
+   data-pc-invert so it survives as a solid inverted block; the dog bubbles had no such treatment, so in a
+   scheme the sweep flattened their per-dog colour fill to the scheme background with no border -- a white
+   bubble on the white page, invisible. A border keeps the outline: the sweep leaves border WIDTH alone and
+   only recolours it, so in a scheme this reads as a scheme-foreground outline around a scheme-background
+   fill (an OUTLINED bubble), while the inverted visitor bubble is a FILLED block -- the two sides stay
+   distinguishable by filled-vs-outlined even though the four per-dog colours collapse to one in a scheme.
+   In hide-images (colour) mode the fill is kept and the border simply frames it. Applies at every width. */
+.rootAccessible .bubbleDog {
+  border: 2px solid var(--pc-ui-navy);
+}
 /* Task 116: the panel and selector CONTAINERS are large, mostly-empty rectangles laid over the page
    (the panel is ~460px wide and nearly full height; on mobile it is ~full width). Task 105 gave the
    CONTAINERS pointer-events: auto, so their transparent areas swallowed every click and scroll over

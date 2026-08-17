@@ -1630,8 +1630,11 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
       )}
 
       {(phase === 'selecting' || (wide && !minimised)) && (
-        <div className={styles.selectorWrap}>
-          <div className={`${styles.selector} ${docked && phase !== 'selecting' ? styles.selectorDocked : ''}`}>
+        <div className={styles.selectorWrap} data-pc-flat>
+          {/* Task 174: the selector containers carry no fill of their own; as data-pc-reach descendants the
+              scheme sweep would fill them (a 440px scheme-coloured block blanking the page behind the fan),
+              the same fault the wash had. data-pc-flat forces them transparent, like root/wash. */}
+          <div className={`${styles.selector} ${docked && phase !== 'selecting' ? styles.selectorDocked : ''}`} data-pc-flat>
             {/* Task 174: the yellow connector wedges are a colour cue linking the centre icon to each dog.
                 In any accessibility mode the fan is name plates, not portraits, and the chat is a body-level
                 overlay the scheme sweep cannot reach, so a bare yellow line would survive uncrushed. Drop
@@ -1795,7 +1798,10 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
           either -- the chip is a face, the name shows only in the active chat.
           The scrim and the offer card hide via body[data-pc-min] as before. */}
       {phase !== 'selecting' && minimised && !logoHidden && (
-        <div className={styles.miniDock}>
+        <div className={styles.miniDock} data-pc-flat>
+          {/* Task 174: the miniDock has no fill of its own; the scheme sweep would fill the 128px square behind
+              the round chip (blanking the page), the same fault as the wash. data-pc-flat keeps it transparent;
+              the round .miniFace name plate keeps its own cream fill. */}
           <button
             type="button"
             className={`${styles.miniFace} ${accessible ? styles.miniFaceNamed : ''} ${(auto && !revealedRef.current) || spoke ? styles.miniAuto : ''}`}
