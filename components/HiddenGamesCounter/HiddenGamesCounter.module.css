@@ -731,7 +731,7 @@
   @-moz-document url-prefix() {
     .counter.counter,
     .reveal.reveal {
-      top: calc(clamp(76px, 12vh, 112px) + env(safe-area-inset-top, 0px) - 19px); /* Firefox: -31px + 12px down */
+      top: calc(clamp(76px, 12vh, 112px) + env(safe-area-inset-top, 0px) - 9px); /* Firefox: was -19px; down another 10px */
     }
   }
 }
