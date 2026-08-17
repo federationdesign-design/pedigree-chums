@@ -1495,9 +1495,13 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
                 )}
                 {msg.typing ? (
                   <div className={styles.typingDots} aria-hidden="true">
-                    <span />
-                    <span />
-                    <span />
+                    {/* Task 174: the dots are blue; in a scheme the sweep would repaint them the scheme
+                        background (invisible against the bubble). data-pc-invert gives each dot the scheme
+                        FOREGROUND fill instead, so they stay visible. It sets only background-color, leaving
+                        the bounce (transform/opacity) and the reduced-motion static fallback intact. */}
+                    <span data-pc-invert />
+                    <span data-pc-invert />
+                    <span data-pc-invert />
                   </div>
                 ) : (
                   // aria-hidden while still typing so the character stream is
