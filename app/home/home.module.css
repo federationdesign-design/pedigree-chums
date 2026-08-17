@@ -598,7 +598,8 @@
   line-height: 1;
 }
 
-/* Wider column holds the main video with plinth.mp4 stacked directly beneath. */
+/* Wider column holds the main 16:9 video with the two portrait videos stacked
+   directly beneath. */
 .videoStack {
   display: flex;
   flex-direction: column;
@@ -615,20 +616,37 @@
   box-shadow: 0 8px 40px rgba(0,0,0,0.3);
 }
 
-.plinthVideo {
-  display: block;
+/* Two portrait videos beneath the 16:9 clip, replacing the old plinth.mp4. They
+   carry sound so they cannot autoplay: these use the standard Vimeo player (poster
+   thumbnail, controls, click to play), not the muted background embed above. Equal
+   columns so the two portraits sit evenly side by side. */
+.portraitPair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(16px, 2vw, 24px);
   width: 100%;
+}
+.portraitCol {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 9 / 16;
   border-radius: 20px;
   overflow: hidden;
   box-shadow: 0 8px 40px rgba(0,0,0,0.3);
 }
+.portraitFrame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
 
-/* On very wide / full-screen viewports the plinth clip makes the video column
-   much taller than the text column, so hide it past this width. Adjust the
-   2000px value to taste. */
-@media (min-width: 2000px) {
-  .plinthVideo {
-    display: none;
+/* Mobile: stack the two portraits vertically, each full width (owner request),
+   rather than sitting side by side. */
+@media (max-width: 768px) {
+  .portraitPair {
+    grid-template-columns: 1fr;
   }
 }
 

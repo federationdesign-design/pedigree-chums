@@ -37,15 +37,30 @@ export default function VideoSection() {
           className={styles.videoFrame}
         />
       </div>
-      <video
-        className={styles.plinthVideo}
-        src="/plinth.mp4"
-        autoPlay
-        loop
-        muted
-        playsInline
-        preload="metadata"
-      />
+      {/* Two portrait clips replacing the old plinth.mp4. They have sound, so they
+          cannot autoplay: the standard Vimeo player shows each video's Vimeo
+          thumbnail, with controls and click to play (sound on), unlike the muted
+          background embed above. */}
+      <div className={styles.portraitPair}>
+        <div className={styles.portraitCol}>
+          <iframe
+            src="https://player.vimeo.com/video/1218972477?title=0&byline=0&portrait=0&dnt=1"
+            title="Pedigree Chums"
+            allow="fullscreen; picture-in-picture"
+            frameBorder="0"
+            className={styles.portraitFrame}
+          />
+        </div>
+        <div className={styles.portraitCol}>
+          <iframe
+            src="https://player.vimeo.com/video/1218974120?title=0&byline=0&portrait=0&dnt=1"
+            title="Pedigree Chums"
+            allow="fullscreen; picture-in-picture"
+            frameBorder="0"
+            className={styles.portraitFrame}
+          />
+        </div>
+      </div>
     </div>
   );
 }
