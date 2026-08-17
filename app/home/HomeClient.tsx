@@ -6,6 +6,7 @@ import AnubisFeature from "../../components/AnubisFeature/AnubisFeature";
    same one (owner instruction, 5 August). The markup and behaviour are
    unchanged: they were moved whole, not rewritten. */
 import ChumSearch from "../../components/ChumSearch/ChumSearch";
+import ArticleTextToggle from "../../components/ArticleTextToggle/ArticleTextToggle";
 import styles from "./home.module.css";
 
 export default function HomeClient() {
@@ -27,6 +28,12 @@ export default function HomeClient() {
         <VideoGrid />
         <AnubisFeature />
       </div>
+
+      {/* Article text toggle: switches the white content below the hero to navy.
+          Anchored above the H1 that follows the video grid (Steve, 17 Aug 2026).
+          Same control and per-pathname sessionStorage as the essay pages; it hides
+          itself in a contrast scheme. Needs the <main> wrapper added in page.tsx. */}
+      <ArticleTextToggle />
 
       {/* Search hero */}
       <section id="preorder" className={styles.searchHero}>

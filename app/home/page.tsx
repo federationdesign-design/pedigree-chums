@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 
 export default function HomePage() {
   return (
-    <div className={styles.page}>
+    <main className={styles.page}>
       <Nav />
       <HomeClient />
 
@@ -47,6 +47,6 @@ export default function HomePage() {
       <HowItPlays />
 
       <Footer />
-    </div>
+    </main>
   );
 }
