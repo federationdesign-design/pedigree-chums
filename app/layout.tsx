@@ -167,8 +167,10 @@ export default function RootLayout({
         {/* data-pc-reach brings these body-level overlays into the scheme's reach
             (they sit outside #pc-site): the sweep flattens their colour and the
             crush greyscales their icons. display:contents keeps layout unchanged. */}
-        {/* PickAChumLauncher marks only its launcher button internally (the chat
-            experience must not be swept), so it is not wrapped here. */}
+        {/* PickAChumLauncher marks its own reach internally: the launcher button and
+            (Task 174) the open chat experience each carry data-pc-reach, so the chat is
+            now inside the schemes while still a sibling of #pc-site (the Boxer lights-out
+            filter, scoped to #pc-site, therefore still cannot dim it). Not wrapped here. */}
         <PickAChumLauncher />
         <div data-pc-reach style={{ display: "contents" }}><OfferLauncher /></div>
         {/* Hidden Games Stage 1 counter. Owner-approved layout mount, 28 Jul

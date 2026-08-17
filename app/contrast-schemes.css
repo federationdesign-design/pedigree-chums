@@ -123,6 +123,18 @@
   filter: none !important;
   -webkit-filter: none !important;
 }
+/* Task 174: the Pick a Chum control icons (the red close X, an <img>) are chrome, not content -- the media
+   crush above would grey them to a dim wash on the scheme background (near-invisible in white-on-black).
+   Recolour them to the scheme FOREGROUND instead: brightness(0) flattens the art to black for black-on-white,
+   then invert(1) lifts it to white for white-on-black. (1,3,0) beats the media crush's (1,1,1). */
+:root[data-pc-contrast-scheme="black-on-white"] :is(#pc-site, [data-pc-reach]) [data-pc-ctl-icon] {
+  filter: brightness(0) !important;
+  -webkit-filter: brightness(0) !important;
+}
+:root[data-pc-contrast-scheme="white-on-black"] :is(#pc-site, [data-pc-reach]) [data-pc-ctl-icon] {
+  filter: brightness(0) invert(1) !important;
+  -webkit-filter: brightness(0) invert(1) !important;
+}
 
 /* RULE A (SchemeLayers marks data-pc-cover): a pure absolute/fixed overlay that
    covers a media element goes transparent so the crushed media shows through.
@@ -138,6 +150,29 @@
 :root[data-pc-contrast-scheme] :is(#pc-site, [data-pc-reach]) [data-pc-crushbg] {
   filter: grayscale(1) contrast(1.1) brightness(0.55) !important;
   -webkit-filter: grayscale(1) contrast(1.1) brightness(0.55) !important;
+}
+/* Task 174: the Pick a Chum full-bleed layers that the sweep would fill with an opaque scheme colour and
+   paint over the page and the chat carry data-pc-flat: the fixed inset:0 .root itself (a reach ROOT -- else
+   its white fill covers the whole page including the nav and toolbar: a trap), and the decorative .wash dim
+   and 2800px .scrim glow (its descendants). Force them transparent. The first selector matches descendants,
+   the second the reach root itself (which is not its own descendant); both are (1,3,0) -- the :is() carries
+   #pc-site's id and the attribute adds a class -- so they out-specify the sweep and win despite !important. */
+:root[data-pc-contrast-scheme] :is(#pc-site, [data-pc-reach]) [data-pc-flat],
+:root[data-pc-contrast-scheme] :is(#pc-site, [data-pc-reach])[data-pc-flat] {
+  background-color: transparent !important;
+  background-image: none !important;
+}
+/* Task 174: data-pc-invert (the Pick a Chum visitor's own message bubble). The sweep would flatten it to the
+   scheme background with foreground text -- white-on-white against the white page cover, so it reads as faint
+   floating text. Invert it instead: the scheme FOREGROUND as fill and the background as text, so the
+   visitor's messages stay a solid, distinct, high-contrast block. (1,3,0) beats the sweep. */
+:root[data-pc-contrast-scheme="black-on-white"] :is(#pc-site, [data-pc-reach]) [data-pc-invert] {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+}
+:root[data-pc-contrast-scheme="white-on-black"] :is(#pc-site, [data-pc-reach]) [data-pc-invert] {
+  background-color: #ffffff !important;
+  color: #000000 !important;
 }
 /* Text sitting directly over crushed media (the video lightbox stage) goes white,
    the same move the hero titles took: the 0.55 crush keeps every pixel behind it
@@ -356,11 +391,14 @@
    surround and reads at ~21:1, whatever the control did itself. It also wins
    over the sweep's box-shadow:none by specificity, so nothing can suppress it.
    ========================================================================== */
-:root[data-pc-contrast-scheme="black-on-white"] #pc-site :focus-visible {
+/* Task 174: extended to [data-pc-reach] so the Pick a Chum chat (a body-level overlay in the scheme's reach,
+   outside #pc-site) gets the same visible focus in a scheme -- a keyboard user in the chat would otherwise
+   have no focus indicator once the sweep flattens the control's own ring. */
+:root[data-pc-contrast-scheme="black-on-white"] :is(#pc-site, [data-pc-reach]) :focus-visible {
   outline: 3px solid #000000 !important;
   outline-offset: 3px !important;
 }
-:root[data-pc-contrast-scheme="white-on-black"] #pc-site :focus-visible {
+:root[data-pc-contrast-scheme="white-on-black"] :is(#pc-site, [data-pc-reach]) :focus-visible {
   outline: 3px solid #ffffff !important;
   outline-offset: 3px !important;
 }
@@ -371,10 +409,11 @@
    Give button-like controls a foreground edge that survives, as an inset ring
    (no layout shift, unlike a border). Applies to any button built later too.
    ========================================================================== */
-:root[data-pc-contrast-scheme="black-on-white"] #pc-site :is(button, [role="button"], [class*="btn"], [class*="Btn"], [class*="cta"], [class*="Cta"]) {
+/* Task 174: extended to [data-pc-reach] so the chat's buttons keep a foreground edge in a scheme too. */
+:root[data-pc-contrast-scheme="black-on-white"] :is(#pc-site, [data-pc-reach]) :is(button, [role="button"], [class*="btn"], [class*="Btn"], [class*="cta"], [class*="Cta"]) {
   box-shadow: inset 0 0 0 2px #000000 !important;
 }
-:root[data-pc-contrast-scheme="white-on-black"] #pc-site :is(button, [role="button"], [class*="btn"], [class*="Btn"], [class*="cta"], [class*="Cta"]) {
+:root[data-pc-contrast-scheme="white-on-black"] :is(#pc-site, [data-pc-reach]) :is(button, [role="button"], [class*="btn"], [class*="Btn"], [class*="cta"], [class*="Cta"]) {
   box-shadow: inset 0 0 0 2px #ffffff !important;
 }
 /* The toolbar cells are a segmented control: only the container box carries a

@@ -32,6 +32,10 @@ import { breeds } from '../../../data/breeds';
 import { skipTheatre, buildTypingPlan, TYPING_PROFILES, TypingPlan } from '../lib/theatre';
 import { emitTurn } from '../lib/turn-tap';
 import { CHAT_KEY, PROTECTED_FLAG } from './pcKeys';
+// Task 174: the chat is now inside the contrast schemes (data-pc-reach on the root). Scheme and hide-images
+// are read here, live, so the portraits can be swapped for the dog's name as text in any accessibility mode
+// -- the generic HideImages overlay is scoped to #pc-site and cannot reach this body-level overlay.
+import { getScheme, getHideImages, CONTRAST_EVENT } from '../../../lib/contrastScheme';
 
 type Phase = 'selecting' | 'idle' | 'transferring' | 'ending';
 
@@ -266,7 +270,7 @@ function collieChumLines(): string[] {
   });
 }
 
-export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, terrierSay }: { onClose: () => void; autoAppear?: AutoAppear; pickupRoute?: string | null; terrierSay?: string | null }) {
+export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, terrierSay, logoHidden = false }: { onClose: () => void; autoAppear?: AutoAppear; pickupRoute?: string | null; terrierSay?: string | null; logoHidden?: boolean }) {
   // Task 140: the page the visitor is on, carried into the engine as session state (like lastAction)
   // so "what is this page" answers with that page's bio. Always a string on a real route.
   const pathname = usePathname();
@@ -315,6 +319,16 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
         : []
   );
   const [announce, setAnnounce] = useState(''); // aria-live: whole messages, once
+  // Task 174: ANY accessibility mode -- a contrast scheme OR hide-images -- swaps every dog portrait for the
+  // dog's name as text; only the default view shows the photo. Read live off the <html> attributes the
+  // toolbar sets, kept current via the same CONTRAST_EVENT the Nav listens on.
+  const [accessible, setAccessible] = useState(false);
+  useEffect(() => {
+    const read = () => setAccessible(getScheme() !== null || getHideImages());
+    read();
+    window.addEventListener(CONTRAST_EVENT, read);
+    return () => window.removeEventListener(CONTRAST_EVENT, read);
+  }, []);
   const inputRef = useRef<HTMLInputElement | null>(null);
   // Task 82: messages the visitor sent while a reply was still performing. The input is never
   // disabled, so they can type ahead; each queued line is processed when the dog finishes, in order.
@@ -755,8 +769,19 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
       if (!s || s.protectedState || everProtectedRef.current) return;
       const token = { aborted: false, monologue };
       seqRef.current = token;
+      // Task 174: the route this run belongs to. A beat is a wall-clock setTimeout that fires whatever page
+      // the visitor is on; the pathname-effect abort below is racy (usePathname commits only when the client
+      // navigation settles, which can land AFTER a beat has already fired). Capturing the start route and
+      // re-checking it at fire time is the deterministic stop: a beat scheduled on the old page refuses to
+      // post once the live route (pathnameRef, updated every render) has moved on.
+      const startRoute = pathnameRef.current;
       const play = (i: number) => {
         if (token.aborted || seqRef.current !== token) return;
+        // Task 174: the visitor has left the page this run was speaking about -- drop it (a leave is a stop).
+        if (pathnameRef.current !== startRoute) {
+          seqRef.current = null;
+          return;
+        }
         // Stop in flight if the session has since become protected.
         const sess = sessionRef.current;
         if (!sess || sess.protectedState || everProtectedRef.current) {
@@ -1226,6 +1251,10 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
   // progress on other pages is untouched.
   useEffect(() => {
     if (seqRef.current) abandonSequence();
+    // Task 174: a reply typed over a monologue is parked on the Task 82 type-ahead queue (Task 169 queues
+    // rather than abandons). Leaving the page must drop it too, or it drains later on the wrong page. A
+    // visitor leaving is a stop, queue included.
+    queueRef.current = [];
   }, [pathname, abandonSequence]);
 
   // Task 82: drain the type-ahead queue. When a reply finishes (phase returns to idle) the next
@@ -1358,7 +1387,27 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
   // sits. Each is a real <button> that switches to that dog (a fresh conversation); the green arrow points
   // at the active dog. `recededOn` is the pointed-at dog (keeps colour + a bright arrow); `recededOff` is
   // the rest while one is pointed at (their arrows fade). Close X and minimise sit above these (z-index).
-  const recededEl = (
+  // Task 174: with images hidden a name will not fit a 33.5% circle (43px desktop, 32px mobile), so the arc
+  // of portrait circles becomes a small stack of TEXT buttons carrying each dog's name. Same buttons, same
+  // aria-label and switch behaviour, same yellow focus ring; the greyscale-at-rest face and the green
+  // "which one" arrow are dropped (moot without a portrait). The portrait form is unchanged otherwise.
+  const recededEl = accessible ? (
+    <div className={styles.recededTextGroup}>
+      {recededDogs.map((d) => (
+        <button
+          key={d}
+          type="button"
+          data-receded={d}
+          className={styles.recededName}
+          aria-label={`Switch to the ${dogInfo(d).name}`}
+          title={`Switch to the ${dogInfo(d).name}`}
+          onClick={() => pressReceded(d)}
+        >
+          {dogInfo(d).name}
+        </button>
+      ))}
+    </div>
+  ) : (
     <div className={styles.recededGroup}>
       {recededDogs.map((d, i) => (
         <button
@@ -1371,13 +1420,31 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
           onClick={() => pressReceded(d)}
         >
           {/* Task 168: the portrait is its OWN layer so the greyscale-at-rest filter greys the dog but NOT
-              the green arrow (a sibling). The active dog is colour; an unselected dog is grey until hovered. */}
+              the green arrow (a sibling). The active dog is colour; an unselected dog is grey until hovered.
+              Task 174: this portrait branch renders only in the default view -- any accessibility mode uses the
+              named text buttons above -- so no scheme ever reaches it and it needs no crush marker. */}
           <span className={styles.recededFace} style={{ backgroundImage: `url("${PROFILE_IMG[d]}")` }} aria-hidden="true" />
           <span className={styles.recededArrow} aria-hidden="true" />
         </button>
       ))}
     </div>
   );
+
+  // Task 174: in an accessibility mode the icon controls (a crushed X, an invisible minimise bar, a move
+  // glyph) are replaced by a labelled control PANEL beside the medallion -- CLOSE / MINIMISE / MOVE. The
+  // panel's own solid background is the backing, so the labels never sit cluttered over page text (the chat
+  // is non-modal). Same handlers as the icons. `withMove` is false on mobile, where the medallion is pinned
+  // and there is no column drag. Rendered only in accessible mode; default keeps the icon controls.
+  const controlPanelEl = (withMove: boolean) =>
+    accessible ? (
+      <div className={styles.controlPanel} role="group" aria-label="Chat controls">
+        <button type="button" className={styles.controlBtn} aria-label="Close Pick a Chum" onClick={closeChat}>CLOSE</button>
+        <button type="button" className={styles.controlBtn} aria-label="Minimise the chat" onClick={minimise}>MINIMISE</button>
+        {withMove && (
+          <button type="button" className={styles.controlBtn} aria-label="Move the chat" title="Move the chat" onPointerDown={startColumnDrag}>MOVE</button>
+        )}
+      </div>
+    ) : null;
 
   // Task 129: the thread and composer render in two homes -- the >480px
   // column-under-the-dog plus fixed visitor bar, or the pre-129 stacked panel
@@ -1390,7 +1457,11 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
         {messages.map((msg) =>
           msg.who === 'user' ? (
             <div key={msg.id} className={`${styles.msgRow} ${styles.rowUser}`}>
-              <div className={styles.bubbleUser}>{msg.text}</div>
+              {/* Task 174: data-pc-invert -- the visitor's own bubble is black with white text by design;
+                  the scheme sweep would flatten it to white-on-white against the page cover (it reads as
+                  faint floating text). Invert it to the scheme FOREGROUND fill with background-colour text,
+                  so it stays a solid, distinct, high-contrast block. */}
+              <div className={styles.bubbleUser} data-pc-invert>{msg.text}</div>
             </div>
           ) : (
             <div key={msg.id} className={`${styles.msgRow} ${styles.rowDog} ${msg.avatar ? styles.rowDogAvatar : ''}`}>
@@ -1401,11 +1472,18 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
                   Task 165 EXCEPTION: an interjection (msg.avatar) is a DIFFERENT dog cutting in while the
                   medallion stays the active dog, so it carries a small face to mark the second speaker. */}
               {msg.done && msg.avatar && msg.dog && (
-                <span
-                  className={styles.interjectFace}
-                  style={{ backgroundImage: `url("${portraitSrc(msg.dog, 0)}")` }}
-                  aria-hidden="true"
-                />
+                // Task 174: the cutting-in dog's 38px face becomes a small visible nameplate (the full name,
+                // which fits a pill beside the bubble) in any accessibility mode. The bubble's own "[name]
+                // says" still carries it to a screen reader either way. The portrait renders only in default.
+                accessible ? (
+                  <span className={styles.interjectName} aria-hidden="true">{dogInfo(msg.dog).name}</span>
+                ) : (
+                  <span
+                    className={styles.interjectFace}
+                    style={{ backgroundImage: `url("${portraitSrc(msg.dog, 0)}")` }}
+                    aria-hidden="true"
+                  />
+                )
               )}
               <div className={`${styles.bubbleDog} ${!msg.support && !msg.plainSurface && msg.dog ? styles[BUBBLE_CLASS[msg.dog]] : ''}`}>
                 {/* S12: the support surface keeps its VISIBLE header -- it is
@@ -1519,17 +1597,25 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
     }
   };
 
+  // Task 174: data-pc-reach brings the chat into the contrast schemes' reach WITHOUT moving it inside
+  // #pc-site. It stays a sibling of #pc-site, so the Boxer's lights-out filter (scoped to #pc-site) still
+  // cannot dim it and the emergency reset stays bright: the exclusion's original reason is preserved, only
+  // the scheme's selector reach is extended (the same opt-in the offer/games overlays use).
   return (
-    <div className={styles.root} role="dialog" aria-label="Pick a Chum" aria-modal="false">
+    <div className={`${styles.root} ${accessible ? styles.rootAccessible : ''}`} role="dialog" aria-label="Pick a Chum" aria-modal="false" data-pc-reach data-pc-flat>
       {/* Task 105: the wash dims but no longer captures clicks (pointer-events via .wash/.root), so the
           page beneath stays usable; it no longer closes on click (X and Escape still close). */}
+      {/* Task 174: in an accessibility mode the wash becomes the opaque PAGE COVER -- the sweep (no
+          data-pc-flat here, unlike root/scrim) fills it, and .rootAccessible insets it below the header, so
+          the page content is covered while the header (logo, menu, toolbar) stays clear above it. In the
+          default view it is the transparent dim, as before. */}
       <div className={styles.wash} />
 
       {/* Task 118/170: the brand-blue glow, now living in the experience (where the dog's position is known)
           rather than the launcher, so it can FOLLOW her. Decoration only (pointer-events:none in CSS); the
           transform drops the gradient's centre onto her medallion and rides every drag. Hidden while
           minimised via body[data-pc-min] (unchanged). */}
-      <div className={styles.scrim} aria-hidden="true" style={{ transform: `translate3d(${round1(scrimX)}px, ${round1(scrimY)}px, 0)` }} />
+      <div className={styles.scrim} data-pc-flat aria-hidden="true" style={{ transform: `translate3d(${round1(scrimX)}px, ${round1(scrimY)}px, 0)` }} />
 
       {/* Task 164 (brief section 8): a persistent, visible emergency reset in the dog interface, shown
           whenever an effect is live and the chat is open. It sits fixed above the effects (it lives in the
@@ -1546,7 +1632,11 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
       {(phase === 'selecting' || (wide && !minimised)) && (
         <div className={styles.selectorWrap}>
           <div className={`${styles.selector} ${docked && phase !== 'selecting' ? styles.selectorDocked : ''}`}>
-            {phase === 'selecting' && (
+            {/* Task 174: the yellow connector wedges are a colour cue linking the centre icon to each dog.
+                In any accessibility mode the fan is name plates, not portraits, and the chat is a body-level
+                overlay the scheme sweep cannot reach, so a bare yellow line would survive uncrushed. Drop
+                the connectors entirely there: the plates stand on their own. */}
+            {phase === 'selecting' && !accessible && (
               <svg className={styles.connectors} viewBox="0 0 440 440" aria-hidden="true" focusable="false">
                 {/* Task 113 + 121: each radial starts at the icon's circular-body edge (ARC_BODY_R from
                     the anchor centre) and runs to its dog's centre. Both ends derive from the arc, so
@@ -1585,17 +1675,25 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
                     data-recede={activeReceded ? '1' : undefined}
                   >
                     {/* Task 78 fix: the tricks apply to the dog image layer ONLY, so the red X and the
-                        ring do not go black or rotate with her. */}
+                        ring do not go black or rotate with her.
+                        Task 174: in any accessibility mode the portrait becomes the dog's name as text, in
+                        place, on the same draggable/tappable layer; only the default view shows the photo. */}
                     <div
-                      className={`${styles.dogFace} ${dead ? styles.anchorDead : ''} ${roll ? styles.anchorRoll : ''}`}
-                      style={{ backgroundImage: `url("${portraitSrc(dog, profileIdx[dog] ?? 0)}")`, touchAction: 'none', cursor: 'grab' }}
+                      className={`${styles.dogFace} ${accessible ? styles.dogFaceNamed : ''} ${dead ? styles.anchorDead : ''} ${roll ? styles.anchorRoll : ''}`}
+                      style={{ ...(accessible ? {} : { backgroundImage: `url("${portraitSrc(dog, profileIdx[dog] ?? 0)}")` }), touchAction: 'none', cursor: 'grab' }}
                       onPointerDown={startPortrait}
                       onAnimationEnd={() => setRoll(false)}
-                    />
+                    >
+                      {accessible && <span className={styles.faceName}>{nameLines(dogInfo(dog).name)}</span>}
+                    </div>
                     {/* Task 168: the receded dogs, stacked beside this medallion. */}
                     {recededEl}
+                    {/* Task 174: the accessibility-mode control panel (desktop has MOVE). */}
+                    {controlPanelEl(true)}
+                    {/* Task 174: in an accessibility mode these icon controls are hidden (a crushed X, an
+                        invisible minimise bar) and replaced by the labelled control panel below. */}
                     <button type="button" className={styles.close} aria-label="Close Pick a Chum" onClick={closeChat}>
-                      <img src="/red-icon.svg" alt="" aria-hidden="true" />
+                      <img src="/red-icon.svg" alt="" aria-hidden="true" data-pc-ctl-icon />
                     </button>
                     {/* Task 130: minimise to a corner chip; restore brings the
                         conversation back exactly as it was. */}
@@ -1603,8 +1701,10 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
                       <span aria-hidden="true" />
                     </button>
                     {/* Task 132: the dog's name, once, beside her medallion.
-                        Reads the active dog, so a switch renames it. */}
-                    <div className={styles.anchorName} aria-hidden="true">{nameLines(dogInfo(dog).name)}</div>
+                        Reads the active dog, so a switch renames it.
+                        Task 174: suppressed with images hidden -- the medallion plate already shows the name,
+                        so this would say it twice. */}
+                    {!accessible && <div className={styles.anchorName} aria-hidden="true">{nameLines(dogInfo(dog).name)}</div>}
                     {/* Owner review: the move handle rides the medallion,
                         centred on her bottom rim; dragging moves the whole
                         dog-and-chat unit. */}
@@ -1633,15 +1733,19 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
               // to the fan.
               if (phase !== 'selecting') return null;
               return (
+                // Task 174: a fan dog. In any accessibility mode the portrait becomes the dog's name as text;
+                // the fan slot (128px) holds it. Only the default view shows the photo.
                 <button
                   key={d}
                   type="button"
-                  className={styles.dogBtn}
+                  className={`${styles.dogBtn} ${accessible ? styles.dogBtnNamed : ''}`}
                   onClick={() => selectDog(d)}
                   title={info.name}
                   aria-label={info.name}
-                  style={{ backgroundImage: `url("${PROFILE_IMG[d]}")`, left: `${round1(p.left)}px`, top: `${round1(p.top)}px`, animationDelay: `${0.15 + i * 0.3}s` }}
-                />
+                  style={{ ...(accessible ? {} : { backgroundImage: `url("${PROFILE_IMG[d]}")` }), left: `${round1(p.left)}px`, top: `${round1(p.top)}px`, animationDelay: `${0.15 + i * 0.3}s` }}
+                >
+                  {accessible && <span className={styles.faceName}>{nameLines(info.name)}</span>}
+                </button>
               );
             })}
             {phase === 'selecting' && (
@@ -1659,7 +1763,7 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
                     top-right, closing the selector back to the closed launcher (same onClose as the
                     chat medallion X). */}
                 <button type="button" className={styles.selectorClose} aria-label="Close Pick a Chum" onClick={closeChat}>
-                  <img src="/red-icon.svg" alt="" aria-hidden="true" />
+                  <img src="/red-icon.svg" alt="" aria-hidden="true" data-pc-ctl-icon />
                 </button>
               </>
             )}
@@ -1690,20 +1794,24 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
           separate: to end a session, reopen and close from the chat). No name
           either -- the chip is a face, the name shows only in the active chat.
           The scrim and the offer card hide via body[data-pc-min] as before. */}
-      {phase !== 'selecting' && minimised && (
+      {phase !== 'selecting' && minimised && !logoHidden && (
         <div className={styles.miniDock}>
           <button
             type="button"
-            className={`${styles.miniFace} ${(auto && !revealedRef.current) || spoke ? styles.miniAuto : ''}`}
+            className={`${styles.miniFace} ${accessible ? styles.miniFaceNamed : ''} ${(auto && !revealedRef.current) || spoke ? styles.miniAuto : ''}`}
             aria-label={`Reopen the chat with the ${dogInfo(dog).name}`}
             title={`Reopen the chat with the ${dogInfo(dog).name}`}
-            style={{ backgroundImage: `url("${portraitSrc(dog, profileIdx[dog] ?? 0)}")` }}
+            style={accessible ? undefined : { backgroundImage: `url("${portraitSrc(dog, profileIdx[dog] ?? 0)}")` }}
             onClick={() => {
               setMinimised(false);
               setSpoke(false); // Task 151: opening the chip clears the "he said something" pulse
               window.setTimeout(() => inputRef.current?.focus(), 60); // Task 82
             }}
-          />
+          >
+            {/* Task 174: in any accessibility mode the chip shows the dog's full name, wrapped word-per-line
+                and sized down to fit the 64px circle; the aria-label carries it for a screen reader too. */}
+            {accessible && <span className={styles.chipName}>{nameLines(dogInfo(dog).name)}</span>}
+          </button>
         </div>
       )}
       {/* Screen-reader announcements stay mounted through minimise, so a
@@ -1731,18 +1839,24 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
               data-recede={activeReceded ? '1' : undefined}
             >
               {/* Task 78 fix: the tricks apply to the dog image layer ONLY, so the red X and the ring
-                  do not go black or rotate with her. */}
+                  do not go black or rotate with her.
+                  Task 174: in any accessibility mode the portrait becomes the dog's name as text (mobile
+                  medallion too); only the default view shows the photo. */}
               <div
-                className={`${styles.dogFace} ${dead ? styles.anchorDead : ''} ${roll ? styles.anchorRoll : ''}`}
+                className={`${styles.dogFace} ${accessible ? styles.dogFaceNamed : ''} ${dead ? styles.anchorDead : ''} ${roll ? styles.anchorRoll : ''}`}
                 // Task 156: the portrait cycles on tap and drags on move (mobile medallion too).
-                style={{ backgroundImage: `url("${portraitSrc(dog, profileIdx[dog] ?? 0)}")`, touchAction: 'none', cursor: 'grab' }}
+                style={{ ...(accessible ? {} : { backgroundImage: `url("${portraitSrc(dog, profileIdx[dog] ?? 0)}")` }), touchAction: 'none', cursor: 'grab' }}
                 onPointerDown={startPortrait}
                 onAnimationEnd={() => setRoll(false)}
-              />
+              >
+                {accessible && <span className={styles.faceName}>{nameLines(dogInfo(dog).name)}</span>}
+              </div>
               {/* Task 168: the receded dogs, stacked beside this medallion (mobile). */}
               {recededEl}
+              {/* Task 174: the accessibility-mode control panel (mobile has no MOVE -- the medallion is pinned). */}
+              {controlPanelEl(false)}
               <button type="button" className={styles.close} aria-label="Close Pick a Chum" onClick={closeChat}>
-                <img src="/red-icon.svg" alt="" aria-hidden="true" />
+                <img src="/red-icon.svg" alt="" aria-hidden="true" data-pc-ctl-icon />
               </button>
               {/* Task 130 on mobile: the desktop medallion block is gated on
                   `wide`, so the minimise never rendered here. Same control,
@@ -1750,8 +1864,9 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
               <button type="button" className={styles.minimise} aria-label="Minimise the chat" onClick={minimise}>
                 <span aria-hidden="true" />
               </button>
-              {/* Task 132: the name once, on the medallion (mobile too). */}
-              <div className={styles.anchorName} aria-hidden="true">{nameLines(dogInfo(dog).name)}</div>
+              {/* Task 132: the name once, on the medallion (mobile too).
+                  Task 174: suppressed with images hidden -- the plate already shows it. */}
+              {!accessible && <div className={styles.anchorName} aria-hidden="true">{nameLines(dogInfo(dog).name)}</div>}
             </div>
             {composerEl}
           </div>

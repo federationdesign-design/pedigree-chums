@@ -70,6 +70,11 @@ export default function PickAChumLauncher() {
   // state and publishes it as data-pc-logo on its header; we watch that attribute
   // rather than re-deriving it from scroll.
   const [logoShowing, setLogoShowing] = useState(false);
+  // Task 174: the chip follows the logo. True when this page HAS a logo but it is currently hidden (the
+  // visitor has scrolled back above the 80px threshold): the minimised chip then hides with it. On a page
+  // with no logo at all (hideLogo, e.g. the pit) this stays false, so the persist-open override that keeps
+  // an open chat alive there is left untouched.
+  const [logoHidden, setLogoHidden] = useState(false);
   // Task (JS hold): whether the launcher has been revealed yet. Gated behind APPEAR_HOLD_MS after the
   // logo becomes visible, so the reveal (fade + icon cycles) is a reliable hold, not a soft CSS delay.
   const [shown, setShown] = useState(false);
@@ -128,7 +133,14 @@ export default function PickAChumLauncher() {
   // no logo (or no nav) simply never set it true, so the launcher stays hidden.
   useEffect(() => {
     let current: Element | null = null;
-    const sync = () => setLogoShowing(current?.getAttribute('data-pc-logo') === 'true');
+    const sync = () => {
+      const showing = current?.getAttribute('data-pc-logo') === 'true';
+      setLogoShowing(showing);
+      // data-pc-has-logo is static per page; read it alongside the live visibility. Chip hides only when the
+      // page has a logo AND it is currently hidden -- never on a no-logo page (persist-open stays intact).
+      const hasLogo = current?.getAttribute('data-pc-has-logo') === 'true';
+      setLogoHidden(hasLogo && !showing);
+    };
     const obs = new MutationObserver(sync);
     const attach = () => {
       const header = document.querySelector('header.pc-nav');
@@ -379,7 +391,7 @@ export default function PickAChumLauncher() {
       {/* Task 118/170: the brand-blue scrim moved INTO the experience so it can follow the dog (it needs her
           live position). It renders only while the experience is open, exactly as this launcher copy did. */}
       {open ? (
-        <PickAChumExperience onClose={closeExperience} autoAppear={autoAppear ?? undefined} pickupRoute={pickupRoute} terrierSay={terrierSay} />
+        <PickAChumExperience onClose={closeExperience} autoAppear={autoAppear ?? undefined} pickupRoute={pickupRoute} terrierSay={terrierSay} logoHidden={logoHidden} />
       ) : (
         <button
           ref={buttonRef}
