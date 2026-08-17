@@ -132,11 +132,13 @@
    keeps its own paragraph spacing (margin-bottom + max-width) rather than GDBD's
    sibling-gap rhythm system. */
 /* Per-page opt-in (the article text toggle): main[data-pc-textinvert="on"] flips
-   the body paragraphs to white. Gated on :root:not([data-pc-contrast-scheme]) so
-   a future accessibility toolbar wins automatically; paragraphs only, matching
-   the .essayBody p black rule below. Opt-in cost: white bottoms out at ~1.45:1 on
-   the gradient, a deliberate non-compliant state (Steve, 12 Aug 2026). */
-:root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"] .essayBody p {
+   the body-reading text to white. Gated on :root:not([data-pc-contrast-scheme]) so
+   a future accessibility toolbar wins automatically. Covers the body paragraphs AND
+   the back-link breadcrumb, which read on the gradient and must invert with the
+   prose. Opt-in cost: white bottoms out at ~1.45:1 on the gradient, a deliberate
+   non-compliant state (Steve, 12 Aug 2026; breadcrumb added 17 Aug 2026). */
+:root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"] .essayBody p,
+:root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"] .backLink {
   color: #ffffff;
 }
 .essayBody p {
@@ -358,14 +360,14 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: rgba(255,255,255,0.85);
+  color: #000000; /* solid black default (was rgba white), matching the .essayBody p prose: clears ~6.3:1+ across the gradient where navy would dip to ~3.6:1. Inverts to white with the toggle. */
   text-decoration: none;
   display: inline-block;
   white-space: nowrap;
   margin-bottom: 20px;
   transition: color 0.15s ease;
 }
-.backLink:hover { color: #ffffff; }
+.backLink:hover { color: var(--blue-deep, #0b78bd); }
 
 /* ── Hero content (h1 + pills inside hero) ──────────────────── */
 .essayHeroContent {
