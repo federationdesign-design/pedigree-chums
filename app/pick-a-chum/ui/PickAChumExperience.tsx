@@ -1632,7 +1632,11 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
       {(phase === 'selecting' || (wide && !minimised)) && (
         <div className={styles.selectorWrap}>
           <div className={`${styles.selector} ${docked && phase !== 'selecting' ? styles.selectorDocked : ''}`}>
-            {phase === 'selecting' && (
+            {/* Task 174: the yellow connector wedges are a colour cue linking the centre icon to each dog.
+                In any accessibility mode the fan is name plates, not portraits, and the chat is a body-level
+                overlay the scheme sweep cannot reach, so a bare yellow line would survive uncrushed. Drop
+                the connectors entirely there: the plates stand on their own. */}
+            {phase === 'selecting' && !accessible && (
               <svg className={styles.connectors} viewBox="0 0 440 440" aria-hidden="true" focusable="false">
                 {/* Task 113 + 121: each radial starts at the icon's circular-body edge (ARC_BODY_R from
                     the anchor centre) and runs to its dog's centre. Both ends derive from the arc, so
