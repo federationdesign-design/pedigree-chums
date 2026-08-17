@@ -629,7 +629,11 @@
 .portraitCol {
   position: relative;
   width: 100%;
-  aspect-ratio: 9 / 16;
+  /* The videos' true portrait ratio, not a generic 9/16: Vimeo oEmbed reports both
+     clips as 240x342 (thumbnail 200x285), i.e. 40:57 (~0.702). Matching it means the
+     player fills the box with no letterbox strips, so the box-shadow hugs the real
+     video edges instead of sitting out beyond letterbox padding. */
+  aspect-ratio: 40 / 57;
   border-radius: 20px;
   overflow: hidden;
   box-shadow: 0 8px 40px rgba(0,0,0,0.3);
