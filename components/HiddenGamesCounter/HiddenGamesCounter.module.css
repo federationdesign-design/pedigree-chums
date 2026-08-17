@@ -667,9 +667,9 @@
    below the logo never applied. Fixed again, with the mark absolute inside it. */
 .counter.counter {
   position: fixed;
-  top: calc(clamp(96px, 12vh, 132px) + env(safe-area-inset-top, 0px) - 25px); /* nudge 25px up (was 28; down another 3px) */
+  top: calc(clamp(96px, 12vh, 132px) + env(safe-area-inset-top, 0px) - 22px); /* nudge 22px up (was 25; down another 3px) */
   bottom: auto;
-  left: calc(clamp(12px, 3vw, 22px) + 44px); /* nudge 44px right (was 39; right another 5px) */
+  left: calc(clamp(12px, 3vw, 22px) + 47px); /* nudge 47px right (was 44; right another 3px) */
 }
 
 /* Match .reveal (the default, minimised pill) to .counter so the two stay
@@ -677,8 +677,8 @@
    rules further down still override at <=768px. The shared translateX(30px)
    (line 629) is untouched, so both states keep the same 30px card alignment. */
 .reveal.reveal {
-  top: calc(clamp(96px, 12vh, 132px) + env(safe-area-inset-top, 0px) - 25px); /* nudge 25px up (was 28; down another 3px) */
-  left: calc(clamp(12px, 3vw, 22px) + 44px); /* nudge 44px right (was 39; right another 5px) */
+  top: calc(clamp(96px, 12vh, 132px) + env(safe-area-inset-top, 0px) - 22px); /* nudge 22px up (was 25; down another 3px) */
+  left: calc(clamp(12px, 3vw, 22px) + 47px); /* nudge 47px right (was 44; right another 3px) */
 }
 
 /* The discovery toast joins them: top left, below the counter, in the same
