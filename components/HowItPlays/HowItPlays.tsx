@@ -1,6 +1,8 @@
 "use client";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import BentoBoard from "../Nav/BentoBoard";
+import AccessibleMenu from "../Nav/AccessibleMenu";
+import { getScheme, getHideImages, CONTRAST_EVENT } from "../../lib/contrastScheme";
 import styles from "./HowItPlays.module.css";
 
 type Step = { n: number; caption: string; img: string; video: string | null };
@@ -19,6 +21,19 @@ export default function HowItPlays() {
   const trackRef = useRef<HTMLDivElement>(null);
   const thumbRef = useRef<HTMLDivElement>(null);
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
+
+  // In a contrast scheme (or with images hidden) the page Bento swaps to the same
+  // outlined-box text menu the hamburger uses, so there are no images/video to
+  // fight the monochrome sweep. Same condition and same component as Nav; the
+  // boxes carry their own outlines (and pick up the #pc-site scheme stroke), so no
+  // separate stroke work is needed. Starts false so SSR matches the default board.
+  const [accessibleMode, setAccessibleMode] = useState(false);
+  useEffect(() => {
+    const read = () => setAccessibleMode(getScheme() !== null || getHideImages());
+    read();
+    window.addEventListener(CONTRAST_EVENT, read);
+    return () => window.removeEventListener(CONTRAST_EVENT, read);
+  }, []);
 
   // Owner review: the videos no longer loop independently. They play ONCE, in
   // order, and each one starts the next when it has a second left, so the
@@ -231,9 +246,10 @@ export default function HowItPlays() {
         </div>
       </div>
 
-      {/* Bento sits directly beneath the cards, tight (no reserved gap). */}
+      {/* Bento sits directly beneath the cards, tight (no reserved gap). In a
+          scheme it becomes the outlined-box text menu, the same swap the Nav uses. */}
       <div className={styles.bento}>
-        <BentoBoard />
+        {accessibleMode ? <AccessibleMenu /> : <BentoBoard />}
       </div>
     </div>
   );
