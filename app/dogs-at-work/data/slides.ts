@@ -75,7 +75,9 @@ export const SLIDES: Slide[] = [
       // three images are wired (Steve supplied dog_working_img1..3.jpg); alt text
       // is still owed, so a clearly named placeholder alt is used and logged in
       // PLACEHOLDERS.md and docs/dogs-at-work/NEEDS_STEVE.md. Image order mirrors
-      // the concept: the dog's game, then the human's job, then the payment.
+      // the concept: the dog's game, then the human's job. The third section, the
+      // payment, has moved to slide 2 (medical-alert), keeping its thumbnail
+      // (dog_working_img3.jpg); slide 1 therefore carries img1 and img2.
       sections: [
         {
           subheading: "To the dog; *it's a game.*",
@@ -87,11 +89,6 @@ export const SLIDES: Slide[] = [
           body: `It only becomes work when humans benefit from it. This series looks at the dogs that help Britain function - the noses at the border, the paws on the hills, the search dogs in the woods, the assistance dogs beside their people, and the bio-detection dogs helping scientists ask whether disease has a smell.`,
           thumbnail: { src: "/dog_working_img2.jpg", alt: "a shepherd watching over a flock" },
         },
-        {
-          subheading: "The payment; *very different*",
-          body: `They are paid in food, shelter, praise, tennis balls, head strokes and the occasional stolen sausage. But their value is measured in time, safety, independence, science and trust. This is about that hidden workforce, and the question behind every wagging tail: if dogs give us this much, what do we owe them back?`,
-          thumbnail: { src: "/dog_working_img3.jpg", alt: "banknotes and coins" },
-        },
       ],
     },
     article: ARTICLE_BIO_DETECTION,
@@ -101,7 +98,18 @@ export const SLIDES: Slide[] = [
     order: 2,
     published: "live",
     panel: {
+      // The payment block moved here from slide 1 (bio-detection), Steve's
+      // instruction, and leads the panel; "Why dogs love doing" follows. Both
+      // sections carry a thumbnail so the panel is not left with a single lone
+      // image: the payment keeps its own /dog_working_img3.jpg, and "Why dogs love
+      // doing" takes /a-dog-never-died-from-missing-a-walk.jpg (a happy active dog,
+      // matching the section's theme and the photographic slide-1 thumbnails).
       sections: [
+        {
+          subheading: "The payment; *very different*",
+          body: `They are paid in food, shelter, praise, tennis balls, head strokes and the occasional stolen sausage. But their value is measured in time, safety, independence, science and trust. This is about that hidden workforce, and the question behind every wagging tail: if dogs give us this much, what do we owe them back?`,
+          thumbnail: { src: "/dog_working_img3.jpg", alt: "banknotes and coins" },
+        },
         {
           subheading: "Why *dogs love* doing",
           body: `**Dogs seem happiest when they have something to do.**
@@ -109,6 +117,7 @@ export const SLIDES: Slide[] = [
 For thousands of years they have been selected to chase, retrieve, guard, herd, track, dig, carry and solve problems alongside people, so many of those behaviours are deeply rewarding in their own right. A Labrador fetching a ball, a Collie rounding up the family, or a Terrier digging furiously under a hedge may look like play to us, but to the dog they are using the same instincts, senses and problem-solving skills their ancestors relied on for real jobs.
 
 "Work" does not need to mean employment: anything that gives a dog a purpose, a challenge and the chance to use the abilities it was built for can provide the satisfaction of a job well done.`,
+          thumbnail: { src: "/a-dog-never-died-from-missing-a-walk.jpg", alt: "a pug in a red harness on a walk, tongue out, on a dirt path" },
         },
       ],
     },

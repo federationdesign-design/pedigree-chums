@@ -126,8 +126,14 @@
   flex: 0 0 100%;
   display: flex;
   /* Container units (cqi = 1% of the panel width): top padding, right room for
-     the chevron, bottom room for the dots, left gutter. */
-  padding: clamp(50px, 4.25cqi, 52px) clamp(96px, 12.7cqi, 150px)
+     the chevron, bottom room for the dots, left gutter. The right value clears
+     the chevron across the whole desktop range: the chevron sits at
+     right clamp(18px, 2cqi, 40px) and is clamp(72px, 14cqi, 260px) wide, so its
+     inner edge reaches ~16cqi from the panel's right edge (grows past the old
+     150px cap on wide screens). This reserves 17.5cqi (floor 126px, cap 320px),
+     ~9-27px clear of the chevron from 769px to 2560px, so a subheading (which is
+     not width-capped like blueSectionBody) can no longer run under the arrow. */
+  padding: clamp(50px, 4.25cqi, 52px) clamp(126px, 17.5cqi, 320px)
     clamp(54px, 6.3cqi, 74px) clamp(28px, 4.4cqi, 52px);
 }
 
