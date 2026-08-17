@@ -37,6 +37,24 @@
   background: rgba(255,255,255,0.12);
 }
 
+/* Article text toggle (/home): the resting white border, input text and placeholder
+   follow the toggle to dark blue (--navy) when it is on, white at rest. The input fill
+   is transparent (~8% white over the gradient), so navy sits effectively on the gradient;
+   at 32-44px display size it clears the 3:1 large-text AA bar across the whole gradient
+   (~3.93:1 at the deep-blue end, ~7.75:1 at the cyan end). Border and placeholder use
+   :not(:focus) so the yellow focus border and the hide-placeholder-on-focus behaviour
+   still win when focused. The green GO button and the solid-fill dropdown are left alone.
+   Gated on :root:not([data-pc-contrast-scheme]) so a contrast scheme wins. */
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .searchInput {
+  color: var(--navy, #0a3a57);
+}
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .searchInput:not(:focus) {
+  border-color: var(--navy, #0a3a57);
+}
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .searchInput:not(:focus)::placeholder {
+  color: var(--navy, #0a3a57);
+}
+
 .searchGo {
   position: absolute;
   right: clamp(22px, 3vw, 44px);
