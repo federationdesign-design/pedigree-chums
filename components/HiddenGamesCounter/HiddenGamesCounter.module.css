@@ -578,26 +578,26 @@
 /* ── Counter pill in the campaign style ───────────────────────── */
 .counter.counter {
   background: linear-gradient(45deg, #001ae0 0%, #62c9f3 100%);
-  border: 3px solid #141544;
+  border: 3px solid var(--white);
   box-shadow: 0 10px 24px rgba(10, 58, 87, 0.3);
   padding: 10px 12px 10px 18px;
 }
 .counter.counter .label {
   font-family: var(--font-mohave), var(--font-body), system-ui, sans-serif;
   font-weight: 700;
-  font-size: 0.8925rem; /* 15% smaller: 1.05rem x 0.85 */
+  font-size: 0.80325rem; /* 15% smaller then x0.9: 0.8925 x 0.9 */
   color: #ffffff;
 }
 
 /* ── The minimised pill (4th state) in the campaign style ─────── */
 .reveal.reveal {
   background: linear-gradient(45deg, #001ae0 0%, #62c9f3 100%);
-  border: 3px solid #141544;
+  border: 3px solid var(--white);
   box-shadow: 0 10px 24px rgba(10, 58, 87, 0.3);
-  padding: 8.5px 13.6px; /* 15% smaller: 10/16 x 0.85 */
+  padding: 7.65px 12.24px; /* then x0.9: 8.5/13.6 x 0.9 */
   font-family: var(--font-mohave), var(--font-body), system-ui, sans-serif;
   font-weight: 700;
-  font-size: 0.8925rem; /* 15% smaller: 1.05rem x 0.85 */
+  font-size: 0.80325rem; /* then x0.9: 0.8925 x 0.9 */
   color: #ffffff;
 }
 
@@ -606,7 +606,7 @@
 .counter.counter {
   position: relative;
   overflow: visible;
-  padding: 10.2px 15.3px 8.5px 15.3px; /* 15% smaller: 12/18/10/18 x 0.85 */
+  padding: 9.18px 13.77px 7.65px 13.77px; /* then x0.9: 10.2/15.3/8.5/15.3 x 0.9 */
 }
 .counter.counter .minimiseBtn {
   position: absolute;
@@ -626,7 +626,7 @@
 
 /* Align the pills to the same left edge as the two cards, which sit 30px in. */
 .counter.counter, .reveal.reveal {
-  transform: translateX(30px);
+  transform: translateX(30px) rotate(1deg);
 }
 
 /* All three close marks at half size. */
@@ -667,7 +667,7 @@
    below the logo never applied. Fixed again, with the mark absolute inside it. */
 .counter.counter {
   position: fixed;
-  top: calc(clamp(96px, 12vh, 132px) + env(safe-area-inset-top, 0px) - 35px); /* nudge 35px up (10 + 25) */
+  top: calc(clamp(96px, 12vh, 132px) + env(safe-area-inset-top, 0px) - 28px); /* nudge 28px up (was 35; down 7px) */
   bottom: auto;
   left: calc(clamp(12px, 3vw, 22px) + 39px); /* nudge 39px right (15 + 10 + 10 + 4) */
 }
@@ -677,7 +677,7 @@
    rules further down still override at <=768px. The shared translateX(30px)
    (line 629) is untouched, so both states keep the same 30px card alignment. */
 .reveal.reveal {
-  top: calc(clamp(96px, 12vh, 132px) + env(safe-area-inset-top, 0px) - 35px); /* nudge 35px up */
+  top: calc(clamp(96px, 12vh, 132px) + env(safe-area-inset-top, 0px) - 28px); /* nudge 28px up (was 35; down 7px) */
   left: calc(clamp(12px, 3vw, 22px) + 39px); /* nudge 39px right (15 + 10 + 10 + 4) */
 }
 
@@ -717,7 +717,7 @@
   .counter.counter,
   .reveal.reveal {
     left: 2px;
-    top: calc(clamp(76px, 12vh, 112px) + env(safe-area-inset-top, 0px));
+    top: calc(clamp(76px, 12vh, 112px) + env(safe-area-inset-top, 0px) + 7px); /* down 7px (no -35px here to reduce) */
   }
 }
 
