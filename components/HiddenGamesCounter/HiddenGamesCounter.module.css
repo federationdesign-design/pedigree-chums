@@ -721,6 +721,21 @@
   }
 }
 
+/* Firefox renders the mobile counter ~12px higher than Safari. @-moz-document
+   url-prefix() is a Firefox-only conditional group rule (no other engine
+   implements @-moz-document; the empty url-prefix() form still applies to
+   author stylesheets), so this nudge is scoped to Firefox and leaves Safari and
+   Chrome untouched. Same selector/specificity as the block above but later in
+   source order, so it wins only where the @-moz-document condition matches. */
+@media (max-width: 768px) {
+  @-moz-document url-prefix() {
+    .counter.counter,
+    .reveal.reveal {
+      top: calc(clamp(76px, 12vh, 112px) + env(safe-area-inset-top, 0px) - 19px); /* Firefox: -31px + 12px down */
+    }
+  }
+}
+
 /* Mobile: the prelude is 30% smaller. It already carries a transform for its
    offset, so the scale joins that rather than replacing it, and the origin is
    the bottom-left corner it is pinned to. */
