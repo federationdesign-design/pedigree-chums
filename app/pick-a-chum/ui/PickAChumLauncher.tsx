@@ -26,6 +26,7 @@ import { CHAT_KEY, PROTECTED_FLAG } from './pcKeys';
 import { bioForRoute } from '../data/page-bios';
 import { getHiddenGamesEngine } from '../../../lib/hiddenGames/browserEngine';
 import { HAT_COUNTDOWN_LINES } from '../../../lib/hiddenGames/hatHunt';
+import { getScheme, getHideImages, CONTRAST_EVENT } from '../../../lib/contrastScheme';
 
 const PickAChumExperience = dynamic(() => import('./PickAChumExperience'), { ssr: false });
 
@@ -65,6 +66,16 @@ const PULSE_MS = 700; // dead-click launcher pulse duration (matches the CSS key
 export default function PickAChumLauncher() {
   const [open, setOpen] = useState(false);
   const [frame, setFrame] = useState(0); // Task 84: current icon frame index
+  // Task 174: the launcher is a separate component from the chat, so it needs its OWN accessibility flag,
+  // read the same way and kept live via CONTRAST_EVENT. In an accessibility mode the chat icon becomes a
+  // solid "DOG BOT" text circle, matching the medallion name-plate treatment (text instead of imagery).
+  const [accessible, setAccessible] = useState(false);
+  useEffect(() => {
+    const read = () => setAccessible(getScheme() !== null || getHideImages());
+    read();
+    window.addEventListener(CONTRAST_EVENT, read);
+    return () => window.removeEventListener(CONTRAST_EVENT, read);
+  }, []);
   // Whether the Pedigree Chums logo is currently showing. The launcher anchors to
   // the logo (top-left), so it only appears when the logo does. The Nav owns this
   // state and publishes it as data-pc-logo on its header; we watch that attribute
@@ -396,12 +407,19 @@ export default function PickAChumLauncher() {
         <button
           ref={buttonRef}
           type="button"
-          className={`${styles.launcher} ${shown ? styles.launcherOn : ''} ${pulse ? styles.launcherPulse : ''}`}
+          className={`${styles.launcher} ${accessible ? styles.launcherNamed : ''} ${shown ? styles.launcherOn : ''} ${pulse ? styles.launcherPulse : ''}`}
           aria-label="Pick a Chum"
           data-pc-reach
           onClick={() => setOpen(true)}
         >
-          <PickAChumIcon src={ICON_FRAMES[frame]} />
+          {/* Task 174: in an accessibility mode the icon becomes DOG / BOT text (two lines). The button keeps
+              data-pc-reach, so a scheme fills the circle with the scheme colour; hide-images keeps the cream
+              fill set on .launcherNamed. Full label stays in the button's aria-label for screen readers. */}
+          {accessible ? (
+            <span className={styles.launcherName} aria-hidden="true">DOG<br />BOT</span>
+          ) : (
+            <PickAChumIcon src={ICON_FRAMES[frame]} />
+          )}
         </button>
       )}
       {/* DEV-RECORDER (strip for production): renders null on production hosts. */}

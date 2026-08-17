@@ -98,6 +98,23 @@
   width: 100%;
   height: 100%;
 }
+/* Task 174: in an accessibility mode the launcher is a solid DOG/BOT text circle, matching the medallion
+   name plates. Hide-images (colour) mode keeps the cream fill + navy border/text set here; in a scheme the
+   button (data-pc-reach, no data-pc-flat) is filled by the sweep -- circle to the scheme background, text and
+   border to the scheme foreground. */
+.launcherNamed {
+  background-color: var(--pc-ui-cream);
+  border: 3px solid var(--pc-ui-navy);
+  box-sizing: border-box;
+}
+.launcherName {
+  font-family: var(--font-display, 'Luckiest Guy', cursive);
+  font-size: 20px;
+  line-height: 1;
+  text-align: center;
+  text-transform: uppercase;
+  color: var(--pc-ui-navy);
+}
 
 /* ---- Overlay root ----
    Same stacking band as the launcher (below cookie 55 / nav 100 / offer 120):
