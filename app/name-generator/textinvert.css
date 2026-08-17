@@ -1,0 +1,62 @@
+/* Article text toggle overrides for /name-generator (17 Aug 2026).
+
+   This page is built from inline styles + global class names (pcm-*), not a CSS
+   module, so these rules live in a plain global stylesheet (the same "global by
+   necessity" pattern as contrast-schemes.css) and use !important to beat the
+   inline colours. Every rule is scoped to this page's .pcm-* classes and gated on
+   the toggle attribute plus the no-scheme guard, so nothing leaks to other pages
+   and an accessibility contrast scheme still wins.
+
+   Agreed scope (Steve, 17 Aug 2026): invert the H1 and the intro paragraph on the
+   body gradient, and lighten ONLY the input and reveal panels. The knockout game,
+   the bracket tree, the shortlist bar and the share screen are left at rest, as is
+   the "from calculator" banner (a self-styled gradient card). #eaf4fb is the light
+   container colour used site-wide for this toggle: navy text on it is ~11:1, and it
+   is clearly lighter than the cyan->blue gradient so a lightened panel still reads
+   as a raised container. */
+
+/* -- H1 + intro paragraph on the gradient: white -> navy. The yellow "Name"
+      accent (.display-yellow) keeps its own colour and is untouched. -- */
+:root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"] .pcm-h1,
+:root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"] .pcm-sub {
+  color: var(--navy, #0a3a57) !important;
+}
+
+/* -- Input panel (.pcm-inputs, navy): -> light, with its text and controls
+      darkened. The umbrella label/p/span/button rule covers the many un-classed
+      inline-styled elements; .display (the green "Go" CTA) is excluded so it stays
+      a self-coloured button. -- */
+:root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"] .pcm-inputs {
+  background: #eaf4fb !important;
+}
+:root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"] .pcm-inputs label,
+:root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"] .pcm-inputs p,
+:root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"] .pcm-inputs span,
+:root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"] .pcm-inputs button:not(.display) {
+  color: var(--navy, #0a3a57) !important;
+}
+/* Form fields: translucent-white on navy -> a solid white field with navy text
+   and a navy-tint border, so they are legible on the light panel. (An error state
+   sets a red border inline; that red is overridden here, but the profanity message
+   text remains and turns navy, so the error is still conveyed.) */
+:root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"] .pcm-inputs select,
+:root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"] .pcm-inputs input,
+:root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"] .pcm-inputs textarea {
+  color: var(--navy, #0a3a57) !important;
+  background: #ffffff !important;
+  border-color: rgba(10, 58, 87, 0.3) !important;
+}
+
+/* -- Reveal card (.pcm-reveal-card, a blue-gradient card): -> light. Most of its
+      copy (the breed, the full name, the reasoning) is already navy and its action
+      buttons are self-coloured, so only its two white hero texts need flipping: the
+      big nickname (.pcm-nick) and the no-nickname hero. Both are direct-child divs,
+      so a single "> div" rule catches them; navy-on-navy elsewhere is a no-op and
+      the self-coloured buttons keep their own inline colours. -- */
+:root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"] .pcm-reveal-card {
+  background: #eaf4fb !important;
+}
+:root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"] .pcm-reveal-card .pcm-nick,
+:root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"] .pcm-reveal-card > div {
+  color: var(--navy, #0a3a57) !important;
+}

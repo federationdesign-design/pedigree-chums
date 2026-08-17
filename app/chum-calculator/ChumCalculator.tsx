@@ -11,6 +11,7 @@ import groomingNeeds from "../../data/groomingNeeds";
 import trainingDifficulty from "../../data/trainingDifficulty";
 import styles from "./calculator.module.css";
 import BreedResultRail from "./BreedResultRail";
+import ArticleTextToggle from "../../components/ArticleTextToggle/ArticleTextToggle";
 
 type Option = { label: string; value: string };
 type Question = { id: string; question: string; sub?: string; info?: string; options: Option[] };
@@ -738,6 +739,11 @@ export default function ChumCalculator() {
 
   return (
     <main className={styles.page}>
+
+      {/* Article text toggle, centred as on /home. When on: white H1 + progress
+          copy on the gradient go dark blue, and the navy step card lightens with
+          its inner text darkened (see the invert block in calculator.module.css). */}
+      <ArticleTextToggle centered />
 
       {/* ── Header ── */}
       <div className={styles.header}>
