@@ -5,6 +5,7 @@ import Footer from "../../components/Footer/Footer";
 import ShortlistBar, { type ShortlistEntry } from "./ShortlistBar";
 import KnockoutRound from "./KnockoutRound";
 import { BANNED_WORDS } from "./bannedWords";
+import ArticleTextToggle from "../../components/ArticleTextToggle/ArticleTextToggle";
 
 // ── SHARE CAPTIONS + PNG METADATA ───────────────────────────────────────────────
 const SITE_URL = "https://pedigreechums.co.uk";
@@ -2686,6 +2687,11 @@ export default function NameGeneratorPage() {
           }
         `}</style>
         <div style={{ maxWidth:1800, margin:"0 auto" }}>
+          {/* Article text toggle, centred as on /home. When on: the H1 and intro
+              paragraph on the gradient go dark blue, and the input + reveal panels
+              lighten with their text darkened (see textinvert.css). The knockout
+              game, bracket, shortlist bar and share screen stay at rest. */}
+          <ArticleTextToggle centered />
           <h1 className="display pcm-h1" style={{ textAlign:"center", marginBottom:16, fontSize:"clamp(3rem,10vw,6.5rem)", color:"#ffffff", lineHeight:0.95 }}>
             Chum <br className="pcm-h1br" /><span className="display-yellow">Name</span> <br className="pcm-h1br2" />Generator
           </h1>
