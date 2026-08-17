@@ -1392,7 +1392,7 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
   // aria-label and switch behaviour, same yellow focus ring; the greyscale-at-rest face and the green
   // "which one" arrow are dropped (moot without a portrait). The portrait form is unchanged otherwise.
   const recededEl = accessible ? (
-    <div className={styles.recededTextGroup}>
+    <div className={styles.recededTextGroup} data-pc-flat>
       {recededDogs.map((d) => (
         <button
           key={d}
@@ -1437,7 +1437,7 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
   // and there is no column drag. Rendered only in accessible mode; default keeps the icon controls.
   const controlPanelEl = (withMove: boolean) =>
     accessible ? (
-      <div className={styles.controlPanel} role="group" aria-label="Chat controls">
+      <div className={styles.controlPanel} role="group" aria-label="Chat controls" data-pc-flat>
         <button type="button" className={styles.controlBtn} aria-label="Close Pick a Chum" onClick={closeChat}>CLOSE</button>
         <button type="button" className={styles.controlBtn} aria-label="Minimise the chat" onClick={minimise}>MINIMISE</button>
         {withMove && (
@@ -1786,7 +1786,7 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
           >
             {threadEl}
           </div>
-          <div className={styles.visitorBar} onMouseDown={keepFocus}>
+          <div className={styles.visitorBar} onMouseDown={keepFocus} data-pc-flat>
             {composerEl}
           </div>
         </>
@@ -1837,7 +1837,7 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
             {announce}
           </div>
 
-          <div className={styles.composerRow}>
+          <div className={styles.composerRow} data-pc-flat>
             <div
               className={`${styles.dogAnchor} ${anchorSwap}`}
               role="img"
