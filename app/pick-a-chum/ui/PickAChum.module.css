@@ -1407,10 +1407,13 @@
     --pc-anchor-cx: calc(clamp(18px, 4vw, 48px) + clamp(112px, 16vw, 150px) + 2px + 30px);
     --pc-anchor-cy: calc(clamp(112px, 16vw, 150px) * 0.3 - 12px + 30px);
   }
-  /* Her face when minimised matches the mobile medallion, not the desktop. */
+  /* Her face when minimised matches the mobile medallion, not the desktop, then
+     10% smaller again on mobile (64 -> 58). The chip's left (134px) is unchanged:
+     it tracks the logo's right edge (~130px) plus a 4px gap, which a smaller face
+     does not move. */
   .miniDock .miniFace {
-    width: 64px !important;
-    height: 64px !important;
+    width: 58px !important;
+    height: 58px !important;
   }
 }
 
