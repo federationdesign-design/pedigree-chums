@@ -663,3 +663,24 @@
   margin: 0 -16px;
   padding: clamp(26px, 7vw, 40px) clamp(16px, 5vw, 24px) clamp(34px, 9vw, 52px);
 }
+
+/* ============================================================================
+   Article text toggle (dogs-at-work index, 18 Aug 2026). Recolours white text to
+   dark blue, but only the intro sits on the gradient, so that is nearly all it
+   touches. TWO dark regions are deliberately EXCLUDED (no rule here) because
+   white on them is already compliant and navy would be unreadable -- do not add
+   them later:
+     - the blue GlowPanel copy (blueSubheading/blueBody/blueBold/blueBullets):
+       white on blue ~4.76:1; navy on blue would be ~2.52:1.
+     - the navy article-panel copy (learnAbout/subLabel/headline/dek): white on
+       navy ~12:1; navy on navy would be ~1.0 (invisible).
+   The green CTA follows the toggle (white-on-green 2.54:1 -> navy-on-green
+   4.70:1, the same call as the /home Pre-order button). Gated on
+   :root:not([data-pc-contrast-scheme]) so a scheme wins. */
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .title,
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .introText {
+  color: var(--navy, #0a3a57);
+}
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .cta {
+  color: var(--navy, #0a3a57);
+}

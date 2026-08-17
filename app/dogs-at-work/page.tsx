@@ -11,6 +11,7 @@ import styles from "./dogs-at-work.module.css";
 // and 4 respectively.
 import { SLIDES } from "./data/slides";
 import WorkDeck from "./WorkDeck";
+import ArticleTextToggle from "../../components/ArticleTextToggle/ArticleTextToggle";
 
 export const metadata: Metadata = {
   title: "Dogs at Work",
@@ -59,6 +60,10 @@ export default function DogsAtWorkPage() {
     <>
       <Nav showLogo />
       <main>
+        {/* Article text toggle, centred as on /home. Inverts white text to dark
+            blue; the blue GlowPanel copy and the navy article-panel copy are
+            excluded (they would be unreadable navy). See deck.module.css. */}
+        <ArticleTextToggle centered />
         {/* Desktop mechanic: three regions, counter-motion, dots (checkpoint 3). */}
         <WorkDeck slides={liveSlides} />
         <div className={styles.page}>
