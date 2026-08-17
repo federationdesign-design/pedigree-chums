@@ -402,6 +402,15 @@
   box-shadow: 0 1px 0 rgba(10,58,87,0.4);
 }
 
+/* Article text toggle (/home): the Pre-order button text follows the toggle, white by
+   default and dark blue (--navy) when it is on. The green fill is unchanged; navy on
+   #22c55e measures 5.25:1 (passes AA at any size) and beats the default white's 2.28:1
+   on that fill (owner-approved, 17 Aug 2026). Gated on :root:not([data-pc-contrast-scheme])
+   so a contrast scheme wins. */
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .btnPrimary {
+  color: var(--navy, #0a3a57);
+}
+
 .btnSecondary {
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
   font-size: clamp(14px, 1.6vw, 17px);

@@ -66,7 +66,7 @@
   border: 0;
   cursor: pointer;
   text-align: left;
-  color: var(--navy, #0a3a57);
+  color: var(--white, #fff);
 }
 .qText {
   font-family: var(--font-body, "Montserrat", sans-serif);
@@ -75,7 +75,7 @@
   line-height: 1.3;
 }
 .answerLink {
-  color: var(--navy, #0a3a57);
+  color: var(--white, #fff);
   font-weight: 800;
   text-decoration: underline;
 }
@@ -117,5 +117,16 @@
   font-size: clamp(1.08rem, 1.9vw, 1.21rem);
   font-weight: 600;
   line-height: 1.6;
+  color: var(--white, #fff);
+}
+
+/* Article text toggle (/home): question and answer text is white by default like
+   the rest of the below-hero content, and follows the toggle to dark blue when it is
+   on. .qText inherits its colour from the .question button, so recolouring .question
+   carries the question text. Gated on :root:not([data-pc-contrast-scheme]) so a
+   contrast scheme wins. FAQ is used only on /home (17 Aug 2026). */
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .question,
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .answer,
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .answerLink {
   color: var(--navy, #0a3a57);
 }

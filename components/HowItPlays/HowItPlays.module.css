@@ -182,3 +182,12 @@
   padding-top: 14px;
   box-sizing: border-box;
 }
+
+/* Article text toggle (/home): the circle fill stays blue; only the number inside
+   follows the toggle, white by default and dark blue (--navy) when it is on. Navy on
+   the #00a0e1 fill measures 4.05:1, which passes for large text (these digits are
+   56-90px) and beats the default white's 2.95:1 on that fill (owner-approved, 17 Aug
+   2026). Gated on :root:not([data-pc-contrast-scheme]) so a contrast scheme wins. */
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .badge {
+  color: var(--navy, #0a3a57);
+}
