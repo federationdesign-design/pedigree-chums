@@ -1328,13 +1328,16 @@
    edge at 1280px (48px padding + 150px logo = 198px). On mobile both clamps sit
    at their minimums (padding 4vw pins to 18px below 450px; logo 16vw pins to
    112px below 700px), so the logo's right edge is only ~130px and 202px overshot
-   it to near the viewport centre. Beside the logo here is 130 + the same 4px gap
-   = 134px. DOCK_L is left alone: the reopen medallion it positions is desktop-
-   only (rendered inside .selectorWrap, gated on `wide`), so it has no mobile
-   resting spot to fix. */
+   it to near the viewport centre. Beside the logo here is 130 + a small gap.
+   Then nudged 4px down and 4px right from the original 134px/18px resting spot,
+   so left is 138px (gap to the logo now 8px) and top is 22px (overriding the
+   base 18px, which the mobile block otherwise inherits). DOCK_L is left alone:
+   the reopen medallion it positions is desktop-only (rendered inside
+   .selectorWrap, gated on `wide`), so it has no mobile resting spot to fix. */
 @media (max-width: 480px) {
   .miniDock {
-    left: 134px;
+    left: 138px;
+    top: 22px;
   }
 }
 
