@@ -585,7 +585,7 @@
 .counter.counter .label {
   font-family: var(--font-mohave), var(--font-body), system-ui, sans-serif;
   font-weight: 700;
-  font-size: 0.80325rem; /* 15% smaller then x0.9: 0.8925 x 0.9 */
+  font-size: 0.722925rem; /* then x0.9 again: 0.80325 x 0.9 */
   color: #ffffff;
 }
 
@@ -594,10 +594,10 @@
   background: linear-gradient(45deg, #001ae0 0%, #62c9f3 100%);
   border: 3px solid var(--white);
   box-shadow: 0 10px 24px rgba(10, 58, 87, 0.3);
-  padding: 7.65px 12.24px; /* then x0.9: 8.5/13.6 x 0.9 */
+  padding: 6.885px 11.016px; /* then x0.9 again: 7.65/12.24 x 0.9 */
   font-family: var(--font-mohave), var(--font-body), system-ui, sans-serif;
   font-weight: 700;
-  font-size: 0.80325rem; /* then x0.9: 0.8925 x 0.9 */
+  font-size: 0.722925rem; /* then x0.9 again: 0.80325 x 0.9 */
   color: #ffffff;
 }
 
@@ -606,7 +606,7 @@
 .counter.counter {
   position: relative;
   overflow: visible;
-  padding: 9.18px 13.77px 7.65px 13.77px; /* then x0.9: 10.2/15.3/8.5/15.3 x 0.9 */
+  padding: 8.262px 12.393px 6.885px 12.393px; /* then x0.9 again: 9.18/13.77/7.65/13.77 x 0.9 */
 }
 .counter.counter .minimiseBtn {
   position: absolute;
@@ -626,7 +626,7 @@
 
 /* Align the pills to the same left edge as the two cards, which sit 30px in. */
 .counter.counter, .reveal.reveal {
-  transform: translateX(30px) rotate(1deg);
+  transform: translateX(30px) rotate(-2deg);
 }
 
 /* All three close marks at half size. */
