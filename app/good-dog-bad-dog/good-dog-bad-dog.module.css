@@ -192,9 +192,16 @@
    12 Aug 2026; breadcrumb added 17 Aug 2026). */
 :root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"] .essayBody p,
 :root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"] .backLink,
-:root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"] .backLinkArticle {
+:root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"] .backLinkArticle,
+:root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"] .toggleText {
   color: #ffffff;
 }
+/* Argos body-prose emphasis (strongs) and spans that used to carry an inline colour
+   the toggle could not reach. Now a class so they follow the toggle: black by default
+   (matching the prose), white when it is on. The yellow emphasis is deliberately left
+   inline, and the smarter-than-the-test hero-title span stays white (it sits over the
+   hero image, not the gradient) (17 Aug 2026). */
+.toggleText { color: #000000; }
 .essayBody p {
   font-family: var(--font-body, "Montserrat", sans-serif);
   font-size: 1.25rem;

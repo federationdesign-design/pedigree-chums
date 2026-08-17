@@ -545,7 +545,7 @@ export default function ArgosPage() {
               <div className={styles.desktopOnly}>
               <ul className={styles.essayBullets}>
                 <li>But Argos recognises Odysseus.</li>
-                <li style={{ color: "var(--navy)" }}>The humans see a beggar.</li>
+                <li className={styles.toggleText}>The humans see a beggar.</li>
                 <li>The dog knows his master.</li>
                 <li>That is the whole power of the scene.</li>
               </ul>
@@ -589,15 +589,15 @@ export default function ArgosPage() {
               <p>
                 Odysseus notices. He wipes away a tear, but he cannot go to Argos openly.{" "}
                 <strong style={{ fontWeight: 700, color: "var(--yellow)" }}>He cannot kneel beside him,</strong>{" "}
-                <strong style={{ fontWeight: 700, color: "#ffffff" }}>call his name, or comfort him</strong>{" "}
+                <strong className={styles.toggleText} style={{ fontWeight: 700 }}>call his name, or comfort him</strong>{" "}
                 <strong style={{ fontWeight: 700, color: "var(--yellow)" }}>without risking his disguise.</strong>{" "}
-                <strong style={{ fontWeight: 700, color: "#ffffff" }}>Argos has enough strength left to recognise him,</strong>{" "}
+                <strong className={styles.toggleText} style={{ fontWeight: 700 }}>Argos has enough strength left to recognise him,</strong>{" "}
                 <strong style={{ fontWeight: 700, color: "var(--yellow)" }}>but not enough to reach him.</strong>{" "}
-                <strong style={{ fontWeight: 700, color: "#ffffff" }}>Then, as Odysseus goes inside,</strong>{" "}
+                <strong className={styles.toggleText} style={{ fontWeight: 700 }}>Then, as Odysseus goes inside,</strong>{" "}
                 <strong style={{ fontWeight: 700, color: "var(--yellow)" }}>Argos dies.</strong>
               </p>
 
-              <p><span style={{ color: "var(--navy)" }}>It is a brutal little scene because it withholds the reunion we want. Homer does not give us the big embrace. He gives us recognition without comfort.</span></p>
+              <p><span className={styles.toggleText}>It is a brutal little scene because it withholds the reunion we want. Homer does not give us the big embrace. He gives us recognition without comfort.</span></p>
 
               <h2 className={styles.subhead}>Why we need Odysseus to go to him</h2>
 
