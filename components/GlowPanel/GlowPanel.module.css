@@ -14,6 +14,26 @@
   box-shadow: 0 24px 60px rgba(10, 58, 87, 0.32);
 }
 
+/* Scheme stroke. Same fault and fix as the PitchPanel: SchemeStrokes marks both
+   this .panel and the .glowLayer child, but the item-6 inset outline never shows
+   on the panel edge -- the .glowLayer fill (absolute, inset:0) the sweep turns
+   opaque paints over .panel's outline, and glowLayer's own outline is at the
+   bottom of the paint order. Draw a top-layer ring on the panel that paints above
+   the fill and content, tracing the rounded edge. Colour follows the scheme
+   foreground (verified on production /dogs-at-work, 18 Aug 2026). */
+:global(:root[data-pc-contrast-scheme]) .panel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 2px solid #000000;
+  border-radius: 40px;
+  z-index: 50;
+  pointer-events: none;
+}
+:global(:root[data-pc-contrast-scheme="white-on-black"]) .panel::after {
+  border-color: #ffffff;
+}
+
 /* Clips the two screen-blend circles to the rounded corners and paints the
    brand gradient. */
 .glowLayer {
