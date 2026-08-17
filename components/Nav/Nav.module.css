@@ -95,15 +95,19 @@
    height 0.1, bar pitch 0.22, and a 5px navy edge that is not scaled.
    Breakpoint is 768px to match PackPit's own isMobile query. */
 @media (max-width: 768px) {
+  /* Scaled down 15% from the pit-matched 67.5 (-> 57.375), keeping every internal
+     proportion: radius, bar width/height and pitch all take the same 0.85, so the
+     mobile hamburger stays matched to the accessibility button (PcContrastToolbar,
+     scaled by the same 15%). The 5px navy edge is absolute and not scaled. */
   .burger {
-    width: 67.5px;
-    height: 67.5px;
-    border-radius: 20.25px;
-    gap: 8.1px;
+    width: 57.375px;
+    height: 57.375px;
+    border-radius: 17.2125px;
+    gap: 6.885px;
   }
   .burger span {
-    width: 33.75px;
-    height: 6.75px;
+    width: 28.6875px;
+    height: 5.7375px;
   }
 }
 
