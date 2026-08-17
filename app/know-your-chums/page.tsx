@@ -7,6 +7,7 @@ import ParallaxShape from "../../components/Parallax/ParallaxShape";
 import Announce from "../../components/Announce/Announce";
 import BreedStats from "./BreedStats";
 import ChumExplorer from "./ChumExplorer";
+import ArticleTextToggle from "../../components/ArticleTextToggle/ArticleTextToggle";
 import styles from "./know.module.css";
 
 export const metadata: Metadata = {
@@ -51,6 +52,11 @@ export default function KnowYourChums() {
             <Triangles items={heroTriangles} z={2} />
           </div>
         </section>
+
+        {/* Article text toggle, centred as on /home. Inverts the page text
+            (white -> dark blue); see know.module.css for the deliberately
+            asymmetric rules and what is excluded. */}
+        <ArticleTextToggle centered />
 
         {/* Intro */}
         <section className={styles.intro}>

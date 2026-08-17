@@ -1037,3 +1037,47 @@
   .flipHint { font-size: 1.05rem !important; padding: 14px 20px 10px; }
   .flipName { font-size: 1.3rem !important; }
 }
+
+/* ============================================================================
+   Article text toggle (know-your-chums, 18 Aug 2026).
+
+   THIS IS NOT A TRUE INVERSION, by decision -- do not "finish" it by making it
+   symmetric later. It goes one way only where compliance allows: white text (low
+   contrast on the gradient) flips to dark blue, but text that is ALREADY compliant
+   dark stays dark, because flipping it to white would drop it below AA:
+     - factLabel: dark navy on the panel gradient (~3.6-7.6:1); white would be
+       ~1.5-3.3:1 on the gradient. Left dark (no rule below).
+     - flipName / flipNote: dark navy on the yellow card back (~8.3:1); white on
+       yellow would be ~1.4:1. Left dark (no rule below).
+   Also excluded: the yellow display accents (stay yellow), the hero Announce (over
+   the hero image, not the gradient), and the row scrollbar (not a % bar). The
+   search inverts via ChumSearch's own toggle rule. Gated on
+   :root:not([data-pc-contrast-scheme]) so a contrast scheme wins.
+
+   Group A -- white on the gradient -> dark blue (navy clears the 3:1 large-text
+   bar across the gradient; small body dips to ~3.6:1 at the deep end, accepted as
+   elsewhere). flipHint joins this group: white-on-green was 2.28:1 (failing),
+   navy-on-green is 5.25:1. */
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .title,
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .lead,
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .panelTitle,
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .factHero,
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .source,
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .statsHeading,
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .statCaption,
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .statsIntro,
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .barPct,
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .rowTitle,
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .flipHint {
+  color: var(--navy, #0a3a57);
+}
+
+/* Group B -- the yellow percentage bars go dark blue, and the breed name inside
+   each (dark navy at rest, 9.98:1 on yellow) flips to white so it stays legible on
+   the now-navy fill (~10:1). The fill and the name MUST move together. */
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .barFill {
+  background: var(--navy, #0a3a57);
+}
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .barName {
+  color: #ffffff;
+}
