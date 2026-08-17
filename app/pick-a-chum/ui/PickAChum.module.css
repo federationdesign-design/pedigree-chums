@@ -1163,6 +1163,11 @@
      accessibility: in the default view the panel has no backing and keeps its top:8px. */
   .rootAccessible .panel {
     top: 96px;
+    /* Match the desktop .chatColumn frame so the capped backing reads as a bounded region, not a fill that
+       runs off the edges. In a scheme the sweep recolours the border to the scheme foreground. */
+    border: 2px solid var(--pc-ui-navy);
+    border-radius: 14px;
+    padding: 6px;
   }
 
   /* The dog's name: half the size, tucked closer to the medallion. */
@@ -1959,6 +1964,8 @@
     justify-content: flex-end;
     gap: 4px;
     margin: 0 0 6px;
+    /* Match the controls' right inset so the two right-aligned rows line up. */
+    padding-right: 8px;
   }
   /* Shrink so all three names fit one row across the mobile panel. */
   .recededName {
@@ -2070,7 +2077,10 @@
     justify-content: flex-start;
     flex-wrap: nowrap;
     gap: 6px;
-    margin: 0 0 6px;
+    /* Task 174: extra breathing room above the CLOSE/MINIMISE row (8px, on top of the panel's 6px pad) and
+       to their right (8px), so they are not tight against the panel edge/stroke. */
+    margin: 8px 0 6px;
+    padding-right: 8px;
   }
   /* The old margin-top made room above the medallion for the absolutely-positioned chrome; the chrome is now
      in the panel flex flow, so it is no longer needed. */
