@@ -85,6 +85,10 @@
 .contentCol {
   color: var(--white);
 }
+/* RECORDED default-view failure, not fixed (Steve, 18 Aug 2026): these headings stay
+   white on the site gradient -- ~1.45:1 at the cyan end, and below the 3:1 large-text
+   bar across most of the gradient (WCAG 1.4.3). Kept white by decision; the article text
+   toggle does not recolour them, while the body prose below is compliant black instead. */
 .contentCol h1 {
   font-size: clamp(2.3rem, 6vw, 4.2rem);
   margin: 0;
