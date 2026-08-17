@@ -184,6 +184,28 @@
   .option, .optionRed { padding-top: 2.4rem; padding-bottom: 2.4rem; font-size: calc(1em + 2pt); }
 }
 
+/* Article text toggle (argos only): the essay toggle inverts the prose to white, and
+   the poll's title/question/footnote are <p> inside .essayBody, so they whiten with it
+   and then vanish on the poll's white panel. Follow the toggle: the panel goes dark blue
+   in the on state so the (white) text stays legible, white by default with navy text.
+   The results view uses <span> labels and the percentage, which the p-only essay rule
+   cannot reach, so every text element is set white here too, keeping the panel
+   self-contained rather than depending on that rule. Buttons and bars keep their own
+   colours. Gated on :root:not([data-pc-contrast-scheme]) so a contrast scheme wins.
+   DogPoll is used only on argos (17 Aug 2026). */
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .wrap {
+  background: var(--navy, #0a3a57);
+}
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .wrap .kicker,
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .wrap .kickerBody,
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .wrap .question,
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .wrap .resultLabel,
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .wrap .resultLabelPicked,
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .wrap .resultPct,
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .wrap .footnote {
+  color: #ffffff;
+}
+
 @media (min-width: 769px) {
   /* Poll: bigger everything, more inset, more breathing room. */
   .wrap { padding: 8.5rem 5rem; }
