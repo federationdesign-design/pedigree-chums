@@ -80,6 +80,9 @@ export interface HiddenGamesEngine {
   markIntroSeen: () => void;
   markCompletionSeen: () => void;
   markPreludeSeen: () => void;
+  // Count this page view and persist it, returning the new 1-indexed page number.
+  // The counter uses the number to decide which page shows a card.
+  registerPageView: () => number;
   getState: () => CounterState;
   subscribe: (listener: () => void) => () => void;
   // A non-final award (CHANGE-LIST C02): the listener receives the remaining
@@ -260,11 +263,23 @@ export function createEngine(deps: EngineDeps): HiddenGamesEngine {
     emit();
   }
 
+  // Count this page view and persist the running tally, returning the new
+  // 1-indexed page number. page_views is not part of CounterState (nothing the
+  // counter renders changes), so no snapshot recompute or emit is needed. Same
+  // best-effort persistence as markPreludeSeen: a refused write just means the
+  // tally does not advance this page.
+  function registerPageView(): number {
+    record = { ...record, page_views: record.page_views + 1 };
+    safeSet(serializeRecord(record));
+    return record.page_views;
+  }
+
   return {
     reportHiddenGame,
     markIntroSeen,
     markCompletionSeen,
     markPreludeSeen,
+    registerPageView,
     getState: () => snapshot,
     subscribe: (listener: () => void) => {
       listeners.add(listener);

@@ -36,6 +36,12 @@ export interface HiddenGamesRecord {
   // record_schema stays 3 and no earlier record is invalidated. G10-found is derived (length >= 3);
   // completion is derived (length >= 10). Persists across reloads (unlike the tap-cycle image).
   hats_found: string[];
+  // How many pages this visitor has viewed, a 1-indexed running tally. ADDITIVE
+  // optional field, same treatment as intro_seen: a record written before this
+  // existed reads as 0, so the schema stays 3 and no earlier record is
+  // invalidated. Drives which page the cards appear on: the prelude on page 2,
+  // the introduction on page 3 (both once only, gated by the flags above).
+  page_views: number;
 }
 
 // Why a record read differed from a clean restore. Used only for the
@@ -63,6 +69,7 @@ export function freshRecord(nowMs: number): HiddenGamesRecord {
     completion_seen: false,
     prelude_seen: false,
     hats_found: [],
+    page_views: 0,
   };
 }
 
@@ -136,6 +143,15 @@ export function readRecord(
     : [];
   const hats = Array.from(new Set(rawHats));
 
+  // Missing or invalid reads as 0 (an older record predating this field), so it
+  // is never invalidated: it just starts its page tally afresh.
+  const pageViews =
+    typeof obj.page_views === "number" &&
+    Number.isFinite(obj.page_views) &&
+    obj.page_views >= 0
+      ? obj.page_views
+      : 0;
+
   return {
     record: {
       record_schema: RECORD_SCHEMA,
@@ -148,6 +164,7 @@ export function readRecord(
       completion_seen: obj.completion_seen === true,
       prelude_seen: obj.prelude_seen === true,
       hats_found: hats,
+      page_views: pageViews,
     },
     note: "restored",
   };
@@ -180,6 +197,7 @@ export function applyReport(
       completion_seen: record.completion_seen,
       prelude_seen: record.prelude_seen,
       hats_found: record.hats_found,
+      page_views: record.page_views, // a find never touches the page tally
     },
     outcome: "awarded",
   };
