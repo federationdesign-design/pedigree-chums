@@ -1170,6 +1170,13 @@
     padding: 6px;
   }
 
+  /* Task 174: hide the GO button in an accessibility mode on mobile only (the input keeps its full width and
+     still submits on Enter -- the composer is a form with onSubmit). Default view keeps GO, and desktop keeps
+     it in every mode. The input is flex:1, so the freed space goes to it rather than leaving a gap. */
+  .rootAccessible .go {
+    display: none;
+  }
+
   /* The dog's name: half the size, tucked closer to the medallion. */
   .dialogue { font-size: 11px; }
   .name,
@@ -1889,16 +1896,17 @@
   overflow: hidden;
 }
 
-/* The receded switch as named text buttons (desktop: a column left of the medallion). */
-/* Task 174 (desktop): the three other-dog name buttons sit ABOVE the profile image, as a centred horizontal
-   row. (Mobile overrides this to a right-aligned panel-level row, below.) */
+/* Task 174 (desktop): the three other-dog name buttons sit ABOVE the profile image, stacked VERTICALLY (a
+   column). Desktop has the vertical room; mobile overrides this to a right-aligned panel-level row (below),
+   which is intended -- different space on each side. */
 .recededTextGroup {
   position: absolute;
   bottom: calc(100% + 8px);
   left: 50%;
   transform: translateX(-50%);
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
+  align-items: center;
   flex-wrap: nowrap;
   gap: 6px;
   z-index: 4;

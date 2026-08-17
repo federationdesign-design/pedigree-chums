@@ -1463,7 +1463,7 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
           <button type="button" className={styles.controlBtn} aria-label="Minimise the chat" onClick={minimise}>MINIMISE</button>
         </div>
         {withMove && (
-          <button type="button" className={`${styles.controlBtn} ${styles.moveBtn}`} aria-label="Move the chat" title="Move the chat" onPointerDown={startColumnDrag} data-pc-flat>MOVE</button>
+          <button type="button" className={`${styles.controlBtn} ${styles.moveBtn}`} aria-label="Move the chat" title="Move the chat" onPointerDown={startColumnDrag}>MOVE</button>
         )}
       </>
     ) : null;
@@ -1696,7 +1696,11 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
                     ref={fanAnchorRef}
                     className={`${styles.dogAnchor} ${styles.anchorFan} ${docked ? styles.anchorDocked : ''} ${anchorSwap}`}
                     style={docked
-                      ? { left: `${round1(DOCK_L + dragOffset.dx)}px`, top: `${round1(DOCK_T + dragOffset.dy)}px` }
+                      // Task 174: a reopen-from-chip docks at DOCK_T (18px, top), but in an accessibility mode
+                      // the history is pinned at top:200px, so a top-docked medallion leaves it no room and it
+                      // cannot be seen. Anchor the docked medallion to the MIDDLE of the page instead there,
+                      // so the history (200px to the medallion) is visible. Keeps DOCK_L horizontally.
+                      ? { left: `${round1(DOCK_L + dragOffset.dx)}px`, top: accessible ? `calc(50vh + ${round1(dragOffset.dy)}px)` : `${round1(DOCK_T + dragOffset.dy)}px` }
                       // Task 168 (point 3): the FROZEN chat position (set on the first pick), NOT the active
                       // dog's own fan slot -- so a switch changes the portrait, not the position.
                       : { left: `${round1((chatAnchorRef.current?.left ?? p.left) + dragOffset.dx)}px`, top: `${round1((chatAnchorRef.current?.top ?? p.top) + dragOffset.dy)}px` }}
