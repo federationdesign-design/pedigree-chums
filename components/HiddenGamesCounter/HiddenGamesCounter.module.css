@@ -627,6 +627,7 @@
 /* Align the pills to the same left edge as the two cards, which sit 30px in. */
 .counter.counter, .reveal.reveal {
   transform: translateX(30px) rotate(-2deg);
+  z-index: 400; /* above the header bar/logo (z-index 300); below the nav drawer (1200) */
 }
 
 /* All three close marks at half size. */
