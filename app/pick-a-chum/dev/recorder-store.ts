@@ -48,10 +48,14 @@ export interface Aggregate {
 
 // Column order for export (kept in one place so CSV and any future xlsx agree). `timestamp`
 // is deliberately excluded -- gapAfter replaces it (a relative gap reads without arithmetic).
+// Task 174: route, outcome, protected and lastTurn are TRIMMED from the export (owner request). The TurnRow
+// still carries them -- buildSessions/getAggregate read outcome, protected and route to compute endReason,
+// linkFollowed and the miss count -- they are just omitted from the exported columns here (and from the sheet
+// payload, see SheetSync).
 export const COLUMNS: (keyof TurnRow)[] = [
-  'sessionId', 'turn', 'gapAfter', 'activeDog', 'route', 'trigger', 'input', 'outcome',
+  'sessionId', 'turn', 'gapAfter', 'activeDog', 'trigger', 'input',
   'action', 'bucket', 'responseId', 'responseText', 'media', 'transferTo', 'gameActive',
-  'rephrase', 'protected', 'lastTurn',
+  'rephrase',
 ];
 
 const MIN_MESSAGES = 3; // a conversation counts only at three turns or more

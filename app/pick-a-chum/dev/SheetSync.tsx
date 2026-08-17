@@ -22,7 +22,11 @@ function payload(buf: Buffered[]): string {
     })
     .filter((r): r is TurnRow => r !== null);
   const turns = enrichRows(rows); // gapAfter / rephrase / lastTurn, exactly as the CSV export computes them
-  return JSON.stringify({ turns, sessions: buildSessions(turns) });
+  const sessions = buildSessions(turns); // computed BEFORE the trim -- it reads outcome/protected/route
+  // Task 174: trim route, outcome, protected and lastTurn from the exported turns (owner request), matching
+  // the CSV COLUMNS. Stripped after buildSessions so the session summary still sees them.
+  const exportTurns = turns.map(({ route, outcome, protected: _protected, lastTurn, ...rest }) => rest);
+  return JSON.stringify({ turns: exportTurns, sessions });
 }
 
 export default function SheetSync() {

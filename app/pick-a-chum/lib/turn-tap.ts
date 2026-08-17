@@ -83,9 +83,32 @@ export function gapLogEnabled(): boolean {
 // /api/pc-sync-config route; this client helper only asks that route. DEFAULT IS OFF: no `?rec=1`, no Edge
 // Config store connected, a disabled value, or any network/parse error all resolve to false. Nothing here
 // sends transcript data -- it only reports the on/off state the send path will check before it does anything.
+// ============================================================================
+//  ⚠️  TEMPORARY — TESTING WINDOW ONLY.  REMOVE (set to false) BEFORE LAUNCH.  ⚠️
+// ----------------------------------------------------------------------------
+//  THE OFF SWITCH. This ONE line is the whole thing. While true, the sheet sync
+//  runs for EVERY visitor on EVERY page with NO ?rec=1 -- so real test-window
+//  conversations reach the Google Sheet, not just flagged testers. Set it to
+//  false and the sync reverts to the normal ?rec=1-gated tester behaviour;
+//  nothing else needs touching.
+//
+//  Why this is temporary and deliberate: it sends every NON-protected visitor's
+//  conversation off the device to the sheet, which we only want during the test
+//  window. Two things are unchanged and must stay so:
+//    - Protected sessions still send NOTHING (dropped in the sync buffer before
+//      anything leaves the browser).
+//    - The visible REC badge is NOT turned on for visitors -- it stays ?rec=1 /
+//      preview only (recorderEnabled, above). Visitors record silently.
+//  And the live Global Config `pickachum_sync.enabled` remains a SEPARATE,
+//  instant, server-side kill for the send that needs no redeploy.
+// ============================================================================
+export const RECORD_EVERY_VISITOR_TEMP = true;
+
 export async function fetchSheetSyncEnabled(): Promise<boolean> {
   if (typeof window === 'undefined') return false;
-  if (new URLSearchParams(window.location.search).get('rec') !== '1') return false; // gate before any fetch
+  // Normally gated to ?rec=1 testers before any fetch; during the temporary testing window (the switch above)
+  // it runs for every visitor. The runtime Global Config switch is still required either way (checked below).
+  if (!RECORD_EVERY_VISITOR_TEMP && new URLSearchParams(window.location.search).get('rec') !== '1') return false;
   try {
     const res = await fetch('/api/pc-sync-config', { cache: 'no-store' });
     if (!res.ok) return false;
