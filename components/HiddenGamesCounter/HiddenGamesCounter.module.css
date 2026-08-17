@@ -716,8 +716,8 @@
 @media (max-width: 768px) {
   .counter.counter,
   .reveal.reveal {
-    left: 19px; /* was 12px; right another 7px */
-    top: calc(clamp(76px, 12vh, 112px) + env(safe-area-inset-top, 0px) - 23px); /* was -8px; up another 15px */
+    left: 21px; /* was 19px; right another 2px */
+    top: calc(clamp(76px, 12vh, 112px) + env(safe-area-inset-top, 0px) - 31px); /* was -23px; up another 8px */
   }
 }
 
