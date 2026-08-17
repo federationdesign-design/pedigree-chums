@@ -316,6 +316,20 @@
 :root[data-pc-contrast-scheme] #pc-site .pc-nav [class*="aWhiteOnBlack"] { background: #000000 !important; color: #ffffff !important; }
 :root[data-pc-contrast-scheme] #pc-site .pc-nav [class*="aWhiteOnBlack"] span { color: #ffffff !important; background: transparent !important; }
 
+/* Mobile master-icon collapse (<=768px). The master button, its active chips and
+   the dropdown take the scheme foreground on every stroke, and the master's
+   figure (a recolourable mask) takes the foreground too, exactly like the
+   burger's bars; the sweep supplies the scheme-background fill. The scheme chips
+   and scheme panel buttons keep their own A sample via the a* rules above. */
+:root[data-pc-contrast-scheme="black-on-white"] #pc-site .pc-nav [class*="master"],
+:root[data-pc-contrast-scheme="black-on-white"] #pc-site .pc-nav [class*="chip"],
+:root[data-pc-contrast-scheme="black-on-white"] #pc-site .pc-nav [class*="panel"] { outline-color: #000000 !important; }
+:root[data-pc-contrast-scheme="black-on-white"] #pc-site .pc-nav [class*="masterGlyph"] { background-color: #000000 !important; }
+:root[data-pc-contrast-scheme="white-on-black"] #pc-site .pc-nav [class*="master"],
+:root[data-pc-contrast-scheme="white-on-black"] #pc-site .pc-nav [class*="chip"],
+:root[data-pc-contrast-scheme="white-on-black"] #pc-site .pc-nav [class*="panel"] { outline-color: #ffffff !important; }
+:root[data-pc-contrast-scheme="white-on-black"] #pc-site .pc-nav [class*="masterGlyph"] { background-color: #ffffff !important; }
+
 /* ============================================================================
    ITEMS 1-2 (seven-changes redesign): header AND footer wordmark swap per scheme.
 
