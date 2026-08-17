@@ -22,7 +22,7 @@ export default function About() {
     <>
       <Suspense><AboutClient /></Suspense>
       <Nav />
-      <main>
+      <main data-pc-page="about">
         <Hero />
 
         <PitchPanel />

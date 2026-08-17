@@ -322,3 +322,23 @@ body.boxer-wrong-transfer::before {
 ) {
   color: var(--navy, #0a3a57);
 }
+
+/* /about article text toggle (18 Aug 2026). The ArticleTextToggle in the PitchPanel sets
+   data-pc-textinvert on the /about <main> (marked data-pc-page="about"); this recolours the
+   white below-hero prose to dark blue. These are the shared content globals, so the rule is
+   scoped to the /about main via data-pc-page to keep it off the essays, which share the
+   attribute but flip prose the other way (to white). The section headings (HowItPlays's
+   [class*="heading"]) are already covered by the rule above; the yellow accents and tick
+   bullets keep their colour (their own rules win), and the hero announce (over media), the
+   OfferCta buttons and all media are untouched. Navy on the gradient runs ~7.6:1 (cyan) to
+   ~3.6:1 (deep), a deliberate sub-AA dip at the deep end, accepted as on /home (Steve).
+   Gated on :root:not([data-pc-contrast-scheme]) so a contrast scheme wins. */
+:root:not([data-pc-contrast-scheme]) main[data-pc-page="about"][data-pc-textinvert="on"] :is(
+  .display,
+  .lead,
+  .subLead,
+  .point,
+  .feedSub
+) {
+  color: var(--navy, #0a3a57);
+}

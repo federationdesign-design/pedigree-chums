@@ -30,6 +30,21 @@
   padding: 6px;
 }
 
+/* Corner variant (/about panel): pin the control to the top-left of the enclosing
+   positioned panel instead of flowing in a full-width row. */
+.wrapCorner {
+  position: absolute;
+  top: clamp(12px, 1.6vw, 22px);
+  left: clamp(14px, 1.8vw, 26px);
+  width: auto;
+  margin: 0;
+  padding: 0;
+  z-index: 4;
+}
+.wrapCorner .toggle {
+  padding: 6px;
+}
+
 /* Icon-only: no pill, no visible label (the name lives on aria-label). padding
    is 0 on the left so the icon's left edge sits on the shared axis, matching the
    headline and first paragraph; the small right/vertical padding only grows the

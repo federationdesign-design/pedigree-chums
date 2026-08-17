@@ -24,8 +24,9 @@ const keyFor = () => "pc-textinvert:" + window.location.pathname;
 
 // `centered` centres the control in its full-width row instead of hugging the
 // shared left essay axis. The essays render it prop-less (left-aligned on that
-// axis); /home opts in because it has no essay axis to line up with.
-export default function ArticleTextToggle({ centered = false }: { centered?: boolean }) {
+// axis); /home opts in because it has no essay axis to line up with. `corner`
+// pins it to the top-left of a positioned parent (used inside the /about panel).
+export default function ArticleTextToggle({ centered = false, corner = false }: { centered?: boolean; corner?: boolean }) {
   const ref = useRef<HTMLDivElement>(null);
   const [white, setWhite] = useState(false);
 
@@ -54,7 +55,7 @@ export default function ArticleTextToggle({ centered = false }: { centered?: boo
   };
 
   return (
-    <div ref={ref} className={centered ? styles.wrap + " " + styles.wrapCentered : styles.wrap}>
+    <div ref={ref} className={[styles.wrap, centered && styles.wrapCentered, corner && styles.wrapCorner].filter(Boolean).join(" ")}>
       <button
         type="button"
         className={styles.toggle}

@@ -2,6 +2,7 @@ import CardRail from "../CardRail/CardRail";
 import LabPop from "./LabPop";
 import OfferCta from "../Offer/OfferCta";
 import Triangles, { type Tri } from "../Parallax/Triangles";
+import ArticleTextToggle from "../ArticleTextToggle/ArticleTextToggle";
 import styles from "./PitchPanel.module.css";
 
 const pitchTriangles: Tri[] = [
@@ -18,6 +19,9 @@ export default function PitchPanel() {
           <span className={`${styles.glowCircle} ${styles.glowTop}`} />
           <span className={`${styles.glowCircle} ${styles.glowBottom}`} />
         </div>
+        {/* Article text toggle, pinned to the panel's top-left corner. Sets
+            data-pc-textinvert on the /about <main>; hides itself in a scheme. */}
+        <ArticleTextToggle corner />
         <div className={styles.pitch}>
           <Triangles items={pitchTriangles} z={0} />
           <div className={styles.photoCol}>
