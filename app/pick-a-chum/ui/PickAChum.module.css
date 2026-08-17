@@ -152,19 +152,18 @@
      underneath is clickable/scrollable. The old click-the-wash-to-close is intentionally gone -- the
      X and Escape still close. */
 }
-/* Task 174: in an accessibility mode the wash is the opaque PAGE COVER. It is inset from the top so the
-   header strip (logo, menu, toolbar) stays clear above it, while the page content below is hidden behind the
-   chat. In a scheme the monochrome sweep fills it (the wash carries no data-pc-flat, unlike root/scrim); the
-   white here is the hide-images-only (colour) case, overridden by the sweep in a scheme. The inset matches
-   the history cap so the two share one below-the-header line. */
-.rootAccessible .wash {
-  background-color: #ffffff;
-  top: 150px;
-}
-@media (max-width: 480px) {
-  .rootAccessible .wash {
-    top: 72px;
-  }
+/* Task 174 (reversed): the accessibility-mode PAGE COVER is gone. The wash was made opaque here (a white
+   fill for the hide-images case, the sweep filling it in a scheme) and inset below the header, but that
+   cover blocked the header menus and the accessibility toolbar -- the same trap as the full-bleed .root.
+   The wash is now transparent in every mode: this override is removed and the wash div carries data-pc-flat
+   so the scheme sweep leaves it transparent too. The chat sits over the page, as it does by default. */
+
+/* Task 174 (reversed): the brand-blue scrim glow is removed entirely in an accessibility mode. It was built
+   to sit behind the chat in the default view; in a scheme its data-pc-flat already blanks the gradient, but
+   in the hide-images (colour) case it stayed a full-viewport blue layer over the page -- the same class of
+   problem as the wash cover. Drop it in both accessibility sub-modes; it returns in the default view. */
+.rootAccessible .scrim {
+  display: none;
 }
 /* Task 116: the panel and selector CONTAINERS are large, mostly-empty rectangles laid over the page
    (the panel is ~460px wide and nearly full height; on mobile it is ~full width). Task 105 gave the
