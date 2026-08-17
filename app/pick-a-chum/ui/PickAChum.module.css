@@ -1917,14 +1917,25 @@
      text is smaller here to fit the longest name without clipping. */
   .faceName { font-size: 12px; }
   .chipName { font-size: 10px; }
-  /* Mobile medallion is pinned top-left, so the named switch sits in a wrapped row below it. */
+  /* Task 174 (mobile space): the receded switch and the controls used to hang BELOW the medallion, into
+     the thread, stealing response height (the names stacked in a column, which cost even more). Both now sit
+     ABOVE the medallion/input as single horizontal rows -- names just above, controls above them -- so the
+     whole thread below the composer is clear. The composer is pushed down (below) to make the room. */
   .recededTextGroup {
-    top: calc(100% + 8px);
+    top: auto;
+    bottom: calc(100% + 6px);
     right: auto;
     left: 0;
     flex-direction: row;
-    flex-wrap: wrap;
-    max-width: 240px;
+    flex-wrap: nowrap;
+    max-width: none;
+    gap: 4px;
+  }
+  /* Shrink so all three names fit one row across the mobile panel. */
+  .recededName {
+    font-size: 9px;
+    padding: 4px 6px;
+    letter-spacing: 0;
   }
   .recededName:hover { transform: none; }
 }
@@ -2001,14 +2012,21 @@
   outline-offset: 2px;
 }
 
-/* Task 174: on mobile the medallion is pinned top-left, so the desktop right:100%+8 would push the control
-   panel off-screen. Sit it to the RIGHT of the receded names panel, both below the medallion. */
+/* Task 174 (mobile space): the CLOSE/MINIMISE/MOVE controls sit ABOVE the medallion/input as one horizontal
+   row (above the receded-names row), not below it into the thread. The composer is pushed down to make room
+   so the whole thread below stays clear of the chrome. */
 @media (max-width: 480px) {
   .controlPanel {
     right: auto;
-    left: 160px;
-    top: calc(100% + 8px);
+    left: 0;
+    top: auto;
+    bottom: calc(100% + 42px);
     flex-direction: row;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    gap: 6px;
+  }
+  /* Room above the medallion for the two chrome rows (controls + names). */
+  .composerRow {
+    margin-top: 84px;
   }
 }
