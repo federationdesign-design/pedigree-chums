@@ -246,6 +246,15 @@
   opacity: 0;
   animation: pcFade 240ms ease forwards;
 }
+/* Task 174: the sweep does not reach this SVG (svg/path are excluded), so recolour the wedges to the scheme
+   FOREGROUND explicitly, or they would stay yellow in a scheme. Hide-images (colour) mode keeps the yellow.
+   The :root[scheme] prefix out-specifies the base .connectorLine fill. */
+:root[data-pc-contrast-scheme="black-on-white"] .connectorLine {
+  fill: #000000;
+}
+:root[data-pc-contrast-scheme="white-on-black"] .connectorLine {
+  fill: #ffffff;
+}
 .dogBtn {
   position: absolute;
   width: 128px;
@@ -1145,6 +1154,15 @@
     top: 8px;
   }
 
+  /* Task 174: in an accessibility mode the panel carries an opaque backing (the scheme sweep fills it) that
+     otherwise runs to the top of the screen and covers the header (logo, accessibility toolbar, menu). Cap
+     the panel below the header, the mobile analogue of the desktop .chatColumn top:200px. The mobile header
+     content ends at ~85px (logo 85, toolbar/menu 80), so 96px clears it with a small gap. Scoped to
+     accessibility: in the default view the panel has no backing and keeps its top:8px. */
+  .rootAccessible .panel {
+    top: 96px;
+  }
+
   /* The dog's name: half the size, tucked closer to the medallion. */
   .dialogue { font-size: 11px; }
   .name,
@@ -1834,6 +1852,14 @@
   color: var(--pc-ui-navy);
   padding: 3px;
   overflow: hidden;
+}
+/* Task 174: the FAN circles show a short single-word name (COLLIE/LAB/TERRIER/BOXER), much larger than the
+   full name they replace, since it was too small to read in the 128px slot. Scoped to the fan (.dogBtnNamed)
+   so the medallion, chip and receded switch keep their sizes. A true 2x (38px) clips the longest name,
+   TERRIER, in the circle; 29px fits it on one line with a small margin (~1.5x the 19px faceName).
+   Beats the .faceName mobile override by specificity. */
+.dogBtnNamed .fanName {
+  font-size: 29px;
 }
 
 /* The minimised chip: the dog's full name, wrapped word-per-line and sized to fit the circle

@@ -122,6 +122,11 @@ function dogInfo(dog: Dog): { name: string; image: string } {
   return { name: rec?.name ?? dog, image: rec ? encodeURI(rec.image) : '' };
 }
 
+// Task 174: in the fan (the selector circles) in an accessibility mode the full name is too small to read,
+// so a SHORT single-word name is shown at double the size. Fan ONLY -- the medallion, chip and receded
+// switch keep the full name.
+const FAN_SHORT_NAME: Record<Dog, string> = { collie: 'COLLIE', labrador: 'LAB', terrier: 'TERRIER', boxer: 'BOXER' };
+
 // Match the assembler's whitespace collapse so a handover prefix strips cleanly.
 function collapse(s: string): string {
   return s.replace(/\s{2,}/g, ' ').trim();
@@ -1649,11 +1654,12 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
               scheme sweep would fill them (a 440px scheme-coloured block blanking the page behind the fan),
               the same fault the wash had. data-pc-flat forces them transparent, like root/wash. */}
           <div className={`${styles.selector} ${docked && phase !== 'selecting' ? styles.selectorDocked : ''}`} data-pc-flat>
-            {/* Task 174: the yellow connector wedges are a colour cue linking the centre icon to each dog.
-                In any accessibility mode the fan is name plates, not portraits, and the chat is a body-level
-                overlay the scheme sweep cannot reach, so a bare yellow line would survive uncrushed. Drop
-                the connectors entirely there: the plates stand on their own. */}
-            {phase === 'selecting' && !accessible && (
+            {/* Task 174 (reversed): the connector wedges link the centre icon to each dog. They were dropped
+                in an accessibility mode (yellow, decorative, and the sweep does not reach this SVG to crush
+                it). They are back now: the .connectorLine fill is recoloured to the scheme FOREGROUND in a
+                scheme (black on black-on-white, white on white-on-black), so they show in both schemes; in
+                hide-images (colour) mode they keep the brand yellow. */}
+            {phase === 'selecting' && (
               <svg className={styles.connectors} viewBox="0 0 440 440" aria-hidden="true" focusable="false">
                 {/* Task 113 + 121: each radial starts at the icon's circular-body edge (ARC_BODY_R from
                     the anchor centre) and runs to its dog's centre. Both ends derive from the arc, so
@@ -1761,7 +1767,7 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
                   aria-label={info.name}
                   style={{ ...(accessible ? {} : { backgroundImage: `url("${PROFILE_IMG[d]}")` }), left: `${round1(p.left)}px`, top: `${round1(p.top)}px`, animationDelay: `${0.15 + i * 0.3}s` }}
                 >
-                  {accessible && <span className={styles.faceName}>{nameLines(info.name)}</span>}
+                  {accessible && <span className={`${styles.faceName} ${styles.fanName}`}>{FAN_SHORT_NAME[d]}</span>}
                 </button>
               );
             })}
