@@ -30,6 +30,7 @@ import {
   PRELUDE_WARNING,
   PRELUDE_HEADING,
 } from "../../lib/hiddenGames/copy";
+import { getScheme, getHideImages, CONTRAST_EVENT } from "../../lib/contrastScheme";
 import styles from "./HiddenGamesCounter.module.css";
 
 const PRELUDE_AT = 5000; // C03 timings, from page load
@@ -74,6 +75,32 @@ export default function HiddenGamesCounter() {
   // Task 136: condensed by DEFAULT. A click expands it (was desktop hover, now
   // click on both platforms, matching the mobile tap). There is no minimise
   // control, so once expanded it stays open until the next page load.
+  // Task 174: on mobile, in an accessibility mode, an OPEN chat covers this corner and sits over the dog
+  // profile. Gate the counter off only in that exact intersection: mobile AND accessibility AND chat open.
+  // The chat (a separate component) publishes data-pc-chat-open on <body>; accessibility is the scheme/
+  // hide-images signal; mobile is the width. Still shows in the default view, on desktop, and when the chat
+  // is minimised or closed (no data-pc-chat-open).
+  const [hideForChat, setHideForChat] = useState(false);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const mq = window.matchMedia("(max-width: 480px)");
+    const compute = () => {
+      const accessible = getScheme() !== null || getHideImages();
+      const chatOpen = document.body.hasAttribute("data-pc-chat-open");
+      setHideForChat(mq.matches && accessible && chatOpen);
+    };
+    compute();
+    mq.addEventListener("change", compute);
+    window.addEventListener(CONTRAST_EVENT, compute);
+    const obs = new MutationObserver(compute);
+    obs.observe(document.body, { attributes: true, attributeFilter: ["data-pc-chat-open"] });
+    return () => {
+      mq.removeEventListener("change", compute);
+      window.removeEventListener(CONTRAST_EVENT, compute);
+      obs.disconnect();
+    };
+  }, []);
+
   const [minimised, setMinimised] = useState(true);
   const [blockedDismissed, setBlockedDismissed] = useState(false);
   const [completionCollapsed, setCompletionCollapsed] = useState(false);
@@ -131,6 +158,7 @@ export default function HiddenGamesCounter() {
 
   if (!state) return null;
   if (!state.render) return null;
+  if (hideForChat) return null;
 
   if (state.view === "suspended") {
     return (

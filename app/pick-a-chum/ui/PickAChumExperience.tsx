@@ -465,6 +465,16 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
     return () => document.body.removeAttribute('data-pc-min');
   }, [minimised]);
 
+  // Task 174: a body flag for "the expanded chat is showing" (mounted and not the minimised chip), so a
+  // SEPARATE component -- the hidden-games counter -- can gate itself off when the chat covers its corner in
+  // an accessibility mode on mobile. Absent when minimised (the chip is small) and on unmount (chat closed).
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    if (!minimised) document.body.setAttribute('data-pc-chat-open', '1');
+    else document.body.removeAttribute('data-pc-chat-open');
+    return () => document.body.removeAttribute('data-pc-chat-open');
+  }, [minimised]);
+
   // Task 164: drive the page from the Boxer game state. A fresh `boxer` object each turn re-runs this, so
   // applyBoxerEffect (which resets the previous effect first) keeps exactly one effect live; going null
   // (game ended, transfer away, safety) resets the page. This is the ONLY place the game paints the site.
