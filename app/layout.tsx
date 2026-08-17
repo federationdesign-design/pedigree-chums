@@ -128,7 +128,11 @@ export default function RootLayout({
             a returning scheme user never sees a flash of the default view (brief
             v5, task 5). Built with string concatenation, NOT a template literal:
             backticks inside an inline script have broken this build before. Keep
-            the key, attribute name and values in sync with lib/contrastScheme.ts. */}
+            the key, attribute name and values in sync with lib/contrastScheme.ts.
+            Hide-images is disabled (Steve, 17 Aug 2026): rather than apply a stored
+            pc-hide-images value, clear it here before paint so anyone already stuck
+            in that mode is freed with no flash and no way to be trapped. The key and
+            the rest of the plumbing are left intact so it can be re-enabled later. */}
         <script
           dangerouslySetInnerHTML={{
             __html:
@@ -137,9 +141,9 @@ export default function RootLayout({
               "if(v==='black-on-white'||v==='white-on-black'){" +
               "document.documentElement.setAttribute('data-pc-contrast-scheme',v);" +
               "}" +
-              "if(window.localStorage.getItem('pc-hide-images')==='1'){" +
-              "document.documentElement.setAttribute('data-pc-hide-images','');" +
-              "}}catch(e){}})();",
+              "window.localStorage.removeItem('pc-hide-images');" +
+              "document.documentElement.removeAttribute('data-pc-hide-images');" +
+              "}catch(e){}})();",
           }}
         />
         {/* Task 164: the SITE layer. The page content is wrapped so the Boxer's DO NOT PRESS THAT BUTTON

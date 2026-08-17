@@ -43,6 +43,14 @@ const Refresh = (
   </svg>
 );
 
+// Hide images is DISABLED (Steve, 17 Aug 2026). The mode repeatedly stranded users
+// -- the menu could be lost in it with no way to switch it back off -- so the control
+// is removed from the desktop toolbar AND the mobile dropdown, and any stored
+// pc-hide-images value is cleared before paint (see app/layout.tsx). Everything else
+// is left intact: HideImages, the storage key, the CSS, the toggle handler and the
+// `hidden` state below all stay, so re-enabling is a one-line flip of this flag.
+const HIDE_IMAGES_ENABLED = false;
+
 export default function PcContrastToolbar() {
   const [scheme, setLocalScheme] = useState<ContrastScheme | null>(null);
   const [hidden, setHidden] = useState(false);
@@ -133,6 +141,8 @@ export default function PcContrastToolbar() {
         </button>
       </div>
 
+      {/* Hide-images box: disabled (see HIDE_IMAGES_ENABLED). Left in place, gated off. */}
+      {HIDE_IMAGES_ENABLED && (
       <div className={`${styles.box} ${styles.desktopBox}`} role="group" aria-label="Images">
         <button
           type="button"
@@ -144,6 +154,7 @@ export default function PcContrastToolbar() {
           {CrossedPhoto}
         </button>
       </div>
+      )}
 
       {/* MOBILE (<=768px): exactly two icons -- this accessibility button and the
           hamburger (its sibling in the header). No third icon: the active setting
@@ -200,6 +211,8 @@ export default function PcContrastToolbar() {
               >
                 <span aria-hidden="true">A</span>
               </button>
+              {/* Hide-images control: disabled (see HIDE_IMAGES_ENABLED). Gated off, code kept. */}
+              {HIDE_IMAGES_ENABLED && (
               <button
                 type="button"
                 className={styles.panelBtn}
@@ -209,6 +222,7 @@ export default function PcContrastToolbar() {
               >
                 {CrossedPhoto}
               </button>
+              )}
               <button
                 type="button"
                 className={styles.panelBtn}
