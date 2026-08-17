@@ -1452,21 +1452,21 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
   // panel's own solid background is the backing, so the labels never sit cluttered over page text (the chat
   // is non-modal). Same handlers as the icons. `withMove` is false on mobile, where the medallion is pinned
   // and there is no column drag. Rendered only in accessible mode; default keeps the icon controls.
-  const controlPanelEl = (withMove: boolean) =>
-    accessible ? (
-      <>
-        {/* CLOSE + MINIMISE as one group (DOM order CLOSE, MINIMISE; mobile swaps to MINIMISE-first and
-            right-aligns via CSS). MOVE is split out as its own button so desktop can sit it directly below the
-            profile image while CLOSE/MINIMISE move above the history. MOVE is desktop-only (withMove). */}
-        <div className={styles.controlPanel} role="group" aria-label="Chat controls" data-pc-flat>
-          <button type="button" className={styles.controlBtn} aria-label="Close Pick a Chum" onClick={closeChat}>CLOSE</button>
-          <button type="button" className={styles.controlBtn} aria-label="Minimise the chat" onClick={minimise}>MINIMISE</button>
-        </div>
-        {withMove && (
-          <button type="button" className={`${styles.controlBtn} ${styles.moveBtn}`} aria-label="Move the chat" title="Move the chat" onPointerDown={startColumnDrag}>MOVE</button>
-        )}
-      </>
-    ) : null;
+  // CLOSE + MINIMISE (DOM order CLOSE, MINIMISE; mobile swaps to MINIMISE-first and right-aligns via CSS).
+  // On desktop this is rendered INSIDE the chatColumn so it anchors ABOVE the history (right-aligned to it)
+  // regardless of where the medallion sits; on mobile it is a panel-level row.
+  const controlPanelEl = accessible ? (
+    <div className={styles.controlPanel} role="group" aria-label="Chat controls" data-pc-flat>
+      <button type="button" className={styles.controlBtn} aria-label="Close Pick a Chum" onClick={closeChat}>CLOSE</button>
+      <button type="button" className={styles.controlBtn} aria-label="Minimise the chat" onClick={minimise}>MINIMISE</button>
+    </div>
+  ) : null;
+
+  // MOVE is split out (desktop only) so it can sit directly below the profile image while CLOSE/MINIMISE live
+  // on the history. Rendered in the medallion (dogAnchor).
+  const moveEl = accessible ? (
+    <button type="button" className={`${styles.controlBtn} ${styles.moveBtn}`} aria-label="Move the chat" title="Move the chat" onPointerDown={startColumnDrag}>MOVE</button>
+  ) : null;
 
   // Task 129: the thread and composer render in two homes -- the >480px
   // column-under-the-dog plus fixed visitor bar, or the pre-129 stacked panel
@@ -1722,8 +1722,9 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
                     </div>
                     {/* Task 168: the receded dogs, stacked beside this medallion. */}
                     {recededEl}
-                    {/* Task 174: the accessibility-mode control panel (desktop has MOVE). */}
-                    {controlPanelEl(true)}
+                    {/* Task 174: MOVE sits below the medallion here; CLOSE/MINIMISE live on the history
+                        (rendered inside .chatColumn below), anchored above it rather than to the medallion. */}
+                    {moveEl}
                     {/* Task 174: in an accessibility mode these icon controls are hidden (a crushed X, an
                         invisible minimise bar) and replaced by the labelled control panel below. */}
                     <button type="button" className={styles.close} aria-label="Close Pick a Chum" onClick={closeChat}>
@@ -1815,6 +1816,9 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
             style={colBox ? { left: `${Math.round(colBox.left)}px`, top: `${Math.round(colBox.top)}px`, bottom: `${Math.round(colBox.bottom)}px` } : undefined}
             onMouseDown={keepFocus}
           >
+            {/* Task 174: CLOSE/MINIMISE anchored to the HISTORY (above it, right-aligned), so they hold their
+                place whatever the medallion does -- including a mid-page reopen. Desktop only. */}
+            {controlPanelEl}
             {threadEl}
           </div>
           <div className={styles.visitorBar} onMouseDown={keepFocus} data-pc-flat>
@@ -1911,7 +1915,7 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
               they span the panel width and right-align. Order in DOM is names then controls; the panel is
               column-reverse, so they render controls-row on top, names-row below, above the composer. */}
           {accessible && recededEl}
-          {controlPanelEl(false)}
+          {controlPanelEl}
         </div>
       )}
     </div>

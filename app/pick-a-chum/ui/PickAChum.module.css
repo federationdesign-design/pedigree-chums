@@ -2027,15 +2027,14 @@
 .rootAccessible .dragHandle {
   display: none;
 }
-/* Task 174 (desktop): CLOSE + MINIMISE move ABOVE the chat history, right-aligned to the history's right
-   edge. The history column sits at medallion-right + 12px gap + 380px width, so its right edge is 392px past
-   the medallion's right edge; right:-392px pins the row's right edge there whatever its own width. bottom
-   lifts it clear above the history's 200px top (medallion top is ~101px below that). (Mobile overrides to a
-   right-aligned panel-level row, below.) */
+/* Task 174 (desktop): CLOSE + MINIMISE are rendered INSIDE the .chatColumn now, so they anchor to the HISTORY
+   itself -- just above it (bottom:100%+8px) and right-aligned to its right edge (right:0) -- and hold that
+   place whatever the medallion does, including a mid-page reopen. (Mobile overrides to a right-aligned
+   panel-level row, below.) */
 .controlPanel {
   position: absolute;
-  bottom: calc(100% + 110px);
-  right: -392px;
+  bottom: calc(100% + 8px);
+  right: 0;
   left: auto;
   display: flex;
   flex-direction: row;
@@ -2053,6 +2052,10 @@
   z-index: 6;
 }
 .controlBtn {
+  /* The panel/chatColumn containers are pointer-events:none (they let the page beneath stay clickable); the
+     buttons must opt back in, exactly as .recededName does, or they are dead when not inheriting auto from a
+     medallion ancestor. */
+  pointer-events: auto;
   font-family: var(--font-body, sans-serif);
   font-size: 12px;
   font-weight: 700;
