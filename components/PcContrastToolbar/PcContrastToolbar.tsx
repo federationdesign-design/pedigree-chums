@@ -145,33 +145,30 @@ export default function PcContrastToolbar() {
         </button>
       </div>
 
-      {/* MOBILE (<=768px): active-state chips, then the master icon that opens the
-          dropdown. Order left to right ends up: chips, master, hamburger (the
-          hamburger is the master's sibling in the header). Hidden on desktop. */}
+      {/* MOBILE (<=768px): exactly two icons -- this accessibility button and the
+          hamburger (its sibling in the header). No third icon: the active setting
+          rides ON the button's face instead of a separate chip, so the row width is
+          constant in every state. Hidden on desktop. */}
       <div className={styles.mobileCluster} ref={clusterRef}>
-        {/* Active scheme chip: the scheme's own sample (reusing the aBlackOnWhite /
-            aWhiteOnBlack class names so the scheme-mode overrides already cover it). */}
-        {scheme === "black-on-white" && (
-          <span className={`${styles.chip} ${styles.aBlackOnWhite}`} aria-hidden="true"><span>A</span></span>
-        )}
-        {scheme === "white-on-black" && (
-          <span className={`${styles.chip} ${styles.aWhiteOnBlack}`} aria-hidden="true"><span>A</span></span>
-        )}
-        {/* Hide-images chip: the crossed photo, shown only while images are hidden. */}
-        {hidden && (
-          <span className={`${styles.chip} ${styles.chipHide}`} aria-hidden="true">{CrossedPhoto}</span>
-        )}
-
         <div className={styles.masterWrap}>
           <button
             type="button"
-            className={styles.master}
+            className={`${styles.master} ${scheme === "black-on-white" ? styles.aBlackOnWhite : scheme === "white-on-black" ? styles.aWhiteOnBlack : ""}`}
             aria-haspopup="true"
             aria-expanded={open}
             aria-label="Accessibility options"
             onClick={() => setOpen((o) => !o)}
           >
-            <span className={styles.masterGlyph} aria-hidden="true" />
+            {/* The face reflects the active setting: the scheme's own sample when a
+                scheme is on (it wins over hide-images), the crossed photo when only
+                images are hidden, else the accessibility figure. */}
+            {scheme !== null ? (
+              <span className={styles.masterLetter} aria-hidden="true">A</span>
+            ) : hidden ? (
+              CrossedPhoto
+            ) : (
+              <span className={styles.masterGlyph} aria-hidden="true" />
+            )}
           </button>
 
           {open && (
