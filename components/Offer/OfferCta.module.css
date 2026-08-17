@@ -45,6 +45,18 @@
   transform: translateY(-2px);
 }
 
+/* Article text toggle (/about): the CTA sentence and the outline button follow the
+   toggle to dark blue when it is on, white at rest. The "pre-release offer" accent keeps
+   its yellow (its own colour wins). The outline button takes navy on both its text and
+   its border. Gated on :root:not([data-pc-contrast-scheme]) so a contrast scheme wins. */
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .ctaTitle {
+  color: var(--navy, #0a3a57);
+}
+:root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .btnOutline {
+  color: var(--navy, #0a3a57);
+  border-color: var(--navy, #0a3a57);
+}
+
 .ctaError {
   margin: 14px 0 0;
   font-family: var(--font-body), system-ui, sans-serif;

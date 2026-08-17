@@ -429,6 +429,27 @@
 :root[data-pc-contrast-scheme="white-on-black"] :is(#pc-site, [data-pc-reach]) :is(button, [role="button"], [class*="btn"], [class*="Btn"], [class*="cta"], [class*="Cta"]) {
   box-shadow: inset 0 0 0 2px #ffffff !important;
 }
+/* False-positive guard for the rule above. It matches by [class*="cta"/"btn"] substring,
+   which also catches non-control text and layout whose class merely contains those letters:
+   the OfferCta copy (ctaTitle, ctaTitleAccent, ctaRow, ctaError), /home's productCta wrapper,
+   and CTA / button-group containers (heroCtas, priceCtaRow, ctaSection, ctaWrap, and the
+   btns / BtnRow wrappers). None are controls, so strip the button ring back off; real buttons
+   keep theirs via .btn / .ctaBtn / etc. Placed after the edge rules so it wins (same
+   specificity, later source). Verified the offending set on production (18 Aug 2026). */
+:root[data-pc-contrast-scheme] :is(#pc-site, [data-pc-reach]) :is(
+  [class*="ctaTitle"],
+  [class*="ctaRow"],
+  [class*="ctaError"],
+  [class*="productCta"],
+  [class*="heroCtas"],
+  [class*="priceCtaRow"],
+  [class*="ctaSection"],
+  [class*="ctaWrap"],
+  [class*="btns"],
+  [class*="BtnRow"]
+) {
+  box-shadow: none !important;
+}
 /* The toolbar cells are a segmented control: only the container box carries a
    stroke, so the cells opt out of the per-control edge ring in a scheme. Their
    dividers and the box outline do the separating; keyboard focus still shows via
