@@ -1418,7 +1418,9 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
           title={`Switch to the ${dogInfo(d).name}`}
           onClick={() => pressReceded(d)}
         >
-          {dogInfo(d).name}
+          {/* Task 174: the SHORT name (COLLIE/LAB/TERRIER/BOXER), reusing the fan's one source; the full name
+              stays in aria-label/title for screen readers. */}
+          {FAN_SHORT_NAME[d]}
         </button>
       ))}
     </div>
@@ -1452,13 +1454,18 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
   // and there is no column drag. Rendered only in accessible mode; default keeps the icon controls.
   const controlPanelEl = (withMove: boolean) =>
     accessible ? (
-      <div className={styles.controlPanel} role="group" aria-label="Chat controls" data-pc-flat>
-        <button type="button" className={styles.controlBtn} aria-label="Close Pick a Chum" onClick={closeChat}>CLOSE</button>
-        <button type="button" className={styles.controlBtn} aria-label="Minimise the chat" onClick={minimise}>MINIMISE</button>
+      <>
+        {/* CLOSE + MINIMISE as one group (DOM order CLOSE, MINIMISE; mobile swaps to MINIMISE-first and
+            right-aligns via CSS). MOVE is split out as its own button so desktop can sit it directly below the
+            profile image while CLOSE/MINIMISE move above the history. MOVE is desktop-only (withMove). */}
+        <div className={styles.controlPanel} role="group" aria-label="Chat controls" data-pc-flat>
+          <button type="button" className={styles.controlBtn} aria-label="Close Pick a Chum" onClick={closeChat}>CLOSE</button>
+          <button type="button" className={styles.controlBtn} aria-label="Minimise the chat" onClick={minimise}>MINIMISE</button>
+        </div>
         {withMove && (
-          <button type="button" className={styles.controlBtn} aria-label="Move the chat" title="Move the chat" onPointerDown={startColumnDrag}>MOVE</button>
+          <button type="button" className={`${styles.controlBtn} ${styles.moveBtn}`} aria-label="Move the chat" title="Move the chat" onPointerDown={startColumnDrag} data-pc-flat>MOVE</button>
         )}
-      </div>
+      </>
     ) : null;
 
   // Task 129: the thread and composer render in two homes -- the >480px
@@ -1877,10 +1884,10 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
               >
                 {accessible && <span className={styles.faceName}>{nameLines(dogInfo(dog).name)}</span>}
               </div>
-              {/* Task 168: the receded dogs, stacked beside this medallion (mobile). */}
-              {recededEl}
-              {/* Task 174: the accessibility-mode control panel (mobile has no MOVE -- the medallion is pinned). */}
-              {controlPanelEl(false)}
+              {/* Task 168: the receded dogs, beside this medallion (mobile). Default (portrait) form only --
+                  Task 174 moves the accessibility NAME buttons out to panel level (below) so they right-align
+                  to the panel width rather than hanging off the small medallion. */}
+              {!accessible && recededEl}
               <button type="button" className={styles.close} aria-label="Close Pick a Chum" onClick={closeChat}>
                 <img src="/red-icon.svg" alt="" aria-hidden="true" data-pc-ctl-icon />
               </button>
@@ -1896,6 +1903,11 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
             </div>
             {composerEl}
           </div>
+          {/* Task 174: the accessibility control + name rows live at PANEL level (not on the medallion), so
+              they span the panel width and right-align. Order in DOM is names then controls; the panel is
+              column-reverse, so they render controls-row on top, names-row below, above the composer. */}
+          {accessible && recededEl}
+          {controlPanelEl(false)}
         </div>
       )}
     </div>

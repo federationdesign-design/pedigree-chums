@@ -654,7 +654,9 @@
 .go {
   border: none;
   background: transparent;
-  color: var(--pc-ui-green);
+  /* White on the black composer (21:1), replacing the green. In a scheme the sweep recolours it to the
+     scheme foreground anyway, so this only changes the default full-colour view. */
+  color: #ffffff;
   font-family: var(--font-display, sans-serif);
   font-size: 20px;
   font-weight: 800;
@@ -1883,16 +1885,19 @@
 }
 
 /* The receded switch as named text buttons (desktop: a column left of the medallion). */
+/* Task 174 (desktop): the three other-dog name buttons sit ABOVE the profile image, as a centred horizontal
+   row. (Mobile overrides this to a right-aligned panel-level row, below.) */
 .recededTextGroup {
   position: absolute;
-  top: 0;
-  right: calc(100% + 8px);
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  flex-wrap: nowrap;
   gap: 6px;
   z-index: 4;
-  /* Transparent container; the buttons opt pointer events back in. The header stays clear (the history is
-     capped below it) and the page is covered, so no backing panel is needed. */
+  /* Transparent container; the buttons opt pointer events back in. */
   pointer-events: none;
 }
 .recededName {
@@ -1943,19 +1948,17 @@
      text is smaller here to fit the longest name without clipping. */
   .faceName { font-size: 12px; }
   .chipName { font-size: 10px; }
-  /* Task 174 (mobile space): the receded switch and the controls used to hang BELOW the medallion, into
-     the thread, stealing response height (the names stacked in a column, which cost even more). Both now sit
-     ABOVE the medallion/input as single horizontal rows -- names just above, controls above them -- so the
-     whole thread below the composer is clear. The composer is pushed down (below) to make the room. */
+  /* Task 174 (mobile space + right align): the receded switch and the controls now live at PANEL level (not
+     on the medallion), so they are plain flex rows spanning the panel width. RIGHT-align their buttons. The
+     names row sits above the composer; the controls row above it (panel is column-reverse). */
   .recededTextGroup {
-    top: auto;
-    bottom: calc(100% + 6px);
-    right: auto;
-    left: 0;
+    position: static;
+    transform: none;
     flex-direction: row;
     flex-wrap: nowrap;
-    max-width: none;
+    justify-content: flex-end;
     gap: 4px;
+    margin: 0 0 6px;
   }
   /* Shrink so all three names fit one row across the mobile panel. */
   .recededName {
@@ -2009,13 +2012,29 @@
 .rootAccessible .dragHandle {
   display: none;
 }
+/* Task 174 (desktop): CLOSE + MINIMISE move ABOVE the chat history, right-aligned to the history's right
+   edge. The history column sits at medallion-right + 12px gap + 380px width, so its right edge is 392px past
+   the medallion's right edge; right:-392px pins the row's right edge there whatever its own width. bottom
+   lifts it clear above the history's 200px top (medallion top is ~101px below that). (Mobile overrides to a
+   right-aligned panel-level row, below.) */
 .controlPanel {
   position: absolute;
-  right: calc(100% + 8px);
-  top: calc(100% + 8px);
+  bottom: calc(100% + 110px);
+  right: -392px;
+  left: auto;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  justify-content: flex-end;
   gap: 6px;
+  z-index: 6;
+}
+/* Task 174 (desktop): MOVE sits directly below the profile image, centred. Desktop only (mobile has no
+   column drag). */
+.moveBtn {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 6;
 }
 .controlBtn {
@@ -2042,17 +2061,20 @@
    row (above the receded-names row), not below it into the thread. The composer is pushed down to make room
    so the whole thread below stays clear of the chrome. */
 @media (max-width: 480px) {
+  /* Panel-level flex row spanning the panel width. row-reverse turns the DOM order [CLOSE, MINIMISE] into a
+     visual [MINIMISE, CLOSE] packed against the RIGHT edge -- satisfying both "MINIMISE before CLOSE" and
+     "right aligned" at once. */
   .controlPanel {
-    right: auto;
-    left: 0;
-    top: auto;
-    bottom: calc(100% + 42px);
-    flex-direction: row;
+    position: static;
+    flex-direction: row-reverse;
+    justify-content: flex-start;
     flex-wrap: nowrap;
     gap: 6px;
+    margin: 0 0 6px;
   }
-  /* Room above the medallion for the two chrome rows (controls + names). */
+  /* The old margin-top made room above the medallion for the absolutely-positioned chrome; the chrome is now
+     in the panel flex flow, so it is no longer needed. */
   .composerRow {
-    margin-top: 84px;
+    margin-top: 10px;
   }
 }
