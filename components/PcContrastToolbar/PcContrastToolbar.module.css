@@ -86,14 +86,144 @@
   box-shadow: inset 0 0 0 3px #ffffff, inset 0 0 0 6px #0a3a57;
 }
 
+/* ==========================================================================
+   MOBILE COLLAPSE (<=768px): the two boxes give way to a single master icon
+   that matches the hamburger, with any active setting echoed as a chip to its
+   left and the five controls in a dropdown. Desktop is untouched: .desktopBox
+   only hides here, and .mobileCluster only shows here.
+   ========================================================================== */
+
+/* The mobile cluster is absent on desktop; the two boxes carry the toolbar. */
+.mobileCluster { display: none; }
+
 @media (max-width: 768px) {
-  .toolbar { gap: 8px; }
-  .box { height: 67.5px; border-radius: 20.25px; } /* exact mobile hamburger height + radius */
-  /* Mobile: cells revert to 36 wide by the full 67.5 tall (not square), so the
-     two boxes plus the hamburger fit on one row at 375px, including with the
-     reset button present. Desktop keeps the square, hamburger-sized cell. */
-  .cell { width: 36px; height: 67.5px; } /* flush segments; box owns the radius */
-  /* Glyphs capped to the 36px cell width, keeping the hamburger's ~0.5 proportion. */
-  .cell span { font-size: 34px; }
-  .cell svg { width: 34px; height: 34px; }
+  /* Desktop boxes retire; the master cluster takes over. */
+  .desktopBox { display: none; }
+
+  .mobileCluster {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;             /* tight enough that both chips + master clear the logo at 375px */
+    pointer-events: auto;
+  }
+
+  /* Master icon: the hamburger's mobile rect exactly (67.5 square, 20.25 radius,
+     5px navy outline, yellow fill, same drop weight). */
+  .master {
+    pointer-events: auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 67.5px;
+    height: 67.5px;
+    padding: 0;
+    outline: 5px solid var(--navy);
+    border: none;
+    border-radius: 20.25px;
+    background: var(--yellow);
+    box-shadow: 0 4px 0 rgba(10, 58, 87, 0.3);
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  /* The accessibility figure, drawn from the asset as a recolourable mask so it
+     can take the scheme foreground in a scheme, just as the burger's bars do.
+     Height ~0.56 of the button, matching the hamburger glyph's proportion. */
+  .masterGlyph {
+    display: block;
+    width: 30px;
+    height: 38px;
+    background-color: var(--navy);
+    -webkit-mask: url("/accessability-icon.svg") center / contain no-repeat;
+    mask: url("/accessability-icon.svg") center / contain no-repeat;
+  }
+  .master:focus-visible {
+    outline: 5px solid var(--navy);
+    box-shadow: 0 0 0 3px #ffffff, 0 0 0 6px #0a3a57;
+  }
+
+  .masterWrap { position: relative; display: inline-flex; }
+
+  /* Active-state chip: a compact lozenge carrying the setting's own glyph. The
+     scheme chips reuse .aBlackOnWhite / .aWhiteOnBlack (their own sample); the
+     hide chip is yellow with the crossed photo. 4px stroke so two chips plus the
+     master fit the row beside the logo at 375px. */
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 67.5px;
+    box-sizing: border-box;
+    padding: 0;
+    outline: 4px solid var(--navy);
+    border: none;
+    border-radius: 20.25px;
+    background: var(--yellow);
+    color: var(--navy);
+    box-shadow: 0 4px 0 rgba(10, 58, 87, 0.3);
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+  .chip span {
+    font-family: var(--font-body), system-ui, sans-serif;
+    font-weight: 800;
+    font-size: 24px;
+    line-height: 1;
+  }
+  .chip svg { width: 22px; height: 22px; display: block; }
+  /* The scheme chips carry their own sample. Combined selectors so they beat the
+     .chip base fill (equal specificity would fall to source order). */
+  .chip.aBlackOnWhite { background: #ffffff; color: #000000; }
+  .chip.aWhiteOnBlack { background: #000000; color: #ffffff; }
+
+  /* Dropdown panel: anchored under the master, right-aligned so it never spills
+     off the viewport edge. Five icon-only controls stacked vertically. */
+  .panel {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 8px;
+    background: var(--yellow);
+    outline: 5px solid var(--navy);
+    border-radius: 18px;
+    box-shadow: 0 4px 0 rgba(10, 58, 87, 0.3);
+    z-index: 10;
+  }
+  .panelBtn {
+    width: 48px;      /* >= the 44px minimum target */
+    height: 48px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--yellow);
+    color: var(--navy);
+    border: none;
+    border-radius: 12px;
+    outline: 3px solid var(--navy);
+    cursor: pointer;
+  }
+  .panelBtn span {
+    font-family: var(--font-body), system-ui, sans-serif;
+    font-weight: 800;
+    font-size: 28px;
+    line-height: 1;
+  }
+  .panelBtn svg { width: 28px; height: 28px; display: block; }
+  /* Scheme controls show their own sample (combined selectors to beat the base fill). */
+  .panelBtn.aDefault { background: var(--blue-sky); color: var(--yellow); }
+  .panelBtn.aBlackOnWhite { background: #ffffff; color: #000000; }
+  .panelBtn.aWhiteOnBlack { background: #000000; color: #ffffff; }
+  /* Active control: a heavy inner ring, echoing the desktop focus treatment, so
+     the current scheme / hidden state reads without relying on colour alone. */
+  .panelBtn[aria-pressed="true"] {
+    box-shadow: inset 0 0 0 3px #ffffff, inset 0 0 0 6px #0a3a57;
+  }
+  .panelBtn:focus-visible {
+    outline: 3px solid var(--navy);
+    box-shadow: inset 0 0 0 3px #ffffff, inset 0 0 0 6px #0a3a57;
+  }
 }
