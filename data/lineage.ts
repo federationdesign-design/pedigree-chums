@@ -1062,7 +1062,10 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "A 1980s British creation, bred to look like a wolf while keeping a gentle, trainable temperament. Famous as the Stark direwolves on screen.",
     children: [
       { name: "Arctic sled dogs", note: "Siberian Husky and Alaskan Malamute for the wolfish looks and coat.", img: "/history/breeds/Arctic-sled-dogs.jpg", value: 55 },
-      { name: "German Shepherd Dog", note: "For size, trainability and a steady working mind.",  img: "/history/breeds/German-cattle-dog.jpg", value: 45 }
+      // Renamed from "German Shepherd Dog" to "German Shepherd" and img switched from the
+      // wrong-animal /history/breeds/German-cattle-dog.jpg to /german-shepard-square.jpg so this
+      // node grafts onto the German Shepherd lineage root and matches the pack card (15 August 2026).
+      { name: "German Shepherd", note: "For size, trainability and a steady working mind.",  img: "/german-shepard-square.jpg", value: 45 }
     ]
   },
 
