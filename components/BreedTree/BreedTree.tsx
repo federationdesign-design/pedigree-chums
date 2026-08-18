@@ -5704,7 +5704,7 @@ export default function BreedTree({
                   onMouseEnter={hidden || frozen ? undefined : () => {
                     if (touchRef.current) return; // touch drives this from the tap
                     setHovered(d);
-                    setHoverHint("tap to zoom and learn");
+                    setHoverHint(`tap to learn more about ${d.data.name}`);
                   }}
                   onMouseLeave={hidden || frozen ? undefined : (e) => {
                     // Ignore the mouseleave the blue box triggers when its own
@@ -5736,7 +5736,7 @@ export default function BreedTree({
                       if (rn && rn !== d && d.descendants().includes(rn)) return;
                     }
                     setHovered((h) => (h === d ? null : h));
-                    setHoverHint((s) => (s === "tap to zoom and learn" ? "" : s));
+                    setHoverHint((s) => (s.startsWith("tap to learn more about") ? "" : s));
                   }}
                   onClick={
                     // `frozen` used to swallow this outright, and frozen is
@@ -6830,7 +6830,14 @@ export default function BreedTree({
                 // CONTRAST (on record, no fallback by request 14 Aug 2026): ~13:1 over the
                 // blue body gradient where this line sits, but a DARK themed level
                 // background could drop it below AA. If dark themes spread, revisit.
-                style={{ fontSize: `${titleFs * upp}px`, fill: "#000000", stroke: "none" }}
+                // REVERSED 18 Aug 2026: the no-outline decision is undone. Black on the
+                // dark wood band was hard to read, and this line is the static "start
+                // playing" on touch, so it affected phone users by default. Black fill
+                // kept, but a white stroke added so it reads over both the blue sky and
+                // the dark wood band. strokeWidth matches the start-screen captions'
+                // 24-font-to-2-stroke ratio; .autoLabel already sets paint-order stroke
+                // and stroke-linejoin round.
+                style={{ fontSize: `${titleFs * 1.12 * upp}px`, fill: "#000000", stroke: "#ffffff", strokeWidth: (titleFs * 1.12 * upp) / 12 }}
               >
                 {text}
               </text>
