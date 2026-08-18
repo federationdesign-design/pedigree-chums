@@ -85,7 +85,15 @@ export default function HistoryPage() {
         </section>
 
         <section className={styles.intro}>
-          <PopHeading className={`display ${styles.title}`}>
+          {/* as="h1": the desktop view's visible top heading, so it is the h1.
+              The mobile carousel (.mobileView, HistoryCarousel) carries its own
+              h1, and display:none removes that one from the accessibility tree on
+              desktop, so a desktop screen reader would otherwise meet an h2 with
+              no h1 above it. Two h1s therefore exist in the source, exactly one
+              exposed per breakpoint, which is correct. The duplication is a
+              symptom of this page's two-view-tree architecture and resolves once
+              it moves to a single layout. */}
+          <PopHeading as="h1" className={`display ${styles.title}`}>
             Britain&apos;s dog <span className="display-yellow">history</span>
           </PopHeading>
           <p className={styles.lead}>
