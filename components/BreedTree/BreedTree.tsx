@@ -6849,10 +6849,13 @@ export default function BreedTree({
                 // REVERSED AGAIN 18 Aug 2026: the outline is flipped to white fill with
                 // a black stroke, and the size is doubled again (1.12 to 2.24) for
                 // legibility. strokeWidth still carries the same 12:1 ratio.
+                // LINE SPACING: Luckiest Guy's visible cap height is about 0.6 of the
+                // em, so a dy of 1.05em reads as roughly 1.4 line spacing against the
+                // ink; 0.67em is the value that reads as about 0.9.
                 style={{ fontSize: `${titleFs * 2.24 * upp}px`, fill: "#ffffff", stroke: "#000000", strokeWidth: (titleFs * 2.24 * upp) / 12 }}
               >
                 <tspan x={x}>{line1}</tspan>
-                {line2 !== null ? <tspan x={x} dy="1.05em">{line2}</tspan> : null}
+                {line2 !== null ? <tspan x={x} dy="0.67em">{line2}</tspan> : null}
               </text>
             );
           })()}
