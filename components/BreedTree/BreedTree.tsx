@@ -6606,7 +6606,9 @@ export default function BreedTree({
                   <text
                     className={styles.autoLabel}
                     x={0}
-                    y={half + 18 * upp}
+                    // 18 Aug 2026: nudged down another 10px (18 to 28), stacking
+                    // on the earlier 10px move in e984ef95.
+                    y={half + 28 * upp}
                     textAnchor="middle"
                     dominantBaseline="text-before-edge"
                     style={{ fontSize: `${24 * upp}px`, strokeWidth: `${2 * upp}px` }}
