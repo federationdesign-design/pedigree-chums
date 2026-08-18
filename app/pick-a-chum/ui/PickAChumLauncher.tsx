@@ -22,7 +22,7 @@ import SheetSync from '../dev/SheetSync';
 // helper + registry + page-bios are lightweight (no chatbot engine), so the launcher stays cheap.
 import type { AutoAppear } from './PickAChumExperience';
 import { canDogAppear, isDismissed, markDismissed, unfoundGameHint, appearanceForRoute, pickMisread, type DogAppearance } from './dogAppearance';
-import { CHAT_KEY, PROTECTED_FLAG } from './pcKeys';
+import { CHAT_KEY, PROTECTED_FLAG, HAS_SPOKEN } from './pcKeys';
 import { bioForRoute } from '../data/page-bios';
 import { getHiddenGamesEngine } from '../../../lib/hiddenGames/browserEngine';
 import { HAT_COUNTDOWN_LINES } from '../../../lib/hiddenGames/hatHunt';
@@ -319,19 +319,21 @@ export default function PickAChumLauncher() {
     return () => io.disconnect();
   }, [shown, pathname, open, appear]);
 
-  // Task 151 Case A: on /hot-dogs, decide the thread pickup purely by whether a chat exists (brief
-  // section 3). Chat present -> hand /hot-dogs to the experience so the Labrador speaks from the chip;
-  // no chat -> null, and the Case B arrival appearance above handles it instead. Never into a protected
-  // session: a child who disclosed something and then followed a link must not have a dog start chatting.
+  // Task 151 Case A: on /hot-dogs, decide the thread pickup by whether the VISITOR HAS ACTUALLY SPOKEN
+  // (HAS_SPOKEN), not merely whether a session exists. Task 176 fix: CHAT_KEY is set by any dog session --
+  // including an unbidden appearance the visitor never replied to -- so it made the pickup ("you made it,
+  // I got here first...") fire at a first-time visitor. HAS_SPOKEN is set only once a 'user' message
+  // exists. Spoken -> hand /hot-dogs to the experience so the Labrador picks up the thread; not spoken ->
+  // null (the Case B arrival appearance handles a truly fresh visitor). Never into a protected session.
   useEffect(() => {
     if ((pathname ?? '') !== LAB_HOTDOG_ROUTE) {
       setPickupRoute(null);
       return;
     }
     try {
-      const hasChat = !!window.sessionStorage.getItem(CHAT_KEY);
+      const hasSpoken = !!window.sessionStorage.getItem(HAS_SPOKEN);
       const wasProtected = !!window.sessionStorage.getItem(PROTECTED_FLAG);
-      setPickupRoute(hasChat && !wasProtected ? LAB_HOTDOG_ROUTE : null);
+      setPickupRoute(hasSpoken && !wasProtected ? LAB_HOTDOG_ROUTE : null);
     } catch {
       setPickupRoute(null);
     }

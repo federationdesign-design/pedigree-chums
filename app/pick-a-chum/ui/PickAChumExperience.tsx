@@ -31,7 +31,7 @@ import { BOXER_BUTTONS, BoxerButton } from '../data/boxer-button-game';
 import { breeds } from '../../../data/breeds';
 import { skipTheatre, buildTypingPlan, TYPING_PROFILES, TypingPlan } from '../lib/theatre';
 import { emitTurn } from '../lib/turn-tap';
-import { CHAT_KEY, PROTECTED_FLAG } from './pcKeys';
+import { CHAT_KEY, PROTECTED_FLAG, HAS_SPOKEN } from './pcKeys';
 // Task 174: the chat is now inside the contrast schemes (data-pc-reach on the root). Scheme and hide-images
 // are read here, live, so the portraits can be swapped for the dog's name as text in any accessibility mode
 // -- the generic HideImages overlay is scoped to #pc-site and cannot reach this body-level overlay.
@@ -933,6 +933,9 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
       everProtectedRef.current = true;
       try {
         window.sessionStorage.removeItem(CHAT_KEY);
+        // Task 176: the "visitor has spoken" flag is scrubbed too, so a protected session cannot enable
+        // Case A (it is also guarded by the launcher's wasProtected check -- belt and braces).
+        window.sessionStorage.removeItem(HAS_SPOKEN);
         // Task 148: the chat content is scrubbed (a disclosure must never sit in sessionStorage), but
         // leave a CONTENT-FREE flag so the Terrier's unbidden appearances stay suppressed for the rest
         // of the session -- a child who has disclosed something must not have a dog pop out at them.
@@ -942,6 +945,10 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
     }
     try {
       window.sessionStorage.setItem(CHAT_KEY, JSON.stringify({ messages, session, dog, phase, recSessionId: recSessionRef.current, minimised }));
+      // Task 176: mark that the VISITOR has actually sent a message (a 'user' bubble exists), distinct from
+      // CHAT_KEY (which an unbidden appearance sets on its own). Case A gates on this. Survives navigation
+      // via sessionStorage; a restored chat re-derives it here from its messages.
+      if (messages.some((m) => m.who === 'user')) window.sessionStorage.setItem(HAS_SPOKEN, '1');
     } catch {}
   }, [messages, phase, dog, minimised]);
 

@@ -7,3 +7,8 @@ export const CHAT_KEY = 'pc-chat';
 // itself is scrubbed from sessionStorage (a disclosure must never persist), but this bare boolean
 // survives so the Terrier's unbidden appearances stay suppressed for the rest of the session.
 export const PROTECTED_FLAG = 'pc-protected';
+// Task 176: a content-free flag set once the VISITOR has actually SENT a message. CHAT_KEY alone means
+// "a dog session exists" -- which an unbidden appearance sets before the visitor ever replies -- so Case A
+// (the Labrador's /hot-dogs thread pickup) gates on THIS instead, to avoid greeting a first-time visitor
+// as if a conversation had happened. CHAT_KEY keeps its own job (appearance suppression) unchanged.
+export const HAS_SPOKEN = 'pc-spoke';
