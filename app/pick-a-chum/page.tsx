@@ -8,6 +8,8 @@ import styles from './page.module.css';
 
 export const metadata: Metadata = {
   title: 'Pick a Chum',
+  description:
+    'Meet the chums, pick a dog from the pack, and discover what your chosen chum makes of you in a playful back-and-forth. A different reply every single time.',
 };
 
 export default function PickAChumPage() {
