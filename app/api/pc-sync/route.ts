@@ -1,42 +1,41 @@
 import { NextResponse } from "next/server";
 import { readSyncConfig } from "../../pick-a-chum/lib/sheet-sync-config";
+import { insertBatch } from "../../../lib/pcSync/db";
 
 // POST /api/pc-sync
 //
-// Task 171: the same-origin sender. The client posts a completed (non-protected) session's rows here as
-// { turns: [...], sessions: [...] } and this route forwards them to the Apps Script endpoint. TWO reasons it
-// is a server hop, not a direct client -> Apps Script post:
-//   1. The kill switch is RE-READ HERE, server-side, on every request. A tab that was open before the owner
-//      flipped the switch still thinks sync is on and will post; this drops that post, so an instant kill is
-//      enforced even for stale tabs (the beacon-on-unload cannot re-check).
-//   2. The Apps Script URL lives in Edge Config and is read here, so it never reaches the client.
+// The same-origin sink for tester conversation recording. The client posts a completed (non-protected)
+// session's rows here as { turns: [...], sessions: [...] } and this route writes them to Postgres (Vercel /
+// Neon). It replaces the abandoned Apps Script forward; the payload shape is unchanged.
 //
-// Fire-and-forget: a disabled switch, a bad body, or an Apps Script failure all return without throwing, so a
-// tester whose network drops or whose post is dropped notices nothing. It carries no protected data: the
-// client already dropped any protected session's buffer (earlier turns included) before it could post.
+// It stays a server hop (not a direct client -> DB write) for the same reason it always was: the kill switch
+// is RE-READ HERE, server-side, on every request. A tab that was open before the owner flipped the switch
+// still thinks recording is on and will post; this drops that post, so an instant kill is enforced even for a
+// stale tab (the beacon-on-unload cannot re-check).
+//
+// Fire-and-forget: a disabled switch, a bad body, no store connected, or a DB failure all return without
+// throwing, so a tester whose network drops or whose post is dropped notices nothing. It carries no protected
+// data: the client already dropped any protected session's buffer (earlier turns included) before it posted.
 
 export const dynamic = "force-dynamic"; // never cached: re-read the live switch every time
+export const runtime = "nodejs"; // Neon HTTP driver + fixed to the Node runtime
 
 export async function POST(req: Request) {
-  const { enabled, endpoint } = await readSyncConfig();
-  if (!enabled || !endpoint) return NextResponse.json({ ok: false, reason: "disabled" });
+  const { enabled } = await readSyncConfig();
+  if (!enabled) return NextResponse.json({ ok: false, reason: "disabled" });
 
-  let body: string;
+  let data: unknown;
   try {
-    body = await req.text();
+    data = JSON.parse(await req.text());
   } catch {
     return NextResponse.json({ ok: false, reason: "bad-body" });
   }
 
   try {
-    await fetch(endpoint, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body,
-      cache: "no-store",
-    });
+    const { turns, sessions } = (data ?? {}) as { turns?: unknown; sessions?: unknown };
+    await insertBatch(Array.isArray(turns) ? turns : [], Array.isArray(sessions) ? sessions : []);
   } catch {
-    // Never surface a sink failure to the chat.
+    // Never surface a sink failure to the client.
   }
   return NextResponse.json({ ok: true });
 }
