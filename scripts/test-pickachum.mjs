@@ -319,7 +319,7 @@ const t10outcome = (input, r, resp) => buildRow({ sessionId: 's', turn: 1, activ
 });
 // Part B regression guard: these keep their FAQ and still report 'answered'. If any
 // changes, the threshold is too aggressive: narrow it, do not adjust the assertion.
-check('how many people can play', { bucket: 'B04', action: 'faq_answer' }, { assert: (r, resp) => (r.faqId !== 'FAQ001' ? `not FAQ001: ${r.faqId}` : t10outcome('how many people can play', r, resp) === 'answered' ? null : 'not answered') });
+check('how many people can play', { bucket: 'B04', action: 'faq_answer' }, { assert: (r, resp) => (r.faqId !== 'FAQ005' ? `Task 176 audit: now FAQ005, not FAQ001: ${r.faqId}` : t10outcome('how many people can play', r, resp) === 'answered' ? null : 'not answered') });
 check('whats in the pack', { bucket: 'B04', action: 'faq_answer' }, { assert: (r, resp) => (r.faqId !== 'FAQ004' ? `not FAQ004: ${r.faqId}` : t10outcome('whats in the pack', r, resp) === 'answered' ? null : 'not answered') });
 check('what do you do when a dog barks', { bucket: 'B04', action: 'faq_answer' }, { assert: (r, resp) => (r.faqId !== 'FAQ001' ? `not FAQ001: ${r.faqId}` : t10outcome('what do you do when a dog barks', r, resp) === 'answered' ? null : 'not answered') });
 
@@ -354,11 +354,13 @@ check('is it for kids', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) =
 check('do you have any games', { bucket: 'B17', action: 'offer_bark_game' });
 check('how does it work', { bucket: 'B15', action: 'orientation' }); // already recovered by Task 9 orientation
 // no games-catalogue answer exists, so this stays honestly unmatched:
-check('what games are there', { bucket: 'B06', action: 'gk_unknown' });
+// Task 176 audit: "what games are there" now reaches the games MENU (the chat games exist to list), where
+// it used to be deliberately unmatched (there was no catalogue).
+check('what games are there', { bucket: 'B45', action: 'games_menu' });
 // Regression guard: the meta-route sits above FAQ/GK, so these must NOT change bucket.
 check('how much is the game', { bucket: 'B04', action: 'price_answer' }); // Task 49: price -> FAQ008 in chat, was open_discount_popup
 check('whats in the pack', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ004' ? null : `not FAQ004: ${r.faqId}`) });
-check('how many people can play', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ001' ? null : `not FAQ001: ${r.faqId}`) });
+check('how many people can play', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ005' ? null : `Task 176 audit: now FAQ005, not FAQ001: ${r.faqId}`) });
 check('what do you do when a dog barks', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ001' ? null : `not FAQ001: ${r.faqId}`) });
 check('what is a labrador', { bucket: 'B05', action: 'breed_page' });
 check('where do I buy it', { bucket: 'B01', action: 'open_discount_popup' });
@@ -593,7 +595,7 @@ for (const inp of [
 // Regression guard: the complaint route sits above FAQ, so it is greedy. These six
 // product / pack questions must NOT move bucket into the complaint route.
 check('whats in the pack', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ004' ? null : `pack contents moved: ${r.faqId ?? r.action}`) });
-check('how many cards', { bucket: 'B02', action: 'rules_answer' });
+check('how many cards', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ004' ? null : `Task 176 audit: "how many cards" is FAQ004 now (removed from RULES): ${r.faqId}`) });
 // Task 175 §5: these two got the "54 cards" FAQ004 blurb via a lone 'cards' token -- a confident WRONG
 // answer (FAQ004 addresses neither child-safety nor materials). With the companion-token rule they now
 // MISS instead (there is no child-safety / materials FAQ; a future workbook FAQ is the real fix). Per §5 a
@@ -617,7 +619,7 @@ check('how do I contact you', { bucket: 'B04', action: 'faq_answer' }, { assert:
 check('whats your email', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ012' ? null : `not FAQ012: ${r.faqId}`) }); // Task 25a: moved from gk_unknown to the FAQ012 general enquiry answer
 check('whats in the pack', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ004' ? null : `pack moved: ${r.faqId}`) });
 check('are the cards child friendly', { action: 'fallback' }, { assert: (r) => (r.faqId === undefined ? null : `Task 175 §5: child-safety should miss now, not mis-answer: ${r.faqId}`) });
-check('how many cards', { bucket: 'B02', action: 'rules_answer' });
+check('how many cards', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ004' ? null : `Task 176 audit: "how many cards" is FAQ004 now (removed from RULES): ${r.faqId}`) });
 check('where can I buy the game', { bucket: 'B01', action: 'open_discount_popup' });
 
 // ---- Task 20: personal-sadness pair. L1 gentle redirect (no latch); L2 enters PROTECTED_ACTIVE ----
@@ -1487,7 +1489,7 @@ check('how do I contact you', { bucket: 'B04', action: 'faq_answer' }, { assert:
 check('whats your email', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ012' ? null : `email moved: ${r.faqId}`) });
 check('whats in the pack', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ004' ? null : `pack moved: ${r.faqId}`) });
 check('are the cards child friendly', { action: 'fallback' }, { assert: (r) => (r.faqId === undefined ? null : `Task 175 §5: child-safety should miss now, not mis-answer: ${r.faqId}`) });
-check('how many cards', { bucket: 'B02', action: 'rules_answer' });
+check('how many cards', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ004' ? null : `Task 176 audit: "how many cards" is FAQ004 now (removed from RULES): ${r.faqId}`) });
 check('where can I buy the game', { bucket: 'B01', action: 'open_discount_popup' });
 
 // ---- Task 26: the general-distress signpost (first variant) uses "safe grown-up", not
@@ -2599,8 +2601,9 @@ check('why are there so many', { action: 'canned', bucket: 'B52' }, { destinatio
   check('I have a cocker spaniel', { action: 'breed_page' }, { session: s, url: '/chums/cocker-spaniel' });
   check('how long do they live', { action: 'breed_page' }, { session: s, url: '/chums/cocker-spaniel', assert: (r) => (r.bucket === 'B48' ? 'B48 hijacked the breed follow-up' : null) });
 })();
-// "how many people can play" stays FAQ001; "how many players" stays the card-game rules (both above canned).
-check('how many people can play', { action: 'faq_answer', bucket: 'B04' }, { assert: (r) => (r.faqId === 'FAQ001' ? null : `not FAQ001: ${r.faqId ?? r.bucket}`) });
+// Task 176 audit: "how many people can play" now reaches its OWN answer FAQ005 (was stolen by FAQ001 via
+// the 'play' token); "how many players" stays the card-game rules (both above canned).
+check('how many people can play', { action: 'faq_answer', bucket: 'B04' }, { assert: (r) => (r.faqId === 'FAQ005' ? null : `now FAQ005: ${r.faqId ?? r.bucket}`) });
 check('how many players', { action: 'rules_answer', bucket: 'B02' });
 
 // Section 8: no new-bucket answer (and no clip) may serve inside a protected state.

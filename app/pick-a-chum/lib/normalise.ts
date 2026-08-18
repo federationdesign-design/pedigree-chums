@@ -181,6 +181,9 @@ const COMMON_WORDS = new Set([
   'talk', 'talking', 'listen', 'idea', 'idiom', 'chit', 'chat', 'chap',
   // near-neighbours of 6+ letter triggers (still fuzzed): launch/lunch, dinner/diner|winner
   'lunch', 'diner', 'winner', 'sinner', 'hunger', 'hunter', 'better', 'butter', 'matter',
+  // Task 176 (audit): "order" is one edit from "border" and was reaching a Border Terrier breed page.
+  // Held exact so it never fuzzes into a breed; "order the game" still matches exactly.
+  'order',
 ]);
 
 // True if word matches target exactly, or is a genuine (non-common-word) typo

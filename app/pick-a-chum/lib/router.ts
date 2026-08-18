@@ -89,6 +89,9 @@ const COMMERCIAL = [
   'when does it launch', 'launch date', 'release date', 'when is it out', 'when is it released', 'when can i get it',
   'is it available', 'when is it available', 'available to buy',
   'discount', '30%', '30 percent', 'mailing list', 'sign me up', 'sign up', 'get one', 'want one', 'in stock',
+  // Task 176 (audit): buying phrasings the recorder showed dead-ending. 'reserve' is unambiguous on a
+  // pre-order site (the owner's call); the bare ambiguous words (order/buy alone) are deliberately left.
+  'reserve', 'buy now', 'available now', 'i want the game',
 ];
 
 // Task 69: the "get" buying forms, as a RULE not an enumeration. A get/buy/order VERB phrase
@@ -152,7 +155,10 @@ const BUY_STANDALONE = [
 
 const RULES = [
   'how to play', 'how do i play', 'how do you play', 'the rules', 'what are the rules',
-  'how many cards', 'how do we play', 'who wins', 'how do you win', 'hot dog mode', 'game rules',
+  'how do we play', 'who wins', 'how do you win', 'game rules',
+  // Task 176 (audit): 'how many cards' (a pack-contents question, FAQ004) and 'hot dog mode' (FAQ007)
+  // were mis-filed here and stole those two FAQ answers into the how-to-play route. Removed so they
+  // reach their own FAQ.
 ];
 
 // Task 18: complaint / report / human-escalation intent. Routes to the approved
@@ -408,6 +414,19 @@ const FUN = [
   'bored', 'can you play',
 ];
 
+// Task 176 (audit): explicit requests to see or play the CHAT games (bark, cookies, Kennel Sketch, the
+// button panel, Nine-Square, Missing Sheep) -> the games menu (B45), NOT the card game (FAQ001/rules).
+// The recorder showed "play game online" / "play game on website" wrongly getting the card-game rules.
+// 'minigame' is 8 chars, so hasAny fuzz (budget 1) catches mingame / miniagme / mimigame; 'mini game' is
+// a phrase (covers "mini-game" / "mini game"); 'mimigane' is edit-distance 2 so it is listed explicitly.
+// None of these sits within 2 edits of a real word, so the fuzz introduces no false positives.
+const GAME_REQUEST = [
+  'show me game', 'show me games', 'show me the games', 'show me a game', 'what game', 'what games',
+  'play minigame', 'play a minigame', 'minigame', 'mini game', 'minigame where', 'where minigame',
+  'online game', 'online games', 'online website game', 'website game', 'play game online',
+  'play game on website', 'play online game', 'mimigane',
+];
+
 const CURRENT_DATA = ['latest', 'current', 'today', 'tonight', 'right now', 'this week', 'score', 'scores', 'weather forecast', 'news', 'who is winning', 'live'];
 const GK_SHAPE = /^(what|whats|who|whos|where|when|how many|how much|why|name the|capital of)\b/;
 
@@ -496,7 +515,11 @@ function matchArticle(n: ChumData, compact: string): { destinationId: string; ur
 // FAQ token is distinctive and is the whole point of its record (discount ->
 // FAQ009, delivery -> FAQ014, competition -> FAQ011, contact -> FAQ012, price ->
 // FAQ008, pack -> FAQ004), so those must keep matching. Task 10A.
-const COMMON_FAQ_TOKENS = new Set(['game', 'games']);
+// Task 176 (audit): 'play' joins game/games as a non-distinctive FAQ token. FAQ001's phrasings collapse
+// to a lone 'play' ("how to play"), so before this ANY message with 'play' matched FAQ001 and stole the
+// how-to-play *questions* (who can play -> FAQ002, how many people can play -> FAQ005, other way to play
+// -> FAQ007). FAQ001's real route is the full RULES phrases, so lone 'play' in matchFaq was pure over-reach.
+const COMMON_FAQ_TOKENS = new Set(['game', 'games', 'play']);
 
 // FAQ match strength for a single phrase against the input:
 //   2 = the whole phrase is a substring of the input (strong, unambiguous)
@@ -1744,6 +1767,19 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
     if (hasAny(N, grp.triggers)) {
       return { layer: 12, layerName: 'Identity and scepticism', bucket: 'B16', action: 'identity', responseFamily: grp.family };
     }
+  }
+
+  // Task 176 (audit): "can we play indoors" is FAQ006 (you need real dogs to spot), not a play request.
+  // Above FUN so the 'can we play' in it does not send this to the bark-game offer.
+  if (hasAny(N, ['indoors', 'indoor', 'inside']) && hasAny(N, ['play', 'spot', 'game'])) {
+    return { layer: 4, layerName: 'FAQ knowledge', bucket: 'B04', action: 'faq_answer', faqId: 'FAQ006', faqMatchStrength: 2 };
+  }
+
+  // Task 176 (audit): a games request reaches the games MENU (B45), above rules/FAQ/FUN so it never
+  // collides with the card game ("how do I play") or the "games are coming" tease. This is the priority
+  // fix that stops the chat games and the card game answering each other's questions.
+  if (hasAny(N, GAME_REQUEST)) {
+    return { layer: 13, layerName: 'Play and entertainment', bucket: 'B45', action: 'games_menu', responseId: 'B45-GAMELIST-02' };
   }
 
   // Layer 13: play / entertainment intent. Interim tease until the mini-games
