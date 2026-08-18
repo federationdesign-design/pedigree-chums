@@ -6820,6 +6820,13 @@ export default function BreedTree({
             const titleFs = winW <= 640
               ? Math.min(Math.max(0.9 * 16, 5 * vw), 1.6 * 16)
               : Math.min(Math.min(Math.max(0.832 * 16, 2 * vw), 1.808 * 16), tp / 2.15);
+            // Two lines when the hint carries a breed name: "tap to learn more
+            // about" on line one, the name on line two. The static "start
+            // playing" has no name, so it stays a single line.
+            const NAME_PREFIX = "tap to learn more about";
+            const hasName = text.startsWith(NAME_PREFIX) && text.length > NAME_PREFIX.length;
+            const line1 = hasName ? NAME_PREFIX : text;
+            const line2 = hasName ? text.slice(NAME_PREFIX.length).trim() : null;
             return (
               <text
                 className={styles.autoLabel}
@@ -6839,9 +6846,13 @@ export default function BreedTree({
                 // the dark wood band. strokeWidth matches the start-screen captions'
                 // 24-font-to-2-stroke ratio; .autoLabel already sets paint-order stroke
                 // and stroke-linejoin round.
-                style={{ fontSize: `${titleFs * 1.12 * upp}px`, fill: "#000000", stroke: "#ffffff", strokeWidth: (titleFs * 1.12 * upp) / 12 }}
+                // REVERSED AGAIN 18 Aug 2026: the outline is flipped to white fill with
+                // a black stroke, and the size is doubled again (1.12 to 2.24) for
+                // legibility. strokeWidth still carries the same 12:1 ratio.
+                style={{ fontSize: `${titleFs * 2.24 * upp}px`, fill: "#ffffff", stroke: "#000000", strokeWidth: (titleFs * 2.24 * upp) / 12 }}
               >
-                {text}
+                <tspan x={x}>{line1}</tspan>
+                {line2 !== null ? <tspan x={x} dy="1.05em">{line2}</tspan> : null}
               </text>
             );
           })()}
