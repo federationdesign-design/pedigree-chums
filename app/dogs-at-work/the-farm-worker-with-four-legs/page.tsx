@@ -15,7 +15,6 @@ export const metadata: Metadata = {
   title: "The Farm Worker With Four Legs | Dogs at Work",
   description:
     "To the shepherd it is labour saved. To the sheepdog it is the best game ever invented: find the sheep, get behind them, bring them home. Nobody has told it otherwise.",
-  robots: "noindex",
 };
 
 // Article 4 body, transcribed verbatim from the supplied copy

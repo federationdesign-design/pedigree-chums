@@ -15,7 +15,6 @@ export const metadata: Metadata = {
   title: "The Dogs Teaching Medicine How to Smell Disease | Dogs at Work",
   description:
     "In 2025, dogs called Bumper and Peanut detected Parkinson's disease by smell with up to 98% specificity. They are not replacing doctors - they may be inventing the machines that will. How bio-detection dogs are teaching medicine what disease smells like.",
-  robots: "noindex",
 };
 
 // Essay body kept as data so apostrophes/quotes stay plain text (no JSX escaping).

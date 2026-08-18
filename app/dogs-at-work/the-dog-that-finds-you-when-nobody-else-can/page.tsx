@@ -16,7 +16,6 @@ export const metadata: Metadata = {
   // Meta description drawn from the index card dek (supplied by Steve, 11 Aug).
   description:
     "Air scent, trailing, water. A dog covers ground people cannot, in the dark, in the rain, for a toy and a bit of praise.",
-  robots: "noindex",
 };
 
 // Article 5 body, transcribed verbatim from the supplied copy
