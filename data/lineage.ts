@@ -1430,7 +1430,10 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "A tall, rough-coated sighthound bred to course red deer across the Highlands, close kin to the Irish Wolfhound.",
     children: [
       { name: "Celtic Hound", note: "The ancient sighthound stock of the north.", img: "/history/breeds/celtic-hound-remake.jpg", value: 60 },
-      { name: "Rough northern sighthounds", note: "Shaggy-coated coursing dogs built for cold, rough ground. Now extinct.", img: "/history/breeds/irish-wolfhound-photo.jpg", value: 40 }
+      // 18 August 2026: swapped off the Irish Wolfhound photo. The Wolfhound is
+      // a living breed and, per the Deerhound's own note, its close kin rather
+      // than its ancestor, so this extinct node now carries its own artwork.
+      { name: "Rough northern sighthounds", note: "Shaggy-coated coursing dogs built for cold, rough ground. Now extinct.", img: "/history/breeds/rough-northern-sighthounds.jpg", value: 40 }
     ]
   },
 
