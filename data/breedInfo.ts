@@ -102,7 +102,6 @@ export const breedInfo: Record<string, string> = {
   "Rough water dogs": "Rough water dogs were shaggy, practical water-working dogs with protective coats, before refined spaniel, poodle and retriever branches separated.",
   "Schnauzer-type farm dogs": "Schnauzer-type farm dogs were medium rough-coated southern German stable ratters, bearded and practical, the root of the Schnauzer/Pinscher branch.",
   "Setter": "The Setter is the later gun-dog form of the old setting spaniel, feathered, elegant and bred to locate birds and hold point.",
-  "Shaggy lowland herders": "Shaggy lowland herders were heavy-coated pastoral dogs of damp lowland farms, useful for droving, guarding and managing stock.",
   "Shaggy upland herders": "Shaggy upland herders were rough-coated hill and mountain sheepdogs, weatherproof and hardy, used on exposed uplands.",
   "Skye terrier stock": "Skye terrier stock was the long, low rough-coated island earth-dog branch behind Skye, Paisley and related Scottish terriers.",
   "Small imported dogs": "Small imported dogs refers to foreign toy and companion dogs brought into Britain or Europe, often influencing court lapdogs, toy spaniels and small urban breeds.",

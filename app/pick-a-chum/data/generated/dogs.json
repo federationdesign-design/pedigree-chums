@@ -4496,10 +4496,99 @@
           "img": "/history/breeds/bearded-collie-photo.jpg",
           "children": [
             {
-              "name": "Shaggy lowland herders",
-              "note": "Polish Lowland sheepdogs said to have come ashore in Scotland. Now extinct.",
-              "img": "/history/breeds/Old-English-Sheepdog.jpg",
-              "value": 27.5
+              "name": "Old Welsh Grey Sheepdog",
+              "note": "A shaggy grey Welsh hill sheepdog, worked loose-eyed and noisy like the Beardie itself. Now extinct.",
+              "img": "/history/breeds/old-welsh-grey-sheepdog.jpg",
+              "children": [
+                {
+                  "name": "Welsh herding dogs",
+                  "note": "The old Welsh herding and droving dogs, a long-legged, loose-eyed landrace and the parallel Welsh branch behind the region's sheep-working breeds. Now extinct.",
+                  "img": "/history/breeds/Welsh-herding-dogs-cluster.jpg",
+                  "children": [
+                    {
+                      "name": "Shepherd's Dog",
+                      "note": "Practical medieval working dog used to move and protect sheep, forming an early root of Britain's collie families. An extinct historical type.",
+                      "img": "/history/breeds/medieval-shepherds-dog.jpg",
+                      "children": [
+                        {
+                          "name": "Celtic herdsmen's dogs",
+                          "note": "The all-round farm dogs of the Celtic tribes, guarding and driving the herds. Now extinct.",
+                          "img": "/history/breeds/celtic-herdsmen-dogs.jpg",
+                          "value": 2.8875
+                        },
+                        {
+                          "name": "Roman shepherd dogs",
+                          "note": "The flock-guarding sheepdogs the Roman farm writers described, kept white so the shepherd knew dog from wolf. Now extinct.",
+                          "img": "/history/breeds/roman-shepherd-dogs.jpg",
+                          "value": 2.0625
+                        },
+                        {
+                          "name": "Anglo-Saxon herding dogs",
+                          "note": "Collie-sized herding dogs of Anglo-Saxon England, found at West Stow and Brandon. Now extinct.",
+                          "img": "/history/breeds/anglo-saxon-herding-dogs.jpg",
+                          "value": 1.65
+                        },
+                        {
+                          "name": "Norse settlers dogs",
+                          "note": "Scandinavian dogs brought over with Viking settlement, likely mixed into local herding stock. Now extinct.",
+                          "img": "/history/breeds/viking-herding-spitz.jpg",
+                          "value": 1.65
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Welsh herding dogs",
+                      "note": "The old Welsh herding and droving dogs, a long-legged, loose-eyed landrace and the parallel Welsh branch behind the region's sheep-working breeds. Now extinct.",
+                      "img": "/history/breeds/Welsh-herding-dogs-cluster.jpg",
+                      "value": 8.25
+                    }
+                  ]
+                },
+                {
+                  "name": "Shaggy upland herders",
+                  "note": "Rough-coated hill dogs of the same old type. Now extinct.",
+                  "img": "/history/breeds/Old-working-collies-cluster.jpg",
+                  "children": [
+                    {
+                      "name": "Shepherd's Dog",
+                      "note": "Practical medieval working dog used to move and protect sheep, forming an early root of Britain's collie families. An extinct historical type.",
+                      "img": "/history/breeds/medieval-shepherds-dog.jpg",
+                      "children": [
+                        {
+                          "name": "Celtic herdsmen's dogs",
+                          "note": "The all-round farm dogs of the Celtic tribes, guarding and driving the herds. Now extinct.",
+                          "img": "/history/breeds/celtic-herdsmen-dogs.jpg",
+                          "value": 1.925
+                        },
+                        {
+                          "name": "Roman shepherd dogs",
+                          "note": "The flock-guarding sheepdogs the Roman farm writers described, kept white so the shepherd knew dog from wolf. Now extinct.",
+                          "img": "/history/breeds/roman-shepherd-dogs.jpg",
+                          "value": 1.375
+                        },
+                        {
+                          "name": "Anglo-Saxon herding dogs",
+                          "note": "Collie-sized herding dogs of Anglo-Saxon England, found at West Stow and Brandon. Now extinct.",
+                          "img": "/history/breeds/anglo-saxon-herding-dogs.jpg",
+                          "value": 1.1
+                        },
+                        {
+                          "name": "Norse settlers dogs",
+                          "note": "Scandinavian dogs brought over with Viking settlement, likely mixed into local herding stock. Now extinct.",
+                          "img": "/history/breeds/viking-herding-spitz.jpg",
+                          "value": 1.1
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Shaggy upland herders",
+                      "note": "Rough-coated hill dogs of the same old type. Now extinct.",
+                      "img": "/history/breeds/Old-working-collies-cluster.jpg",
+                      "value": 5.5
+                    }
+                  ]
+                }
+              ]
             },
             {
               "name": "Old working collies",

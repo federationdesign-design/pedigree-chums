@@ -1545,7 +1545,11 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Bearded Collie",
     note: "A shaggy, bouncy Scottish herding dog, also called the Highland Collie, built for driving sheep and cattle over the hills.",
     children: [
-      { name: "Shaggy lowland herders", note: "Polish Lowland sheepdogs said to have come ashore in Scotland. Now extinct.", img: "/history/breeds/Old-English-Sheepdog.jpg", value: 50 },
+      // Re-keyed 18 August 2026. The old node named the Polish Lowland Sheepdog,
+      // which is not extinct, on a conjectural arrival story, and carried an Old
+      // English Sheepdog photo. The Old Welsh Grey is a documented extinct Welsh
+      // type widely held to be a Bearded Collie ancestor.
+      { name: "Old Welsh Grey Sheepdog", note: "A shaggy grey Welsh hill sheepdog, worked loose-eyed and noisy like the Beardie itself. Now extinct.", img: "/history/breeds/old-welsh-grey-sheepdog.jpg", value: 50 },
       { name: "Old working collies", note: "The old northern hill-collie landrace of Scotland and the borders, the shared working stock the Rough, Smooth and Border collies all grew from. Now extinct.", img: "/history/breeds/Old-working-collies-cluster.jpg", value: 50 }
     ]
   },
