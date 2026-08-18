@@ -112,7 +112,10 @@ const GET_VERBS = [
 const COMMERCIAL_EXCLUDE = [
   'without signing', 'without signing up', 'without sign up',
   'buy it for me', 'buy the game for me', 'buy one for me', 'buy me', 'order it for me',
-  'get it for me', 'purchase it for me',
+  'get it for me', 'purchase it for me', 'pay for me',
+  // Task 175: "in order to ..." is the idiom, never a purchase. Without this the buy rule ('order' +
+  // the product word 'game') would reopen the very false positive bare 'order' was removed to avoid.
+  'in order to',
 ];
 
 // Task 45: the offer modal is about the product, never a dog. A buy/price phrase opens it
@@ -126,6 +129,26 @@ const PRODUCT_WORDS = ['game', 'games', 'pack', 'packs', 'cards', 'card', 'deck'
 // markers: "how much" covers every "how much..." phrasing; "price"/"cost"/"expensive" cover the
 // noun and adjective forms ("whats the price", "what does it cost", "is it expensive").
 const PRICE_INTENT = ['how much', 'price', 'cost', 'expensive'];
+
+// Task 175 (recorder evidence): the commerce misses. The curated COMMERCIAL/GET_VERBS lists left five of
+// the six ways to ask "where do I buy" falling through to "im a dog" (and worse, into the FAQ "54 cards"
+// answer). The fix is a RULE, mirroring getVerb, not more enumeration: a purchase verb NEXT TO a product
+// or a purchase channel is a buying intent. The verb alone never fires -- which is exactly why bare
+// buy/order were once removed from COMMERCIAL ("in order to win", "the cost of living"); the product/
+// channel requirement re-admits them safely. "pay" was the single biggest hole: it matched nothing at all.
+// Fuzz note: every short needle here is <=5 chars, so hasAny matches it EXACTLY (fuzzThreshold), and the
+// collision words (play/say/shop/game/help) are already in COMMON_WORDS -- so none fuzzes in.
+const PURCHASE_VERBS = ['buy', 'buying', 'order', 'ordering', 'purchase', 'purchasing', 'pay for', 'paying for'];
+// A place/channel of purchase is enough context on its own ("buy online", "order from you").
+const CHANNEL_WORDS = ['online', 'on the website', 'on the site', 'on your site', 'from you', 'in the shop', 'in store'];
+// Buying signals that stand alone, no product word needed. Pay/buy question frames: unlike "get" (Task 69:
+// "where can I get a dog"), pay and buy have no innocent non-commerce reading here. A shop/store on a
+// pre-order site is itself a request to buy. "shop" is a whole word (never "workshop"/"shopping"); "store"
+// only in phrases, so "do you store my data" stays a privacy question.
+const BUY_STANDALONE = [
+  'where can i pay', 'where do i pay', 'where i pay', 'how do i pay', 'how can i pay', 'where to pay', 'can i pay', 'how to pay',
+  'where buy', 'how to buy', 'do you sell', 'shop', 'online store', 'the store', 'your store',
+];
 
 const RULES = [
   'how to play', 'how do i play', 'how do you play', 'the rules', 'what are the rules',
@@ -573,7 +596,7 @@ const CONFIRM_NO = new Set(['no', 'nah', 'nope']);
 // The question-posing offers (besides the loop's own pendingConfirm): a bare "no" right after one of
 // these is a decline, not a miss. games_menu is included so a "no" to the games LIST ("Nine-Square,
 // Missing Sheep ...") declines too, not just a "no" to the "You want to play a game?" question.
-const OFFER_ACTIONS = new Set(['ask_games', 'ask_dogs', 'ask_breeds', 'tricks_menu', 'games_menu']);
+const OFFER_ACTIONS = new Set(['ask_games', 'ask_dogs', 'ask_breeds', 'tricks_menu', 'games_menu', 'buy_clarify']);
 // Task 123 fix: whole-message phrases that open the B45 games menu (serve B45-GAMELIST-01 "Game?").
 // Deliberately NARROW: bare "game" is left to the dog-led loop (correct by design) and "lets play" to
 // the bark-game offer. A following "yes" is caught by the games_menu confirmation (below) and serves
@@ -1419,6 +1442,10 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
   if (state.lastAction === 'ask_games' && isConfirmYes(c)) {
     return { layer: 13, layerName: 'Play and entertainment', bucket: 'B45', action: 'games_menu', responseId: 'B45-GAMELIST-02' };
   }
+  // Task 175: a yes to the "The card game?" clarifier (below, for a bare get-question) opens the pre-order.
+  if (state.lastAction === 'buy_clarify' && isConfirmYes(c)) {
+    return { layer: 2, layerName: 'Buying, launch and 30% discount', bucket: 'B01', action: 'open_discount_popup', destinationId: 'DST001' };
+  }
   if (DOGS_TRIGGERS.has(c)) {
     return { layer: 13, layerName: 'Play and entertainment', bucket: 'B55', action: 'ask_dogs', responseId: 'COL-B55-CONFIRM-01' };
   }
@@ -1571,7 +1598,9 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
   // "how do I get a dog" / "where can I get help" (no product word) do not, and the topic slot
   // already being commercial also satisfies the second half.
   const getVerb = hasAny(N, GET_VERBS) && (hasAny(N, PRODUCT_WORDS) || state.topic?.kind === 'commercial');
-  if ((hasAny(N, COMMERCIAL) || hasAny(N, PRICE_INTENT) || getVerb) && !hasAny(N, COMMERCIAL_EXCLUDE)) {
+  // Task 175: buy/order/purchase/pay + a product OR a purchase channel (the rule, mirroring getVerb).
+  const buyVerb = hasAny(N, PURCHASE_VERBS) && (hasAny(N, PRODUCT_WORDS) || hasAny(N, CHANNEL_WORDS) || state.topic?.kind === 'commercial');
+  if ((hasAny(N, COMMERCIAL) || hasAny(N, PRICE_INTENT) || getVerb || buyVerb || hasAny(N, BUY_STANDALONE)) && !hasAny(N, COMMERCIAL_EXCLUDE)) {
     // Task 45/46: the offer modal AND the price answer are about the product, never a dog. A
     // price/buy question that names a dog or breed, or whose bare "it" points at a breed topic
     // (Task 27), carrying no explicit product word, gets neither: it refuses to guess
@@ -1588,6 +1617,22 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
       return { layer: 4, layerName: 'FAQ knowledge', bucket: 'B04', action: 'price_answer', faqId: 'FAQ008' };
     }
     return { layer: 2, layerName: 'Buying, launch and 30% discount', bucket: 'B01', action: 'open_discount_popup', destinationId: 'DST001' };
+  }
+
+  // Task 175: a BARE get-question -- a get verb, no product word, no dog/breed, and no other content noun
+  // ("where can I get", "how do I get one") -- is most likely reaching for the game. Rather than "im a dog"
+  // it asks "The card game?" (buy_clarify); a following yes opens the pre-order (handled above). This KEEPS
+  // the Task 69 guard: a named dog ("where can I get a dog") or any other subject ("where can I get help")
+  // carries a residual content word and so never reaches here -- it falls through to the existing routes.
+  if (hasAny(N, GET_VERBS) && !hasAny(N, PRODUCT_WORDS) && !hasAny(N, COMMERCIAL_EXCLUDE)) {
+    const clarifyWords = new Set(c.match(/[a-z]+/g) ?? []);
+    if (!namesDogOrBreed(c, clarifyWords)) {
+      const GET_Q_IGNORE = new Set(['where', 'how', 'can', 'do', 'i', 'get', 'buy', 'to', 'it', 'one', 'them', 'some', 'that', 'this', 'a', 'the', 'me', 'my', 'from', 'you']);
+      const residual = [...clarifyWords].filter((w) => !GET_Q_IGNORE.has(w) && !STOP.has(w));
+      if (residual.length === 0) {
+        return { layer: 2, layerName: 'Buying, launch and 30% discount', bucket: 'B01', action: 'buy_clarify', responseId: 'BUY-CLARIFY-01' };
+      }
+    }
   }
 
   // Task 142 (§7.2): a referral question. No referral scheme exists, so rather than guess, point it

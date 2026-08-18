@@ -1946,7 +1946,10 @@ check('where can I get help', { action: 'gk_unknown' }, { assert: (r) => r.actio
 // Product-word gate: a bare "get" form with no product word / commercial topic does NOT open the
 // modal (Task 69 tightening); a get verb + ANY product word does. The rule (not an enumeration)
 // covers game/cards/deck alike.
-check('where can I get it?', { action: 'gk_unknown' });
+// Task 175: a bare get-question with no product now asks "The card game?" (buy_clarify) rather than
+// refusing outright. It still never AUTO-opens the modal -- a following yes does -- so the Task 69 guard
+// (no product word must not open the buy modal) is intact.
+check('where can I get it?', { action: 'buy_clarify' });
 check('how do I get the cards', { action: 'open_discount_popup' }); // get verb + "cards"
 check('where can I get the game?', { action: 'open_discount_popup' }); // get verb + "game" (the gap the rule closes)
 check('where can I get the deck?', { action: 'open_discount_popup' }); // get verb + "deck"

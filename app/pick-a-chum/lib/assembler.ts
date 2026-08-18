@@ -520,6 +520,11 @@ export function assemble(res: Resolution, data0: ChumData, n: Normalised, sessio
       return { responseId: rid, text, dog, ...(media ? { media } : {}), ...(interjection ? { interjection } : {}) };
     }
 
+    case 'buy_clarify':
+      // Task 175: the bare-get clarifier. A short question the visitor answers yes/no; a yes opens the
+      // pre-order (routed in the router). Owner-specified copy, kept inline like the other clarifier lines.
+      return { responseId: 'BUY-CLARIFY-01', text: 'The card game?', dog };
+
     case 'open_discount_popup': {
       const r = pickResponse(data, 'B01', session.usedResponseIds);
       const text = r ? fill(r.template, baseContext(n)) : CAMPAIGN.answers.discount_answer;
