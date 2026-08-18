@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import styles from "./pcAdmin.module.css";
 import { isAuthed, isConfigured } from "../../lib/pcSync/adminAuth";
 import {
@@ -14,6 +15,14 @@ import { loginAction, logoutAction } from "./actions";
 // login form; the shared password (PC_SYNC_ADMIN_PASSWORD) is checked by the loginAction server action.
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
+
+/* NEVER IN SEARCH, whatever else on the site is. This page is behind a
+   password, but a login form for a data viewer still has no business appearing
+   in results, and a crawler finding the address is the first step to somebody
+   else finding it. */
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+};
 
 const RECENT_LIMIT = 200;
 

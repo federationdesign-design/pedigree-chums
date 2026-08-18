@@ -18,7 +18,6 @@ import ArticleTextToggle from "../../../components/ArticleTextToggle/ArticleText
 export const metadata: Metadata = {
   title: "The Hound of the Baskervilles: How a Dog Was Made into a Monster | Good Dog, Bad Dog",
   description: "How Arthur Conan Doyle turned a real dog into the image of a supernatural killer.",
-  robots: "noindex",
 };
 
 const SLUG = "bloodhound";
