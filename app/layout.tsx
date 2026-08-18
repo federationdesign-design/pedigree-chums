@@ -89,6 +89,19 @@ const DESCRIPTION =
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
+  /* EVERY PAGE DECLARES ITS OWN ADDRESS.
+
+     There was no canonical anywhere on the site. `metadataBase` on its own only
+     resolves relative URLs for things like the OG image; it does not emit a
+     <link rel="canonical">, so nothing told a search engine which address a page
+     really lives at.
+
+     "./" is relative, and Next resolves it against metadataBase AND the current
+     route. So this one line gives every page a canonical pointing at itself,
+     rather than every page claiming to be the homepage.
+
+     A page that sets its own `alternates` overrides this. None do today. */
+  alternates: { canonical: "./" },
   title: {
     default: TITLE,
     template: TITLE_TEMPLATE,
