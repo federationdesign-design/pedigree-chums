@@ -919,6 +919,22 @@ for (const q of ['Who is your owner?', 'Do you have an owner?', 'Who owns you?']
 // A non-greeting is unaffected (still library-served, no mirror).
 check('how much is it', { action: 'price_answer' }, { assert: (_r, resp) => resp.responseId !== 'B09-MIRROR' ? null : 'non-greeting was mirrored' });
 check('tell me about labradors', { action: 'breed_page' }, { assert: (_r, resp) => resp.responseId !== 'B09-MIRROR' ? null : 'non-greeting was mirrored' });
+// Task 175 §6: mistyped hellos are caught (curated variant set + edit-distance-1 last resort) and greeted
+// back, instead of falling to "im a dog" (and, three in a row, a history diversion).
+for (const inp of ['hui', 'hioo', 'ji', 'hiyu', 'hoya', 'hihi', 'helli']) {
+  check(inp, { action: 'converse', bucket: 'B09' }, { assert: (_r, resp) => resp.responseId === 'B09-MIRROR' ? null : `mistyped hello not caught: ${resp.responseId}` });
+}
+// The danger words a fuzzy greeting must NOT swallow ('yo' is deliberately not a fuzzy anchor).
+for (const inp of ['no', 'so', 'go', 'do', 'ok', 'yes']) {
+  check(inp, {}, { assert: (_r, resp) => resp.responseId !== 'B09-MIRROR' ? null : `"${inp}" was wrongly greeted` });
+}
+// Task 175 §6: a run of lone nonsense tokens never trips the history diversion; each stays "im a dog".
+(() => {
+  const s = newSession();
+  for (const inp of ['hjdihi', 'zxcvq', 'mnbvq']) {
+    check(inp, {}, { session: s, assert: (_r, resp) => resp.responseId !== 'DIVERSION-01' && resp.responseId !== 'DIVERSION-02' ? null : `lone token tripped a diversion: ${resp.responseId}` });
+  }
+})();
 
 // ---- No dog speaks before the visitor ----
 (() => {

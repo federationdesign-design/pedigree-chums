@@ -8,7 +8,7 @@
 
 import { ChumData, Resolution, Dog, ActionType, GameId, DogRecord } from './types';
 import { effectiveBank } from './banks';
-import { Normalised, normalise, isGibberish, isSingleWord, isEmojiOnly, isBarkOnly, barkUnitCount, hasAny, buildAliasMap, applyAliases } from './normalise';
+import { Normalised, normalise, isGibberish, isSingleWord, isEmojiOnly, isBarkOnly, barkUnitCount, hasAny, buildAliasMap, applyAliases, editDistance } from './normalise';
 import { detectSafety, isDogHealthQuestion, detectProtectedContinuation, detectPersonalSadness, detectGrief } from './safety';
 import { SYNONYM_MAP } from './synonyms';
 import { Topic } from './session';
@@ -330,6 +330,22 @@ const GREETING = ['hi', 'hiya', 'hello', 'hey', 'morning', 'good morning', 'even
 function matchedGreeting(n: Normalised): string | null {
   const matches = GREETING.filter((g) => hasAny(n, [g]));
   return matches.length ? matches.reduce((a, b) => (b.length > a.length ? b : a)) : null;
+}
+// Task 175 §6: mistyped hellos. The greeting anchors are all <=5 chars, so hasAny holds them EXACT and
+// every slip ("hui", "hiyu", "helli") missed and fell to "im a dog" (and then a history diversion). Two
+// tiers, both used as a LAST RESORT (below every real route, just above the single-word fallback):
+//   1. a curated set of common greeting spellings (greetings are a small closed class, so listing their
+//      variants -- unlike "every misspelling of every word" -- actually scales);
+//   2. an edit-distance-1 check against the anchors for a lone short token.
+// 'yo'/'hi' are the 2-char anchors; 'yo' is deliberately NOT a fuzzy anchor (it would pull in no/so/go/do),
+// and 'hi' as a fuzzy anchor can pull a rare lone real word (his/him/hit) into a greeting -- an accepted,
+// low-harm cost (as a lone message those were a fallback miss anyway). Whole-message single token only.
+const GREETING_FUZZY_ANCHORS = ['hi', 'hey', 'hiya', 'hello', 'hullo', 'howdy'];
+const GREETING_VARIANTS = new Set(['heya', 'hii', 'hiii', 'helo', 'hallo', 'hullo', 'howdy', 'hai', 'oi', 'oy', 'sup', 'wagwan', 'hihi', 'hioo', 'hiyo', 'yoo']);
+function looksLikeGreeting(c: string): boolean {
+  if (GREETING_VARIANTS.has(c)) return true;
+  if (!/^[a-z]{2,6}$/.test(c)) return false; // a single short alphabetic token only
+  return GREETING_FUZZY_ANCHORS.some((a) => editDistance(c, a, 1) <= 1);
 }
 // Functional "is this on" testing only; identity/scepticism ("are you real / AI")
 // now belongs to the identity bucket (B16) below.
@@ -1959,6 +1975,11 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
     if (nth >= 3) return { layer: 13, layerName: 'Play and entertainment', bucket: 'B24', action: 'canned', responseId: 'BOX-B24-02', note: 'boxer_stop_done' };
     return { layer: 13, layerName: 'Play and entertainment', bucket: 'B30', action: 'canned', responseId: nth === 1 ? 'BOX-B30-04' : 'BOX-B30-06', note: 'boxer_stop' };
   }
+
+  // Task 175 §6: a mistyped hello, caught here as a last resort (below every real route, just above the
+  // single-word fallback) so it gets a hello back -- mirroring a clean "hi" rather than echoing the typo --
+  // instead of "im a dog" and, three in a row, a history diversion.
+  if (looksLikeGreeting(c)) return { ...conv('B09'), mirror: 'hi' };
 
   if (isSingleWord(N)) {
     if (c === 'help' && state.lastAction !== 'clarifier') {

@@ -410,7 +410,11 @@ export function submit(data: ChumData, session: Session, input: string): Turn {
       // in a row, the THIRD consecutive no-subject turn offers ONE diversion -- somewhere to go -- and
       // then it is back to "im a dog" (three offers in a row is pestering). Each session rotates to the
       // next of the eight offers. The old B46 single-word rotation (woof/bark/games?) is retired.
-      if (session.noSubjectStreak === 2) {
+      // Task 175 §6: a lone mistyped / nonsense token must NOT advance the diversion streak, so a run of
+      // typos ("hjdihi", "hioo") never trips the history diversion. Only coherent multi-word misses -- a
+      // genuinely stuck visitor -- build toward the "somewhere to go" nudge. isGibberish is untouched.
+      const loneToken = n.words.length <= 1;
+      if (session.noSubjectStreak === 2 && !loneToken) {
         const d = DIVERSIONS[(session.diversionsShown ?? 0) % DIVERSIONS.length];
         response.text = d.text;
         response.responseId = d.id;
@@ -422,7 +426,7 @@ export function submit(data: ChumData, session: Session, input: string): Turn {
         response.text = b40?.template ?? 'im a dog';
         response.responseId = b40?.responseId ?? 'B40-NOSUBJECT-01';
       }
-      session.noSubjectStreak += 1; // one more consecutive no-subject serve
+      if (!loneToken) session.noSubjectStreak += 1; // lone-token misses never advance the streak
     }
     // Task 68: only LOOP-01 (repeat) and LOOP-02 (destination offer) pose a yes/no; remember the
     // offered subject so a bare affirmation next turn can route to its destination.
