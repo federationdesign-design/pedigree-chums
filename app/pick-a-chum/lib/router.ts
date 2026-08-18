@@ -489,15 +489,38 @@ const COMMON_FAQ_TOKENS = new Set(['game', 'games']);
 //   0 = no match
 // Recorded on the resolution (Task 10B) so the outcome flag can mark a weak match
 // as unmatched rather than reporting a wrong answer as a success.
+// Task 175 §5: container/product words that are NOT a distinctive FAQ signal on their own. FAQ004's
+// phrasings collapse to a lone one of these ("what is in the pack" -> "pack", "how many cards" -> "cards",
+// "in the box" -> "box"), so before this ANY message mentioning a pack/card/box scored 1 and was served the
+// "54 cards" answer -- "a pack of dogs", "the cards", "think outside the box" all got it confidently. Like
+// game/games (COMMON_FAQ_TOKENS) they now count only WITH context: an actual contents question.
+const OVERLOADED_FAQ_TOKENS = new Set(['pack', 'packs', 'card', 'cards', 'box', 'deck', 'decks']);
+// A genuine pack-contents question, as opposed to a bare group noun ("wolf pack") or an unrelated mention
+// ("i lost my cards"). Matched as a substring of the whole message, so "in the pack" is container-specific
+// and "in the park" does not count.
+const FAQ_CONTENTS_SIGNALS = [
+  'in the pack', 'in a pack', 'in each pack', 'in this pack', 'in the box', 'in the deck', 'in the set',
+  'in it', 'inside', 'contents', 'how many', 'come with', 'comes with', 'come in', 'comes in', 'included',
+  'what do i get', 'what do you get', 'whats in', "what's in", 'what is in', 'what are in',
+];
+
 function faqPhraseStrength(compact: string, phrase: string): number {
   const p = phrase.toLowerCase().trim();
   if (!p) return 0;
-  if (p.includes(' ') && compact.includes(p)) return 2;
+  if (p.includes(' ') && compact.includes(p)) return 2; // whole phrase present: strong, unambiguous
   const toks = keyTokens(p);
   if (!toks.length) return 0;
   const words = new Set(compact.match(/[a-z]+/g) ?? []);
   if (!toks.every((t) => words.has(t))) return 0;
-  return toks.filter((t) => !COMMON_FAQ_TOKENS.has(t)).length;
+  // Task 175 §5: a lone overloaded container token counts only when the message actually asks about
+  // contents; otherwise it contributes 0, exactly like a COMMON_FAQ_TOKEN. This kills the "54 cards"
+  // over-reach ("a pack of dogs", "the cards") while keeping the real questions ("whats in the pack").
+  const hasContents = FAQ_CONTENTS_SIGNALS.some((s) => compact.includes(s));
+  return toks.filter((t) => {
+    if (COMMON_FAQ_TOKENS.has(t)) return false;
+    if (OVERLOADED_FAQ_TOKENS.has(t) && !hasContents) return false;
+    return true;
+  }).length;
 }
 
 // First FAQ (in sheet order) with any confident signal, reporting its best phrase

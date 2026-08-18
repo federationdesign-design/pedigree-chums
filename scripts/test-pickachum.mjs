@@ -592,10 +592,20 @@ for (const inp of [
 // product / pack questions must NOT move bucket into the complaint route.
 check('whats in the pack', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ004' ? null : `pack contents moved: ${r.faqId ?? r.action}`) });
 check('how many cards', { bucket: 'B02', action: 'rules_answer' });
-check('are the cards child friendly', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ004' ? null : `child-safety moved: ${r.faqId ?? r.action}`) });
-check('what are the cards made of', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ004' ? null : `materials moved: ${r.faqId ?? r.action}`) });
+// Task 175 §5: these two got the "54 cards" FAQ004 blurb via a lone 'cards' token -- a confident WRONG
+// answer (FAQ004 addresses neither child-safety nor materials). With the companion-token rule they now
+// MISS instead (there is no child-safety / materials FAQ; a future workbook FAQ is the real fix). Per §5 a
+// miss beats a mis-answer. Still not the complaint route, which was the original point of this guard.
+check('are the cards child friendly', { action: 'fallback' }, { assert: (r) => (r.faqId === undefined ? null : `child-safety should miss, not mis-answer: ${r.faqId}`) });
+check('what are the cards made of', { action: 'gk_unknown' }, { assert: (r) => (r.faqId === undefined ? null : `materials should miss, not mis-answer: ${r.faqId}`) });
 check('where can I buy the game', { bucket: 'B01', action: 'open_discount_popup' });
 check('is there any plastic in the packaging', { bucket: 'B13', action: 'fallback' });
+// Task 175 §5 guards: a lone overloaded container token no longer wins the "54 cards" answer; only a real
+// contents question does.
+check('a pack of dogs', {}, { assert: (r) => (r.faqId !== 'FAQ004' ? null : 'a pack of dogs got the 54-cards answer') });
+check('the cards', {}, { assert: (r) => (r.faqId !== 'FAQ004' ? null : 'bare "the cards" got the 54-cards answer') });
+check('think outside the box', {}, { assert: (r) => (r.faqId !== 'FAQ004' ? null : 'box idiom got the 54-cards answer') });
+check('whats in the pack', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ004' ? null : `real contents question must keep FAQ004: ${r.faqId}`) });
 
 // ---- Task 18: complaint route repointed to FAQ015; FAQ012 stays the general enquiry
 // answer. These six must reach exactly what they reached before the repoint. The one to
@@ -604,7 +614,7 @@ check('is there any plastic in the packaging', { bucket: 'B13', action: 'fallbac
 check('how do I contact you', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ012' ? null : `contact enquiry moved off FAQ012: ${r.faqId ?? r.action}`) });
 check('whats your email', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ012' ? null : `not FAQ012: ${r.faqId}`) }); // Task 25a: moved from gk_unknown to the FAQ012 general enquiry answer
 check('whats in the pack', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ004' ? null : `pack moved: ${r.faqId}`) });
-check('are the cards child friendly', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ004' ? null : `child-safety moved: ${r.faqId}`) });
+check('are the cards child friendly', { action: 'fallback' }, { assert: (r) => (r.faqId === undefined ? null : `Task 175 §5: child-safety should miss now, not mis-answer: ${r.faqId}`) });
 check('how many cards', { bucket: 'B02', action: 'rules_answer' });
 check('where can I buy the game', { bucket: 'B01', action: 'open_discount_popup' });
 
@@ -1458,7 +1468,7 @@ for (const q of ['your email', 'whats your email', 'what is your email'])
 check('how do I contact you', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ012' ? null : `contact moved: ${r.faqId}`) });
 check('whats your email', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ012' ? null : `email moved: ${r.faqId}`) });
 check('whats in the pack', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ004' ? null : `pack moved: ${r.faqId}`) });
-check('are the cards child friendly', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ004' ? null : `child-safety moved: ${r.faqId}`) });
+check('are the cards child friendly', { action: 'fallback' }, { assert: (r) => (r.faqId === undefined ? null : `Task 175 §5: child-safety should miss now, not mis-answer: ${r.faqId}`) });
 check('how many cards', { bucket: 'B02', action: 'rules_answer' });
 check('where can I buy the game', { bucket: 'B01', action: 'open_discount_popup' });
 
@@ -1515,7 +1525,7 @@ const hasUnresolvedTok = (t) => /\[|\]|\{\{|\}\}|\bundefined\b|\bnull\b/.test(t)
 (() => {
   const s = newSession();
   const turns = [
-    ['whats the thing with the cards', 'faq_answer', null],
+    ['whats the thing with the cards', 'gk_unknown', null], // Task 175 §5: vague, not a contents question -> a miss (Cards? loop), not the 54-cards answer
     ['no not that', 'fallback', 'B40-NOSUBJECT-01'],
     ['I mean the pictures on them', 'fallback', 'B40-NOSUBJECT-01'],
     ["you're not understanding me", 'fallback', 'DIVERSION-01'], // Task 142: 3rd in a row -> ONE diversion
@@ -1928,11 +1938,12 @@ check('my dog is old and unwell', { action: 'grief' }, { assert: (r) => r.griefC
 })();
 
 // ---- Task 69: route the "get" buying forms to commercial (product-word / commercial-topic gated) ----
-// The reported session: pack contents stays, "Yes them" is a loop turn, and the "where can I get
-// them" buying forms (product word "cards" present) now open the buy modal, not the FAQ004 blurb.
+// The reported session: the opening statement is a Cards? loop turn (Task 175 §5: a statement mentioning
+// cards is not a pack-contents question, so it no longer gets the FAQ004 blurb), "Yes them" is a loop
+// turn, and the "where can I get them" buying forms (product word "cards" present) open the buy modal.
 (() => {
   const s = newSession();
-  check('The cards I saw somebody playing with them', { action: 'faq_answer' }, { session: s, assert: (r) => r.faqId === 'FAQ004' ? null : `not FAQ004: ${r.faqId}` });
+  check('The cards I saw somebody playing with them', { action: 'fallback' }, { session: s, assert: (r) => r.faqId === undefined ? null : `Task 175 §5: a statement about cards must not get FAQ004: ${r.faqId}` });
   check('Yes them', {}, { session: s, assert: (_r, resp) => resp.responseId === 'B40-NOSUBJECT-01' ? null : `not the im-a-dog line: ${resp.responseId}` });
   check('The cards, where can I get them?', { action: 'open_discount_popup' }, { session: s });
   check("Yes, you've told me about the cards. I want to know where I can get them.", { action: 'open_discount_popup' }, { session: s });
