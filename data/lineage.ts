@@ -1098,10 +1098,8 @@ const LINEAGE: Record<string, LineageNode> = {
       // separately and the former 50 divides evenly between them. Bloodhound is
       // a lineage key in its own right, so that half now grafts its real
       // ancestry in instead of dead-ending.
-      // TODO artwork: the Gascogne reuses the Bloodhound photo as a stand-in
-      // until its own image exists. Owner-agreed placeholder, replace the img.
       { name: "Bloodhound", note: "Bloodhound for size, nose and the black-and-tan.", img: "/history/breeds/modern-bloodhound.jpg", value: 25 },
-      { name: "Grand Bleu de Gascogne", note: "The big French blue hound, for scenting power and voice.", img: "/history/breeds/modern-bloodhound.jpg", value: 25 }
+      { name: "Grand Bleu de Gascogne", note: "The big French blue hound, for scenting power and voice.", img: "/history/breeds/grand-bleu-de-gascogne.jpg", value: 25 }
     ]
   },
 
