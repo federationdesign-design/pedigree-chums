@@ -126,6 +126,17 @@ export default function PackPit() {
   // celebration variant; PitEnd has no such variant, so it is unused for now.
 
   useEffect(() => { if (!howToPlay) window.dispatchEvent(new Event("pc:close-howtoplay")); }, [howToPlay]);
+  // Campaign messages (the hidden-games discovery toast and the prelude/intro
+  // cards) must not appear over the Main Pit: it is the home route itself, runs
+  // from mount, and breaks concentration. Publish a body flag those components
+  // observe, mirroring data-pc-chat-open. Set while the pit is mounted, cleared
+  // on unmount, i.e. when the visitor leaves the pit (its only exit), so a held
+  // message can surface then.
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    document.body.setAttribute("data-pc-pit-playing", "1");
+    return () => document.body.removeAttribute("data-pc-pit-playing");
+  }, []);
   useEffect(() => {
     // Preload HowToPlay videos immediately on pit mount
     [1,2,3,6].forEach((n) => {

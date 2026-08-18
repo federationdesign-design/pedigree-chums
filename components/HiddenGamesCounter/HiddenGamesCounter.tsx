@@ -47,6 +47,16 @@ const PRELUDE_FROM_PAGE = 2; // earliest page the prelude may appear on
 const INTRO_FROM_PAGE = 3; // earliest page the introduction may appear on
 const COMPLETION_TIMEOUT_MS = 10000; // D11 completion auto-collapse
 
+// The Main Pit (the home route) is on screen and being played: PackPit sets this
+// body flag while it is mounted. A prelude or introduction card must not appear
+// over it, so a card due while the pit is in play is held for a later page.
+function pitInPlay(): boolean {
+  return (
+    typeof document !== "undefined" &&
+    document.body.hasAttribute("data-pc-pit-playing")
+  );
+}
+
 type Phase = "pending" | "hidden" | "prelude" | "intro" | "counter";
 
 export default function HiddenGamesCounter() {
@@ -146,6 +156,12 @@ export default function HiddenGamesCounter() {
     if (page >= PRELUDE_FROM_PAGE && !s.preludeSeen) {
       setPhase("hidden");
       const t = window.setTimeout(() => {
+        if (pitInPlay()) {
+          // Held: the Main Pit is being played. Leave prelude_seen unset so the
+          // card stays due and reveals on a later page not in the pit.
+          setPhase("counter");
+          return;
+        }
         setPhase("prelude");
         engine.markPreludeSeen(); // once only, even if they leave before closing
       }, CARD_AT);
@@ -154,6 +170,10 @@ export default function HiddenGamesCounter() {
     if (page >= INTRO_FROM_PAGE && !s.introSeen) {
       setPhase("hidden");
       const t = window.setTimeout(() => {
+        if (pitInPlay()) {
+          setPhase("counter"); // held for a later page, as the prelude is
+          return;
+        }
         setPhase("intro");
         engine.markIntroSeen();
       }, CARD_AT);
