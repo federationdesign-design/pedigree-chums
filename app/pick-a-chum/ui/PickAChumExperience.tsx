@@ -773,10 +773,16 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
   // all drop it, so the rest never fire (see send(), the pathname effect, and the protected checks here).
   // The extras appear whole (no per-message typing), so there is no theatre to stack -- the 40s ceiling
   // is never approached by a sequence, only by the single main message that precedes it.
-  const SEQ_MAX_EXTRAS = 2;
+  // Task 176: raised from 2 to 3 so a four-message FAQ answer (opener + three extras) plays in full
+  // (FAQ009 the four-part 30%-off sequence, FAQ012 the four-part contact sequence).
+  const SEQ_MAX_EXTRAS = 3;
   const playSequence = useCallback(
-    (lines: string[], seqDog: Dog, gapMs: number, showAvatar = false, media?: { src: string; alt: string }, monologue = false) => {
-      const items = lines.filter((l) => l && l.trim()).slice(0, SEQ_MAX_EXTRAS);
+    (lines: Array<string | { text: string; url?: string | null; destinationId?: string }>, seqDog: Dog, gapMs: number, showAvatar = false, media?: { src: string; alt: string }, monologue = false) => {
+      // Task 176: an item may carry its own link (a FAQ sequence message), so normalise strings to steps.
+      const items = lines
+        .map((l) => (typeof l === 'string' ? { text: l } : l))
+        .filter((l) => l.text && l.text.trim())
+        .slice(0, SEQ_MAX_EXTRAS);
       if (!items.length) return;
       const s = sessionRef.current;
       // Never BEGIN a sequence in a protected session: a child who disclosed something must not have a
@@ -803,12 +809,14 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
           seqRef.current = null;
           return;
         }
-        const line = items[i];
+        const item = items[i];
         // Task 166: the media rides ONLY the last line of the run (a red cookie's clip on its single
         // follow-up line), so a multi-line sequence never repeats the clip.
         const withMedia = media && i === items.length - 1 ? media : undefined;
-        setMessages((m) => [...m, { id: idRef.current++, who: 'dog', text: line, display: line, done: true, dog: seqDog, name: dogInfo(seqDog).name, avatar: showAvatar, media: withMedia }]);
-        setAnnounce(line);
+        // Task 176: a sequence message may carry its own structural link (FAQ009's pay/form links).
+        const action = item.url ? actionFor({ url: item.url, destinationId: item.destinationId } as Turn['response']) : undefined;
+        setMessages((m) => [...m, { id: idRef.current++, who: 'dog', text: item.text, display: item.text, done: true, dog: seqDog, name: dogInfo(seqDog).name, avatar: showAvatar, action, media: withMedia }]);
+        setAnnounce(item.text);
         if (i + 1 < items.length) {
           after(gapMs, () => play(i + 1));
         } else {
@@ -1243,6 +1251,17 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
       // medallion stays the Labrador), so navy alone is too subtle -- the face makes "a second dog spoke"
       // unmistakable.
       playSequence([ij.line], ij.dog, reducedMotion ? 0 : 700, true);
+      return;
+    }
+    // Task 176: a FAQ answer that plays as separate messages (FAQ009 the four-part 30%-off explainer with a
+    // pay link then a form link; FAQ012 who / but im a dog / humans? / the email). The opener is dogMsg
+    // (already carrying step one's link); the rest flow through the sequence player, each with its own link.
+    if (r.sequence && r.sequence.length) {
+      setMsg(dogMsg.id, { display: r.text, typing: false, done: true });
+      setAnnounce(r.text);
+      setPhase('idle');
+      window.setTimeout(() => inputRef.current?.focus(), 0);
+      playSequence(r.sequence, toDog, reducedMotion ? 0 : 900);
       return;
     }
     if (r.followUp) {

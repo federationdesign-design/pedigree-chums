@@ -95,11 +95,13 @@ check('Where is the Name Generator?', { layer: 3, bucket: 'B03', action: 'link' 
 check('Show me Know Your Chum', { layer: 3, bucket: 'B03', action: 'link' }, { destinationId: 'DST006' });
 check('How do I play?', { layer: 3, bucket: 'B02', action: 'rules_answer' });
 check('Do I need to own a dog?', { layer: 4, bucket: 'B04', action: 'faq_answer' });
-// FAQ011 fills {{competition_close_date}} at render, mirroring the /chumspot page.
+// Task 176: FAQ011 now DEFERS to the ChumSpot page ("got to this page" + the /chumspot link). The close
+// date and eligibility/guardian wording are compliance copy that lives on that page, not inline here.
 check('How do I enter the competition?', { layer: 4, bucket: 'B04', action: 'faq_answer' }, {
-  assert: (_r, resp) => {
+  assert: (r, resp) => {
     if (resp.text.includes('{{')) return 'unfilled template token in answer';
-    return /\b\d{1,2} [A-Z][a-z]+ \d{4}\b/.test(resp.text) ? null : 'expected a resolved close date (e.g. "31 July 2026")';
+    if (r.faqId !== 'FAQ011') return `not FAQ011: ${r.faqId}`;
+    return resp.url === '/chumspot' && !/\d{4}/.test(resp.text) ? null : `expected the ChumSpot deferral (no inline date), got "${resp.text}" url=${resp.url}`;
   },
 });
 check('Tell me about working dogs.', { layer: 5, bucket: 'B05', action: 'link' });
@@ -1466,7 +1468,7 @@ for (const q of ['your email', 'whats your email', 'what is your email'])
   script.forEach((inp, i) => {
     check(inp, {}, { session: s, assert: (r, resp) => {
       if (r.faqId !== 'FAQ015') return `turn ${i + 1} left the complaint: ${r.faqId ?? r.action}`;
-      const full = resp.text.includes('That needs a person, not a dog');
+      const full = resp.text.includes('That needs a human, not a dog');
       const short = resp.text.includes('Put that in the email too and someone will look at it');
       if (i === 0) return full ? null : 'turn 1 was not the full answer';
       return short ? null : `turn ${i + 1} was not the short repeat: "${resp.text.slice(0, 40)}"`;
@@ -1476,9 +1478,9 @@ for (const q of ['your email', 'whats your email', 'what is your email'])
 // 25b: a clear topic change ends the complaint context, so the next complaint is full again.
 (() => {
   const s = newSession();
-  check('I have a complaint', {}, { session: s, assert: (_r, resp) => (resp.text.includes('That needs a person, not a dog') ? null : 'first complaint not the full answer') });
+  check('I have a complaint', {}, { session: s, assert: (_r, resp) => (resp.text.includes('That needs a human, not a dog') ? null : 'first complaint not the full answer') });
   check('how do I play?', { action: 'rules_answer' }, { session: s }); // clear topic change
-  check('I have a complaint', {}, { session: s, assert: (_r, resp) => (resp.text.includes('That needs a person, not a dog') ? null : 'complaint context did not reset to the full answer') });
+  check('I have a complaint', {}, { session: s, assert: (_r, resp) => (resp.text.includes('That needs a human, not a dog') ? null : 'complaint context did not reset to the full answer') });
 })();
 // The six existing complaint-route guards still hold (email now FAQ012 per 25a).
 check('how do I contact you', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ012' ? null : `contact moved: ${r.faqId}`) });
@@ -2532,10 +2534,10 @@ check('do you like going in the car', { action: 'canned', bucket: 'B64' }, { ass
 check('can you lick your balls?', { action: 'canned', bucket: 'B52' }, { notAction: 'safety_boundary', assert: (_r, resp) =>
   resp.responseId !== 'COL-B52-MISC-09' ? `balls not B52-MISC-09: ${resp.responseId}`
     : resp.text !== 'Tennis balls?' ? `balls text wrong: "${resp.text}"` : resp.media?.src !== '/chat-media/ball.mp4' ? `ball clip missing: ${JSON.stringify(resp.media)}` : null });
-// hotdog -> the EXISTING FAQ007 answer, unchanged, with the clip joined.
+// Task 176: hotdog -> FAQ007 in the dog's own words ("a slightly different rule set"), with the clip joined.
 check('hot dogs', { action: 'faq_answer', bucket: 'B04' }, { assert: (r, resp) =>
   r.faqId !== 'FAQ007' ? `hotdog not FAQ007: ${r.faqId}`
-    : !resp.text.startsWith('Hot Dogs is a memory version') ? `FAQ007 answer changed: "${resp.text}"`
+    : resp.text !== 'a slightly different rule set' ? `FAQ007 answer wrong: "${resp.text}"`
       : resp.media?.src !== '/chat-media/hotdog.mp4' ? `hotdog clip missing: ${JSON.stringify(resp.media)}` : null });
 
 // Section 8: no Task 140 clip may surface inside a protected state (assert on served text/media).

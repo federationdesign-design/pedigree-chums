@@ -6,13 +6,13 @@
       "how to play",
       "what do you do"
     ],
-    "canonicalAnswer": "{{approved_rule_summary}}",
+    "canonicalAnswer": "Deal cards, go outside, spot dog that matches one of your cards~~~get cards, give some to other humans, spot the dogs on the cards~~~all players gets some cards, winner is who spots the most dogs in their hand",
     "sourcePage": "Rules page",
     "cta": "Full game rules",
     "campaignState": "Any",
     "contentStatus": "Import from live site",
     "notes": "Rules must remain canonical.",
-    "resolvedAnswer": "Deal 3 to 6 chum cards to each player, then head outside. When you spot a real dog that matches one of your cards, call it out and claim the chum. Keep spotting to collect more, and whoever matches the most chums wins. It's made for walks, car journeys and days at the park, anywhere dogs happen.",
+    "resolvedAnswer": "Deal cards, go outside, spot dog that matches one of your cards~~~get cards, give some to other humans, spot the dogs on the cards~~~all players gets some cards, winner is who spots the most dogs in their hand",
     "resolvedCta": null
   },
   {
@@ -21,13 +21,13 @@
     "alternativePhrasings": [
       "who can play"
     ],
-    "canonicalAnswer": "Pick a Chum is for ages seven and up.",
+    "canonicalAnswer": "anyone who likes dogs",
     "sourcePage": "Product / FAQ",
     "cta": "Full game rules",
     "campaignState": "Any",
     "contentStatus": "Import from live site",
     "notes": "Separate product age from competition eligibility.",
-    "resolvedAnswer": "Pick a Chum is for ages seven and up.",
+    "resolvedAnswer": "anyone who likes dogs",
     "resolvedCta": null
   },
   {
@@ -38,13 +38,13 @@
       "own a dog",
       "without a dog"
     ],
-    "canonicalAnswer": "No, you don't need to own a dog. You only need to see a dog.",
+    "canonicalAnswer": "No, you just need see dog.",
     "sourcePage": "FAQ",
     "cta": "How to play",
     "campaignState": "Any",
     "contentStatus": "Import from live site",
     "notes": "Useful early objection answer.",
-    "resolvedAnswer": "No, you don't need to own a dog. You only need to see a dog.",
+    "resolvedAnswer": "No, you just need see dog.",
     "resolvedCta": null
   },
   {
@@ -56,13 +56,13 @@
       "how many cards",
       "54 cards"
     ],
-    "canonicalAnswer": "54 uniquely illustrated cards, 47 of the most popular UK dog breeds. Plus 7 designer crossbreeds.",
+    "canonicalAnswer": "54 cards dog breeds you see in Britain",
     "sourcePage": "Product data",
     "cta": "Product information",
     "campaignState": "Any",
     "contentStatus": "Import from live site",
     "notes": "Use exact current contents.",
-    "resolvedAnswer": "54 uniquely illustrated cards, 47 of the most popular UK dog breeds. Plus 7 designer crossbreeds.",
+    "resolvedAnswer": "54 cards dog breeds you see in Britain",
     "resolvedCta": null
   },
   {
@@ -71,13 +71,13 @@
     "alternativePhrasings": [
       "group size"
     ],
-    "canonicalAnswer": "No limit, you can even play by yourself if you really wanted, better with two, great with 3, hilarious with 4, hazardous with 50",
+    "canonicalAnswer": "No limit, you can even play by yourself",
     "sourcePage": "Rules",
     "cta": "Full game rules",
     "campaignState": "Any",
     "contentStatus": "Import from live site",
     "notes": "Do not guess ranges.",
-    "resolvedAnswer": "No limit, you can even play by yourself if you really wanted, better with two, great with 3, hilarious with 4, hazardous with 50",
+    "resolvedAnswer": "No limit, you can even play by yourself",
     "resolvedCta": null
   },
   {
@@ -86,13 +86,13 @@
     "alternativePhrasings": [
       "where play"
     ],
-    "canonicalAnswer": "Yes, if you have enough actual dogs indoors",
+    "canonicalAnswer": "only if you have enough dogs to spot",
     "sourcePage": "Rules",
     "cta": "Full game rules",
     "campaignState": "Any",
     "contentStatus": "Import from live site",
     "notes": "Explain intended outdoor discovery.",
-    "resolvedAnswer": "Yes, if you have enough actual dogs indoors",
+    "resolvedAnswer": "only if you have enough dogs to spot",
     "resolvedCta": null
   },
   {
@@ -102,13 +102,13 @@
       "Hot Dog",
       "other way to play"
     ],
-    "canonicalAnswer": "Hot Dogs is a memory version. Everyone sees the hands, then hides them. The whole thing is here:",
+    "canonicalAnswer": "a slightly different rule set",
     "sourcePage": "Rules",
     "cta": "/hot-dogs",
     "campaignState": "Any",
     "contentStatus": "Import from live site",
     "notes": "Memory restriction and revealed hands.",
-    "resolvedAnswer": "Hot Dogs is a memory version. Everyone sees the hands, then hides them. The whole thing is here:",
+    "resolvedAnswer": "a slightly different rule set",
     "resolvedCta": "/hot-dogs"
   },
   {
@@ -120,13 +120,13 @@
       "how much",
       "£6.99"
     ],
-    "canonicalAnswer": "Pre-order now for £6.99 instead of the usual £9.99, with free UK mainland delivery. We will email your launch code and date.",
+    "canonicalAnswer": "I Pre-order now for £6.99, RRP is £9.99. Delivery is free to UK mainland",
     "sourcePage": "Campaign / product",
     "cta": "Get 30% Off",
     "campaignState": "PRE_LAUNCH",
     "contentStatus": "Confirm before launch",
     "notes": "Clarify full price versus discounted price.",
-    "resolvedAnswer": "Pre-order now for £6.99 instead of the usual £9.99, with free UK mainland delivery. We will email your launch code and date.",
+    "resolvedAnswer": "I Pre-order now for £6.99, RRP is £9.99. Delivery is free to UK mainland",
     "resolvedCta": null
   },
   {
@@ -137,13 +137,13 @@
       "30%",
       "pre-release"
     ],
-    "canonicalAnswer": "Join the pre-release list and the code will be emailed the day before launch.",
+    "canonicalAnswer": "2 way; secure your pack by buying now at [[/preorder]]|||or, fill out the form here [[/discount-code]] and we will send you a code to use launch.|||that doesnt guarantee you a pack. it just gets you a code to use when the product is released|||we are expecting (and hoping) for all to sell quick",
     "sourcePage": "Campaign",
     "cta": "Get 30% Off",
     "campaignState": "PRE_LAUNCH",
     "contentStatus": "Approved concept",
     "notes": "Pop-up action required.",
-    "resolvedAnswer": "Join the pre-release list and the code will be emailed the day before launch.",
+    "resolvedAnswer": "2 way; secure your pack by buying now at [[/preorder]]|||or, fill out the form here [[/discount-code]] and we will send you a code to use launch.|||that doesnt guarantee you a pack. it just gets you a code to use when the product is released|||we are expecting (and hoping) for all to sell quick",
     "resolvedCta": null
   },
   {
@@ -154,13 +154,13 @@
       "email code",
       "day before"
     ],
-    "canonicalAnswer": "The 30% code is emailed to list members the day before launch.",
+    "canonicalAnswer": "soon, the day before launch. I dont understand time though",
     "sourcePage": "Campaign",
     "cta": "Get 30% Off",
     "campaignState": "PRE_LAUNCH",
     "contentStatus": "Approved concept",
     "notes": "Campaign wording must match email flow.",
-    "resolvedAnswer": "The 30% code is emailed to list members the day before launch.",
+    "resolvedAnswer": "soon, the day before launch. I dont understand time though",
     "resolvedCta": null
   },
   {
@@ -170,26 +170,26 @@
       "competition",
       "prize"
     ],
-    "canonicalAnswer": "Spot a dog. Match the card. Share your ChumSpot with us on social. The current monthly round closes on {{competition_close_date}}.",
+    "canonicalAnswer": "got to this page",
     "sourcePage": "Competition page",
     "cta": "Competition",
     "campaignState": "Any",
     "contentStatus": "Import from live site",
     "notes": "Eligibility and guardian wording must remain exact.",
-    "resolvedAnswer": "Spot a dog. Match the card. Share your ChumSpot with us on social. The current monthly round closes on {{competition_close_date}}.",
+    "resolvedAnswer": "got to this page",
     "resolvedCta": null
   },
   {
     "faqId": "FAQ012",
     "canonicalQuestion": "How do I contact you?",
     "alternativePhrasings": [],
-    "canonicalAnswer": "A human will come when beckoned at hello@Pedigree-Chums.co.uk",
+    "canonicalAnswer": "who|||but im a dog|||humans?|||hello@Pedigree-Chums.co.uk",
     "sourcePage": "Contact page",
     "cta": "Contact",
     "campaignState": "Any",
     "contentStatus": "Import from live site",
     "notes": "Utility answer should remain polite and clean.",
-    "resolvedAnswer": "A human will come when beckoned at hello@Pedigree-Chums.co.uk",
+    "resolvedAnswer": "who|||but im a dog|||humans?|||hello@Pedigree-Chums.co.uk",
     "resolvedCta": null
   },
   {
@@ -199,13 +199,13 @@
       "FSC",
       "laminated"
     ],
-    "canonicalAnswer": "Fully biodegradable, no plastic coatings. Compact, pocket-friendly and lightweight. Made in the UK using recycled paper.",
+    "canonicalAnswer": "Fully biodegradable, no plastic coatings. Made in the UK using recycled paper",
     "sourcePage": "Product / compliance data",
     "cta": "Product information",
     "campaignState": "Any",
     "contentStatus": "Import from technical file",
     "notes": "Only include approved manufacturing details.",
-    "resolvedAnswer": "Fully biodegradable, no plastic coatings. Compact, pocket-friendly and lightweight. Made in the UK using recycled paper.",
+    "resolvedAnswer": "Fully biodegradable, no plastic coatings. Made in the UK using recycled paper",
     "resolvedCta": null
   },
   {
@@ -217,13 +217,13 @@
       "postage",
       "outside UK"
     ],
-    "canonicalAnswer": "UK mainland only for now, so Scotland, England and Wales are covered. Not Northern Ireland or the islands yet.",
+    "canonicalAnswer": "no. UK mainland only",
     "sourcePage": "Campaign / product",
     "cta": "Product information",
     "campaignState": "Any",
     "contentStatus": "Open",
     "notes": "Do not infer coverage.",
-    "resolvedAnswer": "UK mainland only for now, so Scotland, England and Wales are covered. Not Northern Ireland or the islands yet.",
+    "resolvedAnswer": "no. UK mainland only",
     "resolvedCta": null
   },
   {
@@ -233,13 +233,13 @@
       "make a complaint",
       "report a problem"
     ],
-    "canonicalAnswer": "Thank you for telling me. That needs a person, not a dog. Email hello@Pedigree-Chums.co.uk and someone will look at it.",
+    "canonicalAnswer": "That needs a human, not a dog. Email: hello@Pedigree-Chums.co.uk",
     "sourcePage": "Contact page",
     "cta": "",
     "campaignState": "Any",
     "contentStatus": "Open",
     "notes": "Destination for the COMPLAINT_CONTACT route. FAQ012 stays the general enquiry answer.",
-    "resolvedAnswer": "Thank you for telling me. That needs a person, not a dog. Email hello@Pedigree-Chums.co.uk and someone will look at it.",
+    "resolvedAnswer": "That needs a human, not a dog. Email: hello@Pedigree-Chums.co.uk",
     "resolvedCta": null
   }
 ]
