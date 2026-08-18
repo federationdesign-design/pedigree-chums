@@ -2521,12 +2521,12 @@ check('cats', { action: 'canned', bucket: 'B21' }, { assert: (_r, resp) =>
   resp.responseId !== 'B21-CATS-01' ? `cats not B21-CATS-01: ${resp.responseId}`
     : resp.text !== 'Where?' ? `existing copy lost: "${resp.text}"`
       : resp.media?.src !== '/chat-media/cats.mp4' ? `cats clip not attached: ${JSON.stringify(resp.media)}` : null });
-// birthday -> ":)" + clip (any birthday mention). ":)" is the existing smile face, so it keeps that accessible name.
+// Task 176 (clip accessibility): birthday -> "party hat" (owner copy, verbatim) + clip. The words are
+// self-describing, so the ":)" smile SR label was dropped.
 for (const inp of ['its my birthday', 'when is your birthday', 'its my dads birthday', 'happy birthday']) {
   check(inp, { action: 'media_reply' }, { assert: (_r, resp) =>
-    resp.text !== ':)' ? `birthday text not ":)": "${resp.text}"`
-      : resp.media?.src !== '/chat-media/birthday.mp4' ? `birthday clip missing: ${JSON.stringify(resp.media)}`
-        : resp.ariaLabel !== 'the Collie smiles' ? `smile a11y label missing: ${resp.ariaLabel}` : null });
+    resp.text !== 'party hat' ? `birthday text not "party hat": "${resp.text}"`
+      : resp.media?.src !== '/chat-media/birthday.mp4' ? `birthday clip missing: ${JSON.stringify(resp.media)}` : null });
 }
 // car -> the B64 workbook row "yes" + clip (Task 141 moved it out of MEDIA_REPLIES).
 check('do you like going in the car', { action: 'canned', bucket: 'B64' }, { assert: (_r, resp) =>

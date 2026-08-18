@@ -49,9 +49,11 @@ export const DEAD_FACE_SR_LABEL = 'the dog plays dead';
 // migration in PLACEHOLDERS.md. (car and balls moved into the workbook in Task 141: B64 / B52-MISC-09;
 // their clips now attach in the canned case below, keyed by responseId, like cats.)
 const MEDIA_REPLIES: Record<string, { text: string; media: { src: string; alt: string }; ariaLabel?: string }> = {
-  'BIRTHDAY-01': { text: ':)', media: { src: '/chat-media/birthday.mp4', alt: 'A birthday celebration' }, ariaLabel: SMILE_FACE_SR_LABEL },
+  // Task 176 (clip accessibility): owner copy, verbatim. Birthday moves from the ':)' face to real words
+  // ("party hat"), so the smile SR label is dropped (the words are self-describing now).
+  'BIRTHDAY-01': { text: 'party hat', media: { src: '/chat-media/birthday.mp4', alt: 'A birthday celebration' } },
   // Task 156: any mention of hats plays the hats clip. Not a hat-hunt hat itself.
-  'HATS-01': { text: '', media: { src: '/chat-media/hats.mp4', alt: 'A dog in a hat' } },
+  'HATS-01': { text: 'I brought you a hat', media: { src: '/chat-media/hats.mp4', alt: 'A dog in a hat' } },
 };
 // Task 141: canned rows that carry a clip. The clip joins the row's copy, it does not replace it.
 const CANNED_MEDIA: Record<string, { src: string; alt: string }> = {
@@ -402,23 +404,27 @@ export function assemble(res: Resolution, data0: ChumData, n: Normalised, sessio
     }
 
     case 'good_boy':
-      // Task 142: praise -> the wagging-tail clip. The clip is the answer, so there is no line.
-      return { responseId: 'GOOD-BOY-01', text: '', dog, media: { src: '/chat-media/goodboy.mp4', alt: 'A dog wagging its tail' } };
+      // Task 176 (clip accessibility): the wagging-tail clip now carries a spoken line so it works for a
+      // screen reader, images-off, reduced motion or a missed loop. The ':)' keeps the smile SR label the
+      // system gives every ':)' glyph. Owner copy, verbatim.
+      return { responseId: 'GOOD-BOY-01', text: ':)', ariaLabel: SMILE_FACE_SR_LABEL, dog, media: { src: '/chat-media/goodboy.mp4', alt: 'A dog wagging its tail' } };
 
     case 'how_are_you': {
       // Task 142: a personal question with no in-world answer -> one of three deflection clips, chosen
       // AT RANDOM and not repeated until all three have been used this session (the B57 fact pattern).
+      // Task 176 (clip accessibility): each clip now carries the dog's spoken line (owner copy, verbatim),
+      // so the answer survives without the video -- screen reader, images-off, reduced motion, missed loop.
       const clips = [
-        { responseId: 'HOWAREYOU-1', src: '/chat-media/howareyou1.mp4', alt: 'A dog typing at a computer' },
-        { responseId: 'HOWAREYOU-2', src: '/chat-media/howareyou2.mp4', alt: 'A dog with a weary stare' },
-        { responseId: 'HOWAREYOU-3', src: '/chat-media/howareyou3.mp4', alt: 'A corgi looking busy' },
+        { responseId: 'HOWAREYOU-1', src: '/chat-media/howareyou1.mp4', alt: 'A dog typing at a computer', text: 'busy busy busy how are you' },
+        { responseId: 'HOWAREYOU-2', src: '/chat-media/howareyou2.mp4', alt: 'A dog with a weary stare', text: 'bored' },
+        { responseId: 'HOWAREYOU-3', src: '/chat-media/howareyou3.mp4', alt: 'A corgi looking busy', text: 'im working' },
       ];
       // Task 142 (change 2): the three clips convey completely different feelings, so a visitor who
       // sees one gets the SAME one again. Pick one per session and keep it (reuse the one already
       // served this session; otherwise choose at random).
       const prior = clips.find((x) => session.usedResponseIds.includes(x.responseId));
       const pick = prior ?? clips[Math.floor(Math.random() * clips.length)];
-      return { responseId: pick.responseId, text: '', dog, media: { src: pick.src, alt: pick.alt } };
+      return { responseId: pick.responseId, text: pick.text, dog, media: { src: pick.src, alt: pick.alt } };
     }
 
     case 'name_ack': {
