@@ -21,8 +21,10 @@ const BASE =
 //   /prelude-preview       a design review page, not linked from anywhere
 //   /britains-dog-history-2  not on its live URL yet
 const PAGES: [path: string, freq: "weekly" | "monthly" | "yearly", priority: number][] = [
-  ["/", "weekly", 1],
-  ["/home", "weekly", 0.9],
+  /* /home is the homepage in everything but address: `/` is the splash screen
+     and carries almost no readable content. So /home takes the top priority. */
+  ["/home", "weekly", 1],
+  ["/", "weekly", 0.8],
   ["/about", "monthly", 0.7],
   ["/preorder", "monthly", 0.8],
 
@@ -56,7 +58,6 @@ const PAGES: [path: string, freq: "weekly" | "monthly" | "yearly", priority: num
 
   ["/toy-safety", "yearly", 0.3],
   ["/evidence-register", "yearly", 0.3],
-  ["/discount-code", "monthly", 0.3],
   ["/independents", "monthly", 0.4],
   ["/trade", "monthly", 0.4],
   ["/whats-your-superpower", "monthly", 0.5],

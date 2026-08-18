@@ -8,7 +8,15 @@ import Footer from "../../components/Footer/Footer";
 import styles from "./home.module.css";
 
 export const metadata: Metadata = {
-  title: "Home",
+  /* THIS IS THE HOMEPAGE, whatever the address says. `/` is the splash: the pit
+     tipping out, with almost no text on it. Everything a stranger needs to read
+     is here, so this page carries the title that describes the product.
+
+     `absolute` bypasses the site template. Without it this would render as
+     "The Dog Spotting Card Game | Pedigree Chums™ The Dog Bingo Game", which
+     says the same thing twice and pushes the useful half off the end of a
+     search result. */
+  title: { absolute: "Pedigree Chums™ | The Dog Spotting Card Game" },
   description:
     "Find your favourite dog breed and discover their family tree, history and personality. 54 illustrated breed cards for the on-the-go dog spotting game.",
 };
