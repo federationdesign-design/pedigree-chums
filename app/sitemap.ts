@@ -28,7 +28,10 @@ const PAGES: [path: string, freq: "weekly" | "monthly" | "yearly", priority: num
   ["/about", "monthly", 0.7],
   ["/preorder", "monthly", 0.8],
 
-  ["/chums", "monthly", 0.8],
+  /* /chums is out of the sitemap until it is built: the route currently renders
+     a one-line placeholder, and a stub in the sitemap is worse than an omission.
+     The 54 /chums/<slug> detail pages below are unaffected. Restore this when the
+     index page has real content. */
   ["/know-your-chums", "monthly", 0.7],
   ["/chumspot", "monthly", 0.6],
   ["/chum-calculator", "monthly", 0.6],

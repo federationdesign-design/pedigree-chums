@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { SITE_URL } from "../../../lib/site";
 import * as React from "react";
 import Link from "next/link";
 import Nav from "../../../components/Nav/Nav";
@@ -265,9 +266,43 @@ const CARDS: ArticleCard[] = [
   },
 ];
 
+// Article + breadcrumb structured data for this essay. Every value comes from
+// this page: headline is the on-page heading, description reuses the metadata
+// description, image is the real hero above. Author and publish date are omitted
+// (the page has no honest source for either). Publisher links to the site-wide
+// Organization node emitted in app/layout.tsx.
+const HEADLINE = "The Dog That Gives You Your World Back";
+const ARTICLE_JSONLD = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Article",
+      headline: HEADLINE,
+      description: metadata.description,
+      image: `${SITE_URL}/guide_dog_image.jpg`,
+      publisher: { "@id": `${SITE_URL}/#organization` },
+      mainEntityOfPage: `${SITE_URL}/dogs-at-work/the-dog-that-gives-you-your-world-back`,
+    },
+    {
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
+        { "@type": "ListItem", position: 2, name: "Dogs at Work", item: `${SITE_URL}/dogs-at-work` },
+        { "@type": "ListItem", position: 3, name: HEADLINE, item: `${SITE_URL}/dogs-at-work/the-dog-that-gives-you-your-world-back` },
+      ],
+    },
+  ],
+};
+
 export default function GuideDogsPage() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(ARTICLE_JSONLD).replace(/</g, "\\u003c"),
+        }}
+      />
       <Nav showLogo />
       <main className={styles.essayPage}>
         <div className={styles.essayHero}>
