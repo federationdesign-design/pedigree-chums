@@ -557,11 +557,23 @@ export interface RouterState {
 }
 
 // Task 68: bare affirmations that confirm a loop offer. Whole-message forms only, so "yes but
-// tell me about labradors" is not swallowed. "no" is deliberately NOT here: it advances the loop.
-const CONFIRM_YES = new Set(['yes', 'yeah', 'yep', 'yup', 'aye', 'that one', 'correct', 'uh huh', 'uhhuh', 'yes please']);
+// tell me about labradors" is not swallowed.
+// Task 175: widened from the recorder evidence -- real testers answered offers with "yea", "ok",
+// "okay", "sure" and "go on", every one of which fell through to "im a dog". These are consumed ONLY
+// inside the offer-pending handlers (lastAction / pendingConfirm), so a bare "ok" with nothing pending
+// still resolves exactly as before. "no" is handled separately (CONFIRM_NO, a graceful decline).
+const CONFIRM_YES = new Set(['yes', 'yeah', 'yea', 'yep', 'yup', 'aye', 'ok', 'okay', 'sure', 'go on', 'that one', 'correct', 'uh huh', 'uhhuh', 'yes please']);
 function isConfirmYes(compact: string): boolean {
   return CONFIRM_YES.has(compact.trim());
 }
+// Task 175: a bare decline. Whole-message only, and distinct from GO_AWAY_TRIGGERS ("no thanks" closes
+// the chat) -- this just turns down the current offer and keeps the conversation open (a dog being told
+// "no" is normal). Consumed only when an offer is live, so a bare "no" with nothing pending is unchanged.
+const CONFIRM_NO = new Set(['no', 'nah', 'nope']);
+// The question-posing offers (besides the loop's own pendingConfirm): a bare "no" right after one of
+// these is a decline, not a miss. games_menu is included so a "no" to the games LIST ("Nine-Square,
+// Missing Sheep ...") declines too, not just a "no" to the "You want to play a game?" question.
+const OFFER_ACTIONS = new Set(['ask_games', 'ask_dogs', 'ask_breeds', 'tricks_menu', 'games_menu']);
 // Task 123 fix: whole-message phrases that open the B45 games menu (serve B45-GAMELIST-01 "Game?").
 // Deliberately NARROW: bare "game" is left to the dog-led loop (correct by design) and "lets play" to
 // the bark-game offer. A following "yes" is caught by the games_menu confirmation (below) and serves
@@ -702,11 +714,22 @@ const FACT_TRIGGERS = new Set(['tell me something', 'tell me a fact', 'a dog fac
 // and the loop advances).
 const CONFIRM_GAME_WORDS = new Set(['cards', 'deck', 'set', 'rules', 'play', 'chums', 'game']);
 const CONFIRM_DOG_WORDS = new Set(['dog', 'dogs', 'doggy', 'puppy', 'pup', 'breed', 'breeds']);
+// Task 175: the loop echoed inside-world subjects ("Site?", "Woof?") that a following "yes" could not
+// honour, so the yes died as "im a dog". These two sets close that gap for the subjects the recorder
+// showed people asking about, routing a confirmed subject to an answer that already exists:
+//   - site words -> the orientation (what-is-this) answer (B15)
+//   - woof / bark -> the bark-game offer (B17)
+// The four chatbot-dog NAMES need no entry here: extractCandidateSubject canonicalises them to a breed
+// title (collie -> "Border Collie"), which the breed-title branch below already maps to that dog's page.
+const CONFIRM_SITE_WORDS = new Set(['site', 'website', 'page']);
+const CONFIRM_BARK_WORDS = new Set(['woof', 'bark']);
 function confirmResolution(subject: string): Resolution | null {
   const p = BREED_PAGES.find((x) => x.title === subject);
   if (p) return breedPageRes(p);
   if (CONFIRM_GAME_WORDS.has(subject)) return { layer: 3, layerName: 'Gameplay and website navigation', bucket: 'B02', action: 'rules_answer', destinationId: 'DST011' };
   if (CONFIRM_DOG_WORDS.has(subject)) return { layer: 5, layerName: 'Dog, breed and website content', bucket: 'B05', action: 'breed_hub' };
+  if (CONFIRM_SITE_WORDS.has(subject)) return { layer: 11, layerName: 'Orientation and onboarding', bucket: 'B15', action: 'orientation' };
+  if (CONFIRM_BARK_WORDS.has(subject)) return { layer: 13, layerName: 'Play and entertainment', bucket: 'B17', action: 'offer_bark_game' };
   return null;
 }
 
@@ -1444,6 +1467,15 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
   if (state.pendingConfirm && isConfirmYes(c)) {
     const routed = confirmResolution(state.pendingConfirm);
     if (routed) return routed;
+  }
+
+  // Task 175: a bare "no" to an offer declines gracefully instead of falling through to "im a dog".
+  // Fires ONLY when an offer is actually live -- a loop offer armed pendingConfirm, or the previous turn
+  // posed one of the ask/menu questions -- so a bare "no" with nothing pending still advances the loop
+  // exactly as before. Serves an existing B15 "what next" line (no new copy). Below safety/grief, like
+  // the yes-confirms above, so a disclosure is never read as a decline.
+  if (CONFIRM_NO.has(c) && (state.pendingConfirm || OFFER_ACTIONS.has(state.lastAction ?? ''))) {
+    return { layer: 9, layerName: 'Recognised conversation', bucket: 'B15', action: 'canned', responseId: 'B15-R04-v2' };
   }
 
   // Task 27: explicit topic return. A generic return ("you were saying", "what were you

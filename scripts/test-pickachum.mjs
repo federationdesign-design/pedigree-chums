@@ -43,7 +43,7 @@ const { skipTheatre, buildTypingPlan, TYPING_PROFILES, THEATRE_MAX_MS, isTypoEli
 );
 const { buildRow, buildProtectedMarker, buildAppearanceRow, enrichRows, detectRephrase, buildSessions, isLaugh } = await import(pathToFileURL(join(ROOT, 'app/pick-a-chum/dev/recorder-store.ts')).href);
 const { isNoSubjectFallback, redact, ingest, onProtected, rankedItems, emptyStore, newSessionState } = await import(pathToFileURL(join(ROOT, 'app/pick-a-chum/dev/gap-log.ts')).href);
-const { recorderEnabled, fetchSheetSyncEnabled } = await import(pathToFileURL(join(ROOT, 'app/pick-a-chum/lib/turn-tap.ts')).href);
+const { recorderEnabled, fetchSheetSyncEnabled, RECORD_EVERY_VISITOR_TEMP } = await import(pathToFileURL(join(ROOT, 'app/pick-a-chum/lib/turn-tap.ts')).href);
 const { applyProtection, newGuard } = await import(pathToFileURL(join(ROOT, 'app/pick-a-chum/dev/session-protection.ts')).href);
 const { SyncBuffer } = await import(pathToFileURL(join(ROOT, 'app/pick-a-chum/dev/sheet-sync-buffer.ts')).href);
 const { SAFETY_TRIGGER_PHRASES } = await import(pathToFileURL(join(LIB, 'safety.ts')).href);
@@ -1293,8 +1293,14 @@ await (async () => {
   try {
     delete globalThis.window; // no window (SSR) -> off
     const offNoWin = (await fetchSheetSyncEnabled()) === false;
-    setWin(''); setFetch(() => jsonRes({ enabled: true })); fetchCalls = 0; // window, no ?rec=1 -> off, no fetch
-    const offNoFlag = (await fetchSheetSyncEnabled()) === false && fetchCalls === 0;
+    // With RECORD_EVERY_VISITOR_TEMP on (the testing-window flag), a visitor WITHOUT ?rec=1 is recorded
+    // too, so the gate fetches the runtime config and follows it (on when enabled). With the flag off it
+    // is the normal ?rec=1 gate: off, and no fetch at all. Assert whichever the flag currently selects.
+    setWin(''); setFetch(() => jsonRes({ enabled: true })); fetchCalls = 0;
+    const noFlag = await fetchSheetSyncEnabled();
+    const offNoFlag = RECORD_EVERY_VISITOR_TEMP
+      ? (noFlag === true && fetchCalls === 1)
+      : (noFlag === false && fetchCalls === 0);
     setWin('?rec=1'); setFetch(() => jsonRes({ enabled: true })); // ?rec=1 + enabled -> on
     const onBoth = (await fetchSheetSyncEnabled()) === true;
     setFetch(() => jsonRes({ enabled: false })); // ?rec=1 + disabled -> off
@@ -1898,12 +1904,12 @@ check('my dog is old and unwell', { action: 'grief' }, { assert: (r) => r.griefC
   check('game', { action: 'fallback' }, { session: s, assert: (_r, resp) => resp.responseId === 'LOOP-02' ? null : `not LOOP-02: ${resp.responseId}` });
   check('yes', { action: 'rules_answer' }, { session: s });
 })();
-// A "no" after the repeat clears the pending offer; "no" carries no candidate, so the turn serves
-// B40 "im a dog" (Task 79: no ladder to advance).
+// Task 175: a "no" to the offer now DECLINES gracefully -- an existing B15 "what next" line -- instead
+// of falling through to B40 "im a dog" (being turned down is normal). The pending offer still clears.
 (() => {
   const s = newSession();
   check('game', { action: 'fallback' }, { session: s }); // LOOP-01, pendingConfirm "game"
-  check('no', { action: 'fallback' }, { session: s, assert: (_r, resp, se) => resp.responseId === 'B40-NOSUBJECT-01' && se.pendingConfirm === null ? null : `no not handled: ${resp.responseId} conf=${se.pendingConfirm}` });
+  check('no', { action: 'canned' }, { session: s, assert: (_r, resp, se) => resp.responseId === 'B15-R04-v2' && se.pendingConfirm === null ? null : `no not declined: ${resp.responseId} conf=${se.pendingConfirm}` });
 })();
 // A dog subject confirms to the breed hub, so LOOP-01 "Dogs?" never invites a dead-end yes. (Uses a
 // gk_unknown dog question, since "why do dogs yawn" now answers from B31.)
@@ -1954,12 +1960,12 @@ check('where can I get the deck?', { action: 'open_discount_popup' }); // get ve
   check('I wa to know about dogs', {}, { session: s, assert: (_r, resp) => resp.responseId === 'LOOP-01' && resp.text === 'Dogs?' ? null : `t2 ${resp.responseId} "${resp.text}"` });
   check('yes', { action: 'breed_hub' }, { session: s });
 })();
-// Second session: a no after the repeat clears the offer and (no candidate in "no") serves B40.
+// Second session: a "no" after the repeat declines gracefully (Task 175: B15 "what next"), offer clears.
 (() => {
   const s = newSession();
   check('learn', {}, { session: s, assert: (_r, resp) => resp.responseId === 'B40-NOSUBJECT-01' ? null : `t1 ${resp.responseId}` });
   check('I wa to know about dogs', {}, { session: s, assert: (_r, resp) => resp.responseId === 'LOOP-01' && resp.text === 'Dogs?' ? null : `t2 ${resp.responseId} "${resp.text}"` });
-  check('no', {}, { session: s, assert: (r, resp) => resp.responseId === 'B40-NOSUBJECT-01' && r.action !== 'breed_hub' ? null : `t3 wrong: ${resp.responseId}/${r.action}` });
+  check('no', {}, { session: s, assert: (r, resp) => resp.responseId === 'B15-R04-v2' && r.action === 'canned' ? null : `t3 wrong: ${resp.responseId}/${r.action}` });
 })();
 // The repeat is once per run: two candidate turns in a row give LOOP-01 then LOOP-02 (offer), not
 // LOOP-01 twice. (Uses a gk_unknown dog question, since "why do dogs yawn" now answers from B31.)
