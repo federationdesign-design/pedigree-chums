@@ -1270,8 +1270,13 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Shepherd's Dog",
     note: "Practical medieval working dog used to move and protect sheep, forming an early root of Britain's collie families. An extinct historical type.",
     children: [
-      { name: "Celtic herdsmen's dogs", note: "The all-round farm dogs of the Celtic tribes, guarding and driving the herds. Now extinct.", img: "/history/breeds/celtic-herdsmen-dogs.jpg", value: 60 },
-      { name: "Roman shepherd dogs", note: "The flock-guarding sheepdogs the Roman farm writers described, kept white so the shepherd knew dog from wolf. Now extinct.", img: "/history/breeds/roman-shepherd-dogs.jpg", value: 40 }
+      { name: "Celtic herdsmen's dogs", note: "The all-round farm dogs of the Celtic tribes, guarding and driving the herds. Now extinct.", img: "/history/breeds/celtic-herdsmen-dogs.jpg", value: 35 },
+      { name: "Roman shepherd dogs", note: "The flock-guarding sheepdogs the Roman farm writers described, kept white so the shepherd knew dog from wolf. Now extinct.", img: "/history/breeds/roman-shepherd-dogs.jpg", value: 25 },
+      // Added 18 August 2026. The Anglo-Saxon layer is supported by Crabtree's
+      // East Anglia zooarchaeology; the Norse layer by the Heath Wood strontium
+      // study.
+      { name: "Anglo-Saxon herding dogs", note: "Collie-sized herding dogs of Anglo-Saxon England, found at West Stow and Brandon. Now extinct.", img: "/history/breeds/anglo-saxon-herding-dogs.jpg", value: 20 },
+      { name: "Norse settlers dogs", note: "Scandinavian dogs brought over with Viking settlement, likely mixed into local herding stock. Now extinct.", img: "/history/breeds/viking-herding-spitz.jpg", value: 20 }
     ]
   },
   "Drover's Dog": {
