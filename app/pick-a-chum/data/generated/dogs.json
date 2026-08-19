@@ -2394,10 +2394,23 @@
                       ]
                     },
                     {
-                      "name": "Old British ratting terriers",
-                      "note": "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.",
-                      "img": "/history/breeds/Old-British-ratting-terriers.jpg",
-                      "value": 4.2
+                      "name": "Earth Dog",
+                      "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+                      "img": "/history/breeds/medieval-earth-dog.jpg",
+                      "children": [
+                        {
+                          "name": "Ancient Celtic earth dogs",
+                          "note": "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.",
+                          "img": "/history/breeds/ancient-celtic-earth-dog.jpg",
+                          "value": 2.31
+                        },
+                        {
+                          "name": "Early badger hunting dogs",
+                          "note": "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
+                          "img": "/history/breeds/early-badger-hunting-dogs.jpg",
+                          "value": 1.89
+                        }
+                      ]
                     }
                   ]
                 },
@@ -2426,10 +2439,23 @@
                       ]
                     },
                     {
-                      "name": "Earth and hunt terriers",
-                      "note": "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.",
-                      "img": "/history/breeds/Earth-and-hunt-terrier.jpg",
-                      "value": 2.8
+                      "name": "Earth Dog",
+                      "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+                      "img": "/history/breeds/medieval-earth-dog.jpg",
+                      "children": [
+                        {
+                          "name": "Ancient Celtic earth dogs",
+                          "note": "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.",
+                          "img": "/history/breeds/ancient-celtic-earth-dog.jpg",
+                          "value": 1.54
+                        },
+                        {
+                          "name": "Early badger hunting dogs",
+                          "note": "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
+                          "img": "/history/breeds/early-badger-hunting-dogs.jpg",
+                          "value": 1.2599999999999998
+                        }
+                      ]
                     }
                   ]
                 }
@@ -2489,9 +2515,9 @@
                           "value": 0.552
                         },
                         {
-                          "name": "Old British ratting terriers",
-                          "note": "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.",
-                          "img": "/history/breeds/Old-British-ratting-terriers.jpg",
+                          "name": "Earth Dog",
+                          "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+                          "img": "/history/breeds/medieval-earth-dog.jpg",
                           "value": 0.552
                         }
                       ]
@@ -2508,9 +2534,9 @@
                           "value": 0.36800000000000005
                         },
                         {
-                          "name": "Earth and hunt terriers",
-                          "note": "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.",
-                          "img": "/history/breeds/Earth-and-hunt-terrier.jpg",
+                          "name": "Earth Dog",
+                          "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+                          "img": "/history/breeds/medieval-earth-dog.jpg",
                           "value": 0.36800000000000005
                         }
                       ]
@@ -5562,13 +5588,13 @@
                           "name": "St Hubert Hound",
                           "note": "The monks' scent hound the Normans brought over, one strain behind the running pack.",
                           "img": "/history/breeds/St-Hubert-Hound.jpg",
-                          "value": 12.6
+                          "value": 6.3
                         },
                         {
                           "name": "Talbot",
                           "note": "The older white finding-hound stock, the other strain in that pack. A modelled half of the pair, not a recorded mating.",
                           "img": "/history/breeds/talbot-hound.jpg",
-                          "value": 12.6
+                          "value": 6.3
                         },
                         {
                           "name": "Old scenting hounds",
@@ -5601,7 +5627,86 @@
                           "name": "St Hubert Hound",
                           "note": "The monks' scent hound brought over by the Normans.",
                           "img": "/history/breeds/St-Hubert-Hound.jpg",
-                          "value": 16.8
+                          "value": 8.4
+                        },
+                        {
+                          "name": "Old scenting hounds",
+                          "note": "The tracking hounds of medieval lords.",
+                          "img": "/history/breeds/Old-scenting-hounds.jpg",
+                          "children": [
+                            {
+                              "name": "Celtic Scent Hound",
+                              "note": "Early Celtic tracking hound that followed game by scent, representing the roots of later European scent hounds. An extinct historical type.",
+                              "img": "/history/breeds/ancient-celtic-scent-hound.jpg",
+                              "value": 20
+                            },
+                            {
+                              "name": "Old scenting hounds",
+                              "note": "The tracking hounds of medieval lords.",
+                              "img": "/history/breeds/Old-scenting-hounds.jpg",
+                              "value": 20
+                            }
+                          ],
+                          "value": 0
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "Land spaniels",
+                  "note": "The old sporting land-spaniel stock the court toy spaniels were bred down from. Now extinct.",
+                  "img": "/history/breeds/original-land-spaniel.jpg",
+                  "children": [
+                    {
+                      "name": "Rache",
+                      "note": "The medieval running scenting hound that ranged and flushed game, the closest in work to a bird dog. Caius listed the land spaniel among the fowling dogs, separate from the hounds, so this older root is a reconstruction, not recorded descent. Now extinct.",
+                      "img": "/history/breeds/rache.jpg",
+                      "children": [
+                        {
+                          "name": "St Hubert Hound",
+                          "note": "The monks' scent hound the Normans brought over, one strain behind the running pack.",
+                          "img": "/history/breeds/St-Hubert-Hound.jpg",
+                          "value": 6.3
+                        },
+                        {
+                          "name": "Talbot",
+                          "note": "The older white finding-hound stock, the other strain in that pack. A modelled half of the pair, not a recorded mating.",
+                          "img": "/history/breeds/talbot-hound.jpg",
+                          "value": 6.3
+                        },
+                        {
+                          "name": "Old scenting hounds",
+                          "note": "The native pack hounds of medieval Britain.",
+                          "img": "/history/breeds/Old-scenting-hounds.jpg",
+                          "children": [
+                            {
+                              "name": "Celtic Scent Hound",
+                              "note": "Early Celtic tracking hound that followed game by scent, representing the roots of later European scent hounds. An extinct historical type.",
+                              "img": "/history/breeds/ancient-celtic-scent-hound.jpg",
+                              "value": 20
+                            },
+                            {
+                              "name": "Old scenting hounds",
+                              "note": "The native pack hounds of medieval Britain.",
+                              "img": "/history/breeds/Old-scenting-hounds.jpg",
+                              "value": 20
+                            }
+                          ],
+                          "value": 0
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Talbot",
+                      "note": "Older white finding-hound stock standing behind the medieval scenting hounds. An inferred deeper root, not documented spaniel descent. Now extinct.",
+                      "img": "/history/breeds/talbot-hound.jpg",
+                      "children": [
+                        {
+                          "name": "St Hubert Hound",
+                          "note": "The monks' scent hound brought over by the Normans.",
+                          "img": "/history/breeds/St-Hubert-Hound.jpg",
+                          "value": 8.4
                         },
                         {
                           "name": "Old scenting hounds",
@@ -5663,7 +5768,7 @@
                       "name": "St Hubert Hound",
                       "note": "The monks' scent hound the Normans brought over, one strain behind the running pack.",
                       "img": "/history/breeds/St-Hubert-Hound.jpg",
-                      "value": 9
+                      "value": 4.5
                     },
                     {
                       "name": "Talbot",
@@ -5674,7 +5779,7 @@
                           "name": "St Hubert Hound",
                           "note": "The monks' scent hound brought over by the Normans.",
                           "img": "/history/breeds/St-Hubert-Hound.jpg",
-                          "value": 9
+                          "value": 4.5
                         },
                         {
                           "name": "Old scenting hounds",
@@ -5729,7 +5834,113 @@
                       "name": "St Hubert Hound",
                       "note": "The monks' scent hound brought over by the Normans.",
                       "img": "/history/breeds/St-Hubert-Hound.jpg",
-                      "value": 12
+                      "value": 6
+                    },
+                    {
+                      "name": "Old scenting hounds",
+                      "note": "The tracking hounds of medieval lords.",
+                      "img": "/history/breeds/Old-scenting-hounds.jpg",
+                      "children": [
+                        {
+                          "name": "Celtic Scent Hound",
+                          "note": "Early Celtic tracking hound that followed game by scent, representing the roots of later European scent hounds. An extinct historical type.",
+                          "img": "/history/breeds/ancient-celtic-scent-hound.jpg",
+                          "value": 20
+                        },
+                        {
+                          "name": "Old scenting hounds",
+                          "note": "The tracking hounds of medieval lords.",
+                          "img": "/history/breeds/Old-scenting-hounds.jpg",
+                          "value": 20
+                        }
+                      ],
+                      "value": 0
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Land spaniels",
+              "note": "The old sporting land-spaniel stock behind the toy spaniels. Now extinct.",
+              "img": "/history/breeds/original-land-spaniel.jpg",
+              "children": [
+                {
+                  "name": "Rache",
+                  "note": "The medieval running scenting hound that ranged and flushed game, the closest in work to a bird dog. Caius listed the land spaniel among the fowling dogs, separate from the hounds, so this older root is a reconstruction, not recorded descent. Now extinct.",
+                  "img": "/history/breeds/rache.jpg",
+                  "children": [
+                    {
+                      "name": "St Hubert Hound",
+                      "note": "The monks' scent hound the Normans brought over, one strain behind the running pack.",
+                      "img": "/history/breeds/St-Hubert-Hound.jpg",
+                      "value": 4.5
+                    },
+                    {
+                      "name": "Talbot",
+                      "note": "The older white finding-hound stock, the other strain in that pack. A modelled half of the pair, not a recorded mating.",
+                      "img": "/history/breeds/talbot-hound.jpg",
+                      "children": [
+                        {
+                          "name": "St Hubert Hound",
+                          "note": "The monks' scent hound brought over by the Normans.",
+                          "img": "/history/breeds/St-Hubert-Hound.jpg",
+                          "value": 4.5
+                        },
+                        {
+                          "name": "Old scenting hounds",
+                          "note": "The tracking hounds of medieval lords.",
+                          "img": "/history/breeds/Old-scenting-hounds.jpg",
+                          "children": [
+                            {
+                              "name": "Celtic Scent Hound",
+                              "note": "Early Celtic tracking hound that followed game by scent, representing the roots of later European scent hounds. An extinct historical type.",
+                              "img": "/history/breeds/ancient-celtic-scent-hound.jpg",
+                              "value": 20
+                            },
+                            {
+                              "name": "Old scenting hounds",
+                              "note": "The tracking hounds of medieval lords.",
+                              "img": "/history/breeds/Old-scenting-hounds.jpg",
+                              "value": 20
+                            }
+                          ],
+                          "value": 0
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Old scenting hounds",
+                      "note": "The native pack hounds of medieval Britain.",
+                      "img": "/history/breeds/Old-scenting-hounds.jpg",
+                      "children": [
+                        {
+                          "name": "Celtic Scent Hound",
+                          "note": "Early Celtic tracking hound that followed game by scent, representing the roots of later European scent hounds. An extinct historical type.",
+                          "img": "/history/breeds/ancient-celtic-scent-hound.jpg",
+                          "value": 20
+                        },
+                        {
+                          "name": "Old scenting hounds",
+                          "note": "The native pack hounds of medieval Britain.",
+                          "img": "/history/breeds/Old-scenting-hounds.jpg",
+                          "value": 20
+                        }
+                      ],
+                      "value": 0
+                    }
+                  ]
+                },
+                {
+                  "name": "Talbot",
+                  "note": "Older white finding-hound stock standing behind the medieval scenting hounds. An inferred deeper root, not documented spaniel descent. Now extinct.",
+                  "img": "/history/breeds/talbot-hound.jpg",
+                  "children": [
+                    {
+                      "name": "St Hubert Hound",
+                      "note": "The monks' scent hound brought over by the Normans.",
+                      "img": "/history/breeds/St-Hubert-Hound.jpg",
+                      "value": 6
                     },
                     {
                       "name": "Old scenting hounds",
@@ -9840,9 +10051,9 @@
                           "value": 3.7125
                         },
                         {
-                          "name": "Old British ratting terriers",
-                          "note": "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.",
-                          "img": "/history/breeds/Old-British-ratting-terriers.jpg",
+                          "name": "Earth Dog",
+                          "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+                          "img": "/history/breeds/medieval-earth-dog.jpg",
                           "value": 3.7125
                         }
                       ]
@@ -9859,9 +10070,9 @@
                           "value": 2.475
                         },
                         {
-                          "name": "Earth and hunt terriers",
-                          "note": "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.",
-                          "img": "/history/breeds/Earth-and-hunt-terrier.jpg",
+                          "name": "Earth Dog",
+                          "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+                          "img": "/history/breeds/medieval-earth-dog.jpg",
                           "value": 2.475
                         }
                       ]
@@ -10078,9 +10289,9 @@
                           "value": 2.25
                         },
                         {
-                          "name": "Old British ratting terriers",
-                          "note": "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.",
-                          "img": "/history/breeds/Old-British-ratting-terriers.jpg",
+                          "name": "Earth Dog",
+                          "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+                          "img": "/history/breeds/medieval-earth-dog.jpg",
                           "value": 2.25
                         }
                       ]
@@ -10097,9 +10308,9 @@
                           "value": 1.5
                         },
                         {
-                          "name": "Earth and hunt terriers",
-                          "note": "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.",
-                          "img": "/history/breeds/Earth-and-hunt-terrier.jpg",
+                          "name": "Earth Dog",
+                          "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+                          "img": "/history/breeds/medieval-earth-dog.jpg",
                           "value": 1.5
                         }
                       ]
@@ -10123,9 +10334,9 @@
                           "value": 2.25
                         },
                         {
-                          "name": "Old British ratting terriers",
-                          "note": "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.",
-                          "img": "/history/breeds/Old-British-ratting-terriers.jpg",
+                          "name": "Earth Dog",
+                          "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+                          "img": "/history/breeds/medieval-earth-dog.jpg",
                           "value": 2.25
                         }
                       ]
@@ -10142,9 +10353,9 @@
                           "value": 1.5
                         },
                         {
-                          "name": "Earth and hunt terriers",
-                          "note": "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.",
-                          "img": "/history/breeds/Earth-and-hunt-terrier.jpg",
+                          "name": "Earth Dog",
+                          "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+                          "img": "/history/breeds/medieval-earth-dog.jpg",
                           "value": 1.5
                         }
                       ]
@@ -10249,13 +10460,13 @@
                           "name": "St Hubert Hound",
                           "note": "The abbey scent hound it descends from almost unchanged.",
                           "img": "/history/breeds/St-Hubert-Hound.jpg",
-                          "value": 3.0375
+                          "value": 1.51875
                         },
                         {
                           "name": "Old scenting hounds",
                           "note": "The heavy continental tracking hounds of the same line.",
                           "img": "/history/breeds/Old-scenting-hounds.jpg",
-                          "value": 2.025
+                          "value": 1.0125
                         }
                       ]
                     },
@@ -10268,13 +10479,13 @@
                           "name": "Talbot",
                           "note": "The white Norman hound at its root.",
                           "img": "/history/breeds/talbot-hound.jpg",
-                          "value": 2.025
+                          "value": 1.0125
                         },
                         {
                           "name": "St Hubert Hound",
                           "note": "The abbey scent hounds brought across the Channel.",
                           "img": "/history/breeds/St-Hubert-Hound.jpg",
-                          "value": 1.35
+                          "value": 0.675
                         }
                       ]
                     },
@@ -10282,7 +10493,58 @@
                       "name": "Rough water dogs",
                       "note": "Shaggy, water-loving dogs for the wet work. Now extinct.",
                       "img": "/history/breeds/rough-water-dogs.jpg",
-                      "value": 2.8125
+                      "value": 1.40625
+                    }
+                  ]
+                },
+                {
+                  "name": "Otterhound",
+                  "note": "The web-footed otter-hunting hound, the water-working Tudor root of the water spaniels. A functional match, not documented descent. Now endangered.",
+                  "img": "/history/breeds/otterhound-photo.jpg",
+                  "children": [
+                    {
+                      "name": "Bloodhound",
+                      "note": "Tracking power and a tremendous nose.",
+                      "img": "/history/breeds/Medieval-Bloodhound.jpg",
+                      "children": [
+                        {
+                          "name": "St Hubert Hound",
+                          "note": "The abbey scent hound it descends from almost unchanged.",
+                          "img": "/history/breeds/St-Hubert-Hound.jpg",
+                          "value": 1.51875
+                        },
+                        {
+                          "name": "Old scenting hounds",
+                          "note": "The heavy continental tracking hounds of the same line.",
+                          "img": "/history/breeds/Old-scenting-hounds.jpg",
+                          "value": 1.0125
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Southern Hound",
+                      "note": "Old deep-voiced scent-hound stock.",
+                      "img": "/history/breeds/Southern-Hound.jpg",
+                      "children": [
+                        {
+                          "name": "Talbot",
+                          "note": "The white Norman hound at its root.",
+                          "img": "/history/breeds/talbot-hound.jpg",
+                          "value": 1.0125
+                        },
+                        {
+                          "name": "St Hubert Hound",
+                          "note": "The abbey scent hounds brought across the Channel.",
+                          "img": "/history/breeds/St-Hubert-Hound.jpg",
+                          "value": 0.675
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Rough water dogs",
+                      "note": "Shaggy, water-loving dogs for the wet work. Now extinct.",
+                      "img": "/history/breeds/rough-water-dogs.jpg",
+                      "value": 1.40625
                     }
                   ]
                 }
@@ -10584,13 +10846,32 @@
                           "name": "Rache",
                           "note": "The medieval running scenting hound that ranged and flushed game, the closest in work to a bird dog. Caius listed the land spaniel among the fowling dogs, separate from the hounds, so this older root is a reconstruction, not recorded descent. Now extinct.",
                           "img": "/history/breeds/rache.jpg",
-                          "value": 12.6
+                          "value": 6.3
                         },
                         {
                           "name": "Talbot",
                           "note": "Older white finding-hound stock standing behind the medieval scenting hounds. An inferred deeper root, not documented spaniel descent. Now extinct.",
                           "img": "/history/breeds/talbot-hound.jpg",
-                          "value": 8.4
+                          "value": 4.2
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Land spaniels",
+                      "note": "The old sporting land-spaniel stock the court toy spaniels were bred down from. Now extinct.",
+                      "img": "/history/breeds/original-land-spaniel.jpg",
+                      "children": [
+                        {
+                          "name": "Rache",
+                          "note": "The medieval running scenting hound that ranged and flushed game, the closest in work to a bird dog. Caius listed the land spaniel among the fowling dogs, separate from the hounds, so this older root is a reconstruction, not recorded descent. Now extinct.",
+                          "img": "/history/breeds/rache.jpg",
+                          "value": 6.3
+                        },
+                        {
+                          "name": "Talbot",
+                          "note": "Older white finding-hound stock standing behind the medieval scenting hounds. An inferred deeper root, not documented spaniel descent. Now extinct.",
+                          "img": "/history/breeds/talbot-hound.jpg",
+                          "value": 4.2
                         }
                       ]
                     }
@@ -10630,13 +10911,13 @@
                           "name": "St Hubert Hound",
                           "note": "The monks' scent hound the Normans brought over, one strain behind the running pack.",
                           "img": "/history/breeds/St-Hubert-Hound.jpg",
-                          "value": 4.5
+                          "value": 2.25
                         },
                         {
                           "name": "Talbot",
                           "note": "The older white finding-hound stock, the other strain in that pack. A modelled half of the pair, not a recorded mating.",
                           "img": "/history/breeds/talbot-hound.jpg",
-                          "value": 4.5
+                          "value": 2.25
                         },
                         {
                           "name": "Old scenting hounds",
@@ -10669,7 +10950,86 @@
                           "name": "St Hubert Hound",
                           "note": "The monks' scent hound brought over by the Normans.",
                           "img": "/history/breeds/St-Hubert-Hound.jpg",
-                          "value": 6
+                          "value": 3
+                        },
+                        {
+                          "name": "Old scenting hounds",
+                          "note": "The tracking hounds of medieval lords.",
+                          "img": "/history/breeds/Old-scenting-hounds.jpg",
+                          "children": [
+                            {
+                              "name": "Celtic Scent Hound",
+                              "note": "Early Celtic tracking hound that followed game by scent, representing the roots of later European scent hounds. An extinct historical type.",
+                              "img": "/history/breeds/ancient-celtic-scent-hound.jpg",
+                              "value": 20
+                            },
+                            {
+                              "name": "Old scenting hounds",
+                              "note": "The tracking hounds of medieval lords.",
+                              "img": "/history/breeds/Old-scenting-hounds.jpg",
+                              "value": 20
+                            }
+                          ],
+                          "value": 0
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "Land spaniels",
+                  "note": "The old sporting land-spaniel stock behind the toy spaniels. Now extinct.",
+                  "img": "/history/breeds/original-land-spaniel.jpg",
+                  "children": [
+                    {
+                      "name": "Rache",
+                      "note": "The medieval running scenting hound that ranged and flushed game, the closest in work to a bird dog. Caius listed the land spaniel among the fowling dogs, separate from the hounds, so this older root is a reconstruction, not recorded descent. Now extinct.",
+                      "img": "/history/breeds/rache.jpg",
+                      "children": [
+                        {
+                          "name": "St Hubert Hound",
+                          "note": "The monks' scent hound the Normans brought over, one strain behind the running pack.",
+                          "img": "/history/breeds/St-Hubert-Hound.jpg",
+                          "value": 2.25
+                        },
+                        {
+                          "name": "Talbot",
+                          "note": "The older white finding-hound stock, the other strain in that pack. A modelled half of the pair, not a recorded mating.",
+                          "img": "/history/breeds/talbot-hound.jpg",
+                          "value": 2.25
+                        },
+                        {
+                          "name": "Old scenting hounds",
+                          "note": "The native pack hounds of medieval Britain.",
+                          "img": "/history/breeds/Old-scenting-hounds.jpg",
+                          "children": [
+                            {
+                              "name": "Celtic Scent Hound",
+                              "note": "Early Celtic tracking hound that followed game by scent, representing the roots of later European scent hounds. An extinct historical type.",
+                              "img": "/history/breeds/ancient-celtic-scent-hound.jpg",
+                              "value": 20
+                            },
+                            {
+                              "name": "Old scenting hounds",
+                              "note": "The native pack hounds of medieval Britain.",
+                              "img": "/history/breeds/Old-scenting-hounds.jpg",
+                              "value": 20
+                            }
+                          ],
+                          "value": 0
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Talbot",
+                      "note": "Older white finding-hound stock standing behind the medieval scenting hounds. An inferred deeper root, not documented spaniel descent. Now extinct.",
+                      "img": "/history/breeds/talbot-hound.jpg",
+                      "children": [
+                        {
+                          "name": "St Hubert Hound",
+                          "note": "The monks' scent hound brought over by the Normans.",
+                          "img": "/history/breeds/St-Hubert-Hound.jpg",
+                          "value": 3
                         },
                         {
                           "name": "Old scenting hounds",
@@ -11012,13 +11372,32 @@
                           "name": "Rache",
                           "note": "The medieval running scenting hound that ranged and flushed game, the closest in work to a bird dog. Caius listed the land spaniel among the fowling dogs, separate from the hounds, so this older root is a reconstruction, not recorded descent. Now extinct.",
                           "img": "/history/breeds/rache.jpg",
-                          "value": 12.6
+                          "value": 6.3
                         },
                         {
                           "name": "Talbot",
                           "note": "Older white finding-hound stock standing behind the medieval scenting hounds. An inferred deeper root, not documented spaniel descent. Now extinct.",
                           "img": "/history/breeds/talbot-hound.jpg",
-                          "value": 8.4
+                          "value": 4.2
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Land spaniels",
+                      "note": "The old sporting land-spaniel stock the court toy spaniels were bred down from. Now extinct.",
+                      "img": "/history/breeds/original-land-spaniel.jpg",
+                      "children": [
+                        {
+                          "name": "Rache",
+                          "note": "The medieval running scenting hound that ranged and flushed game, the closest in work to a bird dog. Caius listed the land spaniel among the fowling dogs, separate from the hounds, so this older root is a reconstruction, not recorded descent. Now extinct.",
+                          "img": "/history/breeds/rache.jpg",
+                          "value": 6.3
+                        },
+                        {
+                          "name": "Talbot",
+                          "note": "Older white finding-hound stock standing behind the medieval scenting hounds. An inferred deeper root, not documented spaniel descent. Now extinct.",
+                          "img": "/history/breeds/talbot-hound.jpg",
+                          "value": 4.2
                         }
                       ]
                     }
@@ -11058,13 +11437,13 @@
                           "name": "St Hubert Hound",
                           "note": "The monks' scent hound the Normans brought over, one strain behind the running pack.",
                           "img": "/history/breeds/St-Hubert-Hound.jpg",
-                          "value": 4.5
+                          "value": 2.25
                         },
                         {
                           "name": "Talbot",
                           "note": "The older white finding-hound stock, the other strain in that pack. A modelled half of the pair, not a recorded mating.",
                           "img": "/history/breeds/talbot-hound.jpg",
-                          "value": 4.5
+                          "value": 2.25
                         },
                         {
                           "name": "Old scenting hounds",
@@ -11097,7 +11476,86 @@
                           "name": "St Hubert Hound",
                           "note": "The monks' scent hound brought over by the Normans.",
                           "img": "/history/breeds/St-Hubert-Hound.jpg",
-                          "value": 6
+                          "value": 3
+                        },
+                        {
+                          "name": "Old scenting hounds",
+                          "note": "The tracking hounds of medieval lords.",
+                          "img": "/history/breeds/Old-scenting-hounds.jpg",
+                          "children": [
+                            {
+                              "name": "Celtic Scent Hound",
+                              "note": "Early Celtic tracking hound that followed game by scent, representing the roots of later European scent hounds. An extinct historical type.",
+                              "img": "/history/breeds/ancient-celtic-scent-hound.jpg",
+                              "value": 20
+                            },
+                            {
+                              "name": "Old scenting hounds",
+                              "note": "The tracking hounds of medieval lords.",
+                              "img": "/history/breeds/Old-scenting-hounds.jpg",
+                              "value": 20
+                            }
+                          ],
+                          "value": 0
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "Land spaniels",
+                  "note": "The old sporting land-spaniel stock behind the toy spaniels. Now extinct.",
+                  "img": "/history/breeds/original-land-spaniel.jpg",
+                  "children": [
+                    {
+                      "name": "Rache",
+                      "note": "The medieval running scenting hound that ranged and flushed game, the closest in work to a bird dog. Caius listed the land spaniel among the fowling dogs, separate from the hounds, so this older root is a reconstruction, not recorded descent. Now extinct.",
+                      "img": "/history/breeds/rache.jpg",
+                      "children": [
+                        {
+                          "name": "St Hubert Hound",
+                          "note": "The monks' scent hound the Normans brought over, one strain behind the running pack.",
+                          "img": "/history/breeds/St-Hubert-Hound.jpg",
+                          "value": 2.25
+                        },
+                        {
+                          "name": "Talbot",
+                          "note": "The older white finding-hound stock, the other strain in that pack. A modelled half of the pair, not a recorded mating.",
+                          "img": "/history/breeds/talbot-hound.jpg",
+                          "value": 2.25
+                        },
+                        {
+                          "name": "Old scenting hounds",
+                          "note": "The native pack hounds of medieval Britain.",
+                          "img": "/history/breeds/Old-scenting-hounds.jpg",
+                          "children": [
+                            {
+                              "name": "Celtic Scent Hound",
+                              "note": "Early Celtic tracking hound that followed game by scent, representing the roots of later European scent hounds. An extinct historical type.",
+                              "img": "/history/breeds/ancient-celtic-scent-hound.jpg",
+                              "value": 20
+                            },
+                            {
+                              "name": "Old scenting hounds",
+                              "note": "The native pack hounds of medieval Britain.",
+                              "img": "/history/breeds/Old-scenting-hounds.jpg",
+                              "value": 20
+                            }
+                          ],
+                          "value": 0
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Talbot",
+                      "note": "Older white finding-hound stock standing behind the medieval scenting hounds. An inferred deeper root, not documented spaniel descent. Now extinct.",
+                      "img": "/history/breeds/talbot-hound.jpg",
+                      "children": [
+                        {
+                          "name": "St Hubert Hound",
+                          "note": "The monks' scent hound brought over by the Normans.",
+                          "img": "/history/breeds/St-Hubert-Hound.jpg",
+                          "value": 3
                         },
                         {
                           "name": "Old scenting hounds",
@@ -11215,13 +11673,13 @@
                           "name": "St Hubert Hound",
                           "note": "The abbey scent hound it descends from almost unchanged.",
                           "img": "/history/breeds/St-Hubert-Hound.jpg",
-                          "value": 3.0375
+                          "value": 1.51875
                         },
                         {
                           "name": "Old scenting hounds",
                           "note": "The heavy continental tracking hounds of the same line.",
                           "img": "/history/breeds/Old-scenting-hounds.jpg",
-                          "value": 2.025
+                          "value": 1.0125
                         }
                       ]
                     },
@@ -11234,13 +11692,13 @@
                           "name": "Talbot",
                           "note": "The white Norman hound at its root.",
                           "img": "/history/breeds/talbot-hound.jpg",
-                          "value": 2.025
+                          "value": 1.0125
                         },
                         {
                           "name": "St Hubert Hound",
                           "note": "The abbey scent hounds brought across the Channel.",
                           "img": "/history/breeds/St-Hubert-Hound.jpg",
-                          "value": 1.35
+                          "value": 0.675
                         }
                       ]
                     },
@@ -11248,7 +11706,58 @@
                       "name": "Rough water dogs",
                       "note": "Shaggy, water-loving dogs for the wet work. Now extinct.",
                       "img": "/history/breeds/rough-water-dogs.jpg",
-                      "value": 2.8125
+                      "value": 1.40625
+                    }
+                  ]
+                },
+                {
+                  "name": "Otterhound",
+                  "note": "The web-footed otter-hunting hound, the water-working Tudor root of the water spaniels. A functional match, not documented descent. Now endangered.",
+                  "img": "/history/breeds/otterhound-photo.jpg",
+                  "children": [
+                    {
+                      "name": "Bloodhound",
+                      "note": "Tracking power and a tremendous nose.",
+                      "img": "/history/breeds/Medieval-Bloodhound.jpg",
+                      "children": [
+                        {
+                          "name": "St Hubert Hound",
+                          "note": "The abbey scent hound it descends from almost unchanged.",
+                          "img": "/history/breeds/St-Hubert-Hound.jpg",
+                          "value": 1.51875
+                        },
+                        {
+                          "name": "Old scenting hounds",
+                          "note": "The heavy continental tracking hounds of the same line.",
+                          "img": "/history/breeds/Old-scenting-hounds.jpg",
+                          "value": 1.0125
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Southern Hound",
+                      "note": "Old deep-voiced scent-hound stock.",
+                      "img": "/history/breeds/Southern-Hound.jpg",
+                      "children": [
+                        {
+                          "name": "Talbot",
+                          "note": "The white Norman hound at its root.",
+                          "img": "/history/breeds/talbot-hound.jpg",
+                          "value": 1.0125
+                        },
+                        {
+                          "name": "St Hubert Hound",
+                          "note": "The abbey scent hounds brought across the Channel.",
+                          "img": "/history/breeds/St-Hubert-Hound.jpg",
+                          "value": 0.675
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Rough water dogs",
+                      "note": "Shaggy, water-loving dogs for the wet work. Now extinct.",
+                      "img": "/history/breeds/rough-water-dogs.jpg",
+                      "value": 1.40625
                     }
                   ]
                 }
@@ -11641,13 +12150,13 @@
                           "name": "St Hubert Hound",
                           "note": "The abbey scent hound it descends from almost unchanged.",
                           "img": "/history/breeds/St-Hubert-Hound.jpg",
-                          "value": 0.91125
+                          "value": 0.455625
                         },
                         {
                           "name": "Old scenting hounds",
                           "note": "The heavy continental tracking hounds of the same line.",
                           "img": "/history/breeds/Old-scenting-hounds.jpg",
-                          "value": 0.6075
+                          "value": 0.30375
                         }
                       ]
                     },
@@ -11660,13 +12169,13 @@
                           "name": "Talbot",
                           "note": "The white Norman hound at its root.",
                           "img": "/history/breeds/talbot-hound.jpg",
-                          "value": 0.6075
+                          "value": 0.30375
                         },
                         {
                           "name": "St Hubert Hound",
                           "note": "The abbey scent hounds brought across the Channel.",
                           "img": "/history/breeds/St-Hubert-Hound.jpg",
-                          "value": 0.405
+                          "value": 0.2025
                         }
                       ]
                     },
@@ -11674,7 +12183,58 @@
                       "name": "Rough water dogs",
                       "note": "Shaggy, water-loving dogs for the wet work. Now extinct.",
                       "img": "/history/breeds/rough-water-dogs.jpg",
-                      "value": 0.84375
+                      "value": 0.421875
+                    }
+                  ]
+                },
+                {
+                  "name": "Otterhound",
+                  "note": "The web-footed otter-hunting hound, the water-working Tudor root of the water spaniels. A functional match, not documented descent. Now endangered.",
+                  "img": "/history/breeds/otterhound-photo.jpg",
+                  "children": [
+                    {
+                      "name": "Bloodhound",
+                      "note": "Tracking power and a tremendous nose.",
+                      "img": "/history/breeds/Medieval-Bloodhound.jpg",
+                      "children": [
+                        {
+                          "name": "St Hubert Hound",
+                          "note": "The abbey scent hound it descends from almost unchanged.",
+                          "img": "/history/breeds/St-Hubert-Hound.jpg",
+                          "value": 0.455625
+                        },
+                        {
+                          "name": "Old scenting hounds",
+                          "note": "The heavy continental tracking hounds of the same line.",
+                          "img": "/history/breeds/Old-scenting-hounds.jpg",
+                          "value": 0.30375
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Southern Hound",
+                      "note": "Old deep-voiced scent-hound stock.",
+                      "img": "/history/breeds/Southern-Hound.jpg",
+                      "children": [
+                        {
+                          "name": "Talbot",
+                          "note": "The white Norman hound at its root.",
+                          "img": "/history/breeds/talbot-hound.jpg",
+                          "value": 0.30375
+                        },
+                        {
+                          "name": "St Hubert Hound",
+                          "note": "The abbey scent hounds brought across the Channel.",
+                          "img": "/history/breeds/St-Hubert-Hound.jpg",
+                          "value": 0.2025
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Rough water dogs",
+                      "note": "Shaggy, water-loving dogs for the wet work. Now extinct.",
+                      "img": "/history/breeds/rough-water-dogs.jpg",
+                      "value": 0.421875
                     }
                   ]
                 }
@@ -12317,10 +12877,23 @@
                   ]
                 },
                 {
-                  "name": "Old British ratting terriers",
-                  "note": "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.",
-                  "img": "/history/breeds/Old-British-ratting-terriers.jpg",
-                  "value": 6
+                  "name": "Earth Dog",
+                  "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+                  "img": "/history/breeds/medieval-earth-dog.jpg",
+                  "children": [
+                    {
+                      "name": "Ancient Celtic earth dogs",
+                      "note": "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.",
+                      "img": "/history/breeds/ancient-celtic-earth-dog.jpg",
+                      "value": 3.3
+                    },
+                    {
+                      "name": "Early badger hunting dogs",
+                      "note": "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
+                      "img": "/history/breeds/early-badger-hunting-dogs.jpg",
+                      "value": 2.7
+                    }
+                  ]
                 }
               ]
             },
@@ -12349,10 +12922,23 @@
                   ]
                 },
                 {
-                  "name": "Earth and hunt terriers",
-                  "note": "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.",
-                  "img": "/history/breeds/Earth-and-hunt-terrier.jpg",
-                  "value": 4
+                  "name": "Earth Dog",
+                  "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+                  "img": "/history/breeds/medieval-earth-dog.jpg",
+                  "children": [
+                    {
+                      "name": "Ancient Celtic earth dogs",
+                      "note": "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.",
+                      "img": "/history/breeds/ancient-celtic-earth-dog.jpg",
+                      "value": 2.2
+                    },
+                    {
+                      "name": "Early badger hunting dogs",
+                      "note": "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
+                      "img": "/history/breeds/early-badger-hunting-dogs.jpg",
+                      "value": 1.8
+                    }
+                  ]
                 }
               ]
             }
@@ -12700,10 +13286,23 @@
                   ]
                 },
                 {
-                  "name": "Old British ratting terriers",
-                  "note": "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.",
-                  "img": "/history/breeds/Old-British-ratting-terriers.jpg",
-                  "value": 6.9
+                  "name": "Earth Dog",
+                  "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+                  "img": "/history/breeds/medieval-earth-dog.jpg",
+                  "children": [
+                    {
+                      "name": "Ancient Celtic earth dogs",
+                      "note": "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.",
+                      "img": "/history/breeds/ancient-celtic-earth-dog.jpg",
+                      "value": 3.795
+                    },
+                    {
+                      "name": "Early badger hunting dogs",
+                      "note": "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
+                      "img": "/history/breeds/early-badger-hunting-dogs.jpg",
+                      "value": 3.105
+                    }
+                  ]
                 }
               ]
             },
@@ -12732,10 +13331,23 @@
                   ]
                 },
                 {
-                  "name": "Earth and hunt terriers",
-                  "note": "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.",
-                  "img": "/history/breeds/Earth-and-hunt-terrier.jpg",
-                  "value": 4.6
+                  "name": "Earth Dog",
+                  "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+                  "img": "/history/breeds/medieval-earth-dog.jpg",
+                  "children": [
+                    {
+                      "name": "Ancient Celtic earth dogs",
+                      "note": "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.",
+                      "img": "/history/breeds/ancient-celtic-earth-dog.jpg",
+                      "value": 2.53
+                    },
+                    {
+                      "name": "Early badger hunting dogs",
+                      "note": "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
+                      "img": "/history/breeds/early-badger-hunting-dogs.jpg",
+                      "value": 2.07
+                    }
+                  ]
                 }
               ]
             }
@@ -13137,13 +13749,13 @@
                           "name": "St Hubert Hound",
                           "note": "The abbey scent hound it descends from almost unchanged.",
                           "img": "/history/breeds/St-Hubert-Hound.jpg",
-                          "value": 3.0375
+                          "value": 1.51875
                         },
                         {
                           "name": "Old scenting hounds",
                           "note": "The heavy continental tracking hounds of the same line.",
                           "img": "/history/breeds/Old-scenting-hounds.jpg",
-                          "value": 2.025
+                          "value": 1.0125
                         }
                       ]
                     },
@@ -13156,13 +13768,13 @@
                           "name": "Talbot",
                           "note": "The white Norman hound at its root.",
                           "img": "/history/breeds/talbot-hound.jpg",
-                          "value": 2.025
+                          "value": 1.0125
                         },
                         {
                           "name": "St Hubert Hound",
                           "note": "The abbey scent hounds brought across the Channel.",
                           "img": "/history/breeds/St-Hubert-Hound.jpg",
-                          "value": 1.35
+                          "value": 0.675
                         }
                       ]
                     },
@@ -13170,7 +13782,58 @@
                       "name": "Rough water dogs",
                       "note": "Shaggy, water-loving dogs for the wet work. Now extinct.",
                       "img": "/history/breeds/rough-water-dogs.jpg",
-                      "value": 2.8125
+                      "value": 1.40625
+                    }
+                  ]
+                },
+                {
+                  "name": "Otterhound",
+                  "note": "The web-footed otter-hunting hound, the water-working Tudor root of the water spaniels. A functional match, not documented descent. Now endangered.",
+                  "img": "/history/breeds/otterhound-photo.jpg",
+                  "children": [
+                    {
+                      "name": "Bloodhound",
+                      "note": "Tracking power and a tremendous nose.",
+                      "img": "/history/breeds/Medieval-Bloodhound.jpg",
+                      "children": [
+                        {
+                          "name": "St Hubert Hound",
+                          "note": "The abbey scent hound it descends from almost unchanged.",
+                          "img": "/history/breeds/St-Hubert-Hound.jpg",
+                          "value": 1.51875
+                        },
+                        {
+                          "name": "Old scenting hounds",
+                          "note": "The heavy continental tracking hounds of the same line.",
+                          "img": "/history/breeds/Old-scenting-hounds.jpg",
+                          "value": 1.0125
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Southern Hound",
+                      "note": "Old deep-voiced scent-hound stock.",
+                      "img": "/history/breeds/Southern-Hound.jpg",
+                      "children": [
+                        {
+                          "name": "Talbot",
+                          "note": "The white Norman hound at its root.",
+                          "img": "/history/breeds/talbot-hound.jpg",
+                          "value": 1.0125
+                        },
+                        {
+                          "name": "St Hubert Hound",
+                          "note": "The abbey scent hounds brought across the Channel.",
+                          "img": "/history/breeds/St-Hubert-Hound.jpg",
+                          "value": 0.675
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Rough water dogs",
+                      "note": "Shaggy, water-loving dogs for the wet work. Now extinct.",
+                      "img": "/history/breeds/rough-water-dogs.jpg",
+                      "value": 1.40625
                     }
                   ]
                 }
@@ -13478,19 +14141,44 @@
                           "name": "Bloodhound",
                           "note": "Tracking power and a tremendous nose.",
                           "img": "/history/breeds/Medieval-Bloodhound.jpg",
-                          "value": 3.7125
+                          "value": 1.85625
                         },
                         {
                           "name": "Southern Hound",
                           "note": "Old deep-voiced scent-hound stock.",
                           "img": "/history/breeds/Southern-Hound.jpg",
-                          "value": 2.475
+                          "value": 1.2375
                         },
                         {
                           "name": "Rough water dogs",
                           "note": "Shaggy, water-loving dogs for the wet work. Now extinct.",
                           "img": "/history/breeds/rough-water-dogs.jpg",
-                          "value": 2.0625
+                          "value": 1.03125
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Otterhound",
+                      "note": "The web-footed otter-hunting hound, the water-working Tudor root of the water spaniels. A functional match, not documented descent. Now endangered.",
+                      "img": "/history/breeds/otterhound-photo.jpg",
+                      "children": [
+                        {
+                          "name": "Bloodhound",
+                          "note": "Tracking power and a tremendous nose.",
+                          "img": "/history/breeds/Medieval-Bloodhound.jpg",
+                          "value": 1.85625
+                        },
+                        {
+                          "name": "Southern Hound",
+                          "note": "Old deep-voiced scent-hound stock.",
+                          "img": "/history/breeds/Southern-Hound.jpg",
+                          "value": 1.2375
+                        },
+                        {
+                          "name": "Rough water dogs",
+                          "note": "Shaggy, water-loving dogs for the wet work. Now extinct.",
+                          "img": "/history/breeds/rough-water-dogs.jpg",
+                          "value": 1.03125
                         }
                       ]
                     }
@@ -13580,7 +14268,13 @@
                           "name": "Otterhound",
                           "note": "The web-footed otter-hunting hound, the water-working Tudor root of the water spaniels. A functional match, not documented descent. Now endangered.",
                           "img": "/history/breeds/otterhound-photo.jpg",
-                          "value": 0.525
+                          "value": 0.2625
+                        },
+                        {
+                          "name": "Otterhound",
+                          "note": "The web-footed otter-hunting hound, the water-working Tudor root of the water spaniels. A functional match, not documented descent. Now endangered.",
+                          "img": "/history/breeds/otterhound-photo.jpg",
+                          "value": 0.2625
                         }
                       ]
                     }
@@ -13600,7 +14294,13 @@
                           "name": "Otterhound",
                           "note": "The web-footed otter-hunting hound, the same water-working Tudor root, reached in parallel with the British water spaniels. Now endangered.",
                           "img": "/history/breeds/otterhound-photo.jpg",
-                          "value": 1.03125
+                          "value": 0.515625
+                        },
+                        {
+                          "name": "Otterhound",
+                          "note": "The web-footed otter-hunting hound, the same water-working Tudor root, reached in parallel with the British water spaniels. Now endangered.",
+                          "img": "/history/breeds/otterhound-photo.jpg",
+                          "value": 0.515625
                         }
                       ]
                     },
@@ -13850,13 +14550,13 @@
                           "name": "St Hubert Hound",
                           "note": "The abbey scent hound it descends from almost unchanged.",
                           "img": "/history/breeds/St-Hubert-Hound.jpg",
-                          "value": 3.0375
+                          "value": 1.51875
                         },
                         {
                           "name": "Old scenting hounds",
                           "note": "The heavy continental tracking hounds of the same line.",
                           "img": "/history/breeds/Old-scenting-hounds.jpg",
-                          "value": 2.025
+                          "value": 1.0125
                         }
                       ]
                     },
@@ -13869,13 +14569,13 @@
                           "name": "Talbot",
                           "note": "The white Norman hound at its root.",
                           "img": "/history/breeds/talbot-hound.jpg",
-                          "value": 2.025
+                          "value": 1.0125
                         },
                         {
                           "name": "St Hubert Hound",
                           "note": "The abbey scent hounds brought across the Channel.",
                           "img": "/history/breeds/St-Hubert-Hound.jpg",
-                          "value": 1.35
+                          "value": 0.675
                         }
                       ]
                     },
@@ -13883,7 +14583,58 @@
                       "name": "Rough water dogs",
                       "note": "Shaggy, water-loving dogs for the wet work. Now extinct.",
                       "img": "/history/breeds/rough-water-dogs.jpg",
-                      "value": 2.8125
+                      "value": 1.40625
+                    }
+                  ]
+                },
+                {
+                  "name": "Otterhound",
+                  "note": "The web-footed otter-hunting hound, the water-working Tudor root of the water spaniels. A functional match, not documented descent. Now endangered.",
+                  "img": "/history/breeds/otterhound-photo.jpg",
+                  "children": [
+                    {
+                      "name": "Bloodhound",
+                      "note": "Tracking power and a tremendous nose.",
+                      "img": "/history/breeds/Medieval-Bloodhound.jpg",
+                      "children": [
+                        {
+                          "name": "St Hubert Hound",
+                          "note": "The abbey scent hound it descends from almost unchanged.",
+                          "img": "/history/breeds/St-Hubert-Hound.jpg",
+                          "value": 1.51875
+                        },
+                        {
+                          "name": "Old scenting hounds",
+                          "note": "The heavy continental tracking hounds of the same line.",
+                          "img": "/history/breeds/Old-scenting-hounds.jpg",
+                          "value": 1.0125
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Southern Hound",
+                      "note": "Old deep-voiced scent-hound stock.",
+                      "img": "/history/breeds/Southern-Hound.jpg",
+                      "children": [
+                        {
+                          "name": "Talbot",
+                          "note": "The white Norman hound at its root.",
+                          "img": "/history/breeds/talbot-hound.jpg",
+                          "value": 1.0125
+                        },
+                        {
+                          "name": "St Hubert Hound",
+                          "note": "The abbey scent hounds brought across the Channel.",
+                          "img": "/history/breeds/St-Hubert-Hound.jpg",
+                          "value": 0.675
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Rough water dogs",
+                      "note": "Shaggy, water-loving dogs for the wet work. Now extinct.",
+                      "img": "/history/breeds/rough-water-dogs.jpg",
+                      "value": 1.40625
                     }
                   ]
                 }
@@ -14513,13 +15264,13 @@
                           "name": "St Hubert Hound",
                           "note": "The abbey scent hound it descends from almost unchanged.",
                           "img": "/history/breeds/St-Hubert-Hound.jpg",
-                          "value": 3.0375
+                          "value": 1.51875
                         },
                         {
                           "name": "Old scenting hounds",
                           "note": "The heavy continental tracking hounds of the same line.",
                           "img": "/history/breeds/Old-scenting-hounds.jpg",
-                          "value": 2.025
+                          "value": 1.0125
                         }
                       ]
                     },
@@ -14532,13 +15283,13 @@
                           "name": "Talbot",
                           "note": "The white Norman hound at its root.",
                           "img": "/history/breeds/talbot-hound.jpg",
-                          "value": 2.025
+                          "value": 1.0125
                         },
                         {
                           "name": "St Hubert Hound",
                           "note": "The abbey scent hounds brought across the Channel.",
                           "img": "/history/breeds/St-Hubert-Hound.jpg",
-                          "value": 1.35
+                          "value": 0.675
                         }
                       ]
                     },
@@ -14546,7 +15297,58 @@
                       "name": "Rough water dogs",
                       "note": "Shaggy, water-loving dogs for the wet work. Now extinct.",
                       "img": "/history/breeds/rough-water-dogs.jpg",
-                      "value": 2.8125
+                      "value": 1.40625
+                    }
+                  ]
+                },
+                {
+                  "name": "Otterhound",
+                  "note": "The web-footed otter-hunting hound, the water-working Tudor root of the water spaniels. A functional match, not documented descent. Now endangered.",
+                  "img": "/history/breeds/otterhound-photo.jpg",
+                  "children": [
+                    {
+                      "name": "Bloodhound",
+                      "note": "Tracking power and a tremendous nose.",
+                      "img": "/history/breeds/Medieval-Bloodhound.jpg",
+                      "children": [
+                        {
+                          "name": "St Hubert Hound",
+                          "note": "The abbey scent hound it descends from almost unchanged.",
+                          "img": "/history/breeds/St-Hubert-Hound.jpg",
+                          "value": 1.51875
+                        },
+                        {
+                          "name": "Old scenting hounds",
+                          "note": "The heavy continental tracking hounds of the same line.",
+                          "img": "/history/breeds/Old-scenting-hounds.jpg",
+                          "value": 1.0125
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Southern Hound",
+                      "note": "Old deep-voiced scent-hound stock.",
+                      "img": "/history/breeds/Southern-Hound.jpg",
+                      "children": [
+                        {
+                          "name": "Talbot",
+                          "note": "The white Norman hound at its root.",
+                          "img": "/history/breeds/talbot-hound.jpg",
+                          "value": 1.0125
+                        },
+                        {
+                          "name": "St Hubert Hound",
+                          "note": "The abbey scent hounds brought across the Channel.",
+                          "img": "/history/breeds/St-Hubert-Hound.jpg",
+                          "value": 0.675
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Rough water dogs",
+                      "note": "Shaggy, water-loving dogs for the wet work. Now extinct.",
+                      "img": "/history/breeds/rough-water-dogs.jpg",
+                      "value": 1.40625
                     }
                   ]
                 }
@@ -14916,10 +15718,23 @@
                   ]
                 },
                 {
-                  "name": "Old Highland terriers",
-                  "note": "The old working-terrier stock of the Highlands that every Scottish terrier springs from. Now extinct.",
-                  "img": "/history/breeds/Old-Highland-terriers.jpg",
-                  "value": 6.6
+                  "name": "Earth Dog",
+                  "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+                  "img": "/history/breeds/medieval-earth-dog.jpg",
+                  "children": [
+                    {
+                      "name": "Ancient Celtic earth dogs",
+                      "note": "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.",
+                      "img": "/history/breeds/ancient-celtic-earth-dog.jpg",
+                      "value": 3.63
+                    },
+                    {
+                      "name": "Early badger hunting dogs",
+                      "note": "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
+                      "img": "/history/breeds/early-badger-hunting-dogs.jpg",
+                      "value": 2.97
+                    }
+                  ]
                 }
               ]
             },
@@ -14981,10 +15796,23 @@
                   ]
                 },
                 {
-                  "name": "Old Highland terriers",
-                  "note": "The old working-terrier stock of the Highlands that every Scottish terrier springs from. Now extinct.",
-                  "img": "/history/breeds/Old-Highland-terriers.jpg",
-                  "value": 4.2
+                  "name": "Earth Dog",
+                  "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+                  "img": "/history/breeds/medieval-earth-dog.jpg",
+                  "children": [
+                    {
+                      "name": "Ancient Celtic earth dogs",
+                      "note": "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.",
+                      "img": "/history/breeds/ancient-celtic-earth-dog.jpg",
+                      "value": 2.31
+                    },
+                    {
+                      "name": "Early badger hunting dogs",
+                      "note": "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
+                      "img": "/history/breeds/early-badger-hunting-dogs.jpg",
+                      "value": 1.89
+                    }
+                  ]
                 }
               ]
             },
@@ -16394,10 +17222,23 @@
                   ]
                 },
                 {
-                  "name": "Old British ratting terriers",
-                  "note": "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.",
-                  "img": "/history/breeds/Old-British-ratting-terriers.jpg",
-                  "value": 13.5
+                  "name": "Earth Dog",
+                  "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+                  "img": "/history/breeds/medieval-earth-dog.jpg",
+                  "children": [
+                    {
+                      "name": "Ancient Celtic earth dogs",
+                      "note": "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.",
+                      "img": "/history/breeds/ancient-celtic-earth-dog.jpg",
+                      "value": 7.425
+                    },
+                    {
+                      "name": "Early badger hunting dogs",
+                      "note": "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
+                      "img": "/history/breeds/early-badger-hunting-dogs.jpg",
+                      "value": 6.075
+                    }
+                  ]
                 }
               ]
             },
@@ -16426,10 +17267,23 @@
                   ]
                 },
                 {
-                  "name": "Earth and hunt terriers",
-                  "note": "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.",
-                  "img": "/history/breeds/Earth-and-hunt-terrier.jpg",
-                  "value": 9
+                  "name": "Earth Dog",
+                  "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+                  "img": "/history/breeds/medieval-earth-dog.jpg",
+                  "children": [
+                    {
+                      "name": "Ancient Celtic earth dogs",
+                      "note": "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.",
+                      "img": "/history/breeds/ancient-celtic-earth-dog.jpg",
+                      "value": 4.95
+                    },
+                    {
+                      "name": "Early badger hunting dogs",
+                      "note": "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
+                      "img": "/history/breeds/early-badger-hunting-dogs.jpg",
+                      "value": 4.05
+                    }
+                  ]
                 }
               ]
             }
@@ -17680,13 +18534,13 @@
                           "name": "St Hubert Hound",
                           "note": "The abbey scent hound it descends from almost unchanged.",
                           "img": "/history/breeds/St-Hubert-Hound.jpg",
-                          "value": 3.9000000000000004
+                          "value": 1.9500000000000002
                         },
                         {
                           "name": "Old scenting hounds",
                           "note": "The heavy continental tracking hounds of the same line.",
                           "img": "/history/breeds/Old-scenting-hounds.jpg",
-                          "value": 2.6000000000000005
+                          "value": 1.3000000000000003
                         }
                       ]
                     },
@@ -17699,13 +18553,13 @@
                           "name": "Talbot",
                           "note": "The white Norman hound at its root.",
                           "img": "/history/breeds/talbot-hound.jpg",
-                          "value": 2.6000000000000005
+                          "value": 1.3000000000000003
                         },
                         {
                           "name": "St Hubert Hound",
                           "note": "The abbey scent hounds brought across the Channel.",
                           "img": "/history/breeds/St-Hubert-Hound.jpg",
-                          "value": 1.7333333333333336
+                          "value": 0.8666666666666668
                         }
                       ]
                     },
@@ -17713,7 +18567,58 @@
                       "name": "Rough water dogs",
                       "note": "Shaggy, water-loving dogs for the wet work. Now extinct.",
                       "img": "/history/breeds/rough-water-dogs.jpg",
-                      "value": 3.6111111111111116
+                      "value": 1.8055555555555558
+                    }
+                  ]
+                },
+                {
+                  "name": "Otterhound",
+                  "note": "The web-footed otter-hunting hound, the water-working Tudor root of the water spaniels. A functional match, not documented descent. Now endangered.",
+                  "img": "/history/breeds/otterhound-photo.jpg",
+                  "children": [
+                    {
+                      "name": "Bloodhound",
+                      "note": "Tracking power and a tremendous nose.",
+                      "img": "/history/breeds/Medieval-Bloodhound.jpg",
+                      "children": [
+                        {
+                          "name": "St Hubert Hound",
+                          "note": "The abbey scent hound it descends from almost unchanged.",
+                          "img": "/history/breeds/St-Hubert-Hound.jpg",
+                          "value": 1.9500000000000002
+                        },
+                        {
+                          "name": "Old scenting hounds",
+                          "note": "The heavy continental tracking hounds of the same line.",
+                          "img": "/history/breeds/Old-scenting-hounds.jpg",
+                          "value": 1.3000000000000003
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Southern Hound",
+                      "note": "Old deep-voiced scent-hound stock.",
+                      "img": "/history/breeds/Southern-Hound.jpg",
+                      "children": [
+                        {
+                          "name": "Talbot",
+                          "note": "The white Norman hound at its root.",
+                          "img": "/history/breeds/talbot-hound.jpg",
+                          "value": 1.3000000000000003
+                        },
+                        {
+                          "name": "St Hubert Hound",
+                          "note": "The abbey scent hounds brought across the Channel.",
+                          "img": "/history/breeds/St-Hubert-Hound.jpg",
+                          "value": 0.8666666666666668
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Rough water dogs",
+                      "note": "Shaggy, water-loving dogs for the wet work. Now extinct.",
+                      "img": "/history/breeds/rough-water-dogs.jpg",
+                      "value": 1.8055555555555558
                     }
                   ]
                 }
@@ -17809,13 +18714,13 @@
                           "name": "St Hubert Hound",
                           "note": "The abbey scent hound it descends from almost unchanged.",
                           "img": "/history/breeds/St-Hubert-Hound.jpg",
-                          "value": 3.0375
+                          "value": 1.51875
                         },
                         {
                           "name": "Old scenting hounds",
                           "note": "The heavy continental tracking hounds of the same line.",
                           "img": "/history/breeds/Old-scenting-hounds.jpg",
-                          "value": 2.025
+                          "value": 1.0125
                         }
                       ]
                     },
@@ -17828,13 +18733,13 @@
                           "name": "Talbot",
                           "note": "The white Norman hound at its root.",
                           "img": "/history/breeds/talbot-hound.jpg",
-                          "value": 2.025
+                          "value": 1.0125
                         },
                         {
                           "name": "St Hubert Hound",
                           "note": "The abbey scent hounds brought across the Channel.",
                           "img": "/history/breeds/St-Hubert-Hound.jpg",
-                          "value": 1.35
+                          "value": 0.675
                         }
                       ]
                     },
@@ -17842,7 +18747,58 @@
                       "name": "Rough water dogs",
                       "note": "Shaggy, water-loving dogs for the wet work. Now extinct.",
                       "img": "/history/breeds/rough-water-dogs.jpg",
-                      "value": 2.8125
+                      "value": 1.40625
+                    }
+                  ]
+                },
+                {
+                  "name": "Otterhound",
+                  "note": "The web-footed otter-hunting hound, the water-working Tudor root of the water spaniels. A functional match, not documented descent. Now endangered.",
+                  "img": "/history/breeds/otterhound-photo.jpg",
+                  "children": [
+                    {
+                      "name": "Bloodhound",
+                      "note": "Tracking power and a tremendous nose.",
+                      "img": "/history/breeds/Medieval-Bloodhound.jpg",
+                      "children": [
+                        {
+                          "name": "St Hubert Hound",
+                          "note": "The abbey scent hound it descends from almost unchanged.",
+                          "img": "/history/breeds/St-Hubert-Hound.jpg",
+                          "value": 1.51875
+                        },
+                        {
+                          "name": "Old scenting hounds",
+                          "note": "The heavy continental tracking hounds of the same line.",
+                          "img": "/history/breeds/Old-scenting-hounds.jpg",
+                          "value": 1.0125
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Southern Hound",
+                      "note": "Old deep-voiced scent-hound stock.",
+                      "img": "/history/breeds/Southern-Hound.jpg",
+                      "children": [
+                        {
+                          "name": "Talbot",
+                          "note": "The white Norman hound at its root.",
+                          "img": "/history/breeds/talbot-hound.jpg",
+                          "value": 1.0125
+                        },
+                        {
+                          "name": "St Hubert Hound",
+                          "note": "The abbey scent hounds brought across the Channel.",
+                          "img": "/history/breeds/St-Hubert-Hound.jpg",
+                          "value": 0.675
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Rough water dogs",
+                      "note": "Shaggy, water-loving dogs for the wet work. Now extinct.",
+                      "img": "/history/breeds/rough-water-dogs.jpg",
+                      "value": 1.40625
                     }
                   ]
                 }
@@ -18196,10 +19152,23 @@
                   ]
                 },
                 {
-                  "name": "Old Highland terriers",
-                  "note": "The old working-terrier stock of the Highlands that every Scottish terrier springs from. Now extinct.",
-                  "img": "/history/breeds/Old-Highland-terriers.jpg",
-                  "value": 7.875
+                  "name": "Earth Dog",
+                  "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+                  "img": "/history/breeds/medieval-earth-dog.jpg",
+                  "children": [
+                    {
+                      "name": "Ancient Celtic earth dogs",
+                      "note": "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.",
+                      "img": "/history/breeds/ancient-celtic-earth-dog.jpg",
+                      "value": 4.33125
+                    },
+                    {
+                      "name": "Early badger hunting dogs",
+                      "note": "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
+                      "img": "/history/breeds/early-badger-hunting-dogs.jpg",
+                      "value": 3.54375
+                    }
+                  ]
                 }
               ]
             }
@@ -18235,10 +19204,23 @@
                   ]
                 },
                 {
-                  "name": "Old Highland terriers",
-                  "note": "The old working-terrier stock of the Highlands that every Scottish terrier springs from. Now extinct.",
-                  "img": "/history/breeds/Old-Highland-terriers.jpg",
-                  "value": 9
+                  "name": "Earth Dog",
+                  "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+                  "img": "/history/breeds/medieval-earth-dog.jpg",
+                  "children": [
+                    {
+                      "name": "Ancient Celtic earth dogs",
+                      "note": "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.",
+                      "img": "/history/breeds/ancient-celtic-earth-dog.jpg",
+                      "value": 4.95
+                    },
+                    {
+                      "name": "Early badger hunting dogs",
+                      "note": "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
+                      "img": "/history/breeds/early-badger-hunting-dogs.jpg",
+                      "value": 4.05
+                    }
+                  ]
                 }
               ]
             },
@@ -18300,10 +19282,23 @@
                   ]
                 },
                 {
-                  "name": "Old British ratting terriers",
-                  "note": "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.",
-                  "img": "/history/breeds/Old-British-ratting-terriers.jpg",
-                  "value": 7.5
+                  "name": "Earth Dog",
+                  "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+                  "img": "/history/breeds/medieval-earth-dog.jpg",
+                  "children": [
+                    {
+                      "name": "Ancient Celtic earth dogs",
+                      "note": "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.",
+                      "img": "/history/breeds/ancient-celtic-earth-dog.jpg",
+                      "value": 4.125
+                    },
+                    {
+                      "name": "Early badger hunting dogs",
+                      "note": "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
+                      "img": "/history/breeds/early-badger-hunting-dogs.jpg",
+                      "value": 3.375
+                    }
+                  ]
                 }
               ]
             },
@@ -18332,10 +19327,23 @@
                   ]
                 },
                 {
-                  "name": "Earth and hunt terriers",
-                  "note": "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.",
-                  "img": "/history/breeds/Earth-and-hunt-terrier.jpg",
-                  "value": 5
+                  "name": "Earth Dog",
+                  "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+                  "img": "/history/breeds/medieval-earth-dog.jpg",
+                  "children": [
+                    {
+                      "name": "Ancient Celtic earth dogs",
+                      "note": "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.",
+                      "img": "/history/breeds/ancient-celtic-earth-dog.jpg",
+                      "value": 2.75
+                    },
+                    {
+                      "name": "Early badger hunting dogs",
+                      "note": "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
+                      "img": "/history/breeds/early-badger-hunting-dogs.jpg",
+                      "value": 2.25
+                    }
+                  ]
                 }
               ]
             }
@@ -18756,13 +19764,13 @@
                       "name": "St Hubert Hound",
                       "note": "The abbey scent hound it descends from almost unchanged.",
                       "img": "/history/breeds/St-Hubert-Hound.jpg",
-                      "value": 6.075
+                      "value": 3.0375
                     },
                     {
                       "name": "Old scenting hounds",
                       "note": "The heavy continental tracking hounds of the same line.",
                       "img": "/history/breeds/Old-scenting-hounds.jpg",
-                      "value": 4.05
+                      "value": 2.025
                     }
                   ]
                 },
@@ -18780,7 +19788,7 @@
                           "name": "St Hubert Hound",
                           "note": "The monks' scent hound brought over by the Normans.",
                           "img": "/history/breeds/St-Hubert-Hound.jpg",
-                          "value": 4.05
+                          "value": 2.025
                         },
                         {
                           "name": "Old scenting hounds",
@@ -18808,7 +19816,7 @@
                       "name": "St Hubert Hound",
                       "note": "The abbey scent hounds brought across the Channel.",
                       "img": "/history/breeds/St-Hubert-Hound.jpg",
-                      "value": 2.7
+                      "value": 1.35
                     }
                   ]
                 },
@@ -18816,7 +19824,85 @@
                   "name": "Rough water dogs",
                   "note": "Shaggy, water-loving dogs for the wet work. Now extinct.",
                   "img": "/history/breeds/rough-water-dogs.jpg",
-                  "value": 5.625
+                  "value": 2.8125
+                }
+              ]
+            },
+            {
+              "name": "Otterhound",
+              "note": "The web-footed otter-hunting hound, the water-working Tudor root of the water spaniels. A functional match, not documented descent. Now endangered.",
+              "img": "/history/breeds/otterhound-photo.jpg",
+              "children": [
+                {
+                  "name": "Bloodhound",
+                  "note": "Tracking power and a tremendous nose.",
+                  "img": "/history/breeds/Medieval-Bloodhound.jpg",
+                  "children": [
+                    {
+                      "name": "St Hubert Hound",
+                      "note": "The abbey scent hound it descends from almost unchanged.",
+                      "img": "/history/breeds/St-Hubert-Hound.jpg",
+                      "value": 3.0375
+                    },
+                    {
+                      "name": "Old scenting hounds",
+                      "note": "The heavy continental tracking hounds of the same line.",
+                      "img": "/history/breeds/Old-scenting-hounds.jpg",
+                      "value": 2.025
+                    }
+                  ]
+                },
+                {
+                  "name": "Southern Hound",
+                  "note": "Old deep-voiced scent-hound stock.",
+                  "img": "/history/breeds/Southern-Hound.jpg",
+                  "children": [
+                    {
+                      "name": "Talbot",
+                      "note": "The white Norman hound at its root.",
+                      "img": "/history/breeds/talbot-hound.jpg",
+                      "children": [
+                        {
+                          "name": "St Hubert Hound",
+                          "note": "The monks' scent hound brought over by the Normans.",
+                          "img": "/history/breeds/St-Hubert-Hound.jpg",
+                          "value": 2.025
+                        },
+                        {
+                          "name": "Old scenting hounds",
+                          "note": "The tracking hounds of medieval lords.",
+                          "img": "/history/breeds/Old-scenting-hounds.jpg",
+                          "children": [
+                            {
+                              "name": "Celtic Scent Hound",
+                              "note": "Early Celtic tracking hound that followed game by scent, representing the roots of later European scent hounds. An extinct historical type.",
+                              "img": "/history/breeds/ancient-celtic-scent-hound.jpg",
+                              "value": 20
+                            },
+                            {
+                              "name": "Old scenting hounds",
+                              "note": "The tracking hounds of medieval lords.",
+                              "img": "/history/breeds/Old-scenting-hounds.jpg",
+                              "value": 20
+                            }
+                          ],
+                          "value": 0
+                        }
+                      ]
+                    },
+                    {
+                      "name": "St Hubert Hound",
+                      "note": "The abbey scent hounds brought across the Channel.",
+                      "img": "/history/breeds/St-Hubert-Hound.jpg",
+                      "value": 1.35
+                    }
+                  ]
+                },
+                {
+                  "name": "Rough water dogs",
+                  "note": "Shaggy, water-loving dogs for the wet work. Now extinct.",
+                  "img": "/history/breeds/rough-water-dogs.jpg",
+                  "value": 2.8125
                 }
               ]
             }
@@ -19772,13 +20858,13 @@
                           "name": "St Hubert Hound",
                           "note": "The abbey scent hound it descends from almost unchanged.",
                           "img": "/history/breeds/St-Hubert-Hound.jpg",
-                          "value": 2.835
+                          "value": 1.4175
                         },
                         {
                           "name": "Old scenting hounds",
                           "note": "The heavy continental tracking hounds of the same line.",
                           "img": "/history/breeds/Old-scenting-hounds.jpg",
-                          "value": 1.89
+                          "value": 0.945
                         }
                       ]
                     },
@@ -19791,13 +20877,13 @@
                           "name": "Talbot",
                           "note": "The white Norman hound at its root.",
                           "img": "/history/breeds/talbot-hound.jpg",
-                          "value": 1.89
+                          "value": 0.945
                         },
                         {
                           "name": "St Hubert Hound",
                           "note": "The abbey scent hounds brought across the Channel.",
                           "img": "/history/breeds/St-Hubert-Hound.jpg",
-                          "value": 1.26
+                          "value": 0.63
                         }
                       ]
                     },
@@ -19805,7 +20891,58 @@
                       "name": "Rough water dogs",
                       "note": "Shaggy, water-loving dogs for the wet work. Now extinct.",
                       "img": "/history/breeds/rough-water-dogs.jpg",
-                      "value": 2.625
+                      "value": 1.3125
+                    }
+                  ]
+                },
+                {
+                  "name": "Otterhound",
+                  "note": "The web-footed otter-hunting hound, the water-working Tudor root of the water spaniels. A functional match, not documented descent. Now endangered.",
+                  "img": "/history/breeds/otterhound-photo.jpg",
+                  "children": [
+                    {
+                      "name": "Bloodhound",
+                      "note": "Tracking power and a tremendous nose.",
+                      "img": "/history/breeds/Medieval-Bloodhound.jpg",
+                      "children": [
+                        {
+                          "name": "St Hubert Hound",
+                          "note": "The abbey scent hound it descends from almost unchanged.",
+                          "img": "/history/breeds/St-Hubert-Hound.jpg",
+                          "value": 1.4175
+                        },
+                        {
+                          "name": "Old scenting hounds",
+                          "note": "The heavy continental tracking hounds of the same line.",
+                          "img": "/history/breeds/Old-scenting-hounds.jpg",
+                          "value": 0.945
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Southern Hound",
+                      "note": "Old deep-voiced scent-hound stock.",
+                      "img": "/history/breeds/Southern-Hound.jpg",
+                      "children": [
+                        {
+                          "name": "Talbot",
+                          "note": "The white Norman hound at its root.",
+                          "img": "/history/breeds/talbot-hound.jpg",
+                          "value": 0.945
+                        },
+                        {
+                          "name": "St Hubert Hound",
+                          "note": "The abbey scent hounds brought across the Channel.",
+                          "img": "/history/breeds/St-Hubert-Hound.jpg",
+                          "value": 0.63
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Rough water dogs",
+                      "note": "Shaggy, water-loving dogs for the wet work. Now extinct.",
+                      "img": "/history/breeds/rough-water-dogs.jpg",
+                      "value": 1.3125
                     }
                   ]
                 }
@@ -20161,9 +21298,9 @@
                           "value": 0.7038
                         },
                         {
-                          "name": "Old British ratting terriers",
-                          "note": "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.",
-                          "img": "/history/breeds/Old-British-ratting-terriers.jpg",
+                          "name": "Earth Dog",
+                          "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+                          "img": "/history/breeds/medieval-earth-dog.jpg",
                           "value": 0.7038
                         }
                       ]
@@ -20180,9 +21317,9 @@
                           "value": 0.4692
                         },
                         {
-                          "name": "Earth and hunt terriers",
-                          "note": "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.",
-                          "img": "/history/breeds/Earth-and-hunt-terrier.jpg",
+                          "name": "Earth Dog",
+                          "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+                          "img": "/history/breeds/medieval-earth-dog.jpg",
                           "value": 0.4692
                         }
                       ]
@@ -20454,10 +21591,23 @@
                       ]
                     },
                     {
-                      "name": "Old British ratting terriers",
-                      "note": "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.",
-                      "img": "/history/breeds/Old-British-ratting-terriers.jpg",
-                      "value": 4.95
+                      "name": "Earth Dog",
+                      "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+                      "img": "/history/breeds/medieval-earth-dog.jpg",
+                      "children": [
+                        {
+                          "name": "Ancient Celtic earth dogs",
+                          "note": "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.",
+                          "img": "/history/breeds/ancient-celtic-earth-dog.jpg",
+                          "value": 2.7225
+                        },
+                        {
+                          "name": "Early badger hunting dogs",
+                          "note": "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
+                          "img": "/history/breeds/early-badger-hunting-dogs.jpg",
+                          "value": 2.2275
+                        }
+                      ]
                     }
                   ]
                 },
@@ -20486,10 +21636,23 @@
                       ]
                     },
                     {
-                      "name": "Earth and hunt terriers",
-                      "note": "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.",
-                      "img": "/history/breeds/Earth-and-hunt-terrier.jpg",
-                      "value": 3.3
+                      "name": "Earth Dog",
+                      "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+                      "img": "/history/breeds/medieval-earth-dog.jpg",
+                      "children": [
+                        {
+                          "name": "Ancient Celtic earth dogs",
+                          "note": "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.",
+                          "img": "/history/breeds/ancient-celtic-earth-dog.jpg",
+                          "value": 1.815
+                        },
+                        {
+                          "name": "Early badger hunting dogs",
+                          "note": "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
+                          "img": "/history/breeds/early-badger-hunting-dogs.jpg",
+                          "value": 1.485
+                        }
+                      ]
                     }
                   ]
                 }
@@ -20525,10 +21688,23 @@
                       ]
                     },
                     {
-                      "name": "Old British ratting terriers",
-                      "note": "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.",
-                      "img": "/history/breeds/Old-British-ratting-terriers.jpg",
-                      "value": 4.95
+                      "name": "Earth Dog",
+                      "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+                      "img": "/history/breeds/medieval-earth-dog.jpg",
+                      "children": [
+                        {
+                          "name": "Ancient Celtic earth dogs",
+                          "note": "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.",
+                          "img": "/history/breeds/ancient-celtic-earth-dog.jpg",
+                          "value": 2.7225
+                        },
+                        {
+                          "name": "Early badger hunting dogs",
+                          "note": "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
+                          "img": "/history/breeds/early-badger-hunting-dogs.jpg",
+                          "value": 2.2275
+                        }
+                      ]
                     }
                   ]
                 },
@@ -20557,10 +21733,23 @@
                       ]
                     },
                     {
-                      "name": "Earth and hunt terriers",
-                      "note": "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.",
-                      "img": "/history/breeds/Earth-and-hunt-terrier.jpg",
-                      "value": 3.3
+                      "name": "Earth Dog",
+                      "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+                      "img": "/history/breeds/medieval-earth-dog.jpg",
+                      "children": [
+                        {
+                          "name": "Ancient Celtic earth dogs",
+                          "note": "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.",
+                          "img": "/history/breeds/ancient-celtic-earth-dog.jpg",
+                          "value": 1.815
+                        },
+                        {
+                          "name": "Early badger hunting dogs",
+                          "note": "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
+                          "img": "/history/breeds/early-badger-hunting-dogs.jpg",
+                          "value": 1.485
+                        }
+                      ]
                     }
                   ]
                 }
@@ -22329,13 +23518,13 @@
                           "name": "St Hubert Hound",
                           "note": "The abbey scent hound it descends from almost unchanged.",
                           "img": "/history/breeds/St-Hubert-Hound.jpg",
-                          "value": 4.455
+                          "value": 2.2275
                         },
                         {
                           "name": "Old scenting hounds",
                           "note": "The heavy continental tracking hounds of the same line.",
                           "img": "/history/breeds/Old-scenting-hounds.jpg",
-                          "value": 2.97
+                          "value": 1.485
                         }
                       ]
                     },
@@ -22348,13 +23537,13 @@
                           "name": "Talbot",
                           "note": "The white Norman hound at its root.",
                           "img": "/history/breeds/talbot-hound.jpg",
-                          "value": 2.97
+                          "value": 1.485
                         },
                         {
                           "name": "St Hubert Hound",
                           "note": "The abbey scent hounds brought across the Channel.",
                           "img": "/history/breeds/St-Hubert-Hound.jpg",
-                          "value": 1.98
+                          "value": 0.99
                         }
                       ]
                     },
@@ -22362,7 +23551,58 @@
                       "name": "Rough water dogs",
                       "note": "Shaggy, water-loving dogs for the wet work. Now extinct.",
                       "img": "/history/breeds/rough-water-dogs.jpg",
-                      "value": 4.125
+                      "value": 2.0625
+                    }
+                  ]
+                },
+                {
+                  "name": "Otterhound",
+                  "note": "The web-footed otter-hunting hound, the water-working Tudor root of the water spaniels. A functional match, not documented descent. Now endangered.",
+                  "img": "/history/breeds/otterhound-photo.jpg",
+                  "children": [
+                    {
+                      "name": "Bloodhound",
+                      "note": "Tracking power and a tremendous nose.",
+                      "img": "/history/breeds/Medieval-Bloodhound.jpg",
+                      "children": [
+                        {
+                          "name": "St Hubert Hound",
+                          "note": "The abbey scent hound it descends from almost unchanged.",
+                          "img": "/history/breeds/St-Hubert-Hound.jpg",
+                          "value": 2.2275
+                        },
+                        {
+                          "name": "Old scenting hounds",
+                          "note": "The heavy continental tracking hounds of the same line.",
+                          "img": "/history/breeds/Old-scenting-hounds.jpg",
+                          "value": 1.485
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Southern Hound",
+                      "note": "Old deep-voiced scent-hound stock.",
+                      "img": "/history/breeds/Southern-Hound.jpg",
+                      "children": [
+                        {
+                          "name": "Talbot",
+                          "note": "The white Norman hound at its root.",
+                          "img": "/history/breeds/talbot-hound.jpg",
+                          "value": 1.485
+                        },
+                        {
+                          "name": "St Hubert Hound",
+                          "note": "The abbey scent hounds brought across the Channel.",
+                          "img": "/history/breeds/St-Hubert-Hound.jpg",
+                          "value": 0.99
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Rough water dogs",
+                      "note": "Shaggy, water-loving dogs for the wet work. Now extinct.",
+                      "img": "/history/breeds/rough-water-dogs.jpg",
+                      "value": 2.0625
                     }
                   ]
                 }
@@ -22509,19 +23749,44 @@
                           "name": "Bloodhound",
                           "note": "Tracking power and a tremendous nose.",
                           "img": "/history/breeds/Medieval-Bloodhound.jpg",
-                          "value": 0.4725
+                          "value": 0.23625
                         },
                         {
                           "name": "Southern Hound",
                           "note": "Old deep-voiced scent-hound stock.",
                           "img": "/history/breeds/Southern-Hound.jpg",
-                          "value": 0.315
+                          "value": 0.1575
                         },
                         {
                           "name": "Rough water dogs",
                           "note": "Shaggy, water-loving dogs for the wet work. Now extinct.",
                           "img": "/history/breeds/rough-water-dogs.jpg",
-                          "value": 0.2625
+                          "value": 0.13125
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Otterhound",
+                      "note": "The web-footed otter-hunting hound, the water-working Tudor root of the water spaniels. A functional match, not documented descent. Now endangered.",
+                      "img": "/history/breeds/otterhound-photo.jpg",
+                      "children": [
+                        {
+                          "name": "Bloodhound",
+                          "note": "Tracking power and a tremendous nose.",
+                          "img": "/history/breeds/Medieval-Bloodhound.jpg",
+                          "value": 0.23625
+                        },
+                        {
+                          "name": "Southern Hound",
+                          "note": "Old deep-voiced scent-hound stock.",
+                          "img": "/history/breeds/Southern-Hound.jpg",
+                          "value": 0.1575
+                        },
+                        {
+                          "name": "Rough water dogs",
+                          "note": "Shaggy, water-loving dogs for the wet work. Now extinct.",
+                          "img": "/history/breeds/rough-water-dogs.jpg",
+                          "value": 0.13125
                         }
                       ]
                     }
@@ -22548,19 +23813,44 @@
                           "name": "Bloodhound",
                           "note": "Tracking power and a tremendous nose.",
                           "img": "/history/breeds/Medieval-Bloodhound.jpg",
-                          "value": 0.928125
+                          "value": 0.4640625
                         },
                         {
                           "name": "Southern Hound",
                           "note": "Old deep-voiced scent-hound stock.",
                           "img": "/history/breeds/Southern-Hound.jpg",
-                          "value": 0.61875
+                          "value": 0.309375
                         },
                         {
                           "name": "Rough water dogs",
                           "note": "Shaggy, water-loving dogs for the wet work. Now extinct.",
                           "img": "/history/breeds/rough-water-dogs.jpg",
-                          "value": 0.515625
+                          "value": 0.2578125
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Otterhound",
+                      "note": "The web-footed otter-hunting hound, the same water-working Tudor root, reached in parallel with the British water spaniels. Now endangered.",
+                      "img": "/history/breeds/otterhound-photo.jpg",
+                      "children": [
+                        {
+                          "name": "Bloodhound",
+                          "note": "Tracking power and a tremendous nose.",
+                          "img": "/history/breeds/Medieval-Bloodhound.jpg",
+                          "value": 0.4640625
+                        },
+                        {
+                          "name": "Southern Hound",
+                          "note": "Old deep-voiced scent-hound stock.",
+                          "img": "/history/breeds/Southern-Hound.jpg",
+                          "value": 0.309375
+                        },
+                        {
+                          "name": "Rough water dogs",
+                          "note": "Shaggy, water-loving dogs for the wet work. Now extinct.",
+                          "img": "/history/breeds/rough-water-dogs.jpg",
+                          "value": 0.2578125
                         }
                       ]
                     }
@@ -23170,13 +24460,13 @@
                       "name": "St Hubert Hound",
                       "note": "The abbey scent hound it descends from almost unchanged.",
                       "img": "/history/breeds/St-Hubert-Hound.jpg",
-                      "value": 3.51
+                      "value": 1.755
                     },
                     {
                       "name": "Old scenting hounds",
                       "note": "The heavy continental tracking hounds of the same line.",
                       "img": "/history/breeds/Old-scenting-hounds.jpg",
-                      "value": 2.34
+                      "value": 1.17
                     }
                   ]
                 },
@@ -23194,7 +24484,7 @@
                           "name": "St Hubert Hound",
                           "note": "The monks' scent hound brought over by the Normans.",
                           "img": "/history/breeds/St-Hubert-Hound.jpg",
-                          "value": 2.3399999999999994
+                          "value": 1.1699999999999997
                         },
                         {
                           "name": "Old scenting hounds",
@@ -23222,7 +24512,7 @@
                       "name": "St Hubert Hound",
                       "note": "The abbey scent hounds brought across the Channel.",
                       "img": "/history/breeds/St-Hubert-Hound.jpg",
-                      "value": 1.56
+                      "value": 0.78
                     }
                   ]
                 },
@@ -23230,7 +24520,85 @@
                   "name": "Rough water dogs",
                   "note": "Shaggy, water-loving dogs for the wet work. Now extinct.",
                   "img": "/history/breeds/rough-water-dogs.jpg",
-                  "value": 3.25
+                  "value": 1.625
+                }
+              ]
+            },
+            {
+              "name": "Otterhound",
+              "note": "The web-footed otter-hunting hound, the water-working Tudor root of the water spaniels. A functional match, not documented descent. Now endangered.",
+              "img": "/history/breeds/otterhound-photo.jpg",
+              "children": [
+                {
+                  "name": "Bloodhound",
+                  "note": "Tracking power and a tremendous nose.",
+                  "img": "/history/breeds/Medieval-Bloodhound.jpg",
+                  "children": [
+                    {
+                      "name": "St Hubert Hound",
+                      "note": "The abbey scent hound it descends from almost unchanged.",
+                      "img": "/history/breeds/St-Hubert-Hound.jpg",
+                      "value": 1.755
+                    },
+                    {
+                      "name": "Old scenting hounds",
+                      "note": "The heavy continental tracking hounds of the same line.",
+                      "img": "/history/breeds/Old-scenting-hounds.jpg",
+                      "value": 1.17
+                    }
+                  ]
+                },
+                {
+                  "name": "Southern Hound",
+                  "note": "Old deep-voiced scent-hound stock.",
+                  "img": "/history/breeds/Southern-Hound.jpg",
+                  "children": [
+                    {
+                      "name": "Talbot",
+                      "note": "The white Norman hound at its root.",
+                      "img": "/history/breeds/talbot-hound.jpg",
+                      "children": [
+                        {
+                          "name": "St Hubert Hound",
+                          "note": "The monks' scent hound brought over by the Normans.",
+                          "img": "/history/breeds/St-Hubert-Hound.jpg",
+                          "value": 1.1699999999999997
+                        },
+                        {
+                          "name": "Old scenting hounds",
+                          "note": "The tracking hounds of medieval lords.",
+                          "img": "/history/breeds/Old-scenting-hounds.jpg",
+                          "children": [
+                            {
+                              "name": "Celtic Scent Hound",
+                              "note": "Early Celtic tracking hound that followed game by scent, representing the roots of later European scent hounds. An extinct historical type.",
+                              "img": "/history/breeds/ancient-celtic-scent-hound.jpg",
+                              "value": 20
+                            },
+                            {
+                              "name": "Old scenting hounds",
+                              "note": "The tracking hounds of medieval lords.",
+                              "img": "/history/breeds/Old-scenting-hounds.jpg",
+                              "value": 20
+                            }
+                          ],
+                          "value": 0
+                        }
+                      ]
+                    },
+                    {
+                      "name": "St Hubert Hound",
+                      "note": "The abbey scent hounds brought across the Channel.",
+                      "img": "/history/breeds/St-Hubert-Hound.jpg",
+                      "value": 0.78
+                    }
+                  ]
+                },
+                {
+                  "name": "Rough water dogs",
+                  "note": "Shaggy, water-loving dogs for the wet work. Now extinct.",
+                  "img": "/history/breeds/rough-water-dogs.jpg",
+                  "value": 1.625
                 }
               ]
             }
@@ -23566,10 +24934,23 @@
                       ]
                     },
                     {
-                      "name": "Old British ratting terriers",
-                      "note": "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.",
-                      "img": "/history/breeds/Old-British-ratting-terriers.jpg",
-                      "value": 7.425
+                      "name": "Earth Dog",
+                      "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+                      "img": "/history/breeds/medieval-earth-dog.jpg",
+                      "children": [
+                        {
+                          "name": "Ancient Celtic earth dogs",
+                          "note": "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.",
+                          "img": "/history/breeds/ancient-celtic-earth-dog.jpg",
+                          "value": 4.08375
+                        },
+                        {
+                          "name": "Early badger hunting dogs",
+                          "note": "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
+                          "img": "/history/breeds/early-badger-hunting-dogs.jpg",
+                          "value": 3.34125
+                        }
+                      ]
                     }
                   ]
                 },
@@ -23598,10 +24979,23 @@
                       ]
                     },
                     {
-                      "name": "Earth and hunt terriers",
-                      "note": "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.",
-                      "img": "/history/breeds/Earth-and-hunt-terrier.jpg",
-                      "value": 4.95
+                      "name": "Earth Dog",
+                      "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+                      "img": "/history/breeds/medieval-earth-dog.jpg",
+                      "children": [
+                        {
+                          "name": "Ancient Celtic earth dogs",
+                          "note": "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.",
+                          "img": "/history/breeds/ancient-celtic-earth-dog.jpg",
+                          "value": 2.7225
+                        },
+                        {
+                          "name": "Early badger hunting dogs",
+                          "note": "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
+                          "img": "/history/breeds/early-badger-hunting-dogs.jpg",
+                          "value": 2.2275
+                        }
+                      ]
                     }
                   ]
                 }
@@ -23674,9 +25068,9 @@
                           "value": 1.65
                         },
                         {
-                          "name": "Old British ratting terriers",
-                          "note": "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.",
-                          "img": "/history/breeds/Old-British-ratting-terriers.jpg",
+                          "name": "Earth Dog",
+                          "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+                          "img": "/history/breeds/medieval-earth-dog.jpg",
                           "value": 1.65
                         }
                       ]
@@ -23693,9 +25087,9 @@
                           "value": 1.1
                         },
                         {
-                          "name": "Earth and hunt terriers",
-                          "note": "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.",
-                          "img": "/history/breeds/Earth-and-hunt-terrier.jpg",
+                          "name": "Earth Dog",
+                          "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+                          "img": "/history/breeds/medieval-earth-dog.jpg",
                           "value": 1.1
                         }
                       ]
@@ -23986,10 +25380,23 @@
                       ]
                     },
                     {
-                      "name": "Old British ratting terriers",
-                      "note": "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.",
-                      "img": "/history/breeds/Old-British-ratting-terriers.jpg",
-                      "value": 4.5
+                      "name": "Earth Dog",
+                      "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+                      "img": "/history/breeds/medieval-earth-dog.jpg",
+                      "children": [
+                        {
+                          "name": "Ancient Celtic earth dogs",
+                          "note": "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.",
+                          "img": "/history/breeds/ancient-celtic-earth-dog.jpg",
+                          "value": 2.475
+                        },
+                        {
+                          "name": "Early badger hunting dogs",
+                          "note": "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
+                          "img": "/history/breeds/early-badger-hunting-dogs.jpg",
+                          "value": 2.025
+                        }
+                      ]
                     }
                   ]
                 },
@@ -24018,10 +25425,23 @@
                       ]
                     },
                     {
-                      "name": "Earth and hunt terriers",
-                      "note": "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.",
-                      "img": "/history/breeds/Earth-and-hunt-terrier.jpg",
-                      "value": 3
+                      "name": "Earth Dog",
+                      "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+                      "img": "/history/breeds/medieval-earth-dog.jpg",
+                      "children": [
+                        {
+                          "name": "Ancient Celtic earth dogs",
+                          "note": "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.",
+                          "img": "/history/breeds/ancient-celtic-earth-dog.jpg",
+                          "value": 1.65
+                        },
+                        {
+                          "name": "Early badger hunting dogs",
+                          "note": "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
+                          "img": "/history/breeds/early-badger-hunting-dogs.jpg",
+                          "value": 1.35
+                        }
+                      ]
                     }
                   ]
                 }
@@ -24057,10 +25477,23 @@
                       ]
                     },
                     {
-                      "name": "Old British ratting terriers",
-                      "note": "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.",
-                      "img": "/history/breeds/Old-British-ratting-terriers.jpg",
-                      "value": 4.5
+                      "name": "Earth Dog",
+                      "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+                      "img": "/history/breeds/medieval-earth-dog.jpg",
+                      "children": [
+                        {
+                          "name": "Ancient Celtic earth dogs",
+                          "note": "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.",
+                          "img": "/history/breeds/ancient-celtic-earth-dog.jpg",
+                          "value": 2.475
+                        },
+                        {
+                          "name": "Early badger hunting dogs",
+                          "note": "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
+                          "img": "/history/breeds/early-badger-hunting-dogs.jpg",
+                          "value": 2.025
+                        }
+                      ]
                     }
                   ]
                 },
@@ -24089,10 +25522,23 @@
                       ]
                     },
                     {
-                      "name": "Earth and hunt terriers",
-                      "note": "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.",
-                      "img": "/history/breeds/Earth-and-hunt-terrier.jpg",
-                      "value": 3
+                      "name": "Earth Dog",
+                      "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+                      "img": "/history/breeds/medieval-earth-dog.jpg",
+                      "children": [
+                        {
+                          "name": "Ancient Celtic earth dogs",
+                          "note": "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.",
+                          "img": "/history/breeds/ancient-celtic-earth-dog.jpg",
+                          "value": 1.65
+                        },
+                        {
+                          "name": "Early badger hunting dogs",
+                          "note": "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
+                          "img": "/history/breeds/early-badger-hunting-dogs.jpg",
+                          "value": 1.35
+                        }
+                      ]
                     }
                   ]
                 }
@@ -25090,13 +26536,13 @@
                           "name": "St Hubert Hound",
                           "note": "The abbey scent hound it descends from almost unchanged.",
                           "img": "/history/breeds/St-Hubert-Hound.jpg",
-                          "value": 1.89
+                          "value": 0.945
                         },
                         {
                           "name": "Old scenting hounds",
                           "note": "The heavy continental tracking hounds of the same line.",
                           "img": "/history/breeds/Old-scenting-hounds.jpg",
-                          "value": 1.26
+                          "value": 0.63
                         }
                       ]
                     },
@@ -25109,13 +26555,13 @@
                           "name": "Talbot",
                           "note": "The white Norman hound at its root.",
                           "img": "/history/breeds/talbot-hound.jpg",
-                          "value": 1.26
+                          "value": 0.63
                         },
                         {
                           "name": "St Hubert Hound",
                           "note": "The abbey scent hounds brought across the Channel.",
                           "img": "/history/breeds/St-Hubert-Hound.jpg",
-                          "value": 0.84
+                          "value": 0.42
                         }
                       ]
                     },
@@ -25123,7 +26569,58 @@
                       "name": "Rough water dogs",
                       "note": "Shaggy, water-loving dogs for the wet work. Now extinct.",
                       "img": "/history/breeds/rough-water-dogs.jpg",
-                      "value": 1.75
+                      "value": 0.875
+                    }
+                  ]
+                },
+                {
+                  "name": "Otterhound",
+                  "note": "The web-footed otter-hunting hound, the water-working Tudor root of the water spaniels. A functional match, not documented descent. Now endangered.",
+                  "img": "/history/breeds/otterhound-photo.jpg",
+                  "children": [
+                    {
+                      "name": "Bloodhound",
+                      "note": "Tracking power and a tremendous nose.",
+                      "img": "/history/breeds/Medieval-Bloodhound.jpg",
+                      "children": [
+                        {
+                          "name": "St Hubert Hound",
+                          "note": "The abbey scent hound it descends from almost unchanged.",
+                          "img": "/history/breeds/St-Hubert-Hound.jpg",
+                          "value": 0.945
+                        },
+                        {
+                          "name": "Old scenting hounds",
+                          "note": "The heavy continental tracking hounds of the same line.",
+                          "img": "/history/breeds/Old-scenting-hounds.jpg",
+                          "value": 0.63
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Southern Hound",
+                      "note": "Old deep-voiced scent-hound stock.",
+                      "img": "/history/breeds/Southern-Hound.jpg",
+                      "children": [
+                        {
+                          "name": "Talbot",
+                          "note": "The white Norman hound at its root.",
+                          "img": "/history/breeds/talbot-hound.jpg",
+                          "value": 0.63
+                        },
+                        {
+                          "name": "St Hubert Hound",
+                          "note": "The abbey scent hounds brought across the Channel.",
+                          "img": "/history/breeds/St-Hubert-Hound.jpg",
+                          "value": 0.42
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Rough water dogs",
+                      "note": "Shaggy, water-loving dogs for the wet work. Now extinct.",
+                      "img": "/history/breeds/rough-water-dogs.jpg",
+                      "value": 0.875
                     }
                   ]
                 }
@@ -25155,13 +26652,13 @@
                           "name": "St Hubert Hound",
                           "note": "The abbey scent hound it descends from almost unchanged.",
                           "img": "/history/breeds/St-Hubert-Hound.jpg",
-                          "value": 3.7125
+                          "value": 1.85625
                         },
                         {
                           "name": "Old scenting hounds",
                           "note": "The heavy continental tracking hounds of the same line.",
                           "img": "/history/breeds/Old-scenting-hounds.jpg",
-                          "value": 2.475
+                          "value": 1.2375
                         }
                       ]
                     },
@@ -25174,13 +26671,13 @@
                           "name": "Talbot",
                           "note": "The white Norman hound at its root.",
                           "img": "/history/breeds/talbot-hound.jpg",
-                          "value": 2.475
+                          "value": 1.2375
                         },
                         {
                           "name": "St Hubert Hound",
                           "note": "The abbey scent hounds brought across the Channel.",
                           "img": "/history/breeds/St-Hubert-Hound.jpg",
-                          "value": 1.65
+                          "value": 0.825
                         }
                       ]
                     },
@@ -25188,7 +26685,58 @@
                       "name": "Rough water dogs",
                       "note": "Shaggy, water-loving dogs for the wet work. Now extinct.",
                       "img": "/history/breeds/rough-water-dogs.jpg",
-                      "value": 3.4375
+                      "value": 1.71875
+                    }
+                  ]
+                },
+                {
+                  "name": "Otterhound",
+                  "note": "The web-footed otter-hunting hound, the same water-working Tudor root, reached in parallel with the British water spaniels. Now endangered.",
+                  "img": "/history/breeds/otterhound-photo.jpg",
+                  "children": [
+                    {
+                      "name": "Bloodhound",
+                      "note": "Tracking power and a tremendous nose.",
+                      "img": "/history/breeds/Medieval-Bloodhound.jpg",
+                      "children": [
+                        {
+                          "name": "St Hubert Hound",
+                          "note": "The abbey scent hound it descends from almost unchanged.",
+                          "img": "/history/breeds/St-Hubert-Hound.jpg",
+                          "value": 1.85625
+                        },
+                        {
+                          "name": "Old scenting hounds",
+                          "note": "The heavy continental tracking hounds of the same line.",
+                          "img": "/history/breeds/Old-scenting-hounds.jpg",
+                          "value": 1.2375
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Southern Hound",
+                      "note": "Old deep-voiced scent-hound stock.",
+                      "img": "/history/breeds/Southern-Hound.jpg",
+                      "children": [
+                        {
+                          "name": "Talbot",
+                          "note": "The white Norman hound at its root.",
+                          "img": "/history/breeds/talbot-hound.jpg",
+                          "value": 1.2375
+                        },
+                        {
+                          "name": "St Hubert Hound",
+                          "note": "The abbey scent hounds brought across the Channel.",
+                          "img": "/history/breeds/St-Hubert-Hound.jpg",
+                          "value": 0.825
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Rough water dogs",
+                      "note": "Shaggy, water-loving dogs for the wet work. Now extinct.",
+                      "img": "/history/breeds/rough-water-dogs.jpg",
+                      "value": 1.71875
                     }
                   ]
                 }

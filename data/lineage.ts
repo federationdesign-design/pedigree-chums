@@ -1047,22 +1047,40 @@ const LINEAGE: Record<string, LineageNode> = {
     // Water spaniels branch here, so it reads as green. Its dominant 55% St John's
     // water-dog line still dead-ends until Family 5, which traces its principal
     // ancestry. A green Labrador does NOT mean its main line is finished.
+    // 19 August 2026: display device. The single documented ancestor below is
+    // drawn twice, as two identical children at 50 each (same note and img), so
+    // the level shows two circles rather than one filling the ring. The children
+    // differ in name from the parent, so isEcho, the pit words and the badge
+    // paths do not touch them. This must NOT be read as two separate ancestors.
     children: [
-      { name: "Otterhound", note: "The web-footed otter-hunting hound, the water-working Tudor root of the water spaniels. A functional match, not documented descent. Now endangered.", img: "/history/breeds/otterhound-photo.jpg", value: 100 }
+      { name: "Otterhound", note: "The web-footed otter-hunting hound, the water-working Tudor root of the water spaniels. A functional match, not documented descent. Now endangered.", img: "/history/breeds/otterhound-photo.jpg", value: 50 },
+      { name: "Otterhound", note: "The web-footed otter-hunting hound, the water-working Tudor root of the water spaniels. A functional match, not documented descent. Now endangered.", img: "/history/breeds/otterhound-photo.jpg", value: 50 }
     ]
   },
   "Old Irish water dogs": {
     name: "Old Irish water dogs",
     note: "The southern and northern water spaniels of Ireland. Now extinct.",
+    // 19 August 2026: display device. The single documented ancestor below is
+    // drawn twice, as two identical children at 50 each (same note and img), so
+    // the level shows two circles rather than one filling the ring. The children
+    // differ in name from the parent, so isEcho, the pit words and the badge
+    // paths do not touch them. This must NOT be read as two separate ancestors.
     children: [
-      { name: "Otterhound", note: "The web-footed otter-hunting hound, the same water-working Tudor root, reached in parallel with the British water spaniels. Now endangered.", img: "/history/breeds/otterhound-photo.jpg", value: 100 }
+      { name: "Otterhound", note: "The web-footed otter-hunting hound, the same water-working Tudor root, reached in parallel with the British water spaniels. Now endangered.", img: "/history/breeds/otterhound-photo.jpg", value: 50 },
+      { name: "Otterhound", note: "The web-footed otter-hunting hound, the same water-working Tudor root, reached in parallel with the British water spaniels. Now endangered.", img: "/history/breeds/otterhound-photo.jpg", value: 50 }
     ]
   },
   "English Water Spaniel": {
     name: "English Water Spaniel",
     note: "The extinct native English water spaniel, a working water dog of the fens and rivers. Now extinct.",
+    // 19 August 2026: display device. The single documented ancestor below is
+    // drawn twice, as two identical children at 50 each (same note and img), so
+    // the level shows two circles rather than one filling the ring. The children
+    // differ in name from the parent, so isEcho, the pit words and the badge
+    // paths do not touch them. This must NOT be read as two separate ancestors.
     children: [
-      { name: "Water spaniels", note: "The broad old British water-spaniel population it came from. Now extinct.", img: "/history/breeds/original-water-spaniel.jpg", value: 100 }
+      { name: "Water spaniels", note: "The broad old British water-spaniel population it came from. Now extinct.", img: "/history/breeds/original-water-spaniel.jpg", value: 50 },
+      { name: "Water spaniels", note: "The broad old British water-spaniel population it came from. Now extinct.", img: "/history/breeds/original-water-spaniel.jpg", value: 50 }
     ]
   },
 
@@ -1364,25 +1382,43 @@ const LINEAGE: Record<string, LineageNode> = {
   "Old Highland terriers": {
     name: "Old Highland terriers",
     note: "The old working-terrier stock of the Highlands that every Scottish terrier springs from. Now extinct.",
+    // 19 August 2026: display device. The single documented ancestor (Earth Dog)
+    // is drawn twice, as two identical children at 50 each (same note and img),
+    // so the level shows two circles rather than one filling the ring. The
+    // children differ in name from the parent, so isEcho, the pit words and the
+    // badge paths do not touch them. This must NOT be read as two separate
+    // ancestors.
     children: [
-      { name: "Earth Dog", note: "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.", img: "/history/breeds/medieval-earth-dog.jpg", value: 30 },
-      { name: "Old Highland terriers", note: "The old working-terrier stock of the Highlands that every Scottish terrier springs from. Now extinct.", img: "/history/breeds/Old-Highland-terriers.jpg", value: 30 },
+      { name: "Earth Dog", note: "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.", img: "/history/breeds/medieval-earth-dog.jpg", value: 50 },
+      { name: "Earth Dog", note: "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.", img: "/history/breeds/medieval-earth-dog.jpg", value: 50 }
     ],
   },
   "Old British ratting terriers": {
     name: "Old British ratting terriers",
     note: "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.",
+    // 19 August 2026: display device. The single documented ancestor (Earth Dog)
+    // is drawn twice, as two identical children at 50 each (same note and img),
+    // so the level shows two circles rather than one filling the ring. The
+    // children differ in name from the parent, so isEcho, the pit words and the
+    // badge paths do not touch them. This must NOT be read as two separate
+    // ancestors.
     children: [
-      { name: "Earth Dog", note: "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.", img: "/history/breeds/medieval-earth-dog.jpg", value: 30 },
-      { name: "Old British ratting terriers", note: "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.", img: "/history/breeds/Old-British-ratting-terriers.jpg", value: 30 },
+      { name: "Earth Dog", note: "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.", img: "/history/breeds/medieval-earth-dog.jpg", value: 50 },
+      { name: "Earth Dog", note: "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.", img: "/history/breeds/medieval-earth-dog.jpg", value: 50 }
     ],
   },
   "Earth and hunt terriers": {
     name: "Earth and hunt terriers",
     note: "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.",
+    // 19 August 2026: display device. The single documented ancestor (Earth Dog)
+    // is drawn twice, as two identical children at 50 each (same note and img),
+    // so the level shows two circles rather than one filling the ring. The
+    // children differ in name from the parent, so isEcho, the pit words and the
+    // badge paths do not touch them. This must NOT be read as two separate
+    // ancestors.
     children: [
-      { name: "Earth Dog", note: "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.", img: "/history/breeds/medieval-earth-dog.jpg", value: 20 },
-      { name: "Earth and hunt terriers", note: "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.", img: "/history/breeds/Earth-and-hunt-terrier.jpg", value: 20 },
+      { name: "Earth Dog", note: "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.", img: "/history/breeds/medieval-earth-dog.jpg", value: 50 },
+      { name: "Earth Dog", note: "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.", img: "/history/breeds/medieval-earth-dog.jpg", value: 50 }
     ],
   },
   // Playable like the two ancient additions above (owner instruction,
@@ -1774,15 +1810,27 @@ const LINEAGE: Record<string, LineageNode> = {
   "Old toy spaniels": {
     name: "Old toy spaniels",
     note: "The small sporting and lap spaniels of Tudor and Stuart England. Now extinct.",
+    // 19 August 2026: display device. The single documented ancestor below is
+    // drawn twice, as two identical children at 50 each (same note and img), so
+    // the level shows two circles rather than one filling the ring. The children
+    // differ in name from the parent, so isEcho, the pit words and the badge
+    // paths do not touch them. This must NOT be read as two separate ancestors.
     children: [
-      { name: "Land spaniels", note: "The old sporting land-spaniel stock the court toy spaniels were bred down from. Now extinct.", img: "/history/breeds/original-land-spaniel.jpg", value: 100 }
+      { name: "Land spaniels", note: "The old sporting land-spaniel stock the court toy spaniels were bred down from. Now extinct.", img: "/history/breeds/original-land-spaniel.jpg", value: 50 },
+      { name: "Land spaniels", note: "The old sporting land-spaniel stock the court toy spaniels were bred down from. Now extinct.", img: "/history/breeds/original-land-spaniel.jpg", value: 50 }
     ]
   },
   "Old sporting toy spaniels": {
     name: "Old sporting toy spaniels",
     note: "The longer-muzzled toy spaniels of the older paintings. Now extinct.",
+    // 19 August 2026: display device. The single documented ancestor below is
+    // drawn twice, as two identical children at 50 each (same note and img), so
+    // the level shows two circles rather than one filling the ring. The children
+    // differ in name from the parent, so isEcho, the pit words and the badge
+    // paths do not touch them. This must NOT be read as two separate ancestors.
     children: [
-      { name: "Land spaniels", note: "The old sporting land-spaniel stock behind the toy spaniels. Now extinct.", img: "/history/breeds/original-land-spaniel.jpg", value: 100 }
+      { name: "Land spaniels", note: "The old sporting land-spaniel stock behind the toy spaniels. Now extinct.", img: "/history/breeds/original-land-spaniel.jpg", value: 50 },
+      { name: "Land spaniels", note: "The old sporting land-spaniel stock behind the toy spaniels. Now extinct.", img: "/history/breeds/original-land-spaniel.jpg", value: 50 }
     ]
   },
   "Asian flat-faced toys": {
