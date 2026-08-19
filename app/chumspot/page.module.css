@@ -73,7 +73,7 @@
 }
 .heroTitle {
   font-family: var(--font-display, "Luckiest Guy", system-ui);
-  font-size: clamp(3.58rem, 8.5vw, 7.38rem); /* +3pt more (cumulative +7pt from 6.8rem); was clamp(3.33rem, 8.5vw, 7.13rem) (Steve, 19 Aug 2026) */
+  font-size: clamp(3.75rem, 8.5vw, 7.55rem); /* +2pt more (cumulative +9pt from 6.8rem); was clamp(3.58rem, 8.5vw, 7.38rem) (Steve, 19 Aug 2026) */
   line-height: 0.95;
   color: var(--yellow, #ffd23e);
   margin: 0 0 clamp(6px, 1vw, 12px);
@@ -123,7 +123,8 @@
   font-weight: 600;
   color: #000000; /* prose on gradient -> black, WCAG 1.4.3 (Steve, 12 Aug 2026) */
   line-height: 1.3em;
-  margin: 50px 0 clamp(16px, 2vw, 24px);
+  max-width: 80%; /* 80% of the content container, centred (Steve, 19 Aug 2026) */
+  margin: 50px auto clamp(16px, 2vw, 24px);
 }
 .inner p:not(.lead):not(.ageNote):not(.closingDate):not(.contactNote):not(.hashtags):not(.termBody):not(.introPara):not(.prizeIntro) {
   font-size: clamp(0.95rem, 1.6vw, 1.1rem);
@@ -142,7 +143,8 @@
   font-size: clamp(28px, 3.6vw, 36px);
   color: #000000; /* prose on gradient -> black, WCAG 1.4.3 */
   line-height: 1.3em;
-  margin: 0 0 clamp(10px, 1.5vw, 16px);
+  max-width: 80%; /* 80% of the content container, centred (Steve, 19 Aug 2026) */
+  margin: 0 auto clamp(10px, 1.5vw, 16px);
 }
 /* Prize "One winner..." intro paragraph, doubled. Excluded from the generic
    .inner p rule above (which outranks it via its :not() chain), so it fully
@@ -338,7 +340,10 @@
 }
 
 /* ── Full Terms ──────────────────────────────────────────────────────────── */
-.termsSection { background: rgba(10,58,87,0.2); }
+.termsSection { background: #0a3a57; } /* fully solid navy, was rgba(10,58,87,0.2) (Steve, 19 Aug 2026) */
+/* 50px of space above the "Spot your Chum: Full Competition Terms" title inside
+   its container (Steve, 19 Aug 2026). */
+.termsSection .inner { padding-top: 50px; }
 .termsSectionTitle {
   font-family: var(--font-display, "Luckiest Guy", system-ui);
   font-size: clamp(3.2rem, 7vw, 5.6rem); /* doubled from clamp(1.6rem, 3.5vw, 2.8rem) (Steve, 19 Aug 2026) */
@@ -408,6 +413,8 @@
 }
 
 /* ── Prize two-col with video ────────────────────────────────────────────── */
+/* 50px of space above the "The prize" title inside the blue panel (Steve, 19 Aug 2026). */
+.prizeSection .inner { padding-top: 50px; }
 .prizeCols {
   display: grid;
   grid-template-columns: clamp(160px, 22%, 280px) 1fr;
@@ -417,7 +424,7 @@
 }
 .prizeVideo {
   width: 100%;
-  min-height: 200px;
+  min-height: 400px; /* doubled height only; column width unchanged so the prize text column is not squeezed (Steve, 19 Aug 2026) */
   border-radius: 16px;
   display: block;
   object-fit: cover;
@@ -427,19 +434,22 @@
 /* ── Two-col: What/Ready side by side ───────────────────────────────────── */
 .whatReadyCols {
   display: grid;
-  /* Single column at all widths so the doubled H2s ("What are we looking for?",
-     "Ready to join the pack?") get the full content width and cannot overflow a
-     half-width column. Was 1fr 1fr with a 720px collapse (Steve, 19 Aug 2026). */
-  grid-template-columns: 1fr;
+  /* Two columns again (reverted from the single-column fix). The H2s keep the
+     smaller clamp(4.38rem, 11vw, 8.58rem) size below, but at 1280px that is still
+     ~137px and the longest word ("looking") is wider than the ~539px half-column,
+     so this DOES overflow between roughly 769px and ~1600px; it reads clean only
+     at ~1600px+ (Steve's call, 19 Aug 2026). */
+  grid-template-columns: 1fr 1fr;
   gap: clamp(24px, 4vw, 48px);
   align-items: start;
   padding-top: 50px;
 }
 .whatReadyCols .sectionTitle { text-align: left; }
-/* "What are we looking for?" / "Ready to join the pack?" down 5pt (~0.42rem)
-   from the doubled .sectionTitle, so they sit a touch below How-to-enter and
-   The-prize. Scoped here so only these two move (Steve, 19 Aug 2026). */
+/* "What are we looking for?" / "Ready to join the pack?" stay 5pt (~0.42rem)
+   below the doubled .sectionTitle used by How-to-enter and The-prize. Scoped here
+   so only these two move (Steve, 19 Aug 2026). */
 .whatReadyCols .sectionTitle { font-size: clamp(4.38rem, 11vw, 8.58rem); }
+@media (max-width: 720px) { .whatReadyCols { grid-template-columns: 1fr; } }
 
 .termList {
   padding-left: 18px;
