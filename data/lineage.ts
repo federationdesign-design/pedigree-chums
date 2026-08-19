@@ -509,12 +509,17 @@ const LINEAGE: Record<string, LineageNode> = {
     // nothing real to add. Two folklore candidates were rejected as discredited
     // (both already removed from this project): the Viking herding spitz (given
     // as a Scotch Collie ancestor) and the Polish Lowland Sheepdog (the Bearded
-    // Collie 1514 story). Do not redo this search and reach for either. The node
-    // carries no value of its own; the repeat below (its own note and img, value
-    // 50) makes the node's ring render instead of the single child filling it.
+    // Collie 1514 story). Do not redo this search and reach for either.
+    //
+    // 19 August 2026: display device. The single documented ancestor (Shepherd's
+    // Dog) is drawn twice, as two identical children at 50 each (same note and
+    // img), so the level shows two circles rather than one filling the ring. The
+    // children differ in name from the parent, so isEcho, the pit words and the
+    // badge paths do not touch them. This must NOT be read as two separate
+    // ancestors.
     children: [
       { name: "Shepherd's Dog", note: "The medieval British herding dog, the Sheepdog or Colley that Caius wrote of in 1576. Chaucer's black-faced 'Coll' or 'Coaly' of the 1300s gives the name: Coaly became Colley became Collie. Now extinct.", img: "/history/breeds/medieval-shepherds-dog.jpg", value: 50 },
-      { name: "Old working collies", note: "The old northern hill-collie landrace of Scotland and the borders, the shared working stock the Rough, Smooth and Border collies all grew from. Now extinct.", img: "/history/breeds/Old-working-collies-cluster.jpg", value: 50 }
+      { name: "Shepherd's Dog", note: "The medieval British herding dog, the Sheepdog or Colley that Caius wrote of in 1576. Chaucer's black-faced 'Coll' or 'Coaly' of the 1300s gives the name: Coaly became Colley became Collie. Now extinct.", img: "/history/breeds/medieval-shepherds-dog.jpg", value: 50 }
     ]
   },
   "Old Scotch Collie": {
@@ -526,12 +531,17 @@ const LINEAGE: Record<string, LineageNode> = {
     // nothing real to add. Two folklore candidates were rejected as discredited
     // (both already removed from this project): the Viking herding spitz (given
     // as a Scotch Collie ancestor) and the Polish Lowland Sheepdog (the Bearded
-    // Collie 1514 story). Do not redo this search and reach for either. The node
-    // carries no value of its own; the repeat below (its own note and img, value
-    // 50) makes the node's ring render instead of the single child filling it.
+    // Collie 1514 story). Do not redo this search and reach for either.
+    //
+    // 19 August 2026: display device. The single documented ancestor (Old working
+    // collies) is drawn twice, as two identical children at 50 each (same note
+    // and img), so the level shows two circles rather than one filling the ring.
+    // The children differ in name from the parent, so isEcho, the pit words and
+    // the badge paths do not touch them. This must NOT be read as two separate
+    // ancestors.
     children: [
       { name: "Old working collies", note: "The shared old hill-collie landrace it grew from. Now extinct.", img: "/history/breeds/Old-working-collies-cluster.jpg", value: 50 },
-      { name: "Old Scotch Collie", note: "The old Scottish shepherd's collie, the pre-show hill-herding landrace that fed the working border strain long before it had a name. Now extinct.", img: "/history/breeds/Old-Scotch-Collie.jpg", value: 50 }
+      { name: "Old working collies", note: "The shared old hill-collie landrace it grew from. Now extinct.", img: "/history/breeds/Old-working-collies-cluster.jpg", value: 50 }
     ]
   },
   "Old hill and bearded collies": {
@@ -543,12 +553,17 @@ const LINEAGE: Record<string, LineageNode> = {
     // nothing real to add. Two folklore candidates were rejected as discredited
     // (both already removed from this project): the Viking herding spitz (given
     // as a Scotch Collie ancestor) and the Polish Lowland Sheepdog (the Bearded
-    // Collie 1514 story). Do not redo this search and reach for either. The node
-    // carries no value of its own; the repeat below (its own note and img, value
-    // 50) makes the node's ring render instead of the single child filling it.
+    // Collie 1514 story). Do not redo this search and reach for either.
+    //
+    // 19 August 2026: display device. The single documented ancestor (Old working
+    // collies) is drawn twice, as two identical children at 50 each (same note
+    // and img), so the level shows two circles rather than one filling the ring.
+    // The children differ in name from the parent, so isEcho, the pit words and
+    // the badge paths do not touch them. This must NOT be read as two separate
+    // ancestors.
     children: [
       { name: "Old working collies", note: "The shared old hill-collie landrace of the same family. Now extinct.", img: "/history/breeds/Old-working-collies-cluster.jpg", value: 50 },
-      { name: "Old hill and bearded collies", note: "Shaggy upland herding dogs of the same collie family. Now extinct.", img: "/history/breeds/old-hill-and-bearded-collies.jpg", value: 50 }
+      { name: "Old working collies", note: "The shared old hill-collie landrace of the same family. Now extinct.", img: "/history/breeds/Old-working-collies-cluster.jpg", value: 50 }
     ]
   },
   "Old Cumberland herding dogs": {
@@ -560,12 +575,17 @@ const LINEAGE: Record<string, LineageNode> = {
     // nothing real to add. Two folklore candidates were rejected as discredited
     // (both already removed from this project): the Viking herding spitz (given
     // as a Scotch Collie ancestor) and the Polish Lowland Sheepdog (the Bearded
-    // Collie 1514 story). Do not redo this search and reach for either. The node
-    // carries no value of its own; the repeat below (its own note and img, value
-    // 50) makes the node's ring render instead of the single child filling it.
+    // Collie 1514 story). Do not redo this search and reach for either.
+    //
+    // 19 August 2026: display device. The single documented ancestor (Old working
+    // collies) is drawn twice, as two identical children at 50 each (same note
+    // and img), so the level shows two circles rather than one filling the ring.
+    // The children differ in name from the parent, so isEcho, the pit words and
+    // the badge paths do not touch them. This must NOT be read as two separate
+    // ancestors.
     children: [
       { name: "Old working collies", note: "The shared old hill-collie landrace of the border country. Now extinct.", img: "/history/breeds/Old-working-collies-cluster.jpg", value: 50 },
-      { name: "Old Cumberland herding dogs", note: "Northern English herding dogs from the same border country. Now extinct.", img: "/history/breeds/cumberland-sheepdog-photo.jpg", value: 50 }
+      { name: "Old working collies", note: "The shared old hill-collie landrace of the border country. Now extinct.", img: "/history/breeds/Old-working-collies-cluster.jpg", value: 50 }
     ]
   },
   "Welsh herding dogs": {
@@ -724,8 +744,15 @@ const LINEAGE: Record<string, LineageNode> = {
     // not be its own child, and it leaked into the render's name paths; the level
     // root now carries its own name on the outer ring, so the node returns to its
     // single real parent below.
+    //
+    // 19 August 2026: display device. The single documented ancestor below is
+    // drawn twice, as two identical children at 50 each (same note and img), so
+    // the level shows two circles rather than one filling the ring. The children
+    // differ in name from the parent, so isEcho, the pit words and the badge
+    // paths do not touch them. This must NOT be read as two separate ancestors.
     children: [
-      { name: "Earth Dog", note: "The old low, earth-working dog type behind these short-legged glen dogs. Now extinct.", img: "/history/breeds/medieval-earth-dog.jpg", value: 100 }
+      { name: "Earth Dog", note: "The old low, earth-working dog type behind these short-legged glen dogs. Now extinct.", img: "/history/breeds/medieval-earth-dog.jpg", value: 50 },
+      { name: "Earth Dog", note: "The old low, earth-working dog type behind these short-legged glen dogs. Now extinct.", img: "/history/breeds/medieval-earth-dog.jpg", value: 50 }
     ]
   },
   "Native Irish terriers": {
@@ -743,8 +770,15 @@ const LINEAGE: Record<string, LineageNode> = {
     // not be its own child, and it leaked into the render's name paths; the level
     // root now carries its own name on the outer ring, so the node returns to its
     // single real parent below.
+    //
+    // 19 August 2026: display device. The single documented ancestor below is
+    // drawn twice, as two identical children at 50 each (same note and img), so
+    // the level shows two circles rather than one filling the ring. The children
+    // differ in name from the parent, so isEcho, the pit words and the badge
+    // paths do not touch them. This must NOT be read as two separate ancestors.
     children: [
-      { name: "Old English Black and Tan Terrier", note: "The old British black-and-tan working terrier, the shared ratting stock behind Britain and Ireland's farm terriers. Now extinct.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 100 }
+      { name: "Old English Black and Tan Terrier", note: "The old British black-and-tan working terrier, the shared ratting stock behind Britain and Ireland's farm terriers. Now extinct.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 50 },
+      { name: "Old English Black and Tan Terrier", note: "The old British black-and-tan working terrier, the shared ratting stock behind Britain and Ireland's farm terriers. Now extinct.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 50 }
     ]
   },
   "Old fell terriers": {
@@ -761,8 +795,15 @@ const LINEAGE: Record<string, LineageNode> = {
     // not be its own child, and it leaked into the render's name paths; the level
     // root now carries its own name on the outer ring, so the node returns to its
     // single real parent below.
+    //
+    // 19 August 2026: display device. The single documented ancestor below is
+    // drawn twice, as two identical children at 50 each (same note and img), so
+    // the level shows two circles rather than one filling the ring. The children
+    // differ in name from the parent, so isEcho, the pit words and the badge
+    // paths do not touch them. This must NOT be read as two separate ancestors.
     children: [
-      { name: "Old English Black and Tan Terrier", note: "The old black-and-tan working terrier stock the fell terriers were bred from. Now extinct.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 100 }
+      { name: "Old English Black and Tan Terrier", note: "The old black-and-tan working terrier stock the fell terriers were bred from. Now extinct.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 50 },
+      { name: "Old English Black and Tan Terrier", note: "The old black-and-tan working terrier stock the fell terriers were bred from. Now extinct.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 50 }
     ]
   },
 
@@ -820,8 +861,15 @@ const LINEAGE: Record<string, LineageNode> = {
     // not be its own child, and it leaked into the render's name paths; the level
     // root now carries its own name on the outer ring, so the node returns to its
     // single real parent below.
+    //
+    // 19 August 2026: display device. The single documented ancestor below is
+    // drawn twice, as two identical children at 50 each (same note and img), so
+    // the level shows two circles rather than one filling the ring. The children
+    // differ in name from the parent, so isEcho, the pit words and the badge
+    // paths do not touch them. This must NOT be read as two separate ancestors.
     children: [
-      { name: "Old English Black and Tan Terrier", note: "The black-and-tan working stock the white terriers were selected out of, for coat colour. Now extinct.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 100 }
+      { name: "Old English Black and Tan Terrier", note: "The black-and-tan working stock the white terriers were selected out of, for coat colour. Now extinct.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 50 },
+      { name: "Old English Black and Tan Terrier", note: "The black-and-tan working stock the white terriers were selected out of, for coat colour. Now extinct.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 50 }
     ]
   },
 
@@ -924,8 +972,15 @@ const LINEAGE: Record<string, LineageNode> = {
     // not be its own child, and it leaked into the render's name paths; the level
     // root now carries its own name on the outer ring, so the node returns to its
     // single real parent below.
+    //
+    // 19 August 2026: display device. The single documented ancestor below is
+    // drawn twice, as two identical children at 50 each (same note and img), so
+    // the level shows two circles rather than one filling the ring. The children
+    // differ in name from the parent, so isEcho, the pit words and the badge
+    // paths do not touch them. This must NOT be read as two separate ancestors.
     children: [
-      { name: "Native Irish terriers", note: "Ireland's old all-purpose working farm terriers. Now extinct.", img: "/history/breeds/native-irish-terriers.jpg", value: 100 }
+      { name: "Native Irish terriers", note: "Ireland's old all-purpose working farm terriers. Now extinct.", img: "/history/breeds/native-irish-terriers.jpg", value: 50 },
+      { name: "Native Irish terriers", note: "Ireland's old all-purpose working farm terriers. Now extinct.", img: "/history/breeds/native-irish-terriers.jpg", value: 50 }
     ]
   },
 
@@ -1460,11 +1515,18 @@ const LINEAGE: Record<string, LineageNode> = {
   // on 19 August 2026 (a node should not be its own child, and it leaked into the
   // render's name paths). The level root now carries its own name on the outer
   // ring, so it returns to the single Old mastiffs of the ancient East parent.
+  //
+  // 19 August 2026: display device. The single documented ancestor below is
+  // drawn twice, as two identical children at 50 each (same note and img), so
+  // the level shows two circles rather than one filling the ring. The children
+  // differ in name from the parent, so isEcho, the pit words and the badge paths
+  // do not touch them. This must NOT be read as two separate ancestors.
   "Ancient Molossers": {
     name: "Ancient Molossers",
     note: "The huge eastern war and guard dogs at the root of every mastiff. Now extinct.",
     children: [
-      { name: "Old mastiffs of the ancient East", note: "The huge guard and hunting mastiffs of the ancient East, carved on palace walls thousands of years ago. Now extinct.", img: "/history/breeds/old-mastiffs-of-the-ancient-east.jpg", value: 100 }
+      { name: "Old mastiffs of the ancient East", note: "The huge guard and hunting mastiffs of the ancient East, carved on palace walls thousands of years ago. Now extinct.", img: "/history/breeds/old-mastiffs-of-the-ancient-east.jpg", value: 50 },
+      { name: "Old mastiffs of the ancient East", note: "The huge guard and hunting mastiffs of the ancient East, carved on palace walls thousands of years ago. Now extinct.", img: "/history/breeds/old-mastiffs-of-the-ancient-east.jpg", value: 50 }
     ]
   },
 

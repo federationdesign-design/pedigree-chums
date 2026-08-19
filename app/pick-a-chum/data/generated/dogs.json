@@ -272,7 +272,13 @@
               "name": "Old mastiffs of the ancient East",
               "note": "The huge guard and hunting mastiffs of the ancient East, carved on palace walls thousands of years ago. Now extinct.",
               "img": "/history/breeds/old-mastiffs-of-the-ancient-east.jpg",
-              "value": 40
+              "value": 20
+            },
+            {
+              "name": "Old mastiffs of the ancient East",
+              "note": "The huge guard and hunting mastiffs of the ancient East, carved on palace walls thousands of years ago. Now extinct.",
+              "img": "/history/breeds/old-mastiffs-of-the-ancient-east.jpg",
+              "value": 20
             }
           ]
         }
@@ -804,7 +810,13 @@
               "name": "Old mastiffs of the ancient East",
               "note": "The huge guard and hunting mastiffs of the ancient East, carved on palace walls thousands of years ago. Now extinct.",
               "img": "/history/breeds/old-mastiffs-of-the-ancient-east.jpg",
-              "value": 60
+              "value": 30
+            },
+            {
+              "name": "Old mastiffs of the ancient East",
+              "note": "The huge guard and hunting mastiffs of the ancient East, carved on palace walls thousands of years ago. Now extinct.",
+              "img": "/history/breeds/old-mastiffs-of-the-ancient-east.jpg",
+              "value": 30
             }
           ]
         },
@@ -1151,7 +1163,13 @@
                   "name": "Old mastiffs of the ancient East",
                   "note": "The huge guard and hunting mastiffs of the ancient East, carved on palace walls thousands of years ago. Now extinct.",
                   "img": "/history/breeds/old-mastiffs-of-the-ancient-east.jpg",
-                  "value": 15
+                  "value": 7.5
+                },
+                {
+                  "name": "Old mastiffs of the ancient East",
+                  "note": "The huge guard and hunting mastiffs of the ancient East, carved on palace walls thousands of years ago. Now extinct.",
+                  "img": "/history/breeds/old-mastiffs-of-the-ancient-east.jpg",
+                  "value": 7.5
                 }
               ]
             },
@@ -1293,7 +1311,13 @@
                   "name": "Old mastiffs of the ancient East",
                   "note": "The huge guard and hunting mastiffs of the ancient East, carved on palace walls thousands of years ago. Now extinct.",
                   "img": "/history/breeds/old-mastiffs-of-the-ancient-east.jpg",
-                  "value": 12
+                  "value": 6
+                },
+                {
+                  "name": "Old mastiffs of the ancient East",
+                  "note": "The huge guard and hunting mastiffs of the ancient East, carved on palace walls thousands of years ago. Now extinct.",
+                  "img": "/history/breeds/old-mastiffs-of-the-ancient-east.jpg",
+                  "value": 6
                 }
               ]
             }
@@ -1726,7 +1750,13 @@
                       "name": "Old mastiffs of the ancient East",
                       "note": "The huge guard and hunting mastiffs of the ancient East, carved on palace walls thousands of years ago. Now extinct.",
                       "img": "/history/breeds/old-mastiffs-of-the-ancient-east.jpg",
-                      "value": 6.75
+                      "value": 3.375
+                    },
+                    {
+                      "name": "Old mastiffs of the ancient East",
+                      "note": "The huge guard and hunting mastiffs of the ancient East, carved on palace walls thousands of years ago. Now extinct.",
+                      "img": "/history/breeds/old-mastiffs-of-the-ancient-east.jpg",
+                      "value": 3.375
                     }
                   ]
                 },
@@ -2820,7 +2850,13 @@
               "name": "Old mastiffs of the ancient East",
               "note": "The huge guard and hunting mastiffs of the ancient East, carved on palace walls thousands of years ago. Now extinct.",
               "img": "/history/breeds/old-mastiffs-of-the-ancient-east.jpg",
-              "value": 20
+              "value": 10
+            },
+            {
+              "name": "Old mastiffs of the ancient East",
+              "note": "The huge guard and hunting mastiffs of the ancient East, carved on palace walls thousands of years ago. Now extinct.",
+              "img": "/history/breeds/old-mastiffs-of-the-ancient-east.jpg",
+              "value": 10
             }
           ]
         }
@@ -4348,7 +4384,13 @@
               "name": "Old mastiffs of the ancient East",
               "note": "The huge guard and hunting mastiffs of the ancient East, carved on palace walls thousands of years ago. Now extinct.",
               "img": "/history/breeds/old-mastiffs-of-the-ancient-east.jpg",
-              "value": 60
+              "value": 30
+            },
+            {
+              "name": "Old mastiffs of the ancient East",
+              "note": "The huge guard and hunting mastiffs of the ancient East, carved on palace walls thousands of years ago. Now extinct.",
+              "img": "/history/breeds/old-mastiffs-of-the-ancient-east.jpg",
+              "value": 30
             }
           ]
         },
@@ -4790,10 +4832,35 @@
                   ]
                 },
                 {
-                  "name": "Old working collies",
-                  "note": "The old northern hill-collie landrace of Scotland and the borders, the shared working stock the Rough, Smooth and Border collies all grew from. Now extinct.",
-                  "img": "/history/breeds/Old-working-collies-cluster.jpg",
-                  "value": 13.75
+                  "name": "Shepherd's Dog",
+                  "note": "The medieval British herding dog, the Sheepdog or Colley that Caius wrote of in 1576. Chaucer's black-faced 'Coll' or 'Coaly' of the 1300s gives the name: Coaly became Colley became Collie. Now extinct.",
+                  "img": "/history/breeds/medieval-shepherds-dog.jpg",
+                  "children": [
+                    {
+                      "name": "Celtic herdsmen's dogs",
+                      "note": "The all-round farm dogs of the Celtic tribes, guarding and driving the herds. Now extinct.",
+                      "img": "/history/breeds/celtic-herdsmen-dogs.jpg",
+                      "value": 4.8125
+                    },
+                    {
+                      "name": "Roman shepherd dogs",
+                      "note": "The flock-guarding sheepdogs the Roman farm writers described, kept white so the shepherd knew dog from wolf. Now extinct.",
+                      "img": "/history/breeds/roman-shepherd-dogs.jpg",
+                      "value": 3.4375
+                    },
+                    {
+                      "name": "Anglo-Saxon herding dogs",
+                      "note": "Collie-sized herding dogs of Anglo-Saxon England, found at West Stow and Brandon. Now extinct.",
+                      "img": "/history/breeds/anglo-saxon-herding-dogs.jpg",
+                      "value": 2.75
+                    },
+                    {
+                      "name": "Norse settlers dogs",
+                      "note": "Scandinavian dogs brought over with Viking settlement, likely mixed into local herding stock. Now extinct.",
+                      "img": "/history/breeds/viking-herding-spitz.jpg",
+                      "value": 2.75
+                    }
+                  ]
                 }
               ]
             }
@@ -6099,7 +6166,13 @@
                   "name": "Old mastiffs of the ancient East",
                   "note": "The huge guard and hunting mastiffs of the ancient East, carved on palace walls thousands of years ago. Now extinct.",
                   "img": "/history/breeds/old-mastiffs-of-the-ancient-east.jpg",
-                  "value": 15
+                  "value": 7.5
+                },
+                {
+                  "name": "Old mastiffs of the ancient East",
+                  "note": "The huge guard and hunting mastiffs of the ancient East, carved on palace walls thousands of years ago. Now extinct.",
+                  "img": "/history/breeds/old-mastiffs-of-the-ancient-east.jpg",
+                  "value": 7.5
                 }
               ]
             },
@@ -8280,7 +8353,13 @@
                       "name": "Old mastiffs of the ancient East",
                       "note": "The huge guard and hunting mastiffs of the ancient East, carved on palace walls thousands of years ago. Now extinct.",
                       "img": "/history/breeds/old-mastiffs-of-the-ancient-east.jpg",
-                      "value": 8.25
+                      "value": 4.125
+                    },
+                    {
+                      "name": "Old mastiffs of the ancient East",
+                      "note": "The huge guard and hunting mastiffs of the ancient East, carved on palace walls thousands of years ago. Now extinct.",
+                      "img": "/history/breeds/old-mastiffs-of-the-ancient-east.jpg",
+                      "value": 4.125
                     }
                   ]
                 },
@@ -9803,7 +9882,13 @@
                           "name": "Old English Black and Tan Terrier",
                           "note": "The black-and-tan working stock the white terriers were selected out of, for coat colour. Now extinct.",
                           "img": "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg",
-                          "value": 4.125
+                          "value": 2.0625
+                        },
+                        {
+                          "name": "Old English Black and Tan Terrier",
+                          "note": "The black-and-tan working stock the white terriers were selected out of, for coat colour. Now extinct.",
+                          "img": "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg",
+                          "value": 2.0625
                         }
                       ]
                     },
@@ -9990,13 +10075,13 @@
                           "name": "Earth Dog",
                           "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
                           "img": "/history/breeds/medieval-earth-dog.jpg",
-                          "value": 4.5
+                          "value": 2.25
                         },
                         {
                           "name": "Old British ratting terriers",
                           "note": "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.",
                           "img": "/history/breeds/Old-British-ratting-terriers.jpg",
-                          "value": 4.5
+                          "value": 2.25
                         }
                       ]
                     },
@@ -10009,13 +10094,58 @@
                           "name": "Earth Dog",
                           "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
                           "img": "/history/breeds/medieval-earth-dog.jpg",
-                          "value": 3
+                          "value": 1.5
                         },
                         {
                           "name": "Earth and hunt terriers",
                           "note": "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.",
                           "img": "/history/breeds/Earth-and-hunt-terrier.jpg",
-                          "value": 3
+                          "value": 1.5
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "Old English Black and Tan Terrier",
+                  "note": "The black-and-tan working stock the white terriers were selected out of, for coat colour. Now extinct.",
+                  "img": "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg",
+                  "children": [
+                    {
+                      "name": "Old British ratting terriers",
+                      "note": "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.",
+                      "img": "/history/breeds/Old-British-ratting-terriers.jpg",
+                      "children": [
+                        {
+                          "name": "Earth Dog",
+                          "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+                          "img": "/history/breeds/medieval-earth-dog.jpg",
+                          "value": 2.25
+                        },
+                        {
+                          "name": "Old British ratting terriers",
+                          "note": "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.",
+                          "img": "/history/breeds/Old-British-ratting-terriers.jpg",
+                          "value": 2.25
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Earth and hunt terriers",
+                      "note": "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.",
+                      "img": "/history/breeds/Earth-and-hunt-terrier.jpg",
+                      "children": [
+                        {
+                          "name": "Earth Dog",
+                          "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+                          "img": "/history/breeds/medieval-earth-dog.jpg",
+                          "value": 1.5
+                        },
+                        {
+                          "name": "Earth and hunt terriers",
+                          "note": "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.",
+                          "img": "/history/breeds/Earth-and-hunt-terrier.jpg",
+                          "value": 1.5
                         }
                       ]
                     }
@@ -15572,7 +15702,13 @@
                       "name": "Old mastiffs of the ancient East",
                       "note": "The huge guard and hunting mastiffs of the ancient East, carved on palace walls thousands of years ago. Now extinct.",
                       "img": "/history/breeds/old-mastiffs-of-the-ancient-east.jpg",
-                      "value": 9.75
+                      "value": 4.875
+                    },
+                    {
+                      "name": "Old mastiffs of the ancient East",
+                      "note": "The huge guard and hunting mastiffs of the ancient East, carved on palace walls thousands of years ago. Now extinct.",
+                      "img": "/history/breeds/old-mastiffs-of-the-ancient-east.jpg",
+                      "value": 4.875
                     }
                   ]
                 },
@@ -16098,7 +16234,13 @@
                       "name": "Old mastiffs of the ancient East",
                       "note": "The huge guard and hunting mastiffs of the ancient East, carved on palace walls thousands of years ago. Now extinct.",
                       "img": "/history/breeds/old-mastiffs-of-the-ancient-east.jpg",
-                      "value": 8.25
+                      "value": 4.125
+                    },
+                    {
+                      "name": "Old mastiffs of the ancient East",
+                      "note": "The huge guard and hunting mastiffs of the ancient East, carved on palace walls thousands of years ago. Now extinct.",
+                      "img": "/history/breeds/old-mastiffs-of-the-ancient-east.jpg",
+                      "value": 4.125
                     }
                   ]
                 },
@@ -20301,13 +20443,13 @@
                           "name": "Ancient Celtic earth dogs",
                           "note": "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.",
                           "img": "/history/breeds/ancient-celtic-earth-dog.jpg",
-                          "value": 5.445
+                          "value": 2.7225
                         },
                         {
                           "name": "Early badger hunting dogs",
                           "note": "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
                           "img": "/history/breeds/early-badger-hunting-dogs.jpg",
-                          "value": 4.455
+                          "value": 2.2275
                         }
                       ]
                     },
@@ -20315,7 +20457,7 @@
                       "name": "Old British ratting terriers",
                       "note": "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.",
                       "img": "/history/breeds/Old-British-ratting-terriers.jpg",
-                      "value": 9.9
+                      "value": 4.95
                     }
                   ]
                 },
@@ -20333,13 +20475,13 @@
                           "name": "Ancient Celtic earth dogs",
                           "note": "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.",
                           "img": "/history/breeds/ancient-celtic-earth-dog.jpg",
-                          "value": 3.63
+                          "value": 1.815
                         },
                         {
                           "name": "Early badger hunting dogs",
                           "note": "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
                           "img": "/history/breeds/early-badger-hunting-dogs.jpg",
-                          "value": 2.97
+                          "value": 1.485
                         }
                       ]
                     },
@@ -20347,7 +20489,78 @@
                       "name": "Earth and hunt terriers",
                       "note": "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.",
                       "img": "/history/breeds/Earth-and-hunt-terrier.jpg",
-                      "value": 6.6
+                      "value": 3.3
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Old English Black and Tan Terrier",
+              "note": "The old black-and-tan working terrier stock the fell terriers were bred from. Now extinct.",
+              "img": "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg",
+              "children": [
+                {
+                  "name": "Old British ratting terriers",
+                  "note": "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.",
+                  "img": "/history/breeds/Old-British-ratting-terriers.jpg",
+                  "children": [
+                    {
+                      "name": "Earth Dog",
+                      "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+                      "img": "/history/breeds/medieval-earth-dog.jpg",
+                      "children": [
+                        {
+                          "name": "Ancient Celtic earth dogs",
+                          "note": "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.",
+                          "img": "/history/breeds/ancient-celtic-earth-dog.jpg",
+                          "value": 2.7225
+                        },
+                        {
+                          "name": "Early badger hunting dogs",
+                          "note": "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
+                          "img": "/history/breeds/early-badger-hunting-dogs.jpg",
+                          "value": 2.2275
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Old British ratting terriers",
+                      "note": "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.",
+                      "img": "/history/breeds/Old-British-ratting-terriers.jpg",
+                      "value": 4.95
+                    }
+                  ]
+                },
+                {
+                  "name": "Earth and hunt terriers",
+                  "note": "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.",
+                  "img": "/history/breeds/Earth-and-hunt-terrier.jpg",
+                  "children": [
+                    {
+                      "name": "Earth Dog",
+                      "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+                      "img": "/history/breeds/medieval-earth-dog.jpg",
+                      "children": [
+                        {
+                          "name": "Ancient Celtic earth dogs",
+                          "note": "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.",
+                          "img": "/history/breeds/ancient-celtic-earth-dog.jpg",
+                          "value": 1.815
+                        },
+                        {
+                          "name": "Early badger hunting dogs",
+                          "note": "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
+                          "img": "/history/breeds/early-badger-hunting-dogs.jpg",
+                          "value": 1.485
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Earth and hunt terriers",
+                      "note": "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.",
+                      "img": "/history/breeds/Earth-and-hunt-terrier.jpg",
+                      "value": 3.3
                     }
                   ]
                 }
@@ -20709,18 +20922,106 @@
                   ]
                 },
                 {
-                  "name": "Old working collies",
-                  "note": "The old northern hill-collie landrace of Scotland and the borders, the shared working stock the Rough, Smooth and Border collies all grew from. Now extinct.",
-                  "img": "/history/breeds/Old-working-collies-cluster.jpg",
-                  "value": 12.5
+                  "name": "Shepherd's Dog",
+                  "note": "The medieval British herding dog, the Sheepdog or Colley that Caius wrote of in 1576. Chaucer's black-faced 'Coll' or 'Coaly' of the 1300s gives the name: Coaly became Colley became Collie. Now extinct.",
+                  "img": "/history/breeds/medieval-shepherds-dog.jpg",
+                  "children": [
+                    {
+                      "name": "Celtic herdsmen's dogs",
+                      "note": "The all-round farm dogs of the Celtic tribes, guarding and driving the herds. Now extinct.",
+                      "img": "/history/breeds/celtic-herdsmen-dogs.jpg",
+                      "value": 4.375
+                    },
+                    {
+                      "name": "Roman shepherd dogs",
+                      "note": "The flock-guarding sheepdogs the Roman farm writers described, kept white so the shepherd knew dog from wolf. Now extinct.",
+                      "img": "/history/breeds/roman-shepherd-dogs.jpg",
+                      "value": 3.125
+                    },
+                    {
+                      "name": "Anglo-Saxon herding dogs",
+                      "note": "Collie-sized herding dogs of Anglo-Saxon England, found at West Stow and Brandon. Now extinct.",
+                      "img": "/history/breeds/anglo-saxon-herding-dogs.jpg",
+                      "value": 2.5
+                    },
+                    {
+                      "name": "Norse settlers dogs",
+                      "note": "Scandinavian dogs brought over with Viking settlement, likely mixed into local herding stock. Now extinct.",
+                      "img": "/history/breeds/viking-herding-spitz.jpg",
+                      "value": 2.5
+                    }
+                  ]
                 }
               ]
             },
             {
-              "name": "Old Scotch Collie",
-              "note": "The old Scottish shepherd's collie, the pre-show hill-herding landrace that fed the working border strain long before it had a name. Now extinct.",
-              "img": "/history/breeds/Old-Scotch-Collie.jpg",
-              "value": 25
+              "name": "Old working collies",
+              "note": "The shared old hill-collie landrace it grew from. Now extinct.",
+              "img": "/history/breeds/Old-working-collies-cluster.jpg",
+              "children": [
+                {
+                  "name": "Shepherd's Dog",
+                  "note": "The medieval British herding dog, the Sheepdog or Colley that Caius wrote of in 1576. Chaucer's black-faced 'Coll' or 'Coaly' of the 1300s gives the name: Coaly became Colley became Collie. Now extinct.",
+                  "img": "/history/breeds/medieval-shepherds-dog.jpg",
+                  "children": [
+                    {
+                      "name": "Celtic herdsmen's dogs",
+                      "note": "The all-round farm dogs of the Celtic tribes, guarding and driving the herds. Now extinct.",
+                      "img": "/history/breeds/celtic-herdsmen-dogs.jpg",
+                      "value": 4.375
+                    },
+                    {
+                      "name": "Roman shepherd dogs",
+                      "note": "The flock-guarding sheepdogs the Roman farm writers described, kept white so the shepherd knew dog from wolf. Now extinct.",
+                      "img": "/history/breeds/roman-shepherd-dogs.jpg",
+                      "value": 3.125
+                    },
+                    {
+                      "name": "Anglo-Saxon herding dogs",
+                      "note": "Collie-sized herding dogs of Anglo-Saxon England, found at West Stow and Brandon. Now extinct.",
+                      "img": "/history/breeds/anglo-saxon-herding-dogs.jpg",
+                      "value": 2.5
+                    },
+                    {
+                      "name": "Norse settlers dogs",
+                      "note": "Scandinavian dogs brought over with Viking settlement, likely mixed into local herding stock. Now extinct.",
+                      "img": "/history/breeds/viking-herding-spitz.jpg",
+                      "value": 2.5
+                    }
+                  ]
+                },
+                {
+                  "name": "Shepherd's Dog",
+                  "note": "The medieval British herding dog, the Sheepdog or Colley that Caius wrote of in 1576. Chaucer's black-faced 'Coll' or 'Coaly' of the 1300s gives the name: Coaly became Colley became Collie. Now extinct.",
+                  "img": "/history/breeds/medieval-shepherds-dog.jpg",
+                  "children": [
+                    {
+                      "name": "Celtic herdsmen's dogs",
+                      "note": "The all-round farm dogs of the Celtic tribes, guarding and driving the herds. Now extinct.",
+                      "img": "/history/breeds/celtic-herdsmen-dogs.jpg",
+                      "value": 4.375
+                    },
+                    {
+                      "name": "Roman shepherd dogs",
+                      "note": "The flock-guarding sheepdogs the Roman farm writers described, kept white so the shepherd knew dog from wolf. Now extinct.",
+                      "img": "/history/breeds/roman-shepherd-dogs.jpg",
+                      "value": 3.125
+                    },
+                    {
+                      "name": "Anglo-Saxon herding dogs",
+                      "note": "Collie-sized herding dogs of Anglo-Saxon England, found at West Stow and Brandon. Now extinct.",
+                      "img": "/history/breeds/anglo-saxon-herding-dogs.jpg",
+                      "value": 2.5
+                    },
+                    {
+                      "name": "Norse settlers dogs",
+                      "note": "Scandinavian dogs brought over with Viking settlement, likely mixed into local herding stock. Now extinct.",
+                      "img": "/history/breeds/viking-herding-spitz.jpg",
+                      "value": 2.5
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -20837,18 +21138,106 @@
                   ]
                 },
                 {
-                  "name": "Old working collies",
-                  "note": "The old northern hill-collie landrace of Scotland and the borders, the shared working stock the Rough, Smooth and Border collies all grew from. Now extinct.",
-                  "img": "/history/breeds/Old-working-collies-cluster.jpg",
-                  "value": 6.25
+                  "name": "Shepherd's Dog",
+                  "note": "The medieval British herding dog, the Sheepdog or Colley that Caius wrote of in 1576. Chaucer's black-faced 'Coll' or 'Coaly' of the 1300s gives the name: Coaly became Colley became Collie. Now extinct.",
+                  "img": "/history/breeds/medieval-shepherds-dog.jpg",
+                  "children": [
+                    {
+                      "name": "Celtic herdsmen's dogs",
+                      "note": "The all-round farm dogs of the Celtic tribes, guarding and driving the herds. Now extinct.",
+                      "img": "/history/breeds/celtic-herdsmen-dogs.jpg",
+                      "value": 2.1875
+                    },
+                    {
+                      "name": "Roman shepherd dogs",
+                      "note": "The flock-guarding sheepdogs the Roman farm writers described, kept white so the shepherd knew dog from wolf. Now extinct.",
+                      "img": "/history/breeds/roman-shepherd-dogs.jpg",
+                      "value": 1.5625
+                    },
+                    {
+                      "name": "Anglo-Saxon herding dogs",
+                      "note": "Collie-sized herding dogs of Anglo-Saxon England, found at West Stow and Brandon. Now extinct.",
+                      "img": "/history/breeds/anglo-saxon-herding-dogs.jpg",
+                      "value": 1.25
+                    },
+                    {
+                      "name": "Norse settlers dogs",
+                      "note": "Scandinavian dogs brought over with Viking settlement, likely mixed into local herding stock. Now extinct.",
+                      "img": "/history/breeds/viking-herding-spitz.jpg",
+                      "value": 1.25
+                    }
+                  ]
                 }
               ]
             },
             {
-              "name": "Old Cumberland herding dogs",
-              "note": "Northern English herding dogs from the same border country. Now extinct.",
-              "img": "/history/breeds/cumberland-sheepdog-photo.jpg",
-              "value": 12.5
+              "name": "Old working collies",
+              "note": "The shared old hill-collie landrace of the border country. Now extinct.",
+              "img": "/history/breeds/Old-working-collies-cluster.jpg",
+              "children": [
+                {
+                  "name": "Shepherd's Dog",
+                  "note": "The medieval British herding dog, the Sheepdog or Colley that Caius wrote of in 1576. Chaucer's black-faced 'Coll' or 'Coaly' of the 1300s gives the name: Coaly became Colley became Collie. Now extinct.",
+                  "img": "/history/breeds/medieval-shepherds-dog.jpg",
+                  "children": [
+                    {
+                      "name": "Celtic herdsmen's dogs",
+                      "note": "The all-round farm dogs of the Celtic tribes, guarding and driving the herds. Now extinct.",
+                      "img": "/history/breeds/celtic-herdsmen-dogs.jpg",
+                      "value": 2.1875
+                    },
+                    {
+                      "name": "Roman shepherd dogs",
+                      "note": "The flock-guarding sheepdogs the Roman farm writers described, kept white so the shepherd knew dog from wolf. Now extinct.",
+                      "img": "/history/breeds/roman-shepherd-dogs.jpg",
+                      "value": 1.5625
+                    },
+                    {
+                      "name": "Anglo-Saxon herding dogs",
+                      "note": "Collie-sized herding dogs of Anglo-Saxon England, found at West Stow and Brandon. Now extinct.",
+                      "img": "/history/breeds/anglo-saxon-herding-dogs.jpg",
+                      "value": 1.25
+                    },
+                    {
+                      "name": "Norse settlers dogs",
+                      "note": "Scandinavian dogs brought over with Viking settlement, likely mixed into local herding stock. Now extinct.",
+                      "img": "/history/breeds/viking-herding-spitz.jpg",
+                      "value": 1.25
+                    }
+                  ]
+                },
+                {
+                  "name": "Shepherd's Dog",
+                  "note": "The medieval British herding dog, the Sheepdog or Colley that Caius wrote of in 1576. Chaucer's black-faced 'Coll' or 'Coaly' of the 1300s gives the name: Coaly became Colley became Collie. Now extinct.",
+                  "img": "/history/breeds/medieval-shepherds-dog.jpg",
+                  "children": [
+                    {
+                      "name": "Celtic herdsmen's dogs",
+                      "note": "The all-round farm dogs of the Celtic tribes, guarding and driving the herds. Now extinct.",
+                      "img": "/history/breeds/celtic-herdsmen-dogs.jpg",
+                      "value": 2.1875
+                    },
+                    {
+                      "name": "Roman shepherd dogs",
+                      "note": "The flock-guarding sheepdogs the Roman farm writers described, kept white so the shepherd knew dog from wolf. Now extinct.",
+                      "img": "/history/breeds/roman-shepherd-dogs.jpg",
+                      "value": 1.5625
+                    },
+                    {
+                      "name": "Anglo-Saxon herding dogs",
+                      "note": "Collie-sized herding dogs of Anglo-Saxon England, found at West Stow and Brandon. Now extinct.",
+                      "img": "/history/breeds/anglo-saxon-herding-dogs.jpg",
+                      "value": 1.25
+                    },
+                    {
+                      "name": "Norse settlers dogs",
+                      "note": "Scandinavian dogs brought over with Viking settlement, likely mixed into local herding stock. Now extinct.",
+                      "img": "/history/breeds/viking-herding-spitz.jpg",
+                      "value": 1.25
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }
@@ -22232,9 +22621,9 @@
                           "value": 0.14625
                         },
                         {
-                          "name": "Old working collies",
-                          "note": "The old northern hill-collie landrace of Scotland and the borders, the shared working stock the Rough, Smooth and Border collies all grew from. Now extinct.",
-                          "img": "/history/breeds/Old-working-collies-cluster.jpg",
+                          "name": "Shepherd's Dog",
+                          "note": "The medieval British herding dog, the Sheepdog or Colley that Caius wrote of in 1576. Chaucer's black-faced 'Coll' or 'Coaly' of the 1300s gives the name: Coaly became Colley became Collie. Now extinct.",
+                          "img": "/history/breeds/medieval-shepherds-dog.jpg",
                           "value": 0.14625
                         }
                       ]
@@ -22251,9 +22640,9 @@
                           "value": 0.07875
                         },
                         {
-                          "name": "Old hill and bearded collies",
-                          "note": "Shaggy upland herding dogs of the same collie family. Now extinct.",
-                          "img": "/history/breeds/old-hill-and-bearded-collies.jpg",
+                          "name": "Old working collies",
+                          "note": "The shared old hill-collie landrace of the same family. Now extinct.",
+                          "img": "/history/breeds/Old-working-collies-cluster.jpg",
                           "value": 0.07875
                         }
                       ]
@@ -23237,13 +23626,32 @@
                           "name": "Old British ratting terriers",
                           "note": "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.",
                           "img": "/history/breeds/Old-British-ratting-terriers.jpg",
-                          "value": 4.95
+                          "value": 2.475
                         },
                         {
                           "name": "Earth and hunt terriers",
                           "note": "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.",
                           "img": "/history/breeds/Earth-and-hunt-terrier.jpg",
-                          "value": 3.3
+                          "value": 1.65
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Old English Black and Tan Terrier",
+                      "note": "The black-and-tan working stock the white terriers were selected out of, for coat colour. Now extinct.",
+                      "img": "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg",
+                      "children": [
+                        {
+                          "name": "Old British ratting terriers",
+                          "note": "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.",
+                          "img": "/history/breeds/Old-British-ratting-terriers.jpg",
+                          "value": 2.475
+                        },
+                        {
+                          "name": "Earth and hunt terriers",
+                          "note": "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.",
+                          "img": "/history/breeds/Earth-and-hunt-terrier.jpg",
+                          "value": 1.65
                         }
                       ]
                     }
@@ -23567,13 +23975,13 @@
                           "name": "Ancient Celtic earth dogs",
                           "note": "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.",
                           "img": "/history/breeds/ancient-celtic-earth-dog.jpg",
-                          "value": 4.95
+                          "value": 2.475
                         },
                         {
                           "name": "Early badger hunting dogs",
                           "note": "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
                           "img": "/history/breeds/early-badger-hunting-dogs.jpg",
-                          "value": 4.05
+                          "value": 2.025
                         }
                       ]
                     },
@@ -23581,7 +23989,7 @@
                       "name": "Old British ratting terriers",
                       "note": "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.",
                       "img": "/history/breeds/Old-British-ratting-terriers.jpg",
-                      "value": 9
+                      "value": 4.5
                     }
                   ]
                 },
@@ -23599,13 +24007,13 @@
                           "name": "Ancient Celtic earth dogs",
                           "note": "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.",
                           "img": "/history/breeds/ancient-celtic-earth-dog.jpg",
-                          "value": 3.3
+                          "value": 1.65
                         },
                         {
                           "name": "Early badger hunting dogs",
                           "note": "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
                           "img": "/history/breeds/early-badger-hunting-dogs.jpg",
-                          "value": 2.7
+                          "value": 1.35
                         }
                       ]
                     },
@@ -23613,7 +24021,78 @@
                       "name": "Earth and hunt terriers",
                       "note": "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.",
                       "img": "/history/breeds/Earth-and-hunt-terrier.jpg",
-                      "value": 6
+                      "value": 3
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Old English Black and Tan Terrier",
+              "note": "The black-and-tan working stock the white terriers were selected out of, for coat colour. Now extinct.",
+              "img": "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg",
+              "children": [
+                {
+                  "name": "Old British ratting terriers",
+                  "note": "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.",
+                  "img": "/history/breeds/Old-British-ratting-terriers.jpg",
+                  "children": [
+                    {
+                      "name": "Earth Dog",
+                      "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+                      "img": "/history/breeds/medieval-earth-dog.jpg",
+                      "children": [
+                        {
+                          "name": "Ancient Celtic earth dogs",
+                          "note": "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.",
+                          "img": "/history/breeds/ancient-celtic-earth-dog.jpg",
+                          "value": 2.475
+                        },
+                        {
+                          "name": "Early badger hunting dogs",
+                          "note": "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
+                          "img": "/history/breeds/early-badger-hunting-dogs.jpg",
+                          "value": 2.025
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Old British ratting terriers",
+                      "note": "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.",
+                      "img": "/history/breeds/Old-British-ratting-terriers.jpg",
+                      "value": 4.5
+                    }
+                  ]
+                },
+                {
+                  "name": "Earth and hunt terriers",
+                  "note": "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.",
+                  "img": "/history/breeds/Earth-and-hunt-terrier.jpg",
+                  "children": [
+                    {
+                      "name": "Earth Dog",
+                      "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+                      "img": "/history/breeds/medieval-earth-dog.jpg",
+                      "children": [
+                        {
+                          "name": "Ancient Celtic earth dogs",
+                          "note": "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.",
+                          "img": "/history/breeds/ancient-celtic-earth-dog.jpg",
+                          "value": 1.65
+                        },
+                        {
+                          "name": "Early badger hunting dogs",
+                          "note": "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
+                          "img": "/history/breeds/early-badger-hunting-dogs.jpg",
+                          "value": 1.35
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Earth and hunt terriers",
+                      "note": "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.",
+                      "img": "/history/breeds/Earth-and-hunt-terrier.jpg",
+                      "value": 3
                     }
                   ]
                 }
@@ -24020,7 +24499,13 @@
                       "name": "Old mastiffs of the ancient East",
                       "note": "The huge guard and hunting mastiffs of the ancient East, carved on palace walls thousands of years ago. Now extinct.",
                       "img": "/history/breeds/old-mastiffs-of-the-ancient-east.jpg",
-                      "value": 36
+                      "value": 18
+                    },
+                    {
+                      "name": "Old mastiffs of the ancient East",
+                      "note": "The huge guard and hunting mastiffs of the ancient East, carved on palace walls thousands of years ago. Now extinct.",
+                      "img": "/history/breeds/old-mastiffs-of-the-ancient-east.jpg",
+                      "value": 18
                     }
                   ]
                 },
@@ -24132,7 +24617,13 @@
                   "name": "Old mastiffs of the ancient East",
                   "note": "The huge guard and hunting mastiffs of the ancient East, carved on palace walls thousands of years ago. Now extinct.",
                   "img": "/history/breeds/old-mastiffs-of-the-ancient-east.jpg",
-                  "value": 40
+                  "value": 20
+                },
+                {
+                  "name": "Old mastiffs of the ancient East",
+                  "note": "The huge guard and hunting mastiffs of the ancient East, carved on palace walls thousands of years ago. Now extinct.",
+                  "img": "/history/breeds/old-mastiffs-of-the-ancient-east.jpg",
+                  "value": 20
                 }
               ]
             }
@@ -24783,10 +25274,35 @@
                       ]
                     },
                     {
-                      "name": "Old working collies",
-                      "note": "The old northern hill-collie landrace of Scotland and the borders, the shared working stock the Rough, Smooth and Border collies all grew from. Now extinct.",
-                      "img": "/history/breeds/Old-working-collies-cluster.jpg",
-                      "value": 0.975
+                      "name": "Shepherd's Dog",
+                      "note": "The medieval British herding dog, the Sheepdog or Colley that Caius wrote of in 1576. Chaucer's black-faced 'Coll' or 'Coaly' of the 1300s gives the name: Coaly became Colley became Collie. Now extinct.",
+                      "img": "/history/breeds/medieval-shepherds-dog.jpg",
+                      "children": [
+                        {
+                          "name": "Celtic herdsmen's dogs",
+                          "note": "The all-round farm dogs of the Celtic tribes, guarding and driving the herds. Now extinct.",
+                          "img": "/history/breeds/celtic-herdsmen-dogs.jpg",
+                          "value": 0.34125
+                        },
+                        {
+                          "name": "Roman shepherd dogs",
+                          "note": "The flock-guarding sheepdogs the Roman farm writers described, kept white so the shepherd knew dog from wolf. Now extinct.",
+                          "img": "/history/breeds/roman-shepherd-dogs.jpg",
+                          "value": 0.24375
+                        },
+                        {
+                          "name": "Anglo-Saxon herding dogs",
+                          "note": "Collie-sized herding dogs of Anglo-Saxon England, found at West Stow and Brandon. Now extinct.",
+                          "img": "/history/breeds/anglo-saxon-herding-dogs.jpg",
+                          "value": 0.195
+                        },
+                        {
+                          "name": "Norse settlers dogs",
+                          "note": "Scandinavian dogs brought over with Viking settlement, likely mixed into local herding stock. Now extinct.",
+                          "img": "/history/breeds/viking-herding-spitz.jpg",
+                          "value": 0.195
+                        }
+                      ]
                     }
                   ]
                 },
@@ -24807,18 +25323,31 @@
                           "value": 0.2625
                         },
                         {
-                          "name": "Old working collies",
-                          "note": "The old northern hill-collie landrace of Scotland and the borders, the shared working stock the Rough, Smooth and Border collies all grew from. Now extinct.",
-                          "img": "/history/breeds/Old-working-collies-cluster.jpg",
+                          "name": "Shepherd's Dog",
+                          "note": "The medieval British herding dog, the Sheepdog or Colley that Caius wrote of in 1576. Chaucer's black-faced 'Coll' or 'Coaly' of the 1300s gives the name: Coaly became Colley became Collie. Now extinct.",
+                          "img": "/history/breeds/medieval-shepherds-dog.jpg",
                           "value": 0.2625
                         }
                       ]
                     },
                     {
-                      "name": "Old hill and bearded collies",
-                      "note": "Shaggy upland herding dogs of the same collie family. Now extinct.",
-                      "img": "/history/breeds/old-hill-and-bearded-collies.jpg",
-                      "value": 0.525
+                      "name": "Old working collies",
+                      "note": "The shared old hill-collie landrace of the same family. Now extinct.",
+                      "img": "/history/breeds/Old-working-collies-cluster.jpg",
+                      "children": [
+                        {
+                          "name": "Shepherd's Dog",
+                          "note": "The medieval British herding dog, the Sheepdog or Colley that Caius wrote of in 1576. Chaucer's black-faced 'Coll' or 'Coaly' of the 1300s gives the name: Coaly became Colley became Collie. Now extinct.",
+                          "img": "/history/breeds/medieval-shepherds-dog.jpg",
+                          "value": 0.2625
+                        },
+                        {
+                          "name": "Shepherd's Dog",
+                          "note": "The medieval British herding dog, the Sheepdog or Colley that Caius wrote of in 1576. Chaucer's black-faced 'Coll' or 'Coaly' of the 1300s gives the name: Coaly became Colley became Collie. Now extinct.",
+                          "img": "/history/breeds/medieval-shepherds-dog.jpg",
+                          "value": 0.2625
+                        }
+                      ]
                     }
                   ]
                 }
