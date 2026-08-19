@@ -73,7 +73,7 @@
 }
 .heroTitle {
   font-family: var(--font-display, "Luckiest Guy", system-ui);
-  font-size: clamp(3.75rem, 8.5vw, 7.55rem); /* +2pt more (cumulative +9pt from 6.8rem); was clamp(3.58rem, 8.5vw, 7.38rem) (Steve, 19 Aug 2026) */
+  font-size: clamp(4rem, 8.5vw, 7.8rem); /* +3pt more (cumulative +12pt from 6.8rem); was clamp(3.75rem, 8.5vw, 7.55rem) (Steve, 20 Aug 2026) */
   line-height: 0.95;
   color: var(--yellow, #ffd23e);
   margin: 0 0 clamp(6px, 1vw, 12px);
@@ -417,7 +417,7 @@
 .prizeSection .inner { padding-top: 50px; }
 .prizeCols {
   display: grid;
-  grid-template-columns: clamp(160px, 22%, 280px) 1fr;
+  grid-template-columns: 2fr 3fr; /* 40/60 split (video | text); fr so the gap is respected, was clamp(160px, 22%, 280px) 1fr (Steve, 19 Aug 2026) */
   gap: clamp(24px, 4vw, 48px);
   align-items: start;
   margin-top: clamp(16px, 2vw, 24px);
@@ -434,21 +434,19 @@
 /* ── Two-col: What/Ready side by side ───────────────────────────────────── */
 .whatReadyCols {
   display: grid;
-  /* Two columns again (reverted from the single-column fix). The H2s keep the
-     smaller clamp(4.38rem, 11vw, 8.58rem) size below, but at 1280px that is still
-     ~137px and the longest word ("looking") is wider than the ~539px half-column,
-     so this DOES overflow between roughly 769px and ~1600px; it reads clean only
-     at ~1600px+ (Steve's call, 19 Aug 2026). */
+  /* Two columns. The H2s now use the .termsSectionTitle scale (see below), which
+     caps at ~90px at 1280px, so the longest word ("looking", ~392px) fits inside
+     the ~539px half-column and this reads clean at 1280 (Steve, 20 Aug 2026). */
   grid-template-columns: 1fr 1fr;
   gap: clamp(24px, 4vw, 48px);
   align-items: start;
   padding-top: 50px;
 }
 .whatReadyCols .sectionTitle { text-align: left; }
-/* "What are we looking for?" / "Ready to join the pack?" stay 5pt (~0.42rem)
-   below the doubled .sectionTitle used by How-to-enter and The-prize. Scoped here
-   so only these two move (Steve, 19 Aug 2026). */
-.whatReadyCols .sectionTitle { font-size: clamp(4.38rem, 11vw, 8.58rem); }
+/* "What are we looking for?" / "Ready to join the pack?" match the terms title
+   scale, clamp(3.2rem, 7vw, 5.6rem). Scoped here so only these two move; How-to-
+   enter and The-prize keep the larger doubled .sectionTitle (Steve, 20 Aug 2026). */
+.whatReadyCols .sectionTitle { font-size: clamp(3.2rem, 7vw, 5.6rem); }
 @media (max-width: 720px) { .whatReadyCols { grid-template-columns: 1fr; } }
 
 .termList {

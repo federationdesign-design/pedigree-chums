@@ -250,7 +250,7 @@ export default function ChumSpotClient() {
         {/* ── Full Terms ───────────────────────────────────────── */}
         <section className={styles.termsSection}>
           <div className={styles.inner}>
-            <h2 id="terms" className={styles.termsSectionTitle}>Spot your Chum: <span style={{color:"#ffffff"}}>Full Competition Terms</span></h2>
+            <h2 id="terms" className={styles.termsSectionTitle}>Spot your Chum:<br /><span style={{color:"#ffffff"}}>Full Competition Terms</span></h2>
             <div className={styles.termsGrid}>
               {TERMS.map((t, i) => (
                 <div key={t.num} className={`${styles.termCard} ${i % 2 === 0 ? styles.termCardYellow : styles.termCardWhite}`}>
