@@ -13584,7 +13584,7 @@
                       "name": "St Hubert Hound",
                       "note": "The monks' scent hound the Normans brought over, one strain behind the running pack.",
                       "img": "/history/breeds/St-Hubert-Hound.jpg",
-                      "value": 8.25
+                      "value": 10.5
                     },
                     {
                       "name": "Talbot",
@@ -13595,7 +13595,7 @@
                           "name": "St Hubert Hound",
                           "note": "The monks' scent hound brought over by the Normans.",
                           "img": "/history/breeds/St-Hubert-Hound.jpg",
-                          "value": 8.25
+                          "value": 10.5
                         },
                         {
                           "name": "Old scenting hounds",
@@ -13650,7 +13650,7 @@
                       "name": "St Hubert Hound",
                       "note": "The monks' scent hound brought over by the Normans.",
                       "img": "/history/breeds/St-Hubert-Hound.jpg",
-                      "value": 11
+                      "value": 14
                     },
                     {
                       "name": "Old scenting hounds",
@@ -13677,31 +13677,50 @@
               ]
             },
             {
-              "name": "Field Spaniel",
-              "note": "A close gundog cousin from the same spaniel family.",
-              "img": "/history/breeds/field-spaniel-photo.jpg",
+              "name": "Welsh Springer Spaniel",
+              "note": "A Welsh outcross used to establish the parti-coloured lines.",
+              "img": "/history/breeds/welsh-springer-spaniel-photo.jpg",
               "children": [
                 {
-                  "name": "Land spaniels",
-                  "note": "The old land-spaniel stock at its foundation. Now extinct.",
-                  "img": "/history/breeds/original-land-spaniel.jpg",
+                  "name": "Old Welsh land spaniels",
+                  "note": "The native red-and-white working spaniels of Wales. Now extinct.",
+                  "img": "/history/breeds/Old-Welsh-land-spaniels.jpg",
                   "children": [
                     {
+                      "name": "Land spaniels",
+                      "note": "The broader old English land-spaniel stock behind the Welsh variety. Now extinct.",
+                      "img": "/history/breeds/original-land-spaniel.jpg",
+                      "children": [
+                        {
+                          "name": "Rache",
+                          "note": "The medieval running scenting hound that ranged and flushed game, the closest in work to a bird dog. Caius listed the land spaniel among the fowling dogs, separate from the hounds, so this older root is a reconstruction, not recorded descent. Now extinct.",
+                          "img": "/history/breeds/rache.jpg",
+                          "value": 3.24
+                        },
+                        {
+                          "name": "Talbot",
+                          "note": "Older white finding-hound stock standing behind the medieval scenting hounds. An inferred deeper root, not documented spaniel descent. Now extinct.",
+                          "img": "/history/breeds/talbot-hound.jpg",
+                          "value": 2.16
+                        }
+                      ]
+                    },
+                    {
                       "name": "Rache",
-                      "note": "The medieval running scenting hound that ranged and flushed game, the closest in work to a bird dog. Caius listed the land spaniel among the fowling dogs, separate from the hounds, so this older root is a reconstruction, not recorded descent. Now extinct.",
+                      "note": "The medieval ranging scenting hound, an inferred deeper root rather than documented descent. Now extinct.",
                       "img": "/history/breeds/rache.jpg",
                       "children": [
                         {
                           "name": "St Hubert Hound",
                           "note": "The monks' scent hound the Normans brought over, one strain behind the running pack.",
                           "img": "/history/breeds/St-Hubert-Hound.jpg",
-                          "value": 1.6875
+                          "value": 1.8
                         },
                         {
                           "name": "Talbot",
                           "note": "The older white finding-hound stock, the other strain in that pack. A modelled half of the pair, not a recorded mating.",
                           "img": "/history/breeds/talbot-hound.jpg",
-                          "value": 1.6875
+                          "value": 1.8
                         },
                         {
                           "name": "Old scenting hounds",
@@ -13724,142 +13743,12 @@
                           "value": 0
                         }
                       ]
-                    },
-                    {
-                      "name": "Talbot",
-                      "note": "Older white finding-hound stock standing behind the medieval scenting hounds. An inferred deeper root, not documented spaniel descent. Now extinct.",
-                      "img": "/history/breeds/talbot-hound.jpg",
-                      "children": [
-                        {
-                          "name": "St Hubert Hound",
-                          "note": "The monks' scent hound brought over by the Normans.",
-                          "img": "/history/breeds/St-Hubert-Hound.jpg",
-                          "value": 2.25
-                        },
-                        {
-                          "name": "Old scenting hounds",
-                          "note": "The tracking hounds of medieval lords.",
-                          "img": "/history/breeds/Old-scenting-hounds.jpg",
-                          "children": [
-                            {
-                              "name": "Celtic Scent Hound",
-                              "note": "Early Celtic tracking hound that followed game by scent, representing the roots of later European scent hounds. An extinct historical type.",
-                              "img": "/history/breeds/ancient-celtic-scent-hound.jpg",
-                              "value": 20
-                            },
-                            {
-                              "name": "Old scenting hounds",
-                              "note": "The tracking hounds of medieval lords.",
-                              "img": "/history/breeds/Old-scenting-hounds.jpg",
-                              "value": 20
-                            }
-                          ],
-                          "value": 0
-                        }
-                      ]
                     }
                   ]
                 },
-                {
-                  "name": "Sussex Spaniel",
-                  "note": "Lent weight, bone and a longer body.",
-                  "img": "/history/breeds/Sussex-Spaniel.jpg",
-                  "children": [
-                    {
-                      "name": "Land spaniels",
-                      "note": "The native working spaniels of southern England. Now extinct.",
-                      "img": "/history/breeds/original-land-spaniel.jpg",
-                      "children": [
-                        {
-                          "name": "Rache",
-                          "note": "The medieval running scenting hound that ranged and flushed game, the closest in work to a bird dog. Caius listed the land spaniel among the fowling dogs, separate from the hounds, so this older root is a reconstruction, not recorded descent. Now extinct.",
-                          "img": "/history/breeds/rache.jpg",
-                          "value": 1.575
-                        },
-                        {
-                          "name": "Talbot",
-                          "note": "Older white finding-hound stock standing behind the medieval scenting hounds. An inferred deeper root, not documented spaniel descent. Now extinct.",
-                          "img": "/history/breeds/talbot-hound.jpg",
-                          "value": 1.05
-                        }
-                      ]
-                    },
-                    {
-                      "name": "Heavier working spaniels",
-                      "note": "Lower, stouter spaniels that fixed its build. Now extinct.",
-                      "img": "/history/breeds/heavier-working-spaniel.jpg",
-                      "children": [
-                        {
-                          "name": "Land spaniels",
-                          "note": "The old land-spaniel stock at the base. Now extinct.",
-                          "img": "/history/breeds/original-land-spaniel.jpg",
-                          "value": 0.9625
-                        },
-                        {
-                          "name": "Basset and heavy hounds",
-                          "note": "Low, long, heavy hound blood for build and weight. Now extinct.",
-                          "img": "/history/breeds/Medieval-Bloodhound.jpg",
-                          "value": 0.7875
-                        }
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "name": "Clumber Spaniel",
-                  "note": "Heavier spaniel blood for substance.",
-                  "img": "/history/breeds/clumber-spaniel-photo.jpg",
-                  "children": [
-                    {
-                      "name": "Land spaniels",
-                      "note": "The heavy Alpine and old land spaniels at its base. Now extinct.",
-                      "img": "/history/breeds/original-land-spaniel.jpg",
-                      "children": [
-                        {
-                          "name": "Rache",
-                          "note": "The medieval running scenting hound that ranged and flushed game, the closest in work to a bird dog. Caius listed the land spaniel among the fowling dogs, separate from the hounds, so this older root is a reconstruction, not recorded descent. Now extinct.",
-                          "img": "/history/breeds/rache.jpg",
-                          "value": 0.825
-                        },
-                        {
-                          "name": "Talbot",
-                          "note": "Older white finding-hound stock standing behind the medieval scenting hounds. An inferred deeper root, not documented spaniel descent. Now extinct.",
-                          "img": "/history/breeds/talbot-hound.jpg",
-                          "value": 0.55
-                        }
-                      ]
-                    },
-                    {
-                      "name": "Basset and heavy hounds",
-                      "note": "Low, long hound blood, by tradition Basset Hound, for its build and weight. Now in-decline.",
-                      "img": "/history/breeds/Medieval-Bloodhound.jpg",
-                      "children": [
-                        {
-                          "name": "Southern Hound",
-                          "note": "The heavy, slow, deep-voiced trailing hound, the right match for the stout, low spaniels. Now extinct.",
-                          "img": "/history/breeds/Southern-Hound.jpg",
-                          "value": 0.675
-                        },
-                        {
-                          "name": "Bloodhound",
-                          "note": "The supreme heavy trailing hound of the same deep-nosed line, still bred today.",
-                          "img": "/history/breeds/Medieval-Bloodhound.jpg",
-                          "value": 0.45
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "name": "Sussex Spaniel",
-              "note": "A heavier, golden-liver spaniel that lent bone and a rich coat.",
-              "img": "/history/breeds/Sussex-Spaniel.jpg",
-              "children": [
                 {
                   "name": "Land spaniels",
-                  "note": "The native working spaniels of southern England. Now extinct.",
+                  "note": "The larger flushing spaniels of the same family. Now extinct.",
                   "img": "/history/breeds/original-land-spaniel.jpg",
                   "children": [
                     {
@@ -13931,51 +13820,6 @@
                             }
                           ],
                           "value": 0
-                        }
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "name": "Heavier working spaniels",
-                  "note": "Lower, stouter spaniels that fixed its build. Now extinct.",
-                  "img": "/history/breeds/heavier-working-spaniel.jpg",
-                  "children": [
-                    {
-                      "name": "Land spaniels",
-                      "note": "The old land-spaniel stock at the base. Now extinct.",
-                      "img": "/history/breeds/original-land-spaniel.jpg",
-                      "children": [
-                        {
-                          "name": "Rache",
-                          "note": "The medieval running scenting hound that ranged and flushed game, the closest in work to a bird dog. Caius listed the land spaniel among the fowling dogs, separate from the hounds, so this older root is a reconstruction, not recorded descent. Now extinct.",
-                          "img": "/history/breeds/rache.jpg",
-                          "value": 1.32
-                        },
-                        {
-                          "name": "Talbot",
-                          "note": "Older white finding-hound stock standing behind the medieval scenting hounds. An inferred deeper root, not documented spaniel descent. Now extinct.",
-                          "img": "/history/breeds/talbot-hound.jpg",
-                          "value": 0.88
-                        }
-                      ]
-                    },
-                    {
-                      "name": "Basset and heavy hounds",
-                      "note": "Low, long, heavy hound blood for build and weight. Now extinct.",
-                      "img": "/history/breeds/Medieval-Bloodhound.jpg",
-                      "children": [
-                        {
-                          "name": "Southern Hound",
-                          "note": "The heavy, slow, deep-voiced trailing hound, the right match for the stout, low spaniels. Now extinct.",
-                          "img": "/history/breeds/Southern-Hound.jpg",
-                          "value": 1.08
-                        },
-                        {
-                          "name": "Bloodhound",
-                          "note": "The supreme heavy trailing hound of the same deep-nosed line, still bred today.",
-                          "img": "/history/breeds/Medieval-Bloodhound.jpg",
-                          "value": 0.72
                         }
                       ]
                     }
@@ -18827,6 +18671,190 @@
       "note": "The larger land spaniels, bred to 'spring' game from cover for the net, hawk and later the gun. The Cocker's bigger litter-mate, set apart only by size.",
       "children": [
         {
+          "name": "Land spaniels",
+          "note": "The old English land-spaniel stock that every working spaniel springs from. Now extinct.",
+          "img": "/history/breeds/original-land-spaniel.jpg",
+          "children": [
+            {
+              "name": "Rache",
+              "note": "The medieval running scenting hound that ranged and flushed game, the closest in work to a bird dog. Caius listed the land spaniel among the fowling dogs, separate from the hounds, so this older root is a reconstruction, not recorded descent. Now extinct.",
+              "img": "/history/breeds/rache.jpg",
+              "children": [
+                {
+                  "name": "St Hubert Hound",
+                  "note": "The monks' scent hound the Normans brought over, one strain behind the running pack.",
+                  "img": "/history/breeds/St-Hubert-Hound.jpg",
+                  "value": 21
+                },
+                {
+                  "name": "Talbot",
+                  "note": "The older white finding-hound stock, the other strain in that pack. A modelled half of the pair, not a recorded mating.",
+                  "img": "/history/breeds/talbot-hound.jpg",
+                  "children": [
+                    {
+                      "name": "St Hubert Hound",
+                      "note": "The monks' scent hound brought over by the Normans.",
+                      "img": "/history/breeds/St-Hubert-Hound.jpg",
+                      "value": 21
+                    },
+                    {
+                      "name": "Old scenting hounds",
+                      "note": "The tracking hounds of medieval lords.",
+                      "img": "/history/breeds/Old-scenting-hounds.jpg",
+                      "children": [
+                        {
+                          "name": "Celtic Scent Hound",
+                          "note": "Early Celtic tracking hound that followed game by scent, representing the roots of later European scent hounds. An extinct historical type.",
+                          "img": "/history/breeds/ancient-celtic-scent-hound.jpg",
+                          "value": 20
+                        },
+                        {
+                          "name": "Old scenting hounds",
+                          "note": "The tracking hounds of medieval lords.",
+                          "img": "/history/breeds/Old-scenting-hounds.jpg",
+                          "value": 20
+                        }
+                      ],
+                      "value": 0
+                    }
+                  ]
+                },
+                {
+                  "name": "Old scenting hounds",
+                  "note": "The native pack hounds of medieval Britain.",
+                  "img": "/history/breeds/Old-scenting-hounds.jpg",
+                  "children": [
+                    {
+                      "name": "Celtic Scent Hound",
+                      "note": "Early Celtic tracking hound that followed game by scent, representing the roots of later European scent hounds. An extinct historical type.",
+                      "img": "/history/breeds/ancient-celtic-scent-hound.jpg",
+                      "children": [
+                        {
+                          "name": "Segusian tracking hounds",
+                          "note": "The shaggy Gaulish trail hounds the Romans knew by name, famous for following a scent. Now extinct.",
+                          "img": "/history/breeds/segusian-hounds.jpg",
+                          "children": [
+                            {
+                              "name": "Old hunting dogs of the Celts",
+                              "note": "The native running dogs of Iron Age Europe. Now extinct.",
+                              "img": "/history/breeds/Old-hunting-dogs-of-the-Celts.jpg",
+                              "value": 5
+                            },
+                            {
+                              "name": "Segusian tracking hounds",
+                              "note": "The shaggy Gaulish trail hounds the Romans knew by name, famous for following a scent. Now extinct.",
+                              "img": "/history/breeds/segusian-hounds.jpg",
+                              "value": 5
+                            }
+                          ]
+                        },
+                        {
+                          "name": "Laconian tracking hounds",
+                          "note": "The keen-nosed hare-tracking hounds of ancient Greece, praised by Greek hunting writers. Now extinct.",
+                          "img": "/history/greek-harehound.jpg",
+                          "children": [
+                            {
+                              "name": "Old trail dogs of the ancient East",
+                              "note": "The early trail-following hunting dogs of the ancient East. Now extinct.",
+                              "img": "/history/breeds/old-trail-dogs-of-the-ancient-east.jpg",
+                              "value": 5
+                            },
+                            {
+                              "name": "Laconian tracking hounds",
+                              "note": "The keen-nosed hare-tracking hounds of ancient Greece, praised by Greek hunting writers. Now extinct.",
+                              "img": "/history/greek-harehound.jpg",
+                              "value": 5
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Old scenting hounds",
+                      "note": "The native pack hounds of medieval Britain.",
+                      "img": "/history/breeds/Old-scenting-hounds.jpg",
+                      "value": 20
+                    }
+                  ],
+                  "value": 0
+                }
+              ]
+            },
+            {
+              "name": "Talbot",
+              "note": "Older white finding-hound stock standing behind the medieval scenting hounds. An inferred deeper root, not documented spaniel descent. Now extinct.",
+              "img": "/history/breeds/talbot-hound.jpg",
+              "children": [
+                {
+                  "name": "St Hubert Hound",
+                  "note": "The monks' scent hound brought over by the Normans.",
+                  "img": "/history/breeds/St-Hubert-Hound.jpg",
+                  "value": 28
+                },
+                {
+                  "name": "Old scenting hounds",
+                  "note": "The tracking hounds of medieval lords.",
+                  "img": "/history/breeds/Old-scenting-hounds.jpg",
+                  "children": [
+                    {
+                      "name": "Celtic Scent Hound",
+                      "note": "Early Celtic tracking hound that followed game by scent, representing the roots of later European scent hounds. An extinct historical type.",
+                      "img": "/history/breeds/ancient-celtic-scent-hound.jpg",
+                      "children": [
+                        {
+                          "name": "Segusian tracking hounds",
+                          "note": "The shaggy Gaulish trail hounds the Romans knew by name, famous for following a scent. Now extinct.",
+                          "img": "/history/breeds/segusian-hounds.jpg",
+                          "children": [
+                            {
+                              "name": "Old hunting dogs of the Celts",
+                              "note": "The native running dogs of Iron Age Europe. Now extinct.",
+                              "img": "/history/breeds/Old-hunting-dogs-of-the-Celts.jpg",
+                              "value": 5
+                            },
+                            {
+                              "name": "Segusian tracking hounds",
+                              "note": "The shaggy Gaulish trail hounds the Romans knew by name, famous for following a scent. Now extinct.",
+                              "img": "/history/breeds/segusian-hounds.jpg",
+                              "value": 5
+                            }
+                          ]
+                        },
+                        {
+                          "name": "Laconian tracking hounds",
+                          "note": "The keen-nosed hare-tracking hounds of ancient Greece, praised by Greek hunting writers. Now extinct.",
+                          "img": "/history/greek-harehound.jpg",
+                          "children": [
+                            {
+                              "name": "Old trail dogs of the ancient East",
+                              "note": "The early trail-following hunting dogs of the ancient East. Now extinct.",
+                              "img": "/history/breeds/old-trail-dogs-of-the-ancient-east.jpg",
+                              "value": 5
+                            },
+                            {
+                              "name": "Laconian tracking hounds",
+                              "note": "The keen-nosed hare-tracking hounds of ancient Greece, praised by Greek hunting writers. Now extinct.",
+                              "img": "/history/greek-harehound.jpg",
+                              "value": 5
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Old scenting hounds",
+                      "note": "The tracking hounds of medieval lords.",
+                      "img": "/history/breeds/Old-scenting-hounds.jpg",
+                      "value": 20
+                    }
+                  ],
+                  "value": 0
+                }
+              ]
+            }
+          ]
+        },
+        {
           "name": "Norfolk Spaniel",
           "note": "A springer-type spaniel later folded into the breed.",
           "img": "/history/breeds/Norfolk-Spaniel.jpg",
@@ -18845,7 +18873,7 @@
                       "name": "St Hubert Hound",
                       "note": "The monks' scent hound the Normans brought over, one strain behind the running pack.",
                       "img": "/history/breeds/St-Hubert-Hound.jpg",
-                      "value": 8.775
+                      "value": 5.85
                     },
                     {
                       "name": "Talbot",
@@ -18856,7 +18884,7 @@
                           "name": "St Hubert Hound",
                           "note": "The monks' scent hound brought over by the Normans.",
                           "img": "/history/breeds/St-Hubert-Hound.jpg",
-                          "value": 8.775
+                          "value": 5.85
                         },
                         {
                           "name": "Old scenting hounds",
@@ -18911,7 +18939,7 @@
                       "name": "St Hubert Hound",
                       "note": "The monks' scent hound brought over by the Normans.",
                       "img": "/history/breeds/St-Hubert-Hound.jpg",
-                      "value": 11.7
+                      "value": 7.8
                     },
                     {
                       "name": "Old scenting hounds",
@@ -18956,13 +18984,13 @@
                           "name": "St Hubert Hound",
                           "note": "The abbey scent hound it descends from almost unchanged.",
                           "img": "/history/breeds/St-Hubert-Hound.jpg",
-                          "value": 4.2525
+                          "value": 2.835
                         },
                         {
                           "name": "Old scenting hounds",
                           "note": "The heavy continental tracking hounds of the same line.",
                           "img": "/history/breeds/Old-scenting-hounds.jpg",
-                          "value": 2.835
+                          "value": 1.89
                         }
                       ]
                     },
@@ -18975,13 +19003,13 @@
                           "name": "Talbot",
                           "note": "The white Norman hound at its root.",
                           "img": "/history/breeds/talbot-hound.jpg",
-                          "value": 2.835
+                          "value": 1.89
                         },
                         {
                           "name": "St Hubert Hound",
                           "note": "The abbey scent hounds brought across the Channel.",
                           "img": "/history/breeds/St-Hubert-Hound.jpg",
-                          "value": 1.89
+                          "value": 1.26
                         }
                       ]
                     },
@@ -18989,357 +19017,7 @@
                       "name": "Rough water dogs",
                       "note": "Shaggy, water-loving dogs for the wet work. Now extinct.",
                       "img": "/history/breeds/rough-water-dogs.jpg",
-                      "value": 3.9375
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "Water spaniels",
-          "note": "Working water spaniels that added drive and a love of wet cover. Now extinct.",
-          "img": "/history/breeds/original-water-spaniel.jpg",
-          "children": [
-            {
-              "name": "Otterhound",
-              "note": "The web-footed otter-hunting hound, the water-working Tudor root of the water spaniels. A functional match, not documented descent. Now endangered.",
-              "img": "/history/breeds/otterhound-photo.jpg",
-              "children": [
-                {
-                  "name": "Bloodhound",
-                  "note": "Tracking power and a tremendous nose.",
-                  "img": "/history/breeds/Medieval-Bloodhound.jpg",
-                  "children": [
-                    {
-                      "name": "St Hubert Hound",
-                      "note": "The abbey scent hound it descends from almost unchanged.",
-                      "img": "/history/breeds/St-Hubert-Hound.jpg",
-                      "value": 8.1
-                    },
-                    {
-                      "name": "Old scenting hounds",
-                      "note": "The heavy continental tracking hounds of the same line.",
-                      "img": "/history/breeds/Old-scenting-hounds.jpg",
-                      "value": 5.4
-                    }
-                  ]
-                },
-                {
-                  "name": "Southern Hound",
-                  "note": "Old deep-voiced scent-hound stock.",
-                  "img": "/history/breeds/Southern-Hound.jpg",
-                  "children": [
-                    {
-                      "name": "Talbot",
-                      "note": "The white Norman hound at its root.",
-                      "img": "/history/breeds/talbot-hound.jpg",
-                      "children": [
-                        {
-                          "name": "St Hubert Hound",
-                          "note": "The monks' scent hound brought over by the Normans.",
-                          "img": "/history/breeds/St-Hubert-Hound.jpg",
-                          "value": 5.4
-                        },
-                        {
-                          "name": "Old scenting hounds",
-                          "note": "The tracking hounds of medieval lords.",
-                          "img": "/history/breeds/Old-scenting-hounds.jpg",
-                          "children": [
-                            {
-                              "name": "Celtic Scent Hound",
-                              "note": "Early Celtic tracking hound that followed game by scent, representing the roots of later European scent hounds. An extinct historical type.",
-                              "img": "/history/breeds/ancient-celtic-scent-hound.jpg",
-                              "value": 20
-                            },
-                            {
-                              "name": "Old scenting hounds",
-                              "note": "The tracking hounds of medieval lords.",
-                              "img": "/history/breeds/Old-scenting-hounds.jpg",
-                              "value": 20
-                            }
-                          ],
-                          "value": 0
-                        }
-                      ]
-                    },
-                    {
-                      "name": "St Hubert Hound",
-                      "note": "The abbey scent hounds brought across the Channel.",
-                      "img": "/history/breeds/St-Hubert-Hound.jpg",
-                      "value": 3.6
-                    }
-                  ]
-                },
-                {
-                  "name": "Rough water dogs",
-                  "note": "Shaggy, water-loving dogs for the wet work. Now extinct.",
-                  "img": "/history/breeds/rough-water-dogs.jpg",
-                  "value": 7.5
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "Welsh Springer Spaniel",
-          "note": "A close cousin from the same springing-spaniel root.",
-          "img": "/history/breeds/welsh-springer-spaniel-photo.jpg",
-          "children": [
-            {
-              "name": "Old Welsh land spaniels",
-              "note": "The native red-and-white working spaniels of Wales. Now extinct.",
-              "img": "/history/breeds/Old-Welsh-land-spaniels.jpg",
-              "children": [
-                {
-                  "name": "Land spaniels",
-                  "note": "The broader old English land-spaniel stock behind the Welsh variety. Now extinct.",
-                  "img": "/history/breeds/original-land-spaniel.jpg",
-                  "children": [
-                    {
-                      "name": "Rache",
-                      "note": "The medieval running scenting hound that ranged and flushed game, the closest in work to a bird dog. Caius listed the land spaniel among the fowling dogs, separate from the hounds, so this older root is a reconstruction, not recorded descent. Now extinct.",
-                      "img": "/history/breeds/rache.jpg",
-                      "children": [
-                        {
-                          "name": "St Hubert Hound",
-                          "note": "The monks' scent hound the Normans brought over, one strain behind the running pack.",
-                          "img": "/history/breeds/St-Hubert-Hound.jpg",
-                          "value": 2.7
-                        },
-                        {
-                          "name": "Talbot",
-                          "note": "The older white finding-hound stock, the other strain in that pack. A modelled half of the pair, not a recorded mating.",
-                          "img": "/history/breeds/talbot-hound.jpg",
-                          "value": 2.7
-                        },
-                        {
-                          "name": "Old scenting hounds",
-                          "note": "The native pack hounds of medieval Britain.",
-                          "img": "/history/breeds/Old-scenting-hounds.jpg",
-                          "children": [
-                            {
-                              "name": "Celtic Scent Hound",
-                              "note": "Early Celtic tracking hound that followed game by scent, representing the roots of later European scent hounds. An extinct historical type.",
-                              "img": "/history/breeds/ancient-celtic-scent-hound.jpg",
-                              "value": 20
-                            },
-                            {
-                              "name": "Old scenting hounds",
-                              "note": "The native pack hounds of medieval Britain.",
-                              "img": "/history/breeds/Old-scenting-hounds.jpg",
-                              "value": 20
-                            }
-                          ],
-                          "value": 0
-                        }
-                      ]
-                    },
-                    {
-                      "name": "Talbot",
-                      "note": "Older white finding-hound stock standing behind the medieval scenting hounds. An inferred deeper root, not documented spaniel descent. Now extinct.",
-                      "img": "/history/breeds/talbot-hound.jpg",
-                      "children": [
-                        {
-                          "name": "St Hubert Hound",
-                          "note": "The monks' scent hound brought over by the Normans.",
-                          "img": "/history/breeds/St-Hubert-Hound.jpg",
-                          "value": 3.6
-                        },
-                        {
-                          "name": "Old scenting hounds",
-                          "note": "The tracking hounds of medieval lords.",
-                          "img": "/history/breeds/Old-scenting-hounds.jpg",
-                          "children": [
-                            {
-                              "name": "Celtic Scent Hound",
-                              "note": "Early Celtic tracking hound that followed game by scent, representing the roots of later European scent hounds. An extinct historical type.",
-                              "img": "/history/breeds/ancient-celtic-scent-hound.jpg",
-                              "value": 20
-                            },
-                            {
-                              "name": "Old scenting hounds",
-                              "note": "The tracking hounds of medieval lords.",
-                              "img": "/history/breeds/Old-scenting-hounds.jpg",
-                              "value": 20
-                            }
-                          ],
-                          "value": 0
-                        }
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "name": "Rache",
-                  "note": "The medieval ranging scenting hound, an inferred deeper root rather than documented descent. Now extinct.",
-                  "img": "/history/breeds/rache.jpg",
-                  "children": [
-                    {
-                      "name": "St Hubert Hound",
-                      "note": "The monks' scent hound the Normans brought over, one strain behind the running pack.",
-                      "img": "/history/breeds/St-Hubert-Hound.jpg",
-                      "value": 3
-                    },
-                    {
-                      "name": "Talbot",
-                      "note": "The older white finding-hound stock, the other strain in that pack. A modelled half of the pair, not a recorded mating.",
-                      "img": "/history/breeds/talbot-hound.jpg",
-                      "children": [
-                        {
-                          "name": "St Hubert Hound",
-                          "note": "The monks' scent hound brought over by the Normans.",
-                          "img": "/history/breeds/St-Hubert-Hound.jpg",
-                          "value": 3
-                        },
-                        {
-                          "name": "Old scenting hounds",
-                          "note": "The tracking hounds of medieval lords.",
-                          "img": "/history/breeds/Old-scenting-hounds.jpg",
-                          "children": [
-                            {
-                              "name": "Celtic Scent Hound",
-                              "note": "Early Celtic tracking hound that followed game by scent, representing the roots of later European scent hounds. An extinct historical type.",
-                              "img": "/history/breeds/ancient-celtic-scent-hound.jpg",
-                              "value": 20
-                            },
-                            {
-                              "name": "Old scenting hounds",
-                              "note": "The tracking hounds of medieval lords.",
-                              "img": "/history/breeds/Old-scenting-hounds.jpg",
-                              "value": 20
-                            }
-                          ],
-                          "value": 0
-                        }
-                      ]
-                    },
-                    {
-                      "name": "Old scenting hounds",
-                      "note": "The native pack hounds of medieval Britain.",
-                      "img": "/history/breeds/Old-scenting-hounds.jpg",
-                      "children": [
-                        {
-                          "name": "Celtic Scent Hound",
-                          "note": "Early Celtic tracking hound that followed game by scent, representing the roots of later European scent hounds. An extinct historical type.",
-                          "img": "/history/breeds/ancient-celtic-scent-hound.jpg",
-                          "value": 20
-                        },
-                        {
-                          "name": "Old scenting hounds",
-                          "note": "The native pack hounds of medieval Britain.",
-                          "img": "/history/breeds/Old-scenting-hounds.jpg",
-                          "value": 20
-                        }
-                      ],
-                      "value": 0
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "name": "Land spaniels",
-              "note": "The larger flushing spaniels of the same family. Now extinct.",
-              "img": "/history/breeds/original-land-spaniel.jpg",
-              "children": [
-                {
-                  "name": "Rache",
-                  "note": "The medieval running scenting hound that ranged and flushed game, the closest in work to a bird dog. Caius listed the land spaniel among the fowling dogs, separate from the hounds, so this older root is a reconstruction, not recorded descent. Now extinct.",
-                  "img": "/history/breeds/rache.jpg",
-                  "children": [
-                    {
-                      "name": "St Hubert Hound",
-                      "note": "The monks' scent hound the Normans brought over, one strain behind the running pack.",
-                      "img": "/history/breeds/St-Hubert-Hound.jpg",
-                      "value": 3
-                    },
-                    {
-                      "name": "Talbot",
-                      "note": "The older white finding-hound stock, the other strain in that pack. A modelled half of the pair, not a recorded mating.",
-                      "img": "/history/breeds/talbot-hound.jpg",
-                      "children": [
-                        {
-                          "name": "St Hubert Hound",
-                          "note": "The monks' scent hound brought over by the Normans.",
-                          "img": "/history/breeds/St-Hubert-Hound.jpg",
-                          "value": 3
-                        },
-                        {
-                          "name": "Old scenting hounds",
-                          "note": "The tracking hounds of medieval lords.",
-                          "img": "/history/breeds/Old-scenting-hounds.jpg",
-                          "children": [
-                            {
-                              "name": "Celtic Scent Hound",
-                              "note": "Early Celtic tracking hound that followed game by scent, representing the roots of later European scent hounds. An extinct historical type.",
-                              "img": "/history/breeds/ancient-celtic-scent-hound.jpg",
-                              "value": 20
-                            },
-                            {
-                              "name": "Old scenting hounds",
-                              "note": "The tracking hounds of medieval lords.",
-                              "img": "/history/breeds/Old-scenting-hounds.jpg",
-                              "value": 20
-                            }
-                          ],
-                          "value": 0
-                        }
-                      ]
-                    },
-                    {
-                      "name": "Old scenting hounds",
-                      "note": "The native pack hounds of medieval Britain.",
-                      "img": "/history/breeds/Old-scenting-hounds.jpg",
-                      "children": [
-                        {
-                          "name": "Celtic Scent Hound",
-                          "note": "Early Celtic tracking hound that followed game by scent, representing the roots of later European scent hounds. An extinct historical type.",
-                          "img": "/history/breeds/ancient-celtic-scent-hound.jpg",
-                          "value": 20
-                        },
-                        {
-                          "name": "Old scenting hounds",
-                          "note": "The native pack hounds of medieval Britain.",
-                          "img": "/history/breeds/Old-scenting-hounds.jpg",
-                          "value": 20
-                        }
-                      ],
-                      "value": 0
-                    }
-                  ]
-                },
-                {
-                  "name": "Talbot",
-                  "note": "Older white finding-hound stock standing behind the medieval scenting hounds. An inferred deeper root, not documented spaniel descent. Now extinct.",
-                  "img": "/history/breeds/talbot-hound.jpg",
-                  "children": [
-                    {
-                      "name": "St Hubert Hound",
-                      "note": "The monks' scent hound brought over by the Normans.",
-                      "img": "/history/breeds/St-Hubert-Hound.jpg",
-                      "value": 4
-                    },
-                    {
-                      "name": "Old scenting hounds",
-                      "note": "The tracking hounds of medieval lords.",
-                      "img": "/history/breeds/Old-scenting-hounds.jpg",
-                      "children": [
-                        {
-                          "name": "Celtic Scent Hound",
-                          "note": "Early Celtic tracking hound that followed game by scent, representing the roots of later European scent hounds. An extinct historical type.",
-                          "img": "/history/breeds/ancient-celtic-scent-hound.jpg",
-                          "value": 20
-                        },
-                        {
-                          "name": "Old scenting hounds",
-                          "note": "The tracking hounds of medieval lords.",
-                          "img": "/history/breeds/Old-scenting-hounds.jpg",
-                          "value": 20
-                        }
-                      ],
-                      "value": 0
+                      "value": 2.625
                     }
                   ]
                 }
@@ -20711,7 +20389,7 @@
                   "name": "St Hubert Hound",
                   "note": "The monks' scent hound the Normans brought over, one strain behind the running pack.",
                   "img": "/history/breeds/St-Hubert-Hound.jpg",
-                  "value": 16.5
+                  "value": 21
                 },
                 {
                   "name": "Talbot",
@@ -20722,7 +20400,7 @@
                       "name": "St Hubert Hound",
                       "note": "The monks' scent hound brought over by the Normans.",
                       "img": "/history/breeds/St-Hubert-Hound.jpg",
-                      "value": 16.5
+                      "value": 21
                     },
                     {
                       "name": "Old scenting hounds",
@@ -20816,7 +20494,7 @@
                   "name": "St Hubert Hound",
                   "note": "The monks' scent hound brought over by the Normans.",
                   "img": "/history/breeds/St-Hubert-Hound.jpg",
-                  "value": 22
+                  "value": 28
                 },
                 {
                   "name": "Old scenting hounds",
@@ -20882,25 +20560,104 @@
           ]
         },
         {
-          "name": "Field Spaniel",
-          "note": "A close gundog cousin from the same spaniel family.",
-          "img": "/history/breeds/field-spaniel-photo.jpg",
+          "name": "Welsh Springer Spaniel",
+          "note": "A Welsh outcross used to establish the parti-coloured lines.",
+          "img": "/history/breeds/welsh-springer-spaniel-photo.jpg",
           "children": [
             {
-              "name": "Land spaniels",
-              "note": "The old land-spaniel stock at its foundation. Now extinct.",
-              "img": "/history/breeds/original-land-spaniel.jpg",
+              "name": "Old Welsh land spaniels",
+              "note": "The native red-and-white working spaniels of Wales. Now extinct.",
+              "img": "/history/breeds/Old-Welsh-land-spaniels.jpg",
               "children": [
                 {
+                  "name": "Land spaniels",
+                  "note": "The broader old English land-spaniel stock behind the Welsh variety. Now extinct.",
+                  "img": "/history/breeds/original-land-spaniel.jpg",
+                  "children": [
+                    {
+                      "name": "Rache",
+                      "note": "The medieval running scenting hound that ranged and flushed game, the closest in work to a bird dog. Caius listed the land spaniel among the fowling dogs, separate from the hounds, so this older root is a reconstruction, not recorded descent. Now extinct.",
+                      "img": "/history/breeds/rache.jpg",
+                      "children": [
+                        {
+                          "name": "St Hubert Hound",
+                          "note": "The monks' scent hound the Normans brought over, one strain behind the running pack.",
+                          "img": "/history/breeds/St-Hubert-Hound.jpg",
+                          "value": 3.24
+                        },
+                        {
+                          "name": "Talbot",
+                          "note": "The older white finding-hound stock, the other strain in that pack. A modelled half of the pair, not a recorded mating.",
+                          "img": "/history/breeds/talbot-hound.jpg",
+                          "value": 3.24
+                        },
+                        {
+                          "name": "Old scenting hounds",
+                          "note": "The native pack hounds of medieval Britain.",
+                          "img": "/history/breeds/Old-scenting-hounds.jpg",
+                          "children": [
+                            {
+                              "name": "Celtic Scent Hound",
+                              "note": "Early Celtic tracking hound that followed game by scent, representing the roots of later European scent hounds. An extinct historical type.",
+                              "img": "/history/breeds/ancient-celtic-scent-hound.jpg",
+                              "value": 20
+                            },
+                            {
+                              "name": "Old scenting hounds",
+                              "note": "The native pack hounds of medieval Britain.",
+                              "img": "/history/breeds/Old-scenting-hounds.jpg",
+                              "value": 20
+                            }
+                          ],
+                          "value": 0
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Talbot",
+                      "note": "Older white finding-hound stock standing behind the medieval scenting hounds. An inferred deeper root, not documented spaniel descent. Now extinct.",
+                      "img": "/history/breeds/talbot-hound.jpg",
+                      "children": [
+                        {
+                          "name": "St Hubert Hound",
+                          "note": "The monks' scent hound brought over by the Normans.",
+                          "img": "/history/breeds/St-Hubert-Hound.jpg",
+                          "value": 4.320000000000001
+                        },
+                        {
+                          "name": "Old scenting hounds",
+                          "note": "The tracking hounds of medieval lords.",
+                          "img": "/history/breeds/Old-scenting-hounds.jpg",
+                          "children": [
+                            {
+                              "name": "Celtic Scent Hound",
+                              "note": "Early Celtic tracking hound that followed game by scent, representing the roots of later European scent hounds. An extinct historical type.",
+                              "img": "/history/breeds/ancient-celtic-scent-hound.jpg",
+                              "value": 20
+                            },
+                            {
+                              "name": "Old scenting hounds",
+                              "note": "The tracking hounds of medieval lords.",
+                              "img": "/history/breeds/Old-scenting-hounds.jpg",
+                              "value": 20
+                            }
+                          ],
+                          "value": 0
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
                   "name": "Rache",
-                  "note": "The medieval running scenting hound that ranged and flushed game, the closest in work to a bird dog. Caius listed the land spaniel among the fowling dogs, separate from the hounds, so this older root is a reconstruction, not recorded descent. Now extinct.",
+                  "note": "The medieval ranging scenting hound, an inferred deeper root rather than documented descent. Now extinct.",
                   "img": "/history/breeds/rache.jpg",
                   "children": [
                     {
                       "name": "St Hubert Hound",
                       "note": "The monks' scent hound the Normans brought over, one strain behind the running pack.",
                       "img": "/history/breeds/St-Hubert-Hound.jpg",
-                      "value": 3.375
+                      "value": 3.6
                     },
                     {
                       "name": "Talbot",
@@ -20911,7 +20668,7 @@
                           "name": "St Hubert Hound",
                           "note": "The monks' scent hound brought over by the Normans.",
                           "img": "/history/breeds/St-Hubert-Hound.jpg",
-                          "value": 3.375
+                          "value": 3.6
                         },
                         {
                           "name": "Old scenting hounds",
@@ -20956,314 +20713,12 @@
                       "value": 0
                     }
                   ]
-                },
-                {
-                  "name": "Talbot",
-                  "note": "Older white finding-hound stock standing behind the medieval scenting hounds. An inferred deeper root, not documented spaniel descent. Now extinct.",
-                  "img": "/history/breeds/talbot-hound.jpg",
-                  "children": [
-                    {
-                      "name": "St Hubert Hound",
-                      "note": "The monks' scent hound brought over by the Normans.",
-                      "img": "/history/breeds/St-Hubert-Hound.jpg",
-                      "value": 4.5
-                    },
-                    {
-                      "name": "Old scenting hounds",
-                      "note": "The tracking hounds of medieval lords.",
-                      "img": "/history/breeds/Old-scenting-hounds.jpg",
-                      "children": [
-                        {
-                          "name": "Celtic Scent Hound",
-                          "note": "Early Celtic tracking hound that followed game by scent, representing the roots of later European scent hounds. An extinct historical type.",
-                          "img": "/history/breeds/ancient-celtic-scent-hound.jpg",
-                          "value": 20
-                        },
-                        {
-                          "name": "Old scenting hounds",
-                          "note": "The tracking hounds of medieval lords.",
-                          "img": "/history/breeds/Old-scenting-hounds.jpg",
-                          "value": 20
-                        }
-                      ],
-                      "value": 0
-                    }
-                  ]
                 }
               ]
             },
-            {
-              "name": "Sussex Spaniel",
-              "note": "Lent weight, bone and a longer body.",
-              "img": "/history/breeds/Sussex-Spaniel.jpg",
-              "children": [
-                {
-                  "name": "Land spaniels",
-                  "note": "The native working spaniels of southern England. Now extinct.",
-                  "img": "/history/breeds/original-land-spaniel.jpg",
-                  "children": [
-                    {
-                      "name": "Rache",
-                      "note": "The medieval running scenting hound that ranged and flushed game, the closest in work to a bird dog. Caius listed the land spaniel among the fowling dogs, separate from the hounds, so this older root is a reconstruction, not recorded descent. Now extinct.",
-                      "img": "/history/breeds/rache.jpg",
-                      "children": [
-                        {
-                          "name": "St Hubert Hound",
-                          "note": "The monks' scent hound the Normans brought over, one strain behind the running pack.",
-                          "img": "/history/breeds/St-Hubert-Hound.jpg",
-                          "value": 1.575
-                        },
-                        {
-                          "name": "Talbot",
-                          "note": "The older white finding-hound stock, the other strain in that pack. A modelled half of the pair, not a recorded mating.",
-                          "img": "/history/breeds/talbot-hound.jpg",
-                          "value": 1.575
-                        },
-                        {
-                          "name": "Old scenting hounds",
-                          "note": "The native pack hounds of medieval Britain.",
-                          "img": "/history/breeds/Old-scenting-hounds.jpg",
-                          "children": [
-                            {
-                              "name": "Celtic Scent Hound",
-                              "note": "Early Celtic tracking hound that followed game by scent, representing the roots of later European scent hounds. An extinct historical type.",
-                              "img": "/history/breeds/ancient-celtic-scent-hound.jpg",
-                              "value": 20
-                            },
-                            {
-                              "name": "Old scenting hounds",
-                              "note": "The native pack hounds of medieval Britain.",
-                              "img": "/history/breeds/Old-scenting-hounds.jpg",
-                              "value": 20
-                            }
-                          ],
-                          "value": 0
-                        }
-                      ]
-                    },
-                    {
-                      "name": "Talbot",
-                      "note": "Older white finding-hound stock standing behind the medieval scenting hounds. An inferred deeper root, not documented spaniel descent. Now extinct.",
-                      "img": "/history/breeds/talbot-hound.jpg",
-                      "children": [
-                        {
-                          "name": "St Hubert Hound",
-                          "note": "The monks' scent hound brought over by the Normans.",
-                          "img": "/history/breeds/St-Hubert-Hound.jpg",
-                          "value": 2.1
-                        },
-                        {
-                          "name": "Old scenting hounds",
-                          "note": "The tracking hounds of medieval lords.",
-                          "img": "/history/breeds/Old-scenting-hounds.jpg",
-                          "children": [
-                            {
-                              "name": "Celtic Scent Hound",
-                              "note": "Early Celtic tracking hound that followed game by scent, representing the roots of later European scent hounds. An extinct historical type.",
-                              "img": "/history/breeds/ancient-celtic-scent-hound.jpg",
-                              "value": 20
-                            },
-                            {
-                              "name": "Old scenting hounds",
-                              "note": "The tracking hounds of medieval lords.",
-                              "img": "/history/breeds/Old-scenting-hounds.jpg",
-                              "value": 20
-                            }
-                          ],
-                          "value": 0
-                        }
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "name": "Heavier working spaniels",
-                  "note": "Lower, stouter spaniels that fixed its build. Now extinct.",
-                  "img": "/history/breeds/heavier-working-spaniel.jpg",
-                  "children": [
-                    {
-                      "name": "Land spaniels",
-                      "note": "The old land-spaniel stock at the base. Now extinct.",
-                      "img": "/history/breeds/original-land-spaniel.jpg",
-                      "children": [
-                        {
-                          "name": "Rache",
-                          "note": "The medieval running scenting hound that ranged and flushed game, the closest in work to a bird dog. Caius listed the land spaniel among the fowling dogs, separate from the hounds, so this older root is a reconstruction, not recorded descent. Now extinct.",
-                          "img": "/history/breeds/rache.jpg",
-                          "value": 1.155
-                        },
-                        {
-                          "name": "Talbot",
-                          "note": "Older white finding-hound stock standing behind the medieval scenting hounds. An inferred deeper root, not documented spaniel descent. Now extinct.",
-                          "img": "/history/breeds/talbot-hound.jpg",
-                          "value": 0.77
-                        }
-                      ]
-                    },
-                    {
-                      "name": "Basset and heavy hounds",
-                      "note": "Low, long, heavy hound blood for build and weight. Now extinct.",
-                      "img": "/history/breeds/Medieval-Bloodhound.jpg",
-                      "children": [
-                        {
-                          "name": "Southern Hound",
-                          "note": "The heavy, slow, deep-voiced trailing hound, the right match for the stout, low spaniels. Now extinct.",
-                          "img": "/history/breeds/Southern-Hound.jpg",
-                          "value": 0.945
-                        },
-                        {
-                          "name": "Bloodhound",
-                          "note": "The supreme heavy trailing hound of the same deep-nosed line, still bred today.",
-                          "img": "/history/breeds/Medieval-Bloodhound.jpg",
-                          "value": 0.63
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "name": "Clumber Spaniel",
-              "note": "Heavier spaniel blood for substance.",
-              "img": "/history/breeds/clumber-spaniel-photo.jpg",
-              "children": [
-                {
-                  "name": "Land spaniels",
-                  "note": "The heavy Alpine and old land spaniels at its base. Now extinct.",
-                  "img": "/history/breeds/original-land-spaniel.jpg",
-                  "children": [
-                    {
-                      "name": "Rache",
-                      "note": "The medieval running scenting hound that ranged and flushed game, the closest in work to a bird dog. Caius listed the land spaniel among the fowling dogs, separate from the hounds, so this older root is a reconstruction, not recorded descent. Now extinct.",
-                      "img": "/history/breeds/rache.jpg",
-                      "children": [
-                        {
-                          "name": "St Hubert Hound",
-                          "note": "The monks' scent hound the Normans brought over, one strain behind the running pack.",
-                          "img": "/history/breeds/St-Hubert-Hound.jpg",
-                          "value": 0.825
-                        },
-                        {
-                          "name": "Talbot",
-                          "note": "The older white finding-hound stock, the other strain in that pack. A modelled half of the pair, not a recorded mating.",
-                          "img": "/history/breeds/talbot-hound.jpg",
-                          "value": 0.825
-                        },
-                        {
-                          "name": "Old scenting hounds",
-                          "note": "The native pack hounds of medieval Britain.",
-                          "img": "/history/breeds/Old-scenting-hounds.jpg",
-                          "children": [
-                            {
-                              "name": "Celtic Scent Hound",
-                              "note": "Early Celtic tracking hound that followed game by scent, representing the roots of later European scent hounds. An extinct historical type.",
-                              "img": "/history/breeds/ancient-celtic-scent-hound.jpg",
-                              "value": 20
-                            },
-                            {
-                              "name": "Old scenting hounds",
-                              "note": "The native pack hounds of medieval Britain.",
-                              "img": "/history/breeds/Old-scenting-hounds.jpg",
-                              "value": 20
-                            }
-                          ],
-                          "value": 0
-                        }
-                      ]
-                    },
-                    {
-                      "name": "Talbot",
-                      "note": "Older white finding-hound stock standing behind the medieval scenting hounds. An inferred deeper root, not documented spaniel descent. Now extinct.",
-                      "img": "/history/breeds/talbot-hound.jpg",
-                      "children": [
-                        {
-                          "name": "St Hubert Hound",
-                          "note": "The monks' scent hound brought over by the Normans.",
-                          "img": "/history/breeds/St-Hubert-Hound.jpg",
-                          "value": 1.1
-                        },
-                        {
-                          "name": "Old scenting hounds",
-                          "note": "The tracking hounds of medieval lords.",
-                          "img": "/history/breeds/Old-scenting-hounds.jpg",
-                          "children": [
-                            {
-                              "name": "Celtic Scent Hound",
-                              "note": "Early Celtic tracking hound that followed game by scent, representing the roots of later European scent hounds. An extinct historical type.",
-                              "img": "/history/breeds/ancient-celtic-scent-hound.jpg",
-                              "value": 20
-                            },
-                            {
-                              "name": "Old scenting hounds",
-                              "note": "The tracking hounds of medieval lords.",
-                              "img": "/history/breeds/Old-scenting-hounds.jpg",
-                              "value": 20
-                            }
-                          ],
-                          "value": 0
-                        }
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "name": "Basset and heavy hounds",
-                  "note": "Low, long hound blood, by tradition Basset Hound, for its build and weight. Now in-decline.",
-                  "img": "/history/breeds/Medieval-Bloodhound.jpg",
-                  "children": [
-                    {
-                      "name": "Southern Hound",
-                      "note": "The heavy, slow, deep-voiced trailing hound, the right match for the stout, low spaniels. Now extinct.",
-                      "img": "/history/breeds/Southern-Hound.jpg",
-                      "children": [
-                        {
-                          "name": "Talbot",
-                          "note": "The white Norman hound at its root.",
-                          "img": "/history/breeds/talbot-hound.jpg",
-                          "value": 0.81
-                        },
-                        {
-                          "name": "St Hubert Hound",
-                          "note": "The abbey scent hounds brought across the Channel.",
-                          "img": "/history/breeds/St-Hubert-Hound.jpg",
-                          "value": 0.54
-                        }
-                      ]
-                    },
-                    {
-                      "name": "Bloodhound",
-                      "note": "The supreme heavy trailing hound of the same deep-nosed line, still bred today.",
-                      "img": "/history/breeds/Medieval-Bloodhound.jpg",
-                      "children": [
-                        {
-                          "name": "St Hubert Hound",
-                          "note": "The abbey scent hound it descends from almost unchanged.",
-                          "img": "/history/breeds/St-Hubert-Hound.jpg",
-                          "value": 0.54
-                        },
-                        {
-                          "name": "Old scenting hounds",
-                          "note": "The heavy continental tracking hounds of the same line.",
-                          "img": "/history/breeds/Old-scenting-hounds.jpg",
-                          "value": 0.36
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "Sussex Spaniel",
-          "note": "A heavier, golden-liver spaniel that lent bone and a rich coat.",
-          "img": "/history/breeds/Sussex-Spaniel.jpg",
-          "children": [
             {
               "name": "Land spaniels",
-              "note": "The native working spaniels of southern England. Now extinct.",
+              "note": "The larger flushing spaniels of the same family. Now extinct.",
               "img": "/history/breeds/original-land-spaniel.jpg",
               "children": [
                 {
@@ -21362,137 +20817,6 @@
                         }
                       ],
                       "value": 0
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "name": "Heavier working spaniels",
-              "note": "Lower, stouter spaniels that fixed its build. Now extinct.",
-              "img": "/history/breeds/heavier-working-spaniel.jpg",
-              "children": [
-                {
-                  "name": "Land spaniels",
-                  "note": "The old land-spaniel stock at the base. Now extinct.",
-                  "img": "/history/breeds/original-land-spaniel.jpg",
-                  "children": [
-                    {
-                      "name": "Rache",
-                      "note": "The medieval running scenting hound that ranged and flushed game, the closest in work to a bird dog. Caius listed the land spaniel among the fowling dogs, separate from the hounds, so this older root is a reconstruction, not recorded descent. Now extinct.",
-                      "img": "/history/breeds/rache.jpg",
-                      "children": [
-                        {
-                          "name": "St Hubert Hound",
-                          "note": "The monks' scent hound the Normans brought over, one strain behind the running pack.",
-                          "img": "/history/breeds/St-Hubert-Hound.jpg",
-                          "value": 1.32
-                        },
-                        {
-                          "name": "Talbot",
-                          "note": "The older white finding-hound stock, the other strain in that pack. A modelled half of the pair, not a recorded mating.",
-                          "img": "/history/breeds/talbot-hound.jpg",
-                          "value": 1.32
-                        },
-                        {
-                          "name": "Old scenting hounds",
-                          "note": "The native pack hounds of medieval Britain.",
-                          "img": "/history/breeds/Old-scenting-hounds.jpg",
-                          "children": [
-                            {
-                              "name": "Celtic Scent Hound",
-                              "note": "Early Celtic tracking hound that followed game by scent, representing the roots of later European scent hounds. An extinct historical type.",
-                              "img": "/history/breeds/ancient-celtic-scent-hound.jpg",
-                              "value": 20
-                            },
-                            {
-                              "name": "Old scenting hounds",
-                              "note": "The native pack hounds of medieval Britain.",
-                              "img": "/history/breeds/Old-scenting-hounds.jpg",
-                              "value": 20
-                            }
-                          ],
-                          "value": 0
-                        }
-                      ]
-                    },
-                    {
-                      "name": "Talbot",
-                      "note": "Older white finding-hound stock standing behind the medieval scenting hounds. An inferred deeper root, not documented spaniel descent. Now extinct.",
-                      "img": "/history/breeds/talbot-hound.jpg",
-                      "children": [
-                        {
-                          "name": "St Hubert Hound",
-                          "note": "The monks' scent hound brought over by the Normans.",
-                          "img": "/history/breeds/St-Hubert-Hound.jpg",
-                          "value": 1.76
-                        },
-                        {
-                          "name": "Old scenting hounds",
-                          "note": "The tracking hounds of medieval lords.",
-                          "img": "/history/breeds/Old-scenting-hounds.jpg",
-                          "children": [
-                            {
-                              "name": "Celtic Scent Hound",
-                              "note": "Early Celtic tracking hound that followed game by scent, representing the roots of later European scent hounds. An extinct historical type.",
-                              "img": "/history/breeds/ancient-celtic-scent-hound.jpg",
-                              "value": 20
-                            },
-                            {
-                              "name": "Old scenting hounds",
-                              "note": "The tracking hounds of medieval lords.",
-                              "img": "/history/breeds/Old-scenting-hounds.jpg",
-                              "value": 20
-                            }
-                          ],
-                          "value": 0
-                        }
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "name": "Basset and heavy hounds",
-                  "note": "Low, long, heavy hound blood for build and weight. Now extinct.",
-                  "img": "/history/breeds/Medieval-Bloodhound.jpg",
-                  "children": [
-                    {
-                      "name": "Southern Hound",
-                      "note": "The heavy, slow, deep-voiced trailing hound, the right match for the stout, low spaniels. Now extinct.",
-                      "img": "/history/breeds/Southern-Hound.jpg",
-                      "children": [
-                        {
-                          "name": "Talbot",
-                          "note": "The white Norman hound at its root.",
-                          "img": "/history/breeds/talbot-hound.jpg",
-                          "value": 1.2960000000000003
-                        },
-                        {
-                          "name": "St Hubert Hound",
-                          "note": "The abbey scent hounds brought across the Channel.",
-                          "img": "/history/breeds/St-Hubert-Hound.jpg",
-                          "value": 0.8640000000000001
-                        }
-                      ]
-                    },
-                    {
-                      "name": "Bloodhound",
-                      "note": "The supreme heavy trailing hound of the same deep-nosed line, still bred today.",
-                      "img": "/history/breeds/Medieval-Bloodhound.jpg",
-                      "children": [
-                        {
-                          "name": "St Hubert Hound",
-                          "note": "The abbey scent hound it descends from almost unchanged.",
-                          "img": "/history/breeds/St-Hubert-Hound.jpg",
-                          "value": 0.8639999999999999
-                        },
-                        {
-                          "name": "Old scenting hounds",
-                          "note": "The heavy continental tracking hounds of the same line.",
-                          "img": "/history/breeds/Old-scenting-hounds.jpg",
-                          "value": 0.576
-                        }
-                      ]
                     }
                   ]
                 }

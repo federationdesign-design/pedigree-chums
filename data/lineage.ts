@@ -571,23 +571,23 @@ const LINEAGE: Record<string, LineageNode> = {
     ]
   },
 
+  // 18 August 2026: until 1893 all these dogs were bred together as Land Spaniels and classified afterwards by size and colour, per the Kennel Club, so both breeds now take the shared root at the same weight. One litter could produce springer, Sussex and cocker, which is why littermates (Field Spaniel, Sussex Spaniel) have been removed as parents.
   "Cocker Spaniel": {
     name: "Cocker Spaniel",
     note: "The smallest of the old land spaniels, bred to flush, or 'cock', woodcock from cover. For years Cockers and Springers were born in the very same litters, sorted only by working size.",
     children: [
-      { name: "Land spaniels", note: "The old English land-spaniel stock that every working spaniel springs from. Now extinct.", img: "/history/breeds/original-land-spaniel.jpg", value: 55 },
-      { name: "Field Spaniel", note: "A close gundog cousin from the same spaniel family.", img: "/history/breeds/field-spaniel-photo.jpg", value: 25 },
-      { name: "Sussex Spaniel", note: "A heavier, golden-liver spaniel that lent bone and a rich coat.", img: "/history/breeds/Sussex-Spaniel.jpg", value: 20 }
+      { name: "Land spaniels", note: "The old English land-spaniel stock that every working spaniel springs from. Now extinct.", img: "/history/breeds/original-land-spaniel.jpg", value: 70 },
+      { name: "Welsh Springer Spaniel", note: "A Welsh outcross used to establish the parti-coloured lines.", img: "/history/breeds/welsh-springer-spaniel-photo.jpg", value: 30 }
     ]
   },
 
+  // 18 August 2026: until 1893 all these dogs were bred together as Land Spaniels and classified afterwards by size and colour, per the Kennel Club, so both breeds now take the shared root at the same weight. One litter could produce springer, Sussex and cocker, which is why littermates have been removed as parents.
   "Springer Spaniel": {
     name: "Springer Spaniel",
     note: "The larger land spaniels, bred to 'spring' game from cover for the net, hawk and later the gun. The Cocker's bigger litter-mate, set apart only by size.",
     children: [
-      { name: "Norfolk Spaniel", note: "A springer-type spaniel later folded into the breed.", img: "/history/breeds/Norfolk-Spaniel.jpg", value: 45 },
-      { name: "Water spaniels", note: "Working water spaniels that added drive and a love of wet cover. Now extinct.", img: "/history/breeds/original-water-spaniel.jpg", value: 30 },
-      { name: "Welsh Springer Spaniel", note: "A close cousin from the same springing-spaniel root.", img: "/history/breeds/welsh-springer-spaniel-photo.jpg", value: 25 }
+      { name: "Land spaniels", note: "The old English land-spaniel stock that every working spaniel springs from. Now extinct.", img: "/history/breeds/original-land-spaniel.jpg", value: 70 },
+      { name: "Norfolk Spaniel", note: "A springer-type spaniel later folded into the breed.", img: "/history/breeds/Norfolk-Spaniel.jpg", value: 30 }
     ]
   },
 
