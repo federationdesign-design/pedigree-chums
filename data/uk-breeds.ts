@@ -63,16 +63,29 @@ export const ukBreeds: UKBreed[] = [
 
   // The early 1800s
   { name: "Beagle", strip: "c1500", era: "1500s", anchor: 1555, note: "Small, merry scent hound bred to hunt rabbit and hare.", image: "/beagle-square.jpg" , tag: "popular" },
+  // 19 August 2026: early1800 group era labels reconciled with the file
+  // convention. era is an honest band label, never a bare year; anchor is purely
+  // an ordering device, never shown to the user, so an anchor must not be read as
+  // a researched date. Lurcher (1802) and Longdog (1803) read "1800s" and are now
+  // banded as "early 1800s" like the rest of the strip.
   { name: "Tweed Water Spaniel", strip: "early1800", era: "early 1800s", anchor: 1810, note: "Border water dog absorbed into the Golden Retriever.", image: "/history/breeds/tweed-water-spaniel.jpg", tag: "extinct" },
   { name: "Manchester Terrier", strip: "early1800", era: "early 1800s", anchor: 1820, note: "Sleek black-and-tan terrier bred to clear city rats.", image: "/history/breeds/manchester-terrior.jpg", tag: "endangered" },
   { name: "Bedlington Terrier", strip: "early1800", era: "early 1800s", anchor: 1825, note: "Lamb-like terrier with surprising grit.", image: "/history/breeds/Bedlington Terrier-photo.jpg", tag: "endangered" },
 
   // The spaniel explosion
-  { name: "English Springer Spaniel", strip: "spaniels", era: "1800s", anchor: 1870, note: "Tireless gundog that springs game from cover.", image: "/springer-square.jpg", tag: "popular" },
-  { name: "Welsh Springer Spaniel", strip: "spaniels", era: "1800s", anchor: 1872, note: "Red-and-white Welsh flushing spaniel.", image: "/history/breeds/welsh-springer-spaniel-photo.jpg", tag: "endangered" },
-  { name: "Cocker Spaniel", strip: "spaniels", era: "1800s", anchor: 1874, note: "Merry spaniel named for flushing woodcock.", image: "/cooker-square.jpg", tag: "popular" },
-  { name: "Field Spaniel", strip: "spaniels", era: "1800s", anchor: 1876, note: "Elegant working gundog spaniel.", image: "/history/breeds/field-spaniel-photo.jpg", tag: "endangered" },
-  { name: "Sussex Spaniel", strip: "spaniels", era: "1800s", anchor: 1878, note: "Golden-liver spaniel that works slow and gives tongue.", image: "/history/breeds/Sussex-Spaniel.jpg", tag: "endangered" },
+  // 19 August 2026: spaniels group era labels reconciled with the file
+  // convention. era is an honest band label, never a bare year; anchor is purely
+  // an ordering device, never shown to the user, so an anchor must not be read as
+  // a researched date. Every dog here is late 1800s by date (anchors 1870 to
+  // 1882), so all seven now read "late 1800s". The group stands as its own strip
+  // for editorial reasons, being the Spaniel Explosion, not because it sits in a
+  // different period. Toy Trawler Spaniel's anchor moved from 1878 to 1879 to
+  // break its tie with Sussex Spaniel and give a stable sort.
+  { name: "English Springer Spaniel", strip: "spaniels", era: "late 1800s", anchor: 1870, note: "Tireless gundog that springs game from cover.", image: "/springer-square.jpg", tag: "popular" },
+  { name: "Welsh Springer Spaniel", strip: "spaniels", era: "late 1800s", anchor: 1872, note: "Red-and-white Welsh flushing spaniel.", image: "/history/breeds/welsh-springer-spaniel-photo.jpg", tag: "endangered" },
+  { name: "Cocker Spaniel", strip: "spaniels", era: "late 1800s", anchor: 1874, note: "Merry spaniel named for flushing woodcock.", image: "/cooker-square.jpg", tag: "popular" },
+  { name: "Field Spaniel", strip: "spaniels", era: "late 1800s", anchor: 1876, note: "Elegant working gundog spaniel.", image: "/history/breeds/field-spaniel-photo.jpg", tag: "endangered" },
+  { name: "Sussex Spaniel", strip: "spaniels", era: "late 1800s", anchor: 1878, note: "Golden-liver spaniel that works slow and gives tongue.", image: "/history/breeds/Sussex-Spaniel.jpg", tag: "endangered" },
   // 19 August 2026: mid1800 group era labels reconciled with the file
   // convention. era is an honest band label, never a bare year and never carrying
   // a "c." hedge, since a band already implies approximation; anchor is purely an
@@ -82,7 +95,7 @@ export const ukBreeds: UKBreed[] = [
   // this strip deliberately: strip membership is an editorial grouping, not
   // arithmetic.
   { name: "Irish Water Spaniel", strip: "mid1800", era: "1830s", anchor: 1834, note: "Curly-coated water retriever with a rat-like tail.", image: "/history/breeds/irish-water-spaniel-photo.jpg", tag: "endangered" },
-  { name: "Norfolk Spaniel", strip: "spaniels", era: "1800s", anchor: 1882, note: "Springer-type spaniel later folded into the English Springer.", image: "/history/breeds/norfolk-spaniel-painting.jpg", tag: "extinct" },
+  { name: "Norfolk Spaniel", strip: "spaniels", era: "late 1800s", anchor: 1882, note: "Springer-type spaniel later folded into the English Springer.", image: "/history/breeds/norfolk-spaniel-painting.jpg", tag: "extinct" },
 
   // The mid-1800s
   { name: "Jack Russell Terrier", strip: "mid1800", era: "1820s", anchor: 1820, note: "Bold fox-bolting terrier bred by the Reverend John Russell.", image: "/jack-russel-square.jpg", tag: "trending" },
@@ -91,8 +104,8 @@ export const ukBreeds: UKBreed[] = [
   { name: "Staffordshire Bull Terrier", strip: "early1800", era: "early 1800s", anchor: 1832, note: "Bull-and-terrier fighting dog turned devoted family friend.", image: "/staffy-square.jpg", tag: "popular" },
   { name: "Bullmastiff", strip: "mid1800", era: "1860s", anchor: 1866, note: "Powerful night dog bred to pin poachers on Victorian estates.", image: "/history/breeds/Bullmastiff-photo.jpg", tag: "endangered" },
   { name: "Whippet", strip: "mid1800", era: "1880s", anchor: 1880, note: "The 'poor man's racehorse', a miniature coursing sighthound.", image: "/Whippet-square.jpg" , tag: "popular" },
-  { name: "Lurcher", strip: "early1800", era: "1800s", anchor: 1802, note: "Sighthound crossed with a working dog, the poacher's companion.", image: "/lercher-square.jpg" , tag: "popular" },
-  { name: "Longdog", strip: "early1800", era: "1800s", anchor: 1803, note: "A cross of two sighthounds, bred purely for speed.", image: "/history/breeds/long-dog-photo.jpg" , tag: "endangered" },
+  { name: "Lurcher", strip: "early1800", era: "early 1800s", anchor: 1802, note: "Sighthound crossed with a working dog, the poacher's companion.", image: "/lercher-square.jpg" , tag: "popular" },
+  { name: "Longdog", strip: "early1800", era: "early 1800s", anchor: 1803, note: "A cross of two sighthounds, bred purely for speed.", image: "/history/breeds/long-dog-photo.jpg" , tag: "endangered" },
   { name: "English White Terrier", strip: "mid1800", era: "1860s", anchor: 1860, note: "Show terrier of the 1860s that died out within decades.", image: "/history/breeds/english-white-terrier-painting.jpg", tag: "extinct" },
   { name: "Yorkshire Terrier", strip: "mid1800", era: "1860s", anchor: 1863, note: "Mill-town ratter that became a glamorous toy.", image: "/yorkshire-square.jpg" , tag: "in-decline" },
   // 19 August 2026: late1800 group era and anchor reconciled with the file
@@ -183,7 +196,7 @@ export const ukBreeds: UKBreed[] = [
   { name: "North Country Beagle", strip: "c1700", era: "1700s", anchor: 1720, note: "Swift northern hound, bred away into the modern Beagle by 1800.", tag: "extinct", image: "/history/breeds/North-Country-Beagle.jpg" },
   { name: "Old Welsh Grey Sheepdog", strip: "c1700", era: "1700s", anchor: 1740, note: "Shaggy grey Welsh hill herder, kin to the Bearded Collie.", tag: "extinct", image: "/history/breeds/old-welsh-grey-sheepdog.jpg" },
   { name: "Paisley Terrier", strip: "mid1800", era: "1860s", anchor: 1865, note: "Silky Scottish show terrier, forerunner of the Yorkshire Terrier.", tag: "extinct", image: "/history/breeds/Paisley-Terrier=photo.jpg" },
-  { name: "Toy Trawler Spaniel", strip: "spaniels", era: "1800s", anchor: 1878, note: "Small Victorian companion spaniel bred from the King Charles.", tag: "extinct", image: "/history/breeds/Toy-Trawler-Spaniel.jpg" },
+  { name: "Toy Trawler Spaniel", strip: "spaniels", era: "late 1800s", anchor: 1879, note: "Small Victorian companion spaniel bred from the King Charles.", tag: "extinct", image: "/history/breeds/Toy-Trawler-Spaniel.jpg" },
   { name: "Cumberland Sheepdog", strip: "c1900", era: "early 1900s", anchor: 1910, note: "Northern herder folded into the Border Collie in the early 1900s.", image: "/history/breeds/cumberland-sheepdog.jpg", tag: "extinct" },
   { name: "Toy Bulldog", strip: "c1900", era: "early 1900s", anchor: 1914, note: "Miniature Victorian companion Bulldog, last recorded in 1914.", image: "/history/breeds/toy-bulldog.jpg", tag: "extinct" },
   { name: "Dumfriesshire Hound", strip: "c1900", era: "1920s", anchor: 1920, note: "Tall black-and-tan Scottish foxhound of the Galloway hills.", tag: "extinct", image: "/history/breeds/Dumfriesshire-Hound.jpg" },
