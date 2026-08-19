@@ -107,6 +107,9 @@ export default function HistoryPage() {
 
         <div className={styles.sections}>
           <Triangles items={pageTriangles} z={3} />
+          {/* 19 August 2026: stacking this index newest-first was tried and
+              reverted the same day. It stays chronological, Ancient Times at the
+              top. Recorded so the idea is not proposed again as new. */}
           {SECTIONS.filter((s) => s.title !== "Dogs in the armed forces").map((s, i) => {
             return (
               <div key={i} id={s.anchor}>
