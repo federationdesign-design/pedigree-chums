@@ -369,7 +369,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "A true working terrier from the hills along the English and Scottish border, bred to keep up with the hunt and go to ground after foxes.",
     children: [
       { name: "Bedlington Terrier", note: "Shares the same old Border terrier stock and a common working ancestor.", img: "/history/breeds/Bedlington Terrier-photo.jpg", value: 34 },
-      { name: "Dandie Dinmont Terrier", note: "Another Border breed from the same root, raised in the same hills.", img: "/history/breeds/dandie-dinmont-terrier-photo.jpeg", value: 33 },
+      { name: "Dandie Dinmont Terrier", note: "Another Border breed from the same root, raised in the same hills.", img: "/history/breeds/dandie-dinmont-terrier.jpg", value: 33 },
       { name: "Old fell terriers", note: "The hardy fox-working terriers of the fells that shaped the type. Now extinct.", img: "/history/breeds/Old-fell-terriers-Patterdale-Terrier-Working-hunt-terriers.jpg", value: 33 }
     ]
   },
@@ -643,7 +643,7 @@ const LINEAGE: Record<string, LineageNode> = {
     children: [
       { name: "Old Border terriers", note: "The local working terriers of the Rothbury and border country. Now extinct.", img: "/history/breeds/Old-Border-terriers.jpg", value: 50 },
       { name: "Whippet", note: "Brought in for speed and the arched, racy back.", img: "/history/breeds/whippet-photo.jpg", value: 30 },
-      { name: "Dandie Dinmont Terrier", note: "A close relative from the same border rootstock, sharing the crisp coat and topknot.", img: "/history/breeds/dandie-dinmont-terrier-photo.jpeg", value: 20 }
+      { name: "Dandie Dinmont Terrier", note: "A close relative from the same border rootstock, sharing the crisp coat and topknot.", img: "/history/breeds/dandie-dinmont-terrier.jpg", value: 20 }
     ]
   },
 
@@ -697,7 +697,8 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "Ireland's blue-coated all-rounder from County Kerry, a farm dog, herder, hunter and fighter rolled into one.",
     children: [
       { name: "Soft-Coated Wheaten Terrier", note: "The older native Irish terrier widely held to be its parent.", img: "/history/breeds/soft-coated--wheaten-terrier-photo.jpg", value: 60 },
-      { name: "Native Irish terriers", note: "The shared stock of Ireland's working farm terriers. Now extinct.", img: "/history/breeds/irish-terrier-photo.jpg", value: 40 }
+      // 19 August 2026: this extinct ancestor was wearing a photograph of a living descendant, the Irish Terrier. Repointed to its own artwork.
+      { name: "Native Irish terriers", note: "The shared stock of Ireland's working farm terriers. Now extinct.", img: "/history/breeds/native-irish-terriers.jpg", value: 40 }
     ]
   },
 
@@ -745,7 +746,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Sealyham Terrier",
     note: "A stocky white terrier built in Pembrokeshire by Captain John Edwardes to draw badger and otter alongside his hounds.",
     children: [
-      { name: "Dandie Dinmont Terrier", note: "Brought in to shorten the leg and add bone.", img: "/history/breeds/dandie-dinmont-terrier-photo.jpeg", value: 35 },
+      { name: "Dandie Dinmont Terrier", note: "Brought in to shorten the leg and add bone.", img: "/history/breeds/dandie-dinmont-terrier.jpg", value: 35 },
       { name: "West Highland White Terrier", note: "Used to set the white coat that kept it from being mistaken for the quarry.", img: "/history/breeds/West-Highland-White-Terrier.jpg", value: 35 },
       { name: "Wire Fox Terrier", note: "Added gameness and a sharp working drive. Now endangered.", img: "/history/breeds/wire-fox-terrier.jpg", value: 30 }
     ]
@@ -804,7 +805,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Irish Terrier",
     note: "The 'daredevil' of Ireland, a fiery red terrier and one of the four native Irish terrier breeds.",
     children: [
-      { name: "Native Irish terriers", note: "The old Irish farm-terrier stock shared with the Wheaten and Kerry Blue. Now extinct.", img: "/history/breeds/irish-terrier-photo.jpg", value: 60 },
+      { name: "Native Irish terriers", note: "The old Irish farm-terrier stock shared with the Wheaten and Kerry Blue. Now extinct.", img: "/history/breeds/native-irish-terriers.jpg", value: 60 },
       { name: "Old English Black and Tan Terrier", note: "Wirehaired working terriers that shaped the harsh red coat.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 40 }
     ]
   },
@@ -813,7 +814,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Soft-Coated Wheaten Terrier",
     note: "The oldest of Ireland's four native terriers, a soft-coated all-purpose farm dog, and the likely parent of the Kerry Blue and Irish Terrier.",
     children: [
-      { name: "Native Irish terriers", note: "Ireland's old all-purpose working farm terriers. Now extinct.", img: "/history/breeds/irish-terrier-photo.jpg", value: 100 }
+      { name: "Native Irish terriers", note: "Ireland's old all-purpose working farm terriers. Now extinct.", img: "/history/breeds/native-irish-terriers.jpg", value: 100 }
     ]
   },
 
@@ -821,8 +822,9 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Glen of Imaal Terrier",
     note: "A low, powerful terrier from a remote Wicklow valley, one of the four native Irish terriers and quiet for its kind.",
     children: [
-      { name: "Native Irish terriers", note: "The old Irish farm-terrier stock, with the Wheaten in its background. Now extinct.", img: "/history/breeds/irish-terrier-photo.jpg", value: 60 },
-      { name: "Low-slung soldiers' dogs", note: "Short-legged dogs left by Flemish and Hessian soldiers settled in the glen. Now extinct.", img: "/history/breeds/dandie-dinmont-terrier-photo.jpeg", value: 40 }
+      { name: "Native Irish terriers", note: "The old Irish farm-terrier stock, with the Wheaten in its background. Now extinct.", img: "/history/breeds/native-irish-terriers.jpg", value: 60 },
+      // 19 August 2026: this extinct ancestor was wearing a photograph of a living descendant, the Dandie Dinmont Terrier. Repointed to its own artwork.
+      { name: "Low-slung soldiers' dogs", note: "Short-legged dogs left by Flemish and Hessian soldiers settled in the glen. Now extinct.", img: "/history/breeds/low-slung-soldiers-dogs.jpg", value: 40 }
     ]
   },
 
@@ -978,7 +980,8 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "The tallest of the spaniels, a curly liver-brown water dog with a rat-like tail, one of Ireland's old gundog breeds.",
     children: [
       { name: "Old Irish water dogs", note: "The southern and northern water spaniels of Ireland. Now extinct.", img: "/history/breeds/Old-Irish-water-dog.jpg", value: 55 },
-      { name: "Continental water dogs", note: "Continental curly water dogs that shaped the coat. Now extinct.", img: "/history/breeds/Poodle-and-Barbet-water-dogs.jpg", value: 45 }
+      // 19 August 2026: this extinct ancestor was wearing a photograph of a living descendant, the Poodle. Repointed to its own artwork.
+      { name: "Continental water dogs", note: "Continental curly water dogs that shaped the coat. Now extinct.", img: "/history/breeds/continental-water-dogs.jpg", value: 45 }
     ]
   },
 
@@ -1018,7 +1021,8 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "The flowing-coated Scottish herder of farm and film, refined in Victorian times with a touch of Borzoi for its long, noble head.",
     children: [
       { name: "Old working collies", note: "The old northern hill-collie landrace of Scotland and the borders, the shared working stock the Rough, Smooth and Border collies all grew from. Now extinct.", img: "/history/breeds/Old-working-collies-cluster.jpg", value: 65 },
-      { name: "Old hill and bearded collies", note: "Shaggy upland herding dogs of the same family. Now extinct.",  img: "/history/breeds/bearded-collie-photo.jpg", value: 35 }
+      // 19 August 2026: this extinct ancestor was wearing a photograph of a living descendant, the Bearded Collie. Repointed to its own artwork.
+      { name: "Old hill and bearded collies", note: "Shaggy upland herding dogs of the same family. Now extinct.",  img: "/history/breeds/old-hill-and-bearded-collies.jpg", value: 35 }
     ]
   },
 
@@ -1668,7 +1672,8 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "Lower, stouter spaniels that gave the Sussex and Clumber their weight and bone. Now extinct.",
     children: [
       { name: "Land spaniels", note: "The old land-spaniel stock at the base. Now extinct.", img: "/history/breeds/original-land-spaniel.jpg", value: 55 },
-      { name: "Basset and heavy hounds", note: "Low, long, heavy hound blood for build and weight. Now extinct.", img: "/history/breeds/Medieval-Bloodhound.jpg", value: 45 }
+      // 19 August 2026: this extinct ancestor was wearing a photograph of a living descendant, the Bloodhound. Repointed to its own artwork.
+      { name: "Basset and heavy hounds", note: "Low, long, heavy hound blood for build and weight. Now extinct.", img: "/history/breeds/basset-and-heavy-hounds.jpg", value: 45 }
     ]
   },
   "Basset and heavy hounds": {
@@ -1685,7 +1690,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "The heaviest, slowest spaniel of all, a stocky white gundog built to push through thick cover, developed at Clumber Park.",
     children: [
       { name: "Land spaniels", note: "The heavy Alpine and old land spaniels at its base. Now extinct.", img: "/history/breeds/original-land-spaniel.jpg", value: 55 },
-      { name: "Basset and heavy hounds", note: "Low, long hound blood, by tradition Basset Hound, for its build and weight. Now in-decline.", img: "/history/breeds/Medieval-Bloodhound.jpg", value: 45 }
+      { name: "Basset and heavy hounds", note: "Low, long hound blood, by tradition Basset Hound, for its build and weight. Now in-decline.", img: "/history/breeds/basset-and-heavy-hounds.jpg", value: 45 }
     ]
   },
 

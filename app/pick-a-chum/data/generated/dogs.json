@@ -12916,7 +12916,7 @@
                     {
                       "name": "Continental water dogs",
                       "note": "Continental curly water dogs that shaped the coat. Now extinct.",
-                      "img": "/history/breeds/Poodle-and-Barbet-water-dogs.jpg",
+                      "img": "/history/breeds/continental-water-dogs.jpg",
                       "value": 0.84375
                     }
                   ]
@@ -12965,7 +12965,7 @@
                         {
                           "name": "Old hill and bearded collies",
                           "note": "Shaggy upland herding dogs of the same family. Now extinct.",
-                          "img": "/history/breeds/bearded-collie-photo.jpg",
+                          "img": "/history/breeds/old-hill-and-bearded-collies.jpg",
                           "value": 0.07875
                         }
                       ]
@@ -19257,7 +19257,7 @@
             {
               "name": "Dandie Dinmont Terrier",
               "note": "A close relative from the same border rootstock, sharing the crisp coat and topknot.",
-              "img": "/history/breeds/dandie-dinmont-terrier-photo.jpeg",
+              "img": "/history/breeds/dandie-dinmont-terrier.jpg",
               "children": [
                 {
                   "name": "Old Border terriers",
@@ -19349,7 +19349,7 @@
         {
           "name": "Dandie Dinmont Terrier",
           "note": "Another Border breed from the same root, raised in the same hills.",
-          "img": "/history/breeds/dandie-dinmont-terrier-photo.jpeg",
+          "img": "/history/breeds/dandie-dinmont-terrier.jpg",
           "children": [
             {
               "name": "Old Border terriers",
@@ -21264,7 +21264,7 @@
                 {
                   "name": "Continental water dogs",
                   "note": "Continental curly water dogs that shaped the coat. Now extinct.",
-                  "img": "/history/breeds/Poodle-and-Barbet-water-dogs.jpg",
+                  "img": "/history/breeds/continental-water-dogs.jpg",
                   "value": 1.6875
                 }
               ]
@@ -21320,7 +21320,7 @@
                     {
                       "name": "Old hill and bearded collies",
                       "note": "Shaggy upland herding dogs of the same family. Now extinct.",
-                      "img": "/history/breeds/bearded-collie-photo.jpg",
+                      "img": "/history/breeds/old-hill-and-bearded-collies.jpg",
                       "children": [
                         {
                           "name": "Old working collies",
@@ -23597,7 +23597,7 @@
             {
               "name": "Continental water dogs",
               "note": "Continental curly water dogs that shaped the coat. Now extinct.",
-              "img": "/history/breeds/Poodle-and-Barbet-water-dogs.jpg",
+              "img": "/history/breeds/continental-water-dogs.jpg",
               "value": 11.25
             }
           ]
@@ -23678,7 +23678,7 @@
                 {
                   "name": "Old hill and bearded collies",
                   "note": "Shaggy upland herding dogs of the same family. Now extinct.",
-                  "img": "/history/breeds/bearded-collie-photo.jpg",
+                  "img": "/history/breeds/old-hill-and-bearded-collies.jpg",
                   "children": [
                     {
                       "name": "Old working collies",
