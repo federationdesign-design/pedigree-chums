@@ -148,11 +148,11 @@ export default function ChumSpotClient() {
             <p className={styles.lead} style={{textAlign:"center"}}>
               Have you spotted a dog that matches one of the breeds in your Pedigree Chums™ pack?
             </p>
-            <p style={{textAlign:"center"}}>
+            <p className={styles.introPara} style={{textAlign:"center"}}>
               Take a photo with the matching card, share it on Instagram or TikTok,
               and enter the <strong>Spot your Chum Photo Competition</strong>.
             </p>
-            <p style={{textAlign:"center"}}>
+            <p className={styles.introPara} style={{textAlign:"center"}}>
               Every month, we&rsquo;ll choose our favourite entry as <strong>Best in Show</strong>.
               The winner receives an exclusive Limited Edition Chum Figurine, 3D printed to order
               and delivered free anywhere in the United Kingdom.

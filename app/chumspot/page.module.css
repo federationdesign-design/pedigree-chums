@@ -73,7 +73,7 @@
 }
 .heroTitle {
   font-family: var(--font-display, "Luckiest Guy", system-ui);
-  font-size: clamp(3rem, 8.5vw, 6.8rem);
+  font-size: clamp(3.33rem, 8.5vw, 7.13rem); /* +4pt (~0.33rem) on min and cap, was clamp(3rem, 8.5vw, 6.8rem) (Steve, 19 Aug 2026) */
   line-height: 0.95;
   color: var(--yellow, #ffd23e);
   margin: 0 0 clamp(6px, 1vw, 12px);
@@ -112,25 +112,35 @@
 }
 .sectionTitle {
   font-family: var(--font-display, "Luckiest Guy", system-ui);
-  font-size: clamp(2.4rem, 5.5vw, 4.5rem);
+  font-size: clamp(4.8rem, 11vw, 9rem); /* doubled from clamp(2.4rem, 5.5vw, 4.5rem) (Steve, 19 Aug 2026) */
   color: var(--yellow, #ffd23e);
   margin: 0 0 clamp(8px, 1.5vw, 14px);
   line-height: 1.05;
   text-align: center;
 }
 .lead {
-  font-size: clamp(1.2rem, 2.2vw, 1.55rem);
+  font-size: clamp(28px, 3.6vw, 36px); /* matches the /home and /know-your-chums intro size, was clamp(1.2rem, 2.2vw, 1.55rem) (Steve, 19 Aug 2026) */
   font-weight: 600;
   color: #000000; /* prose on gradient -> black, WCAG 1.4.3 (Steve, 12 Aug 2026) */
   line-height: 1.5;
   margin: 50px 0 clamp(16px, 2vw, 24px);
 }
-.inner p:not(.lead):not(.ageNote):not(.closingDate):not(.contactNote):not(.hashtags):not(.termBody) {
+.inner p:not(.lead):not(.ageNote):not(.closingDate):not(.contactNote):not(.hashtags):not(.termBody):not(.introPara) {
   font-size: clamp(0.95rem, 1.6vw, 1.1rem);
   /* Body prose sits on the site gradient -> black for WCAG 1.4.3 (Steve, 12 Aug
      2026). The hero .ageNote/.closingDate are excluded here (they sit on the hero
      video) and stay white. */
   color: #000000;
+  line-height: 1.7;
+  margin: 0 0 clamp(10px, 1.5vw, 16px);
+}
+/* The two plain intro paragraphs match the .lead size (they keep normal weight,
+   so the lead still reads as the lead). Excluded from the generic .inner p rule
+   above, which carries higher specificity from its six :not()s, so this fully
+   specifies the black WCAG colour, line-height and margin (Steve, 19 Aug 2026). */
+.inner p.introPara {
+  font-size: clamp(28px, 3.6vw, 36px);
+  color: #000000; /* prose on gradient -> black, WCAG 1.4.3 */
   line-height: 1.7;
   margin: 0 0 clamp(10px, 1.5vw, 16px);
 }
@@ -201,13 +211,13 @@
 }
 .stepTitle {
   font-family: var(--font-display, "Luckiest Guy", system-ui);
-  font-size: clamp(1.6rem, 2.8vw, 2.1rem);
+  font-size: clamp(3.2rem, 5.6vw, 4.2rem); /* doubled from clamp(1.6rem, 2.8vw, 2.1rem) (Steve, 19 Aug 2026) */
   color: var(--yellow, #ffd23e);
   margin: 0 0 10px;
   line-height: 1.1;
 }
 .step p {
-  font-size: clamp(0.75rem, 1.1vw, 0.88rem) !important;
+  font-size: clamp(1.5rem, 2.2vw, 1.76rem) !important; /* doubled from clamp(0.75rem, 1.1vw, 0.88rem) (Steve, 19 Aug 2026) */
   color: #ffffff;
   margin: 0;
   line-height: 1.3 !important;
@@ -319,7 +329,7 @@
 .termsSection { background: rgba(10,58,87,0.2); }
 .termsSectionTitle {
   font-family: var(--font-display, "Luckiest Guy", system-ui);
-  font-size: clamp(1.6rem, 3.5vw, 2.8rem);
+  font-size: clamp(3.2rem, 7vw, 5.6rem); /* doubled from clamp(1.6rem, 3.5vw, 2.8rem) (Steve, 19 Aug 2026) */
   color: var(--yellow, #ffd23e);
   margin: 0 0 clamp(24px, 4vw, 48px);
   text-align: center;
@@ -327,7 +337,11 @@
 }
 .termsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  /* Fixed 3 columns at all desktop widths so the term boxes widen with the
+     viewport instead of the column count growing. Was auto-fill minmax(300px,
+     1fr), which fanned out to 5 columns once the page went full width. The
+     640px collapse to 1fr below still applies (Steve, 19 Aug 2026). */
+  grid-template-columns: repeat(3, 1fr);
   gap: clamp(12px, 2vw, 20px);
   margin-bottom: clamp(32px, 5vw, 56px);
 }
@@ -401,13 +415,15 @@
 /* ── Two-col: What/Ready side by side ───────────────────────────────────── */
 .whatReadyCols {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  /* Single column at all widths so the doubled H2s ("What are we looking for?",
+     "Ready to join the pack?") get the full content width and cannot overflow a
+     half-width column. Was 1fr 1fr with a 720px collapse (Steve, 19 Aug 2026). */
+  grid-template-columns: 1fr;
   gap: clamp(24px, 4vw, 48px);
   align-items: start;
   padding-top: 50px;
 }
 .whatReadyCols .sectionTitle { text-align: left; }
-@media (max-width: 720px) { .whatReadyCols { grid-template-columns: 1fr; } }
 
 .termList {
   padding-left: 18px;
