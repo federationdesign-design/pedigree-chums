@@ -1427,13 +1427,20 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Old British bandogs",
     note: "The heavy chained dogs of old England, kept tied by day and set loose at night, and put to work by butchers and baiters alike. Now extinct.",
     // 19 August 2026: was a single 100% child (Ancient Mastiff), a pass-through
-    // that filled the parent circle. It was briefly given a Celtic Heeler
-    // self-repeat, then that was removed the same day: a node should not be its
-    // own child, and it leaked into the render's name paths. The level root now
-    // carries its own name on the outer ring, so it returns to the single Ancient
-    // Mastiff parent below.
+    // that filled the parent circle so the level read as Ancient Mastiff rather
+    // than as itself. It was briefly given a Celtic Heeler self-repeat (a child
+    // named after the parent), then removed: a node should not be its own child,
+    // and that name leaked into isEcho, the pit words and the badge paths.
+    //
+    // Instead, a display device: TWO identical children, both "Ancient Mastiff",
+    // sharing the same note and img, at 50 each, so the level shows two circles
+    // rather than one filling the ring. Because the children differ in name from
+    // the parent, none of the self-repeat leaks apply. This must NOT be read as
+    // two separate ancestors: the node has one documented ancestor, drawn twice
+    // on purpose.
     children: [
-      { name: "Ancient Mastiff", note: "The ancient British guard and war dog, praised by Roman writers, that the heavy bandogs descend from. A functional root, not documented descent. An extinct historical type.", img: "/history/breeds/ancient-british-mastiff-type.jpg", value: 100 }
+      { name: "Ancient Mastiff", note: "The ancient British guard and war dog, praised by Roman writers, that the heavy bandogs descend from. A functional root, not documented descent. An extinct historical type.", img: "/history/breeds/ancient-british-mastiff-type.jpg", value: 50 },
+      { name: "Ancient Mastiff", note: "The ancient British guard and war dog, praised by Roman writers, that the heavy bandogs descend from. A functional root, not documented descent. An extinct historical type.", img: "/history/breeds/ancient-british-mastiff-type.jpg", value: 50 }
     ]
   },
   "Arctic sled dogs": {

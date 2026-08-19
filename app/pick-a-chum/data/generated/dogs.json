@@ -827,13 +827,13 @@
                       "name": "Old mastiffs of the ancient East",
                       "note": "The huge guard and hunting mastiffs of the ancient East, carved on palace walls thousands of years ago. Now extinct.",
                       "img": "/history/breeds/old-mastiffs-of-the-ancient-east.jpg",
-                      "value": 10
+                      "value": 5
                     },
                     {
                       "name": "Ancient Molossers",
                       "note": "The huge eastern war and guard dogs at the root of every mastiff. Now extinct.",
                       "img": "/history/breeds/Ancient-Molossers.jpg",
-                      "value": 10
+                      "value": 5
                     }
                   ]
                 },
@@ -846,13 +846,58 @@
                       "name": "Dogs of the Alan horsemen",
                       "note": "The big steppe dogs of the Alan horsemen, guarding their camps and herds across the plains. Now extinct.",
                       "img": "/history/breeds/dogs-of-the-alan-horsemen.jpg",
-                      "value": 10
+                      "value": 5
                     },
                     {
                       "name": "Alaunt war dogs",
                       "note": "The fierce war and catch dogs that rode west with mounted warriors. Now extinct.",
                       "img": "/history/breeds/alunt-war-dogs.jpg",
-                      "value": 10
+                      "value": 5
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Ancient Mastiff",
+              "note": "The ancient British guard and war dog, praised by Roman writers, that the heavy bandogs descend from. A functional root, not documented descent. An extinct historical type.",
+              "img": "/history/breeds/ancient-british-mastiff-type.jpg",
+              "children": [
+                {
+                  "name": "Ancient Molossers",
+                  "note": "The huge eastern war and guard dogs at the root of every mastiff. Now extinct.",
+                  "img": "/history/breeds/Ancient-Molossers.jpg",
+                  "children": [
+                    {
+                      "name": "Old mastiffs of the ancient East",
+                      "note": "The huge guard and hunting mastiffs of the ancient East, carved on palace walls thousands of years ago. Now extinct.",
+                      "img": "/history/breeds/old-mastiffs-of-the-ancient-east.jpg",
+                      "value": 5
+                    },
+                    {
+                      "name": "Ancient Molossers",
+                      "note": "The huge eastern war and guard dogs at the root of every mastiff. Now extinct.",
+                      "img": "/history/breeds/Ancient-Molossers.jpg",
+                      "value": 5
+                    }
+                  ]
+                },
+                {
+                  "name": "Alaunt war dogs",
+                  "note": "The fierce war and catch dogs that rode west with mounted warriors. Now extinct.",
+                  "img": "/history/breeds/alunt-war-dogs.jpg",
+                  "children": [
+                    {
+                      "name": "Dogs of the Alan horsemen",
+                      "note": "The big steppe dogs of the Alan horsemen, guarding their camps and herds across the plains. Now extinct.",
+                      "img": "/history/breeds/dogs-of-the-alan-horsemen.jpg",
+                      "value": 5
+                    },
+                    {
+                      "name": "Alaunt war dogs",
+                      "note": "The fierce war and catch dogs that rode west with mounted warriors. Now extinct.",
+                      "img": "/history/breeds/alunt-war-dogs.jpg",
+                      "value": 5
                     }
                   ]
                 }
@@ -1129,13 +1174,13 @@
                           "name": "Old mastiffs of the ancient East",
                           "note": "The huge guard and hunting mastiffs of the ancient East, carved on palace walls thousands of years ago. Now extinct.",
                           "img": "/history/breeds/old-mastiffs-of-the-ancient-east.jpg",
-                          "value": 2.5
+                          "value": 1.25
                         },
                         {
                           "name": "Ancient Molossers",
                           "note": "The huge eastern war and guard dogs at the root of every mastiff. Now extinct.",
                           "img": "/history/breeds/Ancient-Molossers.jpg",
-                          "value": 2.5
+                          "value": 1.25
                         }
                       ]
                     },
@@ -1148,13 +1193,58 @@
                           "name": "Dogs of the Alan horsemen",
                           "note": "The big steppe dogs of the Alan horsemen, guarding their camps and herds across the plains. Now extinct.",
                           "img": "/history/breeds/dogs-of-the-alan-horsemen.jpg",
-                          "value": 2.5
+                          "value": 1.25
                         },
                         {
                           "name": "Alaunt war dogs",
                           "note": "The fierce war and catch dogs that rode west with mounted warriors. Now extinct.",
                           "img": "/history/breeds/alunt-war-dogs.jpg",
-                          "value": 2.5
+                          "value": 1.25
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "Ancient Mastiff",
+                  "note": "The ancient British guard and war dog, praised by Roman writers, that the heavy bandogs descend from. A functional root, not documented descent. An extinct historical type.",
+                  "img": "/history/breeds/ancient-british-mastiff-type.jpg",
+                  "children": [
+                    {
+                      "name": "Ancient Molossers",
+                      "note": "The huge eastern war and guard dogs at the root of every mastiff. Now extinct.",
+                      "img": "/history/breeds/Ancient-Molossers.jpg",
+                      "children": [
+                        {
+                          "name": "Old mastiffs of the ancient East",
+                          "note": "The huge guard and hunting mastiffs of the ancient East, carved on palace walls thousands of years ago. Now extinct.",
+                          "img": "/history/breeds/old-mastiffs-of-the-ancient-east.jpg",
+                          "value": 1.25
+                        },
+                        {
+                          "name": "Ancient Molossers",
+                          "note": "The huge eastern war and guard dogs at the root of every mastiff. Now extinct.",
+                          "img": "/history/breeds/Ancient-Molossers.jpg",
+                          "value": 1.25
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Alaunt war dogs",
+                      "note": "The fierce war and catch dogs that rode west with mounted warriors. Now extinct.",
+                      "img": "/history/breeds/alunt-war-dogs.jpg",
+                      "children": [
+                        {
+                          "name": "Dogs of the Alan horsemen",
+                          "note": "The big steppe dogs of the Alan horsemen, guarding their camps and herds across the plains. Now extinct.",
+                          "img": "/history/breeds/dogs-of-the-alan-horsemen.jpg",
+                          "value": 1.25
+                        },
+                        {
+                          "name": "Alaunt war dogs",
+                          "note": "The fierce war and catch dogs that rode west with mounted warriors. Now extinct.",
+                          "img": "/history/breeds/alunt-war-dogs.jpg",
+                          "value": 1.25
                         }
                       ]
                     }
@@ -1536,13 +1626,13 @@
                               "name": "Old mastiffs of the ancient East",
                               "note": "The huge guard and hunting mastiffs of the ancient East, carved on palace walls thousands of years ago. Now extinct.",
                               "img": "/history/breeds/old-mastiffs-of-the-ancient-east.jpg",
-                              "value": 4.05
+                              "value": 2.025
                             },
                             {
                               "name": "Ancient Molossers",
                               "note": "The huge eastern war and guard dogs at the root of every mastiff. Now extinct.",
                               "img": "/history/breeds/Ancient-Molossers.jpg",
-                              "value": 4.05
+                              "value": 2.025
                             }
                           ]
                         },
@@ -1555,13 +1645,58 @@
                               "name": "Dogs of the Alan horsemen",
                               "note": "The big steppe dogs of the Alan horsemen, guarding their camps and herds across the plains. Now extinct.",
                               "img": "/history/breeds/dogs-of-the-alan-horsemen.jpg",
-                              "value": 4.05
+                              "value": 2.025
                             },
                             {
                               "name": "Alaunt war dogs",
                               "note": "The fierce war and catch dogs that rode west with mounted warriors. Now extinct.",
                               "img": "/history/breeds/alunt-war-dogs.jpg",
-                              "value": 4.05
+                              "value": 2.025
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Ancient Mastiff",
+                      "note": "The ancient British guard and war dog, praised by Roman writers, that the heavy bandogs descend from. A functional root, not documented descent. An extinct historical type.",
+                      "img": "/history/breeds/ancient-british-mastiff-type.jpg",
+                      "children": [
+                        {
+                          "name": "Ancient Molossers",
+                          "note": "The huge eastern war and guard dogs at the root of every mastiff. Now extinct.",
+                          "img": "/history/breeds/Ancient-Molossers.jpg",
+                          "children": [
+                            {
+                              "name": "Old mastiffs of the ancient East",
+                              "note": "The huge guard and hunting mastiffs of the ancient East, carved on palace walls thousands of years ago. Now extinct.",
+                              "img": "/history/breeds/old-mastiffs-of-the-ancient-east.jpg",
+                              "value": 2.025
+                            },
+                            {
+                              "name": "Ancient Molossers",
+                              "note": "The huge eastern war and guard dogs at the root of every mastiff. Now extinct.",
+                              "img": "/history/breeds/Ancient-Molossers.jpg",
+                              "value": 2.025
+                            }
+                          ]
+                        },
+                        {
+                          "name": "Alaunt war dogs",
+                          "note": "The fierce war and catch dogs that rode west with mounted warriors. Now extinct.",
+                          "img": "/history/breeds/alunt-war-dogs.jpg",
+                          "children": [
+                            {
+                              "name": "Dogs of the Alan horsemen",
+                              "note": "The big steppe dogs of the Alan horsemen, guarding their camps and herds across the plains. Now extinct.",
+                              "img": "/history/breeds/dogs-of-the-alan-horsemen.jpg",
+                              "value": 2.025
+                            },
+                            {
+                              "name": "Alaunt war dogs",
+                              "note": "The fierce war and catch dogs that rode west with mounted warriors. Now extinct.",
+                              "img": "/history/breeds/alunt-war-dogs.jpg",
+                              "value": 2.025
                             }
                           ]
                         }
@@ -1614,13 +1749,13 @@
                               "name": "Old mastiffs of the ancient East",
                               "note": "The huge guard and hunting mastiffs of the ancient East, carved on palace walls thousands of years ago. Now extinct.",
                               "img": "/history/breeds/old-mastiffs-of-the-ancient-east.jpg",
-                              "value": 1.125
+                              "value": 0.5625
                             },
                             {
                               "name": "Ancient Molossers",
                               "note": "The huge eastern war and guard dogs at the root of every mastiff. Now extinct.",
                               "img": "/history/breeds/Ancient-Molossers.jpg",
-                              "value": 1.125
+                              "value": 0.5625
                             }
                           ]
                         },
@@ -1633,13 +1768,58 @@
                               "name": "Dogs of the Alan horsemen",
                               "note": "The big steppe dogs of the Alan horsemen, guarding their camps and herds across the plains. Now extinct.",
                               "img": "/history/breeds/dogs-of-the-alan-horsemen.jpg",
-                              "value": 1.125
+                              "value": 0.5625
                             },
                             {
                               "name": "Alaunt war dogs",
                               "note": "The fierce war and catch dogs that rode west with mounted warriors. Now extinct.",
                               "img": "/history/breeds/alunt-war-dogs.jpg",
-                              "value": 1.125
+                              "value": 0.5625
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Ancient Mastiff",
+                      "note": "The ancient British guard and war dog, praised by Roman writers, that the heavy bandogs descend from. A functional root, not documented descent. An extinct historical type.",
+                      "img": "/history/breeds/ancient-british-mastiff-type.jpg",
+                      "children": [
+                        {
+                          "name": "Ancient Molossers",
+                          "note": "The huge eastern war and guard dogs at the root of every mastiff. Now extinct.",
+                          "img": "/history/breeds/Ancient-Molossers.jpg",
+                          "children": [
+                            {
+                              "name": "Old mastiffs of the ancient East",
+                              "note": "The huge guard and hunting mastiffs of the ancient East, carved on palace walls thousands of years ago. Now extinct.",
+                              "img": "/history/breeds/old-mastiffs-of-the-ancient-east.jpg",
+                              "value": 0.5625
+                            },
+                            {
+                              "name": "Ancient Molossers",
+                              "note": "The huge eastern war and guard dogs at the root of every mastiff. Now extinct.",
+                              "img": "/history/breeds/Ancient-Molossers.jpg",
+                              "value": 0.5625
+                            }
+                          ]
+                        },
+                        {
+                          "name": "Alaunt war dogs",
+                          "note": "The fierce war and catch dogs that rode west with mounted warriors. Now extinct.",
+                          "img": "/history/breeds/alunt-war-dogs.jpg",
+                          "children": [
+                            {
+                              "name": "Dogs of the Alan horsemen",
+                              "note": "The big steppe dogs of the Alan horsemen, guarding their camps and herds across the plains. Now extinct.",
+                              "img": "/history/breeds/dogs-of-the-alan-horsemen.jpg",
+                              "value": 0.5625
+                            },
+                            {
+                              "name": "Alaunt war dogs",
+                              "note": "The fierce war and catch dogs that rode west with mounted warriors. Now extinct.",
+                              "img": "/history/breeds/alunt-war-dogs.jpg",
+                              "value": 0.5625
                             }
                           ]
                         }
@@ -5819,13 +5999,13 @@
                           "name": "Old mastiffs of the ancient East",
                           "note": "The huge guard and hunting mastiffs of the ancient East, carved on palace walls thousands of years ago. Now extinct.",
                           "img": "/history/breeds/old-mastiffs-of-the-ancient-east.jpg",
-                          "value": 9
+                          "value": 4.5
                         },
                         {
                           "name": "Ancient Molossers",
                           "note": "The huge eastern war and guard dogs at the root of every mastiff. Now extinct.",
                           "img": "/history/breeds/Ancient-Molossers.jpg",
-                          "value": 9
+                          "value": 4.5
                         }
                       ]
                     },
@@ -5838,13 +6018,58 @@
                           "name": "Dogs of the Alan horsemen",
                           "note": "The big steppe dogs of the Alan horsemen, guarding their camps and herds across the plains. Now extinct.",
                           "img": "/history/breeds/dogs-of-the-alan-horsemen.jpg",
-                          "value": 9
+                          "value": 4.5
                         },
                         {
                           "name": "Alaunt war dogs",
                           "note": "The fierce war and catch dogs that rode west with mounted warriors. Now extinct.",
                           "img": "/history/breeds/alunt-war-dogs.jpg",
-                          "value": 9
+                          "value": 4.5
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "Ancient Mastiff",
+                  "note": "The ancient British guard and war dog, praised by Roman writers, that the heavy bandogs descend from. A functional root, not documented descent. An extinct historical type.",
+                  "img": "/history/breeds/ancient-british-mastiff-type.jpg",
+                  "children": [
+                    {
+                      "name": "Ancient Molossers",
+                      "note": "The huge eastern war and guard dogs at the root of every mastiff. Now extinct.",
+                      "img": "/history/breeds/Ancient-Molossers.jpg",
+                      "children": [
+                        {
+                          "name": "Old mastiffs of the ancient East",
+                          "note": "The huge guard and hunting mastiffs of the ancient East, carved on palace walls thousands of years ago. Now extinct.",
+                          "img": "/history/breeds/old-mastiffs-of-the-ancient-east.jpg",
+                          "value": 4.5
+                        },
+                        {
+                          "name": "Ancient Molossers",
+                          "note": "The huge eastern war and guard dogs at the root of every mastiff. Now extinct.",
+                          "img": "/history/breeds/Ancient-Molossers.jpg",
+                          "value": 4.5
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Alaunt war dogs",
+                      "note": "The fierce war and catch dogs that rode west with mounted warriors. Now extinct.",
+                      "img": "/history/breeds/alunt-war-dogs.jpg",
+                      "children": [
+                        {
+                          "name": "Dogs of the Alan horsemen",
+                          "note": "The big steppe dogs of the Alan horsemen, guarding their camps and herds across the plains. Now extinct.",
+                          "img": "/history/breeds/dogs-of-the-alan-horsemen.jpg",
+                          "value": 4.5
+                        },
+                        {
+                          "name": "Alaunt war dogs",
+                          "note": "The fierce war and catch dogs that rode west with mounted warriors. Now extinct.",
+                          "img": "/history/breeds/alunt-war-dogs.jpg",
+                          "value": 4.5
                         }
                       ]
                     }
@@ -5897,13 +6122,13 @@
                           "name": "Old mastiffs of the ancient East",
                           "note": "The huge guard and hunting mastiffs of the ancient East, carved on palace walls thousands of years ago. Now extinct.",
                           "img": "/history/breeds/old-mastiffs-of-the-ancient-east.jpg",
-                          "value": 2.5
+                          "value": 1.25
                         },
                         {
                           "name": "Ancient Molossers",
                           "note": "The huge eastern war and guard dogs at the root of every mastiff. Now extinct.",
                           "img": "/history/breeds/Ancient-Molossers.jpg",
-                          "value": 2.5
+                          "value": 1.25
                         }
                       ]
                     },
@@ -5916,13 +6141,58 @@
                           "name": "Dogs of the Alan horsemen",
                           "note": "The big steppe dogs of the Alan horsemen, guarding their camps and herds across the plains. Now extinct.",
                           "img": "/history/breeds/dogs-of-the-alan-horsemen.jpg",
-                          "value": 2.5
+                          "value": 1.25
                         },
                         {
                           "name": "Alaunt war dogs",
                           "note": "The fierce war and catch dogs that rode west with mounted warriors. Now extinct.",
                           "img": "/history/breeds/alunt-war-dogs.jpg",
-                          "value": 2.5
+                          "value": 1.25
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "Ancient Mastiff",
+                  "note": "The ancient British guard and war dog, praised by Roman writers, that the heavy bandogs descend from. A functional root, not documented descent. An extinct historical type.",
+                  "img": "/history/breeds/ancient-british-mastiff-type.jpg",
+                  "children": [
+                    {
+                      "name": "Ancient Molossers",
+                      "note": "The huge eastern war and guard dogs at the root of every mastiff. Now extinct.",
+                      "img": "/history/breeds/Ancient-Molossers.jpg",
+                      "children": [
+                        {
+                          "name": "Old mastiffs of the ancient East",
+                          "note": "The huge guard and hunting mastiffs of the ancient East, carved on palace walls thousands of years ago. Now extinct.",
+                          "img": "/history/breeds/old-mastiffs-of-the-ancient-east.jpg",
+                          "value": 1.25
+                        },
+                        {
+                          "name": "Ancient Molossers",
+                          "note": "The huge eastern war and guard dogs at the root of every mastiff. Now extinct.",
+                          "img": "/history/breeds/Ancient-Molossers.jpg",
+                          "value": 1.25
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Alaunt war dogs",
+                      "note": "The fierce war and catch dogs that rode west with mounted warriors. Now extinct.",
+                      "img": "/history/breeds/alunt-war-dogs.jpg",
+                      "children": [
+                        {
+                          "name": "Dogs of the Alan horsemen",
+                          "note": "The big steppe dogs of the Alan horsemen, guarding their camps and herds across the plains. Now extinct.",
+                          "img": "/history/breeds/dogs-of-the-alan-horsemen.jpg",
+                          "value": 1.25
+                        },
+                        {
+                          "name": "Alaunt war dogs",
+                          "note": "The fierce war and catch dogs that rode west with mounted warriors. Now extinct.",
+                          "img": "/history/breeds/alunt-war-dogs.jpg",
+                          "value": 1.25
                         }
                       ]
                     }
@@ -7910,13 +8180,13 @@
                               "name": "Old mastiffs of the ancient East",
                               "note": "The huge guard and hunting mastiffs of the ancient East, carved on palace walls thousands of years ago. Now extinct.",
                               "img": "/history/breeds/old-mastiffs-of-the-ancient-east.jpg",
-                              "value": 4.95
+                              "value": 2.475
                             },
                             {
                               "name": "Ancient Molossers",
                               "note": "The huge eastern war and guard dogs at the root of every mastiff. Now extinct.",
                               "img": "/history/breeds/Ancient-Molossers.jpg",
-                              "value": 4.95
+                              "value": 2.475
                             }
                           ]
                         },
@@ -7929,13 +8199,58 @@
                               "name": "Dogs of the Alan horsemen",
                               "note": "The big steppe dogs of the Alan horsemen, guarding their camps and herds across the plains. Now extinct.",
                               "img": "/history/breeds/dogs-of-the-alan-horsemen.jpg",
-                              "value": 4.95
+                              "value": 2.475
                             },
                             {
                               "name": "Alaunt war dogs",
                               "note": "The fierce war and catch dogs that rode west with mounted warriors. Now extinct.",
                               "img": "/history/breeds/alunt-war-dogs.jpg",
-                              "value": 4.95
+                              "value": 2.475
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Ancient Mastiff",
+                      "note": "The ancient British guard and war dog, praised by Roman writers, that the heavy bandogs descend from. A functional root, not documented descent. An extinct historical type.",
+                      "img": "/history/breeds/ancient-british-mastiff-type.jpg",
+                      "children": [
+                        {
+                          "name": "Ancient Molossers",
+                          "note": "The huge eastern war and guard dogs at the root of every mastiff. Now extinct.",
+                          "img": "/history/breeds/Ancient-Molossers.jpg",
+                          "children": [
+                            {
+                              "name": "Old mastiffs of the ancient East",
+                              "note": "The huge guard and hunting mastiffs of the ancient East, carved on palace walls thousands of years ago. Now extinct.",
+                              "img": "/history/breeds/old-mastiffs-of-the-ancient-east.jpg",
+                              "value": 2.475
+                            },
+                            {
+                              "name": "Ancient Molossers",
+                              "note": "The huge eastern war and guard dogs at the root of every mastiff. Now extinct.",
+                              "img": "/history/breeds/Ancient-Molossers.jpg",
+                              "value": 2.475
+                            }
+                          ]
+                        },
+                        {
+                          "name": "Alaunt war dogs",
+                          "note": "The fierce war and catch dogs that rode west with mounted warriors. Now extinct.",
+                          "img": "/history/breeds/alunt-war-dogs.jpg",
+                          "children": [
+                            {
+                              "name": "Dogs of the Alan horsemen",
+                              "note": "The big steppe dogs of the Alan horsemen, guarding their camps and herds across the plains. Now extinct.",
+                              "img": "/history/breeds/dogs-of-the-alan-horsemen.jpg",
+                              "value": 2.475
+                            },
+                            {
+                              "name": "Alaunt war dogs",
+                              "note": "The fierce war and catch dogs that rode west with mounted warriors. Now extinct.",
+                              "img": "/history/breeds/alunt-war-dogs.jpg",
+                              "value": 2.475
                             }
                           ]
                         }
@@ -7988,13 +8303,13 @@
                               "name": "Old mastiffs of the ancient East",
                               "note": "The huge guard and hunting mastiffs of the ancient East, carved on palace walls thousands of years ago. Now extinct.",
                               "img": "/history/breeds/old-mastiffs-of-the-ancient-east.jpg",
-                              "value": 1.375
+                              "value": 0.6875
                             },
                             {
                               "name": "Ancient Molossers",
                               "note": "The huge eastern war and guard dogs at the root of every mastiff. Now extinct.",
                               "img": "/history/breeds/Ancient-Molossers.jpg",
-                              "value": 1.375
+                              "value": 0.6875
                             }
                           ]
                         },
@@ -8007,13 +8322,58 @@
                               "name": "Dogs of the Alan horsemen",
                               "note": "The big steppe dogs of the Alan horsemen, guarding their camps and herds across the plains. Now extinct.",
                               "img": "/history/breeds/dogs-of-the-alan-horsemen.jpg",
-                              "value": 1.375
+                              "value": 0.6875
                             },
                             {
                               "name": "Alaunt war dogs",
                               "note": "The fierce war and catch dogs that rode west with mounted warriors. Now extinct.",
                               "img": "/history/breeds/alunt-war-dogs.jpg",
-                              "value": 1.375
+                              "value": 0.6875
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Ancient Mastiff",
+                      "note": "The ancient British guard and war dog, praised by Roman writers, that the heavy bandogs descend from. A functional root, not documented descent. An extinct historical type.",
+                      "img": "/history/breeds/ancient-british-mastiff-type.jpg",
+                      "children": [
+                        {
+                          "name": "Ancient Molossers",
+                          "note": "The huge eastern war and guard dogs at the root of every mastiff. Now extinct.",
+                          "img": "/history/breeds/Ancient-Molossers.jpg",
+                          "children": [
+                            {
+                              "name": "Old mastiffs of the ancient East",
+                              "note": "The huge guard and hunting mastiffs of the ancient East, carved on palace walls thousands of years ago. Now extinct.",
+                              "img": "/history/breeds/old-mastiffs-of-the-ancient-east.jpg",
+                              "value": 0.6875
+                            },
+                            {
+                              "name": "Ancient Molossers",
+                              "note": "The huge eastern war and guard dogs at the root of every mastiff. Now extinct.",
+                              "img": "/history/breeds/Ancient-Molossers.jpg",
+                              "value": 0.6875
+                            }
+                          ]
+                        },
+                        {
+                          "name": "Alaunt war dogs",
+                          "note": "The fierce war and catch dogs that rode west with mounted warriors. Now extinct.",
+                          "img": "/history/breeds/alunt-war-dogs.jpg",
+                          "children": [
+                            {
+                              "name": "Dogs of the Alan horsemen",
+                              "note": "The big steppe dogs of the Alan horsemen, guarding their camps and herds across the plains. Now extinct.",
+                              "img": "/history/breeds/dogs-of-the-alan-horsemen.jpg",
+                              "value": 0.6875
+                            },
+                            {
+                              "name": "Alaunt war dogs",
+                              "note": "The fierce war and catch dogs that rode west with mounted warriors. Now extinct.",
+                              "img": "/history/breeds/alunt-war-dogs.jpg",
+                              "value": 0.6875
                             }
                           ]
                         }
@@ -15112,13 +15472,13 @@
                               "name": "Old mastiffs of the ancient East",
                               "note": "The huge guard and hunting mastiffs of the ancient East, carved on palace walls thousands of years ago. Now extinct.",
                               "img": "/history/breeds/old-mastiffs-of-the-ancient-east.jpg",
-                              "value": 5.85
+                              "value": 2.925
                             },
                             {
                               "name": "Ancient Molossers",
                               "note": "The huge eastern war and guard dogs at the root of every mastiff. Now extinct.",
                               "img": "/history/breeds/Ancient-Molossers.jpg",
-                              "value": 5.85
+                              "value": 2.925
                             }
                           ]
                         },
@@ -15131,13 +15491,58 @@
                               "name": "Dogs of the Alan horsemen",
                               "note": "The big steppe dogs of the Alan horsemen, guarding their camps and herds across the plains. Now extinct.",
                               "img": "/history/breeds/dogs-of-the-alan-horsemen.jpg",
-                              "value": 5.85
+                              "value": 2.925
                             },
                             {
                               "name": "Alaunt war dogs",
                               "note": "The fierce war and catch dogs that rode west with mounted warriors. Now extinct.",
                               "img": "/history/breeds/alunt-war-dogs.jpg",
-                              "value": 5.85
+                              "value": 2.925
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Ancient Mastiff",
+                      "note": "The ancient British guard and war dog, praised by Roman writers, that the heavy bandogs descend from. A functional root, not documented descent. An extinct historical type.",
+                      "img": "/history/breeds/ancient-british-mastiff-type.jpg",
+                      "children": [
+                        {
+                          "name": "Ancient Molossers",
+                          "note": "The huge eastern war and guard dogs at the root of every mastiff. Now extinct.",
+                          "img": "/history/breeds/Ancient-Molossers.jpg",
+                          "children": [
+                            {
+                              "name": "Old mastiffs of the ancient East",
+                              "note": "The huge guard and hunting mastiffs of the ancient East, carved on palace walls thousands of years ago. Now extinct.",
+                              "img": "/history/breeds/old-mastiffs-of-the-ancient-east.jpg",
+                              "value": 2.925
+                            },
+                            {
+                              "name": "Ancient Molossers",
+                              "note": "The huge eastern war and guard dogs at the root of every mastiff. Now extinct.",
+                              "img": "/history/breeds/Ancient-Molossers.jpg",
+                              "value": 2.925
+                            }
+                          ]
+                        },
+                        {
+                          "name": "Alaunt war dogs",
+                          "note": "The fierce war and catch dogs that rode west with mounted warriors. Now extinct.",
+                          "img": "/history/breeds/alunt-war-dogs.jpg",
+                          "children": [
+                            {
+                              "name": "Dogs of the Alan horsemen",
+                              "note": "The big steppe dogs of the Alan horsemen, guarding their camps and herds across the plains. Now extinct.",
+                              "img": "/history/breeds/dogs-of-the-alan-horsemen.jpg",
+                              "value": 2.925
+                            },
+                            {
+                              "name": "Alaunt war dogs",
+                              "note": "The fierce war and catch dogs that rode west with mounted warriors. Now extinct.",
+                              "img": "/history/breeds/alunt-war-dogs.jpg",
+                              "value": 2.925
                             }
                           ]
                         }
@@ -15190,13 +15595,13 @@
                               "name": "Old mastiffs of the ancient East",
                               "note": "The huge guard and hunting mastiffs of the ancient East, carved on palace walls thousands of years ago. Now extinct.",
                               "img": "/history/breeds/old-mastiffs-of-the-ancient-east.jpg",
-                              "value": 1.625
+                              "value": 0.8125
                             },
                             {
                               "name": "Ancient Molossers",
                               "note": "The huge eastern war and guard dogs at the root of every mastiff. Now extinct.",
                               "img": "/history/breeds/Ancient-Molossers.jpg",
-                              "value": 1.625
+                              "value": 0.8125
                             }
                           ]
                         },
@@ -15209,13 +15614,58 @@
                               "name": "Dogs of the Alan horsemen",
                               "note": "The big steppe dogs of the Alan horsemen, guarding their camps and herds across the plains. Now extinct.",
                               "img": "/history/breeds/dogs-of-the-alan-horsemen.jpg",
-                              "value": 1.625
+                              "value": 0.8125
                             },
                             {
                               "name": "Alaunt war dogs",
                               "note": "The fierce war and catch dogs that rode west with mounted warriors. Now extinct.",
                               "img": "/history/breeds/alunt-war-dogs.jpg",
-                              "value": 1.625
+                              "value": 0.8125
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Ancient Mastiff",
+                      "note": "The ancient British guard and war dog, praised by Roman writers, that the heavy bandogs descend from. A functional root, not documented descent. An extinct historical type.",
+                      "img": "/history/breeds/ancient-british-mastiff-type.jpg",
+                      "children": [
+                        {
+                          "name": "Ancient Molossers",
+                          "note": "The huge eastern war and guard dogs at the root of every mastiff. Now extinct.",
+                          "img": "/history/breeds/Ancient-Molossers.jpg",
+                          "children": [
+                            {
+                              "name": "Old mastiffs of the ancient East",
+                              "note": "The huge guard and hunting mastiffs of the ancient East, carved on palace walls thousands of years ago. Now extinct.",
+                              "img": "/history/breeds/old-mastiffs-of-the-ancient-east.jpg",
+                              "value": 0.8125
+                            },
+                            {
+                              "name": "Ancient Molossers",
+                              "note": "The huge eastern war and guard dogs at the root of every mastiff. Now extinct.",
+                              "img": "/history/breeds/Ancient-Molossers.jpg",
+                              "value": 0.8125
+                            }
+                          ]
+                        },
+                        {
+                          "name": "Alaunt war dogs",
+                          "note": "The fierce war and catch dogs that rode west with mounted warriors. Now extinct.",
+                          "img": "/history/breeds/alunt-war-dogs.jpg",
+                          "children": [
+                            {
+                              "name": "Dogs of the Alan horsemen",
+                              "note": "The big steppe dogs of the Alan horsemen, guarding their camps and herds across the plains. Now extinct.",
+                              "img": "/history/breeds/dogs-of-the-alan-horsemen.jpg",
+                              "value": 0.8125
+                            },
+                            {
+                              "name": "Alaunt war dogs",
+                              "note": "The fierce war and catch dogs that rode west with mounted warriors. Now extinct.",
+                              "img": "/history/breeds/alunt-war-dogs.jpg",
+                              "value": 0.8125
                             }
                           ]
                         }
@@ -15548,13 +15998,13 @@
                               "name": "Old mastiffs of the ancient East",
                               "note": "The huge guard and hunting mastiffs of the ancient East, carved on palace walls thousands of years ago. Now extinct.",
                               "img": "/history/breeds/old-mastiffs-of-the-ancient-east.jpg",
-                              "value": 4.95
+                              "value": 2.475
                             },
                             {
                               "name": "Ancient Molossers",
                               "note": "The huge eastern war and guard dogs at the root of every mastiff. Now extinct.",
                               "img": "/history/breeds/Ancient-Molossers.jpg",
-                              "value": 4.95
+                              "value": 2.475
                             }
                           ]
                         },
@@ -15567,13 +16017,58 @@
                               "name": "Dogs of the Alan horsemen",
                               "note": "The big steppe dogs of the Alan horsemen, guarding their camps and herds across the plains. Now extinct.",
                               "img": "/history/breeds/dogs-of-the-alan-horsemen.jpg",
-                              "value": 4.95
+                              "value": 2.475
                             },
                             {
                               "name": "Alaunt war dogs",
                               "note": "The fierce war and catch dogs that rode west with mounted warriors. Now extinct.",
                               "img": "/history/breeds/alunt-war-dogs.jpg",
-                              "value": 4.95
+                              "value": 2.475
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Ancient Mastiff",
+                      "note": "The ancient British guard and war dog, praised by Roman writers, that the heavy bandogs descend from. A functional root, not documented descent. An extinct historical type.",
+                      "img": "/history/breeds/ancient-british-mastiff-type.jpg",
+                      "children": [
+                        {
+                          "name": "Ancient Molossers",
+                          "note": "The huge eastern war and guard dogs at the root of every mastiff. Now extinct.",
+                          "img": "/history/breeds/Ancient-Molossers.jpg",
+                          "children": [
+                            {
+                              "name": "Old mastiffs of the ancient East",
+                              "note": "The huge guard and hunting mastiffs of the ancient East, carved on palace walls thousands of years ago. Now extinct.",
+                              "img": "/history/breeds/old-mastiffs-of-the-ancient-east.jpg",
+                              "value": 2.475
+                            },
+                            {
+                              "name": "Ancient Molossers",
+                              "note": "The huge eastern war and guard dogs at the root of every mastiff. Now extinct.",
+                              "img": "/history/breeds/Ancient-Molossers.jpg",
+                              "value": 2.475
+                            }
+                          ]
+                        },
+                        {
+                          "name": "Alaunt war dogs",
+                          "note": "The fierce war and catch dogs that rode west with mounted warriors. Now extinct.",
+                          "img": "/history/breeds/alunt-war-dogs.jpg",
+                          "children": [
+                            {
+                              "name": "Dogs of the Alan horsemen",
+                              "note": "The big steppe dogs of the Alan horsemen, guarding their camps and herds across the plains. Now extinct.",
+                              "img": "/history/breeds/dogs-of-the-alan-horsemen.jpg",
+                              "value": 2.475
+                            },
+                            {
+                              "name": "Alaunt war dogs",
+                              "note": "The fierce war and catch dogs that rode west with mounted warriors. Now extinct.",
+                              "img": "/history/breeds/alunt-war-dogs.jpg",
+                              "value": 2.475
                             }
                           ]
                         }
@@ -15626,13 +16121,13 @@
                               "name": "Old mastiffs of the ancient East",
                               "note": "The huge guard and hunting mastiffs of the ancient East, carved on palace walls thousands of years ago. Now extinct.",
                               "img": "/history/breeds/old-mastiffs-of-the-ancient-east.jpg",
-                              "value": 1.375
+                              "value": 0.6875
                             },
                             {
                               "name": "Ancient Molossers",
                               "note": "The huge eastern war and guard dogs at the root of every mastiff. Now extinct.",
                               "img": "/history/breeds/Ancient-Molossers.jpg",
-                              "value": 1.375
+                              "value": 0.6875
                             }
                           ]
                         },
@@ -15645,13 +16140,58 @@
                               "name": "Dogs of the Alan horsemen",
                               "note": "The big steppe dogs of the Alan horsemen, guarding their camps and herds across the plains. Now extinct.",
                               "img": "/history/breeds/dogs-of-the-alan-horsemen.jpg",
-                              "value": 1.375
+                              "value": 0.6875
                             },
                             {
                               "name": "Alaunt war dogs",
                               "note": "The fierce war and catch dogs that rode west with mounted warriors. Now extinct.",
                               "img": "/history/breeds/alunt-war-dogs.jpg",
-                              "value": 1.375
+                              "value": 0.6875
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Ancient Mastiff",
+                      "note": "The ancient British guard and war dog, praised by Roman writers, that the heavy bandogs descend from. A functional root, not documented descent. An extinct historical type.",
+                      "img": "/history/breeds/ancient-british-mastiff-type.jpg",
+                      "children": [
+                        {
+                          "name": "Ancient Molossers",
+                          "note": "The huge eastern war and guard dogs at the root of every mastiff. Now extinct.",
+                          "img": "/history/breeds/Ancient-Molossers.jpg",
+                          "children": [
+                            {
+                              "name": "Old mastiffs of the ancient East",
+                              "note": "The huge guard and hunting mastiffs of the ancient East, carved on palace walls thousands of years ago. Now extinct.",
+                              "img": "/history/breeds/old-mastiffs-of-the-ancient-east.jpg",
+                              "value": 0.6875
+                            },
+                            {
+                              "name": "Ancient Molossers",
+                              "note": "The huge eastern war and guard dogs at the root of every mastiff. Now extinct.",
+                              "img": "/history/breeds/Ancient-Molossers.jpg",
+                              "value": 0.6875
+                            }
+                          ]
+                        },
+                        {
+                          "name": "Alaunt war dogs",
+                          "note": "The fierce war and catch dogs that rode west with mounted warriors. Now extinct.",
+                          "img": "/history/breeds/alunt-war-dogs.jpg",
+                          "children": [
+                            {
+                              "name": "Dogs of the Alan horsemen",
+                              "note": "The big steppe dogs of the Alan horsemen, guarding their camps and herds across the plains. Now extinct.",
+                              "img": "/history/breeds/dogs-of-the-alan-horsemen.jpg",
+                              "value": 0.6875
+                            },
+                            {
+                              "name": "Alaunt war dogs",
+                              "note": "The fierce war and catch dogs that rode west with mounted warriors. Now extinct.",
+                              "img": "/history/breeds/alunt-war-dogs.jpg",
+                              "value": 0.6875
                             }
                           ]
                         }
@@ -23354,13 +23894,13 @@
                               "name": "Old mastiffs of the ancient East",
                               "note": "The huge guard and hunting mastiffs of the ancient East, carved on palace walls thousands of years ago. Now extinct.",
                               "img": "/history/breeds/old-mastiffs-of-the-ancient-east.jpg",
-                              "value": 6
+                              "value": 3
                             },
                             {
                               "name": "Ancient Molossers",
                               "note": "The huge eastern war and guard dogs at the root of every mastiff. Now extinct.",
                               "img": "/history/breeds/Ancient-Molossers.jpg",
-                              "value": 6
+                              "value": 3
                             }
                           ]
                         },
@@ -23373,13 +23913,58 @@
                               "name": "Dogs of the Alan horsemen",
                               "note": "The big steppe dogs of the Alan horsemen, guarding their camps and herds across the plains. Now extinct.",
                               "img": "/history/breeds/dogs-of-the-alan-horsemen.jpg",
-                              "value": 6
+                              "value": 3
                             },
                             {
                               "name": "Alaunt war dogs",
                               "note": "The fierce war and catch dogs that rode west with mounted warriors. Now extinct.",
                               "img": "/history/breeds/alunt-war-dogs.jpg",
-                              "value": 6
+                              "value": 3
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Ancient Mastiff",
+                      "note": "The ancient British guard and war dog, praised by Roman writers, that the heavy bandogs descend from. A functional root, not documented descent. An extinct historical type.",
+                      "img": "/history/breeds/ancient-british-mastiff-type.jpg",
+                      "children": [
+                        {
+                          "name": "Ancient Molossers",
+                          "note": "The huge eastern war and guard dogs at the root of every mastiff. Now extinct.",
+                          "img": "/history/breeds/Ancient-Molossers.jpg",
+                          "children": [
+                            {
+                              "name": "Old mastiffs of the ancient East",
+                              "note": "The huge guard and hunting mastiffs of the ancient East, carved on palace walls thousands of years ago. Now extinct.",
+                              "img": "/history/breeds/old-mastiffs-of-the-ancient-east.jpg",
+                              "value": 3
+                            },
+                            {
+                              "name": "Ancient Molossers",
+                              "note": "The huge eastern war and guard dogs at the root of every mastiff. Now extinct.",
+                              "img": "/history/breeds/Ancient-Molossers.jpg",
+                              "value": 3
+                            }
+                          ]
+                        },
+                        {
+                          "name": "Alaunt war dogs",
+                          "note": "The fierce war and catch dogs that rode west with mounted warriors. Now extinct.",
+                          "img": "/history/breeds/alunt-war-dogs.jpg",
+                          "children": [
+                            {
+                              "name": "Dogs of the Alan horsemen",
+                              "note": "The big steppe dogs of the Alan horsemen, guarding their camps and herds across the plains. Now extinct.",
+                              "img": "/history/breeds/dogs-of-the-alan-horsemen.jpg",
+                              "value": 3
+                            },
+                            {
+                              "name": "Alaunt war dogs",
+                              "note": "The fierce war and catch dogs that rode west with mounted warriors. Now extinct.",
+                              "img": "/history/breeds/alunt-war-dogs.jpg",
+                              "value": 3
                             }
                           ]
                         }
@@ -23458,13 +24043,13 @@
                               "name": "Old mastiffs of the ancient East",
                               "note": "The huge guard and hunting mastiffs of the ancient East, carved on palace walls thousands of years ago. Now extinct.",
                               "img": "/history/breeds/old-mastiffs-of-the-ancient-east.jpg",
-                              "value": 6
+                              "value": 3
                             },
                             {
                               "name": "Ancient Molossers",
                               "note": "The huge eastern war and guard dogs at the root of every mastiff. Now extinct.",
                               "img": "/history/breeds/Ancient-Molossers.jpg",
-                              "value": 6
+                              "value": 3
                             }
                           ]
                         },
@@ -23477,13 +24062,58 @@
                               "name": "Dogs of the Alan horsemen",
                               "note": "The big steppe dogs of the Alan horsemen, guarding their camps and herds across the plains. Now extinct.",
                               "img": "/history/breeds/dogs-of-the-alan-horsemen.jpg",
-                              "value": 6
+                              "value": 3
                             },
                             {
                               "name": "Alaunt war dogs",
                               "note": "The fierce war and catch dogs that rode west with mounted warriors. Now extinct.",
                               "img": "/history/breeds/alunt-war-dogs.jpg",
-                              "value": 6
+                              "value": 3
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Ancient Mastiff",
+                      "note": "The ancient British guard and war dog, praised by Roman writers, that the heavy bandogs descend from. A functional root, not documented descent. An extinct historical type.",
+                      "img": "/history/breeds/ancient-british-mastiff-type.jpg",
+                      "children": [
+                        {
+                          "name": "Ancient Molossers",
+                          "note": "The huge eastern war and guard dogs at the root of every mastiff. Now extinct.",
+                          "img": "/history/breeds/Ancient-Molossers.jpg",
+                          "children": [
+                            {
+                              "name": "Old mastiffs of the ancient East",
+                              "note": "The huge guard and hunting mastiffs of the ancient East, carved on palace walls thousands of years ago. Now extinct.",
+                              "img": "/history/breeds/old-mastiffs-of-the-ancient-east.jpg",
+                              "value": 3
+                            },
+                            {
+                              "name": "Ancient Molossers",
+                              "note": "The huge eastern war and guard dogs at the root of every mastiff. Now extinct.",
+                              "img": "/history/breeds/Ancient-Molossers.jpg",
+                              "value": 3
+                            }
+                          ]
+                        },
+                        {
+                          "name": "Alaunt war dogs",
+                          "note": "The fierce war and catch dogs that rode west with mounted warriors. Now extinct.",
+                          "img": "/history/breeds/alunt-war-dogs.jpg",
+                          "children": [
+                            {
+                              "name": "Dogs of the Alan horsemen",
+                              "note": "The big steppe dogs of the Alan horsemen, guarding their camps and herds across the plains. Now extinct.",
+                              "img": "/history/breeds/dogs-of-the-alan-horsemen.jpg",
+                              "value": 3
+                            },
+                            {
+                              "name": "Alaunt war dogs",
+                              "note": "The fierce war and catch dogs that rode west with mounted warriors. Now extinct.",
+                              "img": "/history/breeds/alunt-war-dogs.jpg",
+                              "value": 3
                             }
                           ]
                         }
