@@ -73,12 +73,20 @@ export const ukBreeds: UKBreed[] = [
   { name: "Cocker Spaniel", strip: "spaniels", era: "1800s", anchor: 1874, note: "Merry spaniel named for flushing woodcock.", image: "/cooker-square.jpg", tag: "popular" },
   { name: "Field Spaniel", strip: "spaniels", era: "1800s", anchor: 1876, note: "Elegant working gundog spaniel.", image: "/history/breeds/field-spaniel-photo.jpg", tag: "endangered" },
   { name: "Sussex Spaniel", strip: "spaniels", era: "1800s", anchor: 1878, note: "Golden-liver spaniel that works slow and gives tongue.", image: "/history/breeds/Sussex-Spaniel.jpg", tag: "endangered" },
+  // 19 August 2026: mid1800 group era labels reconciled with the file
+  // convention. era is an honest band label, never a bare year and never carrying
+  // a "c." hedge, since a band already implies approximation; anchor is purely an
+  // ordering device, never shown to the user, so an anchor must not be read as a
+  // researched date. Jack Russell at anchor 1820, and Fox Terrier, Sealyham and
+  // Whippet at 1872 to 1880, sit outside a strict mid-1800s reading but stay in
+  // this strip deliberately: strip membership is an editorial grouping, not
+  // arithmetic.
   { name: "Irish Water Spaniel", strip: "mid1800", era: "1830s", anchor: 1834, note: "Curly-coated water retriever with a rat-like tail.", image: "/history/breeds/irish-water-spaniel-photo.jpg", tag: "endangered" },
   { name: "Norfolk Spaniel", strip: "spaniels", era: "1800s", anchor: 1882, note: "Springer-type spaniel later folded into the English Springer.", image: "/history/breeds/norfolk-spaniel-painting.jpg", tag: "extinct" },
 
   // The mid-1800s
-  { name: "Jack Russell Terrier", strip: "mid1800", era: "c. 1820s", anchor: 1820, note: "Bold fox-bolting terrier bred by the Reverend John Russell.", image: "/jack-russel-square.jpg", tag: "trending" },
-  { name: "Kerry Blue Terrier", strip: "mid1800", era: "1847", anchor: 1847, note: "Blue-coated Irish all-rounder, first documented in 1847.", image: "/history/breeds/Kerry_Blue_Terrier_photo.jpg", tag: "endangered" },
+  { name: "Jack Russell Terrier", strip: "mid1800", era: "1820s", anchor: 1820, note: "Bold fox-bolting terrier bred by the Reverend John Russell.", image: "/jack-russel-square.jpg", tag: "trending" },
+  { name: "Kerry Blue Terrier", strip: "mid1800", era: "1840s", anchor: 1847, note: "Blue-coated Irish all-rounder, first documented in 1847.", image: "/history/breeds/Kerry_Blue_Terrier_photo.jpg", tag: "endangered" },
   { name: "Bull Terrier", strip: "early1800", era: "early 1800s", anchor: 1830, note: "Egg-headed dog from crossing bulldogs with terriers.", image: "/bull-terrier-square37.jpg" , tag: "in-decline" },
   { name: "Staffordshire Bull Terrier", strip: "early1800", era: "early 1800s", anchor: 1832, note: "Bull-and-terrier fighting dog turned devoted family friend.", image: "/staffy-square.jpg", tag: "popular" },
   { name: "Bullmastiff", strip: "mid1800", era: "1860s", anchor: 1866, note: "Powerful night dog bred to pin poachers on Victorian estates.", image: "/history/breeds/Bullmastiff-photo.jpg", tag: "endangered" },
@@ -140,7 +148,7 @@ export const ukBreeds: UKBreed[] = [
   // Sealyhams crossed with Norfolk Terriers. Patterdale Terrier's 1950s band is
   // unverified and flagged for a later check.
   { name: "Norwich Terrier", strip: "c1900", era: "early 1900s", anchor: 1900, note: "Small, hardy red terrier with prick ears.", image: "/history/breeds/norwich-terrier-photo.jpg", tag: "endangered" },
-  { name: "Bulldog", strip: "mid1800", era: "mid-1800s", anchor: 1858, note: "The wrinkled national symbol, bred down from bull-baiting dogs.", image: "/bulldog-square.jpg", tag: "popular" },
+  { name: "Bulldog", strip: "mid1800", era: "1850s", anchor: 1858, note: "The wrinkled national symbol, bred down from bull-baiting dogs.", image: "/bulldog-square.jpg", tag: "popular" },
   { name: "Cavalier King Charles Spaniel", strip: "c1900", era: "1920s", anchor: 1925, note: "Sweet-natured toy spaniel reconstructed from old portraits.", image: "/cav-spaniel-square.jpg" , tag: "popular" },
   { name: "Patterdale Terrier", strip: "c1900", era: "1950s", anchor: 1950, note: "Hard-as-nails working fell terrier.", image: "/history/breeds/Patterdale-Terrier-photo.jpg" , tag: "popular" },
   { name: "Lucas Terrier", strip: "c1900", era: "1940s", anchor: 1948, note: "Gentle terrier from crossing the Sealyham and Norfolk.", image: "/history/breeds/Lucas-Terrier-photo.jpg" , tag: "endangered" },
