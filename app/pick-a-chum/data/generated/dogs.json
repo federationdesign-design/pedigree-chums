@@ -2214,21 +2214,66 @@
               "img": "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg",
               "children": [
                 {
-                  "name": "Earth Dog",
-                  "note": "The medieval earth-and-vermin dog the black-and-tan working terrier goes back to, a functional match rather than documented descent. Now extinct.",
-                  "img": "/history/breeds/medieval-earth-dog.jpg",
+                  "name": "Old British ratting terriers",
+                  "note": "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.",
+                  "img": "/history/breeds/Old-British-ratting-terriers.jpg",
                   "children": [
                     {
-                      "name": "Ancient Celtic earth dogs",
-                      "note": "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.",
-                      "img": "/history/breeds/ancient-celtic-earth-dog.jpg",
-                      "value": 7.7
+                      "name": "Earth Dog",
+                      "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+                      "img": "/history/breeds/medieval-earth-dog.jpg",
+                      "children": [
+                        {
+                          "name": "Ancient Celtic earth dogs",
+                          "note": "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.",
+                          "img": "/history/breeds/ancient-celtic-earth-dog.jpg",
+                          "value": 2.31
+                        },
+                        {
+                          "name": "Early badger hunting dogs",
+                          "note": "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
+                          "img": "/history/breeds/early-badger-hunting-dogs.jpg",
+                          "value": 1.89
+                        }
+                      ]
                     },
                     {
-                      "name": "Early badger hunting dogs",
-                      "note": "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
-                      "img": "/history/breeds/early-badger-hunting-dogs.jpg",
-                      "value": 6.3
+                      "name": "Old British ratting terriers",
+                      "note": "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.",
+                      "img": "/history/breeds/Old-British-ratting-terriers.jpg",
+                      "value": 4.2
+                    }
+                  ]
+                },
+                {
+                  "name": "Earth and hunt terriers",
+                  "note": "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.",
+                  "img": "/history/breeds/Earth-and-hunt-terrier.jpg",
+                  "children": [
+                    {
+                      "name": "Earth Dog",
+                      "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+                      "img": "/history/breeds/medieval-earth-dog.jpg",
+                      "children": [
+                        {
+                          "name": "Ancient Celtic earth dogs",
+                          "note": "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.",
+                          "img": "/history/breeds/ancient-celtic-earth-dog.jpg",
+                          "value": 1.54
+                        },
+                        {
+                          "name": "Early badger hunting dogs",
+                          "note": "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
+                          "img": "/history/breeds/early-badger-hunting-dogs.jpg",
+                          "value": 1.2599999999999998
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Earth and hunt terriers",
+                      "note": "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.",
+                      "img": "/history/breeds/Earth-and-hunt-terrier.jpg",
+                      "value": 2.8
                     }
                   ]
                 }
@@ -2277,21 +2322,40 @@
                   "img": "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg",
                   "children": [
                     {
-                      "name": "Earth Dog",
-                      "note": "The medieval earth-and-vermin dog the black-and-tan working terrier goes back to, a functional match rather than documented descent. Now extinct.",
-                      "img": "/history/breeds/medieval-earth-dog.jpg",
+                      "name": "Old British ratting terriers",
+                      "note": "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.",
+                      "img": "/history/breeds/Old-British-ratting-terriers.jpg",
                       "children": [
                         {
-                          "name": "Ancient Celtic earth dogs",
-                          "note": "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.",
-                          "img": "/history/breeds/ancient-celtic-earth-dog.jpg",
-                          "value": 1.012
+                          "name": "Earth Dog",
+                          "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+                          "img": "/history/breeds/medieval-earth-dog.jpg",
+                          "value": 0.552
                         },
                         {
-                          "name": "Early badger hunting dogs",
-                          "note": "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
-                          "img": "/history/breeds/early-badger-hunting-dogs.jpg",
-                          "value": 0.828
+                          "name": "Old British ratting terriers",
+                          "note": "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.",
+                          "img": "/history/breeds/Old-British-ratting-terriers.jpg",
+                          "value": 0.552
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Earth and hunt terriers",
+                      "note": "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.",
+                      "img": "/history/breeds/Earth-and-hunt-terrier.jpg",
+                      "children": [
+                        {
+                          "name": "Earth Dog",
+                          "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+                          "img": "/history/breeds/medieval-earth-dog.jpg",
+                          "value": 0.36800000000000005
+                        },
+                        {
+                          "name": "Earth and hunt terriers",
+                          "note": "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.",
+                          "img": "/history/breeds/Earth-and-hunt-terrier.jpg",
+                          "value": 0.36800000000000005
                         }
                       ]
                     }
@@ -4589,27 +4653,33 @@
                       "name": "Celtic herdsmen's dogs",
                       "note": "The all-round farm dogs of the Celtic tribes, guarding and driving the herds. Now extinct.",
                       "img": "/history/breeds/celtic-herdsmen-dogs.jpg",
-                      "value": 9.625
+                      "value": 4.8125
                     },
                     {
                       "name": "Roman shepherd dogs",
                       "note": "The flock-guarding sheepdogs the Roman farm writers described, kept white so the shepherd knew dog from wolf. Now extinct.",
                       "img": "/history/breeds/roman-shepherd-dogs.jpg",
-                      "value": 6.875
+                      "value": 3.4375
                     },
                     {
                       "name": "Anglo-Saxon herding dogs",
                       "note": "Collie-sized herding dogs of Anglo-Saxon England, found at West Stow and Brandon. Now extinct.",
                       "img": "/history/breeds/anglo-saxon-herding-dogs.jpg",
-                      "value": 5.5
+                      "value": 2.75
                     },
                     {
                       "name": "Norse settlers dogs",
                       "note": "Scandinavian dogs brought over with Viking settlement, likely mixed into local herding stock. Now extinct.",
                       "img": "/history/breeds/viking-herding-spitz.jpg",
-                      "value": 5.5
+                      "value": 2.75
                     }
                   ]
+                },
+                {
+                  "name": "Old working collies",
+                  "note": "The old northern hill-collie landrace of Scotland and the borders, the shared working stock the Rough, Smooth and Border collies all grew from. Now extinct.",
+                  "img": "/history/breeds/Old-working-collies-cluster.jpg",
+                  "value": 13.75
                 }
               ]
             }
@@ -9422,21 +9492,40 @@
                   "img": "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg",
                   "children": [
                     {
-                      "name": "Earth Dog",
-                      "note": "The medieval earth-and-vermin dog the black-and-tan working terrier goes back to, a functional match rather than documented descent. Now extinct.",
-                      "img": "/history/breeds/medieval-earth-dog.jpg",
+                      "name": "Old British ratting terriers",
+                      "note": "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.",
+                      "img": "/history/breeds/Old-British-ratting-terriers.jpg",
                       "children": [
                         {
-                          "name": "Ancient Celtic earth dogs",
-                          "note": "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.",
-                          "img": "/history/breeds/ancient-celtic-earth-dog.jpg",
-                          "value": 6.80625
+                          "name": "Earth Dog",
+                          "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+                          "img": "/history/breeds/medieval-earth-dog.jpg",
+                          "value": 3.7125
                         },
                         {
-                          "name": "Early badger hunting dogs",
-                          "note": "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
-                          "img": "/history/breeds/early-badger-hunting-dogs.jpg",
-                          "value": 5.56875
+                          "name": "Old British ratting terriers",
+                          "note": "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.",
+                          "img": "/history/breeds/Old-British-ratting-terriers.jpg",
+                          "value": 3.7125
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Earth and hunt terriers",
+                      "note": "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.",
+                      "img": "/history/breeds/Earth-and-hunt-terrier.jpg",
+                      "children": [
+                        {
+                          "name": "Earth Dog",
+                          "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+                          "img": "/history/breeds/medieval-earth-dog.jpg",
+                          "value": 2.475
+                        },
+                        {
+                          "name": "Earth and hunt terriers",
+                          "note": "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.",
+                          "img": "/history/breeds/Earth-and-hunt-terrier.jpg",
+                          "value": 2.475
                         }
                       ]
                     }
@@ -9456,7 +9545,13 @@
                           "name": "Old English Black and Tan Terrier",
                           "note": "The black-and-tan working stock the white terriers were selected out of, for coat colour. Now extinct.",
                           "img": "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg",
-                          "value": 4.125
+                          "value": 2.0625
+                        },
+                        {
+                          "name": "Old English White Terrier",
+                          "note": "The white-bodied working terriers bred out of the black-and-tan stock for coat colour. The split of this line into population and named breed is a useful reconstruction, not a documented distinction: the three white-terrier names all refer to one extinct breed. Now extinct.",
+                          "img": "/history/breeds/english-white-terrier-painting.jpg",
+                          "value": 2.0625
                         }
                       ]
                     },
@@ -9466,10 +9561,16 @@
                       "img": "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg",
                       "children": [
                         {
-                          "name": "Earth Dog",
-                          "note": "The medieval earth-and-vermin dog the black-and-tan working terrier goes back to, a functional match rather than documented descent. Now extinct.",
-                          "img": "/history/breeds/medieval-earth-dog.jpg",
-                          "value": 2.75
+                          "name": "Old British ratting terriers",
+                          "note": "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.",
+                          "img": "/history/breeds/Old-British-ratting-terriers.jpg",
+                          "value": 1.65
+                        },
+                        {
+                          "name": "Earth and hunt terriers",
+                          "note": "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.",
+                          "img": "/history/breeds/Earth-and-hunt-terrier.jpg",
+                          "value": 1.1
                         }
                       ]
                     }
@@ -9629,25 +9730,50 @@
                   "img": "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg",
                   "children": [
                     {
-                      "name": "Earth Dog",
-                      "note": "The medieval earth-and-vermin dog the black-and-tan working terrier goes back to, a functional match rather than documented descent. Now extinct.",
-                      "img": "/history/breeds/medieval-earth-dog.jpg",
+                      "name": "Old British ratting terriers",
+                      "note": "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.",
+                      "img": "/history/breeds/Old-British-ratting-terriers.jpg",
                       "children": [
                         {
-                          "name": "Ancient Celtic earth dogs",
-                          "note": "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.",
-                          "img": "/history/breeds/ancient-celtic-earth-dog.jpg",
-                          "value": 8.25
+                          "name": "Earth Dog",
+                          "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+                          "img": "/history/breeds/medieval-earth-dog.jpg",
+                          "value": 2.25
                         },
                         {
-                          "name": "Early badger hunting dogs",
-                          "note": "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
-                          "img": "/history/breeds/early-badger-hunting-dogs.jpg",
-                          "value": 6.75
+                          "name": "Old British ratting terriers",
+                          "note": "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.",
+                          "img": "/history/breeds/Old-British-ratting-terriers.jpg",
+                          "value": 2.25
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Earth and hunt terriers",
+                      "note": "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.",
+                      "img": "/history/breeds/Earth-and-hunt-terrier.jpg",
+                      "children": [
+                        {
+                          "name": "Earth Dog",
+                          "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+                          "img": "/history/breeds/medieval-earth-dog.jpg",
+                          "value": 1.5
+                        },
+                        {
+                          "name": "Earth and hunt terriers",
+                          "note": "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.",
+                          "img": "/history/breeds/Earth-and-hunt-terrier.jpg",
+                          "value": 1.5
                         }
                       ]
                     }
                   ]
+                },
+                {
+                  "name": "Old English White Terrier",
+                  "note": "The white-bodied working terriers bred out of the black-and-tan stock for coat colour. The split of this line into population and named breed is a useful reconstruction, not a documented distinction: the three white-terrier names all refer to one extinct breed. Now extinct.",
+                  "img": "/history/breeds/english-white-terrier-painting.jpg",
+                  "value": 7.5
                 }
               ]
             },
@@ -11791,21 +11917,66 @@
           "img": "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg",
           "children": [
             {
-              "name": "Earth Dog",
-              "note": "The medieval earth-and-vermin dog the black-and-tan working terrier goes back to, a functional match rather than documented descent. Now extinct.",
-              "img": "/history/breeds/medieval-earth-dog.jpg",
+              "name": "Old British ratting terriers",
+              "note": "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.",
+              "img": "/history/breeds/Old-British-ratting-terriers.jpg",
               "children": [
                 {
-                  "name": "Ancient Celtic earth dogs",
-                  "note": "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.",
-                  "img": "/history/breeds/ancient-celtic-earth-dog.jpg",
-                  "value": 11
+                  "name": "Earth Dog",
+                  "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+                  "img": "/history/breeds/medieval-earth-dog.jpg",
+                  "children": [
+                    {
+                      "name": "Ancient Celtic earth dogs",
+                      "note": "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.",
+                      "img": "/history/breeds/ancient-celtic-earth-dog.jpg",
+                      "value": 3.3
+                    },
+                    {
+                      "name": "Early badger hunting dogs",
+                      "note": "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
+                      "img": "/history/breeds/early-badger-hunting-dogs.jpg",
+                      "value": 2.7
+                    }
+                  ]
                 },
                 {
-                  "name": "Early badger hunting dogs",
-                  "note": "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
-                  "img": "/history/breeds/early-badger-hunting-dogs.jpg",
-                  "value": 9
+                  "name": "Old British ratting terriers",
+                  "note": "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.",
+                  "img": "/history/breeds/Old-British-ratting-terriers.jpg",
+                  "value": 6
+                }
+              ]
+            },
+            {
+              "name": "Earth and hunt terriers",
+              "note": "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.",
+              "img": "/history/breeds/Earth-and-hunt-terrier.jpg",
+              "children": [
+                {
+                  "name": "Earth Dog",
+                  "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+                  "img": "/history/breeds/medieval-earth-dog.jpg",
+                  "children": [
+                    {
+                      "name": "Ancient Celtic earth dogs",
+                      "note": "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.",
+                      "img": "/history/breeds/ancient-celtic-earth-dog.jpg",
+                      "value": 2.2
+                    },
+                    {
+                      "name": "Early badger hunting dogs",
+                      "note": "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
+                      "img": "/history/breeds/early-badger-hunting-dogs.jpg",
+                      "value": 1.8
+                    }
+                  ]
+                },
+                {
+                  "name": "Earth and hunt terriers",
+                  "note": "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.",
+                  "img": "/history/breeds/Earth-and-hunt-terrier.jpg",
+                  "value": 4
                 }
               ]
             }
@@ -12129,21 +12300,66 @@
           "img": "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg",
           "children": [
             {
-              "name": "Earth Dog",
-              "note": "The medieval earth-and-vermin dog the black-and-tan working terrier goes back to, a functional match rather than documented descent. Now extinct.",
-              "img": "/history/breeds/medieval-earth-dog.jpg",
+              "name": "Old British ratting terriers",
+              "note": "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.",
+              "img": "/history/breeds/Old-British-ratting-terriers.jpg",
               "children": [
                 {
-                  "name": "Ancient Celtic earth dogs",
-                  "note": "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.",
-                  "img": "/history/breeds/ancient-celtic-earth-dog.jpg",
-                  "value": 12.65
+                  "name": "Earth Dog",
+                  "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+                  "img": "/history/breeds/medieval-earth-dog.jpg",
+                  "children": [
+                    {
+                      "name": "Ancient Celtic earth dogs",
+                      "note": "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.",
+                      "img": "/history/breeds/ancient-celtic-earth-dog.jpg",
+                      "value": 3.795
+                    },
+                    {
+                      "name": "Early badger hunting dogs",
+                      "note": "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
+                      "img": "/history/breeds/early-badger-hunting-dogs.jpg",
+                      "value": 3.105
+                    }
+                  ]
                 },
                 {
-                  "name": "Early badger hunting dogs",
-                  "note": "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
-                  "img": "/history/breeds/early-badger-hunting-dogs.jpg",
-                  "value": 10.35
+                  "name": "Old British ratting terriers",
+                  "note": "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.",
+                  "img": "/history/breeds/Old-British-ratting-terriers.jpg",
+                  "value": 6.9
+                }
+              ]
+            },
+            {
+              "name": "Earth and hunt terriers",
+              "note": "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.",
+              "img": "/history/breeds/Earth-and-hunt-terrier.jpg",
+              "children": [
+                {
+                  "name": "Earth Dog",
+                  "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+                  "img": "/history/breeds/medieval-earth-dog.jpg",
+                  "children": [
+                    {
+                      "name": "Ancient Celtic earth dogs",
+                      "note": "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.",
+                      "img": "/history/breeds/ancient-celtic-earth-dog.jpg",
+                      "value": 2.53
+                    },
+                    {
+                      "name": "Early badger hunting dogs",
+                      "note": "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
+                      "img": "/history/breeds/early-badger-hunting-dogs.jpg",
+                      "value": 2.07
+                    }
+                  ]
+                },
+                {
+                  "name": "Earth and hunt terriers",
+                  "note": "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.",
+                  "img": "/history/breeds/Earth-and-hunt-terrier.jpg",
+                  "value": 4.6
                 }
               ]
             }
@@ -15622,21 +15838,66 @@
           "img": "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg",
           "children": [
             {
-              "name": "Earth Dog",
-              "note": "The medieval earth-and-vermin dog the black-and-tan working terrier goes back to, a functional match rather than documented descent. Now extinct.",
-              "img": "/history/breeds/medieval-earth-dog.jpg",
+              "name": "Old British ratting terriers",
+              "note": "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.",
+              "img": "/history/breeds/Old-British-ratting-terriers.jpg",
               "children": [
                 {
-                  "name": "Ancient Celtic earth dogs",
-                  "note": "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.",
-                  "img": "/history/breeds/ancient-celtic-earth-dog.jpg",
-                  "value": 24.75
+                  "name": "Earth Dog",
+                  "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+                  "img": "/history/breeds/medieval-earth-dog.jpg",
+                  "children": [
+                    {
+                      "name": "Ancient Celtic earth dogs",
+                      "note": "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.",
+                      "img": "/history/breeds/ancient-celtic-earth-dog.jpg",
+                      "value": 7.425
+                    },
+                    {
+                      "name": "Early badger hunting dogs",
+                      "note": "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
+                      "img": "/history/breeds/early-badger-hunting-dogs.jpg",
+                      "value": 6.075
+                    }
+                  ]
                 },
                 {
-                  "name": "Early badger hunting dogs",
-                  "note": "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
-                  "img": "/history/breeds/early-badger-hunting-dogs.jpg",
-                  "value": 20.25
+                  "name": "Old British ratting terriers",
+                  "note": "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.",
+                  "img": "/history/breeds/Old-British-ratting-terriers.jpg",
+                  "value": 13.5
+                }
+              ]
+            },
+            {
+              "name": "Earth and hunt terriers",
+              "note": "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.",
+              "img": "/history/breeds/Earth-and-hunt-terrier.jpg",
+              "children": [
+                {
+                  "name": "Earth Dog",
+                  "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+                  "img": "/history/breeds/medieval-earth-dog.jpg",
+                  "children": [
+                    {
+                      "name": "Ancient Celtic earth dogs",
+                      "note": "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.",
+                      "img": "/history/breeds/ancient-celtic-earth-dog.jpg",
+                      "value": 4.95
+                    },
+                    {
+                      "name": "Early badger hunting dogs",
+                      "note": "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
+                      "img": "/history/breeds/early-badger-hunting-dogs.jpg",
+                      "value": 4.05
+                    }
+                  ]
+                },
+                {
+                  "name": "Earth and hunt terriers",
+                  "note": "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.",
+                  "img": "/history/breeds/Earth-and-hunt-terrier.jpg",
+                  "value": 9
                 }
               ]
             }
@@ -17483,21 +17744,66 @@
           "img": "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg",
           "children": [
             {
-              "name": "Earth Dog",
-              "note": "The medieval earth-and-vermin dog the black-and-tan working terrier goes back to, a functional match rather than documented descent. Now extinct.",
-              "img": "/history/breeds/medieval-earth-dog.jpg",
+              "name": "Old British ratting terriers",
+              "note": "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.",
+              "img": "/history/breeds/Old-British-ratting-terriers.jpg",
               "children": [
                 {
-                  "name": "Ancient Celtic earth dogs",
-                  "note": "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.",
-                  "img": "/history/breeds/ancient-celtic-earth-dog.jpg",
-                  "value": 13.75
+                  "name": "Earth Dog",
+                  "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+                  "img": "/history/breeds/medieval-earth-dog.jpg",
+                  "children": [
+                    {
+                      "name": "Ancient Celtic earth dogs",
+                      "note": "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.",
+                      "img": "/history/breeds/ancient-celtic-earth-dog.jpg",
+                      "value": 4.125
+                    },
+                    {
+                      "name": "Early badger hunting dogs",
+                      "note": "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
+                      "img": "/history/breeds/early-badger-hunting-dogs.jpg",
+                      "value": 3.375
+                    }
+                  ]
                 },
                 {
-                  "name": "Early badger hunting dogs",
-                  "note": "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
-                  "img": "/history/breeds/early-badger-hunting-dogs.jpg",
-                  "value": 11.25
+                  "name": "Old British ratting terriers",
+                  "note": "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.",
+                  "img": "/history/breeds/Old-British-ratting-terriers.jpg",
+                  "value": 7.5
+                }
+              ]
+            },
+            {
+              "name": "Earth and hunt terriers",
+              "note": "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.",
+              "img": "/history/breeds/Earth-and-hunt-terrier.jpg",
+              "children": [
+                {
+                  "name": "Earth Dog",
+                  "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+                  "img": "/history/breeds/medieval-earth-dog.jpg",
+                  "children": [
+                    {
+                      "name": "Ancient Celtic earth dogs",
+                      "note": "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.",
+                      "img": "/history/breeds/ancient-celtic-earth-dog.jpg",
+                      "value": 2.75
+                    },
+                    {
+                      "name": "Early badger hunting dogs",
+                      "note": "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
+                      "img": "/history/breeds/early-badger-hunting-dogs.jpg",
+                      "value": 2.25
+                    }
+                  ]
+                },
+                {
+                  "name": "Earth and hunt terriers",
+                  "note": "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.",
+                  "img": "/history/breeds/Earth-and-hunt-terrier.jpg",
+                  "value": 5
                 }
               ]
             }
@@ -19312,21 +19618,40 @@
                   "img": "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg",
                   "children": [
                     {
-                      "name": "Earth Dog",
-                      "note": "The medieval earth-and-vermin dog the black-and-tan working terrier goes back to, a functional match rather than documented descent. Now extinct.",
-                      "img": "/history/breeds/medieval-earth-dog.jpg",
+                      "name": "Old British ratting terriers",
+                      "note": "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.",
+                      "img": "/history/breeds/Old-British-ratting-terriers.jpg",
                       "children": [
                         {
-                          "name": "Ancient Celtic earth dogs",
-                          "note": "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.",
-                          "img": "/history/breeds/ancient-celtic-earth-dog.jpg",
-                          "value": 1.2903
+                          "name": "Earth Dog",
+                          "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+                          "img": "/history/breeds/medieval-earth-dog.jpg",
+                          "value": 0.7038
                         },
                         {
-                          "name": "Early badger hunting dogs",
-                          "note": "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
-                          "img": "/history/breeds/early-badger-hunting-dogs.jpg",
-                          "value": 1.0557
+                          "name": "Old British ratting terriers",
+                          "note": "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.",
+                          "img": "/history/breeds/Old-British-ratting-terriers.jpg",
+                          "value": 0.7038
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Earth and hunt terriers",
+                      "note": "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.",
+                      "img": "/history/breeds/Earth-and-hunt-terrier.jpg",
+                      "children": [
+                        {
+                          "name": "Earth Dog",
+                          "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+                          "img": "/history/breeds/medieval-earth-dog.jpg",
+                          "value": 0.4692
+                        },
+                        {
+                          "name": "Earth and hunt terriers",
+                          "note": "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.",
+                          "img": "/history/breeds/Earth-and-hunt-terrier.jpg",
+                          "value": 0.4692
                         }
                       ]
                     }
@@ -19573,25 +19898,76 @@
               "img": "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg",
               "children": [
                 {
-                  "name": "Earth Dog",
-                  "note": "The medieval earth-and-vermin dog the black-and-tan working terrier goes back to, a functional match rather than documented descent. Now extinct.",
-                  "img": "/history/breeds/medieval-earth-dog.jpg",
+                  "name": "Old British ratting terriers",
+                  "note": "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.",
+                  "img": "/history/breeds/Old-British-ratting-terriers.jpg",
                   "children": [
                     {
-                      "name": "Ancient Celtic earth dogs",
-                      "note": "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.",
-                      "img": "/history/breeds/ancient-celtic-earth-dog.jpg",
-                      "value": 18.15
+                      "name": "Earth Dog",
+                      "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+                      "img": "/history/breeds/medieval-earth-dog.jpg",
+                      "children": [
+                        {
+                          "name": "Ancient Celtic earth dogs",
+                          "note": "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.",
+                          "img": "/history/breeds/ancient-celtic-earth-dog.jpg",
+                          "value": 2.7225
+                        },
+                        {
+                          "name": "Early badger hunting dogs",
+                          "note": "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
+                          "img": "/history/breeds/early-badger-hunting-dogs.jpg",
+                          "value": 2.2275
+                        }
+                      ]
                     },
                     {
-                      "name": "Early badger hunting dogs",
-                      "note": "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
-                      "img": "/history/breeds/early-badger-hunting-dogs.jpg",
-                      "value": 14.85
+                      "name": "Old British ratting terriers",
+                      "note": "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.",
+                      "img": "/history/breeds/Old-British-ratting-terriers.jpg",
+                      "value": 4.95
+                    }
+                  ]
+                },
+                {
+                  "name": "Earth and hunt terriers",
+                  "note": "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.",
+                  "img": "/history/breeds/Earth-and-hunt-terrier.jpg",
+                  "children": [
+                    {
+                      "name": "Earth Dog",
+                      "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+                      "img": "/history/breeds/medieval-earth-dog.jpg",
+                      "children": [
+                        {
+                          "name": "Ancient Celtic earth dogs",
+                          "note": "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.",
+                          "img": "/history/breeds/ancient-celtic-earth-dog.jpg",
+                          "value": 1.815
+                        },
+                        {
+                          "name": "Early badger hunting dogs",
+                          "note": "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
+                          "img": "/history/breeds/early-badger-hunting-dogs.jpg",
+                          "value": 1.485
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Earth and hunt terriers",
+                      "note": "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.",
+                      "img": "/history/breeds/Earth-and-hunt-terrier.jpg",
+                      "value": 3.3
                     }
                   ]
                 }
               ]
+            },
+            {
+              "name": "Old fell terriers",
+              "note": "The hardy black-and-tan fox-working terriers of the northern fells. Now extinct.",
+              "img": "/history/breeds/Old-fell-terriers-Patterdale-Terrier-Working-hunt-terriers.jpg",
+              "value": 16.5
             }
           ]
         }
@@ -19926,29 +20302,41 @@
                       "name": "Celtic herdsmen's dogs",
                       "note": "The all-round farm dogs of the Celtic tribes, guarding and driving the herds. Now extinct.",
                       "img": "/history/breeds/celtic-herdsmen-dogs.jpg",
-                      "value": 17.5
+                      "value": 4.375
                     },
                     {
                       "name": "Roman shepherd dogs",
                       "note": "The flock-guarding sheepdogs the Roman farm writers described, kept white so the shepherd knew dog from wolf. Now extinct.",
                       "img": "/history/breeds/roman-shepherd-dogs.jpg",
-                      "value": 12.5
+                      "value": 3.125
                     },
                     {
                       "name": "Anglo-Saxon herding dogs",
                       "note": "Collie-sized herding dogs of Anglo-Saxon England, found at West Stow and Brandon. Now extinct.",
                       "img": "/history/breeds/anglo-saxon-herding-dogs.jpg",
-                      "value": 10
+                      "value": 2.5
                     },
                     {
                       "name": "Norse settlers dogs",
                       "note": "Scandinavian dogs brought over with Viking settlement, likely mixed into local herding stock. Now extinct.",
                       "img": "/history/breeds/viking-herding-spitz.jpg",
-                      "value": 10
+                      "value": 2.5
                     }
                   ]
+                },
+                {
+                  "name": "Old working collies",
+                  "note": "The old northern hill-collie landrace of Scotland and the borders, the shared working stock the Rough, Smooth and Border collies all grew from. Now extinct.",
+                  "img": "/history/breeds/Old-working-collies-cluster.jpg",
+                  "value": 12.5
                 }
               ]
+            },
+            {
+              "name": "Old Scotch Collie",
+              "note": "The old Scottish shepherd's collie, the pre-show hill-herding landrace that fed the working border strain long before it had a name. Now extinct.",
+              "img": "/history/breeds/Old-Scotch-Collie.jpg",
+              "value": 25
             }
           ]
         },
@@ -20042,29 +20430,41 @@
                       "name": "Celtic herdsmen's dogs",
                       "note": "The all-round farm dogs of the Celtic tribes, guarding and driving the herds. Now extinct.",
                       "img": "/history/breeds/celtic-herdsmen-dogs.jpg",
-                      "value": 8.75
+                      "value": 2.1875
                     },
                     {
                       "name": "Roman shepherd dogs",
                       "note": "The flock-guarding sheepdogs the Roman farm writers described, kept white so the shepherd knew dog from wolf. Now extinct.",
                       "img": "/history/breeds/roman-shepherd-dogs.jpg",
-                      "value": 6.25
+                      "value": 1.5625
                     },
                     {
                       "name": "Anglo-Saxon herding dogs",
                       "note": "Collie-sized herding dogs of Anglo-Saxon England, found at West Stow and Brandon. Now extinct.",
                       "img": "/history/breeds/anglo-saxon-herding-dogs.jpg",
-                      "value": 5
+                      "value": 1.25
                     },
                     {
                       "name": "Norse settlers dogs",
                       "note": "Scandinavian dogs brought over with Viking settlement, likely mixed into local herding stock. Now extinct.",
                       "img": "/history/breeds/viking-herding-spitz.jpg",
-                      "value": 5
+                      "value": 1.25
                     }
                   ]
+                },
+                {
+                  "name": "Old working collies",
+                  "note": "The old northern hill-collie landrace of Scotland and the borders, the shared working stock the Rough, Smooth and Border collies all grew from. Now extinct.",
+                  "img": "/history/breeds/Old-working-collies-cluster.jpg",
+                  "value": 6.25
                 }
               ]
+            },
+            {
+              "name": "Old Cumberland herding dogs",
+              "note": "Northern English herding dogs from the same border country. Now extinct.",
+              "img": "/history/breeds/cumberland-sheepdog-photo.jpg",
+              "value": 12.5
             }
           ]
         }
@@ -21445,7 +21845,13 @@
                           "name": "Shepherd's Dog",
                           "note": "The medieval British herding dog, the Sheepdog or Colley that Caius wrote of in 1576. Chaucer's black-faced 'Coll' or 'Coaly' of the 1300s gives the name: Coaly became Colley became Collie. Now extinct.",
                           "img": "/history/breeds/medieval-shepherds-dog.jpg",
-                          "value": 0.2925
+                          "value": 0.14625
+                        },
+                        {
+                          "name": "Old working collies",
+                          "note": "The old northern hill-collie landrace of Scotland and the borders, the shared working stock the Rough, Smooth and Border collies all grew from. Now extinct.",
+                          "img": "/history/breeds/Old-working-collies-cluster.jpg",
+                          "value": 0.14625
                         }
                       ]
                     },
@@ -21458,7 +21864,13 @@
                           "name": "Old working collies",
                           "note": "The shared old hill-collie landrace of the same family. Now extinct.",
                           "img": "/history/breeds/Old-working-collies-cluster.jpg",
-                          "value": 0.1575
+                          "value": 0.07875
+                        },
+                        {
+                          "name": "Old hill and bearded collies",
+                          "note": "Shaggy upland herding dogs of the same collie family. Now extinct.",
+                          "img": "/history/breeds/old-hill-and-bearded-collies.jpg",
+                          "value": 0.07875
                         }
                       ]
                     }
@@ -22357,21 +22769,66 @@
               "img": "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg",
               "children": [
                 {
-                  "name": "Earth Dog",
-                  "note": "The medieval earth-and-vermin dog the black-and-tan working terrier goes back to, a functional match rather than documented descent. Now extinct.",
-                  "img": "/history/breeds/medieval-earth-dog.jpg",
+                  "name": "Old British ratting terriers",
+                  "note": "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.",
+                  "img": "/history/breeds/Old-British-ratting-terriers.jpg",
                   "children": [
                     {
-                      "name": "Ancient Celtic earth dogs",
-                      "note": "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.",
-                      "img": "/history/breeds/ancient-celtic-earth-dog.jpg",
-                      "value": 13.6125
+                      "name": "Earth Dog",
+                      "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+                      "img": "/history/breeds/medieval-earth-dog.jpg",
+                      "children": [
+                        {
+                          "name": "Ancient Celtic earth dogs",
+                          "note": "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.",
+                          "img": "/history/breeds/ancient-celtic-earth-dog.jpg",
+                          "value": 4.08375
+                        },
+                        {
+                          "name": "Early badger hunting dogs",
+                          "note": "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
+                          "img": "/history/breeds/early-badger-hunting-dogs.jpg",
+                          "value": 3.34125
+                        }
+                      ]
                     },
                     {
-                      "name": "Early badger hunting dogs",
-                      "note": "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
-                      "img": "/history/breeds/early-badger-hunting-dogs.jpg",
-                      "value": 11.1375
+                      "name": "Old British ratting terriers",
+                      "note": "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.",
+                      "img": "/history/breeds/Old-British-ratting-terriers.jpg",
+                      "value": 7.425
+                    }
+                  ]
+                },
+                {
+                  "name": "Earth and hunt terriers",
+                  "note": "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.",
+                  "img": "/history/breeds/Earth-and-hunt-terrier.jpg",
+                  "children": [
+                    {
+                      "name": "Earth Dog",
+                      "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+                      "img": "/history/breeds/medieval-earth-dog.jpg",
+                      "children": [
+                        {
+                          "name": "Ancient Celtic earth dogs",
+                          "note": "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.",
+                          "img": "/history/breeds/ancient-celtic-earth-dog.jpg",
+                          "value": 2.7225
+                        },
+                        {
+                          "name": "Early badger hunting dogs",
+                          "note": "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
+                          "img": "/history/breeds/early-badger-hunting-dogs.jpg",
+                          "value": 2.2275
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Earth and hunt terriers",
+                      "note": "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.",
+                      "img": "/history/breeds/Earth-and-hunt-terrier.jpg",
+                      "value": 4.95
                     }
                   ]
                 }
@@ -22393,12 +22850,24 @@
                       "img": "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg",
                       "children": [
                         {
-                          "name": "Earth Dog",
-                          "note": "The medieval earth-and-vermin dog the black-and-tan working terrier goes back to, a functional match rather than documented descent. Now extinct.",
-                          "img": "/history/breeds/medieval-earth-dog.jpg",
-                          "value": 8.25
+                          "name": "Old British ratting terriers",
+                          "note": "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.",
+                          "img": "/history/breeds/Old-British-ratting-terriers.jpg",
+                          "value": 2.475
+                        },
+                        {
+                          "name": "Earth and hunt terriers",
+                          "note": "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.",
+                          "img": "/history/breeds/Earth-and-hunt-terrier.jpg",
+                          "value": 1.65
                         }
                       ]
+                    },
+                    {
+                      "name": "Old English White Terrier",
+                      "note": "The white-bodied working terriers bred out of the black-and-tan stock for coat colour. The split of this line into population and named breed is a useful reconstruction, not a documented distinction: the three white-terrier names all refer to one extinct breed. Now extinct.",
+                      "img": "/history/breeds/english-white-terrier-painting.jpg",
+                      "value": 4.125
                     }
                   ]
                 },
@@ -22408,21 +22877,40 @@
                   "img": "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg",
                   "children": [
                     {
-                      "name": "Earth Dog",
-                      "note": "The medieval earth-and-vermin dog the black-and-tan working terrier goes back to, a functional match rather than documented descent. Now extinct.",
-                      "img": "/history/breeds/medieval-earth-dog.jpg",
+                      "name": "Old British ratting terriers",
+                      "note": "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.",
+                      "img": "/history/breeds/Old-British-ratting-terriers.jpg",
                       "children": [
                         {
-                          "name": "Ancient Celtic earth dogs",
-                          "note": "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.",
-                          "img": "/history/breeds/ancient-celtic-earth-dog.jpg",
-                          "value": 3.025
+                          "name": "Earth Dog",
+                          "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+                          "img": "/history/breeds/medieval-earth-dog.jpg",
+                          "value": 1.65
                         },
                         {
-                          "name": "Early badger hunting dogs",
-                          "note": "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
-                          "img": "/history/breeds/early-badger-hunting-dogs.jpg",
-                          "value": 2.475
+                          "name": "Old British ratting terriers",
+                          "note": "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.",
+                          "img": "/history/breeds/Old-British-ratting-terriers.jpg",
+                          "value": 1.65
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Earth and hunt terriers",
+                      "note": "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.",
+                      "img": "/history/breeds/Earth-and-hunt-terrier.jpg",
+                      "children": [
+                        {
+                          "name": "Earth Dog",
+                          "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+                          "img": "/history/breeds/medieval-earth-dog.jpg",
+                          "value": 1.1
+                        },
+                        {
+                          "name": "Earth and hunt terriers",
+                          "note": "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.",
+                          "img": "/history/breeds/Earth-and-hunt-terrier.jpg",
+                          "value": 1.1
                         }
                       ]
                     }
@@ -22688,25 +23176,76 @@
               "img": "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg",
               "children": [
                 {
-                  "name": "Earth Dog",
-                  "note": "The medieval earth-and-vermin dog the black-and-tan working terrier goes back to, a functional match rather than documented descent. Now extinct.",
-                  "img": "/history/breeds/medieval-earth-dog.jpg",
+                  "name": "Old British ratting terriers",
+                  "note": "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.",
+                  "img": "/history/breeds/Old-British-ratting-terriers.jpg",
                   "children": [
                     {
-                      "name": "Ancient Celtic earth dogs",
-                      "note": "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.",
-                      "img": "/history/breeds/ancient-celtic-earth-dog.jpg",
-                      "value": 16.5
+                      "name": "Earth Dog",
+                      "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+                      "img": "/history/breeds/medieval-earth-dog.jpg",
+                      "children": [
+                        {
+                          "name": "Ancient Celtic earth dogs",
+                          "note": "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.",
+                          "img": "/history/breeds/ancient-celtic-earth-dog.jpg",
+                          "value": 2.475
+                        },
+                        {
+                          "name": "Early badger hunting dogs",
+                          "note": "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
+                          "img": "/history/breeds/early-badger-hunting-dogs.jpg",
+                          "value": 2.025
+                        }
+                      ]
                     },
                     {
-                      "name": "Early badger hunting dogs",
-                      "note": "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
-                      "img": "/history/breeds/early-badger-hunting-dogs.jpg",
-                      "value": 13.5
+                      "name": "Old British ratting terriers",
+                      "note": "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.",
+                      "img": "/history/breeds/Old-British-ratting-terriers.jpg",
+                      "value": 4.5
+                    }
+                  ]
+                },
+                {
+                  "name": "Earth and hunt terriers",
+                  "note": "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.",
+                  "img": "/history/breeds/Earth-and-hunt-terrier.jpg",
+                  "children": [
+                    {
+                      "name": "Earth Dog",
+                      "note": "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.",
+                      "img": "/history/breeds/medieval-earth-dog.jpg",
+                      "children": [
+                        {
+                          "name": "Ancient Celtic earth dogs",
+                          "note": "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.",
+                          "img": "/history/breeds/ancient-celtic-earth-dog.jpg",
+                          "value": 1.65
+                        },
+                        {
+                          "name": "Early badger hunting dogs",
+                          "note": "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
+                          "img": "/history/breeds/early-badger-hunting-dogs.jpg",
+                          "value": 1.35
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Earth and hunt terriers",
+                      "note": "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.",
+                      "img": "/history/breeds/Earth-and-hunt-terrier.jpg",
+                      "value": 3
                     }
                   ]
                 }
               ]
+            },
+            {
+              "name": "Old English White Terrier",
+              "note": "The white-bodied working terriers bred out of the black-and-tan stock for coat colour. The split of this line into population and named breed is a useful reconstruction, not a documented distinction: the three white-terrier names all refer to one extinct breed. Now extinct.",
+              "img": "/history/breeds/english-white-terrier-painting.jpg",
+              "value": 15
             }
           ]
         },
@@ -23783,27 +24322,33 @@
                           "name": "Celtic herdsmen's dogs",
                           "note": "The all-round farm dogs of the Celtic tribes, guarding and driving the herds. Now extinct.",
                           "img": "/history/breeds/celtic-herdsmen-dogs.jpg",
-                          "value": 0.6825
+                          "value": 0.34125
                         },
                         {
                           "name": "Roman shepherd dogs",
                           "note": "The flock-guarding sheepdogs the Roman farm writers described, kept white so the shepherd knew dog from wolf. Now extinct.",
                           "img": "/history/breeds/roman-shepherd-dogs.jpg",
-                          "value": 0.4875
+                          "value": 0.24375
                         },
                         {
                           "name": "Anglo-Saxon herding dogs",
                           "note": "Collie-sized herding dogs of Anglo-Saxon England, found at West Stow and Brandon. Now extinct.",
                           "img": "/history/breeds/anglo-saxon-herding-dogs.jpg",
-                          "value": 0.39
+                          "value": 0.195
                         },
                         {
                           "name": "Norse settlers dogs",
                           "note": "Scandinavian dogs brought over with Viking settlement, likely mixed into local herding stock. Now extinct.",
                           "img": "/history/breeds/viking-herding-spitz.jpg",
-                          "value": 0.39
+                          "value": 0.195
                         }
                       ]
+                    },
+                    {
+                      "name": "Old working collies",
+                      "note": "The old northern hill-collie landrace of Scotland and the borders, the shared working stock the Rough, Smooth and Border collies all grew from. Now extinct.",
+                      "img": "/history/breeds/Old-working-collies-cluster.jpg",
+                      "value": 0.975
                     }
                   ]
                 },
@@ -23821,9 +24366,21 @@
                           "name": "Shepherd's Dog",
                           "note": "The medieval British herding dog, the Sheepdog or Colley that Caius wrote of in 1576. Chaucer's black-faced 'Coll' or 'Coaly' of the 1300s gives the name: Coaly became Colley became Collie. Now extinct.",
                           "img": "/history/breeds/medieval-shepherds-dog.jpg",
-                          "value": 1.05
+                          "value": 0.2625
+                        },
+                        {
+                          "name": "Old working collies",
+                          "note": "The old northern hill-collie landrace of Scotland and the borders, the shared working stock the Rough, Smooth and Border collies all grew from. Now extinct.",
+                          "img": "/history/breeds/Old-working-collies-cluster.jpg",
+                          "value": 0.2625
                         }
                       ]
+                    },
+                    {
+                      "name": "Old hill and bearded collies",
+                      "note": "Shaggy upland herding dogs of the same collie family. Now extinct.",
+                      "img": "/history/breeds/old-hill-and-bearded-collies.jpg",
+                      "value": 0.525
                     }
                   ]
                 }
