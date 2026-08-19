@@ -38,7 +38,9 @@
   position: relative;
   z-index: 1;
   width: 100%;
-  max-width: 860px;
+  /* Hero text at 80% of the viewport, liquid, instead of the old 860px cap
+     (Steve, 19 Aug 2026). */
+  max-width: 80vw;
   margin: 0 auto;
 }
 .heroAgeNote {
@@ -97,7 +99,10 @@
   padding: clamp(20px, 3vw, 40px) clamp(24px, 6vw, 80px);
 }
 .inner {
-  max-width: 1100px;
+  /* Fully liquid: no width cap. The sections own the side gutters via
+     clamp(24px, 6vw, 80px) padding (.prizeSection via its margin), so content
+     now fills the viewport minus 2x that gutter, and the auto-fill grids and the
+     prose widen with it. Was max-width: 1100px (Steve, 19 Aug 2026). */
   margin: 0 auto;
 }
 .sectionTitle {
