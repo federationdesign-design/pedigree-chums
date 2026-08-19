@@ -1569,7 +1569,11 @@
   .intro {
     font-size: clamp(28px, 3.6vw, 36px);
     line-height: 1.1;
-    max-width: 56ch;
+    /* 80vw, not a character measure: 56ch is viewport-independent, so it read as
+       a thin centred column past ~1600px while the hero container stayed 95vw.
+       80vw keeps the intro at 80% of the viewport at every desktop width. The
+       .hero (95vw) and the shared .grid rule are untouched (Steve, 19 Aug 2026). */
+    max-width: 80vw;
   }
 }
 
