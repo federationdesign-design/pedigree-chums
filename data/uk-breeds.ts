@@ -220,4 +220,39 @@ export const ukBreeds: UKBreed[] = [
   { name: "Cumberland Sheepdog", strip: "c1900", era: "early 1900s", anchor: 1910, note: "Northern herder folded into the Border Collie in the early 1900s.", image: "/history/breeds/cumberland-sheepdog.jpg", tag: "extinct" },
   { name: "Toy Bulldog", strip: "c1900", era: "early 1900s", anchor: 1914, note: "Miniature Victorian companion Bulldog, last recorded in 1914.", image: "/history/breeds/toy-bulldog.jpg", tag: "extinct" },
   { name: "Dumfriesshire Hound", strip: "c1900", era: "1920s", anchor: 1920, note: "Tall black-and-tan Scottish foxhound of the Galloway hills.", tag: "extinct", image: "/history/breeds/Dumfriesshire-Hound.jpg" },
+
+  // 19 August 2026: 23 extinct British ancestor types that already exist as
+  // lineage roots in data/lineage.ts but had no history-strip card. First, these
+  // are extinct types rather than recognised breeds: before the nineteenth
+  // century dogs were types, not breeds, and each has a documented job role,
+  // appearance and temperament. Second, every anchor was computed to sit after
+  // the dog's own ancestors and before the dogs it feeds, so the ordering is
+  // derived and must not be changed casually; the one exception is Low-slung
+  // soldiers' dogs at 1575, set from the Elizabethan Glen of Imaal settlement
+  // rather than arithmetic. Third, these anchors are ordering devices, not
+  // researched dates: only the era band is shown to the user. Notes and images
+  // are taken from each node's lineage entry, trimmed to strip-note length.
+  { name: "Old British bandogs", strip: "ancient", era: "Ancient", anchor: 600, note: "Heavy chained guard dogs of old England, set loose at night and worked by butchers and baiters.", image: "/history/breeds/Old-British-bandogs.jpg", tag: "extinct" },
+  { name: "Old Highland terriers", strip: "medieval", era: "Medieval", anchor: 1315, note: "The old working-terrier stock of the Highlands that every Scottish terrier springs from.", image: "/history/breeds/Old-Highland-terriers.jpg", tag: "extinct" },
+  { name: "Old working collies", strip: "medieval", era: "Medieval", anchor: 1355, note: "The old hill-collie landrace of Scotland and the borders, behind the Rough, Smooth and Border collies.", image: "/history/breeds/Old-working-collies-cluster.jpg", tag: "extinct" },
+  { name: "Welsh herding dogs", strip: "medieval", era: "Medieval", anchor: 1375, note: "The old Welsh herding and droving dogs, a long-legged, loose-eyed landrace behind the region's sheep-working breeds.", image: "/history/breeds/Welsh-herding-dogs-cluster.jpg", tag: "extinct" },
+  { name: "Old British ratting terriers", strip: "medieval", era: "Medieval", anchor: 1390, note: "The ancient ratting and vermin dogs kept on farms long before breeds were named.", image: "/history/breeds/Old-British-ratting-terriers.jpg", tag: "extinct" },
+  { name: "Earth and hunt terriers", strip: "medieval", era: "Medieval", anchor: 1392, note: "Hardy go-to-ground terriers used to bolt fox and badger.", image: "/history/breeds/Earth-and-hunt-terrier.jpg", tag: "extinct" },
+  { name: "Old English Black and Tan Terrier", strip: "medieval", era: "Medieval", anchor: 1436, note: "The old British black-and-tan working terrier, the rough ratting stock much of Britain's terrier blood came from.", image: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", tag: "extinct" },
+  { name: "Land spaniels", strip: "medieval", era: "Medieval", anchor: 1475, note: "The old English land-spaniel stock that every working spaniel springs from.", image: "/history/breeds/original-land-spaniel.jpg", tag: "extinct" },
+  { name: "Old Welsh land spaniels", strip: "c1500", era: "1500s", anchor: 1511, note: "The native red-and-white working spaniels of Wales.", image: "/history/breeds/Old-Welsh-land-spaniels.jpg", tag: "extinct" },
+  { name: "Basset and heavy hounds", strip: "c1500", era: "1500s", anchor: 1525, note: "Low, long, heavy scenting-hound stock that lent weight and bone to the stouter spaniels.", image: "/history/breeds/basset-and-heavy-hounds.jpg", tag: "extinct" },
+  { name: "Low-slung soldiers' dogs", strip: "c1500", era: "late 1500s", anchor: 1575, note: "Short-legged dogs left by Flemish and Hessian soldiers settled in the glen.", image: "/history/breeds/low-slung-soldiers-dogs.jpg", tag: "extinct" },
+  { name: "Old toy spaniels", strip: "c1500", era: "1600s", anchor: 1650, note: "The small sporting and lap spaniels of Tudor and Stuart England.", image: "/history/breeds/Old-sporting-toy-spaniels.jpg", tag: "extinct" },
+  { name: "Water spaniels", strip: "c1500", era: "1600s", anchor: 1653, note: "The old rough-coated working water spaniels of Britain's rivers and fens.", image: "/history/breeds/original-water-spaniel.jpg", tag: "extinct" },
+  { name: "Old Irish water dogs", strip: "c1700", era: "1700s", anchor: 1705, note: "The southern and northern water spaniels of Ireland.", image: "/history/breeds/Old-Irish-water-dog.jpg", tag: "extinct" },
+  { name: "Old fell terriers", strip: "c1700", era: "1700s", anchor: 1745, note: "The hardy black-and-tan fox-working terriers of the northern fells.", image: "/history/breeds/Old-fell-terriers-Patterdale-Terrier-Working-hunt-terriers.jpg", tag: "extinct" },
+  { name: "Old English White Terrier", strip: "c1700", era: "1700s", anchor: 1760, note: "The white-bodied working terriers bred out of the black-and-tan stock for coat colour.", image: "/history/breeds/english-white-terrier-painting.jpg", tag: "extinct" },
+  { name: "Native Irish terriers", strip: "c1700", era: "1700s", anchor: 1787, note: "The old Irish farm-terrier stock shared with the Wheaten and Kerry Blue.", image: "/history/breeds/native-irish-terriers.jpg", tag: "extinct" },
+  { name: "English Water Spaniel", strip: "c1700", era: "1700s", anchor: 1790, note: "The native English water spaniel, a working water dog of the fens and rivers.", image: "/history/breeds/original-water-spaniel.jpg", tag: "extinct" },
+  { name: "Old hill and bearded collies", strip: "early1800", era: "early 1800s", anchor: 1802, note: "Shaggy upland herding dogs of the same collie family.", image: "/history/breeds/old-hill-and-bearded-collies.jpg", tag: "extinct" },
+  { name: "Heavier working spaniels", strip: "early1800", era: "early 1800s", anchor: 1818, note: "Lower, stouter spaniels that gave the Sussex and Clumber their weight and bone.", image: "/history/breeds/heavier-working-spaniel.jpg", tag: "extinct" },
+  { name: "Old Scotch Collie", strip: "early1800", era: "early 1800s", anchor: 1825, note: "The old Scottish shepherd's collie, the pre-show hill-herding landrace behind the working border strain.", image: "/history/breeds/Old-Scotch-Collie.jpg", tag: "extinct" },
+  { name: "Old Cumberland herding dogs", strip: "early1800", era: "early 1800s", anchor: 1826, note: "Northern English herding dogs from the same border country.", image: "/history/breeds/cumberland-sheepdog-photo.jpg", tag: "extinct" },
+  { name: "Old sporting toy spaniels", strip: "mid1800", era: "mid 1800s", anchor: 1865, note: "The longer-muzzled toy spaniels of the older paintings.", image: "/history/breeds/Old-sporting-toy-spaniels.jpg", tag: "extinct" },
 ];
