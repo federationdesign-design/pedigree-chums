@@ -2878,11 +2878,7 @@ export default function BreedTree({
       }
       const l = wrap?.children[1] as SVGGElement | undefined;
       if (l) {
-        if (d.depth === 0) {
-          // 19 August 2026: the root's name rides the top rim of the outer ring,
-          // not the centre, so it names the level without covering the children.
-          l.setAttribute("transform", `translate(${tx},${ty - drawR(d, v, k)})`);
-        } else if (d === focusRef.current) {
+        if (d === focusRef.current) {
           // The focused circle's own label sits at its centre.
           l.setAttribute("transform", "translate(0,0)");
         } else {
@@ -5906,7 +5902,7 @@ export default function BreedTree({
                 <g
                   textAnchor="middle"
                   style={{
-                    display: (visible || (d.depth === 0 && !dropped)) ? "inline" : "none",
+                    display: visible ? "inline" : "none",
                     // These five used to live on the single labels group. That
                     // group is gone, so each label carries them itself.
                     fontFamily: "var(--font-body), system-ui, sans-serif",
@@ -5916,40 +5912,15 @@ export default function BreedTree({
                     userSelect: "none",
                   }}
                 >
-                  {/* 19 August 2026: the level's own name on the outer ring. The
-                      root circle (depth 0) is not drawn, so without this the name
-                      shows only in the header and a single child reads as the
-                      level. The rAF parks this group on the top rim; it hides once
-                      the pit drops so it cannot collide with the falling circles. */}
-                  {d.depth === 0 && !dropped && (
-                    (() => {
-                      const rn = (rootLabel ?? d.data.name).toUpperCase();
-                      const lines = splitName(rn);
-                      const rfs = Math.max(28, SIZE * 0.05);
-                      return (
-                        <text
-                          x={0}
-                          y={0}
-                          textAnchor="middle"
-                          dominantBaseline="central"
-                          style={{
-                            fill: "#ffffff",
-                            stroke: "#000000",
-                            strokeWidth: Math.max(2, rfs * 0.16),
-                            strokeLinejoin: "round" as const,
-                            paintOrder: "stroke" as const,
-                            fontFamily: "var(--font-display), system-ui, sans-serif",
-                            fontSize: `${rfs}px`,
-                            letterSpacing: "0.5px",
-                          }}
-                        >
-                          {lines.map((ln, li) => (
-                            <tspan key={li} x={0} y={rfs * (li + 0.9)}>{ln}</tspan>
-                          ))}
-                        </text>
-                      );
-                    })()
-                  )}
+                  {/* 19 August 2026: a depth-0 root-ring label was added here and
+                      removed the same day. It named the level on the outer ring
+                      back when a single child filled the ring, but the two-circle
+                      display device (data/lineage.ts) now names every level
+                      through its own circles, so the label was redundant. Parked
+                      on the top rim it also collided with the packing: on tight
+                      levels like Old Highland terriers it ran behind the top
+                      circle and was cut off mid-word. Its rim transform in the rAF
+                      was removed with it. */}
                   {isInside && !(dropped && d.depth === 1) && (
                     (() => {
                       // Contain the label in its own circle. On mobile zoomTo
