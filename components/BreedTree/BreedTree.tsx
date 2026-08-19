@@ -686,6 +686,10 @@ const POP_GROW = 1.5;
 const POP_MIN_PX = 50;
 const BOMB_BURST_MS = 180;    // the squash-and-snap before the blast fires
 const BOMB_CHAIN_MS = 25;     // gap between each object going up in the chain
+// ROUND WON sweep: the gap between each remaining prop popping, nearest-first.
+// Halved from 90 on 19 August 2026 because the sweep read as slow. The chain's
+// returned duration is targets.length * this, so the two must stay in step.
+const WON_CHAIN_STEP_MS = 45;
 const rollBomb = () => Math.random() < 1 / BOMB_ODDS;
 // Owner ruling (badge sizing): every badge is BADGE_FRAC of ITS OWN dog's drawn
 // radius (nodeR * k), so a big circle carries a big disc and a deep small one a
@@ -3650,7 +3654,8 @@ export default function BreedTree({
         (kind === "rod" ? setDeadRods : kind === "toy" ? setDeadToys : setDeadPills)((prev) => new Set(prev).add(pr.idx));
       };
       // ROUND WON chain: every remaining prop explodes nearest-first from the
-      // final circle's resting spot, 90ms apart (the bomb's chain, mini-pit cut)
+      // final circle's resting spot, WON_CHAIN_STEP_MS apart (the bomb's chain,
+      // mini-pit cut)
       chainRef.current = (ox: number, oy: number) => {
         const targets: { x: number; y: number; go: () => void }[] = [];
         for (const b of all) {
@@ -3663,9 +3668,9 @@ export default function BreedTree({
         const du = (uiBodiesRef.current as any[] | null)?.find((u) => u.kind === "desc");
         if (du && du.mb) targets.push({ x: du.x, y: du.y, go: () => { poofAt(du.x, du.y, performance.now()); Composite.remove(world, du.mb); setDescGone(true); } });
         targets.sort((a, b2) => Math.hypot(a.x - ox, a.y - oy) - Math.hypot(b2.x - ox, b2.y - oy));
-        targets.forEach((t, i) => window.setTimeout(t.go, i * 90));
+        targets.forEach((t, i) => window.setTimeout(t.go, i * WON_CHAIN_STEP_MS));
         wake();
-        return targets.length * 90;
+        return targets.length * WON_CHAIN_STEP_MS;
       };
       // ---- toys: tennis ball and Union Jack, main pit physics verbatim ----
       const BIGT = 84 * (window.matchMedia("(max-width: 768px)").matches ? 0.67 : 1);
