@@ -23,7 +23,7 @@ export const ukBreeds: UKBreed[] = [
   // breeds superseded on the early timelines by the ancient-type records.
   // Each moves to its modern formalisation point: the Mastiff to 1883, when
   // the standard type was refined, and the Greyhound to the 1700s.
-  { name: "Mastiff", strip: "late1800", era: "1883", anchor: 1883, note: "Britain's ancient war and guard dog, known since Roman times.", image: "/mastiff-square.jpg", tag: "endangered" },
+  { name: "Mastiff", strip: "late1800", era: "late 1800s", anchor: 1883, note: "Britain's ancient war and guard dog, known since Roman times.", image: "/mastiff-square.jpg", tag: "endangered" },
   { name: "Greyhound", strip: "c1700", era: "1700s", anchor: 1745, note: "The fastest of all dogs, a sighthound in Britain since antiquity.", image: "/greyhound-square.jpg", tag: "in-decline" },
   // The two ancient additions (docs/lineage/BRIEF.md section 4): extinct
   // historical types placed beside their modern descendants. The Mastiff and
@@ -87,6 +87,17 @@ export const ukBreeds: UKBreed[] = [
   { name: "Longdog", strip: "early1800", era: "1800s", anchor: 1803, note: "A cross of two sighthounds, bred purely for speed.", image: "/history/breeds/long-dog-photo.jpg" , tag: "endangered" },
   { name: "English White Terrier", strip: "mid1800", era: "1860s", anchor: 1860, note: "Show terrier of the 1860s that died out within decades.", image: "/history/breeds/english-white-terrier-painting.jpg", tag: "extinct" },
   { name: "Yorkshire Terrier", strip: "mid1800", era: "1860s", anchor: 1863, note: "Mill-town ratter that became a glamorous toy.", image: "/yorkshire-square.jpg" , tag: "in-decline" },
+  // 19 August 2026: late1800 group era and anchor reconciled with the file
+  // convention. era is an honest band label, never a bare year; anchor is purely
+  // an ordering device, never shown to the user, so an anchor must not be read as
+  // a researched date. The Mastiff's "1883" and the three "1800s" labels
+  // (Labrador Retriever, Border Collie, Lancashire Heeler) were coarser or more
+  // precise than their neighbours and are now banded consistently as "late
+  // 1800s". The Cardigan Welsh Corgi's anchor moved from 1919 to 1880 because
+  // 1919 placed it outside its own strip and sorted it after the Pembroke, when
+  // the Cardigan is generally held to be the older of the two Welsh corgi types.
+  // The Cardigan's claimed deeper antiquity is handled in data/lineage.ts through
+  // the Celtic Heeler root rather than by moving it to an earlier strip.
   { name: "West Highland White Terrier", strip: "late1800", era: "late 1800s", anchor: 1870, note: "The plucky white terrier of the Scottish Highlands.", image: "/west-highland-square.jpg" , tag: "in-decline" },
   { name: "Airedale Terrier", strip: "mid1800", era: "1850s", anchor: 1853, note: "The 'King of Terriers', largest of the terrier breeds.", image: "/history/breeds/airedale-terrier-photo.jpg", tag: "in-decline" },
   { name: "Sealyham Terrier", strip: "mid1800", era: "1870s", anchor: 1875, note: "White Welsh terrier bred to take on badgers.", image: "/history/breeds/sealyham-terrier-photo.jpg", tag: "endangered" },
@@ -106,15 +117,15 @@ export const ukBreeds: UKBreed[] = [
   { name: "Basset Hound", strip: "late1800", era: "late 1800s", anchor: 1880, note: "Low-slung scenthound refined in Victorian England.", image: "/basset-square.jpg" , tag: "in-decline" },
   { name: "Curly-Coated Retriever", strip: "mid1800", era: "1850s", anchor: 1850, note: "The oldest retriever breed, with a coat of tight curls.", image: "/history/breeds/Curly-Coated-Retriever-photo.jpg", tag: "endangered" },
   { name: "Flat-Coated Retriever", strip: "mid1800", era: "1850s", anchor: 1854, note: "Glossy gamekeeper's retriever, ever cheerful.", image: "/history/breeds/flatcoated_retriever-photo.jpg" , tag: "endangered" },
-  { name: "Labrador Retriever", strip: "late1800", era: "1800s", anchor: 1882, note: "From Newfoundland's water dogs to Britain's favourite breed.", image: "/lab-square.jpg", tag: "popular" },
+  { name: "Labrador Retriever", strip: "late1800", era: "late 1800s", anchor: 1882, note: "From Newfoundland's water dogs to Britain's favourite breed.", image: "/lab-square.jpg", tag: "popular" },
   { name: "Bearded Collie", strip: "c1500", era: "1600s", anchor: 1660, note: "Shaggy, bouncing Scottish herding dog.", image: "/history/breeds/bearded-collie-photo.jpg", tag: "endangered" },
   { name: "Rough Collie", strip: "mid1800", era: "1860s", anchor: 1862, note: "The classic Scottish collie of film and fame.", image: "/history/breeds/rough-collie-photo.jpg", tag: "in-decline" },
-  { name: "Border Collie", strip: "late1800", era: "1800s", anchor: 1885, note: "The supreme sheepdog, all focus and crouching 'eye'.", image: "/border-collie-square.png" , tag: "popular" },
+  { name: "Border Collie", strip: "late1800", era: "late 1800s", anchor: 1885, note: "The supreme sheepdog, all focus and crouching 'eye'.", image: "/border-collie-square.png" , tag: "popular" },
   { name: "Golden Retriever", strip: "late1800", era: "late 1800s", anchor: 1890, note: "Bred in the Scottish Highlands by Lord Tweedmouth.", image: "/golden-square.jpg", tag: "popular" },
   { name: "Celtic Heeler", strip: "ancient", era: "Ancient", anchor: 900, note: "Low-slung Celtic cattle heeler, forerunner of both Welsh Corgis.", image: "/history/breeds/medieval-corgi.jpg", tag: "extinct" },
-  { name: "Cardigan Welsh Corgi", strip: "late1800", era: "late 1800s", anchor: 1919, note: "The older, long-tailed corgi, first shown in 1919.", image: "/history/breeds/Welsh_Corgi_Cardigan-photo.jpg", tag: "endangered" },
+  { name: "Cardigan Welsh Corgi", strip: "late1800", era: "late 1800s", anchor: 1880, note: "The older, long-tailed corgi, first shown in 1919.", image: "/history/breeds/Welsh_Corgi_Cardigan-photo.jpg", tag: "endangered" },
   { name: "Pembroke Welsh Corgi", strip: "late1800", era: "late 1800s", anchor: 1891, note: "Short-legged Welsh cattle dog, beloved of the Crown.", image: "/corgi-square.jpg", tag: "trending" },
-  { name: "Lancashire Heeler", strip: "late1800", era: "1800s", anchor: 1892, note: "Small, agile droving heeler from northern England.", image: "/history/breeds/lancashire-heelers-photo.jpg", tag: "endangered" },
+  { name: "Lancashire Heeler", strip: "late1800", era: "late 1800s", anchor: 1892, note: "Small, agile droving heeler from northern England.", image: "/history/breeds/lancashire-heelers-photo.jpg", tag: "endangered" },
 
   // The 1900s
   // 19 August 2026: c1900 group era and anchor reconciled with the file
