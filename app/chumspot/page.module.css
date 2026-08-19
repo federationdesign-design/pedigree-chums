@@ -73,7 +73,7 @@
 }
 .heroTitle {
   font-family: var(--font-display, "Luckiest Guy", system-ui);
-  font-size: clamp(3.33rem, 8.5vw, 7.13rem); /* +4pt (~0.33rem) on min and cap, was clamp(3rem, 8.5vw, 6.8rem) (Steve, 19 Aug 2026) */
+  font-size: clamp(3.58rem, 8.5vw, 7.38rem); /* +3pt more (cumulative +7pt from 6.8rem); was clamp(3.33rem, 8.5vw, 7.13rem) (Steve, 19 Aug 2026) */
   line-height: 0.95;
   color: var(--yellow, #ffd23e);
   margin: 0 0 clamp(6px, 1vw, 12px);
@@ -122,10 +122,10 @@
   font-size: clamp(28px, 3.6vw, 36px); /* matches the /home and /know-your-chums intro size, was clamp(1.2rem, 2.2vw, 1.55rem) (Steve, 19 Aug 2026) */
   font-weight: 600;
   color: #000000; /* prose on gradient -> black, WCAG 1.4.3 (Steve, 12 Aug 2026) */
-  line-height: 1.5;
+  line-height: 1.3em;
   margin: 50px 0 clamp(16px, 2vw, 24px);
 }
-.inner p:not(.lead):not(.ageNote):not(.closingDate):not(.contactNote):not(.hashtags):not(.termBody):not(.introPara) {
+.inner p:not(.lead):not(.ageNote):not(.closingDate):not(.contactNote):not(.hashtags):not(.termBody):not(.introPara):not(.prizeIntro) {
   font-size: clamp(0.95rem, 1.6vw, 1.1rem);
   /* Body prose sits on the site gradient -> black for WCAG 1.4.3 (Steve, 12 Aug
      2026). The hero .ageNote/.closingDate are excluded here (they sit on the hero
@@ -141,6 +141,16 @@
 .inner p.introPara {
   font-size: clamp(28px, 3.6vw, 36px);
   color: #000000; /* prose on gradient -> black, WCAG 1.4.3 */
+  line-height: 1.3em;
+  margin: 0 0 clamp(10px, 1.5vw, 16px);
+}
+/* Prize "One winner..." intro paragraph, doubled. Excluded from the generic
+   .inner p rule above (which outranks it via its :not() chain), so it fully
+   specifies the black colour, line-height and margin the generic gave it
+   (Steve, 19 Aug 2026). */
+.inner p.prizeIntro {
+  font-size: clamp(1.9rem, 3.2vw, 2.2rem); /* doubled from clamp(0.95rem, 1.6vw, 1.1rem) */
+  color: #000000;
   line-height: 1.7;
   margin: 0 0 clamp(10px, 1.5vw, 16px);
 }
@@ -165,8 +175,10 @@
 .ctaPrimary,
 .ctaSecondary {
   font-family: var(--font-display, "Luckiest Guy", system-ui);
-  font-size: clamp(0.6rem, 1.1vw, 0.78rem);
-  padding: clamp(13px, 1.4vw, 16px) clamp(19px, 2.7vw, 32px) clamp(8px, 1vw, 11px);
+  /* Whole pill doubled: font and padding both (Steve, 19 Aug 2026).
+     Was clamp(0.6rem, 1.1vw, 0.78rem) / 13-16px 19-32px 8-11px. */
+  font-size: clamp(1.2rem, 2.2vw, 1.56rem);
+  padding: clamp(26px, 2.8vw, 32px) clamp(38px, 5.4vw, 64px) clamp(16px, 2vw, 22px);
   border-radius: 999px;
   text-decoration: none;
   transition: transform 0.15s, filter 0.15s;
@@ -272,7 +284,7 @@
   gap: 10px;
 }
 .prizeList li {
-  font-size: clamp(1rem, 1.7vw, 1.2rem);
+  font-size: clamp(2rem, 3.4vw, 2.4rem); /* doubled from clamp(1rem, 1.7vw, 1.2rem) (Steve, 19 Aug 2026) */
   color: #ffffff;
   padding-left: 28px;
   position: relative;
@@ -375,7 +387,7 @@
 }
 .termBody {
   font-family: Montserrat, sans-serif;
-  font-size: clamp(0.68rem, 1vw, 0.8rem);
+  font-size: clamp(0.85rem, 1vw, 0.97rem); /* +2pt from clamp(0.68rem, 1vw, 0.8rem) (Steve, 19 Aug 2026) */
   font-weight: 500;
   color: var(--navy, #0a3a57);
   line-height: 1.3;
@@ -424,6 +436,10 @@
   padding-top: 50px;
 }
 .whatReadyCols .sectionTitle { text-align: left; }
+/* "What are we looking for?" / "Ready to join the pack?" down 5pt (~0.42rem)
+   from the doubled .sectionTitle, so they sit a touch below How-to-enter and
+   The-prize. Scoped here so only these two move (Steve, 19 Aug 2026). */
+.whatReadyCols .sectionTitle { font-size: clamp(4.38rem, 11vw, 8.58rem); }
 
 .termList {
   padding-left: 18px;
@@ -431,7 +447,7 @@
 }
 .termList li {
   font-family: Montserrat, sans-serif;
-  font-size: clamp(0.68rem, 1vw, 0.8rem);
+  font-size: clamp(0.85rem, 1vw, 0.97rem); /* +2pt, mirrors .termBody so numbered-list terms match (Steve, 19 Aug 2026) */
   font-weight: 500;
   color: var(--navy, #0a3a57);
   line-height: 1.3;

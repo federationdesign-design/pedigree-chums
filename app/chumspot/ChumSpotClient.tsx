@@ -211,14 +211,14 @@ export default function ChumSpotClient() {
                 />
               </div>
               <div>
-                <p>One winner will be selected during each monthly round. The winner receives:</p>
+                <p className={styles.prizeIntro}>One winner will be selected during each monthly round. The winner receives:</p>
                 <ul className={styles.prizeList}>
                   <li>One exclusive 3D printed Chum Figurine*</li>
                   <li>Free delivery to one UK address</li>
                   <li>The title of Spot your Chum winner</li>
                   <li>The opportunity to be featured on the Pedigree Chums™ website and social channels</li>
                 </ul>
-                <p style={{fontSize:"0.78rem",marginTop:"16px",opacity:1}}>* The figurine design is selected by Pedigree Chums™. Only certain Chum characters have currently been modelled for 3D printing. The winner cannot choose which figurine they receive.</p>
+                <p style={{fontSize:"1.56rem",marginTop:"16px",opacity:1}}>* The figurine design is selected by Pedigree Chums™. Only certain Chum characters have currently been modelled for 3D printing. The winner cannot choose which figurine they receive.</p>
               </div>
             </div>
           </div>
