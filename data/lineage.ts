@@ -1028,7 +1028,10 @@ const LINEAGE: Record<string, LineageNode> = {
     children: [
       { name: "Old black-and-tan setters", note: "The setting dogs at its foundation. Now extinct.", img: "/history/breeds/british-setters.jpg", value: 65 },
       { name: "Bloodhound", note: "Thought to have deepened the nose and the black-and-tan.", img: "/history/breeds/modern-bloodhound.jpg", value: 20 },
-      { name: "Collie", note: "A little collie for steadiness, by tradition. Now extinct.",  img: "/history/breeds/rough-collie-photo.jpg", value: 15 }
+      // 19 August 2026: the bare "Collie" leaf dead-ended (no tree of its own).
+      // Renamed to the "Rough Collie" lineage root so the Setter reaches the
+      // collie ancestry; note and img taken from that root. Value unchanged.
+      { name: "Rough Collie", note: "The flowing-coated Scottish herder of farm and film, refined in Victorian times with a touch of Borzoi for its long, noble head.", img: "/history/breeds/rough-collie-photo.jpg", value: 15 }
     ]
   },
 
@@ -1036,7 +1039,11 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Lancashire Heeler",
     note: "A tiny, sharp black-and-tan drover's dog from north-west England, used to nip cattle along and clear rats from the farm.",
     children: [
-      { name: "Welsh Corgi", note: "The low, heel-nipping cattle dog at its base.", img: "/history/breeds/Pembroke-Welsh-Corgi-photo.jpg", value: 55 },
+      // 19 August 2026: the bare "Welsh Corgi" leaf dead-ended (no tree of its
+      // own). Renamed to the "Celtic Heeler" lineage root, the correct ancestral
+      // corgi stock, so it grafts; note and img taken from that root. Value
+      // unchanged.
+      { name: "Celtic Heeler", note: "The ancestral low-slung herding dogs brought to Wales by Celtic tribes -- forerunners of both the Cardigan and Pembroke Welsh Corgi. Short legs bred for nipping cattle heels and ducking kicks.", img: "/history/breeds/medieval-corgi.jpg", value: 55 },
       { name: "Manchester Terrier", note: "Black-and-tan terrier blood for ratting and colour.", img: "/history/breeds/manchester-terrior.jpg", value: 45 }
     ]
   },

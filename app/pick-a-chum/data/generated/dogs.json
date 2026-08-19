@@ -12952,10 +12952,23 @@
                       ]
                     },
                     {
-                      "name": "Collie",
-                      "note": "A little collie for steadiness, by tradition. Now extinct.",
+                      "name": "Rough Collie",
+                      "note": "The flowing-coated Scottish herder of farm and film, refined in Victorian times with a touch of Borzoi for its long, noble head.",
                       "img": "/history/breeds/rough-collie-photo.jpg",
-                      "value": 0.225
+                      "children": [
+                        {
+                          "name": "Old working collies",
+                          "note": "The old northern hill-collie landrace of Scotland and the borders, the shared working stock the Rough, Smooth and Border collies all grew from. Now extinct.",
+                          "img": "/history/breeds/Old-working-collies-cluster.jpg",
+                          "value": 0.14625
+                        },
+                        {
+                          "name": "Old hill and bearded collies",
+                          "note": "Shaggy upland herding dogs of the same family. Now extinct.",
+                          "img": "/history/breeds/bearded-collie-photo.jpg",
+                          "value": 0.07875
+                        }
+                      ]
                     }
                   ]
                 },
@@ -21287,10 +21300,37 @@
                   ]
                 },
                 {
-                  "name": "Collie",
-                  "note": "A little collie for steadiness, by tradition. Now extinct.",
+                  "name": "Rough Collie",
+                  "note": "The flowing-coated Scottish herder of farm and film, refined in Victorian times with a touch of Borzoi for its long, noble head.",
                   "img": "/history/breeds/rough-collie-photo.jpg",
-                  "value": 0.45
+                  "children": [
+                    {
+                      "name": "Old working collies",
+                      "note": "The old northern hill-collie landrace of Scotland and the borders, the shared working stock the Rough, Smooth and Border collies all grew from. Now extinct.",
+                      "img": "/history/breeds/Old-working-collies-cluster.jpg",
+                      "children": [
+                        {
+                          "name": "Shepherd's Dog",
+                          "note": "The medieval British herding dog, the Sheepdog or Colley that Caius wrote of in 1576. Chaucer's black-faced 'Coll' or 'Coaly' of the 1300s gives the name: Coaly became Colley became Collie. Now extinct.",
+                          "img": "/history/breeds/medieval-shepherds-dog.jpg",
+                          "value": 0.2925
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Old hill and bearded collies",
+                      "note": "Shaggy upland herding dogs of the same family. Now extinct.",
+                      "img": "/history/breeds/bearded-collie-photo.jpg",
+                      "children": [
+                        {
+                          "name": "Old working collies",
+                          "note": "The shared old hill-collie landrace of the same family. Now extinct.",
+                          "img": "/history/breeds/Old-working-collies-cluster.jpg",
+                          "value": 0.1575
+                        }
+                      ]
+                    }
+                  ]
                 }
               ]
             },
@@ -23593,10 +23633,69 @@
               ]
             },
             {
-              "name": "Collie",
-              "note": "A little collie for steadiness, by tradition. Now extinct.",
+              "name": "Rough Collie",
+              "note": "The flowing-coated Scottish herder of farm and film, refined in Victorian times with a touch of Borzoi for its long, noble head.",
               "img": "/history/breeds/rough-collie-photo.jpg",
-              "value": 3
+              "children": [
+                {
+                  "name": "Old working collies",
+                  "note": "The old northern hill-collie landrace of Scotland and the borders, the shared working stock the Rough, Smooth and Border collies all grew from. Now extinct.",
+                  "img": "/history/breeds/Old-working-collies-cluster.jpg",
+                  "children": [
+                    {
+                      "name": "Shepherd's Dog",
+                      "note": "The medieval British herding dog, the Sheepdog or Colley that Caius wrote of in 1576. Chaucer's black-faced 'Coll' or 'Coaly' of the 1300s gives the name: Coaly became Colley became Collie. Now extinct.",
+                      "img": "/history/breeds/medieval-shepherds-dog.jpg",
+                      "children": [
+                        {
+                          "name": "Celtic herdsmen's dogs",
+                          "note": "The all-round farm dogs of the Celtic tribes, guarding and driving the herds. Now extinct.",
+                          "img": "/history/breeds/celtic-herdsmen-dogs.jpg",
+                          "value": 0.6825
+                        },
+                        {
+                          "name": "Roman shepherd dogs",
+                          "note": "The flock-guarding sheepdogs the Roman farm writers described, kept white so the shepherd knew dog from wolf. Now extinct.",
+                          "img": "/history/breeds/roman-shepherd-dogs.jpg",
+                          "value": 0.4875
+                        },
+                        {
+                          "name": "Anglo-Saxon herding dogs",
+                          "note": "Collie-sized herding dogs of Anglo-Saxon England, found at West Stow and Brandon. Now extinct.",
+                          "img": "/history/breeds/anglo-saxon-herding-dogs.jpg",
+                          "value": 0.39
+                        },
+                        {
+                          "name": "Norse settlers dogs",
+                          "note": "Scandinavian dogs brought over with Viking settlement, likely mixed into local herding stock. Now extinct.",
+                          "img": "/history/breeds/viking-herding-spitz.jpg",
+                          "value": 0.39
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "Old hill and bearded collies",
+                  "note": "Shaggy upland herding dogs of the same family. Now extinct.",
+                  "img": "/history/breeds/bearded-collie-photo.jpg",
+                  "children": [
+                    {
+                      "name": "Old working collies",
+                      "note": "The shared old hill-collie landrace of the same family. Now extinct.",
+                      "img": "/history/breeds/Old-working-collies-cluster.jpg",
+                      "children": [
+                        {
+                          "name": "Shepherd's Dog",
+                          "note": "The medieval British herding dog, the Sheepdog or Colley that Caius wrote of in 1576. Chaucer's black-faced 'Coll' or 'Coaly' of the 1300s gives the name: Coaly became Colley became Collie. Now extinct.",
+                          "img": "/history/breeds/medieval-shepherds-dog.jpg",
+                          "value": 1.05
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
