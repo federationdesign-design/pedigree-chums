@@ -13,7 +13,7 @@ import TrainingCard from "../TrainingCard/TrainingCard";
 import trainingDifficulty from "../../data/trainingDifficulty";
 import { ICONS } from "../CardDock/CardDock";
 import { bust } from "../../data/imgVersion";
-import { breedInfo } from "../../data/breedInfo";
+import { breedInfo, breedInfoLong } from "../../data/breedInfo";
 import breedTraits from "../../data/breed-info.json";
 import styles from "./BreedTree.module.css";
 import { BRAIN_PATH, BRAIN_ARTBOARD } from "../icons/brain";
@@ -5123,6 +5123,10 @@ export default function BreedTree({
   // The caption follows the hovered circle when there is one, so you can read a
   // breed's note just by pointing at it, and falls back to the focused circle.
   const shown = hovered ?? focus;
+  // Hovering shows the short write-up; clicking into a circle shows the extended
+  // one. hovered is non-null only while the pointer is over a circle, so a null
+  // hovered with shown back on focus means the user has clicked in, not pointed.
+  const isFocused = hovered === null && shown === focus;
   const shownShare = shown.parent
     ? Math.round(((shown.value ?? 0) / (shown.parent.value || 1)) * 100)
     : null;
@@ -7300,7 +7304,7 @@ export default function BreedTree({
             </span>
           )}
           <p className={styles.cNote}>
-            {ancestryFor ? ancestryFor.note : breedInfo[shown.data.name] || (shown.depth === 0 && rootNote ? rootNote : shown.data.note)}
+            {ancestryFor ? ancestryFor.note : (isFocused && breedInfoLong[shown.data.name]) || breedInfo[shown.data.name] || (shown.depth === 0 && rootNote ? rootNote : shown.data.note)}
             {/* the mini pit drops the "keep digging" prompt: in LEARN mode the
                 circles are the whole point, so the nudge is noise */}
             {!dockAside && shown.children ? " Tap a circle inside to keep digging." : ""}

@@ -212,3 +212,12 @@ export const breedInfo: Record<string, string> = {
   "Toy Trawler Spaniel": "The Toy Trawler Spaniel was a small Victorian companion spaniel created from toy and sporting spaniel stock. Its reconstructed ancestry combines the King Charles Spaniel with Sussex Spaniel influence. The type disappeared and left no separate modern playable descendant.",
   "Welsh Springer Spaniel": "The Welsh Springer comes from the old red-and-white flushing spaniel tradition of Wales, bred for active work in rough country. Its reconstructed ancestry combines old Welsh land spaniels with the wider land-spaniel population. The breed survives today and also contributes to the English Springer line.",
 };
+
+// Extended write-ups, shown once a circle is clicked into (the short entries in
+// breedInfo stay on hover). Added progressively: any name missing from here
+// falls back to its short entry in breedInfo, so this can be filled in batches
+// without ever leaving a blank box. Keys must match tree-node names in
+// data/lineage.ts exactly, including case and apostrophes, or the lookup
+// silently falls back to the short text.
+export const breedInfoLong: Record<string, string> = {
+};
