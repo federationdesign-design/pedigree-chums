@@ -38,10 +38,15 @@
   position: relative;
   z-index: 1;
   width: 100%;
-  /* Hero text at 80% of the viewport, liquid, instead of the old 860px cap
-     (Steve, 19 Aug 2026). */
-  max-width: 80vw;
+  max-width: 860px;
   margin: 0 auto;
+}
+/* Desktop only: hero text at 80% of the viewport, liquid. Below 769px it keeps
+   the original 860px cap, which is inert on phones (the padding box is already
+   narrower), so the hero stays exactly as it was and never narrows on mobile
+   (Steve, 19 Aug 2026). */
+@media (min-width: 769px) {
+  .heroInner { max-width: 80vw; }
 }
 .heroAgeNote {
   position: absolute;
