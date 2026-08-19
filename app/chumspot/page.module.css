@@ -121,12 +121,12 @@
 .lead {
   font-size: clamp(28px, 3.6vw, 36px); /* matches the /home and /know-your-chums intro size, was clamp(1.2rem, 2.2vw, 1.55rem) (Steve, 19 Aug 2026) */
   font-weight: 600;
-  color: #000000; /* prose on gradient -> black, WCAG 1.4.3 (Steve, 12 Aug 2026) */
+  color: #ffffff; /* white at rest (branded, ~3.3:1 at the blue end), navy when toggled -- see the toggle invert block (Steve, 20 Aug 2026) */
   line-height: 1.3em;
   max-width: 80%; /* 80% of the content container, centred (Steve, 19 Aug 2026) */
   margin: 50px auto clamp(16px, 2vw, 24px);
 }
-.inner p:not(.lead):not(.ageNote):not(.closingDate):not(.contactNote):not(.hashtags):not(.termBody):not(.introPara):not(.prizeIntro) {
+.inner p:not(.lead):not(.ageNote):not(.closingDate):not(.contactNote):not(.hashtags):not(.termBody):not(.introPara):not(.prizeIntro):not(.wrPara) {
   font-size: clamp(0.95rem, 1.6vw, 1.1rem);
   /* Body prose sits on the site gradient -> black for WCAG 1.4.3 (Steve, 12 Aug
      2026). The hero .ageNote/.closingDate are excluded here (they sit on the hero
@@ -141,7 +141,7 @@
    specifies the black WCAG colour, line-height and margin (Steve, 19 Aug 2026). */
 .inner p.introPara {
   font-size: clamp(28px, 3.6vw, 36px);
-  color: #000000; /* prose on gradient -> black, WCAG 1.4.3 */
+  color: #ffffff; /* white at rest, navy when toggled (see the toggle invert block) (Steve, 20 Aug 2026) */
   line-height: 1.3em;
   max-width: 80%; /* 80% of the content container, centred (Steve, 19 Aug 2026) */
   margin: 0 auto clamp(10px, 1.5vw, 16px);
@@ -155,6 +155,29 @@
   color: #000000;
   line-height: 1.7;
   margin: 0 0 clamp(10px, 1.5vw, 16px);
+}
+/* What/Ready gradient paragraphs. Excluded from the generic .inner p rule above
+   (which colours the panel text -- step boxes, prize asterisk -- and outranks a
+   plain class on specificity), so this fully specifies them. White at rest, navy
+   when toggled (see the invert block below). White on the gradient measures
+   ~1.6:1 (cyan) to ~3.3:1 (blue), a deliberate non-compliant rest (Steve, 20 Aug
+   2026). */
+.wrPara {
+  font-size: clamp(0.95rem, 1.6vw, 1.1rem);
+  color: #ffffff;
+  line-height: 1.7;
+  margin: 0 0 clamp(10px, 1.5vw, 16px);
+}
+/* Text toggle, matching /home. At rest the gradient prose is white (branded);
+   when the toggle is on it goes navy. Gated on :root:not([data-pc-contrast-scheme])
+   so a future accessibility scheme wins. Contrast trade, on record (Steve's
+   decision, 20 Aug 2026): the body gradient runs #00e2ff (cyan, L 0.62) to #008eff
+   (blue, L 0.27). REST (white): ~1.6:1 (cyan) to ~3.3:1 (blue) -- fails WCAG 1.4.3
+   AA across the gradient; only the large intro text scrapes AA-large (3:1) at the
+   blue end. TOGGLED (navy): ~3.6:1 (blue) to ~7.6:1 (cyan) -- passes AA on most of
+   the gradient, sub-AA (3.6:1) on the deep-blue end, accepted as on /home. */
+:root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"] :is(.lead, .inner p.introPara, .wrPara) {
+  color: var(--navy, #0a3a57);
 }
 .ageNote {
   font-size: clamp(0.82rem, 1.2vw, 0.95rem);
@@ -400,7 +423,7 @@
 }
 .contactNote {
   font-size: clamp(0.85rem, 1.3vw, 1rem);
-  color: #000000; /* prose on gradient -> black, WCAG 1.4.3 (Steve, 12 Aug 2026) */
+  color: #ffffff; /* on the solid navy terms panel -> white (~11.9:1); was #000 (black on navy, unreadable). Stays white in both toggle states since it is on navy, not the gradient (Steve, 20 Aug 2026) */
   text-align: center;
   line-height: 1.6;
 }

@@ -1,6 +1,7 @@
 "use client";
 import Nav from "../../components/Nav/Nav";
 import Footer from "../../components/Footer/Footer";
+import ArticleTextToggle from "../../components/ArticleTextToggle/ArticleTextToggle";
 import styles from "./page.module.css";
 
 const TERMS = [
@@ -142,6 +143,11 @@ export default function ChumSpotClient() {
           </div>
         </section>
 
+        {/* Text toggle, centred between the hero and the intro. At rest the
+            gradient prose is white (branded, non-compliant); when on it goes
+            navy, matching /home. */}
+        <ArticleTextToggle centered />
+
         {/* ── What it is ───────────────────────────────────────── */}
         <section className={styles.section}>
           <div className={styles.inner}>
@@ -230,13 +236,13 @@ export default function ChumSpotClient() {
             <div className={styles.whatReadyCols}>
               <div>
                 <h2 className={styles.sectionTitle}>What are we looking for?</h2>
-                <p>You do not need professional equipment.</p>
-                <p>We&rsquo;re looking for ChumSpots that capture the fun, charm and personality of dog spotting.</p>
-                <p>Make us smile, surprise us or show us a particularly brilliant ChumSpot.</p>
+                <p className={styles.wrPara}>You do not need professional equipment.</p>
+                <p className={styles.wrPara}>We&rsquo;re looking for ChumSpots that capture the fun, charm and personality of dog spotting.</p>
+                <p className={styles.wrPara}>Make us smile, surprise us or show us a particularly brilliant ChumSpot.</p>
               </div>
               <div style={{textAlign:"center"}}>
                 <h2 className={styles.sectionTitle}>Ready to join the pack?</h2>
-                <p>Spot your next Chum, share your entry and remember both hashtags:</p>
+                <p className={styles.wrPara}>Spot your next Chum, share your entry and remember both hashtags:</p>
                 <p className={styles.hashtags}>#ChumSpot &nbsp; #DogSpotting</p>
                 <div className={styles.ctaPills}>
                   <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer" className={styles.ctaPrimary}>Enter on Instagram</a>
