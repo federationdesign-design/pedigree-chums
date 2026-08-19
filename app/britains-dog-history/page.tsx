@@ -107,7 +107,18 @@ export default function HistoryPage() {
 
         <div className={styles.sections}>
           <Triangles items={pageTriangles} z={3} />
-          {SECTIONS.filter((s) => s.title !== "Dogs in the armed forces").map((s, i) => {
+          {/* 19 August 2026: the history index stacks NEWEST first (Today's
+              Crossbreeds at the top, Ancient Times at the bottom) via the
+              .reverse() below. SECTIONS itself stays in chronological order on
+              purpose: [era]/page.tsx looks sections up by find(s.era === strip),
+              which is order-independent, so only this render is reversed. Do NOT
+              reverse SECTIONS, and do NOT touch STRIP_ORDER at BreedStrip.tsx:157,
+              which is a DIFFERENT array driving the level progression: the game
+              must keep running forward through time, oldest to newest. Note that
+              the decorative circles below are gated on i < 2, so they now accent
+              the top two sections (crosses, c1900) rather than the oldest two;
+              that is accepted, not a bug. */}
+          {SECTIONS.filter((s) => s.title !== "Dogs in the armed forces").reverse().map((s, i) => {
             return (
               <div key={i} id={s.anchor}>
                 <div className={styles.panelOuter}>
