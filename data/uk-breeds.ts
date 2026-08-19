@@ -86,6 +86,14 @@ export const ukBreeds: UKBreed[] = [
   { name: "Cocker Spaniel", strip: "spaniels", era: "late 1800s", anchor: 1874, note: "Merry spaniel named for flushing woodcock.", image: "/cooker-square.jpg", tag: "popular" },
   { name: "Field Spaniel", strip: "spaniels", era: "late 1800s", anchor: 1876, note: "Elegant working gundog spaniel.", image: "/history/breeds/field-spaniel-photo.jpg", tag: "endangered" },
   { name: "Sussex Spaniel", strip: "spaniels", era: "late 1800s", anchor: 1878, note: "Golden-liver spaniel that works slow and gives tongue.", image: "/history/breeds/Sussex-Spaniel.jpg", tag: "endangered" },
+  // 19 August 2026: Irish Water Spaniel moved into the spaniels strip. It is the
+  // earliest of the spaniels and leads the Spaniel Explosion strip on editorial
+  // grounds; its earlier "mid 1800s" era band (anchor 1834, against the others'
+  // 1870 to 1882) is deliberate, so it sorts first in the strip.
+  { name: "Irish Water Spaniel", strip: "spaniels", era: "mid 1800s", anchor: 1834, note: "Curly-coated water retriever with a rat-like tail.", image: "/history/breeds/irish-water-spaniel-photo.jpg", tag: "endangered" },
+  { name: "Norfolk Spaniel", strip: "spaniels", era: "late 1800s", anchor: 1882, note: "Springer-type spaniel later folded into the English Springer.", image: "/history/breeds/norfolk-spaniel-painting.jpg", tag: "extinct" },
+
+  // The mid-1800s
   // 19 August 2026: mid1800 group era labels reconciled with the file
   // convention. era is an honest band label, never a bare year and never carrying
   // a "c." hedge, since a band already implies approximation; anchor is purely an
@@ -94,10 +102,6 @@ export const ukBreeds: UKBreed[] = [
   // Whippet at 1872 to 1880, sit outside a strict mid-1800s reading but stay in
   // this strip deliberately: strip membership is an editorial grouping, not
   // arithmetic.
-  { name: "Irish Water Spaniel", strip: "mid1800", era: "1830s", anchor: 1834, note: "Curly-coated water retriever with a rat-like tail.", image: "/history/breeds/irish-water-spaniel-photo.jpg", tag: "endangered" },
-  { name: "Norfolk Spaniel", strip: "spaniels", era: "late 1800s", anchor: 1882, note: "Springer-type spaniel later folded into the English Springer.", image: "/history/breeds/norfolk-spaniel-painting.jpg", tag: "extinct" },
-
-  // The mid-1800s
   { name: "Jack Russell Terrier", strip: "mid1800", era: "1820s", anchor: 1820, note: "Bold fox-bolting terrier bred by the Reverend John Russell.", image: "/jack-russel-square.jpg", tag: "trending" },
   { name: "Kerry Blue Terrier", strip: "mid1800", era: "1840s", anchor: 1847, note: "Blue-coated Irish all-rounder, first documented in 1847.", image: "/history/breeds/Kerry_Blue_Terrier_photo.jpg", tag: "endangered" },
   { name: "Bull Terrier", strip: "early1800", era: "early 1800s", anchor: 1830, note: "Egg-headed dog from crossing bulldogs with terriers.", image: "/bull-terrier-square37.jpg" , tag: "in-decline" },
