@@ -196,6 +196,17 @@
 :root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"] .toggleText {
   color: #ffffff;
 }
+
+/* Index page (this route's landing) opt-in. Unlike the essays above, the index
+   has no black-default prose: its only reading text on the gradient is the two
+   .hero .intro paragraphs, which are white by default (branded). The toggle
+   darkens them to navy, matching the centred /home and /chum-calculator pattern
+   (default white, dark is the accessible opt-in). The mobile carousel intro is
+   left out on purpose: it sits on its own blue panel, not the gradient. No essay
+   sub-page uses .intro, so this rule never reaches them (Steve, 19 Aug 2026). */
+:root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"] .intro {
+  color: var(--navy, #0a3a57);
+}
 /* Argos body-prose emphasis (strongs) and spans that used to carry an inline colour
    the toggle could not reach. Now a class so they follow the toggle: black by default
    (matching the prose), white when it is on. The yellow emphasis is deliberately left

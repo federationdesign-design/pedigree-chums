@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Nav from "../../components/Nav/Nav";
 import Footer from "../../components/Footer/Footer";
+import ArticleTextToggle from "../../components/ArticleTextToggle/ArticleTextToggle";
 import styles from "./good-dog-bad-dog.module.css";
 
 export const metadata: Metadata = {
@@ -91,6 +92,13 @@ export default function GoodDogBadDogPage() {
 
         {/* ── Desktop: header + grid ── */}
         <header className={styles.hero}>
+          {/* Article text toggle, centred as on /home. The two hero intro
+              paragraphs are the only reading prose on the site gradient here;
+              when on, they darken to navy (see the .intro invert block in the
+              module). Desktop only: .hero is display:none under 768px and the
+              mobile carousel intro sits on its own blue panel, so there is no
+              gradient prose to flip there. */}
+          <ArticleTextToggle centered />
           <p className={styles.eyebrow}>An essay series</p>
           <h1 className={styles.title}>
             Good Dog,<br />
