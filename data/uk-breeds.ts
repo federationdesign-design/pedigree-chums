@@ -126,17 +126,25 @@ export const ukBreeds: UKBreed[] = [
   { name: "Northern Inuit Dog", strip: "c1900", era: "1980s", anchor: 1985, note: "Wolf-look companion breed developed in the UK.", image: "/history/breeds/Northern Inuit Dog-photo.jpg" , tag: "endangered" },
 
   // Today's crossbreeds
-  { name: "Cockapoo", strip: "crosses", era: "1950s", anchor: 2000, note: "Cocker Spaniel crossed with a Poodle; the original 'designer dog'.", image: "/Cockapoo-square.jpg", tag: "trending" },
-  { name: "Labradoodle", strip: "crosses", era: "1980s", anchor: 2005, note: "Labrador crossed with a Poodle, first bred as a guide dog.", image: "/Labradoodle-square.jpg", tag: "trending" },
-  { name: "Goldendoodle", strip: "crosses", era: "1990s", anchor: 2010, note: "Golden Retriever crossed with a Poodle.", image: "/Goldendoodle-square.jpg", tag: "trending" },
-  { name: "Cavapoo", strip: "crosses", era: "1990s", anchor: 2012, note: "Cavalier King Charles Spaniel crossed with a Poodle.", image: "/Cavapoo-square.jpg", tag: "trending" },
+  // 19 August 2026: era and anchor brought into line with the convention now
+  // used across this file. The era field is an honest band label, never a bare
+  // year, using forms like "1960s", "late 1800s", "Medieval" and "Ancient". The
+  // anchor field is purely an ordering device and is never shown to the user, so
+  // an anchor year must not be read as a researched date. The previous crosses
+  // anchors of 2000 to 2015 were ordering fiction that contradicted every era
+  // label. Cockapoo, Goldendoodle and Labradoodle are researched to the decade;
+  // the four 1990s dogs are spaced two years apart only to give a stable sort.
+  { name: "Cockapoo", strip: "crosses", era: "1960s", anchor: 1960, note: "Cocker Spaniel crossed with a Poodle; the original 'designer dog'.", image: "/Cockapoo-square.jpg", tag: "trending" },
+  { name: "Labradoodle", strip: "crosses", era: "1980s", anchor: 1988, note: "Labrador crossed with a Poodle, first bred as a guide dog.", image: "/Labradoodle-square.jpg", tag: "trending" },
+  { name: "Goldendoodle", strip: "crosses", era: "1960s", anchor: 1969, note: "Golden Retriever crossed with a Poodle.", image: "/Goldendoodle-square.jpg", tag: "trending" },
+  { name: "Cavapoo", strip: "crosses", era: "1990s", anchor: 1990, note: "Cavalier King Charles Spaniel crossed with a Poodle.", image: "/Cavapoo-square.jpg", tag: "trending" },
   /* The other three crosses that have chum pages of their own (owner request,
      5 August). Notes follow the existing pattern and restate each cross from
      the pack record's own "cross Bred from" line; the era and anchor are a
      best-effort ordering after the four above and are flagged for approval. */
-  { name: "Cavachon", strip: "crosses", era: "1990s", anchor: 2013, note: "Cavalier King Charles Spaniel crossed with a Bichon Frise.", image: "/Cavachon-square.jpg", tag: "trending" },
-  { name: "Maltipoo", strip: "crosses", era: "1990s", anchor: 2014, note: "Maltese crossed with a Poodle.", image: "/multipoo-square.jpg", tag: "trending" },
-  { name: "Jackapoo", strip: "crosses", era: "2000s", anchor: 2015, note: "Jack Russell Terrier crossed with a Poodle.", image: "/jackapoo-square.jpg", tag: "trending" },
+  { name: "Cavachon", strip: "crosses", era: "1990s", anchor: 1992, note: "Cavalier King Charles Spaniel crossed with a Bichon Frise.", image: "/Cavachon-square.jpg", tag: "trending" },
+  { name: "Maltipoo", strip: "crosses", era: "1990s", anchor: 1994, note: "Maltese crossed with a Poodle.", image: "/multipoo-square.jpg", tag: "trending" },
+  { name: "Jackapoo", strip: "crosses", era: "1990s", anchor: 1996, note: "Jack Russell Terrier crossed with a Poodle.", image: "/jackapoo-square.jpg", tag: "trending" },
   { name: "Celtic Hound", strip: "ancient", era: "Ancient", anchor: 80, note: "Ancient Celtic war and hunting hound, forebear of the Wolfhound.", tag: "extinct", image: "/history/breeds/celtic-hound-remake.jpg" },
   { name: "Rache", strip: "medieval", era: "Medieval", anchor: 1150, note: "Medieval scenting hound that hunted by nose in the pack.", tag: "extinct", image: "/history/breeds/rache.jpg" },
   { name: "Buckhound", strip: "medieval", era: "Medieval", anchor: 1220, note: "Medieval pack hound bred to hunt the smaller fallow buck.", tag: "extinct", image: "/history/breeds/Buckhound-illustration.jpg" },
