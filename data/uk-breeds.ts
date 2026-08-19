@@ -35,6 +35,11 @@ export const ukBreeds: UKBreed[] = [
   // Referenced by no tree yet; Batches 4 and 5 do the grafting.
   { name: "Celtic Scent Hound", strip: "ancient", era: "Ancient", anchor: 210, note: "Early Celtic tracking hound that followed game by scent, representing the roots of later European scent hounds.", image: "/history/breeds/ancient-celtic-scent-hound.jpg", tag: "extinct" },
   { name: "Livestock Dog", strip: "ancient", era: "Ancient", anchor: 220, note: "Broad early working-dog population used to guard, move and control livestock before named British breeds existed.", image: "/history/breeds/ancient-livestock-dog.jpg", tag: "extinct" },
+  // 19 August 2026: medieval strip. era is an honest band label ("Medieval"),
+  // never a bare year; anchor is purely an ordering device, never shown to the
+  // user, so an anchor must not be read as a researched date. All nine are
+  // banded "Medieval". Rache's anchor moved from 1150 to 1160 to break its tie
+  // with Scottish Deerhound and give a stable sort.
   { name: "Shepherd's Dog", strip: "medieval", era: "Medieval", anchor: 1050, note: "Practical medieval working dog used to move and protect sheep, forming an early root of Britain's collie families.", image: "/history/breeds/medieval-shepherds-dog.jpg", tag: "extinct" },
   { name: "Drover's Dog", strip: "medieval", era: "Medieval", anchor: 1060, note: "Tough working dog that helped move cattle and sheep over long distances to markets and towns.", image: "/history/breeds/medieval-drover-dog.jpg", tag: "extinct" },
   { name: "Earth Dog", strip: "medieval", era: "Medieval", anchor: 1070, note: "Small, determined hunting and vermin dog that followed quarry underground.", image: "/history/breeds/medieval-earth-dog.jpg", tag: "extinct" },
@@ -44,11 +49,17 @@ export const ukBreeds: UKBreed[] = [
   { name: "Scottish Deerhound", strip: "medieval", era: "Medieval", anchor: 1150, note: "Tall, rough-coated Highland hound bred to course red deer.", image: "/history/breeds/Medieval-Scottish-Deerhound.jpg", tag: "endangered" },
 
   // The 1500s and 1600s
+  // 19 August 2026: c1500 strip. era is an honest band label, never a bare year
+  // and never carrying a "c." hedge, since a band already implies approximation;
+  // anchor is purely an ordering device, never shown to the user. Turnspit Dog's
+  // "c. 1576" became "1500s". Staghound (anchor 1650) and Bearded Collie (1660)
+  // sit in this strip deliberately: strip membership is an editorial grouping,
+  // not arithmetic.
   { name: "Old English Bulldog", strip: "c1500", era: "1500s", anchor: 1550, note: "Stocky bull-baiting dog, ancestor of today's Bulldog.", image: "/history/breeds/Old-English-Bulldog.jpg", tag: "extinct" },
   { name: "Skye Terrier", strip: "c1500", era: "1500s", anchor: 1560, note: "Long-bodied, long-coated terrier from Scotland's Isle of Skye.", image: "/history/breeds/skye-terrier-photo.webp", tag: "endangered" },
   { name: "English Foxhound", strip: "c1500", era: "1500s", anchor: 1570, note: "Pack hound bred on great estates for the fox hunt.", image: "/history/breeds/english-foxhound.jpg", tag: "in-decline" },
   { name: "Otterhound", strip: "c1500", era: "1500s", anchor: 1575, note: "Web-footed otter-hunting hound, now the rarest native breed.", image: "/history/breeds/otterhound-photo.jpg", tag: "endangered" },
-  { name: "Turnspit Dog", strip: "c1500", era: "c. 1576", anchor: 1576, note: "Short-legged dog bred to run in a wheel and turn the spit.", image: "/history/breeds/Turnspitdog-drawing-remake.jpg", tag: "extinct" },
+  { name: "Turnspit Dog", strip: "c1500", era: "1500s", anchor: 1576, note: "Short-legged dog bred to run in a wheel and turn the spit.", image: "/history/breeds/Turnspitdog-drawing-remake.jpg", tag: "extinct" },
   { name: "Staghound", strip: "c1500", era: "1600s", anchor: 1650, note: "English pack hound used to hunt red deer.", image: "/history/breeds/staghound.jpg", tag: "extinct" },
 
   // The 1700s
@@ -63,12 +74,17 @@ export const ukBreeds: UKBreed[] = [
 
   // The early 1800s
   { name: "Beagle", strip: "c1500", era: "1500s", anchor: 1555, note: "Small, merry scent hound bred to hunt rabbit and hare.", image: "/beagle-square.jpg" , tag: "popular" },
+  // 19 August 2026: Tweed Water Spaniel moved into the spaniels strip. It is the
+  // earliest spaniel in the set and now leads the Spaniel Explosion strip on
+  // editorial grounds, alongside the Irish Water Spaniel moved there for the same
+  // reason; its earlier "early 1800s" era band (anchor 1810, ahead of the Irish
+  // Water Spaniel at 1834) is deliberate, so it sorts first in the strip.
+  { name: "Tweed Water Spaniel", strip: "spaniels", era: "early 1800s", anchor: 1810, note: "Border water dog absorbed into the Golden Retriever.", image: "/history/breeds/tweed-water-spaniel.jpg", tag: "extinct" },
   // 19 August 2026: early1800 group era labels reconciled with the file
   // convention. era is an honest band label, never a bare year; anchor is purely
   // an ordering device, never shown to the user, so an anchor must not be read as
   // a researched date. Lurcher (1802) and Longdog (1803) read "1800s" and are now
   // banded as "early 1800s" like the rest of the strip.
-  { name: "Tweed Water Spaniel", strip: "early1800", era: "early 1800s", anchor: 1810, note: "Border water dog absorbed into the Golden Retriever.", image: "/history/breeds/tweed-water-spaniel.jpg", tag: "extinct" },
   { name: "Manchester Terrier", strip: "early1800", era: "early 1800s", anchor: 1820, note: "Sleek black-and-tan terrier bred to clear city rats.", image: "/history/breeds/manchester-terrior.jpg", tag: "endangered" },
   { name: "Bedlington Terrier", strip: "early1800", era: "early 1800s", anchor: 1825, note: "Lamb-like terrier with surprising grit.", image: "/history/breeds/Bedlington Terrier-photo.jpg", tag: "endangered" },
 
@@ -193,7 +209,7 @@ export const ukBreeds: UKBreed[] = [
   { name: "Maltipoo", strip: "crosses", era: "1990s", anchor: 1994, note: "Maltese crossed with a Poodle.", image: "/multipoo-square.jpg", tag: "trending" },
   { name: "Jackapoo", strip: "crosses", era: "1990s", anchor: 1996, note: "Jack Russell Terrier crossed with a Poodle.", image: "/jackapoo-square.jpg", tag: "trending" },
   { name: "Celtic Hound", strip: "ancient", era: "Ancient", anchor: 80, note: "Ancient Celtic war and hunting hound, forebear of the Wolfhound.", tag: "extinct", image: "/history/breeds/celtic-hound-remake.jpg" },
-  { name: "Rache", strip: "medieval", era: "Medieval", anchor: 1150, note: "Medieval scenting hound that hunted by nose in the pack.", tag: "extinct", image: "/history/breeds/rache.jpg" },
+  { name: "Rache", strip: "medieval", era: "Medieval", anchor: 1160, note: "Medieval scenting hound that hunted by nose in the pack.", tag: "extinct", image: "/history/breeds/rache.jpg" },
   { name: "Buckhound", strip: "medieval", era: "Medieval", anchor: 1220, note: "Medieval pack hound bred to hunt the smaller fallow buck.", tag: "extinct", image: "/history/breeds/Buckhound-illustration.jpg" },
   { name: "Southern Hound", strip: "medieval", era: "Medieval", anchor: 1300, note: "Heavy, deep-voiced scent hound descended from the Talbot.", tag: "extinct", image: "/history/breeds/Southern-Hound.jpg" },
   { name: "Black and Tan Terrier", strip: "c1700", era: "1700s", anchor: 1710, note: "One of the earliest terriers, ancestor of the fell terriers.", tag: "extinct", image: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg" },
