@@ -1304,8 +1304,15 @@ const LINEAGE: Record<string, LineageNode> = {
   "Old British bandogs": {
     name: "Old British bandogs",
     note: "The heavy chained dogs of old England, kept tied by day and set loose at night, and put to work by butchers and baiters alike. Now extinct.",
+    // 19 August 2026: was a single 100% child (Ancient Mastiff), a pass-through
+    // that filled the parent circle completely so the bandogs name never showed
+    // in the tree. Fixed on the Celtic Heeler pattern: two even children, the
+    // second repeating the parent with the parent's own note and img. The parent
+    // keeps no value of its own, because d3 adds an owned value ON TOP of the
+    // children, which would count the line twice.
     children: [
-      { name: "Ancient Mastiff", note: "The ancient British guard and war dog, praised by Roman writers, that the heavy bandogs descend from. A functional root, not documented descent. An extinct historical type.", img: "/history/breeds/ancient-british-mastiff-type.jpg", value: 100 }
+      { name: "Ancient Mastiff", note: "The ancient British guard and war dog, praised by Roman writers, that the heavy bandogs descend from. A functional root, not documented descent. An extinct historical type.", img: "/history/breeds/ancient-british-mastiff-type.jpg", value: 50 },
+      { name: "Old British bandogs", note: "The heavy chained dogs of old England, kept tied by day and set loose at night, and put to work by butchers and baiters alike. Now extinct.", img: "/history/breeds/Old-British-bandogs.jpg", value: 50 }
     ]
   },
   "Arctic sled dogs": {
@@ -1485,13 +1492,13 @@ const LINEAGE: Record<string, LineageNode> = {
     ]
   },
 
+  // 19 August 2026: period sources treat mastive, bandogge and alaunt as one animal under three names. Caius in 1576 describes the mastive or bandogge as a single type used to bait bulls, and the name Mastiff was applied indiscriminately to all large dogs, so the English Mastiff is a later divergence from the same stock rather than a parent of the bull-baiting dog. The Mastiff child is therefore removed.
   "Old English Bulldog": {
     name: "Old English Bulldog",
     note: "The extinct, athletic bull-baiting dog, leaner and fiercer than today's Bulldog, bred down from ancient war dogs.",
     children: [
-      { name: "Mastiff", note: "The big Molosser guard dogs that gave it bulk and a broad jaw.", img: "/history/breeds/medieval-british-mastiff.jpg", value: 30 },
-      { name: "Alaunt war dogs", note: "The extinct Alaunt catch dogs crossed in alongside them. A modelled half of the pair, not a recorded mating. Now extinct.", img: "/history/breeds/alunt-war-dogs.jpg", value: 30 },
-      { name: "Old British bandogs", note: "The heavy chained dogs of old England, kept tied by day and set loose at night, and put to work by butchers and baiters alike. Now extinct.", img: "/history/breeds/Old-British-bandogs.jpg", value: 40 }
+      { name: "Old British bandogs", note: "The heavy chained dogs of old England, kept tied by day and set loose at night, and put to work by butchers and baiters alike. Now extinct.", img: "/history/breeds/Old-British-bandogs.jpg", value: 60 },
+      { name: "Alaunt war dogs", note: "The extinct Alaunt catch dogs crossed in alongside them. A modelled half of the pair, not a recorded mating. Now extinct.", img: "/history/breeds/alunt-war-dogs.jpg", value: 40 }
     ]
   },
 
