@@ -718,12 +718,14 @@ const LINEAGE: Record<string, LineageNode> = {
     // AKC Glen of Imaal Terrier history), so their own ancestry is off-tree; the
     // documented cross with local Irish terriers belongs to the Glen of Imaal,
     // not to these dogs. No suitable existing node, and inventing a continental
-    // one is the speculation the brief warns against. The repeat below (value 50,
-    // own note and img) makes the node's own ring render; the node carries no
-    // value of its own.
+    // one is the speculation the brief warns against.
+    //
+    // 19 August 2026 (later): the self-repeat child was removed. A node should
+    // not be its own child, and it leaked into the render's name paths; the level
+    // root now carries its own name on the outer ring, so the node returns to its
+    // single real parent below.
     children: [
-      { name: "Earth Dog", note: "The old low, earth-working dog type behind these short-legged glen dogs. Now extinct.", img: "/history/breeds/medieval-earth-dog.jpg", value: 50 },
-      { name: "Low-slung soldiers' dogs", note: "Short-legged dogs left by Flemish and Hessian soldiers settled in the glen. Now extinct.", img: "/history/breeds/low-slung-soldiers-dogs.jpg", value: 50 }
+      { name: "Earth Dog", note: "The old low, earth-working dog type behind these short-legged glen dogs. Now extinct.", img: "/history/breeds/medieval-earth-dog.jpg", value: 100 }
     ]
   },
   "Native Irish terriers": {
@@ -735,11 +737,14 @@ const LINEAGE: Record<string, LineageNode> = {
     // but that second stock is this node's own indigenous base, not a distinct
     // older node, so the self-repeat represents it honestly. Rejected as
     // folklore: the Irish Wolfhound "behind" the Irish terrier ("some people even
-    // think", not documented). The repeat below carries the node's own note and
-    // img at value 50; the node carries no value of its own.
+    // think", not documented).
+    //
+    // 19 August 2026 (later): the self-repeat child was removed. A node should
+    // not be its own child, and it leaked into the render's name paths; the level
+    // root now carries its own name on the outer ring, so the node returns to its
+    // single real parent below.
     children: [
-      { name: "Old English Black and Tan Terrier", note: "The old British black-and-tan working terrier, the shared ratting stock behind Britain and Ireland's farm terriers. Now extinct.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 50 },
-      { name: "Native Irish terriers", note: "The old Irish farm-terrier stock shared with the Wheaten and Kerry Blue. Now extinct.", img: "/history/breeds/native-irish-terriers.jpg", value: 50 }
+      { name: "Old English Black and Tan Terrier", note: "The old British black-and-tan working terrier, the shared ratting stock behind Britain and Ireland's farm terriers. Now extinct.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 100 }
     ]
   },
   "Old fell terriers": {
@@ -750,12 +755,14 @@ const LINEAGE: Record<string, LineageNode> = {
     // Terrier: fell terriers "share common ancestry with Border terriers") and
     // rejected: shared common ancestry is a shared-ancestor claim, not descent
     // from them, and Old Border terriers has no strip anchor, so the era check
-    // could not be run. No documented second parent, so the self-repeat below
-    // (value 50, own note and img) makes the node's own ring render; the node
-    // carries no value of its own.
+    // could not be run. No documented second parent.
+    //
+    // 19 August 2026 (later): the self-repeat child was removed. A node should
+    // not be its own child, and it leaked into the render's name paths; the level
+    // root now carries its own name on the outer ring, so the node returns to its
+    // single real parent below.
     children: [
-      { name: "Old English Black and Tan Terrier", note: "The old black-and-tan working terrier stock the fell terriers were bred from. Now extinct.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 50 },
-      { name: "Old fell terriers", note: "The hardy black-and-tan fox-working terriers of the northern fells. Now extinct.", img: "/history/breeds/Old-fell-terriers-Patterdale-Terrier-Working-hunt-terriers.jpg", value: 50 }
+      { name: "Old English Black and Tan Terrier", note: "The old black-and-tan working terrier stock the fell terriers were bred from. Now extinct.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 100 }
     ]
   },
 
@@ -807,11 +814,14 @@ const LINEAGE: Record<string, LineageNode> = {
     // is no documented second parent: this is the black-and-tan stock selected
     // for a white coat, and (per this node's own note and Wikipedia) the three
     // white-terrier names refer to one extinct breed. A colour morph of one stock
-    // has no second parent. The repeat below carries the node's own note and img
-    // at value 50; the node carries no value of its own.
+    // has no second parent.
+    //
+    // 19 August 2026 (later): the self-repeat child was removed. A node should
+    // not be its own child, and it leaked into the render's name paths; the level
+    // root now carries its own name on the outer ring, so the node returns to its
+    // single real parent below.
     children: [
-      { name: "Old English Black and Tan Terrier", note: "The black-and-tan working stock the white terriers were selected out of, for coat colour. Now extinct.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 50 },
-      { name: "Old English White Terrier", note: "The white-bodied working terriers bred out of the black-and-tan stock for coat colour. The split of this line into population and named breed is a useful reconstruction, not a documented distinction: the three white-terrier names all refer to one extinct breed. Now extinct.", img: "/history/breeds/english-white-terrier-painting.jpg", value: 50 }
+      { name: "Old English Black and Tan Terrier", note: "The black-and-tan working stock the white terriers were selected out of, for coat colour. Now extinct.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 100 }
     ]
   },
 
@@ -908,11 +918,14 @@ const LINEAGE: Record<string, LineageNode> = {
     // Wheaten is the oldest Irish terrier and the progenitor of the Kerry Blue
     // and Irish Terrier (AKC, SCWT Club of GB), so as the foundational native
     // stock it has no documented distinct second parent. Rejected as folklore:
-    // Portuguese Water Dog ancestry for the Wheaten. The repeat below carries the
-    // node's own note and img at value 50; the node carries no value of its own.
+    // Portuguese Water Dog ancestry for the Wheaten.
+    //
+    // 19 August 2026 (later): the self-repeat child was removed. A node should
+    // not be its own child, and it leaked into the render's name paths; the level
+    // root now carries its own name on the outer ring, so the node returns to its
+    // single real parent below.
     children: [
-      { name: "Native Irish terriers", note: "Ireland's old all-purpose working farm terriers. Now extinct.", img: "/history/breeds/native-irish-terriers.jpg", value: 50 },
-      { name: "Soft-Coated Wheaten Terrier", note: "The oldest of Ireland's four native terriers, a soft-coated all-purpose farm dog, and the likely parent of the Kerry Blue and Irish Terrier.", img: "/history/breeds/soft-coated--wheaten-terrier-photo.jpg", value: 50 }
+      { name: "Native Irish terriers", note: "Ireland's old all-purpose working farm terriers. Now extinct.", img: "/history/breeds/native-irish-terriers.jpg", value: 100 }
     ]
   },
 
@@ -1414,14 +1427,13 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Old British bandogs",
     note: "The heavy chained dogs of old England, kept tied by day and set loose at night, and put to work by butchers and baiters alike. Now extinct.",
     // 19 August 2026: was a single 100% child (Ancient Mastiff), a pass-through
-    // that filled the parent circle completely so the bandogs name never showed
-    // in the tree. Fixed on the Celtic Heeler pattern: two even children, the
-    // second repeating the parent with the parent's own note and img. The parent
-    // keeps no value of its own, because d3 adds an owned value ON TOP of the
-    // children, which would count the line twice.
+    // that filled the parent circle. It was briefly given a Celtic Heeler
+    // self-repeat, then that was removed the same day: a node should not be its
+    // own child, and it leaked into the render's name paths. The level root now
+    // carries its own name on the outer ring, so it returns to the single Ancient
+    // Mastiff parent below.
     children: [
-      { name: "Ancient Mastiff", note: "The ancient British guard and war dog, praised by Roman writers, that the heavy bandogs descend from. A functional root, not documented descent. An extinct historical type.", img: "/history/breeds/ancient-british-mastiff-type.jpg", value: 50 },
-      { name: "Old British bandogs", note: "The heavy chained dogs of old England, kept tied by day and set loose at night, and put to work by butchers and baiters alike. Now extinct.", img: "/history/breeds/Old-British-bandogs.jpg", value: 50 }
+      { name: "Ancient Mastiff", note: "The ancient British guard and war dog, praised by Roman writers, that the heavy bandogs descend from. A functional root, not documented descent. An extinct historical type.", img: "/history/breeds/ancient-british-mastiff-type.jpg", value: 100 }
     ]
   },
   "Arctic sled dogs": {
@@ -1437,13 +1449,15 @@ const LINEAGE: Record<string, LineageNode> = {
   // extends all 11 at once and makes the ancient-East and Alaunt lines reachable
   // from the mastiff and bulldog trees. It is ancient, deeper than the Tudor
   // boundary, so it reaches no era card and moves no count; this is honest tail,
-  // not a count job. Same Celtic-Heeler self-child shape as its inline version.
+  // not a count job. It briefly wore a Celtic-Heeler self-child; that was removed
+  // on 19 August 2026 (a node should not be its own child, and it leaked into the
+  // render's name paths). The level root now carries its own name on the outer
+  // ring, so it returns to the single Old mastiffs of the ancient East parent.
   "Ancient Molossers": {
     name: "Ancient Molossers",
     note: "The huge eastern war and guard dogs at the root of every mastiff. Now extinct.",
     children: [
-      { name: "Old mastiffs of the ancient East", note: "The huge guard and hunting mastiffs of the ancient East, carved on palace walls thousands of years ago. Now extinct.", img: "/history/breeds/old-mastiffs-of-the-ancient-east.jpg", value: 25 },
-      { name: "Ancient Molossers", note: "The huge eastern war and guard dogs at the root of every mastiff. Now extinct.", img: "/history/breeds/Ancient-Molossers.jpg", value: 25 }
+      { name: "Old mastiffs of the ancient East", note: "The huge guard and hunting mastiffs of the ancient East, carved on palace walls thousands of years ago. Now extinct.", img: "/history/breeds/old-mastiffs-of-the-ancient-east.jpg", value: 100 }
     ]
   },
 

@@ -519,27 +519,26 @@ type Node = HierarchyCircularNode<LineageNode>;
 
 // A circle whose name repeats its parent's is not a second animal. It is the
 // same dog carrying on: this line, crossed with the one other dog beside it.
+// The parent circle already stands for that dog, so drawing its name again
+// inside itself says the same thing twice, which is what made the Celtic Heeler
+// level read wrong.
 //
-// ORIGINAL BEHAVIOUR, kept for the record: the echo was drawn as an empty half
-// and skipped by the physics. The reasoning was that the parent circle already
-// stands for that dog, so drawing its name again inside itself says the same
-// thing twice, which is what made the Celtic Heeler level read wrong. The echo
-// still stays in the tree rather than being deleted from the data: the pack
-// sizes every parent from its children, so removing one would make its only
-// sibling swell from half the parent's radius to 0.95 of it, and it would also
-// drop out of the chum rail index.
+// It stays in the tree rather than being deleted from the data. That matters:
+// the pack sizes every parent from its children, so removing one would make its
+// only sibling swell from half the parent's radius to 0.95 of it, and it would
+// also drop out of the chum rail index. Left in and merely not drawn, the sizes,
+// the badge percentages and the rail are all untouched, and what you see is one
+// half-size circle inside its parent, which reads as "this dog, plus the one
+// other dog". The empty half IS the parent.
 //
-// REVERSED 19 August 2026 (Steve): draw both circles even when they are the same
-// dog. The echo now renders as a full circle with its own image and becomes a
-// physics body like any sibling, so it moves, collides, drags and carries its
-// own % badge. Expect two 50% badges on a self-repeat level instead of one; that
-// is correct. Only the echo's NAME LABEL is still suppressed, so the duplicate
-// name that read wrong does not come back.
+// 19 August 2026: an experiment to DRAW both circles was reverted, and the
+// eleven ROOT-level self-repeats were removed from the data (each level now
+// carries its own name on the outer ring, so those did not need drawing at all).
+// The echoes that remain are the deeper sub-ring self-duplicates, which keep an
+// intermediate stock name visible one or more rings down; those stay hidden.
 //
-// isEcho is now called in ONE place: the drawing, where isEchoNode drops the
-// echo's label only. The two physics pops that turn children into bodies no
-// longer skip echoes. The rail and rarity are untouched either way: both are
-// keyed by name across the whole dataset, not by which circles draw.
+// It is skipped in two places and only two: the drawing, and the pop that turns
+// children into physics bodies.
 function isEcho(d: Node): boolean {
   return !!d.parent && d.data.name === d.parent.data.name;
 }
@@ -2879,7 +2878,11 @@ export default function BreedTree({
       }
       const l = wrap?.children[1] as SVGGElement | undefined;
       if (l) {
-        if (d === focusRef.current) {
+        if (d.depth === 0) {
+          // 19 August 2026: the root's name rides the top rim of the outer ring,
+          // not the centre, so it names the level without covering the children.
+          l.setAttribute("transform", `translate(${tx},${ty - drawR(d, v, k)})`);
+        } else if (d === focusRef.current) {
           // The focused circle's own label sits at its centre.
           l.setAttribute("transform", "translate(0,0)");
         } else {
@@ -3541,9 +3544,7 @@ export default function BreedTree({
       // popped so popChildren early-returns and cannot double the circles.
       for (const b of bodies) {
         if (!b.n || !b.mb) continue;
-        // 19 August 2026: echoes are no longer filtered out. They become bodies
-        // and badges like any sibling, to match the drawing that now draws them.
-        const kids = b.n.children ?? [];
+        const kids = (b.n.children ?? []).filter((ch) => !isEcho(ch));
         if (!kids.length) { b.popped = true; continue; }
         const wmb = b.mb; // narrowed and stable for the closure below
         // the word plus everything freed under it, immune to each other briefly
@@ -3608,8 +3609,7 @@ export default function BreedTree({
         b.popped = true;
         const newMbs: any[] = b.mb ? [b.mb] : [];
         for (const ch of b.n.children ?? []) {
-          // 19 August 2026: echoes are no longer skipped; a popped echo becomes
-          // a body like any sibling, to match the drawing that now draws them.
+          if (isEcho(ch)) continue;
           // Grown once, then floored. b.popped guards popChildren against a
           // second run, so this cannot compound down a deep tree. The floor is
           // given in screen pixels and converted here, because the packed radii
@@ -5614,11 +5614,7 @@ export default function BreedTree({
               // The outer breed circle (root) is hidden so only the ancestor
               // circles inside it show. It stays in the DOM (rendered invisible
               // and non-interactive) so the index alignment used by zoomTo holds.
-              // 19 August 2026: echoes are no longer hidden here, so they draw as
-              // full circles with their own image and interaction. Only their
-              // label is suppressed, via isEchoNode (see the label below).
-              const isEchoNode = isEcho(d);
-              const hidden = d.depth === 0;
+              const hidden = d.depth === 0 || isEcho(d);
               const hasImg = !hidden && !!nodeImg(d);
               // The larger "bottom" image in each circle stays full colour and
               // the images nested on top of it are tinted, alternating inward.
@@ -5901,19 +5897,16 @@ export default function BreedTree({
               // redrawn above the labels with its own transform feed. That work
               // is already done, by the interleave.
 
-              // A name belongs to a circle. The root's circle is not drawn, so
-              // its name is dropped via !hidden. Echo circles ARE drawn now
-              // (19 August 2026), but their label is still dropped via
-              // !isEchoNode: two rings for a self-repeat is wanted, two identical
-              // names is not, the duplicate that made the Celtic Heeler level
-              // read wrong. Without this the repeated name floats over its parent.
-              const visible = (isInside || isLeafFocus) && !labelBuried && !hidden && !isEchoNode;
+              // A name belongs to a circle. If the circle is not drawn, and an
+              // echo circle is not, the name goes with it. Without this the
+              // repeated names stayed floating over the parent they belong to.
+              const visible = (isInside || isLeafFocus) && !labelBuried && !hidden;
               const pct = d.parent ? Math.round((d.value ?? 0) / (d.parent.value || 1) * 100) : null;
               const labelEl = (
                 <g
                   textAnchor="middle"
                   style={{
-                    display: visible ? "inline" : "none",
+                    display: (visible || (d.depth === 0 && !dropped)) ? "inline" : "none",
                     // These five used to live on the single labels group. That
                     // group is gone, so each label carries them itself.
                     fontFamily: "var(--font-body), system-ui, sans-serif",
@@ -5923,6 +5916,40 @@ export default function BreedTree({
                     userSelect: "none",
                   }}
                 >
+                  {/* 19 August 2026: the level's own name on the outer ring. The
+                      root circle (depth 0) is not drawn, so without this the name
+                      shows only in the header and a single child reads as the
+                      level. The rAF parks this group on the top rim; it hides once
+                      the pit drops so it cannot collide with the falling circles. */}
+                  {d.depth === 0 && !dropped && (
+                    (() => {
+                      const rn = (rootLabel ?? d.data.name).toUpperCase();
+                      const lines = splitName(rn);
+                      const rfs = Math.max(28, SIZE * 0.05);
+                      return (
+                        <text
+                          x={0}
+                          y={0}
+                          textAnchor="middle"
+                          dominantBaseline="central"
+                          style={{
+                            fill: "#ffffff",
+                            stroke: "#000000",
+                            strokeWidth: Math.max(2, rfs * 0.16),
+                            strokeLinejoin: "round" as const,
+                            paintOrder: "stroke" as const,
+                            fontFamily: "var(--font-display), system-ui, sans-serif",
+                            fontSize: `${rfs}px`,
+                            letterSpacing: "0.5px",
+                          }}
+                        >
+                          {lines.map((ln, li) => (
+                            <tspan key={li} x={0} y={rfs * (li + 0.9)}>{ln}</tspan>
+                          ))}
+                        </text>
+                      );
+                    })()
+                  )}
                   {isInside && !(dropped && d.depth === 1) && (
                     (() => {
                       // Contain the label in its own circle. On mobile zoomTo
