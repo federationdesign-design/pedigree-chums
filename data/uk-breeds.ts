@@ -117,12 +117,23 @@ export const ukBreeds: UKBreed[] = [
   { name: "Lancashire Heeler", strip: "late1800", era: "1800s", anchor: 1892, note: "Small, agile droving heeler from northern England.", image: "/history/breeds/lancashire-heelers-photo.jpg", tag: "endangered" },
 
   // The 1900s
+  // 19 August 2026: c1900 group era and anchor reconciled with the file
+  // convention. era is an honest band label, never a bare year; anchor is purely
+  // an ordering device, never shown to the user, so an anchor must not be read as
+  // a researched date. Norfolk Terrier moved from anchor 1964 to 1905: 1964 was
+  // the Kennel Club split from the Norwich, not the breed's origin. The
+  // drop-eared Norwich existed by 1914 and the Norwich was recognised in 1932.
+  // This matters because the Lucas Terrier was bred from the Norfolk in the late
+  // 1940s, so the parent must sort before the child. Lucas Terrier moved from
+  // 1950 to 1948, developed by Sir Jocelyn Lucas at his Ilmer Kennels from small
+  // Sealyhams crossed with Norfolk Terriers. Patterdale Terrier's 1950s band is
+  // unverified and flagged for a later check.
   { name: "Norwich Terrier", strip: "c1900", era: "early 1900s", anchor: 1900, note: "Small, hardy red terrier with prick ears.", image: "/history/breeds/norwich-terrier-photo.jpg", tag: "endangered" },
   { name: "Bulldog", strip: "mid1800", era: "mid-1800s", anchor: 1858, note: "The wrinkled national symbol, bred down from bull-baiting dogs.", image: "/bulldog-square.jpg", tag: "popular" },
   { name: "Cavalier King Charles Spaniel", strip: "c1900", era: "1920s", anchor: 1925, note: "Sweet-natured toy spaniel reconstructed from old portraits.", image: "/cav-spaniel-square.jpg" , tag: "popular" },
-  { name: "Patterdale Terrier", strip: "c1900", era: "1900s", anchor: 1950, note: "Hard-as-nails working fell terrier.", image: "/history/breeds/Patterdale-Terrier-photo.jpg" , tag: "popular" },
-  { name: "Lucas Terrier", strip: "c1900", era: "1900s", anchor: 1950, note: "Gentle terrier from crossing the Sealyham and Norfolk.", image: "/history/breeds/Lucas-Terrier-photo.jpg" , tag: "endangered" },
-  { name: "Norfolk Terrier", strip: "c1900", era: "1964", anchor: 1964, note: "Drop-eared cousin of the Norwich, split off in 1964.", image: "/history/breeds/Norfolk-Terrier-photo.jpg", tag: "in-decline" },
+  { name: "Patterdale Terrier", strip: "c1900", era: "1950s", anchor: 1950, note: "Hard-as-nails working fell terrier.", image: "/history/breeds/Patterdale-Terrier-photo.jpg" , tag: "popular" },
+  { name: "Lucas Terrier", strip: "c1900", era: "1940s", anchor: 1948, note: "Gentle terrier from crossing the Sealyham and Norfolk.", image: "/history/breeds/Lucas-Terrier-photo.jpg" , tag: "endangered" },
+  { name: "Norfolk Terrier", strip: "c1900", era: "early 1900s", anchor: 1905, note: "Drop-eared cousin of the Norwich, split off in 1964.", image: "/history/breeds/Norfolk-Terrier-photo.jpg", tag: "in-decline" },
   { name: "Northern Inuit Dog", strip: "c1900", era: "1980s", anchor: 1985, note: "Wolf-look companion breed developed in the UK.", image: "/history/breeds/Northern Inuit Dog-photo.jpg" , tag: "endangered" },
 
   // Today's crossbreeds
@@ -154,7 +165,7 @@ export const ukBreeds: UKBreed[] = [
   { name: "Old Welsh Grey Sheepdog", strip: "c1700", era: "1700s", anchor: 1740, note: "Shaggy grey Welsh hill herder, kin to the Bearded Collie.", tag: "extinct", image: "/history/breeds/old-welsh-grey-sheepdog.jpg" },
   { name: "Paisley Terrier", strip: "mid1800", era: "1860s", anchor: 1865, note: "Silky Scottish show terrier, forerunner of the Yorkshire Terrier.", tag: "extinct", image: "/history/breeds/Paisley-Terrier=photo.jpg" },
   { name: "Toy Trawler Spaniel", strip: "spaniels", era: "1800s", anchor: 1878, note: "Small Victorian companion spaniel bred from the King Charles.", tag: "extinct", image: "/history/breeds/Toy-Trawler-Spaniel.jpg" },
-  { name: "Cumberland Sheepdog", strip: "c1900", era: "Early 1900s", anchor: 1910, note: "Northern herder folded into the Border Collie in the early 1900s.", image: "/history/breeds/cumberland-sheepdog.jpg", tag: "extinct" },
-  { name: "Toy Bulldog", strip: "c1900", era: "to 1914", anchor: 1914, note: "Miniature Victorian companion Bulldog, last recorded in 1914.", image: "/history/breeds/toy-bulldog.jpg", tag: "extinct" },
+  { name: "Cumberland Sheepdog", strip: "c1900", era: "early 1900s", anchor: 1910, note: "Northern herder folded into the Border Collie in the early 1900s.", image: "/history/breeds/cumberland-sheepdog.jpg", tag: "extinct" },
+  { name: "Toy Bulldog", strip: "c1900", era: "early 1900s", anchor: 1914, note: "Miniature Victorian companion Bulldog, last recorded in 1914.", image: "/history/breeds/toy-bulldog.jpg", tag: "extinct" },
   { name: "Dumfriesshire Hound", strip: "c1900", era: "1920s", anchor: 1920, note: "Tall black-and-tan Scottish foxhound of the Galloway hills.", tag: "extinct", image: "/history/breeds/Dumfriesshire-Hound.jpg" },
 ];
