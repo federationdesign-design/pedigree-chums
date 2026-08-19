@@ -531,8 +531,16 @@ const LINEAGE: Record<string, LineageNode> = {
   "Welsh herding dogs": {
     name: "Welsh herding dogs",
     note: "The old Welsh herding and droving dogs, a long-legged, loose-eyed landrace and the parallel Welsh branch behind the region's sheep-working breeds. Now extinct.",
+    // 19 August 2026: added Celtic Heeler as a child here. It used to sit the
+    // other way round, with Welsh herding dogs a child of Celtic Heeler, but that
+    // edge ran backwards in time (Celtic Heeler is the ancient low-slung stock,
+    // Welsh herding dogs the later landrace): the same class of error as the
+    // Early badger hunting dogs / Earth Dog edge in the BARE LEAF note just below
+    // this root. Reversing it here also fixes the pass-through that Shepherd's
+    // Dog alone (100%) left behind. Shepherd's Dog 60, Celtic Heeler 40, sum 100.
     children: [
-      { name: "Shepherd's Dog", note: "The medieval British herding dog behind the herding breeds, the Colley of Caius. The parallel Welsh branch reaches the same medieval root. Now extinct.", img: "/history/breeds/medieval-shepherds-dog.jpg", value: 100 }
+      { name: "Shepherd's Dog", note: "The medieval British herding dog behind the herding breeds, the Colley of Caius. The parallel Welsh branch reaches the same medieval root. Now extinct.", img: "/history/breeds/medieval-shepherds-dog.jpg", value: 60 },
+      { name: "Celtic Heeler", note: "The ancestral low-slung herding dogs brought to Wales by Celtic tribes -- forerunners of both the Cardigan and Pembroke Welsh Corgi. Short legs bred for nipping cattle heels and ducking kicks.", img: "/history/breeds/medieval-corgi.jpg", value: 40 }
     ]
   },
   // Early badger hunting dogs is intentionally left a BARE LEAF. It once had a
@@ -1393,35 +1401,33 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Celtic Heeler",
     note: "The ancestral low-slung herding dogs brought to Wales by Celtic tribes -- forerunners of both the Cardigan and Pembroke Welsh Corgi. Short legs bred for nipping cattle heels and ducking kicks.",
     img: "/history/breeds/medieval-corgi.jpg",
+    // 19 August 2026: removed the "Welsh herding dogs" sub-ring from here. That
+    // edge made Celtic Heeler descend from Welsh herding dogs, which runs
+    // backwards in time: Celtic Heeler is the ancestral low-slung stock the
+    // Celts brought to Wales, Welsh herding dogs the later Welsh landrace. It is
+    // the same class of error as the Early badger hunting dogs / Earth Dog edge
+    // recorded in the BARE LEAF note below the Welsh herding dogs root. The edge
+    // has been reversed: Celtic Heeler is now a child of that root instead. To
+    // avoid leaving Celtic Heeler a single pass-through child, "Old hunting dogs
+    // of the Celts" was promoted out of the removed ring into a direct child
+    // here. Early badger 60, Old hunting dogs 40. The ring carries no value of
+    // its own, so Early badger's 60 is written as two even children of 30
+    // (30 + 30 = 60), and 60 + 40 = 100.
     children: [
       {
         name: "Early badger hunting dogs",
         note: "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
         img: "/history/breeds/early-badger-hunting-dogs.jpg",
         // No value of its own. A parent's share is the sum of its children, and
-        // d3 adds an owned value ON TOP of them, so carrying both counted this
-        // line twice and pushed the children down to 32%. The two 55s below are
-        // the 55 that used to sit here, split evenly.
+        // d3 adds an owned value ON TOP of them, so carrying both would count
+        // this line twice. The two 30s below are Early badger's 60 share written
+        // as two even children; the self-duplicate keeps the ancestor in step.
         children: [
-          { name: "Ancient Celtic earth dogs", note: "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.", img: "/history/breeds/ancient-celtic-earth-dog.jpg", value: 55 },
-          { name: "Early badger hunting dogs", note: "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.", img: "/history/breeds/early-badger-hunting-dogs.jpg", value: 55 },
+          { name: "Ancient Celtic earth dogs", note: "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.", img: "/history/breeds/ancient-celtic-earth-dog.jpg", value: 30 },
+          { name: "Early badger hunting dogs", note: "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.", img: "/history/breeds/early-badger-hunting-dogs.jpg", value: 30 },
         ],
       },
-      {
-        name: "Welsh herding dogs",
-        note: "The old Welsh herding and droving dogs -- a long-legged, loose-eyed landrace that provided the herding instinct and biddable temperament. Now extinct.",
-        img: "/history/breeds/Welsh-herding-dogs-cluster.jpg",
-        children: [
-          // Same dog as the one in the Celtic Hound level, so it carries the
-          // same picture and the same words. It used to have its own image and
-          // its own write-up, typed separately, which is why the two levels
-          // disagreed about what it looked like. Nothing copies img or note
-          // between entries, so a duplicate has to be kept in step by hand:
-          // change this one and change "Celtic Hound" below to match.
-          { name: "Old hunting dogs of the Celts", note: "The native running dogs of Iron Age Europe. Now extinct.", img: "/history/breeds/Old-hunting-dogs-of-the-Celts.jpg", value: 45 },
-          { name: "Welsh herding dogs", note: "The old Welsh herding and droving dogs -- a long-legged, loose-eyed landrace that provided the herding instinct and biddable temperament. Now extinct.", img: "/history/breeds/Welsh-herding-dogs-cluster.jpg", value: 45 },
-        ],
-      },
+      { name: "Old hunting dogs of the Celts", note: "The native running dogs of Iron Age Europe. Now extinct.", img: "/history/breeds/Old-hunting-dogs-of-the-Celts.jpg", value: 40 },
     ],
   },
 

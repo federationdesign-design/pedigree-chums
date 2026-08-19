@@ -4629,25 +4629,58 @@
                   "name": "Celtic herdsmen's dogs",
                   "note": "The all-round farm dogs of the Celtic tribes, guarding and driving the herds. Now extinct.",
                   "img": "/history/breeds/celtic-herdsmen-dogs.jpg",
-                  "value": 15.75
+                  "value": 9.45
                 },
                 {
                   "name": "Roman shepherd dogs",
                   "note": "The flock-guarding sheepdogs the Roman farm writers described, kept white so the shepherd knew dog from wolf. Now extinct.",
                   "img": "/history/breeds/roman-shepherd-dogs.jpg",
-                  "value": 11.25
+                  "value": 6.75
                 },
                 {
                   "name": "Anglo-Saxon herding dogs",
                   "note": "Collie-sized herding dogs of Anglo-Saxon England, found at West Stow and Brandon. Now extinct.",
                   "img": "/history/breeds/anglo-saxon-herding-dogs.jpg",
-                  "value": 9
+                  "value": 5.4
                 },
                 {
                   "name": "Norse settlers dogs",
                   "note": "Scandinavian dogs brought over with Viking settlement, likely mixed into local herding stock. Now extinct.",
                   "img": "/history/breeds/viking-herding-spitz.jpg",
-                  "value": 9
+                  "value": 5.4
+                }
+              ]
+            },
+            {
+              "name": "Celtic Heeler",
+              "note": "The ancestral low-slung herding dogs brought to Wales by Celtic tribes -- forerunners of both the Cardigan and Pembroke Welsh Corgi. Short legs bred for nipping cattle heels and ducking kicks.",
+              "img": "/history/breeds/medieval-corgi.jpg",
+              "children": [
+                {
+                  "name": "Early badger hunting dogs",
+                  "note": "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
+                  "img": "/history/breeds/early-badger-hunting-dogs.jpg",
+                  "children": [
+                    {
+                      "name": "Ancient Celtic earth dogs",
+                      "note": "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.",
+                      "img": "/history/breeds/ancient-celtic-earth-dog.jpg",
+                      "value": 30
+                    },
+                    {
+                      "name": "Early badger hunting dogs",
+                      "note": "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
+                      "img": "/history/breeds/early-badger-hunting-dogs.jpg",
+                      "value": 30
+                    }
+                  ],
+                  "value": 0
+                },
+                {
+                  "name": "Old hunting dogs of the Celts",
+                  "note": "The native running dogs of Iron Age Europe. Now extinct.",
+                  "img": "/history/breeds/Old-hunting-dogs-of-the-Celts.jpg",
+                  "value": 18
                 }
               ]
             }
@@ -6879,25 +6912,58 @@
                       "name": "Celtic herdsmen's dogs",
                       "note": "The all-round farm dogs of the Celtic tribes, guarding and driving the herds. Now extinct.",
                       "img": "/history/breeds/celtic-herdsmen-dogs.jpg",
-                      "value": 5.5125
+                      "value": 3.3075
                     },
                     {
                       "name": "Roman shepherd dogs",
                       "note": "The flock-guarding sheepdogs the Roman farm writers described, kept white so the shepherd knew dog from wolf. Now extinct.",
                       "img": "/history/breeds/roman-shepherd-dogs.jpg",
-                      "value": 3.9375
+                      "value": 2.3625
                     },
                     {
                       "name": "Anglo-Saxon herding dogs",
                       "note": "Collie-sized herding dogs of Anglo-Saxon England, found at West Stow and Brandon. Now extinct.",
                       "img": "/history/breeds/anglo-saxon-herding-dogs.jpg",
-                      "value": 3.15
+                      "value": 1.89
                     },
                     {
                       "name": "Norse settlers dogs",
                       "note": "Scandinavian dogs brought over with Viking settlement, likely mixed into local herding stock. Now extinct.",
                       "img": "/history/breeds/viking-herding-spitz.jpg",
-                      "value": 3.15
+                      "value": 1.89
+                    }
+                  ]
+                },
+                {
+                  "name": "Celtic Heeler",
+                  "note": "The ancestral low-slung herding dogs brought to Wales by Celtic tribes -- forerunners of both the Cardigan and Pembroke Welsh Corgi. Short legs bred for nipping cattle heels and ducking kicks.",
+                  "img": "/history/breeds/medieval-corgi.jpg",
+                  "children": [
+                    {
+                      "name": "Early badger hunting dogs",
+                      "note": "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
+                      "img": "/history/breeds/early-badger-hunting-dogs.jpg",
+                      "children": [
+                        {
+                          "name": "Ancient Celtic earth dogs",
+                          "note": "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.",
+                          "img": "/history/breeds/ancient-celtic-earth-dog.jpg",
+                          "value": 30
+                        },
+                        {
+                          "name": "Early badger hunting dogs",
+                          "note": "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
+                          "img": "/history/breeds/early-badger-hunting-dogs.jpg",
+                          "value": 30
+                        }
+                      ],
+                      "value": 0
+                    },
+                    {
+                      "name": "Old hunting dogs of the Celts",
+                      "note": "The native running dogs of Iron Age Europe. Now extinct.",
+                      "img": "/history/breeds/Old-hunting-dogs-of-the-Celts.jpg",
+                      "value": 6.3
                     }
                   ]
                 }
@@ -6919,25 +6985,58 @@
                   "name": "Celtic herdsmen's dogs",
                   "note": "The all-round farm dogs of the Celtic tribes, guarding and driving the herds. Now extinct.",
                   "img": "/history/breeds/celtic-herdsmen-dogs.jpg",
-                  "value": 8.75
+                  "value": 5.25
                 },
                 {
                   "name": "Roman shepherd dogs",
                   "note": "The flock-guarding sheepdogs the Roman farm writers described, kept white so the shepherd knew dog from wolf. Now extinct.",
                   "img": "/history/breeds/roman-shepherd-dogs.jpg",
-                  "value": 6.25
+                  "value": 3.75
                 },
                 {
                   "name": "Anglo-Saxon herding dogs",
                   "note": "Collie-sized herding dogs of Anglo-Saxon England, found at West Stow and Brandon. Now extinct.",
                   "img": "/history/breeds/anglo-saxon-herding-dogs.jpg",
-                  "value": 5
+                  "value": 3
                 },
                 {
                   "name": "Norse settlers dogs",
                   "note": "Scandinavian dogs brought over with Viking settlement, likely mixed into local herding stock. Now extinct.",
                   "img": "/history/breeds/viking-herding-spitz.jpg",
-                  "value": 5
+                  "value": 3
+                }
+              ]
+            },
+            {
+              "name": "Celtic Heeler",
+              "note": "The ancestral low-slung herding dogs brought to Wales by Celtic tribes -- forerunners of both the Cardigan and Pembroke Welsh Corgi. Short legs bred for nipping cattle heels and ducking kicks.",
+              "img": "/history/breeds/medieval-corgi.jpg",
+              "children": [
+                {
+                  "name": "Early badger hunting dogs",
+                  "note": "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
+                  "img": "/history/breeds/early-badger-hunting-dogs.jpg",
+                  "children": [
+                    {
+                      "name": "Ancient Celtic earth dogs",
+                      "note": "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.",
+                      "img": "/history/breeds/ancient-celtic-earth-dog.jpg",
+                      "value": 30
+                    },
+                    {
+                      "name": "Early badger hunting dogs",
+                      "note": "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
+                      "img": "/history/breeds/early-badger-hunting-dogs.jpg",
+                      "value": 30
+                    }
+                  ],
+                  "value": 0
+                },
+                {
+                  "name": "Old hunting dogs of the Celts",
+                  "note": "The native running dogs of Iron Age Europe. Now extinct.",
+                  "img": "/history/breeds/Old-hunting-dogs-of-the-Celts.jpg",
+                  "value": 10
                 }
               ]
             }
@@ -19867,25 +19966,58 @@
                   "name": "Celtic herdsmen's dogs",
                   "note": "The all-round farm dogs of the Celtic tribes, guarding and driving the herds. Now extinct.",
                   "img": "/history/breeds/celtic-herdsmen-dogs.jpg",
-                  "value": 8.75
+                  "value": 5.25
                 },
                 {
                   "name": "Roman shepherd dogs",
                   "note": "The flock-guarding sheepdogs the Roman farm writers described, kept white so the shepherd knew dog from wolf. Now extinct.",
                   "img": "/history/breeds/roman-shepherd-dogs.jpg",
-                  "value": 6.25
+                  "value": 3.75
                 },
                 {
                   "name": "Anglo-Saxon herding dogs",
                   "note": "Collie-sized herding dogs of Anglo-Saxon England, found at West Stow and Brandon. Now extinct.",
                   "img": "/history/breeds/anglo-saxon-herding-dogs.jpg",
-                  "value": 5
+                  "value": 3
                 },
                 {
                   "name": "Norse settlers dogs",
                   "note": "Scandinavian dogs brought over with Viking settlement, likely mixed into local herding stock. Now extinct.",
                   "img": "/history/breeds/viking-herding-spitz.jpg",
-                  "value": 5
+                  "value": 3
+                }
+              ]
+            },
+            {
+              "name": "Celtic Heeler",
+              "note": "The ancestral low-slung herding dogs brought to Wales by Celtic tribes -- forerunners of both the Cardigan and Pembroke Welsh Corgi. Short legs bred for nipping cattle heels and ducking kicks.",
+              "img": "/history/breeds/medieval-corgi.jpg",
+              "children": [
+                {
+                  "name": "Early badger hunting dogs",
+                  "note": "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
+                  "img": "/history/breeds/early-badger-hunting-dogs.jpg",
+                  "children": [
+                    {
+                      "name": "Ancient Celtic earth dogs",
+                      "note": "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.",
+                      "img": "/history/breeds/ancient-celtic-earth-dog.jpg",
+                      "value": 30
+                    },
+                    {
+                      "name": "Early badger hunting dogs",
+                      "note": "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
+                      "img": "/history/breeds/early-badger-hunting-dogs.jpg",
+                      "value": 30
+                    }
+                  ],
+                  "value": 0
+                },
+                {
+                  "name": "Old hunting dogs of the Celts",
+                  "note": "The native running dogs of Iron Age Europe. Now extinct.",
+                  "img": "/history/breeds/Old-hunting-dogs-of-the-Celts.jpg",
+                  "value": 10
                 }
               ]
             }
