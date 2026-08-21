@@ -790,7 +790,9 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
   // is never approached by a sequence, only by the single main message that precedes it.
   // Task 176: raised from 2 to 3 so a four-message FAQ answer (opener + three extras) plays in full
   // (FAQ009 the four-part 30%-off sequence, FAQ012 the four-part contact sequence).
-  const SEQ_MAX_EXTRAS = 3;
+  // Task 178: raised to 4 so the Boxer's five-message /home welcome (opener + four extras) plays in full.
+  // No other sequence carries four extras (the FAQ runs are opener + three), so this enables only /home.
+  const SEQ_MAX_EXTRAS = 4;
   const playSequence = useCallback(
     (lines: Array<string | { text: string; url?: string | null; destinationId?: string }>, seqDog: Dog, gapMs: number, showAvatar = false, media?: { src: string; alt: string }, monologue = false) => {
       // Task 176: an item may carry its own link (a FAQ sequence message), so normalise strings to steps.
@@ -880,7 +882,7 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
     seqStartedRef.current = true;
     // Task 169: the beat lands 2s after the visitor opens the chip (was 2.5s), and marks the run a `monologue`
     // so a reply typed over it QUEUES rather than cutting it short -- the dog finishes, then the reply is answered.
-    // ONLY the fast followUps run (2s beats, at most 4s total) queues. The know-your-chums Collie names breeds
+    // ONLY the fast followUps run (2s beats, up to ~8s total for the four-extra /home) queues. The know-your-chums Collie names breeds
     // on 20s gaps: making a reply wait up to 40s behind that would be worse than abandoning, so it keeps the
     // old abandon-on-type (the visitor's reply wins at once).
     playSequence(extras, auto.dog, auto.gapMs ?? (auto.chums ? 20000 : 2000), false, undefined, !auto.chums);
