@@ -106,8 +106,10 @@ export default function PickAChumLauncher() {
   const [terrierSay, setTerrierSay] = useState<string | null>(null);
   const openRef = useRef(open);
   const pathnameRef = useRef(pathname);
+  const autoAppearRef = useRef(autoAppear);
   openRef.current = open;
   pathnameRef.current = pathname;
+  autoAppearRef.current = autoAppear;
 
   // Restore focus to the launcher when the experience closes.
   useEffect(() => {
@@ -126,6 +128,28 @@ export default function PickAChumLauncher() {
       if (window.sessionStorage.getItem(HAS_SPOKEN) && window.sessionStorage.getItem(CHAT_KEY)) setOpen(true);
     } catch {}
   }, []);
+
+  // Task 180 companion: an un-engaged appearance chip must not follow the visitor across a client-side
+  // navigation (a Link click, how people actually move). Gating persistence on HAS_SPOKEN stops a bare chip
+  // being restored on a remount, but a client nav keeps the same mounted panel, so it is dismissed here
+  // instead. On a real pathname CHANGE, if an unbidden appearance (autoAppear) is open and the visitor
+  // never spoke (no HAS_SPOKEN) and the session is not protected, close it -- so the next page shows its own
+  // dog fresh. A real conversation (HAS_SPOKEN) is deliberately left open to follow, per Task 105; a
+  // protected panel (a disclosure was made) is never force-closed. navRef tracks the last-seen route so
+  // this fires only on an actual navigation, not the initial mount.
+  const navRef = useRef(pathname);
+  useEffect(() => {
+    if (navRef.current === pathname) return;
+    navRef.current = pathname;
+    if (!openRef.current || !autoAppearRef.current) return; // only an open, unbidden-appearance panel
+    try {
+      if (window.sessionStorage.getItem(HAS_SPOKEN) || window.sessionStorage.getItem(PROTECTED_FLAG)) return;
+    } catch {
+      return;
+    }
+    setOpen(false);
+    setAutoAppear(null);
+  }, [pathname]);
 
   // Task 105: an explicit close (X / Escape) clears the persisted chat, so a deliberately-closed panel
   // does not reopen on the next page. (Navigating with it open keeps the key and reopens it.)
