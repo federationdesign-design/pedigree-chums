@@ -11,7 +11,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: clamp(155px, 18vw, 215px) 50px clamp(48px, 8vw, 96px);
+  padding: clamp(155px, 18vw, 215px) clamp(24px, 6vw, 80px) clamp(48px, 8vw, 96px);
   text-align: center;
   position: relative;
   overflow: hidden;
@@ -50,7 +50,8 @@
 
 .heroTitle {
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
-  font-size: clamp(3rem, 9vw, 7.5rem);
+  /* H1 size from /home's hero .heroTitle (was clamp(3rem, 9vw, 7.5rem)). */
+  font-size: clamp(2.8rem, 8vw, 6rem);
   line-height: 0.9;
   color: var(--yellow, #ffd23e);
   margin: 100px 0 clamp(16px, 3vw, 32px);
@@ -66,7 +67,7 @@
 
 .heroSub {
   font-family: Montserrat, sans-serif;
-  font-size: clamp(1rem, 2.2vw, 1.5rem);
+  font-size: clamp(1.15rem, 2.5vw, 1.72rem);
   font-weight: 500;
   color: rgba(255,255,255,0.9);
   line-height: 1.6;
@@ -83,7 +84,7 @@
 }
 .wordplay p {
   font-family: Montserrat, sans-serif;
-  font-size: clamp(0.95rem, 1.8vw, 1.2rem);
+  font-size: clamp(1.1rem, 2.1vw, 1.38rem);
   color: rgba(255,255,255,0.85);
   margin: 0 0 6px;
   line-height: 1.5;
@@ -115,7 +116,7 @@
 }
 .pill {
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
-  font-size: clamp(0.85rem, 1.6vw, 1.1rem);
+  font-size: clamp(0.98rem, 1.8vw, 1.27rem);
   padding: clamp(10px, 1.2vw, 14px) clamp(20px, 3vw, 36px);
   border-radius: 999px;
   background: var(--yellow, #ffd23e);
@@ -140,7 +141,7 @@
 }
 .sectionEyebrow {
   font-family: Montserrat, sans-serif;
-  font-size: 0.8rem;
+  font-size: 0.92rem;
   font-weight: 700;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -150,7 +151,9 @@
 }
 .sectionTitle {
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
-  font-size: clamp(2rem, 5.5vw, 4.5rem);
+  /* H2 size from /home's .productTitle / shared FAQ heading, the consistent /home H2
+     display size (was clamp(2rem, 5.5vw, 4.5rem)). */
+  font-size: clamp(4rem, 10vw, 8rem);
   color: var(--yellow, #ffd23e);
   margin: 0 0 clamp(20px, 3vw, 36px);
   line-height: 1.05;
@@ -158,14 +161,14 @@
 }
 .subTitle {
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
-  font-size: clamp(1.2rem, 2.5vw, 1.9rem);
+  font-size: clamp(1.38rem, 2.9vw, 2.2rem);
   color: #ffffff;
   margin: clamp(32px, 4vw, 48px) 0 clamp(10px, 1.5vw, 16px);
   line-height: 1.1;
 }
 .lead {
   font-family: Montserrat, sans-serif;
-  font-size: clamp(1.05rem, 2vw, 1.35rem);
+  font-size: clamp(1.2rem, 2.3vw, 1.55rem);
   font-weight: 600;
   color: #000000; /* prose on gradient -> black, WCAG 1.4.3 (Steve, 12 Aug 2026) */
   line-height: 1.5;
@@ -183,11 +186,11 @@
 
 /* ── Note section ────────────────────────────────────────────────────────── */
 .noteSection {
-  padding: clamp(24px, 3vw, 40px) 50px clamp(12px, 2vw, 24px);
+  padding: clamp(24px, 3vw, 40px) clamp(24px, 6vw, 80px) clamp(12px, 2vw, 24px);
 }
 .noteInner {
   width: 100%;
-  max-width: 1200px;
+  /* Liquid, matching /chumspot: no max-width cap (was 1200px). */
   margin: 0 auto;
 }
 
@@ -209,7 +212,7 @@
   min-width: 0;
 }
 .noteText p {
-  font-size: 1.125rem;
+  font-size: 1.3rem;
 }
 @media (max-width: 640px) {
   .noteRow {
@@ -246,7 +249,7 @@
 
 .noteTitle {
   font-family: Montserrat, sans-serif;
-  font-size: 0.8rem;
+  font-size: 0.92rem;
   font-weight: 700;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -256,7 +259,9 @@
 }
 .noteTitleMain {
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
-  font-size: clamp(2rem, 5vw, 3.6rem);
+  /* Unified to the same /home H2 size as .sectionTitle (was clamp(2rem, 5vw, 3.6rem),
+     the page's second, smaller H2 scale). */
+  font-size: clamp(4rem, 10vw, 8rem);
   color: #ffffff;
   margin: 0 0 clamp(8px, 1vw, 12px);
   text-align: left;
@@ -285,7 +290,7 @@
 
 /* ── Safety section ─────────────────────────────────────────────────────── */
 .safetySection {
-  padding: clamp(16px, 2vw, 24px) 50px clamp(40px, 6vw, 80px);
+  padding: clamp(16px, 2vw, 24px) clamp(24px, 6vw, 80px) clamp(40px, 6vw, 80px);
 }
 .safetyInner {
   width: 100%;
@@ -318,7 +323,7 @@
 }
 .safetyCard h3 {
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
-  font-size: clamp(1rem, 2vw, 1.4rem);
+  font-size: clamp(1.15rem, 2.3vw, 1.6rem);
   color: var(--yellow, #ffd23e);
   margin: 0 0 8px;
   line-height: 1.2;
@@ -329,11 +334,18 @@
   font-weight: 500;
   color: rgba(255,255,255,0.92);
   margin: 0;
+  font-size: clamp(1.12rem, 1.7vw, 1.3rem);
 }
+/* Live fault fix: the 12 August blackening's broad `.cookingInner p` selector
+   (equal specificity, later in the file) leaked onto these navy cards, rendering
+   their body text black on navy at ~1.76:1 (fails WCAG 1.4.3). Re-assert readable
+   white with section + card specificity (0,2,1 beats the leak's 0,1,1). Solid #fff,
+   not rgba, per the no-rgba-on-text rule. Now ~11.9:1. */
+.safetySection .safetyCard p { color: #ffffff; }
 
 .signsList {
   font-family: Montserrat, sans-serif;
-  font-size: clamp(1.02rem, 1.8vw, 1.2rem);
+  font-size: clamp(1.17rem, 2.1vw, 1.38rem);
   font-weight: 500;
   color: rgba(255,255,255,0.95);
   line-height: 2;
@@ -360,11 +372,16 @@
 }
 .alert[data-level="yellow"] { background: #ffd23e; border-color: #ffd23e; color: #0a3a57; }
 .alert[data-level="yellow"] * { color: #0a3a57 !important; }
-.alert[data-level="amber"]  { background: #ff8c00; border-color: #ff8c00; color: #ffffff; }
+/* Amber alert: white label/temp on #ff8c00 measured ~2.33:1 (fails WCAG 1.4.3).
+   Dark text on this light panel, mirroring the yellow alert directly above, so the
+   whole card is navy on amber (~5.1:1). The * !important also beats the blackening
+   leak that had turned the body copy black. */
+.alert[data-level="amber"]  { background: #ff8c00; border-color: #ff8c00; color: #0a3a57; }
+.alert[data-level="amber"] * { color: #0a3a57 !important; }
 .alert[data-level="red"]    { background: #dc3232; border-color: #dc3232; color: #ffffff; }
 .alertLabel {
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
-  font-size: clamp(1.1rem, 2vw, 1.3rem);
+  font-size: clamp(1.27rem, 2.3vw, 1.5rem);
   letter-spacing: 0.06em;
   display: block;
   margin-bottom: 4px;
@@ -378,7 +395,7 @@
 }
 
 .safetyNote {
-  font-size: clamp(0.78rem, 1.1vw, 0.9rem) !important;
+  font-size: clamp(0.9rem, 1.3vw, 1.03rem) !important;
   color: rgba(255,255,255,0.5) !important;
   font-weight: 500 !important;
 }
@@ -410,7 +427,7 @@
 }
 .ruleNum {
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
-  font-size: clamp(1.8rem, 4vw, 3rem);
+  font-size: clamp(2.07rem, 4.6vw, 3.45rem);
   color: var(--yellow, #ffd23e);
   line-height: 1;
   flex: 0 0 auto;
@@ -418,7 +435,7 @@
 }
 .ruleStep strong {
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
-  font-size: clamp(2.2rem, 3.6vw, 2.6rem);
+  font-size: clamp(2.53rem, 4.1vw, 3rem);
   font-weight: 400;
   color: #ffffff;
   display: block;
@@ -426,7 +443,7 @@
 }
 .ruleStep p {
   font-family: Montserrat, sans-serif;
-  font-size: clamp(1rem, 1.5vw, 1.15rem);
+  font-size: clamp(1.15rem, 1.7vw, 1.32rem);
   font-weight: 500;
   color: rgba(255,255,255,0.9);
   margin: 0;
@@ -437,19 +454,33 @@
 .faqSection {
   background: rgba(10,58,87,0.25);
 }
-.faqList { display: flex; flex-direction: column; gap: 4px; margin-top: clamp(20px, 3vw, 36px); columns: 2; column-gap: clamp(24px,4vw,48px); }
-.faqItem {
-  border-radius: 12px;
-  background: #ffffff;
-  overflow: hidden;
-  transition: background 0.15s;
+/* Game FAQ, restyled to match /home's FAQ look (translucent-white items, 3px white
+   border going yellow when open, white question/answer text, yellow +/- marker).
+   Style only, content untouched. Two columns via grid (was CSS `columns: 2` multicol,
+   which could split a details box across the column break); collapses to one below
+   720px. Padding inside the items is unchanged per the brief. */
+.faqList {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 24px;
+  margin-top: clamp(20px, 3vw, 36px);
+  align-items: start;
 }
-.faqItem[open] { background: #ffffff; }
+@media (max-width: 720px) { .faqList { grid-template-columns: 1fr; } }
+.faqItem {
+  background: rgba(255, 255, 255, 0.08);
+  border: 3px solid #ffffff;
+  border-radius: 16px;
+  overflow: hidden;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+.faqItem:hover { border-color: var(--navy, #0a3a57); }
+.faqItem[open] { background: rgba(255, 255, 255, 0.12); border-color: var(--yellow, #ffd23e); }
 .faqQ {
   font-family: Montserrat, sans-serif;
-  font-size: clamp(0.9rem, 1.5vw, 1.05rem);
+  font-size: clamp(1.04rem, 1.7vw, 1.21rem);
   font-weight: 700;
-  color: var(--navy, #0a3a57);
+  color: #ffffff;
   padding: clamp(14px, 2vw, 20px) clamp(16px, 2.5vw, 24px);
   cursor: pointer;
   list-style: none;
@@ -462,16 +493,18 @@
 .faqQ::after {
   content: "+";
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
-  font-size: 1.4rem;
-  color: var(--navy, #0a3a57);
+  font-size: 1.6rem;
+  color: var(--yellow, #ffd23e);
   flex: 0 0 auto;
   transition: transform 0.2s;
 }
 .faqItem[open] .faqQ::after { transform: rotate(45deg); }
-.faqA {
+/* `.faqItem .faqA` (0,2,0) beats the blackening's `.gameTwoCols p` (0,1,1) leak so
+   the answer follows the white /home treatment instead of rendering black. */
+.faqItem .faqA {
   font-family: Montserrat, sans-serif;
-  font-size: clamp(0.85rem, 1.3vw, 1rem);
-  color: var(--navy, #0a3a57);
+  font-size: clamp(0.98rem, 1.5vw, 1.15rem);
+  color: #ffffff;
   line-height: 1.7;
   margin: 0;
   padding: 0 clamp(16px, 2.5vw, 24px) clamp(14px, 2vw, 20px);
@@ -481,7 +514,7 @@
 .endSection { text-align: center; }
 .endLine {
   font-family: Montserrat, sans-serif;
-  font-size: clamp(0.95rem, 1.8vw, 1.2rem);
+  font-size: clamp(1.1rem, 2.1vw, 1.38rem);
   color: #000000; /* prose on gradient -> black, WCAG 1.4.3 (Steve, 12 Aug 2026) */
   margin: 0 0 8px;
   line-height: 1.5;
@@ -545,13 +578,13 @@
 
 
 .cookingInner .lead,
-.cookingInner > p:not([class]) { font-size: 1.2rem; }
+.cookingInner > p:not([class]) { font-size: 1.38rem; }
 
-.alert p { font-weight: 500; line-height: 1.5; font-size: clamp(0.95rem, 1.5vw, 1.1rem); margin: 8px 0; }
+.alert p { font-weight: 500; line-height: 1.5; font-size: clamp(1.1rem, 1.7vw, 1.27rem); margin: 8px 0; }
 
 .urgentNote {
   text-align: center;
-  font-size: clamp(1.65rem, 3.5vw, 2.1rem);
+  font-size: clamp(1.9rem, 4vw, 2.42rem);
   font-weight: 700;
   margin: clamp(24px, 4vw, 40px) 0;
   color: #ffffff;
@@ -578,16 +611,18 @@
 }
 
 .cookingSection {
-  padding: clamp(12px, 2vw, 20px) 50px clamp(32px, 5vw, 64px);
+  padding: clamp(12px, 2vw, 20px) clamp(24px, 6vw, 80px) clamp(32px, 5vw, 64px);
 }
 .cookingInner {
   width: 100%;
-  max-width: 1200px;
+  /* Liquid, matching /chumspot: no max-width cap. The sections own the side gutters
+     via clamp(24px, 6vw, 80px) padding, so content fills the viewport minus the
+     gutters instead of freezing in a 1200px band. */
   margin: 0 auto;
 }
 
 .gameSection {
-  padding: clamp(32px, 5vw, 64px) 50px;
+  padding: clamp(32px, 5vw, 64px) clamp(24px, 6vw, 80px);
 }
 .gameInner {
   width: 100%;
@@ -598,7 +633,7 @@
 .alertTemp {
   display: block;
   font-family: Montserrat, sans-serif;
-  font-size: clamp(1.5rem, 3vw, 1.85rem);
+  font-size: clamp(1.72rem, 3.4vw, 2.13rem);
   font-weight: 700;
   letter-spacing: 0.02em;
   margin: 4px 0 16px;
@@ -626,7 +661,7 @@
   color: var(--navy, #0a3a57);
   border-radius: 12px;
   padding: clamp(20px, 3vw, 36px);
-  font-size: 0.95rem;
+  font-size: 1.1rem;
   font-weight: 500;
   margin-top: 24px;
   line-height: 1.6;
@@ -656,14 +691,14 @@
 }
 .congaStep strong {
   font-family: var(--font-display, "Luckiest Guy", system-ui);
-  font-size: clamp(1.3rem, 2.8vw, 1.7rem);
+  font-size: clamp(1.5rem, 3.2vw, 1.96rem);
   color: var(--yellow, #ffd23e);
   display: block;
   margin-bottom: 8px;
 }
 .congaStep em {
   font-style: normal;
-  font-size: clamp(0.72rem, 1.2vw, 0.83rem);
+  font-size: clamp(0.83rem, 1.4vw, 0.95rem);
   font-weight: 600;
   color: rgba(255,255,255,0.95);
   line-height: 1.3;
@@ -677,7 +712,7 @@
 }
 .congaCaption {
   text-align: center;
-  font-size: 1rem;
+  font-size: 1.15rem;
   font-weight: 600;
   color: rgba(255,255,255,0.8);
   font-style: italic;
@@ -686,7 +721,7 @@
   padding-top: 16px;
 }
 
-.safetyCol p:not(.lead) { font-size: 1.125rem; font-weight: 500; }
+.safetyCol p:not(.lead) { font-size: 1.3rem; font-weight: 500; }
 
 .alertIcon {
   font-size: 2.2rem;
@@ -711,20 +746,25 @@
   gap: 4px;
   margin-top: 12px;
 }
+/* Cooking mini-accordion, same /home FAQ look as the game FAQ above (single column,
+   it lives in a narrow food column). Style only, content untouched; padding kept. */
 .miniItem {
-  border-radius: 10px;
-  background: var(--yellow, #ffd23e);
-  border: none;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 3px solid #ffffff;
   overflow: hidden;
+  transition: border-color 0.2s ease, background 0.2s ease;
 }
+.miniItem:hover { border-color: var(--navy, #0a3a57); }
 .miniItem[open] {
-  background: #ffffff;
+  background: rgba(255, 255, 255, 0.12);
+  border-color: var(--yellow, #ffd23e);
 }
 .miniQ {
   font-family: Montserrat, sans-serif;
-  font-size: clamp(0.9rem, 1.5vw, 1.05rem);
+  font-size: clamp(1.04rem, 1.7vw, 1.21rem);
   font-weight: 700;
-  color: var(--navy, #0a3a57);
+  color: #ffffff;
   padding: clamp(14px, 2vw, 20px) clamp(16px, 2.5vw, 24px);
   cursor: pointer;
   list-style: none;
@@ -734,13 +774,14 @@
   gap: 12px;
 }
 .miniQ::-webkit-details-marker { display: none; }
-.miniQ::after { content: "+"; font-family: var(--font-display, 'Luckiest Guy', system-ui); font-size: 1.4rem; color: var(--navy, #0a3a57); flex: 0 0 auto; transition: transform 0.2s; }
+.miniQ::after { content: "+"; font-family: var(--font-display, 'Luckiest Guy', system-ui); font-size: 1.6rem; color: var(--yellow, #ffd23e); flex: 0 0 auto; transition: transform 0.2s; }
 details[open] .miniQ::after { transform: rotate(45deg); }
-.miniA {
+/* `.miniAccordion .miniA` (0,2,0) beats the blackening's `.foodCol p` (0,1,1) leak. */
+.miniAccordion .miniA {
   font-family: Montserrat, sans-serif;
-  font-size: clamp(0.85rem, 1.3vw, 1rem);
+  font-size: clamp(0.98rem, 1.5vw, 1.15rem);
   font-weight: 400;
-  color: var(--navy, #0a3a57);
+  color: #ffffff;
   padding: 0 clamp(16px, 2.5vw, 24px) clamp(14px, 2vw, 20px);
   margin: 0;
   line-height: 1.7;
