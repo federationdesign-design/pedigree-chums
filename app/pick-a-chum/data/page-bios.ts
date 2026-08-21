@@ -36,20 +36,14 @@ export const PAGE_BIOS: PageBio[] = [
   { route: '/know-your-chums', name: 'Know Your Chums', bio: 'Learn about the breeds in the pack', extended: 'All 54 of us, one at a time. Tap a face, read the card. Find your favourite.' },
   { route: '/chums/[slug]', name: 'A breed page', bio: 'Learn more about {{BREED}} like lifespan and temperament', extended: 'Everything on the {{BREED}}. The job it was bred for, the size, how long it lasts. Scroll for the lot.' },
   { route: '/britains-dog-history', name: 'Britain\'s Dog History', bio: 'Where you learn the history of British dogs.', extended: 'Where the old dogs are. Dig through the family trees and follow a line back as far as it goes.', sequence: ['oi oi', 'you can learn about all British dogs that have ever existed', 'Dig through the family trees'] },
-  // Task 153: the Collie's warning-disguised-as-invitation. THREE separate messages (section 3, verbatim);
-  // the beat before the third is the joke. Not softened -- a reader who likes reading is invited in, one
-  // who does not is told kindly before committing to 3,000 words.
-  { route: '/good-dog-bad-dog', name: 'Good Dog, Bad Dog', bio: 'Learn about why some dogs get called bad, some are good boys', extended: 'Stories of dogs who went good and dogs who went bad. Pick one and read it.', sequence: ['Tuck in if you like history, stories, and dogs and how they all cross over.', 'I like to learn stuff, but these just take too much time to read.', "I'd rather be herding something."] },
+  // Task 153: the Collie's invitation into the good-dog / bad-dog stories. Owner copy (opener + one follow-up).
+  { route: '/good-dog-bad-dog', name: 'Good Dog, Bad Dog', bio: 'Learn about why some dogs get called bad, some are good boys', extended: 'Stories of dogs who went good and dogs who went bad. Pick one and read it.', sequence: ['do you like history? stories? and dogs...', 'learn how they all cross over here'] },
   { route: '/name-generator', name: 'Name Generator', bio: 'Where you can generate a name for a real or imaginary dog.', extended: 'Need a name? Press the button till one fits. Works for a real dog or a made-up one.', sequence: ['oi oi', 'Need a name? build a shortlist of the names you like', 'then enter the knockout round to find your favourite'] },
   { route: '/chum-calculator', name: 'Chum Finder', bio: 'Answer questions about your life and we will see which breeds suit you', extended: 'Answer a few questions and it tells you which of us you would get on with. Answer honest.' },
   { route: '/hot-dogs', name: 'Hot Dogs', bio: 'Advise on all kinds of hotdogs', extended: 'Hot dogs. The food and the game flavour, all in one place. Do not overthink it.', craving: 'I like hotdogs' },
-  // Task 153: the Collie is the only dog who has DONE these jobs. Three messages: her credentials (a
-  // professional listing, not a boast), the dogs-as-technology shrug (true at three levels -- a farming
-  // technology, a computer, a character made of code -- landed as a shrug, never explained), and the
-  // productivity claim HEDGED ("a farmer told me") because the 40x figure is unverifiable, not wrong: no
-  // one has run a controlled comparison of gathering with and without a dog. FLAG 40x FOR THE STATS AUDIT.
-  // PLACEHOLDER copy pending owner rewrite (section 4).
-  { route: '/dogs-at-work', name: 'Dogs at Work', bio: 'We work, here you can learn about some jobs we have', extended: 'The jobs dogs actually do. Sniffing, herding, guarding. Proper work, not tricks.', sequence: ['I still do this one. I move sheep. Some of the jobs on this page are proper work; some are just fetching.', 'dogs were a technology, once. humans farmed with us. and here I am now, code on a screen. same job, really.', "a farmer told me that back when I was integral to the herding, we let them do about forty times the work they would without us. cant prove it, mind. nobody farms sheep without a dog."] },
+  // Task 153: the Collie's credentials on the jobs page -- she is the only dog who has actually done these.
+  // Owner copy (opener + one follow-up); the unverifiable "forty times the work" claim was removed with it.
+  { route: '/dogs-at-work', name: 'Dogs at Work', bio: 'We work, here you can learn about some jobs we have', extended: 'The jobs dogs actually do. Sniffing, herding, guarding. Proper work, not tricks.', sequence: ['I still do work', 'Some of the jobs on this page are proper work; some are just fetching'] },
   // Task 153 (section 8 note): the Boxer's /smarter read is retro-fitted onto the sequence (it shipped as
   // one multi-line block before the player existed). Three messages now; he is then wrong in chat (the
   // maths gag, Task 145). PLACEHOLDER, pending owner rewrite.
