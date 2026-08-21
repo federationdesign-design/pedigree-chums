@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Nav from "../../../components/Nav/Nav";
 import Footer from "../../../components/Footer/Footer";
 import type { Metadata } from "next";
 import styles from "../preorder.module.css";
@@ -20,6 +21,9 @@ export default function PreorderSuccess() {
 
   return (
     <>
+    {/* showLogo: this page has no hero and does not scroll, so the logo must be
+        shown from the top rather than fading in on scroll (it never would here). */}
+    <Nav showLogo />
     <main className={styles.page}>
       <section className={styles.card}>
         <p className={styles.kicker}>Pre-order confirmed</p>
