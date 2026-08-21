@@ -330,7 +330,7 @@ check('what is this', { action: 'orientation', bucket: 'B15' });
 check('what is this dog', { bucket: 'B05', action: 'breed_hub' }, { assert: (r) => (r.action === 'orientation' ? 'exact orientation match leaked to a longer input' : null) });
 // (b) bare "help" -> the approved BARE_HELP clarifier (same line "can you help me"
 // gets); "help me find a labrador" is unchanged (already that clarifier).
-check('help', { action: 'clarifier' }, { assert: (r, resp) => (r.moderationId === 'MOD_BARE_HELP' && resp.text.toLowerCase().includes('worrying you') ? null : `not the bare-help clarifier: ${r.moderationId}`) });
+check('help', { action: 'clarifier' }, { assert: (r, resp) => (r.moderationId === 'MOD_BARE_HELP' && resp.text.toLowerCase().includes('help with something on the site') ? null : `not the bare-help clarifier: ${r.moderationId}`) });
 check('help me find a labrador', { action: 'clarifier' }, { assert: (r) => (r.moderationId === 'MOD_BARE_HELP' ? null : `changed from bare-help clarifier: ${r.moderationId}`) });
 
 // ---- Task 13/28: a QUESTION naming the bark game now reaches the explanation (Task 28a),
@@ -542,7 +542,7 @@ check('im in trouble', { layer: 1, action: 'safety_signpost' }, { assert: (_r, r
 check('I think I might drunk drive later', { layer: 1, action: 'safety_boundary' }, { assert: (_r, resp) => (resp.text.includes('999') ? null : 'expected 999') });
 check("What's your advice on drink-driving?", { layer: 1, action: 'safety_boundary' });
 check('poison the dog', { layer: 1, action: 'safety_boundary' }, { assert: (_r, resp) => (resp.text.includes('RSPCA') ? null : 'expected RSPCA') });
-check('help me', { layer: 1, action: 'clarifier' }, { assert: (_r, resp) => (resp.text.toLowerCase().includes('worrying you') ? null : 'expected clarifier line') });
+check('help me', { layer: 1, action: 'clarifier' }, { assert: (_r, resp) => (resp.text.toLowerCase().includes('help with something on the site') ? null : 'expected clarifier line') });
 // Collisions resolved by longest match, not first category:
 check('I am not safe', { action: 'safety_signpost' }, { assert: (r) => (r.moderationId === 'MOD_GENERAL_DISTRESS' ? null : `not-safe misrouted to ${r.moderationId}`) });
 check('can someone help me', { action: 'safety_signpost' }, { assert: (r) => (r.moderationId === 'MOD_GENERAL_DISTRESS' ? null : `plea misrouted to ${r.moderationId}`) });
