@@ -7,13 +7,19 @@
   position: relative;
   color: #fff;
   font-family: var(--font-body, 'Montserrat', system-ui);
-  /* Single in-flow grid. Full-bleed hero and slider span all tracks; the FAQ and
-     checkout share the middle row with a fixed 28px gap. Liquid, like /chumspot
-     and the article pages: the side gutters are fixed page padding (no max-width
-     cap) and the FAQ is the flexible 1fr column, so it grows with the viewport
-     (538px at 1280, ~692px at 1440, ~1172px at 1920). The checkout stays a fixed
-     560px because the Stripe card is a set width. Collapses to a flex column below
-     860px (see the media queries at the foot of this file). */
+  /* Single in-flow grid. Full-bleed hero (row 1), a full-bleed centred text-toggle
+     row (row 2), then the FAQ + checkout row (row 3) sharing a fixed 28px gap, then
+     the full-bleed slider (row 4). Liquid, like /chumspot and the article pages: the
+     side gutters are fixed page padding (no max-width cap) and the FAQ is the flexible
+     1fr column, so it grows with the viewport (538px at 1280, ~692px at 1440, ~1172px
+     at 1920). The checkout stays a fixed 560px because the Stripe card is a set width.
+     Collapses to a flex column below 860px (see the media queries at the foot of this
+     file). */
+  /* Height of the centred toggle row (row 2). The checkout lift subtracts it so the
+     card top stays ~440px down even though a row was inserted above it (see
+     .checkoutCol). Matches the ArticleTextToggle centred control: 36px top + 12px
+     bottom margin around a ~40px tall icon button. */
+  --toggle-row-h: 88px;
   display: grid;
   grid-template-columns:
     [full-start] clamp(24px, 6vw, 80px)
@@ -82,18 +88,20 @@
 
 /* ── Checkout column ──
    The 560px right track of the .wrap grid, in normal flow. Lifted with a negative
-   margin so its top lands 440px down the page, overlapping the hero from the right
+   margin so its top lands ~440px down the page, overlapping the hero from the right
    exactly as before, but WITHOUT absolute positioning: the column still takes part
    in flow, so its height (which only grows vertically as the Stripe iframe expands)
    is what pushes the slider down. The lift is tied to the hero's own height so the
-   two stay locked at every viewport: card top = heroTop(0) + 440px, because
-   grid-row 2 starts at the hero's height and the negative margin subtracts it. */
+   two stay locked at every viewport: card top = heroTop(0) + 440px. Grid-row 3 now
+   starts at heroHeight + toggle-row height (the toggle row is row 2), so the lift
+   subtracts BOTH: the hero height (keeping the hero/card tracking) and --toggle-row-h
+   (undoing the inserted row) to return the card top to 440px. */
 .checkoutCol {
   grid-column: checkout-start / main-end;
-  grid-row: 2;
+  grid-row: 3;
   position: relative;
   z-index: 3;
-  margin-top: calc(440px - clamp(460px, 80vh, 1000px));
+  margin-top: calc(440px - clamp(460px, 80vh, 1000px) - var(--toggle-row-h));
 }
 
 /* Intro copy, directly below the checkout card in the same in-flow column. */
@@ -136,20 +144,36 @@
   letter-spacing: 0.04em;
 }
 
+/* ── Text toggle row ──
+   Full-bleed row 2, between the hero and the content, holding the centred
+   ArticleTextToggle (white body text at rest, navy when toggled, matching /home).
+   position/z-index sit it BELOW the lifted checkout card (z-index 3): where the
+   card overlaps this band on narrower desktops the card wins, so the toggle can
+   never cover the Stripe iframe. The ArticleTextToggle centres itself; this row
+   just places it and owns the ~88px height the checkout lift compensates for. */
+.toggleRow {
+  grid-column: full-start / full-end;
+  grid-row: 2;
+  display: flex;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+}
+
 /* ── FAQ column ──
-   The 538px left track of the .wrap grid, sitting 50px below the hero. No reserved
-   min-height any more: the checkout beside it is in flow now, so nothing needs to
+   The 1fr left track of the .wrap grid, sitting 50px below the toggle row. No
+   reserved min-height: the checkout beside it is in flow, so nothing needs to
    reserve vertical space for its tallest state. */
 .faqCol {
   grid-column: main-start / faq-end;
-  grid-row: 2;
+  grid-row: 3;
   margin-top: 50px;
 }
 
 /* Chum slider row, full width below both columns. */
 .sliderWrap {
   grid-column: full-start / full-end;
-  grid-row: 3;
+  grid-row: 4;
   margin-top: clamp(36px, 5vw, 72px);
 }
 
@@ -167,17 +191,36 @@
 }
 .faqHeading span { color: var(--yellow, #ffd23e); }
 
+/* ── Text toggle: white at rest -> navy when on ──
+   The below-hero prose on /preorder is all white on the body gradient (this page
+   never had the 12 August blackening), so the toggle flips every white-on-gradient
+   element to navy: the intro title, the product blurb and its inline white spans,
+   the meta labels/values and the FAQ heading. The FAQ ladder itself is the shared
+   component and carries its own invert rule in components/FAQ/FAQ.module.css, so it
+   flips too without a rule here. EXCLUDED and left white: the hero title/sub (over
+   the hero photograph, where navy would be illegible) and the Stripe card (a cream
+   panel with its own dark text). Yellow accents are untouched. Gated on
+   :root:not([data-pc-contrast-scheme]) so a future accessibility scheme wins. The
+   contrast trade is the accepted /home one: white ~1.5:1 (cyan) to ~3.3:1 (blue) at
+   rest; navy ~7.7:1 (cyan) to ~3.6:1 (blue) when toggled. */
+:root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"] :is(.introTitle, .introDesc, .white, .metaLabel, .metaValue, .faqHeading) {
+  color: var(--navy, #0a3a57);
+}
+
 /* ── Below 860px: stack ──
-   The grid collapses to a single flex column. Source order is hero, checkout, FAQ,
-   slider; order pulls the checkout above the hero (as before) and drops the desktop
-   negative-margin lift. The checkout column centres itself and gains side padding so
-   the card is not edge-to-edge. */
+   The grid collapses to a single flex column. Source order is hero, toggle, checkout,
+   FAQ, slider; order pulls the checkout above the hero (as before) and drops the
+   desktop negative-margin lift, so there is no lift to overlap the toggle here. The
+   toggle sits between the hero and the FAQ (order 0, after the hero by source order).
+   The checkout column centres itself and gains side padding so the card is not
+   edge-to-edge. */
 @media (max-width: 860px) {
   .wrap {
     display: flex;
     flex-direction: column;
   }
   .hero { order: 0; }
+  .toggleRow { order: 0; }
   .checkoutCol {
     order: -1;
     margin: 0 auto;
