@@ -101,24 +101,16 @@
   margin-top: 18px;
 }
 
-/* Body prose in the split's text column -> black on the site gradient (WCAG
-   1.4.3, Steve 12 Aug 2026). Scoped to .contentCol (used only by /about), so the
-   GLOBAL .point class used inside PitchPanel stays white. Headings (h1/h2) keep
-   the white base set above. Compounded with .contentCol so the :global does not
-   trip the CSS-Modules build trap. */
-.contentCol :global(.lead),
-.contentCol :global(.point) {
-  color: #000000;
-}
-/* The /about article text toggle recolours the page's white prose to navy, but this
-   column's body is already compliant black on the gradient (~6.3:1+), so keep it black
-   in both toggle states: navy would only drop it below AA at the deep end, with no
-   reading benefit to changing compliant text. Out-specifies the global toggle recolour
-   in globals.css (Steve, 18 Aug 2026). */
-:global(:root:not([data-pc-contrast-scheme]) main[data-pc-page="about"][data-pc-textinvert="on"]) .contentCol :global(.lead),
-:global(:root:not([data-pc-contrast-scheme]) main[data-pc-page="about"][data-pc-textinvert="on"]) .contentCol :global(.point) {
-  color: #000000;
-}
+/* The split's text-column body ("Each card includes:" lead and the two spot lists)
+   used to be forced black at rest (Steve, 12 Aug 2026) and held black through the
+   article text toggle (Steve, 18 Aug 2026). Both overrides were removed on Steve's
+   decision (21 Aug 2026): the lead and lists are now white at rest and follow the
+   toggle to navy, for consistency with /home and /chumspot. The lead-in and its lists
+   behave as one, so the lead is not left black sitting above white list text. This
+   accepts the rest-state drop from ~6.3:1 to ~1.45:1. With no override here, .lead and
+   .point fall back to their white global defaults (globals.css) at rest and to the
+   global /about toggle recolour (navy) when toggled on. Headings (h1/h2) keep the white
+   base set above. Do not reinstate the black default. */
 
 /* Spaniel (reverse) block: copy bumped ~2pt larger than the shared defaults. */
 .reverse .contentCol h2 {
