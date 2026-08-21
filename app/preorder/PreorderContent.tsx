@@ -1,5 +1,5 @@
 import PreorderCheckout from "./PreorderCheckout";
-import FaqLadder from "./FaqLadder";
+import FAQ from "../../components/FAQ/FAQ";
 import CardRail from "../../components/CardRail/CardRail";
 import styles from "./preorderContent.module.css";
 
@@ -69,12 +69,15 @@ export default function PreorderContent() {
       </div>
 
       {/* FAQ column: the left grid track (538px at 1280). A real in-flow column
-          beside the checkout, not a phantom half of an empty two-track grid. */}
+          beside the checkout, not a phantom half of an empty two-track grid. The
+          shared FAQ in single-column, bare mode (no built-in heading, no page
+          padding), so the questions live in one place; the heading below stays
+          local because it is smaller and left-aligned, not the big centred /home one. */}
       <section className={styles.faqCol}>
         <h2 className={styles.faqHeading}>
           Frequently Asked <span>Questions</span>
         </h2>
-        <FaqLadder />
+        <FAQ columns={1} bare />
       </section>
 
       {/* Chum card slider, reused from components/CardRail exactly as /about does. */}
