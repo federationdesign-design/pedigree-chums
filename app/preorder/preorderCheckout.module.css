@@ -44,9 +44,11 @@
   margin: 0;
 }
 
-/* The cream card holds Stripe's embedded iframe, keeping it on a light surface. */
+/* The cream card holds Stripe's embedded iframe, keeping it on a light surface.
+   Width is 100% so it fills its column: on /preorder the parent grid track sets
+   the width (560px desktop, min(92vw,620px) when stacked on mobile). */
 .checkout {
-  width: min(92vw, 620px);
+  width: 100%;
   background: var(--cream);
   border-radius: var(--radius-card);
   padding: clamp(16px, 3vw, 26px);
@@ -63,7 +65,7 @@
 }
 
 .notice {
-  width: min(92vw, 620px);
+  width: 100%;
   text-align: center;
   font-family: var(--font-body), system-ui, sans-serif;
   font-weight: 700;

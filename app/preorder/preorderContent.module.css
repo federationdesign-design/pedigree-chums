@@ -7,10 +7,27 @@
   position: relative;
   color: #fff;
   font-family: var(--font-body, 'Montserrat', system-ui);
+  /* Single in-flow grid. Full-bleed hero and slider span all tracks; the FAQ
+     (538px) and checkout (560px) share the middle row with a fixed 28px gap and
+     1fr side gutters, so on wide screens the surplus becomes symmetric outer
+     margin rather than an empty gap between the two columns. At 1280 the gutters
+     land at ~77px, giving FAQ exactly 538px. Collapses to a flex column below
+     860px (see the media queries at the foot of this file). */
+  display: grid;
+  grid-template-columns:
+    [full-start] minmax(clamp(20px, 6vw, 80px), 1fr)
+    [main-start] minmax(0, 538px)
+    [faq-end] 28px
+    [checkout-start] minmax(0, 560px)
+    [main-end] minmax(clamp(20px, 6vw, 80px), 1fr)
+    [full-end];
+  align-items: start;
 }
 
 /* ── Hero (inlined copy of the /home hero, not the shared component) ── */
 .hero {
+  grid-column: full-start / full-end;
+  grid-row: 1;
   position: relative;
   width: 100%;
   min-height: clamp(460px, 80vh, 1000px);
@@ -62,31 +79,23 @@
   max-width: 520px;
 }
 
-/* ── Checkout stage ──
-   Right-aligned card overlapping the hero. Positioned ABSOLUTELY within .wrap
-   with a fixed top of 440px (its top edge sits 440px down the page, overlapping
-   the hero), so it is out of normal flow and does not push the sections below:
-   the checkout and the FAQ column are independent, and growing the iframe does
-   not move the FAQ. Full bleed via left/right: 0 with the card right-aligned by
-   the flex. */
-.stage {
-  position: absolute;
-  top: 440px;
-  left: 0;
-  right: 0;
+/* ── Checkout column ──
+   The 560px right track of the .wrap grid, in normal flow. Lifted with a negative
+   margin so its top lands 440px down the page, overlapping the hero from the right
+   exactly as before, but WITHOUT absolute positioning: the column still takes part
+   in flow, so its height (which only grows vertically as the Stripe iframe expands)
+   is what pushes the slider down. The lift is tied to the hero's own height so the
+   two stay locked at every viewport: card top = heroTop(0) + 440px, because
+   grid-row 2 starts at the hero's height and the negative margin subtracts it. */
+.checkoutCol {
+  grid-column: checkout-start / main-end;
+  grid-row: 2;
+  position: relative;
   z-index: 3;
-  display: flex;
-  justify-content: flex-end;
-  align-items: flex-start;
-  padding: 0 clamp(16px, 5vw, 48px);
+  margin-top: calc(440px - clamp(460px, 80vh, 1000px));
 }
 
-.col {
-  width: min(92vw, 620px);
-}
-
-/* Intro copy, directly below the checkout card and part of the same absolute
-   stage, so it tracks the card's bottom edge and never touches the FAQ's flow. */
+/* Intro copy, directly below the checkout card in the same in-flow column. */
 .intro {
   margin-top: clamp(20px, 3vw, 32px);
 }
@@ -126,31 +135,21 @@
   letter-spacing: 0.04em;
 }
 
-/* ── FAQ block ──
-   Anchored 50px below the hero's bottom edge (margin-top), independent of the
-   absolutely-positioned checkout above it. */
-.twoCol {
-  position: relative;
-  z-index: 1;
-  /* margin-top alone sets the gap; top padding is 0 so the FAQ column's top
-     lands exactly 50px below the hero, not 50px + padding. */
+/* ── FAQ column ──
+   The 538px left track of the .wrap grid, sitting 50px below the hero. No reserved
+   min-height any more: the checkout beside it is in flow now, so nothing needs to
+   reserve vertical space for its tallest state. */
+.faqCol {
+  grid-column: main-start / faq-end;
+  grid-row: 2;
   margin-top: 50px;
-  /* Reserve the checkout stage's tallest state so the slider always sits below
-     it and nothing overlaps at any card height. The stage is absolute at
-     top:440px; at the max card (~1308px) plus the intro beneath it (~300px) its
-     bottom reaches ~2050px down the page. The FAQ starts at HERO_H + 50px, so
-     this floor pushes the twoCol bottom (and the slider after it) to ~2090px
-     regardless of how tall the card is. Reset on mobile, where the stage is in
-     normal flow (see the 720px rule). */
-  min-height: calc(2040px - clamp(460px, 80vh, 1000px));
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: clamp(28px, 4vw, 56px);
-  align-items: start;
-  padding: 0 clamp(20px, 6vw, 80px) clamp(36px, 5vw, 72px);
 }
-@media (max-width: 860px) {
-  .twoCol { grid-template-columns: 1fr; }
+
+/* Chum slider row, full width below both columns. */
+.sliderWrap {
+  grid-column: full-start / full-end;
+  grid-row: 3;
+  margin-top: clamp(36px, 5vw, 72px);
 }
 
 /* FAQ ladder, single column (inlined copy of components/FAQ). */
@@ -240,36 +239,42 @@
   color: var(--navy, #0a3a57);
 }
 
-/* ── Mobile, below 721px ──
-   The page stacks. The checkout stage returns to normal flow (position: static)
-   and comes first (order: -1), above the hero; the desktop absolute lift and its
-   inline top offset no longer apply once it is static. The hero text is hidden.
-   The two column block is already one column here (see the 860px rule above),
-   FAQ then intro from source order. The chum slider is untouched. */
-@media (max-width: 720px) {
+/* ── Below 860px: stack ──
+   The grid collapses to a single flex column. Source order is hero, checkout, FAQ,
+   slider; order pulls the checkout above the hero (as before) and drops the desktop
+   negative-margin lift. The checkout column centres itself and gains side padding so
+   the card is not edge-to-edge. */
+@media (max-width: 860px) {
   .wrap {
     display: flex;
     flex-direction: column;
   }
-  .stage {
-    position: static;
+  .hero { order: 0; }
+  .checkoutCol {
     order: -1;
-    justify-content: center;
+    margin: 0 auto;
+    max-width: min(92vw, 620px);
     padding-top: clamp(16px, 5vw, 28px);
   }
-  /* Show the hero copy on phones (headline + price / delivery / Stripe copy)
-     instead of hiding it. It sits at the bottom of the hero image; a navy scrim
-     background keeps it legible over the busy photo (background tint, not text
-     opacity). */
+  .faqCol {
+    order: 1;
+    margin-top: 0;
+    padding: 0 clamp(20px, 6vw, 80px);
+  }
+  .sliderWrap {
+    order: 2;
+    margin-top: clamp(28px, 5vw, 56px);
+  }
+}
+
+/* ── Below 720px: hero copy scrim ──
+   Show the hero copy on phones (headline + price / delivery / Stripe copy). It sits
+   at the bottom of the hero image; a navy scrim background keeps it legible over the
+   busy photo (background tint, not text opacity). */
+@media (max-width: 720px) {
   .heroContent {
     width: 100%;
     background: rgba(10, 58, 87, 0.72);
     padding: clamp(18px, 5vw, 26px) clamp(18px, 5vw, 26px) clamp(20px, 6vw, 30px);
-  }
-  /* No 50px hero offset, and no reserved height, once the column is stacked
-     below the hero (the stage is in normal flow here, so it can't overlap). */
-  .twoCol {
-    margin-top: 0;
-    min-height: 0;
   }
 }
