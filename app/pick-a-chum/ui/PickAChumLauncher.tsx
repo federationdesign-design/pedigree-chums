@@ -45,10 +45,12 @@ const ICON_FRAMES = [
 const FRAME_MS = 200;
 const CYCLES = 3; // Task 97: play the four-frame sequence this many times on appearance, then rest
 const APPEAR_HOLD_MS = 2000; // Task (JS hold): wait this long after the logo becomes visible, then reveal
-// Task 148: the Terrier's unbidden lines. His two auto-appear pages carry OI_OI; a game find, ten
+// Task 148: the Terrier's unbidden lines. His two auto-appear pages now carry their OWN sequences (the
+// 'oi oi' opener + two page-specific follow-ups, in page-bios.ts), so the sequence path builds his chip
+// line from seq[0]; OI_OI is the shared fallback opener, kept in step with that seq[0]. A game find, ten
 // seconds on, carries HINT_OFFER. Both open MINIMISED (his chip), and section 2's suppression rule
 // (canDogAppear) is checked before either fires.
-const OI_OI = 'oi oi I know all about this page if you want help';
+const OI_OI = 'oi oi';
 // Task 150: the Boxer's confidently-wrong opener (his chip line). He is certain he knows what the page
 // is; the reveal (his misread) shows how wrong. PLACEHOLDER, pending owner rewrite.
 const BOXER_OPENER = 'oh! this page? i know this one. i know EXACTLY what this is';
@@ -116,9 +118,12 @@ export default function PickAChumLauncher() {
   // Task 105: an open chat persists across navigation. If one was persisted (and not a protected
   // session -- the experience never writes those), reopen it on mount. This OVERRIDES the logo rule:
   // an open panel stays open even on a page where the launcher itself would be hidden.
+  // Task 180: reopen ONLY a chat the visitor actually spoke in (HAS_SPOKEN). Persistence no longer writes a
+  // bare un-engaged appearance, but this also refuses any stale bare-chip payload, so a monologue never
+  // reopens on the next page (and cannot suppress that page's own dog). A real conversation still follows.
   useEffect(() => {
     try {
-      if (window.sessionStorage.getItem('pc-chat')) setOpen(true);
+      if (window.sessionStorage.getItem(HAS_SPOKEN) && window.sessionStorage.getItem(CHAT_KEY)) setOpen(true);
     } catch {}
   }, []);
 

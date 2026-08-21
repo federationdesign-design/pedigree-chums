@@ -196,6 +196,14 @@ function readChat(): { messages: Message[]; session: Session; dog: Dog; phase: P
       if (typeof window !== 'undefined') window.sessionStorage.removeItem(CHAT_KEY);
       return null;
     }
+    // Task 180: only restore a chat the visitor actually SPOKE in (HAS_SPOKEN). An unbidden appearance the
+    // visitor never answered is not a conversation; a stale bare-chip payload (from before persistence was
+    // gated, or a race) is scrubbed rather than restored, so a monologue never reopens on -- or leaks into
+    // -- the next page's dog. A real conversation still restores and follows, per Task 105.
+    if (typeof window !== 'undefined' && !window.sessionStorage.getItem(HAS_SPOKEN)) {
+      window.sessionStorage.removeItem(CHAT_KEY);
+      return null;
+    }
     return s;
   } catch {
     return null;
@@ -975,11 +983,16 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
       return;
     }
     try {
-      window.sessionStorage.setItem(CHAT_KEY, JSON.stringify({ messages, session, dog, phase, recSessionId: recSessionRef.current, minimised }));
-      // Task 176: mark that the VISITOR has actually sent a message (a 'user' bubble exists), distinct from
-      // CHAT_KEY (which an unbidden appearance sets on its own). Case A gates on this. Survives navigation
-      // via sessionStorage; a restored chat re-derives it here from its messages.
-      if (messages.some((m) => m.who === 'user')) window.sessionStorage.setItem(HAS_SPOKEN, '1');
+      // Task 180: persist the chat ONLY once the visitor has actually spoken (a 'user' bubble exists).
+      // An unbidden appearance the visitor never answered is a monologue, not a conversation; persisting it
+      // made the previous page's line follow across pages and surface under the next dog (the CHAT_KEY
+      // overreach Task 176 flagged, finished here). A bare chip now writes nothing, so it cannot be restored
+      // or reopened elsewhere; a real chat persists and follows, exactly as Task 105 intends. CHAT_KEY and
+      // HAS_SPOKEN are now written together, so CHAT_KEY present always means a real conversation.
+      if (messages.some((m) => m.who === 'user')) {
+        window.sessionStorage.setItem(CHAT_KEY, JSON.stringify({ messages, session, dog, phase, recSessionId: recSessionRef.current, minimised }));
+        window.sessionStorage.setItem(HAS_SPOKEN, '1');
+      }
     } catch {}
   }, [messages, phase, dog, minimised]);
 
