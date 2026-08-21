@@ -7,19 +7,20 @@
   position: relative;
   color: #fff;
   font-family: var(--font-body, 'Montserrat', system-ui);
-  /* Single in-flow grid. Full-bleed hero and slider span all tracks; the FAQ
-     (538px) and checkout (560px) share the middle row with a fixed 28px gap and
-     1fr side gutters, so on wide screens the surplus becomes symmetric outer
-     margin rather than an empty gap between the two columns. At 1280 the gutters
-     land at ~77px, giving FAQ exactly 538px. Collapses to a flex column below
+  /* Single in-flow grid. Full-bleed hero and slider span all tracks; the FAQ and
+     checkout share the middle row with a fixed 28px gap. Liquid, like /chumspot
+     and the article pages: the side gutters are fixed page padding (no max-width
+     cap) and the FAQ is the flexible 1fr column, so it grows with the viewport
+     (538px at 1280, ~692px at 1440, ~1172px at 1920). The checkout stays a fixed
+     560px because the Stripe card is a set width. Collapses to a flex column below
      860px (see the media queries at the foot of this file). */
   display: grid;
   grid-template-columns:
-    [full-start] minmax(clamp(20px, 6vw, 80px), 1fr)
-    [main-start] minmax(0, 538px)
+    [full-start] clamp(24px, 6vw, 80px)
+    [main-start] minmax(0, 1fr)
     [faq-end] 28px
-    [checkout-start] minmax(0, 560px)
-    [main-end] minmax(clamp(20px, 6vw, 80px), 1fr)
+    [checkout-start] 560px
+    [main-end] clamp(24px, 6vw, 80px)
     [full-end];
   align-items: start;
 }
