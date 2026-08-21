@@ -90,6 +90,20 @@ export interface Session {
   // as session state the same way lastAction is. Lets "what is this page" answer with that page's
   // bio. Undefined outside the browser (the harness), so the page-bio route only fires live.
   route?: string;
+  // Task 177: the Boxer's /about fact-loop. Seeded true by the experience when the /about appearance
+  // shows misread #1; while true, a filler reply (a greeting, "ok", "why", "haha", a shrug, a lone
+  // unresolved word) draws the NEXT misread instead of ending the appearance. It is set back to false
+  // -- permanently, for the session -- the moment a real route wins (safety, grief, sadness, health,
+  // commerce, rules, FAQ, a dismissal, a breed, or any coherent multi-word statement), or when the
+  // tenth fact has been served (a silent end). It never resumes: once false it stays false, so a return
+  // to /about (the chat is still open, so no new appearance fires) cannot restart it. Absent/false in
+  // the harness unless a test seeds it.
+  boxerFactActive?: boolean;
+  // Task 177: the misread indices already served in this loop, seeded from the appearance's own
+  // sessionStorage rotation (`pc-boxer-misreads-used`, incl. misread #1) so facts #2..#10 never repeat
+  // #1. The engine draws the next fact from the unused indices and appends it here -- the SAME no-repeat
+  // pool as pickMisread, but session-scoped so it survives navigation via the persisted chat.
+  boxerFactUsed?: number[];
 }
 
 export function newSession(activeDog: Dog = 'collie'): Session {
@@ -127,5 +141,7 @@ export function newSession(activeDog: Dog = 'collie'): Session {
     gamesPlayed: 0,
     cookieAskPending: false,
     boxerGameAskPending: false,
+    boxerFactActive: false,
+    boxerFactUsed: [],
   };
 }

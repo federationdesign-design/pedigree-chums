@@ -20,6 +20,7 @@ import PickAChumIcon from './PickAChumIcon';
 import { CHUM_DATA } from '../lib/data';
 import { submit, isSensitiveInput, Turn } from '../lib/engine';
 import { newSession, Session } from '../lib/session';
+import { misreadsUsed } from './dogAppearance';
 import { Dog, GameId } from '../lib/types';
 import { reportHiddenGame, reportHat } from '../../../lib/hiddenGames/browserEngine';
 import { chatHatFor, BIRTHDAY_HAT_ID, KENNEL_SKETCH_HAT_ID } from '../../../lib/hiddenGames/hatHunt';
@@ -287,6 +288,20 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
   const auto = !restored && autoAppear ? autoAppear : null;
   const everProtectedRef = useRef(false); // latches once the session enters a protected state
   const sessionRef = useRef<Session | null>(restored ? restored.session : auto ? newSession(auto.dog) : null);
+  // Task 177: seed the Boxer's /about fact-loop, ONCE, at the fresh appearance that has just shown misread
+  // #1. From here a filler reply draws the next fact (engine.submit owns the chain). boxerFactUsed carries
+  // the appearance's spent indices (incl. #1) so #2..#10 never repeat #1. A RESTORED chat keeps whatever
+  // loop state it persisted, so a mid-loop navigation resumes rather than restarts; a spent loop stays
+  // spent. Only the /about Boxer appearance seeds it -- his /home and /smarter pages carry a sequence, not
+  // a misread, and never set this (the loop is scoped to the Boxer on /about, brief section 5).
+  const factSeededRef = useRef(false);
+  if (!factSeededRef.current) {
+    factSeededRef.current = true;
+    if (auto && auto.dog === 'boxer' && auto.route === '/about' && auto.followUps?.length && sessionRef.current) {
+      sessionRef.current.boxerFactActive = true;
+      sessionRef.current.boxerFactUsed = misreadsUsed();
+    }
+  }
   const [phase, setPhase] = useState<Phase>(restored ? restored.phase || 'idle' : auto ? 'idle' : 'selecting');
   const [dog, setDog] = useState<Dog>(restored ? restored.dog || 'collie' : auto ? auto.dog : 'collie'); // active dog (the anchor medallion)
   const [swap, setSwap] = useState<Swap>('none');

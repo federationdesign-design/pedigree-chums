@@ -56,6 +56,16 @@ export function markDismissed(route: string): void {
 // appearance path never runs through the engine (so session.usedResponseIds is not written for it). Once
 // every index has been used the set refills, so a long session keeps cycling; it clears on tab close.
 const MISREAD_KEY = 'pc-boxer-misreads-used';
+// Task 177: the indices the appearance has already spent (incl. misread #1), so the experience can seed
+// the engine's fact-loop from the SAME rotation and never repeat #1 as fact #2. Empty off-browser.
+export function misreadsUsed(): number[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    return JSON.parse(window.sessionStorage.getItem(MISREAD_KEY) || '[]') as number[];
+  } catch {
+    return [];
+  }
+}
 export function pickMisread(misreads: string[]): string {
   if (!misreads.length) return '';
   let used: number[] = [];
