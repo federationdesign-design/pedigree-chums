@@ -366,7 +366,12 @@
 }
 .alert[data-level="yellow"] { background: #ffd23e; border-color: #ffd23e; color: #0a3a57; }
 .alert[data-level="yellow"] * { color: #0a3a57 !important; }
-.alert[data-level="amber"]  { background: #ff8c00; border-color: #ff8c00; color: #ffffff; }
+/* Amber alert: white label/temp on #ff8c00 measured ~2.33:1 (fails WCAG 1.4.3).
+   Dark text on this light panel, mirroring the yellow alert directly above, so the
+   whole card is navy on amber (~5.1:1). The * !important also beats the blackening
+   leak that had turned the body copy black. */
+.alert[data-level="amber"]  { background: #ff8c00; border-color: #ff8c00; color: #0a3a57; }
+.alert[data-level="amber"] * { color: #0a3a57 !important; }
 .alert[data-level="red"]    { background: #dc3232; border-color: #dc3232; color: #ffffff; }
 .alertLabel {
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
