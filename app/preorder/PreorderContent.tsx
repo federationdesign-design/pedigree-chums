@@ -31,12 +31,14 @@ export default function PreorderContent() {
         </div>
       </section>
 
-      {/* Text toggle: white body text at rest, navy when on, centred like /home.
-          Full-bleed row 2 between the hero and the content. closest("main") resolves
-          to this .wrap, so the toggle sets data-pc-textinvert on it and the invert
-          rule in the CSS module flips the white-on-gradient prose to navy. */}
+      {/* Text toggle: white body text at rest, navy when on. Prop-less (left-aligned)
+          so the control hugs the FAQ column's left edge (.toggleRow spans that column
+          and zeroes the control's axis padding), level with the FAQ heading below and
+          clear of the lifted card. Row 2 between the hero and the content. closest("main")
+          resolves to this .wrap, so the toggle sets data-pc-textinvert on it and the
+          invert rule in the CSS module flips the white-on-gradient prose to navy. */}
       <div className={styles.toggleRow}>
-        <ArticleTextToggle centered />
+        <ArticleTextToggle />
       </div>
 
       {/* Checkout column: the Stripe card plus the intro copy. A real in-flow grid

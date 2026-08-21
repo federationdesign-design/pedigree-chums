@@ -145,17 +145,23 @@
 }
 
 /* ── Text toggle row ──
-   Full-bleed row 2, between the hero and the content, holding the centred
-   ArticleTextToggle (white body text at rest, navy when toggled, matching /home).
-   position/z-index sit it BELOW the lifted checkout card (z-index 3): where the
-   card overlaps this band on narrower desktops the card wins, so the toggle can
-   never cover the Stripe iframe. The ArticleTextToggle centres itself; this row
-   just places it and owns the ~88px height the checkout lift compensates for. */
+   Row 2, between the hero and the content, holding the ArticleTextToggle (white
+   body text at rest, navy when toggled, matching /home). Spans the FAQ column only
+   (main-start / faq-end) and left-aligns the control to main-start, so the toggle
+   icon's left edge sits on the FAQ column's left edge, level with the "Frequently
+   Asked Questions" heading and the FAQ items below. Because it lives entirely in
+   the FAQ column, left of the 28px gap and the 560px checkout track, it never sits
+   under the lifted card at any width (the old page-centred control was clipped by
+   the card between ~860 and ~1273px). --essay-gutter: 0 zeroes the control's own
+   axis padding so it hugs main-start; the row still owns the ~88px height the
+   checkout lift compensates for. z-index is a harmless belt-and-braces (there is no
+   longer any card overlap to guard against). */
 .toggleRow {
-  grid-column: full-start / full-end;
+  grid-column: main-start / faq-end;
   grid-row: 2;
+  --essay-gutter: 0px;
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   position: relative;
   z-index: 1;
 }
@@ -220,7 +226,10 @@
     flex-direction: column;
   }
   .hero { order: 0; }
-  .toggleRow { order: 0; }
+  /* Match the stacked FAQ's side padding so the left-aligned toggle stays level with
+     the FAQ heading below it (the grid main-start line does not exist in the flex
+     stack). --essay-gutter stays 0, so the icon hugs this padded edge. */
+  .toggleRow { order: 0; padding: 0 clamp(20px, 6vw, 80px); }
   .checkoutCol {
     order: -1;
     margin: 0 auto;
