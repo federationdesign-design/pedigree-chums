@@ -330,6 +330,12 @@
   color: rgba(255,255,255,0.92);
   margin: 0;
 }
+/* Live fault fix: the 12 August blackening's broad `.cookingInner p` selector
+   (equal specificity, later in the file) leaked onto these navy cards, rendering
+   their body text black on navy at ~1.76:1 (fails WCAG 1.4.3). Re-assert readable
+   white with section + card specificity (0,2,1 beats the leak's 0,1,1). Solid #fff,
+   not rgba, per the no-rgba-on-text rule. Now ~11.9:1. */
+.safetySection .safetyCard p { color: #ffffff; }
 
 .signsList {
   font-family: Montserrat, sans-serif;
