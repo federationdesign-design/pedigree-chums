@@ -259,6 +259,15 @@ const BUBBLE_CLASS: Record<Dog, string> = { labrador: 'bubbleLabrador', collie: 
 // has been a reply) into an existing chat, and arms the cookie ask so a "yes" feeds him. Owner copy, verbatim.
 const LAB_HOTDOG_PICKUP = 'you made it, I got here first. can you get me a cookie?';
 
+// Task 177 / 179: seed a dog's naming loop, ONCE per session. `namingLoopStarted` latches the dog, so a
+// spent or broken loop never restarts on a fresh appearance or a re-fired /hot-dogs pickup (the loop does
+// not resume). engine.submit then serves one pool line per filler reply until the pool runs out.
+function seedNamingLoop(session: Session, dog: Dog, used: number[]): void {
+  if ((session.namingLoopStarted ?? []).includes(dog)) return;
+  session.namingLoop = { dog, used };
+  session.namingLoopStarted = [...(session.namingLoopStarted ?? []), dog];
+}
+
 // Task 153: the Collie's chum-naming lines for /know-your-chums. THREE DISTINCT breeds, PICKED AT RANDOM
 // (a different three each session), drawn from each breed's OWN `fact` and `character` in her register
 // rather than 54 authored lines. Every one of the 54 has both fields, so no guard is needed; a missing
@@ -288,18 +297,20 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
   const auto = !restored && autoAppear ? autoAppear : null;
   const everProtectedRef = useRef(false); // latches once the session enters a protected state
   const sessionRef = useRef<Session | null>(restored ? restored.session : auto ? newSession(auto.dog) : null);
-  // Task 177: seed the Boxer's /about fact-loop, ONCE, at the fresh appearance that has just shown misread
-  // #1. From here a filler reply draws the next fact (engine.submit owns the chain). boxerFactUsed carries
-  // the appearance's spent indices (incl. #1) so #2..#10 never repeat #1. A RESTORED chat keeps whatever
-  // loop state it persisted, so a mid-loop navigation resumes rather than restarts; a spent loop stays
-  // spent. Only the /about Boxer appearance seeds it -- his /home and /smarter pages carry a sequence, not
-  // a misread, and never set this (the loop is scoped to the Boxer on /about, brief section 5).
+  // Task 177 / 179: seed a naming loop, ONCE, at the fresh appearance. The Boxer's /about appearance has
+  // just shown misread #1, so his loop starts with that index already used (misreadsUsed(), so #2..#10
+  // never repeat it); the Labrador's /hot-dogs Case B appearance ("I like hotdogs" names no YES food)
+  // starts empty, so his first reply names food #1. A RESTORED chat keeps whatever loop state it persisted,
+  // so a mid-loop navigation resumes rather than restarts, and a spent loop stays spent (namingLoopStarted).
+  // The Boxer's /home and /smarter pages carry a sequence, not a loop, and never seed one. The Labrador's
+  // Case A thread pickup seeds separately, in its own effect below.
   const factSeededRef = useRef(false);
   if (!factSeededRef.current) {
     factSeededRef.current = true;
-    if (auto && auto.dog === 'boxer' && auto.route === '/about' && auto.followUps?.length && sessionRef.current) {
-      sessionRef.current.boxerFactActive = true;
-      sessionRef.current.boxerFactUsed = misreadsUsed();
+    const s = sessionRef.current;
+    if (auto && s) {
+      if (auto.dog === 'boxer' && auto.route === '/about' && auto.followUps?.length) seedNamingLoop(s, 'boxer', misreadsUsed());
+      else if (auto.dog === 'labrador' && auto.route === '/hot-dogs') seedNamingLoop(s, 'labrador', []);
     }
   }
   const [phase, setPhase] = useState<Phase>(restored ? restored.phase || 'idle' : auto ? 'idle' : 'selecting');
@@ -440,6 +451,9 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
     pickupDoneRef.current = pickupRoute;
     session.activeDog = 'labrador';
     session.cookieAskPending = true;
+    // Task 179: seed his food-naming loop here too. The cookie ask is armed for THIS turn, so a bare "yes"
+    // next starts the feed game (game_start breaks the loop and wins); any other reply names food #1.
+    seedNamingLoop(session, 'labrador', []);
     if (!session.previousDogs.includes('labrador')) session.previousDogs.push('labrador');
     setDog('labrador');
     setMessages((m) => [...m, { id: idRef.current++, who: 'dog', text: LAB_HOTDOG_PICKUP, dog: 'labrador', name: dogInfo('labrador').name, display: LAB_HOTDOG_PICKUP, done: true }]);

@@ -90,20 +90,19 @@ export interface Session {
   // as session state the same way lastAction is. Lets "what is this page" answer with that page's
   // bio. Undefined outside the browser (the harness), so the page-bio route only fires live.
   route?: string;
-  // Task 177: the Boxer's /about fact-loop. Seeded true by the experience when the /about appearance
-  // shows misread #1; while true, a filler reply (a greeting, "ok", "why", "haha", a shrug, a lone
-  // unresolved word) draws the NEXT misread instead of ending the appearance. It is set back to false
-  // -- permanently, for the session -- the moment a real route wins (safety, grief, sadness, health,
-  // commerce, rules, FAQ, a dismissal, a breed, or any coherent multi-word statement), or when the
-  // tenth fact has been served (a silent end). It never resumes: once false it stays false, so a return
-  // to /about (the chat is still open, so no new appearance fires) cannot restart it. Absent/false in
-  // the harness unless a test seeds it.
-  boxerFactActive?: boolean;
-  // Task 177: the misread indices already served in this loop, seeded from the appearance's own
-  // sessionStorage rotation (`pc-boxer-misreads-used`, incl. misread #1) so facts #2..#10 never repeat
-  // #1. The engine draws the next fact from the unused indices and appends it here -- the SAME no-repeat
-  // pool as pickMisread, but session-scoped so it survives navigation via the persisted chat.
-  boxerFactUsed?: number[];
+  // Task 177 / 179: the active "naming loop" -- a dog serving one line per visitor reply from a fixed
+  // pool until it runs out, then silence. `dog` names which loop is live (and so which pool + rules the
+  // engine uses): the Boxer's ten /about misreads, or the Labrador's ten YES-tier foods on /hot-dogs.
+  // `used` is the pool indices already served (no-repeat). While a loop is live a filler reply (a
+  // greeting, "ok", "why", "haha", a shrug, a lone unresolved word) draws the next line; a real route
+  // (safety, grief, sadness, health, commerce, rules, FAQ, a dismissal, a breed, a named food, or any
+  // coherent multi-word statement) sets this back to null and ENDS the loop. null when none is running.
+  // Seeded by the experience at the appearance; survives navigation via the persisted chat.
+  namingLoop?: { dog: Dog; used: number[] } | null;
+  // Task 177 / 179: the dogs whose naming loop has already started this session. A loop is seeded ONLY
+  // for a dog NOT in here, so it never resumes: once it has run (spent or broken) a fresh appearance /
+  // pickup cannot restart it. Cleared only by a new browser session (a tab close wipes the chat).
+  namingLoopStarted?: Dog[];
 }
 
 export function newSession(activeDog: Dog = 'collie'): Session {
@@ -141,7 +140,7 @@ export function newSession(activeDog: Dog = 'collie'): Session {
     gamesPlayed: 0,
     cookieAskPending: false,
     boxerGameAskPending: false,
-    boxerFactActive: false,
-    boxerFactUsed: [],
+    namingLoop: null,
+    namingLoopStarted: [],
   };
 }

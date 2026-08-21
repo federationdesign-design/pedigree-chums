@@ -3434,14 +3434,14 @@ check('asdfghjkl', { action: 'gibberish' });
 check('what is the capital of France', { action: 'gk_answer' });
 check('im in trouble', { layer: 1, action: 'safety_signpost' });
 
-// ==== Task 177: the Boxer's /about fact-loop ====
+// ==== Task 177: the Boxer's /about fact-loop (naming loop) ====
 // The loop is seeded by the experience at the /about appearance; here we seed a session by hand
-// (boxerFactActive + route + one misread already spent) and drive replies through the real engine.
-// isFact / notFact assert the served line, since an advancing turn keeps its underlying action
+// (namingLoop { dog:'boxer', used:[0] } = misread #1 already shown) and drive replies through the real
+// engine. isFact / notFact assert the served line, since an advancing turn keeps its underlying action
 // (fallback / canned / ...) and only its response.text/responseId are overwritten to the fact.
 const isFact = (resp) => (/^BOX-ABOUT-FACT-\d+$/.test(resp.responseId ?? '') ? null : `expected a fact, got ${resp.responseId} "${resp.text}"`);
 const notFact = (resp) => (/^BOX-ABOUT-FACT-\d+$/.test(resp.responseId ?? '') ? `the loop SWALLOWED this: served fact "${resp.text}"` : null);
-const seedLoop = () => { const s = newSession('boxer'); s.route = '/about'; s.boxerFactActive = true; s.boxerFactUsed = [0]; return s; };
+const seedLoop = () => { const s = newSession('boxer'); s.route = '/about'; s.namingLoop = { dog: 'boxer', used: [0] }; return s; };
 
 // A filler reply draws the next fact. The owner's own examples: hello, ok, why, haha, a shrug.
 for (const filler of ['hello', 'ok', 'why', 'haha', 'lol', 'wow', 'more', 'go on', '🤷', 'k', 'hmm', 'asdfgh', 'tell me more']) {
@@ -3450,7 +3450,7 @@ for (const filler of ['hello', 'ok', 'why', 'haha', 'lol', 'wow', 'more', 'go on
 
 // SAFETY, GRIEF, SADNESS and the HEALTH boundary WIN over the loop, and END it. This is the proof for
 // brief section 3: a disclosure mid-loop gets safeguarding, never fact seven.
-check('i want to kill myself', { action: 'safety_signpost' }, { session: seedLoop(), assert: (_r, resp, s) => notFact(resp) || (s.boxerFactActive ? 'loop survived a safety disclosure' : null) });
+check('i want to kill myself', { action: 'safety_signpost' }, { session: seedLoop(), assert: (_r, resp, s) => notFact(resp) || (s.namingLoop ? 'loop survived a safety disclosure' : null) });
 check('someone is hurting me', { action: 'safety_signpost' }, { session: seedLoop(), assert: (_r, resp) => notFact(resp) });
 check('what is a penis', { action: 'anatomy_redirect' }, { session: seedLoop(), assert: (_r, resp) => notFact(resp) });
 check('my dog died', { action: 'grief' }, { session: seedLoop(), assert: (_r, resp) => notFact(resp) });
@@ -3464,7 +3464,7 @@ check('how do i play', { action: 'rules_answer' }, { session: seedLoop(), assert
 check('what is in the pack', { action: 'faq_answer' }, { session: seedLoop(), assert: (_r, resp) => notFact(resp) });
 
 // DISMISSALS win and end the loop; the Boxer's own "stop" gag (note boxer_stop) also breaks it.
-check('go away', { action: 'dismiss' }, { session: seedLoop(), assert: (_r, resp, s) => notFact(resp) || (s.boxerFactActive ? 'go away did not end the loop' : null) });
+check('go away', { action: 'dismiss' }, { session: seedLoop(), assert: (_r, resp, s) => notFact(resp) || (s.namingLoop ? 'go away did not end the loop' : null) });
 check('go to your bed', { action: 'dismiss' }, { session: seedLoop(), assert: (_r, resp) => notFact(resp) });
 check('stop', {}, { session: seedLoop(), assert: (r, resp) => (r.note === 'boxer_stop' ? notFact(resp) : `stop was not the boxer_stop gag: ${r.action}/${r.note}`) });
 
@@ -3472,7 +3472,7 @@ check('stop', {}, { session: seedLoop(), assert: (r, resp) => (r.note === 'boxer
 // ("i am being bullied", "why does my dad hit me" both fall to fallback/gk_unknown). It must NOT get a
 // cheerful fact: it breaks the loop and is answered normally, exactly as today.
 for (const sentence of ['i am being bullied', 'someone hurt me', 'a man is following me', 'why does my dad hit me', 'i hate myself']) {
-  check(sentence, {}, { session: seedLoop(), assert: (_r, resp, s) => notFact(resp) || (s.boxerFactActive ? `loop survived a multi-word miss: "${sentence}"` : null) });
+  check(sentence, {}, { session: seedLoop(), assert: (_r, resp, s) => notFact(resp) || (s.namingLoop ? `loop survived a multi-word miss: "${sentence}"` : null) });
 }
 
 // The loop does not resume: once a real reply breaks it, later filler is answered normally.
@@ -3481,16 +3481,69 @@ for (const sentence of ['i am being bullied', 'someone hurt me', 'a man is follo
 // The full chain: nine filler replies draw facts #2..#10, none repeating (and none repeating the
 // appearance's #1, index 0), then the loop ends silently and the eleventh reply is normal.
 (() => {
-  const s = seedLoop(); // boxerFactUsed = [0], i.e. misread #1 already shown
+  const s = seedLoop(); // used = [0], i.e. misread #1 already shown
   const served = [];
   for (let i = 0; i < 9; i++) check(`ok ${i}`.slice(0, 2), {}, { session: s, assert: (_r, resp) => { served.push(resp.responseId); return isFact(resp); } });
   check('distinct facts', {}, { session: newSession(), assert: () => (new Set(served).size === 9 && !served.includes('BOX-ABOUT-FACT-1') ? null : `chain not 9 distinct non-#1 facts: ${served.join(',')}`) });
-  check('after the tenth', {}, { session: s, assert: (_r, resp, sess) => (sess.boxerFactActive ? 'loop did not end after ten' : notFact(resp)) });
+  check('after the tenth', {}, { session: s, assert: (_r, resp, sess) => (sess.namingLoop ? 'loop did not end after ten' : notFact(resp)) });
 })();
 
 // The loop is scoped: it never runs for another dog, another page, or inside a protected state.
-(() => { const s = newSession('collie'); s.route = '/about'; s.boxerFactActive = true; s.boxerFactUsed = [0]; check('ok', {}, { session: s, assert: (_r, resp) => notFact(resp) }); })();
+(() => { const s = newSession('collie'); s.route = '/about'; s.namingLoop = { dog: 'boxer', used: [0] }; check('ok', {}, { session: s, assert: (_r, resp) => notFact(resp) }); })();
 (() => { const s = seedLoop(); s.protectedState = 'active'; check('ok', {}, { session: s, assert: (_r, resp) => notFact(resp) }); })();
+
+// ==== Task 179: the Labrador's /hot-dogs food-naming loop (same mechanism, YES tier only) ====
+// Seeded by the experience at the /hot-dogs appearance / pickup; here we seed by hand. He names one YES
+// food per filler reply. YES_IDS is the ten food-yes rows -- the ONLY foods the loop may draw.
+const YES_IDS = new Set(data.labradorResponses.filter((r) => r.subtag === 'food-yes').map((r) => r.responseId));
+const isFood = (resp) => (YES_IDS.has(resp.responseId) ? null : `expected a YES food, got ${resp.responseId} "${resp.text}"`);
+const notFood = (resp) => (YES_IDS.has(resp.responseId) ? `the loop SWALLOWED this: served food "${resp.text}"` : null);
+const seedLab = () => { const s = newSession('labrador'); s.route = '/hot-dogs'; s.namingLoop = { dog: 'labrador', used: [] }; return s; };
+
+// A filler reply names the next YES food. (Lone tokens + reactions. Note "go on" advances for the Boxer
+// because his bank has it as a canned reaction, but for the Labrador it is a two-word fallback and so
+// breaks the loop by the multi-word safety guard -- correct, and asserted in the multi-word case below.)
+for (const filler of ['hello', 'ok', 'why', 'haha', 'k', 'hmm', 'asdfgh', '🤷', 'tell me more']) {
+  check(filler, {}, { session: seedLab(), assert: (_r, resp) => isFood(resp) });
+}
+// A two-word filler that resolves to a bare fallback (not a canned reaction) breaks the loop, like any
+// multi-word catch-all miss. Confirms the guard is not softened for the Labrador.
+check('go on', {}, { session: seedLab(), assert: (_r, resp, s) => notFood(resp) || (s.namingLoop ? '"go on" (2-word fallback) did not break the loop' : null) });
+
+// THE SAFETY TWEAK: a named food (any tier) breaks the loop and serves its REAL tiered answer -- a NEVER
+// food keeps the Collie's safety interjection, never swallowed by a cheerful YES food.
+check('chocolate', {}, { session: seedLab(), assert: (r, resp, s) => {
+  if (resp.responseId !== 'LAB-B32-30') return `chocolate did not get its real answer: ${resp.responseId}`;
+  if (!resp.interjection || !/poison|kill/i.test(resp.interjection.line)) return 'chocolate lost its safety interjection';
+  return s.namingLoop ? 'a NEVER food did not end the loop' : null;
+} });
+check('grapes', {}, { session: seedLab(), assert: (r, resp, s) => (resp.responseId === 'LAB-B32-31' && resp.interjection && !s.namingLoop ? null : `grapes not served with warning / loop not ended: ${resp.responseId}`) });
+check('cheese', {}, { session: seedLab(), assert: (r, resp, s) => (resp.responseId === 'LAB-B32-23' && !s.namingLoop ? null : `A BIT food not its own answer / loop alive: ${resp.responseId}`) });
+check('carrots', {}, { session: seedLab(), assert: (r, resp, s) => (resp.responseId === 'LAB-B32-14' && !s.namingLoop ? null : `a named YES food did not break the loop: ${resp.responseId}`) });
+
+// SAFETY, COMMERCE, DISMISSALS and a multi-word miss win and END his loop, exactly as the Boxer's.
+check('i want to kill myself', { action: 'safety_signpost' }, { session: seedLab(), assert: (_r, resp, s) => notFood(resp) || (s.namingLoop ? 'loop survived a disclosure' : null) });
+check('can my dog eat chocolate', { action: 'health_answer' }, { session: seedLab(), assert: (_r, resp) => notFood(resp) });
+check('how much is it', { action: 'price_answer' }, { session: seedLab(), assert: (_r, resp) => notFood(resp) });
+check('go away', { action: 'dismiss' }, { session: seedLab(), assert: (_r, resp) => notFood(resp) });
+check('i am being bullied', {}, { session: seedLab(), assert: (_r, resp, s) => notFood(resp) || (s.namingLoop ? 'loop survived a multi-word miss' : null) });
+
+// Case A cookie ask: with the ask armed, a bare "yes" starts the feed game and breaks the loop (the
+// cookie wins on its turn); no food is named.
+(() => { const s = seedLab(); s.cookieAskPending = true; check('yes', { action: 'game_start' }, { session: s, assert: (_r, resp, sess) => notFood(resp) || (sess.namingLoop ? 'cookie yes did not end the loop' : null) }); })();
+
+// The full chain: ten filler replies name all ten YES foods, none repeating, then silence.
+(() => {
+  const s = seedLab();
+  const served = [];
+  for (let i = 0; i < 10; i++) check('ok', {}, { session: s, assert: (_r, resp) => { served.push(resp.responseId); return isFood(resp); } });
+  check('ten distinct foods', {}, { session: newSession(), assert: () => (new Set(served).size === 10 ? null : `chain not ten distinct foods: ${served.join(',')}`) });
+  check('after the tenth food', {}, { session: s, assert: (_r, resp, sess) => (sess.namingLoop ? 'loop did not end after ten' : notFood(resp)) });
+})();
+
+// Does not resume, and is scoped to the Labrador.
+(() => { const s = seedLab(); check('go away', { action: 'dismiss' }, { session: s }); check('ok', {}, { session: s, assert: (_r, resp) => notFood(resp) }); })();
+(() => { const s = newSession('collie'); s.route = '/hot-dogs'; s.namingLoop = { dog: 'labrador', used: [] }; check('ok', {}, { session: s, assert: (_r, resp) => notFood(resp) }); })();
 
 // ---- Report ----
 const pad = (s, n) => String(s).padEnd(n);

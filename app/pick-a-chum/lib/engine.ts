@@ -2,7 +2,7 @@
 // session. Pure and deterministic. Mutates the passed session in place; callers
 // that need immutability (React) pass a clone.
 
-import { ChumData, Resolution } from './types';
+import { ChumData, Resolution, Dog } from './types';
 import { normalise, applyAliases, buildAliasMap } from './normalise';
 import { resolve, resolveCanned, extractCandidateSubject } from './router';
 import { startGame, applyMove, exitLine, gameExitText, GameResult } from './games';
@@ -12,27 +12,38 @@ import { detectSadnessClear, detectSafety, detectProtectedContinuation, detectPe
 import { matchReworded } from './matcher';
 import { bioForRoute } from '../data/page-bios';
 
-// Task 177: the Boxer's ten /about misreads, the same array the appearance serves misread #1 from, so
-// the fact-loop's facts #2..#10 come from one source of truth. Read once at module load.
+// Task 177 / 179: the "naming loop" -- a dog serving one line per reply from a fixed pool until it runs
+// out, then silence. Two dogs use it: the Boxer names one of his ten /about misreads per reply, and the
+// Labrador names one of his ten YES-tier foods per reply. Both reuse ONE mechanism (allow-list advance
+// decision + no-repeat pool + break-on-real-reply), differing only in their pool and one Labrador tweak.
 const BOXER_ABOUT_MISREADS: string[] = bioForRoute('/about')?.misreads ?? [];
-// Task 177: the ONLY resolutions the fact-loop is allowed to swallow. This is an ALLOW-LIST, not a
-// deny-list, and that is the whole safety argument: a resolution advances the loop ONLY by appearing
-// here. Safety, grief, personal sadness, the health boundary, moderation, commerce, rules, the FAQ,
-// dismissals, goodbyes, breeds and every real route are ABSENT, so they win by default -- and a new
-// safety or real action added to the engine later also wins by default, because no one added it here.
-// The worst a miss can do is fail to advance the loop (a real reply is served instead); it can never
-// swallow something serious.
-//   FREE advance: pure reactions / nonsense that a disclosure can never resolve to (canned is matched
-//   on exact B21-B39 triggers; gibberish is a keyboard smash; emoji is emoji; dog_fact is "tell me
-//   more"). The Boxer's own "stop" wears the `canned` action but carries note 'boxer_stop'; it is
-//   excluded below so "stop" breaks the loop (brief section 3), leaving his stop-gag to answer.
-const BOXER_FACT_FREE_ADVANCE = new Set<string>(['canned', 'emoji_only', 'gibberish', 'dog_fact']);
-//   GUARDED advance: the catch-all zone (a greeting, an unresolved word, a "why"). A disclosure that
-//   the safety detector misses lands HERE (verified: "i am being bullied", "why does my dad hit me"),
-//   and a disclosure is sentence-shaped -- so these advance ONLY when the message is a lone token
-//   ("hello", "ok", "why", "haha", "k"). Any multi-word message in this zone breaks the loop and is
-//   answered normally (an "im a dog", never a cheerful fact), which is exactly today's behaviour.
-const BOXER_FACT_GUARDED_ADVANCE = new Set<string>(['converse', 'fallback', 'gk_unknown']);
+// The pool of lines for a dog's loop, as {text, responseId}. Boxer: his /about misreads (source of truth
+// shared with the appearance's misread #1). Labrador: the ten YES-tier (subtag 'food-yes') B32 rows,
+// served by their OWN approved templates and real responseIds -- the A BIT and NEVER tiers are never
+// drawn, so a food that would harm a dog is never named in the loop.
+function loopItems(dog: Dog, data: ChumData): { text: string; responseId: string }[] {
+  if (dog === 'boxer') return BOXER_ABOUT_MISREADS.map((t, i) => ({ text: t, responseId: `BOX-ABOUT-FACT-${i + 1}` }));
+  if (dog === 'labrador') return data.labradorResponses.filter((r) => r.subtag === 'food-yes').map((r) => ({ text: r.template, responseId: r.responseId }));
+  return [];
+}
+// The ONLY resolutions the loop is allowed to swallow. This is an ALLOW-LIST, not a deny-list, and that
+// is the whole safety argument: a resolution advances the loop ONLY by appearing here. Safety, grief,
+// personal sadness, the health boundary, moderation, commerce, rules, the FAQ, dismissals, goodbyes,
+// breeds and every real route are ABSENT, so they win by default -- and a new safety or real action
+// added to the engine later also wins by default, because no one added it here. The worst a miss can do
+// is fail to advance the loop (a real reply is served instead); it can never swallow something serious.
+//   FREE advance: pure reactions / nonsense that a disclosure can never resolve to (canned is matched on
+//   exact triggers; gibberish is a keyboard smash; emoji is emoji; dog_fact is "tell me more"). Two
+//   carve-outs handled at the call site: the Boxer's "stop" (note 'boxer_stop') breaks the loop for his
+//   stop-gag, and for the Labrador a B32 food match (a named food, canned LAB-B32-*) breaks the loop so
+//   its real tiered answer -- including a NEVER food's safety warning -- is served, never swallowed.
+const LOOP_FREE_ADVANCE = new Set<string>(['canned', 'emoji_only', 'gibberish', 'dog_fact']);
+//   GUARDED advance: the catch-all zone (a greeting, an unresolved word, a "why"). A disclosure that the
+//   safety detector misses lands HERE (verified: "i am being bullied", "why does my dad hit me"), and a
+//   disclosure is sentence-shaped -- so these advance ONLY when the message is a lone token ("hello",
+//   "ok", "why", "haha", "k"). Any multi-word message in this zone breaks the loop and is answered
+//   normally (an "im a dog", never a fact or a food), which is exactly today's behaviour.
+const LOOP_GUARDED_ADVANCE = new Set<string>(['converse', 'fallback', 'gk_unknown']);
 
 // Task 27: classify a resolution's subject KIND for the topic slot. This is a subject
 // classifier, not a rival MEANINGFUL_TOPIC set (which stays in its S12 role only). A
@@ -281,13 +292,17 @@ export function submit(data: ChumData, session: Session, input: string): Turn {
   // assembly, below); anything else -- safety, grief, sadness, health, commerce, rules, FAQ, a dismissal,
   // a breed, or a coherent multi-word statement in the guarded zone -- ENDS the loop for the session and
   // is served as its normal self.
-  let boxerFactAdvancing = false;
-  if (session.boxerFactActive && session.activeDog === 'boxer' && !wasProtected && BOXER_ABOUT_MISREADS.length) {
+  let loopAdvancing = false;
+  if (session.namingLoop && session.activeDog === session.namingLoop.dog && !wasProtected && loopItems(session.namingLoop.dog, data).length) {
     const a = resolution.action;
-    const free = BOXER_FACT_FREE_ADVANCE.has(a) && resolution.note !== 'boxer_stop';
-    const guarded = BOXER_FACT_GUARDED_ADVANCE.has(a) && n.words.length <= 1;
-    boxerFactAdvancing = free || guarded;
-    if (!boxerFactAdvancing) session.boxerFactActive = false; // a real / serious / substantive turn: the loop is over, and does not resume
+    const isBoxerStop = resolution.note === 'boxer_stop'; // the Boxer's "stop" gag: break the loop, let it answer
+    // Labrador only: a named food (canned LAB-B32-*, any tier) is a real question -- break the loop so its
+    // true tiered answer is served, keeping a NEVER food's Collie safety interjection. Never swallowed.
+    const isNamedFood = session.namingLoop.dog === 'labrador' && a === 'canned' && /^LAB-B32-/.test(resolution.responseId ?? '');
+    const free = LOOP_FREE_ADVANCE.has(a) && !isBoxerStop && !isNamedFood;
+    const guarded = LOOP_GUARDED_ADVANCE.has(a) && n.words.length <= 1;
+    loopAdvancing = free || guarded;
+    if (!loopAdvancing) session.namingLoop = null; // a real / serious / substantive turn: the loop is over, and does not resume
   }
 
   // Complaint context: a weak follow-up after a complaint answer stays in the
@@ -334,23 +349,25 @@ export function submit(data: ChumData, session: Session, input: string): Turn {
 
   const response = assemble(resolution, data, n, session);
 
-  // Task 177: serve the next misread. The reply was already assembled into `response` above (a greeting,
-  // an "im a dog", a canned quip); here we OVERWRITE that text with the next fact, exactly as the LOOP-01
-  // override below overwrites a fallback with a repeat. The pool is the SAME no-repeat rotation as
-  // pickMisread (draw from the indices not in boxerFactUsed, append the chosen one), seeded from the
-  // appearance so #1 is never repeated. When the tenth index is spent the loop ends silently: the next
-  // reply is answered normally, with no farewell. A fact has no destination, so any link is cleared.
-  if (boxerFactAdvancing) {
-    const used = session.boxerFactUsed ?? [];
-    const pool = BOXER_ABOUT_MISREADS.map((_, i) => i).filter((i) => !used.includes(i));
-    const idx = pool.length ? pool[Math.floor(Math.random() * pool.length)] : 0;
-    response.text = BOXER_ABOUT_MISREADS[idx];
-    response.responseId = `BOX-ABOUT-FACT-${idx + 1}`;
+  // Task 177 / 179: serve the next line. The reply was already assembled into `response` above (a greeting,
+  // an "im a dog", a canned quip); here we OVERWRITE that text with the next pool line, exactly as the
+  // LOOP-01 override below overwrites a fallback with a repeat. The pool is a no-repeat rotation (draw from
+  // the indices not in `used`, append the chosen one). For the Boxer it is seeded from the appearance so
+  // misread #1 is never repeated; for the Labrador it starts empty (the "I like hotdogs" opener names no
+  // YES food). When the last index is spent the loop ends silently: the next reply is answered normally,
+  // with no farewell. A named line has no destination, so any link/transfer is cleared.
+  if (loopAdvancing && session.namingLoop) {
+    const items = loopItems(session.namingLoop.dog, data);
+    const used = session.namingLoop.used;
+    const avail = items.map((_, i) => i).filter((i) => !used.includes(i));
+    const idx = avail.length ? avail[Math.floor(Math.random() * avail.length)] : 0;
+    response.text = items[idx].text;
+    response.responseId = items[idx].responseId;
     response.url = null;
     response.destinationId = undefined;
     response.transferTo = undefined;
-    session.boxerFactUsed = [...used, idx];
-    if (session.boxerFactUsed.length >= BOXER_ABOUT_MISREADS.length) session.boxerFactActive = false; // tenth served: the loop is spent for the session
+    const nextUsed = [...used, idx];
+    session.namingLoop = nextUsed.length >= items.length ? null : { dog: session.namingLoop.dog, used: nextUsed }; // last one served: the loop is spent for the session
   }
 
   // Task 164 fix: when the Boxer serves his game offer (B17), arm a one-turn window so the visitor's
@@ -425,10 +442,10 @@ export function submit(data: ChumData, session: Session, input: string): Turn {
   // On a fallback-family turn outside a protected state (the fallback catch-all, or the GK
   // refuse-to-guess), extract the canonical inside-world entity; else clear it. Held null in a
   // protected state, like the dialogue topic (Task 27, a safety requirement).
-  // Task 177: a fact-advance turn has already overwritten the response above; it must NOT also run the
-  // im-a-dog / LOOP-01 / diversion machinery below (that would clobber the fact and mis-set the loop
-  // counters). Excluding it here leaves the fact as the served line and keeps candidateSubject clear.
-  const inLoopTurn = session.protectedState === null && FALLBACK_FAMILY.has(resolution.action) && !boxerFactAdvancing;
+  // Task 177 / 179: a loop-advance turn has already overwritten the response above; it must NOT also run
+  // the im-a-dog / LOOP-01 / diversion machinery below (that would clobber the served line and mis-set the
+  // loop counters). Excluding it here leaves the pool line as the served text and keeps candidateSubject clear.
+  const inLoopTurn = session.protectedState === null && FALLBACK_FAMILY.has(resolution.action) && !loopAdvancing;
   session.candidateSubject = inLoopTurn ? extractCandidateSubject(n, data) : null;
 
   // Task 79: the fallback now has exactly two outcomes, and never escalates. A candidate subject
