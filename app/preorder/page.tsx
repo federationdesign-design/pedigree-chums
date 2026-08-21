@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { SITE_URL } from "../../lib/site";
+import Nav from "../../components/Nav/Nav";
 import Footer from "../../components/Footer/Footer";
 import PreorderContent from "./PreorderContent";
 
@@ -56,6 +57,11 @@ export default function PreorderPage() {
           __html: JSON.stringify(PRODUCT_JSONLD).replace(/</g, "\\u003c"),
         }}
       />
+      {/* showLogo: keep the logo visible from the top (not hidden-until-scroll like
+          the article pages), so the brand shows on this commerce page and the Pick a
+          Chum chip does not newly hide at the top. Nav is position:fixed, so it adds
+          no flow space and does not shift the hero or the checkout lift below. */}
+      <Nav showLogo />
       <PreorderContent />
       <Footer />
     </>
