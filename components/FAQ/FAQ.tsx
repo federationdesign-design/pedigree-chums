@@ -56,7 +56,23 @@ const FAQS: QA[] = [
   },
 ];
 
-export default function FAQ() {
+/*
+ * Shared FAQ ladder. Two consumers:
+ *   /home    -> <FAQ />            two columns, own big centred heading, page padding
+ *   /preorder-> <FAQ columns={1} bare />  one column, no heading, no page padding
+ *
+ * columns: 1 renders all items in a single <ul>; 2 (default) splits at the midpoint
+ * into two side-by-side columns (stacked below 900px). bare drops the padded
+ * <section> chrome and the built-in <h2> so the caller can place the list inside its
+ * own layout (on /preorder that is the .faqCol grid track, with its own .faqHeading).
+ */
+export default function FAQ({
+  columns = 2,
+  bare = false,
+}: {
+  columns?: 1 | 2;
+  bare?: boolean;
+}) {
   const [open, setOpen] = useState<number[]>([]);
   const toggle = (i: number) =>
     setOpen((prev) => (prev.includes(i) ? prev.filter((n) => n !== i) : [...prev, i]));
@@ -93,23 +109,40 @@ export default function FAQ() {
     );
   };
 
-  // Split into two columns (side by side on wide screens, stacked on narrow) so
-  // an open item only grows its own column.
+  // Two columns split at the midpoint (side by side on wide screens, stacked on
+  // narrow) so an open item only grows its own column; one column renders every
+  // item in a single list.
   const mid = Math.ceil(FAQS.length / 2);
-  return (
-    <section className={styles.faq} aria-labelledby="faq-heading">
-      <div className={styles.inner}>
-        <h2 id="faq-heading" className={styles.heading}>
-          Frequently Asked <span className={styles.headingYellow}>Questions</span>
-        </h2>
-        <div className={styles.columns}>
+  const columnsClass = columns === 1 ? styles.columnsSingle : styles.columns;
+  const body = (
+    <div className={columnsClass}>
+      {columns === 1 ? (
+        <ul className={styles.list}>
+          {FAQS.map((item, idx) => renderItem(item, idx))}
+        </ul>
+      ) : (
+        <>
           <ul className={styles.list}>
             {FAQS.slice(0, mid).map((item, idx) => renderItem(item, idx))}
           </ul>
           <ul className={styles.list}>
             {FAQS.slice(mid).map((item, idx) => renderItem(item, mid + idx))}
           </ul>
-        </div>
+        </>
+      )}
+    </div>
+  );
+
+  // bare: just the list(s), for callers that own the wrapper and heading.
+  if (bare) return body;
+
+  return (
+    <section className={styles.faq} aria-labelledby="faq-heading">
+      <div className={styles.inner}>
+        <h2 id="faq-heading" className={styles.heading}>
+          Frequently Asked <span className={styles.headingYellow}>Questions</span>
+        </h2>
+        {body}
       </div>
     </section>
   );

@@ -41,6 +41,14 @@
   }
 }
 
+/* Single-column variant (/preorder): one list at every width, no two-column split. */
+.columnsSingle {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  align-items: start;
+}
+
 .item {
   background: rgba(255, 255, 255, 0.08);
   /* Solid 3px stroke: white closed, dark blue on hover, yellow when open. */
