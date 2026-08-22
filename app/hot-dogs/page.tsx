@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Nav from "../../components/Nav/Nav";
 import Footer from "../../components/Footer/Footer";
+import ArticleTextToggle from "../../components/ArticleTextToggle/ArticleTextToggle";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
@@ -46,6 +47,12 @@ export default function HotDogs() {
             </div>
           </div>
         </section>
+
+        {/* Text toggle: below-hero on-gradient text is white at rest, navy when on
+            (see the text-toggle block in page.module.css), matching /home and
+            /chumspot. closest("main") resolves to the <main> above, so the toggle
+            sets data-pc-textinvert on it. Centred, between the hero and the content. */}
+        <ArticleTextToggle centered />
 
         {/* ── Disambiguation note ───────────────────────────────────── */}
         <section className={styles.noteSection}>
