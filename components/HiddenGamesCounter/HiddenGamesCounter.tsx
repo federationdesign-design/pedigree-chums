@@ -20,7 +20,7 @@
 // Lifecycle (suspended/closed/hidden) and completion take precedence over the
 // cards. The palette is the campaign palette (C03).
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useSyncExternalStore } from "react";
 import { usePathname } from "next/navigation";
 import {
@@ -40,6 +40,7 @@ import {
   PRELUDE_HEADING,
 } from "../../lib/hiddenGames/copy";
 import { getScheme, getHideImages, CONTRAST_EVENT } from "../../lib/contrastScheme";
+import { fireConfetti } from "../../lib/confetti";
 import styles from "./HiddenGamesCounter.module.css";
 
 const CARD_AT = 5000; // a card appears 5s after its page loads (C03 timing)
@@ -131,6 +132,27 @@ export default function HiddenGamesCounter() {
   const countedPage = useRef<{ path: string; page: number } | null>(null);
   const pathname = usePathname();
 
+  // The counter's live DOM element, held by a callback ref so the confetti burst can read its on-screen
+  // position at fire time. Only one of the in-play roots (the minimised reveal pill or the expanded counter)
+  // is ever mounted, so the ref holds whichever is showing, and self-nulls when a card state takes over.
+  const anchorRef = useRef<HTMLElement | null>(null);
+  const setAnchor = (el: HTMLElement | null) => {
+    anchorRef.current = el;
+  };
+
+  // A confetti burst from the counter's live on-screen position (its centre, read at fire time), falling back
+  // to its resting bottom-left corner when it is off screen. Site-palette squares, distinct from the chat's
+  // stars-and-bones win animation. prefers-reduced-motion is honoured (no burst). Stable identity (refs only),
+  // so the subscribe effects below can list it as a dependency without re-subscribing.
+  const burstFromCounter = useCallback(() => {
+    if (typeof window === "undefined") return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const rect = anchorRef.current?.getBoundingClientRect();
+    const x = rect ? (rect.left + rect.width / 2) / window.innerWidth : 0.06;
+    const y = rect ? (rect.top + rect.height / 2) / window.innerHeight : 0.92;
+    fireConfetti({ particleCount: 90, spread: 120, startVelocity: 44, origin: { x, y } });
+  }, []);
+
   // Card reveal (C03). Re-runs on each navigation (the root layout persists, so
   // this component is not remounted per page). Reads the engine directly, not the
   // reactive state, so find-driven re-renders never restart a card's timer.
@@ -204,6 +226,26 @@ export default function HiddenGamesCounter() {
     }
   }, [state?.render, phase]);
 
+  // The "you found something" confetti, bursting FROM the counter. This is the site's single find-burst; the
+  // old centre-screen game_start burst was removed. Two engine signals feed it, covering all ten finds:
+  //   - subscribeDiscovery: finds 1..9. Fires the moment the count ticks up on a genuinely new game (never a
+  //     duplicate, an unknown id, or the completing find). The reveal pill / counter stays mounted through a
+  //     non-final find, so the burst reads its live position.
+  //   - subscribeCompletion: the tenth (completing) find, which discovery deliberately skips. The biggest
+  //     moment in the hunt gets the burst too, alongside the completion card -- not less than the other nine.
+  //     Deferred to the next frame so the completion card has committed, then the burst reads ITS position
+  //     (setAnchor is on the card as well). Fires only on the live completion transition, never on restore of
+  //     an already-complete record, so a returning finished visitor gets no burst on load.
+  useEffect(() => {
+    return getHiddenGamesEngine().subscribeDiscovery(() => burstFromCounter());
+  }, [burstFromCounter]);
+  useEffect(() => {
+    return getHiddenGamesEngine().subscribeCompletion(() => {
+      if (typeof window === "undefined") return burstFromCounter();
+      window.requestAnimationFrame(() => burstFromCounter());
+    });
+  }, [burstFromCounter]);
+
   if (!state) return null;
   if (!state.render) return null;
   if (hideForChat) return null;
@@ -227,7 +269,7 @@ export default function HiddenGamesCounter() {
   if (state.completed) {
     if (!state.completionSeen && !completionCollapsed) {
       return (
-        <div className={styles.completed} role="status" aria-live="polite">
+        <div ref={setAnchor} className={styles.completed} role="status" aria-live="polite">
           <button
             type="button"
             className={styles.iconBtn}
@@ -242,7 +284,7 @@ export default function HiddenGamesCounter() {
       );
     }
     return (
-      <div className={styles.completeChip} role="status" aria-live="polite">
+      <div ref={setAnchor} className={styles.completeChip} role="status" aria-live="polite">
         <span>{state.label}</span>
       </div>
     );
@@ -297,6 +339,7 @@ export default function HiddenGamesCounter() {
   if (minimised) {
     return (
       <button
+        ref={setAnchor}
         type="button"
         className={styles.reveal}
         onClick={() => setMinimised(false)}
@@ -309,7 +352,7 @@ export default function HiddenGamesCounter() {
 
   return (
     <>
-      <div className={styles.counter} role="status" aria-live="polite" onMouseLeave={collapse}>
+      <div ref={setAnchor} className={styles.counter} role="status" aria-live="polite" onMouseLeave={collapse}>
         <span className={styles.label}>{state.label}</span>
       </div>
       {state.storageBlocked && !blockedDismissed && (

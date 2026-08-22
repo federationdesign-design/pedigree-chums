@@ -173,6 +173,55 @@ test("HG-COMPLETE-03 a find preserves an existing completion_seen flag", () => {
   assert.equal(applyReport(rec, "G02", NOW).record.completion_seen, true);
 });
 
+test("HG-COMPLETE-04 subscribeCompletion fires exactly once, on the completing find, never before or beyond the target", () => {
+  const store = makeStore();
+  const engine = makeEngine(store);
+  let fired = 0;
+  engine.subscribeCompletion(() => (fired += 1));
+  GAME_IDS.forEach((id, i) => {
+    engine.reportHiddenGame(id);
+    const found = i + 1;
+    // Nothing before the target; exactly one at the target; nothing beyond it.
+    assert.equal(fired, found >= TARGET ? 1 : 0, `after ${found} finds`);
+  });
+  assert.equal(fired, 1, "the completing find fires completion once and no later find repeats it");
+});
+
+test("HG-COMPLETE-05 a duplicate completing find does not re-fire completion", () => {
+  const store = makeStore();
+  const engine = makeEngine(store);
+  let fired = 0;
+  engine.subscribeCompletion(() => (fired += 1));
+  for (const id of GAME_IDS.slice(0, TARGET)) engine.reportHiddenGame(id); // reach the target
+  assert.equal(fired, 1);
+  engine.reportHiddenGame(GAME_IDS[TARGET - 1]); // duplicate of the completing game
+  assert.equal(fired, 1, "a duplicate fires no completion");
+});
+
+test("HG-COMPLETE-06 restoring an already-complete record fires no completion on construction", () => {
+  // A returning finished visitor: the engine restores count === TARGET but must
+  // NOT fire completion (there was no live transition), so no burst on load.
+  const completeIds = GAME_IDS.slice(0, TARGET);
+  const seed = {
+    [STORAGE_KEY]: JSON.stringify({
+      record_schema: 3,
+      campaign_version: "HIDDEN_GAMES_2026_01",
+      total_at_last_seen: TARGET,
+      completed_game_ids: completeIds,
+      count: TARGET,
+      updated_at: new Date(NOW).toISOString(),
+      intro_seen: true,
+      completion_seen: false,
+    }),
+  };
+  const store = makeStore(seed);
+  const engine = makeEngine(store);
+  let fired = 0;
+  engine.subscribeCompletion(() => (fired += 1));
+  assert.equal(engine.getState().completed, true, "restored as complete");
+  assert.equal(fired, 0, "no completion signal on restore");
+});
+
 test("HG-COPY-03 the intro and completion copy is the current approved text", () => {
   // Task 165: the intro copy was reworded and split into the sentence + an emphasis span; assertion updated
   // to the current strings (FLAGGED for owner confirmation that this wording is the approved one).

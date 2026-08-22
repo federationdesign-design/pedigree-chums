@@ -1324,12 +1324,11 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
       logMeta('hat', KENNEL_SKETCH_HAT_ID);
     }
 
-    // Task 178 §5: confetti on the FIRST game start of the session ONLY (owner's call -- every-time becomes
-    // wallpaper). submit just incremented gamesPlayed, so === 1 means this start was the first. Honours
-    // prefers-reduced-motion (no confetti); colours come from the site tokens inside fireConfetti.
-    if (result.resolution.action === 'game_start' && session.gamesPlayed === 1 && !reducedMotion) {
-      fireConfetti({ particleCount: 140, spread: 100, startVelocity: 45, origin: { x: 0.5, y: 0.42 } });
-    }
+    // Task 178 §5 (revised): the "you found something" confetti now bursts FROM the hidden-games counter when
+    // its count ticks up on a newly-found game (see HiddenGamesCounter's subscribeDiscovery burst), so it
+    // points at where progress lives instead of firing centre-screen on every first game start. The old
+    // game_start burst was removed here so there is exactly one confetti effect for finding a game.
+
     // Task 178 §4: the correct-answer celebration -- the answer word, animated. r.gameCorrect is set by the
     // game logic ONLY on a correct answer, never a wrong guess, the reveal, or the start.
     if (r.gameCorrect) {

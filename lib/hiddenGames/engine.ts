@@ -89,6 +89,13 @@ export interface HiddenGamesEngine {
   // count (total - count). Not fired on a duplicate, an unknown id, or the final
   // find (which shows the completion card instead).
   subscribeDiscovery: (listener: (remaining: number) => void) => () => void;
+  // Fired once when a find COMPLETES the set (the count reaches the target). Not
+  // fired on restore of an already-complete record, on a duplicate, or on a find
+  // beyond the target: only the live transition to complete. subscribeDiscovery
+  // deliberately skips the completing find (it shows the completion card, not a
+  // toast); this is its counterpart, so the counter can fire the completion
+  // confetti on the tenth find as it does on the other nine.
+  subscribeCompletion: (listener: () => void) => () => void;
   // Task 156: report a found hat. Registers G10 as found at HAT_FOUND_AT, and from HAT_COUNTDOWN_AT
   // notifies the hat-milestone listener (the Terrier's countdown) with the current found count.
   reportHat: (hatId: string) => EngineOutcome;
@@ -157,6 +164,11 @@ export function createEngine(deps: EngineDeps): HiddenGamesEngine {
   const discoveryListeners = new Set<(remaining: number) => void>();
   function emitDiscovery(remaining: number): void {
     for (const listener of discoveryListeners) listener(remaining);
+  }
+
+  const completionListeners = new Set<() => void>();
+  function emitCompletion(): void {
+    for (const listener of completionListeners) listener();
   }
 
   const hatMilestoneListeners = new Set<(found: number) => void>();
@@ -229,7 +241,10 @@ export function createEngine(deps: EngineDeps): HiddenGamesEngine {
       // The find that reaches the target shows the completion card; no discovery
       // toast (C02). Fire completion once, only on that transition: a further
       // find beyond the target is inert.
-      if (!wasCompleted) deps.track?.({ name: HG_EVENTS.completion });
+      if (!wasCompleted) {
+        deps.track?.({ name: HG_EVENTS.completion });
+        emitCompletion();
+      }
     } else {
       // A non-final award: notify the discovery toast with the remaining count,
       // measured against the fixed target (not the growing games list) so it
@@ -301,6 +316,12 @@ export function createEngine(deps: EngineDeps): HiddenGamesEngine {
       discoveryListeners.add(listener);
       return () => {
         discoveryListeners.delete(listener);
+      };
+    },
+    subscribeCompletion: (listener: () => void) => {
+      completionListeners.add(listener);
+      return () => {
+        completionListeners.delete(listener);
       };
     },
     reportHat,
