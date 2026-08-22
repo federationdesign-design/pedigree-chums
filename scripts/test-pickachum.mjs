@@ -610,6 +610,11 @@ check('a pack of dogs', {}, { assert: (r) => (r.faqId !== 'FAQ004' ? null : 'a p
 check('the cards', {}, { assert: (r) => (r.faqId !== 'FAQ004' ? null : 'bare "the cards" got the 54-cards answer') });
 check('think outside the box', {}, { assert: (r) => (r.faqId !== 'FAQ004' ? null : 'box idiom got the 54-cards answer') });
 check('whats in the pack', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ004' ? null : `real contents question must keep FAQ004: ${r.faqId}`) });
+// "whats the product?" -- his own /about bio ("A page about the product") invites it, so it reaches FAQ004
+// (the purest what-is-it answer), not "im a dog". "the product" as a phrasing; buying intent still wins.
+check('whats the product', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ004' ? null : `"whats the product" not FAQ004: ${r.faqId ?? r.action}`) });
+check('the product', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ004' ? null : `"the product" not FAQ004: ${r.faqId ?? r.action}`) });
+check('where can i buy the product', { bucket: 'B01', action: 'open_discount_popup' }, { assert: (r) => (r.faqId === 'FAQ004' ? `buying "the product" stole the FAQ: ${r.faqId}` : null) });
 
 // ---- Task 18: complaint route repointed to FAQ015; FAQ012 stays the general enquiry
 // answer. These six must reach exactly what they reached before the repoint. The one to
