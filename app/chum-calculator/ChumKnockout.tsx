@@ -8,9 +8,11 @@ import k from "./ChumKnockout.module.css";
 
 // The knockout runs on the dogs the calculator has already revealed and whittles
 // them down with the four tb_ questions. scoreBreed is reused as-is (the one and
-// only scoring path). Stage 3: fixed question order, no animation. (Job B, 22 Aug 2026.)
+// only scoring path). Stage 4: the question order is chosen by split score, not
+// fixed. No animation yet. (Job B, 22 Aug 2026.)
 
 type ScoredBreed = { slug: string; name: string; image: string; score: number };
+type TBQuestion = { id: string; question: string; sub?: string; options: { label: string; value: string }[] };
 
 type Props = {
   breeds: ScoredBreed[];            // the revealed dogs, up to MAX_RESULTS (8)
@@ -38,23 +40,56 @@ function survivorsAfterRound(prev: ScoredBreed[], answers: Record<string, string
   return kept.length > 0 ? kept : [scored[0]];                     // never clear the screen
 }
 
+// SPLIT SCORE (stage 4). How much a question's answer actually changes who survives.
+// For each of the question's answers we run the elimination and see which dogs live;
+// a dog that survives under some answers but not others is "swung" by this question.
+// More swung dogs means the answer matters more, so that is the question to ask.
+// A question that eliminates the same dogs whatever the answer scores 0 and is avoided.
+function splitScore(q: TBQuestion, survivors: ScoredBreed[], acc: Record<string, string>): number {
+  const survivalCount = new Map<string, number>();
+  for (const o of q.options) {
+    const kept = new Set(survivorsAfterRound(survivors, { ...acc, [q.id]: o.value }).map((b) => b.slug));
+    for (const b of survivors) if (kept.has(b.slug)) survivalCount.set(b.slug, (survivalCount.get(b.slug) ?? 0) + 1);
+  }
+  let swung = 0;
+  for (const b of survivors) {
+    const c = survivalCount.get(b.slug) ?? 0;
+    if (c > 0 && c < q.options.length) swung++;
+  }
+  return swung;
+}
+
+// Pick the highest-splitting unused question. Ties break by fixed file order (the
+// order `unused` arrives in), so a run with no discriminating question left still
+// falls back to a stable order rather than picking at random.
+function pickQuestion(survivors: ScoredBreed[], acc: Record<string, string>, unused: TBQuestion[]): TBQuestion {
+  let best = unused[0];
+  let bestScore = -1;
+  for (const q of unused) {
+    const s = splitScore(q, survivors, acc);
+    if (s > bestScore) { bestScore = s; best = q; }
+  }
+  return best;
+}
+
 export default function ChumKnockout({ breeds, answers, onRestart }: Props) {
-  // The four tb_ questions in fixed file order. Computed here (not at module level)
-  // so a future import cycle with ChumCalculator cannot hit a TDZ. Stage 4 will
-  // replace the fixed order with a split-score picker.
-  const tbQuestions = QUESTIONS.filter((q) => q.id.startsWith("tb_"));
+  // The four tb_ questions. Computed here (not at module level) so a future import
+  // cycle with ChumCalculator cannot hit a TDZ.
+  const tbQuestions = QUESTIONS.filter((q) => q.id.startsWith("tb_")) as TBQuestion[];
 
   const [survivors, setSurvivors] = useState<ScoredBreed[]>(breeds);
   const [acc, setAcc] = useState<Record<string, string>>(answers);
-  const [roundIdx, setRoundIdx] = useState(0);
+  const [usedIds, setUsedIds] = useState<string[]>([]);
   const [done, setDone] = useState(breeds.length <= TARGET_MAX);
 
-  const currentQ = tbQuestions[roundIdx] ?? null;
+  const unused = tbQuestions.filter((q) => !usedIds.includes(q.id));
+  const currentQ = !done && unused.length > 0 ? pickQuestion(survivors, acc, unused) : null;
 
   function answer(value: string) {
     if (!currentQ) return;
     const nextAnswers = { ...acc, [currentQ.id]: value };
     const nextSurvivors = survivorsAfterRound(survivors, nextAnswers);
+    const nextUsed = [...usedIds, currentQ.id];
     setAcc(nextAnswers);
 
     if (nextSurvivors.length <= TARGET_MAX) {
@@ -62,23 +97,22 @@ export default function ChumKnockout({ breeds, answers, onRestart }: Props) {
       setDone(true);
       return;
     }
-    if (roundIdx + 1 >= tbQuestions.length) {
+    if (nextUsed.length >= tbQuestions.length) {
       // Questions exhausted with more than TARGET_MAX still standing: fall back to
-      // cumulative score order and take the top TARGET_MAX. No invented tiebreaker.
+      // cumulative score order and take the top TARGET_MAX. With four questions used
+      // on nearly every run this is the common exit, not a rare branch.
       setSurvivors(nextSurvivors.slice(0, TARGET_MAX));
       setDone(true);
       return;
     }
     setSurvivors(nextSurvivors);
-    setRoundIdx(roundIdx + 1);
+    setUsedIds(nextUsed);
   }
 
-  // ── End screen: empty image slot, the result rail, then Start again ──────────
+  // ── End screen: straight to the result rail, then Start again ────────────────
   if (done || !currentQ) {
     return (
       <div>
-        {/* End-screen image slot: Steve's finished result image drops in here later. */}
-        <div className={k.endSlot} aria-hidden="true">end-screen image slot</div>
         <BreedResultRail breeds={survivors} bestSlug={null} />
         <div style={{ textAlign: "center", marginTop: 32 }}>
           <button className={styles.resetBtn} onClick={onRestart}>Start again</button>
