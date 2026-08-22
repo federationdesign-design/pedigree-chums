@@ -11,6 +11,7 @@ import DragCard, { type Rect } from "./DragCard";
 import { ICONS } from "../../../components/CardDock/CardDock";
 import { INFLUENCE_GLYPH, DIAGRAM_GLYPH, HEALTH_GLYPH } from "./chums2Icons";
 import { breedInfo } from "../../../data/breedInfo";
+import TileZoom from "../../../components/TileZoom/TileZoom";
 import LifespanChart from "../../../components/LifespanChart/LifespanChart";
 import OutboundLink from "../../../components/OutboundLink/OutboundLink";
 import { lifespanCurves, EXPLANATION, METHOD, SOURCES } from "../../../data/lifespanCurves";
@@ -288,14 +289,15 @@ export default function Chums2Client({ name, slug, image, info, lineage }: Props
   // ── Ancestor pack (brief 5.6) ─────────────────────────────────────────────
   // Fed by a hidden BreedTreeMap via onFramesReady, exactly as the live page.
   const [frames, setFrames] = useState<FrameNode[]>([]);
-  // Which tile popout is open, and which kind (i info, % detail, or the enlarged
-  // image). Only one is open at a time (item 3/4), so opening any one replaces
-  // the others.
-  const [openPop, setOpenPop] = useState<{ id: string; kind: "info" | "pct" | "image" } | null>(null);
-  // Close on a click anywhere outside (the popout and its trigger stop
-  // propagation, so this only fires for clicks elsewhere).
+  // Which tile popout is open, and which kind. Only one is open at a time, so
+  // opening any one replaces the others. The enlarged image (kind "image") also
+  // carries the tile's screen rect, captured at click, as the TileZoom anchor.
+  const [openPop, setOpenPop] = useState<{ id: string; kind: "info" | "pct" | "image"; anchor?: { x: number; y: number; size: number } } | null>(null);
+  // Close the i / % popouts on a click anywhere outside (their trigger and body
+  // stop propagation). The enlarged image is excluded: it closes the mini pit's
+  // way, a 2s auto-close after the pointer leaves it, handled inside TileZoom.
   useEffect(() => {
-    if (!openPop) return;
+    if (!openPop || openPop.kind === "image") return;
     const onDoc = () => setOpenPop(null);
     document.addEventListener("click", onDoc);
     return () => document.removeEventListener("click", onDoc);
@@ -433,7 +435,11 @@ export default function Chums2Client({ name, slug, image, info, lineage }: Props
                           <button
                             type="button"
                             className={styles.frameImgBtn}
-                            onClick={(e) => { e.stopPropagation(); setOpenPop(openPop?.id === f.id && openPop.kind === "image" ? null : { id: f.id, kind: "image" }); }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              const r = (e.currentTarget as HTMLElement).getBoundingClientRect();
+                              setOpenPop(openPop?.id === f.id && openPop.kind === "image" ? null : { id: f.id, kind: "image", anchor: { x: r.left, y: r.top, size: r.width } });
+                            }}
                             aria-label={`Enlarge ${f.name}`}
                           >
                             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -580,27 +586,20 @@ export default function Chums2Client({ name, slug, image, info, lineage }: Props
         />
       )}
 
-      {/* Enlarged-image popup for an ancestor tile (item 2): a big rounded image
-          (reusing the pit's magnifier/zoom-overlay treatment, LineageMap
-          zoomedId ~line 2858: rounded, blue-deep border, shadow) on the left,
-          and a navy panel with the name (yellow Montserrat) and the same note
-          the i-popout uses on the right. Joins the one-popout rule; closes on X
-          or the backdrop (outside click). */}
+      {/* Enlarged ancestor image: the SAME shared component the mini pit learn
+          area renders (components/TileZoom/TileZoom.tsx), so it grows in place
+          from the tile with the yellow-name navy panel beside it, no backdrop,
+          no X, 2s auto-close, exactly like the mini pit. Anchored to the tile's
+          screen rect captured at click. (D26.) */}
       {openPop?.kind === "image" && (() => {
         const f = frames.find((x) => x.id === openPop.id);
-        if (!f) return null;
+        if (!f || !openPop.anchor) return null;
         return (
-          <div className={styles.imageModalBackdrop} onClick={() => setOpenPop(null)}>
-            <div className={styles.imageModal} onClick={(e) => e.stopPropagation()} role="dialog" aria-label={f.name}>
-              <button type="button" className={styles.imageModalClose} onClick={() => setOpenPop(null)} aria-label="Close">&times;</button>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img className={styles.imageModalImg} src={f.img} alt={f.name} />
-              <div className={styles.imageModalPanel}>
-                <p className={styles.imageModalName}>{f.name}</p>
-                {f.note && <p className={styles.imageModalNote}>{f.note}</p>}
-              </div>
-            </div>
-          </div>
+          <TileZoom
+            key={f.id}
+            open={{ img: f.img, name: f.name, description: f.note || "", anchor: openPop.anchor }}
+            onClose={() => setOpenPop(null)}
+          />
         );
       })()}
 

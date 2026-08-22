@@ -9,6 +9,7 @@ import { breedInfo } from "../../data/breedInfo";
 import { splitName } from "./splitName";
 import styles from "./LineageMap.module.css";
 import { fireConfetti } from "../../lib/confetti";
+import TileZoom from "../TileZoom/TileZoom";
 
 type BreedTag = "extinct" | "trending" | "popular" | "endangered" | "in-decline";
 // Same status colours as the history page.
@@ -554,16 +555,15 @@ export default function LineageMap({
   useEffect(() => setPctHover(null), [breed.name]);
   const infoSeen = useRef<Set<string>>(new Set()); // cards whose info tooltip has already paid out its +2, so it pays once
   useEffect(() => setInfoHover(null), [breed.name]);
-  // hold-to-magnify: which collected card is enlarged right now, and the release timer
+  // hold-to-magnify: which collected card is enlarged right now. The enlarged
+  // image + its description panel, the drag offset and the 2s auto-close now
+  // live in the shared TileZoom component (components/TileZoom/TileZoom.tsx),
+  // rendered below; this file keeps only which card is open.
   const [zoomedId, setZoomedId] = useState<string | null>(null);
-  const [zoomOff, setZoomOff] = useState<{ x: number; y: number }>({ x: 0, y: 0 }); // drag offset of the enlarged image /* zoom-overlay */
-  const zoomDrag = useRef<{ id: number; sx: number; sy: number; ox: number; oy: number } | null>(null);
-  const zoomTimer = useRef<number | null>(null);
   useEffect(() => setZoomedId(null), [breed.name]);
   // closeAll: ensure only one overlay is open at a time
-  const closeAll = () => { setInfoHover(null); setPctHover(null); setZoomedId(null); if (zoomTimer.current) { window.clearTimeout(zoomTimer.current); zoomTimer.current = null; } };
-  const magnifyHold = (id: string) => { closeAll(); setZoomOff({ x: 0, y: 0 }); setZoomedId(id); setInfoHover(id); };
-  const magnifyRelease = () => { if (zoomTimer.current) window.clearTimeout(zoomTimer.current); zoomTimer.current = window.setTimeout(() => { setZoomedId(null); setInfoHover(null); zoomTimer.current = null; }, 2000); }; // stays big 2s, then shrinks; patch_hoverfix_v1: info closes with zoom
+  const closeAll = () => { setInfoHover(null); setPctHover(null); setZoomedId(null); };
+  const magnifyHold = (id: string) => { closeAll(); setZoomedId(id); setInfoHover(id); };
 
   // Dismiss a fixed/opened card (the X in its corner).
   const removeCard = (id: string) => {
@@ -2675,30 +2675,29 @@ export default function LineageMap({
         ))}
         </g>
       </svg>
-      {infoHover && (() => {
+      {infoHover && infoHover !== zoomedId && (() => {
         const c = pickCards.find((x) => x.id === infoHover);
         const text = c ? (breedInfo[c.name] || c.note) : null;
         if (!c || !text) return null;
-        // Sits to the RIGHT of the card, or of the zoomed image if that is open.
+        // Sits to the RIGHT of the card (the zoomed-image case now renders inside
+        // TileZoom, so this only handles the plain "i" info panel).
         // Cards near the right edge had nowhere to put it: the panel is fixed
         // and 190 wide, and nothing checked whether that would land off screen,
         // so the text was squeezed against the edge and clipped. If it will not
         // fit to the right it now goes BELOW the card instead, and is clamped
         // into the viewport either way.
-        const zoomOpen = zoomedId === c.id;
-        const zoomSize = CW * 3;
         const PANEL_W = 219, EDGE = 8, GAP = 14; // 190, up 15% by request
         const vw = typeof window === "undefined" ? 1024 : window.innerWidth;
         const vh = typeof window === "undefined" ? 768 : window.innerHeight;
-        const rightLeft = zoomOpen ? c.cardX - CW / 2 + pan.x + zoomOff.x + zoomSize + 10 : c.cardX + CW / 2 + GAP + pan.x;
+        const rightLeft = c.cardX + CW / 2 + GAP + pan.x;
         const fitsRight = rightLeft + PANEL_W <= vw - EDGE;
-        const cardLeft = zoomOpen ? c.cardX - CW / 2 + pan.x + zoomOff.x : c.cardX - CW / 2 + pan.x;
-        const cardBottom = zoomOpen ? c.cardY - CW / 2 + pan.y + zoomOff.y + zoomSize : c.cardY + CW / 2 + pan.y;
+        const cardLeft = c.cardX - CW / 2 + pan.x;
+        const cardBottom = c.cardY + CW / 2 + pan.y;
         const left = fitsRight
           ? rightLeft
           : Math.max(EDGE, Math.min(vw - EDGE - PANEL_W, cardLeft));
         const topRaw = fitsRight
-          ? (zoomOpen ? c.cardY - CW / 2 + pan.y + zoomOff.y : c.cardY - CW / 2 - 6 + pan.y)
+          ? c.cardY - CW / 2 - 6 + pan.y
           : cardBottom + GAP;
         // and never start below the fold, whichever side it ended up on
         const top = Math.max(EDGE, Math.min(topRaw, vh - 120));
@@ -2858,26 +2857,18 @@ export default function LineageMap({
       {zoomedId && (() => {
         const c = pickCards.find((x) => x.id === zoomedId);
         if (!c) return null;
-        const big = CW * 3; // 3x enlarged
-        // start at the card's on-screen top-left, then grow down-right, plus any drag offset
-        const left = c.cardX - CW / 2 + pan.x + zoomOff.x;
-        const top = c.cardY - CW / 2 + pan.y + zoomOff.y;
+        // The enlarged image + its description panel, drag and 2s auto-close are
+        // the shared TileZoom. Anchor is this card's on-screen top-left + size.
         return (
-          <img
-            src={encodeURI(bust(c.img))}
-            alt={c.name}
-            draggable={false}
-            onMouseEnter={() => { if (zoomTimer.current) { window.clearTimeout(zoomTimer.current); zoomTimer.current = null; } }}
-            onMouseLeave={() => { if (!zoomDrag.current) magnifyRelease(); }}
-            onPointerDown={(e) => { e.stopPropagation(); try { (e.currentTarget as Element).setPointerCapture(e.pointerId); } catch {} zoomDrag.current = { id: e.pointerId, sx: e.clientX, sy: e.clientY, ox: zoomOff.x, oy: zoomOff.y }; if (zoomTimer.current) { window.clearTimeout(zoomTimer.current); zoomTimer.current = null; } }}
-            onPointerMove={(e) => { const d = zoomDrag.current; if (!d || e.pointerId !== d.id) return; setZoomOff({ x: d.ox + (e.clientX - d.sx), y: d.oy + (e.clientY - d.sy) }); }}
-            onPointerUp={(e) => { const d = zoomDrag.current; if (d && e.pointerId === d.id) { try { (e.currentTarget as Element).releasePointerCapture(e.pointerId); } catch {} zoomDrag.current = null; magnifyRelease(); } }}
-            onPointerCancel={() => { zoomDrag.current = null; magnifyRelease(); }}
-            style={{
-              position: "fixed", left, top, width: big, height: big, zIndex: 120,
-              objectFit: "cover", borderRadius: 18, border: "5px solid var(--blue-deep)",
-              boxShadow: "0 10px 30px rgba(0,0,0,0.45)", cursor: "grab", touchAction: "none", userSelect: "none",
+          <TileZoom
+            key={c.id}
+            open={{
+              img: bust(c.img),
+              name: c.name,
+              description: (breedInfo[c.name] || c.note || "") as string,
+              anchor: { x: c.cardX - CW / 2 + pan.x, y: c.cardY - CW / 2 + pan.y, size: CW },
             }}
+            onClose={() => { setZoomedId(null); setInfoHover(null); }}
           />
         );
       })()}

@@ -80,6 +80,17 @@ Baseline (measured before stage 1):
 - FLAG for Steve: this is a modal tree, not an inline-on-load tree. If you want it inline beside the diagram, that needs a new bounded rendering mode inside LineageMap (a deliberate shared-component change), which I did not make because it would risk the game. Tell me and I will design it behind a defaulted prop.
 - CSS constraint respected: no perspective / backface-visibility / transform-style: preserve-3d anywhere in the chums2 chain.
 
+## Enlarge popup: genuine reuse via shared TileZoom (2026-08-22)
+
+### D26. Removed the lookalike; extracted the mini-pit enlarge into a shared component both pages render
+- Standing rule (Steve): "reuse" = import/render the SAME shipped component, or extract its exact markup+CSS into a shared component both pages import. Never a parallel lookalike.
+- Item 1: removed last round's from-scratch centred-modal popup (markup + CSS) entirely.
+- Item 2: the mini pit learn enlarge lives in components/PackPit/LineageMap.tsx. Magnifier button ~line 2816-2825 (calls magnifyHold, which sets zoomedId + infoHover). Enlarged image overlay ~2856-2881 (fixed img, CW*3, blue-deep border, drag via zoomOff/zoomDrag, 2s auto-close via magnifyRelease/zoomTimer, no backdrop/X). Description panel ~2677-2716 (navy, yellow name Luckiest Guy 13px, Montserrat body, PANEL_W 219, repositions beside the enlarged image when zoomOpen). All inline-styled (no CSS-module classes).
+- Item 3: extracted those two blocks VERBATIM into components/TileZoom/TileZoom.tsx (owns zoomOff drag + the 2s auto-close + the panel-hides-on-its-own-leave nuance; host owns which tile is open and passes the tile's screen rect as `anchor`). LineageMap now RENDERS <TileZoom> in place of its two inline blocks (removed zoomOff/zoomDrag/zoomTimer/magnifyRelease; gated the i-only panel to !zoomOpen); /chums2 renders the SAME <TileZoom>. Inline styles kept verbatim (not moved to a module) to stay byte-identical.
+- Item 4: /chums2 enlarge now grows in place from the tile, panel tight beside, same fonts/sizes, 2s auto-close, NO backdrop dim, NO floating X. Trigger is clicking the tile image (per the earlier /chums2 spec); the mini pit keeps its magnifier button. Both feed the same TileZoom.
+- Item 5 AUDIT (not reworked): the /chums2 i-popout (.framePopover) and % popout (.framePctCard + pctCard*) ARE also from-scratch lookalikes: the i-popout mirrors LineageMap's infoHover panel; the % popout mirrors LineageMap's pctHover / BreedTreeMap's pctCard (I copied genLabel + PCT_TITLES + the markup rather than sharing the shipped component). Flagged for a future genuine-reuse pass.
+- Gates: tsc clean; eslint chums2 + TileZoom clean; LineageMap 47 (under its 48 baseline). CANNOT runtime-verify the mini pit here (no dev server): the extraction is faithful (verbatim styles/handlers/timer, panel-hide nuance preserved), but Steve should visually confirm the mini pit enlarge on /britains-dog-history after committing.
+
 ## Ancestor pack popouts round 2 (2026-08-22)
 
 ### D25. Popout name titles restyled; enlarged-image popup added
