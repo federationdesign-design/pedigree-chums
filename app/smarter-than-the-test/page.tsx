@@ -174,23 +174,44 @@ export default function SmarterThanTheTestPage() {
                       key={item.name}
                       href={item.url}
                       style={{
-                        display: "block",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 12,
                         padding: "10px 20px",
                         textDecoration: "none",
                         borderTop: "1px solid rgba(255,255,255,0.07)",
                       }}
                     >
-                      <div style={{
-                        fontFamily: "var(--font-body,'Montserrat',sans-serif)",
-                        fontSize: "1.07rem", fontWeight: 700,
-                        color: "#ffffff", marginBottom: 3,
-                      }}>{item.name} ↗</div>
-                      <p style={{
-                        fontFamily: "var(--font-body,'Montserrat',sans-serif)",
-                        fontSize: "0.95rem", fontWeight: 500,
-                        color: "rgba(255,255,255,0.6)",
-                        margin: 0, lineHeight: 1.5,
-                      }}>{item.note}</p>
+                      {/* Placeholder circle. Once the photos are in public/notable/,
+                          swap this span for:
+                          <img src={`/notable/${item.slug}.jpg`} alt="" width={56} height={56}
+                               style={{ flex: "0 0 auto", width: 56, height: 56, borderRadius: "50%", objectFit: "cover" }} />
+                          Expected source: square, at least 160x160 (2x of the 56px circle). */}
+                      <span
+                        aria-hidden="true"
+                        style={{
+                          flex: "0 0 auto",
+                          width: 56, height: 56,
+                          borderRadius: "50%",
+                          background: "rgba(255,255,255,0.08)",
+                          border: `1px solid ${colour}`,
+                        }}
+                      />
+                      <span style={{ flex: "1 1 auto", minWidth: 0 }}>
+                        <span style={{
+                          display: "block",
+                          fontFamily: "var(--font-body,'Montserrat',sans-serif)",
+                          fontSize: "1.07rem", fontWeight: 700,
+                          color: "#ffffff", marginBottom: 3,
+                        }}>{item.name} ↗</span>
+                        <span style={{
+                          display: "block",
+                          fontFamily: "var(--font-body,'Montserrat',sans-serif)",
+                          fontSize: "0.95rem", fontWeight: 500,
+                          color: "#c3ced5",
+                          margin: 0, lineHeight: 1.5,
+                        }}>{item.note}</span>
+                      </span>
                     </OutboundLink>
                   ))}
                 </div>
