@@ -20,6 +20,7 @@ import PickAChumIcon from './PickAChumIcon';
 import { CHUM_DATA } from '../lib/data';
 import { submit, isSensitiveInput, Turn } from '../lib/engine';
 import { newSession, Session } from '../lib/session';
+import { GAMES_MENU, GamesMenuItem } from '../lib/assembler';
 import { misreadsUsed } from './dogAppearance';
 import { Dog, GameId } from '../lib/types';
 import { reportHiddenGame, reportHat } from '../../../lib/hiddenGames/browserEngine';
@@ -157,6 +158,7 @@ interface Message {
   gameOutput?: string; // Task 115: the game board / sheep tiles / drawing, rendered in a monospace block
   media?: { src: string; alt: string }; // Task 138: a short looping clip served with the line
   avatar?: boolean; // Task 165: show this dog's face beside the bubble -- a second dog cutting in (the Collie's food interjection), where the medallion stays the active dog so colour alone is too subtle a cue
+  gamesMenu?: GamesMenuItem[]; // the games-menu message's tappable game pills (this dog's own games); typing the name still works too
 }
 
 // The response-specific action link (if any). Navigation links (a destination or
@@ -1272,6 +1274,13 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
       fetchGame: result.resolution.action === 'random_link',
       gameOutput: r.gameOutput,
       media: r.media,
+      // The games-menu LIST (B45-GAMELIST-02, per-dog) gets tappable pills for this dog's own games.
+      // The QUESTION (-01) does not: there is nothing to list yet. Pills call send(phrase) -- the same
+      // path as typing the name -- so typing keeps working exactly as before; the pills are an addition.
+      gamesMenu:
+        result.resolution.action === 'games_menu' && r.responseId?.startsWith('B45-GAMELIST-02')
+          ? GAMES_MENU[toDog].items
+          : undefined,
     };
     setDog(toDog);
     setMessages((m) => [...m, userMsg, dogMsg]);
@@ -1655,6 +1664,26 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
                     {msg.action && (
                       <div className={styles.actionWrap}>
                         <ActionLink command={msg.action} onNavigate={msg.fetchGame ? undefined : () => { logMeta('link', msg.action?.href ?? '', msg.action?.kind === 'external'); setMinimised(true); }} />
+                      </div>
+                    )}
+                    {/* Tappable game pills for the games-menu list. Real <button>s reusing the cookie-pill
+                        a11y kit (role=group + labelled container, per-pill aria-label, focus-visible ring,
+                        reduced-motion CSS, solid house-rule fills that survive the contrast schemes). A tap
+                        just sends the start phrase -- identical to typing it -- so typing is unaffected. The
+                        labels are text (not images), so hide-images mode leaves them fully usable. */}
+                    {msg.gamesMenu && (
+                      <div className={styles.gamePills} role="group" aria-label="Games you can play. Tap one to start, or type its name.">
+                        {msg.gamesMenu.map((g: GamesMenuItem) => (
+                          <button
+                            key={g.phrase}
+                            type="button"
+                            className={styles.gamePill}
+                            aria-label={`Play ${g.label}`}
+                            onClick={() => send(g.phrase)}
+                          >
+                            {g.label}
+                          </button>
+                        ))}
                       </div>
                     )}
                   </>

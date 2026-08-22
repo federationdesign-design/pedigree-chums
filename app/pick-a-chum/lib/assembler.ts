@@ -179,13 +179,40 @@ const SELF_BREED_LINES: Record<Dog, string> = {
 // Task 165: the games menu LIST is now per-dog. Each dog offers only the games it can actually start
 // (Treat Trail is Labrador-only, Missing Biscuit Terrier-only, DO NOT PRESS THAT BUTTON Boxer-only; the
 // Collie keeps her three plus the bark game). Before this, every dog served the Collie's B45-GAMELIST-02
-// row and so offered games it could not start. The words in each line are the actual start phrases the
-// router accepts. DRAFT copy, pending owner approval (same status as SELF_BREED_LINES).
-const GAMES_MENU_LINES: Record<Dog, string> = {
-  collie: 'Nine-Square, Missing Sheep, or Kennel Sketch. Or say woof for the bark game. Say one.',
-  labrador: 'Treat Trail, or Feed the Dog a Cookie. Say one and we start.',
-  terrier: 'The Case of the Missing Biscuit. Say the word and we crack it.',
-  boxer: 'DO NOT PRESS THAT BUTTON. thats the one. say mini game.',
+// row and so offered games it could not start. DRAFT copy, pending owner approval (same status as
+// SELF_BREED_LINES).
+// Each dog's menu is `line` (the served text, verbatim) PLUS `items` (the same games as tappable pills:
+// label + the exact start `phrase` the router accepts). The two live together so the pills ARE that dog's
+// menu content, not a separate hardcoded list, and can never drift from the text. The `phrase` values are
+// verified to start each game (dog-gated) -- tapping a pill sends the phrase through the identical submit
+// path as typing it, so typing keeps working unchanged.
+export interface GamesMenuItem { label: string; phrase: string; }
+export interface GamesMenu { line: string; items: GamesMenuItem[]; }
+export const GAMES_MENU: Record<Dog, GamesMenu> = {
+  collie: {
+    line: 'Nine-Square, Missing Sheep, or Kennel Sketch. Or say woof for the bark game. Say one.',
+    items: [
+      { label: 'Nine-Square', phrase: 'nine square' },
+      { label: 'Missing Sheep', phrase: 'missing sheep' },
+      { label: 'Kennel Sketch', phrase: 'kennel sketch' },
+      { label: 'Bark game', phrase: 'woof' },
+    ],
+  },
+  labrador: {
+    line: 'Treat Trail, or Feed the Dog a Cookie. Say one and we start.',
+    items: [
+      { label: 'Treat Trail', phrase: 'treat trail' },
+      { label: 'Feed the Dog a Cookie', phrase: 'feed the dog a cookie' },
+    ],
+  },
+  terrier: {
+    line: 'The Case of the Missing Biscuit. Say the word and we crack it.',
+    items: [{ label: 'The Case of the Missing Biscuit', phrase: 'missing biscuit' }],
+  },
+  boxer: {
+    line: 'DO NOT PRESS THAT BUTTON. thats the one. say mini game.',
+    items: [{ label: 'DO NOT PRESS THAT BUTTON', phrase: 'do not press that button' }],
+  },
 };
 
 // The generated bark volley: the dog's own word, count units, e.g. "Woof. Woof.".
@@ -524,7 +551,7 @@ export function assemble(res: Resolution, data0: ChumData, n: Normalised, sessio
       // Task 165: the LIST (GAMELIST-02) is now PER-DOG, so a dog offers only games it can start. The
       // QUESTION (GAMELIST-01) stays shared and falls through to the canned serve below.
       if (res.responseId === 'B45-GAMELIST-02') {
-        return { responseId: `B45-GAMELIST-02-${DOG_PREFIX[dog]}`, text: GAMES_MENU_LINES[dog], dog };
+        return { responseId: `B45-GAMELIST-02-${DOG_PREFIX[dog]}`, text: GAMES_MENU[dog].line, dog };
       }
     // falls through
     case 'canned': {

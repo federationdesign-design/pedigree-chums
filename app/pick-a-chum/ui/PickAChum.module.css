@@ -1652,6 +1652,47 @@
   }
 }
 
+/* Game-menu pills: tap a game name to start it (the same as typing it). Real <button>s, the cookie pill's
+   a11y kit (focus-visible ring, reduced-motion), and solid house-rule fills (no text opacity, no rgba on
+   text, no dark background) so they survive the contrast schemes. Uniform rounded shape -- a tidy menu
+   row, not the scattered-biscuit look of the cookie tray. */
+.gamePills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 12px 0 2px;
+}
+.gamePill {
+  font-family: var(--font-body, sans-serif);
+  font-size: 11px;
+  font-weight: 400;
+  text-transform: uppercase;
+  padding: 9px 18px;
+  border: none;
+  border-radius: 999px;
+  box-shadow: var(--pc-shadow);
+  cursor: pointer;
+  color: var(--pc-ui-cream);
+  background: var(--pc-ui-blue);
+  line-height: 1.1;
+  transition: transform 120ms ease;
+}
+.gamePill:hover {
+  transform: translateY(-2px);
+}
+.gamePill:focus-visible {
+  outline: 4px solid var(--pc-ui-yellow);
+  outline-offset: 2px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .gamePill {
+    transition: none;
+  }
+  .gamePill:hover {
+    transform: none;
+  }
+}
+
 /* Task 164: DO NOT PRESS THAT BUTTON -- the Boxer's control panel at the foot of the thread. Warm orange
    faces in his palette (matching his bubble), navy text kept solid and high-contrast (no text opacity, no
    rgba on text, no dark background: house rules). FIX IT stands apart in brand blue as the way back. Real
