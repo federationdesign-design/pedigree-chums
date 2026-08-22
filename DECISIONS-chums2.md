@@ -80,6 +80,16 @@ Baseline (measured before stage 1):
 - FLAG for Steve: this is a modal tree, not an inline-on-load tree. If you want it inline beside the diagram, that needs a new bounded rendering mode inside LineageMap (a deliberate shared-component change), which I did not make because it would risk the game. Tell me and I will design it behind a defaulted prop.
 - CSS constraint respected: no perspective / backface-visibility / transform-style: preserve-3d anywhere in the chums2 chain.
 
+## Header round 2 (2026-08-22)
+
+### D19. The "0/10" counter is HiddenGamesCounter (global), left in place; square moved below it
+- Owner: components/HiddenGamesCounter/HiddenGamesCounter.tsx, its minimised `.reveal` pill renders `{count}/{total}` (the "0/10"). It is a root-layout global that sits under the logo (Task 136) and shows whenever the logo shows.
+- Why it rode on the square: its CSS nudges it +47px right (and translateX(30px)) to clear the Pick a Chum launcher. I hid that launcher on /chums2 (D15), so the nudge lands the counter over the chum square once the square moved under the logo.
+- Fix chosen (lightest, no shared edit): leave the global counter where it is (still tucked under the logo) and drop the chum square BELOW it via header padding-top clamp(110px,14vh,146px), so the counter no longer rides on the square. Confirmed owner per the request.
+- OFFER to Steve: if he wants the counter directly under the logo's LEFT edge on /chums2 (un-nudged), I can add a /chums2-scoped override (a body[data-pc-chums2] rule compounded with .reveal.reveal in the counter's module CSS, plus a body-attribute effect in Chums2Client). Not done yet to avoid a shared-CSS change unless wanted.
+- Other round-2 header changes: title much bigger (clamp(2.2rem,4.2vw,4.8rem), ~double) with subtitle scaled up (clamp(1.3rem,2.3vw,2.4rem)); tight fixed 16px gap between square and title (item 3); title+subtitle nudged slightly lower (headerText margin-top, item 4); right padding reduced so the big one-line title spans toward the toolbar while staying below its row (item 1); square keeps rotate(2deg) and sits snug under the counter so its top-left corner slightly overlaps the logo area (item 5).
+- Tuning note: the exact one-line fit and the square/counter overlap are screenshot-match values I cannot verify without a dev server; tuned for wide (concept) widths, wrap is the fallback per the one-line rule.
+
 ## Header layout step (2026-08-22)
 
 ### D18. Header repositioned to the concept: left column + one-line title
