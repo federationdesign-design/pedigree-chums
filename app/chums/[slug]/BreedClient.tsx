@@ -7,6 +7,7 @@ import BreedTree from "../../../components/BreedTree/BreedTree";
 import BreedTreeMap, { type FrameNode } from "../../../components/BreedTreeMap/BreedTreeMap";
 import type { LineageNode } from "../../../data/lineage";
 import LifespanChart from "../../../components/LifespanChart/LifespanChart";
+import OutboundLink from "../../../components/OutboundLink/OutboundLink";
 import { lifespanCurves, EXPLANATION, METHOD, SOURCES } from "../../../data/lifespanCurves";
 import RunningCostCard from "../../../components/RunningCostCard/RunningCostCard";
 import runningCosts from "../../../data/runningCosts";
@@ -312,7 +313,7 @@ const [zOrders, setZOrders] = useState({ infoBox: 112, ancestry: 113, lifespanCh
             <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
               {SOURCES.map((s) => (
                 <li key={s.url} style={{ marginBottom: 4 }}>
-                  <a href={s.url} target="_blank" rel="noopener noreferrer" style={{ fontFamily: "var(--font-body,'Montserrat',system-ui)", fontSize: 10, color: "var(--yellow,#ffd23e)", textDecoration: "underline", wordBreak: "break-all" }}>{s.label}</a>
+                  <OutboundLink href={s.url} style={{ fontFamily: "var(--font-body,'Montserrat',system-ui)", fontSize: 10, color: "var(--yellow,#ffd23e)", textDecoration: "underline", wordBreak: "break-all" }}>{s.label}</OutboundLink>
                 </li>
               ))}
             </ul>

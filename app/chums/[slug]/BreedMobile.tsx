@@ -6,6 +6,7 @@ import type { LineageNode } from "../../../data/lineage";
 import Footer from "../../../components/Footer/Footer";
 import { lifespanCurves } from "../../../data/lifespanCurves";
 import LifespanChart from "../../../components/LifespanChart/LifespanChart";
+import OutboundLink from "../../../components/OutboundLink/OutboundLink";
 import RunningCostCard from "../../../components/RunningCostCard/RunningCostCard";
 import runningCosts from "../../../data/runningCosts";
 import suitabilityScores from "../../../data/suitabilityScores";
@@ -366,11 +367,11 @@ export default function BreedMobile({ name, slug, image, info, lineage, breed }:
             {sortedFamous.map((dog) => {
               const colour = TYPE_COLOURS[dog.type] ?? "#ffffff";
               return (
-                <a key={dog.name} href={dog.sourceUrl} target="_blank" rel="noopener noreferrer" className={styles.famousCard}>
+                <OutboundLink key={dog.name} href={dog.sourceUrl} className={styles.famousCard}>
                   <span className={styles.famousType} style={{ color: colour, borderColor: colour }}>{dog.type}</span>
                   <span className={styles.famousName}>{dog.name}</span>
                   <span className={styles.famousKnown}>{dog.knownFor}</span>
-                </a>
+                </OutboundLink>
               );
             })}
           </div>

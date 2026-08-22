@@ -1476,58 +1476,8 @@
 }
 
 /* ---- Leaving the site -------------------------------------------------- */
-
-.leaveWrap {
-  position: fixed;
-  inset: 0;
-  z-index: 60;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-  background: rgba(10, 58, 87, 0.55);
-}
-
-.leaveCard {
-  max-width: 34ch;
-  border-radius: var(--radius-card, 22px);
-  background: var(--yellow, #ffd23e);
-  color: #0a3a57;
-  padding: 26px 22px;
-  text-align: center;
-  box-shadow: 0 10px 40px rgba(10, 58, 87, 0.45);
-}
-
-.leaveText {
-  margin: 0 0 20px;
-  font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: 1rem;
-  font-weight: 600;
-  line-height: 1.35;
-}
-
-.leaveRow {
-  display: flex;
-  gap: 12px;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
-.leaveGo,
-.leaveStay {
-  appearance: none;
-  border: 0;
-  cursor: pointer;
-  border-radius: var(--radius-pill, 999px);
-  padding: 13px 20px;
-  font-family: var(--font-display, "Luckiest Guy", cursive);
-  font-size: 1rem;
-  letter-spacing: 0.03em;
-  color: #ffffff;
-}
-
-.leaveGo { background: #22c55e; }
-.leaveStay { background: var(--blue-deep, #0b78bd); }
+/* Moved to components/OutboundLink/LeaveDialog.module.css (one sitewide instance
+   via LeaveDialogProvider). Removed here with TimelineRun.tsx's inline copy. */
 
 /* The marker's three pieces arrive when the row does, not when the page loads.
    Staggered: disc first, then the buttons either side. */

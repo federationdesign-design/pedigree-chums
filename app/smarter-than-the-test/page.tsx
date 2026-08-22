@@ -4,6 +4,7 @@ import Nav from "../../components/Nav/Nav";
 import Footer from "../../components/Footer/Footer";
 import styles from "../good-dog-bad-dog/good-dog-bad-dog.module.css";
 import ArticleTextToggle from "../../components/ArticleTextToggle/ArticleTextToggle";
+import OutboundLink from "../../components/OutboundLink/OutboundLink";
 
 export const metadata: Metadata = {
   title: "Your Dog Is Smarter Than the Test",
@@ -169,11 +170,9 @@ export default function SmarterThanTheTestPage() {
                     }}>{cat}</span>
                   </div>
                   {items.map((item) => (
-                    <a
+                    <OutboundLink
                       key={item.name}
                       href={item.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
                       style={{
                         display: "block",
                         padding: "10px 20px",
@@ -192,7 +191,7 @@ export default function SmarterThanTheTestPage() {
                         color: "rgba(255,255,255,0.6)",
                         margin: 0, lineHeight: 1.5,
                       }}>{item.note}</p>
-                    </a>
+                    </OutboundLink>
                   ))}
                 </div>
               );

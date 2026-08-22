@@ -1,0 +1,51 @@
+/* Outbound-link "you're leaving our site" dialogue. Ported verbatim from the two
+   inline copies this component replaces (app/britains-dog-history/history.module.css
+   and app/britains-dog-history-2/history2.module.css, the .leave* classes), so the
+   look is unchanged. Single source now: both history pages and every other outbound
+   link across the site render THIS dialogue via LeaveDialogProvider. */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(10, 58, 87, 0.55);
+}
+.card {
+  max-width: 34ch;
+  border-radius: var(--radius-card, 22px);
+  background: var(--yellow, #ffd23e);
+  color: #0a3a57;
+  padding: 26px 22px;
+  text-align: center;
+  box-shadow: 0 10px 40px rgba(10, 58, 87, 0.45);
+}
+.text {
+  margin: 0 0 20px;
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+.row {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.go,
+.stay {
+  appearance: none;
+  border: 0;
+  cursor: pointer;
+  border-radius: 999px;
+  padding: 13px 20px;
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: 1rem;
+  letter-spacing: 0.03em;
+  color: #ffffff;
+}
+.go { background: #22c55e; }
+.stay { background: var(--blue-deep, #0b78bd); }

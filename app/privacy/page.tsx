@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Nav from "../../components/Nav/Nav";
 import Footer from "../../components/Footer/Footer";
+import OutboundLink from "../../components/OutboundLink/OutboundLink";
 import styles from "./privacy.module.css";
 
 export const metadata: Metadata = {
@@ -87,9 +88,9 @@ export default function PrivacyPage() {
             To exercise any of these, contact us using the details below. You also
             have the right to complain to the Information Commissioner&apos;s Office
             (ICO) at{" "}
-            <a href="https://ico.org.uk" target="_blank" rel="noopener noreferrer">
+            <OutboundLink href="https://ico.org.uk">
               ico.org.uk
-            </a>
+            </OutboundLink>
             .
           </p>
 

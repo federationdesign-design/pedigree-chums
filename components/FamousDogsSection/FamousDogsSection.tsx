@@ -1,6 +1,7 @@
 "use client";
 
 import type { FamousDog } from "../../data/famousDogs";
+import OutboundLink from "../OutboundLink/OutboundLink";
 import styles from "./FamousDogsSection.module.css";
 
 interface Props {
@@ -57,11 +58,9 @@ export default function FamousDogsSection({ dogs }: Props) {
         {sorted.map((dog) => {
           const colour = typeColour(dog.type);
           return (
-            <a
+            <OutboundLink
               key={dog.name}
               href={dog.sourceUrl}
-              target="_blank"
-              rel="noopener noreferrer"
               className={styles.card}
             >
               <span className={styles.typePill} style={{ color: colour, borderColor: colour }}>
@@ -69,7 +68,7 @@ export default function FamousDogsSection({ dogs }: Props) {
               </span>
               <span className={styles.name}>{dog.name}</span>
               <span className={styles.knownFor}>{dog.knownFor}</span>
-            </a>
+            </OutboundLink>
           );
         })}
       </div>
