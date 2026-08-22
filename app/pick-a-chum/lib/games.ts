@@ -41,6 +41,7 @@ export interface GameResult {
   answer?: string; // {{ANSWER}} substitution (kennel-sketch reveal / treat-trail move-on / biscuit reveal)
   correct?: string; // Task 178 §4: a CORRECT answer -- the word to celebrate (fires the win animation). Absent on a wrong guess, the reveal, and the start (a reveal after three wrong is a consolation, not a win).
   clueId?: string; // treat-trail / missing-biscuit / feed-cookie: a workbook row to append after the reaction line
+  clueLeadId?: string; // treat-trail: a workbook lead-in row prepended to the follow-up CLUE, on the two turns that start a NEW object (correct + move-on), so the second bubble signals a new thing. NOT set at game start (the clue row is shared) nor on the same-object wrong-guess turns.
   suffix?: string; // missing-biscuit: a composed line to append (the suspect list for a case presentation)
   link?: string; // treat-trail: a finale link (SAUSAGE -> /hot-dogs)
   media?: { src: string; alt: string }; // feed-cookie: a clip shown every fifth cookie (good/queasy)
@@ -197,7 +198,7 @@ function treatMove(state: GameState, input: string): { state: GameState; result:
     // Correct. SAUSAGE (the last object) ends the game with the /hot-dogs finale. correct = the word won.
     if (isLast) return { state, result: { line: 'B65-TREATTRAIL-END', display: '', link: obj.link, correct: obj.answer, ended: true } };
     const ns = advance();
-    return { state: ns, result: { line: 'B65-TREATTRAIL-RIGHT', clueId: TREAT_TRAIL_OBJECTS[ns.objectIndex].clueIds[0], correct: obj.answer, display: '', ended: false } };
+    return { state: ns, result: { line: 'B65-TREATTRAIL-RIGHT', clueId: TREAT_TRAIL_OBJECTS[ns.objectIndex].clueIds[0], clueLeadId: 'B65-TREATTRAIL-RIGHT-LEADIN', correct: obj.answer, display: '', ended: false } };
   }
 
   const guesses = state.guesses + 1;
@@ -210,7 +211,7 @@ function treatMove(state: GameState, input: string): { state: GameState; result:
   // Third wrong: reveal the answer and move on warmly. SAUSAGE still ends at /hot-dogs.
   if (isLast) return { state, result: { line: 'B65-TREATTRAIL-END', display: '', link: obj.link, answer: obj.answer, ended: true } };
   const ns = advance();
-  return { state: ns, result: { line: 'B65-TREATTRAIL-MOVEON', answer: obj.answer, clueId: TREAT_TRAIL_OBJECTS[ns.objectIndex].clueIds[0], display: '', ended: false } };
+  return { state: ns, result: { line: 'B65-TREATTRAIL-MOVEON', answer: obj.answer, clueId: TREAT_TRAIL_OBJECTS[ns.objectIndex].clueIds[0], clueLeadId: 'B65-TREATTRAIL-MOVEON-LEADIN', display: '', ended: false } };
 }
 
 // ---- The Case of the Missing Biscuit (a mystery; the Border Terrier's game) ----

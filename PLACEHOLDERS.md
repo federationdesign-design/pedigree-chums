@@ -173,6 +173,28 @@ but nothing reads it any more. Left in place deliberately so a component change
 did not ride on a CSS-only patch. Cleanup: drop the inline `--rows` write from
 the LineageModal component.
 
+## Generated-data drift: dogs.json sizeBand (logged 22 August 2026)
+
+Not a placeholder and not caused by any recent change: the committed
+`app/pick-a-chum/data/generated/dogs.json` is stale against its source. A full
+`npm run build:chumdata` regenerates it and flips `sizeBand` from `"giant"` to
+`"large"` for four dogs, because the derivation in `data/breeds.ts` now yields
+`"large"` for them but the generated file was never rebuilt:
+
+| Dog | slug | committed | rebuild yields |
+|---|---|---|---|
+| Bloodhound | `bloodhound` | `giant` | `large` |
+| Doberman Pinscher | `doberman-pinscher` | `giant` | `large` |
+| Rottweiler | `rottweiler` | `giant` | `large` |
+| Old English Sheepdog | `old-english-sheepdog` | `giant` | `large` |
+
+So the next full rebuild will sweep these four lines into an otherwise unrelated
+commit. This is the ONLY diff a rebuild produces beyond whatever sheet you edited.
+It was deliberately left OUT of the Treat Trail lead-in commit (22 August) to keep
+that change surgical. Resolve by deciding which is right: if `"large"` is correct,
+rebuild and commit `dogs.json` on its own; if `"giant"` was intended, fix the
+`sizeBand` derivation in `data/breeds.ts` first, then rebuild.
+
 ## What's Your Superpower (MVP-4.1 prototype)
 
 | Placeholder | Location | Meaning | Resolve via |

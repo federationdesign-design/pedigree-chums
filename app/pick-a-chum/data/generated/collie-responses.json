@@ -5993,5 +5993,27 @@
     "defaultRoute": "",
     "animationCue": "",
     "status": "Approved"
+  },
+  {
+    "responseId": "B65-TREATTRAIL-RIGHT-LEADIN",
+    "bucketId": "B65",
+    "subtag": "reaction",
+    "triggers": [],
+    "template": "what about this one:",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "B65-TREATTRAIL-MOVEON-LEADIN",
+    "bucketId": "B65",
+    "subtag": "reaction",
+    "triggers": [],
+    "template": "next object clue:",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
   }
 ]

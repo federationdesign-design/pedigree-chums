@@ -213,8 +213,15 @@ function serveGameResult(resolution: Resolution, data: ChumData, result: GameRes
   if (result.clueId) {
     const clue = gameCopy(data, result.clueId);
     if (clue) {
-      if (resolution.game === 'treattrail' || resolution.game === 'missingbiscuit') resolution.gameFollowUp = clue;
-      else text = text ? `${text}\n\n${clue}` : clue;
+      if (resolution.game === 'treattrail' || resolution.game === 'missingbiscuit') {
+        // Task 178 (revised): on the two Treat Trail turns that start a NEW object (correct + move-on) the
+        // clue carries a lead-in row, prepended on its own line so the second bubble reads "what about this
+        // one: / <clue>" and it is clear a new thing has begun. The lead-in canNOT live in the clue row (clue
+        // 1 is reused verbatim at game start); it is a per-turn prefix keyed off result.clueLeadId. The wrong
+        // 1/2 turns stay on the same object and carry no lead-in. (pre-line renders the \n as a line break.)
+        const lead = result.clueLeadId ? gameCopy(data, result.clueLeadId) : '';
+        resolution.gameFollowUp = lead ? `${lead}\n${clue}` : clue;
+      } else text = text ? `${text}\n\n${clue}` : clue;
     }
   }
   // Task 147 (Missing Biscuit): a case presentation appends the composed suspect list (data-driven,
