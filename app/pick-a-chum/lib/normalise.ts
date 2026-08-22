@@ -8,6 +8,21 @@ export interface Normalised {
   letters: string; // just the a-z letters, lowercased
 }
 
+// Central text-speak expansion (was hand-enumerated per route: 'how are u', 'what breed r you',
+// 'whats ur religion', the 'u trick' tricks forms, ...). A small CLOSED map of SMS contractions,
+// each expanded to its full word so every route sees one canonical form and no route needs its own
+// 'u'/'r'/'ur' siblings. Applied as WHOLE tokens only (word boundaries), so real words that merely
+// contain these letters are never touched: "run", "our", "your", "hour", "return", "burger", "us"
+// all pass through unchanged. Deliberately tiny and pronoun/verb-only: these three are the forms the
+// codebase already spelled out by hand, they have no innocent standalone reading a child would type,
+// and none expands into a safety or buying word. Widen only with the same care (a lone letter like
+// "y"/"n"/"c" has real non-text-speak uses and would false-fire, so they are left out).
+const TEXT_SPEAK: Record<string, string> = { u: 'you', ur: 'your', r: 'are' };
+const TEXT_SPEAK_RE = /\b(ur|u|r)\b/g;
+function expandTextSpeak(s: string): string {
+  return s.replace(TEXT_SPEAK_RE, (m) => TEXT_SPEAK[m] ?? m);
+}
+
 export function normalise(input: string): Normalised {
   const original = (input ?? '').trim();
   // Unify the curly apostrophe U+2019 (what iOS/macOS autocorrect produces for
@@ -17,7 +32,9 @@ export function normalise(input: string): Normalised {
   // cannot appear. `original` is untouched; only the matched forms are folded.
   // Then collapse any run of 3+ identical characters ("pleeeassssee" -> "pleasee")
   // so stretched words match their base form (runs of 2 like "hello" are kept).
-  const lower = original.toLowerCase().replace(/’/g, "'").replace(/(.)\1{2,}/gu, '$1');
+  // Finally expand text-speak (u -> you, ur -> your, r -> are) once here so every
+  // derived form (compact/words/letters) and every route agrees on the full word.
+  const lower = expandTextSpeak(original.toLowerCase().replace(/’/g, "'").replace(/(.)\1{2,}/gu, '$1'));
   const compact = lower.replace(/\s+/g, ' ').replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu, '').trim();
   const words = lower.match(/[a-z]+/g) ?? [];
   const letters = (lower.match(/[a-z]/g) ?? []).join('');
