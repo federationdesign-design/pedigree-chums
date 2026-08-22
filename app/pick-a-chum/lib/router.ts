@@ -1297,7 +1297,7 @@ const EMOJI_FOOD: Record<string, string> = { '🍔': 'burger', '🍕': 'pizza', 
 const EMOJI_BALLS = new Set(['⚽', '🏀', '🏐', '🎾']);
 const EMOJI_GAMING = new Set(['🎮', '🕹']);
 const EMOJI_BATH = new Set(['🛁', '🚿']);
-const EMOJI_REACTIONS = new Set(['🤣', '🤭', '😂', '❤', '😍', '👍', '😊']);
+const EMOJI_REACTIONS = new Set(['🤣', '🤭', '😂', '❤', '😍', '👍', '😊', '😮']);
 const EMOJI_COOKIE = '🍪';
 const EMOJI_CAT = '🐱';
 // Negative reactions: the only way to respond to something sad in his own script (e.g. the Boxer's cancer /

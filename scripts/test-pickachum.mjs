@@ -860,6 +860,8 @@ check('?????', { layer: 10, bucket: 'B14', action: 'gibberish' }); // ASCII punc
   check('☹️', { action: 'safety_signpost' }, { session: s });
   check('😭', { action: 'safety_signpost' }, { session: s, assert: (r) => (r.moderationId === 'MOD_PERSONAL_SADNESS_L1' ? null : `😭 after two frowns not L1: ${r.moderationId}`) });
 })();
+// 😮 (surprised) is a neutral acknowledgement -> the same ":)" row the positive reactions use (no new copy).
+check('😮', { action: 'canned', bucket: 'B29' }, { assert: (_r, resp) => (resp.responseId === 'B29-NICE-01' ? null : `😮 not the ":)" reaction: ${resp.responseId}`) });
 
 // ---- Character-manipulation must NOT be swallowed by identity or comedy ----
 // (Safety-first routing of these is the Batch 4 safety phase; here we assert the
