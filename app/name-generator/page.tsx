@@ -6,6 +6,7 @@ import ShortlistBar, { type ShortlistEntry } from "./ShortlistBar";
 import KnockoutRound from "./KnockoutRound";
 import { BANNED_WORDS } from "./bannedWords";
 import ArticleTextToggle from "../../components/ArticleTextToggle/ArticleTextToggle";
+import { fireConfetti } from "../../lib/confetti";
 
 // ── SHARE CAPTIONS + PNG METADATA ───────────────────────────────────────────────
 const SITE_URL = "https://pedigreechums.co.uk";
@@ -2336,14 +2337,7 @@ export default function NameGeneratorPage() {
   const [usedNicknames, setUsedNicknames] = useState<Set<string>>(new Set());
   const [exhausted, setExhausted] = useState(false);
   const [usedFirstNames, setUsedFirstNames] = useState<Set<string>>(new Set());
-  const confettiRef = useRef<((opts: Record<string, unknown>) => void) | null>(null);
-  useEffect(() => {
-    const script = document.createElement("script");
-    script.src = "https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js";
-    script.onload = () => { confettiRef.current = (window as unknown as Record<string, unknown>)["confetti"] as (opts: Record<string, unknown>) => void; };
-    document.head.appendChild(script);
-    return () => { try { document.head.removeChild(script); } catch {} };
-  }, []);
+  // Confetti comes from the vendored lib/confetti (no external CDN script).
 
   // Gather the bonus words from every answered question -- both the inline
   // input-screen questions (keyed by position in qIndices) AND the quick-fire
@@ -2513,11 +2507,9 @@ export default function NameGeneratorPage() {
     setCopiedCaption(caption);
   }
   function handleLike(e?: React.MouseEvent) {
-    if (confettiRef.current) {
-      let x = 0.5, y = 0.62;
-      if (e && typeof e.clientX === "number") { x = e.clientX / window.innerWidth; y = e.clientY / window.innerHeight; }
-      confettiRef.current({ particleCount: 90, spread: 75, origin: { x, y }, colors: ["#22c55e","#ffe227","#ffffff","#60d394"] });
-    }
+    let x = 0.5, y = 0.62;
+    if (e && typeof e.clientX === "number") { x = e.clientX / window.innerWidth; y = e.clientY / window.innerHeight; }
+    fireConfetti({ particleCount: 90, spread: 75, origin: { x, y } });
     if (results.length > 0) saveToShortlist(results[0]);
     setSwipeDir("right");
     setTimeout(() => { setSwipeDir(null); handleRollAgain(); }, 350);

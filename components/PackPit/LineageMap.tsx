@@ -8,6 +8,7 @@ import { breeds } from "../../data/breeds";
 import { breedInfo } from "../../data/breedInfo";
 import { splitName } from "./splitName";
 import styles from "./LineageMap.module.css";
+import { fireConfetti } from "../../lib/confetti";
 
 type BreedTag = "extinct" | "trending" | "popular" | "endangered" | "in-decline";
 // Same status colours as the history page.
@@ -379,16 +380,7 @@ export default function LineageMap({
   // it so the button keeps the same overlap on the rim at any size.
   const learnBtnScale = circular ? Math.min(1, (1.8 * liftR) / 200) : 1;
   const [rootGone, setRootGone] = useState(false);
-  const confettiRef = useRef<((opts: Record<string, unknown>) => void) | null>(null);
-  useEffect(() => {
-    if (!circular) return;
-    const w = window as unknown as Record<string, unknown>;
-    if (typeof w["confetti"] === "function") { confettiRef.current = w["confetti"] as (o: Record<string, unknown>) => void; return; }
-    const script = document.createElement("script");
-    script.src = "https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js";
-    script.onload = () => { confettiRef.current = w["confetti"] as (o: Record<string, unknown>) => void; };
-    document.head.appendChild(script);
-  }, [circular]);
+  // Confetti comes from the vendored lib/confetti (no external CDN script).
   // Preload all images for instruction cards so they appear instantly when tapped
   useEffect(() => {
     if (!INSTR_NAMES.has(breed.name)) return;
@@ -1198,11 +1190,10 @@ export default function LineageMap({
     setScattered(true);
     burstAt(breed.x, breed.y, circR * 1.33);
     setRootGone(true);
-    confettiRef.current?.({
+    fireConfetti({
       particleCount: 150,
       spread: 100,
       origin: { x: (breed.x + pan.x) / vp.w, y: (breed.y + pan.y) / vp.h },
-      colors: ["#ffe227", "#ffffff", "#22c55e", "#ff6b6b"],
       startVelocity: 45,
     });
     window.setTimeout(() => { onRemove?.(breed.name); onClose(); }, 900);

@@ -4,6 +4,7 @@ import Nav from "../../components/Nav/Nav";
 import styles from "./KnockoutRound.module.css";
 import ShareScreen from "./ShareScreen";
 import { ShortlistEntry } from "./ShortlistBar";
+import { fireConfetti } from "../../lib/confetti";
 
 type Props = {
   shortlist: ShortlistEntry[];
@@ -193,14 +194,8 @@ export default function KnockoutRound({ shortlist, recommended = [], breed, onBa
   const roundFlashedRef = useRef(false); // did the last doAdvance start a new round?
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [podiumReady, setPodiumReady] = useState(false);
-  const confettiRef = useRef<((opts: Record<string, unknown>) => void) | null>(null);
-  useEffect(() => {
-    const script = document.createElement("script");
-    script.src = "https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js";
-    script.onload = () => { confettiRef.current = (window as unknown as Record<string, unknown>)["confetti"] as (opts: Record<string, unknown>) => void; };
-    document.head.appendChild(script);
-    return () => { document.head.removeChild(script); };
-  }, []);
+  // Confetti now comes from the vendored lib/confetti (no external CDN script -- a <script> with no SRI is
+  // not appropriate on a children's site). fireConfetti draws it locally and defaults to the site colours.
   const [sharing, setSharing] = useState(false);
   const [shareOpen, setShareOpen] = useState(false); // caption-picker popout on the podium
   // Entry stopper: title + round pill show first, cards pop in after a beat and
@@ -360,9 +355,7 @@ export default function KnockoutRound({ shortlist, recommended = [], breed, onBa
       roundFlashedRef.current = true;
       const _r=totalRounds-curRound-1; const nextRoundName=_r===1?"The Final":_r===2?"Semi Final":_r===3?"Quarter Final":`Round ${curRound+2}`;
       setRoundFlash(nextRoundName + " coming up!");
-      if (confettiRef.current) {
-        confettiRef.current({ particleCount: 150, spread: 100, origin: { x: 0.5, y: 0.4 }, colors: ["#ffe227","#ffffff","#22c55e","#ff6b6b"], startVelocity: 45 });
-      }
+      fireConfetti({ particleCount: 150, spread: 100, origin: { x: 0.5, y: 0.4 }, startVelocity: 45 });
       setTimeout(() => setRoundFlash(null), 1900);
     }
     // Fill recycle slots in next match from accumulated losers
@@ -395,10 +388,10 @@ export default function KnockoutRound({ shortlist, recommended = [], breed, onBa
     setCardsInteractive(false);
     setHoveredIdx(null);
     // Fire confetti from click point
-    if (e && confettiRef.current) {
+    if (e) {
       const x = e.clientX / window.innerWidth;
       const y = e.clientY / window.innerHeight;
-      confettiRef.current({ particleCount: 80, spread: 70, origin: { x, y }, colors: ["#22c55e","#ffe227","#ffffff","#60d394"] });
+      fireConfetti({ particleCount: 80, spread: 70, origin: { x, y } });
     }
     // Step 1 (400ms): loser falls, winner pulses
     // Step 2 (500ms): winner puffs out
@@ -428,9 +421,7 @@ export default function KnockoutRound({ shortlist, recommended = [], breed, onBa
       setTimeout(() => {
         setShowInterstitial(false);
         setRoundFlash("And the winner is...");
-        if (confettiRef.current) {
-          confettiRef.current({ particleCount: 150, spread: 100, origin: { x: 0.5, y: 0.4 }, colors: ["#ffe227","#ffffff","#22c55e","#ff6b6b"], startVelocity: 45 });
-        }
+        fireConfetti({ particleCount: 150, spread: 100, origin: { x: 0.5, y: 0.4 }, startVelocity: 45 });
         setTimeout(() => {
           setRoundFlash(null);
           doAdvance(winner, loser, false, snapBracket, snapRound, snapMatch); // -> podium
