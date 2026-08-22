@@ -2564,6 +2564,12 @@ check('do you like going in the car', { action: 'canned', bucket: 'B64' }, { ass
 check('can you lick your balls?', { action: 'canned', bucket: 'B52' }, { notAction: 'safety_boundary', assert: (_r, resp) =>
   resp.responseId !== 'COL-B52-MISC-09' ? `balls not B52-MISC-09: ${resp.responseId}`
     : resp.text !== 'Tennis balls?' ? `balls text wrong: "${resp.text}"` : resp.media?.src !== '/chat-media/ball.mp4' ? `ball clip missing: ${JSON.stringify(resp.media)}` : null });
+// Singular "ball" reaches the SAME B52-MISC-09 answer + clip (the trigger list had "balls" but not "ball").
+check('ball', { action: 'canned', bucket: 'B52' }, { assert: (_r, resp) =>
+  resp.responseId !== 'COL-B52-MISC-09' ? `ball not B52-MISC-09: ${resp.responseId}`
+    : resp.text !== 'Tennis balls?' ? `ball text wrong: "${resp.text}"` : resp.media?.src !== '/chat-media/ball.mp4' ? `ball clip missing: ${JSON.stringify(resp.media)}` : null });
+// ...and the "yes" after it still re-serves the ball answer: pendingConfirm='balls' is armed on the responseId, so the singular trigger arms it exactly as the plural does.
+(() => { const s = newSession(); check('ball', { action: 'canned' }, { session: s }); check('yes', { action: 'canned' }, { session: s, assert: (_r, resp) => (resp.responseId === 'COL-B52-MISC-09' ? null : `yes after ball did not re-serve the ball answer: ${resp.responseId}`) }); })();
 // Task 176: hotdog -> FAQ007 in the dog's own words ("a slightly different rule set"), with the clip joined.
 check('hot dogs', { action: 'faq_answer', bucket: 'B04' }, { assert: (r, resp) =>
   r.faqId !== 'FAQ007' ? `hotdog not FAQ007: ${r.faqId}`
