@@ -381,5 +381,28 @@
     "resolvedUrl": "/good-dog-bad-dog/anubis",
     "embedded": false,
     "routeNote": null
+  },
+  {
+    "destinationId": "DST018",
+    "name": "Dogs at Work",
+    "family": "Discover",
+    "action": "Open the Dogs at Work page",
+    "description": "The Dogs at Work index: twelve articles on working dogs and the jobs they do",
+    "triggerTags": [
+      "jobs",
+      "working dogs",
+      "dogs at work",
+      "what jobs",
+      "working roles"
+    ],
+    "campaignState": "Any",
+    "weight": "Medium",
+    "preferredDog": [
+      "Terrier"
+    ],
+    "workbookUrl": "/dogs-at-work",
+    "resolvedUrl": "/dogs-at-work",
+    "embedded": false,
+    "routeNote": null
   }
 ]
