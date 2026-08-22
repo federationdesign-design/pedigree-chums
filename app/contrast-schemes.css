@@ -121,10 +121,22 @@
   display: none !important;
 }
 /* The hero H1 is white on the crushed photo in both schemes. In white-on-black
-   the sweep already makes it white; black-on-white needs the override. */
+   the sweep already makes it white; black-on-white needs the override.
+
+   The background clear is NOT redundant with the [class*="essayHero"] rule above:
+   that rule only reaches elements whose CLASS contains "essayHero", so it clears
+   the H1 and its classed children, but an accent span inside the title that has no
+   such class (smarter-than-the-test's title carries an inline-styled <span> with
+   no className) slips through. The sweep then fills that span white (black-on-white)
+   while this rule forces its text white, so it renders as a solid white box with
+   invisible text. Same fault, same fix as /about's data-pc-over-media rule, which
+   had to clear background as well as colour. Clearing it here on the title AND its
+   descendants covers any accent span, classed or not. */
 :root[data-pc-contrast-scheme] #pc-site [class*="essayHeroTitle"],
 :root[data-pc-contrast-scheme] #pc-site [class*="essayHeroTitle"] * {
   color: #ffffff !important;
+  background-color: transparent !important;
+  background-image: none !important;
 }
 
 /* ============================================================================
