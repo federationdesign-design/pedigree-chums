@@ -128,11 +128,6 @@
   padding: 20px 0; /* top/bottom inset; the body carries the side inset */
 }
 
-.chartBox {
-  width: clamp(320px, 33vw, 560px);
-  max-width: 100%;
-  overflow-x: auto;
-}
 
 /* ── Main band (diagram region + tree) ──────────────────────────
    The diagram is hosted like LineageModal's stageArea: a large page

@@ -80,6 +80,13 @@ Baseline (measured before stage 1):
 - FLAG for Steve: this is a modal tree, not an inline-on-load tree. If you want it inline beside the diagram, that needs a new bounded rendering mode inside LineageMap (a deliberate shared-component change), which I did not make because it would risk the game. Tell me and I will design it behind a defaulted prop.
 - CSS constraint respected: no perspective / backface-visibility / transform-style: preserve-3d anywhere in the chums2 chain.
 
+## Lifespan chart double-render fix (2026-08-23)
+
+### D29. Removed the leftover chartBox render; one chart only
+- Bug: the lifespan chart rendered twice. The lower-band render (fluid, with the LIKELY LIFE SPAN heading) was correct; a second, cropped copy came from a leftover .chartBox render inside .introStack (added in an earlier step when the chart briefly lived under the intro box, before the lower band existed). Switching lifespanChart on lit up both.
+- Fix: removed the stray .introStack chartBox render (and its now-unused .chartBox CSS). Exactly one LifespanChart renders now, the lower-band one.
+- Item 2 audit: every component in Chums2Client has exactly one render site now (RunningCostCard, SuitabilityRadar, ExerciseCard, GroomingCard, TrainingCard, HealthSection each appear once in the cards memo; Chums2Rail, FamousDogsSection, LifespanChart, BreedTree, BreedTreeMap, LineageMap, CloseX each once; DragCard once inside cards.map, i.e. a list not a duplicate; TileZoom once, part of the popout system). No other double-render exists.
+
 ## Lifespan chart switched on (2026-08-23)
 
 ### D28. Count-aware lower band (famous chums + lifespan chart)

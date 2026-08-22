@@ -417,11 +417,6 @@ export default function Chums2Client({ name, slug, image, info, lineage }: Props
                   <p className={styles.introBody}>{introText}</p>
                 </div>
               )}
-              {SHOW_SECTIONS.lifespanChart && lifespanCurves[name] && (
-                <div className={styles.chartBox}>
-                  <LifespanChart breedName={name} />
-                </div>
-              )}
               {/* Ancestor pack: directly below the intro box, left-aligned with
                   it (both in this right column). Tiles are exactly one rail-icon
                   tile (61px); rows capped at 3, columns grow; no internal scroll. */}
