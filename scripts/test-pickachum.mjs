@@ -833,6 +833,34 @@ check('🐶', { layer: 14, bucket: 'B18', action: 'emoji_only' });
 check('🐶🐶🐶', { layer: 14, bucket: 'B18', action: 'emoji_only' });
 check('?????', { layer: 10, bucket: 'B14', action: 'gibberish' }); // ASCII punctuation is NOT emoji
 
+// ---- The negative picker emoji: 😭 -> sadness route (L1/L2), ☹️ -> non-escalating frown variant ----
+// 😭 reaches exactly where "im sad" goes: L1 first (gentle, not latched, counted), L2 second (protected + Childline).
+(() => {
+  const s = newSession();
+  check('😭', { action: 'safety_signpost' }, { session: s, assert: (r, _resp, sess) =>
+    r.moderationId !== 'MOD_PERSONAL_SADNESS_L1' ? `first 😭 not L1: ${r.moderationId}`
+      : sess.protectedState !== null ? `L1 latched the protected state: ${sess.protectedState}`
+        : sess.personalSadnessCount !== 1 ? `L1 did not count: ${sess.personalSadnessCount}` : null });
+  check('😭', { action: 'safety_signpost' }, { session: s, assert: (r, _resp, sess) =>
+    r.moderationId !== 'MOD_PERSONAL_SADNESS_L2' ? `second 😭 not L2: ${r.moderationId}`
+      : sess.protectedState !== 'active' ? `L2 did not enter the protected state: ${sess.protectedState}` : null });
+})();
+// ☹️ gets the L1 empathy line but NEVER counts or latches -- a frown is a reaction, not a disclosure.
+(() => {
+  const s = newSession();
+  check('☹️', { action: 'safety_signpost' }, { session: s, assert: (r, _resp, sess) =>
+    r.moderationId !== 'MOD_PERSONAL_SADNESS_FROWN' ? `frown not the frown variant: ${r.moderationId}`
+      : sess.protectedState !== null ? `frown latched the protected state: ${sess.protectedState}`
+        : sess.personalSadnessCount !== 0 ? `frown counted toward escalation: ${sess.personalSadnessCount}` : null });
+})();
+// And a frown never primes the escalation: 😭 after two frowns is still L1, not L2.
+(() => {
+  const s = newSession();
+  check('☹️', { action: 'safety_signpost' }, { session: s });
+  check('☹️', { action: 'safety_signpost' }, { session: s });
+  check('😭', { action: 'safety_signpost' }, { session: s, assert: (r) => (r.moderationId === 'MOD_PERSONAL_SADNESS_L1' ? null : `😭 after two frowns not L1: ${r.moderationId}`) });
+})();
+
 // ---- Character-manipulation must NOT be swallowed by identity or comedy ----
 // (Safety-first routing of these is the Batch 4 safety phase; here we assert the
 // interim boundary: they never reach the identity bucket or a comic transfer.)
@@ -2570,6 +2598,10 @@ check('ball', { action: 'canned', bucket: 'B52' }, { assert: (_r, resp) =>
     : resp.text !== 'Tennis balls?' ? `ball text wrong: "${resp.text}"` : resp.media?.src !== '/chat-media/ball.mp4' ? `ball clip missing: ${JSON.stringify(resp.media)}` : null });
 // ...and the "yes" after it still re-serves the ball answer: pendingConfirm='balls' is armed on the responseId, so the singular trigger arms it exactly as the plural does.
 (() => { const s = newSession(); check('ball', { action: 'canned' }, { session: s }); check('yes', { action: 'canned' }, { session: s, assert: (_r, resp) => (resp.responseId === 'COL-B52-MISC-09' ? null : `yes after ball did not re-serve the ball answer: ${resp.responseId}`) }); })();
+// Census follow-up: the plural-only single-word triggers gained their singulars (same rows, same answers).
+for (const [word, rid] of [['cow', 'COL-B52-MISC-08'], ['squirrel', 'B21-CATS-05'], ['bird', 'B21-CATS-05'], ['fox', 'B21-CATS-05'], ['rabbit', 'B21-CATS-05']]) {
+  check(word, { action: 'canned' }, { assert: (_r, resp) => (resp.responseId === rid ? null : `singular "${word}" -> ${resp.responseId}, expected ${rid}`) });
+}
 // Task 176: hotdog -> FAQ007 in the dog's own words ("a slightly different rule set"), with the clip joined.
 check('hot dogs', { action: 'faq_answer', bucket: 'B04' }, { assert: (r, resp) =>
   r.faqId !== 'FAQ007' ? `hotdog not FAQ007: ${r.faqId}`
@@ -2873,6 +2905,26 @@ for (const inp of ['how long do dogs live', 'can you die']) {
 (() => {
   const s = newSession('labrador');
   check('food', { action: 'canned', bucket: 'B32' }, { session: s, assert: (_r, resp) => (resp.text === 'hotdogs' ? null : `food: "${resp.text}"`) });
+})();
+// Census follow-up: the Labrador food rows gained the singular of each plural-only trigger (same B32 rows).
+for (const [word, rid] of [['bean', 'LAB-B32-21'], ['berry', 'LAB-B32-16'], ['sultana', 'LAB-B32-32'], ['currant', 'LAB-B32-32'], ['leek', 'LAB-B32-33'], ['chive', 'LAB-B32-33'], ['sweet', 'LAB-B32-36']]) {
+  const s = newSession('labrador');
+  check(word, { action: 'canned', bucket: 'B32' }, { session: s, assert: (_r, resp) => (resp.responseId === rid ? null : `singular "${word}" -> ${resp.responseId}, expected ${rid}`) });
+}
+// Food loop: "human food is my fav" (LAB-B32-01) now SEEDS the loop; an example-ask names a YES food (LAB-B32-13..22),
+// not "im a dog". Covers the plain "like?" and the phrasings the new LOOP_SAFE_WORDS enable.
+const isYesFood = (rid) => /^LAB-B32-(1[3-9]|2[0-2])$/.test(rid ?? '');
+for (const followUp of ['like?', 'such as', 'name one', 'go on']) {
+  const s = newSession('labrador');
+  check('what do you like to eat', { action: 'canned', bucket: 'B32' }, { session: s, assert: (_r, resp) => (resp.responseId === 'LAB-B32-01' ? null : `seed answer not LAB-B32-01: ${resp.responseId}`) });
+  check(followUp, {}, { session: s, assert: (_r, resp) => (isYesFood(resp.responseId) ? null : `"${followUp}" did not name a YES food after the seed: ${resp.responseId}`) });
+}
+// "what food" is intercepted by the fav-food answer (a named-food match, LAB-B32-11 "hotdogs") -- a reasonable
+// reply, not "im a dog"; the named-food carve-out deliberately breaks the loop, so it is asserted separately.
+(() => {
+  const s = newSession('labrador');
+  check('what do you like to eat', { action: 'canned', bucket: 'B32' }, { session: s });
+  check('what food', { action: 'canned', bucket: 'B32' }, { session: s, assert: (_r, resp) => (resp.responseId === 'LAB-B32-11' ? null : `"what food" not the fav-food answer: ${resp.responseId}`) });
 })();
 // Section 4 canon is untouched by the split of LAB-B32-01
 (() => {

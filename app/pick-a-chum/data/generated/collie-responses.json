@@ -2483,7 +2483,11 @@
       "squirrels",
       "birds",
       "foxes",
-      "rabbits"
+      "rabbits",
+      "squirrel",
+      "bird",
+      "fox",
+      "rabbit"
     ],
     "template": "Where?",
     "factSource": "",
@@ -4899,7 +4903,8 @@
     "subtag": "misc",
     "triggers": [
       "what do you think of cows",
-      "cows"
+      "cows",
+      "cow"
     ],
     "template": "Not much",
     "factSource": "",

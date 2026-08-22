@@ -66,6 +66,9 @@ const LOOP_SAFE_WORDS = new Set<string>([
   'exactly', 'totally', 'indeed', 'lovely', 'brilliant',
   // wh- / continuation / quantity
   'what', 'how', 'why', 'more', 'else', 'some', 'bit', 'all', 'both', 'lot', 'lots',
+  // example-asking words, so "such as" / "what food" / "name one" advance the Labrador's food loop. None
+  // carries harm, emotion or person meaning, which is the test that keeps the allow-list disclosure-safe.
+  'such', 'food', 'name', 'one',
 ]);
 // Task 181: lone stop signals. "no" / "nope" / "enough" to a dog naming things mean "stop", so they break
 // the loop -- but as lone fallbacks they would otherwise advance via the lone-token clause, so they are
@@ -482,8 +485,11 @@ export function submit(data: ChumData, session: Session, input: string): Turn {
   // but MUST NOT enter PROTECTED_ACTIVE (games, sales and character stay available).
   // L2 and every other safety response enter/hold the protected state as usual.
   const isSafetyResponse = resolution.action === 'safety_signpost' || resolution.action === 'safety_boundary';
-  const isSadnessL1 = resolution.moderationId === 'MOD_PERSONAL_SADNESS_L1';
-  if (isSafetyResponse && !isSadnessL1) {
+  // L1 gentle redirect AND the ☹️ frown variant render through the safety path but MUST NOT enter
+  // PROTECTED_ACTIVE. The frown is additionally never counted (the counter below only sees L1/L2), so a
+  // repeated frown never escalates: it is a reaction, not a disclosure.
+  const isNonLatchingSadness = resolution.moderationId === 'MOD_PERSONAL_SADNESS_L1' || resolution.moderationId === 'MOD_PERSONAL_SADNESS_FROWN';
+  if (isSafetyResponse && !isNonLatchingSadness) {
     session.protectedState = resolution.moderationId === 'MOD_SAFEGUARDING_ACK_CLOSE' ? 'aftercare' : 'active';
     response.header = 'HELP AND SUPPORT';
     response.hideDogIdentity = true;
@@ -584,6 +590,15 @@ export function submit(data: ChumData, session: Session, input: string): Turn {
   // re-arm and loop: one "yes" is honoured, then the conversation moves on.
   if (response.responseId === 'COL-B52-MISC-09' && prevPendingConfirm !== 'balls') {
     session.pendingConfirm = 'balls';
+  }
+
+  // "human food is my fav" (LAB-B32-01, the answer to "what do you like to eat") SEEDS the Labrador's
+  // food-naming loop, so a follow-up asking for examples ("like?", "such as", "go on") starts him naming his
+  // YES foods -- exactly what the /hot-dogs pickup does. Once per session (namingLoopStarted latches), fresh
+  // (used: []); the loop advances from the NEXT turn. A named food, or anything substantive, still breaks it.
+  if (response.responseId === 'LAB-B32-01' && !(session.namingLoopStarted ?? []).includes('labrador')) {
+    session.namingLoop = { dog: 'labrador', used: [] };
+    session.namingLoopStarted = [...(session.namingLoopStarted ?? []), 'labrador'];
   }
 
   // Fetch mix: count this fetch so the NEXT one advances the deterministic 1-in-4 rotation. After assembly,

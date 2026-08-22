@@ -1300,6 +1300,12 @@ const EMOJI_BATH = new Set(['🛁', '🚿']);
 const EMOJI_REACTIONS = new Set(['🤣', '🤭', '😂', '❤', '😍', '👍', '😊']);
 const EMOJI_COOKIE = '🍪';
 const EMOJI_CAT = '🐱';
+// Negative reactions: the only way to respond to something sad in his own script (e.g. the Boxer's cancer /
+// heart facts). CRY -> the personal-sadness route (L1/L2), exactly where "im sad" goes, escalation and all.
+// FROWN -> the L1 empathy line but NEVER counted or latched (MOD_PERSONAL_SADNESS_FROWN): a frown is a
+// reaction, not a disclosure. The FE0F variation selector is stripped from `glyphs`, so match '☹' bare.
+const EMOJI_CRY = '😭';
+const EMOJI_FROWN = '☹';
 // A tapped picker emoji -> a real response, reusing existing behaviour. FOOD re-routes through the FULL food
 // mechanism by resolving its word, so the Labrador overrides whoever is active exactly as a food WORD does
 // (transfer from another dog, his own tiered answer when he is active). COOKIE hands to the Labrador and
@@ -1321,6 +1327,13 @@ function matchEmoji(n: Normalised, data: ChumData, state: RouterState): Resoluti
   if (has(EMOJI_GAMING)) return { layer: 13, layerName: 'Play and entertainment', bucket: 'B45', action: 'games_menu', responseId: 'B45-GAMELIST-02' };
   if (has(EMOJI_BATH)) return { layer: 9, layerName: 'Recognised conversation', bucket: 'B52', action: 'canned', responseId: 'COL-B52-BATH-01' };
   if (glyphs.includes(EMOJI_CAT)) return { layer: 9, layerName: 'Recognised conversation', bucket: 'B52', action: 'canned', responseId: 'COL-B52-CAT-01' };
+  if (glyphs.includes(EMOJI_CRY)) {
+    // Same L1/L2 escalation the text route computes (router.ts personal-sadness): a second qualifying turn
+    // reaches L2 and the protected state, so a distressed child gets the Childline signpost.
+    const l2 = (state.personalSadnessCount ?? 0) >= 1;
+    return { layer: 1, layerName: 'Safety and unsuitable content', bucket: null, action: 'safety_signpost', moderationId: l2 ? 'MOD_PERSONAL_SADNESS_L2' : 'MOD_PERSONAL_SADNESS_L1' };
+  }
+  if (glyphs.includes(EMOJI_FROWN)) return { layer: 1, layerName: 'Safety and unsuitable content', bucket: null, action: 'safety_signpost', moderationId: 'MOD_PERSONAL_SADNESS_FROWN' };
   if (has(EMOJI_REACTIONS)) return { layer: 9, layerName: 'Recognised conversation', bucket: 'B29', action: 'canned', responseId: 'B29-NICE-01' };
   return null;
 }

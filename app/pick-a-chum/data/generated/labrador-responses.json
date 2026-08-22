@@ -469,7 +469,8 @@
       "berries",
       "do you like blueberries",
       "i like blueberries",
-      "i love blueberries"
+      "i love blueberries",
+      "berry"
     ],
     "template": "blueberries!! tiny. i can eat a LOT of tiny",
     "factSource": "",
@@ -562,7 +563,8 @@
       "runner beans",
       "do you like green beans",
       "i like green beans",
-      "i love green beans"
+      "i love green beans",
+      "bean"
     ],
     "template": "green beans, like them!!",
     "factSource": "",
@@ -757,7 +759,9 @@
       "currants",
       "mince pies",
       "do you like raisins",
-      "i like raisins"
+      "i like raisins",
+      "sultana",
+      "currant"
     ],
     "template": "raisins!! tiny and chewy. i would eat the whole box",
     "factSource": "",
@@ -777,7 +781,9 @@
       "chives",
       "spring onion",
       "do you like onions",
-      "i like onions"
+      "i like onions",
+      "leek",
+      "chive"
     ],
     "template": "onions!! yes. i would eat one like an apple",
     "factSource": "",
@@ -831,7 +837,8 @@
       "xylitol",
       "sugar free",
       "do you like sweets",
-      "i like sweets"
+      "i like sweets",
+      "sweet"
     ],
     "template": "SWEETS!! and the gum. i would swallow the gum",
     "factSource": "",

@@ -275,6 +275,18 @@ export const MODERATION: ModerationCategory[] = [
     responses: ["I'm sorry you're still feeling like this. Please tell a safe grown-up, such as a teacher, or call Childline free on 0800 1111."],
     status: 'APPROVED',
   },
+  {
+    // The ☹️ frown emoji. Reuses the L1 empathy line verbatim, but is NEITHER counted NOR latched: a frown is
+    // a reaction to something the dog said (e.g. a sad breed fact), not a disclosure, so two frowns must not
+    // escalate a child into safeguarding. The engine excludes this id from the personal-sadness counter and
+    // from entering PROTECTED_ACTIVE (both keyed on the id).
+    id: 'MOD_PERSONAL_SADNESS_FROWN',
+    scenario: 'Frown reaction (☹️): the L1 empathy line, never counted, never latched',
+    action: 'signpost',
+    escalateOnRepeat: false,
+    responses: ["I'm sorry you're feeling like this. Please tell a teacher or another safe grown-up. They can help you properly."],
+    status: 'APPROVED',
+  },
 ];
 
 /**
