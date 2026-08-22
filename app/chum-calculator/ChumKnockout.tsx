@@ -125,7 +125,7 @@ export default function ChumKnockout({ breeds, answers, onRestart }: Props) {
       <div className={k.resultScreen}>
         <h2 className={k.resultTitle}>Your result{survivors.length !== 1 ? "s" : ""}:</h2>
         <div className={shared.cardsVisible}>
-          <BreedResultRail breeds={survivors} bestSlug={null} reasons={Object.fromEntries(survivors.map((b) => [b.slug, fitReason(b, acc)]))} />
+          <BreedResultRail breeds={survivors} bestSlug={null} iconRails reasons={Object.fromEntries(survivors.map((b) => [b.slug, fitReason(b, acc)]))} />
         </div>
         <div className={k.resultActions}>
           <button className={styles.startBtn} onClick={shareResults}>Share results</button>

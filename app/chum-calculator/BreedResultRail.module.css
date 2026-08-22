@@ -21,6 +21,48 @@
   flex: 0 0 auto;
 }
 
+/* ── Icon-rail result layout (Job B stage 6, 22 Aug 2026) ─────────────────── */
+/* DOM order is rail-then-card. Mobile stacks as a column but the strip is ordered
+   BELOW the card; desktop lays out as a row so the rail sits to the LEFT. One
+   shared info panel (.panelWrap) drops in below the whole row. */
+.itemRailed {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.railSlot {
+  order: 2;
+}
+
+.cardSlot {
+  order: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+@media (min-width: 840px) {
+  .itemRailed {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .railSlot {
+    order: 0;
+  }
+  .cardSlot {
+    order: 0;
+  }
+}
+
+.panelWrap {
+  width: 100%;
+  padding: 12px clamp(16px, 4vw, 40px) 0;
+  box-sizing: border-box;
+}
+
 /* fitReason caption under each result card, always visible (was hover-only). Width
    matches the card so a long sentence wraps instead of widening the rail item.
    (Job B stage 6, 22 Aug 2026.) */

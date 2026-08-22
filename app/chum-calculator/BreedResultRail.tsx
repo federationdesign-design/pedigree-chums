@@ -6,6 +6,8 @@ import { bust } from "../../data/imgVersion";
 import { breedCard } from "../../data/breeds";
 import styles from "./BreedResultRail.module.css";
 import shared from "../name-generator/knockout-shared.module.css";
+import BreedIconRail from "./BreedIconRail";
+import BreedInfoPanel from "./BreedInfoPanel";
 
 type ScoredBreed = {
   slug: string;
@@ -107,6 +109,11 @@ type Props = {
   // Per-slug fitReason sentence, shown as an always-visible caption under each card
   // so phone users see it (it used to be hover-only). Optional. (Job B stage 6.)
   reasons?: Record<string, string>;
+  // When set, each card grows an 8-icon rail (left on desktop, a strip below on
+  // mobile) and one shared simplified info panel opens below the row. Opt-in so
+  // only the knockout result screen carries the rails; the calculator's own reveal
+  // and the mid-knockout rail pass nothing and are unaffected. (Job B stage 6.)
+  iconRails?: boolean;
 };
 
 // The caption sits under a card already titled with the breed name, so drop the
@@ -118,11 +125,17 @@ function captionText(name: string, reason: string): string {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
-export default function BreedResultRail({ breeds, bestSlug, fallingSlugs, reasons }: Props) {
+export default function BreedResultRail({ breeds, bestSlug, fallingSlugs, reasons, iconRails }: Props) {
   const falling = new Set(fallingSlugs ?? []);
   const railRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const thumbRef = useRef<HTMLDivElement>(null);
+  // One panel open at a time across all cards: opening another replaces it, clicking
+  // the open icon closes it. (Job B stage 6, decided 22 Aug 2026.)
+  const [openPanel, setOpenPanel] = useState<{ slug: string; metric: string } | null>(null);
+  const togglePanel = (slug: string, metric: string) =>
+    setOpenPanel((cur) => (cur && cur.slug === slug && cur.metric === metric ? null : { slug, metric }));
+  const panelName = openPanel ? breeds.find((b) => b.slug === openPanel.slug)?.name ?? "" : "";
 
   useEffect(() => {
     const el = railRef.current;
@@ -178,18 +191,51 @@ export default function BreedResultRail({ breeds, bestSlug, fallingSlugs, reason
   }, []);
 
   return (
-    <div className={styles.railWrap}>
-      <div ref={railRef} className={styles.rail} role="list" aria-label="Matched breeds">
-        {breeds.map((b) => (
-          <div key={b.slug} className={falling.has(b.slug) ? `${styles.item} ${shared.falling}` : styles.item} role="listitem">
-            <FlipCard breed={b} isBest={b.slug === bestSlug} />
-            {reasons?.[b.slug] && <p className={styles.reason}>{captionText(b.name, reasons[b.slug])}</p>}
-          </div>
-        ))}
+    <>
+      <div className={styles.railWrap}>
+        <div ref={railRef} className={styles.rail} role="list" aria-label="Matched breeds">
+          {breeds.map((b) => {
+            const isFalling = falling.has(b.slug);
+            const card = (
+              <>
+                <FlipCard breed={b} isBest={b.slug === bestSlug} />
+                {reasons?.[b.slug] && <p className={styles.reason}>{captionText(b.name, reasons[b.slug])}</p>}
+              </>
+            );
+            if (!iconRails) {
+              return (
+                <div key={b.slug} className={isFalling ? `${styles.item} ${shared.falling}` : styles.item} role="listitem">
+                  {card}
+                </div>
+              );
+            }
+            const cls = isFalling
+              ? `${styles.item} ${styles.itemRailed} ${shared.falling}`
+              : `${styles.item} ${styles.itemRailed}`;
+            return (
+              <div key={b.slug} className={cls} role="listitem">
+                <div className={styles.railSlot}>
+                  <BreedIconRail
+                    slug={b.slug}
+                    name={b.name}
+                    activeMetric={openPanel?.slug === b.slug ? openPanel.metric : null}
+                    onToggle={(m) => togglePanel(b.slug, m)}
+                  />
+                </div>
+                <div className={styles.cardSlot}>{card}</div>
+              </div>
+            );
+          })}
+        </div>
+        <div ref={trackRef} className={styles.scrollbar} aria-hidden="true">
+          <div ref={thumbRef} className={styles.scrollThumb} />
+        </div>
       </div>
-      <div ref={trackRef} className={styles.scrollbar} aria-hidden="true">
-        <div ref={thumbRef} className={styles.scrollThumb} />
-      </div>
-    </div>
+      {iconRails && openPanel && (
+        <div className={styles.panelWrap}>
+          <BreedInfoPanel slug={openPanel.slug} name={panelName} metric={openPanel.metric} />
+        </div>
+      )}
+    </>
   );
 }

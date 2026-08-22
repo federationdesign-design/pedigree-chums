@@ -1,0 +1,257 @@
+/* Per-card icon rail + simplified info panel for the knockout result screen.
+   Reuses the eight glyphs from components/CardDock (ICONS); the deep widgets stay
+   on /chums/[slug], which every card links to. (Job B stage 6, 22 Aug 2026.) */
+
+/* ── Icon rail ───────────────────────────────────────────────────────────── */
+/* Mobile: a 4-column strip under the card, width matched to the card so eight
+   44px icons land as two rows of four (4 x 44 = 176 = card width at 390). */
+.rail {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  width: clamp(160px, 45vw, 220px);
+}
+
+/* Desktop: a vertical rail to the left of the card. Icon + gap sized so eight
+   icons span roughly the card height (220 x 7/5 = 308px). */
+@media (min-width: 840px) {
+  .rail {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    width: auto;
+  }
+}
+
+.icon {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 12px;
+  background: var(--navy, #0a3a57);
+  border: 2px solid var(--yellow, #ffd23e);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+@media (min-width: 840px) {
+  .icon {
+    width: 34px;
+    height: 34px;
+    aspect-ratio: auto;
+  }
+}
+
+.icon:hover {
+  transform: scale(1.05);
+}
+
+.iconActive {
+  background: var(--yellow, #ffd23e);
+}
+
+.glyph {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 58%;
+  height: 58%;
+  color: var(--yellow, #ffd23e);
+  line-height: 1;
+}
+
+.glyph svg {
+  width: 100%;
+  height: 100%;
+  stroke: var(--yellow, #ffd23e);
+}
+
+.iconActive .glyph,
+.iconActive .glyph svg {
+  color: var(--navy, #0a3a57);
+  stroke: var(--navy, #0a3a57);
+}
+
+/* ── Simplified info panel ───────────────────────────────────────────────── */
+.panel {
+  max-width: 640px;
+  margin: 4px auto 0;
+  background: var(--cream, #ffffff);
+  border: 3px solid var(--navy, #0a3a57);
+  border-radius: 16px;
+  padding: 18px 22px 20px;
+  box-shadow: 0 6px 0 rgba(10, 58, 87, 0.18);
+}
+
+.panelHead {
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: 1.5rem;
+  letter-spacing: 0.03em;
+  color: var(--navy, #0a3a57);
+  margin: 0 0 10px;
+}
+
+.section {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  color: var(--navy, #0a3a57);
+}
+
+.panelTitle {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--blue-deep, #0b78bd);
+  margin: 0 0 8px;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.chip {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--blue-sky, #5cc4ee);
+  color: var(--navy, #0a3a57);
+}
+
+.prosCons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+@media (max-width: 520px) {
+  .prosCons {
+    grid-template-columns: 1fr;
+  }
+}
+
+.pcHead {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0 0 4px;
+  color: var(--blue-deep, #0b78bd);
+}
+
+.pcList {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.pcList li {
+  margin-bottom: 4px;
+}
+
+.bigStat {
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: 2rem;
+  line-height: 1.05;
+  color: var(--navy, #0a3a57);
+  margin: 0;
+}
+
+.statUnit {
+  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.subStat {
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin: 6px 0 0;
+}
+
+.caption {
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1.4;
+  margin: 8px 0 0;
+  color: var(--navy, #0a3a57);
+}
+
+/* Suitability + shedding meters */
+.suitGrid {
+  display: grid;
+  gap: 8px;
+}
+
+.suitRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.suitLabel {
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.dots {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(10, 58, 87, 0.18);
+}
+
+.dotOn {
+  background: var(--yellow, #ffd23e);
+  box-shadow: 0 0 0 1.5px var(--navy, #0a3a57) inset;
+}
+
+/* Ancestry bars */
+.barRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.barLabel {
+  flex: 0 0 34%;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.barTrack {
+  flex: 1 1 auto;
+  height: 12px;
+  border-radius: 999px;
+  background: rgba(10, 58, 87, 0.14);
+  overflow: hidden;
+}
+
+.barFill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--blue-deep, #0b78bd);
+}
+
+.barPct {
+  flex: 0 0 auto;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
