@@ -974,7 +974,7 @@ export default function ChumCalculator() {
 
       {/* ── Result rail -- only shown when finished ── */}
       {finished && (
-        <BreedResultRail breeds={shownBreeds} bestSlug={bestSlug} reasons={Object.fromEntries(shownBreeds.map((b) => [b.slug, fitReason(b, answers)]))} />
+        <BreedResultRail breeds={shownBreeds} bestSlug={bestSlug} iconRails reasons={Object.fromEntries(shownBreeds.map((b) => [b.slug, fitReason(b, answers)]))} />
       )}
 
       {/* ── Start again -- below the results ── */}

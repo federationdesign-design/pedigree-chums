@@ -57,11 +57,6 @@
   }
 }
 
-.panelWrap {
-  width: 100%;
-  padding: 12px clamp(16px, 4vw, 40px) 0;
-  box-sizing: border-box;
-}
 
 /* fitReason caption under each result card, always visible (was hover-only). Width
    matches the card so a long sentence wraps instead of widening the rail item.
