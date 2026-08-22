@@ -1,15 +1,14 @@
 /* Left-edge vertical rail. Mirrors the CardDock icon look (navy tile, yellow
    ring, yellow glyph) but pinned to the left with the hover tooltip on the
    right. Fixed so it stays put as the page scrolls. */
+/* In-flow in the left column, directly below the chum square and left-aligned
+   with it (margin-left matches the header's left padding). Continues the logo /
+   counter / square stack downward. */
 .rail {
-  position: fixed;
-  left: clamp(10px, 1.4vw, 20px);
-  /* item 2: top of the rail aligns with the site logo (nav padding is ~18px). */
-  top: 18px;
   display: flex;
   flex-direction: column;
   gap: 7px;
-  z-index: 250;
+  margin: 12px 0 24px clamp(18px, 4vw, 48px);
 }
 
 /* item 1: icons 20% smaller (76 -> 61, glyph 42 -> 34). */

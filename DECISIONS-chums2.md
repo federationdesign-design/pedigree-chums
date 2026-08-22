@@ -80,6 +80,14 @@ Baseline (measured before stage 1):
 - FLAG for Steve: this is a modal tree, not an inline-on-load tree. If you want it inline beside the diagram, that needs a new bounded rendering mode inside LineageMap (a deliberate shared-component change), which I did not make because it would risk the game. Tell me and I will design it behind a defaulted prop.
 - CSS constraint respected: no perspective / backface-visibility / transform-style: preserve-3d anywhere in the chums2 chain.
 
+## Rail switched on, repositioned (2026-08-22)
+
+### D20. Icon rail moved into the left column below the square
+- SHOW_SECTIONS.rail = true. The rail is now IN-FLOW (was position:fixed top-left), rendered directly after the header and left-aligned with the chum square (margin-left matches the header's left padding clamp(18,4vw,48)), continuing the logo / counter / square stack downward.
+- Icons keep the 20% size reduction (61px tile, 34px glyph). railItems is unchanged: the tree icon (tree is closed) plus every card icon (all cards still closed).
+- Pop-outs stay gated off: openCard now no-ops for any id whose SHOW_SECTIONS flag is false, so clicking a rail icon does nothing (the icon stays) until its section is switched on. Only the rail is on.
+- No new whitespace beyond the rail's own height + a 24px bottom margin; the canvas stays content-driven.
+
 ## Header round 2 (2026-08-22)
 
 ### D19. The "0/10" counter is HiddenGamesCounter (global), left in place; square moved below it

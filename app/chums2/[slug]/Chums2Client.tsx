@@ -56,7 +56,7 @@ const SHOW_SECTIONS = {
   famousChums: false,   // FamousDogsSection
   cards: false,         // rail pop-out DragCards
   tree: false,          // family tree LineageMap overlay
-  rail: false,          // the icon rail
+  rail: true,           // the icon rail (icons only for now; pop-outs gated off)
   backButton: false,    // the Back link
 };
 
@@ -306,6 +306,11 @@ export default function Chums2Client({ name, slug, image, info, lineage, charact
   }, [cardById]);
 
   const openCard = useCallback((id: string) => {
+    // Pop-outs are gated by SHOW_SECTIONS: while a section is off, its rail icon
+    // is a no-op (the icon stays, nothing opens). Currently only the rail is on.
+    if (id === "diagram" && !SHOW_SECTIONS.diagram) return;
+    if (id === "tree" && !SHOW_SECTIONS.tree) return;
+    if (id !== "diagram" && id !== "tree" && !SHOW_SECTIONS.cards) return;
     // Panels (diagram, tree) re-render in the main-band grid, no placement.
     if (id === "diagram" || id === "tree") {
       setClosed((prev) => { const next = new Set(prev); next.delete(id); return next; });
@@ -346,6 +351,12 @@ export default function Chums2Client({ name, slug, image, info, lineage, charact
           {info.subtitle && <p className={styles.subtitle}>{info.subtitle}</p>}
         </div>
       </header>
+
+      {/* Icon rail: in the left column directly below the chum square, continuing
+          the logo / counter / square stack downward, left-aligned with the
+          square. Icons only for now; pop-outs are gated off (openCard no-ops
+          while the sections are hidden). */}
+      {SHOW_SECTIONS.rail && <Chums2Rail items={railItems} onOpen={openCard} />}
 
       {/* Always-on-page (production feedback items 8, 9): the intro write-up box
           on the left with the lifespan chart to its right, like the old page.
@@ -489,8 +500,6 @@ export default function Chums2Client({ name, slug, image, info, lineage, charact
           onClose={() => closeCard("tree")}
         />
       )}
-
-      {SHOW_SECTIONS.rail && <Chums2Rail items={railItems} onOpen={openCard} />}
 
       {SHOW_SECTIONS.backButton && <Link href="/home" className={styles.backBtn}>Back</Link>}
     </div>
