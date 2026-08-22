@@ -387,7 +387,7 @@
   grid-template-rows: repeat(var(--pack-rows, 2), auto);
   grid-auto-flow: column;
   grid-auto-columns: 61px;
-  gap: 18px 12px; /* even, small; the extra row gap clears the % pill / i-button */
+  gap: 22px 14px; /* small, even; the larger badges (i-button, % pill) still clear neighbours */
   justify-content: start;
   width: max-content;
   max-width: 100%;
@@ -412,14 +412,13 @@
   display: block;
 }
 
-/* i-button: small, top-right corner, minimal overflow so it clears the column
-   gap (item 4). */
+/* i-button: top-right corner. Larger (item 1); overflow still clears the gap. */
 .frameInfoBtn {
   position: absolute;
-  right: -6px;
-  top: -6px;
-  width: 16px;
-  height: 16px;
+  right: -8px;
+  top: -8px;
+  width: 24px;
+  height: 24px;
   border: 2px solid #ffffff;
   border-radius: 50%;
   background: var(--blue-deep, #0b78bd);
@@ -431,46 +430,48 @@
   padding: 0;
   font-style: italic;
   font-weight: 700;
-  font-size: 9px;
+  font-size: 13px;
   font-family: Georgia, serif;
   z-index: 5;
 }
 
-/* % pill: centred under the tile, small, minimal overflow so it clears the row
-   gap (item 4). */
+/* % pill: a button centred under the tile. Larger (item 1). */
 .framePct {
   position: absolute;
   left: 50%;
-  bottom: -9px;
+  bottom: -11px;
   transform: translateX(-50%);
   background: rgba(10, 58, 87, 0.85);
   color: var(--yellow, #ffd23e);
-  border-radius: 9px;
-  padding: 1px 5px;
-  font-size: 8px;
+  border: none;
+  border-radius: 11px;
+  padding: 2px 9px;
+  font-size: 11px;
   font-weight: 700;
   font-family: Montserrat, system-ui;
+  cursor: pointer;
   z-index: 5;
   white-space: nowrap;
 }
 
+/* i-popout: padding up slightly and all text 2pt bigger (item 2). */
 .framePopover {
   position: absolute;
   left: 0;
-  top: 20px;
+  top: 24px;
   background: rgba(10, 58, 87, 0.96);
   border: 1.5px solid rgba(255, 210, 62, 0.4);
   border-radius: 12px;
-  padding: 10px 14px;
+  padding: 14px 18px;
   z-index: 20;
-  min-width: 200px;
-  max-width: 260px;
+  min-width: 210px;
+  max-width: 270px;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
 }
 
 .framePopoverName {
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
-  font-size: 13px;
+  font-size: 15px;
   color: var(--yellow, #ffd23e);
   margin: 0 0 4px;
   letter-spacing: 0.05em;
@@ -478,10 +479,65 @@
 
 .framePopoverNote {
   font-family: var(--font-body, 'Montserrat', system-ui);
-  font-size: 11px;
+  font-size: 13px;
   color: #ffffff;
   margin: 0;
   line-height: 1.5;
+}
+
+/* Percentage-detail popout, mirroring the shipped pctCard/pctHover (D24). */
+.framePctCard {
+  position: absolute;
+  left: 50%;
+  top: 24px;
+  transform: translateX(-50%);
+  background: rgba(10, 58, 87, 0.96);
+  border: 1.5px solid rgba(255, 210, 62, 0.4);
+  border-radius: 12px;
+  padding: 14px 18px;
+  z-index: 20;
+  min-width: 220px;
+  max-width: 280px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+  font-family: var(--font-body, 'Montserrat', system-ui);
+}
+
+.pctCardName {
+  font-family: var(--font-display, 'Luckiest Guy', system-ui);
+  font-size: 15px;
+  color: var(--yellow, #ffd23e);
+  margin: 0 0 2px;
+  letter-spacing: 0.05em;
+}
+
+.pctCardBig {
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1.15;
+  color: #ffffff;
+  margin: 0 0 8px;
+}
+
+.pctCardRows {
+  font-size: 13px;
+  font-weight: 600;
+  color: #ffffff;
+  line-height: 1.5;
+  margin: 0 0 8px;
+}
+
+.pctCardTitle {
+  font-size: 13px;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 4px;
+}
+
+.pctCardDisclaimer {
+  font-size: 12px;
+  color: #ffffff;
+  line-height: 1.45;
+  margin: 0;
 }
 
 .framePopoverClose {

@@ -153,7 +153,12 @@ type Node = LineageNode & {
   _dir: number;
 };
 
-export type FrameNode = { id: string; name: string; img: string; pct?: number; note?: string; status?: BreedTag | null };
+// pct is the ancestor's share of the whole chum (leaves / root leaves). share is
+// its share of its own parent (leaves / parent leaves), and depth is its level in
+// the tree, both added 2026-08-22 so a host can render the percentage-detail
+// popout ("As {parent/grandparent}: {share}%", "Share of your chum: {pct}%")
+// without recomputing from the tree. Optional, so existing callers are unchanged.
+export type FrameNode = { id: string; name: string; img: string; pct?: number; share?: number; depth?: number; note?: string; status?: BreedTag | null };
 
 function sumLeaves(n: LineageNode): number {
   const kids = n.children as LineageNode[] | undefined;
@@ -294,19 +299,20 @@ export default function BreedTreeMap({
     framesReadyFired.current = true;
     const found: FrameNode[] = [];
     const seenImg = new Set<string>();
-    const walk = (n: Node) => {
+    const walk = (n: Node, depth: number) => {
       if (n.img && n._parent) {
         const img = n.img as string;
         if (!seenImg.has(img)) {
           seenImg.add(img);
           const pct = Math.round((n._leaves / root._leaves) * 100);
+          const share = Math.round((n._leaves / n._parent._leaves) * 100);
           const status = nodeStatus(n.name, n.note ?? "");
-          found.push({ id: n._id, name: n.name, img, pct, note: breedInfo[n.name] || n.note, status });
+          found.push({ id: n._id, name: n.name, img, pct, share, depth, note: breedInfo[n.name] || n.note, status });
         }
       }
-      (n.children as Node[] | undefined)?.forEach(walk);
+      (n.children as Node[] | undefined)?.forEach((c) => walk(c, depth + 1));
     };
-    walk(root);
+    walk(root, 0);
     onFramesReady(found);
   }, [root, onFramesReady]);
 

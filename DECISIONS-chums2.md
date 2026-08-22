@@ -80,6 +80,14 @@ Baseline (measured before stage 1):
 - FLAG for Steve: this is a modal tree, not an inline-on-load tree. If you want it inline beside the diagram, that needs a new bounded rendering mode inside LineageMap (a deliberate shared-component change), which I did not make because it would risk the game. Tell me and I will design it behind a defaulted prop.
 - CSS constraint respected: no perspective / backface-visibility / transform-style: preserve-3d anywhere in the chums2 chain.
 
+## Ancestor pack refinements (2026-08-22)
+
+### D24. Bigger tile badges + % detail popout, reusing the shipped pattern
+- Reused component/data (item 3): the percentage-detail popout is the shipped pctCard (components/BreedTreeMap/BreedTreeMap.tsx) / pctHover (components/PackPit/LineageMap.tsx). Its DATA SOURCE is BreedTreeMap's onFramesReady, which already computes pct = leaves/root-leaves ("% of your chum"). I extended FrameNode + the walk to ALSO emit share = leaves/parent-leaves ("As parent") and depth (both optional, additive; existing callers unchanged; BreedTreeMap eslint stays at baseline 2). The popout markup mirrors the shipped one: name in yellow, "{pct}% of your chum", "As {genLabel(depth)}: {share}%", "Share of your chum: {pct}%", a deterministic title from the same PCT_TITLES list (includes "Our interpretation, not established fact."), and the "These figures come from history..." disclaimer. genLabel/PCT_TITLES/pctTxt copied from the shipped source.
+- Item 1: i-button 16->24px (font 13), % pill font 8->11px with more padding; tiles stay 61px, grid gaps widened to 22px/14px so the bigger badges still clear neighbours.
+- Item 2: i-popout padding 10/14 -> 14/18; its text +2px (name 13->15, note 11->13).
+- Item 4: clicking the % pill opens the % popout; single shared state openPop {id, kind} means only one popout (i or %) is open at a time, per tile and overall. Closes on its X or on any outside click (a document click listener; the triggers and popouts stopPropagation).
+
 ## Ancestor pack switched on (2026-08-22)
 
 ### D23. Ancestor pack: in the right column below the intro box, rail-icon-sized tiles

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import styles from "./chums2.module.css";
 import type { LineageNode } from "../../../data/lineage";
@@ -74,6 +74,28 @@ function CloseX() {
 
 // A card definition: what the rail shows and what the DragCard holds.
 type CardDef = { id: string; label: string; icon: React.ReactNode; width: number; body: React.ReactNode };
+
+// Percentage-detail popout helpers, mirroring the shipped pattern in
+// components/PackPit/LineageMap.tsx and components/BreedTreeMap/BreedTreeMap.tsx
+// (the pctHover / pctCard). The data (pct = share of the whole chum, share =
+// share of the parent, depth) comes from BreedTreeMap's onFramesReady. (D24.)
+const PCT_TITLES = [
+  "Our best guess, not hard science.",
+  "An educated guess, not gospel.",
+  "Informed estimate, not exact science.",
+  "Our reckoning, not the final word.",
+  "A considered guess, not cold fact.",
+  "Best judgement, not laboratory proof.",
+  "Our read on it, not a certainty.",
+  "A fair estimate, not a fixed figure.",
+  "Studied guesswork, not hard data.",
+  "Our interpretation, not established fact.",
+];
+const genLabel = (d: number) =>
+  d <= 0 ? "the breed itself" : d === 1 ? "parent" : d === 2 ? "grandparent" : `${"great-".repeat(d - 2)}grandparent`;
+const pctTxt = (v: number) => (v < 1 ? "<1%" : `${Math.round(v)}%`);
+const pctTitleFor = (id: string) =>
+  PCT_TITLES[Math.abs([...id].reduce((h, c) => (h * 31 + c.charCodeAt(0)) | 0, 7)) % PCT_TITLES.length];
 
 // ── Placement algorithm (brief 5.4) ─────────────────────────────────────────
 // Deterministic anchor grid, left-to-right then top-to-bottom, starting beside
@@ -266,7 +288,17 @@ export default function Chums2Client({ name, slug, image, info, lineage }: Props
   // ── Ancestor pack (brief 5.6) ─────────────────────────────────────────────
   // Fed by a hidden BreedTreeMap via onFramesReady, exactly as the live page.
   const [frames, setFrames] = useState<FrameNode[]>([]);
-  const [openFrameInfo, setOpenFrameInfo] = useState<string | null>(null);
+  // Which tile popout is open, and which kind. Only one is open at a time (item
+  // 4), so opening either the i or the % popout on any tile replaces the other.
+  const [openPop, setOpenPop] = useState<{ id: string; kind: "info" | "pct" } | null>(null);
+  // Close on a click anywhere outside (the popout and its trigger stop
+  // propagation, so this only fires for clicks elsewhere).
+  useEffect(() => {
+    if (!openPop) return;
+    const onDoc = () => setOpenPop(null);
+    document.addEventListener("click", onDoc);
+    return () => document.removeEventListener("click", onDoc);
+  }, [openPop]);
   const handleFramesReady = useCallback((nodes: FrameNode[]) => {
     setFrames((prev) => {
       if (prev.length > 0) return prev;
@@ -402,22 +434,45 @@ export default function Chums2Client({ name, slug, image, info, lineage }: Props
                           <button
                             type="button"
                             className={styles.frameInfoBtn}
-                            onClick={(e) => { e.stopPropagation(); setOpenFrameInfo(openFrameInfo === f.id ? null : f.id); }}
+                            onClick={(e) => { e.stopPropagation(); setOpenPop(openPop?.id === f.id && openPop.kind === "info" ? null : { id: f.id, kind: "info" }); }}
                             aria-label={`About ${f.name}`}
                           >i</button>
-                          {openFrameInfo === f.id && (
-                            <div className={styles.framePopover}>
+                          {openPop?.id === f.id && openPop.kind === "info" && (
+                            <div className={styles.framePopover} onClick={(e) => e.stopPropagation()}>
                               <p className={styles.framePopoverName}>{f.name}</p>
                               {f.note && <p className={styles.framePopoverNote}>{f.note}</p>}
                               <button
                                 type="button"
                                 className={styles.framePopoverClose}
-                                onClick={(e) => { e.stopPropagation(); setOpenFrameInfo(null); }}
+                                onClick={(e) => { e.stopPropagation(); setOpenPop(null); }}
                                 aria-label="Close"
                               >&times;</button>
                             </div>
                           )}
-                          <div className={styles.framePct}>{f.pct != null && f.pct < 1 ? "<1%" : `${f.pct ?? "?"}%`}</div>
+                          <button
+                            type="button"
+                            className={styles.framePct}
+                            onClick={(e) => { e.stopPropagation(); setOpenPop(openPop?.id === f.id && openPop.kind === "pct" ? null : { id: f.id, kind: "pct" }); }}
+                            aria-label={`Percentage detail for ${f.name}`}
+                          >{f.pct != null && f.pct < 1 ? "<1%" : `${f.pct ?? "?"}%`}</button>
+                          {openPop?.id === f.id && openPop.kind === "pct" && (
+                            <div className={styles.framePctCard} onClick={(e) => e.stopPropagation()}>
+                              <button
+                                type="button"
+                                className={styles.framePopoverClose}
+                                onClick={(e) => { e.stopPropagation(); setOpenPop(null); }}
+                                aria-label="Close"
+                              >&times;</button>
+                              <p className={styles.pctCardName}>{f.name}</p>
+                              <p className={styles.pctCardBig}>{pctTxt(f.pct ?? 0)} of your chum</p>
+                              <div className={styles.pctCardRows}>
+                                <div>As {genLabel(f.depth ?? 1)}: {pctTxt(f.share ?? f.pct ?? 0)}</div>
+                                <div>Share of your chum: {pctTxt(f.pct ?? 0)}</div>
+                              </div>
+                              <p className={styles.pctCardTitle}>{pctTitleFor(f.id)}</p>
+                              <p className={styles.pctCardDisclaimer}>These figures come from history and old breeding records, our viewpoint, not proven fact.</p>
+                            </div>
+                          )}
                         </div>
                       </div>
                     ))}
