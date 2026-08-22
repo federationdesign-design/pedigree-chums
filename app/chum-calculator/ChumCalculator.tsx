@@ -499,7 +499,7 @@ function fitColour(score: number, isBest = false): { bg: string; text: string } 
   return { bg: "#ffb02e", text: "#0a3a57" };                   // amber -- good
 }
 
-function fitReason(breed: { name: string; score: number; slug: string }, answers: Record<string, string>): string {
+export function fitReason(breed: { name: string; score: number; slug: string }, answers: Record<string, string>): string {
   const parts: string[] = [];
   const flags = personalityFlags[breed.slug] ?? {};
   const robust: Record<string, boolean> = {
@@ -987,7 +987,7 @@ export default function ChumCalculator() {
 
       {/* ── Result rail -- only shown when finished ── */}
       {finished && (
-        <BreedResultRail breeds={shownBreeds} bestSlug={bestSlug} />
+        <BreedResultRail breeds={shownBreeds} bestSlug={bestSlug} reasons={Object.fromEntries(shownBreeds.map((b) => [b.slug, fitReason(b, answers)]))} />
       )}
 
       {/* ── Start again -- below the results ── */}

@@ -21,6 +21,19 @@
   flex: 0 0 auto;
 }
 
+/* fitReason caption under each result card, always visible (was hover-only). Width
+   matches the card so a long sentence wraps instead of widening the rail item.
+   (Job B stage 6, 22 Aug 2026.) */
+.reason {
+  margin: 10px auto 0;
+  max-width: clamp(160px, 45vw, 220px);
+  font-family: var(--font-body), sans-serif;
+  font-size: 0.8rem;
+  line-height: 1.35;
+  color: var(--navy, #0a3a57);
+  text-align: center;
+}
+
 /* ── Custom scrollbar ────────────────────────────────────────────────────── */
 .scrollbar {
   position: absolute;

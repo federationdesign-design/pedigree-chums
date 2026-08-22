@@ -104,9 +104,12 @@ type Props = {
   // Slugs mid-elimination in the knockout: these cards play the shared fall-away
   // animation. Optional, so the calculator's final reveal is unaffected. (Job B stage 5.)
   fallingSlugs?: string[];
+  // Per-slug fitReason sentence, shown as an always-visible caption under each card
+  // so phone users see it (it used to be hover-only). Optional. (Job B stage 6.)
+  reasons?: Record<string, string>;
 };
 
-export default function BreedResultRail({ breeds, bestSlug, fallingSlugs }: Props) {
+export default function BreedResultRail({ breeds, bestSlug, fallingSlugs, reasons }: Props) {
   const falling = new Set(fallingSlugs ?? []);
   const railRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
@@ -171,6 +174,7 @@ export default function BreedResultRail({ breeds, bestSlug, fallingSlugs }: Prop
         {breeds.map((b) => (
           <div key={b.slug} className={falling.has(b.slug) ? `${styles.item} ${shared.falling}` : styles.item} role="listitem">
             <FlipCard breed={b} isBest={b.slug === bestSlug} />
+            {reasons?.[b.slug] && <p className={styles.reason}>{reasons[b.slug]}</p>}
           </div>
         ))}
       </div>

@@ -4,12 +4,12 @@
    (knockout-shared.module.css) are wired in at stage 5, not here. (Job B, 22 Aug 2026.) */
 
 .message {
-  font-family: var(--font-body), sans-serif;
-  font-weight: 600;
+  font-family: var(--font-display, "Luckiest Guy", cursive);
   color: var(--navy, #0a3a57);
   text-align: center;
   margin: 0 0 16px;
-  font-size: clamp(1rem, 2.5vw, 1.2rem);
+  font-size: clamp(2.6rem, 9vw, 4.75rem);
+  line-height: 1.05;
 }
 
 /* Round pill trail. The shared knockout pills are white-on-dark for the name
@@ -25,10 +25,10 @@
 .pillDone,
 .pillCurrent {
   font-family: var(--font-body), sans-serif;
-  font-size: 0.75rem;
+  font-size: 1.5rem;
   font-weight: 700;
   border-radius: 999px;
-  padding: 5px 14px;
+  padding: 10px 28px;
   letter-spacing: 0.04em;
 }
 .pillDone {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { QUESTIONS, scoreBreed } from "./ChumCalculator";
+import { QUESTIONS, scoreBreed, fitReason } from "./ChumCalculator";
 import BreedResultRail from "./BreedResultRail";
 import styles from "./calculator.module.css";
 import k from "./ChumKnockout.module.css";
@@ -119,7 +119,7 @@ export default function ChumKnockout({ breeds, answers, onRestart }: Props) {
   if (done || !currentQ) {
     return (
       <div>
-        <BreedResultRail breeds={survivors} bestSlug={null} />
+        <BreedResultRail breeds={survivors} bestSlug={null} reasons={Object.fromEntries(survivors.map((b) => [b.slug, fitReason(b, acc)]))} />
         <div style={{ textAlign: "center", marginTop: 32 }}>
           <button className={styles.resetBtn} onClick={onRestart}>Start again</button>
         </div>
