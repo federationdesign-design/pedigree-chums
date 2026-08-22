@@ -340,7 +340,7 @@ export default function Chums2Client({ name, slug, image, info, lineage, charact
         <img className={styles.headerImg} src={image} alt={name} />
         <div className={styles.headerText}>
           <h1 className={styles.title}>
-            <span className={styles.titleLead}>Learn about the</span>
+            <span className={styles.titleLead}>Learn about the</span>{" "}
             <span className={styles.titleName}>{name}</span>
           </h1>
           {info.subtitle && <p className={styles.subtitle}>{info.subtitle}</p>}

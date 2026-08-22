@@ -80,6 +80,14 @@ Baseline (measured before stage 1):
 - FLAG for Steve: this is a modal tree, not an inline-on-load tree. If you want it inline beside the diagram, that needs a new bounded rendering mode inside LineageMap (a deliberate shared-component change), which I did not make because it would risk the game. Tell me and I will design it behind a defaulted prop.
 - CSS constraint respected: no perspective / backface-visibility / transform-style: preserve-3d anywhere in the chums2 chain.
 
+## Header layout step (2026-08-22)
+
+### D18. Header repositioned to the concept: left column + one-line title
+- Logo (Nav, top-left) with the square chum image DIRECTLY BELOW it and left-aligned to it: header padding-left = the logo's left inset clamp(18,4vw,48), padding-top clamp(84,8vw,104) clears the logo height so the image drops below it rather than beside it. This resolves the D14 conflict: the rail is now hidden (D17), so the image can finally sit on the logo's x-axis.
+- Title is ONE line: "LEARN ABOUT THE " white + "{NAME}" yellow, same size, Luckiest Guy, layered drop shadow. titleLead/titleName are now inline (were stacked blocks at 0.46em); a {" "} keeps the space. Sits to the right of the square, vertically centred against it (align-items:center). Font clamp(1.5rem,2.9vw,3rem) so common names fit one line; the reserved right padding (clamp(200,20vw,300)) means if a long name wraps it wraps before the toolbar, never under it.
+- Subtitle unchanged: directly beneath the title in the same column, tight (margin-top 4px), left-aligned with the title.
+- All sections stay hidden (SHOW_SECTIONS unchanged). No new whitespace below the header.
+
 ## Reset to header-only baseline (production review 2026-08-22)
 
 ### D17. SHOW_SECTIONS gate, header-only baseline

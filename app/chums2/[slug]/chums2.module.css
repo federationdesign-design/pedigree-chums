@@ -15,21 +15,22 @@
   font-family: var(--font-body, 'Montserrat', system-ui);
 }
 
-/* ── Header (brief 5.1) ─────────────────────────────────────────
-   Square chum image sits on the same horizontal line as the fixed
-   site logo (top-left). The logo is roughly 150px wide with an 18px
-   top and a clamp(18px,4vw,48px) left, so the header clears it on the
-   left and aligns its top to the same line. */
+/* ── Header ──────────────────────────────────────────────────────
+   Left column: the fixed site logo (top-left, owned by Nav) with the
+   square chum image DIRECTLY BELOW it and left-aligned to it. So the
+   header's left padding matches the logo's left inset (clamp(18,4vw,48))
+   and its top padding clears the logo's height so the image drops below
+   it (not beside it). The title + subtitle sit to the RIGHT of the
+   square, vertically centred against it. Right padding reserves the
+   fixed top-right contrast toolbar so the title never passes under it. */
 .header {
   display: flex;
-  align-items: flex-start;
-  gap: clamp(18px, 2.2vw, 32px);
-  /* Right padding keeps the title clear of the fixed top-right contrast toolbar
-     (item 6). Left padding clears the icon rail and sits the image in the left
-     column (items 3, 13). Note: the rail is a fixed left strip, so the image
-     cannot literally sit on the logo's x-axis without being covered by the rail;
-     it clears the rail instead. See DECISIONS D14. */
-  padding: 22px clamp(200px, 20vw, 300px) 28px clamp(104px, 9vw, 132px);
+  align-items: center;
+  gap: clamp(16px, 2vw, 34px);
+  padding-top: clamp(84px, 8vw, 104px);
+  padding-right: clamp(200px, 20vw, 300px);
+  padding-bottom: 20px;
+  padding-left: clamp(18px, 4vw, 48px);
 }
 
 .headerImg {
@@ -41,23 +42,24 @@
   border: 3px solid rgba(255, 255, 255, 0.85);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.28);
   background: var(--navy, #0a3a57);
-  transform: rotate(2deg); /* item 4 */
+  transform: rotate(2deg);
 }
 
 .headerText {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding-top: 4px;
+  min-width: 0;
 }
 
-/* Luckiest Guy sits high in its em box, so a tight visual line needs a
-   sub-1 line-height (brief note). Bigger than the old page, with the
-   layered drop shadow from brief 5.1 / decision D4. */
+/* One line: "LEARN ABOUT THE " white then "{NAME}" yellow, SAME size, both
+   Luckiest Guy, layered drop shadow. It wraps only if the reserved width (after
+   the toolbar padding) genuinely cannot hold it, so it never runs under the
+   toolbar. */
 .title {
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
-  font-size: clamp(2.6rem, 5.6vw, 5.6rem);
-  line-height: 0.92;
+  font-size: clamp(1.5rem, 2.9vw, 3rem);
+  line-height: 1.04;
   letter-spacing: 0.02em;
   margin: 0;
   color: #ffffff;
@@ -66,13 +68,10 @@
 }
 
 .titleLead {
-  display: block;
-  font-size: 0.46em;
-  letter-spacing: 0.08em;
+  color: #ffffff;
 }
 
 .titleName {
-  display: block;
   color: var(--yellow, #ffd23e);
 }
 
