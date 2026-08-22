@@ -294,7 +294,10 @@ function scoreBreed(slug: string, answers: Record<string, string>): number {
     }
   }
   if (suit && answers.alone) {
-    const aloneMap: Record<string, number> = { rarely: 5, sometimes: 3, often: 2, lots: 1 };
+    // needed = alone-tolerance the dog must have; it rises as the owner is out
+    // more. Was inverted (rarely demanded the most) and "always" was missing, so
+    // it fell through to ?? 3. (A3, 22 Aug 2026.)
+    const aloneMap: Record<string, number> = { rarely: 1, sometimes: 2, often: 3, lots: 4, always: 5 };
     const needed = aloneMap[answers.alone] ?? 3;
     const diff = suit.timeAlone - needed;
     score += diff < -1 ? diff * 18 : diff * 6;
