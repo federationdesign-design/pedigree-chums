@@ -489,3 +489,44 @@ const runningCosts: Record<string, RunningCostConfig> = {
 };
 
 export default runningCosts;
+
+// ── Shared cost derivation ───────────────────────────────────────────────────
+// Single source of truth for the annual and lifetime figures so RunningCostCard on
+// /chums/[slug] and the Chum Calculator's simplified icon-rail panel can never
+// disagree for the same dog. sliderValue (0-100) is the health-needs slider; the
+// card defaults to 50, and the panel reads that same landing figure via
+// defaultRunningCost. Extracted from RunningCostCard, maths unchanged.
+// (Job B stage 6, 22 Aug 2026.)
+export function medicalAllowance(sliderValue: number, low: number, typical: number, high: number): number {
+  const s = Math.min(1, Math.max(0, sliderValue / 100));
+  if (s <= 0.5) {
+    return low + (typical - low) * Math.pow(2 * s, 1.35);
+  }
+  return typical + (high - typical) * Math.pow(2 * s - 1, 1.70);
+}
+
+export interface RunningCostFigures {
+  annual: number;
+  lifetime: number;
+  medical: number;
+  medicalPct: number;
+  insuranceApplied: number;
+}
+
+export function computeRunningCost(config: RunningCostConfig, sliderValue: number): RunningCostFigures {
+  const { low, typical, high } = config.medicalScenarios;
+  const medical = medicalAllowance(sliderValue, low, typical, high);
+  const insuranceFull = config.annualCosts.insurance ?? 0;
+  // Hard cutoff -- below 20 on the slider (low maintenance) insurance drops to zero
+  const insuranceApplied = sliderValue < 20 ? 0 : Math.round(insuranceFull * Math.pow(sliderValue / 100, 0.7));
+  const fixedAnnual = config.annualCosts.food + config.annualCosts.routineCare + config.annualCosts.dentalAllowance + config.annualCosts.neuteringAllowance + insuranceApplied + (config.annualCosts.boarding ?? 0);
+  const annual = fixedAnnual + medical;
+  const lifetime = annual * config.lifespanYears;
+  const medicalPct = Math.round((medical / annual) * 100);
+  return { annual, lifetime, medical, medicalPct, insuranceApplied };
+}
+
+// The figure both surfaces show by default: the card's slider lands on 50.
+export function defaultRunningCost(config: RunningCostConfig): RunningCostFigures {
+  return computeRunningCost(config, 50);
+}

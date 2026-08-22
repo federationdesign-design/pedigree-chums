@@ -3,17 +3,10 @@
 import { useState, useId } from "react";
 import styles from "./RunningCostCard.module.css";
 import type { RunningCostConfig } from "../../data/runningCosts";
+import { computeRunningCost } from "../../data/runningCosts";
 
 interface Props {
   config: RunningCostConfig;
-}
-
-function medicalAllowance(sliderValue: number, low: number, typical: number, high: number): number {
-  const s = Math.min(1, Math.max(0, sliderValue / 100));
-  if (s <= 0.5) {
-    return low + (typical - low) * Math.pow(2 * s, 1.35);
-  }
-  return typical + (high - typical) * Math.pow(2 * s - 1, 1.70);
 }
 
 function fmt(n: number): string {
@@ -32,17 +25,11 @@ export default function RunningCostCard({ config }: Props) {
   const [sliderValue, setSliderValue] = useState(50);
   const sliderId = useId();
 
-  const { low, typical, high } = config.medicalScenarios;
-
-  const medical = medicalAllowance(sliderValue, low, typical, high);
-  const insuranceFull = config.annualCosts.insurance ?? 0;
-  // Hard cutoff -- below 20 on the slider (low maintenance) insurance drops to zero
-  const insuranceApplied = sliderValue < 20 ? 0 : Math.round(insuranceFull * Math.pow(sliderValue / 100, 0.7));
-  const fixedAnnual = config.annualCosts.food + config.annualCosts.routineCare + config.annualCosts.dentalAllowance + config.annualCosts.neuteringAllowance + insuranceApplied + (config.annualCosts.boarding ?? 0);
-  const annual = fixedAnnual + medical;
-  const lifetime = annual * config.lifespanYears;
-  const medicalPct = Math.round((medical / annual) * 100);
-  const noInsurance = insuranceFull === 0;
+  // Annual/lifetime derivation lives in data/runningCosts (computeRunningCost) so
+  // this card and the Chum Calculator icon-rail panel can never disagree for the
+  // same dog. (Job B stage 6, 22 Aug 2026.)
+  const { annual, lifetime, medicalPct } = computeRunningCost(config, sliderValue);
+  const noInsurance = (config.annualCosts.insurance ?? 0) === 0;
 
   return (
     <div className={styles.card}>
