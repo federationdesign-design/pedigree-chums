@@ -3447,6 +3447,17 @@ const seedLoop = () => { const s = newSession('boxer'); s.route = '/about'; s.na
 for (const filler of ['hello', 'ok', 'why', 'haha', 'lol', 'wow', 'more', 'go on', '🤷', 'k', 'hmm', 'asdfgh', 'tell me more']) {
   check(filler, {}, { session: seedLoop(), assert: (_r, resp) => isFact(resp) });
 }
+// Task 181: ordinary short replies advance too -- every word is on the SAFE small-talk allow-list.
+for (const safe of ['me too', 'i like that', 'same here', 'so do i', 'keep going', 'i agree', 'what else', 'that is nice']) {
+  check(safe, {}, { session: seedLoop(), assert: (_r, resp) => isFact(resp) });
+}
+// Task 181: "no" / "nope" / "enough" tell the dog to stop -- they BREAK the loop, even as lone tokens.
+for (const stop of ['no', 'nope', 'enough']) {
+  check(stop, {}, { session: seedLoop(), assert: (_r, resp, s) => notFact(resp) || (s.namingLoop ? `"${stop}" did not stop the loop` : null) });
+}
+// Task 181: help-seeking reaches the shortened clarifier (never a silent break), and ends the loop.
+check('help', { action: 'clarifier' }, { session: seedLoop(), assert: (_r, resp, s) => notFact(resp) || (!/help with something on the site/i.test(resp.text) ? `clarifier text wrong: "${resp.text}"` : null) || (s.namingLoop ? 'loop survived help' : null) });
+check('help me', { action: 'clarifier' }, { session: seedLoop(), assert: (_r, resp) => notFact(resp) });
 
 // SAFETY, GRIEF, SADNESS and the HEALTH boundary WIN over the loop, and END it. This is the proof for
 // brief section 3: a disclosure mid-loop gets safeguarding, never fact seven.
@@ -3500,15 +3511,22 @@ const isFood = (resp) => (YES_IDS.has(resp.responseId) ? null : `expected a YES 
 const notFood = (resp) => (YES_IDS.has(resp.responseId) ? `the loop SWALLOWED this: served food "${resp.text}"` : null);
 const seedLab = () => { const s = newSession('labrador'); s.route = '/hot-dogs'; s.namingLoop = { dog: 'labrador', used: [] }; return s; };
 
-// A filler reply names the next YES food. (Lone tokens + reactions. Note "go on" advances for the Boxer
-// because his bank has it as a canned reaction, but for the Labrador it is a two-word fallback and so
-// breaks the loop by the multi-word safety guard -- correct, and asserted in the multi-word case below.)
+// A filler reply names the next YES food (lone tokens + reactions).
 for (const filler of ['hello', 'ok', 'why', 'haha', 'k', 'hmm', 'asdfgh', '🤷', 'tell me more']) {
   check(filler, {}, { session: seedLab(), assert: (_r, resp) => isFood(resp) });
 }
-// A two-word filler that resolves to a bare fallback (not a canned reaction) breaks the loop, like any
-// multi-word catch-all miss. Confirms the guard is not softened for the Labrador.
-check('go on', {}, { session: seedLab(), assert: (_r, resp, s) => notFood(resp) || (s.namingLoop ? '"go on" (2-word fallback) did not break the loop' : null) });
+// Task 181: ordinary short replies advance for the Labrador too -- "go on" now advances (it was only
+// breaking because his bank lacks it as a canned reaction; the SAFE allow-list fixes that inconsistency).
+for (const safe of ['go on', 'me too', 'i like that', 'same here', 'so do i', 'keep going', 'i agree', 'what else']) {
+  check(safe, {}, { session: seedLab(), assert: (_r, resp) => isFood(resp) });
+}
+// Task 181: "no" / "nope" / "enough" mean stop -- they break the loop (a "no" to a dog naming foods is a stop).
+for (const stop of ['no', 'nope', 'enough']) {
+  check(stop, {}, { session: seedLab(), assert: (_r, resp, s) => notFood(resp) || (s.namingLoop ? `"${stop}" did not stop the loop` : null) });
+}
+// Task 181: help-seeking reaches the shortened clarifier (never a silent break), and ends the loop.
+check('help', { action: 'clarifier' }, { session: seedLab(), assert: (_r, resp, s) => notFood(resp) || (!/help with something on the site/i.test(resp.text) ? `clarifier text wrong: "${resp.text}"` : null) || (s.namingLoop ? 'loop survived help' : null) });
+check('help me', { action: 'clarifier' }, { session: seedLab(), assert: (_r, resp) => notFood(resp) });
 
 // THE SAFETY TWEAK: a named food (any tier) breaks the loop and serves its REAL tiered answer -- a NEVER
 // food keeps the Collie's safety interjection, never swallowed by a cheerful YES food.

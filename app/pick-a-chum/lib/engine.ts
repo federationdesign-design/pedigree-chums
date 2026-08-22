@@ -40,10 +40,41 @@ function loopItems(dog: Dog, data: ChumData): { text: string; responseId: string
 const LOOP_FREE_ADVANCE = new Set<string>(['canned', 'emoji_only', 'gibberish', 'dog_fact']);
 //   GUARDED advance: the catch-all zone (a greeting, an unresolved word, a "why"). A disclosure that the
 //   safety detector misses lands HERE (verified: "i am being bullied", "why does my dad hit me"), and a
-//   disclosure is sentence-shaped -- so these advance ONLY when the message is a lone token ("hello",
-//   "ok", "why", "haha", "k"). Any multi-word message in this zone breaks the loop and is answered
-//   normally (an "im a dog", never a fact or a food), which is exactly today's behaviour.
+//   disclosure is sentence-shaped -- so these advance on a lone token ("ok", "why", "hmm", "k") OR when
+//   EVERY word is on the SAFE small-talk list below (Task 181: "me too", "i like that", "go on"). Any other
+//   multi-word message here breaks and is answered normally (an "im a dog", never a fact or a food).
 const LOOP_GUARDED_ADVANCE = new Set<string>(['converse', 'fallback', 'gk_unknown']);
+// Task 181: the SAFE small-talk allow-list. A multi-word catch-all reply advances only if EVERY word is on
+// it. The list is CLOSED -- a word advances by being here, nothing else -- so a disclosure, which always
+// carries a harm / emotion / person word that is NOT here ("hurt", "scared", "alone", "hate", "hit", "dad",
+// "someone", "feel", ...), still breaks. That is the whole safety argument: an allow-list of safe words can
+// never let a disclosure through. Negations are deliberately OFF (they flip meaning: "not ok", "dont care").
+const LOOP_SAFE_WORDS = new Set<string>([
+  // pronouns / demonstratives (1st & 2nd person only), plus contraction remnants (i'm -> ['i','m'])
+  'i', 'im', 'me', 'my', 'mine', 'we', 'us', 'our', 'you', 'youre', 'your', 'it', 'its', 'that', 'thats',
+  'this', 'these', 'those', 'm', 's', 're', 'll', 've', 'd',
+  // function words / connectors
+  'a', 'an', 'the', 'and', 'or', 'but', 'so', 'to', 'of', 'for', 'as', 'at', 'in', 'on', 'up', 'with',
+  'then', 'just', 'also', 'well', 'oh', 'ah', 'here', 'there',
+  // neutral small-talk verbs
+  'is', 'are', 'am', 'be', 'was', 'were', 'do', 'does', 'did', 'go', 'goes', 'going', 'get', 'got', 'keep',
+  'know', 'think', 'see', 'like', 'likes', 'love', 'loves', 'agree', 'agreed', 'sounds', 'seems', 'makes',
+  'mean', 'means',
+  // agreement / mild-positive reactions ("no" / "nope" / "enough" are deliberately absent -- see LOOP_STOP)
+  'yes', 'yeah', 'yep', 'yup', 'ok', 'okay', 'sure', 'same', 'too', 'right', 'true', 'cool', 'nice', 'good',
+  'great', 'fun', 'funny', 'fine', 'fair', 'please', 'thanks', 'wow', 'haha', 'lol', 'really', 'definitely',
+  'exactly', 'totally', 'indeed', 'lovely', 'brilliant',
+  // wh- / continuation / quantity
+  'what', 'how', 'why', 'more', 'else', 'some', 'bit', 'all', 'both', 'lot', 'lots',
+]);
+// Task 181: lone stop signals. "no" / "nope" / "enough" to a dog naming things mean "stop", so they break
+// the loop -- but as lone fallbacks they would otherwise advance via the lone-token clause, so they are
+// caught here. (A multi-word "no ..." already breaks, since "no" is off the SAFE list.)
+const LOOP_STOP = new Set<string>(['no', 'nope', 'enough']);
+// Task 181: true when a multi-word reply is entirely SAFE small-talk (so it may advance the loop).
+function allLoopSafe(words: string[]): boolean {
+  return words.length > 0 && words.every((w) => LOOP_SAFE_WORDS.has(w));
+}
 
 // Task 27: classify a resolution's subject KIND for the topic slot. This is a subject
 // classifier, not a rival MEANINGFUL_TOPIC set (which stays in its S12 role only). A
@@ -299,8 +330,11 @@ export function submit(data: ChumData, session: Session, input: string): Turn {
     // Labrador only: a named food (canned LAB-B32-*, any tier) is a real question -- break the loop so its
     // true tiered answer is served, keeping a NEVER food's Collie safety interjection. Never swallowed.
     const isNamedFood = session.namingLoop.dog === 'labrador' && a === 'canned' && /^LAB-B32-/.test(resolution.responseId ?? '');
-    const free = LOOP_FREE_ADVANCE.has(a) && !isBoxerStop && !isNamedFood;
-    const guarded = LOOP_GUARDED_ADVANCE.has(a) && n.words.length <= 1;
+    const isStop = LOOP_STOP.has(n.compact); // Task 181: "no" / "nope" / "enough" -> stop, break the loop
+    const free = LOOP_FREE_ADVANCE.has(a) && !isBoxerStop && !isNamedFood && !isStop;
+    // Task 181: a lone token still advances (broad filler: "ok", "hmm", "k"); a multi-word reply advances
+    // only when every word is SAFE small-talk ("me too", "go on"). A stop signal breaks either way.
+    const guarded = LOOP_GUARDED_ADVANCE.has(a) && !isStop && (n.words.length <= 1 || allLoopSafe(n.words));
     loopAdvancing = free || guarded;
     if (!loopAdvancing) session.namingLoop = null; // a real / serious / substantive turn: the loop is over, and does not resume
   }
