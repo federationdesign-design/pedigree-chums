@@ -575,8 +575,23 @@ function fitReason(breed: { name: string; score: number; slug: string }, answers
 // ── Component ─────────────────────────────────────────────────────────────────
 
 const ALL_BREEDS = breeds.filter((b) => !b.draft);
-const THRESHOLD = 90;
+// Resolved-threshold ladder replaces the old hard THRESHOLD = 90. That constant
+// could leave every breed under the line, so the user reached the end with zero
+// dogs. We walk the ladder and take the first rung that yields at least
+// MIN_RESULTS breeds; if even the lowest rung falls short, resolveThreshold()
+// floors to the MIN_RESULTS-th best score, so the result set is never empty.
+// (Job A, 22 Aug 2026.)
+const LADDER = [90, 80, 70, 60, 50, 40] as const;
+const MIN_RESULTS = 3;
 const MAX_RESULTS = 8;
+
+// sorted must be in descending score order.
+function resolveThreshold(sorted: { score: number }[]): number {
+  for (const t of LADDER) {
+    if (sorted.filter((b) => b.score >= t).length >= MIN_RESULTS) return t;
+  }
+  return sorted.length >= MIN_RESULTS ? sorted[MIN_RESULTS - 1].score : (sorted.at(-1)?.score ?? 0);
+}
 
 export default function ChumCalculator() {
   const [step, setStep] = useState(1); // 1..N = question index (1-based); step 1 = intent/welcome
@@ -604,7 +619,10 @@ export default function ChumCalculator() {
   const CORE_COUNT = 14;
   const coreAnswered = Object.keys(answers).filter(k => !k.startsWith("tb_") && k !== "stairs").length;
   const coreScored = ALL_BREEDS.map((breed) => ({ ...breed, score: scoreBreed(breed.slug, answers) })).sort((a, b) => b.score - a.score);
-  const coreVisible = coreAnswered >= 3 ? coreScored.filter(b => b.score >= THRESHOLD).length : ALL_BREEDS.length;
+  // One resolved threshold, shared by every call site below, so the live count
+  // and the final reveal never disagree. (Job A, 22 Aug 2026.)
+  const resolvedThreshold = resolveThreshold(coreScored);
+  const coreVisible = coreAnswered >= 3 ? coreScored.filter(b => b.score >= resolvedThreshold).length : ALL_BREEDS.length;
   // After core questions, show tiebreakers only if >5 breeds remain
   // Check if the visible breeds are dominated by small breeds -- trigger small-breed tiebreakers
   const smallSlugs = new Set(["chihuahua","yorkshire-terrier","miniature-schnauzer",
@@ -613,7 +631,7 @@ export default function ChumCalculator() {
     "maltese","maltipoo","cavachon","shih-tzu","cockapoo","italian-greyhound","poodle",
     "labradoodle","goldendoodle","french-bulldog","pug","bulldog","shih-tzu"]);
   const smallCount = coreAnswered >= 3
-    ? coreScored.filter(b => b.score >= THRESHOLD && smallSlugs.has(b.slug)).length
+    ? coreScored.filter(b => b.score >= resolvedThreshold && smallSlugs.has(b.slug)).length
     : 0;
   const needsTiebreakers = coreAnswered >= CORE_COUNT && coreVisible > 5;
   const total = needsTiebreakers ? QUESTIONS.length : CORE_COUNT;
@@ -629,7 +647,7 @@ export default function ChumCalculator() {
   }, [answers, answeredCount]);
 
   const thresholdActive = answeredCount >= 5;
-  const visibleBreeds = thresholdActive ? scoredBreeds.filter((b) => b.score >= THRESHOLD) : scoredBreeds;
+  const visibleBreeds = thresholdActive ? scoredBreeds.filter((b) => b.score >= resolvedThreshold) : scoredBreeds;
 
   // Best fit -- rank 1 only, and only when 20+ points clear of rank 2
   const top2 = visibleBreeds.slice(0, 2);
