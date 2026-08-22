@@ -154,7 +154,8 @@
   /* H2 size from /home's .productTitle / shared FAQ heading, the consistent /home H2
      display size (was clamp(2rem, 5.5vw, 4.5rem)). */
   font-size: clamp(4rem, 10vw, 8rem);
-  color: var(--yellow, #ffd23e);
+  /* White at rest, navy when toggled (was yellow). One of the H2s the toggle unifies. */
+  color: #ffffff;
   margin: 0 0 clamp(20px, 3vw, 36px);
   line-height: 1.05;
   text-align: center;
@@ -170,7 +171,7 @@
   font-family: Montserrat, sans-serif;
   font-size: clamp(1.2rem, 2.3vw, 1.55rem);
   font-weight: 600;
-  color: #000000; /* prose on gradient -> black, WCAG 1.4.3 (Steve, 12 Aug 2026) */
+  color: #ffffff; /* white at rest, navy when toggled (see the text-toggle block) */
   line-height: 1.5;
   margin: 0 0 clamp(16px, 2vw, 24px);
 }
@@ -379,6 +380,9 @@
 .alert[data-level="amber"]  { background: #ff8c00; border-color: #ff8c00; color: #0a3a57; }
 .alert[data-level="amber"] * { color: #0a3a57 !important; }
 .alert[data-level="red"]    { background: #dc3232; border-color: #dc3232; color: #ffffff; }
+/* Red alert is an excluded panel: force white in ALL states so the gradient flip
+   cannot turn its body navy-on-red (~2.6:1). Mirrors the yellow/amber * rules. */
+.alert[data-level="red"] * { color: #ffffff !important; }
 .alertLabel {
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
   font-size: clamp(1.27rem, 2.3vw, 1.5rem);
@@ -421,7 +425,10 @@
   display: flex;
   gap: clamp(14px, 2.5vw, 24px);
   align-items: flex-start;
-  background: rgba(255,255,255,0.06);
+  /* Solid navy panel (was rgba(255,255,255,0.06), a see-through 6% wash that left the
+     gradient behind the text). Text on it: ruleNum yellow 8.3:1, strong white 11.9:1,
+     description white 11.9:1. A fixed panel, not part of the gradient flip. */
+  background: #0a3a57;
   border-radius: 14px;
   padding: clamp(14px, 2vw, 22px) clamp(16px, 2.5vw, 26px);
 }
@@ -445,7 +452,7 @@
   font-family: Montserrat, sans-serif;
   font-size: clamp(1.15rem, 1.7vw, 1.32rem);
   font-weight: 500;
-  color: rgba(255,255,255,0.9);
+  color: #ffffff; /* solid white on the navy panel; stays white in both toggle states */
   margin: 0;
   line-height: 1.55;
 }
@@ -515,25 +522,30 @@
 .endLine {
   font-family: Montserrat, sans-serif;
   font-size: clamp(1.1rem, 2.1vw, 1.38rem);
-  color: #000000; /* prose on gradient -> black, WCAG 1.4.3 (Steve, 12 Aug 2026) */
+  color: #ffffff; /* white at rest, navy when toggled (see the text-toggle block) */
   margin: 0 0 8px;
   line-height: 1.5;
 }
 
-/* Body prose on the site gradient -> black for WCAG 1.4.3 (Steve, 12 Aug 2026).
-   Scoped to the prose containers so headings, the hero (on a photo) and any
-   panel text are untouched. .safetyNote is !important in its own rule. */
-.legal { color: #000000; }
+/* Below-hero prose on the body gradient: WHITE at rest, navy when the text toggle is
+   on (see the toggle block at the foot of this file), matching /home and /chumspot.
+   Was black (#000) for WCAG 1.4.3 (12 Aug 2026); the toggle supersedes that.
+   ON-RECORD CONTRAST TRADE (Steve, 22 Aug 2026): white on the gradient measures
+   ~1.5:1 at the cyan end (fails WCAG 1.4.3 AA); this deliberately INCLUDES the
+   on-gradient safety prose (heat advice, heatstroke symptoms, RSPCA links) with no
+   carve-out, so that real advice is ~1.5:1 at rest until the reader toggles (then
+   navy, ~7.7:1 cyan to ~3.6:1 blue). `.ruleStep p` is intentionally NOT here: it now
+   sits on a solid navy panel and stays white in both states (see .ruleStep). */
+.legal { color: #ffffff; }
 .noteText p,
 .cookingCol p,
 .cookingInner p,
 .signsList li,
-.ruleStep p,
 .safetyCol p,
 .gameTwoCols p,
-.foodCol p { color: #000000; }
+.foodCol p { color: #ffffff; }
 .safetyNote,
-.safetyNote a { color: #000000 !important; }
+.safetyNote a { color: #ffffff !important; }
 .endBig {
   font-family: var(--font-display, 'Luckiest Guy', system-ui) !important;
   font-size: clamp(4rem, 12vw, 9rem) !important;
@@ -700,7 +712,7 @@
   font-style: normal;
   font-size: clamp(0.83rem, 1.4vw, 0.95rem);
   font-weight: 600;
-  color: rgba(255,255,255,0.95);
+  color: #ffffff; /* white at rest, navy when toggled (was rgba, also fixes no-rgba-on-text) */
   line-height: 1.3;
 }
 .congaArrow {
@@ -714,7 +726,7 @@
   text-align: center;
   font-size: 1.15rem;
   font-weight: 600;
-  color: rgba(255,255,255,0.8);
+  color: #ffffff; /* white at rest, navy when toggled (was rgba) */
   font-style: italic;
   margin: 0;
   border-top: 1px solid rgba(255,255,255,0.1);
@@ -785,4 +797,52 @@ details[open] .miniQ::after { transform: rotate(45deg); }
   padding: 0 clamp(16px, 2.5vw, 24px) clamp(14px, 2vw, 20px);
   margin: 0;
   line-height: 1.7;
+}
+
+/* ── Text toggle: below-hero on-gradient text flips white -> navy ──────────────
+   Rest colours are white (set throughout above); the toggle sets data-pc-textinvert
+   on <main> and these rules flip the covered elements to navy, matching /home and
+   /chumspot. Gated on :root:not([data-pc-contrast-scheme]) so a future accessibility
+   scheme wins. The control hides itself under a scheme (ArticleTextToggle's own CSS).
+
+   ON-RECORD CONTRAST TRADE (Steve, 22 Aug 2026): white on the body gradient measures
+   ~1.5:1 at the cyan end (fails WCAG 1.4.3 AA); navy when toggled measures ~7.7:1
+   (cyan) to ~3.6:1 (blue). This deliberately INCLUDES the on-gradient safety prose
+   ("What do I do if my dog is hot?", "Stop.", the two paragraphs, "Signs of heatstroke
+   in dogs" and the symptom list, and the RSPCA / Dogs Trust / Blue Cross links): no
+   carve-out, so that real advice is ~1.5:1 at rest until the reader toggles. */
+:root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"] :is(
+  .sectionEyebrow, .noteTitle, .sectionTitle, .noteTitleMain, .subTitle,
+  .lead, .cookingInner p, .noteText p, .cookingCol p, .safetyCol p,
+  .signsList li, .gameTwoCols p, .foodCol p, .legal, .endLine,
+  .safetyNote, .safetyNote a, .urgentNote, .congaStep em, .congaCaption
+) {
+  color: var(--navy, #0a3a57);
+}
+
+/* Rule steps are a SOLID navy panel, not part of the gradient flip: keep the
+   description white in both states (the .gameTwoCols p flip above would otherwise
+   turn it navy-on-navy). ruleNum stays yellow, strong stays white. */
+:root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"] .ruleSteps .ruleStep p {
+  color: #ffffff;
+}
+
+/* FAQ follows the toggle, like /home: question + answer flip white -> navy. Items stay
+   translucent; the yellow +/- marker is unchanged (a yellow accent). */
+:root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"] :is(.faqQ, .faqItem .faqA, .miniQ, .miniAccordion .miniA) {
+  color: var(--navy, #0a3a57);
+}
+
+/* Safety cards INVERT with the toggle: navy panel + white text at rest -> white panel
+   + navy text when on. H3 goes navy (11.9:1 on white; yellow would be 1.44:1). Body p
+   is ~11.9:1 in both states. The border, invisible on white, becomes a subtle navy edge. */
+:root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"] .safetyCard {
+  background: #ffffff;
+  border-color: rgba(10, 58, 87, 0.16);
+}
+:root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"] .safetyCard h3 {
+  color: var(--navy, #0a3a57);
+}
+:root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"] .safetySection .safetyCard p {
+  color: var(--navy, #0a3a57);
 }
