@@ -39,3 +39,30 @@
   background: var(--yellow, #ffd23e);
   color: var(--navy, #0a3a57);
 }
+
+/* Final result screen (stage 6): centred, with a fade-rise entrance on the title
+   and the action buttons. The result cards land in via the shared cardsLand
+   animation (applied in the component). (Job B stage 6, 22 Aug 2026.) */
+@keyframes fadeRise {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.resultScreen {
+  text-align: center;
+}
+.resultTitle {
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  color: var(--navy, #0a3a57);
+  font-size: clamp(2.4rem, 7vw, 3.6rem);
+  line-height: 1.05;
+  margin: 8px 0 20px;
+  animation: fadeRise 0.3s ease both;
+}
+.resultActions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 28px;
+  animation: fadeRise 0.3s ease 0.4s both;
+}

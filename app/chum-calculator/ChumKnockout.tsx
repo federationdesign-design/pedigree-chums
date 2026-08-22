@@ -5,6 +5,7 @@ import { QUESTIONS, scoreBreed, fitReason } from "./ChumCalculator";
 import BreedResultRail from "./BreedResultRail";
 import styles from "./calculator.module.css";
 import k from "./ChumKnockout.module.css";
+import shared from "../name-generator/knockout-shared.module.css";
 
 // The knockout runs on the dogs the calculator has already revealed and whittles
 // them down with the four tb_ questions, in fixed file order. scoreBreed is reused
@@ -115,12 +116,31 @@ export default function ChumKnockout({ breeds, answers, onRestart }: Props) {
     setElim({ falling: eliminated, next: finalNext, nextDone, nextRound: roundIdx + 1 });
   }
 
-  // ── End screen: the result rail, then Start again ────────────────────────────
+  // Native share of a link + the result names (option a). No image: that is a social
+  // asset for a later pass, not a feature. (Job B stage 6, 22 Aug 2026.)
+  async function shareResults() {
+    if (typeof navigator === "undefined") return;
+    const names = survivors.map((b) => b.name).join(", ");
+    const text = `My Pedigree Chums result${survivors.length !== 1 ? "s" : ""}: ${names}`;
+    const url = typeof window !== "undefined" ? `${window.location.origin}/chum-calculator` : "";
+    try {
+      if (navigator.share) await navigator.share({ title: "Pedigree Chums", text, url });
+      else if (navigator.clipboard) await navigator.clipboard.writeText(`${text} ${url}`.trim());
+    } catch {
+      // share cancelled or unsupported; nothing to do
+    }
+  }
+
+  // ── Result screen: title, the surviving cards, share + start again ───────────
   if (done || !currentQ) {
     return (
-      <div>
-        <BreedResultRail breeds={survivors} bestSlug={null} reasons={Object.fromEntries(survivors.map((b) => [b.slug, fitReason(b, acc)]))} />
-        <div style={{ textAlign: "center", marginTop: 32 }}>
+      <div className={k.resultScreen}>
+        <h2 className={k.resultTitle}>Your result{survivors.length !== 1 ? "s" : ""}:</h2>
+        <div className={shared.cardsVisible}>
+          <BreedResultRail breeds={survivors} bestSlug={null} reasons={Object.fromEntries(survivors.map((b) => [b.slug, fitReason(b, acc)]))} />
+        </div>
+        <div className={k.resultActions}>
+          <button className={styles.startBtn} onClick={shareResults}>Share results</button>
           <button className={styles.resetBtn} onClick={onRestart}>Start again</button>
         </div>
       </div>
