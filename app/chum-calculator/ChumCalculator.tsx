@@ -133,9 +133,9 @@ const QUESTIONS: Question[] = [
     sub: "Some breeds follow their owner from room to room and genuinely cannot cope alone",
     info: "Velcro dogs are devoted and deeply bonded -- but they can also be exhausting. Independent dogs are easier to leave but may seem aloof.",
     options: [
+      { label: "Devoted to me, not bothered about everyone else", value: "mine" },
       { label: "Stuck to me at all times", value: "yes" },
       { label: "Close but not obsessive", value: "medium" },
-      { label: "Devoted to me, not bothered about everyone else", value: "mine" },
       { label: "An independent dog suits me", value: "no" },
     ],
   },
@@ -924,10 +924,9 @@ export default function ChumCalculator() {
         {/* Finished -- heading only; results + start-again render below */}
         {finished && (
           <div style={{ textAlign: "center", padding: "8px 0 4px" }}>
-            <h2 className={styles.stepDoneTitle}>Here are your chum{visibleCount !== 1 ? "s" : ""}</h2>
             <p className={styles.stepDoneSub}>
               {visibleCount > 0
-                ? `${visibleCount} breed${visibleCount !== 1 ? "s" : ""} match your lifestyle`
+                ? `${visibleCount} breed${visibleCount !== 1 ? "s" : ""} match${visibleCount === 1 ? "es" : ""} your lifestyle`
                 : "No strong matches -- try relaxing your answers"}
             </p>
           </div>

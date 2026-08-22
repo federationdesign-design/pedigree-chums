@@ -305,7 +305,7 @@
 
 .stepDoneSub {
   font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: 0.85rem;
+  font-size: clamp(18px, 2.6vw, 32px);
   font-weight: 500;
   color: #ffffff;
   margin: 0 0 24px;
