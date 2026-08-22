@@ -302,6 +302,26 @@ export default function Chums2Client({ name, slug, image, info, lineage }: Props
     document.addEventListener("click", onDoc);
     return () => document.removeEventListener("click", onDoc);
   }, [openPop]);
+
+  // Wide-canvas page (like the live /chums page): enable horizontal scroll
+  // (the global rule clips it) and mark <body> so the route-scoped CSS can make
+  // body a 2000px-wide positioning context and un-fix the shared chrome (nav bar
+  // + 0/10 counter) so they scroll away with the page instead of riding the
+  // viewport. All scoped to /chums2 via the data attribute. (D30.)
+  useEffect(() => {
+    const html = document.documentElement;
+    const body = document.body;
+    const prevHtmlX = html.style.overflowX;
+    const prevBodyX = body.style.overflowX;
+    html.style.overflowX = "auto";
+    body.style.overflowX = "auto";
+    body.setAttribute("data-pc-chums2", "");
+    return () => {
+      html.style.overflowX = prevHtmlX;
+      body.style.overflowX = prevBodyX;
+      body.removeAttribute("data-pc-chums2");
+    };
+  }, []);
   const handleFramesReady = useCallback((nodes: FrameNode[]) => {
     setFrames((prev) => {
       if (prev.length > 0) return prev;

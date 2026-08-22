@@ -888,3 +888,13 @@
   border-color: #ffffff;
 }
 :global(:root[data-pc-contrast-scheme="white-on-black"]) .label { color: #ffffff; }
+
+/* Wide-canvas route (/chums2 only, via the data-pc-chums2 attribute on body):
+   the 0/10 counter is un-fixed to absolute so it scrolls away with the wide page
+   instead of riding the viewport. Body is a 2000px positioning context there
+   (globals.css), so the counter's existing top/left keep it at the canvas
+   top-left. Other routes keep the fixed behaviour. (D30.) */
+:global(body[data-pc-chums2]) .counter.counter,
+:global(body[data-pc-chums2]) .reveal.reveal {
+  position: absolute;
+}

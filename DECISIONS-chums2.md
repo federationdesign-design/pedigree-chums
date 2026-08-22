@@ -80,6 +80,15 @@ Baseline (measured before stage 1):
 - FLAG for Steve: this is a modal tree, not an inline-on-load tree. If you want it inline beside the diagram, that needs a new bounded rendering mode inside LineageMap (a deliberate shared-component change), which I did not make because it would risk the game. Tell me and I will design it behind a defaulted prop.
 - CSS constraint respected: no perspective / backface-visibility / transform-style: preserve-3d anywhere in the chums2 chain.
 
+## Wide-canvas layout model (2026-08-23)
+
+### D30. /chums2 is a wide canvas with horizontal scroll; chrome scrolls with it
+- Item 1: .canvas min-width = 2000px (the live /chums canvas is 1800px; I exceed it so the fixed-size lower band never squashes). Chums2Client enables horizontal scroll by setting html/body overflow-x:auto on mount (the global rule is overflow-x:clip), restoring on unmount. Sections lay out at natural sizes across the width.
+- Item 2: fixed-size lower band via CSS grid, no flex squeezing. grid-template-columns: 840px (famous area, holds up to four 200px cards at natural size) 900px (chart); column-gap 56px. The chart slot is width 900px and pinned to grid-column 2, so its SIZE and POSITION are invariant to chum count: fewer chums use less of the 840px famous area; at 0 chums the famous block is not rendered but the 840px column stays reserved, so the chart holds the same size and position. Chart px = 900 (fluid LifespanChart fills the 900px slot; viewBox scales, no label cropping).
+- Item 3 mechanism: ROUTE-SCOPED OVERRIDE via a data-pc-chums2 attribute set on <body> by Chums2Client (removed on unmount). Scoped CSS: globals.css makes body[data-pc-chums2] position:relative min-width:2000px (a 2000px positioning context) and un-fixes the nav bar (body[data-pc-chums2] .pc-nav { position:absolute }), so the logo, contrast toolbar and hamburger scroll with the page. The 0/10 counter is un-fixed in its own module (HiddenGamesCounter.module.css) via :global(body[data-pc-chums2]) .counter.counter/.reveal.reveal { position:absolute }, compounded with the local class (no bare :global). Other routes keep their fixed behaviour.
+- Items 4/5: header and left column stay left-anchored (padding-left, no centering/stretch); the left cluster sits at the left edge. Lower band ends ~1910px, inside the 2000 canvas.
+- NEEDS VISUAL VERIFICATION (no dev server here): the chrome un-fixing spans shared files (globals.css nav, HiddenGamesCounter module) and depends on body being a 2000px positioning context; the fixed->absolute nav and counter should sit at the canvas corners and scroll away. Timed hidden-games cards (prelude/intro, fixed) were left as-is (transient, dismissible); flag if they should also un-fix.
+
 ## Lifespan chart double-render fix (2026-08-23)
 
 ### D29. Removed the leftover chartBox render; one chart only

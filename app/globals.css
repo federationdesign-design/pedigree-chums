@@ -83,6 +83,19 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Wide-canvas route (/chums2 only, via the data attribute set in Chums2Client):
+   body becomes a 2000px-wide positioning context and the shared nav bar is
+   un-fixed to absolute, so the logo, contrast toolbar and hamburger scroll away
+   with the wide page instead of riding the viewport. The 0/10 counter is
+   handled in its own module (HiddenGamesCounter). Other routes are untouched. */
+body[data-pc-chums2] {
+  position: relative;
+  min-width: 2000px;
+}
+body[data-pc-chums2] .pc-nav {
+  position: absolute;
+}
+
 /* One paw pattern for the whole page: fixed behind all content, sitting on top
    of the fixed gradient. Replaces the old per-section .paw-bg::before so the
    pattern is consistent everywhere and never overlaps section content. */

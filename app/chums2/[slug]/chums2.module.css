@@ -9,8 +9,14 @@
    Height is content-driven (no min-height, no bottom padding), so with only the
    header rendered the page is only as tall as the header (no dead whitespace).
    When sections are switched back on their own content provides the height. */
+/* Wide canvas like the live /chums page (its canvas is min-width 1800px). We
+   use 2000px, exceeding it so the fixed-size lower band (famous area 840 + gap
+   56 + chart 900) never squashes. The browser shows a horizontal scrollbar and
+   sections lay out at their natural sizes; Chums2Client enables the scroll (the
+   global rule clips overflow-x). (D30.) */
 .canvas {
   position: relative;
+  min-width: 2000px;
   background: transparent;
   font-family: var(--font-body, 'Montserrat', system-ui);
 }
@@ -579,26 +585,30 @@
    space is tight), the chart takes the remaining width. With zero famous
    chums the famous block is not rendered and the chart (flex-grow) fills
    the whole band. Tops aligned (align-items:flex-start). */
+/* Fixed-size lower band on the wide canvas (no flex squeezing): a grid with a
+   fixed famous area (840px, holds up to four 200px cards at natural size) and a
+   fixed chart column (900px). The chart is pinned to grid-column 2, so its size
+   AND position are invariant to the chum count: fewer chums just use less of the
+   840px famous area, and with zero chums the famous block is not rendered (the
+   840px column stays reserved) so the chart holds the same position. (D30.) */
 .lowerBand {
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  gap: clamp(24px, 3vw, 48px);
-  width: 100%;
+  display: grid;
+  grid-template-columns: 840px 900px;
+  column-gap: 56px;
+  align-items: start;
 }
 
 .famousWrap {
-  flex: 0 1 auto;
-  min-width: 208px;
-  max-width: min(860px, 56vw);
+  grid-column: 1;
 }
 
 .chartSlot {
-  flex: 1 1 340px;
-  min-width: 300px;
+  grid-column: 2;
+  width: 900px;
 }
 
-/* The fluid LifespanChart fills this slot (viewBox scales, no label cropping). */
+/* The fluid LifespanChart fills its fixed 900px slot (viewBox scales, no label
+   cropping). */
 .chartFluid {
   width: 100%;
 }
