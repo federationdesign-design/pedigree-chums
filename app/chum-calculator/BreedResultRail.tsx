@@ -7,7 +7,7 @@ import { breedCard } from "../../data/breeds";
 import styles from "./BreedResultRail.module.css";
 import shared from "../name-generator/knockout-shared.module.css";
 import BreedIconRail from "./BreedIconRail";
-import BreedInfoPanel from "./BreedInfoPanel";
+import ChumInfoPopout from "./ChumInfoPopout";
 
 type ScoredBreed = {
   slug: string;
@@ -190,6 +190,7 @@ export default function BreedResultRail({ breeds, bestSlug, fallingSlugs, reason
   }, []);
 
   return (
+    <>
     <div className={styles.railWrap}>
       <div ref={railRef} className={styles.rail} role="list" aria-label="Matched breeds">
         {breeds.map((b) => {
@@ -222,13 +223,8 @@ export default function BreedResultRail({ breeds, bestSlug, fallingSlugs, reason
                   onToggle={(m) => togglePanel(b.slug, m)}
                 />
               </div>
-              {/* Panel sits inside the tapped card's column, directly under the card,
-                  at card width. One open at a time across all cards. (Job B stage 6.) */}
               <div className={styles.cardSlot}>
                 {card}
-                {openPanel?.slug === b.slug && (
-                  <BreedInfoPanel slug={b.slug} name={b.name} metric={openPanel.metric} />
-                )}
               </div>
             </div>
           );
@@ -238,5 +234,14 @@ export default function BreedResultRail({ breeds, bestSlug, fallingSlugs, reason
         <div ref={thumbRef} className={styles.scrollThumb} />
       </div>
     </div>
+    {iconRails && openPanel && (
+      <ChumInfoPopout
+        slug={openPanel.slug}
+        name={breeds.find((b) => b.slug === openPanel.slug)?.name ?? ""}
+        metric={openPanel.metric}
+        onClose={() => setOpenPanel(null)}
+      />
+    )}
+    </>
   );
 }

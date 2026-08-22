@@ -1,0 +1,66 @@
+/* Copied verbatim from app/chums/[slug]/breed.module.css so the extracted
+   component renders identically on /chums and in the Chum Calculator pop-out.
+   (Job B stage 6, 22 Aug 2026.) */
+
+.infoSection { padding: 0 20px; }
+
+.infoHeading {
+  font-family: var(--font-display, 'Luckiest Guy', system-ui);
+  font-size: 26px;
+  letter-spacing: 0.12em;
+  color: var(--yellow, #ffd23e);
+  text-transform: uppercase;
+  margin: 16px 0 10px;
+  padding-left: 16px;
+}
+
+.temperamentTags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 4px; }
+
+.tag {
+  font-family: var(--font-display, 'Luckiest Guy', system-ui);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  background: rgba(255,255,255,0.1);
+  border: 1.5px solid rgba(255,255,255,0.18);
+  color: #ffffff;
+  border-radius: 20px;
+  padding: 4px 12px;
+}
+
+.prosConsGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+.prosConsHead {
+  font-family: var(--font-display, 'Luckiest Guy', system-ui);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  margin: 0 0 6px;
+  text-transform: uppercase;
+}
+.prosConsHead.pros { color: #4ade80; }
+.prosConsHead.cons { color: #f87171; }
+
+.prosConsList { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 5px; }
+
+.prosConsList li {
+  font-family: var(--font-body, 'Montserrat', system-ui);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.4;
+  color: #ffffff;
+  padding-left: 16px;
+  position: relative;
+}
+
+.prosConsList li::before {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 6px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+}
+
+.prosCol .prosConsList li::before { background: #4ade80; }
+.consCol .prosConsList li::before { background: #f87171; }
+.divider { height: 1px; background: rgba(255,255,255,0.08); margin: 12px 20px; }

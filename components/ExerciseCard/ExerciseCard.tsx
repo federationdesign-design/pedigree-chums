@@ -5,6 +5,9 @@ import styles from "./ExerciseCard.module.css";
 
 interface Props {
   data: ExerciseNeeds;
+  // When true, wraps the card in a narrow container for the Chum Calculator pop-out.
+  // Off by default so /chums renders exactly as before. (Job B stage 6, 22 Aug 2026.)
+  narrow?: boolean;
 }
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
@@ -43,10 +46,10 @@ function formatMins(minutes: number, multiplier: number): string {
   return `${m}m`;
 }
 
-export default function ExerciseCard({ data }: Props) {
+export default function ExerciseCard({ data, narrow = false }: Props) {
   const { minutesPerDay, intensity, weekPattern, copesAlone, notes } = data;
 
-  return (
+  const content = (
     <>
       <p className={styles.heading}>Exercise needs</p>
 
@@ -102,4 +105,6 @@ export default function ExerciseCard({ data }: Props) {
       </p>
     </>
   );
+
+  return narrow ? <div className={styles.narrow}>{content}</div> : content;
 }

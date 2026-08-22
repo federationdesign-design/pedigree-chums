@@ -76,34 +76,6 @@
   stroke: var(--navy, #0a3a57);
 }
 
-/* ── Simplified info panel: a plain navy text box under the tapped card ────── */
-/* Matches the /chums/[slug] info box treatment (navy, rounded, white text). Sits
-   directly under its card and inherits the card column's width (width:100% +
-   border-box), so the two never drift. Plain paragraph text only, no headings or
-   meters. (Job B stage 6, 22 Aug 2026.) */
-.panel {
-  width: 100%;
-  min-width: 0; /* allow shrink below text max-content so long text wraps (stopgap 22 Aug 2026) */
-  overflow-wrap: anywhere; /* long unbroken text wraps instead of forcing the panel wider */
-  box-sizing: border-box;
-  margin: 12px 0 0;
-  background: var(--navy, #0a3a57);
-  border: 2.5px solid rgba(255, 255, 255, 0.12);
-  border-radius: 20px;
-  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.35);
-  padding: 14px 16px;
-  text-align: left;
-}
-
-.panelText {
-  font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: 0.85rem;
-  font-weight: 600;
-  line-height: 1.5;
-  color: #ffffff;
-  margin: 0;
-}
-
-.panelText + .panelText {
-  margin-top: 10px;
-}
+/* The simplified in-column info panel was replaced by the floating ChumInfoPopout
+   (real /chums widgets). Its .panel/.panelText styles were removed here.
+   (Job B stage 6, 22 Aug 2026.) */

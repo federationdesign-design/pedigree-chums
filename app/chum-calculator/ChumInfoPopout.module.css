@@ -1,0 +1,73 @@
+/* Floating pop-out for the real /chums widgets, one at a time, close X. Navy panel
+   matching the /chums card treatment so the widgets' white/yellow text reads.
+   (Job B stage 6, 22 Aug 2026.) */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(10, 58, 87, 0.55);
+}
+
+.panel {
+  position: relative;
+  width: min(560px, 92vw);
+  max-height: 86vh;
+  overflow-y: auto;
+  background: var(--navy, #0a3a57);
+  border: 2.5px solid rgba(255, 255, 255, 0.14);
+  border-radius: 24px;
+  box-shadow: 0 20px 70px rgba(0, 0, 0, 0.5);
+  padding: 8px 4px 20px;
+}
+
+.close {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  background: none;
+  border: none;
+  color: var(--yellow, #ffd23e);
+  font-size: 40px;
+  line-height: 1;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0;
+  z-index: 1;
+}
+
+/* Lifespan: text + figure (the fixed 1008px chart stays on the chum page) */
+.lifespan {
+  padding-bottom: 4px;
+}
+
+.lifeHeading {
+  font-family: var(--font-display, 'Luckiest Guy', system-ui);
+  font-size: 26px;
+  letter-spacing: 0.12em;
+  color: var(--yellow, #ffd23e);
+  text-transform: uppercase;
+  margin: 16px 0 10px;
+  padding-left: 16px;
+}
+
+.lifeFigure {
+  font-family: var(--font-display, 'Luckiest Guy', system-ui);
+  font-size: 2.6rem;
+  line-height: 1;
+  color: #ffffff;
+  margin: 0 20px;
+}
+
+.lifeNote {
+  font-family: var(--font-body, 'Montserrat', system-ui);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: #ffffff;
+  margin: 12px 20px 0;
+}

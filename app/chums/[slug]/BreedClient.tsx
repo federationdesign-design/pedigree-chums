@@ -25,6 +25,8 @@ import FamousDogsSection from "../../../components/FamousDogsSection/FamousDogsS
 import famousDogs from "../../../data/famousDogs";
 import CardDock from "../../../components/CardDock/CardDock";
 import type { DockItem } from "../../../components/CardDock/CardDock";
+import BreedTemperament from "../../../components/BreedTemperament/BreedTemperament";
+import BreedAncestry from "../../../components/BreedAncestry/BreedAncestry";
 
 type BreedInfo = {
   subtitle: string;
@@ -239,25 +241,7 @@ const [zOrders, setZOrders] = useState({ infoBox: 112, ancestry: 113, lifespanCh
           onBringToFront={bringToFront} onClose={() => closeCard("infoBox")}
           style={{ width: INFO_W, padding: "0 0 20px" }}>
           <div ref={infoBoxRef}>
-          <p className={styles.infoHeading}>Temperament</p>
-          <div className={styles.infoSection}>
-            <div className={styles.temperamentTags}>
-              {info.temperament.map((t) => <span key={t} className={styles.tag}>{t}</span>)}
-            </div>
-          </div>
-          <div className={styles.divider} />
-          <div className={styles.infoSection}>
-            <div className={styles.prosConsGrid}>
-              <div className={styles.prosCol}>
-                <p className={`${styles.prosConsHead} ${styles.pros}`}>Pros</p>
-                <ul className={styles.prosConsList}>{info.pros.map((p) => <li key={p}>{p}</li>)}</ul>
-              </div>
-              <div className={styles.consCol}>
-                <p className={`${styles.prosConsHead} ${styles.cons}`}>Cons</p>
-                <ul className={styles.prosConsList}>{info.cons.map((c) => <li key={c}>{c}</li>)}</ul>
-              </div>
-            </div>
-          </div>
+            <BreedTemperament info={info} />
           </div>
         </DragCard>
       )}
@@ -267,19 +251,7 @@ const [zOrders, setZOrders] = useState({ infoBox: 112, ancestry: 113, lifespanCh
         <DragCard id="ancestry" initialX={TREE_LEFT - 200} initialY={CARD_TOP - 75} zIndex={zOrders.ancestry}
           onBringToFront={bringToFront} onClose={() => closeCard("ancestry")}
           style={{ width: ANCESTRY_W, padding: "0 0 16px" }}>
-          <p className={styles.infoHeading}>Historical influence</p>
-          {ancestryBreakdown.map((a) => (
-            <div key={a.name}>
-              <div className={styles.ancestryRow}>
-                <span className={styles.ancestryName}>{a.name}</span>
-                <span className={styles.ancestryPct}>{a.pct}%</span>
-              </div>
-              <div className={styles.ancestryBar} style={{ width: `calc(${a.pct}% - 40px)` }} />
-            </div>
-          ))}
-          <p className={styles.ancestryDisclaimer}>
-            Our best guess, not hard science. These figures come from history and old breeding records, our viewpoint, not proven fact.
-          </p>
+          <BreedAncestry breakdown={ancestryBreakdown} />
         </DragCard>
       )}
 

@@ -8,6 +8,13 @@
   padding-top: 14px;
 }
 
+/* Narrow variant for the Chum Calculator pop-out (Job B stage 6, 22 Aug 2026).
+   Tightens horizontal margins and drops the dividers so the card fits a pop-out.
+   Not used on /chums. */
+.narrow .heading { margin-left: 12px; }
+.narrow .statsRow { margin: 0 12px; padding: 10px 12px; }
+.narrow .statDivider { display: none; }
+
 /* Stats row */
 .statsRow {
   display: flex;
