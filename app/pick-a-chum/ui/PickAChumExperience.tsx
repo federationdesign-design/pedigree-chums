@@ -276,21 +276,28 @@ function seedNamingLoop(session: Session, dog: Dog, used: number[]): void {
   session.namingLoopStarted = [...(session.namingLoopStarted ?? []), dog];
 }
 
+// Task 181: the Collie's /know-your-chums intro chip, served BEFORE the three breed lines so the visitor
+// knows what is coming (was opening straight into "The Border Collie..."). Owner copy, verbatim. It becomes
+// lines[0] (the chip); the three breed lines follow as the three extras, on the existing 20s gaps.
+const CHUM_INTRO = 'get you know us here';
 // Task 153: the Collie's chum-naming lines for /know-your-chums. THREE DISTINCT breeds, PICKED AT RANDOM
 // (a different three each session), drawn from each breed's OWN `fact` and `character` in her register
 // rather than 54 authored lines. Every one of the 54 has both fields, so no guard is needed; a missing
 // field simply drops out of the line. SHAPE (reported for approval): "The <Name>. <fact>. <first
 // sentence of character>." Generated here, not in the launcher, so the launcher stays lightweight.
+// Task 181: the intro is prepended, so the returned array is [intro, breed, breed, breed] -- lines[0] is the
+// chip, slice(1) the three extras (within SEQ_MAX_EXTRAS = 4).
 function collieChumLines(): string[] {
   const pool = [...breeds];
   const picks: typeof breeds = [];
   for (let i = 0; i < 3 && pool.length; i++) picks.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0]);
-  return picks.map((b) => {
+  const breedLines = picks.map((b) => {
     const fact = (b.fact || '').trim().replace(/[.\s]+$/, '');
     const factSentence = fact ? `${fact[0].toUpperCase()}${fact.slice(1)}.` : '';
     const charFirst = (b.character || '').split(/(?<=[.!?])\s+/)[0].replace(/&/g, 'and').trim();
     return [`The ${b.name}.`, factSentence, charFirst].filter(Boolean).join(' ');
   });
+  return [CHUM_INTRO, ...breedLines];
 }
 
 export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, terrierSay, logoHidden = false }: { onClose: () => void; autoAppear?: AutoAppear; pickupRoute?: string | null; terrierSay?: string | null; logoHidden?: boolean }) {
@@ -816,7 +823,7 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
   // No other sequence carries four extras (the FAQ runs are opener + three), so this enables only /home.
   const SEQ_MAX_EXTRAS = 4;
   const playSequence = useCallback(
-    (lines: Array<string | { text: string; url?: string | null; destinationId?: string }>, seqDog: Dog, gapMs: number, showAvatar = false, media?: { src: string; alt: string }, monologue = false) => {
+    (lines: Array<string | { text: string; url?: string | null; destinationId?: string }>, seqDog: Dog, gapMs: number, showAvatar = false, media?: { src: string; alt: string }, monologue = false, firstGapMs?: number) => {
       // Task 176: an item may carry its own link (a FAQ sequence message), so normalise strings to steps.
       const items = lines
         .map((l) => (typeof l === 'string' ? { text: l } : l))
@@ -863,7 +870,10 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
           setSeqDone((t) => t + 1); // Task 169: wake the drain -- a reply queued during the run waits on this
         }
       };
-      after(gapMs, () => play(0));
+      // Task 181: the first beat may use a distinct gap (the /know-your-chums intro -> first breed short
+      // pause); every gap BETWEEN items stays gapMs (the 20s between breeds). Defaults to gapMs, so every
+      // existing caller is unchanged.
+      after(firstGapMs ?? gapMs, () => play(0));
     },
     [after]
   );
@@ -907,7 +917,9 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
     // ONLY the fast followUps run (2s beats, up to ~8s total for the four-extra /home) queues. The know-your-chums Collie names breeds
     // on 20s gaps: making a reply wait up to 40s behind that would be worse than abandoning, so it keeps the
     // old abandon-on-type (the visitor's reply wins at once).
-    playSequence(extras, auto.dog, auto.gapMs ?? (auto.chums ? 20000 : 2000), false, undefined, !auto.chums);
+    // Task 181: for the chums run, the FIRST breed follows the intro after a short 2s beat (20s of silence
+    // after the intro reads as broken); the 20s gap then applies only BETWEEN the three breeds.
+    playSequence(extras, auto.dog, auto.gapMs ?? (auto.chums ? 20000 : 2000), false, undefined, !auto.chums, auto.chums ? 2000 : undefined);
   }, [auto, minimised, playSequence]);
 
   // Drive a handover: post the user line (and any handover line), pause, pop the
