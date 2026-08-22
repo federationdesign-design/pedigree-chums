@@ -1122,6 +1122,12 @@ export default function BreedTree({
   holdEntrance = false,
   resolve = false,
   portraitAnchor = null,
+  // displayOnly (added 2026-08-22, /chums2 v2 desktop): render the diagram as a
+  // static display only. It suppresses the two game affordances that leak into
+  // the centred learn view without the `gravity` prop, the corner close-X square
+  // and the caption aside. Default false, so every game code path is unchanged
+  // when it is not passed. See chums2 DECISIONS D7.
+  displayOnly = false,
 }: {
   root: LineageNode;
   rootImage?: string;
@@ -1211,6 +1217,8 @@ export default function BreedTree({
   // real image on every width instead of a fixed viewBox fraction. Mapped into
   // viewBox units here with the SVG's own getScreenCTM.
   portraitAnchor?: { cx: number; cy: number; rad: number } | null;
+  // See the destructure above (added 2026-08-22).
+  displayOnly?: boolean;
 }) {
   const [isMobile, setIsMobile] = useState(false);
   const [aspect, setAspect] = useState(1);
@@ -6426,7 +6434,7 @@ export default function BreedTree({
           {/* In-pit buttons: close X and description toggle. Navy rounded
               squares with a yellow stroke; fixed top-right until knocked
               loose, always tappable. */}
-          {dockAside && (() => {
+          {dockAside && !displayOnly && (() => {
             const v = viewRef.current;
             const kk = SIZE / v[2];
             const st = stageRef.current;
@@ -7257,7 +7265,7 @@ export default function BreedTree({
         // element's edge, so collapsing it would leave the rail with nothing to
         // hang off. Hidden this way the box keeps its box, the rail keeps its
         // anchor, and the rail turns itself visible again below.
-        style={{ position: "relative", visibility: hideCaption ? "hidden" : undefined }}
+        style={{ position: "relative", visibility: hideCaption || displayOnly ? "hidden" : undefined }}
         onPointerDown={dockAside && !isMobile ? asideDown : undefined}
         onPointerMove={dockAside && !isMobile ? asideMove : undefined}
         onPointerUp={dockAside && !isMobile ? asideUp : undefined}
