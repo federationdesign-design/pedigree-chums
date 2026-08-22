@@ -34,6 +34,7 @@ export interface Assembled {
   media?: { src: string; alt: string }; // Task 138: a short looping clip served with the line. Local files only -- nothing fetched at runtime, so what a child sees is what was approved.
   linkLabel?: string; // Task 140: an explicit label for the action link when the target is not a destination/article record (the fetch fall-through to a page bio); actionFor prefers this over destinationName.
   gameOutput?: string; // Task 115: the game's monospace board / sheep tiles / drawing, rendered pre-formatted below the line.
+  gameCorrect?: string; // Task 178 §4: a correct answer -- the word to celebrate (fires the win animation)
   interjection?: { dog: Dog; line: string }; // Task 161: a one-line aside from ANOTHER dog (the Collie), played after the active dog's line WITHOUT changing the active dog.
 }
 
@@ -61,6 +62,16 @@ const CANNED_MEDIA: Record<string, { src: string; alt: string }> = {
   'COL-B52-MISC-09': { src: '/chat-media/ball.mp4', alt: 'A tennis ball' },
   'COL-B64-CAR-01': { src: '/chat-media/car.mp4', alt: 'A dog enjoying a car ride' },
 };
+
+// Fetch sometimes brings back a physical THING instead of a page link -- the tennis ball, the newspaper, the
+// hat clip (the hat reuses HATS-01's hats.mp4). The engine's fetchCount rotates them 1-in-4 so it is never
+// the same thing twice, and never a page every time. The two emoji ARE the thing he dropped at your feet;
+// each carries a screen-reader name (a lone glyph reads poorly), the same treatment the ":)" reply uses.
+const FETCH_THINGS: { id: string; text: string; ariaLabel?: string; media?: { src: string; alt: string } }[] = [
+  { id: 'FETCH-THING-BALL', text: '🎾', ariaLabel: 'He fetched a tennis ball' },
+  { id: 'FETCH-THING-NEWSPAPER', text: '🗞️', ariaLabel: 'He fetched a newspaper' },
+  { id: 'FETCH-THING-HAT', text: 'I brought you a hat', media: { src: '/chat-media/hats.mp4', alt: 'A dog in a hat' } },
+];
 
 const DOG_LABEL: Record<Dog, string> = {
   collie: 'Collie',
@@ -378,43 +389,46 @@ export function assemble(res: Resolution, data0: ChumData, n: Normalised, sessio
       // Task 146: a Treat Trail finale carries the /hot-dogs link (res.url / destinationId).
       // Task 149: a Feed the Dog a Cookie turn carries a clip every fifth cookie (res.gameMedia).
       // Task 151: the cookie give-up carries a follow-up beat, the sleepy "zzz" (res.gameFollowUp).
-      return { responseId: res.gameLine ?? res.action, text: res.gameText ?? '', gameOutput: res.gameDisplay ?? undefined, dog, ...(res.url ? { url: res.url, destinationId: res.destinationId } : {}), ...(res.gameMedia ? { media: res.gameMedia } : {}), ...(res.gameFollowUp ? { followUp: res.gameFollowUp } : {}), ...(res.gameFollowUpMedia ? { followUpMedia: res.gameFollowUpMedia } : {}) };
+      return { responseId: res.gameLine ?? res.action, text: res.gameText ?? '', gameOutput: res.gameDisplay ?? undefined, dog, ...(res.url ? { url: res.url, destinationId: res.destinationId } : {}), ...(res.gameMedia ? { media: res.gameMedia } : {}), ...(res.gameFollowUp ? { followUp: res.gameFollowUp } : {}), ...(res.gameFollowUpMedia ? { followUpMedia: res.gameFollowUpMedia } : {}), ...(res.gameCorrect ? { gameCorrect: res.gameCorrect } : {}) };
 
     // Task 111: "fetch" hands back a rotating Play/Learn/Discover link (deterministic rotation via the
     // session's offered set), instead of the old B11 command voice. The line comes from the B03 link
     // bank, filled with the destination name.
     case 'random_link': {
-      // Task 140: fetch falls through to the page bios once B03's lines are all used this session.
-      // B03's lines were written to be thrown and are funnier, so they go first; the bios cover
-      // everywhere else and never run short. Concrete routes only (the dynamic breed route has no
-      // single link), rotated by usedResponseIds so a bio is not repeated until all have been used.
-      // The bio carries its own link label (many bio pages have no destination record).
-      const b03pool = data.collieResponses.filter((x) => x.bucketId === 'B03');
-      const b03unused = b03pool.filter((x) => !session.usedResponseIds.includes(x.responseId));
-      if (b03pool.length > 0 && b03unused.length === 0) {
-        const bios = PAGE_BIOS.filter((b) => !b.route.includes('['));
-        const unusedBios = bios.filter((b) => !session.usedResponseIds.includes(`FETCH-BIO-${b.route}`));
-        const pick = (unusedBios.length ? unusedBios : bios)[0];
-        const dest = data.destinations.find((x) => x.resolvedUrl === pick.route);
-        return { responseId: `FETCH-BIO-${pick.route}`, text: pick.bio, dog, destinationId: dest?.destinationId, url: pick.route, linkLabel: dest?.name ?? pick.name, followUp: 'play again? just say fetch' };
+      // Fetch is a deterministic 1-in-4 MIX: every 4th throw brings back a physical THING (rotating ball ->
+      // newspaper -> hat), the other three a PAGE. Pages run the ordered pool [B03 thrown lines first (written
+      // to be thrown, funnier), then the page bios], indexed by a page counter MODULO the pool size -- so once
+      // all are spent it CYCLES from the top rather than sticking on the first bio forever (the old bug). The
+      // engine's session.fetchCount (the pre-turn value) drives both, so the same count reproduces the same
+      // sequence -- deterministic, and it guarantees the variety (never a thing every time, never a page every
+      // time). Concrete routes only (the dynamic breed route has no single link).
+      const B03 = data.collieResponses.filter((x) => x.bucketId === 'B03');
+      const bios = PAGE_BIOS.filter((b) => !b.route.includes('['));
+      const poolSize = B03.length + bios.length;
+      const fetchNo = (session.fetchCount ?? 0) + 1; // this fetch's 1-based ordinal
+      if (fetchNo % 4 === 0) {
+        // A thing: one per completed group of four, rotating through FETCH_THINGS.
+        const thing = FETCH_THINGS[(fetchNo / 4 - 1) % FETCH_THINGS.length];
+        return { responseId: thing.id, text: thing.text, dog, ...(thing.ariaLabel ? { ariaLabel: thing.ariaLabel } : {}), ...(thing.media ? { media: thing.media } : {}), followUp: 'play again? just say fetch' };
       }
-      // Task 137: the destination follows the LINE, not the other way round.
-      // Five of the six B03 templates name a specific place in their text, so
-      // choosing a response and a destination independently guaranteed a
-      // mismatch -- "The Dog Name Generator is ready" linking to Know Your
-      // Chums. Match the named place to its destination; only R01, which uses
-      // the token, gets a free pick.
-      const r = pickResponse(data, 'B03', session.usedResponseIds);
-      const named = r ? data.destinations.find((d) => !!d.resolvedUrl && r.template.includes(d.name)) : null;
-      const dest = named
-        ? { id: named.destinationId, name: named.name, url: named.resolvedUrl }
-        : pickDestination(data, session.offeredDestinationIds);
-      const name = dest?.name ?? 'the site';
-      const text = r ? fill(r.template, baseContext(n, name)) : `${name} is here.`;
-      // Task 135: fetch is a game, so it invites another go. The chat is not
-      // minimised on this link (see fetchGame in the experience), so the
-      // follow-up still has somewhere to land.
-      return { responseId: r?.responseId ?? 'FETCH-LINK', text, dog, destinationId: dest?.id, url: dest?.url ?? null, followUp: 'play again? just say fetch' };
+      // A page. pagesSoFar = fetches so far minus the things among them (one per completed four).
+      const pagesSoFar = fetchNo - 1 - Math.floor((fetchNo - 1) / 4);
+      const idx = poolSize ? pagesSoFar % poolSize : 0;
+      if (idx < B03.length) {
+        // Task 137: the destination follows the LINE (five B03 templates name a specific place; R01/R10 use
+        // the token and get a free pick), so the text and its link never mismatch.
+        const r = B03[idx];
+        const named = data.destinations.find((d) => !!d.resolvedUrl && r.template.includes(d.name));
+        const dest = named ? { id: named.destinationId, name: named.name, url: named.resolvedUrl } : pickDestination(data, session.offeredDestinationIds);
+        const name = dest?.name ?? 'the site';
+        const text = fill(r.template, baseContext(n, name));
+        // Task 135: fetch is a game, so it invites another go (the chat is not minimised on this link).
+        return { responseId: r.responseId, text, dog, destinationId: dest?.id, url: dest?.url ?? null, followUp: 'play again? just say fetch' };
+      }
+      // A page bio (carries its own link label; many bio pages have no destination record).
+      const bio = bios[idx - B03.length];
+      const dest = data.destinations.find((x) => x.resolvedUrl === bio.route);
+      return { responseId: `FETCH-BIO-${bio.route}`, text: bio.bio, dog, destinationId: dest?.destinationId, url: bio.route, linkLabel: dest?.name ?? bio.name, followUp: 'play again? just say fetch' };
     }
 
     case 'paw': {

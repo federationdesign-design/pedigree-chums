@@ -21,6 +21,7 @@ import { CHUM_DATA } from '../lib/data';
 import { submit, isSensitiveInput, Turn } from '../lib/engine';
 import { newSession, Session } from '../lib/session';
 import { GAMES_MENU, GamesMenuItem } from '../lib/assembler';
+import { fireConfetti } from '../../../lib/confetti';
 import { misreadsUsed } from './dogAppearance';
 import { Dog, GameId } from '../lib/types';
 import { reportHiddenGame, reportHat } from '../../../lib/hiddenGames/browserEngine';
@@ -346,6 +347,7 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
   const [feedFed, setFeedFed] = useState<string[] | null>(null);
   const [armedRed, setArmedRed] = useState<string | null>(null);
   const [emojiOpen, setEmojiOpen] = useState(false); // the composer emoji picker panel
+  const [celebrate, setCelebrate] = useState<{ word: string; id: number } | null>(null); // Task 178 §4: the correct-answer win animation (the word); id re-triggers it even on the same word
   // Task 168: the receded dogs (the three non-active) sit stacked beside the medallion while a chat is
   // open, each an arrow to switch to it. `activeReceded` is the one being pointed at: on a hover-capable
   // device it is set on hover (and a click switches straight away); on touch the FIRST tap sets it (grey
@@ -489,15 +491,30 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
     if (!terrierSay || terrierSaidRef.current === terrierSay) return;
     const session = sessionRef.current;
     if (!session || session.protectedState || everProtectedRef.current) return;
+    // Bug fix (hat countdown): do NOT barge into a run in flight, and do NOT seize the active dog. If a
+    // sequence is playing (seqRef) or a message is still typing (phase not idle), DEFER -- this effect
+    // re-runs on seqDone / phase and lands the line only once the chat is idle (the same drain condition the
+    // type-ahead queue uses). terrierSaidRef is set only when it actually lands, so a deferred line retries.
+    if (seqRef.current || phase !== 'idle') return;
     terrierSaidRef.current = terrierSay;
-    session.activeDog = 'terrier';
     if (!session.previousDogs.includes('terrier')) session.previousDogs.push('terrier');
-    setDog('terrier');
-    setMessages((m) => [...m, { id: idRef.current++, who: 'dog', text: terrierSay, dog: 'terrier', name: dogInfo('terrier').name, display: terrierSay, done: true, plainSurface: false }]);
+    // Speak it as an INTERJECTION: the Terrier's own bubble + face (avatar), while the medallion stays on
+    // whoever was talking. He no longer takes the active dog, so the speaker label and the content on screen
+    // can never come apart (the bug: his name over another dog's bubbles).
+    setMessages((m) => [...m, { id: idRef.current++, who: 'dog', text: terrierSay, dog: 'terrier', name: dogInfo('terrier').name, avatar: true, display: terrierSay, done: true, plainSurface: false }]);
     setAnnounce(terrierSay);
-    emitTurn({ sessionId: recSessionRef.current, turn: session.submissionCount, activeDog: 'terrier', input: '', line: terrierSay, route: pathname ?? '', gameActive: session.activeGame ?? null, protectedState: session.protectedState ?? null, trigger: 'appearance' }); // Task 159: the hat countdown
+    emitTurn({ sessionId: recSessionRef.current, turn: session.submissionCount, activeDog: session.activeDog, input: '', line: terrierSay, route: pathname ?? '', gameActive: session.activeGame ?? null, protectedState: session.protectedState ?? null, trigger: 'appearance' }); // Task 159: the hat countdown, spoken without taking the medallion
     if (minimised) setSpoke(true);
-  }, [terrierSay, minimised]);
+  }, [terrierSay, minimised, phase, seqDone]);
+
+  // Task 178 §4: clear the win animation once it has played (matches the 1600ms fade/pop; the static
+  // reduced-motion word simply holds for the same window). Keyed by celebrate.id so a repeat correct answer
+  // re-triggers it.
+  useEffect(() => {
+    if (!celebrate) return;
+    const t = window.setTimeout(() => setCelebrate(null), 1600);
+    return () => window.clearTimeout(t);
+  }, [celebrate]);
   // Task 159 (recorder v2, stage 2): log an unbidden appearance's chip line so the `trigger` column tells
   // it from a reply. Suppressed appearances never reach here. The chums case (no static offer) logs in its
   // seed effect; the /hot-dogs pickup and the Terrier hat line log in their effects above.
@@ -1307,6 +1324,16 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
       logMeta('hat', KENNEL_SKETCH_HAT_ID);
     }
 
+    // Task 178 §5: confetti on the FIRST game start of the session ONLY (owner's call -- every-time becomes
+    // wallpaper). submit just incremented gamesPlayed, so === 1 means this start was the first. Honours
+    // prefers-reduced-motion (no confetti); colours come from the site tokens inside fireConfetti.
+    if (result.resolution.action === 'game_start' && session.gamesPlayed === 1 && !reducedMotion) {
+      fireConfetti({ particleCount: 140, spread: 100, startVelocity: 45, origin: { x: 0.5, y: 0.42 } });
+    }
+    // Task 178 §4: the correct-answer celebration -- the answer word, animated. r.gameCorrect is set by the
+    // game logic ONLY on a correct answer, never a wrong guess, the reveal, or the start.
+    if (r.gameCorrect) setCelebrate({ word: r.gameCorrect, id: idRef.current++ });
+
     // Bark-game break / fetch / the cookie give-up: the main lands instantly, then a follow-up message.
     // Task 152 section 2: the follow-up now flows through the general sequence player, so it inherits the
     // abandon rule, the stop-on-navigation and the protected guard. Phase stays 'idle' during the gap so a
@@ -1345,8 +1372,12 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
       setPhase('idle');
       window.setTimeout(() => inputRef.current?.focus(), 0);
       // Task 166: a red cookie's follow-up carries the clip + the reason, and lands 1.0s after his reaction
-      // (a deliberate beat, longer than the usual 500ms follow-up). Other follow-ups are unchanged.
-      const gap = r.followUpMedia ? (reducedMotion ? 0 : 1000) : (reducedMotion ? 0 : 500);
+      // (a deliberate beat, longer than the usual 500ms follow-up).
+      // Task 178 §3: a Treat Trail / Missing Biscuit clue is a separate thought (the confirmation lands, THEN
+      // the next clue), so it gets the same deliberate 1.0s BEAT -- long enough for a child to read the
+      // confirmation first. Fetch, the bark-break and the cookie "zzz" keep the quicker 500ms.
+      const clueSplit = result.resolution.game === 'treattrail' || result.resolution.game === 'missingbiscuit';
+      const gap = r.followUpMedia ? (reducedMotion ? 0 : 1000) : reducedMotion ? 0 : clueSplit ? BEAT : 500;
       playSequence([followUp], toDog, gap, false, r.followUpMedia);
       return;
     }
@@ -1781,6 +1812,16 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
           blocked the header menus and the accessibility toolbar -- the same trap as the earlier full-bleed
           .root. data-pc-flat now forces it transparent under the scheme sweep too, like root/scrim. */}
       <div className={styles.wash} data-pc-flat />
+
+      {/* Task 178 §4: the correct-answer celebration -- the answer word in the site's display font (Luckiest
+          Guy) and colours, popping in over the chat, then clearing itself (the effect above). Keyed by id so
+          a repeat correct answer re-plays it. role=status announces the word to screen readers. Reduced
+          motion drops the pop and shows the word static (CSS @media block); the win is still marked. */}
+      {celebrate && (
+        <div key={celebrate.id} className={styles.celebrate} role="status" aria-live="polite">
+          <span className={styles.celebrateWord}>{celebrate.word}</span>
+        </div>
+      )}
 
       {/* Task 118/170: the brand-blue glow, now living in the experience (where the dog's position is known)
           rather than the launcher, so it can FOLLOW her. Decoration only (pointer-events:none in CSS); the
