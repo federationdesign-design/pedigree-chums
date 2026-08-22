@@ -1277,6 +1277,41 @@ function matchGameStart(c: string): GameId | null {
   return null;
 }
 
+// The composer emoji picker. A tapped emoji is an emoji-only message that would otherwise fall to the B18
+// "I can see it, but I cannot read it" line; instead each maps to a real response, reusing what exists.
+// Matched on the base glyphs (the U+FE0F variation selector stripped), so both ❤ and ❤️ hit.
+const EMOJI_FOOD: Record<string, string> = { '🍔': 'burger', '🍕': 'pizza', '🌭': 'sausage', '🥕': 'carrot' };
+const EMOJI_BALLS = new Set(['⚽', '🏀', '🏐', '🎾']);
+const EMOJI_GAMING = new Set(['🎮', '🕹']);
+const EMOJI_BATH = new Set(['🛁', '🚿']);
+const EMOJI_REACTIONS = new Set(['🤣', '🤭', '😂', '❤', '😍', '👍', '😊']);
+const EMOJI_COOKIE = '🍪';
+const EMOJI_CAT = '🐱';
+// A tapped picker emoji -> a real response, reusing existing behaviour. FOOD re-routes through the FULL food
+// mechanism by resolving its word, so the Labrador overrides whoever is active exactly as a food WORD does
+// (transfer from another dog, his own tiered answer when he is active). COOKIE hands to the Labrador and
+// starts his cookie game (game_start + transferTo; the engine switches the dog, mirroring the food override).
+// BALLS -> the ball answer (its clip, and it arms the "yes" confirm downstream); GAMING -> the games LIST
+// (with its tappable pills, per dog); BATH/CAT -> the two new B52 lines; the reactions -> the existing laugh
+// / ":)" row (the same one lol/haha reach). Any other emoji returns null and still gets the B18 line.
+function matchEmoji(n: Normalised, data: ChumData, state: RouterState): Resolution | null {
+  const glyphs = n.original.replace(/\uFE0F/g, '');
+  const has = (set: Set<string>) => [...set].some((g) => glyphs.includes(g));
+  for (const [emoji, word] of Object.entries(EMOJI_FOOD)) {
+    if (glyphs.includes(emoji)) return resolve(normalise(word), data, state); // full food behaviour, whoever is active
+  }
+  if (glyphs.includes(EMOJI_COOKIE)) {
+    const handoff = state.activeDog !== 'labrador';
+    return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: 'game_start', game: 'feedcookie', ...(handoff ? { transferTo: 'labrador' as Dog } : {}) };
+  }
+  if (has(EMOJI_BALLS)) return { layer: 9, layerName: 'Recognised conversation', bucket: 'B52', action: 'canned', responseId: 'COL-B52-MISC-09' };
+  if (has(EMOJI_GAMING)) return { layer: 13, layerName: 'Play and entertainment', bucket: 'B45', action: 'games_menu', responseId: 'B45-GAMELIST-02' };
+  if (has(EMOJI_BATH)) return { layer: 9, layerName: 'Recognised conversation', bucket: 'B52', action: 'canned', responseId: 'COL-B52-BATH-01' };
+  if (glyphs.includes(EMOJI_CAT)) return { layer: 9, layerName: 'Recognised conversation', bucket: 'B52', action: 'canned', responseId: 'COL-B52-CAT-01' };
+  if (has(EMOJI_REACTIONS)) return { layer: 9, layerName: 'Recognised conversation', bucket: 'B29', action: 'canned', responseId: 'B29-NICE-01' };
+  return null;
+}
+
 export function resolve(n0: Normalised, data: ChumData, state: RouterState): Resolution {
   // Apply curated misspelling aliases first, so both the safety gate and every
   // downstream layer see the canonical word. Fuzzy matching (in hasAny) then
@@ -2049,6 +2084,8 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
   // Layer 14: emoji-only message (picture-writing with no words). Checked before
   // gibberish so a lone emoji gets the "I read words" family, not the smash reply.
   if (isEmojiOnly(n)) {
+    const em = matchEmoji(n, data, state); // a picker emoji maps to a real response; other emoji fall through
+    if (em) return em;
     return { layer: 14, layerName: 'Emoji only', bucket: 'B18', action: 'emoji_only' };
   }
 

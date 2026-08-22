@@ -28,6 +28,7 @@ import { chatHatFor, BIRTHDAY_HAT_ID, KENNEL_SKETCH_HAT_ID } from '../../../lib/
 import type { GameId as HiddenGameId } from '../../../lib/hiddenGames/registry';
 import { openDiscountPopup } from '../data/discount-popup';
 import { FEED_COOKIES, RED_TOOLTIP, CookiePill } from '../data/feed-cookie';
+import { PICKER_EMOJI } from '../data/emoji-picker';
 import { applyBoxerEffect, resetBoxerEffects } from '../lib/boxerEffects';
 import { BOXER_BUTTONS, BoxerButton } from '../data/boxer-button-game';
 import { breeds } from '../../../data/breeds';
@@ -344,6 +345,7 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
   // ends the game. `armedRed` is the red pill whose "we dont use this" tooltip is currently open.
   const [feedFed, setFeedFed] = useState<string[] | null>(null);
   const [armedRed, setArmedRed] = useState<string | null>(null);
+  const [emojiOpen, setEmojiOpen] = useState(false); // the composer emoji picker panel
   // Task 168: the receded dogs (the three non-active) sit stacked beside the medallion while a chat is
   // open, each an arrow to switch to it. `activeReceded` is the one being pointed at: on a hover-capable
   // device it is set on hover (and a click switches straight away); on touch the FIRST tap sets it (grey
@@ -1707,6 +1709,38 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
         send();
       }}
     >
+      {/* The emoji picker: a small selection, not the full suite. A tap SENDS the emoji (its glyph shows in
+          the visitor's bubble) through the same submit path as typing; the router maps each to a real reply.
+          Real <button>s with the cookie-pill a11y kit: the raw glyph is aria-hidden and each button carries a
+          text aria-label (the emoji name), so it works in hide-images and the contrast schemes; typing is
+          untouched. */}
+      {emojiOpen && (
+        <div className={styles.emojiPanel} role="group" aria-label="Emoji. Tap one to send it.">
+          {PICKER_EMOJI.map((pe) => (
+            <button
+              key={pe.emoji}
+              type="button"
+              className={styles.emojiChoice}
+              aria-label={pe.label}
+              onClick={() => {
+                setEmojiOpen(false);
+                send(pe.emoji);
+              }}
+            >
+              <span aria-hidden="true">{pe.emoji}</span>
+            </button>
+          ))}
+        </div>
+      )}
+      <button
+        type="button"
+        className={styles.emojiToggle}
+        aria-label="Emoji"
+        aria-expanded={emojiOpen}
+        onClick={() => setEmojiOpen((o) => !o)}
+      >
+        <span aria-hidden="true">🙂</span>
+      </button>
       <input
         ref={inputRef}
         className={styles.input}

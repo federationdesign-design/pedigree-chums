@@ -347,6 +347,16 @@ export function submit(data: ChumData, session: Session, input: string): Turn {
     resolution = { layer: 4, layerName: 'FAQ knowledge', bucket: 'B04', action: 'faq_answer', faqId: 'FAQ015' };
   }
 
+  // The cookie emoji hands to the Labrador and starts his cookie game (mirroring the food override): a
+  // game_start carrying transferTo switches the active dog HERE, before the game starts, so the game runs
+  // and every line serves as the Labrador. Same bookkeeping as an ordinary transfer (below): reset the dog
+  // we are leaving and record the arrival. Only the emoji cookie handoff sets transferTo on a game_start.
+  if (resolution.action === 'game_start' && resolution.transferTo && resolution.transferTo !== session.activeDog) {
+    session.barkStreakByDog[session.activeDog] = 0;
+    session.activeDog = resolution.transferTo;
+    if (!session.previousDogs.includes(resolution.transferTo)) session.previousDogs.push(resolution.transferTo);
+  }
+
   // Task 115: the three in-chat games. Processed BEFORE assembly so the served copy and the board/tiles/
   // drawing reflect this move. The router places game routing BELOW safety/grief, and the S12 machine
   // above converts a game turn in a protected state, so a disclosure/bereavement/fear-of-a-person never

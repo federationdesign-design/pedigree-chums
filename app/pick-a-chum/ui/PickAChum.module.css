@@ -641,6 +641,7 @@
 /* Height matches the dog medallion (96px); radius stays a capsule (half the
    height), the chat area widened so the input keeps those proportions. */
 .composer {
+  position: relative; /* anchors the emoji picker panel above the bar */
   flex: 1 1 auto;
   min-width: 0;
   display: flex;
@@ -651,6 +652,76 @@
   background: #000000;
   border-radius: 48px;
   box-shadow: var(--pc-shadow);
+}
+/* Emoji picker. The toggle sits at the head of the composer; a tap opens the panel above it. Real buttons
+   with the cookie-pill a11y kit (focus-visible ring, reduced-motion), solid house-rule fills so the panel
+   survives the contrast schemes; the glyphs are text (survive hide-images) and each button's aria-label
+   carries the emoji name for screen readers. */
+.emojiToggle {
+  flex: 0 0 auto;
+  border: none;
+  background: transparent;
+  font-size: 26px;
+  line-height: 1;
+  padding: 4px;
+  cursor: pointer;
+}
+.emojiToggle:focus-visible {
+  outline: 3px solid var(--pc-ui-yellow);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+.emojiPanel {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 8px;
+  right: 8px;
+  max-width: 360px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 10px;
+  background: #ffffff;
+  border-radius: 18px;
+  box-shadow: var(--pc-shadow);
+  z-index: 3;
+}
+.emojiChoice {
+  min-width: 44px;
+  min-height: 44px;
+  border: none;
+  border-radius: 12px;
+  background: var(--pc-ui-blue);
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  transition: transform 120ms ease;
+}
+.emojiChoice:hover {
+  transform: translateY(-2px);
+}
+.emojiChoice:focus-visible {
+  outline: 4px solid var(--pc-ui-yellow);
+  outline-offset: 2px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .emojiChoice {
+    transition: none;
+  }
+  .emojiChoice:hover {
+    transform: none;
+  }
+}
+/* On mobile the composer docks at the TOP of the thread, so the default upward panel would open off the top
+   of the screen. Open it downward (into the thread) there instead. */
+@media (max-width: 480px) {
+  .emojiPanel {
+    top: calc(100% + 10px);
+    bottom: auto;
+    left: 8px;
+    right: 8px;
+    max-width: none;
+  }
 }
 .input {
   flex: 1;
