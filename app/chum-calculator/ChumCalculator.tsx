@@ -355,8 +355,14 @@ function scoreBreed(slug: string, answers: Record<string, string>): number {
     if (answers.velcro === "yes" && onePersonBreeds.has(slug)) score += 5; // close enough
   }
   if (flags && answers.vocal) {
-    if (answers.vocal === "yes" && flags.vocal) score -= 40;
-    if (answers.vocal === "no" && !flags.vocal) score += 8;
+    // Noise tolerance, 0 (silent) to 4 (no). Vocal breeds are penalised more the
+    // less noise is tolerated, and nudged up when the owner is genuinely unbothered.
+    // Quiet breeds are rewarded only when quiet is actually wanted. Replaces the old
+    // block, where "yes" was never an option (dead) and "no" was inverted. (A5, 22 Aug 2026.)
+    const vocalTol: Record<string, number> = { silent: 0, low: 1, medium: 2, high: 3, no: 4 };
+    const t = vocalTol[answers.vocal] ?? 4;
+    if (flags.vocal) score += t === 4 ? 8 : Math.min(0, (t - 3) * 12);
+    else if (t <= 1) score += t === 0 ? 10 : 5;
   }
   // ── Mobility scoring ────────────────────────────────────────────────────
   const minimalWalkOk = new Set(["maltese","chihuahua","bulldog","french-bulldog","pug",
