@@ -147,7 +147,7 @@ export default function ChumKnockout({ breeds, answers, onRestart }: Props) {
     );
   }
 
-  // ── A question round: pills, message, the surviving dogs, then the question ──
+  // ── A question round: pills, message, the question, then the surviving dogs ──
   return (
     <div>
       <div className={k.pillTrail}>
@@ -157,9 +157,6 @@ export default function ChumKnockout({ breeds, answers, onRestart }: Props) {
         <span className={k.pillCurrent}>Round {roundIdx + 1}</span>
       </div>
       <p className={k.message}>We still have a few too many chums matching you</p>
-      {/* The pack still in the running. On answer the losers get the fall-away
-          animation, then the rail updates. This is the knockout's moment. */}
-      <BreedResultRail breeds={survivors} bestSlug={null} fallingSlugs={elim?.falling} />
       <div className={styles.stepperWrap}>
         <div className={styles.stepCard}>
           <div className={styles.questionHeader}>
@@ -175,6 +172,10 @@ export default function ChumKnockout({ breeds, answers, onRestart }: Props) {
           </div>
         </div>
       </div>
+      {/* The pack still in the running, shown BELOW the question. Order reversed on
+          22 Aug 2026 (the old stage 3 spec had the rail above the question). On
+          answer the losers get the fall-away animation, then the rail updates. */}
+      <BreedResultRail breeds={survivors} bestSlug={null} fallingSlugs={elim?.falling} />
     </div>
   );
 }

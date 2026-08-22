@@ -5,7 +5,7 @@
 
 .message {
   font-family: var(--font-display, "Luckiest Guy", cursive);
-  color: var(--navy, #0a3a57);
+  color: #ffffff;
   text-align: center;
   margin: 0 0 16px;
   font-size: clamp(2.6rem, 9vw, 4.75rem);
