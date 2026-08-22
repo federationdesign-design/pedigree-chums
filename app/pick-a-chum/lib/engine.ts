@@ -192,6 +192,11 @@ const DIVERSIONS: { id: string; text: string; url: string; label: string }[] = [
   { id: 'DIVERSION-06', text: 'Which chum suits you?', url: '/chum-calculator', label: 'Chum Finder' },
   { id: 'DIVERSION-07', text: 'Shall I name a dog?', url: '/name-generator', label: 'Name Generator' },
   { id: 'DIVERSION-08', text: 'The whole pack?', url: '/know-your-chums', label: 'Know Your Chums' },
+  // Two more pages beyond the history cluster, so the offers are not history-heavy. Text is a PLACEHOLDER
+  // (Steve to write, logged in PLACEHOLDERS.md); a leading '[' marks it, and the picker skips any diversion
+  // whose text is still a placeholder, so a child never sees the marker. They join the pool once written.
+  { id: 'DIVERSION-09', text: '[Competition diversion line: Steve to write]', url: '/chumspot', label: 'Competition' },
+  { id: 'DIVERSION-10', text: '[ChumDrop diversion line: Steve to write]', url: '/', label: 'ChumDrop' },
 ];
 
 // Task 115: a game B4x line's template text, or '' (an ongoing board has no line).
@@ -561,11 +566,19 @@ export function submit(data: ChumData, session: Session, input: string): Turn {
       // genuinely stuck visitor -- build toward the "somewhere to go" nudge. isGibberish is untouched.
       const loneToken = n.words.length <= 1;
       if (session.noSubjectStreak === 2 && !loneToken) {
-        const d = DIVERSIONS[(session.diversionsShown ?? 0) % DIVERSIONS.length];
+        // Random pick, no repeat until the pool is exhausted (then it resets and randomises again), drawing
+        // from EVERY offer with real text -- placeholder entries (leading '[') are skipped until written, so
+        // the offers vary and never front-load the history cluster the way the old sequential-from-01 did.
+        const active = DIVERSIONS.filter((x) => !x.text.startsWith('['));
+        const shown = session.diversionsShownIds ?? [];
+        const avail = active.filter((x) => !shown.includes(x.id));
+        const pool = avail.length ? avail : active;
+        const d = pool[Math.floor(Math.random() * pool.length)];
         response.text = d.text;
         response.responseId = d.id;
         response.url = d.url;
         response.linkLabel = d.label;
+        session.diversionsShownIds = avail.length ? [...shown, d.id] : [d.id];
         session.diversionsShown = (session.diversionsShown ?? 0) + 1;
       } else {
         const b40 = data.collieResponses.find((r) => r.bucketId === 'B40');

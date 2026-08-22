@@ -975,7 +975,7 @@ for (const inp of ['no', 'so', 'go', 'do', 'ok', 'yes']) {
 (() => {
   const s = newSession();
   for (const inp of ['hjdihi', 'zxcvq', 'mnbvq']) {
-    check(inp, {}, { session: s, assert: (_r, resp) => resp.responseId !== 'DIVERSION-01' && resp.responseId !== 'DIVERSION-02' ? null : `lone token tripped a diversion: ${resp.responseId}` });
+    check(inp, {}, { session: s, assert: (_r, resp) => !(resp.responseId ?? '').startsWith('DIVERSION') ? null : `lone token tripped a diversion: ${resp.responseId}` });
   }
 })();
 
@@ -1587,7 +1587,7 @@ const hasUnresolvedTok = (t) => /\[|\]|\{\{|\}\}|\bundefined\b|\bnull\b/.test(t)
     ['whats the thing with the cards', 'gk_unknown', null], // Task 175 §5: vague, not a contents question -> a miss (Cards? loop), not the 54-cards answer
     ['no not that', 'fallback', 'B40-NOSUBJECT-01'],
     ['I mean the pictures on them', 'fallback', 'B40-NOSUBJECT-01'],
-    ["you're not understanding me", 'fallback', 'DIVERSION-01'], // Task 142: 3rd in a row -> ONE diversion
+    ["you're not understanding me", 'fallback', 'DIVERSION-*'], // Task 142: 3rd in a row -> ONE (random) diversion
     ['forget it', 'fallback', 'B40-NOSUBJECT-01'], // Task 142: 4th -> back to "im a dog"
     ['actually can you help me find something', 'clarifier', null],
     ['the name generator', 'link', null],
@@ -1596,7 +1596,7 @@ const hasUnresolvedTok = (t) => /\[|\]|\{\{|\}\}|\bundefined\b|\bnull\b/.test(t)
   for (const [inp, act, rid] of turns) {
     const { resolution: r, response } = submit(data, s, inp);
     if (r.action !== act) { ok = false; note += `"${inp}" action ${r.action} want ${act}; `; }
-    if (rid && response.responseId !== rid) { ok = false; note += `"${inp}" respId ${response.responseId} want ${rid}; `; }
+    if (rid) { const got = response.responseId ?? ''; const bad = rid === 'DIVERSION-*' ? !got.startsWith('DIVERSION') : got !== rid; if (bad) { ok = false; note += `"${inp}" respId ${response.responseId} want ${rid}; `; } }
     if (hasUnresolvedTok(response.text)) { ok = false; note += `"${inp}" unresolved token; `; }
   }
   ok ? pass++ : fail++;
@@ -1608,11 +1608,13 @@ const hasUnresolvedTok = (t) => /\[|\]|\{\{|\}\}|\bundefined\b|\bnull\b/.test(t)
   const miss = 'What is the latest football score?'; // gk_unknown, no candidate -> B40 no-subject fallback
   // Task 142: two "im a dog"s, then ONE diversion on the third, then back to "im a dog" (never three
   // offers in a row).
-  const expect = ['im a dog', 'im a dog', 'Ancient dogs of Britain?', 'im a dog', 'im a dog', 'im a dog', 'im a dog', 'im a dog', 'im a dog'];
+  const expect = ['im a dog', 'im a dog', 'DIVERSION', 'im a dog', 'im a dog', 'im a dog', 'im a dog', 'im a dog', 'im a dog'];
   let ok = true, note = '';
   for (let i = 0; i < expect.length; i++) {
     const { response } = submit(data, s, miss);
-    if (response.text !== expect[i]) { ok = false; note += `turn ${i + 1}: "${response.text}" want "${expect[i]}"; `; }
+    const want = expect[i];
+    const bad = want === 'DIVERSION' ? (response.text === 'im a dog' || response.text.startsWith('[')) : response.text !== want;
+    if (bad) { ok = false; note += `turn ${i + 1}: "${response.text}" want "${want}"; `; }
   }
   submit(data, s, 'tell me about the border collie'); // a real answer resets noSubjectStreak
   const after = submit(data, s, miss).response.text;
@@ -1667,8 +1669,8 @@ const hasUnresolvedTok = (t) => /\[|\]|\{\{|\}\}|\bundefined\b|\bnull\b/.test(t)
     ids.push(response.responseId); texts.push(response.text);
   }
   // Task 142: two "im a dog"s, then ONE diversion, then back to "im a dog".
-  const expectText = ['im a dog', 'im a dog', 'Ancient dogs of Britain?', 'im a dog', 'im a dog'];
-  const okText = texts.every((t, i) => t === expectText[i]);
+  const expectText = ['im a dog', 'im a dog', 'DIVERSION', 'im a dog', 'im a dog'];
+  const okText = texts.every((t, i) => expectText[i] === 'DIVERSION' ? (t !== 'im a dog' && !t.startsWith('[')) : t === expectText[i]);
   const noTok = !texts.some((t) => hasUnresolvedTok(t));
   const ok = okText && noTok;
   ok ? pass++ : fail++;
@@ -1851,12 +1853,13 @@ check('cost', { action: 'price_answer' });
   const seq = [
     ['the thing over there', 'B40-NOSUBJECT-01', 'im a dog'],
     ['that does not help', 'B40-NOSUBJECT-01', 'im a dog'],
-    ['i really cannot say', 'DIVERSION-01', 'Ancient dogs of Britain?'], // Task 142: 3rd -> one diversion
+    ['i really cannot say', 'DIVERSION-*', null], // Task 142: 3rd -> one (random) diversion
     ['something something else', 'B40-NOSUBJECT-01', 'im a dog'], // Task 142: 4th -> back to "im a dog"
   ];
   for (const [inp, rid, txt] of seq) {
     check(inp, { action: 'fallback' }, { session: s, assert: (_r, resp) =>
-      resp.responseId === rid && resp.text === txt ? null : `${inp} -> ${resp.responseId} "${resp.text}"` });
+      rid === 'DIVERSION-*' ? ((resp.responseId ?? '').startsWith('DIVERSION') ? null : `${inp} -> ${resp.responseId} (expected a diversion)`)
+        : resp.responseId === rid && resp.text === txt ? null : `${inp} -> ${resp.responseId} "${resp.text}"` });
   }
 })();
 // A successful route breaks the run and re-arms the repeat (loopRepeatUsed back to false).
@@ -1925,11 +1928,13 @@ check('my dog is old and unwell', { action: 'grief' }, { assert: (r) => r.griefC
 (() => {
   const s = newSession();
   // Task 142: two "im a dog"s, ONE diversion on the third, then back to "im a dog" for the rest.
-  const expect = ['im a dog', 'im a dog', 'Ancient dogs of Britain?', 'im a dog', 'im a dog', 'im a dog', 'im a dog', 'im a dog', 'im a dog', 'im a dog'];
+  const expect = ['im a dog', 'im a dog', 'DIVERSION', 'im a dog', 'im a dog', 'im a dog', 'im a dog', 'im a dog', 'im a dog', 'im a dog'];
   let ok = true, note = '';
   for (let i = 0; i < expect.length; i++) {
     const { response } = submit(data, s, 'the thing over there');
-    if (response.text !== expect[i]) { ok = false; note = `turn ${i} "${response.text}" want "${expect[i]}"`; break; }
+    const want = expect[i];
+    const bad = want === 'DIVERSION' ? (response.text === 'im a dog' || response.text.startsWith('[')) : response.text !== want;
+    if (bad) { ok = false; note = `turn ${i} "${response.text}" want "${want}"`; break; }
   }
   ok ? pass++ : fail++;
   rows.push({ ok, input: 'Task79+142: no-candidate misses, one diversion', layer: '-', bucket: '-', action: 'loop', note });
@@ -2847,7 +2852,7 @@ check('how long do they live', { action: 'canned', bucket: 'B48' }, { assert: (_
   const s = newSession();
   let third;
   for (let i = 0; i < 3; i++) third = submit(data, s, 'the thing over there').response;
-  const ok = third.responseId === 'DIVERSION-01' && third.url === '/britains-dog-history#ancient-dogs' && !!third.linkLabel;
+  const ok = (third.responseId ?? '').startsWith('DIVERSION') && !!third.url && !!third.linkLabel && !third.text.startsWith('[');
   ok ? pass++ : fail++;
   rows.push({ ok, input: 'T142: diversion carries a link', layer: 9, bucket: 'B13', action: 'fallback', note: ok ? '' : `rid=${third.responseId} url=${third.url}` });
 })();
@@ -3286,9 +3291,45 @@ check('are you a good dog', { action: 'good_boy' });
   const s = newSession();
   let third;
   for (let i = 0; i < 3; i++) third = submit(data, s, 'the thing over there').response;
-  const ok = third.responseId === 'DIVERSION-01';
+  const ok = (third.responseId ?? '').startsWith('DIVERSION');
   ok ? pass++ : fail++;
   rows.push({ ok, input: '§3 guard: genuine no-subject still diverts', layer: 9, bucket: '-', action: 'fallback', note: ok ? '' : `rid=${third.responseId}` });
+})();
+// Widened fact triggers: the natural ways to ask reach the B57 pool, not "im a dog" (was a 6-phrase keyhole).
+for (const inp of ['fact', 'facts', 'gimme a fact', 'fact me', 'dog facts', 'facts about dogs', 'give me a fact', 'another fact', 'more facts']) {
+  check(inp, { action: 'dog_fact', bucket: 'B57' }, {});
+}
+// "a fact about a breed" reaches a BREED fact (B07 breed_answer), not general history.
+for (const inp of ['a fact about a breed', 'breed fact', 'tell me a breed fact', 'a breed fact']) {
+  check(inp, { action: 'breed_answer', bucket: 'B07' }, {});
+}
+// Diversions are RANDOMISED (not always DIVERSION-01). Across fresh sessions the first offer varies, is
+// always an active offer (never a placeholder 09/10), and carries a real link.
+(() => {
+  const seen = new Set();
+  let ok = true, note = '';
+  for (let run = 0; run < 6; run++) {
+    const s = newSession();
+    let r; for (let i = 0; i < 3; i++) r = submit(data, s, 'the thing over there').response; // 3rd no-subject turn -> a diversion
+    if (!(r.responseId ?? '').startsWith('DIVERSION') || r.text.startsWith('[') || !r.url) { ok = false; note = `bad offer: rid=${r.responseId} text="${r.text}"`; break; }
+    seen.add(r.responseId);
+  }
+  if (ok && seen.size < 2) { ok = false; note = `not randomised, only ever saw ${[...seen].join(',')}`; } // ~(1/8)^5 flake chance
+  ok ? pass++ : fail++;
+  rows.push({ ok, input: 'diversions: first offer is randomised (not always 01), placeholders skipped', layer: 9, bucket: '-', action: 'fallback', note });
+})();
+// No repeat until the pool is exhausted: four diversions in one session (16 turns, under the ceiling) are distinct.
+(() => {
+  const s = newSession();
+  const ids = [];
+  for (let k = 0; k < 4; k++) {
+    let r; for (let i = 0; i < 3; i++) r = submit(data, s, 'the thing over there').response;
+    ids.push(r.responseId);
+    submit(data, s, 'tell me about the border collie'); // a real answer resets the no-subject streak
+  }
+  const ok = ids.every((x) => (x ?? '').startsWith('DIVERSION')) && new Set(ids).size === 4;
+  ok ? pass++ : fail++;
+  rows.push({ ok, input: 'diversions: no repeat across four offers in a session', layer: 9, bucket: '-', action: 'fallback', note: ok ? '' : `ids=${ids.join(',')}` });
 })();
 // §4: the missing name phrasings are acknowledged; the stop list still rejects a non-name.
 check('im called Phil', { action: 'name_ack' }, { assert: (_r, resp) => (/Phil/.test(resp.text) ? null : `im called: "${resp.text}"`) });

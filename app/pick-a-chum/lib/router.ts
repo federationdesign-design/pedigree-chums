@@ -790,7 +790,14 @@ const GENERAL_TRIGGERS: Record<string, string> = {
   'a real dog': 'COL-B56-GENERAL-07', 'is this a real dog': 'COL-B56-GENERAL-07',
   'what are dogs': 'COL-B56-GENERAL-08', 'what is a dog': 'COL-B56-GENERAL-08',
 };
-const FACT_TRIGGERS = new Set(['tell me something', 'tell me a fact', 'a dog fact', 'say something interesting', 'tell me more', 'tell me a dog fact']);
+// A general fact request -> the B57 pool. Six exact phrases were a keyhole; these are the natural ways to
+// ask, matched whole-message so a stray "fact" inside a sentence never fires. A fact ABOUT A BREED is
+// handled separately (BREED_FACT_TRIGGERS -> B07, a fact about the active breed), so it is not general history.
+const FACT_TRIGGERS = new Set(['tell me something', 'tell me a fact', 'a dog fact', 'say something interesting', 'tell me more', 'tell me a dog fact',
+  'fact', 'facts', 'a fact', 'dog fact', 'dog facts', 'gimme a fact', 'give me a fact', 'give me a dog fact', 'fact me', 'facts about dogs', 'a fact about dogs',
+  'another fact', 'more facts', 'fact please', 'tell me facts', 'tell me dog facts', 'any facts', 'facts pls', 'gimme a dog fact']);
+const BREED_FACT_TRIGGERS = new Set(['a fact about a breed', 'fact about a breed', 'a breed fact', 'breed fact', 'breed facts', 'tell me a breed fact',
+  'a fact about breeds', 'fact about breeds', 'facts about breeds', 'tell me a fact about a breed', 'give me a breed fact']);
 
 
 // Route a confirmed loop subject to its destination. Mirrors the loop's offer mapping: a breed
@@ -1613,6 +1620,11 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
     return { layer: 13, layerName: 'Play and entertainment', bucket: 'B54', action: 'tricks_menu', responseId: 'COL-B54-TRICKS-01' };
   }
 
+  // A fact ABOUT A BREED serves a fact about the active breed (B07), not a history link. Checked before the
+  // general fact pool and above the breed-content route below, so "a fact about a breed" reaches a breed fact.
+  if (BREED_FACT_TRIGGERS.has(c)) {
+    return { layer: 7, layerName: 'Facts about the active breed', bucket: 'B07', action: 'breed_answer' };
+  }
   // Task 134: a random dog fact. Rotation is handled in the assembler so the
   // session does not repeat one until all twenty have been used.
   if (FACT_TRIGGERS.has(c)) {

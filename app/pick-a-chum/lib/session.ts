@@ -56,10 +56,13 @@ export interface Session {
   // the third and further consecutive no-subject turns rotate through the B46 bank instead of repeating
   // "im a dog". Reset to 0 the moment anything else is served (a real answer, LOOP-01 or LOOP-02).
   noSubjectStreak: number;
-  // Task 142: how many diversions (destination offers) have been shown this session, to rotate through
-  // the eight offers. One diversion fires on the third consecutive no-subject turn, then it is back to
-  // "im a dog" (three offers in a row is pestering).
+  // Task 142: how many diversions (destination offers) have been shown this session. Kept for compatibility;
+  // the pick is now RANDOM (diversionsShownIds), not a sequential count, so it no longer always starts at 01.
   diversionsShown: number;
+  // Which diversion ids have been offered this session. The pick draws RANDOMLY from those not yet shown, so
+  // the offers vary and never repeat until the pool is exhausted (then it resets). One fires on the third
+  // consecutive no-subject turn, then back to "im a dog" (three in a row is pestering).
+  diversionsShownIds?: string[];
   // Fetch (random_link): how many times the visitor has fetched this session. Drives the deterministic
   // 1-in-4 mix (every 4th fetch brings a physical thing, rotating ball -> newspaper -> hat) and a cycling
   // page rotation, so fetch never sticks on one page after all are spent. Incremented in the engine after
