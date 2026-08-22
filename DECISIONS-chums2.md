@@ -80,6 +80,14 @@ Baseline (measured before stage 1):
 - FLAG for Steve: this is a modal tree, not an inline-on-load tree. If you want it inline beside the diagram, that needs a new bounded rendering mode inside LineageMap (a deliberate shared-component change), which I did not make because it would risk the game. Tell me and I will design it behind a defaulted prop.
 - CSS constraint respected: no perspective / backface-visibility / transform-style: preserve-3d anywhere in the chums2 chain.
 
+## Famous chums switched on (2026-08-23)
+
+### D27. Famous chums in the right column; Smoky "duplicate" is a mockup artifact, not a bug
+- SHOW_SECTIONS.famousChums = true (nothing else on). FamousDogsSection moved INTO .introStack (right column), directly below the ancestor pack, sharing the pack/intro-box left edge. Wrapped in .famousWrap (max-width min(920px,74vw)) so the card row can extend right of the intro box before wrapping while keeping the shared left edge.
+- Heading "FAMOUS CHUMS": the shared component's own <h2> restyled page-scoped to match ANCESTOR PACK exactly (Montserrat, navy, clamp(1.2rem,2vw,1.7rem)); the shared section's 20px heading gap tightened to 14px via .famousWrap > div to match the pack rhythm.
+- Cards left as shipped (navy rounded, REAL type pill, name, knownFor, wrapping row, 12px gaps).
+- ITEM 5 DATA CHECK: the Smoky-twice in the concept is NEITHER a data nor a render bug. data/famousDogs.ts "yorkshire-terrier" has exactly two unique entries (Smoky, Mr Famous); FamousDogsSection maps them 1:1 keyed by name (no repetition). The live render shows two cards, Smoky and Mr Famous once each. The four cards in the concept crop are a mockup artifact (the two duplicated to fill the row). No code fix made; nothing to fix.
+
 ## Enlarge popup: genuine reuse via shared TileZoom (2026-08-22)
 
 ### D26. Removed the lookalike; extracted the mini-pit enlarge into a shared component both pages render

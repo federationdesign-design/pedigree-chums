@@ -576,25 +576,32 @@
   pointer-events: none;
 }
 
-/* ── Famous chums (stage 5) ─────────────────────────────────────
-   In flow, directly below the ancestor pack. Left inset clears the
-   icon rail (item 13). */
-.famousChums {
-  padding: clamp(40px, 4vw, 72px) clamp(24px, 4vw, 64px) 0;
-  padding-left: clamp(104px, 9vw, 132px);
+/* ── Famous chums ───────────────────────────────────────────────
+   In the right column (.introStack), directly below the ancestor pack
+   and sharing its left edge. The card row may extend right of the intro
+   box, so allow it to grow wider than the box before wrapping. */
+.famousWrap {
+  max-width: min(920px, 74vw);
 }
 
-/* Item 14: restyle the FamousDogsSection heading (its own <h2>) to Montserrat,
-   dark navy, smaller, not the yellow display font, scoped to this page only so
+/* Heading: restyle the FamousDogsSection <h2> to match ANCESTOR PACK exactly
+   (Montserrat, navy, same size and 14px bottom rhythm), scoped to this page so
    the shared component and the live page are untouched. Higher specificity than
    the component's own .heading rule, no :global needed. */
-.famousChums h2 {
+.famousWrap h2 {
   font-family: var(--font-body, 'Montserrat', system-ui);
   font-size: clamp(1.2rem, 2vw, 1.7rem);
   font-weight: 800;
   letter-spacing: 0.06em;
   color: var(--navy, #0a3a57);
   text-transform: uppercase;
+  margin: 0;
+}
+
+/* Match the ANCESTOR PACK heading-to-content rhythm (14px): the shared section
+   uses a 20px flex gap, so tighten it here (this page only). */
+.famousWrap > div {
+  gap: 14px;
 }
 
 /* ── Back button (matches the live page) ────────────────────────── */

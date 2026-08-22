@@ -56,7 +56,7 @@ const SHOW_SECTIONS = {
   lifespanChart: false, // the lifespan chart (still off)
   diagram: false,       // circular BreedTree diagram (main band)
   ancestorPack: true,   // hidden BreedTreeMap feed + pack grid
-  famousChums: false,   // FamousDogsSection
+  famousChums: true,    // FamousDogsSection
   cards: false,         // rail pop-out DragCards
   tree: false,          // family tree LineageMap overlay
   rail: true,           // the icon rail (icons only for now; pop-outs gated off)
@@ -407,10 +407,10 @@ export default function Chums2Client({ name, slug, image, info, lineage }: Props
           to its right, the box's TOP aligned to the rail's first icon
           (align-items:flex-start). In the left column below the chum square. The
           rail's pop-outs are still gated off; the lifespan chart is still off. */}
-      {(SHOW_SECTIONS.rail || SHOW_SECTIONS.introBox || SHOW_SECTIONS.lifespanChart || SHOW_SECTIONS.ancestorPack) && (
+      {(SHOW_SECTIONS.rail || SHOW_SECTIONS.introBox || SHOW_SECTIONS.lifespanChart || SHOW_SECTIONS.ancestorPack || SHOW_SECTIONS.famousChums) && (
         <div className={styles.leftBand}>
           {SHOW_SECTIONS.rail && <Chums2Rail items={railItems} onOpen={openCard} />}
-          {(SHOW_SECTIONS.introBox || SHOW_SECTIONS.lifespanChart || SHOW_SECTIONS.ancestorPack) && (
+          {(SHOW_SECTIONS.introBox || SHOW_SECTIONS.lifespanChart || SHOW_SECTIONS.ancestorPack || SHOW_SECTIONS.famousChums) && (
             <div className={styles.introStack} data-region="intro-band">
               {SHOW_SECTIONS.introBox && introText && (
                 <div className={styles.introBox}>
@@ -493,6 +493,13 @@ export default function Chums2Client({ name, slug, image, info, lineage }: Props
                   </div>
                 </section>
               )}
+              {/* Famous chums, directly below the ancestor pack, sharing its
+                  left edge (both in this right column). Cards as shipped. */}
+              {SHOW_SECTIONS.famousChums && famousDogs[slug] && (
+                <div className={styles.famousWrap} data-region="famous-chums">
+                  <FamousDogsSection dogs={famousDogs[slug]} />
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -537,12 +544,6 @@ export default function Chums2Client({ name, slug, image, info, lineage }: Props
         </div>
       )}
 
-      {/* Famous chums, in flow directly below the ancestor pack (brief 5.7). */}
-      {SHOW_SECTIONS.famousChums && famousDogs[slug] && (
-        <section className={styles.famousChums} data-region="famous-chums">
-          <FamousDogsSection dogs={famousDogs[slug]} />
-        </section>
-      )}
 
       {/* Open draggable cards. */}
       {cards.map((c) =>
