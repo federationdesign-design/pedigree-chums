@@ -2132,8 +2132,10 @@ for (const g of GAMES) {
 // next clue, not a penalty; a correct guess (incl. a misspelling) advances warmly.
 (() => {
   const s = newSession('labrador');
-  check('treat trail', { action: 'game_start' }, { session: s, assert: (_r, resp, se) => (se.activeGame === 'treattrail' && resp.text.includes('Treat Trail') && resp.text.includes('its round') ? null : `tt start: game=${se.activeGame} text="${resp.text}"`) });
-  check('cat', { action: 'game_move' }, { session: s, assert: (_r, resp) => (resp.text.includes('another clue') && resp.text.includes('it bounces') ? null : `tt wrong: "${resp.text}"`) });
+  // Task 178 §3: the reaction and the next clue are now two messages -- the clue rides resp.followUp, a beat
+  // later, not the same bubble. Assert the split (clue in followUp, NOT in text).
+  check('treat trail', { action: 'game_start' }, { session: s, assert: (_r, resp, se) => (se.activeGame === 'treattrail' && resp.text.includes('Treat Trail') && !resp.text.includes('its round') && resp.followUp?.includes('its round') ? null : `tt start: game=${se.activeGame} text="${resp.text}" followUp="${resp.followUp}"`) });
+  check('cat', { action: 'game_move' }, { session: s, assert: (_r, resp) => (resp.text.includes('another clue') && !resp.text.includes('it bounces') && resp.followUp?.includes('it bounces') ? null : `tt wrong: text="${resp.text}" followUp="${resp.followUp}"`) });
   check('ball', { action: 'game_move' }, { session: s, assert: (_r, resp) => (resp.text.includes('you got it') ? null : `tt right: "${resp.text}"`) });
 })();
 // a misspelling counts: "bal" (accept list) is right for BALL
@@ -2203,7 +2205,8 @@ for (const dog of ['collie', 'terrier', 'boxer']) {
 (() => {
   const s = newSession('terrier');
   check('missing biscuit', { action: 'game_start' }, { session: s, assert: (_r, resp, se) => (se.activeGame === 'missingbiscuit' && resp.text.includes('a biscuit is missing') && resp.text.includes('the cat, the puppy or grandad') ? null : `mb start: game=${se.activeGame} text="${resp.text}"`) });
-  check('clue', { action: 'game_move' }, { session: s, assert: (_r, resp) => (resp.text.includes('right. heres one') && resp.text.includes('high shelf') && !resp.text.includes('sofa') ? null : `mb clue1 (one at a time): "${resp.text}"`) });
+  // Task 178 §3: the clue splits to resp.followUp, a beat after the "right. heres one" reaction.
+  check('clue', { action: 'game_move' }, { session: s, assert: (_r, resp) => (resp.text.includes('right. heres one') && !resp.text.includes('high shelf') && resp.followUp?.includes('high shelf') && !resp.text.includes('sofa') && !(resp.followUp ?? '').includes('sofa') ? null : `mb clue1 (one at a time): text="${resp.text}" followUp="${resp.followUp}"`) });
   check('the puppy', { action: 'game_move' }, { session: s, assert: (_r, resp) => (resp.text === 'why would it be them?' ? null : `mb wrong1: "${resp.text}"`) });
   check('the cat', { action: 'game_move' }, { session: s, assert: (_r, resp) => (resp.text.includes('aye. thats the one') ? null : `mb correct: "${resp.text}"`) });
 })();
@@ -2490,29 +2493,50 @@ check('what is this page', {}, { session: withRoute('/no-such-page'), assert: (r
       : resp.text.includes('hotdogs') ? 'the hot-dogs bio leaked in PROTECTED_AFTERCARE' : null });
 })();
 
-// ---- Task 140 D: fetch falls through to the page bios once B03's lines are all used ----
+// ---- Fetch: the deterministic 1-in-4 mix (pages + physical things), then cycling ----
+// Every 4th fetch is a THING; the ten B03 thrown lines fill the non-thing slots up to turn 13, so the page
+// bios begin at turn 14. Over 32 fetches, 8 are things and >=5 distinct bios appear.
 (() => {
   const s = newSession();
   const seen = new Set();
-  let firstBioAt = 0;
-  for (let i = 1; i <= 16; i++) {
-    const { response } = submit(data, s, 'fetch');
-    if (response.responseId?.startsWith('FETCH-BIO-') && !firstBioAt) firstBioAt = i;
-    if (response.responseId?.startsWith('FETCH-BIO-')) seen.add(response.responseId);
+  let firstBioAt = 0, things = 0;
+  for (let i = 1; i <= 32; i++) {
+    const id = submit(data, s, 'fetch').response.responseId ?? '';
+    if (id.startsWith('FETCH-THING-')) things++;
+    if (id.startsWith('FETCH-BIO-')) { if (!firstBioAt) firstBioAt = i; seen.add(id); }
   }
-  // B03 has ten lines, so the bios begin at turn 11; every bio link carries a real internal url + label.
-  const ok = firstBioAt === 11 && seen.size >= 5;
+  const ok = firstBioAt === 14 && things === 8 && seen.size >= 5;
   ok ? pass++ : fail++;
-  rows.push({ ok, input: 'T140: fetch -> B03 then bios', layer: 13, bucket: '-', action: 'random_link', note: ok ? '' : `firstBioAt=${firstBioAt} bios=${seen.size}` });
+  rows.push({ ok, input: 'fetch: mix (B03, bios, 1-in-4 things)', layer: 13, bucket: '-', action: 'random_link', note: ok ? '' : `firstBioAt=${firstBioAt} things=${things} bios=${seen.size}` });
 })();
-// A fetch-bio carries a real page link and a readable label (never a bare "Open it").
+// A fetch-bio carries a real page link and a readable label (never a bare "Open it"). Turn 14 is the first bio.
 (() => {
   const s = newSession();
   let last;
-  for (let i = 0; i < 11; i++) last = submit(data, s, 'fetch').response;
+  for (let i = 0; i < 14; i++) last = submit(data, s, 'fetch').response;
   const ok = last.responseId.startsWith('FETCH-BIO-') && typeof last.url === 'string' && last.url.startsWith('/') && !!last.linkLabel;
   ok ? pass++ : fail++;
-  rows.push({ ok, input: 'T140: fetch-bio has link + label', layer: 13, bucket: '-', action: 'random_link', note: ok ? '' : `url=${last.url} label=${last.linkLabel}` });
+  rows.push({ ok, input: 'fetch: bio has link + label', layer: 13, bucket: '-', action: 'random_link', note: ok ? '' : `url=${last.url} label=${last.linkLabel}` });
+})();
+// The physical things rotate ball -> newspaper -> hat, never the same twice; the hat brings its clip.
+(() => {
+  const s = newSession();
+  const things = [];
+  let hatMedia = false;
+  for (let i = 1; i <= 16; i++) { const r = submit(data, s, 'fetch').response; if ((r.responseId ?? '').startsWith('FETCH-THING-')) { things.push(r.responseId); if (r.responseId === 'FETCH-THING-HAT') hatMedia = r.media?.src === '/chat-media/hats.mp4'; } }
+  const ok = things.length === 4 && things[0] === 'FETCH-THING-BALL' && things[1] === 'FETCH-THING-NEWSPAPER' && things[2] === 'FETCH-THING-HAT' && things[3] === 'FETCH-THING-BALL' && hatMedia;
+  ok ? pass++ : fail++;
+  rows.push({ ok, input: 'fetch: things rotate ball/newspaper/hat', layer: 13, bucket: '-', action: 'random_link', note: ok ? '' : `things=${things.join(',')} hatMedia=${hatMedia}` });
+})();
+// After the whole page pool is spent, the rotation CYCLES (a B03 line returns) rather than sticking on the
+// first bio forever (the old bug).
+(() => {
+  const s = newSession();
+  const ids = [];
+  for (let i = 1; i <= 44; i++) ids.push(submit(data, s, 'fetch').response.responseId);
+  const ok = ids.slice(36).some((id) => /^B03-R/.test(id ?? '')); // a page line reappears late = it wrapped
+  ok ? pass++ : fail++;
+  rows.push({ ok, input: 'fetch: page pool cycles, never sticks', layer: 13, bucket: '-', action: 'random_link', note: ok ? '' : `tail=${ids.slice(36).join(',')}` });
 })();
 
 // ---- Task 140 B: the five clips join their responses (the clip is added, never replaces the copy) ----

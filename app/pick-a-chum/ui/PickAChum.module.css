@@ -723,6 +723,62 @@
     max-width: none;
   }
 }
+
+/* Task 178 §4: the correct-answer celebration. The answer word in Luckiest Guy (the site display font) and
+   the site colours, popping in over the chat centre and clearing itself. The FADE lives on the overlay div,
+   never on the text (house rule: no text opacity). pointer-events:none so it never blocks the chat. */
+.celebrate {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 60;
+  animation: pcCelebrateFade 1600ms ease-out forwards;
+}
+.celebrateWord {
+  font-family: var(--font-display, sans-serif);
+  font-size: clamp(52px, 15vw, 150px);
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  text-align: center;
+  padding: 0 14px;
+  color: var(--pc-ui-yellow);
+  -webkit-text-stroke: 3px var(--pc-ui-navy);
+  text-shadow: 0 6px 0 var(--pc-ui-navy);
+  animation: pcCelebratePop 700ms cubic-bezier(0.2, 1.5, 0.5, 1) forwards;
+}
+@keyframes pcCelebrateFade {
+  0% { opacity: 0; }
+  10% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { opacity: 0; }
+}
+@keyframes pcCelebratePop {
+  0% { transform: scale(0.2) rotate(-7deg); }
+  60% { transform: scale(1.14) rotate(4deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+/* Contrast schemes: drop the coloured stroke/shadow and paint the word in the scheme's solid tones (cream on
+   a navy stroke) so it stays a big, clear word. Still reads as a celebration (the display font + size),
+   without the yellow/navy playfulness the full-colour view has. */
+.rootAccessible .celebrateWord {
+  color: var(--pc-ui-cream);
+  -webkit-text-stroke: 4px var(--pc-ui-navy);
+  text-shadow: none;
+}
+/* Reduced motion: no pop, no fade -- the word appears static and holds until its timer clears it, so the win
+   is still marked, with no movement (exactly what the setting is for). */
+@media (prefers-reduced-motion: reduce) {
+  .celebrate {
+    animation: none;
+  }
+  .celebrateWord {
+    animation: none;
+  }
+}
 .input {
   flex: 1;
   min-width: 0;

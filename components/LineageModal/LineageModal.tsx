@@ -10,6 +10,7 @@ import { BRAIN_PATH, BRAIN_ARTBOARD } from "../icons/brain";
 import ShareCard from "../ShareCard/ShareCard";
 import type { LineageNode } from "../../data/lineage";
 import { levelThemeFor } from "../../data/levelThemes";
+import { fireConfetti } from "../../lib/confetti";
 import css from "./LineageModal.module.css";
 import { TAG_STYLE, nodeStatus, type BreedTag } from "../BreedTreeMap/BreedTreeMap";
 import { useRouter } from "next/navigation";
@@ -479,15 +480,8 @@ export default function LineageModal({ name, image, character, lineage, fromRect
             setPhase("won");
             // Completed, so this level's catch counts toward the run.
             if (packSize > 0) onLevelChumRate?.((collectedChums.size / packSize) * 100);
-            // celebration: confetti over the flash (canvas-confetti, CDN pattern)
-            const fire = () => (window as any).confetti?.({ particleCount: 180, spread: 110, origin: { x: 0.5, y: 0.45 }, colors: ["#ffe227", "#ffffff", "#22c55e", "#ff6b6b"], startVelocity: 45 });
-            if ((window as any).confetti) fire();
-            else {
-              const sc = document.createElement("script");
-              sc.src = "https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js";
-              sc.onload = fire;
-              document.body.appendChild(sc);
-            }
+            // celebration: confetti over the flash (vendored lib/confetti, no external CDN script)
+            fireConfetti({ particleCount: 180, spread: 110, origin: { x: 0.5, y: 0.45 }, startVelocity: 45 });
           }}
           onPitFull={() => { setPhase("lost"); onLost?.(); }}
           rootNote={character}

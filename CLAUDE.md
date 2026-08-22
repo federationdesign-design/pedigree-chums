@@ -11,6 +11,12 @@ Read them at the start of every session and follow them without exception.
 - CSS Modules ONLY. Never Tailwind, never styled-components, never inline
   `<style>` blocks in new pages (existing injected mobile styles are legacy).
 - Relative imports only. Never the `@/` alias.
+- Confetti comes from `lib/confetti.ts` (a vendored, dependency-free burst,
+  colours from the site tokens). NEVER load `canvas-confetti` from a CDN
+  `<script>` (jsdelivr and the like): an external script with no SRI is not
+  acceptable on a children's site. `import { fireConfetti } from '.../lib/confetti'`
+  and call it. The module is easy to miss, so a session that adds confetti will
+  reach for the CDN again unless this rule is read: it is not there by accident.
 - No em dashes anywhere: not in code comments, not in user-facing copy, not
   in markdown. Use commas, colons or parentheses instead.
 - No dark backgrounds on any page: the global body gradient must show

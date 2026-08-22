@@ -10,6 +10,7 @@ import runningCosts from "../../data/runningCosts";
 import groomingNeeds from "../../data/groomingNeeds";
 import trainingDifficulty from "../../data/trainingDifficulty";
 import styles from "./calculator.module.css";
+import { fireConfetti } from "../../lib/confetti";
 import BreedResultRail from "./BreedResultRail";
 import ArticleTextToggle from "../../components/ArticleTextToggle/ArticleTextToggle";
 
@@ -617,19 +618,8 @@ export default function ChumCalculator() {
   const [infoOpen, setInfoOpen] = useState(false);
   const [livingStage, setLivingStage] = useState<"home" | "stairs">("home");
   const [stairsChosen, setStairsChosen] = useState<"yes" | "no" | null>(null);
-  const confettiRef = useRef<((o: Record<string, unknown>) => void) | null>(null);
   const busyRef = useRef(false);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const w = window as unknown as Record<string, unknown>;
-    if (w.confetti) { confettiRef.current = w.confetti as (o: Record<string, unknown>) => void; return; }
-    const script = document.createElement("script");
-    script.src = "https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js";
-    script.async = true;
-    script.onload = () => { confettiRef.current = (window as unknown as Record<string, unknown>).confetti as (o: Record<string, unknown>) => void; };
-    document.body.appendChild(script);
-  }, []);
+  // Confetti comes from the vendored lib/confetti (no external CDN script).
 
   // ============================================================================
   // REMOVE BEFORE COMMIT -- throwaway dev shortcut (Job B, 22 Aug 2026).
@@ -732,9 +722,6 @@ export default function ChumCalculator() {
     setInfoOpen(false);
     setStep((s) => s + 1);
   }
-  function fireConfetti() {
-    confettiRef.current?.({ particleCount: 60, spread: 65, startVelocity: 30, origin: { y: 0.72 }, colors: ["#22c55e", "#ffd23e", "#ffffff", "#0a3a57"] });
-  }
   // Home question, part 1: pick a home type -> move to the stairs part (same question 3)
   function pickHome(value: string) {
     setInfoOpen(false);
@@ -747,7 +734,7 @@ export default function ChumCalculator() {
     busyRef.current = true;
     setStairsChosen(value);
     setAnswers((prev) => ({ ...prev, stairs: value }));
-    fireConfetti();
+    fireConfetti({ particleCount: 60, spread: 65, startVelocity: 30, origin: { y: 0.72 } });
     window.setTimeout(() => {
       setStairsChosen(null);
       setLivingStage("home");

@@ -60,6 +60,11 @@ export interface Session {
   // the eight offers. One diversion fires on the third consecutive no-subject turn, then it is back to
   // "im a dog" (three offers in a row is pestering).
   diversionsShown: number;
+  // Fetch (random_link): how many times the visitor has fetched this session. Drives the deterministic
+  // 1-in-4 mix (every 4th fetch brings a physical thing, rotating ball -> newspaper -> hat) and a cycling
+  // page rotation, so fetch never sticks on one page after all are spent. Incremented in the engine after
+  // each fetch turn; the assembler reads the pre-turn value to decide what this fetch serves.
+  fetchCount: number;
   // Task 68: the subject the previous turn offered via LOOP-01 (repeat) or LOOP-02 (destination),
   // awaiting a yes/no. A bare affirmation next turn routes to this subject's destination; anything
   // else (including "no") clears it and lets the loop advance. Set only when LOOP-01/LOOP-02 is
@@ -130,6 +135,7 @@ export function newSession(activeDog: Dog = 'collie'): Session {
     loopRepeatUsed: false,
     noSubjectStreak: 0,
     diversionsShown: 0,
+    fetchCount: 0,
     pendingConfirm: null,
     topic: null,
     previousTopic: null,

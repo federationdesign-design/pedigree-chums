@@ -39,6 +39,7 @@ export interface GameResult {
   display: string; // the monospace block rendered above/with the response
   word?: string; // {{WORD}} substitution (missing-sheep loss)
   answer?: string; // {{ANSWER}} substitution (kennel-sketch reveal / treat-trail move-on / biscuit reveal)
+  correct?: string; // Task 178 §4: a CORRECT answer -- the word to celebrate (fires the win animation). Absent on a wrong guess, the reveal, and the start (a reveal after three wrong is a consolation, not a win).
   clueId?: string; // treat-trail / missing-biscuit / feed-cookie: a workbook row to append after the reaction line
   suffix?: string; // missing-biscuit: a composed line to append (the suspect list for a case presentation)
   link?: string; // treat-trail: a finale link (SAUSAGE -> /hot-dogs)
@@ -137,7 +138,7 @@ function sheepMove(state: GameState, input: string): { state: GameState; result:
   if (state.word.includes(g)) {
     const ns = { ...state, guessed };
     const complete = ns.word.split('').every((ch) => guessed.includes(ch));
-    if (complete) return { state: ns, result: { line: 'B42-MISSINGSHEEP-05', display: sheepDisplay(ns), ended: true } }; // "Got it. Sheep safe."
+    if (complete) return { state: ns, result: { line: 'B42-MISSINGSHEEP-05', display: sheepDisplay(ns), correct: ns.word, ended: true } }; // "Got it. Sheep safe." -- the word solved
     return { state: ns, result: { line: 'B42-MISSINGSHEEP-02', display: sheepDisplay(ns), ended: false } }; // "Yes."
   }
   const wrong = state.wrong + 1;
@@ -162,9 +163,9 @@ function sketchMove(state: GameState, input: string): { state: GameState; result
   }
   const next = state.sketchIndex + 1;
   if (next >= KENNEL_SKETCHES.length) {
-    return { state, result: { line: 'B43-KENNELSKETCH-04', display: sketchDisplay(state.sketchIndex), answer: s.answer, ended: true } }; // "It was a {{ANSWER}}."
+    return { state, result: { line: 'B43-KENNELSKETCH-04', display: sketchDisplay(state.sketchIndex), answer: s.answer, correct: s.answer, ended: true } }; // "It was a {{ANSWER}}." -- named correctly
   }
-  return { state: { ...state, sketchIndex: next }, result: { line: 'B43-KENNELSKETCH-02', display: sketchDisplay(next), ended: false } }; // "Yes." + next drawing
+  return { state: { ...state, sketchIndex: next }, result: { line: 'B43-KENNELSKETCH-02', display: sketchDisplay(next), correct: s.answer, ended: false } }; // "Yes." + next drawing -- named correctly
 }
 
 // ---- Treat Trail (guess the object from three clues; the Labrador's game) ----
@@ -193,10 +194,10 @@ function treatMove(state: GameState, input: string): { state: GameState; result:
   const advance = () => ({ ...state, objectIndex: state.objectIndex + 1, clueIndex: 0, guesses: 0 });
 
   if (treatMatch(state.objectIndex, input)) {
-    // Correct. SAUSAGE (the last object) ends the game with the /hot-dogs finale.
-    if (isLast) return { state, result: { line: 'B65-TREATTRAIL-END', display: '', link: obj.link, ended: true } };
+    // Correct. SAUSAGE (the last object) ends the game with the /hot-dogs finale. correct = the word won.
+    if (isLast) return { state, result: { line: 'B65-TREATTRAIL-END', display: '', link: obj.link, correct: obj.answer, ended: true } };
     const ns = advance();
-    return { state: ns, result: { line: 'B65-TREATTRAIL-RIGHT', clueId: TREAT_TRAIL_OBJECTS[ns.objectIndex].clueIds[0], display: '', ended: false } };
+    return { state: ns, result: { line: 'B65-TREATTRAIL-RIGHT', clueId: TREAT_TRAIL_OBJECTS[ns.objectIndex].clueIds[0], correct: obj.answer, display: '', ended: false } };
   }
 
   const guesses = state.guesses + 1;
@@ -262,10 +263,10 @@ function biscuitMove(state: GameState, input: string): { state: GameState; resul
   const c = BISCUIT_CASES[state.caseIndex];
   const isLast = state.caseIndex >= BISCUIT_CASES.length - 1;
   // Close a case: case 5 ends the game; earlier cases offer "another one?" and wait.
-  const closeCase = (line: string, answer?: string): { state: GameState; result: GameResult } =>
+  const closeCase = (line: string, answer?: string, correct?: string): { state: GameState; result: GameResult } =>
     isLast
-      ? { state, result: { line, answer, display: '', ended: true } }
-      : { state: { ...state, awaitingAnother: true }, result: { line, answer, clueId: 'B66-MISSINGBISCUIT-ANOTHER', display: '', ended: false } };
+      ? { state, result: { line, answer, correct, display: '', ended: true } }
+      : { state: { ...state, awaitingAnother: true }, result: { line, answer, correct, clueId: 'B66-MISSINGBISCUIT-ANOTHER', display: '', ended: false } };
 
   // A clue on request: one at a time. When all three are out, he tells the child to name someone.
   if (BISCUIT_CLUE_REQUEST.has(compact)) {
@@ -274,7 +275,7 @@ function biscuitMove(state: GameState, input: string): { state: GameState; resul
   }
 
   // Otherwise it is a guess (naming a suspect).
-  if (matchBiscuitSuspect(state.caseIndex, input) === c.answer) return closeCase('B66-MISSINGBISCUIT-CORRECT');
+  if (matchBiscuitSuspect(state.caseIndex, input) === c.answer) return closeCase('B66-MISSINGBISCUIT-CORRECT', undefined, c.suspects[c.answer].name);
   const guesses = state.guesses + 1;
   if (guesses < 3) {
     return { state: { ...state, guesses }, result: { line: guesses === 1 ? 'B66-MISSINGBISCUIT-WRONG' : 'B66-MISSINGBISCUIT-WRONG2', display: '', ended: false } };

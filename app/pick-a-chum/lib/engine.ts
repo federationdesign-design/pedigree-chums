@@ -204,11 +204,18 @@ function serveGameResult(resolution: Resolution, data: ChumData, result: GameRes
   let text = result.text ?? gameCopy(data, result.line);
   if (result.word) text = text.replace(/\{\{\s*WORD\s*\}\}/g, result.word);
   if (result.answer) text = text.replace(/\{\{\s*ANSWER\s*\}\}/g, result.answer);
-  // Task 146 (Treat Trail): a turn serves a reaction line plus the next clue, both workbook B65 rows,
-  // combined here so all the copy stays in the workbook (games.ts holds only responseIds).
+  // Task 146 (Treat Trail): a turn serves a reaction line plus the next clue, both workbook B65 rows.
+  // Task 178 §3: for the typed-answer games (Treat Trail, Missing Biscuit) the reaction confirms the LAST
+  // answer and the clue is for the NEXT object -- two thoughts. Serve the clue as a FOLLOW-UP (a second
+  // bubble a beat later, reusing the cookie's Task 151/159 mechanism) instead of joining them with \n\n into
+  // one confusing bubble. Feed-cookie (the excluded tap game) is the only other clueId user and keeps its
+  // joined blue-cookie line, so its "zzz" beat is untouched.
   if (result.clueId) {
     const clue = gameCopy(data, result.clueId);
-    if (clue) text = text ? `${text}\n\n${clue}` : clue;
+    if (clue) {
+      if (resolution.game === 'treattrail' || resolution.game === 'missingbiscuit') resolution.gameFollowUp = clue;
+      else text = text ? `${text}\n\n${clue}` : clue;
+    }
   }
   // Task 147 (Missing Biscuit): a case presentation appends the composed suspect list (data-driven,
   // the suspect names) after the opening line.
@@ -227,6 +234,8 @@ function serveGameResult(resolution: Resolution, data: ChumData, result: GameRes
   if (result.followUpId) resolution.gameFollowUp = gameCopy(data, result.followUpId);
   // Task 166: a red cookie's clip rides the follow-up (reaction first, then clip + reason a beat later).
   if (result.followUpMedia) resolution.gameFollowUpMedia = result.followUpMedia;
+  // Task 178 §4: a correct answer carries the word to celebrate; the UI fires the win animation on it.
+  if (result.correct) resolution.gameCorrect = result.correct;
 }
 // LOOP-02 is candidate-driven: it names the specific destination the candidate maps to. A breed
 // candidate (a Title-Case breed name) -> its page; a game-family word -> the card game rules;
@@ -569,6 +578,10 @@ export function submit(data: ChumData, session: Session, input: string): Turn {
   if (response.responseId === 'COL-B52-MISC-09' && prevPendingConfirm !== 'balls') {
     session.pendingConfirm = 'balls';
   }
+
+  // Fetch mix: count this fetch so the NEXT one advances the deterministic 1-in-4 rotation. After assembly,
+  // so the assembler above decided this turn from the pre-turn count.
+  if (resolution.action === 'random_link') session.fetchCount += 1;
 
   session.lastWasComplaint = resolution.faqId === 'FAQ015'; // complaint follow-up context (Task 18)
   if (!session.lastWasComplaint) session.complaintOpened = false; // Task 25b: a clear topic change ends the complaint context, so the next complaint gets the full answer again

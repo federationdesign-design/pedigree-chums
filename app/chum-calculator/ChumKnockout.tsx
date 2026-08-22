@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { QUESTIONS, scoreBreed, fitReason } from "./ChumCalculator";
 import BreedResultRail from "./BreedResultRail";
+import { fireConfetti } from "../../lib/confetti";
 import styles from "./calculator.module.css";
 import k from "./ChumKnockout.module.css";
 import shared from "../name-generator/knockout-shared.module.css";
@@ -66,22 +67,9 @@ export default function ChumKnockout({ breeds, answers, onRestart }: Props) {
 
   const currentQ = done ? null : (tbQuestions[roundIdx] ?? null);
 
-  // Confetti loader (same pattern as ChumCalculator).
-  const confettiRef = useRef<((o: Record<string, unknown>) => void) | null>(null);
+  // Confetti comes from the vendored lib/confetti (no external CDN script). Fire once the knockout finishes.
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    const w = window as unknown as Record<string, unknown>;
-    if (w.confetti) { confettiRef.current = w.confetti as (o: Record<string, unknown>) => void; return; }
-    const script = document.createElement("script");
-    script.src = "https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js";
-    script.async = true;
-    script.onload = () => { confettiRef.current = (window as unknown as Record<string, unknown>).confetti as (o: Record<string, unknown>) => void; };
-    document.body.appendChild(script);
-  }, []);
-
-  // Fire confetti once the knockout finishes.
-  useEffect(() => {
-    if (done) confettiRef.current?.({ particleCount: 120, spread: 70, origin: { y: 0.6 } });
+    if (done) fireConfetti({ particleCount: 120, spread: 70, origin: { y: 0.6 } });
   }, [done]);
 
   // Commit the pending elimination once the fall animation has played out.
