@@ -2,6 +2,7 @@
 import Nav from "../../components/Nav/Nav";
 import Footer from "../../components/Footer/Footer";
 import ArticleTextToggle from "../../components/ArticleTextToggle/ArticleTextToggle";
+import OutboundLink from "../../components/OutboundLink/OutboundLink";
 import styles from "./page.module.css";
 
 const TERMS = [
@@ -134,8 +135,8 @@ export default function ChumSpotClient() {
               Win a 3D Chum*
             </p>
             <div className={styles.ctaPills}>
-              <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer" className={styles.ctaPrimary}>Enter on Instagram</a>
-              <a href="https://www.tiktok.com" target="_blank" rel="noopener noreferrer" className={styles.ctaSecondary}>Enter on TikTok</a>
+              <OutboundLink href="https://www.instagram.com" className={styles.ctaPrimary}>Enter on Instagram</OutboundLink>
+              <OutboundLink href="https://www.tiktok.com" className={styles.ctaSecondary}>Enter on TikTok</OutboundLink>
             </div>
             <p className={styles.closingDate}>
               Current monthly round closes at 23:59 on <strong>{new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).toLocaleDateString("en-GB", {day:"numeric", month:"long", year:"numeric"})}</strong>.
@@ -245,8 +246,8 @@ export default function ChumSpotClient() {
                 <p className={styles.wrPara}>Spot your next Chum, share your entry and remember both hashtags:</p>
                 <p className={styles.hashtags}>#ChumSpot &nbsp; #DogSpotting</p>
                 <div className={styles.ctaPills}>
-                  <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer" className={styles.ctaPrimary}>Enter on Instagram</a>
-                  <a href="https://www.tiktok.com" target="_blank" rel="noopener noreferrer" className={styles.ctaSecondary}>Enter on TikTok</a>
+                  <OutboundLink href="https://www.instagram.com" className={styles.ctaPrimary}>Enter on Instagram</OutboundLink>
+                  <OutboundLink href="https://www.tiktok.com" className={styles.ctaSecondary}>Enter on TikTok</OutboundLink>
                 </div>
               </div>
             </div>

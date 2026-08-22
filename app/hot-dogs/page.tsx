@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Nav from "../../components/Nav/Nav";
 import Footer from "../../components/Footer/Footer";
 import ArticleTextToggle from "../../components/ArticleTextToggle/ArticleTextToggle";
+import OutboundLink from "../../components/OutboundLink/OutboundLink";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
@@ -173,9 +174,9 @@ export default function HotDogs() {
 
             <p className={styles.safetyNote}>
               For official guidance, see the{" "}
-              <a href="https://www.rspca.org.uk" target="_blank" rel="noopener noreferrer">RSPCA</a>,{" "}
-              <a href="https://www.dogstrust.org.uk" target="_blank" rel="noopener noreferrer">Dogs Trust</a>, and{" "}
-              <a href="https://www.bluecross.org.uk" target="_blank" rel="noopener noreferrer">Blue Cross</a>.
+              <OutboundLink href="https://www.rspca.org.uk">RSPCA</OutboundLink>,{" "}
+              <OutboundLink href="https://www.dogstrust.org.uk">Dogs Trust</OutboundLink>, and{" "}
+              <OutboundLink href="https://www.bluecross.org.uk">Blue Cross</OutboundLink>.
             </p>
           </div>
         </section>

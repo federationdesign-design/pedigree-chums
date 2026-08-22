@@ -8,6 +8,7 @@ import { Montserrat } from "next/font/google";
 import BentoBoard from "./BentoBoard";
 import AccessibleMenu from "./AccessibleMenu";
 import PcContrastToolbar from "../PcContrastToolbar/PcContrastToolbar";
+import OutboundLink from "../OutboundLink/OutboundLink";
 import { getScheme, getHideImages, CONTRAST_EVENT } from "../../lib/contrastScheme";
 import styles from "./Nav.module.css";
 
@@ -262,7 +263,7 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
                 <Link href="/about" className={styles.topNavLink} onClick={closeForNav}>About</Link>
                 <span className={styles.topNavSep}>|</span>
                 <Link href="/preorder" className={styles.topNavLink} onClick={closeForNav}>Pre-order</Link>
-                <a href="https://www.instagram.com" target="_blank" rel="noreferrer" className={styles.socialIcon} aria-label="Instagram">
+                <OutboundLink href="https://www.instagram.com" className={styles.socialIcon} aria-label="Instagram">
                   {/* The viewBox was 440 0 261 341 and the artwork does not fit
                       inside it: the paths run from x 379.4 to 719.5, so 61 units
                       were cut off the left and 19 off the right. Measured off
@@ -273,12 +274,12 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
                     <path d="M549.6,98.2v15.2c7.9,0,15.4,1.6,22.2,4.5,10.2,4.3,18.9,11.6,25.1,20.7,3.1,4.5,5.5,9.6,7.2,14.9,1.7,5.3,2.6,11,2.6,17s-1.6,15.4-4.5,22.2c-4.3,10.2-11.6,18.9-20.7,25.1-4.5,3.1-9.6,5.5-14.9,7.2-5.3,1.7-11,2.6-17,2.6s-15.4-1.6-22.2-4.5c-10.2-4.3-18.9-11.6-25.1-20.7-3.1-4.5-5.5-9.6-7.2-14.9-1.7-5.3-2.6-11-2.6-17s1.6-15.4,4.5-22.2c4.3-10.2,11.6-18.9,20.7-25.1,4.5-3.1,9.6-5.5,14.9-7.2,5.3-1.7,11-2.6,17-2.6v-30.3c-12,0-23.6,2.4-34,6.9-15.7,6.6-29,17.7-38.4,31.7-9.4,13.9-15,30.8-14.9,48.9,0,12,2.4,23.6,6.9,34,6.6,15.7,17.7,29,31.7,38.4,13.9,9.4,30.8,15,48.9,15s23.6-2.5,34-6.9c15.7-6.6,29-17.7,38.4-31.6,9.4-13.9,15-30.8,14.9-48.9,0-12-2.4-23.6-6.9-34-6.6-15.7-17.7-29-31.7-38.4-13.9-9.4-30.8-15-48.9-14.9v15.2Z"/>
                     <path d="M640.7,59.5c11,0,19.9,8.9,19.9,19.9s-8.9,19.9-19.9,19.9-19.9-8.9-19.9-19.9,8.9-19.9,19.9-19.9"/>
                   </svg>
-                </a>
-                <a href="https://www.tiktok.com/@pedigree_chums" target="_blank" rel="noreferrer" className={styles.socialIcon} aria-label="TikTok">
+                </OutboundLink>
+                <OutboundLink href="https://www.tiktok.com/@pedigree_chums" className={styles.socialIcon} aria-label="TikTok">
                   <svg viewBox="0 0 285 341" fill="currentColor" aria-hidden="true">
                     <path d="M239.9,76.8c-21.8-14.3-35-38.6-35-64.8h-55.3v222.6c-1.1,25.7-22.7,45.8-48.3,44.8-25.6-1-45.7-22.7-44.6-48.4.9-25.1,21.5-44.9,46.4-44.9s9.3.8,13.7,2.2v-56.7c-4.6-.7-9.1-1-13.7-1C47,130.6,1.3,176.4,1.3,232.8c.1,56.4,45.6,102.2,101.8,102.2,56.1,0,101.8-45.8,101.8-102.2v-112.8c22.4,16.2,49.3,24.9,76.9,24.9v-55.5c-14.9,0-29.5-4.3-41.9-12.5"/>
                   </svg>
-                </a>
+                </OutboundLink>
               </nav>
             </>
           )}

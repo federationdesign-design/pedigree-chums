@@ -8,6 +8,7 @@ import { ukBreeds } from "../../data/uk-breeds";
    two versions of those rules. Nothing about the game is written in this file.
    See the renderLevels note in BreedStrip.tsx. */
 import BreedStrip, { breedCardKind, stripMatches } from "../britains-dog-history/BreedStrip";
+import { useLeaveDialog } from "../../components/OutboundLink/LeaveDialogProvider";
 import styles from "./history2.module.css";
 import { sourcesFor } from "../../data/breedSources";
 
@@ -80,8 +81,7 @@ export default function TimelineRun({
   };
   /* True once the reader has moved at all. Turns the head of the rail green. */
   const [moved, setMoved] = useState(false);
-  /* The outbound link awaiting confirmation, or null. */
-  const [leaving, setLeaving] = useState<string | null>(null);
+  const { confirmLeave } = useLeaveDialog();
   const runRef = useRef<HTMLDivElement | null>(null);
   const lineRef = useRef<HTMLSpanElement | null>(null);
   const dotRef = useRef<HTMLSpanElement | null>(null);
@@ -229,35 +229,6 @@ export default function TimelineRun({
 
   return (
     <div className={styles.timelinePanel} data-pc-panel={panelIndex}>
-      {/* Our own leave notice. The browser's confirm cannot be branded, and a
-          panel inside the card would sit in a rotated, backface-hidden box.
-          This is fixed to the viewport instead, clear of all of that. */}
-      {leaving && (
-        <div className={styles.leaveWrap} role="dialog" aria-modal="true">
-          <div className={styles.leaveCard}>
-            <p className={styles.leaveText}>
-              You are about to be linked to another site (and dogs), and we can&apos;t
-              control anything from this point. Remember to come back and carry on
-              exploring
-            </p>
-            <div className={styles.leaveRow}>
-              <button
-                type="button"
-                className={styles.leaveGo}
-                onClick={() => {
-                  window.open(leaving, "_blank", "noopener,noreferrer");
-                  setLeaving(null);
-                }}
-              >
-                Off we go
-              </button>
-              <button type="button" className={styles.leaveStay} onClick={() => setLeaving(null)}>
-                Stay here
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
       <div ref={runRef} className={styles.timelineRun}>
         <span ref={lineRef} className={styles.runLine} aria-hidden="true" />
         {/* Screen one: the era title, then the line that introduces the
@@ -467,7 +438,7 @@ export default function TimelineRun({
                               aria-label="Read more on another site"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                setLeaving(o.href);
+                                confirmLeave(o.href);
                               }}
                             >
                               <span className={styles.backLinkIcon} aria-hidden="true" />

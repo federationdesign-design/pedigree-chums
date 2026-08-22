@@ -12,6 +12,7 @@ import SchemeCrushSvg from "../components/SchemeCrushSvg/SchemeCrushSvg";
 import SchemeLayers from "../components/SchemeLayers/SchemeLayers";
 import HiddenGamesToast from "../components/HiddenGamesToast/HiddenGamesToast";
 import PickAChumLauncher from "./pick-a-chum/ui/PickAChumLauncher";
+import LeaveDialogProvider from "../components/OutboundLink/LeaveDialogProvider";
 import "./globals.css";
 // Task 6: the one scheme-override file. Global by necessity (it targets hashed
 // module classes across components). All rules are scoped under
@@ -208,7 +209,7 @@ export default function RootLayout({
             bright and clickable while an effect runs. A CSS filter cannot be escaped by a descendant, which
             is why the chat must sit outside this wrapper (brief section 7.1). The body gradient and paw
             pattern live on <body>, outside #pc-site, so they stay bright under "lights out" (dim, not black). */}
-        <div id="pc-site">{children}</div>
+        <div id="pc-site"><LeaveDialogProvider>{children}</LeaveDialogProvider></div>
         {/* Task 7: draws the alt-text blocks when data-pc-hide-images is set. */}
         <HideImages />
         {/* Remaps background-drawn indicators (rating dots, bars) to foreground

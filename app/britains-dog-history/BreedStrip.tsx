@@ -8,6 +8,7 @@ import { breeds as packBreeds } from "../../data/breeds";
 import { getLineage, type LineageNode } from "../../data/lineage";
 import { resolveLineageName } from "../../data/lineageNames";
 import LineageModal from "../../components/LineageModal/LineageModal";
+import { useLeaveDialog } from "../../components/OutboundLink/LeaveDialogProvider";
 import styles from "./history.module.css";
 import { sourcesFor } from "../../data/breedSources";
 
@@ -99,6 +100,7 @@ export default function BreedStrip({
   renderLevels?: (open: BreedStripOpen) => React.ReactNode;
 }) {
   const router = useRouter();
+  const { confirmLeave } = useLeaveDialog();
   const wrapRef = useRef<HTMLDivElement>(null);
   const railRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
@@ -144,7 +146,6 @@ export default function BreedStrip({
   // a loss breaks the streak, which is what "in a row" has to mean.
   const [lives, setLives] = useState(LIVES_START);
   const [streak, setStreak] = useState(0);
-  const [leaving, setLeaving] = useState<string | null>(null);
   /* Which card is flipped to its back, by name, or null. Only used below 480,
      where there is no hover to flip on: the tap controls set it. Above 480 the
      controls are display:none and the CSS hover flip governs, so this stays null
@@ -602,9 +603,9 @@ export default function BreedStrip({
                                 role="button"
                                 tabIndex={0}
                                 aria-label="Read more on another site"
-                                onClick={(e) => { e.stopPropagation(); setLeaving(o.href); }}
+                                onClick={(e) => { e.stopPropagation(); confirmLeave(o.href); }}
                                 onKeyDown={(e) => {
-                                  if (e.key === "Enter" || e.key === " ") { e.preventDefault(); e.stopPropagation(); setLeaving(o.href); }
+                                  if (e.key === "Enter" || e.key === " ") { e.preventDefault(); e.stopPropagation(); confirmLeave(o.href); }
                                 }}
                               >
                                 <span className={styles.backLinkIcon} aria-hidden="true" />
@@ -646,33 +647,6 @@ export default function BreedStrip({
       <div ref={trackRef} className={styles.stripScrollbar} aria-hidden="true">
         <div ref={thumbRef} className={styles.stripThumb} />
       </div>
-
-      {leaving && (
-        <div className={styles.leaveWrap} role="dialog" aria-modal="true">
-          <div className={styles.leaveCard}>
-            <p className={styles.leaveText}>
-              You are about to be linked to another site (and dogs), and we can&apos;t
-              control anything from this point. Remember to come back and carry on
-              exploring
-            </p>
-            <div className={styles.leaveRow}>
-              <button
-                type="button"
-                className={styles.leaveGo}
-                onClick={() => {
-                  window.open(leaving, "_blank", "noopener,noreferrer");
-                  setLeaving(null);
-                }}
-              >
-                Off we go
-              </button>
-              <button type="button" className={styles.leaveStay} onClick={() => setLeaving(null)}>
-                Stay here
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {modal}
     </div>
