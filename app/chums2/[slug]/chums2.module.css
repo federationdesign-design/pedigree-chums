@@ -1,0 +1,491 @@
+/* ================================================================
+   Chum pages v2 (/chums2/[slug]) desktop.
+   Normal document flow + CSS grid for the fixed sections. Absolute
+   positioning is reserved for pop-out rail cards and the draggable
+   tree card only (brief section 4). No magic-number offset chains.
+   ================================================================ */
+
+/* Page canvas: transparent so the global body gradient shows through. */
+.canvas {
+  position: relative;
+  min-height: 100svh;
+  background: transparent;
+  font-family: var(--font-body, 'Montserrat', system-ui);
+  padding-bottom: 120px;
+}
+
+/* ── Header (brief 5.1) ─────────────────────────────────────────
+   Square chum image sits on the same horizontal line as the fixed
+   site logo (top-left). The logo is roughly 150px wide with an 18px
+   top and a clamp(18px,4vw,48px) left, so the header clears it on the
+   left and aligns its top to the same line. */
+.header {
+  display: flex;
+  align-items: flex-start;
+  gap: clamp(20px, 2.4vw, 36px);
+  padding: 26px clamp(24px, 4vw, 64px) 32px;
+  padding-left: clamp(196px, 15vw, 232px);
+}
+
+.headerImg {
+  flex: 0 0 auto;
+  width: clamp(120px, 12vw, 168px);
+  height: clamp(120px, 12vw, 168px);
+  border-radius: 22px;
+  object-fit: cover;
+  border: 3px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.28);
+  background: var(--navy, #0a3a57);
+}
+
+.headerText {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-top: 4px;
+}
+
+/* Luckiest Guy sits high in its em box, so a tight visual line needs a
+   sub-1 line-height (brief note). Bigger than the old page, with the
+   layered drop shadow from brief 5.1 / decision D4. */
+.title {
+  font-family: var(--font-display, 'Luckiest Guy', system-ui);
+  font-size: clamp(2.6rem, 5.6vw, 5.6rem);
+  line-height: 0.92;
+  letter-spacing: 0.02em;
+  margin: 0;
+  color: #ffffff;
+  text-transform: uppercase;
+  text-shadow: 0 4px 0 rgba(10, 58, 87, 0.35), 0 6px 14px rgba(0, 0, 0, 0.25);
+}
+
+.titleLead {
+  display: block;
+  font-size: 0.46em;
+  letter-spacing: 0.08em;
+}
+
+.titleName {
+  display: block;
+  color: var(--yellow, #ffd23e);
+}
+
+.subtitle {
+  font-family: var(--font-display, 'Luckiest Guy', system-ui);
+  font-size: clamp(1rem, 2vw, 1.7rem);
+  color: #ffffff;
+  margin: 14px 0 0;
+  letter-spacing: 0.04em;
+  line-height: 1.15;
+}
+
+/* ── Main band (rail | diagram | tree) ──────────────────────────
+   Filled in stages 2 and 6. Skeleton container only for now. */
+.mainBand {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(360px, 0.9fr) minmax(360px, 1fr);
+  gap: clamp(24px, 3vw, 56px);
+  align-items: start;
+  padding: 0 clamp(24px, 4vw, 64px);
+  padding-left: clamp(120px, 10vw, 160px);
+  min-height: 480px;
+}
+
+/* ── Draggable pop-out card ─────────────────────────────────────
+   Same look as the live page card (navy rounded box). Absolutely
+   positioned by the placement algorithm; draggable after opening. */
+.card {
+  position: absolute;
+  border-radius: 24px;
+  background: var(--navy, #0a3a57);
+  border: 2.5px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.35);
+  cursor: grab;
+  user-select: none;
+  touch-action: pinch-zoom;
+  will-change: left, top;
+  animation: cardPop 0.22s ease-out;
+}
+
+.card:active { cursor: grabbing; box-shadow: 0 16px 60px rgba(0, 0, 0, 0.5); }
+
+/* Pop-in, echoing the dock's smoke-puff pop (brief 5.4). */
+@keyframes cardPop {
+  0% { transform: scale(0.82); opacity: 0; }
+  70% { transform: scale(1.03); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card { animation: none; }
+}
+
+.cardClose {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  background: none;
+  border: none;
+  color: var(--yellow, #ffd23e);
+  font-size: 40px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+  z-index: 2;
+  font-weight: 700;
+}
+
+/* ── Card content (temperament, influence, intro, lifespan note) ── */
+.cardHeading {
+  font-family: var(--font-display, 'Luckiest Guy', system-ui);
+  font-size: 26px;
+  letter-spacing: 0.12em;
+  color: var(--yellow, #ffd23e);
+  text-transform: uppercase;
+  margin: 16px 0 10px;
+  padding-left: 16px;
+}
+
+.cardPad { padding: 0 20px; }
+
+.temperamentTags { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 20px; margin-bottom: 4px; }
+
+.chip {
+  font-family: var(--font-display, 'Luckiest Guy', system-ui);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1.5px solid rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+  border-radius: 20px;
+  padding: 4px 12px;
+}
+
+.divider { height: 1px; background: rgba(255, 255, 255, 0.08); margin: 12px 20px; }
+
+.prosConsGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 0 20px; }
+
+.prosConsHead {
+  font-family: var(--font-display, 'Luckiest Guy', system-ui);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  margin: 0 0 6px;
+  text-transform: uppercase;
+}
+.prosHead { color: #4ade80; }
+.consHead { color: #f87171; }
+
+.prosConsList { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 5px; }
+
+.prosConsList li {
+  font-family: var(--font-body, 'Montserrat', system-ui);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.4;
+  color: #ffffff;
+  padding-left: 16px;
+  position: relative;
+}
+.prosConsList li::before {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 6px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+}
+.prosCol li::before { background: #4ade80; }
+.consCol li::before { background: #f87171; }
+
+/* Historical influence bars */
+.influenceRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+.influenceName { font-family: var(--font-body, 'Montserrat', system-ui); font-size: 13px; font-weight: 700; color: #ffffff; }
+.influencePct { font-family: var(--font-display, 'Luckiest Guy', system-ui); font-size: 16px; color: var(--yellow, #ffd23e); letter-spacing: 0.04em; }
+.influenceBar { height: 4px; background: var(--yellow, #ffd23e); border-radius: 2px; margin: 0 20px; transition: width 0.4s ease; }
+.influenceNote {
+  font-family: var(--font-body, 'Montserrat', system-ui);
+  font-size: 10px;
+  color: #ffffff;
+  padding: 10px 20px 0;
+  line-height: 1.5;
+  font-style: italic;
+}
+
+/* Intro write-up body */
+.introBody {
+  font-family: var(--font-body, 'Montserrat', system-ui);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.65;
+  color: #ffffff;
+  padding: 0 20px 4px;
+  margin: 0;
+}
+
+/* Lifespan explanation body */
+.explainBody {
+  font-family: var(--font-body, 'Montserrat', system-ui);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.6;
+  color: #ffffff;
+  margin: 0 0 12px;
+  padding: 0 20px;
+}
+.explainSummary {
+  font-family: var(--font-body, 'Montserrat', system-ui);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--yellow, #ffd23e);
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  padding: 0 20px;
+}
+
+/* Wide imported component wrappers (lifespan chart, health section). Keep the
+   content inside the card and let it scroll rather than overflow the layout. */
+.chartWrap { max-width: 100%; overflow-x: auto; padding: 0 10px; }
+.scrollBody { max-height: 70vh; overflow-y: auto; overflow-x: hidden; padding: 0 6px; }
+
+/* ── Circular diagram panel (brief 5.2) ─────────────────────────
+   fill + dockAside make BreedTree fill this box, so it needs an
+   explicit size and position:relative (the diagram is absolute
+   inset:0 inside it). No perspective / preserve-3d anywhere in this
+   chain. */
+.diagramPanel {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  max-width: 760px;
+  justify-self: center;
+}
+
+/* Family-tree panel (right column). Placeholder until the LineageMap embed
+   lands (DECISIONS D13). No perspective / backface-visibility / preserve-3d
+   anywhere in this chain (brief 5.8 LineageMap constraint). */
+.treePanel {
+  position: relative;
+  width: 100%;
+  min-height: 420px;
+  border-radius: 24px;
+  border: 2px dashed rgba(255, 255, 255, 0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.treePlaceholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-display, 'Luckiest Guy', system-ui);
+  font-size: 1.6rem;
+  letter-spacing: 0.06em;
+  color: var(--yellow, #ffd23e);
+  text-align: center;
+}
+.treePlaceholder span {
+  font-family: var(--font-body, 'Montserrat', system-ui);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 0.02em;
+}
+
+/* X close on a panel (diagram, tree). Styled like the pit close X:
+   yellow, top-right of the panel area. */
+.panelClose {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  z-index: 40;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(10, 58, 87, 0.55);
+  color: var(--yellow, #ffd23e);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.panelClose:hover { background: rgba(10, 58, 87, 0.8); transform: scale(1.06); }
+.panelClose svg { width: 16px; height: 16px; }
+
+/* ── Ancestor pack (stage 5) ────────────────────────────────────
+   In flow, directly below the main band. */
+.ancestorPack {
+  padding: clamp(48px, 5vw, 88px) clamp(24px, 4vw, 64px) 0;
+}
+
+.packTitle {
+  font-family: var(--font-display, 'Luckiest Guy', system-ui);
+  font-size: clamp(2.4rem, 5vw, 4.9rem);
+  letter-spacing: 0.1em;
+  color: var(--yellow, #ffd23e);
+  margin: 0 0 24px;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+/* Rows capped, columns grow: fixed row count, auto-flow down then across, so
+   extra dogs add columns rather than a new row. (Brief 5.6, Decision D12.) */
+.packGrid {
+  display: grid;
+  grid-template-rows: repeat(var(--pack-rows, 1), auto);
+  grid-auto-flow: column;
+  grid-auto-columns: 77px;
+  gap: 26px 20px;
+  justify-content: start;
+  width: max-content;
+  max-width: 100%;
+  overflow-x: auto;
+  padding-bottom: 8px;
+}
+
+.frame {
+  width: 77px;
+  height: 77px;
+  border-radius: 10px;
+  border: 4px solid #22c55e;
+  background: transparent;
+  position: relative;
+}
+
+.frameInner { position: relative; width: 100%; height: 100%; }
+
+.frameImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 6px;
+  display: block;
+}
+
+.frameInfoBtn {
+  position: absolute;
+  right: -14px;
+  top: -14px;
+  width: 28px;
+  height: 28px;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  background: var(--blue-deep, #0b78bd);
+  color: #ffffff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  font-style: italic;
+  font-weight: 700;
+  font-size: 14px;
+  font-family: Georgia, serif;
+  z-index: 5;
+}
+
+.framePct {
+  position: absolute;
+  right: -2px;
+  bottom: -14px;
+  background: rgba(10, 58, 87, 0.85);
+  color: var(--yellow, #ffd23e);
+  border-radius: 12px;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: Montserrat, system-ui;
+  z-index: 5;
+  white-space: nowrap;
+}
+
+.framePopover {
+  position: absolute;
+  left: 0;
+  top: 20px;
+  background: rgba(10, 58, 87, 0.96);
+  border: 1.5px solid rgba(255, 210, 62, 0.4);
+  border-radius: 12px;
+  padding: 10px 14px;
+  z-index: 20;
+  min-width: 200px;
+  max-width: 260px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+}
+
+.framePopoverName {
+  font-family: var(--font-display, 'Luckiest Guy', system-ui);
+  font-size: 13px;
+  color: var(--yellow, #ffd23e);
+  margin: 0 0 4px;
+  letter-spacing: 0.05em;
+}
+
+.framePopoverNote {
+  font-family: var(--font-body, 'Montserrat', system-ui);
+  font-size: 11px;
+  color: #ffffff;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.framePopoverClose {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  background: none;
+  border: none;
+  color: var(--yellow, #ffd23e);
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.hiddenMap {
+  position: absolute;
+  left: -9999px;
+  top: -9999px;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* ── Famous chums (stage 5) ─────────────────────────────────────
+   In flow, directly below the ancestor pack. No absolute offsets. */
+.famousChums {
+  padding: clamp(40px, 4vw, 72px) clamp(24px, 4vw, 64px) 0;
+}
+
+/* ── Back button (matches the live page) ────────────────────────── */
+.backBtn {
+  position: fixed;
+  bottom: clamp(20px, 4vw, 36px);
+  left: clamp(20px, 4vw, 36px);
+  z-index: 50;
+  font-family: var(--font-display, 'Luckiest Guy', system-ui);
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  border-radius: 50px;
+  padding: 10px 22px;
+  cursor: pointer;
+  transition: background 0.15s;
+  text-decoration: none;
+  display: inline-block;
+  backdrop-filter: blur(8px);
+}
+
+.backBtn:hover { background: rgba(255, 255, 255, 0.18); }
