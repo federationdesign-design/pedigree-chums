@@ -80,6 +80,16 @@ Baseline (measured before stage 1):
 - FLAG for Steve: this is a modal tree, not an inline-on-load tree. If you want it inline beside the diagram, that needs a new bounded rendering mode inside LineageMap (a deliberate shared-component change), which I did not make because it would risk the game. Tell me and I will design it behind a defaulted prop.
 - CSS constraint respected: no perspective / backface-visibility / transform-style: preserve-3d anywhere in the chums2 chain.
 
+## Lifespan chart switched on (2026-08-23)
+
+### D28. Count-aware lower band (famous chums + lifespan chart)
+- SHOW_SECTIONS.lifespanChart = true (nothing else on). Famous chums and the chart now share a flex-row .lowerBand (align-items:flex-start, tops aligned), inside the right column below the pack. No absolute offsets.
+- Chum-count aware: .famousWrap is flex 0 1 auto (takes the width its cards need, shrinks so the cards wrap within their own width when tight, max-width min(860px,56vw)); .chartSlot is flex 1 1 340px min-width 300px (takes the remaining width, fixed gap between). With zero famous chums the famous block is not rendered, so the chart flex-grows to the full band directly below the pack. Many chums wrap within .famousWrap and never push the chart under or over.
+- To let the band be wide, .introStack now flex:1 (fills the leftBand remaining width); leftBand gained a right padding so the band clears the right edge. Intro box and pack stay left-aligned narrow.
+- Chart fits without cropping: added a defaulted `fluid` prop to the shared LifespanChart (viewBox 0 0 1008 576 + width:100%/height:auto in fluid mode). Default false leaves the live /chums page byte-identical (same width/height attrs, no viewBox). LifespanChart eslint stays at baseline (10). /chums2 passes fluid, so the fixed 1008x576 chart scales to its slot with all axis labels intact.
+- Heading "Likely life span" added above the chart in the ANCESTOR PACK / FAMOUS CHUMS treatment (.packTitle) so the two headings top-align.
+- Verified by layout reasoning (no dev server) against three breeds: yorkshire-terrier (2 chums), bichon-frise (0 chums, chart full band), border-collie (4 chums, most in data/famousDogs; cards wrap, chart takes the rest). All three have lifespan curves.
+
 ## Famous chums switched on (2026-08-23)
 
 ### D27. Famous chums in the right column; Smoky "duplicate" is a mockup artifact, not a bug

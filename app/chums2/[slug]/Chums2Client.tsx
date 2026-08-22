@@ -53,7 +53,7 @@ type Props = {
 // switched back on one at a time under Steve's direction.
 const SHOW_SECTIONS = {
   introBox: true,       // blue intro description box (the breed write-up)
-  lifespanChart: false, // the lifespan chart (still off)
+  lifespanChart: true,  // the lifespan chart (right of famous chums)
   diagram: false,       // circular BreedTree diagram (main band)
   ancestorPack: true,   // hidden BreedTreeMap feed + pack grid
   famousChums: true,    // FamousDogsSection
@@ -493,11 +493,28 @@ export default function Chums2Client({ name, slug, image, info, lineage }: Props
                   </div>
                 </section>
               )}
-              {/* Famous chums, directly below the ancestor pack, sharing its
-                  left edge (both in this right column). Cards as shipped. */}
-              {SHOW_SECTIONS.famousChums && famousDogs[slug] && (
-                <div className={styles.famousWrap} data-region="famous-chums">
-                  <FamousDogsSection dogs={famousDogs[slug]} />
+              {/* Lower band: famous chums (left) and the lifespan chart (right),
+                  tops aligned. Count-aware via flex: famous takes the width its
+                  card count needs and the chart takes the rest with a fixed gap;
+                  with zero famous chums the famous block does not render and the
+                  chart grows to the full band. Cards wrap within their own width,
+                  so the chart is never pushed under or over them. No absolute
+                  offsets. (D28.) */}
+              {((SHOW_SECTIONS.famousChums && famousDogs[slug]) || (SHOW_SECTIONS.lifespanChart && lifespanCurves[name])) && (
+                <div className={styles.lowerBand}>
+                  {SHOW_SECTIONS.famousChums && famousDogs[slug] && (
+                    <div className={styles.famousWrap} data-region="famous-chums">
+                      <FamousDogsSection dogs={famousDogs[slug]} />
+                    </div>
+                  )}
+                  {SHOW_SECTIONS.lifespanChart && lifespanCurves[name] && (
+                    <div className={styles.chartSlot} data-region="lifespan-chart">
+                      <p className={styles.packTitle}>Likely life span</p>
+                      <div className={styles.chartFluid}>
+                        <LifespanChart breedName={name} fluid />
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>

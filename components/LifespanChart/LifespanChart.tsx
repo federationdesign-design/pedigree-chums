@@ -44,7 +44,11 @@ function stageRanges(pts: CurvePoint[]): { stage: string; startAge: number; endA
   return ranges;
 }
 
-export default function LifespanChart({ breedName }: { breedName: string }) {
+// fluid (added 2026-08-23): when true the chart scales to its container via a
+// viewBox and width:100% instead of the fixed 1008x576 pixels, so it fits a
+// flexible slot (the /chums2 lower band) without cropping axis labels. Default
+// false leaves the live /chums page byte-identical.
+export default function LifespanChart({ breedName, fluid = false }: { breedName: string; fluid?: boolean }) {
   // Dynamic sources based on which breed we are viewing
   const sources = [
     // McMillan 2024 is the primary source for all breeds
@@ -79,11 +83,12 @@ export default function LifespanChart({ breedName }: { breedName: string }) {
     : null;
 
   return (
-    <div className={styles.wrap}>
+    <div className={`${styles.wrap}${fluid ? " " + styles.wrapFluid : ""}`}>
       <svg
-        width={W}
-        height={H}
-        className={styles.svg}
+        viewBox={fluid ? `0 0 ${W} ${H}` : undefined}
+        width={fluid ? undefined : W}
+        height={fluid ? undefined : H}
+        className={`${styles.svg}${fluid ? " " + styles.svgFluid : ""}`}
         onMouseMove={(e) => {
           const rect = e.currentTarget.getBoundingClientRect();
           const x = e.clientX - rect.left - PAD.left;

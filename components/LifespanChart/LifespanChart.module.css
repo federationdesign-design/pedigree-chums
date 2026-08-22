@@ -2,6 +2,16 @@
   width: 560px;
 }
 
+/* fluid mode (added 2026-08-23): fill the container instead of a fixed width,
+   used by the /chums2 lower band. Live page (no fluid) is unchanged. */
+.wrapFluid {
+  width: 100%;
+}
+.svgFluid {
+  width: 100%;
+  height: auto;
+}
+
 .title {
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
   font-size: 26px;
