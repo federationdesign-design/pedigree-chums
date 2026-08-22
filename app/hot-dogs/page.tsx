@@ -62,7 +62,7 @@ export default function HotDogs() {
               <img src="/eatinghotdog.png" alt="A cartoon of a long-haired dachshund curled into a ring and biting its own tail, its body drawn as a mustard-and-ketchup hot dog." className={styles.noteImg} />
               <div className={styles.noteText}>
                 <p className={styles.noteTitle}>Disclaimer</p>
-                <h2 className={styles.noteTitleMain}>A note about hot dogs</h2>
+                <h2 className={styles.noteTitleMain}>A note about <span>hot dogs</span></h2>
                 <p>Sometimes we mean human food: sausages in buns.</p>
                 <p>Sometimes we mean dogs who are too hot and need shade, water and probably some ice.</p>
                 <p>Sometimes we mean <strong>Hot Dogs</strong>, the Pedigree Chums™ game flavour.</p>
@@ -86,7 +86,7 @@ export default function HotDogs() {
         <section id="safety" className={styles.safetySection}>
           <div className={styles.cookingInner}>
             <p className={styles.sectionEyebrow}>The serious bit</p>
-            <h2 className={styles.sectionTitle}>Now let&rsquo;s talk about hot dogs</h2>
+            <h2 className={styles.sectionTitle}>Now let&rsquo;s talk about <span>hot dogs</span></h2>
             <p className={styles.lead} style={{textAlign:"center"}}>Not hot dogs in buns. Hot dogs. Dogs who are too hot.</p>
 
             <p style={{textAlign:"center"}}>
@@ -186,7 +186,7 @@ export default function HotDogs() {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/the-edible-kind.jpg" alt="Three grilled sausages on a dark plate beside a bowl of mustard and a sprig of rosemary." data-pc-dead style={{width:"100%",borderRadius:"16px",display:"block",marginBottom:"clamp(20px, 3vw, 36px)"}} />
             <p className={styles.sectionEyebrow}>The edible kind</p>
-            <h2 className={styles.sectionTitle}>How do I cook hot dogs?</h2>
+            <h2 className={styles.sectionTitle}>How do I cook <span>hot dogs</span>?</h2>
             <p className={styles.lead}>Carefully. And preferably without involving a dachshund.</p>
             <p>
               Boil them, grill them, fry them, air-fry them, barbecue them, or warm them gently
@@ -342,7 +342,7 @@ export default function HotDogs() {
         <section id="game" className={styles.gameSection}>
           <div className={styles.cookingInner}>
             <p className={styles.sectionEyebrow}>Pedigree Chums™ game flavour</p>
-            <h2 className={styles.sectionTitle}>Hot Dogs mode</h2>
+            <h2 className={styles.sectionTitle}><span>Hot Dogs</span> mode</h2>
             <div className={styles.gameTwoCols}>
               <div>
                 <h3 className={styles.subTitle} style={{marginTop:0}}>In the original game, your hand is private. Your dogs are your dogs. Your secrets are your secrets. Hot Dogs mode is different.</h3>
