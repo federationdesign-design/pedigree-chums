@@ -16,7 +16,7 @@ import ArticleTextToggle from "../../components/ArticleTextToggle/ArticleTextTog
 type Option = { label: string; value: string };
 type Question = { id: string; question: string; sub?: string; info?: string; options: Option[] };
 
-const QUESTIONS: Question[] = [
+export const QUESTIONS: Question[] = [
   {
     id: "intent",
     question: "Let's find you a chum!",
@@ -220,7 +220,7 @@ const QUESTIONS: Question[] = [
 // small-to-giant worst case stays at the old flat -48. (A4, 22 Aug 2026.)
 const SIZE_ORDER = ["small", "medium", "large", "giant"] as const;
 
-function scoreBreed(slug: string, answers: Record<string, string>): number {
+export function scoreBreed(slug: string, answers: Record<string, string>): number {
   let score = 100;
   const suit = suitabilityScores[slug];
   const ex = exerciseNeeds[slug];

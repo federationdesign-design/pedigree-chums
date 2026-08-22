@@ -1,0 +1,32 @@
+/* ChumKnockout-specific layout. The question card and option buttons reuse
+   calculator.module.css so the knockout looks native to the calculator. The shared
+   knockout shell, round pills and fall/puff animations (knockout-shared.module.css)
+   are wired in at stage 5, not here. (Job B stage 3, 22 Aug 2026.) */
+
+.remaining {
+  font-family: var(--font-body), sans-serif;
+  font-weight: 700;
+  color: var(--navy, #0a3a57);
+  text-align: center;
+  margin: 0 0 14px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+}
+
+/* Empty end-screen slot. Steve drops the finished result image in here later.
+   Left deliberately blank: this is a marker, not a stand-in. Do not fill it. */
+.endSlot {
+  min-height: clamp(120px, 22vw, 200px);
+  max-width: 760px;
+  margin: 0 auto 24px;
+  border: 2px dashed rgba(10, 58, 87, 0.3);
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--navy, #0a3a57);
+  font-family: var(--font-body), sans-serif;
+  font-size: 0.85rem;
+  letter-spacing: 0.02em;
+}
