@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { SITE_URL } from "../../../lib/site";
 import Link from "next/link";
 import Nav from "../../../components/Nav/Nav";
 import Footer from "../../../components/Footer/Footer";
@@ -20,7 +21,6 @@ import { QuoteReveal } from "../../../components/ScrollScenes/QuoteReveal";
 export const metadata: Metadata = {
   title: "Bull's-eye: The Dog as the Owner's Shadow | Good Dog, Bad Dog",
   description: "Bull's-eye in Oliver Twist is not simply a bad dog -- he is a dog made to carry a bad man's reputation. An essay on Dickens, Bill Sikes and the modern status dog.",
-  robots: "noindex",
 };
 
 const SLUG = "bull-terrier";
@@ -34,9 +34,43 @@ const BE_TIMELINE = [
   { era: "Today", name: "The adaptation has overtaken the description", context: "Many readers assume Dickens explicitly created a Bull Terrier, even though the famous breed image belongs largely to Bull\u2019s-eye\u2019s later cultural life.", end: true },
 ];
 
+// Article + breadcrumb structured data for this essay. Every value comes from
+// this page: headline is the on-page heading, description reuses the metadata
+// description, image is the real hero above. Author and publish date are omitted
+// (the page has no honest source for either). Publisher links to the site-wide
+// Organization node emitted in app/layout.tsx.
+const HEADLINE = "Bull’s-eye: The Dog as the Owner’s Shadow";
+const ARTICLE_JSONLD = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Article",
+      headline: HEADLINE,
+      description: metadata.description,
+      image: `${SITE_URL}/bulls-eye-img.jpg`,
+      publisher: { "@id": `${SITE_URL}/#organization` },
+      mainEntityOfPage: `${SITE_URL}/good-dog-bad-dog/bulls-eye`,
+    },
+    {
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
+        { "@type": "ListItem", position: 2, name: "Good Dog, Bad Dog", item: `${SITE_URL}/good-dog-bad-dog` },
+        { "@type": "ListItem", position: 3, name: HEADLINE, item: `${SITE_URL}/good-dog-bad-dog/bulls-eye` },
+      ],
+    },
+  ],
+};
+
 export default function BullsEyePage() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(ARTICLE_JSONLD).replace(/</g, "\\u003c"),
+        }}
+      />
       <Nav showLogo />
       <main className={styles.essayPage}>
         <div className={styles.essayHero}>

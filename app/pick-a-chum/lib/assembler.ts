@@ -23,6 +23,9 @@ export interface Assembled {
   closed?: boolean;
   followUp?: string; // a second message sent after a short pause (bark-game break)
   followUpMedia?: { src: string; alt: string }; // Task 166: a clip carried on that follow-up (a red cookie: reaction first, clip + reason a beat later)
+  // Task 176: a multi-message FAQ answer. The first message is `text`/`url`; these are the REST, each its
+  // own bubble after a pause, each optionally carrying its own link. Not concatenated -- separate messages.
+  sequence?: { text: string; url?: string | null; destinationId?: string }[];
   // Task 15 (S12) presentation: a safety message served under the protected support
   // surface carries a shared header and hides the dog name/avatar/character label.
   header?: string; // e.g. 'HELP AND SUPPORT' above a protected safety response
@@ -46,9 +49,11 @@ export const DEAD_FACE_SR_LABEL = 'the dog plays dead';
 // migration in PLACEHOLDERS.md. (car and balls moved into the workbook in Task 141: B64 / B52-MISC-09;
 // their clips now attach in the canned case below, keyed by responseId, like cats.)
 const MEDIA_REPLIES: Record<string, { text: string; media: { src: string; alt: string }; ariaLabel?: string }> = {
-  'BIRTHDAY-01': { text: ':)', media: { src: '/chat-media/birthday.mp4', alt: 'A birthday celebration' }, ariaLabel: SMILE_FACE_SR_LABEL },
+  // Task 176 (clip accessibility): owner copy, verbatim. Birthday moves from the ':)' face to real words
+  // ("party hat"), so the smile SR label is dropped (the words are self-describing now).
+  'BIRTHDAY-01': { text: 'party hat', media: { src: '/chat-media/birthday.mp4', alt: 'A birthday celebration' } },
   // Task 156: any mention of hats plays the hats clip. Not a hat-hunt hat itself.
-  'HATS-01': { text: '', media: { src: '/chat-media/hats.mp4', alt: 'A dog in a hat' } },
+  'HATS-01': { text: 'I brought you a hat', media: { src: '/chat-media/hats.mp4', alt: 'A dog in a hat' } },
 };
 // Task 141: canned rows that carry a clip. The clip joins the row's copy, it does not replace it.
 const CANNED_MEDIA: Record<string, { src: string; alt: string }> = {
@@ -174,13 +179,40 @@ const SELF_BREED_LINES: Record<Dog, string> = {
 // Task 165: the games menu LIST is now per-dog. Each dog offers only the games it can actually start
 // (Treat Trail is Labrador-only, Missing Biscuit Terrier-only, DO NOT PRESS THAT BUTTON Boxer-only; the
 // Collie keeps her three plus the bark game). Before this, every dog served the Collie's B45-GAMELIST-02
-// row and so offered games it could not start. The words in each line are the actual start phrases the
-// router accepts. DRAFT copy, pending owner approval (same status as SELF_BREED_LINES).
-const GAMES_MENU_LINES: Record<Dog, string> = {
-  collie: 'Nine-Square, Missing Sheep, or Kennel Sketch. Or say woof for the bark game. Say one.',
-  labrador: 'Treat Trail, or Feed the Dog a Cookie. Say one and we start.',
-  terrier: 'The Case of the Missing Biscuit. Say the word and we crack it.',
-  boxer: 'DO NOT PRESS THAT BUTTON. thats the one. say mini game.',
+// row and so offered games it could not start. DRAFT copy, pending owner approval (same status as
+// SELF_BREED_LINES).
+// Each dog's menu is `line` (the served text, verbatim) PLUS `items` (the same games as tappable pills:
+// label + the exact start `phrase` the router accepts). The two live together so the pills ARE that dog's
+// menu content, not a separate hardcoded list, and can never drift from the text. The `phrase` values are
+// verified to start each game (dog-gated) -- tapping a pill sends the phrase through the identical submit
+// path as typing it, so typing keeps working unchanged.
+export interface GamesMenuItem { label: string; phrase: string; }
+export interface GamesMenu { line: string; items: GamesMenuItem[]; }
+export const GAMES_MENU: Record<Dog, GamesMenu> = {
+  collie: {
+    line: 'Nine-Square, Missing Sheep, or Kennel Sketch. Or say woof for the bark game. Say one.',
+    items: [
+      { label: 'Nine-Square', phrase: 'nine square' },
+      { label: 'Missing Sheep', phrase: 'missing sheep' },
+      { label: 'Kennel Sketch', phrase: 'kennel sketch' },
+      { label: 'Bark game', phrase: 'woof' },
+    ],
+  },
+  labrador: {
+    line: 'Treat Trail, or Feed the Dog a Cookie. Say one and we start.',
+    items: [
+      { label: 'Treat Trail', phrase: 'treat trail' },
+      { label: 'Feed the Dog a Cookie', phrase: 'feed the dog a cookie' },
+    ],
+  },
+  terrier: {
+    line: 'The Case of the Missing Biscuit. Say the word and we crack it.',
+    items: [{ label: 'The Case of the Missing Biscuit', phrase: 'missing biscuit' }],
+  },
+  boxer: {
+    line: 'DO NOT PRESS THAT BUTTON. thats the one. say mini game.',
+    items: [{ label: 'DO NOT PRESS THAT BUTTON', phrase: 'do not press that button' }],
+  },
 };
 
 // The generated bark volley: the dog's own word, count units, e.g. "Woof. Woof.".
@@ -239,6 +271,27 @@ function baseContext(n: Normalised, destName = ''): Record<string, string> {
     food_word: n.original.replace(/[.!?]+$/, ''),
     topic: n.original.replace(/[.!?]+$/, ''),
   };
+}
+
+// Task 176: the dog's own FAQ answers (owner copy), served verbatim -- no B04 flourish appended.
+// Encodings in the FAQ "Canonical answer" cell:
+//   ~~~  rotate: pick one of several alternates (FAQ001's three how-to-play lines)
+//   |||  sequence: several messages played in turn, not one long line (FAQ009, FAQ012)
+//   [[/path]]  a per-message link token: stripped from the text, wired as a structural link
+const FAQ_ROTATE = '~~~';
+const FAQ_SEQ = '|||';
+// Pull a per-message link out of a sequence step, returning the cleaned text + the target path.
+function faqStep(raw: string): { text: string; url?: string | null } {
+  const m = raw.match(/\[\[([^\]]+)\]\]/);
+  const url = m ? m[1].trim() : null;
+  const text = raw.replace(/\[\[[^\]]+\]\]/g, '').replace(/\s{2,}/g, ' ').trim();
+  return { text, url };
+}
+// Rotate through ~~~ alternates by the turn count, so a visitor asking twice hears different lines.
+function faqRotate(raw: string, session: Session): string {
+  const alts = raw.split(FAQ_ROTATE).map((s) => s.trim()).filter(Boolean);
+  if (!alts.length) return raw.trim();
+  return alts[(session.submissionCount ?? 1) % alts.length] ?? alts[0];
 }
 
 // Pick a bucket response, preferring one not used this session (rotation). Falls
@@ -378,23 +431,27 @@ export function assemble(res: Resolution, data0: ChumData, n: Normalised, sessio
     }
 
     case 'good_boy':
-      // Task 142: praise -> the wagging-tail clip. The clip is the answer, so there is no line.
-      return { responseId: 'GOOD-BOY-01', text: '', dog, media: { src: '/chat-media/goodboy.mp4', alt: 'A dog wagging its tail' } };
+      // Task 176 (clip accessibility): the wagging-tail clip now carries a spoken line so it works for a
+      // screen reader, images-off, reduced motion or a missed loop. The ':)' keeps the smile SR label the
+      // system gives every ':)' glyph. Owner copy, verbatim.
+      return { responseId: 'GOOD-BOY-01', text: ':)', ariaLabel: SMILE_FACE_SR_LABEL, dog, media: { src: '/chat-media/goodboy.mp4', alt: 'A dog wagging its tail' } };
 
     case 'how_are_you': {
       // Task 142: a personal question with no in-world answer -> one of three deflection clips, chosen
       // AT RANDOM and not repeated until all three have been used this session (the B57 fact pattern).
+      // Task 176 (clip accessibility): each clip now carries the dog's spoken line (owner copy, verbatim),
+      // so the answer survives without the video -- screen reader, images-off, reduced motion, missed loop.
       const clips = [
-        { responseId: 'HOWAREYOU-1', src: '/chat-media/howareyou1.mp4', alt: 'A dog typing at a computer' },
-        { responseId: 'HOWAREYOU-2', src: '/chat-media/howareyou2.mp4', alt: 'A dog with a weary stare' },
-        { responseId: 'HOWAREYOU-3', src: '/chat-media/howareyou3.mp4', alt: 'A corgi looking busy' },
+        { responseId: 'HOWAREYOU-1', src: '/chat-media/howareyou1.mp4', alt: 'A dog typing at a computer', text: 'busy busy busy how are you' },
+        { responseId: 'HOWAREYOU-2', src: '/chat-media/howareyou2.mp4', alt: 'A dog with a weary stare', text: 'bored' },
+        { responseId: 'HOWAREYOU-3', src: '/chat-media/howareyou3.mp4', alt: 'A corgi looking busy', text: 'im working' },
       ];
       // Task 142 (change 2): the three clips convey completely different feelings, so a visitor who
       // sees one gets the SAME one again. Pick one per session and keep it (reuse the one already
       // served this session; otherwise choose at random).
       const prior = clips.find((x) => session.usedResponseIds.includes(x.responseId));
       const pick = prior ?? clips[Math.floor(Math.random() * clips.length)];
-      return { responseId: pick.responseId, text: '', dog, media: { src: pick.src, alt: pick.alt } };
+      return { responseId: pick.responseId, text: pick.text, dog, media: { src: pick.src, alt: pick.alt } };
     }
 
     case 'name_ack': {
@@ -494,7 +551,7 @@ export function assemble(res: Resolution, data0: ChumData, n: Normalised, sessio
       // Task 165: the LIST (GAMELIST-02) is now PER-DOG, so a dog offers only games it can start. The
       // QUESTION (GAMELIST-01) stays shared and falls through to the canned serve below.
       if (res.responseId === 'B45-GAMELIST-02') {
-        return { responseId: `B45-GAMELIST-02-${DOG_PREFIX[dog]}`, text: GAMES_MENU_LINES[dog], dog };
+        return { responseId: `B45-GAMELIST-02-${DOG_PREFIX[dog]}`, text: GAMES_MENU[dog].line, dog };
       }
     // falls through
     case 'canned': {
@@ -520,6 +577,11 @@ export function assemble(res: Resolution, data0: ChumData, n: Normalised, sessio
       return { responseId: rid, text, dog, ...(media ? { media } : {}), ...(interjection ? { interjection } : {}) };
     }
 
+    case 'buy_clarify':
+      // Task 175: the bare-get clarifier. A short question the visitor answers yes/no; a yes opens the
+      // pre-order (routed in the router). Owner-specified copy, kept inline like the other clarifier lines.
+      return { responseId: 'BUY-CLARIFY-01', text: 'The card game?', dog };
+
     case 'open_discount_popup': {
       const r = pickResponse(data, 'B01', session.usedResponseIds);
       const text = r ? fill(r.template, baseContext(n)) : CAMPAIGN.answers.discount_answer;
@@ -538,9 +600,12 @@ export function assemble(res: Resolution, data0: ChumData, n: Normalised, sessio
     }
 
     case 'rules_answer': {
-      const r = pickResponse(data, 'B02', session.usedResponseIds);
-      const text = r ? fill(r.template, baseContext(n)) : RULES.summary;
-      return { responseId: r?.responseId ?? 'B02', text, dog, destinationId: 'DST011' };
+      // Task 176: "how do I play" is FAQ001 -- serve the owner's how-to-play alternates (rotated), not the
+      // old B02 pool. The full rules page (DST011) stays attached as the structural link.
+      const f = data.faq.find((x) => x.faqId === 'FAQ001');
+      const raw = fill(f?.resolvedAnswer ?? '', baseContext(n));
+      const text = raw ? faqRotate(raw, session) : RULES.summary;
+      return { responseId: 'B02-FAQ001', text, dog, destinationId: 'DST011' };
     }
 
     case 'link': {
@@ -556,20 +621,31 @@ export function assemble(res: Resolution, data0: ChumData, n: Normalised, sessio
     case 'faq_answer': {
       const f = data.faq.find((x) => x.faqId === res.faqId);
       const ctx = baseContext(n);
-      // Fill render-time tokens in the approved answer (e.g. competition_close_date).
-      const answer = fill(f?.resolvedAnswer ?? '', ctx);
-      const r = pickResponse(data, 'B04', session.usedResponseIds);
-      const wrapper = r ? fill(r.template, ctx) : '';
-      const text = [answer, wrapper].filter(Boolean).join(' ').trim() || 'That is a fair question.';
-      // Contextual link added by structure, not copy: resolve the FAQ's CTA to a
-      // real destination route (e.g. Competition -> /chumspot). No raw URL lives
-      // in the answer text.
+      // Fill render-time tokens in the answer (e.g. competition_close_date).
+      const raw = fill(f?.resolvedAnswer ?? '', ctx);
+      // The CTA link for a single-message answer, resolved by structure not copy (FAQ007 -> /hot-dogs via
+      // the literal path, FAQ011 -> Competition -> /chumspot). No raw URL ever lives in the answer text.
       const dest = data.destinations.find((d) => d.name === f?.cta || d.destinationId === f?.cta);
-      const url = dest?.resolvedUrl ?? (f?.cta && f.cta.startsWith('/') ? f.cta : null);
-      const out: Assembled = { responseId: f ? `B04-${f.faqId}` : 'B04', text, dog, url, destinationId: dest?.destinationId };
-      // Task 140: the hot-dog clip joins the existing FAQ007 answer (the answer text is unchanged).
-      // Suppressed inside a protected state so no new clip surfaces during a safeguarding exchange
-      // (FAQ007 is a meaningful topic, so it can serve there; the clip must not).
+      const ctaUrl = dest?.resolvedUrl ?? (f?.cta && f.cta.startsWith('/') ? f.cta : null);
+      // Task 176: a |||-sequence FAQ (FAQ009, FAQ012) plays as SEPARATE messages -- first is the reply, the
+      // rest ride Assembled.sequence, each with its own [[/path]] link. No B04 flourish is ever appended.
+      if (raw.includes(FAQ_SEQ)) {
+        const steps = raw.split(FAQ_SEQ).map((s) => faqStep(s)).filter((s) => s.text || s.url);
+        const first = steps[0] ?? { text: '', url: null };
+        return {
+          responseId: `B04-${res.faqId}`,
+          text: first.text || 'That is a fair question.',
+          dog,
+          // Sequence messages carry their OWN [[/path]] links only -- no CTA fallback (it stapled a stray
+          // mailto onto FAQ012's "who").
+          url: first.url ?? null,
+          sequence: steps.slice(1).map((s) => ({ text: s.text, url: s.url })),
+        };
+      }
+      // Task 176: the answer is exactly the owner's line (rotated if it carries ~~~) -- no B04 wrapper.
+      const text = (raw.includes(FAQ_ROTATE) ? faqRotate(raw, session) : raw) || 'That is a fair question.';
+      const out: Assembled = { responseId: f ? `B04-${f.faqId}` : 'B04', text, dog, url: ctaUrl, destinationId: dest?.destinationId };
+      // Task 140: the hot-dog clip joins the FAQ007 answer. Suppressed inside a protected state.
       if (res.faqId === 'FAQ007' && session.protectedState === null) {
         out.media = { src: '/chat-media/hotdog.mp4', alt: 'Hot dogs' };
       }
@@ -580,13 +656,10 @@ export function assemble(res: Resolution, data0: ChumData, n: Normalised, sessio
       // Task 49: the in-chat price answer, rendered from FAQ008 but through a distinct action so
       // the S12 safety machine treats it like buying (non-meaningful, blocked in a protected
       // state). Same assembly as faq_answer for FAQ008: the approved answer plus a B04 wrapper.
+      // Task 176: FAQ008 in the dog's own words, no B04 flourish appended.
       const f = data.faq.find((x) => x.faqId === 'FAQ008');
-      const ctx = baseContext(n);
-      const answer = fill(f?.resolvedAnswer ?? '', ctx);
-      const r = pickResponse(data, 'B04', session.usedResponseIds);
-      const wrapper = r ? fill(r.template, ctx) : '';
-      const text = [answer, wrapper].filter(Boolean).join(' ').trim() || 'That is a fair question.';
-      return { responseId: 'B04-FAQ008', text, dog };
+      const answer = fill(f?.resolvedAnswer ?? '', baseContext(n));
+      return { responseId: 'B04-FAQ008', text: answer || 'That is a fair question.', dog };
     }
 
     case 'gk_answer': {

@@ -2,7 +2,7 @@
 // session. Pure and deterministic. Mutates the passed session in place; callers
 // that need immutability (React) pass a clone.
 
-import { ChumData, Resolution } from './types';
+import { ChumData, Resolution, Dog } from './types';
 import { normalise, applyAliases, buildAliasMap } from './normalise';
 import { resolve, resolveCanned, extractCandidateSubject } from './router';
 import { startGame, applyMove, exitLine, gameExitText, GameResult } from './games';
@@ -10,6 +10,71 @@ import { assemble, Assembled } from './assembler';
 import { Session, Topic } from './session';
 import { detectSadnessClear, detectSafety, detectProtectedContinuation, detectPersonalSadness, detectGrief } from './safety';
 import { matchReworded } from './matcher';
+import { bioForRoute } from '../data/page-bios';
+
+// Task 177 / 179: the "naming loop" -- a dog serving one line per reply from a fixed pool until it runs
+// out, then silence. Two dogs use it: the Boxer names one of his ten /about misreads per reply, and the
+// Labrador names one of his ten YES-tier foods per reply. Both reuse ONE mechanism (allow-list advance
+// decision + no-repeat pool + break-on-real-reply), differing only in their pool and one Labrador tweak.
+const BOXER_ABOUT_MISREADS: string[] = bioForRoute('/about')?.misreads ?? [];
+// The pool of lines for a dog's loop, as {text, responseId}. Boxer: his /about misreads (source of truth
+// shared with the appearance's misread #1). Labrador: the ten YES-tier (subtag 'food-yes') B32 rows,
+// served by their OWN approved templates and real responseIds -- the A BIT and NEVER tiers are never
+// drawn, so a food that would harm a dog is never named in the loop.
+function loopItems(dog: Dog, data: ChumData): { text: string; responseId: string }[] {
+  if (dog === 'boxer') return BOXER_ABOUT_MISREADS.map((t, i) => ({ text: t, responseId: `BOX-ABOUT-FACT-${i + 1}` }));
+  if (dog === 'labrador') return data.labradorResponses.filter((r) => r.subtag === 'food-yes').map((r) => ({ text: r.template, responseId: r.responseId }));
+  return [];
+}
+// The ONLY resolutions the loop is allowed to swallow. This is an ALLOW-LIST, not a deny-list, and that
+// is the whole safety argument: a resolution advances the loop ONLY by appearing here. Safety, grief,
+// personal sadness, the health boundary, moderation, commerce, rules, the FAQ, dismissals, goodbyes,
+// breeds and every real route are ABSENT, so they win by default -- and a new safety or real action
+// added to the engine later also wins by default, because no one added it here. The worst a miss can do
+// is fail to advance the loop (a real reply is served instead); it can never swallow something serious.
+//   FREE advance: pure reactions / nonsense that a disclosure can never resolve to (canned is matched on
+//   exact triggers; gibberish is a keyboard smash; emoji is emoji; dog_fact is "tell me more"). Two
+//   carve-outs handled at the call site: the Boxer's "stop" (note 'boxer_stop') breaks the loop for his
+//   stop-gag, and for the Labrador a B32 food match (a named food, canned LAB-B32-*) breaks the loop so
+//   its real tiered answer -- including a NEVER food's safety warning -- is served, never swallowed.
+const LOOP_FREE_ADVANCE = new Set<string>(['canned', 'emoji_only', 'gibberish', 'dog_fact']);
+//   GUARDED advance: the catch-all zone (a greeting, an unresolved word, a "why"). A disclosure that the
+//   safety detector misses lands HERE (verified: "i am being bullied", "why does my dad hit me"), and a
+//   disclosure is sentence-shaped -- so these advance on a lone token ("ok", "why", "hmm", "k") OR when
+//   EVERY word is on the SAFE small-talk list below (Task 181: "me too", "i like that", "go on"). Any other
+//   multi-word message here breaks and is answered normally (an "im a dog", never a fact or a food).
+const LOOP_GUARDED_ADVANCE = new Set<string>(['converse', 'fallback', 'gk_unknown']);
+// Task 181: the SAFE small-talk allow-list. A multi-word catch-all reply advances only if EVERY word is on
+// it. The list is CLOSED -- a word advances by being here, nothing else -- so a disclosure, which always
+// carries a harm / emotion / person word that is NOT here ("hurt", "scared", "alone", "hate", "hit", "dad",
+// "someone", "feel", ...), still breaks. That is the whole safety argument: an allow-list of safe words can
+// never let a disclosure through. Negations are deliberately OFF (they flip meaning: "not ok", "dont care").
+const LOOP_SAFE_WORDS = new Set<string>([
+  // pronouns / demonstratives (1st & 2nd person only), plus contraction remnants (i'm -> ['i','m'])
+  'i', 'im', 'me', 'my', 'mine', 'we', 'us', 'our', 'you', 'youre', 'your', 'it', 'its', 'that', 'thats',
+  'this', 'these', 'those', 'm', 's', 're', 'll', 've', 'd',
+  // function words / connectors
+  'a', 'an', 'the', 'and', 'or', 'but', 'so', 'to', 'of', 'for', 'as', 'at', 'in', 'on', 'up', 'with',
+  'then', 'just', 'also', 'well', 'oh', 'ah', 'here', 'there',
+  // neutral small-talk verbs
+  'is', 'are', 'am', 'be', 'was', 'were', 'do', 'does', 'did', 'go', 'goes', 'going', 'get', 'got', 'keep',
+  'know', 'think', 'see', 'like', 'likes', 'love', 'loves', 'agree', 'agreed', 'sounds', 'seems', 'makes',
+  'mean', 'means',
+  // agreement / mild-positive reactions ("no" / "nope" / "enough" are deliberately absent -- see LOOP_STOP)
+  'yes', 'yeah', 'yep', 'yup', 'ok', 'okay', 'sure', 'same', 'too', 'right', 'true', 'cool', 'nice', 'good',
+  'great', 'fun', 'funny', 'fine', 'fair', 'please', 'thanks', 'wow', 'haha', 'lol', 'really', 'definitely',
+  'exactly', 'totally', 'indeed', 'lovely', 'brilliant',
+  // wh- / continuation / quantity
+  'what', 'how', 'why', 'more', 'else', 'some', 'bit', 'all', 'both', 'lot', 'lots',
+]);
+// Task 181: lone stop signals. "no" / "nope" / "enough" to a dog naming things mean "stop", so they break
+// the loop -- but as lone fallbacks they would otherwise advance via the lone-token clause, so they are
+// caught here. (A multi-word "no ..." already breaks, since "no" is off the SAFE list.)
+const LOOP_STOP = new Set<string>(['no', 'nope', 'enough']);
+// Task 181: true when a multi-word reply is entirely SAFE small-talk (so it may advance the loop).
+function allLoopSafe(words: string[]): boolean {
+  return words.length > 0 && words.every((w) => LOOP_SAFE_WORDS.has(w));
+}
 
 // Task 27: classify a resolution's subject KIND for the topic slot. This is a subject
 // classifier, not a rival MEANINGFUL_TOPIC set (which stays in its S12 role only). A
@@ -53,7 +118,7 @@ const MEANINGFUL_TOPIC = new Set(['breed_answer', 'rules_answer', 'faq_answer', 
 // Task 142: the new play/deflection routes (clips, name acknowledgement/deflection) join the blocked
 // set so none serves inside PROTECTED_AFTERCARE; in PROTECTED_ACTIVE they are not meaningful and are
 // held as the safeguarding continuation.
-const AFTERCARE_BLOCKED = new Set(['offer_bark_game', 'open_discount_popup', 'transfer', 'bark', 'bark_break', 'bark_ack', 'price_answer', 'canned', 'game_start', 'game_move', 'game_exit', 'page_bio', 'media_reply', 'how_are_you', 'good_boy', 'name_ack', 'name_deflect', 'dog_lifespan', 'death_answer', 'god_answer', 'religion_dumb', 'religion_self', 'maths_answer']);
+const AFTERCARE_BLOCKED = new Set(['offer_bark_game', 'open_discount_popup', 'buy_clarify', 'transfer', 'bark', 'bark_break', 'bark_ack', 'price_answer', 'canned', 'game_start', 'game_move', 'game_exit', 'page_bio', 'media_reply', 'how_are_you', 'good_boy', 'name_ack', 'name_deflect', 'dog_lifespan', 'death_answer', 'god_answer', 'religion_dumb', 'religion_self', 'maths_answer']);
 // The "old voice" routes a canned answer is allowed to override (Steve's decision): the identity
 // spiel, the orientation nudge, the bare-help clarifier and any FAQ match. These resolve above the
 // in-router canned check, so a matching canned trigger overrides them here. Safety, grief, breed
@@ -189,6 +254,7 @@ export function submit(data: ChumData, session: Session, input: string): Turn {
   const n = normalise(input);
   const dog = session.activeDog; // whose bark game this message belongs to
   const wasProtected = session.protectedState; // 'active' | 'aftercare' | null, BEFORE this turn
+  const prevPendingConfirm = session.pendingConfirm ?? null; // the subject an offer/answer armed last turn
   let resolution = resolve(n, data, {
     submissionCount: session.submissionCount,
     activeDog: dog,
@@ -250,11 +316,45 @@ export function submit(data: ChumData, session: Session, input: string): Turn {
     }
   }
 
+  // Task 177: the Boxer's /about fact-loop decision. It runs ONLY when the loop is live (seeded by the
+  // experience at the /about appearance), the active dog is the Boxer, and NO protected state is in play
+  // -- so the S12 machine above has already claimed every safety/aftercare turn before we get here, and a
+  // disclosure can never be read as a fact. `resolution` has been fully classified by resolve() at true
+  // precedence, so we decide purely from its action: a filler action advances (the override lands after
+  // assembly, below); anything else -- safety, grief, sadness, health, commerce, rules, FAQ, a dismissal,
+  // a breed, or a coherent multi-word statement in the guarded zone -- ENDS the loop for the session and
+  // is served as its normal self.
+  let loopAdvancing = false;
+  if (session.namingLoop && session.activeDog === session.namingLoop.dog && !wasProtected && loopItems(session.namingLoop.dog, data).length) {
+    const a = resolution.action;
+    const isBoxerStop = resolution.note === 'boxer_stop'; // the Boxer's "stop" gag: break the loop, let it answer
+    // Labrador only: a named food (canned LAB-B32-*, any tier) is a real question -- break the loop so its
+    // true tiered answer is served, keeping a NEVER food's Collie safety interjection. Never swallowed.
+    const isNamedFood = session.namingLoop.dog === 'labrador' && a === 'canned' && /^LAB-B32-/.test(resolution.responseId ?? '');
+    const isStop = LOOP_STOP.has(n.compact); // Task 181: "no" / "nope" / "enough" -> stop, break the loop
+    const free = LOOP_FREE_ADVANCE.has(a) && !isBoxerStop && !isNamedFood && !isStop;
+    // Task 181: a lone token still advances (broad filler: "ok", "hmm", "k"); a multi-word reply advances
+    // only when every word is SAFE small-talk ("me too", "go on"). A stop signal breaks either way.
+    const guarded = LOOP_GUARDED_ADVANCE.has(a) && !isStop && (n.words.length <= 1 || allLoopSafe(n.words));
+    loopAdvancing = free || guarded;
+    if (!loopAdvancing) session.namingLoop = null; // a real / serious / substantive turn: the loop is over, and does not resume
+  }
+
   // Complaint context: a weak follow-up after a complaint answer stays in the
   // complaint (the FAQ015 answer, Task 18), rather than falling to the catch-all. Not
   // applied inside a protected state (the S12 machine owns those turns).
   if (session.lastWasComplaint && !wasProtected && WEAK_AFTER_COMPLAINT.has(resolution.action)) {
     resolution = { layer: 4, layerName: 'FAQ knowledge', bucket: 'B04', action: 'faq_answer', faqId: 'FAQ015' };
+  }
+
+  // The cookie emoji hands to the Labrador and starts his cookie game (mirroring the food override): a
+  // game_start carrying transferTo switches the active dog HERE, before the game starts, so the game runs
+  // and every line serves as the Labrador. Same bookkeeping as an ordinary transfer (below): reset the dog
+  // we are leaving and record the arrival. Only the emoji cookie handoff sets transferTo on a game_start.
+  if (resolution.action === 'game_start' && resolution.transferTo && resolution.transferTo !== session.activeDog) {
+    session.barkStreakByDog[session.activeDog] = 0;
+    session.activeDog = resolution.transferTo;
+    if (!session.previousDogs.includes(resolution.transferTo)) session.previousDogs.push(resolution.transferTo);
   }
 
   // Task 115: the three in-chat games. Processed BEFORE assembly so the served copy and the board/tiles/
@@ -293,6 +393,27 @@ export function submit(data: ChumData, session: Session, input: string): Turn {
   }
 
   const response = assemble(resolution, data, n, session);
+
+  // Task 177 / 179: serve the next line. The reply was already assembled into `response` above (a greeting,
+  // an "im a dog", a canned quip); here we OVERWRITE that text with the next pool line, exactly as the
+  // LOOP-01 override below overwrites a fallback with a repeat. The pool is a no-repeat rotation (draw from
+  // the indices not in `used`, append the chosen one). For the Boxer it is seeded from the appearance so
+  // misread #1 is never repeated; for the Labrador it starts empty (the "I like hotdogs" opener names no
+  // YES food). When the last index is spent the loop ends silently: the next reply is answered normally,
+  // with no farewell. A named line has no destination, so any link/transfer is cleared.
+  if (loopAdvancing && session.namingLoop) {
+    const items = loopItems(session.namingLoop.dog, data);
+    const used = session.namingLoop.used;
+    const avail = items.map((_, i) => i).filter((i) => !used.includes(i));
+    const idx = avail.length ? avail[Math.floor(Math.random() * avail.length)] : 0;
+    response.text = items[idx].text;
+    response.responseId = items[idx].responseId;
+    response.url = null;
+    response.destinationId = undefined;
+    response.transferTo = undefined;
+    const nextUsed = [...used, idx];
+    session.namingLoop = nextUsed.length >= items.length ? null : { dog: session.namingLoop.dog, used: nextUsed }; // last one served: the loop is spent for the session
+  }
 
   // Task 164 fix: when the Boxer serves his game offer (B17), arm a one-turn window so the visitor's
   // natural accept next turn ("yes" / "lets play" / "play") starts DO NOT PRESS THAT BUTTON. Only his own
@@ -366,7 +487,10 @@ export function submit(data: ChumData, session: Session, input: string): Turn {
   // On a fallback-family turn outside a protected state (the fallback catch-all, or the GK
   // refuse-to-guess), extract the canonical inside-world entity; else clear it. Held null in a
   // protected state, like the dialogue topic (Task 27, a safety requirement).
-  const inLoopTurn = session.protectedState === null && FALLBACK_FAMILY.has(resolution.action);
+  // Task 177 / 179: a loop-advance turn has already overwritten the response above; it must NOT also run
+  // the im-a-dog / LOOP-01 / diversion machinery below (that would clobber the served line and mis-set the
+  // loop counters). Excluding it here leaves the pool line as the served text and keeps candidateSubject clear.
+  const inLoopTurn = session.protectedState === null && FALLBACK_FAMILY.has(resolution.action) && !loopAdvancing;
   session.candidateSubject = inLoopTurn ? extractCandidateSubject(n, data) : null;
 
   // Task 79: the fallback now has exactly two outcomes, and never escalates. A candidate subject
@@ -410,7 +534,11 @@ export function submit(data: ChumData, session: Session, input: string): Turn {
       // in a row, the THIRD consecutive no-subject turn offers ONE diversion -- somewhere to go -- and
       // then it is back to "im a dog" (three offers in a row is pestering). Each session rotates to the
       // next of the eight offers. The old B46 single-word rotation (woof/bark/games?) is retired.
-      if (session.noSubjectStreak === 2) {
+      // Task 175 §6: a lone mistyped / nonsense token must NOT advance the diversion streak, so a run of
+      // typos ("hjdihi", "hioo") never trips the history diversion. Only coherent multi-word misses -- a
+      // genuinely stuck visitor -- build toward the "somewhere to go" nudge. isGibberish is untouched.
+      const loneToken = n.words.length <= 1;
+      if (session.noSubjectStreak === 2 && !loneToken) {
         const d = DIVERSIONS[(session.diversionsShown ?? 0) % DIVERSIONS.length];
         response.text = d.text;
         response.responseId = d.id;
@@ -422,7 +550,7 @@ export function submit(data: ChumData, session: Session, input: string): Turn {
         response.text = b40?.template ?? 'im a dog';
         response.responseId = b40?.responseId ?? 'B40-NOSUBJECT-01';
       }
-      session.noSubjectStreak += 1; // one more consecutive no-subject serve
+      if (!loneToken) session.noSubjectStreak += 1; // lone-token misses never advance the streak
     }
     // Task 68: only LOOP-01 (repeat) and LOOP-02 (destination offer) pose a yes/no; remember the
     // offered subject so a bare affirmation next turn can route to its destination.
@@ -431,6 +559,15 @@ export function submit(data: ChumData, session: Session, input: string): Turn {
     session.loopRepeatUsed = false; // a non-fallback turn breaks the run, re-arming the repeat
     session.pendingConfirm = null;
     session.noSubjectStreak = 0; // Task 117: anything else served resets the no-subject rotation
+  }
+
+  // The ball answer (COL-B52-MISC-09) poses "Tennis balls?", inviting a "yes". It is a canned answer,
+  // so nothing above arms a confirm for it (unlike the LOOP-01 echo, whose yes confirmResolution honours).
+  // Arm a ONE-SHOT confirm here so a following bare "yes" re-serves it (its clip) instead of "im a dog".
+  // Guarded on prevPendingConfirm so honouring the confirm -- which re-serves the same answer -- does not
+  // re-arm and loop: one "yes" is honoured, then the conversation moves on.
+  if (response.responseId === 'COL-B52-MISC-09' && prevPendingConfirm !== 'balls') {
+    session.pendingConfirm = 'balls';
   }
 
   session.lastWasComplaint = resolution.faqId === 'FAQ015'; // complaint follow-up context (Task 18)

@@ -12,7 +12,7 @@ import assert from "node:assert/strict";
 
 import { createEngine } from "../../lib/hiddenGames/engine.ts";
 import { HG_EVENTS } from "../../lib/hiddenGames/measure.ts";
-import { STORAGE_KEY, GAME_IDS } from "../../lib/hiddenGames/registry.ts";
+import { STORAGE_KEY, GAME_IDS, TARGET } from "../../lib/hiddenGames/registry.ts";
 import { serializeRecord } from "../../lib/hiddenGames/record.ts";
 
 const NOW = Date.parse("2026-07-29T12:00:00Z");
@@ -67,29 +67,52 @@ test("HG-MEASURE-03 an unknown id emits the unknown-id event with no raw id in t
   assert.equal(events[0].params, undefined, "the raw unknown id is never sent");
 });
 
-test("HG-MEASURE-04 completing the campaign emits an award per game then the completion event", () => {
-  // Task 165: drive off GAME_IDS so completion is the LAST find, whatever the campaign size (was G01+G02).
+test("HG-MEASURE-04 reaching the target emits an award per find plus one completion, and a find beyond the target emits only its award", () => {
+  // Completion is the TARGET-th find (the target is fixed and decoupled from the
+  // growing games list), not the last GAME_ID. An award fires on every find,
+  // including finds beyond the target; completion fires exactly once, on the
+  // find that reaches the target, and immediately after that find's award.
   const { engine, events } = makeEngine();
-  for (const id of GAME_IDS) engine.reportHiddenGame(id);
-  assert.deepEqual(names(events), [
-    ...GAME_IDS.map(() => HG_EVENTS.award),
-    HG_EVENTS.completion,
-  ]);
-  assert.deepEqual(events[GAME_IDS.length - 1].params, { game_id: GAME_IDS[GAME_IDS.length - 1] });
+  GAME_IDS.forEach((id, i) => {
+    engine.reportHiddenGame(id);
+    if (i + 1 === TARGET) {
+      assert.deepEqual(
+        names(events).slice(-2),
+        [HG_EVENTS.award, HG_EVENTS.completion],
+        "completion lands right after the target-th award"
+      );
+    }
+  });
+  assert.equal(
+    names(events).filter((n) => n === HG_EVENTS.completion).length,
+    1,
+    "completion fires exactly once, even with finds beyond the target"
+  );
+  assert.equal(
+    names(events).filter((n) => n === HG_EVENTS.award).length,
+    GAME_IDS.length,
+    "an award fires on every find, including beyond the target"
+  );
 });
 
-test("HG-MEASURE-05 a refused write emits storage_blocked once, alongside the awards", () => {
+test("HG-MEASURE-05 a refused write emits storage_blocked once, alongside the awards and the single completion", () => {
   const { engine, events } = makeEngine({ throwOnSet: true });
-  for (const id of GAME_IDS) engine.reportHiddenGame(id); // every write fails; the last find completes
-  assert.deepEqual(names(events), [
-    HG_EVENTS.storageBlocked, // once, on the first refusal
-    ...GAME_IDS.map(() => HG_EVENTS.award),
-    HG_EVENTS.completion,
-  ]);
+  for (const id of GAME_IDS) engine.reportHiddenGame(id); // every write fails; the target-th find completes
+  assert.equal(names(events)[0], HG_EVENTS.storageBlocked, "storage_blocked is first, on the first refusal");
   assert.equal(
     names(events).filter((n) => n === HG_EVENTS.storageBlocked).length,
     1,
     "storage_blocked fires only once"
+  );
+  assert.equal(
+    names(events).filter((n) => n === HG_EVENTS.award).length,
+    GAME_IDS.length,
+    "an award fires on every find"
+  );
+  assert.equal(
+    names(events).filter((n) => n === HG_EVENTS.completion).length,
+    1,
+    "completion fires once, at the target"
   );
 });
 

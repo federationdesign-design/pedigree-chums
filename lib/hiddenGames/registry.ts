@@ -25,6 +25,11 @@ export interface Registry {
   mode: "ACHIEVEMENT_ONLY";
   opens_at: string | null;
   closes_at: string | null;
+  // The number of finds a visitor needs to succeed. FIXED, and deliberately
+  // decoupled from games.length: the games list keeps growing as games are
+  // added, but the target does not move with it. The counter shows /target,
+  // completion fires at target, and finds beyond it are inert.
+  target: number;
   games: GameDef[];
 }
 
@@ -38,6 +43,9 @@ export const REGISTRY: Registry = {
   // than a placeholder (owner decision, 29 July 2026).
   opens_at: null,
   closes_at: null,
+  // A visitor succeeds at 10 finds. There are 11 games and more coming; the
+  // target stays 10 and does not track the list length.
+  target: 10,
   games: [
     {
       id: "G06",
@@ -141,9 +149,16 @@ export const REGISTRY: Registry = {
   ],
 };
 
-// Derived, never stored (BRIEF 3, 4.3). The counter and completion check read
-// this so they can never drift from the games list.
+// Derived, never stored (BRIEF 3, 4.3): the length of the games list. It grows
+// as games are added. NOTE: this is no longer the counter/completion total.
+// Use TARGET for what the visitor sees and must reach; TOTAL remains the true
+// size of the list (e.g. for total_at_last_seen).
 export const TOTAL = REGISTRY.games.length;
+
+// The completion target: a visitor needs TARGET finds to succeed, not every
+// game. Fixed at 10 and does not move as the games list grows. This is what the
+// counter shows (/TARGET) and where completion fires.
+export const TARGET = REGISTRY.target;
 
 // The current record schema. Numbers are never reused (BRIEF 4.3): a record
 // reading 1 or 2 is not valid Stage 1 progress.

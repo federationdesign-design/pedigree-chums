@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { SITE_URL } from "../../../lib/site";
 import * as React from "react";
 import Link from "next/link";
 import Nav from "../../../components/Nav/Nav";
@@ -15,7 +16,6 @@ export const metadata: Metadata = {
   title: "The Dogs Teaching Medicine How to Smell Disease | Dogs at Work",
   description:
     "In 2025, dogs called Bumper and Peanut detected Parkinson's disease by smell with up to 98% specificity. They are not replacing doctors - they may be inventing the machines that will. How bio-detection dogs are teaching medicine what disease smells like.",
-  robots: "noindex",
 };
 
 // Essay body kept as data so apostrophes/quotes stay plain text (no JSX escaping).
@@ -149,9 +149,43 @@ const CARDS: ArticleCard[] = [
   },
 ];
 
+// Article + breadcrumb structured data for this essay. Every value comes from
+// this page: headline is the on-page heading, description reuses the metadata
+// description, image is the real hero above. Author and publish date are omitted
+// (the page has no honest source for either). Publisher links to the site-wide
+// Organization node emitted in app/layout.tsx.
+const HEADLINE = "The Dogs Teaching Medicine How to Smell Disease";
+const ARTICLE_JSONLD = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Article",
+      headline: HEADLINE,
+      description: metadata.description,
+      image: `${SITE_URL}/Bumper-and-peatnut.jpg`,
+      publisher: { "@id": `${SITE_URL}/#organization` },
+      mainEntityOfPage: `${SITE_URL}/dogs-at-work/the-dogs-teaching-medicine-how-to-smell-disease`,
+    },
+    {
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
+        { "@type": "ListItem", position: 2, name: "Dogs at Work", item: `${SITE_URL}/dogs-at-work` },
+        { "@type": "ListItem", position: 3, name: HEADLINE, item: `${SITE_URL}/dogs-at-work/the-dogs-teaching-medicine-how-to-smell-disease` },
+      ],
+    },
+  ],
+};
+
 export default function BioDetectionPage() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(ARTICLE_JSONLD).replace(/</g, "\\u003c"),
+        }}
+      />
       <Nav showLogo />
       <main className={styles.essayPage}>
         <div className={styles.essayHero}>

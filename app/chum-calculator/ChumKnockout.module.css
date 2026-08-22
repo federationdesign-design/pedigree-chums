@@ -1,0 +1,15 @@
+/* ChumKnockout-specific layout. The question card and option buttons reuse
+   calculator.module.css so the knockout looks native to the calculator. The shared
+   knockout shell, round pills and fall/puff animations (knockout-shared.module.css)
+   are wired in at stage 5, not here. (Job B stage 3, 22 Aug 2026.) */
+
+.remaining {
+  font-family: var(--font-body), sans-serif;
+  font-weight: 700;
+  color: var(--navy, #0a3a57);
+  text-align: center;
+  margin: 0 0 14px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+}

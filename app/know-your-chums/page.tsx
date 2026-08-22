@@ -60,7 +60,9 @@ export default function KnowYourChums() {
 
         {/* Intro */}
         <section className={styles.intro}>
-          <PopHeading className={`display ${styles.title}`}>
+          {/* as="h1": this is the page's visible top heading, so it is the h1.
+              Without it the page started at h2 with no h1 above. */}
+          <PopHeading as="h1" className={`display ${styles.title}`}>
             Know your <span className="display-yellow">chums</span>
           </PopHeading>
           <p className={styles.lead}>

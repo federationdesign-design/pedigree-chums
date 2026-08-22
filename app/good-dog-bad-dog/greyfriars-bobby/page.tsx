@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { SITE_URL } from "../../../lib/site";
 import Link from "next/link";
 import Nav from "../../../components/Nav/Nav";
 import Footer from "../../../components/Footer/Footer";
@@ -18,14 +19,47 @@ import ArticleTextToggle from "../../../components/ArticleTextToggle/ArticleText
 export const metadata: Metadata = {
   title: "Greyfriars Bobby: Loyalty, Legend and the Making of a National Dog | Good Dog, Bad Dog",
   description: "How a small Edinburgh terrier became a symbol of devotion -- and how the story grew larger than the life behind it.",
-  robots: "noindex",
 };
 
 const SLUG = "skye-terrier";
 
+// Article + breadcrumb structured data for this essay. Every value comes from
+// this page: headline is the on-page heading (which differs from the <title>),
+// description reuses the metadata description, image is the real hero above.
+// Author and publish date are omitted (the page has no honest source for either).
+// Publisher links to the site-wide Organization node emitted in app/layout.tsx.
+const HEADLINE = "Greyfriars Bobby: Loyalty, Legend and the Making of a Nation";
+const ARTICLE_JSONLD = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Article",
+      headline: HEADLINE,
+      description: metadata.description,
+      image: `${SITE_URL}/greyfryers-bobby.jpg`,
+      publisher: { "@id": `${SITE_URL}/#organization` },
+      mainEntityOfPage: `${SITE_URL}/good-dog-bad-dog/greyfriars-bobby`,
+    },
+    {
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
+        { "@type": "ListItem", position: 2, name: "Good Dog, Bad Dog", item: `${SITE_URL}/good-dog-bad-dog` },
+        { "@type": "ListItem", position: 3, name: HEADLINE, item: `${SITE_URL}/good-dog-bad-dog/greyfriars-bobby` },
+      ],
+    },
+  ],
+};
+
 export default function GreyfriarsBobbyPage() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(ARTICLE_JSONLD).replace(/</g, "\\u003c"),
+        }}
+      />
       <Nav showLogo />
       <main className={styles.essayPage}>
         <div className={styles.essayHero}>

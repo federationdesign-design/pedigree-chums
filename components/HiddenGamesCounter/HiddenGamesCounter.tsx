@@ -2,18 +2,27 @@
 
 // Hidden Games counter (C03 timed reveal + prelude + palette).
 //
-// First visit (prelude not yet seen): a timed sequence from page load -
-//   0-5s   nothing renders
-//   5-8s   the prelude card
-//   8-12s  the introduction card
-//   >12s   the plain counter
-// Return visit (prelude seen): the counter renders immediately.
+// The prelude and introduction cards are spread across the visitor's first few
+// pages, at most one per page, gated by the persisted page tally and the
+// once-only flags:
+//   page 1        the plain counter only, neither card
+//   from page 2   the prelude card on the first such page where prelude_seen is
+//                 false, 5s after the page loads
+//   from page 3   the introduction card on the first such page where intro_seen
+//                 is false, 5s after the page loads
+// The prelude takes precedence, so the two never share a page: a visitor who
+// leaves page 2 within the 5s gets the prelude on page 3 and the introduction on
+// page 4. Each card shows once only (prelude_seen / intro_seen), marked seen the
+// moment it appears, and stays until the visitor closes it, then the counter
+// returns. The page tally is counted per pathname, since the root layout
+// persists across client-side navigations.
 //
 // Lifecycle (suspended/closed/hidden) and completion take precedence over the
-// timed sequence. The palette is the campaign palette (C03).
+// cards. The palette is the campaign palette (C03).
 
 import { useEffect, useRef, useState } from "react";
 import { useSyncExternalStore } from "react";
+import { usePathname } from "next/navigation";
 import {
   getHiddenGamesEngine,
   emitHiddenGamesEvent,
@@ -33,10 +42,20 @@ import {
 import { getScheme, getHideImages, CONTRAST_EVENT } from "../../lib/contrastScheme";
 import styles from "./HiddenGamesCounter.module.css";
 
-const PRELUDE_AT = 5000; // C03 timings, from page load
-const INTRO_AT = 8000;
-const COUNTER_AT = 12000;
+const CARD_AT = 5000; // a card appears 5s after its page loads (C03 timing)
+const PRELUDE_FROM_PAGE = 2; // earliest page the prelude may appear on
+const INTRO_FROM_PAGE = 3; // earliest page the introduction may appear on
 const COMPLETION_TIMEOUT_MS = 10000; // D11 completion auto-collapse
+
+// The Main Pit (the home route) is on screen and being played: PackPit sets this
+// body flag while it is mounted. A prelude or introduction card must not appear
+// over it, so a card due while the pit is in play is held for a later page.
+function pitInPlay(): boolean {
+  return (
+    typeof document !== "undefined" &&
+    document.body.hasAttribute("data-pc-pit-playing")
+  );
+}
 
 type Phase = "pending" | "hidden" | "prelude" | "intro" | "counter";
 
@@ -105,34 +124,63 @@ export default function HiddenGamesCounter() {
   const [blockedDismissed, setBlockedDismissed] = useState(false);
   const [completionCollapsed, setCompletionCollapsed] = useState(false);
   const [phase, setPhase] = useState<Phase>("pending");
-  const [preludeClosed, setPreludeClosed] = useState(false);
   const visibleTracked = useRef(false);
+  // The page number counted for the current pathname. Remembered so a re-run of
+  // the effect for the same page (React strict mode double-invokes it, cleanup
+  // in between) reuses the number instead of counting the page twice.
+  const countedPage = useRef<{ path: string; page: number } | null>(null);
+  const pathname = usePathname();
 
-  // Timed reveal (C03). Mount-once; reads the engine directly, not the reactive
-  // state, so find-driven re-renders never restart the sequence.
+  // Card reveal (C03). Re-runs on each navigation (the root layout persists, so
+  // this component is not remounted per page). Reads the engine directly, not the
+  // reactive state, so find-driven re-renders never restart a card's timer.
   useEffect(() => {
     const engine = getHiddenGamesEngine();
     const s = engine.getState();
-    if (s.preludeSeen || s.view !== "counter") {
-      setPhase("counter"); // return visit, or a lifecycle view: show now
+    if (s.view !== "counter") {
+      setPhase("counter"); // a lifecycle view (suspended/closed): show now
       return;
     }
-    setPhase("hidden");
-    const t1 = window.setTimeout(() => setPhase("prelude"), PRELUDE_AT);
-    const t2 = window.setTimeout(() => {
-      setPhase("intro");
-      engine.markPreludeSeen();
-    }, INTRO_AT);
-    const t3 = window.setTimeout(() => {
-      setPhase("counter");
-      engine.markIntroSeen();
-    }, COUNTER_AT);
-    return () => {
-      window.clearTimeout(t1);
-      window.clearTimeout(t2);
-      window.clearTimeout(t3);
-    };
-  }, []);
+
+    // Count this page once per pathname (guard the strict-mode double run).
+    let page: number;
+    if (countedPage.current && countedPage.current.path === pathname) {
+      page = countedPage.current.page;
+    } else {
+      page = engine.registerPageView();
+      countedPage.current = { path: pathname, page };
+    }
+
+    // Prelude first: the first page from PRELUDE_FROM_PAGE onwards still unseen.
+    // Checked before the introduction, so the two never share a page.
+    if (page >= PRELUDE_FROM_PAGE && !s.preludeSeen) {
+      setPhase("hidden");
+      const t = window.setTimeout(() => {
+        if (pitInPlay()) {
+          // Held: the Main Pit is being played. Leave prelude_seen unset so the
+          // card stays due and reveals on a later page not in the pit.
+          setPhase("counter");
+          return;
+        }
+        setPhase("prelude");
+        engine.markPreludeSeen(); // once only, even if they leave before closing
+      }, CARD_AT);
+      return () => window.clearTimeout(t);
+    }
+    if (page >= INTRO_FROM_PAGE && !s.introSeen) {
+      setPhase("hidden");
+      const t = window.setTimeout(() => {
+        if (pitInPlay()) {
+          setPhase("counter"); // held for a later page, as the prelude is
+          return;
+        }
+        setPhase("intro");
+        engine.markIntroSeen();
+      }, CARD_AT);
+      return () => window.clearTimeout(t);
+    }
+    setPhase("counter"); // no card due on this page: counter only
+  }, [pathname]);
 
   const collapseCompletion = () => {
     setCompletionCollapsed(true);
@@ -204,7 +252,6 @@ export default function HiddenGamesCounter() {
   if (phase === "pending" || phase === "hidden") return null;
 
   if (phase === "prelude") {
-    if (preludeClosed) return null;
     return (
       <div className={styles.prelude} role="status" aria-live="polite">
         <img className={styles.preludeIcon} src="/prelude-icon-redux.svg" alt="" />
@@ -216,7 +263,7 @@ export default function HiddenGamesCounter() {
           type="button"
           className={styles.preludeClose}
           onClick={() => {
-            setPreludeClosed(true);
+            setPhase("counter");
             getHiddenGamesEngine().markPreludeSeen();
           }}
           aria-label="Close"

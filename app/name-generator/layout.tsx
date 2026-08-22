@@ -11,6 +11,8 @@ import "./textinvert.css";
 // The site suffix comes from the root layout's title template (WCAG 2.4.2).
 export const metadata: Metadata = {
   title: "Name Generator",
+  description:
+    "Give your dog a one-in-a-million name. Choose a breed, answer a few playful questions, then run a knockout round to crown the winner and share the result.",
 };
 
 export default function NameGeneratorLayout({

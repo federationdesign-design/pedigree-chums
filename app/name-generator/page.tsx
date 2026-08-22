@@ -2707,11 +2707,11 @@ export default function NameGeneratorPage() {
             return (
               <div className="pcm-calc-banner" style={{
                 position:"relative",
-                display:"flex", alignItems:"center", gap:16, marginBottom:24,
+                display:"flex", alignItems:"center", gap:16, margin:"0 auto 24px", maxWidth:1100,
                 background:"linear-gradient(to top right, #00e2ff, #008eff)",
                 borderRadius:24,
                 padding:"clamp(20px,4vw,32px)",
-                paddingLeft: img ? "clamp(160px,38vw,250px)" : "clamp(20px,4vw,32px)",
+                paddingLeft: img ? "clamp(200px,28vw,320px)" : "clamp(20px,4vw,32px)",
                 boxShadow:"0 18px 40px rgba(10,58,87,0.28)",
                 overflow:"visible",
                 animation:"fadeInDown 0.4s ease",
@@ -2722,7 +2722,7 @@ export default function NameGeneratorPage() {
                     position:"absolute",
                     left:-12, top:"50%",
                     transform:"translateY(-50%) rotate(-2deg)",
-                    width:"clamp(180px,42vw,320px)", height:"auto", borderRadius:14,
+                    width:"clamp(180px,26vw,300px)", height:"auto", borderRadius:14,
                     boxShadow:"0 8px 24px rgba(10,58,87,0.28)",
                     zIndex:2
                   }} />

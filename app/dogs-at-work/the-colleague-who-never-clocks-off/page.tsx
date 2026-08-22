@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { SITE_URL } from "../../../lib/site";
 import * as React from "react";
 import Link from "next/link";
 import Nav from "../../../components/Nav/Nav";
@@ -13,7 +14,6 @@ export const metadata: Metadata = {
   title: "The Colleague Who Never Clocks Off | Dogs at Work",
   description:
     "A medical alert dog learns one person so completely it can warn them their own body is about to go wrong - often before they know themselves. That's not a pet. That's a colleague, even if the wages are dinner and the occasional stolen sausage.",
-  robots: "noindex",
 };
 
 const BODY: (string | { h: string; id: string })[] = [
@@ -141,9 +141,43 @@ const CARDS: ArticleCard[] = [
   },
 ];
 
+// Article + breadcrumb structured data for this essay. Every value comes from
+// this page: headline is the on-page heading, description reuses the metadata
+// description, image is the real hero above. Author and publish date are omitted
+// (the page has no honest source for either). Publisher links to the site-wide
+// Organization node emitted in app/layout.tsx.
+const HEADLINE = "The Colleague Who Never Clocks Off";
+const ARTICLE_JSONLD = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Article",
+      headline: HEADLINE,
+      description: metadata.description,
+      image: `${SITE_URL}/article3_hero.jpg`,
+      publisher: { "@id": `${SITE_URL}/#organization` },
+      mainEntityOfPage: `${SITE_URL}/dogs-at-work/the-colleague-who-never-clocks-off`,
+    },
+    {
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
+        { "@type": "ListItem", position: 2, name: "Dogs at Work", item: `${SITE_URL}/dogs-at-work` },
+        { "@type": "ListItem", position: 3, name: HEADLINE, item: `${SITE_URL}/dogs-at-work/the-colleague-who-never-clocks-off` },
+      ],
+    },
+  ],
+};
+
 export default function AlertDogPage() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(ARTICLE_JSONLD).replace(/</g, "\\u003c"),
+        }}
+      />
       <Nav showLogo />
       <main className={styles.essayPage}>
         <div className={styles.essayHero}>

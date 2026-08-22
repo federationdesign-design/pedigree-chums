@@ -16,7 +16,7 @@ import ArticleTextToggle from "../../components/ArticleTextToggle/ArticleTextTog
 type Option = { label: string; value: string };
 type Question = { id: string; question: string; sub?: string; info?: string; options: Option[] };
 
-const QUESTIONS: Question[] = [
+export const QUESTIONS: Question[] = [
   {
     id: "intent",
     question: "Let's find you a chum!",
@@ -36,6 +36,7 @@ const QUESTIONS: Question[] = [
       { label: "Light / Easy / Good for smaller spaces", value: "small" },
       { label: "Medium / Classic family dog", value: "medium" },
       { label: "Large / Proper big dog", value: "large" },
+      { label: "Giant / Enormous / Needs its own sofa", value: "giant" },
     ],
   },
   {
@@ -133,9 +134,9 @@ const QUESTIONS: Question[] = [
     sub: "Some breeds follow their owner from room to room and genuinely cannot cope alone",
     info: "Velcro dogs are devoted and deeply bonded -- but they can also be exhausting. Independent dogs are easier to leave but may seem aloof.",
     options: [
+      { label: "Devoted to me, not bothered about everyone else", value: "mine" },
       { label: "Stuck to me at all times", value: "yes" },
       { label: "Close but not obsessive", value: "medium" },
-      { label: "Devoted to me, not bothered about everyone else", value: "mine" },
       { label: "An independent dog suits me", value: "no" },
     ],
   },
@@ -214,7 +215,12 @@ const QUESTIONS: Question[] = [
 
 // ── Scoring ───────────────────────────────────────────────────────────────────
 
-function scoreBreed(slug: string, answers: Record<string, string>): number {
+// Size bands, small to giant. The mismatch penalty is graded by band distance
+// (16 per band), so an adjacent miss costs less than a two-band miss and the
+// small-to-giant worst case stays at the old flat -48. (A4, 22 Aug 2026.)
+const SIZE_ORDER = ["small", "medium", "large", "giant"] as const;
+
+export function scoreBreed(slug: string, answers: Record<string, string>): number {
   let score = 100;
   const suit = suitabilityScores[slug];
   const ex = exerciseNeeds[slug];
@@ -249,9 +255,10 @@ function scoreBreed(slug: string, answers: Record<string, string>): number {
     "great-dane","saint-bernard","bloodhound","rough-collie",
     "springer-spaniel","basset-hound","corgi"]);
 
-  // Size -- strong signal, tightened
+  // Size -- strong signal, graded by band distance (A4)
   if (answers.size && answers.size !== "any" && breed?.sizeBand) {
-    if (breed.sizeBand !== answers.size) score -= 48;
+    const distance = Math.abs(SIZE_ORDER.indexOf(breed.sizeBand) - SIZE_ORDER.indexOf(answers.size as (typeof SIZE_ORDER)[number]));
+    if (distance > 0) score -= 16 * distance;
   }
 
   // Living environment -- home type + size + urban/rural + open space (merged from home/garden/location/openspace)
@@ -294,7 +301,10 @@ function scoreBreed(slug: string, answers: Record<string, string>): number {
     }
   }
   if (suit && answers.alone) {
-    const aloneMap: Record<string, number> = { rarely: 5, sometimes: 3, often: 2, lots: 1 };
+    // needed = alone-tolerance the dog must have; it rises as the owner is out
+    // more. Was inverted (rarely demanded the most) and "always" was missing, so
+    // it fell through to ?? 3. (A3, 22 Aug 2026.)
+    const aloneMap: Record<string, number> = { rarely: 1, sometimes: 2, often: 3, lots: 4, always: 5 };
     const needed = aloneMap[answers.alone] ?? 3;
     const diff = suit.timeAlone - needed;
     score += diff < -1 ? diff * 18 : diff * 6;
@@ -345,8 +355,14 @@ function scoreBreed(slug: string, answers: Record<string, string>): number {
     if (answers.velcro === "yes" && onePersonBreeds.has(slug)) score += 5; // close enough
   }
   if (flags && answers.vocal) {
-    if (answers.vocal === "yes" && flags.vocal) score -= 40;
-    if (answers.vocal === "no" && !flags.vocal) score += 8;
+    // Noise tolerance, 0 (silent) to 4 (no). Vocal breeds are penalised more the
+    // less noise is tolerated, and nudged up when the owner is genuinely unbothered.
+    // Quiet breeds are rewarded only when quiet is actually wanted. Replaces the old
+    // block, where "yes" was never an option (dead) and "no" was inverted. (A5, 22 Aug 2026.)
+    const vocalTol: Record<string, number> = { silent: 0, low: 1, medium: 2, high: 3, no: 4 };
+    const t = vocalTol[answers.vocal] ?? 4;
+    if (flags.vocal) score += t === 4 ? 8 : Math.min(0, (t - 3) * 12);
+    else if (t <= 1) score += t === 0 ? 10 : 5;
   }
   // ── Mobility scoring ────────────────────────────────────────────────────
   const minimalWalkOk = new Set(["maltese","chihuahua","bulldog","french-bulldog","pug",
@@ -575,8 +591,23 @@ function fitReason(breed: { name: string; score: number; slug: string }, answers
 // ── Component ─────────────────────────────────────────────────────────────────
 
 const ALL_BREEDS = breeds.filter((b) => !b.draft);
-const THRESHOLD = 90;
+// Resolved-threshold ladder replaces the old hard THRESHOLD = 90. That constant
+// could leave every breed under the line, so the user reached the end with zero
+// dogs. We walk the ladder and take the first rung that yields at least
+// MIN_RESULTS breeds; if even the lowest rung falls short, resolveThreshold()
+// floors to the MIN_RESULTS-th best score, so the result set is never empty.
+// (Job A, 22 Aug 2026.)
+const LADDER = [90, 80, 70, 60, 50, 40] as const;
+const MIN_RESULTS = 3;
 const MAX_RESULTS = 8;
+
+// sorted must be in descending score order.
+function resolveThreshold(sorted: { score: number }[]): number {
+  for (const t of LADDER) {
+    if (sorted.filter((b) => b.score >= t).length >= MIN_RESULTS) return t;
+  }
+  return sorted.length >= MIN_RESULTS ? sorted[MIN_RESULTS - 1].score : (sorted.at(-1)?.score ?? 0);
+}
 
 export default function ChumCalculator() {
   const [step, setStep] = useState(1); // 1..N = question index (1-based); step 1 = intent/welcome
@@ -604,7 +635,10 @@ export default function ChumCalculator() {
   const CORE_COUNT = 14;
   const coreAnswered = Object.keys(answers).filter(k => !k.startsWith("tb_") && k !== "stairs").length;
   const coreScored = ALL_BREEDS.map((breed) => ({ ...breed, score: scoreBreed(breed.slug, answers) })).sort((a, b) => b.score - a.score);
-  const coreVisible = coreAnswered >= 3 ? coreScored.filter(b => b.score >= THRESHOLD).length : ALL_BREEDS.length;
+  // One resolved threshold, shared by every call site below, so the live count
+  // and the final reveal never disagree. (Job A, 22 Aug 2026.)
+  const resolvedThreshold = resolveThreshold(coreScored);
+  const coreVisible = coreAnswered >= 3 ? coreScored.filter(b => b.score >= resolvedThreshold).length : ALL_BREEDS.length;
   // After core questions, show tiebreakers only if >5 breeds remain
   // Check if the visible breeds are dominated by small breeds -- trigger small-breed tiebreakers
   const smallSlugs = new Set(["chihuahua","yorkshire-terrier","miniature-schnauzer",
@@ -613,7 +647,7 @@ export default function ChumCalculator() {
     "maltese","maltipoo","cavachon","shih-tzu","cockapoo","italian-greyhound","poodle",
     "labradoodle","goldendoodle","french-bulldog","pug","bulldog","shih-tzu"]);
   const smallCount = coreAnswered >= 3
-    ? coreScored.filter(b => b.score >= THRESHOLD && smallSlugs.has(b.slug)).length
+    ? coreScored.filter(b => b.score >= resolvedThreshold && smallSlugs.has(b.slug)).length
     : 0;
   const needsTiebreakers = coreAnswered >= CORE_COUNT && coreVisible > 5;
   const total = needsTiebreakers ? QUESTIONS.length : CORE_COUNT;
@@ -629,7 +663,7 @@ export default function ChumCalculator() {
   }, [answers, answeredCount]);
 
   const thresholdActive = answeredCount >= 5;
-  const visibleBreeds = thresholdActive ? scoredBreeds.filter((b) => b.score >= THRESHOLD) : scoredBreeds;
+  const visibleBreeds = thresholdActive ? scoredBreeds.filter((b) => b.score >= resolvedThreshold) : scoredBreeds;
 
   // Best fit -- rank 1 only, and only when 20+ points clear of rank 2
   const top2 = visibleBreeds.slice(0, 2);
@@ -906,10 +940,9 @@ export default function ChumCalculator() {
         {/* Finished -- heading only; results + start-again render below */}
         {finished && (
           <div style={{ textAlign: "center", padding: "8px 0 4px" }}>
-            <h2 className={styles.stepDoneTitle}>Here are your chum{visibleCount !== 1 ? "s" : ""}</h2>
             <p className={styles.stepDoneSub}>
               {visibleCount > 0
-                ? `${visibleCount} breed${visibleCount !== 1 ? "s" : ""} match your lifestyle`
+                ? `${visibleCount} breed${visibleCount !== 1 ? "s" : ""} match${visibleCount === 1 ? "es" : ""} your lifestyle`
                 : "No strong matches -- try relaxing your answers"}
             </p>
           </div>

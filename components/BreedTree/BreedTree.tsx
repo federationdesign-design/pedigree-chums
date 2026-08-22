@@ -13,7 +13,7 @@ import TrainingCard from "../TrainingCard/TrainingCard";
 import trainingDifficulty from "../../data/trainingDifficulty";
 import { ICONS } from "../CardDock/CardDock";
 import { bust } from "../../data/imgVersion";
-import { breedInfo } from "../../data/breedInfo";
+import { breedInfo, breedInfoLong } from "../../data/breedInfo";
 import breedTraits from "../../data/breed-info.json";
 import styles from "./BreedTree.module.css";
 import { BRAIN_PATH, BRAIN_ARTBOARD } from "../icons/brain";
@@ -531,6 +531,12 @@ type Node = HierarchyCircularNode<LineageNode>;
 // half-size circle inside its parent, which reads as "this dog, plus the one
 // other dog". The empty half IS the parent.
 //
+// 19 August 2026: an experiment to DRAW both circles was reverted, and the
+// eleven ROOT-level self-repeats were removed from the data (each level now
+// carries its own name on the outer ring, so those did not need drawing at all).
+// The echoes that remain are the deeper sub-ring self-duplicates, which keep an
+// intermediate stock name visible one or more rings down; those stay hidden.
+//
 // It is skipped in two places and only two: the drawing, and the pop that turns
 // children into physics bodies.
 function isEcho(d: Node): boolean {
@@ -680,6 +686,10 @@ const POP_GROW = 1.5;
 const POP_MIN_PX = 50;
 const BOMB_BURST_MS = 180;    // the squash-and-snap before the blast fires
 const BOMB_CHAIN_MS = 25;     // gap between each object going up in the chain
+// ROUND WON sweep: the gap between each remaining prop popping, nearest-first.
+// Halved from 90 on 19 August 2026 because the sweep read as slow. The chain's
+// returned duration is targets.length * this, so the two must stay in step.
+const WON_CHAIN_STEP_MS = 45;
 const rollBomb = () => Math.random() < 1 / BOMB_ODDS;
 // Owner ruling (badge sizing): every badge is BADGE_FRAC of ITS OWN dog's drawn
 // radius (nodeR * k), so a big circle carries a big disc and a deep small one a
@@ -3644,7 +3654,8 @@ export default function BreedTree({
         (kind === "rod" ? setDeadRods : kind === "toy" ? setDeadToys : setDeadPills)((prev) => new Set(prev).add(pr.idx));
       };
       // ROUND WON chain: every remaining prop explodes nearest-first from the
-      // final circle's resting spot, 90ms apart (the bomb's chain, mini-pit cut)
+      // final circle's resting spot, WON_CHAIN_STEP_MS apart (the bomb's chain,
+      // mini-pit cut)
       chainRef.current = (ox: number, oy: number) => {
         const targets: { x: number; y: number; go: () => void }[] = [];
         for (const b of all) {
@@ -3657,9 +3668,9 @@ export default function BreedTree({
         const du = (uiBodiesRef.current as any[] | null)?.find((u) => u.kind === "desc");
         if (du && du.mb) targets.push({ x: du.x, y: du.y, go: () => { poofAt(du.x, du.y, performance.now()); Composite.remove(world, du.mb); setDescGone(true); } });
         targets.sort((a, b2) => Math.hypot(a.x - ox, a.y - oy) - Math.hypot(b2.x - ox, b2.y - oy));
-        targets.forEach((t, i) => window.setTimeout(t.go, i * 90));
+        targets.forEach((t, i) => window.setTimeout(t.go, i * WON_CHAIN_STEP_MS));
         wake();
-        return targets.length * 90;
+        return targets.length * WON_CHAIN_STEP_MS;
       };
       // ---- toys: tennis ball and Union Jack, main pit physics verbatim ----
       const BIGT = 84 * (window.matchMedia("(max-width: 768px)").matches ? 0.67 : 1);
@@ -5123,6 +5134,10 @@ export default function BreedTree({
   // The caption follows the hovered circle when there is one, so you can read a
   // breed's note just by pointing at it, and falls back to the focused circle.
   const shown = hovered ?? focus;
+  // Hovering shows the short write-up; clicking into a circle shows the extended
+  // one. hovered is non-null only while the pointer is over a circle, so a null
+  // hovered with shown back on focus means the user has clicked in, not pointed.
+  const isFocused = hovered === null && shown === focus;
   const shownShare = shown.parent
     ? Math.round(((shown.value ?? 0) / (shown.parent.value || 1)) * 100)
     : null;
@@ -5704,7 +5719,7 @@ export default function BreedTree({
                   onMouseEnter={hidden || frozen ? undefined : () => {
                     if (touchRef.current) return; // touch drives this from the tap
                     setHovered(d);
-                    setHoverHint("tap to zoom and learn");
+                    setHoverHint(`tap to learn more about ${d.data.name}`);
                   }}
                   onMouseLeave={hidden || frozen ? undefined : (e) => {
                     // Ignore the mouseleave the blue box triggers when its own
@@ -5736,7 +5751,7 @@ export default function BreedTree({
                       if (rn && rn !== d && d.descendants().includes(rn)) return;
                     }
                     setHovered((h) => (h === d ? null : h));
-                    setHoverHint((s) => (s === "tap to zoom and learn" ? "" : s));
+                    setHoverHint((s) => (s.startsWith("tap to learn more about") ? "" : s));
                   }}
                   onClick={
                     // `frozen` used to swallow this outright, and frozen is
@@ -5902,6 +5917,15 @@ export default function BreedTree({
                     userSelect: "none",
                   }}
                 >
+                  {/* 19 August 2026: a depth-0 root-ring label was added here and
+                      removed the same day. It named the level on the outer ring
+                      back when a single child filled the ring, but the two-circle
+                      display device (data/lineage.ts) now names every level
+                      through its own circles, so the label was redundant. Parked
+                      on the top rim it also collided with the packing: on tight
+                      levels like Old Highland terriers it ran behind the top
+                      circle and was cut off mid-word. Its rim transform in the rAF
+                      was removed with it. */}
                   {isInside && !(dropped && d.depth === 1) && (
                     (() => {
                       // Contain the label in its own circle. On mobile zoomTo
@@ -6606,7 +6630,9 @@ export default function BreedTree({
                   <text
                     className={styles.autoLabel}
                     x={0}
-                    y={half + 18 * upp}
+                    // 18 Aug 2026: nudged down another 10px (18 to 28), stacking
+                    // on the earlier 10px move in e984ef95.
+                    y={half + 28 * upp}
                     textAnchor="middle"
                     dominantBaseline="text-before-edge"
                     style={{ fontSize: `${24 * upp}px`, strokeWidth: `${2 * upp}px` }}
@@ -6818,6 +6844,13 @@ export default function BreedTree({
             const titleFs = winW <= 640
               ? Math.min(Math.max(0.9 * 16, 5 * vw), 1.6 * 16)
               : Math.min(Math.min(Math.max(0.832 * 16, 2 * vw), 1.808 * 16), tp / 2.15);
+            // Two lines when the hint carries a breed name: "tap to learn more
+            // about" on line one, the name on line two. The static "start
+            // playing" has no name, so it stays a single line.
+            const NAME_PREFIX = "tap to learn more about";
+            const hasName = text.startsWith(NAME_PREFIX) && text.length > NAME_PREFIX.length;
+            const line1 = hasName ? NAME_PREFIX : text;
+            const line2 = hasName ? text.slice(NAME_PREFIX.length).trim() : null;
             return (
               <text
                 className={styles.autoLabel}
@@ -6830,9 +6863,23 @@ export default function BreedTree({
                 // CONTRAST (on record, no fallback by request 14 Aug 2026): ~13:1 over the
                 // blue body gradient where this line sits, but a DARK themed level
                 // background could drop it below AA. If dark themes spread, revisit.
-                style={{ fontSize: `${titleFs * upp}px`, fill: "#000000", stroke: "none" }}
+                // REVERSED 18 Aug 2026: the no-outline decision is undone. Black on the
+                // dark wood band was hard to read, and this line is the static "start
+                // playing" on touch, so it affected phone users by default. Black fill
+                // kept, but a white stroke added so it reads over both the blue sky and
+                // the dark wood band. strokeWidth matches the start-screen captions'
+                // 24-font-to-2-stroke ratio; .autoLabel already sets paint-order stroke
+                // and stroke-linejoin round.
+                // REVERSED AGAIN 18 Aug 2026: the outline is flipped to white fill with
+                // a black stroke, and the size is doubled again (1.12 to 2.24) for
+                // legibility. strokeWidth still carries the same 12:1 ratio.
+                // LINE SPACING: Luckiest Guy's visible cap height is about 0.6 of the
+                // em, so a dy of 1.05em reads as roughly 1.4 line spacing against the
+                // ink; 0.67em is the value that reads as about 0.9.
+                style={{ fontSize: `${titleFs * 2.24 * upp}px`, fill: "#ffffff", stroke: "#000000", strokeWidth: (titleFs * 2.24 * upp) / 12 }}
               >
-                {text}
+                <tspan x={x}>{line1}</tspan>
+                {line2 !== null ? <tspan x={x} dy="0.67em">{line2}</tspan> : null}
               </text>
             );
           })()}
@@ -7277,7 +7324,7 @@ export default function BreedTree({
             </span>
           )}
           <p className={styles.cNote}>
-            {ancestryFor ? ancestryFor.note : breedInfo[shown.data.name] || (shown.depth === 0 && rootNote ? rootNote : shown.data.note)}
+            {ancestryFor ? ancestryFor.note : (isFocused && breedInfoLong[shown.data.name]) || breedInfo[shown.data.name] || (shown.depth === 0 && rootNote ? rootNote : shown.data.note)}
             {/* the mini pit drops the "keep digging" prompt: in LEARN mode the
                 circles are the whole point, so the nudge is noise */}
             {!dockAside && shown.children ? " Tap a circle inside to keep digging." : ""}

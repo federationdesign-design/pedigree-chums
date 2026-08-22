@@ -22,7 +22,7 @@ import SheetSync from '../dev/SheetSync';
 // helper + registry + page-bios are lightweight (no chatbot engine), so the launcher stays cheap.
 import type { AutoAppear } from './PickAChumExperience';
 import { canDogAppear, isDismissed, markDismissed, unfoundGameHint, appearanceForRoute, pickMisread, type DogAppearance } from './dogAppearance';
-import { CHAT_KEY, PROTECTED_FLAG } from './pcKeys';
+import { CHAT_KEY, PROTECTED_FLAG, HAS_SPOKEN } from './pcKeys';
 import { bioForRoute } from '../data/page-bios';
 import { getHiddenGamesEngine } from '../../../lib/hiddenGames/browserEngine';
 import { HAT_COUNTDOWN_LINES } from '../../../lib/hiddenGames/hatHunt';
@@ -45,10 +45,12 @@ const ICON_FRAMES = [
 const FRAME_MS = 200;
 const CYCLES = 3; // Task 97: play the four-frame sequence this many times on appearance, then rest
 const APPEAR_HOLD_MS = 2000; // Task (JS hold): wait this long after the logo becomes visible, then reveal
-// Task 148: the Terrier's unbidden lines. His two auto-appear pages carry OI_OI; a game find, ten
+// Task 148: the Terrier's unbidden lines. His two auto-appear pages now carry their OWN sequences (the
+// 'oi oi' opener + two page-specific follow-ups, in page-bios.ts), so the sequence path builds his chip
+// line from seq[0]; OI_OI is the shared fallback opener, kept in step with that seq[0]. A game find, ten
 // seconds on, carries HINT_OFFER. Both open MINIMISED (his chip), and section 2's suppression rule
 // (canDogAppear) is checked before either fires.
-const OI_OI = 'oi oi I know all about this page if you want help';
+const OI_OI = 'oi oi';
 // Task 150: the Boxer's confidently-wrong opener (his chip line). He is certain he knows what the page
 // is; the reveal (his misread) shows how wrong. PLACEHOLDER, pending owner rewrite.
 const BOXER_OPENER = 'oh! this page? i know this one. i know EXACTLY what this is';
@@ -104,8 +106,10 @@ export default function PickAChumLauncher() {
   const [terrierSay, setTerrierSay] = useState<string | null>(null);
   const openRef = useRef(open);
   const pathnameRef = useRef(pathname);
+  const autoAppearRef = useRef(autoAppear);
   openRef.current = open;
   pathnameRef.current = pathname;
+  autoAppearRef.current = autoAppear;
 
   // Restore focus to the launcher when the experience closes.
   useEffect(() => {
@@ -116,11 +120,36 @@ export default function PickAChumLauncher() {
   // Task 105: an open chat persists across navigation. If one was persisted (and not a protected
   // session -- the experience never writes those), reopen it on mount. This OVERRIDES the logo rule:
   // an open panel stays open even on a page where the launcher itself would be hidden.
+  // Task 180: reopen ONLY a chat the visitor actually spoke in (HAS_SPOKEN). Persistence no longer writes a
+  // bare un-engaged appearance, but this also refuses any stale bare-chip payload, so a monologue never
+  // reopens on the next page (and cannot suppress that page's own dog). A real conversation still follows.
   useEffect(() => {
     try {
-      if (window.sessionStorage.getItem('pc-chat')) setOpen(true);
+      if (window.sessionStorage.getItem(HAS_SPOKEN) && window.sessionStorage.getItem(CHAT_KEY)) setOpen(true);
     } catch {}
   }, []);
+
+  // Task 180 companion: an un-engaged appearance chip must not follow the visitor across a client-side
+  // navigation (a Link click, how people actually move). Gating persistence on HAS_SPOKEN stops a bare chip
+  // being restored on a remount, but a client nav keeps the same mounted panel, so it is dismissed here
+  // instead. On a real pathname CHANGE, if an unbidden appearance (autoAppear) is open and the visitor
+  // never spoke (no HAS_SPOKEN) and the session is not protected, close it -- so the next page shows its own
+  // dog fresh. A real conversation (HAS_SPOKEN) is deliberately left open to follow, per Task 105; a
+  // protected panel (a disclosure was made) is never force-closed. navRef tracks the last-seen route so
+  // this fires only on an actual navigation, not the initial mount.
+  const navRef = useRef(pathname);
+  useEffect(() => {
+    if (navRef.current === pathname) return;
+    navRef.current = pathname;
+    if (!openRef.current || !autoAppearRef.current) return; // only an open, unbidden-appearance panel
+    try {
+      if (window.sessionStorage.getItem(HAS_SPOKEN) || window.sessionStorage.getItem(PROTECTED_FLAG)) return;
+    } catch {
+      return;
+    }
+    setOpen(false);
+    setAutoAppear(null);
+  }, [pathname]);
 
   // Task 105: an explicit close (X / Escape) clears the persisted chat, so a deliberately-closed panel
   // does not reopen on the next page. (Navigating with it open keeps the key and reopens it.)
@@ -319,19 +348,21 @@ export default function PickAChumLauncher() {
     return () => io.disconnect();
   }, [shown, pathname, open, appear]);
 
-  // Task 151 Case A: on /hot-dogs, decide the thread pickup purely by whether a chat exists (brief
-  // section 3). Chat present -> hand /hot-dogs to the experience so the Labrador speaks from the chip;
-  // no chat -> null, and the Case B arrival appearance above handles it instead. Never into a protected
-  // session: a child who disclosed something and then followed a link must not have a dog start chatting.
+  // Task 151 Case A: on /hot-dogs, decide the thread pickup by whether the VISITOR HAS ACTUALLY SPOKEN
+  // (HAS_SPOKEN), not merely whether a session exists. Task 176 fix: CHAT_KEY is set by any dog session --
+  // including an unbidden appearance the visitor never replied to -- so it made the pickup ("you made it,
+  // I got here first...") fire at a first-time visitor. HAS_SPOKEN is set only once a 'user' message
+  // exists. Spoken -> hand /hot-dogs to the experience so the Labrador picks up the thread; not spoken ->
+  // null (the Case B arrival appearance handles a truly fresh visitor). Never into a protected session.
   useEffect(() => {
     if ((pathname ?? '') !== LAB_HOTDOG_ROUTE) {
       setPickupRoute(null);
       return;
     }
     try {
-      const hasChat = !!window.sessionStorage.getItem(CHAT_KEY);
+      const hasSpoken = !!window.sessionStorage.getItem(HAS_SPOKEN);
       const wasProtected = !!window.sessionStorage.getItem(PROTECTED_FLAG);
-      setPickupRoute(hasChat && !wasProtected ? LAB_HOTDOG_ROUTE : null);
+      setPickupRoute(hasSpoken && !wasProtected ? LAB_HOTDOG_ROUTE : null);
     } catch {
       setPickupRoute(null);
     }

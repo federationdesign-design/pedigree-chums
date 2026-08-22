@@ -43,7 +43,7 @@ const { skipTheatre, buildTypingPlan, TYPING_PROFILES, THEATRE_MAX_MS, isTypoEli
 );
 const { buildRow, buildProtectedMarker, buildAppearanceRow, enrichRows, detectRephrase, buildSessions, isLaugh } = await import(pathToFileURL(join(ROOT, 'app/pick-a-chum/dev/recorder-store.ts')).href);
 const { isNoSubjectFallback, redact, ingest, onProtected, rankedItems, emptyStore, newSessionState } = await import(pathToFileURL(join(ROOT, 'app/pick-a-chum/dev/gap-log.ts')).href);
-const { recorderEnabled, fetchSheetSyncEnabled } = await import(pathToFileURL(join(ROOT, 'app/pick-a-chum/lib/turn-tap.ts')).href);
+const { recorderEnabled, fetchSheetSyncEnabled, RECORD_EVERY_VISITOR_TEMP } = await import(pathToFileURL(join(ROOT, 'app/pick-a-chum/lib/turn-tap.ts')).href);
 const { applyProtection, newGuard } = await import(pathToFileURL(join(ROOT, 'app/pick-a-chum/dev/session-protection.ts')).href);
 const { SyncBuffer } = await import(pathToFileURL(join(ROOT, 'app/pick-a-chum/dev/sheet-sync-buffer.ts')).href);
 const { SAFETY_TRIGGER_PHRASES } = await import(pathToFileURL(join(LIB, 'safety.ts')).href);
@@ -95,11 +95,13 @@ check('Where is the Name Generator?', { layer: 3, bucket: 'B03', action: 'link' 
 check('Show me Know Your Chum', { layer: 3, bucket: 'B03', action: 'link' }, { destinationId: 'DST006' });
 check('How do I play?', { layer: 3, bucket: 'B02', action: 'rules_answer' });
 check('Do I need to own a dog?', { layer: 4, bucket: 'B04', action: 'faq_answer' });
-// FAQ011 fills {{competition_close_date}} at render, mirroring the /chumspot page.
+// Task 176: FAQ011 now DEFERS to the ChumSpot page ("got to this page" + the /chumspot link). The close
+// date and eligibility/guardian wording are compliance copy that lives on that page, not inline here.
 check('How do I enter the competition?', { layer: 4, bucket: 'B04', action: 'faq_answer' }, {
-  assert: (_r, resp) => {
+  assert: (r, resp) => {
     if (resp.text.includes('{{')) return 'unfilled template token in answer';
-    return /\b\d{1,2} [A-Z][a-z]+ \d{4}\b/.test(resp.text) ? null : 'expected a resolved close date (e.g. "31 July 2026")';
+    if (r.faqId !== 'FAQ011') return `not FAQ011: ${r.faqId}`;
+    return resp.url === '/chumspot' && !/\d{4}/.test(resp.text) ? null : `expected the ChumSpot deferral (no inline date), got "${resp.text}" url=${resp.url}`;
   },
 });
 check('Tell me about working dogs.', { layer: 5, bucket: 'B05', action: 'link' });
@@ -317,7 +319,7 @@ const t10outcome = (input, r, resp) => buildRow({ sessionId: 's', turn: 1, activ
 });
 // Part B regression guard: these keep their FAQ and still report 'answered'. If any
 // changes, the threshold is too aggressive: narrow it, do not adjust the assertion.
-check('how many people can play', { bucket: 'B04', action: 'faq_answer' }, { assert: (r, resp) => (r.faqId !== 'FAQ001' ? `not FAQ001: ${r.faqId}` : t10outcome('how many people can play', r, resp) === 'answered' ? null : 'not answered') });
+check('how many people can play', { bucket: 'B04', action: 'faq_answer' }, { assert: (r, resp) => (r.faqId !== 'FAQ005' ? `Task 176 audit: now FAQ005, not FAQ001: ${r.faqId}` : t10outcome('how many people can play', r, resp) === 'answered' ? null : 'not answered') });
 check('whats in the pack', { bucket: 'B04', action: 'faq_answer' }, { assert: (r, resp) => (r.faqId !== 'FAQ004' ? `not FAQ004: ${r.faqId}` : t10outcome('whats in the pack', r, resp) === 'answered' ? null : 'not answered') });
 check('what do you do when a dog barks', { bucket: 'B04', action: 'faq_answer' }, { assert: (r, resp) => (r.faqId !== 'FAQ001' ? `not FAQ001: ${r.faqId}` : t10outcome('what do you do when a dog barks', r, resp) === 'answered' ? null : 'not answered') });
 
@@ -328,7 +330,7 @@ check('what is this', { action: 'orientation', bucket: 'B15' });
 check('what is this dog', { bucket: 'B05', action: 'breed_hub' }, { assert: (r) => (r.action === 'orientation' ? 'exact orientation match leaked to a longer input' : null) });
 // (b) bare "help" -> the approved BARE_HELP clarifier (same line "can you help me"
 // gets); "help me find a labrador" is unchanged (already that clarifier).
-check('help', { action: 'clarifier' }, { assert: (r, resp) => (r.moderationId === 'MOD_BARE_HELP' && resp.text.toLowerCase().includes('worrying you') ? null : `not the bare-help clarifier: ${r.moderationId}`) });
+check('help', { action: 'clarifier' }, { assert: (r, resp) => (r.moderationId === 'MOD_BARE_HELP' && resp.text.toLowerCase().includes('help with something on the site') ? null : `not the bare-help clarifier: ${r.moderationId}`) });
 check('help me find a labrador', { action: 'clarifier' }, { assert: (r) => (r.moderationId === 'MOD_BARE_HELP' ? null : `changed from bare-help clarifier: ${r.moderationId}`) });
 
 // ---- Task 13/28: a QUESTION naming the bark game now reaches the explanation (Task 28a),
@@ -352,11 +354,13 @@ check('is it for kids', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) =
 check('do you have any games', { bucket: 'B17', action: 'offer_bark_game' });
 check('how does it work', { bucket: 'B15', action: 'orientation' }); // already recovered by Task 9 orientation
 // no games-catalogue answer exists, so this stays honestly unmatched:
-check('what games are there', { bucket: 'B06', action: 'gk_unknown' });
+// Task 176 audit: "what games are there" now reaches the games MENU (the chat games exist to list), where
+// it used to be deliberately unmatched (there was no catalogue).
+check('what games are there', { bucket: 'B45', action: 'games_menu' });
 // Regression guard: the meta-route sits above FAQ/GK, so these must NOT change bucket.
 check('how much is the game', { bucket: 'B04', action: 'price_answer' }); // Task 49: price -> FAQ008 in chat, was open_discount_popup
 check('whats in the pack', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ004' ? null : `not FAQ004: ${r.faqId}`) });
-check('how many people can play', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ001' ? null : `not FAQ001: ${r.faqId}`) });
+check('how many people can play', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ005' ? null : `Task 176 audit: now FAQ005, not FAQ001: ${r.faqId}`) });
 check('what do you do when a dog barks', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ001' ? null : `not FAQ001: ${r.faqId}`) });
 check('what is a labrador', { bucket: 'B05', action: 'breed_page' });
 check('where do I buy it', { bucket: 'B01', action: 'open_discount_popup' });
@@ -538,7 +542,7 @@ check('im in trouble', { layer: 1, action: 'safety_signpost' }, { assert: (_r, r
 check('I think I might drunk drive later', { layer: 1, action: 'safety_boundary' }, { assert: (_r, resp) => (resp.text.includes('999') ? null : 'expected 999') });
 check("What's your advice on drink-driving?", { layer: 1, action: 'safety_boundary' });
 check('poison the dog', { layer: 1, action: 'safety_boundary' }, { assert: (_r, resp) => (resp.text.includes('RSPCA') ? null : 'expected RSPCA') });
-check('help me', { layer: 1, action: 'clarifier' }, { assert: (_r, resp) => (resp.text.toLowerCase().includes('worrying you') ? null : 'expected clarifier line') });
+check('help me', { layer: 1, action: 'clarifier' }, { assert: (_r, resp) => (resp.text.toLowerCase().includes('help with something on the site') ? null : 'expected clarifier line') });
 // Collisions resolved by longest match, not first category:
 check('I am not safe', { action: 'safety_signpost' }, { assert: (r) => (r.moderationId === 'MOD_GENERAL_DISTRESS' ? null : `not-safe misrouted to ${r.moderationId}`) });
 check('can someone help me', { action: 'safety_signpost' }, { assert: (r) => (r.moderationId === 'MOD_GENERAL_DISTRESS' ? null : `plea misrouted to ${r.moderationId}`) });
@@ -591,11 +595,21 @@ for (const inp of [
 // Regression guard: the complaint route sits above FAQ, so it is greedy. These six
 // product / pack questions must NOT move bucket into the complaint route.
 check('whats in the pack', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ004' ? null : `pack contents moved: ${r.faqId ?? r.action}`) });
-check('how many cards', { bucket: 'B02', action: 'rules_answer' });
-check('are the cards child friendly', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ004' ? null : `child-safety moved: ${r.faqId ?? r.action}`) });
-check('what are the cards made of', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ004' ? null : `materials moved: ${r.faqId ?? r.action}`) });
+check('how many cards', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ004' ? null : `Task 176 audit: "how many cards" is FAQ004 now (removed from RULES): ${r.faqId}`) });
+// Task 175 §5: these two got the "54 cards" FAQ004 blurb via a lone 'cards' token -- a confident WRONG
+// answer (FAQ004 addresses neither child-safety nor materials). With the companion-token rule they now
+// MISS instead (there is no child-safety / materials FAQ; a future workbook FAQ is the real fix). Per §5 a
+// miss beats a mis-answer. Still not the complaint route, which was the original point of this guard.
+check('are the cards child friendly', { action: 'fallback' }, { assert: (r) => (r.faqId === undefined ? null : `child-safety should miss, not mis-answer: ${r.faqId}`) });
+check('what are the cards made of', { action: 'gk_unknown' }, { assert: (r) => (r.faqId === undefined ? null : `materials should miss, not mis-answer: ${r.faqId}`) });
 check('where can I buy the game', { bucket: 'B01', action: 'open_discount_popup' });
 check('is there any plastic in the packaging', { bucket: 'B13', action: 'fallback' });
+// Task 175 §5 guards: a lone overloaded container token no longer wins the "54 cards" answer; only a real
+// contents question does.
+check('a pack of dogs', {}, { assert: (r) => (r.faqId !== 'FAQ004' ? null : 'a pack of dogs got the 54-cards answer') });
+check('the cards', {}, { assert: (r) => (r.faqId !== 'FAQ004' ? null : 'bare "the cards" got the 54-cards answer') });
+check('think outside the box', {}, { assert: (r) => (r.faqId !== 'FAQ004' ? null : 'box idiom got the 54-cards answer') });
+check('whats in the pack', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ004' ? null : `real contents question must keep FAQ004: ${r.faqId}`) });
 
 // ---- Task 18: complaint route repointed to FAQ015; FAQ012 stays the general enquiry
 // answer. These six must reach exactly what they reached before the repoint. The one to
@@ -604,8 +618,8 @@ check('is there any plastic in the packaging', { bucket: 'B13', action: 'fallbac
 check('how do I contact you', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ012' ? null : `contact enquiry moved off FAQ012: ${r.faqId ?? r.action}`) });
 check('whats your email', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ012' ? null : `not FAQ012: ${r.faqId}`) }); // Task 25a: moved from gk_unknown to the FAQ012 general enquiry answer
 check('whats in the pack', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ004' ? null : `pack moved: ${r.faqId}`) });
-check('are the cards child friendly', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ004' ? null : `child-safety moved: ${r.faqId}`) });
-check('how many cards', { bucket: 'B02', action: 'rules_answer' });
+check('are the cards child friendly', { action: 'fallback' }, { assert: (r) => (r.faqId === undefined ? null : `Task 175 §5: child-safety should miss now, not mis-answer: ${r.faqId}`) });
+check('how many cards', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ004' ? null : `Task 176 audit: "how many cards" is FAQ004 now (removed from RULES): ${r.faqId}`) });
 check('where can I buy the game', { bucket: 'B01', action: 'open_discount_popup' });
 
 // ---- Task 20: personal-sadness pair. L1 gentle redirect (no latch); L2 enters PROTECTED_ACTIVE ----
@@ -909,6 +923,22 @@ for (const q of ['Who is your owner?', 'Do you have an owner?', 'Who owns you?']
 // A non-greeting is unaffected (still library-served, no mirror).
 check('how much is it', { action: 'price_answer' }, { assert: (_r, resp) => resp.responseId !== 'B09-MIRROR' ? null : 'non-greeting was mirrored' });
 check('tell me about labradors', { action: 'breed_page' }, { assert: (_r, resp) => resp.responseId !== 'B09-MIRROR' ? null : 'non-greeting was mirrored' });
+// Task 175 §6: mistyped hellos are caught (curated variant set + edit-distance-1 last resort) and greeted
+// back, instead of falling to "im a dog" (and, three in a row, a history diversion).
+for (const inp of ['hui', 'hioo', 'ji', 'hiyu', 'hoya', 'hihi', 'helli']) {
+  check(inp, { action: 'converse', bucket: 'B09' }, { assert: (_r, resp) => resp.responseId === 'B09-MIRROR' ? null : `mistyped hello not caught: ${resp.responseId}` });
+}
+// The danger words a fuzzy greeting must NOT swallow ('yo' is deliberately not a fuzzy anchor).
+for (const inp of ['no', 'so', 'go', 'do', 'ok', 'yes']) {
+  check(inp, {}, { assert: (_r, resp) => resp.responseId !== 'B09-MIRROR' ? null : `"${inp}" was wrongly greeted` });
+}
+// Task 175 §6: a run of lone nonsense tokens never trips the history diversion; each stays "im a dog".
+(() => {
+  const s = newSession();
+  for (const inp of ['hjdihi', 'zxcvq', 'mnbvq']) {
+    check(inp, {}, { session: s, assert: (_r, resp) => resp.responseId !== 'DIVERSION-01' && resp.responseId !== 'DIVERSION-02' ? null : `lone token tripped a diversion: ${resp.responseId}` });
+  }
+})();
 
 // ---- No dog speaks before the visitor ----
 (() => {
@@ -1293,8 +1323,14 @@ await (async () => {
   try {
     delete globalThis.window; // no window (SSR) -> off
     const offNoWin = (await fetchSheetSyncEnabled()) === false;
-    setWin(''); setFetch(() => jsonRes({ enabled: true })); fetchCalls = 0; // window, no ?rec=1 -> off, no fetch
-    const offNoFlag = (await fetchSheetSyncEnabled()) === false && fetchCalls === 0;
+    // With RECORD_EVERY_VISITOR_TEMP on (the testing-window flag), a visitor WITHOUT ?rec=1 is recorded
+    // too, so the gate fetches the runtime config and follows it (on when enabled). With the flag off it
+    // is the normal ?rec=1 gate: off, and no fetch at all. Assert whichever the flag currently selects.
+    setWin(''); setFetch(() => jsonRes({ enabled: true })); fetchCalls = 0;
+    const noFlag = await fetchSheetSyncEnabled();
+    const offNoFlag = RECORD_EVERY_VISITOR_TEMP
+      ? (noFlag === true && fetchCalls === 1)
+      : (noFlag === false && fetchCalls === 0);
     setWin('?rec=1'); setFetch(() => jsonRes({ enabled: true })); // ?rec=1 + enabled -> on
     const onBoth = (await fetchSheetSyncEnabled()) === true;
     setFetch(() => jsonRes({ enabled: false })); // ?rec=1 + disabled -> off
@@ -1434,7 +1470,7 @@ for (const q of ['your email', 'whats your email', 'what is your email'])
   script.forEach((inp, i) => {
     check(inp, {}, { session: s, assert: (r, resp) => {
       if (r.faqId !== 'FAQ015') return `turn ${i + 1} left the complaint: ${r.faqId ?? r.action}`;
-      const full = resp.text.includes('That needs a person, not a dog');
+      const full = resp.text.includes('That needs a human, not a dog');
       const short = resp.text.includes('Put that in the email too and someone will look at it');
       if (i === 0) return full ? null : 'turn 1 was not the full answer';
       return short ? null : `turn ${i + 1} was not the short repeat: "${resp.text.slice(0, 40)}"`;
@@ -1444,16 +1480,16 @@ for (const q of ['your email', 'whats your email', 'what is your email'])
 // 25b: a clear topic change ends the complaint context, so the next complaint is full again.
 (() => {
   const s = newSession();
-  check('I have a complaint', {}, { session: s, assert: (_r, resp) => (resp.text.includes('That needs a person, not a dog') ? null : 'first complaint not the full answer') });
+  check('I have a complaint', {}, { session: s, assert: (_r, resp) => (resp.text.includes('That needs a human, not a dog') ? null : 'first complaint not the full answer') });
   check('how do I play?', { action: 'rules_answer' }, { session: s }); // clear topic change
-  check('I have a complaint', {}, { session: s, assert: (_r, resp) => (resp.text.includes('That needs a person, not a dog') ? null : 'complaint context did not reset to the full answer') });
+  check('I have a complaint', {}, { session: s, assert: (_r, resp) => (resp.text.includes('That needs a human, not a dog') ? null : 'complaint context did not reset to the full answer') });
 })();
 // The six existing complaint-route guards still hold (email now FAQ012 per 25a).
 check('how do I contact you', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ012' ? null : `contact moved: ${r.faqId}`) });
 check('whats your email', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ012' ? null : `email moved: ${r.faqId}`) });
 check('whats in the pack', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ004' ? null : `pack moved: ${r.faqId}`) });
-check('are the cards child friendly', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ004' ? null : `child-safety moved: ${r.faqId}`) });
-check('how many cards', { bucket: 'B02', action: 'rules_answer' });
+check('are the cards child friendly', { action: 'fallback' }, { assert: (r) => (r.faqId === undefined ? null : `Task 175 §5: child-safety should miss now, not mis-answer: ${r.faqId}`) });
+check('how many cards', { bucket: 'B04', action: 'faq_answer' }, { assert: (r) => (r.faqId === 'FAQ004' ? null : `Task 176 audit: "how many cards" is FAQ004 now (removed from RULES): ${r.faqId}`) });
 check('where can I buy the game', { bucket: 'B01', action: 'open_discount_popup' });
 
 // ---- Task 26: the general-distress signpost (first variant) uses "safe grown-up", not
@@ -1509,7 +1545,7 @@ const hasUnresolvedTok = (t) => /\[|\]|\{\{|\}\}|\bundefined\b|\bnull\b/.test(t)
 (() => {
   const s = newSession();
   const turns = [
-    ['whats the thing with the cards', 'faq_answer', null],
+    ['whats the thing with the cards', 'gk_unknown', null], // Task 175 §5: vague, not a contents question -> a miss (Cards? loop), not the 54-cards answer
     ['no not that', 'fallback', 'B40-NOSUBJECT-01'],
     ['I mean the pictures on them', 'fallback', 'B40-NOSUBJECT-01'],
     ["you're not understanding me", 'fallback', 'DIVERSION-01'], // Task 142: 3rd in a row -> ONE diversion
@@ -1898,12 +1934,12 @@ check('my dog is old and unwell', { action: 'grief' }, { assert: (r) => r.griefC
   check('game', { action: 'fallback' }, { session: s, assert: (_r, resp) => resp.responseId === 'LOOP-02' ? null : `not LOOP-02: ${resp.responseId}` });
   check('yes', { action: 'rules_answer' }, { session: s });
 })();
-// A "no" after the repeat clears the pending offer; "no" carries no candidate, so the turn serves
-// B40 "im a dog" (Task 79: no ladder to advance).
+// Task 175: a "no" to the offer now DECLINES gracefully -- an existing B15 "what next" line -- instead
+// of falling through to B40 "im a dog" (being turned down is normal). The pending offer still clears.
 (() => {
   const s = newSession();
   check('game', { action: 'fallback' }, { session: s }); // LOOP-01, pendingConfirm "game"
-  check('no', { action: 'fallback' }, { session: s, assert: (_r, resp, se) => resp.responseId === 'B40-NOSUBJECT-01' && se.pendingConfirm === null ? null : `no not handled: ${resp.responseId} conf=${se.pendingConfirm}` });
+  check('no', { action: 'canned' }, { session: s, assert: (_r, resp, se) => resp.responseId === 'B15-R04-v2' && se.pendingConfirm === null ? null : `no not declined: ${resp.responseId} conf=${se.pendingConfirm}` });
 })();
 // A dog subject confirms to the breed hub, so LOOP-01 "Dogs?" never invites a dead-end yes. (Uses a
 // gk_unknown dog question, since "why do dogs yawn" now answers from B31.)
@@ -1922,11 +1958,12 @@ check('my dog is old and unwell', { action: 'grief' }, { assert: (r) => r.griefC
 })();
 
 // ---- Task 69: route the "get" buying forms to commercial (product-word / commercial-topic gated) ----
-// The reported session: pack contents stays, "Yes them" is a loop turn, and the "where can I get
-// them" buying forms (product word "cards" present) now open the buy modal, not the FAQ004 blurb.
+// The reported session: the opening statement is a Cards? loop turn (Task 175 §5: a statement mentioning
+// cards is not a pack-contents question, so it no longer gets the FAQ004 blurb), "Yes them" is a loop
+// turn, and the "where can I get them" buying forms (product word "cards" present) open the buy modal.
 (() => {
   const s = newSession();
-  check('The cards I saw somebody playing with them', { action: 'faq_answer' }, { session: s, assert: (r) => r.faqId === 'FAQ004' ? null : `not FAQ004: ${r.faqId}` });
+  check('The cards I saw somebody playing with them', { action: 'fallback' }, { session: s, assert: (r) => r.faqId === undefined ? null : `Task 175 §5: a statement about cards must not get FAQ004: ${r.faqId}` });
   check('Yes them', {}, { session: s, assert: (_r, resp) => resp.responseId === 'B40-NOSUBJECT-01' ? null : `not the im-a-dog line: ${resp.responseId}` });
   check('The cards, where can I get them?', { action: 'open_discount_popup' }, { session: s });
   check("Yes, you've told me about the cards. I want to know where I can get them.", { action: 'open_discount_popup' }, { session: s });
@@ -1940,7 +1977,10 @@ check('where can I get help', { action: 'gk_unknown' }, { assert: (r) => r.actio
 // Product-word gate: a bare "get" form with no product word / commercial topic does NOT open the
 // modal (Task 69 tightening); a get verb + ANY product word does. The rule (not an enumeration)
 // covers game/cards/deck alike.
-check('where can I get it?', { action: 'gk_unknown' });
+// Task 175: a bare get-question with no product now asks "The card game?" (buy_clarify) rather than
+// refusing outright. It still never AUTO-opens the modal -- a following yes does -- so the Task 69 guard
+// (no product word must not open the buy modal) is intact.
+check('where can I get it?', { action: 'buy_clarify' });
 check('how do I get the cards', { action: 'open_discount_popup' }); // get verb + "cards"
 check('where can I get the game?', { action: 'open_discount_popup' }); // get verb + "game" (the gap the rule closes)
 check('where can I get the deck?', { action: 'open_discount_popup' }); // get verb + "deck"
@@ -1954,12 +1994,12 @@ check('where can I get the deck?', { action: 'open_discount_popup' }); // get ve
   check('I wa to know about dogs', {}, { session: s, assert: (_r, resp) => resp.responseId === 'LOOP-01' && resp.text === 'Dogs?' ? null : `t2 ${resp.responseId} "${resp.text}"` });
   check('yes', { action: 'breed_hub' }, { session: s });
 })();
-// Second session: a no after the repeat clears the offer and (no candidate in "no") serves B40.
+// Second session: a "no" after the repeat declines gracefully (Task 175: B15 "what next"), offer clears.
 (() => {
   const s = newSession();
   check('learn', {}, { session: s, assert: (_r, resp) => resp.responseId === 'B40-NOSUBJECT-01' ? null : `t1 ${resp.responseId}` });
   check('I wa to know about dogs', {}, { session: s, assert: (_r, resp) => resp.responseId === 'LOOP-01' && resp.text === 'Dogs?' ? null : `t2 ${resp.responseId} "${resp.text}"` });
-  check('no', {}, { session: s, assert: (r, resp) => resp.responseId === 'B40-NOSUBJECT-01' && r.action !== 'breed_hub' ? null : `t3 wrong: ${resp.responseId}/${r.action}` });
+  check('no', {}, { session: s, assert: (r, resp) => resp.responseId === 'B15-R04-v2' && r.action === 'canned' ? null : `t3 wrong: ${resp.responseId}/${r.action}` });
 })();
 // The repeat is once per run: two candidate turns in a row give LOOP-01 then LOOP-02 (offer), not
 // LOOP-01 twice. (Uses a gk_unknown dog question, since "why do dogs yawn" now answers from B31.)
@@ -2481,12 +2521,12 @@ check('cats', { action: 'canned', bucket: 'B21' }, { assert: (_r, resp) =>
   resp.responseId !== 'B21-CATS-01' ? `cats not B21-CATS-01: ${resp.responseId}`
     : resp.text !== 'Where?' ? `existing copy lost: "${resp.text}"`
       : resp.media?.src !== '/chat-media/cats.mp4' ? `cats clip not attached: ${JSON.stringify(resp.media)}` : null });
-// birthday -> ":)" + clip (any birthday mention). ":)" is the existing smile face, so it keeps that accessible name.
+// Task 176 (clip accessibility): birthday -> "party hat" (owner copy, verbatim) + clip. The words are
+// self-describing, so the ":)" smile SR label was dropped.
 for (const inp of ['its my birthday', 'when is your birthday', 'its my dads birthday', 'happy birthday']) {
   check(inp, { action: 'media_reply' }, { assert: (_r, resp) =>
-    resp.text !== ':)' ? `birthday text not ":)": "${resp.text}"`
-      : resp.media?.src !== '/chat-media/birthday.mp4' ? `birthday clip missing: ${JSON.stringify(resp.media)}`
-        : resp.ariaLabel !== 'the Collie smiles' ? `smile a11y label missing: ${resp.ariaLabel}` : null });
+    resp.text !== 'party hat' ? `birthday text not "party hat": "${resp.text}"`
+      : resp.media?.src !== '/chat-media/birthday.mp4' ? `birthday clip missing: ${JSON.stringify(resp.media)}` : null });
 }
 // car -> the B64 workbook row "yes" + clip (Task 141 moved it out of MEDIA_REPLIES).
 check('do you like going in the car', { action: 'canned', bucket: 'B64' }, { assert: (_r, resp) =>
@@ -2496,10 +2536,10 @@ check('do you like going in the car', { action: 'canned', bucket: 'B64' }, { ass
 check('can you lick your balls?', { action: 'canned', bucket: 'B52' }, { notAction: 'safety_boundary', assert: (_r, resp) =>
   resp.responseId !== 'COL-B52-MISC-09' ? `balls not B52-MISC-09: ${resp.responseId}`
     : resp.text !== 'Tennis balls?' ? `balls text wrong: "${resp.text}"` : resp.media?.src !== '/chat-media/ball.mp4' ? `ball clip missing: ${JSON.stringify(resp.media)}` : null });
-// hotdog -> the EXISTING FAQ007 answer, unchanged, with the clip joined.
+// Task 176: hotdog -> FAQ007 in the dog's own words ("a slightly different rule set"), with the clip joined.
 check('hot dogs', { action: 'faq_answer', bucket: 'B04' }, { assert: (r, resp) =>
   r.faqId !== 'FAQ007' ? `hotdog not FAQ007: ${r.faqId}`
-    : !resp.text.startsWith('Hot Dogs is a memory version') ? `FAQ007 answer changed: "${resp.text}"`
+    : resp.text !== 'a slightly different rule set' ? `FAQ007 answer wrong: "${resp.text}"`
       : resp.media?.src !== '/chat-media/hotdog.mp4' ? `hotdog clip missing: ${JSON.stringify(resp.media)}` : null });
 
 // Section 8: no Task 140 clip may surface inside a protected state (assert on served text/media).
@@ -2561,8 +2601,9 @@ check('why are there so many', { action: 'canned', bucket: 'B52' }, { destinatio
   check('I have a cocker spaniel', { action: 'breed_page' }, { session: s, url: '/chums/cocker-spaniel' });
   check('how long do they live', { action: 'breed_page' }, { session: s, url: '/chums/cocker-spaniel', assert: (r) => (r.bucket === 'B48' ? 'B48 hijacked the breed follow-up' : null) });
 })();
-// "how many people can play" stays FAQ001; "how many players" stays the card-game rules (both above canned).
-check('how many people can play', { action: 'faq_answer', bucket: 'B04' }, { assert: (r) => (r.faqId === 'FAQ001' ? null : `not FAQ001: ${r.faqId ?? r.bucket}`) });
+// Task 176 audit: "how many people can play" now reaches its OWN answer FAQ005 (was stolen by FAQ001 via
+// the 'play' token); "how many players" stays the card-game rules (both above canned).
+check('how many people can play', { action: 'faq_answer', bucket: 'B04' }, { assert: (r) => (r.faqId === 'FAQ005' ? null : `now FAQ005: ${r.faqId ?? r.bucket}`) });
 check('how many players', { action: 'rules_answer', bucket: 'B02' });
 
 // Section 8: no new-bucket answer (and no clip) may serve inside a protected state.
@@ -3392,6 +3433,135 @@ for (const input of REWORDED_MISSES) {
 check('asdfghjkl', { action: 'gibberish' });
 check('what is the capital of France', { action: 'gk_answer' });
 check('im in trouble', { layer: 1, action: 'safety_signpost' });
+
+// ==== Task 177: the Boxer's /about fact-loop (naming loop) ====
+// The loop is seeded by the experience at the /about appearance; here we seed a session by hand
+// (namingLoop { dog:'boxer', used:[0] } = misread #1 already shown) and drive replies through the real
+// engine. isFact / notFact assert the served line, since an advancing turn keeps its underlying action
+// (fallback / canned / ...) and only its response.text/responseId are overwritten to the fact.
+const isFact = (resp) => (/^BOX-ABOUT-FACT-\d+$/.test(resp.responseId ?? '') ? null : `expected a fact, got ${resp.responseId} "${resp.text}"`);
+const notFact = (resp) => (/^BOX-ABOUT-FACT-\d+$/.test(resp.responseId ?? '') ? `the loop SWALLOWED this: served fact "${resp.text}"` : null);
+const seedLoop = () => { const s = newSession('boxer'); s.route = '/about'; s.namingLoop = { dog: 'boxer', used: [0] }; return s; };
+
+// A filler reply draws the next fact. The owner's own examples: hello, ok, why, haha, a shrug.
+for (const filler of ['hello', 'ok', 'why', 'haha', 'lol', 'wow', 'more', 'go on', '🤷', 'k', 'hmm', 'asdfgh', 'tell me more']) {
+  check(filler, {}, { session: seedLoop(), assert: (_r, resp) => isFact(resp) });
+}
+// Task 181: ordinary short replies advance too -- every word is on the SAFE small-talk allow-list.
+for (const safe of ['me too', 'i like that', 'same here', 'so do i', 'keep going', 'i agree', 'what else', 'that is nice']) {
+  check(safe, {}, { session: seedLoop(), assert: (_r, resp) => isFact(resp) });
+}
+// Task 181: "no" / "nope" / "enough" tell the dog to stop -- they BREAK the loop, even as lone tokens.
+for (const stop of ['no', 'nope', 'enough']) {
+  check(stop, {}, { session: seedLoop(), assert: (_r, resp, s) => notFact(resp) || (s.namingLoop ? `"${stop}" did not stop the loop` : null) });
+}
+// Task 181: help-seeking reaches the shortened clarifier (never a silent break), and ends the loop.
+check('help', { action: 'clarifier' }, { session: seedLoop(), assert: (_r, resp, s) => notFact(resp) || (!/help with something on the site/i.test(resp.text) ? `clarifier text wrong: "${resp.text}"` : null) || (s.namingLoop ? 'loop survived help' : null) });
+check('help me', { action: 'clarifier' }, { session: seedLoop(), assert: (_r, resp) => notFact(resp) });
+
+// SAFETY, GRIEF, SADNESS and the HEALTH boundary WIN over the loop, and END it. This is the proof for
+// brief section 3: a disclosure mid-loop gets safeguarding, never fact seven.
+check('i want to kill myself', { action: 'safety_signpost' }, { session: seedLoop(), assert: (_r, resp, s) => notFact(resp) || (s.namingLoop ? 'loop survived a safety disclosure' : null) });
+check('someone is hurting me', { action: 'safety_signpost' }, { session: seedLoop(), assert: (_r, resp) => notFact(resp) });
+check('what is a penis', { action: 'anatomy_redirect' }, { session: seedLoop(), assert: (_r, resp) => notFact(resp) });
+check('my dog died', { action: 'grief' }, { session: seedLoop(), assert: (_r, resp) => notFact(resp) });
+check('im all alone', { action: 'safety_signpost' }, { session: seedLoop(), assert: (_r, resp) => notFact(resp) });
+check('can my dog eat chocolate', { action: 'health_answer' }, { session: seedLoop(), assert: (_r, resp) => notFact(resp) });
+
+// COMMERCE, RULES and the FAQ win over the loop (someone trying to buy is never stuck in it).
+check('how much is it', { action: 'price_answer' }, { session: seedLoop(), assert: (_r, resp) => notFact(resp) });
+check('i want to buy one', { action: 'open_discount_popup' }, { session: seedLoop(), assert: (_r, resp) => notFact(resp) });
+check('how do i play', { action: 'rules_answer' }, { session: seedLoop(), assert: (_r, resp) => notFact(resp) });
+check('what is in the pack', { action: 'faq_answer' }, { session: seedLoop(), assert: (_r, resp) => notFact(resp) });
+
+// DISMISSALS win and end the loop; the Boxer's own "stop" gag (note boxer_stop) also breaks it.
+check('go away', { action: 'dismiss' }, { session: seedLoop(), assert: (_r, resp, s) => notFact(resp) || (s.namingLoop ? 'go away did not end the loop' : null) });
+check('go to your bed', { action: 'dismiss' }, { session: seedLoop(), assert: (_r, resp) => notFact(resp) });
+check('stop', {}, { session: seedLoop(), assert: (r, resp) => (r.note === 'boxer_stop' ? notFact(resp) : `stop was not the boxer_stop gag: ${r.action}/${r.note}`) });
+
+// A coherent, sentence-shaped message in the catch-all zone is where a MISSED disclosure hides
+// ("i am being bullied", "why does my dad hit me" both fall to fallback/gk_unknown). It must NOT get a
+// cheerful fact: it breaks the loop and is answered normally, exactly as today.
+for (const sentence of ['i am being bullied', 'someone hurt me', 'a man is following me', 'why does my dad hit me', 'i hate myself']) {
+  check(sentence, {}, { session: seedLoop(), assert: (_r, resp, s) => notFact(resp) || (s.namingLoop ? `loop survived a multi-word miss: "${sentence}"` : null) });
+}
+
+// The loop does not resume: once a real reply breaks it, later filler is answered normally.
+(() => { const s = seedLoop(); check('go away', { action: 'dismiss' }, { session: s }); check('ok', {}, { session: s, assert: (_r, resp) => notFact(resp) }); })();
+
+// The full chain: nine filler replies draw facts #2..#10, none repeating (and none repeating the
+// appearance's #1, index 0), then the loop ends silently and the eleventh reply is normal.
+(() => {
+  const s = seedLoop(); // used = [0], i.e. misread #1 already shown
+  const served = [];
+  for (let i = 0; i < 9; i++) check(`ok ${i}`.slice(0, 2), {}, { session: s, assert: (_r, resp) => { served.push(resp.responseId); return isFact(resp); } });
+  check('distinct facts', {}, { session: newSession(), assert: () => (new Set(served).size === 9 && !served.includes('BOX-ABOUT-FACT-1') ? null : `chain not 9 distinct non-#1 facts: ${served.join(',')}`) });
+  check('after the tenth', {}, { session: s, assert: (_r, resp, sess) => (sess.namingLoop ? 'loop did not end after ten' : notFact(resp)) });
+})();
+
+// The loop is scoped: it never runs for another dog, another page, or inside a protected state.
+(() => { const s = newSession('collie'); s.route = '/about'; s.namingLoop = { dog: 'boxer', used: [0] }; check('ok', {}, { session: s, assert: (_r, resp) => notFact(resp) }); })();
+(() => { const s = seedLoop(); s.protectedState = 'active'; check('ok', {}, { session: s, assert: (_r, resp) => notFact(resp) }); })();
+
+// ==== Task 179: the Labrador's /hot-dogs food-naming loop (same mechanism, YES tier only) ====
+// Seeded by the experience at the /hot-dogs appearance / pickup; here we seed by hand. He names one YES
+// food per filler reply. YES_IDS is the ten food-yes rows -- the ONLY foods the loop may draw.
+const YES_IDS = new Set(data.labradorResponses.filter((r) => r.subtag === 'food-yes').map((r) => r.responseId));
+const isFood = (resp) => (YES_IDS.has(resp.responseId) ? null : `expected a YES food, got ${resp.responseId} "${resp.text}"`);
+const notFood = (resp) => (YES_IDS.has(resp.responseId) ? `the loop SWALLOWED this: served food "${resp.text}"` : null);
+const seedLab = () => { const s = newSession('labrador'); s.route = '/hot-dogs'; s.namingLoop = { dog: 'labrador', used: [] }; return s; };
+
+// A filler reply names the next YES food (lone tokens + reactions).
+for (const filler of ['hello', 'ok', 'why', 'haha', 'k', 'hmm', 'asdfgh', '🤷', 'tell me more']) {
+  check(filler, {}, { session: seedLab(), assert: (_r, resp) => isFood(resp) });
+}
+// Task 181: ordinary short replies advance for the Labrador too -- "go on" now advances (it was only
+// breaking because his bank lacks it as a canned reaction; the SAFE allow-list fixes that inconsistency).
+for (const safe of ['go on', 'me too', 'i like that', 'same here', 'so do i', 'keep going', 'i agree', 'what else']) {
+  check(safe, {}, { session: seedLab(), assert: (_r, resp) => isFood(resp) });
+}
+// Task 181: "no" / "nope" / "enough" mean stop -- they break the loop (a "no" to a dog naming foods is a stop).
+for (const stop of ['no', 'nope', 'enough']) {
+  check(stop, {}, { session: seedLab(), assert: (_r, resp, s) => notFood(resp) || (s.namingLoop ? `"${stop}" did not stop the loop` : null) });
+}
+// Task 181: help-seeking reaches the shortened clarifier (never a silent break), and ends the loop.
+check('help', { action: 'clarifier' }, { session: seedLab(), assert: (_r, resp, s) => notFood(resp) || (!/help with something on the site/i.test(resp.text) ? `clarifier text wrong: "${resp.text}"` : null) || (s.namingLoop ? 'loop survived help' : null) });
+check('help me', { action: 'clarifier' }, { session: seedLab(), assert: (_r, resp) => notFood(resp) });
+
+// THE SAFETY TWEAK: a named food (any tier) breaks the loop and serves its REAL tiered answer -- a NEVER
+// food keeps the Collie's safety interjection, never swallowed by a cheerful YES food.
+check('chocolate', {}, { session: seedLab(), assert: (r, resp, s) => {
+  if (resp.responseId !== 'LAB-B32-30') return `chocolate did not get its real answer: ${resp.responseId}`;
+  if (!resp.interjection || !/poison|kill/i.test(resp.interjection.line)) return 'chocolate lost its safety interjection';
+  return s.namingLoop ? 'a NEVER food did not end the loop' : null;
+} });
+check('grapes', {}, { session: seedLab(), assert: (r, resp, s) => (resp.responseId === 'LAB-B32-31' && resp.interjection && !s.namingLoop ? null : `grapes not served with warning / loop not ended: ${resp.responseId}`) });
+check('cheese', {}, { session: seedLab(), assert: (r, resp, s) => (resp.responseId === 'LAB-B32-23' && !s.namingLoop ? null : `A BIT food not its own answer / loop alive: ${resp.responseId}`) });
+check('carrots', {}, { session: seedLab(), assert: (r, resp, s) => (resp.responseId === 'LAB-B32-14' && !s.namingLoop ? null : `a named YES food did not break the loop: ${resp.responseId}`) });
+
+// SAFETY, COMMERCE, DISMISSALS and a multi-word miss win and END his loop, exactly as the Boxer's.
+check('i want to kill myself', { action: 'safety_signpost' }, { session: seedLab(), assert: (_r, resp, s) => notFood(resp) || (s.namingLoop ? 'loop survived a disclosure' : null) });
+check('can my dog eat chocolate', { action: 'health_answer' }, { session: seedLab(), assert: (_r, resp) => notFood(resp) });
+check('how much is it', { action: 'price_answer' }, { session: seedLab(), assert: (_r, resp) => notFood(resp) });
+check('go away', { action: 'dismiss' }, { session: seedLab(), assert: (_r, resp) => notFood(resp) });
+check('i am being bullied', {}, { session: seedLab(), assert: (_r, resp, s) => notFood(resp) || (s.namingLoop ? 'loop survived a multi-word miss' : null) });
+
+// Case A cookie ask: with the ask armed, a bare "yes" starts the feed game and breaks the loop (the
+// cookie wins on its turn); no food is named.
+(() => { const s = seedLab(); s.cookieAskPending = true; check('yes', { action: 'game_start' }, { session: s, assert: (_r, resp, sess) => notFood(resp) || (sess.namingLoop ? 'cookie yes did not end the loop' : null) }); })();
+
+// The full chain: ten filler replies name all ten YES foods, none repeating, then silence.
+(() => {
+  const s = seedLab();
+  const served = [];
+  for (let i = 0; i < 10; i++) check('ok', {}, { session: s, assert: (_r, resp) => { served.push(resp.responseId); return isFood(resp); } });
+  check('ten distinct foods', {}, { session: newSession(), assert: () => (new Set(served).size === 10 ? null : `chain not ten distinct foods: ${served.join(',')}`) });
+  check('after the tenth food', {}, { session: s, assert: (_r, resp, sess) => (sess.namingLoop ? 'loop did not end after ten' : notFood(resp)) });
+})();
+
+// Does not resume, and is scoped to the Labrador.
+(() => { const s = seedLab(); check('go away', { action: 'dismiss' }, { session: s }); check('ok', {}, { session: s, assert: (_r, resp) => notFood(resp) }); })();
+(() => { const s = newSession('collie'); s.route = '/hot-dogs'; s.namingLoop = { dog: 'labrador', used: [] }; check('ok', {}, { session: s, assert: (_r, resp) => notFood(resp) }); })();
 
 // ---- Report ----
 const pad = (s, n) => String(s).padEnd(n);

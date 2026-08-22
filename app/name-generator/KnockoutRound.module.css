@@ -1,9 +1,4 @@
-.wrap {
-  max-width: 1800px;
-  margin: 0 auto;
-  padding: clamp(16px, 3vw, 32px) clamp(16px, 5vw, 48px) 80px;
-  text-align: center;
-}
+.wrap { composes: wrap from "./knockout-shared.module.css"; }
 .wrapPodium {
   max-width: 1800px;
   margin: 0 auto;
@@ -11,59 +6,15 @@
   text-align: center;
 }
 
-.title {
-  font-size: clamp(3rem, 10vw, 6.5rem);
-  color: #fff;
-  margin: 0 0 8px;
-  line-height: 0.95;
-}
-.yellow { color: var(--yellow, #ffe227); }
-
-.sub {
-  font-family: var(--font-body), sans-serif;
-  color: #ffffff;
-  font-size: clamp(1rem, 2.5vw, 1.3rem);
-  font-weight: 600;
-  margin: 0 0 28px;
-}
+.title { composes: title from "./knockout-shared.module.css"; }
+.yellow { composes: yellow from "./knockout-shared.module.css"; }
+.sub { composes: sub from "./knockout-shared.module.css"; }
 
 /* Round pill trail */
-.pillTrail {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  justify-content: center;
-  margin: 0 0 12px;
-}
-.pillDone {
-  font-family: var(--font-body), sans-serif;
-  font-size: 0.75rem;
-  font-weight: 700;
-  background: rgba(255,255,255,0.2);
-  color: #fff;
-  border-radius: 999px;
-  padding: 5px 14px;
-  letter-spacing: 0.04em;
-}
-.pillCurrent {
-  font-family: var(--font-body), sans-serif;
-  font-size: 0.75rem;
-  font-weight: 700;
-  background: var(--yellow, #ffe227);
-  color: var(--navy, #0a3a57);
-  border-radius: 999px;
-  padding: 5px 14px;
-  letter-spacing: 0.04em;
-}
-.matchLabel {
-  font-family: var(--font-body), sans-serif;
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: #ffffff;
-  margin: 18px 0 32px;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
+.pillTrail { composes: pillTrail from "./knockout-shared.module.css"; }
+.pillDone { composes: pillDone from "./knockout-shared.module.css"; }
+.pillCurrent { composes: pillCurrent from "./knockout-shared.module.css"; }
+.matchLabel { composes: matchLabel from "./knockout-shared.module.css"; }
 
 /* Pair wrap -- 3 col: card | VS | card */
 .pairWrap {
@@ -399,53 +350,16 @@
 }
 
 /* ── Fall away animation ─────────────────────────────────────────────── */
-@keyframes fallAway {
-  0%   { transform: rotate(0deg) translateY(0px); opacity: 1; }
-  20%  { transform: rotate(6deg) translateY(8px); opacity: 1; }
-  100% { transform: rotate(12deg) translateY(160px); opacity: 0; }
-}
-@keyframes winnerPulse {
-  0%   { transform: scale(1); box-shadow: 0 0 0 0 rgba(34,197,94,0); }
-  40%  { transform: scale(1.06); box-shadow: 0 0 0 12px rgba(34,197,94,0.3); }
-  100% { transform: scale(1.04); box-shadow: 0 0 0 0 rgba(34,197,94,0); }
-}
-.falling {
-  animation: fallAway 0.65s cubic-bezier(0.4, 0, 1, 1) forwards !important;
-  pointer-events: none;
-}
-.winnerPulse {
-  animation: winnerPulse 0.5s ease forwards !important;
-  background: #22c55e !important;
-  border-color: #22c55e !important;
-}
+.falling { composes: falling from "./knockout-shared.module.css"; }
+.winnerPulse { composes: winnerPulse from "./knockout-shared.module.css"; }
 
-@keyframes puffOut {
-  0%   { transform: scale(1.04); opacity: 1; }
-  60%  { transform: scale(1.15); opacity: 0.6; }
-  100% { transform: scale(1.3);  opacity: 0; }
-}
-.puffOut {
-  animation: puffOut 0.5s ease forwards !important;
-  pointer-events: none;
-}
+.puffOut { composes: puffOut from "./knockout-shared.module.css"; }
 @keyframes fadeInCards {
   0%   { opacity: 0; transform: translateY(12px); }
   100% { opacity: 1; transform: translateY(0); }
 }
-@keyframes cardsLand {
-  0%   { opacity: 0; transform: scale(0.6) translateY(22px); }
-  55%  { opacity: 1; transform: scale(1.06) translateY(0) rotate(-2deg); }
-  70%  { transform: scale(1) rotate(2deg); }
-  85%  { transform: rotate(-1.2deg); }
-  100% { opacity: 1; transform: scale(1) rotate(0deg); }
-}
-.cardsVisible {
-  animation: cardsLand 0.6s cubic-bezier(0.34,1.56,0.64,1) forwards;
-}
-.cardsHidden {
-  opacity: 0;
-  pointer-events: none;
-}
+.cardsVisible { composes: cardsVisible from "./knockout-shared.module.css"; }
+.cardsHidden { composes: cardsHidden from "./knockout-shared.module.css"; }
 .nextMatchup {
   display: flex;
   align-items: center;
@@ -526,10 +440,7 @@
 
 /* ── Mobile ─────────────────────────────────────────────────────────────── */
 @media (max-width: 640px) {
-  /* match the main page h1 sizing */
-  .title { font-size: clamp(3.5rem, 12vw, 5.4rem); }
-  /* tighter container so the two cards get more room */
-  .wrap { padding: clamp(16px, 3vw, 32px) 5px 80px; }
+  /* .title and .wrap mobile overrides moved to knockout-shared.module.css */
   /* two cards side by side on the same axis, VS overlaid between them */
   .pairWrap {
     grid-template-columns: 1fr 1fr;

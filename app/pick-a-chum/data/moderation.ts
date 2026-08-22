@@ -164,7 +164,7 @@ export const MODERATION: ModerationCategory[] = [
     scenario: 'Bare help-seeking: clarify site question versus a worry',
     action: 'redirect',
     escalateOnRepeat: false,
-    responses: ['Do you need help with something on the site, or is something worrying you? Tell me which and I will point you the right way.'],
+    responses: ['Help with something on the site?'],
     status: 'APPROVED',
   },
   {

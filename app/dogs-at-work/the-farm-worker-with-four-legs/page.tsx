@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { SITE_URL } from "../../../lib/site";
 import * as React from "react";
 import Link from "next/link";
 import Nav from "../../../components/Nav/Nav";
@@ -15,7 +16,6 @@ export const metadata: Metadata = {
   title: "The Farm Worker With Four Legs | Dogs at Work",
   description:
     "To the shepherd it is labour saved. To the sheepdog it is the best game ever invented: find the sheep, get behind them, bring them home. Nobody has told it otherwise.",
-  robots: "noindex",
 };
 
 // Article 4 body, transcribed verbatim from the supplied copy
@@ -179,9 +179,43 @@ const CARDS: ArticleCard[] = [
   },
 ];
 
+// Article + breadcrumb structured data for this essay. Every value comes from
+// this page: headline is the on-page heading, description reuses the metadata
+// description, image is the real hero above. Author and publish date are omitted
+// (the page has no honest source for either). Publisher links to the site-wide
+// Organization node emitted in app/layout.tsx.
+const HEADLINE = "The Farm Worker With Four Legs";
+const ARTICLE_JSONLD = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Article",
+      headline: HEADLINE,
+      description: metadata.description,
+      image: `${SITE_URL}/sheepdogs_job.jpg`,
+      publisher: { "@id": `${SITE_URL}/#organization` },
+      mainEntityOfPage: `${SITE_URL}/dogs-at-work/the-farm-worker-with-four-legs`,
+    },
+    {
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
+        { "@type": "ListItem", position: 2, name: "Dogs at Work", item: `${SITE_URL}/dogs-at-work` },
+        { "@type": "ListItem", position: 3, name: HEADLINE, item: `${SITE_URL}/dogs-at-work/the-farm-worker-with-four-legs` },
+      ],
+    },
+  ],
+};
+
 export default function SheepdogsPage() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(ARTICLE_JSONLD).replace(/</g, "\\u003c"),
+        }}
+      />
       <Nav showLogo />
       <main className={styles.essayPage}>
         <div className={styles.essayHero}>

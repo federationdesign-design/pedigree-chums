@@ -93,7 +93,15 @@ export default function HistoryPage() {
         <ArticleTextToggle centered />
 
         <section className={styles.intro}>
-          <PopHeading className={`display ${styles.title}`}>
+          {/* as="h1": the desktop view's visible top heading, so it is the h1.
+              The mobile carousel (.mobileView, HistoryCarousel) carries its own
+              h1, and display:none removes that one from the accessibility tree on
+              desktop, so a desktop screen reader would otherwise meet an h2 with
+              no h1 above it. Two h1s therefore exist in the source, exactly one
+              exposed per breakpoint, which is correct. The duplication is a
+              symptom of this page's two-view-tree architecture and resolves once
+              it moves to a single layout. */}
+          <PopHeading as="h1" className={`display ${styles.title}`}>
             Britain&apos;s dog <span className="display-yellow">history</span>
           </PopHeading>
           <p className={styles.lead}>
@@ -107,6 +115,9 @@ export default function HistoryPage() {
 
         <div className={styles.sections}>
           <Triangles items={pageTriangles} z={3} />
+          {/* 19 August 2026: stacking this index newest-first was tried and
+              reverted the same day. It stays chronological, Ancient Times at the
+              top. Recorded so the idea is not proposed again as new. */}
           {SECTIONS.filter((s) => s.title !== "Dogs in the armed forces").map((s, i) => {
             return (
               <div key={i} id={s.anchor}>

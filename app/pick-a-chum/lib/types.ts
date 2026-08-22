@@ -187,6 +187,7 @@ export type ActionType =
   | 'maths_answer' // Task 145: an arithmetic expression -> the Collie answers easy sums correctly and hard ones absurdly wrong; the other three always guess absurdly. Computed in the assembler from the input and active dog.
   | 'dog_fact' // Task 134: B57. A dog fact chosen AT RANDOM, not by rotation, and not repeated until the session has used all twenty.
   | 'price_answer' // Task 49: a price question -> FAQ008's text in chat; NOT a MEANINGFUL_TOPIC, so the safety machine holds/refuses it like buying
+  | 'buy_clarify' // Task 175: a bare get-question with no product/dog ("where can I get") -> "The card game?"; a following yes opens the pre-order. Blocked in aftercare like the rest of commerce.
   | 'transfer_request' // visitor asks to switch to a different dog
   | 'anatomy_redirect' // general anatomy question (no disclosure): redirect to a safe grown-up
   | 'breed_page' // confident named-breed match: link to that breed's page

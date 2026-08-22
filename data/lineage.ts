@@ -369,7 +369,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "A true working terrier from the hills along the English and Scottish border, bred to keep up with the hunt and go to ground after foxes.",
     children: [
       { name: "Bedlington Terrier", note: "Shares the same old Border terrier stock and a common working ancestor.", img: "/history/breeds/Bedlington Terrier-photo.jpg", value: 34 },
-      { name: "Dandie Dinmont Terrier", note: "Another Border breed from the same root, raised in the same hills.", img: "/history/breeds/dandie-dinmont-terrier-photo.jpeg", value: 33 },
+      { name: "Dandie Dinmont Terrier", note: "Another Border breed from the same root, raised in the same hills.", img: "/history/breeds/dandie-dinmont-terrier.jpg", value: 33 },
       { name: "Old fell terriers", note: "The hardy fox-working terriers of the fells that shaped the type. Now extinct.", img: "/history/breeds/Old-fell-terriers-Patterdale-Terrier-Working-hunt-terriers.jpg", value: 33 }
     ]
   },
@@ -503,36 +503,104 @@ const LINEAGE: Record<string, LineageNode> = {
   "Old working collies": {
     name: "Old working collies",
     note: "The old northern hill-collie landrace of Scotland and the borders, the shared working stock the Rough, Smooth and Border collies all grew from. Now extinct.",
+    // 19 August 2026: pass-through fixed with the Celtic Heeler fallback.
+    // Researched, no documented second parent found: the collie family is a
+    // single native British landrace, not a cross of two stocks, so there is
+    // nothing real to add. Two folklore candidates were rejected as discredited
+    // (both already removed from this project): the Viking herding spitz (given
+    // as a Scotch Collie ancestor) and the Polish Lowland Sheepdog (the Bearded
+    // Collie 1514 story). Do not redo this search and reach for either.
+    //
+    // 19 August 2026: display device. The single documented ancestor (Shepherd's
+    // Dog) is drawn twice, as two identical children at 50 each (same note and
+    // img), so the level shows two circles rather than one filling the ring. The
+    // children differ in name from the parent, so isEcho, the pit words and the
+    // badge paths do not touch them. This must NOT be read as two separate
+    // ancestors.
     children: [
-      { name: "Shepherd's Dog", note: "The medieval British herding dog, the Sheepdog or Colley that Caius wrote of in 1576. Chaucer's black-faced 'Coll' or 'Coaly' of the 1300s gives the name: Coaly became Colley became Collie. Now extinct.", img: "/history/breeds/medieval-shepherds-dog.jpg", value: 100 }
+      { name: "Shepherd's Dog", note: "The medieval British herding dog, the Sheepdog or Colley that Caius wrote of in 1576. Chaucer's black-faced 'Coll' or 'Coaly' of the 1300s gives the name: Coaly became Colley became Collie. Now extinct.", img: "/history/breeds/medieval-shepherds-dog.jpg", value: 50 },
+      { name: "Shepherd's Dog", note: "The medieval British herding dog, the Sheepdog or Colley that Caius wrote of in 1576. Chaucer's black-faced 'Coll' or 'Coaly' of the 1300s gives the name: Coaly became Colley became Collie. Now extinct.", img: "/history/breeds/medieval-shepherds-dog.jpg", value: 50 }
     ]
   },
   "Old Scotch Collie": {
     name: "Old Scotch Collie",
     note: "The old Scottish shepherd's collie, the pre-show hill-herding landrace that fed the working border strain long before it had a name. Now extinct.",
+    // 19 August 2026: pass-through fixed with the Celtic Heeler fallback.
+    // Researched, no documented second parent found: the collie family is a
+    // single native British landrace, not a cross of two stocks, so there is
+    // nothing real to add. Two folklore candidates were rejected as discredited
+    // (both already removed from this project): the Viking herding spitz (given
+    // as a Scotch Collie ancestor) and the Polish Lowland Sheepdog (the Bearded
+    // Collie 1514 story). Do not redo this search and reach for either.
+    //
+    // 19 August 2026: display device. The single documented ancestor (Old working
+    // collies) is drawn twice, as two identical children at 50 each (same note
+    // and img), so the level shows two circles rather than one filling the ring.
+    // The children differ in name from the parent, so isEcho, the pit words and
+    // the badge paths do not touch them. This must NOT be read as two separate
+    // ancestors.
     children: [
-      { name: "Old working collies", note: "The shared old hill-collie landrace it grew from. Now extinct.", img: "/history/breeds/Old-working-collies-cluster.jpg", value: 100 }
+      { name: "Old working collies", note: "The shared old hill-collie landrace it grew from. Now extinct.", img: "/history/breeds/Old-working-collies-cluster.jpg", value: 50 },
+      { name: "Old working collies", note: "The shared old hill-collie landrace it grew from. Now extinct.", img: "/history/breeds/Old-working-collies-cluster.jpg", value: 50 }
     ]
   },
   "Old hill and bearded collies": {
     name: "Old hill and bearded collies",
     note: "Shaggy upland herding dogs of the same collie family. Now extinct.",
+    // 19 August 2026: pass-through fixed with the Celtic Heeler fallback.
+    // Researched, no documented second parent found: the collie family is a
+    // single native British landrace, not a cross of two stocks, so there is
+    // nothing real to add. Two folklore candidates were rejected as discredited
+    // (both already removed from this project): the Viking herding spitz (given
+    // as a Scotch Collie ancestor) and the Polish Lowland Sheepdog (the Bearded
+    // Collie 1514 story). Do not redo this search and reach for either.
+    //
+    // 19 August 2026: display device. The single documented ancestor (Old working
+    // collies) is drawn twice, as two identical children at 50 each (same note
+    // and img), so the level shows two circles rather than one filling the ring.
+    // The children differ in name from the parent, so isEcho, the pit words and
+    // the badge paths do not touch them. This must NOT be read as two separate
+    // ancestors.
     children: [
-      { name: "Old working collies", note: "The shared old hill-collie landrace of the same family. Now extinct.", img: "/history/breeds/Old-working-collies-cluster.jpg", value: 100 }
+      { name: "Old working collies", note: "The shared old hill-collie landrace of the same family. Now extinct.", img: "/history/breeds/Old-working-collies-cluster.jpg", value: 50 },
+      { name: "Old working collies", note: "The shared old hill-collie landrace of the same family. Now extinct.", img: "/history/breeds/Old-working-collies-cluster.jpg", value: 50 }
     ]
   },
   "Old Cumberland herding dogs": {
     name: "Old Cumberland herding dogs",
     note: "Northern English herding dogs from the same border country. Now extinct.",
+    // 19 August 2026: pass-through fixed with the Celtic Heeler fallback.
+    // Researched, no documented second parent found: the collie family is a
+    // single native British landrace, not a cross of two stocks, so there is
+    // nothing real to add. Two folklore candidates were rejected as discredited
+    // (both already removed from this project): the Viking herding spitz (given
+    // as a Scotch Collie ancestor) and the Polish Lowland Sheepdog (the Bearded
+    // Collie 1514 story). Do not redo this search and reach for either.
+    //
+    // 19 August 2026: display device. The single documented ancestor (Old working
+    // collies) is drawn twice, as two identical children at 50 each (same note
+    // and img), so the level shows two circles rather than one filling the ring.
+    // The children differ in name from the parent, so isEcho, the pit words and
+    // the badge paths do not touch them. This must NOT be read as two separate
+    // ancestors.
     children: [
-      { name: "Old working collies", note: "The shared old hill-collie landrace of the border country. Now extinct.", img: "/history/breeds/Old-working-collies-cluster.jpg", value: 100 }
+      { name: "Old working collies", note: "The shared old hill-collie landrace of the border country. Now extinct.", img: "/history/breeds/Old-working-collies-cluster.jpg", value: 50 },
+      { name: "Old working collies", note: "The shared old hill-collie landrace of the border country. Now extinct.", img: "/history/breeds/Old-working-collies-cluster.jpg", value: 50 }
     ]
   },
   "Welsh herding dogs": {
     name: "Welsh herding dogs",
     note: "The old Welsh herding and droving dogs, a long-legged, loose-eyed landrace and the parallel Welsh branch behind the region's sheep-working breeds. Now extinct.",
+    // 19 August 2026: added Celtic Heeler as a child here. It used to sit the
+    // other way round, with Welsh herding dogs a child of Celtic Heeler, but that
+    // edge ran backwards in time (Celtic Heeler is the ancient low-slung stock,
+    // Welsh herding dogs the later landrace): the same class of error as the
+    // Early badger hunting dogs / Earth Dog edge in the BARE LEAF note just below
+    // this root. Reversing it here also fixes the pass-through that Shepherd's
+    // Dog alone (100%) left behind. Shepherd's Dog 60, Celtic Heeler 40, sum 100.
     children: [
-      { name: "Shepherd's Dog", note: "The medieval British herding dog behind the herding breeds, the Colley of Caius. The parallel Welsh branch reaches the same medieval root. Now extinct.", img: "/history/breeds/medieval-shepherds-dog.jpg", value: 100 }
+      { name: "Shepherd's Dog", note: "The medieval British herding dog behind the herding breeds, the Colley of Caius. The parallel Welsh branch reaches the same medieval root. Now extinct.", img: "/history/breeds/medieval-shepherds-dog.jpg", value: 60 },
+      { name: "Celtic Heeler", note: "The ancestral low-slung herding dogs brought to Wales by Celtic tribes -- forerunners of both the Cardigan and Pembroke Welsh Corgi. Short legs bred for nipping cattle heels and ducking kicks.", img: "/history/breeds/medieval-corgi.jpg", value: 40 }
     ]
   },
   // Early badger hunting dogs is intentionally left a BARE LEAF. It once had a
@@ -571,23 +639,23 @@ const LINEAGE: Record<string, LineageNode> = {
     ]
   },
 
+  // 18 August 2026: until 1893 all these dogs were bred together as Land Spaniels and classified afterwards by size and colour, per the Kennel Club, so both breeds now take the shared root at the same weight. One litter could produce springer, Sussex and cocker, which is why littermates (Field Spaniel, Sussex Spaniel) have been removed as parents.
   "Cocker Spaniel": {
     name: "Cocker Spaniel",
     note: "The smallest of the old land spaniels, bred to flush, or 'cock', woodcock from cover. For years Cockers and Springers were born in the very same litters, sorted only by working size.",
     children: [
-      { name: "Land spaniels", note: "The old English land-spaniel stock that every working spaniel springs from. Now extinct.", img: "/history/breeds/original-land-spaniel.jpg", value: 55 },
-      { name: "Field Spaniel", note: "A close gundog cousin from the same spaniel family.", img: "/history/breeds/field-spaniel-photo.jpg", value: 25 },
-      { name: "Sussex Spaniel", note: "A heavier, golden-liver spaniel that lent bone and a rich coat.", img: "/history/breeds/Sussex-Spaniel.jpg", value: 20 }
+      { name: "Land spaniels", note: "The old English land-spaniel stock that every working spaniel springs from. Now extinct.", img: "/history/breeds/original-land-spaniel.jpg", value: 70 },
+      { name: "Welsh Springer Spaniel", note: "A Welsh outcross used to establish the parti-coloured lines.", img: "/history/breeds/welsh-springer-spaniel-photo.jpg", value: 30 }
     ]
   },
 
+  // 18 August 2026: until 1893 all these dogs were bred together as Land Spaniels and classified afterwards by size and colour, per the Kennel Club, so both breeds now take the shared root at the same weight. One litter could produce springer, Sussex and cocker, which is why littermates have been removed as parents.
   "Springer Spaniel": {
     name: "Springer Spaniel",
     note: "The larger land spaniels, bred to 'spring' game from cover for the net, hawk and later the gun. The Cocker's bigger litter-mate, set apart only by size.",
     children: [
-      { name: "Norfolk Spaniel", note: "A springer-type spaniel later folded into the breed.", img: "/history/breeds/Norfolk-Spaniel.jpg", value: 45 },
-      { name: "Water spaniels", note: "Working water spaniels that added drive and a love of wet cover. Now extinct.", img: "/history/breeds/original-water-spaniel.jpg", value: 30 },
-      { name: "Welsh Springer Spaniel", note: "A close cousin from the same springing-spaniel root.", img: "/history/breeds/welsh-springer-spaniel-photo.jpg", value: 25 }
+      { name: "Land spaniels", note: "The old English land-spaniel stock that every working spaniel springs from. Now extinct.", img: "/history/breeds/original-land-spaniel.jpg", value: 70 },
+      { name: "Norfolk Spaniel", note: "A springer-type spaniel later folded into the breed.", img: "/history/breeds/Norfolk-Spaniel.jpg", value: 30 }
     ]
   },
 
@@ -643,7 +711,7 @@ const LINEAGE: Record<string, LineageNode> = {
     children: [
       { name: "Old Border terriers", note: "The local working terriers of the Rothbury and border country. Now extinct.", img: "/history/breeds/Old-Border-terriers.jpg", value: 50 },
       { name: "Whippet", note: "Brought in for speed and the arched, racy back.", img: "/history/breeds/whippet-photo.jpg", value: 30 },
-      { name: "Dandie Dinmont Terrier", note: "A close relative from the same border rootstock, sharing the crisp coat and topknot.", img: "/history/breeds/dandie-dinmont-terrier-photo.jpeg", value: 20 }
+      { name: "Dandie Dinmont Terrier", note: "A close relative from the same border rootstock, sharing the crisp coat and topknot.", img: "/history/breeds/dandie-dinmont-terrier.jpg", value: 20 }
     ]
   },
 
@@ -664,22 +732,78 @@ const LINEAGE: Record<string, LineageNode> = {
   "Low-slung soldiers' dogs": {
     name: "Low-slung soldiers' dogs",
     note: "Short-legged dogs left by Flemish and Hessian soldiers settled in the glen. Now extinct.",
+    // 19 August 2026: pass-through fixed with the Celtic Heeler fallback,
+    // researched, no documented second parent found. These were imported
+    // continental dogs (Flemish, Lowland, German and French soldiers' low dogs,
+    // AKC Glen of Imaal Terrier history), so their own ancestry is off-tree; the
+    // documented cross with local Irish terriers belongs to the Glen of Imaal,
+    // not to these dogs. No suitable existing node, and inventing a continental
+    // one is the speculation the brief warns against.
+    //
+    // 19 August 2026 (later): the self-repeat child was removed. A node should
+    // not be its own child, and it leaked into the render's name paths; the level
+    // root now carries its own name on the outer ring, so the node returns to its
+    // single real parent below.
+    //
+    // 19 August 2026: display device. The single documented ancestor below is
+    // drawn twice, as two identical children at 50 each (same note and img), so
+    // the level shows two circles rather than one filling the ring. The children
+    // differ in name from the parent, so isEcho, the pit words and the badge
+    // paths do not touch them. This must NOT be read as two separate ancestors.
     children: [
-      { name: "Earth Dog", note: "The old low, earth-working dog type behind these short-legged glen dogs. Now extinct.", img: "/history/breeds/medieval-earth-dog.jpg", value: 100 }
+      { name: "Earth Dog", note: "The old low, earth-working dog type behind these short-legged glen dogs. Now extinct.", img: "/history/breeds/medieval-earth-dog.jpg", value: 50 },
+      { name: "Earth Dog", note: "The old low, earth-working dog type behind these short-legged glen dogs. Now extinct.", img: "/history/breeds/medieval-earth-dog.jpg", value: 50 }
     ]
   },
   "Native Irish terriers": {
     name: "Native Irish terriers",
     note: "The old Irish farm-terrier stock shared with the Wheaten and Kerry Blue. Now extinct.",
+    // 19 August 2026: pass-through fixed with the Celtic Heeler fallback. The
+    // documented origin (Showsight, Wisdom Panel) is a cross of the old British
+    // black-and-tan terrier with a racier native Irish red or wheaten terrier,
+    // but that second stock is this node's own indigenous base, not a distinct
+    // older node, so the self-repeat represents it honestly. Rejected as
+    // folklore: the Irish Wolfhound "behind" the Irish terrier ("some people even
+    // think", not documented).
+    //
+    // 19 August 2026 (later): the self-repeat child was removed. A node should
+    // not be its own child, and it leaked into the render's name paths; the level
+    // root now carries its own name on the outer ring, so the node returns to its
+    // single real parent below.
+    //
+    // 19 August 2026: display device. The single documented ancestor below is
+    // drawn twice, as two identical children at 50 each (same note and img), so
+    // the level shows two circles rather than one filling the ring. The children
+    // differ in name from the parent, so isEcho, the pit words and the badge
+    // paths do not touch them. This must NOT be read as two separate ancestors.
     children: [
-      { name: "Old English Black and Tan Terrier", note: "The old British black-and-tan working terrier, the shared ratting stock behind Britain and Ireland's farm terriers. Now extinct.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 100 }
+      { name: "Old English Black and Tan Terrier", note: "The old British black-and-tan working terrier, the shared ratting stock behind Britain and Ireland's farm terriers. Now extinct.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 50 },
+      { name: "Old English Black and Tan Terrier", note: "The old British black-and-tan working terrier, the shared ratting stock behind Britain and Ireland's farm terriers. Now extinct.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 50 }
     ]
   },
   "Old fell terriers": {
     name: "Old fell terriers",
     note: "The hardy black-and-tan fox-working terriers of the northern fells. Now extinct.",
+    // 19 August 2026: pass-through fixed with the Celtic Heeler fallback. A
+    // second parent of Old Border terriers was considered (Wikipedia Fell
+    // Terrier: fell terriers "share common ancestry with Border terriers") and
+    // rejected: shared common ancestry is a shared-ancestor claim, not descent
+    // from them, and Old Border terriers has no strip anchor, so the era check
+    // could not be run. No documented second parent.
+    //
+    // 19 August 2026 (later): the self-repeat child was removed. A node should
+    // not be its own child, and it leaked into the render's name paths; the level
+    // root now carries its own name on the outer ring, so the node returns to its
+    // single real parent below.
+    //
+    // 19 August 2026: display device. The single documented ancestor below is
+    // drawn twice, as two identical children at 50 each (same note and img), so
+    // the level shows two circles rather than one filling the ring. The children
+    // differ in name from the parent, so isEcho, the pit words and the badge
+    // paths do not touch them. This must NOT be read as two separate ancestors.
     children: [
-      { name: "Old English Black and Tan Terrier", note: "The old black-and-tan working terrier stock the fell terriers were bred from. Now extinct.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 100 }
+      { name: "Old English Black and Tan Terrier", note: "The old black-and-tan working terrier stock the fell terriers were bred from. Now extinct.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 50 },
+      { name: "Old English Black and Tan Terrier", note: "The old black-and-tan working terrier stock the fell terriers were bred from. Now extinct.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 50 }
     ]
   },
 
@@ -697,7 +821,8 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "Ireland's blue-coated all-rounder from County Kerry, a farm dog, herder, hunter and fighter rolled into one.",
     children: [
       { name: "Soft-Coated Wheaten Terrier", note: "The older native Irish terrier widely held to be its parent.", img: "/history/breeds/soft-coated--wheaten-terrier-photo.jpg", value: 60 },
-      { name: "Native Irish terriers", note: "The shared stock of Ireland's working farm terriers. Now extinct.", img: "/history/breeds/irish-terrier-photo.jpg", value: 40 }
+      // 19 August 2026: this extinct ancestor was wearing a photograph of a living descendant, the Irish Terrier. Repointed to its own artwork.
+      { name: "Native Irish terriers", note: "The shared stock of Ireland's working farm terriers. Now extinct.", img: "/history/breeds/native-irish-terriers.jpg", value: 40 }
     ]
   },
 
@@ -711,15 +836,40 @@ const LINEAGE: Record<string, LineageNode> = {
   "Old English Black and Tan Terrier": {
     name: "Old English Black and Tan Terrier",
     note: "The old British black-and-tan working terrier, the rough ratting and vermin stock much of Britain's terrier blood was drawn from. Now extinct.",
+    // 19 August 2026: pass-through fixed with a documented second parent, not
+    // the fallback. Wikipedia's "Black and Tan Terrier" traces the breed to the
+    // small black-and-tan ratting terriers noted from the sixteenth century, so
+    // its children are now Old British ratting terriers (60) and Earth and hunt
+    // terriers (40), mirroring how the sibling Black and Tan Terrier root is
+    // wired. The previous single Earth Dog link was dropped: the node's own note
+    // admitted it was a functional match rather than documented descent.
     children: [
-      { name: "Earth Dog", note: "The medieval earth-and-vermin dog the black-and-tan working terrier goes back to, a functional match rather than documented descent. Now extinct.", img: "/history/breeds/medieval-earth-dog.jpg", value: 100 }
+      { name: "Old British ratting terriers", note: "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.", img: "/history/breeds/Old-British-ratting-terriers.jpg", value: 60 },
+      { name: "Earth and hunt terriers", note: "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.", img: "/history/breeds/Earth-and-hunt-terrier.jpg", value: 40 }
     ]
   },
   "Old English White Terrier": {
     name: "Old English White Terrier",
     note: "The white-bodied working terriers bred out of the black-and-tan stock for coat colour. The split of this line into population and named breed is a useful reconstruction, not a documented distinction: the three white-terrier names all refer to one extinct breed. Now extinct.",
+    // 19 August 2026: pass-through fixed with the Celtic Heeler fallback. There
+    // is no documented second parent: this is the black-and-tan stock selected
+    // for a white coat, and (per this node's own note and Wikipedia) the three
+    // white-terrier names refer to one extinct breed. A colour morph of one stock
+    // has no second parent.
+    //
+    // 19 August 2026 (later): the self-repeat child was removed. A node should
+    // not be its own child, and it leaked into the render's name paths; the level
+    // root now carries its own name on the outer ring, so the node returns to its
+    // single real parent below.
+    //
+    // 19 August 2026: display device. The single documented ancestor below is
+    // drawn twice, as two identical children at 50 each (same note and img), so
+    // the level shows two circles rather than one filling the ring. The children
+    // differ in name from the parent, so isEcho, the pit words and the badge
+    // paths do not touch them. This must NOT be read as two separate ancestors.
     children: [
-      { name: "Old English Black and Tan Terrier", note: "The black-and-tan working stock the white terriers were selected out of, for coat colour. Now extinct.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 100 }
+      { name: "Old English Black and Tan Terrier", note: "The black-and-tan working stock the white terriers were selected out of, for coat colour. Now extinct.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 50 },
+      { name: "Old English Black and Tan Terrier", note: "The black-and-tan working stock the white terriers were selected out of, for coat colour. Now extinct.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 50 }
     ]
   },
 
@@ -745,7 +895,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Sealyham Terrier",
     note: "A stocky white terrier built in Pembrokeshire by Captain John Edwardes to draw badger and otter alongside his hounds.",
     children: [
-      { name: "Dandie Dinmont Terrier", note: "Brought in to shorten the leg and add bone.", img: "/history/breeds/dandie-dinmont-terrier-photo.jpeg", value: 35 },
+      { name: "Dandie Dinmont Terrier", note: "Brought in to shorten the leg and add bone.", img: "/history/breeds/dandie-dinmont-terrier.jpg", value: 35 },
       { name: "West Highland White Terrier", note: "Used to set the white coat that kept it from being mistaken for the quarry.", img: "/history/breeds/West-Highland-White-Terrier.jpg", value: 35 },
       { name: "Wire Fox Terrier", note: "Added gameness and a sharp working drive. Now endangered.", img: "/history/breeds/wire-fox-terrier.jpg", value: 30 }
     ]
@@ -804,7 +954,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Irish Terrier",
     note: "The 'daredevil' of Ireland, a fiery red terrier and one of the four native Irish terrier breeds.",
     children: [
-      { name: "Native Irish terriers", note: "The old Irish farm-terrier stock shared with the Wheaten and Kerry Blue. Now extinct.", img: "/history/breeds/irish-terrier-photo.jpg", value: 60 },
+      { name: "Native Irish terriers", note: "The old Irish farm-terrier stock shared with the Wheaten and Kerry Blue. Now extinct.", img: "/history/breeds/native-irish-terriers.jpg", value: 60 },
       { name: "Old English Black and Tan Terrier", note: "Wirehaired working terriers that shaped the harsh red coat.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 40 }
     ]
   },
@@ -812,8 +962,25 @@ const LINEAGE: Record<string, LineageNode> = {
   "Soft-Coated Wheaten Terrier": {
     name: "Soft-Coated Wheaten Terrier",
     note: "The oldest of Ireland's four native terriers, a soft-coated all-purpose farm dog, and the likely parent of the Kerry Blue and Irish Terrier.",
+    // 19 August 2026: pass-through fixed with the Celtic Heeler fallback. The
+    // Wheaten is the oldest Irish terrier and the progenitor of the Kerry Blue
+    // and Irish Terrier (AKC, SCWT Club of GB), so as the foundational native
+    // stock it has no documented distinct second parent. Rejected as folklore:
+    // Portuguese Water Dog ancestry for the Wheaten.
+    //
+    // 19 August 2026 (later): the self-repeat child was removed. A node should
+    // not be its own child, and it leaked into the render's name paths; the level
+    // root now carries its own name on the outer ring, so the node returns to its
+    // single real parent below.
+    //
+    // 19 August 2026: display device. The single documented ancestor below is
+    // drawn twice, as two identical children at 50 each (same note and img), so
+    // the level shows two circles rather than one filling the ring. The children
+    // differ in name from the parent, so isEcho, the pit words and the badge
+    // paths do not touch them. This must NOT be read as two separate ancestors.
     children: [
-      { name: "Native Irish terriers", note: "Ireland's old all-purpose working farm terriers. Now extinct.", img: "/history/breeds/irish-terrier-photo.jpg", value: 100 }
+      { name: "Native Irish terriers", note: "Ireland's old all-purpose working farm terriers. Now extinct.", img: "/history/breeds/native-irish-terriers.jpg", value: 50 },
+      { name: "Native Irish terriers", note: "Ireland's old all-purpose working farm terriers. Now extinct.", img: "/history/breeds/native-irish-terriers.jpg", value: 50 }
     ]
   },
 
@@ -821,8 +988,9 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Glen of Imaal Terrier",
     note: "A low, powerful terrier from a remote Wicklow valley, one of the four native Irish terriers and quiet for its kind.",
     children: [
-      { name: "Native Irish terriers", note: "The old Irish farm-terrier stock, with the Wheaten in its background. Now extinct.", img: "/history/breeds/irish-terrier-photo.jpg", value: 60 },
-      { name: "Low-slung soldiers' dogs", note: "Short-legged dogs left by Flemish and Hessian soldiers settled in the glen. Now extinct.", img: "/history/breeds/dandie-dinmont-terrier-photo.jpeg", value: 40 }
+      { name: "Native Irish terriers", note: "The old Irish farm-terrier stock, with the Wheaten in its background. Now extinct.", img: "/history/breeds/native-irish-terriers.jpg", value: 60 },
+      // 19 August 2026: this extinct ancestor was wearing a photograph of a living descendant, the Dandie Dinmont Terrier. Repointed to its own artwork.
+      { name: "Low-slung soldiers' dogs", note: "Short-legged dogs left by Flemish and Hessian soldiers settled in the glen. Now extinct.", img: "/history/breeds/low-slung-soldiers-dogs.jpg", value: 40 }
     ]
   },
 
@@ -879,22 +1047,40 @@ const LINEAGE: Record<string, LineageNode> = {
     // Water spaniels branch here, so it reads as green. Its dominant 55% St John's
     // water-dog line still dead-ends until Family 5, which traces its principal
     // ancestry. A green Labrador does NOT mean its main line is finished.
+    // 19 August 2026: display device. The single documented ancestor below is
+    // drawn twice, as two identical children at 50 each (same note and img), so
+    // the level shows two circles rather than one filling the ring. The children
+    // differ in name from the parent, so isEcho, the pit words and the badge
+    // paths do not touch them. This must NOT be read as two separate ancestors.
     children: [
-      { name: "Otterhound", note: "The web-footed otter-hunting hound, the water-working Tudor root of the water spaniels. A functional match, not documented descent. Now endangered.", img: "/history/breeds/otterhound-photo.jpg", value: 100 }
+      { name: "Otterhound", note: "The web-footed otter-hunting hound, the water-working Tudor root of the water spaniels. A functional match, not documented descent. Now endangered.", img: "/history/breeds/otterhound-photo.jpg", value: 50 },
+      { name: "Otterhound", note: "The web-footed otter-hunting hound, the water-working Tudor root of the water spaniels. A functional match, not documented descent. Now endangered.", img: "/history/breeds/otterhound-photo.jpg", value: 50 }
     ]
   },
   "Old Irish water dogs": {
     name: "Old Irish water dogs",
     note: "The southern and northern water spaniels of Ireland. Now extinct.",
+    // 19 August 2026: display device. The single documented ancestor below is
+    // drawn twice, as two identical children at 50 each (same note and img), so
+    // the level shows two circles rather than one filling the ring. The children
+    // differ in name from the parent, so isEcho, the pit words and the badge
+    // paths do not touch them. This must NOT be read as two separate ancestors.
     children: [
-      { name: "Otterhound", note: "The web-footed otter-hunting hound, the same water-working Tudor root, reached in parallel with the British water spaniels. Now endangered.", img: "/history/breeds/otterhound-photo.jpg", value: 100 }
+      { name: "Otterhound", note: "The web-footed otter-hunting hound, the same water-working Tudor root, reached in parallel with the British water spaniels. Now endangered.", img: "/history/breeds/otterhound-photo.jpg", value: 50 },
+      { name: "Otterhound", note: "The web-footed otter-hunting hound, the same water-working Tudor root, reached in parallel with the British water spaniels. Now endangered.", img: "/history/breeds/otterhound-photo.jpg", value: 50 }
     ]
   },
   "English Water Spaniel": {
     name: "English Water Spaniel",
     note: "The extinct native English water spaniel, a working water dog of the fens and rivers. Now extinct.",
+    // 19 August 2026: display device. The single documented ancestor below is
+    // drawn twice, as two identical children at 50 each (same note and img), so
+    // the level shows two circles rather than one filling the ring. The children
+    // differ in name from the parent, so isEcho, the pit words and the badge
+    // paths do not touch them. This must NOT be read as two separate ancestors.
     children: [
-      { name: "Water spaniels", note: "The broad old British water-spaniel population it came from. Now extinct.", img: "/history/breeds/original-water-spaniel.jpg", value: 100 }
+      { name: "Water spaniels", note: "The broad old British water-spaniel population it came from. Now extinct.", img: "/history/breeds/original-water-spaniel.jpg", value: 50 },
+      { name: "Water spaniels", note: "The broad old British water-spaniel population it came from. Now extinct.", img: "/history/breeds/original-water-spaniel.jpg", value: 50 }
     ]
   },
 
@@ -978,7 +1164,8 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "The tallest of the spaniels, a curly liver-brown water dog with a rat-like tail, one of Ireland's old gundog breeds.",
     children: [
       { name: "Old Irish water dogs", note: "The southern and northern water spaniels of Ireland. Now extinct.", img: "/history/breeds/Old-Irish-water-dog.jpg", value: 55 },
-      { name: "Continental water dogs", note: "Continental curly water dogs that shaped the coat. Now extinct.", img: "/history/breeds/Poodle-and-Barbet-water-dogs.jpg", value: 45 }
+      // 19 August 2026: this extinct ancestor was wearing a photograph of a living descendant, the Poodle. Repointed to its own artwork.
+      { name: "Continental water dogs", note: "Continental curly water dogs that shaped the coat. Now extinct.", img: "/history/breeds/continental-water-dogs.jpg", value: 45 }
     ]
   },
 
@@ -1018,7 +1205,8 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "The flowing-coated Scottish herder of farm and film, refined in Victorian times with a touch of Borzoi for its long, noble head.",
     children: [
       { name: "Old working collies", note: "The old northern hill-collie landrace of Scotland and the borders, the shared working stock the Rough, Smooth and Border collies all grew from. Now extinct.", img: "/history/breeds/Old-working-collies-cluster.jpg", value: 65 },
-      { name: "Old hill and bearded collies", note: "Shaggy upland herding dogs of the same family. Now extinct.",  img: "/history/breeds/bearded-collie-photo.jpg", value: 35 }
+      // 19 August 2026: this extinct ancestor was wearing a photograph of a living descendant, the Bearded Collie. Repointed to its own artwork.
+      { name: "Old hill and bearded collies", note: "Shaggy upland herding dogs of the same family. Now extinct.",  img: "/history/breeds/old-hill-and-bearded-collies.jpg", value: 35 }
     ]
   },
 
@@ -1028,7 +1216,10 @@ const LINEAGE: Record<string, LineageNode> = {
     children: [
       { name: "Old black-and-tan setters", note: "The setting dogs at its foundation. Now extinct.", img: "/history/breeds/british-setters.jpg", value: 65 },
       { name: "Bloodhound", note: "Thought to have deepened the nose and the black-and-tan.", img: "/history/breeds/modern-bloodhound.jpg", value: 20 },
-      { name: "Collie", note: "A little collie for steadiness, by tradition. Now extinct.",  img: "/history/breeds/rough-collie-photo.jpg", value: 15 }
+      // 19 August 2026: the bare "Collie" leaf dead-ended (no tree of its own).
+      // Renamed to the "Rough Collie" lineage root so the Setter reaches the
+      // collie ancestry; note and img taken from that root. Value unchanged.
+      { name: "Rough Collie", note: "The flowing-coated Scottish herder of farm and film, refined in Victorian times with a touch of Borzoi for its long, noble head.", img: "/history/breeds/rough-collie-photo.jpg", value: 15 }
     ]
   },
 
@@ -1036,7 +1227,11 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Lancashire Heeler",
     note: "A tiny, sharp black-and-tan drover's dog from north-west England, used to nip cattle along and clear rats from the farm.",
     children: [
-      { name: "Welsh Corgi", note: "The low, heel-nipping cattle dog at its base.", img: "/history/breeds/Pembroke-Welsh-Corgi-photo.jpg", value: 55 },
+      // 19 August 2026: the bare "Welsh Corgi" leaf dead-ended (no tree of its
+      // own). Renamed to the "Celtic Heeler" lineage root, the correct ancestral
+      // corgi stock, so it grafts; note and img taken from that root. Value
+      // unchanged.
+      { name: "Celtic Heeler", note: "The ancestral low-slung herding dogs brought to Wales by Celtic tribes -- forerunners of both the Cardigan and Pembroke Welsh Corgi. Short legs bred for nipping cattle heels and ducking kicks.", img: "/history/breeds/medieval-corgi.jpg", value: 55 },
       { name: "Manchester Terrier", note: "Black-and-tan terrier blood for ratting and colour.", img: "/history/breeds/manchester-terrior.jpg", value: 45 }
     ]
   },
@@ -1062,7 +1257,10 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "A 1980s British creation, bred to look like a wolf while keeping a gentle, trainable temperament. Famous as the Stark direwolves on screen.",
     children: [
       { name: "Arctic sled dogs", note: "Siberian Husky and Alaskan Malamute for the wolfish looks and coat.", img: "/history/breeds/Arctic-sled-dogs.jpg", value: 55 },
-      { name: "German Shepherd Dog", note: "For size, trainability and a steady working mind.",  img: "/history/breeds/German-cattle-dog.jpg", value: 45 }
+      // Renamed from "German Shepherd Dog" to "German Shepherd" and img switched from the
+      // wrong-animal /history/breeds/German-cattle-dog.jpg to /german-shepard-square.jpg so this
+      // node grafts onto the German Shepherd lineage root and matches the pack card (15 August 2026).
+      { name: "German Shepherd", note: "For size, trainability and a steady working mind.",  img: "/german-shepard-square.jpg", value: 45 }
     ]
   },
 
@@ -1095,10 +1293,8 @@ const LINEAGE: Record<string, LineageNode> = {
       // separately and the former 50 divides evenly between them. Bloodhound is
       // a lineage key in its own right, so that half now grafts its real
       // ancestry in instead of dead-ending.
-      // TODO artwork: the Gascogne reuses the Bloodhound photo as a stand-in
-      // until its own image exists. Owner-agreed placeholder, replace the img.
       { name: "Bloodhound", note: "Bloodhound for size, nose and the black-and-tan.", img: "/history/breeds/modern-bloodhound.jpg", value: 25 },
-      { name: "Grand Bleu de Gascogne", note: "The big French blue hound, for scenting power and voice.", img: "/history/breeds/modern-bloodhound.jpg", value: 25 }
+      { name: "Grand Bleu de Gascogne", note: "The big French blue hound, for scenting power and voice.", img: "/history/breeds/grand-bleu-de-gascogne.jpg", value: 25 }
     ]
   },
 
@@ -1186,25 +1382,43 @@ const LINEAGE: Record<string, LineageNode> = {
   "Old Highland terriers": {
     name: "Old Highland terriers",
     note: "The old working-terrier stock of the Highlands that every Scottish terrier springs from. Now extinct.",
+    // 19 August 2026: display device. The single documented ancestor (Earth Dog)
+    // is drawn twice, as two identical children at 50 each (same note and img),
+    // so the level shows two circles rather than one filling the ring. The
+    // children differ in name from the parent, so isEcho, the pit words and the
+    // badge paths do not touch them. This must NOT be read as two separate
+    // ancestors.
     children: [
-      { name: "Earth Dog", note: "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.", img: "/history/breeds/medieval-earth-dog.jpg", value: 30 },
-      { name: "Old Highland terriers", note: "The old working-terrier stock of the Highlands that every Scottish terrier springs from. Now extinct.", img: "/history/breeds/Old-Highland-terriers.jpg", value: 30 },
+      { name: "Earth Dog", note: "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.", img: "/history/breeds/medieval-earth-dog.jpg", value: 50 },
+      { name: "Earth Dog", note: "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.", img: "/history/breeds/medieval-earth-dog.jpg", value: 50 }
     ],
   },
   "Old British ratting terriers": {
     name: "Old British ratting terriers",
     note: "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.",
+    // 19 August 2026: display device. The single documented ancestor (Earth Dog)
+    // is drawn twice, as two identical children at 50 each (same note and img),
+    // so the level shows two circles rather than one filling the ring. The
+    // children differ in name from the parent, so isEcho, the pit words and the
+    // badge paths do not touch them. This must NOT be read as two separate
+    // ancestors.
     children: [
-      { name: "Earth Dog", note: "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.", img: "/history/breeds/medieval-earth-dog.jpg", value: 30 },
-      { name: "Old British ratting terriers", note: "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.", img: "/history/breeds/Old-British-ratting-terriers.jpg", value: 30 },
+      { name: "Earth Dog", note: "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.", img: "/history/breeds/medieval-earth-dog.jpg", value: 50 },
+      { name: "Earth Dog", note: "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.", img: "/history/breeds/medieval-earth-dog.jpg", value: 50 }
     ],
   },
   "Earth and hunt terriers": {
     name: "Earth and hunt terriers",
     note: "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.",
+    // 19 August 2026: display device. The single documented ancestor (Earth Dog)
+    // is drawn twice, as two identical children at 50 each (same note and img),
+    // so the level shows two circles rather than one filling the ring. The
+    // children differ in name from the parent, so isEcho, the pit words and the
+    // badge paths do not touch them. This must NOT be read as two separate
+    // ancestors.
     children: [
-      { name: "Earth Dog", note: "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.", img: "/history/breeds/medieval-earth-dog.jpg", value: 20 },
-      { name: "Earth and hunt terriers", note: "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.", img: "/history/breeds/Earth-and-hunt-terrier.jpg", value: 20 },
+      { name: "Earth Dog", note: "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.", img: "/history/breeds/medieval-earth-dog.jpg", value: 50 },
+      { name: "Earth Dog", note: "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.", img: "/history/breeds/medieval-earth-dog.jpg", value: 50 }
     ],
   },
   // Playable like the two ancient additions above (owner instruction,
@@ -1269,8 +1483,13 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Shepherd's Dog",
     note: "Practical medieval working dog used to move and protect sheep, forming an early root of Britain's collie families. An extinct historical type.",
     children: [
-      { name: "Celtic herdsmen's dogs", note: "The all-round farm dogs of the Celtic tribes, guarding and driving the herds. Now extinct.", img: "/history/breeds/celtic-herdsmen-dogs.jpg", value: 60 },
-      { name: "Roman shepherd dogs", note: "The flock-guarding sheepdogs the Roman farm writers described, kept white so the shepherd knew dog from wolf. Now extinct.", img: "/history/breeds/roman-shepherd-dogs.jpg", value: 40 }
+      { name: "Celtic herdsmen's dogs", note: "The all-round farm dogs of the Celtic tribes, guarding and driving the herds. Now extinct.", img: "/history/breeds/celtic-herdsmen-dogs.jpg", value: 35 },
+      { name: "Roman shepherd dogs", note: "The flock-guarding sheepdogs the Roman farm writers described, kept white so the shepherd knew dog from wolf. Now extinct.", img: "/history/breeds/roman-shepherd-dogs.jpg", value: 25 },
+      // Added 18 August 2026. The Anglo-Saxon layer is supported by Crabtree's
+      // East Anglia zooarchaeology; the Norse layer by the Heath Wood strontium
+      // study.
+      { name: "Anglo-Saxon herding dogs", note: "Collie-sized herding dogs of Anglo-Saxon England, found at West Stow and Brandon. Now extinct.", img: "/history/breeds/anglo-saxon-herding-dogs.jpg", value: 20 },
+      { name: "Norse settlers dogs", note: "Scandinavian dogs brought over with Viking settlement, likely mixed into local herding stock. Now extinct.", img: "/history/breeds/viking-herding-spitz.jpg", value: 20 }
     ]
   },
   "Drover's Dog": {
@@ -1298,8 +1517,21 @@ const LINEAGE: Record<string, LineageNode> = {
   "Old British bandogs": {
     name: "Old British bandogs",
     note: "The heavy chained dogs of old England, kept tied by day and set loose at night, and put to work by butchers and baiters alike. Now extinct.",
+    // 19 August 2026: was a single 100% child (Ancient Mastiff), a pass-through
+    // that filled the parent circle so the level read as Ancient Mastiff rather
+    // than as itself. It was briefly given a Celtic Heeler self-repeat (a child
+    // named after the parent), then removed: a node should not be its own child,
+    // and that name leaked into isEcho, the pit words and the badge paths.
+    //
+    // Instead, a display device: TWO identical children, both "Ancient Mastiff",
+    // sharing the same note and img, at 50 each, so the level shows two circles
+    // rather than one filling the ring. Because the children differ in name from
+    // the parent, none of the self-repeat leaks apply. This must NOT be read as
+    // two separate ancestors: the node has one documented ancestor, drawn twice
+    // on purpose.
     children: [
-      { name: "Ancient Mastiff", note: "The ancient British guard and war dog, praised by Roman writers, that the heavy bandogs descend from. A functional root, not documented descent. An extinct historical type.", img: "/history/breeds/ancient-british-mastiff-type.jpg", value: 100 }
+      { name: "Ancient Mastiff", note: "The ancient British guard and war dog, praised by Roman writers, that the heavy bandogs descend from. A functional root, not documented descent. An extinct historical type.", img: "/history/breeds/ancient-british-mastiff-type.jpg", value: 50 },
+      { name: "Ancient Mastiff", note: "The ancient British guard and war dog, praised by Roman writers, that the heavy bandogs descend from. A functional root, not documented descent. An extinct historical type.", img: "/history/breeds/ancient-british-mastiff-type.jpg", value: 50 }
     ]
   },
   "Arctic sled dogs": {
@@ -1315,13 +1547,22 @@ const LINEAGE: Record<string, LineageNode> = {
   // extends all 11 at once and makes the ancient-East and Alaunt lines reachable
   // from the mastiff and bulldog trees. It is ancient, deeper than the Tudor
   // boundary, so it reaches no era card and moves no count; this is honest tail,
-  // not a count job. Same Celtic-Heeler self-child shape as its inline version.
+  // not a count job. It briefly wore a Celtic-Heeler self-child; that was removed
+  // on 19 August 2026 (a node should not be its own child, and it leaked into the
+  // render's name paths). The level root now carries its own name on the outer
+  // ring, so it returns to the single Old mastiffs of the ancient East parent.
+  //
+  // 19 August 2026: display device. The single documented ancestor below is
+  // drawn twice, as two identical children at 50 each (same note and img), so
+  // the level shows two circles rather than one filling the ring. The children
+  // differ in name from the parent, so isEcho, the pit words and the badge paths
+  // do not touch them. This must NOT be read as two separate ancestors.
   "Ancient Molossers": {
     name: "Ancient Molossers",
     note: "The huge eastern war and guard dogs at the root of every mastiff. Now extinct.",
     children: [
-      { name: "Old mastiffs of the ancient East", note: "The huge guard and hunting mastiffs of the ancient East, carved on palace walls thousands of years ago. Now extinct.", img: "/history/breeds/old-mastiffs-of-the-ancient-east.jpg", value: 25 },
-      { name: "Ancient Molossers", note: "The huge eastern war and guard dogs at the root of every mastiff. Now extinct.", img: "/history/breeds/Ancient-Molossers.jpg", value: 25 }
+      { name: "Old mastiffs of the ancient East", note: "The huge guard and hunting mastiffs of the ancient East, carved on palace walls thousands of years ago. Now extinct.", img: "/history/breeds/old-mastiffs-of-the-ancient-east.jpg", value: 50 },
+      { name: "Old mastiffs of the ancient East", note: "The huge guard and hunting mastiffs of the ancient East, carved on palace walls thousands of years ago. Now extinct.", img: "/history/breeds/old-mastiffs-of-the-ancient-east.jpg", value: 50 }
     ]
   },
 
@@ -1369,35 +1610,33 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Celtic Heeler",
     note: "The ancestral low-slung herding dogs brought to Wales by Celtic tribes -- forerunners of both the Cardigan and Pembroke Welsh Corgi. Short legs bred for nipping cattle heels and ducking kicks.",
     img: "/history/breeds/medieval-corgi.jpg",
+    // 19 August 2026: removed the "Welsh herding dogs" sub-ring from here. That
+    // edge made Celtic Heeler descend from Welsh herding dogs, which runs
+    // backwards in time: Celtic Heeler is the ancestral low-slung stock the
+    // Celts brought to Wales, Welsh herding dogs the later Welsh landrace. It is
+    // the same class of error as the Early badger hunting dogs / Earth Dog edge
+    // recorded in the BARE LEAF note below the Welsh herding dogs root. The edge
+    // has been reversed: Celtic Heeler is now a child of that root instead. To
+    // avoid leaving Celtic Heeler a single pass-through child, "Old hunting dogs
+    // of the Celts" was promoted out of the removed ring into a direct child
+    // here. Early badger 60, Old hunting dogs 40. The ring carries no value of
+    // its own, so Early badger's 60 is written as two even children of 30
+    // (30 + 30 = 60), and 60 + 40 = 100.
     children: [
       {
         name: "Early badger hunting dogs",
         note: "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.",
         img: "/history/breeds/early-badger-hunting-dogs.jpg",
         // No value of its own. A parent's share is the sum of its children, and
-        // d3 adds an owned value ON TOP of them, so carrying both counted this
-        // line twice and pushed the children down to 32%. The two 55s below are
-        // the 55 that used to sit here, split evenly.
+        // d3 adds an owned value ON TOP of them, so carrying both would count
+        // this line twice. The two 30s below are Early badger's 60 share written
+        // as two even children; the self-duplicate keeps the ancestor in step.
         children: [
-          { name: "Ancient Celtic earth dogs", note: "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.", img: "/history/breeds/ancient-celtic-earth-dog.jpg", value: 55 },
-          { name: "Early badger hunting dogs", note: "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.", img: "/history/breeds/early-badger-hunting-dogs.jpg", value: 55 },
+          { name: "Ancient Celtic earth dogs", note: "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.", img: "/history/breeds/ancient-celtic-earth-dog.jpg", value: 30 },
+          { name: "Early badger hunting dogs", note: "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.", img: "/history/breeds/early-badger-hunting-dogs.jpg", value: 30 },
         ],
       },
-      {
-        name: "Welsh herding dogs",
-        note: "The old Welsh herding and droving dogs -- a long-legged, loose-eyed landrace that provided the herding instinct and biddable temperament. Now extinct.",
-        img: "/history/breeds/Welsh-herding-dogs-cluster.jpg",
-        children: [
-          // Same dog as the one in the Celtic Hound level, so it carries the
-          // same picture and the same words. It used to have its own image and
-          // its own write-up, typed separately, which is why the two levels
-          // disagreed about what it looked like. Nothing copies img or note
-          // between entries, so a duplicate has to be kept in step by hand:
-          // change this one and change "Celtic Hound" below to match.
-          { name: "Old hunting dogs of the Celts", note: "The native running dogs of Iron Age Europe. Now extinct.", img: "/history/breeds/Old-hunting-dogs-of-the-Celts.jpg", value: 45 },
-          { name: "Welsh herding dogs", note: "The old Welsh herding and droving dogs -- a long-legged, loose-eyed landrace that provided the herding instinct and biddable temperament. Now extinct.", img: "/history/breeds/Welsh-herding-dogs-cluster.jpg", value: 45 },
-        ],
-      },
+      { name: "Old hunting dogs of the Celts", note: "The native running dogs of Iron Age Europe. Now extinct.", img: "/history/breeds/Old-hunting-dogs-of-the-Celts.jpg", value: 40 },
     ],
   },
 
@@ -1424,7 +1663,10 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "A tall, rough-coated sighthound bred to course red deer across the Highlands, close kin to the Irish Wolfhound.",
     children: [
       { name: "Celtic Hound", note: "The ancient sighthound stock of the north.", img: "/history/breeds/celtic-hound-remake.jpg", value: 60 },
-      { name: "Rough northern sighthounds", note: "Shaggy-coated coursing dogs built for cold, rough ground. Now extinct.", img: "/history/breeds/irish-wolfhound-photo.jpg", value: 40 }
+      // 18 August 2026: swapped off the Irish Wolfhound photo. The Wolfhound is
+      // a living breed and, per the Deerhound's own note, its close kin rather
+      // than its ancestor, so this extinct node now carries its own artwork.
+      { name: "Rough northern sighthounds", note: "Shaggy-coated coursing dogs built for cold, rough ground. Now extinct.", img: "/history/breeds/rough-northern-sighthounds.jpg", value: 40 }
     ]
   },
 
@@ -1476,13 +1718,13 @@ const LINEAGE: Record<string, LineageNode> = {
     ]
   },
 
+  // 19 August 2026: period sources treat mastive, bandogge and alaunt as one animal under three names. Caius in 1576 describes the mastive or bandogge as a single type used to bait bulls, and the name Mastiff was applied indiscriminately to all large dogs, so the English Mastiff is a later divergence from the same stock rather than a parent of the bull-baiting dog. The Mastiff child is therefore removed.
   "Old English Bulldog": {
     name: "Old English Bulldog",
     note: "The extinct, athletic bull-baiting dog, leaner and fiercer than today's Bulldog, bred down from ancient war dogs.",
     children: [
-      { name: "Mastiff", note: "The big Molosser guard dogs that gave it bulk and a broad jaw.", img: "/history/breeds/medieval-british-mastiff.jpg", value: 30 },
-      { name: "Alaunt war dogs", note: "The extinct Alaunt catch dogs crossed in alongside them. A modelled half of the pair, not a recorded mating. Now extinct.", img: "/history/breeds/alunt-war-dogs.jpg", value: 30 },
-      { name: "Old British bandogs", note: "The heavy chained dogs of old England, kept tied by day and set loose at night, and put to work by butchers and baiters alike. Now extinct.", img: "/history/breeds/Old-British-bandogs.jpg", value: 40 }
+      { name: "Old British bandogs", note: "The heavy chained dogs of old England, kept tied by day and set loose at night, and put to work by butchers and baiters alike. Now extinct.", img: "/history/breeds/Old-British-bandogs.jpg", value: 60 },
+      { name: "Alaunt war dogs", note: "The extinct Alaunt catch dogs crossed in alongside them. A modelled half of the pair, not a recorded mating. Now extinct.", img: "/history/breeds/alunt-war-dogs.jpg", value: 40 }
     ]
   },
 
@@ -1539,7 +1781,11 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Bearded Collie",
     note: "A shaggy, bouncy Scottish herding dog, also called the Highland Collie, built for driving sheep and cattle over the hills.",
     children: [
-      { name: "Shaggy lowland herders", note: "Polish Lowland sheepdogs said to have come ashore in Scotland. Now extinct.", img: "/history/breeds/Old-English-Sheepdog.jpg", value: 50 },
+      // Re-keyed 18 August 2026. The old node named the Polish Lowland Sheepdog,
+      // which is not extinct, on a conjectural arrival story, and carried an Old
+      // English Sheepdog photo. The Old Welsh Grey is a documented extinct Welsh
+      // type widely held to be a Bearded Collie ancestor.
+      { name: "Old Welsh Grey Sheepdog", note: "A shaggy grey Welsh hill sheepdog, worked loose-eyed and noisy like the Beardie itself. Now extinct.", img: "/history/breeds/old-welsh-grey-sheepdog.jpg", value: 50 },
       { name: "Old working collies", note: "The old northern hill-collie landrace of Scotland and the borders, the shared working stock the Rough, Smooth and Border collies all grew from. Now extinct.", img: "/history/breeds/Old-working-collies-cluster.jpg", value: 50 }
     ]
   },
@@ -1564,15 +1810,27 @@ const LINEAGE: Record<string, LineageNode> = {
   "Old toy spaniels": {
     name: "Old toy spaniels",
     note: "The small sporting and lap spaniels of Tudor and Stuart England. Now extinct.",
+    // 19 August 2026: display device. The single documented ancestor below is
+    // drawn twice, as two identical children at 50 each (same note and img), so
+    // the level shows two circles rather than one filling the ring. The children
+    // differ in name from the parent, so isEcho, the pit words and the badge
+    // paths do not touch them. This must NOT be read as two separate ancestors.
     children: [
-      { name: "Land spaniels", note: "The old sporting land-spaniel stock the court toy spaniels were bred down from. Now extinct.", img: "/history/breeds/original-land-spaniel.jpg", value: 100 }
+      { name: "Land spaniels", note: "The old sporting land-spaniel stock the court toy spaniels were bred down from. Now extinct.", img: "/history/breeds/original-land-spaniel.jpg", value: 50 },
+      { name: "Land spaniels", note: "The old sporting land-spaniel stock the court toy spaniels were bred down from. Now extinct.", img: "/history/breeds/original-land-spaniel.jpg", value: 50 }
     ]
   },
   "Old sporting toy spaniels": {
     name: "Old sporting toy spaniels",
     note: "The longer-muzzled toy spaniels of the older paintings. Now extinct.",
+    // 19 August 2026: display device. The single documented ancestor below is
+    // drawn twice, as two identical children at 50 each (same note and img), so
+    // the level shows two circles rather than one filling the ring. The children
+    // differ in name from the parent, so isEcho, the pit words and the badge
+    // paths do not touch them. This must NOT be read as two separate ancestors.
     children: [
-      { name: "Land spaniels", note: "The old sporting land-spaniel stock behind the toy spaniels. Now extinct.", img: "/history/breeds/original-land-spaniel.jpg", value: 100 }
+      { name: "Land spaniels", note: "The old sporting land-spaniel stock behind the toy spaniels. Now extinct.", img: "/history/breeds/original-land-spaniel.jpg", value: 50 },
+      { name: "Land spaniels", note: "The old sporting land-spaniel stock behind the toy spaniels. Now extinct.", img: "/history/breeds/original-land-spaniel.jpg", value: 50 }
     ]
   },
   "Asian flat-faced toys": {
@@ -1641,7 +1899,8 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "Lower, stouter spaniels that gave the Sussex and Clumber their weight and bone. Now extinct.",
     children: [
       { name: "Land spaniels", note: "The old land-spaniel stock at the base. Now extinct.", img: "/history/breeds/original-land-spaniel.jpg", value: 55 },
-      { name: "Basset and heavy hounds", note: "Low, long, heavy hound blood for build and weight. Now extinct.", img: "/history/breeds/Medieval-Bloodhound.jpg", value: 45 }
+      // 19 August 2026: this extinct ancestor was wearing a photograph of a living descendant, the Bloodhound. Repointed to its own artwork.
+      { name: "Basset and heavy hounds", note: "Low, long, heavy hound blood for build and weight. Now extinct.", img: "/history/breeds/basset-and-heavy-hounds.jpg", value: 45 }
     ]
   },
   "Basset and heavy hounds": {
@@ -1658,7 +1917,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "The heaviest, slowest spaniel of all, a stocky white gundog built to push through thick cover, developed at Clumber Park.",
     children: [
       { name: "Land spaniels", note: "The heavy Alpine and old land spaniels at its base. Now extinct.", img: "/history/breeds/original-land-spaniel.jpg", value: 55 },
-      { name: "Basset and heavy hounds", note: "Low, long hound blood, by tradition Basset Hound, for its build and weight. Now in-decline.", img: "/history/breeds/Medieval-Bloodhound.jpg", value: 45 }
+      { name: "Basset and heavy hounds", note: "Low, long hound blood, by tradition Basset Hound, for its build and weight. Now in-decline.", img: "/history/breeds/basset-and-heavy-hounds.jpg", value: 45 }
     ]
   },
 

@@ -20,18 +20,21 @@ import PickAChumIcon from './PickAChumIcon';
 import { CHUM_DATA } from '../lib/data';
 import { submit, isSensitiveInput, Turn } from '../lib/engine';
 import { newSession, Session } from '../lib/session';
+import { GAMES_MENU, GamesMenuItem } from '../lib/assembler';
+import { misreadsUsed } from './dogAppearance';
 import { Dog, GameId } from '../lib/types';
 import { reportHiddenGame, reportHat } from '../../../lib/hiddenGames/browserEngine';
 import { chatHatFor, BIRTHDAY_HAT_ID, KENNEL_SKETCH_HAT_ID } from '../../../lib/hiddenGames/hatHunt';
 import type { GameId as HiddenGameId } from '../../../lib/hiddenGames/registry';
 import { openDiscountPopup } from '../data/discount-popup';
 import { FEED_COOKIES, RED_TOOLTIP, CookiePill } from '../data/feed-cookie';
+import { PICKER_EMOJI } from '../data/emoji-picker';
 import { applyBoxerEffect, resetBoxerEffects } from '../lib/boxerEffects';
 import { BOXER_BUTTONS, BoxerButton } from '../data/boxer-button-game';
 import { breeds } from '../../../data/breeds';
 import { skipTheatre, buildTypingPlan, TYPING_PROFILES, TypingPlan } from '../lib/theatre';
 import { emitTurn } from '../lib/turn-tap';
-import { CHAT_KEY, PROTECTED_FLAG } from './pcKeys';
+import { CHAT_KEY, PROTECTED_FLAG, HAS_SPOKEN } from './pcKeys';
 // Task 174: the chat is now inside the contrast schemes (data-pc-reach on the root). Scheme and hide-images
 // are read here, live, so the portraits can be swapped for the dog's name as text in any accessibility mode
 // -- the generic HideImages overlay is scoped to #pc-site and cannot reach this body-level overlay.
@@ -156,6 +159,7 @@ interface Message {
   gameOutput?: string; // Task 115: the game board / sheep tiles / drawing, rendered in a monospace block
   media?: { src: string; alt: string }; // Task 138: a short looping clip served with the line
   avatar?: boolean; // Task 165: show this dog's face beside the bubble -- a second dog cutting in (the Collie's food interjection), where the medallion stays the active dog so colour alone is too subtle a cue
+  gamesMenu?: GamesMenuItem[]; // the games-menu message's tappable game pills (this dog's own games); typing the name still works too
 }
 
 // The response-specific action link (if any). Navigation links (a destination or
@@ -193,6 +197,14 @@ function readChat(): { messages: Message[]; session: Session; dog: Dog; phase: P
       // closed (Boxer cut-off) session is never restored either -- she has left, so reopening starts
       // fresh at the selector rather than a dead input box.
       if (typeof window !== 'undefined') window.sessionStorage.removeItem(CHAT_KEY);
+      return null;
+    }
+    // Task 180: only restore a chat the visitor actually SPOKE in (HAS_SPOKEN). An unbidden appearance the
+    // visitor never answered is not a conversation; a stale bare-chip payload (from before persistence was
+    // gated, or a race) is scrubbed rather than restored, so a monologue never reopens on -- or leaks into
+    // -- the next page's dog. A real conversation still restores and follows, per Task 105.
+    if (typeof window !== 'undefined' && !window.sessionStorage.getItem(HAS_SPOKEN)) {
+      window.sessionStorage.removeItem(CHAT_KEY);
       return null;
     }
     return s;
@@ -258,21 +270,37 @@ const BUBBLE_CLASS: Record<Dog, string> = { labrador: 'bubbleLabrador', collie: 
 // has been a reply) into an existing chat, and arms the cookie ask so a "yes" feeds him. Owner copy, verbatim.
 const LAB_HOTDOG_PICKUP = 'you made it, I got here first. can you get me a cookie?';
 
+// Task 177 / 179: seed a dog's naming loop, ONCE per session. `namingLoopStarted` latches the dog, so a
+// spent or broken loop never restarts on a fresh appearance or a re-fired /hot-dogs pickup (the loop does
+// not resume). engine.submit then serves one pool line per filler reply until the pool runs out.
+function seedNamingLoop(session: Session, dog: Dog, used: number[]): void {
+  if ((session.namingLoopStarted ?? []).includes(dog)) return;
+  session.namingLoop = { dog, used };
+  session.namingLoopStarted = [...(session.namingLoopStarted ?? []), dog];
+}
+
+// Task 181: the Collie's /know-your-chums intro chip, served BEFORE the three breed lines so the visitor
+// knows what is coming (was opening straight into "The Border Collie..."). Owner copy, verbatim. It becomes
+// lines[0] (the chip); the three breed lines follow as the three extras, on the existing 20s gaps.
+const CHUM_INTRO = 'get you know us here';
 // Task 153: the Collie's chum-naming lines for /know-your-chums. THREE DISTINCT breeds, PICKED AT RANDOM
 // (a different three each session), drawn from each breed's OWN `fact` and `character` in her register
 // rather than 54 authored lines. Every one of the 54 has both fields, so no guard is needed; a missing
 // field simply drops out of the line. SHAPE (reported for approval): "The <Name>. <fact>. <first
 // sentence of character>." Generated here, not in the launcher, so the launcher stays lightweight.
+// Task 181: the intro is prepended, so the returned array is [intro, breed, breed, breed] -- lines[0] is the
+// chip, slice(1) the three extras (within SEQ_MAX_EXTRAS = 4).
 function collieChumLines(): string[] {
   const pool = [...breeds];
   const picks: typeof breeds = [];
   for (let i = 0; i < 3 && pool.length; i++) picks.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0]);
-  return picks.map((b) => {
+  const breedLines = picks.map((b) => {
     const fact = (b.fact || '').trim().replace(/[.\s]+$/, '');
     const factSentence = fact ? `${fact[0].toUpperCase()}${fact.slice(1)}.` : '';
     const charFirst = (b.character || '').split(/(?<=[.!?])\s+/)[0].replace(/&/g, 'and').trim();
     return [`The ${b.name}.`, factSentence, charFirst].filter(Boolean).join(' ');
   });
+  return [CHUM_INTRO, ...breedLines];
 }
 
 export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, terrierSay, logoHidden = false }: { onClose: () => void; autoAppear?: AutoAppear; pickupRoute?: string | null; terrierSay?: string | null; logoHidden?: boolean }) {
@@ -287,6 +315,22 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
   const auto = !restored && autoAppear ? autoAppear : null;
   const everProtectedRef = useRef(false); // latches once the session enters a protected state
   const sessionRef = useRef<Session | null>(restored ? restored.session : auto ? newSession(auto.dog) : null);
+  // Task 177 / 179: seed a naming loop, ONCE, at the fresh appearance. The Boxer's /about appearance has
+  // just shown misread #1, so his loop starts with that index already used (misreadsUsed(), so #2..#10
+  // never repeat it); the Labrador's /hot-dogs Case B appearance ("I like hotdogs" names no YES food)
+  // starts empty, so his first reply names food #1. A RESTORED chat keeps whatever loop state it persisted,
+  // so a mid-loop navigation resumes rather than restarts, and a spent loop stays spent (namingLoopStarted).
+  // The Boxer's /home and /smarter pages carry a sequence, not a loop, and never seed one. The Labrador's
+  // Case A thread pickup seeds separately, in its own effect below.
+  const factSeededRef = useRef(false);
+  if (!factSeededRef.current) {
+    factSeededRef.current = true;
+    const s = sessionRef.current;
+    if (auto && s) {
+      if (auto.dog === 'boxer' && auto.route === '/about' && auto.followUps?.length) seedNamingLoop(s, 'boxer', misreadsUsed());
+      else if (auto.dog === 'labrador' && auto.route === '/hot-dogs') seedNamingLoop(s, 'labrador', []);
+    }
+  }
   const [phase, setPhase] = useState<Phase>(restored ? restored.phase || 'idle' : auto ? 'idle' : 'selecting');
   const [dog, setDog] = useState<Dog>(restored ? restored.dog || 'collie' : auto ? auto.dog : 'collie'); // active dog (the anchor medallion)
   const [swap, setSwap] = useState<Swap>('none');
@@ -301,6 +345,7 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
   // ends the game. `armedRed` is the red pill whose "we dont use this" tooltip is currently open.
   const [feedFed, setFeedFed] = useState<string[] | null>(null);
   const [armedRed, setArmedRed] = useState<string | null>(null);
+  const [emojiOpen, setEmojiOpen] = useState(false); // the composer emoji picker panel
   // Task 168: the receded dogs (the three non-active) sit stacked beside the medallion while a chat is
   // open, each an arrow to switch to it. `activeReceded` is the one being pointed at: on a hover-capable
   // device it is set on hover (and a click switches straight away); on touch the FIRST tap sets it (grey
@@ -425,6 +470,9 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
     pickupDoneRef.current = pickupRoute;
     session.activeDog = 'labrador';
     session.cookieAskPending = true;
+    // Task 179: seed his food-naming loop here too. The cookie ask is armed for THIS turn, so a bare "yes"
+    // next starts the feed game (game_start breaks the loop and wins); any other reply names food #1.
+    seedNamingLoop(session, 'labrador', []);
     if (!session.previousDogs.includes('labrador')) session.previousDogs.push('labrador');
     setDog('labrador');
     setMessages((m) => [...m, { id: idRef.current++, who: 'dog', text: LAB_HOTDOG_PICKUP, dog: 'labrador', name: dogInfo('labrador').name, display: LAB_HOTDOG_PICKUP, done: true }]);
@@ -773,10 +821,18 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
   // all drop it, so the rest never fire (see send(), the pathname effect, and the protected checks here).
   // The extras appear whole (no per-message typing), so there is no theatre to stack -- the 40s ceiling
   // is never approached by a sequence, only by the single main message that precedes it.
-  const SEQ_MAX_EXTRAS = 2;
+  // Task 176: raised from 2 to 3 so a four-message FAQ answer (opener + three extras) plays in full
+  // (FAQ009 the four-part 30%-off sequence, FAQ012 the four-part contact sequence).
+  // Task 178: raised to 4 so the Boxer's five-message /home welcome (opener + four extras) plays in full.
+  // No other sequence carries four extras (the FAQ runs are opener + three), so this enables only /home.
+  const SEQ_MAX_EXTRAS = 4;
   const playSequence = useCallback(
-    (lines: string[], seqDog: Dog, gapMs: number, showAvatar = false, media?: { src: string; alt: string }, monologue = false) => {
-      const items = lines.filter((l) => l && l.trim()).slice(0, SEQ_MAX_EXTRAS);
+    (lines: Array<string | { text: string; url?: string | null; destinationId?: string }>, seqDog: Dog, gapMs: number, showAvatar = false, media?: { src: string; alt: string }, monologue = false, firstGapMs?: number) => {
+      // Task 176: an item may carry its own link (a FAQ sequence message), so normalise strings to steps.
+      const items = lines
+        .map((l) => (typeof l === 'string' ? { text: l } : l))
+        .filter((l) => l.text && l.text.trim())
+        .slice(0, SEQ_MAX_EXTRAS);
       if (!items.length) return;
       const s = sessionRef.current;
       // Never BEGIN a sequence in a protected session: a child who disclosed something must not have a
@@ -803,12 +859,14 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
           seqRef.current = null;
           return;
         }
-        const line = items[i];
+        const item = items[i];
         // Task 166: the media rides ONLY the last line of the run (a red cookie's clip on its single
         // follow-up line), so a multi-line sequence never repeats the clip.
         const withMedia = media && i === items.length - 1 ? media : undefined;
-        setMessages((m) => [...m, { id: idRef.current++, who: 'dog', text: line, display: line, done: true, dog: seqDog, name: dogInfo(seqDog).name, avatar: showAvatar, media: withMedia }]);
-        setAnnounce(line);
+        // Task 176: a sequence message may carry its own structural link (FAQ009's pay/form links).
+        const action = item.url ? actionFor({ url: item.url, destinationId: item.destinationId } as Turn['response']) : undefined;
+        setMessages((m) => [...m, { id: idRef.current++, who: 'dog', text: item.text, display: item.text, done: true, dog: seqDog, name: dogInfo(seqDog).name, avatar: showAvatar, action, media: withMedia }]);
+        setAnnounce(item.text);
         if (i + 1 < items.length) {
           after(gapMs, () => play(i + 1));
         } else {
@@ -816,7 +874,10 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
           setSeqDone((t) => t + 1); // Task 169: wake the drain -- a reply queued during the run waits on this
         }
       };
-      after(gapMs, () => play(0));
+      // Task 181: the first beat may use a distinct gap (the /know-your-chums intro -> first breed short
+      // pause); every gap BETWEEN items stays gapMs (the 20s between breeds). Defaults to gapMs, so every
+      // existing caller is unchanged.
+      after(firstGapMs ?? gapMs, () => play(0));
     },
     [after]
   );
@@ -857,10 +918,12 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
     seqStartedRef.current = true;
     // Task 169: the beat lands 2s after the visitor opens the chip (was 2.5s), and marks the run a `monologue`
     // so a reply typed over it QUEUES rather than cutting it short -- the dog finishes, then the reply is answered.
-    // ONLY the fast followUps run (2s beats, at most 4s total) queues. The know-your-chums Collie names breeds
+    // ONLY the fast followUps run (2s beats, up to ~8s total for the four-extra /home) queues. The know-your-chums Collie names breeds
     // on 20s gaps: making a reply wait up to 40s behind that would be worse than abandoning, so it keeps the
     // old abandon-on-type (the visitor's reply wins at once).
-    playSequence(extras, auto.dog, auto.gapMs ?? (auto.chums ? 20000 : 2000), false, undefined, !auto.chums);
+    // Task 181: for the chums run, the FIRST breed follows the intro after a short 2s beat (20s of silence
+    // after the intro reads as broken); the 20s gap then applies only BETWEEN the three breeds.
+    playSequence(extras, auto.dog, auto.gapMs ?? (auto.chums ? 20000 : 2000), false, undefined, !auto.chums, auto.chums ? 2000 : undefined);
   }, [auto, minimised, playSequence]);
 
   // Drive a handover: post the user line (and any handover line), pause, pop the
@@ -925,6 +988,9 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
       everProtectedRef.current = true;
       try {
         window.sessionStorage.removeItem(CHAT_KEY);
+        // Task 176: the "visitor has spoken" flag is scrubbed too, so a protected session cannot enable
+        // Case A (it is also guarded by the launcher's wasProtected check -- belt and braces).
+        window.sessionStorage.removeItem(HAS_SPOKEN);
         // Task 148: the chat content is scrubbed (a disclosure must never sit in sessionStorage), but
         // leave a CONTENT-FREE flag so the Terrier's unbidden appearances stay suppressed for the rest
         // of the session -- a child who has disclosed something must not have a dog pop out at them.
@@ -933,7 +999,16 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
       return;
     }
     try {
-      window.sessionStorage.setItem(CHAT_KEY, JSON.stringify({ messages, session, dog, phase, recSessionId: recSessionRef.current, minimised }));
+      // Task 180: persist the chat ONLY once the visitor has actually spoken (a 'user' bubble exists).
+      // An unbidden appearance the visitor never answered is a monologue, not a conversation; persisting it
+      // made the previous page's line follow across pages and surface under the next dog (the CHAT_KEY
+      // overreach Task 176 flagged, finished here). A bare chip now writes nothing, so it cannot be restored
+      // or reopened elsewhere; a real chat persists and follows, exactly as Task 105 intends. CHAT_KEY and
+      // HAS_SPOKEN are now written together, so CHAT_KEY present always means a real conversation.
+      if (messages.some((m) => m.who === 'user')) {
+        window.sessionStorage.setItem(CHAT_KEY, JSON.stringify({ messages, session, dog, phase, recSessionId: recSessionRef.current, minimised }));
+        window.sessionStorage.setItem(HAS_SPOKEN, '1');
+      }
     } catch {}
   }, [messages, phase, dog, minimised]);
 
@@ -1201,6 +1276,13 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
       fetchGame: result.resolution.action === 'random_link',
       gameOutput: r.gameOutput,
       media: r.media,
+      // The games-menu LIST (B45-GAMELIST-02, per-dog) gets tappable pills for this dog's own games.
+      // The QUESTION (-01) does not: there is nothing to list yet. Pills call send(phrase) -- the same
+      // path as typing the name -- so typing keeps working exactly as before; the pills are an addition.
+      gamesMenu:
+        result.resolution.action === 'games_menu' && r.responseId?.startsWith('B45-GAMELIST-02')
+          ? GAMES_MENU[toDog].items
+          : undefined,
     };
     setDog(toDog);
     setMessages((m) => [...m, userMsg, dogMsg]);
@@ -1243,6 +1325,17 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
       // medallion stays the Labrador), so navy alone is too subtle -- the face makes "a second dog spoke"
       // unmistakable.
       playSequence([ij.line], ij.dog, reducedMotion ? 0 : 700, true);
+      return;
+    }
+    // Task 176: a FAQ answer that plays as separate messages (FAQ009 the four-part 30%-off explainer with a
+    // pay link then a form link; FAQ012 who / but im a dog / humans? / the email). The opener is dogMsg
+    // (already carrying step one's link); the rest flow through the sequence player, each with its own link.
+    if (r.sequence && r.sequence.length) {
+      setMsg(dogMsg.id, { display: r.text, typing: false, done: true });
+      setAnnounce(r.text);
+      setPhase('idle');
+      window.setTimeout(() => inputRef.current?.focus(), 0);
+      playSequence(r.sequence, toDog, reducedMotion ? 0 : 900);
       return;
     }
     if (r.followUp) {
@@ -1575,6 +1668,26 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
                         <ActionLink command={msg.action} onNavigate={msg.fetchGame ? undefined : () => { logMeta('link', msg.action?.href ?? '', msg.action?.kind === 'external'); setMinimised(true); }} />
                       </div>
                     )}
+                    {/* Tappable game pills for the games-menu list. Real <button>s reusing the cookie-pill
+                        a11y kit (role=group + labelled container, per-pill aria-label, focus-visible ring,
+                        reduced-motion CSS, solid house-rule fills that survive the contrast schemes). A tap
+                        just sends the start phrase -- identical to typing it -- so typing is unaffected. The
+                        labels are text (not images), so hide-images mode leaves them fully usable. */}
+                    {msg.gamesMenu && (
+                      <div className={styles.gamePills} role="group" aria-label="Games you can play. Tap one to start, or type its name.">
+                        {msg.gamesMenu.map((g: GamesMenuItem) => (
+                          <button
+                            key={g.phrase}
+                            type="button"
+                            className={styles.gamePill}
+                            aria-label={`Play ${g.label}`}
+                            onClick={() => send(g.phrase)}
+                          >
+                            {g.label}
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </>
                 )}
               </div>
@@ -1596,6 +1709,38 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
         send();
       }}
     >
+      {/* The emoji picker: a small selection, not the full suite. A tap SENDS the emoji (its glyph shows in
+          the visitor's bubble) through the same submit path as typing; the router maps each to a real reply.
+          Real <button>s with the cookie-pill a11y kit: the raw glyph is aria-hidden and each button carries a
+          text aria-label (the emoji name), so it works in hide-images and the contrast schemes; typing is
+          untouched. */}
+      {emojiOpen && (
+        <div className={styles.emojiPanel} role="group" aria-label="Emoji. Tap one to send it.">
+          {PICKER_EMOJI.map((pe) => (
+            <button
+              key={pe.emoji}
+              type="button"
+              className={styles.emojiChoice}
+              aria-label={pe.label}
+              onClick={() => {
+                setEmojiOpen(false);
+                send(pe.emoji);
+              }}
+            >
+              <span aria-hidden="true">{pe.emoji}</span>
+            </button>
+          ))}
+        </div>
+      )}
+      <button
+        type="button"
+        className={styles.emojiToggle}
+        aria-label="Emoji"
+        aria-expanded={emojiOpen}
+        onClick={() => setEmojiOpen((o) => !o)}
+      >
+        <span aria-hidden="true">🙂</span>
+      </button>
       <input
         ref={inputRef}
         className={styles.input}

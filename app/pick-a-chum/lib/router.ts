@@ -8,7 +8,7 @@
 
 import { ChumData, Resolution, Dog, ActionType, GameId, DogRecord } from './types';
 import { effectiveBank } from './banks';
-import { Normalised, normalise, isGibberish, isSingleWord, isEmojiOnly, isBarkOnly, barkUnitCount, hasAny, buildAliasMap, applyAliases } from './normalise';
+import { Normalised, normalise, isGibberish, isSingleWord, isEmojiOnly, isBarkOnly, barkUnitCount, hasAny, buildAliasMap, applyAliases, editDistance } from './normalise';
 import { detectSafety, isDogHealthQuestion, detectProtectedContinuation, detectPersonalSadness, detectGrief } from './safety';
 import { SYNONYM_MAP } from './synonyms';
 import { Topic } from './session';
@@ -89,6 +89,9 @@ const COMMERCIAL = [
   'when does it launch', 'launch date', 'release date', 'when is it out', 'when is it released', 'when can i get it',
   'is it available', 'when is it available', 'available to buy',
   'discount', '30%', '30 percent', 'mailing list', 'sign me up', 'sign up', 'get one', 'want one', 'in stock',
+  // Task 176 (audit): buying phrasings the recorder showed dead-ending. 'reserve' is unambiguous on a
+  // pre-order site (the owner's call); the bare ambiguous words (order/buy alone) are deliberately left.
+  'reserve', 'buy now', 'available now', 'i want the game',
 ];
 
 // Task 69: the "get" buying forms, as a RULE not an enumeration. A get/buy/order VERB phrase
@@ -112,7 +115,10 @@ const GET_VERBS = [
 const COMMERCIAL_EXCLUDE = [
   'without signing', 'without signing up', 'without sign up',
   'buy it for me', 'buy the game for me', 'buy one for me', 'buy me', 'order it for me',
-  'get it for me', 'purchase it for me',
+  'get it for me', 'purchase it for me', 'pay for me',
+  // Task 175: "in order to ..." is the idiom, never a purchase. Without this the buy rule ('order' +
+  // the product word 'game') would reopen the very false positive bare 'order' was removed to avoid.
+  'in order to',
 ];
 
 // Task 45: the offer modal is about the product, never a dog. A buy/price phrase opens it
@@ -127,9 +133,32 @@ const PRODUCT_WORDS = ['game', 'games', 'pack', 'packs', 'cards', 'card', 'deck'
 // noun and adjective forms ("whats the price", "what does it cost", "is it expensive").
 const PRICE_INTENT = ['how much', 'price', 'cost', 'expensive'];
 
+// Task 175 (recorder evidence): the commerce misses. The curated COMMERCIAL/GET_VERBS lists left five of
+// the six ways to ask "where do I buy" falling through to "im a dog" (and worse, into the FAQ "54 cards"
+// answer). The fix is a RULE, mirroring getVerb, not more enumeration: a purchase verb NEXT TO a product
+// or a purchase channel is a buying intent. The verb alone never fires -- which is exactly why bare
+// buy/order were once removed from COMMERCIAL ("in order to win", "the cost of living"); the product/
+// channel requirement re-admits them safely. "pay" was the single biggest hole: it matched nothing at all.
+// Fuzz note: every short needle here is <=5 chars, so hasAny matches it EXACTLY (fuzzThreshold), and the
+// collision words (play/say/shop/game/help) are already in COMMON_WORDS -- so none fuzzes in.
+const PURCHASE_VERBS = ['buy', 'buying', 'order', 'ordering', 'purchase', 'purchasing', 'pay for', 'paying for'];
+// A place/channel of purchase is enough context on its own ("buy online", "order from you").
+const CHANNEL_WORDS = ['online', 'on the website', 'on the site', 'on your site', 'from you', 'in the shop', 'in store'];
+// Buying signals that stand alone, no product word needed. Pay/buy question frames: unlike "get" (Task 69:
+// "where can I get a dog"), pay and buy have no innocent non-commerce reading here. A shop/store on a
+// pre-order site is itself a request to buy. "shop" is a whole word (never "workshop"/"shopping"); "store"
+// only in phrases, so "do you store my data" stays a privacy question.
+const BUY_STANDALONE = [
+  'where can i pay', 'where do i pay', 'where i pay', 'how do i pay', 'how can i pay', 'where to pay', 'can i pay', 'how to pay',
+  'where buy', 'how to buy', 'do you sell', 'shop', 'online store', 'the store', 'your store',
+];
+
 const RULES = [
   'how to play', 'how do i play', 'how do you play', 'the rules', 'what are the rules',
-  'how many cards', 'how do we play', 'who wins', 'how do you win', 'hot dog mode', 'game rules',
+  'how do we play', 'who wins', 'how do you win', 'game rules',
+  // Task 176 (audit): 'how many cards' (a pack-contents question, FAQ004) and 'hot dog mode' (FAQ007)
+  // were mis-filed here and stole those two FAQ answers into the how-to-play route. Removed so they
+  // reach their own FAQ.
 ];
 
 // Task 18: complaint / report / human-escalation intent. Routes to the approved
@@ -308,6 +337,22 @@ function matchedGreeting(n: Normalised): string | null {
   const matches = GREETING.filter((g) => hasAny(n, [g]));
   return matches.length ? matches.reduce((a, b) => (b.length > a.length ? b : a)) : null;
 }
+// Task 175 §6: mistyped hellos. The greeting anchors are all <=5 chars, so hasAny holds them EXACT and
+// every slip ("hui", "hiyu", "helli") missed and fell to "im a dog" (and then a history diversion). Two
+// tiers, both used as a LAST RESORT (below every real route, just above the single-word fallback):
+//   1. a curated set of common greeting spellings (greetings are a small closed class, so listing their
+//      variants -- unlike "every misspelling of every word" -- actually scales);
+//   2. an edit-distance-1 check against the anchors for a lone short token.
+// 'yo'/'hi' are the 2-char anchors; 'yo' is deliberately NOT a fuzzy anchor (it would pull in no/so/go/do),
+// and 'hi' as a fuzzy anchor can pull a rare lone real word (his/him/hit) into a greeting -- an accepted,
+// low-harm cost (as a lone message those were a fallback miss anyway). Whole-message single token only.
+const GREETING_FUZZY_ANCHORS = ['hi', 'hey', 'hiya', 'hello', 'hullo', 'howdy'];
+const GREETING_VARIANTS = new Set(['heya', 'hii', 'hiii', 'helo', 'hallo', 'hullo', 'howdy', 'hai', 'oi', 'oy', 'sup', 'wagwan', 'hihi', 'hioo', 'hiyo', 'yoo']);
+function looksLikeGreeting(c: string): boolean {
+  if (GREETING_VARIANTS.has(c)) return true;
+  if (!/^[a-z]{2,6}$/.test(c)) return false; // a single short alphabetic token only
+  return GREETING_FUZZY_ANCHORS.some((a) => editDistance(c, a, 1) <= 1);
+}
 // Functional "is this on" testing only; identity/scepticism ("are you real / AI")
 // now belongs to the identity bucket (B16) below.
 const TESTING = ['test', 'testing', 'does this work', 'is this working', 'hello test'];
@@ -367,6 +412,19 @@ const FUN = [
   'play a game', 'can we play', 'can i play', 'wanna play', 'want to play', 'lets play', "let's play", 'let’s play',
   'let us play', 'play something', 'a quiz', 'quiz me', 'entertain me', 'something fun', 'im bored', 'i am bored',
   'bored', 'can you play',
+];
+
+// Task 176 (audit): explicit requests to see or play the CHAT games (bark, cookies, Kennel Sketch, the
+// button panel, Nine-Square, Missing Sheep) -> the games menu (B45), NOT the card game (FAQ001/rules).
+// The recorder showed "play game online" / "play game on website" wrongly getting the card-game rules.
+// 'minigame' is 8 chars, so hasAny fuzz (budget 1) catches mingame / miniagme / mimigame; 'mini game' is
+// a phrase (covers "mini-game" / "mini game"); 'mimigane' is edit-distance 2 so it is listed explicitly.
+// None of these sits within 2 edits of a real word, so the fuzz introduces no false positives.
+const GAME_REQUEST = [
+  'show me game', 'show me games', 'show me the games', 'show me a game', 'what game', 'what games',
+  'play minigame', 'play a minigame', 'minigame', 'mini game', 'minigame where', 'where minigame',
+  'online game', 'online games', 'online website game', 'website game', 'play game online',
+  'play game on website', 'play online game', 'mimigane',
 ];
 
 const CURRENT_DATA = ['latest', 'current', 'today', 'tonight', 'right now', 'this week', 'score', 'scores', 'weather forecast', 'news', 'who is winning', 'live'];
@@ -457,7 +515,11 @@ function matchArticle(n: ChumData, compact: string): { destinationId: string; ur
 // FAQ token is distinctive and is the whole point of its record (discount ->
 // FAQ009, delivery -> FAQ014, competition -> FAQ011, contact -> FAQ012, price ->
 // FAQ008, pack -> FAQ004), so those must keep matching. Task 10A.
-const COMMON_FAQ_TOKENS = new Set(['game', 'games']);
+// Task 176 (audit): 'play' joins game/games as a non-distinctive FAQ token. FAQ001's phrasings collapse
+// to a lone 'play' ("how to play"), so before this ANY message with 'play' matched FAQ001 and stole the
+// how-to-play *questions* (who can play -> FAQ002, how many people can play -> FAQ005, other way to play
+// -> FAQ007). FAQ001's real route is the full RULES phrases, so lone 'play' in matchFaq was pure over-reach.
+const COMMON_FAQ_TOKENS = new Set(['game', 'games', 'play']);
 
 // FAQ match strength for a single phrase against the input:
 //   2 = the whole phrase is a substring of the input (strong, unambiguous)
@@ -466,15 +528,38 @@ const COMMON_FAQ_TOKENS = new Set(['game', 'games']);
 //   0 = no match
 // Recorded on the resolution (Task 10B) so the outcome flag can mark a weak match
 // as unmatched rather than reporting a wrong answer as a success.
+// Task 175 §5: container/product words that are NOT a distinctive FAQ signal on their own. FAQ004's
+// phrasings collapse to a lone one of these ("what is in the pack" -> "pack", "how many cards" -> "cards",
+// "in the box" -> "box"), so before this ANY message mentioning a pack/card/box scored 1 and was served the
+// "54 cards" answer -- "a pack of dogs", "the cards", "think outside the box" all got it confidently. Like
+// game/games (COMMON_FAQ_TOKENS) they now count only WITH context: an actual contents question.
+const OVERLOADED_FAQ_TOKENS = new Set(['pack', 'packs', 'card', 'cards', 'box', 'deck', 'decks']);
+// A genuine pack-contents question, as opposed to a bare group noun ("wolf pack") or an unrelated mention
+// ("i lost my cards"). Matched as a substring of the whole message, so "in the pack" is container-specific
+// and "in the park" does not count.
+const FAQ_CONTENTS_SIGNALS = [
+  'in the pack', 'in a pack', 'in each pack', 'in this pack', 'in the box', 'in the deck', 'in the set',
+  'in it', 'inside', 'contents', 'how many', 'come with', 'comes with', 'come in', 'comes in', 'included',
+  'what do i get', 'what do you get', 'whats in', "what's in", 'what is in', 'what are in',
+];
+
 function faqPhraseStrength(compact: string, phrase: string): number {
   const p = phrase.toLowerCase().trim();
   if (!p) return 0;
-  if (p.includes(' ') && compact.includes(p)) return 2;
+  if (p.includes(' ') && compact.includes(p)) return 2; // whole phrase present: strong, unambiguous
   const toks = keyTokens(p);
   if (!toks.length) return 0;
   const words = new Set(compact.match(/[a-z]+/g) ?? []);
   if (!toks.every((t) => words.has(t))) return 0;
-  return toks.filter((t) => !COMMON_FAQ_TOKENS.has(t)).length;
+  // Task 175 §5: a lone overloaded container token counts only when the message actually asks about
+  // contents; otherwise it contributes 0, exactly like a COMMON_FAQ_TOKEN. This kills the "54 cards"
+  // over-reach ("a pack of dogs", "the cards") while keeping the real questions ("whats in the pack").
+  const hasContents = FAQ_CONTENTS_SIGNALS.some((s) => compact.includes(s));
+  return toks.filter((t) => {
+    if (COMMON_FAQ_TOKENS.has(t)) return false;
+    if (OVERLOADED_FAQ_TOKENS.has(t) && !hasContents) return false;
+    return true;
+  }).length;
 }
 
 // First FAQ (in sheet order) with any confident signal, reporting its best phrase
@@ -557,11 +642,23 @@ export interface RouterState {
 }
 
 // Task 68: bare affirmations that confirm a loop offer. Whole-message forms only, so "yes but
-// tell me about labradors" is not swallowed. "no" is deliberately NOT here: it advances the loop.
-const CONFIRM_YES = new Set(['yes', 'yeah', 'yep', 'yup', 'aye', 'that one', 'correct', 'uh huh', 'uhhuh', 'yes please']);
+// tell me about labradors" is not swallowed.
+// Task 175: widened from the recorder evidence -- real testers answered offers with "yea", "ok",
+// "okay", "sure" and "go on", every one of which fell through to "im a dog". These are consumed ONLY
+// inside the offer-pending handlers (lastAction / pendingConfirm), so a bare "ok" with nothing pending
+// still resolves exactly as before. "no" is handled separately (CONFIRM_NO, a graceful decline).
+const CONFIRM_YES = new Set(['yes', 'yeah', 'yea', 'yep', 'yup', 'aye', 'ok', 'okay', 'sure', 'go on', 'that one', 'correct', 'uh huh', 'uhhuh', 'yes please']);
 function isConfirmYes(compact: string): boolean {
   return CONFIRM_YES.has(compact.trim());
 }
+// Task 175: a bare decline. Whole-message only, and distinct from GO_AWAY_TRIGGERS ("no thanks" closes
+// the chat) -- this just turns down the current offer and keeps the conversation open (a dog being told
+// "no" is normal). Consumed only when an offer is live, so a bare "no" with nothing pending is unchanged.
+const CONFIRM_NO = new Set(['no', 'nah', 'nope']);
+// The question-posing offers (besides the loop's own pendingConfirm): a bare "no" right after one of
+// these is a decline, not a miss. games_menu is included so a "no" to the games LIST ("Nine-Square,
+// Missing Sheep ...") declines too, not just a "no" to the "You want to play a game?" question.
+const OFFER_ACTIONS = new Set(['ask_games', 'ask_dogs', 'ask_breeds', 'tricks_menu', 'games_menu', 'buy_clarify']);
 // Task 123 fix: whole-message phrases that open the B45 games menu (serve B45-GAMELIST-01 "Game?").
 // Deliberately NARROW: bare "game" is left to the dog-led loop (correct by design) and "lets play" to
 // the bark-game offer. A following "yes" is caught by the games_menu confirmation (below) and serves
@@ -702,11 +799,44 @@ const FACT_TRIGGERS = new Set(['tell me something', 'tell me a fact', 'a dog fac
 // and the loop advances).
 const CONFIRM_GAME_WORDS = new Set(['cards', 'deck', 'set', 'rules', 'play', 'chums', 'game']);
 const CONFIRM_DOG_WORDS = new Set(['dog', 'dogs', 'doggy', 'puppy', 'pup', 'breed', 'breeds']);
+// Task 175: the loop echoed inside-world subjects ("Site?", "Woof?") that a following "yes" could not
+// honour, so the yes died as "im a dog". These two sets close that gap for the subjects the recorder
+// showed people asking about, routing a confirmed subject to an answer that already exists:
+//   - site words -> the orientation (what-is-this) answer (B15)
+//   - woof / bark -> the bark-game offer (B17)
+// The four chatbot-dog NAMES need no entry here: extractCandidateSubject canonicalises them to a breed
+// title (collie -> "Border Collie"), which the breed-title branch below already maps to that dog's page.
+const CONFIRM_SITE_WORDS = new Set(['site', 'website', 'page', 'link']);
+const CONFIRM_BARK_WORDS = new Set(['woof', 'bark']);
+// Follow-up to the Task 175 gap above: extractCandidateSubject can echo any INSIDE_WORLD_WORDS token as
+// LOOP-01 ("Tail?", "History?"), each arming a "yes", but confirmResolution honoured only ~23 of them, so
+// 14 more subjects died as "im a dog". Close them by routing each to an answer that ALREADY exists (no new
+// copy), exactly like the site/bark additions: paw and fetch reuse their own answers; tail/walk/lead/collar
+// have no on-topic answer so serve a dog fact (B07); the history cluster links to the matching page. ('bone'
+// is deliberately NOT here: the FOOD layer intercepts it before any echo, so its "yes" is already handled --
+// a mapping would be dead code. 'link' joins the site words above; 'toy' shares the ball answer below;
+// 'generator'/'jobs' are handled by their own branches.)
+const CONFIRM_DOG_FACT_WORDS = new Set(['tail', 'walk', 'lead', 'collar']);
+const CONFIRM_HISTORY_WORDS = new Set(['history', 'origin', 'ancestors', 'bred']);
 function confirmResolution(subject: string): Resolution | null {
   const p = BREED_PAGES.find((x) => x.title === subject);
   if (p) return breedPageRes(p);
   if (CONFIRM_GAME_WORDS.has(subject)) return { layer: 3, layerName: 'Gameplay and website navigation', bucket: 'B02', action: 'rules_answer', destinationId: 'DST011' };
   if (CONFIRM_DOG_WORDS.has(subject)) return { layer: 5, layerName: 'Dog, breed and website content', bucket: 'B05', action: 'breed_hub' };
+  if (CONFIRM_SITE_WORDS.has(subject)) return { layer: 11, layerName: 'Orientation and onboarding', bucket: 'B15', action: 'orientation' };
+  if (CONFIRM_BARK_WORDS.has(subject)) return { layer: 13, layerName: 'Play and entertainment', bucket: 'B17', action: 'offer_bark_game' };
+  // The ball answer (COL-B52-MISC-09) poses "Tennis balls?", which invites a "yes". 'balls' is NOT a
+  // LOOP-01 echo subject (not an INSIDE_WORLD_WORD, and the canned answer reaches the visitor before any
+  // fallback echo could) -- the engine arms pendingConfirm='balls' when that answer serves. 'toy' IS a
+  // LOOP-01 subject and a toy is her tennis ball, so both re-serve the same ball answer (its clip), the
+  // only ball content there is, and it stays in character.
+  if (subject === 'balls' || subject === 'toy') return { layer: 9, layerName: 'Recognised conversation', bucket: 'B52', action: 'canned', responseId: 'COL-B52-MISC-09' };
+  if (subject === 'paw') return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: 'paw' }; // her paw/shake answer, as if typed
+  if (subject === 'fetch') return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: 'random_link' }; // throws the ball, as if typed
+  if (CONFIRM_DOG_FACT_WORDS.has(subject)) return { layer: 7, layerName: 'Facts about the active breed', bucket: 'B07', action: 'breed_answer' };
+  if (CONFIRM_HISTORY_WORDS.has(subject)) return { layer: 3, layerName: 'Gameplay and website navigation', bucket: 'B03', action: 'link', destinationId: 'DST007' }; // Britain's Dog History
+  if (subject === 'jobs') return { layer: 3, layerName: 'Gameplay and website navigation', bucket: 'B03', action: 'link', destinationId: 'DST018' }; // Dogs at Work (the page that IS dogs' jobs)
+  if (subject === 'generator') return { layer: 3, layerName: 'Gameplay and website navigation', bucket: 'B03', action: 'link', destinationId: 'DST008' }; // Dog Name Generator
   return null;
 }
 
@@ -1147,6 +1277,41 @@ function matchGameStart(c: string): GameId | null {
   return null;
 }
 
+// The composer emoji picker. A tapped emoji is an emoji-only message that would otherwise fall to the B18
+// "I can see it, but I cannot read it" line; instead each maps to a real response, reusing what exists.
+// Matched on the base glyphs (the U+FE0F variation selector stripped), so both ❤ and ❤️ hit.
+const EMOJI_FOOD: Record<string, string> = { '🍔': 'burger', '🍕': 'pizza', '🌭': 'sausage', '🥕': 'carrot' };
+const EMOJI_BALLS = new Set(['⚽', '🏀', '🏐', '🎾']);
+const EMOJI_GAMING = new Set(['🎮', '🕹']);
+const EMOJI_BATH = new Set(['🛁', '🚿']);
+const EMOJI_REACTIONS = new Set(['🤣', '🤭', '😂', '❤', '😍', '👍', '😊']);
+const EMOJI_COOKIE = '🍪';
+const EMOJI_CAT = '🐱';
+// A tapped picker emoji -> a real response, reusing existing behaviour. FOOD re-routes through the FULL food
+// mechanism by resolving its word, so the Labrador overrides whoever is active exactly as a food WORD does
+// (transfer from another dog, his own tiered answer when he is active). COOKIE hands to the Labrador and
+// starts his cookie game (game_start + transferTo; the engine switches the dog, mirroring the food override).
+// BALLS -> the ball answer (its clip, and it arms the "yes" confirm downstream); GAMING -> the games LIST
+// (with its tappable pills, per dog); BATH/CAT -> the two new B52 lines; the reactions -> the existing laugh
+// / ":)" row (the same one lol/haha reach). Any other emoji returns null and still gets the B18 line.
+function matchEmoji(n: Normalised, data: ChumData, state: RouterState): Resolution | null {
+  const glyphs = n.original.replace(/\uFE0F/g, '');
+  const has = (set: Set<string>) => [...set].some((g) => glyphs.includes(g));
+  for (const [emoji, word] of Object.entries(EMOJI_FOOD)) {
+    if (glyphs.includes(emoji)) return resolve(normalise(word), data, state); // full food behaviour, whoever is active
+  }
+  if (glyphs.includes(EMOJI_COOKIE)) {
+    const handoff = state.activeDog !== 'labrador';
+    return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: 'game_start', game: 'feedcookie', ...(handoff ? { transferTo: 'labrador' as Dog } : {}) };
+  }
+  if (has(EMOJI_BALLS)) return { layer: 9, layerName: 'Recognised conversation', bucket: 'B52', action: 'canned', responseId: 'COL-B52-MISC-09' };
+  if (has(EMOJI_GAMING)) return { layer: 13, layerName: 'Play and entertainment', bucket: 'B45', action: 'games_menu', responseId: 'B45-GAMELIST-02' };
+  if (has(EMOJI_BATH)) return { layer: 9, layerName: 'Recognised conversation', bucket: 'B52', action: 'canned', responseId: 'COL-B52-BATH-01' };
+  if (glyphs.includes(EMOJI_CAT)) return { layer: 9, layerName: 'Recognised conversation', bucket: 'B52', action: 'canned', responseId: 'COL-B52-CAT-01' };
+  if (has(EMOJI_REACTIONS)) return { layer: 9, layerName: 'Recognised conversation', bucket: 'B29', action: 'canned', responseId: 'B29-NICE-01' };
+  return null;
+}
+
 export function resolve(n0: Normalised, data: ChumData, state: RouterState): Resolution {
   // Apply curated misspelling aliases first, so both the safety gate and every
   // downstream layer see the canonical word. Fuzzy matching (in hasAny) then
@@ -1396,6 +1561,10 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
   if (state.lastAction === 'ask_games' && isConfirmYes(c)) {
     return { layer: 13, layerName: 'Play and entertainment', bucket: 'B45', action: 'games_menu', responseId: 'B45-GAMELIST-02' };
   }
+  // Task 175: a yes to the "The card game?" clarifier (below, for a bare get-question) opens the pre-order.
+  if (state.lastAction === 'buy_clarify' && isConfirmYes(c)) {
+    return { layer: 2, layerName: 'Buying, launch and 30% discount', bucket: 'B01', action: 'open_discount_popup', destinationId: 'DST001' };
+  }
   if (DOGS_TRIGGERS.has(c)) {
     return { layer: 13, layerName: 'Play and entertainment', bucket: 'B55', action: 'ask_dogs', responseId: 'COL-B55-CONFIRM-01' };
   }
@@ -1444,6 +1613,15 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
   if (state.pendingConfirm && isConfirmYes(c)) {
     const routed = confirmResolution(state.pendingConfirm);
     if (routed) return routed;
+  }
+
+  // Task 175: a bare "no" to an offer declines gracefully instead of falling through to "im a dog".
+  // Fires ONLY when an offer is actually live -- a loop offer armed pendingConfirm, or the previous turn
+  // posed one of the ask/menu questions -- so a bare "no" with nothing pending still advances the loop
+  // exactly as before. Serves an existing B15 "what next" line (no new copy). Below safety/grief, like
+  // the yes-confirms above, so a disclosure is never read as a decline.
+  if (CONFIRM_NO.has(c) && (state.pendingConfirm || OFFER_ACTIONS.has(state.lastAction ?? ''))) {
+    return { layer: 9, layerName: 'Recognised conversation', bucket: 'B15', action: 'canned', responseId: 'B15-R04-v2' };
   }
 
   // Task 27: explicit topic return. A generic return ("you were saying", "what were you
@@ -1539,7 +1717,9 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
   // "how do I get a dog" / "where can I get help" (no product word) do not, and the topic slot
   // already being commercial also satisfies the second half.
   const getVerb = hasAny(N, GET_VERBS) && (hasAny(N, PRODUCT_WORDS) || state.topic?.kind === 'commercial');
-  if ((hasAny(N, COMMERCIAL) || hasAny(N, PRICE_INTENT) || getVerb) && !hasAny(N, COMMERCIAL_EXCLUDE)) {
+  // Task 175: buy/order/purchase/pay + a product OR a purchase channel (the rule, mirroring getVerb).
+  const buyVerb = hasAny(N, PURCHASE_VERBS) && (hasAny(N, PRODUCT_WORDS) || hasAny(N, CHANNEL_WORDS) || state.topic?.kind === 'commercial');
+  if ((hasAny(N, COMMERCIAL) || hasAny(N, PRICE_INTENT) || getVerb || buyVerb || hasAny(N, BUY_STANDALONE)) && !hasAny(N, COMMERCIAL_EXCLUDE)) {
     // Task 45/46: the offer modal AND the price answer are about the product, never a dog. A
     // price/buy question that names a dog or breed, or whose bare "it" points at a breed topic
     // (Task 27), carrying no explicit product word, gets neither: it refuses to guess
@@ -1556,6 +1736,22 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
       return { layer: 4, layerName: 'FAQ knowledge', bucket: 'B04', action: 'price_answer', faqId: 'FAQ008' };
     }
     return { layer: 2, layerName: 'Buying, launch and 30% discount', bucket: 'B01', action: 'open_discount_popup', destinationId: 'DST001' };
+  }
+
+  // Task 175: a BARE get-question -- a get verb, no product word, no dog/breed, and no other content noun
+  // ("where can I get", "how do I get one") -- is most likely reaching for the game. Rather than "im a dog"
+  // it asks "The card game?" (buy_clarify); a following yes opens the pre-order (handled above). This KEEPS
+  // the Task 69 guard: a named dog ("where can I get a dog") or any other subject ("where can I get help")
+  // carries a residual content word and so never reaches here -- it falls through to the existing routes.
+  if (hasAny(N, GET_VERBS) && !hasAny(N, PRODUCT_WORDS) && !hasAny(N, COMMERCIAL_EXCLUDE)) {
+    const clarifyWords = new Set(c.match(/[a-z]+/g) ?? []);
+    if (!namesDogOrBreed(c, clarifyWords)) {
+      const GET_Q_IGNORE = new Set(['where', 'how', 'can', 'do', 'i', 'get', 'buy', 'to', 'it', 'one', 'them', 'some', 'that', 'this', 'a', 'the', 'me', 'my', 'from', 'you']);
+      const residual = [...clarifyWords].filter((w) => !GET_Q_IGNORE.has(w) && !STOP.has(w));
+      if (residual.length === 0) {
+        return { layer: 2, layerName: 'Buying, launch and 30% discount', bucket: 'B01', action: 'buy_clarify', responseId: 'BUY-CLARIFY-01' };
+      }
+    }
   }
 
   // Task 142 (§7.2): a referral question. No referral scheme exists, so rather than guess, point it
@@ -1628,6 +1824,19 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
     if (hasAny(N, grp.triggers)) {
       return { layer: 12, layerName: 'Identity and scepticism', bucket: 'B16', action: 'identity', responseFamily: grp.family };
     }
+  }
+
+  // Task 176 (audit): "can we play indoors" is FAQ006 (you need real dogs to spot), not a play request.
+  // Above FUN so the 'can we play' in it does not send this to the bark-game offer.
+  if (hasAny(N, ['indoors', 'indoor', 'inside']) && hasAny(N, ['play', 'spot', 'game'])) {
+    return { layer: 4, layerName: 'FAQ knowledge', bucket: 'B04', action: 'faq_answer', faqId: 'FAQ006', faqMatchStrength: 2 };
+  }
+
+  // Task 176 (audit): a games request reaches the games MENU (B45), above rules/FAQ/FUN so it never
+  // collides with the card game ("how do I play") or the "games are coming" tease. This is the priority
+  // fix that stops the chat games and the card game answering each other's questions.
+  if (hasAny(N, GAME_REQUEST)) {
+    return { layer: 13, layerName: 'Play and entertainment', bucket: 'B45', action: 'games_menu', responseId: 'B45-GAMELIST-02' };
   }
 
   // Layer 13: play / entertainment intent. Interim tease until the mini-games
@@ -1860,6 +2069,11 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
     return { layer: 13, layerName: 'Play and entertainment', bucket: 'B30', action: 'canned', responseId: nth === 1 ? 'BOX-B30-04' : 'BOX-B30-06', note: 'boxer_stop' };
   }
 
+  // Task 175 §6: a mistyped hello, caught here as a last resort (below every real route, just above the
+  // single-word fallback) so it gets a hello back -- mirroring a clean "hi" rather than echoing the typo --
+  // instead of "im a dog" and, three in a row, a history diversion.
+  if (looksLikeGreeting(c)) return { ...conv('B09'), mirror: 'hi' };
+
   if (isSingleWord(N)) {
     if (c === 'help' && state.lastAction !== 'clarifier') {
       return { layer: 1, layerName: 'Safety and unsuitable content', bucket: null, action: 'clarifier', moderationId: 'MOD_BARE_HELP' };
@@ -1870,6 +2084,8 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
   // Layer 14: emoji-only message (picture-writing with no words). Checked before
   // gibberish so a lone emoji gets the "I read words" family, not the smash reply.
   if (isEmojiOnly(n)) {
+    const em = matchEmoji(n, data, state); // a picker emoji maps to a real response; other emoji fall through
+    if (em) return em;
     return { layer: 14, layerName: 'Emoji only', bucket: 'B18', action: 'emoji_only' };
   }
 

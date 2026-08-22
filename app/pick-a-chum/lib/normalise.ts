@@ -8,6 +8,55 @@ export interface Normalised {
   letters: string; // just the a-z letters, lowercased
 }
 
+// Central text-speak expansion (was hand-enumerated per route: 'how are u', 'what breed r you',
+// 'whats ur religion', the 'u trick' tricks forms, ...). A CLOSED map of SMS contractions, each expanded
+// to its full word(s) so every route sees one canonical form and no route needs its own siblings. Applied
+// as WHOLE tokens only (word boundaries), so real words that merely contain these letters are never
+// touched: "run", "our", "your", "hour", "return", "burger", "us" all pass through unchanged.
+//
+// Deliberately EXCLUDED (owner's call): business terms; profanity (stfu / wtf / idgaf -- those want
+// moderation, not expansion); adult ones (fwb / bae / ldr); the obscure. Also excluded because they
+// ALREADY reach a real route, so expanding them would break it: omg / wow (the ":)" reaction), yo / sup
+// (the greeting), gtg (goodbye). lol / lmao / rofl are NOT expanded either -- lol already reaches the
+// laugh route, and expanding lmao/rofl would introduce profanity; route those as triggers if wanted.
+//
+// A few short keys (k, bc, np, ik, ty, gm, gn) could in theory be a real lone word, but in a children's
+// dog-chat they are overwhelmingly the SMS form, and each currently falls to "im a dog" / gibberish, so
+// expanding is a net gain. Digit-bearing keys (b4, l8r, gr8) are fine: the boundary matches on both sides.
+const TEXT_SPEAK: Record<string, string> = {
+  // pronoun / verb SMS forms (the original three)
+  u: 'you', ur: 'your', r: 'are',
+  // question openers
+  hru: 'how are you', wyd: 'what you doing', wbu: 'what about you',
+  // knowledge / opinion
+  idk: 'i dont know', idc: 'i dont care', ik: 'i know',
+  // politeness
+  ty: 'thank you', thx: 'thanks', pls: 'please', plz: 'please', yw: 'youre welcome', np: 'no problem', nvm: 'never mind',
+  // leaving (gtg is omitted: it already reaches goodbye)
+  brb: 'be right back', ttyl: 'talk to you later',
+  // ok / really
+  k: 'ok', kk: 'ok', srsly: 'seriously', rly: 'really',
+  // time-of-day greetings
+  gm: 'good morning', gn: 'good night',
+  // because
+  cuz: 'because', bc: 'because',
+  // leetspeak
+  b4: 'before', l8r: 'later', gr8: 'great',
+  // affection (ilysm -> "i love you", NOT "...so much": bare "much" over-matches the price FAQ today, a
+  // wide pre-existing bug logged for its own pass; routing ilysm like ily keeps it off that path)
+  ily: 'i love you', ilysm: 'i love you',
+};
+// Built from the keys so map and pattern never drift. Longest-first so a longer key wins where one is a
+// prefix of another at a shared boundary (belt-and-braces; \b already forces a whole-token match). Keys may
+// carry digits (b4, l8r), and \w includes digits, so \b sits correctly on both sides of those too.
+const TEXT_SPEAK_RE = new RegExp(
+  '\\b(' + Object.keys(TEXT_SPEAK).sort((a, b) => b.length - a.length).map((k) => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') + ')\\b',
+  'g',
+);
+function expandTextSpeak(s: string): string {
+  return s.replace(TEXT_SPEAK_RE, (m) => TEXT_SPEAK[m] ?? m);
+}
+
 export function normalise(input: string): Normalised {
   const original = (input ?? '').trim();
   // Unify the curly apostrophe U+2019 (what iOS/macOS autocorrect produces for
@@ -17,7 +66,9 @@ export function normalise(input: string): Normalised {
   // cannot appear. `original` is untouched; only the matched forms are folded.
   // Then collapse any run of 3+ identical characters ("pleeeassssee" -> "pleasee")
   // so stretched words match their base form (runs of 2 like "hello" are kept).
-  const lower = original.toLowerCase().replace(/’/g, "'").replace(/(.)\1{2,}/gu, '$1');
+  // Finally expand text-speak (u -> you, ur -> your, r -> are) once here so every
+  // derived form (compact/words/letters) and every route agrees on the full word.
+  const lower = expandTextSpeak(original.toLowerCase().replace(/’/g, "'").replace(/(.)\1{2,}/gu, '$1'));
   const compact = lower.replace(/\s+/g, ' ').replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu, '').trim();
   const words = lower.match(/[a-z]+/g) ?? [];
   const letters = (lower.match(/[a-z]/g) ?? []).join('');
@@ -181,6 +232,9 @@ const COMMON_WORDS = new Set([
   'talk', 'talking', 'listen', 'idea', 'idiom', 'chit', 'chat', 'chap',
   // near-neighbours of 6+ letter triggers (still fuzzed): launch/lunch, dinner/diner|winner
   'lunch', 'diner', 'winner', 'sinner', 'hunger', 'hunter', 'better', 'butter', 'matter',
+  // Task 176 (audit): "order" is one edit from "border" and was reaching a Border Terrier breed page.
+  // Held exact so it never fuzzes into a breed; "order the game" still matches exactly.
+  'order',
 ]);
 
 // True if word matches target exactly, or is a genuine (non-common-word) typo

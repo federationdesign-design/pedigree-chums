@@ -1,13 +1,21 @@
 "use client";
 
 // Task 7. When data-pc-hide-images is set on <html>, draw an opaque contrast
-// block over every content image, video, inline SVG and background-image
-// element inside #pc-site, carrying its accessible name (alt / aria-label /
-// <title>) as visible text. The media itself is already hidden before paint by
-// contrast-schemes.css, so nothing flashes and no layout shifts: the blocks are
+// block over every RASTER content image and raster background-image element
+// inside #pc-site, carrying its accessible name (alt / aria-label / <title>) as
+// visible text. The image itself is hidden before paint by contrast-schemes.css
+// (opacity:0 on img), so nothing flashes and no layout shifts: the blocks are
 // absolutely positioned in document coordinates in a zero-size root, so they
 // scroll with the page and never affect layout. Removing the attribute restores
 // everything in one action.
+//
+// Task 176 (comment fix): the previous header claimed this also covers <video>
+// (and inline SVG). It does not, by design -- targets() collects only raster
+// <img> and raster backgrounds. SVG and <video> are NOT raster, so they stay
+// visible and get no block. That is deliberate: the chat clips are the one
+// <video> content here, and Task 176 gave each of them a spoken text line, so
+// the meaning survives images-off through that line -- a block drawn over a
+// still-playing muted video would be redundant and would fight the video.
 
 import { useEffect } from "react";
 

@@ -90,6 +90,19 @@ const DESCRIPTION =
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
+  /* EVERY PAGE DECLARES ITS OWN ADDRESS.
+
+     There was no canonical anywhere on the site. `metadataBase` on its own only
+     resolves relative URLs for things like the OG image; it does not emit a
+     <link rel="canonical">, so nothing told a search engine which address a page
+     really lives at.
+
+     "./" is relative, and Next resolves it against metadataBase AND the current
+     route. So this one line gives every page a canonical pointing at itself,
+     rather than every page claiming to be the homepage.
+
+     A page that sets its own `alternates` overrides this. None do today. */
+  alternates: { canonical: "./" },
   title: {
     default: TITLE,
     template: TITLE_TEMPLATE,
@@ -119,12 +132,55 @@ export const metadata: Metadata = {
   },
 };
 
+// Organization + WebSite structured data (JSON-LD), emitted once for the whole
+// site. Only values with an honest source on the site are included:
+//   - name / url: the site itself. SITE_URL resolves to the live domain in prod.
+//   - logo: the real brand mark at public/PC-logo-black.jpg (778 x 505).
+// Deliberately omitted, because there is no honest source for them:
+//   - Organization sameAs: there are no social profile links anywhere on the site.
+//   - WebSite potentialAction / SearchAction: there is no on-site search.
+const ORG_WEBSITE_JSONLD = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": `${SITE_URL}/#organization`,
+      name: "Pedigree Chums™",
+      url: SITE_URL,
+      logo: {
+        "@type": "ImageObject",
+        url: `${SITE_URL}/PC-logo-black.jpg`,
+        width: 778,
+        height: 505,
+      },
+    },
+    {
+      "@type": "WebSite",
+      "@id": `${SITE_URL}/#website`,
+      name: "Pedigree Chums™",
+      url: SITE_URL,
+      inLanguage: "en-GB",
+      publisher: { "@id": `${SITE_URL}/#organization` },
+    },
+  ],
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" suppressHydrationWarning className={`${display.variable} ${body.variable} ${pct.variable} ${stackNotch.variable} ${score.variable} ${arrowFont.variable} ${unica.variable}`}>
       <body>
+        {/* Site-wide Organization + WebSite structured data. Native <script>, not
+            next/script (JSON-LD is data, not executable code). Every "<" in the
+            payload is escaped to its unicode form to avoid HTML injection through
+            JSON.stringify, per the Next.js JSON-LD guide. */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(ORG_WEBSITE_JSONLD).replace(/</g, "\\u003c"),
+          }}
+        />
         {/* Before first paint: mirror the stored contrast scheme onto <html> so
             a returning scheme user never sees a flash of the default view (brief
             v5, task 5). Built with string concatenation, NOT a template literal:
