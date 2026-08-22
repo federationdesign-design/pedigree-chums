@@ -307,8 +307,8 @@ function faqRotate(raw: string, session: Session): string {
 
 // Pick a bucket response, preferring one not used this session (rotation). Falls
 // back to reuse only when every alternative has been used.
-function pickResponse(data: ChumData, bucket: string, used: string[]): CollieResponse | null {
-  const pool = data.collieResponses.filter((r) => r.bucketId === bucket);
+function pickResponse(data: ChumData, bucket: string, used: string[], idPrefix?: string): CollieResponse | null {
+  const pool = data.collieResponses.filter((r) => r.bucketId === bucket && (!idPrefix || r.responseId.startsWith(idPrefix)));
   if (!pool.length) return null;
   return pool.find((r) => !used.includes(r.responseId)) ?? pool[0];
 }
@@ -704,7 +704,11 @@ export function assemble(res: Resolution, data0: ChumData, n: Normalised, sessio
       return { responseId: `SELF-BREED-${DOG_PREFIX[dog]}`, text: SELF_BREED_LINES[dog], dog };
 
     case 'orientation': {
-      const r = pickResponse(data, 'B15', session.usedResponseIds);
+      // Normally the full B15 rotation. The bare-help clarifier's "yes" pins the family (res.orientationFamily
+      // = 'R02', the "what can I ask" lines) so someone who asked for help is told what they can ask, never
+      // nudged with an R04 "I'm waiting" line. Still rotates within that family via usedResponseIds.
+      const prefix = res.orientationFamily ? `B15-${res.orientationFamily}` : undefined;
+      const r = pickResponse(data, 'B15', session.usedResponseIds, prefix);
       const text = r ? fill(r.template, baseContext(n)) : ORIENTATION_PLACEHOLDER;
       return { responseId: r?.responseId ?? 'B15', text, dog };
     }
