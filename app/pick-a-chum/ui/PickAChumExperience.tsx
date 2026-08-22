@@ -1332,7 +1332,14 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
     }
     // Task 178 §4: the correct-answer celebration -- the answer word, animated. r.gameCorrect is set by the
     // game logic ONLY on a correct answer, never a wrong guess, the reveal, or the start.
-    if (r.gameCorrect) setCelebrate({ word: r.gameCorrect, id: idRef.current++ });
+    if (r.gameCorrect) {
+      setCelebrate({ word: r.gameCorrect, id: idRef.current++ });
+      // A stars-and-bones burst around the word, drawn from the vendored confetti (its own star/bone shapes,
+      // never a second library or a CDN). Suppressed under prefers-reduced-motion, like every other burst.
+      if (!reducedMotion) {
+        fireConfetti({ particleCount: 44, spread: 360, startVelocity: 38, origin: { x: 0.5, y: 0.46 }, shapes: ['star', 'bone'], colors: ['#ffd23e', '#ffffff', '#5cc4ee'] });
+      }
+    }
 
     // Bark-game break / fetch / the cookie give-up: the main lands instantly, then a follow-up message.
     // Task 152 section 2: the follow-up now flows through the general sequence player, so it inherits the
@@ -1818,8 +1825,9 @@ export default function PickAChumExperience({ onClose, autoAppear, pickupRoute, 
           a repeat correct answer re-plays it. role=status announces the word to screen readers. Reduced
           motion drops the pop and shows the word static (CSS @media block); the win is still marked. */}
       {celebrate && (
-        <div key={celebrate.id} className={styles.celebrate} role="status" aria-live="polite">
-          <span className={styles.celebrateWord}>{celebrate.word}</span>
+        <div key={celebrate.id} className={styles.celebrate} role="status" aria-live="polite" aria-label={`answer correct: ${celebrate.word}`}>
+          <span className={styles.celebrateLabel} aria-hidden="true">answer correct:</span>
+          <span className={styles.celebrateWord} aria-hidden="true">{celebrate.word}</span>
         </div>
       )}
 

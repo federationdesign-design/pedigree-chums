@@ -731,23 +731,31 @@
   position: fixed;
   inset: 0;
   display: flex;
+  flex-direction: column; /* stack "answer correct:" over the word, as the mini-pit milestone does */
   align-items: center;
   justify-content: center;
+  gap: 2px;
   pointer-events: none;
   z-index: 60;
+  font-family: var(--font-display, sans-serif);
+  text-align: center;
+  text-shadow: 0 4px 0 rgba(0, 0, 0, 0.85); /* the mini-pit's site-standard black drop shadow, inherited by both lines */
   animation: pcCelebrateFade 1600ms ease-out forwards;
 }
+.celebrateLabel {
+  font-size: clamp(22px, 5.5vw, 56px);
+  line-height: 1.1;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--pc-ui-cream); /* "answer correct:" in white */
+}
 .celebrateWord {
-  font-family: var(--font-display, sans-serif);
   font-size: clamp(52px, 15vw, 150px);
   line-height: 1;
   text-transform: uppercase;
   letter-spacing: 0.02em;
-  text-align: center;
   padding: 0 14px;
-  color: var(--pc-ui-yellow);
-  -webkit-text-stroke: 3px var(--pc-ui-navy);
-  text-shadow: 0 6px 0 var(--pc-ui-navy);
+  color: var(--pc-ui-yellow); /* the answer word in brand yellow */
   animation: pcCelebratePop 700ms cubic-bezier(0.2, 1.5, 0.5, 1) forwards;
 }
 @keyframes pcCelebrateFade {
@@ -761,13 +769,11 @@
   60% { transform: scale(1.14) rotate(4deg); }
   100% { transform: scale(1) rotate(0deg); }
 }
-/* Contrast schemes: drop the coloured stroke/shadow and paint the word in the scheme's solid tones (cream on
-   a navy stroke) so it stays a big, clear word. Still reads as a celebration (the display font + size),
-   without the yellow/navy playfulness the full-colour view has. */
+/* Contrast schemes: both lines to the scheme's solid cream so they stay readable; the black drop shadow
+   (inherited from .celebrate) gives the edge. */
+.rootAccessible .celebrateLabel,
 .rootAccessible .celebrateWord {
   color: var(--pc-ui-cream);
-  -webkit-text-stroke: 4px var(--pc-ui-navy);
-  text-shadow: none;
 }
 /* Reduced motion: no pop, no fade -- the word appears static and holds until its timer clears it, so the win
    is still marked, with no movement (exactly what the setting is for). */
