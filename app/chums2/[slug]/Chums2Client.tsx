@@ -54,7 +54,7 @@ const SHOW_SECTIONS = {
   introBox: true,       // blue intro description box (the breed write-up)
   lifespanChart: false, // the lifespan chart (still off)
   diagram: false,       // circular BreedTree diagram (main band)
-  ancestorPack: false,  // hidden BreedTreeMap feed + pack grid
+  ancestorPack: true,   // hidden BreedTreeMap feed + pack grid
   famousChums: false,   // FamousDogsSection
   cards: false,         // rail pop-out DragCards
   tree: false,          // family tree LineageMap overlay
@@ -372,10 +372,10 @@ export default function Chums2Client({ name, slug, image, info, lineage }: Props
           to its right, the box's TOP aligned to the rail's first icon
           (align-items:flex-start). In the left column below the chum square. The
           rail's pop-outs are still gated off; the lifespan chart is still off. */}
-      {(SHOW_SECTIONS.rail || SHOW_SECTIONS.introBox || SHOW_SECTIONS.lifespanChart) && (
+      {(SHOW_SECTIONS.rail || SHOW_SECTIONS.introBox || SHOW_SECTIONS.lifespanChart || SHOW_SECTIONS.ancestorPack) && (
         <div className={styles.leftBand}>
           {SHOW_SECTIONS.rail && <Chums2Rail items={railItems} onOpen={openCard} />}
-          {(SHOW_SECTIONS.introBox || SHOW_SECTIONS.lifespanChart) && (
+          {(SHOW_SECTIONS.introBox || SHOW_SECTIONS.lifespanChart || SHOW_SECTIONS.ancestorPack) && (
             <div className={styles.introStack} data-region="intro-band">
               {SHOW_SECTIONS.introBox && introText && (
                 <div className={styles.introBox}>
@@ -386,6 +386,43 @@ export default function Chums2Client({ name, slug, image, info, lineage }: Props
                 <div className={styles.chartBox}>
                   <LifespanChart breedName={name} />
                 </div>
+              )}
+              {/* Ancestor pack: directly below the intro box, left-aligned with
+                  it (both in this right column). Tiles are exactly one rail-icon
+                  tile (61px); rows capped at 3, columns grow; no internal scroll. */}
+              {SHOW_SECTIONS.ancestorPack && frames.length > 0 && (
+                <section className={styles.ancestorPack} data-region="ancestor-pack">
+                  <p className={styles.packTitle}>Ancestor Pack</p>
+                  <div className={styles.packGrid} style={{ ["--pack-rows" as string]: String(packRows) }} data-cols={packCols}>
+                    {frames.map((f) => (
+                      <div key={f.id} className={styles.frame} style={{ borderColor: frameBorder(f.status) }}>
+                        <div className={styles.frameInner}>
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img className={styles.frameImg} src={f.img} alt={f.name} />
+                          <button
+                            type="button"
+                            className={styles.frameInfoBtn}
+                            onClick={(e) => { e.stopPropagation(); setOpenFrameInfo(openFrameInfo === f.id ? null : f.id); }}
+                            aria-label={`About ${f.name}`}
+                          >i</button>
+                          {openFrameInfo === f.id && (
+                            <div className={styles.framePopover}>
+                              <p className={styles.framePopoverName}>{f.name}</p>
+                              {f.note && <p className={styles.framePopoverNote}>{f.note}</p>}
+                              <button
+                                type="button"
+                                className={styles.framePopoverClose}
+                                onClick={(e) => { e.stopPropagation(); setOpenFrameInfo(null); }}
+                                aria-label="Close"
+                              >&times;</button>
+                            </div>
+                          )}
+                          <div className={styles.framePct}>{f.pct != null && f.pct < 1 ? "<1%" : `${f.pct ?? "?"}%`}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </section>
               )}
             </div>
           )}
@@ -429,42 +466,6 @@ export default function Chums2Client({ name, slug, image, info, lineage }: Props
         <div className={styles.hiddenMap} aria-hidden="true">
           <BreedTreeMap lineage={lineage} rootImage={image} filledIds={[]} onFramesReady={handleFramesReady} />
         </div>
-      )}
-
-      {/* Ancestor pack: rows capped at 3, columns grow with the pack. */}
-      {SHOW_SECTIONS.ancestorPack && frames.length > 0 && (
-        <section className={styles.ancestorPack} data-region="ancestor-pack">
-          <p className={styles.packTitle}>Ancestor Pack</p>
-          <div className={styles.packGrid} style={{ ["--pack-rows" as string]: String(packRows) }} data-cols={packCols}>
-            {frames.map((f) => (
-              <div key={f.id} className={styles.frame} style={{ borderColor: frameBorder(f.status) }}>
-                <div className={styles.frameInner}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img className={styles.frameImg} src={f.img} alt={f.name} />
-                  <button
-                    type="button"
-                    className={styles.frameInfoBtn}
-                    onClick={(e) => { e.stopPropagation(); setOpenFrameInfo(openFrameInfo === f.id ? null : f.id); }}
-                    aria-label={`About ${f.name}`}
-                  >i</button>
-                  {openFrameInfo === f.id && (
-                    <div className={styles.framePopover}>
-                      <p className={styles.framePopoverName}>{f.name}</p>
-                      {f.note && <p className={styles.framePopoverNote}>{f.note}</p>}
-                      <button
-                        type="button"
-                        className={styles.framePopoverClose}
-                        onClick={(e) => { e.stopPropagation(); setOpenFrameInfo(null); }}
-                        aria-label="Close"
-                      >&times;</button>
-                    </div>
-                  )}
-                  <div className={styles.framePct}>{f.pct != null && f.pct < 1 ? "<1%" : `${f.pct ?? "?"}%`}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
       )}
 
       {/* Famous chums, in flow directly below the ancestor pack (brief 5.7). */}

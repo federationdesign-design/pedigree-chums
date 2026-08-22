@@ -80,6 +80,17 @@ Baseline (measured before stage 1):
 - FLAG for Steve: this is a modal tree, not an inline-on-load tree. If you want it inline beside the diagram, that needs a new bounded rendering mode inside LineageMap (a deliberate shared-component change), which I did not make because it would risk the game. Tell me and I will design it behind a defaulted prop.
 - CSS constraint respected: no perspective / backface-visibility / transform-style: preserve-3d anywhere in the chums2 chain.
 
+## Ancestor pack switched on (2026-08-22)
+
+### D23. Ancestor pack: in the right column below the intro box, rail-icon-sized tiles
+- SHOW_SECTIONS.ancestorPack = true (nothing else on). The visible pack moved INTO .introStack (the right column of .leftBand), directly below the intro box, so it shares the intro box's left edge (introStack now align-items:flex-start). The hidden BreedTreeMap feed stays a separate off-screen div. Famous chums remain below (still off).
+- Heading "ANCESTOR PACK" unchanged: Montserrat, navy, above the grid.
+- Tile size set to EXACTLY one rail-icon tile: 61px (was 52px), grid-auto-columns 61px. Global box-sizing:border-box means both are 61px total including their borders. Border kept 3px.
+- Badges scaled to fit 61px without overlapping neighbours: i-button 20->16px at right/top -6px; % pill centred under the tile (left 50% / translateX(-50%)) at bottom -9px, font 8px.
+- Grid: grid-auto-flow column with grid-template-rows repeat(var(--pack-rows),auto); packRows = 2 (min) up to 30 dogs, 3 (max) beyond, columns = ceil(count/rows). For Yorkshire's 10 ancestors that is 5 columns x 2 rows, matching the concept. Extra dogs grow columns.
+- NO internal scrollbar: removed overflow-x/max-width from .packGrid, so every tile is visible; the page scrolls if a pack ever grows very wide.
+- Gaps small and even: 18px row / 12px column (the larger row gap clears the % pill and i-button overflow).
+
 ## Intro box corrections vs concept (2026-08-22)
 
 ### D22. Intro box: correct text source, styling and rail order to the concept

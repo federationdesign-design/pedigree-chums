@@ -110,7 +110,8 @@
 .introStack {
   display: flex;
   flex-direction: column;
-  gap: 20px; /* the lifespan chart drops in below the box when switched on */
+  align-items: flex-start; /* intro box and ancestor pack left-align together */
+  gap: 20px; /* space between the intro box and the ancestor pack below it */
   min-width: 0;
 }
 
@@ -358,43 +359,44 @@
 /* ── Ancestor pack (stage 5) ────────────────────────────────────
    In flow in the left column, left inset clears the icon rail so the
    heading no longer sits under the icons (item 13). */
+/* Now a child of .introStack (right column, below the intro box), so it inherits
+   the box's left edge and needs no left inset of its own. */
 .ancestorPack {
-  padding: clamp(40px, 4vw, 72px) clamp(24px, 4vw, 64px) 0;
-  padding-left: clamp(104px, 9vw, 132px);
+  padding: 0;
 }
 
 /* Item 14: Montserrat, dark navy, smaller, not the yellow display font. */
+/* Montserrat, dark navy, above the grid. */
 .packTitle {
   font-family: var(--font-body, 'Montserrat', system-ui);
   font-size: clamp(1.2rem, 2vw, 1.7rem);
   font-weight: 800;
   letter-spacing: 0.06em;
   color: var(--navy, #0a3a57);
-  margin: 0 0 18px;
+  margin: 0 0 14px;
   text-transform: uppercase;
   line-height: 1.1;
 }
 
-/* Rows capped, columns grow: fixed row count, auto-flow down then across, so
-   extra dogs add columns rather than a new row. (Brief 5.6, Decision D12.)
-   Tiles reduced 77px -> 52px (item 11). */
+/* Rows capped (min 2, max 3), columns grow: fixed row count, auto-flow down then
+   across, so extra dogs add columns rather than a new row. Tiles are exactly one
+   rail-icon tile (61px). No internal scrollbar: every tile is visible and the
+   page (not the grid) scrolls if the pack ever grows very wide. (D23.) */
 .packGrid {
   display: grid;
   grid-template-rows: repeat(var(--pack-rows, 2), auto);
   grid-auto-flow: column;
-  grid-auto-columns: 52px;
-  gap: 22px 16px;
+  grid-auto-columns: 61px;
+  gap: 18px 12px; /* even, small; the extra row gap clears the % pill / i-button */
   justify-content: start;
   width: max-content;
   max-width: 100%;
-  overflow-x: auto;
-  padding-bottom: 8px;
 }
 
 .frame {
-  width: 52px;
-  height: 52px;
-  border-radius: 8px;
+  width: 61px;
+  height: 61px;
+  border-radius: 10px;
   border: 3px solid #22c55e;
   background: transparent;
   position: relative;
@@ -410,12 +412,14 @@
   display: block;
 }
 
+/* i-button: small, top-right corner, minimal overflow so it clears the column
+   gap (item 4). */
 .frameInfoBtn {
   position: absolute;
-  right: -10px;
-  top: -10px;
-  width: 20px;
-  height: 20px;
+  right: -6px;
+  top: -6px;
+  width: 16px;
+  height: 16px;
   border: 2px solid #ffffff;
   border-radius: 50%;
   background: var(--blue-deep, #0b78bd);
@@ -427,20 +431,23 @@
   padding: 0;
   font-style: italic;
   font-weight: 700;
-  font-size: 11px;
+  font-size: 9px;
   font-family: Georgia, serif;
   z-index: 5;
 }
 
+/* % pill: centred under the tile, small, minimal overflow so it clears the row
+   gap (item 4). */
 .framePct {
   position: absolute;
-  right: -2px;
-  bottom: -11px;
+  left: 50%;
+  bottom: -9px;
+  transform: translateX(-50%);
   background: rgba(10, 58, 87, 0.85);
   color: var(--yellow, #ffd23e);
-  border-radius: 10px;
-  padding: 1px 6px;
-  font-size: 9px;
+  border-radius: 9px;
+  padding: 1px 5px;
+  font-size: 8px;
   font-weight: 700;
   font-family: Montserrat, system-ui;
   z-index: 5;
