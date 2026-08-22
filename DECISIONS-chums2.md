@@ -80,6 +80,14 @@ Baseline (measured before stage 1):
 - FLAG for Steve: this is a modal tree, not an inline-on-load tree. If you want it inline beside the diagram, that needs a new bounded rendering mode inside LineageMap (a deliberate shared-component change), which I did not make because it would risk the game. Tell me and I will design it behind a defaulted prop.
 - CSS constraint respected: no perspective / backface-visibility / transform-style: preserve-3d anywhere in the chums2 chain.
 
+## Reset to header-only baseline (production review 2026-08-22)
+
+### D17. SHOW_SECTIONS gate, header-only baseline
+- Per production review, /chums2 is stripped back to render ONLY the header (square image, "LEARN ABOUT THE {NAME}" title, subtitle). Everything else is HIDDEN not deleted: all code and wiring stay, gated behind a single `SHOW_SECTIONS` flags object at the top of Chums2Client (introBand, diagram, ancestorPack, famousChums, cards, tree, rail, backButton), all false. Sections get switched back on one at a time under Steve's direction in later steps.
+- No dead whitespace: .canvas lost its min-height:100svh and padding-bottom, so height is content-driven and the page is only as tall as the header.
+- The hidden BreedTreeMap frame feed is now gated with the pack (only mounts when ancestorPack is shown).
+- Gates: tsc clean, eslint chums2 clean. One transient react-hooks/refs false-positive appeared when the cards map was wrapped in `SHOW_SECTIONS.cards && ...`; avoided by keeping the original map structure and gating inside the ternary (`!SHOW_SECTIONS.cards || closed.has(id) ? null : ...`).
+
 ## Production feedback batch (2026-08-22)
 
 ### D14. Header geometry: image cannot literally sit on the logo's x-axis

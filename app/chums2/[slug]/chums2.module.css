@@ -5,13 +5,14 @@
    tree card only (brief section 4). No magic-number offset chains.
    ================================================================ */
 
-/* Page canvas: transparent so the global body gradient shows through. */
+/* Page canvas: transparent so the global body gradient shows through.
+   Height is content-driven (no min-height, no bottom padding), so with only the
+   header rendered the page is only as tall as the header (no dead whitespace).
+   When sections are switched back on their own content provides the height. */
 .canvas {
   position: relative;
-  min-height: 100svh;
   background: transparent;
   font-family: var(--font-body, 'Montserrat', system-ui);
-  padding-bottom: 120px;
 }
 
 /* ── Header (brief 5.1) ─────────────────────────────────────────

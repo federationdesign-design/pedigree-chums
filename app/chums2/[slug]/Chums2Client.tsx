@@ -45,6 +45,21 @@ type Props = {
   character: string;
 };
 
+// Section visibility. Reset to header-only (production review 2026-08-22): the
+// square image, the title and the subtitle are the only visible content. Every
+// other section below is KEPT and fully wired, just gated here so it can be
+// switched back on one at a time under Steve's direction.
+const SHOW_SECTIONS = {
+  introBand: false,     // intro write-up box + lifespan chart
+  diagram: false,       // circular BreedTree diagram (main band)
+  ancestorPack: false,  // hidden BreedTreeMap feed + pack grid
+  famousChums: false,   // FamousDogsSection
+  cards: false,         // rail pop-out DragCards
+  tree: false,          // family tree LineageMap overlay
+  rail: false,          // the icon rail
+  backButton: false,    // the Back link
+};
+
 // Small pit-style X used to close a panel (diagram, tree).
 function CloseX() {
   return (
@@ -335,6 +350,7 @@ export default function Chums2Client({ name, slug, image, info, lineage, charact
       {/* Always-on-page (production feedback items 8, 9): the intro write-up box
           on the left with the lifespan chart to its right, like the old page.
           Neither is a rail card. Left inset clears the icon rail (item 13). */}
+      {SHOW_SECTIONS.introBand && (
       <section className={styles.introBand} data-region="intro-band">
         {character && (
           <div className={styles.introBox}>
@@ -348,8 +364,10 @@ export default function Chums2Client({ name, slug, image, info, lineage, charact
           </div>
         )}
       </section>
+      )}
 
-      {/* Main band: circular diagram (big, centred on screen) + family tree. */}
+      {/* Main band: circular diagram (big, centred on screen). */}
+      {SHOW_SECTIONS.diagram && (
       <section className={styles.mainBand} data-region="main-band">
         {lineage && !closed.has("diagram") && (
           <div className={styles.diagramPanel} data-region="diagram">
@@ -377,17 +395,18 @@ export default function Chums2Client({ name, slug, image, info, lineage, charact
         )}
 
       </section>
+      )}
 
       {/* Hidden BreedTreeMap: feeds ancestor-pack frames via onFramesReady only
-          (brief 5.6). Not rendered visibly. */}
-      {lineage && (
+          (brief 5.6). Not rendered visibly. Only mounted when the pack is shown. */}
+      {SHOW_SECTIONS.ancestorPack && lineage && (
         <div className={styles.hiddenMap} aria-hidden="true">
           <BreedTreeMap lineage={lineage} rootImage={image} filledIds={[]} onFramesReady={handleFramesReady} />
         </div>
       )}
 
       {/* Ancestor pack: rows capped at 3, columns grow with the pack. */}
-      {frames.length > 0 && (
+      {SHOW_SECTIONS.ancestorPack && frames.length > 0 && (
         <section className={styles.ancestorPack} data-region="ancestor-pack">
           <p className={styles.packTitle}>Ancestor Pack</p>
           <div className={styles.packGrid} style={{ ["--pack-rows" as string]: String(packRows) }} data-cols={packCols}>
@@ -423,7 +442,7 @@ export default function Chums2Client({ name, slug, image, info, lineage, charact
       )}
 
       {/* Famous chums, in flow directly below the ancestor pack (brief 5.7). */}
-      {famousDogs[slug] && (
+      {SHOW_SECTIONS.famousChums && famousDogs[slug] && (
         <section className={styles.famousChums} data-region="famous-chums">
           <FamousDogsSection dogs={famousDogs[slug]} />
         </section>
@@ -431,7 +450,7 @@ export default function Chums2Client({ name, slug, image, info, lineage, charact
 
       {/* Open draggable cards. */}
       {cards.map((c) =>
-        closed.has(c.id) ? null : (
+        !SHOW_SECTIONS.cards || closed.has(c.id) ? null : (
           <DragCard
             key={c.id}
             id={c.id}
@@ -455,7 +474,7 @@ export default function Chums2Client({ name, slug, image, info, lineage, charact
           prop), and pre-expands to depth 2 via the new initialDepth prop. Its
           centre card drags exactly as in the pit (unchanged). Drawn like the
           pit's own chum family tree (strongBg, no circular). See DECISIONS D13. */}
-      {lineage && !closed.has("tree") && (
+      {SHOW_SECTIONS.tree && lineage && !closed.has("tree") && (
         <LineageMap
           breed={{
             name,
@@ -471,9 +490,9 @@ export default function Chums2Client({ name, slug, image, info, lineage, charact
         />
       )}
 
-      <Chums2Rail items={railItems} onOpen={openCard} />
+      {SHOW_SECTIONS.rail && <Chums2Rail items={railItems} onOpen={openCard} />}
 
-      <Link href="/home" className={styles.backBtn}>Back</Link>
+      {SHOW_SECTIONS.backButton && <Link href="/home" className={styles.backBtn}>Back</Link>}
     </div>
   );
 }
