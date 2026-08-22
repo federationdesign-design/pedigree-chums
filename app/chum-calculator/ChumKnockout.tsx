@@ -7,12 +7,19 @@ import styles from "./calculator.module.css";
 import k from "./ChumKnockout.module.css";
 
 // The knockout runs on the dogs the calculator has already revealed and whittles
-// them down with the four tb_ questions. scoreBreed is reused as-is (the one and
-// only scoring path). Stage 4: the question order is chosen by split score, not
-// fixed. No animation yet. (Job B, 22 Aug 2026.)
+// them down with the four tb_ questions, in fixed file order. scoreBreed is reused
+// as-is (the one and only scoring path). No animation yet. (Job B, 22 Aug 2026.)
+//
+// A split-score question picker was built and REMOVED on 22 Aug 2026. It chose the
+// next question by how many survivors its answer swung. A 108k-field sweep showed it
+// reproduced the fixed file order (tb_build, tb_dogperson, tb_instincts, tb_smallchar)
+// in 100% of sampled reveals: the swing metric is dominated by each question's scoring
+// magnitude, tb_build's are the largest, so it always won round 1, tb_dogperson round 2,
+// and so on. It cost runtime for zero behavioural change. The order is fixed on purpose.
+// Do not rebuild the picker without a metric that adapts to the current field (split
+// balance, not swing count) and a sweep proving it actually varies.
 
 type ScoredBreed = { slug: string; name: string; image: string; score: number };
-type TBQuestion = { id: string; question: string; sub?: string; options: { label: string; value: string }[] };
 
 type Props = {
   breeds: ScoredBreed[];            // the revealed dogs, up to MAX_RESULTS (8)
@@ -40,56 +47,22 @@ function survivorsAfterRound(prev: ScoredBreed[], answers: Record<string, string
   return kept.length > 0 ? kept : [scored[0]];                     // never clear the screen
 }
 
-// SPLIT SCORE (stage 4). How much a question's answer actually changes who survives.
-// For each of the question's answers we run the elimination and see which dogs live;
-// a dog that survives under some answers but not others is "swung" by this question.
-// More swung dogs means the answer matters more, so that is the question to ask.
-// A question that eliminates the same dogs whatever the answer scores 0 and is avoided.
-function splitScore(q: TBQuestion, survivors: ScoredBreed[], acc: Record<string, string>): number {
-  const survivalCount = new Map<string, number>();
-  for (const o of q.options) {
-    const kept = new Set(survivorsAfterRound(survivors, { ...acc, [q.id]: o.value }).map((b) => b.slug));
-    for (const b of survivors) if (kept.has(b.slug)) survivalCount.set(b.slug, (survivalCount.get(b.slug) ?? 0) + 1);
-  }
-  let swung = 0;
-  for (const b of survivors) {
-    const c = survivalCount.get(b.slug) ?? 0;
-    if (c > 0 && c < q.options.length) swung++;
-  }
-  return swung;
-}
-
-// Pick the highest-splitting unused question. Ties break by fixed file order (the
-// order `unused` arrives in), so a run with no discriminating question left still
-// falls back to a stable order rather than picking at random.
-function pickQuestion(survivors: ScoredBreed[], acc: Record<string, string>, unused: TBQuestion[]): TBQuestion {
-  let best = unused[0];
-  let bestScore = -1;
-  for (const q of unused) {
-    const s = splitScore(q, survivors, acc);
-    if (s > bestScore) { bestScore = s; best = q; }
-  }
-  return best;
-}
-
 export default function ChumKnockout({ breeds, answers, onRestart }: Props) {
-  // The four tb_ questions. Computed here (not at module level) so a future import
-  // cycle with ChumCalculator cannot hit a TDZ.
-  const tbQuestions = QUESTIONS.filter((q) => q.id.startsWith("tb_")) as TBQuestion[];
+  // The four tb_ questions in fixed file order. Computed here (not at module level)
+  // so a future import cycle with ChumCalculator cannot hit a TDZ.
+  const tbQuestions = QUESTIONS.filter((q) => q.id.startsWith("tb_"));
 
   const [survivors, setSurvivors] = useState<ScoredBreed[]>(breeds);
   const [acc, setAcc] = useState<Record<string, string>>(answers);
-  const [usedIds, setUsedIds] = useState<string[]>([]);
+  const [roundIdx, setRoundIdx] = useState(0);
   const [done, setDone] = useState(breeds.length <= TARGET_MAX);
 
-  const unused = tbQuestions.filter((q) => !usedIds.includes(q.id));
-  const currentQ = !done && unused.length > 0 ? pickQuestion(survivors, acc, unused) : null;
+  const currentQ = done ? null : (tbQuestions[roundIdx] ?? null);
 
   function answer(value: string) {
     if (!currentQ) return;
     const nextAnswers = { ...acc, [currentQ.id]: value };
     const nextSurvivors = survivorsAfterRound(survivors, nextAnswers);
-    const nextUsed = [...usedIds, currentQ.id];
     setAcc(nextAnswers);
 
     if (nextSurvivors.length <= TARGET_MAX) {
@@ -97,7 +70,7 @@ export default function ChumKnockout({ breeds, answers, onRestart }: Props) {
       setDone(true);
       return;
     }
-    if (nextUsed.length >= tbQuestions.length) {
+    if (roundIdx + 1 >= tbQuestions.length) {
       // Questions exhausted with more than TARGET_MAX still standing: fall back to
       // cumulative score order and take the top TARGET_MAX. With four questions used
       // on nearly every run this is the common exit, not a rare branch.
@@ -106,7 +79,7 @@ export default function ChumKnockout({ breeds, answers, onRestart }: Props) {
       return;
     }
     setSurvivors(nextSurvivors);
-    setUsedIds(nextUsed);
+    setRoundIdx(roundIdx + 1);
   }
 
   // ── End screen: straight to the result rail, then Start again ────────────────
@@ -121,21 +94,26 @@ export default function ChumKnockout({ breeds, answers, onRestart }: Props) {
     );
   }
 
-  // ── A question round ────────────────────────────────────────────────────────
+  // ── A question round: message, then the surviving dogs, then the question ────
   return (
-    <div className={styles.stepperWrap}>
-      <div className={styles.stepCard}>
-        <p className={k.remaining}>{survivors.length} chums left</p>
-        <div className={styles.questionHeader}>
-          <h2 className={styles.stepQuestion}>{currentQ.question}</h2>
-        </div>
-        {currentQ.sub && <p className={styles.stepSub}>{currentQ.sub}</p>}
-        <div className={styles.stepOptions}>
-          {currentQ.options.map((opt) => (
-            <button key={opt.value} className={styles.option} onClick={() => answer(opt.value)}>
-              {opt.label}
-            </button>
-          ))}
+    <div>
+      <p className={k.message}>We still have a few too many chums matching you</p>
+      {/* The pack still in the running. Re-rendered every round so the user watches
+          it shrink as they answer. This rail is what stage 5 will animate. */}
+      <BreedResultRail breeds={survivors} bestSlug={null} />
+      <div className={styles.stepperWrap}>
+        <div className={styles.stepCard}>
+          <div className={styles.questionHeader}>
+            <h2 className={styles.stepQuestion}>{currentQ.question}</h2>
+          </div>
+          {currentQ.sub && <p className={styles.stepSub}>{currentQ.sub}</p>}
+          <div className={styles.stepOptions}>
+            {currentQ.options.map((opt) => (
+              <button key={opt.value} className={styles.option} onClick={() => answer(opt.value)}>
+                {opt.label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
     </div>
