@@ -162,7 +162,7 @@ export default function SmarterThanTheTestPage() {
                   <div style={{ padding: "0 20px 12px", display: "flex", alignItems: "center", gap: 10 }}>
                     <span style={{
                       fontFamily: "var(--font-body,'Montserrat',sans-serif)",
-                      fontSize: "0.6rem", fontWeight: 700,
+                      fontSize: "0.85rem", fontWeight: 700,
                       textTransform: "uppercase", letterSpacing: "0.1em",
                       color: colour, border: `1px solid ${colour}`,
                       borderRadius: 999, padding: "2px 10px",
@@ -183,12 +183,12 @@ export default function SmarterThanTheTestPage() {
                     >
                       <div style={{
                         fontFamily: "var(--font-body,'Montserrat',sans-serif)",
-                        fontSize: "0.82rem", fontWeight: 700,
+                        fontSize: "1.07rem", fontWeight: 700,
                         color: "#ffffff", marginBottom: 3,
                       }}>{item.name} ↗</div>
                       <p style={{
                         fontFamily: "var(--font-body,'Montserrat',sans-serif)",
-                        fontSize: "0.7rem", fontWeight: 500,
+                        fontSize: "0.95rem", fontWeight: 500,
                         color: "rgba(255,255,255,0.6)",
                         margin: 0, lineHeight: 1.5,
                       }}>{item.note}</p>
