@@ -80,6 +80,16 @@ Baseline (measured before stage 1):
 - FLAG for Steve: this is a modal tree, not an inline-on-load tree. If you want it inline beside the diagram, that needs a new bounded rendering mode inside LineageMap (a deliberate shared-component change), which I did not make because it would risk the game. Tell me and I will design it behind a defaulted prop.
 - CSS constraint respected: no perspective / backface-visibility / transform-style: preserve-3d anywhere in the chums2 chain.
 
+## Intro box corrections vs concept (2026-08-22)
+
+### D22. Intro box: correct text source, styling and rail order to the concept
+- TEXT SOURCE FIX: the box now shows the learn-area write-up from data/breedInfo.ts (breedInfo[name]) plus " Tap a circle inside to keep digging." when the breed has lineage children, composed exactly as the diagram caption does (BreedTree line ~7335-7338). It was wrongly showing breed.character. breed.character is now unused in the client (server still passes it; left in place to avoid churn).
+- Removed the yellow "About the {name}" heading; body text only.
+- Body text enlarged to clamp(1.15rem,1.15vw,1.4rem) (was 13px), line-height 1.5, to match the concept proportion.
+- Box width reduced 15%: clamp(320,33vw,560) -> clamp(272px,28vw,476px).
+- leftBand rail-to-box gap tightened 14px -> 5px (~a third); square-to-first-icon gap tightened via leftBand margin-top 12px -> 6px.
+- Rail icon order set to the concept via an explicit RAIL_ORDER: temperament (brain), tree, lifespanExplain (hourglass), cost, suitability, exercise, grooming, training, then influence, health, diagram (the last three are not in the concept crop; kept and appended, only shown when closed).
+
 ## Intro box switched on (2026-08-22)
 
 ### D21. Blue intro box on, right of the rail, tops aligned

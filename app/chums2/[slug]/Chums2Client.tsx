@@ -10,6 +10,7 @@ import Chums2Rail, { type RailItem } from "./Chums2Rail";
 import DragCard, { type Rect } from "./DragCard";
 import { ICONS } from "../../../components/CardDock/CardDock";
 import { INFLUENCE_GLYPH, DIAGRAM_GLYPH, HEALTH_GLYPH } from "./chums2Icons";
+import { breedInfo } from "../../../data/breedInfo";
 import LifespanChart from "../../../components/LifespanChart/LifespanChart";
 import OutboundLink from "../../../components/OutboundLink/OutboundLink";
 import { lifespanCurves, EXPLANATION, METHOD, SOURCES } from "../../../data/lifespanCurves";
@@ -107,7 +108,13 @@ function buildSlots(vw: number): { x: number; y: number }[] {
 // pop-out placement, draggable cards. Production feedback (2026-08-22): the
 // intro box and the lifespan chart are always-on-page in the left column, not
 // rail cards, and the ?alt=1 fork is deleted (see DECISIONS D11).
-export default function Chums2Client({ name, slug, image, info, lineage, character }: Props) {
+export default function Chums2Client({ name, slug, image, info, lineage }: Props) {
+  // The intro box shows the learn-area write-up (data/breedInfo.ts), plus the
+  // "keep digging" prompt when the breed has ancestry to open, composed exactly
+  // as the diagram caption does (BreedTree). NOT the subtitle or the temperament
+  // blurb, and NOT breed.character. (Correction 2026-08-22, D22.)
+  const introText = (breedInfo[name] ?? "") + (lineage?.children?.length ? " Tap a circle inside to keep digging." : "");
+
   // Historical-influence breakdown, same computation as the live page's
   // ancestry card (leaf shares, normalised, merged, sorted desc).
   const influence = useMemo(() => {
@@ -328,14 +335,22 @@ export default function Chums2Client({ name, slug, image, info, lineage, charact
     setClosed((prev) => (prev.has(id) ? prev : new Set(prev).add(id)));
   }, []);
 
-  // Rail order: diagram, tree, then the cards. Only closed + available items show.
+  // Rail order matches the concept (D22, item 6): brain (temperament) first,
+  // then the family tree, then the rest in concept order. Cards not shown in the
+  // concept (influence, health) and the diagram trail after it. Only closed +
+  // available items render.
   const railItems: RailItem[] = useMemo(() => {
-    const panels: RailItem[] = [
-      { id: "diagram", label: "Diagram", icon: DIAGRAM_GLYPH },
-      { id: "tree", label: "Family tree", icon: ICONS.ancestry },
+    const byId = new Map<string, RailItem>();
+    byId.set("diagram", { id: "diagram", label: "Diagram", icon: DIAGRAM_GLYPH });
+    byId.set("tree", { id: "tree", label: "Family tree", icon: ICONS.ancestry });
+    cards.forEach((c) => byId.set(c.id, { id: c.id, label: c.label, icon: c.icon }));
+    const RAIL_ORDER = [
+      "temperament", "tree", "lifespanExplain", "cost", "suitability",
+      "exercise", "grooming", "training", "influence", "health", "diagram",
     ];
-    const cardItems: RailItem[] = cards.map((c) => ({ id: c.id, label: c.label, icon: c.icon }));
-    return [...panels, ...cardItems].filter((it) => closed.has(it.id));
+    return RAIL_ORDER
+      .map((id) => byId.get(id))
+      .filter((it): it is RailItem => !!it && closed.has(it.id));
   }, [cards, closed]);
 
   return (
@@ -362,10 +377,9 @@ export default function Chums2Client({ name, slug, image, info, lineage, charact
           {SHOW_SECTIONS.rail && <Chums2Rail items={railItems} onOpen={openCard} />}
           {(SHOW_SECTIONS.introBox || SHOW_SECTIONS.lifespanChart) && (
             <div className={styles.introStack} data-region="intro-band">
-              {SHOW_SECTIONS.introBox && character && (
+              {SHOW_SECTIONS.introBox && introText && (
                 <div className={styles.introBox}>
-                  <p className={styles.cardHeading}>About the {name}</p>
-                  <p className={styles.introBody}>{character}</p>
+                  <p className={styles.introBody}>{introText}</p>
                 </div>
               )}
               {SHOW_SECTIONS.lifespanChart && lifespanCurves[name] && (
