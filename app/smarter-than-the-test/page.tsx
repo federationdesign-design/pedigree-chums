@@ -17,60 +17,80 @@ const NOTABLE = [
     category: "Dog",
     note: "Border Collie who learned 1,022 object names -- the largest tested vocabulary of any non-human animal.",
     url: "https://en.wikipedia.org/wiki/Chaser_(dog)",
+    image: "/collie-chat-profile-img2.jpg",
+    alt: "Illustrated portrait of a Border Collie, black and white with its tongue out",
   },
   {
     name: "Rico",
     category: "Dog",
     note: "Border Collie who could identify objects by name and use fast mapping to learn new words from a single exposure.",
     url: "https://en.wikipedia.org/wiki/Rico_(dog)",
+    image: "/collie-chat-profile-img2.jpg",
+    alt: "Illustrated portrait of a Border Collie, black and white with its tongue out",
   },
   {
     name: "Betsy",
     category: "Dog",
     note: "Border Collie with a vocabulary of over 340 words who could match a photograph of an object to the real thing.",
     url: "https://en.wikipedia.org/wiki/Betsy_(dog)",
+    image: "/collie-chat-profile-img2.jpg",
+    alt: "Illustrated portrait of a Border Collie, black and white with its tongue out",
   },
   {
     name: "Endal",
     category: "Dog",
     note: "Labrador Retriever service dog who could respond to hundreds of signed commands and was filmed using a cash machine.",
     url: "https://en.wikipedia.org/wiki/Endal",
+    image: "/lab-chat-profile-img2.jpg",
+    alt: "Illustrated portrait of a yellow Labrador Retriever wearing a collar, with its tongue out",
   },
   {
     name: "Bottlenose Dolphin",
     category: "Cetacean",
     note: "Forms multi-level social alliances, uses signature whistles as individual names, and passes learned behaviours between generations.",
     url: "https://en.wikipedia.org/wiki/Bottlenose_dolphin",
+    image: "/notable/bottlenose-dolphin.jpg",
+    alt: "Illustrated portrait of a smiling bottlenose dolphin",
   },
   {
     name: "Orca",
     category: "Cetacean",
     note: "Hunts cooperatively in family pods, has distinct dialects by population, and shows evidence of cultural transmission across generations.",
     url: "https://en.wikipedia.org/wiki/Orca",
+    image: "/notable/orca.jpg",
+    alt: "Illustrated portrait of an orca, black with white eye patches and a pale underside",
   },
   {
     name: "Sperm Whale",
     category: "Cetacean",
     note: "Has the largest brain of any animal on Earth. Lives in matriarchal social groups with complex vocalisation patterns.",
     url: "https://en.wikipedia.org/wiki/Sperm_whale",
+    image: "/notable/sperm-whale.jpg",
+    alt: "Illustrated portrait of a sperm whale with a large blunt boxy head",
   },
   {
     name: "Pakicetus",
     category: "Ancestor",
     note: "The earliest known cetacean ancestor -- a dog-sized land mammal that lived 50 million years ago before the whale lineage returned to the sea.",
     url: "https://en.wikipedia.org/wiki/Pakicetus",
+    image: "/notable/pakicetus.jpg",
+    alt: "Illustrated portrait of Pakicetus, a small furry four-legged early whale ancestor",
   },
   {
     name: "African Elephant",
     category: "Other",
     note: "Recognises itself in mirrors, mourns its dead, uses tools, and maintains complex long-term social bonds across decades.",
     url: "https://en.wikipedia.org/wiki/African_elephant",
+    image: "/notable/african-elephant.jpg",
+    alt: "Illustrated portrait of an African elephant with large ears and curved tusks",
   },
   {
     name: "New Caledonian Crow",
     category: "Other",
     note: "Manufactures hooked tools from leaves, solves multi-step problems, and can plan for future needs -- a capacity once thought uniquely human.",
     url: "https://en.wikipedia.org/wiki/New_Caledonian_crow",
+    image: "/notable/new-caledonian-crow.jpg",
+    alt: "Illustrated portrait of a New Caledonian crow, glossy black with a heavy dark beak",
   },
 ];
 
@@ -182,18 +202,20 @@ export default function SmarterThanTheTestPage() {
                         borderTop: "1px solid rgba(255,255,255,0.07)",
                       }}
                     >
-                      {/* Placeholder circle. Once the photos are in public/notable/,
-                          swap this span for:
-                          <img src={`/notable/${item.slug}.jpg`} alt="" width={56} height={56}
-                               style={{ flex: "0 0 auto", width: 56, height: 56, borderRadius: "50%", objectFit: "cover" }} />
-                          Expected source: square, at least 160x160 (2x of the 56px circle). */}
-                      <span
-                        aria-hidden="true"
+                      {/* Round thumbnail beside the text. Raw <img> like the hero on
+                          this page, so hide-images and the scheme crush both reach it;
+                          alt carries the description they surface. Square source, cropped
+                          to the 56px circle via object-fit cover. */}
+                      <img
+                        src={item.image}
+                        alt={item.alt}
+                        width={56}
+                        height={56}
                         style={{
                           flex: "0 0 auto",
                           width: 56, height: 56,
                           borderRadius: "50%",
-                          background: "rgba(255,255,255,0.08)",
+                          objectFit: "cover",
                           border: `1px solid ${colour}`,
                         }}
                       />
