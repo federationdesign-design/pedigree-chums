@@ -792,7 +792,7 @@ export default function ChumCalculator() {
       {/* ── Header ── */}
       <div className={styles.header}>
         <h1 className={styles.title}>
-          Chum<br /><span className={styles.titleAccent}>Finder</span>
+          Chum <span className={styles.titleAccent}>Finder</span>
         </h1>
         <p className={styles.headerSub}>{progressMsg}</p>
       </div>

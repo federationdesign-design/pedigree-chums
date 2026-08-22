@@ -24,7 +24,7 @@
 
 .title {
   font-family: var(--font-display, "Luckiest Guy", cursive);
-  font-size: clamp(3rem, 10vw, 6.5rem);
+  font-size: clamp(3.5rem, 14vw, 11rem);
   color: #ffffff;
   line-height: 0.95;
   margin: 0 0 16px;
@@ -535,7 +535,7 @@
 /* ── Mobile (matches the name generator's 768px breakpoint) ──── */
 @media (max-width: 768px) {
   .header { margin-bottom: 32px; }
-  .title { font-size: clamp(3.5rem, 12vw, 5.4rem); }
+  .title { font-size: clamp(3.5rem, 12vw, 7rem); }
   .stepperWrap { margin-bottom: 28px; }
   .stepProgress { gap: 10px; margin-bottom: 22px; }
   .stepCount { font-size: 0.72rem; }
