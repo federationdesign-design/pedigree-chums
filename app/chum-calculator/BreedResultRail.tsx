@@ -109,6 +109,15 @@ type Props = {
   reasons?: Record<string, string>;
 };
 
+// The caption sits under a card already titled with the breed name, so drop the
+// leading "Breed name:" prefix fitReason writes and open with a capital. fitReason
+// itself is left unchanged: the hover tooltip still shows the full sentence, name and
+// all. (Job B stage 6, 22 Aug 2026.)
+function captionText(name: string, reason: string): string {
+  const s = reason.startsWith(name) ? reason.slice(name.length).replace(/^[:\s]+/, "") : reason;
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
 export default function BreedResultRail({ breeds, bestSlug, fallingSlugs, reasons }: Props) {
   const falling = new Set(fallingSlugs ?? []);
   const railRef = useRef<HTMLDivElement>(null);
@@ -174,7 +183,7 @@ export default function BreedResultRail({ breeds, bestSlug, fallingSlugs, reason
         {breeds.map((b) => (
           <div key={b.slug} className={falling.has(b.slug) ? `${styles.item} ${shared.falling}` : styles.item} role="listitem">
             <FlipCard breed={b} isBest={b.slug === bestSlug} />
-            {reasons?.[b.slug] && <p className={styles.reason}>{reasons[b.slug]}</p>}
+            {reasons?.[b.slug] && <p className={styles.reason}>{captionText(b.name, reasons[b.slug])}</p>}
           </div>
         ))}
       </div>

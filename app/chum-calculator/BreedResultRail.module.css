@@ -29,6 +29,7 @@
   max-width: clamp(160px, 45vw, 220px);
   font-family: var(--font-body), sans-serif;
   font-size: 0.8rem;
+  font-weight: 600;
   line-height: 1.35;
   color: var(--navy, #0a3a57);
   text-align: center;
