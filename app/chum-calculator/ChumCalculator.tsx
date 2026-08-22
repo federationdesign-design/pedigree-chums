@@ -631,6 +631,29 @@ export default function ChumCalculator() {
     document.body.appendChild(script);
   }, []);
 
+  // ============================================================================
+  // REMOVE BEFORE COMMIT -- throwaway dev shortcut (Job B, 22 Aug 2026).
+  // /chum-calculator?dev=reveal pre-fills a sample answer set and jumps straight to
+  // the results screen, so the reveal (and the knockout once it is wired in) can be
+  // reached without answering every question. NOT a feature. Delete this block in the
+  // stage 6 cleanup, alongside app/knockout-preview/.
+  // ============================================================================
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (new URLSearchParams(window.location.search).get("dev") !== "reveal") return;
+    // Deferred so the state jump does not run synchronously inside the effect.
+    const id = setTimeout(() => {
+      setAnswers({
+        intent: "looking", size: "medium", living: "town_garden", children: "older",
+        other_pets: "none", alone: "sometimes", exercise: "medium", experience: "some",
+        grooming: "medium", budget: "medium", velcro: "medium", vocal: "low",
+        mobility: "full", coat: "some",
+      });
+      setStep(QUESTIONS.length + 1); // any value greater than total forces finished
+    }, 0);
+    return () => clearTimeout(id);
+  }, []);
+
   const answeredCount = Object.keys(answers).length;
   const CORE_COUNT = 14;
   const coreAnswered = Object.keys(answers).filter(k => !k.startsWith("tb_") && k !== "stairs").length;
