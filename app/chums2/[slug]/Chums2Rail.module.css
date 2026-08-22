@@ -1,14 +1,14 @@
 /* Left-edge vertical rail. Mirrors the CardDock icon look (navy tile, yellow
    ring, yellow glyph) but pinned to the left with the hover tooltip on the
    right. Fixed so it stays put as the page scrolls. */
-/* In-flow in the left column, directly below the chum square and left-aligned
-   with it (margin-left matches the header's left padding). Continues the logo /
-   counter / square stack downward. */
+/* In-flow, in the left column below the chum square. Positioned by its parent
+   .leftBand (in chums2.module.css), which handles the left alignment with the
+   square and the gap to the intro box; the rail itself carries no margin so its
+   first icon's top aligns with the intro box's top. */
 .rail {
   display: flex;
   flex-direction: column;
   gap: 7px;
-  margin: 12px 0 24px clamp(18px, 4vw, 48px);
 }
 
 /* item 1: icons 20% smaller (76 -> 61, glyph 42 -> 34). */

@@ -50,7 +50,8 @@ type Props = {
 // other section below is KEPT and fully wired, just gated here so it can be
 // switched back on one at a time under Steve's direction.
 const SHOW_SECTIONS = {
-  introBand: false,     // intro write-up box + lifespan chart
+  introBox: true,       // blue intro description box (the breed write-up)
+  lifespanChart: false, // the lifespan chart (still off)
   diagram: false,       // circular BreedTree diagram (main band)
   ancestorPack: false,  // hidden BreedTreeMap feed + pack grid
   famousChums: false,   // FamousDogsSection
@@ -352,29 +353,29 @@ export default function Chums2Client({ name, slug, image, info, lineage, charact
         </div>
       </header>
 
-      {/* Icon rail: in the left column directly below the chum square, continuing
-          the logo / counter / square stack downward, left-aligned with the
-          square. Icons only for now; pop-outs are gated off (openCard no-ops
-          while the sections are hidden). */}
-      {SHOW_SECTIONS.rail && <Chums2Rail items={railItems} onOpen={openCard} />}
-
-      {/* Always-on-page (production feedback items 8, 9): the intro write-up box
-          on the left with the lifespan chart to its right, like the old page.
-          Neither is a rail card. Left inset clears the icon rail (item 13). */}
-      {SHOW_SECTIONS.introBand && (
-      <section className={styles.introBand} data-region="intro-band">
-        {character && (
-          <div className={styles.introBox}>
-            <p className={styles.cardHeading}>About the {name}</p>
-            <p className={styles.introBody}>{character}</p>
-          </div>
-        )}
-        {lifespanCurves[name] && (
-          <div className={styles.chartBox}>
-            <LifespanChart breedName={name} />
-          </div>
-        )}
-      </section>
+      {/* Left band: the icon rail with the blue intro description box immediately
+          to its right, the box's TOP aligned to the rail's first icon
+          (align-items:flex-start). In the left column below the chum square. The
+          rail's pop-outs are still gated off; the lifespan chart is still off. */}
+      {(SHOW_SECTIONS.rail || SHOW_SECTIONS.introBox || SHOW_SECTIONS.lifespanChart) && (
+        <div className={styles.leftBand}>
+          {SHOW_SECTIONS.rail && <Chums2Rail items={railItems} onOpen={openCard} />}
+          {(SHOW_SECTIONS.introBox || SHOW_SECTIONS.lifespanChart) && (
+            <div className={styles.introStack} data-region="intro-band">
+              {SHOW_SECTIONS.introBox && character && (
+                <div className={styles.introBox}>
+                  <p className={styles.cardHeading}>About the {name}</p>
+                  <p className={styles.introBody}>{character}</p>
+                </div>
+              )}
+              {SHOW_SECTIONS.lifespanChart && lifespanCurves[name] && (
+                <div className={styles.chartBox}>
+                  <LifespanChart breedName={name} />
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       )}
 
       {/* Main band: circular diagram (big, centred on screen). */}

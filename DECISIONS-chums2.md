@@ -80,6 +80,14 @@ Baseline (measured before stage 1):
 - FLAG for Steve: this is a modal tree, not an inline-on-load tree. If you want it inline beside the diagram, that needs a new bounded rendering mode inside LineageMap (a deliberate shared-component change), which I did not make because it would risk the game. Tell me and I will design it behind a defaulted prop.
 - CSS constraint respected: no perspective / backface-visibility / transform-style: preserve-3d anywhere in the chums2 chain.
 
+## Intro box switched on (2026-08-22)
+
+### D21. Blue intro box on, right of the rail, tops aligned
+- Split the old introBand flag into introBox (true) and lifespanChart (false), so only the intro box shows, not the chart.
+- Rail and intro box now share a flex-row wrapper .leftBand with align-items:flex-start, so the box's TOP sits on the same line as the rail's first icon (the key alignment). The rail lost its own margins (leftBand handles the left alignment with the square and the small fixed 14px rail-to-box gap; margin-top 12px keeps the rhythm below the square).
+- Intro box: navy rounded box, white Montserrat write-up, width clamp(320px,33vw,560px) (~a third of the viewport), height driven by its text (no fixed height). Content/styling unchanged from before.
+- Nothing else switched on; pop-outs still gated off.
+
 ## Rail switched on, repositioned (2026-08-22)
 
 ### D20. Icon rail moved into the left column below the square
