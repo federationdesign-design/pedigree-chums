@@ -205,15 +205,15 @@ export default function SmarterThanTheTestPage() {
                       {/* Round thumbnail beside the text. Raw <img> like the hero on
                           this page, so hide-images and the scheme crush both reach it;
                           alt carries the description they surface. Square source, cropped
-                          to the 56px circle via object-fit cover. */}
+                          to the 112px circle via object-fit cover. */}
                       <img
                         src={item.image}
                         alt={item.alt}
-                        width={56}
-                        height={56}
+                        width={112}
+                        height={112}
                         style={{
                           flex: "0 0 auto",
-                          width: 56, height: 56,
+                          width: 112, height: 112,
                           borderRadius: "50%",
                           objectFit: "cover",
                           border: `1px solid ${colour}`,
