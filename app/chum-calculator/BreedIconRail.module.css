@@ -12,13 +12,14 @@
   width: clamp(160px, 45vw, 220px);
 }
 
-/* Desktop: a vertical rail to the left of the card. Icon + gap sized so eight
-   icons span roughly the card height (220 x 7/5 = 308px). */
+/* Desktop: a rail to the left of the card, two columns of four 60px icons
+   (2 x 60 + gap = 128px wide, 4 x 60 + gaps = 264px tall, close to the 308px
+   card height). Sizes differ from mobile by design. (Icon size set 22 Aug 2026.) */
 @media (min-width: 840px) {
   .rail {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
+    display: grid;
+    grid-template-columns: repeat(2, 60px);
+    gap: 8px;
     width: auto;
   }
 }
@@ -39,8 +40,8 @@
 
 @media (min-width: 840px) {
   .icon {
-    width: 34px;
-    height: 34px;
+    width: 60px;
+    height: 60px;
     aspect-ratio: auto;
   }
 }

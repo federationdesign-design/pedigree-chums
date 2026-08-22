@@ -196,8 +196,10 @@ export default function BreedResultRail({ breeds, bestSlug, fallingSlugs, reason
           const isFalling = falling.has(b.slug);
           const card = (
             <>
-              <FlipCard breed={b} isBest={b.slug === bestSlug} />
+              {/* Caption sits ABOVE the card image on both result screens. Moved up
+                  from below on 22 Aug 2026 (was below since the stage 6 caption work). */}
               {reasons?.[b.slug] && <p className={styles.reason}>{captionText(b.name, reasons[b.slug])}</p>}
+              <FlipCard breed={b} isBest={b.slug === bestSlug} />
             </>
           );
           if (!iconRails) {

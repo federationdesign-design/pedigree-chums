@@ -62,15 +62,16 @@
 }
 
 
-/* fitReason caption under each result card, always visible (was hover-only). Width
-   matches the card so a long sentence wraps instead of widening the rail item.
-   (Job B stage 6, 22 Aug 2026.) */
+/* fitReason caption, always visible (was hover-only). Width matches the card so a
+   long sentence wraps instead of widening the rail item. Sits ABOVE the card image,
+   so the margin sits below it. (Job B stage 6, 22 Aug 2026.)
+   Weight set to 500 on 22 Aug 2026, reversing the 600 set earlier the same day. */
 .reason {
-  margin: 10px auto 0;
+  margin: 0 auto 10px;
   max-width: clamp(160px, 45vw, 220px);
   font-family: var(--font-body), sans-serif;
   font-size: 0.8rem;
-  font-weight: 600;
+  font-weight: 500;
   line-height: 1.35;
   color: var(--navy, #0a3a57);
   text-align: center;
