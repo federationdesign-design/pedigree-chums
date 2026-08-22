@@ -59,29 +59,41 @@ Baseline (measured before stage 1):
 ### D8. Extra rail glyphs
 - Cards the shared ICONS map does not cover got new stroke glyphs in chums2Icons.tsx: intro (open book), health (medical-cross shield), historical influence (percentage bar chart, kept distinct from the family-tree glyph which uses ICONS.ancestry). Same yellow-via-currentColor style so they invert on hover like CardDock glyphs.
 
-### D9. Lifespan chart + explanation are ONE card
-- Brief 5.4 inventory lists "lifespan chart + its explanation" as a single item. The live page had the chart fixed and the explanation as a separate card. Read the brief literally: one rail card holding the LifespanChart plus the EXPLANATION text and a Method and sources details block. Smallest reading of the "+". Chart wrapped in an overflow-x container so a wide chart scrolls inside the card.
+### D9. Lifespan chart + explanation (SUPERSEDED by production feedback item 9)
+- Originally one rail card (chart + explanation). Production feedback (2026-08-22): the lifespan CHART is now always-on-page (in the intro band, right of the intro box), NOT a rail card. Only the lifespan EXPLANATION (text + method/sources) stays as a rail card, id "lifespanExplain". Its rail icon is the hourglass.
 
 ### D10. Health card width cap
 - Brief 5.5: HealthSection unchanged inside a card; if too wide, cap at 560 and scroll internally. Built: card width 560, HealthSection wrapped in a max-height 70vh vertical-scroll container.
 
-### D11. ?alt=1 read on the server
-- Read the query on the server page (searchParams) and pass altVariant to the client, instead of reading window in a mount effect. Avoids a setState-in-effect eslint error and any hydration mismatch: the server HTML already matches the variant. A single v2Variants(altVariant) object at the top of the client is the one switch (brief 5.3).
+### D11. ?alt=1 fork (DELETED by production feedback item 8)
+- The intro-box dual-build behind ?alt=1 is removed entirely. Production feedback item 8: the intro description box is no longer a rail card at all; it renders always-on-page in the left column under the header (like the old page). No fork, no rail icon, no altVariant prop, no searchParams read. The v2Variants switch and the server searchParams plumbing were deleted.
 
-### D12. Ancestor pack grid numbers
-- maxPerRow = 10, tiles 77px. rows = 1 if count <= 10, 2 if <= 20, else 3 (capped at 3). columns = ceil(count / rows). CSS grid: grid-template-rows: repeat(var(--pack-rows), auto) + grid-auto-flow: column + grid-auto-columns: 77px, so dogs past 30 add columns (width), never a 4th row. Matches brief 5.6.
+### D12. Ancestor pack grid numbers (REVISED by production feedback items 11, 12)
+- Tiles reduced 77px -> 52px (item 11). Rows: ALWAYS at least 2, never 1 long row, max 3 (item 12): rows = count > 2*maxPerRow ? 3 : 2, maxPerRow = 15. columns = ceil(count / rows). CSS grid grid-template-rows: repeat(var(--pack-rows), auto) default 2, grid-auto-flow: column, grid-auto-columns: 52px, so a big pack adds columns (width), never a 4th row. In flow in the left column with a rail-clearing left inset (item 13).
 
-### D13. Family tree (LineageMap) embed: scaffolded, embed deferred (KEY remaining work)
-- Question: brief 5.8 wants LineageMap embedded bounded, right of the diagram in the main band, self-loading (no tree prop), pre-expanded to depth 2, centre card draggable unchanged, X close + rail icon.
-- Blockers found:
-  1. Depth-2 pre-expand needs LineageMap's expand mechanism. Its expandNode is INTERNAL, not callable from outside, so per brief this needs a new optional prop `initialDepth?: number` (default current behaviour) added INSIDE LineageMap. That is a shared-file edit, deferred under Steve's "new files only" instruction, and LineageMap is additionally staged-modified by the in-flight merge (D7).
-  2. LineageMap is viewport-anchored: it renders placed cards as position:fixed and the precedent (BreedTree chumTree, self-loading) positions the centre card at window coords (innerWidth/2, innerHeight*0.75). Whether it can render bounded inside a main-band column (vs covering the viewport) needs visual verification, which is impossible while the tsc gate and dev server are unavailable on the conflicted tree.
-- Built now: the tree panel container, its X close, and the rail reopen icon (tree is a panel in the rail inventory, open on load, closing rails its icon, reopening restores it). A labelled placeholder sits in the tree slot.
-- Exact integration plan for when the tree is clean and renderable:
-  a. Add `initialDepth?: number` to LineageMap (default undefined = current). When set, after first layout, run its existing expandNode for the root's children down to that depth. Dated comment, no behaviour change when unset.
-  b. Embed with the chumTree-style prop set: `breed={{ name, image, x, y, angle: 0 }}`, `strongBg`, `currentScore={0}`, no `tree` (self-loads via getLineage(name)), `initialDepth={2}`, `onClose={() => closeCard("tree")}`.
-  c. Decide bounded-vs-overlay by rendering: if it must stay a viewport overlay, position breed x/y over the right region and accept the fixed centre card (brief says do not modify its drag).
-  d. Audit the ancestor CSS chain for perspective / backface-visibility / transform-style: preserve-3d (none in chums2 CSS today) and keep it that way.
+### D13. Family tree (LineageMap): implemented as an on-demand full-viewport overlay
+- Brief 5.8 wanted LineageMap embedded BOUNDED, inline right of the diagram, visible on load at depth 2.
+- Hard constraint found on reading LineageMap fresh: its root element is `styles.overlay` = position:fixed; inset:0, and it renders placed cards as position:fixed at viewport coordinates. It is architecturally a FULL-VIEWPORT OVERLAY. Making it render bounded inline would mean changing that shared positioning, which the game's pit-lift card and learn rail both depend on. That is a brief 2.6 STOP condition (cannot change game behaviour). So bounded-inline is not available without a new bounded mode inside LineageMap, a larger shared change Steve should design deliberately.
+- DEVIATION from brief 5.8, chosen as the game-safe reading (this is the overlay branch D13 already anticipated): the family tree is LineageMap's native full-viewport overlay, opened ON DEMAND from the tree rail icon (closed on load, so it does not cover the page), not inline. Its own Back/close button calls onClose -> closeCard("tree") -> the rail icon returns. Centre card drags unchanged.
+- Depth-2 pre-expand: added `initialDepth?: number` to LineageMap (default undefined = pit unchanged). It seeds the existing `open` set (the pit's own expansion mechanism, no second system) via a new module helper openIdsToDepth, which collects the ids of every node shallower than the depth, so a node renders its children exactly when its id is in `open`. /chums2 passes initialDepth={2}. LineageMap eslint stays at baseline (48).
+- Embed prop set (matches BreedTree's chumTree usage, "the chum's own family tree"): `breed={{ name, image, x: innerWidth/2, y: innerHeight*0.75, angle: 0 }}`, `strongBg`, `currentScore={0}`, no `tree` (self-loads via getLineage(name)), `initialDepth={2}`, `onClose`.
+- FLAG for Steve: this is a modal tree, not an inline-on-load tree. If you want it inline beside the diagram, that needs a new bounded rendering mode inside LineageMap (a deliberate shared-component change), which I did not make because it would risk the game. Tell me and I will design it behind a defaulted prop.
+- CSS constraint respected: no perspective / backface-visibility / transform-style: preserve-3d anywhere in the chums2 chain.
+
+## Production feedback batch (2026-08-22)
+
+### D14. Header geometry: image cannot literally sit on the logo's x-axis
+- Items 2 and 3 ask for the rail top aligned to the logo AND the square image on the logo's vertical axis. The rail is a fixed left strip (x ~10-71) and the logo is inset at x ~18-48, i.e. inside the rail zone. Any flow content on the logo's x (including the image) would be covered by the fixed rail.
+- Built: rail raised so its top aligns with the logo line (item 2), icons -20% (item 1). The header image clears the rail instead of sitting on the logo x, i.e. it aligns to the left column immediately right of the rail. Image rotated 2deg (item 4), title/subtitle gap tightened (item 5), header right-padded to keep the title clear of the top-right contrast toolbar (item 6). Flagged for Steve's visual pass: if he wants the image literally under the logo, the rail must move (e.g. start below the header) so it does not cover it.
+
+### D15. Speech-bubble leak (item 7)
+- The stray speech bubble is the logo-anchored PickAChumLauncher (root layout), which overlaps the /chums2 top-left image. Fixed with a route guard: `if (pathname?.startsWith("/chums2")) return null;` placed after all hooks. Affects only /chums2 (a new route); the live /chums page, the game and every other route are byte-identical. Launcher eslint unchanged (9, baseline).
+
+### D16. Circular diagram hosting corrected to LineageModal stageArea (item 10 + 2026-08-22 correction)
+- First attempt sized the fill host as a fixed square box; the diagram rendered zoomed into one child and cropped (the SVG clips to its own bounds when the viewBox is zoomed in). That is the exact failure v2 exists to remove.
+- Correction: host BreedTree like LineageModal's learn screen, .overlay (fixed, inset:0, NO overflow) -> .stageArea (absolute, inset:0) -> BreedTree fill. Replicated as a large page region (.diagramPanel: flex-grow, definite height min(88vh,1040px) so fill-mode height:100% has a box, overflow visible) between the rail and the tree column, no overflow clipping on it or any ancestor.
+- ROOT CAUSE (confirmed by a full read of BreedTree's fill-mode view state): NOT a framing/zoom bug. BreedTree's mount entrance effect already ends in zoomTo(root) for the no-gravity path (dropArmed = true because holdEntrance is unset), so the seed view is the full pack. The zoomed-into-a-child symptom was the fill host collapsing: .treeFill/.stage use height:100%, which resolves to zero unless the PARENT has a definite height, degenerating the SVG box so meet-fit mis-frames. Fix = definite height on .diagramPanel (min(88vh,1040px)) + no overflow clip on any ancestor. No BreedTree change and no extra prop. startInLearn does NOT affect framing and was NOT added; the prop set stays root/rootImage/rootLabel/centred/fill/dockAside/strokeByDepth/tinted={false}/displayOnly.
+- Still needs Steve's visual confirmation (no dev server available here).
 
 ### D3. Data passed to the client
 - The old page passes name, slug, image, info, lineage. The v2 intro-box card (stage 3, brief 5.3) needs the breed write-up, which is `breed.character` (data/breeds.ts), not in `info`. Added `character` to the props the server passes, so the client has it without re-reading data.

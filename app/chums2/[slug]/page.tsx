@@ -6,10 +6,7 @@ import { getLineage } from "../../../data/lineage";
 import { resolveLineageName } from "../../../data/lineageNames";
 import breedInfo from "../../../data/breed-info.json";
 
-type Props = {
-  params: Promise<{ slug: string }>;
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
-};
+type Props = { params: Promise<{ slug: string }> };
 
 export const dynamic = "force-dynamic";
 
@@ -26,13 +23,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function Chum2Page({ params, searchParams }: Props) {
+export default async function Chum2Page({ params }: Props) {
   const { slug } = await params;
-  const sp = await searchParams;
-  // Variant fork (brief 5.3): ?alt=1 opens the intro box on load. Read on the
-  // server so the client needs no window and no mount effect, and the server
-  // HTML already matches the variant (no hydration mismatch). (Decision D11.)
-  const altVariant = sp.alt === "1";
   const breed = breeds.find((b) => b.slug === slug);
   if (!breed) return <h1 style={{ color: "white", background: "#0a3a57", padding: 40 }}>Not found: {slug}</h1>;
 
@@ -58,7 +50,6 @@ export default async function Chum2Page({ params, searchParams }: Props) {
         info={info}
         lineage={lineage}
         character={breed.character}
-        altVariant={altVariant}
       />
     </>
   );

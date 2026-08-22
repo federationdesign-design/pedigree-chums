@@ -5,10 +5,11 @@ import Link from "next/link";
 import styles from "./chums2.module.css";
 import type { LineageNode } from "../../../data/lineage";
 import BreedTree from "../../../components/BreedTree/BreedTree";
+import LineageMap from "../../../components/PackPit/LineageMap";
 import Chums2Rail, { type RailItem } from "./Chums2Rail";
 import DragCard, { type Rect } from "./DragCard";
 import { ICONS } from "../../../components/CardDock/CardDock";
-import { INTRO_GLYPH, INFLUENCE_GLYPH, DIAGRAM_GLYPH, HEALTH_GLYPH } from "./chums2Icons";
+import { INFLUENCE_GLYPH, DIAGRAM_GLYPH, HEALTH_GLYPH } from "./chums2Icons";
 import LifespanChart from "../../../components/LifespanChart/LifespanChart";
 import OutboundLink from "../../../components/OutboundLink/OutboundLink";
 import { lifespanCurves, EXPLANATION, METHOD, SOURCES } from "../../../data/lifespanCurves";
@@ -42,16 +43,7 @@ type Props = {
   info: BreedInfo;
   lineage: LineageNode | null;
   character: string;
-  // ?alt=1, read on the server (Decision D11).
-  altVariant: boolean;
 };
-
-// The single switch object for the one planned dual-build (brief 5.3). Default
-// path (no query string) closes the intro on load like every other card; the
-// alt path opens it on load as the single exception.
-function v2Variants(altVariant: boolean) {
-  return { introOpenOnLoad: altVariant };
-}
 
 // Small pit-style X used to close a panel (diagram, tree).
 function CloseX() {
@@ -95,10 +87,11 @@ function buildSlots(vw: number): { x: number; y: number }[] {
 
 // ── Main component ──────────────────────────────────────────────────────────
 // Stage 1: header + flow skeleton. Stage 2: circular diagram (healthy hosting)
-// + X close + rail reopen. Stage 3: all cards closed on load, deterministic
-// pop-out placement, draggable cards, and the intro-box ?alt=1 fork.
-export default function Chums2Client({ name, slug, image, info, lineage, character, altVariant }: Props) {
-  const VARIANTS = v2Variants(altVariant);
+// + X close + rail reopen. Stage 3: rail cards closed on load, deterministic
+// pop-out placement, draggable cards. Production feedback (2026-08-22): the
+// intro box and the lifespan chart are always-on-page in the left column, not
+// rail cards, and the ?alt=1 fork is deleted (see DECISIONS D11).
+export default function Chums2Client({ name, slug, image, info, lineage, character }: Props) {
   // Historical-influence breakdown, same computation as the live page's
   // ancestry card (leaf shares, normalised, merged, sorted desc).
   const influence = useMemo(() => {
@@ -130,17 +123,9 @@ export default function Chums2Client({ name, slug, image, info, lineage, charact
   // imported-component cards (lifespan, cost, ...) arrive in stage 4.
   const cards = useMemo<CardDef[]>(() => {
     const list: CardDef[] = [];
-    if (character) {
-      list.push({
-        id: "intro", label: "About", icon: INTRO_GLYPH, width: 420,
-        body: (
-          <>
-            <p className={styles.cardHeading}>About the {name}</p>
-            <p className={styles.introBody}>{character}</p>
-          </>
-        ),
-      });
-    }
+    // Intro box and the lifespan CHART are no longer rail cards (production
+    // feedback items 8 and 9): they render always-on-page in the left column
+    // below. Only the lifespan EXPLANATION stays as a rail card.
     if (info.temperament.length || info.pros.length || info.cons.length) {
       list.push({
         id: "temperament", label: "Temperament", icon: ICONS.infoBox, width: 420,
@@ -194,14 +179,12 @@ export default function Chums2Client({ name, slug, image, info, lineage, charact
       });
     }
     if (lifespanCurves[name]) {
+      // Explanation only: the chart itself is always-on-page (item 9).
       list.push({
-        id: "lifespan", label: "Lifespan", icon: ICONS.lifespanExplain, width: 560,
+        id: "lifespanExplain", label: "Lifespan", icon: ICONS.lifespanExplain, width: 420,
         body: (
           <>
             <p className={styles.cardHeading}>The Lifespan Diagram</p>
-            <div className={styles.chartWrap}>
-              <LifespanChart breedName={name} />
-            </div>
             <p className={styles.explainBody}>{EXPLANATION}</p>
             <details>
               <summary className={styles.explainSummary}>Method &amp; sources</summary>
@@ -243,23 +226,16 @@ export default function Chums2Client({ name, slug, image, info, lineage, charact
       });
     }
     return list;
-  }, [name, slug, character, info, influence]);
+  }, [name, slug, info, influence]);
 
   const cardById = useMemo(() => new Map(cards.map((c) => [c.id, c])), [cards]);
 
-  // Every card starts CLOSED on load (brief 5.4), except intro under the alt
-  // variant. Diagram and tree are panels that start OPEN (not in the closed set
-  // until X'd).
-  const [closed, setClosed] = useState<Set<string>>(() => {
-    const all = new Set(cards.map((c) => c.id));
-    if (VARIANTS.introOpenOnLoad) all.delete("intro");
-    return all;
-  });
-  const [positions, setPositions] = useState<Record<string, { x: number; y: number }>>(() => {
-    const init: Record<string, { x: number; y: number }> = {};
-    if (VARIANTS.introOpenOnLoad) init.intro = { x: SLOT_LEFT, y: SLOT_TOP };
-    return init;
-  });
+  // Every rail card starts CLOSED on load (brief 5.4). The diagram panel starts
+  // OPEN. The family tree starts CLOSED: LineageMap is a full-viewport overlay
+  // (see the tree render below and DECISIONS D13), so it opens on demand from
+  // its rail icon rather than covering the page on load.
+  const [closed, setClosed] = useState<Set<string>>(() => new Set([...cards.map((c) => c.id), "tree"]));
+  const [positions, setPositions] = useState<Record<string, { x: number; y: number }>>({});
   const [zOrders, setZOrders] = useState<Record<string, number>>({});
   const zCounter = useRef(120);
   const openRects = useRef<Map<string, Rect>>(new Map());
@@ -276,12 +252,12 @@ export default function Chums2Client({ name, slug, image, info, lineage, charact
     });
   }, []);
 
-  // Grid shape: rows capped at 3, columns grow with the pack. maxPerRow = 10 so
-  // 77px tiles stay comfortable up to 10 across; 1 row up to 10 dogs, 2 up to
-  // 20, else 3, and extra dogs past 30 add COLUMNS (grid-auto-flow: column), not
-  // a 4th row. (Decision D12.)
-  const MAX_PER_ROW = 10;
-  const packRows = frames.length <= MAX_PER_ROW ? 1 : frames.length <= 2 * MAX_PER_ROW ? 2 : 3;
+  // Grid shape (item 12): ALWAYS at least 2 rows, never 1 long row, max 3.
+  // Columns grow with the pack (grid-auto-flow: column), so a big pack adds
+  // width, not a 4th row. maxPerRow = 15 (52px tiles) sets the 2->3 row step.
+  // (Decision D12, revised.)
+  const MAX_PER_ROW = 15;
+  const packRows = frames.length > 2 * MAX_PER_ROW ? 3 : 2;
   const packCols = Math.max(1, Math.ceil(frames.length / packRows));
 
   const frameBorder = (status?: FrameNode["status"]) =>
@@ -356,7 +332,24 @@ export default function Chums2Client({ name, slug, image, info, lineage, charact
         </div>
       </header>
 
-      {/* Main band: circular diagram (centre) | family tree (stage 6, right). */}
+      {/* Always-on-page (production feedback items 8, 9): the intro write-up box
+          on the left with the lifespan chart to its right, like the old page.
+          Neither is a rail card. Left inset clears the icon rail (item 13). */}
+      <section className={styles.introBand} data-region="intro-band">
+        {character && (
+          <div className={styles.introBox}>
+            <p className={styles.cardHeading}>About the {name}</p>
+            <p className={styles.introBody}>{character}</p>
+          </div>
+        )}
+        {lifespanCurves[name] && (
+          <div className={styles.chartBox}>
+            <LifespanChart breedName={name} />
+          </div>
+        )}
+      </section>
+
+      {/* Main band: circular diagram (big, centred on screen) + family tree. */}
       <section className={styles.mainBand} data-region="main-band">
         {lineage && !closed.has("diagram") && (
           <div className={styles.diagramPanel} data-region="diagram">
@@ -383,29 +376,6 @@ export default function Chums2Client({ name, slug, image, info, lineage, charact
           </div>
         )}
 
-        {/* Family tree (brief 5.8). Structure, X close and rail reopen are wired
-            here; the live LineageMap embed is the one genuinely blocked piece:
-            it needs the deferred LineageMap `initialDepth` prop for the depth-2
-            pre-expand, and LineageMap is a viewport-anchored overlay whose
-            bounded placement needs visual verification before it can render
-            without covering the page. See DECISIONS D13 for the exact plan. */}
-        {lineage && !closed.has("tree") && (
-          <div className={styles.treePanel} data-region="tree">
-            <button
-              type="button"
-              className={styles.panelClose}
-              onClick={() => closeCard("tree")}
-              aria-label="Close family tree"
-              title="Close family tree"
-            >
-              <CloseX />
-            </button>
-            <p className={styles.treePlaceholder}>
-              Family tree
-              <span>LineageMap embed pending: see DECISIONS D13</span>
-            </p>
-          </div>
-        )}
       </section>
 
       {/* Hidden BreedTreeMap: feeds ancestor-pack frames via onFramesReady only
@@ -476,6 +446,29 @@ export default function Chums2Client({ name, slug, image, info, lineage, charact
             {c.body}
           </DragCard>
         )
+      )}
+
+      {/* Family tree (brief 5.8). LineageMap is a full-viewport overlay (its own
+          fixed positioning, which the game's pit-lift card depends on, so it
+          cannot be made bounded without changing game behaviour). It opens on
+          demand from the tree rail icon, self-loads from the breed name (no tree
+          prop), and pre-expands to depth 2 via the new initialDepth prop. Its
+          centre card drags exactly as in the pit (unchanged). Drawn like the
+          pit's own chum family tree (strongBg, no circular). See DECISIONS D13. */}
+      {lineage && !closed.has("tree") && (
+        <LineageMap
+          breed={{
+            name,
+            image,
+            x: (typeof window !== "undefined" ? window.innerWidth : 1440) / 2,
+            y: (typeof window !== "undefined" ? window.innerHeight : 900) * 0.75,
+            angle: 0,
+          }}
+          strongBg
+          currentScore={0}
+          initialDepth={2}
+          onClose={() => closeCard("tree")}
+        />
       )}
 
       <Chums2Rail items={railItems} onOpen={openCard} />

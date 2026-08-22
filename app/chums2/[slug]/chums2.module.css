@@ -22,20 +22,25 @@
 .header {
   display: flex;
   align-items: flex-start;
-  gap: clamp(20px, 2.4vw, 36px);
-  padding: 26px clamp(24px, 4vw, 64px) 32px;
-  padding-left: clamp(196px, 15vw, 232px);
+  gap: clamp(18px, 2.2vw, 32px);
+  /* Right padding keeps the title clear of the fixed top-right contrast toolbar
+     (item 6). Left padding clears the icon rail and sits the image in the left
+     column (items 3, 13). Note: the rail is a fixed left strip, so the image
+     cannot literally sit on the logo's x-axis without being covered by the rail;
+     it clears the rail instead. See DECISIONS D14. */
+  padding: 22px clamp(200px, 20vw, 300px) 28px clamp(104px, 9vw, 132px);
 }
 
 .headerImg {
   flex: 0 0 auto;
-  width: clamp(120px, 12vw, 168px);
-  height: clamp(120px, 12vw, 168px);
+  width: clamp(112px, 11vw, 150px);
+  height: clamp(112px, 11vw, 150px);
   border-radius: 22px;
   object-fit: cover;
   border: 3px solid rgba(255, 255, 255, 0.85);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.28);
   background: var(--navy, #0a3a57);
+  transform: rotate(2deg); /* item 4 */
 }
 
 .headerText {
@@ -74,22 +79,53 @@
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
   font-size: clamp(1rem, 2vw, 1.7rem);
   color: #ffffff;
-  margin: 14px 0 0;
+  margin: 4px 0 0; /* item 5: tighter gap under the title */
   letter-spacing: 0.04em;
   line-height: 1.15;
 }
 
-/* ── Main band (rail | diagram | tree) ──────────────────────────
-   Filled in stages 2 and 6. Skeleton container only for now. */
+/* ── Intro band (always on page, items 8 and 9) ─────────────────
+   Intro write-up box on the left, lifespan chart to its right. Left
+   inset clears the fixed icon rail (item 13). */
+.introBand {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: clamp(20px, 2.4vw, 40px);
+  padding: 8px clamp(24px, 4vw, 64px) 0;
+  padding-left: clamp(104px, 9vw, 132px);
+}
+
+.introBox {
+  flex: 0 1 460px;
+  border-radius: 24px;
+  background: var(--navy, #0a3a57);
+  border: 2.5px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.35);
+  padding: 0 0 18px;
+}
+
+.chartBox {
+  flex: 1 1 460px;
+  min-width: 320px;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+/* ── Main band (diagram region + tree) ──────────────────────────
+   The diagram is hosted like LineageModal's stageArea: a large page
+   region between the rail and the tree column, NO overflow clipping
+   on it or any ancestor, so the whole packed pack is visible at rest
+   (production correction 2026-08-22). Left inset clears the rail. */
 .mainBand {
   position: relative;
-  display: grid;
-  grid-template-columns: minmax(360px, 0.9fr) minmax(360px, 1fr);
-  gap: clamp(24px, 3vw, 56px);
-  align-items: start;
-  padding: 0 clamp(24px, 4vw, 64px);
-  padding-left: clamp(120px, 10vw, 160px);
-  min-height: 480px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: clamp(20px, 2.4vw, 44px);
+  padding: clamp(16px, 2vw, 32px) clamp(20px, 3vw, 48px) 0;
+  padding-left: clamp(96px, 8vw, 120px);
+  overflow: visible;
 }
 
 /* ── Draggable pop-out card ─────────────────────────────────────
@@ -262,46 +298,21 @@
    chain. */
 .diagramPanel {
   position: relative;
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  max-width: 760px;
-  justify-self: center;
+  /* Large viewport-scale region (like .stageArea). fill-mode BreedTree fills
+     it via height:100%, so the parent needs a definite height. NO overflow here
+     or on any ancestor, so the SVG's meet-fit shows the whole pack uncropped. */
+  flex: 1 1 620px;
+  min-width: 460px;
+  height: min(88vh, 1040px);
+  overflow: visible;
 }
 
-/* Family-tree panel (right column). Placeholder until the LineageMap embed
-   lands (DECISIONS D13). No perspective / backface-visibility / preserve-3d
-   anywhere in this chain (brief 5.8 LineageMap constraint). */
-.treePanel {
-  position: relative;
-  width: 100%;
-  min-height: 420px;
-  border-radius: 24px;
-  border: 2px dashed rgba(255, 255, 255, 0.18);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+/* The family tree renders as LineageMap's own full-viewport overlay, opened on
+   demand from the rail (DECISIONS D13), so there is no inline tree panel here.
+   No perspective / backface-visibility / preserve-3d anywhere in the chums2
+   chain (brief 5.8 LineageMap constraint). */
 
-.treePlaceholder {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  font-family: var(--font-display, 'Luckiest Guy', system-ui);
-  font-size: 1.6rem;
-  letter-spacing: 0.06em;
-  color: var(--yellow, #ffd23e);
-  text-align: center;
-}
-.treePlaceholder span {
-  font-family: var(--font-body, 'Montserrat', system-ui);
-  font-size: 0.72rem;
-  font-weight: 700;
-  color: #ffffff;
-  letter-spacing: 0.02em;
-}
-
-/* X close on a panel (diagram, tree). Styled like the pit close X:
+/* X close on a panel (diagram). Styled like the pit close X:
    yellow, top-right of the panel area. */
 .panelClose {
   position: absolute;
@@ -326,29 +337,34 @@
 .panelClose svg { width: 16px; height: 16px; }
 
 /* ── Ancestor pack (stage 5) ────────────────────────────────────
-   In flow, directly below the main band. */
+   In flow in the left column, left inset clears the icon rail so the
+   heading no longer sits under the icons (item 13). */
 .ancestorPack {
-  padding: clamp(48px, 5vw, 88px) clamp(24px, 4vw, 64px) 0;
+  padding: clamp(40px, 4vw, 72px) clamp(24px, 4vw, 64px) 0;
+  padding-left: clamp(104px, 9vw, 132px);
 }
 
+/* Item 14: Montserrat, dark navy, smaller, not the yellow display font. */
 .packTitle {
-  font-family: var(--font-display, 'Luckiest Guy', system-ui);
-  font-size: clamp(2.4rem, 5vw, 4.9rem);
-  letter-spacing: 0.1em;
-  color: var(--yellow, #ffd23e);
-  margin: 0 0 24px;
+  font-family: var(--font-body, 'Montserrat', system-ui);
+  font-size: clamp(1.2rem, 2vw, 1.7rem);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: var(--navy, #0a3a57);
+  margin: 0 0 18px;
   text-transform: uppercase;
-  line-height: 1;
+  line-height: 1.1;
 }
 
 /* Rows capped, columns grow: fixed row count, auto-flow down then across, so
-   extra dogs add columns rather than a new row. (Brief 5.6, Decision D12.) */
+   extra dogs add columns rather than a new row. (Brief 5.6, Decision D12.)
+   Tiles reduced 77px -> 52px (item 11). */
 .packGrid {
   display: grid;
-  grid-template-rows: repeat(var(--pack-rows, 1), auto);
+  grid-template-rows: repeat(var(--pack-rows, 2), auto);
   grid-auto-flow: column;
-  grid-auto-columns: 77px;
-  gap: 26px 20px;
+  grid-auto-columns: 52px;
+  gap: 22px 16px;
   justify-content: start;
   width: max-content;
   max-width: 100%;
@@ -357,10 +373,10 @@
 }
 
 .frame {
-  width: 77px;
-  height: 77px;
-  border-radius: 10px;
-  border: 4px solid #22c55e;
+  width: 52px;
+  height: 52px;
+  border-radius: 8px;
+  border: 3px solid #22c55e;
   background: transparent;
   position: relative;
 }
@@ -377,10 +393,10 @@
 
 .frameInfoBtn {
   position: absolute;
-  right: -14px;
-  top: -14px;
-  width: 28px;
-  height: 28px;
+  right: -10px;
+  top: -10px;
+  width: 20px;
+  height: 20px;
   border: 2px solid #ffffff;
   border-radius: 50%;
   background: var(--blue-deep, #0b78bd);
@@ -392,7 +408,7 @@
   padding: 0;
   font-style: italic;
   font-weight: 700;
-  font-size: 14px;
+  font-size: 11px;
   font-family: Georgia, serif;
   z-index: 5;
 }
@@ -400,12 +416,12 @@
 .framePct {
   position: absolute;
   right: -2px;
-  bottom: -14px;
+  bottom: -11px;
   background: rgba(10, 58, 87, 0.85);
   color: var(--yellow, #ffd23e);
-  border-radius: 12px;
-  padding: 2px 8px;
-  font-size: 11px;
+  border-radius: 10px;
+  padding: 1px 6px;
+  font-size: 9px;
   font-weight: 700;
   font-family: Montserrat, system-ui;
   z-index: 5;
@@ -462,9 +478,24 @@
 }
 
 /* ── Famous chums (stage 5) ─────────────────────────────────────
-   In flow, directly below the ancestor pack. No absolute offsets. */
+   In flow, directly below the ancestor pack. Left inset clears the
+   icon rail (item 13). */
 .famousChums {
   padding: clamp(40px, 4vw, 72px) clamp(24px, 4vw, 64px) 0;
+  padding-left: clamp(104px, 9vw, 132px);
+}
+
+/* Item 14: restyle the FamousDogsSection heading (its own <h2>) to Montserrat,
+   dark navy, smaller, not the yellow display font, scoped to this page only so
+   the shared component and the live page are untouched. Higher specificity than
+   the component's own .heading rule, no :global needed. */
+.famousChums h2 {
+  font-family: var(--font-body, 'Montserrat', system-ui);
+  font-size: clamp(1.2rem, 2vw, 1.7rem);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: var(--navy, #0a3a57);
+  text-transform: uppercase;
 }
 
 /* ── Back button (matches the live page) ────────────────────────── */

@@ -428,6 +428,12 @@ export default function PickAChumLauncher() {
     return () => document.removeEventListener('click', onClick, true);
   }, []);
 
+  // Route guard (added 2026-08-22): the /chums2 v2 desktop page owns its own
+  // top-left region (square chum image on the logo line), and this logo-anchored
+  // chip and its speech bubble overlap it. Hidden on /chums2 only, so every
+  // other route (and the live /chums page and the game) is byte-identical.
+  if (pathname?.startsWith("/chums2")) return null;
+
   return (
     <>
       {/* Task 118/170: the brand-blue scrim moved INTO the experience so it can follow the dog (it needs her

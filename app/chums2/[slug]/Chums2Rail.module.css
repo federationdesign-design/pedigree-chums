@@ -3,20 +3,22 @@
    right. Fixed so it stays put as the page scrolls. */
 .rail {
   position: fixed;
-  left: clamp(12px, 1.6vw, 24px);
-  top: 150px;
+  left: clamp(10px, 1.4vw, 20px);
+  /* item 2: top of the rail aligns with the site logo (nav padding is ~18px). */
+  top: 18px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 7px;
   z-index: 250;
 }
 
+/* item 1: icons 20% smaller (76 -> 61, glyph 42 -> 34). */
 .icon {
-  width: 76px;
-  height: 76px;
-  border-radius: 20px;
+  width: 61px;
+  height: 61px;
+  border-radius: 16px;
   background: var(--navy, #0a3a57);
-  border: 3px solid var(--yellow, #ffd23e);
+  border: 2.5px solid var(--yellow, #ffd23e);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -45,8 +47,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 42px;
-  height: 42px;
+  width: 34px;
+  height: 34px;
   color: var(--yellow, #ffd23e);
   line-height: 1;
 }
@@ -60,7 +62,7 @@
 /* Tooltip label, to the RIGHT of the tile (rail sits on the left edge). */
 .label {
   position: absolute;
-  left: 88px;
+  left: 72px;
   top: 50%;
   transform: translateY(-50%) translateX(-8px);
   background: var(--navy, #0a3a57);

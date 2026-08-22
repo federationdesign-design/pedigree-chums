@@ -75,6 +75,23 @@ type Node = LineageNode & {
   _dir: number; // outward direction this node sits at, so its own children fan away
 };
 
+// Collect the ids of every node shallower than `depth`, so seeding the `open`
+// set with them reveals the tree down to `depth` levels. A node renders its
+// children only when its id is in `open` (see the layout walk), so opening every
+// node above the target depth is exactly a depth-first pre-expansion, using the
+// pit's own mechanism. Added 2026-08-22 for /chums2 (initialDepth prop).
+function openIdsToDepth(node: Node | null, depth: number): Set<string> {
+  if (!node || depth < 1) return new Set(["0"]);
+  const s = new Set<string>();
+  const walk = (n: Node, d: number) => {
+    if (d >= depth) return;
+    if (n._id) s.add(n._id);
+    (n.children as Node[] | undefined)?.forEach((c) => walk(c, d + 1));
+  };
+  walk(node, 0);
+  return s.size ? s : new Set(["0"]);
+}
+
 // Single child on the first ring of the circular layer: angle from horizontal,
 // and which way it leans (1 right, -1 left). Two numbers, nothing else uses them.
 const SOLO_DEG = 33;
@@ -268,6 +285,7 @@ export default function LineageMap({
   ringColor,
   rarityTier,
   strongBg = false,
+  initialDepth,
 }: {
   breed: { name: string; image: string; x: number; y: number; angle: number };
   tree?: LineageNode;
@@ -304,6 +322,11 @@ export default function LineageMap({
   }) => void;
   onScore?: (v: number) => void;
   currentScore?: number;
+  // Pre-expand the tree to this many levels on mount, via the same `open` set
+  // the pit already uses (no second expansion system). Default undefined leaves
+  // the pit behaviour unchanged (open = just the root). Added 2026-08-22 for the
+  // /chums2 family tree, which wants depth 2 at rest (brief 5.8).
+  initialDepth?: number;
 }) {
   // TEMP rarity-band instrumentation: does the tier prop reach the lifted card?
   if (typeof window !== "undefined" && circular) console.log("[rarity-band] LineageMap boundary:", { breed: breed?.name, rarityTier, soloLeaf });
@@ -440,9 +463,11 @@ export default function LineageMap({
 
   const hasTree = !!(root && root.children && root.children.length);
 
-  // the open set is the single line currently being followed (root..node)
-  const [open, setOpen] = useState<Set<string>>(() => new Set(["0"]));
-  useEffect(() => setOpen(new Set(["0"])), [breed.name]);
+  // the open set is the single line currently being followed (root..node).
+  // With initialDepth set, it is pre-seeded to that many levels instead (default
+  // stays the root only, so the pit is unchanged). See openIdsToDepth.
+  const [open, setOpen] = useState<Set<string>>(() => (initialDepth ? openIdsToDepth(root, initialDepth) : new Set(["0"])));
+  useEffect(() => setOpen(initialDepth ? openIdsToDepth(root, initialDepth) : new Set(["0"])), [breed.name, initialDepth, root]);
   // the circle whose breed image is currently popped out, if any
   const [picked, setPicked] = useState<Set<string>>(() => new Set());
   useEffect(() => setPicked(new Set()), [breed.name]);
