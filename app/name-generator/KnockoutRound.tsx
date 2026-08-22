@@ -4,7 +4,6 @@ import Nav from "../../components/Nav/Nav";
 import styles from "./KnockoutRound.module.css";
 import ShareScreen from "./ShareScreen";
 import { ShortlistEntry } from "./ShortlistBar";
-import { useLeaveDialog } from "../../components/OutboundLink/LeaveDialogProvider";
 
 type Props = {
   shortlist: ShortlistEntry[];
@@ -173,7 +172,6 @@ function nickFontSize(label: string): string {
 
 export default function KnockoutRound({ shortlist, recommended = [], breed, onBack, onRestart }: Props) {
   const seeded = seedBracket(shortlist);
-  const { confirmLeave } = useLeaveDialog();
   const [bracket, setBracket] = useState<BracketRound[]>(() => buildBracket(seeded, recommended));
   const [currentRound, setCurrentRound] = useState(0);
   const [currentMatch, setCurrentMatch] = useState(0);
@@ -597,7 +595,7 @@ export default function KnockoutRound({ shortlist, recommended = [], breed, onBa
       } else if (navigator.share) {
         await navigator.share({ text: caption });
       } else {
-        confirmLeave(`https://twitter.com/intent/tweet?text=${encodeURIComponent(caption)}`);
+        window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(caption)}`, "_blank", "noopener,noreferrer");
       }
     } catch {}
     setSharing(false);
