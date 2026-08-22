@@ -88,16 +88,34 @@
   background-color: transparent !important;
   background-image: none !important;
 }
-/* Both schemes: crush the hero photo dark (luminance-capped) instead of plain
-   greyscale, with a white H1 on top. A hue duotone (DAC's img filter) does not
-   help -- it preserves the light end; capping brightness pushes every pixel dark
-   enough for white text to clear 3:1 against the lightest pixel. brightness(0.55)
-   is the lightest value that still keeps all 13 heroes above 3:1 (worst 3.36,
-   measured); both schemes are identical. */
+/* Hero photos, both schemes: crushed dark (luminance-capped) with a white H1 on
+   top, NOT plain greyscale. The two schemes now DIFFER (DAC feedback, 22 Aug
+   2026): black-on-white keeps the neutral grey crush; white-on-black carries the
+   DAC's blue high-contrast duotone (sepia + hue-rotate + saturate), added as a
+   scoped white-on-black override after each grey rule (here and at every other
+   crush site below: media, crushbg, content SVGs, heroImg/productImage).
+
+   This comment used to say a hue duotone "does not help" because it preserves the
+   light end. That was only half true: on its OWN it does fail. The point missed
+   is that the luminance cap comes from the TRAILING brightness(0.55), not from
+   grayscale. brightness(0.55) is the last op, so every channel is forced <= 0.55
+   whatever colour work precedes it; that caps luminance at L(0.55,0.55,0.55) and
+   floors white-text contrast at 3.35:1 for ANY pipeline ending in it. So the blue
+   duotone (sepia(1) hue-rotate(190deg) saturate(5) brightness(0.55)) keeps the
+   exact same cap: measured worst hero-title contrast 3.47:1, vs the grey crush's
+   3.35:1 (both clear 3:1; blue is a touch better because saturated blue pixels
+   carry less luminance than neutral grey). brightness(0.55) is still the lightest
+   value that keeps every hero above 3:1. */
 :root[data-pc-contrast-scheme] #pc-site [class*="essayHeroImg"] {
   display: block !important;
   filter: grayscale(1) contrast(1.1) brightness(0.55) !important;
   -webkit-filter: grayscale(1) contrast(1.1) brightness(0.55) !important;
+}
+/* white-on-black: blue duotone in place of the grey crush (same trailing cap).
+   Identical specificity to the grey rule above, so later source order wins. */
+:root[data-pc-contrast-scheme="white-on-black"] #pc-site [class*="essayHeroImg"] {
+  filter: sepia(1) hue-rotate(190deg) saturate(5) brightness(0.55) !important;
+  -webkit-filter: sepia(1) hue-rotate(190deg) saturate(5) brightness(0.55) !important;
 }
 :root[data-pc-contrast-scheme] #pc-site [class*="essayHeroTint"] {
   display: none !important;
@@ -118,6 +136,14 @@
 :root[data-pc-contrast-scheme] :is(#pc-site, [data-pc-reach]) :is(img, video, iframe) {
   filter: grayscale(1) contrast(1.1) brightness(0.55) !important;
   -webkit-filter: grayscale(1) contrast(1.1) brightness(0.55) !important;
+}
+/* white-on-black media: blue duotone. Placed BEFORE the .pc-nav/.pc-footer
+   exclusion below. (The exclusion is (1,3,1) and out-specifies this (1,2,1)
+   regardless, so header/footer logos stay uncrushed either way; kept before it
+   for clarity.) */
+:root[data-pc-contrast-scheme="white-on-black"] :is(#pc-site, [data-pc-reach]) :is(img, video, iframe) {
+  filter: sepia(1) hue-rotate(190deg) saturate(5) brightness(0.55) !important;
+  -webkit-filter: sepia(1) hue-rotate(190deg) saturate(5) brightness(0.55) !important;
 }
 :root[data-pc-contrast-scheme] #pc-site :is(.pc-nav, .pc-footer) :is(img, video, iframe) {
   filter: none !important;
@@ -150,6 +176,11 @@
 :root[data-pc-contrast-scheme] :is(#pc-site, [data-pc-reach]) [data-pc-crushbg] {
   filter: grayscale(1) contrast(1.1) brightness(0.55) !important;
   -webkit-filter: grayscale(1) contrast(1.1) brightness(0.55) !important;
+}
+/* white-on-black: blue duotone for the photo backgrounds (same trailing cap). */
+:root[data-pc-contrast-scheme="white-on-black"] :is(#pc-site, [data-pc-reach]) [data-pc-crushbg] {
+  filter: sepia(1) hue-rotate(190deg) saturate(5) brightness(0.55) !important;
+  -webkit-filter: sepia(1) hue-rotate(190deg) saturate(5) brightness(0.55) !important;
 }
 /* Task 174: the Pick a Chum full-bleed layers that the sweep would fill with an opaque scheme colour and
    paint over the page and the chat carry data-pc-flat: the fixed inset:0 .root itself (a reach ROOT -- else
@@ -193,6 +224,11 @@
   filter: grayscale(1) contrast(1.1) brightness(0.55) !important;
   -webkit-filter: grayscale(1) contrast(1.1) brightness(0.55) !important;
 }
+/* white-on-black: blue duotone for the marked content SVGs (same trailing cap). */
+:root[data-pc-contrast-scheme="white-on-black"] #pc-site [data-pc-crush] {
+  filter: sepia(1) hue-rotate(190deg) saturate(5) brightness(0.55) !important;
+  -webkit-filter: sepia(1) hue-rotate(190deg) saturate(5) brightness(0.55) !important;
+}
 
 /* Background-image PHOTO panels keep their photograph (crushed) rather than the
    sweep stripping it. The dedicated hero image layer (.heroImg -- home, know-your-
@@ -205,6 +241,12 @@
 :root[data-pc-contrast-scheme] #pc-site [class*="productImage"] {
   filter: grayscale(1) contrast(1.1) brightness(0.55) !important;
   -webkit-filter: grayscale(1) contrast(1.1) brightness(0.55) !important;
+}
+/* white-on-black: blue duotone for the hero/product photo panels (same trailing cap). */
+:root[data-pc-contrast-scheme="white-on-black"] #pc-site [class*="heroImg"],
+:root[data-pc-contrast-scheme="white-on-black"] #pc-site [class*="productImage"] {
+  filter: sepia(1) hue-rotate(190deg) saturate(5) brightness(0.55) !important;
+  -webkit-filter: sepia(1) hue-rotate(190deg) saturate(5) brightness(0.55) !important;
 }
 /* GROUP 1: hero-panel pages (.heroImg -- home, hot-dogs, preorder, know-your-
    chums, britains). The sibling text/overlay layers of the hero photo get an
