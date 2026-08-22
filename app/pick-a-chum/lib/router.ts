@@ -815,6 +815,12 @@ function confirmResolution(subject: string): Resolution | null {
   if (CONFIRM_DOG_WORDS.has(subject)) return { layer: 5, layerName: 'Dog, breed and website content', bucket: 'B05', action: 'breed_hub' };
   if (CONFIRM_SITE_WORDS.has(subject)) return { layer: 11, layerName: 'Orientation and onboarding', bucket: 'B15', action: 'orientation' };
   if (CONFIRM_BARK_WORDS.has(subject)) return { layer: 13, layerName: 'Play and entertainment', bucket: 'B17', action: 'offer_bark_game' };
+  // The ball answer (COL-B52-MISC-09) poses "Tennis balls?", which invites a "yes". Unlike the words
+  // above this is NOT a LOOP-01 echo subject ('balls' is not an INSIDE_WORLD_WORD, and the canned
+  // answer reaches the visitor before any fallback echo could): the engine arms pendingConfirm='balls'
+  // when that answer serves, so a following "yes" re-serves it (its tennis-ball clip) rather than dying
+  // as "im a dog". Re-serving is the only ball content there is, and it stays in character.
+  if (subject === 'balls') return { layer: 9, layerName: 'Recognised conversation', bucket: 'B52', action: 'canned', responseId: 'COL-B52-MISC-09' };
   return null;
 }
 

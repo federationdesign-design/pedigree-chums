@@ -254,6 +254,7 @@ export function submit(data: ChumData, session: Session, input: string): Turn {
   const n = normalise(input);
   const dog = session.activeDog; // whose bark game this message belongs to
   const wasProtected = session.protectedState; // 'active' | 'aftercare' | null, BEFORE this turn
+  const prevPendingConfirm = session.pendingConfirm ?? null; // the subject an offer/answer armed last turn
   let resolution = resolve(n, data, {
     submissionCount: session.submissionCount,
     activeDog: dog,
@@ -548,6 +549,15 @@ export function submit(data: ChumData, session: Session, input: string): Turn {
     session.loopRepeatUsed = false; // a non-fallback turn breaks the run, re-arming the repeat
     session.pendingConfirm = null;
     session.noSubjectStreak = 0; // Task 117: anything else served resets the no-subject rotation
+  }
+
+  // The ball answer (COL-B52-MISC-09) poses "Tennis balls?", inviting a "yes". It is a canned answer,
+  // so nothing above arms a confirm for it (unlike the LOOP-01 echo, whose yes confirmResolution honours).
+  // Arm a ONE-SHOT confirm here so a following bare "yes" re-serves it (its clip) instead of "im a dog".
+  // Guarded on prevPendingConfirm so honouring the confirm -- which re-serves the same answer -- does not
+  // re-arm and loop: one "yes" is honoured, then the conversation moves on.
+  if (response.responseId === 'COL-B52-MISC-09' && prevPendingConfirm !== 'balls') {
+    session.pendingConfirm = 'balls';
   }
 
   session.lastWasComplaint = resolution.faqId === 'FAQ015'; // complaint follow-up context (Task 18)
