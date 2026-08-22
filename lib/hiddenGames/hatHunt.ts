@@ -24,13 +24,15 @@
 
 export const HAT_GAME_ID = "G10" as const;
 
-// Task 156 (§8): the Terrier counts you down IN THE CHAT, blunt, no enthusiasm -- from 6 hats (4 to go)
-// to the understated congratulations at 10. Owner-approved copy. Keyed by the running found count.
+// Task 156 (§8): the Terrier counts you down IN THE CHAT, blunt, no enthusiasm -- from 6 hats to the
+// understated congratulations at 10. Owner-approved copy. Keyed by the running found count. Each countdown
+// line now names the find ("you found a hat!") so the first one a visitor sees (their 6th hat) says what
+// they found and what is being counted, not a bare "4 to go". The 10-hat congratulations is unchanged.
 export const HAT_COUNTDOWN_LINES: Record<number, string> = {
-  6: "4 to go",
-  7: "3 to go",
-  8: "2 to go",
-  9: "one left",
+  6: "you found a hat! 4 to go",
+  7: "you found a hat! 3 to go",
+  8: "you found a hat! 2 to go",
+  9: "you found a hat! one left",
   10: "thats ten. every hat found. not bad.",
 };
 
