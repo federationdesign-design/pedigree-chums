@@ -36,6 +36,7 @@ const QUESTIONS: Question[] = [
       { label: "Light / Easy / Good for smaller spaces", value: "small" },
       { label: "Medium / Classic family dog", value: "medium" },
       { label: "Large / Proper big dog", value: "large" },
+      { label: "Giant / Enormous / Needs its own sofa", value: "giant" },
     ],
   },
   {
@@ -214,6 +215,11 @@ const QUESTIONS: Question[] = [
 
 // ── Scoring ───────────────────────────────────────────────────────────────────
 
+// Size bands, small to giant. The mismatch penalty is graded by band distance
+// (16 per band), so an adjacent miss costs less than a two-band miss and the
+// small-to-giant worst case stays at the old flat -48. (A4, 22 Aug 2026.)
+const SIZE_ORDER = ["small", "medium", "large", "giant"] as const;
+
 function scoreBreed(slug: string, answers: Record<string, string>): number {
   let score = 100;
   const suit = suitabilityScores[slug];
@@ -249,9 +255,10 @@ function scoreBreed(slug: string, answers: Record<string, string>): number {
     "great-dane","saint-bernard","bloodhound","rough-collie",
     "springer-spaniel","basset-hound","corgi"]);
 
-  // Size -- strong signal, tightened
+  // Size -- strong signal, graded by band distance (A4)
   if (answers.size && answers.size !== "any" && breed?.sizeBand) {
-    if (breed.sizeBand !== answers.size) score -= 48;
+    const distance = Math.abs(SIZE_ORDER.indexOf(breed.sizeBand) - SIZE_ORDER.indexOf(answers.size as (typeof SIZE_ORDER)[number]));
+    if (distance > 0) score -= 16 * distance;
   }
 
   // Living environment -- home type + size + urban/rural + open space (merged from home/garden/location/openspace)
