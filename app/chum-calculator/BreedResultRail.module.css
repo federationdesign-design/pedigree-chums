@@ -38,6 +38,10 @@
 
 .cardSlot {
   order: 1;
+  /* Definite width so the column cannot shrink-wrap to the info panel's text and
+     force the whole item wider (which ran the panel off-screen and pushed the
+     cards apart). Matches the card. Stopgap, 22 Aug 2026. */
+  width: clamp(160px, 45vw, 220px);
   display: flex;
   flex-direction: column;
   align-items: center;

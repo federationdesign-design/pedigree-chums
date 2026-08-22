@@ -82,6 +82,8 @@
    meters. (Job B stage 6, 22 Aug 2026.) */
 .panel {
   width: 100%;
+  min-width: 0; /* allow shrink below text max-content so long text wraps (stopgap 22 Aug 2026) */
+  overflow-wrap: anywhere; /* long unbroken text wraps instead of forcing the panel wider */
   box-sizing: border-box;
   margin: 12px 0 0;
   background: var(--navy, #0a3a57);
