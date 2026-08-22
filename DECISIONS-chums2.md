@@ -80,6 +80,13 @@ Baseline (measured before stage 1):
 - FLAG for Steve: this is a modal tree, not an inline-on-load tree. If you want it inline beside the diagram, that needs a new bounded rendering mode inside LineageMap (a deliberate shared-component change), which I did not make because it would risk the game. Tell me and I will design it behind a defaulted prop.
 - CSS constraint respected: no perspective / backface-visibility / transform-style: preserve-3d anywhere in the chums2 chain.
 
+## Ancestor pack popouts round 2 (2026-08-22)
+
+### D25. Popout name titles restyled; enlarged-image popup added
+- Item 1: both popout name titles (i info .framePopoverName and % detail .pctCardName) changed from the display font (Luckiest Guy, hard to read) to Montserrat, weight 800, still yellow, 18px, clearly larger than the body text. Same treatment on the image popup name. /chums2 only.
+- Item 2: clicking a tile IMAGE opens an enlarged-image popup: a big rounded image (left) beside a navy panel (right) with the ancestor name (yellow Montserrat) and its description. Reused component/behaviour (stated per request): the pit's magnifier + image-enlarge in components/PackPit/LineageMap.tsx, its placed cards show a magnifier (~line 2540/2559) and the enlarge is the zoomedId zoom-overlay (~line 2858: rounded, blue-deep border, shadow) which I mirror for the enlarged image. The description text is the same note the i-popout uses (frame.note, i.e. breedInfo || node note). No shared file touched this round.
+- Item 3: the image popup joins the single openPop {id, kind:"info"|"pct"|"image"} state, so only one popout is open at a time across i, % and image. Closes on its X or on the backdrop / outside click.
+
 ## Ancestor pack refinements (2026-08-22)
 
 ### D24. Bigger tile badges + % detail popout, reusing the shipped pattern

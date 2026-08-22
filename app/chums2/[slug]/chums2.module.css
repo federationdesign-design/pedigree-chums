@@ -404,12 +404,107 @@
 
 .frameInner { position: relative; width: 100%; height: 100%; }
 
+/* The tile image is a button that opens the enlarged-image popup; magnifier
+   cursor echoes the pit's placed-card magnifier. */
+.frameImgBtn {
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: zoom-in;
+}
+
 .frameImg {
   width: 100%;
   height: 100%;
   object-fit: cover;
   border-radius: 6px;
   display: block;
+}
+
+/* ── Enlarged-image popup (item 2) ──────────────────────────────
+   Reuses the pit's zoom-overlay treatment (rounded, blue-deep border,
+   shadow) for the image; navy caption panel to its right. */
+.imageModalBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(10, 58, 87, 0.55);
+  padding: 24px;
+}
+
+.imageModal {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  gap: 18px;
+  max-width: min(920px, 92vw);
+}
+
+.imageModalImg {
+  flex: 0 0 auto;
+  width: clamp(220px, 34vw, 420px);
+  height: clamp(220px, 34vw, 420px);
+  object-fit: cover;
+  border-radius: 18px;
+  border: 5px solid var(--blue-deep, #0b78bd);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+  background: var(--navy, #0a3a57);
+}
+
+.imageModalPanel {
+  flex: 1 1 300px;
+  min-width: 240px;
+  align-self: center;
+  background: var(--navy, #0a3a57);
+  border: 2.5px solid rgba(255, 255, 255, 0.12);
+  border-radius: 18px;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.35);
+  padding: 22px 24px;
+}
+
+.imageModalName {
+  font-family: var(--font-body, 'Montserrat', system-ui);
+  font-weight: 800;
+  font-size: clamp(20px, 2vw, 28px);
+  color: var(--yellow, #ffd23e);
+  margin: 0 0 10px;
+  letter-spacing: 0.01em;
+}
+
+.imageModalNote {
+  font-family: var(--font-body, 'Montserrat', system-ui);
+  font-size: clamp(14px, 1.1vw, 17px);
+  font-weight: 600;
+  line-height: 1.55;
+  color: #ffffff;
+  margin: 0;
+}
+
+.imageModalClose {
+  position: absolute;
+  top: -14px;
+  right: -14px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+  background: var(--navy, #0a3a57);
+  color: var(--yellow, #ffd23e);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
 }
 
 /* i-button: top-right corner. Larger (item 1); overflow still clears the gap. */
@@ -469,12 +564,15 @@
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
 }
 
+/* Name title (item 1): Montserrat, bold, yellow, clearly larger than the body
+   text below. Shared treatment across both popouts and the image popup. */
 .framePopoverName {
-  font-family: var(--font-display, 'Luckiest Guy', system-ui);
-  font-size: 15px;
+  font-family: var(--font-body, 'Montserrat', system-ui);
+  font-weight: 800;
+  font-size: 18px;
   color: var(--yellow, #ffd23e);
-  margin: 0 0 4px;
-  letter-spacing: 0.05em;
+  margin: 0 0 6px;
+  letter-spacing: 0.01em;
 }
 
 .framePopoverNote {
@@ -503,11 +601,12 @@
 }
 
 .pctCardName {
-  font-family: var(--font-display, 'Luckiest Guy', system-ui);
-  font-size: 15px;
+  font-family: var(--font-body, 'Montserrat', system-ui);
+  font-weight: 800;
+  font-size: 18px;
   color: var(--yellow, #ffd23e);
-  margin: 0 0 2px;
-  letter-spacing: 0.05em;
+  margin: 0 0 4px;
+  letter-spacing: 0.01em;
 }
 
 .pctCardBig {

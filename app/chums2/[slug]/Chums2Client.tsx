@@ -288,9 +288,10 @@ export default function Chums2Client({ name, slug, image, info, lineage }: Props
   // ── Ancestor pack (brief 5.6) ─────────────────────────────────────────────
   // Fed by a hidden BreedTreeMap via onFramesReady, exactly as the live page.
   const [frames, setFrames] = useState<FrameNode[]>([]);
-  // Which tile popout is open, and which kind. Only one is open at a time (item
-  // 4), so opening either the i or the % popout on any tile replaces the other.
-  const [openPop, setOpenPop] = useState<{ id: string; kind: "info" | "pct" } | null>(null);
+  // Which tile popout is open, and which kind (i info, % detail, or the enlarged
+  // image). Only one is open at a time (item 3/4), so opening any one replaces
+  // the others.
+  const [openPop, setOpenPop] = useState<{ id: string; kind: "info" | "pct" | "image" } | null>(null);
   // Close on a click anywhere outside (the popout and its trigger stop
   // propagation, so this only fires for clicks elsewhere).
   useEffect(() => {
@@ -429,8 +430,15 @@ export default function Chums2Client({ name, slug, image, info, lineage }: Props
                     {frames.map((f) => (
                       <div key={f.id} className={styles.frame} style={{ borderColor: frameBorder(f.status) }}>
                         <div className={styles.frameInner}>
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img className={styles.frameImg} src={f.img} alt={f.name} />
+                          <button
+                            type="button"
+                            className={styles.frameImgBtn}
+                            onClick={(e) => { e.stopPropagation(); setOpenPop(openPop?.id === f.id && openPop.kind === "image" ? null : { id: f.id, kind: "image" }); }}
+                            aria-label={`Enlarge ${f.name}`}
+                          >
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img className={styles.frameImg} src={f.img} alt={f.name} />
+                          </button>
                           <button
                             type="button"
                             className={styles.frameInfoBtn}
@@ -571,6 +579,30 @@ export default function Chums2Client({ name, slug, image, info, lineage }: Props
           onClose={() => closeCard("tree")}
         />
       )}
+
+      {/* Enlarged-image popup for an ancestor tile (item 2): a big rounded image
+          (reusing the pit's magnifier/zoom-overlay treatment, LineageMap
+          zoomedId ~line 2858: rounded, blue-deep border, shadow) on the left,
+          and a navy panel with the name (yellow Montserrat) and the same note
+          the i-popout uses on the right. Joins the one-popout rule; closes on X
+          or the backdrop (outside click). */}
+      {openPop?.kind === "image" && (() => {
+        const f = frames.find((x) => x.id === openPop.id);
+        if (!f) return null;
+        return (
+          <div className={styles.imageModalBackdrop} onClick={() => setOpenPop(null)}>
+            <div className={styles.imageModal} onClick={(e) => e.stopPropagation()} role="dialog" aria-label={f.name}>
+              <button type="button" className={styles.imageModalClose} onClick={() => setOpenPop(null)} aria-label="Close">&times;</button>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img className={styles.imageModalImg} src={f.img} alt={f.name} />
+              <div className={styles.imageModalPanel}>
+                <p className={styles.imageModalName}>{f.name}</p>
+                {f.note && <p className={styles.imageModalNote}>{f.note}</p>}
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       {SHOW_SECTIONS.backButton && <Link href="/home" className={styles.backBtn}>Back</Link>}
     </div>
