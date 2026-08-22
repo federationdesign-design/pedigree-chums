@@ -733,6 +733,10 @@ check('my dog is ill', { action: 'health_answer' });
 (() => { const s = newSession(); check('help me', { action: 'clarifier' }, { session: s }); check('game', { action: 'rules_answer' }, { session: s }); })();
 (() => { const s = newSession(); check('help me', { action: 'clarifier' }, { session: s }); check('dogs', { action: 'link' }, { session: s, assert: (r) => (r.destinationId === 'DST006' ? null : `not DST006, got ${r.destinationId}`) }); })();
 (() => { const s = newSession(); check('help me', { action: 'clarifier' }, { session: s }); check('worried', { action: 'safety_signpost' }, { session: s, assert: (r) => (r.moderationId === 'MOD_GENERAL_DISTRESS' ? null : `not general distress, got ${r.moderationId}`) }); })();
+// A bare "yes" to the clarifier reaches orientation, pinned to the B15 "what can I ask" family (R02), never a nudge:
+(() => { const s = newSession(); check('help me', { action: 'clarifier' }, { session: s }); check('yes', { action: 'orientation' }, { session: s, assert: (_r, resp) => (resp.responseId && resp.responseId.startsWith('B15-R02') ? null : `not the R02 family, got ${resp.responseId}`) }); })();
+// A bare "no" declines: closes the chat exactly like a dismissal (go away / stop), not the "im a dog" fallback:
+(() => { const s = newSession(); check('help me', { action: 'clarifier' }, { session: s }); check('no', { action: 'dismiss' }, { session: s }); })();
 // Second consecutive clarifier is capped to the repair line:
 (() => { const s = newSession(); check('help me', { action: 'clarifier' }, { session: s }); check('need help', { action: 'fallback' }, { session: s }); })();
 // A single clarifier still works on a fresh session (no follow-up state):

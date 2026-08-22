@@ -1036,6 +1036,19 @@ function detectTopicReturn(n: Normalised, state: RouterState): Resolution | null
 // After the bare-help clarifier fires, the visitor's next turn is an answer to
 // "site, or something worrying you?". Map it to an existing route (no new copy).
 function captureClarifierAnswer(n: Normalised, data: ChumData): Resolution | null {
+  // A bare "yes" to "Help with something on the site?" was armed but honoured by nothing (same confirm
+  // asymmetry as the ball answer and the LOOP-01 subjects) and fell to "im a dog". Someone asking for help
+  // deserves better: send it to orientation, pinned to the B15 "what can I ask" family (R02) so they are
+  // told what they can ask, not nudged. Whole-message confirm only, so a real disclosure still falls through.
+  if (isConfirmYes(n.compact)) {
+    return { layer: 11, layerName: 'Orientation and onboarding', bucket: 'B15', action: 'orientation', orientationFamily: 'R02' };
+  }
+  // A bare "no" is someone declining the offer of help, not disclosing. Close the chat exactly as the
+  // dismissals do ("go away" / "stop"): the dog's own goodbye (or a short "ok") then the panel closes. No
+  // new copy. Whole-message only, so "no, someone is hurting me" still falls through to the safety gate.
+  if (CONFIRM_NO.has(n.compact)) {
+    return { layer: 9, layerName: 'Recognised conversation', bucket: null, action: 'dismiss' };
+  }
   if (hasAny(n, ['worried', 'worrying', 'something is wrong'])) {
     return { layer: 1, layerName: 'Safety and unsuitable content', bucket: null, action: 'safety_signpost', moderationId: 'MOD_GENERAL_DISTRESS' };
   }

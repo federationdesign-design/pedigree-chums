@@ -219,6 +219,7 @@ export interface Resolution {
   gkId?: string;
   moderationId?: string;
   responseFamily?: string; // e.g. identity family 'F01'..'F10' for family-specific copy
+  orientationFamily?: string; // orientation: pin the B15 pick to one family (e.g. 'R02' = the "what can I ask" lines) instead of the full B15 rotation. Used by the bare-help clarifier's "yes".
   barkCount?: number; // dog bark units to render this round (visitor count + 1, capped)
   note?: string;
   breedSlug?: string; // breed_page: the matched breed's slug
