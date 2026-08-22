@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { QUESTIONS, scoreBreed } from "./ChumCalculator";
 import BreedResultRail from "./BreedResultRail";
 import styles from "./calculator.module.css";
@@ -8,7 +8,7 @@ import k from "./ChumKnockout.module.css";
 
 // The knockout runs on the dogs the calculator has already revealed and whittles
 // them down with the four tb_ questions, in fixed file order. scoreBreed is reused
-// as-is (the one and only scoring path). No animation yet. (Job B, 22 Aug 2026.)
+// as-is (the one and only scoring path). (Job B, 22 Aug 2026.)
 //
 // A split-score question picker was built and REMOVED on 22 Aug 2026. It chose the
 // next question by how many survivors its answer swung. A 108k-field sweep showed it
@@ -29,6 +29,7 @@ type Props = {
 
 const TARGET_MAX = 3; // knockout stops once this many or fewer survive
 const FLOOR = 1;      // the screen is never cleared below one dog
+const FALL_MS = 700;  // must exceed the fallAway animation (0.65s) in knockout-shared
 
 // LAST DOG STANDING guard. Runs at the end of every elimination pass, never trusted
 // to the ranking maths. Ranks the current survivors on their CUMULATIVE scoreBreed
@@ -47,6 +48,8 @@ function survivorsAfterRound(prev: ScoredBreed[], answers: Record<string, string
   return kept.length > 0 ? kept : [scored[0]];                     // never clear the screen
 }
 
+type Elim = { falling: string[]; next: ScoredBreed[]; nextDone: boolean; nextRound: number };
+
 export default function ChumKnockout({ breeds, answers, onRestart }: Props) {
   // The four tb_ questions in fixed file order. Computed here (not at module level)
   // so a future import cycle with ChumCalculator cannot hit a TDZ.
@@ -56,33 +59,63 @@ export default function ChumKnockout({ breeds, answers, onRestart }: Props) {
   const [acc, setAcc] = useState<Record<string, string>>(answers);
   const [roundIdx, setRoundIdx] = useState(0);
   const [done, setDone] = useState(breeds.length <= TARGET_MAX);
+  // While a round is being applied, the eliminated dogs fall away before the rail
+  // updates. elim holds the pending next state until the animation has played.
+  const [elim, setElim] = useState<Elim | null>(null);
 
   const currentQ = done ? null : (tbQuestions[roundIdx] ?? null);
 
+  // Confetti loader (same pattern as ChumCalculator).
+  const confettiRef = useRef<((o: Record<string, unknown>) => void) | null>(null);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const w = window as unknown as Record<string, unknown>;
+    if (w.confetti) { confettiRef.current = w.confetti as (o: Record<string, unknown>) => void; return; }
+    const script = document.createElement("script");
+    script.src = "https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js";
+    script.async = true;
+    script.onload = () => { confettiRef.current = (window as unknown as Record<string, unknown>).confetti as (o: Record<string, unknown>) => void; };
+    document.body.appendChild(script);
+  }, []);
+
+  // Fire confetti once the knockout finishes.
+  useEffect(() => {
+    if (done) confettiRef.current?.({ particleCount: 120, spread: 70, origin: { y: 0.6 } });
+  }, [done]);
+
+  // Commit the pending elimination once the fall animation has played out.
+  useEffect(() => {
+    if (!elim) return;
+    const t = setTimeout(() => {
+      setSurvivors(elim.next);
+      setRoundIdx(elim.nextRound);
+      setDone(elim.nextDone);
+      setElim(null);
+    }, FALL_MS);
+    return () => clearTimeout(t);
+  }, [elim]);
+
   function answer(value: string) {
-    if (!currentQ) return;
+    if (!currentQ || elim) return; // ignore clicks mid-animation
     const nextAnswers = { ...acc, [currentQ.id]: value };
     const nextSurvivors = survivorsAfterRound(survivors, nextAnswers);
+    const eliminated = survivors.filter((b) => !nextSurvivors.some((n) => n.slug === b.slug)).map((b) => b.slug);
     setAcc(nextAnswers);
 
+    let nextDone = false;
+    let finalNext = nextSurvivors;
     if (nextSurvivors.length <= TARGET_MAX) {
-      setSurvivors(nextSurvivors);
-      setDone(true);
-      return;
-    }
-    if (roundIdx + 1 >= tbQuestions.length) {
+      nextDone = true;
+    } else if (roundIdx + 1 >= tbQuestions.length) {
       // Questions exhausted with more than TARGET_MAX still standing: fall back to
-      // cumulative score order and take the top TARGET_MAX. With four questions used
-      // on nearly every run this is the common exit, not a rare branch.
-      setSurvivors(nextSurvivors.slice(0, TARGET_MAX));
-      setDone(true);
-      return;
+      // cumulative score order and take the top TARGET_MAX. Common exit, not rare.
+      finalNext = nextSurvivors.slice(0, TARGET_MAX);
+      nextDone = true;
     }
-    setSurvivors(nextSurvivors);
-    setRoundIdx(roundIdx + 1);
+    setElim({ falling: eliminated, next: finalNext, nextDone, nextRound: roundIdx + 1 });
   }
 
-  // ── End screen: straight to the result rail, then Start again ────────────────
+  // ── End screen: the result rail, then Start again ────────────────────────────
   if (done || !currentQ) {
     return (
       <div>
@@ -94,13 +127,19 @@ export default function ChumKnockout({ breeds, answers, onRestart }: Props) {
     );
   }
 
-  // ── A question round: message, then the surviving dogs, then the question ────
+  // ── A question round: pills, message, the surviving dogs, then the question ──
   return (
     <div>
+      <div className={k.pillTrail}>
+        {Array.from({ length: roundIdx }).map((_, i) => (
+          <span key={i} className={k.pillDone}>Round {i + 1}</span>
+        ))}
+        <span className={k.pillCurrent}>Round {roundIdx + 1}</span>
+      </div>
       <p className={k.message}>We still have a few too many chums matching you</p>
-      {/* The pack still in the running. Re-rendered every round so the user watches
-          it shrink as they answer. This rail is what stage 5 will animate. */}
-      <BreedResultRail breeds={survivors} bestSlug={null} />
+      {/* The pack still in the running. On answer the losers get the fall-away
+          animation, then the rail updates. This is the knockout's moment. */}
+      <BreedResultRail breeds={survivors} bestSlug={null} fallingSlugs={elim?.falling} />
       <div className={styles.stepperWrap}>
         <div className={styles.stepCard}>
           <div className={styles.questionHeader}>
@@ -109,7 +148,7 @@ export default function ChumKnockout({ breeds, answers, onRestart }: Props) {
           {currentQ.sub && <p className={styles.stepSub}>{currentQ.sub}</p>}
           <div className={styles.stepOptions}>
             {currentQ.options.map((opt) => (
-              <button key={opt.value} className={styles.option} onClick={() => answer(opt.value)}>
+              <button key={opt.value} className={styles.option} disabled={!!elim} onClick={() => answer(opt.value)}>
                 {opt.label}
               </button>
             ))}

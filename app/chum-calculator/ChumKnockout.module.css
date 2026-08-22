@@ -11,3 +11,31 @@
   margin: 0 0 16px;
   font-size: clamp(1rem, 2.5vw, 1.2rem);
 }
+
+/* Round pill trail. The shared knockout pills are white-on-dark for the name
+   generator; the calculator sits on a light card, so these are recoloured navy
+   and yellow for legibility. (Job B stage 5, 22 Aug 2026.) */
+.pillTrail {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin: 0 0 12px;
+}
+.pillDone,
+.pillCurrent {
+  font-family: var(--font-body), sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 5px 14px;
+  letter-spacing: 0.04em;
+}
+.pillDone {
+  background: rgba(10, 58, 87, 0.12);
+  color: var(--navy, #0a3a57);
+}
+.pillCurrent {
+  background: var(--yellow, #ffd23e);
+  color: var(--navy, #0a3a57);
+}

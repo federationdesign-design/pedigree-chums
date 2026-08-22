@@ -5,6 +5,7 @@ import Link from "next/link";
 import { bust } from "../../data/imgVersion";
 import { breedCard } from "../../data/breeds";
 import styles from "./BreedResultRail.module.css";
+import shared from "../name-generator/knockout-shared.module.css";
 
 type ScoredBreed = {
   slug: string;
@@ -100,9 +101,13 @@ function FlipCard({ breed, isBest }: { breed: ScoredBreed; isBest: boolean }) {
 type Props = {
   breeds: ScoredBreed[];
   bestSlug: string | null;
+  // Slugs mid-elimination in the knockout: these cards play the shared fall-away
+  // animation. Optional, so the calculator's final reveal is unaffected. (Job B stage 5.)
+  fallingSlugs?: string[];
 };
 
-export default function BreedResultRail({ breeds, bestSlug }: Props) {
+export default function BreedResultRail({ breeds, bestSlug, fallingSlugs }: Props) {
+  const falling = new Set(fallingSlugs ?? []);
   const railRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const thumbRef = useRef<HTMLDivElement>(null);
@@ -164,7 +169,7 @@ export default function BreedResultRail({ breeds, bestSlug }: Props) {
     <div className={styles.railWrap}>
       <div ref={railRef} className={styles.rail} role="list" aria-label="Matched breeds">
         {breeds.map((b) => (
-          <div key={b.slug} className={styles.item} role="listitem">
+          <div key={b.slug} className={falling.has(b.slug) ? `${styles.item} ${shared.falling}` : styles.item} role="listitem">
             <FlipCard breed={b} isBest={b.slug === bestSlug} />
           </div>
         ))}
