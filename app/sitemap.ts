@@ -36,7 +36,6 @@ const PAGES: [path: string, freq: "weekly" | "monthly" | "yearly", priority: num
   ["/chumspot", "monthly", 0.6],
   ["/chum-calculator", "monthly", 0.6],
   ["/name-generator", "monthly", 0.7],
-  ["/pick-a-chum", "monthly", 0.6],
   ["/hot-dogs", "monthly", 0.6],
   ["/smarter-than-the-test", "monthly", 0.6],
 

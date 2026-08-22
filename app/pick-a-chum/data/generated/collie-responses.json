@@ -5971,5 +5971,27 @@
     "defaultRoute": "",
     "animationCue": "",
     "status": "Approved"
+  },
+  {
+    "responseId": "COL-B52-BATH-01",
+    "bucketId": "B52",
+    "subtag": "emoji",
+    "triggers": [],
+    "template": "nooooo!!!",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
+  },
+  {
+    "responseId": "COL-B52-CAT-01",
+    "bucketId": "B52",
+    "subtag": "emoji",
+    "triggers": [],
+    "template": "where???",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
   }
 ]

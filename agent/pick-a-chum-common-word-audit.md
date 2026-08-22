@@ -174,3 +174,23 @@ Heaviest offenders by blast radius: COMMERCIAL (`order`, `cost`, `shop`, `launch
 `cheese`) and COMMAND (`sit`, `stay`, `fetch`) because they are extremely common.
 The two safety-adjacency items (`sad`, `lonely` in PERSONAL) are a coverage
 question, not just noise. No edits made; this is a map for you to prioritise.
+
+## Addendum (22 Aug 2026): `much` DOES reach a route -- FAQ008 (price)
+
+The note at the top says `much` is only a COMMON_WORDS fuzzy-blocklist entry and not a
+trigger. That is true of the keyword lists, but it is NOT the whole picture: bare
+`much` (and `so much`, `thanks so much`, `i love it so much`) all resolve to
+**FAQ008, the price answer**, via `matchFaq` / `faqPhraseStrength` -- an FAQ008
+phrasing reduces to the lone content token `much`, which then matches any message
+containing that word. So "thanks so much" is answered with the game's price.
+
+Mechanism is the FAQ phrase matcher, not a keyword trigger, so it is not in the
+tables above. It is the same shape as the `game`/`pack`/`card` over-reach already
+fixed with COMMON_FAQ_TOKENS / OVERLOADED_FAQ_TOKENS (`router.ts`): `much` wants the
+same treatment (count it only WITH a price signal, e.g. "how much"), OR the offending
+FAQ008 phrasing wants tightening.
+
+Found while adding text-speak expansion (`ilysm` -> "i love you so much" surfaced it).
+That expansion was routed to "i love you" instead to avoid the trap; the underlying
+over-match is left for its own pass (it is wide -- any message with "much"). Report
+only, no edits.

@@ -806,8 +806,18 @@ const CONFIRM_DOG_WORDS = new Set(['dog', 'dogs', 'doggy', 'puppy', 'pup', 'bree
 //   - woof / bark -> the bark-game offer (B17)
 // The four chatbot-dog NAMES need no entry here: extractCandidateSubject canonicalises them to a breed
 // title (collie -> "Border Collie"), which the breed-title branch below already maps to that dog's page.
-const CONFIRM_SITE_WORDS = new Set(['site', 'website', 'page']);
+const CONFIRM_SITE_WORDS = new Set(['site', 'website', 'page', 'link']);
 const CONFIRM_BARK_WORDS = new Set(['woof', 'bark']);
+// Follow-up to the Task 175 gap above: extractCandidateSubject can echo any INSIDE_WORLD_WORDS token as
+// LOOP-01 ("Tail?", "History?"), each arming a "yes", but confirmResolution honoured only ~23 of them, so
+// 14 more subjects died as "im a dog". Close them by routing each to an answer that ALREADY exists (no new
+// copy), exactly like the site/bark additions: paw and fetch reuse their own answers; tail/walk/lead/collar
+// have no on-topic answer so serve a dog fact (B07); the history cluster links to the matching page. ('bone'
+// is deliberately NOT here: the FOOD layer intercepts it before any echo, so its "yes" is already handled --
+// a mapping would be dead code. 'link' joins the site words above; 'toy' shares the ball answer below;
+// 'generator'/'jobs' are handled by their own branches.)
+const CONFIRM_DOG_FACT_WORDS = new Set(['tail', 'walk', 'lead', 'collar']);
+const CONFIRM_HISTORY_WORDS = new Set(['history', 'origin', 'ancestors', 'bred']);
 function confirmResolution(subject: string): Resolution | null {
   const p = BREED_PAGES.find((x) => x.title === subject);
   if (p) return breedPageRes(p);
@@ -815,6 +825,18 @@ function confirmResolution(subject: string): Resolution | null {
   if (CONFIRM_DOG_WORDS.has(subject)) return { layer: 5, layerName: 'Dog, breed and website content', bucket: 'B05', action: 'breed_hub' };
   if (CONFIRM_SITE_WORDS.has(subject)) return { layer: 11, layerName: 'Orientation and onboarding', bucket: 'B15', action: 'orientation' };
   if (CONFIRM_BARK_WORDS.has(subject)) return { layer: 13, layerName: 'Play and entertainment', bucket: 'B17', action: 'offer_bark_game' };
+  // The ball answer (COL-B52-MISC-09) poses "Tennis balls?", which invites a "yes". 'balls' is NOT a
+  // LOOP-01 echo subject (not an INSIDE_WORLD_WORD, and the canned answer reaches the visitor before any
+  // fallback echo could) -- the engine arms pendingConfirm='balls' when that answer serves. 'toy' IS a
+  // LOOP-01 subject and a toy is her tennis ball, so both re-serve the same ball answer (its clip), the
+  // only ball content there is, and it stays in character.
+  if (subject === 'balls' || subject === 'toy') return { layer: 9, layerName: 'Recognised conversation', bucket: 'B52', action: 'canned', responseId: 'COL-B52-MISC-09' };
+  if (subject === 'paw') return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: 'paw' }; // her paw/shake answer, as if typed
+  if (subject === 'fetch') return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: 'random_link' }; // throws the ball, as if typed
+  if (CONFIRM_DOG_FACT_WORDS.has(subject)) return { layer: 7, layerName: 'Facts about the active breed', bucket: 'B07', action: 'breed_answer' };
+  if (CONFIRM_HISTORY_WORDS.has(subject)) return { layer: 3, layerName: 'Gameplay and website navigation', bucket: 'B03', action: 'link', destinationId: 'DST007' }; // Britain's Dog History
+  if (subject === 'jobs') return { layer: 3, layerName: 'Gameplay and website navigation', bucket: 'B03', action: 'link', destinationId: 'DST018' }; // Dogs at Work (the page that IS dogs' jobs)
+  if (subject === 'generator') return { layer: 3, layerName: 'Gameplay and website navigation', bucket: 'B03', action: 'link', destinationId: 'DST008' }; // Dog Name Generator
   return null;
 }
 
@@ -1252,6 +1274,41 @@ const BUTTON_PANEL_START = /(mini ?game|do not press|dont press|don't press|pres
 const BOXER_GAME_ACCEPT = new Set(['lets play', 'let us play', 'play', 'play it', 'go on', 'ok lets play', 'yes lets play', 'yes please', 'ready', 'lets go', 'do it']);
 function matchGameStart(c: string): GameId | null {
   for (const [re, id] of GAME_STARTS) if (re.test(c)) return id;
+  return null;
+}
+
+// The composer emoji picker. A tapped emoji is an emoji-only message that would otherwise fall to the B18
+// "I can see it, but I cannot read it" line; instead each maps to a real response, reusing what exists.
+// Matched on the base glyphs (the U+FE0F variation selector stripped), so both ❤ and ❤️ hit.
+const EMOJI_FOOD: Record<string, string> = { '🍔': 'burger', '🍕': 'pizza', '🌭': 'sausage', '🥕': 'carrot' };
+const EMOJI_BALLS = new Set(['⚽', '🏀', '🏐', '🎾']);
+const EMOJI_GAMING = new Set(['🎮', '🕹']);
+const EMOJI_BATH = new Set(['🛁', '🚿']);
+const EMOJI_REACTIONS = new Set(['🤣', '🤭', '😂', '❤', '😍', '👍', '😊']);
+const EMOJI_COOKIE = '🍪';
+const EMOJI_CAT = '🐱';
+// A tapped picker emoji -> a real response, reusing existing behaviour. FOOD re-routes through the FULL food
+// mechanism by resolving its word, so the Labrador overrides whoever is active exactly as a food WORD does
+// (transfer from another dog, his own tiered answer when he is active). COOKIE hands to the Labrador and
+// starts his cookie game (game_start + transferTo; the engine switches the dog, mirroring the food override).
+// BALLS -> the ball answer (its clip, and it arms the "yes" confirm downstream); GAMING -> the games LIST
+// (with its tappable pills, per dog); BATH/CAT -> the two new B52 lines; the reactions -> the existing laugh
+// / ":)" row (the same one lol/haha reach). Any other emoji returns null and still gets the B18 line.
+function matchEmoji(n: Normalised, data: ChumData, state: RouterState): Resolution | null {
+  const glyphs = n.original.replace(/\uFE0F/g, '');
+  const has = (set: Set<string>) => [...set].some((g) => glyphs.includes(g));
+  for (const [emoji, word] of Object.entries(EMOJI_FOOD)) {
+    if (glyphs.includes(emoji)) return resolve(normalise(word), data, state); // full food behaviour, whoever is active
+  }
+  if (glyphs.includes(EMOJI_COOKIE)) {
+    const handoff = state.activeDog !== 'labrador';
+    return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: 'game_start', game: 'feedcookie', ...(handoff ? { transferTo: 'labrador' as Dog } : {}) };
+  }
+  if (has(EMOJI_BALLS)) return { layer: 9, layerName: 'Recognised conversation', bucket: 'B52', action: 'canned', responseId: 'COL-B52-MISC-09' };
+  if (has(EMOJI_GAMING)) return { layer: 13, layerName: 'Play and entertainment', bucket: 'B45', action: 'games_menu', responseId: 'B45-GAMELIST-02' };
+  if (has(EMOJI_BATH)) return { layer: 9, layerName: 'Recognised conversation', bucket: 'B52', action: 'canned', responseId: 'COL-B52-BATH-01' };
+  if (glyphs.includes(EMOJI_CAT)) return { layer: 9, layerName: 'Recognised conversation', bucket: 'B52', action: 'canned', responseId: 'COL-B52-CAT-01' };
+  if (has(EMOJI_REACTIONS)) return { layer: 9, layerName: 'Recognised conversation', bucket: 'B29', action: 'canned', responseId: 'B29-NICE-01' };
   return null;
 }
 
@@ -2027,6 +2084,8 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
   // Layer 14: emoji-only message (picture-writing with no words). Checked before
   // gibberish so a lone emoji gets the "I read words" family, not the smash reply.
   if (isEmojiOnly(n)) {
+    const em = matchEmoji(n, data, state); // a picker emoji maps to a real response; other emoji fall through
+    if (em) return em;
     return { layer: 14, layerName: 'Emoji only', bucket: 'B18', action: 'emoji_only' };
   }
 

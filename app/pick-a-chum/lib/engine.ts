@@ -254,6 +254,7 @@ export function submit(data: ChumData, session: Session, input: string): Turn {
   const n = normalise(input);
   const dog = session.activeDog; // whose bark game this message belongs to
   const wasProtected = session.protectedState; // 'active' | 'aftercare' | null, BEFORE this turn
+  const prevPendingConfirm = session.pendingConfirm ?? null; // the subject an offer/answer armed last turn
   let resolution = resolve(n, data, {
     submissionCount: session.submissionCount,
     activeDog: dog,
@@ -344,6 +345,16 @@ export function submit(data: ChumData, session: Session, input: string): Turn {
   // applied inside a protected state (the S12 machine owns those turns).
   if (session.lastWasComplaint && !wasProtected && WEAK_AFTER_COMPLAINT.has(resolution.action)) {
     resolution = { layer: 4, layerName: 'FAQ knowledge', bucket: 'B04', action: 'faq_answer', faqId: 'FAQ015' };
+  }
+
+  // The cookie emoji hands to the Labrador and starts his cookie game (mirroring the food override): a
+  // game_start carrying transferTo switches the active dog HERE, before the game starts, so the game runs
+  // and every line serves as the Labrador. Same bookkeeping as an ordinary transfer (below): reset the dog
+  // we are leaving and record the arrival. Only the emoji cookie handoff sets transferTo on a game_start.
+  if (resolution.action === 'game_start' && resolution.transferTo && resolution.transferTo !== session.activeDog) {
+    session.barkStreakByDog[session.activeDog] = 0;
+    session.activeDog = resolution.transferTo;
+    if (!session.previousDogs.includes(resolution.transferTo)) session.previousDogs.push(resolution.transferTo);
   }
 
   // Task 115: the three in-chat games. Processed BEFORE assembly so the served copy and the board/tiles/
@@ -548,6 +559,15 @@ export function submit(data: ChumData, session: Session, input: string): Turn {
     session.loopRepeatUsed = false; // a non-fallback turn breaks the run, re-arming the repeat
     session.pendingConfirm = null;
     session.noSubjectStreak = 0; // Task 117: anything else served resets the no-subject rotation
+  }
+
+  // The ball answer (COL-B52-MISC-09) poses "Tennis balls?", inviting a "yes". It is a canned answer,
+  // so nothing above arms a confirm for it (unlike the LOOP-01 echo, whose yes confirmResolution honours).
+  // Arm a ONE-SHOT confirm here so a following bare "yes" re-serves it (its clip) instead of "im a dog".
+  // Guarded on prevPendingConfirm so honouring the confirm -- which re-serves the same answer -- does not
+  // re-arm and loop: one "yes" is honoured, then the conversation moves on.
+  if (response.responseId === 'COL-B52-MISC-09' && prevPendingConfirm !== 'balls') {
+    session.pendingConfirm = 'balls';
   }
 
   session.lastWasComplaint = resolution.faqId === 'FAQ015'; // complaint follow-up context (Task 18)
