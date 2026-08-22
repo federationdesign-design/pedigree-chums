@@ -958,3 +958,34 @@
     cursor: pointer;
   }
 }
+
+/* ── Text toggle: on-gradient text flips white -> navy ────────────────────────
+   Rest colours are white (set throughout above); ArticleTextToggle (centred, in
+   page.tsx between the hero and the intro) sets data-pc-textinvert on <main> and
+   these rules flip the covered text to navy, matching hot-dogs and /home. Gated on
+   :root:not([data-pc-contrast-scheme]) so a future accessibility scheme wins, and
+   the control hides itself under a scheme (ArticleTextToggle's own CSS).
+
+   Covered: the page title (.title, white base only), the intro (.lead), and inside
+   every era panel the white copy (.sectionTitle white base, .sectionIntro, .detail,
+   .bullets li, .factText), plus the strip heading (.stripLabel) and breed name
+   (.nodeName). Yellow accents are deliberately left off the list so they keep their
+   colour: the title/section-title accent words (.display-yellow) and the "Did you
+   know?" label (.factLabel). Card-internal text (.flipNote, .deskBackHint, .nodeTag,
+   .nodeEra) is out of scope per the brief and untouched.
+
+   ON-RECORD CONTRAST TRADE (Steve, 22 Aug 2026): body and panel share the same
+   cyan->blue gradient (#00e2ff -> #008eff). At rest, white measures ~1.5:1 at the
+   cyan end (fails WCAG 1.4.3 AA); toggled navy measures ~7.6:1 (cyan) down to ~3.6:1
+   at the darkest blue corner. Large text (title, lead, section titles/intro, strip
+   and breed names) clears the 3:1 large-text bar everywhere. The smaller normal-weight
+   copy (.detail, .bullets li, .factText) reaches full AA only across the cyan half,
+   bottoming at ~3.6-4.3:1 on the blue corner; included as-is (no background change is
+   part of this task). Navy's worst case still beats white's best, so the flip only
+   ever improves legibility. */
+:root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"] :is(
+  .title, .lead, .sectionTitle, .sectionIntro, .detail, .bullets li,
+  .factText, .nodeName, .stripLabel
+) {
+  color: var(--navy, #0a3a57);
+}

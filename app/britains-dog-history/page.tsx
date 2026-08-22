@@ -6,6 +6,7 @@ import Triangles, { type Tri } from "../../components/Parallax/Triangles";
 import ParallaxShape from "../../components/Parallax/ParallaxShape";
 import Announce from "../../components/Announce/Announce";
 import BreedStrip from "./BreedStrip";
+import ArticleTextToggle from "../../components/ArticleTextToggle/ArticleTextToggle";
 import HistoryCarousel from "../britains-dog-history-2/HistoryCarousel";
 import styles from "./history.module.css";
 import HistorySection from "../../components/HistorySection/HistorySection";
@@ -83,6 +84,13 @@ export default function HistoryPage() {
             <Triangles items={heroTriangles} z={2} />
           </div>
         </section>
+
+        {/* Text toggle: the on-gradient text below (title, intro, era-panel text,
+            strip headings and breed names) is white at rest and flips to navy when
+            on (see the text-toggle block in history.module.css), matching hot-dogs
+            and /home. closest("main") resolves to the <main> above, so it sets
+            data-pc-textinvert on it. Centred, between the hero and the content. */}
+        <ArticleTextToggle centered />
 
         <section className={styles.intro}>
           <PopHeading className={`display ${styles.title}`}>
