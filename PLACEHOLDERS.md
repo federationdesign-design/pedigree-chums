@@ -18,17 +18,6 @@ final copy.
 | LOOP-02 route offer | `engine.ts` (`LOOP_02_ROUTE_OFFER = 'the game or a dog?'`) | The `[ROUTE A] or [ROUTE B]?` fill is my best-effort using ORIENT's two departments; the exact copy, and whether it should adapt to the candidate's specific route ("close to a supported route"), is unspecified. It also overlaps ORIENT's wording | Steve supplies the LOOP-02 route-offer copy and the adapt-to-candidate rule |
 | Grief detection trigger lists | `safety.ts` (`GRIEF_DIED`/`GRIEF_LOST`/`GRIEF_WORRIED`/`GRIEF_CONTINUE`/`GRIEF_EXCLUDE`) | Task 58 grief COPY (`:(`) is approved; the DETECTION wording is best-effort, authored to cover the three scenarios and the required assertions, conservative to avoid false positives. As a safety route it should be reviewed/extended by Steve like the other safety trigger lists | Steve reviews and extends the grief triggers |
 
-## Diversion offers: Competition and ChumDrop (text pending)
-
-Two diversions added to broaden the pool beyond the history cluster:
-`DIVERSION-09` (Competition, `/chumspot`) and `DIVERSION-10` (ChumDrop, `/`) in
-`engine.ts` DIVERSIONS. Their `text` is a clearly-marked placeholder
-(`[Competition diversion line: Steve to write]` / `[ChumDrop diversion line:
-Steve to write]`). The picker **skips any diversion whose text begins with `[`**,
-so a child never sees the marker; the two join the live pool the moment Steve
-replaces the text. Resolve: write the two offer lines (short, in the Collie's
-voice, like "Which chum suits you?"), drop the placeholder, done.
-
 ## Task 140/141 media clips (all five wired)
 
 All five clips in `public/chat-media/` are wired. The clip is ADDED to its

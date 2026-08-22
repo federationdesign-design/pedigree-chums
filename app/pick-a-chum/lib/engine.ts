@@ -192,11 +192,11 @@ const DIVERSIONS: { id: string; text: string; url: string; label: string }[] = [
   { id: 'DIVERSION-06', text: 'Which chum suits you?', url: '/chum-calculator', label: 'Chum Finder' },
   { id: 'DIVERSION-07', text: 'Shall I name a dog?', url: '/name-generator', label: 'Name Generator' },
   { id: 'DIVERSION-08', text: 'The whole pack?', url: '/know-your-chums', label: 'Know Your Chums' },
-  // Two more pages beyond the history cluster, so the offers are not history-heavy. Text is a PLACEHOLDER
-  // (Steve to write, logged in PLACEHOLDERS.md); a leading '[' marks it, and the picker skips any diversion
-  // whose text is still a placeholder, so a child never sees the marker. They join the pool once written.
-  { id: 'DIVERSION-09', text: '[Competition diversion line: Steve to write]', url: '/chumspot', label: 'Competition' },
-  { id: 'DIVERSION-10', text: '[ChumDrop diversion line: Steve to write]', url: '/', label: 'ChumDrop' },
+  // Two more pages beyond the history cluster, so the offers are not history-heavy (owner's copy). The
+  // picker still skips any diversion whose text begins with '[' (a future placeholder), so a child never
+  // sees an unwritten marker; these two are written, so they are live in the pool.
+  { id: 'DIVERSION-09', text: 'enter our competition?', url: '/chumspot', label: 'Competition' },
+  { id: 'DIVERSION-10', text: 'wanna play this game?', url: '/', label: 'ChumDrop' },
 ];
 
 // Task 115: a game B4x line's template text, or '' (an ongoing board has no line).

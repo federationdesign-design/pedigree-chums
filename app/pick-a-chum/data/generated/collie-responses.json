@@ -6021,5 +6021,25 @@
     "defaultRoute": "",
     "animationCue": "",
     "status": "Approved"
+  },
+  {
+    "responseId": "COL-B52-STICKS-01",
+    "bucketId": "B52",
+    "subtag": "misc",
+    "triggers": [
+      "stick",
+      "sticks",
+      "do you like sticks",
+      "you like sticks",
+      "do you like a stick",
+      "like sticks",
+      "do you like big sticks",
+      "do you like long sticks"
+    ],
+    "template": "I like long sticks and I like big sticks",
+    "factSource": "",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
   }
 ]

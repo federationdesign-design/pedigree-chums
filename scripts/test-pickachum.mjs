@@ -2610,6 +2610,11 @@ check('ball', { action: 'canned', bucket: 'B52' }, { assert: (_r, resp) =>
     : resp.text !== 'Tennis balls?' ? `ball text wrong: "${resp.text}"` : resp.media?.src !== '/chat-media/ball.mp4' ? `ball clip missing: ${JSON.stringify(resp.media)}` : null });
 // ...and the "yes" after it still re-serves the ball answer: pendingConfirm='balls' is armed on the responseId, so the singular trigger arms it exactly as the plural does.
 (() => { const s = newSession(); check('ball', { action: 'canned' }, { session: s }); check('yes', { action: 'canned' }, { session: s, assert: (_r, resp) => (resp.responseId === 'COL-B52-MISC-09' ? null : `yes after ball did not re-serve the ball answer: ${resp.responseId}`) }); })();
+// The sticks answer (COL-B52-STICKS-01), same shape as the ball line. "u like sticks" reaches it via the
+// u -> you text-speak expansion. The copy is served verbatim.
+for (const inp of ['sticks', 'stick', 'do you like sticks', 'you like sticks', 'u like sticks']) {
+  check(inp, { action: 'canned', bucket: 'B52' }, { assert: (_r, resp) => (resp.responseId === 'COL-B52-STICKS-01' && resp.text === 'I like long sticks and I like big sticks' ? null : `"${inp}" -> ${resp.responseId} "${resp.text}"`) });
+}
 // Census follow-up: the plural-only single-word triggers gained their singulars (same rows, same answers).
 for (const [word, rid] of [['cow', 'COL-B52-MISC-08'], ['squirrel', 'B21-CATS-05'], ['bird', 'B21-CATS-05'], ['fox', 'B21-CATS-05'], ['rabbit', 'B21-CATS-05']]) {
   check(word, { action: 'canned' }, { assert: (_r, resp) => (resp.responseId === rid ? null : `singular "${word}" -> ${resp.responseId}, expected ${rid}`) });
