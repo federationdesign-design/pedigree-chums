@@ -92,36 +92,23 @@ const pctTxt = (v: number) => (v < 1 ? "<1%" : `${Math.round(v)}%`);
 const pctTitleFor = (id: string) =>
   PCT_TITLES[Math.abs([...id].reduce((h, c) => (h * 31 + c.charCodeAt(0)) | 0, 7)) % PCT_TITLES.length];
 
-// ── Placement algorithm (brief 5.4) ─────────────────────────────────────────
-// Deterministic anchor grid, left-to-right then top-to-bottom, starting beside
-// the rail. Open a card at the first slot whose rect intersects no open card
-// rect and stays inside the viewport width. If none is free, use the last slot
-// and bring it to front (logged by the caller).
-const SLOT_TOP = 196;      // clears the fixed nav + header band
-const SLOT_LEFT = 120;     // beside the left rail
-const SLOT_STEP_X = 372;   // column pitch
-const SLOT_STEP_Y = 232;   // row pitch
+// ── Card placement: FIXED, deterministic slots (D73 #4) ──────────────────────
+// Each card owns a slot by its position in the RAIL ORDER, independent of open order,
+// so opening health first still lands it in health's own slot (not slot 1). Slots flow
+// left-to-right from DIRECTLY below famous chums, exactly CARD_GAP between cards on both
+// axes, wrapping down at the canvas edge. Coords are canvas-space (DragCard is absolute).
+const SLOT_TOP = 196;      // fallback band top if famous chums cannot be measured
+const SLOT_LEFT = 120;     // left inset of the band
 const SLOT_MARGIN = 24;    // keep off the right edge
-const EST_H = 260;         // incoming-card height estimate before it mounts
+const CARD_GAP = 10;       // exact gap between cards, both axes (D73 #3)
+const EST_H = 260;         // card height estimate (row pitch + canvas-growth reserve)
 
-function intersects(a: Rect, b: Rect): boolean {
-  return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
-}
-
-// The anchor grid. Cards fill LEFT-TO-RIGHT across the canvas width, in rows growing
-// DOWN from `bandTop` (the band below famous chums / the chart). Canvas-space coords,
-// matching DragCard's absolute left/top. (D72 #5 moved the band from the old fixed
-// SLOT_TOP near the rail to this measured bottom band.)
-function buildSlots(canvasW: number, bandTop: number): { x: number; y: number }[] {
-  const slots: { x: number; y: number }[] = [];
-  const cols = Math.max(1, Math.floor((canvasW - SLOT_LEFT - SLOT_MARGIN) / SLOT_STEP_X));
-  for (let row = 0; row < 10; row++) {
-    for (let col = 0; col < cols; col++) {
-      slots.push({ x: SLOT_LEFT + col * SLOT_STEP_X, y: bandTop + row * SLOT_STEP_Y });
-    }
-  }
-  return slots;
-}
+// The rail order doubles as the fixed slot order. tree/diagram are panels, not placed
+// cards, so they are skipped when the slot walk hits them.
+const RAIL_ORDER = [
+  "temperament", "tree", "lifespanExplain", "cost", "suitability",
+  "exercise", "grooming", "training", "influence", "health", "diagram",
+];
 
 // Intro-box write-up alias (2026-08-23). breedInfo is keyed by tree-NODE name, but a
 // few breed cards use a shorter/different root name than the node that carries the
@@ -287,8 +274,6 @@ export default function Chums2Client({ name, slug, image, info, lineage, diag = 
     }
     return list;
   }, [name, slug, info, influence]);
-
-  const cardById = useMemo(() => new Map(cards.map((c) => [c.id, c])), [cards]);
 
   // Every rail card starts CLOSED on load (brief 5.4). The diagram and the
   // family tree are panels that start OPEN (the tree now renders INLINE and
@@ -503,35 +488,27 @@ export default function Chums2Client({ name, slug, image, info, lineage, diag = 
   }, []);
 
   const placeCard = useCallback((id: string) => {
-    const width = cardById.get(id)?.width ?? 380;
-    // Cards land in the BAND BELOW famous chums / the chart (D72 #5), filling left to
-    // right across the CANVAS width. Everything is measured in canvas (page) coords -
-    // the same space DragCard's absolute left/top live in - by subtracting the canvas's
-    // own top, exactly as the ?audit=1 readout does.
+    // FIXED slot (D73 #4): walk the cards in rail order, accumulating x by each card's
+    // width + CARD_GAP and wrapping down at the canvas edge, and return THIS card's slot.
+    // The result depends only on the card ORDER (not which are open), so a card always
+    // lands in its own slot. The band starts DIRECTLY below famous chums (measured in
+    // canvas coords by subtracting the canvas top, like ?audit=1); 10px gaps throughout.
     const canvasEl = typeof document !== "undefined" ? (document.querySelector('[data-canvas="true"]') as HTMLElement | null) : null;
     const cRect = canvasEl?.getBoundingClientRect();
     const canvasW = cRect?.width ?? 2244;
     const cTop = cRect?.top ?? 0;
-    const bottomOf = (sel: string) => { const el = document.querySelector(sel); return el ? el.getBoundingClientRect().bottom - cTop : 0; };
-    // Below the LOWER of famous chums and the chart, so cards never overlap them; the
-    // intro band is a floor for breeds with neither. GAP of 36 clears the section.
-    const bandTop = canvasEl
-      ? Math.max(bottomOf('[data-region="famous-chums"]'), bottomOf('[data-region="lifespan-chart"]'), bottomOf('[data-region="intro-band"]')) + 36
-      : SLOT_TOP;
-    const slots = buildSlots(canvasW, bandTop);
-    const openList = [...openRects.current.values()];
-    for (const slot of slots) {
-      if (slot.x + width > canvasW - SLOT_MARGIN) continue;      // stays inside the canvas width
-      const candidate: Rect = { x: slot.x, y: slot.y, w: width, h: EST_H };
-      if (!openList.some((r) => intersects(candidate, r))) {
-        return { x: slot.x, y: slot.y };
-      }
+    const famous = typeof document !== "undefined" ? document.querySelector('[data-region="famous-chums"]') : null;
+    const bandTop = famous ? famous.getBoundingClientRect().bottom - cTop + CARD_GAP : SLOT_TOP;
+    const ordered = RAIL_ORDER.map((rid) => cards.find((c) => c.id === rid)).filter((c): c is CardDef => !!c);
+    let x = SLOT_LEFT, y = bandTop, rowH = 0;
+    for (const c of ordered) {
+      if (x + c.width > canvasW - SLOT_MARGIN && x > SLOT_LEFT) { x = SLOT_LEFT; y += rowH + CARD_GAP; rowH = 0; } // wrap
+      if (c.id === id) return { x, y };
+      x += c.width + CARD_GAP;
+      rowH = Math.max(rowH, EST_H);
     }
-    // No free slot: last slot, brought to front (brief 5.4 asks to log this).
-    const last = slots[slots.length - 1];
-    console.warn(`[chums2] no free slot for card "${id}"; opening at last slot and bringing to front`);
-    return { x: last.x, y: last.y };
-  }, [cardById]);
+    return { x: SLOT_LEFT, y: bandTop };
+  }, [cards]);
 
   const openCard = useCallback((id: string) => {
     // Pop-outs are gated by SHOW_SECTIONS: while a section is off, its rail icon
@@ -559,19 +536,27 @@ export default function Chums2Client({ name, slug, image, info, lineage, diag = 
   // then the family tree, then the rest in concept order. Cards not shown in the
   // concept (influence, health) and the diagram trail after it. Only closed +
   // available items render.
+  // D73 #1: every icon stays in the rail PERMANENTLY (no removal on open). Order is
+  // fixed; `closed` no longer filters the list, only the per-icon open state below.
   const railItems: RailItem[] = useMemo(() => {
     const byId = new Map<string, RailItem>();
     byId.set("diagram", { id: "diagram", label: "Diagram", icon: DIAGRAM_GLYPH });
     byId.set("tree", { id: "tree", label: "Family tree", icon: ICONS.ancestry });
     cards.forEach((c) => byId.set(c.id, { id: c.id, label: c.label, icon: c.icon }));
-    const RAIL_ORDER = [
-      "temperament", "tree", "lifespanExplain", "cost", "suitability",
-      "exercise", "grooming", "training", "influence", "health", "diagram",
-    ];
-    return RAIL_ORDER
-      .map((id) => byId.get(id))
-      .filter((it): it is RailItem => !!it && closed.has(it.id));
-  }, [cards, closed]);
+    return RAIL_ORDER.map((id) => byId.get(id)).filter((it): it is RailItem => !!it);
+  }, [cards]);
+
+  // An icon is "open" when its card/panel is not in `closed`. Drives the inverted tile.
+  const openIds = useMemo(() => {
+    const s = new Set<string>();
+    railItems.forEach((it) => { if (!closed.has(it.id)) s.add(it.id); });
+    return s;
+  }, [railItems, closed]);
+
+  // Rail click TOGGLES (D73 #1): open if closed, close if open.
+  const toggleCard = useCallback((id: string) => {
+    if (closed.has(id)) openCard(id); else closeCard(id);
+  }, [closed, openCard, closeCard]);
 
   // ?diag=1 ISOLATION RIG (D46). ONLY the circular diagram, hosted exactly as the
   // mini pit: an empty 3000 x viewport-height canvas with the stage absolutely
@@ -644,7 +629,7 @@ export default function Chums2Client({ name, slug, image, info, lineage, diag = 
           {/* #0: the rail is an interactive LEAF. .leftBand is pointer-events:none so
               events fall THROUGH the wrapper to the behind-diagram; this wrapper turns
               them back on for the rail (which does not overlap the diagram anyway). */}
-          {SHOW_SECTIONS.rail && <div className={styles.railWrap}><Chums2Rail items={railItems} onOpen={openCard} /></div>}
+          {SHOW_SECTIONS.rail && <div className={styles.railWrap}><Chums2Rail items={railItems} openIds={openIds} onOpen={toggleCard} /></div>}
           {(SHOW_SECTIONS.introBox || SHOW_SECTIONS.lifespanChart || SHOW_SECTIONS.ancestorPack || SHOW_SECTIONS.famousChums || SHOW_SECTIONS.tree) && (
             <div className={styles.introStack} data-region="intro-band">
               {/* Top row: the intro write-up box on the left, the family tree
@@ -800,7 +785,7 @@ export default function Chums2Client({ name, slug, image, info, lineage, diag = 
             hideLeafImages
             strongBg
             currentScore={0}
-            initialDepth={2}
+            initialDepth={4}
             onNodeClick={(nodeName, rect) => {
               // The click already ran the pit's expand for this node (LineageMap).
               // Here we open THAT ancestor's pack popout DIRECTLY BELOW the node so it

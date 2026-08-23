@@ -987,6 +987,20 @@ export default function LineageMap({
     return { x: minX, y: minY, w, h };
   }, [bounded, shown, vp.w, vp.h, root, initialDepth]);
 
+  // D73 #4: the bounded tree must NEVER overlay the circular diagram to its LEFT. It
+  // lays out the WHOLE tree, so its leftmost node can sit left of the frozen fit frame
+  // and overdraw into the diagram zone. Shift the CONTENT RIGHT (position only - the
+  // scale/fitBox.w is untouched, per the mount-once rule) so the full tree's leftmost
+  // extent sits at the region's left edge, which is already right of the diagram zone +
+  // gutter. Computed from the FULL layout, so it is STABLE - expanding reveals nodes at
+  // fixed positions, no per-click shift. Applied to the viewBox x below.
+  const treeShiftX = useMemo(() => {
+    if (!bounded || !fitBox || shown.length === 0) return 0;
+    let minX = Infinity;
+    for (const n of shown) if (n._x < minX) minX = n._x;
+    return Math.max(0, fitBox.x - (minX - 120)); // 120 = the fitBox PAD (circle + name pill)
+  }, [bounded, fitBox, shown]);
+
   const follow = (n: Node) => {
     const s = new Set<string>();
     let c: Node | null = n;
@@ -1492,6 +1506,12 @@ export default function LineageMap({
       interacted.current = true; setIdleHint(false);
       return;
     }
+    // /chums2 (hideLeafImages, D73 #5): images NEVER appear in this hosting. The single
+    // -click path is gated (further down), but this double-click revealStep writes
+    // `picked` directly in the toPop block below, which pops image cards - the escape.
+    // Once the tree is fully expanded, a further double-click is simply a no-op here (no
+    // reveal, no place, no collapse), so the tree stays label-only at every interaction.
+    if (hideLeafImages) { interacted.current = true; setIdleHint(false); return; }
     // nothing left to reveal: if any shown node still hasn't popped its ancestor
     // card, pop them all (a staggered ripple, +50 each) before any collapse begins.
     const toPop = shown.filter((n) => n._parent && n.img && !picked.has(n._id));
@@ -2185,7 +2205,7 @@ export default function LineageMap({
       {packed && packLabels.extinct && (
         <div className={styles.packHead} style={{ left: packLabels.extinct.x, top: packLabels.extinct.y }}>{INSTR_NAMES.has(breed.name) ? "How it works" : "These dogs have had their days"}</div>
       )}
-      <svg className={`${styles.svg}${bounded ? " " + styles.svgBounded : ""}`} viewBox={fitBox ? `${fitBox.x - pan.x} ${fitBox.y - pan.y} ${fitBox.w} ${fitBox.h}` : `${-pan.x} ${-pan.y} ${vp.w} ${vp.h}`} width={vp.w} height={vp.h} xmlns="http://www.w3.org/2000/svg">
+      <svg className={`${styles.svg}${bounded ? " " + styles.svgBounded : ""}`} viewBox={fitBox ? `${fitBox.x - treeShiftX - pan.x} ${fitBox.y - pan.y} ${fitBox.w} ${fitBox.h}` : `${-pan.x} ${-pan.y} ${vp.w} ${vp.h}`} width={vp.w} height={vp.h} xmlns="http://www.w3.org/2000/svg">
         <g style={removing ? { pointerEvents: "none" } : undefined}>
         {hasTree ? (
           <>
@@ -3070,7 +3090,7 @@ export default function LineageMap({
       {liftRoot && hasTree && !soloLeaf && (
         <svg
           className={`${styles.svg} ${styles.svgTop}${bounded ? " " + styles.svgBounded : ""}`}
-          viewBox={fitBox ? `${fitBox.x - pan.x} ${fitBox.y - pan.y} ${fitBox.w} ${fitBox.h}` : `${-pan.x} ${-pan.y} ${vp.w} ${vp.h}`}
+          viewBox={fitBox ? `${fitBox.x - treeShiftX - pan.x} ${fitBox.y - pan.y} ${fitBox.w} ${fitBox.h}` : `${-pan.x} ${-pan.y} ${vp.w} ${vp.h}`}
           width={vp.w}
           height={vp.h}
           xmlns="http://www.w3.org/2000/svg"

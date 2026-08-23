@@ -8,14 +8,14 @@
 .rail {
   display: flex;
   flex-direction: column;
-  gap: 7px;
+  gap: 9px; /* D73 #2: 7 -> 9 (x1.25 with the bigger icons) */
 }
 
-/* item 1: icons 20% smaller (76 -> 61, glyph 42 -> 34). */
+/* D73 #2: icons 25% bigger (61 -> 76, glyph 34 -> 42, radius/label scale with them). */
 .icon {
-  width: 61px;
-  height: 61px;
-  border-radius: 16px;
+  width: 76px;
+  height: 76px;
+  border-radius: 20px;
   background: var(--navy, #0a3a57);
   border: 2.5px solid var(--yellow, #ffd23e);
   cursor: pointer;
@@ -36,6 +36,12 @@
 .icon:hover .glyph { color: var(--navy, #0a3a57); }
 .icon:hover .glyph svg { stroke: var(--navy, #0a3a57); }
 
+/* D73 #1: OPEN state - the inverted active look (yellow tile, navy glyph), the same
+   treatment as :hover, held while the card is open. Clicking again toggles it closed. */
+.iconOpen { background: var(--yellow, #ffd23e); }
+.iconOpen .glyph { color: var(--navy, #0a3a57); }
+.iconOpen .glyph svg { stroke: var(--navy, #0a3a57); }
+
 .icon:hover .label {
   opacity: 1;
   transform: translateY(-50%) translateX(0);
@@ -46,8 +52,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 34px;
+  width: 42px;   /* D73 #2: 34 -> 42 (x1.25) */
+  height: 42px;
   color: var(--yellow, #ffd23e);
   line-height: 1;
 }
@@ -61,15 +67,15 @@
 /* Tooltip label, to the RIGHT of the tile (rail sits on the left edge). */
 .label {
   position: absolute;
-  left: 72px;
+  left: 90px; /* D73 #2: 72 -> 90, clears the wider tile */
   top: 50%;
   transform: translateY(-50%) translateX(-8px);
   background: var(--navy, #0a3a57);
   border: 1.5px solid var(--yellow, #ffd23e);
   border-radius: 8px;
-  padding: 4px 10px;
+  padding: 5px 13px; /* D73 #2: x1.25 */
   font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: 0.65rem;
+  font-size: 0.8rem; /* D73 #2: 0.65 -> 0.8 */
   font-weight: 700;
   color: #ffffff;
   white-space: nowrap;

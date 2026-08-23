@@ -14,6 +14,48 @@ Baseline (measured before stage 1):
 
 ---
 
+## 2026-08-23 rail open-state, tree depth/clamp/image-gate, pack tiles, fixed card slots (D73)
+
+ICONS:
+1. Icons stay in the rail permanently (railItems no longer filters by `closed`). An icon
+   wears the inverted OPEN look (`.iconOpen`: yellow tile, navy glyph, = the hover style)
+   while its card is open; the rail click TOGGLES (toggleCard: open if closed, close if
+   open). openIds (ids not in `closed`) is passed to the rail. Card X still closes/reverts.
+2. Rail icons 25% bigger: 61 -> 76 tile, 34 -> 42 glyph, radius/label/gap scale. The
+   .diagramStage left calc's rail term follows 61 -> 76.
+
+FAMILY TREE (LineageMap, bounded):
+3. initialDepth 2 -> 4 (depths 1-4 visible on load via the existing pre-expand set).
+4. NEVER overlay the diagram (to its LEFT). The bounded tree lays out the whole tree, so
+   its leftmost node can sit left of the frozen fit frame and overdraw into the diagram.
+   MECHANISM: `treeShiftX = max(0, fitBox.x - (minX - PAD))` over ALL laid-out nodes,
+   subtracted from the viewBox x, shifts the CONTENT right so the full tree's leftmost
+   extent sits at the region's left edge (already right of the diagram zone + gutter).
+   Position only - fitBox.w (scale) is untouched (mount-once). Stable (full layout), so no
+   per-click shift. Vertical: the tree fans UP and deeper branches overdraw upward, away
+   from the left-side diagram, so no Y clamp was needed.
+5. Double-click IMAGE reveal gated: revealStep's toPop block writes `picked` directly,
+   escaping the single-click hideLeafImages gate. Added `if (hideLeafImages) return;` right
+   after the frontier auto-expand, so expand-all still works but no interaction ever reveals
+   a leaf image (no reveal/place/collapse) in this hosting.
+
+ANCESTOR PACK:
+6. Pack tile images 25% bigger: tile/grid-auto-columns 61 -> 76, gap 22/14 -> 28/18, the
+   i-button (24 -> 30) and % pill (padding/size/offset x1.25) scale so nothing collides.
+   Grid rows/columns rules unchanged.
+
+REVIEW CORRECTIONS (same push):
+1. HOVER: dropped the yellow BAND fill entirely - removed the punch-out `<path>`, its
+   effect and hlPathRef (deleted, not gated). Hover feedback everywhere is the yellow
+   OUTLINE only (tile + circle identical), via the existing `hovYellow`.
+2/3/4. CARD BAND: replaced the D72 collision grid with FIXED slots. placeCard walks the
+   cards in RAIL_ORDER accumulating x by (card width + 10px), wrapping down at the canvas
+   edge, and returns THIS card's slot - deterministic, so card N is always in slot N
+   regardless of open order (health opened first still lands in health's slot). Band top =
+   famous-chums bottom + 10 (DIRECTLY below it, ~300 up from D72's chart-based value). 10px
+   gaps both axes. Dragging + persistence + canvas min-height growth unchanged. buildSlots /
+   intersects / SLOT_STEP_* / cardById removed as dead.
+
 ## 2026-08-23 hide labels, hover outline, depth-1 stroke, health heading, card band (D72)
 
 1. HIDE LABELS: the label `visible` gains `&& !displayOnly`, so the diagram draws no

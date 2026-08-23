@@ -472,7 +472,7 @@
                + --gutter-diagram (GUTTER 4: box right -> pack leftmost circle).
        right = tree column (its 75 right offset + 840 width) + --gutter-tree (GUTTER 5:
                diagram zone right edge -> tree column left edge). */
-  left: calc(clamp(18px, 4vw, 48px) + 61px + var(--gutter-rail) + 480px + var(--gutter-diagram)); /* D66: box 600 -> 480 */
+  left: calc(clamp(18px, 4vw, 48px) + 76px + var(--gutter-rail) + 480px + var(--gutter-diagram)); /* D66: box 600 -> 480; D73: rail 61 -> 76 */
   top: 320px;
   right: var(--diagram-zone-right);
   /* Vertical extent (D58): the zone is landscape (~1176 wide), so the pack HEIGHT-binds
@@ -552,23 +552,23 @@
 
 /* Rows capped (min 2, max 3), columns grow: fixed row count, auto-flow down then
    across, so extra dogs add columns rather than a new row. Tiles are exactly one
-   rail-icon tile (61px). No internal scrollbar: every tile is visible and the
+   rail-icon tile (76px, D73). No internal scrollbar: every tile is visible and the
    page (not the grid) scrolls if the pack ever grows very wide. (D23.) */
 .packGrid {
   display: grid;
   grid-template-rows: repeat(var(--pack-rows, 2), auto);
   grid-auto-flow: column;
-  grid-auto-columns: 61px;
-  gap: 22px 14px; /* small, even; the larger badges (i-button, % pill) still clear neighbours */
+  grid-auto-columns: 76px; /* D73 #6: tiles 25% bigger (61 -> 76); rows/columns rules unchanged */
+  gap: 28px 18px; /* x1.25 so the bigger badges (i-button, % pill) still clear neighbours */
   justify-content: start;
   width: max-content;
   max-width: 100%;
 }
 
 .frame {
-  width: 61px;
-  height: 61px;
-  border-radius: 10px;
+  width: 76px; /* D73 #6: 61 -> 76 (x1.25) */
+  height: 76px;
+  border-radius: 12px;
   border: 3px solid #22c55e;
   background: transparent;
   position: relative;
@@ -600,10 +600,10 @@
 /* i-button: top-right corner. Larger (item 1); overflow still clears the gap. */
 .frameInfoBtn {
   position: absolute;
-  right: -8px;
-  top: -8px;
-  width: 24px;
-  height: 24px;
+  right: -10px; /* D73 #6: badge scaled x1.25 with the bigger tile */
+  top: -10px;
+  width: 30px;
+  height: 30px;
   border: 2px solid #ffffff;
   border-radius: 50%;
   background: var(--blue-deep, #0b78bd);
@@ -615,23 +615,23 @@
   padding: 0;
   font-style: italic;
   font-weight: 700;
-  font-size: 13px;
+  font-size: 16px;
   font-family: Georgia, serif;
   z-index: 5;
 }
 
-/* % pill: a button centred under the tile. Larger (item 1). */
+/* % pill: a button centred under the tile. Scaled x1.25 with the tile (D73 #6). */
 .framePct {
   position: absolute;
   left: 50%;
-  bottom: -11px;
+  bottom: -14px;
   transform: translateX(-50%);
   background: rgba(10, 58, 87, 0.85);
   color: var(--yellow, #ffd23e);
   border: none;
-  border-radius: 11px;
-  padding: 2px 9px;
-  font-size: 11px;
+  border-radius: 14px;
+  padding: 3px 11px;
+  font-size: 14px;
   font-weight: 700;
   font-family: Montserrat, system-ui;
   cursor: pointer;
