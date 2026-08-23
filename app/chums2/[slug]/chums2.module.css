@@ -35,11 +35,9 @@
                         (one value, identical rhythm)
        --gutter-diagram (4) intro box right edge -> resting pack's leftmost circle
        --gutter-tree    (5) diagram zone right edge -> tree column left edge
-     PACK_PULL below is not a gutter: the pack CENTRES in its stage, so to land its
-     leftmost circle exactly --gutter-diagram off the box we pull the stage left by
-     ~half its empty margin (~356px at this stage width). Retune PACK_PULL on a
-     screenshot if the pack radius shifts; a large change to --gutter-diagram or
-     --gutter-tree (which resize the stage) also nudges it. */
+     The stage edges ARE the gutters now: BreedTree's displayOnly content fit
+     (displayRestView, D57) maps the pack's left edge to the stage's left edge and
+     scales it up to fill the stage, so the old PACK_PULL is gone. */
   --gutter-rail: 40px;
   --gutter-v: 40px;
   --gutter-diagram: 60px;
@@ -427,17 +425,15 @@
    hit-tests its painted circles (zoom unchanged, empty areas pass clicks through). */
 .diagramStage {
   position: absolute;
-  /* HORIZONTAL GUTTERS (chose: reposition the stage, not left-bias the frame - the
-     pack centres in its stage, so moving the stage moves the pack, mechanism
-     untouched). All derived from the gutter vars:
+  /* HORIZONTAL GUTTERS. The stage is now the EXACT diagram zone; BreedTree's
+     displayOnly content fit (displayRestView) fills it, mapping the pack's LEFT edge to
+     this left edge and scaling it up to the right edge / height. So PACK_PULL is gone -
+     the stage edges ARE the gutters:
        left  = box RIGHT edge (leftBand pad + rail 61 + --gutter-rail + box 600)
-               + --gutter-diagram (GUTTER 4, box -> pack leftmost) - PACK_PULL(356)
-               [PACK_PULL cancels the centred pack's left margin, see .canvas note].
-       right = tree column (its 75 right offset + 840 width) + --gutter-tree (GUTTER 5,
-               diagram zone right edge -> tree column left edge). So the zone's right
-               edge sits --gutter-tree left of the tree, with the resting pack fully
-               left of that channel. */
-  left: calc(clamp(18px, 4vw, 48px) + 61px + var(--gutter-rail) + 600px + var(--gutter-diagram) - 356px);
+               + --gutter-diagram (GUTTER 4: box right -> pack leftmost circle).
+       right = tree column (its 75 right offset + 840 width) + --gutter-tree (GUTTER 5:
+               diagram zone right edge -> tree column left edge). */
+  left: calc(clamp(18px, 4vw, 48px) + 61px + var(--gutter-rail) + 600px + var(--gutter-diagram));
   top: 320px;
   right: calc(75px + 840px + var(--gutter-tree));
   bottom: 170px;

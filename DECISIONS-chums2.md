@@ -14,6 +14,37 @@ Baseline (measured before stage 1):
 
 ---
 
+## 2026-09-04 content-aware resting fit (per-breed gutters hold)
+
+### D57. displayRestView: per-breed content fit replaces DISPLAY_SPAN + PACK_PULL
+The audit (D56) confirmed the pack floats ~290-344px wide in a ~1330px zone because the
+fixed DISPLAY_SPAN view width + fixed PACK_PULL offset could not hold the gutters as the
+pack width varies per breed. Implemented the D47/D48 content fit:
+- New `displayRestView()` in BreedTree: over the VISIBLE circles (depth>=1, non-echo) it
+  computes the pack's real world bbox, then returns the resting view [cx, cy, w] as a
+  CONTAIN fit against the stage aspect: w = max(bboxW/WWperW, bboxH/((1-2m)*WHperW))
+  (WWperW/WHperW = the world width/height shown per unit w, = aspect / 1 for landscape),
+  cx = minX + (w*WWperW)/2 so the pack's LEFT edge maps to the stage's left edge
+  (left-aligned), cy = bbox centre. Uses only the bbox + aspect (stage px cancel), so no
+  ref access; safe in the useRef seeds and re-run in the mount effect.
+- Wired at every displayOnly resting/home site (viewRef & homeWRef seeds, mount effect,
+  backToStartScreen, PLAY reset, and the zoom-OUT-to-root branch) as
+  `displayOnly ? displayRestView() : [<PIT_SPAN game view>]`. Zoom-into-a-child is
+  untouched, so zoom is unchanged and zoom-out returns to this fitted frame.
+- Added a small displayOnly-only re-fit effect (deps [displayOnly, aspect, nodes]) so the
+  fit runs with the REAL stage aspect (the shared mount effect keys on [nodes, dropArmed],
+  not aspect, and aspect is measured just after the first paint) and re-fits on resize.
+- DELETED the DISPLAY_SPAN constant (no longer referenced) and the CSS PACK_PULL: the
+  stage is now the EXACT zone (left = box right + --gutter-diagram = 809; right edge =
+  tree left - --gutter-tree = 1985), and the fit fills it.
+Game paths are byte-identical (displayOnly=false reduces every site to the original
+`(dockAside ? PIT_SPAN : 1)` game view; displayRestView is never called). BreedTree stays
+at its 61-problem (54e/7w) baseline. Expected: gutter 4 = 60 for every breed, gutter 5 =
+100 when width binds (else the pack fills the zone height and gutter 5 is wider, contain
+fit) - and the pack now fills the zone, bringing the tree/chart back into view. The
+?audit=1 banner stays this round to verify the three breeds hit target; I cannot drive a
+browser under the tsc/eslint/tsx-only tool limit, so the on-screen numbers need a load.
+
 ## 2026-09-03 no drop-in on the diagram; gutter audit instrument + proposal
 
 ### D55. displayOnly skips the drop-in entrance (settled immediately)

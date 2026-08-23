@@ -186,17 +186,11 @@ const DIFF_TILT_DEG = 12.5;
 // 1 leaves things exactly as they were. Raise it to shrink the circles.
 const PIT_SHRINK = 2.1;
 const PIT_SPAN = DIFF_SPAN * PIT_SHRINK;
-// displayOnly (static /chums2 diagram) resting view ONLY. The pit's resting view
-// pulls back to PIT_SPAN (~2.54x) to leave the play arena around the pack: that
-// slack is game-load-bearing and must not change on any game path. A static
-// display has no arena, so its resting view frames the pack itself. This is the ONLY
-// thing gated on displayOnly; the pack packing (walls, sizeMul, difficulty) is shared
-// and untouched, so PIT_SPAN still cancels out of the game's pack-to-frame ratio.
-// The rig (?diag=1) confirmed the hosting is correct and uncropped; at 1.1 the pack
-// framed too big and overshot the viewport, so this is 1.7 (= 1.1 / 0.65, a 35%
-// smaller pack in the same stage). A WIDER resting view width = a smaller on-screen
-// pack. Raise for a smaller pack, lower to fill.
-const DISPLAY_SPAN = 1.7;
+// displayOnly (static /chums2 diagram) resting view: superseded 2026-09-03. The fixed
+// DISPLAY_SPAN factor (a single view width) could not hold the gutters as the pack
+// width varies per breed, so the resting frame is now a per-breed content-aware fit
+// derived from the pack's real bounding box (see displayRestView / D57). Game paths
+// still use PIT_SPAN, untouched.
 const DIFF_INSET = 16;
 // `fit` is the largest scale at which the whole cluster still fits the pit, both
 // axes, whatever the circle count. Level 10 IS that, so the hardest setting
@@ -1343,6 +1337,37 @@ export default function BreedTree({
   const circlesRef = useRef<SVGGElement>(null);
   const isMobileRef = useRef(false);
   isMobileRef.current = isMobile;
+  // displayOnly RESTING FRAME (D57): a CONTENT-AWARE contain fit derived from the
+  // pack's REAL bounding box, replacing the fixed DISPLAY_SPAN/PACK_PULL that could
+  // not hold the gutters as the pack width varies per breed. The pack's LEFT edge maps
+  // to the stage's left edge (CSS sets that to box right + --gutter-diagram), and the
+  // pack scales UP to fill the stage: its right edge reaches the stage right (= tree
+  // left - --gutter-tree) when width binds, else it fills the stage height minus a
+  // margin, whichever binds first. So gutter 4 holds for every breed and the pack fills
+  // the zone instead of floating. Uses only the pack bbox + the stage aspect (the
+  // absolute stage px cancel out of the world->screen scale), so it touches no ref and
+  // is safe in the useRef seeds below and re-run in the mount effect.
+  const displayRestView = (): View => {
+    const vis = nodes.filter((d) => !(d.depth === 0 || isEcho(d)));
+    if (vis.length === 0) return [nodes[0].x, nodes[0].y, nodes[0].r * 2 * (isMobile ? PAD : ZOOM_PAD)];
+    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+    for (const d of vis) {
+      if (d.x - d.r < minX) minX = d.x - d.r;
+      if (d.x + d.r > maxX) maxX = d.x + d.r;
+      if (d.y - d.r < minY) minY = d.y - d.r;
+      if (d.y + d.r > maxY) maxY = d.y + d.r;
+    }
+    const bboxW = maxX - minX, bboxH = maxY - minY;
+    const A = aspect;                    // stage aspect, same value the viewBox uses
+    const WWperW = A >= 1 ? A : 1;       // world WIDTH shown per unit of view-width w
+    const WHperW = A >= 1 ? 1 : 1 / A;   // world HEIGHT shown per unit of view-width w
+    const m = 0.06;                      // vertical breathing margin (height-bound case)
+    // Contain fit: the larger view-width wins (smaller pack that still fits both axes).
+    const w = Math.max(bboxW / WWperW, bboxH / ((1 - 2 * m) * WHperW));
+    const cx = minX + (w * WWperW) / 2;  // left-align: pack left edge at the stage left
+    const cy = (minY + maxY) / 2;        // vertical centre
+    return [cx, cy, w];
+  };
   // Seed the view with the SETTLED pit fit, not a placeholder. On the start screen
   // dockAside widens the root view by PIT_SPAN, and clampRootView only shifts y and
   // never the width, so this expression is the exact settled width the first render
@@ -1351,11 +1376,11 @@ export default function BreedTree({
   // the drop finished, and the pre-drop % badges, sized in an effect that only
   // re-ran on [nodes, dockAside], stayed oversized until the slider forced a
   // re-pack. Same class as the LineageMap lift-card viewport seed.
-  const viewRef = useRef<View>([nodes[0].x, nodes[0].y, nodes[0].r * 2 * (isMobile ? PAD : ZOOM_PAD) * (dockAside ? (displayOnly ? DISPLAY_SPAN : PIT_SPAN) : 1)]);
+  const viewRef = useRef<View>(displayOnly ? displayRestView() : [nodes[0].x, nodes[0].y, nodes[0].r * 2 * (isMobile ? PAD : ZOOM_PAD) * (dockAside ? PIT_SPAN : 1)]);
   // The width of the full-pit view, kept so a ring can be drawn at the weight it
   // has when you are zoomed out. Seeded with the same expression as viewRef and
   // rewritten by every site that returns the view to the root.
-  const homeWRef = useRef<number>(nodes[0].r * 2 * (isMobile ? PAD : ZOOM_PAD) * (dockAside ? (displayOnly ? DISPLAY_SPAN : PIT_SPAN) : 1));
+  const homeWRef = useRef<number>(displayOnly ? displayRestView()[2] : nodes[0].r * 2 * (isMobile ? PAD : ZOOM_PAD) * (dockAside ? PIT_SPAN : 1));
   const focusRef = useRef<Node>(nodes[0]);
   const rafRef = useRef<number>(0);
 
@@ -1774,7 +1799,7 @@ export default function BreedTree({
     setFlighting(false); // an interrupted flight must not leave the marker stranded hidden
     focusRef.current = nodes[0];
     setFocus(nodes[0]);
-    const rootV = clampRootView([nodes[0].x, nodes[0].y, nodes[0].r * 2 * (isMobileRef.current ? PAD : ZOOM_PAD) * (dockAside ? (displayOnly ? DISPLAY_SPAN : PIT_SPAN) : 1)]);
+    const rootV = clampRootView(displayOnly ? displayRestView() : [nodes[0].x, nodes[0].y, nodes[0].r * 2 * (isMobileRef.current ? PAD : ZOOM_PAD) * (dockAside ? PIT_SPAN : 1)]);
     homeWRef.current = rootV[2];
     zoomTo(rootV);
     if (!hideCaption) onToggleCaption?.();
@@ -2965,7 +2990,7 @@ export default function BreedTree({
        they play their own relPop and it arrives with a pop rather than a fade. */
     setRailHidden(false);
     onActiveChange?.(d !== nodes[0]);
-    let target: View = [d.x, d.y, dockAside && d !== nodes[0] ? d.r * 2 * (isMobileRef.current ? PAD : ZOOM_PAD) : d.r * 2 * (isMobileRef.current ? PAD : ZOOM_PAD) * (dockAside && d === nodes[0] ? (displayOnly ? DISPLAY_SPAN : PIT_SPAN) : 1)];
+    let target: View = displayOnly && d === nodes[0] ? displayRestView() : [d.x, d.y, dockAside && d !== nodes[0] ? d.r * 2 * (isMobileRef.current ? PAD : ZOOM_PAD) : d.r * 2 * (isMobileRef.current ? PAD : ZOOM_PAD) * (dockAside && d === nodes[0] ? PIT_SPAN : 1)];
     if (d === nodes[0]) target = clampRootView(target);
     if (d === nodes[0]) homeWRef.current = target[2];
     const reduce = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -3156,7 +3181,7 @@ export default function BreedTree({
     setFocus(nodes[0]);
     setReady(true);
 
-    const v: View = clampRootView([nodes[0].x, nodes[0].y, nodes[0].r * 2 * (isMobile ? PAD : ZOOM_PAD) * (dockAside ? (displayOnly ? DISPLAY_SPAN : PIT_SPAN) : 1)]);
+    const v: View = clampRootView(displayOnly ? displayRestView() : [nodes[0].x, nodes[0].y, nodes[0].r * 2 * (isMobile ? PAD : ZOOM_PAD) * (dockAside ? PIT_SPAN : 1)]);
     homeWRef.current = v[2];
     const reduce =
       typeof window !== "undefined" &&
@@ -3239,6 +3264,21 @@ export default function BreedTree({
     return () => cancelAnimationFrame(rafRef.current);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [nodes, dropArmed]);
+
+  // displayOnly (D57): keep the resting frame fitted to the pack as the stage aspect
+  // settles after mount (the layout effect measures it just after the first paint) and
+  // on resize. The shared mount effect keys on [nodes, dropArmed], NOT aspect, so this
+  // dedicated pass is what guarantees the content fit runs with the REAL aspect (and
+  // re-fits on resize). Gated on displayOnly; it never touches game paths. It fires only
+  // on aspect/nodes changes, not on a drill-in, so zoom is unaffected.
+  useEffect(() => {
+    if (!displayOnly) return;
+    const v = clampRootView(displayRestView());
+    homeWRef.current = v[2];
+    focusRef.current = nodes[0];
+    zoomTo(v);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [displayOnly, aspect, nodes]);
 
   // Closing the blue box used to be the way out of LEARN. It is not any more:
   // the corner X is the single exit everywhere, on the start screen, in play and
@@ -7115,7 +7155,7 @@ export default function BreedTree({
             cancelAnimationFrame(rafRef.current);
             focusRef.current = nodes[0];
             setFocus(nodes[0]);
-            const rootV = clampRootView([nodes[0].x, nodes[0].y, nodes[0].r * 2 * (isMobileRef.current ? PAD : ZOOM_PAD) * (dockAside ? (displayOnly ? DISPLAY_SPAN : PIT_SPAN) : 1)]);
+            const rootV = clampRootView(displayOnly ? displayRestView() : [nodes[0].x, nodes[0].y, nodes[0].r * 2 * (isMobileRef.current ? PAD : ZOOM_PAD) * (dockAside ? PIT_SPAN : 1)]);
             homeWRef.current = rootV[2];
             zoomTo(rootV);
             // Hide the open info box as the round begins.
