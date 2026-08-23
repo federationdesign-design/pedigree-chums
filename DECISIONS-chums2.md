@@ -14,6 +14,31 @@ Baseline (measured before stage 1):
 
 ---
 
+## 2026-08-23 tree scale frozen; box slimmed; pack +15%; 2-circle row (D66)
+
+1. TREE SCALE FROZEN. Audit of every bounded viewBox/scale path I added:
+   - fitBox (LineageMap ~962): the ONLY scale-setting site. Its D64/D65 grow logic
+     (`cb = boundsOf(open)` + max-with-cb) fired on each click's `open` change -> rescale.
+     THE CULPRIT. Deleted the grow entirely: it now frames ONLY the initial depth-2 set
+     (`boundsOf(initOpen)`, open-independent), so the value is identical on every render.
+   - D63 full-layout walk gate (~844): sets `shown` to the whole tree; NOT a scale site
+     (fitBox filters to initOpen). Kept (gives stable positions + overdraw of revealed nodes).
+   - pan (drag) / vp (resize): translate + aspect only, not click-driven. Not culprits.
+   Rule now met: scale set once at mount, never changes; deeper branches OVERDRAW beyond
+   the fixed frame (page allows free overdraw).
+2. INTRO BOX: width 600 -> 480px (x0.8); drop shadow and border/stroke removed (flat navy).
+   `.diagramStage` left calc 600 -> 480, so the zone left follows: box right 749 -> 629,
+   stage left 809 -> 689 (gutter 4 still 60).
+3. PACK +15%: displayRestView divides the fitted view-width by DISPLAY_FILL = 1.15 (the
+   pack is height-bound, so a smaller w renders it 15% larger; it overfills the stage
+   height ~8% and spills a few px top/bottom as overdraw). Yorkshire audit maths: last
+   height-bound width ~511px -> ~588px (x1.15). With the box-driven shift the pack now sits
+   ~689..1277, so gutter 5 ~52 (was ~9; the diagram moved left with the box, tree held).
+4. TWO-CIRCLE ROW: in relayoutMobile (the displayOnly relayout site), added a
+   `wantTwoRow = displayOnly && n === 2` case: the wide->tall rotation is FLIPPED to force
+   the pair WIDE (rotate only when h0 > w0), and the DIFF_TILT lean is skipped so the pair
+   stays level. Three-plus circles untouched. `displayOnly` now passed into relayoutMobile.
+
 ## 2026-08-23 revert taper; fix bounded-tree rest size (D64)
 
 1. STROKE TAPER REVERTED (D62 item 3 undone): removed the displayOnly early-return in

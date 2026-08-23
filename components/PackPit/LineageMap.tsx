@@ -961,40 +961,31 @@ export default function LineageMap({
   // screen on load. The pit path (bounded=false) is untouched.
   const fitBox = useMemo(() => {
     if (!bounded || shown.length === 0) return null;
-    // `shown` is the whole tree (deterministic positions), but the frame must size to
-    // the VISIBLE set, not the full constellation, or the initial depth-2 view is shrunk
-    // to whole-tree scale. A node is visible when its parent is expanded (or it is root).
-    const boundsOf = (openSet: Set<string>) => {
-      let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-      for (const n of shown) {
-        if (n._parent && !openSet.has((n._parent as Node)._id)) continue; // not revealed
-        minX = Math.min(minX, n._x); minY = Math.min(minY, n._y);
-        maxX = Math.max(maxX, n._x); maxY = Math.max(maxY, n._y);
-      }
-      return { minX, minY, maxX, maxY };
-    };
+    // SCALE IS SET ONCE, at mount, from the INITIAL depth-2 visible set, and never
+    // changes: no grow, no re-fit on a click (the pit never rescales on a node click
+    // either). `shown` carries the whole deterministic layout; here we frame only the
+    // nodes visible at initialDepth (root, plus nodes whose parent is open at that
+    // depth). Anything the user later reveals simply OVERDRAWS beyond this frame (the
+    // page allows free overdraw). `open` is deliberately NOT read, so no expand can
+    // change the frame: boundsOf(initOpen) is identical on every render.
     const initOpen = initialDepth ? openIdsToDepth(root, initialDepth) : new Set<string>(["0"]);
-    const ib = boundsOf(initOpen); // the fixed INITIAL (depth-2) content
-    const cb = boundsOf(open);     // whatever is revealed NOW
-    if (!isFinite(ib.minX)) return null;
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    for (const n of shown) {
+      if (n._parent && !initOpen.has((n._parent as Node)._id)) continue; // outside the depth-2 set
+      minX = Math.min(minX, n._x); minY = Math.min(minY, n._y);
+      maxX = Math.max(maxX, n._x); maxY = Math.max(maxY, n._y);
+    }
+    if (!isFinite(minX)) return null;
     const PAD = 120; // clears the largest node circle plus its name pill
-    // Fixed pivot = centre of the initial depth-2 content (it maps to the region centre).
-    // The frame is centred here and only GROWS: its half-extents are the initial
-    // half-size, raised to whatever the current visible set pokes OUTSIDE it. Because
-    // `open` only ever grows (accumulate), the frame only ever grows too - and a click
-    // whose new children stay inside leaves the half-extents unchanged, so no rescale.
-    // Rescaling is thus gentle and centred on the region, never a pan/jump.
-    const cx = (ib.minX + ib.maxX) / 2, cy = (ib.minY + ib.maxY) / 2;
-    const hw = Math.max((ib.maxX - ib.minX) / 2, cx - cb.minX, cb.maxX - cx) + PAD;
-    const hh = Math.max((ib.maxY - ib.minY) / 2, cy - cb.minY, cb.maxY - cy) + PAD;
-    let minX = cx - hw, minY = cy - hh, w = 2 * hw, h = 2 * hh;
+    minX -= PAD; minY -= PAD; maxX += PAD; maxY += PAD;
+    let w = maxX - minX, h = maxY - minY;
     // Grow the shorter axis to the container's aspect so meet-fit fills it and
     // centres the tree rather than leaving one axis heavily letterboxed.
     const aspect = vp.w / Math.max(1, vp.h);
     if (w / h < aspect) { const nw = h * aspect; minX -= (nw - w) / 2; w = nw; }
     else { const nh = w / aspect; minY -= (nh - h) / 2; h = nh; }
     return { x: minX, y: minY, w, h };
-  }, [bounded, shown, open, vp.w, vp.h, root, initialDepth]);
+  }, [bounded, shown, vp.w, vp.h, root, initialDepth]);
 
   const follow = (n: Node) => {
     const s = new Set<string>();

@@ -888,7 +888,7 @@ function normalizeTop(nodes: Node[]) {
 
 // How much of the available stage the mobile masonry fills. The mini pit runs at
 // 0.85 so the circles sit 15% smaller; the breed page keeps the full fill.
-function relayoutMobile(nodes: Node[], aspect: number, level: number | null = null, sizeMul = 1) {
+function relayoutMobile(nodes: Node[], aspect: number, level: number | null = null, sizeMul = 1, displayOnly = false) {
   const root = nodes[0];
   const kids = root.children ?? [];
   const n = kids.length;
@@ -917,12 +917,17 @@ function relayoutMobile(nodes: Node[], aspect: number, level: number | null = nu
   const d1 = pts.filter((p) => p.d.depth === 1);
   const w0 = Math.max(...d1.map((p) => p.x)) - Math.min(...d1.map((p) => p.x));
   const h0 = Math.max(...d1.map((p) => p.y)) - Math.min(...d1.map((p) => p.y));
-  // turn a wide cluster on its side so the long axis runs down the portrait
-  if (w0 > h0) pts.forEach((p) => { const t = p.x; p.x = p.y; p.y = -t; });
-  // and then lean the pair off vertical. A rigid rotation of the whole cloud,
-  // so every nested circle keeps its place inside its parent. The bounding box
-  // below is measured after this, so the fit already allows for it.
-  if (level !== null && n === 2 && DIFF_TILT_DEG) {
+  // Normally turn a WIDE cluster on its side so the long axis runs down the portrait.
+  // chums2 #4: a TWO-circle pack must instead sit side by side in a ROW, so force it
+  // WIDE - rotate only when it is currently taller than wide (h0 > w0). Three-plus
+  // circles are untouched (wantTwoRow is false). displayOnly-gated.
+  const wantTwoRow = displayOnly && n === 2;
+  if (wantTwoRow ? h0 > w0 : w0 > h0) pts.forEach((p) => { const t = p.x; p.x = p.y; p.y = -t; });
+  // and then lean the pair off vertical. A rigid rotation of the whole cloud, so every
+  // nested circle keeps its place inside its parent. The bounding box below is measured
+  // after this, so the fit already allows for it. Skipped for the chums2 two-row pack,
+  // which must stay level (horizontal), not leaned onto a diagonal.
+  if (level !== null && n === 2 && DIFF_TILT_DEG && !wantTwoRow) {
     const t = (DIFF_TILT_DEG * Math.PI) / 180, cs = Math.cos(t), sn = Math.sin(t);
     pts.forEach((p) => {
       const nx = p.x * cs - p.y * sn;
@@ -1316,7 +1321,7 @@ export default function BreedTree({
     // parent and its children read as one solid nest with no gap ring. (chums2 #4.)
     const ns = pack<LineageNode>().size([SIZE, SIZE]).padding(displayOnly ? 0 : 8)(h).descendants();
     normalizeTop(ns);
-    if (isMobile || dockAside) relayoutMobile(ns, aspectKey, dockAside ? level : null, isMobile ? 1 : 0.6);
+    if (isMobile || dockAside) relayoutMobile(ns, aspectKey, dockAside ? level : null, isMobile ? 1 : 0.6, displayOnly);
     // /chums2 (displayOnly) OFF-CENTRE inner circles (chums2 #2, revised): d3 pack +
     // the relayout leave a parent's child cluster on the parent's vertical centreline,
     // over its name label. A leftward shift did not clear it (the pair re-centred), so
@@ -1403,8 +1408,13 @@ export default function BreedTree({
     const WWperW = A >= 1 ? A : 1;       // world WIDTH shown per unit of view-width w
     const WHperW = A >= 1 ? 1 : 1 / A;   // world HEIGHT shown per unit of view-width w
     const m = 0.03;                      // vertical breathing margin (height-bound case)
+    // The pack is height-bound, so to render it 15% LARGER at rest we shrink the fitted
+    // view-width by the same factor (equivalent to trimming the vertical margin past 0):
+    // the pack then overfills the stage height by ~8% and spills a few px past top and
+    // bottom, which the page draws freely (overdraw). (D66 item 3.)
+    const DISPLAY_FILL = 1.15;
     // Contain fit: the larger view-width wins (smaller pack that still fits both axes).
-    const w = Math.max(bboxW / WWperW, bboxH / ((1 - 2 * m) * WHperW));
+    const w = Math.max(bboxW / WWperW, bboxH / ((1 - 2 * m) * WHperW)) / DISPLAY_FILL;
     const cx = minX + (w * WWperW) / 2;  // left-align: pack left edge at the stage left
     const cy = (minY + maxY) / 2;        // vertical centre
     return [cx, cy, w];

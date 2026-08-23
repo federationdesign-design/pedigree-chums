@@ -255,14 +255,12 @@
 }
 
 .introBox {
-  /* Concept proportion: narrow-and-tall (~600px, ~8 lines), NOT the wide-short
-     800px version. Height is text-driven. The diagram zone's left edge is derived
-     from this width (box right + 20) in .diagramStage, so keep them in step. */
-  width: 600px;
+  /* Height is text-driven. Width was 600px; reduced 20% -> 480px (D66). The diagram
+     zone's left edge is derived from this width in .diagramStage, so they move in step
+     (updated there too). Drop shadow and border/stroke removed (D66): flat navy panel. */
+  width: 480px;
   border-radius: 24px;
   background: var(--navy, #0a3a57);
-  border: 2.5px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.35);
   padding: 20px 0; /* top/bottom inset; the body carries the side inset */
 }
 
@@ -455,7 +453,7 @@
                + --gutter-diagram (GUTTER 4: box right -> pack leftmost circle).
        right = tree column (its 75 right offset + 840 width) + --gutter-tree (GUTTER 5:
                diagram zone right edge -> tree column left edge). */
-  left: calc(clamp(18px, 4vw, 48px) + 61px + var(--gutter-rail) + 600px + var(--gutter-diagram));
+  left: calc(clamp(18px, 4vw, 48px) + 61px + var(--gutter-rail) + 480px + var(--gutter-diagram)); /* D66: box 600 -> 480 */
   top: 320px;
   right: var(--diagram-zone-right);
   /* Vertical extent (D58): the zone is landscape (~1176 wide), so the pack HEIGHT-binds
