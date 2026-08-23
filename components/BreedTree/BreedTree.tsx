@@ -520,6 +520,12 @@ function titleDy(r: number): number {
   return -Math.max(0, r) * TITLE_DY_FRAC;
 }
 const TITLE_ANGLE = 4; // was 1 (was -5); +3 more degrees clockwise (14 August 2026). Learn circle labels only.
+// chums2 stroke-only diagram (2026-08-23): the centred name (no photo now) takes a
+// small LEFT nudge and a slight counter-rotation, in place of the game's right-shifted
+// +4deg arc. DX is a fraction of the fit radius (negative = left), ROT is degrees. Both
+// tunable, both displayOnly-gated at the label draw.
+const DISPLAY_LABEL_DX = -0.08;
+const DISPLAY_LABEL_ROT_DEG = -3;
 type Node = HierarchyCircularNode<LineageNode>;
 
 // A circle whose name repeats its parent's is not a second animal. It is the
@@ -2759,6 +2765,12 @@ export default function BreedTree({
     return stroke;
   }
   function strokeWidthFor(d: Node): number {
+    // chums2 #3: gentler taper. The game's ring is radius-proportional (d.r x the
+    // descending RING_FRAC table below), so nested rings roughly HALVE per depth. For
+    // the stroke-only displayOnly diagram, make each nested level 0.9x its PARENT's
+    // ring instead: recurse to the depth-1 ring (which keeps the radius-proportional
+    // width below) and apply 0.9 per level under it. displayOnly-gated; game untouched.
+    if (displayOnly && d.depth >= 2 && d.parent) return strokeWidthFor(d.parent) * 0.9;
     // A ring is a FRACTION OF ITS OWN RADIUS, not a fixed number. Two things
     // resize a circle: the view zoom, and the difficulty slider, which rescales
     // the radii directly. A flat width tracked neither, so a circle could halve
@@ -5785,10 +5797,11 @@ export default function BreedTree({
                 <circle
                   data-n={i}
                   className={circleCls}
-                  // chums2 #3: the diagram is STROKE-ONLY - no photo, no depth fill,
-                  // transparent inside, just the white ring. The hover-yellow highlight
-                  // (#1) is the one exception, keeping its solid yellow fill.
-                  fill={hidden ? "none" : isHi ? "var(--yellow, #ffd23e)" : displayOnly ? "none" : nodeImg(d) ? `url(#bt-img-${i})` : fillFor(d)}
+                  // chums2 #3: the diagram is STROKE-ONLY - no photo, no depth fill, just
+                  // the white ring. Uses "transparent" (NOT "none") so the whole disc
+                  // still HIT-TESTS for hover (none only hit-tests the stroke line, which
+                  // barely works). The hover-yellow highlight keeps its solid fill.
+                  fill={hidden ? "none" : isHi ? "var(--yellow, #ffd23e)" : displayOnly ? "transparent" : nodeImg(d) ? `url(#bt-img-${i})` : fillFor(d)}
                   // displayOnly (chums2 diagram): every circle outline is WHITE at
                   // every depth, in place of the yellow/navy/blue depth strokes. Only
                   // the node circle stroke here; hidden circles keep "none". Gated on
@@ -6109,11 +6122,11 @@ export default function BreedTree({
                       if (!labelFits(widthEm, lines.length, fs, rFit)) return null;
                       // Rightward shift, matched to labelFits' dxR so the draw and
                       // the fit agree; the block also rotates about this new centre.
-                      // chums2 #5: with the photos gone the NAME is the content, so it
-                      // must sit inside the ring. The game's rightward shift + arc angle
-                      // push it past the rim, so displayOnly draws it CENTRED and level
-                      // (dx 0, no rotation), where the fit radius already contains it.
-                      const dx = displayOnly ? 0 : TITLE_DX_FRAC * rFit;
+                      // chums2 #5/#2: with the photos gone the NAME is the content and
+                      // must sit inside the ring, so displayOnly drops the game's big
+                      // right shift + arc for a small LEFT nudge (DISPLAY_LABEL_DX) and a
+                      // slight counter-rotation (DISPLAY_LABEL_ROT_DEG), both tunable.
+                      const dx = displayOnly ? DISPLAY_LABEL_DX * rFit : TITLE_DX_FRAC * rFit;
                       return (
                         <text
                           x={dx}
@@ -6127,7 +6140,7 @@ export default function BreedTree({
                           data-kfit={kL}
                           data-lsfit={ls}
                           y={labelFirstY(lines.length, fs, rFit)}
-                          transform={displayOnly ? undefined : `rotate(${TITLE_ANGLE} ${dx} ${titleDy(rFit)})`}
+                          transform={`rotate(${displayOnly ? DISPLAY_LABEL_ROT_DEG : TITLE_ANGLE} ${dx} ${titleDy(rFit)})`}
                           style={{
                             fill: d === hovered ? "var(--yellow, #ffd23e)" : "#ffffff",
                             fontFamily: "var(--font-display), system-ui, sans-serif",

@@ -16,13 +16,12 @@
    global rule clips overflow-x). (D30.) */
 .canvas {
   position: relative;
-  /* The tree/chart column is canvas-right-anchored, so trimming min-width pulls the
-     zone right edge, the tree and the chart LEFT together (--diagram-zone-right stays
-     1015). Trimmed 2750 -> 2344 (D61) so the zone right edge (2344 - 1015 = 1329) sits
-     just past the height-bound pack's ~1320 right edge: stage width ~520 (still aspect
-     > 0.68 so the pack stays height-bound and unchanged), tree left 1429 (gutter 5
-     ~109, was 520), tree right 2269 + a 75px margin. Body min-width matches (globals). */
-  min-width: 2344px;
+  /* Right-side content is canvas-right-anchored. D62: trimmed 2344 -> 2244 (100px) and
+     raised --diagram-zone-right 1015 -> 915 (same 100) so the zone right edge stays at
+     1329 (pack UNCHANGED, still height-bound at aspect ~0.74 > 0.68) while the tree/chart
+     abut the zone edge - 100px further left. Numbers: zone right 1329, stage width 520,
+     tree left 1329, tree right 2169 + 75px margin, gutter 5 ~9. Body matches (globals). */
+  min-width: 2244px;
   background: transparent;
   font-family: var(--font-body, 'Montserrat', system-ui);
   /* Own stacking context so the diagram's z-index:-1 (behind everything) is contained
@@ -44,14 +43,18 @@
   --gutter-rail: 40px;
   --gutter-v: 40px;
   --gutter-diagram: 60px;
+  /* --gutter-tree WAS the gap between the diagram zone right edge and the tree column.
+     D62 pulled the tree/chart 100px further left, consuming that gap, so the tree now
+     ABUTS the zone right edge (its offset drops the --gutter-tree term). Kept defined
+     for history; the visible pack->tree gap is now just the small pack->zone slack. */
   --gutter-tree: 100px;
   /* The diagram zone's RIGHT edge, as an offset from the canvas right edge. The tree
-     and chart columns derive from it (they sit --gutter-tree to its right), and the
-     .diagramStage uses it directly, so the tree FOLLOWS the stage (D59). Everything on
-     the right is canvas-right-anchored, so shrinking min-width (below) pulls the stage
-     right edge, the tree and the chart LEFT together - gutter 5 preserved - while the
-     left-anchored pack stays put and, being height-bound at aspect >= 1, is unchanged. */
-  --diagram-zone-right: 1015px;
+     and chart columns derive from it and .diagramStage uses it directly, so the tree
+     FOLLOWS the stage. Everything on the right is canvas-right-anchored. D62 trimmed the
+     canvas 100px AND raised this 1015 -> 915 by the same 100, so the zone right edge
+     (canvas - this) stays at 1329 (stage 809..1329, width 520, aspect ~0.74 > the 0.68
+     height-bind threshold): the pack is UNCHANGED while the tree/chart come in 100px. */
+  --diagram-zone-right: 915px;
   /* /chums2 uses the concept yellow (#fff200) in place of the site token
      (#ffd23e). Overriding --yellow HERE, at the page canvas, recolours every
      yellow element on the page in one place: the title breed name, the pack
@@ -237,7 +240,7 @@
 .treeRegion {
   position: absolute;
   top: 300px;
-  right: calc(var(--diagram-zone-right) - var(--gutter-tree) - 840px);
+  right: calc(var(--diagram-zone-right) - 840px); /* D62: abuts the zone right edge (pulled 100px left) */
   width: 840px;
   height: 500px;
 }
@@ -247,7 +250,7 @@
 .chartRegion {
   position: absolute;
   top: 840px;
-  right: calc(var(--diagram-zone-right) - var(--gutter-tree) - 840px);
+  right: calc(var(--diagram-zone-right) - 840px); /* D62: abuts the zone right edge (pulled 100px left) */
   width: 840px;
 }
 
