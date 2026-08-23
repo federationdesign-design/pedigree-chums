@@ -14,6 +14,30 @@ Baseline (measured before stage 1):
 
 ---
 
+## 2026-09-02 five resting-layout gutters as CSS vars
+
+### D54. Gutters 1-5 driven by four vars at the top of chums2.module.css
+Steve numbered five resting-layout gutters; set as four vars on .canvas (gutter-v is
+shared by 2 & 3) so every horizontal offset derives from them and tuning is one line:
+  --gutter-rail: 40px    (1) rail right edge -> intro column left edge = leftBand gap.
+  --gutter-v: 40px       (2) intro box -> ANCESTOR PACK = upperBand gap, AND
+                         (3) pack -> FAMOUS CHUMS = introStack gap. Identical rhythm.
+  --gutter-diagram: 60px (4) intro box right -> resting pack's leftmost circle (wider
+                         than the old 20px). Every left-column item already shares the
+                         one left edge (introStack align-items:flex-start).
+  --gutter-tree: 100px   (5) diagram zone right edge -> tree column left edge.
+Derived .diagramStage offsets (at a >=1200px viewport, leftBand pad 48):
+  left = calc(48 + rail 61 + --gutter-rail + box 600 + --gutter-diagram - PACK_PULL 356)
+       = 453px. PACK_PULL (356) is NOT a gutter: the pack centres in its stage, so we
+       pull the stage left by ~half its empty margin to land the leftmost circle exactly
+       --gutter-diagram off the box. box right = 749, pack leftmost = 809, gutter 4 = 60.
+  right = calc(tree 75 + tree 840 + --gutter-tree) = 1015px -> zone right edge 1985,
+       tree left 2085, gutter 5 = 100. The tree stays at its far-right concept position;
+       the resting pack (small, D48) sits fully left of the 100px channel, with extra
+       air between it and the channel until the pack is enlarged (D48). PACK_PULL is a
+       documented constant, re-tune on a screenshot if the pack radius or a big
+       --gutter-diagram/--gutter-tree change shifts the stage width.
+
 ## 2026-09-01 diagram: tight-left gutter, white outlines, behind everything, photos back
 
 ### D53. Horizontal gutters, white strokes, z-order behind, hideCircleImages removed

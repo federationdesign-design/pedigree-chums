@@ -26,6 +26,24 @@
      between the canvas background and the canvas content, not escaped to the root
      behind the body gradient/paw pattern. */
   isolation: isolate;
+  /* ── THE FIVE RESTING-LAYOUT GUTTERS (concept proportions at 3000px) ──────────
+     Every horizontal offset below derives from these, so tuning a channel is a
+     one-line change here. (Zoom keeps overdrawing freely; these bind the RESTING
+     layout only.)
+       --gutter-rail    (1) rail right edge  -> intro column left edge
+       --gutter-v       (2 & 3) intro box -> ANCESTOR PACK, and pack -> FAMOUS CHUMS
+                        (one value, identical rhythm)
+       --gutter-diagram (4) intro box right edge -> resting pack's leftmost circle
+       --gutter-tree    (5) diagram zone right edge -> tree column left edge
+     PACK_PULL below is not a gutter: the pack CENTRES in its stage, so to land its
+     leftmost circle exactly --gutter-diagram off the box we pull the stage left by
+     ~half its empty margin (~356px at this stage width). Retune PACK_PULL on a
+     screenshot if the pack radius shifts; a large change to --gutter-diagram or
+     --gutter-tree (which resize the stage) also nudges it. */
+  --gutter-rail: 40px;
+  --gutter-v: 40px;
+  --gutter-diagram: 60px;
+  --gutter-tree: 100px;
   /* /chums2 uses the concept yellow (#fff200) in place of the site token
      (#ffd23e). Overriding --yellow HERE, at the page canvas, recolours every
      yellow element on the page in one place: the title breed name, the pack
@@ -148,7 +166,7 @@
   display: flex;
   flex-direction: row;
   align-items: flex-start;
-  gap: 5px; /* item 5: rail-to-box gap tightened to ~a third of the old 14px */
+  gap: var(--gutter-rail); /* GUTTER 1: rail right edge -> intro column left edge */
   margin-top: 6px; /* item 7: tighter chum-square-to-first-icon gap */
   padding-left: clamp(18px, 4vw, 48px);
   padding-right: clamp(20px, 2.5vw, 44px); /* keep the lower band off the right edge */
@@ -159,7 +177,7 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start; /* intro box and ancestor pack left-align together */
-  gap: 20px; /* box-to-pack and pack-to-famous rhythm (matching, brief 4) */
+  gap: var(--gutter-v); /* GUTTER 3: ancestor pack -> FAMOUS CHUMS (== gutter 2) */
   min-width: 0;
   flex: 1 1 auto; /* fill the band width so the lower band (famous + chart) can be wide */
   /* This wrapper is full-width and now sits OVER the behind-diagram, so it must not
@@ -182,7 +200,7 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 20px; /* intro-box-to-pack rhythm (the pack sits directly below the box) */
+  gap: var(--gutter-v); /* GUTTER 2: intro box -> ANCESTOR PACK (== gutter 3) */
 }
 
 /* Top row: just the intro box now (the tree moved to the top-right corner). */
@@ -396,10 +414,8 @@
    The RIG's EXACT hosting (same stage construction, fill mode, props, DISPLAY_SPAN),
    the ONLY difference being it is positioned over the concept's red zone instead of
    the whole canvas. A canvas-child region defined ONLY by offsets (no size box, no
-   background/border/radius, no overflow), there only to be measured:
-     - left  = the intro column's RIGHT edge = leftBand padding + rail(61) + gap(5) +
-               intro box(600) + 20  (so the zone left follows box right + 20, brief 4)
-     - right 915 = right edge at 2085 = the tree column's left edge (0.695 * 3000)
+   background/border/radius, no overflow), there only to be measured. left/right are
+   derived from the gutter vars (see the rule below); top/bottom:
      - top 320   = just below the header/subtitle (header padding-top + chum square)
      - bottom 170 = ~the FAMOUS-CHUMS row bottom (the left column ends there; the
                    far-right chart runs lower, so this pulls the zone up off it). This
@@ -413,16 +429,17 @@
   position: absolute;
   /* HORIZONTAL GUTTERS (chose: reposition the stage, not left-bias the frame - the
      pack centres in its stage, so moving the stage moves the pack, mechanism
-     untouched). The centred pack must sit TIGHT to the intro box: leftmost circle
-     ~20px from box right (box right 714 + 20 = 734), with the WIDE gutter on the
-     RIGHT (pack -> tree). The centred pack's left margin is ~(stageW - packW)/2 ~
-     314px, so pull the stage left by that: left = 734 - 314 = 420, and right grows by
-     the same 314 (915 -> 1229) so the stage width (pack size) is unchanged. The
-     314 is off the estimated pack radius; nudge on a 3000 screenshot if needed. The
-     stage's empty left overhangs the intro box (transparent, no pack there). */
-  left: 420px;
+     untouched). All derived from the gutter vars:
+       left  = box RIGHT edge (leftBand pad + rail 61 + --gutter-rail + box 600)
+               + --gutter-diagram (GUTTER 4, box -> pack leftmost) - PACK_PULL(356)
+               [PACK_PULL cancels the centred pack's left margin, see .canvas note].
+       right = tree column (its 75 right offset + 840 width) + --gutter-tree (GUTTER 5,
+               diagram zone right edge -> tree column left edge). So the zone's right
+               edge sits --gutter-tree left of the tree, with the resting pack fully
+               left of that channel. */
+  left: calc(clamp(18px, 4vw, 48px) + 61px + var(--gutter-rail) + 600px + var(--gutter-diagram) - 356px);
   top: 320px;
-  right: 1229px;
+  right: calc(75px + 840px + var(--gutter-tree));
   bottom: 170px;
   pointer-events: none;
   /* Z-ORDER: the whole diagram sits BEHIND every section. .canvas is isolated (its
