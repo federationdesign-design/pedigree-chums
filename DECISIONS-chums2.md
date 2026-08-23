@@ -14,6 +14,32 @@ Baseline (measured before stage 1):
 
 ---
 
+## 2026-08-24 mobile stage 3: three phone-review corrections (D79)
+
+Chums2Mobile only; desktop byte-identical.
+
+HEADER (item 1): was square-on-top, centred (stage 1). Now the desktop arrangement scaled
+down: `.header` flex-ROW, square on the left, a new `.headerText` column (lead + name +
+subtitle) to its right, left-aligned. Sizes: 84px square + 14px gap (leaves ~250px for the
+title on a 390px viewport), 14px lead, 26px name (down from the stacked 96/15/30); long breed
+names wrap via overflow-wrap.
+
+RAIL (item 2): was flex-wrap (ragged). Now `display:grid; grid-template-columns:repeat(5,46px);
+justify-content:center` so 9 icons land exactly 5 + 4, even columns, no ragged wrap; the 4-icon
+row sits under the first four columns.
+
+FAMOUS CHUMS (item 3): was the shared component's flex-wrap strip of fixed-200px cards = one
+per row on a phone (a single stack). Forced to 2 columns by overriding the strip STRUCTURALLY
+from the wrapper - `.famousWrap > div > div { display:grid; grid-template-columns:1fr 1fr }`
+plus `> * { width:auto }` on the cards. The strip is the only <div> child of the section (h2 is
+its sibling), so the selector is unambiguous; higher specificity than the component's own rules,
+so it wins. No edit to FamousDogsSection, no :global, desktop untouched. Odd counts leave the
+trailing cell empty (grid).
+
+Gates: tsc clean, eslint clean on Chums2Mobile, no bare :global selector in the mobile CSS.
+
+---
+
 ## 2026-08-24 mobile stage 2: bottom rail + content slot (D78)
 
 Chums2Mobile only; desktop byte-identical; behind MOBILE_SECTIONS flags (rail/slot/lifespan

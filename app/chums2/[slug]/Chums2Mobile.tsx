@@ -276,11 +276,13 @@ export default function Chums2Mobile({ name, slug, image, info, lineage }: Props
         <header className={styles.header}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img className={styles.headerImg} src={image} alt={name} />
-          <h1 className={styles.title}>
-            <span className={styles.titleLead}>Learn about the</span>
-            <span className={styles.titleName}>{name}</span>
-          </h1>
-          {info.subtitle && <p className={styles.subtitle}>{info.subtitle}</p>}
+          <div className={styles.headerText}>
+            <h1 className={styles.title}>
+              <span className={styles.titleLead}>Learn about the</span>
+              <span className={styles.titleName}>{name}</span>
+            </h1>
+            {info.subtitle && <p className={styles.subtitle}>{info.subtitle}</p>}
+          </div>
         </header>
       )}
 

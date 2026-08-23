@@ -9,22 +9,31 @@
   box-sizing: border-box;
 }
 
-/* Header: chum square on top, wrapped title below, subtitle under it. Centred. Proposal
-   (Steve to judge): 96px square, 20px lead / 30px name. */
+/* Header: chum square INLINE on the left, title block (lead + name + subtitle) wrapped to its
+   right - the desktop arrangement scaled to phone width. Square 84px + 14px gap leaves ~250px
+   for the title on a 390px viewport; long breed names wrap. Sizes: 84px square, 14px lead,
+   26px name (down from the stacked 96/15/30). */
 .header {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  text-align: center;
-  gap: 8px;
+  justify-content: flex-start;
+  text-align: left;
+  gap: 14px;
   margin-bottom: 18px;
 }
 .headerImg {
-  width: 96px;
-  height: 96px;
-  border-radius: 20px;
+  flex: 0 0 auto;
+  width: 84px;
+  height: 84px;
+  border-radius: 18px;
   object-fit: cover;
   border: 3px solid var(--yellow, #fff200);
+}
+.headerText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
 }
 .title {
   margin: 0;
@@ -35,19 +44,21 @@
 .titleLead {
   font-family: var(--font-body, 'Montserrat', system-ui);
   font-weight: 700;
-  font-size: 15px;
+  font-size: 14px;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: #ffffff;
 }
 .titleName {
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
-  font-size: 30px;
+  font-size: 26px;
+  line-height: 1.05;
   letter-spacing: 0.01em;
   color: var(--yellow, #fff200);
+  overflow-wrap: break-word;
 }
 .subtitle {
-  margin: 2px 0 0;
+  margin: 4px 0 0;
   font-family: var(--font-body, 'Montserrat', system-ui);
   font-size: 13px;
   font-weight: 600;
@@ -224,8 +235,22 @@
   cursor: pointer;
 }
 
-/* Famous chums: the shared section at full mobile width. */
+/* Famous chums: the shared section at full mobile width, forced to a 2-column grid. The
+   component ships a flex-wrap strip of fixed-200px cards (one per row on a phone = a single
+   stack). Override structurally from here (no edit to the shared file, no :global): the strip
+   is the only <div> child of the section (h2 is the sibling), and the cards are its children.
+   Higher specificity than the component's own rules, so this wins; desktop is untouched. Odd
+   card counts leave the trailing grid cell empty. */
 .famousWrap { margin-top: 8px; }
+.famousWrap > div > div {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.famousWrap > div > div > * {
+  width: auto;
+  min-width: 0;
+}
 
 /* Hidden BreedTreeMap feed: off-screen, no paint. */
 .hiddenMap {
@@ -287,9 +312,10 @@
   right: 0;
   bottom: 0;
   z-index: 90;
-  display: flex;
-  flex-wrap: wrap;
-  align-content: center;
+  /* Exactly 5 per row, two even rows: 9 icons land 5 + 4, no ragged wrap. The track group is
+     centred; the 4-icon row sits under the first four columns. */
+  display: grid;
+  grid-template-columns: repeat(5, 46px);
   justify-content: center;
   gap: 8px 10px;
   padding: 10px 10px calc(10px + env(safe-area-inset-bottom, 0px));
