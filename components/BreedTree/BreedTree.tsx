@@ -1311,19 +1311,24 @@ export default function BreedTree({
     const ns = pack<LineageNode>().size([SIZE, SIZE]).padding(displayOnly ? 0 : 8)(h).descendants();
     normalizeTop(ns);
     if (isMobile || dockAside) relayoutMobile(ns, aspectKey, dockAside ? level : null, isMobile ? 1 : 0.6);
-    // /chums2 (displayOnly) OFF-CENTRE inner circles (chums2 #3): d3 pack + the
-    // relayout leave a parent's child cluster on the parent's vertical centreline,
-    // sitting over its name label. Shift each depth-1 parent's whole nested subtree
-    // LEFT by a fraction of the parent radius (rigidly, so the nest keeps its shape),
-    // clearing the centreline so the parent's text shows. Runs AFTER relayoutMobile
-    // so "left" is true screen-left (the relayout rotates the cloud). Gated on
-    // displayOnly, so every game hosting is byte-identical. Tunable via the fraction.
+    // /chums2 (displayOnly) OFF-CENTRE inner circles (chums2 #2, revised): d3 pack +
+    // the relayout leave a parent's child cluster on the parent's vertical centreline,
+    // over its name label. A leftward shift did not clear it (the pair re-centred), so
+    // instead ROTATE each depth-1 parent's whole nested subtree about the PARENT centre
+    // by a fixed angle: a rigid rotation keeps the nest's shape but tips the pair
+    // diagonally off the vertical axis, exposing the label. Runs AFTER relayoutMobile.
+    // Gated on displayOnly, so every game hosting is byte-identical. Angle is tunable.
     if (displayOnly) {
-      const DISPLAY_INNER_SHIFT = 0.45; // leftward shift as a fraction of the parent radius
+      const DISPLAY_INNER_ROT_DEG = 35; // tip the nested cluster this far off vertical
+      const a = (DISPLAY_INNER_ROT_DEG * Math.PI) / 180, cs = Math.cos(a), sn = Math.sin(a);
       for (const p of ns) {
         if (p.depth !== 1) continue;
-        const shift = p.r * DISPLAY_INNER_SHIFT;
-        for (const kid of p.descendants()) if (kid !== p) kid.x -= shift;
+        for (const kid of p.descendants()) {
+          if (kid === p) continue;
+          const dx = kid.x - p.x, dy = kid.y - p.y;
+          kid.x = p.x + dx * cs - dy * sn;
+          kid.y = p.y + dx * sn + dy * cs;
+        }
       }
     }
     return ns;
@@ -5766,7 +5771,9 @@ export default function BreedTree({
               // kept so moving onto one re-hovers it. heldHidden (collected or
               // lifted) stays fully hidden and is never ghosted.
               const ghosted = !!buriedSet && d !== hovered && buriedSet.has(d) && !heldHidden;
-              const sw = hidden ? 0 : strokeWidthFor(d) * strokeK(viewRef.current);
+              // chums2 #4: the stroke-only rings read heavy without the photo fill,
+              // so trim the stroke 20% for displayOnly. Game hostings unchanged.
+              const sw = hidden ? 0 : strokeWidthFor(d) * strokeK(viewRef.current) * (displayOnly ? 0.8 : 1);
               // chums2 #1: an ancestor-pack tile is being hovered and THIS circle is
               // that ancestor (matched by name). Paint it solid yellow (fill + stroke)
               // in place of its photo. displayOnly-gated + prop-gated, so game is inert.
@@ -5778,7 +5785,10 @@ export default function BreedTree({
                 <circle
                   data-n={i}
                   className={circleCls}
-                  fill={hidden ? "none" : isHi ? "var(--yellow, #ffd23e)" : nodeImg(d) ? `url(#bt-img-${i})` : fillFor(d)}
+                  // chums2 #3: the diagram is STROKE-ONLY - no photo, no depth fill,
+                  // transparent inside, just the white ring. The hover-yellow highlight
+                  // (#1) is the one exception, keeping its solid yellow fill.
+                  fill={hidden ? "none" : isHi ? "var(--yellow, #ffd23e)" : displayOnly ? "none" : nodeImg(d) ? `url(#bt-img-${i})` : fillFor(d)}
                   // displayOnly (chums2 diagram): every circle outline is WHITE at
                   // every depth, in place of the yellow/navy/blue depth strokes. Only
                   // the node circle stroke here; hidden circles keep "none". Gated on
@@ -6099,7 +6109,11 @@ export default function BreedTree({
                       if (!labelFits(widthEm, lines.length, fs, rFit)) return null;
                       // Rightward shift, matched to labelFits' dxR so the draw and
                       // the fit agree; the block also rotates about this new centre.
-                      const dx = TITLE_DX_FRAC * rFit;
+                      // chums2 #5: with the photos gone the NAME is the content, so it
+                      // must sit inside the ring. The game's rightward shift + arc angle
+                      // push it past the rim, so displayOnly draws it CENTRED and level
+                      // (dx 0, no rotation), where the fit radius already contains it.
+                      const dx = displayOnly ? 0 : TITLE_DX_FRAC * rFit;
                       return (
                         <text
                           x={dx}
@@ -6113,7 +6127,7 @@ export default function BreedTree({
                           data-kfit={kL}
                           data-lsfit={ls}
                           y={labelFirstY(lines.length, fs, rFit)}
-                          transform={`rotate(${TITLE_ANGLE} ${dx} ${titleDy(rFit)})`}
+                          transform={displayOnly ? undefined : `rotate(${TITLE_ANGLE} ${dx} ${titleDy(rFit)})`}
                           style={{
                             fill: d === hovered ? "var(--yellow, #ffd23e)" : "#ffffff",
                             fontFamily: "var(--font-display), system-ui, sans-serif",

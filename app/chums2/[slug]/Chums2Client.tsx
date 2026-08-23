@@ -630,7 +630,10 @@ export default function Chums2Client({ name, slug, image, info, lineage, diag = 
                             onClick={(e) => { e.stopPropagation(); setOpenPop(openPop?.id === f.id && openPop.kind === "info" ? null : { id: f.id, kind: "info" }); }}
                             aria-label={`About ${f.name}`}
                           >i</button>
-                          {((openPop?.id === f.id && openPop.kind === "info") || preview?.id === f.id) && (
+                          {/* #1 (review): the i info popout opens ONLY from its own
+                              button (click), NOT on circle-hover preview - its text
+                              just repeats the image panel. So no `preview` clause here. */}
+                          {openPop?.id === f.id && openPop.kind === "info" && (
                             <div className={styles.framePopover} onClick={(e) => e.stopPropagation()}>
                               <p className={styles.framePopoverName}>{f.name}</p>
                               {/* Era line (2026-08-23): only when the ancestor has an

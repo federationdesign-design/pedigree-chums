@@ -14,6 +14,32 @@ Baseline (measured before stage 1):
 
 ---
 
+## 2026-08-23 diagram review round: stroke-only, rotation, tighter zone (D61)
+
+All /chums2-scoped (displayOnly or page-level), game byte-identical.
+1. HOVER PREVIEW trimmed: circle-hover opens only the TileZoom image + the % card;
+   the i info popout is click-only (removed its `preview` clause) - it just repeated
+   the image panel text.
+2. INNER OFFSET is now a ROTATION (the leftward shift failed - the pair re-centred).
+   Post-relayoutMobile pass rotates each depth-1 parent's whole nested subtree about
+   the PARENT centre by DISPLAY_INNER_ROT_DEG = 35 (named tunable), rigidly, tipping
+   the pair diagonally off the vertical axis to expose the label. displayOnly-gated.
+3. STROKE-ONLY: displayOnly circle fill is "none" (no photo, no depth fill) - just the
+   white ring. The hover-yellow highlight keeps its solid yellow fill (the one exception).
+4. STROKE -20%: sw *= 0.8 for displayOnly (the rings read heavy without the fill).
+5. LABELS INSIDE: with photos gone the name is the content, so displayOnly draws it
+   CENTRED and level (dx 0, no rotate) instead of the game's rightward-shifted arc,
+   where the fit radius already contains it.
+6. ZONE narrowed toward the pack. The pack is height-bound at ~511 wide (cannot fill a
+   wide zone); trimming the canvas pulls the canvas-right-anchored zone edge + tree +
+   chart left together (--diagram-zone-right stays 1015). Canvas 2750 -> 2344: zone
+   right edge 1329 (just past the ~1320 pack right), stage width ~520 (aspect ~0.74 >
+   the 0.68 height-bind threshold, so the pack stays height-bound and UNCHANGED), tree
+   left 1429, tree right 2269 + 75 margin. gutter 5 ~109 (was 520). NOT exactly 100: a
+   small pack->zone margin keeps the aspect buffer; going tighter risks wider/taller
+   breeds crossing into width-bound (the pack would shrink). Bump the canvas up a touch
+   if the audit shows a breed shrinking.
+
 ## 2026-08-23 ancestor pack <-> diagram interaction round (D60)
 
 All /chums2-scoped (displayOnly or page-level), game hostings byte-identical.

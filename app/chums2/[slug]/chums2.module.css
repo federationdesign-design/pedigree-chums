@@ -16,10 +16,13 @@
    global rule clips overflow-x). (D30.) */
 .canvas {
   position: relative;
-  /* Concept is 3000px wide, but the tree/chart column moved LEFT (D59), so the far
-     right was empty; trimmed to 2750 (the tree/chart column ends at ~2675 + a 75px
-     right margin, no dead plain). Body min-width matches (globals). */
-  min-width: 2750px;
+  /* The tree/chart column is canvas-right-anchored, so trimming min-width pulls the
+     zone right edge, the tree and the chart LEFT together (--diagram-zone-right stays
+     1015). Trimmed 2750 -> 2344 (D61) so the zone right edge (2344 - 1015 = 1329) sits
+     just past the height-bound pack's ~1320 right edge: stage width ~520 (still aspect
+     > 0.68 so the pack stays height-bound and unchanged), tree left 1429 (gutter 5
+     ~109, was 520), tree right 2269 + a 75px margin. Body min-width matches (globals). */
+  min-width: 2344px;
   background: transparent;
   font-family: var(--font-body, 'Montserrat', system-ui);
   /* Own stacking context so the diagram's z-index:-1 (behind everything) is contained

@@ -94,9 +94,11 @@ body {
    .header's own padding-top clears the fixed bar. The single remaining route rule
    is the wide min-width for the horizontal scroll. Other routes are untouched.
    REVISED 2026-09-06 (D59): trimmed 3000 -> 2750 to match .canvas after the tree/chart
-   column moved left; the far right is no longer empty. */
+   column moved left; the far right is no longer empty.
+   REVISED 2026-08-23 (D61): 2750 -> 2344, matching .canvas after the zone was narrowed
+   toward the height-bound pack so the tree/chart come in further. */
 body[data-pc-chums2] {
-  min-width: 2750px;
+  min-width: 2344px;
 }
 /* ?diag=1 isolation rig (D46): strip ALL shared chrome so only the diagram shows on
    the empty 3000px canvas. Scoped to the diag attribute, so the normal route and
