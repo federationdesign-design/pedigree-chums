@@ -47,8 +47,6 @@ type Props = {
   character: string;
   // ?diag=1 isolation rig (D46): read on the server so there is no hydration flip.
   diag?: boolean;
-  // ?audit=1 TEMPORARY gutter measurement (REMOVE BEFORE COMMIT once the fit lands).
-  audit?: boolean;
 };
 
 // Section visibility. Reset to header-only (production review 2026-08-22): the
@@ -143,7 +141,7 @@ const INTRO_ALIASES: Record<string, string> = {
 // pop-out placement, draggable cards. Production feedback (2026-08-22): the
 // intro box and the lifespan chart are always-on-page in the left column, not
 // rail cards, and the ?alt=1 fork is deleted (see DECISIONS D11).
-export default function Chums2Client({ name, slug, image, info, lineage, diag = false, audit = false }: Props) {
+export default function Chums2Client({ name, slug, image, info, lineage, diag = false }: Props) {
   // The intro box shows the learn-area write-up (data/breedInfo.ts), plus the
   // "keep digging" prompt when the breed has ancestry to open, composed exactly
   // as the diagram caption does (BreedTree). NOT the subtitle or the temperament
@@ -359,56 +357,6 @@ export default function Chums2Client({ name, slug, image, info, lineage, diag = 
     };
   }, [diag]);
 
-  // ?audit=1 TEMPORARY gutter instrument (REMOVE BEFORE COMMIT once the per-breed fit
-  // lands). Measures the RESTING layout at runtime and prints the real gutter widths
-  // on screen - no estimation. All x are canvas-space (viewport rect minus the
-  // canvas's own left). setState lives in the async measure callback, not the effect
-  // body, so it does not trip react-hooks/set-state-in-effect.
-  const [auditText, setAuditText] = useState<string[] | null>(null);
-  useEffect(() => {
-    if (!audit) return;
-    const measure = () => {
-      const canvas = document.querySelector('[data-canvas="true"]') as HTMLElement | null;
-      const box = document.querySelector('[data-region="intro-box"]') as HTMLElement | null;
-      const tree = document.querySelector('[data-region="tree"]') as HTMLElement | null;
-      const diagram = document.querySelector('[data-region="diagram"]');
-      if (!canvas || !box || !tree || !diagram) return;
-      const cx = canvas.getBoundingClientRect().left;
-      const circles = (Array.from(diagram.querySelectorAll("circle[data-n]")) as SVGCircleElement[])
-        .filter((c) => c.getAttribute("fill") !== "none"); // drop the hidden root/echo circles
-      if (circles.length === 0) return;
-      const rects = circles.map((c) => c.getBoundingClientRect());
-      const stage = (diagram as HTMLElement).getBoundingClientRect();
-      const boxRight = box.getBoundingClientRect().right - cx;
-      const packLeft = Math.min(...rects.map((r) => r.left)) - cx;
-      const packRight = Math.max(...rects.map((r) => r.right)) - cx;
-      const packTop = Math.min(...rects.map((r) => r.top));
-      const packBottom = Math.max(...rects.map((r) => r.bottom));
-      const treeLeft = tree.getBoundingClientRect().left - cx;
-      const packW = packRight - packLeft, packH = packBottom - packTop;
-      // To fill the stage WIDTH, a pack of this aspect would need this much HEIGHT. If
-      // that exceeds the stage height, the HEIGHT term binds (contain fit) -> the pack
-      // fills the height and stays narrow. That is the diagnosis, on screen.
-      const needH = packW > 0 ? Math.round((packH * stage.width) / packW) : 0;
-      setAuditText([
-        `breed: ${slug}   (circles measured: ${circles.length})`,
-        `intro box right edge:  ${Math.round(boxRight)}`,
-        `pack leftmost circle x: ${Math.round(packLeft)}`,
-        `pack rightmost circle x: ${Math.round(packRight)}`,
-        `tree column left edge:  ${Math.round(treeLeft)}`,
-        `GUTTER 4 (box->pack):  ${Math.round(packLeft - boxRight)}px   [target 60]`,
-        `GUTTER 5 (pack->tree): ${Math.round(treeLeft - packRight)}px   [target 100]`,
-        `stage: ${Math.round(stage.width)} x ${Math.round(stage.height)}  aspect ${(stage.width / Math.max(stage.height, 1)).toFixed(2)}`,
-        `pack on-screen: ${Math.round(packW)} x ${Math.round(packH)}  aspect ${(packW / Math.max(packH, 1)).toFixed(2)}`,
-        `fill-width needs height ${needH} vs stage height ${Math.round(stage.height)} -> ${needH > stage.height ? "HEIGHT BINDS" : "width binds"}`,
-      ]);
-    };
-    // Let the diagram settle (item 1 removes the drop, so it is immediate) then read.
-    const t = window.setTimeout(measure, 700);
-    window.addEventListener("resize", measure);
-    return () => { window.clearTimeout(t); window.removeEventListener("resize", measure); };
-  }, [audit, slug]);
-
   const handleFramesReady = useCallback((nodes: FrameNode[]) => {
     setFrames((prev) => {
       if (prev.length > 0) return prev;
@@ -512,7 +460,7 @@ export default function Chums2Client({ name, slug, image, info, lineage, diag = 
     // width + CARD_GAP and wrapping down at the canvas edge, and return THIS card's slot.
     // The result depends only on the card ORDER (not which are open), so a card always
     // lands in its own slot. The band starts DIRECTLY below famous chums (measured in
-    // canvas coords by subtracting the canvas top, like ?audit=1); 10px gaps throughout.
+    // canvas coords by subtracting the canvas top); 10px gaps throughout.
     const canvasEl = typeof document !== "undefined" ? (document.querySelector('[data-canvas="true"]') as HTMLElement | null) : null;
     const cRect = canvasEl?.getBoundingClientRect();
     const canvasW = cRect?.width ?? 2244;
@@ -629,20 +577,6 @@ export default function Chums2Client({ name, slug, image, info, lineage, diag = 
       <div ref={introMeasureRef} aria-hidden="true" style={{ position: "absolute", left: -99999, top: 0, visibility: "hidden", padding: "20px 0", boxSizing: "content-box", pointerEvents: "none" }}>
         {tallestFrame && renderAncestorCard(tallestFrame)}
       </div>
-      {/* ?audit=1 TEMPORARY gutter readout - REMOVE BEFORE COMMIT once the fit lands. */}
-      {audit && auditText && (
-        <div
-          style={{
-            position: "fixed", top: 8, left: "50%", transform: "translateX(-50%)",
-            zIndex: 99999, background: "#b91c1c", color: "#ffffff",
-            font: "12px/1.5 ui-monospace, monospace", padding: "8px 14px",
-            borderRadius: 6, whiteSpace: "pre", pointerEvents: "none",
-            boxShadow: "0 4px 16px rgba(0,0,0,0.4)",
-          }}
-        >
-          {"⚠ REMOVE BEFORE COMMIT  ·  ?audit=1 gutter readout (canvas-space px)\n" + auditText.join("\n")}
-        </div>
-      )}
       {/* Header (brief 5.1). */}
       <header className={styles.header}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
