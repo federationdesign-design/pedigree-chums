@@ -14,6 +14,23 @@ Baseline (measured before stage 1):
 
 ---
 
+## 2026-08-29 diagram clip fix (svg overflow)
+
+### D49. Zoomed pack clipped to the stage rectangle: outer <svg> overflow:hidden
+Production showed zoomed diagram content cut flat on all four sides at exactly the
+diagram stage's rectangle (intro box visible beyond the flat left edge). Cause: the
+outer BreedTree <svg> uses the browser UA default overflow:hidden, so it clips its
+content to the svg's rect = the stage's rect. BreedTree's own `.stage svg` rule sets
+width/height/etc but NOT overflow, and `.stage` / `.treeFill` are overflow:visible, so
+the svg is the sole clipper. The ?diag=1 rig never showed it because there the svg
+rectangle is the whole 3000 x 100vh canvas, so zoomed circles never reach it; the
+smaller full-page zone clips them. Fix: author `overflow: visible` on the svg, scoped
+to the stage (`.diagramStage svg`, and `.diagStage svg` so the rig mirrors it), which
+beats the UA default with nothing competing. The per-circle image clipPaths are
+untouched, so photos stay round; only the whole-pack viewport clip is lifted, so the
+pack and any zoomed circle now draw freely, clipped only by the browser window. CSS
+only, scoped to /chums2; BreedTree and every game path are untouched.
+
 ## 2026-08-29 full page rebuilt around the (correct) diagram
 
 ### D48. Sections placed to the concept around the rig-hosted diagram; zone aspect reported

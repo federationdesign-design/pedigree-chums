@@ -53,6 +53,10 @@
   inset: 0;
   overflow: visible;
 }
+/* Same un-clip as the full-page stage, so the rig is a faithful mirror of the
+   hosting (see .diagramStage svg). The rig's svg rectangle is the whole canvas so it
+   never showed the clip, but keeping the rule identical means the two cannot drift. */
+.diagStage svg { overflow: visible; }
 
 /* ── Header ──────────────────────────────────────────────────────
    Left column: the fixed site logo (top-left, owned by Nav) with the
@@ -403,8 +407,16 @@
   bottom: 170px;
   pointer-events: none;
 }
-.diagramStage svg { pointer-events: auto; }
-.diagramStage .panelClose { pointer-events: auto; }
+/* Un-clip the pack. The outer <svg> defaults to overflow:hidden (UA sheet), so it
+   clips its content to the svg's rectangle = the stage's rectangle. In the ?diag=1
+   rig that rectangle is the whole 3000 x 100vh canvas, so zoomed circles never reach
+   it and it looks fine; in the smaller full-page zone the same clip cuts flat edges
+   on all four sides. Author overflow:visible beats the UA default, so the pack and
+   any zoomed circle draw freely, clipped only by the browser window (brief acceptance
+   b). Scoped to the stage; the per-circle image clipPaths are unaffected, so photos
+   stay round. .stage / .treeFill are already overflow:visible, so the svg is the only
+   clipper to override. */
+.diagramStage svg { pointer-events: auto; overflow: visible; }
 
 /* The family tree renders as LineageMap's own full-viewport overlay, opened on
    demand from the rail (DECISIONS D13), so there is no inline tree panel here.
