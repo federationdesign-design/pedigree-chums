@@ -14,7 +14,55 @@ Baseline (measured before stage 1):
 
 ---
 
-## 2026-08-23 tree round + colour
+## 2026-08-24 node popout anchor + diagram switch-on
+
+### D37. Tree-node popout now anchors to the NODE, not the far-off pack tile
+Question: clicking a tree node opened the TileZoom enlarge growing from the matching
+ANCESTOR PACK tile, far away on the left. It should open next to the clicked node.
+A: reposition by looking up the pack tile rect (still tile-anchored, wrong place).
+B (built): LineageMap's bounded onNodeClick now also hands up the pointer's viewport
+position (onNodeClick(name, {x,y}); the click lands on the node). /chums2 builds the
+TileZoom anchor from that point: enlarge opens just right of the node, vertically
+centred, flipping to the node's left near the right edge, and clamped so it never
+leaves the visible viewport. Enlarge size stays 61 (== a pack tile, 183 zoomed) for
+a consistent popout. The pack-tile click is untouched (still grows from its own
+rect). Same openPop state, so still one-popout-at-a-time. Why B: the node is the
+thing clicked, so the popout belongs beside it; a viewport point is all TileZoom
+needs and it already position:fixed's to the viewport.
+
+### D38. Circular diagram switched on, hosted the LineageModal .stageArea way, inline right of the intro box
+Question: switch on SHOW_SECTIONS.diagram and host the circular BreedTree diagram
+right of the intro box, big, uncropped, never in a cropping container. A: keep it in
+the old standalone .mainBand below everything (not "right of the intro box"). B
+(built): move the diagram INTO introTopRow, immediately after the intro box, so the
+row is [introBox | 20px | diagram | tree]; the introTopRow gap is now exactly 20px
+(brief B.3). Deleted the now-dead .mainBand rule and section. The diagram keeps the
+learn-mode props it already had (centred + fill + dockAside + strokeByDepth +
+tinted=false) plus displayOnly, i.e. NOT the legacy hideLabels/disableZoom mode. It
+sits in a big .diagramPanel (width clamp(760,52vw,1000), height clamp(680,82vh,980),
+flex 0 0 auto, overflow visible), roughly square so the centred pack fills the width
+rather than floating in a wide letterbox. No ancestor clips (introTopRow, introStack,
+leftBand, canvas are all overflow:visible), so the pack shows whole at rest and
+zoomed circles draw over surrounding page content. Starts open (not a card, so not in
+the initial `closed` set); its X calls closeCard("diagram"), which adds it to `closed`
+and rails the DIAGRAM_GLYPH reopen icon (already wired in byId + openCard). The wide
+canvas scrolls to fit the now-wider row (brief: use the room).
+
+LineageModal mechanism reused for sizing/framing (brief B.8): LineageModal wraps
+BreedTree in a single `.stageArea` div that is `position:absolute; inset:0` with NO
+width/height/overflow/aspect/padding of its own, inside the full-viewport `.overlay`.
+BreedTree runs in `fill` mode (its wrapper/stage/svg all become width:100% height:100%
+via `.treeFill`), MEASURES that box (stageRef.clientWidth/clientHeight) and derives its
+viewBox from the container's aspect ratio (vbW = SIZE*aspect, centred origin). It never
+uses the `size` prop in fill mode. I reproduced that here by giving `.diagramPanel` a
+definite (large) width and height with overflow:visible and no clipping ancestor, and
+passing the same fill+dockAside+centred learn-mode props (plus displayOnly for the
+static, non-gravity chums2 view). NOTE on the 20px: the 20px is the intro-box-to-panel
+gap; because the learn view frames the pack centred with margin around it (as
+LineageModal's resting view does), the leftmost CIRCLE sits a little inside the panel's
+left edge rather than exactly 20px in. Pulling the circle literally to 20px would mean
+overriding BreedTree's resting zoom, which would stop it being "hosted the LineageModal
+way", so I kept the faithful framing and set the container gap to 20px.
 
 ### D34. Bounded tree clipped its outer depth-2 (why initialDepth=2 looked partial)
 Question: production /chums2 showed depth-1 plus only SOME depth-2, not all.

@@ -131,12 +131,15 @@
   flex: 1 1 auto; /* fill the band width so the lower band (famous + chart) can be wide */
 }
 
-/* Top row: intro box (left) + inline family tree (right), in the open area. */
+/* Top row: intro box (left), then the circular diagram, then the family tree, in
+   the open area. The row gap is EXACTLY 20px so the intro box's right edge sits
+   20px from the diagram panel (brief B.3). The wide canvas scrolls to fit all
+   three at their natural sizes. */
 .introTopRow {
   display: flex;
   flex-direction: row;
   align-items: flex-start;
-  gap: clamp(24px, 3vw, 56px);
+  gap: 20px;
 }
 
 /* Sized, positioned region that hosts the bounded LineageMap (D31). It is the
@@ -160,22 +163,6 @@
   padding: 20px 0; /* top/bottom inset; the body carries the side inset */
 }
 
-
-/* ── Main band (diagram region + tree) ──────────────────────────
-   The diagram is hosted like LineageModal's stageArea: a large page
-   region between the rail and the tree column, NO overflow clipping
-   on it or any ancestor, so the whole packed pack is visible at rest
-   (production correction 2026-08-22). Left inset clears the rail. */
-.mainBand {
-  position: relative;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: stretch;
-  gap: clamp(20px, 2.4vw, 44px);
-  padding: clamp(16px, 2vw, 32px) clamp(20px, 3vw, 48px) 0;
-  padding-left: clamp(96px, 8vw, 120px);
-  overflow: visible;
-}
 
 /* ── Draggable pop-out card ─────────────────────────────────────
    Same look as the live page card (navy rounded box). Absolutely
@@ -347,12 +334,19 @@
    chain. */
 .diagramPanel {
   position: relative;
-  /* Large viewport-scale region (like .stageArea). fill-mode BreedTree fills
-     it via height:100%, so the parent needs a definite height. NO overflow here
-     or on any ancestor, so the SVG's meet-fit shows the whole pack uncropped. */
-  flex: 1 1 620px;
-  min-width: 460px;
-  height: min(88vh, 1040px);
+  /* Big page-scale stage, hosted the LineageModal .stageArea way: BreedTree runs
+     in fill mode, so it fills this box (width/height 100%) and MEASURES it to build
+     its aspect-derived viewBox. The box therefore needs a definite width AND height.
+     It is deliberately large so the diagram DOMINATES the space right of the intro
+     box (brief B.4), and roughly square so the centred pack fills the width rather
+     than floating in a wide letterbox. overflow:visible (and no overflow on any
+     ancestor: introTopRow, introStack, leftBand, canvas) means the SVG paints the
+     whole pack uncropped and zoomed circles may draw over surrounding page content
+     (brief B.2 / B.6). flex 0 0 auto so it keeps this size and the wide canvas
+     scrolls to fit the row rather than the diagram being squeezed. */
+  flex: 0 0 auto;
+  width: clamp(760px, 52vw, 1000px);
+  height: clamp(680px, 82vh, 980px);
   overflow: visible;
 }
 
