@@ -80,6 +80,17 @@ Baseline (measured before stage 1):
 - FLAG for Steve: this is a modal tree, not an inline-on-load tree. If you want it inline beside the diagram, that needs a new bounded rendering mode inside LineageMap (a deliberate shared-component change), which I did not make because it would risk the game. Tell me and I will design it behind a defaulted prop.
 - CSS constraint respected: no perspective / backface-visibility / transform-style: preserve-3d anywhere in the chums2 chain.
 
+## Bounded tree: strip the pit collection chrome (2026-08-23)
+
+### D33. In bounded mode the tree is ONLY centre card + name pill + nodes + connectors
+- The bounded tree was pulling in the pit's learn/collect chrome. Gated off in bounded (all default-off, so the pit is byte-identical):
+  - Dark panel wash: .overlayChum is no longer applied when bounded (className), so the region is transparent (item 3). (.overlayBounded already dropped .overlay's own background.)
+  - Frame slot sections + their headings ("Alive and kicking" / "These dogs have had their days" / "A Pedigree Chum") + the frames counter: frameSlots returns empty when bounded, so frameTotal = 0 and every frameTotal>0-gated element (frames, .frameCount, .packHead) is off.
+  - 0/9 circles-turned counter (.dotCount): gated with !bounded.
+  - Yellow Back button (.close): gated with !bounded (item 4: /chums2 uses the page's own CloseX, which rails the reopen icon).
+  - LEARN button (item 2): gated with !bounded. The green Complete / "Collect Ancestor Pack" buttons were already off for this hosting (circular / !strongBg gated).
+- The name pill (root .tag), nodes, connectors and centre card are untouched, so the tree keeps exactly those.
+
 ## Inline tree not rendering: fix (2026-08-23)
 
 ### D32. Tree started in the `closed` set, so it never mounted

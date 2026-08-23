@@ -713,6 +713,10 @@ export default function LineageMap({
   // Every unique image-bearing ancestor, split into the living and the long-gone.
   // These define how many empty frames the player drags each collected card into.
   const frameSlots = useMemo(() => {
+    // Bounded (display) mode has no ancestor-pack collection game, so no frames:
+    // this removes the frame slots, the frames counter and the pack section
+    // headings ("Alive and kicking" etc.), which are all gated on frameTotal > 0.
+    if (bounded) return { chum: [], alive: [], extinct: [] };
     const seenImg = new Set<string>();
     const all: { name: string; img: string; status: BreedTag | null }[] = [];
     const walk = (n: Node) => (n.children as Node[] | undefined)?.forEach((k) => {
@@ -723,7 +727,7 @@ export default function LineageMap({
     const chum = all.filter((s) => PACK_BREEDS.has(s.name)); // ancestors that are themselves one of the 54 pack dogs
     const rest = all.filter((s) => !PACK_BREEDS.has(s.name));
     return { chum, alive: rest.filter((s) => isAlive(s.status)), extinct: rest.filter((s) => !isAlive(s.status)) };
-  }, [root]);
+  }, [root, bounded]);
 
   // how many times each image appears across the whole tree; >1 means the breed is a
   // duplicate, so its frame becomes a stack the extra copies can be dropped onto
@@ -1887,8 +1891,9 @@ export default function LineageMap({
       <g className={styles.rootHit} transform={`translate(${rx},${circular ? ry + R : ry + ROOT + 26})`} style={{ opacity: dragFocus ? 0 : groupFade, transition: DRAG_FADE, pointerEvents: dragFocus ? "none" : undefined }} onClick={(e) => e.stopPropagation()}>
         {!INSTR_NAMES.has(breed.name) && !circular && (<g transform={undefined}><rect className={styles.tag} x={-tagW/2} y={-tagH/2} width={tagW} height={tagH} rx={tagH / 2} />{tagLines.map((ln, li) => (<text key={li} className={styles.tagText} textAnchor="middle" dominantBaseline="central" y={tagLines.length > 1 ? (li === 0 ? -13 : 13) : 0}>{ln}</text>))}</g>)}
         {/* the 3-D Collect button sits on top; it orders the pack into the grid */}
-        {/* Blue Learn button - on ALL cards including instructional */}
-        {!packed && !collecting && !framesDone ? (() => {
+        {/* Blue Learn button - on ALL cards including instructional. Off in
+            bounded (/chums2): the display tree has no learn/collect game. */}
+        {!bounded && !packed && !collecting && !framesDone ? (() => {
           // Count ALL remaining revealStep clicks:
           // phase 1: each frontier layer to open
           // phase 2: expose images (toPop)
@@ -2040,7 +2045,7 @@ export default function LineageMap({
       // now marks "this is the mini pit" for the lifted root, the five-across
       // frames, the smaller nodes, the back button's size and the hidden pack
       // header. Removing it here would quietly undo all five.
-      className={`${styles.overlay}${bounded ? " " + styles.overlayBounded : ""}${circular ? " " + styles.overlayStrong : ""}${strongBg && !circular ? " " + styles.overlayChum : ""}${dragFocus ? " " + styles.overlayFocus : ""}`}
+      className={`${styles.overlay}${bounded ? " " + styles.overlayBounded : ""}${circular ? " " + styles.overlayStrong : ""}${strongBg && !circular && !bounded ? " " + styles.overlayChum : ""}${dragFocus ? " " + styles.overlayFocus : ""}`}
       onClick={closeIfTap}
       onPointerDown={onPanDown}
       onPointerMove={onPanMove}
@@ -2053,6 +2058,9 @@ export default function LineageMap({
           pit lift. Without it that screen fell back to .close, which is 52px
           with no border, against the pit's 100.8 with a 5px navy stroke: the
           size and the missing stroke line were both this. */}
+      {/* Bounded (/chums2) has no back button: the page's own CloseX closes the
+          tree and rails its reopen icon. */}
+      {!bounded && (
       <button
         type="button"
         className={liftRoot ? `${styles.close} ${styles.closeCircular}` : styles.close}
@@ -2073,7 +2081,8 @@ export default function LineageMap({
           <>&times;</>
         )}
       </button>
-      {totalNodes > 0 && frameTotal === 0 && !packed && !collecting && (() => {
+      )}
+      {!bounded && totalNodes > 0 && frameTotal === 0 && !packed && !collecting && (() => {
         const prog = Math.min(1, seen.size / totalNodes); // 0 (none turned) -> 1 (all turned)
         const dotBg = `hsl(${212 - prog * 87}, ${72 + prog * 13}%, ${44 + prog * 3}%)`; // blue -> bright green
         return (
