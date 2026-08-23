@@ -3356,6 +3356,9 @@ for (const game of ['kennelsketch', 'missingsheep']) {
   check('🐱', { action: 'game_move' }, { session: s, assert: (r) => (r.gameGuess === 'cat' ? null : `🐱 -> gameGuess ${JSON.stringify(r.gameGuess)}, expected "cat"`) }); })();
 (() => { const s = newSession('labrador'); const { state } = startGame('treattrail', 0); s.activeGame = 'treattrail'; s.game = state;
   check('⚽', { action: 'game_move' }, { session: s, assert: (r) => (r.gameGuess === 'ball' ? null : `⚽ -> ${JSON.stringify(r.gameGuess)}`) }); })();
+// 🎾 is now the ONLY ball in the picker; confirm it still counts as "ball" mid-game.
+(() => { const s = newSession('labrador'); const { state } = startGame('treattrail', 0); s.activeGame = 'treattrail'; s.game = state;
+  check('🎾', { action: 'game_move' }, { session: s, assert: (r) => (r.gameGuess === 'ball' ? null : `🎾 -> ${JSON.stringify(r.gameGuess)}`) }); })();
 (() => { const s = newSession('collie'); const { state } = startGame('kennelsketch', 0); s.activeGame = 'kennelsketch'; s.game = state;
   check('👍', { action: 'game_move' }, { session: s, assert: (r) => (r.gameGuess === undefined ? null : `👍 got a gameGuess: ${r.gameGuess}`) }); })();
 // SAFETY: a sadness emoji mid-game reaches the sadness route, NOT a wrong guess -- typed "im sad" already did,
