@@ -158,7 +158,19 @@ type Node = LineageNode & {
 // the tree, both added 2026-08-22 so a host can render the percentage-detail
 // popout ("As {parent/grandparent}: {share}%", "Share of your chum: {pct}%")
 // without recomputing from the tree. Optional, so existing callers are unchanged.
-export type FrameNode = { id: string; name: string; img: string; pct?: number; share?: number; depth?: number; note?: string; status?: BreedTag | null };
+// era (display label, e.g. "1700s", "late 1800s") and anchor (numeric year, the
+// oldest-first sort key) come from data/uk-breeds.ts, joined by name via the same
+// ukBreeds.find lookup nodeStatus already uses. Ancestors absent from uk-breeds
+// carry neither (never invented), so a host omits the era line and sorts them last.
+// (chums2 pack ordering, 2026-08-23.)
+export type FrameNode = { id: string; name: string; img: string; pct?: number; share?: number; depth?: number; note?: string; status?: BreedTag | null; era?: string; anchor?: number };
+
+// The ancestor's era label + numeric anchor year from uk-breeds, by name. {} when
+// the ancestor is not in uk-breeds (no era/date invented). Mirrors nodeStatus's join.
+export function nodeEra(name: string): { era?: string; anchor?: number } {
+  const uk = ukBreeds.find((b) => b.name.toLowerCase().trim() === name.toLowerCase().trim());
+  return uk ? { era: uk.era, anchor: uk.anchor } : {};
+}
 
 function sumLeaves(n: LineageNode): number {
   const kids = n.children as LineageNode[] | undefined;
@@ -307,7 +319,8 @@ export default function BreedTreeMap({
           const pct = Math.round((n._leaves / root._leaves) * 100);
           const share = Math.round((n._leaves / n._parent._leaves) * 100);
           const status = nodeStatus(n.name, n.note ?? "");
-          found.push({ id: n._id, name: n.name, img, pct, share, depth, note: breedInfo[n.name] || n.note, status });
+          const { era, anchor } = nodeEra(n.name);
+          found.push({ id: n._id, name: n.name, img, pct, share, depth, note: breedInfo[n.name] || n.note, status, era, anchor });
         }
       }
       (n.children as Node[] | undefined)?.forEach((c) => walk(c, depth + 1));

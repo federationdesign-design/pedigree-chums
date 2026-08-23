@@ -14,6 +14,54 @@ Baseline (measured before stage 1):
 
 ---
 
+## 2026-08-23 ancestor pack <-> diagram interaction round (D60)
+
+All /chums2-scoped (displayOnly or page-level), game hostings byte-identical.
+
+### D60.0 Event routing (the blocker): wrapper pass-through
+MECHANISM: the behind-diagram is z-index:-1; every FULL-WIDTH wrapper that overlaps
+it (.leftBand, .introStack) is pointer-events:none so events fall THROUGH to the
+diagram SVG (pointer-events:auto -> hits only painted circles), and the interactive
+LEAVES (.railWrap NEW, .ancestorPack, .famousWrap, tree/chart, popouts) are auto. The
+bug was .leftBand: it was auto, so it captured over the diagram's empty middle even
+though .introStack (its child) was none. Added .leftBand none + wrapped the rail in
+.railWrap (auto) since it now inherits none. Circles are hoverable/clickable
+everywhere they show; sections keep their own events.
+
+### D60.1 Pack tile hover -> circle yellow
+BreedTree gets `highlightName` (page-scoped). Tile onMouseEnter/Leave sets
+packHoverName; the circle whose d.data.name matches paints solid var(--yellow) fill +
+stroke (isHi = displayOnly && name match). Game never passes it -> inert.
+
+### D60.2 Circle hover -> pack popouts (clicked wins)
+BreedTree gets `onCircleHover(name|null)`, fired in the circle mouseenter/leave. The
+page sets hoverPreview (with the tile's measured rect) IN the handler (an event, not
+an effect -> no set-state-in-effect). `preview = openPop ? null : hoverPreview` so a
+clicked popout WINS. The info popover, % card and TileZoom image all render for the
+preview frame at the tile locations. Hover-out clears it.
+
+### D60.3 Inner circles off-centre
+Site: a post-relayoutMobile pass in the nodes useMemo (runs after the relayout so
+"left" is true screen-left). For each depth-1 parent, its whole nested subtree shifts
+LEFT by 0.45*parent.r (rigid, keeps the nest shape), clearing the vertical centreline
+so the parent label shows. Gated displayOnly (added to the memo deps). Fraction tunable.
+
+### D60.4 / D60.5 padding + badges
+padding(displayOnly ? 0 : 8) so nested circles sit flush; the yellow % badge group
+gains `&& !displayOnly` so the diagram drops the badges (pack tiles keep their pills).
+
+### D60 pack order + popouts (second batch)
+- ORDER oldest-first: FrameNode gains era/anchor from data/uk-breeds.ts (new nodeEra,
+  same name-join BreedTreeMap already uses for status). orderedFrames sorts by anchor;
+  ancestors with no anchor sort LAST (never invented). Era shown as a line in the i
+  card (.framePopoverEra) only when present. CAVEAT: uk-breeds coverage is partial, so
+  ancestors absent from it show no era and trail the sort - by design, no dates invented.
+- PERSISTENCE: TileZoom gains `persist` (skips the 2s auto-close); /chums2 passes it and
+  now closes the image on OUTSIDE click (removed the image exclusion in the doc-click
+  effect; image+panel stopPropagation so their own clicks do not count). Pit keeps its timer.
+- IMAGE BORDER: TileZoom gains `borderColor`; /chums2 passes frameBorder(status) so the
+  enlarge border matches the tile outline (green/orange/red). Pit keeps blue.
+
 ## 2026-09-06 tree/chart column pulled left (option A: shrink the canvas)
 
 ### D59. Tree follows the diagram zone; canvas trimmed 3000 -> 2750

@@ -1139,6 +1139,15 @@ export default function BreedTree({
   // is a separate, page-scoped switch, NOT the accessibility HIDE_IMAGES mechanism.
   // Default false, so the mini pit, main pit and every other hosting are byte-identical.
   hideCircleImages = false,
+  // highlightName (chums2 diagram, 2026-08-23, page-scoped): the ancestor name
+  // currently hovered on the ancestor-pack grid. Its matching circle(s) render as a
+  // solid YELLOW fill + yellow stroke in place of the photo, reverting when null.
+  // Game hostings never pass it (undefined -> no highlight), so they are unchanged.
+  highlightName = null,
+  // onCircleHover (chums2 diagram, 2026-08-23, page-scoped): fires with a circle's
+  // ancestor name on hover-IN and null on hover-OUT, so the page can mirror the hover
+  // to that ancestor's pack popouts. Game never passes it, so it is inert there.
+  onCircleHover,
 }: {
   root: LineageNode;
   rootImage?: string;
@@ -1232,6 +1241,9 @@ export default function BreedTree({
   displayOnly?: boolean;
   // See the destructure above (added 2026-08-30).
   hideCircleImages?: boolean;
+  // See the destructure above (added 2026-08-23).
+  highlightName?: string | null;
+  onCircleHover?: (name: string | null) => void;
 }) {
   const [isMobile, setIsMobile] = useState(false);
   const [aspect, setAspect] = useState(1);
@@ -1293,11 +1305,29 @@ export default function BreedTree({
     const h = hierarchy<LineageNode>(collapsed)
       .sum((d) => d.value ?? 0)
       .sort((a, b) => (b.value ?? 0) - (a.value ?? 0));
-    const ns = pack<LineageNode>().size([SIZE, SIZE]).padding(8)(h).descendants();
+    // padding: 8px inset between nested circles in every game hosting. For the
+    // /chums2 static diagram (displayOnly) the nested circles sit FLUSH (0), so a
+    // parent and its children read as one solid nest with no gap ring. (chums2 #4.)
+    const ns = pack<LineageNode>().size([SIZE, SIZE]).padding(displayOnly ? 0 : 8)(h).descendants();
     normalizeTop(ns);
     if (isMobile || dockAside) relayoutMobile(ns, aspectKey, dockAside ? level : null, isMobile ? 1 : 0.6);
+    // /chums2 (displayOnly) OFF-CENTRE inner circles (chums2 #3): d3 pack + the
+    // relayout leave a parent's child cluster on the parent's vertical centreline,
+    // sitting over its name label. Shift each depth-1 parent's whole nested subtree
+    // LEFT by a fraction of the parent radius (rigidly, so the nest keeps its shape),
+    // clearing the centreline so the parent's text shows. Runs AFTER relayoutMobile
+    // so "left" is true screen-left (the relayout rotates the cloud). Gated on
+    // displayOnly, so every game hosting is byte-identical. Tunable via the fraction.
+    if (displayOnly) {
+      const DISPLAY_INNER_SHIFT = 0.45; // leftward shift as a fraction of the parent radius
+      for (const p of ns) {
+        if (p.depth !== 1) continue;
+        const shift = p.r * DISPLAY_INNER_SHIFT;
+        for (const kid of p.descendants()) if (kid !== p) kid.x -= shift;
+      }
+    }
     return ns;
-  }, [root, isMobile, aspectKey, dockAside, level]);
+  }, [root, isMobile, aspectKey, dockAside, level, displayOnly]);
 
   // Rarity band: per-level count of each dog among the CIRCLES that drop (nodes,
   // echo-excluded, root excluded, so it matches what a player sees). The band is
@@ -5737,6 +5767,10 @@ export default function BreedTree({
               // lifted) stays fully hidden and is never ghosted.
               const ghosted = !!buriedSet && d !== hovered && buriedSet.has(d) && !heldHidden;
               const sw = hidden ? 0 : strokeWidthFor(d) * strokeK(viewRef.current);
+              // chums2 #1: an ancestor-pack tile is being hovered and THIS circle is
+              // that ancestor (matched by name). Paint it solid yellow (fill + stroke)
+              // in place of its photo. displayOnly-gated + prop-gated, so game is inert.
+              const isHi = displayOnly && !hidden && !!highlightName && d.data.name === highlightName;
               const circleCls = ghosted
                 ? `${styles.btCircle} ${styles.ghost} ${curCls}`.trim()
                 : `${styles.btCircle} ${cls ?? ""}`.trim();
@@ -5744,12 +5778,12 @@ export default function BreedTree({
                 <circle
                   data-n={i}
                   className={circleCls}
-                  fill={hidden ? "none" : nodeImg(d) ? `url(#bt-img-${i})` : fillFor(d)}
+                  fill={hidden ? "none" : isHi ? "var(--yellow, #ffd23e)" : nodeImg(d) ? `url(#bt-img-${i})` : fillFor(d)}
                   // displayOnly (chums2 diagram): every circle outline is WHITE at
                   // every depth, in place of the yellow/navy/blue depth strokes. Only
                   // the node circle stroke here; hidden circles keep "none". Gated on
                   // displayOnly so game hostings keep strokeColorFor's colours.
-                  stroke={hidden ? "none" : displayOnly ? "#ffffff" : strokeColorFor(d)}
+                  stroke={hidden ? "none" : isHi ? "var(--yellow, #ffd23e)" : displayOnly ? "#ffffff" : strokeColorFor(d)}
                   strokeWidth={sw}
                   // Dashes proportional to the ring's own width, so they read the
                   // same at every zoom. The fade to and from this state is pure CSS
@@ -5803,6 +5837,7 @@ export default function BreedTree({
                     if (touchRef.current) return; // touch drives this from the tap
                     setHovered(d);
                     setHoverHint(`tap to learn more about ${d.data.name}`);
+                    onCircleHover?.(d.data.name); // chums2 #2: mirror to the pack popouts
                   }}
                   onMouseLeave={hidden || frozen ? undefined : (e) => {
                     // Ignore the mouseleave the blue box triggers when its own
@@ -5835,6 +5870,7 @@ export default function BreedTree({
                     }
                     setHovered((h) => (h === d ? null : h));
                     setHoverHint((s) => (s.startsWith("tap to learn more about") ? "" : s));
+                    onCircleHover?.(null); // chums2 #2: hover-out closes the pack preview
                   }}
                   onClick={
                     // `frozen` used to swallow this outright, and frozen is
@@ -6145,7 +6181,7 @@ export default function BreedTree({
               and to the left), then snapped it to the rim. They now fade in with
               the labels, already at their resting spot on the lower-right rim,
               which is exactly where the physics bodies spawn. */}
-          <g ref={badgesRef} style={{ display: dockAside && !learning ? "inline" : "none", opacity: entered ? 1 : 0, transition: "opacity 0.3s ease" }} textAnchor="middle">
+          <g ref={badgesRef} style={{ display: dockAside && !learning && !displayOnly ? "inline" : "none", opacity: entered ? 1 : 0, transition: "opacity 0.3s ease" }} textAnchor="middle">
             {badgePcts.map((item, i) => {
               const v = viewRef.current;
               const kk = SIZE / v[2];

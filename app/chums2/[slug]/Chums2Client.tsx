@@ -287,11 +287,21 @@ export default function Chums2Client({ name, slug, image, info, lineage, diag = 
   // opening any one replaces the others. The enlarged image (kind "image") also
   // carries the tile's screen rect, captured at click, as the TileZoom anchor.
   const [openPop, setOpenPop] = useState<{ id: string; kind: "info" | "pct" | "image"; anchor?: { x: number; y: number; size: number } } | null>(null);
-  // Close the i / % popouts on a click anywhere outside (their trigger and body
-  // stop propagation). The enlarged image is excluded: it closes the mini pit's
-  // way, a 2s auto-close after the pointer leaves it, handled inside TileZoom.
+  // #1: which ancestor-pack tile is hovered. Its matching diagram circle paints
+  // solid yellow (passed to BreedTree as highlightName). Null when none hovered.
+  const [packHoverName, setPackHoverName] = useState<string | null>(null);
+  // #2: hovering a DIAGRAM circle previews that ancestor's pack popouts (info + %
+  // + enlarged image) at the tile's own location. anchor is the tile's screen rect,
+  // measured when the hover fires. A clicked popout (openPop) WINS: while one is
+  // open the preview is suppressed (see `preview` below). Cleared on hover-out.
+  const [hoverPreview, setHoverPreview] = useState<{ id: string; anchor?: { x: number; y: number; size: number } } | null>(null);
+  // Close ALL popouts (i, %, and now the enlarged image too) on a click outside
+  // them. The image used to be excluded because it self-closed on a 2s timer; that
+  // timer is removed for this hosting (popout persistence), so the outside click is
+  // now its close path (plus opening another, one-at-a-time). Its trigger, body and
+  // the enlarged image itself stop propagation so those clicks do not count.
   useEffect(() => {
-    if (!openPop || openPop.kind === "image") return;
+    if (!openPop) return;
     const onDoc = () => setOpenPop(null);
     document.addEventListener("click", onDoc);
     return () => document.removeEventListener("click", onDoc);
@@ -387,6 +397,33 @@ export default function Chums2Client({ name, slug, image, info, lineage, diag = 
       return nodes.filter((n) => (seen.has(n.id) ? false : (seen.add(n.id), true)));
     });
   }, []);
+
+  // Ancestor pack ORDER (2026-08-23): oldest first, by the ancestor's `anchor`
+  // year (from data/uk-breeds.ts, carried on the frame). Ancestors with no anchor
+  // (not in uk-breeds) sort LAST, keeping their feed order among themselves; no
+  // dates are invented. This orders the tile grid AND the diagram-circle preview
+  // reads from the same list.
+  const orderedFrames = useMemo(() => {
+    return [...frames].sort((a, b) => {
+      if (a.anchor == null && b.anchor == null) return 0;
+      if (a.anchor == null) return 1;
+      if (b.anchor == null) return -1;
+      return a.anchor - b.anchor;
+    });
+  }, [frames]);
+
+  // #2: hovering a diagram circle -> preview that ancestor's pack popouts. Runs in
+  // BreedTree's hover handler (an event, not an effect), so measuring the tile and
+  // setting state here does not trip set-state-in-effect. Matched by name; the tile
+  // rect (data-frame-id) is the TileZoom anchor. Null on hover-out clears the preview.
+  const onCircleHover = useCallback((nm: string | null) => {
+    if (!nm) { setHoverPreview(null); return; }
+    const f = frames.find((x) => x.name === nm);
+    if (!f) { setHoverPreview(null); return; }
+    const el = document.querySelector(`[data-frame-id="${f.id}"]`) as HTMLElement | null;
+    const r = el?.getBoundingClientRect();
+    setHoverPreview({ id: f.id, anchor: r ? { x: r.left, y: r.top, size: r.width } : undefined });
+  }, [frames]);
 
   // Grid shape (item 12): ALWAYS at least 2 rows, never 1 long row, max 3.
   // Columns grow with the pack (grid-auto-flow: column), so a big pack adds
@@ -495,6 +532,10 @@ export default function Chums2Client({ name, slug, image, info, lineage, diag = 
     );
   }
 
+  // #2 "clicked wins": a hover preview only shows when NO popout has been clicked
+  // open. While openPop is set, the preview is suppressed so it cannot fight it.
+  const preview = openPop ? null : hoverPreview;
+
   return (
     <div className={styles.canvas} data-canvas="true">
       {/* ?audit=1 TEMPORARY gutter readout - REMOVE BEFORE COMMIT once the fit lands. */}
@@ -530,7 +571,10 @@ export default function Chums2Client({ name, slug, image, info, lineage, diag = 
           rail's pop-outs are still gated off; the lifespan chart is still off. */}
       {(SHOW_SECTIONS.rail || SHOW_SECTIONS.introBox || SHOW_SECTIONS.lifespanChart || SHOW_SECTIONS.ancestorPack || SHOW_SECTIONS.famousChums) && (
         <div className={styles.leftBand}>
-          {SHOW_SECTIONS.rail && <Chums2Rail items={railItems} onOpen={openCard} />}
+          {/* #0: the rail is an interactive LEAF. .leftBand is pointer-events:none so
+              events fall THROUGH the wrapper to the behind-diagram; this wrapper turns
+              them back on for the rail (which does not overlap the diagram anyway). */}
+          {SHOW_SECTIONS.rail && <div className={styles.railWrap}><Chums2Rail items={railItems} onOpen={openCard} /></div>}
           {(SHOW_SECTIONS.introBox || SHOW_SECTIONS.lifespanChart || SHOW_SECTIONS.ancestorPack || SHOW_SECTIONS.famousChums || SHOW_SECTIONS.tree) && (
             <div className={styles.introStack} data-region="intro-band">
               {/* Top row: the intro write-up box on the left, the family tree
@@ -557,8 +601,14 @@ export default function Chums2Client({ name, slug, image, info, lineage, diag = 
                 <section className={styles.ancestorPack} data-region="ancestor-pack">
                   <p className={styles.packTitle}>Ancestor Pack</p>
                   <div className={styles.packGrid} style={{ ["--pack-rows" as string]: String(packRows) }} data-cols={packCols}>
-                    {frames.map((f) => (
-                      <div key={f.id} className={styles.frame} style={{ borderColor: frameBorder(f.status) }}>
+                    {orderedFrames.map((f) => (
+                      <div
+                        key={f.id}
+                        className={styles.frame}
+                        style={{ borderColor: frameBorder(f.status) }}
+                        onMouseEnter={() => setPackHoverName(f.name)}
+                        onMouseLeave={() => setPackHoverName(null)}
+                      >
                         <div className={styles.frameInner}>
                           <button
                             type="button"
@@ -580,9 +630,12 @@ export default function Chums2Client({ name, slug, image, info, lineage, diag = 
                             onClick={(e) => { e.stopPropagation(); setOpenPop(openPop?.id === f.id && openPop.kind === "info" ? null : { id: f.id, kind: "info" }); }}
                             aria-label={`About ${f.name}`}
                           >i</button>
-                          {openPop?.id === f.id && openPop.kind === "info" && (
+                          {((openPop?.id === f.id && openPop.kind === "info") || preview?.id === f.id) && (
                             <div className={styles.framePopover} onClick={(e) => e.stopPropagation()}>
                               <p className={styles.framePopoverName}>{f.name}</p>
+                              {/* Era line (2026-08-23): only when the ancestor has an
+                                  era in uk-breeds; never invented when absent. */}
+                              {f.era && <p className={styles.framePopoverEra}>Era: {f.era}</p>}
                               {f.note && <p className={styles.framePopoverNote}>{f.note}</p>}
                               <button
                                 type="button"
@@ -598,7 +651,7 @@ export default function Chums2Client({ name, slug, image, info, lineage, diag = 
                             onClick={(e) => { e.stopPropagation(); setOpenPop(openPop?.id === f.id && openPop.kind === "pct" ? null : { id: f.id, kind: "pct" }); }}
                             aria-label={`Percentage detail for ${f.name}`}
                           >{f.pct != null && f.pct < 1 ? "<1%" : `${f.pct ?? "?"}%`}</button>
-                          {openPop?.id === f.id && openPop.kind === "pct" && (
+                          {((openPop?.id === f.id && openPop.kind === "pct") || preview?.id === f.id) && (
                             <div className={styles.framePctCard} onClick={(e) => e.stopPropagation()}>
                               <button
                                 type="button"
@@ -657,6 +710,8 @@ export default function Chums2Client({ name, slug, image, info, lineage, diag = 
             strokeByDepth
             tinted={false}
             displayOnly
+            highlightName={packHoverName}
+            onCircleHover={onCircleHover}
           />
         </div>
       )}
@@ -745,14 +800,23 @@ export default function Chums2Client({ name, slug, image, info, lineage, diag = 
           from the tile with the yellow-name navy panel beside it, no backdrop,
           no X, 2s auto-close, exactly like the mini pit. Anchored to the tile's
           screen rect captured at click. (D26.) */}
-      {openPop?.kind === "image" && (() => {
-        const f = frames.find((x) => x.id === openPop.id);
-        if (!f || !openPop.anchor) return null;
+      {(() => {
+        // The enlarged image serves BOTH the clicked image popout and the circle
+        // -hover preview (#2). persist removes the 2s auto-close (popouts persist,
+        // New-2); borderColor paints the border in the ancestor's tile-status colour
+        // (New-3). A preview closes by clearing hoverPreview; a clicked one by openPop.
+        const src = openPop?.kind === "image" ? openPop : preview;
+        if (!src) return null;
+        const f = frames.find((x) => x.id === src.id);
+        if (!f || !src.anchor) return null;
+        const isPreview = !openPop;
         return (
           <TileZoom
             key={f.id}
-            open={{ img: f.img, name: f.name, description: f.note || "", anchor: openPop.anchor }}
-            onClose={() => setOpenPop(null)}
+            open={{ img: f.img, name: f.name, description: f.note || "", anchor: src.anchor }}
+            onClose={() => (isPreview ? setHoverPreview(null) : setOpenPop(null))}
+            persist
+            borderColor={frameBorder(f.status)}
           />
         );
       })()}

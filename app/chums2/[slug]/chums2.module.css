@@ -176,7 +176,17 @@
   padding-left: clamp(18px, 4vw, 48px);
   padding-right: clamp(20px, 2.5vw, 44px); /* keep the lower band off the right edge */
   padding-bottom: 24px;
+  /* #0 EVENT ROUTING: the left band is a full-width wrapper that overlaps the
+     behind-diagram (z-index:-1) in its empty middle. It must NOT eat the pointer
+     there or the diagram circles are unhoverable/unclickable. Setting it (and
+     .introStack) to none lets events fall THROUGH the wrappers to the diagram SVG
+     (pointer-events:auto, so it hits only on painted circles); the real interactive
+     leaves below (.railWrap, .ancestorPack, .famousWrap) turn events back on. */
+  pointer-events: none;
 }
+/* #0: the rail is an interactive leaf inside the (none) band. It does not overlap
+   the diagram, so re-enabling it never steals a diagram click. */
+.railWrap { pointer-events: auto; }
 
 .introStack {
   display: flex;
@@ -185,9 +195,8 @@
   gap: var(--gutter-v); /* GUTTER 3: ancestor pack -> FAMOUS CHUMS (== gutter 2) */
   min-width: 0;
   flex: 1 1 auto; /* fill the band width so the lower band (famous + chart) can be wide */
-  /* This wrapper is full-width and now sits OVER the behind-diagram, so it must not
-     eat clicks in its empty middle: pass them through to the diagram (zoom) and
-     re-enable only the real sections below. The rail is a sibling (not affected). */
+  /* Full-width wrapper over the behind-diagram: none, same reason as .leftBand
+     (#0). The rail (a sibling in .leftBand) is re-enabled by .railWrap above. */
   pointer-events: none;
 }
 /* Re-enable the interactive left-column sections over the behind-diagram. */
@@ -639,6 +648,18 @@
   color: #ffffff;
   margin: 0;
   line-height: 1.5;
+}
+
+/* Era line (2026-08-23): the ancestor's era from uk-breeds, above the note. Same
+   body font/size/colour as the note; the "Era:" label is emphasised via the yellow
+   token so it reads as a label without a second font. Sits between name and note. */
+.framePopoverEra {
+  font-family: var(--font-body, 'Montserrat', system-ui);
+  font-size: 13px;
+  color: #ffffff;
+  margin: 0 0 6px;
+  line-height: 1.5;
+  font-weight: 700;
 }
 
 /* Percentage-detail popout, mirroring the shipped pctCard/pctHover (D24). */
