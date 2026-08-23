@@ -14,6 +14,53 @@ Baseline (measured before stage 1):
 
 ---
 
+## 2026-08-23 bounded tree: accumulate branches, no re-fit (D63)
+
+Bounded-mode (LineageMap, /chums2) only; the pit's focus-follow and re-fit are untouched.
+Goal: click through to expose the WHOLE tree at once, stable (nothing shifts on click).
+
+MECHANISM. Two pit semantics had to change:
+- FOCUS-SWITCH -> ACCUMULATE: `follow(n)` rebuilds a fresh root->n path Set and drops
+  every other branch. The bounded click no longer calls it; it does
+  `setOpen(prev => new Set(prev).add(n._id))` - additive, nothing ever removed - so every
+  opened branch stays open. Then onNodeClick fires the popup (rect read first). Item 3/4 kept.
+- RE-FIT -> STABLE FULL-TREE FRAME. The re-centre came from `fitBox` recomputing from
+  `shown`, which changed on every expand. Fix: in bounded mode the layout walk lays out the
+  WHOLE tree every render (gate `bounded || open.has(id)`), because positions are
+  deterministic per node (parent + fixed slot). So `shown` - hence `fitBox` - is the full
+  tree from the first render and never changes as branches open: the viewBox is fixed, every
+  node keeps its position, new children just fill in their pre-computed spots. `open` now only
+  gates which nodes RENDER: two SVG filters add `(!bounded || open.has(parent._id))` (a no-op
+  for the pit, whose `shown` already holds only open-parent nodes).
+APPROACH CHOSEN for "outgrows the region": neither scale-on-the-fly nor overdraw - the frame
+is fit to the FULL tree up front, so the tree never outgrows it (no jump, no overdraw). Cost:
+the initial depth-2 view sits in a full-tree frame (a touch zoomed out); that is the price of
+zero shifting. Pit byte-identical (bounded-gated walk, no-op filters, click change inside the
+`if (bounded)` branch only).
+
+## 2026-08-23 diagram refinements: hover, labels, taper, tree left (D62)
+
+All /chums2-scoped (displayOnly or page-level), game byte-identical.
+1. HOVER FIX: displayOnly circle fill "none" -> "transparent". "none" only hit-tests the
+   stroke line (hover barely worked); "transparent" is a paint, so `visiblePainted` (the
+   SVG default) hit-tests the whole disc while still drawing nothing. Hover both ways works.
+2. LABEL nudge: displayOnly name draws with a small LEFT nudge (DISPLAY_LABEL_DX = -0.08
+   x rFit) and a slight counter-rotation (DISPLAY_LABEL_ROT_DEG = -3), both new module
+   tunables, in place of the game's TITLE_DX_FRAC/TITLE_ANGLE right-shifted arc.
+3. STROKE TAPER: lives in strokeWidthFor (radius-proportional d.r x descending RING_FRAC,
+   which roughly halves per depth). displayOnly early-return makes each depth>=2 ring 0.9x
+   its PARENT's ring (recurse to the radius-proportional depth-1 ring, 0.9 per level below).
+   Gated on displayOnly; game taper untouched.
+4. TREE/CHART 100px LEFT. Option (a) canvas -100 alone was rejected: it moves the canvas
+   -right-anchored zone edge too, dropping stage width to ~420 (aspect 0.60 < 0.68) which
+   would WIDTH-bind and shrink the pack. So: trim canvas 2344 -> 2244 AND raise
+   --diagram-zone-right 1015 -> 915 by the same 100, holding the zone edge at 1329 (stage
+   809..1329, width 520, aspect ~0.74 > 0.68 -> pack UNCHANGED, height-bound), and drop
+   the --gutter-tree term from the tree/chart offset so they abut the zone edge. Numbers:
+   tree left 1329 (was 1429), tree right 2169 + 75 margin, canvas 2244, GUTTER 5 ~9 (was
+   ~109). NOTE: 9px is tight (tree nearly abuts the pack) - the honest result of "100px
+   left" with the pack fixed; dial the pull back if that reads too close.
+
 ## 2026-08-23 diagram review round: stroke-only, rotation, tighter zone (D61)
 
 All /chums2-scoped (displayOnly or page-level), game byte-identical.

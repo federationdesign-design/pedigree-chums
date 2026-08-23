@@ -841,7 +841,13 @@ export default function LineageMap({
     root._dir = -Math.PI / 2 + base;
     list.push(root);
     const walk = (n: Node, depth: number) => {
-      const kids = open.has(n._id) && n.children && n.children.length ? (n.children as Node[]) : null;
+      // BOUNDED (/chums2): lay out the WHOLE tree every render, regardless of `open`.
+      // The layout is deterministic per node (parent + fixed slot), so every node gets
+      // its final, stable position from the first render; the fitBox then fits the full
+      // tree and never re-fits as branches open (the "no shifting" rule). `open` still
+      // gates which nodes actually RENDER (see the two filters in the SVG), so branches
+      // still reveal progressively and ACCUMULATE. The pit path is unchanged.
+      const kids = (bounded || open.has(n._id)) && n.children && n.children.length ? (n.children as Node[]) : null;
       if (!kids) return;
       const cnt = kids.length;
       const spread = circular ? Math.PI * 0.42 : depth === 0 ? SPREAD1 : SPREADN;
@@ -2181,7 +2187,10 @@ export default function LineageMap({
                 the original order, with the root drawn last. */}
             {soloLeaf && rootCard(breed.x, breed.y)}
             {shown
-              .filter((n) => n._parent && !soloLeaf && !n._tucked)
+              // BOUNDED: full tree is laid out, so gate the drawn edges to nodes whose
+              // parent is expanded (accumulating `open`). `!bounded ||` makes this a
+              // no-op for the pit, whose `shown` already contains only open-parent nodes.
+              .filter((n) => n._parent && !soloLeaf && !n._tucked && (!bounded || open.has((n._parent as Node)._id)))
               .map((n) => {
                 const p = n._parent as Node;
                 return (
@@ -2196,7 +2205,9 @@ export default function LineageMap({
                 );
               })}
             {shown
-              .filter((n) => n._parent && !soloLeaf)
+              // BOUNDED: same visibility gate as the edges - render only nodes whose
+              // parent is expanded. No-op for the pit (see the edge filter above).
+              .filter((n) => n._parent && !soloLeaf && (!bounded || open.has((n._parent as Node)._id)))
               .map((n) => {
                 const hasKids = !!(n.children && n.children.length);
                 const isOpen = open.has(n._id) && hasKids;
@@ -2221,7 +2232,15 @@ export default function LineageMap({
                       if (bounded) {
                         const g = e.currentTarget as SVGGElement;
                         const rect = g.getBoundingClientRect();
-                        if (n.children && n.children.length) follow(n); // the pit's expand for this node
+                        // ACCUMULATE, do not focus-switch: add this node to `open` so its
+                        // children reveal, keeping every previously opened branch open
+                        // (follow() would rebuild a fresh path-only set and collapse the
+                        // rest). Nothing is ever removed, so clicking through every node
+                        // exposes the whole tree at once. The full-tree layout means no
+                        // re-fit. Then hand the rect up for the popup (rect read first).
+                        if (n.children && n.children.length) {
+                          setOpen((prev) => { const s = new Set(prev); s.add(n._id); return s; });
+                        }
                         onNodeClick?.(n.name, { x: rect.left, y: rect.top, w: rect.width, h: rect.height });
                         return;
                       }
