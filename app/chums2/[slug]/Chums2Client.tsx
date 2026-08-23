@@ -65,16 +65,6 @@ const SHOW_SECTIONS = {
   backButton: false,    // the Back link
 };
 
-// Small pit-style X used to close a panel (diagram, tree).
-function CloseX() {
-  return (
-    <svg viewBox="0 0 32 32" aria-hidden="true">
-      <line x1="7" y1="7" x2="25" y2="25" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
-      <line x1="25" y1="7" x2="7" y2="25" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
-    </svg>
-  );
-}
-
 // A card definition: what the rail shows and what the DragCard holds.
 type CardDef = { id: string; label: string; icon: React.ReactNode; width: number; body: React.ReactNode };
 
@@ -555,28 +545,12 @@ export default function Chums2Client({ name, slug, image, info, lineage, diag = 
                 </section>
               )}
               </div>
-              {/* Lower band: famous chums (left) and the lifespan chart (right),
-                  tops aligned. Count-aware via flex: famous takes the width its
-                  card count needs and the chart takes the rest with a fixed gap;
-                  with zero famous chums the famous block does not render and the
-                  chart grows to the full band. Cards wrap within their own width,
-                  so the chart is never pushed under or over them. No absolute
-                  offsets. (D28.) */}
-              {((SHOW_SECTIONS.famousChums && famousDogs[slug]) || (SHOW_SECTIONS.lifespanChart && lifespanCurves[name])) && (
-                <div className={styles.lowerBand}>
-                  {SHOW_SECTIONS.famousChums && famousDogs[slug] && (
-                    <div className={styles.famousWrap} data-region="famous-chums">
-                      <FamousDogsSection dogs={famousDogs[slug]} />
-                    </div>
-                  )}
-                  {SHOW_SECTIONS.lifespanChart && lifespanCurves[name] && (
-                    <div className={styles.chartSlot} data-region="lifespan-chart">
-                      <p className={styles.packTitle}>Likely life span</p>
-                      <div className={styles.chartFluid}>
-                        <LifespanChart breedName={name} fluid />
-                      </div>
-                    </div>
-                  )}
+              {/* Famous chums: the bottom of the LEFT column, below the ancestor pack
+                  (the lifespan chart is no longer beside it; it moved to the far-right
+                  column below the tree, brief 3). */}
+              {SHOW_SECTIONS.famousChums && famousDogs[slug] && (
+                <div className={styles.famousWrap} data-region="famous-chums">
+                  <FamousDogsSection dogs={famousDogs[slug]} />
                 </div>
               )}
             </div>
@@ -592,15 +566,9 @@ export default function Chums2Client({ name, slug, image, info, lineage, diag = 
           pack to fill. pointer-events:none keeps the sections beneath clickable. */}
       {SHOW_SECTIONS.diagram && lineage && !closed.has("diagram") && (
         <div className={styles.diagramStage} data-region="diagram">
-          <button
-            type="button"
-            className={styles.panelClose}
-            onClick={() => closeCard("diagram")}
-            aria-label="Close diagram"
-            title="Close diagram"
-          >
-            <CloseX />
-          </button>
+          {/* Chrome sweep (brief 5): the diagram's close X was a stray floating X on
+              the invisible stage (nothing to attach it to), so it is removed. The
+              diagram is a permanent centrepiece; it does not close. */}
           <BreedTree
             root={lineage}
             rootImage={image}
@@ -648,6 +616,18 @@ export default function Chums2Client({ name, slug, image, info, lineage, diag = 
             }}
             onClose={() => closeCard("tree")}
           />
+        </div>
+      )}
+
+      {/* Lifespan chart: far-right column, BELOW the tree, heading with it (brief 3).
+          Its concept home; it must not sit in the diagram zone, so it is a canvas
+          -child in the tree column, not in the left-column lower band. */}
+      {SHOW_SECTIONS.lifespanChart && lifespanCurves[name] && (
+        <div className={styles.chartRegion} data-region="lifespan-chart">
+          <p className={styles.packTitle}>Likely life span</p>
+          <div className={styles.chartFluid}>
+            <LifespanChart breedName={name} fluid />
+          </div>
         </div>
       )}
 

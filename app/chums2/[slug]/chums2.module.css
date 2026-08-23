@@ -192,11 +192,21 @@
   height: 500px;
 }
 
+/* Lifespan chart: its concept home is the far-right column BELOW the tree, heading
+   with it (brief 3). Canvas-child in the tree column (right:75 aligns with the tree),
+   below the tree's bottom (~300 + 500 + gap), so it never sits in the diagram zone. */
+.chartRegion {
+  position: absolute;
+  top: 840px;
+  right: 75px;
+  width: 840px;
+}
+
 .introBox {
-  /* On the 3000px canvas the column is set from the concept's proportions, not from
-     the viewport: the intro box fills the intro column (~0.27 of 3000) so its right
-     edge sits just before the diagram zone at 970. Height driven by its text. */
-  width: 800px;
+  /* Concept proportion: narrow-and-tall (~600px, ~8 lines), NOT the wide-short
+     800px version. Height is text-driven. The diagram zone's left edge is derived
+     from this width (box right + 20) in .diagramStage, so keep them in step. */
+  width: 600px;
   border-radius: 24px;
   background: var(--navy, #0a3a57);
   border: 2.5px solid rgba(255, 255, 255, 0.12);
@@ -369,25 +379,28 @@
 .scrollBody { max-height: 70vh; overflow-y: auto; overflow-x: hidden; padding: 0 6px; }
 
 /* ── Circular diagram stage: the concept's RED ZONE ─────────────
-   A canvas-child region defined ONLY by offsets (no size box, no background/border/
-   radius, no overflow), there only to be measured. Offsets read straight off the
-   concept at the 3000px canvas width:
-     - left 970  = intro/pack column's right edge (0.323 * 3000)
-     - right 915 = so the right edge is 2085 = the tree column's left edge (0.695 * 3000)
+   The RIG's EXACT hosting (same stage construction, fill mode, props, DISPLAY_SPAN),
+   the ONLY difference being it is positioned over the concept's red zone instead of
+   the whole canvas. A canvas-child region defined ONLY by offsets (no size box, no
+   background/border/radius, no overflow), there only to be measured:
+     - left  = the intro column's RIGHT edge = leftBand padding + rail(61) + gap(5) +
+               intro box(600) + 20  (so the zone left follows box right + 20, brief 4)
+     - right 915 = right edge at 2085 = the tree column's left edge (0.695 * 3000)
      - top 320   = just below the header/subtitle (header padding-top + chum square)
-     - bottom 40 = the FAMOUS-CHUMS row bottom, i.e. ~the canvas content bottom (the
-                   famous row is the last left-column content), NOT the pack bottom.
-   Zone width ~1115px, tall. BreedTree fill-measures this and (displayOnly) frames
-   the pack to fill it, diameter close to the shorter side (the width). It is the
-   whole open middle band; the pack/famous/chart sit to its left and right and show
-   through: pointer-events:none keeps them clickable, and the SVG only hit-tests its
-   painted circles (zoom unchanged, empty areas pass clicks through). */
+     - bottom 170 = ~the FAMOUS-CHUMS row bottom (the left column ends there; the
+                   far-right chart runs lower, so this pulls the zone up off it). This
+                   is an estimate off the section heights; confirm on a 3000 screenshot.
+   NOTE (brief 1): this zone's aspect (~1.8, close to the mini pit) differs sharply
+   from the rig's ~3.75 that DISPLAY_SPAN 1.7 was tuned for, so the pack frames
+   SMALLER here (see DECISIONS D48) - reported, not retuned blind.
+   pointer-events:none keeps the pack/famous sections beneath clickable; the SVG only
+   hit-tests its painted circles (zoom unchanged, empty areas pass clicks through). */
 .diagramStage {
   position: absolute;
-  left: 970px;
+  left: calc(clamp(18px, 4vw, 48px) + 61px + 5px + 600px + 20px);
   top: 320px;
   right: 915px;
-  bottom: 40px;
+  bottom: 170px;
   pointer-events: none;
 }
 .diagramStage svg { pointer-events: auto; }

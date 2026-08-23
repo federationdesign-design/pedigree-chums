@@ -3055,7 +3055,7 @@ export default function LineageMap({
     {boxPop && !circular && (
       <img className={styles.cardBox} src="/card-pack-box.svg" alt="" aria-hidden="true" />
     )}
-    {showAuto && !circular && (
+    {showAuto && !circular && !bounded && (
       <div className={styles.autoWrap} onClick={autoCollect} onPointerDown={(e) => e.stopPropagation()} role="button" aria-label="Auto Find">
         <div className={styles.autoPop}>
           <img className={styles.autoBtn} src="/auto-icon-redux.svg" alt="Auto Find" />

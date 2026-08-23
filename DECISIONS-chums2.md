@@ -14,6 +14,37 @@ Baseline (measured before stage 1):
 
 ---
 
+## 2026-08-29 full page rebuilt around the (correct) diagram
+
+### D48. Sections placed to the concept around the rig-hosted diagram; zone aspect reported
+The ?diag=1 rig proved the diagram (DISPLAY_SPAN 1.7) is correct, so the full page is
+brought back around it without touching the diagram mechanism:
+- The diagram keeps the RIG's exact hosting (stage construction, fill, props,
+  DISPLAY_SPAN); the ONLY difference is the stage is positioned over the concept's red
+  zone instead of the whole canvas. Offsets only, nothing clips.
+- Intro box back to the concept proportion: 600px (narrow, ~8 lines tall), not the
+  wide-short 800px. The diagram zone's LEFT edge follows box-right + 20 (brief 4):
+  left = leftBand padding + rail(61) + gap(5) + 600 + 20.
+- Lifespan chart moved to its concept home (brief 3): a canvas-child in the far-right
+  column BELOW the tree (.chartRegion, top 840, right 75, width 840), heading with it,
+  out of the diagram zone. The left-column lower band is now famous-chums only.
+- Chrome sweep (brief 5): the AUTO ("Auto Find") button is gated off for bounded
+  (LineageMap ~3058, added !bounded) so it stops arming on the tree; the stray floating
+  X was the diagram's own close button sitting on the invisible stage with nothing to
+  attach to, so it (and the now-unused CloseX helper) are removed - the diagram is a
+  permanent centrepiece and does not close.
+Zone aspect check (brief 1, reported NOT retuned): the zone is ~1351 wide (left ~734 at
+a 1440 viewport, right edge 2085) x ~600-660 tall (top 320 to the famous-row bottom),
+so its aspect is ~2.0-2.25 - far from the rig's ~3.75 that DISPLAY_SPAN 1.7 was tuned
+for. Because the resting frame is width-driven (a fixed view width ~3.75*packDiameter),
+the pack fills the same D/w fraction of whatever stage it is in: in the 1351-wide zone
+that is only ~27% of the width (~360px pack), so the pack frames noticeably SMALLER
+here than in the 3000-wide rig. This is the D47 width-only-fit limitation, confirmed on
+a real zone. Per brief 1 this is REPORTED, not fixed by a blind DISPLAY_SPAN change
+(that would re-break the rig): the proper fix is a height-aware resting fit (frame by
+min(width-fit, height-fit)) so the pack fills any aspect. Numbers are estimates off the
+section heights; confirm on a 3000px screenshot.
+
 ## 2026-08-28 diagram isolation rig (?diag=1)
 
 ### D47. DISPLAY_SPAN 1.1 -> 1.7 (35% smaller resting pack); aspect check
