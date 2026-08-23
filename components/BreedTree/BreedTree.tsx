@@ -1381,6 +1381,10 @@ export default function BreedTree({
     }
   }, []);
   const circlesRef = useRef<SVGGElement>(null);
+  // chums2 hover punch-out band (D69/D70): a single evenodd path drawn behind the
+  // circles, its geometry written imperatively from the LIVE painted view so it lines
+  // up with the circles exactly (see the effect near the re-fit).
+  const hlPathRef = useRef<SVGPathElement>(null);
   const isMobileRef = useRef(false);
   isMobileRef.current = isMobile;
   // displayOnly RESTING FRAME (D57): a CONTENT-AWARE contain fit derived from the
@@ -3337,6 +3341,28 @@ export default function BreedTree({
     zoomTo(v);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [displayOnly, aspect, nodes]);
+
+  // chums2 hover PUNCH-OUT band (D70): write the highlight path's geometry from the
+  // LIVE painted view (viewRef, read here in an EFFECT, never during render) so it
+  // lines up with the imperatively-painted circles exactly. Fires when the hovered
+  // ancestor (highlightName) changes and whenever the fit re-runs (aspect/nodes).
+  // Outer circle + each non-echo direct child as evenodd subpaths => the child discs
+  // punch out. Empty `d` clears it. displayOnly + prop-gated, so the game never sees it.
+  useEffect(() => {
+    const p = hlPathRef.current;
+    if (!p) return;
+    if (!displayOnly || !highlightName) { p.setAttribute("d", ""); return; }
+    const v = viewRef.current, kk = SIZE / v[2];
+    const disc = (cx: number, cy: number, r: number) =>
+      `M ${cx - r},${cy} a ${r},${r} 0 1,0 ${2 * r},0 a ${r},${r} 0 1,0 ${-2 * r},0 Z`;
+    let dd = "";
+    for (const d of nodes) {
+      if (d.depth === 0 || isEcho(d) || d.data.name !== highlightName) continue;
+      dd += disc((d.x - v[0]) * kk, (d.y - v[1]) * kk, d.r * kk);
+      for (const kid of d.children ?? []) if (!isEcho(kid)) dd += " " + disc((kid.x - v[0]) * kk, (kid.y - v[1]) * kk, kid.r * kk);
+    }
+    p.setAttribute("d", dd);
+  }, [displayOnly, highlightName, nodes, aspect]);
 
   // Closing the blue box used to be the way out of LEARN. It is not any more:
   // the corner X is the single exit everywhere, on the start screen, in play and
@@ -5747,38 +5773,17 @@ export default function BreedTree({
               circle it belongs to. zoomTo, the drop-in entrance and
               liftToLearn all index this group and now read
               children[i].children[0] for the circle, [1] for the label. */}
-          {/* chums2 hover PUNCH-OUT: the pack-tile-hover yellow fills only the
-              highlighted circle's EXPOSED band, not the discs of its child circles.
-              A single evenodd path per matching node (outer circle + each non-echo
-              direct child as a subpath) punches the children out; derived from the
-              node's ACTUAL direct children, so it adapts per breed. Drawn BEHIND the
-              stroke-only circles: the transparent parent shows this yellow, the child
-              holes show the background, the white strokes and labels stay on top. Its
-              geometry mirrors the circles' own imperative paint (translate by
-              (world - view)*k, radius drawR), read from the live view. displayOnly only. */}
-          {displayOnly && !!highlightName && (() => {
-            // The RESTING view, recomputed purely (displayRestView reads no refs, so this
-            // is render-safe): the same frame the mount effect paints the circles at, so
-            // the punch-out lines up. Radius is the plain world radius d.r*k (no ring
-            // inset), which makes the child holes clear the child rings cleanly.
-            const v = displayRestView(), kk = SIZE / v[2];
-            const disc = (cx: number, cy: number, r: number) =>
-              `M ${cx - r},${cy} a ${r},${r} 0 1,0 ${2 * r},0 a ${r},${r} 0 1,0 ${-2 * r},0 Z`;
-            const hi = nodes.filter((d) => !(d.depth === 0 || isEcho(d)) && d.data.name === highlightName);
-            if (hi.length === 0) return null;
-            return (
-              <g pointerEvents="none" aria-hidden="true">
-                {hi.map((d, j) => {
-                  let dd = disc((d.x - v[0]) * kk, (d.y - v[1]) * kk, d.r * kk);
-                  for (const kid of d.children ?? []) {
-                    if (isEcho(kid)) continue;
-                    dd += " " + disc((kid.x - v[0]) * kk, (kid.y - v[1]) * kk, kid.r * kk);
-                  }
-                  return <path key={j} d={dd} fillRule="evenodd" fill="var(--yellow, #ffd23e)" />;
-                })}
-              </g>
-            );
-          })()}
+          {/* chums2 hover PUNCH-OUT band (D69/D70): the pack-tile-hover yellow fills
+              ONLY the highlighted circle's exposed band, punching its child discs out to
+              background. A single evenodd path (outer circle + each non-echo direct child
+              as a subpath, per matching node), drawn BEHIND the stroke-only circles so the
+              transparent parent shows this yellow while the child holes show through and
+              the white strokes and labels stay on top. `d` is written imperatively from
+              the LIVE painted view (effect below), so it aligns with the circles exactly -
+              rendering it here with a resting-view guess left it misplaced. displayOnly. */}
+          <g pointerEvents="none" aria-hidden="true">
+            <path ref={hlPathRef} fillRule="evenodd" fill="var(--yellow, #ffd23e)" />
+          </g>
           <g ref={circlesRef}>
             {nodes.map((d, i) => {
               // The outer breed circle (root) is hidden so only the ancestor
@@ -6188,7 +6193,11 @@ export default function BreedTree({
                           y={labelFirstY(lines.length, fs, rFit)}
                           transform={`rotate(${displayOnly ? DISPLAY_LABEL_ROT_DEG : TITLE_ANGLE} ${dx} ${titleDy(rFit)})`}
                           style={{
-                            fill: d === hovered ? "var(--yellow, #ffd23e)" : "#ffffff",
+                            // The hovered circle's NAME goes yellow in the game. On the
+                            // /chums2 diagram the hover feedback is the yellow BAND fill
+                            // (punch-out) instead, so the label must keep its normal white
+                            // - gate the yellow off for displayOnly. (D70 #2.)
+                            fill: d === hovered && !displayOnly ? "var(--yellow, #ffd23e)" : "#ffffff",
                             fontFamily: "var(--font-display), system-ui, sans-serif",
                             fontSize: `${fs}px`,
                             letterSpacing: "0.5px",

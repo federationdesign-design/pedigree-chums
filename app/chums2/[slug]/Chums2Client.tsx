@@ -61,9 +61,9 @@ const SHOW_SECTIONS = {
   diagram: true,        // circular BreedTree diagram (right of the intro box)
   ancestorPack: true,   // hidden BreedTreeMap feed + pack grid
   famousChums: true,    // FamousDogsSection
-  cards: false,         // rail pop-out DragCards
+  cards: true,          // rail pop-out DragCards (D71: re-enabled; collision-placed, draggable, persist until X)
   tree: true,           // family tree (inline bounded LineageMap, right of the intro box)
-  rail: true,           // the icon rail (icons only for now; pop-outs gated off)
+  rail: true,           // the icon rail (opens the cards above)
   backButton: false,    // the Back link
 };
 
@@ -439,22 +439,21 @@ export default function Chums2Client({ name, slug, image, info, lineage, diag = 
   // it would overlap the resting pack, dropped below it.
   const computeDock = useCallback((): { x: number; y: number; size: number } | undefined => {
     if (typeof document === "undefined") return undefined;
-    const box = document.querySelector('[data-region="intro-box"]') as HTMLElement | null;
-    if (!box) return undefined;
-    const br = box.getBoundingClientRect();
-    const SIZE = 61, IMG = SIZE * 3, GAP = 12;
-    const ENS_W = IMG + 10 + 219, ENS_H = IMG + 10 + 200; // image + gap + panel / + pct card
-    let x = br.right + GAP, y = br.top;
+    // Dock in the OPEN AREA top-right of the diagram zone: the band right of the resting
+    // pack, upper region (below the header line), NOT low over the diagram bottom. Anchor
+    // to the pack's measured RIGHT edge (x) and TOP (y); the masonry cluster flows right +
+    // down from there. Clamped inside the canvas/viewport.
     const diagram = document.querySelector('[data-region="diagram"]');
-    if (diagram) {
-      const rects = (Array.from(diagram.querySelectorAll("circle[data-n]")) as SVGCircleElement[])
-        .filter((c) => c.getAttribute("fill") !== "none").map((c) => c.getBoundingClientRect());
-      if (rects.length) {
-        const pT = Math.min(...rects.map((r) => r.top)), pB = Math.max(...rects.map((r) => r.bottom));
-        const pL = Math.min(...rects.map((r) => r.left)), pR = Math.max(...rects.map((r) => r.right));
-        if (x < pR && x + ENS_W > pL && y < pB && y + ENS_H > pT) y = pB + 10; // clear the pack below
-      }
-    }
+    if (!diagram) return undefined;
+    const rects = (Array.from(diagram.querySelectorAll("circle[data-n]")) as SVGCircleElement[])
+      .filter((c) => c.getAttribute("fill") !== "none").map((c) => c.getBoundingClientRect());
+    if (!rects.length) return undefined;
+    const packRight = Math.max(...rects.map((r) => r.right));
+    const packTop = Math.min(...rects.map((r) => r.top));
+    const SIZE = 61, IMG = SIZE * 3, GAP = 16;
+    const ENS_W = IMG + 10 + 219, ENS_H = IMG + 10 + 200; // image + gap + panel / + pct card
+    let x = packRight + GAP;  // in the open band right of the pack
+    let y = packTop;          // upper region, level with the pack top
     const EDGE = 8, vw = window.innerWidth, vh = window.innerHeight;
     x = Math.max(EDGE, Math.min(x, vw - EDGE - ENS_W));
     y = Math.max(EDGE, Math.min(y, vh - EDGE - ENS_H));

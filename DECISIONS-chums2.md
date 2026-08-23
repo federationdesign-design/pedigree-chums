@@ -14,6 +14,39 @@ Baseline (measured before stage 1):
 
 ---
 
+## 2026-08-23 dock top-right; punch-out align + label fix; rail cards (D70-D71)
+
+### D70 #1 Hover ensemble dock -> open band top-right of the pack
+computeDock now anchors to the resting pack's measured RIGHT edge (x) and TOP (y) - the
+open band right of the pack, upper region - instead of the intro box with a push-DOWN on
+overlap (which put it low over the diagram bottom). Masonry flow + viewport clamp unchanged.
+
+### D70 #2 Punch-out band alignment + label must not yellow
+Two bugs: (a) the band was rendered during React render from displayRestView(), but the
+circles are painted from clampRootView(displayRestView()) which SHIFTS cy for dockAside, so
+the band was vertically misaligned (looked like it "did not change"). Fix: write the path's
+`d` IMPERATIVELY in an effect from the LIVE viewRef.current (the exact painted view) into a
+static <path ref> behind the circles - lines up exactly, and reads the ref in an effect (not
+render, so no lint). (b) The circle NAME went yellow on hover via `d === hovered` (a game
+affordance); gated it off for displayOnly so the diagram label keeps its normal white and the
+BAND is the only hover feedback.
+
+### D71 Rail cards re-enabled
+1. TOOLTIP Z-ORDER: the icon-hover tooltip sat behind the pack tiles. Cause: `.icon` gets a
+   stacking context from its `:hover transform: scale`, and `.railWrap` had no z-index, so the
+   later-in-DOM intro/pack sections painted over the rail. Fix: `.railWrap { position: relative;
+   z-index: 60 }` raises the whole rail (and the hovered tooltip) above those sections (under
+   the DragCards at 120+).
+2/3. SHOW_SECTIONS.cards = true. The existing card model already meets the persist/multi-open
+   brief: `closed` is a Set (a card is open when not in it), openCard only deletes the opened id
+   (never closes another -> multiple open at once), closeCard adds it back (returns the icon to
+   the rail), and only openPop (tile popouts) closes on outside click - cards have no
+   outside-click/timer close. Collision placement (placeCard, first free slot) + draggable
+   (DragCard) are the original build. No state change needed.
+4. Cards in scope build in the `cards` memo (temperament, influence, lifespanExplain, cost,
+   suitability, exercise, grooming, training, health). No intro-box / lifespan-chart rail icon
+   exists (both are on-page, never cards), so nothing to remove.
+
 ## 2026-08-23 top-align, hover ensemble, intro alias, yellow punch-out (D67-D69)
 
 ### D67 #1 Two-circle pack top-aligns (displayRestView)
