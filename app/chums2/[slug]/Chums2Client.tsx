@@ -435,6 +435,7 @@ export default function Chums2Client({ name, slug, image, info, lineage, diag = 
               strokeByDepth
               tinted={false}
               displayOnly
+              hideCircleImages
             />
           )}
         </div>
@@ -590,6 +591,7 @@ export default function Chums2Client({ name, slug, image, info, lineage, diag = 
             strokeByDepth
             tinted={false}
             displayOnly
+            hideCircleImages
           />
         </div>
       )}

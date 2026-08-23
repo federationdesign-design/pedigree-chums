@@ -1139,6 +1139,12 @@ export default function BreedTree({
   // and the caption aside. Default false, so every game code path is unchanged
   // when it is not passed. See chums2 DECISIONS D7.
   displayOnly = false,
+  // hideCircleImages (chums2 diagram, 2026-08-30): render every node circle as a
+  // plain FILLED circle (fillFor's depth palette) with no breed photo at any depth,
+  // for a traditional diagram look. Strokes, labels and % badges are unchanged. This
+  // is a separate, page-scoped switch, NOT the accessibility HIDE_IMAGES mechanism.
+  // Default false, so the mini pit, main pit and every other hosting are byte-identical.
+  hideCircleImages = false,
 }: {
   root: LineageNode;
   rootImage?: string;
@@ -1230,6 +1236,8 @@ export default function BreedTree({
   portraitAnchor?: { cx: number; cy: number; rad: number } | null;
   // See the destructure above (added 2026-08-22).
   displayOnly?: boolean;
+  // See the destructure above (added 2026-08-30).
+  hideCircleImages?: boolean;
 }) {
   const [isMobile, setIsMobile] = useState(false);
   const [aspect, setAspect] = useState(1);
@@ -2653,6 +2661,10 @@ export default function BreedTree({
   const [ready, setReady] = useState(false);
 
   function nodeImg(d: Node): string | undefined {
+    // hideCircleImages: report NO image for every circle, so the single image funnel
+    // (the pattern def, hasImg/tint, and the circle fill) all fall through to the
+    // solid fillFor colour. Traditional diagram look, no photos at any depth.
+    if (hideCircleImages) return undefined;
     return d.depth === 0 ? rootImage ?? d.data.img : d.data.img;
   }
   function fillFor(d: Node): string {
@@ -5455,7 +5467,11 @@ export default function BreedTree({
           // so. At the top it does nothing in LEARN, so it keeps the plain arrow
           // rather than promising a zoom that will not happen.
           className={!disableZoom && !dropped && !frozen && focus !== nodes[0] ? styles.curZoomOut : undefined}
-          style={{ opacity: ready ? 1 : 0 }}
+          // displayOnly (chums2 static diagram): force the pack svg's overflow VISIBLE
+          // inline, so no CSS cascade can leave the UA-default overflow:hidden in place
+          // and clip a zoomed circle to the (small) stage rectangle. Inline so it is
+          // guaranteed for this hosting; game paths (displayOnly false) are unchanged.
+          style={displayOnly ? { opacity: ready ? 1 : 0, overflow: "visible" } : { opacity: ready ? 1 : 0 }}
         >
           <defs>
             {/* Per-level duotone tints. feColorMatrix flattens the image to
@@ -6903,8 +6919,13 @@ export default function BreedTree({
             );
           })()}
         </svg>
-        {/* J17: the canvas effects layer, above the SVG, never takes a pointer. */}
-        <canvas ref={fxCanvasRef} className={styles.fxCanvas} aria-hidden="true" />
+        {/* J17: the canvas effects layer, above the SVG, never takes a pointer.
+            displayOnly (chums2 static diagram) omits it: it is a raster bitmap sized
+            to the stage rect, so any effect it paints for a zoomed circle is hard-cut
+            at the stage's bottom edge (a flat line overflow:visible cannot lift, since
+            it is a bitmap, not svg content). The static diagram needs no fx, so drop
+            it here; game paths (displayOnly false) keep it unchanged. */}
+        {!displayOnly && <canvas ref={fxCanvasRef} className={styles.fxCanvas} aria-hidden="true" />}
       </div>
 
       {/* Difficulty: start-screen only, down the left, 10 hardest at the top.

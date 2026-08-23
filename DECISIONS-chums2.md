@@ -14,6 +14,35 @@ Baseline (measured before stage 1):
 
 ---
 
+## 2026-08-31 diagram: kill the surviving clip + traditional no-photo look
+
+### D51. Surviving flat cut: the effects-canvas raster (and a guaranteed svg un-clip)
+A render-tree map from the painted <circle>s up to <html> showed the circles' ancestor
+chain is g -> svg -> .stage/.stageDocked -> .tree/.treeFill -> .diagramStage -> .canvas
+-> body, and NONE of those set overflow (other than the svg's UA-default hidden), no
+clip-path, no contain, no second svg, no foreignObject. So the only two possible
+clippers were: (1) the pack <svg>'s default overflow:hidden (my earlier .diagramStage
+svg { overflow:visible } already lifts it, but to remove any cascade doubt I now ALSO
+set overflow:visible INLINE on the svg for displayOnly, which no rule can override);
+and (2) `.fxCanvas`, the effects layer, a <canvas> sibling above the svg sized in JS to
+the stage rectangle - a raster bitmap, so any effect it paints for a zoomed circle is
+hard-cut at the stage's bottom edge, and overflow:visible cannot lift a bitmap. That
+canvas is the surviving flat horizontal cut. Fix: in displayOnly, do not render the
+fxCanvas at all (`{!displayOnly && <canvas .../>}`); the static diagram needs no fx.
+Both fixes gated on displayOnly, so the mini pit / main pit / every game path are
+byte-identical. Now nothing but the browser window clips at any zoom state.
+
+### D52. hideCircleImages: traditional no-photo diagram, plain filled circles
+New defaulted BreedTree prop `hideCircleImages` (default false), passed by /chums2 (both
+the full-page diagram and the ?diag=1 rig). It gates the single image funnel `nodeImg()`
+to return undefined for every node, so the pattern def, the hasImg/tint path and the
+circle `fill` all fall through to `fillFor(d)` - the existing solid depth palette:
+navy #0a3a57 (root, hidden anyway), #1f8fd0 (depth 1), #bfe3f7 (depth 2+), the site's
+blue family. No breed photo at any depth; existing strokes, labels and % badges are
+unchanged. It is SEPARATE from the accessibility HIDE_IMAGES mechanism (not reused, not
+modified) and page-scoped via the prop, so default false keeps the mini pit, main pit
+and every other hosting byte-identical.
+
 ## 2026-08-30 window scroll fix (body was the scroll container)
 
 ### D50. Mid-page horizontal scrollbar cropping the diagram: <body> was a scroll container
