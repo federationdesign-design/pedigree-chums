@@ -191,8 +191,13 @@
   pointer-events: none;
 }
 /* #0: the rail is an interactive leaf inside the (none) band. It does not overlap
-   the diagram, so re-enabling it never steals a diagram click. */
-.railWrap { pointer-events: auto; }
+   the diagram, so re-enabling it never steals a diagram click.
+   D71 #1: the icon-hover TOOLTIP sat BEHIND the pack tiles. Cause: .icon gets a
+   stacking context from its :hover transform (scale), and the rail carried no z-index,
+   so the later-in-DOM intro/pack sections painted over it. Give .railWrap its own
+   raised stacking context so the whole rail - and the hovered icon's tooltip - paints
+   above those sections (60 sits under the DragCards at 120+, which is correct). */
+.railWrap { pointer-events: auto; position: relative; z-index: 60; }
 
 .introStack {
   display: flex;
