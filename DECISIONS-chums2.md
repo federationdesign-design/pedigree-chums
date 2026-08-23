@@ -14,6 +14,32 @@ Baseline (measured before stage 1):
 
 ---
 
+## 2026-09-06 tree/chart column pulled left (option A: shrink the canvas)
+
+### D59. Tree follows the diagram zone; canvas trimmed 3000 -> 2750
+Option A, fixed reposition. Key insight: the diagram stage RIGHT edge, the tree column
+and the chart column are ALL canvas-right-anchored (right offsets), while the pack is
+left-anchored (stage left 809). So shrinking the canvas min-width pulls the stage right,
+tree and chart LEFT together (gutter 5 preserved at 100) while the pack stays put - and
+because the pack is HEIGHT-bound at aspect >= 1, its width depends only on the stage
+HEIGHT (unchanged), so narrowing the stage does NOT change the pack (D58). One lever
+does points 1, 3, 4 and 5.
+- Decoupled the columns with `--diagram-zone-right: 1015px` (the zone right edge as a
+  canvas-right offset). `.diagramStage right = var(--diagram-zone-right)`; the tree and
+  chart `right = calc(var(--diagram-zone-right) - var(--gutter-tree) - 840px)`, so the
+  tree column left = zone right + --gutter-tree (tree FOLLOWS the stage, brief 1).
+- Canvas + body[data-pc-chums2] min-width 3000 -> 2750 (rig .diagCanvas /
+  data-pc-chums2-diag stay 3000). NUMBERS at 2750: stage right edge 1735, tree column
+  LEFT = 1835 (= 1735 + 100), tree right 2675, then a 75px right margin to 2750 (no dead
+  plain). gutter 4 (60) and gutter 5 (100) preserved; pack unchanged.
+- Tree size RECONCILED: 840 x 500 is real (CSS and DevTools agree); the older 640 x 460
+  spec is superseded. Chart moves WITH the tree (same derived right, brief 3).
+- Aspect stays >= 1 (stage 926 wide x ~700 tall = ~1.3 at 2750, safe for canvasH up to
+  ~1286), so the pack is byte-identical; if a very tall breed pushed canvasH past that
+  the pack would grow slightly - bump the canvas a touch if the audit shows it.
+Banner stays; ?audit=1 on the three breeds now reads tree left ~1835 and confirms
+gutters 4/5 held. Nothing else moved (pack + left column untouched).
+
 ## 2026-09-05 gutter 5 diagnosis: HEIGHT binds (zone too landscape for the pack)
 
 ### D58. Scale-up fails because the height term binds; gutter 5=100 is geometrically blocked

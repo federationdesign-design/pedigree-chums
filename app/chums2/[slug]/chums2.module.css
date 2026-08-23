@@ -16,10 +16,10 @@
    global rule clips overflow-x). (D30.) */
 .canvas {
   position: relative;
-  /* The concept is 3000px wide; the canvas matches it so the column offsets below
-     can be read straight off the concept's proportions. The body horizontal scroll
-     (Chums2Client effect + globals min-width:3000) reveals it. */
-  min-width: 3000px;
+  /* Concept is 3000px wide, but the tree/chart column moved LEFT (D59), so the far
+     right was empty; trimmed to 2750 (the tree/chart column ends at ~2675 + a 75px
+     right margin, no dead plain). Body min-width matches (globals). */
+  min-width: 2750px;
   background: transparent;
   font-family: var(--font-body, 'Montserrat', system-ui);
   /* Own stacking context so the diagram's z-index:-1 (behind everything) is contained
@@ -42,6 +42,13 @@
   --gutter-v: 40px;
   --gutter-diagram: 60px;
   --gutter-tree: 100px;
+  /* The diagram zone's RIGHT edge, as an offset from the canvas right edge. The tree
+     and chart columns derive from it (they sit --gutter-tree to its right), and the
+     .diagramStage uses it directly, so the tree FOLLOWS the stage (D59). Everything on
+     the right is canvas-right-anchored, so shrinking min-width (below) pulls the stage
+     right edge, the tree and the chart LEFT together - gutter 5 preserved - while the
+     left-anchored pack stays put and, being height-bound at aspect >= 1, is unchanged. */
+  --diagram-zone-right: 1015px;
   /* /chums2 uses the concept yellow (#fff200) in place of the site token
      (#ffd23e). Overriding --yellow HERE, at the page canvas, recolours every
      yellow element on the page in one place: the title breed name, the pack
@@ -208,27 +215,27 @@
   align-items: flex-start;
 }
 
-/* Family tree: the concept's TREE COLUMN, a canvas-child in the top-right. Offsets
-   read off the concept at 3000px: left edge is the diagram zone's right (2085), so
-   right:75 puts its right edge at 2925 (0.975 * 3000); width ~840 fills the column;
-   top aligns with the diagram top. It does NOT reserve height in the left column
-   (the pack sits directly below the intro box). The bounded LineageMap fit-scales
-   its content to this region. */
+/* Family tree: the TREE COLUMN, canvas-child top-right, now FOLLOWING the diagram (D59).
+   Its left edge = diagram zone right edge + --gutter-tree. Since both are anchored to
+   the canvas right, `right` derives from --diagram-zone-right (zone right - gutter-tree
+   - tree width). SIZE: 840 x 500 (real - the CSS and DevTools agree; the older 640 x 460
+   spec is superseded). At min-width 2750 this lands the tree LEFT at 1835 (stage right
+   edge 1735 + --gutter-tree 100), right edge 2675. It reserves no height in the left
+   column; the bounded LineageMap fit-scales into this region. */
 .treeRegion {
   position: absolute;
   top: 300px;
-  right: 75px;
+  right: calc(var(--diagram-zone-right) - var(--gutter-tree) - 840px);
   width: 840px;
   height: 500px;
 }
 
-/* Lifespan chart: its concept home is the far-right column BELOW the tree, heading
-   with it (brief 3). Canvas-child in the tree column (right:75 aligns with the tree),
-   below the tree's bottom (~300 + 500 + gap), so it never sits in the diagram zone. */
+/* Lifespan chart: the far-right column BELOW the tree (brief 3), same left edge, so it
+   moves WITH the tree - same derived right offset. */
 .chartRegion {
   position: absolute;
   top: 840px;
-  right: 75px;
+  right: calc(var(--diagram-zone-right) - var(--gutter-tree) - 840px);
   width: 840px;
 }
 
@@ -435,7 +442,7 @@
                diagram zone right edge -> tree column left edge). */
   left: calc(clamp(18px, 4vw, 48px) + 61px + var(--gutter-rail) + 600px + var(--gutter-diagram));
   top: 320px;
-  right: calc(75px + 840px + var(--gutter-tree));
+  right: var(--diagram-zone-right);
   /* Vertical extent (D58): the zone is landscape (~1176 wide), so the pack HEIGHT-binds
      - it fills this height and, being roughly square/portrait, stays far narrower than
      the width. Extended DOWN (170 -> 40) to give the height term more to fill, so the

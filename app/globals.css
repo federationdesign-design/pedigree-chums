@@ -92,9 +92,11 @@ body {
    wide horizontal scroll, exactly as elsewhere. Only the page-specific header
    content (the chum square, title and subtitle, inside .canvas) scrolls; the
    .header's own padding-top clears the fixed bar. The single remaining route rule
-   is the wide min-width for the horizontal scroll. Other routes are untouched. */
+   is the wide min-width for the horizontal scroll. Other routes are untouched.
+   REVISED 2026-09-06 (D59): trimmed 3000 -> 2750 to match .canvas after the tree/chart
+   column moved left; the far right is no longer empty. */
 body[data-pc-chums2] {
-  min-width: 3000px;
+  min-width: 2750px;
 }
 /* ?diag=1 isolation rig (D46): strip ALL shared chrome so only the diagram shows on
    the empty 3000px canvas. Scoped to the diag attribute, so the normal route and
