@@ -14,6 +14,45 @@ Baseline (measured before stage 1):
 
 ---
 
+## 2026-08-23 audit removed; 14 write-ups; mobile scaffold; /chums replacement (D77)
+
+AUDIT INSTRUMENT REMOVED (desktop signed off): deleted the ?audit=1 banner, the auditText
+state + measurement effect, and the audit query-param plumbing from page.tsx (searchParams
+type, auditParam/audit, the audit prop) and Chums2Client (Props, destructure). ?diag stays.
+
+14 BREED WRITE-UPS added to data/breedInfo.ts, alphabetically in the main run, keyed by the
+exact breed name (verified against breeds.ts; none are in INTRO_ALIASES, so breedInfo[name]
+resolves): Great Dane, Doberman Pinscher, Saint Bernard, Afghan Hound, Weimaraner, Papillon,
+Boston Terrier, Siberian Husky, Shih Tzu, Miniature Schnauzer, Pomeranian, French Bulldog,
+Chihuahua, Boxer. Clears the D68 content task; all 54 breeds now have an intro.
+
+MOBILE v1 SCAFFOLD (stage 1): new app/chums2/[slug]/Chums2Mobile.tsx + chums2mobile.module.css
+- a separate component sharing DATA, never desktop layout (desktop byte-identical, no shared
+-component edits). Header (square on top, wrapped title, subtitle - proposal: 96px square, 20/
+30px title), blue intro box, ancestor pack (52px tiles, tap i/%/image popouts, same data),
+famous chums; fed by a hidden BreedTreeMap. The circular diagram (BreedTree) and family tree
+(LineageMap) are OMITTED (not mounted, no icons). MOBILE_SECTIONS flags slot/rail/lifespan/
+cards = false for later stages. The intro drops the "tap a circle" prompt (no diagram).
+
+/chums FULL REPLACEMENT (pre-launch): app/chums/[slug]/page.tsx now renders the chums2
+experience via the same UA split - desktop -> Chums2Client, mobile -> Chums2Mobile (stage 1).
+BreedClient/BreedMobile are unimported here (kept on disk for later cleanup). ?diag/?audit
+dropped on this route (diag stays on /chums2). /chums2/[slug] untouched this round.
+- METADATA (item 4): /chums keeps its own indexable `{ title: breed.name }`; chums2's
+  robots:"noindex" lives in /chums2's generateMetadata (page-level), NOT the client component,
+  so it does NOT travel to /chums.
+- data-pc-chums2 (item 3): set by Chums2Client's mount effect (component-keyed, not route
+  -keyed), so the body attribute + its scoped globals (min-width 2244 etc.) apply when mounted
+  from /chums too. Verified.
+- LINKS/FLOWS to /chums/[slug] (item 6) - all still resolve to the breed page (now the new
+  experience), none hardcode old-layout internals, none broken: good-dog-bad-dog/argos/page
+  (2 anchors), britains-dog-history/BreedStrip (learn -> router.push), ChumSearch (search ->
+  push), and the GAME LEAVE-PAGE FLOW in LineageModal (onRelativeTap -> "View {breed}" button
+  router.push). pick-a-chum/page-bios describes the route as a breed page (still accurate).
+- NOTE: per the round's item 1 caution, mobile could instead get Chums2Client (full desktop
+  -on-phone) until the mobile v1 stages complete; wired mobile -> Chums2Mobile per item 7
+  (stage 1 slots into the split) - a one-line flip if Steve prefers the desktop view on phones.
+
 ## 2026-08-23 smooth-scroll a newly opened rail card into view (D76)
 
 The fixed card slots (band below famous chums) are often below the fold. On OPEN only,
