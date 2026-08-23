@@ -131,24 +131,39 @@
   flex: 1 1 auto; /* fill the band width so the lower band (famous + chart) can be wide */
 }
 
-/* Top row: intro box (left) + inline family tree (right), in the open area. The
-   circular diagram is NOT here: it is an absolutely positioned stage over the open
-   area (see .diagramStage), so the intro box and tree keep their own gap. */
+/* Upper band: the middle section of the page. It stacks the intro box then the
+   ancestor pack (block flow, so the pack sits DIRECTLY below the box), and is the
+   position:relative offset parent for the circular diagram (.diagramStage) and the
+   family tree (.treeRegion), both absolutely placed over it. Full width so those
+   offsets have the whole band to work against; no fixed height, so its height is
+   just box + gap + pack, which is exactly what the diagram's bottom:0 needs. */
+.upperBand {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 20px; /* intro-box-to-pack rhythm (the pack sits directly below the box) */
+}
+
+/* Top row: just the intro box now (the tree moved to the top-right corner). */
 .introTopRow {
   display: flex;
   flex-direction: row;
   align-items: flex-start;
-  gap: clamp(24px, 3vw, 56px);
 }
 
-/* Sized, positioned region that hosts the bounded LineageMap (D31). It is the
-   positioning context (position:relative) the bounded overlay fills; breed.x/y
-   passed to LineageMap is this region's centre (550, ~0.48*660). */
+/* Family tree: the concept's top-right corner of the upper band, absolutely placed
+   so it does NOT reserve height in the left column between the intro box and the
+   pack. Smaller than the old inline 1100x660; the bounded LineageMap fit-scales its
+   content to whatever size this region is. Its 640px width is what .diagramStage's
+   right:660 (640 + a 20px gap) leaves clear. */
 .treeRegion {
-  position: relative;
-  flex: 0 0 auto;
-  width: 1100px;
-  height: 660px;
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 640px;
+  height: 460px;
 }
 
 .introBox {
@@ -348,10 +363,17 @@
    so zoom is unchanged and empty areas pass clicks through. */
 .diagramStage {
   position: absolute;
-  left: calc(clamp(18px, 4vw, 48px) + 66px + clamp(272px, 28vw, 476px) + 20px);
-  top: calc(clamp(110px, 14vh, 146px) + clamp(112px, 11vw, 150px) + 26px);
-  right: 0;
+  /* Offsets against the UPPER BAND (its offset parent), which spans the intro box
+     down to the ancestor pack. So the stage is steered to the concept's middle band
+     without any magic canvas-height number:
+       top:0    = intro box top   -> the pack's top circles sit level with the box top
+       bottom:0 = pack bottom      -> the diagram stays ABOVE the lower band
+       left     = just past the intro box (its width + 20) -> pack tight beside the box
+       right    = leaves the family tree's column on the right (tree is 640 wide, +20) */
+  top: 0;
   bottom: 0;
+  left: calc(clamp(272px, 28vw, 476px) + 20px);
+  right: 660px;
   pointer-events: none;
 }
 .diagramStage svg { pointer-events: auto; }

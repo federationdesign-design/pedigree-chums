@@ -14,6 +14,34 @@ Baseline (measured before stage 1):
 
 ---
 
+## 2026-08-26 diagram: steer to the concept's middle band; kill the tree-reserved gap
+
+### D40. Diagram bounded to an UPPER BAND; tree moved to the top-right corner
+Two placement fixes against the concept. Both traced to ONE cause: the 660px inline
+tree region sitting right of the intro box in introTopRow. It (a) made that row 660
+tall so the ancestor pack sat ~360px below the ~300px intro box (the "empty gap",
+which was NOT a leftover margin/panel/min-height, it was the tree), and (b) occupied
+the middle band the diagram needed. The round-3 stage also spanned the whole canvas
+(right:0, bottom:0 on the 2000px canvas), so the centred pack landed low and far right.
+Built:
+- New `.upperBand` (position:relative, width:100%, flex column, gap 20) wraps the intro
+  box (introTopRow, now box-only) and the ancestor pack, so the pack sits DIRECTLY
+  below the box again (fix 2). The tree no longer reserves height there.
+- `.diagramStage` is now offset against the upper band instead of the canvas: top:0 =
+  box top (top circles level with the box), bottom:0 = pack bottom (ABOVE the lower
+  band), left = intro box width + 20 (pack tight beside the box), right = 660 (leaves
+  the 640px tree column + a 20px gap). Offsets only, no sizing box, no overflow; the
+  hosting mechanism (BreedTree fill-measures the stage, pointer-events:none with the
+  SVG re-enabled) is UNCHANGED, zoom still spills freely. bottom:0 needs no magic
+  canvas-height number because the upper band's own height is exactly box + pack.
+- `.treeRegion` moved to the concept's top-right corner: position:absolute, top:0,
+  right:0, and shrunk from 1100x660 to 640x460 so it reads as the concept's small
+  top-right tree and clears the diagram (the bounded LineageMap fit-scales to it).
+Result: resting pack tight beside the intro box in the middle band, pack heading
+directly below the intro box, tree top-right, lower band (famous/chart) untouched
+below. The tree move/resize was not separately requested but was unavoidable: it was
+the shared root cause of both fixes and the concept shows it small in the top-right.
+
 ## 2026-08-25 diagram: kill the sized panel, host on an offset-only stage
 
 ### D39. .diagramPanel DELETED; BreedTree now on an offset-defined stage (supersedes D38's panel)
