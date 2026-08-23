@@ -189,11 +189,14 @@ const PIT_SPAN = DIFF_SPAN * PIT_SHRINK;
 // displayOnly (static /chums2 diagram) resting view ONLY. The pit's resting view
 // pulls back to PIT_SPAN (~2.54x) to leave the play arena around the pack: that
 // slack is game-load-bearing and must not change on any game path. A static
-// display has no arena, so its resting view should frame the pack itself, ~1x plus
-// a small breathing margin. This is the ONLY thing gated on displayOnly; the pack
-// packing (walls, sizeMul, difficulty) is shared and untouched, so PIT_SPAN still
-// cancels out of the game's pack-to-frame ratio. Raise for more air, lower to fill.
-const DISPLAY_SPAN = 1.1;
+// display has no arena, so its resting view frames the pack itself. This is the ONLY
+// thing gated on displayOnly; the pack packing (walls, sizeMul, difficulty) is shared
+// and untouched, so PIT_SPAN still cancels out of the game's pack-to-frame ratio.
+// The rig (?diag=1) confirmed the hosting is correct and uncropped; at 1.1 the pack
+// framed too big and overshot the viewport, so this is 1.7 (= 1.1 / 0.65, a 35%
+// smaller pack in the same stage). A WIDER resting view width = a smaller on-screen
+// pack. Raise for a smaller pack, lower to fill.
+const DISPLAY_SPAN = 1.7;
 const DIFF_INSET = 16;
 // `fit` is the largest scale at which the whole cluster still fits the pit, both
 // axes, whatever the circle count. Level 10 IS that, so the hardest setting

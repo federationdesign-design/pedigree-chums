@@ -16,6 +16,28 @@ Baseline (measured before stage 1):
 
 ## 2026-08-28 diagram isolation rig (?diag=1)
 
+### D47. DISPLAY_SPAN 1.1 -> 1.7 (35% smaller resting pack); aspect check
+The ?diag=1 rig confirmed the hosting is correct and UNCROPPED: no clipping at rest or
+any zoom level. The only fault was that the resting pack framed too big and overshot
+the viewport. One change: DISPLAY_SPAN 1.1 -> 1.7 (= 1.1 / 0.65), a wider resting view
+width, so the on-screen pack is 35% smaller in the same stage. Same displayOnly gate,
+same five resting/home view sites + the zoom-out-to-root branch, nothing else; game
+paths (PIT_SPAN) untouched.
+Aspect check (a check, not a change): the resting view is WIDTH-anchored - the viewBox
+width is rootR*2*ZOOM_PAD*DISPLAY_SPAN and the shown HEIGHT follows the stage aspect
+(height = width / aspect), with overflow visible (no clip). So a pack taller than the
+shown height spills past top/bottom - that overshoot is what was seen. At the mini
+pit's ~1.8 aspect the shown height is width/1.8 (tall enough that a width-framed pack
+mostly fits). At the rig's / real /chums2's ~3.75 aspect the SAME view width gives only
+width/3.75 of shown height (~half), so the same pack overshoots ~2x more. Widening the
+view (1.1 -> 1.7) shrinks the pack and proportionally grows the shown height, so at
+~3.75 the factor alone lifts the pack inside the viewport. BUT because the fit is
+width-only, the right factor is aspect-dependent: if the stage aspect changes (viewport
+height, or a different zone shape) the overshoot returns. The robust later fix is a
+HEIGHT-AWARE resting fit (frame by min(width-fit, height-fit) so the pack fits both axes
+at any aspect) instead of a single width factor tuned for ~3.75.
+
+
 ### D46. ?diag=1 strips /chums2 to only the circular diagram, for isolating BreedTree's framing
 To diagnose BreedTree's displayOnly framing with nothing else able to interfere, the
 existing page gains a query-string mode (no new route, no new files). `?diag=1` is read
