@@ -123,6 +123,24 @@
   flex: 1 1 auto; /* fill the band width so the lower band (famous + chart) can be wide */
 }
 
+/* Top row: intro box (left) + inline family tree (right), in the open area. */
+.introTopRow {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: clamp(24px, 3vw, 56px);
+}
+
+/* Sized, positioned region that hosts the bounded LineageMap (D31). It is the
+   positioning context (position:relative) the bounded overlay fills; breed.x/y
+   passed to LineageMap is this region's centre (550, ~0.48*660). */
+.treeRegion {
+  position: relative;
+  flex: 0 0 auto;
+  width: 1100px;
+  height: 660px;
+}
+
 .introBox {
   /* Width reduced 15% from the old clamp(320,33vw,560) (item 4); height driven
      by its text (no fixed height). Navy rounded box. */

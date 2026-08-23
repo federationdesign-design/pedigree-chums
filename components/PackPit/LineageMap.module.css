@@ -30,6 +30,29 @@
   /* above the placed cards, which sit at 62 and 63 */
   z-index: 70;
 }
+
+/* Bounded mode (/chums2 inline tree, added 2026-08-23): the overlay and SVG
+   become position:absolute so they fill a positioned page region instead of the
+   viewport, and the overlay drops its fixed z-index, brand-wash background and
+   fade so the page gradient shows through. Declared after .overlay/.svg so it
+   wins on equal specificity. Default (no .overlayBounded) is byte-identical. */
+.overlayBounded {
+  position: absolute;
+  z-index: auto;
+  background: none;
+  animation: none;
+}
+.svgBounded {
+  position: absolute;
+}
+/* In bounded mode the chrome (Back X and the game counters, mostly dormant in
+   the depth-2 rest view) sits at the region's corners, not the viewport. */
+.overlayBounded .close,
+.overlayBounded .dotCount,
+.overlayBounded .frameCount,
+.overlayBounded .pauseBtn {
+  position: absolute;
+}
 .close {
   position: fixed;
   top: 33px;

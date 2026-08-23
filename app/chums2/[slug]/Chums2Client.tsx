@@ -58,7 +58,7 @@ const SHOW_SECTIONS = {
   ancestorPack: true,   // hidden BreedTreeMap feed + pack grid
   famousChums: true,    // FamousDogsSection
   cards: false,         // rail pop-out DragCards
-  tree: false,          // family tree LineageMap overlay
+  tree: true,           // family tree (inline bounded LineageMap, right of the intro box)
   rail: true,           // the icon rail (icons only for now; pop-outs gated off)
   backButton: false,    // the Back link
 };
@@ -430,11 +430,30 @@ export default function Chums2Client({ name, slug, image, info, lineage }: Props
       {(SHOW_SECTIONS.rail || SHOW_SECTIONS.introBox || SHOW_SECTIONS.lifespanChart || SHOW_SECTIONS.ancestorPack || SHOW_SECTIONS.famousChums) && (
         <div className={styles.leftBand}>
           {SHOW_SECTIONS.rail && <Chums2Rail items={railItems} onOpen={openCard} />}
-          {(SHOW_SECTIONS.introBox || SHOW_SECTIONS.lifespanChart || SHOW_SECTIONS.ancestorPack || SHOW_SECTIONS.famousChums) && (
+          {(SHOW_SECTIONS.introBox || SHOW_SECTIONS.lifespanChart || SHOW_SECTIONS.ancestorPack || SHOW_SECTIONS.famousChums || SHOW_SECTIONS.tree) && (
             <div className={styles.introStack} data-region="intro-band">
-              {SHOW_SECTIONS.introBox && introText && (
-                <div className={styles.introBox}>
-                  <p className={styles.introBody}>{introText}</p>
+              {/* Top row: the intro write-up box on the left, the family tree
+                  inline to its right in the open area (bounded LineageMap). */}
+              {((SHOW_SECTIONS.introBox && introText) || (SHOW_SECTIONS.tree && lineage && !closed.has("tree"))) && (
+                <div className={styles.introTopRow}>
+                  {SHOW_SECTIONS.introBox && introText && (
+                    <div className={styles.introBox}>
+                      <p className={styles.introBody}>{introText}</p>
+                    </div>
+                  )}
+                  {SHOW_SECTIONS.tree && lineage && !closed.has("tree") && (
+                    <div className={styles.treeRegion} data-region="tree">
+                      <LineageMap
+                        breed={{ name, image, x: 550, y: 320, angle: 0 }}
+                        bounded
+                        hideLeafImages
+                        strongBg
+                        currentScore={0}
+                        initialDepth={2}
+                        onClose={() => closeCard("tree")}
+                      />
+                    </div>
+                  )}
                 </div>
               )}
               {/* Ancestor pack: directly below the intro box, left-aligned with
@@ -596,28 +615,8 @@ export default function Chums2Client({ name, slug, image, info, lineage }: Props
         )
       )}
 
-      {/* Family tree (brief 5.8). LineageMap is a full-viewport overlay (its own
-          fixed positioning, which the game's pit-lift card depends on, so it
-          cannot be made bounded without changing game behaviour). It opens on
-          demand from the tree rail icon, self-loads from the breed name (no tree
-          prop), and pre-expands to depth 2 via the new initialDepth prop. Its
-          centre card drags exactly as in the pit (unchanged). Drawn like the
-          pit's own chum family tree (strongBg, no circular). See DECISIONS D13. */}
-      {SHOW_SECTIONS.tree && lineage && !closed.has("tree") && (
-        <LineageMap
-          breed={{
-            name,
-            image,
-            x: (typeof window !== "undefined" ? window.innerWidth : 1440) / 2,
-            y: (typeof window !== "undefined" ? window.innerHeight : 900) * 0.75,
-            angle: 0,
-          }}
-          strongBg
-          currentScore={0}
-          initialDepth={2}
-          onClose={() => closeCard("tree")}
-        />
-      )}
+      {/* Family tree now renders INLINE in the top row (bounded LineageMap, see
+          above and DECISIONS D31), not as a full-viewport overlay. */}
 
       {/* Enlarged ancestor image: the SAME shared component the mini pit learn
           area renders (components/TileZoom/TileZoom.tsx), so it grows in place

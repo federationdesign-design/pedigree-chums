@@ -287,6 +287,8 @@ export default function LineageMap({
   rarityTier,
   strongBg = false,
   initialDepth,
+  bounded = false,
+  hideLeafImages = false,
 }: {
   breed: { name: string; image: string; x: number; y: number; angle: number };
   tree?: LineageNode;
@@ -328,6 +330,19 @@ export default function LineageMap({
   // the pit behaviour unchanged (open = just the root). Added 2026-08-22 for the
   // /chums2 family tree, which wants depth 2 at rest (brief 5.8).
   initialDepth?: number;
+  // bounded (added 2026-08-23): render inline inside a positioned page region
+  // instead of the position:fixed inset:0 viewport overlay. Default false keeps
+  // the pit lift and every game path byte-identical. When true: .overlay and the
+  // SVG become position:absolute, `vp` is measured from the container (not the
+  // window), and the four inline position:fixed HTML blocks become absolute, so
+  // the whole tree is container-relative. The host passes breed.x/y as
+  // container-local coords and gives the region position:relative + a size.
+  bounded?: boolean;
+  // hideLeafImages (added 2026-08-23): suppress revealing breed IMAGE tiles when
+  // a node is clicked; the deepest nodes stay labelled % circles. Expansion,
+  // scoring and the seen/blue recolour are untouched. Used by /chums2 (the
+  // ancestor pack already shows those images). Default false = pit unchanged.
+  hideLeafImages?: boolean;
 }) {
   // TEMP rarity-band instrumentation: does the tier prop reach the lifted card?
   if (typeof window !== "undefined" && circular) console.log("[rarity-band] LineageMap boundary:", { breed: breed?.name, rarityTier, soloLeaf });
@@ -337,10 +352,17 @@ export default function LineageMap({
   // card near full width, then snapped down once the effect measured. This
   // component only ever mounts client-side (gated behind activeBreed), so window
   // exists here; the 1280 fallback is for a server render that never happens.
-  const [vp, setVp] = useState(() => ({
-    w: typeof window !== "undefined" ? window.innerWidth : 1280,
-    h: typeof window !== "undefined" ? window.innerHeight : 800,
-  }));
+  // In bounded mode `vp` is the container size (measured below); seed with a
+  // reasonable box until the layout effect measures. Otherwise the window.
+  const overlayRef = useRef<HTMLDivElement>(null);
+  const [vp, setVp] = useState(() =>
+    bounded
+      ? { w: 900, h: 520 }
+      : {
+          w: typeof window !== "undefined" ? window.innerWidth : 1280,
+          h: typeof window !== "undefined" ? window.innerHeight : 800,
+        }
+  );
 
   /* THE SIZE OF THE DOG LIFTED OUT OF THE PIT.
 
@@ -421,11 +443,20 @@ export default function LineageMap({
   // cheap insurance and safe here because the component never renders on the
   // server, so useLayoutEffect raises no SSR warning.
   useLayoutEffect(() => {
+    if (bounded) {
+      const el = overlayRef.current;
+      if (!el) return;
+      const measure = () => setVp({ w: el.clientWidth, h: el.clientHeight });
+      measure();
+      const ro = new ResizeObserver(measure);
+      ro.observe(el);
+      return () => ro.disconnect();
+    }
     const f = () => setVp({ w: window.innerWidth, h: window.innerHeight });
     f();
     window.addEventListener("resize", f);
     return () => window.removeEventListener("resize", f);
-  }, []);
+  }, [bounded]);
 
   const root = useMemo(() => {
     const t = tree ?? getLineage(breed.name);
@@ -587,7 +618,11 @@ export default function LineageMap({
   // little white numbers that flash up when a node or the chum button is tapped
   const [flashes, setFlashes] = useState<{ id: number; x: number; y: number; val: number; size: number }[]>([]);
   const [bursts, setBursts] = useState<{ id: number; x: number; y: number; s: number; born: number }[]>([]);
-  const [seen, setSeen] = useState<Set<string>>(new Set()); // circles tapped at least once, recoloured blue
+  // circles tapped at least once, recoloured blue. With initialDepth set, the
+  // pre-expanded nodes (root + shallower levels) start "seen" so depth-1 renders
+  // as the dark named nodes and only the depth-2 frontier stays yellow dashed
+  // (matches the /chums2 concept). Pit unchanged (no initialDepth).
+  const [seen, setSeen] = useState<Set<string>>(() => (initialDepth ? openIdsToDepth(root, initialDepth) : new Set()));
   const fxId = useRef(0);
   const scoredRef = useRef<Set<string>>(new Set());
   const [autoArmed, setAutoArmed] = useState(false); // the auto-collect shortcut arms 5s in, while circles are still yellow
@@ -1992,6 +2027,7 @@ export default function LineageMap({
   return (
     <>
     <div
+      ref={overlayRef}
       // BACKGROUND: the chum family tree is back on the faint brand wash.
       //
       // It wore overlayStrong and then a hue-shifted overlayAlt, both added while
@@ -2004,7 +2040,7 @@ export default function LineageMap({
       // now marks "this is the mini pit" for the lifted root, the five-across
       // frames, the smaller nodes, the back button's size and the hidden pack
       // header. Removing it here would quietly undo all five.
-      className={`${styles.overlay}${circular ? " " + styles.overlayStrong : ""}${strongBg && !circular ? " " + styles.overlayChum : ""}${dragFocus ? " " + styles.overlayFocus : ""}`}
+      className={`${styles.overlay}${bounded ? " " + styles.overlayBounded : ""}${circular ? " " + styles.overlayStrong : ""}${strongBg && !circular ? " " + styles.overlayChum : ""}${dragFocus ? " " + styles.overlayFocus : ""}`}
       onClick={closeIfTap}
       onPointerDown={onPanDown}
       onPointerMove={onPanMove}
@@ -2090,7 +2126,7 @@ export default function LineageMap({
       {packed && packLabels.extinct && (
         <div className={styles.packHead} style={{ left: packLabels.extinct.x, top: packLabels.extinct.y }}>{INSTR_NAMES.has(breed.name) ? "How it works" : "These dogs have had their days"}</div>
       )}
-      <svg className={styles.svg} viewBox={`${-pan.x} ${-pan.y} ${vp.w} ${vp.h}`} width={vp.w} height={vp.h} xmlns="http://www.w3.org/2000/svg">
+      <svg className={`${styles.svg}${bounded ? " " + styles.svgBounded : ""}`} viewBox={`${-pan.x} ${-pan.y} ${vp.w} ${vp.h}`} width={vp.w} height={vp.h} xmlns="http://www.w3.org/2000/svg">
         <g style={removing ? { pointerEvents: "none" } : undefined}>
         {hasTree ? (
           <>
@@ -2142,6 +2178,10 @@ export default function LineageMap({
                       follow(n);
                       // a card placed in a frame is protected: a node click won't remove it
                       if (placedSet.has(n._id) || cardFrame.has(n._id)) { return; }
+                      // /chums2 (hideLeafImages): expansion, scoring and the blue
+                      // recolour above still run, but never reveal a breed IMAGE
+                      // tile; the node stays a labelled % circle.
+                      if (hideLeafImages) return;
                       const wasPicked = picked.has(n._id);
                       setPicked((cur) => {
                         const s = new Set(cur);
@@ -2687,8 +2727,9 @@ export default function LineageMap({
         // fit to the right it now goes BELOW the card instead, and is clamped
         // into the viewport either way.
         const PANEL_W = 219, EDGE = 8, GAP = 14; // 190, up 15% by request
-        const vw = typeof window === "undefined" ? 1024 : window.innerWidth;
-        const vh = typeof window === "undefined" ? 768 : window.innerHeight;
+        // Clamp against the container in bounded mode, the viewport otherwise.
+        const vw = bounded ? vp.w : (typeof window === "undefined" ? 1024 : window.innerWidth);
+        const vh = bounded ? vp.h : (typeof window === "undefined" ? 768 : window.innerHeight);
         const rightLeft = c.cardX + CW / 2 + GAP + pan.x;
         const fitsRight = rightLeft + PANEL_W <= vw - EDGE;
         const cardLeft = c.cardX - CW / 2 + pan.x;
@@ -2705,7 +2746,7 @@ export default function LineageMap({
           <div
             onMouseLeave={() => setInfoHover(null)}
             style={{
-              position: "fixed", left, top, maxWidth: PANEL_W, zIndex: 100, pointerEvents: "auto",
+              position: bounded ? "absolute" : "fixed", left, top, maxWidth: PANEL_W, zIndex: 100, pointerEvents: "auto",
               background: "rgba(10, 58, 87, 0.92)", color: "#ffffff",
               font: "500 11px/1.4 Montserrat, system-ui, sans-serif", padding: "7px 10px",
               borderRadius: "8px", boxShadow: "0 4px 12px rgba(10, 58, 87, 0.35)",
@@ -2729,7 +2770,7 @@ export default function LineageMap({
             <div
               key={`stk-html-${sid}`}
               style={{
-                position: "fixed", left, top, width: CW, height: CW,
+                position: bounded ? "absolute" : "fixed", left, top, width: CW, height: CW,
                 borderRadius: circular ? "50%" : 15, overflow: "hidden",
                 transform: `rotate(${(cardDeg + stackTilt).toFixed(2)}deg)`,
                 transformOrigin: "center",
@@ -2768,7 +2809,7 @@ export default function LineageMap({
             key={`placed-${c.id}`}
             draggable={false}
             style={{
-              position: "fixed", left, top, width: CW, height: CW,
+              position: bounded ? "absolute" : "fixed", left, top, width: CW, height: CW,
               borderRadius: circular ? "50%" : 15, overflow: "visible",
               transform: `rotate(${cardDeg}deg)`,
               transformOrigin: "center",
@@ -2908,7 +2949,7 @@ export default function LineageMap({
             onMouseEnter={pctKeep}
             onMouseLeave={pctClose}
             style={{
-              position: "fixed", left, top, maxWidth: 288, zIndex: 100, pointerEvents: "auto", /* pct-close: hoverable so it can self-dismiss */
+              position: bounded ? "absolute" : "fixed", left, top, maxWidth: 288, zIndex: 100, pointerEvents: "auto", /* pct-close: hoverable so it can self-dismiss */
               background: "rgba(10, 58, 87, 0.92)", color: "#ffffff",
               font: "500 11px/1.45 Montserrat, system-ui, sans-serif", padding: "9px 12px",
               borderRadius: "8px", boxShadow: "0 4px 12px rgba(10, 58, 87, 0.35)",
@@ -2943,7 +2984,7 @@ export default function LineageMap({
           so only the buttons inside it take a press. */}
       {liftRoot && hasTree && !soloLeaf && (
         <svg
-          className={`${styles.svg} ${styles.svgTop}`}
+          className={`${styles.svg} ${styles.svgTop}${bounded ? " " + styles.svgBounded : ""}`}
           viewBox={`${-pan.x} ${-pan.y} ${vp.w} ${vp.h}`}
           width={vp.w}
           height={vp.h}

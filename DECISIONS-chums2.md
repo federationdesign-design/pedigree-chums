@@ -80,6 +80,23 @@ Baseline (measured before stage 1):
 - FLAG for Steve: this is a modal tree, not an inline-on-load tree. If you want it inline beside the diagram, that needs a new bounded rendering mode inside LineageMap (a deliberate shared-component change), which I did not make because it would risk the game. Tell me and I will design it behind a defaulted prop.
 - CSS constraint respected: no perspective / backface-visibility / transform-style: preserve-3d anywhere in the chums2 chain.
 
+## Family tree inline: bounded LineageMap (2026-08-23)
+
+### D31. bounded + hideLeafImages props on LineageMap; inline tree on /chums2
+- Supersedes the D13 overlay-on-demand decision: the tree now renders INLINE on the wide canvas.
+- Exactly what `bounded` (default false) changes, all additive/gated so bounded=false is byte-identical:
+  1. .overlay and both SVGs get a modifier class (.overlayBounded / .svgBounded) that switches position:fixed -> absolute (and .overlayBounded drops the fixed z-index, brand-wash background and fade), so they fill a positioned page region instead of the viewport.
+  2. `vp` (the coordinate canvas) is measured from the overlay container via a ResizeObserver (overlayRef) instead of window.innerWidth/Height. Seeded 900x520 until measured.
+  3. The four inline position:fixed HTML blocks (info panel, stacked cards, placed cards, pct panel) become position:absolute, so they resolve against the region not the viewport.
+  4. The info-panel viewport clamps use vp (container) when bounded.
+  5. Chrome (.close Back-X, .dotCount, .frameCount, .pauseBtn) becomes absolute within the region (CSS .overlayBounded descendant rules); most is game-state-gated and dormant in the depth-2 rest view anyway.
+  The host passes breed.x/y as container-local coords and gives the region position:relative + a fixed size.
+- `hideLeafImages` (default false): the node click still expands (follow), scores and recolours (seen/blue), but skips the pick/pin block, so a deepest node never reveals a breed IMAGE tile, it stays a labelled % circle (item 6; the ancestor pack already shows those images).
+- `seen` is seeded from initialDepth (openIdsToDepth) so the pre-expanded depth-1 nodes render as the dark named % circles and only the depth-2 frontier stays yellow dashed with "+N inside" (matches the concept). Pit unchanged (no initialDepth).
+- /chums2: SHOW_SECTIONS.tree = true; the tree is a bounded LineageMap inside .treeRegion (position:relative, 1100x660), in a new .introTopRow to the RIGHT of the intro box; breed={{x:550,y:320}} = region centre; strongBg, initialDepth={2}, hideLeafImages. Its own Back X closes -> closeCard("tree") -> the rail icon reopens it.
+- Gates: tsc clean; eslint chums2 clean; LineageMap 47 (under its 48 baseline); :global audit clean.
+- NEEDS VISUAL VERIFICATION (no dev server): (a) the pit lift card and every game path must be byte-identical (bounded=false; verified by construction, but please eyeball the mini pit / a game round). (b) The /chums2 inline tree: check it fits the 1100x660 region (nodes may need a bigger region or a different breed.y), the depth-1 dark / depth-2 yellow-dashed colours, and the drag: panning the tree uses LineageMap's general background pan (delta-based, works in bounded); the centre-card-specific drag is gated on a game end-state (framesDone/packed) and may not fire in the display tree, flag if the card itself must drag.
+
 ## Wide-canvas layout model (2026-08-23)
 
 ### D30. /chums2 is a wide canvas with horizontal scroll; chrome scrolls with it
