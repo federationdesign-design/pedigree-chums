@@ -6,7 +6,7 @@ import { getLineage } from "../../../data/lineage";
 import { resolveLineageName } from "../../../data/lineageNames";
 import breedInfo from "../../../data/breed-info.json";
 
-type Props = { params: Promise<{ slug: string }>; searchParams: Promise<{ diag?: string }> };
+type Props = { params: Promise<{ slug: string }>; searchParams: Promise<{ diag?: string; audit?: string }> };
 
 export const dynamic = "force-dynamic";
 
@@ -28,8 +28,11 @@ export default async function Chum2Page({ params, searchParams }: Props) {
   // ?diag=1 isolation rig (D46): read on the server so the client renders the diagram
   // -only view from the first paint (no hydration flip), and so the shared <Nav> can
   // simply be left out rather than hidden after mount.
-  const { diag: diagParam } = await searchParams;
+  const { diag: diagParam, audit: auditParam } = await searchParams;
   const diag = diagParam === "1";
+  // ?audit=1 (TEMPORARY, REMOVE BEFORE COMMIT once the gutter fit lands): dev-only
+  // on-screen gutter measurement. Read on the server like diag, passed as a prop.
+  const audit = auditParam === "1";
   const breed = breeds.find((b) => b.slug === slug);
   if (!breed) return <h1 style={{ color: "white", background: "#0a3a57", padding: 40 }}>Not found: {slug}</h1>;
 
@@ -58,6 +61,7 @@ export default async function Chum2Page({ params, searchParams }: Props) {
         lineage={lineage}
         character={breed.character}
         diag={diag}
+        audit={audit}
       />
     </>
   );

@@ -3167,7 +3167,11 @@ export default function BreedTree({
     // slider would be unusable, and START is gated on `entered` so it would
     // blink out each time. Resize in place instead: the pack is real, so the
     // physics still reads the true radii when START is pressed.
-    if (reduce || resizeOnlyRef.current) {
+    // displayOnly (chums2 static diagram): no drop/entrance choreography - the circles
+    // must appear settled at their resting positions immediately, the same settle-in
+    // -place path prefers-reduced-motion and a resize-only re-pack already take. Game
+    // hostings (displayOnly false) keep the staggered drop-in below.
+    if (reduce || resizeOnlyRef.current || displayOnly) {
       resizeOnlyRef.current = false;
       zoomTo(v);
       setEntered(true);

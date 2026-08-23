@@ -14,6 +14,40 @@ Baseline (measured before stage 1):
 
 ---
 
+## 2026-09-03 no drop-in on the diagram; gutter audit instrument + proposal
+
+### D55. displayOnly skips the drop-in entrance (settled immediately)
+The diagram's falling/entrance choreography is the staggered rAF DROP-IN ENTRANCE in
+BreedTree's mount/re-pack effect (~3154): each circle starts 1.3*SIZE above its packed
+position and tweens down with a bounce, staggered ~45ms by index (dur 700). There is
+already a settle-in-place branch (used by prefers-reduced-motion and a resize-only
+re-pack) that just zoomTo(home) + setEntered(true) with no tween. Fix: add displayOnly
+to that branch's condition (`reduce || resizeOnlyRef.current || displayOnly`), so on
+/chums2 the circles appear settled at their resting positions immediately. Gated on
+displayOnly; game hostings keep the drop.
+
+### D56 (audit, temporary). Gutter instrument behind ?audit=1 + per-breed root cause
+Built a dev-only, ?audit=1 on-screen readout (server-read `audit` prop like `diag`; a
+fixed banner labelled "REMOVE BEFORE COMMIT"). It MEASURES at runtime (no estimation),
+in canvas-space px: intro box right edge, the resting pack's actual leftmost/rightmost
+circle x (min/max getBoundingClientRect of the visible `circle[data-n]`, hidden
+root/echo dropped by fill="none"), the tree column left edge, and the real gutter 4
+(box->pack) and gutter 5 (pack->tree). Load /chums2/<slug>?audit=1 per breed to read it.
+ROOT CAUSE (confirmed by the staffie regression): the pack CENTRES in a fixed-position,
+fixed-width stage, but the pack's OWN width varies per breed (staffie = two big circles,
+yorkshire = many small ones, border-collie = another shape). PACK_PULL 356 was tuned to
+yorkshire's estimated pack radius; a different pack width lands the centred pack's edges
+at different offsets, so fixed CSS offsets can NEVER hold gutter 4 and 5 for every breed.
+PROPOSAL (not implemented this round): derive the resting frame from the pack's MEASURED
+bounding box per breed (the D47/D48 content-/height-aware fit). After BreedTree packs the
+nodes, compute the cluster bbox (min/max x,y of the real circle centres +/- radii) and
+set the resting view so the pack's LEFT edge maps to a fixed screen x (box right +
+--gutter-diagram) and it fits the zone's short side; the pack's measured RIGHT edge then
+fixes gutter 5. Gate the content-aware fit on displayOnly. This removes PACK_PULL and the
+per-breed drift, so gutter 4 and 5 hold for every breed. Deliverable this round is the
+instrument + this proposal; the measured three-breed numbers need a browser load of
+?audit=1 (cannot drive a browser under the current tsc/eslint/tsx-only tool limit).
+
 ## 2026-09-02 five resting-layout gutters as CSS vars
 
 ### D54. Gutters 1-5 driven by four vars at the top of chums2.module.css
