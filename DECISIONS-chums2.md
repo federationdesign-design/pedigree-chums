@@ -14,7 +14,71 @@ Baseline (measured before stage 1):
 
 ---
 
-## 2026-08-26 diagram: steer to the concept's middle band; kill the tree-reserved gap
+## 2026-08-27 canvas 3000, fixed nav, zone stage, pack fill, node expand+popup
+
+### D41. Canvas widened to 3000px; columns re-derived from the concept
+The concept is 3000px wide, so `.canvas` and `body[data-pc-chums2]` min-width are now
+3000px and the column offsets are read straight off the concept's proportions (no
+longer viewport vw, which cannot fill a fixed 3000 canvas). Offsets set: intro/pack
+column right = 970 (0.323*3000); diagram zone = 970..2085 (0.695*3000); tree column =
+2085..2925 (0.975*3000). Intro box widened to 800px so it fills the intro column to
+the zone. STATED so they can be tuned against a 3000px screenshot.
+
+### D42. /chums2 reverts to the site's STANDARD fixed nav (un-fix deleted)
+Earlier this run the shared nav was un-fixed (position:absolute) so the whole bar
+scrolled with the wide canvas. Reversed: deleted `body[data-pc-chums2] .pc-nav {
+position:absolute }` and the HiddenGamesCounter `:global(body[data-pc-chums2])
+.counter/.reveal { position:absolute }` override, and dropped body's now-unneeded
+position:relative. The shared nav (bar, logo, 0/10 counter, contrast toolbar, menu)
+is position:fixed, so it stays pinned to the window over the 3000px horizontal scroll
+exactly like every other page. Only the page-specific header content (chum square,
+LEARN ABOUT THE title, subtitle) is inside .canvas and scrolls; the .header's existing
+padding-top (clamp(110px,14vh,146px)) clears the fixed bar so it is not overlapped.
+No new route-scoped nav exceptions remain; the only body[data-pc-chums2] rule left is
+the 3000px min-width for the scroll.
+
+### D43. Diagram stage = the concept's RED ZONE (canvas-child, bottom at the famous row)
+The diagram is a canvas-child again (not bounded to the upper band), an offset-only
+stage over the concept's marked zone: left 970 (intro/pack column right), right 915
+(edge at 2085 = tree column left), top 320 (below the header/subtitle), bottom 40 (the
+FAMOUS-CHUMS row bottom ~ the canvas content bottom, NOT the pack bottom). Zone width
+~1115, tall. No size box, no background/border/overflow; BreedTree fill-measures it.
+The tree moved to its own canvas-child in the tree column (top 300, right 75, width
+840, height 500). The intro box + pack stay in the left column (pack directly below
+the box). pointer-events:none + SVG-only hit-testing keep the sections beneath
+clickable.
+
+### D44. Small resting pack: gated the resting VIEW factor for displayOnly only
+Finding (via investigation, correcting the earlier guess): the `level === null`
+"off the pit, on a chum page" branch (BreedTree ~line 950) is NOT active here, because
+dockAside passes the real `level` (DIFF_DEFAULT = 5) at the relayoutMobile call. The
+small pack is the difficulty packing (`diffScale` at level 5 -> DIFF_STOP_5 0.575)
+times desktop `sizeMul` 0.6, framed inside the pit's PIT_SPAN (2.541x) play-arena
+resting view. PIT_SPAN scales BOTH the camera view AND the packing walls in lockstep,
+so it cancels out of the game's pack-to-frame ratio and is game-load-bearing: NOT
+touched, nor sizeMul, nor any shared packing math. Fix = ONE gated multiplier: a new
+`DISPLAY_SPAN = 1.1` replaces PIT_SPAN in the resting/home VIEW-width sites ONLY when
+displayOnly is set. Gate condition: `dockAside ? (displayOnly ? DISPLAY_SPAN : PIT_SPAN)
+: 1`, applied at the five identical resting/home sites (viewRef init, homeWRef init,
+backToStartScreen, mount effect, PLAY reset) plus the zoom-OUT-to-root branch. The
+drill-into-a-child zoom target is untouched (no PIT_SPAN there), so click-to-zoom is
+unchanged. Before/after resting factor: PIT_SPAN 2.541 (every game hosting, unchanged)
+-> DISPLAY_SPAN 1.1 (displayOnly only), so the static resting view frames the pack
+(~1x + small margin) and it fills the stage.
+
+### D45. Tree node click: pit-expand THEN popup, popup directly below the node
+Bounded onNodeClick used to return before the expand, so only the popup opened.
+Reworked (LineageMap): the bounded click reads the node's rect, runs the pit's expand
+`follow(n)` when the node has children (nodes with nothing deeper skip it), then fires
+onNodeClick with the node's on-screen rect. /chums2 opens the shared TileZoom DIRECTLY
+BELOW the node: the enlarge image + description panel side by side, centred under the
+node, a small offset down, clamped to the viewport, flipping ABOVE only when there is
+no room below, never covering the node. Same one-popout-at-a-time (openPop). Pit
+behaviour unchanged (the expand-then-popup is bounded-only). Caveat: the expand
+re-fits the tree (fitBox), so the node can shift from the rect captured pre-expand;
+the popup anchors to the click-time rect.
+
+
 
 ### D40. Diagram bounded to an UPPER BAND; tree moved to the top-right corner
 Two placement fixes against the concept. Both traced to ONE cause: the 660px inline

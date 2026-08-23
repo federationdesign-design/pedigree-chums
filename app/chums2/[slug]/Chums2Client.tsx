@@ -521,78 +521,6 @@ export default function Chums2Client({ name, slug, image, info, lineage }: Props
                   </div>
                 </section>
               )}
-                {/* Circular diagram: the mini pit's offset-defined stage (see CSS
-                    .diagramStage), now bounded to the UPPER BAND. top:0 = intro box
-                    top (top circles level with the box), bottom:0 = pack bottom (above
-                    the lower band), left past the intro box, right pulled in to leave
-                    the tree's column. Offsets only, no sizing box, no overflow. Same
-                    mechanism as before: BreedTree fill-measures the stage, pointer
-                    -events:none keeps the sections beneath clickable, the SVG stays
-                    interactive (zoom unchanged). */}
-                {SHOW_SECTIONS.diagram && lineage && !closed.has("diagram") && (
-                  <div className={styles.diagramStage} data-region="diagram">
-                    <button
-                      type="button"
-                      className={styles.panelClose}
-                      onClick={() => closeCard("diagram")}
-                      aria-label="Close diagram"
-                      title="Close diagram"
-                    >
-                      <CloseX />
-                    </button>
-                    <BreedTree
-                      root={lineage}
-                      rootImage={image}
-                      rootLabel={name}
-                      centred
-                      fill
-                      dockAside
-                      strokeByDepth
-                      tinted={false}
-                      displayOnly
-                    />
-                  </div>
-                )}
-                {/* Family tree: top-right corner of the upper band (its concept home),
-                    absolutely positioned so it no longer reserves height in the left
-                    column between the intro box and the pack. Smaller region than the
-                    old inline 1100x660; the bounded LineageMap fit-scales to it. */}
-                {SHOW_SECTIONS.tree && lineage && !closed.has("tree") && (
-                  <div className={styles.treeRegion} data-region="tree">
-                    <LineageMap
-                      breed={{ name, image, x: 550, y: 320, angle: 0 }}
-                      bounded
-                      hideLeafImages
-                      strongBg
-                      currentScore={0}
-                      initialDepth={2}
-                      onNodeClick={(nodeName, point) => {
-                        // Clicking a tree node opens THAT ancestor's pack popout:
-                        // the shared TileZoom enlarge, which carries the image plus
-                        // the name and note (the same content as the i info popout).
-                        // Matched by name; a node with no pack frame does nothing.
-                        // The enlarge grows NEXT TO THE CLICKED NODE (from the pointer
-                        // position), not from the far-off pack tile, and is clamped so
-                        // it never leaves the visible canvas. Shares openPop, so it
-                        // obeys the one-popout-at-a-time rule.
-                        const f = frames.find((x) => x.name === nodeName);
-                        if (!f) return;
-                        const SIZE = 61; // same enlarge size as a pack tile (61 -> 183 zoomed)
-                        const ZOOM = SIZE * 3, GAP = 16, EDGE = 8;
-                        const vw = window.innerWidth, vh = window.innerHeight;
-                        // open just right of the node, vertically centred on it; if it
-                        // would run off the right edge, flip to the node's left.
-                        let x = point.x + GAP;
-                        if (x + ZOOM > vw - EDGE) x = point.x - GAP - ZOOM;
-                        let y = point.y - ZOOM / 2;
-                        x = Math.max(EDGE, Math.min(x, vw - EDGE - ZOOM));
-                        y = Math.max(EDGE, Math.min(y, vh - EDGE - ZOOM));
-                        setOpenPop({ id: f.id, kind: "image", anchor: { x, y, size: SIZE } });
-                      }}
-                      onClose={() => closeCard("tree")}
-                    />
-                  </div>
-                )}
               </div>
               {/* Lower band: famous chums (left) and the lifespan chart (right),
                   tops aligned. Count-aware via flex: famous takes the width its
@@ -623,8 +551,72 @@ export default function Chums2Client({ name, slug, image, info, lineage }: Props
         </div>
       )}
 
-      {/* The circular diagram now renders inside the upper band (see above), bounded
-          to the middle band, not as a canvas-edge-to-edge stage. */}
+      {/* Circular diagram: canvas-child stage over the concept's RED ZONE (offsets in
+          CSS .diagramStage): left at the intro/pack column's right, top below the
+          header, right at the tree column's left, BOTTOM at the famous-chums row
+          bottom (not the pack bottom), on the 3000px canvas. Offsets only, no sizing
+          box, no overflow; BreedTree fill-measures it and (displayOnly) frames the
+          pack to fill. pointer-events:none keeps the sections beneath clickable. */}
+      {SHOW_SECTIONS.diagram && lineage && !closed.has("diagram") && (
+        <div className={styles.diagramStage} data-region="diagram">
+          <button
+            type="button"
+            className={styles.panelClose}
+            onClick={() => closeCard("diagram")}
+            aria-label="Close diagram"
+            title="Close diagram"
+          >
+            <CloseX />
+          </button>
+          <BreedTree
+            root={lineage}
+            rootImage={image}
+            rootLabel={name}
+            centred
+            fill
+            dockAside
+            strokeByDepth
+            tinted={false}
+            displayOnly
+          />
+        </div>
+      )}
+
+      {/* Family tree: canvas-child in the top-right column (its concept home). */}
+      {SHOW_SECTIONS.tree && lineage && !closed.has("tree") && (
+        <div className={styles.treeRegion} data-region="tree">
+          <LineageMap
+            breed={{ name, image, x: 550, y: 320, angle: 0 }}
+            bounded
+            hideLeafImages
+            strongBg
+            currentScore={0}
+            initialDepth={2}
+            onNodeClick={(nodeName, rect) => {
+              // The click already ran the pit's expand for this node (LineageMap).
+              // Here we open THAT ancestor's pack popout DIRECTLY BELOW the node so it
+              // reads as attached to it: the shared TileZoom (enlarge image + name/note
+              // panel, side by side) centred under the node, a small offset down,
+              // clamped to the viewport, flipping ABOVE the node only when there is no
+              // room below. Never covers the node. Matched by name; no frame = nothing.
+              const f = frames.find((x) => x.name === nodeName);
+              if (!f) return;
+              const SIZE = 61; // enlarge size (61 -> 183 zoomed), same as a pack tile
+              const ZOOM = SIZE * 3, PANEL_W = 219, GAP = 12, EDGE = 8;
+              const blockW = ZOOM + 10 + PANEL_W; // image + gap + description panel
+              const vw = window.innerWidth, vh = window.innerHeight;
+              const nodeCX = rect.x + rect.w / 2, nodeBottom = rect.y + rect.h;
+              let x = nodeCX - blockW / 2; // centre the block under the node
+              x = Math.max(EDGE, Math.min(x, vw - EDGE - blockW));
+              let y = nodeBottom + GAP; // just below the node
+              if (y + ZOOM > vh - EDGE) y = rect.y - GAP - ZOOM; // no room below -> flip above
+              y = Math.max(EDGE, Math.min(y, vh - EDGE - ZOOM));
+              setOpenPop({ id: f.id, kind: "image", anchor: { x, y, size: SIZE } });
+            }}
+            onClose={() => closeCard("tree")}
+          />
+        </div>
+      )}
 
       {/* Hidden BreedTreeMap: feeds ancestor-pack frames via onFramesReady only
           (brief 5.6). Not rendered visibly. Only mounted when the pack is shown. */}

@@ -344,11 +344,12 @@ export default function LineageMap({
   // scoring and the seen/blue recolour are untouched. Used by /chums2 (the
   // ancestor pack already shows those images). Default false = pit unchanged.
   hideLeafImages?: boolean;
-  // onNodeClick (added 2026-08-23): bounded only. Fires with the clicked node's
-  // breed name AND the pointer's viewport position instead of running the game tap
-  // (follow/score/pick), so the host (/chums2) can open THAT ancestor's pack popout
-  // anchored to the node. Ignored when bounded is false, so the pit is unchanged.
-  onNodeClick?: (name: string, point: { x: number; y: number }) => void;
+  // onNodeClick (added 2026-08-23; rect 2026-08-27): bounded only. In bounded mode
+  // the node click first runs the pit's expand for that node, then fires this with
+  // the clicked node's breed name AND its on-screen rect (viewport px), so the host
+  // (/chums2) can open THAT ancestor's pack popout directly below the node. Ignored
+  // when bounded is false, so the pit is unchanged.
+  onNodeClick?: (name: string, rect: { x: number; y: number; w: number; h: number }) => void;
 }) {
   // TEMP rarity-band instrumentation: does the tier prop reach the lifted card?
   if (typeof window !== "undefined" && circular) console.log("[rarity-band] LineageMap boundary:", { breed: breed?.name, rarityTier, soloLeaf });
@@ -2211,14 +2212,19 @@ export default function LineageMap({
                     onClick={(e) => {
                       e.stopPropagation();
                       if (suppressClick.current) { suppressClick.current = false; return; }
-                      // BOUNDED (/chums2): a node is not a game tap. Clicking it asks
-                      // the host to open THAT ancestor's pack popout (enlarge + info),
-                      // matched by name, anchored to the NODE. We hand up the pointer's
-                      // viewport position (the click lands on the node) so the host can
-                      // grow the enlarge next to it, not from the far-off pack tile. A
-                      // node with no matching frame does nothing. No follow/score/pick
-                      // runs, so the tree stays fully expanded.
-                      if (bounded) { onNodeClick?.(n.name, { x: e.clientX, y: e.clientY }); return; }
+                      // BOUNDED (/chums2): a node is not a game tap, but it must do
+                      // TWO things on one click: (1) run the pit's own expand for this
+                      // node so its deeper level opens (nodes with nothing deeper skip
+                      // this), then (2) hand the node's on-screen rect up so the host can
+                      // open THAT ancestor's pack popout directly BELOW the node. No
+                      // score/pick runs. The rect is read before follow() re-renders.
+                      if (bounded) {
+                        const g = e.currentTarget as SVGGElement;
+                        const rect = g.getBoundingClientRect();
+                        if (n.children && n.children.length) follow(n); // the pit's expand for this node
+                        onNodeClick?.(n.name, { x: rect.left, y: rect.top, w: rect.width, h: rect.height });
+                        return;
+                      }
                       interacted.current = true; setIdleHint(false); // any tap stops the first-ring hint
                       burstAt(n._x, n._y, r * 1.33); // pink starburst, 33% over the circle radius, exactly as the pit
                       const firstHit = !scoredRef.current.has(n._id);

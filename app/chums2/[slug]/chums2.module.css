@@ -16,7 +16,10 @@
    global rule clips overflow-x). (D30.) */
 .canvas {
   position: relative;
-  min-width: 2000px;
+  /* The concept is 3000px wide; the canvas matches it so the column offsets below
+     can be read straight off the concept's proportions. The body horizontal scroll
+     (Chums2Client effect + globals min-width:3000) reveals it. */
+  min-width: 3000px;
   background: transparent;
   font-family: var(--font-body, 'Montserrat', system-ui);
   /* /chums2 uses the concept yellow (#fff200) in place of the site token
@@ -153,23 +156,25 @@
   align-items: flex-start;
 }
 
-/* Family tree: the concept's top-right corner of the upper band, absolutely placed
-   so it does NOT reserve height in the left column between the intro box and the
-   pack. Smaller than the old inline 1100x660; the bounded LineageMap fit-scales its
-   content to whatever size this region is. Its 640px width is what .diagramStage's
-   right:660 (640 + a 20px gap) leaves clear. */
+/* Family tree: the concept's TREE COLUMN, a canvas-child in the top-right. Offsets
+   read off the concept at 3000px: left edge is the diagram zone's right (2085), so
+   right:75 puts its right edge at 2925 (0.975 * 3000); width ~840 fills the column;
+   top aligns with the diagram top. It does NOT reserve height in the left column
+   (the pack sits directly below the intro box). The bounded LineageMap fit-scales
+   its content to this region. */
 .treeRegion {
   position: absolute;
-  top: 0;
-  right: 0;
-  width: 640px;
-  height: 460px;
+  top: 300px;
+  right: 75px;
+  width: 840px;
+  height: 500px;
 }
 
 .introBox {
-  /* Width reduced 15% from the old clamp(320,33vw,560) (item 4); height driven
-     by its text (no fixed height). Navy rounded box. */
-  width: clamp(272px, 28vw, 476px);
+  /* On the 3000px canvas the column is set from the concept's proportions, not from
+     the viewport: the intro box fills the intro column (~0.27 of 3000) so its right
+     edge sits just before the diagram zone at 970. Height driven by its text. */
+  width: 800px;
   border-radius: 24px;
   background: var(--navy, #0a3a57);
   border: 2.5px solid rgba(255, 255, 255, 0.12);
@@ -341,39 +346,26 @@
 .chartWrap { max-width: 100%; overflow-x: auto; padding: 0 10px; }
 .scrollBody { max-height: 70vh; overflow-y: auto; overflow-x: hidden; padding: 0 6px; }
 
-/* ── Circular diagram stage (brief B, round 3) ──────────────────
-   The mini pit's LITERAL hosting: LineageModal gives BreedTree a stage that is
-   .stageArea { position:absolute; inset:0 } inside a full-viewport overlay, i.e. a
-   region defined by OFFSETS, with no size box, no background and no overflow rule,
-   there only to be measured. This is that, mapped onto /chums2's canvas: an
-   absolutely positioned region covering the page's large open area. It is NOT a
-   sized panel (a sized box was the disease that kept cropping the pack); it has NO
-   width/height, NO background/border/radius, NO overflow rule.
-     - left: the intro column's right edge = padding-left + rail(61) + rail-gap(5) +
-       intro box width + a 20px gap. So the stage begins right after the intro box.
-     - top: below the header = header padding-top + chum square height + a little.
-     - right/bottom: 0 = the canvas's right and bottom edges. Because the canvas is
-       min-width:2000px, right:0 makes the stage ~1460px wide at a 1440 viewport,
-       i.e. pit-scale, not a 620px box.
-   BreedTree runs in fill mode and MEASURES this stage (stageRef.clientWidth/Height)
-   to build its aspect viewBox, exactly as it measures .stageArea in the pit; the
-   pack lands large and centred. pointer-events:none keeps the transparent stage
-   from blocking the sections beneath it (pack grid, famous, chart); the SVG and the
-   close button re-enable it below, and the SVG only hit-tests its painted circles,
-   so zoom is unchanged and empty areas pass clicks through. */
+/* ── Circular diagram stage: the concept's RED ZONE ─────────────
+   A canvas-child region defined ONLY by offsets (no size box, no background/border/
+   radius, no overflow), there only to be measured. Offsets read straight off the
+   concept at the 3000px canvas width:
+     - left 970  = intro/pack column's right edge (0.323 * 3000)
+     - right 915 = so the right edge is 2085 = the tree column's left edge (0.695 * 3000)
+     - top 320   = just below the header/subtitle (header padding-top + chum square)
+     - bottom 40 = the FAMOUS-CHUMS row bottom, i.e. ~the canvas content bottom (the
+                   famous row is the last left-column content), NOT the pack bottom.
+   Zone width ~1115px, tall. BreedTree fill-measures this and (displayOnly) frames
+   the pack to fill it, diameter close to the shorter side (the width). It is the
+   whole open middle band; the pack/famous/chart sit to its left and right and show
+   through: pointer-events:none keeps them clickable, and the SVG only hit-tests its
+   painted circles (zoom unchanged, empty areas pass clicks through). */
 .diagramStage {
   position: absolute;
-  /* Offsets against the UPPER BAND (its offset parent), which spans the intro box
-     down to the ancestor pack. So the stage is steered to the concept's middle band
-     without any magic canvas-height number:
-       top:0    = intro box top   -> the pack's top circles sit level with the box top
-       bottom:0 = pack bottom      -> the diagram stays ABOVE the lower band
-       left     = just past the intro box (its width + 20) -> pack tight beside the box
-       right    = leaves the family tree's column on the right (tree is 640 wide, +20) */
-  top: 0;
-  bottom: 0;
-  left: calc(clamp(272px, 28vw, 476px) + 20px);
-  right: 660px;
+  left: 970px;
+  top: 320px;
+  right: 915px;
+  bottom: 40px;
   pointer-events: none;
 }
 .diagramStage svg { pointer-events: auto; }

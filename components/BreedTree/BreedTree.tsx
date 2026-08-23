@@ -186,6 +186,14 @@ const DIFF_TILT_DEG = 12.5;
 // 1 leaves things exactly as they were. Raise it to shrink the circles.
 const PIT_SHRINK = 2.1;
 const PIT_SPAN = DIFF_SPAN * PIT_SHRINK;
+// displayOnly (static /chums2 diagram) resting view ONLY. The pit's resting view
+// pulls back to PIT_SPAN (~2.54x) to leave the play arena around the pack: that
+// slack is game-load-bearing and must not change on any game path. A static
+// display has no arena, so its resting view should frame the pack itself, ~1x plus
+// a small breathing margin. This is the ONLY thing gated on displayOnly; the pack
+// packing (walls, sizeMul, difficulty) is shared and untouched, so PIT_SPAN still
+// cancels out of the game's pack-to-frame ratio. Raise for more air, lower to fill.
+const DISPLAY_SPAN = 1.1;
 const DIFF_INSET = 16;
 // `fit` is the largest scale at which the whole cluster still fits the pit, both
 // axes, whatever the circle count. Level 10 IS that, so the hardest setting
@@ -1332,11 +1340,11 @@ export default function BreedTree({
   // the drop finished, and the pre-drop % badges, sized in an effect that only
   // re-ran on [nodes, dockAside], stayed oversized until the slider forced a
   // re-pack. Same class as the LineageMap lift-card viewport seed.
-  const viewRef = useRef<View>([nodes[0].x, nodes[0].y, nodes[0].r * 2 * (isMobile ? PAD : ZOOM_PAD) * (dockAside ? PIT_SPAN : 1)]);
+  const viewRef = useRef<View>([nodes[0].x, nodes[0].y, nodes[0].r * 2 * (isMobile ? PAD : ZOOM_PAD) * (dockAside ? (displayOnly ? DISPLAY_SPAN : PIT_SPAN) : 1)]);
   // The width of the full-pit view, kept so a ring can be drawn at the weight it
   // has when you are zoomed out. Seeded with the same expression as viewRef and
   // rewritten by every site that returns the view to the root.
-  const homeWRef = useRef<number>(nodes[0].r * 2 * (isMobile ? PAD : ZOOM_PAD) * (dockAside ? PIT_SPAN : 1));
+  const homeWRef = useRef<number>(nodes[0].r * 2 * (isMobile ? PAD : ZOOM_PAD) * (dockAside ? (displayOnly ? DISPLAY_SPAN : PIT_SPAN) : 1));
   const focusRef = useRef<Node>(nodes[0]);
   const rafRef = useRef<number>(0);
 
@@ -1755,7 +1763,7 @@ export default function BreedTree({
     setFlighting(false); // an interrupted flight must not leave the marker stranded hidden
     focusRef.current = nodes[0];
     setFocus(nodes[0]);
-    const rootV = clampRootView([nodes[0].x, nodes[0].y, nodes[0].r * 2 * (isMobileRef.current ? PAD : ZOOM_PAD) * (dockAside ? PIT_SPAN : 1)]);
+    const rootV = clampRootView([nodes[0].x, nodes[0].y, nodes[0].r * 2 * (isMobileRef.current ? PAD : ZOOM_PAD) * (dockAside ? (displayOnly ? DISPLAY_SPAN : PIT_SPAN) : 1)]);
     homeWRef.current = rootV[2];
     zoomTo(rootV);
     if (!hideCaption) onToggleCaption?.();
@@ -2942,7 +2950,7 @@ export default function BreedTree({
        they play their own relPop and it arrives with a pop rather than a fade. */
     setRailHidden(false);
     onActiveChange?.(d !== nodes[0]);
-    let target: View = [d.x, d.y, dockAside && d !== nodes[0] ? d.r * 2 * (isMobileRef.current ? PAD : ZOOM_PAD) : d.r * 2 * (isMobileRef.current ? PAD : ZOOM_PAD) * (dockAside && d === nodes[0] ? PIT_SPAN : 1)];
+    let target: View = [d.x, d.y, dockAside && d !== nodes[0] ? d.r * 2 * (isMobileRef.current ? PAD : ZOOM_PAD) : d.r * 2 * (isMobileRef.current ? PAD : ZOOM_PAD) * (dockAside && d === nodes[0] ? (displayOnly ? DISPLAY_SPAN : PIT_SPAN) : 1)];
     if (d === nodes[0]) target = clampRootView(target);
     if (d === nodes[0]) homeWRef.current = target[2];
     const reduce = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -3133,7 +3141,7 @@ export default function BreedTree({
     setFocus(nodes[0]);
     setReady(true);
 
-    const v: View = clampRootView([nodes[0].x, nodes[0].y, nodes[0].r * 2 * (isMobile ? PAD : ZOOM_PAD) * (dockAside ? PIT_SPAN : 1)]);
+    const v: View = clampRootView([nodes[0].x, nodes[0].y, nodes[0].r * 2 * (isMobile ? PAD : ZOOM_PAD) * (dockAside ? (displayOnly ? DISPLAY_SPAN : PIT_SPAN) : 1)]);
     homeWRef.current = v[2];
     const reduce =
       typeof window !== "undefined" &&
@@ -7075,7 +7083,7 @@ export default function BreedTree({
             cancelAnimationFrame(rafRef.current);
             focusRef.current = nodes[0];
             setFocus(nodes[0]);
-            const rootV = clampRootView([nodes[0].x, nodes[0].y, nodes[0].r * 2 * (isMobileRef.current ? PAD : ZOOM_PAD) * (dockAside ? PIT_SPAN : 1)]);
+            const rootV = clampRootView([nodes[0].x, nodes[0].y, nodes[0].r * 2 * (isMobileRef.current ? PAD : ZOOM_PAD) * (dockAside ? (displayOnly ? DISPLAY_SPAN : PIT_SPAN) : 1)]);
             homeWRef.current = rootV[2];
             zoomTo(rootV);
             // Hide the open info box as the round begins.
