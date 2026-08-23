@@ -460,17 +460,33 @@
   white-space: pre-line;
 }
 /* Task 115: game output (noughts-and-crosses grid, Missing Sheep tiles, Kennel Sketch drawing). MUST be
-   monospace with preserved whitespace or the ASCII art collapses. Dark navy on the light bubble for
-   strong contrast (the solid block glyphs must not disappear); pre + horizontal scroll so a wide drawing
-   keeps its shape and never wraps on a narrow phone. */
+   monospace with preserved whitespace or the ASCII art collapses. It is a SIBLING of .dialogue in the bubble,
+   so it does not pick up the per-dog .dialogue colour on its own -- left at the default it rendered dark
+   (--pc-dialogue) and vanished inside the Collie's navy bubble. The per-dog rules below give it the SAME
+   colour the dialogue text uses for each dog. pre + horizontal scroll keeps a wide drawing's shape on a
+   narrow phone. */
 .gameOutput {
   margin: 8px 0 0;
   font-family: ui-monospace, "SF Mono", Menlo, Consolas, "Courier New", monospace;
   font-size: 14px;
   line-height: 1.35;
-  color: var(--pc-ui-navy);
+  color: var(--pc-dialogue);
   white-space: pre;
   overflow-x: auto;
+}
+/* Match the ASCII to each dog's dialogue colour (mirrors the .bubbleXxx .dialogue rules above), so the
+   drawing is always as readable as the text in the same bubble. */
+.bubbleCollie .gameOutput {
+  color: #ffffff;
+}
+.bubbleLabrador .gameOutput {
+  color: #1a1a1a;
+}
+.bubbleTerrier .gameOutput {
+  color: #1a1a1a;
+}
+.bubbleBoxer .gameOutput {
+  color: #0a3a57;
 }
 .actionWrap {
   margin-top: 10px;

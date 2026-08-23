@@ -234,6 +234,7 @@ export interface Resolution {
   // before assembly and fills `gameLine` (the B4x responseId to serve), `gameText` (that copy, with
   // {{WORD}}/{{ANSWER}} substituted) and `gameDisplay` (the monospace board / tiles / drawing).
   game?: GameId;
+  gameGuess?: string; // game_move: the guess to match when it differs from the raw input -- a picker emoji translated to its object word (🐱 -> "cat"). The engine passes this to applyMove instead of the compact input.
   gameLine?: string;
   gameText?: string;
   gameDisplay?: string;

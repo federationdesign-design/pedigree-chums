@@ -1313,6 +1313,32 @@ const EMOJI_CAT = '🐱';
 // reaction, not a disclosure. The FE0F variation selector is stripped from `glyphs`, so match '☹' bare.
 const EMOJI_CRY = '😭';
 const EMOJI_FROWN = '☹';
+// A picker emoji that NAMES an object -> that object's word, so mid-game it counts as the guess exactly as
+// the typed word would (🐱 -> "cat" in Missing Biscuit, ⚽ -> "ball", 🍪 -> "cookie", 🌭 -> "sausage" in Treat
+// Trail). The action / reaction emoji (gaming, the reactions, 😭, ☹️) name no object and return null, so they
+// stay a non-matching move like any stray input. FE0F is stripped, matching matchEmoji.
+function pickerEmojiWord(n: Normalised): string | null {
+  const glyphs = n.original.replace(/\uFE0F/g, '');
+  for (const [emoji, word] of Object.entries(EMOJI_FOOD)) if (glyphs.includes(emoji)) return word;
+  if (glyphs.includes(EMOJI_CAT)) return 'cat';
+  if ([...EMOJI_BALLS].some((g) => glyphs.includes(g))) return 'ball';
+  if (glyphs.includes(EMOJI_COOKIE)) return 'cookie';
+  if ([...EMOJI_BATH].some((g) => glyphs.includes(g))) return 'bath';
+  return null;
+}
+// The sadness emoji as a resolution: 😭 -> the personal-sadness route (L1, or L2 on a second qualifying turn,
+// with the protected state and Childline), ☹️ -> the non-escalating frown line. Extracted so it can be checked
+// HIGH UP (next to the typed "im sad" route, above the game-move handler) as well as in matchEmoji, so a
+// distressed tap wins mid-game exactly as the typed word does instead of being swallowed as a wrong guess.
+function emojiSadness(n: Normalised, state: RouterState): Resolution | null {
+  const glyphs = n.original.replace(/\uFE0F/g, '');
+  if (glyphs.includes(EMOJI_CRY)) {
+    const l2 = (state.personalSadnessCount ?? 0) >= 1;
+    return { layer: 1, layerName: 'Safety and unsuitable content', bucket: null, action: 'safety_signpost', moderationId: l2 ? 'MOD_PERSONAL_SADNESS_L2' : 'MOD_PERSONAL_SADNESS_L1' };
+  }
+  if (glyphs.includes(EMOJI_FROWN)) return { layer: 1, layerName: 'Safety and unsuitable content', bucket: null, action: 'safety_signpost', moderationId: 'MOD_PERSONAL_SADNESS_FROWN' };
+  return null;
+}
 // A tapped picker emoji -> a real response, reusing existing behaviour. FOOD re-routes through the FULL food
 // mechanism by resolving its word, so the Labrador overrides whoever is active exactly as a food WORD does
 // (transfer from another dog, his own tiered answer when he is active). COOKIE hands to the Labrador and
@@ -1334,13 +1360,8 @@ function matchEmoji(n: Normalised, data: ChumData, state: RouterState): Resoluti
   if (has(EMOJI_GAMING)) return { layer: 13, layerName: 'Play and entertainment', bucket: 'B45', action: 'games_menu', responseId: 'B45-GAMELIST-02' };
   if (has(EMOJI_BATH)) return { layer: 9, layerName: 'Recognised conversation', bucket: 'B52', action: 'canned', responseId: 'COL-B52-BATH-01' };
   if (glyphs.includes(EMOJI_CAT)) return { layer: 9, layerName: 'Recognised conversation', bucket: 'B52', action: 'canned', responseId: 'COL-B52-CAT-01' };
-  if (glyphs.includes(EMOJI_CRY)) {
-    // Same L1/L2 escalation the text route computes (router.ts personal-sadness): a second qualifying turn
-    // reaches L2 and the protected state, so a distressed child gets the Childline signpost.
-    const l2 = (state.personalSadnessCount ?? 0) >= 1;
-    return { layer: 1, layerName: 'Safety and unsuitable content', bucket: null, action: 'safety_signpost', moderationId: l2 ? 'MOD_PERSONAL_SADNESS_L2' : 'MOD_PERSONAL_SADNESS_L1' };
-  }
-  if (glyphs.includes(EMOJI_FROWN)) return { layer: 1, layerName: 'Safety and unsuitable content', bucket: null, action: 'safety_signpost', moderationId: 'MOD_PERSONAL_SADNESS_FROWN' };
+  const sad = emojiSadness(n, state); // 😭 / ☹️ -> the sadness route (normally caught higher, above the game-move handler; kept here too as a backstop)
+  if (sad) return sad;
   if (has(EMOJI_REACTIONS)) return { layer: 9, layerName: 'Recognised conversation', bucket: 'B29', action: 'canned', responseId: 'B29-NICE-01' };
   return null;
 }
@@ -1431,6 +1452,16 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
       moderationId: l2 ? 'MOD_PERSONAL_SADNESS_L2' : 'MOD_PERSONAL_SADNESS_L1',
     };
   }
+  // The sadness EMOJI (😭 / ☹️) reaches the SAME route here, at the same priority as the typed "im sad" above
+  // and ABOVE the game-move handler below -- so a distressed tap wins mid-game instead of being swallowed as a
+  // wrong guess ("No. Look again." was the worst response on the site). The engine counts/latches on the
+  // moderationId regardless of source, so L1 -> L2 -> Childline escalates identically. Guarded on
+  // !protectedState like the typed route. (Only the sadness emoji needed lifting: the picker's other emoji
+  // resolve below the game-move handler, exactly as their typed words do, so they are already consistent.)
+  if (!state.protectedState) {
+    const sadEmoji = emojiSadness(N, state);
+    if (sadEmoji) return sadEmoji;
+  }
 
   // Task 58: dog bereavement / grief. Sits BELOW urgent safety and personal sadness (both
   // checked above) and ABOVE everything else, including the loop. Served as a gentle ':('
@@ -1469,16 +1500,21 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
       }
       return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: 'death_answer' };
     }
-    // Task 146/147: while a word-guessing game is running (Treat Trail, the Labrador's; Missing
-    // Biscuit, the Terrier's), every non-safety input is a guess/clue. Placed directly below the
-    // safety / grief / death cluster (which still wins mid-round and ends it) and ABOVE every word-route
-    // below (the specialist transfers, maths, the god cluster, ask_dogs / breeds / games, breed pages,
-    // canned), so a guess like "dog", "games", "sausige" or "5 x 5" is never swallowed as something
-    // else. The Collie games keep their own handler lower down (letter/digit inputs, so they never
-    // reach those routes).
-    if (state.activeGame === 'treattrail' || state.activeGame === 'missingbiscuit' || state.activeGame === 'feedcookie') {
+    // While ANY in-chat game is running, every non-safety input is a guess/move. Placed directly below the
+    // safety / grief / death cluster (which still wins mid-round and ends the game) and ABOVE every word-route
+    // below (paw / hat / fetch, the specialist transfers, maths, the god cluster, ask_dogs / breeds / games,
+    // breed pages, canned), so a guess like "paw", "hat", "fetch", "dog" or "5 x 5" is never swallowed as
+    // something else. Previously only Treat Trail / Missing Biscuit / feed-cookie routed here; Kennel Sketch,
+    // Nine-Square, Missing Sheep and Button Panel fell to a duplicate handler far below the paw/hat/fetch
+    // routes, so those words hijacked a guess and ended the game (e.g. "paw" mid Kennel Sketch). All games
+    // now route here, so a guess always wins. GAME_EXIT ("stop"/"done") is the one word that leaves.
+    if (state.activeGame) {
       if (GAME_EXIT.has(c)) return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: 'game_exit', game: state.activeGame };
-      return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: 'game_move', game: state.activeGame };
+      // A picker emoji that names an object counts as that word (🐱 -> "cat"), so the game matches it exactly
+      // as the typed word. The emoji route sits below this, so without the translation the raw glyph reached
+      // the game and never matched. gameGuess carries the word; the engine passes it to the move.
+      const emojiGuess = pickerEmojiWord(N);
+      return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: 'game_move', game: state.activeGame, ...(emojiGuess ? { gameGuess: emojiGuess } : {}) };
     }
     // Task 145: the Terrier's sit gag runs as a sequence (the deathAskStreak shape). Once he has
     // asked "why?" (TER-B22-01 -> terrierSitStep 1), the NEXT input, whatever it is, gets the
@@ -1677,17 +1713,9 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
     return { layer: 8, layerName: 'Specialist handoff', bucket: 'B08', action: 'boxer_cutoff', transferTo: 'boxer' };
   }
 
-  // Task 115: the three in-chat games. Placed AFTER safety, personal sadness, grief and the ceiling
-  // (all of which return above), and before every content route. So a disclosure, a bereavement or a
-  // fear-of-a-person message mid-game is caught by the safety/grief layers above and NEVER reaches here
-  // as a move; the engine then ends the game. While a game is active, an exact exit word leaves it and
-  // anything else is a move. Cold, a game name starts it.
-  if (state.activeGame) {
-    if (GAME_EXIT.has(c)) {
-      return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: 'game_exit', game: state.activeGame };
-    }
-    return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: 'game_move', game: state.activeGame };
-  }
+  // Task 115: the in-chat games. A move while a game is ACTIVE is now handled far above (directly below the
+  // safety/grief/death cluster), so a guess always wins and paw/hat/fetch can no longer hijack it; only the
+  // START triggers remain here, each gated on !state.activeGame, reached only when no game is running.
   // Task 146: Treat Trail is the Labrador's game -- start it only when the Labrador is active (the
   // Collie/Terrier/Boxer keep their own games). Below safety and the active-game move handler above.
   if (state.activeDog === 'labrador' && !state.activeGame && TREAT_TRAIL_START.test(c)) {

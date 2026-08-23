@@ -393,7 +393,7 @@ export function submit(data: ChumData, session: Session, input: string): Turn {
     session.gamesPlayed += 1;
     serveGameResult(resolution, data, result);
   } else if (resolution.action === 'game_move' && session.activeGame && session.game) {
-    const { state, result } = applyMove(session.activeGame, session.game, n.compact);
+    const { state, result } = applyMove(session.activeGame, session.game, resolution.gameGuess ?? n.compact);
     session.game = state;
     if (result.ended) {
       session.activeGame = null;

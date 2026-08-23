@@ -36,6 +36,7 @@ const data = {
 
 const { submit } = await import(pathToFileURL(join(LIB, 'engine.ts')).href);
 const { newSession } = await import(pathToFileURL(join(LIB, 'session.ts')).href);
+const { startGame } = await import(pathToFileURL(join(LIB, 'games.ts')).href);
 const { normalise } = await import(pathToFileURL(join(LIB, 'normalise.ts')).href);
 const { extractCandidateSubject } = await import(pathToFileURL(join(LIB, 'router.ts')).href);
 const { skipTheatre, buildTypingPlan, TYPING_PROFILES, THEATRE_MAX_MS, isTypoEligible } = await import(
@@ -3336,6 +3337,36 @@ for (const inp of ['a fact about a breed', 'breed fact', 'tell me a breed fact',
   ok ? pass++ : fail++;
   rows.push({ ok, input: 'diversions: no repeat across four offers in a session', layer: 9, bucket: '-', action: 'fallback', note: ok ? '' : `ids=${ids.join(',')}` });
 })();
+// Mid-game a GUESS always wins: paw / hat / fetch / shake no longer hijack a Kennel Sketch or Missing Sheep
+// move and end the game (the four late-routed games now route early, above those routes, below safety).
+// The safe words (ball / bone) were already moves; GAME_EXIT ("stop") still leaves.
+for (const game of ['kennelsketch', 'missingsheep']) {
+  for (const word of ['paw', 'hat', 'fetch', 'shake', 'high five', 'ball', 'bone']) {
+    const s = newSession('collie');
+    const { state } = startGame(game, 0);
+    s.activeGame = game; s.game = state;
+    check(word, { action: 'game_move' }, { session: s, assert: (r) => (r.action === 'game_move' && r.game === game ? null : `"${word}" mid ${game} -> ${r.action}/${r.game}, expected game_move`) });
+  }
+  const s2 = newSession('collie'); const { state: st2 } = startGame(game, 0); s2.activeGame = game; s2.game = st2;
+  check('stop', { action: 'game_exit' }, { session: s2, assert: (r) => (r.game === game ? null : `stop mid ${game} -> ${r.action}`) });
+}
+// A picker emoji that names an object counts as that word mid-game (gameGuess), so 🐱 matches "cat" in
+// Missing Biscuit exactly as the typed word does. Reaction emoji (no object) carry no gameGuess.
+(() => { const s = newSession('terrier'); const { state } = startGame('missingbiscuit', 0); s.activeGame = 'missingbiscuit'; s.game = state;
+  check('🐱', { action: 'game_move' }, { session: s, assert: (r) => (r.gameGuess === 'cat' ? null : `🐱 -> gameGuess ${JSON.stringify(r.gameGuess)}, expected "cat"`) }); })();
+(() => { const s = newSession('labrador'); const { state } = startGame('treattrail', 0); s.activeGame = 'treattrail'; s.game = state;
+  check('⚽', { action: 'game_move' }, { session: s, assert: (r) => (r.gameGuess === 'ball' ? null : `⚽ -> ${JSON.stringify(r.gameGuess)}`) }); })();
+(() => { const s = newSession('collie'); const { state } = startGame('kennelsketch', 0); s.activeGame = 'kennelsketch'; s.game = state;
+  check('👍', { action: 'game_move' }, { session: s, assert: (r) => (r.gameGuess === undefined ? null : `👍 got a gameGuess: ${r.gameGuess}`) }); })();
+// SAFETY: a sadness emoji mid-game reaches the sadness route, NOT a wrong guess -- typed "im sad" already did,
+// now the tap does too (a distressed 😭 was getting "No. Look again."). Only the sadness emoji sits above the
+// game-move handler; every other picker emoji is a game_move mid-game, consistent with its typed word.
+for (const [g, dog] of [['kennelsketch', 'collie'], ['missingbiscuit', 'terrier']]) {
+  const s = newSession(dog); const { state } = startGame(g, 0); s.activeGame = g; s.game = state;
+  check('😭', { action: 'safety_signpost' }, { session: s, assert: (r) => (r.moderationId === 'MOD_PERSONAL_SADNESS_L1' ? null : `😭 mid ${g} -> ${r.action}/${r.moderationId}`) });
+  const s2 = newSession(dog); const { state: st2 } = startGame(g, 0); s2.activeGame = g; s2.game = st2;
+  check('☹️', { action: 'safety_signpost' }, { session: s2, assert: (r) => (r.moderationId === 'MOD_PERSONAL_SADNESS_FROWN' ? null : `☹️ mid ${g} -> ${r.action}/${r.moderationId}`) });
+}
 // §4: the missing name phrasings are acknowledged; the stop list still rejects a non-name.
 check('im called Phil', { action: 'name_ack' }, { assert: (_r, resp) => (/Phil/.test(resp.text) ? null : `im called: "${resp.text}"`) });
 check('they call me Rex', { action: 'name_ack' }, { assert: (_r, resp) => (/Rex/.test(resp.text) ? null : `they call me: "${resp.text}"`) });
