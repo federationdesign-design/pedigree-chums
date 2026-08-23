@@ -436,7 +436,12 @@
   left: calc(clamp(18px, 4vw, 48px) + 61px + var(--gutter-rail) + 600px + var(--gutter-diagram));
   top: 320px;
   right: calc(75px + 840px + var(--gutter-tree));
-  bottom: 170px;
+  /* Vertical extent (D58): the zone is landscape (~1176 wide), so the pack HEIGHT-binds
+     - it fills this height and, being roughly square/portrait, stays far narrower than
+     the width. Extended DOWN (170 -> 40) to give the height term more to fill, so the
+     pack is as large as it can be without spilling below the page content. Even maxed,
+     a ~600-760px-tall pack cannot fill the 1176px width (see D58 / the ?audit=1 terms). */
+  bottom: 40px;
   pointer-events: none;
   /* Z-ORDER: the whole diagram sits BEHIND every section. .canvas is isolated (its
      own stacking context), so this negative z-index paints just above the canvas

@@ -1361,7 +1361,7 @@ export default function BreedTree({
     const A = aspect;                    // stage aspect, same value the viewBox uses
     const WWperW = A >= 1 ? A : 1;       // world WIDTH shown per unit of view-width w
     const WHperW = A >= 1 ? 1 : 1 / A;   // world HEIGHT shown per unit of view-width w
-    const m = 0.06;                      // vertical breathing margin (height-bound case)
+    const m = 0.03;                      // vertical breathing margin (height-bound case)
     // Contain fit: the larger view-width wins (smaller pack that still fits both axes).
     const w = Math.max(bboxW / WWperW, bboxH / ((1 - 2 * m) * WHperW));
     const cx = minX + (w * WWperW) / 2;  // left-align: pack left edge at the stage left

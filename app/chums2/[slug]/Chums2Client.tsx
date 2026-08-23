@@ -349,10 +349,18 @@ export default function Chums2Client({ name, slug, image, info, lineage, diag = 
         .filter((c) => c.getAttribute("fill") !== "none"); // drop the hidden root/echo circles
       if (circles.length === 0) return;
       const rects = circles.map((c) => c.getBoundingClientRect());
+      const stage = (diagram as HTMLElement).getBoundingClientRect();
       const boxRight = box.getBoundingClientRect().right - cx;
       const packLeft = Math.min(...rects.map((r) => r.left)) - cx;
       const packRight = Math.max(...rects.map((r) => r.right)) - cx;
+      const packTop = Math.min(...rects.map((r) => r.top));
+      const packBottom = Math.max(...rects.map((r) => r.bottom));
       const treeLeft = tree.getBoundingClientRect().left - cx;
+      const packW = packRight - packLeft, packH = packBottom - packTop;
+      // To fill the stage WIDTH, a pack of this aspect would need this much HEIGHT. If
+      // that exceeds the stage height, the HEIGHT term binds (contain fit) -> the pack
+      // fills the height and stays narrow. That is the diagnosis, on screen.
+      const needH = packW > 0 ? Math.round((packH * stage.width) / packW) : 0;
       setAuditText([
         `breed: ${slug}   (circles measured: ${circles.length})`,
         `intro box right edge:  ${Math.round(boxRight)}`,
@@ -361,6 +369,9 @@ export default function Chums2Client({ name, slug, image, info, lineage, diag = 
         `tree column left edge:  ${Math.round(treeLeft)}`,
         `GUTTER 4 (box->pack):  ${Math.round(packLeft - boxRight)}px   [target 60]`,
         `GUTTER 5 (pack->tree): ${Math.round(treeLeft - packRight)}px   [target 100]`,
+        `stage: ${Math.round(stage.width)} x ${Math.round(stage.height)}  aspect ${(stage.width / Math.max(stage.height, 1)).toFixed(2)}`,
+        `pack on-screen: ${Math.round(packW)} x ${Math.round(packH)}  aspect ${(packW / Math.max(packH, 1)).toFixed(2)}`,
+        `fill-width needs height ${needH} vs stage height ${Math.round(stage.height)} -> ${needH > stage.height ? "HEIGHT BINDS" : "width binds"}`,
       ]);
     };
     // Let the diagram settle (item 1 removes the drop, so it is immediate) then read.

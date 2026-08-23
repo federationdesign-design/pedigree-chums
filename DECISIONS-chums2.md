@@ -14,6 +14,36 @@ Baseline (measured before stage 1):
 
 ---
 
+## 2026-09-05 gutter 5 diagnosis: HEIGHT binds (zone too landscape for the pack)
+
+### D58. Scale-up fails because the height term binds; gutter 5=100 is geometrically blocked
+yorkshire ?audit=1 after the content fit: gutter 4 = 60 (exact), but the pack renders
+379px wide in a 1176px zone (32%) and gutter 5 = 897. Which candidate:
+- CANDIDATE 2 (a later view write overriding the fit) RULED OUT: cx is exact (gutter 4 =
+  60), so displayRestView's frame IS applied - a later override would move cx too.
+- CANDIDATE 3 (bbox inflated) unlikely: displayRestView measures depth>=1 non-echo, the
+  same set the audit measures (fill != none).
+- CANDIDATE 1 (contain-fit HEIGHT term binds) CONFIRMED: the pack fills 32% of the width,
+  so width is not binding; the height term is. The two terms: to fill the 1176px WIDTH
+  the pack (aspect ~0.72:1 - relayoutMobile turns the dockAside cluster ON ITS SIDE,
+  portrait, ~line 910) would need ~1630px of HEIGHT; the stage is only ~600px tall, so
+  height-fit wins (a wider view w = a smaller pack) and the pack fills the ~600px height
+  at ~380px wide.
+Fix per the steer (stage vertical extent + margin): stage bottom 170 -> 40 (extend down
+to the content bottom, no spill) and displayRestView margin m 0.06 -> 0.03, so the pack
+grows ~30%. Added the live fit terms to the ?audit=1 banner (stage WxH + aspect, pack
+WxH + aspect, and "fill-width needs height N vs stage height M -> HEIGHT BINDS").
+CEILING (stated honestly): gutter 4 = 60 AND gutter 5 = 100 are geometrically
+incompatible for THIS pack in THIS zone. The pack fills the height; a ~600-760px-tall
+pack is ~380-500px wide (portrait) - the 1176px-wide zone would need a ~1176px-wide pack,
+i.e. ~1176-1630px tall, off the page. So gutter 5 reads a height-bound value (~500-750
+after this fix), not 100. To reach ~100 the ZONE must be narrowed: bring the tree left to
+follow the pack's right edge + --gutter-tree (needs the pack's runtime width, so a
+JS-positioned tree; far-right then goes empty). Optionally, skipping the dockAside
+portrait rotation for displayOnly would make the pack squarer/wider (gutter 5 ~750 not
+~900) but still not 100. Deliverable: diagnosis + terms + the vertical fix; the zone
+-narrowing / tree-follows-pack is a layout decision for Steve. Banner stays.
+
 ## 2026-09-04 content-aware resting fit (per-breed gutters hold)
 
 ### D57. displayRestView: per-breed content fit replaces DISPLAY_SPAN + PACK_PULL
