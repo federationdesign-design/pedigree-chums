@@ -306,8 +306,19 @@ export default function Chums2Client({ name, slug, image, info, lineage, diag = 
     const body = document.body;
     const prevHtmlX = html.style.overflowX;
     const prevBodyX = body.style.overflowX;
-    html.style.overflowX = "auto";
-    body.style.overflowX = "auto";
+    // The WINDOW must scroll both directions, like the old /chums page, with nothing
+    // between body and the sections acting as a scroll container. globals pins
+    // html+body to overflow-x:clip (so normal pages never scroll sideways); the wide
+    // 3000px canvas needs that un-clipped. Use VISIBLE, not auto: `overflow-x:auto`
+    // makes <body> a scroll container AND coerces its overflow-y to auto, and since
+    // <body> is only as tall as the canvas's in-flow content while the absolute
+    // diagram/tree/chart run below it, the body then clips them and drops its own
+    // horizontal scrollbar mid-page. `visible` keeps html+body out of the scroll-
+    // container role (per the globals comment) and lets the viewport provide the
+    // scrollbars at the window edges; overflow-y stays visible so the window scrolls
+    // down to the absolute sections too. (D30, D50.)
+    html.style.overflowX = "visible";
+    body.style.overflowX = "visible";
     const attr = diag ? "data-pc-chums2-diag" : "data-pc-chums2";
     body.setAttribute(attr, "");
     return () => {

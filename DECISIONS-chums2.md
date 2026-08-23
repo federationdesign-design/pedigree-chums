@@ -14,6 +14,28 @@ Baseline (measured before stage 1):
 
 ---
 
+## 2026-08-30 window scroll fix (body was the scroll container)
+
+### D50. Mid-page horizontal scrollbar cropping the diagram: <body> was a scroll container
+Symptom: a horizontal scrollbar mid-page with dead space below it, and the scroller's
+bottom edge cropping the diagram (flat cut at the scrollbar line). Cause: the wide
+-canvas mount effect (D30) set `overflow-x: auto` on html AND body. On <body>,
+overflow-x:auto (a) makes body a scroll container and (b) coerces its overflow-y from
+visible to auto (the CSS "auto + visible -> auto both axes" rule). <body> is only as
+tall as the canvas's IN-FLOW content, but this round's restructure made the diagram,
+tree and chart ABSOLUTE canvas-children that run BELOW that in-flow height, so the body
+scroll container clipped them and dropped its own horizontal scrollbar at its bottom
+edge, mid-page. globals deliberately pins html+body to overflow-x:clip precisely to
+keep body OUT of the scroll-container role (its comment says so); the effect's `auto`
+overrode that. No wrapper between body and the sections was a scroll container (the
+only overflow:auto rules, .chartWrap/.scrollBody, are card-only and the cards are gated
+off). Fix: the effect now sets overflow-x: VISIBLE, not auto, on html+body. visible
+un-clips the wide canvas without promoting body to a scroll container, so the VIEWPORT
+provides both scrollbars at the window edges, overflow-y stays visible, and the window
+scrolls down to the absolute sections. Nothing but the window clips anything. State:
+the element that was scrolling was <body>; it was scrolling because the effect set
+overflow-x:auto on it (coercing overflow-y to auto too).
+
 ## 2026-08-29 diagram clip fix (svg overflow)
 
 ### D49. Zoomed pack clipped to the stage rectangle: outer <svg> overflow:hidden
