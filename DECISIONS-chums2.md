@@ -14,6 +14,35 @@ Baseline (measured before stage 1):
 
 ---
 
+## 2026-08-23 hide labels, hover outline, depth-1 stroke, health heading, card band (D72)
+
+1. HIDE LABELS: the label `visible` gains `&& !displayOnly`, so the diagram draws no
+   circle names (they collided into a stack); names surface via the hover ensemble.
+2. HOVER OUTLINE: new `hovYellow = isHi || (displayOnly && d === hovered)` drives the
+   stroke colour, so the outline goes white->yellow on hover from EITHER a pack tile
+   (isHi/highlightName) or the diagram circle (hovered). Replaces the label-yellow feedback.
+   NOTE: on a TILE hover both the yellow band fill AND the yellow outline show together;
+   on a CIRCLE hover only the outline (the band is highlightName-driven). Flagged to Steve
+   as possibly heavy - band-on-tile can be dropped if so.
+3. DEPTH-1 STROKE +25%: `sw` gains `* (displayOnly && d.depth === 1 ? 1.25 : 1)` after the
+   0.8 trim; only the outermost ring is boosted, nested depths unchanged.
+4. HEALTH HEADING: HealthSection's own `.heading` is a 3rem Luckiest Guy display size.
+   Unified WITHOUT editing the shared component via a tag-descendant override
+   `.scrollBody h2 { font-size:26px; letter-spacing:0.12em; margin:16px 0 10px;
+   padding-left:16px; line-height:normal }` - higher specificity than the component's
+   single `.heading` class, no :global (same pattern as `.famousWrap h2`). Font-family,
+   colour and casing already matched .cardHeading.
+5. CARD PLACEMENT -> bottom band. Cards are canvas-absolute (page coords) but the canvas
+   height is content-driven, so absolute cards do not grow it. placeCard now measures (in
+   canvas coords, subtracting the canvas top like ?audit=1) the band top = max(bottom of
+   famous-chums, chart, intro-band) + 36, and buildSlots fills LEFT-TO-RIGHT across the
+   CANVAS width from there (was a fixed SLOT_TOP=196 grid sized to the viewport). A
+   cardsMinHeight memo (lowest open card y + EST_H + 40) is set as the canvas min-height so
+   the page GROWS downward under the band; it falls away when all cards close. Collision
+   avoidance, draggability and persistence (D71) are unchanged. Caveat: min-height uses the
+   PLACED y (not a dragged position) and the EST_H estimate, so a card dragged far down may
+   not extend the canvas - acceptable for the initial layout.
+
 ## 2026-08-23 dock top-right; punch-out align + label fix; rail cards (D70-D71)
 
 ### D70 #1 Hover ensemble dock -> open band top-right of the pack

@@ -5833,11 +5833,18 @@ export default function BreedTree({
               const ghosted = !!buriedSet && d !== hovered && buriedSet.has(d) && !heldHidden;
               // chums2 #4: the stroke-only rings read heavy without the photo fill,
               // so trim the stroke 20% for displayOnly. Game hostings unchanged.
-              const sw = hidden ? 0 : strokeWidthFor(d) * strokeK(viewRef.current) * (displayOnly ? 0.8 : 1);
+              // chums2: displayOnly rings are trimmed 20% (stroke-only reads heavy), then
+              // the OUTERMOST (depth-1) rings are boosted 25% so they frame the pack more
+              // strongly than the nested ones (D72 #3). Nested depths keep their weight.
+              const sw = hidden ? 0 : strokeWidthFor(d) * strokeK(viewRef.current) * (displayOnly ? 0.8 : 1) * (displayOnly && d.depth === 1 ? 1.25 : 1);
               // chums2 #1: an ancestor-pack tile is being hovered and THIS circle is
               // that ancestor (matched by name). Paint it solid yellow (fill + stroke)
               // in place of its photo. displayOnly-gated + prop-gated, so game is inert.
               const isHi = displayOnly && !hidden && !!highlightName && d.data.name === highlightName;
+              // chums2 #2 (D72): the outline goes yellow on hover from EITHER trigger - a
+              // pack tile (isHi, matched by name) or the diagram circle itself (d ===
+              // hovered). This replaces the old label-yellow feedback (labels are hidden).
+              const hovYellow = isHi || (displayOnly && !hidden && d === hovered);
               const circleCls = ghosted
                 ? `${styles.btCircle} ${styles.ghost} ${curCls}`.trim()
                 : `${styles.btCircle} ${cls ?? ""}`.trim();
@@ -5857,7 +5864,7 @@ export default function BreedTree({
                   // every depth, in place of the yellow/navy/blue depth strokes. Only
                   // the node circle stroke here; hidden circles keep "none". Gated on
                   // displayOnly so game hostings keep strokeColorFor's colours.
-                  stroke={hidden ? "none" : isHi ? "var(--yellow, #ffd23e)" : displayOnly ? "#ffffff" : strokeColorFor(d)}
+                  stroke={hidden ? "none" : hovYellow ? "var(--yellow, #ffd23e)" : displayOnly ? "#ffffff" : strokeColorFor(d)}
                   strokeWidth={sw}
                   // Dashes proportional to the ring's own width, so they read the
                   // same at every zoom. The fade to and from this state is pure CSS
@@ -6094,7 +6101,10 @@ export default function BreedTree({
               // A name belongs to a circle. If the circle is not drawn, and an
               // echo circle is not, the name goes with it. Without this the
               // repeated names stayed floating over the parent they belong to.
-              const visible = (isInside || isLeafFocus) && !labelBuried && !hidden;
+              // chums2 #1 (D72): HIDE the circle name labels entirely on the diagram -
+              // they collide into an unreadable stack, and the names now surface via the
+              // hover ensemble instead, so no information is lost. displayOnly-gated.
+              const visible = (isInside || isLeafFocus) && !labelBuried && !hidden && !displayOnly;
               const pct = d.parent ? Math.round((d.value ?? 0) / (d.parent.value || 1) * 100) : null;
               const labelEl = (
                 <g

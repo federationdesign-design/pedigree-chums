@@ -325,6 +325,20 @@
   padding-left: 16px;
 }
 
+/* Health card heading (D72 #4): HealthSection's own .heading is an oversized 3rem
+   Luckiest Guy display treatment, out of step with the other cards. Unify it to the
+   .cardHeading look WITHOUT editing the shared component: a tag-descendant override on
+   the card body (.scrollBody h2 has higher specificity than the component's single
+   .heading class, so no :global is needed - same pattern as .famousWrap h2). Font-
+   family, colour and casing already match; only size, spacing and margin differ. */
+.scrollBody h2 {
+  font-size: 26px;
+  letter-spacing: 0.12em;
+  margin: 16px 0 10px;
+  padding-left: 16px;
+  line-height: normal;
+}
+
 .cardPad { padding: 0 20px; }
 
 .temperamentTags { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 20px; margin-bottom: 4px; }

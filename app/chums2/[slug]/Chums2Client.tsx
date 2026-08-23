@@ -108,12 +108,16 @@ function intersects(a: Rect, b: Rect): boolean {
   return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
 }
 
-function buildSlots(vw: number): { x: number; y: number }[] {
+// The anchor grid. Cards fill LEFT-TO-RIGHT across the canvas width, in rows growing
+// DOWN from `bandTop` (the band below famous chums / the chart). Canvas-space coords,
+// matching DragCard's absolute left/top. (D72 #5 moved the band from the old fixed
+// SLOT_TOP near the rail to this measured bottom band.)
+function buildSlots(canvasW: number, bandTop: number): { x: number; y: number }[] {
   const slots: { x: number; y: number }[] = [];
-  const cols = Math.max(1, Math.floor((vw - SLOT_LEFT - SLOT_MARGIN) / SLOT_STEP_X));
-  for (let row = 0; row < 6; row++) {
+  const cols = Math.max(1, Math.floor((canvasW - SLOT_LEFT - SLOT_MARGIN) / SLOT_STEP_X));
+  for (let row = 0; row < 10; row++) {
     for (let col = 0; col < cols; col++) {
-      slots.push({ x: SLOT_LEFT + col * SLOT_STEP_X, y: SLOT_TOP + row * SLOT_STEP_Y });
+      slots.push({ x: SLOT_LEFT + col * SLOT_STEP_X, y: bandTop + row * SLOT_STEP_Y });
     }
   }
   return slots;
@@ -469,6 +473,15 @@ export default function Chums2Client({ name, slug, image, info, lineage, diag = 
     setHoverPreview({ id: f.id, anchor: computeDock() });
   }, [frames, computeDock]);
 
+  // Canvas GROWTH (D72 #5): DragCards are position:absolute (out of flow), so they do not
+  // stretch the content-driven canvas. Force a min-height that contains the lowest OPEN
+  // card so the page grows downward under the bottom band. Undefined when none are open.
+  const cardsMinHeight = useMemo(() => {
+    const openCards = cards.filter((c) => !closed.has(c.id) && positions[c.id]);
+    if (openCards.length === 0) return undefined;
+    return Math.max(...openCards.map((c) => (positions[c.id]?.y ?? 0) + EST_H)) + 40;
+  }, [cards, closed, positions]);
+
   // Grid shape (item 12): ALWAYS at least 2 rows, never 1 long row, max 3.
   // Columns grow with the pack (grid-auto-flow: column), so a big pack adds
   // width, not a 4th row. maxPerRow = 15 (52px tiles) sets the 2->3 row step.
@@ -491,11 +504,24 @@ export default function Chums2Client({ name, slug, image, info, lineage, diag = 
 
   const placeCard = useCallback((id: string) => {
     const width = cardById.get(id)?.width ?? 380;
-    const vw = typeof window !== "undefined" ? window.innerWidth : 1440;
-    const slots = buildSlots(vw);
+    // Cards land in the BAND BELOW famous chums / the chart (D72 #5), filling left to
+    // right across the CANVAS width. Everything is measured in canvas (page) coords -
+    // the same space DragCard's absolute left/top live in - by subtracting the canvas's
+    // own top, exactly as the ?audit=1 readout does.
+    const canvasEl = typeof document !== "undefined" ? (document.querySelector('[data-canvas="true"]') as HTMLElement | null) : null;
+    const cRect = canvasEl?.getBoundingClientRect();
+    const canvasW = cRect?.width ?? 2244;
+    const cTop = cRect?.top ?? 0;
+    const bottomOf = (sel: string) => { const el = document.querySelector(sel); return el ? el.getBoundingClientRect().bottom - cTop : 0; };
+    // Below the LOWER of famous chums and the chart, so cards never overlap them; the
+    // intro band is a floor for breeds with neither. GAP of 36 clears the section.
+    const bandTop = canvasEl
+      ? Math.max(bottomOf('[data-region="famous-chums"]'), bottomOf('[data-region="lifespan-chart"]'), bottomOf('[data-region="intro-band"]')) + 36
+      : SLOT_TOP;
+    const slots = buildSlots(canvasW, bandTop);
     const openList = [...openRects.current.values()];
     for (const slot of slots) {
-      if (slot.x + width > vw - SLOT_MARGIN) continue;      // stays inside viewport width
+      if (slot.x + width > canvasW - SLOT_MARGIN) continue;      // stays inside the canvas width
       const candidate: Rect = { x: slot.x, y: slot.y, w: width, h: EST_H };
       if (!openList.some((r) => intersects(candidate, r))) {
         return { x: slot.x, y: slot.y };
@@ -581,7 +607,7 @@ export default function Chums2Client({ name, slug, image, info, lineage, diag = 
   const preview = openPop ? null : hoverPreview;
 
   return (
-    <div className={styles.canvas} data-canvas="true">
+    <div className={styles.canvas} data-canvas="true" style={cardsMinHeight ? { minHeight: cardsMinHeight } : undefined}>
       {/* ?audit=1 TEMPORARY gutter readout - REMOVE BEFORE COMMIT once the fit lands. */}
       {audit && auditText && (
         <div
