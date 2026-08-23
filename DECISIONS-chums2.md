@@ -14,6 +14,25 @@ Baseline (measured before stage 1):
 
 ---
 
+## 2026-08-23 revert taper; fix bounded-tree rest size (D64)
+
+1. STROKE TAPER REVERTED (D62 item 3 undone): removed the displayOnly early-return in
+   strokeWidthFor, so /chums2 nested rings use the game's radius-proportional taper (the
+   ~halving per depth) again. The rest of that round (hover fix, label nudge, tree
+   position) stays.
+2. BOUNDED TREE too SMALL at rest: D63 framed the ENTIRE pre-laid-out constellation from
+   first paint, so depth-2 was shrunk to whole-tree scale. Fixed the fitBox: it now sizes
+   to the VISIBLE set, not all of `shown`. `boundsOf(openSet)` = bounds of root + nodes
+   whose parent is expanded. The frame is centred on the FIXED pivot = centre of the
+   INITIAL (initialDepth) content, at the original depth-2 size, and its half-extents only
+   GROW to whatever the current visible set pokes outside (max with the initial half).
+   Because `open` only grows (accumulate), the frame only grows, and a click whose children
+   land inside leaves it unchanged (no rescale). Rescaling is centred on the region (no pan/
+   jump). The full-tree layout + render filters from D63 stay (they give stable positions +
+   progressive reveal); only the fit changed. Approach for "outgrows region": gentle
+   centre-anchored rescale only when needed (Steve item 2), superseding D63's up-front
+   full-frame.
+
 ## 2026-08-23 bounded tree: accumulate branches, no re-fit (D63)
 
 Bounded-mode (LineageMap, /chums2) only; the pit's focus-follow and re-fit are untouched.

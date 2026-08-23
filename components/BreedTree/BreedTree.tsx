@@ -2765,12 +2765,6 @@ export default function BreedTree({
     return stroke;
   }
   function strokeWidthFor(d: Node): number {
-    // chums2 #3: gentler taper. The game's ring is radius-proportional (d.r x the
-    // descending RING_FRAC table below), so nested rings roughly HALVE per depth. For
-    // the stroke-only displayOnly diagram, make each nested level 0.9x its PARENT's
-    // ring instead: recurse to the depth-1 ring (which keeps the radius-proportional
-    // width below) and apply 0.9 per level under it. displayOnly-gated; game untouched.
-    if (displayOnly && d.depth >= 2 && d.parent) return strokeWidthFor(d.parent) * 0.9;
     // A ring is a FRACTION OF ITS OWN RADIUS, not a fixed number. Two things
     // resize a circle: the view zoom, and the difficulty slider, which rescales
     // the radii directly. A flat width tracked neither, so a circle could halve
