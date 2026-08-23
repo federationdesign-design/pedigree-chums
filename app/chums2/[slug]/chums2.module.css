@@ -131,15 +131,14 @@
   flex: 1 1 auto; /* fill the band width so the lower band (famous + chart) can be wide */
 }
 
-/* Top row: intro box (left), then the circular diagram, then the family tree, in
-   the open area. The row gap is EXACTLY 20px so the intro box's right edge sits
-   20px from the diagram panel (brief B.3). The wide canvas scrolls to fit all
-   three at their natural sizes. */
+/* Top row: intro box (left) + inline family tree (right), in the open area. The
+   circular diagram is NOT here: it is an absolutely positioned stage over the open
+   area (see .diagramStage), so the intro box and tree keep their own gap. */
 .introTopRow {
   display: flex;
   flex-direction: row;
   align-items: flex-start;
-  gap: 20px;
+  gap: clamp(24px, 3vw, 56px);
 }
 
 /* Sized, positioned region that hosts the bounded LineageMap (D31). It is the
@@ -327,28 +326,36 @@
 .chartWrap { max-width: 100%; overflow-x: auto; padding: 0 10px; }
 .scrollBody { max-height: 70vh; overflow-y: auto; overflow-x: hidden; padding: 0 6px; }
 
-/* ── Circular diagram panel (brief 5.2) ─────────────────────────
-   fill + dockAside make BreedTree fill this box, so it needs an
-   explicit size and position:relative (the diagram is absolute
-   inset:0 inside it). No perspective / preserve-3d anywhere in this
-   chain. */
-.diagramPanel {
-  position: relative;
-  /* Big page-scale stage, hosted the LineageModal .stageArea way: BreedTree runs
-     in fill mode, so it fills this box (width/height 100%) and MEASURES it to build
-     its aspect-derived viewBox. The box therefore needs a definite width AND height.
-     It is deliberately large so the diagram DOMINATES the space right of the intro
-     box (brief B.4), and roughly square so the centred pack fills the width rather
-     than floating in a wide letterbox. overflow:visible (and no overflow on any
-     ancestor: introTopRow, introStack, leftBand, canvas) means the SVG paints the
-     whole pack uncropped and zoomed circles may draw over surrounding page content
-     (brief B.2 / B.6). flex 0 0 auto so it keeps this size and the wide canvas
-     scrolls to fit the row rather than the diagram being squeezed. */
-  flex: 0 0 auto;
-  width: clamp(760px, 52vw, 1000px);
-  height: clamp(680px, 82vh, 980px);
-  overflow: visible;
+/* ── Circular diagram stage (brief B, round 3) ──────────────────
+   The mini pit's LITERAL hosting: LineageModal gives BreedTree a stage that is
+   .stageArea { position:absolute; inset:0 } inside a full-viewport overlay, i.e. a
+   region defined by OFFSETS, with no size box, no background and no overflow rule,
+   there only to be measured. This is that, mapped onto /chums2's canvas: an
+   absolutely positioned region covering the page's large open area. It is NOT a
+   sized panel (a sized box was the disease that kept cropping the pack); it has NO
+   width/height, NO background/border/radius, NO overflow rule.
+     - left: the intro column's right edge = padding-left + rail(61) + rail-gap(5) +
+       intro box width + a 20px gap. So the stage begins right after the intro box.
+     - top: below the header = header padding-top + chum square height + a little.
+     - right/bottom: 0 = the canvas's right and bottom edges. Because the canvas is
+       min-width:2000px, right:0 makes the stage ~1460px wide at a 1440 viewport,
+       i.e. pit-scale, not a 620px box.
+   BreedTree runs in fill mode and MEASURES this stage (stageRef.clientWidth/Height)
+   to build its aspect viewBox, exactly as it measures .stageArea in the pit; the
+   pack lands large and centred. pointer-events:none keeps the transparent stage
+   from blocking the sections beneath it (pack grid, famous, chart); the SVG and the
+   close button re-enable it below, and the SVG only hit-tests its painted circles,
+   so zoom is unchanged and empty areas pass clicks through. */
+.diagramStage {
+  position: absolute;
+  left: calc(clamp(18px, 4vw, 48px) + 66px + clamp(272px, 28vw, 476px) + 20px);
+  top: calc(clamp(110px, 14vh, 146px) + clamp(112px, 11vw, 150px) + 26px);
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
 }
+.diagramStage svg { pointer-events: auto; }
+.diagramStage .panelClose { pointer-events: auto; }
 
 /* The family tree renders as LineageMap's own full-viewport overlay, opened on
    demand from the rail (DECISIONS D13), so there is no inline tree panel here.

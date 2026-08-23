@@ -14,6 +14,43 @@ Baseline (measured before stage 1):
 
 ---
 
+## 2026-08-25 diagram: kill the sized panel, host on an offset-only stage
+
+### D39. .diagramPanel DELETED; BreedTree now on an offset-defined stage (supersedes D38's panel)
+Question: two rounds running, the circular diagram came out cropped because it was
+put in a SIZED box (.diagramPanel, width/height in flex flow). A sized box IS a
+container, and that is the disease, not a hosting choice. The mini pit (LineageModal)
+does NOT do this: it gives BreedTree `.stageArea { position:absolute; inset:0 }` in a
+full-viewport overlay, a region defined by OFFSETS with no size, no background, no
+overflow, there only to be measured. Copy that literally.
+Built: deleted .diagramPanel (gone, not restyled) and the in-row diagram. Added
+`.diagramStage`, an absolutely positioned region that is a direct child of `.canvas`
+(the offset parent), defined ONLY by offsets: left = the intro column's right edge
+(padding-left + rail 61 + gap 5 + intro box width + 20), top = below the header
+(header padding-top + chum square height + 26), right:0 and bottom:0 = the canvas
+edges. NO width/height, NO background/border/radius, NO overflow rule. BreedTree runs
+in fill mode and measures this stage (stageRef.clientWidth/Height) to build its aspect
+viewBox, the same mechanism the pit uses on .stageArea; the pack lands large and
+centred. Because the canvas is min-width:2000px, right:0 makes the stage pit-scale,
+not a 620px box. Props unchanged (centred + fill + dockAside + strokeByDepth +
+tinted=false + displayOnly). Zoom unchanged.
+pointer-events: the stage is transparent and now covers sections beneath it (pack
+grid, famous, chart), so `.diagramStage` is pointer-events:none with the SVG and the
+close button re-enabled (`.diagramStage svg`, `.diagramStage .panelClose`
+pointer-events:auto). The SVG hit-tests only its painted circles, so the pack stays
+clickable (zoom) while empty areas pass clicks through to the sections below. This is
+interaction correctness, not visual styling, so it does not break the "nothing visual"
+rule.
+Measured stage at 1440x900 (clamp/vw/vh resolved): left 537, top 302, so the stage is
+~1463 wide x ~1324 tall. Mini pit .stageArea = the full viewport, 1440 x 900. WIDTH is
+the number that proves it is a real full stage and not a box: 1463 vs 1440 = +1.6%,
+i.e. the same. HEIGHT is taller (1324 vs 900) because /chums2 is a scrolling page with
+stacked sections below the fold, not a single full-screen overlay; the pack fits and
+centres the same way, just with more vertical room. Open follow-up: the existing
+1100px inline tree still sits in the top of this open area and overlaps the centred
+pack; the concept shows a SMALLER tree in the top-right. Left the tree untouched this
+round (out of scope); flagged for Steve.
+
 ## 2026-08-24 node popout anchor + diagram switch-on
 
 ### D37. Tree-node popout now anchors to the NODE, not the far-off pack tile

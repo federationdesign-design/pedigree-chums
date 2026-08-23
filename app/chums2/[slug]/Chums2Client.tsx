@@ -434,41 +434,11 @@ export default function Chums2Client({ name, slug, image, info, lineage }: Props
             <div className={styles.introStack} data-region="intro-band">
               {/* Top row: the intro write-up box on the left, the family tree
                   inline to its right in the open area (bounded LineageMap). */}
-              {((SHOW_SECTIONS.introBox && introText) || (SHOW_SECTIONS.diagram && lineage && !closed.has("diagram")) || (SHOW_SECTIONS.tree && lineage && !closed.has("tree"))) && (
+              {((SHOW_SECTIONS.introBox && introText) || (SHOW_SECTIONS.tree && lineage && !closed.has("tree"))) && (
                 <div className={styles.introTopRow}>
                   {SHOW_SECTIONS.introBox && introText && (
                     <div className={styles.introBox}>
                       <p className={styles.introBody}>{introText}</p>
-                    </div>
-                  )}
-                  {/* Circular diagram, immediately RIGHT of the intro box (brief B).
-                      Hosted the LineageModal way: BreedTree with the learn-mode props
-                      (centred + fill + dockAside + strokeByDepth + tinted=false) plus
-                      displayOnly, in a big non-clipping .diagramPanel that BreedTree
-                      measures to build its viewBox. No hideLabels/disableZoom (legacy),
-                      no cropping wrapper. Starts open; the X rails its reopen icon. */}
-                  {SHOW_SECTIONS.diagram && lineage && !closed.has("diagram") && (
-                    <div className={styles.diagramPanel} data-region="diagram">
-                      <button
-                        type="button"
-                        className={styles.panelClose}
-                        onClick={() => closeCard("diagram")}
-                        aria-label="Close diagram"
-                        title="Close diagram"
-                      >
-                        <CloseX />
-                      </button>
-                      <BreedTree
-                        root={lineage}
-                        rootImage={image}
-                        rootLabel={name}
-                        centred
-                        fill
-                        dockAside
-                        strokeByDepth
-                        tinted={false}
-                        displayOnly
-                      />
                     </div>
                   )}
                   {SHOW_SECTIONS.tree && lineage && !closed.has("tree") && (
@@ -610,8 +580,42 @@ export default function Chums2Client({ name, slug, image, info, lineage }: Props
         </div>
       )}
 
-      {/* The circular diagram now renders INLINE in the top row, immediately right
-          of the intro box (see above, brief B), not as a standalone band. */}
+      {/* Circular diagram, hosted the mini pit's LITERAL way (brief B, round 3).
+          NOT a sized panel: `.diagramStage` is an absolutely positioned region
+          defined only by OFFSETS from the canvas (left at the intro column's right,
+          top below the header, right and bottom at the canvas edges), with no
+          width/height, no background, border, radius or overflow. It is the page's
+          large open area, exactly as LineageModal's .stageArea is inset:0 in the
+          full-viewport overlay. BreedTree runs in fill mode and MEASURES this stage
+          to build its aspect viewBox (same mechanism as the pit); the pack lands
+          large and centred. pointer-events:none on the stage (re-enabled on the SVG
+          and the close button in CSS) so the transparent stage never blocks the
+          sections beneath it while the pack circles stay clickable (zoom unchanged).
+          Direct child of .canvas so the offsets are measured against the canvas. */}
+      {SHOW_SECTIONS.diagram && lineage && !closed.has("diagram") && (
+        <div className={styles.diagramStage} data-region="diagram">
+          <button
+            type="button"
+            className={styles.panelClose}
+            onClick={() => closeCard("diagram")}
+            aria-label="Close diagram"
+            title="Close diagram"
+          >
+            <CloseX />
+          </button>
+          <BreedTree
+            root={lineage}
+            rootImage={image}
+            rootLabel={name}
+            centred
+            fill
+            dockAside
+            strokeByDepth
+            tinted={false}
+            displayOnly
+          />
+        </div>
+      )}
 
       {/* Hidden BreedTreeMap: feeds ancestor-pack frames via onFramesReady only
           (brief 5.6). Not rendered visibly. Only mounted when the pack is shown. */}
