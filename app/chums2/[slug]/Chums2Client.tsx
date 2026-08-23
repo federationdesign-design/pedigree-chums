@@ -119,6 +119,22 @@ function buildSlots(vw: number): { x: number; y: number }[] {
   return slots;
 }
 
+// Intro-box write-up alias (2026-08-23). breedInfo is keyed by tree-NODE name, but a
+// few breed cards use a shorter/different root name than the node that carries the
+// write-up, so breedInfo[breed.name] misses and the box shows only the fallback. This
+// is the same class of mismatch data/lineageNames.ts (UK_TO_LINEAGE) exists for, but
+// that map runs the opposite direction (uk-name -> lineage-name) and targets lineage
+// keys, not breedInfo keys, so a small dedicated map is clearer than reversing it.
+// Each target is verified to exist in breedInfo. Extend here, do NOT rename data keys.
+const INTRO_ALIASES: Record<string, string> = {
+  "Corgi": "Pembroke Welsh Corgi",
+  "West Highland Terrier": "West Highland White Terrier",
+  "German Shepherd": "German Shepherd Dog",
+  "Dachshund": "Teckel (Dachshund) family",
+  "Springer Spaniel": "English Springer Spaniel",
+  "Labrador": "Labrador Retriever",
+};
+
 // ── Main component ──────────────────────────────────────────────────────────
 // Stage 1: header + flow skeleton. Stage 2: circular diagram (healthy hosting)
 // + X close + rail reopen. Stage 3: rail cards closed on load, deterministic
@@ -130,7 +146,7 @@ export default function Chums2Client({ name, slug, image, info, lineage, diag = 
   // "keep digging" prompt when the breed has ancestry to open, composed exactly
   // as the diagram caption does (BreedTree). NOT the subtitle or the temperament
   // blurb, and NOT breed.character. (Correction 2026-08-22, D22.)
-  const introText = (breedInfo[name] ?? "") + (lineage?.children?.length ? " Tap a circle inside to keep digging." : "");
+  const introText = (breedInfo[INTRO_ALIASES[name] ?? name] ?? "") + (lineage?.children?.length ? " Tap a circle inside to keep digging." : "");
 
   // Historical-influence breakdown, same computation as the live page's
   // ancestry card (leaf shares, normalised, merged, sorted desc).
@@ -416,14 +432,43 @@ export default function Chums2Client({ name, slug, image, info, lineage, diag = 
   // BreedTree's hover handler (an event, not an effect), so measuring the tile and
   // setting state here does not trip set-state-in-effect. Matched by name; the tile
   // rect (data-frame-id) is the TileZoom anchor. Null on hover-out clears the preview.
+  // #3: the hover ENSEMBLE docks in the open band immediately RIGHT of the intro box -
+  // the same spot for every ancestor and BOTH triggers (tile hover + circle hover), not
+  // at the pack tiles and not over the diagram. Measures the intro box: the image sits
+  // tight to its right edge, top-aligned; the cluster is clamped to the viewport and, if
+  // it would overlap the resting pack, dropped below it.
+  const computeDock = useCallback((): { x: number; y: number; size: number } | undefined => {
+    if (typeof document === "undefined") return undefined;
+    const box = document.querySelector('[data-region="intro-box"]') as HTMLElement | null;
+    if (!box) return undefined;
+    const br = box.getBoundingClientRect();
+    const SIZE = 61, IMG = SIZE * 3, GAP = 12;
+    const ENS_W = IMG + 10 + 219, ENS_H = IMG + 10 + 200; // image + gap + panel / + pct card
+    let x = br.right + GAP, y = br.top;
+    const diagram = document.querySelector('[data-region="diagram"]');
+    if (diagram) {
+      const rects = (Array.from(diagram.querySelectorAll("circle[data-n]")) as SVGCircleElement[])
+        .filter((c) => c.getAttribute("fill") !== "none").map((c) => c.getBoundingClientRect());
+      if (rects.length) {
+        const pT = Math.min(...rects.map((r) => r.top)), pB = Math.max(...rects.map((r) => r.bottom));
+        const pL = Math.min(...rects.map((r) => r.left)), pR = Math.max(...rects.map((r) => r.right));
+        if (x < pR && x + ENS_W > pL && y < pB && y + ENS_H > pT) y = pB + 10; // clear the pack below
+      }
+    }
+    const EDGE = 8, vw = window.innerWidth, vh = window.innerHeight;
+    x = Math.max(EDGE, Math.min(x, vw - EDGE - ENS_W));
+    y = Math.max(EDGE, Math.min(y, vh - EDGE - ENS_H));
+    return { x, y, size: SIZE };
+  }, []);
+
+  // #2/#3: show the docked ensemble for an ancestor by name (from either trigger); null
+  // clears it. `anchor` is the DOCK, not the tile - both triggers land in the same place.
   const onCircleHover = useCallback((nm: string | null) => {
     if (!nm) { setHoverPreview(null); return; }
     const f = frames.find((x) => x.name === nm);
     if (!f) { setHoverPreview(null); return; }
-    const el = document.querySelector(`[data-frame-id="${f.id}"]`) as HTMLElement | null;
-    const r = el?.getBoundingClientRect();
-    setHoverPreview({ id: f.id, anchor: r ? { x: r.left, y: r.top, size: r.width } : undefined });
-  }, [frames]);
+    setHoverPreview({ id: f.id, anchor: computeDock() });
+  }, [frames, computeDock]);
 
   // Grid shape (item 12): ALWAYS at least 2 rows, never 1 long row, max 3.
   // Columns grow with the pack (grid-auto-flow: column), so a big pack adds
@@ -606,8 +651,8 @@ export default function Chums2Client({ name, slug, image, info, lineage, diag = 
                         key={f.id}
                         className={styles.frame}
                         style={{ borderColor: frameBorder(f.status) }}
-                        onMouseEnter={() => setPackHoverName(f.name)}
-                        onMouseLeave={() => setPackHoverName(null)}
+                        onMouseEnter={() => { setPackHoverName(f.name); onCircleHover(f.name); }}
+                        onMouseLeave={() => { setPackHoverName(null); onCircleHover(null); }}
                       >
                         <div className={styles.frameInner}>
                           <button
@@ -654,7 +699,9 @@ export default function Chums2Client({ name, slug, image, info, lineage, diag = 
                             onClick={(e) => { e.stopPropagation(); setOpenPop(openPop?.id === f.id && openPop.kind === "pct" ? null : { id: f.id, kind: "pct" }); }}
                             aria-label={`Percentage detail for ${f.name}`}
                           >{f.pct != null && f.pct < 1 ? "<1%" : `${f.pct ?? "?"}%`}</button>
-                          {((openPop?.id === f.id && openPop.kind === "pct") || preview?.id === f.id) && (
+                          {/* Inline % card is the CLICKED popout only; the hover preview's
+                              % card renders in the docked ensemble below (D67 #2/#3). */}
+                          {openPop?.id === f.id && openPop.kind === "pct" && (
                             <div className={styles.framePctCard} onClick={(e) => e.stopPropagation()}>
                               <button
                                 type="button"
@@ -804,23 +851,43 @@ export default function Chums2Client({ name, slug, image, info, lineage, diag = 
           no X, 2s auto-close, exactly like the mini pit. Anchored to the tile's
           screen rect captured at click. (D26.) */}
       {(() => {
-        // The enlarged image serves BOTH the clicked image popout and the circle
-        // -hover preview (#2). persist removes the 2s auto-close (popouts persist,
-        // New-2); borderColor paints the border in the ancestor's tile-status colour
-        // (New-3). A preview closes by clearing hoverPreview; a clicked one by openPop.
-        const src = openPop?.kind === "image" ? openPop : preview;
+        // Clicked image popout stays at the TILE (openPop.anchor). The hover ENSEMBLE
+        // (#2/#3) is a masonry cluster docked right of the intro box: the enlarged image
+        // (the anchor), its description panel (TileZoom, 10px to the image's right), and
+        // the % card (10px below the image). persist removes the 2s auto-close; the
+        // border is the ancestor's tile-status colour. Preview closes by clearing
+        // hoverPreview; a clicked one by openPop.
+        const isPreview = !openPop && !!preview;
+        const src = openPop?.kind === "image" ? openPop : isPreview ? preview : null;
         if (!src) return null;
         const f = frames.find((x) => x.id === src.id);
         if (!f || !src.anchor) return null;
-        const isPreview = !openPop;
+        const IMG = src.anchor.size * 3;
         return (
-          <TileZoom
-            key={f.id}
-            open={{ img: f.img, name: f.name, description: f.note || "", anchor: src.anchor }}
-            onClose={() => (isPreview ? setHoverPreview(null) : setOpenPop(null))}
-            persist
-            borderColor={frameBorder(f.status)}
-          />
+          <>
+            <TileZoom
+              key={f.id}
+              open={{ img: f.img, name: f.name, description: f.note || "", anchor: src.anchor }}
+              onClose={() => (isPreview ? setHoverPreview(null) : setOpenPop(null))}
+              persist
+              borderColor={frameBorder(f.status)}
+            />
+            {isPreview && (
+              <div
+                className={styles.framePctCard}
+                style={{ position: "fixed", left: src.anchor.x, top: src.anchor.y + IMG + 10, right: "auto", transform: "none", zIndex: 130, pointerEvents: "none" }}
+              >
+                <p className={styles.pctCardName}>{f.name}</p>
+                <p className={styles.pctCardBig}>{pctTxt(f.pct ?? 0)} of your chum</p>
+                <div className={styles.pctCardRows}>
+                  <div>As {genLabel(f.depth ?? 1)}: {pctTxt(f.share ?? f.pct ?? 0)}</div>
+                  <div>Share of your chum: {pctTxt(f.pct ?? 0)}</div>
+                </div>
+                <p className={styles.pctCardTitle}>{pctTitleFor(f.id)}</p>
+                <p className={styles.pctCardDisclaimer}>These figures come from history and old breeding records, our viewpoint, not proven fact.</p>
+              </div>
+            )}
+          </>
         );
       })()}
 

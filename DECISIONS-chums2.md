@@ -14,6 +14,51 @@ Baseline (measured before stage 1):
 
 ---
 
+## 2026-08-23 top-align, hover ensemble, intro alias, yellow punch-out (D67-D69)
+
+### D67 #1 Two-circle pack top-aligns (displayRestView)
+The view maps `cy` to the stage vertical CENTRE; visible world-height H = WHperW*w. Set
+`cy = minY + H*(0.5 - m)` so the pack TOP sits a margin below the zone top. A height
+-bound (tall) pack has H ~ bboxH/(1-2m) -> lands ~where centring did (barely moves); a
+short two-circle row rises to the intro-box top line instead of floating low.
+
+### D67 #2/#3 Hover ensemble: docked masonry cluster
+The three-element hover preview (enlarged image + TileZoom description panel + % card)
+was overlapping and pinned at the tiles. Now it docks in the open band right of the
+intro box, same spot for BOTH triggers (tile hover now also fires it, circle hover as
+before): a masonry cluster - image tight to the box's right edge (computeDock measures
+the box), description panel 10px to its right (TileZoom), % card 10px below the image
+(fixed-position, its own render; the inline % card is now the CLICKED popout only).
+Clamped to the viewport and dropped below the resting pack if it would overlap.
+
+### D68 Intro-box write-up alias (data audit)
+21/54 breeds showed only the fallback. Six are name mismatches (write-up under a
+different breedInfo key): added INTRO_ALIASES in Chums2Client (breedInfo[ALIAS[name] ??
+name]). UK_TO_LINEAGE (data/lineageNames.ts) is the same class of problem but runs the
+other direction and targets lineage keys, so a small dedicated map is clearer. Mappings
+(each target verified present in breedInfo): Corgi -> Pembroke Welsh Corgi; West Highland
+Terrier -> West Highland White Terrier; German Shepherd -> German Shepherd Dog; Dachshund
+-> Teckel (Dachshund) family; Springer Spaniel -> English Springer Spaniel; Labrador ->
+Labrador Retriever.
+
+CONTENT TASK FOR STEVE (report only, no descriptions written): 15 breeds have NO breedInfo
+write-up at all (6 aliases + 15 = 21, matching the audit total; the brief said 14 but the
+list is 15). Confirmed absent from data/breedInfo.ts: Great Dane, Doberman Pinscher, Saint
+Bernard, Afghan Hound, Weimaraner, Papillon, Boston Terrier, Siberian Husky, Shih Tzu,
+Miniature Schnauzer, Pomeranian, French Bulldog, Chihuahua, Poodle, Boxer.
+
+### D69 Hover highlight punch-out
+The tile-hover yellow flooded the whole disc (the stroke-only children are transparent,
+so the parent's fill showed through them). Fixed: the highlighted circle's fill stays
+transparent; a separate evenodd `<path>` per matching node (outer circle + each non-echo
+direct child as a subpath) is drawn BEHIND the circles, filling only the exposed band and
+punching the child discs out to background. Derived from the node's ACTUAL direct
+children (adapts per breed), not a fixed count. Geometry mirrors the circles' imperative
+paint ((world - view)*k), computed from the ref-free displayRestView() at the resting view
+(render-safe; hover is at rest). NOT added inside the index-aligned node groups (would
+break the circle/label [0]/[1] indexing) - it is a sibling group before circlesRef. Stroke
+highlight unchanged; displayOnly-scoped.
+
 ## 2026-08-23 tree scale frozen; box slimmed; pack +15%; 2-circle row (D66)
 
 1. TREE SCALE FROZEN. Audit of every bounded viewBox/scale path I added:

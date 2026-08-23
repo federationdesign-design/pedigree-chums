@@ -1416,7 +1416,14 @@ export default function BreedTree({
     // Contain fit: the larger view-width wins (smaller pack that still fits both axes).
     const w = Math.max(bboxW / WWperW, bboxH / ((1 - 2 * m) * WHperW)) / DISPLAY_FILL;
     const cx = minX + (w * WWperW) / 2;  // left-align: pack left edge at the stage left
-    const cy = (minY + maxY) / 2;        // vertical centre
+    // TOP-align, not centre (D67 #1): the view maps cy to the vertical CENTRE of the
+    // stage, and the visible world-height is H = WHperW * w. Placing the pack top (minY)
+    // a margin below the top of the visible band => cy = minY + H*(0.5 - m). A height
+    // -bound (tall) pack has H ~ bboxH/(1-2m), for which this lands ~where centring did
+    // (barely affected); a short two-circle row rises so its top sits on the zone top
+    // (the intro-box top line) instead of floating low with dead space above it.
+    const H = WHperW * w;
+    const cy = minY + H * (0.5 - m);
     return [cx, cy, w];
   };
   // Seed the view with the SETTLED pit fit, not a placeholder. On the start screen
@@ -5740,6 +5747,38 @@ export default function BreedTree({
               circle it belongs to. zoomTo, the drop-in entrance and
               liftToLearn all index this group and now read
               children[i].children[0] for the circle, [1] for the label. */}
+          {/* chums2 hover PUNCH-OUT: the pack-tile-hover yellow fills only the
+              highlighted circle's EXPOSED band, not the discs of its child circles.
+              A single evenodd path per matching node (outer circle + each non-echo
+              direct child as a subpath) punches the children out; derived from the
+              node's ACTUAL direct children, so it adapts per breed. Drawn BEHIND the
+              stroke-only circles: the transparent parent shows this yellow, the child
+              holes show the background, the white strokes and labels stay on top. Its
+              geometry mirrors the circles' own imperative paint (translate by
+              (world - view)*k, radius drawR), read from the live view. displayOnly only. */}
+          {displayOnly && !!highlightName && (() => {
+            // The RESTING view, recomputed purely (displayRestView reads no refs, so this
+            // is render-safe): the same frame the mount effect paints the circles at, so
+            // the punch-out lines up. Radius is the plain world radius d.r*k (no ring
+            // inset), which makes the child holes clear the child rings cleanly.
+            const v = displayRestView(), kk = SIZE / v[2];
+            const disc = (cx: number, cy: number, r: number) =>
+              `M ${cx - r},${cy} a ${r},${r} 0 1,0 ${2 * r},0 a ${r},${r} 0 1,0 ${-2 * r},0 Z`;
+            const hi = nodes.filter((d) => !(d.depth === 0 || isEcho(d)) && d.data.name === highlightName);
+            if (hi.length === 0) return null;
+            return (
+              <g pointerEvents="none" aria-hidden="true">
+                {hi.map((d, j) => {
+                  let dd = disc((d.x - v[0]) * kk, (d.y - v[1]) * kk, d.r * kk);
+                  for (const kid of d.children ?? []) {
+                    if (isEcho(kid)) continue;
+                    dd += " " + disc((kid.x - v[0]) * kk, (kid.y - v[1]) * kk, kid.r * kk);
+                  }
+                  return <path key={j} d={dd} fillRule="evenodd" fill="var(--yellow, #ffd23e)" />;
+                })}
+              </g>
+            );
+          })()}
           <g ref={circlesRef}>
             {nodes.map((d, i) => {
               // The outer breed circle (root) is hidden so only the ancestor
@@ -5805,7 +5844,10 @@ export default function BreedTree({
                   // the white ring. Uses "transparent" (NOT "none") so the whole disc
                   // still HIT-TESTS for hover (none only hit-tests the stroke line, which
                   // barely works). The hover-yellow highlight keeps its solid fill.
-                  fill={hidden ? "none" : isHi ? "var(--yellow, #ffd23e)" : displayOnly ? "transparent" : nodeImg(d) ? `url(#bt-img-${i})` : fillFor(d)}
+                  // isHi keeps the transparent disc; the YELLOW comes from the punch-out
+                  // overlay drawn behind the circles (below), which fills only this
+                  // circle's exposed band and leaves its child circles as background.
+                  fill={hidden ? "none" : displayOnly ? "transparent" : nodeImg(d) ? `url(#bt-img-${i})` : fillFor(d)}
                   // displayOnly (chums2 diagram): every circle outline is WHITE at
                   // every depth, in place of the yellow/navy/blue depth strokes. Only
                   // the node circle stroke here; hidden circles keep "none". Gated on
