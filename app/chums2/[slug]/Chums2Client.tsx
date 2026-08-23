@@ -450,6 +450,22 @@ export default function Chums2Client({ name, slug, image, info, lineage }: Props
                         strongBg
                         currentScore={0}
                         initialDepth={2}
+                        onNodeClick={(nodeName) => {
+                          // Clicking a tree node opens THAT ancestor's pack popout:
+                          // the shared TileZoom enlarge, which carries the image plus
+                          // the name and note (the same content as the i info popout).
+                          // Matched by name; a node with no pack frame does nothing.
+                          // Grows from the matching pack tile, and shares openPop so
+                          // it obeys the one-popout-at-a-time rule.
+                          const f = frames.find((x) => x.name === nodeName);
+                          if (!f) return;
+                          const el = document.querySelector(`[data-frame-id="${f.id}"]`);
+                          const r = el?.getBoundingClientRect();
+                          const anchor = r
+                            ? { x: r.left, y: r.top, size: r.width }
+                            : { x: window.innerWidth / 2 - 40, y: window.innerHeight / 2 - 40, size: 80 };
+                          setOpenPop({ id: f.id, kind: "image", anchor });
+                        }}
                         onClose={() => closeCard("tree")}
                       />
                     </div>
@@ -469,6 +485,7 @@ export default function Chums2Client({ name, slug, image, info, lineage }: Props
                           <button
                             type="button"
                             className={styles.frameImgBtn}
+                            data-frame-id={f.id}
                             onClick={(e) => {
                               e.stopPropagation();
                               const r = (e.currentTarget as HTMLElement).getBoundingClientRect();

@@ -289,6 +289,7 @@ export default function LineageMap({
   initialDepth,
   bounded = false,
   hideLeafImages = false,
+  onNodeClick,
 }: {
   breed: { name: string; image: string; x: number; y: number; angle: number };
   tree?: LineageNode;
@@ -343,6 +344,11 @@ export default function LineageMap({
   // scoring and the seen/blue recolour are untouched. Used by /chums2 (the
   // ancestor pack already shows those images). Default false = pit unchanged.
   hideLeafImages?: boolean;
+  // onNodeClick (added 2026-08-23): bounded only. Fires with the clicked node's
+  // breed name instead of running the game tap (follow/score/pick), so the host
+  // (/chums2) can open THAT ancestor's pack popouts, matched by name. Ignored
+  // when bounded is false, so the pit is unchanged.
+  onNodeClick?: (name: string) => void;
 }) {
   // TEMP rarity-band instrumentation: does the tier prop reach the lifted card?
   if (typeof window !== "undefined" && circular) console.log("[rarity-band] LineageMap boundary:", { breed: breed?.name, rarityTier, soloLeaf });
@@ -938,6 +944,33 @@ export default function LineageMap({
     walk(root, 0);
     return list;
   }, [root, open, breed.x, breed.y, base]);
+
+  // BOUNDED ONLY. The tree is laid out at pit scale (fixed RING1/RSTEP fanning up
+  // 270deg), which the fullscreen pit has room for but a 1100x660 inline box does
+  // not: the top of the fan runs off the container edge and clips the outer
+  // depth-2 nodes. So instead of the 1:1 viewBox the pit uses, fit the viewBox to
+  // the actual content bounds (every shown node, padded for its circle and name
+  // pill) and let the SVG scale it to meet the box. Every depth-2 node is then on
+  // screen on load. The pit path (bounded=false) is untouched.
+  const fitBox = useMemo(() => {
+    if (!bounded || shown.length === 0) return null;
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    for (const n of shown) {
+      minX = Math.min(minX, n._x);
+      minY = Math.min(minY, n._y);
+      maxX = Math.max(maxX, n._x);
+      maxY = Math.max(maxY, n._y);
+    }
+    const PAD = 120; // clears the largest node circle plus its name pill
+    minX -= PAD; minY -= PAD; maxX += PAD; maxY += PAD;
+    let w = maxX - minX, h = maxY - minY;
+    // Grow the shorter axis to the container's aspect so meet-fit fills it and
+    // centres the tree rather than leaving one axis heavily letterboxed.
+    const aspect = vp.w / Math.max(1, vp.h);
+    if (w / h < aspect) { const nw = h * aspect; minX -= (nw - w) / 2; w = nw; }
+    else { const nh = w / aspect; minY -= (nh - h) / 2; h = nh; }
+    return { x: minX, y: minY, w, h };
+  }, [bounded, shown, vp.w, vp.h]);
 
   const follow = (n: Node) => {
     const s = new Set<string>();
@@ -1978,8 +2011,10 @@ export default function LineageMap({
             </g>
           </g>
         ) : null}
-        {/* Green button - Complete/skip for instructional, Pack chum for dog cards */}
-        {!circular && (canRemove || removing || INSTR_NAMES.has(breed.name)) && !packed && !collecting ? (
+        {/* Green button - Complete/skip for instructional, Pack chum ("Collect")
+            for dog cards. Off in bounded (/chums2): the display tree has no
+            collect game. */}
+        {!bounded && !circular && (canRemove || removing || INSTR_NAMES.has(breed.name)) && !packed && !collecting ? (
           <g
             className={styles.removeBtn}
             transform={`translate(0,${INSTR_NAMES.has(breed.name) ? 150 : (!packed && !collecting && !framesDone ? 138 : 62)})`}
@@ -2135,7 +2170,7 @@ export default function LineageMap({
       {packed && packLabels.extinct && (
         <div className={styles.packHead} style={{ left: packLabels.extinct.x, top: packLabels.extinct.y }}>{INSTR_NAMES.has(breed.name) ? "How it works" : "These dogs have had their days"}</div>
       )}
-      <svg className={`${styles.svg}${bounded ? " " + styles.svgBounded : ""}`} viewBox={`${-pan.x} ${-pan.y} ${vp.w} ${vp.h}`} width={vp.w} height={vp.h} xmlns="http://www.w3.org/2000/svg">
+      <svg className={`${styles.svg}${bounded ? " " + styles.svgBounded : ""}`} viewBox={fitBox ? `${fitBox.x - pan.x} ${fitBox.y - pan.y} ${fitBox.w} ${fitBox.h}` : `${-pan.x} ${-pan.y} ${vp.w} ${vp.h}`} width={vp.w} height={vp.h} xmlns="http://www.w3.org/2000/svg">
         <g style={removing ? { pointerEvents: "none" } : undefined}>
         {hasTree ? (
           <>
@@ -2172,10 +2207,15 @@ export default function LineageMap({
                     className={styles.node}
                     transform={`translate(${n._x},${n._y})`}
                     style={allBlue ? { pointerEvents: "none" } : undefined}
-                    onMouseEnter={() => { if (!drag.current?.moved) follow(n); }}
+                    onMouseEnter={() => { if (!bounded && !drag.current?.moved) follow(n); }}
                     onClick={(e) => {
                       e.stopPropagation();
                       if (suppressClick.current) { suppressClick.current = false; return; }
+                      // BOUNDED (/chums2): a node is not a game tap. Clicking it asks
+                      // the host to open THAT ancestor's pack popouts (enlarge + info),
+                      // matched by name. A node with no matching frame does nothing.
+                      // No follow/score/pick runs, so the tree stays fully expanded.
+                      if (bounded) { onNodeClick?.(n.name); return; }
                       interacted.current = true; setIdleHint(false); // any tap stops the first-ring hint
                       burstAt(n._x, n._y, r * 1.33); // pink starburst, 33% over the circle radius, exactly as the pit
                       const firstHit = !scoredRef.current.has(n._id);
@@ -2994,7 +3034,7 @@ export default function LineageMap({
       {liftRoot && hasTree && !soloLeaf && (
         <svg
           className={`${styles.svg} ${styles.svgTop}${bounded ? " " + styles.svgBounded : ""}`}
-          viewBox={`${-pan.x} ${-pan.y} ${vp.w} ${vp.h}`}
+          viewBox={fitBox ? `${fitBox.x - pan.x} ${fitBox.y - pan.y} ${fitBox.w} ${fitBox.h}` : `${-pan.x} ${-pan.y} ${vp.w} ${vp.h}`}
           width={vp.w}
           height={vp.h}
           xmlns="http://www.w3.org/2000/svg"

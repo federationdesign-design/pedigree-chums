@@ -14,6 +14,46 @@ Baseline (measured before stage 1):
 
 ---
 
+## 2026-08-23 tree round + colour
+
+### D34. Bounded tree clipped its outer depth-2 (why initialDepth=2 looked partial)
+Question: production /chums2 showed depth-1 plus only SOME depth-2, not all.
+Cause (not the open set): openIdsToDepth(root,2) DOES open root + every depth-1,
+and the layout walk pushes every depth-2, so `open` was never the problem. The
+non-circular chum tree lays out at fixed PIT scale (RING1=154, RSTEP=128) fanning
+270deg straight up from a root at (550, ~245). The fullscreen pit has room; the
+1100x660 inline box does not, so the top of the fan runs to negative y and off the
+sides, clipping the outer depth-2 circles. A: shrink RING1/RSTEP in bounded mode
+(touches shared layout maths, risky). B (built): a `fitBox` memo, bounded only,
+that takes the bbox of every shown node (padded for circle + name pill, grown to
+the container aspect) and drives BOTH SVG viewBoxes, so the whole tree scales to
+meet the box and every depth-2 node is on screen at load. Pit path (bounded=false,
+fitBox=null) is byte-identical. Why B: it fits whatever the tree's real extent is
+without touching the layout constants the pit depends on.
+
+### D35. Tree node click opens the ancestor's pack popout (not a game tap)
+Question: on /chums2 a node is not a scoring tap; clicking it should open THAT
+ancestor's popout. A: add a second popout system. B (built): a bounded-only
+`onNodeClick(name)` prop. In bounded mode the node onClick calls it and returns
+before any follow/score/pick, and the hover-follow is disabled too, so the tree
+stays fully expanded. The host (/chums2) matches the name to a pack frame and, via
+the SAME openPop state, opens the shared TileZoom enlarge (image + name + note =
+the enlarge PLUS the info in one popout), grown from the matching pack tile. A node
+with no matching frame does nothing. Obeys the one-popout-at-a-time rule because it
+reuses openPop. Why: one popout state, one shared component, no parallel lookalike.
+
+### D36. /chums2 yellow -> #fff200 via a single page-scoped token override
+Question: recolour every yellow on /chums2 to the concept yellow #fff200 without
+touching the global token (menu + every other page stay #ffd23e). Every yellow on
+the page (title breed name, pack % pills, popout name titles) already reads
+var(--yellow), and so do LineageMap and TileZoom. A: body[data-pc-chums2] scope
+(also hits the site menu, which must stay #ffd23e). B (built): `--yellow: #fff200`
+on `.canvas` only. The menu is owned by the layout Nav OUTSIDE .canvas, so it keeps
+the global token; the inline tree and TileZoom sit INSIDE .canvas in the DOM and
+inherit the override regardless of their position:fixed painting. One line, no
+element-by-element edits, no LineageMap change (it reads the token, so no bounded
+gate was needed). Global --yellow untouched.
+
 ## Stage 1
 
 ### D1. Mobile handling on /chums2
