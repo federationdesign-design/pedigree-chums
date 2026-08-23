@@ -14,6 +14,37 @@ Baseline (measured before stage 1):
 
 ---
 
+## 2026-08-23 intro box fixed height + width steps; yellow band reinstated (D75)
+
+INTRO BOX FIXED HEIGHT (so the pack heading/grid below never shift on the hover swap):
+- .introBox height is FIXED at 400px (fits the ancestor card - the taller of the two
+  states - for the great majority of breeds at the base width), overflow:hidden.
+- Width is per-breed via `--intro-box-width` (base 480, tiers [480, 600, 720], +120). A
+  hidden probe renders the breed's LONGEST-note ancestor card and an effect measures it at
+  each tier, choosing the smallest whose scrollHeight fits 400 (rAF, so not a synchronous
+  set-state-in-effect). Stable per breed, so the box never resizes on hover.
+- .diagramStage left calc follows var(--intro-box-width), so on the rare wide breed the
+  circular diagram/pack shifts RIGHT, never the grid DOWN.
+- VERIFICATION: the longest breedInfo entry is Curly-Coated Retriever (451 chars); at 480
+  its card overflows 400, so the probe steps that breed's box to 600 (fits) - measured, not
+  guessed, so it can never grow vertically. The 14 no-write-up breeds show the short
+  fallback intro, which is far under 400 at any width; their box width is driven by their
+  ancestor cards regardless, so their intro fits trivially. Neither grows the height.
+- renderAncestorCard extracted (shared by the box and the probe).
+
+YELLOW HOVER FILL RECONCILED (regression from the images-on-zoom rewire + the heaviness
+trim). The displayOnly circle fill now supports three coexisting states, with the band
+reinstated:
+- (b) inside a zoomed + hovered subtree -> the bt-img PHOTO pattern (opaque, so it WINS
+  over the band behind it);
+- (c) otherwise -> transparent; and at rest a tile/circle hover shows
+- (a) the exposed-band yellow via the reinstated evenodd punch-out PATH behind the circles
+  (hlPathRef + the imperative effect that writes `d` from the LIVE viewRef, NOT
+  displayRestView), children punched to background.
+Precedence: zoom-images win inside a zoom, the band applies at rest. The yellow OUTLINE
+(hovYellow stroke) stays on hover too - band + outline together (supersedes the outline
+-only trim). All displayOnly-gated.
+
 ## 2026-08-23 tree scale=depth-2, images on zoom, intro-box ancestor card (D74)
 
 1. TREE SCALE back to DEPTH-2. initialDepth is 4 (pre-expands depths 1-4 for the render),

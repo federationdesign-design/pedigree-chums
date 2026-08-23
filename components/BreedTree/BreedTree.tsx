@@ -1381,6 +1381,11 @@ export default function BreedTree({
     }
   }, []);
   const circlesRef = useRef<SVGGElement>(null);
+  // chums2 hover punch-out band (D75, reinstated): a single evenodd path behind the
+  // circles filling the hovered ancestor's EXPOSED band (children punched to background).
+  // Its geometry is written imperatively from the LIVE painted view (viewRef) in an
+  // effect, so it aligns with the circles exactly.
+  const hlPathRef = useRef<SVGPathElement>(null);
   const isMobileRef = useRef(false);
   isMobileRef.current = isMobile;
   // displayOnly RESTING FRAME (D57): a CONTENT-AWARE contain fit derived from the
@@ -3337,6 +3342,27 @@ export default function BreedTree({
     zoomTo(v);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [displayOnly, aspect, nodes]);
+
+  // chums2 hover PUNCH-OUT band (D75, reinstated): write the highlight path's geometry
+  // from the LIVE painted view (viewRef, read in an EFFECT not during render) so it lines
+  // up with the imperatively-painted circles. Fires on the hovered ancestor (highlightName)
+  // and whenever the fit re-runs. Outer circle + each non-echo direct child as evenodd
+  // subpaths => the child discs punch out. Empty `d` clears it. displayOnly + prop-gated.
+  useEffect(() => {
+    const p = hlPathRef.current;
+    if (!p) return;
+    if (!displayOnly || !highlightName) { p.setAttribute("d", ""); return; }
+    const v = viewRef.current, kk = SIZE / v[2];
+    const disc = (cx: number, cy: number, r: number) =>
+      `M ${cx - r},${cy} a ${r},${r} 0 1,0 ${2 * r},0 a ${r},${r} 0 1,0 ${-2 * r},0 Z`;
+    let dd = "";
+    for (const d of nodes) {
+      if (d.depth === 0 || isEcho(d) || d.data.name !== highlightName) continue;
+      dd += disc((d.x - v[0]) * kk, (d.y - v[1]) * kk, d.r * kk);
+      for (const kid of d.children ?? []) if (!isEcho(kid)) dd += " " + disc((kid.x - v[0]) * kk, (kid.y - v[1]) * kk, kid.r * kk);
+    }
+    p.setAttribute("d", dd);
+  }, [displayOnly, highlightName, nodes, aspect]);
 
   // Closing the blue box used to be the way out of LEARN. It is not any more:
   // the corner X is the single exit everywhere, on the start screen, in play and
@@ -5754,6 +5780,15 @@ export default function BreedTree({
               circle it belongs to. zoomTo, the drop-in entrance and
               liftToLearn all index this group and now read
               children[i].children[0] for the circle, [1] for the label. */}
+          {/* chums2 hover PUNCH-OUT band (D75): the tile-hover yellow fills only the
+              hovered circle's exposed band, punching the child discs out to background.
+              Drawn BEHIND the stroke-only circles: the transparent parent shows this
+              yellow, the child holes show through, the strokes stay on top. `d` is set
+              imperatively from the live view (effect above). An image-showing circle (in
+              a zoom) fills opaque over it, so zoom-images win; the band shows at rest. */}
+          <g pointerEvents="none" aria-hidden="true">
+            <path ref={hlPathRef} fillRule="evenodd" fill="var(--yellow, #ffd23e)" />
+          </g>
           <g ref={circlesRef}>
             {nodes.map((d, i) => {
               // The outer breed circle (root) is hidden so only the ancestor
@@ -5822,11 +5857,13 @@ export default function BreedTree({
                 <circle
                   data-n={i}
                   className={circleCls}
-                  // chums2 #3: the diagram is STROKE-ONLY at rest - transparent fill (NOT
-                  // "none", so the whole disc still HIT-TESTS for hover), the yellow OUTLINE
-                  // is the only hover feedback. EXCEPTION (D74 #2): a circle inside the
-                  // currently zoomed + hovered subtree shows its PHOTO (the bt-img pattern,
-                  // which exists for every image node). Game path unchanged.
+                  // chums2 displayOnly circle fill, three coexisting states (D75):
+                  // (b) inside a zoomed + hovered subtree -> the PHOTO (bt-img pattern),
+                  //     which fills opaque and thus WINS over the band behind it;
+                  // (c) otherwise -> "transparent" (not "none", so the whole disc still
+                  //     HIT-TESTS for hover) - and at rest a tile-hover shows the yellow
+                  // (a) exposed BAND through it, drawn by the punch-out path BEHIND the
+                  //     circles (above). The yellow OUTLINE (stroke) shows on hover too.
                   fill={hidden ? "none" : displayOnly ? (imgZoomOn && imgZoomSet?.has(d) && hasImg ? `url(#bt-img-${i})` : "transparent") : nodeImg(d) ? `url(#bt-img-${i})` : fillFor(d)}
                   // displayOnly (chums2 diagram): every circle outline is WHITE at
                   // every depth, in place of the yellow/navy/blue depth strokes. Only

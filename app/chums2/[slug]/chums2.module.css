@@ -260,10 +260,15 @@
 }
 
 .introBox {
-  /* Height is text-driven. Width was 600px; reduced 20% -> 480px (D66). The diagram
-     zone's left edge is derived from this width in .diagramStage, so they move in step
-     (updated there too). Drop shadow and border/stroke removed (D66): flat navy panel. */
-  width: 480px;
+  /* D75: FIXED height so the pack heading/grid below never shift when the hover swap
+     changes the content. Width is per-breed (--intro-box-width, set by the measurement
+     effect; 480 base, stepping wider only when the tallest ancestor card would overflow
+     the fixed height); .diagramStage's left follows the same var so the pack shifts RIGHT
+     on those breeds, not the grid DOWN. overflow:hidden guards the (measurement-fitted)
+     content. Flat navy panel (D66). */
+  width: var(--intro-box-width, 480px);
+  height: 400px;
+  overflow: hidden;
   border-radius: 24px;
   background: var(--navy, #0a3a57);
   padding: 20px 0; /* top/bottom inset; the body carries the side inset */
@@ -516,7 +521,7 @@
                + --gutter-diagram (GUTTER 4: box right -> pack leftmost circle).
        right = tree column (its 75 right offset + 840 width) + --gutter-tree (GUTTER 5:
                diagram zone right edge -> tree column left edge). */
-  left: calc(clamp(18px, 4vw, 48px) + 76px + var(--gutter-rail) + 480px + var(--gutter-diagram)); /* D66: box 600 -> 480; D73: rail 61 -> 76 */
+  left: calc(clamp(18px, 4vw, 48px) + 76px + var(--gutter-rail) + var(--intro-box-width, 480px) + var(--gutter-diagram)); /* D75: follows the box's actual width */
   top: 320px;
   right: var(--diagram-zone-right);
   /* Vertical extent (D58): the zone is landscape (~1176 wide), so the pack HEIGHT-binds

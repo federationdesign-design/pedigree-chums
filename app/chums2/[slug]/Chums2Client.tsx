@@ -110,6 +110,17 @@ const RAIL_ORDER = [
   "exercise", "grooming", "training", "influence", "health", "diagram",
 ];
 
+// ── Intro box: FIXED height, width steps up on overflow (D75) ────────────────
+// The box height is FIXED so the pack heading/grid below never shift when the hover
+// swap changes the content (breed intro <-> the taller ancestor card). INTRO_BOX_H fits
+// the ancestor-card layout at the base width for the great majority of breeds; a card
+// that would overflow it makes the box grow WIDER, not taller, stepping through
+// INTRO_WIDTH_TIERS until it fits. The diagram zone's left edge follows the box's actual
+// width (a CSS var), so on those breeds the circular diagram/pack shifts RIGHT rather than
+// the grid shifting DOWN. Measured per breed against its longest-note ancestor card.
+const INTRO_BOX_H = 400;                    // px; fits ~380-char notes at 480 (the taller state)
+const INTRO_WIDTH_TIERS = [480, 600, 720];  // +120 steps; 480 base, up to 720 for the longest note
+
 // Intro-box write-up alias (2026-08-23). breedInfo is keyed by tree-NODE name, but a
 // few breed cards use a shorter/different root name than the node that carries the
 // write-up, so breedInfo[breed.name] misses and the box shows only the fallback. This
@@ -297,6 +308,12 @@ export default function Chums2Client({ name, slug, image, info, lineage, diag = 
   // BOX content swap (D74 #3): while set, the box shows that ancestor's card in place of
   // the breed intro; null restores the intro. The old floating masonry ensemble is gone.
   const [hoverName, setHoverName] = useState<string | null>(null);
+  // D75: the intro box's fixed width for THIS breed (default base tier). Bumped by the
+  // measurement effect below when the tallest ancestor card would overflow the fixed
+  // height at a narrower tier. Published to CSS as --intro-box-width; the diagram zone
+  // follows it. Stable per breed, so the box never resizes on hover (no diagram shift).
+  const [boxWidth, setBoxWidth] = useState<number>(INTRO_WIDTH_TIERS[0]);
+  const introMeasureRef = useRef<HTMLDivElement>(null);
   // Close ALL popouts (i, %, and now the enlarged image too) on a click outside
   // them. The image used to be excluded because it self-closed on a 2s timer; that
   // timer is removed for this hosting (popout persistence), so the outside click is
@@ -439,6 +456,48 @@ export default function Chums2Client({ name, slug, image, info, lineage, diag = 
   const frameBorder = (status?: FrameNode["status"]) =>
     status === "extinct" ? "#ef4444" : status === "endangered" || status === "in-decline" ? "#f97316" : "#22c55e";
 
+  // D75: the ancestor card body (shared by the intro-box hover swap AND the hidden
+  // measuring div below). Reuses the box's own introCard* classes.
+  const renderAncestorCard = (f: FrameNode) => (
+    <div className={styles.introCard}>
+      <p className={styles.introCardHead}>
+        <span className={styles.introCardName}>{f.name}</span>{" "}
+        <span className={styles.introCardPct}>{pctTxt(f.pct ?? 0)} of your chum</span>
+      </p>
+      {f.note && <p className={styles.introCardBody}>{f.note}</p>}
+      <div className={styles.introCardRow}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img className={styles.introCardThumb} src={f.img} alt={f.name} style={{ borderColor: frameBorder(f.status) }} />
+        <div className={styles.introCardMeta}>
+          <div>As {genLabel(f.depth ?? 1)}: {pctTxt(f.share ?? f.pct ?? 0)}</div>
+          <div>Share of your chum: {pctTxt(f.pct ?? 0)}</div>
+          <p className={styles.introCardTitle}>{pctTitleFor(f.id)}</p>
+          <p className={styles.introCardDisc}>These figures come from history and old breeding records, our viewpoint, not proven fact.</p>
+        </div>
+      </div>
+    </div>
+  );
+
+  // The ancestor with the LONGEST note is the tallest card; the measuring div renders it.
+  const tallestFrame = useMemo(
+    () => frames.reduce<FrameNode | null>((a, b) => ((b.note?.length ?? 0) > (a?.note?.length ?? 0) ? b : a), null),
+    [frames]
+  );
+
+  // D75: pick the box width. Measure the tallest card (hidden div, real font) at each
+  // width tier and take the smallest whose height fits INTRO_BOX_H. The setState runs in
+  // a rAF (not the effect body), so it is not a synchronous set-state-in-effect.
+  useEffect(() => {
+    const el = introMeasureRef.current;
+    if (!el || !tallestFrame) { setBoxWidth(INTRO_WIDTH_TIERS[0]); return; }
+    const raf = requestAnimationFrame(() => {
+      let chosen = INTRO_WIDTH_TIERS[INTRO_WIDTH_TIERS.length - 1];
+      for (const w of INTRO_WIDTH_TIERS) { el.style.width = `${w}px`; if (el.scrollHeight <= INTRO_BOX_H) { chosen = w; break; } }
+      setBoxWidth(chosen);
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [tallestFrame]);
+
   const bringToFront = useCallback((id: string) => {
     zCounter.current = Math.min(zCounter.current + 1, 290);
     setZOrders((prev) => ({ ...prev, [id]: zCounter.current }));
@@ -553,7 +612,12 @@ export default function Chums2Client({ name, slug, image, info, lineage, diag = 
   const hoverFrame = hoverName ? frames.find((f) => f.name === hoverName) ?? null : null;
 
   return (
-    <div className={styles.canvas} data-canvas="true" style={cardsMinHeight ? { minHeight: cardsMinHeight } : undefined}>
+    <div className={styles.canvas} data-canvas="true" style={{ ...(cardsMinHeight ? { minHeight: cardsMinHeight } : {}), ["--intro-box-width" as string]: `${boxWidth}px` }}>
+      {/* D75: hidden probe - measures the tallest ancestor card at each width tier so the
+          intro box can fix its width. Off-screen, never paints, no pointer. */}
+      <div ref={introMeasureRef} aria-hidden="true" style={{ position: "absolute", left: -99999, top: 0, visibility: "hidden", padding: "20px 0", boxSizing: "content-box", pointerEvents: "none" }}>
+        {tallestFrame && renderAncestorCard(tallestFrame)}
+      </div>
       {/* ?audit=1 TEMPORARY gutter readout - REMOVE BEFORE COMMIT once the fit lands. */}
       {audit && auditText && (
         <div
@@ -606,30 +670,10 @@ export default function Chums2Client({ name, slug, image, info, lineage, diag = 
                 {SHOW_SECTIONS.introBox && introText && (
                   <div className={styles.introTopRow}>
                     <div className={styles.introBox} data-region="intro-box">
-                      {/* D74 #3: on ancestor hover the SAME box swaps to that ancestor's
-                          card (name + share, description, thumbnail + share detail); hover
-                          out restores the breed intro. No floating popup, no movement. */}
-                      {hoverFrame ? (
-                        <div className={styles.introCard}>
-                          <p className={styles.introCardHead}>
-                            <span className={styles.introCardName}>{hoverFrame.name}</span>{" "}
-                            <span className={styles.introCardPct}>{pctTxt(hoverFrame.pct ?? 0)} of your chum</span>
-                          </p>
-                          {hoverFrame.note && <p className={styles.introCardBody}>{hoverFrame.note}</p>}
-                          <div className={styles.introCardRow}>
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img className={styles.introCardThumb} src={hoverFrame.img} alt={hoverFrame.name} style={{ borderColor: frameBorder(hoverFrame.status) }} />
-                            <div className={styles.introCardMeta}>
-                              <div>As {genLabel(hoverFrame.depth ?? 1)}: {pctTxt(hoverFrame.share ?? hoverFrame.pct ?? 0)}</div>
-                              <div>Share of your chum: {pctTxt(hoverFrame.pct ?? 0)}</div>
-                              <p className={styles.introCardTitle}>{pctTitleFor(hoverFrame.id)}</p>
-                              <p className={styles.introCardDisc}>These figures come from history and old breeding records, our viewpoint, not proven fact.</p>
-                            </div>
-                          </div>
-                        </div>
-                      ) : (
-                        <p className={styles.introBody}>{introText}</p>
-                      )}
+                      {/* D74 #3 / D75: on ancestor hover the SAME box (fixed height/width)
+                          swaps to that ancestor's card; hover out restores the breed intro.
+                          No floating popup, no movement of the grid below. */}
+                      {hoverFrame ? renderAncestorCard(hoverFrame) : <p className={styles.introBody}>{introText}</p>}
                     </div>
                   </div>
                 )}
