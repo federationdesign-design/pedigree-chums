@@ -14,6 +14,37 @@ Baseline (measured before stage 1):
 
 ---
 
+## 2026-09-01 diagram: tight-left gutter, white outlines, behind everything, photos back
+
+### D53. Horizontal gutters, white strokes, z-order behind, hideCircleImages removed
+Four /chums2 diagram changes:
+1. GUTTERS (chose: REPOSITION THE STAGE, not left-bias the frame). The pack centres in
+   its stage, so moving the stage moves the pack - truest to the mechanism, and no risk
+   to the shared BreedTree view code (whose resting frame is applied imperatively via
+   zoomTo, so a `shift` change might not even survive to rest). The centred pack must
+   sit tight to the intro box (leftmost circle ~20px from box right = 734) with the wide
+   gutter on the RIGHT. The centred left margin is ~(stageW - packW)/2 ~ 314px, so pull
+   the stage left by that: `.diagramStage` left 734-derived-calc -> 420px, right 915 ->
+   1229px (stage width unchanged, so pack size unchanged). The 314 is off the estimated
+   pack radius; nudge on a 3000 screenshot. Left column rhythm (brief 4) already matched:
+   box->pack and pack->famous are both the 20px introStack/upperBand gap.
+2. WHITE OUTLINES (chose: the displayOnly GATE in BreedTree, not page CSS). At the node
+   circle stroke (BreedTree ~5704): `stroke={hidden ? "none" : displayOnly ? "#ffffff" :
+   strokeColorFor(d)}`. Cleaner than a `.diagramStage circle` CSS override because it hits
+   EXACTLY the node circle stroke, keeps the hidden circles' "none", and does not touch
+   badge/toy/pill circles - and the node class .btCircle is hashed, so page CSS cannot
+   target it precisely. Gated on displayOnly, so game hostings keep their depth strokes.
+3. Z-ORDER BEHIND. `.canvas { isolation: isolate }` (own stacking context) + `.diagramStage
+   { z-index: -1 }`, so the diagram paints just above the canvas background and BELOW all
+   canvas content: intro box, pack, famous, tree, chart (auto z-index / in-flow, so
+   effectively 0+) and the position:fixed popouts (z-index ~120) all render over it. To
+   keep the behind-diagram zoomable in the open middle (the full-width introStack now sits
+   over it), `.introStack { pointer-events: none }` passes clicks through and
+   `.ancestorPack, .famousWrap { pointer-events: auto }` re-enable the real sections; the
+   rail is a sibling of introStack, unaffected. Values: stage -1, sections auto/0+.
+4. PHOTOS BACK: removed `hideCircleImages` from both the page and the ?diag=1 rig BreedTree
+   calls. The prop stays defined in BreedTree, defaulted false (costs nothing, available).
+
 ## 2026-08-31 diagram: kill the surviving clip + traditional no-photo look
 
 ### D51. Surviving flat cut: the effects-canvas raster (and a guaranteed svg un-clip)

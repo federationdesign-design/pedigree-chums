@@ -22,6 +22,10 @@
   min-width: 3000px;
   background: transparent;
   font-family: var(--font-body, 'Montserrat', system-ui);
+  /* Own stacking context so the diagram's z-index:-1 (behind everything) is contained
+     between the canvas background and the canvas content, not escaped to the root
+     behind the body gradient/paw pattern. */
+  isolation: isolate;
   /* /chums2 uses the concept yellow (#fff200) in place of the site token
      (#ffd23e). Overriding --yellow HERE, at the page canvas, recolours every
      yellow element on the page in one place: the title breed name, the pack
@@ -155,10 +159,16 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start; /* intro box and ancestor pack left-align together */
-  gap: 20px; /* space between the intro box and the ancestor pack below it */
+  gap: 20px; /* box-to-pack and pack-to-famous rhythm (matching, brief 4) */
   min-width: 0;
   flex: 1 1 auto; /* fill the band width so the lower band (famous + chart) can be wide */
+  /* This wrapper is full-width and now sits OVER the behind-diagram, so it must not
+     eat clicks in its empty middle: pass them through to the diagram (zoom) and
+     re-enable only the real sections below. The rail is a sibling (not affected). */
+  pointer-events: none;
 }
+/* Re-enable the interactive left-column sections over the behind-diagram. */
+.ancestorPack, .famousWrap { pointer-events: auto; }
 
 /* Upper band: the middle section of the page. It stacks the intro box then the
    ancestor pack (block flow, so the pack sits DIRECTLY below the box), and is the
@@ -401,11 +411,25 @@
    hit-tests its painted circles (zoom unchanged, empty areas pass clicks through). */
 .diagramStage {
   position: absolute;
-  left: calc(clamp(18px, 4vw, 48px) + 61px + 5px + 600px + 20px);
+  /* HORIZONTAL GUTTERS (chose: reposition the stage, not left-bias the frame - the
+     pack centres in its stage, so moving the stage moves the pack, mechanism
+     untouched). The centred pack must sit TIGHT to the intro box: leftmost circle
+     ~20px from box right (box right 714 + 20 = 734), with the WIDE gutter on the
+     RIGHT (pack -> tree). The centred pack's left margin is ~(stageW - packW)/2 ~
+     314px, so pull the stage left by that: left = 734 - 314 = 420, and right grows by
+     the same 314 (915 -> 1229) so the stage width (pack size) is unchanged. The
+     314 is off the estimated pack radius; nudge on a 3000 screenshot if needed. The
+     stage's empty left overhangs the intro box (transparent, no pack there). */
+  left: 420px;
   top: 320px;
-  right: 915px;
+  right: 1229px;
   bottom: 170px;
   pointer-events: none;
+  /* Z-ORDER: the whole diagram sits BEHIND every section. .canvas is isolated (its
+     own stacking context), so this negative z-index paints just above the canvas
+     background and below all canvas content - intro box, pack, famous, tree, chart
+     and the position:fixed popouts all render over it. */
+  z-index: -1;
 }
 /* Un-clip the pack. The outer <svg> defaults to overflow:hidden (UA sheet), so it
    clips its content to the svg's rectangle = the stage's rectangle. In the ?diag=1

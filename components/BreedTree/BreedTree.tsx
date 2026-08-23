@@ -5701,7 +5701,11 @@ export default function BreedTree({
                   data-n={i}
                   className={circleCls}
                   fill={hidden ? "none" : nodeImg(d) ? `url(#bt-img-${i})` : fillFor(d)}
-                  stroke={hidden ? "none" : strokeColorFor(d)}
+                  // displayOnly (chums2 diagram): every circle outline is WHITE at
+                  // every depth, in place of the yellow/navy/blue depth strokes. Only
+                  // the node circle stroke here; hidden circles keep "none". Gated on
+                  // displayOnly so game hostings keep strokeColorFor's colours.
+                  stroke={hidden ? "none" : displayOnly ? "#ffffff" : strokeColorFor(d)}
                   strokeWidth={sw}
                   // Dashes proportional to the ring's own width, so they read the
                   // same at every zoom. The fade to and from this state is pure CSS
