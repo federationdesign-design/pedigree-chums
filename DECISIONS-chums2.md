@@ -14,6 +14,44 @@ Baseline (measured before stage 1):
 
 ---
 
+## 2026-08-24 mobile stage 2: bottom rail + content slot (D78)
+
+Chums2Mobile only; desktop byte-identical; behind MOBILE_SECTIONS flags (rail/slot/lifespan
+now true, consolidating the stage-1 lifespanChart/cards placeholders).
+
+BOTTOM RAIL (rail=true): a new `.rail`, position:fixed to the viewport bottom, flex-wrap so
+9 icons land as two rows on any phone width, centred. ~46px icons (76 -> 46, the 40%-down the
+brief asked), 26px glyphs (42 -> 26). Same icon SET as desktop minus diagram/tree (which do
+not exist on mobile), built from the same slotCards list so an icon only appears when its card
+has data. Same navy/yellow open-state inversion as the desktop rail (.railIconOpen). `.withRail`
+adds 128px bottom padding to .page so scrolled content clears the fixed bar.
+
+THE SLOT (slot=true): the intro-box POSITION is the single content slot. Default shows the
+write-up; tapping a rail icon sets openSlot and the box renders that card's body instead (one
+at a time, opening another swaps directly, no floating/stacking). An X (top-right, .slotClose)
+restores the intro and reverts the icon colour. Card bodies reuse the SAME shared components +
+data + order the desktop client builds (temperament/influence text rebuilt inline against the
+DESKTOP content styles via a second `cardStyles` import of chums2.module.css; cost/suitability/
+exercise/grooming/training/health are the shared components verbatim). Reusing the desktop CSS
+module is read-only, so desktop output is unchanged.
+  Why import chums2.module.css rather than duplicate ~20 content classes: DRY, and it cannot
+  affect desktop (same compiled hashes, no edits). Layout stays in chums2mobile.module.css.
+
+LIFESPAN IN THE SLOT (lifespan=true): a `lifespan` slot card = LifespanChart inside a copied
+`.lifespanScroll` wrapper (lifted from BreedMobile ~L212: overflow-x auto, child min-width
+600px), with the EXPLANATION/METHOD/SOURCES text below the scroller in the same slot. Replaces
+the desktop's explanation-only `lifespanExplain` card (desktop keeps the chart always-on-page;
+mobile has no always-on chart, so the chart moves into this card).
+
+SCROLL (item 4): opening a card scrolls the page smoothly so the slot top sits ~12px below the
+viewport top, unless already near the top (r.top in [0,24] -> no-op). Vertical only, on OPEN
+only (X/toggle-closed never scroll), measured 60ms post-swap off the slot ref. Mirrors D76.
+
+DIAGRAM + TREE still omitted on mobile (no BreedTree/LineageMap icons in the set). Gates: tsc
+clean, eslint clean on Chums2Mobile, no bare :global in the mobile CSS, desktop untouched.
+
+---
+
 ## 2026-08-23 audit removed; 14 write-ups; mobile scaffold; /chums replacement (D77)
 
 AUDIT INSTRUMENT REMOVED (desktop signed off): deleted the ?audit=1 banner, the auditText

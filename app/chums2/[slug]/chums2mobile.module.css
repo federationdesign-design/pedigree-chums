@@ -237,3 +237,90 @@
   overflow: hidden;
   pointer-events: none;
 }
+
+/* ── Stage 2: the intro-box SLOT ─────────────────────────────────────────────
+   The intro box doubles as the single content slot: a rail-icon tap swaps the write-up for
+   that card's body. The box is the positioning context for the X; when open it clears room
+   for it. Card BODIES reuse the desktop content styles (cardStyles); the box only frames them. */
+.introBox { position: relative; }
+.slotOpen { padding-top: 44px; }
+.slotCard { position: relative; }
+.slotClose {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  width: 30px;
+  height: 30px;
+  border: 2px solid var(--yellow, #fff200);
+  border-radius: 50%;
+  background: var(--navy, #0a3a57);
+  color: var(--yellow, #fff200);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  z-index: 3;
+}
+
+/* Lifespan chart wrapper, lifted from BreedMobile's .lifespanScroll: horizontal scroll with a
+   min chart width; the explanation text sits below it in the same slot. Side margins match the
+   intro box's 18px padding so the scroller bleeds to the box edges. */
+.lifespanScroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin: 0 -18px;
+  padding: 0 18px 8px;
+}
+.lifespanScroll > * { min-width: 600px; }
+
+/* ── Stage 2: the bottom icon RAIL ───────────────────────────────────────────
+   Fixed to the viewport bottom, two rows via wrap, centred. Same icon set as desktop minus
+   diagram/tree, same navy/yellow open-state inversion. .withRail reserves the height on .page
+   so scrolled content clears the bar. */
+.withRail { padding-bottom: 128px; }
+.rail {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 90;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: center;
+  justify-content: center;
+  gap: 8px 10px;
+  padding: 10px 10px calc(10px + env(safe-area-inset-bottom, 0px));
+  background: var(--navy, #0a3a57);
+  border-top: 2px solid var(--yellow, #fff200);
+  box-sizing: border-box;
+}
+.railIcon {
+  width: 46px;
+  height: 46px;
+  flex: 0 0 auto;
+  border-radius: 13px;
+  background: var(--navy, #0a3a57);
+  border: 2px solid var(--yellow, #fff200);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: background 0.15s ease;
+}
+.railIconOpen { background: var(--yellow, #fff200); }
+.railGlyph {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  color: var(--yellow, #fff200);
+  line-height: 1;
+}
+.railGlyph svg { width: 100%; height: 100%; stroke: var(--yellow, #fff200); }
+.railIconOpen .railGlyph { color: var(--navy, #0a3a57); }
+.railIconOpen .railGlyph svg { stroke: var(--navy, #0a3a57); }
