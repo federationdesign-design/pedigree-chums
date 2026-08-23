@@ -80,6 +80,12 @@ Baseline (measured before stage 1):
 - FLAG for Steve: this is a modal tree, not an inline-on-load tree. If you want it inline beside the diagram, that needs a new bounded rendering mode inside LineageMap (a deliberate shared-component change), which I did not make because it would risk the game. Tell me and I will design it behind a defaulted prop.
 - CSS constraint respected: no perspective / backface-visibility / transform-style: preserve-3d anywhere in the chums2 chain.
 
+## Inline tree not rendering: fix (2026-08-23)
+
+### D32. Tree started in the `closed` set, so it never mounted
+- Bug: on production /chums2 the inline tree area was empty. Cause: the initial `closed` set still contained "tree" (added in D13 when the tree was an overlay opened on demand). The render guard `SHOW_SECTIONS.tree && lineage && !closed.has("tree")` was therefore false on load. Not a vp/ref/coords issue (vp seeds 900x520 before the ResizeObserver measures, never zero; ref/lineage/coords are fine).
+- Fix: the tree is now inline and visible on load, so it must not start closed. Initial `closed` = only the rail card ids; "tree" (and the diagram) are added to `closed` only when X'd (which rails the reopen icon).
+
 ## Family tree inline: bounded LineageMap (2026-08-23)
 
 ### D31. bounded + hideLeafImages props on LineageMap; inline tree on /chums2

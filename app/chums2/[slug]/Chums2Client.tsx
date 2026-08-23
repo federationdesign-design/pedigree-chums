@@ -276,11 +276,11 @@ export default function Chums2Client({ name, slug, image, info, lineage }: Props
 
   const cardById = useMemo(() => new Map(cards.map((c) => [c.id, c])), [cards]);
 
-  // Every rail card starts CLOSED on load (brief 5.4). The diagram panel starts
-  // OPEN. The family tree starts CLOSED: LineageMap is a full-viewport overlay
-  // (see the tree render below and DECISIONS D13), so it opens on demand from
-  // its rail icon rather than covering the page on load.
-  const [closed, setClosed] = useState<Set<string>>(() => new Set([...cards.map((c) => c.id), "tree"]));
+  // Every rail card starts CLOSED on load (brief 5.4). The diagram and the
+  // family tree are panels that start OPEN (the tree now renders INLINE and
+  // visible on load, D31); each is added to `closed` only when X'd, which rails
+  // its reopen icon.
+  const [closed, setClosed] = useState<Set<string>>(() => new Set(cards.map((c) => c.id)));
   const [positions, setPositions] = useState<Record<string, { x: number; y: number }>>({});
   const [zOrders, setZOrders] = useState<Record<string, number>>({});
   const zCounter = useRef(120);
