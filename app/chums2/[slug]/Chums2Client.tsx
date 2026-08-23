@@ -45,6 +45,8 @@ type Props = {
   info: BreedInfo;
   lineage: LineageNode | null;
   character: string;
+  // ?diag=1 isolation rig (D46): read on the server so there is no hydration flip.
+  diag?: boolean;
 };
 
 // Section visibility. Reset to header-only (production review 2026-08-22): the
@@ -131,7 +133,7 @@ function buildSlots(vw: number): { x: number; y: number }[] {
 // pop-out placement, draggable cards. Production feedback (2026-08-22): the
 // intro box and the lifespan chart are always-on-page in the left column, not
 // rail cards, and the ?alt=1 fork is deleted (see DECISIONS D11).
-export default function Chums2Client({ name, slug, image, info, lineage }: Props) {
+export default function Chums2Client({ name, slug, image, info, lineage, diag = false }: Props) {
   // The intro box shows the learn-area write-up (data/breedInfo.ts), plus the
   // "keep digging" prompt when the breed has ancestry to open, composed exactly
   // as the diagram caption does (BreedTree). NOT the subtitle or the temperament
@@ -303,11 +305,12 @@ export default function Chums2Client({ name, slug, image, info, lineage }: Props
     return () => document.removeEventListener("click", onDoc);
   }, [openPop]);
 
-  // Wide-canvas page (like the live /chums page): enable horizontal scroll
-  // (the global rule clips it) and mark <body> so the route-scoped CSS can make
-  // body a 2000px-wide positioning context and un-fix the shared chrome (nav bar
-  // + 0/10 counter) so they scroll away with the page instead of riding the
-  // viewport. All scoped to /chums2 via the data attribute. (D30.)
+  // Wide-canvas page: enable horizontal scroll (the global rule clips it) and mark
+  // <body> so the route-scoped CSS applies (the shared nav stays fixed as elsewhere;
+  // min-width 3000 for the scroll). In ?diag=1 isolation mode (D46, the `diag` prop
+  // is read on the server so there is no hydration flip) we mark a DIFFERENT attribute
+  // so the diag globals apply (hide any shared chrome, 3000 min-width) and the normal
+  // route CSS does not. Scoped to /chums2 via the data attribute. (D30, D42, D46.)
   useEffect(() => {
     const html = document.documentElement;
     const body = document.body;
@@ -315,13 +318,14 @@ export default function Chums2Client({ name, slug, image, info, lineage }: Props
     const prevBodyX = body.style.overflowX;
     html.style.overflowX = "auto";
     body.style.overflowX = "auto";
-    body.setAttribute("data-pc-chums2", "");
+    const attr = diag ? "data-pc-chums2-diag" : "data-pc-chums2";
+    body.setAttribute(attr, "");
     return () => {
       html.style.overflowX = prevHtmlX;
       body.style.overflowX = prevBodyX;
-      body.removeAttribute("data-pc-chums2");
+      body.removeAttribute(attr);
     };
-  }, []);
+  }, [diag]);
   const handleFramesReady = useCallback((nodes: FrameNode[]) => {
     setFrames((prev) => {
       if (prev.length > 0) return prev;
@@ -407,6 +411,35 @@ export default function Chums2Client({ name, slug, image, info, lineage }: Props
       .map((id) => byId.get(id))
       .filter((it): it is RailItem => !!it && closed.has(it.id));
   }, [cards, closed]);
+
+  // ?diag=1 ISOLATION RIG (D46). ONLY the circular diagram, hosted exactly as the
+  // mini pit: an empty 3000 x viewport-height canvas with the stage absolutely
+  // positioned over the whole of it (inset:0, no size box, no overflow rule), and
+  // BreedTree in fill mode with the LineageModal learn-mode props + displayOnly (so
+  // the DISPLAY_SPAN resting frame runs as shipped). Nothing else on the page exists
+  // to interfere, so any at-rest straight edge / zoom clipping / bad zoom-out here is
+  // BreedTree's displayOnly framing, not the page.
+  if (diag) {
+    return (
+      <div className={styles.diagCanvas} data-canvas="true" data-diag="true">
+        <div className={styles.diagStage}>
+          {lineage && (
+            <BreedTree
+              root={lineage}
+              rootImage={image}
+              rootLabel={name}
+              centred
+              fill
+              dockAside
+              strokeByDepth
+              tinted={false}
+              displayOnly
+            />
+          )}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.canvas} data-canvas="true">

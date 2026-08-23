@@ -893,3 +893,10 @@
    counter now follows the site standard on /chums2 too (fixed with the nav, riding
    the viewport top-left over the wide horizontal scroll), so there is no route rule
    here any more. Other routes were always the fixed default. */
+
+/* ?diag=1 isolation rig (D46): hide the counter entirely so the diagram is the only
+   thing on the page. Scoped to the diag attribute, so nothing else is affected. */
+:global(body[data-pc-chums2-diag]) .counter.counter,
+:global(body[data-pc-chums2-diag]) .reveal.reveal {
+  display: none;
+}

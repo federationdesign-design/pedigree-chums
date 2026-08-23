@@ -32,6 +32,28 @@
   --yellow: #fff200;
 }
 
+/* ── ?diag=1 isolation rig (D46) ────────────────────────────────
+   ONLY the circular diagram, nothing else, so BreedTree's displayOnly framing can
+   be judged with no page content able to interfere. The canvas is an empty
+   3000 x viewport-height box; the stage is absolutely positioned over the WHOLE of
+   it (inset:0), a region defined only by that fill, with NO size box, NO background/
+   border/radius, and NO overflow rule (overflow:visible), so the pack and any zoomed
+   circle draw freely, clipped only by the browser window. BreedTree fill-measures
+   the stage exactly as it measures LineageModal's .stageArea. */
+.diagCanvas {
+  position: relative;
+  min-width: 3000px;
+  height: 100vh;
+  background: transparent;
+  overflow: visible;
+  --yellow: #fff200;
+}
+.diagStage {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+}
+
 /* ── Header ──────────────────────────────────────────────────────
    Left column: the fixed site logo (top-left, owned by Nav) with the
    square chum image DIRECTLY BELOW it and left-aligned to it. So the

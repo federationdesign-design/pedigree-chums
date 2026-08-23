@@ -6,7 +6,7 @@ import { getLineage } from "../../../data/lineage";
 import { resolveLineageName } from "../../../data/lineageNames";
 import breedInfo from "../../../data/breed-info.json";
 
-type Props = { params: Promise<{ slug: string }> };
+type Props = { params: Promise<{ slug: string }>; searchParams: Promise<{ diag?: string }> };
 
 export const dynamic = "force-dynamic";
 
@@ -23,8 +23,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function Chum2Page({ params }: Props) {
+export default async function Chum2Page({ params, searchParams }: Props) {
   const { slug } = await params;
+  // ?diag=1 isolation rig (D46): read on the server so the client renders the diagram
+  // -only view from the first paint (no hydration flip), and so the shared <Nav> can
+  // simply be left out rather than hidden after mount.
+  const { diag: diagParam } = await searchParams;
+  const diag = diagParam === "1";
   const breed = breeds.find((b) => b.slug === slug);
   if (!breed) return <h1 style={{ color: "white", background: "#0a3a57", padding: 40 }}>Not found: {slug}</h1>;
 
@@ -42,7 +47,9 @@ export default async function Chum2Page({ params }: Props) {
   // branch: the desktop client renders for every UA on /chums2. (Decision D1.)
   return (
     <>
-      <Nav showLogo />
+      {/* ?diag=1 (D46): drop the shared nav entirely so the isolation rig is only the
+          diagram. Normal route keeps the nav. */}
+      {!diag && <Nav showLogo />}
       <Chums2Client
         name={breed.name}
         slug={breed.slug}
@@ -50,6 +57,7 @@ export default async function Chum2Page({ params }: Props) {
         info={info}
         lineage={lineage}
         character={breed.character}
+        diag={diag}
       />
     </>
   );

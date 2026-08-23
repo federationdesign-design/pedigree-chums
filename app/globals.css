@@ -96,6 +96,15 @@ body {
 body[data-pc-chums2] {
   min-width: 3000px;
 }
+/* ?diag=1 isolation rig (D46): strip ALL shared chrome so only the diagram shows on
+   the empty 3000px canvas. Scoped to the diag attribute, so the normal route and
+   every other page are untouched. */
+body[data-pc-chums2-diag] {
+  min-width: 3000px;
+}
+body[data-pc-chums2-diag] .pc-nav {
+  display: none;
+}
 
 /* One paw pattern for the whole page: fixed behind all content, sitting on top
    of the fixed gradient. Replaces the old per-section .paw-bg::before so the

@@ -14,6 +14,29 @@ Baseline (measured before stage 1):
 
 ---
 
+## 2026-08-28 diagram isolation rig (?diag=1)
+
+### D46. ?diag=1 strips /chums2 to only the circular diagram, for isolating BreedTree's framing
+To diagnose BreedTree's displayOnly framing with nothing else able to interfere, the
+existing page gains a query-string mode (no new route, no new files). `?diag=1` is read
+on the SERVER (page.tsx searchParams, already force-dynamic) and passed as a `diag`
+prop, so there is no hydration flip and the shared `<Nav>` is simply not rendered
+(rather than hidden after mount). When diag: Chums2Client early-returns ONLY the
+diagram, in an empty `.diagCanvas` (3000 x 100vh, transparent, overflow:visible) with
+`.diagStage` absolutely positioned over the whole of it (inset:0, no size box, no
+background/border/overflow), and BreedTree in fill mode with the LineageModal
+learn-mode props (centred + fill + dockAside + strokeByDepth + tinted=false) + displayOnly,
+so the DISPLAY_SPAN resting frame runs as shipped. Body gets a distinct
+`data-pc-chums2-diag` attribute (not the normal `data-pc-chums2`), so diag globals
+apply (min-width 3000, `.pc-nav` display:none as a safety net, 0/10 counter hidden via
+its module) and the normal route CSS does not. Without ?diag=1 the page is byte-for-byte
+unchanged. NOTE: BreedTree was NOT changed this round; the rig exists to test the three
+acceptance criteria first. Suspected hosting difference vs LineageModal, to confirm in
+the rig: LineageModal's .stageArea is the full VIEWPORT (~1440 wide, aspect ~1.8),
+whereas this stage (and real /chums2) is 3000 wide (aspect ~3.75), and BreedTree's
+viewBox is width-driven (vbW = SIZE * aspect), so an extreme landscape aspect is the
+prime suspect for a small/edge-clipped resting pack.
+
 ## 2026-08-27 canvas 3000, fixed nav, zone stage, pack fill, node expand+popup
 
 ### D41. Canvas widened to 3000px; columns re-derived from the concept
