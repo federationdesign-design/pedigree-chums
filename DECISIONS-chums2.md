@@ -14,6 +14,32 @@ Baseline (measured before stage 1):
 
 ---
 
+## 2026-08-23 tree scale=depth-2, images on zoom, intro-box ancestor card (D74)
+
+1. TREE SCALE back to DEPTH-2. initialDepth is 4 (pre-expands depths 1-4 for the render),
+   but the fitBox was framing the depth-4 set, shrinking the tree. Fixed: the fitBox frame
+   is hardcoded to the DEPTH-2 set (`FRAME_DEPTH = 2`, `openIdsToDepth(root, 2)`), decoupled
+   from initialDepth; depths 3-4 overdraw beyond the frame like the anti-diagram right-shift.
+   Removed initialDepth from the fitBox deps (now unused there).
+2. DIAGRAM IMAGES ON ZOOM ONLY. At rest every circle is stroke-only. New per-render state in
+   BreedTree: `imgZoomSet = displayOnly && focus !== root ? new Set(focus.descendants()) :
+   null` and `imgZoomOn = imgZoomSet && hovered && imgZoomSet.has(hovered)`. The fill shows
+   the bt-img pattern only when `imgZoomOn && imgZoomSet.has(d) && hasImg` - i.e. the circle
+   is inside the currently ZOOMED + HOVERED subtree; otherwise transparent. Zooming out
+   (focus back to root) or the pointer leaving reverts to stroke-only. focus/hovered are
+   states, so it re-renders. displayOnly-gated; game path untouched. (Show/hide is a fill
+   swap; the fade is whatever .btCircle's transition gives - can add an image overlay if a
+   real fade is wanted.)
+3. HOVER POPUP -> INTRO-BOX SWAP. Deleted the floating masonry ensemble entirely (computeDock,
+   hoverPreview, the docked TileZoom+% card; the tile-CLICK image popout stays). Unified hover
+   into one `hoverName` state (set by tile hover AND circle hover via onCircleHover), driving
+   BOTH the diagram outline (highlightName) and the box swap. When set, the SAME intro box
+   (same position/width) renders the ancestor card: line 1 name (yellow) + "N% of your chum"
+   (white); the description; a row with the status-bordered thumbnail beside "As {genLabel}:
+   N%", "Share of your chum: N%", the bold pctTitleFor line and the records disclaimer. Hover
+   out restores the intro text. Reuses note/pct/share/genLabel/pctTitleFor + new introCard*
+   styles that mirror the box (Montserrat, 22px inset). No floating, no movement.
+
 ## 2026-08-23 rail open-state, tree depth/clamp/image-gate, pack tiles, fixed card slots (D73)
 
 ICONS:

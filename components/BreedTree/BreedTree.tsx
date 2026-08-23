@@ -5267,6 +5267,13 @@ export default function BreedTree({
   // The caption follows the hovered circle when there is one, so you can read a
   // breed's note just by pointing at it, and falls back to the focused circle.
   const shown = hovered ?? focus;
+  // chums2 (D74 #2): breed PHOTOS appear ONLY inside a zoomed circle. At rest (focus is
+  // the root) every circle is stroke-only; once the user zooms into a circle (focus is
+  // not the root) AND the pointer is within that subtree (hovered in imgZoomSet), the
+  // focused circle and its visible descendants show their photos. Leaving the circle
+  // (hovered null / outside) or zooming out reverts to stroke-only. displayOnly only.
+  const imgZoomSet = displayOnly && focus !== nodes[0] ? new Set(focus.descendants()) : null;
+  const imgZoomOn = !!imgZoomSet && !!hovered && imgZoomSet.has(hovered);
   // Hovering shows the short write-up; clicking into a circle shows the extended
   // one. hovered is non-null only while the pointer is over a circle, so a null
   // hovered with shown back on focus means the user has clicked in, not pointed.
@@ -5815,12 +5822,12 @@ export default function BreedTree({
                 <circle
                   data-n={i}
                   className={circleCls}
-                  // chums2 #3: the diagram is STROKE-ONLY - no photo, no depth fill, just
-                  // the white ring. Uses "transparent" (NOT "none") so the whole disc
-                  // still HIT-TESTS for hover (none only hit-tests the stroke line, which
-                  // barely works). Hover feedback is the yellow OUTLINE only (see stroke
-                  // below); the fill stays transparent even when highlighted (D72.1).
-                  fill={hidden ? "none" : displayOnly ? "transparent" : nodeImg(d) ? `url(#bt-img-${i})` : fillFor(d)}
+                  // chums2 #3: the diagram is STROKE-ONLY at rest - transparent fill (NOT
+                  // "none", so the whole disc still HIT-TESTS for hover), the yellow OUTLINE
+                  // is the only hover feedback. EXCEPTION (D74 #2): a circle inside the
+                  // currently zoomed + hovered subtree shows its PHOTO (the bt-img pattern,
+                  // which exists for every image node). Game path unchanged.
+                  fill={hidden ? "none" : displayOnly ? (imgZoomOn && imgZoomSet?.has(d) && hasImg ? `url(#bt-img-${i})` : "transparent") : nodeImg(d) ? `url(#bt-img-${i})` : fillFor(d)}
                   // displayOnly (chums2 diagram): every circle outline is WHITE at
                   // every depth, in place of the yellow/navy/blue depth strokes. Only
                   // the node circle stroke here; hidden circles keep "none". Gated on

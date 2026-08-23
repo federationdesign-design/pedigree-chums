@@ -292,14 +292,11 @@ export default function Chums2Client({ name, slug, image, info, lineage, diag = 
   // opening any one replaces the others. The enlarged image (kind "image") also
   // carries the tile's screen rect, captured at click, as the TileZoom anchor.
   const [openPop, setOpenPop] = useState<{ id: string; kind: "info" | "pct" | "image"; anchor?: { x: number; y: number; size: number } } | null>(null);
-  // #1: which ancestor-pack tile is hovered. Its matching diagram circle paints
-  // solid yellow (passed to BreedTree as highlightName). Null when none hovered.
-  const [packHoverName, setPackHoverName] = useState<string | null>(null);
-  // #2: hovering a DIAGRAM circle previews that ancestor's pack popouts (info + %
-  // + enlarged image) at the tile's own location. anchor is the tile's screen rect,
-  // measured when the hover fires. A clicked popout (openPop) WINS: while one is
-  // open the preview is suppressed (see `preview` below). Cleared on hover-out.
-  const [hoverPreview, setHoverPreview] = useState<{ id: string; anchor?: { x: number; y: number; size: number } } | null>(null);
+  // The hovered ancestor NAME (from a pack tile OR a diagram circle). Drives BOTH the
+  // diagram-circle yellow OUTLINE (passed to BreedTree as highlightName) and the INTRO
+  // BOX content swap (D74 #3): while set, the box shows that ancestor's card in place of
+  // the breed intro; null restores the intro. The old floating masonry ensemble is gone.
+  const [hoverName, setHoverName] = useState<string | null>(null);
   // Close ALL popouts (i, %, and now the enlarged image too) on a click outside
   // them. The image used to be excluded because it self-closed on a 2s timer; that
   // timer is removed for this hosting (popout persistence), so the outside click is
@@ -417,46 +414,10 @@ export default function Chums2Client({ name, slug, image, info, lineage, diag = 
     });
   }, [frames]);
 
-  // #2: hovering a diagram circle -> preview that ancestor's pack popouts. Runs in
-  // BreedTree's hover handler (an event, not an effect), so measuring the tile and
-  // setting state here does not trip set-state-in-effect. Matched by name; the tile
-  // rect (data-frame-id) is the TileZoom anchor. Null on hover-out clears the preview.
-  // #3: the hover ENSEMBLE docks in the open band immediately RIGHT of the intro box -
-  // the same spot for every ancestor and BOTH triggers (tile hover + circle hover), not
-  // at the pack tiles and not over the diagram. Measures the intro box: the image sits
-  // tight to its right edge, top-aligned; the cluster is clamped to the viewport and, if
-  // it would overlap the resting pack, dropped below it.
-  const computeDock = useCallback((): { x: number; y: number; size: number } | undefined => {
-    if (typeof document === "undefined") return undefined;
-    // Dock in the OPEN AREA top-right of the diagram zone: the band right of the resting
-    // pack, upper region (below the header line), NOT low over the diagram bottom. Anchor
-    // to the pack's measured RIGHT edge (x) and TOP (y); the masonry cluster flows right +
-    // down from there. Clamped inside the canvas/viewport.
-    const diagram = document.querySelector('[data-region="diagram"]');
-    if (!diagram) return undefined;
-    const rects = (Array.from(diagram.querySelectorAll("circle[data-n]")) as SVGCircleElement[])
-      .filter((c) => c.getAttribute("fill") !== "none").map((c) => c.getBoundingClientRect());
-    if (!rects.length) return undefined;
-    const packRight = Math.max(...rects.map((r) => r.right));
-    const packTop = Math.min(...rects.map((r) => r.top));
-    const SIZE = 61, IMG = SIZE * 3, GAP = 16;
-    const ENS_W = IMG + 10 + 219, ENS_H = IMG + 10 + 200; // image + gap + panel / + pct card
-    let x = packRight + GAP;  // in the open band right of the pack
-    let y = packTop;          // upper region, level with the pack top
-    const EDGE = 8, vw = window.innerWidth, vh = window.innerHeight;
-    x = Math.max(EDGE, Math.min(x, vw - EDGE - ENS_W));
-    y = Math.max(EDGE, Math.min(y, vh - EDGE - ENS_H));
-    return { x, y, size: SIZE };
-  }, []);
-
-  // #2/#3: show the docked ensemble for an ancestor by name (from either trigger); null
-  // clears it. `anchor` is the DOCK, not the tile - both triggers land in the same place.
-  const onCircleHover = useCallback((nm: string | null) => {
-    if (!nm) { setHoverPreview(null); return; }
-    const f = frames.find((x) => x.name === nm);
-    if (!f) { setHoverPreview(null); return; }
-    setHoverPreview({ id: f.id, anchor: computeDock() });
-  }, [frames, computeDock]);
+  // Hovering a diagram circle sets the hovered ancestor NAME (D74 #3): drives the outline
+  // and swaps the intro box to the ancestor card. An event handler (not an effect), so no
+  // set-state-in-effect. Null on hover-out restores the intro. Tile hover sets the same.
+  const onCircleHover = useCallback((nm: string | null) => setHoverName(nm), []);
 
   // Canvas GROWTH (D72 #5): DragCards are position:absolute (out of flow), so they do not
   // stretch the content-driven canvas. Force a min-height that contains the lowest OPEN
@@ -587,9 +548,9 @@ export default function Chums2Client({ name, slug, image, info, lineage, diag = 
     );
   }
 
-  // #2 "clicked wins": a hover preview only shows when NO popout has been clicked
-  // open. While openPop is set, the preview is suppressed so it cannot fight it.
-  const preview = openPop ? null : hoverPreview;
+  // D74 #3: the hovered ancestor's frame, for the intro-box content swap. When set, the
+  // box renders that ancestor's card in place of the breed intro; null -> intro text.
+  const hoverFrame = hoverName ? frames.find((f) => f.name === hoverName) ?? null : null;
 
   return (
     <div className={styles.canvas} data-canvas="true" style={cardsMinHeight ? { minHeight: cardsMinHeight } : undefined}>
@@ -645,7 +606,30 @@ export default function Chums2Client({ name, slug, image, info, lineage, diag = 
                 {SHOW_SECTIONS.introBox && introText && (
                   <div className={styles.introTopRow}>
                     <div className={styles.introBox} data-region="intro-box">
-                      <p className={styles.introBody}>{introText}</p>
+                      {/* D74 #3: on ancestor hover the SAME box swaps to that ancestor's
+                          card (name + share, description, thumbnail + share detail); hover
+                          out restores the breed intro. No floating popup, no movement. */}
+                      {hoverFrame ? (
+                        <div className={styles.introCard}>
+                          <p className={styles.introCardHead}>
+                            <span className={styles.introCardName}>{hoverFrame.name}</span>{" "}
+                            <span className={styles.introCardPct}>{pctTxt(hoverFrame.pct ?? 0)} of your chum</span>
+                          </p>
+                          {hoverFrame.note && <p className={styles.introCardBody}>{hoverFrame.note}</p>}
+                          <div className={styles.introCardRow}>
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img className={styles.introCardThumb} src={hoverFrame.img} alt={hoverFrame.name} style={{ borderColor: frameBorder(hoverFrame.status) }} />
+                            <div className={styles.introCardMeta}>
+                              <div>As {genLabel(hoverFrame.depth ?? 1)}: {pctTxt(hoverFrame.share ?? hoverFrame.pct ?? 0)}</div>
+                              <div>Share of your chum: {pctTxt(hoverFrame.pct ?? 0)}</div>
+                              <p className={styles.introCardTitle}>{pctTitleFor(hoverFrame.id)}</p>
+                              <p className={styles.introCardDisc}>These figures come from history and old breeding records, our viewpoint, not proven fact.</p>
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <p className={styles.introBody}>{introText}</p>
+                      )}
                     </div>
                   </div>
                 )}
@@ -661,8 +645,8 @@ export default function Chums2Client({ name, slug, image, info, lineage, diag = 
                         key={f.id}
                         className={styles.frame}
                         style={{ borderColor: frameBorder(f.status) }}
-                        onMouseEnter={() => { setPackHoverName(f.name); onCircleHover(f.name); }}
-                        onMouseLeave={() => { setPackHoverName(null); onCircleHover(null); }}
+                        onMouseEnter={() => setHoverName(f.name)}
+                        onMouseLeave={() => setHoverName(null)}
                       >
                         <div className={styles.frameInner}>
                           <button
@@ -770,7 +754,7 @@ export default function Chums2Client({ name, slug, image, info, lineage, diag = 
             strokeByDepth
             tinted={false}
             displayOnly
-            highlightName={packHoverName}
+            highlightName={hoverName}
             onCircleHover={onCircleHover}
           />
         </div>
@@ -855,49 +839,20 @@ export default function Chums2Client({ name, slug, image, info, lineage, diag = 
       {/* Family tree now renders INLINE in the top row (bounded LineageMap, see
           above and DECISIONS D31), not as a full-viewport overlay. */}
 
-      {/* Enlarged ancestor image: the SAME shared component the mini pit learn
-          area renders (components/TileZoom/TileZoom.tsx), so it grows in place
-          from the tile with the yellow-name navy panel beside it, no backdrop,
-          no X, 2s auto-close, exactly like the mini pit. Anchored to the tile's
-          screen rect captured at click. (D26.) */}
-      {(() => {
-        // Clicked image popout stays at the TILE (openPop.anchor). The hover ENSEMBLE
-        // (#2/#3) is a masonry cluster docked right of the intro box: the enlarged image
-        // (the anchor), its description panel (TileZoom, 10px to the image's right), and
-        // the % card (10px below the image). persist removes the 2s auto-close; the
-        // border is the ancestor's tile-status colour. Preview closes by clearing
-        // hoverPreview; a clicked one by openPop.
-        const isPreview = !openPop && !!preview;
-        const src = openPop?.kind === "image" ? openPop : isPreview ? preview : null;
-        if (!src) return null;
-        const f = frames.find((x) => x.id === src.id);
-        if (!f || !src.anchor) return null;
-        const IMG = src.anchor.size * 3;
+      {/* Enlarged ancestor image (CLICK only): the shared mini-pit TileZoom, anchored to
+          the tile rect captured at click. The old hover ensemble is gone (D74 #3 - the
+          hover now swaps the intro box instead). Clicked image closes on outside click. */}
+      {openPop?.kind === "image" && (() => {
+        const f = frames.find((x) => x.id === openPop.id);
+        if (!f || !openPop.anchor) return null;
         return (
-          <>
-            <TileZoom
-              key={f.id}
-              open={{ img: f.img, name: f.name, description: f.note || "", anchor: src.anchor }}
-              onClose={() => (isPreview ? setHoverPreview(null) : setOpenPop(null))}
-              persist
-              borderColor={frameBorder(f.status)}
-            />
-            {isPreview && (
-              <div
-                className={styles.framePctCard}
-                style={{ position: "fixed", left: src.anchor.x, top: src.anchor.y + IMG + 10, right: "auto", transform: "none", zIndex: 130, pointerEvents: "none" }}
-              >
-                <p className={styles.pctCardName}>{f.name}</p>
-                <p className={styles.pctCardBig}>{pctTxt(f.pct ?? 0)} of your chum</p>
-                <div className={styles.pctCardRows}>
-                  <div>As {genLabel(f.depth ?? 1)}: {pctTxt(f.share ?? f.pct ?? 0)}</div>
-                  <div>Share of your chum: {pctTxt(f.pct ?? 0)}</div>
-                </div>
-                <p className={styles.pctCardTitle}>{pctTitleFor(f.id)}</p>
-                <p className={styles.pctCardDisclaimer}>These figures come from history and old breeding records, our viewpoint, not proven fact.</p>
-              </div>
-            )}
-          </>
+          <TileZoom
+            key={f.id}
+            open={{ img: f.img, name: f.name, description: f.note || "", anchor: openPop.anchor }}
+            onClose={() => setOpenPop(null)}
+            persist
+            borderColor={frameBorder(f.status)}
+          />
         );
       })()}
 

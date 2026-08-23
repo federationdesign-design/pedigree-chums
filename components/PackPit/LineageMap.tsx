@@ -968,7 +968,12 @@ export default function LineageMap({
     // depth). Anything the user later reveals simply OVERDRAWS beyond this frame (the
     // page allows free overdraw). `open` is deliberately NOT read, so no expand can
     // change the frame: boundsOf(initOpen) is identical on every render.
-    const initOpen = initialDepth ? openIdsToDepth(root, initialDepth) : new Set<string>(["0"]);
+    // D74 #1: the FRAME is fixed at the DEPTH-2 set (the signed-off resting size),
+    // regardless of initialDepth. initialDepth (now 4) pre-expands deeper levels for the
+    // RENDER, but those depth 3-4 nodes just overdraw beyond this depth-2 frame (like the
+    // anti-diagram right-shift). Framing the depth-4 set is what shrank the tree.
+    const FRAME_DEPTH = 2;
+    const initOpen = openIdsToDepth(root, FRAME_DEPTH);
     let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
     for (const n of shown) {
       if (n._parent && !initOpen.has((n._parent as Node)._id)) continue; // outside the depth-2 set
@@ -985,7 +990,7 @@ export default function LineageMap({
     if (w / h < aspect) { const nw = h * aspect; minX -= (nw - w) / 2; w = nw; }
     else { const nh = w / aspect; minY -= (nh - h) / 2; h = nh; }
     return { x: minX, y: minY, w, h };
-  }, [bounded, shown, vp.w, vp.h, root, initialDepth]);
+  }, [bounded, shown, vp.w, vp.h, root]); // D74 #1: frame is depth-2 fixed, initialDepth no longer read here
 
   // D73 #4: the bounded tree must NEVER overlay the circular diagram to its LEFT. It
   // lays out the WHOLE tree, so its leftmost node can sit left of the frozen fit frame
