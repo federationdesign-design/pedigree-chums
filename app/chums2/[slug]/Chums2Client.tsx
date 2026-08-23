@@ -545,6 +545,17 @@ export default function Chums2Client({ name, slug, image, info, lineage, diag = 
     setPositions((prev) => ({ ...prev, [id]: pos }));
     setClosed((prev) => { const next = new Set(prev); next.delete(id); return next; });
     bringToFront(id);
+    // D76: the card's fixed slot (in the band below famous chums) is often below the
+    // fold. ONLY on open, after it mounts, smooth-scroll VERTICALLY so it sits ~80px
+    // below the viewport top. No-op if already fully visible. left:0 keeps the wide
+    // canvas's horizontal position. Close/toggle-closed/drag never reach here.
+    window.setTimeout(() => {
+      const el = document.querySelector(`[data-card-id="${id}"]`) as HTMLElement | null;
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      if (r.top >= 0 && r.bottom <= window.innerHeight) return; // already fully visible
+      window.scrollBy({ top: r.top - 80, left: 0, behavior: "smooth" });
+    }, 60);
   }, [placeCard, bringToFront]);
 
   const closeCard = useCallback((id: string) => {

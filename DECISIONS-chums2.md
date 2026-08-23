@@ -14,6 +14,19 @@ Baseline (measured before stage 1):
 
 ---
 
+## 2026-08-23 smooth-scroll a newly opened rail card into view (D76)
+
+The fixed card slots (band below famous chums) are often below the fold. On OPEN only,
+after the card mounts, the window smooth-scrolls it into view:
+- DragCard gains `data-card-id={id}` so openCard can find the mounted element.
+- openCard (card branch, after placeCard/setClosed/bringToFront) schedules a setTimeout(60)
+  that reads the card's rect: if `top >= 0 && bottom <= innerHeight` it is already fully
+  visible -> NO scroll; otherwise `window.scrollBy({ top: rect.top - 80, left: 0, behavior:
+  "smooth" })` puts its top ~80px below the viewport top. `left: 0` keeps the wide canvas's
+  horizontal position untouched (vertical scroll only).
+- ONLY on open: closeCard, toggleCard-when-closing and dragging never reach this code, and
+  the diagram/tree panel reopen returns earlier, so no scroll fires for them.
+
 ## 2026-08-23 intro box fixed height + width steps; yellow band reinstated (D75)
 
 INTRO BOX FIXED HEIGHT (so the pack heading/grid below never shift on the hover swap):

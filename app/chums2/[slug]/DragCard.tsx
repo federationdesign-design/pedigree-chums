@@ -78,6 +78,7 @@ export default function DragCard({
   return (
     <div
       ref={ref}
+      data-card-id={id}
       className={`${styles.card} ${className ?? ""}`}
       style={{ position: "absolute", zIndex, ...style }}
       onPointerDown={onPointerDown}
