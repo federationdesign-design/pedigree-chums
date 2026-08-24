@@ -6041,5 +6041,16 @@
     "defaultRoute": "",
     "animationCue": "",
     "status": "Approved"
+  },
+  {
+    "responseId": "B43-KENNELSKETCH-06",
+    "bucketId": "B43",
+    "subtag": "kennelsketch",
+    "triggers": [],
+    "template": "thats all of them. you are good at this",
+    "factSource": "Game copy",
+    "defaultRoute": "",
+    "animationCue": "",
+    "status": "Approved"
   }
 ]

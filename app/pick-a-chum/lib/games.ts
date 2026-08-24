@@ -164,7 +164,9 @@ function sketchMove(state: GameState, input: string): { state: GameState; result
   }
   const next = state.sketchIndex + 1;
   if (next >= KENNEL_SKETCHES.length) {
-    return { state, result: { line: 'B43-KENNELSKETCH-04', display: sketchDisplay(state.sketchIndex), answer: s.answer, correct: s.answer, ended: true } }; // "It was a {{ANSWER}}." -- named correctly
+    // Naming the LAST drawing: the completion line (B43-06), not the generic per-drawing reveal (B43-04, now
+    // unused). correct still fires the win animation on this final correct guess.
+    return { state, result: { line: 'B43-KENNELSKETCH-06', display: sketchDisplay(state.sketchIndex), correct: s.answer, ended: true } };
   }
   return { state: { ...state, sketchIndex: next }, result: { line: 'B43-KENNELSKETCH-02', display: sketchDisplay(next), correct: s.answer, ended: false } }; // "Yes." + next drawing -- named correctly
 }

@@ -99,7 +99,11 @@ export const KENNEL_SKETCHES: KennelSketch[] = [
     accept: ['tail', 'a tail', 'wag', 'wagging tail'],
     clue: 'Look for: it wags',
     art: [
-      '  _/  _/',
+      '           /',
+      '          /',
+      '         /',
+      '   ___/',
+      ' /',
     ].join('\n'),
   },
   {
