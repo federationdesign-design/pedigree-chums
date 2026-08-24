@@ -12,7 +12,9 @@ import trainingDifficulty from "../../data/trainingDifficulty";
 import styles from "./calculator.module.css";
 import { fireConfetti } from "../../lib/confetti";
 import BreedResultRail from "./BreedResultRail";
+import ChumKnockout from "./ChumKnockout";
 import ArticleTextToggle from "../../components/ArticleTextToggle/ArticleTextToggle";
+import ShareResultsButton from "../../components/ShareResultsButton/ShareResultsButton";
 
 type Option = { label: string; value: string };
 type Question = { id: string; question: string; sub?: string; info?: string; options: Option[] };
@@ -646,24 +648,15 @@ export default function ChumCalculator() {
 
   const answeredCount = Object.keys(answers).length;
   const CORE_COUNT = 14;
-  const coreAnswered = Object.keys(answers).filter(k => !k.startsWith("tb_") && k !== "stairs").length;
   const coreScored = ALL_BREEDS.map((breed) => ({ ...breed, score: scoreBreed(breed.slug, answers) })).sort((a, b) => b.score - a.score);
   // One resolved threshold, shared by every call site below, so the live count
   // and the final reveal never disagree. (Job A, 22 Aug 2026.)
   const resolvedThreshold = resolveThreshold(coreScored);
-  const coreVisible = coreAnswered >= 3 ? coreScored.filter(b => b.score >= resolvedThreshold).length : ALL_BREEDS.length;
-  // After core questions, show tiebreakers only if >5 breeds remain
-  // Check if the visible breeds are dominated by small breeds -- trigger small-breed tiebreakers
-  const smallSlugs = new Set(["chihuahua","yorkshire-terrier","miniature-schnauzer",
-    "west-highland-terrier","jack-russell-terrier","pomeranian","papillon","boston-terrier",
-    "jackapoo","border-terrier","cavapoo","cavalier-king-charles-spaniel","bichon-frise",
-    "maltese","maltipoo","cavachon","shih-tzu","cockapoo","italian-greyhound","poodle",
-    "labradoodle","goldendoodle","french-bulldog","pug","bulldog","shih-tzu"]);
-  const smallCount = coreAnswered >= 3
-    ? coreScored.filter(b => b.score >= resolvedThreshold && smallSlugs.has(b.slug)).length
-    : 0;
-  const needsTiebreakers = coreAnswered >= CORE_COUNT && coreVisible > 5;
-  const total = needsTiebreakers ? QUESTIONS.length : CORE_COUNT;
+  // The four tb_ questions have left the pre-reveal flow entirely: the main flow now
+  // always stops at the core 14, and the knockout runs them on the revealed dogs.
+  // Removed 22 Aug 2026: coreAnswered, coreVisible, smallSlugs, smallCount,
+  // needsTiebreakers, and the total ternary. (Job B stage 6.)
+  const total = CORE_COUNT;
   const currentQ = step >= 1 && step <= total ? QUESTIONS[step - 1] : null;
   const started = step > 0;
   const finished = step > total;
@@ -706,6 +699,11 @@ export default function ChumCalculator() {
       }).slice(0, MAX_RESULTS)
     : visibleBreeds;
   const visibleCount = thresholdActive ? shownBreeds.length : ALL_BREEDS.length;
+
+  // More than one dog revealed: hand off to the question-driven knockout, which owns
+  // the rounds, the result screen and Start again. A single match (or none) shows the
+  // result rail directly. (Job B stage 6 wiring, 22 Aug 2026.)
+  const runKnockout = finished && shownBreeds.length > 1;
 
   function handleAnswer(qId: string, value: string) {
     setInfoOpen(false);
@@ -787,8 +785,6 @@ export default function ChumCalculator() {
       {/* Article text toggle, centred as on /home. When on: white H1 + progress
           copy on the gradient go dark blue, and the navy step card lightens with
           its inner text darkened (see the invert block in calculator.module.css). */}
-      <ArticleTextToggle centered />
-
       {/* ── Header ── */}
       <div className={styles.header}>
         <h1 className={styles.title}>
@@ -796,6 +792,8 @@ export default function ChumCalculator() {
         </h1>
         <p className={styles.headerSub}>{progressMsg}</p>
       </div>
+      {/* Contrast toggle sits below the header (moved from above the h1, 24 Aug 2026). */}
+      <ArticleTextToggle centered />
 
       {/* ── Question stepper ── */}
       <div className={styles.stepperWrap}>
@@ -823,7 +821,7 @@ export default function ChumCalculator() {
         )}
 
         {/* Question 3 -- part 1: home type, part 2: stairs (split so neither box is too long) */}
-        {currentQ && currentQ.id === "living" && !(needsTiebreakers && step === CORE_COUNT + 1) && (
+        {currentQ && currentQ.id === "living" && (
           <div className={styles.stepCard}>
             <div className={styles.stepProgress}>
               <span className={styles.stepCount}>{step}/{total}</span>
@@ -887,24 +885,8 @@ export default function ChumCalculator() {
           </div>
         )}
 
-        {/* Tiebreaker transition message */}
-        {needsTiebreakers && step === CORE_COUNT + 1 && currentQ && (
-          <div className={styles.stepCard} style={{ textAlign: "center", padding: "32px 24px" }}>
-            <p style={{ fontSize: "2rem", margin: "0 0 12px" }}>🐾</p>
-            <h2 className={styles.stepQuestion} style={{ marginBottom: 8 }}>
-              We still have a few too many chums matching you
-            </h2>
-            <p className={styles.stepSub} style={{ marginBottom: 24 }}>
-              We still have a few too many chums matching you -- let us ask a couple more questions to narrow it down.
-            </p>
-            <button className={styles.startBtn} onClick={() => setStep(s => s + 1)}>
-              Continue
-            </button>
-          </div>
-        )}
-
         {/* Active question (auto-advance) */}
-        {currentQ && currentQ.id !== "intent" && currentQ.id !== "living" && !(needsTiebreakers && step === CORE_COUNT + 1) && (
+        {currentQ && currentQ.id !== "intent" && currentQ.id !== "living" && (
           <div className={styles.stepCard}>
             <div className={styles.stepProgress}>
               <span className={styles.stepCount}>{step}/{total}</span>
@@ -948,7 +930,7 @@ export default function ChumCalculator() {
         )}
 
         {/* Finished -- heading only; results + start-again render below */}
-        {finished && (
+        {finished && !runKnockout && (
           <div style={{ textAlign: "center", padding: "8px 0 4px" }}>
             <p className={styles.stepDoneSub}>
               {visibleCount > 0
@@ -972,14 +954,20 @@ export default function ChumCalculator() {
         </div>
       )}
 
-      {/* ── Result rail -- only shown when finished ── */}
-      {finished && (
-        <BreedResultRail breeds={shownBreeds} bestSlug={bestSlug} iconRails reasons={Object.fromEntries(shownBreeds.map((b) => [b.slug, fitReason(b, answers)]))} />
+      {/* ── Knockout when more than one dog is revealed ── */}
+      {runKnockout && (
+        <ChumKnockout breeds={shownBreeds} answers={answers} onRestart={reset} />
       )}
 
-      {/* ── Start again -- below the results ── */}
-      {finished && (
-        <div style={{ textAlign: "center", marginTop: 32 }}>
+      {/* ── Result rail -- single match (or none) reveals directly ── */}
+      {finished && !runKnockout && (
+        <BreedResultRail breeds={shownBreeds} bestSlug={bestSlug} iconRails fullBleed reasons={Object.fromEntries(shownBreeds.map((b) => [b.slug, fitReason(b, answers)]))} />
+      )}
+
+      {/* ── End actions -- single-match reveal only; the knockout has its own ── */}
+      {finished && !runKnockout && (
+        <div className={styles.endActions}>
+          <ShareResultsButton names={shownBreeds.map((b) => b.name)} className={styles.shareBtn} />
           <button className={styles.resetBtn} onClick={reset}>Start again</button>
         </div>
       )}

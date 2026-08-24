@@ -5,6 +5,13 @@
   padding-bottom: 32px;
 }
 
+/* Full-bleed: break the carousel out of the centred page container to full viewport
+   width. Result screens only (opt-in via the fullBleed prop). No horizontal scrollbar
+   because globals.css sets html,body { overflow-x: clip }. (Job B stage 6, 24 Aug 2026.) */
+.railWrapFull {
+  margin-inline: calc(50% - 50vw);
+}
+
 .rail {
   display: flex;
   flex-wrap: nowrap;
@@ -65,13 +72,13 @@
 /* fitReason caption, always visible (was hover-only). Width matches the card so a
    long sentence wraps instead of widening the rail item. Sits ABOVE the card image,
    so the margin sits below it. (Job B stage 6, 22 Aug 2026.)
-   Weight set to 500 on 22 Aug 2026, reversing the 600 set earlier the same day. */
+   Weight set to 600 on 24 Aug 2026, reversing the 500 set on 22 Aug. */
 .reason {
   margin: 0 auto 10px;
   max-width: clamp(160px, 45vw, 220px);
   font-family: var(--font-body), sans-serif;
   font-size: 0.8rem;
-  font-weight: 500;
+  font-weight: 600;
   line-height: 1.35;
   color: var(--navy, #0a3a57);
   text-align: center;

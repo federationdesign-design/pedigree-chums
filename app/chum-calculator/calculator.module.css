@@ -35,7 +35,7 @@
 .headerSub {
   font-family: var(--font-body, "Montserrat", sans-serif);
   font-size: clamp(1rem, 2.5vw, 1.3rem);
-  font-weight: 600;
+  font-weight: 700; /* bolder, was 600 (24 Aug 2026) */
   color: #ffffff;
   margin: 0;
 }
@@ -306,7 +306,7 @@
 .stepDoneSub {
   font-family: var(--font-body, "Montserrat", sans-serif);
   font-size: clamp(18px, 2.6vw, 32px);
-  font-weight: 500;
+  font-weight: 700; /* bolder, was 500 (24 Aug 2026) */
   color: #ffffff;
   margin: 0 0 24px;
   text-align: center;
@@ -316,15 +316,47 @@
 .resetBtn {
   display: inline-block;
   font-family: var(--font-display, "Luckiest Guy", cursive);
-  font-size: 0.85rem;
+  font-size: 1.7rem; /* 2x bigger, was 0.85rem (24 Aug 2026) */
   letter-spacing: 0.05em;
   background: transparent;
   color: var(--navy, #0a3a57);
-  border: 2px solid var(--navy, #0a3a57);
+  border: 3px solid var(--navy, #0a3a57);
   border-radius: 999px;
-  padding: 8px 20px;
+  padding: 16px 40px; /* 2x bigger, was 8px 20px */
   cursor: pointer;
   transition: background 0.15s, color 0.15s;
+}
+
+/* End-screen actions: Share (primary green) beside Start Again (outlined). Side by
+   side on desktop, stacked on mobile. Shared by both end screens. (24 Aug 2026.) */
+.endActions {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  align-items: center;
+  margin-top: 28px;
+}
+
+.shareBtn {
+  font-family: var(--font-display, "Luckiest Guy", cursive);
+  font-size: 1.7rem;
+  letter-spacing: 0.05em;
+  background: #22c55e;
+  color: #ffffff;
+  border: 3px solid #22c55e;
+  border-radius: 999px;
+  padding: 16px 40px;
+  cursor: pointer;
+  box-shadow: 0 4px 0 rgba(10, 58, 87, 0.35);
+  transition: background 0.15s, transform 0.1s, box-shadow 0.1s;
+}
+.shareBtn:hover { background: #16a34a; border-color: #16a34a; }
+.shareBtn:active { transform: translateY(2px); box-shadow: 0 2px 0 rgba(10, 58, 87, 0.35); }
+
+@media (max-width: 600px) {
+  .endActions {
+    flex-direction: column;
+  }
 }
 .resetBtn:hover { background: var(--navy, #0a3a57); color: #ffffff; }
 

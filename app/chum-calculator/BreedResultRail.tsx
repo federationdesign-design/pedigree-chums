@@ -114,6 +114,10 @@ type Props = {
   // only the knockout result screen carries the rails; the calculator's own reveal
   // and the mid-knockout rail pass nothing and are unaffected. (Job B stage 6.)
   iconRails?: boolean;
+  // Break the card carousel out to full viewport width (result screens only). Safe
+  // from a horizontal scrollbar because globals.css sets html,body { overflow-x: clip }.
+  // (Job B stage 6, 24 Aug 2026.)
+  fullBleed?: boolean;
 };
 
 // The caption sits under a card already titled with the breed name, so drop the
@@ -125,7 +129,7 @@ function captionText(name: string, reason: string): string {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
-export default function BreedResultRail({ breeds, bestSlug, fallingSlugs, reasons, iconRails }: Props) {
+export default function BreedResultRail({ breeds, bestSlug, fallingSlugs, reasons, iconRails, fullBleed }: Props) {
   const falling = new Set(fallingSlugs ?? []);
   const railRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
@@ -191,7 +195,7 @@ export default function BreedResultRail({ breeds, bestSlug, fallingSlugs, reason
 
   return (
     <>
-    <div className={styles.railWrap}>
+    <div className={fullBleed ? `${styles.railWrap} ${styles.railWrapFull}` : styles.railWrap}>
       <div ref={railRef} className={styles.rail} role="list" aria-label="Matched breeds">
         {breeds.map((b) => {
           const isFalling = falling.has(b.slug);
