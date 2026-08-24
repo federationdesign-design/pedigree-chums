@@ -179,6 +179,7 @@ export type ActionType =
   | 'good_boy' // Task 142: praise (good boy/girl/dog, clever girl, well done) -> the wagging-tail clip.
   | 'name_ack' // Task 142: a name statement (my name is X) -> acknowledge once with the visitor's name, then drop it (never stored).
   | 'name_deflect' // Task 142: an attempt to name HER (are you Dave / hello Dave / can I name you) -> she deflects without accepting or storing a name.
+  | 'name_breed' // Naming redux: asking the dog its name (whats your name / what are you called) -> its breed short-form (border collie / labrador / boxer / border terrier), immediately, no deflection or counter.
   | 'dog_lifespan' // Task 142: "how long do dogs live" (generic) -> a real general lifespan answer + the breed explorer link. ("how long do they live" stays B48.)
   | 'death_answer' // Task 142: the death cluster (can you die / are you dead / can i kill you) -> the in-character "I cannot die" line; persistence escalates to safeguarding.
   | 'god_answer' // Task 145: the god cluster (belief / which-god / generic) -> a real answer + the Anubis essay link. responseId selects GOD-BELIEF / GOD-WHICH / GOD-READ.

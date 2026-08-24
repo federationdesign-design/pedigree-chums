@@ -187,6 +187,12 @@ const SELF_BREED_LINES: Record<Dog, string> = {
   terrier: 'Border Terrier. bred to go down holes after foxes and rats. small, stubborn, dont back down. dont let the size fool you.',
 };
 
+// Naming redux: asking the dog its NAME is answered with its breed, short-form and lowercase (matching the
+// previously-approved Collie "border collie" line, B23-IDENTITY-04). Owner-dictated copy: the four breed
+// names verbatim. Distinct from SELF_BREED_LINES above, which is the fuller in-character breed answer to a
+// breed QUESTION ("what breed are you"); a NAME question gets the snappy breed name instead.
+const NAME_BREED: Record<Dog, string> = { collie: 'border collie', labrador: 'labrador', boxer: 'boxer', terrier: 'border terrier' };
+
 // Task 165: the games menu LIST is now per-dog. Each dog offers only the games it can actually start
 // (Treat Trail is Labrador-only, Missing Biscuit Terrier-only, DO NOT PRESS THAT BUTTON Boxer-only; the
 // Collie keeps her three plus the bark game). Before this, every dog served the Collie's B45-GAMELIST-02
@@ -702,6 +708,12 @@ export function assemble(res: Resolution, data0: ChumData, n: Normalised, sessio
     // reported for sign-off, not final.
     case 'self_breed':
       return { responseId: `SELF-BREED-${DOG_PREFIX[dog]}`, text: SELF_BREED_LINES[dog], dog };
+
+    // Naming redux: the dog's name IS its breed. Short-form, immediate, per-dog. Supersedes the dormant
+    // B23-IDENTITY-03/04 ladder ("im a dog", then "border collie" only on an exact rephrase). Owner-dictated
+    // copy: the four breed names verbatim, lowercase to match the previously-approved Collie "border collie".
+    case 'name_breed':
+      return { responseId: `NAME-BREED-${DOG_PREFIX[dog]}`, text: NAME_BREED[dog], dog };
 
     case 'orientation': {
       // Normally the full B15 rotation. The bare-help clarifier's "yes" pins the family (res.orientationFamily

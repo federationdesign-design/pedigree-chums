@@ -168,6 +168,43 @@ check('take me back to the collie', { action: 'transfer' }, { transferTo: 'colli
 check('get me the labrador', { action: 'transfer' }, { transferTo: 'labrador' });
 check('border collie', { action: 'breed_page' }, { url: '/chums/border-collie' });
 
+// ---- Naming redux: the dog's name IS its breed, answered immediately (no ladder, no counter) ----
+// Was: "im a dog" (byte-identical to the fallback, so it read as broken) and the breed only on an exact
+// rephrase nobody types. Now every dog answers a name question with its own breed short-form, one step.
+(() => {
+  const NAME_Q = ['whats your name', 'what is your name', 'do you have a name', 'what are you called', 'tell me your name', 'what should i call you'];
+  const BREED = { collie: 'border collie', labrador: 'labrador', boxer: 'boxer', terrier: 'border terrier' };
+  for (const [dog, breed] of Object.entries(BREED)) {
+    for (const q of NAME_Q) {
+      const s = newSession();
+      s.activeDog = dog;
+      check(q, { action: 'name_breed' }, { session: s, assert: (_r, resp) =>
+        resp.text === breed ? null : `${dog} "${q}" -> "${resp.text}" want "${breed}"` });
+    }
+  }
+  // Asking again, in a different phrasing, just answers again -- no rung 1, no drift, never "im a dog".
+  const s = newSession();
+  check('whats your name', { action: 'name_breed' }, { session: s, assert: (_r, resp) => (resp.text === 'border collie' ? null : `first ask -> "${resp.text}"`) });
+  check('do you have a name', { action: 'name_breed' }, { session: s, assert: (_r, resp) => (resp.text === 'border collie' ? null : `second ask -> "${resp.text}"`) });
+})();
+
+// ---- Fix 3: the truncated breed-question forms reach the self-breed answer (were the "Dogs?" echo) ----
+(() => {
+  const PREFIX = { collie: 'COL', labrador: 'LAB', boxer: 'BOX', terrier: 'TER' };
+  for (const form of ['what sort of dog', 'what kind of dog', 'what type of dog', 'what breed of dog']) {
+    for (const [dog, pfx] of Object.entries(PREFIX)) {
+      const s = newSession();
+      s.activeDog = dog;
+      check(form, { action: 'self_breed' }, { session: s, assert: (_r, resp) =>
+        resp.responseId === `SELF-BREED-${pfx}` ? null : `${dog} "${form}" -> ${resp.responseId}` });
+    }
+  }
+  // The whole-message guard holds: a LONGER message that merely contains the form is not self-breed.
+  check('what sort of dog is best', {}, { notAction: 'self_breed' });
+  // The full "... are you" form is unchanged.
+  check('what breed are you', { action: 'self_breed' });
+})();
+
 // Breed page renders three parts: the factual answer, a mid-conversation
 // NAV_BREED_HANDOFF line in the ACTIVE dog's voice (Collie by default), and the
 // real page link (url). The [LINK] token is stripped from the spoken text.
@@ -3359,6 +3396,14 @@ for (const game of ['kennelsketch', 'missingsheep']) {
 // 🎾 is now the ONLY ball in the picker; confirm it still counts as "ball" mid-game.
 (() => { const s = newSession('labrador'); const { state } = startGame('treattrail', 0); s.activeGame = 'treattrail'; s.game = state;
   check('🎾', { action: 'game_move' }, { session: s, assert: (r) => (r.gameGuess === 'ball' ? null : `🎾 -> ${JSON.stringify(r.gameGuess)}`) }); })();
+// Kennel Sketch finale: naming the last drawing serves the completion line (B43-06), not the generic reveal.
+(() => {
+  const s = newSession('collie'); const { state } = startGame('kennelsketch', 0); s.activeGame = 'kennelsketch'; s.game = state;
+  let last; for (const a of ['bone', 'ball', 'bowl', 'lead', 'stick', 'kennel', 'paw', 'tail', 'ears', 'hat']) last = submit(data, s, a);
+  const ok = last.resolution.gameLine === 'B43-KENNELSKETCH-06' && last.response.text === 'thats all of them. you are good at this' && s.activeGame === null;
+  ok ? pass++ : fail++;
+  rows.push({ ok, input: 'Kennel Sketch finale (B43-06 on the last drawing)', layer: 13, bucket: '-', action: 'game_move', note: ok ? '' : `line=${last.resolution.gameLine} text="${last.response.text}"` });
+})();
 (() => { const s = newSession('collie'); const { state } = startGame('kennelsketch', 0); s.activeGame = 'kennelsketch'; s.game = state;
   check('👍', { action: 'game_move' }, { session: s, assert: (r) => (r.gameGuess === undefined ? null : `👍 got a gameGuess: ${r.gameGuess}`) }); })();
 // SAFETY: a sadness emoji mid-game reaches the sadness route, NOT a wrong guess -- typed "im sad" already did,

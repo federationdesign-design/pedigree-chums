@@ -612,10 +612,27 @@ const SELF_BREED_PHRASES = [
   'what kind of dog r you', 'tell me about your breed', 'tell me your breed', 'what breed of dog are you',
 ];
 const SELF_BREED_ARE_YOU = /^are (?:you|u) an? (border collie|collie|border terrier|terrier|labrador|lab|retriever|boxer)\??$/;
+// Naming redux (fix 3): the TRUNCATED breed-question forms, with no trailing "are you". The SELF_BREED_PHRASES
+// above all require the "... are you" tail (matched by hasAny/phraseFuzzy, which cannot match an input SHORTER
+// than the needle), so a bare "what sort of dog" slipped past self-breed and became the "Dogs?" loop echo.
+// Matched on the WHOLE message only (a Set), so "what sort of dog" reaches the self-breed answer while a longer
+// message that merely contains it ("what sort of dog is best") does not.
+const SELF_BREED_EXACT = new Set(['what sort of dog', 'what kind of dog', 'what type of dog', 'what breed of dog']);
 function isSelfBreedQuestion(compact: string): boolean {
   const c = compact.trim();
-  return hasAny({ compact: c } as Normalised, SELF_BREED_PHRASES) || SELF_BREED_ARE_YOU.test(c);
+  return hasAny({ compact: c } as Normalised, SELF_BREED_PHRASES) || SELF_BREED_ARE_YOU.test(c) || SELF_BREED_EXACT.has(c);
 }
+// Naming redux: asking the active dog its NAME is answered immediately with its breed short-form (served
+// per-dog by the assembler: border collie / labrador / boxer / border terrier). No deflection, no counter,
+// no two-step. The old design answered "im a dog" (identical to the fallback, so it read as broken) and only
+// reached the breed on an exact rephrase nobody types; people asking a dog's name want an answer. Whole-message
+// forms only (a Set), so a longer sentence that merely contains one of these is not caught. This route sits
+// above the canned matcher, so it supersedes the now-dormant B23-IDENTITY-03/04 bank rows (left in place).
+const NAME_ASK = new Set([
+  'whats your name', 'what is your name', 'whats ur name', 'what is ur name', 'whats your name then',
+  'do you have a name', 'have you got a name', 'do you got a name', 'tell me your name',
+  'what are you called', 'what do i call you', 'what should i call you',
+]);
 
 export interface RouterState {
   safetyAskStreak?: number; // Task 139: consecutive safety questions; three in a row hands to a human.
@@ -1592,6 +1609,10 @@ export function resolve(n0: Normalised, data: ChumData, state: RouterState): Res
     // Task 142: trying to NAME her -> she deflects, taking no name. "whats your name" is deliberately
     // not here, so it keeps its existing "im a dog".
     if (isNamingHer(c, n.original)) return { layer: 13, layerName: 'Play and entertainment', bucket: null, action: 'name_deflect' };
+    // Naming redux: asking her NAME -> her breed, immediately (per-dog short-form in the assembler). Placed
+    // beside the name-deflect / name-statement rules and above the canned matcher, so it supersedes the old
+    // B23-IDENTITY "im a dog" bank answer. Every dog answers with its own breed.
+    if (NAME_ASK.has(c)) return { layer: 12, layerName: 'Identity and scepticism', bucket: 'B16', action: 'name_breed' };
     // Task 142: a name statement -> acknowledge once with the (capitalised) name, then drop it. Safety
     // is checked far above, so "im scared" is a safety route and never reaches here as a name.
     {
