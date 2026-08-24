@@ -38,9 +38,9 @@ const OG_DESC =
 export const metadata: Metadata = {
   title: "Britain's Dog History",
   description: OG_DESC,
-  // Its own share card. The Open Graph image now comes from the colocated
-  // opengraph-image.jpg file convention (Facebook, LinkedIn, WhatsApp, Slack);
-  // the twitter block below still carries its own image for X and a few others.
+  // Its own share card. Both the Open Graph and Twitter images now come from
+  // the colocated opengraph-image.jpg file convention, so og and twitter never
+  // disagree; twitter's image falls back to the resolved openGraph one.
   openGraph: {
     title: OG_TITLE,
     description: OG_DESC,
@@ -51,7 +51,6 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: OG_TITLE,
     description: OG_DESC,
-    images: ["/minipit-OG.jpg"],
   },
 };
 
