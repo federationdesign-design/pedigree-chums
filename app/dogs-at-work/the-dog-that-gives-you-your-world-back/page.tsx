@@ -18,6 +18,9 @@ export const metadata: Metadata = {
   // Meta description drawn from the index card dek (supplied by Steve, 11 Aug).
   description:
     "A guide dog does not give somebody their sight back. It gives them the confidence to go, and that turns out to be almost as valuable.",
+  openGraph: {
+    images: ["/guide_dog_image.jpg"],
+  },
 };
 
 // Article 6 body, transcribed verbatim from the supplied copy

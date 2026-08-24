@@ -25,19 +25,10 @@ export const metadata: Metadata = {
     // follows the real domain rather than a hard-coded guess at it.
     url: "/good-dog-bad-dog/argos",
     siteName: "Pedigree Chums",
-    images: [
-      {
-        // THIS WAS WRONG THREE WAYS and the card has never rendered: the
-        // domain was pedigree-chums.co.uk with a hyphen, the folder was /og
-        // when the real one is /OG, which matters because Vercel serves from a
-        // case-sensitive filesystem, and the extension was .jpg when the file
-        // is a .png. Relative now, so the domain looks after itself.
-        url: "/OG/argos-og.png",
-        width: 1200,
-        height: 630,
-        alt: "Argos: The Dog Who Knew His Master — Pedigree Chums Good Dog Bad Dog",
-      },
-    ],
+    // OG image is the essay's real hero, the same path as the Article schema's
+    // image field, so the share card and the structured data never disagree.
+    // (Was a bespoke /OG/argos-og.png card, now the hero.)
+    images: ["/history/Argos-hero.jpg"],
     locale: "en_GB",
     type: "article",
   },
@@ -46,7 +37,7 @@ export const metadata: Metadata = {
     title: "Argos: The Dog Who Knew His Master",
     description:
       "He simply lifts his head, recognises the man he has waited for, wags his tail, and dies. Nearly three thousand years later, that is enough.",
-    images: ["/OG/argos-og.png"],
+    images: ["/history/Argos-hero.jpg"],
   },
 };
 

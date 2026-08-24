@@ -14,6 +14,9 @@ export const metadata: Metadata = {
   title: "The Machine That May Owe Dogs a Biscuit | Dogs at Work",
   description:
     "In 2025, a dog-built \"electronic nose\" began a UK trial sniffing urine for prostate cancer. The machine was shaped from Medical Detection Dogs' own data. The dog wrote the manual for its own replacement - and doesn't care, because there's a ball by the back door.",
+  openGraph: {
+    images: ["/never-clocking-off.jpg"],
+  },
 };
 
 const BODY: (string | { h: string; id: string })[] = [

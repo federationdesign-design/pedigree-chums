@@ -14,6 +14,9 @@ export const metadata: Metadata = {
   title: "The Colleague Who Never Clocks Off | Dogs at Work",
   description:
     "A medical alert dog learns one person so completely it can warn them their own body is about to go wrong - often before they know themselves. That's not a pet. That's a colleague, even if the wages are dinner and the occasional stolen sausage.",
+  openGraph: {
+    images: ["/article3_hero.jpg"],
+  },
 };
 
 const BODY: (string | { h: string; id: string })[] = [

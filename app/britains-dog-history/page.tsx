@@ -38,24 +38,14 @@ const OG_DESC =
 export const metadata: Metadata = {
   title: "Britain's Dog History",
   description: OG_DESC,
-  // Its own share card. Without this the page inherited the site-wide /og.png
-  // from the root layout, so anyone posting the game got the generic homepage
-  // image. Both blocks are set: openGraph covers Facebook, LinkedIn, WhatsApp
-  // and Slack, twitter is read by X and a few others, and neither falls back to
-  // the other.
+  // Its own share card. The Open Graph image now comes from the colocated
+  // opengraph-image.jpg file convention (Facebook, LinkedIn, WhatsApp, Slack);
+  // the twitter block below still carries its own image for X and a few others.
   openGraph: {
     title: OG_TITLE,
     description: OG_DESC,
     type: "website",
     url: "/britains-dog-history",
-    images: [
-      {
-        url: "/minipit-OG.jpg",
-        width: 1200,
-        height: 630,
-        alt: "Britain's Dog History, a Pedigree Chums\u2122 game",
-      },
-    ],
   },
   twitter: {
     card: "summary_large_image",

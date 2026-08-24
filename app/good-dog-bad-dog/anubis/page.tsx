@@ -11,6 +11,9 @@ export const metadata: Metadata = {
   title: "Anubis: The Scavenger Made Into a God | Good Dog, Bad Dog",
   description:
     "The Egyptians made a dog the god of death -- and it turns out almost everyone did. An essay on the jackal we posted at the door of the dark, from a scavenger of desert graves to a Suffolk hellhound, and why we thanked it by turning its name into an insult.",
+  openGraph: {
+    images: ["/history/Anubis-hero.jpg"],
+  },
 };
 
 type Row = string | { h: string } | { quote: string };

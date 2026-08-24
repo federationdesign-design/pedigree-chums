@@ -21,6 +21,9 @@ import { QuoteReveal } from "../../../components/ScrollScenes/QuoteReveal";
 export const metadata: Metadata = {
   title: "Bull's-eye: The Dog as the Owner's Shadow | Good Dog, Bad Dog",
   description: "Bull's-eye in Oliver Twist is not simply a bad dog -- he is a dog made to carry a bad man's reputation. An essay on Dickens, Bill Sikes and the modern status dog.",
+  openGraph: {
+    images: ["/bulls-eye-img.jpg"],
+  },
 };
 
 const SLUG = "bull-terrier";

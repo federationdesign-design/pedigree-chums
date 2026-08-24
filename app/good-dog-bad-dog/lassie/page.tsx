@@ -19,6 +19,9 @@ import ArticleTextToggle from "../../../components/ArticleTextToggle/ArticleText
 export const metadata: Metadata = {
   title: "Lassie: The Burden of Being the Perfect Dog | Good Dog, Bad Dog",
   description: "Lassie's intelligence and sensitivity are genuinely Collie-like. But what happens when a real trait gets elevated into something close to a superpower?",
+  openGraph: {
+    images: ["/lassie-img.jpg"],
+  },
 };
 
 const SLUG = "rough-collie";

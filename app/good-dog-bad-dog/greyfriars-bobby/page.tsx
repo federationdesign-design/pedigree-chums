@@ -19,6 +19,9 @@ import ArticleTextToggle from "../../../components/ArticleTextToggle/ArticleText
 export const metadata: Metadata = {
   title: "Greyfriars Bobby: Loyalty, Legend and the Making of a National Dog | Good Dog, Bad Dog",
   description: "How a small Edinburgh terrier became a symbol of devotion -- and how the story grew larger than the life behind it.",
+  openGraph: {
+    images: ["/greyfryers-bobby.jpg"],
+  },
 };
 
 const SLUG = "skye-terrier";

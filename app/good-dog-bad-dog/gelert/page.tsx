@@ -19,6 +19,9 @@ import ArticleTextToggle from "../../../components/ArticleTextToggle/ArticleText
 export const metadata: Metadata = {
   title: "Gelert: The Dog Who Couldn't Explain Himself | Good Dog, Bad Dog",
   description: "A legend about what happens when a powerful dog cannot defend itself against the story told about it.",
+  openGraph: {
+    images: ["/gelert-painting.jpg"],
+  },
 };
 
 const SLUG = "irish-wolfhound";
