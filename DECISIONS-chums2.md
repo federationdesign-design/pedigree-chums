@@ -14,6 +14,46 @@ Baseline (measured before stage 1):
 
 ---
 
+## 2026-08-24 mobile header nav-clearance fix + /chums2 cleanup (D80)
+
+HEADER OVERLAP (live bug on the shipped /chums mobile page): the header (chum square + title +
+subtitle) rendered UNDER the shared <Nav showLogo> fixed top bar (z-index 300) - the logo (left),
+the accessibility toolbar + 57.375px burger (right), and the global Pick a Chum launcher chip
+(top:18px, z-index 301, anchored beside the logo). The chum square was not absent, it was occluded
+by the fixed logo. Fix: `.page` padding-top 12px -> 96px. 96px is the site's OWN measured clearance
+for this band (PickAChum's mobile chat panel docks at top:96px "below the mobile header",
+PickAChum.module.css), reused not guessed; the ~93px bar (18px pad + 57.375px burger + 18px pad)
+clears with 3px to spare. Header content, at any breed-name length, now sits fully below the chrome
+(name length only affects the title's horizontal wrap, not the vertical clearance). BreedMobile's
+own approach was a 280px decorative hero the chrome floated over with the title at its bottom - not
+reusable for an inline top header, so the explicit padding is the right analogue.
+
+CLEANUP: /chums2 now lives on /chums (D77). Deleted: app/chums2/[slug]/page.tsx (the route),
+app/chums/[slug]/{BreedClient,BreedMobile}.tsx and {breed,breed-mobile}.module.css (unimported
+since the cutover). Import grep first (BreedClient|BreedMobile|breed.module|breed-mobile.module
+across app/components/lib): the only import lines were the deleted files' own CSS self-imports;
+every other hit was prose in comments. BreedAncestry/BreedTemperament COPIED breed.module.css into
+their own module files (standalone), so they are unaffected. The chums2 COMPONENTS (Chums2Client,
+Chums2Mobile, Chums2Rail, DragCard, chums2.module.css, chums2Icons, chums2mobile.module.css) STAY -
+they are imported by app/chums/[slug]/page.tsx (the sole importer); deleting page.tsx just makes the
+[slug] dir a non-routable module folder (no page/route file = not a route, no build error).
+
+?DIAG: let it go with the route. The rig lived only in chums2's page.tsx; deleting the page removes
+it. It is a debug isolation rig, dropped from /chums at cutover, and does not belong on the
+production indexable page. Chums2Client keeps an inert `diag = false` prop (dead, harmless) for a
+future micro-strip.
+
+FLAGGED (not touched, out of cleanup scope): PickAChumLauncher.tsx:435
+`if (pathname?.startsWith("/chums2")) return null;` is now dead (no /chums2 route). More
+importantly it reveals a product question: the launcher was SUPPRESSED on the old /chums2 but is
+NOT suppressed on /chums, which is why it overlaps the header there. This fix CLEARS the chrome
+(per the brief) rather than hiding the launcher; whether to also suppress it on /chums, and whether
+to drop the dead guard, is Steve's call.
+
+Gates: tsc clean after deletions, no bare :global selector in the mobile CSS.
+
+---
+
 ## 2026-08-24 mobile stage 3: three phone-review corrections (D79)
 
 Chums2Mobile only; desktop byte-identical.
