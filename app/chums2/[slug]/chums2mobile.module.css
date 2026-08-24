@@ -5,7 +5,13 @@
   width: 100%;
   max-width: 100vw;
   overflow-x: hidden;
-  padding: 12px 14px 40px;
+  /* Nav-aware top clearance: the shared <Nav showLogo> renders a FIXED top bar (z-index 300)
+     spanning the top ~93px on a phone - the logo (left), the accessibility toolbar + the 57.375px
+     burger (right), plus the global Pick a Chum launcher chip (top:18px, z-index 301) that anchors
+     beside the logo. Without this, the header (square + title) rendered UNDER all of it. 96px is
+     the site's own measured clearance for this band: PickAChum's mobile chat panel docks at
+     top:96px "below the mobile header" (PickAChum.module.css). Reused here, not guessed. */
+  padding: 96px 14px 40px;
   box-sizing: border-box;
 }
 
