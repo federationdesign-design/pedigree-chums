@@ -20,6 +20,7 @@
 // auto-dismiss), and has a close control.
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 import { getHiddenGamesEngine } from "../../lib/hiddenGames/browserEngine";
 import { discoveryToast } from "../../lib/hiddenGames/copy";
 import {
@@ -55,6 +56,7 @@ export default function HiddenGamesToast() {
   const deferredRef = useRef(false);
   // The toast is due but a card holds the campaign slot; show it when it frees.
   const waitingRef = useRef(false);
+  const pathname = usePathname();
 
   // Show now if the campaign slot is free, else wait for it. Remaining is
   // recomputed from the live engine so the toast reflects the count at the moment
@@ -110,6 +112,17 @@ export default function HiddenGamesToast() {
       if (waitingRef.current) attemptShow();
     });
   }, [attemptShow]);
+
+  // Client-side navigation clears any showing toast and frees the slot, so a
+  // held toast never blocks a card on the next page. This mirrors the counter's
+  // cards, which release the slot and reset on every navigation (their reveal
+  // effect, keyed on the same pathname). The deferred-find flush is untouched: it
+  // is scheduled by leaving the game and still shows 2s into the next page.
+  useEffect(() => {
+    waitingRef.current = false;
+    releaseSurface(TOAST_SURFACE);
+    setToast(null);
+  }, [pathname]);
 
   if (!toast) return null;
 

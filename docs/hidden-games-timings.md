@@ -78,16 +78,24 @@ message is on screen, and a second one queues.
   (`HiddenGamesCounter.tsx:314-337`), and navigation releases the slot at the top
   of the reveal effect (`HiddenGamesCounter.tsx:239`).
 - Toast wiring: `attemptShow` claims or waits
-  (`HiddenGamesToast.tsx:64-73`), the slot-free retry
-  (`HiddenGamesToast.tsx:108-112`), and `close` releases
-  (`HiddenGamesToast.tsx:116-118`).
+  (`HiddenGamesToast.tsx:65-74`), the slot-free retry
+  (`HiddenGamesToast.tsx:110-114`), and `close` releases
+  (`HiddenGamesToast.tsx:127-129`).
+
+**Release on navigation (both surfaces).** A held surface is cleared on every
+client-side navigation, so it can never block across pages. The counter's cards
+do this at the top of the reveal effect (`releaseCard`,
+`HiddenGamesCounter.tsx:239`); the toast does the same in a pathname effect that
+frees the slot and hides the toast (`HiddenGamesToast.tsx:116-125`). The
+deferred-find flush is untouched: a find made during a game still shows 2s into
+the next page.
 
 **Consequence to note:** the introduction, the completion celebration and the
-toast now stay until closed (no auto-dismiss). Because only one surface shows at a
-time and a second waits, a surface left unclosed holds the slot and defers the
-others until it is dismissed. The prelude is the exception (it auto-dismisses at
-10s), so it never blocks indefinitely. This is the intended "second one waits"
-behaviour; flagged here in case the blocking is stronger than wanted.
+toast stay until closed (no auto-dismiss). Because only one surface shows at a
+time and a second waits, a surface left unclosed defers the others *for as long as
+it is on that page*. Navigation clears it (above), so the blocking is bounded to a
+single page and never carries across pages. The prelude also auto-dismisses at
+10s. This is the intended "second one waits" behaviour.
 
 ---
 
@@ -148,8 +156,9 @@ behaviour; flagged here in case the blocking is stronger than wanted.
   find while it is up re-claims the slot (same id) and refreshes the count in
   place.
 - **Pages:** any page; positioned bottom-right on the live campaign styling
-  (`HiddenGamesToast.module.css:79-84`). It persists across navigation until
-  closed, so it holds the slot (and defers cards) until dismissed.
+  (`HiddenGamesToast.module.css:79-84`). It is cleared on client-side navigation
+  (`HiddenGamesToast.tsx:116-125`), so it holds the slot only for the page it
+  appears on and never blocks a card on the next page.
 - **Suppressed / deferred:** the completing (final) find shows no toast
   (`engine.ts:240-247`; the toast also guards `remaining <= 0`,
   `HiddenGamesToast.tsx:66`). Duplicate/unknown finds never fire it. Hat finds in
