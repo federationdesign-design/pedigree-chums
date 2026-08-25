@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Nav from "../../components/Nav/Nav";
 import Footer from "../../components/Footer/Footer";
+import CompetitionTitles from "../../components/CompetitionTitles/CompetitionTitles";
 import CompetitionTerms from "../../components/CompetitionTerms/CompetitionTerms";
 
 /* Spot your Chum competition page, first of the per-breed series (/findpug,
@@ -23,6 +24,8 @@ type CompetitionConfig = {
   seoTitle: string;
   /** Meta description. */
   seoDescription: string;
+  /** The two intro body lines beneath the "Have you spotted ..." question. */
+  introLines: string[];
 };
 
 const PUG: CompetitionConfig = {
@@ -30,6 +33,10 @@ const PUG: CompetitionConfig = {
   seoTitle: "Spot your Chum Photo Competition: Pug",
   seoDescription:
     "Have you spotted a Pug? Get a photo or selfie and share it on Instagram or TikTok to win an exclusive 3D printed Chum figurine.",
+  introLines: [
+    "Get a photo or selfie and share it on Instagram or TikTok.",
+    "This month, we will collect all submitted images and do a tombola raffle.",
+  ],
 };
 
 export const metadata: Metadata = {
@@ -46,8 +53,10 @@ export default function FindPugPage() {
     <>
       <Nav />
       <main>
-        {/* Hero, titles and intro, product strip, THE PRIZE and PRE-ORDER
-            land in later stages. Stage 2 proves the route and the terms. */}
+        {/* Hero (4a) and the icon row (4b) land in later stages, once the
+            supplied assets arrive. Stage 3 adds the titles + intro (4c). */}
+        <CompetitionTitles breed={PUG.breed} introLines={PUG.introLines} />
+        {/* Product strip, THE PRIZE and PRE-ORDER land in later stages. */}
         <CompetitionTerms />
       </main>
       <Footer />

@@ -1,0 +1,57 @@
+/* Titles + intro block, desktop-first (brief stage 3). The block sits on the
+   flat yellow field the mockup shows carrying down from under the hero photo. */
+
+.section {
+  background: var(--yellow, #ffd23e);
+  padding: clamp(24px, 4vw, 56px) clamp(24px, 6vw, 80px) clamp(32px, 5vw, 64px);
+  text-align: center;
+}
+.inner {
+  margin: 0 auto;
+}
+
+/* One heading, two visible lines. Luckiest Guy sits high in its em box, so a
+   line-height near 0.58 gives a visually tight ~0.9 leading and locks the two
+   lines together with the mockup's overlap (brief 4c). */
+.title {
+  font-family: var(--font-display, "Luckiest Guy", system-ui);
+  margin: 0;
+  line-height: 0.58;
+  text-transform: uppercase;
+}
+.line1,
+.line2 {
+  display: block;
+  font-size: clamp(3rem, 8vw, 7rem);
+  letter-spacing: 0.01em;
+  /* paint-order puts the stroke behind the fill, so the outline sits outside the
+     letterform instead of eating into it (single-element outline, no stacked
+     copy). */
+  paint-order: stroke fill;
+}
+/* SPOT YOUR CHUM: --blue fill, white outline. */
+.line1 {
+  color: var(--blue, #1497d6);
+  -webkit-text-stroke: clamp(4px, 0.8vw, 10px) #ffffff;
+}
+/* PHOTO COMPETITION: white fill, --navy outline. */
+.line2 {
+  color: #ffffff;
+  -webkit-text-stroke: clamp(4px, 0.8vw, 10px) var(--navy, #0a3a57);
+}
+
+.question {
+  font-family: Montserrat, sans-serif;
+  font-weight: 700;
+  color: var(--navy, #0a3a57);
+  font-size: clamp(1.3rem, 2.4vw, 2rem);
+  margin: clamp(20px, 2.4vw, 34px) 0 clamp(12px, 1.6vw, 20px);
+}
+.introBody {
+  font-family: Montserrat, sans-serif;
+  font-weight: 400;
+  color: var(--navy, #0a3a57);
+  font-size: clamp(1.05rem, 1.8vw, 1.4rem);
+  line-height: 1.4;
+  margin: 0 0 clamp(8px, 1vw, 14px);
+}
