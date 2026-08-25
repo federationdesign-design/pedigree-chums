@@ -263,3 +263,39 @@ Resolved 11 Aug 2026: `PLACEHOLDER_ARTICLE_5_PANEL`, `PLACEHOLDER_ARTICLE_5_DEK`
 `PLACEHOLDER_ARTICLE_6_DEK` are all filled with Steve's supplied copy and inlined
 in `slides.ts` (and the article page meta descriptions / the article 5 hero alt).
 No consts remain for them.
+
+## Spot your Chum competition terms (findpug build, 25 Aug 2026)
+
+Known duplicate, accepted by Steve. The competition terms now exist in two
+places: the live `app/chumspot/ChumSpotClient.tsx` `TERMS` array, and a
+byte-for-byte copy in the new shared `components/CompetitionTerms/CompetitionTerms.tsx`.
+`/chumspot` is live and was not touched in the same session as the `/findpug`
+build. Once `/findpug` is live and tested, Steve will decide whether to point
+`/chumspot` at the shared component and collapse the two copies to one.
+
+Two live production defects in that terms copy, present on `/chumspot` and now
+carried verbatim into `/findpug`. Both are to be fixed together, in their own
+push, NOT inside a build session:
+
+| Defect | Location | Meaning | Resolve via |
+|---|---|---|---|
+| `[PRIVACY POLICY LINK]` placeholder | Term 14, in both `ChumSpotClient.tsx` and `CompetitionTerms.tsx` | The Privacy Policy link text was never resolved to the real `/privacy` route; the literal bracket text ships to users | Steve, dedicated copy push across both pages |
+| Duplicated sentence | Term 2, in both `ChumSpotClient.tsx` and `CompetitionTerms.tsx` | "Each monthly round opens at 00:00 ... final calendar day of that month." appears twice | Steve, dedicated copy push across both pages |
+
+### Pre-order card render carries stale figures
+
+The `/findpug` PRE-ORDER block uses a static photographic product render (box +
+printed card on podiums), NOT a card generated from breed data at runtime. The
+height, length and weight printed on the card in that artwork are baked into the
+image, so:
+
+- The figures are currently WRONG and the artwork must be RE-EXPORTED once the
+  breed data fix lands. A data change alone does not touch the image.
+- Divergence risk, explicit: the interactive breed card in
+  `app/know-your-chums/BreedDialog.tsx` renders those same figures LIVE from the
+  data. When the data fix lands there, the live card will show the corrected
+  numbers while the baked pre-order artwork still shows the old ones, until the
+  artwork is re-exported to match. Ship the corrected render alongside, or the
+  two surfaces will disagree.
+- No pug pre-order asset exists in `public/` yet; Steve is supplying it
+  separately. It is a per-page (breed-specific) config field, not shared.

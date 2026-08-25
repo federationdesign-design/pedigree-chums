@@ -1,0 +1,105 @@
+/* Shared terms section styling. Copied verbatim from the terms rules in
+   app/chumspot/page.module.css (Steve, 25 Aug 2026) so the shared component
+   renders identically to the live /chumspot terms. Self-contained: only the
+   selectors the terms section uses are here. */
+
+.termsSection {
+  padding: clamp(20px, 3vw, 40px) clamp(24px, 6vw, 80px);
+  background: #0a3a57; /* fully solid navy */
+}
+.inner {
+  /* Fully liquid, no width cap; the section owns the side gutters. */
+  margin: 0 auto;
+}
+/* 50px of space above the "Spot your Chum: Full Competition Terms" title. */
+.termsSection .inner {
+  padding-top: 50px;
+}
+.termsSectionTitle {
+  font-family: var(--font-display, "Luckiest Guy", system-ui);
+  font-size: clamp(3.2rem, 7vw, 5.6rem);
+  color: var(--yellow, #ffd23e);
+  margin: 0 0 clamp(24px, 4vw, 48px);
+  text-align: center;
+  line-height: 1.1;
+}
+.termsSectionTitleWhite {
+  color: #ffffff;
+}
+.termsGrid {
+  display: grid;
+  /* Fixed 3 columns at all desktop widths; collapses to 1fr at 640px below. */
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(12px, 2vw, 20px);
+  margin-bottom: clamp(32px, 5vw, 56px);
+}
+.termCard {
+  border-radius: 18px;
+  padding: clamp(20px, 3vw, 32px);
+  position: relative;
+}
+.termCardYellow {
+  background: var(--yellow, #ffd23e);
+}
+.termCardWhite {
+  background: #ffffff;
+}
+.termNum {
+  font-family: var(--font-display, "Luckiest Guy", system-ui);
+  font-size: clamp(2.5rem, 5vw, 3.5rem);
+  line-height: 1;
+  display: block;
+  margin-bottom: 8px;
+  opacity: 1;
+}
+.termCardYellow .termNum {
+  color: var(--navy, #0a3a57);
+}
+.termCardWhite .termNum {
+  color: var(--yellow, #ffd23e);
+}
+.termTitle {
+  font-family: var(--font-display, "Luckiest Guy", system-ui);
+  font-size: clamp(1.1rem, 2vw, 1.5rem);
+  color: var(--navy, #0a3a57);
+  margin: 0 0 clamp(10px, 1.5vw, 16px);
+  line-height: 1.15;
+}
+.termBody {
+  font-family: Montserrat, sans-serif;
+  font-size: clamp(0.85rem, 1vw, 0.97rem);
+  font-weight: 500;
+  color: var(--navy, #0a3a57);
+  line-height: 1.3;
+  margin: 0;
+}
+.termList {
+  padding-left: 18px;
+  margin: 0;
+}
+.termList li {
+  font-family: Montserrat, sans-serif;
+  font-size: clamp(0.85rem, 1vw, 0.97rem);
+  font-weight: 500;
+  color: var(--navy, #0a3a57);
+  line-height: 1.3;
+  margin-bottom: 4px;
+}
+.contactNote {
+  font-size: clamp(0.85rem, 1.3vw, 1rem);
+  color: #ffffff; /* on the solid navy panel -> white (~11.9:1) */
+  text-align: center;
+  line-height: 1.6;
+}
+.contactNote strong {
+  color: #ffffff;
+}
+.contactLink {
+  color: #ffffff;
+}
+
+@media (max-width: 640px) {
+  .termsGrid {
+    grid-template-columns: 1fr;
+  }
+}
