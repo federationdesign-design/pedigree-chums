@@ -7,6 +7,9 @@
   left: 50%;
   transform: translateX(-50%);
   z-index: 2000;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
   max-width: min(360px, calc(100vw - 24px));
   padding: 12px 18px;
   border-radius: var(--radius-pill, 999px);
@@ -89,5 +92,38 @@
     border-width: 2px;
     white-space: normal;
     max-width: calc(100vw - 24px);
+  }
+}
+
+/* Close control (Task B): the toast now stays until dismissed, so it carries an
+   X. Red-icon SVG, matching the cards' close button. */
+.toastText {
+  flex: 1 1 auto;
+}
+.close {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+.closeIcon {
+  width: 16px;
+  height: 16px;
+  display: block;
+}
+@media (max-width: 768px) {
+  .close {
+    width: 18px;
+    height: 18px;
+  }
+  .closeIcon {
+    width: 13px;
+    height: 13px;
   }
 }

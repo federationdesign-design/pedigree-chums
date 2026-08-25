@@ -7,15 +7,22 @@
 // once-only flags:
 //   page 1        the plain counter only, neither card
 //   from page 2   the prelude card on the first such page where prelude_seen is
-//                 false, 5s after the page loads
+//                 false, immediately as the page loads (auto-dismisses after 10s,
+//                 and also has a close X)
 //   from page 3   the introduction card on the first such page where intro_seen
-//                 is false, 5s after the page loads
+//                 is false, 10s after the page loads (stays until the visitor
+//                 closes it)
 // The prelude takes precedence, so the two never share a page: a visitor who
-// leaves page 2 within the 5s gets the prelude on page 3 and the introduction on
-// page 4. Each card shows once only (prelude_seen / intro_seen), marked seen the
-// moment it appears, and stays until the visitor closes it, then the counter
-// returns. The page tally is counted per pathname, since the root layout
-// persists across client-side navigations.
+// leaves page 2 before the prelude has shown gets the prelude on page 3 and the
+// introduction on page 4. Each card shows once only (prelude_seen / intro_seen),
+// marked seen the moment it appears. The page tally is counted per pathname,
+// since the root layout persists across client-side navigations.
+//
+// Task B collision guard: every card claims the single campaign slot
+// (surfaceLock) before it shows and releases it when dismissed, so a card and
+// the discovery toast can never be on screen together; whichever is second
+// waits for the slot to free. The counter's `phase` still serialises the cards
+// relative to one another.
 //
 // Lifecycle (suspended/closed/hidden) and completion take precedence over the
 // cards. The palette is the campaign palette (C03).
@@ -40,13 +47,21 @@ import {
   PRELUDE_HEADING,
 } from "../../lib/hiddenGames/copy";
 import { getScheme, getHideImages, CONTRAST_EVENT } from "../../lib/contrastScheme";
+import {
+  claimSurface,
+  releaseSurface,
+  subscribeSurfaceFree,
+  CARD_SURFACE,
+} from "../../lib/hiddenGames/surfaceLock";
 import { fireConfetti } from "../../lib/confetti";
 import styles from "./HiddenGamesCounter.module.css";
 
-const CARD_AT = 5000; // a card appears 5s after its page loads (C03 timing)
+const PRELUDE_AT = 0; // the prelude appears immediately on its eligible page
+const PRELUDE_DISMISS_MS = 10000; // ...and auto-dismisses after 10s (also has an X)
+const INTRO_AT = 10000; // the introduction appears 10s into its eligible page
+const COMPLETION_AT = 2000; // the completion celebration appears 2s after completing
 const PRELUDE_FROM_PAGE = 2; // earliest page the prelude may appear on
 const INTRO_FROM_PAGE = 3; // earliest page the introduction may appear on
-const COMPLETION_TIMEOUT_MS = 10000; // D11 completion auto-collapse
 
 // The Main Pit (the home route) is on screen and being played: PackPit sets this
 // body flag while it is mounted. A prelude or introduction card must not appear
@@ -124,8 +139,20 @@ export default function HiddenGamesCounter() {
   const [minimised, setMinimised] = useState(true);
   const [blockedDismissed, setBlockedDismissed] = useState(false);
   const [completionCollapsed, setCompletionCollapsed] = useState(false);
+  const [completionVisible, setCompletionVisible] = useState(false);
   const [phase, setPhase] = useState<Phase>("pending");
   const visibleTracked = useRef(false);
+  // Campaign-slot bookkeeping (Task B). cardHeldRef: this component currently
+  // holds the single slot for a card or the celebration. pendingCardRef: a card
+  // due while the slot was taken (by the toast), waiting to be shown when it
+  // frees. pendingCompletionRef: the celebration waiting the same way.
+  // preludeDismissRef: the prelude's 10s auto-dismiss timer.
+  const cardHeldRef = useRef(false);
+  const pendingCardRef = useRef<
+    { target: "prelude" | "intro"; mark: () => void; autoDismissMs?: number } | null
+  >(null);
+  const pendingCompletionRef = useRef(false);
+  const preludeDismissRef = useRef<number | null>(null);
   // The page number counted for the current pathname. Remembered so a re-run of
   // the effect for the same page (React strict mode double-invokes it, cleanup
   // in between) reuses the number instead of counting the page twice.
@@ -153,12 +180,64 @@ export default function HiddenGamesCounter() {
     fireConfetti({ particleCount: 90, spread: 120, startVelocity: 44, origin: { x, y } });
   }, []);
 
-  // Card reveal (C03). Re-runs on each navigation (the root layout persists, so
-  // this component is not remounted per page). Reads the engine directly, not the
-  // reactive state, so find-driven re-renders never restart a card's timer.
+  // ---- Campaign-slot helpers (Task B) --------------------------------------
+  const clearPreludeDismiss = useCallback(() => {
+    if (preludeDismissRef.current != null) {
+      window.clearTimeout(preludeDismissRef.current);
+      preludeDismissRef.current = null;
+    }
+  }, []);
+
+  // Release the single campaign slot if this component holds it, and clear the
+  // prelude's auto-dismiss timer.
+  const releaseCard = useCallback(() => {
+    clearPreludeDismiss();
+    if (cardHeldRef.current) {
+      cardHeldRef.current = false;
+      releaseSurface(CARD_SURFACE);
+    }
+  }, [clearPreludeDismiss]);
+
+  // Show a card if the slot is free; otherwise remember it and wait
+  // (subscribeSurfaceFree retries when the slot frees). A prelude also arms its
+  // 10s auto-dismiss.
+  const showCard = useCallback(
+    (target: "prelude" | "intro", mark: () => void, autoDismissMs?: number) => {
+      if (!claimSurface(CARD_SURFACE)) {
+        pendingCardRef.current = { target, mark, autoDismissMs };
+        setPhase("counter"); // wait behind the toast; the counter shows meanwhile
+        return;
+      }
+      cardHeldRef.current = true;
+      pendingCardRef.current = null;
+      setPhase(target);
+      mark();
+      if (autoDismissMs != null) {
+        clearPreludeDismiss();
+        preludeDismissRef.current = window.setTimeout(() => {
+          releaseCard();
+          setPhase("counter");
+        }, autoDismissMs);
+      }
+    },
+    [clearPreludeDismiss, releaseCard]
+  );
+
+  // Dismiss a showing card via its X: free the slot and return to the counter.
+  const dismissCard = useCallback(() => {
+    releaseCard();
+    setPhase("counter");
+  }, [releaseCard]);
+
+  // Card reveal (C03 + Task B). Re-runs on each navigation (the root layout
+  // persists, so this component is not remounted per page). Reads the engine
+  // directly, not the reactive state, so find-driven re-renders never restart a
+  // card's timer. Navigation first ends any card on screen and frees the slot.
   useEffect(() => {
     const engine = getHiddenGamesEngine();
     const s = engine.getState();
+    releaseCard();
+    pendingCardRef.current = null;
     if (s.view !== "counter") {
       setPhase("counter"); // a lifecycle view (suspended/closed): show now
       return;
@@ -184,9 +263,8 @@ export default function HiddenGamesCounter() {
           setPhase("counter");
           return;
         }
-        setPhase("prelude");
-        engine.markPreludeSeen(); // once only, even if they leave before closing
-      }, CARD_AT);
+        showCard("prelude", () => engine.markPreludeSeen(), PRELUDE_DISMISS_MS);
+      }, PRELUDE_AT);
       return () => window.clearTimeout(t);
     }
     if (page >= INTRO_FROM_PAGE && !s.introSeen) {
@@ -196,26 +274,70 @@ export default function HiddenGamesCounter() {
           setPhase("counter"); // held for a later page, as the prelude is
           return;
         }
-        setPhase("intro");
-        engine.markIntroSeen();
-      }, CARD_AT);
+        showCard("intro", () => engine.markIntroSeen());
+      }, INTRO_AT);
       return () => window.clearTimeout(t);
     }
     setPhase("counter"); // no card due on this page: counter only
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
 
   const collapseCompletion = () => {
     setCompletionCollapsed(true);
+    setCompletionVisible(false);
+    if (cardHeldRef.current) {
+      cardHeldRef.current = false;
+      releaseSurface(CARD_SURFACE);
+    }
     getHiddenGamesEngine().markCompletionSeen();
   };
 
-  // Completion celebration auto-collapse (D11).
+  // Completion celebration (D11 + Task B): 2s after the set completes, show the
+  // celebration if the slot is free, else wait for it. It stays until the visitor
+  // closes it (no auto-collapse); dismissing it frees the slot.
   useEffect(() => {
     if (!(state?.completed && !state?.completionSeen && !completionCollapsed)) return;
-    const t = window.setTimeout(collapseCompletion, COMPLETION_TIMEOUT_MS);
+    const t = window.setTimeout(() => {
+      if (claimSurface(CARD_SURFACE)) {
+        clearPreludeDismiss(); // completion reuses CARD_SURFACE: cancel a prelude's
+        // stale auto-dismiss so it cannot release the slot under the celebration
+        cardHeldRef.current = true;
+        pendingCompletionRef.current = false;
+        setCompletionVisible(true);
+      } else {
+        pendingCompletionRef.current = true; // wait behind the toast
+      }
+    }, COMPLETION_AT);
     return () => window.clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state?.completed, state?.completionSeen, completionCollapsed]);
+
+  // Task B: when the slot frees, show whichever card or celebration was waiting.
+  useEffect(() => {
+    return subscribeSurfaceFree(() => {
+      const pc = pendingCardRef.current;
+      if (pc && claimSurface(CARD_SURFACE)) {
+        cardHeldRef.current = true;
+        pendingCardRef.current = null;
+        setPhase(pc.target);
+        pc.mark();
+        if (pc.autoDismissMs != null) {
+          clearPreludeDismiss();
+          preludeDismissRef.current = window.setTimeout(() => {
+            releaseCard();
+            setPhase("counter");
+          }, pc.autoDismissMs);
+        }
+        return;
+      }
+      if (pendingCompletionRef.current && claimSurface(CARD_SURFACE)) {
+        clearPreludeDismiss();
+        pendingCompletionRef.current = false;
+        cardHeldRef.current = true;
+        setCompletionVisible(true);
+      }
+    });
+  }, [clearPreludeDismiss, releaseCard]);
 
   // Campaign visible (measurement) once, when the campaign first shows something.
   useEffect(() => {
@@ -267,7 +389,7 @@ export default function HiddenGamesCounter() {
 
   // Completion (2/2): celebration once, then a persistent completed chip.
   if (state.completed) {
-    if (!state.completionSeen && !completionCollapsed) {
+    if (!state.completionSeen && !completionCollapsed && completionVisible) {
       return (
         <div ref={setAnchor} className={styles.completed} role="status" aria-live="polite">
           <button
@@ -305,7 +427,7 @@ export default function HiddenGamesCounter() {
           type="button"
           className={styles.preludeClose}
           onClick={() => {
-            setPhase("counter");
+            dismissCard();
             getHiddenGamesEngine().markPreludeSeen();
           }}
           aria-label="Close"
@@ -321,7 +443,7 @@ export default function HiddenGamesCounter() {
       <div className={styles.intro} role="status" aria-live="polite">
         <span className={styles.introScore}><span className={styles.introScoreNum}>{state.count}/{state.total}</span><span className={styles.introScoreWord}>games found</span></span>
         <p className={styles.introLine}>{CAMPAIGN_INTRO}<br /><span className={styles.introEmphasis}>{CAMPAIGN_INTRO_EMPHASIS}</span></p>
-        <button type="button" className={styles.preludeClose} onClick={() => { setPhase("counter"); getHiddenGamesEngine().markIntroSeen(); }} aria-label="Close">
+        <button type="button" className={styles.preludeClose} onClick={() => { dismissCard(); getHiddenGamesEngine().markIntroSeen(); }} aria-label="Close">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img className={styles.redIcon} src="/red-icon.svg" alt="" />
         </button>
