@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Nav from "../../components/Nav/Nav";
 import Footer from "../../components/Footer/Footer";
 import CompetitionHero from "../../components/CompetitionHero/CompetitionHero";
+import CompetitionIconRow from "../../components/CompetitionIconRow/CompetitionIconRow";
 import CompetitionTitles from "../../components/CompetitionTitles/CompetitionTitles";
 import CompetitionProductStrip from "../../components/CompetitionProductStrip/CompetitionProductStrip";
 import CompetitionTerms from "../../components/CompetitionTerms/CompetitionTerms";
@@ -102,8 +103,10 @@ export default function FindPugPage() {
           alt={PUG.hero.alt}
           still={PUG.hero.still}
         />
-        {/* The icon row (4b) lands once the supplied social/silhouette SVGs
-            arrive. Stage 3 added the titles + intro (4c). */}
+        {/* Icon row (4b): spot, Snap, logo, TikTok, Instagram. Sits on the same
+            yellow field as the titles below. */}
+        <CompetitionIconRow />
+        {/* Stage 3 added the titles + intro (4c). */}
         <CompetitionTitles breed={PUG.breed} introLines={PUG.introLines} />
         {/* Stage 4: desktop product image strip. */}
         <CompetitionProductStrip hand={PUG.productStrip.hand} shots={PUG.productStrip.shots} />
