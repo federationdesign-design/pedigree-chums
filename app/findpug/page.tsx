@@ -26,8 +26,9 @@ type CompetitionConfig = {
   seoTitle: string;
   /** Meta description. */
   seoDescription: string;
-  /** Hero video (brief 4a): WIN ME badge and breed name are baked into it. */
-  hero: { video: string; poster: string; alt: string };
+  /** Hero video (brief 4a): WIN ME badge and breed name are baked into it.
+      `still` forces the poster and skips the video (see the note on PUG.hero). */
+  hero: { video: string; poster: string; alt: string; still?: boolean };
   /** The two intro body lines beneath the "Have you spotted ..." question. */
   introLines: string[];
   /** Product image strip (brief 4d): the hand shot plus three product shots. */
@@ -46,6 +47,13 @@ const PUG: CompetitionConfig = {
     video: "/competitions/pug/video-start.mp4",
     poster: "/competitions/pug/video-start.jpg",
     alt: "Win me: a blue 3D printed Pug figurine on a yellow podium labelled Pug, against blue and cream arches",
+    /* Poster only for now. The supplied video-start.mp4 export is the wrong cut:
+       the clean hero holds for ~1.8s, then it runs into behind-the-scenes studio
+       footage (a presenter, softbox lights, the set edge) before a pre-order
+       reveal, none of which is a hero. The file and path stay wired; when the
+       correct hero export replaces video-start.mp4, set still to false (or drop
+       this line) and motion returns with no code change (Steve, 26 Aug 2026). */
+    still: true,
   },
   introLines: [
     "Get a photo or selfie and share it on Instagram or TikTok.",
@@ -88,7 +96,12 @@ export default function FindPugPage() {
       <Nav />
       <main>
         {/* Stage 6: hero video (WIN ME and breed name baked in). */}
-        <CompetitionHero video={PUG.hero.video} poster={PUG.hero.poster} alt={PUG.hero.alt} />
+        <CompetitionHero
+          video={PUG.hero.video}
+          poster={PUG.hero.poster}
+          alt={PUG.hero.alt}
+          still={PUG.hero.still}
+        />
         {/* The icon row (4b) lands once the supplied social/silhouette SVGs
             arrive. Stage 3 added the titles + intro (4c). */}
         <CompetitionTitles breed={PUG.breed} introLines={PUG.introLines} />

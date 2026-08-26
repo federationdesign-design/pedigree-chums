@@ -22,9 +22,14 @@ type Props = {
   poster: string;
   /** Alt for the poster still (describes the baked scene). */
   alt: string;
+  /** Force the poster still and never load the video (config kill switch).
+      Used while the supplied export is the wrong cut: setting this false (once a
+      correct hero export is in place at `video`) re-enables motion, no code
+      change. */
+  still?: boolean;
 };
 
-export default function CompetitionHero({ video, poster, alt }: Props) {
+export default function CompetitionHero({ video, poster, alt, still = false }: Props) {
   // Default to the poster (motion off) so reduced-motion users never trigger a
   // download or an autoplay flash before the media query is read on mount.
   const [motion, setMotion] = useState(false);
@@ -40,7 +45,7 @@ export default function CompetitionHero({ video, poster, alt }: Props) {
   return (
     <section className={styles.hero}>
       <div className={styles.frame}>
-        {motion ? (
+        {motion && !still ? (
           <video
             className={styles.media}
             src={video}
