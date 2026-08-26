@@ -10,13 +10,15 @@
   margin: 0 auto;
 }
 
-/* One heading, two visible lines. Luckiest Guy sits high in its em box, so a
-   line-height near 0.58 gives a visually tight ~0.9 leading and locks the two
-   lines together with the mockup's overlap (brief 4c). */
+/* One heading, two visible lines. Luckiest Guy sits high in its em box, so the
+   leading is tighter than the type size suggests. 0.58 was too tight at the
+   current size: PHOTO COMPETITION rode up into SPOT YOUR CHUM and clipped its
+   descenders. 0.72 keeps the two lines locked with the mockup's overlap but
+   clears the collision (Steve, 26 Aug 2026, brief 4c). */
 .title {
   font-family: var(--font-display, "Luckiest Guy", system-ui);
   margin: 0;
-  line-height: 0.58;
+  line-height: 0.72;
   text-transform: uppercase;
 }
 .line1,
@@ -31,17 +33,18 @@
      copy). */
   paint-order: stroke fill;
 }
-/* SPOT YOUR CHUM: --blue fill (closest token to the concept blue #2485ee and to
-   the logo), fine white keyline. Stroke thinned from clamp(4px,0.8vw,10px) so the
-   blue reads at full strength rather than washed out (Steve, 26 Aug 2026). */
+/* SPOT YOUR CHUM: --blue-deep fill, the deep brand blue that matches the logo
+   and the sampled mockup heading. The previous --blue (#1497d6) read as sky blue.
+   Keyline thinned to a hairline (was clamp(1.5px,0.2vw,3px)) so it reads as a fine
+   outline, not a heavy border (Steve, 26 Aug 2026). */
 .line1 {
-  color: var(--blue, #1497d6);
-  -webkit-text-stroke: clamp(1.5px, 0.2vw, 3px) #ffffff;
+  color: var(--blue-deep, #0b78bd);
+  -webkit-text-stroke: clamp(1px, 0.12vw, 1.5px) #ffffff;
 }
-/* PHOTO COMPETITION: white fill, fine --navy keyline. */
+/* PHOTO COMPETITION: white fill, fine --navy hairline keyline. */
 .line2 {
   color: #ffffff;
-  -webkit-text-stroke: clamp(1.5px, 0.2vw, 3px) var(--navy, #0a3a57);
+  -webkit-text-stroke: clamp(1px, 0.12vw, 1.5px) var(--navy, #0a3a57);
 }
 
 .question {
