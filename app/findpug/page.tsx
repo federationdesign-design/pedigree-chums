@@ -7,6 +7,7 @@ import CompetitionTitles from "../../components/CompetitionTitles/CompetitionTit
 import CompetitionProductStrip from "../../components/CompetitionProductStrip/CompetitionProductStrip";
 import CompetitionPreorder from "../../components/CompetitionPreorder/CompetitionPreorder";
 import CompetitionTerms from "../../components/CompetitionTerms/CompetitionTerms";
+import { SPOT_YOUR_CHUM_TERMS } from "../../components/CompetitionTerms/spotYourChumTerms";
 
 /* Spot your Chum competition page, first of the per-breed series (/findpug,
    /findbeagle and so on). Every breed-specific value lives in the config object
@@ -120,7 +121,7 @@ export default function FindPugPage() {
         <CompetitionProductStrip hand={PUG.productStrip.hand} shots={PUG.productStrip.shots} />
         {/* Pre-order block (4e): full-width composed artwork. */}
         <CompetitionPreorder src={PUG.preorder.src} alt={PUG.preorder.alt} />
-        <CompetitionTerms />
+        <CompetitionTerms terms={SPOT_YOUR_CHUM_TERMS} />
       </main>
       <Footer />
     </>
