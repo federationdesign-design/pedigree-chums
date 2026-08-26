@@ -63,3 +63,15 @@
   color: var(--navy, #0a3a57);
   transform: translateY(-2px);
 }
+
+/* Mobile (approved 26 Aug 2026, option B). Drop only the decorative spot mark;
+   keep the centre logo and the TikTok/Instagram links. This row is the ONLY place
+   the platform links exist (the footer carries no socials), and the entry copy
+   sends users to both platforms, so the links must stay on mobile even though the
+   mockup's icon row shows the logo alone. Placed after the base rules so the
+   override is not silently dropped. */
+@media (max-width: 768px) {
+  .icon {
+    display: none;
+  }
+}
