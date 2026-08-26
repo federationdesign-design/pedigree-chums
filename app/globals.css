@@ -13,6 +13,7 @@ html {
   --blue: #1497d6;        /* primary section blue */
   --blue-deep: #0b78bd;   /* darker blue for depth */
   --blue-sky: #5cc4ee;    /* lighter sky blue */
+  --blue-royal: #2a65d6;  /* competition heading blue (Spot your Chum), shared across breed pages */
   --cyan: #45cfef;        /* card / bright accent */
   --yellow: #ffd23e;      /* punchy accent */
   --navy: #0a3a57;        /* dark text */

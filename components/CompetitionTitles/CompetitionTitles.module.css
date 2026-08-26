@@ -11,14 +11,14 @@
 }
 
 /* One heading, two visible lines. Luckiest Guy sits high in its em box, so the
-   leading is tighter than the type size suggests. 0.58 was too tight at the
-   current size: PHOTO COMPETITION rode up into SPOT YOUR CHUM and clipped its
-   descenders. 0.72 keeps the two lines locked with the mockup's overlap but
-   clears the collision (Steve, 26 Aug 2026, brief 4c). */
+   leading is tighter than the type size suggests. Walked open across live checks
+   (0.58 clipped, 0.72, 0.80) to 0.90, which gives clear air between SPOT YOUR
+   CHUM and PHOTO COMPETITION while still reading as one lockup (Steve, 26 Aug
+   2026, brief 4c). */
 .title {
   font-family: var(--font-display, "Luckiest Guy", system-ui);
   margin: 0;
-  line-height: 0.72;
+  line-height: 0.9;
   text-transform: uppercase;
 }
 .line1,
@@ -28,23 +28,22 @@
      to match the concept proportions (Steve, live check 26 Aug 2026). */
   font-size: clamp(2.4rem, 6vw, 5rem);
   letter-spacing: 0.01em;
-  /* paint-order puts the stroke behind the fill, so the outline sits outside the
-     letterform instead of eating into it (single-element outline, no stacked
-     copy). */
-  paint-order: stroke fill;
+  /* No stroke/keyline on either line (Steve, 26 Aug 2026): the letters read as
+     solid fills, lifted off the flat yellow by a soft drop shadow alone. filter
+     (not text-shadow) shadows the whole letterform as one shape; 2px offset, 6px
+     blur, solid --navy (no rgba, per the no-rgba-on-text rule) for a subtle lift,
+     not a hard offset. */
+  filter: drop-shadow(0 2px 6px var(--navy, #0a3a57));
 }
-/* SPOT YOUR CHUM: --blue-deep fill, the deep brand blue that matches the logo
-   and the sampled mockup heading. The previous --blue (#1497d6) read as sky blue.
-   Keyline thinned to a hairline (was clamp(1.5px,0.2vw,3px)) so it reads as a fine
-   outline, not a heavy border (Steve, 26 Aug 2026). */
+/* SPOT YOUR CHUM: --blue-royal fill, the shared competition-heading blue
+   (globals.css, #2a65d6). No keyline. */
 .line1 {
-  color: var(--blue-deep, #0b78bd);
-  -webkit-text-stroke: clamp(1px, 0.12vw, 1.5px) #ffffff;
+  color: var(--blue-royal, #2a65d6);
 }
-/* PHOTO COMPETITION: white fill, fine --navy hairline keyline. */
+/* PHOTO COMPETITION: white fill, no keyline (the drop shadow defines it against
+   the yellow). */
 .line2 {
   color: #ffffff;
-  -webkit-text-stroke: clamp(1px, 0.12vw, 1.5px) var(--navy, #0a3a57);
 }
 
 .question {
@@ -52,7 +51,10 @@
   font-weight: 700;
   color: var(--navy, #0a3a57);
   font-size: clamp(1.3rem, 2.4vw, 2rem);
-  margin: clamp(20px, 2.4vw, 34px) 0 clamp(12px, 1.6vw, 20px);
+  /* More room above the question than the first pass (was clamp(20px,2.4vw,34px))
+     so PHOTO COMPETITION and "Have you spotted ..." are not crowded (Steve, 26
+     Aug 2026). */
+  margin: clamp(32px, 4vw, 56px) 0 clamp(12px, 1.6vw, 20px);
 }
 .introBody {
   font-family: Montserrat, sans-serif;
