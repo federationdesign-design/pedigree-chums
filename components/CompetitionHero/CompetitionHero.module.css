@@ -57,6 +57,16 @@
   .posterMobile {
     display: block;
   }
+  /* Crop ~4px off the top and bottom of the mobile media to hide an artefact edge
+     on the portrait video (and keep the poster matched to it). Grow the media 8px
+     and shift up 4px so the frame's overflow:hidden clips 4px off each end while
+     the frame stays filled. CSS-only, so the source stays clean (Steve, 26 Aug
+     2026). */
+  .media {
+    top: -4px;
+    bottom: auto;
+    height: calc(100% + 8px);
+  }
 }
 
 /* Sound toggle, bottom-right of the video. A --comp-yellow pill with a navy
