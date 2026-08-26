@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Nav from "../../components/Nav/Nav";
 import Footer from "../../components/Footer/Footer";
+import CompetitionHero from "../../components/CompetitionHero/CompetitionHero";
 import CompetitionTitles from "../../components/CompetitionTitles/CompetitionTitles";
 import CompetitionProductStrip from "../../components/CompetitionProductStrip/CompetitionProductStrip";
 import CompetitionTerms from "../../components/CompetitionTerms/CompetitionTerms";
@@ -25,6 +26,8 @@ type CompetitionConfig = {
   seoTitle: string;
   /** Meta description. */
   seoDescription: string;
+  /** Hero video (brief 4a): WIN ME badge and breed name are baked into it. */
+  hero: { video: string; poster: string; alt: string };
   /** The two intro body lines beneath the "Have you spotted ..." question. */
   introLines: string[];
   /** Product image strip (brief 4d): the hand shot plus three product shots. */
@@ -39,6 +42,11 @@ const PUG: CompetitionConfig = {
   seoTitle: "Spot your Chum Photo Competition: Pug",
   seoDescription:
     "Have you spotted a Pug? Get a photo or selfie and share it on Instagram or TikTok to win an exclusive 3D printed Chum figurine.",
+  hero: {
+    video: "/competitions/pug/video-start.mp4",
+    poster: "/competitions/pug/video-start.jpg",
+    alt: "Win me: a blue 3D printed Pug figurine on a yellow podium labelled Pug, against blue and cream arches",
+  },
   introLines: [
     "Get a photo or selfie and share it on Instagram or TikTok.",
     "This month, we will collect all submitted images and do a tombola raffle.",
@@ -79,8 +87,10 @@ export default function FindPugPage() {
     <>
       <Nav />
       <main>
-        {/* Hero (4a) and the icon row (4b) land in later stages, once the
-            supplied assets arrive. Stage 3 adds the titles + intro (4c). */}
+        {/* Stage 6: hero video (WIN ME and breed name baked in). */}
+        <CompetitionHero video={PUG.hero.video} poster={PUG.hero.poster} alt={PUG.hero.alt} />
+        {/* The icon row (4b) lands once the supplied social/silhouette SVGs
+            arrive. Stage 3 added the titles + intro (4c). */}
         <CompetitionTitles breed={PUG.breed} introLines={PUG.introLines} />
         {/* Stage 4: desktop product image strip. */}
         <CompetitionProductStrip hand={PUG.productStrip.hand} shots={PUG.productStrip.shots} />
