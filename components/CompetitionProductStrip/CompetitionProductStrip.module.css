@@ -1,0 +1,42 @@
+/* Desktop product strip (brief stage 4). Sits on the same flat yellow field the
+   titles carry down. The hand bleeds off the left edge; the three shots sit in
+   white rounded cards filling the width to the right gutter. Mobile pass later. */
+
+.section {
+  background: var(--yellow, #ffd23e);
+  overflow: hidden; /* clips the hand where it bleeds off the left edge */
+  padding: clamp(16px, 2.5vw, 40px) 0;
+}
+.strip {
+  display: flex;
+  align-items: center;
+  gap: clamp(16px, 2vw, 32px);
+  /* No left gutter (the hand bleeds); right gutter matches the other sections. */
+  padding-right: clamp(24px, 6vw, 80px);
+}
+.hand {
+  flex: 0 0 auto;
+  width: clamp(260px, 26vw, 520px);
+  height: auto;
+  display: block;
+  /* Pull the wrist off the left edge for the bleed. */
+  margin-left: clamp(-70px, -3vw, -20px);
+}
+.cards {
+  flex: 1 1 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(12px, 1.5vw, 24px);
+}
+.card {
+  position: relative; /* containing block for the fill image */
+  background: #ffffff;
+  border-radius: 24px;
+  overflow: hidden;
+  aspect-ratio: 1 / 1;
+}
+.cardImg {
+  /* next/image fill positions it absolute inset:0; the shots carry their own
+     white margin, so contain centres the figurine with breathing room. */
+  object-fit: contain;
+}

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Nav from "../../components/Nav/Nav";
 import Footer from "../../components/Footer/Footer";
 import CompetitionTitles from "../../components/CompetitionTitles/CompetitionTitles";
+import CompetitionProductStrip from "../../components/CompetitionProductStrip/CompetitionProductStrip";
 import CompetitionTerms from "../../components/CompetitionTerms/CompetitionTerms";
 
 /* Spot your Chum competition page, first of the per-breed series (/findpug,
@@ -26,6 +27,11 @@ type CompetitionConfig = {
   seoDescription: string;
   /** The two intro body lines beneath the "Have you spotted ..." question. */
   introLines: string[];
+  /** Product image strip (brief 4d): the hand shot plus three product shots. */
+  productStrip: {
+    hand: { src: string; alt: string };
+    shots: { src: string; alt: string }[];
+  };
 };
 
 const PUG: CompetitionConfig = {
@@ -37,6 +43,26 @@ const PUG: CompetitionConfig = {
     "Get a photo or selfie and share it on Instagram or TikTok.",
     "This month, we will collect all submitted images and do a tombola raffle.",
   ],
+  productStrip: {
+    hand: {
+      src: "/competitions/pug/hand.png",
+      alt: "A hand holding the small blue 3D printed Pug figurine, showing how it fits in the palm",
+    },
+    shots: [
+      {
+        src: "/competitions/pug/blue-orig1.jpg",
+        alt: "The blue 3D printed Pug figurine facing forward, sitting",
+      },
+      {
+        src: "/competitions/pug/blue-orig2.jpg",
+        alt: "The blue 3D printed Pug figurine from a three-quarter angle",
+      },
+      {
+        src: "/competitions/pug/blue-orig3.jpg",
+        alt: "The blue 3D printed Pug figurine turned slightly to one side",
+      },
+    ],
+  },
 };
 
 export const metadata: Metadata = {
@@ -56,7 +82,9 @@ export default function FindPugPage() {
         {/* Hero (4a) and the icon row (4b) land in later stages, once the
             supplied assets arrive. Stage 3 adds the titles + intro (4c). */}
         <CompetitionTitles breed={PUG.breed} introLines={PUG.introLines} />
-        {/* Product strip, THE PRIZE and PRE-ORDER land in later stages. */}
+        {/* Stage 4: desktop product image strip. */}
+        <CompetitionProductStrip hand={PUG.productStrip.hand} shots={PUG.productStrip.shots} />
+        {/* THE PRIZE and PRE-ORDER land in later stages. */}
         <CompetitionTerms />
       </main>
       <Footer />
