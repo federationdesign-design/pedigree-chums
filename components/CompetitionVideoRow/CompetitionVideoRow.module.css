@@ -6,8 +6,9 @@
 
 .section {
   background: var(--comp-yellow, #f9dd3b);
-  /* No horizontal padding: the row spans the full page width, not a container. */
-  padding: clamp(24px, 4vw, 56px) 0;
+  /* 20px side gutters so the row is not flush to the screen edges (and the drop
+     shadow has room to show at the outer columns). */
+  padding: clamp(24px, 4vw, 56px) 20px;
 }
 .row {
   /* Lifted above the pre-order band so the three videos sit over its lower edge:
@@ -24,15 +25,24 @@
   position: relative;
   aspect-ratio: 3 / 4;
   border-radius: 16px;
-  overflow: hidden;
+  overflow: hidden; /* clips the oversized iframe below -> the 4px crop */
   background: #000; /* behind the Vimeo player while it loads */
-  box-shadow: 0 18px 36px rgba(10, 58, 87, 0.32); /* --navy tinted drop shadow */
+  /* 5px white stroke on the OUTER edge of the cropped video: with box-sizing
+     border-box the overflow clip is at the padding box (inside the border), so the
+     border rings the cropped result, not the uncropped iframe. */
+  border: 5px solid #fff;
+  box-shadow: 0 18px 36px rgba(10, 58, 87, 0.32); /* --navy tinted drop shadow, kept */
 }
 .frame {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
+  /* Crop ~4px off all four edges (each clip has an artefact edge): oversize the
+     iframe by 8px and offset it -4px, so .col's overflow:hidden trims 4px per side.
+     Offset, not transform:scale (scaling softens the player). Same box-clip trick
+     already shipped on the mobile hero video. */
+  top: -4px;
+  left: -4px;
+  width: calc(100% + 8px);
+  height: calc(100% + 8px);
   border: none;
   display: block;
 }
