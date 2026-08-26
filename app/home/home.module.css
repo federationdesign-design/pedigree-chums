@@ -262,7 +262,31 @@
    .productImage so they override the background-image longhand its shorthand set;
    the blue-sky fill, centre position, cover size and no-repeat all carry over. */
 .productImageSticker { background-image: url("/stickerpack-product-img-web.jpg"); }
-.productImageFigurine { background-image: url("/blue-orig1.jpg"); }
+.productImageFigurine { background-image: url("/3D-chum-inbox.jpg"); }
+
+/* Batch 2 (restructure): the two Coming Soon teasers sit side by side below the
+   full-width card game, in a narrower two-column row (one column on mobile). */
+.comingSoonRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(24px, 4vw, 56px);
+  align-items: start;
+  padding: 16px clamp(20px, 6vw, 80px) clamp(60px, 10vw, 120px);
+}
+@media (max-width: 768px) {
+  .comingSoonRow { grid-template-columns: 1fr; }
+}
+/* Compact ProductBlock for a narrow column: stack the image over the copy, and
+   shrink both against the full-width card game block. The row above owns the
+   outer padding. */
+.productCompact {
+  grid-template-columns: 1fr;
+  gap: clamp(14px, 1.6vw, 20px);
+  padding: 0;
+}
+.productCompact .productContent { gap: 12px; }
+.productCompact .productDesc { font-size: clamp(15px, 1.5vw, 19px); }
+.productCompact .productCorner { font-size: 18px; padding: 8px 18px; }
 
 .productPlaceholder {
   font-family: var(--font-display, 'Luckiest Guy', system-ui);

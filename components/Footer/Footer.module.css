@@ -1,7 +1,9 @@
 .footer {
   position: relative;
   z-index: 95;
-  background: var(--blue-deep);
+  /* Footer-only blue. A literal, not the --blue-deep token (rgb(11,120,189)),
+     so the many other --blue-deep consumers site-wide are not repainted. */
+  background: #0061de;
   color: var(--white);
   padding: clamp(40px, 6vw, 72px) clamp(20px, 6vw, 90px) 28px;
   border-top: 6px solid var(--yellow);
