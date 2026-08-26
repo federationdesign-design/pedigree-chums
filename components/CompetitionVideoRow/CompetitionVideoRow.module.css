@@ -6,14 +6,19 @@
 
 .section {
   background: var(--comp-yellow, #fcde04);
-  padding: clamp(24px, 4vw, 56px) clamp(16px, 4vw, 48px);
+  /* No horizontal padding: the row spans the full page width, not a container. */
+  padding: clamp(24px, 4vw, 56px) 0;
 }
 .row {
+  /* Lifted above the pre-order band so the three videos sit over its lower edge:
+     the two sections overlap instead of meeting at a flat seam. */
+  position: relative;
+  z-index: 2;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: clamp(12px, 2vw, 28px);
-  max-width: 1100px;
-  margin: 0 auto;
+  width: 100%;
+  margin-top: clamp(-140px, -9vw, -64px);
 }
 .col {
   position: relative;
@@ -21,6 +26,7 @@
   border-radius: 16px;
   overflow: hidden;
   background: #000; /* behind the Vimeo player while it loads */
+  box-shadow: 0 18px 36px rgba(10, 58, 87, 0.32); /* --navy tinted drop shadow */
 }
 .frame {
   position: absolute;
@@ -32,10 +38,11 @@
 }
 
 @media (max-width: 768px) {
-  /* Single-column stack: a Vimeo iframe captures touch, so no swipe rail. */
+  /* Single-column stack: a Vimeo iframe captures touch, so no swipe rail.
+     Still full width, still overlapping the pre-order edge (smaller pull). */
   .row {
     grid-template-columns: 1fr;
-    max-width: 520px;
     gap: clamp(16px, 5vw, 28px);
+    margin-top: clamp(-90px, -14vw, -44px);
   }
 }
