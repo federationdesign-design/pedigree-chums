@@ -5,6 +5,7 @@ import CompetitionHero from "../../components/CompetitionHero/CompetitionHero";
 import CompetitionIconRow from "../../components/CompetitionIconRow/CompetitionIconRow";
 import CompetitionTitles from "../../components/CompetitionTitles/CompetitionTitles";
 import CompetitionProductStrip from "../../components/CompetitionProductStrip/CompetitionProductStrip";
+import CompetitionPreorder from "../../components/CompetitionPreorder/CompetitionPreorder";
 import CompetitionTerms from "../../components/CompetitionTerms/CompetitionTerms";
 
 /* Spot your Chum competition page, first of the per-breed series (/findpug,
@@ -37,6 +38,8 @@ type CompetitionConfig = {
     hand: { src: string; alt: string };
     shots: { src: string; alt: string }[];
   };
+  /** Pre-order block (brief 4e): the full composed pre-order artwork. */
+  preorder: { src: string; alt: string };
 };
 
 const PUG: CompetitionConfig = {
@@ -48,13 +51,12 @@ const PUG: CompetitionConfig = {
     video: "/competitions/pug/video-start.mp4",
     poster: "/competitions/pug/video-start.jpg",
     alt: "Win me: a blue 3D printed Pug figurine on a yellow podium labelled Pug, against blue and cream arches",
-    /* Poster only for now. The supplied video-start.mp4 export is the wrong cut:
-       the clean hero holds for ~1.8s, then it runs into behind-the-scenes studio
-       footage (a presenter, softbox lights, the set edge) before a pre-order
-       reveal, none of which is a hero. The file and path stay wired; when the
-       correct hero export replaces video-start.mp4, set still to false (or drop
-       this line) and motion returns with no code change (Steve, 26 Aug 2026). */
-    still: true,
+    /* Video enabled: video-start.mp4 is the recovered original hero (44f12c3d),
+       re-encoded to 720p CRF23 with the audio stripped. The poster shows at once
+       and the video autoplays after a 3s beat, holding on its final frame; the
+       kill switch stays available if a future export needs disabling (Steve, 26
+       Aug 2026). */
+    still: false,
   },
   introLines: [
     "Get a photo or selfie and share it on Instagram or TikTok.",
@@ -79,6 +81,12 @@ const PUG: CompetitionConfig = {
         alt: "The blue 3D printed Pug figurine turned slightly to one side",
       },
     ],
+  },
+  preorder: {
+    src: "/competitions/pug/pug-preorder.jpg",
+    /* No printed measurements in the alt: the card's height/length/weight are
+       stale (PLACEHOLDERS.md), so they are not repeated here. */
+    alt: "Pre-order now: the Pedigree Chums Pug collectible pack at 6.99 pounds, RRP 9.99 pounds, showing the printed Pug character card and the boxed set on a yellow and blue set",
   },
 };
 
@@ -110,7 +118,8 @@ export default function FindPugPage() {
         <CompetitionTitles breed={PUG.breed} introLines={PUG.introLines} />
         {/* Stage 4: desktop product image strip. */}
         <CompetitionProductStrip hand={PUG.productStrip.hand} shots={PUG.productStrip.shots} />
-        {/* THE PRIZE and PRE-ORDER land in later stages. */}
+        {/* Pre-order block (4e): full-width composed artwork. */}
+        <CompetitionPreorder src={PUG.preorder.src} alt={PUG.preorder.alt} />
         <CompetitionTerms />
       </main>
       <Footer />

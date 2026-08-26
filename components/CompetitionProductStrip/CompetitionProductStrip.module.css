@@ -41,7 +41,9 @@
   aspect-ratio: 6 / 5; /* slightly wider than tall, per the concept */
 }
 .cardImg {
-  /* next/image fill positions it absolute inset:0; the shots carry their own
-     white margin, so contain centres the figurine with breathing room. */
-  object-fit: contain;
+  /* Fill the card, no letterbox bars. The shots are near-square (689x700) and
+     the card is 6/5, so contain left white strips down each side; cover fills
+     the card and only trims the shots' own white top/bottom margin, leaving the
+     centred figurine intact (Steve, 26 Aug 2026). */
+  object-fit: cover;
 }

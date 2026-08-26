@@ -1,0 +1,23 @@
+/* Full-width pre-order band (brief 4e), below the product strip. Keeps the
+   artwork's own aspect (1800x1022) so the whole composed scene shows with no crop
+   and no layout shift. */
+
+.section {
+  width: 100%;
+  overflow: hidden;
+}
+.frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1800 / 1022; /* the artwork's ratio: no crop, no CLS */
+}
+.media {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  /* Frame aspect equals the image aspect, so cover shows it whole. */
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
