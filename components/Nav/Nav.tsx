@@ -30,7 +30,7 @@ const tradeNavLinks = [
   { label: "Toy Safety Technical File", href: "/toy-safety" },
 ];
 
-export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo = false, tradeLinks = false }: { hideLogo?: boolean; dockBottomLeft?: boolean; showLogo?: boolean; tradeLinks?: boolean }) {
+export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo = false, tradeLinks = false, contrastKeyline = false }: { hideLogo?: boolean; dockBottomLeft?: boolean; showLogo?: boolean; tradeLinks?: boolean; contrastKeyline?: boolean }) {
   const router = useRouter();
   /* PREFETCH ON INTENT, NOT ON OPEN.
 
@@ -223,7 +223,16 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
       )}
       {!open && !dockBottomLeft && (
         <div className={styles.headerRight}>
-          <PcContrastToolbar />
+          {/* contrastKeyline (findpug only): a white ring is added around the
+              toolbar so it holds over the bright hero video. Gated so every other
+              page renders the bare toolbar, byte-identical. */}
+          {contrastKeyline ? (
+            <div className={styles.contrastKeyline}>
+              <PcContrastToolbar />
+            </div>
+          ) : (
+            <PcContrastToolbar />
+          )}
           <button type="button" className={styles.burger} onClick={() => setOpen(true)} aria-label="Open menu">
             <span />
             <span />
