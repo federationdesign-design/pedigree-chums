@@ -47,3 +47,76 @@
      centred figurine intact (Steve, 26 Aug 2026). */
   object-fit: cover;
 }
+
+/* THE PRIZE (mobile, brief 4d). Hidden on desktop; below 768px it replaces the
+   hand+cards strip with a peeking scroll-snap carousel of the same shots plus the
+   prize copy. Native scroll-snap, no JS. Sits on the section's --comp-yellow. */
+.prize {
+  display: none;
+}
+.prizeHeading {
+  font-family: var(--font-display, "Luckiest Guy", system-ui);
+  text-transform: uppercase;
+  text-align: center;
+  padding: 0 16px;
+  margin: 0 0 clamp(14px, 3.5vw, 22px);
+  color: var(--blue-royal, #2a65d6);
+  font-size: clamp(2rem, 9vw, 2.9rem);
+  line-height: 0.9;
+  filter: drop-shadow(0 1px 3px color-mix(in srgb, var(--navy, #0a3a57) 50%, transparent));
+}
+.carousel {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  /* Side padding centres the active slide and lets its neighbours peek in. */
+  padding: 0 16vw;
+}
+.carousel::-webkit-scrollbar {
+  display: none;
+}
+.slide {
+  position: relative; /* fill anchor for next/image */
+  flex: 0 0 68vw;
+  scroll-snap-align: center;
+  aspect-ratio: 1 / 1; /* the shots are near-square (689x700) */
+  border-radius: 20px;
+  overflow: hidden;
+  background: #ffffff;
+}
+.slideImg {
+  object-fit: cover;
+}
+.prizeReceives {
+  font-family: Montserrat, sans-serif;
+  font-weight: 400;
+  color: var(--navy, #0a3a57);
+  text-align: center;
+  padding: 0 16px;
+  margin: clamp(18px, 4.5vw, 28px) 0 4px;
+  font-size: clamp(1rem, 3.6vw, 1.2rem);
+}
+.prizeLine {
+  font-family: Montserrat, sans-serif;
+  font-weight: 700;
+  color: var(--navy, #0a3a57);
+  text-align: center;
+  padding: 0 16px;
+  margin: 0;
+  font-size: clamp(1.05rem, 3.8vw, 1.3rem);
+  line-height: 1.35;
+}
+
+@media (max-width: 768px) {
+  /* Swap the desktop strip for THE PRIZE. After the base rules so the override is
+     not silently dropped. */
+  .strip {
+    display: none;
+  }
+  .prize {
+    display: block;
+  }
+}

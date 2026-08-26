@@ -41,6 +41,9 @@ type CompetitionConfig = {
   };
   /** Pre-order block (brief 4e): the full composed pre-order artwork. */
   preorder: { src: string; alt: string };
+  /** THE PRIZE block (brief 4d, mobile): the winner-receives copy shown beneath
+      the peeking carousel of product shots. */
+  prize: { receives: string; lines: string[] };
 };
 
 const PUG: CompetitionConfig = {
@@ -89,6 +92,13 @@ const PUG: CompetitionConfig = {
        stale (PLACEHOLDERS.md), so they are not repeated here. */
     alt: "Pre-order now: the Pedigree Chums Pug collectible pack at 6.99 pounds, RRP 9.99 pounds, showing the printed Pug character card and the boxed set on a yellow and blue set",
   },
+  prize: {
+    receives: "The winner receives:",
+    lines: [
+      "1 exclusive 3D printed Chum Figurine*",
+      "Free delivery to one UK address",
+    ],
+  },
 };
 
 export const metadata: Metadata = {
@@ -120,7 +130,7 @@ export default function FindPugPage() {
         {/* Stage 3 added the titles + intro (4c). */}
         <CompetitionTitles breed={PUG.breed} introLines={PUG.introLines} />
         {/* Stage 4: desktop product image strip. */}
-        <CompetitionProductStrip hand={PUG.productStrip.hand} shots={PUG.productStrip.shots} />
+        <CompetitionProductStrip hand={PUG.productStrip.hand} shots={PUG.productStrip.shots} prize={PUG.prize} />
         {/* Pre-order block (4e): full-width composed artwork. */}
         <CompetitionPreorder src={PUG.preorder.src} alt={PUG.preorder.alt} />
         <CompetitionTerms terms={SPOT_YOUR_CHUM_TERMS} />
