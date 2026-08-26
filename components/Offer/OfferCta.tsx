@@ -3,11 +3,9 @@ import { useState } from "react";
 import styles from "./OfferCta.module.css";
 import { startCheckout } from "./startCheckout";
 
-// CTA copy + buttons in the pitch panel. Two choices, side by side:
-//  - "Pre-order now" goes straight to Stripe Checkout (pay the pre-release price)
-//  - "Get discount code" opens the email popup (owned by OfferLauncher) via the
-//    shared "pc:open-offer" window event, for visitors who would rather not pay
-//    before they know the arrival date.
+// CTA copy + button in the pitch panel. One choice: "Pre-order now" opens a
+// confirm popup and then goes to Stripe Checkout (pay the pre-release price).
+// The "Get discount code" button was removed (Batch 3): only Pre-order remains.
 export default function OfferCta() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -37,13 +35,6 @@ export default function OfferCta() {
           onClick={() => setShowPop(true)}
         >
           Pre-order now £6.99
-        </button>
-        <button
-          type="button"
-          className={`${styles.btn} ${styles.btnOutline}`}
-          onClick={() => window.dispatchEvent(new CustomEvent("pc:open-offer"))}
-        >
-          Get discount code
         </button>
       </div>
       {error && <p className={styles.ctaError}>{error}</p>}

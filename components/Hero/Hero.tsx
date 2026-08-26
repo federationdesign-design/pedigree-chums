@@ -75,14 +75,6 @@ export default function Hero() {
         <div className={styles.poster} />
         <div className={styles.tint} />
       </div>
-      <button
-        type="button"
-        className={styles.announce}
-        data-pc-over-media
-        onClick={() => window.dispatchEvent(new CustomEvent("pc:open-offer"))}
-      >
-        <strong>Released Soon!</strong> Add your email to get a discount code to use on launch day
-      </button>
       <div className={styles.heroTris}>
         <Triangles items={heroTriangles} z={1} />
       </div>
