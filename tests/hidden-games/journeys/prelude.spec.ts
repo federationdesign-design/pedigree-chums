@@ -1,40 +1,54 @@
 import { test, expect } from "@playwright/test";
 
-// C03 timed reveal, from page load, first visit only:
-//   0-5s nothing / 5-8s prelude / 8-12s introduction / >12s plain counter.
-// Return visit: no cards, counter immediately.
-// Driven on /about (a calm page with no Main Pit) so the campaign chrome is
-// observed without incidental finds.
+// The prelude and introduction cards are switched OFF behind the CARDS_ENABLED
+// flag in components/HiddenGamesCounter/HiddenGamesCounter.tsx. These journeys
+// now assert the hidden behaviour: walking far enough into the site that, with
+// the flag on, each card would be due, and confirming neither ever appears.
+// They replace the former "first visit: ... then prelude, then introduction"
+// journey, which asserted the cards appearing. Driven on calm pages with no
+// Main Pit so the campaign chrome is observed without incidental finds.
 
 const RECORD_KEY = "pedigree_hidden_games:HIDDEN_GAMES_2026_01";
 
-test("first visit: nothing at 5s, then prelude, then introduction, then the counter", async ({
+// Replaces the prelude half of the former first-visit reveal journey.
+test("cards flag off: the prelude card never appears on its eligible page", async ({
   page,
 }) => {
   test.setTimeout(45000);
-  await page.goto("/about");
-
-  // 0-5s: nothing renders.
+  // Page 2 is the prelude's earliest eligible page, where (flag on) it would
+  // show immediately on load. Walk there as a fresh visitor.
+  await page.goto("/about"); // page 1
+  await page.goto("/good-dog-bad-dog"); // page 2: prelude would fire at once
   await page.waitForTimeout(3000);
   await expect(page.getByText("THIS WEBSITE MAY CONTAIN GAMES")).toHaveCount(0);
-  await expect(page.getByText(/games found/)).toHaveCount(0);
-
-  // 5-8s: the prelude card.
-  await expect(page.getByText("THIS WEBSITE MAY CONTAIN GAMES")).toBeVisible({
-    timeout: 6000,
-  });
-  await expect(page.getByText("Warning:")).toBeVisible();
-
-  // 8-12s: the introduction card.
-  await expect(
-    page.getByText(/hidden games across the Pedigree Chums website/)
-  ).toBeVisible({ timeout: 6000 });
-
-  // >12s: the plain counter.
-  await expect(page.getByText(/0\/2 games found/)).toBeVisible({ timeout: 6000 });
+  await expect(page.getByText("Warning:")).toHaveCount(0);
 });
 
-test("return visit: no cards, the counter appears immediately", async ({ page }) => {
+// Replaces the introduction half of the former first-visit reveal journey.
+test("cards flag off: the introduction card never appears on its eligible page", async ({
+  page,
+}) => {
+  test.setTimeout(45000);
+  // Page 3 is the introduction's earliest eligible page, where (flag on) it
+  // would show 10s after load. Walk there and wait past that window.
+  await page.goto("/about"); // page 1
+  await page.goto("/good-dog-bad-dog"); // page 2
+  await page.goto("/britains-dog-history"); // page 3: introduction would fire at 10s
+  await page.waitForTimeout(12000);
+  await expect(
+    page.getByText(/There are hidden games across the website/)
+  ).toHaveCount(0);
+  await expect(page.getByText("Find them all")).toHaveCount(0);
+  // The prelude never appears here either.
+  await expect(page.getByText("THIS WEBSITE MAY CONTAIN GAMES")).toHaveCount(0);
+});
+
+// Formerly "return visit: no cards, the counter appears immediately". The old
+// counter-visibility assertion depended on the logo being present on this page
+// and is unrelated to the cards, so it is dropped; what remains asserts the
+// hidden behaviour: a returning visitor (seen-flags seeded) still sees neither
+// card, exactly as a fresh one does now that the flag is off.
+test("cards flag off: a return visit shows neither the prelude nor the introduction", async ({ page }) => {
   await page.addInitScript((key) => {
     localStorage.setItem(
       key as string,
@@ -52,6 +66,8 @@ test("return visit: no cards, the counter appears immediately", async ({ page })
     );
   }, RECORD_KEY);
   await page.goto("/about");
-  await expect(page.getByText(/0\/2 games found/)).toBeVisible();
+  await page.waitForTimeout(3000);
   await expect(page.getByText("THIS WEBSITE MAY CONTAIN GAMES")).toHaveCount(0);
+  await expect(page.getByText("Warning:")).toHaveCount(0);
+  await expect(page.getByText(/There are hidden games across the website/)).toHaveCount(0);
 });

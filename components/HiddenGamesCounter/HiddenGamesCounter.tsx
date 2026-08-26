@@ -2,6 +2,11 @@
 
 // Hidden Games counter (C03 timed reveal + prelude + palette).
 //
+// NOTE: the prelude and introduction cards are currently switched OFF behind the
+// CARDS_ENABLED flag (defined just above the timing constants below). No visitor
+// sees either card while it is false. The description that follows documents the
+// intact, dormant behaviour so it can be turned back on by flipping that flag.
+//
 // The prelude and introduction cards are spread across the visitor's first few
 // pages, at most one per page, gated by the persisted page tally and the
 // once-only flags:
@@ -55,6 +60,15 @@ import {
 } from "../../lib/hiddenGames/surfaceLock";
 import { fireConfetti } from "../../lib/confetti";
 import styles from "./HiddenGamesCounter.module.css";
+
+// FEATURE FLAG (the single switch for the prelude + introduction cards).
+// While this is false, no visitor ever sees the prelude or the introduction
+// card. All their machinery below stays intact and wired: the timings, the
+// showCard/releaseCard slot helpers, the surface-lock claim/release, the render
+// blocks and the once-only flags. Flip this back to true to bring both cards
+// back with no rebuilding. This flag gates ONLY those two cards: the counter,
+// the discovery toast and the completion celebration are unaffected.
+const CARDS_ENABLED = false;
 
 const PRELUDE_AT = 0; // the prelude appears immediately on its eligible page
 const PRELUDE_DISMISS_MS = 10000; // ...and auto-dismisses after 10s (also has an X)
@@ -254,7 +268,8 @@ export default function HiddenGamesCounter() {
 
     // Prelude first: the first page from PRELUDE_FROM_PAGE onwards still unseen.
     // Checked before the introduction, so the two never share a page.
-    if (page >= PRELUDE_FROM_PAGE && !s.preludeSeen) {
+    // Gated by CARDS_ENABLED: while the flag is off, no prelude is ever due.
+    if (CARDS_ENABLED && page >= PRELUDE_FROM_PAGE && !s.preludeSeen) {
       setPhase("hidden");
       const t = window.setTimeout(() => {
         if (pitInPlay()) {
@@ -267,7 +282,7 @@ export default function HiddenGamesCounter() {
       }, PRELUDE_AT);
       return () => window.clearTimeout(t);
     }
-    if (page >= INTRO_FROM_PAGE && !s.introSeen) {
+    if (CARDS_ENABLED && page >= INTRO_FROM_PAGE && !s.introSeen) {
       setPhase("hidden");
       const t = window.setTimeout(() => {
         if (pitInPlay()) {
