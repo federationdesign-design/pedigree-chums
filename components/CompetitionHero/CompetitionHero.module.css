@@ -1,9 +1,8 @@
-/* Full-bleed hero. The frame keeps the video's own display aspect (the export is
-   2000x1500 stored with a 1333:1000 pixel aspect, i.e. a 1333:750 display ratio,
-   native ~16:9) so the whole product film shows with no crop, start to finish:
-   the opening WIN ME / breed-podium reveal and the closing pre-order frame it
-   holds on both stay fully in shot. The fixed header controls float over the
-   top-right, which is decorative arches only (brief 4a). */
+/* Full-bleed hero. Two aspects: the desktop landscape frame (1333:750) and the
+   mobile portrait frame (1328:2004), each matching its own video/poster so cover
+   neither crops nor gaps. Only one <video> is JS-mounted (see the component); both
+   posters are server-rendered and CSS-picked here. The fixed header controls float
+   over the top-right, decorative arches only (brief 4a). */
 
 .hero {
   width: 100%;
@@ -31,26 +30,65 @@
   inset: 0;
   width: 100%;
   height: 100%;
-  /* Media aspect equals the frame aspect, so cover shows the whole frame with no
-     trim; centre is neutral (nothing is cropped either way). The poster still is
-     the video's first frame at the same ratio, so motion and reduced-motion
-     framing match exactly. */
+  /* Media aspect equals the frame aspect (per breakpoint), so cover shows the
+     whole frame with no trim. The poster is the video's first frame, so the
+     hand-off is seamless. */
   object-fit: cover;
   object-position: center;
   display: block;
 }
 
-/* Mobile (approved 26 Aug 2026). The 16:9 band is only ~220px tall on a phone;
-   the mockup wants a taller, portrait-ish hero with the pug large. A min-height
-   overrides the aspect-ratio (which stays as the desktop rule), and object-fit
-   cover then crops the LEFT and RIGHT of the landscape footage rather than
-   shrinking it. The pug is centred, so it stays large; the outer arches and the
-   baked-in WIN ME at top-left crop off (WIN ME leaves anyway once it becomes a
-   PNG overlay). Full height is shown, so the podium and PUG label are kept. The
-   held pre-order end frame crops to its centre card. First-pass height, to judge
-   on the deploy. Placed after the base rules so the override is not dropped. */
+/* Poster picking. Base = desktop: show the desktop poster, hide the mobile one.
+   Both posters are in the DOM (server-rendered for LCP); display:none also drops
+   the hidden one from the a11y tree, so the alt is announced once. */
+.posterMobile {
+  display: none;
+}
 @media (max-width: 768px) {
+  /* Mobile: the portrait video's own aspect, no crop (replaces the old 66vh
+     landscape crop). Swap which poster shows. Placed after the base rules so the
+     overrides are not dropped. */
   .frame {
-    min-height: 66vh;
+    aspect-ratio: 1328 / 2004;
   }
+  .posterDesktop {
+    display: none;
+  }
+  .posterMobile {
+    display: block;
+  }
+}
+
+/* Sound toggle, bottom-right of the video. A --comp-yellow pill with a navy
+   outline and a white keyline (drop-shadow) so it reads over the footage. At least
+   44px for the touch-target minimum. */
+.soundToggle {
+  position: absolute;
+  right: clamp(12px, 2vw, 24px);
+  bottom: clamp(12px, 2vw, 24px);
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: clamp(44px, 6vw, 62px);
+  height: clamp(44px, 6vw, 62px);
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: var(--comp-yellow, #fcde04);
+  color: var(--navy, #0a3a57);
+  outline: 4px solid var(--navy, #0a3a57);
+  box-shadow: 0 4px 0 rgba(10, 58, 87, 0.3);
+  cursor: pointer;
+  filter:
+    drop-shadow(1px 0 0 #fff) drop-shadow(-1px 0 0 #fff)
+    drop-shadow(0 1px 0 #fff) drop-shadow(0 -1px 0 #fff);
+}
+.soundToggle svg {
+  width: 56%;
+  height: 56%;
+  display: block;
+}
+.soundToggle:focus-visible {
+  box-shadow: 0 0 0 4px #fff, 0 4px 0 rgba(10, 58, 87, 0.3);
 }

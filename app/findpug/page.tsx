@@ -32,9 +32,15 @@ type CompetitionConfig = {
   seoTitle: string;
   /** Meta description. */
   seoDescription: string;
-  /** Hero video (brief 4a): WIN ME badge and breed name are baked into it.
-      `still` forces the poster and skips the video (see the note on PUG.hero). */
-  hero: { video: string; poster: string; alt: string; still?: boolean };
+  /** Hero (brief 4a): a landscape video/poster on desktop and a portrait pair on
+      mobile, WIN ME and the breed name baked into the footage. Only one video is
+      mounted at a time (see CompetitionHero). `still` forces poster-only. */
+  hero: {
+    desktop: { video: string; poster: string };
+    mobile: { video: string; poster: string };
+    alt: string;
+    still?: boolean;
+  };
   /** The two intro body lines beneath the "Have you spotted ..." question. */
   introLines: string[];
   /** Product image strip (brief 4d): the hand shot plus three product shots. */
@@ -56,14 +62,21 @@ const PUG: CompetitionConfig = {
   seoDescription:
     "Have you spotted a Pug? Get a photo or selfie and share it on Instagram or TikTok to win an exclusive 3D printed Chum figurine.",
   hero: {
-    video: "/competitions/pug/video-start.mp4",
-    poster: "/competitions/pug/video-start.jpg",
+    /* Desktop landscape pair and mobile portrait pair, both breed-specific, so a
+       new breed is a new folder with the same filenames. video-start.mp4 is the
+       ~3.6MB landscape re-encode (audio kept); portrait-advert.mp4 is the 1.9MB
+       720p portrait (audio kept). Only one is downloaded per session; the poster
+       shows at once and the chosen video autoplays after a 3s beat, holding on its
+       final frame. `still` is the kill switch (Steve, 26 Aug 2026). */
+    desktop: {
+      video: "/competitions/pug/video-start.mp4",
+      poster: "/competitions/pug/video-start.jpg",
+    },
+    mobile: {
+      video: "/competitions/pug/portrait-advert.mp4",
+      poster: "/competitions/pug/portrait-advert.jpg",
+    },
     alt: "Win me: a blue 3D printed Pug figurine on a yellow podium labelled Pug, against blue and cream arches",
-    /* Video enabled: video-start.mp4 is the recovered original hero (44f12c3d),
-       re-encoded to 720p CRF23 with the audio stripped. The poster shows at once
-       and the video autoplays after a 3s beat, holding on its final frame; the
-       kill switch stays available if a future export needs disabling (Steve, 26
-       Aug 2026). */
     still: false,
   },
   introLines: [
@@ -123,8 +136,8 @@ export default function FindPugPage() {
       <main>
         {/* Stage 6: hero video (WIN ME and breed name baked in). */}
         <CompetitionHero
-          video={PUG.hero.video}
-          poster={PUG.hero.poster}
+          desktop={PUG.hero.desktop}
+          mobile={PUG.hero.mobile}
           alt={PUG.hero.alt}
           still={PUG.hero.still}
         />
