@@ -210,7 +210,7 @@ export default function HowItPlays() {
     <div className={styles.root}>
       <div className={styles.module}>
         <h2 className={styles.heading}>
-          How it <span className={styles.headingYellow}>plays</span>
+          How it <span className={styles.headingYellow}>works</span>
         </h2>
 
         {/* Progress bar sits above the cards. */}

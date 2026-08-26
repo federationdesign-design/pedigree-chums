@@ -97,9 +97,14 @@ export default function BentoBoard({
       {/* Featured hero -- carousel: Argos / Anubis / Hound of the Baskervilles */}
       <HeroCarousel onNavigate={navigate} />
 
-      {/* Row 1 -- Name Generator (left) beside the Chum Drop / Britain's / About cluster */}
+      {/* Row 1 -- Competition (above) + Name Generator (below) in the left column,
+          beside the Chum Drop / Britain's / About cluster. Batch 1 moved the
+          competition tile here, above the Name Generator. */}
       <div className={styles.rowBlock}>
-        {fitTile(NAV_TILES.nameGen, true)}
+        <div className={styles.cluster}>
+          <VideoTile href="/chumspot" src="/comp-vid.mp4" labelA="Current" labelB="Competitions" cta="Win prizes" sizeClass={`${styles.competitionTile} ${styles.centerMeta} ${styles.ctaHover} ${styles.compTile}`} loop={false} reverseOnHover onNavigate={navigate} />
+          {fitTile(NAV_TILES.nameGen, true)}
+        </div>
         <div className={styles.cluster}>
           <ChumDropTile href="/" labelA="Mini-game:" labelB="Chum Drop" cta="Play free now" sizeClass={styles.clusterVideo} onNavigate={navigate} />
           <div className={styles.clusterRow}>
@@ -109,40 +114,32 @@ export default function BentoBoard({
         </div>
       </div>
 
-      {/* Row 2 -- alternated: cluster (left) beside The Card Game (right) */}
+      {/* Row 2 -- Chum Finder + Dogs at Work (2-wide banner) on the left, beside
+          Know Your Chums (above) + The Card Game (below). Batch 1 made Dogs at
+          Work a 2-wide/1-high banner and moved Know Your Chums above the card game. */}
       <div className={styles.rowBlock}>
         <div className={styles.cluster}>
           <VideoTile href="/chum-calculator" src="/chumfinder-vid.mp4" labelA="Chum" labelB="Finder" cta="Take the suitability test" sizeClass={`${styles.clusterWide} ${styles.chumFinderTitle}`} loop={false} reverseOnHover onNavigate={navigate} />
-          <div className={styles.clusterRow}>
-            {coverTile(NAV_TILES.gdbd, styles.clusterCell, false, true)}
-            {coverTile(NAV_TILES.dogsAtWork, styles.clusterCell, false, true)}
-          </div>
+          {coverTile(NAV_TILES.dogsAtWork, styles.dogsAtWorkWide, false, true)}
         </div>
-        {fitTile(NAV_TILES.product)}
-      </div>
-
-      {/* Bottom bento -- Competitions (square video) + Know Your Chums (square) */}
-      <div className={`${styles.rowBlock} ${styles.rowBlockStart}`}>
-        {/* Left: Competitions video + Smarter / Home */}
-        <div className={styles.cluster}>
-          <VideoTile href="/chumspot" src="/comp-vid.mp4" labelA="Current" labelB="Competitions" cta="Win prizes" sizeClass={`${styles.sqTile} ${styles.centerMeta} ${styles.ctaHover} ${styles.compTile}`} loop={false} reverseOnHover onNavigate={navigate} />
-          <div className={styles.miniRow}>
-            {coverTile(NAV_TILES.smarter, `${styles.miniCell} ${styles.homeLabel} ${styles.labelHover}`, false, true)}
-            {coverTile(NAV_TILES.hotDogs, `${styles.miniCell} ${styles.homeLabel} ${styles.labelHover}`, false, true)}
-          </div>
-        </div>
-        {/* Right: Know Your Chums square + Discount / Home side by side */}
         <div className={styles.cluster}>
           {coverTile(NAV_TILES.knowYourChums, styles.sqTile, true)}
+          {fitTile(NAV_TILES.product)}
+        </div>
+      </div>
+
+      {/* Bottom bento -- the remaining tiles. Good Dog Bad Dog was displaced by
+          Dogs at Work's widening; the discount code tile was removed (Batch 1). */}
+      <div className={`${styles.rowBlock} ${styles.rowBlockStart}`}>
+        <div className={styles.cluster}>
           <div className={styles.miniRow}>
-            <Link href="/discount-code" className={`${styles.tile} ${styles.tileStrip} ${styles.miniCell}`} onClick={navigate}>
-              <span className={styles.tileMeta}>
-                <span className={styles.tileLabel}>
-                  <span className={styles.tileLabelAccent}>Discount</span> code
-                </span>
-                <span className={styles.tileCta}>Grab your code →</span>
-              </span>
-            </Link>
+            {coverTile(NAV_TILES.gdbd, `${styles.miniCell} ${styles.homeLabel} ${styles.labelHover}`, false, true)}
+            {coverTile(NAV_TILES.smarter, `${styles.miniCell} ${styles.homeLabel} ${styles.labelHover}`, false, true)}
+          </div>
+        </div>
+        <div className={styles.cluster}>
+          <div className={styles.miniRow}>
+            {coverTile(NAV_TILES.hotDogs, `${styles.miniCell} ${styles.homeLabel} ${styles.labelHover}`, false, true)}
             {coverTile(NAV_TILES.superpower, `${styles.miniCell} ${styles.homeLabel} ${styles.labelHover}`, false, true)}
           </div>
         </div>

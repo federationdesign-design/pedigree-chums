@@ -263,6 +263,14 @@
   gap: 16px;
 }
 
+/* Batch 1 (site-changes): the bento MENUS use a lemon yellow, one step less
+   orange than the site --yellow token (#ffd23e). Scoped here as a local
+   custom-property override on the board root, so the global token is untouched
+   and only the var(--yellow) usages INSIDE the menu (tile-label accents, tile
+   CTA text, the Name Generator hero accent, the carousel title) resolve to
+   lemon. The #ffb02e status tiles live outside the bento and are unaffected. */
+.bentoWrap { --yellow: #ffed00; }
+
 /* ── Featured hero -- Argos clip as a cropped backdrop, text overlaid on top ── */
 .heroSlot {
   position: relative;
@@ -446,6 +454,16 @@
 .miniRow > * { flex: 1 1 0; min-width: 0; }
 .miniCell { height: clamp(225px, 25vh, 300px); }   /* 1.5x taller */
 .wideBottom { height: clamp(150px, 17vh, 200px); }
+
+/* Batch 1 (site-changes): Dogs at Work as a 2-cell-wide, 1-cell-high banner.
+   The grid-span classes (.tileWide etc.) are inert in this flex board (recon
+   Q8.1), so the span is achieved by taking the full cluster width at a single
+   clusterCell's height, in place of the former two-cell clusterRow. */
+.dogsAtWorkWide { flex: none; width: 100%; height: clamp(150px, 18vh, 205px); }
+/* Batch 1: Competition tile stacked above the Name Generator in the left column,
+   sized as a banner. Holds the competitions video (comp-vid.mp4) for now; the
+   final competitions still image is still to come. */
+.competitionTile { flex: none; width: 100%; height: clamp(200px, 26vh, 300px); }
 
 /* Tile base */
 .tile {
