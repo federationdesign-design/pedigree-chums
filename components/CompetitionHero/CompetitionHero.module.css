@@ -1,17 +1,30 @@
-/* Full-bleed hero. The frame keeps the video's own aspect (1933x1088, native
-   16:9) so the whole product film shows with no crop, start to finish: the
-   opening WIN ME / breed-podium reveal and the closing pre-order frame it holds
-   on both stay fully in shot. The fixed header controls float over the top-right,
-   which is decorative arches only (brief 4a). */
+/* Full-bleed hero. The frame keeps the video's own display aspect (the export is
+   2000x1500 stored with a 1333:1000 pixel aspect, i.e. a 1333:750 display ratio,
+   native ~16:9) so the whole product film shows with no crop, start to finish:
+   the opening WIN ME / breed-podium reveal and the closing pre-order frame it
+   holds on both stay fully in shot. The fixed header controls float over the
+   top-right, which is decorative arches only (brief 4a). */
 
 .hero {
   width: 100%;
   overflow: hidden;
+  /* Yellow backstop. The hero section and frame paint no background of their own,
+     so the fixed blue body gradient (globals.css) sits directly behind the media.
+     An aspect-ratio box resolves to a fractional-pixel height and the cover-fitted
+     video/poster paints to a rounded height, leaving a sub-pixel row unpainted at
+     the very bottom. Without this the sliver revealed the blue gradient as a hard
+     line where the hero meets the yellow band below; painting the hero yellow
+     makes any reveal match that band, so the join is seamless (Steve, 26 Aug
+     2026). */
+  background: var(--yellow, #ffd23e);
 }
 .frame {
   position: relative;
   width: 100%;
-  aspect-ratio: 1933 / 1088; /* the video's own ratio: no crop, no CLS */
+  /* The video's own display ratio: no crop, no CLS. Matches the new export
+     (1333:750) so cover neither trims nor gaps. */
+  aspect-ratio: 1333 / 750;
+  background: var(--yellow, #ffd23e);
 }
 .media {
   position: absolute;
