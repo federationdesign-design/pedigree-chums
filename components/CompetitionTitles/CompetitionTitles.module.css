@@ -65,3 +65,26 @@
   line-height: 1.4;
   margin: 0 0 clamp(8px, 1vw, 14px);
 }
+
+/* Mobile type (approved 26 Aug 2026). Luckiest Guy runs wide, so the desktop
+   clamp floor (2.4rem) can push PHOTO COMPETITION, the longest line, past a
+   narrow viewport; these sizes hold both title lines on one line each down to
+   ~360px, with the intro body wrapping to about three lines (brief 4c). First
+   pass, to judge on the live deploy. Placed after the base rules so the overrides
+   are not silently dropped. */
+@media (max-width: 768px) {
+  .section {
+    padding: clamp(20px, 5vw, 32px) 16px clamp(24px, 6vw, 40px);
+  }
+  .line1,
+  .line2 {
+    font-size: clamp(1.75rem, 8vw, 2.4rem);
+  }
+  .question {
+    font-size: clamp(1.15rem, 4vw, 1.6rem);
+    margin: clamp(24px, 5vw, 40px) 0 clamp(10px, 2vw, 16px);
+  }
+  .introBody {
+    font-size: clamp(1rem, 3.6vw, 1.25rem);
+  }
+}
