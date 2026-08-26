@@ -257,6 +257,13 @@
   justify-content: center;
 }
 
+/* Batch 2: the two Coming Soon product blocks (sticker pack, 3D figurines) reuse
+   the .productImage box and only swap the background image. Placed after
+   .productImage so they override the background-image longhand its shorthand set;
+   the blue-sky fill, centre position, cover size and no-repeat all carry over. */
+.productImageSticker { background-image: url("/stickerpack-product-img-web.jpg"); }
+.productImageFigurine { background-image: url("/blue-orig1.jpg"); }
+
 .productPlaceholder {
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
   font-size: clamp(14px, 2vw, 20px);
@@ -310,6 +317,14 @@
 
 .productTitle span {
   color: var(--yellow, #ffd23e);
+}
+
+/* Batch 2: smaller title for the two Coming Soon blocks (their names are longer
+   than the card game's "Pedigree Chums"). Sized so the longest, "Pedigree Chums
+   Sticker Pack, 212 Stickers", sits on at most two lines on desktop. The card
+   game keeps the large .productTitle size above. */
+.productTitleSmall {
+  font-size: clamp(1.6rem, 2.4vw, 2.4rem);
 }
 
 .productDesc {
@@ -616,13 +631,14 @@
   box-shadow: 0 8px 40px rgba(0,0,0,0.3);
 }
 
-/* Two portrait videos beneath the 16:9 clip, replacing the old plinth.mp4. They
-   carry sound so they cannot autoplay: these use the standard Vimeo player (poster
-   thumbnail, controls, click to play), not the muted background embed above. Equal
-   columns so the two portraits sit evenly side by side. */
+/* Three portrait videos beneath the 16:9 clip (the third, the Staffy clip, added
+   in Batch 2). They carry sound so they cannot autoplay: these use the standard
+   Vimeo player (poster thumbnail, controls, click to play), not the muted
+   background embed above. Three equal columns so the portraits sit evenly side by
+   side (they stack to one column on mobile below). */
 .portraitPair {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, 1fr);
   gap: clamp(16px, 2vw, 24px);
   width: 100%;
 }
