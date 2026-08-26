@@ -3,37 +3,37 @@
    white rounded cards filling the width to the right gutter. Mobile pass later. */
 
 .section {
+  position: relative; /* anchor for the overlaid hand */
   background: var(--comp-yellow, #fcde04);
-  overflow: hidden; /* clips the hand where it bleeds off the left edge */
+  overflow: hidden; /* clips the hand off the left AND the bottom */
   padding: clamp(16px, 2.5vw, 40px) 0;
 }
 .strip {
   display: flex;
-  align-items: flex-end;
+  align-items: flex-start; /* the card row starts at the top of the band */
   gap: clamp(14px, 1.6vw, 26px);
-  /* No side gutters: the hand bleeds off the left, the rail bleeds off the right.
-     Bottom-aligned so the hand and cards share a lower baseline and the hand's
-     wrist runs past the section's lower edge (brief concept). */
+  /* Reserve the hand's footprint on the left. The hand itself is positioned
+     absolutely (below), so it does not set the row height. */
+  padding-left: clamp(230px, 27vw, 520px);
 }
 .hand {
-  flex: 0 0 auto;
-  /* Larger than the three cards (was 23vw), so the hand reads as the hero of the
-     strip and is clearly taller than the card row. */
-  width: clamp(300px, 32vw, 620px);
+  /* Overlaid, NOT in flow: the section height is governed by the card row, so the
+     hand can be a little larger than the cards and bleed off the BOTTOM (and left)
+     without dragging the row down. Top-aligned with the cards so hand and cards
+     read as one band (Steve, 26 Aug 2026). Offsets and width are tunable. */
+  position: absolute;
+  top: clamp(16px, 2.5vw, 40px); /* matches the section padding: hand top = card top */
+  left: clamp(-60px, -3vw, -20px); /* left bleed */
+  width: clamp(280px, 30vw, 560px); /* a little larger than the cards */
   height: auto;
+  z-index: 1;
   display: block;
-  /* Bleed the wrist off the LEFT and the BOTTOM. The negative bottom margin
-     pushes the hand's lower portion below the section's box; overflow:hidden on
-     .section crops it, mirroring the left crop. The negative margin keeps the
-     hand's margin box no taller than the cards, so the section height stays
-     governed by the card row (no growth). Both depths are tunable. */
-  margin-left: clamp(-80px, -3.5vw, -24px);
-  margin-bottom: clamp(-260px, -16vw, -120px);
 }
 .cards {
   flex: 1 1 auto;
   min-width: 0;
   display: flex;
+  align-items: flex-start; /* do NOT stretch: let each card keep its aspect-ratio */
   gap: clamp(14px, 1.6vw, 26px);
   /* Pull the rail past the right edge so the third (last) card is cropped,
      mirroring the hand bleeding off the left (brief 4d). Clipped by the section
@@ -47,7 +47,7 @@
   background: #ffffff;
   border-radius: 20px;
   overflow: hidden;
-  aspect-ratio: 6 / 5; /* slightly wider than tall, per the concept */
+  aspect-ratio: 6 / 5; /* constant shape at every width (now actually held) */
 }
 .cardImg {
   /* Fill the card, no letterbox bars. The shots are near-square (689x700) and
