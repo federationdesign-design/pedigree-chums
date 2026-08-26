@@ -5,7 +5,7 @@
    internal letterbox). Sits on --comp-yellow like the other competition surfaces. */
 
 .section {
-  background: var(--comp-yellow, #fcde04);
+  background: var(--comp-yellow, #f9dd3b);
   /* No horizontal padding: the row spans the full page width, not a container. */
   padding: clamp(24px, 4vw, 56px) 0;
 }

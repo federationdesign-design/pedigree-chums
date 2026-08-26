@@ -18,7 +18,7 @@
 .termsSectionTitle {
   font-family: var(--font-display, "Luckiest Guy", system-ui);
   font-size: clamp(3.2rem, 7vw, 5.6rem);
-  color: var(--comp-yellow, #fcde04);
+  color: var(--comp-yellow, #f9dd3b);
   margin: 0 0 clamp(24px, 4vw, 48px);
   text-align: center;
   line-height: 1.1;
@@ -39,7 +39,7 @@
   position: relative;
 }
 .termCardYellow {
-  background: var(--comp-yellow, #fcde04);
+  background: var(--comp-yellow, #f9dd3b);
 }
 .termCardWhite {
   background: #ffffff;
@@ -56,7 +56,7 @@
   color: var(--navy, #0a3a57);
 }
 .termCardWhite .termNum {
-  color: var(--comp-yellow, #fcde04);
+  color: var(--comp-yellow, #f9dd3b);
 }
 .termTitle {
   font-family: var(--font-display, "Luckiest Guy", system-ui);

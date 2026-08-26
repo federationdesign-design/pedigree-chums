@@ -16,7 +16,7 @@ html {
   --blue-royal: #2a65d6;  /* competition heading blue (Spot your Chum), shared across breed pages */
   --cyan: #45cfef;        /* card / bright accent */
   --yellow: #ffd23e;      /* punchy accent */
-  --comp-yellow: #fcde04; /* Spot your Chum competition pages only: a brighter,
+  --comp-yellow: #f9dd3b; /* Spot your Chum competition pages only: a brighter,
                              more acid yellow. Scoped like --emphasis below so the
                              96-file --yellow is untouched. Consumed by the five
                              Competition* module CSS files, and (as they land) the

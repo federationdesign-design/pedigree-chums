@@ -15,7 +15,7 @@
      line where the hero meets the yellow band below; painting the hero yellow
      makes any reveal match that band, so the join is seamless (Steve, 26 Aug
      2026). */
-  background: var(--comp-yellow, #fcde04);
+  background: var(--comp-yellow, #f9dd3b);
 }
 .frame {
   position: relative;
@@ -23,7 +23,7 @@
   /* The video's own display ratio: no crop, no CLS. Matches the new export
      (1333:750) so cover neither trims nor gaps. */
   aspect-ratio: 1333 / 750;
-  background: var(--comp-yellow, #fcde04);
+  background: var(--comp-yellow, #f9dd3b);
 }
 .media {
   position: absolute;
@@ -36,6 +36,19 @@
   object-fit: cover;
   object-position: center;
   display: block;
+}
+
+/* Desktop only: fade the bottom of the footage into the yellow band so it does
+   not stop on a hard edge. A mask on the media (video + both posters, all .media),
+   NOT on the frame: the sound toggle is a sibling in the frame and must stay fully
+   opaque. The media fades to transparent over its bottom 15% and the frame's
+   --comp-yellow shows through, matching the band below. min-width query so mobile
+   (the portrait hero, with the breed name baked lower in frame) is untouched. */
+@media (min-width: 769px) {
+  .media {
+    -webkit-mask-image: linear-gradient(to bottom, #000 85%, transparent 100%);
+    mask-image: linear-gradient(to bottom, #000 85%, transparent 100%);
+  }
 }
 
 /* Poster picking. Base = desktop: show the desktop poster, hide the mobile one.
@@ -85,7 +98,7 @@
   padding: 0;
   border: none;
   border-radius: 50%;
-  background: var(--comp-yellow, #fcde04);
+  background: var(--comp-yellow, #f9dd3b);
   color: var(--navy, #0a3a57);
   outline: 4px solid var(--navy, #0a3a57);
   box-shadow: 0 4px 0 rgba(10, 58, 87, 0.3);

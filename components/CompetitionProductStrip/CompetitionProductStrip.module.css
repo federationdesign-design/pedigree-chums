@@ -4,7 +4,7 @@
 
 .section {
   position: relative; /* anchor for the overlaid hand */
-  background: var(--comp-yellow, #fcde04);
+  background: var(--comp-yellow, #f9dd3b);
   overflow: hidden; /* clips the hand off the left AND the bottom */
   padding: clamp(16px, 2.5vw, 40px) 0;
 }
