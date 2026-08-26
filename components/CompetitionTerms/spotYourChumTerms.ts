@@ -7,6 +7,10 @@
    the wording diverges (no purchase required, one entry per social account, no
    card mechanic), so this is no longer a copy of the /chumspot array.
 
+   The terms are a function of the featured breed: spotYourChumTerms(breed)
+   returns the array with the breed name woven into terms 4 and 8, and each page
+   calls it with its own breed (e.g. spotYourChumTerms(PUG.breed)).
+
    Two verbatim defects are still carried and logged in PLACEHOLDERS.md, not fixed
    here as part of the mechanical extraction:
    - term 14 carries a live [PRIVACY POLICY LINK] placeholder
@@ -24,7 +28,8 @@ export type Term = {
   body: string;
 };
 
-export const SPOT_YOUR_CHUM_TERMS: Term[] = [
+export function spotYourChumTerms(breed: string): Term[] {
+  return [
   {
     num: "1",
     title: "The promoter",
@@ -43,7 +48,7 @@ export const SPOT_YOUR_CHUM_TERMS: Term[] = [
   {
     num: "4",
     title: "How to enter",
-    body: "1. Spot a dog matching a breed in the Pedigree Chums pack. | 2. Take an original photo with the matching card. | 3. Post publicly on Instagram or TikTok during the relevant period. | 4. Tag @pedigree_chums. | 5. Include both #ChumSpot and #DogSpotting. | 6. Keep the post publicly viewable until the winner is selected. Multiple entries are permitted — each must be a separate post featuring an original photo.",
+    body: `1. Spot a real ${breed} out and about. Only ${breed}s qualify this month, so a photo of any other breed is not a valid entry and will not be counted or included in the draw. | 2. Take an original photo of the dog, or a selfie with it. | 3. To enter on Instagram, post the photo publicly, tag @pedigree_chums, and include both #ChumSpot and #DogSpotting. | 4. To enter on TikTok, post the photo publicly, tag @pedigree_chums, and include both #ChumSpot and #DogSpotting. | 5. Keep your post publicly viewable until the winner is selected. | 6. You may enter once per social account, so an Instagram post and a TikTok post count as two separate entries. | No pack, card or purchase is needed to take part.`,
   },
   {
     num: "5",
@@ -63,7 +68,7 @@ export const SPOT_YOUR_CHUM_TERMS: Term[] = [
   {
     num: "8",
     title: "Judging process",
-    body: "We choose our favourite each month — and our criteria change to keep things fresh. That said, the safest way to get noticed is simple: a good quality image, a clear view of the card, a clear view of the dog, and something fun. Make us smile. The judges' decision is final.",
+    body: "We choose our favourite each month — and our criteria change to keep things fresh. That said, the safest way to get noticed is simple: a good quality image, a clear view of the dog, an obvious match to the featured breed, and something fun. Make us smile. The judges' decision is final.",
   },
   {
     num: "9",
@@ -125,4 +130,10 @@ export const SPOT_YOUR_CHUM_TERMS: Term[] = [
     title: "Figurine selection",
     body: "The winner cannot choose which Chum figurine they receive. The figurine design is selected by Pedigree Chums™ at the time of fulfilment. Only certain Chum characters have currently been modelled for 3D printing. If the specific character cannot be produced for any reason, a reasonable alternative figurine of equal or greater value will be provided.",
   },
-];
+  {
+    num: "21",
+    title: "No purchase necessary",
+    body: "No purchase is necessary to enter or to win. You do not need to buy a pack, own a card, or spend anything to take part. The promoter may verify entries and may disqualify duplicate accounts, or multiple accounts operated by the same entrant, used to enter more than the permitted number of times.",
+  },
+  ];
+}

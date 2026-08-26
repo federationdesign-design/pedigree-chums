@@ -3,7 +3,7 @@ import type { Term } from "./spotYourChumTerms";
 
 /* Presentational "Full Competition Terms" section for the Spot your Chum
    competition pages (/findpug, /findbeagle and so on). This component holds no
-   copy: the terms array is passed in (SPOT_YOUR_CHUM_TERMS from
+   copy: the terms array is passed in (spotYourChumTerms(breed) from
    ./spotYourChumTerms), so the shared wording lives in one module and every breed
    page renders the same list. Rendering only:
    - a body containing " | " is split into an ordered list, otherwise a paragraph
