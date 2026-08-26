@@ -384,7 +384,7 @@ export default function HotDogs() {
                 ["Are dogs safe in hot cars?", "No. Not for five minutes. Not with the window cracked. Not because you parked in the shade. Not because you are just popping in. A car is not a kennel. It is an oven with cup holders."],
                 ["What is Hot Dogs mode?", "Hot Dogs mode is a Pedigree Chums™ game flavour where everyone briefly shows their hand after the draw, then hides it again. From then on you can only look at your own cards. You must remember which dogs were in the other players' hands. It is fast, it is memory, and it makes everyone accuse Grandma of hiding a spaniel."],
                 ["Is Hot Dogs mode like Snap?", "Yes. But with homework. In Snap you react to what you can see. In Hot Dogs you react to what you think you remember seeing. That is worse. And therefore better."],
-                ["Is Pedigree Chums™ dog food?", "No. Pedigree Chums™ is a dog card game. It contains dog characters, dog jokes, and dog chaos. It does not contain dog food. Do not feed the game to the dog. Play the game. Feed the dog something else."],
+                ["Is Pedigree Chums food?", "No. Despite the name, a cheeky nod to a certain dog-food brand, Pedigree Chums is a card game, not dinner. The only thing your dog gets out of it is the joy of being spotted. Please do not feed the cards to anyone."],
                     ["What is the best kind of hot dog?", "The one in a bun. The one with mustard. The one that is not panting, drooling, wobbling, trapped in a car, standing on hot pavement, or wondering why humans have made summer everybody’s problem. The best hot dogs are not dogs."],
               ].map(([q, a], i) => (
                 <details key={i} className={styles.faqItem}>
