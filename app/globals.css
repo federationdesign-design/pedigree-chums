@@ -16,6 +16,13 @@ html {
   --blue-royal: #2a65d6;  /* competition heading blue (Spot your Chum), shared across breed pages */
   --cyan: #45cfef;        /* card / bright accent */
   --yellow: #ffd23e;      /* punchy accent */
+  --comp-yellow: #fcde04; /* Spot your Chum competition pages only: a brighter,
+                             more acid yellow. Scoped like --emphasis below so the
+                             96-file --yellow is untouched. Consumed by the five
+                             Competition* module CSS files, and (as they land) the
+                             sound toggle, THE PRIZE carousel and the WIN ME
+                             overlay, so every competition surface is one colour
+                             (Steve, 26 Aug 2026). */
   --navy: #0a3a57;        /* dark text */
   --cream: #ffffff;       /* v3.0: was #fbf7ec, now pure white site-wide (see CLAUDE.md) */
   --white: #ffffff;
@@ -23,7 +30,7 @@ html {
      Value confirmed by Steve against the concept artwork. */
   --cta: #4CB847;
   /* Dogs at Work panel emphasis: the yellow highlight on the blue panel copy.
-     A brighter yellow than --yellow, scoped here so the 32-file --yellow is not
+     A brighter yellow than --yellow, scoped here so the 96-file --yellow is not
      disturbed (a site-wide change would be decided separately). */
   --emphasis: #FFED60;
   /* Dogs at Work family pill fills (brief section 10). Named by family, not

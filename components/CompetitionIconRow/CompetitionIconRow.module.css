@@ -4,7 +4,7 @@
    keeps its brand colour. */
 
 .section {
-  background: var(--yellow, #ffd23e);
+  background: var(--comp-yellow, #fcde04);
   /* Slim side padding so the row reads as a bold band across the page, not a
      centred cluster. */
   padding: clamp(14px, 2.6vw, 34px) clamp(12px, 2.5vw, 40px) clamp(10px, 1.8vw, 22px);

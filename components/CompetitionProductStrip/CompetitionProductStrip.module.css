@@ -3,7 +3,7 @@
    white rounded cards filling the width to the right gutter. Mobile pass later. */
 
 .section {
-  background: var(--yellow, #ffd23e);
+  background: var(--comp-yellow, #fcde04);
   overflow: hidden; /* clips the hand where it bleeds off the left edge */
   padding: clamp(16px, 2.5vw, 40px) 0;
 }

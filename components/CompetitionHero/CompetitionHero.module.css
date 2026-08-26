@@ -16,7 +16,7 @@
      line where the hero meets the yellow band below; painting the hero yellow
      makes any reveal match that band, so the join is seamless (Steve, 26 Aug
      2026). */
-  background: var(--yellow, #ffd23e);
+  background: var(--comp-yellow, #fcde04);
 }
 .frame {
   position: relative;
@@ -24,7 +24,7 @@
   /* The video's own display ratio: no crop, no CLS. Matches the new export
      (1333:750) so cover neither trims nor gaps. */
   aspect-ratio: 1333 / 750;
-  background: var(--yellow, #ffd23e);
+  background: var(--comp-yellow, #fcde04);
 }
 .media {
   position: absolute;

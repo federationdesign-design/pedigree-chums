@@ -2,7 +2,7 @@
    flat yellow field the mockup shows carrying down from under the hero photo. */
 
 .section {
-  background: var(--yellow, #ffd23e);
+  background: var(--comp-yellow, #fcde04);
   padding: clamp(24px, 4vw, 56px) clamp(24px, 6vw, 80px) clamp(32px, 5vw, 64px);
   text-align: center;
 }
