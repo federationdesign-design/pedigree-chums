@@ -299,3 +299,29 @@ image, so:
   two surfaces will disagree.
 - No pug pre-order asset exists in `public/` yet; Steve is supplying it
   separately. It is a per-page (breed-specific) config field, not shared.
+
+### Case-collision pairs in public/ (existing defect on main)
+
+`git ls-files` shows three pairs of tracked filenames that differ only in case.
+On the case-insensitive macOS working tree only one of each pair exists on disk;
+Vercel's case-sensitive Linux build treats them as two separate files, so
+whichever the code does not reference is a phantom and the other may 404
+depending on the exact casing used. Pre-existing on `main`, NOT introduced by
+the findpug work and NOT for this session to fix:
+
+- `public/a-car-is-not-a-kennel.jpg` vs `public/A-car-is-not-a-kennel.jpg`
+- `public/a-dog-never-died-from-missing-a-walk.jpg` vs `public/A-dog-never-died-from-missing-a-walk.jpg`
+- `public/if-the-pavement-is-too-hot-for-your-hand.jpg` vs `public/If-the-pavement-is-too-hot-for-your-hand.jpg`
+
+Resolve via a dedicated cleanup on `main`: pick the lowercase name each side
+references, `git rm` the other, confirm with `git ls-files` (not `ls`).
+
+### Product strip fourth card is a decorative stand-in (findpug, 26 Aug 2026)
+
+The desktop product strip (brief 4d) shows a fourth card cropped off the right
+edge, mirroring the hand bleeding off the left. Only three product shots exist
+(`blue-orig1/2/3.jpg`), so `CompetitionProductStrip.tsx` renders the first shot
+again as the fourth card, `aria-hidden` with empty alt so it is not announced or
+double-counted. Replace with a distinct fourth product shot when supplied (add
+it to the `PUG.productStrip.shots` config and drop the decorative repeat), or
+confirm the repeat is acceptable as the final treatment.

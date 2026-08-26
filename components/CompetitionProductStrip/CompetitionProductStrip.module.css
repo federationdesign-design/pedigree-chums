@@ -10,13 +10,12 @@
 .strip {
   display: flex;
   align-items: center;
-  gap: clamp(16px, 2vw, 32px);
-  /* No left gutter (the hand bleeds); right gutter matches the other sections. */
-  padding-right: clamp(24px, 6vw, 80px);
+  gap: clamp(14px, 1.6vw, 26px);
+  /* No side gutters: the hand bleeds off the left, the rail bleeds off the right. */
 }
 .hand {
   flex: 0 0 auto;
-  width: clamp(260px, 26vw, 520px);
+  width: clamp(230px, 23vw, 460px);
   height: auto;
   display: block;
   /* Pull the wrist off the left edge for the bleed. */
@@ -24,16 +23,21 @@
 }
 .cards {
   flex: 1 1 auto;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: clamp(12px, 1.5vw, 24px);
+  min-width: 0;
+  display: flex;
+  gap: clamp(14px, 1.6vw, 26px);
+  /* Pull the rail past the right edge so the last card is cropped, mirroring the
+     hand bleeding off the left (brief 4d). Clipped by the section overflow. */
+  margin-right: clamp(-240px, -13vw, -90px);
 }
 .card {
+  flex: 1 1 0;
+  min-width: 0;
   position: relative; /* containing block for the fill image */
   background: #ffffff;
-  border-radius: 24px;
+  border-radius: 20px;
   overflow: hidden;
-  aspect-ratio: 1 / 1;
+  aspect-ratio: 6 / 5; /* slightly wider than tall, per the concept */
 }
 .cardImg {
   /* next/image fill positions it absolute inset:0; the shots carry their own
