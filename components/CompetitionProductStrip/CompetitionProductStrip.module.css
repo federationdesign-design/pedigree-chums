@@ -26,9 +26,10 @@
   min-width: 0;
   display: flex;
   gap: clamp(14px, 1.6vw, 26px);
-  /* Pull the rail past the right edge so the last card is cropped, mirroring the
-     hand bleeding off the left (brief 4d). Clipped by the section overflow. */
-  margin-right: clamp(-240px, -13vw, -90px);
+  /* Pull the rail past the right edge so the third (last) card is cropped,
+     mirroring the hand bleeding off the left (brief 4d). Clipped by the section
+     overflow. Crop depth is tunable via this value. */
+  margin-right: clamp(-180px, -9vw, -70px);
 }
 .card {
   flex: 1 1 0;

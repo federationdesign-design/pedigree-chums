@@ -315,13 +315,3 @@ the findpug work and NOT for this session to fix:
 
 Resolve via a dedicated cleanup on `main`: pick the lowercase name each side
 references, `git rm` the other, confirm with `git ls-files` (not `ls`).
-
-### Product strip fourth card is a decorative stand-in (findpug, 26 Aug 2026)
-
-The desktop product strip (brief 4d) shows a fourth card cropped off the right
-edge, mirroring the hand bleeding off the left. Only three product shots exist
-(`blue-orig1/2/3.jpg`), so `CompetitionProductStrip.tsx` renders the first shot
-again as the fourth card, `aria-hidden` with empty alt so it is not announced or
-double-counted. Replace with a distinct fourth product shot when supplied (add
-it to the `PUG.productStrip.shots` config and drop the decorative repeat), or
-confirm the repeat is acceptable as the final treatment.

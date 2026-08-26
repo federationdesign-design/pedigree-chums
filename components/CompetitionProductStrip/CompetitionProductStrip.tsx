@@ -33,6 +33,8 @@ export default function CompetitionProductStrip({ hand, shots }: Props) {
           height={673}
           sizes="(min-width: 1024px) 26vw, 60vw"
         />
+        {/* Three cards; the rail bleeds off the right edge so the third card is
+            cropped by the section edge, mirroring the hand on the left (brief 4d). */}
         <div className={styles.cards}>
           {shots.map((shot) => (
             <div key={shot.src} className={styles.card}>
@@ -41,26 +43,10 @@ export default function CompetitionProductStrip({ hand, shots }: Props) {
                 src={shot.src}
                 alt={shot.alt}
                 fill
-                sizes="(min-width: 1024px) 22vw, 90vw"
+                sizes="(min-width: 1024px) 28vw, 90vw"
               />
             </div>
           ))}
-          {/* Decorative fourth card, cropped off the right edge to mirror the
-              hand bleeding off the left (brief 4d, concept). Reuses the first
-              shot as a stand-in until a distinct fourth product shot is supplied;
-              aria-hidden with empty alt so it is not announced or double-counted.
-              See PLACEHOLDERS.md. */}
-          {shots[0] ? (
-            <div className={styles.card} aria-hidden="true">
-              <Image
-                className={styles.cardImg}
-                src={shots[0].src}
-                alt=""
-                fill
-                sizes="(min-width: 1024px) 22vw, 90vw"
-              />
-            </div>
-          ) : null}
         </div>
       </div>
     </section>
