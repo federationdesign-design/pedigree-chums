@@ -127,9 +127,11 @@ export default function CompetitionHero({ desktop, mobile, alt, still = false }:
                 <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4zM14 3.2v2.1a7 7 0 0 1 0 13.4v2.1a9 9 0 0 0 0-17.6z" />
               </svg>
             ) : (
+              /* Muted: a plain speaker, no waves and no X. The waves appearing is
+                 the "on" state; their absence is "off". aria-pressed and the label
+                 carry the state for assistive tech. */
               <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                 <path d="M3 9v6h4l5 5V4L7 9H3z" />
-                <path d="M16.5 12l3-3-1.4-1.4-3 3-3-3L10.7 9l3 3-3 3 1.4 1.4 3-3 3 3 1.4-1.4-3-3z" />
               </svg>
             )}
           </button>
