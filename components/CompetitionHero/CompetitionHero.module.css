@@ -39,3 +39,18 @@
   object-position: center;
   display: block;
 }
+
+/* Mobile (approved 26 Aug 2026). The 16:9 band is only ~220px tall on a phone;
+   the mockup wants a taller, portrait-ish hero with the pug large. A min-height
+   overrides the aspect-ratio (which stays as the desktop rule), and object-fit
+   cover then crops the LEFT and RIGHT of the landscape footage rather than
+   shrinking it. The pug is centred, so it stays large; the outer arches and the
+   baked-in WIN ME at top-left crop off (WIN ME leaves anyway once it becomes a
+   PNG overlay). Full height is shown, so the podium and PUG label are kept. The
+   held pre-order end frame crops to its centre card. First-pass height, to judge
+   on the deploy. Placed after the base rules so the override is not dropped. */
+@media (max-width: 768px) {
+  .frame {
+    min-height: 66vh;
+  }
+}
