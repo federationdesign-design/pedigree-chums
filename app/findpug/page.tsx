@@ -6,6 +6,7 @@ import CompetitionIconRow from "../../components/CompetitionIconRow/CompetitionI
 import CompetitionTitles from "../../components/CompetitionTitles/CompetitionTitles";
 import CompetitionProductStrip from "../../components/CompetitionProductStrip/CompetitionProductStrip";
 import CompetitionPreorder from "../../components/CompetitionPreorder/CompetitionPreorder";
+import CompetitionVideoRow from "../../components/CompetitionVideoRow/CompetitionVideoRow";
 import CompetitionTerms from "../../components/CompetitionTerms/CompetitionTerms";
 import { SPOT_YOUR_CHUM_TERMS } from "../../components/CompetitionTerms/spotYourChumTerms";
 
@@ -53,6 +54,9 @@ type CompetitionConfig = {
   /** THE PRIZE block (brief 4d, mobile): the winner-receives copy shown beneath
       the peeking carousel of product shots. */
   prize: { receives: string; lines: string[] };
+  /** Vimeo IDs for the three-video row (after pre-order): from config so next
+      month is three new IDs, nothing hardcoded in the component. */
+  videos: string[];
 };
 
 const PUG: CompetitionConfig = {
@@ -116,6 +120,7 @@ const PUG: CompetitionConfig = {
       "Free delivery to one UK address",
     ],
   },
+  videos: ["1221597431", "1221597430", "1221597429"],
 };
 
 export const metadata: Metadata = {
@@ -150,6 +155,8 @@ export default function FindPugPage() {
         <CompetitionProductStrip hand={PUG.productStrip.hand} shots={PUG.productStrip.shots} prize={PUG.prize} />
         {/* Pre-order block (4e): full-width composed artwork. */}
         <CompetitionPreorder src={PUG.preorder.src} alt={PUG.preorder.alt} />
+        {/* Three Vimeo clips between the pre-order block and the terms. */}
+        <CompetitionVideoRow videos={PUG.videos} />
         <CompetitionTerms terms={SPOT_YOUR_CHUM_TERMS} />
       </main>
       <Footer />

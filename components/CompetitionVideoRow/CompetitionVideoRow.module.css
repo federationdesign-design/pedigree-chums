@@ -1,0 +1,41 @@
+/* Three-video row (brief addition), between the pre-order block and the terms.
+   Desktop: three equal columns. Mobile: a single-column stack. Portrait boxes at
+   3:4, the aspect confirmed from Vimeo for these clips (they run 0.72 to 0.755, so
+   3:4 keeps the columns the same height and the ~0.72 clip carries a hair of
+   internal letterbox). Sits on --comp-yellow like the other competition surfaces. */
+
+.section {
+  background: var(--comp-yellow, #fcde04);
+  padding: clamp(24px, 4vw, 56px) clamp(16px, 4vw, 48px);
+}
+.row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(12px, 2vw, 28px);
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.col {
+  position: relative;
+  aspect-ratio: 3 / 4;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #000; /* behind the Vimeo player while it loads */
+}
+.frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+}
+
+@media (max-width: 768px) {
+  /* Single-column stack: a Vimeo iframe captures touch, so no swipe rail. */
+  .row {
+    grid-template-columns: 1fr;
+    max-width: 520px;
+    gap: clamp(16px, 5vw, 28px);
+  }
+}
