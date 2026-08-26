@@ -10,7 +10,7 @@ import { BRITAIN_HISTORY_HAT_ID } from '../../lib/hiddenGames/hatHunt';
 
 const HAT_SRC = '/history/dog-birthday.jpg';
 
-export default function FactHatImage({ src, alt, width, height }: { src: string; alt?: string; width: number; height: number }) {
+export default function FactHatImage({ src, alt, width, height, objectPosition }: { src: string; alt?: string; width: number; height: number; objectPosition?: string }) {
   const isHat = src === HAT_SRC;
   return (
     <Image
@@ -19,6 +19,7 @@ export default function FactHatImage({ src, alt, width, height }: { src: string;
       width={width}
       height={height}
       unoptimized
+      style={objectPosition ? { objectPosition } : undefined}
       onClick={isHat ? () => reportHat(BRITAIN_HISTORY_HAT_ID) : undefined}
     />
   );

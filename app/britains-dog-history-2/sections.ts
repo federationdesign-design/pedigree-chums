@@ -16,7 +16,7 @@ export type Section = {
   // One short title per bullet, same order. Only Medieval has these so far.
   bulletTitles?: string[];
   detail: string;
-  facts: { text: string; image?: string; imageAlt?: string }[];
+  facts: { text: string; image?: string; imageAlt?: string; imagePos?: string }[]; // imagePos: object-position for the round fact image, so the dog's face shows
   image: string; // /history/<name>.jpg image path; drop art in later
   // Optional scroll-scrubbed video for the sticky top. `image` stays as the
   // poster, so a section without a video, or one whose video has not landed
@@ -45,10 +45,10 @@ export const SECTIONS: Section[] = [
     detail:
       "Several generations later, the Roman writer Arrian described swift Celtic coursing hounds that hunted by sight rather than scent. These early dogs were types shaped by work and place rather than standardised breeds: the same island held fast coursing hounds, powerful guard dogs and small practical workers, and their names, appearance and purpose could change between regions and centuries.",
     facts: [
-      { text: "British hunting dogs were valuable enough to be exported across the Channel almost 2,000 years ago.", image: "/history/acident-main-img.jpg" },
-      { text: "Arrian, writing in the Roman period, praised Celtic hounds for speed, spirit and their enthusiasm for chasing hares.", image: "/history/greek-harehound.jpg", imageAlt: "A black-and-tan harehound standing on a muddy grass path in a brown harness, its tail raised." },
-      { text: "Archaeologists have found dogs of very different sizes in early British settlements, from small animals to dogs approaching wolf size.", image: "/history/breeds/Mastiff-and-Alaunt-war-dogs.jpg", imageAlt: "A tall, powerfully built white dog with a black head and pricked ears, standing in profile on open moorland under a grey sky." },
-      { text: "The swift coursing hound of the Celts was famous enough in the ancient world to be described in Roman hunting manuals.", image: "/history/breeds/celtic-hound-drawing.jpg", imageAlt: "An antique engraving of a tall, lean sighthound in a rocky landscape, its long tail curled high, looking back over its shoulder." },
+      { text: "British hunting dogs were valuable enough to be exported across the Channel almost 2,000 years ago.", image: "/history/breeds/celtic-hound-remake.jpg", imageAlt: "A rough-coated grey sighthound standing on a Highland hillside at sunset.", imagePos: "66% 22%" },
+      { text: "Arrian, writing in the Roman period, praised Celtic hounds for speed, spirit and their enthusiasm for chasing hares.", image: "/history/breeds/ancient-celtic-coursing-hound.jpg", imageAlt: "A lean tan coursing hound standing on a moorland hilltop under a golden sky.", imagePos: "70% 24%" },
+      { text: "Archaeologists have found dogs of very different sizes in early British settlements, from small animals to dogs approaching wolf size.", image: "/history/breeds/ancient-british-mastiff-type.jpg", imageAlt: "A powerful brindle mastiff standing on a hillside below a distant hillfort.", imagePos: "72% 30%" },
+      { text: "The swift coursing hound of the Celts was famous enough in the ancient world to be described in Roman hunting manuals.", image: "/history/breeds/ancient-celtic-scent-hound.jpg", imageAlt: "A tan and white scent hound standing in profile on open moorland.", imagePos: "78% 30%" },
     ],
     // Supplied artwork. The filename says "acident": it is spelled that way on
     // disk, so it is spelled that way here.
@@ -71,10 +71,10 @@ export const SECTIONS: Section[] = [
     detail:
       "By the Middle Ages Britain's dogs had settled into recognisable working kinds. Hunting treatises described each type and its task, household records listed hounds by the work they did, and forest law regulated which dogs could live near the royal deer. These were still types rather than breeds: a talbot or a rache was a job and a look, not a pedigree, and the same name could cover different dogs in different counties.",
     facts: [
-      { text: "Medieval pictures often show different dogs doing different jobs, including scent hounds hunting in packs and greyhounds held on leads before the chase.", image: "/history/master-of-the-game.jpg", imageAlt: "A medieval illuminated-manuscript scene of huntsmen in coloured tunics tending white hunting hounds in a walled garden." },
-      { text: "The Master of Game, an English hunting book from the early 1400s, describes running hounds, greyhounds, alaunts, spaniels and mastiffs, each with its own work.", image: "/history/master-of-the-game.jpg", imageAlt: "A medieval illuminated-manuscript scene of huntsmen in coloured tunics tending white hunting hounds in a walled garden." },
-      { text: "Under medieval forest law, large dogs kept near royal forests could be required to have claws removed so they could not chase the deer.", image: "/history/medieval-law.jpg", imageAlt: "A medieval manuscript illustration of a man in a tunic carrying a spear and leading a white hound through woodland." },
-      { text: "The drove roads that dogs and drovers used to walk cattle to market were in use for centuries, and stretches of them can still be walked today.", image: "/history/drovers-dogs.jpg", imageAlt: "A woodcut of a sturdy drover's dog in the foreground, with a second dog driving cattle along a lane behind, among trees and farmland." },
+      { text: "Medieval pictures often show different dogs doing different jobs, including scent hounds hunting in packs and greyhounds held on leads before the chase.", image: "/history/breeds/medieval-earth-dog.jpg", imageAlt: "A small wiry brown terrier standing by a burrow below a ruined castle.", imagePos: "50% 40%" },
+      { text: "The Master of Game, an English hunting book from the early 1400s, describes running hounds, greyhounds, alaunts, spaniels and mastiffs, each with its own work.", image: "/history/breeds/talbot-hound.jpg", imageAlt: "A white pack hound with tan ears standing in the rain on rough ground.", imagePos: "82% 32%" },
+      { text: "Under medieval forest law, large dogs kept near royal forests could be required to have claws removed so they could not chase the deer.", image: "/history/breeds/Medieval-Scottish-Deerhound.jpg", imageAlt: "A tall grey rough-coated deerhound standing on a Highland moor.", imagePos: "76% 22%" },
+      { text: "The drove roads that dogs and drovers used to walk cattle to market were in use for centuries, and stretches of them can still be walked today.", image: "/history/breeds/medieval-shepherds-dog.jpg", imageAlt: "A shaggy grey herding dog on a hillside with a shepherd and sheep behind.", imagePos: "72% 30%" },
     ],
     image: "/history/medieveal-dogs.jpg",
     imageAlt: "Medieval working dogs at their jobs, from pack hounds to herders",
@@ -98,10 +98,10 @@ export const SECTIONS: Section[] = [
     detail:
       "The forest laws were among the most resented in medieval England, with even a harmless guard dog lamed simply for living near royal land. Yet within a few centuries the mood had utterly changed. At the Tudor court, Henry VIII's pampered lapdogs wore velvet collars stamped with the gold Tudor rose, and Anne Boleyn doted on a little dog named Purkoy. The dog as a treasured companion, not just a working animal, was already taking shape.",
     facts: [
-      { text: "Anne Boleyn so loved her lapdog Purkoy that when he died in a fall, no one at court dared to tell her the news.", image: "/history/purkoy.jpg", imageAlt: "A detail from an old painting of a small red-and-white toy spaniel held in its owner's arms." },
-      { text: "Medieval law valued a dog by its job, with a shepherd's dog, a guard dog and a hunting hound each worth a different sum.", image: "/history/medieval-law.jpg", imageAlt: "A medieval manuscript illustration of a man in a tunic carrying a spear and leading a white hound through woodland." },
-      { text: "Mastiff-type 'bandogs' were chained up by day and let loose at night to guard farms from thieves and even wolves.", image: "/history/bandogs.jpg", imageAlt: "A close-up of a large fawn mastiff with a black muzzle and heavy jowls, its tongue showing." },
-      { text: "One of the first books written in English, 'The Master of Game' from around 1406, was a guide to hunting hounds and their care.", image: "/history/master-of-the-game.jpg", imageAlt: "A medieval illuminated-manuscript scene of huntsmen in coloured tunics tending white hunting hounds in a walled garden." },
+      { text: "Anne Boleyn so loved her lapdog Purkoy that when he died in a fall, no one at court dared to tell her the news.", image: "/history/breeds/Old-sporting-toy-spaniels.jpg", imageAlt: "A small red and white toy spaniel standing in a meadow.", imagePos: "74% 40%" },
+      { text: "Medieval law valued a dog by its job, with a shepherd's dog, a guard dog and a hunting hound each worth a different sum.", image: "/history/breeds/low-slung-soldiers-dogs.jpg", imageAlt: "A short-legged brindle working dog standing on a rocky moor.", imagePos: "72% 34%" },
+      { text: "Mastiff-type 'bandogs' were chained up by day and let loose at night to guard farms from thieves and even wolves.", image: "/history/breeds/Old-English-Bulldog.jpg", imageAlt: "A stocky brindle and white bulldog standing in a field by a stone wall.", imagePos: "74% 28%" },
+      { text: "One of the first books written in English, 'The Master of Game' from around 1406, was a guide to hunting hounds and their care.", image: "/history/breeds/staghound.jpg", imageAlt: "A tricolour pack hound standing on a hillside under a cloudy sky.", imagePos: "74% 30%" },
     ],
     image: "/history/medieveal-dogs.jpg",
     /* The scroll-scrubbed video is off. It was 9MB, and every frame of it had
