@@ -22,19 +22,6 @@
   margin: 0 auto;
 }
 
-/* Decorative brand marks (spot, Snap). White via currentColor so the contrast
-   toolbar can repaint them by changing `color`. Roughly 3x the first pass so the
-   row reads as a bold band (Steve, 26 Aug 2026). */
-.icon {
-  color: #ffffff;
-  display: inline-flex;
-}
-.icon svg {
-  height: clamp(34px, 9.4vw, 200px);
-  width: auto;
-  display: block;
-}
-
 /* Centre logo, proportionally larger than the flanking icons (~1.55x), in brand
    colour. */
 .logo {
@@ -64,14 +51,7 @@
   transform: translateY(-2px);
 }
 
-/* Mobile (approved 26 Aug 2026, option B). Drop only the decorative spot mark;
-   keep the centre logo and the TikTok/Instagram links. This row is the ONLY place
-   the platform links exist (the footer carries no socials), and the entry copy
-   sends users to both platforms, so the links must stay on mobile even though the
-   mockup's icon row shows the logo alone. Placed after the base rules so the
-   override is not silently dropped. */
-@media (max-width: 768px) {
-  .icon {
-    display: none;
-  }
-}
+/* Mobile: all four marks stay (spot, logo, TikTok, Instagram), same as desktop.
+   The spot mark is now an internal link to the breed page, so it is no longer
+   decorative and must be tappable on mobile, where most people will use it
+   (Steve, 26 Aug 2026). They fit comfortably at 360px, so nothing is hidden. */

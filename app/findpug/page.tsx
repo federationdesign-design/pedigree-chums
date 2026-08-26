@@ -25,6 +25,9 @@ import { SPOT_YOUR_CHUM_TERMS } from "../../components/CompetitionTerms/spotYour
 type CompetitionConfig = {
   /** Breed name, as printed in copy, titles and the podium. */
   breed: string;
+  /** Internal link to this breed's page, for the icon-row spot mark (from config
+      so next month is /chums/beagle, not hardcoded). */
+  breedHref: string;
   /** <title> for the page. */
   seoTitle: string;
   /** Meta description. */
@@ -48,6 +51,7 @@ type CompetitionConfig = {
 
 const PUG: CompetitionConfig = {
   breed: "Pug",
+  breedHref: "/chums/pug",
   seoTitle: "Spot your Chum Photo Competition: Pug",
   seoDescription:
     "Have you spotted a Pug? Get a photo or selfie and share it on Instagram or TikTok to win an exclusive 3D printed Chum figurine.",
@@ -126,7 +130,7 @@ export default function FindPugPage() {
         />
         {/* Icon row (4b): spot, Snap, logo, TikTok, Instagram. Sits on the same
             yellow field as the titles below. */}
-        <CompetitionIconRow />
+        <CompetitionIconRow breedHref={PUG.breedHref} breedName={PUG.breed} />
         {/* Stage 3 added the titles + intro (4c). */}
         <CompetitionTitles breed={PUG.breed} introLines={PUG.introLines} />
         {/* Stage 4: desktop product image strip. */}

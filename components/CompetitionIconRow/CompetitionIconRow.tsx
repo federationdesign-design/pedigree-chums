@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import OutboundLink from "../OutboundLink/OutboundLink";
 import styles from "./CompetitionIconRow.module.css";
 
@@ -21,9 +22,7 @@ import styles from "./CompetitionIconRow.module.css";
    primary logo; its contrast-scheme variants land with the accessibility pass. */
 
 const TIKTOK_URL = "https://www.tiktok.com/@pedigree_chums";
-/* PLACEHOLDER: the bare domain, matching Nav, until Steve supplies the Pedigree
-   Chums Instagram profile URL. One-line swap when it arrives. */
-const INSTAGRAM_URL = "https://www.instagram.com";
+const INSTAGRAM_URL = "https://www.instagram.com/pedigree_chums_game/";
 
 function SpotIcon() {
   return (
@@ -56,13 +55,27 @@ function InstagramIcon() {
   );
 }
 
-export default function CompetitionIconRow() {
+type Props = {
+  /** Internal breed-page href (from config), e.g. /chums/pug. */
+  breedHref: string;
+  /** Breed name for the spot mark's aria-label. */
+  breedName: string;
+};
+
+export default function CompetitionIconRow({ breedHref, breedName }: Props) {
   return (
     <section className={styles.section} aria-label="Follow Pedigree Chums">
       <div className={styles.row}>
-        <span className={styles.icon}>
+        {/* Spot mark: an INTERNAL link to the featured breed's page, so a normal
+            Next Link (no OutboundLink, no leave dialogue). Styled like the social
+            marks. Visible on mobile now that it is a link. */}
+        <Link
+          href={breedHref}
+          className={styles.social}
+          aria-label={`See the ${breedName} breed page`}
+        >
           <SpotIcon />
-        </span>
+        </Link>
         <span className={styles.logo}>
           <Image
             className={styles.logoImg}
