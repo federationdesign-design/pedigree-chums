@@ -9,17 +9,26 @@
 }
 .strip {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   gap: clamp(14px, 1.6vw, 26px);
-  /* No side gutters: the hand bleeds off the left, the rail bleeds off the right. */
+  /* No side gutters: the hand bleeds off the left, the rail bleeds off the right.
+     Bottom-aligned so the hand and cards share a lower baseline and the hand's
+     wrist runs past the section's lower edge (brief concept). */
 }
 .hand {
   flex: 0 0 auto;
-  width: clamp(230px, 23vw, 460px);
+  /* Larger than the three cards (was 23vw), so the hand reads as the hero of the
+     strip and is clearly taller than the card row. */
+  width: clamp(300px, 32vw, 620px);
   height: auto;
   display: block;
-  /* Pull the wrist off the left edge for the bleed. */
-  margin-left: clamp(-70px, -3vw, -20px);
+  /* Bleed the wrist off the LEFT and the BOTTOM. The negative bottom margin
+     pushes the hand's lower portion below the section's box; overflow:hidden on
+     .section crops it, mirroring the left crop. The negative margin keeps the
+     hand's margin box no taller than the cards, so the section height stays
+     governed by the card row (no growth). Both depths are tunable. */
+  margin-left: clamp(-80px, -3.5vw, -24px);
+  margin-bottom: clamp(-260px, -16vw, -120px);
 }
 .cards {
   flex: 1 1 auto;
