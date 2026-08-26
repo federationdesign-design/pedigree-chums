@@ -22,22 +22,26 @@
 .line1,
 .line2 {
   display: block;
-  font-size: clamp(3rem, 8vw, 7rem);
+  /* Smaller relative to the page than the first pass (was clamp(3rem,8vw,7rem)),
+     to match the concept proportions (Steve, live check 26 Aug 2026). */
+  font-size: clamp(2.4rem, 6vw, 5rem);
   letter-spacing: 0.01em;
   /* paint-order puts the stroke behind the fill, so the outline sits outside the
      letterform instead of eating into it (single-element outline, no stacked
      copy). */
   paint-order: stroke fill;
 }
-/* SPOT YOUR CHUM: --blue fill, white outline. */
+/* SPOT YOUR CHUM: --blue fill (closest token to the concept blue #2485ee and to
+   the logo), fine white keyline. Stroke thinned from clamp(4px,0.8vw,10px) so the
+   blue reads at full strength rather than washed out (Steve, 26 Aug 2026). */
 .line1 {
   color: var(--blue, #1497d6);
-  -webkit-text-stroke: clamp(4px, 0.8vw, 10px) #ffffff;
+  -webkit-text-stroke: clamp(1.5px, 0.2vw, 3px) #ffffff;
 }
-/* PHOTO COMPETITION: white fill, --navy outline. */
+/* PHOTO COMPETITION: white fill, fine --navy keyline. */
 .line2 {
   color: #ffffff;
-  -webkit-text-stroke: clamp(4px, 0.8vw, 10px) var(--navy, #0a3a57);
+  -webkit-text-stroke: clamp(1.5px, 0.2vw, 3px) var(--navy, #0a3a57);
 }
 
 .question {
