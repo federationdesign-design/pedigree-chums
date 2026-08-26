@@ -22,8 +22,12 @@ export default function CompetitionTitles({ breed, introLines }: Props) {
   return (
     <section className={styles.section}>
       <div className={styles.inner}>
+        {/* The explicit {" "} between the two block lines guarantees a space in
+            the text content, so the accessible name reads "Spot your Chum Photo
+            Competition" and any inline fallback does not run the words together
+            ("ChumPhoto"). The lines stack via display: block in the CSS. */}
         <h1 className={styles.title}>
-          <span className={styles.line1}>Spot your Chum</span>
+          <span className={styles.line1}>Spot your Chum</span>{" "}
           <span className={styles.line2}>Photo Competition</span>
         </h1>
         <p className={styles.question}>Have you spotted {breed}?</p>
