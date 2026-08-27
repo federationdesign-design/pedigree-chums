@@ -151,9 +151,7 @@ export const metadata: Metadata = {
 export default function FindPugPage() {
   return (
     <>
-      {/* contrastKeyline: white ring around the accessibility toolbar so it stays
-          legible over the hero video (findpug only; gated in Nav). */}
-      <Nav contrastKeyline />
+      <Nav />
       <main>
         {/* Stage 6: hero video (WIN ME and breed name baked in). */}
         <CompetitionHero

@@ -62,28 +62,6 @@
   pointer-events: none;
 }
 
-/* White keyline around the accessibility toolbar, findpug only (gated by Nav's
-   `contrastKeyline` prop; every other page renders the bare toolbar). The toolbar
-   is a yellow pill with a 5px navy outline; over the bright yellow/blue hero
-   video it can lose its edge. A white ring just outside the navy outline adds a
-   second stroke, so the pill separates from the yellow and the blue of the
-   footage without moving the control or restyling the shared toolbar. drop-shadow
-   is used (not box-shadow) because it hugs the real pill silhouettes, whose class
-   names are hashed in another module and cannot be selected from here; eight
-   offset copies build an even ~1.5px ring. Verified across all three contrast
-   schemes: both schemes crush the hero video dark (contrast-schemes.css), so
-   white only has to beat the bright default video, and the navy outline still
-   carries the pill over the cream arches. */
-.contrastKeyline {
-  display: inline-flex;
-  align-items: center;
-  filter:
-    drop-shadow(1px 0 0 #fff) drop-shadow(-1px 0 0 #fff)
-    drop-shadow(0 1px 0 #fff) drop-shadow(0 -1px 0 #fff)
-    drop-shadow(1px 1px 0 #fff) drop-shadow(-1px -1px 0 #fff)
-    drop-shadow(1px -1px 0 #fff) drop-shadow(-1px 1px 0 #fff);
-}
-
 /* Hamburger, always visible, on both mobile and desktop. The yellow pill is
    legible over the hero and over the page content, so no header fill is needed. */
 .burger {
