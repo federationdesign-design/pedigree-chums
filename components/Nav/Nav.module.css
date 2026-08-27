@@ -382,6 +382,9 @@
   gap: 14px;
 }
 .clusterWide { flex: 1.7 1 0; min-height: 0; }   /* Chum Finder (cover video) */
+/* Chum Finder at half height: a short wide tile instead of flex-filling the
+   column, so Know Your Chums can sit below it in the same left cluster. */
+.clusterWideHalf { flex: none; height: clamp(160px, 20vh, 220px); min-height: 0; }
 .clusterRow { flex: 1 1 0; min-height: 0; display: flex; gap: 14px; }
 .clusterCell { flex: 1 1 0; min-width: 0; min-height: clamp(150px, 18vh, 205px); }
 
@@ -442,6 +445,8 @@
    sized as a banner. Holds the competitions video (comp-vid.mp4) for now; the
    final competitions still image is still to come. */
 .competitionTile { flex: none; width: 100%; height: clamp(200px, 26vh, 300px); }
+/* Smaller "Current Competitions" title on the competition image tile. */
+.competitionTile .tileLabel { font-size: clamp(1rem, 8cqi, 2rem); }
 
 /* Tile base */
 .tile {
@@ -549,6 +554,17 @@
   transition: opacity 0.2s ease;
 }
 .labelHover:hover .tileLabel { opacity: 1; }
+
+/* Blue panel behind the Smarter Than the Test ("Dog Intelligence") hover title so
+   it reads over the busy artwork. Pairs with .labelHover: the title fades in as a
+   solid blue box hugging the text. */
+.hoverPanel .tileLabel {
+  display: inline-block;
+  padding: 8px 16px;
+  border-radius: 14px;
+  background: var(--blue-deep, #0b78bd);
+  box-shadow: 0 6px 18px rgba(10, 58, 87, 0.42);
+}
 
 /* Very light, blurred drop shadow on the Chum Finder title */
 .chumFinderTitle .tileLabel { text-shadow: 0 2px 12px rgba(0, 0, 0, 0.28); }

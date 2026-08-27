@@ -117,26 +117,27 @@ export default function BentoBoard({
         </div>
       </div>
 
-      {/* Row 2 -- Chum Finder on the left, beside Know Your Chums (above) + The
-          Card Game (below). Dogs at Work moved up to Row 1's right cluster, so the
-          left column here now holds Chum Finder alone. */}
+      {/* Row 2 -- Chum Finder (half height) above Know Your Chums on the left,
+          beside Good Dog Bad Dog on the right. Know Your Chums moved in from the
+          right; Good Dog Bad Dog was swapped up from the bottom mini-row in place
+          of the card game (which dropped down to the bottom-left mini slot). */}
       <div className={styles.rowBlock}>
         <div className={styles.cluster}>
-          <VideoTile href="/chum-calculator" src="/chumfinder-vid.mp4" labelA="Chum" labelB="Finder" cta="Take the suitability test" sizeClass={`${styles.clusterWide} ${styles.chumFinderTitle}`} loop={false} reverseOnHover onNavigate={navigate} />
+          <VideoTile href="/chum-calculator" src="/chumfinder-vid.mp4" labelA="Chum" labelB="Finder" cta="Take the suitability test" sizeClass={`${styles.clusterWideHalf} ${styles.chumFinderTitle}`} loop={false} reverseOnHover onNavigate={navigate} />
+          {coverTile(NAV_TILES.knowYourChums, styles.sqTile, true)}
         </div>
         <div className={styles.cluster}>
-          {coverTile(NAV_TILES.knowYourChums, styles.sqTile, true)}
-          {fitTile(NAV_TILES.product)}
+          {fitTile(NAV_TILES.gdbd)}
         </div>
       </div>
 
-      {/* Bottom bento -- the remaining tiles. Good Dog Bad Dog was displaced by
-          Dogs at Work's widening; the discount code tile was removed (Batch 1). */}
+      {/* Bottom bento -- the card game (swapped down from Row 2) beside Smarter
+          Than the Test, then Hot/Dogs + Superpower. */}
       <div className={`${styles.rowBlock} ${styles.rowBlockStart}`}>
         <div className={styles.cluster}>
           <div className={styles.miniRow}>
-            {coverTile(NAV_TILES.gdbd, `${styles.miniCell} ${styles.homeLabel} ${styles.labelHover}`, false, true)}
-            {coverTile(NAV_TILES.smarter, `${styles.miniCell} ${styles.homeLabel} ${styles.labelHover}`, false, true)}
+            {coverTile(NAV_TILES.product, `${styles.miniCell} ${styles.homeLabel} ${styles.labelHover}`, false, true)}
+            {coverTile(NAV_TILES.smarter, `${styles.miniCell} ${styles.homeLabel} ${styles.labelHover} ${styles.hoverPanel}`, false, true)}
           </div>
         </div>
         <div className={styles.cluster}>
