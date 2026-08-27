@@ -33,6 +33,9 @@ type CompetitionConfig = {
   seoTitle: string;
   /** Meta description. */
   seoDescription: string;
+  /** Open Graph share image (1200x630): path + alt from config, so a new breed is
+      a new image at a new path with no code change. */
+  og: { src: string; alt: string };
   /** Hero (brief 4a): a landscape video/poster on desktop and a portrait pair on
       mobile, WIN ME and the breed name baked into the footage. Only one video is
       mounted at a time (see CompetitionHero). `still` forces poster-only. */
@@ -65,6 +68,10 @@ const PUG: CompetitionConfig = {
   seoTitle: "Spot your Chum Photo Competition: Pug",
   seoDescription:
     "Have you spotted a Pug? Get a photo or selfie and share it on Instagram or TikTok to win an exclusive 3D printed Chum figurine.",
+  og: {
+    src: "/competitions/pug/findpug-og.jpg",
+    alt: "Win me: a blue 3D printed Pug figurine on a yellow podium labelled Pug, against blue and cream arches, with a WIN ME badge",
+  },
   hero: {
     /* Desktop landscape pair and mobile portrait pair, both breed-specific, so a
        new breed is a new folder with the same filenames. video-start.mp4 is the
@@ -126,6 +133,12 @@ const PUG: CompetitionConfig = {
 export const metadata: Metadata = {
   title: PUG.seoTitle,
   description: PUG.seoDescription,
+  /* Per-page OG image (1200x630) overriding the site-wide default in layout.tsx.
+     Path and alt come from the config, so next month's breed is a new image with
+     no code change. */
+  openGraph: {
+    images: [{ url: PUG.og.src, width: 1200, height: 630, alt: PUG.og.alt }],
+  },
 };
 
 export default function FindPugPage() {
