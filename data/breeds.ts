@@ -1,6 +1,5 @@
 // Single source of truth for the 54 dogs in the pack.
 // Physical characteristics + personality, from the card data.
-// Copy pending final card content: review before relying on them.
 //
 // MEASUREMENT BASIS. Do NOT "correct" these to Kennel Club figures.
 //   height:      estimated ground-to-top-of-ears in a natural standing posture,
