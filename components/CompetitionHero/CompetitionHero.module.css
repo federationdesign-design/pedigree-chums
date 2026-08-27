@@ -82,15 +82,18 @@
   .posterMobile {
     display: block;
   }
-  /* Crop ~4px off the top and bottom of the mobile media to hide an artefact edge
-     on the portrait video (and keep the poster matched to it). Grow the media 8px
-     and shift up 4px so the frame's overflow:hidden clips 4px off each end while
-     the frame stays filled. CSS-only, so the source stays clean (Steve, 26 Aug
-     2026). */
+  /* Hide the black band baked into the top and bottom of the portrait source
+     (measured 27 Aug 2026: video 4px each end of 1086 = 0.37%; poster 6px each of
+     1810 = 0.33%). Crop by PERCENTAGE, not fixed px: the 1086-tall source renders
+     ~700 CSS px on a phone, so a fixed-px crop under-corrects on larger/denser
+     screens (the old 4px cleared the band only below ~714px wide). 0.5% each end
+     clears the larger (video) band with a small margin, applied to both the video
+     and the poster via .media. Grow the media 1% and shift up 0.5% so the frame's
+     overflow:hidden clips 0.5% off each end while it stays filled. */
   .media {
-    top: -4px;
+    top: -0.5%;
     bottom: auto;
-    height: calc(100% + 8px);
+    height: 101%;
   }
 }
 
