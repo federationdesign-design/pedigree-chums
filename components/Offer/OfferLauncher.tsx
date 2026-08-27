@@ -87,15 +87,6 @@ export default function OfferLauncher() {
         >
           {buying ? "One sec..." : "Pre-order £6.99"}
         </button>
-        <button
-          type="button"
-          className={styles.cta}
-          onClick={() => setOpen(true)}
-          tabIndex={focusable}
-        >
-          <span className={styles.ctaFull}>Get code emailed</span>
-          <span className={styles.ctaShort}>Get code</span>
-        </button>
       </aside>
 
       {open && <OfferModal onClose={() => setOpen(false)} />}

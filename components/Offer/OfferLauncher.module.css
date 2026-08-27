@@ -36,7 +36,7 @@
   font-weight: 800;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--yellow);
+  color: #ffed00; /* lemon accent (Batch), token left alone */
 }
 
 .headline {
@@ -48,53 +48,35 @@
   color: var(--white);
 }
 .accent {
-  color: var(--yellow);
+  color: #ffed00; /* lemon accent (Batch), token left alone */
 }
 
-.cta {
-  display: inline-block;
-  font-family: var(--font-body), system-ui, sans-serif;
-  font-weight: 800;
-  font-size: 1rem;
-  line-height: 1.15;
-  padding: 13px 22px;
-  border-radius: var(--radius-pill);
-  border: 3px solid var(--yellow);
-  background: var(--yellow);
-  color: var(--navy);
-  cursor: pointer;
-  box-shadow: 0 10px 24px rgba(10, 58, 87, 0.3);
-  transition: transform 0.15s ease;
-}
-.cta:hover {
-  transform: translateY(-2px);
-}
-.ctaShort {
-  display: none;
-}
-
-/* Pre-order (pay now) button in the card. Desktop only; hidden in the phone tab
-   collapse below so the slim tab stays a single control. White on the navy card
-   so it reads as the primary action next to the yellow "get code" button. */
+/* Pre-order (pay now) button in the card, now the card's only control (the "Get
+   code emailed" button was removed). Green style with white Luckiest Guy text,
+   matching the /about and /home green buttons. On phones it becomes the slim
+   vertical tab (see the collapse below). */
 .preorder {
   display: block;
   width: 100%;
-  font-family: var(--font-body), system-ui, sans-serif;
-  font-weight: 800;
-  font-size: 1rem;
+  font-family: var(--font-display), "Luckiest Guy", cursive;
+  font-weight: 400;
+  font-size: 1.15rem;
+  letter-spacing: 0.02em;
   line-height: 1.15;
   padding: 13px 22px;
-  margin: 0 0 10px;
+  margin: 0;
   border-radius: var(--radius-pill);
-  border: 3px solid var(--white);
-  background: var(--white);
-  color: var(--navy);
+  border: 3px solid #22c55e;
+  background: #22c55e;
+  color: #ffffff;
   cursor: pointer;
   box-shadow: 0 10px 24px rgba(10, 58, 87, 0.3);
-  transition: transform 0.15s ease;
+  transition: transform 0.15s ease, background 0.15s ease;
 }
 .preorder:hover {
   transform: translateY(-2px);
+  background: #2fd46b;
+  border-color: #2fd46b;
 }
 .preorder:disabled {
   opacity: 0.75;
@@ -124,7 +106,8 @@
 }
 
 /* Phones: collapse to a slim tab hugging the right edge so it never covers the
-   page content. The yellow CTA itself becomes the tab, with vertical text. */
+   page content. The green Pre-order button itself becomes the tab, with vertical
+   text (it is now the card's only control). */
 @media (max-width: 720px) {
   .card {
     width: auto;
@@ -139,24 +122,17 @@
     display: none;
   }
   .preorder {
-    display: none;
-  }
-  .cta {
     writing-mode: vertical-rl;
-    padding: 18px 9px;
+    width: auto;
+    margin: 0;
+    padding: 18px 10px;
     border-radius: 14px 0 0 14px;
-    font-size: 0.9rem;
-    letter-spacing: 0.01em;
+    font-size: 0.95rem;
+    letter-spacing: 0.02em;
     box-shadow: 0 14px 34px rgba(10, 58, 87, 0.45);
   }
-  .cta:hover {
+  .preorder:hover {
     transform: none;
-  }
-  .ctaFull {
-    display: none;
-  }
-  .ctaShort {
-    display: inline;
   }
 }
 
