@@ -88,14 +88,16 @@
      <Image fill> sets inline position/height that override this class, so only the
      plain <video> is cropped. Band measured 27 Aug 2026: 4px each end of 1086 =
      0.37%. Crop by PERCENTAGE, not fixed px (the 1086-tall source renders ~700 CSS
-     px on a phone, so fixed px under-corrects on larger screens). 0.4% each end
-     clears the 0.37% band with a hair of margin and lands the video's framing on
-     the band-free poster's, so the 3s poster->video swap does not jump. Grow the
-     media 0.8% and shift up 0.4% so overflow:hidden clips 0.4% off each end. */
+     px on a phone, so fixed px under-corrects on larger screens). ASYMMETRIC: top
+     stays 0.4% (clears the 0.37% band with a hair of margin), bottom is deepened to
+     1.2% because a black line persisted along the bottom edge. The extra 0.8% is
+     ~5px rendered on a phone (590-700px hero) and scales with the device. Keep
+     top at -0.4% and grow the height so only the bottom clip deepens: clips 0.4%
+     off the top and 1.2% off the bottom. */
   .media {
     top: -0.4%;
     bottom: auto;
-    height: 100.8%;
+    height: 101.6%;
   }
 }
 
