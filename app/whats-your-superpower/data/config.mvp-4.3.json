@@ -1,5 +1,5 @@
 {
-  "configVersion": "MVP-4.2",
+  "configVersion": "MVP-4.3",
   "schemaVersion": "result-contract-2.0",
   "nameSet": "final-1.0",
   "sidekickSet": "1.0",
@@ -45,57 +45,37 @@
   "questions": [
     {
       "id": "M01",
-      "copy": "You are a dog. A small sound happens somewhere in the house. What grabs you first?",
+      "copy": "You are a dog. Someone drops something in the next room. What do you do?",
       "answers": {
         "A": {
-          "copy": "The sound itself, even if nobody else reacts",
+          "copy": "Point my ears at the exact spot it came from",
           "primary": "Zoom",
           "primaryPoints": 2,
           "secondary": "Focus",
           "secondaryPoints": 1
         },
         "B": {
-          "copy": "The way the whole room responds",
+          "copy": "Watch what everyone in the room does next",
           "primary": "Vision",
           "primaryPoints": 2,
           "secondary": "Energy",
-          "secondaryPoints": 1
-        }
-      }
-    },
-    {
-      "id": "M02",
-      "copy": "You are a dog, arriving at a very busy park. What does your attention land on first?",
-      "answers": {
-        "A": {
-          "copy": "The whole park and everything going on",
-          "primary": "Vision",
-          "primaryPoints": 2,
-          "secondary": "Energy",
-          "secondaryPoints": 1
-        },
-        "B": {
-          "copy": "All the little details, toys and pawprints",
-          "primary": "Zoom",
-          "primaryPoints": 2,
-          "secondary": "Focus",
           "secondaryPoints": 1
         }
       }
     },
     {
       "id": "M03",
-      "copy": "You are a dog. You are busy with a bone in the kitchen when a letter drops through the door. What happens?",
+      "copy": "You are a dog with a bone in the kitchen. The letterbox clatters. What happens?",
       "answers": {
         "A": {
-          "copy": "I go straight back to my bone",
+          "copy": "The bone wins. The bone always wins.",
           "primary": "Focus",
           "primaryPoints": 2,
           "secondary": "Zoom",
           "secondaryPoints": 1
         },
         "B": {
-          "copy": "The new arrival sends me onto a different mission",
+          "copy": "Straight down the hall to investigate",
           "primary": "Energy",
           "primaryPoints": 2,
           "secondary": "Ideas",
@@ -184,26 +164,6 @@
       }
     },
     {
-      "id": "M08",
-      "copy": "You are a dog. On the walk there is a trail of pawprints in muddy ground, and one print is strange and different from the rest. What happens?",
-      "answers": {
-        "A": {
-          "copy": "My eyes go straight to the odd one",
-          "primary": "Zoom",
-          "primaryPoints": 2,
-          "secondary": "Focus",
-          "secondaryPoints": 1
-        },
-        "B": {
-          "copy": "I want to know what made the strange print",
-          "primary": "Ideas",
-          "primaryPoints": 2,
-          "secondary": "Vision",
-          "secondaryPoints": 1
-        }
-      }
-    },
-    {
       "id": "M09",
       "copy": "You are a dog. On the walk, the route is closed for maintenance. What is your first reaction?",
       "answers": {
@@ -219,26 +179,6 @@
           "primary": "Ideas",
           "primaryPoints": 2,
           "secondary": "Energy",
-          "secondaryPoints": 1
-        }
-      }
-    },
-    {
-      "id": "M10",
-      "copy": "You are a human again now. You are halfway through a task when something else catches your interest. What do you do?",
-      "answers": {
-        "A": {
-          "copy": "Finish the job I have already started",
-          "primary": "Focus",
-          "primaryPoints": 2,
-          "secondary": "Zoom",
-          "secondaryPoints": 1
-        },
-        "B": {
-          "copy": "Follow the exciting thing and see where it leads",
-          "primary": "Energy",
-          "primaryPoints": 2,
-          "secondary": "Ideas",
           "secondaryPoints": 1
         }
       }
@@ -284,46 +224,6 @@
       }
     },
     {
-      "id": "M13",
-      "copy": "You are a human now, halfway through a book when a squirrel of a thought runs off with you. What happens next?",
-      "answers": {
-        "A": {
-          "copy": "I find my way back to the exact point",
-          "primary": "Focus",
-          "primaryPoints": 2,
-          "secondary": "Vision",
-          "secondaryPoints": 1
-        },
-        "B": {
-          "copy": "The squirrel leads me into a better new story",
-          "primary": "Ideas",
-          "primaryPoints": 2,
-          "secondary": "Energy",
-          "secondaryPoints": 1
-        }
-      }
-    },
-    {
-      "id": "M14",
-      "copy": "You are a dog, something lands upside down on the floor and you know it is not food. How do you work out its proper shape?",
-      "answers": {
-        "A": {
-          "copy": "I turn it around in my head",
-          "primary": "Vision",
-          "primaryPoints": 2,
-          "secondary": "Zoom",
-          "secondaryPoints": 1
-        },
-        "B": {
-          "copy": "I pick it up and test how the pieces fit",
-          "primary": "Energy",
-          "primaryPoints": 2,
-          "secondary": "Ideas",
-          "secondaryPoints": 1
-        }
-      }
-    },
-    {
       "id": "M15",
       "copy": "You are a dog. A strange automatic ball-thrower appears in the garden. What interests you first?",
       "answers": {
@@ -346,7 +246,7 @@
   ],
   "plot": {
     "rawMin": 0,
-    "rawMax": 18,
+    "rawMax": 12,
     "displayMin": 1,
     "displayMax": 5
   },
@@ -545,6 +445,6 @@
     "replay": "A different set of choices may make a different shape.",
     "gameTitle": "What's Your Superpower?",
     "promise": "Answer a collection of strange dog-themed questions and reveal your power mix.",
-    "completionTime": "Takes about three minutes."
+    "completionTime": "Takes about two minutes."
   }
 }
