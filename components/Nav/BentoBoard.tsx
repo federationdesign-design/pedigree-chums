@@ -23,7 +23,7 @@ const NAV_TILES: Record<string, TileData> = {
   home: { href: "/home", labelA: "Home", cta: "Back to start", img: "/home-hero.jpg" },
   hotDogs: { href: "/hot-dogs", labelA: "Hot/Dogs", cta: "What??", img: "/hot-dog-hearo-img.jpg" },
   smarter: { href: "/smarter-than-the-test", labelA: "Smarter Than", labelB: "the Test", cta: "Learn", img: "/inteligent-dogs.jpg" },
-  superpower: { href: "/whats-your-superpower", labelA: "What's Your", labelB: "Superpower", cta: "Find out", img: "/superhero-power.jpg" },
+  superpower: { href: "/whats-your-superpower", labelA: "What's Your", labelB: "Superpower", cta: "Find out", img: "/superpower-img.jpg" },
 };
 
 // The bento launcher board. Used both inside the menu overlay and as a section
