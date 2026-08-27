@@ -58,7 +58,7 @@ export default function AccessibleMenu({ onNavigate }: { onNavigate?: () => void
       {/* Bottom: (Competitions over Smarter + Hot/Dogs) | (Know Your Chums over Discount + Superpower) */}
       <div className={styles.row}>
         <div className={styles.col}>
-          {box("/chumspot", "Current Competitions", true)}
+          {box("/findpug", "Current Competitions", true)}
           <div className={styles.pairRow}>
             {box("/smarter-than-the-test", "Smarter Than the Test")}
             {box("/hot-dogs", "Hot/Dogs")}

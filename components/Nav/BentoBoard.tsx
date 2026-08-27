@@ -9,6 +9,7 @@ import styles from "./Nav.module.css";
 type TileData = { href: string; labelA: string; labelB?: string; cta: string; img?: string; emoji?: string; size?: string; video?: string; videoAspect?: string };
 const NAV_TILES: Record<string, TileData> = {
   nameGen: { href: "/name-generator", labelA: "Try the Dog", labelB: "Name Generator", cta: "Name your chum", video: "/podium-video-menu.mp4", videoAspect: "650 / 542" },
+  competition: { href: "/findpug", labelA: "Current", labelB: "Competitions", cta: "Win prizes", img: "/feacebook-hero.jpg" },
   /* `/` is the pit itself, which is where this used to land: a tile saying
      "Get yours" dropped you into the game. It goes to the marketing page now.
      Note the Home tile below also points at /home, so the two now share a
@@ -98,15 +99,17 @@ export default function BentoBoard({
       <HeroCarousel onNavigate={navigate} />
 
       {/* Row 1 -- Competition (above) + Name Generator (below) in the left column,
-          beside the Chum Drop / Britain's / About cluster. Batch 1 moved the
-          competition tile here, above the Name Generator. */}
+          beside the Chum Drop / Dogs at Work / Britain's / About cluster. The
+          competition tile is now an image tile (feacebook-hero) linking to the
+          /findpug competition; Dogs at Work moved up to sit below Chum Drop. */}
       <div className={styles.rowBlock}>
         <div className={styles.cluster}>
-          <VideoTile href="/chumspot" src="/comp-vid.mp4" labelA="Current" labelB="Competitions" cta="Win prizes" sizeClass={`${styles.competitionTile} ${styles.centerMeta} ${styles.ctaHover} ${styles.compTile}`} loop={false} reverseOnHover onNavigate={navigate} />
+          {coverTile(NAV_TILES.competition, styles.competitionTile)}
           {fitTile(NAV_TILES.nameGen, true)}
         </div>
         <div className={styles.cluster}>
           <ChumDropTile href="/" labelA="Mini-game:" labelB="Chum Drop" cta="Play free now" sizeClass={styles.clusterVideo} onNavigate={navigate} />
+          {coverTile(NAV_TILES.dogsAtWork, styles.dogsAtWorkWide, false, true)}
           <div className={styles.clusterRow}>
             {coverTile(NAV_TILES.britains, `${styles.clusterCell} ${styles.zoomHover}`, false, true)}
             <VideoTile href="/about" src="/menu-about-video.mp4" labelA="About" cta="Who we are" noCta sizeClass={`${styles.clusterCell} ${styles.aboutBig}`} loop={false} reverseOnHover onNavigate={navigate} />
@@ -114,13 +117,12 @@ export default function BentoBoard({
         </div>
       </div>
 
-      {/* Row 2 -- Chum Finder + Dogs at Work (2-wide banner) on the left, beside
-          Know Your Chums (above) + The Card Game (below). Batch 1 made Dogs at
-          Work a 2-wide/1-high banner and moved Know Your Chums above the card game. */}
+      {/* Row 2 -- Chum Finder on the left, beside Know Your Chums (above) + The
+          Card Game (below). Dogs at Work moved up to Row 1's right cluster, so the
+          left column here now holds Chum Finder alone. */}
       <div className={styles.rowBlock}>
         <div className={styles.cluster}>
           <VideoTile href="/chum-calculator" src="/chumfinder-vid.mp4" labelA="Chum" labelB="Finder" cta="Take the suitability test" sizeClass={`${styles.clusterWide} ${styles.chumFinderTitle}`} loop={false} reverseOnHover onNavigate={navigate} />
-          {coverTile(NAV_TILES.dogsAtWork, styles.dogsAtWorkWide, false, true)}
         </div>
         <div className={styles.cluster}>
           {coverTile(NAV_TILES.knowYourChums, styles.sqTile, true)}
