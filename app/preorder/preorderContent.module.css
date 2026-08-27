@@ -197,6 +197,86 @@
 }
 .faqHeading span { color: var(--yellow, #ffd23e); }
 
+/* ── Coming-soon product blocks (mirror /home) ──
+   Two teaser blocks in a full-bleed row below the slider (row 5): sticker pack +
+   3D figurines, same copy and images as /home, the square image beside the copy
+   at half size. The figurines block carries the green "Enter competition" button. */
+.comingSoonRow {
+  grid-column: full-start / full-end;
+  grid-row: 5;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(24px, 4vw, 56px);
+  align-items: start;
+  padding: clamp(40px, 6vw, 80px) clamp(24px, 6vw, 80px) clamp(48px, 8vw, 96px);
+}
+.productCompact {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(16px, 2vw, 28px);
+  align-items: center;
+}
+.productImage {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 20px;
+  overflow: hidden;
+  background: var(--blue-sky) center / cover no-repeat;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+}
+.productImageSticker { background-image: url("/stickerpack-product-img-web.jpg"); }
+.productImageFigurine { background-image: url("/3D-chum-inbox.jpg"); }
+.productCorner {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  font-family: var(--font-display, 'Luckiest Guy', system-ui);
+  font-size: 18px;
+  letter-spacing: 0.04em;
+  background: var(--yellow, #ffd23e);
+  color: var(--navy, #0a3a57);
+  padding: 8px 18px;
+  border-radius: 999px;
+}
+.productContent {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.productTitle {
+  font-family: var(--font-display, 'Luckiest Guy', system-ui);
+  font-size: clamp(1.1rem, 1.8vw, 1.5rem);
+  line-height: 1.05;
+  margin: 0;
+  color: #ffffff;
+  letter-spacing: 0.01em;
+}
+.productDesc {
+  font-size: clamp(15px, 1.5vw, 19px);
+  font-weight: 600;
+  line-height: 1.35;
+  color: #ffffff;
+  margin: 0;
+}
+.productCta { margin-top: 4px; }
+.enterBtn {
+  display: inline-block;
+  font-family: var(--font-display, 'Luckiest Guy', system-ui);
+  font-size: clamp(1rem, 1.6vw, 1.25rem);
+  letter-spacing: 0.03em;
+  color: #ffffff;
+  background: #22c55e;
+  border-radius: 14px;
+  padding: 14px 26px;
+  box-shadow: 0 4px 0 rgba(10, 58, 87, 0.4);
+  transition: background 0.15s, transform 0.1s, box-shadow 0.1s;
+}
+.enterBtn:hover { background: #2fd46b; }
+.enterBtn:active { transform: translateY(3px); box-shadow: 0 1px 0 rgba(10, 58, 87, 0.4); }
+@media (max-width: 520px) {
+  .productCompact { grid-template-columns: 1fr; }
+}
+
 /* ── Text toggle: white at rest -> navy when on ──
    The below-hero prose on /preorder is all white on the body gradient (this page
    never had the 12 August blackening), so the toggle flips every white-on-gradient
@@ -209,7 +289,7 @@
    :root:not([data-pc-contrast-scheme]) so a future accessibility scheme wins. The
    contrast trade is the accepted /home one: white ~1.5:1 (cyan) to ~3.3:1 (blue) at
    rest; navy ~7.7:1 (cyan) to ~3.6:1 (blue) when toggled. */
-:root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"] :is(.introTitle, .introDesc, .white, .metaLabel, .metaValue, .faqHeading) {
+:root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"] :is(.introTitle, .introDesc, .white, .metaLabel, .metaValue, .faqHeading, .productTitle, .productDesc) {
   color: var(--navy, #0a3a57);
 }
 
@@ -244,6 +324,12 @@
   .sliderWrap {
     order: 2;
     margin-top: clamp(28px, 5vw, 56px);
+  }
+  /* Teasers sit last in the stack and drop to one block per row. */
+  .comingSoonRow {
+    order: 3;
+    grid-template-columns: 1fr;
+    padding: clamp(28px, 6vw, 56px) clamp(20px, 6vw, 80px) clamp(40px, 8vw, 72px);
   }
 }
 

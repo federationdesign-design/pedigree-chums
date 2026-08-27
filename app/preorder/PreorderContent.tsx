@@ -1,3 +1,4 @@
+import Link from "next/link";
 import PreorderCheckout from "./PreorderCheckout";
 import FAQ from "../../components/FAQ/FAQ";
 import CardRail from "../../components/CardRail/CardRail";
@@ -94,6 +95,46 @@ export default function PreorderContent() {
       {/* Chum card slider, reused from components/CardRail exactly as /about does. */}
       <div className={styles.sliderWrap}>
         <CardRail />
+      </div>
+
+      {/* Coming-soon teasers, mirroring /home: sticker pack + 3D figurines, same
+          copy and images, the square image beside the copy at half size. The
+          figurines block carries the green Enter competition button (to /findpug). */}
+      <div className={styles.comingSoonRow}>
+        <section className={styles.productCompact}>
+          <div className={`${styles.productImage} ${styles.productImageSticker}`}>
+            <span className={styles.productCorner}>Coming soon</span>
+          </div>
+          <div className={styles.productContent}>
+            <h2 className={styles.productTitle}>Pedigree Chums Sticker Pack, 212 Stickers</h2>
+            <p className={styles.productDesc}>
+              A bumper pack of 212 colourful Pedigree Chums stickers, featuring favourite
+              breeds, paws, bones, stars and more. Perfect for notebooks, bottles, folders
+              and anywhere that needs a little more dog.{" "}
+              <span className={styles.hi}>Coming soon. Not yet available to purchase.</span>
+            </p>
+          </div>
+        </section>
+
+        <section className={styles.productCompact}>
+          <div className={`${styles.productImage} ${styles.productImageFigurine}`}>
+            <span className={styles.productCorner}>Coming soon</span>
+          </div>
+          <div className={styles.productContent}>
+            <h2 className={styles.productTitle}>Pedigree Chums 3D Figurines</h2>
+            <p className={styles.productDesc}>
+              Bring your favourite chum off the card and into the real world with our
+              collectible 3D Pedigree Chums figurines. They are not available to buy just
+              yet. For now, the only way to get one is to win one in a Pedigree Chums
+              competition. <span className={styles.hi}>More chums coming soon.</span>
+            </p>
+            <div className={styles.productCta}>
+              <Link className={styles.enterBtn} href="/findpug">
+                Enter competition
+              </Link>
+            </div>
+          </div>
+        </section>
       </div>
     </main>
   );
