@@ -16,7 +16,7 @@
   margin: 0 0 clamp(20px, 3vw, 36px);
   letter-spacing: 0.01em;
 }
-.headingYellow { color: var(--yellow, #ffd23e); }
+.headingYellow { color: #ffed00; } /* lemon header text (Batch), token left alone */
 
 .list {
   list-style: none;

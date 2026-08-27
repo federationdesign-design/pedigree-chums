@@ -148,8 +148,11 @@ body::before {
   margin: 0;
   text-shadow: 0 4px 6px rgba(10, 58, 87, 0.25);
 }
+/* Lemon header-text yellow (#ffed00), one step less orange than the --yellow
+   token, for display-heading accent words site-wide. The token stays #ffd23e so
+   borders, badges, buttons and game elements are unaffected. */
 .display-yellow {
-  color: var(--yellow);
+  color: #ffed00;
 }
 
 /* paw-print texture, a tiled inline SVG used as a subtle section background */

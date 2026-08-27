@@ -30,7 +30,7 @@
   margin: 0 0 16px;
 }
 
-.titleAccent { color: var(--yellow, #ffd23e); }
+.titleAccent { color: #ffed00; } /* lemon header text (Batch), token left alone */
 
 .headerSub {
   font-family: var(--font-body, "Montserrat", sans-serif);

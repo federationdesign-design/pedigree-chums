@@ -48,7 +48,7 @@
   text-shadow: 0 4px 24px rgba(0,0,0,0.3);
 }
 
-.heroTitle span { color: var(--yellow, #ffd23e); }
+.heroTitle span { color: #ffed00; } /* lemon header text (Batch), token left alone */
 
 .heroSub {
   font-size: clamp(14px, 1.8vw, 18px);
@@ -340,7 +340,7 @@
 }
 
 .productTitle span {
-  color: var(--yellow, #ffd23e);
+  color: #ffed00; /* lemon header text (Batch), token left alone */
 }
 
 /* Batch 2: smaller title for the two Coming Soon blocks (their names are longer
@@ -568,7 +568,7 @@
 }
 
 .cardsHeadingYellow {
-  color: var(--yellow, #ffd23e);
+  color: #ffed00; /* lemon header text (Batch), token left alone */
 }
 
 /* Bento launcher section embedded at the foot of the page. Negative top margin

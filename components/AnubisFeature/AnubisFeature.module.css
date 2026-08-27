@@ -86,7 +86,7 @@
   max-width: 16ch;
   text-shadow: 0 3px 16px rgba(0, 0, 0, 0.45);
 }
-.titleAccent { color: var(--yellow, #ffd23e); }
+.titleAccent { color: #ffed00; } /* lemon header text (Batch), token left alone */
 
 .btn {
   display: inline-block;

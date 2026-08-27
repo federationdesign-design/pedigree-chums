@@ -341,7 +341,7 @@
   letter-spacing: 0.01em; margin: 0; max-width: 16ch;
   text-shadow: 0 3px 16px rgba(0,0,0,0.45);
 }
-.heroTitleAccent { color: var(--yellow, #ffd23e); }
+.heroTitleAccent { color: #ffed00; } /* lemon header text (Batch), token left alone */
 /* Green Luckiest Guy button with the raised top-shadow -- matches Name Generator */
 .heroBtn {
   display: inline-block;

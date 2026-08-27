@@ -17,7 +17,7 @@
   text-align: center;
   letter-spacing: 0.02em;
 }
-.headingYellow { color: var(--yellow, #ffd23e); }
+.headingYellow { color: #ffed00; } /* lemon header text (Batch), token left alone */
 
 /* Progress bar — short, centred, ABOVE the cards. */
 .scrollbar {
