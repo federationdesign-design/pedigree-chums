@@ -69,7 +69,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.14em;
-  color: var(--yellow, #ffd23e);
+  color: #ffed00; /* lemon, matches the FINDER title accent above it (Batch) */
   margin: 0 0 16px;
   text-align: center;
 }

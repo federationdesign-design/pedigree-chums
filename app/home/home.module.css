@@ -84,7 +84,7 @@
 }
 
 .searchTitle span {
-  color: var(--yellow, #ffd23e);
+  color: #ffed00; /* lemon, matches the product-title accent below it (Batch) */
 }
 
 .searchSub {
