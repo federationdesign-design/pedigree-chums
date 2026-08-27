@@ -135,7 +135,7 @@ export default function HomeClient() {
         <ProductBlock
           className={styles.productCompact}
           imageClass={styles.productImageFigurine}
-          badge="Coming soon"
+          badge="Prize only"
           title="Pedigree Chums 3D Figurines"
           titleClass={styles.productTitleSmall}
           cta={

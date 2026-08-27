@@ -315,7 +315,7 @@
   position: absolute;
   top: 16px;
   left: 16px;
-  background: var(--yellow, #ffd23e);
+  background: #ffed00; /* lemon pill (Batch), token left alone */
   color: var(--navy, #0a3a57);
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
   font-size: 26px;
