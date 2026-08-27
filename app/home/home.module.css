@@ -464,6 +464,18 @@
   color: var(--navy, #0a3a57);
 }
 
+/* Mobile (max-width 768px): shrink "Pre-order now" so it fits on one line. At the
+   base 1.9rem it wraps at 360px and below; 1.6rem holds a single line across 320 to
+   390px (measured). Only the full-size button shrinks: "Enter competition" keeps its
+   own .productCompact .btnPrimary size, which has higher specificity than this bare
+   .btnPrimary rule. The navy textinvert colour above is left untouched at every
+   width (deliberate AA contrast fix, df3fbe71). */
+@media (max-width: 768px) {
+  .btnPrimary {
+    font-size: 1.6rem;
+  }
+}
+
 .btnSecondary {
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
   font-size: clamp(14px, 1.6vw, 17px);
