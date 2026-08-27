@@ -1123,7 +1123,7 @@ const allBreeds: Breed[] = [
     maxAgeYears: 15,
     topSpeedKmh: 48,
     established: "1882",
-    image: "/irish-square.png",
+    image: "/irish-setter-square.jpg",
   },
 ];
 
