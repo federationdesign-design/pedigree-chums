@@ -134,3 +134,14 @@
 .soundToggle:focus-visible {
   box-shadow: 0 0 0 4px #fff, 0 4px 0 rgba(10, 58, 87, 0.3);
 }
+
+/* Mobile: lift the toggle clear of the baked "#ChumSpot" caption in the held final
+   frame. Bottom-right and the 44px+ size are unchanged; only the bottom offset
+   rises, vw-scaled so it tracks the video. Placed after the base rule so the
+   override is not dropped. Desktop is left as-is (different footage); revisit if
+   its final frame overlaps too (Steve, 27 Aug 2026). */
+@media (max-width: 768px) {
+  .soundToggle {
+    bottom: clamp(56px, 9vw, 92px);
+  }
+}
