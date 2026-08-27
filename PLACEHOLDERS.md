@@ -339,3 +339,15 @@ the findpug work and NOT for this session to fix:
 
 Resolve via a dedicated cleanup on `main`: pick the lowercase name each side
 references, `git rm` the other, confirm with `git ls-files` (not `ls`).
+
+## Discount badge is desktop-only on britains-dog-history (27 Aug 2026)
+
+The 30% OFF discount badge (`.heroBadge`, background `public/30percent-off.png`)
+shows on /britains-dog-history at **desktop width only**. The badge sits inside
+`.desktopView`, which is `display:none` below 721px; on mobile the whole desktop
+hero is replaced by `HistoryCarousel` (`.mobileView`), which renders no badge. On
+/know-your-chums the same badge is NOT gated, so it shows at every width.
+
+Deliberate for now, NOT a bug: whether to add the badge to the bdh mobile carousel
+is a design decision Steve will make when looking at that page properly, not as a
+side effect of the badge/shadow change. Do not "fix" it in a drive-by.
