@@ -82,18 +82,20 @@
   .posterMobile {
     display: block;
   }
-  /* Hide the black band baked into the top and bottom of the portrait source
-     (measured 27 Aug 2026: video 4px each end of 1086 = 0.37%; poster 6px each of
-     1810 = 0.33%). Crop by PERCENTAGE, not fixed px: the 1086-tall source renders
-     ~700 CSS px on a phone, so a fixed-px crop under-corrects on larger/denser
-     screens (the old 4px cleared the band only below ~714px wide). 0.5% each end
-     clears the larger (video) band with a small margin, applied to both the video
-     and the poster via .media. Grow the media 1% and shift up 0.5% so the frame's
-     overflow:hidden clips 0.5% off each end while it stays filled. */
+  /* Crop the black band off the top and bottom of the portrait VIDEO only. The
+     poster's own band is removed at source (portrait-advert.jpg is exported band-
+     free at 1200x1798), and this crop cannot reach the poster anyway: Next's
+     <Image fill> sets inline position/height that override this class, so only the
+     plain <video> is cropped. Band measured 27 Aug 2026: 4px each end of 1086 =
+     0.37%. Crop by PERCENTAGE, not fixed px (the 1086-tall source renders ~700 CSS
+     px on a phone, so fixed px under-corrects on larger screens). 0.4% each end
+     clears the 0.37% band with a hair of margin and lands the video's framing on
+     the band-free poster's, so the 3s poster->video swap does not jump. Grow the
+     media 0.8% and shift up 0.4% so overflow:hidden clips 0.4% off each end. */
   .media {
-    top: -0.5%;
+    top: -0.4%;
     bottom: auto;
-    height: 101%;
+    height: 100.8%;
   }
 }
 
