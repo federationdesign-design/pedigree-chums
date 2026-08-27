@@ -18,7 +18,7 @@ export default function Footer({ tradeLinks = false }: { tradeLinks?: boolean })
   return (
     <footer className={`pc-footer ${styles.footer}`}>
       <div className={styles.logoCol}>
-        <Image src="/dogbingo.svg" alt="Pedigree Chums™" width={340} height={148} className={styles.logoImgDefault} />
+        <Image src="/competitions/pug/PC-logo-blue.svg" alt="Pedigree Chums™" width={340} height={204} className={styles.logoImgDefault} />
         {/* Items 1-2: the footer wordmark swaps to the monochrome PC logo per
             scheme, driven by the header's own swap. contrast-schemes.css keys the
             display switch and the crush-exclusion on :is(.pc-nav, .pc-footer), so
