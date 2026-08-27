@@ -43,6 +43,10 @@ export default function CompetitionHero({ desktop, mobile, alt, still = false }:
   // video is server-rendered and exactly one is ever mounted.
   const [source, setSource] = useState<Source | null>(null);
   const [showVideo, setShowVideo] = useState(false);
+  // Once the video is actually playing it has replaced the poster, so we drop the
+  // poster out of view: the desktop bottom mask makes the video transparent, and a
+  // poster left stacked behind would ghost through the faded strip.
+  const [videoPlaying, setVideoPlaying] = useState(false);
   // Sound starts off: autoplay only works muted, and unmuted autoplay is hostile.
   // The bottom-right toggle unmutes the mounted video.
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -80,7 +84,7 @@ export default function CompetitionHero({ desktop, mobile, alt, still = false }:
             breakpoint and hides (display:none) the other, which also drops it from
             the a11y tree so the alt is announced once. */}
         <Image
-          className={`${styles.media} ${styles.posterDesktop}`}
+          className={`${styles.media} ${styles.posterDesktop} ${videoPlaying ? styles.posterPlayed : ""}`}
           src={desktop.poster}
           alt={alt}
           fill
@@ -88,7 +92,7 @@ export default function CompetitionHero({ desktop, mobile, alt, still = false }:
           priority
         />
         <Image
-          className={`${styles.media} ${styles.posterMobile}`}
+          className={`${styles.media} ${styles.posterMobile} ${videoPlaying ? styles.posterPlayed : ""}`}
           src={mobile.poster}
           alt={alt}
           fill
@@ -105,6 +109,7 @@ export default function CompetitionHero({ desktop, mobile, alt, still = false }:
             muted
             playsInline
             aria-hidden="true"
+            onPlaying={() => setVideoPlaying(true)}
             onEnded={(e) => {
               e.currentTarget.pause();
             }}

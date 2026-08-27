@@ -39,16 +39,28 @@
 }
 
 /* Desktop only: fade the bottom of the footage into the yellow band so it does
-   not stop on a hard edge. A mask on the media (video + both posters, all .media),
-   NOT on the frame: the sound toggle is a sibling in the frame and must stay fully
-   opaque. The media fades to transparent over its bottom 15% and the frame's
-   --comp-yellow shows through, matching the band below. min-width query so mobile
+   not stop on a hard edge. The mask is alpha transparency, so it "fades into the
+   yellow" only because the frame's --comp-yellow is the sole thing directly behind
+   the media: anything else stacked behind (e.g. the poster) would ghost through the
+   faded strip, so the poster is dropped once the video plays (.posterPlayed below).
+   Mask on the media, NOT on the frame: the sound toggle is a sibling in the frame
+   and must stay fully opaque. Fades over the bottom 15%. min-width query so mobile
    (the portrait hero, with the breed name baked lower in frame) is untouched. */
 @media (min-width: 769px) {
   .media {
     -webkit-mask-image: linear-gradient(to bottom, #000 85%, transparent 100%);
     mask-image: linear-gradient(to bottom, #000 85%, transparent 100%);
   }
+}
+
+/* Poster dropped once the video is playing: it has done its job (LCP + covering the
+   3s before the video mounts), and leaving it stacked behind the mask-faded video
+   ghosts through the faded strip. opacity:0, not display:none, so it keeps its alt
+   in the a11y tree for the DAC sign-off while contributing nothing to the composite.
+   In `still`/reduced-motion (no video) this never applies, so the poster shows and
+   fades into the yellow as intended. */
+.posterPlayed {
+  opacity: 0;
 }
 
 /* Poster picking. Base = desktop: show the desktop poster, hide the mobile one.
