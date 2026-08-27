@@ -22,14 +22,13 @@ import styles from "./know.module.css";
    Pint-sized pups takes the rest of the small dogs. */
 const ROWS: { title: string; accent: string; names: string[] }[] = [
   /* Batch 8 (owner review): Employed Dogs moved to second, Pint-sized Pups to
-     fourth (below Popular UK Breeds), and ten dogs reassigned. Jack Russell is
-     kept in Top Dogs per the brief's "confirmed" line (Dachshund, Jack Russell
-     and Bulldog to Top Dogs), which overrides the reassignment table's row that
-     sent it to Popular UK Breeds. */
+     fourth (below Popular UK Breeds), and ten dogs reassigned per the table.
+     Jack Russell goes to Popular UK Breeds; the "confirmed" line only confirmed
+     Bulldog to Top Dogs. */
   {
     title: "The top dogs",
     accent: "dogs",
-    names: ["Jack Russell Terrier", "Staffordshire Bull Terrier", "French Bulldog", "Chihuahua", "Dachshund", "Bulldog"],
+    names: ["Staffordshire Bull Terrier", "French Bulldog", "Chihuahua", "Dachshund", "Bulldog"],
   },
   /* Bred for a job and still doing one: herding, guarding, police and
      military work, mountain rescue. */
@@ -41,7 +40,7 @@ const ROWS: { title: string; accent: string; names: string[] }[] = [
   {
     title: "Popular UK breeds",
     accent: "breeds",
-    names: ["Border Collie", "Greyhound", "Miniature Schnauzer", "Boxer", "Bull Terrier"],
+    names: ["Jack Russell Terrier", "Border Collie", "Greyhound", "Miniature Schnauzer", "Boxer", "Bull Terrier"],
   },
   /* The rest of the small dogs, once the rows above have taken the ones they
      describe better. */
