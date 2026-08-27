@@ -276,17 +276,31 @@
 @media (max-width: 768px) {
   .comingSoonRow { grid-template-columns: 1fr; }
 }
-/* Compact ProductBlock for a narrow column: stack the image over the copy, and
-   shrink both against the full-width card game block. The row above owns the
-   outer padding. */
+/* Compact ProductBlock for a narrow column: the image sits BESIDE the copy at
+   half its former size (the two 1fr tracks split the block, so the square image
+   is ~half the width it was when it spanned the whole column), and both shrink
+   against the full-width card game block. The row above owns the outer padding. */
 .productCompact {
-  grid-template-columns: 1fr;
-  gap: clamp(14px, 1.6vw, 20px);
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(16px, 2vw, 28px);
   padding: 0;
+  align-items: center;
 }
 .productCompact .productContent { gap: 12px; }
 .productCompact .productDesc { font-size: clamp(15px, 1.5vw, 19px); }
 .productCompact .productCorner { font-size: 18px; padding: 8px 18px; }
+/* Green "Enter competition" button (3D figurines block): the full-size .btnPrimary
+   is far too big for this narrow column, so scale it down while keeping the green
+   fill, white Luckiest Guy text and shadow. */
+.productCompact .btnPrimary {
+  font-size: clamp(1rem, 1.6vw, 1.25rem);
+  padding: 14px 26px;
+}
+/* Below 520px the beside layout gets too tight for the square image plus copy, so
+   drop back to image-over-text at the narrow end only. */
+@media (max-width: 520px) {
+  .productCompact { grid-template-columns: 1fr; }
+}
 
 .productPlaceholder {
   font-family: var(--font-display, 'Luckiest Guy', system-ui);

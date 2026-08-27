@@ -138,6 +138,13 @@ export default function HomeClient() {
           badge="Coming soon"
           title="Pedigree Chums 3D Figurines"
           titleClass={styles.productTitleSmall}
+          cta={
+            <div className={styles.productCta}>
+              <Link className={styles.btnPrimary} href="/findpug">
+                Enter competition
+              </Link>
+            </div>
+          }
         >
           Bring your favourite chum off the card and into the real world with our collectible 3D Pedigree Chums figurines. They are not available to buy just yet. For now, the only way to get one is to win one in a Pedigree Chums competition. <span className={styles.productDescHi}>More chums coming soon.</span>
         </ProductBlock>
