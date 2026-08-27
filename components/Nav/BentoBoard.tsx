@@ -98,14 +98,14 @@ export default function BentoBoard({
       {/* Featured hero -- carousel: Argos / Anubis / Hound of the Baskervilles */}
       <HeroCarousel onNavigate={navigate} />
 
-      {/* Row 1 -- Competition (above) + Name Generator (below) in the left column,
-          beside the Chum Drop / Dogs at Work / Britain's / About cluster. The
-          competition tile is now an image tile (feacebook-hero) linking to the
-          /findpug competition; Dogs at Work moved up to sit below Chum Drop. */}
+      {/* Row 1 -- Competition (above) + Know Your Chums (below) in the left column,
+          beside the Chum Drop / Dogs at Work / Britain's / About cluster. Know Your
+          Chums swapped up here from Row 2 (Name Generator went the other way). The
+          competition tile is an image tile (feacebook-hero) linking to /findpug. */}
       <div className={styles.rowBlock}>
         <div className={styles.cluster}>
           {coverTile(NAV_TILES.competition, styles.competitionTile)}
-          {fitTile(NAV_TILES.nameGen, true)}
+          {coverTile(NAV_TILES.knowYourChums, styles.sqTile, true)}
         </div>
         <div className={styles.cluster}>
           <ChumDropTile href="/" labelA="Mini-game:" labelB="Chum Drop" cta="Play free now" sizeClass={styles.clusterVideo} onNavigate={navigate} />
@@ -117,16 +117,17 @@ export default function BentoBoard({
         </div>
       </div>
 
-      {/* Row 2 -- Chum Finder (half height) above Know Your Chums on the left,
-          beside Good Dog Bad Dog on the right. Know Your Chums moved in from the
-          right; Good Dog Bad Dog was swapped up from the bottom mini-row in place
-          of the card game (which dropped down to the bottom-left mini slot). */}
+      {/* Row 2 -- Name Generator alone on the left (Chum Finder moved to the right
+          column and Know Your Chums swapped up to Row 1). On the right, Chum Finder
+          (one cell high) sits below the Britain's / About pair and above Good Dog
+          Bad Dog, so the right column reads Chum Drop, Dogs at Work, Britain's /
+          About, Chum Finder, Good Dog Bad Dog. */}
       <div className={styles.rowBlock}>
         <div className={styles.cluster}>
-          <VideoTile href="/chum-calculator" src="/chumfinder-vid.mp4" labelA="Chum" labelB="Finder" cta="Take the suitability test" sizeClass={`${styles.clusterWideHalf} ${styles.chumFinderTitle}`} loop={false} reverseOnHover onNavigate={navigate} />
-          {coverTile(NAV_TILES.knowYourChums, styles.sqTile, true)}
+          {fitTile(NAV_TILES.nameGen, true)}
         </div>
         <div className={styles.cluster}>
+          <VideoTile href="/chum-calculator" src="/chumfinder-vid.mp4" labelA="Chum" labelB="Finder" cta="Take the suitability test" sizeClass={`${styles.clusterWideHalf} ${styles.chumFinderTitle}`} loop={false} reverseOnHover onNavigate={navigate} />
           {fitTile(NAV_TILES.gdbd)}
         </div>
       </div>

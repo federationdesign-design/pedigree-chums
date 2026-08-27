@@ -418,7 +418,7 @@
 }
 /* Name Generator: "Try the Dog" over the image, pops in on hover */
 .fitAccent {
-  position: absolute; left: clamp(16px, 2vw, 26px); bottom: clamp(16px, 2vw, 26px);
+  position: absolute; left: clamp(16px, 2vw, 26px); top: clamp(16px, 2vw, 26px);
   z-index: 2; pointer-events: none; margin: 0;
   font-family: var(--font-display, "Luckiest Guy", cursive);
   font-size: clamp(1.6rem, 9cqi, 3.4rem); line-height: 1;
@@ -445,8 +445,10 @@
    sized as a banner. Holds the competitions video (comp-vid.mp4) for now; the
    final competitions still image is still to come. */
 .competitionTile { flex: none; width: 100%; height: clamp(200px, 26vh, 300px); }
-/* Smaller "Current Competitions" title on the competition image tile. */
-.competitionTile .tileLabel { font-size: clamp(1rem, 8cqi, 2rem); }
+/* Smaller "Current Competitions" title on the competition image tile, right-aligned.
+   Only the label moves right; the "Win prizes" button keeps its own align-self:
+   flex-start, so it stays at the left where it was. */
+.competitionTile .tileLabel { font-size: clamp(1rem, 8cqi, 2rem); text-align: right; }
 
 /* Tile base */
 .tile {
