@@ -126,10 +126,6 @@ const PUG: CompetitionConfig = {
 export const metadata: Metadata = {
   title: PUG.seoTitle,
   description: PUG.seoDescription,
-  /* Noindex while the page is half-built (terms only, no prize or entry info).
-     Lifted, along with the sitemap listing, only after the accessibility pass
-     when the page is finished (Steve, 25 Aug 2026). */
-  robots: { index: false, follow: false },
 };
 
 export default function FindPugPage() {

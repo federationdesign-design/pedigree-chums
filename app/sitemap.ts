@@ -34,6 +34,7 @@ const PAGES: [path: string, freq: "weekly" | "monthly" | "yearly", priority: num
      index page has real content. */
   ["/know-your-chums", "monthly", 0.7],
   ["/chumspot", "monthly", 0.6],
+  ["/findpug", "monthly", 0.6],
   ["/chum-calculator", "monthly", 0.6],
   ["/name-generator", "monthly", 0.7],
   ["/hot-dogs", "monthly", 0.6],

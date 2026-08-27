@@ -301,6 +301,29 @@ image, so:
 - No pug pre-order asset exists in `public/` yet; Steve is supplying it
   separately. It is a per-page (breed-specific) config field, not shared.
 
+### /findpug now live (27 Aug 2026): accepted known issues, not blocking
+
+The noindex was removed and `/findpug` added to the sitemap on 27 Aug 2026. Two
+issues are accepted for now and are NOT blockers:
+
+1. **Default-view contrast (WCAG 1.4.3 / 1.4.11).** On the default view (no
+   contrast scheme), two elements sit white on the `--comp-yellow` band at 1.36:1,
+   below the 3:1 they need:
+   - the icon-row glyphs (spot, TikTok, Instagram)
+   - the PHOTO COMPETITION title line
+   Both clear 8.8:1 if turned navy; that fix is deferred, not applied. The three
+   contrast schemes and the navy terms panel are unaffected.
+
+2. **Wrong breed figures baked into artwork.** The Pug height/length/weight are
+   wrong and are baked (not live data) into three surfaces, each of which must be
+   RE-EXPORTED when the corrected art lands (see "Pre-order card render carries
+   stale figures" above):
+   - the pre-order product render
+   - the hero video's held final frame
+   - the first of the three Vimeo thumbnails
+   The OG image (`findpug-og.jpg`) is the hero scene only and carries NO card or
+   figures, so it is safe to serve.
+
 ### Case-collision pairs in public/ (existing defect on main)
 
 `git ls-files` shows three pairs of tracked filenames that differ only in case.
