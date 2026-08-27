@@ -223,7 +223,10 @@
   min-width: 0;
 }
 .noteText p {
-  font-size: 1.3rem;
+  /* Batch 7: body text +4pt on desktop (net of the original +2pt and a further
+     +2pt), and fluid like the About / Dog History pages rather than fixed. Was a
+     fixed 1.3rem; max is 1.3rem + 4pt (0.333rem). */
+  font-size: clamp(1.2rem, 2.3vw, 1.633rem);
 }
 @media (max-width: 640px) {
   .noteRow {
@@ -599,17 +602,20 @@
 /* ── Fixed cerberus dog ─────────────────────────────────────────────────── */
 
 
-.cookingInner .lead,
-.cookingInner > p:not([class]) { font-size: 1.38rem; }
+.cookingInner .lead { font-size: 1.38rem; }
+/* Batch 7: plain cooking-section body paragraph, +4pt and fluid (was fixed 1.38rem). */
+.cookingInner > p:not([class]) { font-size: clamp(1.25rem, 2.5vw, 1.713rem); }
 /* Cooking/food column prose and the plain game paragraphs had no size rule, so they
    rendered at the browser default 16px, smaller than every redesigned page: the
    "hot dogs are called hot dogs" section, the storage instructions, the game copy.
    Size them to /know-your-chums body (16-19px, fluid). The already-larger paragraphs
    (.noteText p, .safetyCol p, the direct .cookingInner > p above) keep their sizes via
    their more-specific rules, and the FAQ answers keep theirs, so nothing shrinks. */
+/* Batch 7: cooking / food / game body columns, +4pt and still fluid (was
+   clamp(1rem, 2vw, 1.2rem); max is 1.2rem + 4pt). */
 .cookingCol p,
 .foodCol p,
-.gameTwoCols > div > p { font-size: clamp(1rem, 2vw, 1.2rem); }
+.gameTwoCols > div > p { font-size: clamp(1.15rem, 2.2vw, 1.533rem); }
 
 .alert p { font-weight: 500; line-height: 1.5; font-size: clamp(1.1rem, 1.7vw, 1.27rem); margin: 8px 0; }
 
@@ -753,7 +759,8 @@
   padding-top: 16px;
 }
 
-.safetyCol p:not(.lead) { font-size: 1.3rem; font-weight: 500; }
+/* Batch 7: safety-column body paragraphs, +4pt and fluid (was fixed 1.3rem). */
+.safetyCol p:not(.lead) { font-size: clamp(1.2rem, 2.3vw, 1.633rem); font-weight: 500; }
 
 .alertIcon {
   font-size: 2.2rem;
