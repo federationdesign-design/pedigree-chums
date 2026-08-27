@@ -102,6 +102,10 @@ function BarTable({
       {bars.map((b, i) => {
         const target = (b.w != null ? b.w : (b.pct / max) * 78) * barScale;
         const breed = resolveBreed(b.name);
+        // Prefer the pack's own square (kept current by the breed-image swaps) so
+        // the charts never drift from the artwork on the cards. The hardcoded
+        // `img` is a fallback for stats-only breeds not in the pack (English Setter).
+        const imgSrc = breed?.image ?? b.img;
         return (
           <Link
             href={breed ? `/chums/${breed.slug}` : "#"}
@@ -111,8 +115,8 @@ function BarTable({
             style={{ textDecoration: "none" }}
           >
             <div className={styles.barThumb}>
-              {b.img ? (
-                <Image src={b.img} alt={b.name} width={120} height={120} unoptimized />
+              {imgSrc ? (
+                <Image src={imgSrc} alt={b.name} width={120} height={120} unoptimized />
               ) : (
                 <span className={styles.barThumbPaw} aria-hidden="true">
                   🐾

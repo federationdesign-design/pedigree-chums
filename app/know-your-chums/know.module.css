@@ -248,7 +248,7 @@
 }
 .barFill {
   height: clamp(58px, 8.5vw, 84px);
-  background: #FFED60;
+  background: #ffed00;
   border-radius: 0 var(--radius-pill) var(--radius-pill) 0;
   width: 0;
   transition: width 1.1s cubic-bezier(0.22, 1, 0.36, 1);
