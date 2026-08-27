@@ -1004,7 +1004,7 @@ const allBreeds: Breed[] = [
     maxAgeYears: 15,
     topSpeedKmh: 48,
     established: "1976",
-    image: "/border-collie-square.png",
+    image: "/collie-square.jpg",
   },
   {
     name: "Cocker Spaniel",

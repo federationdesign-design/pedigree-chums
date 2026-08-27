@@ -161,7 +161,7 @@ export const ukBreeds: UKBreed[] = [
   { name: "Labrador Retriever", strip: "late1800", era: "late 1800s", anchor: 1882, note: "From Newfoundland's water dogs to Britain's favourite breed.", image: "/lab-square.jpg", tag: "popular" },
   { name: "Bearded Collie", strip: "c1500", era: "1600s", anchor: 1660, note: "Shaggy, bouncing Scottish herding dog.", image: "/history/breeds/bearded-collie-photo.jpg", tag: "endangered" },
   { name: "Rough Collie", strip: "mid1800", era: "1860s", anchor: 1862, note: "The classic Scottish collie of film and fame.", image: "/history/breeds/rough-collie-photo.jpg", tag: "in-decline" },
-  { name: "Border Collie", strip: "late1800", era: "late 1800s", anchor: 1885, note: "The supreme sheepdog, all focus and crouching 'eye'.", image: "/border-collie-square.png" , tag: "popular" },
+  { name: "Border Collie", strip: "late1800", era: "late 1800s", anchor: 1885, note: "The supreme sheepdog, all focus and crouching 'eye'.", image: "/collie-square.jpg" , tag: "popular" },
   { name: "Golden Retriever", strip: "late1800", era: "late 1800s", anchor: 1890, note: "Bred in the Scottish Highlands by Lord Tweedmouth.", image: "/golden-square.jpg", tag: "popular" },
   { name: "Celtic Heeler", strip: "ancient", era: "Ancient", anchor: 900, note: "Low-slung Celtic cattle heeler, forerunner of both Welsh Corgis.", image: "/history/breeds/medieval-corgi.jpg", tag: "extinct" },
   { name: "Cardigan Welsh Corgi", strip: "late1800", era: "late 1800s", anchor: 1880, note: "The older, long-tailed corgi, first shown in 1919.", image: "/history/breeds/Welsh_Corgi_Cardigan-photo.jpg", tag: "endangered" },
