@@ -1,8 +1,9 @@
 /* Three-video row (brief addition), between the pre-order block and the terms.
-   Desktop: three equal columns. Mobile: a single-column stack. Portrait boxes at
-   3:4, the aspect confirmed from Vimeo for these clips (they run 0.72 to 0.755, so
-   3:4 keeps the columns the same height and the ~0.72 clip carries a hair of
-   internal letterbox). Sits on --comp-yellow like the other competition surfaces. */
+   Desktop: three equal columns. Mobile: a single-column stack. Boxes are a uniform
+   3:4; each clip cover-fills its box from its OWN aspect (--aspect, from config),
+   so a clip that is not 3:4 (these run 0.72 to 0.755) fills the box instead of
+   letterboxing inside the Vimeo player. Sits on --comp-yellow like the other
+   competition surfaces. */
 
 .section {
   background: var(--comp-yellow, #f9dd3b);
@@ -25,24 +26,28 @@
   position: relative;
   aspect-ratio: 3 / 4;
   border-radius: 16px;
-  overflow: hidden; /* clips the oversized iframe below -> the 4px crop */
+  overflow: hidden; /* clips the cover-filled iframe below to the box */
   background: #000; /* behind the Vimeo player while it loads */
-  /* 5px white stroke on the OUTER edge of the cropped video: with box-sizing
-     border-box the overflow clip is at the padding box (inside the border), so the
-     border rings the cropped result, not the uncropped iframe. */
+  /* 5px white stroke on the OUTER edge of the box: with box-sizing border-box the
+     overflow clip is at the padding box (inside the border), so the border rings
+     the clipped video, not the overflowing iframe. */
   border: 5px solid #fff;
   box-shadow: 0 18px 36px rgba(10, 58, 87, 0.32); /* --navy tinted drop shadow, kept */
 }
 .frame {
   position: absolute;
-  /* Crop ~4px off all four edges (each clip has an artefact edge): oversize the
-     iframe by 8px and offset it -4px, so .col's overflow:hidden trims 4px per side.
-     Offset, not transform:scale (scaling softens the player). Same box-clip trick
-     already shipped on the mobile hero video. */
-  top: -4px;
-  left: -4px;
-  width: calc(100% + 8px);
-  height: calc(100% + 8px);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  /* Cover-fill from the clip's own aspect (--aspect = w/h, set per iframe from
+     config). The iframe is given the clip's aspect so the Vimeo player has no room
+     to letterbox, then sized to cover the 3:4 box; whichever axis overflows is
+     clipped by .col's overflow:hidden (top/bottom for a clip taller than 3:4 like
+     the 0.72 one, left/right for a wider one, nothing for an exact 3:4). Box aspect
+     is 0.75. Percentage-based so it holds at any box size, and generic: any
+     --aspect works, so next month's clips need no code change. */
+  width: max(100%, calc(var(--aspect) / 0.75 * 100%));
+  height: max(100%, calc(0.75 / var(--aspect) * 100%));
   border: none;
   display: block;
 }

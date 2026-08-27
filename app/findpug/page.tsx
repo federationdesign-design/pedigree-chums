@@ -57,9 +57,10 @@ type CompetitionConfig = {
   /** THE PRIZE block (brief 4d, mobile): the winner-receives copy shown beneath
       the peeking carousel of product shots. */
   prize: { receives: string; lines: string[] };
-  /** Vimeo IDs for the three-video row (after pre-order): from config so next
-      month is three new IDs, nothing hardcoded in the component. */
-  videos: string[];
+  /** The three-video row (after pre-order): each clip carries its Vimeo id and its
+      native pixel size, so the row cover-fills any aspect. From config, so next
+      month is three new clips of any shape with no code change. */
+  videos: { id: string; w: number; h: number }[];
 };
 
 const PUG: CompetitionConfig = {
@@ -127,7 +128,13 @@ const PUG: CompetitionConfig = {
       "Free delivery to one UK address",
     ],
   },
-  videos: ["1221597431", "1221597430", "1221597429"],
+  /* Native sizes from Vimeo oEmbed (27 Aug 2026): 0.755, 0.750, 0.719. The third
+     is the odd one; cover-fill handles it from these figures. */
+  videos: [
+    { id: "1221597431", w: 240, h: 318 },
+    { id: "1221597430", w: 240, h: 320 },
+    { id: "1221597429", w: 240, h: 334 },
+  ],
 };
 
 export const metadata: Metadata = {
