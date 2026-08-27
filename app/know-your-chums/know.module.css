@@ -1036,6 +1036,18 @@
   .flipNote { display: none; }
   .flipHint { font-size: 1.05rem !important; padding: 14px 20px 10px; }
   .flipName { font-size: 1.3rem !important; }
+
+  /* Batch 8 mobile: the blue fact container gets wider (much smaller side
+     margin), its padding drops 25% (from clamp(24px, 3.5vw, 48px)), and the
+     paragraph text (.factLabel) drops 40% (from clamp(1.56rem, 3.2vw, 1.9rem)).
+     These sit after the unwrapped .factsPanel / .factLabel rules so they win. */
+  .factsPanel {
+    margin: clamp(20px, 4vw, 40px) clamp(8px, 2vw, 16px);
+    padding: clamp(18px, 2.6vw, 36px);
+  }
+  .factLabel {
+    font-size: clamp(0.936rem, 1.92vw, 1.14rem) !important;
+  }
 }
 
 /* ============================================================================

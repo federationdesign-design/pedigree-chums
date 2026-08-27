@@ -21,36 +21,50 @@ import styles from "./know.module.css";
    where they did, the dog sits in the row that describes it best and
    Pint-sized pups takes the rest of the small dogs. */
 const ROWS: { title: string; accent: string; names: string[] }[] = [
-  /* Reviewed as asked: these are the actual most-owned breeds in Britain
-     (RVC VetCompass, O'Neill et al. 2023), which is what the same source
-     already drives the bar charts above with. The old four were a mix of
-     popular and merely well-known. */
+  /* Batch 8 (owner review): Employed Dogs moved to second, Pint-sized Pups to
+     fourth (below Popular UK Breeds), and ten dogs reassigned. Jack Russell is
+     kept in Top Dogs per the brief's "confirmed" line (Dachshund, Jack Russell
+     and Bulldog to Top Dogs), which overrides the reassignment table's row that
+     sent it to Popular UK Breeds. */
   {
     title: "The top dogs",
     accent: "dogs",
-    names: ["Labrador", "Jack Russell Terrier", "Cocker Spaniel", "Staffordshire Bull Terrier", "French Bulldog", "Chihuahua"],
+    names: ["Jack Russell Terrier", "Staffordshire Bull Terrier", "French Bulldog", "Chihuahua", "Dachshund", "Bulldog"],
+  },
+  /* Bred for a job and still doing one: herding, guarding, police and
+     military work, mountain rescue. */
+  {
+    title: "Employed dogs",
+    accent: "dogs",
+    names: ["Labrador", "Cocker Spaniel", "Golden Retriever", "Springer Spaniel", "Cockapoo", "German Shepherd", "Rottweiler", "Doberman Pinscher"],
   },
   {
     title: "Popular UK breeds",
     accent: "breeds",
-    names: ["Golden Retriever", "Springer Spaniel", "Dachshund", "Miniature Schnauzer", "Boxer", "Bull Terrier"],
+    names: ["Border Collie", "Greyhound", "Miniature Schnauzer", "Boxer", "Bull Terrier"],
+  },
+  /* The rest of the small dogs, once the rows above have taken the ones they
+     describe better. */
+  {
+    title: "Pint-sized pups",
+    accent: "pups",
+    names: ["Pomeranian", "Maltese", "Bichon Frise", "Papillon", "Italian Greyhound", "Chihuahua"],
   },
   {
     title: "The ol' favourites",
     accent: "favourites",
     names: ["West Highland Terrier", "Yorkshire Terrier", "Cavalier King Charles Spaniel", "Whippet", "Border Terrier", "Lurcher"],
   },
-  /* All seven crossbreeds in the pack, including the three the strip on
-     Britain's dog history just gained. */
+  /* The pack's crossbreeds (Cockapoo now sits with the working dogs above). */
   {
     title: "The new favourites",
     accent: "favourites",
-    names: ["Cockapoo", "Cavapoo", "Labradoodle", "Goldendoodle", "Cavachon", "Maltipoo", "Jackapoo"],
+    names: ["Cavapoo", "Labradoodle", "Goldendoodle", "Cavachon", "Maltipoo", "Jackapoo"],
   },
   {
     title: "Oldest UK breeds",
     accent: "breeds",
-    names: ["Irish Wolfhound", "Corgi", "Bulldog", "Beagle", "Greyhound", "Basset Hound"],
+    names: ["Irish Wolfhound", "Corgi", "Beagle", "Basset Hound"],
   },
   /* Dogs whose homeland is not Britain. */
   {
@@ -58,34 +72,20 @@ const ROWS: { title: string; accent: string; names: string[] }[] = [
     accent: "home",
     names: ["Afghan Hound", "Shih Tzu", "Pug", "Siberian Husky", "Great Dane", "Saint Bernard", "Dalmatian", "Weimaraner", "Poodle", "Boston Terrier"],
   },
-  /* The pack's vulnerable natives, the same five the rarity chart above is
-     built from, minus the English Setter, which is not in the pack. */
+  /* The pack's vulnerable natives, minus the English Setter, which is not in
+     the pack (Irish Setter takes its place). */
   {
     title: "Endangered dogs",
     accent: "dogs",
     names: ["Old English Sheepdog", "Bloodhound", "Mastiff", "Irish Setter"],
   },
-  /* Bred for a job and still doing one: herding, guarding, police and
-     military work, mountain rescue. */
-  {
-    title: "Employed dogs",
-    accent: "dogs",
-    names: ["Border Collie", "German Shepherd", "Rottweiler", "Doberman Pinscher"],
-  },
-  /* The rest of the small dogs, once the rows above have taken the ones they
-     describe better. */
-  {
-    title: "Pint-sized pups",
-    accent: "pups",
-    names: ["Pomeranian", "Maltese", "Bichon Frise", "Papillon", "Italian Greyhound", "Chihuahua", "Cavachon"],
-  },
 ];
 
-/* Two dogs above are deliberately listed twice in the source (Chihuahua and
-   Cavachon read naturally in two rows), so the render de-duplicates: a dog is
-   drawn in the FIRST row that claims it. Anything left over lands in the
-   catch-all row below, which is what the owner asked for rather than leaving a
-   dog off the page. */
+/* Chihuahua is deliberately listed twice in the source (it reads naturally in
+   both Top Dogs and Pint-sized Pups), so the render de-duplicates: a dog is
+   drawn in the FIRST row that claims it. Cavachon is now listed once, in The
+   new favourites, so the reorder does not move it into Pint-sized Pups. Anything
+   left over lands in the catch-all row below rather than off the page. */
 const CATCH_ALL = { title: "The rest of the pack", accent: "pack" };
 
 const byName = (name: string): Breed | undefined => breeds.find((b) => b.name === name);
