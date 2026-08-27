@@ -2658,6 +2658,10 @@ export default function NameGeneratorPage() {
           .pcm-breed-select option { font-size: 1.05rem; text-align: center; }
           .pcm-pool { text-decoration: none; }
           .pcm-pool:hover { text-decoration: underline; text-underline-offset: 3px; }
+          /* Two-column title block: sticker 30% left, title + subtitle 70% right. */
+          .pcm-titlecols { display: flex; align-items: center; gap: clamp(16px, 3vw, 40px); max-width: 1100px; margin: 0 auto 48px; }
+          .pcm-titleimg { flex: 0 0 30%; max-width: 30%; }
+          .pcm-titletext { flex: 0 0 70%; min-width: 0; }
           @media (min-width: 769px) {
             /* Keep the desktop form compact like mobile (so buttons/dropdown don't stretch) */
             .pcm-inputs { padding-top: 56px !important; padding-bottom: 56px !important; margin-top: 24px !important; margin-bottom: 24px !important; max-width: 460px !important; }
@@ -2676,6 +2680,10 @@ export default function NameGeneratorPage() {
             .pcm-h1 { font-size: clamp(3.5rem, 12vw, 5.4rem) !important; }
             .pcm-nick { font-size: clamp(2.98rem, 11vw, 3.6rem) !important; margin-top: 18px !important; }
             .pcm-sub { margin-bottom: 20px !important; }
+            /* Title block stacks: sticker above the text, both full width. */
+            .pcm-titlecols { flex-direction: column !important; gap: 14px !important; margin-bottom: 28px !important; }
+            .pcm-titleimg { flex: none !important; width: 100% !important; max-width: 280px !important; margin: 0 auto !important; }
+            .pcm-titletext { flex: none !important; width: 100% !important; }
           }
         `}</style>
         <div style={{ maxWidth:1800, margin:"0 auto" }}>
@@ -2684,14 +2692,22 @@ export default function NameGeneratorPage() {
               lighten with their text darkened (see textinvert.css). The knockout
               game, bracket, shortlist bar and share screen stay at rest. */}
           <ArticleTextToggle centered />
-          <h1 className="display pcm-h1" style={{ textAlign:"center", marginBottom:16, fontSize:"clamp(3rem,10vw,6.5rem)", color:"#ffffff", lineHeight:0.95 }}>
-            Chum <br className="pcm-h1br" /><span className="display-yellow">Name</span> <br className="pcm-h1br2" />Generator
-          </h1>
-          <p ref={subRef} className="pcm-sub" style={{ textAlign:"center", color:"#ffffff", fontFamily:"var(--font-body)", fontSize:"clamp(1rem,2.5vw,1.3rem)", fontWeight:600, marginBottom:48 }}>
-            {shortlist.length >= 4 && stage !== "inputs"
-              ? <>You have {shortlist.length} names!<br />Tap 🏆 Knockout button to decide</>
-              : "Give your chum the truly 1 in a million personalised to you name"}
-          </p>
+          <div className="pcm-titlecols">
+            <div className="pcm-titleimg">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/name-gen-sticker.png" alt="" style={{ width:"100%", height:"auto", display:"block", borderRadius:24 }} />
+            </div>
+            <div className="pcm-titletext">
+              <h1 className="display pcm-h1" style={{ textAlign:"center", marginBottom:16, fontSize:"clamp(3rem,10vw,6.5rem)", color:"#ffffff", lineHeight:0.95 }}>
+                <span className="display-yellow">Name</span><br />Generator
+              </h1>
+              <p ref={subRef} className="pcm-sub" style={{ textAlign:"center", color:"#ffffff", fontFamily:"var(--font-body)", fontSize:"clamp(1rem,2.5vw,1.3rem)", fontWeight:600, marginBottom:0 }}>
+                {shortlist.length >= 4 && stage !== "inputs"
+                  ? <>You have {shortlist.length} names!<br />Tap 🏆 Knockout button to decide</>
+                  : "Give your chum the truly 1 in a million personalised to you name"}
+              </p>
+            </div>
+          </div>
 
           {/* ── STAGE 1: INPUTS ── */}
           {fromCalculator && breed && stage === "inputs" && (() => {
