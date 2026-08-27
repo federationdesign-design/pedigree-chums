@@ -10,11 +10,10 @@ type TileData = { href: string; labelA: string; labelB?: string; cta: string; im
 const NAV_TILES: Record<string, TileData> = {
   nameGen: { href: "/name-generator", labelA: "Try the Dog", labelB: "Name Generator", cta: "Name your chum", video: "/podium-video-menu.mp4", videoAspect: "650 / 542" },
   competition: { href: "/findpug", labelA: "Current", labelB: "Competitions", cta: "Win prizes", img: "/feacebook-hero.jpg" },
-  /* `/` is the pit itself, which is where this used to land: a tile saying
-     "Get yours" dropped you into the game. It goes to the marketing page now.
-     Note the Home tile below also points at /home, so the two now share a
-     destination. */
-  product: { href: "/home", labelA: "The Card", labelB: "Game", cta: "Get yours", img: "/product-img.jpg" },
+  /* The Card Game tile. It once dropped into the pit (`/`), then pointed at the
+     /home marketing page; it now goes straight to /preorder to buy, hence the
+     "Buy Card Game" label. */
+  product: { href: "/preorder", labelA: "Buy", labelB: "Card Game", cta: "Get yours", img: "/product-img.jpg" },
   chumFinder: { href: "/chum-calculator", labelA: "Chum", labelB: "Finder", cta: "Find your perfect dog", emoji: "🔍" },
   britains: { href: "/britains-dog-history", labelA: "Britain's", labelB: "Dog History", cta: "Travel back", img: "/history-hero.jpg" },
   about: { href: "/about", labelA: "About", cta: "Who we are", img: "/initial-preload-hero-img.jpg" },
@@ -117,35 +116,26 @@ export default function BentoBoard({
         </div>
       </div>
 
-      {/* Row 2 -- Name Generator alone on the left (Chum Finder moved to the right
-          column and Know Your Chums swapped up to Row 1). On the right, Chum Finder
-          (one cell high) sits below the Britain's / About pair and above Good Dog
-          Bad Dog, so the right column reads Chum Drop, Dogs at Work, Britain's /
-          About, Chum Finder, Good Dog Bad Dog. */}
+      {/* Row 2 -- Left: Name Generator above a [Card Game | Superpower] quarter-square
+          pair. Right: Chum Finder, then a [Hot/Dogs | Smarter] quarter-square pair,
+          then Good Dog Bad Dog. The old bottom row is gone: its four tiles moved up
+          here (Smarter and Hot/Dogs to the right, Superpower to the left beside the
+          card game). */}
       <div className={styles.rowBlock}>
         <div className={styles.cluster}>
           {fitTile(NAV_TILES.nameGen, true)}
+          <div className={styles.miniRow}>
+            {coverTile(NAV_TILES.product, `${styles.miniCell} ${styles.homeLabel} ${styles.labelHover}`, false, true)}
+            {coverTile(NAV_TILES.superpower, `${styles.miniCell} ${styles.homeLabel} ${styles.labelHover}`, false, true)}
+          </div>
         </div>
         <div className={styles.cluster}>
           <VideoTile href="/chum-calculator" src="/chumfinder-vid.mp4" labelA="Chum" labelB="Finder" cta="Take the suitability test" sizeClass={`${styles.clusterWideHalf} ${styles.chumFinderTitle}`} loop={false} reverseOnHover onNavigate={navigate} />
-          {fitTile(NAV_TILES.gdbd)}
-        </div>
-      </div>
-
-      {/* Bottom bento -- the card game (swapped down from Row 2) beside Smarter
-          Than the Test, then Hot/Dogs + Superpower. */}
-      <div className={`${styles.rowBlock} ${styles.rowBlockStart}`}>
-        <div className={styles.cluster}>
-          <div className={styles.miniRow}>
-            {coverTile(NAV_TILES.product, `${styles.miniCell} ${styles.homeLabel} ${styles.labelHover}`, false, true)}
-            {coverTile(NAV_TILES.smarter, `${styles.miniCell} ${styles.homeLabel} ${styles.labelHover} ${styles.hoverPanel}`, false, true)}
-          </div>
-        </div>
-        <div className={styles.cluster}>
           <div className={styles.miniRow}>
             {coverTile(NAV_TILES.hotDogs, `${styles.miniCell} ${styles.homeLabel} ${styles.labelHover}`, false, true)}
-            {coverTile(NAV_TILES.superpower, `${styles.miniCell} ${styles.homeLabel} ${styles.labelHover}`, false, true)}
+            {coverTile(NAV_TILES.smarter, `${styles.miniCell} ${styles.homeLabel} ${styles.labelHover} ${styles.hoverPanel}`, false, true)}
           </div>
+          {fitTile(NAV_TILES.gdbd)}
         </div>
       </div>
     </div>

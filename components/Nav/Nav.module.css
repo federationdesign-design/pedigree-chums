@@ -449,6 +449,12 @@
    Only the label moves right; the "Win prizes" button keeps its own align-self:
    flex-start, so it stays at the left where it was. */
 .competitionTile .tileLabel { font-size: clamp(1rem, 8cqi, 2rem); text-align: right; }
+/* Force "Current" and "Competitions" onto separate lines: the accent word becomes a
+   block, so "Competitions" wraps beneath it. */
+.competitionTile .tileLabelAccent { display: block; }
+/* Dogs at Work label smaller and right-aligned, label only (the tile has no button),
+   matching the competition tile treatment. */
+.dogsAtWorkWide .tileLabel { font-size: clamp(1rem, 8cqi, 2rem); text-align: right; }
 
 /* Tile base */
 .tile {

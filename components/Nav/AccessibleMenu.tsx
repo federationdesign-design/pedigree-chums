@@ -52,7 +52,7 @@ export default function AccessibleMenu({ onNavigate }: { onNavigate?: () => void
             {box("/dogs-at-work", "Dogs at Work")}
           </div>
         </div>
-        {box("/home", "The Card Game")}
+        {box("/preorder", "Buy Card Game")}
       </div>
 
       {/* Bottom: (Competitions over Smarter + Hot/Dogs) | (Know Your Chums over Discount + Superpower) */}
