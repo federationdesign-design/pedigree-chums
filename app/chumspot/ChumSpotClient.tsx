@@ -5,6 +5,21 @@ import ArticleTextToggle from "../../components/ArticleTextToggle/ArticleTextTog
 import OutboundLink from "../../components/OutboundLink/OutboundLink";
 import styles from "./page.module.css";
 
+/* Term bodies are plain strings, but a body may embed one markdown-style link,
+   [label](/path) (the privacy policy in term 14). Split it into a real anchor and
+   leave the rest as plain text; bodies without the token render unchanged. Navy +
+   underline reads on both the yellow and white term cards. */
+function renderBody(text: string) {
+  return text.split(/(\[[^\]]+\]\([^)]+\))/g).map((part, i) => {
+    const m = part.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
+    return m ? (
+      <a key={i} href={m[2]} style={{ color: "inherit", fontWeight: 700, textDecoration: "underline" }}>{m[1]}</a>
+    ) : (
+      part
+    );
+  });
+}
+
 const TERMS = [
   {
     num: "1",
@@ -14,7 +29,7 @@ const TERMS = [
   {
     num: "2",
     title: "Competition dates",
-    body: "The Spot your Chum Photo Competition is an ongoing monthly competition. Each monthly round opens at 00:00 on the first calendar day of the month and closes at 23:59 on the final calendar day of that month. The competition is divided into monthly rounds. Each monthly round opens at 00:00 on the first calendar day of the month and closes at 23:59 on the final calendar day of that month. All times are UK local time (GMT or BST as applicable). An entry received after a monthly closing time may be considered during the following monthly round, provided the overall competition is still open. Entries received after the overall final closing date will not be accepted.",
+    body: "The Spot your Chum Photo Competition is an ongoing monthly competition. Each monthly round opens at 00:00 on the first calendar day of the month and closes at 23:59 on the final calendar day of that month. All times are UK local time (GMT or BST as applicable). An entry received after a monthly closing time may be considered during the following monthly round, provided the overall competition is still open. Entries received after the overall final closing date will not be accepted.",
   },
   {
     num: "3",
@@ -74,7 +89,7 @@ const TERMS = [
   {
     num: "14",
     title: "Personal information and privacy",
-    body: "We use personal information to verify eligibility, contact winners, administer the competition and arrange prize delivery. We collect only what is reasonably required. Delivery addresses are normally requested only from winners. We will not add you to a marketing list without your agreement. Further information is in the Pedigree Chums™ Privacy Policy at [PRIVACY POLICY LINK].",
+    body: "We use personal information to verify eligibility, contact winners, administer the competition and arrange prize delivery. We collect only what is reasonably required. Delivery addresses are normally requested only from winners. We will not add you to a marketing list without your agreement. Further information is in the Pedigree Chums™ [Privacy Policy](/privacy).",
   },
   {
     num: "15",
@@ -266,11 +281,11 @@ export default function ChumSpotClient() {
                   {t.body.includes(" | ") ? (
                     <ol className={styles.termList}>
                       {t.body.split(" | ").map((item, j) => (
-                        <li key={j} className={styles.termBody}>{item}</li>
+                        <li key={j} className={styles.termBody}>{renderBody(item)}</li>
                       ))}
                     </ol>
                   ) : (
-                    <p className={styles.termBody}>{t.body}</p>
+                    <p className={styles.termBody}>{renderBody(t.body)}</p>
                   )}
                 </div>
               ))}
