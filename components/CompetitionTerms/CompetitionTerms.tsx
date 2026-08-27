@@ -7,12 +7,28 @@ import type { Term } from "./spotYourChumTerms";
    ./spotYourChumTerms), so the shared wording lives in one module and every breed
    page renders the same list. Rendering only:
    - a body containing " | " is split into an ordered list, otherwise a paragraph
+   - a body may embed a single markdown-style link, [label](/path) (the privacy
+     policy in term 14); it renders as an anchor. Bodies without the token are
+     returned unchanged, so every other term still renders as plain text.
    - cards alternate yellow/white by index. */
 
 type Props = {
   /** The competition terms to render, in display order. */
   terms: Term[];
 };
+
+/* Split a body on any [label](href) tokens and turn each into an anchor, leaving
+   the surrounding plain text intact. */
+function renderBody(text: string) {
+  return text.split(/(\[[^\]]+\]\([^)]+\))/g).map((part, i) => {
+    const m = part.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
+    return m ? (
+      <a key={i} href={m[2]} className={styles.termLink}>{m[1]}</a>
+    ) : (
+      part
+    );
+  });
+}
 
 export default function CompetitionTerms({ terms }: Props) {
   return (
@@ -33,11 +49,11 @@ export default function CompetitionTerms({ terms }: Props) {
               {t.body.includes(" | ") ? (
                 <ol className={styles.termList}>
                   {t.body.split(" | ").map((item, j) => (
-                    <li key={j} className={styles.termBody}>{item}</li>
+                    <li key={j} className={styles.termBody}>{renderBody(item)}</li>
                   ))}
                 </ol>
               ) : (
-                <p className={styles.termBody}>{t.body}</p>
+                <p className={styles.termBody}>{renderBody(t.body)}</p>
               )}
             </div>
           ))}

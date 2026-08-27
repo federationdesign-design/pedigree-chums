@@ -85,6 +85,14 @@
   line-height: 1.3;
   margin-bottom: 4px;
 }
+/* Inline link in a term body (the privacy policy in term 14). Navy + underline:
+   navy reads on both the yellow and white cards (~8.8:1 and ~13:1), and the
+   underline carries the affordance so colour is not the only signal. */
+.termLink {
+  color: var(--navy, #0a3a57);
+  font-weight: 700;
+  text-decoration: underline;
+}
 .contactNote {
   font-size: clamp(0.85rem, 1.3vw, 1rem);
   color: #ffffff; /* on the solid navy panel -> white (~11.9:1) */

@@ -11,10 +11,11 @@
    returns the array with the breed name woven into terms 4 and 8, and each page
    calls it with its own breed (e.g. spotYourChumTerms(PUG.breed)).
 
-   Two verbatim defects are still carried and logged in PLACEHOLDERS.md, not fixed
-   here as part of the mechanical extraction:
-   - term 14 carries a live [PRIVACY POLICY LINK] placeholder
-   - term 2 repeats its "Each monthly round opens ..." sentence
+   Both previously carried defects are now fixed here and in ChumSpotClient.tsx
+   (Steve, 27 Aug 2026):
+   - term 14 now links "Privacy Policy" to /privacy (markdown-style [label](href)
+     in the body, rendered as an anchor by CompetitionTerms.tsx)
+   - term 2's duplicated "Each monthly round opens ..." sentence is removed
 
    The em dashes inside these strings are the published editorial/legal copy and
    are exempt from the no-em-dash rule (CLAUDE.md, Dogs at Work amendment 2). */
@@ -38,7 +39,7 @@ export function spotYourChumTerms(breed: string): Term[] {
   {
     num: "2",
     title: "Competition dates",
-    body: "The Spot your Chum Photo Competition is an ongoing monthly competition. Each monthly round opens at 00:00 on the first calendar day of the month and closes at 23:59 on the final calendar day of that month. The competition is divided into monthly rounds. Each monthly round opens at 00:00 on the first calendar day of the month and closes at 23:59 on the final calendar day of that month. All times are UK local time (GMT or BST as applicable). An entry received after a monthly closing time may be considered during the following monthly round, provided the overall competition is still open. Entries received after the overall final closing date will not be accepted.",
+    body: "The Spot your Chum Photo Competition is an ongoing monthly competition. Each monthly round opens at 00:00 on the first calendar day of the month and closes at 23:59 on the final calendar day of that month. All times are UK local time (GMT or BST as applicable). An entry received after a monthly closing time may be considered during the following monthly round, provided the overall competition is still open. Entries received after the overall final closing date will not be accepted.",
   },
   {
     num: "3",
@@ -98,7 +99,7 @@ export function spotYourChumTerms(breed: string): Term[] {
   {
     num: "14",
     title: "Personal information and privacy",
-    body: "We use personal information to verify eligibility, contact winners, administer the competition and arrange prize delivery. We collect only what is reasonably required. Delivery addresses are normally requested only from winners. We will not add you to a marketing list without your agreement. Further information is in the Pedigree Chums™ Privacy Policy at [PRIVACY POLICY LINK].",
+    body: "We use personal information to verify eligibility, contact winners, administer the competition and arrange prize delivery. We collect only what is reasonably required. Delivery addresses are normally requested only from winners. We will not add you to a marketing list without your agreement. Further information is in the Pedigree Chums™ [Privacy Policy](/privacy).",
   },
   {
     num: "15",

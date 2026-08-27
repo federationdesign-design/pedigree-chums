@@ -273,14 +273,15 @@ byte-for-byte copy in the new shared `components/CompetitionTerms/CompetitionTer
 build. Once `/findpug` is live and tested, Steve will decide whether to point
 `/chumspot` at the shared component and collapse the two copies to one.
 
-Two live production defects in that terms copy, present on `/chumspot` and now
-carried verbatim into `/findpug`. Both are to be fixed together, in their own
-push, NOT inside a build session:
+Two live production defects in that terms copy, present on `/chumspot` and
+carried verbatim into `/findpug`. Both were FIXED on 27 Aug 2026, in both places
+(`spotYourChumTerms.ts` for findpug, `ChumSpotClient.tsx` for /chumspot), across
+two separate pushes (one per page):
 
-| Defect | Location | Meaning | Resolve via |
+| Defect | Location | Meaning | Status |
 |---|---|---|---|
-| `[PRIVACY POLICY LINK]` placeholder | Term 14, in both `ChumSpotClient.tsx` and `CompetitionTerms.tsx` | The Privacy Policy link text was never resolved to the real `/privacy` route; the literal bracket text ships to users | Steve, dedicated copy push across both pages |
-| Duplicated sentence | Term 2, in both `ChumSpotClient.tsx` and `CompetitionTerms.tsx` | "Each monthly round opens at 00:00 ... final calendar day of that month." appears twice | Steve, dedicated copy push across both pages |
+| `[PRIVACY POLICY LINK]` placeholder | Term 14, in both `ChumSpotClient.tsx` and `spotYourChumTerms.ts` | The Privacy Policy link text was never resolved to the real `/privacy` route; the literal bracket text shipped to users | RESOLVED 27 Aug 2026: term 14 now links "Privacy Policy" to the relative `/privacy` route. Bodies gained markdown-style `[label](href)` link support, rendered as an anchor in both terms renderers. |
+| Duplicated sentence | Term 2, in both `ChumSpotClient.tsx` and `spotYourChumTerms.ts` | "Each monthly round opens at 00:00 ... final calendar day of that month." appeared twice | RESOLVED 27 Aug 2026: the duplicated sentence (and its "The competition is divided into monthly rounds." lead-in) is removed. |
 
 ### Pre-order card render carries stale figures
 
