@@ -42,7 +42,8 @@
 .hero {
   position: relative;
   width: 100%;
-  min-height: clamp(420px, 64vh, 720px);
+  /* +20% desktop depth (Steve, 28 Aug 2026): 420->504, 64vh->76.8vh, 720->864. Mobile untouched. */
+  min-height: clamp(504px, 76.8vh, 864px);
   overflow: hidden;
 }
 .heroImg {

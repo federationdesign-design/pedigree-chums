@@ -573,7 +573,8 @@
 .essayHero {
   position: relative;
   width: 100%;
-  min-height: clamp(500px, 65vh, 1000px);
+  /* +20% depth (Steve, 28 Aug 2026): 500->600, 65vh->78vh, 1000->1200. Shared by all 8 essay heroes, incl. smarter-than-the-test. */
+  min-height: clamp(600px, 78vh, 1200px);
   overflow: hidden;
   display: flex;
   align-items: flex-end;
