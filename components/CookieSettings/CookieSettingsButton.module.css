@@ -1,0 +1,23 @@
+/* A text button that reads as a link and inherits its colour and font from the
+   surrounding nav, so it sits among the sibling links in both the Footer and the
+   Nav menu. Underlined to signal it is actionable. */
+.link {
+  appearance: none;
+  -webkit-appearance: none;
+  background: none;
+  border: none;
+  margin: 0;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.link:hover {
+  text-decoration: none;
+}
+.link:focus-visible {
+  outline: 3px solid var(--blue-deep);
+  outline-offset: 3px;
+}

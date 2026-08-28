@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import CookieSettingsButton from "../CookieSettings/CookieSettingsButton";
 import styles from "./Footer.module.css";
 
 const NAV_LINKS = [
@@ -33,6 +34,7 @@ export default function Footer({ tradeLinks = false }: { tradeLinks?: boolean })
             {link.label}
           </Link>
         ))}
+        <CookieSettingsButton className={styles.navLink} />
       </nav>
 
       {tradeLinks && (

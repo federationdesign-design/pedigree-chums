@@ -30,6 +30,13 @@ export default function Analytics() {
     };
   }, []);
 
+  // Belt and braces: GA must never fire without consent. Set GA's official kill
+  // switch whenever consent is not accepted, so even a stray gtag call is inert,
+  // and it stays set across a withdrawal reload before this component re-decides.
+  useEffect(() => {
+    (window as unknown as Record<string, unknown>)[`ga-disable-${GA_ID}`] = !allowed;
+  }, [allowed]);
+
   if (!allowed) return null;
 
   return (

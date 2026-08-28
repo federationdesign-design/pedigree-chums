@@ -9,6 +9,7 @@ import BentoBoard from "./BentoBoard";
 import AccessibleMenu from "./AccessibleMenu";
 import PcContrastToolbar from "../PcContrastToolbar/PcContrastToolbar";
 import OutboundLink from "../OutboundLink/OutboundLink";
+import CookieSettingsButton from "../CookieSettings/CookieSettingsButton";
 import { getScheme, getHideImages, CONTRAST_EVENT } from "../../lib/contrastScheme";
 import styles from "./Nav.module.css";
 
@@ -263,6 +264,8 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
                 <Link href="/about" className={styles.topNavLink} onClick={closeForNav}>About</Link>
                 <span className={styles.topNavSep}>|</span>
                 <Link href="/preorder" className={styles.topNavLink} onClick={closeForNav}>Pre-order</Link>
+                <span className={styles.topNavSep}>|</span>
+                <CookieSettingsButton className={styles.topNavLink} onActivate={closeForNav} />
                 <OutboundLink href="https://www.instagram.com" className={styles.socialIcon} aria-label="Instagram">
                   {/* The viewBox was 440 0 261 341 and the artwork does not fit
                       inside it: the paths run from x 379.4 to 719.5, so 61 units

@@ -79,8 +79,11 @@ export default function CookiesPage() {
           <h2>Managing cookies</h2>
           <p>
             You can accept or decline non-essential cookies using the notice that
-            appears when you first visit. To change your choice later, clear this
-            site&apos;s data in your browser and the notice will appear again.
+            appears when you first visit. To change or withdraw your choice at any
+            time, select <strong>Cookie settings</strong> in the footer of any page
+            (or in the menu). Withdrawing stops Google Analytics and the Meta Pixel:
+            we reload the page so nothing further is sent, and clear the cookies they
+            set. Withdrawing is as easy as accepting.
           </p>
           <p>
             You can also control or delete cookies through your browser settings,
