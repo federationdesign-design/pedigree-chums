@@ -75,11 +75,12 @@ export default function SuperpowerGame() {
   const { answersByQuestion, started } = state;
 
   // Slide 0 cover video. Plays once, muted, no loop: collie-wet.jpg is the
-  // poster shown before playback and collie-super.jpg holds after it ends.
-  // Under prefers-reduced-motion the video never plays; the held still is
-  // shown straight away instead (spec section 12, same policy as the scroll).
+  // poster shown before playback; the trimmed video holds on its own final
+  // frame after it ends, so no separate still is overlaid. Under
+  // prefers-reduced-motion the video never plays, so a still exported from that
+  // same final frame (supercollie-final.jpg) is shown instead, giving reduced-
+  // motion users the same ending as everyone else.
   const introVideoRef = useRef<HTMLVideoElement>(null);
-  const [introEnded, setIntroEnded] = useState(false);
   const [introReducedMotion, setIntroReducedMotion] = useState(false);
   useEffect(() => {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -205,18 +206,17 @@ export default function SuperpowerGame() {
           <video
             ref={introVideoRef}
             className={styles.introVideo}
-            src="/superpower/supercolie.mp4"
+            src="/superpower/supercollie-cut.mp4"
             poster="/superpower/collie-wet.jpg"
             muted
             playsInline
             preload="auto"
-            onEnded={() => setIntroEnded(true)}
             aria-hidden="true"
           />
-          {introEnded || introReducedMotion ? (
+          {introReducedMotion ? (
             <img
               className={styles.introStill}
-              src="/superpower/collie-super.jpg"
+              src="/superpower/supercollie-final.jpg"
               alt=""
               aria-hidden="true"
             />

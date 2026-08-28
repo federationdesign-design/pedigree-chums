@@ -55,8 +55,9 @@
 /* ------------------------------------------------------------ slide 0, intro */
 
 /* Cover video layer. Sits at z-0 under .introBody (z-2); the poster
-   (collie-wet.jpg) shows before playback, the held still (collie-super.jpg)
-   overlays at z-1 once the video ends or under reduced motion. */
+   (collie-wet.jpg) shows before playback, the video holds on its own final
+   frame once it ends, and a still of that same final frame
+   (supercollie-final.jpg) overlays at z-1 only under reduced motion. */
 .introCover {
   position: absolute;
   inset: 0;
@@ -155,45 +156,61 @@
 }
 
 /* ---- slide 0 intro, DESKTOP (>= 769px) --------------------------------------
-   Desktop-only redesign: the title and promise move to the top and grow, the
-   "Takes about two minutes" line doubles and stays pinned to the foot, and the
-   Start button is capped at 300px. Mobile keeps the original bottom-anchored
-   intro (there is no breakpoint below this). */
+   Desktop-only redesign: the heading grows and is centred, the Start button is
+   centred and floats to the vertical middle, and "Takes about two minutes" is
+   pinned to the foot. Mobile keeps the original bottom-anchored intro (there is
+   no breakpoint below this). */
 @media (min-width: 769px) {
-  /* 3. Title and promise sit at the top; margin-top:auto on the time (below)
-     sends the time + Start button to the foot, so the two groups split. */
+  /* 1, 2, 4. Centre the column: heading text and blocks centred, all children
+     centred horizontally. Start from the top so the heading sits up top and the
+     button's auto margins (below) can float it to the middle. */
   .introBody {
     justify-content: flex-start;
+    align-items: center;
+    text-align: center;
     padding: 76px 56px 72px;
-    gap: 26px;
+    gap: 20px;
   }
 
-  /* 1. Much bigger title. */
+  /* 1, 4. Much bigger, centred title. */
   .introTitle {
     font-size: clamp(4rem, 8.5vw, 8rem);
   }
 
-  /* 2. Much bigger promise. */
+  /* Much bigger, centred promise. */
   .introText {
     font-size: clamp(1.4rem, 2.2vw, 2.1rem);
     line-height: 1.3;
     max-width: 760px;
   }
 
-  /* 5. Twice as big (0.85rem -> 1.7rem) and pinned to the foot. */
+  /* 5. Twice as big (0.85rem -> 1.7rem) and pinned to the foot. order:1 moves it
+     after the Start button in the visual flow (the mobile DOM order is left
+     alone), so the button's margin-bottom:auto below leaves the time sitting at
+     the very bottom. */
   .introTime {
     font-size: 1.7rem;
-    margin-top: auto;
+    order: 1;
   }
 
-  /* The time now provides the bottom push, so the row needs no top margin. */
+  /* 2, 3. Start button capped at 300px, centred, and floated to the vertical
+     middle by equal auto margins above and below. */
   .introBtnRow {
-    margin-top: 0;
+    justify-content: center;
+    margin-top: auto;
+    margin-bottom: auto;
+  }
+  .introBtnRow .introBtn {
+    flex: 0 0 auto;
+    width: 100%;
+    max-width: 300px;
   }
 
-  /* 4. Start button capped at 300px, left-aligned under the text. Scoped to the
-     intro row, so the result slide's Play again button is untouched. */
-  .introBtnRow .introBtn {
+  /* 8. Result screen Play Again gets the same 300px cap and centring as Start. */
+  .restartRow {
+    align-items: center;
+  }
+  .restartRow .introBtn {
     flex: 0 0 auto;
     width: 100%;
     max-width: 300px;
