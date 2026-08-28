@@ -4,7 +4,6 @@ import { useCallback, useEffect, useRef, useState, type Ref } from "react";
 import { createPortal } from "react-dom";
 import BreedTree from "../BreedTree/BreedTree";
 import TimeTunnel from "../TimeTunnel/TimeTunnel";
-import CookieBanner from "../CookieBanner/CookieBanner";
 import ScoreTable from "../ScoreTable/ScoreTable";
 import { BRAIN_PATH, BRAIN_ARTBOARD } from "../icons/brain";
 import ShareCard from "../ShareCard/ShareCard";
@@ -879,9 +878,6 @@ export default function LineageModal({ name, image, character, lineage, fromRect
           }}
         />
       )}
-
-      {/* The cookie notice must be reachable above this overlay */}
-      <CookieBanner />
     </div>,
     document.body,
   );

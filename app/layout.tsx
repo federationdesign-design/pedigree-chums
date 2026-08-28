@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Dela_Gothic_One, Luckiest_Guy, Montserrat, Open_Sans, Press_Start_2P, Unica_One } from "next/font/google";
 import localFont from "next/font/local";
-import CookieBanner from "../components/CookieBanner/CookieBanner";
+import CookieDrop from "../components/CookieDrop/CookieDrop";
 import Analytics from "../components/Analytics/Analytics";
 import MetaPixel from "../components/MetaPixel/MetaPixel";
 import OfferLauncher from "../components/Offer/OfferLauncher";
@@ -244,7 +244,7 @@ export default function RootLayout({
         {/* G01 awards on the first pointer interaction with the Main Pit
             (CHANGE-LIST C01), wired inside PackPit. RouteWatcher was removed
             (NEEDS_OWNER Q06). */}
-        <CookieBanner />
+        <CookieDrop />
         <Analytics />
         <MetaPixel />
       </body>
