@@ -1,9 +1,10 @@
 "use client";
 import { useState, useEffect } from "react";
 import Script from "next/script";
+import { CONSENT_KEY } from "../../lib/consent";
 
 const PIXEL_ID = "1072172202055733";
-const KEY = "pc-cookie-consent-v2";
+const KEY = CONSENT_KEY;
 
 // Meta Pixel (marketing), gated on cookie consent exactly like Analytics (GA).
 // The tag is only injected once the visitor has accepted cookies via the banner,

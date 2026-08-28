@@ -13,13 +13,13 @@ import type { GameId } from "./registry";
 import { createEngine, type HiddenGamesEngine } from "./engine";
 import { STATUS } from "./lifecycle";
 import type { MeasurementEvent } from "./measure";
+import { CONSENT_KEY } from "../consent";
 
-// Consent key, matching CookieBanner and Analytics (recon 03). GA4 loads only
-// after the visitor accepts, so we gate explicitly on the same value: this is
-// the first gtag('event') pattern in the repo. Measurement therefore covers
-// consented visitors only (BRIEF 8), sends aggregate params only, and never
-// throws so it cannot break the site.
-const CONSENT_KEY = "pc-cookie-consent-v2";
+// Consent gating uses the shared CONSENT_KEY (lib/consent), the same value
+// CookieBanner writes and Analytics reads. GA4 loads only after the visitor
+// accepts, so we gate explicitly on it: this is the first gtag('event') pattern
+// in the repo. Measurement therefore covers consented visitors only (BRIEF 8),
+// sends aggregate params only, and never throws so it cannot break the site.
 
 type Gtag = (command: string, name: string, params?: Record<string, unknown>) => void;
 

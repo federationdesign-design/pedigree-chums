@@ -1,9 +1,10 @@
 "use client";
 import { useState, useEffect } from "react";
 import Script from "next/script";
+import { CONSENT_KEY } from "../../lib/consent";
 
 const GA_ID = "G-7FZ4898NK8";
-const KEY = "pc-cookie-consent-v2";
+const KEY = CONSENT_KEY;
 
 // GA4, gated on cookie consent. The tag is only injected once the visitor has
 // accepted cookies (via the banner). It reacts to the "pc:consent" event the

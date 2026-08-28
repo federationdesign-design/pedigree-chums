@@ -10,6 +10,7 @@ import HowToPlay from "../HowToPlay/HowToPlay";
 import { startCheckout } from "../Offer/startCheckout";
 import { startFixedTimestep } from "./fixedTimestep";
 import styles from "./PackPit.module.css";
+import { CONSENT_KEY } from "../../lib/consent";
 import BritainMessage from "./BritainMessage";
 import { reportHiddenGame } from "../../lib/hiddenGames/browserEngine";
 import PitEnd from "../PitEnd/PitEnd";
@@ -118,7 +119,7 @@ export default function PackPit() {
   }, [milestone]);
   const [howToPlay, setHowToPlay] = useState(false); // how-to-play strip, opened by the pit panel
   // Start false if cookies already accepted/rejected in a previous session
-  const cookieBannerOpenRef = useRef(typeof window !== "undefined" && !localStorage.getItem("pc-cookie-consent-v2") ? true : false);
+  const cookieBannerOpenRef = useRef(typeof window !== "undefined" && !localStorage.getItem(CONSENT_KEY) ? true : false);
   const [howToPlayStep, setHowToPlayStep] = useState<number | null>(null); // which step card was tapped (0-4); null = show intro
   const [gameOver, setGameOver] = useState(false);
   // true only when the game-over trigger fired because all 54 were collected

@@ -10,6 +10,7 @@ import type { LineageNode } from "../../data/lineage";
 import { nodeStatus, TAG_STYLE, type BreedTag } from "../BreedTreeMap/BreedTreeMap";
 import { descendantPackBreeds, ancestryBreakdown, ancestorShareOf, treesContaining } from "../../data/lineageArchive";
 import TrainingCard from "../TrainingCard/TrainingCard";
+import { CONSENT_KEY } from "../../lib/consent";
 import trainingDifficulty from "../../data/trainingDifficulty";
 import { ICONS } from "../CardDock/CardDock";
 import { bust } from "../../data/imgVersion";
@@ -268,7 +269,7 @@ const TOY_COOKIES_SEEN_KEY = "pc-minipit-cookies-seen";
 // Consent lives in localStorage and is permanent, so the panel never falls for
 // someone who has already answered. NOTE: the main pit reads a DIFFERENT key,
 // "pc-cookies". That mismatch is a real bug and is logged, not fixed here.
-const COOKIE_CONSENT_KEY = "pc-cookie-consent-v2";
+const COOKIE_CONSENT_KEY = CONSENT_KEY;
 function cookieConsentGiven(): boolean {
   try { return !!localStorage.getItem(COOKIE_CONSENT_KEY); } catch { return false; }
 }

@@ -2,12 +2,9 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import styles from "./CookieBanner.module.css";
+import { CONSENT_KEY } from "../../lib/consent";
 
-// v2 (Steve, 28 Aug 2026): bumped from "pc-cookie-consent" when the Meta Pixel
-// (marketing) was added. Anyone who accepted under the old key has no v2 value,
-// so the notice reappears and they re-consent under the marketing disclosure
-// rather than being silently migrated. The old key is left orphaned, unread.
-const KEY = "pc-cookie-consent-v2";
+const KEY = CONSENT_KEY;
 
 // Game-intro style cookie notice: centred text that appears when the pit's
 // cookie-policy object is tapped, and clears once its Accept button (an object
