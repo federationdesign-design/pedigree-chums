@@ -198,6 +198,13 @@
   margin: 0;
 }
 
+/* Desktop-only stack label. Hidden by default so mobile is unaffected: the
+   .progress element inside .qMedia is the one mobile shows. The desktop media
+   query at the foot of this section swaps them. */
+.progressOverlay {
+  display: none;
+}
+
 .question {
   font-family: var(--font-body, "Montserrat", sans-serif);
   font-size: clamp(1.05rem, 4.6vw, 1.35rem);
@@ -256,6 +263,96 @@
   font-weight: 600;
   text-decoration: underline;
   cursor: pointer;
+}
+
+/* -------------------------------------------- questions, DESKTOP (>= 769px)
+
+   Desktop only. Every rule below is scoped to min-width: 769px so the mobile
+   layout above is left exactly as it was. The image goes full height and the
+   question, answers, label and Back link sit over it in one bottom-anchored
+   stack, matching the intro slide (slide 0). A bottom gradient scrim (on
+   .qMediaTint) carries the white text, the same device the intro uses. */
+@media (min-width: 769px) {
+  /* The image fills the slide instead of the 52% band. */
+  .qMedia {
+    flex: 0 0 100%;
+    height: 100%;
+  }
+
+  /* The mobile label (over the image foot) gives way to the in-stack one. */
+  .qMedia .progress {
+    display: none;
+  }
+
+  /* Stronger, taller scrim rising from the foot: transparent across the top
+     of the photo, deepening to near-solid at the base where the text sits. */
+  .qMediaTint {
+    background: linear-gradient(
+      180deg,
+      rgba(11, 18, 32, 0) 34%,
+      rgba(11, 18, 32, 0.5) 62%,
+      rgba(11, 18, 32, 0.92) 100%
+    );
+  }
+
+  /* The panel becomes a bottom-anchored overlay over the image. No card, no
+     ground fill: the stack sits straight on the scrimmed photograph. Content
+     is capped (see .question) so it never scrolls or reaches the buttons. */
+  .qBody {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 4;
+    background: transparent;
+    overflow: visible;
+    justify-content: flex-end;
+    gap: clamp(20px, 2.6vh, 30px);
+    padding: 0 clamp(48px, 6vw, 96px) clamp(52px, 6.5vh, 80px);
+    max-width: 1120px;
+  }
+
+  /* The label, now the top line of the stack, white on the scrim. */
+  .progressOverlay {
+    display: block;
+    margin: 0;
+    font-family: var(--font-body, "Montserrat", sans-serif);
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #ffffff;
+  }
+
+  /* Roughly three times the mobile size. Capped to four lines so the longest
+     question can never push the two answer buttons off screen. */
+  .question {
+    font-size: clamp(3rem, 5vw, 4.6rem);
+    line-height: 1.04em;
+    color: #ffffff;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Answers keep their green face (self-backing, so the white answer text
+     needs no scrim of its own); the shadow is deepened to lift them off the
+     photograph, and the pair is held to a comfortable measure. */
+  .answers {
+    max-width: 760px;
+    margin-top: 0;
+  }
+  .answerBtn {
+    font-size: 1.05rem;
+    box-shadow: 0 6px 0 var(--sp-green-deep), 0 12px 26px rgba(0, 0, 0, 0.4);
+  }
+
+  /* Back link: white on the scrim rather than the muted grey it uses in the
+     panel, so it reads over photography. */
+  .backButton {
+    color: #ffffff;
+  }
 }
 
 /* ------------------------------------------------------ slide 16, the result */

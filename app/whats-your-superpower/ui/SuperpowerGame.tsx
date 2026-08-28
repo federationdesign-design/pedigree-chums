@@ -200,6 +200,12 @@ export default function SuperpowerGame() {
             </div>
 
             <div className={styles.qBody}>
+              {/* Desktop only: the label lives in the on-image stack, hugging
+                  the question. The mobile label above (inside .qMedia) is
+                  hidden on desktop, so the two never both show. */}
+              <p className={styles.progressOverlay}>
+                Question {index + 1} of {QUESTION_COUNT}
+              </p>
               <h2 className={styles.question}>{q.copy}</h2>
               <div className={styles.answers}>
                 {(["A", "B"] as const).map((letter) => {
