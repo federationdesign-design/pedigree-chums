@@ -284,35 +284,30 @@
     display: none;
   }
 
-  /* Stronger, taller scrim rising from the foot: transparent across the top
-     of the photo, deepening to near-solid at the base where the text sits. */
+  /* No scrim on desktop: the mobile tint is switched off so the white text
+     sits straight on the photograph (revision, per Steve). Mobile keeps its
+     tint, since this override is scoped to the desktop query. */
   .qMediaTint {
-    background: linear-gradient(
-      180deg,
-      rgba(11, 18, 32, 0) 34%,
-      rgba(11, 18, 32, 0.5) 62%,
-      rgba(11, 18, 32, 0.92) 100%
-    );
+    display: none;
   }
 
-  /* The panel becomes a bottom-anchored overlay over the image. No card, no
-     ground fill: the stack sits straight on the scrimmed photograph. Content
-     is capped (see .question) so it never scrolls or reaches the buttons. */
+  /* The panel becomes a centred overlay over the image: the stack sits in the
+     middle of the slide, horizontally and vertically. No card, no ground fill.
+     Content is capped (see .question) so it never scrolls. */
   .qBody {
     position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    inset: 0;
     z-index: 4;
     background: transparent;
     overflow: visible;
-    justify-content: flex-end;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
     gap: clamp(20px, 2.6vh, 30px);
-    padding: 0 clamp(48px, 6vw, 96px) clamp(52px, 6.5vh, 80px);
-    max-width: 1120px;
+    padding: clamp(40px, 6vh, 80px) clamp(48px, 6vw, 96px);
   }
 
-  /* The label, now the top line of the stack, white on the scrim. */
+  /* The label, the top line of the centred stack. */
   .progressOverlay {
     display: block;
     margin: 0;
@@ -324,21 +319,22 @@
     color: #ffffff;
   }
 
-  /* Roughly three times the mobile size. Capped to four lines so the longest
-     question can never push the two answer buttons off screen. */
+  /* Full text ALWAYS: never clamp. A silently cut question is worse than a
+     small one, so long questions are sized down instead (per-question, via
+     --q-size set in the component) rather than having words hidden. Short
+     questions keep the large ~3x size; the longest drop a tier or two so every
+     word fits above the buttons. */
   .question {
-    font-size: clamp(3rem, 5vw, 4.6rem);
-    line-height: 1.04em;
+    font-size: var(--q-size, clamp(3rem, 5vw, 4.6rem));
+    line-height: 1.05em;
     color: #ffffff;
-    display: -webkit-box;
-    -webkit-line-clamp: 4;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+    text-align: center;
+    max-width: min(1100px, 92vw);
   }
 
   /* Answers keep their green face (self-backing, so the white answer text
-     needs no scrim of its own); the shadow is deepened to lift them off the
-     photograph, and the pair is held to a comfortable measure. */
+     needs no backing of its own); the shadow is deepened to lift them off the
+     photograph, and the pair is held to a comfortable measure, centred. */
   .answers {
     max-width: 760px;
     margin-top: 0;
@@ -348,9 +344,9 @@
     box-shadow: 0 6px 0 var(--sp-green-deep), 0 12px 26px rgba(0, 0, 0, 0.4);
   }
 
-  /* Back link: white on the scrim rather than the muted grey it uses in the
-     panel, so it reads over photography. */
+  /* Back link, centred under the answers. */
   .backButton {
+    align-self: center;
     color: #ffffff;
   }
 }

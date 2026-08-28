@@ -16,6 +16,7 @@
 // be swiped to early.
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { CSSProperties } from "react";
 import configJson from "../data/config.mvp-4.3.json";
 import {
   resolveResult,
@@ -37,6 +38,18 @@ const QUESTION_COUNT = config.questions.length;
  * shift every image onto the wrong (or a dropped) question. */
 const questionImage = (id: string) =>
   `/superpower/q${id.replace(/^M/, "").padStart(2, "0")}.jpg`;
+
+/** Desktop question size, chosen by copy length so the whole question always
+ * fits without ever clamping (see SuperpowerGame.module.css). Short questions
+ * stay at the large ~3x size; longer ones step down a tier so every word shows
+ * above the buttons. Consumed only by the desktop media query, via --q-size;
+ * mobile keeps its own font-size and ignores the variable. */
+const desktopQuestionSize = (len: number) =>
+  len > 84
+    ? "clamp(2rem, 3.3vw, 2.9rem)"
+    : len > 66
+      ? "clamp(2.5rem, 4.1vw, 3.6rem)"
+      : "clamp(3rem, 5vw, 4.6rem)";
 
 interface GameState {
   answersByQuestion: (AnswerLetter | null)[];
@@ -206,7 +219,14 @@ export default function SuperpowerGame() {
               <p className={styles.progressOverlay}>
                 Question {index + 1} of {QUESTION_COUNT}
               </p>
-              <h2 className={styles.question}>{q.copy}</h2>
+              <h2
+                className={styles.question}
+                style={
+                  { "--q-size": desktopQuestionSize(q.copy.length) } as CSSProperties
+                }
+              >
+                {q.copy}
+              </h2>
               <div className={styles.answers}>
                 {(["A", "B"] as const).map((letter) => {
                   const chosen = stored === letter;
