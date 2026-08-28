@@ -9,12 +9,15 @@
 }
 
 /* The COOKIES POLICY sticker. Falls from above the viewport, tumbling, down past
-   the bottom. A CSS impression of the pit's Matter drop, not real physics. */
+   the bottom, taking two sideways knocks on the way (lanes A -> B -> C). The lanes
+   (--xa/--xb/--xc) and total spin (--rtot) are set per drop in JS, so each fall
+   differs. X is driven entirely by the transform, so left/top are 0. A CSS
+   impression of the pit's Matter drop, not real physics. */
 .cookie {
   position: absolute;
   top: 0;
-  left: clamp(12px, 8vw, 140px);
-  width: clamp(150px, 22vw, 240px);
+  left: 0;
+  width: clamp(187.5px, 27.5vw, 300px);
   appearance: none;
   -webkit-appearance: none;
   background: none;
@@ -23,7 +26,7 @@
   cursor: pointer;
   pointer-events: auto;
   will-change: transform;
-  animation: cookieFall 4.2s cubic-bezier(0.45, 0.05, 0.55, 0.95) forwards;
+  animation: cookieKnock 4s cubic-bezier(0.4, 0.12, 0.7, 1) forwards;
 }
 .cookie:focus-visible {
   outline: 3px solid var(--blue-deep);
@@ -36,7 +39,13 @@
   height: auto;
 }
 
-@keyframes cookieFall {
-  from { transform: translateY(-30vh) rotate(-8deg); }
-  to   { transform: translateY(140vh) rotate(710deg); }
+/* The two knocks are the tight 34-40% and 66-72% windows: a big sideways move in
+   little time reads as an impact against the smooth fall. Spin speeds up at each. */
+@keyframes cookieKnock {
+  0%   { transform: translate(var(--xa, 40px), -30vh) rotate(0deg); }
+  34%  { transform: translate(var(--xa, 40px), 38vh)  rotate(calc(var(--rtot, 900deg) * 0.20)); }
+  40%  { transform: translate(var(--xb, 120px), 46vh) rotate(calc(var(--rtot, 900deg) * 0.36)); }
+  66%  { transform: translate(var(--xb, 120px), 92vh) rotate(calc(var(--rtot, 900deg) * 0.56)); }
+  72%  { transform: translate(var(--xc, 60px), 100vh) rotate(calc(var(--rtot, 900deg) * 0.73)); }
+  100% { transform: translate(var(--xc, 60px), 145vh) rotate(var(--rtot, 900deg)); }
 }
