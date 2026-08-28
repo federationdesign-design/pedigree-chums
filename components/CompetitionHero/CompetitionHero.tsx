@@ -14,7 +14,8 @@ import styles from "./CompetitionHero.module.css";
      media> tags are unreliable (browsers fetch more than one), so this is done in
      JS on purpose. The pick is made once on mount, so a session never loads both.
    - Cost: the video src is client-decided (no server-rendered <source>) and the
-     video is requested only after hydration plus the 3s beat. The gap is covered
+     video is requested only after hydration plus a short beat (0.5s, see the
+     setTimeout below). The gap is covered
      because BOTH posters are server-rendered and CSS-picked: the matching one
      paints immediately for LCP, and display:none drops the other from the a11y
      tree so the alt is announced once.
@@ -73,7 +74,13 @@ export default function CompetitionHero({ desktop, mobile, alt, still = false }:
     // the breakpoint swaps the poster via CSS; the mounted video stays, and
     // object-fit cover keeps it framed).
     setSource(window.matchMedia(MOBILE_QUERY).matches ? mobile : desktop);
-    const timer = window.setTimeout(() => setShowVideo(true), 3000);
+    // 0.5s beat before the video shows (Steve, 28 Aug 2026; was 3000). Kept
+    // short on purpose: the high-res poster currently carries the WRONG baked
+    // Pug figures (see PLACEHOLDERS.md, re-export pending), so a longer hold
+    // would showcase the incorrect numbers on a crisp still. Revisit at
+    // 1.0-1.5s to restore the crafted first impression ONCE the artwork is
+    // re-rendered with the corrected figures.
+    const timer = window.setTimeout(() => setShowVideo(true), 500);
     return () => window.clearTimeout(timer);
   }, [still, desktop, mobile]);
 
