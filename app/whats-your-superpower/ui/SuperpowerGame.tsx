@@ -51,6 +51,16 @@ const desktopQuestionSize = (len: number) =>
       ? "clamp(2.5rem, 4.1vw, 3.6rem)"
       : "clamp(3rem, 5vw, 4.6rem)";
 
+/** Desktop tint strength, the alpha of the flat --navy wash over the question
+ * photo (see SuperpowerGame.module.css). Data, not a hardcoded pair of ids in
+ * the CSS: most photos take 0.1 (10%), but the two high-key ones, M05 (pale
+ * kitchen Labrador) and M12 (terrier on pale sand), wash out the white text at
+ * 10% and need a stronger 0.5 to lift it off. Consumed via --q-tint; mobile
+ * keeps its gradient tint and ignores this. */
+const STRONG_TINT_IDS = new Set(["M05", "M12"]);
+const desktopQuestionTint = (id: string) =>
+  STRONG_TINT_IDS.has(id) ? "0.5" : "0.1";
+
 interface GameState {
   answersByQuestion: (AnswerLetter | null)[];
   started: boolean;
@@ -75,6 +85,28 @@ export default function SuperpowerGame() {
   const [slide, setSlide] = useState(0);
   const railRef = useRef<HTMLDivElement>(null);
   const { answersByQuestion, started } = state;
+
+  // Slide 0 cover video. Plays once, muted, no loop: collie-wet.jpg is the
+  // poster shown before playback and collie-super.jpg holds after it ends.
+  // Under prefers-reduced-motion the video never plays; the held still is
+  // shown straight away instead (spec section 12, same policy as the scroll).
+  const introVideoRef = useRef<HTMLVideoElement>(null);
+  const [introEnded, setIntroEnded] = useState(false);
+  const [introReducedMotion, setIntroReducedMotion] = useState(false);
+  useEffect(() => {
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    setIntroReducedMotion(reduced);
+    if (reduced) return;
+    const video = introVideoRef.current;
+    if (!video) return;
+    // muted set imperatively too: the attribute alone is unreliable for
+    // programmatic autoplay in some engines.
+    video.muted = true;
+    void video.play().catch(() => {
+      // Autoplay refused despite muted: leave the poster in place rather than
+      // forcing anything. The slide is still usable; Start sits over it.
+    });
+  }, []);
 
   const complete = answersByQuestion.every((a) => a !== null);
   const resultSlide = QUESTION_COUNT + 1;
@@ -172,7 +204,30 @@ export default function SuperpowerGame() {
     <div className={styles.rail} ref={railRef} aria-label={config.copy.gameTitle}>
       {/* ---- Slide 0: the intro ------------------------------------------ */}
       <section className={styles.slide} aria-label="Start">
-        <div className={styles.introImg} />
+        {/* Cover video at z-0. The intro text and Start button (.introBody,
+            z-2) sit over it unchanged. Decorative: aria-hidden, and the slide
+            is fully usable from the poster or still alone. */}
+        <div className={styles.introCover}>
+          <video
+            ref={introVideoRef}
+            className={styles.introVideo}
+            src="/superpower/supercolie.mp4"
+            poster="/superpower/collie-wet.jpg"
+            muted
+            playsInline
+            preload="auto"
+            onEnded={() => setIntroEnded(true)}
+            aria-hidden="true"
+          />
+          {introEnded || introReducedMotion ? (
+            <img
+              className={styles.introStill}
+              src="/superpower/collie-super.jpg"
+              alt=""
+              aria-hidden="true"
+            />
+          ) : null}
+        </div>
         <div className={styles.introBody}>
           <h1 className={styles.introTitle}>
             What&apos;s Your
@@ -197,6 +252,7 @@ export default function SuperpowerGame() {
             key={q.id}
             className={styles.slide}
             aria-label={`Question ${index + 1} of ${QUESTION_COUNT}`}
+            style={{ "--q-tint": desktopQuestionTint(q.id) } as CSSProperties}
           >
             <div className={styles.qMedia}>
               {/* Decorative: the question is answerable without it. */}

@@ -54,11 +54,29 @@
 
 /* ------------------------------------------------------------ slide 0, intro */
 
-.introImg {
+/* Cover video layer. Sits at z-0 under .introBody (z-2); the poster
+   (collie-wet.jpg) shows before playback, the held still (collie-super.jpg)
+   overlays at z-1 once the video ends or under reduced motion. */
+.introCover {
   position: absolute;
   inset: 0;
   z-index: 0;
-  background: var(--sp-ground) url("/superhero-power.jpg") center / cover no-repeat;
+  background: var(--sp-ground);
+  overflow: hidden;
+}
+
+.introVideo,
+.introStill {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.introStill {
+  z-index: 1;
 }
 
 .introBody {
@@ -284,11 +302,17 @@
     display: none;
   }
 
-  /* No scrim on desktop: the mobile tint is switched off so the white text
-     sits straight on the photograph (revision, per Steve). Mobile keeps its
-     tint, since this override is scoped to the desktop query. */
+  /* A flat dark-blue wash over every question photo, to lift the white text
+     off the photography (revision, per Steve). Reuses the scrim element, now a
+     flat fill instead of the removed gradient. --navy (#0a3a57) from the site
+     tokens. Strength is per-question: --q-tint (set in the component) is the
+     alpha, defaulting to 0.1 (10%); the two bright photos that need more get a
+     stronger value as data, not a hardcoded pair of ids here. Mobile keeps its
+     own gradient tint (this is scoped to the desktop query and overrides both
+     display and background). */
   .qMediaTint {
-    display: none;
+    display: block;
+    background: rgba(10, 58, 87, var(--q-tint, 0.1)); /* --navy #0a3a57 */
   }
 
   /* The panel becomes a centred overlay over the image: the stack sits in the
