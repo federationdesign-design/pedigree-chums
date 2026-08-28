@@ -33,6 +33,11 @@ html {
      A brighter yellow than --yellow, scoped here so the 96-file --yellow is not
      disturbed (a site-wide change would be decided separately). */
   --emphasis: #FFED60;
+  /* Editorial header yellow: one yellow for hero H1s and display-font section
+     sub-headers across the editorial pages. Distinct from --yellow (#ffd23e,
+     the 96-file body/UI yellow) and --emphasis (#ffed60, kept for Dogs at Work
+     body emphasis, bullets and card titles). */
+  --yellow-header: #ffed00;
   /* Dogs at Work family pill fills (brief section 10). Named by family, not
      colour. Emergency, Rural and Science were adjusted from the originals for
      contrast or distinctness; do not revert. */

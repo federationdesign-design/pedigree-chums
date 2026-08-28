@@ -75,7 +75,7 @@
   text-shadow: 0 4px 24px rgba(0,0,0,0.3);
 }
 
-.heroTitle span { color: var(--yellow, #ffd23e); }
+.heroTitle span { color: var(--yellow-header, #ffed00); }
 
 .heroSub {
   font-size: clamp(15px, 1.8vw, 19px);
@@ -116,7 +116,7 @@
   color: #fff;
   letter-spacing: 0.02em;
 }
-.introTitle span { color: var(--yellow, #ffd23e); }
+.introTitle span { color: var(--yellow-header, #ffed00); }
 .introDesc {
   font-size: clamp(17px, 1.8vw, 22px);
   font-weight: 600;
@@ -195,7 +195,7 @@
   margin: 0 0 18px;
   letter-spacing: 0.01em;
 }
-.faqHeading span { color: var(--yellow, #ffd23e); }
+.faqHeading span { color: var(--yellow-header, #ffed00); }
 
 /* ── Coming-soon product blocks (mirror /home) ──
    Two teaser blocks in a full-bleed row below the slider (row 5): sticker pack +

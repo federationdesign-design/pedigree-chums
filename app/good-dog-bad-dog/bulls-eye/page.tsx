@@ -277,7 +277,7 @@ export default function BullsEyePage() {
 
               <div className={styles.sidebarCard}>
                 <div style={{ padding: "16px 20px 4px" }}>
-                  <p style={{ fontFamily: "var(--font-display)", fontSize: "54px", lineHeight: 0.9, textAlign: "center", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: 0 }}>What shapes a dog&rsquo;s behaviour?</p>
+                  <p style={{ fontFamily: "var(--font-display)", fontSize: "54px", lineHeight: 0.9, textAlign: "center", letterSpacing: "0.12em", color: "var(--yellow-header)", textTransform: "uppercase", margin: 0 }}>What shapes a dog&rsquo;s behaviour?</p>
                 </div>
                 <div style={{ padding: "12px 25px 20px" }}>
                   <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "center" }}>
@@ -320,7 +320,7 @@ export default function BullsEyePage() {
               <p><em>Oliver Twist</em> was published between 1837 and 1839. The recognisable Bull Terrier was developed and standardised later, particularly through the work of James Hinks during the 1850s and 1860s. The breed therefore developed after Dickens had already created Bull&rsquo;s-eye.</p>
 
               <div className={styles.timelineScene}>
-                <p style={{ fontFamily: "var(--font-display)", fontSize: "54px", lineHeight: 0.9, textAlign: "center", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: "0 0 18px" }}>How the image changed</p>
+                <p style={{ fontFamily: "var(--font-display)", fontSize: "54px", lineHeight: 0.9, textAlign: "center", letterSpacing: "0.12em", color: "var(--yellow-header)", textTransform: "uppercase", margin: "0 0 18px" }}>How the image changed</p>
                 <div className={styles.tlBody}>
                   <div className={styles.tlTrack} />
                   {BE_TIMELINE.map(({ era, name, context, end }) => (

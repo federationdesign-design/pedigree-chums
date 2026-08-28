@@ -116,7 +116,7 @@ function NolanFilmCard() {
   return (
             <div className={styles.sidebarCard}>
               <div style={{ padding: "16px 20px 4px" }}>
-                <p style={{ fontFamily: "var(--font-display)", fontSize: "54px", textAlign: "center", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: "0 0 2px" }}>The Odyssey</p>
+                <p style={{ fontFamily: "var(--font-display)", fontSize: "54px", textAlign: "center", letterSpacing: "0.12em", color: "var(--yellow-header)", textTransform: "uppercase", margin: "0 0 2px" }}>The Odyssey</p>
                 <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 600, color: "#fff", textAlign: "center" }}>Christopher Nolan · Universal · 2026</p>
               </div>
               <div style={{ padding: "12px 30px 4px 30px" }}>
@@ -161,7 +161,7 @@ function LivingDescendantCard({ showImage = false }: { showImage?: boolean }) {
   return (
             <div className={styles.sidebarCard}>
               <div style={{ padding: "16px 20px 4px" }}>
-                <p style={{ fontFamily: "var(--font-display)", fontSize: "54px", textAlign: "center", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: 0 }}>Living Descendant</p>
+                <p style={{ fontFamily: "var(--font-display)", fontSize: "54px", textAlign: "center", letterSpacing: "0.12em", color: "var(--yellow-header)", textTransform: "uppercase", margin: 0 }}>Living Descendant</p>
               </div>
               {showImage && (
               <div style={{ overflow: "hidden" }}>
@@ -185,7 +185,7 @@ function EditorsNoteCard() {
   return (
             <div className={styles.sidebarCard}>
               <div style={{ padding: "16px 20px 4px" }}>
-                <p style={{ fontFamily: "var(--font-display)", fontSize: "54px", textAlign: "center", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: "0 0 8px" }}>Editor&apos;s Note</p>
+                <p style={{ fontFamily: "var(--font-display)", fontSize: "54px", textAlign: "center", letterSpacing: "0.12em", color: "var(--yellow-header)", textTransform: "uppercase", margin: "0 0 8px" }}>Editor&apos;s Note</p>
               </div>
               <div style={{ padding: "0 20px 16px" }}>
                 <p style={{ fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 500, color: "#fff", lineHeight: 1.3, fontStyle: "italic" }}>This piece was written before the release of Christopher Nolan&apos;s <em style={{ fontWeight: 600 }}>The Odyssey</em>. It reflects the conversation around the Argos scene in the weeks leading up to the film, and should be read in that context.</p>
@@ -198,7 +198,7 @@ function ArgosIdentityCard() {
   return (
             <div className={styles.sidebarCard}>
               <div style={{ padding: "16px 20px 4px" }}>
-                <p style={{ fontFamily: "var(--font-display)", fontSize: "54px", textAlign: "center", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: "0 0 4px" }}>ARGOS</p>
+                <p style={{ fontFamily: "var(--font-display)", fontSize: "54px", textAlign: "center", letterSpacing: "0.12em", color: "var(--yellow-header)", textTransform: "uppercase", margin: "0 0 4px" }}>ARGOS</p>
                 <p style={{ textAlign: "center", fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 600, color: "#fff" }}>The Dog of Odysseus</p>
               </div>
               <div style={{ padding: "9px 25px 16px 25px" }}>
@@ -212,7 +212,7 @@ function InContextCard() {
   return (
             <div className={styles.sidebarCard}>
               <div style={{ padding: "16px 20px 4px" }}>
-                <p style={{ fontFamily: "var(--font-display)", fontSize: "54px", textAlign: "center", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: 0 }}>In Context</p>
+                <p style={{ fontFamily: "var(--font-display)", fontSize: "54px", textAlign: "center", letterSpacing: "0.12em", color: "var(--yellow-header)", textTransform: "uppercase", margin: 0 }}>In Context</p>
               </div>
               <div style={{ padding: "9px 50px 16px 50px" }}>
                 <p style={{ fontFamily: "var(--font-body)", fontSize: "1rem", fontWeight: 500, color: "#fff", lineHeight: 1.3, fontStyle: "italic", textAlign: "center" }}>&ldquo;Argos in <em style={{ fontWeight: 600 }}>The Odyssey</em> is old, neglected and lying in refuse when Odysseus returns. He once hunted beside his master, but in his absence, no one cared for him.&rdquo;</p>
@@ -225,7 +225,7 @@ function BookFactsCard() {
   return (
             <div className={styles.sidebarCard}>
               <div style={{ padding: "16px 20px 12px" }}>
-                <p style={{ fontFamily: "var(--font-display)", fontSize: "54px", textAlign: "center", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: "0 0 2px" }}>The Odyssey</p>
+                <p style={{ fontFamily: "var(--font-display)", fontSize: "54px", textAlign: "center", letterSpacing: "0.12em", color: "var(--yellow-header)", textTransform: "uppercase", margin: "0 0 2px" }}>The Odyssey</p>
                 <p style={{ textAlign: "center", fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 600, color: "#fff" }}>Homer · c. 700 BCE &mdash; The Book</p>
               </div>
               <div style={{ padding: "0 20px 4px", display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16 }}>
@@ -251,7 +251,7 @@ function AboutHomerCard() {
   return (
             <div className={styles.sidebarCard}>
               <div style={{ padding: "16px 20px 4px" }}>
-                <p style={{ fontFamily: "var(--font-display)", fontSize: "54px", textAlign: "center", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: 0 }}>About Homer</p>
+                <p style={{ fontFamily: "var(--font-display)", fontSize: "54px", textAlign: "center", letterSpacing: "0.12em", color: "var(--yellow-header)", textTransform: "uppercase", margin: 0 }}>About Homer</p>
               </div>
               <div style={{ overflow: "hidden", position: "relative" }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -295,7 +295,7 @@ function WhatWeKnowCard() {
   return (
             <div className={styles.sidebarCard}>
               <div style={{ padding: "16px 20px 4px" }}>
-                <p style={{ fontFamily: "var(--font-display)", fontSize: "54px", textAlign: "center", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: 0 }}>What We Know</p>
+                <p style={{ fontFamily: "var(--font-display)", fontSize: "54px", textAlign: "center", letterSpacing: "0.12em", color: "var(--yellow-header)", textTransform: "uppercase", margin: 0 }}>What We Know</p>
               </div>
               <div style={{ padding: "10px 20px 4px" }}>
                 {[
@@ -336,7 +336,7 @@ function LikelyOriginsCard() {
   return (
             <div className={styles.sidebarCard}>
               <div style={{ padding: "16px 20px 4px" }}>
-                <p style={{ fontFamily: "var(--font-display)", fontSize: "54px", textAlign: "center", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: 0 }}>Likely Origins</p>
+                <p style={{ fontFamily: "var(--font-display)", fontSize: "54px", textAlign: "center", letterSpacing: "0.12em", color: "var(--yellow-header)", textTransform: "uppercase", margin: 0 }}>Likely Origins</p>
               </div>
               <div style={{ padding: "9px 25px 16px 25px" }}>
                 <p style={{ textAlign: "center", fontFamily: "var(--font-body)", fontSize: "0.95rem", fontWeight: 500, color: "#fff", lineHeight: 1.3, marginBottom: 8 }}>Argos would not be a modern breed but a type of ancient working dog common across the Mediterranean — most likely descended from <strong>Molossian / Molosser type dogs</strong>: powerful, loyal hunting and guard animals used by the Greeks and earlier by the Mycenaeans.</p>
@@ -350,7 +350,7 @@ function BuildAppearanceCard() {
   return (
             <div className={styles.sidebarCard}>
               <div style={{ padding: "16px 20px 4px" }}>
-                <p style={{ fontFamily: "var(--font-display)", fontSize: "54px", textAlign: "center", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: 0 }}>Build &amp; <span style={{ fontSize: "0.86em" }}>Appearance</span></p>
+                <p style={{ fontFamily: "var(--font-display)", fontSize: "54px", textAlign: "center", letterSpacing: "0.12em", color: "var(--yellow-header)", textTransform: "uppercase", margin: 0 }}>Build &amp; <span style={{ fontSize: "0.86em" }}>Appearance</span></p>
               </div>
               <div style={{ padding: "9px 25px 16px 25px" }}>
                 {[
@@ -377,7 +377,7 @@ function EstimatedSizeCard() {
   return (
             <div className={styles.sidebarCard}>
               <div style={{ padding: "16px 20px 12px" }}>
-                <p style={{ fontFamily: "var(--font-display)", fontSize: "54px", textAlign: "center", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: 0 }}>Estimated Size</p>
+                <p style={{ fontFamily: "var(--font-display)", fontSize: "54px", textAlign: "center", letterSpacing: "0.12em", color: "var(--yellow-header)", textTransform: "uppercase", margin: 0 }}>Estimated Size</p>
               </div>
               <div style={{ padding: "0 20px 16px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
                 {[
@@ -400,7 +400,7 @@ function SizeBuildCard() {
   return (
             <div className={styles.sidebarCard}>
               <div style={{ padding: "16px 20px 12px" }}>
-                <p style={{ fontFamily: "var(--font-display)", fontSize: "54px", textAlign: "center", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: 0 }}>Size & Build</p>
+                <p style={{ fontFamily: "var(--font-display)", fontSize: "54px", textAlign: "center", letterSpacing: "0.12em", color: "var(--yellow-header)", textTransform: "uppercase", margin: 0 }}>Size & Build</p>
               </div>
               <div className={styles.sizeBuildGrid} style={{ padding: "0 30px 16px 30px", display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
                 {[
@@ -776,7 +776,7 @@ export default function ArgosPage() {
                 <HomerCrossfade
                   title={
                     <div style={{ padding: "16px 20px 12px", background: "var(--navy)", borderRadius: "16px 16px 0 0" }}>
-                      <p style={{ fontFamily: "var(--font-display)", fontSize: "34px", textAlign: "center", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", margin: 0 }}>About Homer</p>
+                      <p style={{ fontFamily: "var(--font-display)", fontSize: "34px", textAlign: "center", letterSpacing: "0.12em", color: "var(--yellow-header)", textTransform: "uppercase", margin: 0 }}>About Homer</p>
                     </div>
                   }
                   header={
@@ -800,7 +800,7 @@ export default function ArgosPage() {
                   works={
                     <>
                       <div style={{ borderTop: "1px solid rgba(255,255,255,0.25)", marginBottom: 14 }} />
-                      <p style={{ fontFamily: "var(--font-display)", fontSize: "1.15rem", letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--yellow)", marginBottom: 14, textAlign: "center" }}>Major Works</p>
+                      <p style={{ fontFamily: "var(--font-display)", fontSize: "1.15rem", letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--yellow-header)", marginBottom: 14, textAlign: "center" }}>Major Works</p>
                       {[
                         { title: "The Iliad", detail: "c. 750 BCE · 24 books · 15,693 lines", desc: "The Trojan War — the wrath of Achilles, the siege of Troy, the death of Hector. Where the Odyssey is about homecoming, the Iliad is about what war costs." },
                         { title: "The Odyssey", detail: "c. 700 BCE · 24 books · 12,109 lines", desc: "The journey home. Ten years of storms, monsters and gods. The poem that contains Argos." },
@@ -1127,7 +1127,7 @@ export default function ArgosPage() {
               <img src="/history/Greek-Harehound-photo.jpg" alt="Greek Harehound (Hellinikos Ichnilatis)" loading="lazy" style={{ width: "100%", display: "block", borderRadius: 12 }} />
             </div>
               <div className={`${styles.sceneMobile} ${styles.timelineScene} ${styles.tightTop}`} id="tl-scene">
-                <p style={{ fontFamily: "var(--font-display)", fontSize: "54px", textAlign: "center", letterSpacing: "0.12em", color: "var(--yellow)", textTransform: "uppercase", lineHeight: 0.9, margin: "0 0 18px" }}>Ancestral Lineage</p>
+                <p style={{ fontFamily: "var(--font-display)", fontSize: "54px", textAlign: "center", letterSpacing: "0.12em", color: "var(--yellow-header)", textTransform: "uppercase", lineHeight: 0.9, margin: "0 0 18px" }}>Ancestral Lineage</p>
                 <div className={styles.tlBody} id="tl-body">
                   <div className={styles.tlTrack} />
                   <div className={styles.tlFill} id="tl-fill" />

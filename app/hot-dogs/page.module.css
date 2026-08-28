@@ -54,7 +54,7 @@
      (was clamp(2.8rem, 8vw, 6rem), the /home size). */
   font-size: clamp(4rem, 8.5vw, 7.8rem);
   line-height: 0.9;
-  color: var(--yellow, #ffd23e);
+  color: var(--yellow-header, #ffed00);
   margin: 100px 0 clamp(16px, 3vw, 32px);
   text-align: center;
   width: 100%;

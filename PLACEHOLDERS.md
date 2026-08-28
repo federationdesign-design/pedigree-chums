@@ -352,3 +352,20 @@ hero is replaced by `HistoryCarousel` (`.mobileView`), which renders no badge. O
 Deliberate for now, NOT a bug: whether to add the badge to the bdh mobile carousel
 is a design decision Steve will make when looking at that page properly, not as a
 side effect of the badge/shadow change. Do not "fix" it in a drive-by.
+
+## Unrendered selectors in dogs-at-work.module.css (28 Aug 2026)
+
+Found during the editorial-header yellow unification (`--yellow-header: #ffed00`).
+Two yellow-text selectors in `app/dogs-at-work/dogs-at-work.module.css` are defined
+but not referenced by any `.tsx` in `app/dogs-at-work/` (checked with
+`grep -rl "styles.<name>"`), so they render nowhere:
+
+| Selector | Where | Meaning |
+|---|---|---|
+| `.essayTitle` | `dogs-at-work.module.css` | Display-font article title, `var(--yellow)`. No JSX uses it; the articles title via other classes. |
+| `.breedPanelLabel` | `dogs-at-work.module.css` | Small uppercase body-font label, `var(--yellow)`. No JSX uses it. |
+
+Left as-is on the old `--yellow` (NOT retargeted to `--yellow-header`), because they
+do not render and changing dead code adds diff for no visible effect. Logged so
+nobody chases why they were skipped, or "fixes" their colour later. Resolve by
+deleting them if a future pass confirms they are still unused.
