@@ -39,18 +39,6 @@ const QUESTION_COUNT = config.questions.length;
 const questionImage = (id: string) =>
   `/superpower/q${id.replace(/^M/, "").padStart(2, "0")}.jpg`;
 
-/** Desktop question size, chosen by copy length so the whole question always
- * fits without ever clamping (see SuperpowerGame.module.css). Short questions
- * stay at the large ~3x size; longer ones step down a tier so every word shows
- * above the buttons. Consumed only by the desktop media query, via --q-size;
- * mobile keeps its own font-size and ignores the variable. */
-const desktopQuestionSize = (len: number) =>
-  len > 84
-    ? "clamp(2rem, 3.3vw, 2.9rem)"
-    : len > 66
-      ? "clamp(2.5rem, 4.1vw, 3.6rem)"
-      : "clamp(3rem, 5vw, 4.6rem)";
-
 /** Desktop tint strength, the alpha of the flat --navy wash over the question
  * photo (see SuperpowerGame.module.css). Data, not a hardcoded pair of ids in
  * the CSS: most photos take 0.1 (10%), but the two high-key ones, M05 (pale
@@ -113,7 +101,7 @@ export default function SuperpowerGame() {
 
   // Scroll the rail to a slide. Honours prefers-reduced-motion by jumping
   // rather than animating (spec section 12).
-  const goTo = useCallback((index: number) => {
+  const goTo = useCallback((index: number, instant = false) => {
     const rail = railRef.current;
     if (!rail) return;
     const reduced =
@@ -121,7 +109,7 @@ export default function SuperpowerGame() {
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     rail.scrollTo({
       left: index * rail.clientWidth,
-      behavior: reduced ? "auto" : "smooth",
+      behavior: instant || reduced ? "auto" : "smooth",
     });
   }, []);
 
@@ -179,7 +167,13 @@ export default function SuperpowerGame() {
   const restart = () => {
     trackEvent("game_restart");
     setState(freshState());
-    goTo(0);
+    // Jump instantly, do not smooth-scroll: clearing state unmounts the result
+    // section (12 sections to 11) and a 1.6s smooth scroll to 0 would still be
+    // running underneath it, so the shrinking rail shifts the animation off
+    // course and it settles mid-rail. scrollLeft 0 is valid in both layouts, so
+    // an instant jump lands on the intro deterministically regardless of when
+    // the unmount happens.
+    goTo(0, true);
   };
 
   // Selection stores one current answer for this question and advances.
@@ -275,14 +269,7 @@ export default function SuperpowerGame() {
               <p className={styles.progressOverlay}>
                 Question {index + 1} of {QUESTION_COUNT}
               </p>
-              <h2
-                className={styles.question}
-                style={
-                  { "--q-size": desktopQuestionSize(q.copy.length) } as CSSProperties
-                }
-              >
-                {q.copy}
-              </h2>
+              <h2 className={styles.question}>{q.copy}</h2>
               <div className={styles.answers}>
                 {(["A", "B"] as const).map((letter) => {
                   const chosen = stored === letter;

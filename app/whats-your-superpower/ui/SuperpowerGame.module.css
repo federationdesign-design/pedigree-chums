@@ -154,6 +154,52 @@
   box-shadow: 0 2px 0 var(--sp-green-deep);
 }
 
+/* ---- slide 0 intro, DESKTOP (>= 769px) --------------------------------------
+   Desktop-only redesign: the title and promise move to the top and grow, the
+   "Takes about two minutes" line doubles and stays pinned to the foot, and the
+   Start button is capped at 300px. Mobile keeps the original bottom-anchored
+   intro (there is no breakpoint below this). */
+@media (min-width: 769px) {
+  /* 3. Title and promise sit at the top; margin-top:auto on the time (below)
+     sends the time + Start button to the foot, so the two groups split. */
+  .introBody {
+    justify-content: flex-start;
+    padding: 76px 56px 72px;
+    gap: 26px;
+  }
+
+  /* 1. Much bigger title. */
+  .introTitle {
+    font-size: clamp(4rem, 8.5vw, 8rem);
+  }
+
+  /* 2. Much bigger promise. */
+  .introText {
+    font-size: clamp(1.4rem, 2.2vw, 2.1rem);
+    line-height: 1.3;
+    max-width: 760px;
+  }
+
+  /* 5. Twice as big (0.85rem -> 1.7rem) and pinned to the foot. */
+  .introTime {
+    font-size: 1.7rem;
+    margin-top: auto;
+  }
+
+  /* The time now provides the bottom push, so the row needs no top margin. */
+  .introBtnRow {
+    margin-top: 0;
+  }
+
+  /* 4. Start button capped at 300px, left-aligned under the text. Scoped to the
+     intro row, so the result slide's Play again button is untouched. */
+  .introBtnRow .introBtn {
+    flex: 0 0 auto;
+    width: 100%;
+    max-width: 300px;
+  }
+}
+
 /* ------------------------------------------------- slides 1..15, questions */
 
 /* 52% is the seam the Britain's Dog History section photographs sit on, so
@@ -343,13 +389,12 @@
     color: #ffffff;
   }
 
-  /* Full text ALWAYS: never clamp. A silently cut question is worse than a
-     small one, so long questions are sized down instead (per-question, via
-     --q-size set in the component) rather than having words hidden. Short
-     questions keep the large ~3x size; the longest drop a tier or two so every
-     word fits above the buttons. */
+  /* One size for every question (revision): the per-question --q-size sizing is
+     gone. Never clamp and never cut: the text fills the page and long questions
+     simply take more vertical space (they wrap to more lines) rather than being
+     scaled down. */
   .question {
-    font-size: var(--q-size, clamp(3rem, 5vw, 4.6rem));
+    font-size: clamp(3rem, 5vw, 4.6rem);
     line-height: 1.05em;
     color: #ffffff;
     text-align: center;
@@ -363,8 +408,13 @@
     max-width: 760px;
     margin-top: 0;
   }
+  /* 6. Answer text 3pt bigger (1.05rem = 12.6pt -> ~15.6pt = 1.3rem).
+     7. Buttons roughly twice as big: the inner padding is close to doubled
+        (18/15 -> 36/32 vertical, 18 -> 30 horizontal), which is the reading I
+        took of "more padding within the button" (see the report). */
   .answerBtn {
-    font-size: 1.05rem;
+    font-size: 1.3rem;
+    padding: 36px 30px 32px;
     box-shadow: 0 6px 0 var(--sp-green-deep), 0 12px 26px rgba(0, 0, 0, 0.4);
   }
 
