@@ -19,7 +19,7 @@ export default function CookiesPage() {
           <h1 className={styles.title}>
             Cookie <span>Policy</span>
           </h1>
-          <p className={styles.updated}>Last updated: June 2026</p>
+          <p className={styles.updated}>Last updated: August 2026</p>
 
           <p>
             This policy explains how Pedigree Chums (a trading name of Taylor
@@ -59,10 +59,21 @@ export default function CookiesPage() {
               Vimeo, not by us, and are covered by Vimeo&apos;s own privacy and
               cookie policies.
             </li>
+            <li>
+              <strong>Meta Pixel (marketing).</strong> If you accept cookies, we
+              load the Meta Pixel, provided by Meta Platforms Ireland Limited
+              (Facebook and Instagram). It sets cookies and sends Meta information
+              about your visit, such as the pages you view and actions you take,
+              so we can measure our advertising and show relevant ads to people
+              like you on Facebook and Instagram. This information is shared with
+              Meta, who use it under their own terms. It is only loaded after you
+              accept; if you decline, it is not loaded at all.
+            </li>
           </ul>
           <p>
-            We do not use advertising cookies. Analytics cookies are only set
-            once you have accepted them on our cookie notice.
+            Our analytics and marketing cookies (Google Analytics and the Meta
+            Pixel) are only set once you have accepted them on our cookie notice.
+            If you decline, neither is loaded.
           </p>
 
           <h2>Managing cookies</h2>

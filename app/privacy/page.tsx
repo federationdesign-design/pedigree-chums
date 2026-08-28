@@ -20,7 +20,7 @@ export default function PrivacyPage() {
           <h1 className={styles.title}>
             Privacy <span>Policy</span>
           </h1>
-          <p className={styles.updated}>Last updated: June 2026</p>
+          <p className={styles.updated}>Last updated: August 2026</p>
 
           <p>
             This policy explains how Pedigree Chums (referred to as we, us or our
@@ -66,6 +66,12 @@ export default function PrivacyPage() {
             <li>MailerLite, which stores and manages our mailing list</li>
           </ul>
           <p>We do not sell your personal data to anyone.</p>
+          <p>
+            If you accept marketing cookies, the Meta Pixel shares information
+            about your website activity with Meta Platforms Ireland Limited, who
+            act as a separate controller. This is distinct from the sign-up data
+            above.
+          </p>
 
           <h2>How long we keep it</h2>
           <p>
@@ -100,12 +106,16 @@ export default function PrivacyPage() {
             out at any time and we will stop sending you marketing emails.
           </p>
 
-          <h2>Cookies and analytics</h2>
+          <h2>Cookies, analytics and marketing</h2>
           <p>
             If you accept cookies, we use Google Analytics to understand how the
-            site is used. This site also embeds a video from Vimeo, which may set
-            its own cookies. We do not use advertising cookies. For the full
-            detail, see our <Link href="/cookies">Cookie Policy</Link>.
+            site is used, and the Meta Pixel to measure our advertising and show
+            relevant ads on Facebook and Instagram. The Meta Pixel shares
+            information about your visit with Meta Platforms Ireland Limited. This
+            site also embeds a video from Vimeo, which may set its own cookies.
+            These are only loaded if you accept on our cookie notice; if you
+            decline, they are not loaded. For the full detail, see our{" "}
+            <Link href="/cookies">Cookie Policy</Link>.
           </p>
 
           <h2>Changes to this policy</h2>
