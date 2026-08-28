@@ -773,16 +773,12 @@ export default function PackPit() {
 
 
         waveTimers.push(setTimeout(() => { if (!disposed) dropBalls(); }, 700));                                    // 0:00.7  tennis balls
-        // 0:02.0 cookies: withheld. Consent is owned site-wide by the CookieDrop
-        // banner (components/CookieDrop), which is keyboard and screen-reader
-        // accessible; the pit cookie was a canvas physics body and could not be. It
-        // never spawns now, in any consent state, so there is no dead object and no
-        // second prompt. makeCookies and the cookieaccept/cookiereject tap handlers
-        // stay below, dormant, so flipping SHOW_PIT_COOKIE restores it.
-        const SHOW_PIT_COOKIE = false;
-        if (SHOW_PIT_COOKIE) {
-          waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeCookies(w)); }, 2000));
-        }
+        // 0:02.0 cookies: the pit owns the cookie prompt on "/". Tapping it opens
+        // the CookieDrop notice (pc:open-cookies, text only there) and squeezes out
+        // the pit's own Accept/Reject objects. On every other page the DOM
+        // FallingCookie plays this role; keyboard, screen-reader and reduced-motion
+        // users get the notice directly.
+        waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeCookies(w)); }, 2000));
         waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeButton("reserve", "Discount code", w)); }, 4000)); // 0:04.0  discount
         waveTimers.push(setTimeout(() => { if (!disposed) Composite.add(engine.world, makeButton("preorder", "Pre-order", w)); }, 6000));     // 0:06.0  pre-order
 

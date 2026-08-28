@@ -1,0 +1,42 @@
+/* Full-viewport, click-through field the sticker falls through. Below the Nav (300)
+   and the notice; above page content. Only the sticker itself takes clicks. */
+.field {
+  position: fixed;
+  inset: 0;
+  z-index: 240;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* The COOKIES POLICY sticker. Falls from above the viewport, tumbling, down past
+   the bottom. A CSS impression of the pit's Matter drop, not real physics. */
+.cookie {
+  position: absolute;
+  top: 0;
+  left: clamp(12px, 8vw, 140px);
+  width: clamp(150px, 22vw, 240px);
+  appearance: none;
+  -webkit-appearance: none;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  pointer-events: auto;
+  will-change: transform;
+  animation: cookieFall 4.2s cubic-bezier(0.45, 0.05, 0.55, 0.95) forwards;
+}
+.cookie:focus-visible {
+  outline: 3px solid var(--blue-deep);
+  outline-offset: 4px;
+}
+
+.img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+@keyframes cookieFall {
+  from { transform: translateY(-30vh) rotate(-8deg); }
+  to   { transform: translateY(140vh) rotate(710deg); }
+}
