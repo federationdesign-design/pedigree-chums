@@ -1731,7 +1731,7 @@ const ACRONYM_PUNS: Record<string,string> = {...ACRONYM_PUNS_BOY, ...ACRONYM_PUN
   const RESCUE_THRESHOLD = 15;
   if (score < RESCUE_THRESHOLD && styleRoll >= 4) {
     // Already a no-title style -- return as-is
-    return { full, nickname, reasoning, score };
+    return { full, nickname, reasoning, score, dogWord: dogWordEntry.word };
   }
   if (score < RESCUE_THRESHOLD && full.startsWith(title.title + " ")) {
     // Build bare version: just firstName + surname
@@ -1742,7 +1742,7 @@ const ACRONYM_PUNS: Record<string,string> = {...ACRONYM_PUNS_BOY, ...ACRONYM_PUN
     if (bareScore > score) {
       // Bare name scores better -- use it
       const bareNick = getNickname(firstName.name, seed) || nickname;
-      return { full: bareFull, nickname: bareNick, reasoning, score: bareScore };
+      return { full: bareFull, nickname: bareNick, reasoning, score: bareScore, dogWord: dogWordEntry.word };
     }
   }
 
@@ -1757,7 +1757,7 @@ const ACRONYM_PUNS: Record<string,string> = {...ACRONYM_PUNS_BOY, ...ACRONYM_PUN
   });
   if (improvedNick) nickname = improvedNick;
 
-  return { full, nickname, reasoning, score };
+  return { full, nickname, reasoning, score, dogWord: dogWordEntry.word };
 }
 
 
@@ -1779,9 +1779,11 @@ function dedupeResults(candidates: Result[], limit = 10): Result[] {
     const firstName = isAbbrevFull
       ? parts.slice(1, parts.length - 1).join(" ")  // "(Boss Original)"
       : parts[1] ?? "";
-    // Extract dog word from hyphenated surname (e.g. "Sniff-Taylor" -> "Sniff")
+    // Prefer the dog word recorded on the result; the string parse below only
+    // catches the hyphenated form ("Sniff-Taylor"), never the space-joined
+    // compound ("Cleverboy Taylor"), which is exactly what let one word repeat.
     const surnamepart = parts[parts.length - 1] ?? "";
-    const dogWord = surnamepart.includes("-") ? surnamepart.split("-")[0] : "";
+    const dogWord = r.dogWord || (surnamepart.includes("-") ? surnamepart.split("-")[0] : "");
     const wordInName = [...ONCE_ONLY_WORDS].find(w => r.full.includes(" " + w + " ") || r.full.includes(" " + w + "-"));
     if (wordInName && usedDogWords.has(wordInName)) continue;
     if (wordInName) usedDogWords.add(wordInName);
@@ -2226,7 +2228,7 @@ function runPass(
 }
 
 type Stage = "inputs"|"question"|"reveal"|"exhausted";
-type Result = { full: string; nickname: string; reasoning: string; score: number };
+type Result = { full: string; nickname: string; reasoning: string; score: number; dogWord: string };
 type PrefixEntry = { prefix: string; breeds: string[]; bonusContrast: number; };
 
 const TITLE_PREFIXES_GIRL: { prefix: string; bonusContrast: number }[] = [
@@ -2337,6 +2339,9 @@ export default function NameGeneratorPage() {
   const [usedNicknames, setUsedNicknames] = useState<Set<string>>(new Set());
   const [exhausted, setExhausted] = useState(false);
   const [usedFirstNames, setUsedFirstNames] = useState<Set<string>>(new Set());
+  // Cross-roll dog-word memory: the word in the double-barrelled surname is now
+  // tracked so it is not repeated across rolls the way "Cleverboy" was.
+  const [usedDogWords, setUsedDogWords] = useState<Set<string>>(new Set());
   // Confetti comes from the vendored lib/confetti (no external CDN script).
 
   // Gather the bonus words from every answered question -- both the inline
@@ -2394,6 +2399,7 @@ export default function NameGeneratorPage() {
     const ranked = rankResults(sc21, breed ? getGroup(breed) : "default");
     const genResult = ranked.length>0 ? ranked.slice(0,1) : rankResults(allD,breed?getGroup(breed):"default").slice(0,1);
     setUsedNicknames(new Set(genResult.map((r: Result) => r.nickname)));
+    setUsedDogWords(new Set(genResult.map((r: Result) => r.dogWord).filter(Boolean)));
     setResults(genResult);
     setStage("reveal");
     // Jump back to the top so the reveal (not the footer) is in view after Go
@@ -2426,7 +2432,7 @@ export default function NameGeneratorPage() {
     const sc21 = allD.filter(r=>r.score>=17);
     const ranked = rankResults(sc21, breed ? getGroup(breed) : "default");
     const allRanked = ranked.length>0 ? ranked : rankResults(allD,breed?getGroup(breed):"default");
-    const fresh = allRanked.filter((r: Result) => !usedNicknames.has(r.nickname));
+    const fresh = allRanked.filter((r: Result) => !usedNicknames.has(r.nickname) && !(r.dogWord && usedDogWords.has(r.dogWord)));
     if (fresh.length === 0) {
       setStage("exhausted");
       return;
@@ -2435,6 +2441,7 @@ export default function NameGeneratorPage() {
     const rollFirstName = rollResult[0]?.full?.split(" ").find((w:string) => w.length > 1 && /^[A-Z]/.test(w) && !w.includes(".")) ?? "";
     setUsedNicknames((prev: Set<string>) => new Set([...prev, ...rollResult.map((r: Result) => r.nickname)]));
     setUsedFirstNames((prev:Set<string>) => rollFirstName ? new Set([...prev, rollFirstName]) : prev);
+    setUsedDogWords((prev: Set<string>) => { const d = rollResult[0]?.dogWord; return d ? new Set([...prev, d]) : prev; });
     setResults(rollResult);
     setStage("reveal");
   }
