@@ -3,7 +3,11 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import styles from "./CookieBanner.module.css";
 
-const KEY = "pc-cookie-consent";
+// v2 (Steve, 28 Aug 2026): bumped from "pc-cookie-consent" when the Meta Pixel
+// (marketing) was added. Anyone who accepted under the old key has no v2 value,
+// so the notice reappears and they re-consent under the marketing disclosure
+// rather than being silently migrated. The old key is left orphaned, unread.
+const KEY = "pc-cookie-consent-v2";
 
 // Game-intro style cookie notice: centred text that appears when the pit's
 // cookie-policy object is tapped, and clears once its Accept button (an object
@@ -39,7 +43,7 @@ export default function CookieBanner() {
     <div className={styles.intro} role="dialog" aria-label="Cookie notice">
       <div className={styles.card}>
         <p className={styles.introText}>
-          We use cookies to make the site work and to show our product video. Accept via the green button in the pit, or see our{" "}
+          We use cookies to make the site work, to show our product video, to measure how the site is used, and for marketing, including the Meta Pixel, which helps us show relevant ads on Facebook and Instagram. Accept via the green button in the pit, or see our{" "}
           <Link href="/cookies" className={styles.introLink}>Cookie Policy</Link>{" "}
           for the details. You can also reject cookies using the red button in the pit.
         </p>

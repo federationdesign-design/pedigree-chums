@@ -3,6 +3,7 @@ import { Dela_Gothic_One, Luckiest_Guy, Montserrat, Open_Sans, Press_Start_2P, U
 import localFont from "next/font/local";
 import CookieBanner from "../components/CookieBanner/CookieBanner";
 import Analytics from "../components/Analytics/Analytics";
+import MetaPixel from "../components/MetaPixel/MetaPixel";
 import OfferLauncher from "../components/Offer/OfferLauncher";
 import HiddenGamesCounter from "../components/HiddenGamesCounter/HiddenGamesCounter";
 import HideImages from "../components/HideImages/HideImages";
@@ -245,6 +246,7 @@ export default function RootLayout({
             (NEEDS_OWNER Q06). */}
         <CookieBanner />
         <Analytics />
+        <MetaPixel />
       </body>
     </html>
   );

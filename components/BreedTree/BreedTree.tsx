@@ -268,7 +268,7 @@ const TOY_COOKIES_SEEN_KEY = "pc-minipit-cookies-seen";
 // Consent lives in localStorage and is permanent, so the panel never falls for
 // someone who has already answered. NOTE: the main pit reads a DIFFERENT key,
 // "pc-cookies". That mismatch is a real bug and is logged, not fixed here.
-const COOKIE_CONSENT_KEY = "pc-cookie-consent";
+const COOKIE_CONSENT_KEY = "pc-cookie-consent-v2";
 function cookieConsentGiven(): boolean {
   try { return !!localStorage.getItem(COOKIE_CONSENT_KEY); } catch { return false; }
 }

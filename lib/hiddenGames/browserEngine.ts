@@ -19,7 +19,7 @@ import type { MeasurementEvent } from "./measure";
 // the first gtag('event') pattern in the repo. Measurement therefore covers
 // consented visitors only (BRIEF 8), sends aggregate params only, and never
 // throws so it cannot break the site.
-const CONSENT_KEY = "pc-cookie-consent";
+const CONSENT_KEY = "pc-cookie-consent-v2";
 
 type Gtag = (command: string, name: string, params?: Record<string, unknown>) => void;
 
