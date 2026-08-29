@@ -7,13 +7,15 @@
    the toggle attribute plus the no-scheme guard, so nothing leaks to other pages
    and an accessibility contrast scheme still wins.
 
-   Agreed scope (Steve, 17 Aug 2026): invert the H1 and the intro paragraph on the
-   body gradient, and lighten ONLY the input and reveal panels. The knockout game,
-   the bracket tree, the shortlist bar and the share screen are left at rest, as is
-   the "from calculator" banner (a self-styled gradient card). #eaf4fb is the light
-   container colour used site-wide for this toggle: navy text on it is ~11:1, and it
-   is clearly lighter than the cyan->blue gradient so a lightened panel still reads
-   as a raised container. */
+   Agreed scope (Steve, 17 Aug 2026, revised 29 Aug 2026): invert the H1 and the
+   intro paragraph on the body gradient, and lighten ONLY the input panel. The
+   reveal card was in that list until 29 Aug and is now excluded, see the note
+   further down. The knockout game, the bracket tree, the shortlist bar and the
+   share screen are left at rest, as is the "from calculator" banner (a
+   self-styled gradient card). #eaf4fb is the light container colour used
+   site-wide for this toggle: navy text on it is ~11:1, and it is clearly lighter
+   than the cyan to blue gradient so a lightened panel still reads as a raised
+   container. */
 
 /* -- H1 + intro paragraph on the gradient: white -> navy. The yellow "Name"
       accent (.display-yellow) keeps its own colour and is untouched. -- */
@@ -47,16 +49,21 @@
   border-color: rgba(10, 58, 87, 0.3) !important;
 }
 
-/* -- Reveal card (.pcm-reveal-card, a blue-gradient card): -> light. Most of its
-      copy (the breed, the full name, the reasoning) is already navy and its action
-      buttons are self-coloured, so only its two white hero texts need flipping: the
-      big nickname (.pcm-nick) and the no-nickname hero. Both are direct-child divs,
-      so a single "> div" rule catches them; navy-on-navy elsewhere is a no-op and
-      the self-coloured buttons keep their own inline colours. -- */
-:root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"] .pcm-reveal-card {
-  background: #eaf4fb !important;
-}
-:root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"] .pcm-reveal-card .pcm-nick,
-:root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"] .pcm-reveal-card > div {
-  color: var(--navy, #0a3a57) !important;
-}
+/* -- Reveal card (.pcm-reveal-card): DELIBERATELY NOT LIGHTENED.
+
+      REVERSED 29 Aug 2026 (Steve). The 17 Aug scope lightened this card to
+      #eaf4fb along with the input panel. Steve wants it to keep the blue
+      container gradient, linear-gradient(to top right, #00e2ff, #008eff), which
+      is the same fill used for the containers on know-your-chums (know.module.css
+      lines 107, 409, 520). So the card is now simply excluded from the toggle and
+      renders identically in both views.
+
+      The two rules that used to live here are gone on purpose. Do not restore
+      them:
+        .pcm-reveal-card { background: #eaf4fb !important; }
+        .pcm-reveal-card .pcm-nick, .pcm-reveal-card > div { color: navy !important; }
+      The second went with the first. It existed only to flip the two white hero
+      texts so they read on the light fill; with the gradient back, the nickname
+      needs to stay white, which is its inline default.
+
+      The input panel (.pcm-inputs) above is unchanged and still lightens. -- */
