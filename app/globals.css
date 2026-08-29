@@ -14,6 +14,12 @@ html {
   --blue-deep: #0b78bd;   /* darker blue for depth */
   --blue-sky: #5cc4ee;    /* lighter sky blue */
   --blue-royal: #2a65d6;  /* competition heading blue (Spot your Chum), shared across breed pages */
+  /* Light-mode panel fill for the article text toggle. The toggle is light and
+     dark: dark mode uses the navy panel, light mode uses this. It was #eaf4fb,
+     which measured as an off-white grey rather than a blue. #cfe9fb reads as a
+     light blue and still gives navy text 9.5:1, well over the 4.5:1 AA needs.
+     Steve, 29 Aug 2026. */
+  --panel-light: #cfe9fb;
   --cyan: #45cfef;        /* card / bright accent */
   --yellow: #ffd23e;      /* punchy accent */
   --comp-yellow: #f9dd3b; /* Spot your Chum competition pages only: a brighter,
