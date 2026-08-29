@@ -12,11 +12,11 @@
    reveal card was in that list until 29 Aug and is now excluded, see the note
    further down. The knockout game, the bracket tree, the shortlist bar and the
    share screen are left at rest, as is the "from calculator" banner (a
-   self-styled gradient card). --panel-light (#cfe9fb) is the light-mode
-   container colour, shared with the chum calculator: navy text on it is 9.5:1, and
-   it is clearly lighter than the cyan to blue gradient so a lightened panel still
-   reads as a raised container. It was #eaf4fb until 29 Aug 2026, changed because
-   that read as an off-white grey rather than a light blue. */
+   self-styled gradient card). --panel-light is the light-mode container
+   fill, shared with the chum calculator. It is the site container gradient, the
+   same one the reveal card and the know-your-chums containers use, with the panel
+   copy staying navy on top of it. It was #eaf4fb, then #cfe9fb, until 29 Aug 2026;
+   both read as an off-white grey rather than a blue. */
 
 /* -- H1 + intro paragraph on the gradient: white -> navy. The yellow "Name"
       accent (.display-yellow) keeps its own colour and is untouched. -- */
@@ -30,7 +30,7 @@
       inline-styled elements; .display (the green "Go" CTA) is excluded so it stays
       a self-coloured button. -- */
 :root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"] .pcm-inputs {
-  background: var(--panel-light, #cfe9fb) !important;
+  background: var(--panel-light, linear-gradient(to top right, #00e2ff, #008eff)) !important;
 }
 :root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"] .pcm-inputs label,
 :root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"] .pcm-inputs p,

@@ -586,10 +586,9 @@
 /* ============================================================================
    Article text toggle (chum-calculator, 17 Aug 2026). Centred toggle as on /home.
    When on: white H1 + paragraph text on the body gradient goes dark blue, and the
-   navy step card lightens to --panel-light, #cfe9fb (9.5:1 with navy, and clearly
-   lighter than the cyan->blue gradient so the card still reads as a container).
-   That was #eaf4fb until 29 Aug 2026, changed because it read as an off-white
-   grey rather than a light blue with its inner
+   navy step card switches to --panel-light, the site container gradient, with the
+   card copy staying navy on top of it. That was #eaf4fb, then #cfe9fb, until
+   29 Aug 2026; both read as an off-white grey rather than a blue with its inner
    text and controls darkened. Gated on :root:not([data-pc-contrast-scheme]) so an
    accessibility scheme wins. Self-coloured chrome is deliberately left at rest:
    the green/red stairs + start buttons, the yellow selected option, the info
@@ -607,7 +606,7 @@
 /* -- The step card: navy -> light. The umbrella colour catches any inner text
       that inherits white; explicit whites/yellows are re-pointed below. -- */
 :root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .stepCard {
-  background: var(--panel-light, #cfe9fb);
+  background: var(--panel-light, linear-gradient(to top right, #00e2ff, #008eff));
   color: var(--navy, #0a3a57);
   border-color: rgba(10, 58, 87, 0.15);
 }
