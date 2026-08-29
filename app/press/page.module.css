@@ -52,6 +52,95 @@
   padding: clamp(88px, 13vh, 120px) 16px clamp(96px, 15vh, 128px);
 }
 
+/* Media slide: a single image or the video facade, centred and contained so
+   nothing is cropped (every asset is a finished composition), sitting on the page
+   gradient. Same width envelope as the placeholder frame so the pacing matches. */
+.media {
+  flex: 1 1 auto;
+  min-height: 0; /* lets the contained child shrink so max-height can bite */
+  width: 100%;
+  max-width: min(92vw, 480px);
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* next/image (width/height given): scale to fit within the media box, keeping
+   the intrinsic aspect, so the frame hugs the picture rather than boxing it. */
+.mediaImg {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: var(--radius-card, 22px);
+  box-shadow: 0 18px 44px rgba(10, 58, 87, 0.22);
+}
+
+/* Video facade: a box carrying the clip's own aspect (--aspect = w/h). The poster
+   fills it and the player replaces the poster on tap. */
+.videoBox {
+  position: relative;
+  height: 100%;
+  max-width: 100%;
+  aspect-ratio: var(--aspect);
+  margin: 0 auto;
+  border-radius: var(--radius-card, 22px);
+  overflow: hidden;
+  background: #000; /* behind the Vimeo player while it loads */
+  box-shadow: 0 18px 44px rgba(10, 58, 87, 0.22);
+}
+.videoFacade {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  display: block;
+}
+.videoPoster {
+  object-fit: cover;
+}
+/* Play button: green CTA circle with a white triangle, centred over the poster. */
+.playIcon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 76px;
+  height: 76px;
+  border-radius: var(--radius-pill, 999px);
+  background: #22c55e;
+  box-shadow: 0 8px 20px rgba(10, 58, 87, 0.34);
+}
+.playIcon::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 54%;
+  transform: translate(-50%, -50%);
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 15px 0 15px 24px;
+  border-color: transparent transparent transparent #ffffff;
+}
+.videoFacade:active .playIcon {
+  transform: translate(-50%, -50%) scale(0.94);
+}
+.videoFrame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+}
+
 /* Placeholder frame: a light card that fills the slide so the pacing reads like
    a real slide. Dashed edge marks it as a placeholder, never a finished design. */
 .placeholder {
@@ -186,8 +275,11 @@
   .slide {
     padding: clamp(96px, 14vh, 132px) 24px clamp(104px, 15vh, 140px);
   }
+  .media,
   .placeholder {
     max-width: min(72vw, 760px);
+  }
+  .placeholder {
     gap: 14px;
   }
   .slideNum {

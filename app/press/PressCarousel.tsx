@@ -1,44 +1,207 @@
 "use client";
 
+import type { CSSProperties } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import styles from "./page.module.css";
 
-/* Press pack: the carousel shell only. No content yet. The slides below are
-   PLACEHOLDERS, one per entry in the mobile split (docs/press/PLAN.md), so the
-   pacing of clicking through the pack on a phone can be felt before any content
-   lands. Each label is the slide's planned role, not final copy.
+/* Press pack: the click-through carousel. Media is now wired into the slides that
+   have a resolved asset (docs/press/PLAN.md, "Resolved assets"); the remaining
+   slides stay as PLACEHOLDER frames, either because the section is deferred
+   (press release, no-board, a-little-deeper, assets/contact) or because the copy
+   is owner-supplied and not yet written (story payoff, the two closing lines).
 
    Mechanics are the proven scroll-snap + goTo pattern (borrowed from the
    superpower rail's React model, not its dark theme), plus the three controls
    that are net-new to this pack: a previous/next pair, keyboard arrows, and a
-   position indicator. Horizontal swipe comes free from native scroll-snap. */
+   position indicator. Horizontal swipe comes free from native scroll-snap.
 
-const SLIDES: string[] = [
-  "Cover",
-  "Story in 30s (1 of 2)",
-  "Story in 30s (2 of 2)",
-  "Press release (1 of 2)",
-  "Press release (2 of 2)",
-  "Imaginary",
-  "Real",
-  "Tangible",
-  "Missing card: the normal card",
-  "Missing card: Pug leaving",
-  "Missing card: the blank card",
-  "54 became 53",
-  "We can't launch like that",
-  "Find Pug: the steps",
-  "Find Pug: dates and prize",
-  "One-of-one: the figurine",
-  "One-of-one: only one exists",
-  "Britain is the board",
-  "Take them outside",
-  "The traffic-jam example",
-  "A little deeper (1 of 2)",
-  "A little deeper (2 of 2)",
-  "Assets: the thumbnails",
-  "Assets: contact and handles",
+   The Find Pug slide (Section 6) is a Vimeo clip behind a click-to-play facade:
+   a poster with a play button, the iframe mounting only on tap. A live Vimeo
+   iframe captures touch and would fight the swipe rail (its own comment on
+   CompetitionVideoRow documents exactly this), so it is kept out of the DOM until
+   asked for, and unmounted again when the slide is swiped away. */
+
+type Slide =
+  | { kind: "image"; src: string; alt: string; width: number; height: number; priority?: boolean }
+  | { kind: "video"; videoId: string; poster: string; alt: string; width: number; height: number }
+  | { kind: "placeholder"; label: string };
+
+const SLIDES: Slide[] = [
+  // 1 Cover
+  {
+    kind: "image",
+    src: "/press/cover.jpg",
+    alt: "Poster reading Can You Find Pug over a photograph of an empty grassy field under a blue sky, with a large yellow question mark and the Pedigree Chums logo.",
+    width: 1250,
+    height: 1738,
+    priority: true,
+  },
+  // 2 Story in 30s (1 of 2)
+  {
+    kind: "image",
+    src: "/actual-cards.jpg",
+    alt: "Four printed Pedigree Chums breed cards laid on a wooden table: Cavapoo, Yorkshire Terrier, Boston Terrier and Labradoodle.",
+    width: 2713,
+    height: 1490,
+  },
+  // 3 Story in 30s (2 of 2): owner copy only, no image (PLAN M2b)
+  { kind: "placeholder", label: "Story in 30s (2 of 2)" },
+  // 4-5 Press release: Section 3, deferred
+  { kind: "placeholder", label: "Press release (1 of 2)" },
+  { kind: "placeholder", label: "Press release (2 of 2)" },
+  // 6 Imaginary
+  {
+    kind: "image",
+    src: "/press/state-imaginary.jpg",
+    alt: "The illustrated Pug character card: a cartoon Pug on a blue breed card headed Pug, set against a painted parkland background.",
+    width: 1798,
+    height: 2500,
+  },
+  // 7 Real
+  {
+    kind: "image",
+    src: "/press/state-real.jpg",
+    alt: "A real fawn Pug standing in long grass under a bright blue sky, photographed from low down.",
+    width: 2158,
+    height: 3000,
+  },
+  // 8 Tangible
+  {
+    kind: "image",
+    src: "/press/state-tangible.jpg",
+    alt: "The blue 3D printed Pug figurine sitting on a yellow podium in front of blue and cream arches.",
+    width: 2500,
+    height: 3476,
+  },
+  // 9 Missing card: the normal card
+  {
+    kind: "image",
+    src: "/press/card-normal.jpg",
+    alt: "The Pug breed card standing upright on a podium, the cartoon Pug present on the blue card.",
+    width: 1250,
+    height: 1738,
+  },
+  // 10 Missing card: Pug leaving
+  {
+    kind: "image",
+    src: "/press/card-leaving.jpg",
+    alt: "The cartoon Pug leaping up out of its breed card into a painted sky, the card behind it clouding over blank, with the words Find Pug.",
+    width: 1250,
+    height: 1738,
+  },
+  // 11 Missing card: the blank card. HELD: press/card-blank.jpg is currently the
+  // pre-order composed artwork (a filled card with a PRE-ORDER sticker), not the
+  // blank card the slide needs. Left as a placeholder until the right asset lands.
+  { kind: "placeholder", label: "Missing card: the blank card" },
+  // 12-13 Closing lines: owner copy only, no image (PLAN M5d/M5e)
+  { kind: "placeholder", label: "54 became 53" },
+  { kind: "placeholder", label: "We can't launch like that" },
+  // 14 Find Pug: the steps (advertB, click-to-play facade)
+  {
+    kind: "video",
+    videoId: "1221597431",
+    poster: "/press/findpug-video-poster.jpg",
+    alt: "A fawn Pug walking through grass under a blue sky, the opening frame of the Find Pug advert.",
+    width: 240,
+    height: 318,
+  },
+  // 15 Find Pug: dates and prize
+  {
+    kind: "image",
+    src: "/press/findpug-ticket.jpg",
+    alt: "A We Lost Pug, Find Pug free-entry ticket above a photo of the blue Pug figurine being placed on a Pug podium in front of a camera.",
+    width: 1042,
+    height: 1452,
+  },
+  // 16 One-of-one: the figurine
+  {
+    kind: "image",
+    src: "/press/figurine-hero.jpg",
+    alt: "The blue 3D printed Pug figurine facing forward on a plain pale background.",
+    width: 1449,
+    height: 1473,
+  },
+  // 17 One-of-one: only one exists
+  {
+    kind: "image",
+    src: "/press/figurine-angle.jpg",
+    alt: "The blue 3D printed Pug figurine seen from a three-quarter angle on a plain pale background.",
+    width: 1449,
+    height: 1473,
+  },
+  // 18-20 No board: Section 8, deferred
+  { kind: "placeholder", label: "Britain is the board" },
+  { kind: "placeholder", label: "Take them outside" },
+  { kind: "placeholder", label: "The traffic-jam example" },
+  // 21-22 A little deeper: Section 9, deferred
+  { kind: "placeholder", label: "A little deeper (1 of 2)" },
+  { kind: "placeholder", label: "A little deeper (2 of 2)" },
+  // 23-24 Assets and contact: Section 10, deferred
+  { kind: "placeholder", label: "Assets: the thumbnails" },
+  { kind: "placeholder", label: "Assets: contact and handles" },
 ];
+
+/* The Find Pug clip, kept out of the DOM until the poster is tapped. Its own box
+   carries the clip's aspect (--aspect = w/h), so poster and player fill it with no
+   letterbox. When the slide is swiped away (active goes false) the iframe is
+   unmounted and the facade returns, so a Vimeo player never sits off-screen
+   capturing touch or holding a connection. */
+function VideoFacade({
+  videoId,
+  poster,
+  alt,
+  width,
+  height,
+  active,
+}: {
+  videoId: string;
+  poster: string;
+  alt: string;
+  width: number;
+  height: number;
+  active: boolean;
+}) {
+  const [playing, setPlaying] = useState(false);
+
+  useEffect(() => {
+    if (!active) setPlaying(false);
+  }, [active]);
+
+  return (
+    <div
+      className={styles.videoBox}
+      style={{ "--aspect": width / height } as CSSProperties}
+    >
+      {playing ? (
+        <iframe
+          className={styles.videoFrame}
+          src={`https://player.vimeo.com/video/${videoId}?autoplay=1&title=0&byline=0&portrait=0&dnt=1`}
+          title="Find Pug advert"
+          allow="autoplay; fullscreen; picture-in-picture"
+          frameBorder="0"
+        />
+      ) : (
+        <button
+          type="button"
+          className={styles.videoFacade}
+          onClick={() => setPlaying(true)}
+          aria-label="Play the Find Pug advert"
+          tabIndex={active ? 0 : -1}
+        >
+          <Image
+            className={styles.videoPoster}
+            src={poster}
+            alt={alt}
+            fill
+            sizes="(min-width: 769px) 60vw, 90vw"
+          />
+          <span className={styles.playIcon} aria-hidden="true" />
+        </button>
+      )}
+    </div>
+  );
+}
 
 export default function PressCarousel() {
   const railRef = useRef<HTMLDivElement>(null);
@@ -117,19 +280,44 @@ export default function PressCarousel() {
       aria-label="Pedigree Chums press pack"
     >
       <div className={styles.rail} ref={railRef}>
-        {SLIDES.map((label, i) => (
+        {SLIDES.map((slide, i) => (
           <article
-            key={label}
+            key={i}
             className={styles.slide}
             aria-roledescription="slide"
             aria-label={`Slide ${i + 1} of ${count}`}
             aria-hidden={i !== index}
           >
-            <div className={styles.placeholder}>
-              <p className={styles.kicker}>Placeholder</p>
-              <p className={styles.slideNum}>{i + 1}</p>
-              <p className={styles.slideRole}>{label}</p>
-            </div>
+            {slide.kind === "image" ? (
+              <div className={styles.media}>
+                <Image
+                  className={styles.mediaImg}
+                  src={slide.src}
+                  alt={slide.alt}
+                  width={slide.width}
+                  height={slide.height}
+                  priority={slide.priority}
+                  sizes="(min-width: 769px) 72vw, 92vw"
+                />
+              </div>
+            ) : slide.kind === "video" ? (
+              <div className={styles.media}>
+                <VideoFacade
+                  videoId={slide.videoId}
+                  poster={slide.poster}
+                  alt={slide.alt}
+                  width={slide.width}
+                  height={slide.height}
+                  active={i === index}
+                />
+              </div>
+            ) : (
+              <div className={styles.placeholder}>
+                <p className={styles.kicker}>Placeholder</p>
+                <p className={styles.slideNum}>{i + 1}</p>
+                <p className={styles.slideRole}>{slide.label}</p>
+              </div>
+            )}
           </article>
         ))}
       </div>
