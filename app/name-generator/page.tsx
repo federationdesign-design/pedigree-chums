@@ -2721,10 +2721,10 @@ export default function NameGeneratorPage() {
               <img src="/name-gen-sticker.png" alt="" style={{ width:"100%", height:"auto", display:"block", borderRadius:24 }} />
             </div>
             <div className="pcm-titletext">
-              <h1 className="display pcm-h1" style={{ textAlign:"center", marginBottom:16, fontSize:"clamp(3rem,10vw,6.5rem)", color:"#ffffff", lineHeight:0.95 }}>
+              <h1 className="display pcm-h1" style={{ textAlign:"left", marginBottom:16, fontSize:"clamp(3rem,10vw,6.5rem)", color:"#ffffff", lineHeight:0.95 }}>
                 <span className="display-yellow">Name</span><br />Generator
               </h1>
-              <p ref={subRef} className="pcm-sub" style={{ textAlign:"center", color:"#ffffff", fontFamily:"var(--font-body)", fontSize:"clamp(1rem,2.5vw,1.3rem)", fontWeight:600, marginBottom:0 }}>
+              <p ref={subRef} className="pcm-sub" style={{ textAlign:"left", color:"#ffffff", fontFamily:"var(--font-body)", fontSize:"clamp(1rem,2.5vw,1.3rem)", fontWeight:600, marginBottom:0 }}>
                 {shortlist.length >= 4 && stage !== "inputs"
                   ? <>You have {shortlist.length} names!<br />Tap 🏆 Knockout button to decide</>
                   : "Give your chum the truly 1 in a million personalised to you name"}
