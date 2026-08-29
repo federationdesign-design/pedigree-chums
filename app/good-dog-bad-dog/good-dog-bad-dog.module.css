@@ -629,7 +629,9 @@
 /* Title first -- meta + back link below */
 .essayHeroTitle {
   font-family: var(--font-display, "Luckiest Guy", cursive);
-  font-size: clamp(3.1rem, 7vw, 4.375rem);
+  /* +3pt on 29 Aug 2026 (Steve): 3.1/4.375 -> 3.2875/4.5625rem. The vw term is
+     left alone so the fluid middle of the range still tracks the viewport. */
+  font-size: clamp(3.2875rem, 7vw, 4.5625rem);
   color: var(--yellow-header, #ffed00);
   margin: 0 0 20px;
   line-height: 1.0;
@@ -686,7 +688,8 @@
 
   /* H1 hero title +4pt */
   .essayHeroTitle {
-    font-size: clamp(3.5rem, 8vw, 4.625rem);
+    /* +3pt on 29 Aug 2026, on top of the +4pt this rule already applied. */
+    font-size: clamp(3.6875rem, 8vw, 4.8125rem);
   }
 
   /* Para text +3pt */
@@ -1082,7 +1085,9 @@
   }
 
   .heroScene .essayHeroTitle {
-    font-size: clamp(2.16rem, 9.2vw, 2.86rem);
+    /* +3pt on 29 Aug 2026. Argos only: .heroScene is its layout, nothing else
+       uses it. Worth an eyeball on a narrow phone, the title is long. */
+    font-size: clamp(2.3475rem, 9.2vw, 3.0475rem);
   }
 
   .heroScene .heroArrow {
