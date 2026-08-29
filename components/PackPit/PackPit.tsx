@@ -28,6 +28,35 @@ function sumLeaves(n: LineageNode): number {
   return n.children && n.children.length ? n.children.reduce((s, c) => s + sumLeaves(c), 0) : n.value ?? 0;
 }
 
+/* PIT-LOAD-3, 2026-08-29. The pit's drop schedule is fixed, so the set of
+   assets it needs in its first ten seconds is knowable up front. These two
+   lists are that set, and the mount effect preloads them and nothing else.
+
+   EASY_PAIRS lives here rather than inside dropAll so the preload and the drop
+   schedule cannot drift apart: preloading a breed that no longer drops first
+   would be worthless, and the bug would be silent. dropAll reads this same
+   constant. One name from each pair drops, chosen at random at run time, so
+   all twelve have to be ready. That is about 750KB. */
+const EASY_PAIRS: [string, string][] = [
+  ["Chihuahua", "Labrador"],
+  ["Pug", "Border Collie"],
+  ["Pomeranian", "Maltese"],
+  ["Dachshund", "Cocker Spaniel"],
+  ["Corgi", "Saint Bernard"],
+  ["Yorkshire Terrier", "Poodle"],
+];
+
+// The non-card art due in the same window, in the order the wave timers fire.
+// The floor is not here: it is a plain <img> in the DOM, so the browser already
+// requests it at first paint.
+const FIRST_WAVE_ASSETS = [
+  "/tennis-ball.svg",       // 0:00.7  tennis balls
+  "/cookies-policy.svg",    // 0:02.0  cookies
+  "/entersite.svg",         // 0:09.0  enter site panel
+  "/howtoplay.svg",         // 0:09.0  how to play panel
+  "/green-arrow-short.svg", // 0:09.0  arrow
+];
+
 export default function PackPit() {
   const stageRef = useRef<HTMLDivElement>(null);
   const shakeRef = useRef<() => void>(() => {});
@@ -151,6 +180,25 @@ export default function PackPit() {
     // 11.2MB was downloaded, never used, then downloaded again on first real use.
     // Together that is roughly 28MB competing for a phone's downlink against the
     // assets the first objects to drop actually need.
+    //
+    // PIT-LOAD-3, 2026-08-29. What replaces it: only what the pit needs inside
+    // its first ten seconds, about 800KB, requested through bust() so the URL
+    // matches the one getImg() will ask for. decode() is called on each so the
+    // picture is ready to paint, not merely downloaded: the draw paths all guard
+    // on img.complete and silently skip the artwork when it is not ready, which
+    // is what produced the empty container boxes. The LOGO_STAGES block further
+    // down already uses this same download-then-decode pattern.
+    const priority = [
+      ...FIRST_WAVE_ASSETS,
+      ...EASY_PAIRS.flat()
+        .map((n) => breeds.find((b) => b.name === n)?.image)
+        .filter((s): s is string => !!s),
+    ];
+    priority.forEach((src) => {
+      const img = new Image();
+      img.src = bust(src);
+      if (img.decode) img.decode().catch(() => {});
+    });
     const open = () => { setHowToPlay(true); };
     window.addEventListener("pc:open-howtoplay", open);
     return () => window.removeEventListener("pc:open-howtoplay", open);
@@ -787,14 +835,9 @@ export default function PackPit() {
 
         // ── EASY PAIRS (pairs 1-6) ───────────────────────────────────────────
         // Pair logic: pick one randomly, loser joins reject pool for pool drops
-        const easyPairs: [string,string][] = [
-          ["Chihuahua","Labrador"],
-          ["Pug","Border Collie"],
-          ["Pomeranian","Maltese"],
-          ["Dachshund","Cocker Spaniel"],
-          ["Corgi","Saint Bernard"],
-          ["Yorkshire Terrier","Poodle"],
-        ];
+        // Read from the module-level EASY_PAIRS so the mount-time priority
+        // preload and this schedule can never disagree. See PIT-LOAD-3.
+        const easyPairs = EASY_PAIRS;
         const easyRejects: string[] = [];
         easyPairs.forEach(([a,b]) => {
           const winner = Math.random() < 0.5 ? a : b;
