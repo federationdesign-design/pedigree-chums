@@ -218,6 +218,18 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
     navTo(href);
   };
   // Kept for the few controls that are not links and close the menu themselves.
+  /* PIT-LOAD-5, 2026-08-29. It is deliberately NOT passed to BentoBoard or
+     AccessibleMenu any more. Every tile in both is a <Link href>, so a tap ran
+     two handlers: the tile's own closeForNav, which shut the menu at once, and
+     then onOverlayClick, which started the real navigation inside a transition.
+     The menu was therefore gone before the page had been fetched, and on the
+     home page what sits behind it is the pit, so a slow connection looked like
+     the tile had simply bounced you back into the game. The pending spinner
+     above existed for exactly this and could never appear, because the overlay
+     holding it had already unmounted.
+     Nothing is lost by dropping it: onOverlayClick sets navigatingRef itself
+     via navTo, so the scroll-restore skip below still works, and the pending
+     effect closes the menu once the page is ready. */
   const closeForNav = () => { navigatingRef.current = true; setOpen(false); };
 
   // data-pc-logo is the logo's LIVE visibility (toggles with scroll); data-pc-has-logo is STATIC per page --
@@ -314,9 +326,9 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
               <Link href="/preorder" className={styles.menuLink} onClick={closeForNav}>Get pre-order discount code</Link>
             </nav>
           ) : accessibleMode ? (
-            <AccessibleMenu onNavigate={closeForNav} />
+            <AccessibleMenu />
           ) : (
-            <BentoBoard onNavigate={closeForNav} onOffer={openOffer} animateIn />
+            <BentoBoard onOffer={openOffer} animateIn />
           )}
         </div>
       , document.body)}
