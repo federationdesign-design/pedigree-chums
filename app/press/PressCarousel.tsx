@@ -5,30 +5,44 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import styles from "./page.module.css";
 
-/* Press pack: the click-through carousel. Media is now wired into the slides that
-   have a resolved asset (docs/press/PLAN.md, "Resolved assets"); the remaining
-   slides stay as PLACEHOLDER frames, either because the section is deferred
-   (press release, no-board, a-little-deeper, assets/contact) or because the copy
-   is owner-supplied and not yet written (story payoff, the two closing lines).
+/* Press pack: the click-through carousel. Media is wired into the slides that
+   have a resolved asset (docs/press/PLAN.md plus the owner's pick list, 30 Aug);
+   the remaining slides stay as PLACEHOLDER frames, either because the section is
+   deferred (press release text, no-board, a-little-deeper, assets/contact) or
+   because the copy is owner-supplied and not yet written (story payoff, the two
+   closing lines).
+
+   Every image comes from the supplied press folder; nothing from the repo root.
+   The owner's picks are primary and my recommendations only fill the gaps they
+   leave (the Find Pug dates/prize still uses get-your-ticket).
 
    Mechanics are the proven scroll-snap + goTo pattern (borrowed from the
    superpower rail's React model, not its dark theme), plus the three controls
    that are net-new to this pack: a previous/next pair, keyboard arrows, and a
    position indicator. Horizontal swipe comes free from native scroll-snap.
 
-   The Find Pug slide (Section 6) is a Vimeo clip behind a click-to-play facade:
-   a poster with a play button, the iframe mounting only on tap. A live Vimeo
-   iframe captures touch and would fight the swipe rail (its own comment on
-   CompetitionVideoRow documents exactly this), so it is kept out of the DOM until
-   asked for, and unmounted again when the slide is swiped away. */
+   Two slides are Vimeo clips behind a click-to-play facade: the story video
+   (advert2B) on Story in 30s, and advertB on Find Pug. A live Vimeo iframe
+   captures touch and would fight the swipe rail (its own comment on
+   CompetitionVideoRow documents exactly this), so the iframe is kept out of the
+   DOM until the poster is tapped, and unmounted again when the slide is swiped
+   away. */
 
 type Slide =
   | { kind: "image"; src: string; alt: string; width: number; height: number; priority?: boolean }
-  | { kind: "video"; videoId: string; poster: string; alt: string; width: number; height: number }
+  | {
+      kind: "video";
+      videoId: string;
+      poster: string;
+      alt: string;
+      width: number;
+      height: number;
+      label: string;
+    }
   | { kind: "placeholder"; label: string };
 
 const SLIDES: Slide[] = [
-  // 1 Cover
+  // 1 Cover (owner: slide1.jpg)
   {
     kind: "image",
     src: "/press/cover.jpg",
@@ -37,20 +51,29 @@ const SLIDES: Slide[] = [
     height: 1738,
     priority: true,
   },
-  // 2 Story in 30s (1 of 2)
+  // 2 Story in 30s (owner: advert2B.mp4, Vimeo 1221597429, facade)
+  {
+    kind: "video",
+    videoId: "1221597429",
+    poster: "/press/story-video-poster.jpg",
+    alt: "The Pug character card standing on a blue and yellow set, the opening frame of the story video.",
+    width: 1380,
+    height: 1920,
+    label: "the story video",
+  },
+  // 3 Story in 30s (2 of 2): owner copy only, no image
+  { kind: "placeholder", label: "Story in 30s (2 of 2)" },
+  // 4 Press release (owner: blue-orig1.jpg)
   {
     kind: "image",
-    src: "/actual-cards.jpg",
-    alt: "Four printed Pedigree Chums breed cards laid on a wooden table: Cavapoo, Yorkshire Terrier, Boston Terrier and Labradoodle.",
-    width: 2713,
-    height: 1490,
+    src: "/press/press-release.jpg",
+    alt: "The blue 3D printed Pug figurine facing forward on a plain pale background.",
+    width: 1449,
+    height: 1473,
   },
-  // 3 Story in 30s (2 of 2): owner copy only, no image (PLAN M2b)
-  { kind: "placeholder", label: "Story in 30s (2 of 2)" },
-  // 4-5 Press release: Section 3, deferred
-  { kind: "placeholder", label: "Press release (1 of 2)" },
+  // 5 Press release (2 of 2): Section 3 release text deferred
   { kind: "placeholder", label: "Press release (2 of 2)" },
-  // 6 Imaginary
+  // 6 How the world works: Imaginary (owner: card-on-cartoon.jpg)
   {
     kind: "image",
     src: "/press/state-imaginary.jpg",
@@ -58,7 +81,7 @@ const SLIDES: Slide[] = [
     width: 1798,
     height: 2500,
   },
-  // 7 Real
+  // 7 Real (owner: dog-on-real.jpg)
   {
     kind: "image",
     src: "/press/state-real.jpg",
@@ -66,47 +89,92 @@ const SLIDES: Slide[] = [
     width: 2158,
     height: 3000,
   },
-  // 8 Tangible
+  // 8 Tangible (owner: slide3.jpg)
   {
     kind: "image",
     src: "/press/state-tangible.jpg",
-    alt: "The blue 3D printed Pug figurine sitting on a yellow podium in front of blue and cream arches.",
-    width: 2500,
-    height: 3476,
+    alt: "The blue 3D printed Pug figurine on a yellow podium labelled Pug beneath a Win Me badge, in front of blue and cream arches.",
+    width: 1250,
+    height: 1738,
   },
-  // 9 Missing card: the normal card
+  // 9 Missing card 1 (owner order: slide13.jpg)
   {
     kind: "image",
-    src: "/press/card-normal.jpg",
+    src: "/press/missing-1.jpg",
+    alt: "The Pug character card standing in a sunlit painted field, with the words Find Pug.",
+    width: 1250,
+    height: 1738,
+  },
+  // 10 Missing card 2 (owner order: slide14.jpg)
+  {
+    kind: "image",
+    src: "/press/missing-2.jpg",
+    alt: "The cartoon Pug leaping up out of its breed card into a painted sky, with the words Find Pug.",
+    width: 1250,
+    height: 1738,
+  },
+  // 11 Missing card 3 (owner order: slide14b.jpg)
+  {
+    kind: "image",
+    src: "/press/missing-3.jpg",
+    alt: "The cartoon Pug flying through a painted sky above an empty field, with a person-and-dog icon and the words Find Pug.",
+    width: 1250,
+    height: 1738,
+  },
+  // 12 Missing card 4 (owner order: slide17b.jpg)
+  {
+    kind: "image",
+    src: "/press/missing-4.jpg",
+    alt: "A close-up of the blue 3D printed Pug figurine held in a hand against a blue and yellow set.",
+    width: 1250,
+    height: 1738,
+  },
+  // 13 Missing card 5 (owner order: zoom-card.jpg)
+  {
+    kind: "image",
+    src: "/press/missing-5.jpg",
     alt: "The Pug breed card standing upright on a podium, the cartoon Pug present on the blue card.",
     width: 1250,
     height: 1738,
   },
-  // 10 Missing card: Pug leaving
+  // 14 Missing card 6 (owner order: slide12.jpg)
   {
     kind: "image",
-    src: "/press/card-leaving.jpg",
-    alt: "The cartoon Pug leaping up out of its breed card into a painted sky, the card behind it clouding over blank, with the words Find Pug.",
+    src: "/press/missing-6.jpg",
+    alt: "A Pre-order now scene: the Pug character card and the boxed Pedigree Chums set on blue podiums against a yellow background.",
     width: 1250,
     height: 1738,
   },
-  // 11 Missing card: the blank card. HELD: press/card-blank.jpg is currently the
-  // pre-order composed artwork (a filled card with a PRE-ORDER sticker), not the
-  // blank card the slide needs. Left as a placeholder until the right asset lands.
-  { kind: "placeholder", label: "Missing card: the blank card" },
-  // 12-13 Closing lines: owner copy only, no image (PLAN M5d/M5e)
+  // 15 Missing card 7 (owner order: slide15.jpg)
+  {
+    kind: "image",
+    src: "/press/missing-7.jpg",
+    alt: "A real fawn Pug walking through grass, overlaid with the hashtag ChumSpot and the words Add photo to our feed.",
+    width: 1250,
+    height: 1738,
+  },
+  // 16 Missing card 8 (owner order: slide16.jpg)
+  {
+    kind: "image",
+    src: "/press/missing-8.jpg",
+    alt: "A real fawn Pug running through grass, overlaid with the hashtag ChumSpot and the words Add photo to our feed.",
+    width: 1250,
+    height: 1738,
+  },
+  // 17-18 Closing lines: owner copy only, no image
   { kind: "placeholder", label: "54 became 53" },
   { kind: "placeholder", label: "We can't launch like that" },
-  // 14 Find Pug: the steps (advertB, click-to-play facade)
+  // 19 Find Pug: the steps (owner: advertB.mp4, Vimeo 1221597431, facade)
   {
     kind: "video",
     videoId: "1221597431",
     poster: "/press/findpug-video-poster.jpg",
     alt: "A fawn Pug walking through grass under a blue sky, the opening frame of the Find Pug advert.",
-    width: 240,
-    height: 318,
+    width: 1250,
+    height: 1660,
+    label: "the Find Pug advert",
   },
-  // 15 Find Pug: dates and prize
+  // 20 Find Pug: dates and prize (gap-fill: get-your-ticket.jpg)
   {
     kind: "image",
     src: "/press/findpug-ticket.jpg",
@@ -114,36 +182,37 @@ const SLIDES: Slide[] = [
     width: 1042,
     height: 1452,
   },
-  // 16 One-of-one: the figurine
+  // 21 One-of-one: the figurine (owner: slide6.jpg)
   {
     kind: "image",
-    src: "/press/figurine-hero.jpg",
-    alt: "The blue 3D printed Pug figurine facing forward on a plain pale background.",
-    width: 1449,
-    height: 1473,
+    src: "/press/figurine-a.jpg",
+    alt: "The blue 3D printed Pug figurine being photographed on a Pug podium and held in an open palm, with a Win Me badge.",
+    width: 1250,
+    height: 1738,
   },
-  // 17 One-of-one: only one exists
+  // 22 One-of-one: only one exists (owner: slide5.jpg)
   {
     kind: "image",
-    src: "/press/figurine-angle.jpg",
-    alt: "The blue 3D printed Pug figurine seen from a three-quarter angle on a plain pale background.",
-    width: 1449,
-    height: 1473,
+    src: "/press/figurine-b.jpg",
+    alt: "The blue 3D printed Pug figurine inside a Pedigree Chums window box labelled Pug, a loyal little legend, on a yellow and blue set.",
+    width: 1250,
+    height: 1738,
   },
-  // 18-20 No board: Section 8, deferred
+  // 23-25 No board: owner pick ad1d.mp4 is not on Vimeo, so this stays a
+  // placeholder until the clip is uploaded (no substitute).
   { kind: "placeholder", label: "Britain is the board" },
   { kind: "placeholder", label: "Take them outside" },
   { kind: "placeholder", label: "The traffic-jam example" },
-  // 21-22 A little deeper: Section 9, deferred
+  // 26-27 A little deeper: Section 9, deferred (no supplied asset fits)
   { kind: "placeholder", label: "A little deeper (1 of 2)" },
   { kind: "placeholder", label: "A little deeper (2 of 2)" },
-  // 23-24 Assets and contact: Section 10, deferred
+  // 28-29 Assets and contact: Section 10, deferred
   { kind: "placeholder", label: "Assets: the thumbnails" },
   { kind: "placeholder", label: "Assets: contact and handles" },
 ];
 
-/* The Find Pug clip, kept out of the DOM until the poster is tapped. Its own box
-   carries the clip's aspect (--aspect = w/h), so poster and player fill it with no
+/* A Vimeo clip kept out of the DOM until the poster is tapped. Its own box carries
+   the clip's aspect (--aspect = w/h), so poster and player fill it with no
    letterbox. When the slide is swiped away (active goes false) the iframe is
    unmounted and the facade returns, so a Vimeo player never sits off-screen
    capturing touch or holding a connection. */
@@ -153,6 +222,7 @@ function VideoFacade({
   alt,
   width,
   height,
+  label,
   active,
 }: {
   videoId: string;
@@ -160,6 +230,7 @@ function VideoFacade({
   alt: string;
   width: number;
   height: number;
+  label: string;
   active: boolean;
 }) {
   const [playing, setPlaying] = useState(false);
@@ -177,7 +248,7 @@ function VideoFacade({
         <iframe
           className={styles.videoFrame}
           src={`https://player.vimeo.com/video/${videoId}?autoplay=1&title=0&byline=0&portrait=0&dnt=1`}
-          title="Find Pug advert"
+          title={label}
           allow="autoplay; fullscreen; picture-in-picture"
           frameBorder="0"
         />
@@ -186,7 +257,7 @@ function VideoFacade({
           type="button"
           className={styles.videoFacade}
           onClick={() => setPlaying(true)}
-          aria-label="Play the Find Pug advert"
+          aria-label={`Play ${label}`}
           tabIndex={active ? 0 : -1}
         >
           <Image
@@ -308,6 +379,7 @@ export default function PressCarousel() {
                   alt={slide.alt}
                   width={slide.width}
                   height={slide.height}
+                  label={slide.label}
                   active={i === index}
                 />
               </div>
