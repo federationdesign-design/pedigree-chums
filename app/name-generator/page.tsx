@@ -2984,14 +2984,14 @@ export default function NameGeneratorPage() {
                       const jiggle = n >= 8;
                       const angle = (2 + (t - 8) * 0.34).toFixed(2);   // 8 -> 2deg, 14 -> ~4deg
                       const dur = Math.max(0.34, 0.7 - (t - 8) * 0.06).toFixed(2); // 8 -> 0.7s, 14 -> ~0.34s
-                      const koStyle: React.CSSProperties = { background:"var(--yellow)", border:"2px solid var(--yellow)", color:"var(--navy)", fontFamily:"var(--font-display,'Luckiest Guy',cursive)", fontSize:"0.9rem", letterSpacing:"0.05em", cursor:"pointer", borderRadius:999, padding:"23px 22px 18px", transformOrigin:"center", animation: jiggle ? `pcJiggle ${dur}s ease-in-out infinite` : undefined };
+                      const koStyle: React.CSSProperties = { background:"var(--ng-lemon, #ffed00)", border:"2px solid var(--ng-lemon, #ffed00)", color:"var(--navy)", fontFamily:"var(--font-display,'Luckiest Guy',cursive)", fontSize:"0.9rem", letterSpacing:"0.05em", cursor:"pointer", borderRadius:999, padding:"23px 22px 18px", transformOrigin:"center", animation: jiggle ? `pcJiggle ${dur}s ease-in-out infinite` : undefined };
                       (koStyle as Record<string, string>)["--jiggle"] = `${angle}deg`;
                       return <button onClick={() => { setShowKnockout(true); try { window.scrollTo(0,0); } catch {} }} style={koStyle}>🏆 Knockout</button>;
                     })()
                   ) : (
                     <button onClick={handleStartOver} style={{ background:"transparent", border:"2px solid var(--navy)", color:"var(--navy)", fontFamily:"var(--font-display,'Luckiest Guy',cursive)", fontSize:"0.85rem", letterSpacing:"0.05em", cursor:"pointer", borderRadius:999, padding:"8px 20px" }}>Start over</button>
                   )}
-                  <button onClick={(e) => handleLike(e)} className="pcm-action" style={{ width:112, height:112, borderRadius:"50%", border:"none", background:"#22c55e", color:"#fff", fontSize:"3rem", fontFamily: showLikeCount ? "var(--font-display,'Luckiest Guy',cursive)" : undefined, cursor:"pointer", boxShadow:"0 4px 12px rgba(0,0,0,0.25)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>{showLikeCount ? shortlist.length : "♥"}</button>
+                  <button onClick={(e) => handleLike(e)} className="pcm-action" style={{ width:112, height:112, borderRadius:"50%", border:"none", background:"#2fd46b", color:"#fff", fontSize:"3rem", fontFamily: showLikeCount ? "var(--font-display,'Luckiest Guy',cursive)" : undefined, cursor:"pointer", boxShadow:"0 4px 12px rgba(0,0,0,0.25)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>{showLikeCount ? shortlist.length : "♥"}</button>
                 </div>
                   {r.nickname ? (
                     <>
@@ -3027,7 +3027,7 @@ export default function NameGeneratorPage() {
               {results[0] && (
                 <div style={{ position:"relative", display:"flex", justifyContent:"center", margin:"12px auto 0" }}>
                   <button onClick={() => setCardShareOpen(o => !o)} disabled={cardSharing}
-                    style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:8, background:"var(--yellow)", color:"var(--navy)", border:"none", borderRadius:999, padding:"11px 26px", fontFamily:"var(--font-display,'Luckiest Guy',cursive)", fontSize:"1rem", letterSpacing:"0.03em", cursor: cardSharing ? "default" : "pointer", opacity: cardSharing ? 0.6 : 1, boxShadow:"0 4px 14px rgba(0,0,0,0.2)" }}>
+                    style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:10, background:"var(--ng-lemon, #ffed00)", color:"var(--navy)", border:"none", borderRadius:999, padding:"18px 44px", fontFamily:"var(--font-display,'Luckiest Guy',cursive)", fontSize:"1.3rem", letterSpacing:"0.03em", cursor: cardSharing ? "default" : "pointer", opacity: cardSharing ? 0.6 : 1, boxShadow:"0 4px 14px rgba(0,0,0,0.2)" }}>
                     {cardSharing ? "Preparing…" : "📣 Share this name"}
                   </button>
                   {cardShareOpen && !cardSharing && (
