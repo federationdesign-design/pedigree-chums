@@ -74,9 +74,9 @@ export default function OfferLauncher() {
         >
           {"\u00D7"}
         </button>
-        <p className={styles.kicker}>Exclusive offer</p>
+        <p className={styles.kicker}>Secure a pack</p>
         <p className={styles.headline}>
-          pre-release <span className={styles.accent}>discount</span>
+          pre-release <span className={styles.accent}>offer</span>
         </p>
         <button
           type="button"

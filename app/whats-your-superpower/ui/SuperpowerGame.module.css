@@ -104,7 +104,7 @@
 }
 
 .titleAccent {
-  color: var(--yellow, #ffd23e);
+  color: #ffed00; /* lemon, matching every other site H1/H2 (not the --yellow token) */
 }
 
 .introText {
@@ -172,9 +172,13 @@
     gap: 20px;
   }
 
-  /* 1, 4. Much bigger, centred title. */
+  /* 1, 4. Much bigger, centred title. margin-top:auto here and margin-top:auto on
+     the time below split the free space equally, so the title/promise/button
+     cluster drops to roughly the middle of the window (it used to sit hard at the
+     top) while the time stays pinned to the foot. */
   .introTitle {
     font-size: clamp(4rem, 8.5vw, 8rem);
+    margin-top: auto;
   }
 
   /* Much bigger, centred promise. */
@@ -186,19 +190,19 @@
 
   /* 5. Twice as big (0.85rem -> 1.7rem) and pinned to the foot. order:1 moves it
      after the Start button in the visual flow (the mobile DOM order is left
-     alone), so the button's margin-bottom:auto below leaves the time sitting at
-     the very bottom. */
+     alone), and margin-top:auto takes the lower half of the free space so it
+     sits at the very bottom. */
   .introTime {
     font-size: 1.7rem;
     order: 1;
+    margin-top: auto;
   }
 
-  /* 2, 3. Start button capped at 300px, centred, and floated to the vertical
-     middle by equal auto margins above and below. */
+  /* 2. Start button capped at 300px and centred; it now sits with the cluster
+     just under the promise rather than floating on its own auto margins. */
   .introBtnRow {
     justify-content: center;
-    margin-top: auto;
-    margin-bottom: auto;
+    margin-top: 0;
   }
   .introBtnRow .introBtn {
     flex: 0 0 auto;
@@ -270,7 +274,7 @@
   left: 24px;
   bottom: 12px;
   z-index: 2;
-  font-family: var(--font-body, "Montserrat", sans-serif);
+  font-family: var(--font-display), system-ui, sans-serif;
   font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -306,14 +310,14 @@
    left aligned and wraps, because answer copy is a sentence not a label. */
 .answerBtn {
   width: 100%;
-  padding: 18px 18px 15px;
+  /* +33% on padding and font vs the previous 18/18/15 and 0.917rem. */
+  padding: 24px 24px 20px;
   border: none;
   border-radius: 14px;
   background: var(--sp-green);
   color: #ffffff;
   font-family: var(--font-body, "Montserrat", sans-serif);
-  /* One point down from 1rem: 16px is 12pt, so 11pt is 14.67px. */
-  font-size: 0.917rem;
+  font-size: 1.22rem;
   font-weight: 700;
   line-height: 1.3;
   text-align: center;
@@ -398,7 +402,7 @@
   .progressOverlay {
     display: block;
     margin: 0;
-    font-family: var(--font-body, "Montserrat", sans-serif);
+    font-family: var(--font-display), system-ui, sans-serif;
     font-size: 1rem;
     font-weight: 700;
     letter-spacing: 0.08em;
@@ -425,13 +429,11 @@
     max-width: 760px;
     margin-top: 0;
   }
-  /* 6. Answer text 3pt bigger (1.05rem = 12.6pt -> ~15.6pt = 1.3rem).
-     7. Buttons roughly twice as big: the inner padding is close to doubled
-        (18/15 -> 36/32 vertical, 18 -> 30 horizontal), which is the reading I
-        took of "more padding within the button" (see the report). */
+  /* Answer buttons a further 33% up on desktop: font 1.3rem -> 1.73rem and
+     padding 36/30/32 -> 48/40/43. */
   .answerBtn {
-    font-size: 1.3rem;
-    padding: 36px 30px 32px;
+    font-size: 1.73rem;
+    padding: 48px 40px 43px;
     box-shadow: 0 6px 0 var(--sp-green-deep), 0 12px 26px rgba(0, 0, 0, 0.4);
   }
 
@@ -439,6 +441,22 @@
   .backButton {
     align-self: center;
     color: #ffffff;
+  }
+
+  /* 1. Result column: cap the blocks (title, description, power name) to the
+     300px Play Again width and centre them, so the whole column is consistent
+     rather than full bleed. Mobile keeps them full width, matching the
+     full-width mobile Play Again button. */
+  .rBody {
+    align-items: center;
+  }
+  .mainBlock,
+  .blockRow,
+  .compactBlock,
+  .reasonList,
+  .restartRow {
+    width: 100%;
+    max-width: 300px;
   }
 }
 
