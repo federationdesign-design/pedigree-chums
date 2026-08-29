@@ -2,7 +2,7 @@
   position: relative;
   z-index: 90;
   background: var(--navy, #0a3a57);
-  border-top: 2px solid var(--yellow, #ffe227);
+  border-top: 2px solid var(--ng-lemon, #ffed00);
   padding: 0;
   box-shadow: 0 -4px 24px rgba(0,0,0,0.35);
 }
@@ -12,7 +12,10 @@
   align-items: flex-start;
   gap: 10px;
   width: 100%;
-  padding: 0;
+  /* 4px of breathing room above and below everything in the bar, so the
+     Knockout button and the trash icon are not flush against the edges.
+     Steve, 29 Aug 2026. */
+  padding: 4px 0;
   flex-wrap: wrap;
 }
 
@@ -22,7 +25,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--yellow, #ffe227);
+  color: var(--ng-lemon, #ffed00);
   white-space: nowrap;
   flex-shrink: 0;
 }
@@ -41,7 +44,7 @@
   align-items: center;
   gap: 6px;
   background: rgba(255,255,255,0.1);
-  border: 1.5px solid var(--yellow, #ffe227);
+  border: 1.5px solid var(--ng-lemon, #ffed00);
   border-radius: 999px;
   padding: 6px 16px;
   white-space: nowrap;
@@ -68,7 +71,7 @@
 .pillNick {
   font-family: var(--font-body), sans-serif;
   font-size: 1.4rem;
-  color: var(--yellow, #ffe227);
+  color: var(--ng-lemon, #ffed00);
 }
 
 .pillRemove {
@@ -79,7 +82,7 @@
   height: 20px;
   border-radius: 50%;
   background: var(--navy, #0a3a57);
-  border: 1.5px solid var(--yellow, #ffe227);
+  border: 1.5px solid var(--ng-lemon, #ffed00);
   color: #fff;
   cursor: pointer;
   font-size: 0.85rem;
@@ -104,7 +107,7 @@
   font-family: var(--font-display, "Luckiest Guy", cursive);
   font-size: 1.6rem;
   letter-spacing: 0.04em;
-  background: var(--yellow, #ffe227);
+  background: var(--ng-lemon, #ffed00);
   color: var(--navy, #0a3a57);
   border: none;
   border-radius: 999px;

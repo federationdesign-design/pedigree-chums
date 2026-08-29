@@ -38,6 +38,12 @@ html {
      the 96-file body/UI yellow) and --emphasis (#ffed60, kept for Dogs at Work
      body emphasis, bullets and card titles). */
   --yellow-header: #ffed00;
+  /* Name generator lemon. The same lemon as --yellow-header, given its own name
+     because it is used for UI here (the shortlist bar, the Knockout Round chrome)
+     rather than for heading text, so a future editorial change to the header
+     yellow cannot silently repaint a button. Scoped like --comp-yellow above so
+     the 96-file --yellow is untouched. Steve, 29 Aug 2026. */
+  --ng-lemon: #ffed00;
   /* Dogs at Work family pill fills (brief section 10). Named by family, not
      colour. Emergency, Rural and Science were adjusted from the originals for
      contrast or distinctness; do not revert. */

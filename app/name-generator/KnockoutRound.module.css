@@ -7,7 +7,14 @@
 }
 
 .title { composes: title from "./knockout-shared.module.css"; }
-.yellow { composes: yellow from "./knockout-shared.module.css"; }
+/* Composes the shared class for structure, then overrides the colour to the
+   name-generator lemon. knockout-shared.module.css is deliberately left alone:
+   its header says ChumKnockout imports it directly, so editing it there would
+   repaint the chum calculator's knockout too. Steve, 29 Aug 2026. */
+.yellow {
+  composes: yellow from "./knockout-shared.module.css";
+  color: var(--ng-lemon, #ffed00);
+}
 .sub { composes: sub from "./knockout-shared.module.css"; }
 
 /* Round pill trail */
@@ -117,8 +124,8 @@
 
 /* Bye card */
 .byeCard {
-  background: rgba(255,226,39,0.1);
-  border: 2px solid var(--yellow, #ffe227);
+  background: rgba(255,237,0,0.1);
+  border: 2px solid var(--ng-lemon, #ffed00);
   border-radius: 20px;
   padding: 28px 32px;
   text-align: center;
@@ -129,12 +136,12 @@
 .byeName {
   font-family: var(--font-display, "Luckiest Guy", cursive);
   font-size: 1.4rem;
-  color: var(--yellow, #ffe227);
+  color: var(--ng-lemon, #ffed00);
   margin: 0 0 16px;
 }
 .byeBtn {
   font-family: var(--font-display, "Luckiest Guy", cursive);
-  background: var(--yellow, #ffe227);
+  background: var(--ng-lemon, #ffed00);
   color: var(--navy, #0a3a57);
   border: none;
   border-radius: 999px;
@@ -166,7 +173,7 @@
   font-family: var(--font-display, "Luckiest Guy", cursive);
   font-size: clamp(0.85rem, 1.8vw, 1.05rem);
   letter-spacing: 0.04em;
-  background: var(--yellow, #ffe227);
+  background: var(--ng-lemon, #ffed00);
   color: var(--navy, #0a3a57);
   border: none;
   border-radius: 999px;
@@ -314,8 +321,8 @@
 }
 
 .bracketSlotActive {
-  border-color: var(--yellow, #ffe227) !important;
-  background: var(--yellow, #ffe227) !important;
+  border-color: var(--ng-lemon, #ffed00) !important;
+  background: var(--ng-lemon, #ffed00) !important;
   color: var(--navy, #0a3a57) !important;
 }
 
@@ -338,9 +345,9 @@
 }
 
 .bracketBye {
-  background: rgba(255,226,39,0.15) !important;
-  border-color: var(--yellow, #ffe227) !important;
-  color: var(--yellow, #ffe227) !important;
+  background: rgba(255,237,0,0.15) !important;
+  border-color: var(--ng-lemon, #ffed00) !important;
+  color: var(--ng-lemon, #ffed00) !important;
 }
 
 .bracketEmpty {
@@ -413,7 +420,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  background: var(--yellow, #ffe227);
+  background: var(--ng-lemon, #ffed00);
   color: var(--navy, #0a3a57);
   border-radius: 999px;
   padding: 1px 6px;
