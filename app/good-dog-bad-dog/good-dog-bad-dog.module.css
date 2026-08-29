@@ -1,3 +1,12 @@
+/* Yellow in this file is the lemon --yellow-header (#ffed00), never the golden
+   --yellow (#ffd23e). Three rules already used it; the other fourteen were
+   converted on 29 Aug 2026 at Steve's request, so the page no longer mixes two
+   yellows. The essay card titles on the index are .cardTitle. If you add a rule
+   here, use --yellow-header.
+
+   Not covered by that pass: the argos, bulls-eye and anubis essay pages still
+   carry 45 inline var(--yellow) styles in their own page.tsx files. */
+
 /* ── Page shell ─────────────────────────────────────────────── */
 .page {
   min-height: 100vh;
@@ -65,7 +74,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  background: var(--yellow, #ffd23e);
+  background: var(--yellow-header, #ffed00);
   color: var(--navy, #0a3a57);
   border-radius: 999px;
   padding: 14px 20px;
@@ -106,7 +115,7 @@
 .essayTitle {
   font-family: var(--font-display, "Luckiest Guy", cursive);
   font-size: clamp(1.8rem, 4vw, 3rem);
-  color: var(--yellow, #ffd23e);
+  color: var(--yellow-header, #ffed00);
   margin: 0 0 40px;
   line-height: 1.1;
   letter-spacing: 0.04em;
@@ -246,7 +255,7 @@
 .essayBullets li + li { margin-top: 14px; }
 
 .essayBullets li::marker {
-  color: var(--yellow, #ffd23e);
+  color: var(--yellow-header, #ffed00);
 }
 
 .essayBody > p:first-child,
@@ -311,7 +320,7 @@
 .subhead {
   font-family: var(--font-display, "Luckiest Guy", cursive);
   font-size: clamp(2rem, 4vw, 4rem);
-  color: var(--yellow, #ffd23e);
+  color: var(--yellow-header, #ffed00);
   letter-spacing: 0.06em;
   text-transform: uppercase;
   margin: 0;
@@ -325,7 +334,7 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  border-left: 3px solid var(--yellow, #ffd23e);
+  border-left: 3px solid var(--yellow-header, #ffed00);
   padding-left: 20px;
   max-width: 520px;
 }
@@ -340,7 +349,7 @@
 
 .breedPanel {
   background: var(--navy, #0a3a57);
-  border-left: 4px solid var(--yellow, #ffd23e);
+  border-left: 4px solid var(--yellow-header, #ffed00);
   border-radius: 0 12px 12px 0;
   padding: 20px 24px;
   margin: 32px 0;
@@ -353,7 +362,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  color: var(--yellow, #ffd23e);
+  color: var(--yellow-header, #ffed00);
   margin: 0 0 10px;
 }
 
@@ -454,7 +463,7 @@
 .comingName {
   font-family: var(--font-display, "Luckiest Guy", cursive);
   font-size: 1.1rem;
-  color: var(--yellow, #ffd23e);
+  color: var(--yellow-header, #ffed00);
   letter-spacing: 0.04em;
   text-transform: uppercase;
   margin: 0;
@@ -515,7 +524,7 @@
 .cardTitle {
   font-family: var(--font-display, "Luckiest Guy", cursive);
   font-size: clamp(1.2rem, 2.2vw, 1.6rem);
-  color: var(--yellow, #ffd23e);
+  color: var(--yellow-header, #ffed00);
   letter-spacing: 0.04em;
   text-transform: uppercase;
   margin: 0;
@@ -535,7 +544,7 @@
   align-self: flex-start;
   margin-top: 8px;
   padding: 10px 22px;
-  background: var(--yellow, #ffd23e);
+  background: var(--yellow-header, #ffed00);
   color: var(--navy, #0a3a57);
   font-family: var(--font-display, "Luckiest Guy", cursive);
   font-size: 0.85rem;
@@ -706,7 +715,7 @@
   margin: 0;
   /* right padding shortens the measure so quotes do not run the full width */
   padding: 24px 12% 24px 20px;
-  border-left: 10px solid var(--yellow, #ffd23e);
+  border-left: 10px solid var(--yellow-header, #ffed00);
   border-radius: 6px;
   max-width: 100%;
   display: block;
@@ -828,7 +837,7 @@
     font-weight: 700;
     letter-spacing: 0.1em;
     text-transform: uppercase;
-    color: var(--yellow, #ffd23e);
+    color: var(--yellow-header, #ffed00);
     margin-top: 8px;
   }
 
@@ -977,7 +986,7 @@
     left: 0;
     height: 4px;
     width: 0%;
-    background: var(--yellow, #ffd23e);
+    background: var(--yellow-header, #ffed00);
     border-radius: 0 3px 3px 0;
     transition: width 0.08s linear;
     pointer-events: none;
@@ -1008,7 +1017,7 @@
 }
 
 .backArrow {
-  color: var(--yellow, #ffd23e);
+  color: var(--yellow-header, #ffed00);
   font-family: var(--font-arrow, "Dela Gothic One"), var(--font-body, "Montserrat", sans-serif);
   font-weight: 400; /* single-weight font; avoids browser faux-bold distortion */
   font-size: 0.95rem;
@@ -1272,7 +1281,7 @@
   .tlFill {
     bottom: auto;
     height: 0%;
-    background: var(--yellow, #ffd23e);
+    background: var(--yellow-header, #ffed00);
     transition: height 0.15s linear;
   }
 
