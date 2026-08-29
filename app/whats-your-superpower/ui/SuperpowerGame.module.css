@@ -104,7 +104,12 @@
 }
 
 .titleAccent {
-  color: #ffed00; /* lemon, matching every other site H1/H2 (not the --yellow token) */
+  /* Lemon, matching every other site H1/H2 (not the --yellow token). As of
+     29 Aug 2026 every yellow in this file is this same lemon, at Steve's request:
+     the six that used var(--yellow, #ffd23e) were the old golden yellow and now
+     match. Written as a literal rather than a token because the site-wide
+     --yellow is a different colour and must not be repointed. */
+  color: #ffed00;
 }
 
 .introText {
@@ -332,7 +337,7 @@
 /* Chosen: a ring rather than a colour change, so the state survives a
    colour-blind reading and neither option ever looks like the right one. */
 .answerChosen {
-  outline: 3px solid var(--yellow, #ffd23e);
+  outline: 3px solid #ffed00;
   outline-offset: 2px;
 }
 
@@ -509,7 +514,9 @@
   border: 1px solid var(--sp-line);
   border-radius: 14px;
   background: var(--sp-panel);
-  padding: 14px 16px;
+  /* Padding opened up 14/16 -> 22/26 so the result copy is not tight against the
+     border now that it is larger. Steve, 29 Aug 2026. */
+  padding: 22px 26px;
   margin-top: 4px;
 }
 
@@ -534,7 +541,9 @@
   border: 1px solid var(--sp-line);
   border-radius: 14px;
   background: var(--sp-panel);
-  padding: 12px 14px;
+  /* Padding opened up 12/14 -> 20px 24px, to match .mainBlock above.
+     Steve, 29 Aug 2026. */
+  padding: 20px 24px;
 }
 
 .compactPower {
@@ -543,16 +552,19 @@
   line-height: 1.05;
   letter-spacing: 0.03em;
   text-align: center;
-  color: var(--yellow, #ffd23e);
+  color: #ffed00;
   margin: 0 0 6px;
 }
 
 
 .blockBody {
   font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: 0.88rem;
+  /* Raised 0.88rem -> 1rem, about 2pt, at Steve's request 29 Aug 2026. Montserrat
+     is kept. Line height lifted 1.1 -> 1.35 with it: 1.1 was already tight and
+     reads cramped once the type is larger. */
+  font-size: 1rem;
   font-weight: 500;
-  line-height: 1.1em;
+  line-height: 1.35;
   text-align: center;
   color: var(--sp-ink);
   margin: 0 0 8px;
@@ -587,7 +599,7 @@
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: var(--yellow, #ffd23e);
+  background: #ffed00;
 }
 
 
@@ -613,7 +625,7 @@
 
 .progressFill {
   height: 100%;
-  background: var(--yellow, #ffd23e);
+  background: #ffed00;
   transition: width 260ms ease;
 }
 @media (prefers-reduced-motion: reduce) {
@@ -672,14 +684,14 @@
 /* Emphasis never rests on colour alone: the leading marker is larger and
    ringed, and its label is heavier (spec section 9). */
 .chartMarkerPrimary {
-  fill: var(--yellow, #ffd23e);
+  fill: #ffed00;
   stroke: var(--sp-ground);
   stroke-width: 3;
 }
 
 .chartMarkerSecondary {
   fill: var(--sp-ground);
-  stroke: var(--yellow, #ffd23e);
+  stroke: #ffed00;
   stroke-width: 2.5;
 }
 
