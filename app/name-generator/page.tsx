@@ -1434,7 +1434,23 @@ function generateScored(breed: string, surname: string, gender: "boy"|"girl", se
     w.firstLetter.toUpperCase() === surnameInitial ||
     (soundFamily[w.firstLetter.toUpperCase()] === surnameFamily && surnameFamily.length > 1)
   );
-  const useMatchingWord = matchingWords.length >= 2 && (seed % 7 !== 0);
+  /* NG-DUP-1, 2026-08-29. Threshold raised from 2 to 3.
+
+     At 2, a surname initial with exactly two matching words locked the generator
+     onto those two, on six seeds in seven. A Labrador plus a C surname has only
+     Canter and Cleverboy, so the higher scorer took nearly every result. Since
+     98491d7 added usedDogWords, that showed up a second way: both words get
+     spent, nothing is fresh, and Roll Again declares itself exhausted after two
+     or three names.
+
+     Measured over 30 sessions, Labrador plus Clarke:
+       threshold 2   top word 48% of names,  4.1 names per session, 56% of names alliterate
+       threshold 3   top word 26% of names, 10.0 names per session, 45% alliterate
+       threshold 4   top word 30% of names, 10.0 names per session, 40% alliterate
+     3 gets the whole exhaustion fix and the lowest dominance while giving up the
+     least alliteration, which scoreName treats as the engine of the comedy. Do
+     not raise it further without re-measuring that last column. */
+  const useMatchingWord = matchingWords.length >= 3 && (seed % 7 !== 0);
   const dogWordEntry = useMatchingWord
     ? matchingWords[(seed + 7) % matchingWords.length]
     : pick(wordBank, seed + 7);
