@@ -804,11 +804,57 @@ export default function PackPit() {
         // Pick one name randomly from a pair (alternates each load)
         const pickName = (a: string, b: string) => Math.random() < 0.5 ? a : b;
         // Drop a specific named breed card, mark it as dropped
+        /* PIT-LOAD-4, 2026-08-29. THE READINESS GATE.
+
+           A card used to be added to the world the instant its wave timer fired,
+           with no reference to whether its picture had arrived. Every draw path
+           guards on img.complete and silently skips the artwork when it has not,
+           so the card still appeared, as an empty rounded box. That is what a
+           slow phone was showing.
+
+           Card drops now go through one queue. If the card at the front is not
+           ready it waits, and the cards behind it wait with it, so the scripted
+           easy-to-hard order is preserved rather than being reshuffled by
+           whichever picture happens to land first. CARD_GATE_MS caps the wait, so
+           a missing or broken file costs a few seconds rather than the game: the
+           card drops anyway and, worst case, draws the way it always used to.
+
+           Cards only. Props, panels, buttons and the menu keep their own beats,
+           and their art is either in the mount-time priority list or arrives long
+           before it is due. The late refill path further down is deliberately
+           untouched: by the time it runs the pit has been playing for minutes. */
+        const CARD_GATE_MS = 3000;
+        const cardQueue: number[] = [];
+        let pumping = false;
+        const pumpCards = () => {
+          if (pumping) return;
+          pumping = true;
+          const step = () => {
+            if (disposed) { pumping = false; return; }
+            const idx = cardQueue.shift();
+            if (idx === undefined) { pumping = false; return; }
+            const br: any = BREEDS[idx];
+            const img = br.img ? getImg(br.name, br.img) : null;
+            const add = () => {
+              if (!disposed) Composite.add(engine.world, makeBall(br, idx, w));
+              step();
+            };
+            if (!img || (img.complete && img.naturalWidth)) { add(); return; }
+            let fired = false;
+            const go = () => { if (fired) return; fired = true; window.clearTimeout(cap); add(); };
+            const cap = window.setTimeout(go, CARD_GATE_MS);
+            waveTimers.push(cap); // so unmount clears it with the rest
+            img.addEventListener("load", go, { once: true });
+            img.addEventListener("error", go, { once: true });
+          };
+          step();
+        };
         const dropCardNamed = (name: string, droppedSet: Set<number>) => {
           const idx = BREEDS.findIndex((br: any) => br.name === name);
           if (idx === -1 || droppedSet.has(idx)) return;
           droppedSet.add(idx);
-          Composite.add(engine.world, makeBall(BREEDS[idx], idx, w));
+          cardQueue.push(idx);
+          pumpCards();
         };
         const addProps = (list: any[]) => list.forEach((p) => Composite.add(engine.world, makeProp(p, w)));
         // tennis balls only; the pre-order button now drops on its own beat (desktop)
