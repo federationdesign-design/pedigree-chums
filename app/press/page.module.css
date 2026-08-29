@@ -1,0 +1,216 @@
+/* Press pack shell. Light: no dark ground, the global blue gradient and paw
+   pattern show through. Portrait first (phone is the primary case), widened for
+   desktop at the foot. Full viewport, no page scroll, nothing scrolls within a
+   slide. */
+
+.page {
+  padding: 0;
+  min-height: 100dvh;
+  /* No background: the fixed body gradient is the ground, like every other
+     light page. */
+}
+
+.footerOff {
+  display: none;
+}
+
+/* ---- carousel ------------------------------------------------------------ */
+
+.pack {
+  position: relative;
+  height: 100dvh;
+  max-height: 100dvh;
+  overflow: hidden;
+}
+
+/* Horizontal scroll-snap rail. Native snapping gives the swipe for free; the
+   buttons and keys drive the same scroll. */
+.rail {
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  touch-action: pan-x;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.rail::-webkit-scrollbar {
+  display: none;
+}
+
+.slide {
+  flex: 0 0 100%;
+  width: 100%;
+  height: 100%;
+  scroll-snap-align: start;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  /* Top clears the fixed Nav; bottom clears the position indicator. */
+  padding: clamp(88px, 13vh, 120px) 16px clamp(96px, 15vh, 128px);
+}
+
+/* Placeholder frame: a light card that fills the slide so the pacing reads like
+   a real slide. Dashed edge marks it as a placeholder, never a finished design. */
+.placeholder {
+  flex: 1 1 auto;
+  width: 100%;
+  max-width: min(92vw, 480px);
+  margin: 0 auto;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 24px;
+  background: var(--cream, #ffffff);
+  border: 2px dashed var(--navy, #0a3a57);
+  border-radius: var(--radius-card, 22px);
+  box-shadow: 0 18px 44px rgba(10, 58, 87, 0.18);
+  text-align: center;
+}
+
+.kicker {
+  margin: 0;
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--blue-deep, #0b78bd);
+}
+
+.slideNum {
+  margin: 0;
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: clamp(3.4rem, 16vw, 5.2rem);
+  line-height: 1;
+  color: var(--navy, #0a3a57);
+}
+
+.slideRole {
+  margin: 0;
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: 1.02rem;
+  font-weight: 600;
+  color: var(--navy, #0a3a57);
+}
+
+/* ---- controls ------------------------------------------------------------ */
+
+/* Previous/next: circular, cream face, navy edge and chevron, thumb-sized for a
+   phone. Below the Nav (z 300) but above the slides. */
+.arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 6;
+  width: 54px;
+  height: 54px;
+  border-radius: var(--radius-pill, 999px);
+  border: 2px solid var(--navy, #0a3a57);
+  background: var(--cream, #ffffff);
+  color: var(--navy, #0a3a57);
+  font-size: 2rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(10, 58, 87, 0.22);
+}
+.arrow span {
+  /* Optical centring for the chevron glyph, which sits low in its box. */
+  margin-top: -4px;
+}
+.prev {
+  left: 12px;
+}
+.next {
+  right: 12px;
+}
+.arrow:active {
+  transform: translateY(-50%) scale(0.94);
+}
+.arrow:disabled {
+  opacity: 0.35;
+  cursor: default;
+  box-shadow: none;
+}
+
+/* Position indicator: a counter and a progress bar, both scale to any slide
+   count (the pack will run to roughly two dozen). */
+.indicator {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: clamp(20px, 4vh, 34px);
+  z-index: 6;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.counter {
+  margin: 0;
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--navy, #0a3a57);
+}
+
+.progressTrack {
+  width: min(72vw, 320px);
+  height: 6px;
+  border-radius: var(--radius-pill, 999px);
+  background: rgba(10, 58, 87, 0.16);
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  border-radius: var(--radius-pill, 999px);
+  background: var(--navy, #0a3a57);
+  transition: width 260ms ease;
+}
+
+/* ---- desktop adapt (portrait grows into a wider slide) ------------------- */
+
+@media (min-width: 769px) {
+  .slide {
+    padding: clamp(96px, 14vh, 132px) 24px clamp(104px, 15vh, 140px);
+  }
+  .placeholder {
+    max-width: min(72vw, 760px);
+    gap: 14px;
+  }
+  .slideNum {
+    font-size: clamp(4.6rem, 8vw, 7rem);
+  }
+  .slideRole {
+    font-size: 1.25rem;
+  }
+  .arrow {
+    width: 60px;
+    height: 60px;
+    font-size: 2.3rem;
+  }
+  .prev {
+    left: clamp(16px, 4vw, 48px);
+  }
+  .next {
+    right: clamp(16px, 4vw, 48px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .progressFill {
+    transition: none;
+  }
+}
