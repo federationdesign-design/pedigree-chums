@@ -139,15 +139,18 @@ export default function PackPit() {
     return () => document.body.removeAttribute("data-pc-pit-playing");
   }, []);
   useEffect(() => {
-    // Preload HowToPlay videos immediately on pit mount
-    [1,2,3,6].forEach((n) => {
-      const vsrc = n === 3 ? "/step3-video-animationv3.mp4" : n === 6 ? "/step6-video-animation.mp4" : `/step${n}-video-animation.mp4`;
-      const v = document.createElement("video");
-      v.src = vsrc; v.preload = "auto"; v.muted = true;
-    });
-    // Preload pit square images AND card artwork so game over screen shows them instantly
-    breeds.forEach((b) => { if (b.image) { const img = new Image(); img.src = b.image; } });
-    Object.values(breedCard).forEach((src) => { const img = new Image(); img.src = src; });
+    // PIT-LOAD-1, 2026-08-29. The three mount-time preloads that used to sit here
+    // have been removed deliberately. Do not restore them.
+    //   1. Four HowToPlay mp4s at preload="auto", 16.4MB. They only ever play inside
+    //      HowToPlay, which returns null until opened and carries its own
+    //      preload="auto", so they now load when the panel opens.
+    //   2. All 54 pit square jpgs, 3.6MB.
+    //   3. All 54 card jpgs, 7.6MB, needed only by the game over screen.
+    // Loops 2 and 3 requested the bare path while getImg() and the game over screen
+    // request bust(path), i.e. "?v=N". Different URL, different cache entry, so all
+    // 11.2MB was downloaded, never used, then downloaded again on first real use.
+    // Together that is roughly 28MB competing for a phone's downlink against the
+    // assets the first objects to drop actually need.
     const open = () => { setHowToPlay(true); };
     window.addEventListener("pc:open-howtoplay", open);
     return () => window.removeEventListener("pc:open-howtoplay", open);
