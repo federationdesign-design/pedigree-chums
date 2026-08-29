@@ -24,6 +24,22 @@ const PRELOAD_IMAGES = [
   "/know-your-chums.jpg", "/hot-dog-hearo-img.jpg", "/inteligent-dogs.jpg",
 ];
 
+/* PIT-LOAD-2, 2026-08-29. These nine images used to be requested from a mount
+   effect, so 9.5MB went on the wire on page load, on every page of the site,
+   competing with whatever that page actually needed to paint. On the home page
+   that meant the pit's own art queued behind them. Two of the nine are over
+   2MB on their own.
+
+   They now load on intent, exactly as the route prefetch below already does:
+   a pointer over the hamburger, or the menu opening. Do not move this back to
+   mount. Fired once per page load; the browser cache covers the rest. */
+let menuImagesRequested = false;
+function preloadMenuImages() {
+  if (menuImagesRequested || typeof window === "undefined") return;
+  menuImagesRequested = true;
+  PRELOAD_IMAGES.forEach((s) => { const im = new window.Image(); im.src = s; });
+}
+
 const tradeNavLinks = [
   { label: "Trade Enquiry", href: "/trade#enquire" },
   { label: "Independent Stockists", href: "/independents#enquire" },
@@ -104,10 +120,13 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
     window.dispatchEvent(new CustomEvent("pc:logo", { detail: logoShowing }));
   }, [logoShowing]);
 
-  // Preload the menu images on page load so the launcher opens without pop-in.
+  // Menu images load on intent now, not on mount. See PIT-LOAD-2 above. This
+  // covers the menu being opened from anywhere, including the pc:open-menu
+  // event the pit's hamburger object dispatches, where there is no hover to
+  // read. The hamburger button itself preloads earlier, on pointer intent.
   useEffect(() => {
-    PRELOAD_IMAGES.forEach((s) => { const im = new window.Image(); im.src = s; });
-  }, []);
+    if (open) preloadMenuImages();
+  }, [open]);
 
   // Lock the page body while the menu is open. On iOS a touch drag on a fixed
   // overlay otherwise scrolls the body behind it instead of the overlay, so the
@@ -225,7 +244,7 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
       {!open && !dockBottomLeft && (
         <div className={styles.headerRight}>
           <PcContrastToolbar />
-          <button type="button" className={styles.burger} onClick={() => setOpen(true)} aria-label="Open menu">
+          <button type="button" className={styles.burger} onClick={() => setOpen(true)} onPointerEnter={preloadMenuImages} onPointerDown={preloadMenuImages} aria-label="Open menu">
             <span />
             <span />
             <span />
