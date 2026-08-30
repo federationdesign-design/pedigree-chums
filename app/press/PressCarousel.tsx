@@ -40,7 +40,16 @@ type Media =
   | VideoMedia;
 
 type Block = { kind: "standfirst" | "body" | "display"; text: string };
-type Screen = { title?: string; media?: Media; blocks: Block[]; layout?: "overlay" };
+type Screen = {
+  title?: string;
+  media?: Media;
+  blocks: Block[];
+  layout?: "overlay";
+  /* px offset of the overlaid copy from the media bottom (default 15). */
+  overlayBottom?: number;
+  /* screen 2: images 30% wider, pushed to the top. */
+  mediaVariant?: "wideTop";
+};
 
 const SCREENS: Screen[] = [
   // 1 Cover. Now a Vimeo film (ad1d), image filling the slide with the copy
@@ -66,8 +75,10 @@ const SCREENS: Screen[] = [
     ],
   },
   // 2 The Card Is the Lens. Two images side by side, copy overlaid at the bottom.
+  // Images 30% wider and pushed up (owner round 2).
   {
     layout: "overlay",
+    mediaVariant: "wideTop",
     title: "The Card Is the Lens",
     media: {
       type: "diptych",
@@ -101,24 +112,32 @@ const SCREENS: Screen[] = [
       },
     ],
   },
-  // 3 Meet Pug. HELD unchanged pending the two-image list (revision gave
-  // card-on-real twice). Confirmed replacement copy is captured in PLACEHOLDERS.md.
+  // 3 Meet Pug. Two images, card-on-real twice (owner: same file twice, judge live),
+  // with the owner's confirmed copy.
   {
     title: "Meet Pug",
     media: {
-      type: "image",
-      pic: {
-        src: "/press/card-on-colour.jpg",
-        alt: "The Pug character card on a blue and yellow studio set.",
-        w: 1798,
-        h: 2500,
-      },
+      type: "diptych",
+      items: [
+        {
+          src: "/press/card-on-real.jpg",
+          alt: "The Pug card shown against a real grassy field.",
+          w: 4930,
+          h: 6855,
+        },
+        {
+          src: "/press/card-on-real.jpg",
+          alt: "The Pug card shown against a real grassy field.",
+          w: 4930,
+          h: 6855,
+        },
+      ],
     },
     blocks: [
       { kind: "standfirst", text: "One of 54 Chums." },
       {
         kind: "body",
-        text: "There may be millions of dogs outside the cards. In our world, there is only one Pug.",
+        text: "There may be millions of dogs outside the cards. In our world, there is only one Pug. Every real Pug you see is the same Pug.",
       },
     ],
   },
@@ -192,8 +211,11 @@ const SCREENS: Screen[] = [
       { kind: "standfirst", text: "[ Placeholder — copy for this screen to follow ]" },
     ],
   },
-  // 6 Why Pug? (was 5). Vimeo advertB with a custom frame-1 poster.
+  // 6 Why Pug? (was 5). Vimeo advertB with a custom frame-1 poster. Copy overlaid
+  // 5px on the video bottom (owner round 2).
   {
+    layout: "overlay",
+    overlayBottom: 5,
     title: "Why Pug?",
     media: {
       type: "vimeo",
@@ -213,8 +235,10 @@ const SCREENS: Screen[] = [
       },
     ],
   },
-  // 7 One Pug. One Prize. (was 6). No change.
+  // 7 One Pug. One Prize. (was 6). Copy overlaid 5px on the bottom (owner round 2).
   {
+    layout: "overlay",
+    overlayBottom: 5,
     title: "One Pug. One Prize.",
     media: {
       type: "image",
@@ -235,8 +259,10 @@ const SCREENS: Screen[] = [
     ],
   },
   // 8 Making Pug Tangible. Two columns: A = the hand-drawn then artworked Pug
-  // (stacked squares), B = the make-ad 3D video as before.
+  // (stacked squares), B = the make-ad 3D video. Copy overlaid 5px on the bottom.
   {
+    layout: "overlay",
+    overlayBottom: 5,
     title: "Making Pug Tangible",
     media: {
       type: "twoCol",
@@ -559,10 +585,11 @@ function MediaView({ media, active }: { media: Media; active: boolean }) {
     );
   }
   if (media.type === "diptych") {
+    // index in the key: screen 3 uses the same file twice.
     return (
       <div className={styles.diptych}>
-        {media.items.map((pic) => (
-          <Thumb key={pic.src} pic={pic} />
+        {media.items.map((pic, i) => (
+          <Thumb key={`${pic.src}-${i}`} pic={pic} />
         ))}
       </div>
     );
@@ -619,12 +646,23 @@ function ScreenView({ screen, active }: { screen: Screen; active: boolean }): Re
     return <div className={styles.copyOnly}>{copy}</div>;
   }
   if (screen.layout === "overlay") {
+    const mediaCls =
+      screen.media.type === "twoCol"
+        ? `${styles.overlayMedia} ${styles.overlayMediaTwoCol}`
+        : screen.mediaVariant === "wideTop"
+          ? `${styles.overlayMedia} ${styles.overlayMediaWideTop}`
+          : styles.overlayMedia;
     return (
       <div className={styles.overlayScreen}>
-        <div className={styles.overlayMedia}>
+        <div className={mediaCls}>
           <MediaView media={screen.media} active={active} />
         </div>
-        <div className={styles.overlayCopy}>{copy}</div>
+        <div
+          className={styles.overlayCopy}
+          style={{ bottom: screen.overlayBottom ?? 15 }}
+        >
+          {copy}
+        </div>
       </div>
     );
   }
@@ -641,6 +679,8 @@ function ScreenView({ screen, active }: { screen: Screen; active: boolean }): Re
 export default function PressCarousel() {
   const railRef = useRef<HTMLDivElement>(null);
   const [index, setIndex] = useState(0);
+  // Whole-pack text-colour toggle: white (default) or navy (owner round 2).
+  const [navyText, setNavyText] = useState(false);
   const count = SCREENS.length;
 
   const goTo = useCallback(
@@ -711,6 +751,7 @@ export default function PressCarousel() {
   return (
     <section
       className={styles.pack}
+      style={{ "--press-copy": navyText ? "#0a3a57" : "#ffffff" } as CSSProperties}
       aria-roledescription="carousel"
       aria-label="Pedigree Chums press pack"
     >
@@ -727,6 +768,17 @@ export default function PressCarousel() {
           </article>
         ))}
       </div>
+
+      {/* Whole-pack text-colour toggle, above the media area (owner round 2). */}
+      <button
+        type="button"
+        className={styles.colorToggle}
+        onClick={() => setNavyText((v) => !v)}
+        aria-pressed={navyText}
+        aria-label="Toggle text colour between white and navy"
+      >
+        {navyText ? "Text: Navy" : "Text: White"}
+      </button>
 
       <button
         type="button"

@@ -24,7 +24,8 @@ export const metadata: Metadata = {
 export default function PressPage() {
   return (
     <>
-      <Nav />
+      {/* showLogo: the logo shows on every screen, not only on scroll (owner round 2). */}
+      <Nav showLogo />
       <main className={styles.page}>
         <PressCarousel />
       </main>

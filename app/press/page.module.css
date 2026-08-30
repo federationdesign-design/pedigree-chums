@@ -21,6 +21,13 @@
   height: 100dvh;
   max-height: 100dvh;
   overflow: hidden;
+  /* Media keeps the old envelope; the text container is 40% wider (owner, round 2).
+     --media-wide is screen 2's 30%-wider images. --press-copy is the white/navy
+     text-colour toggle, default white. */
+  --media-max: min(92vw, 480px);
+  --media-wide: min(96vw, 624px);
+  --copy-max: min(96vw, 672px);
+  --press-copy: #ffffff;
 }
 
 /* Horizontal scroll-snap rail. Native snapping gives the swipe for free; the
@@ -48,8 +55,9 @@
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  /* Top clears the fixed Nav; bottom clears the position indicator. */
-  padding: clamp(88px, 13vh, 120px) 16px clamp(96px, 15vh, 128px);
+  /* Top clears the fixed Nav plus the top-of-page progress bar and colour toggle;
+     the bottom is small now the indicator has moved up, so the copy biases low. */
+  padding: clamp(104px, 16vh, 144px) 16px clamp(24px, 5vh, 44px);
 }
 
 /* Media slide: a single image or the video facade, centred and contained so
@@ -151,7 +159,6 @@
   flex: 1 1 auto;
   min-height: 0;
   width: 100%;
-  max-width: min(92vw, 480px);
   margin: 0 auto;
   /* Grid, not flex: the media row is minmax(0,1fr) so it always yields to the
      copy row's natural height, and its definite size lets the picture inside cap
@@ -163,20 +170,25 @@
 .screenMedia {
   min-height: 0;
   width: 100%;
+  max-width: var(--media-max);
+  margin: 0 auto;
   display: flex;
   align-items: center;
   justify-content: center;
 }
+/* The text container is wider than the media (40%, owner round 2). */
 .copyWrap {
   flex: 0 0 auto;
   width: 100%;
+  max-width: var(--copy-max);
+  margin: 0 auto;
 }
 /* Copy-only screen (no picture): the panel centres in the slide on its own. */
 .copyOnly {
   flex: 1 1 auto;
   min-height: 0;
   width: 100%;
-  max-width: min(92vw, 480px);
+  max-width: var(--copy-max);
   margin: 0 auto;
   display: flex;
   align-items: center;
@@ -226,7 +238,8 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-template-rows: 1fr 1fr;
-  gap: clamp(8px, 2vw, 14px);
+  /* row-gap / central column gutter. Owner round 2: column gutter to 10px. */
+  gap: clamp(8px, 2vw, 14px) 10px;
   width: 100%;
   height: 100%;
   place-items: center;
@@ -266,6 +279,15 @@
   align-items: center;
   justify-content: center;
 }
+/* Letterbox fix (owner round 2): the shared .videoBox is forced to height:100%,
+   which in this narrow column made a portrait clip taller than its 3:4 aspect, so
+   the player letterboxed. Size it by the column width here, so the box is exactly
+   the clip aspect and neither poster nor player gets black bars. */
+.twoColB .videoBox {
+  height: auto;
+  width: 100%;
+  max-height: 100%;
+}
 
 /* Overlay layout (screens 1-2): the picture fills the slide and the copy panel
    sits over its lower edge, inset 15px. New to this pack, which otherwise keeps
@@ -274,7 +296,6 @@
   flex: 1 1 auto;
   min-height: 0;
   width: 100%;
-  max-width: min(92vw, 480px);
   margin: 0 auto;
   position: relative;
   display: flex;
@@ -284,9 +305,21 @@
 .overlayMedia {
   width: 100%;
   height: 100%;
+  max-width: var(--media-max);
+  margin: 0 auto;
   display: flex;
   align-items: center;
   justify-content: center;
+}
+/* Screen 2: images 30% wider and pushed up to the top of the slide. */
+.overlayMediaWideTop {
+  max-width: var(--media-wide);
+  align-items: flex-start;
+}
+/* Screen 8 two-column: a wider envelope so the columns are roomier and the video
+   fills its column (owner round 2 letterbox note). */
+.overlayMediaTwoCol {
+  max-width: var(--media-wide);
 }
 .overlayCopy {
   position: absolute;
@@ -294,6 +327,9 @@
   right: 0;
   bottom: 15px;
   z-index: 2;
+  width: 100%;
+  max-width: var(--copy-max);
+  margin: 0 auto;
 }
 
 /* Panel helpers (kept): let the imported blue-fade panel fill the copy block and
@@ -325,7 +361,7 @@
   font-weight: 700;
   font-size: clamp(1.18rem, 4vw, 1.55rem);
   line-height: 1.16;
-  color: var(--white, #ffffff);
+  color: var(--press-copy, #ffffff);
 }
 .copyBody {
   margin: 0 0 clamp(7px, 1.4vh, 12px);
@@ -333,7 +369,7 @@
   font-weight: 500;
   font-size: clamp(1.02rem, 3.2vw, 1.24rem);
   line-height: 1.26;
-  color: var(--white, #ffffff);
+  color: var(--press-copy, #ffffff);
   white-space: pre-line;
 }
 .copyBody:last-child {
@@ -344,7 +380,7 @@
   font-family: var(--font-display), system-ui, sans-serif;
   font-size: clamp(1.32rem, 4.4vw, 1.85rem);
   line-height: 1.1;
-  color: var(--white, #ffffff);
+  color: var(--press-copy, #ffffff);
   white-space: pre-line;
 }
 
@@ -437,19 +473,44 @@
   box-shadow: none;
 }
 
-/* Position indicator: a counter and a progress bar, both scale to any slide
-   count (the pack will run to roughly two dozen). */
+/* Position indicator: a counter and a progress bar. Moved to the top of the page
+   (owner round 2), below the Nav. */
 .indicator {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: clamp(20px, 4vh, 34px);
+  top: clamp(58px, 9vh, 82px);
   z-index: 6;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 8px;
   pointer-events: none;
+}
+
+/* Text-colour toggle (owner round 2): flips the whole pack's copy between white
+   and navy. Sits above the media area, below the indicator. */
+.colorToggle {
+  position: absolute;
+  top: clamp(92px, 13.5vh, 122px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 6;
+  height: 34px;
+  padding: 0 16px;
+  border-radius: var(--radius-pill, 999px);
+  border: 2px solid var(--navy, #0a3a57);
+  background: var(--cream, #ffffff);
+  color: var(--navy, #0a3a57);
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(10, 58, 87, 0.22);
+}
+.colorToggle:active {
+  transform: translateX(-50%) scale(0.96);
 }
 
 .counter {
@@ -479,13 +540,15 @@
 /* ---- desktop adapt (portrait grows into a wider slide) ------------------- */
 
 @media (min-width: 769px) {
+  .pack {
+    --media-max: min(72vw, 760px);
+    --media-wide: min(84vw, 988px);
+    --copy-max: min(96vw, 1064px);
+  }
   .slide {
-    padding: clamp(96px, 14vh, 132px) 24px clamp(104px, 15vh, 140px);
+    padding: clamp(112px, 16vh, 152px) 24px clamp(28px, 5vh, 48px);
   }
   .media,
-  .screen,
-  .copyOnly,
-  .overlayScreen,
   .placeholder {
     max-width: min(72vw, 760px);
   }
