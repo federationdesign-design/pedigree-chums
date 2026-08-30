@@ -15,7 +15,20 @@ import { DOG_WALK_PATHS, DOG_WALK_VIEWBOX } from "./dogWalkPaths";
   reader is actively scrolling; frame 1 (standing) shows at rest.
   Pointer-events are disabled throughout -- purely decorative chrome.
 */
-export default function ReadingProgress({ articleSelector = "article" }: { articleSelector?: string }) {
+export default function ReadingProgress({
+  articleSelector = "article",
+  progress,
+  active,
+}: {
+  articleSelector?: string;
+  /* Controlled mode: when a number is given, the bar is driven by this
+     percentage (e.g. a carousel position) instead of window scroll, and the
+     scroll listener, h2 notches and footer dock are all skipped. `active` drives
+     the walk cycle in that mode. Omit both for the default scroll behaviour. */
+  progress?: number;
+  active?: boolean;
+}) {
+  const controlled = typeof progress === "number";
   const [pct, setPct] = useState(0);
   const [notches, setNotches] = useState<number[]>([]);
   const [walking, setWalking] = useState(false);
@@ -24,6 +37,7 @@ export default function ReadingProgress({ articleSelector = "article" }: { artic
   const raf = useRef(false);
 
   useEffect(() => {
+    if (controlled) return; // driven by the `progress` prop, not scroll
     const measureNotches = () => {
       const article = document.querySelector(articleSelector);
       if (!article) return;
@@ -79,9 +93,11 @@ export default function ReadingProgress({ articleSelector = "article" }: { artic
       clearTimeout(settle);
       if (walkTimer.current) clearTimeout(walkTimer.current);
     };
-  }, [articleSelector]);
+  }, [articleSelector, controlled]);
 
-  const done = pct >= 99.5;
+  const displayPct = controlled ? Math.min(100, Math.max(0, progress as number)) : pct;
+  const walkingState = controlled ? !!active : walking;
+  const done = displayPct >= 99.5;
 
   // Walk-cycle: frame 1 (standing) at rest; 2 -> 3 -> 4 -> 2... while
   // actively scrolling. A fixed-interval timer drives the cycle so its
@@ -89,7 +105,7 @@ export default function ReadingProgress({ articleSelector = "article" }: { artic
   // `walking` is true.
   const [frame, setFrame] = useState(1);
   useEffect(() => {
-    if (!walking) {
+    if (!walkingState) {
       setFrame(1);
       return;
     }
@@ -98,7 +114,7 @@ export default function ReadingProgress({ articleSelector = "article" }: { artic
       setFrame((f) => (f >= 4 ? 2 : f + 1));
     }, 140);
     return () => clearInterval(id);
-  }, [walking]);
+  }, [walkingState]);
 
   return (
     <div ref={wrapRef} className={styles.wrap} id="rp-wrap" aria-hidden="true">
@@ -106,7 +122,7 @@ export default function ReadingProgress({ articleSelector = "article" }: { artic
         {notches.map((n) => (
           <span key={n} className={styles.notch} style={{ left: `${n}%` }} />
         ))}
-        <div className={styles.fill} id="rp-fill" style={{ width: `${pct}%` }} />
+        <div className={styles.fill} id="rp-fill" style={{ width: `${displayPct}%` }} />
       </div>
 
       {/* The dog. Source SVGs face left -- flipped via CSS (scaleX(-1) in
@@ -115,10 +131,10 @@ export default function ReadingProgress({ articleSelector = "article" }: { artic
           exact -- swap it there to try white vs yellow vs anything else. */}
       <div
         id="rp-dog"
-        data-walking={walking ? "1" : "0"}
+        data-walking={walkingState ? "1" : "0"}
         data-done={done ? "1" : "0"}
         className={`${styles.dog} ${done ? styles.dogDone : ""}`}
-        style={{ left: `${pct}%` }}
+        style={{ left: `${displayPct}%` }}
       >
         <svg viewBox={DOG_WALK_VIEWBOX} className={styles.dogImg}>
           <path d={DOG_WALK_PATHS[frame]} className={styles.dogFill} />

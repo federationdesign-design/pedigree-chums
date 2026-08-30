@@ -3,6 +3,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import ReadingProgress from "../../components/ReadingProgress/ReadingProgress";
 import styles from "./page.module.css";
 /* The one approved container for text on a darker ground (brief section 1): the
    britains-dog-history blue-fade panel. Imported and reused as-is; the press page
@@ -35,12 +36,14 @@ type Media =
   | { type: "image"; pic: Pic; priority?: boolean }
   | { type: "thumbs"; items: Pic[] }
   | { type: "grid"; items: Pic[] }
-  | { type: "diptych"; items: [Pic, Pic] }
-  | { type: "twoCol"; images: [Pic, Pic]; video: VideoMedia }
+  | { type: "diptych"; items: [Pic, Pic]; captions?: [string, string] }
+  | { type: "twoCol"; images: Pic[]; video: VideoMedia; neat?: boolean }
   | VideoMedia;
 
-type Block = { kind: "standfirst" | "body" | "display"; text: string };
+type Block = { kind: "standfirst" | "body" | "display"; text: string; mont?: boolean };
 type Screen = {
+  /* Round 3: a Luckiest Guy yellow title above the media, one class for all six. */
+  topTitle?: string;
   title?: string;
   media?: Media;
   blocks: Block[];
@@ -49,13 +52,15 @@ type Screen = {
   overlayBottom?: number;
   /* screen 2: images 30% wider, pushed to the top. */
   mediaVariant?: "wideTop";
+  /* screens 1, 6: video 20% smaller. */
+  mediaShrink?: boolean;
 };
 
 const SCREENS: Screen[] = [
-  // 1 Cover. Now a Vimeo film (ad1d), image filling the slide with the copy
-  // overlaid at the bottom. "Cover" is a label, so no title is printed.
+  // 1 Cover. Vimeo film (ad1d), copy overlaid; video 20% smaller (round 3).
   {
     layout: "overlay",
+    mediaShrink: true,
     media: {
       type: "vimeo",
       videoId: "1222451619",
@@ -74,14 +79,16 @@ const SCREENS: Screen[] = [
       { kind: "display", text: "There is no board. Britain is the board." },
     ],
   },
-  // 2 The Card Is the Lens. Two images side by side, copy overlaid at the bottom.
-  // Images 30% wider and pushed up (owner round 2).
+  // 2 The Card Is the Lens (round 3): title moved to the top, image subtitles,
+  // second image now dog-on-real, the list rewritten as one bold comma sentence at
+  // the top of the container, 10px gutter.
   {
     layout: "overlay",
     mediaVariant: "wideTop",
-    title: "The Card Is the Lens",
+    topTitle: "The Card Is the Lens",
     media: {
       type: "diptych",
+      captions: ["Imagination world", "Real-life world"],
       items: [
         {
           src: "/press/card-on-cartoon.jpg",
@@ -90,21 +97,21 @@ const SCREENS: Screen[] = [
           h: 2500,
         },
         {
-          src: "/press/card-on-real.jpg",
-          alt: "The Pug card shown against a real grassy field.",
-          w: 4930,
-          h: 6855,
+          src: "/press/dog-on-real.jpg",
+          alt: "A real fawn Pug standing in long grass under a bright blue sky.",
+          w: 2158,
+          h: 3000,
         },
       ],
     },
     blocks: [
       {
-        kind: "body",
-        text: "Every Chum begins in the card, where illustration turns a breed into something you can imagine, recognise and play with, helping you notice, recognise and understand the dogs that were already around you.",
+        kind: "standfirst",
+        text: "The card introduces the dog, Your imagination gives the dog character, The real world brings the dog to life",
       },
       {
         kind: "body",
-        text: "The card introduces the dog.\nYour imagination gives the dog character.\nThe real world brings the dog to life.",
+        text: "Every Chum begins in the card, where illustration turns a breed into something you can imagine, recognise and play with, helping you notice, recognise and understand the dogs that were already around you.",
       },
       {
         kind: "body",
@@ -112,24 +119,23 @@ const SCREENS: Screen[] = [
       },
     ],
   },
-  // 3 Meet Pug. Two images, card-on-real twice (owner: same file twice, judge live),
-  // with the owner's confirmed copy.
+  // 3 Meet Pug (round 3): title to the top, images now dog-on-real and card-on-colour.
   {
-    title: "Meet Pug",
+    topTitle: "Meet Pug",
     media: {
       type: "diptych",
       items: [
         {
-          src: "/press/card-on-real.jpg",
-          alt: "The Pug card shown against a real grassy field.",
-          w: 4930,
-          h: 6855,
+          src: "/press/dog-on-real.jpg",
+          alt: "A real fawn Pug standing in long grass under a bright blue sky.",
+          w: 2158,
+          h: 3000,
         },
         {
-          src: "/press/card-on-real.jpg",
-          alt: "The Pug card shown against a real grassy field.",
-          w: 4930,
-          h: 6855,
+          src: "/press/card-on-colour.jpg",
+          alt: "The Pug character card on a blue and yellow studio set.",
+          w: 1798,
+          h: 2500,
         },
       ],
     },
@@ -172,9 +178,7 @@ const SCREENS: Screen[] = [
         },
       ],
     },
-    blocks: [
-      { kind: "standfirst", text: "[ Placeholder — copy for this screen to follow ]" },
-    ],
+    blocks: [],
   },
   // 5 (new, inserted) 2x2 grid: real Pugs to spot and photograph.
   {
@@ -207,16 +211,13 @@ const SCREENS: Screen[] = [
         },
       ],
     },
-    blocks: [
-      { kind: "standfirst", text: "[ Placeholder — copy for this screen to follow ]" },
-    ],
+    blocks: [],
   },
-  // 6 Why Pug? (was 5). Vimeo advertB with a custom frame-1 poster. Copy overlaid
-  // 5px on the video bottom (owner round 2).
+  // 6 Why Pug? (round 3): title removed from the container, video 20% smaller.
   {
     layout: "overlay",
     overlayBottom: 5,
-    title: "Why Pug?",
+    mediaShrink: true,
     media: {
       type: "vimeo",
       videoId: "1221597431",
@@ -235,18 +236,30 @@ const SCREENS: Screen[] = [
       },
     ],
   },
-  // 7 One Pug. One Prize. (was 6). Copy overlaid 5px on the bottom (owner round 2).
+  // 7 One Pug. One Prize. (round 3): title to the top, second column added with the
+  // self-hosted Photoshop time-lapse video beside the ticket image.
   {
     layout: "overlay",
     overlayBottom: 5,
-    title: "One Pug. One Prize.",
+    topTitle: "One Pug. One Prize.",
     media: {
-      type: "image",
-      pic: {
-        src: "/press/get-your-ticket.jpg",
-        alt: "A We Lost Pug, Find Pug free-entry ticket above the blue Pug figurine being photographed on a Pug podium.",
-        w: 1042,
-        h: 1452,
+      type: "twoCol",
+      images: [
+        {
+          src: "/press/get-your-ticket.jpg",
+          alt: "A We Lost Pug, Find Pug free-entry ticket above the blue Pug figurine being photographed on a Pug podium.",
+          w: 1042,
+          h: 1452,
+        },
+      ],
+      video: {
+        type: "file",
+        src: "/press/photoshop-timesnaps.mp4",
+        poster: "/press/photoshop-timesnaps-poster.jpg",
+        alt: "A time-lapse of the Pug character being drawn and coloured in Photoshop.",
+        w: 1112,
+        h: 834,
+        label: "the Photoshop time-lapse",
       },
     },
     blocks: [
@@ -258,14 +271,15 @@ const SCREENS: Screen[] = [
       { kind: "body", text: "But first, we have another problem to solve." },
     ],
   },
-  // 8 Making Pug Tangible. Two columns: A = the hand-drawn then artworked Pug
-  // (stacked squares), B = the make-ad 3D video. Copy overlaid 5px on the bottom.
+  // 8 Making Pug Tangible (round 3): title to the top, three assets fit uniformly
+  // into a neat rectangle (neat), column gutter 10%.
   {
     layout: "overlay",
     overlayBottom: 5,
-    title: "Making Pug Tangible",
+    topTitle: "Making Pug Tangible.",
     media: {
       type: "twoCol",
+      neat: true,
       images: [
         {
           src: "/press/handdrawn-pug.jpg",
@@ -299,19 +313,14 @@ const SCREENS: Screen[] = [
       { kind: "body", text: "The form changes. Pug does not." },
     ],
   },
-  // 9 Find Pug (was 8)
+  // 9 Find Pug (round 3): title to the top, middle image dropped, two columns, the
+  // steps line set in Montserrat.
   {
-    title: "Find Pug",
+    topTitle: "Find Pug.",
     media: {
-      type: "thumbs",
+      type: "diptych",
       items: [
         { src: "/press/slide2.jpg", alt: "The Pug character card on a blue and yellow set.", w: 1250, h: 1738 },
-        {
-          src: "/press/slide4.jpg",
-          alt: "A real Pug in grass with TikTok and Instagram icons and the words When you do.",
-          w: 1250,
-          h: 1738,
-        },
         {
           src: "/press/slide6.jpg",
           alt: "The blue Pug figurine being photographed on a Pug podium and held in a palm, with a Win Me badge.",
@@ -328,13 +337,14 @@ const SCREENS: Screen[] = [
       },
       {
         kind: "display",
+        mont: true,
         text: "Spot Pug. Take a photograph. Post it. Tag Pedigree Chums. Use #ChumSpot.",
       },
     ],
   },
-  // 10 Then Pug Left (was 9)
+  // 10 Then Pug Left (round 3): title to the top.
   {
-    title: "Then Pug Left",
+    topTitle: "Then Pug Left.",
     media: {
       type: "diptych",
       items: [
@@ -585,21 +595,27 @@ function MediaView({ media, active }: { media: Media; active: boolean }) {
     );
   }
   if (media.type === "diptych") {
-    // index in the key: screen 3 uses the same file twice.
+    // index in the key: screen 3 uses the same file twice. Optional per-image
+    // caption overlaid at the top (screen 2).
     return (
       <div className={styles.diptych}>
         {media.items.map((pic, i) => (
-          <Thumb key={`${pic.src}-${i}`} pic={pic} />
+          <div key={`${pic.src}-${i}`} className={styles.diptychCell}>
+            {media.captions ? (
+              <span className={styles.imgCaption}>{media.captions[i]}</span>
+            ) : null}
+            <Thumb pic={pic} />
+          </div>
         ))}
       </div>
     );
   }
   if (media.type === "twoCol") {
     return (
-      <div className={styles.twoCol}>
+      <div className={media.neat ? `${styles.twoCol} ${styles.twoColNeat}` : styles.twoCol}>
         <div className={styles.twoColA}>
-          {media.images.map((pic) => (
-            <Thumb key={pic.src} pic={pic} />
+          {media.images.map((pic, i) => (
+            <Thumb key={`${pic.src}-${i}`} pic={pic} />
           ))}
         </div>
         <div className={styles.twoColB}>
@@ -627,7 +643,9 @@ function CopyPanel({ title, blocks }: { title?: string; blocks: Block[] }) {
             b.kind === "standfirst"
               ? styles.copyStandfirst
               : b.kind === "display"
-                ? styles.copyDisplay
+                ? b.mont
+                  ? styles.copyDisplayMont
+                  : styles.copyDisplay
                 : styles.copyBody;
           return (
             <p key={i} className={cls}>
@@ -641,47 +659,73 @@ function CopyPanel({ title, blocks }: { title?: string; blocks: Block[] }) {
 }
 
 function ScreenView({ screen, active }: { screen: Screen; active: boolean }): ReactNode {
-  const copy = <CopyPanel title={screen.title} blocks={screen.blocks} />;
+  const hasCopy = screen.blocks.length > 0;
+  const copy = hasCopy ? <CopyPanel title={screen.title} blocks={screen.blocks} /> : null;
+  const titleEl = screen.topTitle ? (
+    <p className={styles.screenTitle}>{screen.topTitle}</p>
+  ) : null;
+  const shrink = screen.mediaShrink ? ` ${styles.mediaShrink}` : "";
+
   if (!screen.media) {
-    return <div className={styles.copyOnly}>{copy}</div>;
+    return (
+      <>
+        {titleEl}
+        <div className={styles.copyOnly}>{copy}</div>
+      </>
+    );
   }
   if (screen.layout === "overlay") {
-    const mediaCls =
+    const variant =
       screen.media.type === "twoCol"
-        ? `${styles.overlayMedia} ${styles.overlayMediaTwoCol}`
+        ? ` ${styles.overlayMediaTwoCol}`
         : screen.mediaVariant === "wideTop"
-          ? `${styles.overlayMedia} ${styles.overlayMediaWideTop}`
-          : styles.overlayMedia;
+          ? ` ${styles.overlayMediaWideTop}`
+          : "";
     return (
-      <div className={styles.overlayScreen}>
-        <div className={mediaCls}>
-          <MediaView media={screen.media} active={active} />
+      <>
+        {titleEl}
+        <div className={styles.overlayScreen}>
+          <div className={`${styles.overlayMedia}${variant}${shrink}`}>
+            <MediaView media={screen.media} active={active} />
+          </div>
+          {hasCopy ? (
+            <div
+              className={styles.overlayCopy}
+              style={{ bottom: screen.overlayBottom ?? 15 }}
+            >
+              {copy}
+            </div>
+          ) : null}
         </div>
-        <div
-          className={styles.overlayCopy}
-          style={{ bottom: screen.overlayBottom ?? 15 }}
-        >
-          {copy}
-        </div>
-      </div>
+      </>
     );
   }
   return (
-    <div className={styles.screen}>
-      <div className={styles.screenMedia}>
-        <MediaView media={screen.media} active={active} />
+    <>
+      {titleEl}
+      <div className={styles.screen}>
+        <div className={`${styles.screenMedia}${shrink}`}>
+          <MediaView media={screen.media} active={active} />
+        </div>
+        {hasCopy ? <div className={styles.copyWrap}>{copy}</div> : null}
       </div>
-      <div className={styles.copyWrap}>{copy}</div>
-    </div>
+    </>
   );
 }
 
 export default function PressCarousel() {
   const railRef = useRef<HTMLDivElement>(null);
   const [index, setIndex] = useState(0);
-  // Whole-pack text-colour toggle: white (default) or navy (owner round 2).
-  const [navyText, setNavyText] = useState(false);
+  // Brief "walking" pulse on each slide change so the Scotty dog trots as the bar
+  // advances, then settles to standing.
+  const [walking, setWalking] = useState(false);
   const count = SCREENS.length;
+
+  useEffect(() => {
+    setWalking(true);
+    const id = setTimeout(() => setWalking(false), 450);
+    return () => clearTimeout(id);
+  }, [index]);
 
   const goTo = useCallback(
     (target: number) => {
@@ -751,10 +795,12 @@ export default function PressCarousel() {
   return (
     <section
       className={styles.pack}
-      style={{ "--press-copy": navyText ? "#0a3a57" : "#ffffff" } as CSSProperties}
       aria-roledescription="carousel"
       aria-label="Pedigree Chums press pack"
     >
+      {/* Header title (round 3), shown on every screen. */}
+      <p className={styles.headerTitle}>Press Pack</p>
+
       <div className={styles.rail} ref={railRef}>
         {SCREENS.map((screen, i) => (
           <article
@@ -769,16 +815,8 @@ export default function PressCarousel() {
         ))}
       </div>
 
-      {/* Whole-pack text-colour toggle, above the media area (owner round 2). */}
-      <button
-        type="button"
-        className={styles.colorToggle}
-        onClick={() => setNavyText((v) => !v)}
-        aria-pressed={navyText}
-        aria-label="Toggle text colour between white and navy"
-      >
-        {navyText ? "Text: Navy" : "Text: White"}
-      </button>
+      {/* Text light/dark control is the site's PcContrastToolbar, already rendered
+          in the Nav header, so nothing is added here (round 3). */}
 
       <button
         type="button"
@@ -799,21 +837,22 @@ export default function PressCarousel() {
         <span aria-hidden="true">{"›"}</span>
       </button>
 
-      <div className={styles.indicator}>
+      <div
+        className={styles.indicator}
+        role="progressbar"
+        aria-valuemin={1}
+        aria-valuemax={count}
+        aria-valuenow={index + 1}
+        aria-label="Slide position"
+      >
         <p className={styles.counter} aria-live="polite">
           {index + 1} / {count}
         </p>
-        <div
-          className={styles.progressTrack}
-          role="progressbar"
-          aria-valuemin={1}
-          aria-valuemax={count}
-          aria-valuenow={index + 1}
-          aria-label="Slide position"
-        >
-          <div className={styles.progressFill} style={{ width: `${progress}%` }} />
-        </div>
       </div>
+
+      {/* Progress bar: the Argos ReadingProgress element (the Scotty-dog bar),
+          reused as-is but driven by the carousel position instead of scroll. */}
+      <ReadingProgress progress={progress} active={walking} />
     </section>
   );
 }

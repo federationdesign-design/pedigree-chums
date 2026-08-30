@@ -22,12 +22,11 @@
   max-height: 100dvh;
   overflow: hidden;
   /* Media keeps the old envelope; the text container is 40% wider (owner, round 2).
-     --media-wide is screen 2's 30%-wider images. --press-copy is the white/navy
-     text-colour toggle, default white. */
+     --media-wide is screen 2's 30%-wider images. --press-copy defaults white; the
+     standard text control (round 3) flips it to navy via [data-pc-textinvert]. */
   --media-max: min(92vw, 480px);
   --media-wide: min(96vw, 624px);
   --copy-max: min(96vw, 672px);
-  --press-copy: #ffffff;
 }
 
 /* Horizontal scroll-snap rail. Native snapping gives the swipe for free; the
@@ -216,7 +215,7 @@
 .diptych {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: clamp(10px, 2.4vw, 18px);
+  gap: 10px; /* round 3: 10px gutter */
   width: 100%;
   height: 100%;
   align-items: center;
@@ -238,8 +237,7 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-template-rows: 1fr 1fr;
-  /* row-gap / central column gutter. Owner round 2: column gutter to 10px. */
-  gap: clamp(8px, 2vw, 14px) 10px;
+  gap: 10px; /* round 3: 10px gutter, screens 4 and 5 */
   width: 100%;
   height: 100%;
   place-items: center;
@@ -262,10 +260,11 @@
 }
 .twoColA {
   display: grid;
-  grid-template-rows: 1fr 1fr;
-  gap: clamp(8px, 2vw, 14px);
+  grid-auto-rows: 1fr; /* one row per image: 1 (screen 7) or 2 (screen 8) */
+  gap: 10px;
   flex: 1 1 0;
   min-width: 0;
+  height: 100%;
   place-items: center;
 }
 .twoColA .thumbImg {
@@ -287,6 +286,17 @@
   height: auto;
   width: 100%;
   max-height: 100%;
+}
+/* Screen 8 (round 3): three assets fit uniformly into a neat rectangle, 10%
+   column gutter. The columns stretch to equal height and the video fills its
+   column (poster cover-fills, so no black bars). */
+.twoColNeat {
+  gap: 10%;
+}
+.twoColNeat .twoColB .videoBox {
+  height: 100%;
+  width: 100%;
+  max-height: none;
 }
 
 /* Overlay layout (screens 1-2): the picture fills the slide and the copy panel
@@ -383,6 +393,80 @@
   color: var(--press-copy, #ffffff);
   white-space: pre-line;
 }
+/* Screen 9: the steps line set in Montserrat rather than the display font. */
+.copyDisplayMont {
+  margin: clamp(10px, 2vh, 16px) 0 0;
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-weight: 700;
+  font-size: clamp(1.05rem, 3.4vw, 1.32rem);
+  line-height: 1.2;
+  color: var(--press-copy, #ffffff);
+  white-space: pre-line;
+}
+
+/* Round 3 titles: the header "Press Pack" and the six per-screen titles, one class
+   each, Luckiest Guy in the lemon header token. */
+.headerTitle {
+  position: absolute;
+  top: clamp(8px, 1.4vh, 14px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 6;
+  margin: 0;
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: clamp(1.2rem, 4vw, 1.7rem);
+  line-height: 1;
+  color: var(--yellow-header, #ffed00);
+  pointer-events: none;
+  white-space: nowrap;
+}
+.screenTitle {
+  flex: 0 0 auto;
+  width: 100%;
+  max-width: var(--copy-max);
+  margin: 0 auto clamp(8px, 1.6vh, 16px);
+  text-align: center;
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: clamp(1.8rem, 6vw, 2.7rem);
+  line-height: 1.04;
+  color: var(--yellow-header, #ffed00);
+}
+/* Wrapper positioning for the standard text toggle, below the indicator. */
+.textToggle {
+  position: absolute;
+  top: clamp(88px, 12.5vh, 116px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 6;
+}
+
+/* Diptych cell + per-image caption (screen 2 subtitles). */
+.diptychCell {
+  position: relative;
+  height: 100%;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.imgCaption {
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-weight: 700;
+  font-size: clamp(0.82rem, 2.8vw, 1.05rem);
+  color: #ffffff;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.55);
+  white-space: nowrap;
+}
+
+/* Screens 1, 6: video 20% smaller. Comes after the media rules so it wins. */
+.mediaShrink {
+  max-width: calc(var(--media-max) * 0.8);
+}
 
 /* Placeholder frame: a light card that fills the slide so the pacing reads like
    a real slide. Dashed edge marks it as a placeholder, never a finished design. */
@@ -433,26 +517,26 @@
 
 /* ---- controls ------------------------------------------------------------ */
 
-/* Previous/next: circular, cream face, navy edge and chevron, thumb-sized for a
-   phone. Below the Nav (z 300) but above the slides. */
+/* Previous/next (round 3): the Dogs at Work chevrons: big and white, no container.
+   A soft shadow keeps them legible over light photography. */
 .arrow {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
   z-index: 6;
-  width: 54px;
-  height: 54px;
-  border-radius: var(--radius-pill, 999px);
-  border: 2px solid var(--navy, #0a3a57);
-  background: var(--cream, #ffffff);
-  color: var(--navy, #0a3a57);
-  font-size: 2rem;
+  width: auto;
+  height: auto;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--cream, #ffffff);
+  font-size: clamp(3.4rem, 10vw, 5.4rem);
   line-height: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 6px 16px rgba(10, 58, 87, 0.22);
+  text-shadow: 0 2px 10px rgba(10, 58, 87, 0.45);
 }
 .arrow span {
   /* Optical centring for the chevron glyph, which sits low in its box. */
@@ -465,12 +549,11 @@
   right: 12px;
 }
 .arrow:active {
-  transform: translateY(-50%) scale(0.94);
+  transform: translateY(-50%) scale(0.9);
 }
 .arrow:disabled {
-  opacity: 0.35;
+  visibility: hidden;
   cursor: default;
-  box-shadow: none;
 }
 
 /* Position indicator: a counter and a progress bar. Moved to the top of the page
