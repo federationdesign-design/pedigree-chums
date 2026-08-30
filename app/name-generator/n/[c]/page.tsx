@@ -77,11 +77,30 @@ const CARD_IMAGE: Record<string, string> = {
   "Yorkshire Terrier": "/yorkshire-card.jpg"
 };
 
-export const metadata: Metadata = {
-  robots: { index: false, follow: true },
-};
-
 type Props = { params: Promise<{ c: string }> };
+
+/* Per-name title and description. Without this the link previews the site-wide
+   default, so a shared dog reads as "The ultimate on-the-go dog spotting game"
+   with no mention of the name. The OG image itself comes next. */
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { c } = await params;
+  const data = decodeSharedName(c);
+  if (!data) {
+    return { title: "Shared name", robots: { index: false, follow: true } };
+  }
+  const shown = data.k ? `${data.k} (${data.f})` : data.f;
+  return {
+    title: shown,
+    description: data.b
+      ? `A ${data.b} named ${shown}. Make your own dog name at Pedigree Chums.`
+      : `${shown}. Make your own dog name at Pedigree Chums.`,
+    robots: { index: false, follow: true },
+    openGraph: {
+      title: shown,
+      description: data.b ? `A ${data.b}, named by somebody at Pedigree Chums.` : "Named at Pedigree Chums.",
+    },
+  };
+}
 
 export default async function SharedNamePage({ params }: Props) {
   const { c } = await params;
@@ -118,10 +137,16 @@ export default async function SharedNamePage({ params }: Props) {
         {/* Same card as the generator's reveal card, minus the three action
             buttons, which have nothing to act on here. */}
         <div style={{ position: "relative", background: "linear-gradient(to top right, #00e2ff, #008eff)", borderRadius: 40, padding: "clamp(24px,4vw,40px)", boxShadow: "0 18px 40px rgba(10,58,87,0.28)", marginBottom: 28 }}>
+          {/* The generator positions this card absolutely and then hides it on
+              desktop (page.tsx line 2663). Copying the positioning without the
+              hiding rule put it straight over the name and the reasoning. Here it
+              sits in the flow above the name instead, so it cannot overlap at any
+              width and it stays visible on desktop, which is the point of a shared
+              card. Fixed 30 Aug 2026. */}
           {cardImg && (
-            <div style={{ position: "absolute", right: -12, top: -10, zIndex: 2, transform: "rotate(2deg)", transformOrigin: "bottom right", filter: "drop-shadow(0 8px 24px rgba(10,58,87,0.28))" }}>
+            <div style={{ display: "flex", justifyContent: "center", marginBottom: 18 }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={cardImg} alt={data.b} style={{ width: "clamp(120px,28vw,220px)", height: "auto", borderRadius: 14, display: "block" }} />
+              <img src={cardImg} alt={data.b} style={{ width: "clamp(150px,34vw,240px)", height: "auto", borderRadius: 14, display: "block", transform: "rotate(2deg)", filter: "drop-shadow(0 8px 24px rgba(10,58,87,0.28))" }} />
             </div>
           )}
 
