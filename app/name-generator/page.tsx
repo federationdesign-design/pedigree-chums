@@ -2867,7 +2867,7 @@ export default function NameGeneratorPage() {
                         {chosen && <p style={{ color:"var(--yellow)", fontSize:"0.62rem", fontWeight:700, margin:0, fontFamily:"var(--font-body)", textAlign:"center" }}>✓ {chosen}</p>}
                       </div>
                       {/* live pool size -- grows as questions are answered */}
-                      <p style={{ color:"var(--yellow)", fontFamily:"var(--font-body)", fontSize:"0.8rem", fontWeight:700, textAlign:"center", margin:0 }}>
+                      <p style={{ color:"var(--yellow)", fontFamily:"var(--font-body)", fontSize:"0.925rem", fontWeight:700, textAlign:"center", margin:0 }}>
                         ✨ {outcomes.toLocaleString()} possible names in your pool
                       </p>
                     </div>
@@ -3010,14 +3010,14 @@ export default function NameGeneratorPage() {
                     </div>
                   )}
                   {/* Reasoning */}
-                  <div style={{ fontSize:"0.8rem", color:"var(--navy)", lineHeight:1.3, borderTop:"1px solid rgba(10,58,87,0.2)", paddingTop:14, fontFamily:"var(--font-body)", textAlign:"center", fontWeight:600 }}>{r.reasoning}</div>
+                  <div style={{ fontSize:"0.925rem", color:"var(--navy)", lineHeight:1.35, borderTop:"1px solid rgba(10,58,87,0.2)", paddingTop:14, fontFamily:"var(--font-body)", textAlign:"center", fontWeight:600 }}>{r.reasoning}</div>
                 </div>
                 </div>
               ))}
 
               <div className="pcm-panel" style={{ maxWidth:"60%", margin:"14px auto 0", width:"100%" }}>
                 <button onClick={() => startQuickFire()} className="pcm-pool"
-                  style={{ display:"block", width:"100%", background:"none", border:"none", borderRadius:0, padding:"6px 16px", fontFamily:"var(--font-body)", fontSize:"0.82rem", fontWeight:700, color:"var(--navy)", textAlign:"center", cursor:"pointer" }}>
+                  style={{ display:"block", width:"100%", background:"none", border:"none", borderRadius:0, padding:"6px 16px", fontFamily:"var(--font-body)", fontSize:"0.945rem", fontWeight:700, color:"var(--navy)", textAlign:"center", cursor:"pointer" }}>
                   ✨ {outcomes.toLocaleString()} possible names in your pool
                 </button>
               </div>
