@@ -72,16 +72,32 @@ export default async function Image({ params }: { params: Promise<{ c: string }>
     { name: "Montserrat", data: body, style: "normal" as const, weight: 700 as const },
   ];
 
-  // Same fallback as the canvas: /name-podium.jpg covers the breeds with no art,
-  // currently Weimaraner, Dalmatian and Poodle.
+  /* The podium art is fetched over HTTP, not read from disk. This looks like the
+     long way round, and it is deliberate.
+
+     The first version did `readFile(join(process.cwd(), "public", artPath))`.
+     Because artPath is computed at runtime, Next's file tracer cannot tell which
+     file is needed, so it bundles the whole of public/ into the function. That is
+     293MB, and the build failed on Vercel's 250MB uncompressed limit:
+
+       "The Vercel Function name-generator/p/[c]/opengraph-image is 328.01mb
+        uncompressed which exceeds the maximum uncompressed size limit of 250mb."
+
+     Vercel's own suggestion is to set VERCEL_SUPPORT_LARGE_FUNCTIONS=1. Do NOT.
+     That ships a 328MB function to serve one 100KB jpg, with the cold start to
+     match. Fetching the image instead keeps the function tiny.
+
+     The two font reads above stay on disk on purpose: their paths are string
+     literals, so the tracer includes exactly those two files and nothing else.
+     Never make a path in this file dynamic against process.cwd().
+
+     Same fallback as the canvas: /name-podium.jpg covers the breeds with no art,
+     currently Weimaraner, Dalmatian and Poodle. */
   const artPath = (data?.b && podiumArtFor(data.b)) || "/name-podium.jpg";
-  let artUrl = "";
-  try {
-    const buf = await readFile(join(process.cwd(), "public", artPath));
-    artUrl = `data:image/jpeg;base64,${buf.toString("base64")}`;
-  } catch {
-    artUrl = "";
-  }
+  const base =
+    process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
+    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
+  const artUrl = `${base}${artPath}`;
 
   const places: PodiumEntry[] = data?.places ?? [];
 
