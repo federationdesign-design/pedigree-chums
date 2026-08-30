@@ -141,6 +141,137 @@
   display: block;
 }
 
+/* ---- content screen: picture + short copy ------------------------------- */
+
+/* Each screen stacks a picture (dominant, ~70% of the height) over a short copy
+   block. The copy sits in the britains-dog-history blue-fade panel (.section +
+   .glowLayer, imported as-is), the one container the brief approves for text on a
+   darker ground. */
+.screen {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  max-width: min(92vw, 480px);
+  margin: 0 auto;
+  /* Grid, not flex: the media row is minmax(0,1fr) so it always yields to the
+     copy row's natural height, and its definite size lets the picture inside cap
+     to it (a flex row leaves the percentage height unresolved and they overlap). */
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: clamp(14px, 2.6vh, 24px);
+}
+.screenMedia {
+  min-height: 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.copyWrap {
+  flex: 0 0 auto;
+  width: 100%;
+}
+/* Copy-only screen (no picture): the panel centres in the slide on its own. */
+.copyOnly {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  max-width: min(92vw, 480px);
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Thumbnails: a grid that divides the media height into equal rows, each picture
+   contained so none is cropped. Works for three, four or five. */
+.thumbGrid {
+  display: flex;
+  gap: clamp(8px, 2vw, 14px);
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+}
+/* Each thumb takes an equal share of the row and caps to the row height, so a
+   strip of three, four or five never overflows or overlaps the copy below. */
+.thumbGrid .thumbImg {
+  flex: 1 1 0;
+  min-width: 0;
+  height: auto;
+  max-height: 100%;
+}
+.diptych {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(10px, 2.4vw, 18px);
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-items: center;
+}
+.thumbImg {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 14px;
+  box-shadow: 0 10px 24px rgba(10, 58, 87, 0.2);
+}
+
+/* Panel helpers (kept): let the imported blue-fade panel fill the copy block and
+   centre its content; the panel's own look, type and colour are untouched. */
+.panel {
+  width: 100%;
+  margin-bottom: 0;
+}
+.panelBody {
+  grid-column: 1 / -1;
+  position: relative;
+  z-index: 1;
+  text-align: center;
+}
+
+/* Copy on the panel: a lemon display title, a bold standfirst, body lines and any
+   set-apart display line, all white on the gradient as the history page sets it.
+   pre-line keeps the owner's own line breaks in the stacked lines. */
+.copyTitle {
+  margin: 0 0 clamp(8px, 1.6vh, 14px);
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: clamp(1.7rem, 5.6vw, 2.5rem);
+  line-height: 1.05;
+  color: var(--yellow-header, #ffed00);
+}
+.copyStandfirst {
+  margin: 0 0 clamp(8px, 1.6vh, 14px);
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-weight: 700;
+  font-size: clamp(1.18rem, 4vw, 1.55rem);
+  line-height: 1.16;
+  color: var(--white, #ffffff);
+}
+.copyBody {
+  margin: 0 0 clamp(7px, 1.4vh, 12px);
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-weight: 500;
+  font-size: clamp(1.02rem, 3.2vw, 1.24rem);
+  line-height: 1.26;
+  color: var(--white, #ffffff);
+  white-space: pre-line;
+}
+.copyBody:last-child {
+  margin-bottom: 0;
+}
+.copyDisplay {
+  margin: clamp(10px, 2vh, 16px) 0 0;
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: clamp(1.32rem, 4.4vw, 1.85rem);
+  line-height: 1.1;
+  color: var(--white, #ffffff);
+  white-space: pre-line;
+}
+
 /* Placeholder frame: a light card that fills the slide so the pacing reads like
    a real slide. Dashed edge marks it as a placeholder, never a finished design. */
 .placeholder {
@@ -276,6 +407,8 @@
     padding: clamp(96px, 14vh, 132px) 24px clamp(104px, 15vh, 140px);
   }
   .media,
+  .screen,
+  .copyOnly,
   .placeholder {
     max-width: min(72vw, 760px);
   }

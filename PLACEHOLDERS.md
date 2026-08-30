@@ -369,3 +369,20 @@ Left as-is on the old `--yellow` (NOT retargeted to `--yellow-header`), because 
 do not render and changing dead code adds diff for no visible effect. Logged so
 nobody chases why they were skipped, or "fixes" their colour later. Resolve by
 deleting them if a future pass confirms they are still unused.
+
+## Press pack contact details (29 August)
+
+The Press Enquiries screen (`/press`, the final slide) renders the owner's own
+bracketed placeholders verbatim from `docs/press/COPY.md` (screen 19). They are
+clearly bracketed on the page, never mistaken for real details.
+
+| Placeholder | Location | Meaning | Resolve via |
+|---|---|---|---|
+| `[NAME]` `[EMAIL]` `[TELEPHONE]` | `app/press/PressCarousel.tsx` (screen 16, from COPY.md §19) | Press contact, not yet supplied | Owner supplies contact details |
+| `[WEBSITE]` `[HANDLE]` | same | Website and social handle | Owner supplies |
+| `[DATE]` (opens / closes) | same | Competition dates | Owner supplies dates |
+
+The three copy-only tail screens (17 A Little Deeper, 18 Press Assets, 19 Press
+Enquiries) also have no image assigned; parked, unused press images are available
+(`cover-where-is-pug`, `no-dog-on-real`, `slide9`, `3d-on-podium`, `slide5`) if
+the owner wants pictures there.
