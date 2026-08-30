@@ -2,26 +2,62 @@ import { ImageResponse } from "next/og";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { decodeSharedPodium, type PodiumEntry } from "../../shareLink";
+import { podiumArtFor } from "../../podiumArt";
 
-/* NG-SHARE-2, 30 Aug 2026. The social card for a shared podium.
+/* NG-SHARE-2, 31 Aug 2026. The social card for a shared podium.
 
-   Built at 1200x630, the ratio Facebook and LinkedIn crop to, so nothing is cut.
-   Composed here rather than reusing the podium artwork, which is 1254x1006 and
-   would lose 349px off its height to the crop.
+   REWRITTEN. The first version laid the names out as plain text on a gradient.
+   Steve wants what the app itself produces: the real podium artwork with the
+   names burned onto the placards, the same picture the knockout screen draws.
 
-   Fonts are read off disk, not fetched. ImageResponse cannot use next/font, and
-   a runtime fetch to fonts.gstatic.com is exactly what NG-FONT-1 removed from the
-   two share canvases. Same .ttf files, one copy for everything.
+   So this mirrors KnockoutRound's canvas. That canvas draws the podium jpg at
+   its natural 1254x1006 and places three placards at fixed coordinates,
+   KnockoutRound.tsx line 517:
 
-   Satori, which renders this, supports a subset of CSS: flexbox only, every div
-   with more than one child needs an explicit display:flex, and there is no
-   text-shadow. Keep the layout plain. */
+     1st  centre (627, 527)  nick 72px  full 32px  rotate  5deg  maxW 460
+     2nd  left   (270, 754)  nick 44px  full 20px  rotate -6deg  maxW 270
+     3rd  right  (983, 779)  nick 40px  full 18px  rotate -5deg  maxW 270
+
+   Those numbers are duplicated here on purpose rather than shared: the canvas
+   version runs in the browser against a live ctx.measureText, this one runs on
+   the server with no canvas at all. If the artwork is ever re-cut, BOTH need
+   updating.
+
+   Fitting 1254x1006 (1.25:1) into 1200x630 (1.91:1): the image is drawn at full
+   width and the overflow is clipped equally top and bottom. That loses 333px of
+   the 963 scaled height, but all three placards sit between y=527 and y=779 in
+   source coordinates, well inside the kept band of 174 to 832, so nothing that
+   carries a name is cut. Letterboxing instead would waste 415px of a 1200px card.
+
+   Satori renders this. Flexbox only, every multi-child div needs an explicit
+   display:flex, and there is no ctx.measureText, so the shrink-to-fit below is
+   an estimate from character count rather than a measurement. */
 
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 export const alt = "A dog name podium from Pedigree Chums";
 
-const MEDALS = ["1st", "2nd", "3rd"];
+const SRC_W = 1254;
+const SRC_H = 1006;
+const SCALE = size.width / SRC_W;                    // 0.957
+const OFFSET_Y = (SRC_H * SCALE - size.height) / 2;  // 166.5, clipped top and bottom
+
+// Placard geometry, mirroring KnockoutRound.tsx line 517.
+const PLACARDS = [
+  { x: 627, y: 527, nick: 72, full: 32, rot: 5, maxW: 460 },
+  { x: 270, y: 754, nick: 44, full: 20, rot: -6, maxW: 270 },
+  { x: 983, y: 779, nick: 40, full: 18, rot: -5, maxW: 270 },
+];
+
+// Satori cannot measure text, so approximate. Luckiest Guy is a wide display
+// face, Montserrat Bold narrower. These ratios are chosen to under-run rather
+// than over-run: a name slightly too small looks fine, one that overflows the
+// placard does not.
+function fit(text: string, start: number, maxW: number, perChar: number, floor: number) {
+  let s = start;
+  while (text.length * s * perChar > maxW && s > floor) s -= 1;
+  return s;
+}
 
 export default async function Image({ params }: { params: Promise<{ c: string }> }) {
   const { c } = await params;
@@ -31,71 +67,80 @@ export default async function Image({ params }: { params: Promise<{ c: string }>
     readFile(join(process.cwd(), "public/fonts/LuckiestGuy-Regular.ttf")),
     readFile(join(process.cwd(), "public/fonts/Montserrat-Bold.ttf")),
   ]);
-
   const fonts = [
     { name: "Luckiest Guy", data: display, style: "normal" as const, weight: 400 as const },
     { name: "Montserrat", data: body, style: "normal" as const, weight: 700 as const },
   ];
 
-  if (!data) {
-    return new ImageResponse(
-      (
-        <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", background: "linear-gradient(to top right, #00e2ff, #008eff)" }}>
-          <div style={{ fontFamily: "Luckiest Guy", fontSize: 78, color: "#ffffff" }}>Pedigree Chums</div>
-        </div>
-      ),
-      { ...size, fonts }
-    );
+  // Same fallback as the canvas: /name-podium.jpg covers the breeds with no art,
+  // currently Weimaraner, Dalmatian and Poodle.
+  const artPath = (data?.b && podiumArtFor(data.b)) || "/name-podium.jpg";
+  let artUrl = "";
+  try {
+    const buf = await readFile(join(process.cwd(), "public", artPath));
+    artUrl = `data:image/jpeg;base64,${buf.toString("base64")}`;
+  } catch {
+    artUrl = "";
   }
 
-  const first = data.places[0];
-  const rest = data.places.slice(1);
+  const places: PodiumEntry[] = data?.places ?? [];
 
   return new ImageResponse(
     (
       <div
         style={{
-          width: "100%",
-          height: "100%",
+          width: size.width,
+          height: size.height,
           display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          padding: "48px 64px",
-          background: "linear-gradient(to top right, #00e2ff, #008eff)",
+          position: "relative",
+          overflow: "hidden",
+          background: "#0b78bd",
         }}
       >
-        <div style={{ display: "flex", fontFamily: "Montserrat", fontSize: 26, letterSpacing: 4, color: "#0a3a57", marginBottom: 18 }}>
-          {(data.b ? `${data.b.toUpperCase()} ` : "") + "NAME KNOCKOUT WINNER"}
-        </div>
-
-        <div style={{ display: "flex", fontFamily: "Luckiest Guy", fontSize: first.k && first.k.length <= 14 ? 128 : 88, color: "#ffffff", lineHeight: 1 }}>
-          {first.k || first.f}
-        </div>
-
-        {first.k ? (
-          <div style={{ display: "flex", fontFamily: "Montserrat", fontSize: 34, color: "#0a3a57", marginTop: 14 }}>
-            {first.f}
-          </div>
+        {artUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={artUrl}
+            alt=""
+            width={size.width}
+            height={Math.round(SRC_H * SCALE)}
+            style={{ position: "absolute", left: 0, top: -OFFSET_Y }}
+          />
         ) : null}
 
-        {rest.length > 0 ? (
-          <div style={{ display: "flex", marginTop: 40, gap: 56 }}>
-            {rest.map((p: PodiumEntry, i: number) => (
-              <div key={p.f + i} style={{ display: "flex", flexDirection: "column" }}>
-                <div style={{ display: "flex", fontFamily: "Montserrat", fontSize: 20, letterSpacing: 3, color: "#0a3a57", opacity: 0.8 }}>
-                  {MEDALS[i + 1]}
-                </div>
-                <div style={{ display: "flex", fontFamily: "Luckiest Guy", fontSize: 44, color: "#ffffff", marginTop: 6 }}>
-                  {p.k || p.f}
-                </div>
+        {places.slice(0, 3).map((p: PodiumEntry, i: number) => {
+          const g = PLACARDS[i];
+          const nickname = p.k || p.f;
+          const fullName = p.f && p.f !== nickname ? p.f : "";
+          const maxW = g.maxW * SCALE;
+          const ns = fit(nickname, g.nick * SCALE, maxW, 0.55, 22);
+          const fs = fullName ? fit(fullName, g.full * SCALE, maxW, 0.52, 13) : 0;
+          return (
+            <div
+              key={p.f + i}
+              style={{
+                position: "absolute",
+                left: g.x * SCALE - maxW / 2,
+                top: g.y * SCALE - OFFSET_Y - (g.nick * SCALE) / 2 - (fullName ? fs : 0),
+                width: maxW,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                transform: `rotate(${g.rot}deg)`,
+                color: "#0a3a57",
+              }}
+            >
+              <div style={{ display: "flex", fontFamily: "Luckiest Guy", fontSize: ns, lineHeight: 1 }}>
+                {nickname}
               </div>
-            ))}
-          </div>
-        ) : null}
-
-        <div style={{ display: "flex", position: "absolute", right: 64, bottom: 44, fontFamily: "Luckiest Guy", fontSize: 30, color: "#ffed00" }}>
-          pedigreechums.co.uk
-        </div>
+              {fullName ? (
+                <div style={{ display: "flex", fontFamily: "Montserrat", fontSize: fs, lineHeight: 1.2, marginTop: ns * 0.22, textAlign: "center" }}>
+                  {fullName}
+                </div>
+              ) : null}
+            </div>
+          );
+        })}
       </div>
     ),
     { ...size, fonts }
