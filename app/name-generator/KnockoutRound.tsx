@@ -3,6 +3,7 @@ import React, { useState, useRef, useEffect } from "react";
 import Nav from "../../components/Nav/Nav";
 import styles from "./KnockoutRound.module.css";
 import ShareScreen from "./ShareScreen";
+import { PODIUM_ART } from "./podiumArt";
 import { ShortlistEntry } from "./ShortlistBar";
 import { fireConfetti } from "../../lib/confetti";
 
@@ -470,67 +471,9 @@ export default function KnockoutRound({ shortlist, recommended = [], breed, onBa
     );
     luckiestGuy.load().then(f => document.fonts.add(f)).catch(() => {}).finally(() => {
       const img = new window.Image();
-      const PODIUM_MAP: Record<string, string> = {
-        "afghan hound":                    "/podiums/afgan-podium.jpg",
-        "basset hound":                    "/podiums/basset-podium.jpg",
-        "beagle":                          "/podiums/beagle-podium.jpg",
-        "bichon frise":                    "/podiums/bichon-podium.jpg",
-        "bichon":                          "/podiums/bichon-podium.jpg",
-        "bloodhound":                      "/podiums/bloodhound-podium.jpg",
-        "border collie":                   "/podiums/collie-podium.jpg",
-        "border terrier":                  "/podiums/border-terrier-podium.jpg",
-        "boston terrier":                  "/podiums/boston-podium.jpg",
-        "boxer":                           "/podiums/boxer-podium.jpg",
-        "bull terrier":                    "/podiums/bull-terrier-podium.jpg",
-        "bulldog":                         "/podiums/bulldog-podium.jpg",
-        "cavachon":                        "/podiums/cavachon-podium.jpg",
-        "cavalier king charles spaniel":   "/podiums/cavalier-podium.jpg",
-        "cavapoo":                         "/podiums/cavalier-podium.jpg",
-        "chihuahua":                       "/podiums/chihuahua-podium.jpg",
-        "cockapoo":                        "/podiums/cockapoo-podium.jpg",
-        "cocker spaniel":                  "/podiums/cocker-podium.jpg",
-        "corgi":                           "/podiums/corgi-podium.jpg",
-        "pembroke welsh corgi":            "/podiums/corgi-podium.jpg",
-        "dachshund":                       "/podiums/dachshund-podium.jpg",
-        "doberman pinscher":               "/podiums/doberman-podium.jpg",
-        "french bulldog":                  "/podiums/french-bulldog-podium.jpg",
-        "german shepherd":                 "/podiums/german-sheperd-podium.jpg",
-        "german sheperd":                  "/podiums/german-sheperd-podium.jpg",
-        "golden retriever":                "/podiums/golden-retreaver-podium.jpg",
-        "golden retreaver":                "/podiums/golden-retreaver-podium.jpg",
-        "goldendoodle":                    "/podiums/golden-retreaver-podium.jpg",
-        "great dane":                      "/podiums/great-dane-podium.jpg",
-        "greyhound":                       "/podiums/greyhound-podium.jpg",
-        "irish setter":                    "/podiums/setter-podium.jpg",
-        "irish wolfhound":                 "/podiums/irish-wolfhound-podium.jpg",
-        "italian greyhound":               "/podiums/greyhound-podium.jpg",
-        "jack russell":                    "/podiums/jack-russel-podium.jpg",
-        "jack russell terrier":            "/podiums/jack-russel-podium.jpg",
-        "jackapoo":                        "/podiums/jackapoo-podium.jpg",
-        "labradoodle":                     "/podiums/labradooble-podium.jpg",
-        "labrador":                        "/podiums/labrador-podium.jpg",
-        "lurcher":                         "/podiums/lurcher-podium.jpg",
-        "maltese":                         "/podiums/multipoo-podium.jpg",
-        "maltipoo":                        "/podiums/multipoo-podium.jpg",
-        "mastiff":                         "/podiums/mastiff-podium.jpg",
-        "miniature schnauzer":             "/podiums/schnauzer-podium.jpg",
-        "old english sheepdog":            "/podiums/old-english-podium.jpg",
-        "papillon":                        "/podiums/Papilion-podium.jpg",
-        "papilion":                        "/podiums/Papilion-podium.jpg",
-        "pomeranian":                      "/podiums/pomarian-podium.jpg",
-        "pomarian":                        "/podiums/pomarian-podium.jpg",
-                "pug":                             "/podiums/pug-podium.jpg",
-        "rottweiler":                      "/podiums/rotty-podium.jpg",
-        "saint bernard":                   "/podiums/st-bernard-podium.jpg",
-        "shih tzu":                        "/podiums/shih-tzu-podium.jpg",
-        "siberian husky":                  "/podiums/husky-podium.jpg",
-        "springer spaniel":                "/podiums/springer-podium.jpg",
-        "staffordshire bull terrier":      "/podiums/staffy-podium.jpg",
-                "west highland terrier":           "/podiums/westy-podium.jpg",
-        "west highland":                   "/podiums/westy-podium.jpg",
-        "whippet":                         "/podiums/whippet-podium.jpg",
-        "yorkshire terrier":               "/podiums/yorky-podium.jpg",
-      };
+      // PODIUM_ART now lives in ./podiumArt so the share route can use the same
+      // map. See NG-SHARE-2 in that file.
+      const PODIUM_MAP = PODIUM_ART;
       img.src = PODIUM_MAP[(breed || "").toLowerCase().trim()] || "/name-podium.jpg";
       img.onload = () => {
         const W = img.width, H = img.height;

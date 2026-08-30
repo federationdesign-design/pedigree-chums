@@ -171,11 +171,6 @@ export default async function SharedNamePage({ params }: Props) {
             </div>
           )}
 
-          {data.r && (
-            <div style={{ fontSize: "0.925rem", color: "var(--navy)", lineHeight: 1.35, borderTop: "1px solid rgba(10,58,87,0.2)", paddingTop: 14, fontFamily: "var(--font-body)", textAlign: "center", fontWeight: 600 }}>
-              {data.r}
-            </div>
-          )}
         </div>
 
         <div style={{ textAlign: "center" }}>
