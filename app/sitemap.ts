@@ -11,7 +11,8 @@ import { ERA_PAGES } from "./britains-dog-history/[era]/eraConfig";
    Set NEXT_PUBLIC_SITE_URL in Vercel to the canonical domain; it falls back to
    the Vercel URL otherwise. */
 const BASE =
-  process.env.NEXT_PUBLIC_SITE_URL || "https://pedigree-chums.vercel.app";
+  // Live domain, not a vercel.app host. See lib/site.ts, NG-SHARE-3.
+  process.env.NEXT_PUBLIC_SITE_URL || "https://www.pedigreechums.co.uk";
 
 // Pages that are deliberately absent, and why:
 //   /pc-admin              the data viewer, noindexed

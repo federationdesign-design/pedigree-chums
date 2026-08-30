@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { decodeSharedPodium, type PodiumEntry } from "../../shareLink";
 import { podiumArtFor } from "../../podiumArt";
+import { SITE_URL } from "../../../../lib/site";
 
 /* NG-SHARE-2, 31 Aug 2026. The social card for a shared podium.
 
@@ -94,10 +95,11 @@ export default async function Image({ params }: { params: Promise<{ c: string }>
      Same fallback as the canvas: /name-podium.jpg covers the breeds with no art,
      currently Weimaraner, Dalmatian and Poodle. */
   const artPath = (data?.b && podiumArtFor(data.b)) || "/name-podium.jpg";
-  const base =
-    process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
-    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
-  const artUrl = `${base}${artPath}`;
+  // SITE_URL from lib/site, the one place the base URL is decided. The first
+  // version reimplemented the fallback chain here and fell through to VERCEL_URL,
+  // which is SSO-protected, so the fetch returned a login page and the card
+  // rendered half drawn. Do not reintroduce a local copy of this.
+  const artUrl = `${SITE_URL.replace(/\/$/, "")}${artPath}`;
 
   const places: PodiumEntry[] = data?.places ?? [];
 

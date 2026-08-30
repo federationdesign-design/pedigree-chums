@@ -77,7 +77,8 @@ const unica = Unica_One({
 });
 
 const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL || "https://pedigree-chums.vercel.app";
+  // Live domain, not a vercel.app host. See lib/site.ts, NG-SHARE-3.
+  process.env.NEXT_PUBLIC_SITE_URL || "https://www.pedigreechums.co.uk";
 
 const TITLE = "Pedigree Chums™ | The Dog Bingo Game";
 // Every page's <title> is page-name first, then this identical site suffix, per

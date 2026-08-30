@@ -1,7 +1,8 @@
 import type { MetadataRoute } from "next";
 
 const BASE =
-  process.env.NEXT_PUBLIC_SITE_URL || "https://pedigree-chums.vercel.app";
+  // Live domain, not a vercel.app host. See lib/site.ts, NG-SHARE-3.
+  process.env.NEXT_PUBLIC_SITE_URL || "https://www.pedigreechums.co.uk";
 
 export default function robots(): MetadataRoute.Robots {
   return {
