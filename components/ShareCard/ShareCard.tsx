@@ -178,9 +178,16 @@ export default function ShareCard(props: ShareCardProps) {
     // draws without waiting, so on some devices it renders in a fallback face
     // and nobody notices until it is in someone's feed. This is the pattern from
     // KnockoutRound, which does it correctly.
+    /* NG-FONT-1, 30 Aug 2026. Served from our own origin, not fonts.gstatic.com.
+       This canvas draws an image people put in their feed, and the old URL was a
+       third-party runtime fetch whose failure was swallowed by the .catch below,
+       so a Google outage or a blocked request rendered the card in a fallback
+       face with no error anywhere. A next/font/google build fetch already failed
+       once on 27 Jul 2026. The .ttf is in public/fonts and is also what the
+       OpenGraph image route uses, so there is one copy for both. */
     const luckiestGuy = new FontFace(
       "Luckiest Guy",
-      "url(https://fonts.gstatic.com/s/luckiestguy/v22/_gP_1RrxsjcxVyin9l9n_j2RStC3yts.woff2)"
+      "url(/fonts/LuckiestGuy-Regular.ttf)"
     );
     let dead = false;
     luckiestGuy
