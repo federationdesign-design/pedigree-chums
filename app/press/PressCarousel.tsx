@@ -9,46 +9,52 @@ import styles from "./page.module.css";
    adds only the .panel/.copy* helpers that let it fill a slide. */
 import panel from "../britains-dog-history/history.module.css";
 
-/* Press pack, /press. The online pack is 16 screens (docs/press/COPY.md, the short
-   70/30 version). Each screen is one slide: a picture (dominant) over a short,
-   verbatim copy block in the blue-fade panel. Copy is the owner's own, cut but
-   never rewritten; screens 9, 13 and 15 of the long version are PDF-only and do
-   not appear here, and sections 17-19 (A Little Deeper, Press Assets, Press
-   Enquiries) are the new tail. Every image comes from the supplied press folder.
+/* Press pack, /press. 17 screens after the screens 1-7 revision (docs/press/
+   REVISIONS.md): the old "Imaginary. Real. Tangible." screen splits into two 2x2
+   grids (new 4 and 5), which pushes everything after it down one. Screens 1 and 2
+   now overlay their copy on the picture (bottom, inset 15px) rather than below it;
+   the rest keep the picture-over-panel stack. Screen 3 is HELD pending its image
+   list, so it is unchanged. Screens 4 and 5 carry clearly-labelled placeholder
+   copy (logged in PLACEHOLDERS.md); the wording follows later.
 
-   Two screens are Vimeo clips and one is a self-hosted clip, all behind a
-   click-to-play facade: the iframe/video is kept out of the DOM until the poster
-   is tapped and unmounted again when the slide is swiped away, so a live player
-   never captures touch and fights the swipe rail.
+   Text colour is left to the site's global controls (the A/A/A contrast toolbar
+   and the text-invert toggle); no per-screen control is added.
 
-   Mechanics are the proven scroll-snap + goTo pattern (the superpower rail's React
-   model, not its dark theme), plus the net-new prev/next pair, keyboard arrows and
-   position indicator. Horizontal swipe comes free from native scroll-snap. */
+   Video screens are Vimeo or self-hosted clips behind a click-to-play facade: the
+   player is kept out of the DOM until the poster is tapped and unmounted again on
+   swipe-away, so it never fights the swipe rail.
+
+   Mechanics are the proven scroll-snap + goTo pattern, plus the net-new prev/next
+   pair, keyboard arrows and position indicator. */
 
 type Pic = { src: string; alt: string; w: number; h: number };
+type VideoMedia =
+  | { type: "vimeo"; videoId: string; poster: string; alt: string; w: number; h: number; label: string }
+  | { type: "file"; src: string; poster: string; alt: string; w: number; h: number; label: string };
 type Media =
   | { type: "image"; pic: Pic; priority?: boolean }
   | { type: "thumbs"; items: Pic[] }
+  | { type: "grid"; items: Pic[] }
   | { type: "diptych"; items: [Pic, Pic] }
-  | { type: "vimeo"; videoId: string; poster: string; alt: string; w: number; h: number; label: string }
-  | { type: "file"; src: string; poster: string; alt: string; w: number; h: number; label: string };
+  | { type: "twoCol"; images: [Pic, Pic]; video: VideoMedia }
+  | VideoMedia;
 
 type Block = { kind: "standfirst" | "body" | "display"; text: string };
-type Screen = { title?: string; media?: Media; blocks: Block[] };
+type Screen = { title?: string; media?: Media; blocks: Block[]; layout?: "overlay" };
 
 const SCREENS: Screen[] = [
-  // 1 Cover (§1). Picture: ad1d still (child with a real dog). "Cover" is a label,
-  // not copy, so no title is printed.
+  // 1 Cover. Now a Vimeo film (ad1d), image filling the slide with the copy
+  // overlaid at the bottom. "Cover" is a label, so no title is printed.
   {
+    layout: "overlay",
     media: {
-      type: "image",
-      priority: true,
-      pic: {
-        src: "/press/ad1d-still.jpg",
-        alt: "A young girl in green hugging a grey dog on grass while a woman holds it, a real-world family and dog moment.",
-        w: 750,
-        h: 1064,
-      },
+      type: "vimeo",
+      videoId: "1222451619",
+      poster: "/press/ad1d-still.jpg",
+      alt: "A young girl in green hugging a grey dog on grass while a woman holds it, a real-world family and dog moment.",
+      w: 3594,
+      h: 5100,
+      label: "the opening film",
     },
     blocks: [
       { kind: "standfirst", text: "Pedigree Chums. A Very British Game." },
@@ -59,31 +65,44 @@ const SCREENS: Screen[] = [
       { kind: "display", text: "There is no board. Britain is the board." },
     ],
   },
-  // 2 The Cards Are the Lens (§2)
+  // 2 The Card Is the Lens. Two images side by side, copy overlaid at the bottom.
   {
-    title: "The Cards Are the Lens",
+    layout: "overlay",
+    title: "The Card Is the Lens",
     media: {
-      type: "image",
-      pic: {
-        src: "/press/card-on-cartoon.jpg",
-        alt: "The illustrated Pug character card set against a painted parkland background.",
-        w: 1798,
-        h: 2500,
-      },
+      type: "diptych",
+      items: [
+        {
+          src: "/press/card-on-cartoon.jpg",
+          alt: "The illustrated Pug card against a painted parkland background.",
+          w: 1798,
+          h: 2500,
+        },
+        {
+          src: "/press/card-on-real.jpg",
+          alt: "The Pug card shown against a real grassy field.",
+          w: 4930,
+          h: 6855,
+        },
+      ],
     },
     blocks: [
-      { kind: "standfirst", text: "Look at the card. Then look up." },
       {
         kind: "body",
-        text: "A dog in the park becomes a Labrador. A dog on the train becomes a Collie.",
+        text: "Every Chum begins in the card, where illustration turns a breed into something you can imagine, recognise and play with, helping you notice, recognise and understand the dogs that were already around you.",
       },
       {
         kind: "body",
-        text: "The cards provide the structure. The real world provides the chance.",
+        text: "The card introduces the dog.\nYour imagination gives the dog character.\nThe real world brings the dog to life.",
+      },
+      {
+        kind: "body",
+        text: "The world has not changed. The way you look at it has.",
       },
     ],
   },
-  // 3 Meet Pug (§3)
+  // 3 Meet Pug. HELD unchanged pending the two-image list (revision gave
+  // card-on-real twice). Confirmed replacement copy is captured in PLACEHOLDERS.md.
   {
     title: "Meet Pug",
     media: {
@@ -103,56 +122,84 @@ const SCREENS: Screen[] = [
       },
     ],
   },
-  // 4 Imaginary. Real. Tangible. (§4). Thumbs map the four-beat cycle:
-  // imaginary (card), real (dog), tangible (figurine), imaginary again (card).
+  // 4 (new) 2x2 grid: the leaving-the-card sequence into the real world.
   {
-    title: "Imaginary. Real. Tangible.",
     media: {
-      type: "thumbs",
+      type: "grid",
       items: [
         {
-          src: "/press/card-on-real.jpg",
-          alt: "The Pug card shown against a real grassy field: imaginary.",
-          w: 4930,
-          h: 6855,
+          src: "/press/slide13.jpg",
+          alt: "The Pug card standing in a sunlit painted field, with the words Find Pug.",
+          w: 1250,
+          h: 1738,
+        },
+        {
+          src: "/press/slide14.jpg",
+          alt: "The cartoon Pug leaping out of its card into a painted sky.",
+          w: 1250,
+          h: 1738,
+        },
+        {
+          src: "/press/slide14b.jpg",
+          alt: "The cartoon Pug flying over an empty field with a person-and-dog icon.",
+          w: 1250,
+          h: 1738,
         },
         {
           src: "/press/dog-on-real.jpg",
-          alt: "A real fawn Pug standing in long grass: real.",
+          alt: "A real fawn Pug standing in long grass.",
           w: 2158,
           h: 3000,
-        },
-        {
-          src: "/press/to-pickup.jpg",
-          alt: "The blue 3D printed Pug figurine on a plain background: tangible.",
-          w: 1122,
-          h: 1402,
-        },
-        {
-          src: "/press/card-on-colour.jpg",
-          alt: "The Pug card again: imaginary once more.",
-          w: 1798,
-          h: 2500,
         },
       ],
     },
     blocks: [
-      { kind: "standfirst", text: "One Pug. Three states." },
-      {
-        kind: "body",
-        text: "Inside the card, Pug is imaginary. In the real world, Pug is real. As a figurine, Pug is tangible.",
-      },
-      { kind: "display", text: "Imaginary → Real → Tangible → Imaginary" },
+      { kind: "standfirst", text: "[ Placeholder — copy for this screen to follow ]" },
     ],
   },
-  // 5 Why Pug? (§5). Vimeo advertB.
+  // 5 (new, inserted) 2x2 grid: real Pugs to spot and photograph.
+  {
+    media: {
+      type: "grid",
+      items: [
+        {
+          src: "/press/dog-on-real.jpg",
+          alt: "A real fawn Pug standing in long grass.",
+          w: 2158,
+          h: 3000,
+        },
+        {
+          src: "/press/slide15.jpg",
+          alt: "A real fawn Pug walking through grass, tagged hashtag ChumSpot.",
+          w: 1250,
+          h: 1738,
+        },
+        {
+          src: "/press/slide16.jpg",
+          alt: "A real fawn Pug running through grass, tagged hashtag ChumSpot.",
+          w: 1250,
+          h: 1738,
+        },
+        {
+          src: "/press/cover-where-is-pug.jpg",
+          alt: "A Where Is Pug poster: the Pug card in a grassy field.",
+          w: 1250,
+          h: 1738,
+        },
+      ],
+    },
+    blocks: [
+      { kind: "standfirst", text: "[ Placeholder — copy for this screen to follow ]" },
+    ],
+  },
+  // 6 Why Pug? (was 5). Vimeo advertB with a custom frame-1 poster.
   {
     title: "Why Pug?",
     media: {
       type: "vimeo",
       videoId: "1221597431",
       poster: "/press/advertB-poster.jpg",
-      alt: "A fawn Pug walking through grass, the opening frame of the Find Pug advert.",
+      alt: "The illustrated Pug card on a painted parkland background, the opening frame of the Find Pug advert.",
       w: 1250,
       h: 1660,
       label: "the Find Pug advert",
@@ -166,7 +213,7 @@ const SCREENS: Screen[] = [
       },
     ],
   },
-  // 6 One Pug. One Prize. (§6)
+  // 7 One Pug. One Prize. (was 6). No change.
   {
     title: "One Pug. One Prize.",
     media: {
@@ -187,17 +234,35 @@ const SCREENS: Screen[] = [
       { kind: "body", text: "But first, we have another problem to solve." },
     ],
   },
-  // 7 Making Pug Tangible (§7). Vimeo make-ad (moved here; fits the making of it).
+  // 8 Making Pug Tangible. Two columns: A = the hand-drawn then artworked Pug
+  // (stacked squares), B = the make-ad 3D video as before.
   {
     title: "Making Pug Tangible",
     media: {
-      type: "vimeo",
-      videoId: "1221597430",
-      poster: "/press/make-ad-poster.jpg",
-      alt: "The Pug figurine as a grey 3D model in a sculpting program, before it is printed.",
-      w: 1440,
-      h: 1920,
-      label: "the making of the figurine",
+      type: "twoCol",
+      images: [
+        {
+          src: "/press/handdrawn-pug.jpg",
+          alt: "A rough blue-line hand drawing of the Pug character on a dark ground.",
+          w: 1254,
+          h: 1254,
+        },
+        {
+          src: "/press/artworked-pug.jpg",
+          alt: "The finished black line-art of the Pug character on a lemon background.",
+          w: 1254,
+          h: 1254,
+        },
+      ],
+      video: {
+        type: "vimeo",
+        videoId: "1221597430",
+        poster: "/press/make-ad-poster.jpg",
+        alt: "The Pug figurine as a grey 3D model in a sculpting program, before it is printed.",
+        w: 1440,
+        h: 1920,
+        label: "the making of the figurine",
+      },
     },
     blocks: [
       { kind: "standfirst", text: "From imagination into your hand." },
@@ -208,19 +273,13 @@ const SCREENS: Screen[] = [
       { kind: "body", text: "The form changes. Pug does not." },
     ],
   },
-  // 8 Find Pug (§8). Thumbs: slide2, slide4, slide6 (slide5 dropped, "collect them
-  // all" contradicts the one-of-one copy).
+  // 9 Find Pug (was 8)
   {
     title: "Find Pug",
     media: {
       type: "thumbs",
       items: [
-        {
-          src: "/press/slide2.jpg",
-          alt: "The Pug character card on a blue and yellow set.",
-          w: 1250,
-          h: 1738,
-        },
+        { src: "/press/slide2.jpg", alt: "The Pug character card on a blue and yellow set.", w: 1250, h: 1738 },
         {
           src: "/press/slide4.jpg",
           alt: "A real Pug in grass with TikTok and Instagram icons and the words When you do.",
@@ -247,24 +306,14 @@ const SCREENS: Screen[] = [
       },
     ],
   },
-  // 9 Then Pug Left (§10). Diptych: card with Pug, then blank card.
+  // 10 Then Pug Left (was 9)
   {
     title: "Then Pug Left",
     media: {
       type: "diptych",
       items: [
-        {
-          src: "/press/slide10.jpg",
-          alt: "The pre-order product scene with the Pug present on the card.",
-          w: 1250,
-          h: 1738,
-        },
-        {
-          src: "/press/slide12.jpg",
-          alt: "The same pre-order scene with the card now blank.",
-          w: 1250,
-          h: 1738,
-        },
+        { src: "/press/slide10.jpg", alt: "The pre-order product scene with the Pug present on the card.", w: 1250, h: 1738 },
+        { src: "/press/slide12.jpg", alt: "The same pre-order scene with the card now blank.", w: 1250, h: 1738 },
       ],
     },
     blocks: [
@@ -276,55 +325,26 @@ const SCREENS: Screen[] = [
       { kind: "body", text: "And now the Pug card is empty." },
     ],
   },
-  // 10 There Is Only One Pug (§11). Thumbs: the five leaving/real-Pug beats.
+  // 11 There Is Only One Pug (was 10)
   {
     title: "There Is Only One Pug",
     media: {
       type: "thumbs",
       items: [
-        {
-          src: "/press/slide13.jpg",
-          alt: "The Pug card standing in a sunlit painted field, with the words Find Pug.",
-          w: 1250,
-          h: 1738,
-        },
-        {
-          src: "/press/slide14.jpg",
-          alt: "The cartoon Pug leaping out of its card into a painted sky.",
-          w: 1250,
-          h: 1738,
-        },
-        {
-          src: "/press/slide14b.jpg",
-          alt: "The cartoon Pug flying over an empty field with a person-and-dog icon.",
-          w: 1250,
-          h: 1738,
-        },
-        {
-          src: "/press/slide15.jpg",
-          alt: "A real fawn Pug walking through grass, tagged hashtag ChumSpot.",
-          w: 1250,
-          h: 1738,
-        },
-        {
-          src: "/press/slide16.jpg",
-          alt: "A real fawn Pug running through grass, tagged hashtag ChumSpot.",
-          w: 1250,
-          h: 1738,
-        },
+        { src: "/press/slide13.jpg", alt: "The Pug card standing in a sunlit painted field, with the words Find Pug.", w: 1250, h: 1738 },
+        { src: "/press/slide14.jpg", alt: "The cartoon Pug leaping out of its card into a painted sky.", w: 1250, h: 1738 },
+        { src: "/press/slide14b.jpg", alt: "The cartoon Pug flying over an empty field with a person-and-dog icon.", w: 1250, h: 1738 },
+        { src: "/press/slide15.jpg", alt: "A real fawn Pug walking through grass, tagged hashtag ChumSpot.", w: 1250, h: 1738 },
+        { src: "/press/slide16.jpg", alt: "A real fawn Pug running through grass, tagged hashtag ChumSpot.", w: 1250, h: 1738 },
       ],
     },
     blocks: [
       { kind: "standfirst", text: "So how can any real Pug be Pug?" },
-      {
-        kind: "body",
-        text: "In Pedigree Chums, each breed is represented by one Chum.",
-      },
+      { kind: "body", text: "In Pedigree Chums, each breed is represented by one Chum." },
       { kind: "body", text: "Every real Pug you see could be a sighting of Pug." },
     ],
   },
-  // 11 Turning Imagination Into Reality (§12). Self-hosted portrait-advert (the
-  // clip displaced from screen 7).
+  // 12 Turning Imagination Into Reality (was 11). Self-hosted portrait-advert.
   {
     title: "Turning Imagination Into Reality",
     media: {
@@ -345,7 +365,7 @@ const SCREENS: Screen[] = [
       { kind: "body", text: "Then you look up and find that dog walking past you." },
     ],
   },
-  // 12 What We Have Now (§14). Empty podium.
+  // 13 What We Have Now (was 12)
   {
     title: "What We Have Now",
     media: {
@@ -366,7 +386,7 @@ const SCREENS: Screen[] = [
       { kind: "body", text: "We cannot really launch like that." },
     ],
   },
-  // 13 Help Us Find Pug (§16). Winner promo.
+  // 14 Help Us Find Pug (was 13)
   {
     title: "Help Us Find Pug",
     media: {
@@ -384,15 +404,12 @@ const SCREENS: Screen[] = [
         kind: "display",
         text: "Spot Pug. Photograph Pug. Post Pug. Tag Pedigree Chums. Use #ChumSpot.",
       },
-      {
-        kind: "body",
-        text: "One participant will receive the one-of-one physical Pug.",
-      },
+      { kind: "body", text: "One participant will receive the one-of-one physical Pug." },
       { kind: "body", text: "We really would quite like Pug back." },
       { kind: "display", text: "There is no board. Britain is the board." },
     ],
   },
-  // 14 A Little Deeper (§17). No picture assigned in the list; copy-only.
+  // 15 A Little Deeper (was 14). Copy-only.
   {
     title: "A Little Deeper",
     blocks: [
@@ -407,7 +424,7 @@ const SCREENS: Screen[] = [
       },
     ],
   },
-  // 15 Press Assets (§18). Copy-only.
+  // 16 Press Assets (was 15). Copy-only.
   {
     title: "Press Assets",
     blocks: [
@@ -422,8 +439,7 @@ const SCREENS: Screen[] = [
       },
     ],
   },
-  // 16 Press Enquiries (§19). Copy-only. The bracketed lines are owner placeholders
-  // carried verbatim from the copy file (logged in PLACEHOLDERS.md).
+  // 17 Press Enquiries (was 16). Copy-only. Bracketed lines are owner placeholders.
   {
     title: "Press Enquiries",
     blocks: [
@@ -444,7 +460,7 @@ function VideoFacade({
   media,
   active,
 }: {
-  media: Extract<Media, { type: "vimeo" | "file" }>;
+  media: VideoMedia;
   active: boolean;
 }) {
   const [playing, setPlaying] = useState(false);
@@ -533,12 +549,35 @@ function MediaView({ media, active }: { media: Media; active: boolean }) {
       </div>
     );
   }
+  if (media.type === "grid") {
+    return (
+      <div className={styles.grid2x2}>
+        {media.items.map((pic) => (
+          <Thumb key={pic.src} pic={pic} />
+        ))}
+      </div>
+    );
+  }
   if (media.type === "diptych") {
     return (
       <div className={styles.diptych}>
         {media.items.map((pic) => (
           <Thumb key={pic.src} pic={pic} />
         ))}
+      </div>
+    );
+  }
+  if (media.type === "twoCol") {
+    return (
+      <div className={styles.twoCol}>
+        <div className={styles.twoColA}>
+          {media.images.map((pic) => (
+            <Thumb key={pic.src} pic={pic} />
+          ))}
+        </div>
+        <div className={styles.twoColB}>
+          <VideoFacade media={media.video} active={active} />
+        </div>
       </div>
     );
   }
@@ -578,6 +617,16 @@ function ScreenView({ screen, active }: { screen: Screen; active: boolean }): Re
   const copy = <CopyPanel title={screen.title} blocks={screen.blocks} />;
   if (!screen.media) {
     return <div className={styles.copyOnly}>{copy}</div>;
+  }
+  if (screen.layout === "overlay") {
+    return (
+      <div className={styles.overlayScreen}>
+        <div className={styles.overlayMedia}>
+          <MediaView media={screen.media} active={active} />
+        </div>
+        <div className={styles.overlayCopy}>{copy}</div>
+      </div>
+    );
   }
   return (
     <div className={styles.screen}>

@@ -220,6 +220,82 @@
   box-shadow: 0 10px 24px rgba(10, 58, 87, 0.2);
 }
 
+/* 2x2 grid (screens 4-5): four pictures in equal cells. min-height:0 on the items
+   lets the rows shrink so the grid never overflows into the copy below. */
+.grid2x2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: clamp(8px, 2vw, 14px);
+  width: 100%;
+  height: 100%;
+  place-items: center;
+}
+.grid2x2 .thumbImg {
+  min-height: 0;
+  min-width: 0;
+}
+
+/* Two-column media (screen 8): column A is two stacked square images, column B is
+   the portrait make-ad video. Both columns fill the media height; the square
+   images split their column into equal halves and cap to it. */
+.twoCol {
+  display: flex;
+  gap: clamp(8px, 2vw, 14px);
+  width: 100%;
+  height: 100%;
+  align-items: stretch;
+  justify-content: center;
+}
+.twoColA {
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  gap: clamp(8px, 2vw, 14px);
+  flex: 1 1 0;
+  min-width: 0;
+  place-items: center;
+}
+.twoColA .thumbImg {
+  min-height: 0;
+  min-width: 0;
+}
+.twoColB {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Overlay layout (screens 1-2): the picture fills the slide and the copy panel
+   sits over its lower edge, inset 15px. New to this pack, which otherwise keeps
+   text on the panel below the picture rather than on the photography. */
+.overlayScreen {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  max-width: min(92vw, 480px);
+  margin: 0 auto;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.overlayMedia {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.overlayCopy {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 15px;
+  z-index: 2;
+}
+
 /* Panel helpers (kept): let the imported blue-fade panel fill the copy block and
    centre its content; the panel's own look, type and colour are untouched. */
 .panel {
@@ -409,6 +485,7 @@
   .media,
   .screen,
   .copyOnly,
+  .overlayScreen,
   .placeholder {
     max-width: min(72vw, 760px);
   }

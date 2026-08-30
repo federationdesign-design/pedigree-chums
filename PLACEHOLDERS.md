@@ -382,7 +382,23 @@ clearly bracketed on the page, never mistaken for real details.
 | `[WEBSITE]` `[HANDLE]` | same | Website and social handle | Owner supplies |
 | `[DATE]` (opens / closes) | same | Competition dates | Owner supplies dates |
 
-The three copy-only tail screens (17 A Little Deeper, 18 Press Assets, 19 Press
-Enquiries) also have no image assigned; parked, unused press images are available
+The copy-only tail screens (A Little Deeper, Press Assets, Press Enquiries) also
+have no image assigned; parked, unused press images are available
 (`cover-where-is-pug`, `no-dog-on-real`, `slide9`, `3d-on-podium`, `slide5`) if
 the owner wants pictures there.
+
+### Screens 4 and 5 copy (30 August, from the screens 1-7 revision)
+
+The two new 2x2-grid screens (new numbering 4 and 5, inserted where the old
+"Imaginary. Real. Tangible." screen was) carry a clearly-labelled placeholder line
+on the copy panel. Images and the 2x2 layout are wired; the copy follows later.
+
+| Placeholder | Location | Meaning | Resolve via |
+|---|---|---|---|
+| `[ Placeholder — copy for screen 4 to follow ]` | `app/press/PressCarousel.tsx` (screen 4) | 2x2 grid: slide13, slide14, slide14b, dog-on-real | Owner supplies the copy |
+| `[ Placeholder — copy for screen 5 to follow ]` | `app/press/PressCarousel.tsx` (screen 5) | 2x2 grid: dog-on-real, slide15, slide16, cover | Owner supplies the copy |
+
+Screen 3 is held pending its image list (the revision gave `card-on-real` twice);
+its confirmed copy is captured for the next pass: "There may be millions of dogs
+outside the cards. In our world, there is only one Pug. Every real Pug you see is
+the same Pug."
