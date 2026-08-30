@@ -4,6 +4,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import ReadingProgress from "../../components/ReadingProgress/ReadingProgress";
+import BentoBoard from "../../components/Nav/BentoBoard";
 import styles from "./page.module.css";
 /* The one approved container for text on a darker ground (brief section 1): the
    britains-dog-history blue-fade panel. Imported and reused as-is; the press page
@@ -32,12 +33,18 @@ type Pic = { src: string; alt: string; w: number; h: number };
 type VideoMedia =
   | { type: "vimeo"; videoId: string; poster: string; alt: string; w: number; h: number; label: string }
   | { type: "file"; src: string; poster: string; alt: string; w: number; h: number; label: string };
+/* A cell in the neat two-column grid: either an image or a video. */
+type NeatCell = { img: Pic } | { vid: VideoMedia };
 type Media =
   | { type: "image"; pic: Pic; priority?: boolean }
   | { type: "thumbs"; items: Pic[] }
   | { type: "grid"; items: Pic[] }
+  | { type: "gallery"; items: Pic[] }
   | { type: "diptych"; items: [Pic, Pic]; captions?: [string, string] }
-  | { type: "twoCol"; images: Pic[]; video: VideoMedia; neat?: boolean }
+  | { type: "pairAndRow"; pair: [Pic, Pic]; row: Pic[] }
+  | { type: "neat"; colA: NeatCell[]; colB: NeatCell[] }
+  | { type: "videoStack"; video: VideoMedia; images: [Pic, Pic] }
+  | { type: "bento" }
   | VideoMedia;
 
 type Block = { kind: "standfirst" | "body" | "display"; text: string; mont?: boolean };
@@ -54,6 +61,8 @@ type Screen = {
   mediaVariant?: "wideTop";
   /* screens 1, 6: video 20% smaller. */
   mediaShrink?: boolean;
+  /* screen 16: a text-box grid of available assets. */
+  assetGrid?: { heading: string; items: string[] }[];
 };
 
 const SCREENS: Screen[] = [
@@ -143,9 +152,23 @@ const SCREENS: Screen[] = [
       { kind: "standfirst", text: "One of 54 Chums." },
       {
         kind: "body",
-        text: "There may be millions of dogs outside the cards. In our world, there is only one Pug. Every real Pug you see is the same Pug.",
+        text: "There may be millions of Pug outside the cards. but in the chums world, there is only Pug. Every real Pug you see is the Pug.",
       },
     ],
+  },
+  // NEW (round 5, inserted after 3, before 4): Meet Pug, a video.
+  {
+    topTitle: "Meet Pug",
+    media: {
+      type: "file",
+      src: "/press/pug-run.mp4",
+      poster: "/press/pug-run-poster.jpg",
+      alt: "A film of a Pug running.",
+      w: 850,
+      h: 980,
+      label: "the Pug running film",
+    },
+    blocks: [],
   },
   // 4 (new) 2x2 grid: the leaving-the-card sequence into the real world.
   {
@@ -213,19 +236,38 @@ const SCREENS: Screen[] = [
     },
     blocks: [],
   },
-  // 6 Why Pug? (round 3): title removed from the container, video 20% smaller.
+  // 6 Why Pug? (round 5): two columns, a second video added, neat grid.
   {
     layout: "overlay",
     overlayBottom: 5,
-    mediaShrink: true,
     media: {
-      type: "vimeo",
-      videoId: "1221597431",
-      poster: "/press/advertB-poster.jpg",
-      alt: "The illustrated Pug card on a painted parkland background, the opening frame of the Find Pug advert.",
-      w: 1250,
-      h: 1660,
-      label: "the Find Pug advert",
+      type: "neat",
+      colA: [
+        {
+          vid: {
+            type: "vimeo",
+            videoId: "1221597431",
+            poster: "/press/advertB-poster.jpg",
+            alt: "The illustrated Pug card on a painted parkland background, the opening frame of the Find Pug advert.",
+            w: 1250,
+            h: 1660,
+            label: "the Find Pug advert",
+          },
+        },
+      ],
+      colB: [
+        {
+          vid: {
+            type: "file",
+            src: "/press/portrait-advert.mp4",
+            poster: "/press/portrait-advert-poster.jpg",
+            alt: "The blue Pug figurine on a yellow Pug podium, the opening frame of the portrait advert.",
+            w: 1328,
+            h: 2004,
+            label: "the portrait advert",
+          },
+        },
+      ],
     },
     blocks: [
       { kind: "standfirst", text: "We had a plan. Pug had instincts." },
@@ -243,24 +285,38 @@ const SCREENS: Screen[] = [
     overlayBottom: 5,
     topTitle: "One Pug. One Prize.",
     media: {
-      type: "twoCol",
-      images: [
+      type: "neat",
+      colA: [
         {
-          src: "/press/get-your-ticket.jpg",
-          alt: "A We Lost Pug, Find Pug free-entry ticket above the blue Pug figurine being photographed on a Pug podium.",
-          w: 1042,
-          h: 1452,
+          img: {
+            src: "/press/get-your-ticket.jpg",
+            alt: "A We Lost Pug, Find Pug free-entry ticket above the blue Pug figurine being photographed on a Pug podium.",
+            w: 1042,
+            h: 1452,
+          },
         },
       ],
-      video: {
-        type: "file",
-        src: "/press/photoshop-timesnaps.mp4",
-        poster: "/press/photoshop-timesnaps-poster.jpg",
-        alt: "A time-lapse of the Pug character being drawn and coloured in Photoshop.",
-        w: 1112,
-        h: 834,
-        label: "the Photoshop time-lapse",
-      },
+      colB: [
+        {
+          vid: {
+            type: "file",
+            src: "/press/photoshop-timesnaps.mp4",
+            poster: "/press/photoshop-timesnaps-poster.jpg",
+            alt: "A time-lapse of the Pug character being drawn and coloured in Photoshop.",
+            w: 1112,
+            h: 834,
+            label: "the Photoshop time-lapse",
+          },
+        },
+        {
+          img: {
+            src: "/press/blue-orig1.jpg",
+            alt: "The blue 3D printed Pug figurine facing forward on a plain background.",
+            w: 1449,
+            h: 1473,
+          },
+        },
+      ],
     },
     blocks: [
       { kind: "standfirst", text: "A genuine one-of-one." },
@@ -278,31 +334,38 @@ const SCREENS: Screen[] = [
     overlayBottom: 5,
     topTitle: "Making Pug Tangible.",
     media: {
-      type: "twoCol",
-      neat: true,
-      images: [
+      type: "neat",
+      colA: [
         {
-          src: "/press/handdrawn-pug.jpg",
-          alt: "A rough blue-line hand drawing of the Pug character on a dark ground.",
-          w: 1254,
-          h: 1254,
+          img: {
+            src: "/press/handdrawn-pug.jpg",
+            alt: "A rough blue-line hand drawing of the Pug character on a dark ground.",
+            w: 1254,
+            h: 1254,
+          },
         },
         {
-          src: "/press/artworked-pug.jpg",
-          alt: "The finished black line-art of the Pug character on a lemon background.",
-          w: 1254,
-          h: 1254,
+          img: {
+            src: "/press/artworked-pug.jpg",
+            alt: "The finished black line-art of the Pug character on a lemon background.",
+            w: 1254,
+            h: 1254,
+          },
         },
       ],
-      video: {
-        type: "vimeo",
-        videoId: "1221597430",
-        poster: "/press/make-ad-poster.jpg",
-        alt: "The Pug figurine as a grey 3D model in a sculpting program, before it is printed.",
-        w: 1440,
-        h: 1920,
-        label: "the making of the figurine",
-      },
+      colB: [
+        {
+          vid: {
+            type: "vimeo",
+            videoId: "1221597430",
+            poster: "/press/make-ad-poster.jpg",
+            alt: "The Pug figurine as a grey 3D model in a sculpting program, before it is printed.",
+            w: 1440,
+            h: 1920,
+            label: "the making of the figurine",
+          },
+        },
+      ],
     },
     blocks: [
       { kind: "standfirst", text: "From imagination into your hand." },
@@ -342,14 +405,33 @@ const SCREENS: Screen[] = [
       },
     ],
   },
-  // 10 Then Pug Left (round 3): title to the top.
+  // 10 Then Pug Left (round 4): full-width landscape video over two portrait images.
   {
     topTitle: "Then Pug Left.",
     media: {
-      type: "diptych",
-      items: [
-        { src: "/press/slide10.jpg", alt: "The pre-order product scene with the Pug present on the card.", w: 1250, h: 1738 },
-        { src: "/press/slide12.jpg", alt: "The same pre-order scene with the card now blank.", w: 1250, h: 1738 },
+      type: "videoStack",
+      video: {
+        type: "file",
+        src: "/press/landscape-advert.mp4",
+        poster: "/press/landscape-advert-poster.jpg",
+        alt: "A landscape advert film for the Pedigree Chums Pug.",
+        w: 1600,
+        h: 1200,
+        label: "the landscape advert",
+      },
+      images: [
+        {
+          src: "/press/slide9.jpg",
+          alt: "A presenter placing the blue Pug figurine on a Pug podium in a studio.",
+          w: 1250,
+          h: 1738,
+        },
+        {
+          src: "/press/slide19.jpg",
+          alt: "The blue Pug figurine held in an open palm on a Pug podium, with a Win Me badge.",
+          w: 1250,
+          h: 1738,
+        },
       ],
     },
     blocks: [
@@ -361,17 +443,33 @@ const SCREENS: Screen[] = [
       { kind: "body", text: "And now the Pug card is empty." },
     ],
   },
-  // 11 There Is Only One Pug (was 10)
+  // NEW (round 4, inserted after 10): There Is Only One Pug, copy from old 11.
   {
-    title: "There Is Only One Pug",
+    topTitle: "There Is Only One Pug",
     media: {
-      type: "thumbs",
-      items: [
-        { src: "/press/slide13.jpg", alt: "The Pug card standing in a sunlit painted field, with the words Find Pug.", w: 1250, h: 1738 },
-        { src: "/press/slide14.jpg", alt: "The cartoon Pug leaping out of its card into a painted sky.", w: 1250, h: 1738 },
-        { src: "/press/slide14b.jpg", alt: "The cartoon Pug flying over an empty field with a person-and-dog icon.", w: 1250, h: 1738 },
-        { src: "/press/slide15.jpg", alt: "A real fawn Pug walking through grass, tagged hashtag ChumSpot.", w: 1250, h: 1738 },
-        { src: "/press/slide16.jpg", alt: "A real fawn Pug running through grass, tagged hashtag ChumSpot.", w: 1250, h: 1738 },
+      type: "videoStack",
+      video: {
+        type: "file",
+        src: "/press/pug-escape.mp4",
+        poster: "/press/pug-escape-poster.jpg",
+        alt: "A film of the Pug escaping from the card into the real world.",
+        w: 1280,
+        h: 720,
+        label: "the Pug escape film",
+      },
+      images: [
+        {
+          src: "/press/slide6.jpg",
+          alt: "The blue Pug figurine being photographed on a Pug podium and held in a palm, with a Win Me badge.",
+          w: 1250,
+          h: 1738,
+        },
+        {
+          src: "/press/non-zoom-card-no-dog.jpg",
+          alt: "The Pug breed card with no dog on it: a blank card.",
+          w: 1250,
+          h: 1738,
+        },
       ],
     },
     blocks: [
@@ -380,17 +478,17 @@ const SCREENS: Screen[] = [
       { kind: "body", text: "Every real Pug you see could be a sighting of Pug." },
     ],
   },
-  // 12 Turning Imagination Into Reality (was 11). Self-hosted portrait-advert.
+  // (old screen 11, the 5-thumb There Is Only One Pug, removed in round 4)
+  // 12 Turning Imagination Into Reality (round 4): title to top, three-image gallery.
   {
-    title: "Turning Imagination Into Reality",
+    topTitle: "Turning Imagination Into Reality",
     media: {
-      type: "file",
-      src: "/press/portrait-advert.mp4",
-      poster: "/press/portrait-advert-poster.jpg",
-      alt: "The blue Pug figurine on a yellow Pug podium, the opening frame of the portrait advert.",
-      w: 1328,
-      h: 2004,
-      label: "the portrait advert",
+      type: "gallery",
+      items: [
+        { src: "/press/cartoon-world.jpg", alt: "The Pug in its illustrated cartoon world.", w: 1250, h: 1738 },
+        { src: "/press/no-dog-on-real.jpg", alt: "An empty real-world grassy field.", w: 1250, h: 1738 },
+        { src: "/press/slide1.jpg", alt: "A Can You Find Pug poster.", w: 1250, h: 1738 },
+      ],
     },
     blocks: [
       { kind: "standfirst", text: "This is what Pedigree Chums was designed to do." },
@@ -401,17 +499,15 @@ const SCREENS: Screen[] = [
       { kind: "body", text: "Then you look up and find that dog walking past you." },
     ],
   },
-  // 13 What We Have Now (was 12)
+  // 13 What We Have Now (round 4): title to top, two images.
   {
-    title: "What We Have Now",
+    topTitle: "What We Have Now",
     media: {
-      type: "image",
-      pic: {
-        src: "/press/no-3d-on-podium.jpg",
-        alt: "An empty yellow podium in front of blue and cream arches.",
-        w: 1798,
-        h: 2500,
-      },
+      type: "diptych",
+      items: [
+        { src: "/press/card-on-colour.jpg", alt: "The Pug character card on a blue and yellow studio set.", w: 1798, h: 2500 },
+        { src: "/press/no-3d-on-podium.jpg", alt: "An empty yellow podium in front of blue and cream arches.", w: 1798, h: 2500 },
+      ],
     },
     blocks: [
       { kind: "standfirst", text: "53 Chums and one blank card." },
@@ -422,32 +518,34 @@ const SCREENS: Screen[] = [
       { kind: "body", text: "We cannot really launch like that." },
     ],
   },
-  // 14 Help Us Find Pug (was 13)
+  // 14 Help Us Find Pug (round 4): title to top, four-image gallery, Montserrat copy.
   {
-    title: "Help Us Find Pug",
+    topTitle: "Help Us Find Pug",
     media: {
-      type: "image",
-      pic: {
-        src: "/press/winner-promo.jpg",
-        alt: "The boxed blue Pug figurine with a We Have a Winner banner.",
-        w: 1798,
-        h: 2324,
-      },
+      type: "gallery",
+      items: [
+        { src: "/press/slide1.jpg", alt: "A Can You Find Pug poster.", w: 1250, h: 1738 },
+        { src: "/press/slide2.jpg", alt: "The Pug character card on a blue and yellow set.", w: 1250, h: 1738 },
+        { src: "/press/slide4.jpg", alt: "A real Pug in grass with TikTok and Instagram icons and the words When you do.", w: 1250, h: 1738 },
+        { src: "/press/slide5.jpg", alt: "The blue Pug figurine inside a Pedigree Chums window box.", w: 1250, h: 1738 },
+      ],
     },
     blocks: [
       { kind: "standfirst", text: "Get involved." },
       {
         kind: "display",
+        mont: true,
         text: "Spot Pug. Photograph Pug. Post Pug. Tag Pedigree Chums. Use #ChumSpot.",
       },
       { kind: "body", text: "One participant will receive the one-of-one physical Pug." },
       { kind: "body", text: "We really would quite like Pug back." },
-      { kind: "display", text: "There is no board. Britain is the board." },
+      { kind: "display", mont: true, text: "There is no board. Britain is the board." },
     ],
   },
-  // 15 A Little Deeper (was 14). Copy-only.
+  // 15 A Little Deeper (round 4): title to top, the live bento menu as the media.
   {
-    title: "A Little Deeper",
+    topTitle: "A Little Deeper",
+    media: { type: "bento" },
     blocks: [
       { kind: "standfirst", text: "Dog spotting is only the beginning." },
       {
@@ -460,15 +558,16 @@ const SCREENS: Screen[] = [
       },
     ],
   },
-  // 16 Press Assets (was 15). Copy-only.
+  // 16 Press Assets (round 4): title to top, plus a text-box grid of the assets.
   {
-    title: "Press Assets",
+    topTitle: "Press Assets",
+    assetGrid: [
+      { heading: "Video", items: ["Product", "CGI", "Live action"] },
+      { heading: "Photosets", items: ["Studio", "CGI"] },
+      { heading: "Word docs", items: ["Campaign bio", "Competition terms"] },
+    ],
     blocks: [
       { kind: "standfirst", text: "Available on request." },
-      {
-        kind: "body",
-        text: "Hero films, campaign photography, the blank card, figurine photography, 3D-printing footage, logos and social artwork.",
-      },
       {
         kind: "body",
         text: "The full press release is available as a PDF and quotable in whole or in part.",
@@ -610,16 +709,75 @@ function MediaView({ media, active }: { media: Media; active: boolean }) {
       </div>
     );
   }
-  if (media.type === "twoCol") {
+  if (media.type === "neat") {
+    // Two columns, each a stack of cells (image or video). Both columns stretch to
+    // the same height and every cell cover-fills, so the block reads as one neat
+    // rectangle with aligned edges and no gaps (screens 6, 7, 8).
+    const col = (cells: NeatCell[]) => (
+      <div className={styles.neatCol}>
+        {cells.map((c, i) => (
+          <div key={i} className={styles.neatCell}>
+            {"img" in c ? <Thumb pic={c.img} /> : <VideoFacade media={c.vid} active={active} />}
+          </div>
+        ))}
+      </div>
+    );
     return (
-      <div className={media.neat ? `${styles.twoCol} ${styles.twoColNeat}` : styles.twoCol}>
-        <div className={styles.twoColA}>
+      <div className={styles.neat}>
+        {col(media.colA)}
+        {col(media.colB)}
+      </div>
+    );
+  }
+  if (media.type === "pairAndRow") {
+    // Two columns with a row of images below (screen 3).
+    return (
+      <div className={styles.pairAndRow}>
+        <div className={styles.diptych}>
+          {media.pair.map((pic, i) => (
+            <div key={`${pic.src}-${i}`} className={styles.diptychCell}>
+              <Thumb pic={pic} />
+            </div>
+          ))}
+        </div>
+        <div className={styles.gallery}>
+          {media.row.map((pic, i) => (
+            <Thumb key={`${pic.src}-${i}`} pic={pic} />
+          ))}
+        </div>
+      </div>
+    );
+  }
+  if (media.type === "gallery") {
+    return (
+      <div className={styles.gallery}>
+        {media.items.map((pic, i) => (
+          <Thumb key={`${pic.src}-${i}`} pic={pic} />
+        ))}
+      </div>
+    );
+  }
+  if (media.type === "videoStack") {
+    // Full-width landscape video over two portrait images (screens 10 and new-11).
+    return (
+      <div className={styles.videoStack}>
+        <div className={styles.videoStackTop}>
+          <VideoFacade media={media.video} active={active} />
+        </div>
+        <div className={styles.videoStackImgs}>
           {media.images.map((pic, i) => (
             <Thumb key={`${pic.src}-${i}`} pic={pic} />
           ))}
         </div>
-        <div className={styles.twoColB}>
-          <VideoFacade media={media.video} active={active} />
+      </div>
+    );
+  }
+  if (media.type === "bento") {
+    // The live bento launcher menu, scaled to fit the media area (screen 15).
+    return (
+      <div className={styles.bentoWrap}>
+        <div className={styles.bentoScale}>
+          <BentoBoard />
         </div>
       </div>
     );
@@ -629,7 +787,15 @@ function MediaView({ media, active }: { media: Media; active: boolean }) {
 
 /* The blue-fade panel with the screen's copy. glowLayer + circles are the panel's
    own decoration, reproduced exactly as the history page composes them. */
-function CopyPanel({ title, blocks }: { title?: string; blocks: Block[] }) {
+function CopyPanel({
+  title,
+  blocks,
+  assetGrid,
+}: {
+  title?: string;
+  blocks: Block[];
+  assetGrid?: { heading: string; items: string[] }[];
+}) {
   return (
     <div className={`${panel.section} ${styles.panel}`}>
       <div className={panel.glowLayer} aria-hidden="true">
@@ -653,14 +819,30 @@ function CopyPanel({ title, blocks }: { title?: string; blocks: Block[] }) {
             </p>
           );
         })}
+        {assetGrid ? (
+          <div className={styles.assetGrid}>
+            {assetGrid.map((g, i) => (
+              <div key={i} className={styles.assetBox}>
+                <p className={styles.assetHeading}>{g.heading}</p>
+                {g.items.map((it, j) => (
+                  <p key={j} className={styles.assetItem}>
+                    {it}
+                  </p>
+                ))}
+              </div>
+            ))}
+          </div>
+        ) : null}
       </div>
     </div>
   );
 }
 
 function ScreenView({ screen, active }: { screen: Screen; active: boolean }): ReactNode {
-  const hasCopy = screen.blocks.length > 0;
-  const copy = hasCopy ? <CopyPanel title={screen.title} blocks={screen.blocks} /> : null;
+  const hasCopy = screen.blocks.length > 0 || !!screen.assetGrid;
+  const copy = hasCopy ? (
+    <CopyPanel title={screen.title} blocks={screen.blocks} assetGrid={screen.assetGrid} />
+  ) : null;
   const titleEl = screen.topTitle ? (
     <p className={styles.screenTitle}>{screen.topTitle}</p>
   ) : null;
@@ -676,7 +858,7 @@ function ScreenView({ screen, active }: { screen: Screen; active: boolean }): Re
   }
   if (screen.layout === "overlay") {
     const variant =
-      screen.media.type === "twoCol"
+      screen.media.type === "neat"
         ? ` ${styles.overlayMediaTwoCol}`
         : screen.mediaVariant === "wideTop"
           ? ` ${styles.overlayMediaWideTop}`

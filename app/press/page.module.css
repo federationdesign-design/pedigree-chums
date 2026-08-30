@@ -54,9 +54,10 @@
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  /* Top clears the fixed Nav plus the top-of-page progress bar and colour toggle;
-     the bottom is small now the indicator has moved up, so the copy biases low. */
-  padding: clamp(104px, 16vh, 144px) 16px clamp(24px, 5vh, 44px);
+  /* Top clears the fixed Nav and the counter; the counter and yellow screen title
+     sit lower (global round), so the top padding grows. Bottom stays small so the
+     copy biases low. */
+  padding: clamp(124px, 19vh, 168px) 16px clamp(24px, 5vh, 44px);
 }
 
 /* Media slide: a single image or the video facade, centred and contained so
@@ -172,7 +173,8 @@
   max-width: var(--media-max);
   margin: 0 auto;
   display: flex;
-  align-items: center;
+  /* Global round: image block sits high, just under the title. */
+  align-items: flex-start;
   justify-content: center;
 }
 /* The text container is wider than the media (40%, owner round 2). */
@@ -218,7 +220,8 @@
   gap: 10px; /* round 3: 10px gutter */
   width: 100%;
   height: 100%;
-  align-items: center;
+  /* Images top-align so the caption overlays the picture, not the gap above it. */
+  align-items: start;
   justify-items: center;
 }
 .thumbImg {
@@ -318,7 +321,7 @@
   max-width: var(--media-max);
   margin: 0 auto;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
 }
 /* Screen 2: images 30% wider and pushed up to the top of the slide. */
@@ -446,7 +449,7 @@
   height: 100%;
   min-width: 0;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
 }
 .imgCaption {
@@ -466,6 +469,162 @@
 /* Screens 1, 6: video 20% smaller. Comes after the media rules so it wins. */
 .mediaShrink {
   max-width: calc(var(--media-max) * 0.8);
+}
+
+/* ---- neat two-column grid (screens 6, 7, 8) ----------------------------- */
+/* Both columns stretch to the same height; every cell cover-fills. The fix at the
+   cause: the video's aspect-ratio is neutralised here (aspect-ratio:auto) so it no
+   longer imposes its own height and drives the columns out of alignment. */
+.neat {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  height: 100%;
+  align-items: stretch;
+}
+.neatCol {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.neatCell {
+  flex: 1 1 0;
+  min-height: 0;
+  position: relative;
+  overflow: hidden;
+  border-radius: 14px;
+  box-shadow: 0 10px 24px rgba(10, 58, 87, 0.2);
+}
+.neatCell .thumbImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  max-width: none;
+  max-height: none;
+  border-radius: 0;
+  box-shadow: none;
+}
+.neatCell .videoBox {
+  width: 100%;
+  height: 100%;
+  max-height: none;
+  aspect-ratio: auto;
+  border-radius: 0;
+  box-shadow: none;
+}
+.neatCell .videoPoster {
+  object-fit: cover;
+}
+
+/* Gallery: a row of images (screens 12, 14). */
+.gallery {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+}
+.gallery .thumbImg {
+  flex: 1 1 0;
+  min-width: 0;
+  height: auto;
+  max-height: 100%;
+}
+
+/* Video stack: a full-width landscape video over two portrait images (screens 10,
+   11). */
+.videoStack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  height: 100%;
+}
+.videoStackTop {
+  flex: 0 1 auto;
+  min-height: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+.videoStackTop .videoBox {
+  width: 100%;
+  height: auto;
+  max-height: 44vh;
+}
+.videoStackImgs {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.videoStackImgs .thumbImg {
+  min-width: 0;
+  min-height: 0;
+}
+
+/* Pair + row (screen 3): two images over a row of images below. */
+.pairAndRow {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  height: 100%;
+}
+.pairAndRow .diptych {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+.pairAndRow .gallery {
+  flex: 0 0 auto;
+  height: 22%;
+}
+
+/* Bento: the live launcher menu, scaled down to fit the media area (screen 15). */
+.bentoWrap {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+.bentoScale {
+  width: 154%;
+  transform: scale(0.65);
+  transform-origin: top center;
+}
+
+/* Asset grid (screen 16): text boxes of the available assets. */
+.assetGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: clamp(8px, 1.6vh, 14px);
+  text-align: left;
+}
+.assetBox {
+  border: 2px solid var(--white, #ffffff);
+  border-radius: 12px;
+  padding: 8px 6px;
+}
+.assetHeading {
+  margin: 0 0 4px;
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: clamp(0.9rem, 3vw, 1.15rem);
+  line-height: 1.05;
+  color: var(--yellow-header, #ffed00);
+}
+.assetItem {
+  margin: 0;
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: clamp(0.78rem, 2.5vw, 0.95rem);
+  line-height: 1.25;
+  color: var(--press-copy, #ffffff);
 }
 
 /* Placeholder frame: a light card that fills the slide so the pacing reads like
@@ -530,7 +689,8 @@
   border: none;
   background: transparent;
   color: var(--cream, #ffffff);
-  font-size: clamp(3.4rem, 10vw, 5.4rem);
+  /* Global round: roughly double the previous size. */
+  font-size: clamp(6.5rem, 20vw, 10rem);
   line-height: 1;
   display: flex;
   align-items: center;
@@ -562,7 +722,7 @@
   position: absolute;
   left: 0;
   right: 0;
-  top: clamp(58px, 9vh, 82px);
+  top: clamp(74px, 11vh, 100px);
   z-index: 6;
   display: flex;
   flex-direction: column;
