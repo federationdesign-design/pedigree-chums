@@ -789,7 +789,11 @@
     --copy-max: min(96vw, 1064px);
   }
   .slide {
-    padding: clamp(112px, 16vh, 152px) 24px clamp(28px, 5vh, 48px);
+    /* Desktop only widens the side padding; the top/bottom rhythm is the
+       global-round base (top clamp(124px, 19vh, 168px), bottom clamp(24px, 5vh,
+       44px)). Restating those here would just re-strand them on the next round. */
+    padding-left: 24px;
+    padding-right: 24px;
   }
   .media,
   .placeholder {
@@ -804,11 +808,8 @@
   .slideRole {
     font-size: 1.25rem;
   }
-  .arrow {
-    width: 60px;
-    height: 60px;
-    font-size: 2.3rem;
-  }
+  /* No desktop .arrow size override: the global-round base clamp (line 693)
+     is the intended chevron size at every width. Only the edge insets differ. */
   .prev {
     left: clamp(16px, 4vw, 48px);
   }
