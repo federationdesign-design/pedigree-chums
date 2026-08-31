@@ -606,7 +606,9 @@
   gap: 10px;
   width: 100%;
   height: 100%;
-  align-items: center;
+  /* Round 13: top-align like .diptych (align-items:start) so the gallery's images share
+     the same top as the two-image slides, rather than centring 59px lower. */
+  align-items: flex-start;
   justify-content: center;
 }
 .gallery .thumbImg {
