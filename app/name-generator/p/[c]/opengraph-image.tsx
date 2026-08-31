@@ -24,11 +24,17 @@ import { SITE_URL } from "../../../../lib/site";
    the server with no canvas at all. If the artwork is ever re-cut, BOTH need
    updating.
 
-   Fitting 1254x1006 (1.25:1) into 1200x630 (1.91:1): the image is drawn at full
-   width and the overflow is clipped equally top and bottom. That loses 333px of
-   the 963 scaled height, but all three placards sit between y=527 and y=779 in
-   source coordinates, well inside the kept band of 174 to 832, so nothing that
-   carries a name is cut. Letterboxing instead would waste 415px of a 1200px card.
+   Fitting 1254x1006 (1.25:1) into 1200x630 (1.91:1). The first attempt drew the
+   art at full width and clipped 166px off each end. The placard TEXT survived
+   that, but the placards sit low in the artwork and their wrapped second lines
+   did not, and the dog was cut through the middle. Steve saw a card that "cuts
+   off", and he was right.
+
+   So the whole picture is shown instead: scaled to fit the 630 height, which
+   makes it 785 wide, centred, with the remaining 207px each side filled in the
+   artwork's own background blue. That colour is sampled from the podium jpgs,
+   which are #0145b2 at the left edge and #0145b0 at the right, so the bands read
+   as part of the picture rather than as letterboxing.
 
    Satori renders this. Flexbox only, every multi-child div needs an explicit
    display:flex, and there is no ctx.measureText, so the shrink-to-fit below is
@@ -40,8 +46,11 @@ export const alt = "A dog name podium from Pedigree Chums";
 
 const SRC_W = 1254;
 const SRC_H = 1006;
-const SCALE = size.width / SRC_W;                    // 0.957
-const OFFSET_Y = (SRC_H * SCALE - size.height) / 2;  // 166.5, clipped top and bottom
+const SCALE = size.height / SRC_H;                   // 0.626, fit the height
+const ART_W = Math.round(SRC_W * SCALE);             // 785
+const OFFSET_X = Math.round((size.width - ART_W) / 2); // 207 each side
+// Sampled from the podium artwork's own edges, so the side bands are invisible.
+const ART_BLUE = "#0145b1";
 
 // Placard geometry, mirroring KnockoutRound.tsx line 517.
 const PLACARDS = [
@@ -112,7 +121,7 @@ export default async function Image({ params }: { params: Promise<{ c: string }>
           display: "flex",
           position: "relative",
           overflow: "hidden",
-          background: "#0b78bd",
+          background: ART_BLUE,
         }}
       >
         {artUrl ? (
@@ -120,9 +129,9 @@ export default async function Image({ params }: { params: Promise<{ c: string }>
           <img
             src={artUrl}
             alt=""
-            width={size.width}
-            height={Math.round(SRC_H * SCALE)}
-            style={{ position: "absolute", left: 0, top: -OFFSET_Y }}
+            width={ART_W}
+            height={size.height}
+            style={{ position: "absolute", left: OFFSET_X, top: 0 }}
           />
         ) : null}
 
@@ -138,8 +147,8 @@ export default async function Image({ params }: { params: Promise<{ c: string }>
               key={p.f + i}
               style={{
                 position: "absolute",
-                left: g.x * SCALE - maxW / 2,
-                top: g.y * SCALE - OFFSET_Y - (g.nick * SCALE) / 2 - (fullName ? fs : 0),
+                left: OFFSET_X + g.x * SCALE - maxW / 2,
+                top: g.y * SCALE - (g.nick * SCALE) / 2 - (fullName ? fs : 0),
                 width: maxW,
                 display: "flex",
                 flexDirection: "column",
@@ -161,6 +170,15 @@ export default async function Image({ params }: { params: Promise<{ c: string }>
         })}
       </div>
     ),
-    { ...size, fonts }
+    {
+      ...size,
+      fonts,
+      /* Cache hard. The card is fully determined by the URL, so it never needs
+         rebuilding. Before this every view was x-vercel-cache: MISS, so a 757KB
+         PNG was rasterised from scratch each time, streamed chunked, and painted
+         top down in the browser: it looked like a half-loaded image. Social
+         crawlers hit it repeatedly too. NG-SHARE-4, 31 Aug 2026. */
+      headers: { "cache-control": "public, max-age=31536000, immutable" },
+    }
   );
 }
