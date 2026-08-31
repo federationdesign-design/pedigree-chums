@@ -359,12 +359,10 @@
   /* 31 Aug 2026, second pass: +20px right of the old 8px. Third pass, same day:
      +20px again, so 28 becomes 48. Fourth pass: +20px again, so 48 becomes 68. */
   left: 68px;
-  /* The head row is the drag handle and the body still scrolls. .asideDocked sets
-     touch-action: pinch-zoom on this element, which blocks panning, so the two are
-     set explicitly here: none on the head so a drag is never stolen by the browser,
-     pan-y on the box so the write-up can still be scrolled. Pair them with
-     sheetDown's `.cHead` test in BreedTree.tsx. */
-  touch-action: pan-y;
+  /* The WHOLE box is the drag handle now, so the browser must never claim the
+     gesture. .asideDocked sets pinch-zoom here, which is overridden. Nothing inside
+     scrolls any more, so there is no pan to preserve. */
+  touch-action: none;
   /* Width is now explicit rather than an inset pair. The old rule anchored the
      right edge at calc(2 * clamp(38px, 7.5vw, 56px) + 58px) to clear the chum rail;
      that expression survives below as the BASE of the width sum, so the 20% is
@@ -393,13 +391,15 @@
      only, so it does nothing at the widths where the sum already fits. It replaces
      `max-width: none`, whose job was to beat .aside's 460px; a calc() beats that too. */
   max-width: calc(100vw - 76px);
-  /* THE HEIGHT DIAL. The pit is no longer shrunk to make room, so this only
-     decides how much of the diagram the box covers and how soon it scrolls. */
-  max-height: 38vh;
-  overflow-y: auto;
-  overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
-  cursor: default;
+  /* NO SCROLLBAR, 31 Aug 2026. This was max-height: 38vh with overflow-y: auto,
+     which put a scrollbar on the box and cut the write-up mid-sentence. The box now
+     SIZES TO ITS CONTENT: the write-up always shows in full, and everything from the
+     dividing line down folds behind a "..." (BreakFold in BreedTree.tsx) so the box
+     cannot grow without limit. overflow is visible rather than merely unset, on
+     purpose: the chum rail and the zoom-out button are DOM children of this element
+     and were being clipped to it, which is why the zoom-out only appeared where the
+     box happened to cover it. */
+  overflow: visible;
   /* All four corners: it floats clear of every screen edge now. */
   border-radius: 14px;
   z-index: 16;
@@ -556,16 +556,15 @@
   gap: 12px;
   margin-bottom: 10px;
 }
-/* PHONE: the head row is the box's drag handle (31 Aug 2026). touch-action: none so
-   the browser never claims the gesture as a scroll, which on a touch screen is the
-   same movement. The body keeps pan-y, so the write-up still scrolls. Desktop drags
-   from anywhere on the box and is untouched. */
+/* PHONE: the box drags from anywhere, so the grab cursor sits on the whole sheet
+   rather than the head row. It was head-only for one afternoon on 31 Aug 2026, while
+   the box still scrolled its write-up; that scroll is gone, so the restriction went
+   with it. touch-action lives on .asideSheet itself. */
 @media (max-width: 640px) {
-  .asideSheet .cHead {
-    touch-action: none;
+  .asideSheet {
     cursor: grab;
   }
-  .asideSheet .cHead:active {
+  .asideSheet:active {
     cursor: grabbing;
   }
 }

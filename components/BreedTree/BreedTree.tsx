@@ -69,6 +69,31 @@ function BreakNote() {
   );
 }
 
+// PHONE ONLY: everything from the dividing line down, folded behind a "...".
+// Added 31 Aug 2026 together with dropping the sheet's max-height and scroll. The
+// box now sizes to its content, so the write-up has to be allowed to show in full
+// and the figures block has to be allowed to get out of the way. The divider still
+// draws while folded, so the "..." reads as "there is more under this line".
+// Mount it with a key that changes with the shown dog, like BreakNote, so it folds
+// again every time rather than remembering.
+function BreakFold({ folded, children }: { folded: boolean; children: React.ReactNode }) {
+  const [open, setOpen] = useState(false);
+  if (!folded || open) return <>{children}</>;
+  return (
+    <div className={styles.cBreak}>
+      <button
+        type="button"
+        className={styles.cNoteDots}
+        onClick={() => setOpen(true)}
+        aria-expanded={false}
+        aria-label="Show the influence figures"
+      >
+        ...
+      </button>
+    </div>
+  );
+}
+
 // A small pie of one share, drawn at the same diameter as the head portrait.
 // Yellow slice on navy. A share under 1% still gets a visible sliver rather
 // than nothing: the wedge is floored at about two degrees.
@@ -1825,14 +1850,15 @@ export default function BreedTree({
      re-render, and this box re-renders on every hover in the pit behind it. */
   const [sheetPos, setSheetPos] = useState<{ left: number; bottom: number } | null>(null);
   const sheetDrag = useRef<{ sx: number; sy: number; ol: number; ob: number; w: number; h: number } | null>(null);
-  // Drag by the HEAD ROW only, not the whole box. The body scrolls, and on a touch
-  // screen a drag and a scroll are the same gesture, so one of them has to own it.
-  // The head is the handle; the body keeps its scroll (see the touch-action pair in
-  // the CSS). A press on a button inside the head still reaches the button.
+  // The WHOLE box is the handle. It was the head row only, because the box scrolled
+  // its write-up and on a touch screen a drag and a scroll are the same gesture, so
+  // one had to own it. The sheet no longer scrolls (max-height and overflow are gone,
+  // the figures block folds behind a "..." instead), so there is no scroll left to
+  // protect and the box drags from anywhere, as it does on desktop.
+  // Presses on the chum rail never arrive here: railDown stops propagation itself.
   const sheetDown = (e: React.PointerEvent) => {
     const t = e.target as HTMLElement;
     if (t.closest("button, a, input, select, textarea")) return;
-    if (!t.closest(`.${styles.cHead}`)) return;
     const el = asideRef.current;
     if (!el) return;
     const r = el.getBoundingClientRect();
@@ -7661,29 +7687,33 @@ export default function BreedTree({
               the breed's share of this whole dog, its share in the role it sits
               in, and the same best-guess caveat. Only when a circle is picked. */}
           {!ancestryFor && dockAside && shown.parent && shownNorm !== null && (
-            <div className={styles.cBreak}>
-              <div className={styles.cBreakBig}>{shownNorm < 1 ? "<1%" : `${shownNorm}%`} historical influence</div>
-              <div className={styles.cBreakRow}>As {genLabel(shown.depth)}: {shownShare === null ? "" : shownShare < 1 ? "<1%" : `${shownShare}%`}</div>
-              <div className={styles.cBreakRow}>Share of this dog: {shownNorm < 1 ? "<1%" : `${shownNorm}%`}</div>
-              <div className={styles.cBreakTitle}>Our best guess, not hard science.</div>
-              <BreakNote key={`${hideCaption ? "shut" : "open"}|${shown.data.name}`} />
-            </div>
+            <BreakFold folded={isMobile} key={`fold|${hideCaption ? "shut" : "open"}|${shown.data.name}`}>
+              <div className={styles.cBreak}>
+                <div className={styles.cBreakBig}>{shownNorm < 1 ? "<1%" : `${shownNorm}%`} historical influence</div>
+                <div className={styles.cBreakRow}>As {genLabel(shown.depth)}: {shownShare === null ? "" : shownShare < 1 ? "<1%" : `${shownShare}%`}</div>
+                <div className={styles.cBreakRow}>Share of this dog: {shownNorm < 1 ? "<1%" : `${shownNorm}%`}</div>
+                <div className={styles.cBreakTitle}>Our best guess, not hard science.</div>
+                <BreakNote key={`${hideCaption ? "shut" : "open"}|${shown.data.name}`} />
+              </div>
+            </BreakFold>
           )}
           {/* Chum picked: how much of that pack dog traces to the level circle
               currently shown, from its own ancestry breakdown. */}
           {ancestryFor && dockAside && shown !== nodes[0] && (() => {
             const share = ancestorShareOf(ancestryFor.name, shown.data.name);
             return share !== null ? (
-              <div className={styles.cBreak}>
-                <div className={styles.cBreakBigRow}>
-                  <div className={styles.cBreakBig}>
-                    {ancestryFor.name} is <span className={styles.cPct}>{share < 1 ? "<1%" : `${share}%`}</span> {shown.data.name}
+              <BreakFold folded={isMobile} key={`fold|${hideCaption ? "shut" : "open"}|${ancestryFor.name}|${shown.data.name}`}>
+                <div className={styles.cBreak}>
+                  <div className={styles.cBreakBigRow}>
+                    <div className={styles.cBreakBig}>
+                      {ancestryFor.name} is <span className={styles.cPct}>{share < 1 ? "<1%" : `${share}%`}</span> {shown.data.name}
+                    </div>
+                    <SharePie pct={share} />
                   </div>
-                  <SharePie pct={share} />
+                  <div className={styles.cBreakTitle}>Our best guess, not hard science.</div>
+                  <BreakNote key={`${hideCaption ? "shut" : "open"}|${ancestryFor.name}|${shown.data.name}`} />
                 </div>
-                <div className={styles.cBreakTitle}>Our best guess, not hard science.</div>
-                <BreakNote key={`${hideCaption ? "shut" : "open"}|${ancestryFor.name}|${shown.data.name}`} />
-              </div>
+              </BreakFold>
             ) : null;
           })()}
           {/* Related pack dogs, part of the box: they open and close with it
