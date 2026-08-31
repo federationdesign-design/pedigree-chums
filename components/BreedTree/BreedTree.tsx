@@ -3511,7 +3511,7 @@ export default function BreedTree({
       if (focusRef.current !== nodes[0]) return; // user already exploring
       const Matter = (await import("matter-js")) as any; // pit convention: dynamic, untyped
       if (fellRef.current || focusRef.current !== nodes[0]) return; // re-check across the await
-      const { Engine, Bodies, Body: MBody, Composite, Events, Mouse, MouseConstraint } = Matter;
+      const { Engine, Bodies, Body: MBody, Composite, Events, Mouse, MouseConstraint, Sleeping } = Matter;
       fellRef.current = true;
       setFalling(true);
       setDropped(true); // names disappear, physics badges appear
@@ -3598,9 +3598,28 @@ export default function BreedTree({
       badgeBodiesRef.current = badges;
 
       // ---- Matter world ----
-      const engine = Engine.create();
+      /* SLEEPING IS ON (2026-08-31). A settled body stops being solved until
+         something touches it. Measured headless at 46 bodies, this cuts
+         Engine.update cost by about 68% over the first ten seconds of a round
+         and about 88% over thirty, because most of the pit is at rest for most
+         of a round. Nothing else in this file changes: the fixed-timestep loop
+         already parks itself after twelve still frames, so this is about the
+         cost of the frames BEFORE the pit settles, which are the expensive
+         ones.
+         To revert, set this back to Engine.create(). Leave wakeBody and its
+         call sites in place: they are correct either way. */
+      const engine = Engine.create({ enableSleeping: true });
       engine.gravity.y = 1; // pit verbatim
       const world = engine.world;
+      /* THE CATCH, and the reason wakeBody exists. Matter wakes a body by
+         itself on a collision, on a constraint (so MouseConstraint is covered)
+         and when a force is applied (so the blast is covered). It does NOT wake
+         on setPosition, setVelocity, setAngularVelocity, setAngle or setStatic.
+         Measured 2026-08-31: a sleeping body given setPosition stays exactly
+         where it was and never falls, and one given setVelocity reports the new
+         speed while not moving at all. Every place in this file that drives a
+         body by hand therefore wakes it first. */
+      const wakeBody = (mb: unknown) => { if (mb) Sleeping.set(mb as never, false); };
       const CIRCLE_OPTS = { restitution: 0.78, friction: 0.1, frictionAir: 0.01, density: 0.001 }; // tennis-ball lively floor bounce
       // The freed dog circles use these instead of CIRCLE_OPTS. Job A frees every
       // circle at the drop, up to about 50 a level where it used to be 2 to 4, and
@@ -4752,11 +4771,13 @@ export default function BreedTree({
               u.hits += 1;
               if (u.hits >= 5) {
                 u.fixed = false;
+                wakeBody(u.mb); // a fixed square is static, and a static body sleeps
                 MBody.setStatic(u.mb, false);
                 MBody.setAngularVelocity(u.mb, (Math.random() - 0.5) * 2 / 60);
               } else {
                 u.y += 12 * uppW; // sink a notch and tip
                 u.a += 0.09;
+                wakeBody(u.mb);
                 MBody.setPosition(u.mb, pxFromWorld(u.x, u.y));
                 MBody.setAngle(u.mb, u.a);
               }
@@ -4899,6 +4920,7 @@ export default function BreedTree({
           const d: any = dragRef.current;
           const db: any = d && d.body;
           if (db && db.mb && db.mbIn) {
+            wakeBody(db.mb); // grabbing a settled body must not leave it asleep
             MBody.setPosition(db.mb, pxFromWorld(db.x, db.y));
             MBody.setVelocity(db.mb, { x: (db.vx * pxPerWorld) / 60, y: (db.vy * pxPerWorld) / 60 });
           }
@@ -4927,6 +4949,7 @@ export default function BreedTree({
             if (mb.isStatic) continue;
             if (mb.position.y <= escapeY) continue;
             const backX = pL.x + 30 + Math.random() * Math.max(1, wPx - 60);
+            wakeBody(mb); // or it hangs where it was put and never falls back
             MBody.setPosition(mb as never, { x: backX, y: pTop.y - 40 });
             MBody.setVelocity(mb as never, { x: 0, y: 0 });
             MBody.setAngularVelocity(mb as never, 0);
@@ -4949,6 +4972,7 @@ export default function BreedTree({
             // obstacle that objects fall around. detonate and killChained both
             // set `blown`, so this one guard covers both. Inert badges never set
             // `blown`, so they still keep their bodies here, which is correct.
+            wakeBody(b.mb); // released asleep, it would freeze in mid air
             MBody.setPosition(b.mb, pxFromWorld(b.x, b.y));
             MBody.setVelocity(b.mb, { x: 0, y: 0 });
             Composite.add(world, b.mb);
@@ -5011,6 +5035,7 @@ export default function BreedTree({
               pr.vx = (pr.mb.velocity.x * 60) / pxPerWorld;
               pr.vy = (pr.mb.velocity.y * 60) / pxPerWorld;
             } else {
+              wakeBody(pr.mb);
               MBody.setPosition(pr.mb, pxFromWorld(pr.x, pr.y));
               MBody.setVelocity(pr.mb, { x: (pr.vx * pxPerWorld) / 60, y: (pr.vy * pxPerWorld) / 60 });
             }
@@ -5027,6 +5052,7 @@ export default function BreedTree({
               u.vx = (u.mb.velocity.x * 60) / pxPerWorld;
               u.vy = (u.mb.velocity.y * 60) / pxPerWorld;
             } else {
+              wakeBody(u.mb);
               MBody.setPosition(u.mb, pxFromWorld(u.x, u.y));
               MBody.setVelocity(u.mb, { x: (u.vx * pxPerWorld) / 60, y: (u.vy * pxPerWorld) / 60 });
             }
@@ -5078,15 +5104,20 @@ export default function BreedTree({
       fullPollRef.current = window.setTimeout(fullPoll, FULL_POLL_MS);
       // Shake: pit-style jolt of everything in the mini pit (pit velocities, verbatim px/step).
       shakeInnerRef.current = () => {
+        // A shake almost always lands on a pit that has come to rest, which is
+        // exactly the state where every body is asleep, so each one is woken
+        // before it is jolted or the jolt does nothing at all.
         for (const b of all) if (b.mb && b.mbIn && !b.held) {
+          wakeBody(b.mb);
           MBody.setVelocity(b.mb, { x: (Math.random() - 0.5) * 18, y: -(8 + Math.random() * 14) });
         }
         const uu = uiBodiesRef.current as any[] | null;
         if (uu) for (const u of uu) if (!u.fixed && u.mb) {
+          wakeBody(u.mb);
           MBody.setVelocity(u.mb, { x: (Math.random() - 0.5) * 16, y: -(7 + Math.random() * 12) });
         }
         for (const list of [rodBodiesRef.current, pillBodiesRef.current, toyBodiesRef.current, chumBodiesRef.current]) {
-          for (const pr of list) if (!pr.dead && pr.mb) MBody.setVelocity(pr.mb, { x: (Math.random() - 0.5) * 16, y: -(7 + Math.random() * 12) });
+          for (const pr of list) if (!pr.dead && pr.mb) { wakeBody(pr.mb); MBody.setVelocity(pr.mb, { x: (Math.random() - 0.5) * 16, y: -(7 + Math.random() * 12) }); }
         }
         wake();
       };
@@ -5149,7 +5180,7 @@ export default function BreedTree({
               if (dt > 0) {
                 const vx = (((last.x - old.x) / dt) / 60) * FLICK_SCALE;
                 const vy = (((last.y - old.y) / dt) / 60) * FLICK_SCALE;
-                if (Math.hypot(vx, vy) >= FLICK_FLOOR) MBody.setVelocity(b as never, { x: vx, y: vy });
+                if (Math.hypot(vx, vy) >= FLICK_FLOOR) { wakeBody(b); MBody.setVelocity(b as never, { x: vx, y: vy }); }
               }
             }
           }
