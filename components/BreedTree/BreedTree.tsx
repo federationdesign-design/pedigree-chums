@@ -5544,6 +5544,74 @@ export default function BreedTree({
         };
         Events.on(mc, "enddrag", onEndDrag);
         mcReleaseRef.current = () => { mc.constraint.bodyB = null; mc.body = null; mouse.button = -1; };
+
+        /* ---- THE LOGO AND BONE FUSE ----------------------------------------
+           Ported from the main pit's onFuseMagnet, PackPit.tsx:1018. Owner
+           asked for it once the logo destruction was done, and it is.
+
+           IT CANNOT FIRE UNTIL THE LOGO HAS FALLEN. The main pit bails while
+           its logo is still static; here the same test is `fixed`, which the
+           hit block clears on the fifth knock. So the sequence is: knock the
+           logo five times, it tumbles into the pile, and only then will a bone
+           dragged onto it fuse.
+
+           ONE DIRECTION, NOT TWO. The main pit lets you drag either the logo or
+           the bone. Here only the bone is draggable: MC_KINDS above does not
+           include the UI bodies, and the logo is rendered with pointer events
+           off so it can never swallow a tap meant for a dog. Dragging the bone
+           is the whole interaction.
+
+           Distances are the main pit's own figures in the same space, client
+           pixels, so they are copied verbatim. They are TIGHT: 40px to feel the
+           pull and 12px to snap. If it turns out to be fiddly on a phone, this
+           pair is what to open up, not the pull strength. */
+        const FUSE_MAGNET_RADIUS = 40;
+        const FUSE_SNAP_DIST = 12;
+        const FUSE_PULL = 0.00005;
+        const FUSE_POINTS = 2000;
+        let fused = false;
+        const onFuseMagnet = () => {
+          if (fused) return;
+          const lu = uiBodiesRef.current?.find((u) => u.kind === "logo") as (UiBody & { mb?: { position: { x: number; y: number }; mass: number } }) | undefined;
+          // still fixed means it has not been knocked loose yet
+          if (!lu || lu.fixed || !lu.mb || lu.mbIn === false) return;
+          const held = mc.body as { position: { x: number; y: number }; plugin?: { prop?: { toyKind?: string; dead?: boolean } } } | null;
+          if (!held || held.plugin?.prop?.toyKind !== "bone" || held.plugin?.prop?.dead) return;
+          const lb = lu.mb;
+          const tx = held.position.x - lb.position.x, ty = held.position.y - lb.position.y;
+          const dist = Math.hypot(tx, ty);
+          if (dist > FUSE_MAGNET_RADIUS || dist < 1) return;
+          // The HELD body is the one you are steering, so the pull is applied to
+          // the other one: the logo comes to the bone, not the other way round.
+          const f = FUSE_PULL * (FUSE_MAGNET_RADIUS - dist);
+          MBody.applyForce(lb, lb.position, { x: (tx / dist) * f * lb.mass, y: (ty / dist) * f * lb.mass });
+          if (dist > FUSE_SNAP_DIST) return;
+          fused = true;
+          // Snap the bone onto the logo and stop both dead, the main pit's own
+          // order of operations.
+          MBody.setPosition(held as never, { x: lb.position.x, y: lb.position.y });
+          MBody.setVelocity(held as never, { x: 0, y: 0 });
+          MBody.setAngularVelocity(held as never, 0);
+          mcReleaseRef.current?.(); // let go, or the constraint drags the fused bone away
+          const w = worldFromPx(lb.position.x, lb.position.y);
+          const now = performance.now();
+          /* THE MAIN PIT'S GOO IS NINE SOFT BLOBS ON A CANVAS. There is no
+             canvas here, so this uses the pit's OWN pop, whackAt, three times
+             for nine white circles that drift and fade. Existing, in style, and
+             it costs no new effects system. */
+          whackAt(w.x, w.y, now);
+          whackAt(w.x, w.y, now);
+          whackAt(w.x, w.y, now);
+          numAt(w.x, w.y, FUSE_POINTS, now);
+          // The logo has become part of the bone, so its body leaves the world
+          // and its artwork leaves the screen.
+          Composite.remove(world, lb as never);
+          lu.mbIn = false;
+          const lg = uiLogoRef.current;
+          if (lg) lg.style.display = "none";
+          wake();
+        };
+        Events.on(engine, "beforeUpdate", onFuseMagnet);
         // ---- J17 stage 3: the fuse ------------------------------------------
         // Pressing a bomb lights it. The constraint already hit-tests in physics
         // space, so this hangs off its own drag events rather than a second set
@@ -5607,6 +5675,10 @@ export default function BreedTree({
           mcReleaseRef.current = null;
           Events.off(mc, "startdrag", onStartDrag);
           Events.off(mc, "enddrag", onEndDrag);
+          // The fuse rides on the ENGINE, not the constraint, so it has to come
+          // off here too: without this a level change leaves a listener holding
+          // the old world's bodies alive.
+          Events.off(engine, "beforeUpdate", onFuseMagnet);
           st.removeEventListener("pointerdown", onDown);
           window.removeEventListener("pointermove", onMove);
           window.removeEventListener("pointerup", onUp);
