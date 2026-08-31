@@ -4,7 +4,6 @@ import Nav from "../../../../components/Nav/Nav";
 import Footer from "../../../../components/Footer/Footer";
 import { decodeSharedPodium, type PodiumEntry } from "../../shareLink";
 import ShareLinkButton from "../../ShareLinkButton";
-import { podiumArtFor } from "../../podiumArt";
 
 /* NG-SHARE-2, 30 Aug 2026. Landing page for a shared knockout podium.
 
@@ -60,10 +59,6 @@ export default async function SharedPodiumPage({ params }: Props) {
     );
   }
 
-  // Falls back to /name-podium.jpg exactly as the knockout canvas does, which is
-  // what covers Weimaraner, Dalmatian and Poodle until their art exists.
-  const art = (data.b && podiumArtFor(data.b)) || "/name-podium.jpg";
-
   return (
     <>
       <Nav />
@@ -73,9 +68,24 @@ export default async function SharedPodiumPage({ params }: Props) {
         </p>
 
         <div style={{ background: "linear-gradient(to top right, #00e2ff, #008eff)", borderRadius: 40, padding: "clamp(24px,4vw,40px)", boxShadow: "0 18px 40px rgba(10,58,87,0.28)", marginBottom: 28 }}>
+          {/* NG-PODIUM-2, 31 Aug 2026. Shows this route's own OpenGraph card, not
+              the raw podium jpg. The jpg has blank placards: the names are drawn
+              on by opengraph-image.tsx, so rendering the artwork directly gave a
+              podium with three empty boards while the text sat underneath it.
+
+              Pointing at /opengraph-image also means the visitor sees exactly the
+              image their friends will see in a message, and there is only one
+              layout to maintain instead of two that can drift. It is cached for a
+              year, so this costs nothing after the first view. */}
           <div style={{ display: "flex", justifyContent: "center", marginBottom: 22 }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={art} alt="" style={{ width: "clamp(200px,52vw,380px)", height: "auto", borderRadius: 18, display: "block", filter: "drop-shadow(0 8px 24px rgba(10,58,87,0.28))" }} />
+            <img
+              src={`/name-generator/p/${c}/opengraph-image`}
+              alt={`Podium: ${data.places.map((p: PodiumEntry) => p.k || p.f).join(", ")}`}
+              width={1200}
+              height={630}
+              style={{ width: "100%", height: "auto", borderRadius: 18, display: "block", filter: "drop-shadow(0 8px 24px rgba(10,58,87,0.28))" }}
+            />
           </div>
 
           {data.places.map((p: PodiumEntry, i: number) => (

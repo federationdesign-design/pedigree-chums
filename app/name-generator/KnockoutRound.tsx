@@ -457,7 +457,23 @@ export default function KnockoutRound({ shortlist, recommended = [], breed, onBa
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const sorted = [...allRoundLosers].sort((a, b) => b.score - a.score);
+    /* NG-PODIUM-1, 31 Aug 2026. Third place must not repeat first or second.
+
+       allRoundLosers is not cleaned up on every path. The recycle fill at line
+       371 removes a loser it puts back in the bracket; takeLoser at line 310 does
+       not. So a name given a second chance stays in the pool, and if it then wins
+       the tournament it is both `first` and the top-scoring "loser", which put the
+       winner on the podium twice. Steve caught it on a Bichon Frise: TUP was 1st
+       and 3rd.
+
+       Filtering here rather than fixing takeLoser on purpose: this is the one
+       place the three places are decided, so the canvas, the share link and the
+       shared landing page all get the same answer. Matched on `full`, the same key
+       every other de-duplication in this file uses. */
+    const onPodium = new Set([first?.full, second?.full].filter(Boolean));
+    const sorted = [...allRoundLosers]
+      .filter((l) => !onPodium.has(l.full))
+      .sort((a, b) => b.score - a.score);
     const p2 = second;
     const p3 = sorted[0] || null;
 
@@ -574,7 +590,11 @@ export default function KnockoutRound({ shortlist, recommended = [], breed, onBa
                The image is still attached on mobile, so nothing is lost. This
                fixes desktop and any app that drops the file, where a share used
                to arrive as a generic homepage link. */
-            const shareSorted = [...allRoundLosers].sort((a, b) => b.score - a.score);
+            // Same guard as the canvas above. See NG-PODIUM-1.
+            const shareOnPodium = new Set([first?.full, second?.full].filter(Boolean));
+            const shareSorted = [...allRoundLosers]
+              .filter((l) => !shareOnPodium.has(l.full))
+              .sort((a, b) => b.score - a.score);
             const places = [first, second, shareSorted[0] || null]
               .filter((e): e is ShortlistEntry => !!e)
               .map((e) => ({ f: e.full, k: getLabel(e) }));
