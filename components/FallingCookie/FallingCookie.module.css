@@ -9,20 +9,31 @@
   overflow: hidden;
 }
 
-/* Shared resting spot. Horizontally unchanged, hard against the right edge.
-   VERTICALLY, 31 Aug 2026: was clamp(46px, 6vw, 56px), which parked the whole
-   sticker neatly in the corner. It now sits low enough that the BOTTOM HALF OF THE
-   WORD "POLICY" is off screen, by request.
+/* Shared resting spot. Both the fall and the settled button read this, so the
+   landing and the static button line up with no jump.
+
+   HORIZONTALLY, 31 Aug 2026: was right: clamp(12px, 3vw, 22px), hard against the
+   right edge. Steve asked for it to fall centre left instead, and with the sideways
+   knocks gone the drop column IS the resting column, so this one rule moves both.
+   Written as a CENTRE fraction rather than a left inset so it holds at every width:
+   the sticker's middle sits at 33% of the viewport, so half its own width is
+   subtracted. THIS IS THE DIAL. 33% reads as left of centre and clear of both
+   edges; 50% would be dead centre, 20% would tuck it near the left edge.
+   No transform is used here on purpose: the falling element animates transform, so
+   a translateX would be overwritten the moment the drop starts.
+
+   VERTICALLY, 31 Aug 2026: it sits low enough that the BOTTOM HALF OF THE WORD
+   "POLICY" is off screen, by request.
    The figure is measured from the artwork, not eyeballed. cookies-policy.svg is
    672.6 x 266; rasterised, "cookies" inks rows 9-134 and "policy" rows 139-254, so
    the midline of "policy" is at 196.5, leaving 69.5 of 266 (26.13%) below it. The
    element's height is width x (266 / 672.6) = width x 0.39548, so the offset is
-   -(0.2613 x 0.39548) = -0.1033 of the width. Both the fall's final frame and the
-   settled button read this, so they line up. If the artwork is ever redrawn, remeasure. */
+   -(0.2613 x 0.39548) = -0.1033 of the width. If the artwork is ever redrawn, remeasure. */
 .cookie,
 .settled {
   bottom: calc(clamp(187.5px, 27.5vw, 300px) * -0.1033);
-  right: clamp(12px, 3vw, 22px);
+  left: calc(33% - clamp(187.5px, 27.5vw, 300px) / 2);
+  right: auto;
   width: clamp(187.5px, 27.5vw, 300px);
   appearance: none;
   -webkit-appearance: none;
