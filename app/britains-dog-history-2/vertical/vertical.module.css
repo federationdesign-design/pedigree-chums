@@ -1707,3 +1707,49 @@
   --era-num: clamp(2.1rem, 11vw, 3.1rem);
   --era-word: clamp(0.7rem, 3.6vw, 1rem);
 }
+
+
+/* ============================================================================
+   STAGE 3C, 31 August 2026. The rail works, so this is the look. Three fixes,
+   all of them the same underlying problem: the era screen was designed to own
+   a WHOLE screen with the dogs on separate screens below it. It now shares one
+   panel with the rail, so everything in it has to be smaller.
+
+   Foot of the file, same reason as the 3b block above.
+   ========================================================================= */
+
+/* 1. THE TITLE WAS EATING THE PANEL.
+      50pt matched the section titles, which is right when the words own a
+      screen to themselves. ANCIENT TIMES DOGS is three lines of it, about
+      300px, and with the paragraph under it there was almost nothing left for
+      the dogs, which is why the cards were cut off at the bottom edge.
+      A clamp rather than a flat figure, so a one-word era does not look
+      shrunken next to a three-word one. */
+.eraWord {
+  font-size: clamp(26pt, 9vw, 34pt);
+}
+
+/* 2. THE TWO BIG FIGURES SAT ON THE PARAGRAPH.
+      .eraCount is `position: absolute; bottom: 10px`, pinned to the foot of
+      the era screen. That was clear of everything when the screen was a full
+      viewport. The screen is now only as tall as its own words, so the figures
+      landed straight on top of the last line of the paragraph.
+      Put back in the FLOW and aligned right, so it cannot overlap anything,
+      whatever length the paragraph turns out to be. */
+.eraCount {
+  position: static;
+  align-self: flex-end;
+  margin-top: 2px;
+  --era-num: clamp(1.9rem, 9vw, 2.6rem);
+  --era-word: clamp(0.62rem, 3.1vw, 0.85rem);
+}
+
+/* 3. THE CARD PLUS ITS MARKER ROW WAS TALLER THAN THE RAIL.
+      The photo face is a 1:1 square, so the card's HEIGHT is set by the slot
+      width. At 64vw the square alone was 250px and the icon row under it was
+      clipped. Narrower, so the whole card and its row fit with room to spare,
+      and more of the next dog shows at the edge, which reads better as a rail
+      anyway. */
+.dogScreen {
+  width: clamp(196px, 56vw, 264px);
+}
