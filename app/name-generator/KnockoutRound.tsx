@@ -4,6 +4,8 @@ import Nav from "../../components/Nav/Nav";
 import styles from "./KnockoutRound.module.css";
 import ShareScreen from "./ShareScreen";
 import { PODIUM_ART } from "./podiumArt";
+import { sharedPodiumPath } from "./shareLink";
+import { SITE_URL } from "../../lib/site";
 import { ShortlistEntry } from "./ShortlistBar";
 import { fireConfetti } from "../../lib/confetti";
 
@@ -556,7 +558,28 @@ export default function KnockoutRound({ shortlist, recommended = [], breed, onBa
           </div>
           {(() => {
             const name = first ? (first.full || getLabel(first)) : "";
-            const url = "https://pedigreechums.co.uk";
+
+            /* NG-SHARE-5, 31 Aug 2026. The caption now carries a link to this
+               exact podium rather than the bare homepage. Opening it shows the
+               same three names with a button to make your own, and the link's
+               OpenGraph card is the podium artwork with the names on it, drawn
+               by app/name-generator/p/[c]/opengraph-image.tsx.
+
+               The three places are rebuilt the same way the canvas does it at
+               line 458: first, then second, then the highest-scoring loser from
+               the rounds before the final. p3 is null with a two-name field, so
+               places is filtered rather than assumed to be three long.
+
+               The image is still attached on mobile, so nothing is lost. This
+               fixes desktop and any app that drops the file, where a share used
+               to arrive as a generic homepage link. */
+            const shareSorted = [...allRoundLosers].sort((a, b) => b.score - a.score);
+            const places = [first, second, shareSorted[0] || null]
+              .filter((e): e is ShortlistEntry => !!e)
+              .map((e) => ({ f: e.full, k: getLabel(e) }));
+            const url = first
+              ? `${SITE_URL.replace(/\/$/, "")}${sharedPodiumPath({ b: breed || "", places })}`
+              : SITE_URL;
             const tags = `#MyChum #PedigreeChums ${url}`;
             const messages = [
               `I had such fun creating my dog's name! The result is: ${name}`,

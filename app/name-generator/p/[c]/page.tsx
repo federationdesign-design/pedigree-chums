@@ -3,6 +3,7 @@ import Link from "next/link";
 import Nav from "../../../../components/Nav/Nav";
 import Footer from "../../../../components/Footer/Footer";
 import { decodeSharedPodium, type PodiumEntry } from "../../shareLink";
+import ShareLinkButton from "../../ShareLinkButton";
 import { podiumArtFor } from "../../podiumArt";
 
 /* NG-SHARE-2, 30 Aug 2026. Landing page for a shared knockout podium.
@@ -94,8 +95,9 @@ export default async function SharedPodiumPage({ params }: Props) {
           ))}
         </div>
 
-        <div style={{ textAlign: "center" }}>
+        <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap", alignItems: "center" }}>
           <Link href="/name-generator" style={startBtn}>Start a new name</Link>
+          <ShareLinkButton label="Share this podium" />
         </div>
       </main>
       <Footer />

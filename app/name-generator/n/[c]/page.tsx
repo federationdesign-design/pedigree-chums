@@ -3,6 +3,7 @@ import Link from "next/link";
 import Nav from "../../../../components/Nav/Nav";
 import Footer from "../../../../components/Footer/Footer";
 import { decodeSharedName } from "../../shareLink";
+import ShareLinkButton from "../../ShareLinkButton";
 
 /* NG-SHARE-1, 29 Aug 2026. The landing page for a shared name.
 
@@ -173,8 +174,9 @@ export default async function SharedNamePage({ params }: Props) {
 
         </div>
 
-        <div style={{ textAlign: "center" }}>
+        <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap", alignItems: "center" }}>
           <Link href="/name-generator" style={startBtn}>Start a new name</Link>
+          <ShareLinkButton label="Share this name" />
         </div>
       </main>
       <Footer />
