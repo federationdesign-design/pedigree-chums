@@ -182,13 +182,17 @@
   /* Grid, not flex: the media row is minmax(0,1fr) so it always yields to the
      copy row's natural height, and its definite size lets the picture inside cap
      to it (a flex row leaves the percentage height unresolved and they overlap). */
-  display: grid;
-  grid-template-rows: minmax(0, 1fr) auto;
-  /* Round 10: media-to-copy gap down to a uniform 10px (was ~23px). */
-  gap: 10px;
+  /* Round 10 (container overlap): the media fills this fixed-height box and the copy
+     panel is absolutely positioned over its lower edge (like the overlay screens), so
+     the media has a hard position and height and is never pushed up or resized. A tall
+     copy panel simply overlaps the media more deeply. */
+  position: relative;
 }
 .screenMedia {
   min-height: 0;
+  /* Round 10: fills the fixed-height .screen so the media never resizes; the image
+     stays top-aligned and the copy overlaps the lower part. */
+  height: 100%;
   width: 100%;
   max-width: var(--media-max);
   margin: 0 auto;
@@ -205,8 +209,15 @@
   max-width: calc(100vw - 2 * (clamp(16px, 4vw, 48px) + clamp(64px, 9vw, 132px) + 16px));
 }
 /* The text container is wider than the media (40%, owner round 2). */
+/* Round 10 (container overlap): the copy panel overlays the bottom of the media, the
+   same as the overlay screens (.overlayCopy). Bottom-anchored so a taller panel grows
+   upward over the media rather than pushing it. */
 .copyWrap {
-  flex: 0 0 auto;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 15px;
+  z-index: 2;
   width: 100%;
   max-width: var(--copy-max);
   margin: 0 auto;
