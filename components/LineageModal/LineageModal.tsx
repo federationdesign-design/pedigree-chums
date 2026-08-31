@@ -398,11 +398,23 @@ export default function LineageModal({ name, image, character, lineage, fromRect
     <div className={css.overlay} role="dialog" aria-modal="true" aria-label={name}>
       {/* The time tunnel covers the pit while it arrives, then removes itself. */}
       {tunnelActive && <TimeTunnel fromRect={fromRect} onResolve={() => setResolving(true)} onDone={() => setTunnelActive(false)} />}
-      {/* Score, fixed top-right beside where the in-pit close object starts.
-          Hidden once the round is running: the number belongs to the menu and
-          the end screens, and during play it competes with the lives indicator
-          that now sits along the same edge. */}
-      {!running && !learningActive && (
+      {/* Score, top of the pit on the same axis as the level portrait.
+
+          SHOWN DURING PLAY AGAIN, 31 August 2026 (Steve), to match the main
+          pit, where .scoreTotal sits in .controls and is never gated at all.
+
+          THE REASON IT WAS HIDDEN HAS EXPIRED. The old note here said the
+          number competed with the lives indicator along the same edge, and at
+          the time that was true. The lives have since moved: see .lives in the
+          stylesheet, "BOTTOM CENTRE ... Moved by request: the top left is now
+          three things deep and the foot of the pit is empty." Nothing has sat
+          on this axis since, so the gate was guarding against a collision that
+          no longer exists.
+
+          Still hidden in the LEARN area. That is a different screen with its own
+          crowded top left, and a running score means nothing while the round is
+          paused behind it. */}
+      {!learningActive && (
         <div className={css.scoreTotal + (scorePulse ? " " + css.scorePulse : "")} aria-label={`Score: ${score.toLocaleString("en-GB")}`}>
           {score.toLocaleString("en-GB")}
         </div>
