@@ -402,7 +402,14 @@
   overflow: visible;
   /* All four corners: it floats clear of every screen edge now. */
   border-radius: 14px;
-  z-index: 16;
+  /* 16 -> 13, 31 Aug 2026. At 16 it tied with .learnPlay and won on DOM order, so
+     the box covered the green PLAY button. It now sits UNDER every control in the
+     learn area: PLAY (16), the title block (15) and the zoom-out (14).
+     Its own children are unaffected. The chum rail and the zoom-out button are DOM
+     descendants of this element, so they paint inside its stacking context and
+     therefore still sit above the box's own panel, which is what you want.
+     Still above the pit itself: .stageDocked is z-index 1. */
+  z-index: 13;
 }
 /* RETIRED 31 Aug 2026, deliberately left here as the record. This used to be
    applied to the stage whenever the mobile info box was open, to give the box a
@@ -919,13 +926,30 @@
    need to become 84px / 25.2px again. */
 .zoomOutBtn {
   position: fixed;
+  /* 14px of visible air to the right of PLAY. PLAY's visible right edge is
+     15.5 + 72.5 = 88px, and this button's outline puts its visible left edge 5px
+     before its box, so 88 + 14 + 5 = 107. */
   left: 107px;
   right: auto;
-  bottom: calc(3% + 7.5px);
+  /* CORRECTED 31 Aug 2026. The first attempt matched this button's BOX to PLAY's
+     square, 67.5px, which came out 5px too big and sitting low. The two rims are
+     drawn differently:
+       PLAY  - an SVG rect with a 5px stroke CENTRED on its edge, inside an artboard
+               of S + 5. Visible outer box = 72.5 x 72.5, outer corner radius
+               20.25 + 2.5 = 22.75.
+       here  - a CSS `outline`, which draws entirely OUTSIDE the box and adds 5px on
+               every side.
+     So to land on the same 72.5 visible square the box must be 62.5, and the radius
+     must be 22.75 - 5 = 17.75 so the outline's own corner matches PLAY's.
+     Bottom is 3% + 5px, not 3% + 7.5px: the outline's outer edge is 5px below the
+     box, and PLAY's outer edge sits exactly on its 3%.
+     The 4px drop shadow is gone with it. PLAY has none, and it added apparent height
+     under the button, which is what the lower red line was catching. */
+  bottom: calc(3% + 5px);
   z-index: 14;
-  width: 67.5px;
-  height: 67.5px;
-  border-radius: 20.25px;
+  width: 62.5px;
+  height: 62.5px;
+  border-radius: 17.75px;
   border: none;
   outline: 5px solid var(--navy, #0a3a57);
   background: var(--yellow, #ffd23e);
@@ -934,7 +958,6 @@
   place-items: center;
   padding: 0;
   cursor: pointer;
-  box-shadow: 0 4px 0 rgba(10, 58, 87, 0.3);
   pointer-events: auto;
 }
 .zoomOutBtn svg {
