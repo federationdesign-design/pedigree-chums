@@ -118,3 +118,31 @@ export function levelThemeFor(era?: string): LevelTheme | null {
   if (!THEMES_ENABLED) return null;
   return (era && THEMES[era]) || null;
 }
+
+/* PROPS ARE NOT THEME ART, AND THIS IS THE SPLIT (31 August 2026, owner
+   request). THEMES_ENABLED reverted the backgrounds, the sky gradients and the
+   stepped physics floors, and because the props hung off the same theme object
+   they were reverted too. That was never the intention: the art came off, the
+   toys were supposed to stay available.
+
+   So props get their own lookup and their own flag. propsFor does NOT call
+   levelThemeFor and does NOT read THEMES_ENABLED, which means a level can have
+   its own set of things to knock about while its pit keeps the plain gradient
+   and the flat floor like every other level.
+
+   Do NOT re-route this through levelThemeFor to save a few lines. The whole
+   point is that the two can be switched independently.
+
+   Returns null when there is nothing specific to say, and the pit falls back to
+   its own DEFAULT_PROPS. Ordering is most specific first: the named level, then
+   the era, then nothing. */
+const PROPS_ENABLED = true;
+export function propsFor(era?: string, levelName?: string): string[] | null {
+  if (!PROPS_ENABLED) return null;
+  const theme = (era && THEMES[era]) || null;
+  if (!theme) return null;
+  const byLevel = levelName ? theme.propsByLevel?.[levelName] : undefined;
+  if (byLevel?.length) return byLevel;
+  if (theme.props?.length) return theme.props;
+  return null;
+}

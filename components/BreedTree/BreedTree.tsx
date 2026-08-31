@@ -19,7 +19,7 @@ import breedTraits from "../../data/breed-info.json";
 import styles from "./BreedTree.module.css";
 import { BRAIN_PATH, BRAIN_ARTBOARD } from "../icons/brain";
 import LineageMap from "../PackPit/LineageMap";
-import type { LevelTheme } from "../../data/levelThemes";
+import { propsFor, type LevelTheme } from "../../data/levelThemes";
 import BritainMessage from "../PackPit/BritainMessage";
 
 // Reference-info marker on the learn-box portrait: the same red/amber/green
@@ -4234,13 +4234,12 @@ export default function BreedTree({
            so a set of any length keeps the original rhythm: a pair thumps in,
            then the stragglers land one after another rather than in a heap. */
         /* Most specific wins: this level's own set, then the era's, then the
-           pit's default three. */
-        const byLevel = levelName ? levelTheme?.propsByLevel?.[levelName] : undefined;
-        const props: ToyKind[] = byLevel?.length
-          ? (byLevel as ToyKind[])
-          : levelTheme?.props?.length
-            ? (levelTheme.props as ToyKind[])
-            : DEFAULT_PROPS;
+           pit's default. propsFor does that walk and, unlike levelThemeFor, it
+           is NOT gated on THEMES_ENABLED, so a level can have its own toys
+           without its backdrop, floor and sky coming back with them. See the
+           note above propsFor in data/levelThemes.ts. */
+        const themed = propsFor(era, levelName);
+        const props: ToyKind[] = themed?.length ? (themed as ToyKind[]) : DEFAULT_PROPS;
         /* SIDES ALTERNATE, AND THE FIRST SIDE ALTERNATES TOO. Each prop lands on
            the opposite side to the one before it, so two can never come down
            together in the same corner, and the whole sequence starts on the
