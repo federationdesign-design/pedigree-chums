@@ -1753,3 +1753,56 @@
 .dogScreen {
   width: clamp(196px, 56vw, 264px);
 }
+
+
+/* ============================================================================
+   STAGE 3D, 31 August 2026. Foot of the file, same reason as 3b and 3c.
+   ========================================================================= */
+
+/* 1. THE TITLE TOOK THREE LINES WHERE TWO WOULD DO.
+      .eraWord is `display: block`, one word per line, which is the section
+      title treatment and is right when the words own a whole screen. Sharing a
+      panel with the rail, ANCIENT TIMES DOGS spent three lines on what fits in
+      two.
+      The words flow and wrap naturally now. The band stops being a flex column
+      to allow it: an inline-block cannot wrap inside a column, every child
+      would still get a line of its own. The margin is what keeps the words
+      apart, because the markup has no whitespace between them. */
+.eraTitleBand {
+  display: block;
+  text-align: center;
+}
+.eraWord {
+  display: inline-block;
+  margin: 0 0.16em;
+  /* A touch looser than the 0.9em above. Luckiest Guy's visible cap height is
+     about 0.6 of its em, so tight leading is safe on one line but two wrapped
+     lines of it read as touching. */
+  line-height: 0.95em;
+}
+
+/* 2. THE DOG COUNT IS DRAWING TWICE, AND THAT IS MY FAULT.
+      The figure is two copies of the same markup, a white outline behind a
+      solid one, because -webkit-text-stroke on its own draws the stroke
+      CENTRED on the letter edge and eats half the letterform away.
+      The outline copy is `position: absolute; right: 0; bottom: 0`, which
+      relied on .eraCount being positioned to anchor it. Stage 3c set
+      .eraCount to `position: static` to get it out of the paragraph, which
+      removed that anchor, so the outline fell through to .eraScreen and landed
+      offset below the solid copy as a ghost.
+      `relative` keeps it in the flow, which is what 3c wanted, AND restores
+      the containing block, which is what 3c broke. */
+.eraCount {
+  position: relative;
+}
+
+/* 3. THE DOG NAME OVERFLOWED ITS CARD.
+      `clamp(2rem, 10vw, 3.2rem)` sizes the name against the VIEWPORT, which
+      was right when a card was 95vw wide. The rail slot is 56vw, so 10vw of
+      lettering inside it was always going to run past the edge, which is why
+      IRISH WOLFHOUND lost its D.
+      Scaled to the slot instead. */
+.dogNameOver {
+  font-size: clamp(1.05rem, 5.2vw, 1.75rem);
+  bottom: 52px;
+}
