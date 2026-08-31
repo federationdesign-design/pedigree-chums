@@ -464,9 +464,7 @@ const SCREENS: Screen[] = [
         mont: true,
         text: "Spot Pug. Photograph Pug. Post Pug. Tag Pedigree Chums. Use #ChumSpot.",
       },
-      { kind: "body", text: "One participant will receive the one-of-one physical Pug." },
       { kind: "body", text: "We really would quite like Pug back." },
-      { kind: "display", mont: true, text: "There is no board. Britain is the board." },
     ],
   },
   // Round 13: Find Pug moved here, to after Help Us Find Pug.
@@ -509,10 +507,6 @@ const SCREENS: Screen[] = [
       {
         kind: "body",
         text: "Breed pages, working dogs, dogs and history, all built around curiosity rather than homework.",
-      },
-      {
-        kind: "display",
-        text: "Like dogs, curious people tend to find interesting things when they start digging.",
       },
     ],
   },
