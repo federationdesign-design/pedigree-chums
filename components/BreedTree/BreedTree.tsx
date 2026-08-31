@@ -359,6 +359,31 @@ const LOGO_BIG_MULT = 6.8;         // PackPit's LOGO_W = BIG * 6.8
    PackPit line 548. */
 const LOGO_BODY_W = 0.85;
 const LOGO_BODY_H = 0.7;
+/* THE SIX STAGES OF DAMAGE, stage 2 of the logo job (31 August 2026).
+   Index 0 is the art after the FIRST hit, so the list is read as
+   LOGO_STAGE_SRC[hits - 1] and an unhit logo keeps LOGO_SRC. Five entries for
+   five hits, the same files and the same order the main pit uses in its own
+   LOGO_STAGES (PackPit.tsx:564).
+
+   THE PIECES ARE NOT DROPPED YET. Each of these files is the logo MINUS the
+   elements that came off, and the main pit also spawns those elements as real
+   bodies at their true spots. That is stage 3, and it is the part that still
+   needs the canvas work rebuilding as SVG nodes. Here the elements simply
+   vanish from the artwork. */
+const LOGO_STAGE_SRC = [
+  "/PC-logo-2nd-hit.svg",
+  "/PC-logo-3rd-hit.svg",
+  "/PC-logo-4th-hit.svg",
+  "/PC-logo-5th-hit.svg",
+  "/PC-logo-6th-hit.svg",
+];
+/* The artwork for a given hit count. One function, used by BOTH the per-frame
+   writer and the React render, so the two can never disagree: a re-render
+   triggered by anything else would otherwise snap the logo back to undamaged. */
+function logoArtFor(hits: number): string {
+  if (hits <= 0) return LOGO_SRC;
+  return LOGO_STAGE_SRC[Math.min(hits, LOGO_STAGE_SRC.length) - 1];
+}
 /* Share of the pit width the drawn logo may take. Was 0.7; owner's call on
    31 August 2026, no more than 60% of the screen. The pit runs wall to wall
    with only a few pixels of margin, so its width and the screen's are the same
@@ -2646,6 +2671,19 @@ export default function BreedTree({
     // count for good. To see that one again you have to clear site data.
     try { for (const k of Object.values(TOY_GONE_KEY)) sessionStorage.removeItem(k); } catch { /* private mode */ }
   }, []);
+  /* PRELOAD THE DAMAGED LOGO ARTWORK. Swapping an <image> href to a file the
+     browser has never fetched leaves the logo blank for a frame or two, and a
+     hit is exactly the moment you are looking at it. Five small SVGs, fetched
+     once when the component mounts and then served from cache.
+     The main pit does the same thing for the same reason, and additionally
+     force-decodes; an <img> here is enough, because these are vectors and there
+     is no large bitmap to decode. */
+  useEffect(() => {
+    for (const src of LOGO_STAGE_SRC) {
+      const im = new window.Image();
+      im.src = src;
+    }
+  }, []);
   // Consent arrives as an event whichever way it was given, so the pit clears
   // its cookie objects from one place rather than from each button.
   useEffect(() => {
@@ -2706,7 +2744,7 @@ export default function BreedTree({
   // on the body rather than being recomputed in the render, because the sim and
   // the render already size the squares by two different formulas and a third
   // copy of that mistake is not wanted.
-  type UiBody = { x: number; y: number; vx: number; vy: number; r: number; half: number; a: number; va: number; fixed: boolean; hits: number; kind: UiKind; mb?: unknown; mbIn?: boolean; id?: number; spawned?: boolean; w?: number; h?: number };
+  type UiBody = { x: number; y: number; vx: number; vy: number; r: number; half: number; a: number; va: number; fixed: boolean; hits: number; kind: UiKind; mb?: unknown; mbIn?: boolean; id?: number; spawned?: boolean; w?: number; h?: number; art?: string };
   const uiBodiesRef = useRef<UiBody[] | null>(null);
   // THE PIT-MENU PILE-UP. Every tap of the corner X during a round drops another
   // red-leave + green-restart PAIR into the pit, up to 8; they never leave, and
@@ -3137,6 +3175,18 @@ export default function BreedTree({
       for (const u of ub) {
         const el = u.spawned ? (pg?.children[pairIdx++] as SVGGElement | undefined) : uiRefFor(u.kind).current;
         if (el) el.setAttribute("transform", `translate(${(u.x - v[0]) * k},${(u.y - v[1]) * k}) rotate(${u.a * 57.2958})`);
+        /* THE LOGO'S DAMAGE STAGE. A hit does not set React state, so the
+           render cannot know about it: the art is swapped here instead, in the
+           same loop that already moves the thing. Written only when the count
+           has actually changed, because re-setting an href every frame makes
+           the browser reload the file and the logo flickers. */
+        if (el && u.kind === "logo") {
+          const want = logoArtFor(u.hits);
+          if (u.art !== want) {
+            const im = el.querySelector("[data-logo-art]") as SVGImageElement | null;
+            if (im) { im.setAttribute("href", want); u.art = want; }
+          }
+        }
       }
     }
     for (const [listRef, gRef] of [[rodBodiesRef, rodsGRef], [pillBodiesRef, pillsGRef], [toyBodiesRef, toysGRef], [chumBodiesRef, chumsGRef], [btnBodiesRef, btnsGRef]] as const) {
@@ -7062,7 +7112,11 @@ export default function BreedTree({
                 return (
                   <g ref={uiLogoRef} style={{ pointerEvents: "none" }} aria-hidden="true"
                     transform={`translate(${(lb.x - v[0]) * kk},${(lb.y - v[1]) * kk}) rotate(${lb.a * 57.2958})`}>
-                    <image href={LOGO_SRC} x={-lw / 2} y={-lh / 2} width={lw} height={lh} preserveAspectRatio="xMidYMid meet" />
+                    {/* data-logo-art is how the per-frame writer finds this
+                        node. href is derived from the hit count here as well,
+                        so a re-render caused by anything else cannot snap a
+                        damaged logo back to its undamaged art. */}
+                    <image data-logo-art href={logoArtFor(lb.hits)} x={-lw / 2} y={-lh / 2} width={lw} height={lh} preserveAspectRatio="xMidYMid meet" />
                   </g>
                 );
               })()}
