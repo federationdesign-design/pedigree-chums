@@ -54,10 +54,13 @@
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  /* Top clears the fixed Nav and the counter; the counter and yellow screen title
-     sit lower (global round), so the top padding grows. Bottom stays small so the
-     copy biases low. */
-  padding: clamp(124px, 19vh, 168px) 16px clamp(24px, 5vh, 44px);
+  /* Round 8: the "Press Pack" title and the counter are absolute in .pack (not here),
+     so they are moved down to clear the 136px site header via .headerTitle / .indicator
+     top, NOT via this padding (the earlier +50 padding attempt moved the media, never
+     the header title). The media top here clears the repositioned counter, which is
+     also ROUND8's "move image/video containers down 50px". Bottom +15 lifts the blue
+     copy panel. No desktop twin sets top/bottom, so this holds at 1280. */
+  padding: clamp(214px, 24vh, 236px) 16px calc(clamp(24px, 5vh, 44px) + 15px);
 }
 
 /* Media slide: a single image or the video facade, centred and contained so
@@ -255,6 +258,14 @@
 .grid2x2 .thumbImg {
   min-height: 0;
   min-width: 0;
+  /* Round 8 (slides 5, 6): fill each cell so the 10px gap is the only spacing and the
+     row padding matches the column padding (contained portrait images left uneven
+     whitespace that read as mismatched padding). */
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  max-width: none;
+  max-height: none;
 }
 
 /* Two-column media (screen 8): column A is two stacked square images, column B is
@@ -418,7 +429,8 @@
    each, Luckiest Guy in the lemon header token. */
 .headerTitle {
   position: absolute;
-  top: clamp(8px, 1.4vh, 14px);
+  /* Round 8: cleared below the 136px site header (was 12.6px, up in the header band). */
+  top: clamp(144px, 16vh, 152px);
   left: 50%;
   transform: translateX(-50%);
   z-index: 6;
@@ -480,7 +492,8 @@
    bit. Scale the frame instead: it shrinks in both dimensions whichever one binds,
    and the top-centre origin keeps it anchored just under the title. */
 .mediaShrink {
-  transform: scale(0.75);
+  /* Round 8: slide 1 video 10% smaller (was 25%). */
+  transform: scale(0.9);
   transform-origin: top center;
 }
 
@@ -492,7 +505,12 @@
   display: flex;
   gap: 10px;
   width: 100%;
+  /* Round 8 (slides 7, 9): the columns stretched to the full media height, making the
+     video containers far too tall. Cap the height and centre so they read at a sane
+     size; the copy panel already overlays the lower part of the media area. */
   height: 100%;
+  max-height: 46vh;
+  margin: 0 auto;
   align-items: stretch;
 }
 .neatCol {
@@ -603,12 +621,12 @@
   min-height: 0;
 }
 /* The pair images render at intrinsic height (percentage max-height does not resolve
-   through this flex/grid chain), so clip each cell to its grid height and centre the
-   image within it. This keeps the pair from overflowing down over the row; the trade
-   is a centre crop rather than the full card. */
+   through this flex/grid chain), so clip each cell to its grid height. Round 8: align
+   the image to the bottom of the cell so it sits right above the row (10px gap) rather
+   than centred with a large gap below it. */
 .pairAndRow .diptychCell {
   overflow: hidden;
-  align-items: center;
+  align-items: flex-end;
 }
 
 /* Bento: the live launcher menu, scaled down to fit the media area (screen 15). */
@@ -754,7 +772,8 @@
   position: absolute;
   left: 0;
   right: 0;
-  top: clamp(74px, 11vh, 100px);
+  /* Round 8: cleared below the 136px site header, sitting just under the title. */
+  top: clamp(182px, 20vh, 194px);
   z-index: 6;
   display: flex;
   flex-direction: column;
