@@ -730,13 +730,20 @@
 
 /* THE RAIL. This is the piece that makes the run safe again.
 
-   `touch-action: pan-x` is the load-bearing line. It tells the browser this
-   element owns HORIZONTAL gestures only, so a downward drag that starts on a
-   dog card is handed straight up to the page and scrolls it, while a sideways
-   drag moves the rail. Cross axis, no competition, no lock, no script.
+   WRONG ABOUT touch-action, CORRECTED 31 AUGUST 2026. This said `pan-x` was
+   the load-bearing line and that it handed downward drags up to the page. It
+   does the opposite: `pan-x` means this element and its whole subtree pan
+   HORIZONTALLY ONLY, so a downward drag starting on a dog card was refused
+   outright and the reader could not leave the era screen.
+
+   The rail is `touch-action: auto` now, set at the foot of this file. Both
+   rails on this site that already work, .rowRail in know-your-chums and
+   .stripRail in BreedStrip, are auto for exactly this reason. A horizontal
+   scroller nested in a vertical one is something browsers resolve natively
+   from the direction of the gesture. Do not restrict it again.
 
    `overscroll-behavior-x: contain` stops a flick off either end of the rail
-   chaining anywhere else. */
+   chaining anywhere else, and that part was right. */
 .dogRail {
   display: flex;
   flex-wrap: nowrap;
@@ -1840,4 +1847,63 @@
       while it is off, and turning it back on is one line. */
 .eraCount {
   display: none;
+}
+
+
+/* ==== 3F-BLOCK ==== */
+/* ============================================================================
+   STAGE 3F, 31 August 2026. Two faults Steve found, one of them serious.
+   Foot of the file, same reason as the blocks above.
+   ========================================================================= */
+
+/* 1. THE PAGE COULD NOT BE SCROLLED FROM A DOG CARD. THIS WAS THE BAD ONE.
+
+      Stage 3a put `touch-action: pan-x` on the rail believing it would hand
+      vertical drags up to the page. It does the reverse. `pan-x` declares that
+      this element and everything inside it pans horizontally and NOTHING else,
+      so a downward drag beginning on a dog was refused and no ancestor
+      scrolled. The reader reached the end of an era and was stuck there.
+
+      .timelineRun compounded it with a leftover `pan-y` from the old vertical
+      run, which restricts the opposite axis over the same subtree.
+
+      Both are `auto` now. THE PROOF THIS IS RIGHT IS ALREADY IN THE REPO: the
+      two rails on this site that work, .rowRail in know-your-chums and
+      .stripRail in BreedStrip, set no touch-action at all. The only
+      touch-action either file carries is `pinch-zoom` on the yellow drag
+      thumb. Browsers resolve a horizontal scroller nested inside a vertical
+      one from the direction of the gesture, natively, and they do it well.
+      Never restrict either of these again. */
+.timelineRun,
+.dogRail {
+  touch-action: auto;
+}
+
+/* 2. ONE CARD ON SCREEN, NOT THREE.
+      Stage 3c narrowed the slot to fit the cards in, which worked, but the
+      back of the card is a paragraph of text and at 56vw it had nowhere to go.
+      Back to roughly the width the vertical run used, so a flipped card has
+      room to be read.
+
+      The room comes from the header above: the title band and the era
+      paragraph give back about 24px between them, and the playable count and
+      the down arrow are already gone. Measured against a 390 by 708 phone:
+      header about 288px, rail about 420px, card 336px square plus a 57px icon
+      row. Roughly 27px spare. If a future change adds anything to the header,
+      this is the figure it eats into. */
+.dogScreen {
+  width: min(86vw, 372px);
+}
+.eraTitleBand {
+  padding-top: 92px;
+}
+.eraScreen {
+  padding-bottom: 10px;
+}
+
+/* The name is sized against the viewport, so it has to come back up now the
+   card is wide again. Stage 3d cut it to fit a 56vw slot. */
+.dogNameOver {
+  font-size: clamp(1.6rem, 8vw, 2.6rem);
+  bottom: 58px;
 }
