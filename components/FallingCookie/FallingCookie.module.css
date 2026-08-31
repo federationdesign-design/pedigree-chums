@@ -46,14 +46,14 @@
 /* Falling: absolute inside the fixed field, animating from above down to translate
    0,0 which IS the resting spot. `forwards` holds it there; the spin lands on a
    whole turn (upright), so the static settled button below does not jump.
-   0.85s, down from 4s on 31 Aug 2026. See the keyframes: the fall is linear now, and
-   0.85s is what makes that constant speed equal the old curve's terminal 173vh/s.
-   This duration is the speed dial; the keyframes hold the shape. */
+   4s -> 0.85s -> 1.3s over 31 Aug 2026. The extra 0.45s is the bob, not a slower
+   fall: the fall is still 0.688s because the keyframes give it the first 53%.
+   Change this and the 53% together, or the fall speed moves with it. */
 .cookie {
   position: absolute;
   pointer-events: auto;
   will-change: transform;
-  animation: cookieLand 0.85s linear forwards;
+  animation: cookieLand 1.3s linear forwards;
 }
 
 /* Settled: a real, reachable, keyboard-focusable button at the same corner, no
@@ -80,14 +80,29 @@
    the way down.
    The figure is derived, not picked: that curve's slope at t=1 is 3(1-0.5)/3(1-0.9)
    = 5, so its terminal speed was 5x its 34.6vh/s average, i.e. 173vh/s. The drop is
-   119vh, so at that speed it takes 0.688s, and with a 0.16s settle on the end the
-   whole animation is 0.85s and the fall is the first 81% of it.
-   THE DIAL IS THE 0.85s ON .cookie. Raise it and the fall slows in proportion; the
-   81% split keeps the settle reading as an impact rather than a stop. */
+   119vh, so at that speed it takes 0.688s.
+
+   THE BOB, added 31 Aug 2026 (third pass). The landing used to be one overshoot and
+   a spring back. It now settles through five diminishing swings, 3vh down, 1.5 up,
+   0.9 down, 0.45 up, 0.2 down, each roughly half the last, ending flat at 0. The
+   segments use an ease-in-out so it reads as an oscillation coming to rest rather
+   than a hard bounce.
+   The bob takes 0.61s on top of the 0.688s fall, so the animation is 1.3s and the
+   FALL IS THE FIRST 53% of it. Those two numbers are a pair: if the duration below
+   changes, 53% has to be re-derived as 0.688 / duration or the fall speed moves with
+   it. The spin finishes at the landing and is held through the whole bob. */
 @keyframes cookieLand {
-  0%   { transform: translateY(-115vh) rotate(0deg);
+  0%   { transform: translateY(-115vh)  rotate(0deg);
          animation-timing-function: linear; }
-  81%  { transform: translateY(4vh)    rotate(var(--rtot, 720deg));
-         animation-timing-function: cubic-bezier(0.3, 1.5, 0.5, 1); }
-  100% { transform: translateY(0)      rotate(var(--rtot, 720deg)); }
+  53%  { transform: translateY(3vh)     rotate(var(--rtot, 720deg));
+         animation-timing-function: cubic-bezier(0.4, 0, 0.6, 1); }
+  65%  { transform: translateY(-1.5vh)  rotate(var(--rtot, 720deg));
+         animation-timing-function: cubic-bezier(0.4, 0, 0.6, 1); }
+  76%  { transform: translateY(0.9vh)   rotate(var(--rtot, 720deg));
+         animation-timing-function: cubic-bezier(0.4, 0, 0.6, 1); }
+  85%  { transform: translateY(-0.45vh) rotate(var(--rtot, 720deg));
+         animation-timing-function: cubic-bezier(0.4, 0, 0.6, 1); }
+  93%  { transform: translateY(0.2vh)   rotate(var(--rtot, 720deg));
+         animation-timing-function: cubic-bezier(0.4, 0, 0.6, 1); }
+  100% { transform: translateY(0)       rotate(var(--rtot, 720deg)); }
 }
