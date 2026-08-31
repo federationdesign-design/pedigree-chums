@@ -588,8 +588,21 @@
   font-family: var(--font-body, "Montserrat", sans-serif);
   font-size: 1.05rem;
   font-weight: 600;
-  /* Prose on the site gradient -> black for WCAG 1.4.3 (Steve, 12 Aug 2026). */
-  color: #000000;
+  /* WHITE. REVERSED 31 August 2026 (Steve), and the measurements say the
+     reversal was overdue.
+
+     The note here read "prose on the site gradient -> black for WCAG 1.4.3
+     (Steve, 12 Aug 2026)". That rule is correct, but it is about the SITE
+     GRADIENT. This paragraph does not sit on the gradient. It sits on the fact
+     panel, which .panel paints --blue-deep #0b78bd, and against that:
+
+       black on #0b78bd  4.44:1  FAILS AA for normal text
+       white on #0b78bd  4.73:1  PASSES
+
+     So black was quietly failing 1.4.3 here while passing everywhere the
+     original note was aimed at. White is both what was asked for and the
+     accessible answer. Do not "restore" black on this class. */
+  color: #ffffff;
   line-height: 1.35;
   /* MEASURED, same screenshot. The capitals ended at y1378 and this
      paragraph began at y1428: 49 device pixels, so 24.5 CSS px, with this

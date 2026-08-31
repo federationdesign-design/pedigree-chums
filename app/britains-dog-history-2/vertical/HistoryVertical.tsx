@@ -443,6 +443,38 @@ export default function HistoryVertical() {
         function refresh(){ update(); updateCount(); placeBar(); updateRoll(); }
         measure();
         refresh();
+
+        /* ================= REMOVE BEFORE STAGE 3 =================
+           DIAGNOSTIC ONLY, and only on ?diag=1. The fact circles did not appear
+           after the axis flip. The only thing that changed for them is the
+           input to updateRoll, which went from a live division to a reading of
+           the measured positions table, so this prints the table and what the
+           circles are being told. Nothing here runs on a normal visit.
+           ========================================================= */
+        if (location.search.indexOf('diag=1') > -1) {
+          var dg = document.createElement('div');
+          dg.setAttribute('style', 'position:fixed;left:0;bottom:0;z-index:99;background:#000;color:#0f0;font:11px/1.4 monospace;padding:6px 8px;white-space:pre-wrap;pointer-events:none;max-width:100vw;');
+          document.body.appendChild(dg);
+          var nPanels = carousel.querySelectorAll('[data-pc-panel]').length;
+          var diag = function(){
+            var five = [];
+            for (var k = 0; k < 5 && k < positions.length; k++) five.push(Math.round(positions[k]));
+            dg.textContent =
+              'clientH ' + carousel.clientHeight +
+              ' | scrollTop ' + Math.round(carousel.scrollTop) +
+              ' | scrollH ' + carousel.scrollHeight +
+              ' | panels ' + nPanels +
+              ' | pos.len ' + positions.length +
+              ' | pos0-4 ' + five.join(',') +
+              ' | panelAt ' + panelAt().toFixed(2) +
+              ' | rollEls ' + rollEls.length +
+              ' | roll0op ' + (rollEls[0] ? (rollEls[0].style.opacity || 'unset') : 'none');
+          };
+          carousel.addEventListener('scroll', diag, { passive: true });
+          window.addEventListener('load', diag);
+          window.addEventListener('resize', diag);
+          diag();
+        }
         /* Heights move after this script runs: web fonts land, the section
            photographs decode, the address bar settles. Each of those shifts
            every snap position below it, so the table is rebuilt. */
