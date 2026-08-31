@@ -1806,3 +1806,38 @@
   font-size: clamp(1.05rem, 5.2vw, 1.75rem);
   bottom: 52px;
 }
+
+
+/* ============================================================================
+   STAGE 3E, 31 August 2026. Steve's call, and both are the same thing: pieces
+   built for a run that travelled DOWNWARDS, still on screen after it started
+   travelling sideways. Foot of the file, same reason as 3b, 3c and 3d.
+   ========================================================================= */
+
+/* 1. THE DOWN ARROW UNDER EVERY CARD.
+      .markerDot is a yellow disc carrying /node-arrow.svg, and it meant "carry
+      on down the timeline to the next dog". There is no down any more: the
+      next dog is to the RIGHT. So it was pointing every reader at a gesture
+      that does nothing, which is worse than showing nothing at all.
+
+      display: none rather than visibility: hidden. The old .markerDotOff kept
+      the box on the last dog because the row was centred around it and losing
+      it would have slid the other two icons inward. That does not apply when
+      every dot goes: the row simply centres the tree and the information icon
+      instead, and the height it gives back goes to the cards. */
+.markerDot {
+  display: none;
+}
+
+/* 2. THE PLAYABLE COUNT.
+      "7 PLAYABLE / 8 DOGS" was designed for an era screen that owned a whole
+      viewport and had room at the foot of it. Sharing a panel with the rail it
+      is the least useful thing competing for the space, and the reader can see
+      the dogs themselves right below it.
+
+      Hidden, NOT removed from the markup. The figures are read from the data
+      by breedCardKind, the same answer the cards use, so nothing goes stale
+      while it is off, and turning it back on is one line. */
+.eraCount {
+  display: none;
+}
