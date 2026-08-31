@@ -6849,10 +6849,22 @@ export default function BreedTree({
                     x={0}
                     // 18 Aug 2026: nudged down another 10px (18 to 28), stacking
                     // on the earlier 10px move in e984ef95.
-                    y={half + 28 * upp}
+                    // 31 Aug 2026, MOBILE ONLY: 28 back down to 14. Desktop keeps
+                    // 28 and is not touched by any of the three mobile values here.
+                    y={half + (isMobile ? 14 : 28) * upp}
                     textAnchor="middle"
                     dominantBaseline="text-before-edge"
-                    style={{ fontSize: `${24 * upp}px`, strokeWidth: `${2 * upp}px` }}
+                    // MOBILE ONLY: 24 to 16 (a third smaller, by request), which
+                    // also stops "main page" clipping the right edge: the square's
+                    // centre is only about 50px from it, and the line was ~125px
+                    // wide. Stroke 2 to 3 and forced to true black; .autoLabel's
+                    // navy stays on desktop. paint-order is stroke, so the fill
+                    // covers half the width and 3 reads as a 1.5px outline.
+                    style={{
+                      fontSize: `${(isMobile ? 16 : 24) * upp}px`,
+                      strokeWidth: `${(isMobile ? 3 : 2) * upp}px`,
+                      stroke: isMobile ? "#000000" : undefined,
+                    }}
                   >
                     <tspan x={0}>back to</tspan>
                     <tspan x={0} dy="1.05em">main page</tspan>
@@ -6980,7 +6992,15 @@ export default function BreedTree({
                   y={w.y - SQ / 2 - 8 * upp}
                   textAnchor="middle"
                   dominantBaseline="text-after-edge"
-                  style={{ fontSize: `${24 * upp}px`, strokeWidth: `${2 * upp}px` }}
+                  // 31 Aug 2026, MOBILE ONLY: stroke 2 to 4 and forced to true
+                  // black. Size stays 24. .autoLabel sets paint-order: stroke, so
+                  // the fill paints over half the width and 4 reads as a 2px
+                  // outline. Desktop keeps the 2px navy it has now.
+                  style={{
+                    fontSize: `${24 * upp}px`,
+                    strokeWidth: `${(isMobile ? 4 : 2) * upp}px`,
+                    stroke: isMobile ? "#000000" : undefined,
+                  }}
                 >
                   {w.key === "start" ? "play" : "learn"}
                 </text>
@@ -7031,10 +7051,15 @@ export default function BreedTree({
               Luckiest Guy via .autoLabel, sized up. Anchored right of the play
               row (one square in learn, two on the start screen). */}
           {dockAside && gravity && entered && focus.depth === 0 && ((!started && !learning) || learning) && (() => {
-            // On a phone there is no hover, so the line is a static "start playing"
-            // (option b). On desktop it follows the pointer; blank when nothing is
-            // hovered.
-            const text = isMobile ? "start playing" : hoverHint;
+            // REVERSED 31 Aug 2026: the static phone line is gone. Anchored left
+            // of two squares it needed about 270px from x=185 on a 390px stage, so
+            // it ran off the right edge, and it drew on the same y as the level
+            // number so the two sat on top of each other. It also repeated the
+            // "play" caption above the green square. Mobile draws nothing here now.
+            // Desktop keeps the live hover hint, untouched. Do not restore the
+            // isMobile fallback without solving the width and the level number.
+            if (isMobile) return null;
+            const text = hoverHint;
             if (!text) return null;
             const st = stageRef.current;
             const upp = st ? (aspect >= 1 ? SIZE : SIZE / Math.max(aspect, 0.01)) / Math.max(st.clientHeight, 1) : 1;
