@@ -355,34 +355,45 @@
    clipped by this overflow. */
 .asideSheet {
   position: fixed;
-  left: 0;
-  right: 0;
+  left: 8px;
+  /* Clear of the chum rail on the right. The rail is .relRailHome at right 18px,
+     and its own width is 10px padding + 2px border each side plus its columns at
+     clamp(38px, 7.5vw, 56px) with an 8px gap. Sized for the TWO column case
+     (BreedTree switches at more than 9 chums), so the box never gets covered on a
+     busy level: 32 + 18 + 8 of air = the 58 below. THIS IS THE WIDTH DIAL. Drop
+     the 2 to a 1 and the 58 to a 50 for the one-column levels and the box gets
+     about 46px wider, at the cost of the rail sitting on it when a level has 10
+     or more chums. */
+  right: calc(2 * clamp(38px, 7.5vw, 56px) + 58px);
   top: auto;
   /* 31 Aug 2026: was bottom 0, which buried the learn PLAY button. PLAY is
      .learnPlay at bottom 3%, 67.5px tall on a phone (84 * 0.67 * 1.2), and both
      elements are measured against the same full-viewport overlay, so 3% + 80px
-     puts the box about 12px above it. Change the 80 and the same figure in
-     .stageReserved together, or the circles start again under the box. */
+     puts the box about 12px above it. */
   bottom: calc(3% + 80px);
-  width: 100%;
+  /* auto, so the left and right offsets above set the width. The 100% it used to
+     carry as an edge-to-edge sheet would beat both of them. */
+  width: auto;
   max-width: none;
-  /* THE DIAL. Taller box, shorter pit. 42vh was the bottom-edge figure; 38vh
-     pays for the 80px lift above without eating more of the pit than before. */
+  /* THE HEIGHT DIAL. The pit is no longer shrunk to make room, so this only
+     decides how much of the diagram the box covers and how soon it scrolls. */
   max-height: 38vh;
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
   cursor: default;
-  /* All four corners now: it floats clear of the bottom edge, so the flat
-     bottom it wore as an edge-to-edge sheet no longer has an edge to sit on. */
+  /* All four corners: it floats clear of every screen edge now. */
   border-radius: 14px;
   z-index: 16;
 }
-/* Its partner: while the sheet is up the pit gives back the band the sheet
-   occupies, so the circles re-fit above it and the sheet never overlaps them.
-   The pit already re-lays-out to its container (ResizeObserver), so shrinking
-   the stage suffices. The three figures are .asideSheet's own max-height and
-   bottom offset; keep them in step. */
+/* RETIRED 31 Aug 2026, deliberately left here as the record. This used to be
+   applied to the stage whenever the mobile info box was open, to give the box a
+   band of its own. It is no longer applied anywhere: relayoutMobile centres the
+   circle cluster on the stage rectangle, so shrinking the stage pushed the
+   diagram into the top half of the phone and broke the feel of the zoom and the
+   drag. The box overlaps the pit instead, by decision. Do not re-apply this
+   class; move the centring off the stage rect first if the overlap ever has to
+   go away. */
 .stageReserved {
   bottom: calc(38vh + 3% + 80px);
   height: auto;

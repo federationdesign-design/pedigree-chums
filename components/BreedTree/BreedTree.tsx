@@ -5551,7 +5551,14 @@ export default function BreedTree({
           : undefined
       }
     >
-      <div className={`${styles.stage}${dockAside ? " " + styles.stageDocked : ""}${dockAside && learning && !hideCaption && isMobile ? " " + styles.stageReserved : ""}`} ref={stageRef}>
+      {/* stageReserved REMOVED 31 Aug 2026. It used to shrink the stage while the
+          mobile info box was up so the two never overlapped. But relayoutMobile
+          centres the cluster on the STAGE (see the `drop` rule, level !== null),
+          so a shrunk stage centred the circles in the top 45% of the phone, which
+          put the zoom and drag focus off the middle of the screen. The pit now
+          keeps the full height and the box floats over it by design. Do not
+          re-add the class without moving the centring off the stage rect first. */}
+      <div className={`${styles.stage}${dockAside ? " " + styles.stageDocked : ""}`} ref={stageRef}>
         <svg
           viewBox={viewBox}
           // Records the press only. No stopPropagation: the stage listener above
