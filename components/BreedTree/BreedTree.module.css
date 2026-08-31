@@ -894,6 +894,23 @@
   bottom: auto;
 }
 
+/* PHONE AND SMALL TABLET: the rail starts directly under the corner square, with
+   20px of clear air between the two. Measured from the square's own code rather
+   than eyeballed: BreedTree draws the corner set at m = 16 * upp from the top and
+   uSz = 84 * pitScale * 1.2, and pitScale is 0.67 at this breakpoint, so the
+   square is 67.5px and its bottom edge lands at 16 + 67.5 = 83.5px.
+   83.5 + 20 of padding = 103.5px is where the FIRST CARD must start. The rail's
+   own top border and padding put its first card 12px below its box top (2px
+   border + 10px padding, border-box), so the box goes at 103.5 - 12 = 91.5px.
+   Breakpoint is 768px to match pitScale, not 640px: between the two the square
+   is already the small one, so the geometry above is the correct one there too.
+   Desktop keeps the 300px above untouched, where the square is the full 84px. */
+@media (max-width: 768px) {
+  .relRailHome {
+    top: 91.5px;
+  }
+}
+
 .relCard {
   width: clamp(38px, 7.5vw, 56px);
   height: clamp(38px, 7.5vw, 56px);
