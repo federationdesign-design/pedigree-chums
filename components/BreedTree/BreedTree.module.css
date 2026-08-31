@@ -357,8 +357,8 @@
   position: fixed;
   top: auto;
   /* 31 Aug 2026, second pass: +20px right of the old 8px. Third pass, same day:
-     +20px again, so 28 becomes 48. */
-  left: 48px;
+     +20px again, so 28 becomes 48. Fourth pass: +20px again, so 48 becomes 68. */
+  left: 68px;
   /* The head row is the drag handle and the body still scrolls. .asideDocked sets
      touch-action: pinch-zoom on this element, which blocks panning, so the two are
      set explicitly here: none on the head so a drag is never stolen by the browser,
@@ -375,7 +375,8 @@
      the box (box z-index 16, rail 12). That is the price of the extra width and was
      the owner's call; drop the 1.2 back to 1 to undo it. */
   right: auto;
-  width: calc((100vw - 66px - 2 * clamp(38px, 7.5vw, 56px)) * 1.2);
+  /* 1.2 -> 1.32 (31 Aug 2026, a further 10% on top of the first 20%). */
+  width: calc((100vw - 66px - 2 * clamp(38px, 7.5vw, 56px)) * 1.32);
   /* 31 Aug 2026: was bottom 0, which buried the learn PLAY button. PLAY is
      .learnPlay at bottom 3%, 67.5px tall on a phone (84 * 0.67 * 1.2), and both
      elements are measured against the same full-viewport overlay, so 3% + 80px put
@@ -385,7 +386,13 @@
      laps about 8px over the top of the PLAY button. Put the 80 back to separate
      them again. */
   bottom: calc(3% + 60px);
-  max-width: none;
+  /* GUARD, added 31 Aug 2026 alongside the 1.32. The width above grows faster than
+     the screen does, so on a wide phone it overruns the right edge: at 430px the sum
+     is 380px against 362px of room from left: 68px, and at 640px it is 59px over.
+     This caps it at whatever room is actually left, keeping 8px of air. A ceiling
+     only, so it does nothing at the widths where the sum already fits. It replaces
+     `max-width: none`, whose job was to beat .aside's 460px; a calc() beats that too. */
+  max-width: calc(100vw - 76px);
   /* THE HEIGHT DIAL. The pit is no longer shrunk to make room, so this only
      decides how much of the diagram the box covers and how soon it scrolls. */
   max-height: 38vh;
@@ -408,6 +415,16 @@
 .stageReserved {
   bottom: calc(38vh + 3% + 80px);
   height: auto;
+}
+
+/* PHONE: the write-up's own type. .asideDocked .cNote sets 0.72rem / 1.45 for the
+   docked box; on the phone sheet Steve asked for 1pt off and a 1.3em leading
+   (31 Aug 2026). Same specificity as that rule (0,2,0), so this wins by sitting
+   later in the file. The desktop docked box keeps 0.72rem / 1.45 untouched.
+   1pt = 1.333px, so 0.72rem (11.52px) reads about 10.19px here. */
+.asideSheet .cNote {
+  font-size: calc(0.72rem - 1pt);
+  line-height: 1.3em;
 }
 
 /* Small X in the corner of the docked caption. */
