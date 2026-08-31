@@ -2022,3 +2022,59 @@
 .railThumb:active {
   cursor: grabbing;
 }
+
+/* ======================================================================
+   STAGE 4B: THE HORIZONTAL TIMELINE LINE
+   31 August 2026, Steve's call: option B, the line only. The marker dots
+   stay hidden and no progress colouring comes back with this.
+
+   Foot of the file, same reason as every block above it.
+
+   WHAT IT REPLACES. .runLine drew a white line DOWN the centre of the run
+   and .markerDot put a node under every card. Both were hidden at stages
+   3b and 3e because they pointed the reader downwards. This is their
+   horizontal equivalent, and the values are copied from a line that is
+   already shipped and working: .stripRail::before in
+   app/britains-dog-history/history.module.css:415, the white rule across
+   the live page's breed strip. Same 4px, same rgba white, same pill cap.
+
+   WHY IT IS DRAWN PER CARD AND NOT ONCE ACROSS THE RAIL. The donor hangs
+   its line off the scroller itself. An absolutely positioned child of a
+   scroll container is laid out against the VISIBLE padding box, so a
+   single line would be one screen wide and would scroll away with the
+   first card, leaving the rest of the run bare. Drawing a segment per
+   card and letting the segments meet in the gap gives one continuous
+   line that travels with the cards, which is what the vertical one did.
+
+   NOT ON .markerRow, which would be the obvious host. That row carries
+   .markerHopA and B, a scale animation that runs on every card flip, and
+   a line inside it would collapse and spring back with the icons.
+   .dogScreen has no transform of its own, so the line stays put while
+   the card turns.
+
+   COSTS NO HEIGHT. It sits on the middle of the existing icon row rather
+   than asking for a band of its own, which the 27px slack could not pay
+   for on top of the drag thumb. */
+.dogScreen {
+  /* The line's containing block. Safe to add: every absolutely positioned
+     thing inside a card already resolves against .dogFlipInner or
+     .dogFront or .markerRow, all of which are positioned in their own
+     right, so nothing moves. */
+  position: relative;
+}
+.dogScreen::before {
+  content: "";
+  position: absolute;
+  /* Half the rail's 14px gap on each side, so one card's segment meets
+     the next card's exactly and the run reads as one line. */
+  left: -7px;
+  right: -7px;
+  /* The icon row is 40px tall (.markerInfo) and sits under a 12px margin,
+     so its middle is 20px up from the foot of the screen. Less half the
+     line's own 4px. */
+  bottom: 18px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.32);
+  border-radius: var(--radius-pill, 999px);
+  pointer-events: none;
+}
