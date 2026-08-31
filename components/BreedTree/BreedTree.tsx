@@ -328,10 +328,12 @@ const BOWL_VB_W = 1031.7;
 const BOWL_VB_H = 316.8;
 const BOWL_DROP_DEG = 80;
 const TOY_BOWL_GONE_KEY = "pc-minipit-bowl-gone";
-/* The share of the pit floor a settled bowl may take. 0.7 leaves a bowl clear
-   of both walls with room to be shoved about, rather than wedged between them.
+/* The share of the pit floor a settled bowl may take. Was 0.7; raised to 0.805
+   on 31 August 2026 at the owner's request, which is exactly 15% larger. Still
+   leaves a bowl clear of both walls with room to be shoved about, rather than
+   wedged between them: about 34px each side on a 360 phone and 39px on a 414.
    See the clamp in spawnToy for why this exists at all. */
-const BOWL_PIT_FRACTION = 0.7;
+const BOWL_PIT_FRACTION = 0.805;
 /* TEMPORARY TUNING HOOK, REMOVE ONCE THE NUMBER IS SETTLED. ?bowlw=60 sets the
    fraction to 0.60 for that visit only, so the figure can be found on a real
    phone instead of guessed. Same pattern as the ?d0= and ?tilt= hooks in this
