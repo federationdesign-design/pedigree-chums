@@ -674,8 +674,6 @@
   gap: 10px;
   width: 100%;
   height: 100%;
-  /* Round 11: raise the image set 50px to match The Card Is the Lens alignment. */
-  transform: translateY(-50px);
 }
 .pairAndRow .diptych {
   min-height: 0;

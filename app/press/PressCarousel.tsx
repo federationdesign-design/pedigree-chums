@@ -136,9 +136,14 @@ const SCREENS: Screen[] = [
   // screen 2's exact size while also carrying the row and the copy. Flagged.)
   {
     topTitle: "Meet Pug",
+    // Round 12: copy "The Card Is the Lens" positioning completely: an overlay wideTop
+    // diptych. The round-6 five-image row is dropped, because the deep panel overlap
+    // (round 11) always covered it and pushed it below the container.
+    layout: "overlay",
+    mediaVariant: "wideTop",
     media: {
-      type: "pairAndRow",
-      pair: [
+      type: "diptych",
+      items: [
         {
           src: "/press/dog-on-real.jpg",
           alt: "A real fawn Pug standing in long grass under a bright blue sky.",
@@ -151,13 +156,6 @@ const SCREENS: Screen[] = [
           w: 1798,
           h: 2500,
         },
-      ],
-      row: [
-        { src: "/press/alt-pug1.jpg", alt: "An alternate Pug illustration.", w: 365, h: 365 },
-        { src: "/press/alt-pug2.jpg", alt: "An alternate Pug illustration.", w: 447, h: 447 },
-        { src: "/press/alt-pug3.jpg", alt: "An alternate Pug illustration.", w: 468, h: 468 },
-        { src: "/press/alt-pug4.jpg", alt: "An alternate Pug illustration.", w: 178, h: 178 },
-        { src: "/press/alt-pug5.jpg", alt: "An alternate Pug illustration.", w: 232, h: 232 },
       ],
     },
     // Round 9 (settled): this slide's own copy moved to the video slide; it now carries
@@ -344,6 +342,9 @@ const SCREENS: Screen[] = [
   // steps line set in Montserrat.
   {
     topTitle: "Find Pug.",
+    // Round 12: match "The Card Is the Lens" two-column positioning and size.
+    layout: "overlay",
+    mediaVariant: "wideTop",
     media: {
       type: "diptych",
       items: [
@@ -433,7 +434,8 @@ const SCREENS: Screen[] = [
       // Round 7: film 10% bigger, images 10% smaller. slide10.jpg added to make three
       // in a row. (The brief said "before the current slide12.jpg image", but this
       // screen had no slide12.jpg; slide10.jpg is placed first. Flagged.)
-      videoScale: 1.1,
+      // Round 12: video reduced 15% (1.1 -> 0.935) so the image row clears the copy panel.
+      videoScale: 0.935,
       imgScale: 0.9,
       images: [
         { src: "/press/slide10.jpg", alt: "A Pedigree Chums Pug press image.", w: 1250, h: 1738 },
@@ -461,8 +463,9 @@ const SCREENS: Screen[] = [
   // 12 Turning Imagination Into Reality (round 4): title to top, three-image gallery.
   {
     topTitle: "Turning Imagination Into Reality",
-    // Round 11: wider media envelope so the three images are bigger.
-    mediaWide: true,
+    // Round 12: match "The Card Is the Lens" positioning (overlay wideTop, centred).
+    layout: "overlay",
+    mediaVariant: "wideTop",
     media: {
       type: "gallery",
       items: [
@@ -483,6 +486,9 @@ const SCREENS: Screen[] = [
   // 13 What We Have Now (round 4): title to top, two images.
   {
     topTitle: "What We Have Now",
+    // Round 12: match "The Card Is the Lens" two-column positioning and size.
+    layout: "overlay",
+    mediaVariant: "wideTop",
     media: {
       type: "diptych",
       items: [
