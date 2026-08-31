@@ -359,8 +359,11 @@ const LOGO_BIG_MULT = 6.8;         // PackPit's LOGO_W = BIG * 6.8
    PackPit line 548. */
 const LOGO_BODY_W = 0.85;
 const LOGO_BODY_H = 0.7;
-/* Share of the pit width the drawn logo may take. */
-const LOGO_PIT_FRACTION = 0.7;
+/* Share of the pit width the drawn logo may take. Was 0.7; owner's call on
+   31 August 2026, no more than 60% of the screen. The pit runs wall to wall
+   with only a few pixels of margin, so its width and the screen's are the same
+   figure for this purpose. */
+const LOGO_PIT_FRACTION = 0.6;
 /* TEMPORARY TUNING HOOK, REMOVE ONCE THE NUMBER IS SETTLED. ?logow=60 sets the
    fraction to 0.60 for that visit only, the same as ?bowlw= does for the bowl.
    Anything outside 20 to 100 is ignored. */
