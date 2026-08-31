@@ -358,22 +358,33 @@
   left: 0;
   right: 0;
   top: auto;
-  bottom: 0;
+  /* 31 Aug 2026: was bottom 0, which buried the learn PLAY button. PLAY is
+     .learnPlay at bottom 3%, 67.5px tall on a phone (84 * 0.67 * 1.2), and both
+     elements are measured against the same full-viewport overlay, so 3% + 80px
+     puts the box about 12px above it. Change the 80 and the same figure in
+     .stageReserved together, or the circles start again under the box. */
+  bottom: calc(3% + 80px);
   width: 100%;
   max-width: none;
-  max-height: 42vh;
+  /* THE DIAL. Taller box, shorter pit. 42vh was the bottom-edge figure; 38vh
+     pays for the 80px lift above without eating more of the pit than before. */
+  max-height: 38vh;
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
   cursor: default;
-  border-radius: 14px 14px 0 0;
+  /* All four corners now: it floats clear of the bottom edge, so the flat
+     bottom it wore as an edge-to-edge sheet no longer has an edge to sit on. */
+  border-radius: 14px;
   z-index: 16;
 }
-/* Its partner: while the sheet is up the pit gives back the bottom 42vh, so the
-   circles re-fit the top band and the sheet never overlaps them. The pit already
-   re-lays-out to its container (ResizeObserver), so shrinking the stage suffices. */
+/* Its partner: while the sheet is up the pit gives back the band the sheet
+   occupies, so the circles re-fit above it and the sheet never overlaps them.
+   The pit already re-lays-out to its container (ResizeObserver), so shrinking
+   the stage suffices. The three figures are .asideSheet's own max-height and
+   bottom offset; keep them in step. */
 .stageReserved {
-  bottom: 42vh;
+  bottom: calc(38vh + 3% + 80px);
   height: auto;
 }
 

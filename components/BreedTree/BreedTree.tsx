@@ -7504,7 +7504,18 @@ export default function BreedTree({
         // element's edge, so collapsing it would leave the rail with nothing to
         // hang off. Hidden this way the box keeps its box, the rail keeps its
         // anchor, and the rail turns itself visible again below.
-        style={{ position: "relative", visibility: hideCaption || displayOnly ? "hidden" : undefined }}
+        //
+        // POSITION, 31 Aug 2026. This inline "relative" used to be unconditional
+        // and it BEAT .asideSheet's "position: fixed", because an inline style
+        // wins over any class. With the box back in flow, the 640px block's
+        // "order: -1" on .aside put it FIRST in the column flex, which is why the
+        // mobile info box drew across the top of the pit instead of sitting in the
+        // band .stageReserved had already cleared for it at the foot.
+        // The rail no longer needs this element as an anchor either: it defaults
+        // to .relRailHome, its own fixed screen slot (see the note at the rail
+        // below). So on the mobile sheet the class is allowed to win. Desktop
+        // keeps the inline relative exactly as it was.
+        style={{ position: dockAside && isMobile ? undefined : "relative", visibility: hideCaption || displayOnly ? "hidden" : undefined }}
         onPointerDown={dockAside && !isMobile ? asideDown : undefined}
         onPointerMove={dockAside && !isMobile ? asideMove : undefined}
         onPointerUp={dockAside && !isMobile ? asideUp : undefined}
