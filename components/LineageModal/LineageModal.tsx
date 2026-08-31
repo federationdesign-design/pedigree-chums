@@ -9,7 +9,6 @@ import { BRAIN_PATH, BRAIN_ARTBOARD } from "../icons/brain";
 import ShareCard from "../ShareCard/ShareCard";
 import type { LineageNode } from "../../data/lineage";
 import { levelThemeFor } from "../../data/levelThemes";
-import { fireConfetti } from "../../lib/confetti";
 import css from "./LineageModal.module.css";
 import { TAG_STYLE, nodeStatus, type BreedTag } from "../BreedTreeMap/BreedTreeMap";
 import { useRouter } from "next/navigation";
@@ -313,6 +312,47 @@ export default function LineageModal({ name, image, character, lineage, fromRect
     window.setTimeout(() => setScorePulse(false), 400);
   };
 
+  /* THE TIME DRAIN. Ported from the main pit, PackPit.tsx, where it has always
+     run: one point a second, four a second in slow motion, never below zero.
+
+     WHY IT IS HERE NOW (31 August 2026, Steve). The mini pit had no drain at
+     all, and that single omission is most of why a mini pit score reads
+     drastically higher than a main pit one. A three minute main pit round
+     quietly costs 180 points. The same round here cost nothing, so the only
+     pressure on the clock was the player's patience.
+
+     Four conditions have to hold, and each one is a real case, not caution:
+       - `running`: the start screen is not a round, and a score must not bleed
+         while nobody is playing.
+       - `phase === "play"`: won and lost screens freeze the score, the same way
+         gameOverRef freezes the main pit's.
+       - not `learningActive`: the learn area is a reference layer over a paused
+         round. The main pit does exactly this with lineageOpenRef.
+       - slow motion costs 4x, matching the main pit, because slow motion buys
+         accuracy and has to be paid for.
+
+     Read through refs, so the interval is created once and never torn down and
+     rebuilt as state changes. */
+  const drainRef = useRef<number | null>(null);
+  const runningRef = useRef(false);
+  const phaseRef = useRef<"play" | "won" | "lost">("play");
+  const slowmoDrainRef = useRef(false);
+  const learningRef = useRef(false);
+  useEffect(() => { runningRef.current = running; }, [running]);
+  useEffect(() => { phaseRef.current = phase; }, [phase]);
+  useEffect(() => { slowmoDrainRef.current = slowmo; }, [slowmo]);
+  useEffect(() => { learningRef.current = learningActive; }, [learningActive]);
+  useEffect(() => {
+    drainRef.current = window.setInterval(() => {
+      if (!runningRef.current) return;
+      if (phaseRef.current !== "play") return;
+      if (learningRef.current) return;
+      const drain = slowmoDrainRef.current ? 4 : 1;
+      setScore((s) => Math.max(0, s - drain));
+    }, 1000);
+    return () => { if (drainRef.current) window.clearInterval(drainRef.current); };
+  }, []); // once; every live value above is read through a ref inside the tick
+
   useEffect(() => setMounted(true), []);
 
   // G02 "The Lineage Game": the round has started. One effect on the running
@@ -479,8 +519,22 @@ export default function LineageModal({ name, image, character, lineage, fromRect
             setPhase("won");
             // Completed, so this level's catch counts toward the run.
             if (packSize > 0) onLevelChumRate?.((collectedChums.size / packSize) * 100);
-            // celebration: confetti over the flash (vendored lib/confetti, no external CDN script)
-            fireConfetti({ particleCount: 180, spread: 110, origin: { x: 0.5, y: 0.45 }, startVelocity: 45 });
+            /* CONFETTI REMOVED 31 August 2026 (Steve): off-style, and the
+               most expensive thing on screen at the worst possible moment.
+
+               It fired 180 particles onto a fixed full-screen canvas at
+               z-index 2147483647, sized innerWidth by innerHeight times a
+               device pixel ratio of up to 2, and ran for about two seconds.
+               Every frame cleared the whole canvas and drew 180 rotated
+               shapes, each bone being five separate paths.
+
+               Why that mattered here and not elsewhere: the mini pit steps its
+               physics on a fixed 16.66ms accumulator clamped at MAX_ACC = 100
+               (BreedTree.tsx). Past 100ms of backlog the surplus time is
+               DISCARDED, so the pit does not catch up, it silently runs behind
+               real time. Firing this on the win meant the celebration was
+               competing with the pit for frames and dragging its clock. Do not
+               reintroduce a full-screen per-frame canvas over a live pit. */
           }}
           onPitFull={() => { setPhase("lost"); onLost?.(); }}
           rootNote={character}

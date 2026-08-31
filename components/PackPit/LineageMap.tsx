@@ -8,7 +8,6 @@ import { breeds } from "../../data/breeds";
 import { breedInfo } from "../../data/breedInfo";
 import { splitName } from "./splitName";
 import styles from "./LineageMap.module.css";
-import { fireConfetti } from "../../lib/confetti";
 import TileZoom from "../TileZoom/TileZoom";
 
 type BreedTag = "extinct" | "trending" | "popular" | "endangered" | "in-decline";
@@ -433,7 +432,6 @@ export default function LineageMap({
   // it so the button keeps the same overlap on the rim at any size.
   const learnBtnScale = circular ? Math.min(1, (1.8 * liftR) / 200) : 1;
   const [rootGone, setRootGone] = useState(false);
-  // Confetti comes from the vendored lib/confetti (no external CDN script).
   // Preload all images for instruction cards so they appear instantly when tapped
   useEffect(() => {
     if (!INSTR_NAMES.has(breed.name)) return;
@@ -1321,18 +1319,17 @@ export default function LineageMap({
     setScattered(true);
     burstAt(breed.x, breed.y, circR * 1.33);
     setRootGone(true);
-    fireConfetti({
-      particleCount: 150,
-      spread: 100,
-      origin: { x: (breed.x + pan.x) / vp.w, y: (breed.y + pan.y) / vp.h },
-      startVelocity: 45,
-    });
+    /* CONFETTI REMOVED 31 August 2026 (Steve). 150 particles on a fixed
+       full-screen canvas for about two seconds. This one was worse than the
+       LineageModal burst because this overlay opens OVER A LIVE ROUND, so it
+       took frames from the pit while the pit was still running. See the fuller
+       note in LineageModal.tsx. */
     window.setTimeout(() => { onRemove?.(breed.name); onClose(); }, 900);
   };
   // Solo dog: there is no node to turn green and no Complete button to press,
   // so landing the image in its frame IS the completion. circularComplete does
   // the rest, which is what the green button has always called: scatter into the
-  // pit, burst the big circle, confetti, remove and close.
+  // pit, burst the big circle, remove and close. (Confetti removed, 31 Aug 2026.)
   useEffect(() => {
     if (!soloLeaf || !circular || !framesDone) return;
     const t = window.setTimeout(() => circularComplete(), 420); // let the frame settle first
