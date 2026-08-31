@@ -64,6 +64,9 @@ type Screen = {
   mediaVariant?: "wideTop";
   /* screens 1, 6: video 20% smaller. */
   mediaShrink?: boolean;
+  /* Round 13: per-slide media scale (e.g. 0.75 = 25% smaller), top-center anchored.
+     Numeric counterpart to mediaShrink, for the Meet Pug video slide. */
+  mediaScale?: number;
   /* Round 11: widen the non-overlay media to the --media-wide envelope. */
   mediaWide?: boolean;
   /* screen 16: a text-box grid of available assets. */
@@ -157,6 +160,8 @@ const SCREENS: Screen[] = [
   // NEW (round 5, inserted after 3, before 4): Meet Pug, a video.
   {
     // Round 13: title removed; a persistent Montserrat label sits over the video.
+    // Round 13 (size pass): video 25% smaller.
+    mediaScale: 0.75,
     media: {
       type: "file",
       src: "/press/pug-run.mp4",
@@ -222,6 +227,30 @@ const SCREENS: Screen[] = [
         kind: "body",
         text: "Pug is not trying to cause trouble. Pug is simply behaving like a dog.",
       },
+    ],
+  },
+  // Round 13 (size pass): Turning Imagination Into Reality moved here, to after
+  // "We had a plan. Pug had instincts." (Why Pug?).
+  {
+    topTitle: "Turning Imagination Into Reality",
+    // Round 12: match "The Card Is the Lens" positioning (overlay wideTop, centred).
+    layout: "overlay",
+    mediaVariant: "wideTop",
+    media: {
+      type: "gallery",
+      items: [
+        { src: "/press/cartoon-world.jpg", alt: "The Pug in its illustrated cartoon world.", w: 1250, h: 1738 },
+        { src: "/press/no-dog-on-real.jpg", alt: "An empty real-world grassy field.", w: 1250, h: 1738 },
+        { src: "/press/slide1.jpg", alt: "A Can You Find Pug poster.", w: 1250, h: 1738 },
+      ],
+    },
+    blocks: [
+      { kind: "standfirst", text: "This is what Pedigree Chums was designed to do." },
+      {
+        kind: "body",
+        text: "The card introduces the dog. Your imagination gives the dog character.",
+      },
+      { kind: "body", text: "Then you look up and find that dog walking past you." },
     ],
   },
   // 7 One Pug. One Prize. (round 3): title to the top, second column added with the
@@ -327,29 +356,8 @@ const SCREENS: Screen[] = [
       { kind: "body", text: "The form changes. Pug does not." },
     ],
   },
-  // Round 13: Turning Imagination Into Reality moved here, to after Making Pug Tangible.
-  {
-    topTitle: "Turning Imagination Into Reality",
-    // Round 12: match "The Card Is the Lens" positioning (overlay wideTop, centred).
-    layout: "overlay",
-    mediaVariant: "wideTop",
-    media: {
-      type: "gallery",
-      items: [
-        { src: "/press/cartoon-world.jpg", alt: "The Pug in its illustrated cartoon world.", w: 1250, h: 1738 },
-        { src: "/press/no-dog-on-real.jpg", alt: "An empty real-world grassy field.", w: 1250, h: 1738 },
-        { src: "/press/slide1.jpg", alt: "A Can You Find Pug poster.", w: 1250, h: 1738 },
-      ],
-    },
-    blocks: [
-      { kind: "standfirst", text: "This is what Pedigree Chums was designed to do." },
-      {
-        kind: "body",
-        text: "The card introduces the dog. Your imagination gives the dog character.",
-      },
-      { kind: "body", text: "Then you look up and find that dog walking past you." },
-    ],
-  },
+  // Round 13 (size pass): Turning Imagination Into Reality moved up to after
+  // "We had a plan. Pug had instincts." (Why Pug?).
   // 10 Then Pug Left (round 4): full-width landscape video over two portrait images.
   {
     topTitle: "Then Pug Left.",
@@ -415,7 +423,8 @@ const SCREENS: Screen[] = [
       // in a row. (The brief said "before the current slide12.jpg image", but this
       // screen had no slide12.jpg; slide10.jpg is placed first. Flagged.)
       // Round 12: video reduced 15% (1.1 -> 0.935) so the image row clears the copy panel.
-      videoScale: 0.935,
+      // Round 13 (size pass): a further 25% smaller (0.935 -> 0.701).
+      videoScale: 0.701,
       imgScale: 0.9,
       images: [
         { src: "/press/slide10.jpg", alt: "A Pedigree Chums Pug press image.", w: 1250, h: 1738 },
@@ -440,8 +449,8 @@ const SCREENS: Screen[] = [
       { kind: "body", text: "We cannot really launch like that." },
     ],
   },
-  // Round 13: Turning Imagination moved up (now after Making Pug Tangible); the
-  // "What We Have Now" slide removed (its copy passed to There Is Only One Pug).
+  // Round 13: the "What We Have Now" slide removed (its copy passed to There Is
+  // Only One Pug). Turning Imagination now sits after "We had a plan." (Why Pug?).
   // 14 Help Us Find Pug (round 4): title to top, Montserrat copy. Round 7: the four
   // images now sit in a 2x2 grid rather than a single row.
   {
@@ -875,6 +884,9 @@ function ScreenView({
     <p className={styles.screenTitle}>{screen.topTitle}</p>
   ) : null;
   const shrink = screen.mediaShrink ? ` ${styles.mediaShrink}` : "";
+  const scaleStyle: CSSProperties | undefined = screen.mediaScale
+    ? { transform: `scale(${screen.mediaScale})`, transformOrigin: "top center" }
+    : undefined;
 
   if (!screen.media) {
     return (
@@ -895,7 +907,7 @@ function ScreenView({
       <>
         {titleEl}
         <div className={styles.overlayScreen}>
-          <div className={`${styles.overlayMedia}${variant}${shrink}`}>
+          <div className={`${styles.overlayMedia}${variant}${shrink}`} style={scaleStyle}>
             <MediaView media={screen.media} active={active} onEnded={onEnded} />
           </div>
           {hasCopy ? (
@@ -917,6 +929,7 @@ function ScreenView({
           className={`${styles.screenMedia}${
             screen.media.type === "bento" ? ` ${styles.screenMediaBento}` : ""
           }${screen.mediaWide ? ` ${styles.screenMediaWide}` : ""}${shrink}`}
+          style={scaleStyle}
         >
           <MediaView media={screen.media} active={active} onEnded={onEnded} />
         </div>
