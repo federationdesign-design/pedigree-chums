@@ -157,7 +157,30 @@
 
 @media (max-width: 640px) {
   .title {
-    font-size: clamp(0.9rem, 5vw, 1.6rem);
+    /* 31 Aug 2026: 2pt off at every width, by request. Written as a subtraction so
+       the inherited clamp stays readable and a second nudge is one number. The
+       block comment on .title warns against RAISING this; smaller is always safe.
+       Only the phone branch is touched. BreedTree mirrors this formula to size its
+       hover hint, but that hint returns null on mobile, so its copy of the <= 640
+       branch is dead and needs no matching edit. */
+    font-size: calc(clamp(0.9rem, 5vw, 1.6rem) - 2pt);
+  }
+}
+
+/* PHONE AND SMALL TABLET: even padding either side of the header.
+   31 Aug 2026. The title block is normally centred on --pit-axis (globals.css), the
+   shared vertical line that the difficulty slider, the score and the PLAY button
+   also sit on. On a phone that put the portrait's LEFT EDGE at 51.8 - 44.8/2 =
+   29.4px, while the red corner square's RIGHT EDGE is at 16px, so the left gap was
+   1.84x the right. Steve asked for them to match, so the portrait is pinned to 16px
+   here instead.
+   THE COST, on the record: the portrait no longer shares the axis with PLAY below
+   it. Its centre moves from 51.8px to 38.4px. To put that back, delete this block;
+   nothing else depends on it. Breakpoint is 768px, not 640px, because the corner
+   square is 67.5px with its 16px margin across that whole band (pitScale). */
+@media (max-width: 768px) {
+  .titleWrap {
+    left: 16px;
   }
 }
 
