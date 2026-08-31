@@ -27,6 +27,10 @@
   --media-max: min(92vw, 480px);
   --media-wide: min(96vw, 624px);
   --copy-max: min(96vw, 672px);
+  /* Round 11: the copy panel is anchored by its TOP this far above the media bottom,
+     so every slide overlaps the media by the same deep amount regardless of copy
+     length (was bottom-anchored, so depth varied 191-329px with copy). */
+  --panel-overlap: clamp(220px, 36vh, 340px);
 }
 
 /* Horizontal scroll-snap rail. Native snapping gives the swipe for free; the
@@ -208,6 +212,11 @@
 .screenMediaBento {
   max-width: calc(100vw - 2 * (clamp(16px, 4vw, 48px) + clamp(64px, 9vw, 132px) + 16px));
 }
+/* Round 11: Turning Imagination widens to the --media-wide envelope so its three
+   images are bigger. */
+.screenMediaWide {
+  max-width: var(--media-wide);
+}
 /* The text container is wider than the media (40%, owner round 2). */
 /* Round 10 (container overlap): the copy panel overlays the bottom of the media, the
    same as the overlay screens (.overlayCopy). Bottom-anchored so a taller panel grows
@@ -216,7 +225,9 @@
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 15px;
+  /* Round 11: top-anchored for a consistent, deep overlap (see --panel-overlap). */
+  top: calc(100% - var(--panel-overlap));
+  bottom: auto;
   z-index: 2;
   width: 100%;
   max-width: var(--copy-max);
@@ -384,7 +395,9 @@
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 15px;
+  /* Round 11: top-anchored for a consistent, deep overlap (see --panel-overlap). */
+  top: calc(100% - var(--panel-overlap));
+  bottom: auto;
   z-index: 2;
   width: 100%;
   max-width: var(--copy-max);
@@ -632,7 +645,9 @@
   min-height: 0;
   display: flex;
   gap: 10px;
-  align-items: center;
+  /* Round 11: sit the row directly under the video (10px), matching Meet Pug, rather
+     than centring it in the flex area and leaving a large gap above it. */
+  align-items: flex-start;
   justify-content: center;
   /* Round 10 (cause fix): shrink the whole row via max-width, not each image via
      transform:scale. scale left the flex cell full-size, so the leftover 10% read as
@@ -659,6 +674,8 @@
   gap: 10px;
   width: 100%;
   height: 100%;
+  /* Round 11: raise the image set 50px to match The Card Is the Lens alignment. */
+  transform: translateY(-50px);
 }
 .pairAndRow .diptych {
   min-height: 0;
@@ -676,8 +693,8 @@
 .bentoWrap {
   width: 100%;
   height: 100%;
-  /* Round 9: cap the bento box area height. */
-  max-height: 500px;
+  /* Round 9: cap the bento box area height. Round 11: raised 500px -> 700px. */
+  max-height: 700px;
   margin: 0 auto;
   overflow: hidden;
   display: flex;

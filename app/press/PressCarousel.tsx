@@ -63,6 +63,8 @@ type Screen = {
   mediaVariant?: "wideTop";
   /* screens 1, 6: video 20% smaller. */
   mediaShrink?: boolean;
+  /* Round 11: widen the non-overlay media to the --media-wide envelope. */
+  mediaWide?: boolean;
   /* screen 16: a text-box grid of available assets. */
   assetGrid?: { heading: string; items: string[]; href?: string }[];
 };
@@ -115,6 +117,7 @@ const SCREENS: Screen[] = [
         },
       ],
     },
+    // Round 9 (settled): the tail moved off to the "Meet Pug" diptych.
     blocks: [
       {
         kind: "standfirst",
@@ -122,11 +125,7 @@ const SCREENS: Screen[] = [
       },
       {
         kind: "body",
-        text: "Every Chum begins in the card, where illustration turns a breed into something you can imagine, recognise and play with, helping you notice, recognise and understand the dogs that were already around you.",
-      },
-      {
-        kind: "body",
-        text: "The world has not changed. The way you look at it has.",
+        text: "Every Chum begins in the card, where illustration turns a breed into something you can imagine.",
       },
     ],
   },
@@ -161,11 +160,16 @@ const SCREENS: Screen[] = [
         { src: "/press/alt-pug5.jpg", alt: "An alternate Pug illustration.", w: 232, h: 232 },
       ],
     },
+    // Round 9 (settled): this slide's own copy moved to the video slide; it now carries
+    // the tail moved off "The Card Is the Lens".
     blocks: [
-      { kind: "standfirst", text: "One of 54 Chums." },
       {
         kind: "body",
-        text: "There may be millions of Pug outside the cards. but in the chums world, there is only Pug. Every real Pug you see is the Pug.",
+        text: "recognise and play with, helping you notice, recognise and understand the dogs that were already around you.",
+      },
+      {
+        kind: "body",
+        text: "The world has not changed. The way you look at it has.",
       },
     ],
   },
@@ -181,7 +185,14 @@ const SCREENS: Screen[] = [
       h: 980,
       label: "the Pug running film",
     },
-    blocks: [],
+    // Round 9 (settled): gains the copy moved off the "Meet Pug" diptych.
+    blocks: [
+      { kind: "standfirst", text: "One of 54 Chums." },
+      {
+        kind: "body",
+        text: "There may be millions of Pug outside the cards. but in the chums world, there is only Pug. Every real Pug you see is the Pug.",
+      },
+    ],
   },
   // (Round 9: the two 2x2 grid screens, formerly "4 (new)" and "5 (new)", removed
   // entirely. This shifts the pack numbering after slide 4.)
@@ -235,8 +246,8 @@ const SCREENS: Screen[] = [
     topTitle: "One Pug. One Prize.",
     media: {
       type: "neat",
-      // Round 10: column A (images) 30%, column B (video) 70%.
-      split: [30, 70],
+      // Round 11: reversed to column A 70%, column B (video) 30% (round 10 had it 30/70).
+      split: [70, 30],
       colA: [
         {
           img: {
@@ -450,6 +461,8 @@ const SCREENS: Screen[] = [
   // 12 Turning Imagination Into Reality (round 4): title to top, three-image gallery.
   {
     topTitle: "Turning Imagination Into Reality",
+    // Round 11: wider media envelope so the three images are bigger.
+    mediaWide: true,
     media: {
       type: "gallery",
       items: [
@@ -490,9 +503,12 @@ const SCREENS: Screen[] = [
   // images now sit in a 2x2 grid rather than a single row.
   {
     topTitle: "Help Us Find Pug",
+    // Round 11: matched to "The Card Is the Lens": a wideTop diptych at native ratio,
+    // filling more of the page (was a 2x2 grid with cover-fill).
+    layout: "overlay",
+    mediaVariant: "wideTop",
     media: {
-      // Round 9: top two images (slide1, slide2) removed; two remain.
-      type: "grid",
+      type: "diptych",
       items: [
         { src: "/press/slide4.jpg", alt: "A real Pug in grass with TikTok and Instagram icons and the words When you do.", w: 1250, h: 1738 },
         { src: "/press/slide5.jpg", alt: "The blue Pug figurine inside a Pedigree Chums window box.", w: 1250, h: 1738 },
@@ -889,7 +905,6 @@ function ScreenView({
           {hasCopy ? (
             <div
               className={styles.overlayCopy}
-              style={{ bottom: screen.overlayBottom ?? 15 }}
             >
               {copy}
             </div>
@@ -905,7 +920,7 @@ function ScreenView({
         <div
           className={`${styles.screenMedia}${
             screen.media.type === "bento" ? ` ${styles.screenMediaBento}` : ""
-          }${shrink}`}
+          }${screen.mediaWide ? ` ${styles.screenMediaWide}` : ""}${shrink}`}
         >
           <MediaView media={screen.media} active={active} onEnded={onEnded} />
         </div>
@@ -1050,18 +1065,8 @@ export default function PressCarousel() {
         <WorkChevron />
       </button>
 
-      <div
-        className={styles.indicator}
-        role="progressbar"
-        aria-valuemin={1}
-        aria-valuemax={count}
-        aria-valuenow={index + 1}
-        aria-label="Slide position"
-      >
-        <p className={styles.counter} aria-live="polite">
-          {index + 1} / {count}
-        </p>
-      </div>
+      {/* Round 11: the progress counter (X / N) below the title is removed. The
+          Scotty-dog progress bar below still indicates position. */}
 
       {/* Progress bar: the Argos ReadingProgress element (the Scotty-dog bar),
           reused as-is but driven by the carousel position instead of scroll. */}
