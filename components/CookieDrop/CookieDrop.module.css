@@ -16,40 +16,57 @@
 .card {
   pointer-events: auto;
   width: min(680px, 100%);
-  background: var(--cream);
-  color: var(--navy);
-  border: 3px solid var(--navy);
-  border-radius: 22px;
+  /* Glass, restored 31 Aug 2026. This panel was cream with a navy border and small
+     Montserrat body copy from d4a3bdd2 until Steve asked for the old look back. The
+     values here are lifted verbatim from the deleted CookieBanner's .card and
+     .introText rules (git show d4a3bdd2^:components/CookieBanner/), so it matches
+     the panel he was still seeing on the 27 Aug deployment rather than being a
+     fresh guess at it.
+
+     Safe site-wide because body carries one blue gradient on every page
+     (globals.css line 112), so there is no light background for white text to get
+     lost on. The text-shadow is the belt and braces for a panel that happens to
+     float over a pale hero photo. */
+  background: transparent;
+  color: #ffffff;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-radius: 26px;
   padding: clamp(20px, 3.5vw, 30px) clamp(20px, 4vw, 34px) clamp(22px, 4vw, 32px);
-  box-shadow: 0 18px 50px rgba(10, 58, 87, 0.30);
+  box-shadow: 0 12px 32px rgba(10, 58, 87, 0.32);
   text-align: center;
   /* Pops in like the pit notice. Scale only, no opacity on the text. */
   animation: cardPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 .card:focus-visible {
-  outline: 3px solid var(--blue-deep);
+  outline: 3px solid #ffffff;
   outline-offset: 4px;
 }
 
 .title {
   font-family: var(--font-display), "Luckiest Guy", cursive;
   font-size: clamp(1.6rem, 4.5vw, 2.3rem);
-  color: var(--blue-deep);
+  color: #ffffff;
+  text-shadow: 0 4px 0 rgba(10, 58, 87, 0.45), 0 0 26px rgba(10, 58, 87, 0.6);
   line-height: 1;
   letter-spacing: 0.01em;
   margin: 0 0 10px;
 }
 
+/* Display face at the old banner's size, not Montserrat at 1rem. Copied from
+   CookieBanner's .introText: same family, same clamp, same leading, same shadow. */
 .body {
-  font-family: var(--font-body), "Montserrat", sans-serif;
-  font-size: clamp(0.95rem, 2vw, 1.05rem);
-  font-weight: 500;
-  line-height: 1.5;
-  margin: 0 0 18px;
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: clamp(17px, 3.7vw, 41px);
+  line-height: 1.28;
+  letter-spacing: 0.01em;
+  text-shadow: 0 4px 0 rgba(10, 58, 87, 0.45), 0 0 26px rgba(10, 58, 87, 0.6);
+  margin: 0 0 22px;
 }
 
 .link {
-  color: var(--navy);
+  color: var(--ng-lemon, #ffed00);
   font-weight: 700;
   text-decoration: underline;
   text-underline-offset: 2px;
@@ -60,6 +77,7 @@
   font-family: var(--font-body), "Montserrat", sans-serif;
   font-weight: 700;
   font-size: clamp(0.9rem, 1.9vw, 1rem);
+  text-shadow: 0 2px 10px rgba(10, 58, 87, 0.55);
   margin: 0 0 14px;
 }
 
@@ -69,6 +87,7 @@
   font-family: var(--font-body), "Montserrat", sans-serif;
   font-weight: 700;
   font-size: clamp(0.95rem, 2vw, 1.05rem);
+  text-shadow: 0 2px 10px rgba(10, 58, 87, 0.55);
   margin: 4px 0 0;
 }
 
@@ -99,7 +118,7 @@
 .reject { background: var(--family-emergency); animation-delay: 0.12s; }
 .btn:hover { filter: brightness(1.05); }
 .btn:focus-visible {
-  outline: 3px solid var(--blue-deep);
+  outline: 3px solid #ffffff;
   outline-offset: 3px;
 }
 
@@ -113,14 +132,15 @@
   font-family: var(--font-body), "Montserrat", sans-serif;
   font-weight: 700;
   font-size: clamp(0.95rem, 2vw, 1.05rem);
-  color: var(--navy);
+  color: #ffffff;
+  text-shadow: 0 2px 10px rgba(10, 58, 87, 0.55);
   text-decoration: underline;
   text-underline-offset: 2px;
   cursor: pointer;
 }
 .closeBtn:hover { text-decoration: none; }
 .closeBtn:focus-visible {
-  outline: 3px solid var(--blue-deep);
+  outline: 3px solid #ffffff;
   outline-offset: 3px;
   text-decoration: none;
 }
