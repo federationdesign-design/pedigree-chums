@@ -630,15 +630,8 @@
    is the disc's foot, height is the scroll position plus the card's inset, so
    the end of the line always lands on the next card's top edge. Behind the
    cards, whose front face is opaque, so it simply disappears under them. */
-/* STAGE 3: HIDDEN. The line, the disc and the scroll cue all draw a vertical
-   timeline running DOWN the screen, and the run travels sideways now. They are
-   hidden rather than deleted because the shape of a horizontal timeline is a
-   design question for Steve, not something to invent here. The script that
-   drew this no longer writes to it either. */
-.runLine,
-.railHead {
-  display: none;
-}
+/* STAGE 3: the line, the disc and the scroll cue are hidden. The rule that
+   does it is at the FOOT OF THIS FILE, not here. See the stage 3b block. */
 
 .runLine {
   position: absolute;
@@ -1651,3 +1644,66 @@
 .markerIn > *:nth-child(2) { animation-delay: 0s; }
 .markerIn > *:nth-child(1) { animation-delay: 0.16s; }
 .markerIn > *:nth-child(3) { animation-delay: 0.16s; }
+
+
+/* ============================================================================
+   STAGE 3B, 31 August 2026. Four corrections to the rail, all of them faults
+   introduced by stage 3a.
+
+   THIS BLOCK IS AT THE FOOT OF THE FILE ON PURPOSE. Every rule in it overrides
+   one declared earlier, and this stylesheet resolves equal specificity by
+   last-one-wins. Stage 3a put its hide rule for .railHead at line 638, above
+   .railHead's own definition at 830, so it was silently ignored and the disc
+   and the arrow stayed on screen. That is the exact trap the note at the top
+   of this file warns about. Adding to the foot cannot repeat it.
+   ========================================================================= */
+
+/* 1. THE VERTICAL TIMELINE FURNITURE. The line, the disc and the scroll-down
+      cue all draw a timeline running DOWN the screen. The run travels sideways
+      now, so the cue in particular was pointing the reader the wrong way.
+      Hidden rather than deleted: what a horizontal timeline should look like
+      is Steve's design call, not something to invent here. */
+.runLine,
+.railHead,
+.railCue {
+  display: none;
+}
+
+/* 2. THE CARD WAS WIDER THAN THE RAIL SLOT IT SITS IN.
+      .dogCard is min(95vw, 414px), which is right for a full-screen dog but is
+      390px on a phone inside a 228px rail item, so every card overflowed its
+      slot and the row ran off the bottom of the panel. It fills its slot now
+      and the slot is the thing that carries the width. */
+.dogCard {
+  width: 100%;
+}
+
+/* 3. THE TITLE RAN UNDER THE MENU.
+      .eraTitleBand is `flex: 0 0 52%`, a percentage of .eraScreen. That
+      resolved against a full-height screen before stage 3a; the screen is
+      auto-height now, so the percentage had nothing to measure against and the
+      band collapsed to nothing, dropping the title behind the fixed Nav.
+      An explicit inset instead of a percentage, so it cannot collapse again. */
+.eraTitleBand {
+  flex: 0 0 auto;
+  padding-top: 104px;
+}
+
+/* 4. THE RAIL HAD NO SHARE OF THE PANEL.
+      It was `flex` default, so the title band took what it wanted and the rail
+      was pushed off the bottom edge. It takes the leftover height now, and
+      centres the cards in it. `min-height: 0` is required: without it a flex
+      item refuses to shrink below its content and the overflow comes back. */
+.dogRail {
+  flex: 1 1 auto;
+  min-height: 0;
+  align-items: center;
+}
+
+/* The two big figures sit bottom right of the era screen, which is a much
+   shorter box than it was. Scaled down so they cannot crowd the paragraph
+   above them or the rail below. */
+.eraCount {
+  --era-num: clamp(2.1rem, 11vw, 3.1rem);
+  --era-word: clamp(0.7rem, 3.6vw, 1rem);
+}
