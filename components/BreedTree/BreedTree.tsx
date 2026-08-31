@@ -328,6 +328,20 @@ const BOWL_VB_W = 1031.7;
 const BOWL_VB_H = 316.8;
 const BOWL_DROP_DEG = 80;
 const TOY_BOWL_GONE_KEY = "pc-minipit-bowl-gone";
+/* The share of the pit floor a settled bowl may take. 0.7 leaves a bowl clear
+   of both walls with room to be shoved about, rather than wedged between them.
+   See the clamp in spawnToy for why this exists at all. */
+const BOWL_PIT_FRACTION = 0.7;
+/* TEMPORARY TUNING HOOK, REMOVE ONCE THE NUMBER IS SETTLED. ?bowlw=60 sets the
+   fraction to 0.60 for that visit only, so the figure can be found on a real
+   phone instead of guessed. Same pattern as the ?d0= and ?tilt= hooks in this
+   file. Anything outside 20 to 100 is ignored. */
+function bowlFrac(): number {
+  if (typeof window === "undefined") return BOWL_PIT_FRACTION;
+  const m = /[?&]bowlw=(\d+)/.exec(window.location.search);
+  const n = m ? Number(m[1]) : NaN;
+  return Number.isFinite(n) && n >= 20 && n <= 100 ? n / 100 : BOWL_PIT_FRACTION;
+}
 /* ---- Era props -------------------------------------------------------------
    Objects that belong to one era rather than to the pit as a whole. They take
    the place of the stick, big stick and rock in the props slot, and an era with
@@ -4052,9 +4066,19 @@ export default function BreedTree({
           : kind === "fork" ? ballDia * 1.15
           : kind === "shoe" ? TOY_SHOE_W
           // The bowl takes the main pit's own multiplier off the same unit,
-          // PackPit.tsx:364, including its 0.85 mobile reduction, so the two
-          // pits show a bowl of the same size.
-          : kind === "bowl" ? BIGT * 9.38 * (isNarrow ? 0.85 : 1)
+          // PackPit.tsx:364, including its 0.85 mobile reduction.
+          //
+          // BUT IT IS CLAMPED TO THE PIT, and that clamp is the important half.
+          // The main pit is a full-width canvas. This one is only as wide as
+          // the walls, which on a phone is the viewport: about 380 to 414px.
+          // BIGT * 9.38 * 0.85 comes out at about 449px on mobile, so the
+          // unclamped bowl is WIDER THAN THE PIT IT FALLS INTO and its rims
+          // foul both walls. Steve reported exactly that, 31 August 2026.
+          //
+          // BOWL_PIT_FRACTION is the share of the floor a settled bowl is
+          // allowed to take. Whichever is smaller wins, so a wide desktop pit
+          // still gets the main pit's size and a phone gets one that fits.
+          : kind === "bowl" ? Math.min(BIGT * 9.38 * (isNarrow ? 0.85 : 1), wPx * bowlFrac())
           : BIGT * 0.6 * 2;
         const hgt = kind === "stick" || kind === "stickBig" ? dia / STICK_ASPECT : kind === "rock" ? dia / ROCK_ASPECT : kind === "cookies" ? dia / COOKIES_ASPECT : kind === "bone" ? dia / BONE_ASPECT
           : kind === "newspaper" ? dia / TOY_NEWSPAPER_ASPECT
