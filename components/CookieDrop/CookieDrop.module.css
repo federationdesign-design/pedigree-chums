@@ -55,10 +55,13 @@
 }
 
 /* Display face at the old banner's size, not Montserrat at 1rem. Copied from
-   CookieBanner's .introText: same family, same clamp, same leading, same shadow. */
+   CookieBanner's .introText: same family, same clamp, same leading, same shadow.
+   31 Aug 2026: 2pt taken off at every width, by request. Written as a subtraction
+   rather than new clamp numbers so the inherited figures stay visible and a second
+   nudge is a change to one number. 2pt = 2.667px. */
 .body {
   font-family: var(--font-display), system-ui, sans-serif;
-  font-size: clamp(17px, 3.7vw, 41px);
+  font-size: calc(clamp(17px, 3.7vw, 41px) - 2pt);
   line-height: 1.28;
   letter-spacing: 0.01em;
   text-shadow: 0 4px 0 rgba(10, 58, 87, 0.45), 0 0 26px rgba(10, 58, 87, 0.6);

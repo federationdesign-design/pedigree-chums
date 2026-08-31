@@ -9,11 +9,19 @@
   overflow: hidden;
 }
 
-/* Shared resting spot: bottom-right corner, lifted clear of the reading-progress
-   bar (36px on article pages) and sitting below the pre-order launcher. */
+/* Shared resting spot. Horizontally unchanged, hard against the right edge.
+   VERTICALLY, 31 Aug 2026: was clamp(46px, 6vw, 56px), which parked the whole
+   sticker neatly in the corner. It now sits low enough that the BOTTOM HALF OF THE
+   WORD "POLICY" is off screen, by request.
+   The figure is measured from the artwork, not eyeballed. cookies-policy.svg is
+   672.6 x 266; rasterised, "cookies" inks rows 9-134 and "policy" rows 139-254, so
+   the midline of "policy" is at 196.5, leaving 69.5 of 266 (26.13%) below it. The
+   element's height is width x (266 / 672.6) = width x 0.39548, so the offset is
+   -(0.2613 x 0.39548) = -0.1033 of the width. Both the fall's final frame and the
+   settled button read this, so they line up. If the artwork is ever redrawn, remeasure. */
 .cookie,
 .settled {
-  bottom: clamp(46px, 6vw, 56px);
+  bottom: calc(clamp(187.5px, 27.5vw, 300px) * -0.1033);
   right: clamp(12px, 3vw, 22px);
   width: clamp(187.5px, 27.5vw, 300px);
   appearance: none;
@@ -51,22 +59,16 @@
   height: auto;
 }
 
-/* The two knocks are the 24-31% and 57-64% windows: X snaps (sharp per-segment
-   easing) while the spin is HELD flat across each window, so the jolt breaks against
-   a steady baseline instead of blending into the tumble. Knock 2 lands the X at the
-   corner (0); the tail is a small impact overshoot, then settle, ending upright. */
+/* REVERSED 31 Aug 2026: the two sideways knocks are gone. This used to snap X at the
+   24-31% and 57-64% windows while holding the spin flat, so the jolt read as a knock.
+   Steve asked for the horizontal travel to stop, so the drop is now a straight
+   vertical line and only the tumble remains. The tail keeps its small impact
+   overshoot and settle, ending upright at translate(0,0), which IS the resting spot
+   set above. */
 @keyframes cookieLand {
-  0%   { transform: translate(var(--kx0, -30vw), -115vh) rotate(0deg);
+  0%   { transform: translateY(-115vh) rotate(0deg);
          animation-timing-function: cubic-bezier(0.45, 0, 0.9, 0.5); }
-  24%  { transform: translate(var(--kx0, -30vw), -46vh)  rotate(calc(var(--rtot, 720deg) * 0.30));
-         animation-timing-function: cubic-bezier(0.85, 0, 0.15, 1); }
-  31%  { transform: translate(var(--kx1, -14vw), -38vh)  rotate(calc(var(--rtot, 720deg) * 0.30));
-         animation-timing-function: cubic-bezier(0.5, 0, 0.9, 0.5); }
-  57%  { transform: translate(var(--kx1, -14vw), -8vh)   rotate(calc(var(--rtot, 720deg) * 0.66));
-         animation-timing-function: cubic-bezier(0.85, 0, 0.15, 1); }
-  64%  { transform: translate(0, -3vh)                   rotate(calc(var(--rtot, 720deg) * 0.66));
-         animation-timing-function: cubic-bezier(0.4, 0, 0.5, 1); }
-  86%  { transform: translate(0, 4vh)                    rotate(var(--rtot, 720deg));
+  86%  { transform: translateY(4vh)    rotate(var(--rtot, 720deg));
          animation-timing-function: cubic-bezier(0.3, 1.5, 0.5, 1); }
-  100% { transform: translate(0, 0)                      rotate(var(--rtot, 720deg)); }
+  100% { transform: translateY(0)      rotate(var(--rtot, 720deg)); }
 }
