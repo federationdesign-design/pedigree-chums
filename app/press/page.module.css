@@ -588,6 +588,10 @@
   border-radius: 0;
   box-shadow: none;
 }
+/* Round 13: a cell that must show its whole image, uncropped on every side. */
+.neatCellContain .thumbImg {
+  object-fit: contain;
+}
 .neatCell .videoBox {
   width: 100%;
   height: 100%;

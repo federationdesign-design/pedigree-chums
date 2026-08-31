@@ -33,10 +33,11 @@ import panel from "../britains-dog-history/history.module.css";
 
 type Pic = { src: string; alt: string; w: number; h: number };
 type VideoMedia =
-  | { type: "vimeo"; videoId: string; poster: string; alt: string; w: number; h: number; label: string }
-  | { type: "file"; src: string; poster: string; alt: string; w: number; h: number; label: string };
-/* A cell in the neat two-column grid: either an image or a video. */
-type NeatCell = { img: Pic } | { vid: VideoMedia };
+  | { type: "vimeo"; videoId: string; poster: string; alt: string; w: number; h: number; label: string; caption?: string }
+  | { type: "file"; src: string; poster: string; alt: string; w: number; h: number; label: string; caption?: string };
+/* A cell in the neat two-column grid: either an image or a video. Round 13: an image
+   cell can force contain (no crop). */
+type NeatCell = { img: Pic; contain?: boolean } | { vid: VideoMedia };
 type Media =
   | { type: "image"; pic: Pic; priority?: boolean }
   | { type: "thumbs"; items: Pic[] }
@@ -70,28 +71,8 @@ type Screen = {
 };
 
 const SCREENS: Screen[] = [
-  // 1 Cover. Vimeo film (ad1d), copy overlaid; video 20% smaller (round 3).
-  {
-    layout: "overlay",
-    mediaShrink: true,
-    media: {
-      type: "vimeo",
-      videoId: "1222451619",
-      poster: "/press/ad1d-still.jpg",
-      alt: "A young girl in green hugging a grey dog on grass while a woman holds it, a real-world family and dog moment.",
-      w: 3594,
-      h: 5100,
-      label: "the opening film",
-    },
-    blocks: [
-      { kind: "standfirst", text: "Pedigree Chums. A Very British Game." },
-      {
-        kind: "body",
-        text: "Fifty-four Chums introduce the dogs. Britain provides the places to find them.",
-      },
-      { kind: "display", text: "There is no board. Britain is the board." },
-    ],
-  },
+  // Round 13: the Cover (ad1d film) moved to after "A Little Deeper", so
+  // "The Card Is the Lens" is now the opening slide.
   // 2 The Card Is the Lens (round 3): title moved to the top, image subtitles,
   // second image now dog-on-real, the list rewritten as one bold comma sentence at
   // the top of the container, 10px gutter.
@@ -143,6 +124,8 @@ const SCREENS: Screen[] = [
     mediaVariant: "wideTop",
     media: {
       type: "diptych",
+      // Round 13: Montserrat labels in the Card Is the Lens style.
+      captions: ["Imagination world", "Our Studio Set"],
       items: [
         {
           src: "/press/dog-on-real.jpg",
@@ -173,7 +156,7 @@ const SCREENS: Screen[] = [
   },
   // NEW (round 5, inserted after 3, before 4): Meet Pug, a video.
   {
-    topTitle: "Meet Pug",
+    // Round 13: title removed; a persistent Montserrat label sits over the video.
     media: {
       type: "file",
       src: "/press/pug-run.mp4",
@@ -182,6 +165,7 @@ const SCREENS: Screen[] = [
       w: 850,
       h: 980,
       label: "the Pug running film",
+      caption: "Transitioning to real",
     },
     // Round 9 (settled): gains the copy moved off the "Meet Pug" diptych.
     blocks: [
@@ -196,6 +180,9 @@ const SCREENS: Screen[] = [
   // entirely. This shifts the pack numbering after slide 4.)
   // 6 Why Pug? (round 5): two columns, a second video added, neat grid.
   {
+    // Round 13: title added; that line removed from the blue container; Montserrat
+    // labels added over each video.
+    topTitle: "We had a plan. Pug had instincts.",
     layout: "overlay",
     overlayBottom: 5,
     media: {
@@ -210,6 +197,7 @@ const SCREENS: Screen[] = [
             w: 1250,
             h: 1660,
             label: "the Find Pug advert",
+            caption: "Our social advert",
           },
         },
       ],
@@ -223,12 +211,12 @@ const SCREENS: Screen[] = [
             w: 1328,
             h: 2004,
             label: "the portrait advert",
+            caption: "Our website video",
           },
         },
       ],
     },
     blocks: [
-      { kind: "standfirst", text: "We had a plan. Pug had instincts." },
       { kind: "body", text: "A ball rolls past. Pug follows it." },
       {
         kind: "body",
@@ -244,10 +232,11 @@ const SCREENS: Screen[] = [
     topTitle: "One Pug. One Prize.",
     media: {
       type: "neat",
-      // Round 11: reversed to column A 70%, column B (video) 30% (round 10 had it 30/70).
-      split: [70, 30],
+      // Round 13: 60/40 (column A wide), and column A contains (no crop on any side).
+      split: [60, 40],
       colA: [
         {
+          contain: true,
           img: {
             src: "/press/get-your-ticket.jpg",
             alt: "A We Lost Pug, Find Pug free-entry ticket above the blue Pug figurine being photographed on a Pug podium.",
@@ -338,36 +327,27 @@ const SCREENS: Screen[] = [
       { kind: "body", text: "The form changes. Pug does not." },
     ],
   },
-  // 9 Find Pug (round 3): title to the top, middle image dropped, two columns, the
-  // steps line set in Montserrat.
+  // Round 13: Turning Imagination Into Reality moved here, to after Making Pug Tangible.
   {
-    topTitle: "Find Pug.",
-    // Round 12: match "The Card Is the Lens" two-column positioning and size.
+    topTitle: "Turning Imagination Into Reality",
+    // Round 12: match "The Card Is the Lens" positioning (overlay wideTop, centred).
     layout: "overlay",
     mediaVariant: "wideTop",
     media: {
-      type: "diptych",
+      type: "gallery",
       items: [
-        { src: "/press/slide2.jpg", alt: "The Pug character card on a blue and yellow set.", w: 1250, h: 1738 },
-        {
-          src: "/press/slide6.jpg",
-          alt: "The blue Pug figurine being photographed on a Pug podium and held in a palm, with a Win Me badge.",
-          w: 1250,
-          h: 1738,
-        },
+        { src: "/press/cartoon-world.jpg", alt: "The Pug in its illustrated cartoon world.", w: 1250, h: 1738 },
+        { src: "/press/no-dog-on-real.jpg", alt: "An empty real-world grassy field.", w: 1250, h: 1738 },
+        { src: "/press/slide1.jpg", alt: "A Can You Find Pug poster.", w: 1250, h: 1738 },
       ],
     },
     blocks: [
-      { kind: "standfirst", text: "The public becomes part of the story." },
+      { kind: "standfirst", text: "This is what Pedigree Chums was designed to do." },
       {
         kind: "body",
-        text: "Look up. Notice a dog. Recognise the breed. This time, we are looking for Pug.",
+        text: "The card introduces the dog. Your imagination gives the dog character.",
       },
-      {
-        kind: "display",
-        mont: true,
-        text: "Spot Pug. Take a photograph. Post it. Tag Pedigree Chums. Use #ChumSpot.",
-      },
+      { kind: "body", text: "Then you look up and find that dog walking past you." },
     ],
   },
   // 10 Then Pug Left (round 4): full-width landscape video over two portrait images.
@@ -454,57 +434,14 @@ const SCREENS: Screen[] = [
       ],
     },
     blocks: [
-      { kind: "standfirst", text: "So how can any real Pug be Pug?" },
-      { kind: "body", text: "In Pedigree Chums, each breed is represented by one Chum." },
-      { kind: "body", text: "Every real Pug you see could be a sighting of Pug." },
-    ],
-  },
-  // (old screen 11, the 5-thumb There Is Only One Pug, removed in round 4)
-  // 12 Turning Imagination Into Reality (round 4): title to top, three-image gallery.
-  {
-    topTitle: "Turning Imagination Into Reality",
-    // Round 12: match "The Card Is the Lens" positioning (overlay wideTop, centred).
-    layout: "overlay",
-    mediaVariant: "wideTop",
-    media: {
-      type: "gallery",
-      items: [
-        { src: "/press/cartoon-world.jpg", alt: "The Pug in its illustrated cartoon world.", w: 1250, h: 1738 },
-        { src: "/press/no-dog-on-real.jpg", alt: "An empty real-world grassy field.", w: 1250, h: 1738 },
-        { src: "/press/slide1.jpg", alt: "A Can You Find Pug poster.", w: 1250, h: 1738 },
-      ],
-    },
-    blocks: [
-      { kind: "standfirst", text: "This is what Pedigree Chums was designed to do." },
-      {
-        kind: "body",
-        text: "The card introduces the dog. Your imagination gives the dog character.",
-      },
-      { kind: "body", text: "Then you look up and find that dog walking past you." },
-    ],
-  },
-  // 13 What We Have Now (round 4): title to top, two images.
-  {
-    topTitle: "What We Have Now",
-    // Round 12: match "The Card Is the Lens" two-column positioning and size.
-    layout: "overlay",
-    mediaVariant: "wideTop",
-    media: {
-      type: "diptych",
-      items: [
-        { src: "/press/card-on-colour.jpg", alt: "The Pug character card on a blue and yellow studio set.", w: 1798, h: 2500 },
-        { src: "/press/no-3d-on-podium.jpg", alt: "An empty yellow podium in front of blue and cream arches.", w: 1798, h: 2500 },
-      ],
-    },
-    blocks: [
+      // Round 13: copy changed (it takes What We Have Now's slot and its copy).
       { kind: "standfirst", text: "53 Chums and one blank card." },
-      {
-        kind: "body",
-        text: "There is no spare Pug. There is no replacement card waiting backstage.",
-      },
+      { kind: "body", text: "There is no spare Pug. There is no replacement card waiting backstage." },
       { kind: "body", text: "We cannot really launch like that." },
     ],
   },
+  // Round 13: Turning Imagination moved up (now after Making Pug Tangible); the
+  // "What We Have Now" slide removed (its copy passed to There Is Only One Pug).
   // 14 Help Us Find Pug (round 4): title to top, Montserrat copy. Round 7: the four
   // images now sit in a 2x2 grid rather than a single row.
   {
@@ -532,6 +469,37 @@ const SCREENS: Screen[] = [
       { kind: "display", mont: true, text: "There is no board. Britain is the board." },
     ],
   },
+  // Round 13: Find Pug moved here, to after Help Us Find Pug.
+  {
+    topTitle: "Find Pug.",
+    // Round 12: match "The Card Is the Lens" two-column positioning and size.
+    layout: "overlay",
+    mediaVariant: "wideTop",
+    media: {
+      type: "diptych",
+      items: [
+        { src: "/press/slide2.jpg", alt: "The Pug character card on a blue and yellow set.", w: 1250, h: 1738 },
+        {
+          src: "/press/slide6.jpg",
+          alt: "The blue Pug figurine being photographed on a Pug podium and held in a palm, with a Win Me badge.",
+          w: 1250,
+          h: 1738,
+        },
+      ],
+    },
+    blocks: [
+      { kind: "standfirst", text: "The public becomes part of the story." },
+      {
+        kind: "body",
+        text: "Look up. Notice a dog. Recognise the breed. This time, we are looking for Pug.",
+      },
+      {
+        kind: "display",
+        mont: true,
+        text: "Spot Pug. Take a photograph. Post it. Tag Pedigree Chums. Use #ChumSpot.",
+      },
+    ],
+  },
   // 15 A Little Deeper (round 4): title to top, the live bento menu as the media.
   {
     topTitle: "A Little Deeper",
@@ -546,6 +514,28 @@ const SCREENS: Screen[] = [
         kind: "display",
         text: "Like dogs, curious people tend to find interesting things when they start digging.",
       },
+    ],
+  },
+  // Round 13: the Cover (ad1d film) moved here, to after A Little Deeper.
+  {
+    layout: "overlay",
+    mediaShrink: true,
+    media: {
+      type: "vimeo",
+      videoId: "1222451619",
+      poster: "/press/ad1d-still.jpg",
+      alt: "A young girl in green hugging a grey dog on grass while a woman holds it, a real-world family and dog moment.",
+      w: 3594,
+      h: 5100,
+      label: "the opening film",
+    },
+    blocks: [
+      { kind: "standfirst", text: "Pedigree Chums. A Very British Game." },
+      {
+        kind: "body",
+        text: "Fifty-four Chums introduce the dogs. Britain provides the places to find them.",
+      },
+      { kind: "display", text: "There is no board. Britain is the board." },
     ],
   },
   // 16 Press Assets (round 4): title to top, plus a text-box grid of the assets.
@@ -604,6 +594,9 @@ function VideoFacade({
       className={styles.videoBox}
       style={{ "--aspect": media.w / media.h } as CSSProperties}
     >
+      {/* Round 13: a Montserrat label above the player (z-index in .imgCaption), so it
+          survives playback rather than living on the poster. */}
+      {media.caption ? <span className={styles.imgCaption}>{media.caption}</span> : null}
       {playing && media.type === "vimeo" ? (
         <iframe
           className={styles.videoFrame}
@@ -722,7 +715,10 @@ function MediaView({
     const col = (cells: NeatCell[], grow?: number) => (
       <div className={styles.neatCol} style={grow ? { flexGrow: grow } : undefined}>
         {cells.map((c, i) => (
-          <div key={i} className={styles.neatCell}>
+          <div
+            key={i}
+            className={`${styles.neatCell}${"img" in c && c.contain ? ` ${styles.neatCellContain}` : ""}`}
+          >
             {"img" in c ? <Thumb pic={c.img} /> : <VideoFacade media={c.vid} active={active} onEnded={onEnded} />}
           </div>
         ))}
