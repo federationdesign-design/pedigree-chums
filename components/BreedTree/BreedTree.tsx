@@ -1557,6 +1557,10 @@ export default function BreedTree({
   const KNOCK_DAMP = 0.55;     // how quickly it stops arguing with itself
   const KNOCK_REST = 0.35;     // world units below which it is home
   const KNOCK_POINTS = 1;      // a nudge is worth almost nothing, by design
+  /* What learning a circle costs, charged when it leaves the pit. The figure is
+     the main pit's, LineageMap.tsx, so the two games price the same shortcut
+     the same way. Negative on purpose: it is spent, not earned. */
+  const LEARN_COST = -2500;
   /* An IMPULSE, not just an overlap correction. Resolving the overlap alone was
      invisible: the spring cancelled the shove on the frame it was applied, so
      the neighbour sat about eight units from home and never travelled. Contact
@@ -7559,6 +7563,20 @@ export default function BreedTree({
           onRemove={(name) => {
             // learnt: the circle leaves the pit for good
             if (learnNode && name === learnNode.data.name) {
+              /* THE SHORTCUT COST, 31 August 2026 (Steve). Mirrors the main
+                 pit, where LineageMap charges the same 2500 the moment AUTO is
+                 committed.
+
+                 CHARGED HERE, ON COMPLETION, NOT ON OPENING. Lifting a circle
+                 into learn is free: a reader who opens one, looks, and backs
+                 out has taken no shortcut and pays nothing. This line is the
+                 moment the shortcut actually pays off, because the circle
+                 leaves the pit for good rather than having to be knocked out.
+
+                 It also settles a comment that had been wrong for a while.
+                 LineageModal.tsx says the score can dip mid-play because the
+                 learn shortcut costs points. Until now it did not. It does. */
+              onScore?.(LEARN_COST);
               removedNodesRef.current.add(learnNode);
               const owned = pitBodiesRef.current?.owned;
               if (owned && [...owned].every((n) => removedNodesRef.current.has(n))) {
