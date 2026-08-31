@@ -32,12 +32,17 @@ const NAV_TILES: Record<string, TileData> = {
 export default function BentoBoard({
   onNavigate,
   animateIn = false,
+  hidePromoTiles = false,
 }: {
   onNavigate?: () => void;
   // Kept for call-site compatibility (Nav still passes it); the discount tile now
   // navigates to /discount-code rather than opening the popup, so it is unused.
   onOffer?: () => void;
   animateIn?: boolean;
+  // Press pack preview (round 7): omit the Chum Drop tile and the Good Dog Bad Dog
+  // hero slider (the HeroCarousel). Only the press bento passes this; the homepage
+  // and nav menu keep both.
+  hidePromoTiles?: boolean;
 }) {
   const navigate = onNavigate ?? (() => {});
 
@@ -94,8 +99,9 @@ export default function BentoBoard({
 
   return (
     <div className={`${styles.bentoWrap} ${animateIn ? styles.overlayIn : ""}`}>
-      {/* Featured hero -- carousel: Argos / Anubis / Hound of the Baskervilles */}
-      <HeroCarousel onNavigate={navigate} />
+      {/* Featured hero -- carousel: Argos / Anubis / Hound of the Baskervilles.
+          The Good Dog Bad Dog slider; hidden in the press preview (round 7). */}
+      {!hidePromoTiles && <HeroCarousel onNavigate={navigate} />}
 
       {/* Row 1 -- Competition (above) + Know Your Chums (below) in the left column,
           beside the Chum Drop / Dogs at Work / Britain's / About cluster. Know Your
@@ -107,7 +113,9 @@ export default function BentoBoard({
           {coverTile(NAV_TILES.knowYourChums, styles.sqTile, true)}
         </div>
         <div className={styles.cluster}>
-          <ChumDropTile href="/" labelA="Mini-game:" labelB="Chum Drop" cta="Play free now" sizeClass={styles.clusterVideo} onNavigate={navigate} />
+          {!hidePromoTiles && (
+            <ChumDropTile href="/" labelA="Mini-game:" labelB="Chum Drop" cta="Play free now" sizeClass={styles.clusterVideo} onNavigate={navigate} />
+          )}
           {coverTile(NAV_TILES.dogsAtWork, styles.dogsAtWorkWide, false, true)}
           <div className={styles.clusterRow}>
             {coverTile(NAV_TILES.britains, `${styles.clusterCell} ${styles.zoomHover}`, false, true)}

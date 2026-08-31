@@ -44,7 +44,7 @@ type Media =
   | { type: "diptych"; items: [Pic, Pic]; captions?: [string, string] }
   | { type: "pairAndRow"; pair: [Pic, Pic]; row: Pic[] }
   | { type: "neat"; colA: NeatCell[]; colB: NeatCell[] }
-  | { type: "videoStack"; video: VideoMedia; images: [Pic, Pic] }
+  | { type: "videoStack"; video: VideoMedia; images: Pic[]; videoScale?: number; imgScale?: number }
   | { type: "bento" }
   | VideoMedia;
 
@@ -434,6 +434,9 @@ const SCREENS: Screen[] = [
         h: 900,
         label: "the landscape advert",
       },
+      // Round 7: three new images added below the video (five in the row), each 10%
+      // smaller, 10px gutter.
+      imgScale: 0.9,
       images: [
         {
           src: "/press/slide9.jpg",
@@ -447,6 +450,9 @@ const SCREENS: Screen[] = [
           w: 1250,
           h: 1738,
         },
+        { src: "/press/slide21.jpg", alt: "A Pedigree Chums Pug press image.", w: 1250, h: 1738 },
+        { src: "/press/slide22.jpg", alt: "A Pedigree Chums Pug press image.", w: 1250, h: 1738 },
+        { src: "/press/slide23.jpg", alt: "A Pedigree Chums Pug press image.", w: 1250, h: 1738 },
       ],
     },
     blocks: [
@@ -472,7 +478,13 @@ const SCREENS: Screen[] = [
         h: 720,
         label: "the Pug escape film",
       },
+      // Round 7: film 10% bigger, images 10% smaller. slide10.jpg added to make three
+      // in a row. (The brief said "before the current slide12.jpg image", but this
+      // screen had no slide12.jpg; slide10.jpg is placed first. Flagged.)
+      videoScale: 1.1,
+      imgScale: 0.9,
       images: [
+        { src: "/press/slide10.jpg", alt: "A Pedigree Chums Pug press image.", w: 1250, h: 1738 },
         {
           src: "/press/slide6.jpg",
           alt: "The blue Pug figurine being photographed on a Pug podium and held in a palm, with a Win Me badge.",
@@ -533,11 +545,12 @@ const SCREENS: Screen[] = [
       { kind: "body", text: "We cannot really launch like that." },
     ],
   },
-  // 14 Help Us Find Pug (round 4): title to top, four-image gallery, Montserrat copy.
+  // 14 Help Us Find Pug (round 4): title to top, Montserrat copy. Round 7: the four
+  // images now sit in a 2x2 grid rather than a single row.
   {
     topTitle: "Help Us Find Pug",
     media: {
-      type: "gallery",
+      type: "grid",
       items: [
         { src: "/press/slide1.jpg", alt: "A Can You Find Pug poster.", w: 1250, h: 1738 },
         { src: "/press/slide2.jpg", alt: "The Pug character card on a blue and yellow set.", w: 1250, h: 1738 },
@@ -578,7 +591,7 @@ const SCREENS: Screen[] = [
     topTitle: "Press Assets",
     assetGrid: [
       { heading: "Video", items: ["Product", "CGI", "Live action"] },
-      { heading: "Photosets", items: ["Studio", "CGI"] },
+      { heading: "Photosets", items: ["Studio", "CGI", "Product"] },
       { heading: "Word docs", items: ["Campaign bio", "Competition terms"] },
     ],
     blocks: [
@@ -589,14 +602,14 @@ const SCREENS: Screen[] = [
       },
     ],
   },
-  // 17 Press Enquiries (was 16). Copy-only. Bracketed lines are owner placeholders.
+  // 17 Press Enquiries (was 16). Copy-only. Contact details supplied round 7.
   {
     title: "Press Enquiries",
     blocks: [
       { kind: "standfirst", text: "Get in touch." },
-      { kind: "body", text: "[NAME]\n[EMAIL]\n[TELEPHONE]" },
-      { kind: "body", text: "Website: [WEBSITE]\nInstagram: [HANDLE]" },
-      { kind: "body", text: "Competition opens: [DATE]. Closes: [DATE]." },
+      { kind: "body", text: "Steven\nhello@pedigreechums.co.uk\n07507235380" },
+      { kind: "body", text: "www.pedigreechums.co.uk\nhttps://www.instagram.com/" },
+      { kind: "body", text: "Open date: 1st Sept\nClose date: 1st Oct" },
       { kind: "display", text: "There is no board. Britain is the board." },
     ],
   },
@@ -773,9 +786,17 @@ function MediaView({ media, active }: { media: Media; active: boolean }) {
     );
   }
   if (media.type === "videoStack") {
-    // Full-width landscape video over two portrait images (screens 10 and new-11).
+    // Full-width landscape video over a row of portrait images (slides 11 and 12).
     return (
-      <div className={styles.videoStack}>
+      <div
+        className={styles.videoStack}
+        style={
+          {
+            "--video-scale": media.videoScale ?? 1,
+            "--img-scale": media.imgScale ?? 1,
+          } as CSSProperties
+        }
+      >
         <div className={styles.videoStackTop}>
           <VideoFacade media={media.video} active={active} />
         </div>
@@ -792,7 +813,7 @@ function MediaView({ media, active }: { media: Media; active: boolean }) {
     return (
       <div className={styles.bentoWrap}>
         <div className={styles.bentoScale}>
-          <BentoBoard />
+          <BentoBoard hidePromoTiles />
         </div>
       </div>
     );

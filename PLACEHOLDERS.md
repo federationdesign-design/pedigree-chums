@@ -370,17 +370,13 @@ do not render and changing dead code adds diff for no visible effect. Logged so
 nobody chases why they were skipped, or "fixes" their colour later. Resolve by
 deleting them if a future pass confirms they are still unused.
 
-## Press pack contact details (29 August)
+## Press pack contact details (29 August) — RESOLVED (round 7)
 
-The Press Enquiries screen (`/press`, the final slide) renders the owner's own
-bracketed placeholders verbatim from `docs/press/COPY.md` (screen 19). They are
-clearly bracketed on the page, never mistaken for real details.
-
-| Placeholder | Location | Meaning | Resolve via |
-|---|---|---|---|
-| `[NAME]` `[EMAIL]` `[TELEPHONE]` | `app/press/PressCarousel.tsx` (screen 16, from COPY.md §19) | Press contact, not yet supplied | Owner supplies contact details |
-| `[WEBSITE]` `[HANDLE]` | same | Website and social handle | Owner supplies |
-| `[DATE]` (opens / closes) | same | Competition dates | Owner supplies dates |
+The Press Enquiries screen (`/press`, the final slide) now carries the owner's real
+contact details (name, email, telephone, website, Instagram, open/close dates),
+supplied in round 7. No bracketed placeholders remain on that screen. Note the
+Instagram value is the bare `https://www.instagram.com/` root, not a handle, and it
+renders as plain text in the copy panel (not a clickable link).
 
 The copy-only tail screens (A Little Deeper, Press Assets, Press Enquiries) also
 have no image assigned; parked, unused press images are available

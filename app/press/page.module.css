@@ -566,18 +566,26 @@
 .videoStackTop .videoBox {
   width: 100%;
   height: auto;
-  max-height: 44vh;
+  /* Round 7: --video-scale lets a slide grow the film (slide 12 is 10% bigger). */
+  max-height: calc(44vh * var(--video-scale, 1));
 }
+/* Round 7: a flex row so the image strip holds any count (slide 11 has five,
+   slide 12 has three), 10px gutter. --img-scale shrinks each image per slide. */
 .videoStackImgs {
   flex: 1 1 auto;
   min-height: 0;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
   gap: 10px;
+  align-items: center;
+  justify-content: center;
 }
 .videoStackImgs .thumbImg {
+  flex: 1 1 0;
   min-width: 0;
   min-height: 0;
+  height: auto;
+  max-height: 100%;
+  transform: scale(var(--img-scale, 1));
 }
 
 /* Pair + row (screen 3): two images over a row of images below. Grid (the same
@@ -619,29 +627,33 @@
 }
 
 /* Asset grid (screen 16): text boxes of the available assets. */
+/* Round 7: boxes stacked in one column, text centred. */
 .assetGrid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: 1fr;
   gap: 8px;
   margin-top: clamp(8px, 1.6vh, 14px);
-  text-align: left;
+  text-align: center;
 }
 .assetBox {
   border: 2px solid var(--white, #ffffff);
   border-radius: 12px;
   padding: 8px 6px;
 }
+/* Round 7: font size doubled on all text in the box. */
 .assetHeading {
   margin: 0 0 4px;
   font-family: var(--font-display), system-ui, sans-serif;
-  font-size: clamp(0.9rem, 3vw, 1.15rem);
+  font-size: clamp(1.8rem, 6vw, 2.3rem);
   line-height: 1.05;
   color: var(--yellow-header, #ffed00);
 }
 .assetItem {
   margin: 0;
   font-family: var(--font-body), system-ui, sans-serif;
-  font-size: clamp(0.78rem, 2.5vw, 0.95rem);
+  /* Round 7: Montserrat weight up to 500. */
+  font-weight: 500;
+  font-size: clamp(1.56rem, 5vw, 1.9rem);
   line-height: 1.25;
   color: var(--press-copy, #ffffff);
 }
