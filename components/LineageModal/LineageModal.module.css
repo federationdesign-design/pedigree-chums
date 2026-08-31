@@ -156,6 +156,18 @@
 }
 
 @media (max-width: 640px) {
+  /* PHONE: only the level's own dog is shown in the header. The ladder rows under
+     it, the path down to whichever circle is being looked at, are hidden by request
+     (31 Aug 2026). Desktop keeps the full ladder.
+     Done in CSS rather than by not rendering the rows, on purpose: the FIRST row
+     carries portraitRef, which BreedTree measures for the dashed cluster line's
+     arrow target and for the top of the difficulty slider. Leaving the DOM alone
+     means those measures cannot be disturbed, and it is one rule to revert.
+     `display: none` also takes the row out of the column flex, so .titleWrap's 5px
+     gap collapses with it and no empty space is left behind. */
+  .titleRow:not(:first-child) {
+    display: none;
+  }
   .title {
     /* 31 Aug 2026: 2pt off at every width, by request. Written as a subtraction so
        the inherited clamp stays readable and a second nudge is one number. The
