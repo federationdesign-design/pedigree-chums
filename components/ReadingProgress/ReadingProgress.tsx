@@ -117,7 +117,12 @@ export default function ReadingProgress({
   }, [walkingState]);
 
   return (
-    <div ref={wrapRef} className={styles.wrap} id="rp-wrap" aria-hidden="true">
+    <div
+      ref={wrapRef}
+      className={`${styles.wrap}${controlled ? ` ${styles.controlled}` : ""}`}
+      id="rp-wrap"
+      aria-hidden="true"
+    >
       <div className={styles.track}>
         {notches.map((n) => (
           <span key={n} className={styles.notch} style={{ left: `${n}%` }} />

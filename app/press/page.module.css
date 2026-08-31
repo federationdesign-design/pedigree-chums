@@ -86,11 +86,18 @@
   box-shadow: 0 18px 44px rgba(10, 58, 87, 0.22);
 }
 
-/* Video facade: a box carrying the clip's own aspect (--aspect = w/h). The poster
-   fills it and the player replaces the poster on tap. */
+/* Video facade: the frame carries the clip's own aspect (--aspect = clip display
+   width / height, sourced from the clip itself, not the poster still). A full-slide
+   clip is height-bound, so the frame takes its height from the slot and derives its
+   width from the aspect; max-width caps it. Because the aspect is the clip's, the
+   poster (object-fit: cover) and the player fill it with no bars. Narrow columns are
+   width-bound and flip this (see .twoColB and .videoStackTop). The one real bar in
+   the pack was a data fault, not this rule: landscape-advert stores 4:3 but plays
+   16:9, so its --aspect had to come from the display aspect, not the stored size. */
 .videoBox {
   position: relative;
   height: 100%;
+  width: auto;
   max-width: 100%;
   aspect-ratio: var(--aspect);
   margin: 0 auto;
@@ -281,10 +288,9 @@
   align-items: center;
   justify-content: center;
 }
-/* Letterbox fix (owner round 2): the shared .videoBox is forced to height:100%,
-   which in this narrow column made a portrait clip taller than its 3:4 aspect, so
-   the player letterboxed. Size it by the column width here, so the box is exactly
-   the clip aspect and neither poster nor player gets black bars. */
+/* The narrow two-column video column is width-bound, not height-bound, so size the
+   frame by the column width (height:auto) and let the aspect set the height, or the
+   clip letterboxes. This is the width-bound counterpart of the base rule. */
 .twoColB .videoBox {
   height: auto;
   width: 100%;
@@ -324,10 +330,11 @@
   align-items: flex-start;
   justify-content: center;
 }
-/* Screen 2: images 30% wider and pushed up to the top of the slide. */
+/* Screen 2: images 30% wider. Round 6: moved down from the top edge to vertical
+   centre (was align-items: flex-start), as instructed. */
 .overlayMediaWideTop {
   max-width: var(--media-wide);
-  align-items: flex-start;
+  align-items: center;
 }
 /* Screen 8 two-column: a wider envelope so the columns are roomier and the video
    fills its column (owner round 2 letterbox note). */
@@ -417,12 +424,13 @@
   z-index: 6;
   margin: 0;
   font-family: var(--font-display), system-ui, sans-serif;
-  font-size: clamp(1.2rem, 4vw, 1.7rem);
+  font-size: clamp(1.53rem, 4vw, 2.03rem);
   line-height: 1;
   color: var(--yellow-header, #ffed00);
   pointer-events: none;
   white-space: nowrap;
 }
+/* Round 6: "Press Pack" up 4pt (~0.33rem) at both clamp ends; no desktop twin. */
 .screenTitle {
   flex: 0 0 auto;
   width: 100%;
@@ -454,7 +462,8 @@
 }
 .imgCaption {
   position: absolute;
-  top: 8px;
+  /* Round 6: down 10px (was 8px) for more room above the label. */
+  top: 18px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 2;
@@ -466,9 +475,13 @@
   white-space: nowrap;
 }
 
-/* Screens 1, 6: video 20% smaller. Comes after the media rules so it wins. */
+/* Screen 1: video 25% smaller (round 6). The earlier max-width reduction did
+   nothing because that clip is portrait and height-bound, so the width cap never
+   bit. Scale the frame instead: it shrinks in both dimensions whichever one binds,
+   and the top-centre origin keeps it anchored just under the title. */
 .mediaShrink {
-  max-width: calc(var(--media-max) * 0.8);
+  transform: scale(0.75);
+  transform-origin: top center;
 }
 
 /* ---- neat two-column grid (screens 6, 7, 8) ----------------------------- */
@@ -567,21 +580,27 @@
   min-height: 0;
 }
 
-/* Pair + row (screen 3): two images over a row of images below. */
+/* Pair + row (screen 3): two images over a row of images below. Grid (the same
+   pattern .screen uses): the pair takes a clamped 1fr track so its cells have a
+   definite height to cap the portrait images, and the row takes its natural height
+   below. A flex column let the tall pair grow and hide the row. */
 .pairAndRow {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
   gap: 10px;
   width: 100%;
   height: 100%;
 }
 .pairAndRow .diptych {
-  flex: 1 1 auto;
   min-height: 0;
 }
-.pairAndRow .gallery {
-  flex: 0 0 auto;
-  height: 22%;
+/* The pair images render at intrinsic height (percentage max-height does not resolve
+   through this flex/grid chain), so clip each cell to its grid height and centre the
+   image within it. This keeps the pair from overflowing down over the row; the trade
+   is a centre crop rather than the full card. */
+.pairAndRow .diptychCell {
+  overflow: hidden;
+  align-items: center;
 }
 
 /* Bento: the live launcher menu, scaled down to fit the media area (screen 15). */
@@ -683,24 +702,25 @@
   top: 50%;
   transform: translateY(-50%);
   z-index: 6;
-  width: auto;
-  height: auto;
+  /* One responsive size for every width (no desktop twin to strand). */
+  width: clamp(64px, 9vw, 132px);
+  height: clamp(64px, 9vw, 132px);
   padding: 0;
   border: none;
   background: transparent;
   color: var(--cream, #ffffff);
-  /* Global round: roughly double the previous size. */
-  font-size: clamp(6.5rem, 20vw, 10rem);
-  line-height: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   cursor: pointer;
-  text-shadow: 0 2px 10px rgba(10, 58, 87, 0.45);
+  /* Keeps the reused Dogs at Work chevron legible over light photography. */
+  filter: drop-shadow(0 2px 10px rgba(10, 58, 87, 0.45));
 }
-.arrow span {
-  /* Optical centring for the chevron glyph, which sits low in its box. */
-  margin-top: -4px;
+.arrow svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+/* The reused asset points right (next); mirror it for the previous control. */
+.prev svg {
+  transform: scaleX(-1);
 }
 .prev {
   left: 12px;

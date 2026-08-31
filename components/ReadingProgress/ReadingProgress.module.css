@@ -1,92 +1,102 @@
-/* Mobile-only for now -- flip the media query to enable on desktop */
+/* The bottom reading-progress bar. On article pages it is scroll-driven and shown
+   on mobile only. In controlled mode (the press carousel drives `progress`) the
+   wrap carries the .controlled class and is shown at every width. The .wrap gates
+   visibility; the pieces below always carry their positioning, so they render
+   whenever the wrap is displayed and nothing is stranded inside a media query. */
 .wrap {
   display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 36px;
+  /* 98 sits above the footer (95) and below the Get code launcher (100),
+     which must stay clickable. Raising the launcher instead would push it
+     above its own modal (120) and the open menu, so the bar comes down
+     rather than the launcher going up. */
+  z-index: 98;
+  pointer-events: none;
 }
 
+/* Article pages: mobile only (flip nothing here to keep desktop articles clean). */
 @media (max-width: 768px) {
   .wrap {
     display: block;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 36px;
-    /* 98 sits above the footer (95) and below the Get code launcher (100),
-       which must stay clickable. Raising the launcher instead would push it
-       above its own modal (120) and the open menu, so the bar comes down
-       rather than the launcher going up. */
-    z-index: 98;
-    pointer-events: none;
   }
+}
 
-  /* 3x taller, as requested -- was 4px. bottom:0 so the track's own
-     bottom edge sits flush with the true screen edge -- it was
-     previously anchored to the top of the 36px wrap, leaving 24px of
-     genuinely empty space below it before the real bottom of the screen. */
-  .track {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 12px;
-    background: var(--navy, #0a3a57);
-  }
+/* Controlled mode (e.g. the press carousel): show at every width. */
+.wrap.controlled {
+  display: block;
+}
 
-  /* Milestone notches: solid dark blue (no transparency), thicker and
-     taller than the track itself so they read clearly against the fill */
-  /* z-index above .fill so notches stay visible once the yellow fill
-     has passed over them, instead of being covered by it */
-  /* -6px reaches through the footer's 6px yellow top border, so the notches
-     meet the bottom of the yellow rather than stopping at the track. */
-  .notch {
-    position: absolute;
-    bottom: -6px;
-    width: 4px;
-    height: 24px;
-    background: var(--navy, #0a3a57);
-    z-index: 3;
-  }
+/* 3x taller, as requested -- was 4px. bottom:0 so the track's own
+   bottom edge sits flush with the true screen edge -- it was
+   previously anchored to the top of the 36px wrap, leaving 24px of
+   genuinely empty space below it before the real bottom of the screen. */
+.track {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 12px;
+  background: var(--navy, #0a3a57);
+}
 
-  .fill {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    height: 100%;
-    background: var(--yellow, #ffd23e);
-    z-index: 1;
-  }
+/* Milestone notches: solid dark blue (no transparency), thicker and
+   taller than the track itself so they read clearly against the fill */
+/* z-index above .fill so notches stay visible once the yellow fill
+   has passed over them, instead of being covered by it */
+/* -6px reaches through the footer's 6px yellow top border, so the notches
+   meet the bottom of the yellow rather than stopping at the track. */
+.notch {
+  position: absolute;
+  bottom: -6px;
+  width: 4px;
+  height: 24px;
+  background: var(--navy, #0a3a57);
+  z-index: 3;
+}
 
-  /* Sits clear above the track (track is 12px), not overlapping into it */
-  .dog {
-    position: absolute;
-    bottom: 15px;
-    transform: translateX(-55%) scaleX(-1);
-    filter: drop-shadow(0 1px 2px rgba(10, 58, 87, 0.35));
-    will-change: left;
-  }
+.fill {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 100%;
+  background: var(--yellow, #ffd23e);
+  z-index: 1;
+}
 
-  .dogImg {
-    width: 34px;
-    height: auto;
-    display: block;
-    overflow: visible;
-  }
+/* Sits clear above the track (track is 12px), not overlapping into it */
+.dog {
+  position: absolute;
+  bottom: 15px;
+  transform: translateX(-55%) scaleX(-1);
+  filter: drop-shadow(0 1px 2px rgba(10, 58, 87, 0.35));
+  will-change: left;
+}
 
-  /* Real fill, not a filter guess. One value to change to try another
-     colour -- e.g. var(--yellow, #ffd23e) for the brand yellow instead. */
-  .dogFill {
-    fill: #ffffff;
-  }
+.dogImg {
+  width: 34px;
+  height: auto;
+  display: block;
+  overflow: visible;
+}
 
-  /* Reaching the end: each frame is a single flat path (no separate
-     tail element to target), so the whole dog gives a small celebratory
-     wobble instead */
-  .dogDone {
-    animation: rpWobble 0.4s ease-in-out infinite;
-  }
+/* Real fill, not a filter guess. One value to change to try another
+   colour -- e.g. var(--yellow, #ffd23e) for the brand yellow instead. */
+.dogFill {
+  fill: #ffffff;
+}
 
-  @keyframes rpWobble {
-    0%, 100% { transform: translateX(-55%) scaleX(-1) rotate(0deg); }
-    50% { transform: translateX(-55%) scaleX(-1) rotate(-6deg); }
-  }
+/* Reaching the end: each frame is a single flat path (no separate
+   tail element to target), so the whole dog gives a small celebratory
+   wobble instead */
+.dogDone {
+  animation: rpWobble 0.4s ease-in-out infinite;
+}
+
+@keyframes rpWobble {
+  0%, 100% { transform: translateX(-55%) scaleX(-1) rotate(0deg); }
+  50% { transform: translateX(-55%) scaleX(-1) rotate(-6deg); }
 }

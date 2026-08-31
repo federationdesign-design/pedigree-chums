@@ -37,6 +37,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import GlowPanel from "../../components/GlowPanel/GlowPanel";
+import WorkChevron from "../../components/WorkChevron/WorkChevron";
 import Triangles, { type Tri } from "../../components/Parallax/Triangles";
 import type { Slide } from "./data/types";
 import { FAMILY_PILL_LABEL } from "./data/types";
@@ -435,18 +436,7 @@ export default function WorkDeck({ slides }: { slides: Slide[] }) {
     </div>
   );
 
-  const chevronSvg = (
-    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-      <path
-        d="M8 4l8 8-8 8"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="4"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
+  const chevronSvg = <WorkChevron />;
 
   const trackClass = (base: string) => (instant ? `${base} ${styles.instant}` : base);
 

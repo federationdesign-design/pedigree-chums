@@ -4,6 +4,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import ReadingProgress from "../../components/ReadingProgress/ReadingProgress";
+import WorkChevron from "../../components/WorkChevron/WorkChevron";
 import BentoBoard from "../../components/Nav/BentoBoard";
 import styles from "./page.module.css";
 /* The one approved container for text on a darker ground (brief section 1): the
@@ -128,12 +129,16 @@ const SCREENS: Screen[] = [
       },
     ],
   },
-  // 3 Meet Pug (round 3): title to the top, images now dog-on-real and card-on-colour.
+  // 3 Meet Pug (round 6): same diptych styling as screen 2, with a row of five
+  // alternate-Pug images added below the two columns. (The pair sits in the normal
+  // media envelope, not screen 2's wider one: at the wider width the portrait pair
+  // grows tall enough to overrun the copy panel and the new row, so it cannot match
+  // screen 2's exact size while also carrying the row and the copy. Flagged.)
   {
     topTitle: "Meet Pug",
     media: {
-      type: "diptych",
-      items: [
+      type: "pairAndRow",
+      pair: [
         {
           src: "/press/dog-on-real.jpg",
           alt: "A real fawn Pug standing in long grass under a bright blue sky.",
@@ -146,6 +151,13 @@ const SCREENS: Screen[] = [
           w: 1798,
           h: 2500,
         },
+      ],
+      row: [
+        { src: "/press/alt-pug1.jpg", alt: "An alternate Pug illustration.", w: 365, h: 365 },
+        { src: "/press/alt-pug2.jpg", alt: "An alternate Pug illustration.", w: 447, h: 447 },
+        { src: "/press/alt-pug3.jpg", alt: "An alternate Pug illustration.", w: 468, h: 468 },
+        { src: "/press/alt-pug4.jpg", alt: "An alternate Pug illustration.", w: 178, h: 178 },
+        { src: "/press/alt-pug5.jpg", alt: "An alternate Pug illustration.", w: 232, h: 232 },
       ],
     },
     blocks: [
@@ -415,8 +427,11 @@ const SCREENS: Screen[] = [
         src: "/press/landscape-advert.mp4",
         poster: "/press/landscape-advert-poster.jpg",
         alt: "A landscape advert film for the Pedigree Chums Pug.",
+        // Stored 1600x1200 with non-square pixels; it DISPLAYS as 16:9 (ffprobe
+        // DAR 711:400). Frame the container to the display aspect, not the storage
+        // size, or the clip letterboxes top and bottom.
         w: 1600,
-        h: 1200,
+        h: 900,
         label: "the landscape advert",
       },
       images: [
@@ -1007,7 +1022,7 @@ export default function PressCarousel() {
         disabled={atStart}
         aria-label="Previous slide"
       >
-        <span aria-hidden="true">{"‹"}</span>
+        <WorkChevron />
       </button>
       <button
         type="button"
@@ -1016,7 +1031,7 @@ export default function PressCarousel() {
         disabled={atEnd}
         aria-label="Next slide"
       >
-        <span aria-hidden="true">{"›"}</span>
+        <WorkChevron />
       </button>
 
       <div
