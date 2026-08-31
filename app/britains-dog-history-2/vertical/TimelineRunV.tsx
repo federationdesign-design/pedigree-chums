@@ -92,6 +92,11 @@ export default function TimelineRun({
   const runRef = useRef<HTMLDivElement | null>(null);
   const lineRef = useRef<HTMLSpanElement | null>(null);
   const dotRef = useRef<HTMLSpanElement | null>(null);
+  /* The yellow drag thumb under the rail. Same three refs, same names, as
+     BreedStrip's own strip scrollbar, so the two read alike. */
+  const railRef = useRef<HTMLDivElement | null>(null);
+  const trackRef = useRef<HTMLDivElement | null>(null);
+  const thumbRef = useRef<HTMLDivElement | null>(null);
   /* Marker rows that have arrived on screen, so their three icons pop in as
      the reader reaches them rather than all at once on load.
 
@@ -215,6 +220,80 @@ export default function TimelineRun({
     };
   }, [panelIndex]);
 
+  /* THE YELLOW DRAG THUMB. Lifted from BreedStrip's strip scrollbar
+     (BreedStrip.tsx, the "Yellow draggable scrollbar thumb" effect) rather than
+     written again, so this rail and the ones on the live page and in
+     know-your-chums behave identically. Same maths, same pointer capture, same
+     ResizeObserver.
+
+     ONE ADDITION, and it is the only difference. .dogRail is
+     `scroll-snap-type: x mandatory` and .stripRail is not, so dragging the
+     thumb would fight the snap the whole way and land somewhere other than
+     where the finger let go. Snapping is switched off for the duration of a
+     thumb drag and restored on release, so the rail still snaps to a card the
+     moment you let go. */
+  useEffect(() => {
+    const el = railRef.current;
+    const track = trackRef.current;
+    const thumb = thumbRef.current;
+    if (!el || !track || !thumb) return;
+
+    const sync = () => {
+      const max = el.scrollWidth - el.clientWidth;
+      if (max <= 1) {
+        track.style.opacity = "0";
+        return;
+      }
+      track.style.opacity = "1";
+      thumb.style.width = `${(el.clientWidth / el.scrollWidth) * 100}%`;
+      thumb.style.left = `${(el.scrollLeft / el.scrollWidth) * 100}%`;
+    };
+
+    let dragging = false;
+    let startX = 0;
+    let startScroll = 0;
+    const onDown = (e: PointerEvent) => {
+      dragging = true;
+      startX = e.clientX;
+      startScroll = el.scrollLeft;
+      el.style.scrollSnapType = "none"; // see the note above
+      thumb.setPointerCapture(e.pointerId);
+      e.preventDefault();
+    };
+    const onMove = (e: PointerEvent) => {
+      if (!dragging) return;
+      const trackW = track.clientWidth || 1;
+      const max = el.scrollWidth - el.clientWidth;
+      const next = startScroll + ((e.clientX - startX) / trackW) * el.scrollWidth;
+      el.scrollLeft = Math.max(0, Math.min(next, max));
+    };
+    const onUp = () => {
+      if (!dragging) return;
+      dragging = false;
+      el.style.scrollSnapType = ""; // back to the stylesheet's x mandatory
+    };
+
+    sync();
+    el.addEventListener("scroll", sync, { passive: true });
+    window.addEventListener("resize", sync);
+    thumb.addEventListener("pointerdown", onDown);
+    thumb.addEventListener("pointermove", onMove);
+    thumb.addEventListener("pointerup", onUp);
+    thumb.addEventListener("pointercancel", onUp);
+    const ro = new ResizeObserver(sync);
+    ro.observe(el);
+
+    return () => {
+      el.removeEventListener("scroll", sync);
+      window.removeEventListener("resize", sync);
+      thumb.removeEventListener("pointerdown", onDown);
+      thumb.removeEventListener("pointermove", onMove);
+      thumb.removeEventListener("pointerup", onUp);
+      thumb.removeEventListener("pointercancel", onUp);
+      ro.disconnect();
+    };
+  }, []);
+
   /* How many of this run's dogs open a level. breedCardKind is pure, so it is
      safe to call here, and it is the same answer the card itself uses. */
   const playable = breeds.filter((b) => breedCardKind(b.name) === "play").length;
@@ -302,7 +381,8 @@ export default function TimelineRun({
             The rail wraps only the CARDS. BreedStrip's own modal, lives and
             score come back alongside them and stay outside it. */}
         <BreedStrip era={era} renderLevels={(open) => (
-          <div className={styles.dogRail}>{breeds.map((b, bi) => {
+          <>
+          <div ref={railRef} className={styles.dogRail}>{breeds.map((b, bi) => {
           const isFlipped = flipped === b.name;
           /* undefined for a dog with no level. 62 of the 97 open one, 28 go to
              their own breed page, and 7 flip only, which is the live page's
@@ -553,6 +633,14 @@ export default function TimelineRun({
             </div>
           );
         })}</div>
+          {/* The only cue that the dogs move sideways. A sibling of the rail,
+              not a child, exactly as .stripScrollbar is a sibling of
+              .stripRail. renderLevels returns a fragment, so both land as flex
+              children of .timelineRun. */}
+          <div ref={trackRef} className={styles.railScrollbar} aria-hidden="true">
+            <div ref={thumbRef} className={styles.railThumb} />
+          </div>
+          </>
         )} />
       </div>
     </div>

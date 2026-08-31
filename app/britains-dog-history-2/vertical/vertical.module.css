@@ -1966,3 +1966,59 @@
 .backLinks {
   gap: 10px;
 }
+
+/* ======================================================================
+   STAGE 4: THE YELLOW DRAG THUMB
+   31 August 2026. Added at the FOOT of the file, per the rule-order trap
+   at the top of this block list: an override placed above the rule it
+   overrides is silently ignored.
+
+   THE ONLY CUE THAT THE DOGS MOVE SIDEWAYS. The down arrow that used to
+   hint at movement went at stage 3e because it pointed the wrong way.
+
+   Copied from .stripScrollbar and .stripThumb in
+   app/britains-dog-history/history.module.css, so this rail, the live
+   page's breed strip and know-your-chums all scroll and look alike.
+
+   TWO DELIBERATE DIFFERENCES FROM THE DONOR:
+
+   1. HEIGHT. The donor is 12px with an 8px top margin, 20px in all. The
+      rail's whole slack is about 27px on a 390 by 708 phone (see the
+      space budget note above), and the card is locked square so it
+      cannot shrink to make room: it would simply be clipped by
+      .dogRail's overflow. 8px with a 6px margin costs 14px instead of
+      20px and leaves the margin intact on a shorter phone.
+   2. SIDE INSET. The donor's is clamp(40px, 8vw, 120px), sized for a
+      desktop-width strip. This rail is a phone, so it matches the
+      rail's own 16px side padding and the thumb lines up with the cards
+      above it.
+
+   touch-action: pinch-zoom on the THUMB and nowhere else. Do not add
+   any touch-action to .dogRail or .timelineRun, see trap 3. */
+.railScrollbar {
+  position: relative;
+  flex: 0 0 auto;
+  height: 8px;
+  margin: 6px 16px 0;
+  border-radius: var(--radius-pill, 999px);
+  background: rgba(255, 255, 255, 0.22);
+  /* Hidden until the rail actually overflows. The effect sets this to 1,
+     so an era with too few dogs to scroll shows no bar at all. */
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+.railThumb {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 30%;
+  min-width: 44px;
+  border-radius: var(--radius-pill, 999px);
+  background: var(--yellow);
+  cursor: grab;
+  touch-action: pinch-zoom;
+}
+.railThumb:active {
+  cursor: grabbing;
+}
