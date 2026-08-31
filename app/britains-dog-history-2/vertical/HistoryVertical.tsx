@@ -296,6 +296,28 @@ export default function HistoryVertical() {
            laid-out DOM and everything reads this table instead. Re-measured on
            resize and on load, because a late font or image changes heights. */
         var positions = [];
+        /* Layout signature. The table is rebuilt whenever this changes, which
+           covers every way it can go stale at once: first paint, font load,
+           image decode, rotation, the address bar moving. */
+        var sig = '';
+        var sawEls = -1;   /* diagnostic only */
+
+        /* THE TABLE IS BUILT ON DEMAND, NEVER ONLY UP FRONT.
+
+           31 August 2026: the first version measured once at parse time and
+           again on window load, and on a real iPhone it produced an EMPTY
+           table. Every fact circle then read as more than one panel away and
+           sat at opacity 0, which is why they vanished.
+
+           Building it up front was the mistake. The table is now rebuilt the
+           moment the layout signature disagrees with it, so a bad early
+           measurement can only survive until the next frame that reads it. */
+        function table(){
+          var s = carousel.clientHeight + 'x' + carousel.scrollHeight;
+          if (s !== sig || !positions.length) { measure(); sig = s; }
+          return positions;
+        }
+
         function measure(){
           var h = carousel.clientHeight;
           if (!h) return;
@@ -315,6 +337,7 @@ export default function HistoryVertical() {
             var off = el.getAttribute('data-pc-sec') !== null ? h * SEAM : 0;
             next[n] = top - off;
           }
+          sawEls = els.length;
           if (next.length) positions = next;
         }
 
@@ -322,12 +345,13 @@ export default function HistoryVertical() {
            fraction is how far through the move to the next one we are, which
            is what the circle roll and the video scrub need. */
         function panelAt(){
-          var last = positions.length - 1;
+          var pos = table();
+          var last = pos.length - 1;
           if (last < 1) return 0;
           var y = carousel.scrollTop;
-          if (y <= positions[0]) return 0;
+          if (y <= pos[0]) return 0;
           for (var i = 0; i < last; i++) {
-            var a = positions[i], b = positions[i + 1];
+            var a = pos[i], b = pos[i + 1];
             if (a === undefined || b === undefined) continue;
             if (y < b) return b > a ? i + (y - a) / (b - a) : i;
           }
@@ -441,7 +465,8 @@ export default function HistoryVertical() {
           }
         }, { passive: true });
         function refresh(){ update(); updateCount(); placeBar(); updateRoll(); }
-        measure();
+        /* No measure() call here on purpose. table() builds itself the first
+           time anything reads it, so there is nothing to prime. */
         refresh();
 
         /* ================= REMOVE BEFORE STAGE 3 =================
@@ -465,6 +490,8 @@ export default function HistoryVertical() {
               ' | scrollH ' + carousel.scrollHeight +
               ' | panels ' + nPanels +
               ' | pos.len ' + positions.length +
+              ' | sawEls ' + sawEls +
+              ' | sig ' + sig +
               ' | pos0-4 ' + five.join(',') +
               ' | panelAt ' + panelAt().toFixed(2) +
               ' | rollEls ' + rollEls.length +
@@ -476,10 +503,11 @@ export default function HistoryVertical() {
           diag();
         }
         /* Heights move after this script runs: web fonts land, the section
-           photographs decode, the address bar settles. Each of those shifts
-           every snap position below it, so the table is rebuilt. */
-        window.addEventListener('resize', function(){ measure(); refresh(); });
-        window.addEventListener('load', function(){ measure(); refresh(); });
+           photographs decode, the address bar settles. table() notices each of
+           those through the layout signature and rebuilds itself, so these only
+           have to ask for a repaint. */
+        window.addEventListener('resize', refresh);
+        window.addEventListener('load', refresh);
 
         function goTo(idx) {
           /* Re-queried each time so the handler still works if React has
@@ -489,13 +517,13 @@ export default function HistoryVertical() {
           /* Panels, not sections: a top-level child is now a whole section
              group nine panels wide, so counting children under-counted by
              nine and clamped every jump into the first section. */
-          /* Measured fresh: a button can be pressed before the load handler
-             has run, and a stale table would jump to the wrong screen. */
-          measure();
-          var last = positions.length - 1;
+          /* Through table(), so a button pressed before anything has scrolled
+             still gets a freshly built set of positions. */
+          var pos = table();
+          var last = pos.length - 1;
           if (idx < 0) idx = 0;
           if (idx > last) idx = last;
-          var target = positions[idx];
+          var target = pos[idx];
           if (target === undefined) return;
           var from = c.scrollTop;
           /* scroll-snap-type mandatory blocks programmatic smooth scrolling on
