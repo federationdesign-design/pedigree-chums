@@ -356,8 +356,15 @@
 .asideSheet {
   position: fixed;
   top: auto;
-  /* 31 Aug 2026, second pass: +20px right of the old 8px, by request. */
-  left: 28px;
+  /* 31 Aug 2026, second pass: +20px right of the old 8px. Third pass, same day:
+     +20px again, so 28 becomes 48. */
+  left: 48px;
+  /* The head row is the drag handle and the body still scrolls. .asideDocked sets
+     touch-action: pinch-zoom on this element, which blocks panning, so the two are
+     set explicitly here: none on the head so a drag is never stolen by the browser,
+     pan-y on the box so the write-up can still be scrolled. Pair them with
+     sheetDown's `.cHead` test in BreedTree.tsx. */
+  touch-action: pan-y;
   /* Width is now explicit rather than an inset pair. The old rule anchored the
      right edge at calc(2 * clamp(38px, 7.5vw, 56px) + 58px) to clear the chum rail;
      that expression survives below as the BASE of the width sum, so the 20% is
@@ -531,6 +538,19 @@
   align-items: center;
   gap: 12px;
   margin-bottom: 10px;
+}
+/* PHONE: the head row is the box's drag handle (31 Aug 2026). touch-action: none so
+   the browser never claims the gesture as a scroll, which on a touch screen is the
+   same movement. The body keeps pan-y, so the write-up still scrolls. Desktop drags
+   from anywhere on the box and is untouched. */
+@media (max-width: 640px) {
+  .asideSheet .cHead {
+    touch-action: none;
+    cursor: grab;
+  }
+  .asideSheet .cHead:active {
+    cursor: grabbing;
+  }
 }
 .cPortrait {
   display: block;

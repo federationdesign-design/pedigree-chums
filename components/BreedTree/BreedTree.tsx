@@ -1807,6 +1807,60 @@ export default function BreedTree({
   const railRef = useRef<HTMLDivElement>(null);
   const asideOff = useRef({ x: 0, y: 0 });
   const asideDrag = useRef<{ sx: number; sy: number; ox: number; oy: number } | null>(null);
+  /* MOBILE DRAG, added 31 Aug 2026. The phone sheet could not be moved at all: the
+     handlers below were gated `!isMobile`.
+
+     It cannot reuse the desktop path. That one writes a TRANSFORM, and the chum rail
+     is a DOM CHILD of this box using `position: fixed`. A transformed ancestor
+     becomes the containing block for a fixed descendant, so the first drag would tear
+     the rail off the screen and hand it to the box, where `overflow-y: auto` would
+     clip it. That is why the CSS said "not draggable on a phone".
+
+     So the phone drag writes inline LEFT and BOTTOM in pixels instead. No transform,
+     no containing block, and the rail carries on ignoring the box. It only works
+     because .asideSheet now carries an explicit `width`; with the old left/right
+     inset pair, setting `left` alone would have stretched it.
+
+     Held in state rather than a ref because the inline style has to survive a
+     re-render, and this box re-renders on every hover in the pit behind it. */
+  const [sheetPos, setSheetPos] = useState<{ left: number; bottom: number } | null>(null);
+  const sheetDrag = useRef<{ sx: number; sy: number; ol: number; ob: number; w: number; h: number } | null>(null);
+  // Drag by the HEAD ROW only, not the whole box. The body scrolls, and on a touch
+  // screen a drag and a scroll are the same gesture, so one of them has to own it.
+  // The head is the handle; the body keeps its scroll (see the touch-action pair in
+  // the CSS). A press on a button inside the head still reaches the button.
+  const sheetDown = (e: React.PointerEvent) => {
+    const t = e.target as HTMLElement;
+    if (t.closest("button, a, input, select, textarea")) return;
+    if (!t.closest(`.${styles.cHead}`)) return;
+    const el = asideRef.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    e.preventDefault();
+    e.stopPropagation();
+    sheetDrag.current = {
+      sx: e.clientX, sy: e.clientY,
+      ol: r.left, ob: window.innerHeight - r.bottom,
+      w: r.width, h: r.height,
+    };
+    try { el.setPointerCapture(e.pointerId); } catch { /* no capture available */ }
+  };
+  const sheetMove = (e: React.PointerEvent) => {
+    const d = sheetDrag.current;
+    if (!d) return;
+    // Clamped so it can never be shoved fully off screen and stranded. 24px of the
+    // box has to stay in view on every edge.
+    const KEEP = 24;
+    const maxL = window.innerWidth - KEEP;
+    const maxB = window.innerHeight - KEEP;
+    const left = Math.min(maxL, Math.max(KEEP - d.w, d.ol + (e.clientX - d.sx)));
+    const bottom = Math.min(maxB, Math.max(KEEP - d.h, d.ob - (e.clientY - d.sy)));
+    setSheetPos({ left, bottom });
+  };
+  const sheetUp = (e: React.PointerEvent) => {
+    sheetDrag.current = null;
+    try { asideRef.current?.releasePointerCapture(e.pointerId); } catch { /* already gone */ }
+  };
   // The rail lives inside the box's element, so a press on it used to bubble to
   // the box's own drag and carry both away together. It now has its own, which
   // pins it to the screen and leaves the box exactly where it is.
@@ -1995,6 +2049,7 @@ export default function BreedTree({
     }
     asideOff.current = { x: 0, y: 0 }; // closed: forget where it was left
     if (asideRef.current) asideRef.current.style.transform = "";
+    setSheetPos(null); // same for the phone sheet: reopening snaps it home
   }, [hideCaption]);
 
   // Item 13, the chum family tree. A rail dog lifted onto its own layer, the
@@ -7522,11 +7577,19 @@ export default function BreedTree({
         // to .relRailHome, its own fixed screen slot (see the note at the rail
         // below). So on the mobile sheet the class is allowed to win. Desktop
         // keeps the inline relative exactly as it was.
-        style={{ position: dockAside && isMobile ? undefined : "relative", visibility: hideCaption || displayOnly ? "hidden" : undefined }}
-        onPointerDown={dockAside && !isMobile ? asideDown : undefined}
-        onPointerMove={dockAside && !isMobile ? asideMove : undefined}
-        onPointerUp={dockAside && !isMobile ? asideUp : undefined}
-        onPointerCancel={dockAside && !isMobile ? asideUp : undefined}
+        style={{
+          position: dockAside && isMobile ? undefined : "relative",
+          visibility: hideCaption || displayOnly ? "hidden" : undefined,
+          // Only once it has actually been dragged; until then the CSS owns the
+          // load position, so the 48px / 60px in .asideSheet stay the single source.
+          ...(dockAside && isMobile && sheetPos
+            ? { left: `${sheetPos.left}px`, bottom: `${sheetPos.bottom}px` }
+            : null),
+        }}
+        onPointerDown={dockAside ? (isMobile ? sheetDown : asideDown) : undefined}
+        onPointerMove={dockAside ? (isMobile ? sheetMove : asideMove) : undefined}
+        onPointerUp={dockAside ? (isMobile ? sheetUp : asideUp) : undefined}
+        onPointerCancel={dockAside ? (isMobile ? sheetUp : asideUp) : undefined}
       >
         <div className={styles.crumbs}>
           {trail.map((n, i) => (
