@@ -19,7 +19,7 @@ import breedTraits from "../../data/breed-info.json";
 import styles from "./BreedTree.module.css";
 import { BRAIN_PATH, BRAIN_ARTBOARD } from "../icons/brain";
 import LineageMap from "../PackPit/LineageMap";
-import { propsFor, type LevelTheme } from "../../data/levelThemes";
+import { propsFor, mobilePropsForLevel, type LevelTheme } from "../../data/levelThemes";
 import BritainMessage from "../PackPit/BritainMessage";
 
 // Reference-info marker on the learn-box portrait: the same red/amber/green
@@ -4316,15 +4316,19 @@ export default function BreedTree({
            is NOT gated on THEMES_ENABLED, so a level can have its own toys
            without its backdrop, floor and sky coming back with them. See the
            note above propsFor in data/levelThemes.ts. */
+        /* THE MOBILE TABLE WINS. Below 768px a level's toys come from the
+           owner's per-level list; above it, nothing changes and the era sets
+           apply as before. mobilePropsForLevel takes a ONE BASED level, and
+           levelNo is zero based (the pit paints "00" for the first level), so
+           the one is added here and nowhere else.
+           `??` and not `||`: an empty array from the table means deliberately
+           no props, and must not fall through to the default. */
+        const narrowPit = window.matchMedia("(max-width: 768px)").matches;
+        const mobileSet = narrowPit && levelNo !== undefined ? mobilePropsForLevel(levelNo + 1) : null;
         const themed = propsFor(era, levelName);
-        const baseProps: ToyKind[] = themed?.length ? (themed as ToyKind[]) : DEFAULT_PROPS;
-        /* TEMPORARY TEST HOOK, REMOVE WHEN THE PER-LEVEL TOY TABLE LANDS.
-           ?bowl=1 appends the bowl to whatever this level's props are, so it
-           can be seen on a real phone before any level actually asks for one.
-           Same pattern as ?bombs=all and ?fxtest=1, and it does nothing without
-           the flag. As a third prop it lands on the empty 7.5s rock beat. */
-        const forceBowl = typeof window !== "undefined" && window.location.search.indexOf("bowl=1") > -1;
-        const props: ToyKind[] = forceBowl ? [...baseProps, "bowl"] : baseProps;
+        const props: ToyKind[] =
+          (mobileSet as ToyKind[] | null) ??
+          (themed?.length ? (themed as ToyKind[]) : DEFAULT_PROPS);
         /* SIDES ALTERNATE, AND THE FIRST SIDE ALTERNATES TOO. Each prop lands on
            the opposite side to the one before it, so two can never come down
            together in the same corner, and the whole sequence starts on the

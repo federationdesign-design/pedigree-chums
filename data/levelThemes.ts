@@ -146,3 +146,76 @@ export function propsFor(era?: string, levelName?: string): string[] | null {
   if (theme.props?.length) return theme.props;
   return null;
 }
+
+/* ===========================================================================
+   THE MOBILE PER-LEVEL TOY TABLE
+   31 August 2026, owner's list, transcribed and checked against the running
+   order before it was written here.
+
+   MOBILE ONLY. Desktop is untouched and keeps DEFAULT_PROPS, plus the era sets
+   above where propsFor supplies them. Everything in this table applies at
+   768px and below, which is the same test the pit uses for its own sizes.
+
+   REVERSED DECISION, recorded rather than quietly applied: earlier in the same
+   session the call was "Tudor props win on mobile", then "lose all Tudor
+   props". The second one stands. So on mobile this table beats propsFor
+   entirely, and the Tudor levels (23 to 34) get what is written here rather
+   than newspaper, fork and shoe. Desktop still gets the Tudor set.
+
+   LEVELS ARE ONE BASED HERE. Level 1 is Celtic Hound, the first level of the
+   campaign. Note that the pit PAINTS it as "00", because levelNo comes from a
+   findIndex and is zero based. The caller adds the one. Getting this backwards
+   shifts every entry by a dog, which is why it is spelled out.
+
+   AN EMPTY ARRAY MEANS DELIBERATELY NOTHING, and is not the same as having no
+   entry at all. A level with no entry (2 and 10) falls through to the pit's own
+   DEFAULT_PROPS and keeps both sticks. Ten levels below are deliberately bare.
+
+   FRAGILE BY NATURE. These are positions, not names, so adding a play level or
+   changing a breed's anchor shifts everything after it. MOBILE_PROPS_LEVELS is
+   the count this table was written against; the pit checks it and shouts in
+   development if the running order has moved underneath it. */
+export const MOBILE_PROPS_LEVELS = 92;
+/* From this level to the end: one stick, nothing else. */
+const MOBILE_PROPS_TAIL_FROM = 30;
+const MOBILE_PROPS_TAIL: string[] = ["stick"];
+const MOBILE_PROPS: Record<number, string[]> = {
+  1: ["stick", "bowl"],           // Celtic Hound
+  // 2 Ancient Mastiff: no entry, keeps both sticks
+  3: ["stick"],                   // Celtic Coursing Hound
+  4: ["stick"],                   // Celtic Scent Hound
+  5: ["stick"],                   // Livestock Dog
+  6: ["stick"],                   // Old British bandogs
+  7: ["stick", "bowl"],           // Celtic Heeler
+  8: ["stick", "stickBig", "bowl"], // Shepherd's Dog
+  9: ["stick"],                   // Drover's Dog
+  // 10 Earth Dog: no entry, keeps both sticks
+  11: [],                         // Scottish Deerhound
+  12: ["stick", "bowl"],          // Rache
+  13: [],                         // Talbot
+  14: [],                         // Buckhound
+  15: ["stick", "bowl"],          // Southern Hound
+  16: [],                         // Old Highland terriers
+  17: [],                         // Old working collies
+  18: ["stick", "bowl"],          // Welsh herding dogs
+  19: ["stick", "stickBig", "bowl"], // Old British ratting terriers
+  20: ["stick", "bowl"],          // Earth and hunt terriers
+  21: [],                         // Old English Black and Tan Terrier
+  22: [],                         // Land spaniels
+  23: [],                         // Old Welsh land spaniels
+  24: ["stick"],                  // Basset and heavy hounds
+  25: ["stick", "bowl"],          // Old English Bulldog
+  26: [],                         // Skye Terrier
+  27: [],                         // English Foxhound
+  28: ["stick", "stickBig", "bowl"], // Otterhound
+  29: ["stick", "stickBig", "bowl"], // Low-slung soldiers' dogs
+};
+
+/* The mobile answer for ONE BASED level `level`.
+   Returns null when this table has nothing to say, and the caller falls back to
+   its own default. Returns an empty array when the level is deliberately bare. */
+export function mobilePropsForLevel(level?: number): string[] | null {
+  if (level === undefined || !Number.isFinite(level) || level < 1) return null;
+  if (level >= MOBILE_PROPS_TAIL_FROM) return MOBILE_PROPS_TAIL;
+  return MOBILE_PROPS[level] ?? null;
+}
