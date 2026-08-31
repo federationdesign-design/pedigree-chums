@@ -334,6 +334,42 @@ const TOY_BOWL_GONE_KEY = "pc-minipit-bowl-gone";
    wedged between them: about 34px each side on a 360 phone and 39px on a 414.
    See the clamp in spawnToy for why this exists at all. */
 const BOWL_PIT_FRACTION = 0.805;
+/* ---- The breakable logo, stage 1 -------------------------------------------
+   The Pedigree Chums mark, ported from the main pit (PackPit.tsx:536 to 560).
+   It sits fixed near the top of the pit, the pack and the toys bounce off it,
+   every knock sinks and tilts it a notch, and on the fifth it gives way and
+   tumbles into the pile. That whole mechanic ALREADY EXISTS here for the navy
+   corner squares, so stage 1 adds a body and nothing else.
+
+   Owner's call, 31 August 2026: DESKTOP AND MOBILE. Note the main pit's own
+   comment ends "Desktop only.", so this is a deliberate change of intent.
+
+   NOT DONE HERE, on purpose: the six-stage art swap and the dropped pieces.
+   The main pit paints those on a canvas through `plugin.img`; this pit is SVG
+   and both have to be rebuilt as SVG nodes. Stages 2 and 3.
+
+   THE WIDTH IS CLAMPED, same as the bowl and for the same reason. The main
+   pit's LOGO_W is BIG * 6.8, which on mobile is about 383px against a pit
+   about 380px wide, so unclamped it would be wider than the pit it hangs in. */
+const LOGO_SRC = "/PC-logo.svg";
+const LOGO_ASPECT = 595.3 / 356.5; // the artwork's own viewBox
+const LOGO_BIG_MULT = 6.8;         // PackPit's LOGO_W = BIG * 6.8
+/* The collider is smaller than the drawing: the mark sits in about 85% of the
+   box across and 70% down it, so a corner of empty space does not take hits.
+   PackPit line 548. */
+const LOGO_BODY_W = 0.85;
+const LOGO_BODY_H = 0.7;
+/* Share of the pit width the drawn logo may take. */
+const LOGO_PIT_FRACTION = 0.7;
+/* TEMPORARY TUNING HOOK, REMOVE ONCE THE NUMBER IS SETTLED. ?logow=60 sets the
+   fraction to 0.60 for that visit only, the same as ?bowlw= does for the bowl.
+   Anything outside 20 to 100 is ignored. */
+function logoFrac(): number {
+  if (typeof window === "undefined") return LOGO_PIT_FRACTION;
+  const m = /[?&]logow=(\d+)/.exec(window.location.search);
+  const n = m ? Number(m[1]) : NaN;
+  return Number.isFinite(n) && n >= 20 && n <= 100 ? n / 100 : LOGO_PIT_FRACTION;
+}
 /* TEMPORARY TUNING HOOK, REMOVE ONCE THE NUMBER IS SETTLED. ?bowlw=60 sets the
    fraction to 0.60 for that visit only, so the figure can be found on a real
    phone instead of guessed. Same pattern as the ?d0= and ?tilt= hooks in this
@@ -2655,8 +2691,19 @@ export default function BreedTree({
   // toggle are navy rounded squares that start fixed in the corner, sink and
   // tilt a notch on every knock, give way on the fifth, then tumble like
   // anything else. A tap always works, wherever they are.
-  type UiKind = "close" | "desc" | "learn" | "leave" | "restart";
-  type UiBody = { x: number; y: number; vx: number; vy: number; r: number; half: number; a: number; va: number; fixed: boolean; hits: number; kind: UiKind; mb?: unknown; mbIn?: boolean; id?: number; spawned?: boolean };
+  // "logo" joined them on 31 August 2026. It is not a button: it is the
+  // Pedigree Chums mark, sitting fixed at the top of the pit, taking the same
+  // knocks and giving way on the fifth exactly as the squares do. Stage 1 is
+  // the BODY only. No art swap through the six damaged stages and no dropped
+  // pieces; those are stages 2 and 3, and both need the SVG equivalents of the
+  // main pit's canvas work.
+  type UiKind = "close" | "desc" | "learn" | "leave" | "restart" | "logo";
+  // w and h are the DRAWN size in world units, and only the logo carries them:
+  // every other UI object is a square and its `half` says everything. They live
+  // on the body rather than being recomputed in the render, because the sim and
+  // the render already size the squares by two different formulas and a third
+  // copy of that mistake is not wanted.
+  type UiBody = { x: number; y: number; vx: number; vy: number; r: number; half: number; a: number; va: number; fixed: boolean; hits: number; kind: UiKind; mb?: unknown; mbIn?: boolean; id?: number; spawned?: boolean; w?: number; h?: number };
   const uiBodiesRef = useRef<UiBody[] | null>(null);
   // THE PIT-MENU PILE-UP. Every tap of the corner X during a round drops another
   // red-leave + green-restart PAIR into the pit, up to 8; they never leave, and
@@ -2683,8 +2730,9 @@ export default function BreedTree({
   // ternary would have quietly handed "learn" the description square.
   const uiLeaveRef = useRef<SVGGElement>(null);
   const uiRestartRef = useRef<SVGGElement>(null);
+  const uiLogoRef = useRef<SVGGElement>(null);
   const uiRefFor = (k: UiKind) =>
-    k === "close" ? uiCloseRef : k === "desc" ? uiDescRef : k === "learn" ? uiLearnRef : k === "leave" ? uiLeaveRef : uiRestartRef;
+    k === "close" ? uiCloseRef : k === "desc" ? uiDescRef : k === "learn" ? uiLearnRef : k === "leave" ? uiLeaveRef : k === "logo" ? uiLogoRef : uiRestartRef;
   const pressRef = useRef<{ x: number; y: number; t: number } | null>(null);
   // Where and when a press on the pit background began, so a drag can be told
   // apart from a tap. Read by onBackground.
@@ -3793,6 +3841,24 @@ export default function BreedTree({
           { x: ux, y: v[1] + (-vbHf / 2 + m + uSz / 2) / k, vx: 0, vy: 0, r: (uSz / 2) * 1.1 / k, half: uSz / 2, a: 0, va: 0, fixed: true, hits: 0, kind: "close" },
           { x: ux, y: v[1] + (-vbHf / 2 + m + uSz * 1.5 + 14 * uppW) / k, vx: 0, vy: 0, r: (uSz / 2) * 1.1 / k, half: uSz / 2, a: 0, va: 0, fixed: true, hits: 0, kind: "desc" },
           { x: ux, y: v[1] + (-vbHf / 2 + m + uSz * 1.5 + 14 * uppW) / k, vx: 0, vy: 0, r: (uSz / 2) * 1.1 / k, half: uSz / 2, a: 0, va: 0, fixed: true, hits: 0, kind: "learn" },
+          /* THE LOGO. Top CENTRE, not the top-right corner the three squares
+             share, and 20% down the stage like the main pit's own placement.
+             Its drawn width is the main pit's figure clamped to the pit, so a
+             narrow phone gets one that fits between the walls. */
+          (() => {
+            const lwPx = Math.min(84 * uppW * LOGO_BIG_MULT, ((pR.x - pL.x) * uppW) * logoFrac());
+            const lhPx = lwPx / LOGO_ASPECT;
+            return {
+              x: v[0] + (xMinF + vbWf / 2) / k,
+              y: v[1] + (-vbHf / 2 + vbHf * 0.2) / k,
+              vx: 0, vy: 0,
+              // `r` is only used for the circle bodies; the logo carries w and h
+              // and the body creation below branches on them.
+              r: (lhPx / 2) / k, half: lhPx / 2,
+              a: 0, va: 0, fixed: true, hits: 0, kind: "logo" as UiKind,
+              w: lwPx / k, h: lhPx / k,
+            };
+          })(),
           // The leave/restart squares are no longer built here. They are spawned
           // as PAIRS into the live world by spawnPairRef, one pair per corner-X
           // tap, so they pile up instead of toggling a single pair in and out.
@@ -3829,7 +3895,18 @@ export default function BreedTree({
       const isMenuKind = (k: string) => k === "leave" || k === "restart";
       for (const u of uiBodies as any[]) {
         const p = pxFromWorld(u.x, u.y);
-        const um = Bodies.circle(p.x, p.y, Math.max(2, u.r * pxPerWorld), { isStatic: u.fixed, restitution: 0.3, frictionAir: 0.012, density: 0.0012 });
+        /* Every UI object here is a circle except the logo, which is a wide
+           rectangle. Its collider is inset to the artwork's own bounds, the
+           main pit's 85% by 70%, so the empty corners of the box do not take
+           hits that the drawing never touches. */
+        const um = u.kind === "logo" && u.w && u.h
+          ? Bodies.rectangle(
+              p.x, p.y,
+              Math.max(2, u.w * LOGO_BODY_W * pxPerWorld),
+              Math.max(2, u.h * LOGO_BODY_H * pxPerWorld),
+              { isStatic: u.fixed, restitution: 0.3, frictionAir: 0.012, density: 0.0012 },
+            )
+          : Bodies.circle(p.x, p.y, Math.max(2, u.r * pxPerWorld), { isStatic: u.fixed, restitution: 0.3, frictionAir: 0.012, density: 0.0012 });
         um.plugin = { ui: u };
         u.mb = um;
         u.mbIn = !isMenuKind(u.kind);
@@ -6963,7 +7040,30 @@ export default function BreedTree({
                 )}
               </g>
             );
-            return (<>{defs.map((d) => (
+            return (<>
+              {/* THE LOGO. Its own node, not a member of `defs`: every entry
+                  there is a button with a hover hint, an aria-label and a tap
+                  action, and the logo is none of those. It is decoration that
+                  happens to be solid.
+                  Positioned by the same per-frame loop as the squares, through
+                  uiRefFor("logo"), so it sinks, tilts and tumbles with no extra
+                  writer. Sized from the body itself rather than recomputed here,
+                  since the sim and this block already size the squares by two
+                  different formulas.
+                  pointerEvents none: it must never swallow a tap meant for a
+                  dog behind it. */}
+              {started && (() => {
+                const lb = ub?.find((u) => u.kind === "logo");
+                if (!lb || !lb.w || !lb.h) return null;
+                const lw = lb.w * kk, lh = lb.h * kk;
+                return (
+                  <g ref={uiLogoRef} style={{ pointerEvents: "none" }} aria-hidden="true"
+                    transform={`translate(${(lb.x - v[0]) * kk},${(lb.y - v[1]) * kk}) rotate(${lb.a * 57.2958})`}>
+                    <image href={LOGO_SRC} x={-lw / 2} y={-lh / 2} width={lw} height={lh} preserveAspectRatio="xMidYMid meet" />
+                  </g>
+                );
+              })()}
+              {defs.map((d) => (
               <g key={d.kind} ref={uiRefFor(d.kind)}
                 role="button"
                 onMouseEnter={() => setHoverHint(
