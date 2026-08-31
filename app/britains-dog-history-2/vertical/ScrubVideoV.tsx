@@ -6,11 +6,14 @@ import { useEffect, useRef } from "react";
   Scroll-scrubbed video for the version 2 carousel.
 
   WHY THIS IS NOT components/ScrollVideo/ScrollVideo.tsx: that one reads
-  `window` scroll and maps playback to a vertical scene's bounding box. This
-  page never scrolls vertically. Its motion is `scrollLeft` on a single
-  horizontal container, so the input is different even though the technique is
-  the same. Extracted rather than altered, so the Argos page that uses
-  ScrollVideo cannot break.
+  window scroll and maps playback to a scene's bounding box. This page scrolls
+  a single overflow container, and the document behind it never moves at all,
+  so window scroll would read zero forever. Extracted rather than altered, so
+  the Argos page that uses ScrollVideo cannot break.
+
+  31 Aug 2026, stage 2: the input used to be scrollLeft divided by the
+  container width. The page scrolls down now and the snap step is no longer
+  uniform, so it reads the measured panel index HistoryVertical publishes.
 
   The video is never played. Seeking IS the playback, which is why the source
   needs a keyframe-dense encode: `-g 1 -keyint_min 1 -sc_threshold 0`. A normal
@@ -58,10 +61,14 @@ export default function ScrubVideoV({
       queued.current = false;
       const v = videoRef.current;
       if (!v || !duration || !carousel) return;
-      const w = carousel.clientWidth;
-      if (!w) return;
-      /* Fractional panel index across the whole carousel. */
-      const g = carousel.scrollLeft / w;
+      /* 31 Aug 2026, stage 2: the page scrolls down, and the snap step is no
+         longer a uniform clientWidth, so the index cannot be a division any
+         more. HistoryVertical measures every panel's settled position and
+         publishes the lookup; reading it here means the scrub, the counter and
+         the progress bar can never disagree about which panel is showing. */
+      const at = (window as unknown as { __pcPanelAt?: () => number }).__pcPanelAt;
+      if (!at) return;
+      const g = at();
       const first = firstPanel;
       /* Nine panels means eight gaps between them, so the video reaches its
          last frame exactly as the last panel arrives. */

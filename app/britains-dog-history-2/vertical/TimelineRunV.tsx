@@ -16,21 +16,25 @@ import { sourcesFor } from "../../../data/breedSources";
   The vertical run. One dog per screen, scrolled downwards, inside a carousel
   that otherwise moves sideways.
 
-  THE HARD PART IS NOT THE LAYOUT, IT IS THE TOUCH HANDLING. The carousel sets
-  `touch-action: pan-x` and its script deliberately converts a vertical drag
-  into horizontal movement at a gain of 1.6, so a downward swipe normally
-  advances a slide. Two things undo that here, and both are needed:
+  31 AUGUST 2026, STAGE 2: THIS RUN IS PARKED. READ THIS BEFORE EDITING.
 
-    1. `touch-action: pan-y` on the scrolling element, so the browser gives
-       vertical panning back for touches that start inside it.
-    2. `data-pc-vlock` on the carousel, which the script checks before it
-       converts anything. CSS alone is not enough: the script's listener is on
-       the carousel and still fires for touches that began in here.
+  The description below is the HISTORY, not the current behaviour.
 
-  The lock is released the moment the run reaches its own bottom, so the next
-  flick carries the reader onwards horizontally rather than trapping them.
-  Released from scroll POSITION, not a timer, for the same reason the circle
-  roll is: a timer fires at the wrong moment on a slow swipe.
+  It used to be a vertical scroller inside a horizontal page, which was safe:
+  two axes never compete for a finger. It needed two things to hold that,
+  touch-action pan-y on itself and a data-pc-vlock handshake with the page
+  script, because the page converted vertical drags into sideways travel.
+
+  The page scrolls DOWN now. That made this a vertical scroller inside a
+  vertical one, with mandatory snapping on both, which traps the reader: a drag
+  cannot be attributed to one scroller or the other. So its own scrolling is
+  switched off in the stylesheet and only the era title screen shows this
+  stage. The lock is gone with the translator it spoke to.
+
+  STAGE 3 REBUILDS THIS AS A HORIZONTAL RAIL in the know-your-chums style,
+  which puts it back on the opposite axis to the page and needs no lock at all.
+  Tap to flip and tap to open a level are card state and are unaffected either
+  way. Do not restore vertical scrolling here.
 */
 
 /* Outbound references on the back of a card, top to bottom.
@@ -117,43 +121,27 @@ export default function TimelineRun({
 
     const sync = () => {
       queued = false;
-      const w = carousel.clientWidth;
-      if (!w) return;
-      /* SETTLED, NOT MERELY NEAREST. This was Math.round, which reports THIS
-         panel from the moment a sideways swipe is half done. The lock then
-         engaged mid-move, clamped overflowX and wrote scrollLeft back, which
-         pinned the carousel exactly halfway between two panels. It could not
-         recover: releasing needs either a different panel or the run scrolled
-         to its last dog, and neither can happen while it is pinned.
+      /* 31 Aug 2026, STAGE 2: THE SIDEWAYS LOCK IS GONE.
 
-         0.02 of a panel is the same tolerance the roll script in page.tsx
-         uses to decide a panel has arrived. Keep the two in step. */
-      const pos = carousel.scrollLeft / w;
-      const onThisPanel = Math.abs(pos - panelIndex) < 0.02;
+         It existed to stop the reader sliding horizontally out of a run before
+         the last dog. It did that by setting `data-pc-vlock`, which the drag
+         translator read, and by clamping `overflowX` and writing `scrollLeft`
+         back. All three are meaningless now: the translator is deleted, and
+         the page has no horizontal scroll to clamp. Writing an x axis value at
+         a y axis scroller could only cause harm, so none of it is written.
+
+         The run itself is parked this stage, see .timelineRun in the
+         stylesheet. Stage 3 rebuilds it as a horizontal rail, which puts it
+         back on the opposite axis to the page and needs no lock at all.
+
+         0.02 of a panel is the same tolerance the roll script uses to decide a
+         panel has arrived. Keep the two in step. */
+      const at = (window as unknown as { __pcPanelAt?: () => number }).__pcPanelAt;
+      if (!at) return;
+      const onThisPanel = Math.abs(at() - panelIndex) < 0.02;
       // Not our panel and never was: touch nothing, measure nothing.
       if (!onThisPanel && !owns) return;
-      // 2px of slack: sub-pixel scroll positions never land exactly on the end.
-      const atBottom = run.scrollTop >= run.scrollHeight - run.clientHeight - 2;
-      const lock = onThisPanel && !atBottom;
       owns = onThisPanel;
-      carousel.setAttribute("data-pc-vlock", lock ? "1" : "0");
-      /* The attribute alone only stops TOUCH: the script reads it in its
-         touchmove handler. A trackpad, a mouse wheel or a keyboard scrolls the
-         carousel natively and never reaches that handler, which is how the
-         reader could slide sideways out of the run before reaching the last
-         dog. Clamping overflow is what actually holds them. scrollLeft is
-         written back because changing overflow can reset it.
-
-         Locking pins to the panel's EXACT position rather than to wherever it
-         had reached. Within the tolerance above that is a correction of a few
-         pixels at most, and it means a lock can never freeze the carousel
-         part way between two panels however it was entered. */
-      const keep = lock ? panelIndex * w : carousel.scrollLeft;
-      const want = lock ? "hidden" : "";
-      if (carousel.style.overflowX !== want || (lock && carousel.scrollLeft !== keep)) {
-        carousel.style.overflowX = want;
-        carousel.scrollLeft = keep;
-      }
       if (run.scrollTop > 4) setMoved(true);
       /* A node goes green once the reader has moved past its own row, which is
          the same rule as the head of the timeline: yellow on arrival, green
@@ -200,10 +188,9 @@ export default function TimelineRun({
       /* Never leave the rest of the page locked if this unmounts mid-scroll.
          Guarded by ownership: a run unmounting while a different one holds the
          lock must not release it on that run's behalf. */
-      if (owns) {
-        carousel.setAttribute("data-pc-vlock", "0");
-        carousel.style.overflowX = "";
-      }
+      /* Nothing to release: this run no longer writes to the carousel. Kept as
+         a comment rather than deleted so it is clear the cleanup was not
+         forgotten. See the stage 2 note in sync above. */
     };
   }, [panelIndex]);
 

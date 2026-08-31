@@ -272,16 +272,75 @@ export default function HistoryVertical() {
         <div className={styles.progress} id="vertical-progress" />
       </div>
 
-      {/* Carousel script -- progress bar, intro button, vertical-flick advance.
-          No preventDefault, no scroll hijack: touch-action pan-x in CSS lets the
-          browser own horizontal panning; vertical flicks are read passively. */}
+      {/* Page script: progress bar, buttons, counter, circle roll.
+          NO DRAG HANDLING AT ALL any more. touch-action: pan-y in CSS hands the
+          gesture to the browser, which scrolls and snaps it natively. */}
       <script dangerouslySetInnerHTML={{ __html: `(function(){
         var carousel = document.getElementById('vertical-carousel');
         var bar = document.getElementById('vertical-progress');
         if(!carousel || !bar) return;
+
+        /* Must match --pc-seam in the stylesheet. Change both together. */
+        var SEAM = 0.52;
+
+        /* SNAP POSITIONS ARE MEASURED, NOT CALCULATED.
+
+           Sideways, every snap step was exactly one clientWidth, so a panel
+           index was scrollLeft / width and five functions did that division.
+           Downwards the step is NOT uniform: a section panel is a screen minus
+           the seam, an intro or era screen is a whole screen. Dividing by
+           clientHeight would drift further out of true with every section and
+           put the counter, the bar and the video scrub on different panels.
+
+           So each panel's own settled scroll position is measured once from the
+           laid-out DOM and everything reads this table instead. Re-measured on
+           resize and on load, because a late font or image changes heights. */
+        var positions = [];
+        function measure(){
+          var h = carousel.clientHeight;
+          if (!h) return;
+          var base = carousel.getBoundingClientRect().top;
+          var here = carousel.scrollTop;
+          var els = carousel.querySelectorAll('[data-pc-panel]');
+          var next = [];
+          for (var i = 0; i < els.length; i++) {
+            var el = els[i];
+            var n = parseInt(el.getAttribute('data-pc-panel'), 10);
+            if (isNaN(n)) continue;
+            /* Distance from the top of the scroller's content. */
+            var top = el.getBoundingClientRect().top - base + here;
+            /* A section panel settles with the photograph above it, so its
+               scroll position is the seam higher than its own top edge. This
+               is the script's half of scroll-margin-top in the CSS. */
+            var off = el.getAttribute('data-pc-sec') !== null ? h * SEAM : 0;
+            next[n] = top - off;
+          }
+          if (next.length) positions = next;
+        }
+
+        /* Fractional panel index. Whole numbers are settled panels, the
+           fraction is how far through the move to the next one we are, which
+           is what the circle roll and the video scrub need. */
+        function panelAt(){
+          var last = positions.length - 1;
+          if (last < 1) return 0;
+          var y = carousel.scrollTop;
+          if (y <= positions[0]) return 0;
+          for (var i = 0; i < last; i++) {
+            var a = positions[i], b = positions[i + 1];
+            if (a === undefined || b === undefined) continue;
+            if (y < b) return b > a ? i + (y - a) / (b - a) : i;
+          }
+          return last;
+        }
+        /* Published so ScrubVideoV and TimelineRunV read the SAME index this
+           script does, rather than each re-deriving it from the scroll offset
+           and disagreeing at the edges. */
+        window.__pcPanelAt = panelAt;
+
         function update() {
-          var max = carousel.scrollWidth - carousel.clientWidth;
-          bar.style.width = (max > 0 ? (carousel.scrollLeft / max) * 100 : 0) + '%';
+          var max = carousel.scrollHeight - carousel.clientHeight;
+          bar.style.width = (max > 0 ? (carousel.scrollTop / max) * 100 : 0) + '%';
         }
         /* THE SEAM ONLY EXISTS ON SECTION SLIDES. A section is a photograph
            over blue text and the bar sits on the join. The intro, the era
@@ -290,9 +349,7 @@ export default function HistoryVertical() {
            It reads the settled panel the same way the dog counter does: no
            data-pc-sec means the panel is not part of a section. */
         function placeBar() {
-          var w = carousel.clientWidth;
-          if (!w) return;
-          var g = Math.round(carousel.scrollLeft / w);
+          var g = Math.round(panelAt());
           var panel = document.querySelector('[data-pc-panel="' + g + '"]');
           if (!panel) return;
           var onSeam = panel.getAttribute('data-pc-sec') !== null;
@@ -306,9 +363,7 @@ export default function HistoryVertical() {
            counters are left alone on those. */
         var counters = document.querySelectorAll('[data-pc-count]');
         function updateCount() {
-          var w = carousel.clientWidth;
-          if (!w) return;
-          var g = Math.round(carousel.scrollLeft / w);
+          var g = Math.round(panelAt());
           var panel = document.querySelector('[data-pc-panel="' + g + '"]');
           if (!panel) return;
           var sec = panel.getAttribute('data-pc-sec');
@@ -345,10 +400,15 @@ export default function HistoryVertical() {
                                       panel wide: 1 / (pi x 0.5) of a turn */
         var rollEls = document.querySelectorAll('[data-pc-roll]');
 
+        /* The circle still rolls in from the LEFT even though the page now
+           moves down. That is deliberate and unchanged: the panel is stationary
+           on the x axis, so a circle rolling across it still reads as a circle
+           rolling, and it arrives and leaves with its own panel exactly as
+           before. Only the input changed, from a division to the table. */
         function updateRoll() {
           var w = carousel.clientWidth;
           if (!w) return;
-          var here = carousel.scrollLeft / w;
+          var here = panelAt();
           for (var i = 0; i < rollEls.length; i++) {
             var el = rollEls[i];
             var off = here - parseFloat(el.getAttribute('data-pc-roll'));
@@ -380,10 +440,14 @@ export default function HistoryVertical() {
             requestAnimationFrame(function(){ rollQueued = false; updateRoll(); });
           }
         }, { passive: true });
-        update();
-        updateCount();
-        placeBar();
-        updateRoll();
+        function refresh(){ update(); updateCount(); placeBar(); updateRoll(); }
+        measure();
+        refresh();
+        /* Heights move after this script runs: web fonts land, the section
+           photographs decode, the address bar settles. Each of those shifts
+           every snap position below it, so the table is rebuilt. */
+        window.addEventListener('resize', function(){ measure(); refresh(); });
+        window.addEventListener('load', function(){ measure(); refresh(); });
 
         function goTo(idx) {
           /* Re-queried each time so the handler still works if React has
@@ -393,20 +457,23 @@ export default function HistoryVertical() {
           /* Panels, not sections: a top-level child is now a whole section
              group nine panels wide, so counting children under-counted by
              nine and clamped every jump into the first section. */
-          var count = Math.round(c.scrollWidth / c.clientWidth);
+          /* Measured fresh: a button can be pressed before the load handler
+             has run, and a stale table would jump to the wrong screen. */
+          measure();
+          var last = positions.length - 1;
           if (idx < 0) idx = 0;
-          if (idx > count - 1) idx = count - 1;
-          var from = c.scrollLeft;
-          var target = idx * c.clientWidth;
-          /* scroll-snap-type: x mandatory blocks programmatic smooth scrolling
-             on iOS Safari, which is why this button did nothing while native
-             swiping worked. The touchend handler below already relies on the
-             same off/on trick -- that is the only reason it succeeds. */
+          if (idx > last) idx = last;
+          var target = positions[idx];
+          if (target === undefined) return;
+          var from = c.scrollTop;
+          /* scroll-snap-type mandatory blocks programmatic smooth scrolling on
+             iOS Safari, which is why this button did nothing while native
+             swiping worked. Still true on the y axis. */
           c.style.scrollSnapType = 'none';
-          c.scrollTo({ left: target, behavior: 'smooth' });
+          c.scrollTo({ top: target, behavior: 'smooth' });
           /* If smooth scrolling was ignored outright, jump there instead. */
           setTimeout(function(){
-            if (Math.abs(c.scrollLeft - from) < 2) c.scrollLeft = target;
+            if (Math.abs(c.scrollTop - from) < 2) c.scrollTop = target;
           }, 400);
           setTimeout(function(){ c.style.scrollSnapType = ''; }, 700);
         }
@@ -432,63 +499,25 @@ export default function HistoryVertical() {
           }
         });
 
-        /* Continuous vertical drag -> horizontal movement.
-           touch-action: pan-x means the browser has no default action for
-           vertical touches, so passive listeners are safe: no preventDefault,
-           no interference with native horizontal swiping. */
-        var GAIN = 1.6;           /* px of horizontal travel per px of vertical drag */
-        var startX = 0, startY = 0, startLeft = 0, lastY = 0, lastT = 0, vel = 0;
-        var axis = null;          /* null | 'v' | 'h' */
+        /* THE DRAG TRANSLATOR WAS HERE AND IS GONE (31 August 2026, stage 2).
 
-        carousel.addEventListener('touchstart', function(e){
-          if (e.touches.length !== 1) return;
-          startX = e.touches[0].clientX;
-          startY = e.touches[0].clientY;
-          startLeft = carousel.scrollLeft;
-          lastY = startY; lastT = Date.now(); vel = 0;
-          axis = null;
-        }, { passive: true });
+           It listened for a vertical drag and converted it into horizontal
+           movement at a gain of 1.6, then hand-rolled its own flick velocity,
+           its own snap arithmetic and the scroll-snap-type off/on dance needed
+           to make a programmatic scroll stick on iOS. About sixty lines of it.
 
-        carousel.addEventListener('touchmove', function(e){
-          if (e.touches.length > 1) return; /* pinch: let the browser zoom */
-          var t = e.touches[0];
-          if (!axis) {
-            var adx = Math.abs(t.clientX - startX);
-            var ady = Math.abs(t.clientY - startY);
-            if (adx < 6 && ady < 6) return;           /* not decided yet */
-            axis = ady > adx ? 'v' : 'h';
-            if (axis === 'v') carousel.style.scrollSnapType = 'none';
-          }
-          if (axis !== 'v') return;                    /* horizontal: native handles it */
-          /* The vertical run has the wheel. Without this the drag would be
-             converted to horizontal movement and the dogs could not be
-             scrolled at all: touch-action alone does not stop this listener,
-             because it is bound to the carousel and the touch bubbles. */
-          if (carousel.getAttribute('data-pc-vlock') === '1') return;
-          var now = Date.now();
-          if (now > lastT) vel = (lastY - t.clientY) / (now - lastT);
-          lastY = t.clientY; lastT = now;
-          carousel.scrollLeft = startLeft + (startY - t.clientY) * GAIN;
-        }, { passive: true });
+           All of that was a re-implementation of scrolling. The page moves the
+           way the finger moves now, so touch-action pan-y hands the whole job
+           back to the browser: real momentum, real snapping, real rubber
+           banding, and nothing to keep in step.
 
-        carousel.addEventListener('touchend', function(){
-          if (axis !== 'v') return;
-          if (carousel.getAttribute('data-pc-vlock') === '1') { axis = null; return; }
-          axis = null;
-          var w = carousel.clientWidth;
-          var idx;
-          if (Math.abs(vel) > 0.35) {
-            /* decisive flick at release: continue one slide in that direction */
-            idx = (vel > 0 ? Math.ceil : Math.floor)(carousel.scrollLeft / w);
-          } else {
-            idx = Math.round(carousel.scrollLeft / w);
-          }
-          var count = Math.round(carousel.scrollWidth / carousel.clientWidth);
-          if (idx < 0) idx = 0;
-          if (idx > count - 1) idx = count - 1;
-          carousel.scrollTo({ left: idx * w, behavior: 'smooth' });
-          setTimeout(function(){ carousel.style.scrollSnapType = ''; }, 450);
-        }, { passive: true });
+           NO BACKTICKS IN HERE. This whole script is a template literal and a
+           backtick in a comment closes it. Writing one is exactly how this
+           broke while the note above was being added.
+
+           DO NOT BRING IT BACK. If a drag feels wrong, the fix is in the CSS
+           snap properties, not in a listener. */
+
       })();` }} />
     </>
   );

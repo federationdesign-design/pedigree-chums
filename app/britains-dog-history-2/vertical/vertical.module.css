@@ -32,12 +32,17 @@
    footer was the only thing adding height below a 100dvh wrap. That made the
    DOCUMENT a second, vertical scroller.
 
-   On every other panel that was harmless: .carousel is touch-action: pan-x,
-   which refuses vertical dragging outright. .timelineRun sets pan-y to get the
-   dog run scrolling, and at the top or bottom of the run that drag chained
-   straight through to the document. The page slid, Safari collapsed its bars,
-   100dvh changed by about 117px on a 414 x 896 phone, and all twelve screens
+   It used to bite only inside the dog run, because .carousel was pan-x and
+   refused vertical dragging outright. A drag that reached the end of the run
+   chained through to the document, the page slid, Safari collapsed its bars,
+   100dvh changed by about 117px on a 414 x 896 phone and all twelve screens
    resized mid-scroll. That resize is the drift, not a layout bug in the run.
+
+   31 AUGUST 2026: THIS MATTERS FAR MORE NOW. The page itself scrolls
+   vertically, so the whole document is one flick away from that same bar
+   collapse, and every snap position in the page is measured in dvh. The wrap
+   stays exactly 100dvh with nothing below it, so the DOCUMENT never scrolls
+   and the bars never move. Do not add anything under the wrap.
 
    Hidden rather than removed: it stays in the markup for crawlers, and it
    comes back with the desktop layout. MOVE THIS INSIDE THE MOBILE MEDIA QUERY
@@ -56,16 +61,40 @@
   height: 100dvh;
   position: relative;
   overflow: hidden;
+
+  /* THE SEAM, WRITTEN ONCE. The depth of the pinned section photograph, and
+     therefore the line the yellow bar sits on and the offset every section
+     panel snaps to. It was 52% in three unrelated places; a vertical page has
+     to agree on it in five, so it is a variable now.
+     THE SCRIPT CARRIES THE SAME FIGURE as SEAM = 0.52 in HistoryVertical.tsx,
+     because a stylesheet variable is not readable from an inline script
+     without a getComputedStyle call on every frame. Change both together. */
+  --pc-seam: 52dvh;
 }
 
 /* Inner scroll container */
+/* 31 August 2026, stage 2: THE AXIS FLIP. Everything below used to read x.
+   The page now scrolls DOWN and only down.
+
+   `touch-action: pan-y` is what lets the browser own the gesture. The old
+   `pan-x` existed so a vertical drag had no native action and could be
+   converted to horizontal travel by hand, at a gain of 1.6, in an inline
+   script. That translator is deleted: native scrolling does the job it was
+   faking, and it does it with real momentum and real snapping.
+
+   `overscroll-behavior-y: contain` keeps a flick at either end inside this
+   scroller. The document must never scroll: if it does, Safari collapses its
+   address bar, 100dvh changes by about 117px mid-scroll and every panel
+   resizes under the reader. `.footerOff` is the primary guard, this backs it
+   up on Safari 16 and later. */
 .carousel {
   display: flex;
-  flex-direction: row;
-  overflow-x: auto;
-  overflow-y: hidden;
-  scroll-snap-type: x mandatory;
-  touch-action: pan-x pinch-zoom;
+  flex-direction: column;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scroll-snap-type: y mandatory;
+  touch-action: pan-y pinch-zoom;
+  overscroll-behavior-y: contain;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   height: 100%;
@@ -76,11 +105,17 @@
   display: none;
 }
 
+/* A full-screen slide: the intro. `flex-basis: 100%` now measures the COLUMN
+   axis, so it is a screen tall rather than a screen wide.
+   `scroll-snap-stop: always` is new and it matters more vertically than it did
+   sideways: a hard flick down a 500dvh section would otherwise sail past
+   several panels and land wherever momentum died. */
 .slide {
   flex: 0 0 100%;
   width: 100%;
   height: 100%;
   scroll-snap-align: start;
+  scroll-snap-stop: always;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -246,9 +281,12 @@
 
 /* One group per section, nine panels wide. It is a column so the image can
    sit above the panel row, and the row is what makes it nine screens wide. */
+/* The group is now TALL rather than wide: one seam-deep photograph plus ten
+   panels below it. Its height must stay `auto` so it grows with its panels;
+   the old `height: 100%` would have squashed all ten into one screen. */
 .sectionGroup {
   flex: 0 0 auto;
-  height: 100%;
+  width: 100%;
   display: flex;
   flex-direction: column;
 }
@@ -257,29 +295,52 @@
    position on screen for the whole nine panels of its own section, then is
    pushed out by the next section's group. One scroller, no nesting, which is
    what lets a swipe anywhere move the page. */
+/* THE MECHANISM, TRANSPOSED. `left: 0` became `top: 0`, and that is the whole
+   change: it now pins to the TOP of the scrollport and holds there for the ten
+   panels of its own section, then is pushed up and out by the next group. One
+   scroller, no nesting, exactly as before.
+
+   The height is explicit rather than `flex: 0 0 52%`. A percentage flex-basis
+   resolves against the container's height, and .sectionGroup is auto-height
+   now, so a percentage here would have collapsed the photograph to nothing. */
 .stickyTop {
   position: sticky;
-  left: 0;
+  top: 0;
   z-index: 3;
-  flex: 0 0 52%;
-  width: 100vw;
+  flex: 0 0 auto;
+  height: var(--pc-seam);
+  width: 100%;
   min-height: 0;
 }
 
+/* A column now, not a row. `flex: 0 0 auto` rather than `1 1 auto`: it must
+   take its full stacked height instead of sharing the group's leftover space,
+   which is what made it one screen tall in the horizontal layout. */
 .panelRow {
-  flex: 1 1 auto;
+  flex: 0 0 auto;
   min-height: 0;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
 }
 
 /* One sub-slide. Fixed to the viewport width so it does not measure itself
    against the group, which is nine times wider. */
+/* One sub-slide. It fills the screen BELOW the pinned photograph, so it is a
+   viewport minus the seam, not a whole one.
+
+   `scroll-margin-top: var(--pc-seam)` is what lands it in the right place.
+   `scroll-snap-align: start` would otherwise put the panel's own top edge at
+   the top of the screen, underneath the photograph. The margin outsets the
+   snap area upwards by exactly the seam, so the position the browser settles
+   on leaves the panel starting on the seam line, with the photograph above it.
+   Get this wrong and every panel hides behind the picture. */
 .panel {
-  flex: 0 0 100vw;
-  width: 100vw;
-  height: 100%;
+  flex: 0 0 auto;
+  width: 100%;
+  height: calc(100dvh - var(--pc-seam));
   scroll-snap-align: start;
+  scroll-snap-stop: always;
+  scroll-margin-top: var(--pc-seam);
   box-sizing: border-box;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
@@ -543,10 +604,11 @@
    the diagonal gradient on `body` and the paw pattern on `body::before`. Every
    other panel paints an opaque blue over both. */
 .timelinePanel {
-  flex: 0 0 100vw;
-  width: 100vw;
+  flex: 0 0 auto;
+  width: 100%;
   height: 100%;
   scroll-snap-align: start;
+  scroll-snap-stop: always;
   overflow: hidden;
 }
 
@@ -571,12 +633,22 @@
   position: relative;
   width: 100%;
   height: 100%;
-  overflow-y: auto;
-  overflow-x: hidden;
-  scroll-snap-type: y mandatory;
-  /* Vertical panning handed back to the browser for touches that start in
-     here. The carousel around it is pan-x. See TimelineRun.tsx: this is only
-     half the fix, the script also has to stand down. */
+  /* 31 August 2026, STAGE 2: THIS RUN IS PARKED, DELIBERATELY.
+
+     It was a vertical scroller inside a horizontal one, which is safe: the two
+     axes never compete for a finger. The page around it is vertical now, so it
+     would be a vertical scroller inside a vertical one, with `y mandatory`
+     snapping on both. That traps the reader: a drag cannot be attributed to
+     one scroller or the other and the run will not hand back.
+
+     So its own scrolling is switched off for this stage and only the era title
+     screen shows. The dogs are not lost, they are waiting: stage 3 rebuilds
+     this as a HORIZONTAL rail in the know-your-chums style, which puts it back
+     on the opposite axis to the page and removes the conflict for good.
+
+     `overflow-y: auto` and `scroll-snap-type: y mandatory` were here. Do not
+     restore them while the page scrolls vertically. */
+  overflow: hidden;
   touch-action: pan-y pinch-zoom;
   /* Second layer under .footerOff. Keeps a drag that reaches either end of the
      run inside the run instead of chaining out to whatever scrolls behind it.
