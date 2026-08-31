@@ -630,6 +630,16 @@
    is the disc's foot, height is the scroll position plus the card's inset, so
    the end of the line always lands on the next card's top edge. Behind the
    cards, whose front face is opaque, so it simply disappears under them. */
+/* STAGE 3: HIDDEN. The line, the disc and the scroll cue all draw a vertical
+   timeline running DOWN the screen, and the run travels sideways now. They are
+   hidden rather than deleted because the shape of a horizontal timeline is a
+   design question for Steve, not something to invent here. The script that
+   drew this no longer writes to it either. */
+.runLine,
+.railHead {
+  display: none;
+}
+
 .runLine {
   position: absolute;
   left: 50%;
@@ -646,22 +656,22 @@
   position: relative;
   width: 100%;
   height: 100%;
-  /* 31 August 2026, STAGE 2: THIS RUN IS PARKED, DELIBERATELY.
+  /* STAGE 3, 31 August 2026. The run is a COLUMN now: era title band on top,
+     horizontal dog rail underneath. It scrolls nothing itself.
 
-     It was a vertical scroller inside a horizontal one, which is safe: the two
-     axes never compete for a finger. The page around it is vertical now, so it
-     would be a vertical scroller inside a vertical one, with `y mandatory`
-     snapping on both. That traps the reader: a drag cannot be attributed to
-     one scroller or the other and the run will not hand back.
+     The history matters. This used to be a vertical scroller inside a
+     horizontal page, which is safe, because two axes never compete for a
+     finger. Stage 2 turned the page vertical, which would have made it a
+     vertical scroller inside a vertical one with mandatory snapping on both,
+     and that traps the reader. It was parked for one stage rather than shipped
+     broken.
 
-     So its own scrolling is switched off for this stage and only the era title
-     screen shows. The dogs are not lost, they are waiting: stage 3 rebuilds
-     this as a HORIZONTAL rail in the know-your-chums style, which puts it back
-     on the opposite axis to the page and removes the conflict for good.
-
-     `overflow-y: auto` and `scroll-snap-type: y mandatory` were here. Do not
-     restore them while the page scrolls vertically. */
+     The rail below puts it back on the OPPOSITE axis to the page, which is the
+     arrangement that always worked. Never give this element or .dogRail a
+     vertical scroll again while the page scrolls down. */
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
   touch-action: pan-y pinch-zoom;
   /* Second layer under .footerOff. Keeps a drag that reaches either end of the
      run inside the run instead of chaining out to whatever scrolls behind it.
@@ -679,14 +689,23 @@
   display: none;
 }
 
+/* STAGE 3: A CARD ON A HORIZONTAL RAIL, no longer a full screen.
+
+   The old note here warned against ever putting these inside a wrapper,
+   because they were `height: 100%` of the scroller and a wrapper with no
+   height of its own collapsed every one of them. That no longer applies: they
+   size to their own content now, and .dogRail IS that wrapper. The warning is
+   kept rather than deleted so nobody reads the git history and reinstates it.
+
+   Width is the know-your-chums figure scaled for a phone, so two cards and the
+   edge of a third are visible and the rail obviously invites a sideways push
+   rather than looking like a single centred card. */
 .dogScreen {
-  /* 100% of the SCROLLER, which is only true while these are its direct
-     children. They were briefly nested inside a wrapper that had no height of
-     its own, so this resolved to auto, every screen shrank to its content and
-     both rail legs collapsed to nothing. Do not reintroduce a wrapper here
-     without giving it a height. */
-  height: 100%;
-  scroll-snap-align: start;
+  flex: 0 0 auto;
+  width: clamp(228px, 64vw, 300px);
+  /* Centre, not start: a snapped card sits in the middle of the screen with
+     its neighbours showing on both sides, which is what reads as a rail. */
+  scroll-snap-align: center;
   /* THE NOTCH. `y mandatory` on its own still lets a hard flick fly past
      several dogs: it only decides where momentum finally settles. `always`
      forces the scroll to stop at every snap point, so each dog has to be
@@ -704,9 +723,9 @@
      box tops out near 90vw and the card can never reach 95. */
   /* The card sits 200px down, clear of the menu. The line is drawn to the
      same depth, so the two meet exactly. */
-  /* 125px down, 75 up from 200. CARD_INSET in TimelineRun.tsx carries the
-     same figure and the line is drawn to it, so keep the two in step. */
-  padding: 125px 12px 0;
+  /* No inset any more. The 125px was to clear the menu and to meet the
+     vertical timeline line, and neither exists on a horizontal rail. */
+  padding: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -716,17 +735,50 @@
   gap: 0;
 }
 
+/* THE RAIL. This is the piece that makes the run safe again.
+
+   `touch-action: pan-x` is the load-bearing line. It tells the browser this
+   element owns HORIZONTAL gestures only, so a downward drag that starts on a
+   dog card is handed straight up to the page and scrolls it, while a sideways
+   drag moves the rail. Cross axis, no competition, no lock, no script.
+
+   `overscroll-behavior-x: contain` stops a flick off either end of the rail
+   chaining anywhere else. */
+.dogRail {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: flex-start;
+  gap: 14px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  touch-action: pan-x pinch-zoom;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  /* Side padding equal to half the leftover width would centre the first and
+     last card. Left as a plain inset for now: the rail should look like it
+     starts at the edge and continues past it. */
+  padding: 4px 16px 10px;
+  min-height: 0;
+}
+.dogRail::-webkit-scrollbar {
+  display: none;
+}
+
 /* The title screen is a notch too, so the reader stops on it rather than
    flying straight into the first dog. */
 /* The bottom padding is what keeps the text off the rail head. The rail is
    absolutely positioned and 22vh tall, so reserving 24vh here means the
    centred block is centred in what is LEFT, and the disc can no longer land
    on the last line of the paragraph. */
+/* STAGE 3: `height: 100%` became `flex: 0 0 auto`. It used to be one of many
+   full-height screens in a vertical scroller. It is now the title band at the
+   top of a single panel, with the dog rail taking the space below it, so it
+   has to be as tall as its own words and no taller. */
 .eraScreen {
   position: relative;
-  height: 100%;
-  scroll-snap-align: start;
-  scroll-snap-stop: always;
+  flex: 0 0 auto;
   box-sizing: border-box;
   /* The bottom band is what keeps the text off the rail head. The rail is
      absolute and 22vh tall, so reserving 24vh here centres the block in what

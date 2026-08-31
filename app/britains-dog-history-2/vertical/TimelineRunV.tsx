@@ -42,9 +42,12 @@ import { sourcesFor } from "../../../data/breedSources";
    dog names its own sources, so there is no era gate here any more. A dog with
    no sources of its own simply shows no links. */
 
-/* How far down a dog screen the card sits. The line is drawn to exactly this
-   depth, so the two meet. */
-const CARD_INSET = 125;
+/* CARD_INSET was 125, the depth the card sat at down a dog screen, with the
+   vertical timeline line drawn to exactly that figure so the two met.
+   REMOVED at stage 3 (31 Aug 2026): there is no downward travel and no line,
+   and an unused constant is an eslint error against a clean baseline. Recorded
+   here rather than deleted silently, because a horizontal timeline will need
+   its own equivalent and this is the number the old one used. */
 
 const TAG_LABEL: Record<string, string> = {
   extinct: "Extinct",
@@ -102,6 +105,8 @@ export default function TimelineRun({
      the one at the head of the timeline does. */
   const [passed, setPassed] = useState<Record<string, boolean>>({});
   const rowRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  /* See the stage 3 note in sync: marks every card arrived exactly once. */
+  const allArrived = useRef(false);
 
   useEffect(() => {
     const carousel = document.getElementById("vertical-carousel");
@@ -146,6 +151,23 @@ export default function TimelineRun({
       /* A node goes green once the reader has moved past its own row, which is
          the same rule as the head of the timeline: yellow on arrival, green
          once you are on your way again. */
+      /* STAGE 3: EVERY CARD COUNTS AS ARRIVED, ONCE.
+
+         The test below asks whether a row has come up into the bottom of a
+         vertically scrolling run. There is no such scroll any more, so it can
+         never be true, and the marker row and corner flash would stay hidden
+         behind an animation that cannot fire. Decoration must not gate
+         content, so they are all marked arrived instead.
+
+         Guarded by a ref so it runs once rather than on every scroll frame.
+         Whether the flash should replay as a card is pushed into view along the
+         rail is a stage 3b question. */
+      if (!allArrived.current) {
+        allArrived.current = true;
+        const every: Record<string, boolean> = {};
+        for (const key of Object.keys(rowRefs.current)) every[key] = true;
+        if (Object.keys(every).length) setArrived(every);
+      }
       const rows = rowRefs.current;
       for (const key of Object.keys(rows)) {
         const el = rows[key];
@@ -164,13 +186,12 @@ export default function TimelineRun({
          so its end always sits exactly where the next card's top edge is.
          That is what makes it touch the card at the moment the scroll settles,
          and it cannot read as two lines because there is only one. */
-      const line = lineRef.current;
-      const dot = dotRef.current;
-      if (line && dot) {
-        const top = dot.offsetTop + dot.offsetHeight;
-        line.style.top = `${top}px`;
-        line.style.height = `${Math.max(0, run.scrollTop + CARD_INSET - top)}px`;
-      }
+      /* STAGE 3: nothing drawn. The line was a function of this run's own
+         vertical scroll position, which is always zero now, and both it and the
+         disc are display:none in the stylesheet. Left as a comment rather than
+         deleted because a horizontal timeline may want to draw something here.
+         lineRef and dotRef stay for the same reason; CARD_INSET did not, see
+         the note at the top of this file. */
     };
 
     const queue = () => {
@@ -270,10 +291,18 @@ export default function TimelineRun({
           </span>
         </div>
 
-        {/* A fragment comes back from BreedStrip, so these screens stay DIRECT
-            children of the scroller. They are height: 100% of it and a wrapper
-            here would collapse every one of them. */}
-        <BreedStrip era={era} renderLevels={(open) => breeds.map((b, bi) => {
+        {/* STAGE 3: the cards go on a horizontal rail.
+
+            The note that used to sit here said a wrapper would collapse every
+            screen, because they were height: 100% of the scroller. They size to
+            their own content now, so the wrapper is not only safe, it is the
+            whole mechanism: .dogRail is touch-action pan-x, which is what puts
+            the dogs back on the opposite axis to the page.
+
+            The rail wraps only the CARDS. BreedStrip's own modal, lives and
+            score come back alongside them and stay outside it. */}
+        <BreedStrip era={era} renderLevels={(open) => (
+          <div className={styles.dogRail}>{breeds.map((b, bi) => {
           const isFlipped = flipped === b.name;
           /* undefined for a dog with no level. 62 of the 97 open one, 28 go to
              their own breed page, and 7 flip only, which is the live page's
@@ -523,7 +552,8 @@ export default function TimelineRun({
               </div>
             </div>
           );
-        })} />
+        })}</div>
+        )} />
       </div>
     </div>
   );
