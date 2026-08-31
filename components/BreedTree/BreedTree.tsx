@@ -6433,15 +6433,27 @@ export default function BreedTree({
                    measuring the ring off the level-0 screen: 5 * upp against a
                    radius of about 41 to 46 units, which is 0.19. The label
                    variant keeps the same 18% extra it always had. */
-                /* A learnt chip keeps the green it wore on the learn layer, and
-                   takes a white ring and white figure with it. Yellow chips are
-                   untouched: white on yellow would not be readable. */
-                /* A green badge goes inert WHITE, not the blue every other badge
-                   uses, so a spent green reads as a distinct dead token. Its
-                   active white ring would vanish on the white disc, so the ring
-                   turns navy the moment it goes inert. Yellow badges keep the
-                   blue inert fill (white on white would disappear). */
-                <circle cx={0} cy={0} r={item.r} style={{ fill: inert ? (item.green ? "#ffffff" : "#0c5b92") : item.green ? "#22c55e" : item.label ? "#5cc4ee" : "#ffd23e", stroke: item.green && !inert ? "#ffffff" : "#0a3a57", strokeWidth: item.r * (item.label ? 0.225 : 0.19) }} />
+                /* THE LEARNT CHIP IS LEMON NOW, NOT GREEN (31 Aug 2026, Steve),
+                   matching the #ffed00 rolled out across the reveal card, the
+                   shortlist bar, the knockout round and the superpower pages.
+
+                   THE RING AND THE FIGURE HAD TO MOVE WITH IT. Both were white,
+                   which only ever worked because the disc underneath was green.
+                   Measured against #ffed00: white is 1.21:1, invisible. Navy
+                   #0a3a57 is 9.89:1. The old note directly below said as much
+                   about the yellow chips, that white on yellow would not be
+                   readable, and it was right.
+
+                   Both are navy now, which is what every other badge in the pit
+                   already used, so the `item.green` branch on the stroke and on
+                   the text is gone rather than recoloured. */
+                /* A learnt badge still goes inert WHITE, not the blue every
+                   other badge uses, so a spent one reads as a distinct dead
+                   token. The ring no longer needs to switch to navy on going
+                   inert, because it is navy in both states now. Ordinary
+                   badges keep the blue inert fill (white on white would
+                   disappear). */
+                <circle cx={0} cy={0} r={item.r} style={{ fill: inert ? (item.green ? "#ffffff" : "#0c5b92") : item.green ? "#ffed00" : item.label ? "#5cc4ee" : "#ffd23e", stroke: "#0a3a57", strokeWidth: item.r * (item.label ? 0.225 : 0.19) }} />
                 )}
                 {!item.bomb && !inert && (item.label ? (
                   // solo dog circle: the breed name it wore before the round
@@ -6461,7 +6473,7 @@ export default function BreedTree({
                     );
                   })()
                 ) : (
-                  <text x={0} y={0} dominantBaseline="central" style={{ fill: item.green ? "#ffffff" : "#0a3a57", fontFamily: "Montserrat, var(--font-body), system-ui, sans-serif", fontWeight: 800, fontSize: `${item.r * 0.7}px`, pointerEvents: "none", userSelect: "none" }}>
+                  <text x={0} y={0} dominantBaseline="central" style={{ fill: "#0a3a57", fontFamily: "Montserrat, var(--font-body), system-ui, sans-serif", fontWeight: 800, fontSize: `${item.r * 0.7}px`, pointerEvents: "none", userSelect: "none" }}>
                     {`${item.pct}%`}
                   </text>
                 ))}
