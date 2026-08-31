@@ -879,19 +879,37 @@
    the second dog's picture ends. Change the portrait clamp there and this needs
    to change with it. The lives bar sits at the same left but only renders while
    a round is running, and the rail is learn only, so they never meet. */
-/* The way back out of a zoom. Bottom right, where nothing else sits in the
-   learn area: the pit's squares are top right, the rail starts below them, the
-   slider is on the left and the life bar only renders during a round.
-   Same box as those squares, 84px with a 5px navy rim and a corner radius of
-   0.3, so it belongs to the same family. */
+/* The way back out of a zoom.
+   MOVED 31 Aug 2026: was bottom right at right 18px. It now sits in a line beside the
+   green learn PLAY button, bottom left, by request.
+   The figures are PLAY's own. .learnPlay is left 15.5px, bottom 3%, and its artboard
+   is S + 5 across and tall where S = 84 x pitScale x 1.2 = 67.5px on a phone, because
+   the 5px rim is drawn centred on the square's edge and so overhangs 2.5px. So PLAY's
+   VISIBLE right edge is 15.5 + 72.5 = 88px and its visible bottom is 3% + 2.5px.
+   This button's rim is an `outline`, which draws OUTSIDE the box and takes no layout
+   space, so its visible edge is 5px beyond each side. Hence left 107 for a 14px gap
+   (88 + 14 + 5), the same 14px the corner squares stack with, and bottom 3% + 7.5px
+   so the two visible bottoms line up.
+   The env(safe-area-inset-bottom) that used to be here is gone deliberately: PLAY does
+   not carry it, and keeping it would push this button out of line with PLAY on any
+   phone with a home indicator.
+
+   SIZE, same date: was a flat 84px with a 25.2px radius, which is the DESKTOP square.
+   Every other square in the pit is 84 x pitScale x 1.2, and pitScale is 0.67 below
+   768px, so they are 67.5px and this one was 24% too big. Now 67.5px with the same
+   0.3 corner radius (20.25px) and the same 5px navy rim, so it matches the corner X,
+   the brain and PLAY. This rule is mobile only (see the min-width block below), so
+   the hard-coded phone figures are safe here; if it is ever shown on desktop these
+   need to become 84px / 25.2px again. */
 .zoomOutBtn {
   position: fixed;
-  right: 18px;
-  bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+  left: 107px;
+  right: auto;
+  bottom: calc(3% + 7.5px);
   z-index: 14;
-  width: 84px;
-  height: 84px;
-  border-radius: 25.2px;
+  width: 67.5px;
+  height: 67.5px;
+  border-radius: 20.25px;
   border: none;
   outline: 5px solid var(--navy, #0a3a57);
   background: var(--yellow, #ffd23e);
