@@ -355,25 +355,29 @@
    clipped by this overflow. */
 .asideSheet {
   position: fixed;
-  left: 8px;
-  /* Clear of the chum rail on the right. The rail is .relRailHome at right 18px,
-     and its own width is 10px padding + 2px border each side plus its columns at
-     clamp(38px, 7.5vw, 56px) with an 8px gap. Sized for the TWO column case
-     (BreedTree switches at more than 9 chums), so the box never gets covered on a
-     busy level: 32 + 18 + 8 of air = the 58 below. THIS IS THE WIDTH DIAL. Drop
-     the 2 to a 1 and the 58 to a 50 for the one-column levels and the box gets
-     about 46px wider, at the cost of the rail sitting on it when a level has 10
-     or more chums. */
-  right: calc(2 * clamp(38px, 7.5vw, 56px) + 58px);
   top: auto;
+  /* 31 Aug 2026, second pass: +20px right of the old 8px, by request. */
+  left: 28px;
+  /* Width is now explicit rather than an inset pair. The old rule anchored the
+     right edge at calc(2 * clamp(38px, 7.5vw, 56px) + 58px) to clear the chum rail;
+     that expression survives below as the BASE of the width sum, so the 20% is
+     measured off exactly what was there before:
+       old width = 100vw - 8 (left) - 58 - 2 x rail column = 100vw - 66 - 2 x column.
+     KNOWN AND ACCEPTED: at 1.2x it no longer clears the rail. On a 364px screen the
+     box runs to 294px and the rail starts at 238px, so about 56px of rail sits under
+     the box (box z-index 16, rail 12). That is the price of the extra width and was
+     the owner's call; drop the 1.2 back to 1 to undo it. */
+  right: auto;
+  width: calc((100vw - 66px - 2 * clamp(38px, 7.5vw, 56px)) * 1.2);
   /* 31 Aug 2026: was bottom 0, which buried the learn PLAY button. PLAY is
      .learnPlay at bottom 3%, 67.5px tall on a phone (84 * 0.67 * 1.2), and both
-     elements are measured against the same full-viewport overlay, so 3% + 80px
-     puts the box about 12px above it. */
-  bottom: calc(3% + 80px);
-  /* auto, so the left and right offsets above set the width. The 100% it used to
-     carry as an edge-to-edge sheet would beat both of them. */
-  width: auto;
+     elements are measured against the same full-viewport overlay, so 3% + 80px put
+     the box about 12px above it.
+     Second pass, same day: +20px DOWN, by request, so 80 becomes 60. KNOWN AND
+     ACCEPTED: 60 is less than PLAY's own 67.5px height, so the box's bottom edge now
+     laps about 8px over the top of the PLAY button. Put the 80 back to separate
+     them again. */
+  bottom: calc(3% + 60px);
   max-width: none;
   /* THE HEIGHT DIAL. The pit is no longer shrunk to make room, so this only
      decides how much of the diagram the box covers and how soon it scrolls. */
@@ -557,6 +561,16 @@
   font-size: clamp(1.1rem, 5vw, 1.5rem);
   line-height: 1.05;
   letter-spacing: 0.02em;
+}
+/* PHONE: the name in the box head matches the name beside the top-left profile
+   portrait, by request (31 Aug 2026). This is LineageModal's .title phone rule
+   copied verbatim, including the 2pt taken off it the same day, so the two read as
+   one size. THEY ARE A PAIR: change .title's phone rule and change this with it.
+   The desktop clamp above is untouched. */
+@media (max-width: 640px) {
+  .cHeadName {
+    font-size: calc(clamp(0.9rem, 5vw, 1.6rem) - 2pt);
+  }
 }
 
 /* Difficulty slider: start screen only, mounted down the left of the stage.
