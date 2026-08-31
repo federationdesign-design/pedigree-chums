@@ -125,7 +125,7 @@ const SCREENS: Screen[] = [
     media: {
       type: "diptych",
       // Round 13: Montserrat labels in the Card Is the Lens style.
-      captions: ["Imagination world", "Our Studio Set"],
+      captions: ["Real-life world", "Our Studio Set"],
       items: [
         {
           src: "/press/dog-on-real.jpg",
