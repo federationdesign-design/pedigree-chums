@@ -384,6 +384,53 @@ function logoArtFor(hits: number): string {
   if (hits <= 0) return LOGO_SRC;
   return LOGO_STAGE_SRC[Math.min(hits, LOGO_STAGE_SRC.length) - 1];
 }
+/* ---- Logo stage 3: the pieces that come off ---------------------------------
+   Each damaged artwork above is the logo MINUS some elements. This is those
+   elements, spawned as real tumbling bodies at their spots on the logo, the
+   same five sets the main pit drops (PackPit.tsx:609 to 652).
+
+   SIZES ARE FRACTIONS OF THE DRAWN LOGO, not fixed pixels. The main pit sizes
+   its pieces off BIG while its logo is BIG * 6.8, so the ratio is what matters:
+   ours is clamped to the pit width and a piece has to shrink with it or a dot
+   would be a third of the logo on a phone. Each `frac` below is the main pit's
+   own size divided by BIG * 6.8. */
+const LOGO_PIECES = [
+  { src: "/why-dot-for-logofall.svg",         ar: 19.7 / 19.6, frac: 0.45 / 6.8 },
+  { src: "/yellow-dot-for-logofall.svg",      ar: 19.7 / 19.6, frac: 0.45 / 6.8 },
+  { src: "/shouts-for-logofall.svg",          ar: 69 / 71.4,   frac: 0.8 / 6.8 },
+  { src: "/poofs-for-logofall.svg",           ar: 50.6 / 64.5, frac: 0.75 / 6.8 },
+  { src: "/tagline-dot-for-logofall.svg",     ar: 174.1 / 23.9, frac: 2.0 / 6.8 },
+];
+/* THE SPOT BOX IS NOT THE ARTWORK'S SHAPE, and this is deliberate.
+   Spots below are fractions of the logo's half extents, -1 at the left or top
+   edge and +1 at the right or bottom. The main pit derives that box from
+   150/64, its STALE fallback aspect, and not from the artwork's real 595.3 by
+   356.5. Every spot was then tuned by eye against that box, so reproducing what
+   the main pit actually looks like means copying the same figure rather than
+   correcting it. Change it and all thirty spots move. */
+const LOGO_SPOT_ASPECT = 150 / 64;
+/* Seven white dots, hit one. The last is 40% smaller. [fx, fy, scale] */
+const LOGO_SPOTS_DOTS: [number, number, number][] = [
+  [0.6, -0.9, 1], [-0.94, -0.76, 1], [-0.7, -0.4, 1], [0.56, -0.3, 1],
+  [-0.74, 0.1, 1], [-0.74, 0.7, 1], [0.6, 0.84, 0.6],
+];
+/* Three yellow dots, hit two: bottom left, top right, bottom right. */
+const LOGO_SPOTS_YELLOW: [number, number][] = [[-0.7, 0.7], [0.7, -0.7], [0.7, 0.7]];
+/* Four corners, hit three. Each carries a DYAD, two shouts splayed 33 degrees
+   apart, the base angle pointing out from the centre. */
+const LOGO_SPOTS_SHOUTS: [number, number, number][] = [
+  [-0.8, -0.8, 225], [0.8, -0.8, 315], [0.8, 0.8, 45], [-0.8, 0.8, 135],
+];
+const LOGO_SHOUT_SPLAY = 16.5; // half of the 33 degrees
+/* Hit four: one poof per side, out from the central axis. The main pit's 100px
+   against a 571px logo, kept as a fraction so it scales with the clamp. */
+const LOGO_POOF_OUT = 100 / (84 * 6.8);
+/* Everything in the pit and every piece share this negative collision group, so
+   pieces pass through the logo they came off and through each other, while
+   still colliding with dogs, chips and toys. The main pit does the same job
+   with a category and a mask; a group is two fewer moving parts and cannot be
+   got the wrong way round. */
+const LOGO_GROUP = -7;
 /* Share of the pit width the drawn logo may take. Was 0.7; owner's call on
    31 August 2026, no more than 60% of the screen. The pit runs wall to wall
    with only a few pixels of margin, so its width and the screen's are the same
@@ -2121,6 +2168,7 @@ export default function BreedTree({
   // sizes are view units frozen at the drop; dead ones keep their slot so the
   // render children stay index-aligned with the bridge lists
   const [rodList, setRodList] = useState<{ len: number; h: number; lit: boolean }[]>([]);
+  const [logoPieceList, setLogoPieceList] = useState<{ src: string; w: number; h: number }[]>([]);
   const [deadRods, setDeadRods] = useState<Set<number>>(new Set());
   const [pillList, setPillList] = useState<{ lines: string[]; w: number; h: number; unit: number }[]>([]);
   const [deadPills, setDeadPills] = useState<Set<number>>(new Set());
@@ -2213,6 +2261,12 @@ export default function BreedTree({
   const spawnPillRef = useRef<((x: number, y: number, w: number, name: string) => void) | null>(null);
   type PropBody = { x: number; y: number; vx: number; vy: number; a: number; idx: number; hits: number; maxHits: number; dead?: boolean; lastKnock?: number; mb?: any; onFloor?: boolean; floorLostAt?: number };
   const rodBodiesRef = useRef<PropBody[]>([]);
+  /* Logo pieces. Its own list rather than joining the toys, because a piece has
+     no kind, no retire key, no hit limit and cannot be thrown out of the pit.
+     Same three-part shape as the rods: bodies in a ref, drawn sizes in state,
+     one container the frame loop indexes by idx. */
+  const logoPieceBodiesRef = useRef<PropBody[]>([]);
+  const logoPiecesGRef = useRef<SVGGElement>(null);
   const toyBodiesRef = useRef<PropBody[]>([]);
   const toysGRef = useRef<SVGGElement>(null);
   const chumsGRef = useRef<SVGGElement>(null);
@@ -2679,7 +2733,7 @@ export default function BreedTree({
      force-decodes; an <img> here is enough, because these are vectors and there
      is no large bitmap to decode. */
   useEffect(() => {
-    for (const src of LOGO_STAGE_SRC) {
+    for (const src of [...LOGO_STAGE_SRC, ...LOGO_PIECES.map((d) => d.src)]) {
       const im = new window.Image();
       im.src = src;
     }
@@ -3189,7 +3243,7 @@ export default function BreedTree({
         }
       }
     }
-    for (const [listRef, gRef] of [[rodBodiesRef, rodsGRef], [pillBodiesRef, pillsGRef], [toyBodiesRef, toysGRef], [chumBodiesRef, chumsGRef], [btnBodiesRef, btnsGRef]] as const) {
+    for (const [listRef, gRef] of [[rodBodiesRef, rodsGRef], [pillBodiesRef, pillsGRef], [toyBodiesRef, toysGRef], [chumBodiesRef, chumsGRef], [btnBodiesRef, btnsGRef], [logoPieceBodiesRef, logoPiecesGRef]] as const) {
       const list = (listRef as typeof rodBodiesRef).current;
       const gg = (gRef as typeof rodsGRef).current;
       // A collected chum card is flying to the corner under its own animation.
@@ -3200,6 +3254,9 @@ export default function BreedTree({
         if (flying && flying.has(pr.idx)) continue;
         const el = gg.children[pr.idx] as SVGGElement | undefined;
         if (el) el.setAttribute("transform", `translate(${(pr.x - v[0]) * k},${(pr.y - v[1]) * k}) rotate(${pr.a * 57.2958})`);
+        // A logo piece is rendered hidden so it cannot be seen at the origin
+        // for the frame before this loop first places it. This is that reveal.
+        if (el && gRef === logoPiecesGRef && el.style.visibility) el.style.visibility = "";
         // The chum outline is a STATE, driven here off the physics flag rather
         // than a per-frame React render. Priority, highest first: taken (green),
         // armed (yellow), resting on the floor (red), else white. The grace
@@ -3940,6 +3997,69 @@ export default function BreedTree({
           list.push(mk("leave", -3.2, -0.12), mk("restart", -1.1, 0.12));
         };
       }
+      /* THE PIECES THAT COME OFF THE LOGO. Called from the hit block with the
+         zero-based hit index, so 0 is the first strike.
+
+         Positions are worked out in the logo's own frame and then ROTATED BY
+         ITS CURRENT ANGLE, so a spot tracks the artwork as it sinks and tips.
+         Straight from the main pit's `at()` helper, PackPit.tsx:602.
+
+         Pieces fall under gravity alone: no velocity, no spin. They arrive
+         where they were drawn and drop off, which is what makes it read as
+         something breaking rather than something being fired out.
+
+         NOT DONE, and it is the only piece of the main pit's choreography
+         missing: the shouts HANG for 350ms on a hinge constraint and swing
+         before releasing. Four hinges, four timers, and a `disposed` guard so a
+         level change cannot leave one behind. Worth its own stage. */
+      const dropLogoPieces = (u: { x: number; y: number; a: number; w?: number; h?: number }, hitIndex: number) => {
+        const def = LOGO_PIECES[Math.min(hitIndex, LOGO_PIECES.length - 1)];
+        if (!def || !u.w) return;
+        const lwPx = u.w * pxPerWorld;
+        const HALF_W = lwPx / 2;
+        const HALF_H = (lwPx / LOGO_SPOT_ASPECT) / 2;
+        const c = pxFromWorld(u.x, u.y);
+        const ca = Math.cos(u.a), sa = Math.sin(u.a);
+        const at = (fx: number, fy: number, outX = 0, outY = 0) => {
+          const ox = fx * HALF_W + outX, oy = fy * HALF_H + outY;
+          return { x: c.x + ox * ca - oy * sa, y: c.y + ox * sa + oy * ca };
+        };
+        const spawn = (x: number, y: number, scale: number, angleDeg: number) => {
+          const pw = lwPx * def.frac * scale, ph = pw / def.ar;
+          const idx = logoPieceBodiesRef.current.length;
+          const w2 = worldFromPx(x, y);
+          const pr: PropBody = { x: w2.x, y: w2.y, vx: 0, vy: 0, a: (angleDeg * Math.PI) / 180, idx, hits: 0, maxHits: 9999 };
+          const mb = Bodies.rectangle(x, y, Math.max(2, pw), Math.max(2, ph), {
+            angle: (angleDeg * Math.PI) / 180,
+            chamfer: { radius: Math.min(pw, ph) * 0.18 },
+            restitution: 0.45, friction: 0.4, frictionAir: 0.01, density: 0.0009,
+            collisionFilter: { group: LOGO_GROUP },
+          });
+          mb.plugin = { prop: pr, kind: "logopiece" };
+          pr.mb = mb;
+          Composite.add(world, mb);
+          logoPieceBodiesRef.current.push(pr);
+          setLogoPieceList((l) => [...l, { src: def.src, w: pw * fxScale, h: ph * fxScale }]);
+        };
+        if (hitIndex === 0) {
+          for (const [fx, fy, sc] of LOGO_SPOTS_DOTS) { const p = at(fx, fy); spawn(p.x, p.y, 0.5 * sc, 0); }
+        } else if (hitIndex === 1) {
+          for (const [fx, fy] of LOGO_SPOTS_YELLOW) { const p = at(fx, fy); spawn(p.x, p.y, 0.5, 0); }
+        } else if (hitIndex === 2) {
+          for (const [fx, fy, base] of LOGO_SPOTS_SHOUTS) {
+            const p = at(fx, fy);
+            spawn(p.x, p.y, 1, base - LOGO_SHOUT_SPLAY);
+            spawn(p.x, p.y, 1, base + LOGO_SHOUT_SPLAY);
+          }
+        } else if (hitIndex === 3) {
+          const out = lwPx * LOGO_POOF_OUT;
+          for (const p of [at(0, -1, 0, -out), at(0, 1, 0, out), at(-1, 0, -out, 0), at(1, 0, out, 0)]) spawn(p.x, p.y, 1, 0);
+        } else {
+          const p = at(0, 0, 0, HALF_H * 0.2);
+          spawn(p.x, p.y, 1, 0);
+        }
+        wake();
+      };
       const uiBodies = uiBodiesRef.current;
       /* Which squares belong to the pit menu rather than the corner. Their
          bodies are built like any other, but they are held out of the world
@@ -3957,7 +4077,7 @@ export default function BreedTree({
               p.x, p.y,
               Math.max(2, u.w * LOGO_BODY_W * pxPerWorld),
               Math.max(2, u.h * LOGO_BODY_H * pxPerWorld),
-              { isStatic: u.fixed, restitution: 0.3, frictionAir: 0.012, density: 0.0012 },
+              { isStatic: u.fixed, restitution: 0.3, frictionAir: 0.012, density: 0.0012, collisionFilter: { group: LOGO_GROUP } },
             )
           : Bodies.circle(p.x, p.y, Math.max(2, u.r * pxPerWorld), { isStatic: u.fixed, restitution: 0.3, frictionAir: 0.012, density: 0.0012 });
         um.plugin = { ui: u };
@@ -5000,6 +5120,10 @@ export default function BreedTree({
             if (P.ui && P.ui.fixed && rv > FX_MIN_PS * 0.3) {
               const u = P.ui;
               u.hits += 1;
+              // The logo sheds its removed elements as real bodies. Everything
+              // below this line is the squares' behaviour, unchanged, and the
+              // logo goes through it too.
+              if (u.kind === "logo") dropLogoPieces(u, u.hits - 1);
               if (u.hits >= 5) {
                 u.fixed = false;
                 wakeBody(u.mb); // a fixed square is static, and a static body sleeps
@@ -5257,7 +5381,7 @@ export default function BreedTree({
         }
         if (!fx.idle()) fxKickRef.current?.();
         checkEscapeRef.current?.();
-        for (const list of [rodBodiesRef.current, pillBodiesRef.current, toyBodiesRef.current, chumBodiesRef.current]) {
+        for (const list of [rodBodiesRef.current, pillBodiesRef.current, toyBodiesRef.current, chumBodiesRef.current, logoPieceBodiesRef.current]) {
           for (const pr of list) {
             if (pr.dead || !pr.mb) continue;
             if (!isDragged(pr)) {
@@ -5347,7 +5471,7 @@ export default function BreedTree({
           wakeBody(u.mb);
           MBody.setVelocity(u.mb, { x: (Math.random() - 0.5) * 16, y: -(7 + Math.random() * 12) });
         }
-        for (const list of [rodBodiesRef.current, pillBodiesRef.current, toyBodiesRef.current, chumBodiesRef.current]) {
+        for (const list of [rodBodiesRef.current, pillBodiesRef.current, toyBodiesRef.current, chumBodiesRef.current, logoPieceBodiesRef.current]) {
           for (const pr of list) if (!pr.dead && pr.mb) { wakeBody(pr.mb); MBody.setVelocity(pr.mb, { x: (Math.random() - 0.5) * 16, y: -(7 + Math.random() * 12) }); }
         }
         wake();
@@ -6748,6 +6872,24 @@ export default function BreedTree({
             })}
           </g>
 
+          {/* The elements knocked off the logo. Debris, so pointer events are
+              off: they must never take a tap meant for a dog behind them. The
+              frame loop positions each by index into this container, which is
+              why the order here is the order they were spawned in. */}
+          <g ref={logoPiecesGRef} style={{ display: dockAside ? "inline" : "none", pointerEvents: "none" }} aria-hidden="true">
+            {/* NO TRANSFORM AND NO REF READ HERE. The rods and toys above work
+                out their own opening position by reading their bodies during
+                render, which this file's eslint config counts as an error; the
+                baseline is what it is, but nothing new should join it. A piece
+                is therefore born HIDDEN at the origin and the per-frame loop,
+                which was going to move it on the very next frame anyway, both
+                places it and reveals it. */}
+            {logoPieceList.map((lp, i2) => (
+              <g key={i2} style={{ visibility: "hidden" }}>
+                <image href={lp.src} x={-lp.w / 2} y={-lp.h / 2} width={lp.w} height={lp.h} preserveAspectRatio="xMidYMid meet" />
+              </g>
+            ))}
+          </g>
           {/* Rods and name pills scattered in from the learn layer: true pit
               props with hit limits; dead ones keep their slot, hidden. */}
           <g ref={rodsGRef} style={{ display: dockAside ? "inline" : "none" }}>
