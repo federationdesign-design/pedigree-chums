@@ -86,6 +86,16 @@ type Props = {
   eraJoinLabel?: string;
   initialScore?: number;
   onScoreChange?: (s: number) => void;
+  /* THE BANKED TOTAL: the campaign score as it stood after the last level the
+     player actually FINISHED. Everything below reverts to this figure, so a
+     round that is lost or walked out of cannot leave its points behind.
+     Undefined means nothing has been banked, which is the same as zero and is
+     what failing the very first level correctly reports. */
+  bankedScore?: number;
+  /* Called with the score at the moment a level is COMPLETED, which is the only
+     event that advances the banked total. The score is passed rather than read
+     upstream so the two can never be a render out of step. */
+  onBankScore?: (s: number) => void;
   onNextLevel?: () => void;
   // Photo of the level the player is about to unlock, for the Round Won screen.
   nextLevelImage?: string;
@@ -123,7 +133,7 @@ type Props = {
   era?: string;
 };
 
-export default function LineageModal({ name, image, character, lineage, fromRect, onClose, nextLevelLabel, onNextLevel, onStartOver, initialScore, onScoreChange, era, lives, livesMax = 6, onLost, onSpendLife, onResetRun, nextLevelImage, levelNo, eraJoinLabel, onLevelChumRate, runChumRate, runLevels, onChumCaught, topChum }: Props) {
+export default function LineageModal({ name, image, character, lineage, fromRect, onClose, nextLevelLabel, onNextLevel, onStartOver, initialScore, onScoreChange, bankedScore, onBankScore, era, lives, livesMax = 6, onLost, onSpendLife, onResetRun, nextLevelImage, levelNo, eraJoinLabel, onLevelChumRate, runChumRate, runLevels, onChumCaught, topChum }: Props) {
   const theme = levelThemeFor(era);
   // The close X asks before it closes. A round can take a couple of minutes to
   // build up, and losing it to a mis-tap in the corner is a rotten exit.
@@ -273,6 +283,9 @@ export default function LineageModal({ name, image, character, lineage, fromRect
   // the round is already spent, so charging again would be charging twice.
   const goLearn = (spend: boolean) => {
     if (spend) onSpendLife?.();
+    // Same rule as backToStart: this remounts the pit, so the round is over
+    // and its points do not survive it.
+    if (spend) setScore(bankedScore ?? 0);
     setResumeInLearn(true);
     setPhase("play");
     setSlowmo(false);
@@ -287,6 +300,10 @@ export default function LineageModal({ name, image, character, lineage, fromRect
   // losing one would make the lives meaningless.
   const backToStart = () => {
     onSpendLife?.();
+    // Abandoning a live round forfeits its points, exactly as losing it does.
+    // Without this, backing out at the right moment was the cheapest way to
+    // keep a big score without ever finishing the level.
+    setScore(bankedScore ?? 0);
     setPhase("play");
     setResumeInLearn(false);
     setSlowmo(false);
@@ -529,6 +546,11 @@ export default function LineageModal({ name, image, character, lineage, fromRect
           onBackToStart={backToStart}
           onRoundWon={() => {
             setPhase("won");
+            /* BANK IT. Completing a level is the ONE event that advances the
+               campaign total for good. Everything else, losing, restarting,
+               going back to learn, walking out, returns the score to whatever
+               was banked here last. */
+            onBankScore?.(score);
             // Completed, so this level's catch counts toward the run.
             if (packSize > 0) onLevelChumRate?.((collectedChums.size / packSize) * 100);
             /* CONFETTI REMOVED 31 August 2026 (Steve): off-style, and the
@@ -548,7 +570,13 @@ export default function LineageModal({ name, image, character, lineage, fromRect
                competing with the pit for frames and dragging its clock. Do not
                reintroduce a full-screen per-frame canvas over a live pit. */
           }}
-          onPitFull={() => { setPhase("lost"); onLost?.(); }}
+          /* THE ROUND IS LOST, SO ITS POINTS GO. The score returns to the
+             banked figure before the lost screen renders, which is what puts
+             the honest number in front of the player and, more to the point,
+             into the ScoreTable below: a level you failed can no longer put
+             you on the board. Nothing is clamped at zero, owner's call: a
+             negative total is expected and allowed. */
+          onPitFull={() => { setPhase("lost"); setScore(bankedScore ?? 0); onLost?.(); }}
           rootNote={character}
           onClose={onClose}
         />

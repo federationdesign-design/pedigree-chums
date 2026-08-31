@@ -121,6 +121,18 @@ export default function BreedStrip({
   // as it was lost.
   const [runKey, setRunKey] = useState(0);
   const [campaignScore, setCampaignScore] = useState(0); // carries across levels, resets on start over
+  /* THE BANKED TOTAL, 31 August 2026 (owner). campaignScore follows the live
+     round, point by point, so before this existed a level you FAILED still left
+     its points in the campaign total. Two things fell out of that: a failed
+     level put you on the score table, and closing a level before you died and
+     reopening it refilled your lives while keeping the points, which could be
+     cycled for ever.
+
+     The rule now: the campaign total only advances when a level is COMPLETED.
+     Everything else returns it to this figure.
+
+     Zero at the start, so failing level one reports zero. Owner confirmed. */
+  const [bankedScore, setBankedScore] = useState(0);
   /* Every completed level's chum catch, as a percentage. Kept here rather than
      in the modal because the modal is keyed per level and remounts on each one.
      A list rather than a running mean, so the average is of the levels and not
@@ -192,6 +204,11 @@ export default function BreedStrip({
       // opening a level from the page is a fresh run
       setLives(LIVES_START);
       setStreak(0);
+      /* THE FARM, CLOSED. Opening a level already refilled the lives; it did
+         not touch the score, so leaving a round before dying and coming back in
+         kept the points AND handed back three lives. Starting from the banked
+         total means an unfinished round can never leave anything behind. */
+      setCampaignScore(bankedScore);
       // The clicked card's on-screen rect, so the tunnel's card dives from where
       // it sits. Missing (e.g. a caller that passes no event) falls back to the
       // screen centre in TimeTunnel.
@@ -435,6 +452,8 @@ export default function BreedStrip({
       era={era}
       initialScore={campaignScore}
       onScoreChange={setCampaignScore}
+      bankedScore={bankedScore}
+      onBankScore={setBankedScore}
       onLevelChumRate={(pct) => setChumRates((r) => [...r, pct])}
       onChumCaught={(n) => setChumCounts((c) => ({ ...c, [n]: (c[n] ?? 0) + 1 }))}
       topChum={topChum}
@@ -469,6 +488,7 @@ export default function BreedStrip({
         setLives(LIVES_START);
         setStreak(0);
         setCampaignScore(0);
+        setBankedScore(0); // a fresh run has nothing banked either
         setChumRates([]);
         setChumCounts({});
       }}
@@ -480,6 +500,10 @@ export default function BreedStrip({
         // offers Restart while lives remain.
         setLives((l) => Math.max(0, l - 1));
         setStreak(0);
+        // The retry starts from the BANKED total, not from whatever the failed
+        // attempt reached. The remount below re-seeds the modal from
+        // campaignScore, so this is the line that decides what it re-seeds to.
+        setCampaignScore(bankedScore);
         // The modal is keyed on the level name, so replaying the same one
         // would not remount and the round would not reset. The run counter
         // is what forces it.
@@ -492,7 +516,13 @@ export default function BreedStrip({
       fact={active.fact}
       lineage={active.lineage}
       fromRect={active.fromRect}
-      onClose={() => setActive(null)}
+      onClose={() => {
+        // Walking out of a live round forfeits it, the same as losing it. The
+        // modal does this for its own back-out controls; this is the last way
+        // out, and without it the whole rule has a hole in it.
+        setCampaignScore(bankedScore);
+        setActive(null);
+      }}
     />
   );
 
