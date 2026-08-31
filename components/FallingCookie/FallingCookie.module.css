@@ -44,13 +44,16 @@
 }
 
 /* Falling: absolute inside the fixed field, animating from above down to translate
-   0,0 which IS the resting corner. `forwards` holds it there; the spin lands on a
-   whole turn (upright), so the static settled button below does not jump. */
+   0,0 which IS the resting spot. `forwards` holds it there; the spin lands on a
+   whole turn (upright), so the static settled button below does not jump.
+   0.85s, down from 4s on 31 Aug 2026. See the keyframes: the fall is linear now, and
+   0.85s is what makes that constant speed equal the old curve's terminal 173vh/s.
+   This duration is the speed dial; the keyframes hold the shape. */
 .cookie {
   position: absolute;
   pointer-events: auto;
   will-change: transform;
-  animation: cookieLand 4s linear forwards;
+  animation: cookieLand 0.85s linear forwards;
 }
 
 /* Settled: a real, reachable, keyboard-focusable button at the same corner, no
@@ -70,16 +73,21 @@
   height: auto;
 }
 
-/* REVERSED 31 Aug 2026: the two sideways knocks are gone. This used to snap X at the
-   24-31% and 57-64% windows while holding the spin flat, so the jolt read as a knock.
-   Steve asked for the horizontal travel to stop, so the drop is now a straight
-   vertical line and only the tumble remains. The tail keeps its small impact
-   overshoot and settle, ending upright at translate(0,0), which IS the resting spot
-   set above. */
+/* REVERSED 31 Aug 2026, second pass: the fall is now CONSTANT SPEED, not accelerating.
+   It used to ease in on cubic-bezier(0.45, 0, 0.9, 0.5), which covered 5.8vh in the
+   first quarter of the time and 65.1vh in the last, so it read as a long pause then
+   a sudden arrival. Steve asked for the speed it reached at the very end, held all
+   the way down.
+   The figure is derived, not picked: that curve's slope at t=1 is 3(1-0.5)/3(1-0.9)
+   = 5, so its terminal speed was 5x its 34.6vh/s average, i.e. 173vh/s. The drop is
+   119vh, so at that speed it takes 0.688s, and with a 0.16s settle on the end the
+   whole animation is 0.85s and the fall is the first 81% of it.
+   THE DIAL IS THE 0.85s ON .cookie. Raise it and the fall slows in proportion; the
+   81% split keeps the settle reading as an impact rather than a stop. */
 @keyframes cookieLand {
   0%   { transform: translateY(-115vh) rotate(0deg);
-         animation-timing-function: cubic-bezier(0.45, 0, 0.9, 0.5); }
-  86%  { transform: translateY(4vh)    rotate(var(--rtot, 720deg));
+         animation-timing-function: linear; }
+  81%  { transform: translateY(4vh)    rotate(var(--rtot, 720deg));
          animation-timing-function: cubic-bezier(0.3, 1.5, 0.5, 1); }
   100% { transform: translateY(0)      rotate(var(--rtot, 720deg)); }
 }
