@@ -3341,7 +3341,22 @@ export default function BreedTree({
     // must appear settled at their resting positions immediately, the same settle-in
     // -place path prefers-reduced-motion and a resize-only re-pack already take. Game
     // hostings (displayOnly false) keep the staggered drop-in below.
-    if (reduce || resizeOnlyRef.current || displayOnly) {
+    // MOBILE, 31 Aug 2026: no drop-in. The staggered entrance below runs for
+    // 700ms plus 45ms per circle, and `entered` is false throughout, which holds
+    // back the difficulty slider, the circle names, the badges, PLAY, LEARN and the
+    // level number. On a phone that reads as a broken half-drawn screen rather than
+    // as choreography. Worse, zoomTo(v) only runs when the drop FINISHES, so for
+    // that whole time the dashed cluster ring is drawn from a stale viewRef and
+    // comes in oversized (the same class of bug the stroke-width comment below
+    // describes).
+    // This joins the settle-in-place branch rather than getting its own, because
+    // that branch is exactly the behaviour wanted and has shipped to every
+    // reduced-motion user since the entrance was written.
+    // Read through the ref, not the isMobile state, so the effect keeps its
+    // [nodes, dropArmed] deps; the ref is assigned during render, so it is current
+    // by the time this runs. To drop the entrance on DESKTOP too, delete the
+    // isMobileRef term.
+    if (reduce || resizeOnlyRef.current || displayOnly || isMobileRef.current) {
       resizeOnlyRef.current = false;
       zoomTo(v);
       setEntered(true);
