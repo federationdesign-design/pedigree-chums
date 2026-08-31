@@ -117,7 +117,7 @@ export const SLIDES: Slide[] = [
 For thousands of years they have been selected to chase, retrieve, guard, herd, track, dig, carry and solve problems alongside people, so many of those behaviours are deeply rewarding in their own right. A Labrador fetching a ball, a Collie rounding up the family, or a Terrier digging furiously under a hedge may look like play to us, but to the dog they are using the same instincts, senses and problem-solving skills their ancestors relied on for real jobs.
 
 "Work" does not need to mean employment: anything that gives a dog a purpose, a challenge and the chance to use the abilities it was built for can provide the satisfaction of a job well done.`,
-          thumbnail: { src: "/a-dog-never-died-from-missing-a-walk.jpg", alt: "a pug in a red harness on a walk, tongue out, on a dirt path" },
+          thumbnail: { src: "/history/terra.jpg", alt: "ALT TEXT TO CONFIRM: Terra" },
         },
       ],
     },
@@ -131,6 +131,7 @@ For thousands of years they have been selected to chase, retrieve, guard, herd, 
       sections: [
         {
           subheading: "Why *we* love dogs *doing*",
+          thumbnail: { src: "/dog-at-work-love.jpg", alt: "ALT TEXT TO CONFIRM: why we love dogs doing" },
           body: `**For thousands of years, their enthusiasm has made our lives easier.**
 
 They herd animals we could never control alone, find people we cannot see, retrieve things we cannot reach, guard homes and livestock, guide people through the world and use extraordinary noses to detect drugs, explosives, disease and even signs of some cancers. What looks like a dog happily following its instincts can save humans hours of work, enormous effort and sometimes lives.
@@ -159,6 +160,7 @@ Perhaps that is the remarkable bargain at the heart of our relationship with dog
       sections: [
         {
           subheading: "What we *owe dogs*",
+          thumbnail: { src: "/dog-at-work-owe-dogs.jpg", alt: "ALT TEXT TO CONFIRM: what we owe dogs" },
           body: `Far more than affection. For centuries they have guarded our homes, protected livestock, carried messages, found the lost, hunted food, controlled vermin, pulled loads, guided people, served in war and rescue, and taken on countless jobs simply because working beside us became part of their lives.
 
 What we owe them is responsible care, patience, safety, companionship and the chance to use the instincts and abilities we deliberately bred into them.
@@ -189,6 +191,7 @@ After everything dogs have done for us, the least we can do is make sure their l
       sections: [
         {
           subheading: "What dogs *often get*",
+          thumbnail: { src: "/dog-at-work-often-get.jpg", alt: "ALT TEXT TO CONFIRM: what dogs often get" },
           body: `They get food, shelter, protection, veterinary care, companionship and a place inside our families. Many live warm, comfortable lives filled with walks, play, affection and jobs chosen for enjoyment rather than survival.
 
 But dogs have not always received a fair return and that is still the case in modern times for some dogs. The same animals bred to work beside us can be neglected, abandoned or treated as just tools, or status symbols and disposable possessions.
@@ -274,6 +277,7 @@ Some spend their lives bored and under-stimulated, while others are pushed into 
       sections: [
         {
           subheading: "Some jobs cannot be done by *people alone*",
+          thumbnail: { src: "/dog-at-work-some-jobs.jpg", alt: "ALT TEXT TO CONFIRM: some jobs cannot be done by people alone" },
           body: `There are things a human search team simply cannot do. See through vegetation. Cover a hillside in the dark. Read the air.
 
 A dog does not replace the people. It gives them information they could not otherwise reach, and it works for a toy and a bit of praise.
@@ -294,6 +298,7 @@ That is the pattern across every job in this series: not a dog doing a human's w
       sections: [
         {
           subheading: "What we get back is *bigger than the task*",
+          thumbnail: { src: "/dog-at-work-we-get-back.jpg", alt: "ALT TEXT TO CONFIRM: what we get back" },
           body: `The job description is always small. Find the scent. Move the sheep. Get to the kerb safely.
 
 What comes back is rarely small. Earlier diagnosis. A working farm. A career, a bus journey, an ordinary life somebody had started avoiding.
