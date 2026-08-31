@@ -363,10 +363,21 @@ const TOY_SHOE_ASPECT = 520 / 343;
    86 and 94 degrees sit either side of upright, so the pair leans apart.
    Rotated, a 400px newspaper is only 176px across and a 500px shoe 330px, which
    is what lets them be this big in a pit about 390px wide. */
-/* Which prop waits and lands INTO the flood of dogs rather than before it, so
-   some of the pack is already down and the rest comes in on top of it. One word
-   to move it to another prop, or "" to send them all in together as before. */
-const PROP_IN_FLOOD: string = "shoe";
+/* Which props wait and land INTO the flood of dogs rather than before it, so
+   some of the pack is already down and the rest comes in on top of them. Add or
+   remove a kind here, or empty the list to send them all in together as before.
+
+   THE BOWL JOINED THE SHOE, 31 August 2026, owner's call: a bowl is worth
+   having while the dogs are still raining down, not sitting on an empty floor
+   waiting for them. It lands at the flood's halfway point, which is what
+   `floodMid` is, so roughly half the pack is already down and the rest comes in
+   around and into it. Moving it to the START of the flood would put more dogs
+   in the bowl but would land it while it is still toppling from its 80 degree
+   drop: use `chumsAt` in place of `floodMid` if that turns out to be wanted.
+
+   This also supersedes the earlier "leave the bowl on the props beat" call from
+   the same session. It no longer lands at 7.0s or 7.5s at all. */
+const PROPS_IN_FLOOD: string[] = ["shoe", "bowl"];
 
 const TOY_NEWSPAPER_W = 400;
 const TOY_NEWSPAPER_DEG = 86;
@@ -4352,7 +4363,7 @@ export default function BreedTree({
         const floodMid = chumsAt + ((chumImagesRef.current?.length ?? 0) * CHUM_STAGGER) / 2;
         props.forEach((kind: ToyKind, i: number) => {
           const at =
-            kind === PROP_IN_FLOOD ? floodMid
+            PROPS_IN_FLOOD.includes(kind) ? floodMid
             : i < 2 ? propsAt
             : propsAt + TOY_ROCK_GAP * (i - 1);
           const left = i % 2 === 0 ? firstLeft : !firstLeft;
