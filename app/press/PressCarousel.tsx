@@ -4,6 +4,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import ReadingProgress from "../../components/ReadingProgress/ReadingProgress";
+import ArticleTextToggle from "../../components/ArticleTextToggle/ArticleTextToggle";
 import WorkChevron from "../../components/WorkChevron/WorkChevron";
 import BentoBoard from "../../components/Nav/BentoBoard";
 import styles from "./page.module.css";
@@ -43,7 +44,7 @@ type Media =
   | { type: "gallery"; items: Pic[] }
   | { type: "diptych"; items: [Pic, Pic]; captions?: [string, string] }
   | { type: "pairAndRow"; pair: [Pic, Pic]; row: Pic[] }
-  | { type: "neat"; colA: NeatCell[]; colB: NeatCell[] }
+  | { type: "neat"; colA: NeatCell[]; colB: NeatCell[]; split?: [number, number] }
   | { type: "videoStack"; video: VideoMedia; images: Pic[]; videoScale?: number; imgScale?: number }
   | { type: "bento" }
   | VideoMedia;
@@ -234,6 +235,8 @@ const SCREENS: Screen[] = [
     topTitle: "One Pug. One Prize.",
     media: {
       type: "neat",
+      // Round 10: column A (images) 30%, column B (video) 70%.
+      split: [30, 70],
       colA: [
         {
           img: {
@@ -283,6 +286,8 @@ const SCREENS: Screen[] = [
     topTitle: "Making Pug Tangible.",
     media: {
       type: "neat",
+      // Round 10: column A (images) 30%, column B (video) 70%.
+      split: [30, 70],
       colA: [
         {
           img: {
@@ -557,9 +562,14 @@ const SCREENS: Screen[] = [
 function VideoFacade({
   media,
   active,
+  onEnded,
 }: {
   media: VideoMedia;
   active: boolean;
+  // Round 10: fires when a self-hosted clip ends, to auto-advance. Vimeo iframes
+  // cannot report end without the player SDK (a forbidden external script), so they
+  // never auto-advance.
+  onEnded?: () => void;
 }) {
   const [playing, setPlaying] = useState(false);
 
@@ -588,6 +598,7 @@ function VideoFacade({
           autoPlay
           controls
           playsInline
+          onEnded={onEnded}
         />
       ) : (
         <button
@@ -624,7 +635,15 @@ function Thumb({ pic }: { pic: Pic }) {
   );
 }
 
-function MediaView({ media, active }: { media: Media; active: boolean }) {
+function MediaView({
+  media,
+  active,
+  onEnded,
+}: {
+  media: Media;
+  active: boolean;
+  onEnded?: () => void;
+}) {
   if (media.type === "image") {
     return (
       <Image
@@ -676,19 +695,21 @@ function MediaView({ media, active }: { media: Media; active: boolean }) {
     // Two columns, each a stack of cells (image or video). Both columns stretch to
     // the same height and every cell cover-fills, so the block reads as one neat
     // rectangle with aligned edges and no gaps (screens 6, 7, 8).
-    const col = (cells: NeatCell[]) => (
-      <div className={styles.neatCol}>
+    // Round 10: optional column split (e.g. [30, 70] for a wide video column). The
+    // base flex is 1 1 0 (50/50); an inline flex-grow overrides it per column.
+    const col = (cells: NeatCell[], grow?: number) => (
+      <div className={styles.neatCol} style={grow ? { flexGrow: grow } : undefined}>
         {cells.map((c, i) => (
           <div key={i} className={styles.neatCell}>
-            {"img" in c ? <Thumb pic={c.img} /> : <VideoFacade media={c.vid} active={active} />}
+            {"img" in c ? <Thumb pic={c.img} /> : <VideoFacade media={c.vid} active={active} onEnded={onEnded} />}
           </div>
         ))}
       </div>
     );
     return (
       <div className={styles.neat}>
-        {col(media.colA)}
-        {col(media.colB)}
+        {col(media.colA, media.split?.[0])}
+        {col(media.colB, media.split?.[1])}
       </div>
     );
   }
@@ -733,7 +754,7 @@ function MediaView({ media, active }: { media: Media; active: boolean }) {
         }
       >
         <div className={styles.videoStackTop}>
-          <VideoFacade media={media.video} active={active} />
+          <VideoFacade media={media.video} active={active} onEnded={onEnded} />
         </div>
         <div className={styles.videoStackImgs}>
           {media.images.map((pic, i) => (
@@ -753,7 +774,7 @@ function MediaView({ media, active }: { media: Media; active: boolean }) {
       </div>
     );
   }
-  return <VideoFacade media={media} active={active} />;
+  return <VideoFacade media={media} active={active} onEnded={onEnded} />;
 }
 
 /* The blue-fade panel with the screen's copy. glowLayer + circles are the panel's
@@ -825,7 +846,15 @@ function CopyPanel({
   );
 }
 
-function ScreenView({ screen, active }: { screen: Screen; active: boolean }): ReactNode {
+function ScreenView({
+  screen,
+  active,
+  onEnded,
+}: {
+  screen: Screen;
+  active: boolean;
+  onEnded?: () => void;
+}): ReactNode {
   const hasCopy = screen.blocks.length > 0 || !!screen.assetGrid;
   const copy = hasCopy ? (
     <CopyPanel title={screen.title} blocks={screen.blocks} assetGrid={screen.assetGrid} />
@@ -855,7 +884,7 @@ function ScreenView({ screen, active }: { screen: Screen; active: boolean }): Re
         {titleEl}
         <div className={styles.overlayScreen}>
           <div className={`${styles.overlayMedia}${variant}${shrink}`}>
-            <MediaView media={screen.media} active={active} />
+            <MediaView media={screen.media} active={active} onEnded={onEnded} />
           </div>
           {hasCopy ? (
             <div
@@ -873,8 +902,12 @@ function ScreenView({ screen, active }: { screen: Screen; active: boolean }): Re
     <>
       {titleEl}
       <div className={styles.screen}>
-        <div className={`${styles.screenMedia}${shrink}`}>
-          <MediaView media={screen.media} active={active} />
+        <div
+          className={`${styles.screenMedia}${
+            screen.media.type === "bento" ? ` ${styles.screenMediaBento}` : ""
+          }${shrink}`}
+        >
+          <MediaView media={screen.media} active={active} onEnded={onEnded} />
         </div>
         {hasCopy ? <div className={styles.copyWrap}>{copy}</div> : null}
       </div>
@@ -970,6 +1003,13 @@ export default function PressCarousel() {
       {/* Header title (round 3), shown on every screen. */}
       <p className={styles.headerTitle}>Press Pack</p>
 
+      {/* Round 10: the site's light/dark text switch (ArticleTextToggle), reused as-is.
+          It sets data-pc-textinvert on the press <main>; the .pack rule flips the copy
+          from white to navy. Placed top-left, clear of the header/title/counter/arrows. */}
+      <div className={styles.textToggle}>
+        <ArticleTextToggle />
+      </div>
+
       <div className={styles.rail} ref={railRef}>
         {SCREENS.map((screen, i) => (
           <article
@@ -979,7 +1019,11 @@ export default function PressCarousel() {
             aria-label={`Slide ${i + 1} of ${count}`}
             aria-hidden={i !== index}
           >
-            <ScreenView screen={screen} active={i === index} />
+            <ScreenView
+              screen={screen}
+              active={i === index}
+              onEnded={() => goTo(i + 1)}
+            />
           </article>
         ))}
       </div>

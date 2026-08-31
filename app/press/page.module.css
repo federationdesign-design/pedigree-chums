@@ -184,7 +184,8 @@
      to it (a flex row leaves the percentage height unresolved and they overlap). */
   display: grid;
   grid-template-rows: minmax(0, 1fr) auto;
-  gap: clamp(14px, 2.6vh, 24px);
+  /* Round 10: media-to-copy gap down to a uniform 10px (was ~23px). */
+  gap: 10px;
 }
 .screenMedia {
   min-height: 0;
@@ -195,6 +196,13 @@
   /* Global round: image block sits high, just under the title. */
   align-items: flex-start;
   justify-content: center;
+}
+/* Round 10: the bento (A Little Deeper) widens beyond the media envelope to be as wide
+   as possible without running under the edge arrows. The arrows sit clamp(16px,4vw,48px)
+   from each side and are clamp(64px,9vw,132px) wide; keep the bento inside them with a
+   ~16px clearance each side. Measured gap: 954px at 1280, 238px at 390. */
+.screenMediaBento {
+  max-width: calc(100vw - 2 * (clamp(16px, 4vw, 48px) + clamp(64px, 9vw, 132px) + 16px));
 }
 /* The text container is wider than the media (40%, owner round 2). */
 .copyWrap {
@@ -467,12 +475,19 @@
   color: var(--yellow-header, #ffed00);
 }
 /* Wrapper positioning for the standard text toggle, below the indicator. */
+/* Round 10: wrapper for the reused ArticleTextToggle. Moved to the top-left, clear of
+   the site header, the centred title/counter, and the edge arrows. */
 .textToggle {
   position: absolute;
-  top: clamp(88px, 12.5vh, 116px);
-  left: 50%;
-  transform: translateX(-50%);
+  top: clamp(144px, 16vh, 152px);
+  left: clamp(12px, 3vw, 28px);
   z-index: 6;
+}
+/* Round 10: the reused ArticleTextToggle sets data-pc-textinvert on the press <main>.
+   Wire the round-3 intent that was never written: flip the copy from white to navy.
+   .pack is a local class here, so this is not a bare :global selector. */
+:global(main[data-pc-textinvert="on"]) .pack {
+  --press-copy: var(--navy, #0a3a57);
 }
 
 /* Diptych cell + per-image caption (screen 2 subtitles). */
@@ -608,6 +623,12 @@
   gap: 10px;
   align-items: center;
   justify-content: center;
+  /* Round 10 (cause fix): shrink the whole row via max-width, not each image via
+     transform:scale. scale left the flex cell full-size, so the leftover 10% read as
+     extra gap (24-35px). With max-width the images get 10% smaller and the flex gap
+     stays a true 10px on every videoStack row. */
+  max-width: calc(100% * var(--img-scale, 1));
+  margin-inline: auto;
 }
 .videoStackImgs .thumbImg {
   flex: 1 1 0;
@@ -615,7 +636,6 @@
   min-height: 0;
   height: auto;
   max-height: 100%;
-  transform: scale(var(--img-scale, 1));
 }
 
 /* Pair + row (screen 3): two images over a row of images below. Grid (the same
