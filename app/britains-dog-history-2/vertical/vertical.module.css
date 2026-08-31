@@ -1907,3 +1907,62 @@
   font-size: clamp(1.6rem, 8vw, 2.6rem);
   bottom: 58px;
 }
+
+
+/* ==== 3G-BLOCK ==== */
+/* ============================================================================
+   STAGE 3G, 31 August 2026. THE FLIPPED CARD RAN OUT OF THE PANEL.
+
+   .dogFlipInner is a grid with both faces in one cell, so the card is as tall
+   as whichever face is taller. The original note on it says as much: "the
+   picture holds the square, the back face is FREE TO BE TALLER". That was
+   correct when a dog owned a whole screen and there was nothing underneath it
+   to push into.
+
+   On a rail the card has a fixed slot to live in, so a back face free to grow
+   simply grew out of the bottom of the page. The square is the constraint now
+   and the back has to fit inside it.
+
+   THE TRADE-OFF, STATED PLAINLY: the back is clipped rather than scrolled if a
+   note is very long. A scroller inside the card would be a third nested
+   scroller on this page and is not worth it. The sizes below were set against
+   the longest note in the ancient era with room to spare, but if a longer one
+   is added later this is where it will show, and the answer is to cut the note
+   rather than to let the card grow again.
+   ========================================================================= */
+
+/* The square is the card. Both faces get exactly this box. */
+.dogFlipInner {
+  aspect-ratio: 1 / 1;
+}
+
+/* The back face has to earn its place in that box, so every part of it comes
+   down. The proportions are kept: the green pill is still the loudest thing on
+   the card and the note is still the body copy under it. */
+.dogBack {
+  padding: 14px;
+  gap: 9px;
+}
+.dogHint {
+  font-size: 1.15rem;
+  padding: 13px 24px 11px;
+}
+.dogNote {
+  font-size: 1.05rem;
+  line-height: 1.25em;
+  margin: -4px 0 -3px;
+}
+/* The two flip glyphs and the outbound links, in proportion with the rest. */
+.backFlip {
+  width: 44px;
+  height: 44px;
+  bottom: 10px;
+  right: 10px;
+}
+.frontFlip {
+  width: 42px;
+  height: 42px;
+}
+.backLinks {
+  gap: 10px;
+}
