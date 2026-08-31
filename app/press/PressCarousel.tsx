@@ -63,7 +63,7 @@ type Screen = {
   /* screens 1, 6: video 20% smaller. */
   mediaShrink?: boolean;
   /* screen 16: a text-box grid of available assets. */
-  assetGrid?: { heading: string; items: string[] }[];
+  assetGrid?: { heading: string; items: string[]; href?: string }[];
 };
 
 const SCREENS: Screen[] = [
@@ -182,72 +182,8 @@ const SCREENS: Screen[] = [
     },
     blocks: [],
   },
-  // 4 (new) 2x2 grid: the leaving-the-card sequence into the real world.
-  {
-    media: {
-      type: "grid",
-      items: [
-        {
-          src: "/press/slide13.jpg",
-          alt: "The Pug card standing in a sunlit painted field, with the words Find Pug.",
-          w: 1250,
-          h: 1738,
-        },
-        {
-          src: "/press/slide14.jpg",
-          alt: "The cartoon Pug leaping out of its card into a painted sky.",
-          w: 1250,
-          h: 1738,
-        },
-        {
-          src: "/press/slide14b.jpg",
-          alt: "The cartoon Pug flying over an empty field with a person-and-dog icon.",
-          w: 1250,
-          h: 1738,
-        },
-        {
-          src: "/press/dog-on-real.jpg",
-          alt: "A real fawn Pug standing in long grass.",
-          w: 2158,
-          h: 3000,
-        },
-      ],
-    },
-    blocks: [],
-  },
-  // 5 (new, inserted) 2x2 grid: real Pugs to spot and photograph.
-  {
-    media: {
-      type: "grid",
-      items: [
-        {
-          src: "/press/dog-on-real.jpg",
-          alt: "A real fawn Pug standing in long grass.",
-          w: 2158,
-          h: 3000,
-        },
-        {
-          src: "/press/slide15.jpg",
-          alt: "A real fawn Pug walking through grass, tagged hashtag ChumSpot.",
-          w: 1250,
-          h: 1738,
-        },
-        {
-          src: "/press/slide16.jpg",
-          alt: "A real fawn Pug running through grass, tagged hashtag ChumSpot.",
-          w: 1250,
-          h: 1738,
-        },
-        {
-          src: "/press/cover-where-is-pug.jpg",
-          alt: "A Where Is Pug poster: the Pug card in a grassy field.",
-          w: 1250,
-          h: 1738,
-        },
-      ],
-    },
-    blocks: [],
-  },
+  // (Round 9: the two 2x2 grid screens, formerly "4 (new)" and "5 (new)", removed
+  // entirely. This shifts the pack numbering after slide 4.)
   // 6 Why Pug? (round 5): two columns, a second video added, neat grid.
   {
     layout: "overlay",
@@ -550,10 +486,9 @@ const SCREENS: Screen[] = [
   {
     topTitle: "Help Us Find Pug",
     media: {
+      // Round 9: top two images (slide1, slide2) removed; two remain.
       type: "grid",
       items: [
-        { src: "/press/slide1.jpg", alt: "A Can You Find Pug poster.", w: 1250, h: 1738 },
-        { src: "/press/slide2.jpg", alt: "The Pug character card on a blue and yellow set.", w: 1250, h: 1738 },
         { src: "/press/slide4.jpg", alt: "A real Pug in grass with TikTok and Instagram icons and the words When you do.", w: 1250, h: 1738 },
         { src: "/press/slide5.jpg", alt: "The blue Pug figurine inside a Pedigree Chums window box.", w: 1250, h: 1738 },
       ],
@@ -590,9 +525,9 @@ const SCREENS: Screen[] = [
   {
     topTitle: "Press Assets",
     assetGrid: [
-      { heading: "Video", items: ["Product", "CGI", "Live action"] },
-      { heading: "Photosets", items: ["Studio", "CGI", "Product"] },
-      { heading: "Word docs", items: ["Campaign bio", "Competition terms"] },
+      { heading: "Video", items: ["Product", "CGI", "Live action"], href: "https://u.pcloud.link/publink/show?code=kZlwoJJZEuNohD0sHlf5SluVATShlfUmaexX" },
+      { heading: "Photosets", items: ["Studio", "CGI", "Product"], href: "https://u.pcloud.link/publink/show?code=kZTwoJJZ45qECdWzTxQxWKs5DxpoFHbEApmy" },
+      { heading: "Word docs", items: ["Campaign bio", "Competition terms"], href: "https://u.pcloud.link/publink/show?code=kZqwoJJZFScxcBvsTj8oo09dO5c4sHgkGAEV" },
     ],
     blocks: [
       { kind: "standfirst", text: "Available on request." },
@@ -830,7 +765,7 @@ function CopyPanel({
 }: {
   title?: string;
   blocks: Block[];
-  assetGrid?: { heading: string; items: string[] }[];
+  assetGrid?: { heading: string; items: string[]; href?: string }[];
 }) {
   return (
     <div className={`${panel.section} ${styles.panel}`}>
@@ -857,16 +792,32 @@ function CopyPanel({
         })}
         {assetGrid ? (
           <div className={styles.assetGrid}>
-            {assetGrid.map((g, i) => (
-              <div key={i} className={styles.assetBox}>
-                <p className={styles.assetHeading}>{g.heading}</p>
-                {g.items.map((it, j) => (
-                  <p key={j} className={styles.assetItem}>
-                    {it}
-                  </p>
-                ))}
-              </div>
-            ))}
+            {assetGrid.map((g, i) => {
+              const inner = (
+                <>
+                  <p className={styles.assetHeading}>{g.heading}</p>
+                  {/* Round 9: items as one comma sentence, not a bulleted list. */}
+                  <p className={styles.assetItem}>{g.items.join(", ")}</p>
+                </>
+              );
+              // Round 9: the whole box (and its title) links to its pCloud folder,
+              // opening in a new tab so the journalist keeps their place in the pack.
+              return g.href ? (
+                <a
+                  key={i}
+                  className={styles.assetBox}
+                  href={g.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {inner}
+                </a>
+              ) : (
+                <div key={i} className={styles.assetBox}>
+                  {inner}
+                </div>
+              );
+            })}
           </div>
         ) : null}
       </div>

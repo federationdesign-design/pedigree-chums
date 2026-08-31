@@ -157,6 +157,15 @@
   height: 100%;
   border: none;
   display: block;
+  /* Round 9: fill the box like the poster does. On narrow viewports the box aspect
+     is width-bound and differs from the clip, so a contain-fitted <video> letterboxed
+     and the #000 box showed through as bars; cover removes that. (No effect on the
+     Vimeo iframe.) The small scale crops pug-run.mp4's 4px baked-in source letterbox. */
+  object-fit: cover;
+  transform: scale(1.02);
+}
+.videoPoster {
+  transform: scale(1.02);
 }
 
 /* ---- content screen: picture + short copy ------------------------------- */
@@ -397,8 +406,9 @@
 .copyBody {
   margin: 0 0 clamp(7px, 1.4vh, 12px);
   font-family: var(--font-body), system-ui, sans-serif;
-  font-weight: 500;
-  font-size: clamp(1.02rem, 3.2vw, 1.24rem);
+  /* Round 9: all blue-container copy is weight 700 at the standfirst size. */
+  font-weight: 700;
+  font-size: clamp(1.18rem, 4vw, 1.55rem);
   line-height: 1.26;
   color: var(--press-copy, #ffffff);
   white-space: pre-line;
@@ -409,7 +419,9 @@
 .copyDisplay {
   margin: clamp(10px, 2vh, 16px) 0 0;
   font-family: var(--font-display), system-ui, sans-serif;
-  font-size: clamp(1.32rem, 4.4vw, 1.85rem);
+  /* Round 9: all blue-container copy weight 700 at the standfirst size. */
+  font-weight: 700;
+  font-size: clamp(1.18rem, 4vw, 1.55rem);
   line-height: 1.1;
   color: var(--press-copy, #ffffff);
   white-space: pre-line;
@@ -419,7 +431,7 @@
   margin: clamp(10px, 2vh, 16px) 0 0;
   font-family: var(--font-body), system-ui, sans-serif;
   font-weight: 700;
-  font-size: clamp(1.05rem, 3.4vw, 1.32rem);
+  font-size: clamp(1.18rem, 4vw, 1.55rem);
   line-height: 1.2;
   color: var(--press-copy, #ffffff);
   white-space: pre-line;
@@ -633,6 +645,9 @@
 .bentoWrap {
   width: 100%;
   height: 100%;
+  /* Round 9: cap the bento box area height. */
+  max-height: 500px;
+  margin: 0 auto;
   overflow: hidden;
   display: flex;
   align-items: flex-start;
@@ -653,10 +668,16 @@
   margin-top: clamp(8px, 1.6vh, 14px);
   text-align: center;
 }
+/* Round 9: the box is a link to its pCloud folder. Reset the anchor and even up the
+   padding (8px all sides), then add 10px top and bottom for breathing room. */
 .assetBox {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
   border: 2px solid var(--white, #ffffff);
   border-radius: 12px;
-  padding: 8px 6px;
+  padding: 18px 8px;
 }
 /* Round 7: font size doubled on all text in the box. */
 .assetHeading {
