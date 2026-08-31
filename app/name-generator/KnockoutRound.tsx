@@ -5,6 +5,7 @@ import styles from "./KnockoutRound.module.css";
 import ShareScreen from "./ShareScreen";
 import { PODIUM_ART } from "./podiumArt";
 import { sharedPodiumPath } from "./shareLink";
+import ShareLinkButton from "./ShareLinkButton";
 import { SITE_URL } from "../../lib/site";
 import { ShortlistEntry } from "./ShortlistBar";
 import { fireConfetti } from "../../lib/confetti";
@@ -589,10 +590,27 @@ export default function KnockoutRound({ shortlist, recommended = [], breed, onBa
               `I don't even have a dog but I just got: ${name} on a dog name generator`,
             ];
             return (
-              <div style={{ position:"relative", display:"inline-block", margin:"0 auto" }}>
+              /* NG-SHARE-6, 31 Aug 2026. Two buttons side by side.
+
+                 "Share your chum" is unchanged: caption picker, podium image
+                 attached, native sheet on mobile.
+
+                 "Get share link" is the plain version Steve asked for. It hands
+                 over the URL and nothing else, for anyone who wants to paste it
+                 into a message themselves rather than pick a caption. Same link
+                 the caption carries, so both routes land on the same podium and
+                 preview the same card.
+
+                 It shares .shareBtn with the first button so the pair matches,
+                 and it waits for podiumReady for the same reason: before that,
+                 first and second are not settled. */
+              <div style={{ position:"relative", display:"inline-flex", gap:12, flexWrap:"wrap", justifyContent:"center", margin:"0 auto" }}>
                 <button className={styles.shareBtn} onClick={() => setShareOpen(o => !o)} disabled={sharing || !podiumReady}>
                   {sharing ? "Sharing..." : "📣 Share your chum"}
                 </button>
+                {podiumReady && first ? (
+                  <ShareLinkButton label="🔗 Get share link" url={url} className={styles.shareBtn} />
+                ) : null}
                 {shareOpen && (
                   <>
                     <div onClick={() => setShareOpen(false)} style={{ position:"fixed", inset:0, zIndex:40 }} />

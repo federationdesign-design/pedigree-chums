@@ -16,11 +16,24 @@ import { useState } from "react";
 
    The only client component on those pages, so they stay server-rendered. */
 
-export default function ShareLinkButton({ label = "Share this" }: { label?: string }) {
+export default function ShareLinkButton({
+  label = "Share this",
+  url: given,
+  className,
+}: {
+  label?: string;
+  /* Omit on the landing pages, where the page's own address is the thing to
+     share. Pass a URL from the podium, where the link is built for the result
+     the visitor just produced rather than the page they are standing on. */
+  url?: string;
+  /* Lets the podium hand in its own .shareBtn class so the pair matches.
+     Without it the inline outline style below applies. */
+  className?: string;
+}) {
   const [state, setState] = useState<"idle" | "copied" | "failed">("idle");
 
   async function onShare() {
-    const url = typeof window !== "undefined" ? window.location.href : "";
+    const url = given || (typeof window !== "undefined" ? window.location.href : "");
     if (!url) return;
     try {
       if (navigator.share) {
@@ -38,6 +51,16 @@ export default function ShareLinkButton({ label = "Share this" }: { label?: stri
         setTimeout(() => setState("idle"), 2600);
       }
     }
+  }
+
+  const text = state === "copied" ? "Link copied" : state === "failed" ? "Could not copy" : label;
+
+  if (className) {
+    return (
+      <button type="button" onClick={onShare} className={className} aria-live="polite">
+        {text}
+      </button>
+    );
   }
 
   return (
@@ -59,7 +82,7 @@ export default function ShareLinkButton({ label = "Share this" }: { label?: stri
       }}
       aria-live="polite"
     >
-      {state === "copied" ? "Link copied" : state === "failed" ? "Could not copy" : label}
+      {text}
     </button>
   );
 }
