@@ -308,6 +308,26 @@ const TOY_BONE_GONE_KEY = "pc-minipit-bone-gone";
 // Dropped after the rock and before the chums, so it lands on a floor that has
 // something on it rather than into an empty pit.
 const TOY_BONE_GAP = 900;
+/* The dog bowl, ported from the main pit (PackPit.tsx:364 and 392 to 405).
+   Steve's call, 31 August 2026: FURNITURE. The main pit's bowl carries
+   `isBowl: true` and a `bowlScored` Set and scores anything that lands in it.
+   None of that comes across. This one is something to knock about and drop
+   things into, and it scores nothing.
+
+   A COMPOUND BODY, exactly like the bone above and for the same reason, only
+   more so: a single rectangle would be a closed box and objects would sit on
+   the lid instead of falling inside. The four parts are a floor, a centre bump
+   and two angled walls, taken from the main pit's own figures against its
+   1031.7 x 316.8 artboard.
+
+   The 80 degree drop angle is the main pit's too. It arrives tipped almost onto
+   its rim rather than flat, so it topples as it settles. */
+const TOY_BOWL_SRC = "/dog-bowl-2.svg";
+const BOWL_ASPECT = 3.22;
+const BOWL_VB_W = 1031.7;
+const BOWL_VB_H = 316.8;
+const BOWL_DROP_DEG = 80;
+const TOY_BOWL_GONE_KEY = "pc-minipit-bowl-gone";
 /* ---- Era props -------------------------------------------------------------
    Objects that belong to one era rather than to the pit as a whole. They take
    the place of the stick, big stick and rock in the props slot, and an era with
@@ -403,7 +423,7 @@ const CHUM_BAND: Record<string, number> = { small: 5 / 6, medium: 1, large: 4 / 
 // stickBig is the same artwork half again as large, so the pair reads as two
 // sticks of different sizes rather than one drawn twice
 type ToyKind = "ball" | "flag" | "stick" | "stickBig" | "rock" | "ballPink" | "cookies" | "bone"
-  | "newspaper" | "fork" | "shoe";
+  | "newspaper" | "fork" | "shoe" | "bowl";
 /* The props slot: the three objects that arrive together part way through the
    drop. A theme can replace them, which is how an era gets its own things to
    knock about. */
@@ -418,6 +438,7 @@ const TOY_SRC: Record<ToyKind, string> = {
   cookies: TOY_COOKIES_SRC,
   bone: TOY_BONE_SRC,
   newspaper: TOY_NEWSPAPER_SRC, fork: TOY_FORK_SRC, shoe: TOY_SHOE_SRC,
+  bowl: TOY_BOWL_SRC,
 };
 // every prop except the flag leaves for good once it is thrown clear of the pit
 const TOY_GONE_KEY: Record<ToyKind, string> = {
@@ -427,6 +448,7 @@ const TOY_GONE_KEY: Record<ToyKind, string> = {
   cookies: TOY_COOKIES_SEEN_KEY,
   bone: TOY_BONE_GONE_KEY,
   newspaper: TOY_NEWSPAPER_GONE_KEY, fork: TOY_FORK_GONE_KEY, shoe: TOY_SHOE_GONE_KEY,
+  bowl: TOY_BOWL_GONE_KEY,
 };
 function toyRetired(key: string): boolean {
   try { return sessionStorage.getItem(key) === "1"; } catch { return false; }
@@ -4029,11 +4051,16 @@ export default function BreedTree({
           : kind === "newspaper" ? TOY_NEWSPAPER_W
           : kind === "fork" ? ballDia * 1.15
           : kind === "shoe" ? TOY_SHOE_W
+          // The bowl takes the main pit's own multiplier off the same unit,
+          // PackPit.tsx:364, including its 0.85 mobile reduction, so the two
+          // pits show a bowl of the same size.
+          : kind === "bowl" ? BIGT * 9.38 * (isNarrow ? 0.85 : 1)
           : BIGT * 0.6 * 2;
         const hgt = kind === "stick" || kind === "stickBig" ? dia / STICK_ASPECT : kind === "rock" ? dia / ROCK_ASPECT : kind === "cookies" ? dia / COOKIES_ASPECT : kind === "bone" ? dia / BONE_ASPECT
           : kind === "newspaper" ? dia / TOY_NEWSPAPER_ASPECT
           : kind === "fork" ? dia / TOY_FORK_ASPECT
           : kind === "shoe" ? dia / TOY_SHOE_ASPECT
+          : kind === "bowl" ? dia / BOWL_ASPECT
           : dia;
         const r = dia / 2;
         // ball drops anywhere across the pit, flag comes in at 70% like the pit
@@ -4080,6 +4107,9 @@ export default function BreedTree({
           : kind === "newspaper" ? { restitution: 0.16, friction: 0.6, frictionStatic: 1.0, frictionAir: 0.008, density: 0.002 }
           : kind === "shoe" ? { restitution: 0.14, friction: 0.7, frictionStatic: 1.1, frictionAir: 0.008, density: 0.016 }
           : kind === "fork" ? { restitution: 0.32, friction: 0.4, frictionAir: 0.005, density: 0.003 }
+          // The main pit's own bowl figures, PackPit line 397. frictionAir 0.012
+          // rides on the compound body itself, below, exactly as it does there.
+          : kind === "bowl" ? { restitution: 0.3, friction: 0.3, density: 0.006 }
           : { restitution: 0.5, friction: 0.3, frictionAir: 0.004, density: 0.006 };
         // A long thin body needs a real rectangle or it spins like a propeller.
         // Chamfered, so it reads as a rounded stick and cannot catch on a corner.
@@ -4130,6 +4160,30 @@ export default function BreedTree({
                   ];
                   const body = MBody.create({ parts, ...opts });
                   MBody.setAngle(body, (Math.random() - 0.5) * 0.6);
+                  return body;
+                })()
+            : kind === "bowl"
+              ? (() => {
+                  /* THE COMPOUND BOWL, PackPit.tsx:392 to 405 scaled to this
+                     pit's pixels. Four parts against the artwork's own
+                     1031.7 x 316.8 artboard: a floor, a centre bump and two
+                     walls leaning in at 0.349 radians, which is 20 degrees.
+
+                     A PLAIN RECTANGLE WOULD BE A CLOSED BOX. Objects would rest
+                     on top of the bowl instead of falling into it, which is the
+                     whole point of the object. */
+                  const bk = dia / BOWL_VB_W;
+                  const bcx = BOWL_VB_W / 2, bcy = BOWL_VB_H / 2;
+                  const bR = (vx: number, vy: number, w: number, h: number) =>
+                    Bodies.rectangle(px + (vx - bcx) * bk, py + (vy - bcy) * bk, w * bk, h * bk, opts);
+                  const parts = [
+                    bR(515, 295, 820, 30),  // floor
+                    bR(515, 265, 120, 80),  // centre bump
+                    Bodies.rectangle(px + (90 - bcx) * bk, py + (150 - bcy) * bk, 18 * bk, 230 * bk, { ...opts, angle: 0.349 }),
+                    Bodies.rectangle(px + (940 - bcx) * bk, py + (150 - bcy) * bk, 18 * bk, 230 * bk, { ...opts, angle: -0.349 }),
+                  ];
+                  const body = MBody.create({ parts, ...opts, frictionAir: 0.012 });
+                  MBody.setAngle(body, (BOWL_DROP_DEG * Math.PI) / 180);
                   return body;
                 })()
             : kind === "rock"
@@ -4239,7 +4293,14 @@ export default function BreedTree({
            without its backdrop, floor and sky coming back with them. See the
            note above propsFor in data/levelThemes.ts. */
         const themed = propsFor(era, levelName);
-        const props: ToyKind[] = themed?.length ? (themed as ToyKind[]) : DEFAULT_PROPS;
+        const baseProps: ToyKind[] = themed?.length ? (themed as ToyKind[]) : DEFAULT_PROPS;
+        /* TEMPORARY TEST HOOK, REMOVE WHEN THE PER-LEVEL TOY TABLE LANDS.
+           ?bowl=1 appends the bowl to whatever this level's props are, so it
+           can be seen on a real phone before any level actually asks for one.
+           Same pattern as ?bombs=all and ?fxtest=1, and it does nothing without
+           the flag. As a third prop it lands on the empty 7.5s rock beat. */
+        const forceBowl = typeof window !== "undefined" && window.location.search.indexOf("bowl=1") > -1;
+        const props: ToyKind[] = forceBowl ? [...baseProps, "bowl"] : baseProps;
         /* SIDES ALTERNATE, AND THE FIRST SIDE ALTERNATES TOO. Each prop lands on
            the opposite side to the one before it, so two can never come down
            together in the same corner, and the whole sequence starts on the
