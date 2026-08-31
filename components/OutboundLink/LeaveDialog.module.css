@@ -6,7 +6,18 @@
 .overlay {
   position: fixed;
   inset: 0;
-  z-index: 60;
+  /* Above everything. Raised from 60 on 31 Aug 2026: at 60 the dialogue opened
+     BEHIND the Bento menu overlay, which is z-index 1200 (Nav.module.css line
+     130), so the two social icons in the menu looked dead. The click worked and
+     the dialogue rendered, it was just buried 1140 layers down.
+
+     12001 rather than 1300 because 1200 is not the ceiling: MilestoneMessage and
+     PackPit both use 12000 and LineageMap uses 10001, and BreedStrip on
+     /britains-dog-history carries outbound links inside that stack. A modal that
+     asks a question has to sit on top of whatever raised it, so it takes the top
+     slot rather than one just above the Nav. If anything is ever added above
+     12001, this needs to move with it. */
+  z-index: 12001;
   display: flex;
   align-items: center;
   justify-content: center;

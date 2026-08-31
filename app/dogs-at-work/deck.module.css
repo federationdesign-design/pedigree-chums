@@ -229,7 +229,18 @@
   font-weight: 500;
   line-height: 1.1;
   color: var(--cream);
-  margin: 0 0 6px;
+  /* Paragraph gap raised from 6px to 0.9em on 31 Aug 2026. Steve flagged that
+     slides 3, 4, 5, 7 and 8 had noticeably tighter breaks than 1 and 2.
+
+     The cause is that they space differently. Slides 1 and 2 carry each paragraph
+     as its own SECTION, with a subheading and thumbnail, so the gaps come from
+     section spacing. The others put blank lines inside one body string, which
+     paragraphs() splits and this margin spaces. At 6px against a 1.1 line-height
+     that read as barely a break at all.
+
+     0.9em rather than a pixel value so it tracks the font, which is itself in
+     container units and changes with panel width. */
+  margin: 0 0 0.9em;
 }
 
 .blueBody:last-child {
