@@ -222,7 +222,13 @@
    left, so the box centres itself whatever the number's width. */
 .scoreTotal {
   position: fixed;
-  top: 84px;
+  /* IN LINE WITH THE TOP ROW, 1 September 2026 (owner). 84px was chosen when
+     this sat on the left axis UNDER the close X and had to clear it. Centred,
+     it has nothing above it, so it joins the row: 12px matches .titleWrap's own
+     anchor on the left, and the close X square sits 16px inside the pit on the
+     right. Nothing collides, because the title is left-anchored and the X is
+     right-anchored while this is centred. */
+  top: 12px;
   left: 50%;
   transform: translateX(-50%);
   min-width: 84px;
