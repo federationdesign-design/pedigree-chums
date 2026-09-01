@@ -133,7 +133,7 @@ type Props = {
   era?: string;
 };
 
-export default function LineageModal({ name, image, character, lineage, fromRect, onClose, nextLevelLabel, onNextLevel, onStartOver, initialScore, onScoreChange, bankedScore, onBankScore, era, lives, livesMax = 6, onLost, onSpendLife, onResetRun, nextLevelImage, levelNo, eraJoinLabel, onLevelChumRate, runChumRate, runLevels, onChumCaught, topChum }: Props) {
+export default function LineageModal({ name, image, character, lineage, fromRect, onClose, nextLevelLabel, onNextLevel, onStartOver, initialScore, onScoreChange, bankedScore, onBankScore, era, lives, livesMax = 6, onLost, onSpendLife, onResetRun, nextLevelImage, levelNo, eraJoinLabel, onLevelChumRate, onChumCaught, topChum }: Props) {
   const theme = levelThemeFor(era);
   // The close X asks before it closes. A round can take a couple of minutes to
   // build up, and losing it to a mis-tap in the corner is a rotten exit.
@@ -890,24 +890,17 @@ export default function LineageModal({ name, image, character, lineage, fromRect
                   <div className={css.endSummaryScore} aria-label={`Total score ${score.toLocaleString()}`}>
                     {score.toLocaleString()}
                   </div>
-                  {runChumRate !== null && runChumRate !== undefined && (runLevels ?? 0) > 0 && (
-                    <div className={css.endSummaryChums}>
-                      Chums caught: {Math.round(runChumRate)}% average over {runLevels} level{runLevels === 1 ? "" : "s"}
-                    </div>
-                  )}
-                  {topChum && (
-                    <div className={css.endTopChum}>
-                      {/* eslint-disable-next-line @next/next/no-img-element -- a fixed-size square from the pack data */}
-                      <img className={css.endTopChumImg} src={topChum.image} alt="" aria-hidden="true" />
-                      <span className={css.endTopChumText}>
-                        <span className={css.endTopChumLead}>Most caught</span>
-                        <span className={css.endTopChumName}>{topChum.name}</span>
-                        <span className={css.endTopChumCount}>
-                          {topChum.count} time{topChum.count === 1 ? "" : "s"}
-                        </span>
-                      </span>
-                    </div>
-                  )}
+                  {/* REMOVED 2 September 2026 (owner): the run's average chum
+                      rate and the "most caught" dog. Both had been in this file
+                      for some time but were invisible, because .endSummary and
+                      its children had NO STYLES AT ALL until yesterday and the
+                      screen was rarely reached before the score mining loop was
+                      closed. Styling them is what made them appear, so they read
+                      as new. The run total above is the whole summary now.
+                      The props behind them, runChumRate, runLevels and topChum,
+                      are still passed in and still computed by BreedStrip; left
+                      alone rather than unpicked, since they are cheap and may be
+                      wanted again. */}
                 </div>
               )}
               {/* THE LEADERBOARD IS A FULL STOP. It waits for the run to be
