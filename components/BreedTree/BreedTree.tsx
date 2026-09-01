@@ -305,6 +305,17 @@ function cookieConsentGiven(): boolean {
 const TOY_BONE_SRC = "/big-bone.svg";
 const BONE_ASPECT = 205 / 100;
 const TOY_BONE_GONE_KEY = "pc-minipit-bone-gone";
+/* THE SECOND BONE, worn for a moment when the fuse fires. The main pit has this
+   artwork and a cross-fade for it (PackPit.tsx:1756): hold it at full strength
+   for a second, then fade back to the plain bone over 1.5 seconds.
+
+   IT IS ON A DEAD PATH THERE. `fuseAt`, the flag that drives that cross-fade,
+   is set in exactly one place, PackPit.tsx:1974, which sits inside onArrowFuse,
+   and onArrowFuse is commented out at line 1986. So the main pit's LIVE fuse,
+   onFuseMagnet, swaps nothing at all today. Wired up properly here. */
+const TOY_BONE_OHYEA_SRC = "/big-bone-ohyea.svg";
+const BONE_OHYEA_HOLD = 1000;  // full strength, main pit's 1s
+const BONE_OHYEA_FADE = 1500;  // then back to the plain bone, main pit's 1.5s
 // Dropped after the rock and before the chums, so it lands on a floor that has
 // something on it rather than into an empty pit.
 const TOY_BONE_GAP = 900;
@@ -431,6 +442,26 @@ const LOGO_POOF_OUT = 100 / (84 * 6.8);
    with a category and a mask; a group is two fewer moving parts and cannot be
    got the wrong way round. */
 const LOGO_GROUP = -7;
+/* ---- WHY THE MOUSE CONSTRAINT HAS ITS OWN CATEGORY --------------------------
+   Matter's MouseConstraint keeps the LAST body whose vertices contain the
+   pointer, not the first: the outer loop in MouseConstraint.js has no break, so
+   a body added later to the world beats one added earlier. Chum cards arrive at
+   9.0s, the bone at 8.4s, so a card lands ON the bone and wins every hit test.
+   A chum is not in MC_KINDS, so onStartDrag then cancels the grab outright and
+   the bone underneath never gets a look in. The same was true of anything the
+   flood buried: sticks, the bowl, the logo pieces.
+
+   The cure is to make a chum card invisible to the POINTER while leaving its
+   physics alone. The constraint gets its own collision category and the cards
+   carry a mask with that bit cleared, so Matter skips them in the search and
+   finds whatever is underneath. Everything else in the pit is the default
+   category 0x0001, which both still accept, so nothing about how a card
+   collides changes.
+
+   The cards are still collected: that is a double tap on the SVG node, React
+   and not Matter, and it never went through the constraint. */
+const MC_CAT = 0x0002;
+const CHUM_MASK = 0xFFFFFFFF & ~MC_CAT;
 /* Share of the pit width the drawn logo may take. Was 0.7; owner's call on
    31 August 2026, no more than 60% of the screen. The pit runs wall to wall
    with only a few pixels of margin, so its width and the screen's are the same
@@ -2175,6 +2206,28 @@ export default function BreedTree({
   const [toyList, setToyList] = useState<{ kind: ToyKind; size: number; h: number; src: string; filter?: string }[]>([]);
   const [chumList, setChumList] = useState<{ image: string; size: number; name: string }[]>([]);
   const [deadToys, setDeadToys] = useState<Set<number>>(new Set());
+  /* The bone's fuse moment: the index of the toy wearing the second artwork,
+     and when it started. Null the rest of the time. State rather than a ref
+     because the swap is a RENDER, unlike the logo's damage stages which are
+     written by the per-frame loop: this happens once, not every hit. */
+  const [boneFuse, setBoneFuse] = useState<{ idx: number; at: number } | null>(null);
+  /* Flipped one frame AFTER boneFuse is set, so the opacity actually
+     transitions. Setting a node's starting opacity and its target in the same
+     render gives the browser nothing to animate between and it would snap. */
+  const [boneOhYeaGone, setBoneOhYeaGone] = useState(false);
+  useEffect(() => {
+    if (!boneFuse) return;
+    /* NOTHING IS SET SYNCHRONOUSLY HERE. Resetting the flag inside the effect
+       body is a setState-during-effect, which this file's eslint config counts
+       as an error, and the baseline is not to be added to. The reset happens
+       where the fuse is fired instead, and both writes below are inside
+       callbacks, so they land on a later tick. */
+    const raf = requestAnimationFrame(() => setBoneOhYeaGone(true));
+    // Long enough for the hold and the fade, then the node stops being rendered
+    // at all rather than sitting there at zero opacity for the rest of the round.
+    const t = window.setTimeout(() => { setBoneFuse(null); setBoneOhYeaGone(false); }, BONE_OHYEA_HOLD + BONE_OHYEA_FADE + 200);
+    return () => { cancelAnimationFrame(raf); window.clearTimeout(t); };
+  }, [boneFuse]);
   const [britainOpen, setBritainOpen] = useState(false);
   const killToyRef = useRef<((idx: number) => void) | null>(null);
   const throwWatchRef = useRef<((pr: any) => void) | null>(null);
@@ -2733,7 +2786,7 @@ export default function BreedTree({
      force-decodes; an <img> here is enough, because these are vectors and there
      is no large bitmap to decode. */
   useEffect(() => {
-    for (const src of [...LOGO_STAGE_SRC, ...LOGO_PIECES.map((d) => d.src)]) {
+    for (const src of [...LOGO_STAGE_SRC, ...LOGO_PIECES.map((d) => d.src), TOY_BONE_OHYEA_SRC]) {
       const im = new window.Image();
       im.src = src;
     }
@@ -4282,6 +4335,9 @@ export default function BreedTree({
               chamfer: { radius: dia * 0.22 },
               restitution: 0.4, friction: 0.3, frictionAir: 0.006, density: 0.0012,
               angle: (Math.random() - 0.5) * 1.4,
+              // See MC_CAT above: a card must not steal the grab from whatever
+              // it landed on. Physics unchanged, pointer only.
+              collisionFilter: { mask: CHUM_MASK },
             });
             MBody.setVelocity(mb, { x: (Math.random() - 0.5) * 7, y: 2 + Math.random() * 3 });
             MBody.setAngularVelocity(mb, (Math.random() - 0.5) * 0.3);
@@ -5499,7 +5555,13 @@ export default function BreedTree({
         // A detached element, so Matter's own listeners can never fire. The
         // position is driven by hand below, in physics pixels.
         const mouse = Mouse.create(document.createElement("div"));
-        const mc = MouseConstraint.create(engine, { mouse, constraint: { stiffness: 0.2, render: { visible: false } } });
+        const mc = MouseConstraint.create(engine, {
+          mouse,
+          // Its own category, so a body can opt out of being grabbed without
+          // opting out of colliding. See MC_CAT.
+          collisionFilter: { category: MC_CAT, mask: 0xFFFFFFFF, group: 0 },
+          constraint: { stiffness: 0.2, render: { visible: false } },
+        });
         Composite.add(world, mc);
         // Release-velocity throw. FLICK_SCALE tunes it (1.0 = pointer speed);
         // FLICK_FLOOR is the tap floor in Matter px/step. flickBuf is the pointer
@@ -5603,6 +5665,15 @@ export default function BreedTree({
           whackAt(w.x, w.y, now);
           whackAt(w.x, w.y, now);
           numAt(w.x, w.y, FUSE_POINTS, now);
+          /* The bone wears its second face for a beat. The index is the one the
+             render lays the toys out by, so it is looked up from the body that
+             was actually held rather than assumed to be the last bone spawned:
+             a level can drop only one today, but nothing here should depend on
+             that staying true. */
+          {
+            const bIdx = toyBodiesRef.current.findIndex((t) => t.mb === held);
+            if (bIdx >= 0) { setBoneOhYeaGone(false); setBoneFuse({ idx: bIdx, at: now }); }
+          }
           // The logo has become part of the bone, so its body leaves the world
           // and its artwork leaves the screen.
           Composite.remove(world, lb as never);
@@ -7029,8 +7100,27 @@ export default function BreedTree({
                       <circle cx={0} cy={0} r={half} style={{ fill: "none", stroke: "#ffffff", strokeWidth: ty.size * 0.06 }} />
                     </>
                   ) : (
-                    <image href={ty.src} x={-half} y={-ty.h / 2} width={ty.size} height={ty.h}
-                      style={ty.filter ? { filter: ty.filter } : undefined} />
+                    /* THE FUSED BONE. Two nodes rather than one swapped href,
+                       because a cross-fade needs both artworks on screen at
+                       once. The plain bone sits underneath at full strength and
+                       the second one fades out over it, which is the same
+                       result the main pit gets by drawing twice with alpha,
+                       without needing a canvas. Outside the fuse the second
+                       node is simply not rendered. */
+                    <>
+                      <image href={ty.src} x={-half} y={-ty.h / 2} width={ty.size} height={ty.h}
+                        style={ty.filter ? { filter: ty.filter } : undefined} />
+                      {boneFuse?.idx === i2 && (
+                        <image href={TOY_BONE_OHYEA_SRC} x={-half} y={-ty.h / 2} width={ty.size} height={ty.h}
+                          style={{
+                            // Held at full strength, then faded. The delay is
+                            // what holds it, so the browser owns the timing and
+                            // nothing has to tick.
+                            opacity: boneOhYeaGone ? 0 : 1,
+                            transition: `opacity ${BONE_OHYEA_FADE}ms linear ${BONE_OHYEA_HOLD}ms`,
+                          }} />
+                      )}
+                    </>
                   )}
                 </g>
               );
