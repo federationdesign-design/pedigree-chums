@@ -563,7 +563,7 @@ const SCREENS: Screen[] = [
     blocks: [
       { kind: "standfirst", text: "Get in touch." },
       { kind: "body", text: "Steven\nhello@pedigreechums.co.uk\n07507235380" },
-      { kind: "body", text: "www.pedigreechums.co.uk\nhttps://www.instagram.com/" },
+      { kind: "body", text: "www.pedigreechums.co.uk\nhttps://www.instagram.com/pedigree_chums_game/" },
       { kind: "body", text: "Open date: 1st Sept\nClose date: 1st Oct" },
       { kind: "display", text: "There is no board. Britain is the board." },
     ],

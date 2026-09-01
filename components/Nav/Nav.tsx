@@ -297,7 +297,7 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
                 <Link href="/preorder" className={styles.topNavLink} onClick={closeForNav}>Pre-order</Link>
                 <span className={styles.topNavSep}>|</span>
                 <CookieSettingsButton className={styles.topNavLink} onActivate={closeForNav} />
-                <OutboundLink href="https://www.instagram.com" className={styles.socialIcon} aria-label="Instagram">
+                <OutboundLink href="https://www.instagram.com/pedigree_chums_game/" className={styles.socialIcon} aria-label="Instagram">
                   {/* The viewBox was 440 0 261 341 and the artwork does not fit
                       inside it: the paths run from x 379.4 to 719.5, so 61 units
                       were cut off the left and 19 off the right. Measured off

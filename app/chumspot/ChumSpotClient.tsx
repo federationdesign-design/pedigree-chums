@@ -150,7 +150,7 @@ export default function ChumSpotClient() {
               Win a 3D Chum*
             </p>
             <div className={styles.ctaPills}>
-              <OutboundLink href="https://www.instagram.com" className={styles.ctaPrimary}>Enter on Instagram</OutboundLink>
+              <OutboundLink href="https://www.instagram.com/pedigree_chums_game/" className={styles.ctaPrimary}>Enter on Instagram</OutboundLink>
               <OutboundLink href="https://www.tiktok.com" className={styles.ctaSecondary}>Enter on TikTok</OutboundLink>
             </div>
             <p className={styles.closingDate}>
@@ -261,7 +261,7 @@ export default function ChumSpotClient() {
                 <p className={styles.wrPara}>Spot your next Chum, share your entry and remember both hashtags:</p>
                 <p className={styles.hashtags}>#ChumSpot &nbsp; #DogSpotting</p>
                 <div className={styles.ctaPills}>
-                  <OutboundLink href="https://www.instagram.com" className={styles.ctaPrimary}>Enter on Instagram</OutboundLink>
+                  <OutboundLink href="https://www.instagram.com/pedigree_chums_game/" className={styles.ctaPrimary}>Enter on Instagram</OutboundLink>
                   <OutboundLink href="https://www.tiktok.com" className={styles.ctaSecondary}>Enter on TikTok</OutboundLink>
                 </div>
               </div>

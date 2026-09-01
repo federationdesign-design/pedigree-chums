@@ -49,7 +49,7 @@ export function spotYourChumTerms(breed: string): Term[] {
   {
     num: "4",
     title: "How to enter",
-    body: `1. Spot a real ${breed} out and about. Only ${breed}s qualify this month, so a photo of any other breed is not a valid entry and will not be counted or included in the draw. | 2. Take an original photo of the dog, or a selfie with it. | 3. To enter on Instagram, post the photo publicly, tag @pedigree_chums, and include both #ChumSpot and #DogSpotting. | 4. To enter on TikTok, post the photo publicly, tag @pedigree_chums, and include both #ChumSpot and #DogSpotting. | 5. Keep your post publicly viewable until the winner is selected. | 6. You may enter once per social account, so an Instagram post and a TikTok post count as two separate entries. | No pack, card or purchase is needed to take part.`,
+    body: `1. Spot a real ${breed} out and about. Only ${breed}s qualify this month, so a photo of any other breed is not a valid entry and will not be counted or included in the draw. | 2. Take an original photo of the dog, or a selfie with it. | 3. To enter on Instagram, post the photo publicly, tag @pedigree_chums_game, and include both #ChumSpot and #DogSpotting. | 4. To enter on TikTok, post the photo publicly, tag @pedigree_chums, and include both #ChumSpot and #DogSpotting. | 5. Keep your post publicly viewable until the winner is selected. | 6. You may enter once per social account, so an Instagram post and a TikTok post count as two separate entries. | No pack, card or purchase is needed to take part.`,
   },
   {
     num: "5",
