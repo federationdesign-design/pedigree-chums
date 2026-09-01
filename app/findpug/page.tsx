@@ -8,6 +8,7 @@ import CompetitionProductStrip from "../../components/CompetitionProductStrip/Co
 import CompetitionPreorder from "../../components/CompetitionPreorder/CompetitionPreorder";
 import CompetitionVideoRow from "../../components/CompetitionVideoRow/CompetitionVideoRow";
 import CompetitionTerms from "../../components/CompetitionTerms/CompetitionTerms";
+import TrackView from "../../components/MetaPixel/TrackView";
 import { spotYourChumTerms } from "../../components/CompetitionTerms/spotYourChumTerms";
 
 /* Spot your Chum competition page, first of the per-breed series (/findpug,
@@ -174,6 +175,9 @@ export default function FindPugPage() {
         {/* Three Vimeo clips between the pre-order block and the terms. */}
         <CompetitionVideoRow videos={PUG.videos} />
         <CompetitionTerms terms={spotYourChumTerms(PUG.breed)} />
+        {/* Counts arrivals at this page on their own, not just as one PageView
+            among all the others. Renders nothing. */}
+        <TrackView name={`Spot your Chum: ${PUG.breed}`} />
       </main>
       <Footer />
     </>

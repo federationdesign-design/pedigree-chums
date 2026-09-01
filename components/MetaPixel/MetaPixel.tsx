@@ -1,12 +1,11 @@
 "use client";
 import { useState, useEffect } from "react";
 import Script from "next/script";
-import { CONSENT_KEY } from "../../lib/consent";
+import { trackingAllowed } from "../../lib/track";
 
 const PIXEL_ID = "1072172202055733";
-const KEY = CONSENT_KEY;
 
-// Meta Pixel (marketing), gated on cookie consent exactly like Analytics (GA).
+// Meta Pixel (marketing), gated on cookie consent AND on the production host.
 // The tag is only injected once the visitor has accepted cookies via the banner,
 // and it reacts to the "pc:consent" event, so accepting starts it without a page
 // reload. Gates on the v2 consent key, so anyone who accepted under the old
@@ -19,13 +18,9 @@ export default function MetaPixel() {
   const [allowed, setAllowed] = useState(false);
 
   useEffect(() => {
-    const sync = () => {
-      try {
-        setAllowed(localStorage.getItem(KEY) === "accepted");
-      } catch {
-        setAllowed(false);
-      }
-    };
+    // trackingAllowed() carries BOTH gates now, consent and production host.
+    // Previews used to load the pixel and report into the same dataset.
+    const sync = () => setAllowed(trackingAllowed());
     // rAF keeps the state update out of the effect body and the first paint
     // pixel-free (no hydration mismatch).
     const raf = requestAnimationFrame(sync);

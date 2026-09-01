@@ -5,6 +5,7 @@ import CookieDrop from "../components/CookieDrop/CookieDrop";
 import FallingCookie from "../components/FallingCookie/FallingCookie";
 import Analytics from "../components/Analytics/Analytics";
 import MetaPixel from "../components/MetaPixel/MetaPixel";
+import PixelRouteEvents from "../components/MetaPixel/PixelRouteEvents";
 import OfferLauncher from "../components/Offer/OfferLauncher";
 import HiddenGamesCounter from "../components/HiddenGamesCounter/HiddenGamesCounter";
 import HideImages from "../components/HideImages/HideImages";
@@ -250,6 +251,10 @@ export default function RootLayout({
         <CookieDrop />
         <Analytics />
         <MetaPixel />
+        {/* The base pixel only fires PageView on a hard load. This sends one on
+            every client-side route change too, so tapping through to a page
+            counts. See the note in the component. */}
+        <PixelRouteEvents />
       </body>
     </html>
   );
