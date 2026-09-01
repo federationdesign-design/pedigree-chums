@@ -26,8 +26,12 @@ function DogIcon() {
 
 // Lives: three to begin, a ceiling of six, one back for every three levels
 // completed without a loss in between.
-const LIVES_START = 3;
-const LIVES_MAX = 6;
+/* Owner, 1 September 2026: 2 to start, 3 the ceiling. Was 3 and 6. The run is
+   meant to bite now that a lost or abandoned level no longer leaves its points
+   behind, so a spent run comes round sooner and the streak bonus tops out at a
+   figure a player can actually hold in their head. */
+const LIVES_START = 2;
+const LIVES_MAX = 3;
 const LIVES_STREAK = 3;
 
 const ERA_LABELS: Record<string, string> = {

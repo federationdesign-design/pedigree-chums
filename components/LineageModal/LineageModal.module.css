@@ -1097,6 +1097,18 @@
 /* ONE LINE now, not two stacked. It was a column with the label at 20pt over
    the value at 40pt; both sit on the same row at the same size, and only the
    colours still tell them apart. */
+/* "2 more tries left", under LEVEL FAILED and only on a loss you can come back
+   from. Same stack and the same z-index as .endRound below it, a step smaller
+   than the chum rate, because the count is a consequence and the rate is the
+   thing the player actually did. Yellow, since it is the number that matters. */
+.endTries {
+  position: relative;
+  z-index: 2;
+  margin: 6px 0 2px;
+  text-align: center;
+  font-size: 22pt;
+  color: var(--yellow, #ffd23e);
+}
 .endRound {
   position: relative;
   z-index: 2;

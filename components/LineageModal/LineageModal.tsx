@@ -310,15 +310,14 @@ export default function LineageModal({ name, image, character, lineage, fromRect
     setCaptionOpen(false);
     setRunKey((k) => k + 1);
   };
-  const replay = () => {
-    setPhase("play");
-    setResumeInLearn(false);
-    setScore(0);
-    msLast.current = 0; // fresh run: milestones celebrate again from the bottom
-    setSlowmo(false); // a fresh pit always starts at full speed
-    setCaptionOpen(false);
-    setRunKey((k) => k + 1); // remounts the pit fresh
-  };
+  /* `replay` used to live here: a full reset to a fresh run, called only by the
+     lost screen's yellow button when the lives were gone. That button is now
+     hidden on a spent run (see the note beside it), so nothing called this and
+     eslint flagged it. Removed rather than left as a dead function with a
+     disable comment on it.
+     The same reset is still reachable and unchanged: rewind to this level's
+     start screen, where PLAY has already become PLAY AGAIN and runs
+     onResetRun. */
   const [scorePulse, setScorePulse] = useState(false);
   const shakeFnRef = useRef<(() => void) | null>(null);
   const slowmoFnRef = useRef<(() => void) | null>(null);
@@ -835,10 +834,33 @@ export default function LineageModal({ name, image, character, lineage, fromRect
               </button>
               {/* The size lives in the stylesheet now, not here. An inline style
                   beats a media query, so desktop could never override it. */}
-              <div className={css.endFlash}>
-                <span className={css.endFlashWord}>GAME</span>
-                <span className={css.endFlashWord}>OVER</span>
-              </div>
+              {/* TWO STATES, NOT ONE SCREEN WITH A DIFFERENT WORD ON IT.
+                  A loss you can come back from is an interruption; a spent run
+                  is an ending, and they should not read alike. GAME OVER used to
+                  show on every single loss, which announced a full stop to
+                  someone who still had tries in hand. */}
+              {outOfLives ? (
+                <div className={css.endFlash}>
+                  <span className={css.endFlashWord}>GAME</span>
+                  <span className={css.endFlashWord}>OVER</span>
+                </div>
+              ) : (
+                <>
+                  <div className={css.endFlash}>
+                    <span className={css.endFlashWord}>LEVEL</span>
+                    <span className={css.endFlashWord}>FAILED</span>
+                  </div>
+                  {/* The count is read from `lives` and never from a constant.
+                      Lives are EARNED BACK on a win streak, capped at LIVES_MAX,
+                      so the figure goes up as well as down and any hardcoded
+                      number would be wrong most of the time. */}
+                  {typeof lives === "number" && (
+                    <div className={css.endTries}>
+                      {lives} more {lives === 1 ? "try" : "tries"} left
+                    </div>
+                  )}
+                </>
+              )}
               {/* THIS ROUND, on every life lost. The pack it was measured
                   against is the flood this level dropped, so it is the same
                   figure the win screen would have shown had it gone the other
@@ -881,7 +903,11 @@ export default function LineageModal({ name, image, character, lineage, fromRect
                   )}
                 </div>
               )}
-              <ScoreTable score={score} dogs={3} />
+              {/* THE LEADERBOARD IS A FULL STOP. It waits for the run to be
+                  over, exactly as the run summary above it already did. Shown
+                  on a recoverable loss it made every retry feel like an
+                  epilogue. */}
+              {outOfLives && <ScoreTable score={score} dogs={3} />}
               {/* ICONS, not words. Restart wears the replay mark, Learn wears the
                   pit's own brain, imported rather than copied so the two cannot
                   drift apart. Both keep the button shapes they already had, so
@@ -927,25 +953,39 @@ export default function LineageModal({ name, image, character, lineage, fromRect
                     <path d="M21 5 L13 12 L21 19 Z" fill="currentColor" />
                   </svg>
                 </button>
-                {(onStartOver || onResetRun) && (
+                {/* RETRY, and only while there is something to retry with.
+                    Hidden once the lives are gone (owner): a spent run should
+                    not offer an instant replay of the level that ended it.
+                    The way forward is then the rewind above, which returns to
+                    this level's start screen where PLAY has already become
+                    PLAY AGAIN and resets the run. That keeps ONE forward action
+                    on the ending, which is the point of the split.
+                    The out-of-lives branch inside onClick is now unreachable and
+                    is kept only because `lives` can be undefined, in which case
+                    outOfLives is false and this button is the ordinary retry. */}
+                {!outOfLives && (onStartOver || onResetRun) && (
                   <button
                     type="button"
                     className={`${css.endBtn} ${css.endBtnIcon} ${css.endBtnYellow}`}
-                    onClick={() => {
-                      if (lives !== undefined && lives <= 0) { onResetRun?.(); replay(); return; }
-                      onStartOver?.();
-                    }}
-                    aria-label={lives !== undefined && lives <= 0 ? "Start again on this level" : "Restart this level"}
-                    title={lives !== undefined && lives <= 0 ? "Start again" : "Restart"}
+                    onClick={() => onStartOver?.()}
+                    aria-label="Restart this level"
+                    title="Restart"
                   >
                     <span className={`${css.endIcon} ${css.endIconReplay}`} aria-hidden="true" />
                   </button>
                 )}
+                {/* LEARN costs a life, so it has no business on an ending.
+                    NOTE it is still offered on a recoverable loss, which is the
+                    owner's call as asked; my own view is that a lossy action on
+                    any failure screen is a trap, since it spends the very try
+                    the player just lost. Flagged, not acted on. */}
+                {!outOfLives && (
                 <button type="button" className={`${css.endBtn} ${css.endBtnIcon} ${css.endBtnBlue}`} onClick={() => goLearn(false)} aria-label="Go to the learn area" title="Learn">
                   <svg className={css.endIcon} viewBox={`0 0 ${BRAIN_ARTBOARD.w} ${BRAIN_ARTBOARD.h}`} aria-hidden="true" focusable="false">
                     <path d={BRAIN_PATH} fill="currentColor" />
                   </svg>
                 </button>
+                )}
               </div>
             </>
           )}
