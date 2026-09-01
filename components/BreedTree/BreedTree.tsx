@@ -2211,6 +2211,18 @@ export default function BreedTree({
      because the swap is a RENDER, unlike the logo's damage stages which are
      written by the per-frame loop: this happens once, not every hit. */
   const [boneFuse, setBoneFuse] = useState<{ idx: number; at: number } | null>(null);
+  /* THE APPROACH SWAP. The bone wears its second face while it is within the
+     magnet's reach, before anything has joined, and drops back to the plain
+     bone if you pull away. Owner asked for this from the start: "a 2nd bone svg
+     that appears when the 2 objects are close to each other".
+
+     It doubles as the only cue that the fuse is armed, which a snap distance
+     this tight badly needs: without it you cannot tell a near miss from being
+     nowhere near.
+
+     Holds the toy index, or null. Set from the magnet, which runs every physics
+     step, so it is written ONLY when the answer changes. */
+  const [boneNear, setBoneNear] = useState<number | null>(null);
   /* Flipped one frame AFTER boneFuse is set, so the opacity actually
      transitions. Setting a node's starting opacity and its target in the same
      render gives the browser nothing to animate between and it would snap. */
@@ -4885,12 +4897,59 @@ export default function BreedTree({
           parts.push({ el, x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 36 * fxScale, r: 0, born: now, life: 420 + Math.random() * 220 });
         }
       };
+      /* THE FUSE GOO, the main pit's own recipe (PackPit.tsx:1039 to 1044).
+         Nine blobs in a RING rather than a pop on the spot: one at the centre,
+         the rest evenly spaced around a circle at a random 25 to 75% of the
+         radius, each sized 50 to 100% of R, each born 12ms after the last and
+         living 620ms.
+
+         WHY NOT whackAt. That is the pit's three-ball pop: fixed small radius,
+         all three at once, and they fly outward. The goo does not move at all,
+         it is much larger, and the stagger is what makes it read as a splat
+         spreading rather than three quick dots.
+
+         R is the larger of the two objects' half-size, exactly as the main pit
+         takes `Math.max(logo.plugin.half, bone.plugin.half)`. THE ONE NUMBER
+         MOST LIKELY TO NEED A NUDGE: if the blobs read too big or too small on
+         a phone, scale R here rather than changing the count or the timing. */
+      const gooAt = (x: number, y: number, now: number, rPx: number) => {
+        const fx = fxRef.current;
+        if (!fx) return;
+        const rWorld = rPx / pxPerWorld;
+        for (let i = 0; i < 9; i++) {
+          const a = (i / 9) * Math.PI * 2;
+          const off = i === 0 ? 0 : rWorld * (0.25 + Math.random() * 0.5);
+          const el = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+          el.setAttribute("r", String(rPx * (0.5 + Math.random() * 0.5) * 0.5 * fxScale));
+          el.style.fill = "#ffffff";
+          el.style.pointerEvents = "none";
+          fx.appendChild(el);
+          parts.push({
+            el,
+            x: x + Math.cos(a) * off,
+            y: y + Math.sin(a) * off,
+            vx: 0, vy: 0, // the goo sits where it lands
+            r: 0,
+            born: now + i * 12,
+            life: 620,
+          });
+        }
+      };
       const drawNumbers = (now: number, view: View) => {
         const kk = SIZE / view[2];
         for (let i = parts.length - 1; i >= 0; i--) {
           const pp = parts[i];
           const t = (now - pp.born) / pp.life;
           if (t >= 1) { pp.el.remove(); parts.splice(i, 1); continue; }
+          // A part may be born in the FUTURE. The goo staggers its blobs 12ms
+          // apart, and without this they would all show at once at full
+          // strength, because a negative t reads as an opacity above 1.
+          if (t < 0) {
+            pp.el.setAttribute("cx", String((pp.x - view[0]) * kk));
+            pp.el.setAttribute("cy", String((pp.y - view[1]) * kk));
+            pp.el.style.opacity = "0";
+            continue;
+          }
           pp.x += (pp.vx / 60);
           pp.y += (pp.vy / 60);
           pp.el.setAttribute("cx", String((pp.x - view[0]) * kk));
@@ -5685,13 +5744,19 @@ export default function BreedTree({
         const FUSE_PULL = 0.00005;
         const FUSE_POINTS = 2000;
         let fused = false;
+        let nearWas = false; // last armed state, so the swap is not re-set every step
+        /* DISARM ON EVERY WAY OUT. The magnet returns early whenever nothing
+           useful is held, and letting go of the bone is exactly that case.
+           Without this the second artwork would stay on for the rest of the
+           round the moment you released while in range. */
+        const disarm = () => { if (nearWas) { nearWas = false; setBoneNear(null); } };
         const onFuseMagnet = () => {
           if (fused) return;
           const lu = uiBodiesRef.current?.find((u) => u.kind === "logo") as (UiBody & { mb?: { position: { x: number; y: number }; mass: number } }) | undefined;
           // still fixed means it has not been knocked loose yet
-          if (!lu || lu.fixed || !lu.mb || lu.mbIn === false || !lu.w) return;
+          if (!lu || lu.fixed || !lu.mb || lu.mbIn === false || !lu.w) { disarm(); return; }
           const bonePr = toyBodiesRef.current.find((t) => t.toyKind === "bone" && !t.dead && t.mb);
-          if (!bonePr?.mb) return;
+          if (!bonePr?.mb) { disarm(); return; }
           const logoB = lu.mb;
           const boneB = bonePr.mb as { position: { x: number; y: number }; mass: number };
           /* EITHER DIRECTION, like the main pit. Whichever of the two you are
@@ -5700,7 +5765,7 @@ export default function BreedTree({
           const held = mc.body as unknown;
           const heldIsBone = held === bonePr.mb;
           const heldIsLogo = held === logoB;
-          if (!heldIsBone && !heldIsLogo) return;
+          if (!heldIsBone && !heldIsLogo) { disarm(); return; }
           const puller = heldIsBone ? boneB : logoB;
           const pulled = heldIsBone ? logoB : boneB;
           const lwPx = lu.w * pxPerWorld;
@@ -5708,6 +5773,13 @@ export default function BreedTree({
           const snap = lwPx * FUSE_SNAP_FRAC;
           const tx = puller.position.x - pulled.position.x, ty = puller.position.y - pulled.position.y;
           const dist = Math.hypot(tx, ty);
+          // Armed or not, written only on a change: this runs every step.
+          const nearNow = dist <= magnet;
+          if (nearNow !== nearWas) {
+            nearWas = nearNow;
+            const bi = toyBodiesRef.current.findIndex((t) => t === bonePr);
+            setBoneNear(nearNow && bi >= 0 ? bi : null);
+          }
           if (dist > magnet || dist < 1) return;
           const f = FUSE_PULL * (magnet - dist);
           MBody.applyForce(pulled as never, pulled.position, { x: (tx / dist) * f * pulled.mass, y: (ty / dist) * f * pulled.mass });
@@ -5723,13 +5795,18 @@ export default function BreedTree({
           const now = performance.now();
           /* The main pit's goo is nine soft blobs on a canvas. No canvas here,
              so this is the pit's own pop, three times for nine white circles. */
-          whackAt(w.x, w.y, now);
-          whackAt(w.x, w.y, now);
-          whackAt(w.x, w.y, now);
+          /* R is the larger of the two objects' half-sizes, and "size" there is
+             the SMALLER side, since the main pit takes min(w, h) / 2. Both the
+             logo and the bone are wider than they are tall, so both half-sizes
+             are half a height. The logo is the bigger of the two in every case,
+             so its height decides it. */
+          gooAt(w.x, w.y, now, ((lu.h ?? 0) * pxPerWorld) / 2);
           numAt(w.x, w.y, FUSE_POINTS, now);
           {
             const bIdx = toyBodiesRef.current.findIndex((t) => t === bonePr);
             if (bIdx >= 0) { setBoneOhYeaGone(false); setBoneFuse({ idx: bIdx, at: now }); }
+            nearWas = false;
+            setBoneNear(null); // the fuse fade takes over from the approach swap
           }
           // The logo has become part of the bone, so its body leaves the world
           // and its artwork leaves the screen.
@@ -7221,14 +7298,21 @@ export default function BreedTree({
                     <>
                       <image href={ty.src} x={-half} y={-ty.h / 2} width={ty.size} height={ty.h}
                         style={ty.filter ? { filter: ty.filter } : undefined} />
-                      {boneFuse?.idx === i2 && (
+                      {(boneFuse?.idx === i2 || boneNear === i2) && (
                         <image href={TOY_BONE_OHYEA_SRC} x={-half} y={-ty.h / 2} width={ty.size} height={ty.h}
-                          style={{
-                            // Held at full strength, then faded. The delay is
-                            // what holds it, so the browser owns the timing and
-                            // nothing has to tick.
+                          style={boneFuse?.idx === i2 ? {
+                            // AFTER the snap: held at full strength, then faded.
+                            // The delay does the holding, so the browser owns
+                            // the timing and nothing has to tick.
                             opacity: boneOhYeaGone ? 0 : 1,
                             transition: `opacity ${BONE_OHYEA_FADE}ms linear ${BONE_OHYEA_HOLD}ms`,
+                          } : {
+                            // BEFORE it: simply on while in range. A short fade
+                            // in, none out, so arming reads as a response and
+                            // leaving the range snaps back without a lag that
+                            // would lie about whether you are still armed.
+                            opacity: 1,
+                            transition: "opacity 120ms linear",
                           }} />
                       )}
                     </>
