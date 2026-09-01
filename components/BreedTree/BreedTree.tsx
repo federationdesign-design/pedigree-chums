@@ -4049,8 +4049,9 @@ export default function BreedTree({
            against the start screen.
 
            Applied to the whole column so the X and the brain move together. */
-        const UI_NUDGE_X = -5 * uppW; // negative is left
-        const UI_NUDGE_Y = -5 * uppW; // negative is up
+        // 5 was not enough; owner asked for 10 more each way, so 15 in total.
+        const UI_NUDGE_X = -15 * uppW; // negative is left
+        const UI_NUDGE_Y = -15 * uppW; // negative is up
         const ux = v[0] + (xMinF + vbWf - m - uSz / 2 + UI_NUDGE_X) / k;
         uiBodiesRef.current = [
           { x: ux, y: v[1] + (-vbHf / 2 + m + uSz / 2 + UI_NUDGE_Y) / k, vx: 0, vy: 0, r: (uSz / 2) * 1.1 / k, half: uSz / 2, a: 0, va: 0, fixed: true, hits: 0, kind: "close" },
