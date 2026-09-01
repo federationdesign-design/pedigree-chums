@@ -3771,7 +3771,7 @@ export default function BreedTree({
       if (focusRef.current !== nodes[0]) return; // user already exploring
       const Matter = (await import("matter-js")) as any; // pit convention: dynamic, untyped
       if (fellRef.current || focusRef.current !== nodes[0]) return; // re-check across the await
-      const { Engine, Bodies, Body: MBody, Composite, Events, Mouse, MouseConstraint, Sleeping } = Matter;
+      const { Engine, Bodies, Body: MBody, Composite, Events, Mouse, MouseConstraint, Sleeping, Query } = Matter;
       fellRef.current = true;
       setFalling(true);
       setDropped(true); // names disappear, physics badges appear
@@ -5721,12 +5721,65 @@ export default function BreedTree({
           mouse.position.x = p.x;
           mouse.position.y = p.y;
         };
+        /* ---- GRAB DIAGNOSTIC, ?grab=1 --------------------------------------
+           REMOVE WHEN THE GRAB QUESTION IS CLOSED.
+
+           Two fixes have been made by reasoning and the grab still is not doing
+           what is expected, so this stops guessing and reports what actually
+           happens. On every press it prints, in the corner:
+
+             hit:   every body whose shape contains the pointer, in WORLD ORDER,
+                    which is the order Matter searches. Matter keeps the LAST
+                    match, so the rightmost name is the one it took.
+             mc:    what the constraint is actually holding one tick later, and
+                    whether MC_KINDS allowed it.
+
+           So "cannot grab X" becomes one of three readable answers: nothing was
+           hit at all (a mapping problem), something else was hit (a stacking
+           problem), or the right thing was hit and then refused (a MC_KINDS
+           problem). Those three have completely different fixes. */
+        const grabDiag = typeof window !== "undefined" && window.location.search.indexOf("grab=1") > -1;
+        let diagEl: HTMLDivElement | null = null;
+        const diagLines: string[] = [];
+        if (grabDiag) {
+          diagEl = document.createElement("div");
+          diagEl.setAttribute("style",
+            "position:fixed;left:6px;bottom:6px;z-index:2147483647;max-width:94vw;"
+            + "font:11px/1.35 ui-monospace,Menlo,monospace;color:#0a3a57;background:#fff8e6;"
+            + "border:2px solid #0a3a57;border-radius:8px;padding:6px 8px;pointer-events:none;white-space:pre-wrap;");
+          document.body.appendChild(diagEl);
+        }
+        const kindOf = (b: unknown) => {
+          const pl = (b as { plugin?: { kind?: string; prop?: { toyKind?: string }; ui?: { kind?: string } } })?.plugin;
+          if (!pl) return "?";
+          if (pl.kind === "toy" && pl.prop?.toyKind) return `toy:${pl.prop.toyKind}`;
+          if (pl.ui?.kind) return `ui:${pl.ui.kind}`;
+          return pl.kind ?? "?";
+        };
+        const diagSay = (line: string) => {
+          if (!diagEl) return;
+          diagLines.push(line);
+          while (diagLines.length > 6) diagLines.shift();
+          diagEl.textContent = diagLines.join("\n");
+        };
+
         const onDown = (e: PointerEvent) => {
           setPos(e.clientX, e.clientY);
           mouse.button = 0;
           flickBuf.length = 0;
           flickBuf.push({ t: performance.now(), x: mouse.position.x, y: mouse.position.y });
           wake();
+          if (grabDiag) {
+            const pt = { x: mouse.position.x, y: mouse.position.y };
+            const hits = Query.point(Composite.allBodies(world), pt) as unknown[];
+            diagSay(`hit[${hits.length}]: ${hits.map(kindOf).join(" ") || "NOTHING"}`);
+            // One tick later, so the constraint has run its own search and
+            // onStartDrag has had its chance to refuse.
+            window.setTimeout(() => {
+              const held = mc.body as unknown;
+              diagSay(held ? `  mc: HOLDING ${kindOf(held)}` : "  mc: nothing (refused or missed)");
+            }, 40);
+          }
         };
         const onMove = (e: PointerEvent) => {
           if (mouse.button === 0) {
@@ -5750,6 +5803,7 @@ export default function BreedTree({
           // off here too: without this a level change leaves a listener holding
           // the old world's bodies alive.
           Events.off(engine, "beforeUpdate", onFuseMagnet);
+          if (diagEl) { diagEl.remove(); diagEl = null; }
           st.removeEventListener("pointerdown", onDown);
           window.removeEventListener("pointermove", onMove);
           window.removeEventListener("pointerup", onUp);
