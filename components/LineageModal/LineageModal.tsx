@@ -882,7 +882,14 @@ export default function LineageModal({ name, image, character, lineage, fromRect
                   be reporting the end of something that is not over. */}
               {lives !== undefined && lives <= 0 && (
                 <div className={css.endSummary}>
-                  <div className={css.endSummaryScore}>Total score: {score.toLocaleString()}</div>
+                  {/* The figure alone (owner, 1 September 2026). "Total score:" was doing no
+                      work: it sits under GAME OVER, above the chums line, in the
+                      biggest type on the block, so nothing else it could be.
+                      The words move to aria-label, because a bare number read
+                      out on its own means nothing without them. */}
+                  <div className={css.endSummaryScore} aria-label={`Total score ${score.toLocaleString()}`}>
+                    {score.toLocaleString()}
+                  </div>
                   {runChumRate !== null && runChumRate !== undefined && (runLevels ?? 0) > 0 && (
                     <div className={css.endSummaryChums}>
                       Chums caught: {Math.round(runChumRate)}% average over {runLevels} level{runLevels === 1 ? "" : "s"}
