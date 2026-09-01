@@ -64,7 +64,7 @@ const TERMS = [
   {
     num: "9",
     title: "Winner contact",
-    body: "Judging normally takes place within 10 working days of the monthly closing date. The provisional winner will be contacted by direct message from @pedigree_chums. We will never ask a winner to pay a fee, provide payment-card details, or contact any account other than our official one. The winner must respond within 14 days with their name, eligibility confirmation, and a valid UK delivery address.",
+    body: "Judging normally takes place within 10 working days of the monthly closing date. The provisional winner will be contacted by direct message from @pedigree_chums_game on Instagram or @pedigree_chums on TikTok. We will never ask a winner to pay a fee, provide payment-card details, or contact any account other than our official accounts. The winner must respond within 14 days with their name, eligibility confirmation, and a valid UK delivery address.",
   },
   {
     num: "10",
