@@ -92,7 +92,9 @@ const PUG: CompetitionConfig = {
     still: false,
   },
   introLines: [
-    "Get a photo or selfie and share it on Instagram or TikTok.",
+    // The two platform names are links. See renderLine in CompetitionTitles:
+    // [label](href), so the copy stays a plain string here.
+    "Get a photo or selfie and share it on [Instagram](https://www.instagram.com/pedigree_chums_game/) or [TikTok](https://www.tiktok.com/@pedigree_chums).",
     "This month, we will collect all submitted images and do a tombola raffle.",
   ],
   productStrip: {

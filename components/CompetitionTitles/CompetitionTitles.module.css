@@ -88,3 +88,15 @@
     font-size: clamp(1rem, 3.6vw, 1.25rem);
   }
 }
+
+/* Inline link in an intro line, e.g. Instagram and TikTok on /findpug.
+   Navy on the competition yellow is about 8.8:1, the same pairing .termLink
+   already uses on the yellow term cards, and the underline carries the
+   affordance so colour is not the only signal. Both matter here: PLACEHOLDERS.md
+   already logs contrast failures elsewhere on this page and nothing new should
+   join them. */
+.introLink {
+  color: var(--navy, #0a3a57);
+  font-weight: 700;
+  text-decoration: underline;
+}

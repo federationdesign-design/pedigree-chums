@@ -1,3 +1,4 @@
+import OutboundLink from "../OutboundLink/OutboundLink";
 import styles from "./CompetitionTitles.module.css";
 
 /* Titles + intro block for the Spot your Chum competition pages (brief 4c).
@@ -11,10 +12,34 @@ import styles from "./CompetitionTitles.module.css";
 
    Desktop-first (brief stage 3). Mobile tuning lands at stage 5. */
 
+/* Split an intro line on any [label](href) tokens and turn each into a link,
+   leaving the surrounding plain text intact.
+
+   THE SAME CONVENTION AS THE TERMS BLOCK, deliberately: renderBody in
+   CompetitionTerms.tsx does exactly this, so a line of copy stays a plain string
+   in the per-breed config and nobody has to touch a component to link a word.
+
+   An http(s) target goes through OutboundLink so it raises the sitewide leave
+   dialogue, the same as the social icons further down the page. Anything else is
+   treated as internal and gets a plain anchor. */
+function renderLine(text: string) {
+  return text.split(/(\[[^\]]+\]\([^)]+\))/g).map((part, i) => {
+    const m = part.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
+    if (!m) return part;
+    const [, label, href] = m;
+    return /^https?:\/\//.test(href) ? (
+      <OutboundLink key={i} href={href} className={styles.introLink}>{label}</OutboundLink>
+    ) : (
+      <a key={i} href={href} className={styles.introLink}>{label}</a>
+    );
+  });
+}
+
 type Props = {
   /** Breed name, as printed in "Have you spotted <breed>?". */
   breed: string;
-  /** The intro body lines beneath the question. */
+  /** The intro body lines beneath the question. May contain [label](href)
+      tokens, which are rendered as links. */
   introLines: string[];
 };
 
@@ -32,7 +57,7 @@ export default function CompetitionTitles({ breed, introLines }: Props) {
         </h1>
         <p className={styles.question}>Have you spotted {breed}?</p>
         {introLines.map((line, i) => (
-          <p key={i} className={styles.introBody}>{line}</p>
+          <p key={i} className={styles.introBody}>{renderLine(line)}</p>
         ))}
       </div>
     </section>
