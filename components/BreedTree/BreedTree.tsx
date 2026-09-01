@@ -2656,7 +2656,10 @@ export default function BreedTree({
         // The top-right CORNER, over the close square, as asked. It was 180px
         // down because I placed it below the pit's own squares from their
         // measurements rather than from what is actually on screen.
-        ? "align-items:flex-start;justify-content:flex-end;padding:18px 18px 0 0;font-size:clamp(3.4rem,13vw,7rem);"
+        // 8px down, not 18: the in-pit squares moved 15 up and about 24 right on
+        // 1 September, and the digits stayed where they were, so they sat low
+        // against the title and the portrait. This puts them back on that line.
+        ? "align-items:flex-start;justify-content:flex-end;padding:8px 18px 0 0;font-size:clamp(3.4rem,13vw,7rem);"
         : "align-items:center;justify-content:center;font-size:clamp(5rem,18vw,12rem);");
     st.appendChild(el);
     /* A SECOND SET OF DIGITS, IN THE MIDDLE. The corner pair keeps the count
