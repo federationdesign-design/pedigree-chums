@@ -4036,16 +4036,31 @@ export default function BreedTree({
            used to. Only the spacing is corrected here. */
         const UI_DRAWN = 84 * pitScale * 1.2 * uppW;
         const UI_GAP = UI_DRAWN * 0.08;
-        const ux = v[0] + (xMinF + vbWf - m - uSz / 2) / k;
+        /* NUDGE, 1 September 2026 (owner): the yellow in-pit squares sat a
+           touch inside and below the red X on the start screen, so 5px left and
+           5px up brings the two edges into line.
+
+           WHY A NUDGE AND NOT A NEW MARGIN. The squares are laid out on an
+           84 * uppW slot but DRAWN at 84 * pitScale * 1.2, the same split
+           documented at UI_DRAWN below. So the visible edge is not the body
+           edge, and the margin `m` cannot be corrected without either moving
+           every other thing that uses it or resizing the squares. This offsets
+           the finished result instead, which is what was actually measured
+           against the start screen.
+
+           Applied to the whole column so the X and the brain move together. */
+        const UI_NUDGE_X = -5 * uppW; // negative is left
+        const UI_NUDGE_Y = -5 * uppW; // negative is up
+        const ux = v[0] + (xMinF + vbWf - m - uSz / 2 + UI_NUDGE_X) / k;
         uiBodiesRef.current = [
-          { x: ux, y: v[1] + (-vbHf / 2 + m + uSz / 2) / k, vx: 0, vy: 0, r: (uSz / 2) * 1.1 / k, half: uSz / 2, a: 0, va: 0, fixed: true, hits: 0, kind: "close" },
+          { x: ux, y: v[1] + (-vbHf / 2 + m + uSz / 2 + UI_NUDGE_Y) / k, vx: 0, vy: 0, r: (uSz / 2) * 1.1 / k, half: uSz / 2, a: 0, va: 0, fixed: true, hits: 0, kind: "close" },
           /* UI_GAP is the space between the close X and the square under it.
              Was 14px, now 4px (owner, 1 September 2026: "back to right below the
              X"). The desc and learn squares share this slot, only one of them
              showing at a time, so they carry the same figure and must be
              changed together. */
-          { x: ux, y: v[1] + (-vbHf / 2 + m + uSz / 2 + UI_DRAWN + UI_GAP) / k, vx: 0, vy: 0, r: (uSz / 2) * 1.1 / k, half: uSz / 2, a: 0, va: 0, fixed: true, hits: 0, kind: "desc" },
-          { x: ux, y: v[1] + (-vbHf / 2 + m + uSz / 2 + UI_DRAWN + UI_GAP) / k, vx: 0, vy: 0, r: (uSz / 2) * 1.1 / k, half: uSz / 2, a: 0, va: 0, fixed: true, hits: 0, kind: "learn" },
+          { x: ux, y: v[1] + (-vbHf / 2 + m + uSz / 2 + UI_DRAWN + UI_GAP + UI_NUDGE_Y) / k, vx: 0, vy: 0, r: (uSz / 2) * 1.1 / k, half: uSz / 2, a: 0, va: 0, fixed: true, hits: 0, kind: "desc" },
+          { x: ux, y: v[1] + (-vbHf / 2 + m + uSz / 2 + UI_DRAWN + UI_GAP + UI_NUDGE_Y) / k, vx: 0, vy: 0, r: (uSz / 2) * 1.1 / k, half: uSz / 2, a: 0, va: 0, fixed: true, hits: 0, kind: "learn" },
           /* THE LOGO. Top CENTRE, not the top-right corner the three squares
              share, and 20% down the stage like the main pit's own placement.
              Its drawn width is the main pit's figure clamped to the pit, so a
