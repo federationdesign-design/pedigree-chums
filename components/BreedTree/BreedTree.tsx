@@ -4067,7 +4067,10 @@ export default function BreedTree({
            BETTER FIX, NOT AVAILABLE: reuse the start screen X's own rule. Its
            caption "BACK TO MAIN PAGE" appears nowhere in this repo, so whatever
            draws it was never found. If it turns up, a shared anchor beats this. */
-        const UI_NUDGE_X = -15 * uppW + UI_DRAWN * 0.27; // right, into the corner
+        // Plus a further 5 by eye after the measurement landed close but a touch
+        // shy. Kept as its own term rather than folded into the 0.27, so the
+        // measured part and the taste part stay legible.
+        const UI_NUDGE_X = -15 * uppW + UI_DRAWN * 0.27 + 5 * uppW; // right, into the corner
         const UI_NUDGE_Y = -15 * uppW; // negative is up, measured as close enough
         const ux = v[0] + (xMinF + vbWf - m - uSz / 2 + UI_NUDGE_X) / k;
         uiBodiesRef.current = [
