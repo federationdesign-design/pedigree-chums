@@ -228,9 +228,17 @@
      anchor on the left, and the close X square sits 16px inside the pit on the
      right. Nothing collides, because the title is left-anchored and the X is
      right-anchored while this is centred. */
-  top: 12px;
+  /* Nudged, 1 September 2026 (owner): down 5 from 12, and 20 to the right.
+     The sideways nudge rides in the TRANSFORM, not in `left`, because left is
+     what centres the box: tangling the two would mean a future change to the
+     centring silently moved the nudge as well.
+     It is a variable because the pulse keyframes below have to repeat it on
+     every frame, and four hand-copied numbers drift apart the moment one of
+     them is edited. */
+  --score-nudge: 20px;
+  top: 17px;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translateX(calc(-50% + var(--score-nudge)));
   min-width: 84px;
   box-sizing: border-box;
   text-align: center;
@@ -242,17 +250,17 @@
   pointer-events: none;
   z-index: 20;
 }
-/* THE PULSE HAS TO CARRY THE CENTRING. .scoreTotal now centres itself with
-   translateX(-50%), and this animation sets `transform` outright, so a keyframe
-   of `scale(1)` alone would drop the translate and the score would jump half its
-   own width to the right on every single point scored. Both parts, every frame. */
+/* THE PULSE HAS TO CARRY THE CENTRING AND THE NUDGE. .scoreTotal positions
+   itself with a transform, and this animation sets `transform` outright, so a
+   keyframe of `scale(1)` alone would drop both and the score would jump on every
+   single point scored. Every frame carries the lot. */
 .scorePulse {
   animation: lmScorePulse 0.4s ease-out;
 }
 @keyframes lmScorePulse {
-  0% { transform: translateX(-50%) scale(1); }
-  35% { transform: translateX(-50%) scale(1.25); }
-  100% { transform: translateX(-50%) scale(1); }
+  0% { transform: translateX(calc(-50% + var(--score-nudge))) scale(1); }
+  35% { transform: translateX(calc(-50% + var(--score-nudge))) scale(1.25); }
+  100% { transform: translateX(calc(-50% + var(--score-nudge))) scale(1); }
 }
 
 /* Shake button, copied from the pit. */
