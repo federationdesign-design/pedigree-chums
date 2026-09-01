@@ -214,16 +214,18 @@
   z-index: 0;
 }
 
-/* Score counter, copied from the pit's .scoreTotal, sitting under the close X. */
+/* Score counter, copied from the pit's .scoreTotal.
+   MOVED TO TOP CENTRE, 1 September 2026 (owner). It used to sit on the pit's
+   left axis under the close X, sharing that line with the difficulty slider and
+   PLAY. Centring it on the whole pit rather than on the left axis is why the
+   axis variable is gone from here: transform is used instead of a calculated
+   left, so the box centres itself whatever the number's width. */
 .scoreTotal {
   position: fixed;
   top: 84px;
-  /* Centred on the axis: half of the 84 box either side of it. Was left 30 and
-     left-aligned, which put the digits wherever the number's own width happened
-     to leave them. */
-  left: calc(var(--pit-axis, 51.8px) - 42px);
+  left: 50%;
+  transform: translateX(-50%);
   min-width: 84px;
-  width: 84px;
   box-sizing: border-box;
   text-align: center;
   color: #ffffff;
@@ -234,13 +236,17 @@
   pointer-events: none;
   z-index: 20;
 }
+/* THE PULSE HAS TO CARRY THE CENTRING. .scoreTotal now centres itself with
+   translateX(-50%), and this animation sets `transform` outright, so a keyframe
+   of `scale(1)` alone would drop the translate and the score would jump half its
+   own width to the right on every single point scored. Both parts, every frame. */
 .scorePulse {
   animation: lmScorePulse 0.4s ease-out;
 }
 @keyframes lmScorePulse {
-  0% { transform: scale(1); }
-  35% { transform: scale(1.25); }
-  100% { transform: scale(1); }
+  0% { transform: translateX(-50%) scale(1); }
+  35% { transform: translateX(-50%) scale(1.25); }
+  100% { transform: translateX(-50%) scale(1); }
 }
 
 /* Shake button, copied from the pit. */

@@ -4014,11 +4014,17 @@ export default function BreedTree({
       if (!uiBodiesRef.current) {
         const uSz = 84 * uppW; // 84px on screen, dock-icon territory
         const m = 16 * uppW;
+        const UI_GAP = 4; // px between the close X and the square below it
         const ux = v[0] + (xMinF + vbWf - m - uSz / 2) / k;
         uiBodiesRef.current = [
           { x: ux, y: v[1] + (-vbHf / 2 + m + uSz / 2) / k, vx: 0, vy: 0, r: (uSz / 2) * 1.1 / k, half: uSz / 2, a: 0, va: 0, fixed: true, hits: 0, kind: "close" },
-          { x: ux, y: v[1] + (-vbHf / 2 + m + uSz * 1.5 + 14 * uppW) / k, vx: 0, vy: 0, r: (uSz / 2) * 1.1 / k, half: uSz / 2, a: 0, va: 0, fixed: true, hits: 0, kind: "desc" },
-          { x: ux, y: v[1] + (-vbHf / 2 + m + uSz * 1.5 + 14 * uppW) / k, vx: 0, vy: 0, r: (uSz / 2) * 1.1 / k, half: uSz / 2, a: 0, va: 0, fixed: true, hits: 0, kind: "learn" },
+          /* UI_GAP is the space between the close X and the square under it.
+             Was 14px, now 4px (owner, 1 September 2026: "back to right below the
+             X"). The desc and learn squares share this slot, only one of them
+             showing at a time, so they carry the same figure and must be
+             changed together. */
+          { x: ux, y: v[1] + (-vbHf / 2 + m + uSz * 1.5 + UI_GAP * uppW) / k, vx: 0, vy: 0, r: (uSz / 2) * 1.1 / k, half: uSz / 2, a: 0, va: 0, fixed: true, hits: 0, kind: "desc" },
+          { x: ux, y: v[1] + (-vbHf / 2 + m + uSz * 1.5 + UI_GAP * uppW) / k, vx: 0, vy: 0, r: (uSz / 2) * 1.1 / k, half: uSz / 2, a: 0, va: 0, fixed: true, hits: 0, kind: "learn" },
           /* THE LOGO. Top CENTRE, not the top-right corner the three squares
              share, and 20% down the stage like the main pit's own placement.
              Its drawn width is the main pit's figure clamped to the pit, so a
@@ -4897,46 +4903,99 @@ export default function BreedTree({
           parts.push({ el, x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 36 * fxScale, r: 0, born: now, life: 420 + Math.random() * 220 });
         }
       };
-      /* THE FUSE GOO, the main pit's own recipe (PackPit.tsx:1039 to 1044).
-         Nine blobs in a RING rather than a pop on the spot: one at the centre,
-         the rest evenly spaced around a circle at a random 25 to 75% of the
-         radius, each sized 50 to 100% of R, each born 12ms after the last and
-         living 620ms.
+      /* THE FUSE GOO, the main pit's recipe INCLUDING THE PAINT.
+         Spawn is PackPit.tsx:1039, paint is PackPit.tsx:2065, and the paint is
+         the half that makes it read as goo rather than as nine dots:
 
-         WHY NOT whackAt. That is the pit's three-ball pop: fixed small radius,
-         all three at once, and they fly outward. The goo does not move at all,
-         it is much larger, and the stagger is what makes it read as a splat
-         spreading rather than three quick dots.
+           - a RADIAL GRADIENT, not a flat circle. Opaque white at the centre,
+             70% at 0.6 of the radius, transparent at the rim, so each blob has
+             a soft edge.
+           - it SWELLS then closes: 0.6 + sin(t * PI) * 0.8, so it reaches about
+             1.4 times its size halfway through and shrinks back.
+           - alpha (1 - t) * 0.9, so it never starts fully solid.
+           - drawn ADDITIVELY. The canvas uses globalCompositeOperation
+             "lighter"; the SVG equivalent is mix-blend-mode: screen on the
+             group. This is the important one: nine overlapping soft blobs
+             reinforcing each other is what merges them into one moving mass.
 
-         R is the larger of the two objects' half-size, exactly as the main pit
-         takes `Math.max(logo.plugin.half, bone.plugin.half)`. THE ONE NUMBER
-         MOST LIKELY TO NEED A NUDGE: if the blobs read too big or too small on
-         a phone, scale R here rather than changing the count or the timing. */
-      const gooAt = (x: number, y: number, now: number, rPx: number) => {
+         My first attempt ported the spawn and left the paint, which gave nine
+         hard-edged circles fading linearly at a fixed size. Same positions,
+         same timing, nothing like the same effect.
+
+         It cannot ride on `parts` above: that loop has one fixed radius and a
+         straight fade, and cannot express a swell or a blend mode. Hence its
+         own list and its own step in drawNumbers. */
+      type Goo = { el: SVGCircleElement; x: number; y: number; s: number; born: number; life: number };
+      const goo: Goo[] = [];
+      let gooLayer: SVGGElement | null = null;
+      const GOO_GRAD_ID = "bt-goo-grad";
+      const ensureGooLayer = (): SVGGElement | null => {
         const fx = fxRef.current;
-        if (!fx) return;
+        if (!fx) return null;
+        if (gooLayer && gooLayer.isConnected) return gooLayer;
+        const NS = "http://www.w3.org/2000/svg";
+        // One gradient, shared by every blob, built once and left in place.
+        if (!fx.querySelector(`#${GOO_GRAD_ID}`)) {
+          const defs = document.createElementNS(NS, "defs");
+          const grad = document.createElementNS(NS, "radialGradient");
+          grad.setAttribute("id", GOO_GRAD_ID);
+          for (const [off, op] of [["0", "1"], ["0.6", "0.7"], ["1", "0"]] as [string, string][]) {
+            const stop = document.createElementNS(NS, "stop");
+            stop.setAttribute("offset", off);
+            stop.setAttribute("stop-color", "#ffffff");
+            stop.setAttribute("stop-opacity", op);
+            grad.appendChild(stop);
+          }
+          defs.appendChild(grad);
+          fx.appendChild(defs);
+        }
+        gooLayer = document.createElementNS(NS, "g");
+        gooLayer.style.mixBlendMode = "screen"; // the canvas's "lighter"
+        gooLayer.style.pointerEvents = "none";
+        fx.appendChild(gooLayer);
+        return gooLayer;
+      };
+      const gooAt = (x: number, y: number, now: number, rPx: number) => {
+        const layer = ensureGooLayer();
+        if (!layer) return;
         const rWorld = rPx / pxPerWorld;
         for (let i = 0; i < 9; i++) {
           const a = (i / 9) * Math.PI * 2;
           const off = i === 0 ? 0 : rWorld * (0.25 + Math.random() * 0.5);
           const el = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-          el.setAttribute("r", String(rPx * (0.5 + Math.random() * 0.5) * 0.5 * fxScale));
-          el.style.fill = "#ffffff";
+          el.setAttribute("fill", `url(#${GOO_GRAD_ID})`);
           el.style.pointerEvents = "none";
-          fx.appendChild(el);
-          parts.push({
+          layer.appendChild(el);
+          goo.push({
             el,
             x: x + Math.cos(a) * off,
             y: y + Math.sin(a) * off,
-            vx: 0, vy: 0, // the goo sits where it lands
-            r: 0,
-            born: now + i * 12,
+            s: rPx * (0.5 + Math.random() * 0.5) * fxScale,
+            born: now + i * 12, // the stagger, verbatim
             life: 620,
           });
         }
       };
+      const stepGoo = (now: number, view: View) => {
+        if (goo.length === 0) return;
+        const kk = SIZE / view[2];
+        for (let i = goo.length - 1; i >= 0; i--) {
+          const g = goo[i];
+          const t = (now - g.born) / g.life;
+          if (t < 0) { g.el.style.opacity = "0"; continue; } // not born yet
+          if (t >= 1) { g.el.remove(); goo.splice(i, 1); continue; }
+          const swell = 0.6 + Math.sin(Math.min(t, 1) * Math.PI) * 0.8;
+          g.el.setAttribute("r", String(g.s * swell));
+          g.el.setAttribute("cx", String((g.x - view[0]) * kk));
+          g.el.setAttribute("cy", String((g.y - view[1]) * kk));
+          g.el.style.opacity = String((1 - t) * 0.9);
+        }
+        // The layer is only there to carry the blend mode, so it goes with them.
+        if (goo.length === 0 && gooLayer) { gooLayer.remove(); gooLayer = null; }
+      };
       const drawNumbers = (now: number, view: View) => {
         const kk = SIZE / view[2];
+        stepGoo(now, view);
         for (let i = parts.length - 1; i >= 0; i--) {
           const pp = parts[i];
           const t = (now - pp.born) / pp.life;
