@@ -2312,7 +2312,10 @@ export default function BreedTree({
   const spawnBadgeRef = useRef<((x: number, y: number, r: number, pct: number, opts?: { r?: number; label?: string; charges?: number; green?: boolean }) => void) | null>(null);
   const spawnRodRef = useRef<((x1: number, y1: number, x2: number, y2: number, lit: boolean) => void) | null>(null);
   const spawnPillRef = useRef<((x: number, y: number, w: number, name: string) => void) | null>(null);
-  type PropBody = { x: number; y: number; vx: number; vy: number; a: number; idx: number; hits: number; maxHits: number; dead?: boolean; lastKnock?: number; mb?: any; onFloor?: boolean; floorLostAt?: number };
+  // `toyKind` is only set on entries in toyBodiesRef, which is why it is
+  // optional: rods, pills, chums and logo pieces share this shape and have no
+  // kind of their own. The fuse reads it to find the bone.
+  type PropBody = { x: number; y: number; vx: number; vy: number; a: number; idx: number; hits: number; maxHits: number; dead?: boolean; lastKnock?: number; mb?: any; onFloor?: boolean; floorLostAt?: number; toyKind?: string };
   const rodBodiesRef = useRef<PropBody[]>([]);
   /* Logo pieces. Its own list rather than joining the toys, because a piece has
      no kind, no retire key, no hit limit and cannot be thrown out of the pit.
@@ -5579,8 +5582,26 @@ export default function BreedTree({
         // that can be dragged into the pack is a worse control. The chum
         // scenery is out too, since it was never draggable.
         const MC_KINDS = new Set(["badge", "circle", "rod", "pill", "toy", "btn"]);
-        const onStartDrag = (ev: { body?: { plugin?: { kind?: string } } }) => {
-          if (!MC_KINDS.has(ev?.body?.plugin?.kind ?? "")) { mc.constraint.bodyB = null; mc.body = null; }
+        /* THE FALLEN LOGO IS DRAGGABLE, the others are not (owner, 31 Aug 2026:
+           "I want to pick up and move it around, just like the main pit").
+
+           It is not in MC_KINDS because the UI bodies carry `plugin.ui` and no
+           `plugin.kind` at all, so they can never match that set. The test is on
+           the object itself instead.
+
+           `fixed === false` is the whole gate. While the logo is still perched
+           it is a STATIC body, and Matter's MouseConstraint does not skip static
+           bodies: it would happily take the grab and then move nothing, which
+           would feel exactly like the pit being broken. Once the fifth knock
+           frees it, it is a normal body and behaves like one.
+
+           The close X, the brain and the description square stay undraggable.
+           The comment above still stands for them: a control you can drag into
+           the pack is a worse control. */
+        const onStartDrag = (ev: { body?: { plugin?: { kind?: string; ui?: { kind?: string; fixed?: boolean } } } }) => {
+          const pl = ev?.body?.plugin;
+          if (pl?.ui?.kind === "logo" && pl.ui.fixed === false) return;
+          if (!MC_KINDS.has(pl?.kind ?? "")) { mc.constraint.bodyB = null; mc.body = null; }
         };
         // A thrown toy retires itself once it is clear of the pit. The old path
         // fired this from startDrag's pointer up; the constraint has its own
@@ -5627,8 +5648,18 @@ export default function BreedTree({
            pixels, so they are copied verbatim. They are TIGHT: 40px to feel the
            pull and 12px to snap. If it turns out to be fiddly on a phone, this
            pair is what to open up, not the pull strength. */
-        const FUSE_MAGNET_RADIUS = 40;
-        const FUSE_SNAP_DIST = 12;
+        /* DISTANCES SCALE WITH THE LOGO, they are not fixed pixels.
+           The main pit's 40px magnet and 12px snap were copied verbatim and did
+           not work: they are CENTRE TO CENTRE, and against a 229px logo and a
+           180px bone the two can overlap completely with their centres still
+           about 150px apart, so the magnet never switched on. Proven on a real
+           phone with the ?grab=1 readout, which showed the bone being held
+           correctly while nothing happened.
+
+           Half the logo's width to feel the pull, 15% to snap. On a 390 phone
+           that is about 115px and 34px, against 40 and 12. */
+        const FUSE_MAGNET_FRAC = 0.5;
+        const FUSE_SNAP_FRAC = 0.15;
         const FUSE_PULL = 0.00005;
         const FUSE_POINTS = 2000;
         let fused = false;
@@ -5636,47 +5667,51 @@ export default function BreedTree({
           if (fused) return;
           const lu = uiBodiesRef.current?.find((u) => u.kind === "logo") as (UiBody & { mb?: { position: { x: number; y: number }; mass: number } }) | undefined;
           // still fixed means it has not been knocked loose yet
-          if (!lu || lu.fixed || !lu.mb || lu.mbIn === false) return;
-          const held = mc.body as { position: { x: number; y: number }; plugin?: { prop?: { toyKind?: string; dead?: boolean } } } | null;
-          if (!held || held.plugin?.prop?.toyKind !== "bone" || held.plugin?.prop?.dead) return;
-          const lb = lu.mb;
-          const tx = held.position.x - lb.position.x, ty = held.position.y - lb.position.y;
+          if (!lu || lu.fixed || !lu.mb || lu.mbIn === false || !lu.w) return;
+          const bonePr = toyBodiesRef.current.find((t) => t.toyKind === "bone" && !t.dead && t.mb);
+          if (!bonePr?.mb) return;
+          const logoB = lu.mb;
+          const boneB = bonePr.mb as { position: { x: number; y: number }; mass: number };
+          /* EITHER DIRECTION, like the main pit. Whichever of the two you are
+             holding, the OTHER one is pulled towards it. Before the logo became
+             draggable this only worked one way. */
+          const held = mc.body as unknown;
+          const heldIsBone = held === bonePr.mb;
+          const heldIsLogo = held === logoB;
+          if (!heldIsBone && !heldIsLogo) return;
+          const puller = heldIsBone ? boneB : logoB;
+          const pulled = heldIsBone ? logoB : boneB;
+          const lwPx = lu.w * pxPerWorld;
+          const magnet = lwPx * FUSE_MAGNET_FRAC;
+          const snap = lwPx * FUSE_SNAP_FRAC;
+          const tx = puller.position.x - pulled.position.x, ty = puller.position.y - pulled.position.y;
           const dist = Math.hypot(tx, ty);
-          if (dist > FUSE_MAGNET_RADIUS || dist < 1) return;
-          // The HELD body is the one you are steering, so the pull is applied to
-          // the other one: the logo comes to the bone, not the other way round.
-          const f = FUSE_PULL * (FUSE_MAGNET_RADIUS - dist);
-          MBody.applyForce(lb, lb.position, { x: (tx / dist) * f * lb.mass, y: (ty / dist) * f * lb.mass });
-          if (dist > FUSE_SNAP_DIST) return;
+          if (dist > magnet || dist < 1) return;
+          const f = FUSE_PULL * (magnet - dist);
+          MBody.applyForce(pulled as never, pulled.position, { x: (tx / dist) * f * pulled.mass, y: (ty / dist) * f * pulled.mass });
+          if (dist > snap) return;
           fused = true;
-          // Snap the bone onto the logo and stop both dead, the main pit's own
-          // order of operations.
-          MBody.setPosition(held as never, { x: lb.position.x, y: lb.position.y });
-          MBody.setVelocity(held as never, { x: 0, y: 0 });
-          MBody.setAngularVelocity(held as never, 0);
-          mcReleaseRef.current?.(); // let go, or the constraint drags the fused bone away
-          const w = worldFromPx(lb.position.x, lb.position.y);
+          // The BONE always ends up on the logo, whichever one was being held,
+          // so the join looks the same either way. The main pit's own order.
+          MBody.setPosition(boneB as never, { x: logoB.position.x, y: logoB.position.y });
+          MBody.setVelocity(boneB as never, { x: 0, y: 0 });
+          MBody.setAngularVelocity(boneB as never, 0);
+          mcReleaseRef.current?.(); // let go, or the constraint drags it away again
+          const w = worldFromPx(logoB.position.x, logoB.position.y);
           const now = performance.now();
-          /* THE MAIN PIT'S GOO IS NINE SOFT BLOBS ON A CANVAS. There is no
-             canvas here, so this uses the pit's OWN pop, whackAt, three times
-             for nine white circles that drift and fade. Existing, in style, and
-             it costs no new effects system. */
+          /* The main pit's goo is nine soft blobs on a canvas. No canvas here,
+             so this is the pit's own pop, three times for nine white circles. */
           whackAt(w.x, w.y, now);
           whackAt(w.x, w.y, now);
           whackAt(w.x, w.y, now);
           numAt(w.x, w.y, FUSE_POINTS, now);
-          /* The bone wears its second face for a beat. The index is the one the
-             render lays the toys out by, so it is looked up from the body that
-             was actually held rather than assumed to be the last bone spawned:
-             a level can drop only one today, but nothing here should depend on
-             that staying true. */
           {
-            const bIdx = toyBodiesRef.current.findIndex((t) => t.mb === held);
+            const bIdx = toyBodiesRef.current.findIndex((t) => t === bonePr);
             if (bIdx >= 0) { setBoneOhYeaGone(false); setBoneFuse({ idx: bIdx, at: now }); }
           }
           // The logo has become part of the bone, so its body leaves the world
           // and its artwork leaves the screen.
-          Composite.remove(world, lb as never);
+          Composite.remove(world, logoB as never);
           lu.mbIn = false;
           const lg = uiLogoRef.current;
           if (lg) lg.style.display = "none";
