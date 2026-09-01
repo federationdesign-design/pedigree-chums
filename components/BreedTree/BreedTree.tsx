@@ -4049,9 +4049,26 @@ export default function BreedTree({
            against the start screen.
 
            Applied to the whole column so the X and the brain move together. */
-        // 5 was not enough; owner asked for 10 more each way, so 15 in total.
-        const UI_NUDGE_X = -15 * uppW; // negative is left
-        const UI_NUDGE_Y = -15 * uppW; // negative is up
+        /* MEASURED, not nudged again. Two guesses went the wrong way, so the two
+           screenshots were compared instead, each normalised against the
+           square's OWN drawn width so the different capture sizes cancel out:
+
+             red X, start screen : right margin 0.27 x the square
+             yellow X, pit       : right margin 0.54 x the square
+
+           So it sat about a quarter of a square too far in, and the correction
+           is a FRACTION OF THE SQUARE rather than a pixel count. That matters:
+           the squares are drawn at 84 * pitScale * 1.2 while their slot is 84,
+           so a fixed offset that looks right on one phone is wrong on another.
+
+           The vertical measured close after the earlier move, 2.4% from the top
+           against the red X's 2.7%, so the 15px up is kept as it is.
+
+           BETTER FIX, NOT AVAILABLE: reuse the start screen X's own rule. Its
+           caption "BACK TO MAIN PAGE" appears nowhere in this repo, so whatever
+           draws it was never found. If it turns up, a shared anchor beats this. */
+        const UI_NUDGE_X = -15 * uppW + UI_DRAWN * 0.27; // right, into the corner
+        const UI_NUDGE_Y = -15 * uppW; // negative is up, measured as close enough
         const ux = v[0] + (xMinF + vbWf - m - uSz / 2 + UI_NUDGE_X) / k;
         uiBodiesRef.current = [
           { x: ux, y: v[1] + (-vbHf / 2 + m + uSz / 2 + UI_NUDGE_Y) / k, vx: 0, vy: 0, r: (uSz / 2) * 1.1 / k, half: uSz / 2, a: 0, va: 0, fixed: true, hits: 0, kind: "close" },
