@@ -344,7 +344,7 @@ const TOY_BOWL_GONE_KEY = "pc-minipit-bowl-gone";
    leaves a bowl clear of both walls with room to be shoved about, rather than
    wedged between them: about 34px each side on a 360 phone and 39px on a 414.
    See the clamp in spawnToy for why this exists at all. */
-const BOWL_PIT_FRACTION = 0.805;
+const BOWL_PIT_FRACTION = 0.8855; // was 0.805, 10% bigger (owner, 2 Sept 2026)
 /* ---- The breakable logo, stage 1 -------------------------------------------
    The Pedigree Chums mark, ported from the main pit (PackPit.tsx:536 to 560).
    It sits fixed near the top of the pit, the pack and the toys bounce off it,
@@ -4455,7 +4455,7 @@ export default function BreedTree({
           // the bone reads at the stick's width: both are elongated props, and
           // its 2.05 aspect makes it twice the stick's depth, so it lands as a
           // substantial object rather than a twig
-          : kind === "bone" ? ballDia * 1.6
+          : kind === "bone" ? ballDia * 1.68 // was 1.6, 5% bigger (owner, 2 Sept 2026)
           // Era props. The newspaper is a long roll so it takes the stick's
           // length; the fork and the shoe are hand-sized, so they read at the
           // ball's width like the rock does.
