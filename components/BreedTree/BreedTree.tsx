@@ -4506,6 +4506,28 @@ export default function BreedTree({
                   ];
                   const body = MBody.create({ parts, ...opts });
                   MBody.setAngle(body, (Math.random() - 0.5) * 0.6);
+                  /* THE BONE SHARES THE LOGO'S GROUP, SO THE TWO PASS THROUGH
+                     EACH OTHER. Without this the fuse cannot close, and it is
+                     not a tuning problem: the snap distance is measured CENTRE
+                     TO CENTRE, but collision holds the two apart by roughly half
+                     the logo's collider plus half the bone's. On an iPhone XR
+                     that is about 95px against a 37px snap. Impossible.
+
+                     It looked mobile-only because desktop has a much larger
+                     snap, about 86px, and a drag constraint can shove one body
+                     that far into another before the solver pushes back. The
+                     bug was always here.
+
+                     The main pit does exactly this and says why, PackPit.tsx:541:
+                     "logo + bones share this negative group so they pass through
+                     each other (to fuse)".
+
+                     A negative group only affects pairs INSIDE it, so the bone
+                     still collides with dogs, chips, chums and every other toy.
+                     KNOWN TRADE-OFF: LOGO_GROUP also holds the logo's dropped
+                     pieces, so the bone now passes through those too. They are
+                     small debris and it is not worth a second group to keep. */
+                  body.collisionFilter = { ...(body.collisionFilter || {}), group: LOGO_GROUP };
                   return body;
                 })()
             : kind === "bowl"
