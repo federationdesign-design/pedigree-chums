@@ -4014,7 +4014,28 @@ export default function BreedTree({
       if (!uiBodiesRef.current) {
         const uSz = 84 * uppW; // 84px on screen, dock-icon territory
         const m = 16 * uppW;
-        const UI_GAP = 4; // px between the close X and the square below it
+        /* THE SQUARES ARE SPACED BY WHAT IS DRAWN, NOT BY THE BODY SLOT.
+           Measured 1 September 2026, after a 4px gap changed almost nothing.
+           This file sizes the same square twice and the two disagree:
+
+             body slot  84 * uppW              (here)
+             drawn      84 * pitScale * 1.2 * upp   (the render)
+
+           `upp` and `uppW` are the same conversion, screen px to SVG units, so
+           the two differ purely by pitScale * 1.2. Wherever that is under 1 the
+           drawn square is smaller than its slot and the difference shows up as
+           empty space, on top of whatever gap was asked for. Stacking the second
+           square at 1.5 slots was therefore never putting it one square down.
+
+           Centre to centre is now one DRAWN square plus the gap, so UI_GAP means
+           what it says. 8% of the square matches the spacing between the two
+           yellow icons Steve sent as the reference.
+
+           NOT FIXING THE UNDERLYING SPLIT. Making the render drop its own 1.2
+           would resize all four squares, and the close X is a control people are
+           used to. Only the spacing is corrected here. */
+        const UI_DRAWN = 84 * pitScale * 1.2 * uppW;
+        const UI_GAP = UI_DRAWN * 0.08;
         const ux = v[0] + (xMinF + vbWf - m - uSz / 2) / k;
         uiBodiesRef.current = [
           { x: ux, y: v[1] + (-vbHf / 2 + m + uSz / 2) / k, vx: 0, vy: 0, r: (uSz / 2) * 1.1 / k, half: uSz / 2, a: 0, va: 0, fixed: true, hits: 0, kind: "close" },
@@ -4023,8 +4044,8 @@ export default function BreedTree({
              X"). The desc and learn squares share this slot, only one of them
              showing at a time, so they carry the same figure and must be
              changed together. */
-          { x: ux, y: v[1] + (-vbHf / 2 + m + uSz * 1.5 + UI_GAP * uppW) / k, vx: 0, vy: 0, r: (uSz / 2) * 1.1 / k, half: uSz / 2, a: 0, va: 0, fixed: true, hits: 0, kind: "desc" },
-          { x: ux, y: v[1] + (-vbHf / 2 + m + uSz * 1.5 + UI_GAP * uppW) / k, vx: 0, vy: 0, r: (uSz / 2) * 1.1 / k, half: uSz / 2, a: 0, va: 0, fixed: true, hits: 0, kind: "learn" },
+          { x: ux, y: v[1] + (-vbHf / 2 + m + uSz / 2 + UI_DRAWN + UI_GAP) / k, vx: 0, vy: 0, r: (uSz / 2) * 1.1 / k, half: uSz / 2, a: 0, va: 0, fixed: true, hits: 0, kind: "desc" },
+          { x: ux, y: v[1] + (-vbHf / 2 + m + uSz / 2 + UI_DRAWN + UI_GAP) / k, vx: 0, vy: 0, r: (uSz / 2) * 1.1 / k, half: uSz / 2, a: 0, va: 0, fixed: true, hits: 0, kind: "learn" },
           /* THE LOGO. Top CENTRE, not the top-right corner the three squares
              share, and 20% down the stage like the main pit's own placement.
              Its drawn width is the main pit's figure clamped to the pit, so a
