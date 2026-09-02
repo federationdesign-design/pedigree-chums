@@ -621,9 +621,19 @@ function toyRetiredInEra(key: string, era?: string): boolean {
 function retireToyForEra(key: string, era?: string) {
   try { if (era) sessionStorage.setItem(key, era); } catch { /* private mode */ }
 }
-/* The two balls, and only these, retire per era. Everything else is spent for
-   the session as it always was. */
-const ERA_SCOPED_TOYS: string[] = ["ball", "ballPink"];
+/* EMPTIED, 2 September 2026 (owner): "if thrown out they should not return on
+   future levels". The two balls were the only members. They now retire for the
+   session like everything else, so a ball thrown clear on level one is gone for
+   level two and for every level after it.
+
+   THIS REVERSES the rule written in the block above, that the balls come back on
+   reaching a new era. The machinery is left in place and working, so putting
+   that back is this array and nothing else.
+
+   The pink ball's throw counter already lives in sessionStorage and is no longer
+   cleared behind its own gone flag, so its three lives are now three across the
+   whole session rather than three per round. */
+const ERA_SCOPED_TOYS: string[] = [];
 
 /* ---- Retiring for GOOD ----------------------------------------------------
    The flag carries a message, and once it has been read there is nothing left
@@ -2802,22 +2812,23 @@ export default function BreedTree({
   // Runs before the toy timers, which do not start until a circle lands.
   useEffect(() => {
     resetToysIfAsked();
-    // TOY RETIREMENT IS PER ROUND, not per tab.
-    //
-    // It used to live in sessionStorage for the life of the tab, so once you had
-    // thrown the ball clear or read the flag's message they were gone until you
-    // opened a new tab or remembered ?toys=reset. That is defensible for a
-    // player and miserable for anyone testing: every reload of a working tab
-    // came up short of half its props, which read as the toys being broken.
-    //
-    // This component remounts for every level and every retry, so clearing here
-    // means a fresh round always brings a full set, while a single round still
-    // spends them: throw the ball out and it stays out until the round ends.
-    //
-    // The cookie panel is NOT cleared here on purpose. It is gated on consent,
-    // which is localStorage and permanent, because answering it once is meant to
-    // count for good. To see that one again you have to clear site data.
-    try { for (const k of Object.values(TOY_GONE_KEY)) sessionStorage.removeItem(k); } catch { /* private mode */ }
+    /* THE PER MOUNT WIPE IS GONE, 2 September 2026 (owner).
+
+       It used to clear every entry in TOY_GONE_KEY here. This component remounts
+       for every level AND every retry, so that line handed back a full set of
+       toys on each one. Throwing a ball clear cost you it until the end of that
+       round and no longer, which is why they kept coming back.
+
+       It also quietly killed the era scoping. toyRetiredInEra compares the stored
+       era against the current one, and the stored value was deleted before the
+       next level could ever read it, so that comparison could never be true.
+
+       It was added because a tester reloading a working tab kept coming up short
+       of half the props and read it as the toys being broken. ?toys=reset already
+       solves that, without costing the rule its meaning.
+
+       The cookie panel was never cleared here and still is not. It is gated on
+       consent, which is localStorage and permanent. */
   }, []);
   /* PRELOAD THE DAMAGED LOGO ARTWORK. Swapping an <image> href to a file the
      browser has never fetched leaves the logo blank for a frame or two, and a
@@ -4745,7 +4756,12 @@ export default function BreedTree({
             const spent = pinkThrows() + 1;
             setPinkThrows(spent);
             killProp(pr, "toy", performance.now());
-            if (spent >= BALL_PINK_LIVES) retireToyForEra(TOY_BALL_PINK_GONE_KEY, era);
+            /* retireToyForEra -> retireToy, 2 September 2026. This line does NOT
+               go through ERA_SCOPED_TOYS, so emptying that array would have left
+               it writing an era string while the spawn guard below had switched
+               to looking for "1". The two would never have matched and the pink
+               ball would have returned for ever. */
+            if (spent >= BALL_PINK_LIVES) retireToy(TOY_BALL_PINK_GONE_KEY);
             else toyTimers.push(window.setTimeout(() => spawnToy("ballPink"), BALL_PINK_BACK));
             return;
           }
