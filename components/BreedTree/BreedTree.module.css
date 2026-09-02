@@ -1436,17 +1436,21 @@
      further left, clear of the desc square, so close + three icons fit a 390px
      width. Button sizes match the square's real 768px breakpoint (100.8 desktop
      / 67.5 phone), the figures .closeCircular uses, so "sized to match" holds. */
+  /* 2 September 2026: the corner square came down 25%, 100.8 -> 75.6 on desktop
+     and 67.5 -> 50.6 on a phone, so every figure derived from it here follows.
+     These offsets are not decoration: they are "one square plus a gap in from
+     the corner", so leaving them would park the dock over empty space. */
   top: 18px;
-  right: 132.8px;   /* 18 + 100.8 square + 14 gap */
+  right: 107.6px;   /* 18 + 75.6 square + 14 gap */
   display: flex;
   flex-direction: row;
   gap: 14px;        /* the squares' own gap */
   z-index: 22;
 }
 .learnDockBtn {
-  width: 100.8px;   /* the back square on desktop: 84 * 1.2 */
-  height: 100.8px;
-  border-radius: 30.24px;  /* the square's rx, size * 0.3 */
+  width: 75.6px;    /* the back square on desktop: 84 * 1.2 * 0.75 */
+  height: 75.6px;
+  border-radius: 22.68px;  /* the square's rx, size * 0.3 */
   background: var(--navy, #0a3a57);
   border: 2px solid var(--yellow, #ffd23e);
   cursor: pointer;
@@ -1460,8 +1464,8 @@
 }
 .learnDockIcon {
   display: inline-flex;
-  width: 55px;   /* ~0.55 of the 100.8 button */
-  height: 55px;
+  width: 41px;   /* ~0.55 of the 75.6 button */
+  height: 41px;
   color: var(--yellow, #ffd23e);
 }
 .learnDockIcon svg { width: 100%; height: 100%; stroke: var(--yellow, #ffd23e); }
@@ -1484,15 +1488,15 @@
    + three icons inside a 390px width (~348px used). */
 @media (max-width: 768px) {
   .learnDock {
-    top: 99.5px;    /* one line down: 18 + 67.5 square + 14 gap */
-    right: 99.5px;  /* left of the desc column: 18 + 67.5 + 14 */
+    top: 82.6px;    /* one line down: 18 + 50.6 square + 14 gap */
+    right: 82.6px;  /* left of the desc column: 18 + 50.6 + 14 */
   }
   .learnDockBtn {
-    width: 67.5px;
-    height: 67.5px;
-    border-radius: 20.25px;
+    width: 50.6px;
+    height: 50.6px;
+    border-radius: 15.18px;
   }
-  .learnDockIcon { width: 37px; height: 37px; }
+  .learnDockIcon { width: 28px; height: 28px; }
 }
 .cardTitleWhite {
   color: #ffffff;

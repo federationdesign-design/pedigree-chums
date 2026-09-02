@@ -4020,7 +4020,22 @@ export default function BreedTree({
            NOT FIXING THE UNDERLYING SPLIT. Making the render drop its own 1.2
            would resize all four squares, and the close X is a control people are
            used to. Only the spacing is corrected here. */
-        const UI_DRAWN = 84 * pitScale * 1.2 * uppW;
+        /* 25% OFF THE DRAWN SQUARE, 2 September 2026 (owner), to match the PLAY
+           and LEARN squares on the start screen.
+
+           THE BODY SLOT IS NOT TOUCHED. It stays 84 * uppW, which is the split
+           the block above documents and explicitly declines to fix. Only what is
+           painted comes down, so nothing about the physics changes.
+
+           UI_INSET is half the width lost. Without it the square would appear to
+           drift away from the corner by that amount on both axes, because it
+           shrinks around a centre that has not moved, and the top and right
+           margins were measured off two screenshots last session. Adding it back
+           into the nudges keeps those measured margins exactly as they are. */
+        const UI_DRAWN_FULL = 84 * pitScale * 1.2 * uppW;
+        const UI_SHRINK = 0.75;
+        const UI_DRAWN = UI_DRAWN_FULL * UI_SHRINK;
+        const UI_INSET = (UI_DRAWN_FULL - UI_DRAWN) / 2;
         const UI_GAP = UI_DRAWN * 0.08;
         /* NUDGE, 1 September 2026 (owner): the yellow in-pit squares sat a
            touch inside and below the red X on the start screen, so 5px left and
@@ -4056,8 +4071,12 @@ export default function BreedTree({
         // Plus a further 5 by eye after the measurement landed close but a touch
         // shy. Kept as its own term rather than folded into the 0.27, so the
         // measured part and the taste part stay legible.
-        const UI_NUDGE_X = -15 * uppW + UI_DRAWN * 0.27 + 5 * uppW; // right, into the corner
-        const UI_NUDGE_Y = -15 * uppW; // negative is up, measured as close enough
+        /* The 0.27 reads UI_DRAWN_FULL, not UI_DRAWN. It was measured against the
+           square at its old size, so scaling it with the shrink would move the
+           column and throw away the measurement. UI_INSET is the separate term
+           that puts the smaller square back on the same visible corner. */
+        const UI_NUDGE_X = -15 * uppW + UI_DRAWN_FULL * 0.27 + 5 * uppW + UI_INSET; // right, into the corner
+        const UI_NUDGE_Y = -15 * uppW - UI_INSET; // negative is up, measured as close enough
         const ux = v[0] + (xMinF + vbWf - m - uSz / 2 + UI_NUDGE_X) / k;
         uiBodiesRef.current = [
           { x: ux, y: v[1] + (-vbHf / 2 + m + uSz / 2 + UI_NUDGE_Y) / k, vx: 0, vy: 0, r: (uSz / 2) * 1.1 / k, half: uSz / 2, a: 0, va: 0, fixed: true, hits: 0, kind: "close" },
@@ -7576,7 +7595,12 @@ export default function BreedTree({
             const kk = SIZE / v[2];
             const st = stageRef.current;
             const upp = st ? (aspect >= 1 ? SIZE : SIZE / Math.max(aspect, 0.01)) / Math.max(st.clientHeight, 1) : 1;
-            const uSz = 84 * pitScale * 1.2 * upp; // main pit: BIG * 1.2
+            // 25% off, 2 September 2026 (owner), matching the start screen's PLAY
+            // and LEARN. This is the DRAWN size only; the bodies keep their 84
+            // slot. The same 0.75 is applied to UI_DRAWN where the bodies are
+            // built, so the spacing between the X and the square under it stays
+            // proportional. The two must be changed together.
+            const uSz = 84 * pitScale * 1.2 * upp * 0.75; // main pit: BIG * 1.2
             const m = 16 * upp;
             const vbWr = aspect >= 1 ? SIZE * aspect : SIZE;
             const vbHr = aspect >= 1 ? SIZE : SIZE / aspect;
@@ -7815,9 +7839,17 @@ export default function BreedTree({
                     // wide. Stroke 2 to 3 and forced to true black; .autoLabel's
                     // navy stays on desktop. paint-order is stroke, so the fill
                     // covers half the width and 3 reads as a 1.5px outline.
+                    /* 25% off with the square, 2 September 2026: 16 -> 12 and
+                       24 -> 18, stroke 3 -> 2.25 and 2 -> 1.5. THIS IS THE SAME
+                       MISS AS THE PLAY AND LEARN WORDS. Those were flat numbers
+                       too, stayed at full size when their squares shrank, and had
+                       to be corrected in a second pass. A caption is read against
+                       the thing it labels, so it moves with it.
+                       For the record, the UI_DRAWN comment says this caption
+                       "appears nowhere in this repo". It is right here. */
                     style={{
-                      fontSize: `${(isMobile ? 16 : 24) * upp}px`,
-                      strokeWidth: `${(isMobile ? 3 : 2) * upp}px`,
+                      fontSize: `${(isMobile ? 12 : 18) * upp}px`,
+                      strokeWidth: `${(isMobile ? 2.25 : 1.5) * upp}px`,
                       stroke: isMobile ? "#000000" : undefined,
                     }}
                   >
@@ -7863,9 +7895,22 @@ export default function BreedTree({
                screenshot. The words carry their own 0.75 now, further down. */
             const SQ = 84 * pitScale * 1.2 * upp * 0.75;
             const SQ_GAP = 16 * upp;
+            /* DOWN 10px, 2 September 2026 (owner), to use the room the 25%
+               shrink left underneath.
+               MEASURED, not picked: the squares came down 16.9 CSS px and shrank
+               around their centre, so the bottom edge rose 8.4. Ten puts it back
+               where it was with a little over. The floor strip starts about 20px
+               below the old bottom edge, so 16 is the ceiling here before the
+               squares touch it.
+               The captions ride on w.y, so "play" and "learn" come down with the
+               squares and the gap between the two is untouched.
+               The LEVEL NUMBER does not move: it carries its own +20 and sits on
+               a line you have already signed off. The two are now 10 apart rather
+               than 20. */
+            const ROW_DROP = 10 * upp;
             const words: { key: "learn" | "start"; label: string; x: number; y: number; anchor: "start" | "end" }[] = [
-              { key: "start", label: "PLAY", x: xMinC + m, y: vbHc * WORD_START_Y, anchor: "start" },
-              { key: "learn", label: "LEARN", x: xMinC + m + SQ + SQ_GAP, y: vbHc * WORD_START_Y, anchor: "start" },
+              { key: "start", label: "PLAY", x: xMinC + m, y: vbHc * WORD_START_Y + ROW_DROP, anchor: "start" },
+              { key: "learn", label: "LEARN", x: xMinC + m + SQ + SQ_GAP, y: vbHc * WORD_START_Y + ROW_DROP, anchor: "start" },
             ];
             return words.map((w) => (
               <g
