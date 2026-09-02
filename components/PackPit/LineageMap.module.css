@@ -826,8 +826,25 @@
    Sits after .overlay so it wins, and before .overlayFocus so a chum drag
    still darkens further. Do NOT fold this into .overlay: that class also
    serves the main pit lineage, which must not change. */
+/* 2 September 2026: the wash moved off this class to .chumWash, for the same
+   reason .overlayStrong lost its own. This layer is now scaled to 0.8, and a
+   transform shrinks the painted background with the contents, leaving a band of
+   bare pit all the way round. */
 .overlayChum {
+  background: none;
+}
+
+/* THE CHUM TREE'S BACKGROUND WASH, a sibling of the overlay rather than the
+   overlay itself. Verbatim the gradient .overlayChum used to carry. Same z-index
+   and the same reason as .liftWash above: a fixed-position CHILD of a
+   transformed element resolves against that element and would scale with it. */
+.chumWash {
+  position: fixed;
+  inset: 0;
+  z-index: 59;
+  pointer-events: none;
   background: radial-gradient(120% 120% at 50% 40%, rgba(20, 151, 214, 0.44), rgba(12, 91, 146, 0.92));
+  animation: lm-fade 0.2s ease;
 }
 
 /* mini pit: overlay close matches the in-pit menu squares (navy, yellow stroke) */

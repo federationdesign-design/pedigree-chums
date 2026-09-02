@@ -2105,7 +2105,8 @@ export default function LineageMap({
     <>
     {/* The lift's wash, OUTSIDE the scaled overlay. See .liftWash for why it
         cannot live on the overlay any more. */}
-    {circular && <div className={styles.liftWash} aria-hidden="true" />}
+    {circular && !bounded && <div className={styles.liftWash} aria-hidden="true" />}
+    {strongBg && !circular && !bounded && <div className={styles.chumWash} aria-hidden="true" />}
     <div
       ref={overlayRef}
       // BACKGROUND: the chum family tree is back on the faint brand wash.
@@ -2135,12 +2136,22 @@ export default function LineageMap({
          getBoundingClientRect and getScreenCTM, which are what the pan, the drag
          and the frame drop all read, so nothing needs a matching adjustment.
 
-         circular only. The main pit and the bounded chum tree are untouched.
+         BOTH LIFT LAYERS, not just circular. This first shipped as circular only
+         and nothing looked any smaller: circular is the dog lifted OUT OF THE
+         PIT, while the screen with the frames, the tree and the "x more" button
+         on a chum like the Beagle is the CHUM'S OWN family tree, which BreedTree
+         passes with `strongBg` and circular false. Two instances, two flags.
+
+         THE MAIN PIT IS NOT AFFECTED. PackPit's own LineageMap passes neither
+         flag, and strongBg is set nowhere but BreedTree, so this reaches the two
+         lift layers and nothing else. `bounded` is the chums2 display tree and is
+         excluded outright: it fits its viewBox to its container, so a scale there
+         would be undone by the refit.
 
          NOT 3D. The handover records that perspective, backface-visibility and
          transform-style anywhere in this tree break the SVG stacking. A plain 2D
          scale is not on that list and does not create a 3D context. */
-      style={circular ? { transform: "scale(0.8)", transformOrigin: "50% 50%" } : undefined}
+      style={(circular || strongBg) && !bounded ? { transform: "scale(0.8)", transformOrigin: "50% 50%" } : undefined}
       onClick={closeIfTap}
       onPointerDown={onPanDown}
       onPointerMove={onPanMove}
