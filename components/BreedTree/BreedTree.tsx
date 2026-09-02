@@ -6473,14 +6473,27 @@ export default function BreedTree({
         `.levelFloor x/w ${r(fl?.getBoundingClientRect().left)} / ${r(fl?.getBoundingClientRect().width)}`,
         `img natural w   ${r(fl?.naturalWidth)}`,
         `img client  w   ${r(fl?.clientWidth)}`,
+        `img offset  w   ${r(fl?.offsetWidth)}`,
+        `img css     w   ${fl ? getComputedStyle(fl).width : "-"}`,
+        `.level css  w   ${lv ? getComputedStyle(lv).width : "-"}`,
         `dpr             ${r(window.devicePixelRatio)}`,
       ].join("\n"));
     };
-    const id = window.setTimeout(read, 300); // after the level layer has mounted
+    /* POLLED, NOT A SINGLE SHOT. The first version of this read once at 300ms and
+       every element line came back "-": the .level layer is gated on
+       dockAside && gravity && levelTheme and had not mounted yet, so both refs
+       were still null and the readout measured nothing.
+       Four times a second, giving up after 40 tries, so it cannot poll for ever
+       if the layer never appears. */
+    let tries = 0;
+    const id = window.setInterval(() => {
+      read();
+      if (++tries > 40) window.clearInterval(id);
+    }, 250);
     window.addEventListener("resize", read);
     window.visualViewport?.addEventListener("resize", read);
     return () => {
-      window.clearTimeout(id);
+      window.clearInterval(id);
       window.removeEventListener("resize", read);
       window.visualViewport?.removeEventListener("resize", read);
     };
@@ -8588,7 +8601,16 @@ export default function BreedTree({
             src={levelTheme.floor}
             alt=""
             draggable={false}
-            style={{ bottom: `${floorArtBottomPx()}px` }}
+            /* REMOVE BEFORE LAUNCH, ?floorbox=1: a magenta outline on the IMG BOX.
+               THIS IS THE WHOLE TEST, and it beats the numbers.
+                 outline full width, wood inset -> the SVG is not painting to its
+                   own viewBox edges in Safari, and the fix is in the asset
+                 outline inset too -> it is layout, and the numbers above say
+                   which box is short */
+            style={{
+              bottom: `${floorArtBottomPx()}px`,
+              ...(floorDiag ? { outline: "2px solid #ff00ff", outlineOffset: "-2px" } : null),
+            }}
           />
         </div>
       )}
