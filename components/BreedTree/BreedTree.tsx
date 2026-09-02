@@ -3174,6 +3174,24 @@ export default function BreedTree({
     // (the pattern def, hasImg/tint, and the circle fill) all fall through to the
     // solid fillFor colour. Traditional diagram look, no photos at any depth.
     if (hideCircleImages) return undefined;
+    /* NO PICTURES ONCE THE PIT IS LIVE, 2 September 2026 (owner). The circles
+       drop and are played as plain coloured discs; the photograph is what you get
+       for lifting one out onto the learn layer, where it is framed.
+
+       `dropped` is the flag rather than `started` or `falling`: it is set in the
+       same breath as the drop begins (see setDropped, "names disappear, physics
+       badges appear"), so the pictures go at the moment the circles start to
+       fall and not a beat before or after.
+
+       THE START SCREEN AND THE LEARN AREA ARE UNTOUCHED. Both are read before
+       the drop, so dropped is false and the photographs show as they always did.
+
+       THE LIFTED CARD IS UNAFFECTED, and that is by construction rather than by
+       luck: setLearnCard reads d.data.img DIRECTLY at both of its call sites, not
+       through this function, so the card carries its picture out of a pit that is
+       showing none. If that ever changes to read nodeImg, this rule would blank
+       the lifted card too. */
+    if (dropped) return undefined;
     return d.depth === 0 ? rootImage ?? d.data.img : d.data.img;
   }
   function fillFor(d: Node): string {
