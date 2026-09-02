@@ -587,6 +587,19 @@ const CHUM_BAND: Record<string, number> = { small: 5 / 6, medium: 1, large: 4 / 
    Depths 1 and 2 are both yellow and 3 and 4 are both blue, which is the owner's
    scheme; a child ring sitting inside its parent will read as the same colour. */
 const RING_PALETTE = ["#fff200", "#ffdf00", "#009fe0", "#36b8ff"];
+/* THE PIT QUESTION MARK, 2 September 2026 (owner). A circle in the live pit shows
+   this instead of its photograph; the picture is what you get for lifting it out.
+
+   INLINED, not loaded as an <image>. questionmark-minipit.svg is a single <path>
+   with no fill of its own, so pasting the geometry here means it can be coloured
+   with a plain fill attribute and costs no network request. The file stays in
+   public/ as the source of truth: if it is redrawn, this string is regenerated
+   from it, not edited by hand.
+
+   The viewBox is 720 square, so the artwork is centred on 360,360 and scaled
+   against that. */
+const QMARK_VB = 720;
+const QMARK_PATH = "M417.6,658.1c-5.3,11.8-12.3,22.1-21.1,30.9-8.8,8.8-19.1,15.8-30.9,20.9-11.8,5.1-24.3,7.7-37.6,7.7s-26.3-2.6-38.1-7.7c-11.8-5.1-22.1-12.1-30.9-20.9-8.8-8.8-15.8-19.1-20.9-30.9-5.1-11.8-7.7-24.4-7.7-38.1s2.6-26,7.7-38.1c5.1-12.1,12.1-22.5,20.9-31.3,8.8-8.8,19.1-15.9,30.9-21.1,11.8-5.3,24.4-7.9,38.1-7.9s25.8,2.6,37.6,7.9c11.8,5.3,22.1,12.3,30.9,21.1,8.8,8.8,15.9,19.3,21.1,31.3,5.3,12.1,7.9,24.8,7.9,38.1s-2.6,26.3-7.9,38.1ZM596.8,311.9c-8.4,17.8-19,32.4-32,43.9-13,11.5-27.6,21.1-43.6,28.8-16.1,7.7-31.8,16.2-47.1,25.3-15.3,9.1-29.4,20.4-42.3,33.7-12.8,13.3-22.7,31.3-29.5,53.9h-156.9c-2.2-32.8-.3-60.3,5.6-82.4,5.9-22.1,13.8-40.5,23.9-55.3,10.1-14.7,21.4-26.6,33.9-35.8,12.5-9.1,24.8-17,36.7-23.7,11.9-6.7,22.4-13.1,31.6-19.3,9.1-6.2,15.4-13.9,18.8-23.2,2.2-5.6,2.8-12,1.9-19.3-.9-7.3-4.1-14.2-9.5-20.7-5.4-6.5-13.5-12-24.1-16.5-10.7-4.5-24.5-6.7-41.6-6.7s-24.4,1-39.7,3c-15.3,2-31.3,5.1-48.1,9.3-16.7,4.2-33.2,9.3-49.4,15.3-16.3,6-30.9,12.9-43.9,20.7l-20.4-182c11.4-6.8,24.4-13.8,38.8-21.1,14.4-7.3,30.3-13.8,47.6-19.5,17.3-5.7,36.2-10.4,56.6-14.2,20.4-3.7,42.4-5.6,65.9-5.6,38.1,0,74.1,5.3,107.9,15.8,33.9,10.5,63.5,26,88.9,46.4,25.4,20.4,45.5,45.6,60.4,75.4,14.9,29.9,22.3,64.2,22.3,102.8s-4.2,53-12.5,70.8Z";
 // stickBig is the same artwork half again as large, so the pair reads as two
 // sticks of different sizes rather than one drawn twice
 type ToyKind = "ball" | "flag" | "stick" | "stickBig" | "rock" | "ballPink" | "cookies" | "bone"
@@ -3529,6 +3542,28 @@ export default function BreedTree({
         // The radius is scaled by the view but the stroke was not, so a circle
         // drawn small kept a full-size ring and read as heavy. Scale both.
         c.setAttribute("stroke-width", String(strokeWidthFor(d) * strokeK(v)));
+      }
+      /* THE QUESTION MARK follows its circle. Shown only once the pit is live and
+         only where a circle is actually drawn, so a depth-1 dog, which the pit
+         draws as its NAME rather than as a circle, never gets one.
+
+         fellRef, not the `dropped` React state: this writer runs inside the
+         physics loop, which holds an older closure, so state read here can be a
+         frame or two stale. Every other decision in this function reads the ref
+         for the same reason.
+
+         Sized at 0.9 of the circle's RADIUS across, which is 45% of the disc, and
+         centred on the artboard's own 360,360 rather than on 0,0. The scale is
+         recomputed each frame from drawR, so the mark tracks the view zoom and
+         the difficulty slider exactly as the circle does. */
+      const q = wrap?.children[2] as SVGGElement | undefined;
+      if (q) {
+        const showQ = fellRef.current && !isWordNode && c?.getAttribute("display") !== "none";
+        q.setAttribute("display", showQ ? "inline" : "none");
+        if (showQ) {
+          const sc = (drawR(d, v, k) * 0.9) / QMARK_VB;
+          q.setAttribute("transform", `translate(${tx},${ty}) scale(${sc}) translate(${-QMARK_VB / 2},${-QMARK_VB / 2})`);
+        }
       }
       const l = wrap?.children[1] as SVGGElement | undefined;
       if (l) {
@@ -7462,10 +7497,27 @@ export default function BreedTree({
                   )}
                 </g>
               );
+              /* THE QUESTION MARK, children[2] of the node group.
+
+                 APPENDED AFTER THE LABEL ON PURPOSE. The per-frame writer
+                 addresses this group by index, children[0] the circle and
+                 children[1] the label, so anything inserted BEFORE them would
+                 silently move the circle and the label onto each other's
+                 transforms. Added last, both keep their index.
+
+                 Born hidden with no transform. The writer decides every frame
+                 whether it shows and where it sits, and a mark drawn before that
+                 first pass would flash at the origin. */
+              const qmarkEl = (
+                <g data-qmark style={{ display: "none", pointerEvents: "none" }} aria-hidden="true">
+                  <path d={QMARK_PATH} fill="var(--navy, #0a3a57)" />
+                </g>
+              );
               return (
                 <g key={i}>
                   {circleEl}
                   {labelEl}
+                  {qmarkEl}
                 </g>
               );
             })}
