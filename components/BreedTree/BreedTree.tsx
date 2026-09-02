@@ -3558,8 +3558,22 @@ export default function BreedTree({
          the difficulty slider exactly as the circle does. */
       const q = wrap?.children[2] as SVGGElement | undefined;
       if (q) {
-        const showQ = fellRef.current && !isWordNode && c?.getAttribute("display") !== "none";
-        q.setAttribute("display", showQ ? "inline" : "none");
+        /* IT NEVER SHOWED, and this is why. The group is rendered with an inline
+           STYLE of display none, and this line set the display ATTRIBUTE. CSS
+           beats presentation attributes, so the attribute was overridden on every
+           frame and the mark stayed hidden from the moment it shipped. Writing
+           q.style.display is the fix: same property, same cascade level.
+
+           It also hides with a LIFTED OR COLLECTED dog. That circle is taken out
+           of view with opacity 0 rather than display none (see heldHidden on the
+           circle), so checking display alone left the mark floating over an empty
+           space where the dog used to be. */
+        const showQ =
+          fellRef.current &&
+          !isWordNode &&
+          c?.getAttribute("display") !== "none" &&
+          c?.style.opacity !== "0";
+        q.style.display = showQ ? "inline" : "none";
         if (showQ) {
           const sc = (drawR(d, v, k) * 0.9) / QMARK_VB;
           q.setAttribute("transform", `translate(${tx},${ty}) scale(${sc}) translate(${-QMARK_VB / 2},${-QMARK_VB / 2})`);
