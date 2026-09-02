@@ -671,8 +671,17 @@
   /* Top padding bumped 2026-08-12 (96->148 min) so the ROUND WON group clears the
      absolutely-positioned chum-rate block (top:24px, ~110px tall) it used to
      overlap on mobile. Desktop overrides padding-top to 16vh below, so this is a
-     mobile-only shift. */
-  padding: clamp(148px, 30vw, 180px) clamp(14px, 3vw, 26px) clamp(118px, 28vw, 180px);
+     mobile-only shift.
+
+     148 -> 205, 2 September 2026 (owner), and MEASURED off a screenshot rather
+     than guessed. The corner block is no longer ~110px tall: the Run total added
+     a second rate stack, taking it to 188px from the top of the screen on a
+     402px viewport. Shortening the detail line to one line brings that back to
+     about 177. The score is rotated -7deg, which lifts its right end another
+     20px, so 177 + 20 + 8 of clearance is 205.
+     IF THE CORNER BLOCK EVER GAINS A THIRD STACK, this number is wrong again.
+     It is a hand-measured clearance, not a layout that adapts. */
+  padding: clamp(205px, 30vw, 215px) clamp(14px, 3vw, 26px) clamp(118px, 28vw, 180px);
   overflow: hidden;
   text-align: center;
 }
@@ -682,7 +691,10 @@
 .winTop {
   position: absolute;
   top: 24px;
-  left: 30px;
+  /* 30 -> 20, 2 September 2026 (owner): the tick moves 10px further left. Only
+     the LEFT edge moves; the right edge keeps its own clamp, so the chum rate
+     column in the corner does not shift with it. */
+  left: 20px;
   right: clamp(14px, 3vw, 26px);
   display: flex;
   align-items: flex-start;
@@ -822,7 +834,10 @@
   display: grid;
   place-items: center;
   min-height: 3.4em;
-  margin: 2px 0 6px;
+  /* Top margin 2 -> 16, 2 September 2026 (owner): the era line moves down. This
+     is EXTRA gap on top of the 57px the whole column already gained from
+     .winWrap above, since everything here is one flex stack. */
+  margin: 16px 0 6px;
   z-index: 2;
 }
 
@@ -902,13 +917,24 @@
      pushed to the foot of the column, which put it down by the dog's feet. */
   font-family: var(--font-body, Montserrat, system-ui);
   font-weight: 600;
+  /* Down 14, 2 September 2026 (owner). Put on the LEAD rather than on the name,
+     so the pair moves together and the gap between the two lines is unchanged.
+     Desktop sets margin: 0 on this rule, so the phone moves and desktop, where
+     this line is absolutely positioned above the button, does not. */
+  margin-top: 14px;
   font-size: clamp(0.95rem, 3.2vw, 1.3rem);
   color: #ffffff;
   z-index: 2;
 }
 .winNextName {
   font-family: var(--font-display, "Luckiest Guy", system-ui);
-  font-size: clamp(2.6rem, 13vw, 6.2rem);
+  /* 23% OFF, 2 September 2026 (owner): 2.6 -> 2, 13vw -> 10vw, 6.2 -> 4.8.
+     The shrink is not only cosmetic. A two-line name at 13vw is about 105px
+     tall on a phone, and the column had roughly 69px of slack above the Next
+     Level button before this pass. Taking 23% off the name pays for most of the
+     57px the score moved down. Desktop only overrides this rule's position, not
+     its size, so the name comes down there too. */
+  font-size: clamp(2rem, 10vw, 4.8rem);
   line-height: 1;
   color: #ff2d95;
   text-transform: uppercase;

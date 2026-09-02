@@ -795,8 +795,7 @@ export default function LineageModal({ name, image, character, lineage, fromRect
                         {Math.min(100, Math.round((collectedChums.size / packSize) * 100))}%
                       </span>
                       <span className={css.winRateDetail}>
-                        {collectedChums.size} found from potentially{" "}
-                        {Math.max(packSize, collectedChums.size)} chums
+                        {collectedChums.size} of {Math.max(packSize, collectedChums.size)} chums found
                       </span>
                     </span>
                   )}
@@ -917,8 +916,7 @@ export default function LineageModal({ name, image, character, lineage, fromRect
                     {Math.min(100, Math.round((collectedChums.size / packSize) * 100))}%
                   </span>
                   <span className={css.endRoundDetail}>
-                    {collectedChums.size} found from potentially{" "}
-                    {Math.max(packSize, collectedChums.size)} chums
+                    {collectedChums.size} of {Math.max(packSize, collectedChums.size)} chums found
                   </span>
                 </div>
               )}
