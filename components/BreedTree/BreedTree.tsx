@@ -686,6 +686,34 @@ function retireToyForever(key: string) {
   try { localStorage.setItem(key, "1"); } catch { /* private mode */ }
 }
 const PERMANENT_TOYS: string[] = ["flag"];
+
+/* GIVE THE TOYS BACK, 2 September 2026 (owner).
+
+   THE RULE IS PROGRESS, NOT TIME. A thrown ball is spent for the rest of the
+   level you are on and for every level after it, because clearing a level is
+   progress and you spent the ball getting there. FAILING a level is not progress,
+   so a retry hands the set back, and so does a fresh run after a game over.
+
+   That is the third scope this has had, and the first two were both wrong in the
+   same direction. Per MOUNT gave the toys back on every level and every retry,
+   which made throwing one out meaningless. Per SESSION kept them gone across a
+   game over and out to the end of the tab, which was further than "future
+   levels" ever meant.
+
+   Exported so the page can call it from the two places that already mean "start
+   again": onStartOver, the retry, and onResetRun, the fresh run. The key names
+   stay private to this file.
+
+   THE FLAG IS NOT INCLUDED. It lives in localStorage and is retired for good,
+   because it carries a message that only needs reading once and starting again
+   does not make it unread. The pink ball's throw counter IS included, or the ball
+   would return already drained of colour and die on its next throw. */
+export function resetToys() {
+  try {
+    for (const k of Object.values(TOY_GONE_KEY)) sessionStorage.removeItem(k);
+    sessionStorage.removeItem(TOY_BALL_PINK_THROWS_KEY);
+  } catch { /* private mode */ }
+}
 // ?toys=reset un-retires every toy on load, so a testing session does not have
 // to reach for the browser console. sessionStorage is per tab and survives a
 // reload, so once you have thrown the ball clear or read the flag's message

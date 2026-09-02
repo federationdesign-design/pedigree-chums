@@ -8,6 +8,7 @@ import { breeds as packBreeds } from "../../data/breeds";
 import { getLineage, type LineageNode } from "../../data/lineage";
 import { resolveLineageName } from "../../data/lineageNames";
 import LineageModal from "../../components/LineageModal/LineageModal";
+import { resetToys } from "../../components/BreedTree/BreedTree";
 import { useLeaveDialog } from "../../components/OutboundLink/LeaveDialogProvider";
 import styles from "./history.module.css";
 import { sourcesFor } from "../../data/breedSources";
@@ -507,6 +508,9 @@ export default function BreedStrip({
         setBankedScore(0); // a fresh run has nothing banked either
         setChumTallies([]);
         setChumCounts({});
+        // A fresh run is a fresh set of toys. See resetToys in BreedTree: they
+        // are spent by PROGRESS, and a game over is the opposite of progress.
+        resetToys();
       }}
       onStartOver={() => {
         // A retry costs a life and replays THIS level. It used to rebuild
@@ -524,6 +528,10 @@ export default function BreedStrip({
         // would not remount and the round would not reset. The run counter
         // is what forces it.
         setRunKey((k) => k + 1);
+        // AND THE TOYS COME BACK, because a retry is not progress. Throwing a
+        // ball out costs it for the rest of the level and for every level you go
+        // on to clear; it does not cost it for an attempt you failed.
+        resetToys();
       }}
       levelNo={Math.max(0, levelList.findIndex((b) => b.name === active.name))}
       name={active.name}
