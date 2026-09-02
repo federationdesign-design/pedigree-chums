@@ -588,6 +588,30 @@ export default function LineageMap({
   const pctTimer = useRef<number | null>(null); // closes the % box a beat after the cursor leaves /* pct-close */
   const pctClose = () => { if (pctTimer.current) window.clearTimeout(pctTimer.current); pctTimer.current = window.setTimeout(() => { setPctHover(null); pctTimer.current = null; }, 600); };
   const pctKeep = () => { if (pctTimer.current) { window.clearTimeout(pctTimer.current); pctTimer.current = null; } };
+  /* THE % EXPLAINER'S OWN SIZE, measured after it renders rather than guessed.
+     It has to be clamped to the screen, and its height depends on how many
+     generations the breed lists, which is not knowable up front: maxWidth is 288
+     but the box can be anywhere from about 120 to 500 tall. So it is drawn once,
+     measured, and the clamp applies on the render after that. The first frame is
+     drawn with the raw anchor, which is what it always did. */
+  const pctBoxRef = useRef<HTMLDivElement>(null);
+  const [pctSize, setPctSize] = useState<{ w: number; h: number } | null>(null);
+  useEffect(() => {
+    /* Measured in a rAF, not synchronously. Two reasons and both matter: the box
+       has to have been laid out before it can be measured, and a synchronous
+       setState inside an effect is a lint error in this file's config. */
+    const id = requestAnimationFrame(() => {
+      if (!pctHover) { setPctSize(null); return; }
+      const el = pctBoxRef.current;
+      if (!el) return;
+      /* offsetWidth/offsetHeight, NOT getBoundingClientRect. The overlay carries a
+         0.8 scale on the lift layers and the rect reports the SCALED size, while
+         `left` and `top` below are written in the overlay's own unscaled space.
+         The offset pair is unscaled, so the two agree with no correction. */
+      setPctSize({ w: el.offsetWidth, h: el.offsetHeight });
+    });
+    return () => cancelAnimationFrame(id);
+  }, [pctHover]);
   useEffect(() => setPctHover(null), [breed.name]);
   const infoSeen = useRef<Set<string>>(new Set()); // cards whose info tooltip has already paid out its +2, so it pays once
   useEffect(() => setInfoHover(null), [breed.name]);
@@ -3057,8 +3081,35 @@ export default function LineageMap({
       {pctHover && (() => {
         const c = pickCards.find((x) => x.id === pctHover);
         if (!c) return null;
-        const left = c.cardX - CW / 2 + pan.x;
-        const top = c.cardY + CW / 2 + 6 + pan.y;
+        /* CLAMPED TO THE SCREEN, 2 September 2026 (owner).
+
+           It used to be exactly the two lines below with nothing after them: the
+           panel was pinned to the card's left edge, dropped 6px under it, and
+           rendered with no check against the viewport at all. A card in the
+           right-hand column therefore always ran off the side, and a tall panel
+           on a low card always ran off the bottom. It has been that way from the
+           start; the 20% shrink simply moved more cards near the edges.
+
+           BOTH AXES, and the vertical one FLIPS rather than clamps: sliding a
+           panel up until it fits would cover the card it belongs to, so when
+           there is no room below it is placed above instead, and only clamped if
+           it fits neither way.
+
+           pctSize is null on the very first frame, before the box has been
+           measured, so the raw anchor is used exactly as before and the clamp
+           takes effect on the next render. */
+        const M = 8;                       // keep-off margin from every edge
+        const bw = pctSize?.w ?? 288;      // 288 is the maxWidth set below
+        const bh = pctSize?.h ?? 0;
+        let left = c.cardX - CW / 2 + pan.x;
+        let top = c.cardY + CW / 2 + 6 + pan.y;
+        if (pctSize) {
+          left = Math.max(M, Math.min(left, vp.w - bw - M));
+          if (top + bh > vp.h - M) {
+            const above = c.cardY - CW / 2 - 6 - bh + pan.y;
+            top = above >= M ? above : Math.max(M, vp.h - bh - M);
+          }
+        }
         const info = breedMix.get(c.img);
         const genLabel = (d: number) => {
           if (d <= 0) return "the breed itself";
@@ -3087,6 +3138,7 @@ export default function LineageMap({
         const multi = apps.length > 1;
         return (
           <div
+            ref={pctBoxRef}
             onMouseEnter={pctKeep}
             onMouseLeave={pctClose}
             style={{
