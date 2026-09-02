@@ -691,10 +691,18 @@
   transition: transform 0.14s cubic-bezier(0.2, 1.4, 0.4, 1);
   transform-origin: center;
 }
-/* Held: twice the size, so the thumb stays visible under a fingertip. Scaled
-   rather than resized, so the centre stays exactly on the level it points at. */
+/* Held: bigger, so the thumb stays visible under a fingertip. Scaled rather than
+   resized, so the centre stays exactly on the level it points at.
+
+   2 -> 1.5, 2 September 2026 (owner). The thumb is 38px, so this was 76px held.
+   THE THUMB DID NOT CHANGE TODAY, THE TRACK DID: the slider was halved in
+   length, and a 76px disc that read as a firm grip on a full-length track reads
+   as swallowing a half-length one. The doubling was sized against the old track,
+   not the new one.
+   1.5 gives 57px, still well over the 44px tap target, and the hover state below
+   stays at 1.25 so the two remain distinguishable. */
 .diffThumbBig {
-  transform: scale(2);
+  transform: scale(1.5);
 }
 @media (prefers-reduced-motion: reduce) {
   .diffThumb { transition: none; }

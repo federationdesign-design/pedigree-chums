@@ -8405,12 +8405,12 @@ export default function BreedTree({
             /* 50 -> 14, 2 September 2026 (owner): the slider sits much closer to
                PLAY. 14 is the gap the pit's own squares stack with, so the track
                now rests the same distance off the button as the buttons rest off
-               each other.
+               each other. Then 14 -> 4 the same evening, another 10px down.
                50 was set when the start-screen CAPTION sat ABOVE the square and
                the gap had to clear a word as well as the button. The captions
                moved below the squares earlier today, so that clearance is now
                protecting nothing. */
-            const BOTTOM_GAP = 14;   // slider-bottom -> PLAY-top
+            const BOTTOM_GAP = 4;    // slider-bottom -> PLAY-top
             const MIN_H = 60;        // usable slider length; the TOP gap gives on a short screen to hold this. HALVED with the track below
             const rect = st ? st.getBoundingClientRect() : null;
             // Profile-image bottom in stage px; falls back to the old top area until
