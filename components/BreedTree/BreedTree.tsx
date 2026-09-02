@@ -3182,9 +3182,13 @@ export default function BreedTree({
          depth 2 for exactly that reason. Recorded as the owner's call, not an
          oversight to be quietly corrected.
 
-         Depth 4 is now black where it was white, so a ring at that depth over a
-         dark photograph is the case to look at first if one goes missing. */
-      const base = ["#fff200", "#ffdf00", "#009fe0", "#000000"][(d.depth - 1 + 4) % 4];
+         Depth 4 was #000000 for one commit and is now #36b8ff, a lighter blue.
+
+         NOTE DEPTHS 3 AND 4 ARE NOW BOTH BLUE, #009fe0 and #36b8ff. The same
+         caution as the pair above: adjacent depths that share a hue read as one
+         colour where one circle sits inside the other. Two yellows then two
+         blues is the owner's scheme, recorded as chosen. */
+      const base = ["#fff200", "#ffdf00", "#009fe0", "#36b8ff"][(d.depth - 1 + 4) % 4];
       // The circle the player is reading keeps its DEPTH colour, so it can
       // never collide with a same-depth sibling. It is lifted in BRIGHTNESS
       // only: same hue, same width, just lighter.
