@@ -299,7 +299,13 @@
 /* Countdown of yellow circles still to turn blue, sat top-centre of the tree. */
 .dotCount {
   position: fixed;
-  top: 26px;
+  /* DOWN FROM 26, 2 September 2026 (owner): it sat under the level's own profile
+     portrait in the top left. That portrait starts at top 12 and is 40.32 tall on
+     a phone, so its bottom edge is 52.3; 66 clears it by about 14. Not a guess: if
+     the portrait's --tp changes, this is 12 + tp + 14.
+     BOTH COUNTERS carry it. Only one is on screen at a time, but they share this
+     corner and must not disagree. */
+  top: 66px;
   left: clamp(16px, 3.5vw, 40px);
   z-index: 6;
   padding: 5px 18px;
@@ -663,7 +669,13 @@
 /* frames-filled counter, top-left, same chip as the circle counter */
 .frameCount {
   position: fixed;
-  top: 26px;
+  /* DOWN FROM 26, 2 September 2026 (owner): it sat under the level's own profile
+     portrait in the top left. That portrait starts at top 12 and is 40.32 tall on
+     a phone, so its bottom edge is 52.3; 66 clears it by about 14. Not a guess: if
+     the portrait's --tp changes, this is 12 + tp + 14.
+     BOTH COUNTERS carry it. Only one is on screen at a time, but they share this
+     corner and must not disagree. */
+  top: 66px;
   left: clamp(16px, 3.5vw, 40px);
   z-index: 6;
   padding: 5px 18px;
@@ -855,11 +867,16 @@
   /* The pit draws its own squares 18px in from the top and right edges. This
      inherits top 33 from .close, which at 67.5 tall put its centre 15px below
      the pit's, which is exactly the offset that was visible. */
+  /* SIZED TO THE PIT'S CORNER SQUARE, and it had drifted. That square came down
+     25% on 2 September, 100.8 -> 75.6 on desktop and 67.5 -> 50.6 on a phone, and
+     this button was left on the old figures, so the back button was half again the
+     size of the X it is meant to match. These are the same numbers .learnDockBtn
+     carries in BreedTree.module.css. Change the square and change all three. */
   top: 18px;
   right: 18px;
-  width: 100.8px;
-  height: 100.8px;
-  border-radius: 30.24px;
+  width: 75.6px;
+  height: 75.6px;
+  border-radius: 22.68px;
   background: var(--yellow);
   border: 5px solid var(--navy);
   color: var(--navy);
@@ -871,10 +888,10 @@
 }
 @media (max-width: 768px) {
   .closeCircular {
-    width: 67.5px;
-    height: 67.5px;
-    border-radius: 20.25px;
-    font-size: 2.1rem;
+    width: 50.6px;
+    height: 50.6px;
+    border-radius: 15.18px;
+    font-size: 1.6rem;
   }
 }
 
