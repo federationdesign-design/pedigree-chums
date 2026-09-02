@@ -7853,9 +7853,14 @@ export default function BreedTree({
             /* 25% OFF, 2 September 2026 (owner). The gap is left at 16 on
                purpose: it is a fixed separation between two controls, not a
                part of either one, and scaling it too would pull the pair in
-               tighter than a straight shrink. Everything else on the start
-               screen reads SQ (the hit rect, the drawn square, the glyph, the
-               caption), so they all come down together. */
+               tighter than a straight shrink.
+
+               CORRECTION, same day. This comment used to claim the CAPTION came
+               down with the square. IT DOES NOT. The hit rect, the drawn square
+               and the glyph all read SQ, but the "play" and "learn" words below
+               are a flat `24 * upp` and were left at full size, so the words
+               ended up 66px tall against a 90px square. Measured off a
+               screenshot. The words carry their own 0.75 now, further down. */
             const SQ = 84 * pitScale * 1.2 * upp * 0.75;
             const SQ_GAP = 16 * upp;
             const words: { key: "learn" | "start"; label: string; x: number; y: number; anchor: "start" | "end" }[] = [
@@ -7954,12 +7959,20 @@ export default function BreedTree({
                   textAnchor="middle"
                   dominantBaseline="text-after-edge"
                   // 31 Aug 2026, MOBILE ONLY: stroke 2 to 4 and forced to true
-                  // black. Size stays 24. .autoLabel sets paint-order: stroke, so
-                  // the fill paints over half the width and 4 reads as a 2px
-                  // outline. Desktop keeps the 2px navy it has now.
+                  // black. .autoLabel sets paint-order: stroke, so the fill
+                  // paints over half the width and 4 reads as a 2px outline.
+                  // Desktop keeps the 2px navy it has now.
+                  //
+                  // 2 September 2026 (owner): 25% off, 24 -> 18, to match the
+                  // squares. THE STROKE COMES DOWN WITH IT, 4 -> 3 and 2 -> 1.5.
+                  // An outline is read relative to the letter it wraps, so
+                  // holding the stroke while shrinking the type would have made
+                  // the words look heavier, not smaller.
+                  // These are flat numbers rather than a fraction of SQ, which
+                  // is why they did not follow the squares down on their own.
                   style={{
-                    fontSize: `${24 * upp}px`,
-                    strokeWidth: `${(isMobile ? 4 : 2) * upp}px`,
+                    fontSize: `${18 * upp}px`,
+                    strokeWidth: `${(isMobile ? 3 : 1.5) * upp}px`,
                     stroke: isMobile ? "#000000" : undefined,
                   }}
                 >
