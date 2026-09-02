@@ -4182,13 +4182,22 @@ export default function BreedTree({
         const ux = v[0] + (xMinF + vbWf - m - uSz / 2 + UI_NUDGE_X) / k;
         uiBodiesRef.current = [
           { x: ux, y: v[1] + (-vbHf / 2 + m + uSz / 2 + UI_NUDGE_Y) / k, vx: 0, vy: 0, r: UI_HIT_R, half: uSz / 2, a: 0, va: 0, fixed: true, hits: 0, kind: "close" },
-          /* UI_GAP is the space between the close X and the square under it.
-             Was 14px, now 4px (owner, 1 September 2026: "back to right below the
-             X"). The desc and learn squares share this slot, only one of them
-             showing at a time, so they carry the same figure and must be
-             changed together. */
-          { x: ux, y: v[1] + (-vbHf / 2 + m + uSz / 2 + UI_DRAWN + UI_GAP + UI_NUDGE_Y) / k, vx: 0, vy: 0, r: UI_HIT_R, half: uSz / 2, a: 0, va: 0, fixed: true, hits: 0, kind: "desc" },
-          { x: ux, y: v[1] + (-vbHf / 2 + m + uSz / 2 + UI_DRAWN + UI_GAP + UI_NUDGE_Y) / k, vx: 0, vy: 0, r: UI_HIT_R, half: uSz / 2, a: 0, va: 0, fixed: true, hits: 0, kind: "learn" },
+          /* BESIDE THE CLOSE X, NOT UNDER IT, 2 September 2026 (owner).
+             UI_GAP is the space between the two. It was 14, then 4 (owner,
+             1 September: "back to right below the X"), and 4 is kept now that
+             they sit side by side so the pair still reads as one unit.
+
+             THE OFFSET MOVED FROM y TO x AND CHANGED SIGN. It was
+             + UI_DRAWN + UI_GAP on y, which stacked downward because y grows
+             down the screen. On x it has to be NEGATIVE: these squares are
+             anchored to the RIGHT edge, so the second one goes to the LEFT of
+             the first or it walks off screen.
+
+             The desc and learn squares share this slot, only one of them showing
+             at a time, so they carry the same figures and must be changed
+             together. */
+          { x: ux - (UI_DRAWN + UI_GAP) / k, y: v[1] + (-vbHf / 2 + m + uSz / 2 + UI_NUDGE_Y) / k, vx: 0, vy: 0, r: UI_HIT_R, half: uSz / 2, a: 0, va: 0, fixed: true, hits: 0, kind: "desc" },
+          { x: ux - (UI_DRAWN + UI_GAP) / k, y: v[1] + (-vbHf / 2 + m + uSz / 2 + UI_NUDGE_Y) / k, vx: 0, vy: 0, r: UI_HIT_R, half: uSz / 2, a: 0, va: 0, fixed: true, hits: 0, kind: "learn" },
           /* THE LOGO. Top CENTRE, not the top-right corner the three squares
              share, and 20% down the stage like the main pit's own placement.
              Its drawn width is the main pit's figure clamped to the pit, so a
@@ -7789,8 +7798,13 @@ export default function BreedTree({
               const b = ub?.find((u) => u.kind === kind);
               return {
                 kind,
-                wx: b ? b.x : v[0] + (xMinR + vbWr - m - uSz / 2) / kk,
-                wy: b ? b.y : v[1] + (-vbHr / 2 + m + uSz / 2 + idx * (uSz + 14 * upp)) / kk,
+                /* THE FALLBACK, used only for the frame or two before the bodies
+                   exist. It stacked DOWNWARD off idx while the bodies now sit
+                   SIDE BY SIDE, so it is moved onto x to match. Left unfixed it
+                   would have shown the second square below the X and then jumped
+                   it sideways, which reads as a glitch rather than a layout. */
+                wx: b ? b.x : v[0] + (xMinR + vbWr - m - uSz / 2 - idx * (uSz + 14 * upp)) / kk,
+                wy: b ? b.y : v[1] + (-vbHr / 2 + m + uSz / 2) / kk,
                 a: b ? b.a : 0,
               };
             });
@@ -8376,20 +8390,33 @@ export default function BreedTree({
             const vbHc = aspect >= 1 ? SIZE : SIZE / aspect;
             const stH = st ? st.clientHeight : 844;
             const uppS = (aspect >= 1 ? SIZE : SIZE / Math.max(aspect, 0.01)) / Math.max(stH, 1);
-            const btnHalf = (84 * pitScale * 1.2 * uppS) / 2;
-            const startTopFrac = 0.5 + WORD_START_Y - btnHalf / vbHc; // PLAY button top, fraction of the stage
+            /* PLAY'S REAL SIZE AND PLACE, corrected 2 September 2026.
+               This read 84 * pitScale * 1.2 and had been STALE since the start
+               screen's squares came down 25% earlier the same day, so the slider
+               was measuring its clearance against a button that no longer exists
+               at that size. The 0.75 and the ROW_DROP below are the same two
+               figures the start block uses; all three have to move together. */
+            const btnHalf = (84 * pitScale * 1.2 * uppS * 0.75) / 2;
+            const ROW_DROP_S = 10 * uppS; // the start row's own 10px drop
+            const startTopFrac = 0.5 + WORD_START_Y + (ROW_DROP_S - btnHalf) / vbHc; // PLAY button top, fraction of the stage
             const playTop = startTopFrac * stH;                       // ...in stage px
             // ---- SLIDER LENGTH DIALS ----
             const TOP_GAP = Math.min(200, Math.max(90, 0.22 * (typeof window !== "undefined" ? window.innerHeight : 844))); // clamp(90px, 22vh, 200px): profile-bottom -> slider-top
             const BOTTOM_GAP = 50;   // slider-bottom -> PLAY-top
-            const MIN_H = 120;       // usable slider length; the TOP gap gives on a short screen to hold this
+            const MIN_H = 60;        // usable slider length; the TOP gap gives on a short screen to hold this. HALVED with the track below
             const rect = st ? st.getBoundingClientRect() : null;
             // Profile-image bottom in stage px; falls back to the old top area until
             // the measure lands.
             const portraitBottom = (portraitAnchor && rect) ? (portraitAnchor.cy + portraitAnchor.rad - rect.top) : 0.045 * stH;
             let top = portraitBottom + TOP_GAP;
             const bottom = playTop - BOTTOM_GAP;
-            let height = bottom - top;
+            /* HALF LENGTH, 2 September 2026 (owner).
+               IT SHORTENS FROM THE TOP, not the bottom: `bottom` is PLAY's top
+               less the 50px clearance, and that clearance is the thing the whole
+               block exists to protect. Taking the length off the top keeps the
+               foot exactly where it was and simply starts the track lower. */
+            let height = (bottom - top) * 0.5;
+            top = bottom - height;
             if (height < MIN_H) { height = MIN_H; top = bottom - MIN_H; } // short screen: hold the foot + min height, compress the top gap
             return { top: `${Math.max(0, top)}px`, height: `${Math.max(0, height)}px` };
           })()}

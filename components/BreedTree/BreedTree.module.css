@@ -640,7 +640,12 @@
    circles but clear of START, which rides at 80% of the stage height. */
 .diff {
   position: absolute;
-  /* the track is 14 wide with a 3px border each side, so 20 across */
+  /* the track is 14 wide with a 3px border each side, so 20 across.
+     --pit-axis is 68.4 on desktop, which IS the desktop PLAY square's centre
+     (left 30.6 + half of 75.6), so the track already sits over the button there
+     and this line is unchanged. The phone is a different story: PLAY moved to
+     left 18 earlier today and is 42 across, so its centre is 39, not the axis's
+     51.8. The media query below carries that. */
   left: calc(var(--pit-axis, 51.8px) - 10px);
   /* top and height are set inline: the track runs to the cap of the S in START,
      which is computed from the same numbers the word uses */
@@ -770,10 +775,29 @@
   background-size: 144px auto;
   pointer-events: none;
 }
+/* FULL BLEED, 2 September 2026 (owner): the floor stopped about 9px short of
+   both screen edges and the overlay's cyan gradient showed beside it.
+
+   MEASURED, and the obvious suspects were ruled out one at a time:
+     the asset  ancient-floor.svg rasterises wood edge to edge, column 0 to the
+                last column of its viewBox. No transparent margin
+     the parent .level is position fixed, inset 0
+     the clip   seamClip's polygon runs 2 * (vw + vh) past the frame on every
+                side, so it cannot trim 9px off a side
+     siblings   .levelSky is inset -40% and .levelBg is min-width 100% centred,
+                and neither shows the gap, which is why this rule is the only
+                one changed
+
+   I COULD NOT NAME THE CAUSE. `left: 0; width: 100%` inside an `inset: 0` parent
+   should already reach both edges. So this measures against the VIEWPORT rather
+   than the parent, which is right whatever the parent turns out to be doing.
+   100vw is safe here because the modal sets body overflow hidden while it is
+   open, so there is no scrollbar for vw to include. */
 .levelFloor {
   position: absolute;
-  left: 0;
-  width: 100%;
+  left: 50%;
+  width: 100vw;
+  margin-left: -50vw;
   height: auto;
   user-select: none;
 }
@@ -1543,6 +1567,11 @@
    or tucks left of the desc column: it is on the bottom row now, and the figures
    below are measured off the PLAY button rather than off the corner. */
 @media (max-width: 768px) {
+  /* THE SLIDER SITS OVER PLAY, 2 September 2026 (owner). PLAY's phone left is 18
+     and its visible square is 42, so its centre is 39. The track is 20 across, so
+     39 - 10 = 29. It is NOT --pit-axis any more, because PLAY is no longer on the
+     axis on a phone: see the note directly below this one. */
+  .diff { left: 29px; }
   /* 30.8 -> 18, 2 September 2026 (owner): the row was sitting too far in.
      18 is the margin the pit's own corner squares use from the screen edge, so
      PLAY now lines up with them rather than floating.
