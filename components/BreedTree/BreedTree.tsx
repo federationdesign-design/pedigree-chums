@@ -646,6 +646,38 @@ const PERMANENT_TOYS: string[] = ["flag"];
 // they are gone for that tab until this clears them.
 // Kept deliberately after the other test rigs were removed: it is harmless and
 // saves a console visit every time the pit is worked on.
+/* ============================ REMOVE BEFORE LAUNCH ==========================
+   ?chumbox=1 : the chum resting-gap diagnostic, 2 September 2026.
+
+   THE QUESTION IT ANSWERS. Cards come to rest with visible gaps between them.
+   Four candidates, and they need different fixes, so guessing is expensive:
+     1 rotation   cards spawn at up to +-40deg, so a tilted square rests corner
+                  to face and the flat image edges never meet
+     2 chamfer    the body's corners are cut by 22%, so two corners in contact
+                  still leave a void
+     3 artwork    each PNG has its own transparent margin inside the square
+     4 sleeping   enableSleeping was added on 1 September. A body that parks
+                  just short of contact will never close the gap, because Matter
+                  does not wake on proximity
+
+   HOW TO READ IT. The panel counts chum-to-chum contacts straight out of
+   Matter's own pair list, so it is the engine's answer, not a measurement:
+     contacts HIGH and the cards look apart  -> 1 and 2, a physics shape problem
+     contacts ~0 and asleep HIGH             -> 4, a sleeping problem
+     contacts HIGH and images touching       -> 3, an artwork problem, not code
+
+   The magenta outline on each card is the body's true shape and size, drawn in
+   the card's own transform. If magenta edges touch while white edges do not,
+   that is 1 and 2 on screen.
+
+   Strip this, the DIAG block in the sim effect, the panel and the outline once
+   the question is closed.
+   ========================================================================== */
+function chumBoxOn() {
+  if (typeof window === "undefined") return false;
+  return window.location.search.indexOf("chumbox=1") > -1;
+}
+
 function resetToysIfAsked() {
   if (typeof window === "undefined") return;
   if (window.location.search.indexOf("toys=reset") < 0) return;
@@ -2323,6 +2355,14 @@ export default function BreedTree({
   const chumsGRef = useRef<SVGGElement>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const chumBodiesRef = useRef<any[]>([]);
+  /* REMOVE BEFORE LAUNCH, ?chumbox=1. See chumBoxOn() above. The engine is
+     otherwise a local inside the sim effect; this is the only handle on it and
+     it is written only when the flag is on. */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const diagEngineRef = useRef<any>(null);
+  const [chumDiag, setChumDiag] = useState<null | {
+    n: number; asleep: number; contacts: number; other: number; meanDeg: number; maxDeg: number;
+  }>(null);
   // Filled by an effect below. The spawn runs several seconds after the drop,
   // so it is always populated by the time it is read.
   const chumImagesRef = useRef<{ image: string; band: string; name: string }[]>([]);
@@ -3870,6 +3910,8 @@ export default function BreedTree({
          To revert, set this back to Engine.create(). Leave wakeBody and its
          call sites in place: they are correct either way. */
       const engine = Engine.create({ enableSleeping: true });
+      // REMOVE BEFORE LAUNCH, ?chumbox=1.
+      if (chumBoxOn()) diagEngineRef.current = engine;
       engine.gravity.y = 1; // pit verbatim
       const world = engine.world;
       /* THE CATCH, and the reason wakeBody exists. Matter wakes a body by
@@ -6300,6 +6342,50 @@ export default function BreedTree({
       .map((b) => ({ image: b.image, band: b.sizeBand as string, name: b.name }));
   }, [nodes, collectedChums]);
   useEffect(() => { chumImagesRef.current = levelChums; }, [levelChums]);
+  /* ===================== REMOVE BEFORE LAUNCH, ?chumbox=1 =====================
+     Samples four times a second, not per frame: the panel is for reading, and a
+     per-frame React setState on top of the pit would change the very thing the
+     diagnostic is measuring.
+
+     CONTACTS COME FROM MATTER'S OWN PAIR LIST, not from a distance calculation.
+     A pair is in the list once the engine has resolved a collision between the
+     two, so a non-zero count means the bodies are genuinely touching whatever
+     the gap between the pictures looks like. That is the whole point: it
+     separates a physics problem from a drawing problem in one number.
+     `isActive` is the flag Matter clears when a pair separates, so stale pairs
+     do not inflate the count. */
+  useEffect(() => {
+    if (!chumBoxOn()) return;
+    const id = window.setInterval(() => {
+      const eng = diagEngineRef.current;
+      const list = chumBodiesRef.current;
+      if (!eng || !list.length) return;
+      let asleep = 0, contacts = 0, other = 0, sum = 0, max = 0;
+      for (const c of list) {
+        if (!c?.mb) continue;
+        if (c.mb.isSleeping) asleep++;
+        const deg = Math.abs(((c.mb.angle * 180) / Math.PI) % 90);
+        sum += deg;
+        if (deg > max) max = deg;
+      }
+      for (const p of eng.pairs?.list ?? []) {
+        if (!p.isActive) continue;
+        const a = p.bodyA?.plugin?.kind, b = p.bodyB?.plugin?.kind;
+        if (a === "chum" && b === "chum") contacts++;
+        else if (a === "chum" || b === "chum") other++;
+      }
+      const live = list.filter((c: { mb?: unknown }) => !!c?.mb).length;
+      setChumDiag({
+        n: live,
+        asleep,
+        contacts,
+        other,
+        meanDeg: live ? Math.round(sum / live) : 0,
+        maxDeg: Math.round(max),
+      });
+    }, 250);
+    return () => window.clearInterval(id);
+  }, []);
   // The running total for the corner. It lives in LineageModal, which is keyed
   // per level and remounts, so it starts each level at nothing.
   const chumsCollected = collectedChums?.size ?? 0;
@@ -7468,6 +7554,16 @@ export default function BreedTree({
                       strokeWidth: Math.max(2, cm.size * 0.055),
                       transition: "stroke 0.12s ease",
                     }} />
+                  {/* REMOVE BEFORE LAUNCH, ?chumbox=1. The BODY, not the card:
+                      same side, same 0.22 chamfer, drawn inside the card's own
+                      transform so it carries the same rotation. If two magenta
+                      edges touch while the white ones do not, the gap is the
+                      tilt and the rounded corners, and no amount of physics
+                      tuning will close it. */}
+                  {chumDiag && (
+                    <rect x={-half} y={-half} width={cm.size} height={cm.size} rx={rx}
+                      style={{ fill: "none", stroke: "#ff00ff", strokeWidth: 1.5, pointerEvents: "none" }} />
+                  )}
                 </g>
               );
             })}
@@ -8710,6 +8806,26 @@ export default function BreedTree({
           {/* Related pack dogs, part of the box: they open and close with it
               and ride along when it is dragged. The 54-pack breeds that descend
               from this level's ancestors, as square cards down one side. */}
+          {/* ==================== REMOVE BEFORE LAUNCH, ?chumbox=1 ====================
+              The readout. Fixed and top-left so it clears the bottom button row
+              and the chum rail, and pointer-events none so it cannot take a tap
+              from anything underneath while it is up. */}
+          {chumDiag && (
+            <div style={{
+              position: "fixed", top: 6, left: 6, zIndex: 9000, pointerEvents: "none",
+              background: "rgba(0,0,0,0.78)", color: "#0f0", padding: "6px 8px",
+              font: "11px/1.35 ui-monospace, monospace", borderRadius: 6, whiteSpace: "pre",
+            }}>
+              {[
+                `chums live      ${chumDiag.n}`,
+                `asleep          ${chumDiag.asleep}`,
+                `chum<->chum     ${chumDiag.contacts}`,
+                `chum<->other    ${chumDiag.other}`,
+                `angle mean deg  ${chumDiag.meanDeg}`,
+                `angle max deg   ${chumDiag.maxDeg}`,
+              ].join("\n")}
+            </div>
+          )}
           {/* ZOOM OUT, bottom right, only while zoomed in.
               A tap on the background already does this, but since the background
               also pans there is no longer anything on screen saying so. This is
