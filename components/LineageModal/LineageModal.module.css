@@ -170,11 +170,8 @@
 }
 
 @media (max-width: 768px) {
-  /* The corner square is 50.6 below 768px, not 75.6, so the score's line changes
-     with it: 18 + 50.6 + 8. The breakpoint is 768 to match pitScale in
-     BreedTree, NOT the 640 the block below uses. `right` is 18 at every width
-     and is set on the base rule. */
-  .scoreTotal { top: 76.6px; }
+  /* The score's phone override has gone with the move to the top line: top 17 and
+     right 18 are the same at every width now, and both live on the base rule. */
 }
 @media (max-width: 640px) {
   /* PHONE: only the level's own dog is shown in the header. The ladder rows under
@@ -300,14 +297,19 @@
      the pit's close square sideways and read as centre-right rather than as a
      corner.
 
-     IT CANNOT SHARE THE X'S LINE. That square is in the top right during PLAY as
-     well as on the start screen, so the two would sit on top of each other. The
-     score is therefore right-aligned to the SAME 18px edge the square uses, and
-     dropped one line beneath it:
-       desktop  18 + 75.6 square + 8 gap = 101.6
-       phone    18 + 50.6 square + 8 gap =  76.6   (media query below)
-     Change the corner square's size and both figures move with it. */
-  top: 101.6px;
+     ON THE TOP LINE, 2 September 2026 (owner), after one round at 101.6 which
+     dropped it a square's height down the screen. Straight into the corner.
+
+     IT SHARES THE LINE WITH THE PIT'S CLOSE SQUARE, which is the known cost. The
+     square sits 18px in from the top and right and is 75.6 wide on desktop, 50.6
+     on a phone, so the score's right end runs under it while the square is still
+     in the corner. In practice the square is a physics body that is usually
+     knocked down into the pit early in a round, which is why this reads clear
+     most of the time. The score is hidden entirely on the start screen, where the
+     square never moves.
+     IF THE OVERLAP BECOMES A PROBLEM, the previous position is one line: top
+     101.6 desktop and 76.6 phone, which is 18 + the square + an 8px gap. */
+  top: 17px;
   right: 18px;
   min-width: 84px;
   box-sizing: border-box;
