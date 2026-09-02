@@ -6959,7 +6959,12 @@ export default function BreedTree({
                 last row passes ALPHA straight through. The shape is preserved
                 exactly and the colour is ours.
                 The three values are 10/255, 58/255 and 87/255 to three places. */}
-            <filter id="bt-qmark-navy" x="0" y="0" width="100%" height="100%">
+            {/* colorInterpolationFilters sRGB IS LOAD BEARING. SVG filters run in
+                linearRGB by default, so the three constants below were read as
+                LINEAR values and converted up on output: navy 0a3a57 came out
+                around 3882a3, a mid blue, and the mark looked washed out.
+                Forcing sRGB makes the numbers mean what they say. */}
+            <filter id="bt-qmark-navy" x="0" y="0" width="100%" height="100%" colorInterpolationFilters="sRGB">
               <feColorMatrix type="matrix" values="
                 0 0 0 0 0.039
                 0 0 0 0 0.227
