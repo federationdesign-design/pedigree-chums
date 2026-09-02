@@ -8988,7 +8988,26 @@ export default function BreedTree({
                   : styles.relRailRight
               }`}
               style={{
-                gridTemplateRows: `repeat(${renderRail.length > 9 ? Math.ceil(renderRail.length / 2) : renderRail.length}, auto)`,
+                /* ROWS CAPPED AT 10, 2 September 2026 (owner). It used to be half
+                   the list, which meant the rail grew in HEIGHT for ever and
+                   never past two columns: grid-auto-flow is column, so the row
+                   count decides everything.
+
+                   MEASURED, worst case first. The busiest circles are St Hubert
+                   Hound and Old scenting hounds at 24 chums each, and nothing in
+                   the dataset exceeds that: 263 possible circles checked, 19 of
+                   them past 9. At 24 the old rule gave 2 columns of 12, a box
+                   108 x 568 whose foot landed at y 660 on a 402px phone, ON TOP
+                   of the bottom button row which starts at 614. Capping the rows
+                   gives 3 columns, a box 154 x 476, foot at 568. Wider, but 46px
+                   clear of the row, and the two no longer share a band so the
+                   width costs nothing.
+
+                   THE POINT IS THE CEILING, not today's numbers. The pack is 54
+                   dogs. If new ancestry is authored above more than about 26 of
+                   them, the old rule ran the rail off the top and bottom of the
+                   screen with nothing to catch it. Now it grows sideways. */
+                gridTemplateRows: `repeat(${Math.min(10, renderRail.length)}, auto)`,
                 visibility: "visible", // shows through even when the box is hidden
                 ...(railPin
                   ? { position: "fixed" as const, top: railPin.top, left: railPin.left, right: "auto" }
