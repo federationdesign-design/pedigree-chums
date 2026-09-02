@@ -988,6 +988,23 @@ const WORD_POP_MS = 380;
 // while the circles keep their radii: without this, the same physical heap
 // covers proportionally less and a level would become much harder to lose.
 const PIT_FULL_COVER = 0.72 / PIT_SHRINK;
+/* HOW HIGH THE HEAP HAS TO REACH before it counts as full, in px from the top of
+   the stage. A settled body is "in the zone" once its TOP edge crosses this line.
+
+   150 -> 90, 2 September 2026 (owner): the line moves UP the screen, so the pile
+   has to build higher before the occupancy test can fire, and a round lasts
+   longer. Lower the number to make the round longer still; raise it to end
+   rounds sooner.
+
+   IT IS ONLY ONE OF THE TWO TRIGGERS, and usually the loser. The other is the
+   first chum card touching the FLOOR, which has no threshold and no dwell, and
+   the chums arrive last, so on most levels that fires before the heap ever
+   reaches this line. If rounds still end sooner than you want, that trigger is
+   the thing to change, not this number.
+
+   It was an inline literal inside computeFull. Named here so it sits with the
+   other pit constants and is a one-line tune from now on. */
+const PIT_FULL_ZONE_PX = 90;
 // The yellow percentage badge, drawn and collided at this radius. Doubled from
 // 46: they were easy to lose against the circles, on the start screen and in
 // the pit alike.
@@ -5830,7 +5847,7 @@ export default function BreedTree({
       // the immediate rescue check (tryCancelRef, fired the moment a chum is
       // collected) read the exact same answer.
       const computeFull = (): boolean => {
-        const zoneY = v[1] + (-vbHf / 2 + 150 * uppW) / k;
+        const zoneY = v[1] + (-vbHf / 2 + PIT_FULL_ZONE_PX * uppW) / k;
         // "Full" used to mean five settled bodies reaching the top zone, a count
         // borrowed from the main pit, which always holds dozens of cards. Half the
         // mini pit trees have two or three circles, so the pit could be visibly
