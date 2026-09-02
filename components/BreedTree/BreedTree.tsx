@@ -570,6 +570,23 @@ const CHUM_VW = 0.1;
 // size a medium dog drops at. The mini pit therefore reads BIGGER at the top
 // end than the main pit does, which was the call.
 const CHUM_BAND: Record<string, number> = { small: 5 / 6, medium: 1, large: 4 / 3, giant: 5 / 3 };
+/* THE RING PALETTE, one copy, read by both the ring and the fill.
+
+   It lived inline in strokeColorFor until 2 September 2026, when the pit's
+   circles started playing imageless and their FILL had to become the same colour
+   as their ring. Having fillFor call strokeColorFor would have been the obvious
+   move and it is the wrong one here: it breaks an existing memo and the React
+   Compiler bails out of the whole component, which shows up as a new lint error
+   rather than as anything visible.
+
+   Module scope, so neither function reads the other and there is still only one
+   place to change a colour.
+
+   IT CYCLES every four depths: depth 5 is entry 1 again, 6 is entry 2. So these
+   four have to stay legible against each other as well as against a photograph.
+   Depths 1 and 2 are both yellow and 3 and 4 are both blue, which is the owner's
+   scheme; a child ring sitting inside its parent will read as the same colour. */
+const RING_PALETTE = ["#fff200", "#ffdf00", "#009fe0", "#36b8ff"];
 // stickBig is the same artwork half again as large, so the pair reads as two
 // sticks of different sizes rather than one drawn twice
 type ToyKind = "ball" | "flag" | "stick" | "stickBig" | "rock" | "ballPink" | "cookies" | "bone"
@@ -3195,6 +3212,23 @@ export default function BreedTree({
     return d.depth === 0 ? rootImage ?? d.data.img : d.data.img;
   }
   function fillFor(d: Node): string {
+    /* IN THE LIVE PIT A CIRCLE IS FILLED WITH ITS OWN RING COLOUR,
+       2 September 2026 (owner). The circles now play imageless, and the three
+       colours below were only ever a backing behind a photograph, so a pit full
+       of them read as pale and unrelated to the rings.
+
+       It reads RING_PALETTE directly rather than calling strokeColorFor. Same
+       colours, but calling that function from here breaks an existing memo and
+       the React Compiler bails out of the component.
+
+       IT TAKES THE BASE COLOUR, NOT THE HOVER LIFT, and that is deliberate. The
+       ring lifts 10% toward white for the circle you are reading while the fill
+       stays put, so the ring reappears exactly where you need to see it. Give the
+       fill the lift too and every circle becomes a flat disc at all times.
+
+       Gated on `dropped`, the same flag that hides the pictures, so the start
+       screen and the learn area keep the pale backing they have always had. */
+    if (dropped && strokeByDepth && d.depth > 0) return RING_PALETTE[(d.depth - 1 + 4) % 4];
     return d.depth === 0 ? "#0a3a57" : d.depth === 1 ? "#1f8fd0" : "#bfe3f7";
   }
   // Thinner stroke the deeper (smaller) the circle, so the ring never
@@ -3244,7 +3278,7 @@ export default function BreedTree({
          caution as the pair above: adjacent depths that share a hue read as one
          colour where one circle sits inside the other. Two yellows then two
          blues is the owner's scheme, recorded as chosen. */
-      const base = ["#fff200", "#ffdf00", "#009fe0", "#36b8ff"][(d.depth - 1 + 4) % 4];
+      const base = RING_PALETTE[(d.depth - 1 + 4) % 4];
       // The circle the player is reading keeps its DEPTH colour, so it can
       // never collide with a same-depth sibling. It is lifted in BRIGHTNESS
       // only: same hue, same width, just lighter.
