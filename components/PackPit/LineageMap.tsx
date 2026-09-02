@@ -1170,7 +1170,34 @@ export default function LineageMap({
   const fiveUp = (circular || strongBg) && isMobile;
   const MCOLS = fiveUp ? 5 : 4; // phones: one continuous grid, this many wide before it wraps
   const F_EDGE = 14;
-  const F_LEFT = fiveUp ? F_EDGE + CW / 2 : isMobile ? 52 : 96;
+  /* PRE-COMPENSATING FOR THE LAYER'S 0.8 SCALE, 2 September 2026 (owner).
+
+     THE PROBLEM. The overlay carries transform: scale(0.8), and a scale
+     multiplies the distance from the element's CENTRE, not from its edge. So
+     every coordinate near an edge is pulled a tenth of the viewport inwards: the
+     frame grid was written to start 14px from the left and was landing at 52.6,
+     and the rows were written at 111 and were landing far lower.
+
+     THE FIX, AND WHAT IT COSTS. These two helpers invert the scale, so a value
+     passed through them LANDS where it is written. That is why F_LEFT now comes
+     out NEGATIVE on a phone: to appear 31.6 from the edge, the column has to
+     start about 12px off screen before the scale pulls it back in. The number
+     looks wrong in isolation and is correct on screen.
+
+     IT IS TIED TO THE 0.8. Change the overlay's scale and every figure derived
+     from these is wrong, silently, because nothing here can see that transform.
+     The clean fix is to take the frames out of the scaled element the way the
+     back button and the counters were; this is the cheap one, chosen knowingly.
+
+     Identity off the lift, so the main pit and the chums2 tree are untouched. */
+  const LIFT_K = (circular || strongBg) && !bounded ? 0.8 : 1;
+  const unscaleX = (x: number) => vp.w / 2 + (x - vp.w / 2) / LIFT_K;
+  const unscaleY = (y: number) => vp.h / 2 + (y - vp.h / 2) / LIFT_K;
+  /* The level's own profile portrait sits at --pit-axis less half of --tp:
+     51.8 - 20.16 = 31.6 on a phone. The frame column's LEFT EDGE lines up with
+     it, so F_LEFT, which is the first column's CENTRE, is that plus half a card. */
+  const PORTRAIT_LEFT = 31.6;
+  const F_LEFT = fiveUp ? unscaleX(PORTRAIT_LEFT) + CW / 2 : isMobile ? 52 : 96;
   // On a circle the rim at 45 degrees sits this far in from the bounding box, so
   // corner adornments tuck against the edge instead of floating outside it.
   const RIM_IN = (CW / 2) * (1 - Math.SQRT1_2);
@@ -1183,7 +1210,9 @@ export default function LineageMap({
   const F_ROW = fiveUp ? F_COL : circular ? CW + 3 : isMobile ? 92 : 112;
   const fCols = Math.max(2, Math.min(7, Math.floor((vp.w - 120) / F_COL)));
   // Tucked under the X/XX counter, which sits at top 26 and is about 32 tall.
-  const chumTop = fiveUp ? 111 : circular ? (isMobile ? 118 : 168) : isMobile ? 170 : 240; // 96, down 15 to clear the top-right button
+  // 111 is unchanged as the INTENDED top; unscaleY is what makes it land there
+  // again now the layer is scaled. See the note by F_LEFT.
+  const chumTop = fiveUp ? unscaleY(111) : circular ? (isMobile ? 118 : 168) : isMobile ? 170 : 240; // 96, down 15 to clear the top-right button
   const frames: { id: string; cat: "chum" | "alive" | "extinct"; img: string; sx: number; sy: number }[] = [];
   let aliveTop = chumTop, extinctTop = chumTop; // only the desktop section headers use these
   if (isMobile) {
