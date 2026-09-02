@@ -40,7 +40,11 @@
      box docks on the left on desktop too, so that overlap starts around 4 rows
      on both desktop and phone. One value, trivially revertible. The component
      still sets --rows inline but nothing reads it now (see PLACEHOLDERS.md). */
-  --tp: clamp(44.8px, 8.8vw, 62.4px);
+  /* 10% OFF, 2 September 2026 (owner): 44.8 -> 40.32, 8.8vw -> 7.92vw,
+     62.4 -> 56.16. Shrinking this is always safe for the ladder fit; it is
+     GROWING it that the block above warns against. BreedTree mirrors these
+     three figures for its hover hint and has been changed to match. */
+  --tp: clamp(40.32px, 7.92vw, 56.16px);
 
   /* Centred on the pit's left axis, with the slider, the score and PLAY. */
   left: calc(var(--pit-axis, 51.8px) - var(--tp) / 2);
@@ -95,6 +99,12 @@
   border: 1.5px solid #fff;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
   pointer-events: none;
+  /* HIDDEN, 2 September 2026 (owner): the status dot comes off the profile
+     portrait. `display: none` rather than unrendering it, so the dot takes its
+     aria-label out of the accessibility tree with it and the whole thing is one
+     line to put back. The same dot on the learn info box header and on the
+     history cards is untouched: this rule is scoped to the title portrait. */
+  display: none;
 }
 .title {
   width: auto;
@@ -121,7 +131,11 @@
      2.6% clearance, down from about half. Do not raise the clamp or --tp
      without re-checking this. A separate @media (max-width: 640px) rule below
      overrides this on phones and was NOT doubled. */
-  font-size: min(clamp(0.832rem, 2vw, 1.808rem), calc(var(--tp) / 2.15));
+  /* 25% OFF, 2 September 2026 (owner): 0.832 -> 0.624, 2vw -> 1.5vw,
+     1.808 -> 1.356. The --tp / 2.15 cap is LEFT ALONE. It is a ceiling, and
+     since the name has come down 25% while the portrait came down only 10%,
+     the clearance the block above calls thin is now comfortable again. */
+  font-size: min(clamp(0.624rem, 1.5vw, 1.356rem), calc(var(--tp) / 2.15));
   color: #ffffff;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -175,7 +189,11 @@
        Only the phone branch is touched. BreedTree mirrors this formula to size its
        hover hint, but that hint returns null on mobile, so its copy of the <= 640
        branch is dead and needs no matching edit. */
-    font-size: calc(clamp(0.9rem, 5vw, 1.6rem) - 2pt);
+    /* 25% OFF, 2 September 2026 (owner). Both terms scaled, not just the clamp:
+       0.9 -> 0.675, 5vw -> 3.75vw, 1.6 -> 1.2, and the 2pt subtraction -> 1.5pt.
+       Taking 25% off the clamp alone would leave the subtraction at full weight
+       and the phone would end up more than 25% down. */
+    font-size: calc(clamp(0.675rem, 3.75vw, 1.2rem) - 1.5pt);
   }
 }
 
@@ -245,7 +263,10 @@
   color: #ffffff;
   font-family: var(--font-score), var(--font-pct), system-ui, sans-serif;
   font-weight: 400;
-  font-size: 18px;
+  /* 20% OFF, 2 September 2026 (owner): 18 -> 14.4. min-width stays 84px, which
+     is a floor on the box and not on the type, so the number still centres on
+     the same axis at the smaller size. */
+  font-size: 14.4px;
   line-height: 1.3;
   pointer-events: none;
   z-index: 20;

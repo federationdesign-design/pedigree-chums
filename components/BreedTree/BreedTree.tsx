@@ -854,7 +854,9 @@ const PIT_FULL_COVER = 0.72 / PIT_SHRINK;
 // J17: a scattered percentage badge has this chance of arriving as a bomb.
 // The main pit's own figure, PackPit.tsx scatterRef, where a comment records it
 // was raised from 1 in 35 for better chain reactions.
-const BOMB_ODDS = 20;
+// 2 September 2026 (owner): 20 -> 16, a wildcard in every sixteen. Both roll
+// sites read this one constant, the scatter and the pop, so they cannot drift.
+const BOMB_ODDS = 16;
 // The fuse is 2.5 seconds, half the main pit's five. Five is not a magic number
 // there, it is a divisor in four places, and all four are halved together here
 // or the sparks peak after the blast, or fizz at full doing nothing:
@@ -7848,7 +7850,13 @@ export default function BreedTree({
             // phone that is 287 x 88, sixty per cent of the screen width, lying
             // across the diagram. Taps meant for the dogs underneath it were
             // being taken by the word.
-            const SQ = 84 * pitScale * 1.2 * upp;
+            /* 25% OFF, 2 September 2026 (owner). The gap is left at 16 on
+               purpose: it is a fixed separation between two controls, not a
+               part of either one, and scaling it too would pull the pair in
+               tighter than a straight shrink. Everything else on the start
+               screen reads SQ (the hit rect, the drawn square, the glyph, the
+               caption), so they all come down together. */
+            const SQ = 84 * pitScale * 1.2 * upp * 0.75;
             const SQ_GAP = 16 * upp;
             const words: { key: "learn" | "start"; label: string; x: number; y: number; anchor: "start" | "end" }[] = [
               { key: "start", label: "PLAY", x: xMinC + m, y: vbHc * WORD_START_Y, anchor: "start" },
@@ -7969,7 +7977,10 @@ export default function BreedTree({
             const stW = st ? st.clientWidth : 390;
             const upp = (aspect >= 1 ? SIZE : SIZE / Math.max(aspect, 0.01)) / Math.max(st ? st.clientHeight : 844, 1);
             // Owner review: the LEARN word is half the size of START.
-            const fsL = Math.min(Math.min(Math.max(54.4, stW * 0.12), 128) * START_SCALE, (stW * 0.92) / 3.17) * 0.5;
+            // 10% OFF, 2 September 2026 (owner): the trailing 0.5 becomes 0.45.
+            // NOTE the comment above is now out of date by request: the number no
+            // longer matches LEARN, which came down 25% in the same pass.
+            const fsL = Math.min(Math.min(Math.max(54.4, stW * 0.12), 128) * START_SCALE, (stW * 0.92) / 3.17) * 0.45;
             const vbWc = aspect >= 1 ? SIZE * aspect : SIZE;
             const vbHc = aspect >= 1 ? SIZE : SIZE / aspect;
             const xMinC = -vbWc / 2;
@@ -7977,7 +7988,11 @@ export default function BreedTree({
             return (
               <text
                 x={xMinC + vbWc - m}
-                y={vbHc * WORD_START_Y}
+                /* DOWN 20px, 2 September 2026 (owner). Written as 20 * upp, not
+                   a flat 20: this is drawn in svg units and upp is the px-to-unit
+                   conversion, so a bare 20 would move a different distance on
+                   every screen. */
+                y={vbHc * WORD_START_Y + 20 * upp}
                 textAnchor="end"
                 dominantBaseline="central"
                 style={{
@@ -8020,7 +8035,13 @@ export default function BreedTree({
             const vbHc = aspect >= 1 ? SIZE : SIZE / aspect;
             const xMinC = aspect >= 1 ? -vbWc * shift : -vbWc / 2;
             const m = 18 * upp;
-            const SQ = 84 * pitScale * 1.2 * upp;
+            /* This is a SECOND copy of the start screen's square size, used only
+               to park the hint to the right of the row. It carries the same 0.75
+               the block above does, or the hint would float in the gap the
+               smaller buttons left behind. The learn area's PLAY is a DOM button
+               (.learnPlay) at its own size and is not affected by the 0.75, so
+               the learn branch below still lines up. */
+            const SQ = 84 * pitScale * 1.2 * upp * 0.75;
             const SQ_GAP = 16 * upp;
             const x = xMinC + m + (learning ? 1 : 2) * (SQ + SQ_GAP);
             // Beside the play button: the start PLAY sits at WORD_START_Y, but the
@@ -8035,10 +8056,14 @@ export default function BreedTree({
             // clamp. rem = 16. If .title's rule changes, change this to match.
             const winW = typeof window !== "undefined" ? window.innerWidth : 390;
             const vw = winW / 100;
-            const tp = Math.min(Math.max(44.8, 8.8 * vw), 62.4);
+            // 2 September 2026: --tp came down 10% and .title 25%, so this
+            // mirror carries the same new figures. The phone branch is dead
+            // (this hint returns null on mobile) but is kept in step anyway, so
+            // the next person to read it is not misled.
+            const tp = Math.min(Math.max(40.32, 7.92 * vw), 56.16);
             const titleFs = winW <= 640
-              ? Math.min(Math.max(0.9 * 16, 5 * vw), 1.6 * 16)
-              : Math.min(Math.min(Math.max(0.832 * 16, 2 * vw), 1.808 * 16), tp / 2.15);
+              ? Math.min(Math.max(0.675 * 16, 3.75 * vw), 1.2 * 16)
+              : Math.min(Math.min(Math.max(0.624 * 16, 1.5 * vw), 1.356 * 16), tp / 2.15);
             // Two lines when the hint carries a breed name: "tap to learn more
             // about" on line one, the name on line two. The static "start
             // playing" has no name, so it stays a single line.

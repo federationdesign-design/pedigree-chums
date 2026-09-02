@@ -40,6 +40,21 @@ function titleLines(name: string): string[] {
   return rest ? [first, rest] : [first];
 }
 
+/* SHORT-FORM SCORE, 2 September 2026 (owner). From a hundred thousand up the
+   figure is written in thousands, so 100,000 reads 100k. Below that nothing
+   changes and 99,999 still prints in full.
+   Negatives are handled deliberately: a negative campaign total is allowed by
+   decision (no clamp at zero), so -100,000 has to read -100k rather than -100k
+   with the sign eaten by the rounding.
+   THE VISIBLE NUMBER ONLY. The aria-label below still carries the full figure,
+   because "one hundred k" is a worse thing to hear than the real number. The
+   win screen, the game over total and the main pit's own counter are untouched. */
+const SCORE_SHORT_FROM = 100000;
+function scoreText(n: number) {
+  if (Math.abs(n) < SCORE_SHORT_FROM) return n.toLocaleString("en-GB");
+  return (n < 0 ? "-" : "") + Math.round(Math.abs(n) / 1000).toLocaleString("en-GB") + "k";
+}
+
 // One line of the stacked title: round portrait, status dot, name. Pulled out
 // because the level's dog and the circle being looked at are now drawn with the
 // same markup, one above the other.
@@ -442,7 +457,7 @@ export default function LineageModal({ name, image, character, lineage, fromRect
           paused behind it. */}
       {!learningActive && (
         <div className={css.scoreTotal + (scorePulse ? " " + css.scorePulse : "")} aria-label={`Score: ${score.toLocaleString("en-GB")}`}>
-          {score.toLocaleString("en-GB")}
+          {scoreText(score)}
         </div>
       )}
       {milestone && (

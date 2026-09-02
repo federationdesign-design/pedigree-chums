@@ -486,7 +486,10 @@
 .startBtn {
   transform-box: fill-box;
   transform-origin: center;
-  animation: btStartPulse 1.6s ease-in-out infinite;
+  /* PULSE REMOVED, 2 September 2026 (owner). The keyframes and the
+     reduced-motion rule below are left in place: they cost nothing unused and
+     putting the pulse back is one line. transform-box and transform-origin stay
+     because :active still scales. */
 }
 .startBtn:active {
   animation: none;
