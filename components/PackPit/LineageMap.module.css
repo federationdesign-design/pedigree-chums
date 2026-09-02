@@ -784,8 +784,31 @@
 
 /* Mini pit levels: a much stronger wash so the dotted frames read clearly
    over the bright popup pit. Intuitive beats instructions. */
+/* 2 September 2026: the wash MOVED OFF this class to .liftWash below.
+
+   WHY. The lifted layer is now scaled to 0.8 to bring every element down 20%,
+   and a transform shrinks the painted background with everything else, which
+   left a 41px band of bare pit showing all the way round. The wash has to stay
+   full bleed while the contents shrink, so it is painted by a sibling that is
+   not inside the transform. */
 .overlayStrong {
+  background: none;
+}
+
+/* THE LIFT'S BACKGROUND WASH, painted by a sibling of the overlay rather than by
+   the overlay itself. Verbatim the gradient .overlayStrong used to carry.
+   z-index 59 sits one below .overlay's 60, so it is behind the diagram and above
+   the pit. It must NOT be a child of the overlay: that is the element carrying
+   the 0.8 scale, and a fixed-position child of a transformed element resolves
+   against that element, so it would scale too and the gap would come straight
+   back. */
+.liftWash {
+  position: fixed;
+  inset: 0;
+  z-index: 59;
+  pointer-events: none;
   background: radial-gradient(120% 120% at 50% 40%, rgba(15, 110, 165, 0.62), rgba(8, 62, 100, 0.86));
+  animation: lm-fade 0.2s ease;
 }
 /* The reference layer, the chum's own family tree, wears the same wash rotated
    18 degrees round the wheel, which is 5% of it. Both stops carry the same

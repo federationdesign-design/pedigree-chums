@@ -2103,6 +2103,9 @@ export default function LineageMap({
 
   return (
     <>
+    {/* The lift's wash, OUTSIDE the scaled overlay. See .liftWash for why it
+        cannot live on the overlay any more. */}
+    {circular && <div className={styles.liftWash} aria-hidden="true" />}
     <div
       ref={overlayRef}
       // BACKGROUND: the chum family tree is back on the faint brand wash.
@@ -2118,6 +2121,26 @@ export default function LineageMap({
       // frames, the smaller nodes, the back button's size and the hidden pack
       // header. Removing it here would quietly undo all five.
       className={`${styles.overlay}${bounded ? " " + styles.overlayBounded : ""}${circular ? " " + styles.overlayStrong : ""}${strongBg && !circular && !bounded ? " " + styles.overlayChum : ""}${dragFocus ? " " + styles.overlayFocus : ""}`}
+      /* 20% SMALLER ON THE LIFTED LAYER, 2 September 2026 (owner): frames,
+         buttons, the dog card, nodes, name pills and connectors, all together.
+
+         ONE TRANSFORM RATHER THAN TWENTY CONSTANTS, and that is forced rather
+         than lazy. This layer is drawn in TWO technologies: the diagram is SVG
+         and the placed frames are HTML with a z-index, which the note by the
+         lifted root explains. Shrinking the SVG's own constants or its viewBox
+         would have taken the diagram down and left the frames at full size, and
+         the two would no longer line up.
+
+         Hit testing follows for free. A CSS transform is reported by both
+         getBoundingClientRect and getScreenCTM, which are what the pan, the drag
+         and the frame drop all read, so nothing needs a matching adjustment.
+
+         circular only. The main pit and the bounded chum tree are untouched.
+
+         NOT 3D. The handover records that perspective, backface-visibility and
+         transform-style anywhere in this tree break the SVG stacking. A plain 2D
+         scale is not on that list and does not create a 3D context. */
+      style={circular ? { transform: "scale(0.8)", transformOrigin: "50% 50%" } : undefined}
       onClick={closeIfTap}
       onPointerDown={onPanDown}
       onPointerMove={onPanMove}
