@@ -8383,14 +8383,31 @@ export default function BreedTree({
                holds while the drawn square IS the axis square. It no longer is,
                so .learnPlay now carries a measured left per breakpoint. Change
                this 0.75 and those two numbers are wrong. */
-            const S = 84 * pitScale * 1.2 * 0.75;
-            const B = S + 5;
+            /* SIZED FROM THE DOCK, NOT FROM THE PIT SQUARE, 2 September 2026
+               (owner): every button on this row has to be the same size and wear
+               the same weight of rim.
+
+               PLAY used to be drawn off 84 * pitScale * 1.2, which made it the
+               biggest thing on the row. It now takes .learnDockBtn's own visible
+               size at each breakpoint, so the five buttons match. THESE TWO
+               NUMBERS LIVE IN THE STYLESHEET AS WELL and must be changed
+               together. pitScale is the right test because it flips at the same
+               768px breakpoint the CSS does.
+
+               RIM 5 -> 2, the dock's border weight, which is the thinner one you
+               asked for. The stroke is CENTRED on the rect edge, so the artboard
+               is S + RIM and the rect starts at RIM / 2. Colour is untouched:
+               PLAY keeps its white rim, the others keep yellow. */
+            const VIS = pitScale < 1 ? 42 : 75.6; // .learnDockBtn, phone / desktop
+            const RIM = 2;
+            const S = VIS - RIM;
+            const B = S + RIM;
             const c = B / 2;
             const g = S * 0.34;
             const w = S * 0.30;
             return (
               <svg width={B} height={B} viewBox={`0 0 ${B} ${B}`} aria-hidden="true" focusable="false">
-                <rect x={2.5} y={2.5} width={S} height={S} rx={S * 0.3} fill="#22c55e" stroke="#ffffff" strokeWidth={5} />
+                <rect x={RIM / 2} y={RIM / 2} width={S} height={S} rx={S * 0.3} fill="#22c55e" stroke="#ffffff" strokeWidth={RIM} />
                 <path
                   d={`M${c - w * 0.3},${c - g / 2} L${c + w * 0.7},${c} L${c - w * 0.3},${c + g / 2} Z`}
                   fill="#ffffff"

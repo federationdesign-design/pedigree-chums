@@ -929,10 +929,10 @@
    need to become 84px / 25.2px again. */
 .zoomOutBtn {
   position: fixed;
-  /* 14px of visible air to the right of PLAY. PLAY's visible right edge is
-     15.5 + 72.5 = 88px, and this button's outline puts its visible left edge 5px
-     before its box, so 88 + 14 + 5 = 107. */
-  left: 107px;
+  /* Visible air to the right of PLAY. PLAY's visible right edge on desktop is
+     30.6 + 75.6 = 106.2, and this button's outline puts its visible left edge one
+     rim before its box, so 106.2 + 6 + 2 = 114.2. */
+  left: 114.2px;
   right: auto;
   /* CORRECTED 31 Aug 2026. The first attempt matched this button's BOX to PLAY's
      square, 67.5px, which came out 5px too big and sitting low. The two rims are
@@ -948,13 +948,19 @@
      box, and PLAY's outer edge sits exactly on its 3%.
      The 4px drop shadow is gone with it. PLAY has none, and it added apparent height
      under the button, which is what the lower red line was catching. */
-  bottom: calc(3% + 5px);
+  /* 2 September 2026 (owner): the rim drops 5 -> 2 to match the dock's border,
+     the thinner of the two weights, and the box grows so the VISIBLE square is
+     the dock's 75.6 on desktop. An outline draws entirely outside the box, so
+     the box is 75.6 - 2 * 2 = 71.6 and the bottom offset is the rim, not 5.
+     Desktop hides this button anyway; the figures are kept honest so the two
+     breakpoints do not tell different stories. */
+  bottom: calc(3% + 2px);
   z-index: 14;
-  width: 62.5px;
-  height: 62.5px;
-  border-radius: 17.75px;
+  width: 71.6px;
+  height: 71.6px;
+  border-radius: 21.1px;   /* PLAY's outer 73.6 * 0.3 + 1, less the 2px rim */
   border: none;
-  outline: 5px solid var(--navy, #0a3a57);
+  outline: 2px solid var(--navy, #0a3a57);
   background: var(--yellow, #ffd23e);
   color: var(--navy, #0a3a57);
   display: grid;
@@ -963,9 +969,12 @@
   cursor: pointer;
   pointer-events: auto;
 }
+/* 46% -> 57%, 2 September 2026 (owner): every glyph on the row should read the
+   same size. 71.6 * 0.57 = 40.8, against .learnDockIcon's 41. The phone carries
+   its own figure below because the box there is a different fraction. */
 .zoomOutBtn svg {
-  width: 46%;
-  height: 46%;
+  width: 57%;
+  height: 57%;
   display: block;
 }
 /* Mobile only, by request. */
@@ -1156,8 +1165,13 @@
        phone    pitScale 0.67  S =  67.5 * 0.75 = 50.65  axis 51.8  ->  24.0
 
      PLAY stays centred on --pit-axis, which the title, the score and the
-     difficulty slider all share, so nothing falls out of line. */
-  left: 28.1px;
+     difficulty slider all share, so nothing falls out of line.
+
+     2 September 2026 again: PLAY is now drawn at the DOCK's size with a 2px rim,
+     so its artboard is 75.6 on desktop and 42 on a phone. left is axis - VIS / 2:
+       desktop  68.4 - 37.8 = 30.6
+       phone    51.8 - 21   = 30.8   (in the media query below) */
+  left: 30.6px;
   bottom: 3%;
   z-index: 16;
   border: 0;
@@ -1454,14 +1468,16 @@
      (BreedTree.tsx, the dockAside line in the zoom handler), and the dock only
      renders while a chum is picked.
 
-     Left is PLAY's visible right edge plus the same 14px of air the corner
-     squares stack with: desktop 28.1 + 80.6 + 14 = 122.7. The phone figure is in
-     the media query below. Bottom is PLAY's own 3%, not a copy of a pixel value,
-     so the two bottoms cannot drift apart. */
+     Left is PLAY's visible right edge plus the row's 6px of air: desktop
+     30.6 + 75.6 + 6 = 112.2, and the zoom out is hidden at this width so the
+     icons follow PLAY directly. The phone figure is in the media query below.
+     Bottom is PLAY's own 3%, not a copy of a pixel value, so the two bottoms
+     cannot drift apart. */
   top: auto;
   right: auto;
   bottom: 3%;
-  left: 122.7px;
+  gap: 6px;
+  left: 112.2px;
   display: flex;
   flex-direction: row;
   gap: 14px;        /* the squares' own gap */
@@ -1511,8 +1527,8 @@
    or tucks left of the desc column: it is on the bottom row now, and the figures
    below are measured off the PLAY button rather than off the corner. */
 @media (max-width: 768px) {
-  /* PLAY's phone offset: 51.8 - (50.65 + 5) / 2. See the longhand on .learnPlay. */
-  .learnPlay { left: 24px; }
+  /* PLAY's phone offset: axis 51.8 - 42 / 2. See the longhand on .learnPlay. */
+  .learnPlay { left: 30.8px; }
   /* ONE ROW, FIVE BUTTONS, 2 September 2026 (owner), to the owner's own layout:
      PLAY, then the zoom out, then the three info icons, all along the foot.
 
@@ -1525,36 +1541,43 @@
 
      THE BUDGET, and it is the whole reason these numbers are what they are:
 
-       24      PLAY's left
-       55.65   PLAY, unchanged. It is the primary action and it stays biggest
-       6       gap, down from 14
-       42 x 4  the zoom out and the three icons
-       6 x 3   gaps between them
+       30.8    PLAY's left, axis 51.8 less half a button
+       42 x 5   PLAY, the zoom out and the three icons, ALL THE SAME SIZE
+       6 x 4    gaps between them
        -----
-       271.65  right edge, against the rail's 276. 4.35 to spare
+       264.8   right edge, against the rail's 276. 11.2 to spare
 
-     42 rather than 50.6 because at 50.6 the four buttons ALONE are wider than
-     the space, before any gap at all. Padding was never the constraint.
+     42 rather than 50.6 because at 50.6 the buttons ALONE are wider than the
+     space, before any gap at all. Padding was never the constraint.
+
+     EVERY RIM ON THIS ROW IS 2px, the dock's border weight. PLAY's was a 5px SVG
+     stroke and the zoom out's a 5px CSS outline; both are now 2. The three rims
+     are still drawn three different ways, so the box each one needs to land on a
+     42px VISIBLE square is different:
+       PLAY       SVG stroke, centred on the edge   artboard 42, rect 40
+       zoom out   CSS outline, entirely outside     box 38
+       dock       CSS border, entirely inside       box 42
 
      CHANGE PLAY'S SIZE OR THE RAIL'S COLUMN COUNT AND THIS ROW OVERFLOWS. There
      is no slack left in it. */
   .zoomOutBtn {
-    /* Back beside PLAY, undoing the stack from earlier today. Left is PLAY's
-       visible right edge 79.65, plus the 6 gap, plus 5 because this button's rim
-       is an `outline` drawn OUTSIDE its box while the dock's border is drawn
-       inside. The box is 42 - 10 to land on the same visible 42 square. */
-    left: 90.65px;
-    bottom: calc(3% + 5px);
-    width: 32px;
-    height: 32px;
-    border-radius: 7.6px;
+    /* Left is PLAY's visible right edge 72.8, plus the 6 gap, plus 2 because this
+       button's rim is an `outline` drawn OUTSIDE its box while the dock's border
+       is drawn inside. The box is 42 - 2 * 2 to land on the same visible 42. */
+    left: 80.8px;
+    bottom: calc(3% + 2px);
+    width: 38px;
+    height: 38px;
+    border-radius: 11px;   /* PLAY's outer 40 * 0.3 + 1, less the 2px rim */
   }
+  /* 38 * 0.605 = 23, the same glyph size as .learnDockIcon below. */
+  .zoomOutBtn svg { width: 60.5%; height: 60.5%; }
   .learnDock {
     top: auto;
     right: auto;
     bottom: 3%;
     gap: 6px;
-    left: 133.65px;  /* the zoom out's visible right edge 127.65 + 6 */
+    left: 120.8px;   /* the zoom out's visible right edge 114.8 + 6 */
   }
   .learnDockBtn {
     width: 42px;
