@@ -8402,7 +8402,15 @@ export default function BreedTree({
             const playTop = startTopFrac * stH;                       // ...in stage px
             // ---- SLIDER LENGTH DIALS ----
             const TOP_GAP = Math.min(200, Math.max(90, 0.22 * (typeof window !== "undefined" ? window.innerHeight : 844))); // clamp(90px, 22vh, 200px): profile-bottom -> slider-top
-            const BOTTOM_GAP = 50;   // slider-bottom -> PLAY-top
+            /* 50 -> 14, 2 September 2026 (owner): the slider sits much closer to
+               PLAY. 14 is the gap the pit's own squares stack with, so the track
+               now rests the same distance off the button as the buttons rest off
+               each other.
+               50 was set when the start-screen CAPTION sat ABOVE the square and
+               the gap had to clear a word as well as the button. The captions
+               moved below the squares earlier today, so that clearance is now
+               protecting nothing. */
+            const BOTTOM_GAP = 14;   // slider-bottom -> PLAY-top
             const MIN_H = 60;        // usable slider length; the TOP gap gives on a short screen to hold this. HALVED with the track below
             const rect = st ? st.getBoundingClientRect() : null;
             // Profile-image bottom in stage px; falls back to the old top area until
