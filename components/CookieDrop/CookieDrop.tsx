@@ -87,18 +87,15 @@ export default function CookieDrop() {
     window.addEventListener("pc:open-cookies", onOpen);
     window.addEventListener("pc:manage-cookies", onManage);
 
-    // Reduced-motion and AT users cannot chase a falling object, so first run opens
-    // the notice directly, with buttons, on any page.
-    let decided = true;
-    try { decided = !!localStorage.getItem(CONSENT_KEY); } catch { decided = true; }
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    let raf = 0;
-    if (!decided && reduced) {
-      raf = requestAnimationFrame(() => { setWithButtons(true); setVisible(true); });
-    }
+    /* The reduced-motion first-run auto-open has gone, 2 September 2026.
+       It existed because a reduced-motion visitor cannot chase a falling cookie,
+       so they were the only people who were ever actually ASKED. CookieBar now
+       asks everyone, on every page, and it is a plain fixed bar with real
+       buttons, so it serves that audience at least as well.
+       Leaving both in would have opened this dialog on top of the bar for
+       exactly the visitors least able to deal with two notices at once. */
 
     return () => {
-      if (raf) cancelAnimationFrame(raf);
       window.removeEventListener("pc:cookies-accepted", onAcc);
       window.removeEventListener("pc:cookies-rejected", onRej);
       window.removeEventListener("pc:open-cookies", onOpen);

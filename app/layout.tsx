@@ -4,6 +4,7 @@ import localFont from "next/font/local";
 import CookieDrop from "../components/CookieDrop/CookieDrop";
 import FallingCookie from "../components/FallingCookie/FallingCookie";
 import Analytics from "../components/Analytics/Analytics";
+import CookieBar from "../components/CookieBar/CookieBar";
 import MetaPixel from "../components/MetaPixel/MetaPixel";
 import PixelRouteEvents from "../components/MetaPixel/PixelRouteEvents";
 import OfferLauncher from "../components/Offer/OfferLauncher";
@@ -248,6 +249,11 @@ export default function RootLayout({
             (CHANGE-LIST C01), wired inside PackPit. RouteWatcher was removed
             (NEEDS_OWNER Q06). */}
         <FallingCookie />
+        {/* The fixed top bar that actually ASKS. CookieDrop below still owns the
+            writing, the manage dialog and the pit's own Accept and Reject
+            objects; this only presents the choice to a visitor who has not made
+            one, which nothing did before. See the note in the component. */}
+        <CookieBar />
         <CookieDrop />
         <Analytics />
         <MetaPixel />

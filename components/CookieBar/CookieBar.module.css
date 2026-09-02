@@ -1,0 +1,87 @@
+/* Fixed to the top of every page until a choice exists.
+
+   Z-INDEX 320, and the number is chosen, not guessed. The Nav is 300 and the
+   accessibility toolbar is 1200. The bar has to sit ABOVE the Nav or it hides
+   behind it on scroll, and BELOW the toolbar so an assistive-tech user can still
+   reach their own controls. CookieDrop is 260, which is why the manage dialog
+   still opens over the page but under this.
+
+   Solid navy, not the glass the dialog wears. Glass reads as decoration; a
+   consent notice has to look like an interruption or it gets ignored, which is
+   the exact failure this replaces. */
+.bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 320;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(10px, 2vw, 20px);
+  flex-wrap: wrap;
+  padding: clamp(10px, 2vw, 14px) clamp(12px, 3vw, 24px);
+  background: var(--navy, #0a3a57);
+  border-bottom: 2px solid var(--yellow, #ffd23e);
+  box-shadow: 0 6px 18px rgba(10, 58, 87, 0.35);
+}
+
+.text {
+  margin: 0;
+  flex: 1 1 320px;
+  font-family: var(--font-body, Montserrat, system-ui);
+  font-weight: 600;
+  font-size: clamp(0.72rem, 2.2vw, 0.85rem);
+  line-height: 1.45;
+  color: #ffffff;
+}
+
+.link {
+  color: var(--yellow, #ffd23e);
+  text-decoration: underline;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  flex: 0 0 auto;
+}
+
+/* Both buttons share EVERY dimension: same padding, same radius, same weight,
+   same font size. Only the fill differs, and that is to tell them apart rather
+   than to rank them. Rejecting has to be as easy as accepting, and a reject
+   styled as a faint text link is the usual way that rule gets broken. */
+.btn {
+  font-family: var(--font-body, Montserrat, system-ui);
+  font-weight: 700;
+  font-size: clamp(0.75rem, 2.2vw, 0.85rem);
+  /* 44px minimum tap target, which is why this is a min-height and not padding
+     alone: the text shrinks on a narrow screen and padding alone would shrink
+     the target with it. */
+  min-height: 44px;
+  padding: 0 clamp(16px, 3vw, 24px);
+  border-radius: 22px;
+  border: 2px solid var(--yellow, #ffd23e);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.accept {
+  background: var(--yellow, #ffd23e);
+  color: var(--navy, #0a3a57);
+}
+
+/* Navy fill with the same yellow rim. Yellow on navy measures well over the 4.5
+   threshold, so this is a genuine equal, not a greyed-out decoy. */
+.reject {
+  background: transparent;
+  color: var(--yellow, #ffd23e);
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn:active { transform: none; }
+}
