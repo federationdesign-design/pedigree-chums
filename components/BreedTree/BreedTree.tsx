@@ -3292,7 +3292,12 @@ export default function BreedTree({
 
        Gated on `dropped`, the same flag that hides the pictures, so the start
        screen and the learn area keep the pale backing they have always had. */
-    if (dropped && strokeByDepth && d.depth > 0) return RING_PALETTE[(d.depth - 1 + 4) % 4];
+    /* SWAPPED, 2 September 2026 (owner). The pit circle wore its depth colour as
+       the FILL and navy as the ring; it now wears navy as the fill and its depth
+       colour as the ring, which is the ring it has everywhere else.
+       strokeColorFor no longer overrides for the pit at all, so the two are back
+       to one rule: depth decides the outline, and the inside is navy. */
+    if (dropped && strokeByDepth && d.depth > 0) return "#0a3a57";
     return d.depth === 0 ? "#0a3a57" : d.depth === 1 ? "#1f8fd0" : "#bfe3f7";
   }
   // Thinner stroke the deeper (smaller) the circle, so the ring never
@@ -3343,21 +3348,11 @@ export default function BreedTree({
          colour where one circle sits inside the other. Two yellows then two
          blues is the owner's scheme, recorded as chosen. */
       const base = RING_PALETTE[(d.depth - 1 + 4) % 4];
-      /* EVERY RING IN THE LIVE PIT IS NAVY, 2 September 2026 (owner).
-
-         Two goes at this. The circles are now FILLED with their own base colour,
-         so a ring at that same base vanished into its own disc. It went to
-         liftStroke first, 10% toward white, which is a hover cue tuned against a
-         photograph and turned out to be far too quiet as an edge on a flat disc
-         of the same hue. Navy is the pit's own outline colour, the one the corner
-         squares, the badges and the name pills already wear, so the circles now
-         match everything else in the pit rather than carrying a private rule.
-
-         DEPTH IS READ FROM THE FILL ALONE once the pit is live, since every ring
-         is the same colour. Before the drop nothing changes: the start screen and
-         the learn area keep the depth-coloured rings and lift only the circle
-         being read. */
-      if (dropped) return "var(--navy, #0a3a57)";
+      /* THE PIT NO LONGER OVERRIDES THIS. It briefly did: while the circles were
+         FILLED with their depth colour, a ring at that same colour vanished into
+         its own disc, so every pit ring was forced to navy. The fill and the ring
+         have since swapped (see fillFor), navy is now the inside, and the ring is
+         free to be the depth colour again in the pit as it is everywhere else. */
       // The circle the player is reading keeps its DEPTH colour, so it can
       // never collide with a same-depth sibling. It is lifted in BRIGHTNESS
       // only: same hue, same width, just lighter.
@@ -7004,18 +6999,35 @@ export default function BreedTree({
                 last row passes ALPHA straight through. The shape is preserved
                 exactly and the colour is ours.
                 The three values are 10/255, 58/255 and 87/255 to three places. */}
-            {/* colorInterpolationFilters sRGB IS LOAD BEARING. SVG filters run in
-                linearRGB by default, so the three constants below were read as
-                LINEAR values and converted up on output: navy 0a3a57 came out
-                around 3882a3, a mid blue, and the mark looked washed out.
-                Forcing sRGB makes the numbers mean what they say. */}
-            <filter id="bt-qmark-navy" x="0" y="0" width="100%" height="100%" colorInterpolationFilters="sRGB">
-              <feColorMatrix type="matrix" values="
-                0 0 0 0 0.039
-                0 0 0 0 0.227
-                0 0 0 0 0.341
-                0 0 0 1 0" />
-            </filter>
+            {/* THE MARK'S COLOUR, ONE FILTER PER DEPTH. It was a single navy
+                filter, which stopped working the moment the fill became navy: a
+                navy mark on a navy disc is an invisible mark. It now takes the
+                circle's own RING colour, so a pit circle is two colours rather
+                than three and the mark reads as part of its own edge.
+
+                An <image> paints what its file paints and ignores `fill`, so the
+                colour has to come from a matrix: the source RGB is thrown away and
+                the constants are written in, while the last row passes ALPHA
+                straight through, preserving the artwork's shape exactly.
+
+                colorInterpolationFilters sRGB IS LOAD BEARING. Filters run in
+                linearRGB by default, so these constants would be read as LINEAR
+                and converted up on output, coming out visibly lighter than asked
+                for. The file's two other tint filters both carry it.
+
+                THE FOUR ENTRIES ARE RING_PALETTE, as fractions of 255. If that
+                array changes, these change with it: there is no way to feed a JS
+                array into a filter matrix without generating the elements, and
+                generating four filters inside `defs` for a value that changes
+                once a year is not worth the indirection. */}
+            {RING_PALETTE.map((hex, qi) => (
+              <filter key={qi} id={`bt-qmark-${qi}`} x="0" y="0" width="100%" height="100%" colorInterpolationFilters="sRGB">
+                <feColorMatrix
+                  type="matrix"
+                  values={`0 0 0 0 ${(parseInt(hex.slice(1, 3), 16) / 255).toFixed(3)} 0 0 0 0 ${(parseInt(hex.slice(3, 5), 16) / 255).toFixed(3)} 0 0 0 0 ${(parseInt(hex.slice(5, 7), 16) / 255).toFixed(3)} 0 0 0 1 0`}
+                />
+              </filter>
+            ))}
             {nodes.map((d, i) =>
               nodeImg(d) ? (
                 <pattern key={i} id={`bt-img-${i}`} patternContentUnits="objectBoundingBox" width="1" height="1">
@@ -7662,7 +7674,8 @@ export default function BreedTree({
               const qmarkEl = (
                 <g data-qmark style={{ display: "none", pointerEvents: "none" }} aria-hidden="true">
                   <image href={QMARK_SRC} width={QMARK_VB} height={QMARK_VB}
-                    preserveAspectRatio="xMidYMid meet" filter="url(#bt-qmark-navy)" />
+                    preserveAspectRatio="xMidYMid meet"
+                    filter={`url(#bt-qmark-${(d.depth - 1 + 4) % 4})`} />
                 </g>
               );
               return (
