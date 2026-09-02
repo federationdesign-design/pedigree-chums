@@ -4130,16 +4130,37 @@ export default function BreedTree({
            that puts the smaller square back on the same visible corner. */
         const UI_NUDGE_X = -15 * uppW + UI_DRAWN_FULL * 0.27 + 5 * uppW + UI_INSET; // right, into the corner
         const UI_NUDGE_Y = -15 * uppW - UI_INSET; // negative is up, measured as close enough
+        /* THE COLLISION SIZE, CORRECTED 2 September 2026 (owner).
+
+           THE BUG. On 2 September the DRAWN square came down 25% and the body
+           deliberately did not, on the grounds that the two were already out of
+           step and that split was documented as not-to-be-fixed. That was wrong
+           once the gap grew this wide. These bodies are CIRCLES of radius
+           uSz/2 * 1.1, and uSz is the untouched 84 slot, so on a phone a 50.6px
+           square was pushing everything away with a 92px circle: a 20px halo of
+           nothing all the way round, and round, so cards could not tuck into the
+           corners either. Visible on screen as an even empty frame around the X
+           and the brain, which is exactly how it was spotted.
+
+           UI_HIT_R ties the circle to UI_DRAWN, which already carries the 0.75,
+           so the body follows the artwork from here on. `half` is left on uSz:
+           it is the rest of the pit's idea of this object's slot, used for
+           placement and for the drag maths, and changing it would move every
+           square that has just been positioned by measurement.
+
+           1.1 is kept. It is the main pit's own margin, so the circle sits a
+           touch outside the square rather than inside its corners. */
+        const UI_HIT_R = (UI_DRAWN / 2) * 1.1 / k;
         const ux = v[0] + (xMinF + vbWf - m - uSz / 2 + UI_NUDGE_X) / k;
         uiBodiesRef.current = [
-          { x: ux, y: v[1] + (-vbHf / 2 + m + uSz / 2 + UI_NUDGE_Y) / k, vx: 0, vy: 0, r: (uSz / 2) * 1.1 / k, half: uSz / 2, a: 0, va: 0, fixed: true, hits: 0, kind: "close" },
+          { x: ux, y: v[1] + (-vbHf / 2 + m + uSz / 2 + UI_NUDGE_Y) / k, vx: 0, vy: 0, r: UI_HIT_R, half: uSz / 2, a: 0, va: 0, fixed: true, hits: 0, kind: "close" },
           /* UI_GAP is the space between the close X and the square under it.
              Was 14px, now 4px (owner, 1 September 2026: "back to right below the
              X"). The desc and learn squares share this slot, only one of them
              showing at a time, so they carry the same figure and must be
              changed together. */
-          { x: ux, y: v[1] + (-vbHf / 2 + m + uSz / 2 + UI_DRAWN + UI_GAP + UI_NUDGE_Y) / k, vx: 0, vy: 0, r: (uSz / 2) * 1.1 / k, half: uSz / 2, a: 0, va: 0, fixed: true, hits: 0, kind: "desc" },
-          { x: ux, y: v[1] + (-vbHf / 2 + m + uSz / 2 + UI_DRAWN + UI_GAP + UI_NUDGE_Y) / k, vx: 0, vy: 0, r: (uSz / 2) * 1.1 / k, half: uSz / 2, a: 0, va: 0, fixed: true, hits: 0, kind: "learn" },
+          { x: ux, y: v[1] + (-vbHf / 2 + m + uSz / 2 + UI_DRAWN + UI_GAP + UI_NUDGE_Y) / k, vx: 0, vy: 0, r: UI_HIT_R, half: uSz / 2, a: 0, va: 0, fixed: true, hits: 0, kind: "desc" },
+          { x: ux, y: v[1] + (-vbHf / 2 + m + uSz / 2 + UI_DRAWN + UI_GAP + UI_NUDGE_Y) / k, vx: 0, vy: 0, r: UI_HIT_R, half: uSz / 2, a: 0, va: 0, fixed: true, hits: 0, kind: "learn" },
           /* THE LOGO. Top CENTRE, not the top-right corner the three squares
              share, and 20% down the stage like the main pit's own placement.
              Its drawn width is the main pit's figure clamped to the pit, so a
@@ -4172,7 +4193,7 @@ export default function BreedTree({
           const anchor = list.find((z) => z.kind === "close");
           const ax = anchor ? anchor.x : ux, ay = anchor ? anchor.y : v[1];
           const mk = (kind: UiKind, vx: number, av: number): UiBody => {
-            const u: UiBody = { x: ax, y: ay, vx: 0, vy: 0, r: (uSz / 2) * 1.1 / k, half: uSz / 2, a: 0, va: 0, fixed: false, hits: 5, kind, id, spawned: true };
+            const u: UiBody = { x: ax, y: ay, vx: 0, vy: 0, r: UI_HIT_R, half: uSz / 2, a: 0, va: 0, fixed: false, hits: 5, kind, id, spawned: true };
             const p = pxFromWorld(u.x, u.y);
             const um = Bodies.circle(p.x, p.y, Math.max(2, u.r * pxPerWorld), { restitution: 0.3, frictionAir: 0.012, density: 0.0012 });
             um.plugin = { ui: u };
