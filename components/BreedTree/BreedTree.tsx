@@ -2408,7 +2408,7 @@ export default function BreedTree({
   // Tap toggles it; hover shows it too, in CSS, behind (hover: hover).
   const [namedChum, setNamedChum] = useState<string | null>(null);
   const [learnNode, setLearnNode] = useState<Node | null>(null);
-  const [learnCard, setLearnCard] = useState<{ name: string; image: string; x: number; y: number; angle: number; r: number; ring: string } | null>(null);
+  const [learnCard, setLearnCard] = useState<{ name: string; image: string; x: number; y: number; angle: number; r: number; ring: string; ringFrac: number } | null>(null);
   const removedNodesRef = useRef<Set<Node>>(new Set());
   const spawnBadgeRef = useRef<((x: number, y: number, r: number, pct: number, opts?: { r?: number; label?: string; charges?: number; green?: boolean }) => void) | null>(null);
   const spawnRodRef = useRef<((x1: number, y1: number, x2: number, y2: number, lit: boolean) => void) | null>(null);
@@ -3702,6 +3702,14 @@ export default function BreedTree({
       // froze pixels-per-world at drop time, so the true radius is that.
       r: fellRef.current && d.depth === 1 ? d.r * (fxPxPerWorldRef.current || 1) : cr.width / 2,
       ring: strokeColorFor(d), // the lifted dog keeps the ring it wore in the pit
+      /* AND ITS WEIGHT, not just its colour, 2 September 2026 (owner). The lift
+         used to draw every ring at ringFrac(1), the thickest entry in the table,
+         so a deep circle's thin ring came back heavy on the card.
+         strokeWidthFor returns a width in world units and the pit draws every
+         ring as a fraction of its own radius, so dividing by d.r recovers that
+         fraction exactly. Taken from the live value rather than looked up again,
+         so the difficulty trim and the hierarchy clamp ride along with it. */
+      ringFrac: strokeWidthFor(d) / Math.max(d.r, 0.0001),
     });
     setLearnNode(d);
     return true;
@@ -3780,6 +3788,8 @@ export default function BreedTree({
       // froze pixels-per-world at drop time, so the true radius is that.
       r: fellRef.current && d.depth === 1 ? d.r * (fxPxPerWorldRef.current || 1) : cr.width / 2,
           ring: strokeColorFor(d), // the lifted dog keeps the ring it wore in the pit
+          // ...and its weight. See the note at the other lift site.
+          ringFrac: strokeWidthFor(d) / Math.max(d.r, 0.0001),
         });
         setLearnNode(d);
         return;
@@ -8967,6 +8977,7 @@ export default function BreedTree({
           }
           circular
           ringColor={learnCard.ring}
+          ringWidthFrac={learnCard.ringFrac}
           // Rarity band across the lifted circle: tier from the lifted dog's
           // in-pit appearance count. Every dog gets one (common is not silent).
           rarityTier={rarityTier(treesContaining(learnNode.data.name))}

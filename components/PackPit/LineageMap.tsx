@@ -283,6 +283,7 @@ export default function LineageMap({
   soloLeaf = false,
   rootRadius,
   ringColor,
+  ringWidthFrac,
   rarityTier,
   strongBg = false,
   initialDepth,
@@ -304,6 +305,10 @@ export default function LineageMap({
   // the circle looks like the one just picked up. Without it the card keeps its
   // own yellow stroke over a blue fill, which reads as two thin rings.
   ringColor?: string;
+  /* THE LIFTED RING'S WEIGHT, as a fraction of the card's radius. Supplied by
+     whoever lifted the circle so the ring on the card matches the ring that
+     circle wore in the pit. Optional: without it the old ringFrac(1) is used. */
+  ringWidthFrac?: number;
   // Mini pit only: the rarity tier of the lifted dog, drawn as a coloured band
   // across the bottom of the circle. Set for every lifted dog (common included).
   rarityTier?: "extremelyRare" | "rare" | "uncommon" | "common";
@@ -413,7 +418,20 @@ export default function LineageMap({
      radius is known. Solved the other way instead: the object is 2R wide plus
      one ring, and the ring is R * frac, so the whole thing is R * (2 + frac).
      Divide the budget by that and the total still lands on 31% exactly. */
-  const liftRingFrac = ringFrac(1);
+  /* WAS ringFrac(1) FOR EVERY LIFT, 2 September 2026 (owner), and that is why the
+     ring read so much heavier on the card than on the circle it came from: entry
+     1 is the THICKEST in the table, 0.09, while a depth-3 circle in the pit wears
+     0.075 and a depth-5 one 0.065. Every lift got the depth-1 weight regardless.
+
+     The caller now sends the fraction the circle actually had, worked out from
+     the pit's own stroke rather than looked up again, so the difficulty trim and
+     the hierarchy clamp come with it. ringFrac(1) stays as the fallback for any
+     caller that does not send one.
+
+     IT ALSO SIZES THE CARD, through the (2 + frac) budget below, so a thinner
+     ring buys a slightly larger picture. That is a couple of pixels and it is the
+     correct direction. */
+  const liftRingFrac = ringWidthFrac ?? ringFrac(1);
   // Floor the tapped radius up to the 250-wide minimum, then cap by the share so
   // a narrow viewport never exceeds its own maximum card (176 at 390). Both the
   // floor and the share divide the same (2 + frac) width budget.
