@@ -7853,8 +7853,11 @@ export default function BreedTree({
                       stroke: isMobile ? "#000000" : undefined,
                     }}
                   >
-                    <tspan x={0}>back to</tspan>
-                    <tspan x={0} dy="1.05em">main page</tspan>
+                    {/* "back to main page" -> "back", 2 September 2026 (owner).
+                        One tspan, not two: the second carried a dy of 1.05em and
+                        with nothing under it that line would have reserved space
+                        for a row that is no longer there. */}
+                    <tspan x={0}>back</tspan>
                   </text>
                 ) : null}
               </g>
