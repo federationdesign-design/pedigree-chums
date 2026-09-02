@@ -1143,11 +1143,21 @@
    level background in, which is a separate clip in the TSX. */
 .learnPlay {
   position: absolute;
-  /* 15.5, and it is exact at every scale rather than a fitted number: the axis
-     is 18 + S/2 and the artboard is S + 5 across, so axis - (S+5)/2 is always
-     18 - 2.5 whatever S is. 4% used to drift away from the start screen's
-     button as the window widened. */
-  left: 15.5px;
+  /* WAS 15.5px, and that was exact at every scale rather than fitted: the axis
+     is 18 + S/2 and the artboard is S + 5 across, so axis - (S+5)/2 always came
+     to 18 - 2.5 whatever S was. 4% used to drift away from the start screen's
+     button as the window widened.
+
+     2 September 2026: the drawn square came down 25% and the AXIS DID NOT, so
+     that cancellation no longer holds and left has to be measured per
+     breakpoint. Both figures are axis - (S + 5) / 2 worked out longhand:
+
+       desktop  pitScale 1     S = 100.8 * 0.75 = 75.6   axis 68.4  ->  28.1
+       phone    pitScale 0.67  S =  67.5 * 0.75 = 50.65  axis 51.8  ->  24.0
+
+     PLAY stays centred on --pit-axis, which the title, the score and the
+     difficulty slider all share, so nothing falls out of line. */
+  left: 28.1px;
   bottom: 3%;
   z-index: 16;
   border: 0;
@@ -1430,18 +1440,28 @@
 /* Reopen dock: a closed learn card drops to an icon on the right, tap to reopen. */
 .learnDock {
   position: fixed;
-  /* A ROW running left from the back square. Desktop: on the square's own line
-     (top 18), right edge one square + gap in from the corner so it clears the
-     close/desc column. Phone (media query below): one line down and tucked
-     further left, clear of the desc square, so close + three icons fit a 390px
-     width. Button sizes match the square's real 768px breakpoint (100.8 desktop
-     / 67.5 phone), the figures .closeCircular uses, so "sized to match" holds. */
-  /* 2 September 2026: the corner square came down 25%, 100.8 -> 75.6 on desktop
-     and 67.5 -> 50.6 on a phone, so every figure derived from it here follows.
-     These offsets are not decoration: they are "one square plus a gap in from
-     the corner", so leaving them would park the dock over empty space. */
-  top: 18px;
-  right: 107.6px;   /* 18 + 75.6 square + 14 gap */
+  /* SUPERSEDED, kept for the reasoning only: this used to be a row running LEFT
+     from the back square, on the square's own line on desktop and one line down
+     on a phone. Button sizes still match the corner square's 768px breakpoint,
+     which is what "sized to match" meant and still means.
+
+     MOVED TO THE BOTTOM ROW, 2 September 2026 (owner). It used to hang off the
+     top right on the desc square's own line. It now runs left to right along the
+     foot, starting just past the PLAY button, on PLAY's own bottom.
+
+     WHY THIS SLOT IS FREE. The zoom-out button lives here too, but the two can
+     never be on screen together: zooming into a circle clears the picked chum
+     (BreedTree.tsx, the dockAside line in the zoom handler), and the dock only
+     renders while a chum is picked.
+
+     Left is PLAY's visible right edge plus the same 14px of air the corner
+     squares stack with: desktop 28.1 + 80.6 + 14 = 122.7. The phone figure is in
+     the media query below. Bottom is PLAY's own 3%, not a copy of a pixel value,
+     so the two bottoms cannot drift apart. */
+  top: auto;
+  right: auto;
+  bottom: 3%;
+  left: 122.7px;
   display: flex;
   flex-direction: row;
   gap: 14px;        /* the squares' own gap */
@@ -1458,7 +1478,10 @@
   align-items: center;
   justify-content: center;
   padding: 0;
-  box-shadow: 0 3px 0 rgba(10, 58, 87, 0.3);
+  /* The 3px drop shadow is gone, 2 September 2026. It read as extra height under
+     the button, which put these visibly lower than PLAY once the two shared a
+     bottom edge. The same call was made on .zoomOutBtn for the same reason:
+     PLAY has no shadow, so nothing beside it can have one. */
   position: relative;
   animation: dockPop 440ms cubic-bezier(0.2, 0.9, 0.3, 1.5) both;
 }
@@ -1483,13 +1506,30 @@
   pointer-events: none;
   user-select: none;
 }
-/* Phone: the back square drops to 67.5px (pitScale 0.67 below 768px), so the dock
-   matches, drops one line down, and tucks left of the desc column, keeping close
-   + three icons inside a 390px width (~348px used). */
+/* Phone: the corner square drops to 50.6px (pitScale 0.67 below 768px, then the
+   25% shrink), so the dock matches it. The dock no longer drops "one line down"
+   or tucks left of the desc column: it is on the bottom row now, and the figures
+   below are measured off the PLAY button rather than off the corner. */
 @media (max-width: 768px) {
+  /* PLAY's phone offset: 51.8 - (50.65 + 5) / 2. See the longhand on .learnPlay. */
+  .learnPlay { left: 24px; }
+  /* The zoom-out button is measured off PLAY's visible right edge, so it moves
+     and shrinks with it. PLAY's visible box is now 24 + 55.65 = 79.65 wide to
+     its right edge, and this button's outline draws 5px outside its box, so
+     79.65 + 14 of air + 5 = 98.7. The box is 55.65 - 10 = 45.65 to land on the
+     same visible square, and the radius is PLAY's outer 17.7 less the 5px
+     outline. All four figures come from the block above this rule. */
+  .zoomOutBtn {
+    left: 98.7px;
+    width: 45.65px;
+    height: 45.65px;
+    border-radius: 12.7px;
+  }
   .learnDock {
-    top: 82.6px;    /* one line down: 18 + 50.6 square + 14 gap */
-    right: 82.6px;  /* left of the desc column: 18 + 50.6 + 14 */
+    top: auto;
+    right: auto;
+    bottom: 3%;
+    left: 93.7px;   /* PLAY's visible right edge 79.65 + 14 of air */
   }
   .learnDockBtn {
     width: 50.6px;

@@ -8374,7 +8374,16 @@ export default function BreedTree({
               rim is centred on the rect, so the artboard carries 2.5px of
               padding on every side to hold it. */}
           {(() => {
-            const S = 84 * pitScale * 1.2;
+            /* 25% OFF, 2 September 2026 (owner), matching the start screen's
+               PLAY and LEARN and the corner square.
+               THE LEFT OFFSET IN THE STYLESHEET IS NO LONGER SELF-CANCELLING.
+               .learnPlay used to sit at a flat left: 15.5px, which was exact at
+               every scale because the axis is 18 + S/2 and the artboard is S + 5,
+               so axis - (S+5)/2 always came to 18 - 2.5. That cancellation only
+               holds while the drawn square IS the axis square. It no longer is,
+               so .learnPlay now carries a measured left per breakpoint. Change
+               this 0.75 and those two numbers are wrong. */
+            const S = 84 * pitScale * 1.2 * 0.75;
             const B = S + 5;
             const c = B / 2;
             const g = S * 0.34;
