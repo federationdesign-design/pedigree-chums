@@ -3152,7 +3152,16 @@ export default function BreedTree({
   // as "lighter" without shifting colour or width. 0.4 was chosen so the lift
   // shows on the hard case: navy over a dark photograph.
   function liftStroke(hex: string): string {
-    const t = 0.4;
+    /* 0.4 -> 0.1, 2 September 2026 (owner). The lift is now a tenth of the way
+       to white rather than four tenths.
+
+       IT IS NEARLY INVISIBLE ON THREE OF THE FOUR, and that is measured rather
+       than an opinion: depth 1 moves #fff200 -> #fff31a, depth 2 #ffdf00 ->
+       #ffe21a, depth 4 #000000 -> #1a1a1a. Only depth 3's blue shows a change
+       you would notice. 0.4 was chosen because a smaller lift did not read on
+       the hard case, a ring over a dark photograph. Raising this one number is
+       the whole fix if the hover stops reading. */
+    const t = 0.1;
     const up = [1, 3, 5]
       .map((i) => parseInt(hex.slice(i, i + 2), 16))
       .map((v) => Math.round(v + (255 - v) * t));
@@ -3160,7 +3169,22 @@ export default function BreedTree({
   }
   function strokeColorFor(d: Node): string {
     if (strokeByDepth) {
-      const base = ["#ffd23e", "#0a3a57", "#5cc4ee", "#ffffff"][(d.depth - 1 + 4) % 4];
+      /* THE RING PALETTE, replaced 2 September 2026 (owner). Was
+         #ffd23e yellow / #0a3a57 navy / #5cc4ee blue-sky / #ffffff white.
+
+         The table CYCLES: depth 5 is entry 1 again, 6 is entry 2, and so on, so
+         these four have to stay legible against each other as well as against a
+         photograph.
+
+         NOTE DEPTHS 1 AND 2 ARE BOTH YELLOW, #fff200 and #ffdf00, and differ
+         only in the green channel, 242 against 223. A child ring sitting inside
+         its parent will read as the same colour. The old table put navy at
+         depth 2 for exactly that reason. Recorded as the owner's call, not an
+         oversight to be quietly corrected.
+
+         Depth 4 is now black where it was white, so a ring at that depth over a
+         dark photograph is the case to look at first if one goes missing. */
+      const base = ["#fff200", "#ffdf00", "#009fe0", "#000000"][(d.depth - 1 + 4) % 4];
       // The circle the player is reading keeps its DEPTH colour, so it can
       // never collide with a same-depth sibling. It is lifted in BRIGHTNESS
       // only: same hue, same width, just lighter.
