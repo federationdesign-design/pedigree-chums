@@ -137,12 +137,18 @@ export default function BreedStrip({
 
      Zero at the start, so failing level one reports zero. Owner confirmed. */
   const [bankedScore, setBankedScore] = useState(0);
-  /* Every completed level's chum catch, as a percentage. Kept here rather than
-     in the modal because the modal is keyed per level and remounts on each one.
-     A list rather than a running mean, so the average is of the levels and not
-     of the chums: a level with three chums counts the same as one with twenty,
-     which is what was asked for. */
-  const [chumRates, setChumRates] = useState<number[]>([]);
+  /* Every COMPLETED level's chum catch, as raw counts. Kept here rather than in
+     the modal because the modal is keyed per level and remounts on each one.
+
+     Counts rather than the percentages this held until now, because the run
+     total is read as "23, then 46, then 230" and a mean of percentages cannot
+     be turned back into that. The per-level percentage average is still
+     derived from these below, so nothing that read it has changed.
+
+     A failed level never appends here: the modal only reports on a win, which
+     is the same rule bankedScore advances under. Five retries of level one
+     therefore cannot show 115 possible. */
+  const [chumTallies, setChumTallies] = useState<{ found: number; possible: number }[]>([]);
   /* How many times each dog has been caught this run, by name. The picture is
      resolved from the pack data rather than carried through two components,
      because the pack is already the source of truth for it here. */
@@ -458,11 +464,17 @@ export default function BreedStrip({
       onScoreChange={setCampaignScore}
       bankedScore={bankedScore}
       onBankScore={setBankedScore}
-      onLevelChumRate={(pct) => setChumRates((r) => [...r, pct])}
+      onLevelChums={(found, possible) => setChumTallies((t) => [...t, { found, possible }])}
       onChumCaught={(n) => setChumCounts((c) => ({ ...c, [n]: (c[n] ?? 0) + 1 }))}
       topChum={topChum}
-      runChumRate={chumRates.length ? chumRates.reduce((a, b) => a + b, 0) / chumRates.length : null}
-      runLevels={chumRates.length}
+      /* Unchanged in meaning: still the mean of each completed level's own
+         percentage, so a level with three chums counts the same as one with
+         twenty. Only the source changed, from stored percentages to counts. */
+      runChumRate={chumTallies.length ? chumTallies.reduce((a, t) => a + (t.possible > 0 ? (t.found / t.possible) * 100 : 0), 0) / chumTallies.length : null}
+      runLevels={chumTallies.length}
+      /* THE RUN TOTAL. Plain sums, completed levels only. */
+      runChumsFound={chumTallies.reduce((a, t) => a + t.found, 0)}
+      runChumsPossible={chumTallies.reduce((a, t) => a + t.possible, 0)}
       eraJoinLabel={eraJoinLabel}
       nextLevelLabel={nextUp?.name}
       nextLevelImage={(() => { const nb = nextLevelOf(active.name); return nb ? buildActive(nb)?.image : undefined; })()}
@@ -493,7 +505,7 @@ export default function BreedStrip({
         setStreak(0);
         setCampaignScore(0);
         setBankedScore(0); // a fresh run has nothing banked either
-        setChumRates([]);
+        setChumTallies([]);
         setChumCounts({});
       }}
       onStartOver={() => {

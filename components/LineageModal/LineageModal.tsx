@@ -112,16 +112,26 @@ type Props = {
   onSpendLife?: () => void;
   // PLAY AGAIN on a spent run: the page restores lives and the campaign total.
   onResetRun?: () => void;
-  /* This level's chum catch, as a percentage, reported once when the level is
+  /* This level's chum catch, as RAW COUNTS, reported once when the level is
      completed. The modal is keyed per level and remounts on every one, so the
      figure has to leave here or it goes with it. Silent when the level had no
      chums to catch: a level with nothing to collect is not a level you caught
-     none of, and averaging in a nought would say it was. */
-  onLevelChumRate?: (pct: number) => void;
+     none of, and counting a nought possible would say it was.
+
+     Counts rather than the percentage it used to send, because the run total is
+     "23, then 46, then 230" and a mean of percentages cannot be turned back
+     into that. The page still derives the old percentage from these, so
+     runChumRate below keeps working. */
+  onLevelChums?: (found: number, possible: number) => void;
   // The run so far, handed back down for the game over screen. Mean of every
   // completed level's percentage, and how many levels went into it.
   runChumRate?: number | null;
   runLevels?: number;
+  /* THE RUN TOTAL, completed levels only. A failed level shows its own round
+     figure and leaves these two alone, which is the same rule the campaign
+     score banks under. Shown on the win screen and on both end states. */
+  runChumsFound?: number;
+  runChumsPossible?: number;
   /* Each catch as it happens, so the run can count which dog turns up most.
      A chum leaves this level's flood once taken, but the sets reset per level,
      so the same breed can be caught again in a later one. */
@@ -133,7 +143,7 @@ type Props = {
   era?: string;
 };
 
-export default function LineageModal({ name, image, character, lineage, fromRect, onClose, nextLevelLabel, onNextLevel, onStartOver, initialScore, onScoreChange, bankedScore, onBankScore, era, lives, livesMax = 6, onLost, onSpendLife, onResetRun, nextLevelImage, levelNo, eraJoinLabel, onLevelChumRate, onChumCaught, topChum }: Props) {
+export default function LineageModal({ name, image, character, lineage, fromRect, onClose, nextLevelLabel, onNextLevel, onStartOver, initialScore, onScoreChange, bankedScore, onBankScore, era, lives, livesMax = 6, onLost, onSpendLife, onResetRun, nextLevelImage, levelNo, eraJoinLabel, onLevelChums, onChumCaught, topChum, runChumsFound, runChumsPossible }: Props) {
   const theme = levelThemeFor(era);
   // The close X asks before it closes. A round can take a couple of minutes to
   // build up, and losing it to a mis-tap in the corner is a rotten exit.
@@ -550,8 +560,12 @@ export default function LineageModal({ name, image, character, lineage, fromRect
                going back to learn, walking out, returns the score to whatever
                was banked here last. */
             onBankScore?.(score);
-            // Completed, so this level's catch counts toward the run.
-            if (packSize > 0) onLevelChumRate?.((collectedChums.size / packSize) * 100);
+            /* Completed, so this level's catch counts toward the run. This is
+               the ONLY place it fires: a failed level never reaches here, which
+               is what keeps the running total to completed levels only.
+               `possible` uses the same Math.max the three rate readouts use, so
+               the total can never report fewer possible than were found. */
+            if (packSize > 0) onLevelChums?.(collectedChums.size, Math.max(packSize, collectedChums.size));
             /* CONFETTI REMOVED 31 August 2026 (Steve): off-style, and the
                most expensive thing on screen at the worst possible moment.
 
@@ -771,6 +785,22 @@ export default function LineageModal({ name, image, character, lineage, fromRect
                       </span>
                     </span>
                   )}
+                  {/* THE RUN, under the round. This level is already in it: the
+                      counts are banked in onRoundWon above, which runs before
+                      this screen renders. Completed levels only, so a retry can
+                      never inflate the possible figure.
+                      Wears the round's own classes rather than new ones, so the
+                      two read as the same kind of figure and the stylesheet does
+                      not gain a near-duplicate rule. */}
+                  {(runChumsPossible ?? 0) > 0 && (
+                    <span className={css.winRate}>
+                      <span className={css.winRateTitle}>Run total:</span>
+                      <span className={css.winRateValue}>{runChumsFound ?? 0}</span>
+                      <span className={css.winRateDetail}>
+                        found from {runChumsPossible} chums so far
+                      </span>
+                    </span>
+                  )}
                 </span>
               </div>
               <div className={css.winScore}>Your Round Score: {score.toLocaleString()}</div>
@@ -874,6 +904,22 @@ export default function LineageModal({ name, image, character, lineage, fromRect
                   <span className={css.endRoundDetail}>
                     {collectedChums.size} found from potentially{" "}
                     {Math.max(packSize, collectedChums.size)} chums
+                  </span>
+                </div>
+              )}
+              {/* THE RUN TOTAL, on BOTH end states. It sits outside the
+                  outOfLives branch above, so LEVEL FAILED and GAME OVER both
+                  carry it. The round that just failed is NOT in it, by
+                  decision: only a completed level advances the total, the same
+                  rule the campaign score banks under.
+                  Wears .endRound's classes, so no new stylesheet rules and the
+                  two figures read as one family. */}
+              {(runChumsPossible ?? 0) > 0 && (
+                <div className={css.endRound}>
+                  <span className={css.endRoundTitle}>Run total:</span>
+                  <span className={css.endRoundValue}>{runChumsFound ?? 0}</span>
+                  <span className={css.endRoundDetail}>
+                    found from {runChumsPossible} chums across the levels you completed
                   </span>
                 </div>
               )}
