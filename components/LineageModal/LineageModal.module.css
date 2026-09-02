@@ -170,10 +170,11 @@
 }
 
 @media (max-width: 768px) {
-  /* The corner square is 50.6 below 768px, not 75.6, so the score's clearance
-     changes with it: 18 + 50.6 + 14. The breakpoint is 768 to match pitScale in
-     BreedTree, NOT the 640 the block below uses. */
-  .scoreTotal { right: 82.6px; }
+  /* The corner square is 50.6 below 768px, not 75.6, so the score's line changes
+     with it: 18 + 50.6 + 8. The breakpoint is 768 to match pitScale in
+     BreedTree, NOT the 640 the block below uses. `right` is 18 at every width
+     and is set on the base rule. */
+  .scoreTotal { top: 76.6px; }
 }
 @media (max-width: 640px) {
   /* PHONE: only the level's own dog is shown in the header. The ladder rows under
@@ -295,8 +296,19 @@
      The translate is gone with the centring, so the pulse below is a plain
      scale. transform-origin pins it to the right edge, or a growing number would
      appear to shuffle sideways on every point scored. */
-  top: 17px;
-  right: 107.6px;
+  /* IN THE CORNER, 2 September 2026 (owner). It was right: 107.6, which cleared
+     the pit's close square sideways and read as centre-right rather than as a
+     corner.
+
+     IT CANNOT SHARE THE X'S LINE. That square is in the top right during PLAY as
+     well as on the start screen, so the two would sit on top of each other. The
+     score is therefore right-aligned to the SAME 18px edge the square uses, and
+     dropped one line beneath it:
+       desktop  18 + 75.6 square + 8 gap = 101.6
+       phone    18 + 50.6 square + 8 gap =  76.6   (media query below)
+     Change the corner square's size and both figures move with it. */
+  top: 101.6px;
+  right: 18px;
   min-width: 84px;
   box-sizing: border-box;
   text-align: right;
