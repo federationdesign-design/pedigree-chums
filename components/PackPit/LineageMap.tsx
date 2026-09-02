@@ -2168,6 +2168,66 @@ export default function LineageMap({
         cannot live on the overlay any more. */}
     {circular && !bounded && <div className={styles.liftWash} aria-hidden="true" />}
     {strongBg && !circular && !bounded && <div className={styles.chumWash} aria-hidden="true" />}
+    {/* ============ THE CHROME, OUTSIDE THE SCALED OVERLAY ============
+        The back button and the two counters are `position: fixed` and pinned to
+        the screen corners, and they used to live inside the overlay below. That
+        element now carries a scale(0.8), and a transform scales its children
+        about the element's CENTRE, so anything pinned to a corner was pulled a
+        tenth of the viewport inwards and shrank with everything else. That is
+        why the back button drifted off the corner and the frame counter left the
+        top left.
+
+        Moved out rather than counter-scaled: a counter-scale would restore the
+        SIZE and leave the position wrong, because the offset comes from the
+        distance to the centre, not from the element's own box.
+
+        Nothing else changes. All three are fixed, so their own top/left/right
+        values now resolve against the viewport as they were always written to.
+        ================================================================ */}
+        {/* BACK, not close. A play triangle facing left: it takes you back a layer
+            rather than dismissing anything.
+            closeCircular is now applied for the chum family tree too, not only the
+            pit lift. Without it that screen fell back to .close, which is 52px
+            with no border, against the pit's 100.8 with a 5px navy stroke: the
+            size and the missing stroke line were both this. */}
+        {/* Bounded (/chums2) has no back button: the page's own CloseX closes the
+            tree and rails its reopen icon. */}
+        {!bounded && (
+        <button
+          type="button"
+          className={liftRoot ? `${styles.close} ${styles.closeCircular}` : styles.close}
+          onClick={onClose}
+          aria-label="Back"
+        >
+          {liftRoot ? (
+            <svg className={styles.backGlyph} viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path
+                d="M17 4 L7 12 L17 20 Z"
+                fill="currentColor"
+                stroke="currentColor"
+                strokeWidth="3"
+                strokeLinejoin="round"
+              />
+            </svg>
+          ) : (
+            <>&times;</>
+          )}
+        </button>
+        )}
+        {!bounded && totalNodes > 0 && frameTotal === 0 && !packed && !collecting && (() => {
+          const prog = Math.min(1, seen.size / totalNodes); // 0 (none turned) -> 1 (all turned)
+          const dotBg = `hsl(${212 - prog * 87}, ${72 + prog * 13}%, ${44 + prog * 3}%)`; // blue -> bright green
+          return (
+            <div className={styles.dotCount} style={{ background: dotBg }} aria-label={`${seen.size} of ${totalNodes} circles turned`}>
+              {seen.size}/{totalNodes}
+            </div>
+          );
+        })()}
+        {frameTotal > 0 && !packed && !collecting && (
+          <div className={styles.frameCount} aria-label={`${filled.size} of ${frameTotal} frames filled`}>
+            {filled.size}/{frameTotal}
+          </div>
+        )}
     <div
       ref={overlayRef}
       // BACKGROUND: the chum family tree is back on the faint brand wash.
@@ -2219,50 +2279,6 @@ export default function LineageMap({
       onPointerUp={onPanUp}
       onPointerCancel={onPanUp}
     >
-      {/* BACK, not close. A play triangle facing left: it takes you back a layer
-          rather than dismissing anything.
-          closeCircular is now applied for the chum family tree too, not only the
-          pit lift. Without it that screen fell back to .close, which is 52px
-          with no border, against the pit's 100.8 with a 5px navy stroke: the
-          size and the missing stroke line were both this. */}
-      {/* Bounded (/chums2) has no back button: the page's own CloseX closes the
-          tree and rails its reopen icon. */}
-      {!bounded && (
-      <button
-        type="button"
-        className={liftRoot ? `${styles.close} ${styles.closeCircular}` : styles.close}
-        onClick={onClose}
-        aria-label="Back"
-      >
-        {liftRoot ? (
-          <svg className={styles.backGlyph} viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <path
-              d="M17 4 L7 12 L17 20 Z"
-              fill="currentColor"
-              stroke="currentColor"
-              strokeWidth="3"
-              strokeLinejoin="round"
-            />
-          </svg>
-        ) : (
-          <>&times;</>
-        )}
-      </button>
-      )}
-      {!bounded && totalNodes > 0 && frameTotal === 0 && !packed && !collecting && (() => {
-        const prog = Math.min(1, seen.size / totalNodes); // 0 (none turned) -> 1 (all turned)
-        const dotBg = `hsl(${212 - prog * 87}, ${72 + prog * 13}%, ${44 + prog * 3}%)`; // blue -> bright green
-        return (
-          <div className={styles.dotCount} style={{ background: dotBg }} aria-label={`${seen.size} of ${totalNodes} circles turned`}>
-            {seen.size}/{totalNodes}
-          </div>
-        );
-      })()}
-      {frameTotal > 0 && !packed && !collecting && (
-        <div className={styles.frameCount} aria-label={`${filled.size} of ${frameTotal} frames filled`}>
-          {filled.size}/{frameTotal}
-        </div>
-      )}
       {frameTotal > 0 && !packed && !collecting && frameSlots.chum.length > 0 && (
         <div className={styles.packHead} style={{ left: F_LEFT - CW / 2, top: chumTop - 90 }}>A Pedigree Chum</div>
       )}
