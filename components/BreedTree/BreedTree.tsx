@@ -3279,6 +3279,20 @@ export default function BreedTree({
          colour where one circle sits inside the other. Two yellows then two
          blues is the owner's scheme, recorded as chosen. */
       const base = RING_PALETTE[(d.depth - 1 + 4) % 4];
+      /* EVERY RING IN THE LIVE PIT WEARS THE LIFTED COLOUR, 2 September 2026
+         (owner). The circles are now FILLED with the base colour, so a ring at
+         that same base disappeared into its own disc. The lift is 10% toward
+         white, same hue, same width, so the ring reads as an edge on the fill
+         rather than as a second colour.
+
+         THE HOVER LIFT IS SPENT ONCE THE PIT IS LIVE. It used to mark the circle
+         you were reading; now every ring carries it, so during a round they all
+         look alike. That is the cost of having a visible edge at all, and hover
+         is a learn-area idea rather than a playing one.
+
+         Before the drop nothing changes: the start screen and the learn area
+         still lift only the shown circle, against the pale backing fills. */
+      if (dropped) return liftStroke(base);
       // The circle the player is reading keeps its DEPTH colour, so it can
       // never collide with a same-depth sibling. It is lifted in BRIGHTNESS
       // only: same hue, same width, just lighter.
