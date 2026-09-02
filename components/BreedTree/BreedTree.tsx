@@ -3279,20 +3279,21 @@ export default function BreedTree({
          colour where one circle sits inside the other. Two yellows then two
          blues is the owner's scheme, recorded as chosen. */
       const base = RING_PALETTE[(d.depth - 1 + 4) % 4];
-      /* EVERY RING IN THE LIVE PIT WEARS THE LIFTED COLOUR, 2 September 2026
-         (owner). The circles are now FILLED with the base colour, so a ring at
-         that same base disappeared into its own disc. The lift is 10% toward
-         white, same hue, same width, so the ring reads as an edge on the fill
-         rather than as a second colour.
+      /* EVERY RING IN THE LIVE PIT IS NAVY, 2 September 2026 (owner).
 
-         THE HOVER LIFT IS SPENT ONCE THE PIT IS LIVE. It used to mark the circle
-         you were reading; now every ring carries it, so during a round they all
-         look alike. That is the cost of having a visible edge at all, and hover
-         is a learn-area idea rather than a playing one.
+         Two goes at this. The circles are now FILLED with their own base colour,
+         so a ring at that same base vanished into its own disc. It went to
+         liftStroke first, 10% toward white, which is a hover cue tuned against a
+         photograph and turned out to be far too quiet as an edge on a flat disc
+         of the same hue. Navy is the pit's own outline colour, the one the corner
+         squares, the badges and the name pills already wear, so the circles now
+         match everything else in the pit rather than carrying a private rule.
 
-         Before the drop nothing changes: the start screen and the learn area
-         still lift only the shown circle, against the pale backing fills. */
-      if (dropped) return liftStroke(base);
+         DEPTH IS READ FROM THE FILL ALONE once the pit is live, since every ring
+         is the same colour. Before the drop nothing changes: the start screen and
+         the learn area keep the depth-coloured rings and lift only the circle
+         being read. */
+      if (dropped) return "var(--navy, #0a3a57)";
       // The circle the player is reading keeps its DEPTH colour, so it can
       // never collide with a same-depth sibling. It is lifted in BRIGHTNESS
       // only: same hue, same width, just lighter.
