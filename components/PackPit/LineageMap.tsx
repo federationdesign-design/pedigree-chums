@@ -284,6 +284,7 @@ export default function LineageMap({
   rootRadius,
   ringColor,
   ringWidthFrac,
+  ringWidthPx,
   rarityTier,
   strongBg = false,
   initialDepth,
@@ -309,6 +310,9 @@ export default function LineageMap({
      whoever lifted the circle so the ring on the card matches the ring that
      circle wore in the pit. Optional: without it the old ringFrac(1) is used. */
   ringWidthFrac?: number;
+  /* THE LIFTED RING'S WEIGHT IN PIXELS, which wins over the fraction when it is
+     given. The fraction still sizes the card; this decides what is drawn. */
+  ringWidthPx?: number;
   // Mini pit only: the rarity tier of the lifted dog, drawn as a coloured band
   // across the bottom of the circle. Set for every lifted dog (common included).
   rarityTier?: "extremelyRare" | "rare" | "uncommon" | "common";
@@ -440,7 +444,22 @@ export default function LineageMap({
   const liftR = circular && rootRadius
     ? Math.min(liftShareR, Math.max(liftFloorR, rootRadius))
     : ROOT;
-  const liftRingW = circular && ringColor ? liftR * liftRingFrac : 5;
+  /* THE RING IS DRAWN AT THE PIT'S OWN PIXEL WIDTH when the caller sends one,
+     2 September 2026 (owner): "exactly the same as the pit ring, not increased".
+
+     A FRACTION IS NOT ENOUGH, which is what the previous pass got wrong. liftR is
+     FLOORED up for a small circle, so the card can be larger than the circle it
+     came from, and the same fraction of a larger radius is a wider line. Matching
+     the pixels is the only way the ring is unchanged.
+
+     The fraction still sizes the CARD through the (2 + frac) budget above, so the
+     picture is unaffected; only the drawn width changes.
+
+     A CONSEQUENCE, and it is the intended one: on a floored-up card the ring will
+     read as PROPORTIONALLY thinner than it did in the pit, because the picture
+     grew and the line did not. The outer glow around it is separate and will
+     still make the whole thing look larger than the line itself. */
+  const liftRingW = circular && ringColor ? (ringWidthPx ?? liftR * liftRingFrac) : 5;
   // The Learn/Complete button is a fixed 200x68. On a small card that swamps
   // the picture, so it scales WITH the card: width 1.8 * R (~151px on a 390
   // phone, tuned up from 1.4 by eye on the device), capped at

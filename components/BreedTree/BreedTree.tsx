@@ -2408,7 +2408,7 @@ export default function BreedTree({
   // Tap toggles it; hover shows it too, in CSS, behind (hover: hover).
   const [namedChum, setNamedChum] = useState<string | null>(null);
   const [learnNode, setLearnNode] = useState<Node | null>(null);
-  const [learnCard, setLearnCard] = useState<{ name: string; image: string; x: number; y: number; angle: number; r: number; ring: string; ringFrac: number } | null>(null);
+  const [learnCard, setLearnCard] = useState<{ name: string; image: string; x: number; y: number; angle: number; r: number; ring: string; ringFrac: number; ringPx: number } | null>(null);
   const removedNodesRef = useRef<Set<Node>>(new Set());
   const spawnBadgeRef = useRef<((x: number, y: number, r: number, pct: number, opts?: { r?: number; label?: string; charges?: number; green?: boolean }) => void) | null>(null);
   const spawnRodRef = useRef<((x1: number, y1: number, x2: number, y2: number, lit: boolean) => void) | null>(null);
@@ -3710,6 +3710,18 @@ export default function BreedTree({
          fraction exactly. Taken from the live value rather than looked up again,
          so the difficulty trim and the hierarchy clamp ride along with it. */
       ringFrac: strokeWidthFor(d) / Math.max(d.r, 0.0001),
+      /* AND THE SAME WEIGHT IN PIXELS, 2 September 2026 (owner). The fraction
+         above is not enough on its own: the lift FLOORS a small circle up to a
+         minimum card, and a fraction of a bigger radius is a bigger ring, so a
+         small dog still came back with a heavier line than it had in the pit.
+
+         This is the pit's drawn width in real pixels: the fraction multiplied by
+         the same circle radius the `r` field above uses. Written out again rather
+         than reusing `r`, because an object literal cannot read its own field. If
+         that radius expression changes, change it in BOTH places. */
+      ringPx:
+        (strokeWidthFor(d) / Math.max(d.r, 0.0001)) *
+        (fellRef.current && d.depth === 1 ? d.r * (fxPxPerWorldRef.current || 1) : cr.width / 2),
     });
     setLearnNode(d);
     return true;
@@ -3790,6 +3802,10 @@ export default function BreedTree({
           ring: strokeColorFor(d), // the lifted dog keeps the ring it wore in the pit
           // ...and its weight. See the note at the other lift site.
           ringFrac: strokeWidthFor(d) / Math.max(d.r, 0.0001),
+          // ...and in pixels. See the note at the other lift site.
+          ringPx:
+            (strokeWidthFor(d) / Math.max(d.r, 0.0001)) *
+            (fellRef.current && d.depth === 1 ? d.r * (fxPxPerWorldRef.current || 1) : cr.width / 2),
         });
         setLearnNode(d);
         return;
@@ -8978,6 +8994,7 @@ export default function BreedTree({
           circular
           ringColor={learnCard.ring}
           ringWidthFrac={learnCard.ringFrac}
+          ringWidthPx={learnCard.ringPx}
           // Rarity band across the lifted circle: tier from the lifted dog's
           // in-pit appearance count. Every dog gets one (common is not silent).
           rarityTier={rarityTier(treesContaining(learnNode.data.name))}
