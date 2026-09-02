@@ -1521,6 +1521,25 @@
      outline. All four figures come from the block above this rule. */
   .zoomOutBtn {
     left: 98.7px;
+    /* UP ONE ROW, 2 September 2026 (owner). It shared the bottom row with the
+       info dock and the two DO collide.
+
+       The collision case, for the record, because the first reading of this was
+       wrong: tapping a circle to zoom clears the picked chum (onCircle in
+       BreedTree.tsx), so that path is safe and the dock is gone. But picking a
+       chum from the RAIL while already zoomed in sets the chum and leaves the
+       zoom alone, so both render.
+
+       IT COULD NOT MOVE SIDEWAYS INSTEAD. The bottom row is full: PLAY ends at
+       79.65, the dock runs 93.7 to 273.5, and the chum rail starts around 287.
+       Fourteen pixels is not a button.
+
+       So it stacks. 3% is the row's own bottom, 50.6 is the dock button, 14 is
+       the standard gap, and 5 more because this button's rim is an `outline`
+       that draws outside its box while the dock's border draws inside.
+       It now sits one row up ALWAYS, including when no chum is picked and the
+       dock is not there. A fixed position cannot know. */
+    bottom: calc(3% + 69.6px);
     width: 45.65px;
     height: 45.65px;
     border-radius: 12.7px;
