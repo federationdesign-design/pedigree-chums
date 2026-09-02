@@ -1527,8 +1527,13 @@
    or tucks left of the desc column: it is on the bottom row now, and the figures
    below are measured off the PLAY button rather than off the corner. */
 @media (max-width: 768px) {
-  /* PLAY's phone offset: axis 51.8 - 42 / 2. See the longhand on .learnPlay. */
-  .learnPlay { left: 30.8px; }
+  /* 30.8 -> 18, 2 September 2026 (owner): the row was sitting too far in.
+     18 is the margin the pit's own corner squares use from the screen edge, so
+     PLAY now lines up with them rather than floating.
+     IT IS NO LONGER CENTRED ON --pit-axis. 30.8 was axis 51.8 less half a 42px
+     button, which put PLAY's left edge level with the title portrait's. That
+     alignment is given up on purpose. */
+  .learnPlay { left: 18px; }
   /* ONE ROW, FIVE BUTTONS, 2 September 2026 (owner), to the owner's own layout:
      PLAY, then the zoom out, then the three info icons, all along the foot.
 
@@ -1541,11 +1546,18 @@
 
      THE BUDGET, and it is the whole reason these numbers are what they are:
 
-       30.8    PLAY's left, axis 51.8 less half a button
+       18      PLAY's left, the corner squares' own margin
        42 x 5   PLAY, the zoom out and the three icons, ALL THE SAME SIZE
        6 x 4    gaps between them
        -----
-       264.8   right edge, against the rail's 276. 11.2 to spare
+       252     right edge, against the rail's 276. 24 to spare
+
+     THE VISIBLE EDGES, check against these rather than recomputing:
+       PLAY      18   to   60
+       zoom out  66   to  108
+       ancestry  114  to  156
+       training  162  to  204
+       brain     210  to  252
 
      42 rather than 50.6 because at 50.6 the buttons ALONE are wider than the
      space, before any gap at all. Padding was never the constraint.
@@ -1561,10 +1573,10 @@
      CHANGE PLAY'S SIZE OR THE RAIL'S COLUMN COUNT AND THIS ROW OVERFLOWS. There
      is no slack left in it. */
   .zoomOutBtn {
-    /* Left is PLAY's visible right edge 72.8, plus the 6 gap, plus 2 because this
+    /* Left is PLAY's visible right edge 60, plus the 6 gap, plus 2 because this
        button's rim is an `outline` drawn OUTSIDE its box while the dock's border
        is drawn inside. The box is 42 - 2 * 2 to land on the same visible 42. */
-    left: 80.8px;
+    left: 68px;
     bottom: calc(3% + 2px);
     width: 38px;
     height: 38px;
@@ -1577,7 +1589,12 @@
     right: auto;
     bottom: 3%;
     gap: 6px;
-    left: 120.8px;   /* the zoom out's visible right edge 114.8 + 6 */
+    /* CORRECTED, 2 September 2026. This read 120.8, which was the zoom out's
+       visible RIGHT EDGE with no gap added, so those two buttons touched while
+       every other gap was 6. Measured off a screenshot at 12, 0, 12, 12.
+       It is that edge plus the row's 6. The zoom out's visible left is its box
+       less the 2px outline, 68 - 2 = 66, so 66 + 42 + 6 = 114. */
+    left: 114px;
   }
   .learnDockBtn {
     width: 42px;
