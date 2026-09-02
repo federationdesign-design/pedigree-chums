@@ -169,6 +169,12 @@
   inset: 0;
 }
 
+@media (max-width: 768px) {
+  /* The corner square is 50.6 below 768px, not 75.6, so the score's clearance
+     changes with it: 18 + 50.6 + 14. The breakpoint is 768 to match pitScale in
+     BreedTree, NOT the 640 the block below uses. */
+  .scoreTotal { right: 82.6px; }
+}
 @media (max-width: 640px) {
   /* PHONE: only the level's own dog is shown in the header. The ladder rows under
      it, the path down to whichever circle is being looked at, are hidden by request
@@ -246,20 +252,31 @@
      anchor on the left, and the close X square sits 16px inside the pit on the
      right. Nothing collides, because the title is left-anchored and the X is
      right-anchored while this is centred. */
-  /* Nudged, 1 September 2026 (owner): down 5 from 12, and 20 to the right.
-     The sideways nudge rides in the TRANSFORM, not in `left`, because left is
-     what centres the box: tangling the two would mean a future change to the
-     centring silently moved the nudge as well.
-     It is a variable because the pulse keyframes below have to repeat it on
-     every frame, and four hand-copied numbers drift apart the moment one of
-     them is edited. */
-  --score-nudge: 20px;
+  /* TOP RIGHT, 2 September 2026 (owner). It was centred on the top row.
+
+     RIGHT-ANCHORED, NOT CENTRED, and the number is measured rather than picked.
+     The pit's close square sits 18px in from the right edge and is 50.6 wide on
+     a phone, 75.6 on desktop. 14 is the gap the corner squares already stack
+     with, so:
+       desktop  18 + 75.6 + 14 = 107.6
+       phone    18 + 50.6 + 14 =  82.6   (media query below)
+     These are the same two figures .learnDock uses in BreedTree.module.css, for
+     the same reason: "one square plus a gap in from the corner". IF THE CORNER
+     SQUARE IS RESIZED AGAIN, both files move together.
+
+     The score is hidden until the round starts (LineageModal gates it on
+     `running`), which is what keeps it off the start screen where the red back
+     square owns this corner.
+
+     The translate is gone with the centring, so the pulse below is a plain
+     scale. transform-origin pins it to the right edge, or a growing number would
+     appear to shuffle sideways on every point scored. */
   top: 17px;
-  left: 50%;
-  transform: translateX(calc(-50% + var(--score-nudge)));
+  right: 107.6px;
   min-width: 84px;
   box-sizing: border-box;
-  text-align: center;
+  text-align: right;
+  transform-origin: 100% 50%;
   color: #ffffff;
   font-family: var(--font-score), var(--font-pct), system-ui, sans-serif;
   font-weight: 400;
@@ -271,17 +288,19 @@
   pointer-events: none;
   z-index: 20;
 }
-/* THE PULSE HAS TO CARRY THE CENTRING AND THE NUDGE. .scoreTotal positions
-   itself with a transform, and this animation sets `transform` outright, so a
-   keyframe of `scale(1)` alone would drop both and the score would jump on every
-   single point scored. Every frame carries the lot. */
+/* The pulse used to carry the centring translate on every keyframe, because the
+   rule positioned itself with a transform and this animation overrides transform
+   outright. Now that the box is placed with `right`, there is nothing for these
+   frames to preserve and a plain scale is correct.
+   It grows from the RIGHT edge, set by transform-origin above, so a wider number
+   does not read as a sideways jump. */
 .scorePulse {
   animation: lmScorePulse 0.4s ease-out;
 }
 @keyframes lmScorePulse {
-  0% { transform: translateX(calc(-50% + var(--score-nudge))) scale(1); }
-  35% { transform: translateX(calc(-50% + var(--score-nudge))) scale(1.25); }
-  100% { transform: translateX(calc(-50% + var(--score-nudge))) scale(1); }
+  0% { transform: scale(1); }
+  35% { transform: scale(1.25); }
+  100% { transform: scale(1); }
 }
 
 /* Shake button, copied from the pit. */
