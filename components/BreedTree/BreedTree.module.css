@@ -1586,7 +1586,11 @@
      so the box scales together on every screen. */
   --box-size: clamp(200px, 18vw, 280px); /* overall width; height follows the art */
   --box-off-left: -0.26;                 /* fraction of the box tucked past the left edge */
-  --box-floor: -14px;                    /* how far the base sits into the pit floor */
+  /* DOWN 30px, 2 September 2026 (owner): -14 to -44. Negative is further into
+     the floor, so a bigger negative sits lower. The art is anchored by its BASE
+     (transform-origin 50% 100%), so the pop animation still scales up from the
+     same point and only the resting height moves. */
+  --box-floor: -44px;                    /* how far the base sits into the pit floor */
   left: calc(var(--box-size) * var(--box-off-left));
   bottom: var(--box-floor);
   width: var(--box-size);
@@ -1611,7 +1615,12 @@
 /* chums-collected tally, bottom-left, pops with a starburst each time it climbs */
 .tally {
   position: fixed;
-  bottom: calc(18px + env(safe-area-inset-bottom, 0px)); /* same bottom axis as the shake button */
+  /* DOWN 15px, 2 September 2026 (owner): 18 to 3. The safe-area term stays, so
+     a phone with a home indicator still keeps the number clear of it; the 15
+     comes off the fixed part only.
+     NOTE it no longer shares the shake button's bottom axis, which is where the
+     18 came from. If the two should line up again, this is the number. */
+  bottom: calc(3px + env(safe-area-inset-bottom, 0px));
   left: clamp(6px, 1.5vw, 18px);
   z-index: 41; /* above the box, so the count stays readable */
   width: 140px;
