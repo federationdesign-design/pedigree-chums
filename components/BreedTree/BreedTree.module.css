@@ -234,17 +234,27 @@
    ring colour, which went navy on some depths and vanished on dark artwork), and a
    navy drop-shadow halo keeps them readable over any painted image. The white here
    beats the element's own stroke attribute, which is why it is set in CSS. */
-/* THE GREY DASHED RING. It was never grey on purpose: white at half opacity with
-   TWO navy drop shadows stacked under it reads as grey against the blue sky. The
-   shadows are the culprit, not the stroke.
-   2 September 2026 (owner): opacity 0.5 -> 0.8 and one shadow instead of two. The
-   remaining shadow is what keeps the ring legible where a circle sits over a
-   photograph rather than over the sky, so it is thinned rather than dropped. */
+/* THE GREY DASHED RING, on a buried circle that is not being hovered.
+
+   It was never grey on purpose. White at 0.5 with TWO navy drop shadows stacked
+   under it reads as grey against the blue sky; the shadows were doing it, not
+   the stroke.
+
+   2 September 2026 (owner): almost invisible. 0.5 -> 0.8 earlier the same day,
+   then 0.8 -> 0.1. A buried circle should recede rather than announce itself.
+
+   THE SHADOW IS GONE, and that is required rather than tidy. At 0.1 the navy
+   glow would have been the strongest part of the ring, so keeping it would have
+   left a faint dark line exactly where the grey was, which is the thing being
+   removed. The ring gives up its legibility over a photograph in exchange, which
+   is the point of the change.
+
+   0.1 is very close to nothing. If it reads as absent rather than faint, this
+   number is the only thing to move. */
 .ghost {
   fill-opacity: 0;
   stroke: #ffffff;
-  stroke-opacity: 0.8;
-  filter: drop-shadow(0 0 1.4px var(--navy, #0a3a57));
+  stroke-opacity: 0.1;
 }
 
 /* A quick, gentle rattle of the diagram when a circle is tapped. */
