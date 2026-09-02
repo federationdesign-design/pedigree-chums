@@ -234,11 +234,17 @@
    ring colour, which went navy on some depths and vanished on dark artwork), and a
    navy drop-shadow halo keeps them readable over any painted image. The white here
    beats the element's own stroke attribute, which is why it is set in CSS. */
+/* THE GREY DASHED RING. It was never grey on purpose: white at half opacity with
+   TWO navy drop shadows stacked under it reads as grey against the blue sky. The
+   shadows are the culprit, not the stroke.
+   2 September 2026 (owner): opacity 0.5 -> 0.8 and one shadow instead of two. The
+   remaining shadow is what keeps the ring legible where a circle sits over a
+   photograph rather than over the sky, so it is thinned rather than dropped. */
 .ghost {
   fill-opacity: 0;
   stroke: #ffffff;
-  stroke-opacity: 0.5;
-  filter: drop-shadow(0 0 1.4px var(--navy, #0a3a57)) drop-shadow(0 0 1.4px var(--navy, #0a3a57));
+  stroke-opacity: 0.8;
+  filter: drop-shadow(0 0 1.4px var(--navy, #0a3a57));
 }
 
 /* A quick, gentle rattle of the diagram when a circle is tapped. */

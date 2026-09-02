@@ -7923,12 +7923,26 @@ export default function BreedTree({
                     <path d={BRAIN_PATH}/>
                   </g>
                 ) : (
-                  <g stroke="var(--navy, #0a3a57)" strokeWidth={1.8} fill="none" strokeLinecap="round" strokeLinejoin="round"
+                  /* THE INFO SQUARE. Was an org-chart glyph, three boxes joined
+                     by a stem, which read as "family tree" while the square's own
+                     aria-label has always said "Breed information" and its action
+                     opens the info box. 2 September 2026 (owner): a plain letter
+                     i in a ring, which says what the button does.
+
+                     DRAWN, NOT SET AS TEXT. A <text> i would depend on whichever
+                     font had loaded and would sit on a baseline that shifts with
+                     it; two rounded strokes and a ring cannot drift. The dot is a
+                     zero-length line with a round cap, which is how the rest of
+                     the pit's icons draw a dot.
+
+                     Same scale(uSz / 44) and translate(-12,-12) as the glyph it
+                     replaces, so it is a 24 unit artboard centred in the square
+                     exactly as before. */
+                  <g stroke="var(--navy, #0a3a57)" fill="none" strokeLinecap="round" strokeLinejoin="round"
                     transform={`scale(${uSz / 44}) translate(-12,-12)`}>
-                    <rect x="9" y="2" width="6" height="4" rx="1" />
-                    <rect x="2" y="18" width="6" height="4" rx="1" />
-                    <rect x="16" y="18" width="6" height="4" rx="1" />
-                    <path d="M12 6v4M12 10H5v8M12 10h7v8" />
+                    <circle cx="12" cy="12" r="9.2" strokeWidth={1.8} />
+                    <line x1="12" y1="7.4" x2="12" y2="7.4" strokeWidth={2.6} />
+                    <line x1="12" y1="11" x2="12" y2="16.8" strokeWidth={2.6} />
                   </g>
                 )}
                 {/* Start-screen only: the two-line caption under the red close
@@ -8109,30 +8123,35 @@ export default function BreedTree({
                     </g>
                   );
                 })()}
-                {/* Start-screen caption above the square. It renders only in this
-                    block (gated !started), so it is gone the instant PLAY arms
-                    the pit; nothing tracks a moving body. */}
+                {/* Start-screen caption BELOW the square, 2 September 2026
+                    (owner). It was above.
+                    TWO THINGS CHANGED TOGETHER and both are needed: the offset
+                    flips from minus to plus, and the baseline rule flips from
+                    text-after-edge to text-before-edge. The baseline decides
+                    which edge of the type box lands on y, so moving the offset
+                    alone would have left the words overlapping the square.
+                    It renders only in this block (gated !started), so it is gone
+                    the instant PLAY arms the pit; nothing tracks a moving body. */}
                 <text
                   className={styles.autoLabel}
                   x={w.x + SQ / 2}
-                  y={w.y - SQ / 2 - 8 * upp}
+                  y={w.y + SQ / 2 + 8 * upp}
                   textAnchor="middle"
-                  dominantBaseline="text-after-edge"
+                  dominantBaseline="text-before-edge"
                   // 31 Aug 2026, MOBILE ONLY: stroke 2 to 4 and forced to true
                   // black. .autoLabel sets paint-order: stroke, so the fill
                   // paints over half the width and 4 reads as a 2px outline.
                   // Desktop keeps the 2px navy it has now.
                   //
-                  // 2 September 2026 (owner): 25% off, 24 -> 18, to match the
-                  // squares. THE STROKE COMES DOWN WITH IT, 4 -> 3 and 2 -> 1.5.
-                  // An outline is read relative to the letter it wraps, so
-                  // holding the stroke while shrinking the type would have made
-                  // the words look heavier, not smaller.
-                  // These are flat numbers rather than a fraction of SQ, which
-                  // is why they did not follow the squares down on their own.
+                  /* ONE SIZE FOR ALL THREE CAPTIONS, 2 September 2026 (owner).
+                     "play" and "learn" were 18 flat while "back" was 12 on a
+                     phone and 18 on desktop, so they never matched. All three now
+                     read 12 / 18, and the stroke reads 2.25 / 1.5 with them.
+                     THE FIGURES ARE DUPLICATED at the back caption above. If one
+                     moves, both move, or the mismatch is straight back. */
                   style={{
-                    fontSize: `${18 * upp}px`,
-                    strokeWidth: `${(isMobile ? 3 : 1.5) * upp}px`,
+                    fontSize: `${(isMobile ? 12 : 18) * upp}px`,
+                    strokeWidth: `${(isMobile ? 2.25 : 1.5) * upp}px`,
                     stroke: isMobile ? "#000000" : undefined,
                   }}
                 >

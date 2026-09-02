@@ -455,7 +455,13 @@ export default function LineageModal({ name, image, character, lineage, fromRect
           Still hidden in the LEARN area. That is a different screen with its own
           crowded top left, and a running score means nothing while the round is
           paused behind it. */}
-      {!learningActive && (
+      {/* HIDDEN ON THE START SCREEN TOO, 2 September 2026 (owner). `running` is
+          the round-has-started flag, set from BreedTree's onStartedChange, so
+          before PLAY is pressed this is false and the number stays away.
+          THE REASON IS A COLLISION, not tidiness: the score sits on the top
+          right axis, and the start screen puts the red back square there. The
+          number rendered behind it. */}
+      {running && !learningActive && (
         <div className={css.scoreTotal + (scorePulse ? " " + css.scorePulse : "")} aria-label={`Score: ${score.toLocaleString("en-GB")}`}>
           {scoreText(score)}
         </div>
