@@ -3568,9 +3568,24 @@ export default function BreedTree({
            of view with opacity 0 rather than display none (see heldHidden on the
            circle), so checking display alone left the mark floating over an empty
            space where the dog used to be. */
+        /* TWO MORE CIRCLES THAT MUST NOT CARRY ONE, both found on the first
+           build where the mark actually appeared:
+
+           THE ROOT, depth 0. It is the level's own dog, it is not a thing you
+           lift, and in the pit it has no visible disc, so its mark hung in the
+           middle of an empty screen.
+
+           ANY CIRCLE DRAWN fill="none". That is the `hidden` state in the render,
+           used for a circle that is present in the tree but not meant to be seen.
+           Same symptom, a mark floating over nothing.
+
+           Both are read off the circle rather than recomputed here, so this
+           cannot drift from what the render decided. */
         const showQ =
           fellRef.current &&
           !isWordNode &&
+          d.depth > 0 &&
+          c?.getAttribute("fill") !== "none" &&
           c?.getAttribute("display") !== "none" &&
           c?.style.opacity !== "0";
         q.style.display = showQ ? "inline" : "none";
@@ -4350,8 +4365,16 @@ export default function BreedTree({
              The desc and learn squares share this slot, only one of them showing
              at a time, so they carry the same figures and must be changed
              together. */
+          /* THE TWO SQUARES SPLIT, 2 September 2026 (owner). They used to share one
+             slot, so moving the info "i" beside the close X took the brain with
+             it. They are different buttons on different screens and now sit
+             differently:
+               desc  the info "i", BESIDE the X, to its left
+               learn the brain, BELOW the X, where it was before today
+             Only one of the two is on screen at a time, so they can occupy
+             different places without ever colliding. */
           { x: ux - (UI_DRAWN + UI_GAP) / k, y: v[1] + (-vbHf / 2 + m + uSz / 2 + UI_NUDGE_Y) / k, vx: 0, vy: 0, r: UI_HIT_R, half: uSz / 2, a: 0, va: 0, fixed: true, hits: 0, kind: "desc" },
-          { x: ux - (UI_DRAWN + UI_GAP) / k, y: v[1] + (-vbHf / 2 + m + uSz / 2 + UI_NUDGE_Y) / k, vx: 0, vy: 0, r: UI_HIT_R, half: uSz / 2, a: 0, va: 0, fixed: true, hits: 0, kind: "learn" },
+          { x: ux, y: v[1] + (-vbHf / 2 + m + uSz / 2 + UI_DRAWN + UI_GAP + UI_NUDGE_Y) / k, vx: 0, vy: 0, r: UI_HIT_R, half: uSz / 2, a: 0, va: 0, fixed: true, hits: 0, kind: "learn" },
           /* THE LOGO. Top CENTRE, not the top-right corner the three squares
              share, and 20% down the stage like the main pit's own placement.
              Its drawn width is the main pit's figure clamped to the pit, so a
@@ -8009,7 +8032,7 @@ export default function BreedTree({
                 ? ["close", "desc"]
                 : ["close"]),
             ]) as readonly UiKind[];
-            const defs: { kind: UiKind; wx: number; wy: number; a: number }[] = kinds.map((kind, idx) => {
+            const defs: { kind: UiKind; wx: number; wy: number; a: number }[] = kinds.map((kind) => {
               const b = ub?.find((u) => u.kind === kind);
               return {
                 kind,
@@ -8018,8 +8041,12 @@ export default function BreedTree({
                    SIDE BY SIDE, so it is moved onto x to match. Left unfixed it
                    would have shown the second square below the X and then jumped
                    it sideways, which reads as a glitch rather than a layout. */
-                wx: b ? b.x : v[0] + (xMinR + vbWr - m - uSz / 2 - idx * (uSz + 14 * upp)) / kk,
-                wy: b ? b.y : v[1] + (-vbHr / 2 + m + uSz / 2) / kk,
+                /* The fallback, used for the frame or two before the bodies exist.
+                   It matches the split above: desc goes left of the X, learn goes
+                   below it. Keyed off the KIND, not off idx, because the two no
+                   longer share a direction. */
+                wx: b ? b.x : v[0] + (xMinR + vbWr - m - uSz / 2 - (kind === "desc" ? uSz + 14 * upp : 0)) / kk,
+                wy: b ? b.y : v[1] + (-vbHr / 2 + m + uSz / 2 + (kind === "learn" ? uSz + 14 * upp : 0)) / kk,
                 a: b ? b.a : 0,
               };
             });

@@ -324,7 +324,19 @@
   font-size: 14.4px;
   line-height: 1.3;
   pointer-events: none;
-  z-index: 20;
+  /* BEHIND THE PIT, 2 September 2026 (owner): 20 -> 0, so the corner squares
+     paint over the number rather than the number over them.
+
+     WHY ZERO AND NOT A NEGATIVE. .overlay sets `isolation: isolate`, so this and
+     .stageArea share one stacking context. This element comes FIRST in the DOM
+     and .stageArea comes second, both now at z auto, so document order decides
+     and the pit wins. A negative index would push it behind .overlay's own
+     background and it would vanish altogether.
+
+     Safe because the pit's SVG has no background of its own: it paints circles
+     and squares over a transparent canvas, so the score still shows everywhere
+     the pit does not. */
+  z-index: 0;
 }
 /* The pulse used to carry the centring translate on every keyframe, because the
    rule positioned itself with a transform and this animation overrides transform
