@@ -320,7 +320,7 @@ export default function LineageModal({ name, image, character, lineage, fromRect
        outline inset too -> layout, and whichever width below disagrees with
          innerWidth is the box at fault
      ======================================================================== */
-  const floorImgRef = useRef<HTMLImageElement>(null);
+  const floorImgRef = useRef<HTMLDivElement>(null);
   const stageAreaRef = useRef<HTMLDivElement>(null);
   const [floorDiag, setFloorDiag] = useState<string | null>(null);
   useEffect(() => {
@@ -341,7 +341,7 @@ export default function LineageModal({ name, image, character, lineage, fromRect
         `.stageArea x/w  ${rect(sa)}`,
         `.floor    x/w   ${rect(fl)}`,
         `floor css w     ${fl ? getComputedStyle(fl).width : "-"}`,
-        `floor natural   ${n(fl?.naturalWidth)}`,
+        `floor bg size   ${fl ? getComputedStyle(fl).backgroundSize : "-"}`,
         `dpr             ${n(window.devicePixelRatio)}`,
       ].join("\n"));
     };
@@ -680,15 +680,17 @@ export default function LineageModal({ name, image, character, lineage, fromRect
         {/* Pit floor, same graphic as the main pit. A themed level brings its
             own ground art, so the default strip stands down rather than
             doubling up underneath it. */}
+        {/* A DIV WITH A BACKGROUND, not an <img>. See the .floor rule in the
+            stylesheet for why: the image box measured full width while the wood
+            inside it did not, and background-size: 100% 100% is the one way to
+            take the scaling decision away from the renderer. */}
         {!theme && (
-          <img
+          <div
             ref={floorImgRef}
-            src="/floor-shortened-svg.svg"
-            alt=""
             aria-hidden="true"
             className={css.floor}
-            /* REMOVE BEFORE LAUNCH, ?floorbox=1: the magenta outline on the IMG
-               BOX. See the block by the diagnostic near the top of this file. */
+            /* REMOVE BEFORE LAUNCH, ?floorbox=1: the magenta outline on the box.
+               See the block by the diagnostic near the top of this file. */
             style={floorDiag ? { outline: "2px solid #ff00ff", outlineOffset: "-2px" } : undefined}
           />
         )}

@@ -225,14 +225,38 @@
 }
 
 /* The pit floor graphic, pinned to the bottom of the stage. Physics treats
-   the top of the grass as the ground, so objects rest on it. */
+   the top of the grass as the ground, so objects rest on it.
+
+   A BACKGROUND, NOT AN <img>, 2 September 2026 (owner). The wood stopped about
+   12px short of the left edge and 10px short of the right on a real iPhone, and
+   it was NOT the box and NOT the file:
+     the box    measured 0 / 414 on a 414px phone, full width, confirmed with an
+                outline drawn on the element itself
+     the file   floor-shortened-svg.svg rasterises SOLID wood to column 0 and to
+                the last column, checked at three opacity thresholds
+     the ratio  the box measured 22.0 CSS tall against the viewBox's own
+                544.3 / 28.9, so it was not being letterboxed either
+   That leaves how Safari rasterises this particular SVG when it is asked to
+   scale one for an <img>.
+
+   background-size: 100% 100% takes that decision away. It forces the SVG's
+   viewport to the box on BOTH axes and never consults the intrinsic ratio, so
+   there is no fitting step left to go wrong. The aspect-ratio below replaces the
+   intrinsic height an <img> used to supply.
+
+   IF THIS STILL SHOWS A GAP the remaining explanation is the renderer itself,
+   and the fix is to export the floor as a PNG, which is what the Tudor floor
+   already is. */
 .floor {
   position: absolute;
   left: 0;
   right: 0;
   bottom: 0;
   width: 100%;
-  height: auto;
+  aspect-ratio: 544.3 / 28.9;   /* the asset's own viewBox */
+  background-image: url("/floor-shortened-svg.svg");
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
   display: block;
   pointer-events: none;
   z-index: 0;
