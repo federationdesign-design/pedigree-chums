@@ -2252,8 +2252,28 @@ export default function LineageMap({
             </div>
           );
         })()}
+        {/* THE FRAME COUNTER SITS ON THE FRAMES, not on a number of its own.
+
+            It is the count FOR that grid, so it is placed from the grid: the top
+            of the first row, less the counter's own height, less a gap. It has
+            been a flat 26 and then a flat 66, and both times it read as belonging
+            to whatever else happened to be near it, which was the level portrait.
+
+            THE FRAMES ARE INSIDE THE 0.8 SCALE AND THIS IS NOT, so chumTop has to
+            be run back THROUGH the scale to find where the row actually lands.
+            That is unscaleY's conversion in the other direction. Change the
+            overlay's scale and this follows it.
+
+            36 is the counter's own height, 24px type at 1.1 plus 5px of padding
+            each side. 10 is the gap. The floor of 58 keeps it clear of the level
+            portrait, whose bottom edge is at 52.3, on a screen short enough for
+            the two to argue. */}
         {frameTotal > 0 && !packed && !collecting && (
-          <div className={styles.frameCount} aria-label={`${filled.size} of ${frameTotal} frames filled`}>
+          <div
+            className={styles.frameCount}
+            style={{ top: Math.max(58, vp.h / 2 + LIFT_K * (chumTop - vp.h / 2) - 46) }}
+            aria-label={`${filled.size} of ${frameTotal} frames filled`}
+          >
             {filled.size}/{frameTotal}
           </div>
         )}

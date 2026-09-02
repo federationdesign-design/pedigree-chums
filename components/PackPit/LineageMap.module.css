@@ -872,11 +872,23 @@
      this button was left on the old figures, so the back button was half again the
      size of the X it is meant to match. These are the same numbers .learnDockBtn
      carries in BreedTree.module.css. Change the square and change all three. */
+  /* SIZED TO THE PIT SQUARE'S VISIBLE BOX, not to its rect.
+
+     The pit draws its square as an SVG rect of side 75.6 (50.6 on a phone) with
+     a 5px stroke, and an SVG stroke is CENTRED on the edge, so half of it falls
+     outside and the visible object is 80.6, not 75.6. This button is a DOM box
+     with box-sizing border-box, so its border falls inside and its width is what
+     you see. Matching the two numbers therefore meant adding the stroke:
+       desktop  75.6 + 5 = 80.6
+       phone    50.6 + 5 = 55.6
+     Written at 75.6 it came out 5px small and its edges sat 2.5px inside the
+     square it is meant to sit on. Radius carries the same addition, 0.3 of the
+     rect plus half the stroke, so the corner curve matches too. */
   top: 18px;
   right: 18px;
-  width: 75.6px;
-  height: 75.6px;
-  border-radius: 22.68px;
+  width: 80.6px;
+  height: 80.6px;
+  border-radius: 25.18px;
   background: var(--yellow);
   border: 5px solid var(--navy);
   color: var(--navy);
@@ -888,9 +900,9 @@
 }
 @media (max-width: 768px) {
   .closeCircular {
-    width: 50.6px;
-    height: 50.6px;
-    border-radius: 15.18px;
+    width: 55.6px;
+    height: 55.6px;
+    border-radius: 17.68px;
     font-size: 1.6rem;
   }
 }
