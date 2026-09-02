@@ -688,6 +688,40 @@ function chumBoxOn() {
   return window.location.search.indexOf("chumbox=1") > -1;
 }
 
+/* ============================ REMOVE BEFORE LAUNCH ==========================
+   ?floorbox=1 : the level floor width diagnostic, 2 September 2026.
+
+   THE QUESTION. The wooden floor stops short of both screen edges on a real
+   iPhone. Two reasoned fixes have now failed, so this measures instead of
+   guessing a third time.
+
+   WHAT WAS ALREADY RULED OUT, so nobody repeats it:
+     the asset  ancient-floor.svg rasterises wood edge to edge across its whole
+                viewBox. No transparent margin
+     the clip   seamClip's polygon runs 2 * (vw + vh) past the frame, so it
+                cannot trim a few px off a side
+     siblings   .levelSky is inset -40% and .levelBg is min-width 100% centred,
+                and neither shows a gap
+     100vw      .levelFloor was switched to left 50% / width 100vw /
+                margin-left -50vw and the gap SURVIVED it, which is the fact
+                that makes every remaining theory suspect
+
+   HOW TO READ IT. The panel prints the widths that must agree. Whichever line
+   disagrees with `innerWidth` is the culprit:
+     innerWidth / visualViewport   the two viewport measures iOS reports
+     .level rect                   the floor's parent
+     .levelFloor rect              the floor box itself
+     img natural / client          the SVG's intrinsic size against its used one
+   If the floor rect is full width but the WOOD is not, the asset lies about its
+   own aspect and the fix is in the file, not the CSS.
+
+   Strip this, the two refs, the effect and the panel once the question closes.
+   ========================================================================== */
+function floorBoxOn() {
+  if (typeof window === "undefined") return false;
+  return window.location.search.indexOf("floorbox=1") > -1;
+}
+
 function resetToysIfAsked() {
   if (typeof window === "undefined") return;
   if (window.location.search.indexOf("toys=reset") < 0) return;
@@ -2365,6 +2399,10 @@ export default function BreedTree({
   const chumsGRef = useRef<SVGGElement>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const chumBodiesRef = useRef<any[]>([]);
+  // REMOVE BEFORE LAUNCH, ?floorbox=1. See floorBoxOn() above.
+  const levelLayerRef = useRef<HTMLDivElement>(null);
+  const levelFloorRef = useRef<HTMLImageElement>(null);
+  const [floorDiag, setFloorDiag] = useState<string | null>(null);
   /* REMOVE BEFORE LAUNCH, ?chumbox=1. See chumBoxOn() above. The engine is
      otherwise a local inside the sim effect; this is the only handle on it and
      it is written only when the flag is on. */
@@ -6416,6 +6454,37 @@ export default function BreedTree({
       .map((b) => ({ image: b.image, band: b.sizeBand as string, name: b.name }));
   }, [nodes, collectedChums]);
   useEffect(() => { chumImagesRef.current = levelChums; }, [levelChums]);
+  /* ===================== REMOVE BEFORE LAUNCH, ?floorbox=1 ====================
+     Re-measures on every resize and orientation change, because an iPhone's
+     reported width moves as the browser chrome collapses and that is one of the
+     things under suspicion here. */
+  useEffect(() => {
+    if (!floorBoxOn()) return;
+    const read = () => {
+      const lv = levelLayerRef.current;
+      const fl = levelFloorRef.current;
+      const vv = window.visualViewport;
+      const r = (n: number | undefined) => (n === undefined ? "-" : Math.round(n * 10) / 10);
+      setFloorDiag([
+        `innerWidth      ${r(window.innerWidth)}`,
+        `visualViewport  ${r(vv?.width)}`,
+        `docEl client    ${r(document.documentElement.clientWidth)}`,
+        `.level    x/w   ${r(lv?.getBoundingClientRect().left)} / ${r(lv?.getBoundingClientRect().width)}`,
+        `.levelFloor x/w ${r(fl?.getBoundingClientRect().left)} / ${r(fl?.getBoundingClientRect().width)}`,
+        `img natural w   ${r(fl?.naturalWidth)}`,
+        `img client  w   ${r(fl?.clientWidth)}`,
+        `dpr             ${r(window.devicePixelRatio)}`,
+      ].join("\n"));
+    };
+    const id = window.setTimeout(read, 300); // after the level layer has mounted
+    window.addEventListener("resize", read);
+    window.visualViewport?.addEventListener("resize", read);
+    return () => {
+      window.clearTimeout(id);
+      window.removeEventListener("resize", read);
+      window.visualViewport?.removeEventListener("resize", read);
+    };
+  }, []);
   /* ===================== REMOVE BEFORE LAUNCH, ?chumbox=1 =====================
      Samples four times a second, not per frame: the panel is for reading, and a
      per-frame React setState on top of the pit would change the very thing the
@@ -8496,6 +8565,7 @@ export default function BreedTree({
       {dockAside && gravity && levelTheme && (
         <div
           aria-hidden="true"
+          ref={levelLayerRef}
           className={`${styles.level}${learning && !started ? " " + styles.levelSlow : ""}`}
           style={{ clipPath: seamClip(started || (learning && playPeek) ? -SEAM_OFF() : startPeek ? 0 : SEAM_OFF()) }}
         >
@@ -8513,6 +8583,7 @@ export default function BreedTree({
               pattern on at 90% full with no fade. */}
           <div className={styles.levelPaws} style={{ opacity: fullAlpha }} />
           <img
+            ref={levelFloorRef}
             className={styles.levelFloor}
             src={levelTheme.floor}
             alt=""
@@ -9177,6 +9248,17 @@ export default function BreedTree({
             </button>
           )}
         </div>
+      )}
+      {/* ==================== REMOVE BEFORE LAUNCH, ?floorbox=1 ====================
+          LAST NODE IN THE TREE and z-index 99999, deliberately. The chumbox panel
+          was placed mid-tree and never appeared on the phone, so this one is put
+          where nothing can paint over it. */}
+      {floorDiag && (
+        <div style={{
+          position: "fixed", top: 6, left: 6, zIndex: 99999, pointerEvents: "none",
+          background: "rgba(0,0,0,0.82)", color: "#0f0", padding: "6px 8px",
+          font: "11px/1.35 ui-monospace, monospace", borderRadius: 6, whiteSpace: "pre",
+        }}>{floorDiag}</div>
       )}
     </div>
   );
