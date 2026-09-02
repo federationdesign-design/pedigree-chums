@@ -3,7 +3,13 @@ import { useState, useEffect } from "react";
 import Script from "next/script";
 import { trackingAllowed } from "../../lib/track";
 
-const PIXEL_ID = "1072172202055733";
+/* 2 September 2026: 1072172202055733 -> 2152250512379098, supplied by the social
+   media manager as the correct dataset. The old ID was recorded as confirmed in
+   Events Manager on 1 September, so if events go quiet after this, that earlier
+   confirmation is the thing to re-check first.
+   ONE PLACE ONLY. Every event in the site routes through this component and
+   lib/track.ts, so there is no second copy to keep in step. */
+const PIXEL_ID = "2152250512379098";
 
 // Meta Pixel (marketing), gated on cookie consent AND on the production host.
 // The tag is only injected once the visitor has accepted cookies via the banner,
