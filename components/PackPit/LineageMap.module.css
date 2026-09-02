@@ -55,6 +55,13 @@
 }
 .close {
   position: fixed;
+  /* ABOVE THE OVERLAY, 2 September 2026. This button used to be a CHILD of the
+     overlay and painted inside it; it is now a sibling, so it needs a z-index of
+     its own or the overlay's own background paints straight over it. 62 clears
+     the overlay at 60 and both washes at 59.
+     It looked fine on the lift by luck: .overlayStrong has no background there.
+     In the main pit, where .overlay keeps its gradient, this was hidden. */
+  z-index: 62;
   top: 33px;
   right: clamp(18px, 4vw, 48px);
   width: 52px;
@@ -307,7 +314,10 @@
      corner and must not disagree. */
   top: 66px;
   left: clamp(16px, 3.5vw, 40px);
-  z-index: 6;
+  /* 6 -> 62. Same reason as .close above: this counter used to sit inside the
+     overlay and is now a sibling of it, so 6 put it UNDER the overlay at 60 and
+     under the lift wash at 59, and the wash was painting over the number. */
+  z-index: 62;
   padding: 5px 18px;
   border-radius: 20px;
   background: var(--navy);
@@ -677,7 +687,10 @@
      corner and must not disagree. */
   top: 66px;
   left: clamp(16px, 3.5vw, 40px);
-  z-index: 6;
+  /* 6 -> 62. Same reason as .close above: this counter used to sit inside the
+     overlay and is now a sibling of it, so 6 put it UNDER the overlay at 60 and
+     under the lift wash at 59, and the wash was painting over the number. */
+  z-index: 62;
   padding: 5px 18px;
   border-radius: 20px;
   background: var(--navy);
