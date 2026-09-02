@@ -2445,11 +2445,26 @@ export default function LineageMap({
                       const pcx = off ? off.ox : 0;
                       const pcy = off ? off.oy : nmY;
                       return (
-                        <g>
-                          <rect className={styles.nmPill} x={pcx - nmW / 2} y={pcy - nmH / 2} width={nmW} height={nmH} rx={nmH / 2} />
+                        /* 10% SMALLER, 2 September 2026 (owner).
+
+                           SCALED, not re-measured. The box, the corner radius and
+                           the TEXT all have to come down together, and the text is
+                           sized by a CSS class rather than by a number here, so
+                           shrinking nmW and nmH alone would have left the words at
+                           full size and overflowing their own pill. One transform
+                           takes the lot.
+
+                           nodePillWidth is deliberately NOT touched. The placement
+                           pass spaces siblings on it and the pit pill uses the same
+                           formula, so it stays the shared measurement and this is
+                           purely what gets drawn. Sibling spacing is now 10% more
+                           generous than the pills need, which reads as air rather
+                           than as a fault. */
+                        <g transform={`translate(${pcx},${pcy}) scale(0.9)`}>
+                          <rect className={styles.nmPill} x={-nmW / 2} y={-nmH / 2} width={nmW} height={nmH} rx={nmH / 2} />
                           {nmLines.map((ln, li) => (
                             <text key={li} className={styles.nm} textAnchor="middle" dominantBaseline="central"
-                              x={pcx} y={nmLines.length > 1 ? (li === 0 ? pcy - 8 : pcy + 8) : pcy}>
+                              x={0} y={nmLines.length > 1 ? (li === 0 ? -8 : 8) : 0}>
                               {ln}
                             </text>
                           ))}

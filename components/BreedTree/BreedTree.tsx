@@ -5184,8 +5184,20 @@ export default function BreedTree({
         // below) AND the drawn rect (via setPillList), so never re-tune one number
         // without the other, or the collision shape and the picture drift apart.
         const lines = splitName(name);
-        const pw = Math.max(44, Math.max(...lines.map((l) => l.length)) * 7.4 + 14 + (lines.length > 1 ? 10 : 0));
-        const ph = lines.length > 1 ? 40 : 22;
+        /* THE PIT PILL MATCHES THE LIFTED ONE, 2 September 2026 (owner).
+
+           They were never different by design: LineageMap's nodePillWidth is the
+           SAME formula, max(44, len * 7.4 + 14 + 10 if wrapped), with the same
+           40 / 22 heights. The pit only looked bigger because the whole lifted
+           layer carries a scale(0.8), so a pit pill was drawn 1.25 times the
+           lifted one.
+
+           0.72 is that 0.8 times the 0.9 the lifted pill has just taken, so the
+           two now come out the same size on screen. IF EITHER OF THOSE TWO
+           NUMBERS MOVES, this one has to move with it. */
+        const PILL_K = 0.72;
+        const pw = Math.max(44, Math.max(...lines.map((l) => l.length)) * 7.4 + 14 + (lines.length > 1 ? 10 : 0)) * PILL_K;
+        const ph = (lines.length > 1 ? 40 : 22) * PILL_K;
         const pr = { x: w.x, y: w.y, vx: 0, vy: 0, a: 0, idx: pillBodiesRef.current.length, hits: 0, maxHits: 2, mb: null as any };
         const mb = Bodies.rectangle(sx, sy, pw, ph, { chamfer: { radius: ph / 2 }, restitution: 0.3, friction: 0.1, frictionAir: 0.012, density: 0.0012 });
         mb.plugin = { prop: pr, kind: "pill" };
@@ -5197,7 +5209,9 @@ export default function BreedTree({
         // stroke width, the two-line text offset and the font size. It is NOT the
         // corner radius: the drawn rect rounds by pl.h / 2 (a full capsule), so
         // this number never touches the corners despite its old name `rx`.
-        setPillList((l) => [...l, { lines, w: pw * fxScale, h: ph * fxScale, unit: 13 * fxScale }]);
+        // `unit` carries PILL_K too, or the text would stay full size inside a
+        // pill that has shrunk and immediately overflow it.
+        setPillList((l) => [...l, { lines, w: pw * fxScale, h: ph * fxScale, unit: 13 * PILL_K * fxScale }]);
         wake();
       };
       // opts is how the solo-dog circle arrives: its own radius, its breed name
@@ -7917,8 +7931,12 @@ export default function BreedTree({
                   style={{ display: dead ? "none" : undefined, cursor: "grab", pointerEvents: dead ? "none" : "auto", userSelect: "none" }}
                   onClick={(e) => e.stopPropagation()}
                   >
+                  {/* NO OUTLINE, 2 September 2026 (owner). It wore a white stroke
+                      here and none on the lifted layer, and the lifted one is the
+                      reference. The navy fill and the drop shadow are what the
+                      lift uses, so the two now read as the same object. */}
                   <rect x={-pl.w / 2} y={-pl.h / 2} width={pl.w} height={pl.h} rx={pl.h / 2}
-                    style={{ fill: "#0a3a57", stroke: "rgba(255,255,255,0.85)", strokeWidth: pl.unit * 0.154 }} />
+                    style={{ fill: "#0a3a57" }} />
                   {pl.lines.map((ln, li) => (
                     <text key={li} x={0} y={pl.lines.length > 1 ? (li === 0 ? -pl.unit * 0.6 : pl.unit * 0.6) : 0} dominantBaseline="central"
                       style={{ fill: "#ffffff", fontFamily: "Montserrat, var(--font-body), system-ui, sans-serif", fontWeight: 700, fontSize: `${pl.unit * 0.92}px`, pointerEvents: "none", userSelect: "none" }}>
