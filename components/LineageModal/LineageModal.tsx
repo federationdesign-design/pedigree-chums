@@ -294,6 +294,69 @@ export default function LineageModal({ name, image, character, lineage, fromRect
   // The start screen is bare: no shake, no slow motion. They arrive with the
   // round, so nothing is offered that cannot do anything yet.
   const [running, setRunning] = useState(false);
+  /* ============================ REMOVE BEFORE LAUNCH ========================
+     ?floorbox=1 : the pit floor width diagnostic, 2 September 2026.
+
+     THE QUESTION. The wooden floor stops about 9px short of both screen edges on
+     a real iPhone, measured off a screenshot at 414 CSS wide, dpr 2.
+
+     WHY IT IS HERE AND NOT IN BreedTree. The first two attempts at this changed
+     .levelFloor in BreedTree, which turned out to be DEAD CODE: its gate needs a
+     levelTheme, levelThemeFor returns null while THEMES_ENABLED is false, so that
+     element never renders at all. The floor actually on screen is the .floor
+     image a few hundred lines below, which renders precisely BECAUSE there is no
+     theme. Two fixes and two diagnostics went to the wrong element before the
+     null refs gave it away.
+
+     ALREADY RULED OUT on the right element:
+       the asset  floor-shortened-svg.svg rasterises edge to edge across its
+                  whole viewBox, zero transparent margin either side
+       the boxes  .floor is left 0 / right 0 / width 100% inside .stageArea,
+                  which is inset 0 inside .overlay, which is fixed inset 0
+
+     HOW TO READ IT. The magenta outline is the test and it beats the numbers:
+       outline full width, wood inset -> Safari is not painting the SVG out to
+         its own viewBox edges, and the fix belongs in the asset
+       outline inset too -> layout, and whichever width below disagrees with
+         innerWidth is the box at fault
+     ======================================================================== */
+  const floorImgRef = useRef<HTMLImageElement>(null);
+  const stageAreaRef = useRef<HTMLDivElement>(null);
+  const [floorDiag, setFloorDiag] = useState<string | null>(null);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (window.location.search.indexOf("floorbox=1") < 0) return;
+    const read = () => {
+      const fl = floorImgRef.current;
+      const sa = stageAreaRef.current;
+      const vv = window.visualViewport;
+      const n = (v: number | undefined) => (v === undefined ? "-" : String(Math.round(v * 10) / 10));
+      const rect = (el: Element | null) =>
+        el ? `${Math.round(el.getBoundingClientRect().left * 10) / 10} / ${Math.round(el.getBoundingClientRect().width * 10) / 10}` : "-";
+      setFloorDiag([
+        `innerWidth      ${n(window.innerWidth)}`,
+        `visualViewport  ${n(vv?.width)}`,
+        `docEl client    ${n(document.documentElement.clientWidth)}`,
+        `.overlay  x/w   ${rect(sa?.parentElement ?? null)}`,
+        `.stageArea x/w  ${rect(sa)}`,
+        `.floor    x/w   ${rect(fl)}`,
+        `floor css w     ${fl ? getComputedStyle(fl).width : "-"}`,
+        `floor natural   ${n(fl?.naturalWidth)}`,
+        `dpr             ${n(window.devicePixelRatio)}`,
+      ].join("\n"));
+    };
+    // Polled, not a single shot: the last version read once before the element
+    // existed and every line came back blank.
+    let tries = 0;
+    const id = window.setInterval(() => { read(); if (++tries > 40) window.clearInterval(id); }, 250);
+    window.addEventListener("resize", read);
+    window.visualViewport?.addEventListener("resize", read);
+    return () => {
+      window.clearInterval(id);
+      window.removeEventListener("resize", read);
+      window.visualViewport?.removeEventListener("resize", read);
+    };
+  }, []);
   const [learningActive, setLearningActive] = useState(false);
   const [runKey, setRunKey] = useState(0);
   // The one-way gate. Learn to play is free: nothing is running yet, so there
@@ -515,7 +578,7 @@ export default function LineageModal({ name, image, character, lineage, fromRect
           fill + dockAside mode: caption and breadcrumbs docked at the top,
           circles filling the rest. The character text becomes the caption
           shown at root, replacing the old floating blue box. */}
-      <div className={css.stageArea}>
+      <div ref={stageAreaRef} className={css.stageArea}>
         <BreedTree
           key={runKey}
           /* The pit needs the era by name as well as by theme: a thrown ball is
@@ -617,7 +680,18 @@ export default function LineageModal({ name, image, character, lineage, fromRect
         {/* Pit floor, same graphic as the main pit. A themed level brings its
             own ground art, so the default strip stands down rather than
             doubling up underneath it. */}
-        {!theme && <img src="/floor-shortened-svg.svg" alt="" aria-hidden="true" className={css.floor} />}
+        {!theme && (
+          <img
+            ref={floorImgRef}
+            src="/floor-shortened-svg.svg"
+            alt=""
+            aria-hidden="true"
+            className={css.floor}
+            /* REMOVE BEFORE LAUNCH, ?floorbox=1: the magenta outline on the IMG
+               BOX. See the block by the diagnostic near the top of this file. */
+            style={floorDiag ? { outline: "2px solid #ff00ff", outlineOffset: "-2px" } : undefined}
+          />
+        )}
       </div>
 
       {/* Slow motion, straight from the main pit: snail icon, sits above shake.
@@ -1076,6 +1150,15 @@ export default function LineageModal({ name, image, character, lineage, fromRect
             window.dispatchEvent(new CustomEvent("pc:history-home"));
           }}
         />
+      )}
+      {/* REMOVE BEFORE LAUNCH, ?floorbox=1. Last node in the overlay, z-index
+          99999, so nothing can paint over it. */}
+      {floorDiag && (
+        <div style={{
+          position: "fixed", top: 6, left: 6, zIndex: 99999, pointerEvents: "none",
+          background: "rgba(0,0,0,0.82)", color: "#0f0", padding: "6px 8px",
+          font: "11px/1.35 ui-monospace, monospace", borderRadius: 6, whiteSpace: "pre",
+        }}>{floorDiag}</div>
       )}
     </div>,
     document.body,
