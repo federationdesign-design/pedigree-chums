@@ -1068,7 +1068,23 @@ const rollBomb = () => Math.random() < 1 / BOMB_ODDS;
 // the radius, so below this the number stops reading), converted to viewBox units
 // per device by the stage short side (badgeFloorVb). Physics radius stays coupled
 // (rDraw / k), so a smaller disc also collides smaller.
-const BADGE_FRAC = 0.25;
+/* 0.25 -> 0.20, 2 September 2026 (owner): the pit's yellow badges read far larger
+   than the same dog's chip on the lift.
+
+   THE TWO WERE NEVER THE SAME FORMULA. A pit badge is a fraction of ITS OWN
+   CIRCLE's radius; a lift chip is max(21, 5 * sqrt(share)) * 0.78, an absolute
+   size from the share. They only ever looked close by coincidence, and the gap
+   opened up when the lift layer took its 20% scale: the chips came down and the
+   badges did not. 0.20 is 0.25 less that same fifth, which closes it again.
+
+   IT IS STILL A COINCIDENCE, not a shared rule. Change PIT_NODE_SCALE or the
+   lift's scale and the two drift apart again with nothing to catch it.
+
+   WATCH THE FLOOR. badgeDrawForNode drops a badge to nothing rather than clamping
+   it up once it falls under BADGE_FLOOR_PX, so shrinking every badge by a fifth
+   makes the smallest ones disappear at a slightly larger circle than before. That
+   is the existing rule working, not a new fault. */
+const BADGE_FRAC = 0.20;
 const BADGE_FLOOR_PX = 13.5;
 const badgeDrawForNode = (nodeR: number, k: number, floorVb: number) => {
   const badge = BADGE_FRAC * nodeR * k;

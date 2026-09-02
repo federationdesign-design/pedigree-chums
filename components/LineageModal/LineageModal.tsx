@@ -972,9 +972,13 @@ export default function LineageModal({ name, image, character, lineage, fromRect
                 </div>
               ) : (
                 <>
+                  {/* "LEVEL FAILED" -> "TRY AGAIN?", 2 September 2026 (owner).
+                      Two words still, so the two-line flash layout is unchanged.
+                      It also reads as the question the buttons below answer,
+                      which is the point of this screen having tries left. */}
                   <div className={css.endFlash}>
-                    <span className={css.endFlashWord}>LEVEL</span>
-                    <span className={css.endFlashWord}>FAILED</span>
+                    <span className={css.endFlashWord}>TRY</span>
+                    <span className={css.endFlashWord}>AGAIN?</span>
                   </div>
                   {/* The count is read from `lives` and never from a constant.
                       Lives are EARNED BACK on a win streak, capped at LIVES_MAX,
@@ -1076,6 +1080,19 @@ export default function LineageModal({ name, image, character, lineage, fromRect
                 {/* REWIND, back to this level's start screen. Not a retry: no
                     life spent and no score reset, because the life for this
                     round has already gone and the score is what you keep. */}
+                {/* THE REWIND IS NOW SPENT-SCREEN ONLY, 2 September 2026 (owner).
+
+                    On a recoverable loss it was a second forward action beside
+                    the retry, and the two did nearly the same thing: one dropped
+                    you on the start screen, the other replayed the level. That
+                    screen now offers exactly one way on, the retry, plus leave.
+
+                    IT MUST STAY ON THE SPENT SCREEN. With the retry hidden once
+                    the lives are gone, this is the only forward path there: it
+                    returns to the start screen where PLAY has become PLAY AGAIN
+                    and the run resets. Remove it there and a game over is a dead
+                    end with only a close button. */}
+                {outOfLives && (
                 <button
                   type="button"
                   className={`${css.endBtn} ${css.endBtnIcon} ${css.endBtnGreen}`}
@@ -1094,6 +1111,7 @@ export default function LineageModal({ name, image, character, lineage, fromRect
                     <path d="M21 5 L13 12 L21 19 Z" fill="currentColor" />
                   </svg>
                 </button>
+                )}
                 {/* RETRY, and only while there is something to retry with.
                     Hidden once the lives are gone (owner): a spent run should
                     not offer an instant replay of the level that ended it.
@@ -1115,18 +1133,12 @@ export default function LineageModal({ name, image, character, lineage, fromRect
                     <span className={`${css.endIcon} ${css.endIconReplay}`} aria-hidden="true" />
                   </button>
                 )}
-                {/* LEARN costs a life, so it has no business on an ending.
-                    NOTE it is still offered on a recoverable loss, which is the
-                    owner's call as asked; my own view is that a lossy action on
-                    any failure screen is a trap, since it spends the very try
-                    the player just lost. Flagged, not acted on. */}
-                {!outOfLives && (
-                <button type="button" className={`${css.endBtn} ${css.endBtnIcon} ${css.endBtnBlue}`} onClick={() => goLearn(false)} aria-label="Go to the learn area" title="Learn">
-                  <svg className={css.endIcon} viewBox={`0 0 ${BRAIN_ARTBOARD.w} ${BRAIN_ARTBOARD.h}`} aria-hidden="true" focusable="false">
-                    <path d={BRAIN_PATH} fill="currentColor" />
-                  </svg>
-                </button>
-                )}
+                {/* LEARN IS GONE FROM THE ENDING, 2 September 2026 (owner), and it
+                    was flagged here as a trap before it was removed: going to
+                    learn COSTS A LIFE, so offering it on the screen that just took
+                    one spends the very try the player is looking at.
+                    Learn is still reachable the ordinary way, from the start
+                    screen and from the pit. */}
               </div>
             </>
           )}
