@@ -1513,49 +1513,56 @@
 @media (max-width: 768px) {
   /* PLAY's phone offset: 51.8 - (50.65 + 5) / 2. See the longhand on .learnPlay. */
   .learnPlay { left: 24px; }
-  /* The zoom-out button is measured off PLAY's visible right edge, so it moves
-     and shrinks with it. PLAY's visible box is now 24 + 55.65 = 79.65 wide to
-     its right edge, and this button's outline draws 5px outside its box, so
-     79.65 + 14 of air + 5 = 98.7. The box is 55.65 - 10 = 45.65 to land on the
-     same visible square, and the radius is PLAY's outer 17.7 less the 5px
-     outline. All four figures come from the block above this rule. */
+  /* ONE ROW, FIVE BUTTONS, 2 September 2026 (owner), to the owner's own layout:
+     PLAY, then the zoom out, then the three info icons, all along the foot.
+
+     THE ROW HAS A HARD RIGHT EDGE and it is not the screen. .relRailHome pins
+     the chum rail at right: 18px, and on a level with ten or more chums the rail
+     runs TWO columns: 2 x 38 + 8 gap + 20 padding + 4 border = 108, so its left
+     edge is 402 - 18 - 108 = 276 on a 402px phone. Its bottom card sits at y 608
+     to 664 and this row is y 613 to 669, so they are on the same line and a
+     button that reaches past 276 lands on a card.
+
+     THE BUDGET, and it is the whole reason these numbers are what they are:
+
+       24      PLAY's left
+       55.65   PLAY, unchanged. It is the primary action and it stays biggest
+       6       gap, down from 14
+       42 x 4  the zoom out and the three icons
+       6 x 3   gaps between them
+       -----
+       271.65  right edge, against the rail's 276. 4.35 to spare
+
+     42 rather than 50.6 because at 50.6 the four buttons ALONE are wider than
+     the space, before any gap at all. Padding was never the constraint.
+
+     CHANGE PLAY'S SIZE OR THE RAIL'S COLUMN COUNT AND THIS ROW OVERFLOWS. There
+     is no slack left in it. */
   .zoomOutBtn {
-    left: 98.7px;
-    /* UP ONE ROW, 2 September 2026 (owner). It shared the bottom row with the
-       info dock and the two DO collide.
-
-       The collision case, for the record, because the first reading of this was
-       wrong: tapping a circle to zoom clears the picked chum (onCircle in
-       BreedTree.tsx), so that path is safe and the dock is gone. But picking a
-       chum from the RAIL while already zoomed in sets the chum and leaves the
-       zoom alone, so both render.
-
-       IT COULD NOT MOVE SIDEWAYS INSTEAD. The bottom row is full: PLAY ends at
-       79.65, the dock runs 93.7 to 273.5, and the chum rail starts around 287.
-       Fourteen pixels is not a button.
-
-       So it stacks. 3% is the row's own bottom, 50.6 is the dock button, 14 is
-       the standard gap, and 5 more because this button's rim is an `outline`
-       that draws outside its box while the dock's border draws inside.
-       It now sits one row up ALWAYS, including when no chum is picked and the
-       dock is not there. A fixed position cannot know. */
-    bottom: calc(3% + 69.6px);
-    width: 45.65px;
-    height: 45.65px;
-    border-radius: 12.7px;
+    /* Back beside PLAY, undoing the stack from earlier today. Left is PLAY's
+       visible right edge 79.65, plus the 6 gap, plus 5 because this button's rim
+       is an `outline` drawn OUTSIDE its box while the dock's border is drawn
+       inside. The box is 42 - 10 to land on the same visible 42 square. */
+    left: 90.65px;
+    bottom: calc(3% + 5px);
+    width: 32px;
+    height: 32px;
+    border-radius: 7.6px;
   }
   .learnDock {
     top: auto;
     right: auto;
     bottom: 3%;
-    left: 93.7px;   /* PLAY's visible right edge 79.65 + 14 of air */
+    gap: 6px;
+    left: 133.65px;  /* the zoom out's visible right edge 127.65 + 6 */
   }
   .learnDockBtn {
-    width: 50.6px;
-    height: 50.6px;
-    border-radius: 15.18px;
+    width: 42px;
+    height: 42px;
+    border-radius: 12.6px;
   }
-  .learnDockIcon { width: 28px; height: 28px; }
+  /* 28 was 0.55 of a 50.6 button. Held at the same fraction of 42. */
+  .learnDockIcon { width: 23px; height: 23px; }
 }
 .cardTitleWhite {
   color: #ffffff;
