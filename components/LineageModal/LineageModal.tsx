@@ -390,6 +390,9 @@ export default function LineageModal({ name, image, character, lineage, fromRect
   // is really a restart screen wearing something more useful.
   const [resumeInLearn, setResumeInLearn] = useState(false);
   const outOfLives = typeof lives === "number" && lives <= 0;
+  // The ending overlay shows on a won or lost round, and on a spent run however
+  // the last life went. See the note beside the overlay itself.
+  const showEnding = phase !== "play" || outOfLives;
   // Straight there, no question asked. The switch is meant to feel abrupt.
   // Leaving a LIVE round costs a life. Leaving the game over screen does not:
   // the round is already spent, so charging again would be charging twice.
@@ -905,7 +908,20 @@ export default function LineageModal({ name, image, character, lineage, fromRect
       )}
 
       {/* Round won / game over, main-pit flash styling */}
-      {phase !== "play" && (
+      {/* THE LAST LIFE ENDS THE GAME, WHEREVER IT WENT, 9 Sept 2026 (owner).
+
+          This screen already knew how to say GAME OVER: it does whenever the
+          lives are gone. But it only appeared when phase became "lost", and the
+          only thing that set that was losing a round on a full pit. Spending the
+          last life any other way, on a restart, on the red square, or on a trip
+          to learn, dropped you back on the start screen with nothing said, where
+          PLAY had quietly become PLAY AGAIN and pressing it refilled the run.
+          That is why the lives looked like they climbed back to two on their own.
+
+          Derived from the count rather than pushed into phase by each of the
+          places that spend a life, so a fifth one cannot be added later and miss
+          it, and so no effect has to write state during a render pass. */}
+      {showEnding && (
         <div className={`${css.endOverlay}${phase === "won" ? " " + css.winOverlay : ""}`} role="alertdialog" aria-label={phase === "won" ? "Round won" : "Game over"}>
           {/* Round Won is its own screen: what you just finished, what it was
               worth, and what is coming next. Next Level is the whole point of
@@ -1160,13 +1176,23 @@ export default function LineageModal({ name, image, character, lineage, fromRect
                   type="button"
                   className={`${css.endBtn} ${css.endBtnIcon} ${css.endBtnGreen}`}
                   onClick={() => {
+                    /* THE RESET MOVED HERE, 9 Sept 2026, with the change above.
+                       It used to happen on the start screen, when PLAY AGAIN was
+                       pressed. Now that a spent run holds this screen up until
+                       the lives come back, the start screen sits underneath it
+                       and could never be reached: the run has to be reset by the
+                       button the player can actually see. PLAY AGAIN still calls
+                       the same reset, and by then the lives are already back, so
+                       it does nothing twice. */
+                    onResetRun?.();
+                    setScore(0);
                     setPhase("play");
                     setResumeInLearn(false);
                     setSlowmo(false);
                     setCaptionOpen(false);
                     setRunKey((k) => k + 1);
                   }}
-                  aria-label="Back to the start screen"
+                  aria-label="Start a new run"
                   title="Start screen"
                 >
                   <svg className={css.endIcon} viewBox="0 0 24 24" aria-hidden="true" focusable="false">
