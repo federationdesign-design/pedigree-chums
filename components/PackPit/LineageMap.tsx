@@ -1378,7 +1378,24 @@ export default function LineageMap({
       const ff = cardFrame.get(id);
       const cardX = ff ? ff.sx - pan.x : (pos ? pos.x : baseX);
       const cardY = ff ? ff.sy - pan.y : (pos ? pos.y : baseY);
-      return { id, img, name, note, share, mix, status, cardX, cardY };
+      /* THE RING WEIGHT OF THE NODE THIS CARD CAME OUT OF, item 12, 9 Sept
+         2026 (owner). .pickCard is a flat stroke-width 5; the circle it popped
+         from carries clampedRingW, the pit's fraction-of-radius rule with the
+         hierarchy clamp already applied. Measured here, where the live node is
+         already in hand, rather than at the draw site. A pinned card whose
+         branch has closed has no node left to measure and keeps the flat 5. */
+      let ringW: number | null = null;
+      if (live) {
+        // Depth for the RING_FRAC table: the node's own generation in this tree.
+        let pd = 1;
+        for (let a: Node | null = live._parent as Node | null; a; a = a._parent as Node | null) pd += 1;
+        // The node's raw ring, the same expression clampedRingW starts from. The
+        // hierarchy clamp is deliberately NOT applied: it exists so a ring is
+        // never thicker than the ring of the circle it sits INSIDE, and a card
+        // in your hand sits inside nothing.
+        ringW = nodeR(share) * ringFrac(pd);
+      }
+      return { id, img, name, note, share, mix, status, cardX, cardY, ringW };
     })
     .filter((c) => c.img);
   // images successfully placed in a frame -- turns their node green
@@ -2578,7 +2595,18 @@ export default function LineageMap({
                          Only set in the pit lift: the main pit and the chum
                          tree keep the flat CSS numbers they were signed off on,
                          because neither was asked for. */
-                      const fill = (n.img && (placedImgs.has(n.img as string) || packed)) ? "#22c55e" : seen.has(n._id) ? "#0c5b92" : undefined;
+                      /* PLACED IS THE PIT'S YELLOW, 9 Sept 2026 (owner), item 9.
+                         It was #22c55e. Two things follow and both are deliberate.
+                         .disc's own default fill is already var(--yellow), so a
+                         placed node and an untouched one are now the same colour;
+                         only a SEEN one still reads different, in blue. If the
+                         placed state needs to stand apart again it has to be by
+                         something other than fill.
+                         And the % on it goes back to navy. White is what a placed
+                         node used to wear on green, and white on yellow is 1.6:1,
+                         which is unreadable. See the text style below. */
+                      const placedHere = !!n.img && (placedImgs.has(n.img as string) || packed);
+                      const fill = placedHere ? "var(--yellow, #ffd23e)" : seen.has(n._id) ? "#0c5b92" : undefined;
                       const st: React.CSSProperties = {
                         ...(fill ? { fill } : null),
                         // clamped so a nested ring can never out-thicken its parent
@@ -2588,7 +2616,10 @@ export default function LineageMap({
                     })()}
                     <text className={styles.pct} textAnchor="middle" dominantBaseline="central"
                       fontSize={INSTR_NAMES.has(breed.name) ? Math.max(13, r * 0.75) : Math.max(13, r * (circular ? 0.625 : 0.5))}
-                      style={(n.img && (placedImgs.has(n.img as string) || packed)) || seen.has(n._id) ? {fill:"#ffffff",...(INSTR_NAMES.has(breed.name)?{fontFamily:'"Luckiest Guy",system-ui,sans-serif',fontWeight:400}:{})} : INSTR_NAMES.has(breed.name)?{fontFamily:'"Luckiest Guy",system-ui,sans-serif',fontWeight:400}:undefined}>
+                      /* White only on the blue SEEN fill now. A placed node is
+                         yellow (item 9 above), and white on yellow cannot be read,
+                         so it keeps the default navy. */
+                      style={(!(n.img && (placedImgs.has(n.img as string) || packed)) && seen.has(n._id)) ? {fill:"#ffffff",...(INSTR_NAMES.has(breed.name)?{fontFamily:'"Luckiest Guy",system-ui,sans-serif',fontWeight:400}:{})} : INSTR_NAMES.has(breed.name)?{fontFamily:'"Luckiest Guy",system-ui,sans-serif',fontWeight:400}:undefined}>
                       {INSTR_NAMES.has(breed.name) ? (n.value ?? "") : `${share}%`}
                     </text>
                     {(hasKids || !autoExposed.has(n._id)) && !(circular && n.name === breed.name) ? (() => {
@@ -2997,7 +3028,10 @@ export default function LineageMap({
                     /* Mini pit: a circle that popped out of a dog wears that
                        dog's ring colour, so it is obvious where it came from.
                        The main pit keeps its own blue and white scheme. */
-                    style={circular && ringColor ? { stroke: ringColor } : undefined} />}
+                    /* Colour from the dog it popped out of, weight from the node
+                       itself. vectorEffect is non-scaling-stroke on this rect, so
+                       the number is screen pixels and the two are comparable. */
+                    style={circular ? { ...(ringColor ? { stroke: ringColor } : null), ...(c.ringW != null ? { strokeWidth: c.ringW } : null) } : undefined} />}
                   {INSTR_NAMES.has(breed.name) && placedSet.has(c.id) && (() => { const words = c.name.split(" "); let l1="",l2=""; const mc=Math.floor(CW/7.5); for(const w of words){if((l1+(l1?" ":"")+w).length<=mc)l1+=(l1?" ":"")+w;else l2+=(l2?" ":"")+w;} const ls={fill:"#ffffff",fontFamily:'"Luckiest Guy",system-ui,sans-serif',fontSize:12,fontWeight:400,pointerEvents:"none" as const}; const by1=c.cardY+CW/2+48; const by2=c.cardY+CW/2+40; return l2?(<text x={c.cardX} textAnchor="middle" style={ls}><tspan x={c.cardX} y={by2}>{l1}</tspan><tspan x={c.cardX} dy={20}>{l2}</tspan></text>):(<text x={c.cardX} y={by1} textAnchor="middle" dominantBaseline="central" style={ls}>{l1}</text>); })()}
                   {/* The status dot is reference information, so it belongs to
                       the learning side. The mini pit is a game: no dot there. */}
