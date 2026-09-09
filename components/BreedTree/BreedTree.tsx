@@ -143,7 +143,37 @@ const ZOOM_PAD = 1.1;
 // it goes", and it is the body that has to fit between the pit walls.
 // Mobile only: above 640px the layout does not run relayoutMobile, so the size
 // has nowhere to land and the slider stays hidden.
-const DIFF_DEFAULT = 5;
+/* 5 -> 9 on 9 Sept 2026 (owner). Only the STARTING point moves; the slider still
+   runs 0 to 10 and every stop behaves as it did. */
+const DIFF_DEFAULT = 9;
+
+/* THE DIFFICULTY NOW CARRIES BETWEEN LEVELS, 9 Sept 2026 (owner).
+   It used to reset on every level because LineageModal is keyed on the level and
+   remounts BreedTree, taking this component's state with it. So a reader who set
+   the slider once had to set it again on the next dog, which the new swipe made
+   painfully obvious.
+   sessionStorage rather than lifting the state up to BreedStrip: the value has to
+   survive a REMOUNT, not merely a re-render, and it is one number owned by the
+   control that sets it. Lifting it would have put a pit concern into the history
+   page and threaded a prop through LineageModal for no gain.
+   sessionStorage, not localStorage, deliberately: it is a setting for this
+   sitting, not a preference to remember for ever. Closing the tab forgets it and
+   the next visit starts at the default again.
+   Wrapped because both calls throw outright in Safari private mode. */
+const DIFF_KEY = "pc-mini-pit-difficulty";
+function readDiff(): number {
+  try {
+    const v = sessionStorage.getItem(DIFF_KEY);
+    if (v === null) return DIFF_DEFAULT;
+    const n = Number(v);
+    // Anything out of range or unparseable falls back rather than packing the
+    // pit at a nonsense size.
+    return Number.isFinite(n) && n >= 0 && n <= 10 ? Math.round(n) : DIFF_DEFAULT;
+  } catch { return DIFF_DEFAULT; }
+}
+function writeDiff(n: number) {
+  try { sessionStorage.setItem(DIFF_KEY, String(n)); } catch { /* private mode */ }
+}
 // The three stops, as a fraction of a PIT-FULL cluster. 10 fills the pit, 5 is
 // half of it, 0 about half now too (raised from a quarter). Two straight
 // segments, so 5 lands exactly on its own
@@ -1689,13 +1719,18 @@ export default function BreedTree({
   const [layoutAspect, setLayoutAspect] = useState<number | null>(null);
   const aspectKey = isMobile ? layoutAspect ?? 0.55 : 1;
   // Difficulty: 10 hardest at the top of the slider, 0 easiest at the bottom.
-  // Start-screen control only, and it resets to the default every time the pit
-  // is opened (LineageModal remounts this component on its runKey).
-  const [level, setLevel] = useState(DIFF_DEFAULT);
+  // Start-screen control only. It no longer resets when the pit reopens: the
+  // value is read back from sessionStorage (see readDiff), so it carries from
+  // one level to the next.
+  // Read in a lazy initialiser so it runs once per mount and never during a
+  // server render, where there is no sessionStorage at all.
+  const [level, setLevel] = useState(() => readDiff());
   // Set the instant before a difficulty change, and consumed by the entrance
   // effect so that re-pack resizes in place rather than replaying the drop-in.
   const resizeOnlyRef = useRef(false);
-  const levelRef = useRef(DIFF_DEFAULT);
+  // Seeded from the same place as the state above, or the first re-pack would
+  // use the default while the slider showed the stored value.
+  const levelRef = useRef(readDiff());
   const diffRef = useRef<HTMLDivElement>(null);
   // The drag flag is a ref so the pointer handlers can read it, but the thumb
   // has to re-render to grow, so it needs state as well.
@@ -1706,6 +1741,7 @@ export default function BreedTree({
     if (l === levelRef.current) return;
     levelRef.current = l;
     resizeOnlyRef.current = true;
+    writeDiff(l); // so the next level opens where this one was left
     setLevel(l);
   }
   // The track runs 0 at the bottom to 10 at the top, so invert the pointer's
