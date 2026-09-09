@@ -983,9 +983,13 @@
   bottom: calc(3% + 5px);
   z-index: 15;
   display: grid;
-  /* Two columns for the left/right pair; up and down span both and centre. */
-  grid-template-columns: repeat(2, 62.5px);
-  gap: 10px;
+  /* Two columns for the left/right pair; up and down span both and centre.
+     HALVED 9 Sept 2026 (owner): 62.5 to 31.25 and the 10px gap to 5px, so the
+     whole pad scales rather than just the buttons. Footprint drops from 145px
+     wide to 72.5px, which is one PLAY button's worth of the bottom row instead
+     of nearly half of it. */
+  grid-template-columns: repeat(2, 31.25px);
+  gap: 5px;
   justify-items: center;
   align-items: center;
   pointer-events: auto;
@@ -994,6 +998,9 @@
 .navDown {
   grid-column: 1 / -1;
 }
+/* RETIRED 9 Sept 2026, not deleted. The four labels came off the pad to see how
+   it reads on the arrows alone. Kept here so restoring them is four spans in the
+   JSX and no styling work. If they are still unused in a month, delete this. */
 .navLabel {
   grid-column: 1 / -1;
   font-family: var(--font-display), system-ui, sans-serif;
@@ -1013,11 +1020,18 @@
 .navLabelRight { grid-column: 2; }
 
 .navBtn {
-  width: 62.5px;
-  height: 62.5px;
-  border-radius: 17.75px;
+  /* HALVED 9 Sept 2026 (owner). Every figure is exactly half of what it was, so
+     the button still reads as the same shape as PLAY and the zoom-out, just
+     smaller: 62.5 -> 31.25 box, 17.75 -> 8.875 radius, 5 -> 2.5 outline. The
+     working behind the originals is on .zoomOutBtn. */
+  width: 31.25px;
+  height: 31.25px;
+  border-radius: 8.875px;
   border: none;
-  outline: 5px solid var(--navy, #0a3a57);
+  /* YELLOW RIM, 9 Sept 2026 (owner), was navy on navy. The arrow inside is
+     already yellow, so the button is now a navy square outlined and filled with
+     the one accent, which is what the corner squares do too. */
+  outline: 2.5px solid var(--yellow, #ffd23e);
   background: var(--navy, #0a3a57);
   color: var(--yellow, #ffd23e);
   display: grid;

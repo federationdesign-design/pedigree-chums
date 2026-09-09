@@ -9042,10 +9042,16 @@ export default function BreedTree({
           ARROWS POINT THE WAY THEY GO. Right is next, down is the next era. That
           is deliberately the opposite of the swipe, which follows the content.
           Pressing an arrow and dragging a page are different mental models and
-          both are right in their own terms. */}
+          both are right in their own terms.
+          NO VISIBLE LABELS, 9 Sept 2026 (owner), trying it on the arrows alone.
+          LAST ERA, PREVIOUS, NEXT and NEXT ERA used to sit above and below. The
+          .navLabel rules are still in the stylesheet, unused, so restoring them
+          is four spans and no styling work.
+          The aria-labels below are NOT decoration now: with the text gone they
+          are the only thing naming these controls to a screen reader, so do not
+          simplify them away. */}
       {navOn && (onNavPrev || onNavNext || onNavPrevEra || onNavNextEra) && (
         <div className={styles.navPad} role="group" aria-label="Move between levels">
-          <span className={`${styles.navLabel} ${styles.navLabelUp}`}>LAST ERA</span>
           <button
             type="button"
             className={`${styles.navBtn} ${styles.navUp}`}
@@ -9073,8 +9079,6 @@ export default function BreedTree({
           >
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3 L7 21 L19 12 Z" fill="currentColor" /></svg>
           </button>
-          <span className={`${styles.navLabel} ${styles.navLabelLeft}`}>PREVIOUS</span>
-          <span className={`${styles.navLabel} ${styles.navLabelRight}`}>NEXT</span>
           <button
             type="button"
             className={`${styles.navBtn} ${styles.navDown}`}
@@ -9084,7 +9088,6 @@ export default function BreedTree({
           >
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19 L3 7 L21 7 Z" fill="currentColor" /></svg>
           </button>
-          <span className={`${styles.navLabel} ${styles.navLabelDown}`}>NEXT ERA</span>
         </div>
       )}
 
