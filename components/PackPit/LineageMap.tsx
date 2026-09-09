@@ -2077,13 +2077,18 @@ export default function LineageMap({
                   style={{ ["--band-slide" as string]: `${R}px`, ["--band-dur" as string]: BAND_SLIDE_DUR, ["--band-delay" as string]: BAND_SLIDE_DELAY }}
                 >
                   <g transform={`rotate(${TILT})`}>
-                    {/* At 100% (every frame filled) the band flips to the done-green
-                        #69d176, softer than the ring's #22c55e by design (a large fill
-                        wants the gentler green; the thin ring stays saturated). The
-                        ring owns partial progress; this is the done state. The label
-                        flips to navy because white (RARE/ROOT fg) on #69d176 is ~1.9:1,
-                        unreadable; navy on it is ~7:1. .bandFill eases the swap. */}
-                    <rect className={styles.bandFill} x={-R * 1.6} y={bandTop} width={R * 3.2} height={R * 1.6} style={{ fill: framesDone ? "#69d176" : band.bg }} />
+                    {/* At 100% (every frame filled) the band flips to the done-green,
+                        which is now the RING'S OWN #22c55e (owner, 9 Sept 2026). It was
+                        a softer #69d176, on the reasoning that a large fill wants a
+                        gentler green than a thin ring. On the device the two read as
+                        two different greens on one circle, which is worse than either
+                        being slightly off on its own. One green now, shared with the
+                        ring above and with the placed-node fill at :2574.
+                        The label stays navy. White on this green is 2.2:1 and
+                        unreadable; navy on it is 5.3:1, which clears AA. It was 7:1 on
+                        the old lighter green, so this is a real but acceptable drop.
+                        .bandFill eases the swap. */}
+                    <rect className={styles.bandFill} x={-R * 1.6} y={bandTop} width={R * 3.2} height={R * 1.6} style={{ fill: framesDone ? "#22c55e" : band.bg }} />
                     <text className={styles.bandFill} x={labelX} y={labelY} textAnchor="middle" dominantBaseline="central" style={{ fontFamily: '"Luckiest Guy", system-ui, sans-serif', fontSize: fs, fontWeight: 400, fill: framesDone ? "var(--navy, #0a3a57)" : band.fg }}>{band.label}</text>
                   </g>
                 </g>
