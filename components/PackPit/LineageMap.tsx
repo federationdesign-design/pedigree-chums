@@ -2084,12 +2084,14 @@ export default function LineageMap({
                         two different greens on one circle, which is worse than either
                         being slightly off on its own. One green now, shared with the
                         ring above and with the placed-node fill at :2574.
-                        The label stays navy. White on this green is 2.2:1 and
-                        unreadable; navy on it is 5.3:1, which clears AA. It was 7:1 on
-                        the old lighter green, so this is a real but acceptable drop.
-                        .bandFill eases the swap. */}
+                        THE LABEL IS WHITE ON OWNER REQUEST, 9 Sept 2026, the same
+                        call already recorded for white on the orange RARE band. The
+                        contrast is 2.2:1, below the 4.5:1 threshold. Navy would be
+                        5.3:1. Noted here so nobody "fixes" it back without asking,
+                        and so it is on the record if the accessibility work reaches
+                        this screen. .bandFill eases the swap. */}
                     <rect className={styles.bandFill} x={-R * 1.6} y={bandTop} width={R * 3.2} height={R * 1.6} style={{ fill: framesDone ? "#22c55e" : band.bg }} />
-                    <text className={styles.bandFill} x={labelX} y={labelY} textAnchor="middle" dominantBaseline="central" style={{ fontFamily: '"Luckiest Guy", system-ui, sans-serif', fontSize: fs, fontWeight: 400, fill: framesDone ? "var(--navy, #0a3a57)" : band.fg }}>{band.label}</text>
+                    <text className={styles.bandFill} x={labelX} y={labelY} textAnchor="middle" dominantBaseline="central" style={{ fontFamily: '"Luckiest Guy", system-ui, sans-serif', fontSize: fs, fontWeight: 400, fill: framesDone ? "#ffffff" : band.fg }}>{band.label}</text>
                   </g>
                 </g>
               </g>
