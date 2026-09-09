@@ -2090,3 +2090,32 @@
   border-radius: var(--radius-pill, 999px);
   pointer-events: none;
 }
+
+
+/* ==== 3H-BLOCK ==== */
+/* ============================================================================
+   STAGE 3H, 1 September 2026 (Steve). THE ERA PARAGRAPH COMES OFF.
+
+   The dog card is a 1:1 square whose height is set by its slot width, so the
+   only way to stop it being cropped is to give the rail more room. The header
+   above it is where that room is, and the paragraph is the biggest thing in it
+   and the least load bearing: the era title says where you are, and the dogs
+   themselves are the content.
+
+   That returns about 86px, four lines at 1rem on 1.35 leading, which is more
+   than the roughly 27px the 3f budget had spare and should let the card and its
+   icon row sit inside the panel whole.
+
+   HIDDEN, NOT REMOVED FROM THE MARKUP. TimelineRunV.tsx:334 still renders it,
+   so nothing else has to change and turning it back on is one line. It also
+   stays in the DOM for anyone reading the page with a screen reader, which a
+   deleted paragraph would not.
+
+   DESKTOP DOES NOT USE THIS FILE. The era note on the desktop grid lives in
+   history.module.css and is untouched.
+
+   Foot of the file, same reason as every block above: this stylesheet resolves
+   equal specificity last-one-wins, and .eraNote is declared at line 809. */
+.eraNote {
+  display: none;
+}
