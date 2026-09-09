@@ -2702,6 +2702,41 @@ export default function BreedTree({
     const short = st ? Math.min(st.clientWidth, st.clientHeight) : SIZE;
     return (BADGE_FLOOR_PX * SIZE) / short;
   };
+  /* DIAGNOSTIC, ?badgedebug=1, 9 Sept 2026. REMOVE ONCE ANSWERED.
+     Two readings of the code disagreed about whether a popped circle's chip is
+     created and hidden, or never created at all. This counts the live badge
+     list instead of arguing. It polls rather than logging at the spawn, so the
+     total climbs as circles pop. Nothing is created and nothing runs without
+     the flag. Placed here because it calls badgeFloorVb, declared above. */
+  useEffect(() => {
+    let d: HTMLDivElement | null = null;
+    let t = 0;
+    try {
+      if (new URLSearchParams(window.location.search).get("badgedebug") !== "1") return;
+      d = document.createElement("div");
+      d.style.cssText =
+        "position:fixed;left:0;right:0;bottom:0;z-index:99999;background:#000;color:#0f0;" +
+        "font:11px/1.4 monospace;padding:6px 8px;pointer-events:none;white-space:pre-wrap";
+      d.textContent = "badge debug: start a round";
+      document.body.appendChild(d);
+      const el = d;
+      const tick = () => {
+        const bl = badgeBodiesRef.current;
+        if (!bl || !bl.length) { el.textContent = "no badges yet (round not started)"; return; }
+        const rs = bl.map((b) => b.rDraw ?? 0);
+        const drawn = rs.filter((r) => r > 0).length;
+        el.textContent =
+          `badges ${bl.length}  drawn ${drawn}  hidden ${bl.length - drawn}\n` +
+          `rDraw min ${Math.min(...rs).toFixed(2)}  max ${Math.max(...rs).toFixed(2)}  floor ${badgeFloorVb().toFixed(2)} (viewBox units)`;
+        // NOT reading badgeSrcRef here on purpose: a read from this effect makes
+        // the compiler treat its assignment in the seed as a write to a frozen
+        // value, which costs an eslint error for a line that is only a nicety.
+      };
+      tick();
+      t = window.setInterval(tick, 500);
+    } catch {}
+    return () => { try { if (t) window.clearInterval(t); if (d) d.remove(); } catch {} };
+  }, []);
   useEffect(() => {
     if (!dockAside) return;
     const k = SIZE / viewRef.current[2];
