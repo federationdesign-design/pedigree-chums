@@ -95,6 +95,73 @@ export default function TimelineRun({
   /* The yellow drag thumb under the rail. Same three refs, same names, as
      BreedStrip's own strip scrollbar, so the two read alike. */
   const railRef = useRef<HTMLDivElement | null>(null);
+
+  /* PUSH PAST THE LAST DOG AND THE PAGE MOVES ON.
+
+     1 September 2026 (Steve), replacing a "Next" tile at the end of the rail.
+     He wants this to happen by carrying on scrolling, not by finding a button.
+
+     WHY IT NEEDS CODE AT ALL. The rail is a horizontal scroller inside a
+     vertical page, which is the arrangement that works, but it means a sideways
+     drag at the last dog has nowhere to go: the rail is already at its end and
+     `overscroll-behavior-x: contain` stops it chaining anywhere. The gesture
+     dies silently. This reads that dead gesture and turns it into the move the
+     reader was asking for.
+
+     THE THRESHOLD IS DELIBERATE. RAIL_END_PUSH is a shove, not a nudge, so
+     arriving at the last dog and stopping does nothing at all. It only fires
+     when the reader keeps going after the rail has run out.
+
+     ONCE PER TOUCH. `fired` latches until the finger lifts, or one long drag
+     would run through several eras.
+
+     It goes through pc:history-goto, which the page script routes into goTo, so
+     the snap-off, smooth-scroll, snap-on sequence iOS needs is not reinvented
+     here. panelIndex + 1 IS THE NEXT ERA'S SECTION: SEQUENCE in
+     HistoryVertical.tsx lays each era out as its section FIRST and its era
+     screen second, so an era screen is always the last panel of its era. Do not
+     "correct" this to +2. */
+  useEffect(() => {
+    const el = railRef.current;
+    if (!el) return;
+    const RAIL_END_PUSH = 70;
+    let startX = 0;
+    let atEnd = false;
+    let fired = false;
+    const endReached = () => el.scrollLeft >= el.scrollWidth - el.clientWidth - 2;
+    const onStart = (e: TouchEvent) => {
+      startX = e.touches[0]?.clientX ?? 0;
+      atEnd = endReached();
+      fired = false;
+    };
+    const onMove = (e: TouchEvent) => {
+      if (fired) return;
+      const x = e.touches[0]?.clientX ?? startX;
+      /* Re-checked every move, not just on touchdown: a reader normally reaches
+         the end DURING the drag rather than starting there, and the push is
+         measured from the moment the rail ran out, not from where the finger
+         first landed. */
+      if (!atEnd) {
+        if (endReached()) { atEnd = true; startX = x; }
+        return;
+      }
+      if (!endReached()) { atEnd = false; return; }
+      if (startX - x < RAIL_END_PUSH) return;
+      fired = true;
+      window.dispatchEvent(new CustomEvent("pc:history-goto", { detail: panelIndex + 1 }));
+    };
+    const onEnd = () => { fired = false; atEnd = false; };
+    el.addEventListener("touchstart", onStart, { passive: true });
+    el.addEventListener("touchmove", onMove, { passive: true });
+    el.addEventListener("touchend", onEnd, { passive: true });
+    el.addEventListener("touchcancel", onEnd, { passive: true });
+    return () => {
+      el.removeEventListener("touchstart", onStart);
+      el.removeEventListener("touchmove", onMove);
+      el.removeEventListener("touchend", onEnd);
+      el.removeEventListener("touchcancel", onEnd);
+    };
+  }, [panelIndex]);
   const trackRef = useRef<HTMLDivElement | null>(null);
   const thumbRef = useRef<HTMLDivElement | null>(null);
   /* Marker rows that have arrived on screen, so their three icons pop in as
@@ -633,39 +700,6 @@ export default function TimelineRun({
             </div>
           );
         })}
-          {/* THE WAY OUT OF THE RUN, 1 September 2026 (Steve).
-
-              A reader who scrolled to the last dog had nothing telling them the
-              page carries on, and on a phone the rail fills most of the panel
-              so there is little blue left to drag on. This is a real tile at the
-              end of the rail: reach the last dog and the next thing along is the
-              way forward.
-
-              INSIDE .dogRail, AFTER THE MAP. It has to be a sibling of the dog
-              cards, not of the rail, or it would sit under them rather than
-              after them. The rail thumb below is the opposite: a sibling of the
-              rail, matching .stripScrollbar in BreedStrip.
-
-              `data-goto` is an EXISTING hook, not a new mechanism. The page
-              script delegates clicks on [data-goto] and scrolls to that panel
-              index. See the click listener beside goTo in HistoryVertical.tsx.
-
-              panelIndex + 1 IS THE NEXT ERA'S SECTION. SEQUENCE in
-              HistoryVertical.tsx lays each era out as its section FIRST and its
-              era screen second, so an era screen is always the last panel of its
-              era and the panel after it opens the next one. Do not "correct"
-              this to +2. */}
-          <button
-            type="button"
-            className={styles.railEndCard}
-            data-goto={panelIndex + 1}
-            aria-label="Continue to the next era"
-          >
-            <span className={styles.railEndWord}>Next</span>
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </button>
         </div>
           {/* The only cue that the dogs move sideways. A sibling of the rail,
               not a child, exactly as .stripScrollbar is a sibling of

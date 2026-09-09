@@ -545,6 +545,14 @@ export default function HistoryVertical() {
            the player happened to open the level from. LineageModal fires this as
            it closes; on any page without this carousel it is simply ignored. */
         window.addEventListener('pc:history-home', function(){ goTo(0); });
+        /* Scroll to a panel by index from React. TimelineRunV uses it when a
+           reader pushes past the end of a dog rail. Same shape as the listener
+           above rather than a new mechanism, and it goes through goTo, so the
+           snap-off, smooth-scroll, snap-on dance iOS needs is not duplicated. */
+        window.addEventListener('pc:history-goto', function(e){
+          var n = e && e.detail;
+          if (typeof n === 'number' && !isNaN(n)) goTo(n);
+        });
 
         document.addEventListener('click', function(e){
           var t = e.target;
