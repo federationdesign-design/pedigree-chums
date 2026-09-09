@@ -916,6 +916,20 @@
 }
 @media (max-width: 768px) {
   .closeCircular {
+    /* MEASURED ON THE DEVICE, 9 Sept 2026, with ?cornerdebug=1. The pit square
+       moved 15px up and about 24px right on 1 September and this button was
+       left on the old corner, so it sat low and inside it.
+
+       square  top 6.7  right 13.5  55.7 wide
+       button  top 18   right 18    55.6 wide
+
+       The size was already right, only the corner was wrong. PHONE ONLY on
+       purpose: top and right are set once at the top of this file and the
+       desktop view is correct as it stands, so the override lives here rather
+       than up there. Re-measure with the flag before changing these; two
+       earlier guesses at this corner went the wrong way. */
+    top: 6.7px;
+    right: 13.5px;
     width: 55.6px;
     height: 55.6px;
     border-radius: 17.68px;
