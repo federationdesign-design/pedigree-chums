@@ -2173,63 +2173,43 @@
 }
 
 
-/* ==== 4A-BLOCK ==== */
+/* ==== 4C-BLOCK ==== */
 /* ============================================================================
-   STAGE 4A, 1 September 2026 (Steve). THE SCROLL-DRIVEN ERA.
-
-   Scrolling down an era walks the dogs sideways; the page moves on when they
-   run out. See the note on the panel in TimelineRunV.tsx for why it is built
-   this way rather than by intercepting the gesture.
+   STAGE 4C, 1 September 2026 (Steve). The last card on every dog rail, the way
+   into the next era. Replaces stage 4a, the scroll-driven era, which he tried
+   and found awkward. See the note on the button in TimelineRunV.tsx.
    ========================================================================= */
 
-/* The panel stops being one screen. Its HEIGHT IS SET INLINE from the dog
-   count (TimelineRunV.tsx), because it is one screen per dog and only React
-   knows how many dogs an era has.
-
-   `overflow: hidden` HAD TO GO. It was right when the panel was a single screen
-   and nothing could exceed it. A sticky child cannot pin inside a clipped
-   ancestor, so leaving it would have silently disabled the whole effect.
-
-   `position: relative` makes this the containing block for the spacers. */
-.timelinePanel {
-  height: auto;
-  overflow: visible;
-  position: relative;
-}
-
-/* One per dog, each a screen tall. THESE EXIST ONLY TO GIVE SCROLL-SNAP
-   SOMEWHERE LEGAL TO REST. The carousel is `scroll-snap-type: y mandatory`, so
-   without a snap point at every screen the scroll would be dragged back to the
-   top of the era the moment you moved inside it.
-
-   ABSOLUTELY POSITIONED, AND THAT IS THE WHOLE TRICK. Out of the flow, the
-   sticky box below them starts at the TOP of the panel and pins there for the
-   panel's full height. In the flow they would push it to the bottom and it
-   would only appear as the era ended. This was wrong in the first draft. */
-.eraSpacers {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 0;
-  pointer-events: none;
-}
-.eraSpacer {
-  height: 100dvh;
-  scroll-snap-align: start;
+/* Sized as a rail slot but narrower than a dog, because it is a signpost and
+   not a card. The sliver of it showing past the last dog is what tells a reader
+   there is anything after the dogs at all. */
+.railEndCard {
+  flex: 0 0 auto;
+  width: clamp(104px, 30vw, 148px);
+  /* Matches the dog card's height so the row does not step. A dog is a 1:1
+     square of its slot, and that slot is min(86vw, 372px). Keep the two in
+     step if either moves. */
+  height: min(86vw, 372px);
+  scroll-snap-align: center;
   scroll-snap-stop: always;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  appearance: none;
+  cursor: pointer;
+  padding: 12px;
+  border: 3px solid #ffffff;
+  border-radius: 18px;
+  background: var(--blue-deep, #0c5b92);
+  color: #ffffff;
 }
-
-/* The part you actually see, pinned while the tall panel passes it. One screen
-   tall and `top: 0`, so the title and the rail sit still throughout. */
-.eraSticky {
-  position: sticky;
-  top: 0;
-  height: 100dvh;
-  z-index: 1;
-}
-.eraSticky > * {
-  height: 100%;
+.railEndWord {
+  font-family: var(--font-display, "Luckiest Guy", system-ui);
+  font-size: clamp(1.1rem, 5vw, 1.5rem);
+  letter-spacing: 0.03em;
+  line-height: 1.05;
+  text-align: center;
 }
 
 

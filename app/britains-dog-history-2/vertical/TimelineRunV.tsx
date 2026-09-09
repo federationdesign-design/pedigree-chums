@@ -94,55 +94,8 @@ export default function TimelineRun({
   const dotRef = useRef<HTMLSpanElement | null>(null);
   /* The yellow drag thumb under the rail. Same three refs, same names, as
      BreedStrip's own strip scrollbar, so the two read alike. */
-  const stickyRef = useRef<HTMLDivElement | null>(null);
   const railRef = useRef<HTMLDivElement | null>(null);
 
-  /* THE DRIVER: page scroll position sets the rail's scrollLeft.
-
-     Progress is measured from the STICKY element's own position, not from a
-     count of pixels scrolled. While the column is passing, the sticky box is
-     pinned at the top of the scrollport and its parent's top edge is somewhere
-     above it: the gap between them is exactly how far into the era we are.
-     Measuring it this way needs no knowledge of where the era sits in the page
-     and cannot drift as things above it change height.
-
-     The rail is then set to the same fraction of its own scrollable width, so
-     the last dog arrives exactly as the column runs out.
-
-     Written on rAF rather than on every scroll event, and skipped when the
-     value has not moved, because assigning scrollLeft on a scroller that is
-     already there still costs a layout on iOS. */
-  useEffect(() => {
-    const sticky = stickyRef.current;
-    const rail = railRef.current;
-    const panel = sticky?.parentElement;
-    if (!sticky || !rail || !panel) return;
-    let raf = 0;
-    let last = -1;
-    const apply = () => {
-      raf = 0;
-      const travel = panel.offsetHeight - sticky.offsetHeight;
-      if (travel <= 0) return;
-      const passed = sticky.getBoundingClientRect().top - panel.getBoundingClientRect().top;
-      const t = Math.max(0, Math.min(1, passed / travel));
-      const max = rail.scrollWidth - rail.clientWidth;
-      if (max <= 0) return;
-      const want = Math.round(t * max);
-      if (want === last) return;
-      last = want;
-      rail.scrollLeft = want;
-    };
-    const queue = () => { if (!raf) raf = requestAnimationFrame(apply); };
-    const carousel = document.getElementById("vertical-carousel");
-    carousel?.addEventListener("scroll", queue, { passive: true });
-    window.addEventListener("resize", queue);
-    queue();
-    return () => {
-      if (raf) cancelAnimationFrame(raf);
-      carousel?.removeEventListener("scroll", queue);
-      window.removeEventListener("resize", queue);
-    };
-  }, [panelIndex]);
 
   /* PUSH PAST THE LAST DOG AND THE PAGE MOVES ON.
 
@@ -430,51 +383,7 @@ export default function TimelineRun({
   );
 
   return (
-    /* THE SCROLL-DRIVEN ERA, stage 1 of 3, 1 September 2026 (Steve).
-
-       Scrolling DOWN on an era walks the dogs SIDEWAYS, and the page only moves
-       on once they run out.
-
-       HOW IT IS BUILT. The panel is no longer one screen. It is one screen per
-       dog, and the visible part is pinned inside it with position: sticky, so
-       the title and the rail stay put while that tall column slides past. The
-       rail's scrollLeft is then driven from how far through the column we are.
-
-       WHY scrollLeft AND NOT A TRANSFORM. A transform would fight the sideways
-       swipe, which Steve is keeping: the rail would be moved by two owners with
-       no idea about each other. Driving the real scroll position keeps the rail
-       a real scroller, so a swipe still works natively and stage 2 only has to
-       teach the two to agree rather than rebuild the gesture.
-
-       THE SPACERS ARE LOAD BEARING. The carousel is scroll-snap-type y
-       mandatory, so a tall element with a single snap point at its top would be
-       dragged back to that point the moment you scrolled inside it. One
-       full-height snap target per dog gives the scroll somewhere legal to rest
-       at every step. They are empty and behind everything.
-
-       UNCAPPED, DELIBERATELY (Steve). The late 1800s has 24 dogs and therefore
-       holds for 24 screens. He was asked directly and is happy with that and
-       with the unevenness it creates between eras. Do not add a cap without
-       asking him again.
-
-       STILL TO DO: stage 2 makes a sideways swipe write back to the page scroll
-       position so the two cannot disagree; stage 3 removes the push-past-the-end
-       gesture, which this replaces. */
-    <div
-      className={styles.timelinePanel}
-      data-pc-panel={panelIndex}
-      /* One screen per dog. Inline because only this component knows the count,
-         and uncapped by Steve's explicit decision: the late 1800s has 24 dogs
-         and therefore holds for 24 screens. Do not add a cap without asking. */
-      style={{ height: `${Math.max(1, breeds.length) * 100}dvh` }}
-    >
-      {/* One per dog, each a screen tall, each a snap point. */}
-      <div className={styles.eraSpacers} aria-hidden="true">
-        {breeds.map((b) => (
-          <div key={`sp-${b.name}`} className={styles.eraSpacer} />
-        ))}
-      </div>
-      <div ref={stickyRef} className={styles.eraSticky}>
+    <div className={styles.timelinePanel} data-pc-panel={panelIndex}>
       <div ref={runRef} className={styles.timelineRun}>
         <span ref={lineRef} className={styles.runLine} aria-hidden="true" />
         {/* Screen one: the era title, then the line that introduces the
@@ -792,6 +701,39 @@ export default function TimelineRun({
             </div>
           );
         })}
+          {/* THE LAST CARD ON EVERY RAIL: the way into the next era.
+
+              REINSTATED 1 September 2026, and the history matters. A tile like
+              this was built, rejected by Steve in favour of doing it by scroll,
+              and the scroll version was then built as stage 4a: the era panel
+              became one screen per dog with the visible part pinned, so
+              scrolling down walked the dogs sideways. He tried it, found it
+              awkward, and chose the card instead. 4a is reverted.
+
+              DO NOT REBUILD THE SCROLL VERSION without asking him. It worked.
+              It was not a failed experiment, it simply did not feel right, and
+              that is not something the next person can rediscover from code.
+
+              NO ARROW ON IT. The first version paired the word with a downward
+              chevron and he did not like it. The label carries the meaning.
+
+              `data-goto` is an EXISTING hook. The page script delegates clicks
+              on [data-goto] into goTo, which does the snap-off, smooth-scroll,
+              snap-on sequence iOS needs, so this moves with the same easing as
+              the intro button.
+
+              panelIndex + 1 IS THE NEXT ERA'S SECTION. SEQUENCE in
+              HistoryVertical.tsx lays each era out as its section FIRST and its
+              era screen second, so an era screen is always the last panel of
+              its era. Do not "correct" this to +2. */}
+          <button
+            type="button"
+            className={styles.railEndCard}
+            data-goto={panelIndex + 1}
+            aria-label="Continue to the next era"
+          >
+            <span className={styles.railEndWord}>Next era</span>
+          </button>
         </div>
           {/* The only cue that the dogs move sideways. A sibling of the rail,
               not a child, exactly as .stripScrollbar is a sibling of
@@ -802,7 +744,6 @@ export default function TimelineRun({
           </div>
           </>
         )} />
-      </div>
       </div>
     </div>
   );
