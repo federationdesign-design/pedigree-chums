@@ -31,6 +31,20 @@ const PROGENITOR_STATUS: Record<string, BreedTag> = {
   "Old English White Terrier": "extinct",
   "English White Terrier": "extinct",
 };
+/* DIAGNOSTIC: item 8, a re-picked-up card refused by its frame (9 Sept 2026).
+   Behind ?dropdebug=1 only. Nothing is created and nothing is logged without
+   the flag. REMOVE ONCE ITEM 8 IS FIXED. */
+let DROP_DBG: HTMLDivElement | null = null;
+let DROP_DBG_N = 0;
+const DROP_DBG_LINES: string[] = [];
+const dImg = (s: string) => (s || "").split("/").pop() || "-";
+function dropLog(s: string) {
+  if (!DROP_DBG) return;
+  DROP_DBG_LINES.push(s);
+  while (DROP_DBG_LINES.length > 6) DROP_DBG_LINES.shift();
+  DROP_DBG.textContent = DROP_DBG_LINES.join("\n");
+}
+
 // living breeds whose short tree-card name does not match the uk breed list
 // (e.g. node "Labrador" vs list "Labrador Retriever", and "Poodle" is absent),
 // so without this they fall through to no tag and wrongly show the red gone-dot
@@ -601,6 +615,24 @@ export default function LineageMap({
   // closing, and keep showing it at its dropped spot until breed change / close
   const [pinned, setPinned] = useState<Map<string, { img: string; name: string; note: string; share: number; mix: number; status: BreedTag | null }>>(new Map());
   useEffect(() => { setPinned(new Map()); }, [breed.name]);
+  /* DIAGNOSTIC item 8: the ?dropdebug=1 readout. Built imperatively, like the
+     swipe debug bar in BreedTree, so no render of this component can clear it.
+     REMOVE ONCE ITEM 8 IS FIXED. */
+  useEffect(() => {
+    let d: HTMLDivElement | null = null;
+    try {
+      if (new URLSearchParams(window.location.search).get("dropdebug") !== "1") return;
+      d = document.createElement("div");
+      d.style.cssText =
+        "position:fixed;left:0;right:0;bottom:0;z-index:99999;background:#000;color:#0f0;" +
+        "font:10px/1.3 monospace;padding:5px 7px;pointer-events:none;white-space:pre-wrap";
+      d.textContent = "drop debug ready: pick a card up";
+      document.body.appendChild(d);
+      DROP_DBG = d;
+      DROP_DBG_LINES.length = 0;
+    } catch {}
+    return () => { try { if (d) d.remove(); } catch {} DROP_DBG = null; };
+  }, []);
   // which collected card is showing its info label right now (toggled by tapping its i)
   // Every node radius in this component goes through here, so the mini pit's
   // smaller nodes cannot get out of step between layout and drawing.
@@ -2715,6 +2747,8 @@ export default function LineageMap({
                   }}
                   onPointerDown={(e) => {
                     e.stopPropagation();
+                    // DIAGNOSTIC item 8: proves this element received the press, and on which drag. REMOVE ONCE FIXED.
+                    if (DROP_DBG) dropLog(`DOWN#${++DROP_DBG_N} ${c.name} img ${dImg(c.img)} placed=${placedSet.has(c.id)} live=${liveById.has(c.id)} pinned=${pinned.has(c.id)} cdLeftOver=${cardDrag.current ? "YES" : "no"} supp=${suppressClick.current} ptr ${Math.round(e.clientX)},${Math.round(e.clientY)} card ${Math.round(c.cardX)},${Math.round(c.cardY)}`);
                     if (placedSet.has(c.id)) { if (isMobile) startGridDrag(e); return; } // framed: fixed, not draggable; drives the grid scroll on mobile
                     try { (e.currentTarget as Element).setPointerCapture(e.pointerId); } catch {}
                     cardDrag.current = { id: e.pointerId, sx: e.clientX, sy: e.clientY, ox: c.cardX, oy: c.cardY, moved: false };
@@ -2748,6 +2782,30 @@ export default function LineageMap({
                   }}
                   onPointerUp={(e) => {
                     if (placedSet.has(c.id)) { if (isMobile) endGridDrag(e); return; }
+                    /* DIAGNOSTIC item 8. REMOVE ONCE FIXED. Answers the three
+                       remaining suspects in one readout: whether a hit was
+                       found, hit.img against c.img, whether that frame was
+                       already filled, and whether cardDrag survived. It also
+                       reports the CARD centre against every frame for this dog,
+                       because the accept test is run on the POINTER position,
+                       not on the card. */
+                    if (DROP_DBG) {
+                      const cdd = cardDrag.current;
+                      const ccx = (cdd ? cdd.ox + (e.clientX - cdd.sx) : c.cardX) + pan.x;
+                      const ccy = (cdd ? cdd.oy + (e.clientY - cdd.sy) : c.cardY) + pan.y;
+                      const ptrHit = frames.find((f) => Math.abs(e.clientX - f.sx) <= CW / 2 && Math.abs(e.clientY - f.sy) <= CW / 2);
+                      const cardHit = frames.find((f) => Math.abs(ccx - f.sx) <= CW / 2 && Math.abs(ccy - f.sy) <= CW / 2);
+                      const mine = frames
+                        .filter((f) => f.img === c.img)
+                        .map((f) => `${f.id}${filled.has(f.id) ? "[full]" : "[open]"} ptr ${Math.round(e.clientX - f.sx)},${Math.round(e.clientY - f.sy)} card ${Math.round(ccx - f.sx)},${Math.round(ccy - f.sy)}`)
+                        .join("  ");
+                      dropLog(
+                        `UP#${DROP_DBG_N} ${c.name} cd=${cdd ? (e.pointerId === cdd.id ? "match" : "ID MISMATCH") : "NULL"} moved=${cdd ? cdd.moved : "-"} supp=${suppressClick.current}\n` +
+                        `  ptrHit=${ptrHit ? `${ptrHit.id} img ${dImg(ptrHit.img)} vs ${dImg(c.img)} same=${ptrHit.img === c.img} filled=${filled.has(ptrHit.id)}` : "none"}\n` +
+                        `  cardHit=${cardHit ? cardHit.id : "none"}  half=${Math.round(CW / 2)}px\n` +
+                        `  own frames: ${mine || "none for this dog"}`
+                      );
+                    }
                     const cd = cardDrag.current;
                     if (cd && e.pointerId === cd.id) {
                       try { (e.currentTarget as Element).releasePointerCapture(e.pointerId); } catch {}
@@ -2795,7 +2853,7 @@ export default function LineageMap({
                     setDragName(null); /* pickup-name */
                     setDragXY(null);
                   }}
-                  onPointerCancel={() => { cardDrag.current = null; setDragCat(null); setDragImg(null); setDragXY(null); }}
+                  onPointerCancel={() => { if (DROP_DBG) dropLog(`CANCEL#${DROP_DBG_N} ${c.name}`); /* DIAGNOSTIC item 8, REMOVE ONCE FIXED */ cardDrag.current = null; setDragCat(null); setDragImg(null); setDragXY(null); }}
                 >
                   <g className={styles.pickWobble}>
                   {isSelfCard(c.name) ? (() => {
