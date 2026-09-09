@@ -6,7 +6,7 @@ import Triangles, { type Tri } from "../../components/Parallax/Triangles";
 import ParallaxShape from "../../components/Parallax/ParallaxShape";
 import BreedStrip from "./BreedStrip";
 import ArticleTextToggle from "../../components/ArticleTextToggle/ArticleTextToggle";
-import HistoryCarousel from "../britains-dog-history-2/HistoryCarousel";
+import HistoryVertical from "../britains-dog-history-2/vertical/HistoryVertical";
 import styles from "./history.module.css";
 import HistorySection from "../../components/HistorySection/HistorySection";
 import { SECTIONS } from "../../data/historySections";
@@ -85,7 +85,7 @@ export default function HistoryPage() {
 
         <section className={styles.intro}>
           {/* as="h1": the desktop view's visible top heading, so it is the h1.
-              The mobile carousel (.mobileView, HistoryCarousel) carries its own
+              The mobile page (.mobileView, HistoryVertical) carries its own
               h1, and display:none removes that one from the accessibility tree on
               desktop, so a desktop screen reader would otherwise meet an h2 with
               no h1 above it. Two h1s therefore exist in the source, exactly one
@@ -137,10 +137,22 @@ export default function HistoryPage() {
         </section>
         </div>
 
-        {/* Mobile layout (v2): the horizontal carousel, the same component the
-            /britains-dog-history-2 route renders. Hidden above 720px. */}
+        {/* Mobile layout (v3): the VERTICAL page. Scrolls down and only down,
+            keeping the full-screen snap panels and the pinned section
+            photograph, with the era dogs on a horizontal rail. Same component
+            the /britains-dog-history-2 route renders, so the two cannot drift.
+            Hidden above 720px.
+
+            CUTOVER, 1 September 2026 (Steve). The horizontal HistoryCarousel
+            was here and is still on disk, unchanged, in the folder above this
+            one. Reverting is this import and this tag, nothing else.
+
+            DESKTOP IS NOT AFFECTED BY THIS LINE. .desktopView above is a
+            separate subtree behind a hard 721px seam (history.module.css:27),
+            and nothing renders between the two. This changes only what
+            .mobileView draws. */}
         <div className={styles.mobileView}>
-          <HistoryCarousel />
+          <HistoryVertical />
         </div>
       </main>
       {/* Footer holder: taken out of the layout under 721px so the carousel's
