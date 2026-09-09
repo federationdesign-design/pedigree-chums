@@ -416,10 +416,17 @@
 
 .slideIntro {
   font-family: var(--font-body, "Montserrat", sans-serif);
-  /* Up from 0.95. This is the opening paragraph of every era, and it is the
-     first thing read on a section, so it carries more weight than the detail
-     slide that follows it. */
-  font-size: 1.2rem;
+  /* MATCHED TO .slideDetail, 1 September 2026 (Steve). Was 1.2rem, itself up
+     from 0.95, on the reasoning that the opening paragraph of an era is the
+     first thing read on a section so it should be larger. On the vertical page
+     it simply took too much of the panel.
+
+     SET TO 0.88rem, NOT DELETED. Nothing in the ancestor chain declares a font
+     size, .panel, .panelText, .slide, .sectionGroup, .carousel and
+     .carouselWrap are all silent, so removing this line would inherit the
+     browser default of 1rem and still not match. If .slideDetail moves, move
+     this with it. */
+  font-size: 0.88rem;
   font-weight: 600;
   color: #ffffff;
   line-height: 1.35;
