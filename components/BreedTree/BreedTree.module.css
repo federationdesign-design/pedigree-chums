@@ -547,28 +547,9 @@
   opacity: 0.5;
 }
 
-.learnWash {
-  position: fixed;
-  inset: -60%;
-  background: #ec0376;
-  mix-blend-mode: overlay;
-  pointer-events: none;
-  /* Behind the stage, at the level background's own depth, so it tints the
-     backdrop and nothing else. At z-index 40 it sat over the whole pit and
-     blended the dog photographs and the icons along with it. */
-  z-index: -1;
-  transform: rotate(-18deg) translate3d(115%, -60%, 0);
-  transition: transform 560ms cubic-bezier(0.22, 0.9, 0.3, 1);
-  will-change: transform;
-}
-.learnWashPeek {
-  transform: rotate(-18deg) translate3d(46%, -22%, 0);
-}
-.learnWashOn {
-  transform: rotate(0deg) translate3d(0, 0, 0);
-}
-@media (prefers-reduced-motion: reduce) {
-  .learnWash { transition: none; }
+/* .learnWash, .learnWashPeek and .learnWashOn were removed on 9 Sept 2026 with
+   the element in BreedTree.tsx. See the note there. */
+
 }
 
 /* Round portrait of the dog whose tree is open, at the head of the docked box.

@@ -861,8 +861,13 @@ const warnedFloorEras = new WeakSet<LevelTheme>();
 // numbers are the wash's own, so the two edges are the same line by
 // construction rather than by eye.
 const WASH_DEG = 18;
-const WASH_PEEK_X = 0.46; // .learnWashPeek translate3d(46%, ...)
-const WASH_INSET = 2.2; // .learnWash inset: -60% -> 2.2 viewports wide
+/* THESE TWO ARE NOT WASH CONSTANTS ANY MORE, 9 Sept 2026. The .learnWash element
+   they were named after has been removed, but seamClip still uses both to place
+   the LEVEL background's diagonal edge, which is on screen every round. The
+   original comments are kept so the numbers can still be traced to the geometry
+   they came from. Do not delete them chasing the wash. */
+const WASH_PEEK_X = 0.46; // was .learnWashPeek translate3d(46%, ...)
+const WASH_INSET = 2.2; // was .learnWash inset: -60% -> 2.2 viewports wide
 // 42 was a flat number, and that was the bug. The label block anchored 42 units
 // above centre WHATEVER the circle's size, so as the tree goes deeper and the
 // radii shrink the anchor drifts further off centre: 10% of the radius at the
@@ -2263,7 +2268,12 @@ export default function BreedTree({
   // over everything. learnPeek is the desktop hover preview of that wash.
   const [learning, setLearning] = useState(startInLearn);
   useEffect(() => { onLearningChange?.(learning); }, [learning, onLearningChange]);
-  const [learnPeek, setLearnPeek] = useState(false);
+  /* The VALUE is no longer read anywhere: it existed to drive the magenta learn
+     wash, which was removed on 9 Sept 2026. The SETTER is still called from
+     eleven places (hover, start, teardown), so the state stays and only the
+     unused binding goes. If the wash ever comes back, restore the name here and
+     nothing else has to change. */
+  const [, setLearnPeek] = useState(false);
   const frozen = dockAside && gravity && !started && !learning;
   // Desktop hover preview of the level background, the same courtesy LEARN gets.
   const [startPeek, setStartPeek] = useState(false);
@@ -2487,7 +2497,13 @@ export default function BreedTree({
          because only the horizontal was reported wrong.
          To flip either axis, swap the pair on its line. */
       if (ax >= ay * SWIPE_BIAS) (dx > 0 ? n.prev : n.next)?.();
-      else if (ay >= ax * SWIPE_BIAS) (dy > 0 ? n.nextEra : n.prevEra)?.();
+      /* VERTICAL INVERTED 9 Sept 2026 (owner), to match the horizontal flip made
+         earlier the same day. Both axes now follow the CONTENT, not the arrow:
+         dragging downward pulls the previous era into view, exactly as dragging
+         rightward pulls the previous dog in.
+         The D-pad is deliberately the opposite and stays that way. Pressing a
+         down arrow means "go forward"; dragging a page down means "go back". */
+      else if (ay >= ax * SWIPE_BIAS) (dy > 0 ? n.prevEra : n.nextEra)?.();
       // Neither axis dominant: a diagonal smear, deliberately ignored.
     };
     /* Belt and braces with the touch-action fix in LineageModal. If the browser
@@ -6112,11 +6128,11 @@ export default function BreedTree({
         // zone, merge their horizontal spans so two circles side by side are not
         // counted twice, and compare against the width between the pit walls.
         const spans: [number, number][] = [];
-        let inZone = 0;
+        // (the `inZone` counter went with the `>= 5` rule below)
         const occupy = (x: number, y: number, r: number, vx: number, vy: number, held?: boolean) => {
           if (held) return;
           if (Math.hypot(vx, vy) > worldH * 0.03) return;
-          if (y - r < zoneY) { inZone++; spans.push([x - r, x + r]); }
+          if (y - r < zoneY) { spans.push([x - r, x + r]); }
         };
         for (const b of all) occupy(b.x, b.y, b.r, b.vx, b.vy, b.held);
         // The CHUM CARDS count too: `all` is only the level's own dogs and chips,
@@ -6143,7 +6159,15 @@ export default function BreedTree({
         // past the visible stage
         const pitW = (xR - xL) || 1;
         const blocked = spans.length > 0 && covered / pitW >= PIT_FULL_COVER;
-        return blocked || inZone >= 5;
+        /* `|| inZone >= 5` DELETED, 9 Sept 2026 (owner). It was the OLD rule,
+           a count borrowed from the main pit, and the comment at the top of this
+           function says occupancy replaced it. It was never removed, so it sat
+           beside the new test as an OR and quietly overrode it: any five settled
+           objects near the top made the pit "full", badges and toys included, so
+           the countdown started on a nearly empty pit and, before the freeze fix,
+           could not be called off again.
+           Coverage alone decides now, which is what the function claims to do. */
+        return blocked;
       };
       const checkFull = (now: number) => {
         if (now - fullClock < 4000 || now <= cdGraceRef.current) return;
@@ -9300,17 +9324,18 @@ export default function BreedTree({
         />
       )}
 
-      {dockAside && gravity && (
-        <div
-          aria-hidden="true"
-          className={`${styles.learnWash}${!started && learning ? " " + styles.learnWashOn : !started && learnPeek ? " " + styles.learnWashPeek : ""}`}
-          /* The wash takes its colour from the level's theme when it has one.
-             Set inline rather than through a class, because it is a value per
-             era, not a state. An era with no theme, or a theme with no wash,
-             keeps the stylesheet's own pink. */
-          style={levelTheme?.wash ? { background: levelTheme.wash } : undefined}
-        />
-      )}
+      {/* THE MAGENTA LEARN WASH IS GONE, 9 Sept 2026 (owner). It was a slab of
+          the era's wash colour, blended over the pit with mix-blend-mode:
+          overlay, that slid in behind the learn area.
+          Removed by decision, not because it was broken: it spent a day looking
+          like a flat pink rectangle, which turned out to be a stacking context
+          created by a fill-forwards animation elsewhere. That was fixed first,
+          and the wash was then removed on its own merits.
+          `levelTheme.wash` is left in the data untouched, so restoring this is
+          re-adding the element and its three CSS rules, with nothing to re-derive.
+          WHAT MUST NOT GO WITH IT: WASH_PEEK_X and WASH_INSET stay. They read
+          like wash constants and are not; seamClip uses them to place the LEVEL
+          background's diagonal, which is still very much on screen. */}
       {/* The white-to-yellow word sweep has gone with the word. The level
           background behind it still slides in on hover, driven by the same
           playPeek and the same seamClip a few blocks above. */}
