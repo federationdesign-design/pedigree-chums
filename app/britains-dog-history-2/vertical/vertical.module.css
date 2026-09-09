@@ -2119,3 +2119,38 @@
 .eraNote {
   display: none;
 }
+
+
+/* ==== 3I-BLOCK ==== */
+/* ============================================================================
+   STAGE 3I, 1 September 2026 (Steve). Two adjustments. Foot of the file, same
+   reason as every block above.
+   ========================================================================= */
+
+/* 1. THE TITLE WAS TOUCHING THE HEADER.
+      92px, set at stage 3f, cleared the Nav but only just, and the logo now
+      appears from load on mobile (showLogoMobile) so the header is fuller than
+      it was when that figure was chosen. 10px more.
+
+      This eats into the space the era paragraph gave back at 3h, which was
+      about 86px, so there is still roughly 76px of that in hand. */
+.eraTitleBand {
+  padding-top: 102px;
+}
+
+/* 2. THE YELLOW DISC UNDER THE CARD, REMOVED AS REDUNDANT.
+      VERIFIED BEFORE HIDING, because it is a button and hiding a button can
+      remove the only route to something. It is not: TimelineRunV.tsx:426 puts
+      `onClick={openLevel}` on the card itself, and the disc at 589 calls the
+      same `openLevel`. Two controls, one action, and the card is the larger and
+      more obvious of the two.
+
+      The blue information icon beside it does something different and stays.
+
+      display: none, not the existing .markerTreeOff (visibility: hidden). That
+      class is used to keep the disc's BOX on a non-playable dog so the row does
+      not reflow, which does not apply when every disc goes: the row simply
+      centres the icon that is left. */
+.markerTree {
+  display: none;
+}
