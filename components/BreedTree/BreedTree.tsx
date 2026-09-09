@@ -2118,8 +2118,9 @@ export default function BreedTree({
       if (ni < 0) continue;
       let kn = knocksRef.current.get(ni);
       if (!kn) {
-        const d1s2 = nodes.filter((x) => x.depth === 1);
-        const ci2 = d1s2.indexOf(n);
+        // Which badge belongs to this circle. By identity now, not by position
+        // in the dog list. See badgeSrcRef.
+        const ci2 = badgeSrcRef.current.indexOf(n);
         kn = {
           els: n.descendants().map((x) => nodes.indexOf(x)).filter((j) => j >= 0),
           chip: ci2 >= 0 ? { i: ci2, bx: n.x - n.r * 0.707, by: n.y + n.r * 0.707 } : null,
@@ -2615,8 +2616,34 @@ export default function BreedTree({
   // `green` is a chip that was already learnt on the layer it came from. It
   // keeps that colour in the pit rather than reverting to the yellow a fresh
   // chip wears.
-  type BadgeItem = { pct: number; r: number; label?: string; bomb?: boolean; green?: boolean };
+  /* STAGE 1 OF "EVERY % CIRCLE DROPS", 9 Sept 2026. THE INDEX SPLIT.
+
+     THE PROBLEM. A badge had no identity. Badge 3 meant "the third top-level
+     dog's badge", and five separate places found a badge by counting along
+     `nodes.filter(n => n.depth === 1)`. That list is also the falling dog
+     bodies and the word fits, so it cannot be widened without turning every
+     nested circle into its own falling dog, which is a different game.
+
+     THE SPLIT. `src` is the circle a badge came from, carried by the badge
+     itself. Nothing counts into the dog list any more. Stage 2 can then seed
+     badges from deeper nodes by changing the seed alone.
+
+     TWO HOMES, ON PURPOSE. The render needs it during render, so it rides in
+     BadgeItem state. The knock and the pull need it from a handler, where
+     state would be stale, so badgeSrcRef mirrors it. They are written in the
+     same places and in the same order, so they cannot drift; if you add a
+     badge, write both.
+
+     THIS STAGE IS MEANT TO BE INVISIBLE. The badges are still seeded from the
+     same depth-1 circles as before. Nothing on screen should move. */
+  type BadgeItem = { pct: number; r: number; label?: string; bomb?: boolean; green?: boolean; src?: Node | null };
   const [badgePcts, setBadgePcts] = useState<BadgeItem[]>([]);
+  const badgeSrcRef = useRef<(Node | null)[]>([]);
+  /* THE ONE RULE for which circles carry a badge. Stage 2 widens THIS and
+     nothing else. Both callers are inside effects, the seed and the drop, and
+     they must always agree or the badge list and the badge bodies stop lining
+     up. It is deliberately still depth 1. */
+  const badgeSourceNodes = (all: Node[]) => all.filter((n) => n.depth === 1);
   // rods and name pills scattered in from the learn layer, pit-style props:
   // sizes are view units frozen at the drop; dead ones keep their slot so the
   // render children stay index-aligned with the bridge lists
@@ -2679,13 +2706,16 @@ export default function BreedTree({
     if (!dockAside) return;
     const k = SIZE / viewRef.current[2];
     const floorVb = badgeFloorVb();
+    /* THE ONE PLACE THAT DECIDES WHICH CIRCLES CARRY A BADGE. Stage 2 widens
+       this filter and nothing else, because nothing else counts into the dog
+       list any more. It is deliberately still depth 1 here. */
+    const badgeNodes = badgeSourceNodes(nodes);
+    badgeSrcRef.current = badgeNodes.slice();
     setBadgePcts(
-      nodes
-        .filter((n) => n.depth === 1)
-        .map((n) => {
-          const pct = n.parent ? Math.round(((n.value ?? 0) / (n.parent.value || 1)) * 100) : 0;
-          return { pct, r: badgeDrawForNode(n.r, k, floorVb) };
-        }),
+      badgeNodes.map((n) => {
+        const pct = n.parent ? Math.round(((n.value ?? 0) / (n.parent.value || 1)) * 100) : 0;
+        return { pct, r: badgeDrawForNode(n.r, k, floorVb), src: n };
+      }),
     );
     // k reads only viewRef.current[2], the view WIDTH, and the corrected seed above makes that width exact at
     // mount: clampRootView only shifts y, never the width, so the one number k depends on never needed the
@@ -4457,7 +4487,13 @@ export default function BreedTree({
       // radius (n.r * k) is smaller than that disc gets no badge (badgeDrawForNode
       // returns 0), so a badge never swallows its own dog.
       const badgeFloor = badgeFloorVb();
-      const badges: Body[] = d1.map((n, i) => ({
+      /* NOT d1. The badges come from their own list now, so widening it in
+         stage 2 cannot turn a nested circle into a falling dog. Today it
+         returns the same circles d1 does, which is why this stage is
+         invisible. See badgeSourceNodes. */
+      const badgeNodes = badgeSourceNodes(nodes);
+      badgeSrcRef.current = badgeNodes.slice();
+      const badges: Body[] = badgeNodes.map((n, i) => ({
         // bottom LEFT of the circle: the right side is where the level's own
         // furniture sits, and a badge there crowded it
         n: null, x: n.x - n.r * 0.707, y: n.y + n.r * 0.707, vx: 0, vy: 0,
@@ -4941,7 +4977,9 @@ export default function BreedTree({
             const mbb = mkCircle(kb, "badge", BADGE_OPTS);
             MBody.setVelocity(mbb, { x: cmb.velocity.x * 0.8 + (Math.random() - 0.5) * vps(0.3), y: cmb.velocity.y * 0.8 });
             newMbs.push(mbb);
-            setBadgePcts((l) => [...l, { pct: kb.pct, r: badgeDrawForNode(ch.r, k, badgeFloor), bomb: kidBomb }]);
+            // Both homes, same order. See badgeSrcRef.
+            badgeSrcRef.current.push(ch);
+            setBadgePcts((l) => [...l, { pct: kb.pct, r: badgeDrawForNode(ch.r, k, badgeFloor), bomb: kidBomb, src: ch }]);
           }
         });
         // resolve the deliberate word/circle overlap without an explosion
@@ -5000,7 +5038,8 @@ export default function BreedTree({
             const mbb = mkCircle(bb, "badge", BADGE_OPTS);
             MBody.setVelocity(mbb, { x: mb.velocity.x * 0.8 + (Math.random() - 0.5) * vps(0.3), y: mb.velocity.y * 0.8 });
             newMbs.push(mbb);
-            setBadgePcts((l) => [...l, { pct: bb.pct, r: badgeDrawForNode(ch.r, k, badgeFloor), bomb: popBomb }]);
+            badgeSrcRef.current.push(ch);
+            setBadgePcts((l) => [...l, { pct: bb.pct, r: badgeDrawForNode(ch.r, k, badgeFloor), bomb: popBomb, src: ch }]);
           }
         }
         if (newMbs.length > 1) ghost(newMbs);
@@ -5591,6 +5630,10 @@ export default function BreedTree({
         all.push(nb);
         const mb = mkCircle(nb, "badge", BADGE_OPTS);
         MBody.setVelocity(mb, { x: (Math.random() - 0.5) * 3, y: 3 }); // pit scatter contract, verbatim
+        /* A chip scattered in from the learn layer has no circle in this pit to
+           come from, so its slot is null. The slot still has to exist or the two
+           lists stop lining up. */
+        badgeSrcRef.current.push(null);
         setBadgePcts((l) => [...l, { pct: pctVal, r: rDraw, label: opts?.label, bomb: isBomb, green: opts?.green }]);
         wake();
       };
@@ -7751,8 +7794,8 @@ export default function BreedTree({
                             // The chip belongs to a depth-1 dog. Dragging a
                             // deeper circle moves no chip, which is right: the
                             // chip is its parent's and the parent is not moving.
-                            const d1s = nodes.filter((n) => n.depth === 1);
-                            const ci = d1s.indexOf(d);
+                            // By identity, not by position in the dog list.
+                            const ci = badgeSrcRef.current.indexOf(d);
                             pullRef.current = {
                               node: d,
                               els: d.descendants().map((x) => nodes.indexOf(x)).filter((j) => j >= 0),
@@ -8051,7 +8094,11 @@ export default function BreedTree({
               const v = viewRef.current;
               const kk = SIZE / v[2];
               const b = badgeBodiesRef.current?.[i];
-              const d1n = nodes.filter((n) => n.depth === 1)[i];
+              // The circle this badge came from, carried by the badge. This used
+              // to be nodes.filter(depth === 1)[i], which is the coupling stage 1
+              // exists to remove. Used only before the bodies exist, to park the
+              // badge on its circle's rim.
+              const d1n = item.src ?? null;
               const bx = b ? b.x : d1n ? d1n.x - d1n.r * 0.707 : v[0];
               const by = b ? b.y : d1n ? d1n.y + d1n.r * 0.707 : v[1] - 99999;
               const inert = inertBadges.has(i);
