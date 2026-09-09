@@ -95,6 +95,9 @@ type Props = {
   /* Skip the time tunnel: this level change is navigation between start
      screens, not an entry into the pit. Set by BreedStrip's navTo. */
   quiet?: boolean;
+  /* True for the brief moment BreedStrip holds this level on screen so the
+     outgoing diagram can fade before the next one replaces it. */
+  navFading?: boolean;
   onClose: () => void;
   nextLevelLabel?: string;
   /* The next era's name, set only when the level just won is the last of its
@@ -170,7 +173,7 @@ type Props = {
   era?: string;
 };
 
-export default function LineageModal({ name, image, character, lineage, fromRect, onClose, quiet, nextLevelLabel, onNextLevel, onNavPrev, onNavNext, onNavPrevEra, onNavNextEra, onStartOver, initialScore, onScoreChange, bankedScore, onBankScore, era, lives, livesMax = 6, onLost, onSpendLife, onResetRun, nextLevelImage, levelNo, eraJoinLabel, onLevelChums, onChumCaught, topChum, runChumsFound, runChumsPossible }: Props) {
+export default function LineageModal({ name, image, character, lineage, fromRect, onClose, quiet, navFading, nextLevelLabel, onNextLevel, onNavPrev, onNavNext, onNavPrevEra, onNavNextEra, onStartOver, initialScore, onScoreChange, bankedScore, onBankScore, era, lives, livesMax = 6, onLost, onSpendLife, onResetRun, nextLevelImage, levelNo, eraJoinLabel, onLevelChums, onChumCaught, topChum, runChumsFound, runChumsPossible }: Props) {
   const theme = levelThemeFor(era);
   // The close X asks before it closes. A round can take a couple of minutes to
   // build up, and losing it to a mis-tap in the corner is a rotten exit.
@@ -599,7 +602,13 @@ export default function LineageModal({ name, image, character, lineage, fromRect
           fill + dockAside mode: caption and breadcrumbs docked at the top,
           circles filling the rest. The character text becomes the caption
           shown at root, replacing the old floating blue box. */}
-      <div ref={stageAreaRef} className={css.stageArea}>
+      {/* The cross-fade. `navFading` fades this level's diagram out on the way
+          to the next; `quiet` fades the arriving one in, since a quiet change
+          is the one with no time tunnel to cover the swap. */}
+      <div
+        ref={stageAreaRef}
+        className={`${css.stageArea}${navFading ? " " + css.stageGoing : ""}${quiet ? " " + css.stageComing : ""}`}
+      >
         <BreedTree
           key={runKey}
           /* The pit needs the era by name as well as by theme: a thrown ball is

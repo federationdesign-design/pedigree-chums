@@ -179,6 +179,29 @@
   touch-action: pinch-zoom;
 }
 
+/* THE LEVEL CROSS-FADE (9 Sept 2026). Only for quiet, swipe-driven changes:
+   opening the pit from a card still gets the time tunnel, which covers its own
+   swap. BreedStrip holds the outgoing level on screen for 140ms, which is what
+   makes .stageGoing possible at all, since this component is keyed on the level
+   and would otherwise be gone in the same frame.
+   Out is 140ms and must stay in step with NAV_FADE_MS in BreedStrip. In is
+   slower on purpose, so the arrival is the half you notice. */
+.stageGoing {
+  opacity: 0;
+  transition: opacity 140ms ease-out;
+}
+.stageComing {
+  animation: stageComeIn 200ms ease-in both;
+}
+@keyframes stageComeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .stageGoing { transition: none; }
+  .stageComing { animation: none; }
+}
+
 @media (max-width: 768px) {
   /* The score's phone override has gone with the move to the top line: top 17 and
      right 18 are the same at every width now, and both live on the base rule. */

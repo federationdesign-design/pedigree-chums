@@ -242,10 +242,33 @@ export default function BreedStrip({
     if (prevStrip < 0) return null;
     return levelList.find((b) => STRIP_ORDER.indexOf(b.strip) === prevStrip) ?? null;
   };
+  /* THE CROSS-FADE (9 Sept 2026). Suppressing the time tunnel left the swap
+     bare: one diagram was replaced by the next in a single frame and it read as
+     a flick. So the outgoing diagram is faded out FIRST, then swapped, then the
+     new one fades in.
+     The wait has to live here rather than in the modal because the modal is
+     KEYED on the level and unmounts the instant setActive runs. Nothing inside
+     it can animate its own departure. This holds the old one on screen for
+     NAV_FADE_MS, which is the whole trick.
+     The two halves are deliberately uneven: out is quicker than in, so the
+     screen is never empty for long and the arrival is the part you notice. */
+  const NAV_FADE_MS = 140;
+  const [navFading, setNavFading] = useState(false);
+  const navTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => () => { if (navTimer.current) clearTimeout(navTimer.current); }, []);
   const navTo = (b: UKBreed | null) => {
     const na = b ? buildActive(b) : null;
-    // quiet: this is navigation between start screens, not an arrival.
-    if (na) setActive({ ...na, quiet: true });
+    if (!na) return;
+    // A second swipe mid-fade replaces the first rather than queueing behind it,
+    // so a quick double flick lands on the right dog instead of two in a row.
+    if (navTimer.current) clearTimeout(navTimer.current);
+    setNavFading(true);
+    navTimer.current = setTimeout(() => {
+      navTimer.current = null;
+      // quiet: this is navigation between start screens, not an arrival.
+      setActive({ ...na, quiet: true });
+      setNavFading(false);
+    }, NAV_FADE_MS);
   };
 
   /* What a tap on a dog does. Lifted out of the rail's own map so the slider
@@ -597,6 +620,7 @@ export default function BreedStrip({
       lineage={active.lineage}
       fromRect={active.fromRect}
       quiet={active.quiet}
+      navFading={navFading}
       onClose={() => {
         // Walking out of a live round forfeits it, the same as losing it. The
         // modal does this for its own back-out controls; this is the last way
