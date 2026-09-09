@@ -62,11 +62,16 @@ export default function TimelineRun({
   panelIndex,
   words,
   note,
+  nextNote,
 }: {
   era: string;
   panelIndex: number;
   /* The line that sits between the title and the head of the timeline. */
   note: string;
+  /* The NEXT era's line, shown on the card at the end of this rail so a reader
+     sees where they are going rather than a generic label. Optional: the last
+     era has no next one. */
+  nextNote?: string;
   /* The era title, one word per line. It is the first SCREEN OF THIS RUN, not
      a horizontal slide of its own, so the reader scrolls down from it into
      the dogs rather than swiping sideways. */
@@ -726,6 +731,15 @@ export default function TimelineRun({
               HistoryVertical.tsx lays each era out as its section FIRST and its
               era screen second, so an era screen is always the last panel of
               its era. Do not "correct" this to +2. */}
+          {/* A DOG SLOT, NOT A LONE CARD. It was the card on its own, so this
+              slot was shorter than a dog's, and with the rail centring its
+              items the card sat lower than the dogs beside it. Matching the
+              shape fixes the alignment AND carries the icon row across the full
+              width of the rail instead of stopping at the last dog.
+
+              The icon is an ARROW, not the dogs' information "i" (Steve): it
+              says where this goes, and it carries the same data-goto as the
+              green button, so either one moves you on. */}
           <div className={styles.railEndSlot}>
             <div className={styles.dogCard}>
               {/* Built from the dog card's OWN pieces, not a lookalike.
@@ -742,11 +756,29 @@ export default function TimelineRun({
                   >
                     Next era
                   </button>
+                  {/* THE NEXT ERA'S OWN WORDS, which makes this a teaser
+                      rather than a signpost. These are the lines that used to
+                      sit under each era title and were hidden at stage 3h to
+                      give the rail vertical room. This gives them a home again,
+                      on the card that leads to the era they describe.
+                      The fallback covers the last era, which has no next. */}
                   <span className={styles.dogNote}>
-                    View the next historical era&rsquo;s dogs
+                    {nextNote || "View the next historical era\u2019s dogs"}
                   </span>
                 </span>
               </span>
+            </div>
+            <div className={styles.markerRow}>
+              <button
+                type="button"
+                className={styles.markerInfo}
+                data-goto={panelIndex + 1}
+                aria-label="Continue to the next era"
+              >
+                <svg viewBox="0 0 24 24" aria-hidden="true" className={styles.railEndArrow}>
+                  <path d="M5 12h13M13 6l6 6-6 6" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </button>
             </div>
           </div>
         </div>

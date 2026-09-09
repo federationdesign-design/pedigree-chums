@@ -173,6 +173,13 @@ export default function HistoryVertical() {
             if (entry.type === "intro") return null;
 
             if (entry.type === "timeline") {
+              /* The NEXT era's own words, for the card at the end of this rail.
+                 Read out of the laid-out sequence rather than looked up by era
+                 name, so it stays right if a section is inserted, reordered or
+                 dropped. One already is: the armed forces section is filtered
+                 out of SEQUENCE. undefined on the last era. */
+              const after = LAID_OUT.slice(ei + 1).find((l) => l.entry.type === "timeline");
+              const nextNote = after && after.entry.type === "timeline" ? after.entry.note : undefined;
               return (
                 <TimelineRun
                   key={`t${ei}`}
@@ -180,6 +187,7 @@ export default function HistoryVertical() {
                   panelIndex={first}
                   words={entry.words}
                   note={entry.note}
+                  nextNote={nextNote}
                 />
               );
             }

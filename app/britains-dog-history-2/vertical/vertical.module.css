@@ -2206,3 +2206,30 @@
   transform: none;
   border: 0;
 }
+
+
+/* ==== 4D-BLOCK ==== */
+/* ============================================================================
+   STAGE 4D, 1 September 2026 (Steve). The end card now has the dogs' icon row
+   under it, with an arrow instead of the information "i".
+
+   THIS IS WHAT FIXES THE ALIGNMENT. The slot held only a card, so it was
+   shorter than a dog's slot, and .dogRail centres its items: a shorter item
+   centres lower. Giving it the same row makes the two slots the same shape, so
+   they line up without a single alignment rule, and the row's line now runs the
+   full width of the rail rather than stopping at the last dog.
+   ========================================================================= */
+
+.railEndSlot {
+  /* Was flex-start when this slot was card-only. It matches a dog slot now, so
+     nothing needs overriding. */
+  justify-content: flex-start;
+}
+
+/* The arrow sits in the dogs' own .markerInfo disc, so the size, the ring and
+   the colour all come from there. Only the glyph is different. */
+.railEndArrow {
+  width: 60%;
+  height: 60%;
+  display: block;
+}
