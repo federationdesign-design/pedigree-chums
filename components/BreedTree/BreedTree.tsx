@@ -5982,7 +5982,20 @@ export default function BreedTree({
               const c = (pair.collision.supports && pair.collision.supports[0]) || (b.mb ? b.mb.position : null);
               if (c) {
                 const w = worldFromPx(c.x, c.y);
-                numAt(w.x, w.y, b.pct, now);
+                /* FLAT 1 PER HIT, 9 Sept 2026 (owner). This used to award
+                   `b.pct`, the circle's own share, so a 50% chip paid 50 points
+                   on every impact. With dozens of collisions a second in a full
+                   pit, scores ran to 333,000 and the number stopped meaning
+                   anything.
+                   Flat, not scaled: the owner chose a fixed 1 over pct/10, so a
+                   big ancestor is worth no more per bounce than a small one. If
+                   share should influence reward again, do it on the POP rather
+                   than here, where idle jostling earns it.
+                   Only this site changed. The other four numAt calls are events,
+                   not collisions: 2000 for accepting cookies, 250 at the blast,
+                   the variable at the word pop, and FUSE_POINTS. Those are now
+                   worth far more relative to a hit, which is the point. */
+                numAt(w.x, w.y, 1, now);
                 b.lastFx = now;
                 flashed = true;
               }
