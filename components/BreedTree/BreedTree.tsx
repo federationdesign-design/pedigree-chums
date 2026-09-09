@@ -1320,18 +1320,54 @@ function relayoutMobile(nodes: Node[], aspect: number, level: number | null = nu
   // width. The old rule ignored the vertical, which is why the same slider
   // position filled 80% of the pit on a two-circle level and 43% on a four.
   const pit = pitBox(FW, FH);
-  const scale = diffScale(
-    Math.min((FH - M) / bh, (FW * 1.12) / bw),
-    // width only, since the pit has no ceiling, and the widest circle's ring
-    // has to fit between the walls as well as the circle itself
-    pit.w / (bw * (1 + DIFF_RING)),
-    level
-  ) * sizeMul;
+  /* FIT BY THE ENCLOSING CIRCLE, 9 Sept 2026 (owner), pit only.
+     The dashed ring is drawn from packEnclose over the depth-1 circles, but the
+     layout used to fit their BOUNDING BOX. A box and a circle do not scale
+     together: the circumscribing circle of a tall narrow pack is large relative
+     to its box, and of a compact clump is small. So the ring came out a
+     different size on every level, which only became obvious once swiping made
+     levels easy to compare side by side.
+     Fitting the same circle the ring is drawn from makes the ring a controlled
+     quantity rather than a by-product, so it is identical on every level at a
+     given difficulty setting, and centred.
+     THE PRICE, and it is real: the frame is portrait, so the circle is bound by
+     the WIDTH. A tall two-circle pack used to fill the height and now has to fit
+     the width instead, so those levels get visibly smaller circles. That is the
+     honest cost of a constant circle in a tall frame and it was accepted.
+     RING_FILL is the dial. It is the enclosing radius as a fraction of the frame
+     width, so 0.45 makes the ring 90% of the width. */
+  const RING_FILL = 0.45;
+  const enc2 = packEnclose(d1.map((p) => ({ x: p.x, y: p.y, r: p.d.r })));
+  // Pit only. level === null is a chum page, which keeps the old box fit.
+  const useCircle = level !== null && !!enc2 && enc2.r > 0;
+  const encR = enc2 && enc2.r > 0 ? enc2.r : Math.max(bw, bh) / 2;
+  const scale = (useCircle
+    ? diffScale(
+        (FW * RING_FILL) / encR,
+        // The same wall cap as below, but measured on the enclosing circle's
+        // diameter rather than the box width, so the hardest difficulty cannot
+        // push the ring through the sides.
+        pit.w / (2 * encR * (1 + DIFF_RING)),
+        level
+      )
+    : diffScale(
+        Math.min((FH - M) / bh, (FW * 1.12) / bw),
+        // width only, since the pit has no ceiling, and the widest circle's ring
+        // has to fit between the walls as well as the circle itself
+        pit.w / (bw * (1 + DIFF_RING)),
+        level
+      )) * sizeMul;
+  // Centre on the CIRCLE, not the box. A pack whose box centre and circle centre
+  // differ would otherwise sit off-centre inside its own ring.
+  const fitCx = useCircle && enc2 ? enc2.x : cx;
+  const fitCy = useCircle && enc2 ? enc2.y : cy;
   // The cluster used to sit dead centre, which left the lower third of the pit
   // empty. Drop it toward the words, but never further than the slack actually
   // available: at the hardest difficulty the pack already fills the height, so
   // the shift has to give way rather than push circles through the floor.
-  const bottomAfter = (maxY - cy) * scale;
+  // Measured on whichever shape did the fitting, so the floor rule below keeps
+  // working: for the circle fit the lowest point is the radius, not the box.
+  const bottomAfter = useCircle ? encR * scale : (maxY - cy) * scale;
   // In the pit the cluster hangs off the FLOOR, not the centre: its bottom sits
   // on the drop gap and whatever will not fit runs off the top, which is free.
   // Off the pit, on a chum page, the old centred-and-nudged-down rule stands.
@@ -1348,8 +1384,8 @@ function relayoutMobile(nodes: Node[], aspect: number, level: number | null = nu
     drop = Math.min(0, pit.restY - bottomAfter);
   }
   pts.forEach((p) => {
-    p.d.x = (p.x - cx) * scale;
-    p.d.y = (p.y - cy) * scale + drop;
+    p.d.x = (p.x - fitCx) * scale;
+    p.d.y = (p.y - fitCy) * scale + drop;
     p.d.r = p.d.r * scale;
   });
   root.x = 0;
