@@ -2392,7 +2392,11 @@ export default function BreedTree({
       else if (ay >= ax * SWIPE_BIAS) (dy > 0 ? n.nextEra : n.prevEra)?.();
       // Neither axis dominant: a diagonal smear, deliberately ignored.
     };
-    const cancel = () => { swipeRef.current = null; };
+    /* Belt and braces with the touch-action fix in LineageModal. If the browser
+       still manages to claim a gesture somewhere, judge it on what it had
+       travelled by the time it was cancelled rather than binning it outright.
+       Same thresholds, so a cancelled tap still cannot navigate. */
+    const cancel = (e: PointerEvent) => { up(e); };
     document.addEventListener("pointerdown", down, { capture: true });
     document.addEventListener("pointerup", up, { capture: true });
     document.addEventListener("pointercancel", cancel, { capture: true });

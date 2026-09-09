@@ -167,6 +167,16 @@
 .stageArea {
   position: absolute;
   inset: 0;
+  /* 9 Sept 2026. Without this the start screen swipe only worked if the finger
+     landed ON a circle. A circle press runs startDrag, which calls
+     setPointerCapture and preventDefault, so the browser cannot take the
+     gesture. A press on empty background had neither, touch-action defaulted to
+     auto, and Safari claimed the drag as a page scroll or a back-swipe, fired
+     pointercancel and the swipe was thrown away half finished.
+     pinch-zoom, not none, so a reader can still pinch the artwork. It matches
+     what .stage in BreedTree already carries for exactly the same reason: "the
+     pit owns the gesture". Nothing inside this area scrolls, so no pan is lost. */
+  touch-action: pinch-zoom;
 }
 
 @media (max-width: 768px) {
