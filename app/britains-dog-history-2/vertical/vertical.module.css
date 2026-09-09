@@ -2231,3 +2231,20 @@
 .eraSticky > * {
   height: 100%;
 }
+
+
+/* ==== 4B-BLOCK ==== */
+/* ============================================================================
+   STAGE 4B, 1 September 2026 (Steve). The yellow progress bar was drawing in
+   FRONT of the fact circle.
+
+   The stack was .stickyTop 3, .factImg 4, .progress 5. The bar has to sit above
+   the section photograph, which is what the 5 was for, but that also put it
+   above the circle, and the circle is lifted so it deliberately breaks the seam
+   line the bar runs along. The two were always going to meet.
+
+   The circle goes above the bar rather than the bar below the photograph,
+   because the bar still needs to be seen against the picture. */
+.factImg {
+  z-index: 6;
+}

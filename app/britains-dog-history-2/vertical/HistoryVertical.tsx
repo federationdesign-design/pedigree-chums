@@ -437,20 +437,41 @@ export default function HistoryVertical() {
             var el = rollEls[i];
             var off = here - parseFloat(el.getAttribute('data-pc-roll'));
             var d = Math.abs(off);
-            var t;
+            var t, op;
             if (d >= 1) {
               el.removeAttribute('data-pc-arrived');   /* off screen, re-arm */
-              t = 0;
+              t = 0; op = 0;
+            } else if (off > 0.02) {
+              /* LEAVING UPWARD. The panel has scrolled above the seam and is
+                 now behind the pinned section photograph, but .panelFact is
+                 overflow: visible and the circle is lifted clear of its panel,
+                 so it hangs above the seam. At z-index 6 it draws OVER the
+                 photograph, and the arrived latch below was holding it at full
+                 opacity for the whole gap to the next panel. The result was the
+                 previous fact's portrait sitting in the middle of the next
+                 section's photograph.
+
+                 So it fades on the way out, and quickly: gone by a quarter of
+                 the way to the next panel, which is roughly when its panel has
+                 disappeared behind the photograph.
+
+                 It does NOT roll back out sideways. The roll is an arrival, and
+                 replaying it in reverse as the circle leaves reads as a mistake
+                 rather than a flourish. */
+              t = 1;
+              op = Math.max(0, 1 - d * 4);
+              if (d > 0.02) el.removeAttribute('data-pc-arrived');
             } else if (el.hasAttribute('data-pc-arrived')) {
-              t = 1;                                    /* riding with the panel */
+              t = 1; op = 1;                            /* riding with the panel */
             } else {
               t = 1 - d;
+              op = t;
               if (d < 0.02) el.setAttribute('data-pc-arrived', '1');
             }
             var x = -(1 - t) * w;                       /* enters from the LEFT */
             var a = -(1 - t) * ROLL_TURN_DEG;           /* clockwise, ie rolling right */
             el.style.transform = 'translate(' + x.toFixed(1) + 'px, -${FACT_LIFT_PX}px) rotate(' + a.toFixed(1) + 'deg)';
-            el.style.opacity = t.toFixed(3);
+            el.style.opacity = op.toFixed(3);
           }
         }
 
