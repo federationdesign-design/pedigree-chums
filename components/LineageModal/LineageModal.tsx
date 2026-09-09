@@ -523,7 +523,16 @@ export default function LineageModal({ name, image, character, lineage, fromRect
   if (!mounted) return null;
 
   return createPortal(
-    <div className={css.overlay} role="dialog" aria-modal="true" aria-label={name}>
+    /* `quiet` kills the entry animation as well as the time tunnel. See
+       .overlayQuiet in the stylesheet: on a swipe this component remounts, and
+       lmRise was fading the WHOLE pit in from transparent every time, which is
+       what let the history page show through mid-swipe. */
+    <div
+      className={`${css.overlay}${quiet ? " " + css.overlayQuiet : ""}`}
+      role="dialog"
+      aria-modal="true"
+      aria-label={name}
+    >
       {/* The time tunnel covers the pit while it arrives, then removes itself. */}
       {tunnelActive && <TimeTunnel fromRect={fromRect} onResolve={() => setResolving(true)} onDone={() => setTunnelActive(false)} />}
       {/* Score, top of the pit on the same axis as the level portrait.

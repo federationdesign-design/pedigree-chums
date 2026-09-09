@@ -15,6 +15,25 @@
   -webkit-user-select: none;
   animation: lmRise 0.32s cubic-bezier(0.2, 0.7, 0.3, 1);
 }
+/* NO ENTRY ANIMATION ON A QUIET CHANGE, 9 Sept 2026.
+   This component remounts on every level change, so a swipe replayed lmRise and
+   faded the ENTIRE pit in from opacity 0. Three things came out of that, all
+   visible in the owner's frame-by-frame:
+     1. the Britain's Dog History page behind showed through mid-swipe,
+     2. BreedTree's .learnWash blends with `mix-blend-mode: overlay`, so with
+        nothing solid behind it, it tinted the PAGE instead of the level art,
+     3. lmRise also animates transform: scale(0.98), and a transform makes the
+        element a containing block for fixed descendants, which the chum rail
+        and the zoom-out button both are.
+   The cross-fade inside .stageArea is the only motion a swipe needs; the shell
+   holding it must stay solid throughout. Opening the pit from a card still
+   plays lmRise, because there the modal really is arriving.
+   Do not "simplify" this by deleting the class: the animation is on .overlay,
+   so it can only be stopped from here. */
+.overlayQuiet {
+  animation: none;
+}
+
 @keyframes lmRise {
   from { opacity: 0; transform: scale(0.98); }
   to { opacity: 1; transform: none; }
@@ -188,7 +207,9 @@
    slower on purpose, so the arrival is the half you notice. */
 .stageGoing {
   opacity: 0;
-  transition: opacity 140ms ease-out;
+  /* 140 -> 90, in step with NAV_FADE_MS in BreedStrip. Change both or the swap
+     will fire before the fade has finished. */
+  transition: opacity 90ms ease-out;
 }
 .stageComing {
   /* `backwards`, NOT `both`. This is not a style preference, it is the fix for a

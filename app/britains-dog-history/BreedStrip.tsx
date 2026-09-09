@@ -252,7 +252,13 @@ export default function BreedStrip({
      NAV_FADE_MS, which is the whole trick.
      The two halves are deliberately uneven: out is quicker than in, so the
      screen is never empty for long and the arrival is the part you notice. */
-  const NAV_FADE_MS = 140;
+  /* 140 -> 90 on 9 Sept 2026. With the shell now staying solid through a swipe
+     (see .overlayQuiet), the only thing this wait buys is the outgoing diagram's
+     fade. 140ms out, then a swap, then 200ms in, left a visible beat of empty
+     level background between the two. Shorter out plus the solid shell reads as
+     one diagram replacing another rather than a flash.
+     THE ONE FIGURE TO KEEP IN STEP is the transition on .stageGoing. */
+  const NAV_FADE_MS = 90;
   const [navFading, setNavFading] = useState(false);
   const navTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => () => { if (navTimer.current) clearTimeout(navTimer.current); }, []);
