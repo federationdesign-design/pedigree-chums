@@ -842,6 +842,13 @@
   line-height: 1.2;
   margin-bottom: 4px;
 }
+/* The working under the headline share: one row per appearance, then the sum.
+   Its own wrapper so it can be spaced away from the percentage line above and
+   the disclaimer below without touching either. Added 9 Sept 2026. */
+.cBreakWorking {
+  margin-top: 6px;
+  margin-bottom: 8px;
+}
 .cBreakRow {
   font-weight: 600;
   font-size: 0.7rem;

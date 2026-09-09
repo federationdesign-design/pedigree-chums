@@ -136,3 +136,41 @@ export function ancestorShareOf(
   walk(lineage);
   return found ? pct : null;
 }
+
+/* THE SAME WALK, KEEPING THE WORKING (9 Sept 2026).
+   ancestorShareOf above sums a breed's appearances and throws the detail away.
+   The learn box now shows that working, so this returns the appearances
+   themselves: one entry per time the ancestor turns up in the breed's tree,
+   with how far back it sits and what that appearance is worth.
+
+   IT IS DELIBERATELY THE SAME WALK, SAME RULES, SAME ROUNDING as
+   ancestorShareOf, including the self-duplicate rule where a child named after
+   its parent is the same stock's remainder rather than a second helping. That
+   is what guarantees these lines add up to the figure already on screen. If one
+   is ever changed, change both, or the box will show a sum that contradicts its
+   own headline.
+
+   `depth` counts generations back from the breed itself, so the root's own
+   children are 1. That is the number genLabel turns into "parent",
+   "grandparent" and so on. */
+export function ancestorAppearancesOf(
+  breedName: string,
+  ancestorName: string,
+): { depth: number; pct: number }[] {
+  const lineage = getLineage(resolveLineageName(breedName));
+  if (!lineage) return [];
+  const rootLeaves = sumLeaves(lineage);
+  if (!rootLeaves) return [];
+  const out: { depth: number; pct: number }[] = [];
+  const walk = (n: LineageNode, depth: number) => {
+    if (!n.children?.length) return;
+    n.children.forEach((c) => {
+      if (c.name === ancestorName && c.name !== n.name) {
+        out.push({ depth, pct: Math.round((sumLeaves(c) / rootLeaves) * 100) });
+      }
+      walk(c, depth + 1);
+    });
+  };
+  walk(lineage, 1);
+  return out.sort((a, b) => a.depth - b.depth);
+}

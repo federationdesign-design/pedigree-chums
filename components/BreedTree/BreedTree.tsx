@@ -8,7 +8,7 @@ import { splitName } from "../PackPit/splitName";
 import { interpolateZoom } from "d3-interpolate";
 import type { LineageNode } from "../../data/lineage";
 import { nodeStatus, TAG_STYLE, type BreedTag } from "../BreedTreeMap/BreedTreeMap";
-import { descendantPackBreeds, ancestryBreakdown, ancestorShareOf, treesContaining } from "../../data/lineageArchive";
+import { descendantPackBreeds, ancestryBreakdown, ancestorShareOf, ancestorAppearancesOf, treesContaining } from "../../data/lineageArchive";
 import TrainingCard from "../TrainingCard/TrainingCard";
 import { CONSENT_KEY } from "../../lib/consent";
 import trainingDifficulty from "../../data/trainingDifficulty";
@@ -9463,15 +9463,43 @@ export default function BreedTree({
               currently shown, from its own ancestry breakdown. */}
           {ancestryFor && dockAside && shown !== nodes[0] && (() => {
             const share = ancestorShareOf(ancestryFor.name, shown.data.name);
+            /* THE WORKING BEHIND THE HEADLINE, added 9 Sept 2026 (owner), to
+               match the breakdown the LineageMap popout already shows.
+               One line per time this ancestor turns up in the chum's tree, then
+               the sum when there is more than one.
+               These CANNOT disagree with the percentage above them:
+               ancestorAppearancesOf is the same walk as ancestorShareOf with the
+               detail kept instead of discarded. Checked against live data, e.g.
+               Beagle under Ancient eastern sighthounds reads 6% + 5% = 11%,
+               which is the 11% in the headline.
+               There is no separate "share of your chum" line, unlike the
+               LineageMap version. That popout normalises across every breed, so
+               its sum and its share are two different numbers. Here they are the
+               same number, and printing it twice would just look like an error. */
+            const apps = share !== null ? ancestorAppearancesOf(ancestryFor.name, shown.data.name) : [];
+            const pct = (n: number) => (n < 1 ? "<1%" : `${n}%`);
             return share !== null ? (
               <BreakFold folded={isMobile} key={`fold|${hideCaption ? "shut" : "open"}|${ancestryFor.name}|${shown.data.name}`}>
                 <div className={styles.cBreak}>
                   <div className={styles.cBreakBigRow}>
                     <div className={styles.cBreakBig}>
-                      {ancestryFor.name} is <span className={styles.cPct}>{share < 1 ? "<1%" : `${share}%`}</span> {shown.data.name}
+                      {ancestryFor.name} is <span className={styles.cPct}>{pct(share)}</span> {shown.data.name}
                     </div>
                     <SharePie pct={share} />
                   </div>
+                  {apps.length > 0 && (
+                    <div className={styles.cBreakWorking}>
+                      {apps.map((a, i) => (
+                        <div key={i} className={styles.cBreakRow}>As {genLabel(a.depth)}: {pct(a.pct)}</div>
+                      ))}
+                      {apps.length > 1 && (
+                        <div className={styles.cBreakRow}>
+                          Combined: {apps.map((a) => pct(a.pct)).join(" + ")} = {pct(share)}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  {/* The disclaimer stays, below the working, by request. */}
                   <div className={styles.cBreakTitle}>Our best guess, not hard science.</div>
                   <BreakNote key={`${hideCaption ? "shut" : "open"}|${ancestryFor.name}|${shown.data.name}`} />
                 </div>
