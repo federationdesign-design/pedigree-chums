@@ -2336,6 +2336,21 @@ export default function BreedTree({
   useEffect(() => {
     const el = stageRef.current;
     if (!el) return;
+    /* The readout itself. Only built when ?swipedebug=1 is in the URL, so it
+       cannot appear for a reader. Fixed to the top of the screen, above
+       everything, and it ignores pointer events so it cannot eat a gesture. */
+    let dbg: HTMLDivElement | null = null;
+    try {
+      if (new URLSearchParams(window.location.search).get("swipedebug") === "1") {
+        dbg = document.createElement("div");
+        dbg.setAttribute("data-swipe-debug", "1");
+        dbg.style.cssText =
+          "position:fixed;left:0;right:0;top:0;z-index:99999;background:#000;color:#0f0;" +
+          "font:12px/1.4 monospace;padding:6px 8px;pointer-events:none;white-space:pre-wrap";
+        dbg.textContent = "swipe debug ready: flick anywhere on the pit";
+        document.body.appendChild(dbg);
+      }
+    } catch { /* no window search, nothing to do */ }
     const down = (e: PointerEvent) => {
       if (!navRef.current.on) { swipeRef.current = null; return; }
       swipeRef.current = { x: e.clientX, y: e.clientY, t: performance.now() };
@@ -2343,6 +2358,20 @@ export default function BreedTree({
     const up = (e: PointerEvent) => {
       const p = swipeRef.current;
       swipeRef.current = null;
+      /* TEMPORARY DIAGNOSTIC, add ?swipedebug=1 to the URL. Prints what the
+         gesture actually measured and which gate stopped it, because "I cannot
+         swipe" has four possible causes and guessing between them wastes a
+         deploy each time. REMOVE once the thresholds are settled. */
+      if (dbg) {
+        const n0 = navRef.current;
+        const wired = [n0.prev ? "L" : "-", n0.next ? "R" : "-", n0.prevEra ? "U" : "-", n0.nextEra ? "D" : "-"].join("");
+        if (!p) { dbg.textContent = "no pointerdown seen (navOn was false at press)"; return; }
+        const ddx = e.clientX - p.x, ddy = e.clientY - p.y;
+        const ms = Math.round(performance.now() - p.t);
+        dbg.textContent =
+          `dx ${Math.round(ddx)} dy ${Math.round(ddy)} ms ${ms} | on ${navRef.current.on} | wired ${wired}` +
+          ` | need ${SWIPE_MIN}px in ${SWIPE_MS}ms`;
+      }
       if (!p || !navRef.current.on) return;
       const dx = e.clientX - p.x, dy = e.clientY - p.y;
       const ax = Math.abs(dx), ay = Math.abs(dy);
@@ -2366,6 +2395,7 @@ export default function BreedTree({
     return () => {
       el.removeEventListener("pointerdown", down, { capture: true } as EventListenerOptions);
       el.removeEventListener("pointerup", up, { capture: true } as EventListenerOptions);
+      dbg?.remove();
     };
   }, []);
   // LEARN ONLY: the top-right square goes back to the level's start screen, the
