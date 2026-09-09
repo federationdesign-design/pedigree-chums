@@ -191,7 +191,20 @@
   transition: opacity 140ms ease-out;
 }
 .stageComing {
-  animation: stageComeIn 200ms ease-in both;
+  /* `backwards`, NOT `both`. This is not a style preference, it is the fix for a
+     real bug found on 9 Sept 2026.
+     A filling animation on opacity keeps a STACKING CONTEXT alive on the element
+     after it has finished, exactly as a real opacity below 1 would. That
+     isolated everything inside .stageArea, and BreedTree's .learnWash tints the
+     pit with `mix-blend-mode: overlay`, which blends against whatever is painted
+     behind it. Isolated, there was nothing behind it, so the overlay stopped
+     blending and painted its raw #ec0376: a flat pink slab over the level art.
+     It only showed on levels reached by swiping, because that is what applies
+     this class.
+     `backwards` fills BEFORE the animation, which is all that is needed to stop
+     a flash at frame one, and leaves nothing behind afterwards.
+     DO NOT change this back to `both` or `forwards` without checking the wash. */
+  animation: stageComeIn 200ms ease-in backwards;
 }
 @keyframes stageComeIn {
   from { opacity: 0; }
