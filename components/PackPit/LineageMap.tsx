@@ -3203,6 +3203,14 @@ export default function LineageMap({
         const ff2 = cardFrame.get(c.id)!;
         const left = ff2.sx - CW / 2;
         const top = ff2.sy - CW / 2;
+        /* A DUPLICATE OF THIS DOG IS IN HAND, 9 Sept 2026 (owner). An empty
+           frame lights up yellow to show where a card goes, but once a frame is
+           filled the mini pit hides the frame entirely (see the opacity 0 on
+           .frameFilled above), because the placed card lays its own ring on top.
+           So the one place a duplicate can be dropped had no signal at all. The
+           placed card's own ring carries it instead: white normally, yellow
+           while a matching card is being dragged. */
+        const dupInHand = circular && dragImg != null && dragImg === c.img;
         return (
           <div
             key={`placed-${c.id}`}
@@ -3220,8 +3228,13 @@ export default function LineageMap({
               // white in the learn layer: yellow is the pit's colour and it read as
               // pit furniture sitting on top of the learning view
               boxShadow: circular
-                ? "0 0 0 3px #ffffff, 0 2px 8px rgba(0,0,0,0.25)"
+                ? dupInHand
+                  ? "0 0 0 3px var(--yellow, #ffd23e), 0 0 14px 4px rgba(255, 210, 62, 0.6), 0 2px 8px rgba(0,0,0,0.25)"
+                  : "0 0 0 3px #ffffff, 0 2px 8px rgba(0,0,0,0.25)"
                 : "0 2px 8px rgba(0,0,0,0.25)",
+              // box-shadow only: the card is positioned with left/top and a
+              // blanket transition would make it slide instead of jump
+              transition: "box-shadow 140ms ease",
               userSelect: "none",
               touchAction: "none",
               outline: circular ? "none" : "3px solid var(--yellow, #ffd23e)",
