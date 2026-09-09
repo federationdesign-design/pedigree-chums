@@ -1495,6 +1495,10 @@ export default function BreedTree({
   onToggleCaption,
   onPitClose,
   onBackToStart,
+  onNavPrev,
+  onNavNext,
+  onNavPrevEra,
+  onNavNextEra,
   onRoundWon,
   onPitFull,
   rootNote,
@@ -1584,6 +1588,17 @@ export default function BreedTree({
   /* The pit menu's green rewind: back to THIS level's start screen. Owned by
      the host, because it costs a life and remounts the round. */
   onBackToStart?: () => void;
+  /* START SCREEN LEVEL NAVIGATION, added 2 Sept 2026.
+     The pit does NOT own the campaign. Its own `level` state is the difficulty
+     slider, 0 to 10. The ordered list of dogs lives two components up in
+     BreedStrip (`levelList`), so the pit can only ASK to be moved; it reports a
+     swipe and the strip decides what that means.
+     Pure navigation by decision: no streak, no lives, no score. These must never
+     be wired to onNextLevel, which pays a life every third call. */
+  onNavPrev?: () => void;
+  onNavNext?: () => void;
+  onNavPrevEra?: () => void;
+  onNavNextEra?: () => void;
   onRoundWon?: () => void;
   onPitFull?: () => void;
   rootNote?: string;
@@ -2273,6 +2288,86 @@ export default function BreedTree({
   // zoomed and touching the slider would have thrown you out of the circle you
   // were reading. It cannot happen, because there is nothing to touch.
   const showDiff = dockAside && gravity && entered && !started && focus.depth === 0;
+
+  /* ---- START SCREEN SWIPE NAVIGATION (2 Sept 2026) -----------------------
+     Right for the next dog, left for the previous, down for the first dog of
+     the next era, up for the first dog of the last era. The pit only reports
+     the gesture; BreedStrip owns the list and decides where it lands.
+
+     WHY CAPTURE PHASE. startDrag calls stopPropagation on every circle, toy,
+     rod and pill, so a listener on the bubble path would never hear a swipe
+     that began on top of a dog. The owner asked for the swipe to work
+     ANYWHERE, so these are bound with `capture: true` and run before the
+     target's own handler, which cannot silence them.
+
+     WHY IT DOES NOT NEED TO CANCEL THE CIRCLE DRAG. It was going to have to,
+     and that was the expensive part of this job. It turns out not to: a level
+     change re-packs the whole tree and hands back a brand new node array, so
+     any dog the swipe happened to fling is thrown away with the old level. The
+     drag can run to completion and be discarded. Nothing to unwind.
+
+     A FLICK, NOT A DRAG, so that shoving the dogs about still works. All three
+     have to hold: at least SWIPE_MIN px travelled, inside SWIPE_MS, and the
+     dominant axis at least SWIPE_BIAS times the other. A slow deliberate drag
+     across the pit fails the time test and moves the dog only. */
+  const SWIPE_MIN = 70;    // px of travel
+  const SWIPE_MS = 500;    // within this long
+  const SWIPE_BIAS = 1.6;  // dominant axis versus the other
+  const swipeRef = useRef<{ x: number; y: number; t: number } | null>(null);
+  // Held in a ref so the listeners can stay bound once instead of rebinding on
+  // every hover in the pit behind them.
+  const navRef = useRef({ prev: onNavPrev, next: onNavNext, prevEra: onNavPrevEra, nextEra: onNavNextEra, on: false });
+  // Start screen only. Not mid-round, not zoomed into a circle, not in learn:
+  // in learn a swipe is how you move the info box and the chum rail.
+  const navOn = dockAside && gravity && entered && !started && !learning && focus.depth === 0;
+  // Refreshed in an effect, not assigned during render. The file already carries
+  // 14 "Cannot access refs during render" errors from the older pattern; this
+  // one does not add a fifteenth. No dependency array on purpose: it is the
+  // latest-value ref pattern, and the listeners below read it on a gesture, long
+  // after any render has committed.
+  useEffect(() => {
+    navRef.current.prev = onNavPrev;
+    navRef.current.next = onNavNext;
+    navRef.current.prevEra = onNavPrevEra;
+    navRef.current.nextEra = onNavNextEra;
+    navRef.current.on = navOn;
+  });
+
+  useEffect(() => {
+    const el = stageRef.current;
+    if (!el) return;
+    const down = (e: PointerEvent) => {
+      if (!navRef.current.on) { swipeRef.current = null; return; }
+      swipeRef.current = { x: e.clientX, y: e.clientY, t: performance.now() };
+    };
+    const up = (e: PointerEvent) => {
+      const p = swipeRef.current;
+      swipeRef.current = null;
+      if (!p || !navRef.current.on) return;
+      const dx = e.clientX - p.x, dy = e.clientY - p.y;
+      const ax = Math.abs(dx), ay = Math.abs(dy);
+      if (performance.now() - p.t > SWIPE_MS) return;          // too slow: a drag
+      if (Math.max(ax, ay) < SWIPE_MIN) return;                 // too short: a tap
+      const n = navRef.current;
+      /* DIRECTIONS ARE THE OWNER'S, taken literally and NOT the carousel
+         convention. Swipe right for next, left for previous, DOWN for the next
+         era, up for the last era. That is the opposite of a photo carousel,
+         where you drag left to bring the next item in, and it is deliberate: it
+         makes the swipe agree with the D-pad, where the right arrow is NEXT and
+         the DOWN arrow is NEXT ERA. Two mental models would be one too many.
+         To flip either axis, swap the pair on its line. */
+      if (ax >= ay * SWIPE_BIAS) (dx > 0 ? n.next : n.prev)?.();
+      else if (ay >= ax * SWIPE_BIAS) (dy > 0 ? n.nextEra : n.prevEra)?.();
+      // Neither axis dominant: a diagonal smear, deliberately ignored.
+    };
+    el.addEventListener("pointerdown", down, { capture: true });
+    el.addEventListener("pointerup", up, { capture: true });
+    el.addEventListener("pointercancel", () => { swipeRef.current = null; }, { capture: true });
+    return () => {
+      el.removeEventListener("pointerdown", down, { capture: true } as EventListenerOptions);
+      el.removeEventListener("pointerup", up, { capture: true } as EventListenerOptions);
+    };
+  }, []);
   // LEARN ONLY: the top-right square goes back to the level's start screen, the
   // one with LEARN and PLAY on it. No confirmation, by request: nothing is at
   // stake in learn, so a prompt would only be in the way. The pit keeps its X and

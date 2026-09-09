@@ -112,6 +112,15 @@ type Props = {
      upstream so the two can never be a render out of step. */
   onBankScore?: (s: number) => void;
   onNextLevel?: () => void;
+  /* START SCREEN NAVIGATION (2 Sept 2026). Straight pass-through to BreedTree.
+     BreedStrip owns the campaign list and supplies these; undefined means there
+     is nowhere to go in that direction, which the pit shows as a dimmed control.
+     Keep them clear of onNextLevel above: that one pays a life every third call
+     and belongs to winning a level, not to browsing. */
+  onNavPrev?: () => void;
+  onNavNext?: () => void;
+  onNavPrevEra?: () => void;
+  onNavNextEra?: () => void;
   // Photo of the level the player is about to unlock, for the Round Won screen.
   nextLevelImage?: string;
   onStartOver?: () => void;
@@ -158,7 +167,7 @@ type Props = {
   era?: string;
 };
 
-export default function LineageModal({ name, image, character, lineage, fromRect, onClose, nextLevelLabel, onNextLevel, onStartOver, initialScore, onScoreChange, bankedScore, onBankScore, era, lives, livesMax = 6, onLost, onSpendLife, onResetRun, nextLevelImage, levelNo, eraJoinLabel, onLevelChums, onChumCaught, topChum, runChumsFound, runChumsPossible }: Props) {
+export default function LineageModal({ name, image, character, lineage, fromRect, onClose, nextLevelLabel, onNextLevel, onNavPrev, onNavNext, onNavPrevEra, onNavNextEra, onStartOver, initialScore, onScoreChange, bankedScore, onBankScore, era, lives, livesMax = 6, onLost, onSpendLife, onResetRun, nextLevelImage, levelNo, eraJoinLabel, onLevelChums, onChumCaught, topChum, runChumsFound, runChumsPossible }: Props) {
   const theme = levelThemeFor(era);
   // The close X asks before it closes. A round can take a couple of minutes to
   // build up, and losing it to a mis-tap in the corner is a rotten exit.
@@ -637,6 +646,10 @@ export default function LineageModal({ name, image, character, lineage, fromRect
              panel gave, without a screen over the game. */
           onPitClose={onClose}
           onBackToStart={backToStart}
+          onNavPrev={onNavPrev}
+          onNavNext={onNavNext}
+          onNavPrevEra={onNavPrevEra}
+          onNavNextEra={onNavNextEra}
           onRoundWon={() => {
             setPhase("won");
             /* BANK IT. Completing a level is the ONE event that advances the

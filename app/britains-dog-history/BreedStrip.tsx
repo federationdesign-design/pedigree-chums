@@ -197,6 +197,47 @@ export default function BreedStrip({
     const i = levelList.findIndex((b) => b.name === name);
     return i >= 0 && i + 1 < levelList.length ? levelList[i + 1] : null;
   };
+  /* START SCREEN NAVIGATION (2 Sept 2026). The pit reports a swipe or a D-pad
+     press; the answer to "where does that land" lives here, because levelList
+     above is the whole campaign in order across every era.
+     These are PURE NAVIGATION. They must not borrow onNextLevel's body: that
+     one bumps the streak and hands back a life every third call, which is
+     right for winning a level and wrong for browsing. */
+  const prevLevelOf = (name: string): UKBreed | null => {
+    const i = levelList.findIndex((b) => b.name === name);
+    return i > 0 ? levelList[i - 1] : null;
+  };
+  /* NEXT ERA: the first dog of the first strip after this one. Null in the
+     final era, so the button dims rather than wrapping. */
+  const nextEraOf = (name: string): UKBreed | null => {
+    const i = levelList.findIndex((b) => b.name === name);
+    if (i < 0) return null;
+    const here = STRIP_ORDER.indexOf(levelList[i].strip);
+    return levelList.find((b) => STRIP_ORDER.indexOf(b.strip) > here) ?? null;
+  };
+  /* LAST ERA behaves like a track-back button, which is the owner's choice
+     (option A of three). If you are part way through an era it takes you to the
+     FIRST DOG OF THE ERA YOU ARE IN; only when you are already on that first dog
+     does it cross into the previous era. So the only dog with nowhere to go is
+     the very first of the campaign, which is exactly the stated rule. */
+  const prevEraOf = (name: string): UKBreed | null => {
+    const i = levelList.findIndex((b) => b.name === name);
+    if (i < 0) return null;
+    const here = STRIP_ORDER.indexOf(levelList[i].strip);
+    const firstOfHere = levelList.findIndex((b) => STRIP_ORDER.indexOf(b.strip) === here);
+    if (i > firstOfHere) return levelList[firstOfHere];
+    let prevStrip = -1;
+    for (const b of levelList) {
+      const si = STRIP_ORDER.indexOf(b.strip);
+      if (si < here && si > prevStrip) prevStrip = si;
+    }
+    if (prevStrip < 0) return null;
+    return levelList.find((b) => STRIP_ORDER.indexOf(b.strip) === prevStrip) ?? null;
+  };
+  const navTo = (b: UKBreed | null) => {
+    const na = b ? buildActive(b) : null;
+    if (na) setActive(na);
+  };
 
   /* What a tap on a dog does. Lifted out of the rail's own map so the slider
      gets the identical rule rather than a second version of it. The three
@@ -481,6 +522,12 @@ export default function BreedStrip({
       nextLevelImage={(() => { const nb = nextLevelOf(active.name); return nb ? buildActive(nb)?.image : undefined; })()}
       lives={lives}
       livesMax={LIVES_MAX}
+      /* Pure navigation. Null means the end of the line, and LineageModal dims
+         that control rather than hiding it, so the D-pad does not reflow. */
+      onNavPrev={prevLevelOf(active.name) ? () => navTo(prevLevelOf(active.name)) : undefined}
+      onNavNext={nextLevelOf(active.name) ? () => navTo(nextLevelOf(active.name)) : undefined}
+      onNavPrevEra={prevEraOf(active.name) ? () => navTo(prevEraOf(active.name)) : undefined}
+      onNavNextEra={nextEraOf(active.name) ? () => navTo(nextEraOf(active.name)) : undefined}
       onNextLevel={() => {
         // a level completed: three in a row earns a life back
         setStreak((st) => {
