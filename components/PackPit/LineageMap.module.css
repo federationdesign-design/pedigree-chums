@@ -404,6 +404,10 @@
 }
 .chumTop {
   transform: translateY(0);
+  /* The same transition .chumTopDown carries, so the button eases back up as
+     well as down. Without it the press dropped smoothly and snapped back.
+     Added 9 Sept 2026 with the Learn button press, item 11. */
+  transition: transform 0.1s ease;
 }
 .chumTopDown {
   transform: translateY(8px);

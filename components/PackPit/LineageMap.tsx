@@ -493,6 +493,20 @@ export default function LineageMap({
   // 8px). Applied as one scale() on the button group; the rim offset scales with
   // it so the button keeps the same overlap on the rim at any size.
   const learnBtnScale = circular ? Math.min(1, (1.8 * liftR) / 200) : 1;
+  /* THE LEARN BUTTON PRESSES, 9 Sept 2026 (owner), item 11. The green Collect
+     button already had this: .chumTopDown drops the top of the pill onto its
+     base. Learn never used it, so a button you press three or four times a
+     level gave no feedback at all.
+     Driven off pointerdown with a timed release rather than held until
+     pointerup, so a fast tap still shows the whole movement. */
+  const [learnDown, setLearnDown] = useState(false);
+  const learnDownT = useRef(0);
+  const pressLearn = () => {
+    setLearnDown(true);
+    window.clearTimeout(learnDownT.current);
+    learnDownT.current = window.setTimeout(() => setLearnDown(false), 140);
+  };
+  useEffect(() => () => window.clearTimeout(learnDownT.current), []);
   const [rootGone, setRootGone] = useState(false);
   // Preload all images for instruction cards so they appear instantly when tapped
   useEffect(() => {
@@ -2158,13 +2172,13 @@ export default function LineageMap({
             className={styles.removeBtn}
             transform={`translate(0,${circular ? 4 * learnBtnScale + 2 : 62}) scale(${circular ? learnBtnScale : 1})`}
             onClick={(e) => { e.stopPropagation(); revealStep(); }}
-            onPointerDown={(e) => e.stopPropagation()}
+            onPointerDown={(e) => { e.stopPropagation(); pressLearn(); }}
             role="button"
             aria-label="Learn"
           >
             <g className={styles.chumPop}>
               <rect x={-100} y={-26} width={200} height={68} rx={34} className={styles.compBase} />
-              <g className={styles.chumTop}>
+              <g className={learnDown ? styles.chumTopDown : styles.chumTop}>
                 <rect x={-100} y={-34} width={200} height={68} rx={34} className={styles.compPill} />
                 <rect x={-88} y={-28} width={176} height={22} rx={12} className={styles.chumGloss} />
                 <text className={styles.compText} textAnchor="middle" dominantBaseline="central" y={5}>Learn</text>
@@ -2348,7 +2362,11 @@ export default function LineageMap({
         {frameTotal > 0 && !packed && !collecting && (
           <div
             className={styles.frameCount}
-            style={{ top: Math.max(58, vp.h / 2 + LIFT_K * (chumTop - vp.h / 2) - 46) }}
+            /* UP 10px, 9 Sept 2026 (owner), item 13: at 46 it sat on the top
+               row of frames. The 58 floor is untouched, so on a short screen it
+               still stops clear of the level portrait rather than climbing into
+               it. */
+            style={{ top: Math.max(58, vp.h / 2 + LIFT_K * (chumTop - vp.h / 2) - 56) }}
             aria-label={`${filled.size} of ${frameTotal} frames filled`}
           >
             {filled.size}/{frameTotal}
@@ -2686,7 +2704,12 @@ export default function LineageMap({
                         textAnchor="middle"
                         dominantBaseline="middle"
                         clipPath={`url(#lbl-clip-${f.id})`}
-                        style={{ fill: wrongDog?.frameId === f.id ? "#ffffff" : "#ffd23e", font: `700 ${wrongDog?.frameId === f.id ? 18 : 14}px ${wrongDog?.frameId === f.id ? "'Luckiest Guy', " : ""}Montserrat, system-ui, sans-serif`, pointerEvents: "none" }}
+                        /* 2px OFF BOTH LABELS, 9 Sept 2026 (owner), item 7. The
+                           breed name drops 14 to 12 and WRONG DOG 18 to 16, so
+                           the two keep their relative weight. The line height
+                           below follows the name down, or a two word breed would
+                           keep its old gap and read as loose. */
+                        style={{ fill: wrongDog?.frameId === f.id ? "#ffffff" : "#ffd23e", font: `700 ${wrongDog?.frameId === f.id ? 16 : 12}px ${wrongDog?.frameId === f.id ? "'Luckiest Guy', " : ""}Montserrat, system-ui, sans-serif`, pointerEvents: "none" }}
                       >
                         {wrongDog?.frameId === f.id ? (
                           <>
@@ -2696,7 +2719,7 @@ export default function LineageMap({
                         ) : (() => {
                           // split breed name into words, up to 3 lines
                           const words = (dragName || "").split(" ");
-                          const lineH = 14;
+                          const lineH = 12; // follows the font size above
                           const startY = words.length === 1 ? 0 : words.length === 2 ? -lineH / 2 : -lineH;
                           return words.map((w, i) => (
                             <tspan key={i} x={f.sx - pan.x} dy={i === 0 ? startY : lineH}>{w}</tspan>
