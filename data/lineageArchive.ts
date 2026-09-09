@@ -119,7 +119,16 @@ export function ancestorShareOf(
   if (!lineage) return null;
   const rootLeaves = sumLeaves(lineage);
   if (!rootLeaves) return null;
-  let pct = 0;
+  /* SUM RAW, ROUND ONCE, corrected 9 Sept 2026.
+     This used to round EVERY appearance and then add the rounded figures up.
+     With ten appearances that drifts by up to five points, and it produced a
+     real 101% on screen: Yorkshire Terrier under Earth Dog has ten appearances
+     whose exact shares total 100.000%, but two of them are 7.5% each and round
+     up to 8, inventing a point out of nothing.
+     A share of an ancestor cannot exceed 100%, so any figure above it was proof
+     of an arithmetic fault rather than a data one. Nothing here needed
+     "adjusting" or normalising; the order of operations was simply wrong. */
+  let frac = 0;
   let found = false;
   const walk = (n: LineageNode) => {
     if (!n.children?.length) return;
@@ -127,14 +136,14 @@ export function ancestorShareOf(
       // Same self-duplicate rule as ancestryBreakdown: a child named after
       // its parent is the same stock's remainder, not a second helping.
       if (c.name === ancestorName && c.name !== n.name) {
-        pct += Math.round((sumLeaves(c) / rootLeaves) * 100);
+        frac += sumLeaves(c) / rootLeaves;
         found = true;
       }
       walk(c);
     });
   };
   walk(lineage);
-  return found ? pct : null;
+  return found ? Math.round(frac * 100) : null;
 }
 
 /* THE SAME WALK, KEEPING THE WORKING (9 Sept 2026).
@@ -161,16 +170,43 @@ export function ancestorAppearancesOf(
   if (!lineage) return [];
   const rootLeaves = sumLeaves(lineage);
   if (!rootLeaves) return [];
-  const out: { depth: number; pct: number }[] = [];
+  const raw: { depth: number; exact: number }[] = [];
   const walk = (n: LineageNode, depth: number) => {
     if (!n.children?.length) return;
     n.children.forEach((c) => {
       if (c.name === ancestorName && c.name !== n.name) {
-        out.push({ depth, pct: Math.round((sumLeaves(c) / rootLeaves) * 100) });
+        raw.push({ depth, exact: (sumLeaves(c) / rootLeaves) * 100 });
       }
       walk(c, depth + 1);
     });
   };
   walk(lineage, 1);
-  return out.sort((a, b) => a.depth - b.depth);
+  if (!raw.length) return [];
+
+  /* LARGEST REMAINDER, added 9 Sept 2026 with the round-once fix above.
+     Rounding each line on its own is what produced the 101%. But simply rounding
+     the TOTAL once is not enough on its own either: the box prints the parts and
+     then prints their sum, so if the parts are rounded independently they can
+     still visibly fail to add up, which looks worse than a wrong total.
+     So the parts are apportioned to the total instead. Everyone takes their
+     floor, then the points left over go to whoever was robbed most by that
+     floor. The printed lines therefore add up to the printed total exactly, by
+     construction, on every dog.
+     The total here is computed the same way as ancestorShareOf so the two agree;
+     if that rounding is ever changed, change this with it. */
+  const total = Math.round(raw.reduce((t, r) => t + r.exact, 0));
+  const floors = raw.map((r) => Math.floor(r.exact));
+  let left = total - floors.reduce((t, f) => t + f, 0);
+  const order = raw
+    .map((r, i) => ({ i, rem: r.exact - Math.floor(r.exact) }))
+    .sort((a, b) => b.rem - a.rem);
+  const pcts = floors.slice();
+  for (const o of order) {
+    if (left <= 0) break;
+    pcts[o.i] += 1;
+    left -= 1;
+  }
+  return raw
+    .map((r, i) => ({ depth: r.depth, pct: pcts[i] }))
+    .sort((a, b) => a.depth - b.depth);
 }
