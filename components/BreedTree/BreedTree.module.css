@@ -960,6 +960,95 @@
    the second dog's picture ends. Change the portrait clamp there and this needs
    to change with it. The lives bar sits at the same left but only renders while
    a round is running, and the rail is learn only, so they never meet. */
+/* ===========================================================================
+   THE START SCREEN D-PAD (9 Sept 2026)
+   Four moves: previous and next dog, and the first dog of the last or next era.
+   The same four the swipe does.
+
+   SIZED OFF THE ZOOM-OUT BUTTON, which is itself matched to PLAY. The rim here
+   is an `outline`, which draws OUTSIDE the box and adds 5px a side, so a 62.5px
+   box reads as a 72.5px square, exactly like PLAY's artboard. Corner radius is
+   17.75 so the outline's own corner lands on PLAY's 22.75. Do not "tidy" these
+   to round numbers; they are derived, and the note on .zoomOutBtn shows the
+   working.
+
+   BOTTOM RIGHT, where the level number used to sit. That number has moved to
+   the top line beside the corner X in the same change, because the two cannot
+   share this corner. Same bottom as PLAY and the zoom-out, so all three sit on
+   one line.
+   =========================================================================== */
+.navPad {
+  position: fixed;
+  right: 16px;
+  bottom: calc(3% + 5px);
+  z-index: 15;
+  display: grid;
+  /* Two columns for the left/right pair; up and down span both and centre. */
+  grid-template-columns: repeat(2, 62.5px);
+  gap: 10px;
+  justify-items: center;
+  align-items: center;
+  pointer-events: auto;
+}
+.navUp,
+.navDown {
+  grid-column: 1 / -1;
+}
+.navLabel {
+  grid-column: 1 / -1;
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: #ffffff;
+  stroke: #000000;
+  -webkit-text-stroke: 3px #000000;
+  paint-order: stroke;
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+}
+/* The two middle labels sit under their own button, so they take one column
+   each rather than spanning. */
+.navLabelLeft { grid-column: 1; }
+.navLabelRight { grid-column: 2; }
+
+.navBtn {
+  width: 62.5px;
+  height: 62.5px;
+  border-radius: 17.75px;
+  border: none;
+  outline: 5px solid var(--navy, #0a3a57);
+  background: var(--navy, #0a3a57);
+  color: var(--yellow, #ffd23e);
+  display: grid;
+  place-items: center;
+  padding: 0;
+  cursor: pointer;
+  pointer-events: auto;
+}
+.navBtn svg {
+  width: 60%;
+  height: 60%;
+  display: block;
+}
+.navBtn:active {
+  transform: translateY(2px);
+}
+/* THE ENDS OF THE LINE. Dimmed, not hidden, by decision: hiding one would
+   reflow the pad and move the other buttons under the reader's thumb between
+   presses. The button is genuinely disabled, so it is skipped by the keyboard
+   and announced as unavailable, not merely greyed. */
+.navBtn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.navBtn:disabled:active {
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .navBtn:active { transform: none; }
+}
+
 /* The way back out of a zoom.
    MOVED 31 Aug 2026: was bottom right at right 18px. It now sits in a line beside the
    green learn PLAY button, bottom left, by request.

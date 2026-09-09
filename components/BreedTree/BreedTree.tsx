@@ -8771,15 +8771,23 @@ export default function BreedTree({
             const vbWc = aspect >= 1 ? SIZE * aspect : SIZE;
             const vbHc = aspect >= 1 ? SIZE : SIZE / aspect;
             const xMinC = -vbWc / 2;
-            const m = 18 * upp;
+            // the old 18px side margin went with the move to the top line
             return (
               <text
-                x={xMinC + vbWc - m}
-                /* DOWN 20px, 2 September 2026 (owner). Written as 20 * upp, not
-                   a flat 20: this is drawn in svg units and upp is the px-to-unit
-                   conversion, so a bare 20 would move a different distance on
-                   every screen. */
-                y={vbHc * WORD_START_Y + 20 * upp}
+                /* MOVED TO THE TOP LINE, 9 Sept 2026 (owner's mockup). It used
+                   to sit bottom right at the end of the PLAY/LEARN row, which is
+                   exactly where the new D-pad now goes; the two cannot share
+                   that corner.
+                   It now sits on the same line as the red corner square, just to
+                   its left. The square is 67.5px with a 16px margin, so its left
+                   edge is 83.5px in from the right; 14px of air, the same gap the
+                   corner squares stack with, puts this text's right edge at 97.5.
+                   Vertically it centres on the square: 16px margin plus half of
+                   67.5 is 49.75px down from the top.
+                   Both figures are in px times upp, never bare, because this is
+                   drawn in svg units and upp is the conversion. */
+                x={xMinC + vbWc - 97.5 * upp}
+                y={-vbHc / 2 + 49.75 * upp}
                 textAnchor="end"
                 dominantBaseline="central"
                 style={{
@@ -9018,6 +9026,65 @@ export default function BreedTree({
               style={{ bottom: `${level * 10}%` }}
             />
           </div>
+        </div>
+      )}
+
+      {/* THE START SCREEN D-PAD (9 Sept 2026). The same four moves as the swipe,
+          for anyone who would rather press than flick, and the only way to reach
+          them with a keyboard or a screen reader.
+          DOM buttons, not drawn in the svg. Every other in-pit square is a
+          physics body that can be knocked loose, which is a lot of machinery for
+          a control that only ever needs a tap. It follows the zoom-out button
+          instead, which is already DOM and already matched to PLAY.
+          Rendered HERE, at root level beside the slider, and NOT inside the info
+          box: the chum rail and the zoom-out live in there and were being
+          clipped to it, which is a trap worth not walking into twice.
+          ARROWS POINT THE WAY THEY GO. Right is next, down is the next era. That
+          is deliberately the opposite of the swipe, which follows the content.
+          Pressing an arrow and dragging a page are different mental models and
+          both are right in their own terms. */}
+      {navOn && (onNavPrev || onNavNext || onNavPrevEra || onNavNextEra) && (
+        <div className={styles.navPad} role="group" aria-label="Move between levels">
+          <span className={`${styles.navLabel} ${styles.navLabelUp}`}>LAST ERA</span>
+          <button
+            type="button"
+            className={`${styles.navBtn} ${styles.navUp}`}
+            onClick={() => onNavPrevEra?.()}
+            disabled={!onNavPrevEra}
+            aria-label="First dog of the last era"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5 L21 17 L3 17 Z" fill="currentColor" /></svg>
+          </button>
+          <button
+            type="button"
+            className={`${styles.navBtn} ${styles.navLeft}`}
+            onClick={() => onNavPrev?.()}
+            disabled={!onNavPrev}
+            aria-label="Previous dog"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 3 L17 21 L5 12 Z" fill="currentColor" /></svg>
+          </button>
+          <button
+            type="button"
+            className={`${styles.navBtn} ${styles.navRight}`}
+            onClick={() => onNavNext?.()}
+            disabled={!onNavNext}
+            aria-label="Next dog"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3 L7 21 L19 12 Z" fill="currentColor" /></svg>
+          </button>
+          <span className={`${styles.navLabel} ${styles.navLabelLeft}`}>PREVIOUS</span>
+          <span className={`${styles.navLabel} ${styles.navLabelRight}`}>NEXT</span>
+          <button
+            type="button"
+            className={`${styles.navBtn} ${styles.navDown}`}
+            onClick={() => onNavNextEra?.()}
+            disabled={!onNavNextEra}
+            aria-label="First dog of the next era"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19 L3 7 L21 7 Z" fill="currentColor" /></svg>
+          </button>
+          <span className={`${styles.navLabel} ${styles.navLabelDown}`}>NEXT ERA</span>
         </div>
       )}
 
