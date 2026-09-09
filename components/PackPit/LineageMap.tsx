@@ -2362,11 +2362,11 @@ export default function LineageMap({
         {frameTotal > 0 && !packed && !collecting && (
           <div
             className={styles.frameCount}
-            /* UP 10px, 9 Sept 2026 (owner), item 13: at 46 it sat on the top
-               row of frames. The 58 floor is untouched, so on a short screen it
+            /* UP 20px, 9 Sept 2026 (owner), item 13, in two passes of 10: at
+               46 it sat on the top row of frames. The 58 floor is untouched, so on a short screen it
                still stops clear of the level portrait rather than climbing into
                it. */
-            style={{ top: Math.max(58, vp.h / 2 + LIFT_K * (chumTop - vp.h / 2) - 56) }}
+            style={{ top: Math.max(58, vp.h / 2 + LIFT_K * (chumTop - vp.h / 2) - 66) }}
             aria-label={`${filled.size} of ${frameTotal} frames filled`}
           >
             {filled.size}/{frameTotal}
@@ -2702,18 +2702,19 @@ export default function LineageMap({
                         x={f.sx - pan.x}
                         /* THE NAME MOVED, WRONG DOG DID NOT, 9 Sept 2026 (owner).
                            One text element draws both labels, so the +5 that
-                           optically centred them was shared. The name comes up
-                           5px as asked; WRONG DOG keeps the old baseline. */
-                        y={f.sy - pan.y + (wrongDog?.frameId === f.id ? 5 : 0)}
+                           optically centred them was shared. The name is up
+                           10px in two passes of 5; WRONG DOG keeps the original
+                           baseline throughout. */
+                        y={f.sy - pan.y + (wrongDog?.frameId === f.id ? 5 : -5)}
                         textAnchor="middle"
                         dominantBaseline="middle"
                         clipPath={`url(#lbl-clip-${f.id})`}
                         /* SIZED DOWN TWICE, 9 Sept 2026 (owner), item 7. The
-                           breed name went 14 to 12 to 10, WRONG DOG 18 to 16 to 13,
+                           breed name went 14 to 12 to 10 to 8, WRONG DOG 18 to 16 to 13 to 10,
                            both on the owner reading them on the device. The line height
                            below follows the name down, or a two word breed would
                            keep its old gap and read as loose. */
-                        style={{ fill: wrongDog?.frameId === f.id ? "#ffffff" : "#ffd23e", font: `700 ${wrongDog?.frameId === f.id ? 13 : 10}px ${wrongDog?.frameId === f.id ? "'Luckiest Guy', " : ""}Montserrat, system-ui, sans-serif`, pointerEvents: "none" }}
+                        style={{ fill: wrongDog?.frameId === f.id ? "#ffffff" : "#ffd23e", font: `700 ${wrongDog?.frameId === f.id ? 10 : 8}px ${wrongDog?.frameId === f.id ? "'Luckiest Guy', " : ""}Montserrat, system-ui, sans-serif`, pointerEvents: "none" }}
                       >
                         {wrongDog?.frameId === f.id ? (
                           <>
@@ -2723,7 +2724,7 @@ export default function LineageMap({
                         ) : (() => {
                           // split breed name into words, up to 3 lines
                           const words = (dragName || "").split(" ");
-                          const lineH = 10; // follows the font size above
+                          const lineH = 8; // follows the font size above
                           const startY = words.length === 1 ? 0 : words.length === 2 ? -lineH / 2 : -lineH;
                           return words.map((w, i) => (
                             <tspan key={i} x={f.sx - pan.x} dy={i === 0 ? startY : lineH}>{w}</tspan>
