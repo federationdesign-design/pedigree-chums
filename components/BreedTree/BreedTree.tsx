@@ -8639,8 +8639,26 @@ export default function BreedTree({
                       strokeWidth={iconStroke * 0.8}
                       strokeLinejoin="round"
                     />
+                  ) : started ? (
+                    /* A HAMBURGER DURING A ROUND, 9 Sept 2026 (owner). Mid-round
+                       this square is not a close button: each tap drops a red
+                       leave and a green restart into the pit, and its own
+                       aria-label already says "Pit menu". The X was describing
+                       something it stopped doing.
+                       PLAY ONLY, deliberately. On the start screen the same
+                       square really does close the pit, so it keeps the red X;
+                       a hamburger there would promise a menu that does not
+                       exist. To make it a hamburger everywhere, drop the
+                       `started ?` split and delete the X branch below.
+                       Three bars on the same 0.34 half-width as the X's arms, so
+                       it reads at the same weight and optical size. */
+                    <g stroke="var(--navy, #0a3a57)" strokeWidth={iconStroke} strokeLinecap="round">
+                      <line x1={-half * 0.34} y1={-half * 0.30} x2={half * 0.34} y2={-half * 0.30} />
+                      <line x1={-half * 0.34} y1={0} x2={half * 0.34} y2={0} />
+                      <line x1={-half * 0.34} y1={half * 0.30} x2={half * 0.34} y2={half * 0.30} />
+                    </g>
                   ) : (
-                    <g stroke={!started ? "#ffffff" : "var(--navy, #0a3a57)"} strokeWidth={iconStroke} strokeLinecap="round">
+                    <g stroke="#ffffff" strokeWidth={iconStroke} strokeLinecap="round">
                       <line x1={-half * 0.34} y1={-half * 0.34} x2={half * 0.34} y2={half * 0.34} />
                       <line x1={half * 0.34} y1={-half * 0.34} x2={-half * 0.34} y2={half * 0.34} />
                     </g>
