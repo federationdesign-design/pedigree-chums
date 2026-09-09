@@ -9414,26 +9414,37 @@ export default function BreedTree({
               </span>
               <span className={styles.cHeadText}>
                 <span className={styles.cHeadName}>{shown.data.name}</span>
-                {/* With a chum picked, the header names the hovered circle and this
-                    line links it to the chum shown in yellow just below. */}
-                {ancestryFor && (
-                  <span className={styles.cRelated}>is related to:</span>
-                )}
+                {/* REMOVED 9 Sept 2026: the "is related to:" line went with the
+                    chum name and write-up below. The header now names the
+                    hovered circle and stops there. */}
               </span>
             </div>
           )}
-          {ancestryFor && <span className={styles.cName}>{ancestryFor.name}</span>}
+          {/* THE CHUM NAME AND ITS WRITE-UP ARE GONE, 9 Sept 2026, owner's call.
+              With a chum picked, this box used to open with the chum name in
+              yellow and its character note, and only then reach the percentage.
+              The percentage sentence and the pie are the reason the box is open,
+              so they lead now.
+              Deleted rather than hidden: the same name was already in the header
+              above AND in the percentage sentence below, so it was said three
+              times. The write-up still has a home on the chum's own page.
+              Only the chum branch changed. With no chum picked the box is
+              untouched and still leads with the circle's own note. */}
           {!ancestryFor && shownShare !== null && shown.parent && !learning && (
             <span className={styles.cShare}>
               {shownShare}% of {shown.parent.data.name}
             </span>
           )}
+          {/* The chum branch renders nothing here at all now, rather than an
+              empty <p>, so the box does not carry a blank first line. */}
+          {ancestryFor ? null : (
           <p className={styles.cNote}>
-            {ancestryFor ? ancestryFor.note : (isFocused && breedInfoLong[shown.data.name]) || breedInfo[shown.data.name] || (shown.depth === 0 && rootNote ? rootNote : shown.data.note)}
+            {(isFocused && breedInfoLong[shown.data.name]) || breedInfo[shown.data.name] || (shown.depth === 0 && rootNote ? rootNote : shown.data.note)}
             {/* the mini pit drops the "keep digging" prompt: in LEARN mode the
                 circles are the whole point, so the nudge is noise */}
             {!dockAside && shown.children ? " Tap a circle inside to keep digging." : ""}
           </p>
+          )}
           {/* The share pill from the main pit, reproduced below the write-up:
               the breed's share of this whole dog, its share in the role it sits
               in, and the same best-guess caveat. Only when a circle is picked. */}
