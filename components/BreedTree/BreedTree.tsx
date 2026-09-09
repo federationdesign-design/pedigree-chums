@@ -8117,7 +8117,15 @@ export default function BreedTree({
                    inert, because it is navy in both states now. Ordinary
                    badges keep the blue inert fill (white on white would
                    disappear). */
-                <circle cx={0} cy={0} r={item.r} style={{ fill: inert ? (item.green ? "#ffffff" : "#0c5b92") : item.green ? "#ffed00" : item.label ? "#5cc4ee" : "#ffd23e", stroke: "#0a3a57", strokeWidth: item.r * (item.label ? 0.225 : 0.19) }} />
+                <circle cx={0} cy={0} r={item.r} style={{ fill: inert ? (item.green ? "#ffffff" : "#0c5b92") : item.green ? "#ffed00" : item.label ? "#5cc4ee" : "#ffd23e", stroke: "#0a3a57", /* THE % BADGE'S RIM MATCHES THE NODE IT CAME FROM, 9 Sept 2026
+                     (owner). It was a flat 0.19 of its own radius. ringFrac(1) is
+                     0.09, the weight a first-generation circle wears on the lifted
+                     screen, read from the shared RING_FRAC table rather than typed
+                     in again, so the two cannot drift.
+                     The labelled solo-dog circle keeps its 0.225: it is a different
+                     object, it was not asked about, and it carries a name rather
+                     than a figure. */
+                  strokeWidth: item.r * (item.label ? 0.225 : ringFrac(1)) }} />
                 )}
                 {!item.bomb && !inert && (item.label ? (
                   // solo dog circle: the breed name it wore before the round

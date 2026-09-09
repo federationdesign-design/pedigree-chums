@@ -2053,7 +2053,11 @@ export default function LineageMap({
               cy={0}
               r={R + rootRingW / 2}
               fill="none"
-              stroke="#22c55e"
+              /* LEMON, NOT GREEN, 9 Sept 2026 (owner): the whole done state now
+                 reads as the pit's learnt colour rather than a green of its own.
+                 At 100% this ring covers the lifted circle's own rim, so it is
+                 what you actually see round a finished dog. */
+              stroke="#ffed00"
               strokeWidth={rootRingW + 6}
               strokeLinecap="round"
               pathLength={1}
@@ -2101,14 +2105,17 @@ export default function LineageMap({
                         two different greens on one circle, which is worse than either
                         being slightly off on its own. One green now, shared with the
                         ring above and with the placed-node fill at :2574.
-                        THE LABEL IS WHITE ON OWNER REQUEST, 9 Sept 2026, the same
-                        call already recorded for white on the orange RARE band. The
-                        contrast is 2.2:1, below the 4.5:1 threshold. Navy would be
-                        5.3:1. Noted here so nobody "fixes" it back without asking,
-                        and so it is on the record if the accessibility work reaches
-                        this screen. .bandFill eases the swap. */}
-                    <rect className={styles.bandFill} x={-R * 1.6} y={bandTop} width={R * 3.2} height={R * 1.6} style={{ fill: framesDone ? "#22c55e" : band.bg }} />
-                    <text className={styles.bandFill} x={labelX} y={labelY} textAnchor="middle" dominantBaseline="central" style={{ fontFamily: '"Luckiest Guy", system-ui, sans-serif', fontSize: fs, fontWeight: 400, fill: framesDone ? "#ffffff" : band.fg }}>{band.label}</text>
+                        THE LABEL WENT WHITE ON REQUEST EARLIER TODAY AND HAS HAD TO
+                        COME BACK. White on #22c55e was 2.2:1, poor but visible. On
+                        #ffed00 it is 1.21:1, which is not a contrast problem, it is
+                        an invisible label. Navy on this lemon is 9.89:1. The same
+                        measurement and the same conclusion are already written up
+                        against the pit's own learnt chip in BreedTree, where the
+                        ring and the figure had to move to navy for exactly this
+                        reason when that chip went lemon on 31 Aug. .bandFill eases
+                        the swap. */}
+                    <rect className={styles.bandFill} x={-R * 1.6} y={bandTop} width={R * 3.2} height={R * 1.6} style={{ fill: framesDone ? "#ffed00" : band.bg }} />
+                    <text className={styles.bandFill} x={labelX} y={labelY} textAnchor="middle" dominantBaseline="central" style={{ fontFamily: '"Luckiest Guy", system-ui, sans-serif', fontSize: fs, fontWeight: 400, fill: framesDone ? "var(--navy, #0a3a57)" : band.fg }}>{band.label}</text>
                   </g>
                 </g>
               </g>
@@ -2606,7 +2613,12 @@ export default function LineageMap({
                          node used to wear on green, and white on yellow is 1.6:1,
                          which is unreadable. See the text style below. */
                       const placedHere = !!n.img && (placedImgs.has(n.img as string) || packed);
-                      const fill = placedHere ? "var(--yellow, #ffd23e)" : seen.has(n._id) ? "#0c5b92" : undefined;
+                      /* AND THE LEMON, NOT --yellow, 9 Sept 2026 (owner). #ffed00
+                         is the colour a learnt chip already wears once it drops
+                         into the pit (BreedTree, the badge disc). Using the pit
+                         furniture yellow here left the same dog two shades apart
+                         between the two screens. */
+                      const fill = placedHere ? "#ffed00" : seen.has(n._id) ? "#0c5b92" : undefined;
                       const st: React.CSSProperties = {
                         ...(fill ? { fill } : null),
                         // clamped so a nested ring can never out-thicken its parent
