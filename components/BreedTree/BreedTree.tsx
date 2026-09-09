@@ -8560,6 +8560,10 @@ export default function BreedTree({
               })()}
               {defs.map((d) => (
               <g key={d.kind} ref={uiRefFor(d.kind)}
+                /* A stable hook for measuring this square from outside. Two of
+                   these squares share the aria-label "Back to the start screen",
+                   so the label cannot pick one out. Used by ?cornerdebug=1. */
+                data-ui-square={d.kind}
                 role="button"
                 onMouseEnter={() => setHoverHint(
                   d.kind === "desc" ? "open the info box"

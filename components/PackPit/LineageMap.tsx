@@ -615,6 +615,40 @@ export default function LineageMap({
   // closing, and keep showing it at its dropped spot until breed change / close
   const [pinned, setPinned] = useState<Map<string, { img: string; name: string; note: string; share: number; mix: number; status: BreedTag | null }>>(new Map());
   useEffect(() => { setPinned(new Map()); }, [breed.name]);
+  /* DIAGNOSTIC item 6: ?cornerdebug=1 measures the pit's own close square
+     against this component's back button, so the corner can be SET from real
+     numbers rather than guessed. The file history says two guesses at this went
+     the wrong way. Polls twice a second because the square is redrawn every
+     frame by the physics loop. REMOVE ONCE THE CORNER IS SET. */
+  useEffect(() => {
+    let d: HTMLDivElement | null = null;
+    let t = 0;
+    try {
+      if (new URLSearchParams(window.location.search).get("cornerdebug") !== "1") return;
+      d = document.createElement("div");
+      d.style.cssText =
+        "position:fixed;left:0;right:0;bottom:0;z-index:99999;background:#000;color:#0f0;" +
+        "font:11px/1.4 monospace;padding:6px 8px;pointer-events:none;white-space:pre-wrap";
+      d.textContent = "corner debug: looking for the pit square";
+      document.body.appendChild(d);
+      const el = d;
+      const tick = () => {
+        const sq = document.querySelector('[data-ui-square="close"]') as SVGGraphicsElement | null;
+        const btn = document.querySelector('button[aria-label="Back"]') as HTMLElement | null;
+        if (!sq || !btn) { el.textContent = `waiting: square=${sq ? "yes" : "NO"} button=${btn ? "yes" : "NO"}`; return; }
+        const s = sq.getBoundingClientRect(), b = btn.getBoundingClientRect();
+        const vw = window.innerWidth;
+        el.textContent =
+          `vw ${Math.round(vw)} vh ${Math.round(window.innerHeight)}\n` +
+          `square top ${s.top.toFixed(1)} right ${(vw - s.right).toFixed(1)} w ${s.width.toFixed(1)} h ${s.height.toFixed(1)}\n` +
+          `button top ${b.top.toFixed(1)} right ${(vw - b.right).toFixed(1)} w ${b.width.toFixed(1)} h ${b.height.toFixed(1)}\n` +
+          `SET top ${s.top.toFixed(1)}px right ${(vw - s.right).toFixed(1)}px size ${s.width.toFixed(1)}px`;
+      };
+      tick();
+      t = window.setInterval(tick, 500);
+    } catch {}
+    return () => { try { if (t) window.clearInterval(t); if (d) d.remove(); } catch {} };
+  }, []);
   /* DIAGNOSTIC item 8: the ?dropdebug=1 readout. Built imperatively, like the
      swipe debug bar in BreedTree, so no render of this component can clear it.
      REMOVE ONCE ITEM 8 IS FIXED. */
