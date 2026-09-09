@@ -548,9 +548,9 @@
 }
 
 /* .learnWash, .learnWashPeek and .learnWashOn were removed on 9 Sept 2026 with
-   the element in BreedTree.tsx. See the note there. */
-
-}
+   the element in BreedTree.tsx. See the note there. The reduced-motion @media
+   block that wrapped one of them went with it; the stray closing brace it left
+   behind broke the Turbopack build and is removed here. */
 
 /* Round portrait of the dog whose tree is open, at the head of the docked box.
    Mini pit only: the chum page caption stays text-only. */
