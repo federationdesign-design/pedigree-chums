@@ -726,14 +726,29 @@ export default function TimelineRun({
               HistoryVertical.tsx lays each era out as its section FIRST and its
               era screen second, so an era screen is always the last panel of
               its era. Do not "correct" this to +2. */}
-          <button
-            type="button"
-            className={styles.railEndCard}
-            data-goto={panelIndex + 1}
-            aria-label="Continue to the next era"
-          >
-            <span className={styles.railEndWord}>Next era</span>
-          </button>
+          <div className={styles.railEndSlot}>
+            <div className={styles.dogCard}>
+              {/* Built from the dog card's OWN pieces, not a lookalike.
+                  .dogCard sets the width, .dogFlipInner the 1:1 square, and
+                  .dogBack the yellow face, its radius, its padding and its
+                  centring. If any of those are retuned this follows for free,
+                  which a copy would not. */}
+              <span className={styles.dogFlipInner}>
+                <span className={`${styles.dogBack} ${styles.railEndFace}`}>
+                  <button
+                    type="button"
+                    className={styles.dogHint}
+                    data-goto={panelIndex + 1}
+                  >
+                    Next era
+                  </button>
+                  <span className={styles.dogNote}>
+                    View the next historical era&rsquo;s dogs
+                  </span>
+                </span>
+              </span>
+            </div>
+          </div>
         </div>
           {/* The only cue that the dogs move sideways. A sibling of the rail,
               not a child, exactly as .stripScrollbar is a sibling of

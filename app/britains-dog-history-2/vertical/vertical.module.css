@@ -2175,56 +2175,34 @@
 
 /* ==== 4C-BLOCK ==== */
 /* ============================================================================
-   STAGE 4C, 1 September 2026 (Steve). The last card on every dog rail, the way
-   into the next era. Replaces stage 4a, the scroll-driven era, which he tried
-   and found awkward. See the note on the button in TimelineRunV.tsx.
+   STAGE 4C, 1 September 2026 (Steve). THE LAST CARD ON EVERY DOG RAIL.
+
+   It replaces stage 4a, the scroll-driven era, which he tried and found
+   awkward. See the note on the markup in TimelineRunV.tsx before changing it.
+
+   IT IS A REAL DOG CARD, NOT A LOOKALIKE. The markup uses .dogCard,
+   .dogFlipInner and .dogBack, so it inherits the width, the 1:1 square, the
+   yellow, the corner radius and the centring from the same rules the dogs use.
+   Retune a dog card and this follows. That is the point: Steve asked for
+   exactly the flipped yellow face, and the only way to keep "exactly" true over
+   time is to share the rules rather than copy the values.
    ========================================================================= */
 
-/* Sized as a rail slot but narrower than a dog, because it is a signpost and
-   not a card. The sliver of it showing past the last dog is what tells a reader
-   there is anything after the dogs at all. */
-.railEndCard {
+/* The rail slot. Same width as a dog's slot so the row does not step. */
+.railEndSlot {
   flex: 0 0 auto;
-  width: clamp(104px, 30vw, 148px);
-  /* Matches the dog card's height so the row does not step. A dog is a 1:1
-     square of its slot, and that slot is min(86vw, 372px). Keep the two in
-     step if either moves. */
-  height: min(86vw, 372px);
+  width: min(86vw, 372px);
   scroll-snap-align: center;
   scroll-snap-stop: always;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-  appearance: none;
-  cursor: pointer;
-  padding: 12px;
-  border: 3px solid #ffffff;
-  border-radius: 18px;
-  background: var(--blue-deep, #0c5b92);
-  color: #ffffff;
-}
-.railEndWord {
-  font-family: var(--font-display, "Luckiest Guy", system-ui);
-  font-size: clamp(1.1rem, 5vw, 1.5rem);
-  letter-spacing: 0.03em;
-  line-height: 1.05;
-  text-align: center;
 }
 
-
-/* ==== 4B-BLOCK ==== */
-/* ============================================================================
-   STAGE 4B, 1 September 2026 (Steve). The yellow progress bar was drawing in
-   FRONT of the fact circle.
-
-   The stack was .stickyTop 3, .factImg 4, .progress 5. The bar has to sit above
-   the section photograph, which is what the 5 was for, but that also put it
-   above the circle, and the circle is lifted so it deliberately breaks the seam
-   line the bar runs along. The two were always going to meet.
-
-   The circle goes above the bar rather than the bar below the photograph,
-   because the bar still needs to be seen against the picture. */
-.factImg {
-  z-index: 6;
+/* The face is already .dogBack, which is rotateY(180deg) because it is the far
+   side of a flip. Nothing flips here, so it is turned back to the front.
+   No border: the dog cards have none, and Steve asked for none. */
+.railEndFace {
+  transform: none;
+  border: 0;
 }
