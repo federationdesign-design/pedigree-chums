@@ -92,6 +92,9 @@ type Props = {
   /* The clicked history card's viewport rect, so the time tunnel's card dives
      from where it sat. Optional: absent means the tunnel dives from centre. */
   fromRect?: { x: number; y: number; w: number; h: number };
+  /* Skip the time tunnel: this level change is navigation between start
+     screens, not an entry into the pit. Set by BreedStrip's navTo. */
+  quiet?: boolean;
   onClose: () => void;
   nextLevelLabel?: string;
   /* The next era's name, set only when the level just won is the last of its
@@ -167,7 +170,7 @@ type Props = {
   era?: string;
 };
 
-export default function LineageModal({ name, image, character, lineage, fromRect, onClose, nextLevelLabel, onNextLevel, onNavPrev, onNavNext, onNavPrevEra, onNavNextEra, onStartOver, initialScore, onScoreChange, bankedScore, onBankScore, era, lives, livesMax = 6, onLost, onSpendLife, onResetRun, nextLevelImage, levelNo, eraJoinLabel, onLevelChums, onChumCaught, topChum, runChumsFound, runChumsPossible }: Props) {
+export default function LineageModal({ name, image, character, lineage, fromRect, onClose, quiet, nextLevelLabel, onNextLevel, onNavPrev, onNavNext, onNavPrevEra, onNavNextEra, onStartOver, initialScore, onScoreChange, bankedScore, onBankScore, era, lives, livesMax = 6, onLost, onSpendLife, onResetRun, nextLevelImage, levelNo, eraJoinLabel, onLevelChums, onChumCaught, topChum, runChumsFound, runChumsPossible }: Props) {
   const theme = levelThemeFor(era);
   // The close X asks before it closes. A round can take a couple of minutes to
   // build up, and losing it to a mis-tap in the corner is a rotten exit.
@@ -180,7 +183,12 @@ export default function LineageModal({ name, image, character, lineage, fromRect
   // never mounts, so there is no flash and the pit is there at once. It stays
   // down after the first play, so an in-pit retry does not replay it: the tunnel
   // is the "enter the pit" moment, not a per-round one.
+  /* `quiet` suppresses it outright (9 Sept 2026). BreedStrip sets it when the
+     level changed by a start-screen swipe or D-pad press rather than by opening
+     the pit, because that is browsing, not arriving. Read at mount only, which
+     is all that is needed: this component remounts on every level change. */
   const [tunnelActive, setTunnelActive] = useState(() => {
+    if (quiet) return false;
     if (typeof window === "undefined") return false;
     return !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   });
@@ -189,6 +197,10 @@ export default function LineageModal({ name, image, character, lineage, fromRect
   // mirror of "the tunnel is playing" (so under reduced motion the pit enters
   // normally, unheld); resolving flips once, when the tunnel begins clearing.
   const [holdEntrance] = useState(() => {
+    // Must follow tunnelActive exactly: it exists to hold the pit back WHILE the
+    // tunnel plays. Left true with no tunnel to clear it, the drop-in would be
+    // held for ever and the circles would never arrive.
+    if (quiet) return false;
     if (typeof window === "undefined") return false;
     return !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   });

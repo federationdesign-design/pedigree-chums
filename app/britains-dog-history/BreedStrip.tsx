@@ -119,6 +119,14 @@ export default function BreedStrip({
     lineage: LineageNode;
     // The clicked card's on-screen rect, so the tunnel's card dives from it.
     fromRect?: { x: number; y: number; w: number; h: number };
+    /* NO TIME TUNNEL, 9 Sept 2026. LineageModal remounts on every level change,
+       and its tunnel state initialises to "play" on mount, so swiping between
+       dogs on the start screen replayed the whole arrival sequence each time.
+       The tunnel is the "enter the pit" moment. Browsing from one start screen
+       to the next is not an arrival, so it is suppressed for those and those
+       only. Tapping a card from the page, and finishing a level and taking the
+       next one, both still play it. */
+    quiet?: boolean;
   };
   const [active, setActive] = useState<Active | null>(null);
   // Bumped on a retry so the modal remounts even though the level name has not
@@ -236,7 +244,8 @@ export default function BreedStrip({
   };
   const navTo = (b: UKBreed | null) => {
     const na = b ? buildActive(b) : null;
-    if (na) setActive(na);
+    // quiet: this is navigation between start screens, not an arrival.
+    if (na) setActive({ ...na, quiet: true });
   };
 
   /* What a tap on a dog does. Lifted out of the rail's own map so the slider
@@ -587,6 +596,7 @@ export default function BreedStrip({
       fact={active.fact}
       lineage={active.lineage}
       fromRect={active.fromRect}
+      quiet={active.quiet}
       onClose={() => {
         // Walking out of a live round forfeits it, the same as losing it. The
         // modal does this for its own back-out controls; this is the last way
