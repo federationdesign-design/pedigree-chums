@@ -9510,8 +9510,6 @@ export default function BreedTree({
           }
           circular
           ringColor={learnCard.ring}
-          ringWidthFrac={learnCard.ringFrac}
-          ringWidthPx={learnCard.ringPx}
           // Rarity band across the lifted circle: tier from the lifted dog's
           // in-pit appearance count. Every dog gets one (common is not silent).
           rarityTier={rarityTier(treesContaining(learnNode.data.name))}

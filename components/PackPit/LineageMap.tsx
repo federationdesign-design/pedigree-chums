@@ -297,8 +297,6 @@ export default function LineageMap({
   soloLeaf = false,
   rootRadius,
   ringColor,
-  ringWidthFrac,
-  ringWidthPx,
   rarityTier,
   strongBg = false,
   initialDepth,
@@ -320,13 +318,6 @@ export default function LineageMap({
   // the circle looks like the one just picked up. Without it the card keeps its
   // own yellow stroke over a blue fill, which reads as two thin rings.
   ringColor?: string;
-  /* THE LIFTED RING'S WEIGHT, as a fraction of the card's radius. Supplied by
-     whoever lifted the circle so the ring on the card matches the ring that
-     circle wore in the pit. Optional: without it the old ringFrac(1) is used. */
-  ringWidthFrac?: number;
-  /* THE LIFTED RING'S WEIGHT IN PIXELS, which wins over the fraction when it is
-     given. The fraction still sizes the card; this decides what is drawn. */
-  ringWidthPx?: number;
   // Mini pit only: the rarity tier of the lifted dog, drawn as a coloured band
   // across the bottom of the circle. Set for every lifted dog (common included).
   rarityTier?: "extremelyRare" | "rare" | "uncommon" | "common";
@@ -449,7 +440,27 @@ export default function LineageMap({
      IT ALSO SIZES THE CARD, through the (2 + frac) budget below, so a thinner
      ring buys a slightly larger picture. That is a couple of pixels and it is the
      correct direction. */
-  const liftRingFrac = ringWidthFrac ?? ringFrac(1);
+  /* ONE WEIGHT FOR EVERY LIFT, 9 Sept 2026 (owner): "the thinner is the ideal
+     version that we should be going for".
+
+     THIS REVERSES THE 2 SEPTEMBER RULE ABOVE, deliberately. Carrying the pit's
+     own ring across meant the drawn line varied dog by dog: the lift FLOORS a
+     small circle up to the minimum card while the ring came over at a fixed
+     pixel width, so a small dog blown up read thin and a big dog read heavy.
+     The note above calls that consequence intended. On the device it reads as
+     an inconsistency, so it goes.
+
+     0.065 is the thinnest entry in RING_FRAC, the weight a depth-5 circle wears
+     in the pit, so nothing gets heavier than it is today. It is a fraction of
+     the LIFTED radius, so it follows the card at any screen size, and it sizes
+     the card through the (2 + frac) budget below exactly as before.
+
+     The ringWidthFrac and ringWidthPx props that carried the pit's weight are
+     gone with it, along with the two lines in BreedTree that passed them. The
+     learnCard fields behind those two lines are left in place, unread, so this
+     can be put back by restoring the props alone. */
+  const LIFT_RING_FRAC = 0.065;
+  const liftRingFrac = LIFT_RING_FRAC;
   // Floor the tapped radius up to the 250-wide minimum, then cap by the share so
   // a narrow viewport never exceeds its own maximum card (176 at 390). Both the
   // floor and the share divide the same (2 + frac) width budget.
@@ -473,7 +484,7 @@ export default function LineageMap({
      read as PROPORTIONALLY thinner than it did in the pit, because the picture
      grew and the line did not. The outer glow around it is separate and will
      still make the whole thing look larger than the line itself. */
-  const liftRingW = circular && ringColor ? (ringWidthPx ?? liftR * liftRingFrac) : 5;
+  const liftRingW = circular && ringColor ? liftR * liftRingFrac : 5;
   // The Learn/Complete button is a fixed 200x68. On a small card that swamps
   // the picture, so it scales WITH the card: width 1.8 * R (~151px on a 390
   // phone, tuned up from 1.4 by eye on the device), capped at
