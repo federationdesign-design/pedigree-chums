@@ -2154,3 +2154,20 @@
 .markerTree {
   display: none;
 }
+
+
+/* ==== 3K-BLOCK ==== */
+/* ============================================================================
+   STAGE 3K, 1 September 2026 (Steve). The era title down another 10px.
+
+   92 at 3f, 102 at 3i, 112 now. Written as its own line rather than by editing
+   3i, so the three steps stay visible: this figure has been tuned by eye
+   against a real handset twice, and knowing it moved twice is worth more than
+   a tidy single declaration.
+
+   The era paragraph freed about 86px at 3h. Twenty of that has now gone back
+   into the header, leaving roughly 66px in hand before the dog card starts to
+   crop again. */
+.eraTitleBand {
+  padding-top: 112px;
+}
