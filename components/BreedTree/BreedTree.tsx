@@ -1115,7 +1115,25 @@ const rollBomb = () => Math.random() < 1 / BOMB_ODDS;
    makes the smallest ones disappear at a slightly larger circle than before. That
    is the existing rule working, not a new fault. */
 const BADGE_FRAC = 0.20;
-const BADGE_FLOOR_PX = 13.5;
+/* 13.5 -> 11, 9 Sept 2026 (owner).
+   Not a taste change. The enclosing-circle fit landed earlier the same day made
+   every multi-circle cluster smaller, because a constant circle in a portrait
+   frame is bound by the width. A badge is BADGE_FRAC of its OWN dog's radius,
+   so smaller circles meant smaller badges, and this floor drops a badge to
+   NOTHING rather than clamping it up. Whole levels lost their percentages.
+   Measured across all 149 multi-circle levels under the new fit:
+     13.5px  234/353 badges,  89 levels missing at least one
+     11px    272/353 badges,  59 levels missing at least one
+      9px    291/353 badges,  48 levels missing at least one
+   11 was chosen over 9 on purpose. The floor exists so an unreadable number is
+   not shown at all, and each step down buys fewer badges than the one before
+   while making the smallest ones harder to read. 11 recovers the biggest single
+   jump, 11 points, for the least cost.
+   IT DOES NOT RECOVER EVERYTHING, and it cannot: a badge on a genuinely tiny
+   circle has nowhere legible to go. If more are wanted, the honest lever is
+   RING_FILL in relayoutMobile, which makes the circles themselves bigger, not
+   this. */
+const BADGE_FLOOR_PX = 11;
 const badgeDrawForNode = (nodeR: number, k: number, floorVb: number) => {
   const badge = BADGE_FRAC * nodeR * k;
   return badge < floorVb ? 0 : badge;
