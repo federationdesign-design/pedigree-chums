@@ -78,7 +78,10 @@
   font-weight: 800;
   cursor: pointer;
   box-shadow: 0 4px 0 rgba(10, 58, 87, 0.3);
-  z-index: 2;
+  /* The z-index: 2 that used to sit here was left over from the days when this
+     button was a CHILD of the overlay, and being last it beat the 62 above and
+     put the back icon under the overlay. Removed 9 Sept 2026. Do not restore
+     it: read the comment on z-index: 62 above first. */
 }
 .close:hover {
   filter: brightness(0.95);
