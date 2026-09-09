@@ -2810,7 +2810,19 @@ export default function LineageMap({
                     if (cd && e.pointerId === cd.id) {
                       try { (e.currentTarget as Element).releasePointerCapture(e.pointerId); } catch {}
                       if (cd.moved) {
-                        const hit = frames.find((f) => Math.abs(e.clientX - f.sx) <= CW / 2 && Math.abs(e.clientY - f.sy) <= CW / 2);
+                        /* THE DROP IS TESTED ON THE CARD, NOT THE FINGER (9 Sept 2026).
+                           It used to compare e.clientX/Y against the frame, so a
+                           card sitting squarely in its frame was refused whenever
+                           the grip was more than half a card off centre. That is
+                           why a re-picked-up card was rejected: the second grip
+                           sits wherever you catch it, and the readout showed the
+                           card 11px from the frame centre while the finger was 35px
+                           away, five past the 30px half. cardCx/cardCy are the card
+                           centre in SCREEN space, which is what the player is aiming
+                           and what they can see. Do not put the pointer test back. */
+                        const cardCx = cd.ox + (e.clientX - cd.sx) + pan.x;
+                        const cardCy = cd.oy + (e.clientY - cd.sy) + pan.y;
+                        const hit = frames.find((f) => Math.abs(cardCx - f.sx) <= CW / 2 && Math.abs(cardCy - f.sy) <= CW / 2);
                         if (hit && hit.img === c.img && !filled.has(hit.id)) {
                           // first copy of this breed: it fills the frame (+100)
                           setFilled((m) => { const x = new Map(m); for (const [fid, cid] of x) if (cid === c.id) x.delete(fid); x.set(hit.id, c.id); return x; });
@@ -2838,7 +2850,9 @@ export default function LineageMap({
                           if (correctFrame) { setCorrectFlash(correctFrame.id); window.setTimeout(() => setCorrectFlash((cf) => cf === correctFrame.id ? null : cf), 800); }
                           // a wrong box repels: bump the card just outside its edge, in the
                           // direction it came from, rather than flinging it back to the start
-                          let dx = e.clientX - hit.sx, dy = e.clientY - hit.sy;
+                          // direction off the card centre too, so the bump follows the
+                          // card out rather than wherever the finger happened to sit
+                          let dx = cardCx - hit.sx, dy = cardCy - hit.sy;
                           let len = Math.hypot(dx, dy);
                           if (len < 6) { dx = 0; dy = 1; len = 1; } // dropped dead-centre: spit it out the bottom
                           const push = CW * 0.95 + 14; // frame centre to card centre, just clear of the edge
