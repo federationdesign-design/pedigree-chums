@@ -201,12 +201,28 @@ export async function getCounts(): Promise<Counts> {
   };
 }
 
-// Recent rows for the on-screen table (newest first). CSV export uses the *ordered* readers below.
+/* Recent rows for the on-screen table (newest first). CSV export uses the *ordered*
+   readers below, and those are deliberately unfiltered: everything still lands in
+   the database and still comes out in the export.
+
+   PC-ADMIN-1, 9 Sep 2026. The table now shows only turns where the visitor actually
+   typed. It used to be a plain SELECT *, and a dog speaking unprompted writes a row
+   too (PickAChumExperience.tsx lines 506, 525 and 929, trigger 'appearance', empty
+   input). One of those fires on most page loads while a real conversation needs
+   somebody to type, so the openers were crowding the 200 slots and the actual
+   conversations fell off the bottom.
+
+   Filtered on input rather than on trigger, at Steve's choice: this is the "what did
+   people say" table, so link follows, hat finds and closes are out as well.
+
+   The appearances are NOT deleted and must not be. recorder-store.ts line 434 reads
+   them for hadAppearance, and appearances against replies is how you tell whether an
+   opener works at all. */
 export async function getRecentTurns(limit: number): Promise<Record<string, unknown>[]> {
   const sql = getSql();
   if (!sql) return [];
   await ensureSchema();
-  return sql`SELECT * FROM pc_turns ORDER BY id DESC LIMIT ${limit}` as Promise<Record<string, unknown>[]>;
+  return sql`SELECT * FROM pc_turns WHERE trim(input) <> '' ORDER BY id DESC LIMIT ${limit}` as Promise<Record<string, unknown>[]>;
 }
 
 export async function getRecentSessions(limit: number): Promise<Record<string, unknown>[]> {

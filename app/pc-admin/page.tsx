@@ -145,7 +145,10 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ e
         </a>
       </div>
 
-      <h2 className={styles.sectionTitle}>Turns (latest {RECENT_LIMIT})</h2>
+      {/* Heading says "typed" because getRecentTurns filters to rows with a real
+          input. Unprompted dog lines are still recorded and still in the CSV, they
+          are just not what this table is for. See PC-ADMIN-1 in lib/pcSync/db.ts. */}
+      <h2 className={styles.sectionTitle}>Turns typed by visitors (latest {RECENT_LIMIT})</h2>
       <DataTable columns={TURN_COLUMNS} rows={turns} />
 
       <h2 className={styles.sectionTitle}>Sessions (latest {RECENT_LIMIT})</h2>
