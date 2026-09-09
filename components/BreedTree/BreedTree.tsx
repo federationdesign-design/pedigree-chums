@@ -2334,43 +2334,47 @@ export default function BreedTree({
   });
 
   useEffect(() => {
-    const el = stageRef.current;
-    if (!el) return;
-    /* The readout itself. Only built when ?swipedebug=1 is in the URL, so it
-       cannot appear for a reader. Fixed to the top of the screen, above
-       everything, and it ignores pointer events so it cannot eat a gesture. */
-    let dbg: HTMLDivElement | null = null;
-    try {
-      if (new URLSearchParams(window.location.search).get("swipedebug") === "1") {
-        dbg = document.createElement("div");
-        dbg.setAttribute("data-swipe-debug", "1");
-        dbg.style.cssText =
+    /* BOUND TO THE DOCUMENT, NOT THE STAGE (9 Sept 2026).
+       The first cut bound these to stageRef.current inside an effect with []
+       dependencies. On a phone that ref was still null when the effect ran, so
+       it returned early and, having no dependencies, never ran again. Nothing
+       was ever bound and no gesture could fire. The debug bar was built after
+       that same early return, which is why not even the bar appeared.
+       The document is always there, so there is nothing to be null. Capture
+       phase still does the real work: startDrag calls stopPropagation on every
+       circle, toy and pill, so a bubble-phase listener would never hear a swipe
+       that began on a dog, and the owner asked for it to work anywhere. */
+    const dbg = (() => {
+      try {
+        if (new URLSearchParams(window.location.search).get("swipedebug") !== "1") return null;
+        const d = document.createElement("div");
+        d.style.cssText =
           "position:fixed;left:0;right:0;top:0;z-index:99999;background:#000;color:#0f0;" +
           "font:12px/1.4 monospace;padding:6px 8px;pointer-events:none;white-space:pre-wrap";
-        dbg.textContent = "swipe debug ready: flick anywhere on the pit";
-        document.body.appendChild(dbg);
-      }
-    } catch { /* no window search, nothing to do */ }
+        d.textContent = "swipe debug ready: flick anywhere on the pit";
+        document.body.appendChild(d);
+        return d;
+      } catch { return null; }
+    })();
     const down = (e: PointerEvent) => {
+      /* Controls keep their own gestures. The difficulty slider in particular
+         is a vertical drag on the start screen, which is exactly the shape of
+         an era swipe, so a press starting there must never be read as one. */
+      const t = e.target as HTMLElement | null;
+      if (t?.closest?.('button, a, input, select, textarea, [role="slider"]')) { swipeRef.current = null; return; }
       if (!navRef.current.on) { swipeRef.current = null; return; }
       swipeRef.current = { x: e.clientX, y: e.clientY, t: performance.now() };
     };
     const up = (e: PointerEvent) => {
       const p = swipeRef.current;
       swipeRef.current = null;
-      /* TEMPORARY DIAGNOSTIC, add ?swipedebug=1 to the URL. Prints what the
-         gesture actually measured and which gate stopped it, because "I cannot
-         swipe" has four possible causes and guessing between them wastes a
-         deploy each time. REMOVE once the thresholds are settled. */
       if (dbg) {
         const n0 = navRef.current;
         const wired = [n0.prev ? "L" : "-", n0.next ? "R" : "-", n0.prevEra ? "U" : "-", n0.nextEra ? "D" : "-"].join("");
-        if (!p) { dbg.textContent = "no pointerdown seen (navOn was false at press)"; return; }
-        const ddx = e.clientX - p.x, ddy = e.clientY - p.y;
-        const ms = Math.round(performance.now() - p.t);
+        if (!p) { dbg.textContent = `ignored at press | on ${n0.on} | wired ${wired}`; return; }
         dbg.textContent =
-          `dx ${Math.round(ddx)} dy ${Math.round(ddy)} ms ${ms} | on ${navRef.current.on} | wired ${wired}` +
-          ` | need ${SWIPE_MIN}px in ${SWIPE_MS}ms`;
+          `dx ${Math.round(e.clientX - p.x)} dy ${Math.round(e.clientY - p.y)} ms ${Math.round(performance.now() - p.t)}` +
+          ` | on ${n0.on} | wired ${wired} | need ${SWIPE_MIN}px in ${SWIPE_MS}ms`;
       }
       if (!p || !navRef.current.on) return;
       const dx = e.clientX - p.x, dy = e.clientY - p.y;
@@ -2380,21 +2384,22 @@ export default function BreedTree({
       const n = navRef.current;
       /* DIRECTIONS ARE THE OWNER'S, taken literally and NOT the carousel
          convention. Swipe right for next, left for previous, DOWN for the next
-         era, up for the last era. That is the opposite of a photo carousel,
-         where you drag left to bring the next item in, and it is deliberate: it
-         makes the swipe agree with the D-pad, where the right arrow is NEXT and
-         the DOWN arrow is NEXT ERA. Two mental models would be one too many.
+         era, up for the last era. That is the opposite of a photo carousel, and
+         it is deliberate: it makes the swipe agree with the D-pad, where the
+         right arrow is NEXT and the DOWN arrow is NEXT ERA.
          To flip either axis, swap the pair on its line. */
       if (ax >= ay * SWIPE_BIAS) (dx > 0 ? n.next : n.prev)?.();
       else if (ay >= ax * SWIPE_BIAS) (dy > 0 ? n.nextEra : n.prevEra)?.();
       // Neither axis dominant: a diagonal smear, deliberately ignored.
     };
-    el.addEventListener("pointerdown", down, { capture: true });
-    el.addEventListener("pointerup", up, { capture: true });
-    el.addEventListener("pointercancel", () => { swipeRef.current = null; }, { capture: true });
+    const cancel = () => { swipeRef.current = null; };
+    document.addEventListener("pointerdown", down, { capture: true });
+    document.addEventListener("pointerup", up, { capture: true });
+    document.addEventListener("pointercancel", cancel, { capture: true });
     return () => {
-      el.removeEventListener("pointerdown", down, { capture: true } as EventListenerOptions);
-      el.removeEventListener("pointerup", up, { capture: true } as EventListenerOptions);
+      document.removeEventListener("pointerdown", down, { capture: true } as EventListenerOptions);
+      document.removeEventListener("pointerup", up, { capture: true } as EventListenerOptions);
+      document.removeEventListener("pointercancel", cancel, { capture: true } as EventListenerOptions);
       dbg?.remove();
     };
   }, []);
