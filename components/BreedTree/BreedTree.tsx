@@ -1138,11 +1138,23 @@ const BADGE_FRAC = 0.20;
    circle has nowhere legible to go. If more are wanted, the honest lever is
    RING_FILL in relayoutMobile, which makes the circles themselves bigger, not
    this. */
+/* THE FLOOR IS OFF, 9 Sept 2026 (owner). Everything above is the reasoning
+   that put it at 11, and it was sound while the aim was legibility. The aim has
+   changed: "I do not mind that they cannot be understood or read, I am doing
+   this so I can get some extra debris into the pit."
+
+   AND IT WAS NEVER SAVING ANYTHING. A chip under the floor was still created,
+   still given a physics body, still collided and still counted toward the pit
+   filling. Only the drawing was skipped. Measured on Scottish Terrier with
+   ?badgedebug=1: badges 10, drawn 2, hidden 8. Eight live objects the player
+   could not see. Showing them adds no bodies and no load, because the load was
+   already being paid.
+
+   BADGE_FLOOR_PX stays at 11 and badgeFloorVb still computes it, because the
+   readout reports against it and it is one line to put back. Nothing applies it
+   any more. */
 const BADGE_FLOOR_PX = 11;
-const badgeDrawForNode = (nodeR: number, k: number, floorVb: number) => {
-  const badge = BADGE_FRAC * nodeR * k;
-  return badge < floorVb ? 0 : badge;
-};
+const badgeDrawForNode = (nodeR: number, k: number) => BADGE_FRAC * nodeR * k;
 
 // Split words into exactly n lines as evenly as the word lengths allow.
 // Returns null when n lines are not reachable (a single long word can force
@@ -2740,7 +2752,6 @@ export default function BreedTree({
   useEffect(() => {
     if (!dockAside) return;
     const k = SIZE / viewRef.current[2];
-    const floorVb = badgeFloorVb();
     /* THE ONE PLACE THAT DECIDES WHICH CIRCLES CARRY A BADGE. Stage 2 widens
        this filter and nothing else, because nothing else counts into the dog
        list any more. It is deliberately still depth 1 here. */
@@ -2749,7 +2760,7 @@ export default function BreedTree({
     setBadgePcts(
       badgeNodes.map((n) => {
         const pct = n.parent ? Math.round(((n.value ?? 0) / (n.parent.value || 1)) * 100) : 0;
-        return { pct, r: badgeDrawForNode(n.r, k, floorVb), src: n };
+        return { pct, r: badgeDrawForNode(n.r, k), src: n };
       }),
     );
     // k reads only viewRef.current[2], the view WIDTH, and the corrected seed above makes that width exact at
@@ -4521,7 +4532,6 @@ export default function BreedTree({
       // Every badge is the flat fixed radius (badgeFloorVb); a circle whose drawn
       // radius (n.r * k) is smaller than that disc gets no badge (badgeDrawForNode
       // returns 0), so a badge never swallows its own dog.
-      const badgeFloor = badgeFloorVb();
       /* NOT d1. The badges come from their own list now, so widening it in
          stage 2 cannot turn a nested circle into a falling dog. Today it
          returns the same circles d1 does, which is why this stage is
@@ -4532,7 +4542,7 @@ export default function BreedTree({
         // bottom LEFT of the circle: the right side is where the level's own
         // furniture sits, and a badge there crowded it
         n: null, x: n.x - n.r * 0.707, y: n.y + n.r * 0.707, vx: 0, vy: 0,
-        r: badgeDrawForNode(n.r, k, badgeFloor) / k, rDraw: badgeDrawForNode(n.r, k, badgeFloor), pct: pctOf(n), idx: i, lastFx: 0, popped: true, a: 0, va: 0, ia: 0, iva: 0, charges: 10, green: false,
+        r: badgeDrawForNode(n.r, k) / k, rDraw: badgeDrawForNode(n.r, k), pct: pctOf(n), idx: i, lastFx: 0, popped: true, a: 0, va: 0, ia: 0, iva: 0, charges: 10, green: false,
       }));
       badgeBodiesRef.current = badges;
 
@@ -5003,7 +5013,7 @@ export default function BreedTree({
             const kidBomb = rollBomb();
             const kb: Body = {
               n: null, x: ch.x - ch.r * 0.6, y: ch.y + ch.r * 0.6, vx: 0, vy: 0,
-              r: badgeDrawForNode(ch.r, k, badgeFloor) / k, rDraw: badgeDrawForNode(ch.r, k, badgeFloor),
+              r: badgeDrawForNode(ch.r, k) / k, rDraw: badgeDrawForNode(ch.r, k),
               pct: pctOf(ch), idx: bl.length, lastFx: 0, popped: true,
               a: 0, va: 0, ia: 0, iva: 0, charges: 10, green: false, bomb: kidBomb,
             };
@@ -5014,7 +5024,7 @@ export default function BreedTree({
             newMbs.push(mbb);
             // Both homes, same order. See badgeSrcRef.
             badgeSrcRef.current.push(ch);
-            setBadgePcts((l) => [...l, { pct: kb.pct, r: badgeDrawForNode(ch.r, k, badgeFloor), bomb: kidBomb, src: ch }]);
+            setBadgePcts((l) => [...l, { pct: kb.pct, r: badgeDrawForNode(ch.r, k), bomb: kidBomb, src: ch }]);
           }
         });
         // resolve the deliberate word/circle overlap without an explosion
@@ -5067,14 +5077,14 @@ export default function BreedTree({
             // the roll belongs here as much as in the scatter. Without it a bomb
             // only ever arrives from the lineage layer and stays rare.
             const popBomb = rollBomb();
-            const bb: Body = { n: null, x: ch.x - ch.r * 0.6, y: ch.y + ch.r * 0.6, vx: 0, vy: 0, r: badgeDrawForNode(ch.r, k, badgeFloor) / k, rDraw: badgeDrawForNode(ch.r, k, badgeFloor), pct: pctOf(ch), idx: bl.length, lastFx: 0, popped: true, a: 0, va: 0, ia: 0, iva: 0, charges: 10, green: false, bomb: popBomb };
+            const bb: Body = { n: null, x: ch.x - ch.r * 0.6, y: ch.y + ch.r * 0.6, vx: 0, vy: 0, r: badgeDrawForNode(ch.r, k) / k, rDraw: badgeDrawForNode(ch.r, k), pct: pctOf(ch), idx: bl.length, lastFx: 0, popped: true, a: 0, va: 0, ia: 0, iva: 0, charges: 10, green: false, bomb: popBomb };
             bl.push(bb);
             all.push(bb);
             const mbb = mkCircle(bb, "badge", BADGE_OPTS);
             MBody.setVelocity(mbb, { x: mb.velocity.x * 0.8 + (Math.random() - 0.5) * vps(0.3), y: mb.velocity.y * 0.8 });
             newMbs.push(mbb);
             badgeSrcRef.current.push(ch);
-            setBadgePcts((l) => [...l, { pct: bb.pct, r: badgeDrawForNode(ch.r, k, badgeFloor), bomb: popBomb, src: ch }]);
+            setBadgePcts((l) => [...l, { pct: bb.pct, r: badgeDrawForNode(ch.r, k), bomb: popBomb, src: ch }]);
           }
         }
         if (newMbs.length > 1) ghost(newMbs);
@@ -5642,7 +5652,6 @@ export default function BreedTree({
         // share s lands at the badge a native pit dog of that share would carry.
         // All in viewBox units, the same space as chipFloor, so the cutoff compares
         // like for like; shows nothing only if even that pit-sized disc is under it.
-        const chipFloor = badgeFloorVb();
         const shareOf = (n: Node) => (n.parent ? Math.round(((n.value ?? 0) / (n.parent.value || 1)) * 100) : 0);
         const pitD1 = nodes.filter((n) => n.depth === 1);
         const pitPer = pitD1.length ? pitD1.reduce((a, n) => a + (n.r * kD) / pctRadius(shareOf(n)), 0) / pitD1.length : 0;
@@ -5656,7 +5665,9 @@ export default function BreedTree({
         const rDraw = opts?.green && opts?.r != null
           ? opts.r * fxScale
           : opts?.label ? (opts?.r ?? 0)
-          : chipBadge < chipFloor ? 0 : chipBadge;
+          // The floor is off here too, or a chip scattered in from the learn
+          // layer would still vanish while a popped one shows. See badgeDrawForNode.
+          : chipBadge;
         // A solo dog circle arrives through this same call carrying a label,
         // and that one is never a bomb: it is a whole breed, not a chip.
         const isBomb = !opts?.label && rollBomb();
