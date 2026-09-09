@@ -6321,7 +6321,40 @@ export default function BreedTree({
         drawNumbers(now, viewRef.current);
         checkFull(now);
         stillFrames = still ? stillFrames + 1 : 0;
-        if ((stillFrames < 12 || numbers.length > 0) && now - started < 30000) {
+        /* THE LOOP NO LONGER STOPS MID-ROUND, 9 Sept 2026 (owner: "solve the
+           freeze first").
+
+           WHAT WAS WRONG. This bail ended the rAF loop after 12 still frames,
+           about a fifth of a second of everything being at rest, with a hard 30
+           second cap on top. Only wake() restarted it, and wake() has just five
+           callers in the whole file: three inside startDrag and two on the
+           scatter path. Collecting a chum does not call it. Nor does a bomb
+           blowing, a badge going inert, or anything else that changes the world
+           mid-round. So the pit stopped and stayed stopped, and shake was the
+           only way back, because shake drags.
+           It was not only a visual freeze. computeFull reads the BRIDGE
+           coordinates (b.x, b.y, b.vx, b.vy), which this loop is what updates.
+           With the loop stopped they froze at their last values, so the pit-full
+           test kept answering from a world that no longer existed and the
+           countdown carried on over a pit the player had already cleared.
+
+           WHY IT IS SAFE TO REMOVE. Two idle mechanisms were running and this is
+           the older one. `enableSleeping: true` was added to the engine on 1
+           September, AFTER this bail was written, and does the same job properly:
+           a sleeping body costs almost nothing to step and wakes on force rather
+           than needing something to remember to call wake(). Keeping both meant
+           the redundant one silently froze the game.
+
+           WHAT IS KEPT. Once the round has ended, the original expression runs
+           verbatim, still frames and 30 second cap included, so the loop still
+           winds down when there is nothing to play. And the effect's cleanup
+           cancels the rAF on unmount either way, so nothing runs on past the pit.
+
+           THE ALTERNATIVES, both rejected: adding wake() to every mutation site
+           (precise, but one missed site is a fresh freeze), and letting the 400ms
+           poll wake it (a safety net that still leaves 400ms of stale world). */
+        const roundLive = !pitEndedRef.current;
+        if (roundLive || ((stillFrames < 12 || numbers.length > 0) && now - started < 30000)) {
           fallRafRef.current = requestAnimationFrame(step);
         } else {
           simRunningRef.current = false;
