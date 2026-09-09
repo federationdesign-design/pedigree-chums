@@ -776,7 +776,7 @@ export default function TimelineRun({
                 aria-label="Continue to the next era"
               >
                 <svg viewBox="0 0 24 24" aria-hidden="true" className={styles.railEndArrow}>
-                  <path d="M5 12h13M13 6l6 6-6 6" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M12 5v13M6 13l6 6 6-6" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </button>
             </div>

@@ -2227,7 +2227,13 @@
 }
 
 /* The arrow sits in the dogs' own .markerInfo disc, so the size, the ring and
-   the colour all come from there. Only the glyph is different. */
+   the colour all come from there. Only the glyph is different.
+
+   IT POINTS DOWN (Steve, 1 Sep 2026). Turned by rewriting the path rather than
+   by a CSS rotate: a transform on the glyph would be one more thing to keep in
+   step with the disc, and a rotated square viewBox can shift the stroke off the
+   pixel grid and soften the line. The path is the same shape read down the
+   other axis, M12 5v13 with the head at M6 13. */
 .railEndArrow {
   width: 60%;
   height: 60%;
