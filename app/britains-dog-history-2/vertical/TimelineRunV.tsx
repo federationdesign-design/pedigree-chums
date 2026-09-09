@@ -632,7 +632,41 @@ export default function TimelineRun({
               </div>
             </div>
           );
-        })}</div>
+        })}
+          {/* THE WAY OUT OF THE RUN, 1 September 2026 (Steve).
+
+              A reader who scrolled to the last dog had nothing telling them the
+              page carries on, and on a phone the rail fills most of the panel
+              so there is little blue left to drag on. This is a real tile at the
+              end of the rail: reach the last dog and the next thing along is the
+              way forward.
+
+              INSIDE .dogRail, AFTER THE MAP. It has to be a sibling of the dog
+              cards, not of the rail, or it would sit under them rather than
+              after them. The rail thumb below is the opposite: a sibling of the
+              rail, matching .stripScrollbar in BreedStrip.
+
+              `data-goto` is an EXISTING hook, not a new mechanism. The page
+              script delegates clicks on [data-goto] and scrolls to that panel
+              index. See the click listener beside goTo in HistoryVertical.tsx.
+
+              panelIndex + 1 IS THE NEXT ERA'S SECTION. SEQUENCE in
+              HistoryVertical.tsx lays each era out as its section FIRST and its
+              era screen second, so an era screen is always the last panel of its
+              era and the panel after it opens the next one. Do not "correct"
+              this to +2. */}
+          <button
+            type="button"
+            className={styles.railEndCard}
+            data-goto={panelIndex + 1}
+            aria-label="Continue to the next era"
+          >
+            <span className={styles.railEndWord}>Next</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+        </div>
           {/* The only cue that the dogs move sideways. A sibling of the rail,
               not a child, exactly as .stripScrollbar is a sibling of
               .stripRail. renderLevels returns a fragment, so both land as flex
