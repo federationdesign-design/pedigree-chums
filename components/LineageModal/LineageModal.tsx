@@ -399,6 +399,7 @@ export default function LineageModal({ name, image, character, lineage, fromRect
     // and its points do not survive it.
     if (spend) setScore(bankedScore ?? 0);
     setResumeInLearn(true);
+    setAutoStart(false);
     setPhase("play");
     setSlowmo(false);
     setCaptionOpen(false);
@@ -410,7 +411,24 @@ export default function LineageModal({ name, image, character, lineage, fromRect
   // that one belongs to a spent run. Charged a life for the same reason going
   // to learn is, since it abandons a live round, and a free escape from a
   // losing one would make the lives meaningless.
+  /* RESTART THIS LEVEL, 9 Sept 2026 (owner), the pit menu's green square.
+     Same remount and same cost as backToStart below, with one difference: the
+     pit comes back armed and the dogs drop, rather than waiting on the start
+     screen. autoStart is cleared by every other remount path so a restart
+     cannot leak into the next one. */
+  const [autoStart, setAutoStart] = useState(false);
+  const restartLevel = () => {
+    onSpendLife?.();
+    setScore(bankedScore ?? 0);
+    setPhase("play");
+    setResumeInLearn(false);
+    setSlowmo(false);
+    setCaptionOpen(false);
+    setAutoStart(true);
+    setRunKey((k) => k + 1);
+  };
   const backToStart = () => {
+    setAutoStart(false);
     onSpendLife?.();
     // Abandoning a live round forfeits its points, exactly as losing it does.
     // Without this, backing out at the right moment was the cheapest way to
@@ -641,6 +659,8 @@ export default function LineageModal({ name, image, character, lineage, fromRect
           levelTheme={theme}
           onBackToLearn={backToLearn}
           startInLearn={resumeInLearn}
+          startImmediately={autoStart}
+          onRestartLevel={restartLevel}
           playLabel={outOfLives ? "PLAY AGAIN" : "PLAY"}
           onPlayPressed={() => {
             // Out of lives, so this press is a fresh run, not a fresh round.

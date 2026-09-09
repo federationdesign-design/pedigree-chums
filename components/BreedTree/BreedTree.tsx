@@ -1598,6 +1598,8 @@ export default function BreedTree({
   onLearningChange,
   onRelativeTap,
   startInLearn = false,
+  startImmediately = false,
+  onRestartLevel,
   playLabel = "PLAY",
   onPlayPressed,
   onBackToLearn,
@@ -1705,6 +1707,15 @@ export default function BreedTree({
   // when a round is restarted by the in-pit learn button: the player asked for
   // learn, so they land in learn rather than back on START / LEARN.
   startInLearn?: boolean;
+  /* STRAIGHT INTO A LIVE ROUND, 9 Sept 2026 (owner). The pit normally remounts
+     on its start screen and waits for PLAY. The green pit-menu square restarts
+     the level instead, which means the dogs must drop without a press. The host
+     sets this on the remount it makes for that square, and clears it again for
+     every other remount, or every level would arm itself. */
+  startImmediately?: boolean;
+  /* The pit menu's green square: restart THIS level. Owned by the host, because
+     it costs a life and remounts the round, exactly like onBackToStart. */
+  onRestartLevel?: () => void;
   // The word on the big learn PLAY button. Becomes "PLAY AGAIN" once the run
   // is out of lives, since that press restarts the whole run.
   playLabel?: string;
@@ -2530,6 +2541,13 @@ export default function BreedTree({
   // PLAY button does minus starting the round, so the view reset below is copied
   // from there rather than reinvented: a zoomed-in focus left behind would make
   // the start screen open inside one circle.
+  /* THE AUTO START, paired with startImmediately above.
+     Read once on mount, because the host remounts the whole pit to restart a
+     level. It is fired from inside the simulation effect, at the moment the
+     fall is registered, rather than from an effect of its own: a mount effect
+     runs before the sim has assigned runFallRef, so there would be nothing to
+     call. See the arm block beside runFallRef. */
+  const autoStartRef = useRef(startImmediately);
   const backToStartScreen = () => {
     setHovered(null);
     setHoverHint("");
@@ -6734,6 +6752,20 @@ export default function BreedTree({
       wake();
     };
     runFallRef.current = doFall;
+    /* ARM THE PIT, 9 Sept 2026 (owner), the green pit-menu square's restart.
+       doFall is called directly rather than through the ref, and the flag is
+       cleared first, so this can only ever fire once per mount. Everything else
+       here is exactly what the PLAY button does. */
+    if (autoStartRef.current) {
+      autoStartRef.current = false;
+      setLearnPeek(false);
+      setStartPeek(false);
+      if (!hideCaption) onToggleCaption?.();
+      onPlayPressed?.();
+      setLearning(false);
+      setStarted(true);
+      doFall();
+    }
     registerSlowmo?.(() => slowmoRef.current?.());
     registerShake?.(() => {
       // a shake also starts the round, so the button never blocks the pit
@@ -8509,12 +8541,18 @@ export default function BreedTree({
             // one, or the level changes and the whole component remounts.
             const pairSquare = (id: number, kind: "leave" | "restart") => (
               <g key={`${kind}${id}`} role="button"
-                aria-label={kind === "leave" ? "Leave the game" : "Back to the start screen"}
+                /* THE TWO SQUARES SWAPPED PURPOSE, 9 Sept 2026 (owner).
+                   Red was leave the pit for the main page and green was back to
+                   the start screen. Red now goes to the start screen and green
+                   restarts the level outright. The main page is still reachable
+                   from the corner square on the start screen itself, which is
+                   the only place a close really closes anything. */
+                aria-label={kind === "leave" ? "Back to the start screen" : "Restart this level"}
                 style={{ cursor: "pointer" }}
                 onClick={(e) => e.stopPropagation()}
                 onPointerDown={(e) => {
                   const b = uiBodiesRef.current?.find((u) => u.id === id && u.kind === kind);
-                  startDrag(e, b && !b.fixed ? b : null, kind === "leave" ? () => onPitClose?.() : () => onBackToStart?.());
+                  startDrag(e, b && !b.fixed ? b : null, kind === "leave" ? () => onBackToStart?.() : () => onRestartLevel?.());
                 }}>
                 <rect x={-half} y={-half} width={uSz} height={uSz} rx={uSz * 0.3}
                   style={{ fill: kind === "leave" ? "#ef4444" : "#22c55e", stroke: "var(--navy, #0a3a57)", strokeWidth: 5 * upp }} />
