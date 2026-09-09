@@ -2700,16 +2700,20 @@ export default function LineageMap({
                       </clipPath>
                       <text
                         x={f.sx - pan.x}
-                        y={f.sy - pan.y + 5}
+                        /* THE NAME MOVED, WRONG DOG DID NOT, 9 Sept 2026 (owner).
+                           One text element draws both labels, so the +5 that
+                           optically centred them was shared. The name comes up
+                           5px as asked; WRONG DOG keeps the old baseline. */
+                        y={f.sy - pan.y + (wrongDog?.frameId === f.id ? 5 : 0)}
                         textAnchor="middle"
                         dominantBaseline="middle"
                         clipPath={`url(#lbl-clip-${f.id})`}
-                        /* 2px OFF BOTH LABELS, 9 Sept 2026 (owner), item 7. The
-                           breed name drops 14 to 12 and WRONG DOG 18 to 16, so
-                           the two keep their relative weight. The line height
+                        /* SIZED DOWN TWICE, 9 Sept 2026 (owner), item 7. The
+                           breed name went 14 to 12 to 10, WRONG DOG 18 to 16 to 13,
+                           both on the owner reading them on the device. The line height
                            below follows the name down, or a two word breed would
                            keep its old gap and read as loose. */
-                        style={{ fill: wrongDog?.frameId === f.id ? "#ffffff" : "#ffd23e", font: `700 ${wrongDog?.frameId === f.id ? 16 : 12}px ${wrongDog?.frameId === f.id ? "'Luckiest Guy', " : ""}Montserrat, system-ui, sans-serif`, pointerEvents: "none" }}
+                        style={{ fill: wrongDog?.frameId === f.id ? "#ffffff" : "#ffd23e", font: `700 ${wrongDog?.frameId === f.id ? 13 : 10}px ${wrongDog?.frameId === f.id ? "'Luckiest Guy', " : ""}Montserrat, system-ui, sans-serif`, pointerEvents: "none" }}
                       >
                         {wrongDog?.frameId === f.id ? (
                           <>
@@ -2719,7 +2723,7 @@ export default function LineageMap({
                         ) : (() => {
                           // split breed name into words, up to 3 lines
                           const words = (dragName || "").split(" ");
-                          const lineH = 12; // follows the font size above
+                          const lineH = 10; // follows the font size above
                           const startY = words.length === 1 ? 0 : words.length === 2 ? -lineH / 2 : -lineH;
                           return words.map((w, i) => (
                             <tspan key={i} x={f.sx - pan.x} dy={i === 0 ? startY : lineH}>{w}</tspan>
