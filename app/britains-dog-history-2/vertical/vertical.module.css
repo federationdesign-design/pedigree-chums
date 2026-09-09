@@ -2171,3 +2171,63 @@
 .eraTitleBand {
   padding-top: 112px;
 }
+
+
+/* ==== 4A-BLOCK ==== */
+/* ============================================================================
+   STAGE 4A, 1 September 2026 (Steve). THE SCROLL-DRIVEN ERA.
+
+   Scrolling down an era walks the dogs sideways; the page moves on when they
+   run out. See the note on the panel in TimelineRunV.tsx for why it is built
+   this way rather than by intercepting the gesture.
+   ========================================================================= */
+
+/* The panel stops being one screen. Its HEIGHT IS SET INLINE from the dog
+   count (TimelineRunV.tsx), because it is one screen per dog and only React
+   knows how many dogs an era has.
+
+   `overflow: hidden` HAD TO GO. It was right when the panel was a single screen
+   and nothing could exceed it. A sticky child cannot pin inside a clipped
+   ancestor, so leaving it would have silently disabled the whole effect.
+
+   `position: relative` makes this the containing block for the spacers. */
+.timelinePanel {
+  height: auto;
+  overflow: visible;
+  position: relative;
+}
+
+/* One per dog, each a screen tall. THESE EXIST ONLY TO GIVE SCROLL-SNAP
+   SOMEWHERE LEGAL TO REST. The carousel is `scroll-snap-type: y mandatory`, so
+   without a snap point at every screen the scroll would be dragged back to the
+   top of the era the moment you moved inside it.
+
+   ABSOLUTELY POSITIONED, AND THAT IS THE WHOLE TRICK. Out of the flow, the
+   sticky box below them starts at the TOP of the panel and pins there for the
+   panel's full height. In the flow they would push it to the bottom and it
+   would only appear as the era ended. This was wrong in the first draft. */
+.eraSpacers {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+.eraSpacer {
+  height: 100dvh;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
+/* The part you actually see, pinned while the tall panel passes it. One screen
+   tall and `top: 0`, so the title and the rail sit still throughout. */
+.eraSticky {
+  position: sticky;
+  top: 0;
+  height: 100dvh;
+  z-index: 1;
+}
+.eraSticky > * {
+  height: 100%;
+}
