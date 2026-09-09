@@ -4,7 +4,6 @@ import Footer from "../../components/Footer/Footer";
 import PopHeading from "../../components/PopHeading/PopHeading";
 import Triangles, { type Tri } from "../../components/Parallax/Triangles";
 import ParallaxShape from "../../components/Parallax/ParallaxShape";
-import Announce from "../../components/Announce/Announce";
 import BreedStrip from "./BreedStrip";
 import ArticleTextToggle from "../../components/ArticleTextToggle/ArticleTextToggle";
 import HistoryCarousel from "../britains-dog-history-2/HistoryCarousel";
@@ -67,7 +66,10 @@ export default function HistoryPage() {
         <section className={styles.hero} aria-label="Britain's dog history">
           <div className={styles.heroImg} aria-hidden="true" />
           <div className={styles.heroTint} aria-hidden="true" />
-          <Announce />
+          {/* The "Released Soon!" Announce banner was removed here on 9 Sep 2026 at
+              Steve's request. The component still exists at components/Announce and
+              still dispatches pc:open-offer, so it can be dropped back in if the
+              pre-launch message is wanted again. The offer launcher is unaffected. */}
           <ParallaxShape className={styles.heroBadge} speed={0.2} />
           <div className={styles.heroTris}>
             <Triangles items={heroTriangles} z={2} />
