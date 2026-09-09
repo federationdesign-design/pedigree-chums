@@ -9546,8 +9546,25 @@ export default function BreedTree({
             const apps = share !== null ? ancestorAppearancesOf(ancestryFor.name, shown.data.name) : [];
             const pct = (n: number) => (n < 1 ? "<1%" : `${n}%`);
             return share !== null ? (
-              <BreakFold folded={isMobile} key={`fold|${hideCaption ? "shut" : "open"}|${ancestryFor.name}|${shown.data.name}`}>
                 <div className={styles.cBreak}>
+                  {/* NO FOLD ON THE CHUM VIEW, 9 Sept 2026 (owner). BreakFold was
+                  wrapped round this on 31 Aug to stop the box growing without
+                  limit once its max-height and scrollbar were removed. It has
+                  since stopped earning that: the chum's own name and write-up
+                  came out of this box on 9 Sept, so what is left is the
+                  percentage, the working and the disclaimer, and all of it is
+                  what the reader opened the box to see.
+                  It was also fighting the reader. It defaults to closed AND was
+                  mounted with a key naming the chum, so it re-folded on every
+                  single tap in the rail. Two taps to read each dog.
+                  Removing the wrapper is the whole fix. It cannot be "defaulted
+                  to open" instead: BreakFold has no control to close it again,
+                  so open is a one-way door and the component would be dead code
+                  pretending to be a toggle.
+                  THE OTHER BRANCH KEEPS ITS FOLD. With no chum picked the box
+                  still carries the circle's full write-up above these figures,
+                  which is the long case the fold was written for. */}
+
                   <div className={styles.cBreakBigRow}>
                     <div className={styles.cBreakBig}>
                       {ancestryFor.name} is <span className={styles.cPct}>{pct(share)}</span> {shown.data.name}
@@ -9570,7 +9587,6 @@ export default function BreedTree({
                   <div className={styles.cBreakTitle}>Our best guess, not hard science.</div>
                   <BreakNote key={`${hideCaption ? "shut" : "open"}|${ancestryFor.name}|${shown.data.name}`} />
                 </div>
-              </BreakFold>
             ) : null;
           })()}
           {/* Related pack dogs, part of the box: they open and close with it
