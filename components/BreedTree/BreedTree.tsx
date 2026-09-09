@@ -2382,13 +2382,21 @@ export default function BreedTree({
       if (performance.now() - p.t > SWIPE_MS) return;          // too slow: a drag
       if (Math.max(ax, ay) < SWIPE_MIN) return;                 // too short: a tap
       const n = navRef.current;
-      /* DIRECTIONS ARE THE OWNER'S, taken literally and NOT the carousel
-         convention. Swipe right for next, left for previous, DOWN for the next
-         era, up for the last era. That is the opposite of a photo carousel, and
-         it is deliberate: it makes the swipe agree with the D-pad, where the
-         right arrow is NEXT and the DOWN arrow is NEXT ERA.
+      /* HORIZONTAL AXIS FLIPPED 9 Sept 2026, on testing. It first shipped as
+         "finger moves right, go to the next dog", read literally off the D-pad,
+         where the RIGHT arrow is NEXT. On a real screen that is backwards: a
+         swipe is a grab at the content, not a press of the arrow, so pulling the
+         content rightwards drags the PREVIOUS dog into view and the level number
+         went down. This is the carousel convention and it is what everything
+         else on a phone does.
+         The BUTTONS are unaffected and keep their arrow meanings. A right arrow
+         still goes forwards; only the drag is inverted against it, which is what
+         people expect from the two.
+         VERTICAL IS UNTOUCHED and still reads DOWN for the next era. Flagged to
+         the owner as possibly wanting the same flip; not changed without asking,
+         because only the horizontal was reported wrong.
          To flip either axis, swap the pair on its line. */
-      if (ax >= ay * SWIPE_BIAS) (dx > 0 ? n.next : n.prev)?.();
+      if (ax >= ay * SWIPE_BIAS) (dx > 0 ? n.prev : n.next)?.();
       else if (ay >= ax * SWIPE_BIAS) (dy > 0 ? n.nextEra : n.prevEra)?.();
       // Neither axis dominant: a diagonal smear, deliberately ignored.
     };
