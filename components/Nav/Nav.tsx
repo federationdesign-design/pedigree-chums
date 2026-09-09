@@ -47,7 +47,7 @@ const tradeNavLinks = [
   { label: "Toy Safety Technical File", href: "/toy-safety" },
 ];
 
-export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo = false, tradeLinks = false }: { hideLogo?: boolean; dockBottomLeft?: boolean; showLogo?: boolean; tradeLinks?: boolean }) {
+export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo = false, showLogoMobile = false, tradeLinks = false }: { hideLogo?: boolean; dockBottomLeft?: boolean; showLogo?: boolean; showLogoMobile?: boolean; tradeLinks?: boolean }) {
   const router = useRouter();
   /* PREFETCH ON INTENT, NOT ON OPEN.
 
@@ -103,6 +103,32 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
     };
   }, []);
 
+  /* showLogoMobile: opt in to the logo from load on NARROW VIEWPORTS ONLY, and
+     leave the scroll gate alone above the seam.
+
+     Added 1 September 2026 for /britains-dog-history. That page scrolls its own
+     overflow container on mobile, so `window.scrollY` never moves and the 80px
+     gate above can never fire: the logo simply never appeared. On desktop the
+     same page scrolls normally and the gate works, and Steve wants that
+     behaviour left exactly as it is.
+
+     MEASURED, NOT ASSUMED. It reads the same 720px seam the page uses
+     (history.module.css), through matchMedia rather than a resize listener, so
+     it updates on rotation and on a desktop window being dragged narrow.
+
+     `false` until mounted, so the server render and the first client render
+     agree. Getting this wrong is a hydration mismatch, not a visual bug. */
+  const [narrow, setNarrow] = useState(false);
+  useEffect(() => {
+    if (!showLogoMobile) return;
+    const mq = window.matchMedia("(max-width: 720px)");
+    const read = () => setNarrow(mq.matches);
+    read();
+    mq.addEventListener("change", read);
+    return () => mq.removeEventListener("change", read);
+  }, [showLogoMobile]);
+  const logoFromLoad = showLogo || (showLogoMobile && narrow);
+
   useEffect(() => {
     const openMenu = () => setOpen(true);
     window.addEventListener("pc:open-menu", openMenu);
@@ -115,7 +141,7 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
   // scroll position. Exposed as data-pc-logo on the header (below) and announced on
   // change so the launcher (which lives in the root layout, outside this tree, and
   // persists across navigations) can react without polling scroll.
-  const logoShowing = !hideLogo && !open && (showLogo || scrolled);
+  const logoShowing = !hideLogo && !open && (logoFromLoad || scrolled);
   useEffect(() => {
     window.dispatchEvent(new CustomEvent("pc:logo", { detail: logoShowing }));
   }, [logoShowing]);
@@ -237,7 +263,7 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
   // uses both: on a page that HAS a logo it follows the logo (hidden at the top, shown on scroll); on a
   // no-logo page it must NOT hide, so the persist-open override there is left intact.
   return (
-    <header className={`pc-nav ${styles.bar} ${dockBottomLeft ? styles.barDock : ""} ${scrolled ? styles.scrolled : ""} ${showLogo ? styles.showLogo : ""}`} data-pc-logo={logoShowing ? "true" : "false"} data-pc-has-logo={hideLogo ? "false" : "true"}>
+    <header className={`pc-nav ${styles.bar} ${dockBottomLeft ? styles.barDock : ""} ${scrolled ? styles.scrolled : ""} ${logoFromLoad ? styles.showLogo : ""}`} data-pc-logo={logoShowing ? "true" : "false"} data-pc-has-logo={hideLogo ? "false" : "true"}>
       {/* Header contents hide while the menu is open -- no logo, no hamburger. */}
       {!open && !hideLogo && (
         <Link href="/home" className={styles.logo} aria-label="Pedigree Chums™ home">

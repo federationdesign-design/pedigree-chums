@@ -57,7 +57,11 @@ export const metadata: Metadata = {
 export default function HistoryPage() {
   return (
     <>
-      <Nav />
+      {/* showLogoMobile: the logo from load under 721px only.
+          The mobile page scrolls its own overflow container, so window.scrollY
+          never moves and Nav's 80px scroll gate can never fire. Desktop scrolls
+          normally, the gate works there, and it is deliberately left alone. */}
+      <Nav showLogoMobile />
       <main className={styles.page}>
         {/* Desktop layout (v1): floating glow panels and breed strips. Hidden
             on phones, where the carousel below takes over. Only two viewports
