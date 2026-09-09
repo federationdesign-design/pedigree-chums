@@ -518,7 +518,12 @@
 
 .bulletText {
   font-family: var(--font-body, "Montserrat", sans-serif);
-  font-size: 27px; /* 10% down from 30px */
+  /* 2pt smaller (Steve, 1 Sep 2026). Written as the subtraction rather than a
+     resolved figure so the intent survives: it was 27px, itself 10% down from
+     30px, and it is now that less two points. This is the italic bullet line on
+     every era of the mobile page. Desktop is a different stylesheet
+     (history.module.css) and is untouched. */
+  font-size: calc(27px - 2pt);
   font-style: italic;
   font-weight: 600;
   color: #ffffff;
