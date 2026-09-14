@@ -5448,7 +5448,40 @@ export default function BreedTree({
           killProp(pr, "toy", performance.now());
         }
       };
-      removeChumBodyRef.current = (mb) => { Composite.remove(world, mb); };
+      /* COLLECTING A CARD WAKES THE PILE, 14 Sept 2026 (owner: the space a
+         collected card leaves is not filled, see the two screenshots).
+
+         WHAT WAS WRONG. This was `Composite.remove` and nothing else. Matter
+         does not notify a body's contacts when the body under them is taken
+         out of the world, and `enableSleeping` means everything resting on a
+         collected card is asleep. A sleeping body is skipped by the solver
+         entirely, so the cards above hung exactly where they were and the gap
+         stayed open. Late in a level it left a shelf of cards sitting on
+         nothing.
+
+         This is NOT the 9 September freeze. That was the rAF loop parking
+         mid-round and is fixed; the loop is running throughout. This is per
+         body sleeping, which is a different mechanism and the right one to
+         keep.
+
+         WHY EVERY BODY AND NOT JUST THE NEIGHBOURS. A card is often held up
+         through a chain of two or three others, so a radius around the removed
+         one misses exactly the case the screenshots show. Waking the lot
+         cannot miss, and it costs a burst of about two seconds before the pit
+         settles and sleeps again: measured headless at 30 bodies, 0.069ms per
+         step awake against 0.019ms asleep.
+
+         `wake()` is declared further down this same scope and is called here
+         only at runtime, from the card's pointer handler, long after doFall
+         has finished. It covers the case where the round has already ended and
+         the loop has wound itself down. */
+      removeChumBodyRef.current = (mb) => {
+        Composite.remove(world, mb);
+        for (const o of Composite.allBodies(world) as { isStatic?: boolean }[]) {
+          if (!o.isStatic) wakeBody(o);
+        }
+        wake();
+      };
       killToyRef.current = (idx: number) => {
         const pr = toyBodiesRef.current[idx];
         if (pr && !pr.dead) killProp(pr, "toy", performance.now());
