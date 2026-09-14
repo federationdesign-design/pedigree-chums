@@ -2222,30 +2222,34 @@ const LINEAGE: Record<string, LineageNode> = {
 // LineageModal title ladder portrait shrinks from 25px at six rungs to ~21px at
 // seven and ~17px at eight on a phone, and the pit crowds, since circle radius
 // floors at 21 so deeper circles crowd rather than shrink. It does NOT bind the
-/* THE CAP IS 10, RAISED FROM 5 ON 14 SEPTEMBER 2026 (owner: "I do not want to
-   cut any tree off at a depth of 5, this should be increased to 10").
+/* THE CAP IS 7. Raised from 5 to 10 on 14 September 2026, then settled at 7 the
+   same day after the owner played it: "the level does get too full".
 
-   WHAT IT FIXES. Dogs with a full lineage record of their own were still being
-   cut off when grafted into a host tree. Talbot, Celtic Hound, Earth Dog and
-   Old English Bulldog all have real ancestry here and none of it was reachable
-   from a pack dog's tree. Measured across the 54 pack trees, leaves that had
-   children behind them and were cut anyway fall from 226 to 39.
+   WHY IT WAS RAISED AT ALL. Dogs with a full lineage record of their own were
+   being cut off when grafted into a host tree. Talbot, Celtic Hound, Earth Dog
+   and Old English Bulldog all have real ancestry here and none of it was
+   reachable from a pack dog's tree at 5.
 
-   THE 39 THAT REMAIN ARE NOT A DEPTH PROBLEM. They are stopped by the `visited`
-   cycle guard in expandNode, which is doing its job. Raising this number again
-   would not touch them.
+   WHY 7 AND NOT 10, measured across the 123 level trees. The cards are what
+   crowds a level: a frame is made per distinct picture and a card per
+   appearance, so a deeper tree repeats the same breed far more often. Fox
+   Terrier, the level the owner named, runs 103 cards at cap 5, 159 at 6, 165 at
+   7, 171 at 8 and 177 at 10, against 39 to 40 frames throughout. Nearly all the
+   growth lands between 5 and 6. The worst level in the game is 199 cards at 7
+   against 316 at 10.
 
-   WHAT IT COSTS, measured the same way. The 54 pack trees go from 1,914 nodes
-   to 3,476. The biggest single tree, Goldendoodle, goes from 113 to 317, and 12
-   roots more than double. The mini pit makes a circle per node and a chip per
-   freed circle, so those levels carry roughly three times the bodies. Watch
-   PIT_FULL_COVER, which ends a round on coverage, and the item 17 bonds, which
-   keep a chip awake.
+   WHAT 7 COSTS AGAINST 10. Pack-tree nodes 2,868 against 3,476. Leaves still
+   cut off with children behind them, across the 54 pack trees: 138 against 39,
+   and 226 at the old cap of 5.
 
-   EVERY PERCENTAGE MOVES. 19 of the 54 progenitor lists change length. The
-   progenitor totals stay at exactly 100% at any cap, because that is leaf-sum
-   arithmetic and not a property of where the tree is cut. */
-const MAX_LINEAGE_DEPTH = 10;
+   RAISING IT AGAIN WILL NOT REACH EVERYTHING. At 10, 39 leaves were still cut,
+   and those are stopped by the `visited` cycle guard in expandNode rather than
+   by depth.
+
+   EVERY PERCENTAGE MOVES WITH THIS NUMBER. The progenitor totals stay at exactly
+   100% at any cap, because that is leaf-sum arithmetic and not a property of
+   where the tree is cut. */
+const MAX_LINEAGE_DEPTH = 7;
 
 // Some circles are labelled with a common name; map it to its lineage key so
 // the same history is grafted in wherever the name appears.

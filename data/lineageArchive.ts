@@ -29,13 +29,15 @@ for (const b of breeds) {
 //   1. The cap. getLineage stops at MAX_LINEAGE_DEPTH, so an ancestor sitting
 //      further than that from every modern pack dog never appears in a tree
 //      above and never enters this index. REVISED 14 September 2026: the cap was
-//      raised from 5 to 10, and across the 54 pack trees the leaves cut off with
-//      children behind them fell from 226 to 39. The worked example below no
+//      raised from 5 to 7, and across the 54 pack trees the leaves cut off with
+//      children behind them fell from 226 to 138. The worked example below no
 //      longer holds: "Ancient Molossers" now expands and is no longer a childless
-//      leaf. The 39 that remain are stopped by expandNode's cycle guard, not by
-//      depth, so raising the cap again will not reach them.
+//      leaf. The 138 that remain are stopped by two different things: the cap
+//      itself, and the `visited` cycle guard in expandNode. At cap 10 the figure
+//      was 39, and every one of those was the cycle guard, so raising the cap
+//      again would never reach them all.
 //   2. Missing ancestry. Some nodes still have NO lineage children of their own.
-//      Measured at cap 10: 69 distinct leaf names across the pack trees have no
+//      Measured at cap 7: 69 distinct leaf names across the pack trees have no
 //      record behind them, led by St Hubert Hound, Old scenting hounds and Old
 //      hunting dogs of the Celts. Those carry the largest shares in the game, so
 //      authoring them is what moves the numbers most.
