@@ -2222,9 +2222,30 @@ const LINEAGE: Record<string, LineageNode> = {
 // LineageModal title ladder portrait shrinks from 25px at six rungs to ~21px at
 // seven and ~17px at eight on a phone, and the pit crowds, since circle radius
 // floors at 21 so deeper circles crowd rather than shrink. It does NOT bind the
-// Tudor-era rule: every playable card with the data reaches a Tudor-or-deeper
-// ancestor by depth 4 or less, so 5 is already a rung clear.
-const MAX_LINEAGE_DEPTH = 5;
+/* THE CAP IS 10, RAISED FROM 5 ON 14 SEPTEMBER 2026 (owner: "I do not want to
+   cut any tree off at a depth of 5, this should be increased to 10").
+
+   WHAT IT FIXES. Dogs with a full lineage record of their own were still being
+   cut off when grafted into a host tree. Talbot, Celtic Hound, Earth Dog and
+   Old English Bulldog all have real ancestry here and none of it was reachable
+   from a pack dog's tree. Measured across the 54 pack trees, leaves that had
+   children behind them and were cut anyway fall from 226 to 39.
+
+   THE 39 THAT REMAIN ARE NOT A DEPTH PROBLEM. They are stopped by the `visited`
+   cycle guard in expandNode, which is doing its job. Raising this number again
+   would not touch them.
+
+   WHAT IT COSTS, measured the same way. The 54 pack trees go from 1,914 nodes
+   to 3,476. The biggest single tree, Goldendoodle, goes from 113 to 317, and 12
+   roots more than double. The mini pit makes a circle per node and a chip per
+   freed circle, so those levels carry roughly three times the bodies. Watch
+   PIT_FULL_COVER, which ends a round on coverage, and the item 17 bonds, which
+   keep a chip awake.
+
+   EVERY PERCENTAGE MOVES. 19 of the 54 progenitor lists change length. The
+   progenitor totals stay at exactly 100% at any cap, because that is leaf-sum
+   arithmetic and not a property of where the tree is cut. */
+const MAX_LINEAGE_DEPTH = 10;
 
 // Some circles are labelled with a common name; map it to its lineage key so
 // the same history is grafted in wherever the name appears.

@@ -26,18 +26,21 @@ for (const b of breeds) {
 
 // WHY A DEEP ANCESTOR CAN SHOW ZERO CHUMS, so the next reader does not chase the
 // depth cap alone. Two causes compound:
-//   1. The cap. getLineage stops at MAX_LINEAGE_DEPTH = 5, so an ancestor sitting
-//      more than 5 steps from every modern pack dog never appears in a tree above
-//      and never enters this index. Measured: "Ancient Molossers" is a childless
-//      LEAF at the depth-5 edge in all 12 of its chum trees.
-//   2. Missing ancestry. Some of these nodes have NO lineage children of their
-//      own: getLineage("Ancient Molossers") is childless. Its apparent children
-//      ("Old mastiffs of the ancient East", "Alaunt war dogs", "Dogs of the Alan
-//      horsemen") exist only inline in the Ancient Mastiff LEVEL's authored tree,
-//      not as reusable ancestry, so no pack dog can reach them by any path.
+//   1. The cap. getLineage stops at MAX_LINEAGE_DEPTH, so an ancestor sitting
+//      further than that from every modern pack dog never appears in a tree
+//      above and never enters this index. REVISED 14 September 2026: the cap was
+//      raised from 5 to 10, and across the 54 pack trees the leaves cut off with
+//      children behind them fell from 226 to 39. The worked example below no
+//      longer holds: "Ancient Molossers" now expands and is no longer a childless
+//      leaf. The 39 that remain are stopped by expandNode's cycle guard, not by
+//      depth, so raising the cap again will not reach them.
+//   2. Missing ancestry. Some nodes still have NO lineage children of their own.
+//      Measured at cap 10: 69 distinct leaf names across the pack trees have no
+//      record behind them, led by St Hubert Hound, Old scenting hounds and Old
+//      hunting dogs of the Celts. Those carry the largest shares in the game, so
+//      authoring them is what moves the numbers most.
 // So a zero-chum deep ancestor is honest, not a bug here. Do NOT inherit a
-// parent's chums downward to fill the gap: measured, 0 of Ancient Molossers' 12
-// descend through that child or any sibling, so it would fabricate connections.
+// parent's chums downward to fill the gap: it would fabricate connections.
 // Authoring the real ancestry is the Tudor job (tudor-trail-brief-v3.md).
 
 // Dataset-wide rarity: how many distinct lineage TREES each dog appears in,
