@@ -5935,6 +5935,14 @@ export default function BreedTree({
         !x.n && x.inert && !x.bomb && !x.blown && !!x.mb && x.mbIn === true;
       const joinChips = (x: Body, y: Body) => {
         if (x === y || !canBond(x) || !canBond(y)) return;
+        /* LIKE STICKS TO LIKE, 14 Sept 2026 (owner: blue and white were joining
+           and should form two separate groups). The two inert fills are drawn
+           off `green`: a learnt chip goes inert WHITE, every other chip goes
+           inert BLUE. Reading the same flag here means the groups on the floor
+           always match the groups on screen, with no second source of truth.
+           A blue and a white chip still collide and bounce off each other as
+           before. Only the bond is refused. */
+        if (!!x.green !== !!y.green) return;
         const key = bondKey(x.idx, y.idx);
         if (bondedPairs.has(key)) return;
         if ((bondsOf.get(x.idx)?.length ?? 0) >= BOND_CAP) return;
