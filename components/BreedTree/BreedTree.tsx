@@ -4455,7 +4455,7 @@ export default function BreedTree({
       if (focusRef.current !== nodes[0]) return; // user already exploring
       const Matter = (await import("matter-js")) as any; // pit convention: dynamic, untyped
       if (fellRef.current || focusRef.current !== nodes[0]) return; // re-check across the await
-      const { Engine, Bodies, Body: MBody, Composite, Events, Mouse, MouseConstraint, Sleeping } = Matter;
+      const { Engine, Bodies, Body: MBody, Composite, Constraint, Events, Mouse, MouseConstraint, Sleeping } = Matter;
       fellRef.current = true;
       setFalling(true);
       setDropped(true); // names disappear, physics badges appear
@@ -5893,6 +5893,98 @@ export default function BreedTree({
           parts.push({ el, x: x + (Math.random() - 0.5) * 20 * fxScale, y: y + (Math.random() - 0.5) * 20 * fxScale, vx: Math.cos(a2) * sp2, vy: Math.sin(a2) * sp2 - 60 * fxScale, r: 0, born: now2, life: 420 + Math.random() * 340 });
         }
       };
+      /* ---- ITEM 17: INERT CHIPS TURN STICKY AND JOIN ON CONTACT ------------
+         Owner, 14 Sept 2026. Spec settled the same day: inert sticks to inert
+         ONLY. A live chip, a dog circle, a toy or a chum is never welded into a
+         dead lump, because a live object glued into one cannot be played.
+
+         BONDS ARE REAL MATTER CONSTRAINTS. Matter has no weld, so a pair is
+         held by one distance constraint at the rest length the two chips were
+         at when they touched. Rotation is deliberately not locked: that needs a
+         second offset constraint per pair and doubles the solver work for a
+         clump of discs nobody can see spin.
+
+         THE CAP IS 3. Uncapped, a pile of 30 chips made 57 bonds in a headless
+         run of this engine. Capped at 2 the chips string out into snakes 525px
+         wide instead of clumping, which does not read as sticking at all.
+         3 measured closest to the unbonded pile shape at half the bond count.
+
+         THE COST, MEASURED HEADLESS AT 30 CHIPS. A bonded body never sleeps:
+         Constraint.postSolveAll wakes anything a constraint pushes on, and
+         Constraint.solve has no zero impulse early out, so this is structural
+         in matter-js and no stiffness or damping setting avoids it. 0.230ms per
+         Engine.update against 0.019ms for the same pile asleep. Accepted by the
+         owner with that number in front of him. If it reads as too warm on a
+         long session, the escape hatch is BOND_CAP, then parking a settled
+         clump static, not tuning the numbers below.
+
+         EVERY REMOVAL MUST CALL dropBonds. Composite.remove takes the body out
+         and LEAVES the constraint behind, still referencing it, still solved
+         every step. The surviving partner would then be tethered to an
+         invisible drifting point. Call sites: killChained, detonate, and the
+         escape net, which teleports rather than removes and would otherwise
+         snap the partner across the pit. */
+      const BOND_CAP = 3;
+      const BOND_STIFFNESS = 0.7;
+      const BOND_DAMPING = 0.2;
+      type Bond = { c: unknown; a: number; b: number; key: string };
+      const bondsOf = new Map<number, Bond[]>();
+      const bondedPairs = new Set<string>();
+      const bondKey = (ia: number, ib: number) => (ia < ib ? `${ia}:${ib}` : `${ib}:${ia}`);
+      const canBond = (x: Body) =>
+        !x.n && x.inert && !x.bomb && !x.blown && !!x.mb && x.mbIn === true;
+      const joinChips = (x: Body, y: Body) => {
+        if (x === y || !canBond(x) || !canBond(y)) return;
+        const key = bondKey(x.idx, y.idx);
+        if (bondedPairs.has(key)) return;
+        if ((bondsOf.get(x.idx)?.length ?? 0) >= BOND_CAP) return;
+        if ((bondsOf.get(y.idx)?.length ?? 0) >= BOND_CAP) return;
+        const len = Math.hypot(x.mb.position.x - y.mb.position.x, x.mb.position.y - y.mb.position.y);
+        if (!len) return; // dead centre on each other, no direction to hold
+        const c = Constraint.create({
+          bodyA: x.mb, bodyB: y.mb, length: len,
+          stiffness: BOND_STIFFNESS, damping: BOND_DAMPING,
+          render: { visible: false },
+        });
+        Composite.add(world, c);
+        const rec: Bond = { c, a: x.idx, b: y.idx, key };
+        bondedPairs.add(key);
+        for (const id of [x.idx, y.idx]) {
+          const list = bondsOf.get(id);
+          if (list) list.push(rec); else bondsOf.set(id, [rec]);
+        }
+      };
+      const dropBonds = (idx: number) => {
+        const list = bondsOf.get(idx);
+        bondsOf.delete(idx);
+        if (!list) return;
+        for (const rec of list) {
+          Composite.remove(world, rec.c);
+          bondedPairs.delete(rec.key);
+          const other = rec.a === idx ? rec.b : rec.a;
+          const ol = bondsOf.get(other);
+          if (ol) {
+            const kept = ol.filter((z) => z.key !== rec.key);
+            if (kept.length) bondsOf.set(other, kept); else bondsOf.delete(other);
+          }
+        }
+      };
+      /* THE MOMENT A CHIP GOES INERT IT LOOKS AROUND. collisionStart only fires
+         when a contact BEGINS, so two chips already resting against each other
+         when one of them dies would never bond: the contact started while it
+         was still live. This is a one-off sweep at the instant of death, over
+         the chips only, with the same touching test the bomb chain uses. */
+      const bondOnDeath = (b: Body) => {
+        if (!canBond(b)) return;
+        const reach = b.r * pxPerWorld;
+        for (const o of Composite.allBodies(world) as { isStatic?: boolean; circleRadius?: number; position: { x: number; y: number }; plugin?: { kind?: string; bridge?: Body } }[]) {
+          if (o.isStatic || o.plugin?.kind !== "badge") continue;
+          const ob = o.plugin.bridge;
+          if (!ob || ob === b || !canBond(ob)) continue;
+          const gap = Math.hypot(b.mb.position.x - o.position.x, b.mb.position.y - o.position.y);
+          if (gap <= reach + (o.circleRadius ?? 0) + 4) joinChips(b, ob);
+        }
+      };
       // spend is how many of the 20 charges one knock costs. The rock is the
       // heavy one, so it counts for ten ordinary knocks.
       const ROCK_KNOCK = 10;
@@ -5912,6 +6004,7 @@ export default function BreedTree({
           b.inert = true;
           poofAt(b.x, b.y, now2);
           setInertBadges((prev) => new Set(prev).add(b.idx));
+          bondOnDeath(b);
         }
       };
 
@@ -5949,6 +6042,7 @@ export default function BreedTree({
           const br = p.bridge;
           if (!br || br.blown) return 0;
           br.blown = true;
+          dropBonds(br.idx); // before the body goes: see the bond block above
           poofAt(br.x, br.y, now2);
           if (br.mb && br.mbIn) { Composite.remove(world, br.mb); br.mbIn = false; }
           setDeadBadges((q) => new Set(q).add(br.idx));
@@ -5981,7 +6075,7 @@ export default function BreedTree({
           fxKickRef.current?.();
           numAt(b.x, b.y, 250, now2);
           if (typeof navigator !== "undefined" && navigator.vibrate) navigator.vibrate(wasHeld ? [25, 20, 200] : [20, 15, 120]);
-          if (b.mbIn) { Composite.remove(world, bombMb); b.mbIn = false; }
+          if (b.mbIn) { dropBonds(b.idx); Composite.remove(world, bombMb); b.mbIn = false; }
           setDeadBadges((q) => new Set(q).add(b.idx));
           const live = (Composite.allBodies(world) as MB[]).filter((o) => !o.isStatic && o !== bombMb);
           const touch = (m1: MB, m2: MB) =>
@@ -6165,6 +6259,11 @@ export default function BreedTree({
           };
           hitSide(pa, B);
           hitSide(pb2, A);
+          // ITEM 17. Two dead chips touching stick together. Inert to inert
+          // only, so nothing playable is ever welded in. See the bond block.
+          if (pa.kind === "badge" && pb2.kind === "badge" && pa.bridge && pb2.bridge) {
+            joinChips(pa.bridge, pb2.bridge);
+          }
           for (const [P, other] of [[pa, B], [pb2, A]] as any[]) {
             const pr = P.prop;
             if (!pr || pr.dead || other.isStatic || rv < 5) continue;
@@ -6370,9 +6469,12 @@ export default function BreedTree({
         // the difference between a quirk and a lost round.
         {
           const escapeY = pL.y + T * 0.5;
-          for (const mb of Composite.allBodies(world) as { isStatic?: boolean; position: { x: number; y: number } }[]) {
+          for (const mb of Composite.allBodies(world) as { isStatic?: boolean; position: { x: number; y: number }; plugin?: { kind?: string; bridge?: Body } }[]) {
             if (mb.isStatic) continue;
             if (mb.position.y <= escapeY) continue;
+            // A bond survives a teleport and would snap its partner across the
+            // pit, so an escaping chip is cut loose first. See the bond block.
+            if (mb.plugin?.kind === "badge" && mb.plugin.bridge) dropBonds(mb.plugin.bridge.idx);
             const backX = pL.x + 30 + Math.random() * Math.max(1, wPx - 60);
             wakeBody(mb); // or it hangs where it was put and never falls back
             MBody.setPosition(mb as never, { x: backX, y: pTop.y - 40 });
