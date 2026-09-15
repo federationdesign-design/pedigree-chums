@@ -2812,9 +2812,18 @@ export default function BreedTree({
       const tick = () => {
         const bl = badgeBodiesRef.current;
         if (!bl || !bl.length) { el.textContent = "no chips yet (round not started)"; return; }
-        const svgEl = document.querySelector("svg");
+        const st = stageRef.current;
+        /* CORRECTED 15 September 2026. This was document.querySelector("svg"),
+           which returns the FIRST svg in the document and is not the stage, so
+           ctm.a came back as exactly 1.000 in both the pit and the lifted layer.
+           Two views at different zooms cannot both be 1, which is how the wrong
+           element gave itself away. The pit px column was therefore rDraw in user
+           units, not pixels, and could not be compared with the lifted figure.
+           doFall gets the stage the same way, via stageRef. */
+        const svgEl = st ? st.querySelector("svg") : null;
         const ctm = svgEl ? (svgEl as SVGSVGElement).getScreenCTM() : null;
         const a = ctm && ctm.a ? ctm.a : 0;
+        const vb = svgEl ? (svgEl as SVGSVGElement).getAttribute("viewBox") : null;
         // one line per distinct share, so a pile of chips stays readable
         const seen = new Map<number, { px: number; n: number }>();
         for (const b of bl) {
@@ -2827,7 +2836,7 @@ export default function BreedTree({
           const lifted = Math.max(21, 5 * Math.sqrt(pct)) * 0.78;
           return `${String(pct).padStart(3)}%  pit ${v.px.toFixed(1)}px  lifted ${lifted.toFixed(1)}px  ratio ${(v.px / lifted).toFixed(2)}  x${v.n}`;
         });
-        el.textContent = `chips ${bl.length}  ctm.a ${a.toFixed(3)}\n` + rows.join("\n");
+        el.textContent = `chips ${bl.length}  ctm.a ${a.toFixed(4)}  svg ${svgEl ? "stage" : "MISSING"}  viewBox ${vb ?? "none"}\n` + rows.join("\n");
       };
       tick();
       t = window.setInterval(tick, 500);
