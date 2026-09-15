@@ -121,11 +121,25 @@ const INSTR_NAMES = new Set(["Deal the cards","Head outside","Spot real dogs","M
 // bands (yellow COMMON, green UNCOMMON); white the two dark ones (purple EXTREMELY
 // RARE, orange RARE). White on the orange band is a deliberate call: its contrast
 // is low but kept on request, and the label is large Luckiest Guy.
-const RARITY_BAND: Record<"extremelyRare" | "rare" | "uncommon" | "common", { bg: string; fg: string; label: string }> = {
+/* FIVE TIERS, 16 SEPTEMBER 2026 (owner's palette). The cuts and the reasoning
+   behind them live with rarityTier in BreedTree.tsx; this is only the look.
+
+   WHAT MOVED. RARE was orange and is now royal blue; orange moves up to the new
+   COMMON; yellow moves up to the new VERY COMMON. So a dog that used to wear
+   yellow at 7 trees now needs 50.
+
+   EVERY fg IS THE CONTRAST-SAFE CHOICE, MEASURED, NOT PICKED. Ratios against this
+   palette: purple 9.93:1 on white, royal blue 7.56:1 on white, green 9.26:1 on
+   black, orange 7.37:1 on black, yellow 17.39:1 on black. The alternatives fail:
+   white on yellow is 1.21:1 and white on orange 2.85:1, which is the same
+   unreadable pair that had to be reversed on the done band on 10 September. Do
+   not "tidy" these to one colour. */
+const RARITY_BAND: Record<"extremelyRare" | "rare" | "uncommon" | "common" | "veryCommon", { bg: string; fg: string; label: string }> = {
   extremelyRare: { bg: "#4d2e91", fg: "#ffffff", label: "EXTREMELY RARE" }, // purple
-  rare:          { bg: "#f47421", fg: "#ffffff", label: "RARE" },           // orange
+  rare:          { bg: "#2547c4", fg: "#ffffff", label: "RARE" },           // royal blue
   uncommon:      { bg: "#5dbf86", fg: "#000000", label: "UNCOMMON" },       // green
-  common:        { bg: "#fcee23", fg: "#000000", label: "COMMON" },         // yellow
+  common:        { bg: "#f47421", fg: "#000000", label: "COMMON" },         // orange
+  veryCommon:    { bg: "#fcee23", fg: "#000000", label: "VERY COMMON" },    // yellow
 };
 // How long the rarity ring takes to draw itself on around the lifted circle, and
 // how long it waits first. The lift's own fade is 0.2s, so the draw holds back
@@ -320,7 +334,7 @@ export default function LineageMap({
   ringColor?: string;
   // Mini pit only: the rarity tier of the lifted dog, drawn as a coloured band
   // across the bottom of the circle. Set for every lifted dog (common included).
-  rarityTier?: "extremelyRare" | "rare" | "uncommon" | "common";
+  rarityTier?: "extremelyRare" | "rare" | "uncommon" | "common" | "veryCommon";
   // The heavier wash. It used to ride on `circular`, which was fine while the
   // only caller wanting it also wanted round cards. The chum family tree wants
   // the main pit's rectangular card AND the mini pit's darker background, so the

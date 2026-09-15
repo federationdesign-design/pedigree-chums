@@ -964,12 +964,47 @@ function isEcho(d: Node): boolean {
 // the same dog reads the same tier wherever it is lifted. Fewest trees = rarest:
 // a modern terminal breed sits in one tree; an ancient ancestor threads through
 // many. Every collected circle carries a band.
-type RarityTier = "extremelyRare" | "rare" | "uncommon" | "common";
+/* FIVE TIERS, RE-CUT 16 SEPTEMBER 2026 (owner). The count is treesContaining:
+   how many of the 160 lineage trees a dog turns up in.
+
+   WHY THE OLD FOUR WERE WRONG. Counts run 1 to 96 and "common" started at 7, so
+   Old hunting dogs of the Celts at 96 wore the same badge as a dog in 7. The top
+   band swallowed nine tenths of the range. Measured across all 251 names, the old
+   cuts gave common 28%, uncommon 10%, rare 20%, extremely rare 42%: the rarest
+   tier was the biggest and uncommon was a three-wide squeeze.
+
+   THE NEW CUTS, AND WHAT THEY PRODUCE (251 names):
+     50+    VERY COMMON       14 names,  6%
+     11-49  COMMON            40 names, 16%
+     7-10   UNCOMMON          17 names,  7%
+     3-6    RARE              38 names, 15%
+     1-2    EXTREMELY RARE   142 names, 57%
+   COMMON now outnumbers UNCOMMON, which is what the owner asked for.
+
+   THE PYRAMID IS NOT INVERTED, THOUGH THE NAME COUNTS LOOK LIKE IT. Counting the
+   10,106 circles a player can actually meet across all trees rather than distinct
+   names, the top tier is 72% of them and the bottom two are 5% between them.
+   Seventeen dogs account for three quarters of everything on screen. A trading
+   card set works the same way: more distinct rares exist than commons, and you
+   pull commons constantly because each is printed thousands of times.
+
+   WHY EXTREMELY RARE IS STILL THE BIGGEST BAND, AND CANNOT NOT BE. 105 of the 251
+   names appear in exactly ONE tree, so any band containing 1 starts at 42% before
+   it includes anything else. That is the shape of the data, not the choice of
+   numbers. The cause is that the metric rewards being well CONNECTED: a dead end
+   with no parents sits in one tree, and the moment it is given ancestry it
+   inherits the reach of everything above it. The rough water dogs went from
+   unreachable to 34 trees by gaining one parent. Fixing that means changing the
+   metric, weighting by share rather than counting trees, and it was parked until
+   the ancestry work settles. Expect this pile to keep thinning on its own
+   meanwhile, which is why these cuts will want another look later. */
+type RarityTier = "extremelyRare" | "rare" | "uncommon" | "common" | "veryCommon";
 function rarityTier(count: number): RarityTier {
-  if (count >= 7) return "common";        // 7+  COMMON          (yellow)
-  if (count >= 4) return "uncommon";      // 4-6 UNCOMMON        (green)
-  if (count >= 2) return "rare";          // 2-3 RARE            (orange)
-  return "extremelyRare";                 // 1   EXTREMELY RARE  (purple)
+  if (count >= 50) return "veryCommon";   // 50+   VERY COMMON     (yellow)
+  if (count >= 11) return "common";       // 11-49 COMMON          (orange)
+  if (count >= 7) return "uncommon";      // 7-10  UNCOMMON        (green)
+  if (count >= 3) return "rare";          // 3-6   RARE            (royal blue)
+  return "extremelyRare";                 // 1-2   EXTREMELY RARE  (purple)
 }
 
 // Breed titles are fitted to the circle they belong to. The name is wrapped
