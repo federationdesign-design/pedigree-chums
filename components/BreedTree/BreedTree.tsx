@@ -2775,6 +2775,65 @@ export default function BreedTree({
     } catch {}
     return () => { try { if (t) window.clearInterval(t); if (d) d.remove(); } catch {} };
   }, []);
+  /* DIAGNOSTIC, ?chipdebug=1, 15 September 2026. REMOVE ONCE ANSWERED.
+     The question: are the yellow % chips bigger in the pit than the circles they
+     came from on the lifted layer, and by how much. Two patches have guessed at
+     the conversion and both were wrong, and screenshots taken at two different
+     view zooms cannot separate a wrong chip size from a different zoom.
+
+     This measures instead. A chip's rDraw is in SVG user units, so multiplying by
+     the LIVE screen CTM gives its real radius in CSS px on the glass right now.
+     The lifted layer drew the same circle at nodeR(share), which is
+     radius(share) * PIT_NODE_SCALE. radius is imported here as pctRadius; the
+     0.78 is PIT_NODE_SCALE, which LineageMap does not export, so it is written
+     out with its source named rather than plumbed through for a diagnostic.
+
+     The ratio at the end is the answer. 1.00 means they match and the fault is
+     elsewhere. Anything else is the factor to correct by, and it is arithmetic
+     from there rather than another reading of the code.
+
+     Polls, like ?badgedebug=1, so the numbers follow the live zoom. Nothing is
+     created and nothing runs without the flag. Deliberately does NOT read
+     badgeSrcRef: see the note in the badgedebug block above, a read from an
+     effect costs an eslint error. So native pit chips are listed too, and a
+     scattered one is identified by its share. */
+  useEffect(() => {
+    let d: HTMLDivElement | null = null;
+    let t = 0;
+    try {
+      if (new URLSearchParams(window.location.search).get("chipdebug") !== "1") return;
+      d = document.createElement("div");
+      d.style.cssText =
+        "position:fixed;left:0;right:0;bottom:0;z-index:99999;background:#000;color:#0ff;" +
+        "font:11px/1.4 monospace;padding:6px 8px;pointer-events:none;white-space:pre-wrap";
+      d.textContent = "chip debug: start a round";
+      document.body.appendChild(d);
+      const el = d;
+      const tick = () => {
+        const bl = badgeBodiesRef.current;
+        if (!bl || !bl.length) { el.textContent = "no chips yet (round not started)"; return; }
+        const svgEl = document.querySelector("svg");
+        const ctm = svgEl ? (svgEl as SVGSVGElement).getScreenCTM() : null;
+        const a = ctm && ctm.a ? ctm.a : 0;
+        // one line per distinct share, so a pile of chips stays readable
+        const seen = new Map<number, { px: number; n: number }>();
+        for (const b of bl) {
+          const r = b.rDraw ?? 0;
+          if (!r) continue;
+          const cur = seen.get(b.pct);
+          if (cur) cur.n += 1; else seen.set(b.pct, { px: r * a, n: 1 });
+        }
+        const rows = [...seen.entries()].sort((x, y) => y[0] - x[0]).slice(0, 8).map(([pct, v]) => {
+          const lifted = Math.max(21, 5 * Math.sqrt(pct)) * 0.78;
+          return `${String(pct).padStart(3)}%  pit ${v.px.toFixed(1)}px  lifted ${lifted.toFixed(1)}px  ratio ${(v.px / lifted).toFixed(2)}  x${v.n}`;
+        });
+        el.textContent = `chips ${bl.length}  ctm.a ${a.toFixed(3)}\n` + rows.join("\n");
+      };
+      tick();
+      t = window.setInterval(tick, 500);
+    } catch {}
+    return () => { try { if (t) window.clearInterval(t); if (d) d.remove(); } catch {} };
+  }, []);
   useEffect(() => {
     if (!dockAside) return;
     const k = SIZE / viewRef.current[2];
@@ -5719,43 +5778,31 @@ export default function BreedTree({
         const pitPer = pitD1.length ? pitD1.reduce((a, n) => a + (n.r * kD) / pctRadius(shareOf(n)), 0) / pitD1.length : 0;
         const chipBadge = BADGE_FRAC * pitPer * pctRadius(pctVal);
         /* THE CHIP KEEPS THE SIZE IT HAD ON THE LIFTED LAYER, 15 September 2026
-           (owner). CORRECTED the same day: the first attempt used fxScale alone
-           and the chips still read wrong.
+           (owner). REVERTED the same day to the plain drop-time conversion.
 
-           WHY fxScale ALONE IS NOT ENOUGH. fxScale is captured once, at the drop,
-           from getScreenCTM, and the comment beside it calls it the frozen
-           drop-time transform. kD is frozen the same way. But opts.r is measured
-           in client px at the moment of the SCATTER, under whatever zoom the view
-           has by then, and zoomTo changes the viewBox, which changes the screen
-           CTM. Converting a live measurement with a frozen scale is wrong by
-           exactly the zoom that happened in between.
+           WHAT c.r ACTUALLY IS. LineageMap sends r: nodeR(share), which is
+           radius(share) * PIT_NODE_SCALE, so max(21, 5*sqrt(share)) * 0.78. A
+           constant derived from the share alone, in CSS px, that never moves with
+           any zoom. A 50% circle is always 27.6px on the lifted layer.
 
-           zoomNow IS THAT RATIO. The screen CTM's scale is the element width over
-           the viewBox width, so it moves inversely with v[2]. The drop-time width
-           is SIZE / kD, and viewRef.current[2] is the live one, so their ratio
-           carries fxScale from the drop-time zoom to the present one. It is 1
-           when nothing has zoomed, which is the case the first patch happened to
-           test against.
+           WHY THE LIVE-ZOOM VERSION WAS TAKEN OUT. It multiplied c.r by the ratio
+           of the live viewBox to the drop-time one. But doFall runs at the start
+           of the round, just after zoomTo(rootV), so fxScale is ALREADY the
+           conversion at the pit's resting zoom, which is the view the pit plays
+           at. At the moment of the scatter the view is zoomed in on the lifted
+           card, so that ratio was above 1 and pushed the chip up.
 
-           WHY THIS AND NOT A LIVE getScreenCTM CALL. That was the other option and
-           it was rejected on the negatives: it forces a layout flush once per
-           circle in the scatter loop, on the frame the physics is starting; it
-           returns null on a detached SVG and falls back to exactly the bug being
-           fixed; and it adds a DOM read to a function that has none. This is
-           arithmetic on values already in scope. It rests on one assumption, that
-           the CTM only ever moves through the viewBox. zoomTo is the only writer
-           of viewRef.current and that is all it does.
+           NOT YET PROVEN. Two attempts at this have been wrong and screenshots
+           taken at two different zooms cannot separate a wrong chip size from a
+           different view. See the ?chipdebug=1 readout, which prints the chip's
+           real on-screen radius against the 27.6px the lifted layer drew.
 
-           GREEN AND YELLOW FOLLOW ONE RULE. Green placed cards have landed at
-           their on-layer radius since 9 September and were wrong in the same way.
            chipBadge still stands for a chip that arrives with no radius of its
            own, which is the popped and seeded path. */
-        const vLive = viewRef.current;
-        const zoomNow = (vLive[2] * kD) / SIZE;
         const rDraw = opts?.label
           ? (opts?.r ?? 0)
           : opts?.r != null
-            ? opts.r * fxScale * zoomNow
+            ? opts.r * fxScale
             : chipBadge;
         // A solo dog circle arrives through this same call carrying a label,
         // and that one is never a bomb: it is a whole breed, not a chip.

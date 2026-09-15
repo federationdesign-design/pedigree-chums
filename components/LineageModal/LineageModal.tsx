@@ -462,7 +462,22 @@ export default function LineageModal({ name, image, character, lineage, fromRect
   };
 
   /* THE TIME DRAIN. Ported from the main pit, PackPit.tsx, where it has always
-     run: one point a second, four a second in slow motion, never below zero.
+     run: one point a second, four a second in slow motion.
+
+     THE FLOOR AT ZERO IS GONE, 15 September 2026 (owner: "when I go into a minus
+     score in the play area, the score reverts to 0, this is what I want to
+     change"). It was Math.max(0, s - drain), so a round that ran long sat pinned
+     at 0 and every further second cost nothing. The score now keeps going down
+     and the player has to climb back out of it.
+
+     This is the mini pit only. PackPit's own drain still floors at zero and was
+     not touched.
+
+     NOTHING DOWNSTREAM NEEDED CHANGING, checked rather than assumed. The
+     milestone effect above keeps a high-water mark that is never lowered and
+     ignores anything under one step, so a negative score cannot fire or re-fire
+     a celebration. The readouts all go through toLocaleString, which renders a
+     minus perfectly well.
 
      WHY IT IS HERE NOW (31 August 2026, Steve). The mini pit had no drain at
      all, and that single omission is most of why a mini pit score reads
@@ -497,7 +512,7 @@ export default function LineageModal({ name, image, character, lineage, fromRect
       if (phaseRef.current !== "play") return;
       if (learningRef.current) return;
       const drain = slowmoDrainRef.current ? 4 : 1;
-      setScore((s) => Math.max(0, s - drain));
+      setScore((s) => s - drain);
     }, 1000);
     return () => { if (drainRef.current) window.clearInterval(drainRef.current); };
   }, []); // once; every live value above is read through a ref inside the tick
