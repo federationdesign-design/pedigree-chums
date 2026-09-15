@@ -5719,34 +5719,43 @@ export default function BreedTree({
         const pitPer = pitD1.length ? pitD1.reduce((a, n) => a + (n.r * kD) / pctRadius(shareOf(n)), 0) / pitD1.length : 0;
         const chipBadge = BADGE_FRAC * pitPer * pctRadius(pctVal);
         /* THE CHIP KEEPS THE SIZE IT HAD ON THE LIFTED LAYER, 15 September 2026
-           (owner: "I need these yellow circles to persist at the same size when
-           they are dropped into the pit", estimated at a third bigger in the pit).
+           (owner). CORRECTED the same day: the first attempt used fxScale alone
+           and the chips still read wrong.
 
-           WHAT THIS REPLACES. The yellow chips used to be re-sized to chipBadge,
-           the pit's own dog scale, so a chip of share s landed at the badge a
-           native pit dog of that share would wear. That was a deliberate rule,
-           not an oversight, and it is what made them grow on the way down.
+           WHY fxScale ALONE IS NOT ENOUGH. fxScale is captured once, at the drop,
+           from getScreenCTM, and the comment beside it calls it the frozen
+           drop-time transform. kD is frozen the same way. But opts.r is measured
+           in client px at the moment of the SCATTER, under whatever zoom the view
+           has by then, and zoomTo changes the viewBox, which changes the screen
+           CTM. Converting a live measurement with a frozen scale is wrong by
+           exactly the zoom that happened in between.
 
-           GREEN ALREADY DID THIS. A placed card has landed at its on-layer node
-           radius since 9 September. This widens that carve-out to every chip
-           that arrives carrying one, so yellow and green now follow one rule
-           instead of two.
+           zoomNow IS THAT RATIO. The screen CTM's scale is the element width over
+           the viewBox width, so it moves inversely with v[2]. The drop-time width
+           is SIZE / kD, and viewRef.current[2] is the live one, so their ratio
+           carries fxScale from the drop-time zoom to the present one. It is 1
+           when nothing has zoomed, which is the case the first patch happened to
+           test against.
 
-           opts.r is client px, the radius the node had on the learn layer a
-           moment earlier. * fxScale converts it to the pit's viewBox units, the
-           same conversion the pills use.
+           WHY THIS AND NOT A LIVE getScreenCTM CALL. That was the other option and
+           it was rejected on the negatives: it forces a layout flush once per
+           circle in the scatter loop, on the frame the physics is starting; it
+           returns null on a detached SVG and falls back to exactly the bug being
+           fixed; and it adds a DOM read to a function that has none. This is
+           arithmetic on values already in scope. It rests on one assumption, that
+           the CTM only ever moves through the viewBox. zoomTo is the only writer
+           of viewRef.current and that is all it does.
 
-           ONE REASON FOR THE OLD RULE IS GONE. The comment it replaced worried
-           that a learn-layer chip would fall under the legibility floor and
-           vanish while a popped one showed. That floor was removed on
-           10 September in bfef01d2 and every chip is drawn now.
-
+           GREEN AND YELLOW FOLLOW ONE RULE. Green placed cards have landed at
+           their on-layer radius since 9 September and were wrong in the same way.
            chipBadge still stands for a chip that arrives with no radius of its
            own, which is the popped and seeded path. */
+        const vLive = viewRef.current;
+        const zoomNow = (vLive[2] * kD) / SIZE;
         const rDraw = opts?.label
           ? (opts?.r ?? 0)
           : opts?.r != null
-            ? opts.r * fxScale
+            ? opts.r * fxScale * zoomNow
             : chipBadge;
         // A solo dog circle arrives through this same call carrying a label,
         // and that one is never a bomb: it is a whole breed, not a chip.
