@@ -1457,27 +1457,32 @@ const LINEAGE: Record<string, LineageNode> = {
   /* ITS OWN RECORD, 15 September 2026 (owner: it should appear in the ancient
      timeline, and its ancestry is inconsistent between levels).
 
-     NOTHING HERE IS INVENTED. The children below are lifted verbatim from the
-     inline copy inside "Livestock Dog", which is where this ancestry has always
-     lived. Before this, the name behaved three different ways depending on which
-     tree you opened: under Livestock Dog it had Old hunting dogs of the Celts
-     behind it, and under Shepherd's Dog and Drover's Dog it was a bare leaf with
-     nothing behind it at all. One record makes all three agree.
+     THE PARENTS ARE THE OWNER'S, given 15 September once it became a level:
+     Celtic Coursing Hound, Celtic Hound and Old hunting dogs of the Celts.
 
-     THE SELF-CHILD IS DELIBERATE. The owner's ruling of 15 September: a circle
-     stands for a dog TYPE rather than one breed, so a type can sit behind itself
-     where the stock carried on alongside what came out of it. It is authored
-     that way in the Livestock Dog copy and is kept here unchanged.
+     WHAT THEY REPLACED. The first version lifted the ancestry verbatim from the
+     inline copy inside "Livestock Dog", which paired Old hunting dogs of the
+     Celts with a SELF-CHILD, the same dog inside itself. That is a normal shape
+     for an ancestor circle, and the owner's ruling of the same day is that it is
+     deliberate: a circle stands for a dog TYPE, so a type can sit behind itself.
+     It stops working the moment the dog becomes a LEVEL, because the player is
+     then asked to find the dog they are already looking at, using the same
+     artwork, and the diagram has one real circle instead of two.
 
-     The inline copy under Livestock Dog is left where it is. It already has
-     children, so it does not graft, and it is the source this was taken from. */
+     The inline copy under Livestock Dog is untouched and keeps its self-child.
+     It already has children, so it does not graft, and it is the source the
+     first version was taken from.
+
+     THE THIRDS ARE MINE, NOT THE OWNER'S. No split was given, so the three are
+     even. One number each if any of them should weigh more. */
   "Celtic herdsmen's dogs": {
     name: "Celtic herdsmen's dogs",
     note: "The all-round farm dogs of the Celtic tribes, guarding and driving the herds. Now extinct.",
     img: "/history/breeds/celtic-herdsmen-dogs.jpg",
     children: [
-      { name: "Old hunting dogs of the Celts", note: "The native running dogs of Iron Age Europe. Now extinct.", img: "/history/breeds/Old-hunting-dogs-of-the-Celts.jpg", value: 25 },
-      { name: "Celtic herdsmen's dogs", note: "The all-round farm dogs of the Celtic tribes, guarding and driving the herds. Now extinct.", img: "/history/breeds/celtic-herdsmen-dogs.jpg", value: 25 },
+      { name: "Celtic Coursing Hound", note: "Swift Celtic sight-hunting dog described by classical writers. Now extinct.", img: "/history/breeds/ancient-celtic-coursing-hound.jpg", value: 33 },
+      { name: "Celtic Hound", note: "Ancient Celtic war and hunting hound, forebear of the Wolfhound. Now extinct.", img: "/history/breeds/celtic-hound-remake.jpg", value: 33 },
+      { name: "Old hunting dogs of the Celts", note: "The native running dogs of Iron Age Europe. Now extinct.", img: "/history/breeds/Old-hunting-dogs-of-the-Celts.jpg", value: 34 },
     ],
   },
   "Livestock Dog": {

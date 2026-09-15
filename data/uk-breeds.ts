@@ -34,7 +34,7 @@ export const ukBreeds: UKBreed[] = [
   // extinct historical types, flip-only cards under the root-only rule.
   // Referenced by no tree yet; Batches 4 and 5 do the grafting.
   { name: "Celtic Scent Hound", strip: "ancient", era: "Ancient", anchor: 210, note: "Early Celtic tracking hound that followed game by scent, representing the roots of later European scent hounds.", image: "/history/breeds/ancient-celtic-scent-hound.jpg", tag: "extinct" },
-  { name: "Celtic herdsmen's dogs", strip: "ancient", era: "Ancient", anchor: 200, note: "All-round farm dogs of the Celtic tribes, guarding and driving the herds.", image: "/history/breeds/celtic-herdsmen-dogs.jpg", tag: "extinct" },
+  { name: "Celtic herdsmen's dogs", strip: "ancient", era: "Ancient", anchor: 215, note: "All-round farm dogs of the Celtic tribes, guarding and driving the herds.", image: "/history/breeds/celtic-herdsmen-dogs.jpg", tag: "extinct" },
   { name: "Livestock Dog", strip: "ancient", era: "Ancient", anchor: 220, note: "Broad early working-dog population used to guard, move and control livestock before named British breeds existed.", image: "/history/breeds/ancient-livestock-dog.jpg", tag: "extinct" },
   // 19 August 2026: medieval strip. era is an honest band label ("Medieval"),
   // never a bare year; anchor is purely an ordering device, never shown to the
