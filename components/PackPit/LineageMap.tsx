@@ -902,20 +902,33 @@ export default function LineageMap({
   // non-binary splits). Sum a breed's appearances, then normalise so every breed
   // totals 100% across the whole dog. /* breedMix */
   const breedMix = useMemo(() => {
-    type App = { depth: number; pct: number };
+    /* EACH APPEARANCE REMEMBERS WHICH SIDE OF THE FAMILY IT CAME DOWN,
+       15 September 2026 (owner). The info box used to print one line per
+       appearance, every one labelled only by generation, so a dog reached 32
+       times gave 32 lines reading "As great-great-great-great-grandparent: <1%".
+       That told the reader how far back it was and never which dog it came
+       through, which is the thing the picture cannot show them.
+
+       The branch is the DEPTH-1 ancestor the path descends from, so the box can
+       group by it: "from Fox Terrier: 9%", "from Old English White Terrier: 6%".
+       Measured on the Jack Russell in the owner's screenshot, that turns 32
+       lines into 2, and the two still add to the headline figure. */
+    type App = { depth: number; pct: number; branch: string };
     const apps = new Map<string, App[]>(); // breed key -> appearances
     const rootLeaves = root ? root._leaves : 0;
-    const walk = (n: Node, depth: number) => {
+    const walk = (n: Node, depth: number, branch: string) => {
       (n.children as Node[] | undefined)?.forEach((k) => {
+        // at depth 1 the child IS the branch; deeper down it inherits it
+        const br = depth === 1 ? k.name : branch;
         if (k.img && rootLeaves > 0) {
           const key = PACK_IMG.get(k.name) ?? k.img;
           const pct = (k._leaves / rootLeaves) * 100; // cumulative contribution of this appearance
-          const a = apps.get(key) || []; a.push({ depth, pct }); apps.set(key, a);
+          const a = apps.get(key) || []; a.push({ depth, pct, branch: br }); apps.set(key, a);
         }
-        walk(k, depth + 1);
+        walk(k, depth + 1, br);
       });
     };
-    if (root) walk(root, 1); // root's direct children are 1 generation back
+    if (root) walk(root, 1, ""); // root's direct children are 1 generation back
     // raw sum per breed
     const sums = new Map<string, number>();
     apps.forEach((list, key) => sums.set(key, list.reduce((s, a) => s + a.pct, 0)));
@@ -3463,7 +3476,21 @@ export default function LineageMap({
         const apps = info ? info.apps : [];
         const sum = info ? info.sum : c.mix;
         const norm = info ? info.norm : c.mix;
-        const multi = apps.length > 1;
+        /* ONE LINE PER SIDE OF THE FAMILY, NOT PER APPEARANCE, 15 September 2026
+           (owner). See the comment on breedMix. A dog reached 32 times used to
+           give 32 lines, all reading the same generation label, which told the
+           reader nothing about the route. Grouped by the depth-1 branch it came
+           through, the same case gives two lines that name the dogs and still
+           add to the headline figure.
+
+           genLabel is kept and still used for the single-appearance case, where
+           the generation IS the useful fact and there is no route to disambiguate. */
+        const routes = (() => {
+          const m = new Map<string, number>();
+          for (const a of apps) m.set(a.branch, (m.get(a.branch) ?? 0) + a.pct);
+          return [...m.entries()].sort((x, y) => y[1] - x[1]);
+        })();
+        const multi = routes.length > 1;
         return (
           <div
             ref={pctBoxRef}
@@ -3482,11 +3509,13 @@ export default function LineageMap({
             </div>
             {apps.length > 0 && (
               <div style={{ fontWeight: 600, marginBottom: 6 }}>
-                {apps.map((a, i) => (
-                  <div key={i}>As {genLabel(a.depth)}: {pctTxt(a.pct)}</div>
-                ))}
+                {apps.length === 1
+                  ? <div>As {genLabel(apps[0].depth)}: {pctTxt(apps[0].pct)}</div>
+                  : routes.map(([branch, pct], i) => (
+                      <div key={i}>from {branch}: {pctTxt(pct)}</div>
+                    ))}
                 {multi && (
-                  <div style={{ marginTop: 2 }}>Combined: {apps.map((a) => pctTxt(a.pct)).join(" + ")} = {pctTxt(sum)}</div>
+                  <div style={{ marginTop: 2 }}>Combined: {routes.map(([, p]) => pctTxt(p)).join(" + ")} = {pctTxt(sum)}</div>
                 )}
                 <div style={{ marginTop: 2 }}>Share of your chum: {pctTxt(norm)}</div>
               </div>
