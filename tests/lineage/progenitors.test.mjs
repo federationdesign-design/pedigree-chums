@@ -87,23 +87,20 @@ test("no single ancestor's share exceeds 100%", () => {
 // every number in the game cannot land unnoticed. Update the figures deliberately
 // if the data or the depth cap changes, do not delete the test.
 //
-// IT HAS ALREADY EARNED ITS PLACE. On its first run it failed. The brief's table
-// was measured at MAX_LINEAGE_DEPTH 5 and gives the Cavalier five progenitors
-// with Old scenting hounds at 40.0%. At the current cap of 7 the Cavalier has
-// EIGHT progenitors and Old scenting hounds is 41.4%, because Celtic Scent Hound
-// now expands into the four tracking-hound stocks behind it instead of standing
-// as a 40% leaf. So the brief's tables are correct for the data as it was on
-// 9 September and are NOT the figures to build against. The Beagle is unchanged
-// at seven progenitors, which is why both are pinned here rather than one.
+// IT HAS EARNED ITS PLACE TWICE. First run, it caught that the brief's table was
+// measured at MAX_LINEAGE_DEPTH 5 and the cap is now 7. Second, it caught the
+// share-scaling fix of 15 September, which moved 152 of the game's 330
+// direct-child shares. The brief's figures, and the cap-7 figures that replaced
+// them, are both superseded by the ones below.
 test("the brief's worked examples still hold", () => {
   const cav = getLineage("Cavalier King Charles Spaniel");
   assert.ok(cav, "Cavalier King Charles Spaniel has a lineage");
   const shares = progenitorShares(cav);
-  assert.equal(shares.size, 8, "the Cavalier has 8 progenitors at cap 7");
+  assert.equal(shares.size, 8, "the Cavalier has 8 progenitors");
   assert.equal(
-    Math.round((shares.get("Old scenting hounds") ?? 0) * 10) / 10,
-    41.4,
-    "Old scenting hounds is 41.4% of the Cavalier as a progenitor"
+    Math.round((shares.get("St Hubert Hound") ?? 0) * 10) / 10,
+    38,
+    "St Hubert Hound is 38.0% of the Cavalier"
   );
   const beagle = getLineage("Beagle");
   assert.ok(beagle, "Beagle has a lineage");
@@ -111,7 +108,50 @@ test("the brief's worked examples still hold", () => {
   assert.equal(bShares.size, 7, "the Beagle has 7 progenitors");
   assert.equal(
     Math.round((bShares.get("St Hubert Hound") ?? 0) * 10) / 10,
-    41.7,
-    "St Hubert Hound is 41.7% of the Beagle as a progenitor"
+    50.6,
+    "St Hubert Hound is 50.6% of the Beagle"
   );
+});
+
+/* THE AUTHORED SHARE IS THE SHARE THAT IS DRAWN, added 15 September 2026.
+
+   This is the guard for the fault the scaling fix cured, and it is the one that
+   matters most: if the data says a dog is 40% of its parent, 40% is what must
+   come out the other end. Until the fix, a child that carried its own inline
+   children ignored its authored value and came through at whatever its subtree
+   happened to weigh. The Cavachon, authored 50/50, was drawing 91.4/8.6.
+
+   Scoped to roots where EVERY direct child carries a value, because that is the
+   only case where the expected answer is unambiguous. Where a child has no value
+   of its own, its weight is by design the sum of its subtree's leaves, and there
+   is nothing authored to check it against. */
+test("a direct child's drawn share equals its authored share", () => {
+  const leafSum = (n) =>
+    n.children && n.children.length
+      ? n.children.reduce((s, c) => s + leafSum(c), 0)
+      : (n.value ?? 1);
+  const bad = [];
+  let checked = 0;
+  for (const name of LINEAGE_ROOTS) {
+    const root = getLineage(name);
+    const kids = root?.children ?? [];
+    if (kids.length < 2) continue;
+    // the authored values live on the raw record, which getLineage has already
+    // expanded, so read them from a root whose children were never grafted
+    const authored = kids.map((c) => c.value);
+    if (authored.some((v) => v === undefined)) continue;
+    const sum = authored.reduce((s, v) => s + v, 0);
+    if (sum <= 0) continue;
+    const total = leafSum(root);
+    kids.forEach((c, i) => {
+      checked += 1;
+      const want = (authored[i] / sum) * 100;
+      const got = (leafSum(c) / total) * 100;
+      if (Math.abs(want - got) > 0.05) {
+        bad.push(`${name} > ${c.name}: authored ${want.toFixed(1)}%, drawn ${got.toFixed(1)}%`);
+      }
+    });
+  }
+  assert.ok(checked > 0, "the check found some roots to test");
+  assert.deepEqual(bad, [], `shares that do not match what the data authors:\n  ${bad.join("\n  ")}`);
 });

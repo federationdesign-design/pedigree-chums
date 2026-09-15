@@ -2325,34 +2325,71 @@ function expandNode(
     (!node.children || node.children.length === 0);
 
   if (canGraft && sub.children) {
+    const subKids = sub.children;
     const share = node.value ?? 0;
-    const directTotal = sub.children.reduce((sum, c) => sum + (c.value ?? 0), 0);
     const next = new Set(visited);
     next.add(key);
+    /* THE WEIGHT A CHILD IS MEANT TO CARRY. Its own value where it has one,
+       otherwise the sum of its own subtree's leaves. Both shapes occur in the
+       records and the two used to be handled by two different branches. */
+    const leafSum = (n: LineageNode): number =>
+      n.children && n.children.length
+        ? n.children.reduce((s, c) => s + leafSum(c), 0)
+        : n.value ?? 0;
+    const weightOf = (c: LineageNode): number => c.value ?? leafSum(c);
+    /* SCALE A WHOLE SUBTREE TO A TARGET WEIGHT. An internal node drops its own
+       value, exactly as a grafted node does below, so the branch is counted once
+       through its leaves rather than twice. */
+    const scaleTo = (n: LineageNode, want: number): LineageNode => {
+      if (!n.children || !n.children.length) return { ...n, value: want };
+      const have = leafSum(n);
+      const f = have > 0 ? want / have : 0;
+      const mul = (x: LineageNode): LineageNode =>
+        x.children && x.children.length
+          ? { ...x, value: undefined, children: x.children.map(mul) }
+          : { ...x, value: (x.value ?? 0) * f };
+      return mul(n);
+    };
     let kids: LineageNode[];
-    if (directTotal > 0) {
-      // Every record grafted before 4 August takes this path unchanged: the
-      // frozen fixture figures depend on this exact arithmetic.
-      kids = sub.children.map((c) =>
-        expandNode({ ...c, value: ((c.value ?? 0) * share) / directTotal }, depth + 1, next),
+    const total = subKids.reduce((s, c) => s + weightOf(c), 0);
+    if (total > 0) {
+      /* THE SHARE IS NOW PRESERVED WHATEVER SHAPE THE CHILD IS, 15 September 2026.
+
+         WHAT WAS WRONG. This branch handed each child a scaled `value` and
+         recursed. That works for a child that is a bare leaf, because its value
+         IS its weight. It does nothing for a child that already carries its own
+         inline children, because such a node's weight comes from its leaves and
+         the value it was just handed is ignored. The graft then came through at
+         its authored size instead of the share it was supposed to fill, and it
+         swamped its siblings.
+
+         MEASURED. Turnspit Dog authors Cur at 40 against Old short-legged
+         working dogs at 60. After the September merges Cur was weighing 320 and
+         drawing 84% of the dog. Across the whole game, 26 of 330 direct-child
+         shares had moved: Sealyham's Dandie Dinmont 53.6 to 28.8, Lakeland's
+         Bedlington 46.4 to 25.0, Cairn's Skye stock 55.0 to 45.0. None of it was
+         authored and none of it was intended.
+
+         THE TWO OLD BRANCHES ARE NOW ONE. The former directTotal path and the
+         leaf-sum path were the same operation written twice for two child
+         shapes. weightOf reads either shape and scaleTo rescales either shape,
+         so the rule is one line: every child fills its own weight's fraction of
+         this node's share.
+
+         THE FROZEN FIXTURES ARE SAFE. Where every child is a valued leaf, which
+         is what the pre-4-August records are, weightOf returns c.value and
+         scaleTo sets that value directly, so this computes (c.value * share) /
+         directTotal exactly as before, term for term. */
+      kids = subKids.map((c) =>
+        expandNode(scaleTo(c, (weightOf(c) * share) / total), depth + 1, next),
       );
     } else {
-      // A record whose children are valueless branches (the Celtic Heeler
-      // shape, first grafted with the four ancient playable levels) carries
-      // its weight in the grandchildren. The direct-value total above reads
-      // 0 for it, which used to let the leaves through unscaled and move
-      // every figure in the host tree, so this shape scales by leaf sum.
-      const leafSum = (n: LineageNode): number =>
-        n.children && n.children.length
-          ? n.children.reduce((s, c) => s + leafSum(c), 0)
-          : n.value ?? 0;
-      const total = sub.children.reduce((sum, c) => sum + leafSum(c), 0) || 1;
-      const scale = share / total;
-      const scaleLeaves = (n: LineageNode): LineageNode =>
-        n.children && n.children.length
-          ? { ...n, value: undefined, children: n.children.map(scaleLeaves) }
-          : { ...n, value: (n.value ?? 0) * scale };
-      kids = sub.children.map((c) => expandNode(scaleLeaves(c), depth + 1, next));
+      // Nothing under this record carries any weight at all, so there is no
+      // proportion to preserve. Left as an even split rather than dropping the
+      // branch, which would lose the history the graft exists to show.
+      kids = subKids.map((c) =>
+        expandNode(scaleTo(c, share / subKids.length), depth + 1, next),
+      );
     }
     // A grafted node drops its own value: its children carry its share, so
     // the d3 sum measure counts the branch once rather than twice and the
