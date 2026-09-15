@@ -41,9 +41,9 @@ export const ukBreeds: UKBreed[] = [
   // user, so an anchor must not be read as a researched date. All nine are
   // banded "Medieval". Rache's anchor moved from 1150 to 1160 to break its tie
   // with Scottish Deerhound and give a stable sort.
-  { name: "Shepherd's Dog", strip: "medieval", era: "Medieval", anchor: 1050, note: "Practical medieval working dog used to move and protect sheep, forming an early root of Britain's collie families.", image: "/history/breeds/medieval-shepherds-dog.jpg", tag: "extinct" },
+  { name: "Shepherd's Dog", strip: "medieval", era: "Medieval", anchor: 1070, note: "Practical medieval working dog used to move and protect sheep, forming an early root of Britain's collie families.", image: "/history/breeds/medieval-shepherds-dog.jpg", tag: "extinct" },
   { name: "Drover's Dog", strip: "medieval", era: "Medieval", anchor: 1060, note: "Tough working dog that helped move cattle and sheep over long distances to markets and towns.", image: "/history/breeds/medieval-drover-dog.jpg", tag: "extinct" },
-  { name: "Earth Dog", strip: "medieval", era: "Medieval", anchor: 1070, note: "Small, determined hunting and vermin dog that followed quarry underground.", image: "/history/breeds/medieval-earth-dog.jpg", tag: "extinct" },
+  { name: "Earth Dog", strip: "medieval", era: "Medieval", anchor: 1050, note: "Small, determined hunting and vermin dog that followed quarry underground.", image: "/history/breeds/medieval-earth-dog.jpg", tag: "extinct" },
   { name: "Talbot", strip: "medieval", era: "Medieval", anchor: 1200, note: "White medieval hound, ancestor of the beagle and bloodhound.", image: "/history/breeds/talbot-hound.jpg", tag: "extinct" },
 
   { name: "Bloodhound", strip: "medieval", era: "Medieval", anchor: 1100, note: "Scent hound famed for a nose that can follow a trail days old.", image: "/bloodhound-square.jpg", tag: "endangered" },

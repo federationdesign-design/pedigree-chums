@@ -1345,14 +1345,27 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Celtic Coursing Hound",
     note: "Swift Celtic sight-hunting dog described by classical writers, an early root of later British and Irish sighthounds. An extinct historical type.",
     img: "/history/breeds/ancient-celtic-coursing-hound.jpg",
+    /* THE CELTIC HOUND JOINS AS A THIRD PARENT, 15 September 2026 (owner: a
+       smaller 20% share of the Celtic hound alongside the two already here).
+
+       THE VALUES ON THE OTHER TWO ARE NEW AND NECESSARY. Neither carried one
+       before, so each took its weight from its own subtree and both landed on
+       50. Adding a third child with a value and leaving the other two without
+       would have mixed the two rules and produced a split nobody chose. 40/40/20
+       is the owner's 20 with the remainder shared evenly, as it was.
+
+       No cycle: the Celtic Hound's own parents are Ancient eastern sighthounds
+       and Old hunting dogs of the Celts, and the Celtic Coursing Hound is in
+       neither. */
     children: [
+      { name: "Celtic Hound", note: "Ancient Celtic war and hunting hound, forebear of the Wolfhound. Now extinct.", img: "/history/breeds/celtic-hound-remake.jpg", value: 20 },
       {
         name: "Gaulish coursing hounds",
         note: "The swift vertragus hounds of Gaul that Roman writers admired for pure speed. Now extinct.",
         img: "/history/breeds/old-gaulish-coursinghounds.jpg",
         children: [
-          { name: "Old hunting dogs of the Celts", note: "The native running dogs of Iron Age Europe. Now extinct.", img: "/history/breeds/Old-hunting-dogs-of-the-Celts.jpg", value: 25 },
-          { name: "Gaulish coursing hounds", note: "The swift vertragus hounds of Gaul that Roman writers admired for pure speed. Now extinct.", img: "/history/breeds/old-gaulish-coursinghounds.jpg", value: 25 },
+          { name: "Old hunting dogs of the Celts", note: "The native running dogs of Iron Age Europe. Now extinct.", img: "/history/breeds/Old-hunting-dogs-of-the-Celts.jpg", value: 20 },
+          { name: "Gaulish coursing hounds", note: "The swift vertragus hounds of Gaul that Roman writers admired for pure speed. Now extinct.", img: "/history/breeds/old-gaulish-coursinghounds.jpg", value: 20 },
         ],
       },
       {
@@ -1360,8 +1373,8 @@ const LINEAGE: Record<string, LineageNode> = {
         note: "The slender desert coursing dogs of the old world. Now extinct.",
         img: "/history/breeds/Ancient-eastern-sighthounds.jpg",
         children: [
-          { name: "Old desert coursing dogs", note: "The first slender chasing dogs of the old desert lands. Now extinct.", img: "/history/breeds/old-desert-coursing-dogs.jpg", value: 25 },
-          { name: "Ancient eastern sighthounds", note: "The slender desert coursing dogs of the old world. Now extinct.", img: "/history/breeds/Ancient-eastern-sighthounds.jpg", value: 25 },
+          { name: "Old desert coursing dogs", note: "The first slender chasing dogs of the old desert lands. Now extinct.", img: "/history/breeds/old-desert-coursing-dogs.jpg", value: 20 },
+          { name: "Ancient eastern sighthounds", note: "The slender desert coursing dogs of the old world. Now extinct.", img: "/history/breeds/Ancient-eastern-sighthounds.jpg", value: 20 },
         ],
       },
     ],
@@ -1430,25 +1443,34 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Celtic Scent Hound",
     note: "Early Celtic tracking hound that followed game by scent, representing the roots of later European scent hounds. An extinct historical type.",
     img: "/history/breeds/ancient-celtic-scent-hound.jpg",
+    /* OLD HUNTING DOGS OF THE CELTS MOVED UP A LEVEL, 15 September 2026 (owner:
+       it sits under the Segusian hound but should be a third parent of 03).
+       MOVED, not copied, on the owner's word.
+
+       WHAT THAT DOES TO THE SEGUSIAN. Its only two children were this dog and a
+       copy of itself. Take the first away and it is left pointing at nothing but
+       itself, so it becomes a plain leaf here. That is the shape it already has
+       in every other tree it appears in, so this makes it consistent rather than
+       poorer.
+
+       THE THREE VALUES ARE EXPLICIT NOW, AND THEY HAVE TO BE. These children
+       used to carry no value at all, so each took its weight from its own
+       subtree, which is how both came out at 50. With the Segusian reduced to a
+       leaf it would weigh nothing, and the split would collapse. 40/40/20 mirrors
+       the shape the owner gave for level 02. The 20 is mine: no number was given
+       for this one. */
     children: [
-      {
-        name: "Segusian tracking hounds",
-        note: "The shaggy Gaulish trail hounds the Romans knew by name, famous for following a scent. Now extinct.",
-        img: "/history/breeds/segusian-hounds.jpg",
-        children: [
-          { name: "Old hunting dogs of the Celts", note: "The native running dogs of Iron Age Europe. Now extinct.", img: "/history/breeds/Old-hunting-dogs-of-the-Celts.jpg", value: 25 },
-          { name: "Segusian tracking hounds", note: "The shaggy Gaulish trail hounds the Romans knew by name, famous for following a scent. Now extinct.", img: "/history/breeds/segusian-hounds.jpg", value: 25 },
-        ],
-      },
+      { name: "Segusian tracking hounds", note: "The shaggy Gaulish trail hounds the Romans knew by name, famous for following a scent. Now extinct.", img: "/history/breeds/segusian-hounds.jpg", value: 40 },
       {
         name: "Laconian tracking hounds",
         note: "The keen-nosed hare-tracking hounds of ancient Greece, praised by Greek hunting writers. Now extinct.",
         img: "/history/greek-harehound.jpg",
         children: [
-          { name: "Old trail dogs of the ancient East", note: "The early trail-following hunting dogs of the ancient East. Now extinct.", img: "/history/breeds/old-trail-dogs-of-the-ancient-east.jpg", value: 25 },
-          { name: "Laconian tracking hounds", note: "The keen-nosed hare-tracking hounds of ancient Greece, praised by Greek hunting writers. Now extinct.", img: "/history/greek-harehound.jpg", value: 25 },
+          { name: "Old trail dogs of the ancient East", note: "The early trail-following hunting dogs of the ancient East. Now extinct.", img: "/history/breeds/old-trail-dogs-of-the-ancient-east.jpg", value: 20 },
+          { name: "Laconian tracking hounds", note: "The keen-nosed hare-tracking hounds of ancient Greece, praised by Greek hunting writers. Now extinct.", img: "/history/greek-harehound.jpg", value: 20 },
         ],
       },
+      { name: "Old hunting dogs of the Celts", note: "The native running dogs of Iron Age Europe. Now extinct.", img: "/history/breeds/Old-hunting-dogs-of-the-Celts.jpg", value: 20 },
     ],
   },
   // Playable (owner instruction, 4 August), same shape and rules. Grafted
