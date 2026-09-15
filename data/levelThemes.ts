@@ -91,17 +91,27 @@ const THEMES: Record<string, LevelTheme> = {
       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     ],
     wash: "#fdf251",
-    // Tudor swaps the woodland props for household ones.
-    props: ["newspaper", "fork", "shoe"],
-    /* Three levels in the middle of the Tudor run keep the fork alone. The
-       newspaper and the shoe are the two big ones, and on these the floor was
-       too crowded to play on. Turnspit Dog and Bearded Collie, either side of
-       them, keep all three. */
-    propsByLevel: {
-      "English Foxhound": ["fork"],
-      Otterhound: ["fork"],
-      Staghound: ["fork"],
-    },
+    /* THE HOUSEHOLD PROPS ARE OUT, 15 September 2026 (owner, seen on level 30,
+       Turnspit Dog).
+
+       WAS: props ["newspaper", "fork", "shoe"], with propsByLevel giving English
+       Foxhound, Otterhound and Staghound the fork alone, because the newspaper
+       and the shoe are the two big ones and those floors were too crowded.
+
+       THE FORK AND THE SHOE ARE GONE FOR GOOD. The owner's words: they can be
+       removed completely. THE NEWSPAPER IS PARKED, NOT RETIRED, and is allowed
+       back, which is why the old set is written out above rather than only
+       deleted. To bring it back, this becomes props: ["newspaper"].
+
+       An empty list is not the same as no list, but it behaves the same way
+       here: propsFor tests theme.props?.length, so [] falls through to null and
+       the pit uses DEFAULT_PROPS, the stick and the big stick, exactly as the
+       ancient and medieval eras already do.
+
+       Mobile never saw these anyway. The per-level table below beats propsFor
+       outright at 768px and under, on the reversed decision of 31 August. This
+       only changes desktop. */
+    props: [],
   },
 };
 THEMES["ancient"] = THEMES["ancient-medieval"];
@@ -160,7 +170,8 @@ export function propsFor(era?: string, levelName?: string): string[] | null {
    session the call was "Tudor props win on mobile", then "lose all Tudor
    props". The second one stands. So on mobile this table beats propsFor
    entirely, and the Tudor levels (23 to 34) get what is written here rather
-   than newspaper, fork and shoe. Desktop still gets the Tudor set.
+   than newspaper, fork and shoe. SUPERSEDED 15 September 2026: desktop no
+   longer gets the Tudor set either, since the owner removed those three props.
 
    LEVELS ARE ONE BASED HERE. Level 1 is Celtic Hound, the first level of the
    campaign. Note that the pit PAINTS it as "00", because levelNo comes from a
