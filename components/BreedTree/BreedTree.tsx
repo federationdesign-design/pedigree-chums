@@ -5718,18 +5718,36 @@ export default function BreedTree({
         const pitD1 = nodes.filter((n) => n.depth === 1);
         const pitPer = pitD1.length ? pitD1.reduce((a, n) => a + (n.r * kD) / pctRadius(shareOf(n)), 0) / pitD1.length : 0;
         const chipBadge = BADGE_FRAC * pitPer * pctRadius(pctVal);
-        // A green completion circle carries its own on-layer node radius as opts.r
-        // (client px, the size it wore on the learn layer). Convert it to the pit's
-        // viewBox units the SAME way the pills do (* fxScale) so it lands at that
-        // node radius, not the pit-dog chip scale, and always shows: a placed card
-        // is never dropped below the legibility floor. Yellow % chips keep the
-        // pit-dog scale (chipBadge); the solo-dog label branch is left untouched.
-        const rDraw = opts?.green && opts?.r != null
-          ? opts.r * fxScale
-          : opts?.label ? (opts?.r ?? 0)
-          // The floor is off here too, or a chip scattered in from the learn
-          // layer would still vanish while a popped one shows. See badgeDrawForNode.
-          : chipBadge;
+        /* THE CHIP KEEPS THE SIZE IT HAD ON THE LIFTED LAYER, 15 September 2026
+           (owner: "I need these yellow circles to persist at the same size when
+           they are dropped into the pit", estimated at a third bigger in the pit).
+
+           WHAT THIS REPLACES. The yellow chips used to be re-sized to chipBadge,
+           the pit's own dog scale, so a chip of share s landed at the badge a
+           native pit dog of that share would wear. That was a deliberate rule,
+           not an oversight, and it is what made them grow on the way down.
+
+           GREEN ALREADY DID THIS. A placed card has landed at its on-layer node
+           radius since 9 September. This widens that carve-out to every chip
+           that arrives carrying one, so yellow and green now follow one rule
+           instead of two.
+
+           opts.r is client px, the radius the node had on the learn layer a
+           moment earlier. * fxScale converts it to the pit's viewBox units, the
+           same conversion the pills use.
+
+           ONE REASON FOR THE OLD RULE IS GONE. The comment it replaced worried
+           that a learn-layer chip would fall under the legibility floor and
+           vanish while a popped one showed. That floor was removed on
+           10 September in bfef01d2 and every chip is drawn now.
+
+           chipBadge still stands for a chip that arrives with no radius of its
+           own, which is the popped and seeded path. */
+        const rDraw = opts?.label
+          ? (opts?.r ?? 0)
+          : opts?.r != null
+            ? opts.r * fxScale
+            : chipBadge;
         // A solo dog circle arrives through this same call carrying a label,
         // and that one is never a bomb: it is a whole breed, not a chip.
         const isBomb = !opts?.label && rollBomb();
@@ -9866,11 +9884,12 @@ export default function BreedTree({
               /* THE SIZE AND THE COLOUR IT HAD ON SCREEN.
 
                  c.r is the radius the node had on the learn layer a moment earlier,
-                 in client px. For a GREEN placed card it rides through as opts.r and
-                 spawnBadge lands the chip at that node radius (converted to pit
-                 units), so a collected card drops at the size it just looked, not the
-                 pit-dog chip scale. A non-green (unplaced) circle carries no green
-                 flag and stays on the pit-dog scale. */
+                 in client px. It rides through as opts.r and spawnBadge lands the
+                 chip at that node radius, converted to pit units, so a circle drops
+                 at the size it just looked. REVISED 15 September 2026: this was
+                 green only, and yellow circles were re-sized to the pit-dog chip
+                 scale on the way down, which read as a third bigger. Both colours
+                 now keep their on-layer size. */
               spawnBadgeRef.current?.(c.x, c.y, c.r, Math.round(c.share), { r: c.r, green: c.green });
             }
             for (const rd of data.rods ?? []) {
