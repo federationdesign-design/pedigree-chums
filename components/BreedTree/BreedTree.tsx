@@ -2999,6 +2999,20 @@ export default function BreedTree({
      the same pattern killToyRef and spawnBadgeRef already use. */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const removeChumBodyRef = useRef<((mb: any) => void) | null>(null);
+  /* SCORING A CHUM COLLECTED FROM THE PIT, 15 September 2026 (owner: the score
+     only went up on the green button, not on double-clicking the chum cards).
+
+     It did not go up at all. The double-click handler called onChumCollected and
+     flashCorner and nothing else, so a player could clear every chum out of the
+     pit and finish on the same score they started the round with. The counter
+     moved, which is what made it look like it was working.
+
+     Routed through a ref for the same reason killToyRef and spawnBadgeRef are:
+     numAt lives inside doFall, where the fx layer and the world transform are,
+     and the collect handler is out in the render. numAt already calls onScore,
+     so this scores AND flashes the number where the card was, like every other
+     award in the pit. */
+  const chumScoreRef = useRef<((i: number) => void) | null>(null);
   // Set inside the sim effect; called from the chum-collect handler so a rescue
   // is evaluated the INSTANT a chum is taken, not up to one 400ms poll later.
   // That immediacy is what lets a clear with half a second of "Oh no" left count.
@@ -5580,6 +5594,17 @@ export default function BreedTree({
          only at runtime, from the card's pointer handler, long after doFall
          has finished. It covers the case where the round has already ended and
          the loop has wound itself down. */
+      /* CHUM_COLLECT_POINTS matches the learn area's "Choose as pack chum"
+         button, which the owner raised to 1000 the same day, so the two ways of
+         taking a chum are worth the same. The position comes from the bridge,
+         which still holds the card's last world coordinates after its body
+         leaves the world, so it flashes where the card actually was. */
+      const CHUM_COLLECT_POINTS = 1000;
+      chumScoreRef.current = (i: number) => {
+        const b = chumBodiesRef.current[i];
+        if (!b) return;
+        numAt(b.x, b.y, CHUM_COLLECT_POINTS, performance.now());
+      };
       removeChumBodyRef.current = (mb) => {
         Composite.remove(world, mb);
         for (const o of Composite.allBodies(world) as { isStatic?: boolean }[]) {
@@ -8703,6 +8728,9 @@ export default function BreedTree({
                     // rescue would never fire and the whole feature would look
                     // broken. Clear it, drop the body, then re-test the countdown.
                     if (b) { b.onFloor = false; b.floorLostAt = 0; }
+                    // Scored BEFORE the body goes, so the number flashes at the
+                    // card rather than wherever the bridge was last written.
+                    chumScoreRef.current?.(i2);
                     if (b?.mb) { try { removeChumBodyRef.current?.(b.mb); } catch { /* already gone */ } }
                     tryCancelRef.current?.();
                     // Off it goes to the corner. It leaves the list when it
