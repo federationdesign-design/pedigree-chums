@@ -2280,7 +2280,19 @@ export default function LineageMap({
           <g
             className={styles.removeBtn}
             transform={`translate(0,${INSTR_NAMES.has(breed.name) ? 150 : (!packed && !collecting && !framesDone ? 138 : 62)})`}
-            onClick={(e) => { e.stopPropagation(); flashNum(rx, ry + ROOT + 88, 500, FLASH_SIZE); startRemove(); }}
+            /* COLLECTING THE CHUM IS 1,000, raised from 500 on 15 September 2026
+               (owner). It is the act the whole round is for, and at 500 it was
+               worth the same as stacking one duplicate card on a filled frame.
+
+               It rides the same path as every other award here: flashNum calls
+               onScore, which is BreedTree's onScore, which is addScore in
+               LineageModal. That path is ungated, so this builds the running
+               total from inside the learn area exactly as a pit award does. Only
+               the per-second drain pauses while the learn layer is open.
+
+               LineageMap is rendered by BOTH pits, so this figure changes in the
+               main pit and the mini pit together. */
+            onClick={(e) => { e.stopPropagation(); flashNum(rx, ry + ROOT + 88, 1000, FLASH_SIZE); startRemove(); }}
             role="button"
             aria-label={INSTR_NAMES.has(breed.name) ? "Complete" : "Choose as pack chum"}
           >
