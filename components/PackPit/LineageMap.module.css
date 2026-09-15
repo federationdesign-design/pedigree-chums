@@ -137,6 +137,16 @@
    main pit keeps the original. */
 .discPit {
   stroke-width: var(--ring, 5px);
+  /* THE LEMON, NOT THE FURNITURE YELLOW, 15 September 2026 (owner: the orange
+     yellow on the nodes when they are first lifted should be the lemon).
+     .disc's default fill is var(--yellow), #ffd23e, which is the pit furniture
+     colour. #ffed00 is what a placed node already switches to a few lines up in
+     LineageMap.tsx, and what a learnt chip wears once it drops into the pit, so
+     an untouched node and a placed one now agree instead of sitting two shades
+     apart. Scoped to .discPit so the main pit and the chum tree, neither of
+     which was asked about, keep the yellow they were signed off on. Placed and
+     seen nodes set their fill inline and are unaffected. */
+  fill: #ffed00;
 }
 .node:hover .discPit {
   stroke-width: calc(var(--ring, 5px) * 1.4);
@@ -546,7 +556,11 @@
 }
 
 /* First-ring hint: gently pulse the direct-child circles after a second of no
-   interaction, so it reads as where to tap. Stops the moment a circle is opened. */
+   interaction, so it reads as where to tap. Stops the moment a circle is opened.
+   THE GROWTH WAS HALVED, 15 September 2026 (owner: reduce the throbbing so they
+   do not increase in size as much). 1.13 to 1.065. The timing and the easing are
+   untouched, so it still reads as a pulse rather than a twitch; only the size
+   swing changed. One number if it wants to go further. */
 .hint {
   transform-box: fill-box;
   transform-origin: center;
@@ -554,7 +568,7 @@
 }
 @keyframes lm-hint {
   0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.13); }
+  50% { transform: scale(1.065); }
 }
 
 /* Auto-collect shortcut: a label in the display font over a small icon, centred
