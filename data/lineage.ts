@@ -1535,6 +1535,39 @@ const LINEAGE: Record<string, LineageNode> = {
       { name: "Roman shepherd dogs", note: "The flock-guarding sheepdogs the Roman farm writers described, kept white so the shepherd knew dog from wolf. Now extinct.", img: "/history/breeds/roman-shepherd-dogs.jpg", value: 25 },
     ],
   },
+  /* ROUGH WATER DOGS REACH THE LAND SPANIELS, 15 September 2026 (owner).
+
+     WHAT THE RESEARCH ACTUALLY SAYS. Otterhound University, the breed's own
+     history, is candid that the rough outer coat over a soft undercoat may have
+     come from interbreeding with water dogs but that it has never been proven,
+     that which water dog is unclear, perhaps the Barbet, and that the likeliest
+     candidate is probably no longer in existence. So the specific dog is not
+     known and this node was honest rather than incomplete.
+
+     WHY THE LAND SPANIELS ARE STILL DEFENSIBLE. The English Water Spaniel came
+     out of the old land spaniel stock, and Frank Jackson's Encyclopedia of Dog
+     Terms suggests that water spaniel was probably a forerunner of the
+     Otterhound. Land spaniels is a Medieval level at anchor 1475, a century
+     before the Otterhound at 1575, and its own note already calls it the stock
+     every working spaniel springs from.
+
+     TWO CANDIDATES WERE RULED OUT BY LOOPS, NOT BY HISTORY. Old European water
+     dogs' only parent is the Otterhound, and Water spaniels' only parent is the
+     Otterhound as well, listed twice. Either one behind this node would make the
+     Otterhound its own ancestor. Moving the Water spaniels earlier on the
+     timeline would not help: a loop is about descent, not dates, and their 1653
+     anchor is late precisely because in this data they come FROM the Otterhound.
+
+     Land spaniels contains neither the Otterhound nor this node anywhere in its
+     tree, so there is no loop. */
+  "Rough water dogs": {
+    name: "Rough water dogs",
+    note: "Shaggy, water-loving dogs for the wet work. Now extinct.",
+    img: "/history/breeds/rough-water-dogs.jpg",
+    children: [
+      { name: "Land spaniels", note: "The old English land-spaniel stock that every working spaniel springs from. Now extinct.", img: "/history/breeds/original-land-spaniel.jpg", value: 100 },
+    ],
+  },
   "Livestock Dog": {
     name: "Livestock Dog",
     note: "Broad early working-dog population used to guard, move and control livestock before named British breeds existed. An extinct historical type.",
