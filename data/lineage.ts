@@ -1485,6 +1485,34 @@ const LINEAGE: Record<string, LineageNode> = {
       { name: "Old hunting dogs of the Celts", note: "The native running dogs of Iron Age Europe. Now extinct.", img: "/history/breeds/Old-hunting-dogs-of-the-Celts.jpg", value: 34 },
     ],
   },
+  /* ITS OWN RECORD, 15 September 2026 (owner: on level 08 the Roman shepherd
+     dogs have no progenitors, but on level 05 they have the Ancient Molossers,
+     and 08 should mirror 05).
+
+     NOTHING HERE IS INVENTED. The children are lifted verbatim from the inline
+     copy inside "Livestock Dog", which is where this ancestry has always lived.
+     Until now the name behaved two ways depending on which level you opened: it
+     had Ancient Molossers behind it under Livestock Dog and was a bare leaf
+     everywhere else, Shepherd's Dog included. One record makes them agree.
+
+     THE SELF-CHILD IS KEPT, unlike the Celtic herdsmen's dogs record above. The
+     owner's ruling stands that a circle is a dog TYPE and a type can sit behind
+     itself. That only had to go for the Celtic herdsmen because it became a
+     playable LEVEL, where it would have asked the player to find the dog they
+     were already looking at. Roman shepherd dogs is an ancestor circle, so the
+     shape is left exactly as authored.
+
+     The inline copy under Livestock Dog is untouched. It already has children,
+     so it does not graft, and it is the source this was taken from. */
+  "Roman shepherd dogs": {
+    name: "Roman shepherd dogs",
+    note: "The flock-guarding sheepdogs the Roman farm writers described, kept white so the shepherd knew dog from wolf. Now extinct.",
+    img: "/history/breeds/roman-shepherd-dogs.jpg",
+    children: [
+      { name: "Ancient Molossers", note: "The big flock-guarding stock of the ancient world. Now extinct.", img: "/history/breeds/Ancient-Molossers.jpg", value: 25 },
+      { name: "Roman shepherd dogs", note: "The flock-guarding sheepdogs the Roman farm writers described, kept white so the shepherd knew dog from wolf. Now extinct.", img: "/history/breeds/roman-shepherd-dogs.jpg", value: 25 },
+    ],
+  },
   "Livestock Dog": {
     name: "Livestock Dog",
     note: "Broad early working-dog population used to guard, move and control livestock before named British breeds existed. An extinct historical type.",
