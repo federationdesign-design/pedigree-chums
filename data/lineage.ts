@@ -476,7 +476,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Corgi",
     note: "A big dog in a small body. The Pembroke is a true cattle herder, nipping at heels and ducking the kicks.",
     children: [
-      { name: "Ancient Spitz-type dogs", note: "Foxy-faced Nordic dogs like the Pomeranian and Swedish Vallhund, brought in by Flemish weavers and Viking settlers.", img: "/history/breeds/Northern-Spitz-landraces.jpg",  value: 40 },
+      { name: "Ancient Spitz-type dogs", note: "Foxy-faced Nordic dogs like the Pomeranian and Swedish Vallhund, brought in by Flemish weavers and Viking settlers.", img: "/history/breeds/late-early-spitz-northern-proto-spitz.jpg",  value: 40 },
       { name: "Cardigan Welsh Corgi", note: "Its close cousin and the older of the two Welsh corgis. The pair share deep Welsh roots and were briefly crossed in the 1930s.", img: "/history/breeds/Welsh_Corgi_Cardigan-photo.jpg", value: 35 },
       { name: "Welsh herding dogs", note: "The old Welsh herding and droving dogs, a long-legged, loose-eyed landrace and the parallel Welsh branch behind the region's sheep-working breeds. Now extinct.", img: "/history/breeds/Welsh-herding-dogs-cluster.jpg", value: 25 }
     ]
@@ -897,7 +897,7 @@ const LINEAGE: Record<string, LineageNode> = {
     children: [
       { name: "Dandie Dinmont Terrier", note: "Brought in to shorten the leg and add bone.", img: "/history/breeds/dandie-dinmont-terrier.jpg", value: 35 },
       { name: "West Highland White Terrier", note: "Used to set the white coat that kept it from being mistaken for the quarry.", img: "/history/breeds/West-Highland-White-Terrier.jpg", value: 35 },
-      { name: "Fox Terrier", note: "Added gameness and a sharp working drive. Now endangered.", img: "/history/breeds/wire-fox-terrier.jpg", value: 30 }
+      { name: "Fox Terrier", note: "Added gameness and a sharp working drive. Now endangered.", img: "/history/breeds/fox_terrier-img.jpg", value: 30 }
     ]
   },
 
@@ -906,7 +906,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "A small, shaggy Highland terrier named for the rock cairns it bolted vermin from, the closest of all to the original Scottish working terrier.",
     children: [
       { name: "Skye terrier stock", note: "The island working terriers it was once grouped with as a 'short-haired Skye'. Now endangered.", img: "/history/breeds/Isle-of-Skye-earth-dogs.jpg", value: 55 },
-      { name: "Skye terrier stock", note: "The mainland Highland branch of the same Skye earth-dog stock, shared with the Scottie and Westie. Now extinct.", img: "/history/breeds/Highland-mainland-terriers.jpg", value: 45 }
+      { name: "Skye terrier stock", note: "The mainland Highland branch of the same Skye earth-dog stock, shared with the Scottie and Westie. Now extinct.", img: "/history/breeds/Isle-of-Skye-earth-dogs.jpg", value: 45 }
     ]
   },
 
@@ -917,7 +917,7 @@ const LINEAGE: Record<string, LineageNode> = {
       { name: "Old fell terriers", note: "The hardy black-and-tan working terriers of the northern fells. Now extinct.", img: "/history/breeds/Old-fell-terriers-Patterdale-Terrier-Working-hunt-terriers.jpg", value: 30 },
       { name: "Old wirehaired fell terriers", note: "The wiry-coated strain of fell terrier behind its broken jacket. Now extinct.", img: "/history/breeds/Old-wirehaired-fell-terrier.jpg", value: 20 },
       { name: "Bedlington Terrier", note: "A near neighbour that lent coat and line.", img: "/history/breeds/Bedlington Terrier-photo.jpg", value: 25 },
-      { name: "Fox Terrier", note: "Added smartness and a workmanlike head. Now endangered.", img: "/history/breeds/wire-fox-terrier.jpg", value: 25 }
+      { name: "Fox Terrier", note: "Added smartness and a workmanlike head. Now endangered.", img: "/history/breeds/fox_terrier-img.jpg", value: 25 }
     ]
   },
 
@@ -1098,7 +1098,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "Not a breed but a type: a sighthound crossed with a working dog, long the poacher's and traveller's companion, fast and quiet.",
     children: [
       { name: "Greyhound", note: "A sighthound for speed and a silent, sweeping run.", img: "/history/breeds/original-greyhound.jpg", value: 50 },
-      { name: "Old working collies", note: "Herding or pastoral blood for brains and biddability. Now extinct.", img: "/history/breeds/Old-Scotch-Collie.jpg", value: 30 },
+      { name: "Old working collies", note: "Herding or pastoral blood for brains and biddability. Now extinct.", img: "/history/breeds/Old-working-collies-cluster.jpg", value: 30 },
       { name: "Old English Black and Tan Terrier", note: "Sometimes terrier blood for grit and a harder coat.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 20 }
     ]
   },
@@ -1165,7 +1165,7 @@ const LINEAGE: Record<string, LineageNode> = {
     children: [
       { name: "Old Irish water dogs", note: "The southern and northern water spaniels of Ireland. Now extinct.", img: "/history/breeds/Old-Irish-water-dog.jpg", value: 55 },
       // 19 August 2026: this extinct ancestor was wearing a photograph of a living descendant, the Poodle. Repointed to its own artwork.
-      { name: "Old European water dogs", note: "Continental curly water dogs that shaped the coat. Now extinct.", img: "/history/breeds/continental-water-dogs.jpg", value: 45 }
+      { name: "Old European water dogs", note: "Continental curly water dogs that shaped the coat. Now extinct.", img: "/history/breeds/Old-European-water-dogs.jpg", value: 45 }
     ]
   },
 
@@ -1538,7 +1538,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Arctic sled dogs",
     note: "The Siberian and Alaskan sled dogs, Husky and Malamute, behind the wolfish modern recreations.",
     children: [
-      { name: "Ancient Spitz-type dogs", note: "The broad northern spitz family the arctic sled dogs belong to, Nordic stock that sits outside the British Tudor record and reaches no era card.", img: "/history/breeds/Northern-Spitz-landraces.jpg", value: 100 }
+      { name: "Ancient Spitz-type dogs", note: "The broad northern spitz family the arctic sled dogs belong to, Nordic stock that sits outside the British Tudor record and reaches no era card.", img: "/history/breeds/late-early-spitz-northern-proto-spitz.jpg", value: 100 }
     ]
   },
 
@@ -1753,7 +1753,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "An extinct, short-legged kitchen dog bred to trot inside a wheel and turn the roasting spit over the fire.",
     children: [
       { name: "Old short-legged working dogs", note: "The low, long dwarf working type behind it. Now extinct.", img: "/history/breeds/Old-short-legged-working-dogs.jpg", value: 60 },
-      { name: "Cur", note: "The everyday kitchen curs and household mongrels it was bred down from. Now extinct.", img: "/history/breeds/Farm-and-kitchen-curs.jpg", value: 40 }
+      { name: "Cur", note: "The everyday kitchen curs and household mongrels it was bred down from. Now extinct.", img: "/history/breeds/cur-dog.jpg", value: 40 }
     ]
   },
 
@@ -1865,7 +1865,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "English Setter",
     note: "An elegant, feathered bird dog that 'sets', crouching low when it scents game, built up from the old setting spaniels.",
     children: [
-      { name: "Land spaniels", note: "The crouching land spaniels that marked game for the net. Now extinct.", img: "/history/breeds/old-setting-spaniels.jpg", value: 50 },
+      { name: "Land spaniels", note: "The crouching land spaniels that marked game for the net. Now extinct.", img: "/history/breeds/original-land-spaniel.jpg", value: 50 },
       { name: "Pointer", note: "Spanish pointer blood for nose and a firm point.", img: "/history/breeds/british-pointers.jpg", value: 30 },
       { name: "Water spaniels", note: "A little water-spaniel for coat and biddability. Now extinct.", img: "/history/breeds/original-water-spaniel.jpg", value: 20 }
     ]
@@ -1954,7 +1954,7 @@ const LINEAGE: Record<string, LineageNode> = {
       // are documented as cur-type drovers' dogs. No foundation grafts inside
       // it, so it takes the full branch value and the split rule does not
       // apply.
-      { name: "Celtic Heeler", note: "Low, hard-bitten cattle dogs that drove stock by nipping at the heels and ducking the kick. Now extinct as a type.", img: "/history/breeds/old-heeler-stock.jpg", value: 180 }
+      { name: "Celtic Heeler", note: "Low, hard-bitten cattle dogs that drove stock by nipping at the heels and ducking the kick. Now extinct as a type.", img: "/history/breeds/medieval-corgi.jpg", value: 180 }
     ]
   },
 
@@ -2054,7 +2054,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "Now a clever companion and show dog, but built as a water-retrieving gundog. The name comes from the German 'Pudel', meaning to splash about.",
     children: [
       { name: "Old European water dogs", note: "The rough water-retrieving dogs of Germany and France that fetched waterfowl for hunters. Now extinct.", img: "/history/breeds/Old-European-water-dogs.jpg", value: 55 },
-      { name: "Barbet water dogs", note: "The curly-coated continental Barbet, an old European water dog and the root of the poodle line. A modelled half of the pair, not a recorded mating. Now extinct.", img: "/history/breeds/barbet.jpg", value: 22.5 },
+      { name: "Barbet water dogs", note: "The curly-coated continental Barbet, an old European water dog and the root of the poodle line. A modelled half of the pair, not a recorded mating. Now extinct.", img: "/history/breeds/Barbet-water-dogs.jpg", value: 22.5 },
       { name: "Water spaniels", note: "The British working water-spaniel branch crossed in alongside them, listed separately from the water dogs by Caius in 1576. Now extinct.", img: "/history/breeds/original-water-spaniel.jpg", value: 22.5 }
     ]
   },
