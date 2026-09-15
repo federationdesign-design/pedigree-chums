@@ -1027,7 +1027,35 @@ export default function LineageMap({
         if (!p) return liftR;
         return nodeR(Math.round((nd._leaves / Math.max(1, p._leaves)) * 100));
       };
-      let center = circular ? -Math.PI / 2 : depth === 0 ? -Math.PI / 2 + base : n._dir;
+      /* THE CLOCK FACE IS THE ROOT'S ONLY, FROM DEPTH 1 THE FAN FOLLOWS _dir,
+         15 September 2026 (owner: the nodes still overlay each other awkwardly,
+         though a proper fan clock layout does appear sometimes).
+
+         WHAT WAS WRONG. This read `circular ? -Math.PI / 2 : ...`, so EVERY
+         circular node at EVERY depth fanned its children straight up, regardless
+         of where that node actually sat. On the first ring that is fine: there is
+         one parent and the whole top semicircle is free. With two branches open,
+         both push their children into the same upward corridor and they land on
+         each other. That is why it looks clean when only one branch is open and a
+         mess as soon as it is not.
+
+         _dir is the direction the node itself sits at, so its children now fan
+         AWAY from the centre and branches separate by construction. This is
+         option A from the 10 September handover, which was agreed and never
+         applied; what went in instead was the clock face, recorded there as
+         option B and not agreed.
+
+         THE ROOT KEEPS THE CLOCK FACE ON PURPOSE. It was written to fix a real
+         bug, a child spawning straight up under the pointer as the parent opens
+         and stealing the hover, and to keep nodes off the card and the Learn
+         button. Both of those are properties of the LIFTED card at depth 0. The
+         slot offsets below still apply at depth, they are just measured from the
+         node's own direction rather than from vertical.
+
+         KNOWN AND ACCEPTED: a deep child can now sit below the horizontal, which
+         the clock face was partly written to avoid. That guarantee only ever
+         mattered around the card itself. */
+      let center = circular ? (depth === 0 ? -Math.PI / 2 : n._dir) : depth === 0 ? -Math.PI / 2 + base : n._dir;
       // A lone child on the first ring has no fan spread to offset it, so it used
       // to sit dead vertical above the dog. Lean it out on the diagonal instead.
       // SOLO_DEG is measured from horizontal, the way the connector reads on
