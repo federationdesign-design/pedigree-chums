@@ -1578,8 +1578,23 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Rough water dogs",
     note: "Shaggy, water-loving dogs for the wet work. Now extinct.",
     img: "/history/breeds/rough-water-dogs.jpg",
+    /* A SECOND PARENT, 16 September 2026 (owner). NOT because a second ancestor
+       was discovered, but because of the renderer's KEEP-CHILD COLLAPSE: a
+       grafted node with exactly ONE child is treated as a redundant wrapper and
+       dropped, so a one-parent record vanishes from its own level and draws its
+       parent in its place. That is what was happening to the Otterhound, which
+       showed Land spaniels at 25% with the rough water dogs nowhere. Two children
+       means no wrapper and the dog draws.
+       THE SPLIT IS MINE. No numbers were given. */
+    /* THE BARBET IS THE SOURCED HEDGE, not a claim. Otterhound University names
+       it as the possible water dog behind the rough coat while saying plainly
+       that the specific dog is unclear and the likeliest candidate is probably no
+       longer in existence, which is why it carries the smaller share. It is also
+       the only candidate that does not loop: Old European water dogs and Water
+       spaniels both descend from the Otterhound. */
     children: [
-      { name: "Land spaniels", note: "The old English land-spaniel stock that every working spaniel springs from. Now extinct.", img: "/history/breeds/original-land-spaniel.jpg", value: 100 },
+      { name: "Land spaniels", note: "The old English land-spaniel stock that every working spaniel springs from. Now extinct.", img: "/history/breeds/original-land-spaniel.jpg", value: 70 },
+      { name: "Barbet water dogs", note: "The curly continental water dogs, named in the breed histories as the possible source of the rough coat. Now extinct.", img: "/history/breeds/Barbet-water-dogs.jpg", value: 30 },
     ],
   },
   /* OLD BORDER TERRIERS REACH THE MEDIEVAL EARTH DOG, 15 September 2026 (owner:
@@ -1599,8 +1614,19 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Old Border terriers",
     note: "The old working-terrier stock of the Anglo-Scottish border. Now extinct.",
     img: "/history/breeds/Old-Border-terriers.jpg",
+    /* A SECOND PARENT, 16 September 2026 (owner). NOT because a second ancestor
+       was discovered, but because of the renderer's KEEP-CHILD COLLAPSE: a
+       grafted node with exactly ONE child is treated as a redundant wrapper and
+       dropped, so a one-parent record vanishes from its own level and draws its
+       parent in its place. That is what was happening to the Otterhound, which
+       showed Land spaniels at 25% with the rough water dogs nowhere. Two children
+       means no wrapper and the dog draws.
+       THE SPLIT IS MINE. No numbers were given. */
+    /* Old English Black and Tan Terrier is the other medieval terrier in the data
+       and was named as a defensible second when this record was first built. */
     children: [
-      { name: "Earth Dog", note: "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.", img: "/history/breeds/medieval-earth-dog.jpg", value: 100 },
+      { name: "Earth Dog", note: "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.", img: "/history/breeds/medieval-earth-dog.jpg", value: 65 },
+      { name: "Old English Black and Tan Terrier", note: "The old black-and-tan working terrier behind most of Britain's terrier families. Now extinct.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 35 },
     ],
   },
   /* OLD SHORT-LEGGED WORKING DOGS REACH THE CELTIC HEELER, 15 September 2026
@@ -1621,8 +1647,22 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Old short-legged working dogs",
     note: "The low-slung working dogs of the old farm and yard. Now extinct.",
     img: "/history/breeds/Old-short-legged-working-dogs.jpg",
+    /* A SECOND PARENT, 16 September 2026 (owner). NOT because a second ancestor
+       was discovered, but because of the renderer's KEEP-CHILD COLLAPSE: a
+       grafted node with exactly ONE child is treated as a redundant wrapper and
+       dropped, so a one-parent record vanishes from its own level and draws its
+       parent in its place. That is what was happening to the Otterhound, which
+       showed Land spaniels at 25% with the rough water dogs nowhere. Two children
+       means no wrapper and the dog draws.
+       THE SPLIT IS MINE. No numbers were given. */
+    /* The Earth Dog is the other short-legged strand, bred to go to ground rather
+       than work the yard, so the two together are the honest pair for a stock
+       named for its legs rather than its job. It also gives this dog and the
+       Low-slung soldiers' dogs, its 1575 contemporary, a shared ancestor, which
+       is the only honest way to link two dogs of the same moment. */
     children: [
-      { name: "Celtic Heeler", note: "Low-slung Celtic cattle heeler, forerunner of both Welsh Corgis. Now extinct.", img: "/history/breeds/medieval-corgi.jpg", value: 100 },
+      { name: "Celtic Heeler", note: "Low-slung Celtic cattle heeler, forerunner of both Welsh Corgis. Now extinct.", img: "/history/breeds/medieval-corgi.jpg", value: 65 },
+      { name: "Earth Dog", note: "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.", img: "/history/breeds/medieval-earth-dog.jpg", value: 35 },
     ],
   },
   "Livestock Dog": {
