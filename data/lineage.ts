@@ -1568,6 +1568,49 @@ const LINEAGE: Record<string, LineageNode> = {
       { name: "Land spaniels", note: "The old English land-spaniel stock that every working spaniel springs from. Now extinct.", img: "/history/breeds/original-land-spaniel.jpg", value: 100 },
     ],
   },
+  /* OLD BORDER TERRIERS REACH THE MEDIEVAL EARTH DOG, 15 September 2026 (owner:
+     level 42's old Border terrier needs to go back to the earth dogs of the
+     medieval era).
+
+     Nothing invented: Earth Dog is a Medieval level with its own record. This was
+     a dead end carrying 65% of the Dandie Dinmont, and it is reached by seven
+     levels in all, Dandie Dinmont, Bedlington, Border, Sealyham, Lakeland,
+     Patterdale and Lucas Terrier, so one edit connects the whole Border group
+     back to the medieval era.
+
+     ONE PARENT, ON PURPOSE. The other medieval terrier available is Old English
+     Black and Tan Terrier, and pairing the two would be defensible. No second
+     parent was asked for, so none was invented. */
+  "Old Border terriers": {
+    name: "Old Border terriers",
+    note: "The old working-terrier stock of the Anglo-Scottish border. Now extinct.",
+    img: "/history/breeds/Old-Border-terriers.jpg",
+    children: [
+      { name: "Earth Dog", note: "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.", img: "/history/breeds/medieval-earth-dog.jpg", value: 100 },
+    ],
+  },
+  /* OLD SHORT-LEGGED WORKING DOGS REACH THE CELTIC HEELER, 15 September 2026
+     (owner asked what the options were; this was the recommendation).
+
+     The Celtic Heeler is an Ancient level and is the only low-slung WORKING dog
+     in the data, a cattle heeler and forerunner of both Corgis. The Earth Dog is
+     short-legged too but its work is underground, which is a different job from
+     the one this stock is named for.
+
+     THE OWNER'S HUNCH ABOUT LOW-SLUNG SOLDIERS' DOGS WAS RIGHT BUT SIDEWAYS.
+     That is a level at 1575 and the Turnspit is 1576, so they are contemporaries
+     rather than ancestor and descendant. If the two should be linked it has to be
+     through a shared ancestor: the soldiers' dogs carry Earth Dog, this carries
+     the Celtic Heeler, and both are low-slung stock of the same moment. Left as a
+     note rather than acted on. */
+  "Old short-legged working dogs": {
+    name: "Old short-legged working dogs",
+    note: "The low-slung working dogs of the old farm and yard. Now extinct.",
+    img: "/history/breeds/Old-short-legged-working-dogs.jpg",
+    children: [
+      { name: "Celtic Heeler", note: "Low-slung Celtic cattle heeler, forerunner of both Welsh Corgis. Now extinct.", img: "/history/breeds/medieval-corgi.jpg", value: 100 },
+    ],
+  },
   "Livestock Dog": {
     name: "Livestock Dog",
     note: "Broad early working-dog population used to guard, move and control livestock before named British breeds existed. An extinct historical type.",
