@@ -258,15 +258,33 @@
 .bandFill {
   transition: fill 0.35s ease;
 }
+/* THE RING MATCHES A PLACED CARD'S, 15 September 2026 (owner: the white frame's
+   weight is the ideal and everything else should mirror it).
+
+   WHY 6 AND NOT 3. A placed card's ring is a CSS box-shadow spread of 3px, which
+   sits entirely OUTSIDE the shape, and .frame is a 3 stroke. This is an SVG
+   stroke, which straddles the path, so half of it falls inside the card and only
+   half shows. 5 was showing 2.5. 6 shows 3, which is the placed card's 3 and the
+   frame's visible weight.
+
+   So the number here deliberately does NOT read the same as the one it matches.
+   Setting this to 3 would make the file look consistent and the screen look
+   wrong, with the loose cards at half the weight of the placed ones. If the
+   placed card's box-shadow ever moves off 3, this is double it.
+
+   vectorEffect="non-scaling-stroke" is set on the rect in LineageMap.tsx, so this
+   is a true screen weight and does not grow with the zoom. That is what makes a
+   flat number comparable to the box-shadow at all. */
 .pickCard {
   fill: none;
   stroke: var(--blue-deep);
-  stroke-width: 5;
+  stroke-width: 6;
   stroke-linejoin: round;
 }
 .pickCardStack {
   /* white in the learn layer, matching the ring on a zoomed card. Yellow is the
-     pit's colour and read as pit furniture laid over the learning view. */
+     pit's colour and read as pit furniture laid over the learning view.
+     Width comes from .pickCard above, so the stacked duplicate follows it. */
   stroke: #ffffff;
 }
 .pickCaption {
