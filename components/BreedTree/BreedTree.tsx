@@ -9809,7 +9809,7 @@ export default function BreedTree({
       {dockAside && gravity && learning && (
         <button
           type="button"
-          className={styles.learnPlay}
+          className={`${styles.learnPlay} ${styles.learnDockBtn} ${styles.learnPlayBtn}`}
           onMouseEnter={() => { setPlayPeek(true); setHoverHint("start playing"); }}
           onMouseLeave={() => { setPlayPeek(false); setHoverHint(""); }}
           onFocus={() => setPlayPeek(true)}
@@ -9839,57 +9839,31 @@ export default function BreedTree({
           }}
           aria-label={playLabel}
         >
-          {/* Drawn from the in-pit square's own figures rather than eyeballed,
-              so it cannot drift from the close X and the info square: they use
-              uSz = 84 * pitScale * 1.2 in CSS pixels, rx = 0.3 of that, a 5px
-              navy rim and an icon about a third of the square across. The 5px
-              rim is centred on the rect, so the artboard carries 2.5px of
-              padding on every side to hold it. */}
-          {(() => {
-            /* 25% OFF, 2 September 2026 (owner), matching the start screen's
-               PLAY and LEARN and the corner square.
-               THE LEFT OFFSET IN THE STYLESHEET IS NO LONGER SELF-CANCELLING.
-               .learnPlay used to sit at a flat left: 15.5px, which was exact at
-               every scale because the axis is 18 + S/2 and the artboard is S + 5,
-               so axis - (S+5)/2 always came to 18 - 2.5. That cancellation only
-               holds while the drawn square IS the axis square. It no longer is,
-               so .learnPlay now carries a measured left per breakpoint. Change
-               this 0.75 and those two numbers are wrong. */
-            /* SIZED FROM THE DOCK, NOT FROM THE PIT SQUARE, 2 September 2026
-               (owner): every button on this row has to be the same size and wear
-               the same weight of rim.
+          {/* ONE SIZE, SET IN ONE PLACE, 15 September 2026 (owner: the play icon
+              changes size and stroke weight between screens and needs uniforming
+              with the other icons on that row).
 
-               PLAY used to be drawn off 84 * pitScale * 1.2, which made it the
-               biggest thing on the row. It now takes .learnDockBtn's own visible
-               size at each breakpoint, so the five buttons match. THESE TWO
-               NUMBERS LIVE IN THE STYLESHEET AS WELL and must be changed
-               together. pitScale is the right test because it flips at the same
-               768px breakpoint the CSS does.
+              WHAT THIS REPLACES. PLAY was the only button on the row that drew
+              its own square: an inline SVG carrying VIS, RIM and the radius in
+              TypeScript, duplicating figures that also live in the stylesheet.
+              The comment on it warned of exactly that, saying the two numbers
+              live in the stylesheet as well and must be changed together, and
+              they had already drifted apart once on 2 September. They had drifted
+              again, by about 18% on a phone.
 
-               RIM 5 -> 2, the dock's border weight, which is the thinner one you
-               asked for. The stroke is CENTRED on the rect edge, so the artboard
-               is S + RIM and the rect starts at RIM / 2. Colour is untouched:
-               PLAY keeps its white rim, the others keep yellow. */
-            const VIS = pitScale < 1 ? 42 : 75.6; // .learnDockBtn, phone / desktop
-            const RIM = 2;
-            const S = VIS - RIM;
-            const B = S + RIM;
-            const c = B / 2;
-            const g = S * 0.34;
-            const w = S * 0.30;
-            return (
-              <svg width={B} height={B} viewBox={`0 0 ${B} ${B}`} aria-hidden="true" focusable="false">
-                <rect x={RIM / 2} y={RIM / 2} width={S} height={S} rx={S * 0.3} fill="#22c55e" stroke="#ffffff" strokeWidth={RIM} />
-                <path
-                  d={`M${c - w * 0.3},${c - g / 2} L${c + w * 0.7},${c} L${c - w * 0.3},${c + g / 2} Z`}
-                  fill="#ffffff"
-                  stroke="#ffffff"
-                  strokeWidth={S * 0.07}
-                  strokeLinejoin="round"
-                />
-              </svg>
-            );
-          })()}
+              It is now a .learnDockBtn, the same element the other four use, so
+              the size, the rim weight and the corner radius come from one rule at
+              each breakpoint and cannot drift. .learnPlayBtn carries only what is
+              genuinely different about PLAY: the green fill and the white rim.
+
+              The triangle is a .learnDockIcon, so it takes the same 0.55 of the
+              button the other icons do, and its own stroke went with the old
+              artboard. It has none now, which is why the weight stops changing. */}
+          <span className={styles.learnDockIcon}>
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M9 6.5 L17.5 12 L9 17.5 Z" fill="#ffffff" stroke="none" />
+            </svg>
+          </span>
         </button>
       )}
       {britainOpen && (

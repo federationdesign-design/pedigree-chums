@@ -1622,6 +1622,25 @@
   gap: 14px;        /* the squares' own gap */
   z-index: 22;
 }
+/* PLAY IS A DOCK BUTTON NOW, 15 September 2026 (owner: the play icon changes
+   size and stroke weight between screens and needs uniforming).
+
+   It used to draw its own square in TypeScript, with the visible size, the rim
+   and the radius written out there as well as here. Those two sets drifted apart
+   twice, most recently by about 18% on a phone. It now takes .learnDockBtn like
+   the other four buttons on the row, so the size, the rim weight and the corner
+   radius come from one rule per breakpoint and cannot disagree.
+
+   THIS CLASS CARRIES ONLY WHAT IS ACTUALLY DIFFERENT: PLAY is green with a white
+   rim where the others are navy with yellow. Nothing about its geometry belongs
+   here, or the drift starts again. Position stays on .learnPlay, which is still
+   on the element. */
+.learnPlayBtn {
+  background: #22c55e;
+  border-color: #ffffff;
+}
+.learnPlayBtn .learnDockIcon { color: #ffffff; }
+.learnPlayBtn .learnDockIcon svg { stroke: none; fill: #ffffff; }
 .learnDockBtn {
   width: 75.6px;    /* the back square on desktop: 84 * 1.2 * 0.75 */
   height: 75.6px;
