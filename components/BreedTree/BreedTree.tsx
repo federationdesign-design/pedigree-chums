@@ -910,11 +910,17 @@ const WASH_INSET = 2.2; // was .learnWash inset: -60% -> 2.2 viewports wide
 // Was -min(42, 0.18r), which deliberately held labels near their middle;
 // superseded on purpose, do not restore it thinking the top placement is a drift.
 const TITLE_DY_FRAC = 0.65; // was 0.55; +0.1 = a scaled 10px UP at reference radius 100, proportional on other circles (14 August 2026)
-// Horizontal companion to TITLE_DY_FRAC: shift the block RIGHT by this fraction of
-// the radius (0.1 = 10% of r). New 2026-08-12; there was no horizontal offset
-// before (the block was centred at x=0). labelFits adds it too, so a label pushed
-// toward the right rim is shrunk or dropped rather than spilling over it.
-const TITLE_DX_FRAC = 0.2; // was 0.1; +0.1 = a scaled 10px RIGHT at reference radius 100, proportional on other circles (14 August 2026)
+// Horizontal companion to TITLE_DY_FRAC: shift the block sideways by this fraction
+// of the radius. Positive is RIGHT, negative is LEFT. New 2026-08-12; there was no
+// horizontal offset before (the block was centred at x=0). labelFits adds it too,
+// so a label pushed toward the rim is shrunk or dropped rather than spilling over
+// it, and it follows this sign automatically.
+// FLIPPED TO THE LEFT, 15 September 2026 (owner: move the text so it sits on the
+// left of the centre point rather than the right). Same distance, mirrored, so
+// nothing about the fit or the size changes. TITLE_ANGLE is untouched, so the
+// block still leans the same way; if the lean now reads wrong against the new
+// side, that constant is the one to move, not this one.
+const TITLE_DX_FRAC = -0.2; // was 0.2 (right), and 0.1 before that
 function titleDy(r: number): number {
   return -Math.max(0, r) * TITLE_DY_FRAC;
 }
@@ -1213,8 +1219,10 @@ function labelFirstY(n: number, fs: number, r: number): number {
 }
 
 // Does the rotated text block sit inside a circle of radius r? Corners are
-// rotated about (dxR, titleDy(r)) and shifted right by dxR, exactly as the
-// rendered <text> is, so a block pushed toward the right rim is failed here.
+// rotated about (dxR, titleDy(r)) and shifted sideways by dxR, exactly as the
+// rendered <text> is, so a block pushed toward either rim is failed here.
+// dxR carries the sign of TITLE_DX_FRAC, which went negative (left) on
+// 15 September 2026, so this check followed the move without changing.
 function labelFits(widthEm: number, n: number, fs: number, r: number): boolean {
   const halfW = (widthEm * fs) / 2;
   const dxR = TITLE_DX_FRAC * r;
