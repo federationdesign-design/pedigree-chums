@@ -5808,10 +5808,41 @@ export default function BreedTree({
 
            chipBadge still stands for a chip that arrives with no radius of its
            own, which is the popped and seeded path. */
+        /* THE CHIP KEEPS THE SIZE IT HAD ON THE LIFTED LAYER, 15 September 2026
+           (owner). Third attempt, and this one is an inference from measurement
+           rather than from reading the render.
+
+           THE EVIDENCE. ?chipdebug=1 printed ctm.a 0.5566 and the same viewBox in
+           BOTH the lifted state and the pit, so the stage does not zoom between
+           them and every earlier explanation resting on a zoom difference was
+           wrong. Its ratio column came out flat across shares: 0.77, 0.77, 0.78
+           on three different shares in the first run. A constant across shares
+           means one multiplier is missing, not a curve gone wrong. Measured off
+           the owner's screenshots, normalised for image width, the 50% disc is
+           about 20px on the lifted layer and about 26 in the pit, a ratio of 1.28.
+           1 / 0.78 is 1.282.
+
+           WHAT 0.78 IS. PIT_NODE_SCALE in LineageMap. nodeR applies it so that,
+           in its own words, the layout, the drawing, the card offsets and the
+           scatter all agree. The lifted layer draws its circles shrunk by it. The
+           pit does not, so the same circle lands at full size here.
+
+           SO THIS IS A SHRINK, NOT A GROW. Nothing was ever adding size at the
+           drop. The lifted layer was subtracting it and the pit was not.
+
+           NOT PROVEN. The diagnostic still cannot read the drawn radius, because
+           the chips render inside a transformed group its conversion skips. If
+           this is wrong, the next step is measuring the circle with
+           getBoundingClientRect rather than converting anything.
+
+           LineageMap does not export PIT_NODE_SCALE, so the value is written out
+           with its source named rather than plumbed through. If that dial ever
+           moves, this moves with it. */
+        const LIFTED_NODE_SCALE = 0.78; // PIT_NODE_SCALE, LineageMap.tsx
         const rDraw = opts?.label
           ? (opts?.r ?? 0)
           : opts?.r != null
-            ? opts.r * fxScale
+            ? opts.r * fxScale * LIFTED_NODE_SCALE
             : chipBadge;
         // A solo dog circle arrives through this same call carrying a label,
         // and that one is never a bomb: it is a whole breed, not a chip.
