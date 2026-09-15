@@ -11,7 +11,8 @@
     "test:pickachum": "tsx scripts/test-pickachum.mjs",
     "replay:pickachum": "tsx scripts/replay-pickachum.mjs",
     "sim": "tsx scripts/sim-multi-turn.mjs",
-    "test:hidden-games": "node --import ./tests/hidden-games/register-ts.mjs --test tests/hidden-games/*.test.mjs"
+    "test:hidden-games": "node --import ./tests/hidden-games/register-ts.mjs --test tests/hidden-games/*.test.mjs",
+    "test:lineage": "node --import ./tests/hidden-games/register-ts.mjs --test tests/lineage/*.test.mjs"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0",
