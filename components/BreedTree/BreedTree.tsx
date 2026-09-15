@@ -199,6 +199,32 @@ const DIFF_STOP_5 = 0.575;
 // down each side at level 10. Tilt can still carry a circle a little past the
 // line, which is the trade for filling the width.
 const DIFF_STOP_10 = 1;
+/* DIFFICULTY 0 DROPS SMALLER, 14 September 2026 (owner: "when on the 0 level
+   difficulty, the circles that drop in are 25% smaller").
+
+   ONLY THE DROP, NOT THE DIAGRAM. DIFF_STOP_0 was deliberately not touched: it
+   was raised 0.4 -> 0.5 on 9 September because at 0.4 the deepest circles on
+   Golden Retriever and Irish Setter drew about 20px, under a finger target and
+   too small to read. Cutting the stop by a quarter would land at 0.375, below
+   the value already rejected, and would shrink the pre-round diagram with it.
+   This applies the quarter at the drop instead, so the circles you read before
+   the round are the size they have always been.
+
+   IT MUTATES ch.r, WHICH IS ALSO THE DRAWN RADIUS. A freed circle's picture is
+   drawn from the node's own r in the render, not from the physics body, so
+   shrinking only the body would give a small collider inside a full-size
+   picture. popChildren already mutates ch.r for exactly this reason and relies
+   on the same re-render. The chips follow by themselves: badgeDrawForNode is a
+   fraction of ch.r, which keeps the owner ruling that a badge is sized off its
+   own dog.
+
+   THE WEAKSET IS THE COMPOUNDING GUARD. The drop effect re-runs on `gravity`
+   and `entered` as well as on `nodes`, so without this a second run would
+   shrink an already shrunk circle to 56%. popChildren guards the same hazard
+   with b.popped. Keyed on the node object, so a rebuild of the `nodes` memo,
+   which is what a change of difficulty or level causes, starts clean. */
+const DROP_SHRINK_0 = 0.75;
+const DROP_SHRUNK = new WeakSet<object>();
 // The docked view zooms out to 1.21x the frame, so the visible pit is this much
 // wider than SIZE. DIFF_INSET holds back enough for the 5px stroke and the pit
 // walls, which sit 4 svg units inside the stage edges.
@@ -4992,6 +5018,9 @@ export default function BreedTree({
         // the word plus everything freed under it, immune to each other briefly
         const newMbs = [wmb];
         kids.forEach((ch) => {
+          // See DROP_SHRINK_0. Done before the body and the chip are sized, so
+          // both follow from one number.
+          if (level === 0 && !DROP_SHRUNK.has(ch)) { DROP_SHRUNK.add(ch); ch.r *= DROP_SHRINK_0; }
           const nb: Body = { n: ch, x: ch.x, y: ch.y, vx: 0, vy: 0, r: ch.r, pct: pctOf(ch), idx: -1, lastFx: 0, popped: false, a: 0, va: 0, ia: 0, iva: 0 };
           owned.add(ch);
           all.push(nb);
