@@ -10191,18 +10191,38 @@ export default function BreedTree({
                     </div>
                     <SharePie pct={share} />
                   </div>
-                  {apps.length > 0 && (
-                    <div className={styles.cBreakWorking}>
-                      {apps.map((a, i) => (
-                        <div key={i} className={styles.cBreakRow}>As {genLabel(a.depth)}: {pct(a.pct)}</div>
-                      ))}
-                      {apps.length > 1 && (
-                        <div className={styles.cBreakRow}>
-                          Combined: {apps.map((a) => pct(a.pct)).join(" + ")} = {pct(share)}
-                        </div>
-                      )}
-                    </div>
-                  )}
+                  {/* ONE LINE PER SIDE OF THE FAMILY, NOT PER APPEARANCE,
+                      16 September 2026 (owner: this area should make it easier to
+                      understand, not harder). A Border Collie reached forty times
+                      by Old hunting dogs of the Celts gave forty lines, every one
+                      reading the same generation label, which told the reader
+                      nothing about the route. Grouped by the depth-1 branch it
+                      came through, the same case gives a handful of lines that
+                      name the dogs and still add to the headline figure.
+
+                      genLabel survives for the single-appearance case, where the
+                      generation IS the useful fact and there is no route to
+                      disambiguate. The main pit's own copy was changed the same
+                      way on 15 September; this is the last of the two. */}
+                  {apps.length > 0 && (() => {
+                    const m = new Map<string, number>();
+                    for (const a of apps) m.set(a.branch, (m.get(a.branch) ?? 0) + a.pct);
+                    const routes = [...m.entries()].sort((x, y) => y[1] - x[1]);
+                    return (
+                      <div className={styles.cBreakWorking}>
+                        {apps.length === 1
+                          ? <div className={styles.cBreakRow}>As {genLabel(apps[0].depth)}: {pct(apps[0].pct)}</div>
+                          : routes.map(([branch, p], i) => (
+                              <div key={i} className={styles.cBreakRow}>from {branch}: {pct(p)}</div>
+                            ))}
+                        {routes.length > 1 && (
+                          <div className={styles.cBreakRow}>
+                            Combined: {routes.map(([, p]) => pct(p)).join(" + ")} = {pct(share)}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })()}
                   {/* The disclaimer stays, below the working, by request. */}
                   <div className={styles.cBreakTitle}>Our best guess, not hard science.</div>
                   <BreakNote key={`${hideCaption ? "shut" : "open"}|${ancestryFor.name}|${shown.data.name}`} />

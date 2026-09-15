@@ -167,25 +167,36 @@ export function ancestorShareOf(
    `depth` counts generations back from the breed itself, so the root's own
    children are 1. That is the number genLabel turns into "parent",
    "grandparent" and so on. */
+/* EACH APPEARANCE REMEMBERS WHICH SIDE OF THE FAMILY IT CAME DOWN, 16 September
+   2026 (owner: this information area should make it easier to understand, not
+   harder). The box printed one line per appearance, every one labelled only by
+   generation, so a dog reached forty times gave forty lines of
+   "As great-great-great-great-grandparent: <1%". That says how far back it was
+   and never which dog it came through, which is the thing the picture cannot
+   show. `branch` is the DEPTH-1 ancestor the path descends from, so a caller can
+   group by it: "from Rache: 14%", "from Talbot: 8%". The same change was made to
+   the main pit's own copy on 15 September. */
 export function ancestorAppearancesOf(
   breedName: string,
   ancestorName: string,
-): { depth: number; pct: number }[] {
+): { depth: number; pct: number; branch: string }[] {
   const lineage = getLineage(resolveLineageName(breedName));
   if (!lineage) return [];
   const rootLeaves = sumLeaves(lineage);
   if (!rootLeaves) return [];
-  const raw: { depth: number; exact: number }[] = [];
-  const walk = (n: LineageNode, depth: number) => {
+  const raw: { depth: number; exact: number; branch: string }[] = [];
+  const walk = (n: LineageNode, depth: number, branch: string) => {
     if (!n.children?.length) return;
     n.children.forEach((c) => {
+      // at depth 1 the child IS the branch; deeper down it inherits it
+      const br = depth === 1 ? c.name : branch;
       if (c.name === ancestorName && c.name !== n.name) {
-        raw.push({ depth, exact: (sumLeaves(c) / rootLeaves) * 100 });
+        raw.push({ depth, exact: (sumLeaves(c) / rootLeaves) * 100, branch: br });
       }
-      walk(c, depth + 1);
+      walk(c, depth + 1, br);
     });
   };
-  walk(lineage, 1);
+  walk(lineage, 1, "");
   if (!raw.length) return [];
 
   /* LARGEST REMAINDER, added 9 Sept 2026 with the round-once fix above.
@@ -212,6 +223,6 @@ export function ancestorAppearancesOf(
     left -= 1;
   }
   return raw
-    .map((r, i) => ({ depth: r.depth, pct: pcts[i] }))
+    .map((r, i) => ({ depth: r.depth, pct: pcts[i], branch: r.branch }))
     .sort((a, b) => a.depth - b.depth);
 }
