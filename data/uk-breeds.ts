@@ -126,7 +126,7 @@ export const ukBreeds: UKBreed[] = [
   { name: "Whippet", strip: "mid1800", era: "1880s", anchor: 1880, note: "The 'poor man's racehorse', a miniature coursing sighthound.", image: "/Whippet-square.jpg" , tag: "popular" },
   { name: "Lurcher", strip: "early1800", era: "early 1800s", anchor: 1802, note: "Sighthound crossed with a working dog, the poacher's companion.", image: "/lercher-square.jpg" , tag: "popular" },
   { name: "Longdog", strip: "early1800", era: "early 1800s", anchor: 1803, note: "A cross of two sighthounds, bred purely for speed.", image: "/history/breeds/long-dog-photo.jpg" , tag: "endangered" },
-  { name: "English White Terrier", strip: "mid1800", era: "1860s", anchor: 1860, note: "Show terrier of the 1860s that died out within decades.", image: "/history/breeds/english-white-terrier-painting.jpg", tag: "extinct" },
+  { name: "English White Terrier", strip: "mid1800", era: "1860s", anchor: 1860, note: "Show terrier of the 1860s that died out within decades.", image: "/history/breeds/english-white-terrier.jpg", tag: "extinct" },
   { name: "Yorkshire Terrier", strip: "mid1800", era: "1860s", anchor: 1863, note: "Mill-town ratter that became a glamorous toy.", image: "/yorkshire-square.jpg" , tag: "in-decline" },
   // 19 August 2026: late1800 group era and anchor reconciled with the file
   // convention. era is an honest band label, never a bare year; anchor is purely
@@ -247,7 +247,7 @@ export const ukBreeds: UKBreed[] = [
   { name: "Water spaniels", strip: "c1500", era: "1600s", anchor: 1653, note: "The old rough-coated working water spaniels of Britain's rivers and fens.", image: "/history/breeds/original-water-spaniel.jpg", tag: "extinct" },
   { name: "Old Irish water dogs", strip: "c1700", era: "1700s", anchor: 1705, note: "The southern and northern water spaniels of Ireland.", image: "/history/breeds/Old-Irish-water-dog.jpg", tag: "extinct" },
   { name: "Old fell terriers", strip: "c1700", era: "1700s", anchor: 1745, note: "The hardy black-and-tan fox-working terriers of the northern fells.", image: "/history/breeds/Old-fell-terriers-Patterdale-Terrier-Working-hunt-terriers.jpg", tag: "extinct" },
-  { name: "Old English White Terrier", strip: "c1700", era: "1700s", anchor: 1760, note: "The white-bodied working terriers bred out of the black-and-tan stock for coat colour.", image: "/history/breeds/english-white-terrier-painting.jpg", tag: "extinct" },
+  { name: "Old English White Terrier", strip: "c1700", era: "1700s", anchor: 1760, note: "The white-bodied working terriers bred out of the black-and-tan stock for coat colour.", image: "/history/breeds/old-english-white-terrier.jpg", tag: "extinct" },
   { name: "Native Irish terriers", strip: "c1700", era: "1700s", anchor: 1787, note: "The old Irish farm-terrier stock shared with the Wheaten and Kerry Blue.", image: "/history/breeds/native-irish-terriers.jpg", tag: "extinct" },
   { name: "English Water Spaniel", strip: "c1700", era: "1700s", anchor: 1790, note: "The native English water spaniel, a working water dog of the fens and rivers.", image: "/history/breeds/original-water-spaniel.jpg", tag: "extinct" },
   { name: "Old hill and bearded collies", strip: "early1800", era: "early 1800s", anchor: 1802, note: "Shaggy upland herding dogs of the same collie family.", image: "/history/breeds/old-hill-and-bearded-collies.jpg", tag: "extinct" },

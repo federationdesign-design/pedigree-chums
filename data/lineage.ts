@@ -321,7 +321,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "A Victorian invention. James Hinks set out in the 1860s to build a cleaner, all-white gentleman's companion from the old bull-and-terrier dogs.",
     children: [
       { name: "Bulldog", note: "Brought the power, the broad chest and the determined grip.", img: "/history/breeds/bulldog-photo.jpg", value: 45 },
-      { name: "Old English White Terrier", note: "A now-extinct breed that gave the clean white coat and terrier sharpness.", img: "/history/breeds/english-white-terrier-painting.jpg", value: 40 },
+      { name: "Old English White Terrier", note: "A now-extinct breed that gave the clean white coat and terrier sharpness.", img: "/history/breeds/old-english-white-terrier.jpg", value: 40 },
       { name: "Dalmatian", note: "Crossed in for size, substance and a pure white finish.", img: "/Dalmatian-square.jpg", value: 15 }
     ]
   },
@@ -331,7 +331,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "An American original from 1870s Boston, traced back to a single dog, Hooper's Judge, a bulldog and terrier cross bred smaller and smarter.",
     children: [
       { name: "Bulldog", note: "Brought the stocky frame and the easy-going, affectionate streak.", img: "/history/breeds/bulldog-photo.jpg", value: 55 },
-      { name: "Old English White Terrier", note: "The now-extinct terrier behind the neat build and lively mind.", img: "/history/breeds/english-white-terrier-painting.jpg", value: 45 }
+      { name: "Old English White Terrier", note: "The now-extinct terrier behind the neat build and lively mind.", img: "/history/breeds/old-english-white-terrier.jpg", value: 45 }
     ]
   },
 
@@ -634,7 +634,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "Bred by a hunting parson, the Reverend John Russell, in the early 1800s for a game little terrier that could bolt a fox and keep up with the hounds.",
     children: [
       { name: "Fox Terrier", note: "The old white-bodied fox-working terriers that are the breed's direct foundation.", img: "/history/breeds/fox_terrier-img.jpg", value: 55 },
-      { name: "Old English White Terrier", note: "The old white-bodied working terriers of Britain, the stock the named white terriers were drawn from. Now extinct.", img: "/history/breeds/english-white-terrier-painting.jpg", value: 30 },
+      { name: "Old English White Terrier", note: "The old white-bodied working terriers of Britain, the stock the named white terriers were drawn from. Now extinct.", img: "/history/breeds/old-english-white-terrier.jpg", value: 30 },
       { name: "Working hunt terriers", note: "Hardy local terriers kept for going to ground after fox. Now extinct.", img: "/history/breeds/Old-fell-terriers-Patterdale-Terrier-Working-hunt-terriers.jpg", value: 15 }
     ]
   },
@@ -877,7 +877,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "English White Terrier",
     note: "A pricked-ear white terrier, a short-lived show breed drawn from Britain's old white working terriers, now extinct.",
     children: [
-      { name: "Old English White Terrier", note: "The white-bodied fox-working terriers found across Britain since the 1700s.", img: "/history/breeds/english-white-terrier-painting.jpg", value: 60 },
+      { name: "Old English White Terrier", note: "The white-bodied fox-working terriers found across Britain since the 1700s.", img: "/history/breeds/old-english-white-terrier.jpg", value: 60 },
       { name: "Old English Black and Tan Terrier", note: "The broader old black-and-tan terrier stock behind it.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 40 }
     ]
   },
@@ -926,7 +926,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "The classic earth dog of the foxhunt, carried to the field to bolt the fox when it went to ground.",
     children: [
       { name: "Old English Black and Tan Terrier", note: "The smooth and rough black-and-tan terriers at its foundation.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 45 },
-      { name: "English White Terrier", note: "Lent the predominantly white, easy-to-see coat.", img: "/history/breeds/english-white-terrier-painting.jpg", value: 25 },
+      { name: "English White Terrier", note: "Lent the predominantly white, easy-to-see coat.", img: "/history/breeds/english-white-terrier.jpg", value: 25 },
       { name: "Beagle", note: "A dash of hound for nose and cry.", img: "/history/breeds/beagle.jpg", value: 15 },
       { name: "Bull Terrier", note: "A touch of bull blood for grit.", img: "/bull-terrier-square.jpg", value: 15 }
     ]
