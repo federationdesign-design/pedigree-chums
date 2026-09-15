@@ -2643,7 +2643,24 @@ export default function LineageMap({
                          into the pit (BreedTree, the badge disc). Using the pit
                          furniture yellow here left the same dog two shades apart
                          between the two screens. */
-                      const fill = placedHere ? "#ffed00" : seen.has(n._id) ? "#0c5b92" : undefined;
+                      /* A SEEN NODE WEARS THE RARITY COLOUR, 15 September 2026
+                         (owner). It was a flat #0c5b92, which had nothing to do
+                         with the dog being learnt. It now takes the bg of the
+                         same RARITY_BAND entry the lifted card's band is drawn
+                         from, so the opened nodes and the band read as one set.
+
+                         THE TEXT COLOUR HAS TO FOLLOW IT. The % on a seen node
+                         was hard-coded white, which worked on one dark blue and
+                         nothing else. Common is #fcee23 and white on that is
+                         about 1.1:1, the same unreadable case that had to be
+                         reversed on the done band on 10 September. RARITY_BAND
+                         already carries the fg the band uses, so the pair is
+                         taken from there rather than picked again here.
+
+                         Falls back to the old blue when no tier is supplied,
+                         which is every caller outside the pit lift. */
+                      const seenFill = rarityTier ? RARITY_BAND[rarityTier].bg : "#0c5b92";
+                      const fill = placedHere ? "#ffed00" : seen.has(n._id) ? seenFill : undefined;
                       const st: React.CSSProperties = {
                         ...(fill ? { fill } : null),
                         // clamped so a nested ring can never out-thicken its parent
@@ -2656,7 +2673,7 @@ export default function LineageMap({
                       /* White only on the blue SEEN fill now. A placed node is
                          yellow (item 9 above), and white on yellow cannot be read,
                          so it keeps the default navy. */
-                      style={(!(n.img && (placedImgs.has(n.img as string) || packed)) && seen.has(n._id)) ? {fill:"#ffffff",...(INSTR_NAMES.has(breed.name)?{fontFamily:'"Luckiest Guy",system-ui,sans-serif',fontWeight:400}:{})} : INSTR_NAMES.has(breed.name)?{fontFamily:'"Luckiest Guy",system-ui,sans-serif',fontWeight:400}:undefined}>
+                      style={(!(n.img && (placedImgs.has(n.img as string) || packed)) && seen.has(n._id)) ? {fill:(rarityTier ? RARITY_BAND[rarityTier].fg : "#ffffff"),...(INSTR_NAMES.has(breed.name)?{fontFamily:'"Luckiest Guy",system-ui,sans-serif',fontWeight:400}:{})} : INSTR_NAMES.has(breed.name)?{fontFamily:'"Luckiest Guy",system-ui,sans-serif',fontWeight:400}:undefined}>
                       {INSTR_NAMES.has(breed.name) ? (n.value ?? "") : `${share}%`}
                     </text>
                     {(hasKids || !autoExposed.has(n._id)) && !(circular && n.name === breed.name) ? (() => {
