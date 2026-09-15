@@ -1410,14 +1410,28 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Old British ratting terriers",
     note: "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.",
     // 19 August 2026: display device. The single documented ancestor (Earth Dog)
-    // is drawn twice, as two identical children at 50 each (same note and img),
-    // so the level shows two circles rather than one filling the ring. The
-    // children differ in name from the parent, so isEcho, the pit words and the
-    // badge paths do not touch them. This must NOT be read as two separate
-    // ancestors.
+    // is drawn twice, as two identical children (same note and img), so the level
+    // shows two circles rather than one filling the ring. The children differ in
+    // name from the parent, so isEcho, the pit words and the badge paths do not
+    // touch them. This must NOT be read as two separate ancestors.
+    /* 65/35, NOT 50/50, 16 September 2026 (owner: 19 and 20 have the same lineage
+       and the same figures and need to be unique).
+
+       FOUR LEVELS used the same Earth Dog 50/50 signature: 16 Old Highland
+       terriers, this one, 20 Earth and hunt terriers and 29 Low-slung soldiers'
+       dogs. They look identical because they genuinely have one parent each and
+       all four use this same device. Level 20 keeps 50/50 and this one takes
+       65/35, which is what the owner asked for and which separates the two he
+       named.
+
+       SAID PLAINLY, BECAUSE IT WAS RAISED AND OVERRULED: this does not make the
+       ANCESTRY unique. It is still Earth Dog twice, now drawn at two sizes rather
+       than two equal ones. What it does do is stop levels 19 and 20 reading as
+       the same screen. Levels 16 and 29 still carry 50/50 and so still match
+       level 20. */
     children: [
-      { name: "Earth Dog", note: "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.", img: "/history/breeds/medieval-earth-dog.jpg", value: 50 },
-      { name: "Earth Dog", note: "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.", img: "/history/breeds/medieval-earth-dog.jpg", value: 50 }
+      { name: "Earth Dog", note: "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.", img: "/history/breeds/medieval-earth-dog.jpg", value: 65 },
+      { name: "Earth Dog", note: "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.", img: "/history/breeds/medieval-earth-dog.jpg", value: 35 }
     ],
   },
   "Earth and hunt terriers": {
