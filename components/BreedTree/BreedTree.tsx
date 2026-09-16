@@ -9,6 +9,7 @@ import { interpolateZoom } from "d3-interpolate";
 import type { LineageNode } from "../../data/lineage";
 import { nodeStatus, TAG_STYLE, type BreedTag } from "../BreedTreeMap/BreedTreeMap";
 import { descendantPackBreeds, ancestryFullList, ancestorShareOf, ancestorAppearancesOf, treesContaining } from "../../data/lineageArchive";
+import { fireConfetti } from "../../lib/confetti";
 import TrainingCard from "../TrainingCard/TrainingCard";
 import { CONSENT_KEY } from "../../lib/consent";
 import trainingDifficulty from "../../data/trainingDifficulty";
@@ -10563,6 +10564,17 @@ export default function BreedTree({
                       onPointerDown={(e) => e.stopPropagation()}
                       onClick={(e) => {
                         e.stopPropagation();
+                        /* CONFETTI, 16 September 2026 (owner). The same fireConfetti
+                           the collect button uses, so the shortcut and the long way
+                           celebrate the same way. Fired from the tick's own position
+                           rather than the screen centre, so it reads as coming from
+                           the card the player pressed. This route has no tumble
+                           animation, so the card greens immediately; only the
+                           layer's own collect waits for its flight to land. */
+                        const b = (e.currentTarget as HTMLElement).getBoundingClientRect();
+                        if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+                          fireConfetti({ particleCount: 60, spread: 110, startVelocity: 38, origin: { x: (b.left + b.width / 2) / window.innerWidth, y: (b.top + b.height / 2) / window.innerHeight } });
+                        }
                         onChumCollected?.(r.name);
                         /* 500, HALF THE GREEN BUTTON'S 1000, 16 September 2026
                            (owner). The shortcut and the long way used to pay the

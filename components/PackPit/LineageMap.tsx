@@ -2,6 +2,7 @@
 
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { getLineage, type LineageNode } from "../../data/lineage";
+import { fireConfetti } from "../../lib/confetti";
 import { bust } from "../../data/imgVersion";
 import { ukBreeds } from "../../data/uk-breeds";
 import { breeds } from "../../data/breeds";
@@ -2023,7 +2024,28 @@ export default function LineageMap({
     setCollecting(true);
     setBoxPop(true); // the card-pack box pops in at the bottom-right as the cards are pushed into it
     burstAt(breed.x, breed.y, ROOT * 1.33); // pink starburst on the initial square card
-    onRemove?.(breed.name); // pop the card out of the pit first, so it goes before the circles fall
+    /* CONFETTI ON THE COLLECT, 16 September 2026 (owner). The site's own
+       fireConfetti, the same one the hidden-games counter uses, so there is one
+       burst in the codebase rather than a second implementation. Fired from the
+       card's own position, converted to the viewport fractions it expects.
+       prefers-reduced-motion is honoured at the call site by contract, hence the
+       guard. */
+    if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      fireConfetti({ particleCount: 90, spread: 120, startVelocity: 44, origin: { x: (breed.x + pan.x) / vp.w, y: (breed.y + pan.y) / vp.h } });
+    }
+    /* THE RAIL GREENS ON LANDING, NOT ON PRESS, 16 September 2026 (owner: the card
+       should spin and fall first, and the rail card only go green when it lands).
+
+       onRemove is what turns the rail card green, and it fired here, before the
+       tumble had even started. On the CHUM TREE LAYER it is now deferred to the end
+       of the flight instead.
+
+       THE PIT KEEPS THE OLD ORDER. The comment it carried is a real constraint:
+       the card has to leave the pit before the circles fall, or it is still there
+       when they land on it. strongBg && !circular is the chum tree layer alone, so
+       the pit is untouched. */
+    const deferCollect = strongBg && !circular;
+    if (!deferCollect) onRemove?.(breed.name); // pop the card out of the pit first, so it goes before the circles fall
     // hand the percentage circles straight to the pit so they drop in the instant the button is
     // hit; they fall from each node's spot in the family tree, and the connecting rods and the
     // blue name pills tip in with them. Node coords are user coords, so add the pan for the screen.
@@ -2043,6 +2065,9 @@ export default function LineageMap({
     onScatter?.({ circles, rods, pills });
     tween(520, (t) => setCollectT(t), () => {
       burstAt(50 - pan.x, vp.h - 133 - pan.y, ROOT * 1.5); // dot explosion centred on the bottom-left tally number
+      // The chum tree layer's collect lands here: the card has finished its tumble
+      // into the corner, so this is the moment the rail card should go green.
+      if (deferCollect) onRemove?.(breed.name);
       // hold a beat so the bottom-left pack box can finish its pop before the overlay closes
       window.setTimeout(() => { onClose(); }, 680);
     });
