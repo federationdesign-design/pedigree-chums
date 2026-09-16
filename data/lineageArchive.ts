@@ -250,9 +250,19 @@ export function ancestorAppearancesOf(
    2.00%; Alaunt war dogs appears five times across generations 3 and 5, the
    shallow one worth 1.68% and the deep ones 0.17% to 0.62%, merging to 3.26%.
 
-   THE PRINTED INTEGERS TOTAL 100 TOO. Largest-remainder apportionment, the same
-   method ancestorShareOf and ancestorAppearancesOf already use, so the figures on
-   screen add up rather than the figures behind them.
+   THE PRINTED FIGURES TOTAL 100 TOO. Largest-remainder apportionment, the same
+   method ancestorShareOf and ancestorAppearancesOf already use, so the numbers on
+   screen add up rather than only the ones behind them.
+
+   APPORTIONED IN TENTHS, NOT WHOLE PERCENT, 16 September 2026 (owner: below 1% we
+   need to show the trace, like 0.5%). Whole percent buried every trace at 0: on
+   the Staffie, Dogs of the Alan horsemen, Ancient Chinese toy dogs and Eastern
+   lion and lap dogs are 0.8, 0.6 and 0.4. Rounding only those three to a decimal
+   and leaving the rest whole was measured and rejected: the printed column came
+   to 101.8%, because fifteen values would each round independently while three
+   kept their precision. One decimal for everything is the only form that shows a
+   trace AND still totals exactly 100.0, so the headline figures carry a decimal
+   too: the Bulldog reads 27.9 rather than 28.
 
    SELF-CHILDREN ARE SKIPPED, as everywhere else: a node carrying a child of its
    own name is a display device for a stock that continues alongside what came out
@@ -306,17 +316,19 @@ export function ancestralInfluence(
     for (const [k, v] of exact) exact.set(k, (v / rawTotal) * 100);
   }
 
+  // Apportioned in TENTHS (1000 of them) so the rounded set totals exactly 100.0.
   const rows = [...exact.entries()].sort((a, b) => b[1] - a[1]);
-  const floors = rows.map(([, v]) => Math.floor(v));
-  let left = 100 - floors.reduce((s, v) => s + v, 0);
-  const order = rows
-    .map(([, v], i) => ({ i, rem: v - Math.floor(v) }))
+  const tenths = rows.map(([, v]) => v * 10);
+  const floors = tenths.map((v) => Math.floor(v));
+  let left = 1000 - floors.reduce((s, v) => s + v, 0);
+  const order = tenths
+    .map((v, i) => ({ i, rem: v - Math.floor(v) }))
     .sort((a, b) => b.rem - a.rem);
-  const pcts = floors.slice();
+  const parts = floors.slice();
   for (const o of order) {
     if (left <= 0) break;
-    pcts[o.i] += 1;
+    parts[o.i] += 1;
     left -= 1;
   }
-  return rows.map(([name, v], i) => ({ name, pct: pcts[i], exact: v }));
+  return rows.map(([name, v], i) => ({ name, pct: parts[i] / 10, exact: v }));
 }

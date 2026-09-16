@@ -86,7 +86,13 @@ const PCT_TITLES = [
 ];
 const genLabel = (d: number) =>
   d <= 0 ? "the breed itself" : d === 1 ? "parent" : d === 2 ? "grandparent" : `${"great-".repeat(d - 2)}grandparent`;
-const pctTxt = (v: number) => (v < 1 ? "<1%" : `${Math.round(v)}%`);
+/* ONE DECIMAL, ALWAYS, 16 September 2026 (owner). The ancestor pack prints
+   ancestralInfluence, which is apportioned in tenths so the column totals exactly
+   100.0. Rounding to whole percent here would both bury every trace at 0% and
+   break that total, which was measured at 101.8% on the Staffordshire Bull
+   Terrier. "<1%" is gone for the same reason: a trace is now shown as the figure
+   it is, 0.8%, not hidden behind a threshold. */
+const pctTxt = (v: number) => `${v.toFixed(1)}%`;
 const pctTitleFor = (id: string) =>
   PCT_TITLES[Math.abs([...id].reduce((h, c) => (h * 31 + c.charCodeAt(0)) | 0, 7)) % PCT_TITLES.length];
 
@@ -410,7 +416,7 @@ export default function Chums2Client({ name, slug, image, info, lineage, diag = 
     <div className={styles.introCard}>
       <p className={styles.introCardHead}>
         <span className={styles.introCardName}>{f.name}</span>{" "}
-        <span className={styles.introCardPct}>{pctTxt(f.pct ?? 0)} of your chum</span>
+        <span className={styles.introCardPct}>{pctTxt(f.pct ?? 0)} ancestral influence</span>
       </p>
       {f.note && <p className={styles.introCardBody}>{f.note}</p>}
       <div className={styles.introCardRow}>
@@ -418,7 +424,7 @@ export default function Chums2Client({ name, slug, image, info, lineage, diag = 
         <img className={styles.introCardThumb} src={f.img} alt={f.name} style={{ borderColor: frameBorder(f.status) }} />
         <div className={styles.introCardMeta}>
           <div>As {genLabel(f.depth ?? 1)}: {pctTxt(f.share ?? f.pct ?? 0)}</div>
-          <div>Share of your chum: {pctTxt(f.pct ?? 0)}</div>
+          <div>Ancestral influence: {pctTxt(f.pct ?? 0)}</div>
           <p className={styles.introCardTitle}>{pctTitleFor(f.id)}</p>
           <p className={styles.introCardDisc}>These figures come from history and old breeding records, our viewpoint, not proven fact.</p>
         </div>
@@ -693,10 +699,10 @@ export default function Chums2Client({ name, slug, image, info, lineage, diag = 
                                 aria-label="Close"
                               >&times;</button>
                               <p className={styles.pctCardName}>{f.name}</p>
-                              <p className={styles.pctCardBig}>{pctTxt(f.pct ?? 0)} of your chum</p>
+                              <p className={styles.pctCardBig}>{pctTxt(f.pct ?? 0)} ancestral influence</p>
                               <div className={styles.pctCardRows}>
                                 <div>As {genLabel(f.depth ?? 1)}: {pctTxt(f.share ?? f.pct ?? 0)}</div>
-                                <div>Share of your chum: {pctTxt(f.pct ?? 0)}</div>
+                                <div>Ancestral influence: {pctTxt(f.pct ?? 0)}</div>
                               </div>
                               <p className={styles.pctCardTitle}>{pctTitleFor(f.id)}</p>
                               <p className={styles.pctCardDisclaimer}>These figures come from history and old breeding records, our viewpoint, not proven fact.</p>

@@ -173,9 +173,10 @@ test("ancestral influence totals exactly 100 on every lineage", () => {
     if (!rows.length) continue;
     checked += 1;
     const exact = rows.reduce((s, r) => s + r.exact, 0);
-    const rounded = rows.reduce((s, r) => s + r.pct, 0);
+    // apportioned in tenths, so compare in tenths to dodge float addition noise
+    const rounded = rows.reduce((s, r) => s + Math.round(r.pct * 10), 0);
     if (Math.abs(exact - 100) > 1e-6) badExact.push(`${name}: ${exact.toFixed(4)}`);
-    if (rounded !== 100) badRounded.push(`${name}: ${rounded}`);
+    if (rounded !== 1000) badRounded.push(`${name}: ${(rounded / 10).toFixed(1)}`);
   }
   assert.ok(checked > 100, `expected most lineages to produce an influence list, got ${checked}`);
   assert.deepEqual(badExact, [], `exact totals off 100:\n  ${badExact.join("\n  ")}`);
