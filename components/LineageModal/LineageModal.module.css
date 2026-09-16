@@ -68,7 +68,21 @@
   /* Centred on the pit's left axis, with the slider, the score and PLAY. */
   left: calc(var(--pit-axis, 51.8px) - var(--tp) / 2);
   max-width: 82%;
-  z-index: 15;
+  /* LEVEL WITH THE SCORE, 16 September 2026 (owner: the profile image and the dog
+     name should sit at the same z-index as the score).
+
+     WAS 15, which put the portrait and the name ABOVE the pit while .scoreTotal
+     sits at 0 and passes behind it. Cards and dog circles crossing the top of the
+     screen went over the score and under the title, so the two halves of the same
+     header behaved differently. 0 puts them on the same plane: the pit now runs
+     in front of both.
+
+     Safe for the same reason the score's own note gives: the pit's SVG has no
+     background of its own, it paints circles and squares over a transparent
+     canvas, so the title still shows everywhere the pit does not. Do NOT go
+     negative, which would push it behind .overlay's background and it would
+     disappear altogether. */
+  z-index: 0;
   pointer-events: none;
   /* Two rows now, stacked: the level's own dog on top and whatever circle is
      being looked at underneath it. The row itself keeps the old horizontal
