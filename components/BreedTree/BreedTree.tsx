@@ -18,6 +18,14 @@ import { bust } from "../../data/imgVersion";
 import { breedInfo, breedInfoLong } from "../../data/breedInfo";
 import breedTraits from "../../data/breed-info.json";
 import styles from "./BreedTree.module.css";
+/* The pit's own stylesheet, imported so the learn area's collect flourish IS the
+   pit's rather than a lookalike. Only the .tally* rules are used from it; see the
+   note in BreedTree.module.css. */
+import pitStyles from "../PackPit/PackPit.module.css";
+/* The chum tree layer's own stylesheet, for .cardBox. Same reason as the tally
+   above: the box in the learn area should BE the pit's box, not a second one that
+   drifts away from it. */
+import mapStyles from "../PackPit/LineageMap.module.css";
 import { BRAIN_PATH, BRAIN_ARTBOARD } from "../icons/brain";
 import LineageMap from "../PackPit/LineageMap";
 import { propsFor, mobilePropsForLevel, type LevelTheme } from "../../data/levelThemes";
@@ -10670,15 +10678,27 @@ export default function BreedTree({
           )}
         </div>
       </div>
+      {/* THE PIT'S TALLY, VERBATIM, 16 September 2026 (owner). Markup and classes are
+          PackPit's own, down to the 16 spokes and 5 dots of the burst and the two
+          pink hexes, so a collect in the learn area is the same object as a collect
+          in the pit rather than an imitation of one. The `key` is what replays it:
+          the pit re-keys on its own count for the same reason. */}
       {chumPop !== null && (
-        <div className={styles.chumPopWrap} aria-hidden="true">
-          <div className={styles.chumPopNum}>{chumPop}</div>
-          {/* Eight sparks on a circle, each rotated to its own angle and thrown
-              outward by its own animation. A ring rather than a random scatter so it
-              reads as a burst from the box rather than as debris. */}
-          {[0, 45, 90, 135, 180, 225, 270, 315].map((a) => (
-            <span key={a} className={styles.chumSpark} style={{ transform: `rotate(${a}deg)` }} />
-          ))}
+        <div className={pitStyles.tally} key={chumPop} aria-live="polite" aria-label={`${chumPop} chums collected`}>
+          <button type="button" className={pitStyles.tallyChip} aria-label="Chums collected">
+            <svg className={pitStyles.tallyBurst} viewBox="-60 -60 120 120" aria-hidden="true">
+              {Array.from({ length: 16 }).map((_, i) => {
+                const a = (i / 16) * Math.PI * 2, r1 = 24, r2 = i % 2 === 0 ? 52 : 38;
+                return <line key={i} x1={Math.cos(a) * r1} y1={Math.sin(a) * r1} x2={Math.cos(a) * r2} y2={Math.sin(a) * r2} stroke="#ff2d78" strokeWidth={3.5} strokeLinecap="round" />;
+              })}
+              {Array.from({ length: 5 }).map((_, i) => {
+                const a = (i / 5) * Math.PI * 2 + 0.4, rr = 46;
+                return <circle key={`s${i}`} cx={Math.cos(a) * rr} cy={Math.sin(a) * rr} r={4.5} fill="#ff5d97" />;
+              })}
+            </svg>
+            <span className={pitStyles.tallyNum}>{chumPop}</span>
+            <span className={pitStyles.tallyPlusOne} aria-hidden="true">+1</span>
+          </button>
         </div>
       )}
       {chumBoxPop && (
@@ -10688,7 +10708,7 @@ export default function BreedTree({
            it brings buy nothing. The rule is silenced rather than the file's
            warning count raised. */
         // eslint-disable-next-line @next/next/no-img-element
-        <img className={styles.chumCardBox} src="/card-pack-box.svg" alt="" aria-hidden="true" />
+        <img className={mapStyles.cardBox} src="/card-pack-box.svg" alt="" aria-hidden="true" />
       )}
       {dockAside && ancestryFor && !ancHidden && ancestryRows.length > 0 && (
         <LearnDragCard
