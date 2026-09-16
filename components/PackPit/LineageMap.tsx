@@ -4043,12 +4043,26 @@ export default function LineageMap({
               zIndex: 62,
               // circular: the yellow ring rides as a box-shadow spread rather than
               // an outline, because box-shadow always follows border-radius
-              // white in the learn layer: yellow is the pit's colour and it read as
-              // pit furniture sitting on top of the learning view
+              /* GREEN ONCE IT IS PLACED, 16 September 2026 (owner: the frames were
+                 meant to go green and are still showing yellow).
+
+                 THE FRAME'S GREEN WAS NEVER THE THING ON SCREEN. .frameFilled does
+                 turn the hole green, but the mini pit hides the frame entirely once
+                 it is filled and the placed card lays THIS ring on top of it. So the
+                 colour a player sees when a card lands is decided here, and it was
+                 white, with yellow while a matching duplicate was in hand.
+
+                 #22c55e is the same green the frame, the Collect button and the
+                 collected rail card use, so "this one is done" reads one colour
+                 wherever it appears.
+
+                 THE DUPLICATE STATE KEEPS ITS YELLOW, deliberately. It does not mean
+                 "placed", it means "another one of these can go here", which is the
+                 aiming colour everywhere else in the game. */
               boxShadow: circular
                 ? dupInHand
                   ? "0 0 0 3px var(--yellow, #ffd23e), 0 0 14px 4px rgba(255, 210, 62, 0.6), 0 2px 8px rgba(0,0,0,0.25)"
-                  : "0 0 0 3px #ffffff, 0 2px 8px rgba(0,0,0,0.25)"
+                  : "0 0 0 3px #22c55e, 0 2px 8px rgba(0,0,0,0.25)"
                 : "0 2px 8px rgba(0,0,0,0.25)",
               // box-shadow only: the card is positioned with left/top and a
               // blanket transition would make it slide instead of jump
