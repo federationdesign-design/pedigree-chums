@@ -1360,6 +1360,19 @@
 .relCardLeaving {
   animation: relPopOut 300ms cubic-bezier(0.45, 0, 0.7, 0.2) forwards;
   pointer-events: none;
+  /* OUT OF THE GRID FLOW, 16 September 2026 (owner: the rail still jumps to three
+     columns for a second while moving between circles).
+
+     THE SECOND HALF OF THE SAME FAULT. The row count was fixed to ignore leavers,
+     but the leavers were still LAID OUT: renderRail keeps them for 340ms so they
+     can animate out, and with grid-auto-flow: column the items overflow whatever
+     the row count allows. 27 staying gives 14 rows and room for 28, so five
+     leavers on top of that spilled into a third column until the timer cleared.
+
+     position: absolute takes them out of the flow entirely, so the columns are
+     sized by the cards that are staying and the leavers fade where they are. The
+     rail is position: absolute itself, so these resolve against it. */
+  position: absolute;
 }
 
 /* Big white PLAY, bottom-left of the learn area, to jump into the round. */
