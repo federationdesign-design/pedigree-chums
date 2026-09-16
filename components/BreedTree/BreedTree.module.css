@@ -1714,7 +1714,20 @@
   height: 100.2px;
   border-width: 5px;
   border-radius: 23.5px;
+  /* NO POP, 16 September 2026 (owner: an animation pop has been added to the play
+     icon and needs removing).
+
+     It was never added deliberately. .learnDockBtn carries `animation: dockPop`
+     and its ::before carries `dockSmoke`, and PLAY picked both up when it became
+     a dock button on 15 September. The other four buttons appear when the dock
+     opens, so a pop reads as them arriving. PLAY is always there, so on it the
+     same animation reads as a glitch.
+
+     Both are cancelled rather than the keyframes touched, because the other four
+     still want them. */
+  animation: none;
 }
+.learnDockBtn.learnPlayBtn::before { animation: none; opacity: 0; }
 /* the icon holds the same 0.55 of the button the others do: 0.55 * 100.2 */
 .learnDockBtn.learnPlayBtn .learnDockIcon { color: #ffffff; width: 55.1px; height: 55.1px; }
 .learnDockBtn.learnPlayBtn .learnDockIcon svg { stroke: none; fill: #ffffff; }
