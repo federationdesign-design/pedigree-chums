@@ -250,7 +250,7 @@ const LINEAGE: Record<string, LineageNode> = {
           { name: "Whippet", note: "Slipped into some lines for a touch more refinement and speed.", img: "/Whippet-square.jpg", value: 8 }
         ]
       },
-      { name: "Greyhound", note: "A dash of sighthound for speed and a clean, elegant outline. We stop the trail here for now.", img: "/greyhound square.jpg", value: 13 }
+      { name: "Greyhound", note: "A dash of sighthound for speed and a clean, elegant outline. We stop the trail here for now.", img: "/greyhound-square.jpg", value: 13 } /* WAS "/greyhound square.jpg", with a SPACE, 16 September 2026 (owner: the greyhound still appears twice). Both files exist in public/, so this was one dog under two filenames: the game builds a frame per distinct picture STRING, so two strings made two frames and two cards, and the level filled 21 of 21 with the greyhound showing twice. The hyphenated path is the one every other Greyhound node uses. */
     ]
   },
 

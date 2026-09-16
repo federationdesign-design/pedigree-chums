@@ -753,24 +753,28 @@
    button used to hold. Deliberately the twin of .frameCount below: same navy, same
    display face, same radius and z-index, mirrored to the right so the two read as
    a pair across the top of the layer. Keep them in step if either changes. */
+/* MATCHES THE PLAY AREA, 16 September 2026 (owner: the learn area's score is
+   styled differently and should be the same as the play area's).
+
+   IT WAS BUILT AS THE FRAME COUNTER'S TWIN, a navy pill, which was the wrong
+   reference: the score the player already knows is .scoreTotal in
+   LineageModal.module.css, which is plain white type on nothing. These are its
+   own declarations, copied rather than approximated: the same font stack, the
+   same 400 weight, the same 14.4px, right-aligned, no pill, no shadow.
+
+   Position follows the same corner logic it uses, one square plus a gap in from
+   the right. If either file's figures move, move both. */
 .chumScore {
   position: fixed;
-  top: 16px;
-  right: clamp(26px, 3.5vw, 50px);
+  top: 17px;
+  right: 18px;
   z-index: 62;
-  padding: 10px 16px 6px 16px;
-  border-radius: 20px;
-  background: var(--navy);
+  text-align: right;
   color: #ffffff;
-  font-family: var(--font-display), system-ui, sans-serif;
-  font-size: 24px;
-  line-height: 1.1;
-  letter-spacing: 0.5px;
+  font-family: var(--font-score), var(--font-pct), system-ui, sans-serif;
+  font-weight: 400;
+  font-size: 14.4px;
   pointer-events: none;
-  box-shadow: 0 3px 0 rgba(10, 58, 87, 0.3);
-}
-@media (max-width: 640px) {
-  .chumScore { top: 14px; font-size: 18px; padding: 8px 13px 4px 13px; }
 }
 .frameCount {
   position: fixed;
