@@ -1314,6 +1314,28 @@
   padding: 0;
   z-index: 5;
 }
+/* QUICK COLLECT, 16 September 2026 (owner). Twin of .relCardInfo above: same
+   size, same rim, same offset from the corner, so the two read as a pair on the
+   selected card. Green rather than deep blue, matching the collect button in the
+   layer it shortcuts, and pinned to the BOTTOM right so it cannot be mistaken
+   for the "i" or land under the same thumb. */
+.relCardGrab {
+  position: absolute;
+  bottom: -14px;
+  right: -14px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #22c55e;
+  border: 2px solid #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  z-index: 5;
+}
+.relCardGrab svg { width: 16px; height: 16px; }
 @keyframes relPop {
   0% { opacity: 0; transform: scale(0.4) rotate(-14deg); }
   60% { opacity: 1; transform: scale(1.08) rotate(4deg); }

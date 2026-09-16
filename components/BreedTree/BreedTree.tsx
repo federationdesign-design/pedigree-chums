@@ -9953,10 +9953,23 @@ export default function BreedTree({
           the number flashes and the card flies but nothing is collected, nothing
           leaves the pit and the round is untouched. Reference only, as agreed. */}
       {dockAside && chumTree && (
+        /* onScore WAS MISSING HERE, 16 September 2026 (owner: chums collected in
+           the learn area do not affect my score).
+
+           This layer's green "Choose as pack chum" button calls flashNum, which
+           calls onScore. Every other LineageMap in this file is given one; this
+           instance was not, so the call went nowhere and the collect recorded the
+           chum through onRemove while awarding nothing. Twenty collected in the
+           learn area came to 0 rather than 20,000.
+
+           Nothing else was wrong: pressing PLAY out of the learn area does not
+           reset the score, so nothing was being lost on the way. There was
+           nothing being added. */
         <LineageMap
           breed={chumTree}
           strongBg
           currentScore={0}
+          onScore={onScore}
           onRemove={(n) => onChumCollected?.(n)}
           onClose={() => setChumTree(null)}
         />
@@ -10468,6 +10481,40 @@ export default function BreedTree({
                       }}
                     >
                       i
+                    </span>
+                  )}
+                  {/* QUICK COLLECT, 16 September 2026 (owner: a shortcut past the
+                      layer, doing what the green collect button does).
+
+                      SAME TWO EFFECTS AS THAT BUTTON, deliberately: onChumCollected
+                      to record the chum, and onScore with the same 1000 the layer's
+                      flashNum awards. If that figure moves in LineageMap, move it
+                      here; they are the same action by two routes.
+
+                      Sits beside the "i" on the SELECTED card only, for the reason
+                      given there: a badge on every card would be about 14px and
+                      would fight the tap that picks the dog. Hidden once the chum
+                      is collected, because the card then carries the tick instead
+                      and there is nothing left to collect. The press is stopped so
+                      the card underneath does not deselect. */}
+                  {ancestryFor?.slug === r.slug && !collectedChums?.has(r.name) && (
+                    <span
+                      className={styles.relCardGrab}
+                      role="button"
+                      tabIndex={0}
+                      aria-label={`Collect ${r.name}`}
+                      onMouseEnter={() => setHoverHint(`collect ${r.name}`)}
+                      onMouseLeave={() => setHoverHint("")}
+                      onPointerDown={(e) => e.stopPropagation()}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onChumCollected?.(r.name);
+                        onScore?.(1000);
+                      }}
+                    >
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M4 12.5 L9.5 18 L20 6.5" fill="none" stroke="#ffffff" strokeWidth="3.4" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
                     </span>
                   )}
                 </button>
