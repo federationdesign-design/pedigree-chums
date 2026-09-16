@@ -267,7 +267,7 @@ function countProgenitors(n: LineageNode): number {
    applied, so a small circle is already at 21 * 0.407 = 8.5px and the ring on it
    is a flat 4.8. Below about 0.3 the ring is thicker than the circle is wide and
    the nodes stop reading as circles at all. */
-const PIT_NODE_SCALE = 0.732;
+const PIT_NODE_SCALE = 0.659;
 export function radius(share: number) {
   return Math.max(21, 5 * Math.sqrt(share));
 }
@@ -1211,7 +1211,7 @@ export default function LineageMap({
       // RSTEP scaled with the nodes on the lift and the chum tree, see NODE_POKE
       // below. RING1 is the root's own first ring and is left alone: it is
       // measured off ROOT, the card, which does not shrink.
-      const rstep = RSTEP * (liftOrChum ? PIT_NODE_SCALE : 1);
+      const rstep = RSTEP * (liftOrChum ? PIT_NODE_SCALE * 0.9 : 1); // the same 0.9 as SPACING_K below
       const dist = depth === 0 ? RING1 : (INSTR_NAMES.has(breed.name) ? rstep * 1.2 : rstep);
       // mini pit: the connector is aware of both circles' real sizes - the
       // child clears the parent's EDGE by 50px whatever size either circle is
@@ -1307,7 +1307,14 @@ export default function LineageMap({
 
          THE SAME APPLIES TO RSTEP on the non-clock path below, which is a flat
          128. It is scaled at its use site for the same reason. */
-      const NODE_POKE = 18 * (liftOrChum ? PIT_NODE_SCALE : 1);
+      /* A SECOND DIAL FOR THE SPACING, 16 September 2026 (owner: nodes 10% smaller
+         AND connectors 10% shorter). The two had become one control: the daylight
+         and the ring step both scale with PIT_NODE_SCALE, so shrinking the nodes
+         already shortened the connectors by the same 10%. SPACING_K takes the
+         further 10% the owner asked for, and keeps the two separately tunable from
+         here on. */
+      const SPACING_K = 0.9;
+      const NODE_POKE = 18 * (liftOrChum ? PIT_NODE_SCALE * SPACING_K : 1);
       const shoulderD = rOf(n) + kidR * 0.2 + NODE_POKE;
       const step = spread / Math.max(cnt, 2); // non-circular fan only
       const ringD = shoulderD;                // single-child radius
@@ -3273,7 +3280,10 @@ export default function LineageMap({
                            pill is scaled rather than its type, so the rounded box, its
                            padding and the two-line offset all come down together and
                            nothing has to be re-measured. */
-                        <g transform={`translate(${pcx},${pcy}) scale(0.54)`}>
+                        /* 0.54 -> 0.594, the pill and its name 10% bigger,
+                           16 September 2026 (owner). The whole group is scaled, so the
+                           box, its padding and the two-line offset move together. */
+                        <g transform={`translate(${pcx},${pcy}) scale(0.594)`}>
                           <rect className={styles.nmPill} x={-nmW / 2} y={-nmH / 2} width={nmW} height={nmH} rx={nmH / 2} />
                           {nmLines.map((ln, li) => (
                             <text key={li} className={styles.nm} textAnchor="middle" dominantBaseline="central"
@@ -3371,7 +3381,9 @@ export default function LineageMap({
                            CW / 2 clears the frame's own edge and 12 is the gap under
                            it. WRONG DOG is unchanged, still centred in the frame on
                            the baseline it has had since 9 September. */
-                        y={f.sy - pan.y + (wrongDog?.frameId === f.id ? 5 : CW / 2 + 12)}
+                        /* 12 -> 27, down a further 15, 16 September 2026 (owner: it
+                           touches the frame's bottom edge). WRONG DOG is unchanged. */
+                        y={f.sy - pan.y + (wrongDog?.frameId === f.id ? 5 : CW / 2 + 27)}
                         textAnchor="middle"
                         dominantBaseline="middle"
                         {...(wrongDog?.frameId === f.id ? { clipPath: `url(#lbl-clip-${f.id})` } : null)}
@@ -3384,7 +3396,11 @@ export default function LineageMap({
                            was cut to 8 on 9 September only because the label had to
                            fit inside the frame; out from under the clip it can carry
                            a readable size. WRONG DOG stays at 10. */
-                        style={{ fill: wrongDog?.frameId === f.id ? "#ffffff" : "#ffd23e", font: `700 ${wrongDog?.frameId === f.id ? 10 : 11}px ${wrongDog?.frameId === f.id ? "'Luckiest Guy', " : ""}Montserrat, system-ui, sans-serif`, pointerEvents: "none", paintOrder: "stroke", stroke: wrongDog?.frameId === f.id ? "none" : "rgba(10,58,87,0.85)", strokeWidth: wrongDog?.frameId === f.id ? 0 : 3, strokeLinejoin: "round" }}
+                        /* WHITE, NO OUTLINE, 11 -> 13, 16 September 2026 (owner).
+                           The navy outline was added the same day so yellow could be
+                           read over artwork; white carries itself, and the owner has
+                           seen it in place. WRONG DOG keeps its 10px. */
+                        style={{ fill: "#ffffff", font: `700 ${wrongDog?.frameId === f.id ? 10 : 13}px ${wrongDog?.frameId === f.id ? "'Luckiest Guy', " : ""}Montserrat, system-ui, sans-serif`, pointerEvents: "none" }}
                       >
                         {wrongDog?.frameId === f.id ? (
                           <>
@@ -3394,7 +3410,7 @@ export default function LineageMap({
                         ) : (() => {
                           // split breed name into words, up to 3 lines
                           const words = (dragName || "").split(" ");
-                          const lineH = 11; // follows the font size above
+                          const lineH = 13; // follows the font size above
                           const startY = words.length === 1 ? 0 : words.length === 2 ? -lineH / 2 : -lineH;
                           return words.map((w, i) => (
                             <tspan key={i} x={f.sx - pan.x} dy={i === 0 ? startY : lineH}>{w}</tspan>

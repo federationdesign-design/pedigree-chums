@@ -180,7 +180,10 @@
   font-family: var(--font-body), system-ui, sans-serif;
   font-weight: 800;
   font-size: 11px;
-  fill: var(--navy);
+  /* WHITE, 16 September 2026 (owner). Navy on the pit's blue was legible only
+     because the node above it is pale; over the darker artwork on the lifted
+     layers it disappeared. */
+  fill: #ffffff;
   pointer-events: none;
 }
 
