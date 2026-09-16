@@ -156,7 +156,10 @@ const RARITY_DRAW_DELAY = "0.2s";
 const BAND_SLIDE_DUR = "0.45s";
 const BAND_SLIDE_DELAY = "0.65s";
 // distance from the dog to its direct ancestors (mirrors the canvas hover-fan)
-const RING1 = ROOT + 96;
+/* ROOT + 96 -> ROOT + 72, the first ring 25% shorter, 16 September 2026 (owner:
+   the connectors coming off the central chum card are too long). Only the 96 is
+   cut: ROOT is the card's own radius and the ring has to clear it. */
+const RING1 = ROOT + 72;
 // distance added at each deeper generation
 const RSTEP = 128;
 // the dog's first ring sweeps the same 270 degrees as the hover-fan, centred above it
@@ -263,7 +266,7 @@ function countProgenitors(n: LineageNode): number {
    applied, so a small circle is already at 21 * 0.407 = 8.5px and the ring on it
    is a flat 4.8. Below about 0.3 the ring is thicker than the circle is wide and
    the nodes stop reading as circles at all. */
-const PIT_NODE_SCALE = 0.61;
+const PIT_NODE_SCALE = 0.732;
 export function radius(share: number) {
   return Math.max(21, 5 * Math.sqrt(share));
 }
@@ -2968,7 +2971,33 @@ export default function LineageMap({
                       return <circle className={`${styles.disc} ${circular ? styles.discPit : ""} ${hasKids && !isOpen ? styles.has : ""} ${idleHint && !seen.has(n._id) && (n._parent as Node)?._id === "0" ? styles.hint : ""}`.trim()} r={r} style={Object.keys(st).length ? st : undefined} />;
                     })()}
                     <text className={styles.pct} textAnchor="middle" dominantBaseline="central"
-                      fontSize={INSTR_NAMES.has(breed.name) ? Math.max(13, r * 0.75) : Math.max(13, r * (circular ? 0.625 : 0.5))}
+                      /* THE FIGURE SCALES WITH ITS CIRCLE, AND KEEPS ITS PADDING,
+                         16 September 2026 (owner: the % text stays a standard size
+                         so on a node under 25% it touches the edges).
+
+                         THE FLOOR WAS THE FAULT. Math.max(13, ...) meant every
+                         small node drew 13px type however small the circle got, and
+                         after the node scale was cut the small circles are around
+                         15px across, so the text was wider than the disc.
+
+                         TWO LIMITS, WHICHEVER IS SMALLER. r * 0.55 is the old
+                         proportion, and the second is a width fit: the label is
+                         share plus a percent sign, and at roughly 0.58em a
+                         character it has to sit inside the disc less the 4.8 ring
+                         and a tenth of the radius as padding on each side. So a
+                         one-digit share can use more of its circle than "100%" can,
+                         which is why the cap is per label rather than flat.
+
+                         The lift and the chum tree only. The main pit and the
+                         instruction cards keep their floors: their circles are full
+                         size, so a floor never bites there. */
+                      fontSize={(() => {
+                        if (INSTR_NAMES.has(breed.name)) return Math.max(13, r * 0.75);
+                        if (!liftOrChum) return Math.max(13, r * (circular ? 0.625 : 0.5));
+                        const label = `${share}%`;
+                        const inner = Math.max(1, r - 4.8 - r * 0.1); // half-width left after ring and padding
+                        return Math.max(5, Math.min(r * 0.55, (inner * 2) / (label.length * 0.58)));
+                      })()}
                       /* White only on the blue SEEN fill now. A placed node is
                          yellow (item 9 above), and white on yellow cannot be read,
                          so it keeps the default navy. */
@@ -3011,7 +3040,11 @@ export default function LineageMap({
                            purely what gets drawn. Sibling spacing is now 10% more
                            generous than the pills need, which reads as air rather
                            than as a fault. */
-                        <g transform={`translate(${pcx},${pcy}) scale(0.9)`}>
+                        /* 0.9 -> 0.54, 40% smaller, 16 September 2026 (owner). The whole
+                           pill is scaled rather than its type, so the rounded box, its
+                           padding and the two-line offset all come down together and
+                           nothing has to be re-measured. */
+                        <g transform={`translate(${pcx},${pcy}) scale(0.54)`}>
                           <rect className={styles.nmPill} x={-nmW / 2} y={-nmH / 2} width={nmW} height={nmH} rx={nmH / 2} />
                           {nmLines.map((ln, li) => (
                             <text key={li} className={styles.nm} textAnchor="middle" dominantBaseline="central"
