@@ -19,6 +19,7 @@ export default function ReadingProgress({
   articleSelector = "article",
   progress,
   active,
+  runOffEnds = false,
 }: {
   articleSelector?: string;
   /* Controlled mode: when a number is given, the bar is driven by this
@@ -27,6 +28,15 @@ export default function ReadingProgress({
      the walk cycle in that mode. Omit both for the default scroll behaviour. */
   progress?: number;
   active?: boolean;
+  /* RUNS ON AND OFF THE SCREEN, 16 September 2026 (owner, for the chum tree
+     layer): at 0% the dog is fully off to the left and only comes into view as
+     the work starts; at 100% it has run fully off to the right.
+
+     OPT-IN, DEFAULT OFF. The dog normally sits at left: {pct}%, which straddles
+     the edge at both ends, and that is the article's own look. This prop is off
+     unless asked for so /good-dog-bad-dog/argos and the press carousel are
+     untouched. */
+  runOffEnds?: boolean;
 }) {
   const controlled = typeof progress === "number";
   const [pct, setPct] = useState(0);
@@ -139,7 +149,11 @@ export default function ReadingProgress({
         data-walking={walkingState ? "1" : "0"}
         data-done={done ? "1" : "0"}
         className={`${styles.dog} ${done ? styles.dogDone : ""}`}
-        style={{ left: `${displayPct}%` }}
+        /* DOG_CLEAR is a little wider than the 34px sprite plus its drop shadow,
+           so "off screen" really is off. The offset runs from -DOG_CLEAR at 0% to
+           +DOG_CLEAR at 100%, which puts the dog fully clear at both ends and
+           leaves it exactly where it used to be at 50%. */
+        style={{ left: runOffEnds ? `calc(${displayPct}% + ${(displayPct / 50 - 1) * 52}px)` : `${displayPct}%` }}
       >
         <svg viewBox={DOG_WALK_VIEWBOX} className={styles.dogImg}>
           <path d={DOG_WALK_PATHS[frame]} className={styles.dogFill} />

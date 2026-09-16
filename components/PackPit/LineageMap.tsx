@@ -2684,7 +2684,7 @@ export default function LineageMap({
             sibling of the overlay like the score and the counter, so the layer's own
             0.8 scale cannot shrink it. */}
         {strongBg && !circular && !bounded && (
-          <ReadingProgress progress={learnProgress} active={dogRunning} />
+          <ReadingProgress progress={learnProgress} active={dogRunning} runOffEnds />
         )}
         {strongBg && !circular && !bounded && (
           <div className={styles.chumScore} aria-label={`Score ${currentScore}`}>
