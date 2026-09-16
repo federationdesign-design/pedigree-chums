@@ -65,6 +65,16 @@
   height: 100%;
   background: var(--yellow, #ffd23e);
   z-index: 1;
+  transition: background 0.3s ease;
+}
+/* FULL BAR GOES GREEN, 16 September 2026 (owner). #22c55e is the game's own green,
+   the one a filled frame, the Collect button and the collected rail card all use,
+   so "finished" reads the same colour throughout. The transition above carries it
+   rather than snapping. This applies wherever the bar reaches 100%, the article
+   included; nothing asked for it to be scoped, and a finished article going green
+   is the same statement. */
+.fillDone {
+  background: #22c55e;
 }
 
 /* Sits clear above the track (track is 12px), not overlapping into it */

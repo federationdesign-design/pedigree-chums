@@ -1454,7 +1454,11 @@ export default function LineageMap({
   // because a fixed pitch that suits a 390 screen overflows a 320 one and small
   // screens are the entire point of this.
   const fiveUp = (circular || strongBg) && isMobile;
-  const MCOLS = fiveUp ? 5 : 4; // phones: one continuous grid, this many wide before it wraps
+  /* 5 -> 6 ACROSS, 16 September 2026 (owner). fitCol below already divides the
+     available width by MCOLS - 1, so the columns narrow to suit on their own and
+     nothing else has to be re-measured; F_COL's own floor of CW + 6 stops them
+     overlapping if the screen is too narrow to hold six. */
+  const MCOLS = fiveUp ? 6 : 4; // phones: one continuous grid, this many wide before it wraps
   const F_EDGE = 14;
   /* PRE-COMPENSATING FOR THE LAYER'S 0.8 SCALE, 2 September 2026 (owner).
 
@@ -1483,7 +1487,10 @@ export default function LineageMap({
      51.8 - 20.16 = 31.6 on a phone. The frame column's LEFT EDGE lines up with
      it, so F_LEFT, which is the first column's CENTRE, is that plus half a card. */
   const PORTRAIT_LEFT = 31.6;
-  const F_LEFT = fiveUp ? unscaleX(PORTRAIT_LEFT) + CW / 2 : isMobile ? 52 : 96;
+  /* 20px LEFT on the lifted layers, 16 September 2026 (owner). The nudge is inside
+     unscaleX's result rather than applied to it, so it is a true 20 screen pixels
+     whatever the layer's scale. */
+  const F_LEFT = fiveUp ? unscaleX(PORTRAIT_LEFT - 20) + CW / 2 : isMobile ? 52 : 96;
   // On a circle the rim at 45 degrees sits this far in from the bounding box, so
   // corner adornments tuck against the edge instead of floating outside it.
   const RIM_IN = (CW / 2) * (1 - Math.SQRT1_2);
@@ -1498,7 +1505,11 @@ export default function LineageMap({
   // Tucked under the X/XX counter, which sits at top 26 and is about 32 tall.
   // 111 is unchanged as the INTENDED top; unscaleY is what makes it land there
   // again now the layer is scaled. See the note by F_LEFT.
-  const chumTop = fiveUp ? unscaleY(111) : circular ? (isMobile ? 118 : 168) : isMobile ? 170 : 240; // 96, down 15 to clear the top-right button
+  /* 20px UP, 16 September 2026 (owner): the intended top goes 111 -> 91, inside
+     unscaleY for the same reason as F_LEFT above. The frame counter moved up and
+     left earlier the same day, so the grid is following it rather than crowding
+     it. */
+  const chumTop = fiveUp ? unscaleY(91) : circular ? (isMobile ? 118 : 168) : isMobile ? 170 : 240; // 96, down 15 to clear the top-right button
   const frames: { id: string; cat: "chum" | "alive" | "extinct"; img: string; sx: number; sy: number }[] = [];
   let aliveTop = chumTop, extinctTop = chumTop; // only the desktop section headers use these
   if (isMobile) {

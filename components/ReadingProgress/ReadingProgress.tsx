@@ -137,7 +137,10 @@ export default function ReadingProgress({
         {notches.map((n) => (
           <span key={n} className={styles.notch} style={{ left: `${n}%` }} />
         ))}
-        <div className={styles.fill} id="rp-fill" style={{ width: `${displayPct}%` }} />
+        {/* GREEN AT THE END, 16 September 2026 (owner). Reuses `done`, the same
+            flag that already starts the dog's wobble, so the bar and the dog agree
+            on what finished means rather than testing the percentage twice. */}
+        <div className={`${styles.fill} ${done ? styles.fillDone : ""}`} id="rp-fill" style={{ width: `${displayPct}%` }} />
       </div>
 
       {/* The dog. Source SVGs face left -- flipped via CSS (scaleX(-1) in
