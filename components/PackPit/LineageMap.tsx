@@ -263,7 +263,7 @@ function countProgenitors(n: LineageNode): number {
    applied, so a small circle is already at 21 * 0.407 = 8.5px and the ring on it
    is a flat 4.8. Below about 0.3 the ring is thicker than the circle is wide and
    the nodes stop reading as circles at all. */
-const PIT_NODE_SCALE = 0.407;
+const PIT_NODE_SCALE = 0.61;
 export function radius(share: number) {
   return Math.max(21, 5 * Math.sqrt(share));
 }
@@ -1136,7 +1136,11 @@ export default function LineageMap({
       if (!kids) return;
       const cnt = kids.length;
       const spread = circular ? Math.PI * 0.42 : depth === 0 ? SPREAD1 : SPREADN;
-      const dist = depth === 0 ? RING1 : (INSTR_NAMES.has(breed.name) ? RSTEP * 1.2 : RSTEP);
+      // RSTEP scaled with the nodes on the lift and the chum tree, see NODE_POKE
+      // below. RING1 is the root's own first ring and is left alone: it is
+      // measured off ROOT, the card, which does not shrink.
+      const rstep = RSTEP * (liftOrChum ? PIT_NODE_SCALE : 1);
+      const dist = depth === 0 ? RING1 : (INSTR_NAMES.has(breed.name) ? rstep * 1.2 : rstep);
       // mini pit: the connector is aware of both circles' real sizes - the
       // child clears the parent's EDGE by 50px whatever size either circle is
       const rOf = (nd: Node): number => {
@@ -1220,7 +1224,18 @@ export default function LineageMap({
       // shoulderD / NODE_POKE survive for the SINGLE-CHILD path only: one child
       // still springs from the rim and reads like the solo card, with no line.
       const kidR = Math.max(...kids.map((k) => rOf(k)), 1);
-      const NODE_POKE = 18;
+      /* THE GAP FOLLOWS THE NODES NOW, 16 September 2026 (owner: the nodes got
+         smaller but the connectors stayed the same length).
+
+         rOf already scales with PIT_NODE_SCALE, but the daylight added to it did
+         not: NODE_POKE was a flat 18 whatever the circles measured, so as the
+         nodes shrank the gap became the dominant part of the distance and the
+         tree stayed as spread out as ever. Scaling it keeps the same proportion
+         of daylight to circle at any node size.
+
+         THE SAME APPLIES TO RSTEP on the non-clock path below, which is a flat
+         128. It is scaled at its use site for the same reason. */
+      const NODE_POKE = 18 * (liftOrChum ? PIT_NODE_SCALE : 1);
       const shoulderD = rOf(n) + kidR * 0.2 + NODE_POKE;
       const step = spread / Math.max(cnt, 2); // non-circular fan only
       const ringD = shoulderD;                // single-child radius
