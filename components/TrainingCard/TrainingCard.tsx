@@ -79,19 +79,16 @@ export default function TrainingCard({ data, compact = false }: Props) {
           >
             out of 5
           </text>
-          {/* Scale markers */}
-          {["Easy", "", "", "", "Hard"].map((t, i) => {
-            const deg = 180 + (i / 4) * 180;
-            const rad = (deg * Math.PI) / 180;
-            const mx = GAUGE_CX + (GAUGE_R + 14) * Math.cos(rad);
-            const my = GAUGE_CY + (GAUGE_R + 14) * Math.sin(rad);
-            return t ? (
-              <text key={i} x={mx} y={my} textAnchor={i === 0 ? "end" : "start"} dominantBaseline="central"
-                style={{ fontFamily: "var(--font-body,'Montserrat',sans-serif)", fontSize: 8, fontWeight: 700, fill: "rgba(255,255,255,0.35)", textTransform: "uppercase" }}>
-                {t}
-              </text>
-            ) : null;
-          })}
+          {/* THE EASY AND HARD MARKERS ARE GONE, 16 September 2026 (owner),
+              removing the two labels at either end of the diagram.
+
+              They sat at GAUGE_R + 14 on the left and right, so they were what
+              set the card's minimum width: the gauge itself is narrower than the
+              pair of words around it. With them gone the card was cut 15% in
+              BreedTree.module.css, which is the whole point of removing them.
+
+              The needle, the number and the "out of 5" line all stay, so the
+              reading is unchanged; only the two end captions have gone. */}
         </svg>
 
         {/* Label pill */}

@@ -386,7 +386,9 @@
      now ends at 314 and leaves 76px bare on the right instead of 8. To fill the
      width as well, the 66 in the sum and the 76 in the cap both become 8. Not
      done here: moving a box and resizing it are two different requests. */
-  left: 0px;
+  /* 15px FURTHER LEFT, 16 September 2026 (owner). 0 -> -15, so the box's rounded
+     left corners run off the screen edge and the fill meets it square. */
+  left: -15px;
   /* The WHOLE box is the drag handle now, so the browser must never claim the
      gesture. .asideDocked sets pinch-zoom here, which is overridden. Nothing inside
      scrolls any more, so there is no pan to preserve. */
@@ -1372,6 +1374,11 @@
    as that breed's own page. Rides with the box like the rail does. */
 .ancCard {
   position: fixed;
+  /* 10% SMALLER, 16 September 2026 (owner), the third of the three breed cards.
+     Anchored from the RIGHT, unlike the other two, so the origin pins that edge
+     and it shrinks inwards rather than drifting off it. */
+  scale: 0.9;
+  transform-origin: right center;
   top: 6%;
   right: 4%;
   width: min(88vw, 330px);
@@ -1501,11 +1508,27 @@
 .learnCards .ancCard { margin-top: 0; }
 .trainCard {
   position: fixed;
-  /* LEFT EDGE, 16 September 2026 (owner), bottom unchanged. It shared its exact
-     rectangle with .tempCard until the same day; that one moved to the middle. */
-  bottom: 6%;
-  left: 4%;
+  /* BESIDE THE TEMPERAMENT CARD, 16 September 2026 (owner). It was bottom 6%,
+     left 4%, and earlier the same day it shared its exact rectangle with
+     .tempCard. Both sit on the middle line now, temperament against the left edge
+     and this one directly to its right.
+
+     THE 200px IS MEASURED: .tempCard is 218 wide scaled to 0.9, so it occupies
+     196.2 from left 0, and 200 puts this 4px clear of it.
+
+     15% THINNER, which is what removing the Easy and Hard markers bought. Those
+     two words sat at GAUGE_R + 14 either side of the gauge and were what held the
+     card open; the gauge itself is narrower. 218 -> 185, and with the 0.9 on top
+     it draws 167, so the pair come to 367 on a 390 screen and still clear the
+     right edge. */
+  top: 50%;
+  translate: 0 -50%;
+  scale: 0.9;
+  transform-origin: left center;
+  bottom: auto;
+  left: 200px;
   right: auto;
+  width: min(92vw, 185px);
   width: min(92vw, 218px);
   z-index: 21;
   touch-action: pinch-zoom;
@@ -1572,6 +1595,15 @@
      keeps its offset while dragged. */
   top: 50%;
   translate: 0 -50%;
+  /* 10% SMALLER, 16 September 2026 (owner), on all three breed cards.
+     `scale` RATHER THAN A SMALLER WIDTH, so the type, the padding and the gauge
+     come down with the box instead of the text reflowing inside a narrower one.
+     It is the standalone scale property, not transform, for the same reason
+     translate is: this card animates and drags through transform, and the three
+     compose instead of overwriting one another. transform-origin pins the edge
+     the card is anchored from, so it shrinks inwards rather than drifting. */
+  scale: 0.9;
+  transform-origin: left center;
   bottom: auto;
   /* HARD LEFT TOO, 16 September 2026 (owner: on the left edge, on the same
      vertical axis as the main blue box). Was 4%. Both are 0 now, so the card and
