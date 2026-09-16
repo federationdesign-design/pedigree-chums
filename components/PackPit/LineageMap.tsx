@@ -880,7 +880,15 @@ export default function LineageMap({
      actually down, so it costs nothing the rest of the time. */
   useEffect(() => {
     if (!learnBusy.current) return;
-    const t = window.setTimeout(releaseLearn, 520);
+    /* 520 -> 130, 16 September 2026 (owner: the button stays down about 0.4s when
+       exposing the next rung takes under 0.1s).
+
+       520 was sized for the 460ms pack tween, the LONGEST step. Every other step
+       is near instant, so the button sat down long after its work was done. This
+       effect fires when the step's state lands, so 130 is just enough for the
+       press to register as a press. The pack-out still holds the button, because
+       its own tween keeps re-firing this while it runs. */
+    const t = window.setTimeout(releaseLearn, 130);
     return () => window.clearTimeout(t);
   }, [open, picked, packed]);
  // the ancestor pack has been ordered into its two columns

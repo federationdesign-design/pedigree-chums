@@ -500,7 +500,14 @@
    It holds as long as the press does, which since the same day is until the step
    finishes rather than a 140ms timer, so on a long pack-out the button stays dark
    while it works. */
-.chumTopDown .compPill {
+/* THE SELECTOR CARRIES A THIRD CLASS, 16 September 2026, because the owner could
+   not see the colour change at all. .removeBtn:hover .compPill above is a class
+   plus a pseudo-class plus a class, which outranks a two-class selector, and you
+   are hovering the button at the moment you press it. So the hover blue won every
+   time on a desktop, and on a phone the hover state can stick after a tap.
+   .removeBtn .chumTopDown .compPill matches its specificity and sits after it, so
+   the pressed colour wins. */
+.removeBtn .chumTopDown .compPill {
   fill: #0c6a9c;
 }
 .compText {
@@ -742,7 +749,12 @@
 }
 .frameFilled {
   opacity: 1;
-  stroke: var(--yellow);
+  /* GREEN, NOT YELLOW, 16 September 2026 (owner: a correctly placed image should
+     turn its frame green). #22c55e is the game's own green, the one the Collect
+     button, the collected rail card and the quick-collect tick all use, so
+     "correct" reads the same colour everywhere. Yellow stays on .frameLit, which
+     is the frame you are AIMING at, so the two states no longer share a colour. */
+  stroke: #22c55e;
   stroke-dasharray: none;
   animation: none;
 }
@@ -884,10 +896,26 @@
   0%, 100% { transform: rotate(-3.5deg) scale(1.05); }
   50%      { transform: rotate(3.5deg) scale(1.09); }
 }
+/* THE STROKE FLASHES WHITE TO YELLOW WITH IT, 16 September 2026 (owner: the
+   duplicate highlight should alternate white and yellow rather than sit on one
+   yellow, so it stands out more).
+
+   A SECOND ANIMATION RATHER THAN A REWRITE. frameExpect above animates transform
+   only, and its wobble is unchanged; this runs alongside it on stroke. Two
+   animations on one element is why they are separate names rather than merged
+   keyframes.
+
+   THE TIMING IS DELIBERATELY DIFFERENT. 0.42s for the wobble against 0.34s here,
+   so the colour and the movement drift in and out of step instead of pulsing as
+   one, which reads as livelier at no extra cost. */
+@keyframes frameExpectFlash {
+  0%, 100% { stroke: #ffffff; }
+  50%      { stroke: var(--yellow); }
+}
 .frameExpect {
   transform-box: fill-box;
   transform-origin: center;
-  animation: frameExpect 0.42s ease-in-out infinite;
+  animation: frameExpect 0.42s ease-in-out infinite, frameExpectFlash 0.34s ease-in-out infinite;
 }
 .frameDim {
   opacity: 0.3;
