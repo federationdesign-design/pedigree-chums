@@ -307,11 +307,28 @@
   stroke-width: 2.4;
   stroke-linejoin: round;
 }
+/* THE TWO PLACED STATES, 16 September 2026 (owner). The rim tells the player how
+   far through this dog they are:
+     white   .pickCard        loose, in hand, still to place
+     yellow  .pickCardWaiting in a frame, but copies of it are still out
+     green   .pickCardDone    every copy of this picture is home
+   A dog that appears once never shows the yellow: its first placement is also its
+   last, so it goes white to green.
+
+   These sit after .pickCard and .pickCardStack so they win on source order without
+   needing extra specificity. Yellow is the game's aiming colour and green its
+   finished colour, which is the same pairing the frames use. */
 .pickCardStack {
   /* white in the learn layer, matching the ring on a zoomed card. Yellow is the
      pit's colour and read as pit furniture laid over the learning view.
      Width comes from .pickCard above, so the stacked duplicate follows it. */
   stroke: #ffffff;
+}
+.pickCardWaiting {
+  stroke: var(--yellow, #ffd23e);
+}
+.pickCardDone {
+  stroke: #22c55e;
 }
 .pickCaption {
   fill: rgba(10, 58, 87, 0.88);

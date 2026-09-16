@@ -1799,6 +1799,27 @@ export default function LineageMap({
     topByImg.set(c.img, c.id);
   });
   const isTopOfStack = (c: { id: string; img: string }) => topByImg.get(c.img) === c.id;
+  /* EVERY COPY OF THIS PICTURE IS HOME, 16 September 2026 (owner: a card should turn
+     green only once all of its duplicates are placed too, not on the first one).
+
+     dupTotal is how many cards carry this image. Counting how many of them are in a
+     frame, stacked on one, or folded out by the pack tells us whether the dog is
+     finished. A single-appearance dog reaches this the moment it lands, which is the
+     owner's "if there's only one image then they go instantly green".
+
+     A SET BUILT ONCE, not a function called per card. The per-card version walked
+     pickCards for every card drawn, and eslint's purity rule followed the new call
+     path into tween's performance.now and raised this file's error count. One pass
+     over the cards costs less and keeps the baseline. */
+  const imagesAllHome = (() => {
+    const home = new Map<string, number>();
+    for (const c of pickCards) {
+      if (placedSet.has(c.id) || stackedIds.has(c.id) || packHidden.has(c.id)) home.set(c.img, (home.get(c.img) ?? 0) + 1);
+    }
+    const done = new Set<string>();
+    for (const [img, n] of home) if (n >= (dupTotal.get(img) ?? 0)) done.add(img);
+    return done;
+  })();
   // order cards within each image group so the underneath ones can fan slightly /* stack-pack */
   const stackOrder = new Map<string, number>();
   { const byImg = new Map<string, string[]>();
@@ -3801,7 +3822,19 @@ export default function LineageMap({
                   {/* No ring on a self card. The word IS the object, exactly as
                       it is in the pit, so a circle round it would be the small
                       card coming back. */}
-                  {!INSTR_NAMES.has(breed.name) && !isSelfCard(c.name) && <rect x={c.cardX-CW/2} y={c.cardY-CW/2} width={CW} height={CW} rx={circular ? CW/2 : 15} vectorEffect="non-scaling-stroke" className={isDupImg(c.img) && !isTopOfStack(c) && !PACK_BREEDS.has(c.name) ? `${styles.pickCard} ${styles.pickCardStack}` : styles.pickCard}
+                  {!INSTR_NAMES.has(breed.name) && !isSelfCard(c.name) && <rect x={c.cardX-CW/2} y={c.cardY-CW/2} width={CW} height={CW} rx={circular ? CW/2 : 15} vectorEffect="non-scaling-stroke" /* THREE STATES ON THE CARD'S OWN RIM, 16 September 2026 (owner). White while it is
+   loose and being dragged, YELLOW once it is in a frame but copies of it are still
+   out, GREEN when every copy is home. A dog that appears once goes straight from
+   white to green, because the first placement is also the last.
+
+   THE LEARN AREA IS WHERE THIS BELONGS. An earlier pass put the green on the HTML
+   ring in the placed-card block, which is the PIT LIFT's, so the pit went green and
+   this layer never changed. This rect is what the learn area actually draws. */
+className={[
+                    styles.pickCard,
+                    isDupImg(c.img) && !isTopOfStack(c) && !PACK_BREEDS.has(c.name) ? styles.pickCardStack : "",
+                    (placedSet.has(c.id) || stackedIds.has(c.id)) ? (imagesAllHome.has(c.img) ? styles.pickCardDone : styles.pickCardWaiting) : "",
+                  ].filter(Boolean).join(" ")}
                     /* Mini pit: a circle that popped out of a dog wears that
                        dog's ring colour, so it is obvious where it came from.
                        The main pit keeps its own blue and white scheme. */
