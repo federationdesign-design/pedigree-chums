@@ -374,7 +374,19 @@
   top: auto;
   /* 31 Aug 2026, second pass: +20px right of the old 8px. Third pass, same day:
      +20px again, so 28 becomes 48. Fourth pass: +20px again, so 48 becomes 68. */
-  left: 68px;
+  /* HARD LEFT, 16 September 2026 (owner: move it right into the left corner, the
+     68 removed). It sat at 68px to clear the difficulty slider, whose track and
+     handle run down the left edge, so the box now covers them. The slider is
+     still there and still draggable underneath; put 68 back to expose it again.
+
+     THE WIDTH DID NOT FOLLOW IT. Both the width sum and the max-width cap below
+     were built around the 68: the sum subtracts 66 for it and the cap is
+     100vw - 76, which was 68 plus 8px of air on the right. With left at 0 the box
+     keeps its old width and simply sits 68px further left, so on a 390 screen it
+     now ends at 314 and leaves 76px bare on the right instead of 8. To fill the
+     width as well, the 66 in the sum and the 76 in the cap both become 8. Not
+     done here: moving a box and resizing it are two different requests. */
+  left: 0px;
   /* The WHOLE box is the drag handle now, so the browser must never claim the
      gesture. .asideDocked sets pinch-zoom here, which is overridden. Nothing inside
      scrolls any more, so there is no pan to preserve. */
@@ -1561,7 +1573,12 @@
   top: 50%;
   translate: 0 -50%;
   bottom: auto;
-  left: 4%;
+  /* HARD LEFT TOO, 16 September 2026 (owner: on the left edge, on the same
+     vertical axis as the main blue box). Was 4%. Both are 0 now, so the card and
+     the box share one left edge at every screen width, which a percentage could
+     not guarantee. .trainCard stays at 4% deliberately: it sits at the bottom and
+     was not asked to move. */
+  left: 0;
   right: auto;
   width: min(92vw, 218px);
   z-index: 21;
