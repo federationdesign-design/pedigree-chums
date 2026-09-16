@@ -1909,6 +1909,12 @@ export default function LineageMap({
   const showAuto = autoArmed && totalNodes > 0 && seen.size < totalNodes && !packed && !collecting && !removing;
   /* Set when AUTO has popped everything and the cards still need placing. */
   const autoPlaceRef = useRef(false);
+  /* Bumped by the stall guard in autoCollect so the finishing effect below re-runs
+     even when `picked` never changes. The ref beside it says WHY it re-ran: the
+     tick alone cannot, because it only ever counts up, so testing it against zero
+     would disable the popping check for every AUTO after the first. */
+  const [autoPlaceTick, setAutoPlaceTick] = useState(0);
+  const autoForceRef = useRef(false);
   const autoCollect = () => {
     /* THE BRANCHES UNFOLD IN A WAVE, 16 September 2026 (owner: AUTO opens every
        layer in one go and should ripple out a rung at a time, like the images
@@ -1955,7 +1961,30 @@ export default function LineageMap({
        the last of them, and it is flagged rather than called directly because
        the routine reads pickCards and placedSet, which are only correct once
        React has rendered the new picked set. The effect below does it. */
+    /* THE SEQUENCE CANNOT STALL WAITING FOR A CHANGE THAT NEVER COMES,
+       16 September 2026 (owner: AUTO sometimes stops part-way and the Learn and
+       Collect have to be pressed by hand).
+
+       THE DEAD END. autoPlaceRef is a flag, and the only thing that acts on it is
+       an effect keyed on `picked`. If every image node is ALREADY picked when AUTO
+       is pressed, which happens whenever the player has popped the cards by hand
+       first, imgNodes is empty, not one setPicked runs, `picked` never changes, the
+       effect never fires and the flag sits true for the rest of the round. AUTO
+       looks like it did nothing and the buttons have to be used manually.
+
+       TWO GUARDS. If there is nothing left to pop, the placement is run directly on
+       the next tick rather than flagged. And a backstop timer, sized to the ripple
+       plus a margin, runs it anyway if the effect has not: 45ms a node is 10
+       seconds on a 229-node dog, so the wait is derived rather than a flat number.
+       Both check the flag before acting, so whichever gets there first wins and the
+       other does nothing. */
     autoPlaceRef.current = true;
+    autoForceRef.current = false; // a fresh run waits for the ripple again
+    const rippleMs = allNodes.length * 45;
+    // Both guards nudge the SAME effect that already finishes the sequence rather
+    // than calling the placement themselves: one caller, one place to reason about.
+    // Nothing to pop means fire on the next tick; otherwise wait out the ripple.
+    window.setTimeout(() => { autoForceRef.current = true; setAutoPlaceTick((t) => t + 1); }, imgNodes.length === 0 ? 0 : rippleMs + 600);
     onScore?.(-500); /* WAS -2500, 16 September 2026 (owner). The whole learn-area
        scale was rebalanced that day to reward thoroughness: awards now run into
        the tens of thousands on a deep dog, so a 2500 penalty read as ruinous. */
@@ -2028,12 +2057,15 @@ export default function LineageMap({
     if (!autoPlaceRef.current) return;
     // Wait until every image node has actually popped: the stagger is 45ms a
     // node, so an early run would place the first few and leave the rest loose.
+    // The backstop tick means "stop waiting", so it overrides the popping check;
+    // without that, a node that never pops would hold the sequence open for ever.
     const stillPopping = allNodes.some((n) => n.hasImg && !picked.has(n.id));
-    if (stillPopping) return;
+    if (stillPopping && !autoForceRef.current) return;
+    autoForceRef.current = false;
     autoPlaceRef.current = false;
     placeAllUnplaced();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [picked]);
+  }, [picked, autoPlaceTick]);
 
   // Double-clicking the root card walks the tree open one generation at a time,
   // then once everything is exposed folds it back deepest-first. Rings only: any
