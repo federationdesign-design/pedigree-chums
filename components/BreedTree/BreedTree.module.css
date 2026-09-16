@@ -1362,6 +1362,45 @@
   0% { opacity: 1; transform: scale(1) rotate(0deg); }
   100% { opacity: 0; transform: scale(0.4) rotate(-14deg); }
 }
+/* THE QUICK COLLECT'S FLIGHT, 16 September 2026 (owner: the rail card should move
+   to the bottom left like the pit's chum does).
+
+   --fly-x and --fly-y are measured in the click handler, because how far the card
+   has to travel depends on where it sits in the rail and how far the rail has been
+   nudged. The spin and the shrink are the pit's own feel: tumble, fall, shrink into
+   the box.
+
+   620ms matches the timeout that records the chum, so the card turns green as it
+   lands rather than as it is pressed. Change one and change the other. */
+@keyframes relCardFly {
+  0%   { transform: translate(0, 0) rotate(0deg) scale(1); opacity: 1; }
+  70%  { opacity: 1; }
+  100% { transform: translate(var(--fly-x, -200px), var(--fly-y, 400px)) rotate(420deg) scale(0.25); opacity: 0; }
+}
+.relCardFly {
+  animation: relCardFly 620ms cubic-bezier(0.45, 0, 0.55, 1) forwards;
+  z-index: 40;
+  pointer-events: none;
+}
+/* The learn area's card-pack box. Same artwork and the same corner as the pit's
+   .cardBox, and the same pop, so a collect reads the same in both places. */
+.chumCardBox {
+  position: fixed;
+  --box-size: clamp(200px, 18vw, 280px);
+  left: calc(var(--box-size) * -0.26);
+  bottom: -14px;
+  width: var(--box-size);
+  height: auto;
+  z-index: 39;
+  pointer-events: none;
+  transform-origin: 50% 100%;
+  animation: chumCardBoxPop 0.7s ease-in-out 0.2s both;
+}
+@keyframes chumCardBoxPop {
+  0%   { transform: translateY(60%) scale(0.9); opacity: 0; }
+  55%  { transform: translateY(-6%) scale(1.03); opacity: 1; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
 .relCardLeaving {
   animation: relPopOut 300ms cubic-bezier(0.45, 0, 0.7, 0.2) forwards;
   pointer-events: none;

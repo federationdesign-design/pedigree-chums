@@ -2975,6 +2975,10 @@ export default function BreedTree({
   // A collected card shows nothing but a tick, so its name has to be reachable.
   // Tap toggles it; hover shows it too, in CSS, behind (hover: hover).
   const [namedChum, setNamedChum] = useState<string | null>(null);
+  /* The card-pack box that pops up in the bottom-left corner as a chum lands there.
+     The pit has its own; this is the learn area's, using the same artwork and the
+     same corner, so a collect looks the same wherever it happens. */
+  const [chumBoxPop, setChumBoxPop] = useState(false);
   const [learnNode, setLearnNode] = useState<Node | null>(null);
   const [learnCard, setLearnCard] = useState<{ name: string; image: string; x: number; y: number; angle: number; r: number; ring: string; ringFrac: number; ringPx: number } | null>(null);
   const removedNodesRef = useRef<Set<Node>>(new Set());
@@ -10582,11 +10586,48 @@ export default function BreedTree({
                            the card the player pressed. This route has no tumble
                            animation, so the card greens immediately; only the
                            layer's own collect waits for its flight to land. */
-                        const b = (e.currentTarget as HTMLElement).getBoundingClientRect();
+                        /* THE WHOLE COLLECT, NOT JUST THE TALLY, 16 September 2026
+                           (owner: start the confetti from the middle of the chum
+                           card, fly the card to the bottom left like the pit's own
+                           chum does, and pop the card box up down there).
+
+                           THE CONFETTI CAME FROM THE TICK. e.currentTarget is the
+                           28px badge, so the burst started from its corner rather
+                           than from the card. It now reads the CARD's rect, which is
+                           the tick's offsetParent, so the middle of the artwork is
+                           the origin.
+
+                           THE FLIGHT IS A CSS ANIMATION ON THE CARD, driven by two
+                           custom properties measured here: how far the card has to
+                           travel to reach the corner the pit drops its chums into.
+                           Measured rather than fixed, because the card's position
+                           depends on where it sits in the rail and how far the rail
+                           has been nudged.
+
+                           THE CHUM IS RECORDED WHEN IT LANDS, not on the press, so
+                           the card turns green at the end of the flight. That is the
+                           same rule the layer's own Collect follows. 620ms matches
+                           the animation below; if one changes, change both. */
+                        const tick = e.currentTarget as HTMLElement;
+                        const card = (tick.offsetParent as HTMLElement) ?? tick;
+                        const b = card.getBoundingClientRect();
                         if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
                           fireConfetti({ particleCount: 60, spread: 110, startVelocity: 38, origin: { x: (b.left + b.width / 2) / window.innerWidth, y: (b.top + b.height / 2) / window.innerHeight } });
                         }
-                        onChumCollected?.(r.name);
+                        const toX = 56 - (b.left + b.width / 2);
+                        const toY = (window.innerHeight - 96) - (b.top + b.height / 2);
+                        card.style.setProperty("--fly-x", `${Math.round(toX)}px`);
+                        card.style.setProperty("--fly-y", `${Math.round(toY)}px`);
+                        card.classList.add(styles.relCardFly);
+                        setChumBoxPop(true);
+                        window.setTimeout(() => setChumBoxPop(false), 1400);
+                        window.setTimeout(() => {
+                          card.classList.remove(styles.relCardFly);
+                          card.style.removeProperty("--fly-x");
+                          card.style.removeProperty("--fly-y");
+                          onChumCollected?.(r.name);
+                        }, 620);
+                        return;
                         /* 500, HALF THE GREEN BUTTON'S 1000, 16 September 2026
                            (owner). The shortcut and the long way used to pay the
                            same; the owner's rebalance prices the shortcut lower,
@@ -10606,6 +10647,15 @@ export default function BreedTree({
           )}
         </div>
       </div>
+      {chumBoxPop && (
+        /* A plain <img>, matching the pit's own .cardBox, which uses the same file
+           the same way. next/image is not wanted here: this is a decorative SVG
+           that appears for a second and is gone, so the loader and the layout box
+           it brings buy nothing. The rule is silenced rather than the file's
+           warning count raised. */
+        // eslint-disable-next-line @next/next/no-img-element
+        <img className={styles.chumCardBox} src="/card-pack-box.svg" alt="" aria-hidden="true" />
+      )}
       {dockAside && ancestryFor && !ancHidden && ancestryRows.length > 0 && (
         <LearnDragCard
           className={styles.ancCard}
