@@ -1821,12 +1821,24 @@ export default function LineageMap({
      path into tween's performance.now and raised this file's error count. One pass
      over the cards costs less and keeps the baseline. */
   const imagesAllHome = (() => {
+    /* CORRECTED 16 September 2026, same day: this counted against c.img while
+       dupTotal is keyed by PACK_IMG.get(name) ?? img, the pack artwork wherever a
+       dog has one. For every pack breed the two keys differ, so the lookup returned
+       nothing, `n >= 0` was never satisfied for the right image and not one card
+       went green. The counting key now matches dupTotal's exactly.
+
+       isDupImg and the stacking logic use c.img directly and are unaffected: they
+       ask whether THIS picture repeats, not how many of a dog exist. */
+    const keyOf = (c: { name: string; img: string }) => PACK_IMG.get(c.name) ?? c.img;
     const home = new Map<string, number>();
     for (const c of pickCards) {
-      if (placedSet.has(c.id) || stackedIds.has(c.id) || packHidden.has(c.id)) home.set(c.img, (home.get(c.img) ?? 0) + 1);
+      if (placedSet.has(c.id) || stackedIds.has(c.id) || packHidden.has(c.id)) {
+        const k = keyOf(c);
+        home.set(k, (home.get(k) ?? 0) + 1);
+      }
     }
     const done = new Set<string>();
-    for (const [img, n] of home) if (n >= (dupTotal.get(img) ?? 0)) done.add(img);
+    for (const [img, n] of home) { const total = dupTotal.get(img) ?? 0; if (total > 0 && n >= total) done.add(img); }
     return done;
   })();
   // order cards within each image group so the underneath ones can fan slightly /* stack-pack */
@@ -3852,7 +3864,7 @@ export default function LineageMap({
 className={[
                     styles.pickCard,
                     isDupImg(c.img) && !isTopOfStack(c) && !PACK_BREEDS.has(c.name) ? styles.pickCardStack : "",
-                    (placedSet.has(c.id) || stackedIds.has(c.id)) ? (imagesAllHome.has(c.img) ? styles.pickCardDone : styles.pickCardWaiting) : "",
+                    (placedSet.has(c.id) || stackedIds.has(c.id)) ? (imagesAllHome.has(PACK_IMG.get(c.name) ?? c.img) ? styles.pickCardDone : styles.pickCardWaiting) : "",
                   ].filter(Boolean).join(" ")}
                     /* Mini pit: a circle that popped out of a dog wears that
                        dog's ring colour, so it is obvious where it came from.
