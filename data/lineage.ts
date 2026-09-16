@@ -22,6 +22,24 @@ export interface LineageNode {
   children?: LineageNode[];
 }
 
+/* ONE PICTURE PER DOG, 16 September 2026 (owner). Five names each carried two
+   different files, so the game built two frames and two cards for one dog, which is
+   the duplicate the owner photographed on the Doberman and again on the Irish
+   Setter. Each is unified on the file the MAJORITY of its nodes already used:
+
+     Water Spaniels  Water-spaniels.jpg            -> original-water-spaniel.jpg   (2 -> 23)
+     Whippet         Whippet-square.jpg            -> whippet-photo.jpg            (1 -> 9)
+     Greyhound       greyhound-square.jpg          -> original-greyhound.jpg      (12 -> 47)
+     Poodle          Poodle-and-Barbet-water-dogs  -> poodle-square.jpg            (1 -> 7)
+     Bulldog         Old-English-Bulldog.jpg       -> bulldog-photo.jpg            (2 -> 8)
+
+   THE BLOODHOUND WAS NOT DONE THIS WAY, deliberately: there the two pictures turned
+   out to be two different dogs and the fix was a rename. These five are one dog
+   each, so the minority file was simply the wrong picture. Two are worth a second
+   look if that assumption is wrong, because the minority art belongs to a dog that
+   exists separately in this data under its own name: Bulldog was wearing the Old
+   English Bulldog's picture, and Poodle the Poodle-and-Barbet one. If either was
+   meant to be the older dog, it needs the Bloodhound treatment rather than this. */
 const LINEAGE: Record<string, LineageNode> = {
   "Deal the cards": {
     name: "Deal the cards",
@@ -215,7 +233,7 @@ const LINEAGE: Record<string, LineageNode> = {
       {
         name: "Water Spaniels",
         note: "A touch of spaniel for a soft mouth and real keenness in water and cover. Now extinct.",
-        img: "/history/breeds/Water-spaniels.jpg",
+        img: "/history/breeds/original-water-spaniel.jpg",
         value: 13
       }
     ]
@@ -259,10 +277,10 @@ const LINEAGE: Record<string, LineageNode> = {
         img: "/history/breeds/manchester-terrior.jpg",
         children: [
           { name: "Old English Black & Tan Terrier", note: "The classic British ratting terrier, foundation of the Manchester Terrier line.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 14 },
-          { name: "Whippet", note: "Slipped into some lines for a touch more refinement and speed.", img: "/Whippet-square.jpg", value: 8 }
+          { name: "Whippet", note: "Slipped into some lines for a touch more refinement and speed.", img: "/history/breeds/whippet-photo.jpg", value: 8 }
         ]
       },
-      { name: "Greyhound", note: "A dash of sighthound for speed and a clean, elegant outline. We stop the trail here for now.", img: "/greyhound-square.jpg", value: 13 } /* WAS "/greyhound square.jpg", with a SPACE, 16 September 2026 (owner: the greyhound still appears twice). Both files exist in public/, so this was one dog under two filenames: the game builds a frame per distinct picture STRING, so two strings made two frames and two cards, and the level filled 21 of 21 with the greyhound showing twice. The hyphenated path is the one every other Greyhound node uses. */
+      { name: "Greyhound", note: "A dash of sighthound for speed and a clean, elegant outline. We stop the trail here for now.", img: "/history/breeds/original-greyhound.jpg", value: 13 } /* WAS "/greyhound square.jpg", with a SPACE, 16 September 2026 (owner: the greyhound still appears twice). Both files exist in public/, so this was one dog under two filenames: the game builds a frame per distinct picture STRING, so two strings made two frames and two cards, and the level filled 21 of 21 with the greyhound showing twice. The hyphenated path is the one every other Greyhound node uses. */
     ]
   },
 
@@ -371,7 +389,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Staffordshire Bull Terrier",
     note: "A classic bull-and-terrier, bred in the Black Country by crossing the old bulldog with game local terriers for grip and gameness.",
     children: [
-      { name: "Bulldog", note: "The old, athletic bull-baiting type, not the modern show dog, for strength and courage.", img: "/history/breeds/Old-English-Bulldog.jpg", value: 55 },
+      { name: "Bulldog", note: "The old, athletic bull-baiting type, not the modern show dog, for strength and courage.", img: "/history/breeds/bulldog-photo.jpg", value: 55 },
       { name: "Old English Black & Tan Terrier", note: "Added speed, agility and terrier fire to the heavier bulldog base.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 45 }
     ]
   },
@@ -488,7 +506,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Whippet",
     note: "The poor man's racehorse. Northern miners bred a pocket-sized sighthound for weekend racing and rabbit coursing.",
     children: [
-      { name: "Greyhound", note: "The core of the breed, scaled down for speed in a smaller, cheaper-to-keep package.", img: "/greyhound-square.jpg", value: 62 },
+      { name: "Greyhound", note: "The core of the breed, scaled down for speed in a smaller, cheaper-to-keep package.", img: "/history/breeds/original-greyhound.jpg", value: 62 },
       { name: "Old English Black & Tan Terrier", note: "Added grit and gameness for the rabbit-coursing the early dogs were bred for.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 23 },
       { name: "Italian Greyhound", note: "A later refinement for the elegant, fine-boned outline.", img: "/italian-greyhound-square.jpg", value: 15 }
     ]
@@ -2445,7 +2463,7 @@ const LINEAGE: Record<string, LineageNode> = {
     children: [
       { name: "Schnauzer farm dogs", note: "The wiry German yard and stable dogs it was bred down from.", img: "/history/breeds/Schnauzer-type-farm-dogs-Stallpinscher-stock.jpg", value: 60 },
       { name: "Affenpinscher", note: "A rough little German monkey faced ratter crossed in to take the size down. Now endangered.", img: "/history/breeds/Affenpinscher-type-small-rough-ratters.jpg", value: 25 },
-      { name: "Poodle", note: "A touch of poodle thought to be added for coat and a clever, obedient temperament.", img: "/history/breeds/Poodle-and-Barbet-water-dogs.jpg", value: 15 }
+      { name: "Poodle", note: "A touch of poodle thought to be added for coat and a clever, obedient temperament.", img: "/poodle-square.jpg", value: 15 }
     ]
   },
   "Pomeranian": {
@@ -2460,7 +2478,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "French Bulldog",
     note: "Born when English lacemakers took their little toy bulldogs to France, where Paris fell for the bat eared result.",
     children: [
-      { name: "Bulldog", note: "The English toy bulldogs the Nottingham lace workers carried across to Normandy.", img: "/history/breeds/Old-English-Bulldog.jpg", value: 65 },
+      { name: "Bulldog", note: "The English toy bulldogs the Nottingham lace workers carried across to Normandy.", img: "/history/breeds/bulldog-photo.jpg", value: 65 },
       { name: "Parisian Ratters", note: "The city ratting dogs of Paris crossed in, thought to fix the upright bat ears. Now extinct.", img: "/history/breeds/Parisian-ratters-and-terriers.jpg", value: 35 }
     ]
   },
