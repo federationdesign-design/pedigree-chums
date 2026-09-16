@@ -1511,8 +1511,11 @@
      it sits back on the 62% line the temperament card's foot was derived from. */
   scale: 0.9;
   transform-origin: right center;
-  top: 62%;
-  right: 0;
+  /* 5px DOWN, 16 September 2026 (owner). */
+  top: calc(62% + 5px);
+  /* 5px LEFT, 16 September 2026 (owner): anchored right, so moving left means
+     moving AWAY from that edge, hence a positive right. */
+  right: 5px;
   left: auto;
   z-index: 21;
   touch-action: pinch-zoom;
@@ -1762,7 +1765,8 @@
   /* 30px DOWN, 16 September 2026 (owner): the earlier -20 lift becomes +10. Both
      cards carry the same figure so the pair stay level with each other. */
   translate: 0 calc(-50% + 10px);
-  left: 5px;
+  /* 3px RIGHT, 16 September 2026 (owner): 5 -> 8. */
+  left: 8px;
   right: auto;
   /* ONE HEIGHT FOR BOTH CARDS, 16 September 2026 (owner: training and temperament
      should always appear the same height). Content decides how tall each wants to
