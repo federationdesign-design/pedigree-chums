@@ -3310,7 +3310,22 @@ export default function LineageMap({
                       </g>
                     );
                   })()}
-                  {(placedSet.has(c.id) || packed) && zoomedId !== c.id && !PACK_BREEDS.has(c.name) && !INSTR_NAMES.has(breed.name) && (() => {
+                  {/* STACKED SPARES CARRY THE SAME CHROME, 16 September 2026 (owner:
+                      a spare should work just like every other image).
+
+                      THE GATE WAS placedSet ONLY. A dog reached by two routes makes
+                      two cards and ONE frame, so the second card is dropped onto the
+                      filled frame and stacks there: it is finished, but it is not in
+                      placedSet, so it showed no info badge and no share while its
+                      twin beside it showed both. Two identical pictures, one looking
+                      broken. On the Doberman that is the Greyhound, reached directly
+                      and again through Manchester Terrier and Whippet.
+
+                      stackedIds is the set of cards absorbed into a stack, so adding
+                      it covers exactly those and nothing else. They are the same dog
+                      as the card in the frame, so the same badge and the same share
+                      are the correct values, not an approximation. */}
+                  {(placedSet.has(c.id) || stackedIds.has(c.id) || packed) && zoomedId !== c.id && !PACK_BREEDS.has(c.name) && !INSTR_NAMES.has(breed.name) && (() => {
                     const mx = c.cardX - CW / 2 + 15, my = c.cardY + CW / 2 - 13; // inside the box, bottom-left (nudged +4 right, 2 up)
                     return (
                       <g
