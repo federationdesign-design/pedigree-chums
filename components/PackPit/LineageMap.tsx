@@ -530,10 +530,33 @@ export default function LineageMap({
      pointerup, so a fast tap still shows the whole movement. */
   const [learnDown, setLearnDown] = useState(false);
   const learnDownT = useRef(0);
-  const pressLearn = () => {
-    setLearnDown(true);
+  /* THE BUTTON STAYS DOWN UNTIL THE WORK IS DONE, 16 September 2026 (owner: the
+     pack-out can take a few seconds with fifty images and users keep clicking
+     because nothing looks like it is happening).
+
+     WHAT IT WAS. A 140ms timer released the pressed look whatever the button had
+     started, so on a long step it popped back up while the images were still
+     flying and read as a dead press. Nothing stopped a second click either, and
+     each one starts another step.
+
+     TWO CHANGES. `busy` holds the pressed look until the step reports back rather
+     than on a timer, and revealStep returns early while it is set, so repeat
+     clicks during a run are ignored rather than queued. The 140ms floor is kept
+     underneath so a short step still reads as a press rather than a flicker.
+
+     releaseLearn is called from the end of the step, and from a 6s guard so a step
+     that never reports cannot leave the button stuck down for the session. */
+  const learnBusy = useRef(false);
+  const releaseLearn = () => {
+    learnBusy.current = false;
     window.clearTimeout(learnDownT.current);
     learnDownT.current = window.setTimeout(() => setLearnDown(false), 140);
+  };
+  const pressLearn = () => {
+    setLearnDown(true);
+    learnBusy.current = true;
+    window.clearTimeout(learnDownT.current);
+    learnDownT.current = window.setTimeout(releaseLearn, 6000);
   };
   useEffect(() => () => window.clearTimeout(learnDownT.current), []);
   const [rootGone, setRootGone] = useState(false);
@@ -815,7 +838,18 @@ export default function LineageMap({
   // exposed. clicking it pops the card from the pit, then tips the circles in too.
   const [showRemove, setShowRemove] = useState(false);
   const [removing, setRemoving] = useState(false);
-  const [packed, setPacked] = useState(false); // the ancestor pack has been ordered into its two columns
+  const [packed, setPacked] = useState(false);
+  /* RELEASES THE BUTTON WHEN THE STEP HAS LANDED. revealStep's work shows up as a
+     change in what is open, what has been picked, or the packed flag, and the
+     animations that follow are short and fixed. 520ms covers the longest of them,
+     the 460ms pack tween, with a little over. Only runs while the button is
+     actually down, so it costs nothing the rest of the time. */
+  useEffect(() => {
+    if (!learnBusy.current) return;
+    const t = window.setTimeout(releaseLearn, 520);
+    return () => window.clearTimeout(t);
+  }, [open, picked, packed]);
+ // the ancestor pack has been ordered into its two columns
   const [packLabels, setPackLabels] = useState<{ chum: { x: number; y: number } | null; alive: { x: number; y: number } | null; extinct: { x: number; y: number } | null }>({ chum: null, alive: null, extinct: null });
   const [packHidden, setPackHidden] = useState<Set<string>>(new Set()); // duplicate ancestors folded out of the pack
   const [collecting, setCollecting] = useState(false); // my chum tapped: every card tumbles into the bottom-left
@@ -1768,6 +1802,9 @@ export default function LineageMap({
   // cards already pulled out stay put. Auto-revealed nodes score +50 each, less
   // than a manual tap (125/250) so hand-exploration stays the rewarding route.
   const revealStep = () => {
+    // Ignored while a step is still running: see pressLearn. Without this a
+    // fifty-image pack-out took a second and a third click on top of itself.
+    if (learnBusy.current) return;
     // For instructional cards: show first child icon on first double-click
     if (INSTR_NAMES.has(breed.name)) {
       const firstUnpicked = shown.filter((n) => n.img && !picked.has(n._id) && n._parent);
@@ -2319,6 +2356,12 @@ export default function LineageMap({
           <g
             className={styles.removeBtn}
             transform={`translate(0,${circular ? 4 * learnBtnScale + 2 : 62}) scale(${circular ? learnBtnScale : 1})`}
+            /* pressLearn sets the busy flag on pointerdown, which fires before
+               this, so revealStep sees it and a second click is refused. The
+               release is NOT scheduled here: the step's own animations run after
+               this returns, so releasing on click would pop the button straight
+               back up. It is released by the effect below, when the state the step
+               changed has settled. */
             onClick={(e) => { e.stopPropagation(); revealStep(); }}
             onPointerDown={(e) => { e.stopPropagation(); pressLearn(); }}
             role="button"
@@ -2472,7 +2515,11 @@ export default function LineageMap({
             size and the missing stroke line were both this. */}
         {/* Bounded (/chums2) has no back button: the page's own CloseX closes the
             tree and rails its reopen icon. */}
-        {!bounded && (
+        {/* NO BACK BUTTON ON THE CHUM TREE LAYER, 16 September 2026 (owner: remove
+            it and let the score show there instead). strongBg && !circular is that
+            layer alone; the pit lift and the main pit keep theirs. The layer is
+            still closed by its own Collect and Learn buttons and by the rail. */}
+        {!bounded && !(strongBg && !circular) && (
         <button
           type="button"
           className={liftRoot ? `${styles.close} ${styles.closeCircular}` : styles.close}
@@ -2540,7 +2587,7 @@ export default function LineageMap({
 
                The measured expression is untouched: where the frame row sits low
                enough, the counter still rides above it as before. */
-            style={{ top: Math.max(8, vp.h / 2 + LIFT_K * (chumTop - vp.h / 2) - 116) }} /* -66 -> -116, a further 50 up, 16 September 2026 (owner). The floor of 8 is what catches it on a short screen, so on those this does nothing and 8 is the number to lower next. */
+            style={{ top: Math.max(18, vp.h / 2 + LIFT_K * (chumTop - vp.h / 2) - 106) }} /* 10px DOWN, 16 September 2026 (owner): the floor 8 -> 18 and the offset -116 -> -106, so it moves whichever of the two is governing. */ /* -66 -> -116, a further 50 up, 16 September 2026 (owner). The floor of 8 is what catches it on a short screen, so on those this does nothing and 8 is the number to lower next. */
             aria-label={`${filled.size} of ${frameTotal} frames filled`}
           >
             {filled.size}/{frameTotal}
