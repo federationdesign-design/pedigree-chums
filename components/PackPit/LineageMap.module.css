@@ -749,6 +749,29 @@
 }
 
 /* frames-filled counter, top-left, same chip as the circle counter */
+/* THE CHUM TREE LAYER'S SCORE, 16 September 2026 (owner), in the corner the back
+   button used to hold. Deliberately the twin of .frameCount below: same navy, same
+   display face, same radius and z-index, mirrored to the right so the two read as
+   a pair across the top of the layer. Keep them in step if either changes. */
+.chumScore {
+  position: fixed;
+  top: 16px;
+  right: clamp(26px, 3.5vw, 50px);
+  z-index: 62;
+  padding: 10px 16px 6px 16px;
+  border-radius: 20px;
+  background: var(--navy);
+  color: #ffffff;
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: 24px;
+  line-height: 1.1;
+  letter-spacing: 0.5px;
+  pointer-events: none;
+  box-shadow: 0 3px 0 rgba(10, 58, 87, 0.3);
+}
+@media (max-width: 640px) {
+  .chumScore { top: 14px; font-size: 18px; padding: 8px 13px 4px 13px; }
+}
 .frameCount {
   position: fixed;
   /* DOWN FROM 26, 2 September 2026 (owner): it sat under the level's own profile

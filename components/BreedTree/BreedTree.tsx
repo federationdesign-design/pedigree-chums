@@ -1669,6 +1669,7 @@ export default function BreedTree({
   hideCaption = false,
   onCaptionClose,
   onScore,
+  currentScore = 0,
   registerShake,
   registerSlowmo,
   onToggleCaption,
@@ -1762,6 +1763,9 @@ export default function BreedTree({
   hideCaption?: boolean;
   onCaptionClose?: () => void;
   onScore?: (v: number) => void;
+  /* The live score, so the chum tree layer can show it. One-way in: BreedTree
+     never sets it, it only passes it through. */
+  currentScore?: number;
   registerShake?: (fn: () => void) => void;
   registerSlowmo?: (fn: () => void) => void;
   onToggleCaption?: () => void;
@@ -9997,7 +10001,7 @@ export default function BreedTree({
         <LineageMap
           breed={chumTree}
           strongBg
-          currentScore={0}
+          currentScore={currentScore}
           onScore={onScore}
           onRemove={(n) => onChumCollected?.(n)}
           onClose={() => setChumTree(null)}

@@ -2538,6 +2538,23 @@ export default function LineageMap({
             size and the missing stroke line were both this. */}
         {/* Bounded (/chums2) has no back button: the page's own CloseX closes the
             tree and rails its reopen icon. */}
+        {/* THE SCORE, IN THE CORNER THE BACK BUTTON LEFT, 16 September 2026 (owner).
+
+            currentScore was a prop NOTHING rendered: it had been threaded into this
+            component and never used, so there was no score element here to reveal.
+            This is it, built to match .frameCount on the other side of the screen,
+            the same navy pill and the same type, mirrored to the right.
+
+            LOCALE-FORMATTED, because the learn-area rebalance the same day pushed
+            a thorough player past 200,000 on a deep dog and an unseparated six
+            figures is unreadable.
+
+            This layer only, the same gate as the button it replaces. */}
+        {strongBg && !circular && !bounded && (
+          <div className={styles.chumScore} aria-label={`Score ${currentScore}`}>
+            {currentScore.toLocaleString()}
+          </div>
+        )}
         {/* NO BACK BUTTON ON THE CHUM TREE LAYER, 16 September 2026 (owner: remove
             it and let the score show there instead). strongBg && !circular is that
             layer alone; the pit lift and the main pit keep theirs. The layer is

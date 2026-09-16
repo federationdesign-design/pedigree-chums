@@ -697,6 +697,11 @@ export default function LineageModal({ name, image, character, lineage, fromRect
           hideCaption={!captionOpen}
           onCaptionClose={() => setCaptionOpen(false)}
           onScore={addScore}
+          /* The live total, 16 September 2026 (owner: the score should show on the
+             family tree layer, where the back button used to be). BreedTree only
+             ever had onScore, a one-way callback, so it could add to the score but
+             never read it. */
+          currentScore={score}
           portraitAnchor={portraitAnchor}
           registerShake={(fn) => { shakeFnRef.current = fn; }}
           registerSlowmo={(fn) => { slowmoFnRef.current = fn; }}
