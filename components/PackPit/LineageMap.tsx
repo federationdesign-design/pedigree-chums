@@ -251,10 +251,19 @@ function countProgenitors(n: LineageNode): number {
 
    The tree also draws tighter, not just smaller: the layout packs on these radii,
    so the gaps close with the circles. */
-const PIT_NODE_SCALE = 0.479; /* 0.78 -> 0.663 -> 0.564, a third 15% off on
-   16 September 2026 (owner). Still the single dial for the nodes, the connectors
-   and the pills: it feeds nodeR only, and the cards, root card and frames use
-   their own constants. See the fuller note from the first cut. */
+/* 0.78 -> 0.663 -> 0.564 -> 0.479 -> 0.407, four cuts of 15% on 16 September 2026
+   (owner), leaving the nodes at 52% of the size they were that morning.
+
+   STILL THE SINGLE DIAL for the nodes, the connectors and the pills: it feeds
+   nodeR and nothing else, and the cards, the root card and the frames all use
+   their own constants, so none of them follow it. The tree also draws tighter
+   rather than only smaller, because the layout packs on these radii.
+
+   WORTH KNOWING BEFORE A FIFTH CUT: radius() floors at 21 before this scale is
+   applied, so a small circle is already at 21 * 0.407 = 8.5px and the ring on it
+   is a flat 4.8. Below about 0.3 the ring is thicker than the circle is wide and
+   the nodes stop reading as circles at all. */
+const PIT_NODE_SCALE = 0.407;
 export function radius(share: number) {
   return Math.max(21, 5 * Math.sqrt(share));
 }
