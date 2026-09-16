@@ -762,7 +762,23 @@ export default function LineageMap({
   // which collected card is showing its info label right now (toggled by tapping its i)
   // Every node radius in this component goes through here, so the mini pit's
   // smaller nodes cannot get out of step between layout and drawing.
-  const nodeR = (share: number) => radius(share) * (circular ? PIT_NODE_SCALE : 1);
+  /* THE SCALE NOW REACHES THE CHUM TREE LAYER TOO, 16 September 2026 (owner: the
+     nodes are not getting smaller however far the dial is turned).
+
+     THIS WAS THE WHOLE PROBLEM. The scale was applied only when `circular` is
+     true, which is the PIT LIFT. The chum tree layer is strongBg && !circular, so
+     it used a scale of 1 and ignored the constant entirely. Four cuts of 15% that
+     day all landed on the lift and none of them touched the layer being looked at.
+
+     liftOrChum covers both, so PIT_NODE_SCALE now does on the chum tree what it
+     always did on the lift. The MAIN PIT is still scale 1, which is correct: it
+     draws the circles at full size and was never in scope.
+
+     EXPECT A JUMP. The layer is going straight from 1 to 0.407, so the nodes drop
+     to two fifths at once rather than by the 15% steps that appeared to do
+     nothing. If that overshoots, this constant is finally the right dial to turn. */
+  const liftOrChum = circular || strongBg;
+  const nodeR = (share: number) => radius(share) * (liftOrChum ? PIT_NODE_SCALE : 1);
   // The ring a node draws, HARD-CLAMPED so it is never thicker than the ring of
   // the circle it sits inside (the hierarchy rule). Recursive: each node caps to
   // its parent's already-clamped ring, so the cap holds all the way up the tree.
