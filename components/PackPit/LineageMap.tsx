@@ -1647,7 +1647,9 @@ export default function LineageMap({
        the routine reads pickCards and placedSet, which are only correct once
        React has rendered the new picked set. The effect below does it. */
     autoPlaceRef.current = true;
-    onScore?.(-2500); // the shortcut costs 2500
+    onScore?.(-500); /* WAS -2500, 16 September 2026 (owner). The whole learn-area
+       scale was rebalanced that day to reward thoroughness: awards now run into
+       the tens of thousands on a deep dog, so a 2500 penalty read as ruinous. */
     const pk = (fxId.current += 1);
     setPenalty(pk);
     window.setTimeout(() => setPenalty((cur) => (cur === pk ? null : cur)), 1000);
@@ -1701,7 +1703,7 @@ export default function LineageMap({
             setFilled((m) => { const x = new Map(m); for (const [fid, cid] of x) if (cid === c.id) x.delete(fid); x.set(target.id, c.id); return x; });
           }
           setDragPos((m) => { if (!m.has(c.id)) return m; const x = new Map(m); x.delete(c.id); return x; });
-          flashNum(target.sx - pan.x, target.sy - pan.y - CW / 2, -50, FLASH_SIZE);
+          flashNum(target.sx - pan.x, target.sy - pan.y - CW / 2, -5, FLASH_SIZE /* 16 Sept 2026 (owner), learn-area rebalance: see the table at the top of the flashNum group. */);
           const pid = puffSeq.current++;
           setPuffs((p) => [...p, { id: pid, sx: target.sx, sy: target.sy }]);
           window.setTimeout(() => setPuffs((p) => p.filter((x) => x.id !== pid)), 480);
@@ -1759,7 +1761,7 @@ export default function LineageMap({
         });
       });
       setSeen((prev) => { const s = new Set(prev); toOpen.forEach((n) => s.add(n._id)); return s; });
-      pops.forEach((p) => flashNum(p.x, p.y, -100, FLASH_SIZE));
+      pops.forEach((p) => flashNum(p.x, p.y, -10, FLASH_SIZE) /* 16 Sept 2026 (owner), learn-area rebalance: see the table at the top of the flashNum group. */);
       // Instructional cards: show pick-card icon for each newly revealed child immediately
       if (INSTR_NAMES.has(breed.name)) {
         const newKids = toOpen.flatMap((n) => (n.children as Node[]) || []).filter((k) => k.img && !picked.has(k._id));
@@ -1790,7 +1792,7 @@ export default function LineageMap({
       setSeen((prev) => { const s = new Set(prev); toPop.forEach((n) => s.add(n._id)); return s; });
       toPop.forEach((n, i) => {
         window.setTimeout(() => setPicked((prev) => { const s = new Set(prev); s.add(n._id); return s; }), i * 45);
-        if (!scoredRef.current.has(n._id)) { scoredRef.current.add(n._id); flashNum(n._x, n._y - 8, -100, FLASH_SIZE); }
+        if (!scoredRef.current.has(n._id)) { scoredRef.current.add(n._id); flashNum(n._x, n._y - 8, -10, FLASH_SIZE /* 16 Sept 2026 (owner), learn-area rebalance: see the table at the top of the flashNum group. */); }
         if (INSTR_NAMES.has(breed.name) && n.img && n._parent) {
           const sh = Math.round((n._leaves / (n._parent as Node)._leaves) * 100);
           const rr = nodeR(sh), dd = rr + 10 + CW / 2;
@@ -1887,7 +1889,7 @@ export default function LineageMap({
       });
     }, () => {
       setDragPos((prev) => { const m = new Map(prev); targets.forEach((g, id) => m.set(id, g)); return m; });
-      uniq.forEach((c, i) => { const g = targets.get(c.id); if (g) window.setTimeout(() => flashNum(g.x, g.y - CW / 2, 100, FLASH_SIZE), i * 55); }); // a +100 pops from each card just after it lands
+      uniq.forEach((c, i) => { const g = targets.get(c.id); if (g) window.setTimeout(() => flashNum(g.x, g.y - CW / 2, 250, FLASH_SIZE), i * 55 /* 16 Sept 2026 (owner), learn-area rebalance: see the table at the top of the flashNum group. */); }); // a +100 pops from each card just after it lands
     });
   };
 
@@ -2669,7 +2671,11 @@ export default function LineageMap({
                       const firstHit = !scoredRef.current.has(n._id);
                       if (firstHit) scoredRef.current.add(n._id);
                       setSeen((s) => { if (s.has(n._id)) return s; const x = new Set(s); x.add(n._id); return x; }); // first tap turns it blue
-                      const baseVal = hasKids ? 125 : 250;
+                      const baseVal = 500; /* WAS hasKids ? 125 : 250, 16 September 2026 (owner).
+                        A circle with children and one without now pay the same: the owner's
+                        rebalance rewards opening ANY circle equally, so a deep branch is not
+                        worth less per tap than a leaf. The top-three multiplier still applies
+                        on top. */
                       const mult = topBonus.get(PACK_IMG.get(n.name) ?? (n.img as string)) ?? 1; // top-3 breeds score more
                       flashNum(n._x, n._y - r, firstHit ? Math.round(baseVal * mult) : 0, FLASH_SIZE); // only the first tap on a node scores; later taps read 0
                       follow(n);
@@ -2983,7 +2989,7 @@ export default function LineageMap({
                         setStacked((m) => { const x = new Map(m); const arr = x.get(target.id) ? [...x.get(target.id)!] : []; if (!arr.includes(c.id)) arr.push(c.id); x.set(target.id, arr); return x; });
                         setDragPos((m) => { if (!m.has(c.id)) return m; const x = new Map(m); x.delete(c.id); return x; });
                       }
-                      flashNum(target.sx - pan.x, target.sy - pan.y - CW / 2, 5, FLASH_SIZE); // +5 for the double-click shortcut (drag is worth more)
+                      flashNum(target.sx - pan.x, target.sy - pan.y - CW / 2, 250, FLASH_SIZE /* 16 Sept 2026 (owner), learn-area rebalance: see the table at the top of the flashNum group. */); // +5 for the double-click shortcut (drag is worth more)
                       const pid = puffSeq.current++;
                       setPuffs((p) => [...p, { id: pid, sx: target.sx, sy: target.sy }]);
                       window.setTimeout(() => setPuffs((p) => p.filter((x) => x.id !== pid)), 480);
@@ -3071,7 +3077,7 @@ export default function LineageMap({
                           // first copy of this breed: it fills the frame (+100)
                           setFilled((m) => { const x = new Map(m); for (const [fid, cid] of x) if (cid === c.id) x.delete(fid); x.set(hit.id, c.id); return x; });
                           setDragPos((m) => { if (!m.has(c.id)) return m; const x = new Map(m); x.delete(c.id); return x; }); // the frame position takes over
-                          flashNum(hit.sx - pan.x, hit.sy - pan.y - CW / 2, 100, FLASH_SIZE); // +100 emanates from the frame
+                          flashNum(hit.sx - pan.x, hit.sy - pan.y - CW / 2, 250, FLASH_SIZE /* 16 Sept 2026 (owner), learn-area rebalance: see the table at the top of the flashNum group. */); // +100 emanates from the frame
                           const pid = puffSeq.current++; // smoke poof where it lands
                           setPuffs((p) => [...p, { id: pid, sx: hit.sx, sy: hit.sy }]);
                           window.setTimeout(() => setPuffs((p) => p.filter((x) => x.id !== pid)), 480);
@@ -3087,7 +3093,7 @@ export default function LineageMap({
                           setShakeFrame(hit.id);
                           window.setTimeout(() => setShakeFrame((s) => (s === hit.id ? null : s)), 460);
                           // wrong dog: flash label on frame, subtract 5 points, flash correct frame
-                          flashNum(hit.sx - pan.x, hit.sy - pan.y - CW / 2, -5, FLASH_SIZE);
+                          flashNum(hit.sx - pan.x, hit.sy - pan.y - CW / 2, -1, FLASH_SIZE /* 16 Sept 2026 (owner), learn-area rebalance: see the table at the top of the flashNum group. */);
                           setWrongDog({ frameId: hit.id, x: hit.sx - pan.x, y: hit.sy - pan.y });
                           window.setTimeout(() => setWrongDog((w) => w?.frameId === hit.id ? null : w), 800);
                           const correctFrame = frames.find((f) => f.img === c.img && !filled.has(f.id));
@@ -3248,7 +3254,7 @@ export default function LineageMap({
                           if (infoHover === c.id) { setInfoHover(null); } else { closeAll(); setInfoHover(c.id); } // tap to toggle, works on touch and mouse
                           if (opening && !infoSeen.current.has(c.id)) {
                             infoSeen.current.add(c.id);
-                            flashNum(ix, iy, 2, FLASH_SIZE); // +2 the first time this card's info is exposed, white and small like the rest
+                            flashNum(ix, iy, 250, FLASH_SIZE /* 16 Sept 2026 (owner), learn-area rebalance: see the table at the top of the flashNum group. */); // +2 the first time this card's info is exposed, white and small like the rest
                           }
                         }}
                       >

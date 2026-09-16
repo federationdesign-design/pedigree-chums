@@ -10509,7 +10509,12 @@ export default function BreedTree({
                       onClick={(e) => {
                         e.stopPropagation();
                         onChumCollected?.(r.name);
-                        onScore?.(1000);
+                        /* 500, HALF THE GREEN BUTTON'S 1000, 16 September 2026
+                           (owner). The shortcut and the long way used to pay the
+                           same; the owner's rebalance prices the shortcut lower,
+                           as the auto-place shortcut is priced against placing by
+                           hand. */
+                        onScore?.(500);
                       }}
                     >
                       <svg viewBox="0 0 24 24" aria-hidden="true">
