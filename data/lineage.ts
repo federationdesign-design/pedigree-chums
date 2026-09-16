@@ -232,9 +232,19 @@ const LINEAGE: Record<string, LineageNode> = {
         ]
       },
       {
+        /* ITS OWN PORTRAIT, 16 September 2026 (owner). It carried
+           Old-English-Black-and-Tan-Terrier.jpg, the SAME file as its own child
+           directly below, so two different dogs wore one picture. The game builds
+           a frame per distinct picture, so the pair shared one frame and produced
+           two cards: one landed and showed its badge and share, the other had no
+           frame of its own and showed neither. That is what the owner photographed
+           on the Doberman.
+
+           manchester-terrior.jpg is the archive's own file, the misspelling
+           included; it is the name on disk. */
         name: "Manchester Terrier",
         note: "Gave the sleek coat, the tan points and the terrier fire. Developed from the Old English Black and Tan Terrier.",
-        img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg",
+        img: "/history/breeds/manchester-terrior.jpg",
         children: [
           { name: "Old English Black and Tan Terrier", note: "The classic British ratting terrier, foundation of the Manchester Terrier line.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 14 },
           { name: "Whippet", note: "Slipped into some lines for a touch more refinement and speed.", img: "/Whippet-square.jpg", value: 8 }
