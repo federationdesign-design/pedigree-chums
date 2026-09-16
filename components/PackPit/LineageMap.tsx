@@ -692,6 +692,16 @@ export default function LineageMap({
      That was the owner's condition, and it matters because CW drives the frames,
      the picture cards, the drop targets and the corner adornments alike. */
   const F_EDGE = 14;   // the grid's margin at each side
+  /* HOW MANY FRAMES THIS DOG WILL PRODUCE, counted here rather than from `frames`
+     because that is built much further down and CW has to know before it can cap
+     itself by height. One frame per DISTINCT picture, the same rule the grid uses,
+     so the two cannot disagree. */
+  const frameCountEst = useMemo(() => {
+    const imgs = new Set<string>();
+    const w = (n: Node) => (n.children as Node[] | undefined)?.forEach((k) => { if (k.img) imgs.add(k.img as string); w(k); });
+    if (root) w(root as Node);
+    return imgs.size;
+  }, [root]);
   const F_GUT_MIN = 6;
   const F_GUT_WANT = 10;
   const CW = isMobile
@@ -715,7 +725,38 @@ export default function LineageMap({
           const fits = (n: number) => n * base + (n - 1) * F_GUT_MIN <= avail;
           const cols = fits(6) ? 6 : fits(5) ? 5 : 4;
           const gut = Math.max(F_GUT_MIN, Math.min(F_GUT_WANT, Math.floor((avail - cols * base) / Math.max(1, cols - 1))));
-          return Math.max(base, Math.floor((avail - (cols - 1) * gut) / cols));
+          const byWidth = Math.max(base, Math.floor((avail - (cols - 1) * gut) / cols));
+          /* CAPPED BY HEIGHT TOO, 16 September 2026 (owner: on the deepest dogs the
+             bottom rows run off the page).
+
+             THE CARD WAS DERIVED FROM WIDTH ALONE, so nothing in it knew how many
+             rows it would produce or how tall the screen was. On a 768 tablet that
+             gave a 145px card and nine rows for the Jackapoo's 52 frames: 1,116px
+             of grid against about 764px of room. The wider the device, the worse
+             it got, which is why it was never seen on a phone.
+
+             THE BUDGET. The grid starts around 91px down, below the counters, and
+             has to finish clear of the chum card, the Learn and Collect buttons and
+             the progress bar along the foot. F_VERT_RESERVE is that furniture,
+             measured off the layout rather than guessed: the card is about 150 tall
+             with its name, the two buttons about 130 between them, and the bar 36.
+
+             Divided by k because everything here is in the layer's own units while
+             the screen is not, the same correction the width uses.
+
+             NEVER BELOW `base`. A phone already fits, so the cap must not bite
+             there; it only ever pulls a tablet's oversized card back down. */
+          const rows = Math.max(1, Math.ceil(Math.max(1, frameCountEst) / cols));
+          /* THE ONE FIGURE IN HERE THAT IS AN ESTIMATE. The furniture below the grid
+             is drawn from several places and cannot be measured at this point in
+             the render, so 280 is the chum card, the two buttons and the progress
+             bar added up from their own constants. If the grid still runs long or
+             stops short on a device, THIS is the number to change; everything
+             around it is derived. */
+          const F_VERT_RESERVE = 280;
+          const availH = Math.max(0, vp.h - 91 - F_VERT_RESERVE) / k;
+          const byHeight = Math.floor(availH / rows) - gut;
+          return Math.max(base, Math.min(byWidth, byHeight));
         })()
       : Math.round(CARD * 0.85)
     : CARD;
