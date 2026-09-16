@@ -698,7 +698,20 @@ export default function LineageMap({
     ? circular || strongBg
       ? (() => {
           const base = Math.round(CARD * 0.85 * 0.95);
-          const avail = vp.w - 2 * F_EDGE; // the grid's own margin, one definition
+          /* DIVIDED BY THE LAYER'S SCALE, 16 September 2026 (owner: the grid still
+             leaves about 15% of the width unused).
+
+             THE UNITS WERE THE FAULT. The grid is laid out in UNSCALED coordinates
+             and the whole layer is then drawn at LIFT_K, 0.8 on the lift and the
+             chum tree. Sizing the columns in screen pixels therefore produced a
+             grid that rendered at 80% of the width it was calculated for, which is
+             exactly the strip left over on the right.
+
+             LIFT_K is declared much further down, after the layout it feeds, so its
+             condition is repeated here rather than the constant moved. The two must
+             stay in step: (circular || strongBg) && !bounded. */
+          const k = (circular || strongBg) && !bounded ? 0.8 : 1;
+          const avail = (vp.w - 2 * F_EDGE) / k; // in the units the grid is laid out in
           const fits = (n: number) => n * base + (n - 1) * F_GUT_MIN <= avail;
           const cols = fits(6) ? 6 : fits(5) ? 5 : 4;
           const gut = Math.max(F_GUT_MIN, Math.min(F_GUT_WANT, Math.floor((avail - cols * base) / Math.max(1, cols - 1))));
@@ -712,7 +725,9 @@ export default function LineageMap({
   const fitCols = (() => {
     if (!isMobile || !(circular || strongBg)) return 0;
     const base = Math.round(CARD * 0.85 * 0.95);
-    const avail = vp.w - 2 * F_EDGE;
+    // same scale correction as CW above; the two derivations must agree exactly
+    const k = (circular || strongBg) && !bounded ? 0.8 : 1;
+    const avail = (vp.w - 2 * F_EDGE) / k;
     const fits = (n: number) => n * base + (n - 1) * F_GUT_MIN <= avail;
     return fits(6) ? 6 : fits(5) ? 5 : 4;
   })();
@@ -1532,11 +1547,18 @@ export default function LineageMap({
   /* The level's own profile portrait sits at --pit-axis less half of --tp:
      51.8 - 20.16 = 31.6 on a phone. The frame column's LEFT EDGE lines up with
      it, so F_LEFT, which is the first column's CENTRE, is that plus half a card. */
-  const PORTRAIT_LEFT = 31.6;
+  // PORTRAIT_LEFT is gone, 16 September 2026: the grid anchored to the level
+  // portrait's left edge, and now anchors to the screen margin the column widths
+  // are calculated from. Nothing else read it.
   /* 20px LEFT on the lifted layers, 16 September 2026 (owner). The nudge is inside
      unscaleX's result rather than applied to it, so it is a true 20 screen pixels
      whatever the layer's scale. */
-  const F_LEFT = fiveUp ? unscaleX(PORTRAIT_LEFT - 20) + CW / 2 : isMobile ? 52 : 96;
+  /* FROM THE SCREEN'S OWN MARGIN, 16 September 2026 (owner). It started at the
+     level portrait's left edge, which is where the old narrower grid was anchored;
+     with the columns now sized to fill the width, the grid has to begin at the same
+     F_EDGE its width was calculated from or it runs off the right. unscaleX puts
+     that screen position back into the layout's own coordinates. */
+  const F_LEFT = fiveUp ? unscaleX(F_EDGE) + CW / 2 : isMobile ? 52 : 96;
   // On a circle the rim at 45 degrees sits this far in from the bounding box, so
   // corner adornments tuck against the edge instead of floating outside it.
   const RIM_IN = (CW / 2) * (1 - Math.SQRT1_2);
@@ -1550,7 +1572,7 @@ export default function LineageMap({
      is simply the card plus the gutter it was derived with; the old min/max pair
      fought that and produced the collapsed gutter. */
   const F_COL = fiveUp
-    ? CW + Math.max(F_GUT_MIN, Math.min(F_GUT_WANT, Math.floor((vp.w - 2 * F_EDGE - MCOLS * CW) / Math.max(1, MCOLS - 1))))
+    ? CW + Math.max(F_GUT_MIN, Math.min(F_GUT_WANT, Math.floor(((vp.w - 2 * F_EDGE) / LIFT_K - MCOLS * CW) / Math.max(1, MCOLS - 1))))
     : circular ? CW + 3 : isMobile ? 92 : 112;
   const F_ROW = fiveUp ? F_COL : circular ? CW + 3 : isMobile ? 92 : 112;
   const fCols = Math.max(2, Math.min(7, Math.floor((vp.w - 120) / F_COL)));
