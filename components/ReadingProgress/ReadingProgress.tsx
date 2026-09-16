@@ -20,6 +20,7 @@ export default function ReadingProgress({
   progress,
   active,
   runOffEnds = false,
+  backdrop = false,
 }: {
   articleSelector?: string;
   /* Controlled mode: when a number is given, the bar is driven by this
@@ -37,6 +38,11 @@ export default function ReadingProgress({
      unless asked for so /good-dog-bad-dog/argos and the press carousel are
      untouched. */
   runOffEnds?: boolean;
+  /* A GRADIENT BEHIND THE BAR AND THE DOG, 16 September 2026 (owner, for the chum
+     tree layer): with every node and card exposed, the bar sits over a busy screen
+     and the dog is lost in it. Opt-in and off by default, so the article and the
+     press carousel are unchanged. */
+  backdrop?: boolean;
 }) {
   const controlled = typeof progress === "number";
   const [pct, setPct] = useState(0);
@@ -129,7 +135,7 @@ export default function ReadingProgress({
   return (
     <div
       ref={wrapRef}
-      className={`${styles.wrap}${controlled ? ` ${styles.controlled}` : ""}`}
+      className={`${styles.wrap}${controlled ? ` ${styles.controlled}` : ""}${backdrop ? ` ${styles.wrapBackdrop}` : ""}`}
       id="rp-wrap"
       aria-hidden="true"
     >

@@ -18,6 +18,32 @@
   pointer-events: none;
 }
 
+/* THE OPT-IN BACKDROP, 16 September 2026 (owner: a gradient of the blue behind the
+   bar and the dog so both stay readable once every node and card is exposed).
+
+   TALLER THAN THE WRAP ON PURPOSE. The wrap is 36px and the dog stands 15px above
+   the 12px track, so a gradient confined to the wrap would stop at his feet. This
+   reaches 30px above it and fades to nothing, which puts the soft edge above his
+   head rather than across it.
+
+   THE BLUE IS THE PIT'S OWN, --blue-deep, so the bar reads as part of the game
+   rather than a panel laid over it. It is a fade rather than a band for the same
+   reason: a hard edge across a busy screen looks like a second piece of chrome.
+
+   pointer-events stay none, inherited from .wrap: this is decoration and must
+   never take a tap meant for a card. */
+.wrapBackdrop::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: -30px;
+  background: linear-gradient(to top, rgba(12, 91, 146, 0.95) 0%, rgba(12, 91, 146, 0.8) 45%, rgba(12, 91, 146, 0) 100%);
+  pointer-events: none;
+  z-index: 0;
+}
+
 /* Article pages: mobile only (flip nothing here to keep desktop articles clean). */
 @media (max-width: 768px) {
   .wrap {
