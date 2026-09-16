@@ -399,7 +399,19 @@
      ACCEPTED: 60 is less than PLAY's own 67.5px height, so the box's bottom edge now
      laps about 8px over the top of the PLAY button. Put the 80 back to separate
      them again. */
-  bottom: calc(3% + 60px);
+  /* TOP LEFT, 16 September 2026 (owner). Was bottom: calc(3% + 60px), which
+     anchored it above the PLAY button.
+
+     LEFT IS UNCHANGED AT 68px ON PURPOSE. That figure clears the difficulty
+     slider, which runs down the left edge, so pulling it to 0 would put the box
+     on top of the slider's track and handle. 12px matches .titleWrap's own top
+     anchor, so the box starts on the same line the header does.
+
+     KNOWN: the box now covers the portrait and the dog name, which sit at top
+     12px and are z-index 0 since the same day. Push this down to about 100px to
+     clear a two-row title instead. */
+  top: 12px;
+  bottom: auto;
   /* GUARD, added 31 Aug 2026 alongside the 1.32. The width above grows faster than
      the screen does, so on a wide phone it overruns the right edge: at 430px the sum
      is 380px against 362px of room from left: 68px, and at 640px it is 59px over.
@@ -1130,8 +1142,9 @@
      the top and right, stacked 14px apart, and the learn area shows two. So
      18 + 84 + 14 + 84 is where the second ends, and 14 more is the same gap
      again. Change the square size there and this changes with it. */
-  right: 18px;
-  top: 300px; /* 214 -> 234 -> 300 (14 Aug 2026): dropped a further 66px (more than the last 20px nudge) to clear the more-info icon fully and free the top-right corner for the relocated learn dock. One number, tune to taste. */
+  /* 10px RIGHT and 20px UP, 16 September 2026 (owner): 18 -> 8, 300 -> 280. */
+  right: 8px;
+  top: 280px; /* 214 -> 234 -> 300 (14 Aug 2026): dropped a further 66px (more than the last 20px nudge) to clear the more-info icon fully and free the top-right corner for the relocated learn dock. One number, tune to taste. */
   left: auto;
   bottom: auto;
 }
@@ -1149,7 +1162,10 @@
    Desktop keeps the 300px above untouched, where the square is the full 84px. */
 @media (max-width: 768px) {
   .relRailHome {
-    top: 91.5px;
+    /* 20px UP, 16 September 2026 (owner): 91.5 -> 71.5. The 103.5 figure the
+       block above derives is no longer what this lands on; the owner's nudge
+       overrides it deliberately. */
+    top: 71.5px;
   }
 }
 
@@ -1459,8 +1475,11 @@
 .learnCards .ancCard { margin-top: 0; }
 .trainCard {
   position: fixed;
+  /* LEFT EDGE, 16 September 2026 (owner), bottom unchanged. It shared its exact
+     rectangle with .tempCard until the same day; that one moved to the middle. */
   bottom: 6%;
-  right: 4%;
+  left: 4%;
+  right: auto;
   width: min(92vw, 218px);
   z-index: 21;
   touch-action: pinch-zoom;
@@ -1516,8 +1535,20 @@
    (green for pros, red for cons), never a filled block. */
 .tempCard {
   position: fixed;
-  bottom: 6%;
-  right: 4%;
+  /* MIDDLE AND LEFT, 16 September 2026 (owner). Was bottom 6% / right 4%, the
+     identical rectangle .trainCard occupies, so whichever opened second landed
+     exactly on the first. They are now on opposite sides and different heights.
+
+     CENTRED WITH `translate`, NOT `transform`. This card carries `animation:
+     relPop`, which animates transform outright, and it is draggable, which also
+     writes transform. The standalone translate property composes with both
+     instead of being overwritten, so the card stays centred through the pop and
+     keeps its offset while dragged. */
+  top: 50%;
+  translate: 0 -50%;
+  bottom: auto;
+  left: 4%;
+  right: auto;
   width: min(92vw, 218px);
   z-index: 21;
   touch-action: pinch-zoom;
