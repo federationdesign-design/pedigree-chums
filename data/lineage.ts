@@ -197,7 +197,19 @@ const LINEAGE: Record<string, LineageNode> = {
       {
         name: "British Setters",
         note: "Added biddability and a love of working close with people on the shoot. Now in-decline.",
-        img: "/history/breeds/british-setters.jpg",
+        /* ITS OWN PICTURE, 16 September 2026 (owner supplied it). This was the LAST
+           of four dogs sharing british-setters.jpg: British Setters, Setter, English
+           Setter and Old black-and-tan Setters. The game builds one frame per
+           distinct picture, so all four shared a single frame and three could never
+           have one of their own.
+
+           BRITISH SETTERS TAKES THE NEW ART, not Setter, because Setter is on 18
+           nodes across 15 trees against this one's 2 across 2. Repointing the
+           smaller of the pair is the smaller change and leaves the existing artwork
+           where most players meet it.
+
+           No file is now shared by more than one name anywhere in the data. */
+        img: "/history/breeds/setters.jpg",
         value: 15
       },
       {
