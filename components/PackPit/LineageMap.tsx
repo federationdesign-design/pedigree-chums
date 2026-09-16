@@ -4173,10 +4173,29 @@ className={[
                 : "0 2px 8px rgba(0,0,0,0.25)",
               // box-shadow only: the card is positioned with left/top and a
               // blanket transition would make it slide instead of jump
-              transition: "box-shadow 140ms ease",
+              // box-shadow AND outline: the outline is the ring the player sees on a
+              // placed card in the learn area, so it transitions too.
+              transition: "box-shadow 140ms ease, outline-color 200ms ease",
               userSelect: "none",
               touchAction: "none",
-              outline: circular ? "none" : "3px solid var(--yellow, #ffd23e)",
+              /* THIS IS THE RING, 16 September 2026 (owner: the placed images are
+                 still yellow).
+
+                 THE ONE THAT WAS ON SCREEN ALL ALONG. Three passes changed the wrong
+                 thing: first the frame's stroke, then the box-shadow on this element,
+                 then the SVG rect underneath. All three are drawn, but this HTML card
+                 sits on top of the lot with overflow hidden, and THIS hard-coded
+                 yellow outline is the rim the eye actually sees. The owner's DOM
+                 sample is what found it.
+
+                 It now carries the same three states as the rect below it, from the
+                 same imagesAllHome set, so they cannot disagree: yellow while copies
+                 of this picture are still out, green once every one is home. The pit
+                 lift keeps "none" and its own box-shadow ring, which patch 124 already
+                 turned green. */
+              outline: circular
+                ? "none"
+                : `3px solid ${imagesAllHome.has(PACK_IMG.get(c.name) ?? c.img) ? "#22c55e" : "var(--yellow, #ffd23e)"}`,
               outlineOffset: "-1px",
             }}
             onClick={(e) => { e.stopPropagation(); }}
