@@ -823,8 +823,16 @@
   z-index: 62;
   padding: 10px 16px 6px 16px;
   border-radius: 20px;
-  background: var(--navy);
-  color: #ffffff;
+  /* LIGHT BLUE, NOT NAVY, 16 September 2026 (owner: the two counters were the same
+     colour and could not be told apart). --blue-sky is the palette's own light blue.
+
+     THE TEXT HAD TO CHANGE WITH IT, and this is the reason rather than a preference:
+     white on --blue-sky measures 1.98:1, which is unreadable, while navy on it is
+     6.03:1. That is the same pair that had to be reversed on the done band on
+     10 September and again on the rarity bands. The frame counter keeps navy and
+     white, so the two now differ in both ways round. */
+  background: var(--blue-sky, #5cc4ee);
+  color: var(--navy, #0a3a57);
   font-family: var(--font-display), system-ui, sans-serif;
   font-size: 24px;
   line-height: 1.1;
