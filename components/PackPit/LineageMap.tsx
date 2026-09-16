@@ -2844,10 +2844,20 @@ export default function LineageMap({
                several times over for one dog. Frames is also the number the player
                can see in the counter, so the multiplier is checkable on screen.
 
-               COLLECTING WITH NOTHING PLACED NOW PAYS NOTHING. That follows from
-               the owner's own scale, 0 x 0.1 = 0, and is the point of the change.
-               A floor would need to be added deliberately. */
-            onClick={(e) => { e.stopPropagation(); flashNum(rx, ry + ROOT + 88, Math.round(1000 * 0.1 * filled.size), FLASH_SIZE); startRemove(); }}
+               A BASE OF 1,000 UNDER IT, 16 September 2026 (owner: collecting with
+               nothing placed should pay 1,000). The earlier 1000 x 0.1 x frames paid
+               a hard ZERO for a bare collect, which the owner has now set at 1,000.
+
+               1000 + 100 A FRAME, NOT A FLOOR OF 1,000. A plain floor would pay the
+               same 1,000 whether nothing was placed or all ten frames were filled on
+               any level of ten frames or fewer, which is most of the game: it would
+               have reinstated exactly the problem the multiplier was added to fix.
+               This way the bare collect pays the 1,000 asked for and every frame
+               still adds on top, so placing always beats not placing.
+
+               Celtic Hound 2 frames pays 1,200, the Beagle 12 pays 2,200, the
+               Doberman 20 pays 3,000, the Jackapoo 51 pays 6,100. */
+            onClick={(e) => { e.stopPropagation(); flashNum(rx, ry + ROOT + 88, 1000 + 100 * filled.size, FLASH_SIZE); startRemove(); }}
             role="button"
             aria-label={INSTR_NAMES.has(breed.name) ? "Complete" : "Choose as pack chum"}
           >

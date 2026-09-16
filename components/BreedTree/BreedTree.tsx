@@ -10664,7 +10664,12 @@ export default function BreedTree({
                            same; the owner's rebalance prices the shortcut lower,
                            as the auto-place shortcut is priced against placing by
                            hand. */
-                        onScore?.(500);
+                        /* 500 -> 750, 16 September 2026 (owner). The shortcut is
+                           priced below the long way on purpose, as the auto-place is,
+                           and the green Collect was rebased the same day to
+                           1000 + 100 a frame, so this sits under it on every level of
+                           three frames or more. */
+                        onScore?.(750);
                       }}
                     >
                       <svg viewBox="0 0 24 24" aria-hidden="true">
