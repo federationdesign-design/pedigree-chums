@@ -953,6 +953,27 @@
   transform-origin: center;
   animation: frameExpect 0.42s ease-in-out infinite, frameExpectFlash 0.34s ease-in-out infinite;
 }
+/* A FILLED FRAME FLASHES WHITE TO GREEN, NOT WHITE TO YELLOW, 16 September 2026
+   (owner: correctly placed cards are still showing a yellow ring).
+
+   THIS WAS THE YELLOW. .frameFilled sets a green stroke, and it already sits after
+   .frameLit so it wins there, but a frame that is filled AND still expecting
+   duplicates also carries .frameExpect, and a RUNNING ANIMATION beats a plain
+   declaration whatever the source order. So the white-to-yellow flash painted over
+   the green on exactly the frames the owner was looking at: two cards of the same
+   dog, one placed and one still to stack.
+
+   The flash is the right signal, since that frame does still want another card.
+   Only its colour was wrong: green is what this game says for "this one is done",
+   so a filled frame flashes between white and green and an empty one keeps yellow.
+   The wobble is untouched. */
+@keyframes frameExpectFlashDone {
+  0%, 100% { stroke: #ffffff; }
+  50%      { stroke: #22c55e; }
+}
+.frameExpect.frameFilled {
+  animation: frameExpect 0.42s ease-in-out infinite, frameExpectFlashDone 0.34s ease-in-out infinite;
+}
 .frameDim {
   opacity: 0.3;
   transition: opacity 0.15s ease-out;
