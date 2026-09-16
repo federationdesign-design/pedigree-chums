@@ -632,7 +632,13 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Irish Setter",
     note: "The flashy red gundog of Ireland, bred to range wide and find game birds across open country.",
     children: [
-      { name: "English Setter", note: "The base setter type behind the breed's style and stance.", img: "/history/breeds/british-setters.jpg", value: 35 },
+      /* ITS OWN PICTURE, 16 September 2026 (owner supplied it). Four different dogs
+         shared british-setters.jpg: British Setters, Setter, English Setter and Old
+         black-and-tan Setters. The game builds ONE frame per distinct picture, so
+         four dogs shared one frame between them and three of them could never have
+         a frame of their own. Two now have their own art; British Setters and
+         Setter still share the original, so that pair is still to solve. */
+      { name: "English Setter", note: "The base setter type behind the breed's style and stance.", img: "/history/breeds/English-setters.jpg", value: 35 },
       { name: "Irish Water Spaniel", note: "Native Irish spaniel blood for coat and a love of water.", img: "/history/breeds/irish-water-spaniel.jpg", value: 25 },
       { name: "Gordon Setter", note: "Another setter in the mix, adding substance and steadiness.", img: "/history/breeds/gordon-setter-photo.jpg", value: 20 },
       { name: "Pointer", note: "A touch of pointer for nose and a wide-ranging hunt.", img: "/history/breeds/british-pointers.jpg", value: 20 }
@@ -1224,7 +1230,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Gordon Setter",
     note: "Scotland's black-and-tan setter, built up at the Duke of Gordon's kennels into a heavier, steady bird dog.",
     children: [
-      { name: "Old black-and-tan Setters", note: "The setting dogs at its foundation. Now extinct.", img: "/history/breeds/british-setters.jpg", value: 65 },
+      { name: "Old black-and-tan Setters", note: "The setting dogs at its foundation. Now extinct.", img: "/history/breeds/black-and-tan-setters.jpg", value: 65 },
       { name: "Bloodhound", note: "Thought to have deepened the nose and the black-and-tan.", img: "/history/breeds/modern-bloodhound.jpg", value: 20 },
       // 19 August 2026: the bare "Collie" leaf dead-ended (no tree of its own).
       // Renamed to the "Rough Collie" lineage root so the Setter reaches the
