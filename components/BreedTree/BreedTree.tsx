@@ -10190,16 +10190,27 @@ export default function BreedTree({
               {shownShare}% of {shown.parent.data.name}
             </span>
           )}
-          {/* The chum branch renders nothing here at all now, rather than an
-              empty <p>, so the box does not carry a blank first line. */}
-          {ancestryFor ? null : (
+          {/* THE LEVEL DOG'S WRITE-UP HOLDS WHILE A RAIL CHUM IS PICKED,
+              16 September 2026 (owner: picking a chum before touching the circle
+              diagram leaves the box with no content, and the level dog's original
+              text should stay).
+
+              WHAT THIS REPLACES. The whole paragraph was gated behind
+              `ancestryFor ? null : ...`, so the moment a rail card was selected the
+              box emptied. The reason given was that the chum branch had nothing to
+              say here and an empty <p> left a blank first line, which was true of
+              the empty paragraph but threw the level dog's text out with it.
+
+              It now falls back rather than blanking: if the picked chum has nothing
+              of its own, the box keeps showing what it was showing, which is the
+              level dog's write-up. `shown` is still the circle the box is built
+              from, so nothing else in the box has to change. */}
           <p className={styles.cNote}>
             {(isFocused && breedInfoLong[shown.data.name]) || breedInfo[shown.data.name] || (shown.depth === 0 && rootNote ? rootNote : shown.data.note)}
             {/* the mini pit drops the "keep digging" prompt: in LEARN mode the
                 circles are the whole point, so the nudge is noise */}
             {!dockAside && shown.children ? " Tap a circle inside to keep digging." : ""}
           </p>
-          )}
           {/* The share pill from the main pit, reproduced below the write-up:
               the breed's share of this whole dog, its share in the role it sits
               in, and the same best-guess caveat. Only when a circle is picked. */}
