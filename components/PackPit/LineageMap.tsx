@@ -274,12 +274,21 @@ const PIT_NODE_SCALE = 0.659;
 export function radius(share: number) {
   return Math.max(21, 5 * Math.sqrt(share));
 }
-// The node name pill's drawn width, matching the pit pill exactly (7.4 per char,
-// +14 padding, +10 for a second line, floored at 44). One definition so the
-// placement that spaces siblings on it and the render that draws it cannot drift.
-// Takes the already-split lines so the caller pays for splitName once.
+/* The node name pill's drawn width: 7.4 per character, padding, +10 for a second
+   line, floored at 44. One definition, so the placement that spaces siblings on it
+   and the render that draws it cannot drift. Takes the already-split lines so the
+   caller pays for splitName once.
+
+   PADDING 14 -> 28, 16 September 2026 (owner: the text reaches the edge of the
+   pill). That 14 was 7px a side, which at the 0.594 the pill is drawn at came to
+   about 4 real pixels: enough to look like a mistake on a long name. 28 gives 14 a
+   side, around 8 drawn, and the floor rises with it so a short name keeps its shape.
+
+   THIS IS NOT THE PLACE TO CHANGE THE PILL'S SIZE. The scale on the <g> does that,
+   and it multiplies this; the two are separate on purpose, so padding can be tuned
+   without moving every sibling apart. */
 function nodePillWidth(lines: string[]): number {
-  return Math.max(44, Math.max(...lines.map((l) => l.length)) * 7.4 + 14 + (lines.length > 1 ? 10 : 0));
+  return Math.max(58, Math.max(...lines.map((l) => l.length)) * 7.4 + 28 + (lines.length > 1 ? 10 : 0));
 }
 
 /* ONE RING RULE, FOR THE PIT AND FOR THE LAYER A DOG IS LIFTED ONTO.
@@ -2972,9 +2981,16 @@ export default function LineageMap({
         {/* ON THE LIFT TOO, 16 September 2026 (owner: the play area's lifted circles
             should have the progress bar as well). liftOrChum is the pair, the same
             gate the node scale uses. The main pit is still excluded: it has no
-            frames to fill and its own chrome along the bottom. */}
+            frames to fill and its own chrome along the bottom.
+
+            THE SCRIM IS THE LEARN AREA'S ALONE, 16 September 2026 (owner: the play
+            area's background is not busy, so it can go there and must stay here).
+            strongBg is the chum tree layer, where every node and card is exposed over
+            artwork and the dog would be lost without it; the lift, circular, sits on
+            plain pit blue and needs nothing. Everything else about the bar is shared,
+            so only that one prop is gated. */}
         {liftOrChum && !bounded && (
-          <ReadingProgress progress={learnProgress} active={dogRunning} runOffEnds backdrop />
+          <ReadingProgress progress={learnProgress} active={dogRunning} runOffEnds backdrop={strongBg && !circular} />
         )}
         {strongBg && !circular && !bounded && (
           <div className={styles.chumScore} aria-label={`Score ${currentScore}`}>
@@ -3415,7 +3431,10 @@ export default function LineageMap({
                         /* 0.54 -> 0.594, the pill and its name 10% bigger,
                            16 September 2026 (owner). The whole group is scaled, so the
                            box, its padding and the two-line offset move together. */
-                        <g transform={`translate(${pcx},${pcy}) scale(0.594)`}>
+                        /* 0.594 -> 0.683, the pill and its name 15% bigger,
+                           16 September 2026 (owner). The whole group is scaled, so the
+                           box, its padding and the two-line offset move together. */
+                        <g transform={`translate(${pcx},${pcy}) scale(0.683)`}>
                           <rect className={styles.nmPill} x={-nmW / 2} y={-nmH / 2} width={nmW} height={nmH} rx={nmH / 2} />
                           {nmLines.map((ln, li) => (
                             <text key={li} className={styles.nm} textAnchor="middle" dominantBaseline="central"
