@@ -88,10 +88,16 @@ function TitleRow({ img, name, status, isNarrow, imgRef, done = false }: { img: 
           )}
         </span>
       )}
+      {/* THE WORD REPLACES THE DOG'S NAME WHEN THE LEVEL IS DONE, 16 September 2026
+          (owner's mock-up: a green tick and "complete" in the corner, in place of
+          the level's name). Only the level's own row takes it; the rows below are
+          circles inside the level and keep their names. */}
       <h3 className={css.title}>
-        {(isNarrow ? titleLines(name) : [name]).map((line, i, arr) => (
-          <span key={i}>{line}{i < arr.length - 1 && <br />}</span>
-        ))}
+        {done
+          ? <span>Complete</span>
+          : (isNarrow ? titleLines(name) : [name]).map((line, i, arr) => (
+              <span key={i}>{line}{i < arr.length - 1 && <br />}</span>
+            ))}
       </h3>
     </div>
   );

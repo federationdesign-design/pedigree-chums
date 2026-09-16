@@ -25,6 +25,15 @@
   border-radius: 50%;
   box-sizing: border-box;
   padding: 18%;
+  /* SIZED HERE, 16 September 2026. .titlePortraitWrap carries no dimensions of its
+     own: the <img> inside it is what gives the row its height. Replacing that image
+     with an svg collapsed the wrapper to nothing and the whole title row with it,
+     which is why the completed screen showed no tick and no name at all. --tp is
+     the portrait's own size, set on .titleWrap, so the tick now measures exactly
+     what the dog's picture did. */
+  width: var(--tp);
+  height: var(--tp);
+  flex: none;
 }
 .titleDone svg { width: 100%; height: 100%; display: block; }
 .overlayDone {
