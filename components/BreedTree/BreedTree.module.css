@@ -1621,7 +1621,6 @@
   width: min(92vw, 148px);
   /* matches .tempCard, see the note there */
   min-height: 190px;
-  width: min(92vw, 218px);
   z-index: 21;
   touch-action: pinch-zoom;
   background: #0a2a3f;
