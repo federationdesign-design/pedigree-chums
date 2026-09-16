@@ -297,7 +297,11 @@
      KNOWN: the main pit draws at LIFT_K 1 and shares this class, so its cards lose
      a fifth of their rim too. Nobody has asked about those, and one weight across
      both is the simpler rule. Split the class if the main pit needs its 6 back. */
-  stroke-width: 4.8;
+  /* 4.8 -> 2.4, HALVED, 16 September 2026 (owner: half the current weight).
+     The 15 September value was 6, reduced to 4.8 the next day to account for this
+     layer drawing at LIFT_K 0.8 while vectorEffect="non-scaling-stroke" holds the
+     rim at true screen pixels. Both changes are live; this halves what is there. */
+  stroke-width: 2.4;
   stroke-linejoin: round;
 }
 .pickCardStack {
@@ -647,12 +651,17 @@
      own desktop figure, so it matches that row rather than the shake and slowmo
      pair it was sized against. The radius and padding scale by the same quarter
      so the shape is unchanged: 30.24 -> 22.68 and 12 -> 9. */
-  width: 75.6px;
-  height: 75.6px;
+  /* A FURTHER 20% OFF, 16 September 2026 (owner: the auto icon is still too big,
+     reduce the container and the icon by 20%). 75.6 -> 60.5, with the radius and
+     the padding scaled by the same fifth so the shape holds: 22.68 -> 18.14 and
+     9 -> 7.2. The icon is the element itself, an <img> with this padding, so it
+     comes down with the container rather than needing its own rule. */
+  width: 60.5px;
+  height: 60.5px;
   box-sizing: border-box;
-  padding: 9px;
+  padding: 7.2px;
   background: var(--yellow);
-  border-radius: 22.68px;
+  border-radius: 18.14px;
   object-fit: contain;
   box-shadow: 0 5px 0 rgba(10, 58, 87, 0.3);
   transition: transform 0.15s ease;
