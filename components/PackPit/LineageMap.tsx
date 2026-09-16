@@ -1481,6 +1481,22 @@ export default function LineageMap({
   const packProgress = totalNodes > 0 ? Math.max(0.5, Math.min(1, seen.size / totalNodes)) : 0.5;
   const allBlue = totalNodes > 0 && seen.size >= totalNodes; // every circle ticked
   const framesDone = frameTotal > 0 && filled.size >= frameTotal;
+  /* THE TREE STEPS BACK ONCE EVERY FRAME IS FILLED, 16 September 2026 (owner:
+     after all the images are placed and the Learn button has gone, fade the tree
+     nodes out and leave the central chum square, so the framed images and their
+     icons are what the player is looking at).
+
+     framesDone is the game's own "every frame filled" flag, declared further
+     down and used for the Collect button, so this reads the same condition the
+     Learn button disappears on rather than inventing a second one.
+
+     SAME GATE AS dragFocus: strongBg && !circular is the chum tree layer alone.
+     The pit lift and the main pit share this component and neither was asked for.
+
+     It rides the group that dragFocus already fades, so it inherits the 0.12s
+     DRAG_FADE and the pointerEvents none with it, which matters: an invisible
+     tree that still swallowed taps would block the frames underneath. */
+  const treeDone = strongBg && !circular && framesDone;
   // Mini pit levels: every frame filled means this circle is fully learnt.
   // No collect step: poof the card and its nodes out of existence, remove the
   // circle from the pit, and close, exactly like the instructional finish.
@@ -2585,7 +2601,7 @@ export default function LineageMap({
         <g style={removing ? { pointerEvents: "none" } : undefined}>
         {hasTree ? (
           <>
-            <g style={{ opacity: removing || scattered || dragFocus ? 0 : 1, display: scattered ? "none" : undefined, transition: DRAG_FADE, pointerEvents: dragFocus ? "none" : undefined }}>
+            <g style={{ opacity: removing || scattered || dragFocus || treeDone ? 0 : 1, display: scattered ? "none" : undefined, transition: DRAG_FADE, pointerEvents: dragFocus || treeDone ? "none" : undefined }}>
             {/* A solo dog's card pops out of the big circle, so the circle has
                 to be painted first or it covers the card. Every other dog keeps
                 the original order, with the root drawn last. */}
