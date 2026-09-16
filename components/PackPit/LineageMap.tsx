@@ -5,6 +5,9 @@ import { getLineage, type LineageNode } from "../../data/lineage";
 import { fireConfetti } from "../../lib/confetti";
 import ReadingProgress from "../ReadingProgress/ReadingProgress";
 import { bust } from "../../data/imgVersion";
+/* The influence model, so the badges on the frames print the SAME figure the
+   ancestry card does. See the note on breedMix's `norm` below. */
+import { ancestralInfluence } from "../../data/lineageArchive";
 import { ukBreeds } from "../../data/uk-breeds";
 import { breeds } from "../../data/breeds";
 import { breedInfo } from "../../data/breedInfo";
@@ -1132,6 +1135,14 @@ export default function LineageMap({
   // contributes its cumulative share (leaves / root leaves, which already honours
   // non-binary splits). Sum a breed's appearances, then normalise so every breed
   // totals 100% across the whole dog. /* breedMix */
+  /* The influence percentages for this dog, by name, so breedMix can print the same
+     figures the ancestry card does. Memoised on the breed alone: it is the whole
+     tree's arithmetic and does not change as circles open. */
+  const influenceByName = useMemo(() => {
+    const m = new Map<string, number>();
+    for (const r of ancestralInfluence(breed.name)) m.set(r.name, r.pct);
+    return m;
+  }, [breed.name]);
   const breedMix = useMemo(() => {
     /* EACH APPEARANCE REMEMBERS WHICH SIDE OF THE FAMILY IT CAME DOWN,
        15 September 2026 (owner). The info box used to print one line per
@@ -1144,7 +1155,9 @@ export default function LineageMap({
        group by it: "from Fox Terrier: 9%", "from Old English White Terrier: 6%".
        Measured on the Jack Russell in the owner's screenshot, that turns 32
        lines into 2, and the two still add to the headline figure. */
-    type App = { depth: number; pct: number; branch: string };
+    // `name` added 16 September 2026: the influence lookup is keyed by name while
+    // this map is keyed by image, so each appearance has to carry its own.
+    type App = { depth: number; pct: number; branch: string; name: string };
     const apps = new Map<string, App[]>(); // breed key -> appearances
     const rootLeaves = root ? root._leaves : 0;
     const walk = (n: Node, depth: number, branch: string) => {
@@ -1154,7 +1167,7 @@ export default function LineageMap({
         if (k.img && rootLeaves > 0) {
           const key = PACK_IMG.get(k.name) ?? k.img;
           const pct = (k._leaves / rootLeaves) * 100; // cumulative contribution of this appearance
-          const a = apps.get(key) || []; a.push({ depth, pct, branch: br }); apps.set(key, a);
+          const a = apps.get(key) || []; a.push({ depth, pct, branch: br, name: k.name }); apps.set(key, a);
         }
         walk(k, depth + 1, br);
       });
@@ -1167,11 +1180,31 @@ export default function LineageMap({
     const out = new Map<string, { apps: App[]; sum: number; norm: number }>();
     apps.forEach((list, key) => {
       const sum = sums.get(key) || 0;
-      const norm = total > 0 ? (sum / total) * 100 : 0;
+      /* `norm` IS THE INFLUENCE FIGURE NOW, 16 September 2026 (owner: the ancestry
+         card and the frame badges give contradictory percentages).
+
+         WHAT IT WAS. Each ancestor's raw share divided by the SUM of every
+         ancestor's share. On the Greyhound that sum is 160%, because ancestors nest
+         and their shares overlap, so the badges read 46/38/17 while the ancestry
+         card, which moved onto ancestralInfluence, read 45/40/15. Two models, two
+         answers, on the same screen.
+
+         That normalisation is the exact fault the percentage brief was written
+         about: the denominator is not a total, so a dog's printed figure moves
+         depending on how much of its own ancestry happens to be in the tree.
+
+         The influence figure is keyed by NAME and this map is keyed by IMAGE, so
+         the lookup goes through the appearance list's own name. Anything the model
+         does not carry falls back to the old arithmetic rather than printing zero,
+         which is what a dog with no image or no appearances would otherwise get. */
+      const infl = influenceByName.get(list[0]?.name ?? "");
+      const norm = infl !== undefined ? infl : (total > 0 ? (sum / total) * 100 : 0);
       out.set(key, { apps: [...list].sort((a, b) => a.depth - b.depth), sum, norm });
     });
     return out;
-  }, [root]);
+    // influenceByName is memoised on breed.name alone, so it is stable for as long
+    // as root is; listing it keeps the rule satisfied without adding a recompute.
+  }, [root, influenceByName]);
   // top-3 breeds by share get a click-score multiplier when first tapped /* top3-mult */
   const topBonus = useMemo(() => {
     const ranked = [...breedMix.entries()].sort((a, b) => b[1].norm - a[1].norm);
