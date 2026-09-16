@@ -3328,6 +3328,15 @@ export default function LineageMap({
                   />
                   {(lit && dragName || wrongDog?.frameId === f.id) && ( /* pickup-name: label inside frame, clipped */
                     <>
+                      {/* THE CLIP IS FOR "WRONG DOG" ONLY NOW, 16 September 2026
+                          (owner: the breed name is too small to read, move it below
+                          the frame and make it bigger).
+
+                          It boxed the label inside the frame, which is what forced
+                          the name down to 8px in the first place: a long name had to
+                          fit a 60px square. The name now sits BELOW the frame and is
+                          not clipped, so it can be read. WRONG DOG still belongs
+                          inside the frame, so it keeps the clip. */}
                       <clipPath id={`lbl-clip-${f.id}`}>
                         <rect x={f.sx - pan.x - CW / 2 + 4} y={f.sy - pan.y - CW / 2 + 4} width={CW - 8} height={CW - 8} />
                       </clipPath>
@@ -3338,16 +3347,24 @@ export default function LineageMap({
                            optically centred them was shared. The name is up
                            10px in two passes of 5; WRONG DOG keeps the original
                            baseline throughout. */
-                        y={f.sy - pan.y + (wrongDog?.frameId === f.id ? 5 : -5)}
+                        /* BELOW THE FRAME FOR THE NAME, 16 September 2026 (owner).
+                           CW / 2 clears the frame's own edge and 12 is the gap under
+                           it. WRONG DOG is unchanged, still centred in the frame on
+                           the baseline it has had since 9 September. */
+                        y={f.sy - pan.y + (wrongDog?.frameId === f.id ? 5 : CW / 2 + 12)}
                         textAnchor="middle"
                         dominantBaseline="middle"
-                        clipPath={`url(#lbl-clip-${f.id})`}
+                        {...(wrongDog?.frameId === f.id ? { clipPath: `url(#lbl-clip-${f.id})` } : null)}
                         /* SIZED DOWN TWICE, 9 Sept 2026 (owner), item 7. The
                            breed name went 14 to 12 to 10 to 8, WRONG DOG 18 to 16 to 13 to 10,
                            both on the owner reading them on the device. The line height
                            below follows the name down, or a two word breed would
                            keep its old gap and read as loose. */
-                        style={{ fill: wrongDog?.frameId === f.id ? "#ffffff" : "#ffd23e", font: `700 ${wrongDog?.frameId === f.id ? 10 : 8}px ${wrongDog?.frameId === f.id ? "'Luckiest Guy', " : ""}Montserrat, system-ui, sans-serif`, pointerEvents: "none" }}
+                        /* 8 -> 11, the owner's three points, 16 September 2026. It
+                           was cut to 8 on 9 September only because the label had to
+                           fit inside the frame; out from under the clip it can carry
+                           a readable size. WRONG DOG stays at 10. */
+                        style={{ fill: wrongDog?.frameId === f.id ? "#ffffff" : "#ffd23e", font: `700 ${wrongDog?.frameId === f.id ? 10 : 11}px ${wrongDog?.frameId === f.id ? "'Luckiest Guy', " : ""}Montserrat, system-ui, sans-serif`, pointerEvents: "none", paintOrder: "stroke", stroke: wrongDog?.frameId === f.id ? "none" : "rgba(10,58,87,0.85)", strokeWidth: wrongDog?.frameId === f.id ? 0 : 3, strokeLinejoin: "round" }}
                       >
                         {wrongDog?.frameId === f.id ? (
                           <>
@@ -3357,7 +3374,7 @@ export default function LineageMap({
                         ) : (() => {
                           // split breed name into words, up to 3 lines
                           const words = (dragName || "").split(" ");
-                          const lineH = 8; // follows the font size above
+                          const lineH = 11; // follows the font size above
                           const startY = words.length === 1 ? 0 : words.length === 2 ? -lineH / 2 : -lineH;
                           return words.map((w, i) => (
                             <tspan key={i} x={f.sx - pan.x} dy={i === 0 ? startY : lineH}>{w}</tspan>
