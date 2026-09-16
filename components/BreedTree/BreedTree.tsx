@@ -10364,8 +10364,23 @@ export default function BreedTree({
                    THE POINT IS THE CEILING, not today's numbers. The pack is 54
                    dogs. If new ancestry is authored above more than about 26 of
                    them, the old rule ran the rail off the top and bottom of the
-                   screen with nothing to catch it. Now it grows sideways. */
-                gridTemplateRows: `repeat(${Math.min(10, renderRail.length)}, auto)`,
+                   screen with nothing to catch it. Now it grows sideways.
+
+                   10 -> 14 ON 16 SEPTEMBER 2026 (owner), so every rail is two
+                   columns and none is three.
+
+                   RE-MEASURED THE SAME DAY, because the September figures above
+                   are out of date: the busiest circle is now Old hunting dogs of
+                   the Celts at 27 chums, not the 24 recorded above, and the count
+                   rose because of the ancestry connected that day. 251 circles
+                   checked, 32 past 9, 26 past 10, 17 past 14, none past 28.
+
+                   SO 14 IS TWO COLUMNS FOR EVERYTHING, AND THE MARGIN IS ONE DOG.
+                   14 rows over two columns tops out at 28 against a worst case of
+                   27. Connect ancestry above two more pack dogs on that circle and
+                   it is three columns again. The number to raise is this one; the
+                   height cost is a row of about 46px per step. */
+                gridTemplateRows: `repeat(${Math.min(14, renderRail.length)}, auto)`,
                 visibility: "visible", // shows through even when the box is hidden
                 ...(railPin
                   ? { position: "fixed" as const, top: railPin.top, left: railPin.left, right: "auto" }
