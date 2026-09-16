@@ -2588,35 +2588,22 @@ export default function LineageMap({
         {/* Blue Learn button - on ALL cards including instructional. Off in
             bounded (/chums2): the display tree has no learn/collect game. */}
         {!bounded && !packed && !collecting && !framesDone ? (() => {
-          // Count ALL remaining revealStep clicks:
-          // phase 1: each frontier layer to open
-          // phase 2: expose images (toPop)
-          // phase 3: place images into frames (unplaced)
-          const instrFirstUnpicked = INSTR_NAMES.has(breed.name)
-            ? shown.filter((n) => n.img && !picked.has(n._id) && n._parent)
-            : [];
-          const frontierNodes = shown.filter((n) => n.children && (n.children as Node[]).length && !open.has(n._id));
-          const toPopNodes = shown.filter((n) => n._parent && n.img && !picked.has(n._id));
-          const unplacedCards = pickCards.filter((c) => !placedSet.has(c.id) && !packed && !stackedIds.has(c.id));
-          // Each frontier layer = 1 click; toPop phase = 1 click if needed; unplaced phase = 1 click if needed
-          const instrIconClicks = INSTR_NAMES.has(breed.name) ? instrFirstUnpicked.length : 0;
-          const frontierClicks = frontierNodes.length > 0 ? (INSTR_NAMES.has(breed.name) ? frontierNodes.length : 1) : 0;
-          const toPopClick = toPopNodes.length > 0 ? 1 : 0; // always count if images to expose
-          // Placing follows exposing, always. Counting only the cards that
-          // already exist meant the placement click was invisible until the
-          // images had popped, so two clicks read as "x1" and then "x1" again.
-          // In the mini pit, count the placement step as soon as we know there
-          // is something to expose. Left alone in the main pit, which has not
-          // been asked for and shows longer chains.
-          // 16 September 2026 (owner): the chum tree layer had the same undercount
-          // the mini pit was fixed for. It is strongBg && !circular, so the
-          // `circular` gate above excluded it and its placement click stayed
-          // invisible until the images had popped, reading as "x1" then "x1"
-          // again. The gate is now either layer. The MAIN pit is still left
-          // alone, as before.
-          const countsEarly = circular || strongBg;
-          const unplacedClick = unplacedCards.length > 0 || (countsEarly && toPopNodes.length > 0) ? 1 : 0;
-          const stepsLeft = instrIconClicks + frontierClicks + toPopClick + unplacedClick;
+          /* THE STEP COUNT IS GONE WITH ITS LABEL, 16 September 2026 (owner: the
+             progress bar says the same thing now).
+
+             WHAT IT WAS. Twelve lines working out how many more presses of this
+             button were left: one per frontier layer to open, one for the images
+             still to expose, one for the cards still to place. It existed only to
+             print "x N more" beside the button, and both copies of that label have
+             gone, so nothing read it.
+
+             IT WAS ALSO A DIFFERENT MEASURE from the bar's. It counted BUTTON
+             PRESSES, so a level with fifty cards still to place read "x1 more".
+             The bar counts circles exposed and cards placed, which is the thing the
+             owner actually wanted shown. Keeping both would have meant two numbers
+             disagreeing about the same progress.
+
+             The git history has the arithmetic if it is ever wanted back. */
           return (
           <g
             className={styles.removeBtn}
@@ -2643,26 +2630,23 @@ export default function LineageMap({
                     clean off the screen whenever the lifted dog sat near the
                     right edge. Same size, same style, just brought inside, and
                     inside chumTop so it presses down with the button. */}
-                {circular && stepsLeft > 0 && (
-                  <text
-                    x={88}
-                    y={23}
-                    textAnchor="end"
-                    dominantBaseline="central"
-                    style={{ fontFamily: '"Luckiest Guy", system-ui, sans-serif', fontSize: 14, fill: "#ffffff", pointerEvents: "none" }}
-                  >{`x${stepsLeft} more`}</text>
-                )}
+                {/* THE "x N more" LABEL IS GONE, 16 September 2026 (owner: the
+                    progress bar says the same thing now).
+
+                    BOTH COPIES WENT, this one inside the pill on the lifted layers
+                    and the one beside the button in the main pit below. The figure
+                    it printed was stepsLeft, a count of button presses remaining,
+                    which is a different measure from the bar's: the bar counts
+                    circles exposed and cards placed. Two numbers for the same
+                    progress, and the owner has chosen the bar.
+
+                    stepsLeft itself stays. It is still computed above and nothing
+                    else reads it, but the whole block it lives in is the button's
+                    own arithmetic and removing it would mean unpicking that. It is
+                    the hook to bring the label back. */}
               </g>
             </g>
-            {!circular && stepsLeft > 0 && (
-              <text
-                x={108}
-                y={5}
-                textAnchor="start"
-                dominantBaseline="central"
-                style={{ fontFamily: '"Luckiest Guy", system-ui, sans-serif', fontSize: 14, fill: "#ffffff", pointerEvents: "none" }}
-              >{`x${stepsLeft} more`}</text>
-            )}
+            {/* the main pit's copy of the same label, removed with it */}
           </g>
           );
         })() : null}
@@ -2814,7 +2798,11 @@ export default function LineageMap({
         {/* The Argos bar, driven by this layer rather than by scroll. Rendered as a
             sibling of the overlay like the score and the counter, so the layer's own
             0.8 scale cannot shrink it. */}
-        {strongBg && !circular && !bounded && (
+        {/* ON THE LIFT TOO, 16 September 2026 (owner: the play area's lifted circles
+            should have the progress bar as well). liftOrChum is the pair, the same
+            gate the node scale uses. The main pit is still excluded: it has no
+            frames to fill and its own chrome along the bottom. */}
+        {liftOrChum && !bounded && (
           <ReadingProgress progress={learnProgress} active={dogRunning} runOffEnds backdrop />
         )}
         {strongBg && !circular && !bounded && (
