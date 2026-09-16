@@ -7431,7 +7431,23 @@ export default function BreedTree({
      The cards inside it do animate, which is why the observer watches the rail
      element and not a card. */
   const [railNudge, setRailNudge] = useState({ dx: 0, dy: 0 });
-  useEffect(() => {
+  /* MEASURED BEFORE THE PAINT, NOT AFTER, 16 September 2026 (owner: the rail keeps
+     moving around for a split second before it settles, worst while scrolling).
+
+     WHY IT JUMPED. The rail is a DOM child of the main blue box, so it starts each
+     render wherever that box puts it, and this clamp then measures it and nudges
+     it into place. As a useEffect that ran AFTER the browser had painted, so every
+     re-render showed one frame of the rail sitting in the box's position before the
+     correction landed. Scrolling re-renders constantly, which is why it was worst
+     there.
+
+     useLayoutEffect runs after the DOM is updated and BEFORE the paint, so the
+     measure and the nudge happen in the same frame and the intermediate position is
+     never drawn. Same code, same measurements: only the timing changes.
+
+     The ResizeObserver and the resize listener still fire asynchronously, which is
+     correct. Those are real changes to the rail's size, not the render flash. */
+  useLayoutEffect(() => {
     const el = railRef.current;
     if (!el) return;
     const fit = () => {
