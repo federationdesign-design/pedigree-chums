@@ -668,14 +668,54 @@ export default function LineageMap({
   // a second variable because CW drives the frames, the picture cards, the drop
   // targets and the corner adornments alike: shrinking only the grid would leave
   // the cards the wrong size for the holes they drop into.
+  /* THE GRID FILLS THE WIDTH, AND THE CARD IS DERIVED FROM IT, 16 September 2026
+     (owner: six columns with a 10px gutter, reaching both edges, six only where
+     six fits).
+
+     WHAT WAS WRONG. The cap here still divided by FIVE while the grid had gone to
+     six columns, so the cards were sized for a five-wide layout, came out too
+     small for the space, and the gutter collapsed to absorb the difference. That
+     is the tight gutter and the empty right-hand strip in one fault.
+
+     THE ORDER MATTERS, and it is: columns, then gutter, then card.
+       1. Take the MOST columns that fit at the base card size with a minimum 6px
+          gutter. Six on a tablet, five on most phones, four on a 320.
+       2. Widen the gutter towards 10 with whatever slack is left, never below 6.
+       3. Give the card the rest, so the grid reaches both edges exactly.
+
+     WHY THE GUTTER FLEXES BEFORE THE COLUMN COUNT. A flat 10px gutter costs more
+     than it gains on a small phone: five 61px cards plus four 10px gutters is
+     345px against 332px available on a 360, so a strict 10 would have dropped that
+     screen to four columns. Letting it fall to 6 keeps the fifth.
+
+     THE CARD NEVER SHRINKS, only grows: 61 on a 360, 64 on a 390, 115 on a 768.
+     That was the owner's condition, and it matters because CW drives the frames,
+     the picture cards, the drop targets and the corner adornments alike. */
+  const F_EDGE = 14;   // the grid's margin at each side
+  const F_GUT_MIN = 6;
+  const F_GUT_WANT = 10;
   const CW = isMobile
     ? circular || strongBg
-      // 5% down, then capped so five ALWAYS fit: 14px of margin each side and a
-      // 6px gutter between. A 320 screen cannot hold five 60px frames at all, so
-      // without this cap the last column simply falls off the right.
-      ? Math.min(Math.round(CARD * 0.85 * 0.95), Math.floor((vp.w - 28 - 24) / 5))
+      ? (() => {
+          const base = Math.round(CARD * 0.85 * 0.95);
+          const avail = vp.w - 2 * F_EDGE; // the grid's own margin, one definition
+          const fits = (n: number) => n * base + (n - 1) * F_GUT_MIN <= avail;
+          const cols = fits(6) ? 6 : fits(5) ? 5 : 4;
+          const gut = Math.max(F_GUT_MIN, Math.min(F_GUT_WANT, Math.floor((avail - cols * base) / Math.max(1, cols - 1))));
+          return Math.max(base, Math.floor((avail - (cols - 1) * gut) / cols));
+        })()
       : Math.round(CARD * 0.85)
     : CARD;
+  /* The column count and gutter again, from the same three rules, for the grid to
+     lay out with. Recomputed rather than carried out of the block above so CW
+     stays a single expression; the inputs are identical, so they cannot disagree. */
+  const fitCols = (() => {
+    if (!isMobile || !(circular || strongBg)) return 0;
+    const base = Math.round(CARD * 0.85 * 0.95);
+    const avail = vp.w - 2 * F_EDGE;
+    const fits = (n: number) => n * base + (n - 1) * F_GUT_MIN <= avail;
+    return fits(6) ? 6 : fits(5) ? 5 : 4;
+  })();
   const [gridX, setGridX] = useState(0);
   useEffect(() => setGridX(0), [breed.name]);
   const gridDrag = useRef<{ id: number; sx: number; gx: number; moved: boolean } | null>(null);
@@ -1458,8 +1498,14 @@ export default function LineageMap({
      available width by MCOLS - 1, so the columns narrow to suit on their own and
      nothing else has to be re-measured; F_COL's own floor of CW + 6 stops them
      overlapping if the screen is too narrow to hold six. */
-  const MCOLS = fiveUp ? 6 : 4; // phones: one continuous grid, this many wide before it wraps
-  const F_EDGE = 14;
+  /* THE COLUMN COUNT COMES FROM THE FIT NOW, 16 September 2026 (owner). It was a
+     flat 6, and before that a flat 5, neither of which asked whether six would
+     actually fit. fitCols answers that with the same three rules CW is derived
+     from, so the grid and the cards cannot disagree: six on a tablet, five on most
+     phones, four on a 320. */
+  const MCOLS = fiveUp ? fitCols : 4; // phones: one continuous grid, this many wide before it wraps
+  // F_EDGE moved up beside F_GUT_MIN, 16 September 2026: CW's derivation reads it,
+  // and CW is declared far earlier. One definition, used by both.
   /* PRE-COMPENSATING FOR THE LAYER'S 0.8 SCALE, 2 September 2026 (owner).
 
      THE PROBLEM. The overlay carries transform: scale(0.8), and a scale
@@ -1496,9 +1542,15 @@ export default function LineageMap({
   const RIM_IN = (CW / 2) * (1 - Math.SQRT1_2);
   // the widest pitch that still lands the last column inside the right margin,
   // never tighter than a 6px gutter and never looser than 76
-  const fitCol = MCOLS > 1 ? (vp.w - 2 * F_EDGE - CW) / (MCOLS - 1) : CW;
+  // fitCol is gone, 16 September 2026: it divided the leftover width between the
+  // columns, which is the job CW's own derivation now does. Nothing read it after
+  // F_COL stopped clamping against it.
+  /* CARD PLUS GUTTER, 16 September 2026 (owner), rather than a cap of 76 and a
+     floor of CW + 6. CW is now sized so the columns reach both edges, so the pitch
+     is simply the card plus the gutter it was derived with; the old min/max pair
+     fought that and produced the collapsed gutter. */
   const F_COL = fiveUp
-    ? Math.max(CW + 6, Math.min(76, fitCol))
+    ? CW + Math.max(F_GUT_MIN, Math.min(F_GUT_WANT, Math.floor((vp.w - 2 * F_EDGE - MCOLS * CW) / Math.max(1, MCOLS - 1))))
     : circular ? CW + 3 : isMobile ? 92 : 112;
   const F_ROW = fiveUp ? F_COL : circular ? CW + 3 : isMobile ? 92 : 112;
   const fCols = Math.max(2, Math.min(7, Math.floor((vp.w - 120) / F_COL)));
