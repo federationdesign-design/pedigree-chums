@@ -4280,7 +4280,11 @@ export default function LineageMap({
             style={{
               position: bounded ? "absolute" : "fixed", left, top, maxWidth: 288, zIndex: 100, pointerEvents: "auto", /* pct-close: hoverable so it can self-dismiss */
               background: "rgba(10, 58, 87, 0.92)", color: "#ffffff",
-              font: "500 11px/1.45 Montserrat, system-ui, sans-serif", padding: "9px 12px",
+              /* 11 -> 12, 16 September 2026 (owner), matching the learn area's blue
+                 card, which moved to the same 12 the same day. The two boxes share no
+                 code, which is how they drifted apart in the first place; if either
+                 moves again, move both. */
+              font: "500 12px/1.45 Montserrat, system-ui, sans-serif", padding: "9px 12px",
               borderRadius: "8px", boxShadow: "0 4px 12px rgba(10, 58, 87, 0.35)",
             }}
           >

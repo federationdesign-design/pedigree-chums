@@ -113,7 +113,11 @@
 .cNote {
   margin: 7px 0 0;
   line-height: 1.6;
-  font-size: 0.75rem;
+  /* 12px, 16 September 2026 (owner: raise both boxes to 12). The write-up and the
+     figures under it now share one size, and the family tree layer's info box is set
+     to the same 12 in LineageMap.tsx. A fixed px rather than a rem: the two files
+     have to agree on a number, and a rem would mean agreeing on a root size too. */
+  font-size: 12px;
   font-weight: 600;
   font-family: var(--font-body, "Montserrat", system-ui);
   color: #ffffff;
@@ -356,7 +360,7 @@
 }
 .asideDocked .cNote {
   margin-top: 4px;
-  font-size: 0.72rem;
+  font-size: 12px;  /* see the note on .cNote */
   line-height: 1.45;
 }
 .asideDocked .cName {
@@ -474,7 +478,7 @@
    later in the file. The desktop docked box keeps 0.72rem / 1.45 untouched.
    1pt = 1.333px, so 0.72rem (11.52px) reads about 10.19px here. */
 .asideSheet .cNote {
-  font-size: calc(0.72rem - 1pt);
+  font-size: 12px;  /* see the note on .cNote */
   line-height: 1.3em;
 }
 
@@ -865,7 +869,7 @@
      than as a smaller footnote. The weight drops to 500 with it: 600 was carrying
      the emphasis that now belongs to the figures alone. */
   font-weight: 500;
-  font-size: calc(0.72rem - 1pt);
+  font-size: 12px;  /* see the note on .cNote */
   line-height: 1.3em;
   opacity: 0.95;
 }
@@ -889,7 +893,7 @@
      WEIGHT 500 ON TOP, same day: the body face still rendered this at 400 beside a
      heavier paragraph, so the two did not match on weight even once they matched on
      size. */
-  font-size: calc(0.72rem - 1pt);
+  font-size: 12px;  /* see the note on .cNote */
   line-height: 1.3em;
   font-weight: 500;
   margin-top: 2px;
