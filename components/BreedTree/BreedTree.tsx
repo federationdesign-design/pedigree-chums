@@ -10600,7 +10600,11 @@ export default function BreedTree({
           className={styles.ancCard}
           style={ancPos ? { left: ancPos.left, top: ancPos.top, width: ancPos.width, right: "auto", bottom: "auto" } : undefined}
           ariaLabel={`Ancestry of ${ancestryFor.name}`}
-          icon={ICONS.ancestry}
+          /* NO ICON IN THE TITLE, 16 September 2026 (owner: leave just the card
+             titles). LearnDragCard's icon prop is optional and its head renders
+             nothing without one, so dropping the prop is the whole change; the
+             three ICONS entries stay in use on the dock buttons that reopen these
+             cards, which is where they still earn their place. */
           title={"Ancestry"}  /* was the dog name; the three card titles now read Ancestry, Training, Temperament */
           titleWhite
           onClose={() => setAncHidden(true)}
@@ -10635,7 +10639,6 @@ export default function BreedTree({
           className={styles.trainCard}
           style={trainPos ? { left: trainPos.left, top: trainPos.top, right: "auto", bottom: "auto" } : undefined}
           ariaLabel={`Training for ${ancestryFor.name}`}
-          icon={ICONS.training}
           title={"Training"}  /* the dog name is gone, 16 Sept 2026 (owner): the card sits beside the dog it describes, so repeating it in every title was noise. cardTitleName is unused now. */
           onClose={() => setTrainHidden(true)}
           closeLabel="Close training"
@@ -10648,7 +10651,6 @@ export default function BreedTree({
           className={styles.tempCard}
           style={tempPos ? { left: tempPos.left, top: tempPos.top, right: "auto", bottom: "auto" } : undefined}
           ariaLabel={`Temperament of ${ancestryFor.name}`}
-          icon={ICONS.infoBox}
           title={"Temperament"}  /* the dog name is gone, 16 Sept 2026 (owner): the card sits beside the dog it describes, so repeating it in every title was noise. cardTitleName is unused now. */
           onClose={() => setTempHidden(true)}
           closeLabel="Close temperament"

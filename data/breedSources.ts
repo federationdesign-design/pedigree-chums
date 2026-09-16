@@ -49,7 +49,7 @@ export const BREED_SOURCES: Record<string, BreedSource[]> = {
   ],
 
   // Medieval.
-  "Shepherd's Dog": [
+  "Shepherd's Dogs": [
     { href: "https://en.wikipedia.org/wiki/Welsh_Sheepdog", tone: "blue" },
   ],
   "Drover's Dog": [
