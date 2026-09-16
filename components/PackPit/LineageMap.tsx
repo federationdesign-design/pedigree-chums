@@ -3,6 +3,7 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { getLineage, type LineageNode } from "../../data/lineage";
 import { fireConfetti } from "../../lib/confetti";
+import ReadingProgress from "../ReadingProgress/ReadingProgress";
 import { bust } from "../../data/imgVersion";
 import { ukBreeds } from "../../data/uk-breeds";
 import { breeds } from "../../data/breeds";
@@ -1651,6 +1652,29 @@ export default function LineageMap({
     pickCards.length > 0 &&
     pickCards.every((c) => placedSet.has(c.id) || stackedIds.has(c.id) || packHidden.has(c.id));
   const treeDone = strongBg && !circular && framesDone && cardsAllPlaced;
+
+  /* THE RUNNING-DOG PROGRESS BAR, 16 September 2026 (owner: a bar along the bottom
+     showing how much has been exposed and placed, like the Argos article's).
+
+     NOT A NEW COMPONENT. ReadingProgress is the Argos bar, and it already takes a
+     controlled `progress` percentage and an `active` flag for the walk cycle,
+     exactly as PressCarousel drives it from a carousel position. This feeds it from
+     the layer's own state instead of scroll.
+
+     BOTH HALVES OF THE JOB, WEIGHTED EVENLY. Exposing circles and placing cards are
+     the two things the player does, and one can be finished while the other has not
+     started, so the bar is their mean rather than either alone. A level with no
+     frames falls back to the circles, or an empty denominator would read as done.
+
+     THE DOG RUNS WHILE THERE IS WORK LEFT, and stands still once the bar is full.
+     PressCarousel runs its dog for a beat after each move using a state flag and a
+     450ms timer; that pattern needs setState inside an effect, and this file's
+     eslint baseline is held at its current count, so the derived version is used
+     instead. It costs the little pause between actions and gains no new lint. */
+  const exposedFrac = totalNodes > 0 ? Math.min(1, seen.size / totalNodes) : 1;
+  const placedFrac = frameTotal > 0 ? Math.min(1, filled.size / frameTotal) : exposedFrac;
+  const learnProgress = Math.round(((exposedFrac + placedFrac) / 2) * 100);
+  const dogRunning = learnProgress < 100;
   // Mini pit levels: every frame filled means this circle is fully learnt.
   // No collect step: poof the card and its nodes out of existence, remove the
   // circle from the pit, and close, exactly like the instructional finish.
@@ -2656,6 +2680,12 @@ export default function LineageMap({
             figures is unreadable.
 
             This layer only, the same gate as the button it replaces. */}
+        {/* The Argos bar, driven by this layer rather than by scroll. Rendered as a
+            sibling of the overlay like the score and the counter, so the layer's own
+            0.8 scale cannot shrink it. */}
+        {strongBg && !circular && !bounded && (
+          <ReadingProgress progress={learnProgress} active={dogRunning} />
+        )}
         {strongBg && !circular && !bounded && (
           <div className={styles.chumScore} aria-label={`Score ${currentScore}`}>
             {currentScore.toLocaleString()}
