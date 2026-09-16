@@ -1173,7 +1173,12 @@
   width: clamp(38px, 7.5vw, 56px);
   height: clamp(38px, 7.5vw, 56px);
   padding: 0;
-  border: 2px solid var(--yellow, #ffd23e);
+  /* WHITE, NOT YELLOW, 16 September 2026 (owner). The artwork inside carries its
+     own white outline, so a yellow rim around it left a sliver of white between
+     the two and read as a doubled, mismatched stroke. White makes the card's rim
+     and the picture's own outline one line. .relCardOn already used white for the
+     picked card, so the rail is now consistent whichever card is open. */
+  border: 2px solid #ffffff;
   border-radius: 12px;
   background: #ffffff;
   overflow: hidden;
@@ -1190,6 +1195,12 @@
 /* The selected card is the only one wearing the info badge, and that badge
    overhangs, so this card must stop clipping its own children. */
 .relCardOn {
+  /* Visible so the info badge, which overhangs, is not clipped. THAT IS ALSO WHY
+     THE RIM LOOKED CUT OFF AT THE CORNERS, found 16 September 2026 (owner): with
+     overflow visible the square image is no longer clipped to the card's 12px
+     radius, so its corners paint straight over the rounded rim. The image is
+     given its own radius below instead, which clips the picture without clipping
+     the badge. */
   overflow: visible;
   width: clamp(56px, 11vw, 88px);
   height: clamp(56px, 11vw, 88px);
@@ -1203,6 +1214,9 @@
   z-index: 3;
 }
 .relCard img { width: 100%; height: 100%; object-fit: cover; display: block; }
+/* 12px card radius less the 2px rim. Only needed on the picked card, since every
+   other card still clips its image with overflow: hidden. */
+.relCardOn img { border-radius: 10px; }
 /* The "i" on the picked chum. Sits inside the card, which is overflow: hidden,
    so it is placed just in from the bottom-right corner rather than overhanging.
    Sized off the card so it scales with it: the picked card runs 56 to 88px, so
