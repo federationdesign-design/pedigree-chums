@@ -27,6 +27,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 
 import { getLineage, LINEAGE_ROOTS } from "../../data/lineage.ts";
+import { ancestralInfluence } from "../../data/lineageArchive.ts";
 
 // Floating point: shares are divisions, so exact equality is the wrong test.
 // This tolerance is far tighter than any figure the game prints, which rounds to
@@ -154,4 +155,40 @@ test("a direct child's drawn share equals its authored share", () => {
   }
   assert.ok(checked > 0, "the check found some roots to test");
   assert.deepEqual(bad, [], `shares that do not match what the data authors:\n  ${bad.join("\n  ")}`);
+});
+
+/* THE INFLUENCE MODEL'S OWN GUARD, added 16 September 2026.
+
+   ancestralInfluence exists to answer "every ancestor gets a figure and they add
+   to an even 100". If that ever stops being true the screens printing it go wrong
+   silently, so both the exact figures and the ROUNDED ones are checked: the
+   rounded set is what a player sees, and largest-remainder apportionment is the
+   only reason those add up rather than landing on 99 or 101. */
+test("ancestral influence totals exactly 100 on every lineage", () => {
+  const badExact = [];
+  const badRounded = [];
+  let checked = 0;
+  for (const name of LINEAGE_ROOTS) {
+    const rows = ancestralInfluence(name);
+    if (!rows.length) continue;
+    checked += 1;
+    const exact = rows.reduce((s, r) => s + r.exact, 0);
+    const rounded = rows.reduce((s, r) => s + r.pct, 0);
+    if (Math.abs(exact - 100) > 1e-6) badExact.push(`${name}: ${exact.toFixed(4)}`);
+    if (rounded !== 100) badRounded.push(`${name}: ${rounded}`);
+  }
+  assert.ok(checked > 100, `expected most lineages to produce an influence list, got ${checked}`);
+  assert.deepEqual(badExact, [], `exact totals off 100:\n  ${badExact.join("\n  ")}`);
+  assert.deepEqual(badRounded, [], `rounded totals off 100:\n  ${badRounded.join("\n  ")}`);
+});
+
+// Deeper ancestors must count for less than nearer ones, which is the whole point
+// of the decay. Checked on the owner's worked example rather than asserted in the
+// abstract: the Bulldog is a parent, Ancient Celtic earth dogs is four back.
+test("influence diminishes with depth", () => {
+  const rows = ancestralInfluence("Staffordshire Bull Terrier");
+  const get = (n) => rows.find((r) => r.name === n)?.exact ?? 0;
+  assert.ok(get("Bulldog") > get("Old English Bulldog"), "a parent outweighs a grandparent");
+  assert.ok(get("Old English Bulldog") > get("Ancient Celtic earth dogs"), "a grandparent outweighs a great-great");
+  assert.ok(get("Ancient Celtic earth dogs") > 0, "a deep ancestor still carries something");
 });

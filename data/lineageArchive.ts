@@ -226,3 +226,97 @@ export function ancestorAppearancesOf(
     .map((r, i) => ({ depth: r.depth, pct: pcts[i], branch: r.branch }))
     .sort((a, b) => a.depth - b.depth);
 }
+
+/* ANCESTRAL INFLUENCE: every ancestor, one figure each, adding to exactly 100.
+   Added 16 September 2026 (owner: "I need a way that the total is an even 100%
+   and each dog has a percentage amount that is relatively accurate", and "as each
+   level of ancestors gets deeper the % effect that progenitor has diminishes").
+
+   THE PROBLEM IT SOLVES. Listing every ancestor with its raw share of the whole
+   dog gives a total of 300% to 509%, a median of 300 across the game. That is not
+   a rounding error: EACH GENERATION already sums to 100% on its own, and the list
+   stacks four to six generations on top of each other. The Staffordshire Bull
+   Terrier came to 415% over 47 appearances.
+
+   THE MODEL. Give each generation a slice of the 100 that HALVES as you go back,
+   then split that generation's slice between its dogs in proportion to their own
+   shares. On a six-generation dog the slices are 50.8, 25.4, 12.7, 6.3, 3.2, 1.6.
+   Halving is the pedigree convention: each generation back is half as close. It
+   is the one judgement call in here and it is a single constant.
+
+   A DOG REACHED SEVERAL WAYS ACCUMULATES. Each appearance is weighted by its own
+   generation first, then appearances of the same name are ADDED. On the Staffie,
+   Ancient Celtic earth dogs appears four times at generation 4 and merges to
+   2.00%; Alaunt war dogs appears five times across generations 3 and 5, the
+   shallow one worth 1.68% and the deep ones 0.17% to 0.62%, merging to 3.26%.
+
+   THE PRINTED INTEGERS TOTAL 100 TOO. Largest-remainder apportionment, the same
+   method ancestorShareOf and ancestorAppearancesOf already use, so the figures on
+   screen add up rather than the figures behind them.
+
+   SELF-CHILDREN ARE SKIPPED, as everywhere else: a node carrying a child of its
+   own name is a display device for a stock that continues alongside what came out
+   of it, not a separate ancestor.
+
+   WHAT THIS IS NOT. It is INFLUENCE, not blood. The Bulldog is 55% of a Staffie's
+   raw share and 27.9% of its influence, and both are true of different questions.
+   Label it as influence. Do not print it as "is 28% Bulldog". */
+const INFLUENCE_DECAY = 0.5; // each generation back counts half the one before it
+
+export function ancestralInfluence(
+  breedName: string,
+): { name: string; pct: number; exact: number }[] {
+  const lineage = getLineage(breedName);
+  if (!lineage) return [];
+  const rootLeaves = sumLeaves(lineage);
+  if (rootLeaves <= 0) return [];
+
+  const apps: { name: string; depth: number; raw: number }[] = [];
+  const walk = (n: LineageNode, depth: number) => {
+    n.children?.forEach((c) => {
+      if (c.name !== n.name) {
+        apps.push({ name: c.name, depth, raw: (sumLeaves(c) / rootLeaves) * 100 });
+      }
+      walk(c, depth + 1);
+    });
+  };
+  walk(lineage, 1);
+  if (!apps.length) return [];
+
+  const maxDepth = apps.reduce((m, a) => Math.max(m, a.depth), 1);
+  const weights: number[] = [];
+  for (let d = 1; d <= maxDepth; d += 1) weights.push(Math.pow(INFLUENCE_DECAY, d - 1));
+  const weightSum = weights.reduce((s, v) => s + v, 0);
+
+  const exact = new Map<string, number>();
+  for (let d = 1; d <= maxDepth; d += 1) {
+    const gen = apps.filter((a) => a.depth === d);
+    const genTotal = gen.reduce((s, a) => s + a.raw, 0);
+    if (genTotal <= 0) continue; // a generation with no weight gives up its slice
+    const slice = (weights[d - 1] / weightSum) * 100;
+    for (const a of gen) {
+      exact.set(a.name, (exact.get(a.name) ?? 0) + (a.raw / genTotal) * slice);
+    }
+  }
+
+  /* A generation that gave up its slice would leave the total under 100, so the
+     slices are re-normalised over the generations that actually carried weight. */
+  const rawTotal = [...exact.values()].reduce((s, v) => s + v, 0);
+  if (rawTotal > 0 && Math.abs(rawTotal - 100) > 1e-9) {
+    for (const [k, v] of exact) exact.set(k, (v / rawTotal) * 100);
+  }
+
+  const rows = [...exact.entries()].sort((a, b) => b[1] - a[1]);
+  const floors = rows.map(([, v]) => Math.floor(v));
+  let left = 100 - floors.reduce((s, v) => s + v, 0);
+  const order = rows
+    .map(([, v], i) => ({ i, rem: v - Math.floor(v) }))
+    .sort((a, b) => b.rem - a.rem);
+  const pcts = floors.slice();
+  for (const o of order) {
+    if (left <= 0) break;
+    pcts[o.i] += 1;
+    left -= 1;
+  }
+  return rows.map(([name, v], i) => ({ name, pct: pcts[i], exact: v }));
+}

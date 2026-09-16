@@ -5,6 +5,7 @@ import type { LineageNode } from "../../data/lineage";
 import { breeds } from "../../data/breeds";
 import { ukBreeds } from "../../data/uk-breeds";
 import { breedInfo } from "../../data/breedInfo";
+import { ancestralInfluence } from "../../data/lineageArchive";
 import styles from "./BreedTreeMap.module.css";
 
 export type BreedTag = "extinct" | "trending" | "popular" | "endangered" | "in-decline";
@@ -311,12 +312,31 @@ export default function BreedTreeMap({
     framesReadyFired.current = true;
     const found: FrameNode[] = [];
     const seenImg = new Set<string>();
+    /* THE PACK'S FIGURES ARE INFLUENCE NOW, AND THEY ADD TO 100, 16 September 2026
+       (owner: "surely these ancestor pack percentages should add up to 100").
+
+       They did not, and could not. `pct` was each ancestor's raw share of the
+       whole dog, and because ancestors nest inside one another those shares
+       overlap: each GENERATION sums to 100 on its own, so the pack was stacking
+       four to six generations and totalling 300% to 509%. The Staffordshire Bull
+       Terrier came to 415%.
+
+       ancestralInfluence gives every ancestor one figure, weighted so each
+       generation back counts half the one before, merged across a dog's repeat
+       appearances, and apportioned by largest remainder so the ROUNDED figures on
+       screen add to exactly 100 rather than 99 or 101. See the block on it in
+       data/lineageArchive.ts, and the standing test in tests/lineage.
+
+       `share`, the figure against the immediate parent, is untouched. It was
+       always correct and answers a different question. */
+    const influence = new Map<string, number>();
+    for (const r of ancestralInfluence(root.name)) influence.set(r.name, r.pct);
     const walk = (n: Node, depth: number) => {
       if (n.img && n._parent) {
         const img = n.img as string;
         if (!seenImg.has(img)) {
           seenImg.add(img);
-          const pct = Math.round((n._leaves / root._leaves) * 100);
+          const pct = influence.get(n.name) ?? 0;
           const share = Math.round((n._leaves / n._parent._leaves) * 100);
           const status = nodeStatus(n.name, n.note ?? "");
           const { era, anchor } = nodeEra(n.name);
