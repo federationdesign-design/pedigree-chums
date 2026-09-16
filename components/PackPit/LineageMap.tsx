@@ -238,7 +238,19 @@ function countProgenitors(n: LineageNode): number {
 // lines, and larger than the chip the same dog drops as. One dial, applied
 // through nodeR below so the layout, the drawing, the card offsets and the
 // scatter all agree. 1 is the main pit's size.
-const PIT_NODE_SCALE = 0.78;
+/* 0.78 -> 0.663, a further 15% off, 16 September 2026 (owner: make the family
+   tree diagram 15% smaller again, leaving the frames, the images, the main dog
+   card and the buttons at their current size).
+
+   THIS IS THE ONE DIAL FOR THAT. It feeds nodeR and nothing else, and nodeR sets
+   the node radii, where the connectors start and end, and the ring weight through
+   clampedRingW. The cards use CW, the root card uses ROOT and the frames have
+   their own geometry, so none of them follow this number. That is exactly the
+   split the owner asked for.
+
+   The tree also draws tighter, not just smaller: the layout packs on these radii,
+   so the gaps close with the circles. */
+const PIT_NODE_SCALE = 0.663;
 export function radius(share: number) {
   return Math.max(21, 5 * Math.sqrt(share));
 }
@@ -717,9 +729,31 @@ export default function LineageMap({
   // radius is a share of leaves and not a nesting, so unlike the pit this
   // genuinely bites. The root's own ring is liftRingW, the real width of the big
   // card, so the rule is absolute at the root too rather than assumed away.
+  /* FLAT WEIGHT ON EVERY NODE RING IN THE LEARN AREA, 16 September 2026 (owner).
+
+     WHAT IT REPLACES, on this layer only. The ring was a FRACTION of each circle's
+     own radius, from RING_FRAC, thinning by depth and clamped so a nested ring
+     could never out-thicken its parent. That gave a different weight on every
+     circle, which is what read as inconsistent: a big circle wore a thick ring and
+     a small one a hairline.
+
+     TWO RULES GO WITH IT, and both were deliberate, so this is recorded rather
+     than quietly dropped. The fraction meant the ring scaled with the difficulty
+     slider and the zoom, replacing a flat pixel count that was audited on a 390px
+     phone and rejected. And the clamp enforced the owner's hierarchy rule, that a
+     ring may never be thicker than the ring of the circle it sits inside. Neither
+     survives a flat weight, by definition.
+
+     4.8 IS THE CARDS' OWN FIGURE, set the same day on .pickCard, so the rings and
+     the exposed images now read as one line weight across the layer.
+
+     THE PIT LIFT AND THE MAIN PIT KEEP THE OLD RULE. strongBg && !circular is the
+     chum tree layer alone, and neither of the others was asked for. */
+  const FLAT_RING_W = 4.8;
   const clampedRingW = (n: Node): number => {
     const p = n._parent;
     if (!p) return liftRingW;
+    if (strongBg && !circular) return FLAT_RING_W;
     let pd = 1;
     for (let a: Node | null = p; a; a = a._parent) pd += 1;
     const raw = nodeR(Math.round((n._leaves / p._leaves) * 100)) * ringFrac(pd);
