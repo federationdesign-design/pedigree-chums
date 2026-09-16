@@ -1734,8 +1734,25 @@ export default function LineageMap({
      450ms timer; that pattern needs setState inside an effect, and this file's
      eslint baseline is held at its current count, so the derived version is used
      instead. It costs the little pause between actions and gains no new lint. */
+  /* CORRECTED 16 September 2026 (owner: the bar reaches the end before the
+     duplicates are placed).
+
+     THE PLACEMENT HALF COUNTED FRAMES, filled.size / frameTotal, and there is one
+     frame per DISTINCT picture. A dog reached by several routes has one frame and
+     several cards, and the duplicates stack onto that already-filled frame, so the
+     frame counter reads full with a pile still in hand. On the Doberman that is 20
+     frames against 51 cards.
+
+     IT COUNTS CARDS NOW, and against the total the tree WILL produce rather than
+     the cards popped so far: allNodes carries hasImg for every node in the whole
+     tree, open branch or not, so the denominator does not grow under the player as
+     they expose more. Counting only the cards on screen would have the bar hit 100
+     early for a second reason. The numerator is the same test cardsAllPlaced uses,
+     so the bar and the tree fade agree on what finished means. */
+  const totalCards = useMemo(() => allNodes.filter((n) => n.hasImg).length, [allNodes]);
+  const cardsDone = pickCards.filter((c) => placedSet.has(c.id) || stackedIds.has(c.id) || packHidden.has(c.id)).length;
   const exposedFrac = totalNodes > 0 ? Math.min(1, seen.size / totalNodes) : 1;
-  const placedFrac = frameTotal > 0 ? Math.min(1, filled.size / frameTotal) : exposedFrac;
+  const placedFrac = totalCards > 0 ? Math.min(1, cardsDone / totalCards) : exposedFrac;
   const learnProgress = Math.round(((exposedFrac + placedFrac) / 2) * 100);
   const dogRunning = learnProgress < 100;
   // Mini pit levels: every frame filled means this circle is fully learnt.
