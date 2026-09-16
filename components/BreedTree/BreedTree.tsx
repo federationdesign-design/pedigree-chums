@@ -10748,7 +10748,14 @@ export default function BreedTree({
                unused, so putting it back is one line here. */
             <div key={a.name} className={styles.ancRow} title={a.name}>
               <span className={styles.ancName}>{a.name}</span>
-              <span className={styles.ancPct}>{a.pct.toFixed(1)}%</span>
+              {/* "<0.1%" RATHER THAN "0.0%", 16 September 2026 (owner). pct is
+                  apportioned in whole tenths so the column totals exactly 100.0, and
+                  on a 52-ancestor dog like the Jackapoo the smallest get none. The
+                  dog is still in the tree, so the honest reading is "less than a
+                  tenth", not "none". exact is the unrounded share and is what tells
+                  the two apart. The family tree badges say "<1%" for the same reason
+                  at their own precision. */}
+              <span className={styles.ancPct}>{a.pct < 0.05 && a.exact > 0 ? "<0.1%" : `${a.pct.toFixed(1)}%`}</span>
             </div>
           ))}
           </div>

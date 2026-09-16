@@ -128,8 +128,20 @@ export function ancestryBreakdown(breedName: string): { name: string; pct: numbe
 
    Figures come through as tenths, so a trace reads 0.4 rather than rounding to
    nothing. The card formats them. */
-export function ancestryFullList(breedName: string): { name: string; pct: number }[] {
-  return ancestralInfluence(resolveLineageName(breedName)).map((r) => ({ name: r.name, pct: r.pct }));
+/* `exact` is carried through now, 16 September 2026 (owner: the Jackapoo lists
+   about 25 ancestors at 0.0%, which cannot be right).
+
+   THEY REALLY ARE ZERO, and that is the apportionment doing its job rather than a
+   rounding display fault. pct is handed out in whole TENTHS of a percent by largest
+   remainder so the printed column totals exactly 100.0. The Jackapoo has 52
+   ancestors and only 1000 tenths to share, so the smallest are allocated none and
+   print 0.0.
+
+   `exact` is the unrounded share and is already computed, so dropping it here was
+   what left the card unable to tell a true zero from a rounded one. The caller can
+   now print "<0.1%" where exact is above zero but pct is not. */
+export function ancestryFullList(breedName: string): { name: string; pct: number; exact: number }[] {
+  return ancestralInfluence(resolveLineageName(breedName)).map((r) => ({ name: r.name, pct: r.pct, exact: r.exact }));
 }
 
 // A single breed's share of ONE named ancestor, however deep in its tree.
