@@ -4072,7 +4072,16 @@ className={[
             style={{
               position: bounded ? "absolute" : "fixed", left, top, maxWidth: PANEL_W, zIndex: 100, pointerEvents: "auto",
               background: "rgba(10, 58, 87, 0.92)", color: "#ffffff",
-              font: "500 11px/1.4 Montserrat, system-ui, sans-serif", padding: "7px 10px",
+              /* 11 -> 12, 16 September 2026 (owner: the two boxes on the family tree
+                 layer did not grow with the blue card).
+
+                 THIS IS THE SECOND BOX, the note that opens off a card's own info
+                 badge. The earlier pass raised the blue card and the PERCENTAGE box
+                 below, and missed this one entirely because it sets its own font
+                 shorthand three hundred lines away from the other. Three boxes now
+                 read at 12: this, the percentage box, and the learn card. The
+                 leading is brought to 1.45 with it so all three match. */
+              font: "500 12px/1.45 Montserrat, system-ui, sans-serif", padding: "7px 10px",
               borderRadius: "8px", boxShadow: "0 4px 12px rgba(10, 58, 87, 0.35)",
             }}
           >
