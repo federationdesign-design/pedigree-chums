@@ -177,6 +177,18 @@ export default function BreedStrip({
   // a loss breaks the streak, which is what "in a row" has to mean.
   const [lives, setLives] = useState(LIVES_START);
   const [streak, setStreak] = useState(0);
+  /* LEVELS FINISHED THIS SESSION, 16 September 2026 (owner: show a completed level
+     as green, with a tick for the portrait and no play button).
+
+     IN MEMORY, BY NAME, alongside position, lives and streak, which are all held
+     the same way. The owner chose this deliberately as stage one: the look is what
+     wants judging, and where completion should live is a separate question worth
+     answering properly. A refresh clears it, which will read as a bug to a player,
+     so this is not the finished state of the feature.
+
+     Swapping the backing store later means changing only this line and the setter
+     below; everything downstream reads a Set of names. */
+  const [completedLevels, setCompletedLevels] = useState<Set<string>>(new Set());
   /* Which card is flipped to its back, by name, or null. Only used below 480,
      where there is no hover to flip on: the tap controls set it. Above 480 the
      controls are display:none and the CSS hover flip governs, so this stays null
@@ -567,6 +579,10 @@ export default function BreedStrip({
       onNavPrevEra={prevEraOf(active.name) ? () => navTo(prevEraOf(active.name)) : undefined}
       onNavNextEra={nextEraOf(active.name) ? () => navTo(nextEraOf(active.name)) : undefined}
       onNextLevel={() => {
+        // The one place a level is known to be finished, so the one place this is
+        // recorded. Keyed by name, which is the same key the timeline and the
+        // lineage records use.
+        setCompletedLevels((prev) => (prev.has(active.name) ? prev : new Set(prev).add(active.name)));
         // a level completed: three in a row earns a life back
         setStreak((st) => {
           const next = st + 1;
@@ -618,6 +634,7 @@ export default function BreedStrip({
         // on to clear; it does not cost it for an attempt you failed.
         resetToys();
       }}
+      levelCompleted={completedLevels.has(active.name)}
       levelNo={Math.max(0, levelList.findIndex((b) => b.name === active.name))}
       name={active.name}
       image={active.image}

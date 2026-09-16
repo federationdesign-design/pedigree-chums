@@ -1671,6 +1671,7 @@ export default function BreedTree({
   onCaptionClose,
   onScore,
   currentScore = 0,
+  levelCompleted = false,
   registerShake,
   registerSlowmo,
   onToggleCaption,
@@ -1767,6 +1768,9 @@ export default function BreedTree({
   /* The live score, so the chum tree layer can show it. One-way in: BreedTree
      never sets it, it only passes it through. */
   currentScore?: number;
+  /* This level is already finished. Swaps the start-screen portrait for a green
+     tick and hides PLAY, since there is nothing left to start. See BreedStrip. */
+  levelCompleted?: boolean;
   registerShake?: (fn: () => void) => void;
   registerSlowmo?: (fn: () => void) => void;
   onToggleCaption?: () => void;
@@ -9319,10 +9323,17 @@ export default function BreedTree({
                a line you have already signed off. The two are now 10 apart rather
                than 20. */
             const ROW_DROP = 10 * upp;
-            const words: { key: "learn" | "start"; label: string; x: number; y: number; anchor: "start" | "end" }[] = [
+            /* NO PLAY ON A FINISHED LEVEL, 16 September 2026 (owner). Filtered out
+               of the words array rather than hidden in the render, so LEARN keeps
+               its own x: that is xMinC + m + SQ + SQ_GAP, an absolute position
+               rather than one measured from PLAY, so it does not slide left into
+               the gap. The level stays readable and re-learnable; only the round
+               is gone. */
+            type Word = { key: "learn" | "start"; label: string; x: number; y: number; anchor: "start" | "end" };
+            const words: Word[] = ([
               { key: "start", label: "PLAY", x: xMinC + m, y: vbHc * WORD_START_Y + ROW_DROP, anchor: "start" },
               { key: "learn", label: "LEARN", x: xMinC + m + SQ + SQ_GAP, y: vbHc * WORD_START_Y + ROW_DROP, anchor: "start" },
-            ];
+            ] as Word[]).filter((w) => !(levelCompleted && w.key === "start"));
             return words.map((w) => (
               <g
                 key={w.key}

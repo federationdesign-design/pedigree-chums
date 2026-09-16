@@ -58,10 +58,24 @@ function scoreText(n: number) {
 // One line of the stacked title: round portrait, status dot, name. Pulled out
 // because the level's dog and the circle being looked at are now drawn with the
 // same markup, one above the other.
-function TitleRow({ img, name, status, isNarrow, imgRef }: { img: string | null; name: string; status: BreedTag | null; isNarrow: boolean; imgRef?: Ref<HTMLImageElement> }) {
+function TitleRow({ img, name, status, isNarrow, imgRef, done = false }: { img: string | null; name: string; status: BreedTag | null; isNarrow: boolean; imgRef?: Ref<HTMLImageElement>; done?: boolean }) {
   return (
     <div className={css.titleRow}>
-      {img && (
+      {/* A FINISHED LEVEL SHOWS A TICK INSTEAD OF THE DOG, 16 September 2026
+          (owner). Only the level's OWN row takes it: the rows below are the
+          circles being looked at inside the level, which are not finished just
+          because the level is, so they keep their portraits.
+
+          The status dot is dropped with the portrait. It says alive or extinct
+          about the dog in the picture, and there is no picture here. */}
+      {done && (
+        <span className={`${css.titlePortraitWrap} ${css.titleDone}`}>
+          <svg viewBox="0 0 24 24" aria-label="Level completed" role="img">
+            <path d="M4 12.5 L9.5 18 L20 6.5" fill="none" stroke="#ffffff" strokeWidth="3.4" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </span>
+      )}
+      {!done && img && (
         <span className={css.titlePortraitWrap}>
           <img ref={imgRef} className={css.titlePortrait} src={img} alt="" draggable={false} />
           {status && (
@@ -131,6 +145,10 @@ type Props = {
   nextLevelImage?: string;
   onStartOver?: () => void;
   // Zero-based campaign level, straight through to the pit's start screen.
+  /* This level has been finished at least once this session. Drives the green
+     start screen, the tick portrait and the missing PLAY. See BreedStrip, where
+     the set lives. */
+  levelCompleted?: boolean;
   levelNo?: number;
   // Lives are owned by the page, since they have to survive between levels.
   // The modal only displays them and decides whether a retry may be offered.
@@ -173,7 +191,7 @@ type Props = {
   era?: string;
 };
 
-export default function LineageModal({ name, image, character, lineage, fromRect, onClose, quiet, navFading, nextLevelLabel, onNextLevel, onNavPrev, onNavNext, onNavPrevEra, onNavNextEra, onStartOver, initialScore, onScoreChange, bankedScore, onBankScore, era, lives, livesMax = 6, onLost, onSpendLife, onResetRun, nextLevelImage, levelNo, eraJoinLabel, onLevelChums, onChumCaught, topChum, runChumsFound, runChumsPossible }: Props) {
+export default function LineageModal({ name, image, character, lineage, fromRect, onClose, quiet, navFading, nextLevelLabel, onNextLevel, onNavPrev, onNavNext, onNavPrevEra, onNavNextEra, onStartOver, initialScore, onScoreChange, bankedScore, onBankScore, era, lives, livesMax = 6, onLost, onSpendLife, onResetRun, nextLevelImage, levelCompleted = false, levelNo, eraJoinLabel, onLevelChums, onChumCaught, topChum, runChumsFound, runChumsPossible }: Props) {
   const theme = levelThemeFor(era);
   // The close X asks before it closes. A round can take a couple of minutes to
   // build up, and losing it to a mis-tap in the corner is a rotten exit.
@@ -564,7 +582,7 @@ export default function LineageModal({ name, image, character, lineage, fromRect
        lmRise was fading the WHOLE pit in from transparent every time, which is
        what let the history page show through mid-swipe. */
     <div
-      className={`${css.overlay}${quiet ? " " + css.overlayQuiet : ""}`}
+      className={`${css.overlay}${quiet ? " " + css.overlayQuiet : ""}${levelCompleted ? " " + css.overlayDone : ""}`}
       role="dialog"
       aria-modal="true"
       aria-label={name}
@@ -617,7 +635,7 @@ export default function LineageModal({ name, image, character, lineage, fromRect
         className={css.titleWrap}
         style={{ ["--rows" as string]: Math.max(1, shownPath.length || (shownName !== name ? 2 : 1)) }}
       >
-        <TitleRow img={image} name={name} status={levelStatus} isNarrow={isNarrow} imgRef={portraitRef} />
+        <TitleRow img={image} name={name} status={levelStatus} isNarrow={isNarrow} imgRef={portraitRef} done={levelCompleted} />
         {shownPath.length > 1
           ? shownPath.slice(1).map((step, i) => (
               <TitleRow key={`${i}-${step.name}`} img={step.img} name={step.name} status={step.status} isNarrow={isNarrow} />
@@ -687,6 +705,7 @@ export default function LineageModal({ name, image, character, lineage, fromRect
           onStartedChange={setRunning}
           onLearningChange={setLearningActive}
           onRelativeTap={(slug, nm) => setLeavePage({ slug, name: nm })}
+          levelCompleted={levelCompleted}
           levelNo={levelNo}
           collectedChums={collectedChums}
           onChumCollected={(n) => {
