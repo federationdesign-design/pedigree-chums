@@ -1728,8 +1728,12 @@
   animation: none;
 }
 .learnDockBtn.learnPlayBtn::before { animation: none; opacity: 0; }
-/* the icon holds the same 0.55 of the button the others do: 0.55 * 100.2 */
-.learnDockBtn.learnPlayBtn .learnDockIcon { color: #ffffff; width: 55.1px; height: 55.1px; }
+/* THE ICON BOX IS THE BUTTON'S OUTER SIZE, not 0.55 of it like the other four.
+   The triangle inside is drawn in a 100-unit viewBox so one unit is one percent
+   of the square, which lets it carry the start screen's own figures unconverted.
+   The box therefore laps the 5px rim; flex centring keeps it centred and the
+   glyph sits well inside, so nothing is clipped. */
+.learnDockBtn.learnPlayBtn .learnDockIcon { color: #ffffff; width: 100.2px; height: 100.2px; }
 .learnDockBtn.learnPlayBtn .learnDockIcon svg { stroke: none; fill: #ffffff; }
 .learnDockIcon svg { width: 100%; height: 100%; stroke: var(--yellow, #ffd23e); }
 /* Start-screen SVG captions: "play"/"learn" above the PLAY/LEARN squares and
@@ -1839,8 +1843,8 @@
     border-width: 5px;
     border-radius: 17.7px;
   }
-  /* the icon holds the same 0.55 of the button the others do: 0.55 * 55.7 */
-  .learnDockBtn.learnPlayBtn .learnDockIcon { width: 30.6px; height: 30.6px; }
+  /* the button's outer size, see the desktop rule */
+  .learnDockBtn.learnPlayBtn .learnDockIcon { width: 55.7px; height: 55.7px; }
   /* 28 was 0.55 of a 50.6 button. Held at the same fraction of 42. */
   .learnDockIcon { width: 23px; height: 23px; }
 }

@@ -9894,9 +9894,25 @@ export default function BreedTree({
               The triangle is a .learnDockIcon, so it takes the same 0.55 of the
               button the other icons do, and its own stroke went with the old
               artboard. It has none now, which is why the weight stops changing. */}
+          {/* THE SAME TRIANGLE THE START SCREEN DRAWS, 16 September 2026 (owner:
+              the white icon is smaller in the learn area and needs to match).
+
+              WHY IT WAS SMALLER. The start screen's PLAY is an SVG ui-square, not
+              this button, so the two glyphs were drawn by different code. Its
+              triangle is gw = S * 0.30 wide and gh = S * 0.34 tall with a
+              S * 0.07 round-join stroke, measured off the square's own size. This
+              one was a 24-unit path inside an icon box set to 0.55 of the button,
+              which worked out at about 0.20 of the button wide against 0.37. Near
+              enough half.
+
+              THE VIEWBOX IS 100 UNITS AND THE BOX IS THE BUTTON'S OUTER SIZE, so
+              one unit is one percent of the square and the figures below are the
+              start screen's own, unconverted: cx and cy 50, half-width 9 back and
+              21 forward, half-height 17, stroke 7. Change them there and change
+              them here. */}
           <span className={styles.learnDockIcon}>
-            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-              <path d="M9 6.5 L17.5 12 L9 17.5 Z" fill="#ffffff" stroke="none" />
+            <svg viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+              <path d="M41,33 L71,50 L41,67 Z" fill="#ffffff" stroke="#ffffff" strokeWidth={7} strokeLinejoin="round" />
             </svg>
           </span>
         </button>
