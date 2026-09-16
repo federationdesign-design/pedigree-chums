@@ -1881,6 +1881,35 @@ const LINEAGE: Record<string, LineageNode> = {
     ]
   },
 
+  /* THE MEDIEVAL BLOODHOUND IS ITS OWN DOG, 16 September 2026 (owner: these are
+     separate dogs, and everything before 1700 belongs to the ancient line).
+
+     WHY IT HAD TO BE A RENAME AND NOT JUST A PICTURE. Both were called
+     "Bloodhound" and the tree joins on the NAME, so however many images they
+     carried the game still saw one dog with two pictures: two frames, two cards,
+     and the duplicate pair the owner photographed on the Irish Setter.
+
+     THE 1700 LINE, APPLIED TO THE RECORD EACH NODE SITS IN.
+       BEFORE: Otterhound 1575 and Basset and heavy Hounds 1525 -> this record.
+       AFTER:  Pointer 1720, Gordon Setter 1878, Basset Hound 1880, Golden
+               Retriever 1890, Dumfriesshire Hound 1920, and the modern pack
+               breeds Weimaraner and Dachshund -> the Bloodhound below.
+     Seven of the nine were already on the right art; the Pointer, the Weimaraner
+     and the Dachshund were on the medieval picture and have been moved.
+
+     SAME ANCESTRY AS THE BLOODHOUND, and deliberately so: both descend from the
+     St Hubert Hound through the old continental scenting stock, and the split is
+     about WHEN the dog is being drawn rather than about where it came from. If the
+     medieval line should have its own parents, this is the record to change. */
+  "Medieval Bloodhound": {
+    name: "Medieval Bloodhound",
+    note: "The heavy trailing hound of the medieval hunt, deep-nosed and slow, before the breed took its modern shape. Now extinct.",
+    img: "/history/breeds/Medieval-Bloodhound.jpg",
+    children: [
+      { name: "St Hubert Hound", note: "The abbey scent hound it descends from almost unchanged.", img: "/history/breeds/St-Hubert-Hound.jpg", value: 60 },
+      { name: "Old scenting Hounds", note: "The heavy continental tracking hounds of the same line.", img: "/history/breeds/Old-scenting-hounds.jpg", value: 40 },
+    ],
+  },
   "Bloodhound": {
     name: "Bloodhound",
     note: "The supreme tracking hound, descended from the St Hubert Hound bred by monks in the Ardennes.",
@@ -1974,7 +2003,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Otterhound",
     note: "A big, rough-coated, web-footed scent hound bred to hunt otter in cold rivers, with a magnificent nose.",
     children: [
-      { name: "Bloodhound", note: "Tracking power and a tremendous nose.", img: "/history/breeds/Medieval-Bloodhound.jpg", value: 45 },
+      { name: "Medieval Bloodhound", note: "Tracking power and a tremendous nose.", img: "/history/breeds/Medieval-Bloodhound.jpg", value: 45 },
       { name: "Southern Hound", note: "Old deep-voiced scent-hound stock.", img: "/history/breeds/Southern-Hound.jpg", value: 30 },
       { name: "Rough water dogs", note: "Shaggy, water-loving dogs for the wet work. Now extinct.", img: "/history/breeds/rough-water-dogs.jpg", value: 25 }
     ]
@@ -2088,7 +2117,7 @@ const LINEAGE: Record<string, LineageNode> = {
     children: [
       { name: "English Foxhound", note: "Stamina, drive and a steady temperament.", img: "/history/breeds/english-foxhound.jpg", value: 30 },
       { name: "Greyhound", note: "Speed and a racy, galloping build.", img: "/history/breeds/original-greyhound.jpg", value: 25 },
-      { name: "Bloodhound", note: "A deeper nose for finding game.", img: "/history/breeds/Medieval-Bloodhound.jpg", value: 25 },
+      { name: "Bloodhound", note: "A deeper nose for finding game.", img: "/history/breeds/modern-bloodhound.jpg", value: 25 },
       { name: "Setter", note: "Setting-dog blood for style and steadiness. Now in-decline.", img: "/history/breeds/british-setters.jpg", value: 20 }
     ]
   },
@@ -2140,7 +2169,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "Low, long, heavy scenting-hound stock that lent weight and bone to the stouter spaniels. Now extinct.",
     children: [
       { name: "Southern Hound", note: "The heavy, slow, deep-voiced trailing hound, the right match for the stout, low spaniels. Now extinct.", img: "/history/breeds/Southern-Hound.jpg", value: 60 },
-      { name: "Bloodhound", note: "The supreme heavy trailing hound of the same deep-nosed line, still bred today.", img: "/history/breeds/Medieval-Bloodhound.jpg", value: 40 }
+      { name: "Medieval Bloodhound", note: "The supreme heavy trailing hound of the same deep-nosed line, still bred today.", img: "/history/breeds/Medieval-Bloodhound.jpg", value: 40 }
     ]
   },
 
@@ -2330,7 +2359,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Weimaraner",
     note: "The grey ghost, a noble gun dog from the Weimar court of Germany, built on old scent trailing and pointing stock.",
     children: [
-      { name: "Bloodhound", note: "The heavy German scent trailing hounds, the leithund, behind its nose and tracking drive.", img: "/history/breeds/Medieval-Bloodhound.jpg", value: 40 },
+      { name: "Bloodhound", note: "The heavy German scent trailing hounds, the leithund, behind its nose and tracking drive.", img: "/history/breeds/modern-bloodhound.jpg", value: 40 },
       { name: "Pointer", note: "Continental pointing dogs crossed in for the upright, birdy hunting style.", img: "/history/breeds/british-pointers.jpg", value: 40 },
       { name: "Old German hunting dogs", note: "The all round hunters of the Weimar estates that the courtiers refined into one type. Now extinct.", img: "/history/breeds/German-bracke-scenthounds Old German hunting dogs.jpg", value: 20 }
     ]
@@ -2440,7 +2469,7 @@ const LINEAGE: Record<string, LineageNode> = {
     children: [
       { name: "German bracke scenthounds", note: "The trailing hounds it descends from, dwarfed in the leg to work underground. Now extinct.", img: "/history/breeds/German-bracke-scenthounds Old German hunting dogs.jpg", value: 60 },
       { name: "Old earth Terriers", note: "Terrier type earth dogs thought to add the grit for going to ground after badger and fox. Now extinct.", img: "/history/breeds/Old-Earth-Terriers-Dachshund-brand.jpg", value: 25 },
-      { name: "Bloodhound", note: "A thread of heavy scent hound blood behind the long nose and dogged tracking.", img: "/history/breeds/Medieval-Bloodhound.jpg", value: 15 }
+      { name: "Bloodhound", note: "A thread of heavy scent hound blood behind the long nose and dogged tracking.", img: "/history/breeds/modern-bloodhound.jpg", value: 15 }
     ]
   },
 };
