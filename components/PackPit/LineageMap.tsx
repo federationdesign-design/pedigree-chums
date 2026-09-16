@@ -2518,7 +2518,26 @@ export default function LineageMap({
 
                LineageMap is rendered by BOTH pits, so this figure changes in the
                main pit and the mini pit together. */
-            onClick={(e) => { e.stopPropagation(); flashNum(rx, ry + ROOT + 88, 1000, FLASH_SIZE); startRemove(); }}
+            /* THE COLLECT AWARD IS MULTIPLIED BY THE WORK DONE, 16 September 2026
+               (owner: collecting paid the same flat 1000 whether the player had
+               placed every card or none of them).
+
+               1000 x 0.1 per frame filled, so five filled pays 500 and fifty pays
+               5,000. collectMult is read AT THE MOMENT OF THE PRESS, from filled,
+               which is the live set behind the x/y counter on screen. That is the
+               owner's second point: pressing Collect part-way through AUTO's run
+               now pays for the frames filled so far, not the frames that would
+               eventually be filled.
+
+               FILLED FRAMES, NOT CARDS PLACED. A level has one frame per distinct
+               picture and often many more cards, so counting cards would pay
+               several times over for one dog. Frames is also the number the player
+               can see in the counter, so the multiplier is checkable on screen.
+
+               COLLECTING WITH NOTHING PLACED NOW PAYS NOTHING. That follows from
+               the owner's own scale, 0 x 0.1 = 0, and is the point of the change.
+               A floor would need to be added deliberately. */
+            onClick={(e) => { e.stopPropagation(); flashNum(rx, ry + ROOT + 88, Math.round(1000 * 0.1 * filled.size), FLASH_SIZE); startRemove(); }}
             role="button"
             aria-label={INSTR_NAMES.has(breed.name) ? "Complete" : "Choose as pack chum"}
           >
