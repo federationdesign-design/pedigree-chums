@@ -898,15 +898,21 @@ export default function LineageMap({
   const [seen, setSeen] = useState<Set<string>>(() => (initialDepth ? openIdsToDepth(root, initialDepth) : new Set()));
   const fxId = useRef(0);
   const scoredRef = useRef<Set<string>>(new Set());
-  const [autoArmed, setAutoArmed] = useState(false); // the auto-collect shortcut arms 5s in, while circles are still yellow
+  /* THE AUTO SHORTCUT IS THERE FROM THE START, 16 September 2026 (owner: remove
+     the delay, it should appear straight away). It used to arm 5s in, on the idea
+     that a shortcut should not be offered before the player has tried. Initial
+     state is true now and the timer below is gone; showAuto still hides it once
+     every circle is seen, or while packing, collecting or removing, so it
+     disappears when there is nothing left to shortcut. */
+  const [autoArmed, setAutoArmed] = useState(true);
   const [autoExposed, setAutoExposed] = useState<Set<string>>(new Set()); // nodes auto revealed; their leaf names stay hidden to cut clutter
   const [penalty, setPenalty] = useState<number | null>(null); // animation key while the white -1000 floats up
   const [idleHint, setIdleHint] = useState(false); // pulse the first ring of circles after 1s of no interaction
   const interacted = useRef(false);
   useEffect(() => {
-    setAutoArmed(false); setPenalty(null);
-    const t = setTimeout(() => setAutoArmed(true), 5000);
-    return () => clearTimeout(t);
+    // Was: arm after 5s. Now armed from the start, so this only clears the penalty
+    // flash when the lifted dog changes.
+    setAutoArmed(true); setPenalty(null);
   }, [breed.name]);
   useEffect(() => {
     setIdleHint(false); interacted.current = false;

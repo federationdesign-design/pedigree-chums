@@ -489,6 +489,20 @@
 .removeBtn:hover .compPill {
   fill: #3bb0ec;
 }
+/* THE PRESSED STATE GOES DARKER, 16 September 2026 (owner: show the button has
+   been pressed in, a slightly darker blue like the 3D edge underneath it).
+
+   #0c6a9c is .compBase's own fill, the shadow edge below the pill, so the pressed
+   top lands on exactly the colour it is sinking into rather than a new blue. The
+   pill already drops 8px on .chumTopDown; this is the colour half of the same
+   press.
+
+   It holds as long as the press does, which since the same day is until the step
+   finishes rather than a 140ms timer, so on a long pack-out the button stays dark
+   while it works. */
+.chumTopDown .compPill {
+  fill: #0c6a9c;
+}
 .compText {
   font-family: var(--font-display), system-ui, sans-serif;
   font-weight: 400;
