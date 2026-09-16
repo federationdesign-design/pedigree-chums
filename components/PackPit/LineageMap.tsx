@@ -703,7 +703,8 @@ export default function LineageMap({
     return imgs.size;
   }, [root]);
   const F_GUT_MIN = 6;
-  const F_GUT_WANT = 10;
+  const F_GUT_WANT = 10;  // the gutter the card is chosen against
+  const F_GUT_MAX = 24;   // the widest it may grow to soak up a height-capped card
   const CW = isMobile
     ? circular || strongBg
       ? (() => {
@@ -1606,7 +1607,7 @@ export default function LineageMap({
      with the columns now sized to fill the width, the grid has to begin at the same
      F_EDGE its width was calculated from or it runs off the right. unscaleX puts
      that screen position back into the layout's own coordinates. */
-  const F_LEFT = fiveUp ? unscaleX(F_EDGE) + CW / 2 : isMobile ? 52 : 96;
+  const F_LEFT_BASE = fiveUp ? unscaleX(F_EDGE) + CW / 2 : isMobile ? 52 : 96;
   // On a circle the rim at 45 degrees sits this far in from the bounding box, so
   // corner adornments tuck against the edge instead of floating outside it.
   const RIM_IN = (CW / 2) * (1 - Math.SQRT1_2);
@@ -1620,8 +1621,34 @@ export default function LineageMap({
      is simply the card plus the gutter it was derived with; the old min/max pair
      fought that and produced the collapsed gutter. */
   const F_COL = fiveUp
-    ? CW + Math.max(F_GUT_MIN, Math.min(F_GUT_WANT, Math.floor(((vp.w - 2 * F_EDGE) / LIFT_K - MCOLS * CW) / Math.max(1, MCOLS - 1))))
+    /* THE GUTTER TAKES THE LEFTOVER, UP TO A POINT, 16 September 2026 (owner: an
+       awkward gap down the right side, only on the dogs with a huge number of
+       frames).
+
+       WHY ONLY THOSE. F_GUT_WANT was a ceiling of 10. When the card is sized by
+       width alone it fills the row and there is no leftover, so the ceiling never
+       showed, which is why every shallow dog looked right. The height cap added the
+       same day pulls the card BELOW its width-filling size on a deep dog, 67 down to
+       61 on a 390 screen, and the freed 29px had nowhere to go: it pooled on the
+       right.
+
+       F_GUT_MAX, NOT NO CEILING AT ALL. Removing the cap outright was the first fix
+       and it was wrong: on a 768 tablet the Jackapoo's gutter went to 89px, trading
+       one gap for five. 24 fills a phone exactly, 17 on a 390 and 20 on a 430, and
+       stops the tablet case spreading. Whatever is still over after that is centred
+       by F_LEFT below rather than left on one side. */
+    ? CW + Math.max(F_GUT_MIN, Math.min(F_GUT_MAX, Math.floor(((vp.w - 2 * F_EDGE) / LIFT_K - MCOLS * CW) / Math.max(1, MCOLS - 1))))
     : circular ? CW + 3 : isMobile ? 92 : 112;
+  /* CENTRED WHEN THE ROW CANNOT FILL, 16 September 2026 (owner). Once the gutter has
+     taken what it can, up to F_GUT_MAX, any remaining slack is split evenly instead
+     of sitting on the right. On a phone that is a pixel or none; on a tablet holding
+     a height-capped deep dog it is the 130px each side that stops the grid hugging
+     the left edge. Declared here rather than with F_LEFT_BASE because it needs
+     F_COL, which needs CW. */
+  const F_SLACK = fiveUp
+    ? Math.max(0, ((vp.w - 2 * F_EDGE) / LIFT_K - (MCOLS * CW + (MCOLS - 1) * (F_COL - CW))) / 2)
+    : 0;
+  const F_LEFT = F_LEFT_BASE + F_SLACK;
   const F_ROW = fiveUp ? F_COL : circular ? CW + 3 : isMobile ? 92 : 112;
   const fCols = Math.max(2, Math.min(7, Math.floor((vp.w - 120) / F_COL)));
   // Tucked under the X/XX counter, which sits at top 26 and is about 32 tall.
