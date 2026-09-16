@@ -1888,7 +1888,36 @@ export default function LineageMap({
   /* Set when AUTO has popped everything and the cards still need placing. */
   const autoPlaceRef = useRef(false);
   const autoCollect = () => {
-    setOpen(() => { const s = new Set<string>(["0"]); allNodes.forEach((n) => { if (n.hasKids) s.add(n.id); }); return s; });
+    /* THE BRANCHES UNFOLD IN A WAVE, 16 September 2026 (owner: AUTO opens every
+       layer in one go and should ripple out a rung at a time, like the images
+       already do).
+
+       WHAT IT WAS. One setOpen call added every branch at once, so the whole tree
+       appeared in a single frame while the circles turning blue and the cards
+       popping rippled behind it at 45ms apart. The wave was already here; the
+       unfolding was not part of it.
+
+       BY DEPTH, NOT BY INDEX. The nodes are walked in tree order, so an index
+       ripple would open a deep branch before its neighbour's parent. Grouping by
+       depth opens a whole rung together and the next rung 90ms later, which is the
+       wave the owner is describing, and a rung cannot arrive before the rung it
+       hangs off.
+
+       90ms against the 45ms used below on purpose: the rungs are few and the nodes
+       many, so the same step would make the unfolding outrun the ripple. */
+    const depthOf = new Map<string, number>();
+    const markDepth = (n: Node, d: number) => (n.children as Node[] | undefined)?.forEach((k) => { depthOf.set(k._id, d); markDepth(k, d + 1); });
+    if (root) markDepth(root, 1);
+    const branchIds = allNodes.filter((n) => n.hasKids).map((n) => n.id);
+    const rungs = [...new Set(branchIds.map((id) => depthOf.get(id) ?? 1))].sort((a, b) => a - b);
+    setOpen(new Set<string>(["0"]));
+    rungs.forEach((d, i) => {
+      window.setTimeout(() => setOpen((prev) => {
+        const s = new Set(prev);
+        branchIds.forEach((id) => { if ((depthOf.get(id) ?? 1) === d) s.add(id); });
+        return s;
+      }), i * 90);
+    });
     setAutoExposed(() => { const s = new Set<string>(); allNodes.forEach((n) => { if (!picked.has(n.id)) s.add(n.id); }); return s; });
     const imgNodes = allNodes.filter((n) => n.hasImg && !picked.has(n.id));
     // Ripple: each node turns blue and its card pops at the same moment
@@ -2949,7 +2978,11 @@ export default function LineageMap({
         <g style={removing ? { pointerEvents: "none" } : undefined}>
         {hasTree ? (
           <>
-            <g style={{ opacity: removing || scattered || dragFocus || treeDone ? 0 : 1, display: scattered ? "none" : undefined, transition: DRAG_FADE, pointerEvents: dragFocus || treeDone ? "none" : undefined }}>
+            {/* TWO SPEEDS, 16 September 2026 (owner: the tree snaps out rather than
+               fading). DRAG_FADE is 0.12s, which is right for the drag focus, where
+               the scenery has to be out of the way before the card moves. On the
+               completion fade it reads as a snap, so that case gets its own 0.7s. */}
+            <g style={{ opacity: removing || scattered || dragFocus || treeDone ? 0 : 1, display: scattered ? "none" : undefined, transition: treeDone && !dragFocus && !removing && !scattered ? "opacity 0.7s ease" : DRAG_FADE, pointerEvents: dragFocus || treeDone ? "none" : undefined }}>
             {/* A solo dog's card pops out of the big circle, so the circle has
                 to be painted first or it covers the card. Every other dog keeps
                 the original order, with the root drawn last. */}
