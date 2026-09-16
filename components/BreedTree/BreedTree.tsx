@@ -7594,57 +7594,27 @@ export default function BreedTree({
   }, [learning]);
   // A card opens next to the main box: to its right if there is room, else its
   // left, cascaded a little per card so two do not land dead on top of each other.
-  const cardSpot = (index: number) => {
-    const r = asideRef.current?.getBoundingClientRect();
-    const vw = typeof window === "undefined" ? 390 : window.innerWidth;
-    const vh = typeof window === "undefined" ? 844 : window.innerHeight;
-    const GAP = 10;
-    // Each card's natural max width, so placement matches what actually renders.
-    const widths = [Math.min(vw * 0.88, 330), Math.min(vw * 0.92, 218), Math.min(vw * 0.92, 218)];
-    let cardW = Math.round(widths[index] ?? 218);
-    if (!r) return { left: 8, top: Math.round(vh * 0.28), width: cardW };
-    // Cards open BELOW the main box so they never cover it, and stay clear of
-    // the pack rail so they never cover that either, with GAP px of breathing
-    // room from both. Each card cascades down a little from the last.
-    const rail = railRef.current?.getBoundingClientRect();
-    let left = Math.round(r.left);
-    if (rail && rail.width > 0) {
-      if (rail.left >= r.right - 1) {
-        // Rail on the right: keep the card's right edge left of it.
-        const maxRight = rail.left - GAP;
-        cardW = Math.min(cardW, Math.round(maxRight - 8));
-        if (left + cardW > maxRight) left = Math.round(maxRight - cardW);
-      } else if (rail.right <= r.left + 1) {
-        // Rail on the left: start the card to the right of it.
-        left = Math.max(left, Math.round(rail.right + GAP));
-      }
-    }
-    // Two per row where the screen allows it, so a second card opens BESIDE the
-    // first rather than 40px down and on top of it. That 40px cascade was the
-    // whole reason they buried each other.
-    const perRow = vw >= 2 * 180 + 3 * GAP ? 2 : 1;
-    if (perRow === 2) cardW = Math.min(cardW, Math.floor((vw - 3 * GAP) / 2));
-    const col = index % perRow;
-    const row = Math.floor(index / perRow);
-    left = left + col * (cardW + GAP);
-    if (left + cardW > vw - 8) {
-      cardW = Math.min(cardW, vw - 16);
-      left = Math.max(8, vw - 8 - cardW);
-    }
-    if (left < 8) left = 8;
-    // ROW_H is an estimate, not a measurement: cardSpot runs at open time,
-    // before the card exists, so its real height cannot be read. Measuring it
-    // would mean opening, measuring and moving, which flickers. 210 is the
-    // tallest of the three at its widest.
-    const ROW_H = 210;
-    let top = Math.round(r.bottom + GAP + row * (ROW_H + GAP));
-    // Never start a card below the screen. This is what put them off the bottom:
-    // the top was taken off the info box, which sits low, with nothing checking
-    // the result was still visible.
-    const MIN_VISIBLE = 150;
-    top = Math.min(top, Math.max(8, vh - MIN_VISIBLE));
-    return { left, top, width: cardW };
-  };
+  /* cardSpot IS GONE, 16 September 2026 (owner: the card positions should match
+     the stylesheet).
+
+     WHAT IT DID AND WHY IT HAD TO GO. It measured the main box and the rail with
+     getBoundingClientRect at the moment a card opened and returned a left, top
+     and width, which were applied INLINE. Inline style beats a stylesheet, so
+     every position rule on .ancCard, .tempCard and .trainCard was dead in
+     practice: the cards opened below the box, two per row, wherever the
+     measurement put them, and the owner's placements this afternoon had no
+     effect in play.
+
+     The three setters now pass null, which is the state the style prop already
+     treated as "use the stylesheet". Nothing else read these positions: the drag
+     is handled inside LearnDragCard through its own transform, so a card still
+     drags and still stays where it is dropped.
+
+     WHAT IS LOST. The cards no longer dodge the rail or each other at runtime.
+     They sit where the CSS says at every screen size, which is the point, so any
+     overlap is now a fixed number to change rather than a measurement to chase.
+     The ancestry card also loses its measured width and takes the stylesheet's
+     min(88vw, 330px) instead. */
   // (Removed 14 Aug 2026: the temperament box no longer force-opens on chum
   // select -- that was the wrong behaviour. It is being replaced by the level-dog
   // info box: one box, open on entering the level, staying open while you
@@ -10535,17 +10505,17 @@ export default function BreedTree({
            all live in .learnDock; nothing here tracks a moving body. */
         <div className={styles.learnDock}>
           {ancHidden && ancestryRows.length > 0 && (
-            <button type="button" className={styles.learnDockBtn} onMouseEnter={() => setHoverHint("open ancestry")} onMouseLeave={() => setHoverHint("")} onClick={() => { setAncPos(cardSpot(0)); setAncHidden(false); }} aria-label="Reopen ancestry" title="Ancestry">
+            <button type="button" className={styles.learnDockBtn} onMouseEnter={() => setHoverHint("open ancestry")} onMouseLeave={() => setHoverHint("")} onClick={() => { setAncPos(null); setAncHidden(false); }} aria-label="Reopen ancestry" title="Ancestry">
               <span className={styles.learnDockIcon}>{ICONS.ancestry}</span>
             </button>
           )}
           {trainHidden && trainingDifficulty[ancestryFor.slug] && (
-            <button type="button" className={styles.learnDockBtn} onMouseEnter={() => setHoverHint("open training")} onMouseLeave={() => setHoverHint("")} onClick={() => { setTrainPos(cardSpot(1)); setTrainHidden(false); }} aria-label="Reopen training" title="Training">
+            <button type="button" className={styles.learnDockBtn} onMouseEnter={() => setHoverHint("open training")} onMouseLeave={() => setHoverHint("")} onClick={() => { setTrainPos(null); setTrainHidden(false); }} aria-label="Reopen training" title="Training">
               <span className={styles.learnDockIcon}>{ICONS.training}</span>
             </button>
           )}
           {tempHidden && chumTraits && (
-            <button type="button" className={styles.learnDockBtn} onMouseEnter={() => setHoverHint("open temperament")} onMouseLeave={() => setHoverHint("")} onClick={() => { setTempPos(cardSpot(2)); setTempHidden(false); }} aria-label="Reopen temperament" title="Temperament">
+            <button type="button" className={styles.learnDockBtn} onMouseEnter={() => setHoverHint("open temperament")} onMouseLeave={() => setHoverHint("")} onClick={() => { setTempPos(null); setTempHidden(false); }} aria-label="Reopen temperament" title="Temperament">
               <span className={styles.learnDockIcon}>{ICONS.infoBox}</span>
             </button>
           )}
