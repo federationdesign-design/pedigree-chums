@@ -2503,7 +2503,7 @@ export default function LineageMap({
 
                The measured expression is untouched: where the frame row sits low
                enough, the counter still rides above it as before. */
-            style={{ top: Math.max(8, vp.h / 2 + LIFT_K * (chumTop - vp.h / 2) - 66) }}
+            style={{ top: Math.max(8, vp.h / 2 + LIFT_K * (chumTop - vp.h / 2) - 116) }} /* -66 -> -116, a further 50 up, 16 September 2026 (owner). The floor of 8 is what catches it on a short screen, so on those this does nothing and 8 is the number to lower next. */
             aria-label={`${filled.size} of ${frameTotal} frames filled`}
           >
             {filled.size}/{frameTotal}

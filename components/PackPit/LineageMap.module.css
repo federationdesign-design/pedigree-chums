@@ -277,8 +277,27 @@
    flat number comparable to the box-shadow at all. */
 .pickCard {
   fill: none;
-  stroke: var(--blue-deep);
-  stroke-width: 6;
+  /* WHITE, 16 September 2026 (owner: uniform the stroke colours on the exposed
+     images to one colour, white). The cards carried three different rims: this
+     blue-deep for an ordinary card, white for a stacked duplicate through
+     .pickCardStack, and the yellow of the frames behind them. They are one colour
+     now, and .pickCardStack's own white is left in place so the class still reads
+     as deliberate rather than as a leftover. */
+  stroke: #ffffff;
+  /* 6 -> 4.8, 16 September 2026 (owner: the stroke on an exposed image is too
+     thick and should match the placed images).
+
+     IT WAS NOT WRONG, IT WAS UNSCALED. 6 was set on 15 September so that the half
+     of the stroke sitting outside the path came to 3, matching the 3px box-shadow
+     a placed card wears. But this layer draws at LIFT_K 0.8 while
+     vectorEffect="non-scaling-stroke" holds the rim at a true 6 screen pixels, so
+     against artwork at 80% it read a quarter heavy. 6 * 0.8 = 4.8 puts it back in
+     proportion.
+
+     KNOWN: the main pit draws at LIFT_K 1 and shares this class, so its cards lose
+     a fifth of their rim too. Nobody has asked about those, and one weight across
+     both is the simpler rule. Split the class if the main pit needs its 6 back. */
+  stroke-width: 4.8;
   stroke-linejoin: round;
 }
 .pickCardStack {

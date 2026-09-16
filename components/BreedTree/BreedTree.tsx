@@ -10454,7 +10454,18 @@ export default function BreedTree({
                       already enlarged, so there is room. A span rather than a
                       button because it sits inside one; the press is stopped
                       here so the card does not deselect underneath it. */}
-                  {ancestryFor?.slug === r.slug && (
+                  {/* GONE ONCE THE CHUM IS COLLECTED, 16 September 2026 (owner: the
+                      "i" persists after a collect and lets the dog be collected a
+                      second time).
+
+                      The badge only checked whether the card was SELECTED. A
+                      collected card stayed selectable, so the "i" stayed, the
+                      layer reopened and its green Collect button was still live,
+                      which paid out again. The quick-collect tick beside it
+                      already hid itself on the same condition; this brings the two
+                      into line, and closing the only door into the layer is what
+                      makes the collect a one-time affair. */}
+                  {ancestryFor?.slug === r.slug && !collectedChums?.has(r.name) && (
                     <span
                       className={styles.relCardInfo}
                       role="button"
