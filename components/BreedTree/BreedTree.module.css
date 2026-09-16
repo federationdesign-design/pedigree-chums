@@ -1635,12 +1635,6 @@
    rim where the others are navy with yellow. Nothing about its geometry belongs
    here, or the drift starts again. Position stays on .learnPlay, which is still
    on the element. */
-.learnPlayBtn {
-  background: #22c55e;
-  border-color: #ffffff;
-}
-.learnPlayBtn .learnDockIcon { color: #ffffff; }
-.learnPlayBtn .learnDockIcon svg { stroke: none; fill: #ffffff; }
 .learnDockBtn {
   width: 75.6px;    /* the back square on desktop: 84 * 1.2 * 0.75 */
   height: 75.6px;
@@ -1665,6 +1659,31 @@
   height: 41px;
   color: var(--yellow, #ffd23e);
 }
+
+/* PLAY'S OWN LOOK AND POSITION, RE-ASSERTED, 16 September 2026.
+
+   CORRECTS MY OWN BREAKAGE FROM 15 SEPTEMBER. When PLAY became a .learnDockBtn,
+   this modifier was written ABOVE that rule with a single class. Same
+   specificity, later rule wins, so .learnDockBtn overrode all of it: the green
+   went navy and the white rim went yellow, so it read as another information
+   button, and `position: relative` overrode .learnPlay's `position: absolute`,
+   which dropped the button out of its corner and up to the top of the page.
+
+   TWO FIXES, BOTH STRUCTURAL RATHER THAN A HIGHER NUMBER. It now sits AFTER
+   .learnDockBtn, and every selector carries two classes so it outranks the base
+   rule whatever the order becomes later. Do not move this block above
+   .learnDockBtn again.
+
+   GEOMETRY STILL COMES FROM .learnDockBtn, which was the point of the change:
+   size, rim weight and corner radius are set once per breakpoint and PLAY cannot
+   drift from the row. Only the colours and the position are re-asserted here. */
+.learnDockBtn.learnPlayBtn {
+  position: absolute;
+  background: #22c55e;
+  border-color: #ffffff;
+}
+.learnDockBtn.learnPlayBtn .learnDockIcon { color: #ffffff; }
+.learnDockBtn.learnPlayBtn .learnDockIcon svg { stroke: none; fill: #ffffff; }
 .learnDockIcon svg { width: 100%; height: 100%; stroke: var(--yellow, #ffd23e); }
 /* Start-screen SVG captions: "play"/"learn" above the PLAY/LEARN squares and
    the two-line "back to main page" under the red close square. They render only
