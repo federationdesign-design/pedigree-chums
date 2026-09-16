@@ -1081,6 +1081,11 @@ export default function LineageMap({
   const [dragCat, setDragCat] = useState<"chum" | "alive" | "extinct" | null>(null); // category of the card being dragged, to light matching frames
   const [dragImg, setDragImg] = useState<string | null>(null); // artwork of the card being dragged, to light its one assigned frame
   const [dragName, setDragName] = useState<string | null>(null); // name of the card being dragged, shown on its lit target frame /* pickup-name */
+  /* WHICH card is in hand, 16 September 2026 (owner: the loose pile hides the
+     frame you are aiming at). dragImg and dragName cannot tell two copies of the
+     same dog apart, and the card being dragged is the one card that must stay
+     visible while the rest fade, so it is tracked by id. */
+  const [dragCardId, setDragCardId] = useState<string | null>(null);
   const [shakeFrame, setShakeFrame] = useState<string | null>(null); // frame doing the "no" head-shake on a wrong drop
   const [wrongDog, setWrongDog] = useState<{ frameId: string; x: number; y: number } | null>(null); // flash "Wrong dog" on bad drop
   const [correctFlash, setCorrectFlash] = useState<string | null>(null); // frameId of the correct frame to flash yellow on wrong drop
@@ -3201,7 +3206,24 @@ export default function LineageMap({
                       ? `${cxf.transform} ${zoom}`
                       : `translate(${c.cardX},${c.cardY}) rotate(${cardDeg + fan}) translate(${-c.cardX},${-c.cardY}) ${zoom}`;
                   })()}
-                  style={{ ...(cxf ? { opacity: cxf.opacity } : packed ? { pointerEvents: "none" as const, ...(isDupImg(c.img) && !isTopOfStack(c) && !PACK_BREEDS.has(c.name) ? { filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.35))" } : {}) } : (placedSet.has(c.id) && !PACK_BREEDS.has(c.name)) ? { cursor: "zoom-in" } : {}), ...((placedSet.has(c.id) || packed) && !PACK_BREEDS.has(c.name) ? { pointerEvents: "all" as const } : {}) }}
+                  /* THE LOOSE PILE STANDS ASIDE WHILE A CARD IS IN HAND,
+                     16 September 2026 (owner: dragging on a phone, the other cards
+                     cover the frame you are aiming at and the lit outline is barely
+                     visible).
+
+                     THIS REVERSES A RECORDED DECISION. The drag focus note says the
+                     loose cards stay because they are the pile you are working
+                     through and hiding them would hide the job. That holds on a
+                     desktop with room to spare; on a phone with fifty cards it is
+                     the pile that hides the target. The owner has seen both and
+                     chosen the target.
+
+                     The card in hand keeps its opacity, which is why dragCardId
+                     exists: two copies of the same dog share an image and a name, so
+                     neither could pick out the one being moved. Placed and stacked
+                     cards are untouched, so the board you have already built stays
+                     on screen. */
+                  style={{ ...(dragFocus && dragCardId !== c.id && !placedSet.has(c.id) && !stackedIds.has(c.id) ? { opacity: 0, pointerEvents: "none" as const, transition: DRAG_FADE } : {}), ...(cxf ? { opacity: cxf.opacity } : packed ? { pointerEvents: "none" as const, ...(isDupImg(c.img) && !isTopOfStack(c) && !PACK_BREEDS.has(c.name) ? { filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.35))" } : {}) } : (placedSet.has(c.id) && !PACK_BREEDS.has(c.name)) ? { cursor: "zoom-in" } : {}), ...((placedSet.has(c.id) || packed) && !PACK_BREEDS.has(c.name) ? { pointerEvents: "all" as const } : {}) }}
 
                   onClick={(e) => {
                     e.stopPropagation();
@@ -3251,6 +3273,7 @@ export default function LineageMap({
                     cardDrag.current = { id: e.pointerId, sx: e.clientX, sy: e.clientY, ox: c.cardX, oy: c.cardY, moved: false };
                     setDragCat(PACK_BREEDS.has(c.name) ? "chum" : isAlive(c.status) ? "alive" : "extinct"); // light up the matching frames
                     setDragImg(c.img);
+                    setDragCardId(c.id);
                     setDragName(c.name); /* pickup-name */
                     setDragXY({ x: e.clientX, y: e.clientY });
                   }}
@@ -3360,11 +3383,11 @@ export default function LineageMap({
                       cardDrag.current = null;
                     }
                     setDragCat(null);
-                    setDragImg(null);
+                    setDragImg(null); setDragCardId(null);
                     setDragName(null); /* pickup-name */
                     setDragXY(null);
                   }}
-                  onPointerCancel={() => { if (DROP_DBG) dropLog(`CANCEL#${DROP_DBG_N} ${c.name}`); /* DIAGNOSTIC item 8, REMOVE ONCE FIXED */ cardDrag.current = null; setDragCat(null); setDragImg(null); setDragXY(null); }}
+                  onPointerCancel={() => { if (DROP_DBG) dropLog(`CANCEL#${DROP_DBG_N} ${c.name}`); /* DIAGNOSTIC item 8, REMOVE ONCE FIXED */ cardDrag.current = null; setDragCat(null); setDragImg(null); setDragCardId(null); setDragXY(null); }}
                 >
                   <g className={styles.pickWobble}>
                   {isSelfCard(c.name) ? (() => {
