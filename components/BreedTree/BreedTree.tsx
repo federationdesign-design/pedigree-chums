@@ -10350,7 +10350,27 @@ export default function BreedTree({
                    27. Connect ancestry above two more pack dogs on that circle and
                    it is three columns again. The number to raise is this one; the
                    height cost is a row of about 46px per step. */
-                gridTemplateRows: `repeat(${Math.min(14, renderRail.length)}, auto)`,
+                /* EVEN COLUMNS, AND COUNTED WITHOUT THE LEAVERS, 16 September 2026 (owner).
+
+                   TWO CHANGES IN ONE LINE. First, rows are half the list rounded up rather
+                   than filling the first column to the cap: four dogs give two and two,
+                   twenty give ten and ten. Math.min(14, n) stacked four in one column and
+                   split twenty as 14 and 6.
+
+                   Second, the LEAVERS ARE NOT COUNTED. That is the three-column flash the
+                   owner caught while hovering the bottom left icon: renderRail holds
+                   departing cards for 340ms so they can animate out, so during a swap it
+                   carries the new list PLUS the old one's leavers. Halving that briefly
+                   asked for more rows than the rail has room for and the overflow spilled
+                   into a third column until the timer cleared. The hover was not the
+                   cause; it was re-rendering while a swap was in flight. Counting only the
+                   cards that are staying keeps the row count on the list the player ends
+                   up with, and the leavers fade out of the columns they were already in.
+
+                   The 14 stays as the ceiling and only bites past 28, which nothing
+                   reaches: the busiest circle is Old hunting dogs of the Celts at 27.
+                   Math.max(1, ...) keeps a single-chum rail from asking for zero rows. */
+                gridTemplateRows: `repeat(${Math.max(1, Math.min(14, Math.ceil(renderRail.filter((r) => !r.leaving).length / 2)))}, auto)`,
                 visibility: "visible", // shows through even when the box is hidden
                 ...(railPin
                   ? { position: "fixed" as const, top: railPin.top, left: railPin.left, right: "auto" }
