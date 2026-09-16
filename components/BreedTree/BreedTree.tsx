@@ -2987,6 +2987,9 @@ export default function BreedTree({
      The pit has its own; this is the learn area's, using the same artwork and the
      same corner, so a collect looks the same wherever it happens. */
   const [chumBoxPop, setChumBoxPop] = useState(false);
+  /* The running chum tally, shown big and white over the box as one lands. Null when
+     nothing has just been collected. */
+  const [chumPop, setChumPop] = useState<number | null>(null);
   const [learnNode, setLearnNode] = useState<Node | null>(null);
   const [learnCard, setLearnCard] = useState<{ name: string; image: string; x: number; y: number; angle: number; r: number; ring: string; ringFrac: number; ringPx: number } | null>(null);
   const removedNodesRef = useRef<Set<Node>>(new Set());
@@ -10632,6 +10635,14 @@ export default function BreedTree({
                         card.style.setProperty("--fly-y", `${Math.round(toY)}px`);
                         card.classList.add(styles.relCardFly);
                         setChumBoxPop(true);
+                        /* The pit answers a collect with a big white tally and a
+                           burst of sparks under the box. The learn area had the box
+                           and the confetti but neither of those, so a collect here
+                           read as quieter than the same act in the pit. Both are
+                           built below rather than imported: the pit's own versions
+                           are drawn inside LineageMap's svg, and this is HTML. */
+                        setChumPop(chumsCollected + 1);
+                        window.setTimeout(() => setChumPop(null), 1400);
                         window.setTimeout(() => setChumBoxPop(false), 1400);
                         window.setTimeout(() => {
                           card.classList.remove(styles.relCardFly);
@@ -10659,6 +10670,17 @@ export default function BreedTree({
           )}
         </div>
       </div>
+      {chumPop !== null && (
+        <div className={styles.chumPopWrap} aria-hidden="true">
+          <div className={styles.chumPopNum}>{chumPop}</div>
+          {/* Eight sparks on a circle, each rotated to its own angle and thrown
+              outward by its own animation. A ring rather than a random scatter so it
+              reads as a burst from the box rather than as debris. */}
+          {[0, 45, 90, 135, 180, 225, 270, 315].map((a) => (
+            <span key={a} className={styles.chumSpark} style={{ transform: `rotate(${a}deg)` }} />
+          ))}
+        </div>
+      )}
       {chumBoxPop && (
         /* A plain <img>, matching the pit's own .cardBox, which uses the same file
            the same way. next/image is not wanted here: this is a decorative SVG

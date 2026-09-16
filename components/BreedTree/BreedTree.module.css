@@ -1426,6 +1426,68 @@
 }
 /* The learn area's card-pack box. Same artwork and the same corner as the pit's
    .cardBox, and the same pop, so a collect reads the same in both places. */
+/* THE COLLECT FLOURISH, 16 September 2026 (owner: the pit shows a big white number
+   and fireworks under the box, and the learn area did not).
+
+   Anchored to the same corner as .chumCardBox below and sized from the same
+   --box-size, so the number sits over the box and the sparks come from behind it
+   whatever the screen width. z-index 41 puts the pair above the box, which is 39,
+   and above the flying card at 40, so the card lands INTO the burst. */
+.chumPopWrap {
+  position: fixed;
+  --box-size: clamp(200px, 18vw, 280px);
+  left: calc(var(--box-size) * 0.16);
+  bottom: calc(var(--box-size) * 0.34);
+  width: 0;
+  height: 0;
+  z-index: 41;
+  pointer-events: none;
+}
+/* The tally itself: the pit's own weight and colour, rising and fading as it grows.
+   translate(-50%, -50%) centres it on the anchor point, and the keyframes carry that
+   through every step or it would jump to the corner as the animation starts. */
+.chumPopNum {
+  position: absolute;
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: clamp(44px, 9vw, 72px);
+  line-height: 1;
+  color: #ffffff;
+  text-shadow: 0 3px 0 rgba(10, 58, 87, 0.45);
+  animation: chumPopNum 1.3s cubic-bezier(0.2, 0.9, 0.3, 1) both;
+}
+@keyframes chumPopNum {
+  0%   { transform: translate(-50%, -50%) scale(0.4); opacity: 0; }
+  22%  { transform: translate(-50%, -62%) scale(1.15); opacity: 1; }
+  40%  { transform: translate(-50%, -58%) scale(1); opacity: 1; }
+  100% { transform: translate(-50%, -125%) scale(1); opacity: 0; }
+}
+/* One spark. The wrapper rotates it to its angle, so the keyframes only ever throw
+   it along its own x: eight copies of one animation rather than eight animations. */
+.chumSpark {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 2px;
+  background: var(--yellow, #ffd23e);
+  transform-origin: 0 0;
+}
+.chumSpark::after {
+  content: "";
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  background: inherit;
+  animation: chumSpark 0.75s ease-out both;
+}
+@keyframes chumSpark {
+  0%   { transform: translateX(0) scale(1); opacity: 1; }
+  70%  { opacity: 1; }
+  100% { transform: translateX(86px) scale(0.3); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .chumPopNum, .chumSpark::after { animation-duration: 0.01ms; }
+}
 .chumCardBox {
   position: fixed;
   --box-size: clamp(200px, 18vw, 280px);
