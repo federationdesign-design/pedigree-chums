@@ -1601,8 +1601,17 @@ function LearnDragCard({
 // The temperament card body: a Pros/Cons toggle over white bullet text. Only
 // the active toggle is coloured, and as an outline (green pros, red cons), not
 // a filled block. Keyed per chum so it always reopens on Pros.
-function TemperamentBody({ pros, cons }: { pros: string[]; cons: string[] }) {
-  const [tab, setTab] = useState<"pros" | "cons">("pros");
+/* THE TAB IS THE PARENT'S NOW, 16 September 2026 (owner: the toggle should persist
+   from chum to chum, because switching it back on every dog makes comparing them
+   impossible).
+
+   WHY IT RESET. The tab was local state here AND this component is rendered with
+   key={ancestryFor.slug}, so picking a different chum remounted it and the state
+   went back to its initial value every time. Lifting it to BreedTree survives the
+   remount; the key can stay, since there is no longer any state inside to lose.
+
+   It also defaults to "cons" now, per the same request. */
+function TemperamentBody({ pros, cons, tab, setTab }: { pros: string[]; cons: string[]; tab: "pros" | "cons"; setTab: (t: "pros" | "cons") => void }) {
   const items = tab === "pros" ? pros : cons;
   return (
     <>
@@ -2381,6 +2390,10 @@ export default function BreedTree({
   const [ancHidden, setAncHidden] = useState(false);
   const [trainHidden, setTrainHidden] = useState(false);
   const [tempHidden, setTempHidden] = useState(false);
+  /* CONS FIRST, AND IT STICKS, 16 September 2026 (owner). Held here rather than
+     inside TemperamentBody because that component is keyed on the chum's slug and
+     remounts on every pick, which is what kept resetting the toggle. */
+  const [tempTab, setTempTab] = useState<"pros" | "cons">("cons");
   const [ancPos, setAncPos] = useState<{ left: number; top: number; width: number } | null>(null);
   const [trainPos, setTrainPos] = useState<{ left: number; top: number; width: number } | null>(null);
   const [tempPos, setTempPos] = useState<{ left: number; top: number; width: number } | null>(null);
@@ -10613,7 +10626,7 @@ export default function BreedTree({
           onClose={() => setTempHidden(true)}
           closeLabel="Close temperament"
         >
-          <TemperamentBody key={ancestryFor.slug} pros={chumTraits.pros ?? []} cons={chumTraits.cons ?? []} />
+          <TemperamentBody key={ancestryFor.slug} pros={chumTraits.pros ?? []} cons={chumTraits.cons ?? []} tab={tempTab} setTab={setTempTab} />
         </LearnDragCard>
       )}
       {dockAside && ancestryFor && (ancHidden || trainHidden || tempHidden) && (

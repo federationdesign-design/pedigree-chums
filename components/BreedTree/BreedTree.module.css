@@ -1432,6 +1432,10 @@
    page behind it, which on a fixed overlay reads as the whole screen jumping. */
 .ancCard {
   position: fixed;
+  /* 20% NARROWER, 16 September 2026 (owner): 330 -> 264. The rows lost their
+     percentage bar earlier the same day, which freed 64px, so the names still fit
+     in the narrower card. */
+  width: min(88vw, 264px);
   /* BELOW THE TEMPERAMENT CARD, 16 September 2026 (owner), matching the layout he
      arranged by hand on the phone. It was top 6% / right 4%, up in the corner
      where it covered the chum rail.
@@ -1452,7 +1456,6 @@
   top: calc(62% - 10px);
   left: 3px;
   right: auto;
-  width: min(88vw, 330px);
   z-index: 21;
   touch-action: pinch-zoom;
   background: #0a2a3f;
@@ -1613,7 +1616,9 @@
   bottom: auto;
   left: 210px;
   right: auto;
-  width: min(92vw, 185px);
+  /* 20% THINNER, 16 September 2026 (owner): 185 -> 148. The gauge inside was cut
+     15% earlier the same day, which is what makes the narrower card fit. */
+  width: min(92vw, 148px);
   /* matches .tempCard, see the note there */
   min-height: 190px;
   width: min(92vw, 218px);
