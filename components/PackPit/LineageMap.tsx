@@ -2774,7 +2774,13 @@ export default function LineageMap({
 
                The measured expression is untouched: where the frame row sits low
                enough, the counter still rides above it as before. */
-            style={{ top: Math.max(18, vp.h / 2 + LIFT_K * (chumTop - vp.h / 2) - 106) }} /* 10px DOWN, 16 September 2026 (owner): the floor 8 -> 18 and the offset -116 -> -106, so it moves whichever of the two is governing. */ /* -66 -> -116, a further 50 up, 16 September 2026 (owner). The floor of 8 is what catches it on a short screen, so on those this does nothing and 8 is the number to lower next. */
+            /* THE TOP, IN ONE PLACE. Three moves on 16 September 2026, all the
+               owner's: -66 to -116 (up 50), then the floor 8 to 18 and the offset
+               to -106 (down 10), and now up 10 again, so the floor goes 18 -> 8 and
+               the offset -106 -> -116. Both numbers move together every time,
+               because whichever is larger is the one that governs: the measured
+               expression on a tall screen, the floor on a short one. */
+            style={{ top: Math.max(8, vp.h / 2 + LIFT_K * (chumTop - vp.h / 2) - 116) }}
             aria-label={`${filled.size} of ${frameTotal} frames filled`}
           >
             {filled.size}/{frameTotal}
