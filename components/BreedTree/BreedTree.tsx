@@ -8,7 +8,7 @@ import { splitName } from "../PackPit/splitName";
 import { interpolateZoom } from "d3-interpolate";
 import type { LineageNode } from "../../data/lineage";
 import { nodeStatus, TAG_STYLE, type BreedTag } from "../BreedTreeMap/BreedTreeMap";
-import { descendantPackBreeds, ancestryBreakdown, ancestorShareOf, ancestorAppearancesOf, treesContaining } from "../../data/lineageArchive";
+import { descendantPackBreeds, ancestryFullList, ancestorShareOf, ancestorAppearancesOf, treesContaining } from "../../data/lineageArchive";
 import TrainingCard from "../TrainingCard/TrainingCard";
 import { CONSENT_KEY } from "../../lib/consent";
 import trainingDifficulty from "../../data/trainingDifficulty";
@@ -7570,7 +7570,12 @@ export default function BreedTree({
   const chumsCollected = collectedChums?.size ?? 0;
   // That dog's ancestry breakdown, the same figures as its own page.
   const ancestryRows = useMemo(
-    () => (ancestryFor ? ancestryBreakdown(ancestryFor.name) : []),
+    /* THE FULL LIST, NOT THE TOP EIGHT, 16 September 2026 (owner). The card showed
+       8 rows on the overlapping raw-share model while the ancestor pack showed
+       every ancestor on the influence model: on the Jackapoo, 8 rows adding to
+       295% against 51 adding to 100. Same measure and same length now, and the
+       card scrolls. See the note on ancestryFullList. */
+    () => (ancestryFor ? ancestryFullList(ancestryFor.name) : []),
     [ancestryFor],
   );
   // That dog's pros and cons, for the temperament card. Keyed by breed name.
@@ -10482,6 +10487,9 @@ export default function BreedTree({
           onClose={() => setAncHidden(true)}
           closeLabel="Close ancestry"
         >
+          {/* The rows scroll inside a capped box, see .ancScroll. The card itself
+              keeps its size whatever the lineage length. */}
+          <div className={styles.ancScroll}>
           {ancestryRows.map((a) => (
             /* THE BAR IS GONE, 16 September 2026 (owner: the middle percentage
                bar is always blank and we can show the full name instead).
@@ -10497,9 +10505,10 @@ export default function BreedTree({
                unused, so putting it back is one line here. */
             <div key={a.name} className={styles.ancRow} title={a.name}>
               <span className={styles.ancName}>{a.name}</span>
-              <span className={styles.ancPct}>{a.pct}%</span>
+              <span className={styles.ancPct}>{a.pct.toFixed(1)}%</span>
             </div>
           ))}
+          </div>
         </LearnDragCard>
       )}
       {dockAside && ancestryFor && !trainHidden && trainingDifficulty[ancestryFor.slug] && (

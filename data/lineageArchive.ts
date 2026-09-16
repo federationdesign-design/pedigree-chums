@@ -112,6 +112,26 @@ export function ancestryBreakdown(breedName: string): { name: string; pct: numbe
     .slice(0, 8);
 }
 
+/* THE ANCESTRY CARD'S OWN LIST, added 16 September 2026 (owner: the card shows 8
+   and the pack shows 50, and they should be the same).
+
+   TWO THINGS WERE DIFFERENT, not one. ancestryBreakdown above cuts to the top 8,
+   AND its figures are raw shares of the whole dog, which overlap because
+   ancestors nest inside one another. On the Jackapoo its eight rows already add
+   to 295% while the full list has 51 entries. The ancestor pack moved onto
+   ancestralInfluence the same morning, where every ancestor carries one figure
+   and the set adds to exactly 100.
+
+   So this is simply ancestralInfluence, uncut. One measure, one length, and the
+   card's own total is now 100 like the pack's. ancestryBreakdown is left in place
+   for anything still calling it.
+
+   Figures come through as tenths, so a trace reads 0.4 rather than rounding to
+   nothing. The card formats them. */
+export function ancestryFullList(breedName: string): { name: string; pct: number }[] {
+  return ancestralInfluence(resolveLineageName(breedName)).map((r) => ({ name: r.name, pct: r.pct }));
+}
+
 // A single breed's share of ONE named ancestor, however deep in its tree.
 // Same per-node rounding and merge as ancestryBreakdown, but no top-8 cut, so
 // a distant descendant (e.g. Bull Terrier under a Celtic-level circle) still

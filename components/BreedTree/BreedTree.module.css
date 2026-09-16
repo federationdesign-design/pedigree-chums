@@ -1372,6 +1372,17 @@
 }
 /* Ancestry card: opens below the box when a rail dog is tapped, same breakdown
    as that breed's own page. Rides with the box like the rail does. */
+/* SCROLLS NOW, 16 September 2026 (owner), because the card reads the full
+   ancestor list rather than a top eight: 51 rows on the Jackapoo against 8
+   before. The height is capped and the rows scroll inside it, so the card stays
+   the size it was however long the lineage is.
+
+   THE CAP IS vh-BASED, NOT A PIXEL COUNT, because the card sits at top 62% with
+   the temperament card above it, so a fixed height would run off a short screen.
+   32vh leaves room under it on an 844 phone.
+
+   overscroll-behavior: contain so a flick inside the list does not scroll the
+   page behind it, which on a fixed overlay reads as the whole screen jumping. */
 .ancCard {
   position: fixed;
   /* BELOW THE TEMPERAMENT CARD, 16 September 2026 (owner), matching the layout he
@@ -1440,6 +1451,11 @@
   color: #ffffff;
   padding: 0 16px 8px;
   opacity: 0.85;
+}
+.ancScroll {
+  max-height: 32vh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 .ancRow {
   display: grid;
