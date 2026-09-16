@@ -43,7 +43,11 @@ export default function TrainingCard({ data, compact = false }: Props) {
 
       {/* Arc gauge */}
       <div className={styles.gaugeWrap}>
-        <svg viewBox="0 0 260 110" width={compact ? 208 : 260} height={compact ? 88 : 110} style={compact ? { maxWidth: "100%", height: "auto" } : undefined} aria-label={`Training difficulty gauge: ${score} out of 5`}>
+        <svg viewBox="0 0 260 110" /* GAUGE 15% SMALLER, 16 September 2026 (owner), compact only, which is the size
+             the learn-area card uses: 208 -> 177 and 88 -> 75. The viewBox is untouched,
+             so the arc scales rather than reflows, and the label pill below is a sibling
+             in .gaugeWrap and keeps its own size. */
+          width={compact ? 177 : 260} height={compact ? 75 : 110} style={compact ? { maxWidth: "100%", height: "auto" } : undefined} aria-label={`Training difficulty gauge: ${score} out of 5`}>
           {/* Track arc */}
           <path
             d={describeArc(GAUGE_CX, GAUGE_CY, GAUGE_R, 180, 360)}

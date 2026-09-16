@@ -10529,7 +10529,7 @@ export default function BreedTree({
           style={ancPos ? { left: ancPos.left, top: ancPos.top, width: ancPos.width, right: "auto", bottom: "auto" } : undefined}
           ariaLabel={`Ancestry of ${ancestryFor.name}`}
           icon={ICONS.ancestry}
-          title={ancestryFor.name}
+          title={"Ancestry"}  /* was the dog name; the three card titles now read Ancestry, Training, Temperament */
           titleWhite
           onClose={() => setAncHidden(true)}
           closeLabel="Close ancestry"
@@ -10564,7 +10564,7 @@ export default function BreedTree({
           style={trainPos ? { left: trainPos.left, top: trainPos.top, right: "auto", bottom: "auto" } : undefined}
           ariaLabel={`Training for ${ancestryFor.name}`}
           icon={ICONS.training}
-          title={<>Training <span className={styles.cardTitleName}>{ancestryFor.name}</span></>}
+          title={"Training"}  /* the dog name is gone, 16 Sept 2026 (owner): the card sits beside the dog it describes, so repeating it in every title was noise. cardTitleName is unused now. */
           onClose={() => setTrainHidden(true)}
           closeLabel="Close training"
         >
@@ -10577,7 +10577,7 @@ export default function BreedTree({
           style={tempPos ? { left: tempPos.left, top: tempPos.top, right: "auto", bottom: "auto" } : undefined}
           ariaLabel={`Temperament of ${ancestryFor.name}`}
           icon={ICONS.infoBox}
-          title={<>Temperament <span className={styles.cardTitleName}>{ancestryFor.name}</span></>}
+          title={"Temperament"}  /* the dog name is gone, 16 Sept 2026 (owner): the card sits beside the dog it describes, so repeating it in every title was noise. cardTitleName is unused now. */
           onClose={() => setTempHidden(true)}
           closeLabel="Close temperament"
         >

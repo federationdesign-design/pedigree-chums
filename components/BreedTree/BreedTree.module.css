@@ -388,7 +388,8 @@
      done here: moving a box and resizing it are two different requests. */
   /* 15px FURTHER LEFT, 16 September 2026 (owner). 0 -> -15, so the box's rounded
      left corners run off the screen edge and the fill meets it square. */
-  left: -15px;
+  /* 8px FURTHER LEFT, 16 September 2026 (owner): -15 -> -23. */
+  left: -23px;
   /* The WHOLE box is the drag handle now, so the browser must never claim the
      gesture. .asideDocked sets pinch-zoom here, which is overridden. Nothing inside
      scrolls any more, so there is no pan to preserve. */
@@ -935,6 +936,13 @@
    the cards themselves exactly where they were. */
 .relRail {
   position: absolute;
+  /* 10% SMALLER, 16 September 2026 (owner). A scale on the rail rather than a
+     smaller card size, so the cards, their gaps, the tick and the two badges all
+     come down together and none of the measured offsets inside need redoing.
+     transform-origin pins the top right, which is the corner the rail is anchored
+     from, so it shrinks inwards. */
+  scale: 0.9;
+  transform-origin: top right;
   top: -12px;
   z-index: 12;
   display: grid;
@@ -1242,7 +1250,11 @@
    overflow is opened up because the name label hangs below the tile, and the
    tile is only 38 to 56px so it could never sit inside. */
 .relCardDone {
-  background: #1f9d55;
+  /* ONE GREEN, 16 September 2026 (owner: uniform the two greens on the collected
+     card and the tick). The fill was #1f9d55 against a #22c55e rim and a #22c55e
+     quick-collect button, so the card read as a third colour. All three are
+     #22c55e now. */
+  background: #22c55e;
   border-color: #22c55e;
   overflow: visible;
 }
@@ -1422,8 +1434,10 @@
      scale walks the card off the edge it is pinned to. */
   scale: 0.9;
   transform-origin: left center;
-  top: 62%;
-  left: 0;
+  /* 3px RIGHT AND 10px UP, 16 September 2026 (owner). This card is not centred by
+     a translate, so the lift goes straight into `top`. */
+  top: calc(62% - 10px);
+  left: 3px;
   right: auto;
   width: min(88vw, 330px);
   z-index: 21;
@@ -1578,13 +1592,17 @@
      it draws 167, so the pair come to 367 on a 390 screen and still clear the
      right edge. */
   top: 50%;
-  translate: 0 -50%;
+  /* 10px RIGHT AND 20px UP, 16 September 2026 (owner). Same 20 as .tempCard so
+     the pair stay level with each other. */
+  translate: 0 calc(-50% - 20px);
   scale: 0.9;
   transform-origin: left center;
   bottom: auto;
-  left: 200px;
+  left: 210px;
   right: auto;
   width: min(92vw, 185px);
+  /* matches .tempCard, see the note there */
+  min-height: 190px;
   width: min(92vw, 218px);
   z-index: 21;
   touch-action: pinch-zoom;
@@ -1661,13 +1679,18 @@
   scale: 0.9;
   transform-origin: left center;
   bottom: auto;
-  /* HARD LEFT TOO, 16 September 2026 (owner: on the left edge, on the same
-     vertical axis as the main blue box). Was 4%. Both are 0 now, so the card and
-     the box share one left edge at every screen width, which a percentage could
-     not guarantee. .trainCard stays at 4% deliberately: it sits at the bottom and
-     was not asked to move. */
-  left: 0;
+  /* 5px RIGHT AND 20px UP, 16 September 2026 (owner). The lift goes in the
+     translate rather than in `top`, because translate is already centring this
+     card and the two compose in one property. */
+  translate: 0 calc(-50% - 20px);
+  left: 5px;
   right: auto;
+  /* ONE HEIGHT FOR BOTH CARDS, 16 September 2026 (owner: training and temperament
+     should always appear the same height). Content decides how tall each wants to
+     be, a four-line pros list against a gauge, so a min-height is the only way to
+     hold them level. 190 is the taller of the two at this scale. A longer pros
+     list still grows past it; the pair only stay level up to that point. */
+  min-height: 190px;
   width: min(92vw, 218px);
   z-index: 21;
   touch-action: pinch-zoom;
