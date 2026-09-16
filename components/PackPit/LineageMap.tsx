@@ -2884,6 +2884,31 @@ export default function LineageMap({
             {filled.size}/{frameTotal}
           </div>
         )}
+        {/* THE SECOND COUNTER, 16 September 2026 (owner: one counter for the frames
+            and a second for every image that has to be placed).
+
+            THE TWO COUNT DIFFERENT THINGS. The first is frames filled, one frame per
+            DISTINCT picture. This is CARDS, one per appearance, so a dog reached by
+            two routes shows once in the first and twice in this one. On the Irish
+            Wolfhound that is 5 against 6; on the Doberman 20 against 51.
+
+            SAME NUMBERS THE PROGRESS BAR USES, cardsDone and totalCards, so the two
+            cannot drift apart. totalCards counts the whole tree rather than the
+            cards popped so far, so this reads x/6 from the start rather than
+            climbing as branches open.
+
+            SAME TOP, SET FROM THE SAME EXPRESSION, so the pair stay level whatever
+            the measured position or the floor decides. Only the left differs, in the
+            stylesheet. */}
+        {totalCards > 0 && !packed && !collecting && (
+          <div
+            className={styles.cardCount}
+            style={{ top: Math.max(8, vp.h / 2 + LIFT_K * (chumTop - vp.h / 2) - 116) }}
+            aria-label={`${cardsDone} of ${totalCards} images placed`}
+          >
+            {cardsDone}/{totalCards}
+          </div>
+        )}
     <div
       ref={overlayRef}
       // BACKGROUND: the chum family tree is back on the faint brand wash.

@@ -802,6 +802,40 @@
   font-size: 14.4px;
   pointer-events: none;
 }
+/* THE CARD COUNTER, 16 September 2026 (owner), sitting beside the frame counter.
+   Everything but the left edge is inherited by duplication from .frameCount below,
+   deliberately: the two are a pair and must read as one row. Keep them in step.
+
+   THE 100px IS THE FRAME COUNTER'S OWN WIDTH PLUS A GAP, not a guess: "20/20" at
+   24px in the display face runs about 60px of glyphs inside 32px of padding, so 92
+   wide, and 8 of air. The phone rule below uses 78 for the same sum at 18px. If the
+   counter's type or padding changes, these two move with it.
+
+   A LEVEL COULD REACH THREE DIGITS EACH SIDE: the Jackapoo is 229 cards. At that
+   width the pair would meet, and the fix then is to widen this offset rather than
+   shrink either counter. */
+.cardCount {
+  position: fixed;
+  left: calc(clamp(6px, 3.5vw, 30px) + 100px);
+  z-index: 62;
+  padding: 10px 16px 6px 16px;
+  border-radius: 20px;
+  background: var(--navy);
+  color: #ffffff;
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: 24px;
+  line-height: 1.1;
+  letter-spacing: 0.5px;
+  pointer-events: none;
+  box-shadow: 0 3px 0 rgba(10, 58, 87, 0.3);
+}
+@media (max-width: 640px) {
+  .cardCount {
+    left: calc(clamp(6px, 3.5vw, 30px) + 78px);
+    font-size: 18px;
+    padding: 8px 13px 4px 13px;
+  }
+}
 .frameCount {
   position: fixed;
   /* DOWN FROM 26, 2 September 2026 (owner): it sat under the level's own profile
