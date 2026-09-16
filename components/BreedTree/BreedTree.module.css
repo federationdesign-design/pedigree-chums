@@ -425,7 +425,8 @@
      KNOWN: the box now covers the portrait and the dog name, which sit at top
      12px and are z-index 0 since the same day. Push this down to about 100px to
      clear a two-row title instead. */
-  top: 12px;
+  /* 12 -> 9, 3px up, 16 September 2026 (owner). */
+  top: 9px;
   bottom: auto;
   /* GUARD, added 31 Aug 2026 alongside the 1.32. The width above grows faster than
      the screen does, so on a wide phone it overruns the right edge: at 430px the sum
@@ -1490,16 +1491,19 @@
      content-driven and cannot be read from CSS, so if a long temperament list
      pushes into this one, this is the number to raise.
 
-     LEFT 0 AND A LEFT ORIGIN, so it lines up under temperament rather than
-     against the right edge. The origin has to move with the anchor or the 0.9
-     scale walks the card off the edge it is pinned to. */
+     AGAINST THE RIGHT EDGE, 16 September 2026 (owner). It was left: 3px, aligned
+     under the temperament card, and briefly left: 0 before that. The ORIGIN MOVES
+     WITH THE ANCHOR: at 0.9 a left-pinned origin would shrink the card away from
+     the right edge it is now pinned to, leaving a gap that grows with the scale.
+     These two lines always change together.
+
+     10px DOWN on the same day, so the -10 that lifted it earlier is cancelled and
+     it sits back on the 62% line the temperament card's foot was derived from. */
   scale: 0.9;
-  transform-origin: left center;
-  /* 3px RIGHT AND 10px UP, 16 September 2026 (owner). This card is not centred by
-     a translate, so the lift goes straight into `top`. */
-  top: calc(62% - 10px);
-  left: 3px;
-  right: auto;
+  transform-origin: right center;
+  top: 62%;
+  right: 0;
+  left: auto;
   z-index: 21;
   touch-action: pinch-zoom;
   background: #0a2a3f;
@@ -1654,7 +1658,9 @@
   top: 50%;
   /* 10px RIGHT AND 20px UP, 16 September 2026 (owner). Same 20 as .tempCard so
      the pair stay level with each other. */
-  translate: 0 calc(-50% - 20px);
+  /* 30px DOWN, 16 September 2026 (owner): the earlier -20 lift becomes +10. Both
+     cards carry the same figure so the pair stay level with each other. */
+  translate: 0 calc(-50% + 10px);
   scale: 0.9;
   transform-origin: left center;
   bottom: auto;
@@ -1743,7 +1749,9 @@
   /* 5px RIGHT AND 20px UP, 16 September 2026 (owner). The lift goes in the
      translate rather than in `top`, because translate is already centring this
      card and the two compose in one property. */
-  translate: 0 calc(-50% - 20px);
+  /* 30px DOWN, 16 September 2026 (owner): the earlier -20 lift becomes +10. Both
+     cards carry the same figure so the pair stay level with each other. */
+  translate: 0 calc(-50% + 10px);
   left: 5px;
   right: auto;
   /* ONE HEIGHT FOR BOTH CARDS, 16 September 2026 (owner: training and temperament
