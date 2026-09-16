@@ -995,7 +995,24 @@
    AT THE END OF THE FILE on purpose, for the same reason as the block above:
    .overlay's own background is declared near the top, and same specificity means
    the last rule wins. Anywhere above it this is silently ignored. */
+/* THE DRAG WASH IS FULLY TRANSPARENT, 16 September 2026 (owner: a block of
+   colour appears when a card is dragged to a frame and hides the tree and the
+   chum cards).
+
+   IT WAS A RADIAL GRADIENT AT 0.78 TO 0.92, near solid, so it read as a panel
+   laid over the layer rather than as a dim. The class is kept rather than
+   removed from the element, so the old value is one line away and the drag focus
+   keeps its own hook.
+
+   WHAT THIS DOES NOT CHANGE, and it is the larger half: dragFocus separately
+   fades the family tree, the root chum card, the Learn and Collect buttons and
+   every unlit frame to ZERO while a card is in hand. That is in LineageMap.tsx,
+   not here, and it is the behaviour the comment there describes as intended. So
+   the colour block is gone and those elements still step out of the way.
+
+   .chumWash, the layer's ordinary background, is a separate sibling element and
+   is unaffected, so the layer during a drag now looks as it does at rest. */
 .overlayFocus {
-  background: radial-gradient(120% 120% at 50% 40%, rgba(9, 74, 112, 0.78), rgba(5, 40, 66, 0.92));
+  background: none;
   transition: background 0.12s ease-out;
 }
