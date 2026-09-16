@@ -1705,7 +1705,18 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "Practical medieval working dog used to move and protect sheep, forming an early root of Britain's collie families. An extinct historical type.",
     children: [
       { name: "Celtic herdsmen's dogs", note: "The all-round farm dogs of the Celtic tribes, guarding and driving the herds. Now extinct.", img: "/history/breeds/celtic-herdsmen-dogs.jpg", value: 35 },
-      { name: "Roman shepherd dogs", note: "The flock-guarding sheepdogs the Roman farm writers described, kept white so the shepherd knew dog from wolf. Now extinct.", img: "/history/breeds/roman-shepherd-dogs.jpg", value: 25 },
+      /* THE ROMAN SHEPHERD DOGS ARE OUT, 16 September 2026 (owner: leave only the
+         Norse settlers dogs, the Anglo-Saxon herding dogs and the Celtic herdsmen's
+         dogs).
+
+         THE OTHER THREE KEEP THEIR OWN NUMBERS. 35, 20 and 20 no longer sum to 100,
+         but a share is worked out against the record's own leaf total, so they
+         re-read as 47, 27 and 27: the same proportions to one another, which is
+         what removing one child and not renumbering the rest means.
+
+         THE RECORD ITSELF STAYS. Roman shepherd dogs is still reached through
+         Livestock Dog, where its ancestry was authored on 15 September, so only
+         this level loses it. */
       // Added 18 August 2026. The Anglo-Saxon layer is supported by Crabtree's
       // East Anglia zooarchaeology; the Norse layer by the Heath Wood strontium
       // study.
