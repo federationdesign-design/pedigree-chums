@@ -2251,7 +2251,14 @@ export default function LineageMap({
           // In the mini pit, count the placement step as soon as we know there
           // is something to expose. Left alone in the main pit, which has not
           // been asked for and shows longer chains.
-          const unplacedClick = unplacedCards.length > 0 || (circular && toPopNodes.length > 0) ? 1 : 0;
+          // 16 September 2026 (owner): the chum tree layer had the same undercount
+          // the mini pit was fixed for. It is strongBg && !circular, so the
+          // `circular` gate above excluded it and its placement click stayed
+          // invisible until the images had popped, reading as "x1" then "x1"
+          // again. The gate is now either layer. The MAIN pit is still left
+          // alone, as before.
+          const countsEarly = circular || strongBg;
+          const unplacedClick = unplacedCards.length > 0 || (countsEarly && toPopNodes.length > 0) ? 1 : 0;
           const stepsLeft = instrIconClicks + frontierClicks + toPopClick + unplacedClick;
           return (
           <g

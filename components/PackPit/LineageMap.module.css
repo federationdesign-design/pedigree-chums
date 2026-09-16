@@ -622,13 +622,18 @@
 }
 .autoBtn {
   display: block;
-  /* the shake and slowmo figures, so all three read as one family */
-  width: 100.8px;
-  height: 100.8px;
+  /* the shake and slowmo figures, so all three read as one family.
+     25% SMALLER, 16 September 2026 (owner: it is larger than the other buttons
+     and should match their container size). 100.8 -> 75.6, which is .learnDockBtn's
+     own desktop figure, so it matches that row rather than the shake and slowmo
+     pair it was sized against. The radius and padding scale by the same quarter
+     so the shape is unchanged: 30.24 -> 22.68 and 12 -> 9. */
+  width: 75.6px;
+  height: 75.6px;
   box-sizing: border-box;
-  padding: 12px;
+  padding: 9px;
   background: var(--yellow);
-  border-radius: 30.24px;
+  border-radius: 22.68px;
   object-fit: contain;
   box-shadow: 0 5px 0 rgba(10, 58, 87, 0.3);
   transition: transform 0.15s ease;
@@ -724,7 +729,15 @@
      the portrait's --tp changes, this is 12 + tp + 14.
      BOTH COUNTERS carry it. Only one is on screen at a time, but they share this
      corner and must not disagree. */
-  top: 66px;
+  /* UP 50px, 16 September 2026 (owner: it overlays the frames and should sit
+     directly over the profile image on the layer below). 66 -> 16, which puts it
+     across the portrait at top 12 rather than clearing it, so the 2 September
+     reasoning above is superseded: clearing the portrait was the old requirement
+     and sitting on it is the new one.
+
+     THE PHONE RULE BELOW 640px IS NOT NUDGED. It already sits at top 14, which is
+     where this change moves desktop to, and 14 - 50 would be off the screen. */
+  top: 16px;
   left: clamp(16px, 3.5vw, 40px);
   /* 6 -> 62. Same reason as .close above: this counter used to sit inside the
      overlay and is now a sibling of it, so 6 put it UNDER the overlay at 60 and
@@ -907,7 +920,13 @@
   inset: 0;
   z-index: 59;
   pointer-events: none;
-  background: radial-gradient(120% 120% at 50% 40%, rgba(20, 151, 214, 0.44), rgba(12, 91, 146, 0.92));
+  /* STRONGER, 16 September 2026 (owner: the layer's background needs to be more
+     solid so less of the layers below shows through). 0.44 -> 0.80 at the centre
+     and 0.92 -> 0.98 at the edge. Not fully opaque on purpose: the pit still
+     reads faintly behind it, which is what tells the player this is a layer over
+     the game rather than a new screen. .overlay's own lighter wash on line 8 is
+     a different element and is untouched. */
+  background: radial-gradient(120% 120% at 50% 40%, rgba(20, 151, 214, 0.80), rgba(12, 91, 146, 0.98));
   animation: lm-fade 0.2s ease;
 }
 
