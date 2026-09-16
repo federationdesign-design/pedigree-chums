@@ -743,7 +743,10 @@
      overlay and is now a sibling of it, so 6 put it UNDER the overlay at 60 and
      under the lift wash at 59, and the wash was painting over the number. */
   z-index: 62;
-  padding: 5px 18px;
+  /* 10 16 6 16, 16 September 2026 (owner): the display font sits high in its own
+     line box, so an even 5 top and bottom reads as bottom-heavy. More above than
+     below cancels it. Line 352 is the other counter and is left alone. */
+  padding: 10px 16px 6px 16px;
   border-radius: 20px;
   background: var(--navy);
   color: #ffffff;
@@ -755,7 +758,8 @@
   box-shadow: 0 3px 0 rgba(10, 58, 87, 0.3);
 }
 @media (max-width: 640px) {
-  .frameCount { top: 14px; font-size: 18px; padding: 4px 13px; }
+  /* the same uneven padding as the base rule, scaled down with the type */
+  .frameCount { top: 14px; font-size: 18px; padding: 8px 13px 4px 13px; }
 }
 
 /* Exaggerated dust poof when a card lands, like a heavy book dropped on a table:

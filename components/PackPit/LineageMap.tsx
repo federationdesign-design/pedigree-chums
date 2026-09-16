@@ -2468,10 +2468,24 @@ export default function LineageMap({
           <div
             className={styles.frameCount}
             /* UP 20px, 9 Sept 2026 (owner), item 13, in two passes of 10: at
-               46 it sat on the top row of frames. The 58 floor is untouched, so on a short screen it
-               still stops clear of the level portrait rather than climbing into
-               it. */
-            style={{ top: Math.max(58, vp.h / 2 + LIFT_K * (chumTop - vp.h / 2) - 66) }}
+               46 it sat on the top row of frames.
+
+               THE FLOOR WAS THE THING PINNING IT, found 16 September 2026 from the
+               owner's DOM sample, which showed an inline top of exactly 58. The
+               measured position was BELOW the floor, so Math.max was returning 58
+               every time and the counter never moved. Two edits to the stylesheet
+               that week did nothing for the same reason: an inline style beats a
+               class, and both the base rule and the 640px rule were being
+               overridden.
+
+               THE FLOOR IS NOW 8. Its old job was to clear the level portrait,
+               whose bottom edge is 52.3, but the owner now wants the counter to
+               sit OVER that portrait rather than below it, so clearing it is no
+               longer the requirement. 8 keeps it off the very top edge.
+
+               The measured expression is untouched: where the frame row sits low
+               enough, the counter still rides above it as before. */
+            style={{ top: Math.max(8, vp.h / 2 + LIFT_K * (chumTop - vp.h / 2) - 66) }}
             aria-label={`${filled.size} of ${frameTotal} frames filled`}
           >
             {filled.size}/{frameTotal}
