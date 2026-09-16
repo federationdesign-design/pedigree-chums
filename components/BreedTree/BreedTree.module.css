@@ -1374,13 +1374,24 @@
    as that breed's own page. Rides with the box like the rail does. */
 .ancCard {
   position: fixed;
-  /* 10% SMALLER, 16 September 2026 (owner), the third of the three breed cards.
-     Anchored from the RIGHT, unlike the other two, so the origin pins that edge
-     and it shrinks inwards rather than drifting off it. */
+  /* BELOW THE TEMPERAMENT CARD, 16 September 2026 (owner), matching the layout he
+     arranged by hand on the phone. It was top 6% / right 4%, up in the corner
+     where it covered the chum rail.
+
+     THE 62% IS DERIVED, NOT PICKED. .tempCard is centred on the 50% line and runs
+     about 180px tall at this scale, so its foot sits near 50% + 90px, which is
+     about 61% of an 844 screen. 62% clears it by roughly 8px. Card heights are
+     content-driven and cannot be read from CSS, so if a long temperament list
+     pushes into this one, this is the number to raise.
+
+     LEFT 0 AND A LEFT ORIGIN, so it lines up under temperament rather than
+     against the right edge. The origin has to move with the anchor or the 0.9
+     scale walks the card off the edge it is pinned to. */
   scale: 0.9;
-  transform-origin: right center;
-  top: 6%;
-  right: 4%;
+  transform-origin: left center;
+  top: 62%;
+  left: 0;
+  right: auto;
   width: min(88vw, 330px);
   z-index: 21;
   touch-action: pinch-zoom;
@@ -1432,7 +1443,12 @@
 }
 .ancRow {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 56px 34px;
+  /* TWO COLUMNS, 16 September 2026 (owner): the 56px bar track between the name
+     and the figure is gone, so the name takes its width and the 8px gap with it.
+     See the note on the row in BreedTree.tsx. The percentage column widens
+     34 -> 42 at the same time, because the figures carry a decimal on the traces
+     since the influence work and 34 was cutting "0.4%" tight. */
+  grid-template-columns: minmax(0, 1fr) 42px;
   align-items: center;
   gap: 8px;
   padding: 3px 14px;
@@ -1447,6 +1463,8 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+/* UNUSED SINCE 16 September 2026: the row no longer renders a bar. Kept so
+   putting it back is one line in BreedTree.tsx rather than a rewrite. */
 .ancBarWrap {
   height: 6px;
   background: rgba(255, 255, 255, 0.12);

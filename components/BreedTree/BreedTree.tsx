@@ -10483,11 +10483,20 @@ export default function BreedTree({
           closeLabel="Close ancestry"
         >
           {ancestryRows.map((a) => (
+            /* THE BAR IS GONE, 16 September 2026 (owner: the middle percentage
+               bar is always blank and we can show the full name instead).
+
+               IT WAS NOT BLANK, it was redundant. .ancBar carried width: {pct}%,
+               so at 55% it drew 31px of yellow in a 56px track 6px tall, right
+               beside the figure it restated. Small enough to read as empty and
+               worth nothing next to the number.
+
+               Dropping it frees 64px, the 56px track plus its 8px gap, and the
+               name column takes all of it. That is what was clipping "Otterh..."
+               and "Old Eu...". .ancBarWrap and .ancBar stay in the stylesheet,
+               unused, so putting it back is one line here. */
             <div key={a.name} className={styles.ancRow} title={a.name}>
               <span className={styles.ancName}>{a.name}</span>
-              <span className={styles.ancBarWrap}>
-                <span className={styles.ancBar} style={{ width: `${a.pct}%` }} />
-              </span>
               <span className={styles.ancPct}>{a.pct}%</span>
             </div>
           ))}
