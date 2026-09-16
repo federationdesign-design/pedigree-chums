@@ -40,11 +40,13 @@ const FIGURES_NOTE =
 // mounted with a key that changes whenever the box opens or the circle or chum
 // changes, so it is always folded again on the way in rather than remembering.
 //
-// THE GLYPH IS + WHEN CLOSED AND MINUS WHEN OPEN, 16 September 2026 (owner). It
-// was "..." in all three states, which says there is more but not that pressing
-// again puts it away. The minus is U+2212, the real minus sign, not a hyphen: at
-// this size a hyphen sits short and thin beside the plus and the pair look
-// mismatched. Three buttons carry it, two closed and one open.
+// THE GLYPH: "..." WHEN CLOSED, A RINGED MINUS WHEN OPEN, 16 September 2026
+// (owner). It was "..." throughout, then briefly + and minus; the owner has taken
+// the plus back and kept the minus, which is the pairing that reads best: dots say
+// "there is more", the ringed minus says "put it away". The minus is U+2212, the
+// real minus sign rather than a hyphen, which sits short and thin at this size.
+// Three buttons carry a glyph, two closed and one open; only the open one takes
+// the ring, through .cNoteMinus.
 function BreakNote() {
   const [open, setOpen] = useState(false);
   if (!open) {
@@ -56,7 +58,7 @@ function BreakNote() {
         aria-expanded={false}
         aria-label="Show how these figures were worked out"
       >
-        +
+        ...
       </button>
     );
   }
@@ -65,7 +67,7 @@ function BreakNote() {
       {FIGURES_NOTE}{" "}
       <button
         type="button"
-        className={styles.cNoteDots}
+        className={`${styles.cNoteDots} ${styles.cNoteMinus}`}
         onClick={() => setOpen(false)}
         aria-expanded={true}
         aria-label="Hide how these figures were worked out"
@@ -95,7 +97,7 @@ function BreakFold({ folded, children }: { folded: boolean; children: React.Reac
         aria-expanded={false}
         aria-label="Show the influence figures"
       >
-        +
+        ...
       </button>
     </div>
   );
@@ -10316,13 +10318,17 @@ export default function BreedTree({
                     return (
                       <div className={styles.cBreakWorking}>
                         {apps.length === 1
-                          ? <div className={styles.cBreakRow}>As {genLabel(apps[0].depth)}: {pct(apps[0].pct)}</div>
+                          ? <div className={styles.cBreakRow}>As {genLabel(apps[0].depth)}: <span className={styles.cBreakPct}>{pct(apps[0].pct)}</span></div>
                           : routes.map(([branch, p], i) => (
-                              <div key={i} className={styles.cBreakRow}>from {branch}: {pct(p)}</div>
+                              <div key={i} className={styles.cBreakRow}>from {branch}: <span className={styles.cBreakPct}>{pct(p)}</span></div>
                             ))}
                         {routes.length > 1 && (
+                          /* Every figure on this line is wrapped too, not just the total,
+                             so the sum reads the same as the rows above it. */
                           <div className={styles.cBreakRow}>
-                            Combined: {routes.map(([, p]) => pct(p)).join(" + ")} = {pct(share)}
+                            Combined: {routes.map(([, p], i) => (
+                              <span key={i}>{i > 0 ? " + " : ""}<span className={styles.cBreakPct}>{pct(p)}</span></span>
+                            ))} = <span className={styles.cBreakPct}>{pct(share)}</span>
                           </div>
                         )}
                       </div>

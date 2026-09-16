@@ -860,10 +860,21 @@
   margin-bottom: 8px;
 }
 .cBreakRow {
-  font-weight: 600;
-  font-size: 0.7rem;
-  line-height: 1.4;
+  /* THE DOG DESCRIPTION'S OWN SIZE AND LEADING, 16 September 2026 (owner), so the
+     breakdown reads as the same paragraph style as the write-up above it rather
+     than as a smaller footnote. The weight drops to 500 with it: 600 was carrying
+     the emphasis that now belongs to the figures alone. */
+  font-weight: 500;
+  font-size: calc(0.72rem - 1pt);
+  line-height: 1.3em;
   opacity: 0.95;
+}
+/* The percentage inside a breakdown row. Yellow at 600 so the number is what the
+   eye lands on, with the words around it staying quiet. Same yellow the headline
+   share and the fold toggle use. */
+.cBreakPct {
+  color: var(--yellow, #ffd23e);
+  font-weight: 600;
 }
 .cBreakTitle {
   font-weight: 700;
@@ -872,11 +883,15 @@
 }
 .cBreakNote {
   /* THE SAME TYPE AS THE DOG DESCRIPTION, 16 September 2026 (owner: the small print
-     reads lighter than the paragraph above it). These three lines are .asideSheet
-     .cNote's own, copied rather than approximated, so the two blocks are one style.
-     The opacity went with them: it was what made it look lighter. */
+     reads lighter than the paragraph above it). The size and leading are
+     .asideSheet .cNote's own, copied rather than approximated, and the opacity that
+     used to dim it has gone.
+     WEIGHT 500 ON TOP, same day: the body face still rendered this at 400 beside a
+     heavier paragraph, so the two did not match on weight even once they matched on
+     size. */
   font-size: calc(0.72rem - 1pt);
   line-height: 1.3em;
+  font-weight: 500;
   margin-top: 2px;
 }
 /* The small print starts folded behind this. It is a button so the box's own
@@ -894,6 +909,22 @@
   letter-spacing: 0.08em;
   color: var(--yellow, #ffd23e);
   cursor: pointer;
+}
+/* THE RING, on the OPEN state only, 16 September 2026 (owner). em-based so it
+   tracks the glyph's own size rather than needing a second set of figures if the
+   type changes. line-height 1 and a fixed square keep the minus optically centred:
+   U+2212 sits on the maths axis, which is above the middle of its box, so the
+   flex centring is what puts it right rather than padding. */
+.cNoteMinus {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.7em;
+  height: 1.7em;
+  padding: 0;
+  border: 2px solid var(--yellow, #ffd23e);
+  border-radius: 50%;
+  line-height: 1;
 }
 .cNoteDots:focus-visible {
   outline: 2px solid var(--yellow, #ffd23e);
