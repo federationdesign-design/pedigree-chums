@@ -35,6 +35,21 @@
 }
 .labelPill {
   display: inline-block;
+  /* CENTRED, AND INSET FROM THE CARD, 16 September 2026 (owner: the pill's text is
+     left aligned when it wraps to a second line, and the pill touches the edge of
+     the card).
+
+     TEXT-ALIGN WAS NEVER SET. A single line looked centred only because the pill
+     shrinks to fit it; the moment the text wrapped, the second line sat left
+     against the first. This is the fix for that, not a nudge.
+
+     THE WIDTH CAP IS WHAT KEEPS THE MARGIN. The pill sizes to its content, so a
+     long label such as "STUBBORN BUT TRAINABLE" grew until it met the card's own
+     edge. 88% leaves 6% of the card on each side at any card width, which holds
+     after the card was cut 20% narrower earlier the same day. */
+  text-align: center;
+  max-width: 88%;
+  box-sizing: border-box;
   border: 1.5px solid;
   border-radius: 20px;
   padding: 5px 18px;
