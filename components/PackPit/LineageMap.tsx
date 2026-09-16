@@ -250,7 +250,7 @@ function countProgenitors(n: LineageNode): number {
 
    The tree also draws tighter, not just smaller: the layout packs on these radii,
    so the gaps close with the circles. */
-const PIT_NODE_SCALE = 0.564; /* 0.78 -> 0.663 -> 0.564, a third 15% off on
+const PIT_NODE_SCALE = 0.479; /* 0.78 -> 0.663 -> 0.564, a third 15% off on
    16 September 2026 (owner). Still the single dial for the nodes, the connectors
    and the pills: it feeds nodeR only, and the cards, root card and frames use
    their own constants. See the fuller note from the first cut. */
@@ -552,9 +552,14 @@ export default function LineageMap({
     window.clearTimeout(learnDownT.current);
     learnDownT.current = window.setTimeout(() => setLearnDown(false), 140);
   };
+  /* CORRECTED 16 September 2026, same day: this set learnBusy, and revealStep
+     returns early while that is set, so the click that FOLLOWED the pointerdown
+     was refused and the button did nothing at all. The flag is set inside
+     revealStep now, after its own guard, so the first click runs and only a
+     second one during the same step is refused. This function is back to what it
+     always was, the pressed look, plus the 6s guard that releases it. */
   const pressLearn = () => {
     setLearnDown(true);
-    learnBusy.current = true;
     window.clearTimeout(learnDownT.current);
     learnDownT.current = window.setTimeout(releaseLearn, 6000);
   };
@@ -1567,7 +1572,22 @@ export default function LineageMap({
      It rides the group that dragFocus already fades, so it inherits the 0.12s
      DRAG_FADE and the pointerEvents none with it, which matters: an invisible
      tree that still swallowed taps would block the frames underneath. */
-  const treeDone = strongBg && !circular && framesDone;
+  /* CORRECTED 16 September 2026 (owner: the tree disappears before all the images
+     are placed).
+
+     framesDone only asks whether every FRAME is filled, and a frame is one per
+     distinct picture. A dog that appears several times has one frame and several
+     cards, and the duplicates are stacked on the filled frame rather than framed
+     themselves. So on a level with duplicates the tree vanished with cards still
+     in hand.
+
+     EVERY CARD ACCOUNTED FOR is the real condition: each pickCard is either in a
+     frame (placedSet), stacked on one (stackedIds) or hidden as a pack duplicate
+     (packHidden). When none are left loose, there is nothing more to place. */
+  const cardsAllPlaced =
+    pickCards.length > 0 &&
+    pickCards.every((c) => placedSet.has(c.id) || stackedIds.has(c.id) || packHidden.has(c.id));
+  const treeDone = strongBg && !circular && framesDone && cardsAllPlaced;
   // Mini pit levels: every frame filled means this circle is fully learnt.
   // No collect step: poof the card and its nodes out of existence, remove the
   // circle from the pit, and close, exactly like the instructional finish.
@@ -1802,9 +1822,12 @@ export default function LineageMap({
   // cards already pulled out stay put. Auto-revealed nodes score +50 each, less
   // than a manual tap (125/250) so hand-exploration stays the rewarding route.
   const revealStep = () => {
-    // Ignored while a step is still running: see pressLearn. Without this a
-    // fifty-image pack-out took a second and a third click on top of itself.
+    // Ignored while a step is still running. Without this a fifty-image pack-out
+    // took a second and a third click on top of itself. The flag is set HERE
+    // rather than in pressLearn: pointerdown fires before click, so setting it
+    // there refused the very click that set it.
     if (learnBusy.current) return;
+    learnBusy.current = true;
     // For instructional cards: show first child icon on first double-click
     if (INSTR_NAMES.has(breed.name)) {
       const firstUnpicked = shown.filter((n) => n.img && !picked.has(n._id) && n._parent);
