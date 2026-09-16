@@ -1677,12 +1677,46 @@
    GEOMETRY STILL COMES FROM .learnDockBtn, which was the point of the change:
    size, rim weight and corner radius are set once per breakpoint and PLAY cannot
    drift from the row. Only the colours and the position are re-asserted here. */
+/* PLAY MATCHES THE RED BACK SQUARE, NOT THE DOCK ROW, 16 September 2026 (owner:
+   too small and the stroke weight is not correct; the start screen's PLAY is the
+   one to match).
+
+   MY ERROR IN PATCH 31, CORRECTED. I made PLAY take .learnDockBtn's geometry on
+   the assumption that the row was what it should agree with. It is not. The thing
+   it sits beside and is judged against is the red BACK square and the start
+   screen's PLAY, and both are considerably bigger with a much heavier rim.
+
+   THE FIGURES COME FROM THE OWNER'S OWN DOM SAMPLE OF THE RED SQUARE, not from
+   taste. Its rect is 91.006 units wide with a stroke-width of 8.983, and an SVG
+   stroke straddles the path, so the outer edge is 91.006 + 8.983 = 99.99 units.
+   At the stage transform measured with ?chipdebug=1, ctm.a 0.5566, that is
+   55.7px across with a 5px rim. Its rx is 27.302 units on the path centre,
+   15.2px, and a CSS radius is measured on the OUTER edge, so 15.2 + half the rim
+   = 17.7px.
+
+   BORDER-BOX, so 55.7 is the outer edge including the 5px rim, which is how the
+   SVG square measures too.
+
+   THE PHONE FIGURE IS MEASURED, THE DESKTOP ONE IS DERIVED. 55.7/42 is 1.325, and
+   the same ratio on the desktop dock's 75.6 gives 100.2 with the rim and radius
+   scaled with it. If desktop looks wrong, take a DOM sample of the red square
+   there and replace these three numbers; do not adjust them by eye.
+
+   SIZE LIVES HERE NOW, so the note on .learnDockBtn about PLAY sharing the row's
+   geometry no longer applies to PLAY. What patch 31 was actually for still holds:
+   the figures are in the stylesheet once, not duplicated in TypeScript. */
 .learnDockBtn.learnPlayBtn {
   position: absolute;
   background: #22c55e;
   border-color: #ffffff;
+  box-sizing: border-box;
+  width: 100.2px;
+  height: 100.2px;
+  border-width: 5px;
+  border-radius: 23.5px;
 }
-.learnDockBtn.learnPlayBtn .learnDockIcon { color: #ffffff; }
+/* the icon holds the same 0.55 of the button the others do: 0.55 * 100.2 */
+.learnDockBtn.learnPlayBtn .learnDockIcon { color: #ffffff; width: 55.1px; height: 55.1px; }
 .learnDockBtn.learnPlayBtn .learnDockIcon svg { stroke: none; fill: #ffffff; }
 .learnDockIcon svg { width: 100%; height: 100%; stroke: var(--yellow, #ffd23e); }
 /* Start-screen SVG captions: "play"/"learn" above the PLAY/LEARN squares and
@@ -1783,6 +1817,17 @@
     height: 42px;
     border-radius: 12.6px;
   }
+  /* PLAY keeps the red BACK square's size on a phone: 55.7 outer, 5px rim,
+     17.7 outer radius. Derived from the owner's DOM sample, see the block on
+     .learnDockBtn.learnPlayBtn. */
+  .learnDockBtn.learnPlayBtn {
+    width: 55.7px;
+    height: 55.7px;
+    border-width: 5px;
+    border-radius: 17.7px;
+  }
+  /* the icon holds the same 0.55 of the button the others do: 0.55 * 55.7 */
+  .learnDockBtn.learnPlayBtn .learnDockIcon { width: 30.6px; height: 30.6px; }
   /* 28 was 0.55 of a 50.6 button. Held at the same fraction of 42. */
   .learnDockIcon { width: 23px; height: 23px; }
 }
