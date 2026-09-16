@@ -39,6 +39,12 @@ const FIGURES_NOTE =
 // The small print, folded behind a "...". It carries its own open state and is
 // mounted with a key that changes whenever the box opens or the circle or chum
 // changes, so it is always folded again on the way in rather than remembering.
+//
+// THE GLYPH IS + WHEN CLOSED AND MINUS WHEN OPEN, 16 September 2026 (owner). It
+// was "..." in all three states, which says there is more but not that pressing
+// again puts it away. The minus is U+2212, the real minus sign, not a hyphen: at
+// this size a hyphen sits short and thin beside the plus and the pair look
+// mismatched. Three buttons carry it, two closed and one open.
 function BreakNote() {
   const [open, setOpen] = useState(false);
   if (!open) {
@@ -50,7 +56,7 @@ function BreakNote() {
         aria-expanded={false}
         aria-label="Show how these figures were worked out"
       >
-        ...
+        +
       </button>
     );
   }
@@ -64,7 +70,7 @@ function BreakNote() {
         aria-expanded={true}
         aria-label="Hide how these figures were worked out"
       >
-        ...
+        −
       </button>
     </div>
   );
@@ -89,7 +95,7 @@ function BreakFold({ folded, children }: { folded: boolean; children: React.Reac
         aria-expanded={false}
         aria-label="Show the influence figures"
       >
-        ...
+        +
       </button>
     </div>
   );
