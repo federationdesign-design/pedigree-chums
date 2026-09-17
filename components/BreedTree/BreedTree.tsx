@@ -907,15 +907,23 @@ const CHAIN_TOUCH_SLACK = 0.06;
    figure as CHUM_FLOOR_GRACE_MS and for the same reason: the solver parts
    resting bodies for the odd frame, and a chain must not die of that. */
 const CHAIN_BREAK_GRACE_MS = 120;
-/* RELEASE. The chain is judged once more on the spot, with no grace: every link
-   must be within CHAIN_TOUCH_SLACK, no link may have broken, and no card may
-   have been taken some other way meanwhile. At least CHAIN_MIN_CARDS. Valid: every
-   card goes through collectChum and the multiplier bonus is scored on top.
-   Invalid: nothing clears and nothing scores, but the path COLLAPSES, snapping
-   at every link and falling away over CHAIN_COLLAPSE_MS, with a low falling
-   tone, so a failed chain never looks like a missed gesture. A single card is
-   a tap, not a chain, and fails silently. */
-const CHAIN_MIN_CARDS = 2;
+/* THE CIRCUIT (owner, 17 September 2026). A chain only scores as a CLOSED LOOP.
+   Once it holds CHAIN_MIN_CARDS or more, the first card is the one card that may
+   be entered again, and only as the closing move: that closing link must touch
+   and must not cross the path, like any other. The loop closes the moment the
+   finger enters the first card. Nothing more joins after that, and the closing
+   link is re-tested every frame with the rest. Ring only: the cards on the loop
+   are collected, cards inside it are not.
+
+   RELEASE. A chain of two or more is judged on the spot, with no grace. It must
+   be closed, no link may have broken, every link (the closing one included)
+   must be within CHAIN_TOUCH_SLACK, and no card may have been taken some other
+   way meanwhile. Valid: every card goes through collectChum and the multiplier
+   bonus is scored on top. Invalid, open or broken: nothing clears and nothing
+   scores, but the path COLLAPSES, snapping at every link and falling away over
+   CHAIN_COLLAPSE_MS, with a low falling tone, so a failed chain never looks like
+   a missed gesture. A single card is a tap, not a chain, and ends silently. */
+const CHAIN_MIN_CARDS = 3; // two cards cannot form a loop
 const CHAIN_MULT_STEP = 0.1; // each chum in the chain adds this to a multiplier starting at 1
 const CHAIN_COLLAPSE_MS = 450;
 type ChainSq = { x: number; y: number; a: number; h: number };
@@ -7895,7 +7903,16 @@ export default function BreedTree({
       strain: Map<number, { since: number; share: number }>;
       // Set once, never cleared: the link that broke and the gap that broke it.
       dead: { link: number; a: number; b: number; share: number } | null;
+      // The finger re-entered the first card and the loop closed. Link
+      // cards.length - 1 is then the closing link, last card back to first.
+      closed: boolean;
+      // Refreshed every frame: closing from the last card would be legal now.
+      canClose: boolean;
     };
+    // Links in the chain, and the two cards at each end of link s. A closed
+    // loop has one link more than cards minus one: the closing link wraps.
+    const linkCount = (ch: Chain) => (ch.closed ? ch.cards.length : ch.cards.length - 1);
+    const linkEnds = (ch: Chain, s: number): [number, number] => [ch.cards[s], ch.cards[(s + 1) % ch.cards.length]];
     let chain: Chain | null = null;
     let note = "idle";
     let raf: number | null = null;
@@ -7925,13 +7942,41 @@ export default function BreedTree({
       const k = SIZE / v[2];
       return { x: (pr.x - v[0]) * k, y: (pr.y - v[1]) * k, a: pr.a, h: side / 2 };
     };
+    // Why the last card could not close the loop back to the first right now,
+    // or null if it could. The same touching and crossing tests as any join.
+    const closeBlock = (ch: Chain): string | null => {
+      const cards = ch.cards;
+      if (ch.closed || ch.dead) return "no longer open";
+      if (cards.length < CHAIN_MIN_CARDS) return `a loop needs ${CHAIN_MIN_CARDS} cards`;
+      const first = cards[0], last = cards[cards.length - 1];
+      const a = geo(last), b = geo(first);
+      if (!a || !b) return "could not be measured";
+      const share = chainSquareGap(a, b) / (Math.max(a.h, b.h) * 2);
+      if (share > CHAIN_TOUCH_SLACK) return `#${last} not touching #${first}, gap ${Math.round(share * 100)}%`;
+      // Segment 0 starts at the first card and the last segment ends at the last
+      // card; the crossing test ignores a shared end, so testing both is safe.
+      for (let s = 0; s < cards.length - 1; s++) {
+        const p = geo(cards[s]), q = geo(cards[s + 1]);
+        if (p && q && chainSegmentsCross(p, q, a, b)) return "the closing link would cross the path";
+      }
+      return null;
+    };
     const joinAt = (ch: Chain, cx: number, cy: number) => {
-      if (ch.dead) return; // a broken chain takes nothing more
+      if (ch.dead || ch.closed) return; // broken or complete: nothing more joins
       const i = cardAt(cx, cy);
       if (i == null) return;
       const cards = ch.cards;
       const last = cards[cards.length - 1];
       if (i === last) return;
+      // The first card again: the closing move, and the only repeat allowed.
+      if (i === cards[0] && cards.length > 1) {
+        const why = closeBlock(ch);
+        if (why) { note = `cannot close on #${i}: ${why}`; return; }
+        ch.closed = true;
+        ch.canClose = false;
+        note = `CIRCUIT CLOSED on #${i}, ${cards.length} cards`;
+        return;
+      }
       if (cards.includes(i)) { note = `#${i} already in the chain`; return; }
       if (chumFlyRef.current.has(i)) { note = `#${i} is being collected`; return; }
       if (last === undefined) { cards.push(i); note = `started on #${i}`; return; }
@@ -7970,15 +8015,26 @@ export default function BreedTree({
         dots.replaceChildren();
         return;
       }
-      const WHITE = "#ffffff", GREY = "#9ca3af", RED = "#ef4444";
+      const WHITE = "#ffffff", GREY = "#9ca3af", RED = "#ef4444", GOLD = "#ffd23e";
       const dead = chain.dead;
-      // Index aligned with chain.cards, so link s is always cps[s] to cps[s + 1].
+      /* THE CIRCUIT, ON SCREEN. Two states, both in the site yellow.
+         AVAILABLE: closing from the last card would be legal right now. The first
+         card's dot swells and pulses and the live line to the finger turns
+         yellow, so the target is marked before the finger reaches it. It has to
+         be shown AHEAD like this: the loop closes the instant the finger enters
+         the first card, so there is no moment of hovering over it still open.
+         CLOSED: the closing link is drawn and the whole loop, lines and dots,
+         turns yellow, and the finger's line goes because nothing more can join.
+         Grey strain and a red break still win over yellow on their own links. */
+      const loopCol = chain.closed ? GOLD : WHITE;
+      // Index aligned with chain.cards; link s runs from cps[s] to the next,
+      // wrapping to the first card for the closing link.
       const cps = chain.cards.map((i) => geo(i));
       const unit = cps.find((q) => q)?.h ?? 0;
       type Seg = { x1: number; y1: number; x2: number; y2: number; col: string };
       const segs: Seg[] = [];
-      for (let s = 0; s < cps.length - 1; s++) {
-        const p = cps[s], q = cps[s + 1];
+      for (let s = 0; s < linkCount(chain); s++) {
+        const p = cps[s], q = cps[(s + 1) % cps.length];
         if (!p || !q) continue;
         if (dead && dead.link === s) {
           // The point of failure: red, and cut open at the middle, which is
@@ -7990,22 +8046,28 @@ export default function BreedTree({
           segs.push({ x1: p.x, y1: p.y, x2: mx - ux * half, y2: my - uy * half, col: RED });
           segs.push({ x1: mx + ux * half, y1: my + uy * half, x2: q.x, y2: q.y, col: RED });
         } else {
-          segs.push({ x1: p.x, y1: p.y, x2: q.x, y2: q.y, col: dead || chain.strain.has(s) ? GREY : WHITE });
+          segs.push({ x1: p.x, y1: p.y, x2: q.x, y2: q.y, col: dead || chain.strain.has(s) ? GREY : loopCol });
         }
       }
-      // The live end of the line is the finger itself, while the chain lives.
+      // The live end of the line is the finger itself, while the chain is open.
       const lastP = [...cps].reverse().find((q) => q);
       const sv = g.ownerSVGElement;
       const ctm = g.getScreenCTM();
-      if (!dead && lastP && sv && ctm) {
+      if (!dead && !chain.closed && lastP && sv && ctm) {
         const p = sv.createSVGPoint();
         p.x = chain.fx; p.y = chain.fy;
         const w = p.matrixTransform(ctm.inverse());
-        segs.push({ x1: lastP.x, y1: lastP.y, x2: w.x, y2: w.y, col: WHITE });
+        segs.push({ x1: lastP.x, y1: lastP.y, x2: w.x, y2: w.y, col: chain.canClose ? GOLD : WHITE });
       }
       // The two cards either side of the break go red; the rest grey once dead.
+      const n = cps.length;
+      const pulse = 1.7 + 0.3 * Math.sin(performance.now() / 90);
       const dotList = cps.map((q, d) => q
-        ? { x: q.x, y: q.y, col: dead ? (d === dead.link || d === dead.link + 1 ? RED : GREY) : WHITE }
+        ? {
+            x: q.x, y: q.y,
+            col: dead ? (d === dead.link || d === (dead.link + 1) % n ? RED : GREY) : chain?.canClose && d === 0 ? GOLD : loopCol,
+            r: chain?.canClose && d === 0 ? pulse : 1,
+          }
         : null);
       paint(segs, dotList, unit);
     };
@@ -8013,7 +8075,7 @@ export default function BreedTree({
     // the collapse, so the two can never be drawn two different ways.
     const paint = (
       segs: { x1: number; y1: number; x2: number; y2: number; col: string }[],
-      dotList: ({ x: number; y: number; col: string } | null)[],
+      dotList: ({ x: number; y: number; col: string; r?: number } | null)[],
       unit: number,
     ) => {
       const g = chainGRef.current;
@@ -8049,7 +8111,7 @@ export default function BreedTree({
         if (!q) { c.setAttribute("r", "0"); continue; }
         c.setAttribute("cx", String(q.x));
         c.setAttribute("cy", String(q.y));
-        c.setAttribute("r", String(unit * 0.22));
+        c.setAttribute("r", String(unit * 0.22 * (q.r ?? 1)));
         c.style.fill = q.col;
       }
     };
@@ -8062,12 +8124,13 @@ export default function BreedTree({
       dots: { x: number; y: number; drift: number }[];
     };
     let collapse: Collapse | null = null;
-    const startCollapse = (cards: number[]) => {
+    // `loop` adds the closing link, last card back to first.
+    const startCollapse = (cards: number[], loop: boolean) => {
       const cps = cards.map((i) => geo(i));
       const unit = cps.find((q) => q)?.h ?? 0;
       const pieces: Collapse["pieces"] = [];
-      for (let s = 0; s < cps.length - 1; s++) {
-        const p = cps[s], q = cps[s + 1];
+      for (let s = 0; s < (loop ? cps.length : cps.length - 1); s++) {
+        const p = cps[s], q = cps[(s + 1) % cps.length];
         if (!p || !q) continue;
         const len = Math.hypot(q.x - p.x, q.y - p.y) || 1;
         const ux = (q.x - p.x) / len, uy = (q.y - p.y) / len;
@@ -8127,17 +8190,19 @@ export default function BreedTree({
       } catch { /* no audio available */ }
     };
     // Why a released chain may not clear, or null if it may. No grace here.
+    // A broken link is reported ahead of an open circuit: it is the real cause.
     const judge = (ch: Chain): string | null => {
-      if (ch.dead) return `link #${ch.dead.a}-#${ch.dead.b} had broken, gap ${Math.round(ch.dead.share * 100)}%`;
+      if (ch.dead) return `BROKEN LINK #${ch.dead.a}-#${ch.dead.b}, gap ${Math.round(ch.dead.share * 100)}%`;
+      if (!ch.closed) return `OPEN, circuit not closed (${ch.cards.length} cards)`;
       for (const i of ch.cards) {
         if (chumFlyRef.current.has(i) || chumTakenRef.current.has(i)) return `#${i} was already taken`;
       }
-      for (let s = 0; s < ch.cards.length - 1; s++) {
-        const ai = ch.cards[s], bi = ch.cards[s + 1];
+      for (let s = 0; s < linkCount(ch); s++) {
+        const [ai, bi] = linkEnds(ch, s);
         const a = geo(ai), b = geo(bi);
         if (!a || !b) return `#${!a ? ai : bi} could not be measured`;
         const share = chainSquareGap(a, b) / (Math.max(a.h, b.h) * 2);
-        if (share > CHAIN_TOUCH_SLACK) return `link #${ai}-#${bi} gap ${Math.round(share * 100)}% at release`;
+        if (share > CHAIN_TOUCH_SLACK) return `BROKEN LINK #${ai}-#${bi}, gap ${Math.round(share * 100)}% at release`;
       }
       return null;
     };
@@ -8145,8 +8210,9 @@ export default function BreedTree({
     // Every existing link, every frame. Only the chain's own cards are measured.
     const checkLinks = (ch: Chain, now: number) => {
       if (ch.dead || ch.cards.length < 2) return;
-      for (let s = 0; s < ch.cards.length - 1; s++) {
-        const ai = ch.cards[s], bi = ch.cards[s + 1];
+      // The closing link too, once the loop is closed.
+      for (let s = 0; s < linkCount(ch); s++) {
+        const [ai, bi] = linkEnds(ch, s);
         const a = geo(ai), b = geo(bi);
         if (!a || !b) continue;
         const share = chainSquareGap(a, b) / (Math.max(a.h, b.h) * 2);
@@ -8168,32 +8234,36 @@ export default function BreedTree({
       note = `${why}, ${n} card(s)${ch?.dead ? ", chain was broken" : ""}, path cleared`;
       // Only a real release of a real chain is judged. A cancel, a blur or a
       // stale end is not the player's doing, so it just clears, silently.
+      // A single card is a tap, never a chain. Two or more is judged, and a two
+      // card chain can only ever fail: it cannot close.
+      const isTap = n < 2;
       let cleared = false;
-      if (ch && why === "released" && n >= CHAIN_MIN_CARDS) {
+      if (ch && why === "released" && !isTap) {
         const fail = judge(ch);
         if (fail) {
           result = `FAILED, ${fail}, nothing scored`;
-          startCollapse(ch.cards);
+          startCollapse(ch.cards, ch.closed);
           failTone();
         } else {
           const cards = [...ch.cards];
           chainClearRef.current?.(cards);
           const r = chainBonusRef.current?.(cards);
           result = r
-            ? `CLEARED ${n}: ${r.sum} x${r.mult.toFixed(1)} = ${r.sum + r.bonus} (bonus ${r.bonus})`
-            : `CLEARED ${n}`;
+            ? `CLEARED, circuit closed, ${n} cards: ${r.sum} x${r.mult.toFixed(1)} = ${r.sum + r.bonus} (bonus ${r.bonus})`
+            : `CLEARED, circuit closed, ${n} cards`;
           cleared = true;
         }
         note = result;
       }
       // A parked collect (see chainHeldCollectRef) goes ahead only on a clean
-      // release that never joined a second card. A chain that cleared took the
-      // card with it. A failed chain, a cancel, a blur or a stale end all leave
-      // the card armed.
+      // release that never joined a second card, as the tap always did. A chain
+      // that cleared took the card with it. A failed chain, a cancel, a blur or a
+      // stale end all leave the card armed. Deliberately not CHAIN_MIN_CARDS:
+      // that is the loop minimum, and a two card chain is not a tap.
       const held = chainHeldCollectRef.current;
       if (held != null) {
         chainHeldCollectRef.current = null;
-        if (why === "released" && n < CHAIN_MIN_CARDS) chainTapCollectRef.current?.(held);
+        if (why === "released" && isTap) chainTapCollectRef.current?.(held);
         else if (!cleared) note += `, collect of #${held} cancelled, still armed`;
       }
       chain = null;
@@ -8217,6 +8287,8 @@ export default function BreedTree({
         sweep(chain, fx, fy);
       }
       checkLinks(chain, performance.now());
+      // Cards drift, so whether the loop could close is re-asked every frame.
+      chain.canClose = closeBlock(chain) === null;
       draw();
       raf = requestAnimationFrame(tick);
     };
@@ -8232,7 +8304,7 @@ export default function BreedTree({
         if (chainGRef.current) chainGRef.current.style.opacity = "";
         paint([], [], 0);
       }
-      chain = { id: e.pointerId, pending: true, cards: [], px: e.clientX, py: e.clientY, fx: e.clientX, fy: e.clientY, strain: new Map(), dead: null };
+      chain = { id: e.pointerId, pending: true, cards: [], px: e.clientX, py: e.clientY, fx: e.clientX, fy: e.clientY, strain: new Map(), dead: null, closed: false, canClose: false };
       note = "waiting for the gate";
       if (raf == null) raf = requestAnimationFrame(tick);
     };
@@ -8256,7 +8328,8 @@ export default function BreedTree({
       setChainDiag([
         `chain    ${!chain ? "idle" : chain.pending ? `waiting, pointer ${chain.id}` : chain.dead ? `DEAD, pointer ${chain.id}` : `ACTIVE, pointer ${chain.id}`}`,
         `cards    ${chain ? `${chain.cards.length}${chain.cards.length ? ": #" + chain.cards.join(" #") : ""}` : "-"}`,
-        `strain   ${!chain || !chain.strain.size ? "none" : [...chain.strain].map(([s, st]) => `#${chain?.cards[s]}-#${chain?.cards[s + 1]} ${Math.round(st.share * 100)}%`).join(", ")}`,
+        `circuit  ${!chain || chain.pending ? "-" : chain.closed ? "CLOSED" : chain.canClose ? "open, CAN CLOSE on #" + chain.cards[0] : "open"}`,
+        `strain   ${!chain || !chain.strain.size ? "none" : [...chain.strain].map(([s, st]) => { const [a, b] = linkEnds(chain as Chain, s); return `#${a}-#${b} ${Math.round(st.share * 100)}%`; }).join(", ")}`,
         `break    ${!chain?.dead ? "none" : `#${chain.dead.a}-#${chain.dead.b} gap ${Math.round(chain.dead.share * 100)}% (slack ${Math.round(CHAIN_TOUCH_SLACK * 100)}%)`}`,
         `gate     ${gate == null ? "shut" : `open, pointer ${gate}`}`,
         `last     ${note}`,
