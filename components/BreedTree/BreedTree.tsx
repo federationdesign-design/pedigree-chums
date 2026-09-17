@@ -3148,6 +3148,17 @@ export default function BreedTree({
      layer inside the pit SVG, written directly each frame, and the panel lines. */
   const chainGRef = useRef<SVGGElement>(null);
   const [chainDiag, setChainDiag] = useState<string[] | null>(null);
+  /* REMOVE BEFORE LAUNCH, ?chaindebug=1. THE SWIPE WINS OVER THE COLLECT (owner,
+     17 September 2026). A second press on an armed card collects it on the
+     PRESS, before anyone can know whether a swipe follows. Under the chain flag,
+     when that press also opened the chum gate, the collect is parked here by
+     card index and the chain settles it on release: a chain that joined a second
+     card cancels it and the card stays armed; a release that never got past the
+     first card collects exactly as the tap did. Off the flag this is never set.
+     The collect itself is called through a latest-value ref, because the chain's
+     listeners are bound once and collectChum is a new function every render. */
+  const chainHeldCollectRef = useRef<number | null>(null);
+  const chainTapCollectRef = useRef<((i: number) => void) | null>(null);
   // Filled by an effect below. The spawn runs several seconds after the drop,
   // so it is always populated by the time it is read.
   const chumImagesRef = useRef<{ image: string; band: string; name: string }[]>([]);
@@ -3365,6 +3376,16 @@ export default function BreedTree({
     if (cm) onChumCollected?.(cm.name);
     flashCorner();
   };
+  // REMOVE BEFORE LAUNCH, ?chaindebug=1. The tap's own collect, the same three
+  // calls as the card handler, refreshed every render (the navRef pattern) so
+  // the chain's once-bound listeners never call a stale collectChum.
+  useEffect(() => {
+    chainTapCollectRef.current = (i: number) => {
+      setArmedChum(null);
+      setTakenChum(i);
+      collectChum(i);
+    };
+  });
   // The cookie panel's two answers. They are pit objects, not UI: they squeeze
   // out of the panel, tumble, can be dragged and barge like anything else.
   const btnBodiesRef = useRef<PropBody[]>([]);
@@ -7922,6 +7943,15 @@ export default function BreedTree({
     };
     const end = (why: string) => {
       note = `${why}, ${chain?.cards.length ?? 0} card(s), path cleared`;
+      // A parked collect (see chainHeldCollectRef) goes ahead only on a clean
+      // release that never joined a second card. A chain, a cancel, a blur or a
+      // stale end all leave the card armed.
+      const held = chainHeldCollectRef.current;
+      if (held != null) {
+        chainHeldCollectRef.current = null;
+        if (why === "released" && (chain?.cards.length ?? 0) < 2) chainTapCollectRef.current?.(held);
+        else note += `, collect of #${held} cancelled, still armed`;
+      }
       chain = null;
       if (raf != null) { cancelAnimationFrame(raf); raf = null; }
       draw();
@@ -7956,12 +7986,13 @@ export default function BreedTree({
       if (!chain.pending) sweep(chain, e.clientX, e.clientY);
     };
     const up = (e: PointerEvent) => { if (chain && e.pointerId === chain.id) end("released"); };
+    const cancel = (e: PointerEvent) => { if (chain && e.pointerId === chain.id) end("cancelled"); };
     const lost = () => { if (chain) end("lost (blur or hidden)"); };
     const opts = { capture: true } as const;
     document.addEventListener("pointerdown", down, opts);
     document.addEventListener("pointermove", move, opts);
     document.addEventListener("pointerup", up, opts);
-    document.addEventListener("pointercancel", up, opts);
+    document.addEventListener("pointercancel", cancel, opts);
     window.addEventListener("blur", lost);
     document.addEventListener("visibilitychange", lost);
     const poll = window.setInterval(() => {
@@ -7977,7 +8008,7 @@ export default function BreedTree({
       document.removeEventListener("pointerdown", down, opts);
       document.removeEventListener("pointermove", move, opts);
       document.removeEventListener("pointerup", up, opts);
-      document.removeEventListener("pointercancel", up, opts);
+      document.removeEventListener("pointercancel", cancel, opts);
       window.removeEventListener("blur", lost);
       document.removeEventListener("visibilitychange", lost);
       window.clearInterval(poll);
@@ -9237,6 +9268,10 @@ export default function BreedTree({
                     if (chumFlyRef.current.has(i2)) return;
                     // First tap on this card: arm it, and disarm any other.
                     if (armedChum !== i2) { setArmedChum(i2); return; }
+                    // REMOVE BEFORE LAUNCH, ?chaindebug=1. This press may start a
+                    // swipe chain, so the chain decides on release. See
+                    // chainHeldCollectRef. Off the flag, nothing here changes.
+                    if (chainDebugOn() && chumGateRef.current === e.pointerId) { chainHeldCollectRef.current = i2; return; }
                     // Second tap on the armed card: taken.
                     setArmedChum(null);
                     setTakenChum(i2);
