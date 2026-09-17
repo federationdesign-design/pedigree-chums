@@ -876,8 +876,10 @@ function fuseDebugOn() {
                 with. The rounded corners are ignored
      no cross   the segment to it does not cross an earlier segment
 
-   HOW TO READ THE PANEL. chain state and pointer, the cards joined in order,
-   the gate, and the last thing that happened. A rejection says why, and a
+   HOW TO READ THE PANEL. chain state and pointer (ACTIVE, or DEAD once a link
+   has broken), the cards joined in order, any strained links with their gap,
+   the link that broke and the gap that broke it, the gate, and the last thing
+   that happened. See CHAIN_BREAK_GRACE_MS for strained against broken. A rejection says why, and a
    "not touching" says the measured gap as a share of a card side, which is the
    number to tune CHAIN_TOUCH_SLACK against.
 
@@ -895,6 +897,16 @@ const CHAIN_SAMPLE_PX = 12;
 // of the larger card's side. Resting cards meet within the solver's slop, not
 // exactly, so zero would reject pairs that are visibly in contact.
 const CHAIN_TOUCH_SLACK = 0.06;
+/* LIVE BREAKS. Every link in the chain is re-tested against CHAIN_TOUCH_SLACK on
+   every frame, because the pit keeps stepping and cards drift. A link that goes
+   over it turns grey at once, STRAINED, and heals if the cards close up again.
+   One that stays over for CHAIN_BREAK_GRACE_MS BREAKS: that link turns red with a
+   gap at its middle, where the two cards should meet, and the chain is DEAD from
+   that moment. Nothing more can join, the rest of the line greys and the live
+   segment to the finger goes. Release still just clears. The grace is the same
+   figure as CHUM_FLOOR_GRACE_MS and for the same reason: the solver parts
+   resting bodies for the odd frame, and a chain must not die of that. */
+const CHAIN_BREAK_GRACE_MS = 120;
 type ChainSq = { x: number; y: number; a: number; h: number };
 /* Separating axis test for two rotated squares (centre, angle in radians, half
    side). Returns the largest gap along any of the four axes: zero or less means
@@ -7827,7 +7839,14 @@ export default function BreedTree({
      the stale-closure trap noted on collectChum, avoided rather than risked. */
   useEffect(() => {
     if (!chainDebugOn()) return;
-    type Chain = { id: number; pending: boolean; cards: number[]; px: number; py: number; fx: number; fy: number };
+    type Chain = {
+      id: number; pending: boolean; cards: number[]; px: number; py: number; fx: number; fy: number;
+      // Link index (cards[s] to cards[s + 1]) -> when it first went over the
+      // slack and its gap now, as a share of a card side. Healthy links are absent.
+      strain: Map<number, { since: number; share: number }>;
+      // Set once, never cleared: the link that broke and the gap that broke it.
+      dead: { link: number; a: number; b: number; share: number } | null;
+    };
     let chain: Chain | null = null;
     let note = "idle";
     let raf: number | null = null;
@@ -7858,6 +7877,7 @@ export default function BreedTree({
       return { x: (pr.x - v[0]) * k, y: (pr.y - v[1]) * k, a: pr.a, h: side / 2 };
     };
     const joinAt = (ch: Chain, cx: number, cy: number) => {
+      if (ch.dead) return; // a broken chain takes nothing more
       const i = cardAt(cx, cy);
       if (i == null) return;
       const cards = ch.cards;
@@ -7897,52 +7917,98 @@ export default function BreedTree({
       const dots = g.querySelector("[data-chain=dots]");
       if (!glow || !core || !dots) return;
       if (!chain || chain.pending || !chain.cards.length) {
-        glow.setAttribute("points", "");
-        core.setAttribute("points", "");
+        glow.replaceChildren();
+        core.replaceChildren();
         dots.replaceChildren();
         return;
       }
-      const pts: { x: number; y: number }[] = [];
-      let unit = 0;
-      for (const i of chain.cards) {
-        const q = geo(i);
-        if (!q) continue;
-        pts.push(q);
-        if (!unit) unit = q.h;
+      const WHITE = "#ffffff", GREY = "#9ca3af", RED = "#ef4444";
+      const dead = chain.dead;
+      // Index aligned with chain.cards, so link s is always cps[s] to cps[s + 1].
+      const cps = chain.cards.map((i) => geo(i));
+      const unit = cps.find((q) => q)?.h ?? 0;
+      type Seg = { x1: number; y1: number; x2: number; y2: number; col: string };
+      const segs: Seg[] = [];
+      for (let s = 0; s < cps.length - 1; s++) {
+        const p = cps[s], q = cps[s + 1];
+        if (!p || !q) continue;
+        if (dead && dead.link === s) {
+          // The point of failure: red, and cut open at the middle, which is
+          // where the two cards should have been touching.
+          const len = Math.hypot(q.x - p.x, q.y - p.y) || 1;
+          const ux = (q.x - p.x) / len, uy = (q.y - p.y) / len;
+          const half = Math.min(len * 0.3, unit * 0.6);
+          const mx = (p.x + q.x) / 2, my = (p.y + q.y) / 2;
+          segs.push({ x1: p.x, y1: p.y, x2: mx - ux * half, y2: my - uy * half, col: RED });
+          segs.push({ x1: mx + ux * half, y1: my + uy * half, x2: q.x, y2: q.y, col: RED });
+        } else {
+          segs.push({ x1: p.x, y1: p.y, x2: q.x, y2: q.y, col: dead || chain.strain.has(s) ? GREY : WHITE });
+        }
       }
-      // The live end of the line is the finger itself.
+      // The live end of the line is the finger itself, while the chain lives.
+      const lastP = [...cps].reverse().find((q) => q);
       const sv = g.ownerSVGElement;
       const ctm = g.getScreenCTM();
-      if (sv && ctm) {
+      if (!dead && lastP && sv && ctm) {
         const p = sv.createSVGPoint();
         p.x = chain.fx; p.y = chain.fy;
         const w = p.matrixTransform(ctm.inverse());
-        pts.push({ x: w.x, y: w.y });
+        segs.push({ x1: lastP.x, y1: lastP.y, x2: w.x, y2: w.y, col: WHITE });
       }
-      const str = pts.map((p) => `${p.x},${p.y}`).join(" ");
-      glow.setAttribute("points", str);
-      core.setAttribute("points", str);
-      (glow as SVGElement).style.strokeWidth = String(unit * 0.5);
-      (core as SVGElement).style.strokeWidth = String(unit * 0.14);
+      const lay = (grp: Element, width: number) => {
+        while (grp.children.length > segs.length) grp.lastChild?.remove();
+        while (grp.children.length < segs.length) {
+          const l = document.createElementNS("http://www.w3.org/2000/svg", "line");
+          l.style.strokeLinecap = "round";
+          grp.appendChild(l);
+        }
+        segs.forEach((sg, j) => {
+          const l = grp.children[j] as SVGLineElement;
+          l.setAttribute("x1", String(sg.x1)); l.setAttribute("y1", String(sg.y1));
+          l.setAttribute("x2", String(sg.x2)); l.setAttribute("y2", String(sg.y2));
+          l.style.stroke = sg.col;
+          l.style.strokeWidth = String(width);
+        });
+      };
+      lay(glow, unit * 0.5);
+      lay(core, unit * 0.14);
       blur?.setAttribute("stdDeviation", String(unit * 0.2));
-      const n = chain.cards.length;
+      const n = cps.length;
       while (dots.children.length > n) dots.lastChild?.remove();
-      while (dots.children.length < n) {
-        const c = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-        c.style.fill = "#ffffff";
-        dots.appendChild(c);
-      }
+      while (dots.children.length < n) dots.appendChild(document.createElementNS("http://www.w3.org/2000/svg", "circle"));
       for (let d = 0; d < n; d++) {
-        const c = dots.children[d];
-        const q = pts[d];
-        if (!q) continue;
+        const c = dots.children[d] as SVGCircleElement;
+        const q = cps[d];
+        if (!q) { c.setAttribute("r", "0"); continue; }
         c.setAttribute("cx", String(q.x));
         c.setAttribute("cy", String(q.y));
         c.setAttribute("r", String(unit * 0.22));
+        // The two cards either side of the break go red; the rest grey once dead.
+        c.style.fill = dead ? (d === dead.link || d === dead.link + 1 ? RED : GREY) : WHITE;
+      }
+    };
+    // Every existing link, every frame. Only the chain's own cards are measured.
+    const checkLinks = (ch: Chain, now: number) => {
+      if (ch.dead || ch.cards.length < 2) return;
+      for (let s = 0; s < ch.cards.length - 1; s++) {
+        const ai = ch.cards[s], bi = ch.cards[s + 1];
+        const a = geo(ai), b = geo(bi);
+        if (!a || !b) continue;
+        const share = chainSquareGap(a, b) / (Math.max(a.h, b.h) * 2);
+        if (share <= CHAIN_TOUCH_SLACK) { ch.strain.delete(s); continue; }
+        const st = ch.strain.get(s);
+        if (!st) { ch.strain.set(s, { since: now, share }); continue; }
+        st.share = share;
+        if (now - st.since >= CHAIN_BREAK_GRACE_MS) {
+          ch.dead = { link: s, a: ai, b: bi, share };
+          ch.strain.clear();
+          note = `BROKE at #${ai}-#${bi}, gap ${Math.round(share * 100)}%`;
+          return;
+        }
       }
     };
     const end = (why: string) => {
-      note = `${why}, ${chain?.cards.length ?? 0} card(s), path cleared`;
+      note = `${why}, ${chain?.cards.length ?? 0} card(s)${chain?.dead ? ", chain was broken" : ""}, path cleared`;
       // A parked collect (see chainHeldCollectRef) goes ahead only on a clean
       // release that never joined a second card. A chain, a cancel, a blur or a
       // stale end all leave the card armed.
@@ -7967,6 +8033,7 @@ export default function BreedTree({
         joinAt(chain, chain.px, chain.py);
         sweep(chain, fx, fy);
       }
+      checkLinks(chain, performance.now());
       draw();
       raf = requestAnimationFrame(tick);
     };
@@ -7976,7 +8043,7 @@ export default function BreedTree({
       if (chain) return; // one chain at a time, a second finger is ignored
       const t = e.target as globalThis.Node | null;
       if (!t || !chumsGRef.current?.contains(t)) return;
-      chain = { id: e.pointerId, pending: true, cards: [], px: e.clientX, py: e.clientY, fx: e.clientX, fy: e.clientY };
+      chain = { id: e.pointerId, pending: true, cards: [], px: e.clientX, py: e.clientY, fx: e.clientX, fy: e.clientY, strain: new Map(), dead: null };
       note = "waiting for the gate";
       if (raf == null) raf = requestAnimationFrame(tick);
     };
@@ -7998,8 +8065,10 @@ export default function BreedTree({
     const poll = window.setInterval(() => {
       const gate = chumGateRef.current;
       setChainDiag([
-        `chain    ${!chain ? "idle" : chain.pending ? `waiting, pointer ${chain.id}` : `ACTIVE, pointer ${chain.id}`}`,
+        `chain    ${!chain ? "idle" : chain.pending ? `waiting, pointer ${chain.id}` : chain.dead ? `DEAD, pointer ${chain.id}` : `ACTIVE, pointer ${chain.id}`}`,
         `cards    ${chain ? `${chain.cards.length}${chain.cards.length ? ": #" + chain.cards.join(" #") : ""}` : "-"}`,
+        `strain   ${!chain || !chain.strain.size ? "none" : [...chain.strain].map(([s, st]) => `#${chain?.cards[s]}-#${chain?.cards[s + 1]} ${Math.round(st.share * 100)}%`).join(", ")}`,
+        `break    ${!chain?.dead ? "none" : `#${chain.dead.a}-#${chain.dead.b} gap ${Math.round(chain.dead.share * 100)}% (slack ${Math.round(CHAIN_TOUCH_SLACK * 100)}%)`}`,
         `gate     ${gate == null ? "shut" : `open, pointer ${gate}`}`,
         `last     ${note}`,
       ]);
@@ -10103,10 +10172,12 @@ export default function BreedTree({
                 <feGaussianBlur data-chain="blur" stdDeviation={4} />
               </filter>
             </defs>
-            <polyline data-chain="glow" points="" filter="url(#bt-chain-glow)"
-              style={{ fill: "none", stroke: "#ffffff", strokeLinecap: "round", strokeLinejoin: "round" }} />
-            <polyline data-chain="core" points=""
-              style={{ fill: "none", stroke: "#ffffff", strokeLinecap: "round", strokeLinejoin: "round" }} />
+            {/* One line per link rather than a single polyline, so each link can
+                carry its own state: white, grey while strained, red and cut
+                open where it broke. The glow group blurs a copy of the same
+                lines. */}
+            <g data-chain="glow" filter="url(#bt-chain-glow)" />
+            <g data-chain="core" />
             <g data-chain="dots" />
           </g>
         </svg>
