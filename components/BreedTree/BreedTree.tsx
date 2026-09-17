@@ -934,6 +934,16 @@ const CHAIN_MIN_CARDS = 3; // two cards cannot form a loop
    behaves exactly as it always did, arming and all. Tune this one number. */
 const CHAIN_TAP_UNLOCK_AT = 4;
 const CHAIN_MULT_STEP = 0.1; // each chum in the chain adds this to a multiplier starting at 1
+/* PAID PER CONNECTION (owner, 18 September 2026), the moment one card joins to
+   the next, flashed where the join happened like every other award. The closing
+   link is a connection and pays too, so a closed loop of four cards pays four.
+   It is NOT part of the multiplier, which still applies to the collect value of
+   a cleared loop and nothing else.
+
+   THE ONE THING A FAILED CHAIN KEEPS. Every other part of a failure pays
+   nothing, but these are banked as they are made, so a chain that dies has
+   still paid for the connections the player actually made. Deliberate. */
+const CHAIN_JOIN_POINTS = 10;
 const CHAIN_COLLAPSE_MS = 450;
 /* THE JOIN CLOCK (owner, 17 September 2026, raised from 500ms to a second the
    next day). That long from joining one card
@@ -3215,6 +3225,9 @@ export default function BreedTree({
      uses, so the running total and the milestone celebration see it. */
   const chainClearRef = useRef<((cards: number[]) => void) | null>(null);
   const chainBonusRef = useRef<((cards: number[]) => { sum: number; mult: number; bonus: number }) | null>(null);
+  // Pays CHAIN_JOIN_POINTS at the card just joined. Set inside the sim beside
+  // the other scoring refs, because numAt lives there.
+  const chainJoinScoreRef = useRef<((i: number) => void) | null>(null);
   // Filled by an effect below. The spawn runs several seconds after the drop,
   // so it is always populated by the time it is read.
   const chumImagesRef = useRef<{ image: string; band: string; name: string }[]>([]);
@@ -5987,6 +6000,12 @@ export default function BreedTree({
          applies to the summed value of the chain's chums. collectChum has
          already scored each card its own CHUM_COLLECT_POINTS, so this scores
          only the difference, once, flashed at the last card. */
+      // One connection made, paid on the spot and flashed at the card it
+      // reached. The bridge holds that card's live world position.
+      if (chainDebugOn()) chainJoinScoreRef.current = (i: number) => {
+        const b = chumBodiesRef.current[i];
+        if (b) numAt(b.x, b.y, CHAIN_JOIN_POINTS, performance.now());
+      };
       if (chainDebugOn()) chainBonusRef.current = (cards: number[]) => {
         const sum = cards.length * CHUM_COLLECT_POINTS;
         const mult = 1 + CHAIN_MULT_STEP * cards.length;
@@ -8020,6 +8039,7 @@ export default function BreedTree({
         if (why) { killChain(ch, `CANNOT CLOSE on #${i}, ${why}`); return; }
         ch.closed = true;
         ch.canClose = false;
+        chainJoinScoreRef.current?.(i); // the closing link is a connection
         note = `CIRCUIT CLOSED on #${i}, ${cards.length} cards`;
         return;
       }
@@ -8045,6 +8065,9 @@ export default function BreedTree({
       }
       cards.push(i);
       ch.lastJoin = performance.now(); // the join clock restarts on every card
+      // The connection just made, paid now and kept whatever becomes of the
+      // chain. The first card is not a connection and pays nothing.
+      chainJoinScoreRef.current?.(i);
       note = `joined #${i}`;
     };
     const sweep = (ch: Chain, cx: number, cy: number) => {
