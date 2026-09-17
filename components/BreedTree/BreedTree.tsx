@@ -910,9 +910,9 @@ function chainDebugOn() {
      release  the FIRST circle the player touched lifts and opens, exactly as a
               tap on it would. The others stay where they are
      after    completing that circle in the layer closes the rest of the chain
-     colour   the site's lemon yellow, the opposite of the cards' white
+     colour   white, the same as the cards
      see it   every circle holding the chain's breed turns its question mark
-              yellow. The photograph is never touched
+              white. The photograph is never touched
 
    Strip this, the constants, the refs, the DOG kind, the gate condition, the
    question mark highlight and the closing block in onRemove once it ships.
@@ -952,7 +952,10 @@ function dragDebugOn() {
 // A run of dogs is an open chain, so two is a chain. Its own figure rather than
 // CHAIN_MIN_CARDS, which is the CARDS' loop minimum and means something else.
 const DOG_CHAIN_MIN = 2;
-const DOG_CHAIN_COLOUR = "#ffd23e"; // --yellow, hard-coded: this is written into SVG by hand
+// WHITE, like the card chain (owner, 18 September 2026). It shipped in the site
+// yellow for one day as the deliberate opposite of the cards; both paths are now
+// white, and so is the question mark highlight below.
+const DOG_CHAIN_COLOUR = "#ffffff";
 /* Two circles, as a share of the larger diameter, so CHAIN_TOUCH_SLACK means the
    same for dogs as it does for cards. `h` is the radius here, and the angle is
    not read: a circle has no corners to turn. */
@@ -4603,7 +4606,7 @@ export default function BreedTree({
         }
         /* REMOVE BEFORE LAUNCH, ?dogchain=1. THE MARK IS THE HIGHLIGHT. While a
            dog chain is being drawn, every circle holding its breed turns its
-           question mark yellow, so the player can see where to drag next. The
+           question mark white, so the player can see where to drag next. The
            dog's photograph is never touched.
            Written only when the answer CHANGES, tracked on the element itself,
            so this costs nothing on the frames where nothing is happening. */
@@ -9190,11 +9193,12 @@ export default function BreedTree({
                 />
               </filter>
             ))}
-            {/* REMOVE BEFORE LAUNCH, ?dogchain=1. The fifth question mark filter:
-                the site's lemon yellow, for a circle holding the breed of the
-                chain being drawn. Same shape as the four above it, one colour. */}
+            {/* REMOVE BEFORE LAUNCH, ?dogchain=1. The fifth question mark filter,
+                for a circle holding the breed of the chain being drawn. White,
+                like the path, changed from the site yellow on 18 September 2026.
+                Same shape as the four above it, one colour. */}
             <filter id="bt-qmark-hi" x="0" y="0" width="100%" height="100%" colorInterpolationFilters="sRGB">
-              <feColorMatrix type="matrix" values="0 0 0 0 1 0 0 0 0 0.824 0 0 0 0 0.243 0 0 0 1 0" />
+              <feColorMatrix type="matrix" values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1 0" />
             </filter>
             {nodes.map((d, i) =>
               nodeImg(d) ? (
