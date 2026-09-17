@@ -890,6 +890,48 @@ function chainDebugOn() {
   if (typeof window === "undefined") return false;
   return window.location.search.indexOf("chaindebug=1") > -1;
 }
+
+/* ============================ REMOVE BEFORE LAUNCH ==========================
+   ?dogchain=1 : the same swipe chain, on the dog circles, 18 September 2026.
+
+   THE CASE IT IS FOR. A level like Tweed Water Spaniel holds the same breed
+   several times over, a pit full of Otterhounds. Rather than lift them one at a
+   time, the player draws through a run of them and opens one for all of them.
+
+   THE RULES, and every one of them is the kind's, not the gesture's:
+     start    only a circle whose breed has DUPLICATES in the pit, so a one-off
+              dog can never begin a chain
+     drag     a circle that can start one stops being draggable while pressed:
+              the chum gate does that, with one more condition, not a second gate
+     join     same breed as the first, and touching, like the cards
+     shape    open, never a circuit, never a lasso, two circles at least
+     leaves   a circle with nothing inside it can join. Most duplicates are
+              leaves and they are the whole point
+     release  the FIRST circle the player touched lifts and opens, exactly as a
+              tap on it would. The others stay where they are
+     after    completing that circle in the layer closes the rest of the chain
+     colour   the site's lemon yellow, the opposite of the cards' white
+     see it   every circle holding the chain's breed turns its question mark
+              yellow. The photograph is never touched
+
+   Strip this, the constants, the refs, the DOG kind, the gate condition, the
+   question mark highlight and the closing block in onRemove once it ships.
+   ========================================================================== */
+function dogChainOn() {
+  if (typeof window === "undefined") return false;
+  return window.location.search.indexOf("dogchain=1") > -1;
+}
+// A run of dogs is an open chain, so two is a chain. Its own figure rather than
+// CHAIN_MIN_CARDS, which is the CARDS' loop minimum and means something else.
+const DOG_CHAIN_MIN = 2;
+const DOG_CHAIN_COLOUR = "#ffd23e"; // --yellow, hard-coded: this is written into SVG by hand
+/* Two circles, as a share of the larger diameter, so CHAIN_TOUCH_SLACK means the
+   same for dogs as it does for cards. `h` is the radius here, and the angle is
+   not read: a circle has no corners to turn. */
+function chainCircleGapShare(A: ChainSq, B: ChainSq): number {
+  const gap = Math.hypot(B.x - A.x, B.y - A.y) - A.h - B.h;
+  return gap / (Math.max(A.h, B.h) * 2);
+}
 // Finger path sampling step in client px. Well under a card, so a fast swipe
 // cannot jump clean over one between two pointer events.
 const CHAIN_SAMPLE_PX = 12;
@@ -3238,6 +3280,28 @@ export default function BreedTree({
      where numAt and CHUM_COLLECT_POINTS live: it flashes the chain's multiplier
      bonus at the last card and scores it through the same onScore every collect
      uses, so the running total and the milestone celebration see it. */
+  /* REMOVE BEFORE LAUNCH, ?dogchain=1. See dogChainOn() above.
+     nodesRef  the packed nodes as a ref, because the chain's listeners are bound
+               once and must never read state
+     breed     the breed of the chain being drawn, or null. The frame writer
+               turns the question mark yellow on every circle holding it
+     chain     the chain REMEMBERED from release until completion, which can be a
+               minute later. Cleared when it is honoured, when the player backs
+               out of the layer without completing, and when the pit is torn down
+     starterAt whether the circle at a point may open a chain, asked by the chum
+               gate so a starter is not draggable
+     open      lifts a circle into the layer, the same call the tap makes
+     close     a circle leaves the pit: its body is held out of the world and it
+               poofs where it stood */
+  const nodesRef = useRef<Node[]>([]);
+  const dogChainBreedRef = useRef<string | null>(null);
+  const dogChainRef = useRef<{ opened: Node; others: Node[] } | null>(null);
+  const dogStarterAtRef = useRef<((cx: number, cy: number) => boolean) | null>(null);
+  const dogOpenRef = useRef<((i: number) => boolean) | null>(null);
+  const dogCloseRef = useRef<((n: Node) => void) | null>(null);
+  // The removed set is a ref, so closing circles changes nothing React can see.
+  // This is the nudge that gets them off the screen.
+  const [, setDogChainClosed] = useState(0);
   const chainClearRef = useRef<((cards: number[]) => void) | null>(null);
   const chainBonusRef = useRef<((cards: number[]) => { sum: number; mult: number; bonus: number }) | null>(null);
   // Pays CHAIN_JOIN_POINTS at the card just joined. Set inside the sim beside
@@ -4520,6 +4584,20 @@ export default function BreedTree({
           const sc = (drawR(d, v, k) * 1.4) / QMARK_VB;
           q.setAttribute("transform", `translate(${tx},${ty}) scale(${sc}) translate(${-QMARK_VB / 2},${-QMARK_VB / 2})`);
         }
+        /* REMOVE BEFORE LAUNCH, ?dogchain=1. THE MARK IS THE HIGHLIGHT. While a
+           dog chain is being drawn, every circle holding its breed turns its
+           question mark yellow, so the player can see where to drag next. The
+           dog's photograph is never touched.
+           Written only when the answer CHANGES, tracked on the element itself,
+           so this costs nothing on the frames where nothing is happening. */
+        const qi = q.firstElementChild;
+        if (qi) {
+          const want = dogChainBreedRef.current && d.data.name === dogChainBreedRef.current ? "1" : "0";
+          if (q.dataset.hi !== want) {
+            q.dataset.hi = want;
+            qi.setAttribute("filter", want === "1" ? "url(#bt-qmark-hi)" : `url(#bt-qmark-${(d.depth - 1 + 4) % 4})`);
+          }
+        }
       }
       const l = wrap?.children[1] as SVGGElement | undefined;
       if (l) {
@@ -4653,6 +4731,24 @@ export default function BreedTree({
     setLearnNode(d);
     return true;
   }
+
+  /* REMOVE BEFORE LAUNCH, ?dogchain=1. The nodes and the lift, as refs, for the
+     chain's once-bound listeners. liftToLearn is the tap's own call, and the
+     mouse constraint is let go first exactly as the tap does, so Matter is never
+     left pulling a body the sim has just taken out of the world.
+     Refreshed every render, and AFTER liftToLearn on purpose: assigning it in
+     the earlier effect read the function before its declaration. */
+  useEffect(() => {
+    nodesRef.current = nodes;
+    dogOpenRef.current = (i: number) => {
+      const n = nodesRef.current[i];
+      const wrap = circlesRef.current?.children[i] as SVGGElement | undefined;
+      const el = wrap?.children[0] as SVGCircleElement | undefined;
+      if (!n || !el) return false;
+      mcReleaseRef.current?.();
+      return liftToLearn(el, n);
+    };
+  });
 
   function onCircle(e: React.MouseEvent, d: Node) {
     e.stopPropagation();
@@ -6015,6 +6111,17 @@ export default function BreedTree({
          applies to the summed value of the chain's chums. collectChum has
          already scored each card its own CHUM_COLLECT_POINTS, so this scores
          only the difference, once, flashed at the last card. */
+      /* REMOVE BEFORE LAUNCH, ?dogchain=1. A circle leaves the pit: its body is
+         held, which is what takes it out of the physics world on the next step,
+         and it poofs where it stood so it does not simply blink away. The caller
+         adds it to the removed set, which is what hides the circle itself. The
+         same pair the learn completion has always used. */
+      if (dogChainOn()) dogCloseRef.current = (n) => {
+        const b = pitBodiesRef.current?.find(n);
+        if (b) b.held = true;
+        poofAt(n.x, n.y, performance.now());
+        wake();
+      };
       // One connection made, paid on the spot and flashed at the card it
       // reached. The bridge holds that card's live world position.
       if (chainDebugOn()) chainJoinScoreRef.current = (i: number) => {
@@ -7548,6 +7655,15 @@ export default function BreedTree({
             chumGateRef.current = e.pointerId;
             return;
           }
+          /* REMOVE BEFORE LAUNCH, ?dogchain=1. ONE MORE CONDITION ON THE SAME
+             GATE, not a gate of its own. A dog circle whose breed has duplicates
+             in the pit can start a chain, and a circle you can chain from must
+             not also be a circle you can drag, or the two gestures fight over
+             the same press. Every other circle is grabbed exactly as before. */
+          if (tgt && circlesRef.current?.contains(tgt) && dogStarterAtRef.current?.(e.clientX, e.clientY)) {
+            chumGateRef.current = e.pointerId;
+            return;
+          }
           setPos(e.clientX, e.clientY);
           mouse.button = 0;
           flickBuf.length = 0;
@@ -7610,6 +7726,11 @@ export default function BreedTree({
         setChumGone(new Set());
         chumTakenRef.current = new Set();
         setChumTaken(0);
+        // REMOVE BEFORE LAUNCH, ?dogchain=1. A remembered chain belongs to the
+        // pit that made it: a level change must not leave one waiting on a
+        // circle that no longer exists.
+        dogChainRef.current = null;
+        dogChainBreedRef.current = null;
         if (chumFlyRaf.current != null) { cancelAnimationFrame(chumFlyRaf.current); chumFlyRaf.current = null; }
         chumFlyRef.current = new Map();
         setArmedChum(null);
@@ -7967,7 +8088,10 @@ export default function BreedTree({
      Everything here reads refs, never state, so binding once is safe: this is
      the stale-closure trap noted on collectChum, avoided rather than risked. */
   useEffect(() => {
-    if (!chainDebugOn()) return;
+    // Either flag brings the gesture up; the kinds below decide which of them
+    // a given press belongs to.
+    const cardOn = chainDebugOn(), dogOn = dogChainOn();
+    if (!cardOn && !dogOn) return;
     type Chain = {
       id: number; pending: boolean; cards: number[]; px: number; py: number; fx: number; fy: number;
       // What this chain is made of. See ChainKind below.
@@ -8049,10 +8173,12 @@ export default function BreedTree({
       startable: (i: number) => boolean;                  // may open a chain
       joinBlock: (ch: Chain, i: number) => string | null; // the kind's own rule
       settle: (ch: Chain) => string;                      // a valid release
+      first?: (i: number) => void;                        // the chain's first thing
+      over?: () => void;                                  // the chain is gone
     };
     const CARD: ChainKind = {
       key: "chum card",
-      on: chainDebugOn(),
+      on: cardOn,
       colour: "#ffffff",
       circuit: true,
       minCards: CHAIN_MIN_CARDS,
@@ -8073,7 +8199,100 @@ export default function BreedTree({
           : `CLEARED, circuit closed, ${cards.length} cards`;
       },
     };
-    const KINDS: ChainKind[] = [CARD];
+    /* REMOVE BEFORE LAUNCH, ?dogchain=1. The dog circles, as a kind. Everything
+       it does not name here it gets from the gesture: the sweep, the clock, the
+       crossing test, the breaks, the kills, the collapse, the tone and the path.
+
+       IT READS REFS, NEVER STATE. nodesRef is the packed nodes, the owned set is
+       the live pit and the removed set is what has gone, all of them refs, so
+       these listeners can stay bound once. */
+    const circleAt = (cx: number, cy: number): number | null => {
+      const cg = circlesRef.current;
+      if (!cg) return null;
+      for (const hit of document.elementsFromPoint(cx, cy)) {
+        if (hit === cg || !cg.contains(hit)) continue;
+        let c: globalThis.Node | null = hit;
+        while (c && c.parentNode !== cg) c = c.parentNode;
+        const i = c ? Array.prototype.indexOf.call(cg.children, c) : -1;
+        if (i >= 0) return i;
+      }
+      return null;
+    };
+    const dogNode = (i: number): Node | null => nodesRef.current[i] ?? null;
+    // In the pit and still there: owned by the physics and not removed.
+    const dogInPit = (n: Node | null): n is Node =>
+      !!n && !!pitBodiesRef.current?.owned.has(n) && !removedNodesRef.current.has(n);
+    // How many circles of this breed are in the pit right now. Asked at the
+    // moment of the press and never cached: circles pop and go constantly.
+    // The hidden root and echoes (a circle named after its own parent) are not
+    // duplicates, so neither is counted.
+    const dogSameBreed = (name: string): number => {
+      const owned = pitBodiesRef.current?.owned;
+      if (!owned) return 0;
+      let n = 0;
+      for (const o of owned) {
+        if (o.depth > 0 && !isEcho(o) && o.data.name === name && !removedNodesRef.current.has(o)) n++;
+      }
+      return n;
+    };
+    const DOG: ChainKind = {
+      key: "dog circle",
+      on: dogOn,
+      colour: DOG_CHAIN_COLOUR,
+      circuit: false, // an open run, never a loop and never a lasso
+      minCards: DOG_CHAIN_MIN,
+      owns: (t) => !!circlesRef.current?.contains(t),
+      idAt: circleAt,
+      geo: (i) => {
+        const n = dogNode(i);
+        if (!dogInPit(n)) return null;
+        const v = viewRef.current;
+        const k = SIZE / v[2];
+        // `h` is the radius, and a circle has no angle worth reading.
+        return { x: (n.x - v[0]) * k, y: (n.y - v[1]) * k, a: 0, h: n.r * k };
+      },
+      gapShare: chainCircleGapShare,
+      busy: (i) => !dogInPit(dogNode(i)),
+      taken: (i) => !dogInPit(dogNode(i)),
+      // Duplicates only. A one-off dog cannot begin a chain, which is the whole
+      // rule: a chain is for a pit holding the same breed several times over.
+      startable: (i) => {
+        const n = dogNode(i);
+        return dogInPit(n) && n.depth > 0 && !isEcho(n) && dogSameBreed(n.data.name) > 1;
+      },
+      joinBlock: (ch, i) => {
+        const first = dogNode(ch.cards[0]), n = dogNode(i);
+        if (!first || !n) return "a circle went missing";
+        if (n.data.name !== first.data.name) return `WRONG BREED, #${i} is ${n.data.name}, not ${first.data.name}`;
+        return null;
+      },
+      /* THE FIRST CIRCLE OPENS, and only that one. The others stay where they
+         are until it is completed, which is what closes them: see dogChainRef
+         and the block in the layer's onRemove. The chain is remembered by NODE,
+         not by index, because a pop re-packs the tree and the indices move. */
+      settle: (ch) => {
+        const at = ch.cards[0];
+        const opened = dogNode(at);
+        const others = ch.cards.slice(1).map(dogNode).filter(dogInPit);
+        if (!opened) return "the first circle went missing, nothing opened";
+        const ok = dogOpenRef.current?.(at) ?? false;
+        if (!ok) return `could not open #${at}, ${opened.data.name}`;
+        dogChainRef.current = { opened, others };
+        return `OPENED ${opened.data.name}, ${others.length} more waiting on it`;
+      },
+      // The highlight follows the chain: every circle of this breed turns its
+      // question mark yellow while the chain lives, and back when it is gone.
+      first: (i) => { dogChainBreedRef.current = dogNode(i)?.data.name ?? null; },
+      over: () => { dogChainBreedRef.current = null; },
+    };
+    const KINDS: ChainKind[] = [CARD, DOG];
+    // Asked by the chum gate, so a circle that can start a chain is not also a
+    // circle that can be dragged. Off the flag it always answers no.
+    dogStarterAtRef.current = (cx, cy) => {
+      if (!DOG.on) return false;
+      const i = circleAt(cx, cy);
+      return i != null && DOG.startable(i);
+    };
     // Why the last card could not close the loop back to the first right now,
     // or null if it could. The same touching and crossing tests as any join.
     const closeBlock = (ch: Chain): string | null => {
@@ -8123,7 +8342,13 @@ export default function BreedTree({
       // to refuse and carry on.
       if (cards.includes(i)) { killChain(ch, `REPEAT CARD, #${i} was already in the chain`); return; }
       if (K.busy(i)) { note = `#${i} is being collected`; return; }
-      if (last === undefined) { cards.push(i); ch.lastJoin = performance.now(); note = `started on #${i}`; return; }
+      if (last === undefined) {
+        cards.push(i);
+        ch.lastJoin = performance.now();
+        K.first?.(i); // the kind may want to know what it started on
+        note = `started on #${i}`;
+        return;
+      }
       // The kind's own rule, if it has one, before the shared geometry.
       const own = K.joinBlock(ch, i);
       if (own) { killChain(ch, own); return; }
@@ -8419,6 +8644,7 @@ export default function BreedTree({
         chainHeldCollectRef.current = null;
         note += `, collect of #${held} cancelled, still armed`;
       }
+      ch.kind.over?.();
       chain = null;
     };
     // Every existing link, every frame. Only the chain's own cards are measured.
@@ -8477,6 +8703,7 @@ export default function BreedTree({
         if (why === "released" && isTap) chainTapCollectRef.current?.(held);
         else if (!cleared) note += `, collect of #${held} cancelled, still armed`;
       }
+      ch?.kind.over?.();
       chain = null;
       if (raf != null) { cancelAnimationFrame(raf); raf = null; }
       if (collapse) raf = requestAnimationFrame(tick);
@@ -8579,6 +8806,10 @@ export default function BreedTree({
       if (raf != null) cancelAnimationFrame(raf);
       chain = null;
       collapse = null;
+      // REMOVE BEFORE LAUNCH, ?dogchain=1. The gate asks this ref on every press,
+      // so it must not outlive the listeners that answer it.
+      dogStarterAtRef.current = null;
+      dogChainBreedRef.current = null;
       if (actx) void actx.close().catch(() => { /* already closed */ });
     };
   }, []);
@@ -8904,6 +9135,12 @@ export default function BreedTree({
                 />
               </filter>
             ))}
+            {/* REMOVE BEFORE LAUNCH, ?dogchain=1. The fifth question mark filter:
+                the site's lemon yellow, for a circle holding the breed of the
+                chain being drawn. Same shape as the four above it, one colour. */}
+            <filter id="bt-qmark-hi" x="0" y="0" width="100%" height="100%" colorInterpolationFilters="sRGB">
+              <feColorMatrix type="matrix" values="0 0 0 0 1 0 0 0 0 0.824 0 0 0 0 0.243 0 0 0 1 0" />
+            </filter>
             {nodes.map((d, i) =>
               nodeImg(d) ? (
                 <pattern key={i} id={`bt-img-${i}`} patternContentUnits="objectBoundingBox" width="1" height="1">
@@ -11142,6 +11379,35 @@ export default function BreedTree({
                  learn shortcut costs points. Until now it did not. It does. */
               onScore?.(LEARN_COST);
               removedNodesRef.current.add(learnNode);
+              /* REMOVE BEFORE LAUNCH, ?dogchain=1. COMPLETING THE OPENED CIRCLE
+                 CLOSES THE REST OF ITS CHAIN. This is the moment the chain was
+                 remembered for: the player drew through a run of one breed, this
+                 one opened, and finishing it settles all of them.
+
+                 EVERY CIRCLE IS CHECKED FIRST. Minutes can pass in the layer, and
+                 in that time one of them may have been knocked out, collected or
+                 removed some other way, so each is only closed if it is still in
+                 the pit and not already gone.
+
+                 The chain is spent either way: honoured here, and dropped in
+                 onClose if the player backs out without completing.
+
+                 BEFORE the round-won test below, deliberately: closing these can
+                 empty the pit, and that test is what notices. */
+              const dc = dogChainRef.current;
+              if (dc && dc.opened === learnNode) {
+                dogChainRef.current = null;
+                const pit = pitBodiesRef.current?.owned;
+                let shut = 0;
+                for (const other of dc.others) {
+                  if (!pit?.has(other) || removedNodesRef.current.has(other)) continue;
+                  removedNodesRef.current.add(other);
+                  dogCloseRef.current?.(other);
+                  shut++;
+                }
+                // The removed set is a ref, so nothing above would re-render.
+                if (shut) setDogChainClosed((c) => c + 1);
+              }
               const owned = pitBodiesRef.current?.owned;
               if (owned && [...owned].every((n) => removedNodesRef.current.has(n))) {
                 const fb = pitBodiesRef.current?.find(learnNode);
@@ -11189,6 +11455,10 @@ export default function BreedTree({
             if (body && learnNode && !removedNodesRef.current.has(learnNode)) {
               body.held = false; // falls back in from where it was lifted
             }
+            // REMOVE BEFORE LAUNCH, ?dogchain=1. Backed out without completing,
+            // so the chain is SPENT: the others stay in the pit and nothing
+            // closes. Drawing another chain is the way to try again.
+            if (dogChainRef.current && dogChainRef.current.opened === learnNode) dogChainRef.current = null;
             setLearnNode(null);
             setLearnCard(null);
             wakeRef.current?.();
