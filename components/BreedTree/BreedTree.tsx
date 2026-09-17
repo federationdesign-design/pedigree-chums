@@ -899,8 +899,9 @@ function chainDebugOn() {
    time, the player draws through a run of them and opens one for all of them.
 
    THE RULES, and every one of them is the kind's, not the gesture's:
-     start    only a circle whose breed has DUPLICATES in the pit, so a one-off
-              dog can never begin a chain
+     start    only a circle with another of the SAME BREED TOUCHING it, which is
+              the join's own test asked one move early. A duplicate somewhere
+              else in the pit is not enough: see startable for why
      drag     a circle that can start one stops being draggable while pressed:
               the chum gate does that, with one more condition, not a second gate
      join     same breed as the first, and touching, like the cards
@@ -8225,6 +8226,10 @@ export default function BreedTree({
       settle: (ch: Chain) => string;                      // a valid release
       first?: (i: number) => void;                        // the chain's first thing
       over?: () => void;                                  // the chain is gone
+      // A press that finds nothing under it cannot start this kind. The cards
+      // start on the press itself and do not care; the circles must not, or a
+      // press the hit test misses would take the gate and refuse a drag.
+      needsHit?: boolean;
     };
     const CARD: ChainKind = {
       key: "chum card",
@@ -8276,6 +8281,31 @@ export default function BreedTree({
     // moment of the press and never cached: circles pop and go constantly.
     // The hidden root and echoes (a circle named after its own parent) are not
     // duplicates, so neither is counted.
+    // A circle as drawn, from the node itself. The kind's geo() is this by index.
+    const dogGeoOf = (n: Node): ChainSq | null => {
+      if (!dogInPit(n)) return null;
+      const v = viewRef.current;
+      const k = SIZE / v[2];
+      return { x: (n.x - v[0]) * k, y: (n.y - v[1]) * k, a: 0, h: n.r * k };
+    };
+    /* Is another circle of the same breed TOUCHING this one? The same question a
+       join asks, asked before the chain starts, so a circle only becomes a
+       starter when a chain could really be drawn from it. Costs one pass over
+       the pit's own circles, at the press and nowhere else. */
+    const dogTouchingTwin = (n: Node): boolean => {
+      const a = dogGeoOf(n);
+      const owned = pitBodiesRef.current?.owned;
+      if (!a || !owned) return false;
+      for (const o of owned) {
+        if (o === n || o.depth === 0 || isEcho(o) || o.data.name !== n.data.name) continue;
+        if (removedNodesRef.current.has(o)) continue;
+        const b = dogGeoOf(o);
+        if (b && chainCircleGapShare(a, b) <= CHAIN_TOUCH_SLACK) return true;
+      }
+      return false;
+    };
+    // Kept for the readout only: how many of a breed the pit holds, which is the
+    // number that used to decide a starter and no longer does.
     const dogSameBreed = (name: string): number => {
       const owned = pitBodiesRef.current?.owned;
       if (!owned) return 0;
@@ -8306,9 +8336,27 @@ export default function BreedTree({
       taken: (i) => !dogInPit(dogNode(i)),
       // Duplicates only. A one-off dog cannot begin a chain, which is the whole
       // rule: a chain is for a pit holding the same breed several times over.
+      /* A STARTER NEEDS A TWIN IT COULD ACTUALLY REACH (18 September 2026).
+
+         WHAT WAS WRONG. This asked whether the breed had duplicates ANYWHERE in
+         the pit, while a join asks whether the circle under the finger is the
+         same breed AND touching. Both compare the name the same way, exactly,
+         so the names were never the problem: the SCOPE was. On Scottish Terrier
+         the tree holds three Earth Dogs, three Ancient Celtic earth dogs and
+         three Early Badger hunting dogs, so once the pit has popped, almost
+         every circle has a duplicate somewhere, every press qualified as a
+         starter, the gate took it, and no circle could be dragged. The join then
+         failed on the neighbour, which is a different breed.
+
+         THE TEST IS NOW THE JOIN'S OWN. A circle may start a chain only if
+         another circle of the same breed is TOUCHING it, by the same name test,
+         the same geometry and the same CHAIN_TOUCH_SLACK a join uses. So a
+         starter is a circle a chain can really be drawn from, and everything
+         else drags as it always did. */
       startable: (i) => {
         const n = dogNode(i);
-        return dogInPit(n) && n.depth > 0 && !isEcho(n) && dogSameBreed(n.data.name) > 1;
+        if (!dogInPit(n) || n.depth === 0 || isEcho(n)) return false;
+        return dogTouchingTwin(n);
       },
       joinBlock: (ch, i) => {
         const first = dogNode(ch.cards[0]), n = dogNode(i);
@@ -8334,6 +8382,7 @@ export default function BreedTree({
       // question mark yellow while the chain lives, and back when it is gone.
       first: (i) => { dogChainBreedRef.current = dogNode(i)?.data.name ?? null; },
       over: () => { dogChainBreedRef.current = null; },
+      needsHit: true,
     };
     const KINDS: ChainKind[] = [CARD, DOG];
     // Asked by the chum gate, so a circle that can start a chain is not also a
@@ -8357,6 +8406,7 @@ export default function BreedTree({
       out.push(`node     ${n.data.name}, depth ${n.depth}, echo ${isEcho(n) ? "yes" : "no"}`);
       out.push(`in pit   owned ${owned?.has(n) ? "yes" : "no"}, removed ${removedNodesRef.current.has(n) ? "yes" : "no"}, pit holds ${owned?.size ?? 0}`);
       out.push(`breed    ${dogSameBreed(n.data.name)} of "${n.data.name}" in the pit`);
+      out.push(`twin     ${dogTouchingTwin(n) ? "one of them is TOUCHING this circle" : "none of them is touching this circle"}`);
       out.push(`starter  ${DOG.startable(i) ? "YES, gate will take it" : "no, it should drag"}`);
       return out;
     };
@@ -8818,6 +8868,7 @@ export default function BreedTree({
       for (const k of KINDS) {
         if (!k.on || !k.owns(t)) continue;
         const i0 = k.idAt(e.clientX, e.clientY);
+        if (i0 == null && k.needsHit) continue;
         if (i0 != null && !k.startable(i0)) continue;
         kind = k;
         break;
