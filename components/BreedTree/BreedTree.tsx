@@ -924,6 +924,15 @@ const CHAIN_BREAK_GRACE_MS = 120;
    CHAIN_COLLAPSE_MS, with a low falling tone, so a failed chain never looks like
    a missed gesture. A single card is a tap, not a chain, and ends silently. */
 const CHAIN_MIN_CARDS = 3; // two cards cannot form a loop
+/* THE CIRCUIT IS THE ONLY WAY TO COLLECT (owner, 17 September 2026). Under the
+   chain flag, arming a card with one tap and taking it with a second is no
+   longer how a card is cleared: a card leaves the pit in a closed loop.
+
+   THE ENDGAME EXCEPTION. A loop needs three touching cards, so a pit with one
+   or two cards left, or with the last few scattered apart, could not be
+   finished at all. At or below this many cards left, the tap is unlocked and
+   behaves exactly as it always did, arming and all. Tune this one number. */
+const CHAIN_TAP_UNLOCK_AT = 4;
 const CHAIN_MULT_STEP = 0.1; // each chum in the chain adds this to a multiplier starting at 1
 const CHAIN_COLLAPSE_MS = 450;
 type ChainSq = { x: number; y: number; a: number; h: number };
@@ -3275,6 +3284,12 @@ export default function BreedTree({
      record that still says "taken" after landing, with no render in between.
      Reset with chumGone when the flood is torn down. */
   const chumTakenRef = useRef<Set<number>>(new Set());
+  /* The same count as state, so the render can tell how many cards are left in
+     the pit, and a ref of the answer for the frame writer, which cannot read
+     state. See CHAIN_TAP_UNLOCK_AT: below that many left, the tap is unlocked
+     and every remaining card says so by pulsing its edge. */
+  const [chumTaken, setChumTaken] = useState(0);
+  const tapUnlockedRef = useRef(true);
   /* THE COLLECT FLIGHT, ported from the main pit's collectXf.
 
      A collected card does not blink out. It tumbles into the bottom-left
@@ -3399,6 +3414,7 @@ export default function BreedTree({
     // Already on its way, or already landed, so leave it alone.
     if (chumFlyRef.current.has(i) || chumTakenRef.current.has(i)) return;
     chumTakenRef.current.add(i);
+    setChumTaken((n) => n + 1);
     // Out of the physics world first, so nothing can knock a
     // card that is already on its way to being collected.
     const b = chumBodiesRef.current[i];
@@ -3440,6 +3456,11 @@ export default function BreedTree({
       if (armedChumRef.current != null && cards.includes(armedChumRef.current)) setArmedChum(null);
       for (const i of cards) collectChum(i);
     };
+    /* Is the tap allowed right now? Off the chain flag it always is, and the
+       pit behaves as it always has. Under the flag it unlocks only for the last
+       few cards. Refreshed every render, and read by the card's press handler
+       and by the frame writer, neither of which can read state directly. */
+    tapUnlockedRef.current = !chainDebugOn() || chumList.length - chumTaken <= CHAIN_TAP_UNLOCK_AT;
   });
   // The cookie panel's two answers. They are pit objects, not UI: they squeeze
   // out of the panel, tumble, can be dragged and barge like anything else.
@@ -4375,10 +4396,16 @@ export default function BreedTree({
         if (el && gRef === chumsGRef) {
           if (pr.floorLostAt && now - pr.floorLostAt > CHUM_FLOOR_GRACE_MS) { pr.onFloor = false; pr.floorLostAt = 0; }
           const edge = el.querySelector("[data-chum-edge]") as SVGRectElement | null;
+          // THE TAP UNLOCK PULSE, below taken, armed and the floor red so none of
+          // those are hidden by it: the edge breathes between white and the site
+          // yellow while the tap is available. See CHAIN_TAP_UNLOCK_AT.
+          const m = 0.5 + 0.5 * Math.sin(now / 320);
           if (edge) edge.style.stroke =
             takenChumRef.current === pr.idx ? "#22c55e"
             : armedChumRef.current === pr.idx ? "var(--yellow, #ffd23e)"
-            : pr.onFloor ? "#ef4444" : "#ffffff";
+            : pr.onFloor ? "#ef4444"
+            : tapUnlockedRef.current ? `rgb(255, ${Math.round(255 - 45 * m)}, ${Math.round(255 - 193 * m)})`
+            : "#ffffff";
         }
       }
     }
@@ -7538,6 +7565,7 @@ export default function BreedTree({
         // Indices are per flood, so a new one must not inherit the old holes.
         setChumGone(new Set());
         chumTakenRef.current = new Set();
+        setChumTaken(0);
         if (chumFlyRaf.current != null) { cancelAnimationFrame(chumFlyRaf.current); chumFlyRaf.current = null; }
         chumFlyRef.current = new Map();
         setArmedChum(null);
@@ -9600,6 +9628,13 @@ export default function BreedTree({
                     e.stopPropagation();
                     // Already on its way, so leave it alone.
                     if (chumFlyRef.current.has(i2)) return;
+                    /* REMOVE BEFORE LAUNCH, ?chaindebug=1. THE TAP IS LOCKED
+                       while the pit still holds more than CHAIN_TAP_UNLOCK_AT
+                       cards: the closed circuit is the way to collect, so the
+                       press arms nothing and takes nothing, and is left to the
+                       chain. Under the unlock, and always off the flag, the rest
+                       of this handler runs exactly as it always has. */
+                    if (!tapUnlockedRef.current) return;
                     // First tap on this card: arm it, and disarm any other.
                     if (armedChum !== i2) { setArmedChum(i2); return; }
                     // REMOVE BEFORE LAUNCH, ?chaindebug=1. This press may start a
