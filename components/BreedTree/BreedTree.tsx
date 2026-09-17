@@ -921,6 +921,34 @@ function dogChainOn() {
   if (typeof window === "undefined") return false;
   return window.location.search.indexOf("dogchain=1") > -1;
 }
+
+/* ============================ REMOVE BEFORE LAUNCH ==========================
+   ?dragdebug=1 : why a press on a dog circle did or did not take the gate,
+   18 September 2026.
+
+   THE QUESTION. With ?dogchain=1 on, NO circle can be dragged, when only a
+   circle whose breed has duplicates should be undraggable. Two readings of the
+   code failed to explain it, and the data killed both: most levels have no
+   duplicated circle at the top at all (166 levels, only 20 where every circle
+   is a duplicate), and the level this feature is for has two circles with
+   different names. So the rule cannot be answering "duplicate" honestly, and
+   this prints every step of its answer instead of a third guess.
+
+   HOW TO READ IT. One press, broken down:
+     target     what was actually pressed, and whether the circles group holds it
+     index      what the hit test made of it, and the node at that index
+     node       name, depth, echo, and whether the pit owns it
+     breed      how many circles of that name the pit holds right now
+     starter    the verdict the gate asked for
+     gate       which branch took the press, and where mouse.button ended up
+   The line that disagrees with the pit on screen is the culprit.
+
+   Strip this, the ref, the poll, the panel and the two blocks that write it.
+   ========================================================================== */
+function dragDebugOn() {
+  if (typeof window === "undefined") return false;
+  return window.location.search.indexOf("dragdebug=1") > -1;
+}
 // A run of dogs is an open chain, so two is a chain. Its own figure rather than
 // CHAIN_MIN_CARDS, which is the CARDS' loop minimum and means something else.
 const DOG_CHAIN_MIN = 2;
@@ -3297,6 +3325,11 @@ export default function BreedTree({
   const dogChainBreedRef = useRef<string | null>(null);
   const dogChainRef = useRef<{ opened: Node; others: Node[] } | null>(null);
   const dogStarterAtRef = useRef<((cx: number, cy: number) => boolean) | null>(null);
+  // REMOVE BEFORE LAUNCH, ?dragdebug=1. The same question as dogStarterAt, asked
+  // for a readout: every step of the answer rather than the answer.
+  const dogStarterWhyRef = useRef<((cx: number, cy: number) => string[]) | null>(null);
+  const dragDiagRef = useRef<string[] | null>(null);
+  const [dragDiag, setDragDiag] = useState<string[] | null>(null);
   const dogOpenRef = useRef<((i: number) => boolean) | null>(null);
   const dogCloseRef = useRef<((n: Node) => void) | null>(null);
   // The removed set is a ref, so closing circles changes nothing React can see.
@@ -7660,7 +7693,18 @@ export default function BreedTree({
              in the pit can start a chain, and a circle you can chain from must
              not also be a circle you can drag, or the two gestures fight over
              the same press. Every other circle is grabbed exactly as before. */
-          if (tgt && circlesRef.current?.contains(tgt) && dogStarterAtRef.current?.(e.clientX, e.clientY)) {
+          const dogStarter = !!(tgt && circlesRef.current?.contains(tgt) && dogStarterAtRef.current?.(e.clientX, e.clientY));
+          // REMOVE BEFORE LAUNCH, ?dragdebug=1. Every step of that answer, plus
+          // what this press then did, written for the panel.
+          if (dragDebugOn()) {
+            const el = tgt as Element | null;
+            dragDiagRef.current = [
+              `target   <${el?.nodeName ?? "?"}> circles hold it ${tgt && circlesRef.current?.contains(tgt) ? "yes" : "no"}`,
+              ...(dogStarterWhyRef.current?.(e.clientX, e.clientY) ?? ["why      (chain listeners not bound)"]),
+              `gate     ${dogStarter ? "TAKEN by the dog rule, no drag" : "left open, the constraint may grab"}`,
+            ];
+          }
+          if (dogStarter) {
             chumGateRef.current = e.pointerId;
             return;
           }
@@ -8293,6 +8337,23 @@ export default function BreedTree({
       const i = circleAt(cx, cy);
       return i != null && DOG.startable(i);
     };
+    /* REMOVE BEFORE LAUNCH, ?dragdebug=1. The same answer, shown working. Each
+       line is one step of dogStarterAt, so whichever step is lying can be read
+       off the screen rather than reasoned about. */
+    dogStarterWhyRef.current = (cx, cy) => {
+      const out = [`flag     dogchain ${DOG.on ? "on" : "off"}`];
+      const i = circleAt(cx, cy);
+      out.push(`index    ${i == null ? "no circle under the point" : `#${i} of ${nodesRef.current.length} nodes, ${circlesRef.current?.children.length ?? 0} drawn`}`);
+      if (i == null) return out;
+      const n = dogNode(i);
+      if (!n) { out.push("node     nothing at that index"); return out; }
+      const owned = pitBodiesRef.current?.owned;
+      out.push(`node     ${n.data.name}, depth ${n.depth}, echo ${isEcho(n) ? "yes" : "no"}`);
+      out.push(`in pit   owned ${owned?.has(n) ? "yes" : "no"}, removed ${removedNodesRef.current.has(n) ? "yes" : "no"}, pit holds ${owned?.size ?? 0}`);
+      out.push(`breed    ${dogSameBreed(n.data.name)} of "${n.data.name}" in the pit`);
+      out.push(`starter  ${DOG.startable(i) ? "YES, gate will take it" : "no, it should drag"}`);
+      return out;
+    };
     // Why the last card could not close the loop back to the first right now,
     // or null if it could. The same touching and crossing tests as any join.
     const closeBlock = (ch: Chain): string | null => {
@@ -8812,6 +8873,17 @@ export default function BreedTree({
       dogChainBreedRef.current = null;
       if (actx) void actx.close().catch(() => { /* already closed */ });
     };
+  }, []);
+  /* ==================== REMOVE BEFORE LAUNCH, ?dragdebug=1 ====================
+     The last press, copied out of its ref for the panel. It is written at the
+     press itself, and only read here, so the pointer path never waits on React. */
+  useEffect(() => {
+    if (!dragDebugOn()) return;
+    const id = window.setInterval(() => {
+      const lines = dragDiagRef.current;
+      setDragDiag((cur) => (lines === cur ? cur : lines));
+    }, 100);
+    return () => window.clearInterval(id);
   }, []);
   /* ==================== REMOVE BEFORE LAUNCH, ?fusedebug=1 ====================
      Ten times a second rather than per frame, for the same reason as the chumbox
@@ -11484,6 +11556,19 @@ export default function BreedTree({
       {/* ==================== REMOVE BEFORE LAUNCH, ?chaindebug=1 ===================
           The chain readout. A sibling of the info box for the same reason as the
           fuse panel above, and below it so both flags can be on together. */}
+      {/* ==================== REMOVE BEFORE LAUNCH, ?dragdebug=1 ===================
+          Why the last press on a circle did or did not take the gate. Left side,
+          clear of the lives and the title, and a sibling of the info box like
+          every other readout here. */}
+      {dragDiag && (
+        <div style={{
+          position: "fixed", bottom: 6, left: 6, zIndex: 9000, pointerEvents: "none", visibility: "visible",
+          background: "rgba(0,0,0,0.78)", color: "#0f0", padding: "6px 8px",
+          font: "11px/1.35 ui-monospace, monospace", borderRadius: 6, whiteSpace: "pre",
+        }}>
+          {dragDiag.join("\n")}
+        </div>
+      )}
       {chainDiag && (
         <div style={{
           position: "fixed", top: 96, right: 6, zIndex: 9000, pointerEvents: "none", visibility: "visible",
