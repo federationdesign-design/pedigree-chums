@@ -895,7 +895,18 @@ export default function LineageMap({
      to two fifths at once rather than by the 15% steps that appeared to do
      nothing. If that overshoots, this constant is finally the right dial to turn. */
   const liftOrChum = circular || strongBg;
-  const nodeR = (share: number) => radius(share) * (liftOrChum ? PIT_NODE_SCALE : 1);
+  /* THE SHRINKING IS A PHONE MEASURE, 16 September 2026 (owner: put the desktop
+     nodes back to normal size).
+
+     PIT_NODE_SCALE and the spacing that follows it were cut four times in one day to
+     fit a tree on a phone. They were never gated on width, so a desktop got the same
+     0.659 and the same tightened connectors, which is why the nodes read as small
+     there. isMobile is the gate the frame grid already uses for the same reason.
+
+     Desktop returns to 1: full-size nodes, full RSTEP, full NODE_POKE. Nothing about
+     the phone changes. */
+  const nodeScaleK = liftOrChum && isMobile ? PIT_NODE_SCALE : 1;
+  const nodeR = (share: number) => radius(share) * nodeScaleK;
   // The ring a node draws, HARD-CLAMPED so it is never thicker than the ring of
   // the circle it sits inside (the hierarchy rule). Recursive: each node caps to
   // its parent's already-clamped ring, so the cap holds all the way up the tree.
@@ -1299,7 +1310,7 @@ export default function LineageMap({
       // RSTEP scaled with the nodes on the lift and the chum tree, see NODE_POKE
       // below. RING1 is the root's own first ring and is left alone: it is
       // measured off ROOT, the card, which does not shrink.
-      const rstep = RSTEP * (liftOrChum ? PIT_NODE_SCALE * 0.9 : 1); // the same 0.9 as SPACING_K below
+      const rstep = RSTEP * (liftOrChum && isMobile ? PIT_NODE_SCALE * 0.9 : 1); // the same 0.9 as SPACING_K below
       const dist = depth === 0 ? RING1 : (INSTR_NAMES.has(breed.name) ? rstep * 1.2 : rstep);
       // mini pit: the connector is aware of both circles' real sizes - the
       // child clears the parent's EDGE by 50px whatever size either circle is
@@ -1402,7 +1413,7 @@ export default function LineageMap({
          further 10% the owner asked for, and keeps the two separately tunable from
          here on. */
       const SPACING_K = 0.9;
-      const NODE_POKE = 18 * (liftOrChum ? PIT_NODE_SCALE * SPACING_K : 1);
+      const NODE_POKE = 18 * (liftOrChum && isMobile ? PIT_NODE_SCALE * SPACING_K : 1);
       const shoulderD = rOf(n) + kidR * 0.2 + NODE_POKE;
       const step = spread / Math.max(cnt, 2); // non-circular fan only
       const ringD = shoulderD;                // single-child radius
