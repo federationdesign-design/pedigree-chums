@@ -558,42 +558,23 @@ export default function LineageMap({
      level gave no feedback at all.
      Driven off pointerdown with a timed release rather than held until
      pointerup, so a fast tap still shows the whole movement. */
-  const [learnDown, setLearnDown] = useState(false);
-  const learnDownT = useRef(0);
-  /* THE BUTTON STAYS DOWN UNTIL THE WORK IS DONE, 16 September 2026 (owner: the
-     pack-out can take a few seconds with fifty images and users keep clicking
-     because nothing looks like it is happening).
+  /* NO PRESSED LOOK AND NO WAIT (owner, 18 September 2026). This button used to
+     sink 8px on press and refuse the next press until its step had settled.
 
-     WHAT IT WAS. A 140ms timer released the pressed look whatever the button had
-     started, so on a long step it popped back up while the images were still
-     flying and read as a dead press. Nothing stopped a second click either, and
-     each one starts another step.
+     WHAT WENT WITH IT. `learnDown` and the .chumTopDown class that moved it,
+     `learnBusy`, which made revealStep return early while a step was running,
+     the 130ms release that followed the step's own state landing, and the 6
+     SECOND GUARD, whose whole job was to put the button back up if a step never
+     reported: a failsafe for the pressed look, never for the work.
 
-     TWO CHANGES. `busy` holds the pressed look until the step reports back rather
-     than on a timer, and revealStep returns early while it is set, so repeat
-     clicks during a run are ignored rather than queued. The 140ms floor is kept
-     underneath so a short step still reads as a press rather than a flicker.
+     WHAT OVERLAPPING PRESSES DO NOW. Every press runs a step. A step reads the
+     current open, picked and packed state and advances one rung from it, so
+     presses cannot corrupt anything or run the same rung twice; they can only
+     advance faster than the animations, which reads as the layer hurrying rather
+     than as a fault. The slowest step, the pack-out, is the one where that is
+     most visible.
 
-     releaseLearn is called from the end of the step, and from a 6s guard so a step
-     that never reports cannot leave the button stuck down for the session. */
-  const learnBusy = useRef(false);
-  const releaseLearn = () => {
-    learnBusy.current = false;
-    window.clearTimeout(learnDownT.current);
-    learnDownT.current = window.setTimeout(() => setLearnDown(false), 140);
-  };
-  /* CORRECTED 16 September 2026, same day: this set learnBusy, and revealStep
-     returns early while that is set, so the click that FOLLOWED the pointerdown
-     was refused and the button did nothing at all. The flag is set inside
-     revealStep now, after its own guard, so the first click runs and only a
-     second one during the same step is refused. This function is back to what it
-     always was, the pressed look, plus the 6s guard that releases it. */
-  const pressLearn = () => {
-    setLearnDown(true);
-    window.clearTimeout(learnDownT.current);
-    learnDownT.current = window.setTimeout(releaseLearn, 6000);
-  };
-  useEffect(() => () => window.clearTimeout(learnDownT.current), []);
+     The auto button keeps its own press, which is CSS and has no timer. */
   const [rootGone, setRootGone] = useState(false);
   // Preload all images for instruction cards so they appear instantly when tapped
   useEffect(() => {
@@ -998,24 +979,8 @@ export default function LineageMap({
   const [showRemove, setShowRemove] = useState(false);
   const [removing, setRemoving] = useState(false);
   const [packed, setPacked] = useState(false);
-  /* RELEASES THE BUTTON WHEN THE STEP HAS LANDED. revealStep's work shows up as a
-     change in what is open, what has been picked, or the packed flag, and the
-     animations that follow are short and fixed. 520ms covers the longest of them,
-     the 460ms pack tween, with a little over. Only runs while the button is
-     actually down, so it costs nothing the rest of the time. */
-  useEffect(() => {
-    if (!learnBusy.current) return;
-    /* 520 -> 130, 16 September 2026 (owner: the button stays down about 0.4s when
-       exposing the next rung takes under 0.1s).
-
-       520 was sized for the 460ms pack tween, the LONGEST step. Every other step
-       is near instant, so the button sat down long after its work was done. This
-       effect fires when the step's state lands, so 130 is just enough for the
-       press to register as a press. The pack-out still holds the button, because
-       its own tween keeps re-firing this while it runs. */
-    const t = window.setTimeout(releaseLearn, 130);
-    return () => window.clearTimeout(t);
-  }, [open, picked, packed]);
+  // The effect that released the pressed look when a step landed went with the
+  // pressed look itself, 18 September 2026. See the note above learnDown's grave.
  // the ancestor pack has been ordered into its two columns
   const [packLabels, setPackLabels] = useState<{ chum: { x: number; y: number } | null; alive: { x: number; y: number } | null; extinct: { x: number; y: number } | null }>({ chum: null, alive: null, extinct: null });
   const [packHidden, setPackHidden] = useState<Set<string>>(new Set()); // duplicate ancestors folded out of the pack
@@ -2245,12 +2210,11 @@ export default function LineageMap({
   // cards already pulled out stay put. Auto-revealed nodes score +50 each, less
   // than a manual tap (125/250) so hand-exploration stays the rewarding route.
   const revealStep = () => {
-    // Ignored while a step is still running. Without this a fifty-image pack-out
-    // took a second and a third click on top of itself. The flag is set HERE
-    // rather than in pressLearn: pointerdown fires before click, so setting it
-    // there refused the very click that set it.
-    if (learnBusy.current) return;
-    learnBusy.current = true;
+    // NO LONGER REFUSED WHILE A STEP RUNS (owner, 18 September 2026): the wait
+    // before the button could be pressed again has gone with its pressed look.
+    // Each call advances one rung from the CURRENT open, picked and packed
+    // state, so pressing through an animation hurries the layer along rather
+    // than repeating or corrupting a step.
     // For instructional cards: show first child icon on first double-click
     if (INSTR_NAMES.has(breed.name)) {
       const firstUnpicked = shown.filter((n) => n.img && !picked.has(n._id) && n._parent);
@@ -2831,20 +2795,16 @@ export default function LineageMap({
           <g
             className={styles.removeBtn}
             transform={`translate(0,${circular ? 4 * learnBtnScale + 2 : 62}) scale(${circular ? learnBtnScale : 1})`}
-            /* pressLearn sets the busy flag on pointerdown, which fires before
-               this, so revealStep sees it and a second click is refused. The
-               release is NOT scheduled here: the step's own animations run after
-               this returns, so releasing on click would pop the button straight
-               back up. It is released by the effect below, when the state the step
-               changed has settled. */
+            /* The press still stops here so it cannot reach the layer behind,
+               but it no longer moves the button or starts a timer. */
             onClick={(e) => { e.stopPropagation(); revealStep(); }}
-            onPointerDown={(e) => { e.stopPropagation(); pressLearn(); }}
+            onPointerDown={(e) => { e.stopPropagation(); }}
             role="button"
             aria-label="Learn"
           >
             <g className={styles.chumPop}>
               <rect x={-100} y={-26} width={200} height={68} rx={34} className={styles.compBase} />
-              <g className={learnDown ? styles.chumTopDown : styles.chumTop}>
+              <g className={styles.chumTop}>
                 <rect x={-100} y={-34} width={200} height={68} rx={34} className={styles.compPill} />
                 <rect x={-88} y={-28} width={176} height={22} rx={12} className={styles.chumGloss} />
                 <text className={styles.compText} textAnchor="middle" dominantBaseline="central" y={5}>Learn</text>
