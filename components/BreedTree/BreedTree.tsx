@@ -907,6 +907,17 @@ const CHAIN_TOUCH_SLACK = 0.06;
    figure as CHUM_FLOOR_GRACE_MS and for the same reason: the solver parts
    resting bodies for the odd frame, and a chain must not die of that. */
 const CHAIN_BREAK_GRACE_MS = 120;
+/* RELEASE. The chain is judged once more on the spot, with no grace: every link
+   must be within CHAIN_TOUCH_SLACK, no link may have broken, and no card may
+   have been taken some other way meanwhile. At least CHAIN_MIN_CARDS. Valid: every
+   card goes through collectChum and the multiplier bonus is scored on top.
+   Invalid: nothing clears and nothing scores, but the path COLLAPSES, snapping
+   at every link and falling away over CHAIN_COLLAPSE_MS, with a low falling
+   tone, so a failed chain never looks like a missed gesture. A single card is
+   a tap, not a chain, and fails silently. */
+const CHAIN_MIN_CARDS = 2;
+const CHAIN_MULT_STEP = 0.1; // each chum in the chain adds this to a multiplier starting at 1
+const CHAIN_COLLAPSE_MS = 450;
 type ChainSq = { x: number; y: number; a: number; h: number };
 /* Separating axis test for two rotated squares (centre, angle in radians, half
    side). Returns the largest gap along any of the four axes: zero or less means
@@ -3171,6 +3182,15 @@ export default function BreedTree({
      listeners are bound once and collectChum is a new function every render. */
   const chainHeldCollectRef = useRef<number | null>(null);
   const chainTapCollectRef = useRef<((i: number) => void) | null>(null);
+  /* REMOVE BEFORE LAUNCH, ?chaindebug=1. SCORING AND CLEARING A CHAIN.
+     chainClearRef clears a valid chain through collectChum, card by card, and is
+     refreshed every render like chainTapCollectRef, so the collectChum it calls
+     always closes over the current chumList. chainBonusRef is set inside the sim,
+     where numAt and CHUM_COLLECT_POINTS live: it flashes the chain's multiplier
+     bonus at the last card and scores it through the same onScore every collect
+     uses, so the running total and the milestone celebration see it. */
+  const chainClearRef = useRef<((cards: number[]) => void) | null>(null);
+  const chainBonusRef = useRef<((cards: number[]) => { sum: number; mult: number; bonus: number }) | null>(null);
   // Filled by an effect below. The spawn runs several seconds after the drop,
   // so it is always populated by the time it is read.
   const chumImagesRef = useRef<{ image: string; band: string; name: string }[]>([]);
@@ -3241,6 +3261,12 @@ export default function BreedTree({
   // Cards taken out of the flood, by index, so the card can go the instant it
   // is collected rather than waiting for the level list to be rebuilt.
   const [chumGone, setChumGone] = useState<Set<number>>(new Set());
+  /* Every card index collectChum has ever taken in this flood, written the
+     moment it is taken and never removed. The in-flight map forgets a card when
+     it lands and chumGone only catches up on the next render, so this is the one
+     record that still says "taken" after landing, with no render in between.
+     Reset with chumGone when the flood is torn down. */
+  const chumTakenRef = useRef<Set<number>>(new Set());
   /* THE COLLECT FLIGHT, ported from the main pit's collectXf.
 
      A collected card does not blink out. It tumbles into the bottom-left
@@ -3338,14 +3364,16 @@ export default function BreedTree({
      by whichever delay fires first, and flies the whole map as one batch. A card
      already in flight is skipped, so the same index twice scores once.
 
-     IT DOES NOT GUARD A CARD THAT HAS ALREADY LANDED. The in-flight check above
-     only holds for the 520ms of the flight: stepChumFly deletes a card from the
-     flight map when it lands and moves it into chumGone. Called again after
-     that, this scores the card a second time (another 1000), reports it through
-     onChumCollected again, flashes the corner and flies an invisible card. The tap can never do it, because a landed card is
-     display none with pointer events off. A swipe chain, or any other caller
-     that picks cards by position, must check chumGone (and the flight map)
-     itself before calling this.
+     A CARD THAT HAS ALREADY LANDED IS NOW GUARDED TOO (17 September 2026, for
+     the swipe chain). The in-flight check only holds for the 520ms of the
+     flight: stepChumFly deletes a card from the flight map when it lands, and
+     chumGone only catches up on the next render. Called again in that gap or
+     after, this used to score the card a second time (another 1000), report it
+     through onChumCollected again, flash the corner and fly an invisible card.
+     chumTakenRef records every card taken, synchronously and for good, so a
+     second call for any card already taken does nothing. The tap never reached
+     this, because a landed card is display none with pointer events off, so
+     the tap is unchanged.
 
      IT READS chumList FROM THE RENDER IT WAS CREATED IN. collectChum is a new
      function on every render and closes over that render's chumList, which is
@@ -3360,8 +3388,9 @@ export default function BreedTree({
      problem. stepChumFly does not: it reads only refs and a functional
      setChumGone, so an old copy of it flies cards correctly. */
   const collectChum = (i: number) => {
-    // Already on its way, so leave it alone.
-    if (chumFlyRef.current.has(i)) return;
+    // Already on its way, or already landed, so leave it alone.
+    if (chumFlyRef.current.has(i) || chumTakenRef.current.has(i)) return;
+    chumTakenRef.current.add(i);
     // Out of the physics world first, so nothing can knock a
     // card that is already on its way to being collected.
     const b = chumBodiesRef.current[i];
@@ -3396,6 +3425,12 @@ export default function BreedTree({
       setArmedChum(null);
       setTakenChum(i);
       collectChum(i);
+    };
+    // A valid chain: every card through the one collect route. A card armed
+    // for a tap goes with its chain, so its yellow edge is cleared.
+    chainClearRef.current = (cards: number[]) => {
+      if (armedChumRef.current != null && cards.includes(armedChumRef.current)) setArmedChum(null);
+      for (const i of cards) collectChum(i);
     };
   });
   // The cookie panel's two answers. They are pit objects, not UI: they squeeze
@@ -5902,6 +5937,19 @@ export default function BreedTree({
         if (!b) return;
         numAt(b.x, b.y, CHUM_COLLECT_POINTS, performance.now());
       };
+      /* REMOVE BEFORE LAUNCH, ?chaindebug=1. THE CHAIN MULTIPLIER. Each chum in
+         the chain adds CHAIN_MULT_STEP to a multiplier that starts at 1, and it
+         applies to the summed value of the chain's chums. collectChum has
+         already scored each card its own CHUM_COLLECT_POINTS, so this scores
+         only the difference, once, flashed at the last card. */
+      if (chainDebugOn()) chainBonusRef.current = (cards: number[]) => {
+        const sum = cards.length * CHUM_COLLECT_POINTS;
+        const mult = 1 + CHAIN_MULT_STEP * cards.length;
+        const bonus = Math.round(sum * mult) - sum;
+        const b = chumBodiesRef.current[cards[cards.length - 1]];
+        if (b && bonus > 0) numAt(b.x, b.y, bonus, performance.now());
+        return { sum, mult, bonus };
+      };
       removeChumBodyRef.current = (mb) => {
         Composite.remove(world, mb);
         for (const o of Composite.allBodies(world) as { isStatic?: boolean }[]) {
@@ -7481,6 +7529,7 @@ export default function BreedTree({
         setChumList([]);
         // Indices are per flood, so a new one must not inherit the old holes.
         setChumGone(new Set());
+        chumTakenRef.current = new Set();
         if (chumFlyRaf.current != null) { cancelAnimationFrame(chumFlyRaf.current); chumFlyRaf.current = null; }
         chumFlyRef.current = new Map();
         setArmedChum(null);
@@ -7913,7 +7962,6 @@ export default function BreedTree({
       if (!g) return;
       const glow = g.querySelector("[data-chain=glow]");
       const core = g.querySelector("[data-chain=core]");
-      const blur = g.querySelector("[data-chain=blur]");
       const dots = g.querySelector("[data-chain=dots]");
       if (!glow || !core || !dots) return;
       if (!chain || chain.pending || !chain.cards.length) {
@@ -7955,6 +8003,25 @@ export default function BreedTree({
         const w = p.matrixTransform(ctm.inverse());
         segs.push({ x1: lastP.x, y1: lastP.y, x2: w.x, y2: w.y, col: WHITE });
       }
+      // The two cards either side of the break go red; the rest grey once dead.
+      const dotList = cps.map((q, d) => q
+        ? { x: q.x, y: q.y, col: dead ? (d === dead.link || d === dead.link + 1 ? RED : GREY) : WHITE }
+        : null);
+      paint(segs, dotList, unit);
+    };
+    // Writes lines and dots into the path layer. Shared by the live chain and
+    // the collapse, so the two can never be drawn two different ways.
+    const paint = (
+      segs: { x1: number; y1: number; x2: number; y2: number; col: string }[],
+      dotList: ({ x: number; y: number; col: string } | null)[],
+      unit: number,
+    ) => {
+      const g = chainGRef.current;
+      const glow = g?.querySelector("[data-chain=glow]");
+      const core = g?.querySelector("[data-chain=core]");
+      const blur = g?.querySelector("[data-chain=blur]");
+      const dots = g?.querySelector("[data-chain=dots]");
+      if (!glow || !core || !dots) return;
       const lay = (grp: Element, width: number) => {
         while (grp.children.length > segs.length) grp.lastChild?.remove();
         while (grp.children.length < segs.length) {
@@ -7973,20 +8040,108 @@ export default function BreedTree({
       lay(glow, unit * 0.5);
       lay(core, unit * 0.14);
       blur?.setAttribute("stdDeviation", String(unit * 0.2));
-      const n = cps.length;
+      const n = dotList.length;
       while (dots.children.length > n) dots.lastChild?.remove();
       while (dots.children.length < n) dots.appendChild(document.createElementNS("http://www.w3.org/2000/svg", "circle"));
       for (let d = 0; d < n; d++) {
         const c = dots.children[d] as SVGCircleElement;
-        const q = cps[d];
+        const q = dotList[d];
         if (!q) { c.setAttribute("r", "0"); continue; }
         c.setAttribute("cx", String(q.x));
         c.setAttribute("cy", String(q.y));
         c.setAttribute("r", String(unit * 0.22));
-        // The two cards either side of the break go red; the rest grey once dead.
-        c.style.fill = dead ? (d === dead.link || d === dead.link + 1 ? RED : GREY) : WHITE;
+        c.style.fill = q.col;
       }
     };
+    /* THE COLLAPSE. A failed chain's last shape, snapped open at every link, red,
+       falling and fading over CHAIN_COLLAPSE_MS. Each half link drifts its own
+       way so it reads as the chain coming apart, not the path sliding off. */
+    type Collapse = {
+      t0: number; unit: number;
+      pieces: { x1: number; y1: number; x2: number; y2: number; drift: number }[];
+      dots: { x: number; y: number; drift: number }[];
+    };
+    let collapse: Collapse | null = null;
+    const startCollapse = (cards: number[]) => {
+      const cps = cards.map((i) => geo(i));
+      const unit = cps.find((q) => q)?.h ?? 0;
+      const pieces: Collapse["pieces"] = [];
+      for (let s = 0; s < cps.length - 1; s++) {
+        const p = cps[s], q = cps[s + 1];
+        if (!p || !q) continue;
+        const len = Math.hypot(q.x - p.x, q.y - p.y) || 1;
+        const ux = (q.x - p.x) / len, uy = (q.y - p.y) / len;
+        const half = Math.min(len * 0.12, unit * 0.3);
+        const mx = (p.x + q.x) / 2, my = (p.y + q.y) / 2;
+        pieces.push({ x1: p.x, y1: p.y, x2: mx - ux * half, y2: my - uy * half, drift: Math.random() * 2 - 1 });
+        pieces.push({ x1: mx + ux * half, y1: my + uy * half, x2: q.x, y2: q.y, drift: Math.random() * 2 - 1 });
+      }
+      const dotsArr = cps.flatMap((q) => (q ? [{ x: q.x, y: q.y, drift: Math.random() * 2 - 1 }] : []));
+      collapse = { t0: performance.now(), unit, pieces, dots: dotsArr };
+    };
+    // Paints one collapse frame. False once it is over, having cleared the layer.
+    const drawCollapse = (now: number): boolean => {
+      const g = chainGRef.current;
+      if (!collapse || !g) return false;
+      const t = Math.min(1, (now - collapse.t0) / CHAIN_COLLAPSE_MS);
+      if (t >= 1) {
+        collapse = null;
+        g.style.opacity = "";
+        paint([], [], 0);
+        return false;
+      }
+      const u = collapse.unit;
+      const fall = u * 8 * t * t;
+      const RED = "#ef4444";
+      paint(
+        collapse.pieces.map((p) => ({ x1: p.x1 + p.drift * u * 1.5 * t, y1: p.y1 + fall, x2: p.x2 + p.drift * u * 1.5 * t, y2: p.y2 + fall, col: RED })),
+        collapse.dots.map((d) => ({ x: d.x + d.drift * u * t, y: d.y + fall, col: RED })),
+        u,
+      );
+      g.style.opacity = String(1 - t);
+      return true;
+    };
+    /* THE FAIL TONE. The site has no sound anywhere and no audio files, so this
+       is synthesised: a short triangle wave falling from 260Hz to 70Hz. The
+       context is made on first use, inside the release that failed, which is a
+       user gesture, so browsers allow it. Silent wherever audio is unavailable. */
+    let actx: AudioContext | null = null;
+    const failTone = () => {
+      try {
+        const AC = window.AudioContext ?? (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+        if (!AC) return;
+        actx = actx ?? new AC();
+        if (actx.state === "suspended") void actx.resume();
+        const t = actx.currentTime;
+        const osc = actx.createOscillator();
+        const gain = actx.createGain();
+        osc.type = "triangle";
+        osc.frequency.setValueAtTime(260, t);
+        osc.frequency.exponentialRampToValueAtTime(70, t + 0.32);
+        gain.gain.setValueAtTime(0.0001, t);
+        gain.gain.exponentialRampToValueAtTime(0.3, t + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.36);
+        osc.connect(gain).connect(actx.destination);
+        osc.start(t);
+        osc.stop(t + 0.38);
+      } catch { /* no audio available */ }
+    };
+    // Why a released chain may not clear, or null if it may. No grace here.
+    const judge = (ch: Chain): string | null => {
+      if (ch.dead) return `link #${ch.dead.a}-#${ch.dead.b} had broken, gap ${Math.round(ch.dead.share * 100)}%`;
+      for (const i of ch.cards) {
+        if (chumFlyRef.current.has(i) || chumTakenRef.current.has(i)) return `#${i} was already taken`;
+      }
+      for (let s = 0; s < ch.cards.length - 1; s++) {
+        const ai = ch.cards[s], bi = ch.cards[s + 1];
+        const a = geo(ai), b = geo(bi);
+        if (!a || !b) return `#${!a ? ai : bi} could not be measured`;
+        const share = chainSquareGap(a, b) / (Math.max(a.h, b.h) * 2);
+        if (share > CHAIN_TOUCH_SLACK) return `link #${ai}-#${bi} gap ${Math.round(share * 100)}% at release`;
+      }
+      return null;
+    };
+    let result = "none yet";
     // Every existing link, every frame. Only the chain's own cards are measured.
     const checkLinks = (ch: Chain, now: number) => {
       if (ch.dead || ch.cards.length < 2) return;
@@ -8008,23 +8163,51 @@ export default function BreedTree({
       }
     };
     const end = (why: string) => {
-      note = `${why}, ${chain?.cards.length ?? 0} card(s)${chain?.dead ? ", chain was broken" : ""}, path cleared`;
+      const ch = chain;
+      const n = ch?.cards.length ?? 0;
+      note = `${why}, ${n} card(s)${ch?.dead ? ", chain was broken" : ""}, path cleared`;
+      // Only a real release of a real chain is judged. A cancel, a blur or a
+      // stale end is not the player's doing, so it just clears, silently.
+      let cleared = false;
+      if (ch && why === "released" && n >= CHAIN_MIN_CARDS) {
+        const fail = judge(ch);
+        if (fail) {
+          result = `FAILED, ${fail}, nothing scored`;
+          startCollapse(ch.cards);
+          failTone();
+        } else {
+          const cards = [...ch.cards];
+          chainClearRef.current?.(cards);
+          const r = chainBonusRef.current?.(cards);
+          result = r
+            ? `CLEARED ${n}: ${r.sum} x${r.mult.toFixed(1)} = ${r.sum + r.bonus} (bonus ${r.bonus})`
+            : `CLEARED ${n}`;
+          cleared = true;
+        }
+        note = result;
+      }
       // A parked collect (see chainHeldCollectRef) goes ahead only on a clean
-      // release that never joined a second card. A chain, a cancel, a blur or a
-      // stale end all leave the card armed.
+      // release that never joined a second card. A chain that cleared took the
+      // card with it. A failed chain, a cancel, a blur or a stale end all leave
+      // the card armed.
       const held = chainHeldCollectRef.current;
       if (held != null) {
         chainHeldCollectRef.current = null;
-        if (why === "released" && (chain?.cards.length ?? 0) < 2) chainTapCollectRef.current?.(held);
-        else note += `, collect of #${held} cancelled, still armed`;
+        if (why === "released" && n < CHAIN_MIN_CARDS) chainTapCollectRef.current?.(held);
+        else if (!cleared) note += `, collect of #${held} cancelled, still armed`;
       }
       chain = null;
       if (raf != null) { cancelAnimationFrame(raf); raf = null; }
-      draw();
+      if (collapse) raf = requestAnimationFrame(tick);
+      else draw();
     };
     const tick = () => {
       raf = null;
-      if (!chain) { draw(); return; }
+      if (!chain) {
+        if (drawCollapse(performance.now())) raf = requestAnimationFrame(tick);
+        else draw();
+        return;
+      }
       if (chain.pending) {
         // After dispatch, so the stage's onDown has had its say.
         if (chumGateRef.current !== chain.id) { chain = null; note = "press did not open the gate"; draw(); return; }
@@ -8043,6 +8226,12 @@ export default function BreedTree({
       if (chain) return; // one chain at a time, a second finger is ignored
       const t = e.target as globalThis.Node | null;
       if (!t || !chumsGRef.current?.contains(t)) return;
+      // A new chain cuts short any collapse still falling.
+      if (collapse) {
+        collapse = null;
+        if (chainGRef.current) chainGRef.current.style.opacity = "";
+        paint([], [], 0);
+      }
       chain = { id: e.pointerId, pending: true, cards: [], px: e.clientX, py: e.clientY, fx: e.clientX, fy: e.clientY, strain: new Map(), dead: null };
       note = "waiting for the gate";
       if (raf == null) raf = requestAnimationFrame(tick);
@@ -8071,6 +8260,7 @@ export default function BreedTree({
         `break    ${!chain?.dead ? "none" : `#${chain.dead.a}-#${chain.dead.b} gap ${Math.round(chain.dead.share * 100)}% (slack ${Math.round(CHAIN_TOUCH_SLACK * 100)}%)`}`,
         `gate     ${gate == null ? "shut" : `open, pointer ${gate}`}`,
         `last     ${note}`,
+        `result   ${result}`,
       ]);
     }, 100);
     return () => {
@@ -8083,6 +8273,8 @@ export default function BreedTree({
       window.clearInterval(poll);
       if (raf != null) cancelAnimationFrame(raf);
       chain = null;
+      collapse = null;
+      if (actx) void actx.close().catch(() => { /* already closed */ });
     };
   }, []);
   /* ==================== REMOVE BEFORE LAUNCH, ?fusedebug=1 ====================
