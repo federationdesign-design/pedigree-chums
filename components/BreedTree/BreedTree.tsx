@@ -9099,7 +9099,36 @@ export default function BreedTree({
           put the zoom and drag focus off the middle of the screen. The pit now
           keeps the full height and the box floats over it by design. Do not
           re-add the class without moving the centring off the stage rect first. */}
-      <div className={`${styles.stage}${dockAside ? " " + styles.stageDocked : ""}`} ref={stageRef}>
+      {/* THE BROWSER'S OWN DRAG IS NOT WELCOME HERE (18 September 2026).
+
+          WHAT WAS HAPPENING, mouse only. The pit draws real SVG <image>
+          elements for the chum cards and the toys, and a picture is something
+          the browser will happily drag by itself. Nothing in the pit's press
+          paths prevents the default, by design: the dog circles say so in as
+          many words, because the press has to reach the stage listener that
+          feeds Matter. So a mouse press on a card started a NATIVE drag, with a
+          translucent ghost of the pit following the cursor.
+
+          AND IT TOOK THE POINTER WITH IT. Once a native drag begins the browser
+          owns the pointer, our stream stops and a cancel arrives, so the swipe
+          chain never swept and never drew. One cause, both symptoms: the ghost,
+          and a card chain that worked on a phone and not with a mouse.
+
+          THE GUARD IS ONE EVENT. dragstart bubbles, so this catches a drag
+          starting on any picture in the pit and refuses it. preventDefault on
+          POINTERDOWN would also have worked and is deliberately not used: it
+          suppresses the compatibility mouse events, which is a far bigger blast
+          radius than this needs. The other half of the same problem, dragging a
+          text selection, is handled by user-select in .stage.
+
+          Touch never had either problem: native drag and selection drag are
+          mouse behaviours, and touch-action on .stage is the touch equivalent
+          and has been there all along. */}
+      <div
+        className={`${styles.stage}${dockAside ? " " + styles.stageDocked : ""}`}
+        ref={stageRef}
+        onDragStart={(e) => e.preventDefault()}
+      >
         <svg
           viewBox={viewBox}
           // Records the press only. No stopPropagation: the stage listener above

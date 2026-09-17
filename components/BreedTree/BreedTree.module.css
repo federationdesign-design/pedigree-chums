@@ -13,6 +13,16 @@
   margin: 0;
   z-index: -1;
   pointer-events: auto;
+  /* NO SELECTION IN THE PIT, mouse only (18 September 2026). The other half of
+     the native drag problem described on the stage element itself: with nothing
+     preventing the default, a mouse press could start a text selection and then
+     drag it, which takes the pointer away exactly as a picture drag does.
+     Nothing here is meant to be selected. The stage holds only the pit's SVG and
+     the effects canvas: no inputs, no buttons, no editable text, and no prose.
+     The write-up, the breadcrumbs and every control live in the info box, which
+     is a sibling of this element and is untouched. */
+  user-select: none;
+  -webkit-user-select: none;
 }
 .fxCanvas {
   /* J17: the canvas effects layer. The SVG fills the stage, so the canvas and
