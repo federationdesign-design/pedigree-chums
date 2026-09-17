@@ -2566,7 +2566,25 @@ export default function LineageMap({
             width={R*2+rootRingW*2} height={R*2+rootRingW*2}
             rx={circular ? R + rootRingW : 24}
             className={styles.rootCard}
-            style={circular && ringColor ? { fill: ringColor, stroke: ringColor } : undefined} />
+            /* GREEN ONCE EVERY CIRCLE IS FRAMED, 16 September 2026 (owner: the ring
+               goes back to its rarity yellow when the level is done, and should go
+               green).
+
+               THE LIFT KEEPS THE RING IT WORE IN THE PIT, which is RING_PALETTE by
+               depth: on the owner's Southern Hound that is #fff200, the depth-1
+               yellow, applied inline here and therefore beating anything the
+               stylesheet says. That is correct while there is work left, because the
+               ring is how the player finds the dog they lifted.
+
+               Once the frames are full it means nothing, and green is what this game
+               says for finished everywhere else: the Collect button, the filled
+               frame, the placed card's outline, the full progress bar. packed counts
+               too, since packing the cards away is the other way to finish.
+
+               Both fill and stroke change: the fill is the ring band behind the
+               picture, so leaving it yellow would draw a yellow halo inside a green
+               rim. */
+            style={circular && ringColor ? { fill: (framesDone || packed) ? "#22c55e" : ringColor, stroke: (framesDone || packed) ? "#22c55e" : ringColor } : undefined} />
           {breed.image ? <image href={bust(breed.image)} x={-R} y={-R} width={R*2} height={R*2} clipPath={`url(#${clip})`} preserveAspectRatio="xMidYMid slice" /> : null}
           {/* Rarity ring + OUTWARD glow. The crisp ring is drawn LAST, on top, in the
               tier colour. Behind it sit three blurred bands OFFSET OUTWARD so each one's
