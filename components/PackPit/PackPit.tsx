@@ -360,7 +360,9 @@ export default function PackPit() {
       const BIG = 84 * SCALE;
       const pctFont = (typeof window !== "undefined" ? getComputedStyle(document.documentElement).getPropertyValue("--font-pct").trim() : "") || "Montserrat"; // Open Sans for the % figures
       const ball = { key: "__ball", label: "Tennis ball", src: "/tennis-ball.svg", shape: "ball", width: BIG * 2.25 * (isMobile ? 0.9 : 1), aspect: 1 };
-      const bone = { key: "__bone", label: "Bone", src: "/big-bone.svg", shape: "bone", width: BIG * 4.95 * (isMobile ? 0.9 : 1), aspect: 2.05 };
+      // 4.95 -> 5.45, the bone 10% wider, 16 September 2026 (owner). aspect is fixed,
+      // so the height follows and the shape is unchanged.
+      const bone = { key: "__bone", label: "Bone", src: "/big-bone.svg", shape: "bone", width: BIG * 5.45 * (isMobile ? 0.9 : 1), aspect: 2.05 };
       const bowl = { key: "__bowl", label: "Dog bowl", src: "/dog-bowl-2.svg", shape: "bowl", width: BIG * 9.38 * (isMobile ? 0.85 : 1), aspect: 3.22, angle: (80 * Math.PI) / 180 };
       const slipper = { key: "__slipper", label: "Slipper", src: "/slipper-edit2.svg", shape: "slipper", width: BIG * (isMobile ? 6.65 : 8.31), aspect: 2.721 };
 

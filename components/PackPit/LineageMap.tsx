@@ -271,6 +271,10 @@ function countProgenitors(n: LineageNode): number {
    is a flat 4.8. Below about 0.3 the ring is thicker than the circle is wide and
    the nodes stop reading as circles at all. */
 const PIT_NODE_SCALE = 0.659;
+/* The scale the node name pill is DRAWN at. Named because two places need it: the
+   <g> that draws it on the tree, and scatterPills, which has to send the pit the
+   drawn width rather than the raw one. */
+const PIT_PILL_SCALE = 0.683;
 export function radius(share: number) {
   return Math.max(21, 5 * Math.sqrt(share));
 }
@@ -1980,7 +1984,15 @@ export default function LineageMap({
       .slice(0, 50)
       .map((n) => {
         const share = Math.round((n._leaves / (n._parent as Node)._leaves) * 100);
-        return { x: n._x + pan.x, y: n._y - nodeR(share) - 13 + pan.y, w: nodePillWidth(splitName(n.name)), name: n.name };
+        /* THE WIDTH IS SENT AT THE SIZE IT IS DRAWN, 16 September 2026 (owner: the
+           pills that drop into the pit are about 40% bigger than the ones on the
+           family tree).
+
+           nodePillWidth is the UNSCALED width. The tree then draws the pill inside a
+           group at PIT_PILL_SCALE, but the pit takes this number literally and builds
+           a body from it, so the pill grew by 1 / 0.683, about 46%, on the way across.
+           Scaling it here means the pill that lands is the pill that left. */
+        return { x: n._x + pan.x, y: n._y - nodeR(share) - 13 + pan.y, w: nodePillWidth(splitName(n.name)) * PIT_PILL_SCALE, name: n.name };
       });
   const emitCircularScatter = (includeNodes: boolean) => {
     const pills = [{ x: breed.x + pan.x, y: breed.y + pan.y + circR, w: tagW, name: breed.name }];
@@ -3446,7 +3458,7 @@ export default function LineageMap({
                         /* 0.594 -> 0.683, the pill and its name 15% bigger,
                            16 September 2026 (owner). The whole group is scaled, so the
                            box, its padding and the two-line offset move together. */
-                        <g transform={`translate(${pcx},${pcy}) scale(0.683)`}>
+                        <g transform={`translate(${pcx},${pcy}) scale(${PIT_PILL_SCALE})`}>
                           <rect className={styles.nmPill} x={-nmW / 2} y={-nmH / 2} width={nmW} height={nmH} rx={nmH / 2} />
                           {nmLines.map((ln, li) => (
                             <text key={li} className={styles.nm} textAnchor="middle" dominantBaseline="central"
