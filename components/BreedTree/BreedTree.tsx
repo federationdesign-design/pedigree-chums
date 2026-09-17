@@ -854,6 +854,73 @@ function fuseDebugOn() {
 }
 
 /* ============================ REMOVE BEFORE LAUNCH ==========================
+   ?chaindebug=1 : the swipe chain path, capture and render only, 17 September
+   2026. Press a chum card and drag through the cards touching it; a glowing
+   white line follows the finger with a dot on each card joined. On release the
+   path simply clears. Nothing is collected and nothing is scored.
+
+   THE ENTRY POINT IS THE CHUM GATE. The listeners are on the document in the
+   capture phase, because the card's own press handler stops propagation. That
+   also means they run BEFORE the stage's onDown has opened the gate, so a press
+   on a card only makes a candidate, and the first animation frame confirms it
+   against chumGateRef. A press the gate did not open never draws.
+
+   HOW A CARD JOINS. The finger's path since the last event is sampled every
+   CHAIN_SAMPLE_PX, and the browser's own hit test names the card under each
+   sample, so only the card under the finger is ever looked at, never the whole
+   pit. It joins when all three hold:
+     new        each card once
+     touching   its drawn square and the last card's drawn square overlap, or
+                sit within CHAIN_TOUCH_SLACK of a card side of each other.
+                Squares, from the same centre, angle and size the card is drawn
+                with. The rounded corners are ignored
+     no cross   the segment to it does not cross an earlier segment
+
+   HOW TO READ THE PANEL. chain state and pointer, the cards joined in order,
+   the gate, and the last thing that happened. A rejection says why, and a
+   "not touching" says the measured gap as a share of a card side, which is the
+   number to tune CHAIN_TOUCH_SLACK against.
+
+   Strip this, the helpers below, the refs, the effect, the path layer in the pit
+   SVG and the panel once the chain ships for real.
+   ========================================================================== */
+function chainDebugOn() {
+  if (typeof window === "undefined") return false;
+  return window.location.search.indexOf("chaindebug=1") > -1;
+}
+// Finger path sampling step in client px. Well under a card, so a fast swipe
+// cannot jump clean over one between two pointer events.
+const CHAIN_SAMPLE_PX = 12;
+// How far apart two drawn cards may sit and still count as touching, as a share
+// of the larger card's side. Resting cards meet within the solver's slop, not
+// exactly, so zero would reject pairs that are visibly in contact.
+const CHAIN_TOUCH_SLACK = 0.06;
+type ChainSq = { x: number; y: number; a: number; h: number };
+/* Separating axis test for two rotated squares (centre, angle in radians, half
+   side). Returns the largest gap along any of the four axes: zero or less means
+   they overlap or touch. */
+function chainSquareGap(A: ChainSq, B: ChainSq): number {
+  const dx = B.x - A.x, dy = B.y - A.y;
+  const reach = (S: ChainSq, ux: number, uy: number) => {
+    const c = Math.cos(S.a), s = Math.sin(S.a);
+    return S.h * (Math.abs(c * ux + s * uy) + Math.abs(-s * ux + c * uy));
+  };
+  let gap = -Infinity;
+  for (const ang of [A.a, A.a + Math.PI / 2, B.a, B.a + Math.PI / 2]) {
+    const ux = Math.cos(ang), uy = Math.sin(ang);
+    gap = Math.max(gap, Math.abs(dx * ux + dy * uy) - reach(A, ux, uy) - reach(B, ux, uy));
+  }
+  return gap;
+}
+// True only for a proper crossing. Segments that merely share an end point, or
+// touch end to side, do not count.
+function chainSegmentsCross(p1: ChainSq, p2: ChainSq, p3: ChainSq, p4: ChainSq): boolean {
+  const o = (a: ChainSq, b: ChainSq, c: ChainSq) => (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
+  const d1 = o(p3, p4, p1), d2 = o(p3, p4, p2), d3 = o(p1, p2, p3), d4 = o(p1, p2, p4);
+  return ((d1 > 0 && d2 < 0) || (d1 < 0 && d2 > 0)) && ((d3 > 0 && d4 < 0) || (d3 < 0 && d4 > 0));
+}
+
+/* ============================ REMOVE BEFORE LAUNCH ==========================
    ?floorbox=1 : the level floor width diagnostic, 2 September 2026.
 
    THE QUESTION. The wooden floor stops short of both screen edges on a real
@@ -3077,6 +3144,10 @@ export default function BreedTree({
      handle on them, written only when the flag is on and cleared on teardown. */
   const fuseDiagRef = useRef<{ mouse: { button: number }; mc: { body: unknown }; world: { bodies: unknown[] } } | null>(null);
   const [fuseDiag, setFuseDiag] = useState<string[] | null>(null);
+  /* REMOVE BEFORE LAUNCH, ?chaindebug=1. See chainDebugOn() above. The path
+     layer inside the pit SVG, written directly each frame, and the panel lines. */
+  const chainGRef = useRef<SVGGElement>(null);
+  const [chainDiag, setChainDiag] = useState<string[] | null>(null);
   // Filled by an effect below. The spawn runs several seconds after the drop,
   // so it is always populated by the time it is read.
   const chumImagesRef = useRef<{ image: string; band: string; name: string }[]>([]);
@@ -7729,6 +7800,191 @@ export default function BreedTree({
       window.visualViewport?.removeEventListener("resize", read);
     };
   }, []);
+  /* ==================== REMOVE BEFORE LAUNCH, ?chaindebug=1 ===================
+     The swipe chain gesture, capture and render only. See chainDebugOn() above.
+     Everything here reads refs, never state, so binding once is safe: this is
+     the stale-closure trap noted on collectChum, avoided rather than risked. */
+  useEffect(() => {
+    if (!chainDebugOn()) return;
+    type Chain = { id: number; pending: boolean; cards: number[]; px: number; py: number; fx: number; fy: number };
+    let chain: Chain | null = null;
+    let note = "idle";
+    let raf: number | null = null;
+
+    // The card under a client point, by the browser's own hit test. Topmost
+    // chum card wins; anything that is not a card is looked straight through.
+    const cardAt = (cx: number, cy: number): number | null => {
+      const gg = chumsGRef.current;
+      if (!gg) return null;
+      for (const hit of document.elementsFromPoint(cx, cy)) {
+        if (hit === gg || !gg.contains(hit)) continue;
+        let c: globalThis.Node | null = hit;
+        while (c && c.parentNode !== gg) c = c.parentNode;
+        const i = c ? Array.prototype.indexOf.call(gg.children, c) : -1;
+        if (i >= 0) return i;
+      }
+      return null;
+    };
+    // A card as drawn: the frame writer's own centre and angle, and the size
+    // read off the card's edge rect, in pit SVG units.
+    const geo = (i: number): ChainSq | null => {
+      const pr = chumBodiesRef.current[i];
+      const edge = chumsGRef.current?.children[i]?.querySelector("[data-chum-edge]");
+      const side = edge ? parseFloat(edge.getAttribute("width") || "0") : 0;
+      if (!pr || !side) return null;
+      const v = viewRef.current;
+      const k = SIZE / v[2];
+      return { x: (pr.x - v[0]) * k, y: (pr.y - v[1]) * k, a: pr.a, h: side / 2 };
+    };
+    const joinAt = (ch: Chain, cx: number, cy: number) => {
+      const i = cardAt(cx, cy);
+      if (i == null) return;
+      const cards = ch.cards;
+      const last = cards[cards.length - 1];
+      if (i === last) return;
+      if (cards.includes(i)) { note = `#${i} already in the chain`; return; }
+      if (chumFlyRef.current.has(i)) { note = `#${i} is being collected`; return; }
+      if (last === undefined) { cards.push(i); note = `started on #${i}`; return; }
+      const a = geo(last), b = geo(i);
+      if (!a || !b) return;
+      const side = Math.max(a.h, b.h) * 2;
+      const gap = chainSquareGap(a, b);
+      if (gap > side * CHAIN_TOUCH_SLACK) {
+        note = `#${i} not touching #${last}, gap ${Math.round((gap / side) * 100)}% of a side`;
+        return;
+      }
+      // Every earlier segment except the last one, which ends where this starts.
+      for (let s = 0; s < cards.length - 2; s++) {
+        const p = geo(cards[s]), q = geo(cards[s + 1]);
+        if (p && q && chainSegmentsCross(p, q, a, b)) { note = `#${i} would cross the path`; return; }
+      }
+      cards.push(i);
+      note = `joined #${i}`;
+    };
+    const sweep = (ch: Chain, cx: number, cy: number) => {
+      const dx = cx - ch.px, dy = cy - ch.py;
+      const n = Math.max(1, Math.ceil(Math.hypot(dx, dy) / CHAIN_SAMPLE_PX));
+      for (let s = 1; s <= n; s++) joinAt(ch, ch.px + (dx * s) / n, ch.py + (dy * s) / n);
+      ch.px = cx; ch.py = cy;
+    };
+    const draw = () => {
+      const g = chainGRef.current;
+      if (!g) return;
+      const glow = g.querySelector("[data-chain=glow]");
+      const core = g.querySelector("[data-chain=core]");
+      const blur = g.querySelector("[data-chain=blur]");
+      const dots = g.querySelector("[data-chain=dots]");
+      if (!glow || !core || !dots) return;
+      if (!chain || chain.pending || !chain.cards.length) {
+        glow.setAttribute("points", "");
+        core.setAttribute("points", "");
+        dots.replaceChildren();
+        return;
+      }
+      const pts: { x: number; y: number }[] = [];
+      let unit = 0;
+      for (const i of chain.cards) {
+        const q = geo(i);
+        if (!q) continue;
+        pts.push(q);
+        if (!unit) unit = q.h;
+      }
+      // The live end of the line is the finger itself.
+      const sv = g.ownerSVGElement;
+      const ctm = g.getScreenCTM();
+      if (sv && ctm) {
+        const p = sv.createSVGPoint();
+        p.x = chain.fx; p.y = chain.fy;
+        const w = p.matrixTransform(ctm.inverse());
+        pts.push({ x: w.x, y: w.y });
+      }
+      const str = pts.map((p) => `${p.x},${p.y}`).join(" ");
+      glow.setAttribute("points", str);
+      core.setAttribute("points", str);
+      (glow as SVGElement).style.strokeWidth = String(unit * 0.5);
+      (core as SVGElement).style.strokeWidth = String(unit * 0.14);
+      blur?.setAttribute("stdDeviation", String(unit * 0.2));
+      const n = chain.cards.length;
+      while (dots.children.length > n) dots.lastChild?.remove();
+      while (dots.children.length < n) {
+        const c = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        c.style.fill = "#ffffff";
+        dots.appendChild(c);
+      }
+      for (let d = 0; d < n; d++) {
+        const c = dots.children[d];
+        const q = pts[d];
+        if (!q) continue;
+        c.setAttribute("cx", String(q.x));
+        c.setAttribute("cy", String(q.y));
+        c.setAttribute("r", String(unit * 0.22));
+      }
+    };
+    const end = (why: string) => {
+      note = `${why}, ${chain?.cards.length ?? 0} card(s), path cleared`;
+      chain = null;
+      if (raf != null) { cancelAnimationFrame(raf); raf = null; }
+      draw();
+    };
+    const tick = () => {
+      raf = null;
+      if (!chain) { draw(); return; }
+      if (chain.pending) {
+        // After dispatch, so the stage's onDown has had its say.
+        if (chumGateRef.current !== chain.id) { chain = null; note = "press did not open the gate"; draw(); return; }
+        chain.pending = false;
+        const fx = chain.fx, fy = chain.fy;
+        joinAt(chain, chain.px, chain.py);
+        sweep(chain, fx, fy);
+      }
+      draw();
+      raf = requestAnimationFrame(tick);
+    };
+    const down = (e: PointerEvent) => {
+      // Mirrors the gate: a primary press means nothing else is down.
+      if (chain && e.isPrimary) end("stale chain");
+      if (chain) return; // one chain at a time, a second finger is ignored
+      const t = e.target as globalThis.Node | null;
+      if (!t || !chumsGRef.current?.contains(t)) return;
+      chain = { id: e.pointerId, pending: true, cards: [], px: e.clientX, py: e.clientY, fx: e.clientX, fy: e.clientY };
+      note = "waiting for the gate";
+      if (raf == null) raf = requestAnimationFrame(tick);
+    };
+    const move = (e: PointerEvent) => {
+      if (!chain || e.pointerId !== chain.id) return;
+      chain.fx = e.clientX; chain.fy = e.clientY;
+      if (!chain.pending) sweep(chain, e.clientX, e.clientY);
+    };
+    const up = (e: PointerEvent) => { if (chain && e.pointerId === chain.id) end("released"); };
+    const lost = () => { if (chain) end("lost (blur or hidden)"); };
+    const opts = { capture: true } as const;
+    document.addEventListener("pointerdown", down, opts);
+    document.addEventListener("pointermove", move, opts);
+    document.addEventListener("pointerup", up, opts);
+    document.addEventListener("pointercancel", up, opts);
+    window.addEventListener("blur", lost);
+    document.addEventListener("visibilitychange", lost);
+    const poll = window.setInterval(() => {
+      const gate = chumGateRef.current;
+      setChainDiag([
+        `chain    ${!chain ? "idle" : chain.pending ? `waiting, pointer ${chain.id}` : `ACTIVE, pointer ${chain.id}`}`,
+        `cards    ${chain ? `${chain.cards.length}${chain.cards.length ? ": #" + chain.cards.join(" #") : ""}` : "-"}`,
+        `gate     ${gate == null ? "shut" : `open, pointer ${gate}`}`,
+        `last     ${note}`,
+      ]);
+    }, 100);
+    return () => {
+      document.removeEventListener("pointerdown", down, opts);
+      document.removeEventListener("pointermove", move, opts);
+      document.removeEventListener("pointerup", up, opts);
+      document.removeEventListener("pointercancel", up, opts);
+      window.removeEventListener("blur", lost);
+      document.removeEventListener("visibilitychange", lost);
+      window.clearInterval(poll);
+      if (raf != null) cancelAnimationFrame(raf);
+      chain = null;
+    };
+  }, []);
   /* ==================== REMOVE BEFORE LAUNCH, ?fusedebug=1 ====================
      Ten times a second rather than per frame, for the same reason as the chumbox
      poll below: a per-frame setState would load the pit it is watching. Fast
@@ -9799,6 +10055,25 @@ export default function BreedTree({
               </text>
             );
           })()}
+          {/* REMOVE BEFORE LAUNCH, ?chaindebug=1. The swipe chain path. Last in
+              the pit SVG so it draws over every card, a direct child of the SVG
+              like the chum cards so both share one coordinate space, and never
+              takes a pointer, or the hit test that finds the card under the
+              finger would find the line instead. Empty until a chain draws. The
+              blur region is in user space: an object bounding box region is
+              zero tall on a level line, which would switch the glow off. */}
+          <g ref={chainGRef} style={{ pointerEvents: "none" }}>
+            <defs>
+              <filter id="bt-chain-glow" filterUnits="userSpaceOnUse" x={-5000} y={-5000} width={10000} height={10000}>
+                <feGaussianBlur data-chain="blur" stdDeviation={4} />
+              </filter>
+            </defs>
+            <polyline data-chain="glow" points="" filter="url(#bt-chain-glow)"
+              style={{ fill: "none", stroke: "#ffffff", strokeLinecap: "round", strokeLinejoin: "round" }} />
+            <polyline data-chain="core" points=""
+              style={{ fill: "none", stroke: "#ffffff", strokeLinecap: "round", strokeLinejoin: "round" }} />
+            <g data-chain="dots" />
+          </g>
         </svg>
         {/* J17: the canvas effects layer, above the SVG, never takes a pointer.
             displayOnly (chums2 static diagram) omits it: it is a raster bitmap sized
@@ -10324,6 +10599,18 @@ export default function BreedTree({
           font: "11px/1.35 ui-monospace, monospace", borderRadius: 6, whiteSpace: "pre",
         }}>
           {fuseDiag.join("\n")}
+        </div>
+      )}
+      {/* ==================== REMOVE BEFORE LAUNCH, ?chaindebug=1 ===================
+          The chain readout. A sibling of the info box for the same reason as the
+          fuse panel above, and below it so both flags can be on together. */}
+      {chainDiag && (
+        <div style={{
+          position: "fixed", top: 96, right: 6, zIndex: 9000, pointerEvents: "none", visibility: "visible",
+          background: "rgba(0,0,0,0.78)", color: "#0f0", padding: "6px 8px",
+          font: "11px/1.35 ui-monospace, monospace", borderRadius: 6, whiteSpace: "pre",
+        }}>
+          {chainDiag.join("\n")}
         </div>
       )}
       <div
