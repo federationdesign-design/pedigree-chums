@@ -3603,6 +3603,14 @@ export default function BreedTree({
   // held, so Matter is never left pulling a body that the sim has just taken
   // out of the world.
   const mcReleaseRef = useRef<(() => void) | null>(null);
+  /* THE CHUM GATE, 17 September 2026 (owner, option A of the swipe chain).
+     The pointerId of a press that landed on a chum card, or null. While it is
+     set the mouse constraint is never armed, so Matter never searches for a
+     body and never fires startdrag: nothing can be grabbed and no bomb fuse can
+     light for the whole of that gesture. The stage's onDown opens it and only
+     the same pointer's release closes it. A component ref rather than a local in
+     the physics setup, and cleared again when that setup is torn down. */
+  const chumGateRef = useRef<number | null>(null);
   // The bomb currently under the pointer, so the fuse burns while it is held.
   const pressedBombRef = useRef<unknown>(null);
   // Drop-time pixels per world unit, published by the sim below. Effects are
@@ -7257,6 +7265,23 @@ export default function BreedTree({
           mouse.position.y = p.y;
         };
         const onDown = (e: PointerEvent) => {
+          /* STALE GATE FIRST. A primary press means no other pointer is down,
+             so any gate still set is left over from a release that never
+             arrived: clear it, and a lost release costs one gesture at most. A
+             second finger is never primary, so it cannot clear a live gate. */
+          if (e.isPrimary) chumGateRef.current = null;
+          // Another finger holds the gate open: this press arms nothing.
+          if (chumGateRef.current != null) return;
+          /* A PRESS ON A CHUM CARD OPENS THE GATE and does not arm the button.
+             KNOWN COST, accepted: the cards are invisible to the constraint (see
+             MC_CAT), so a press on a card used to grab the bone or dog lying
+             underneath it. It no longer does. The card's own tap is React and
+             never came through here, so collecting is untouched. */
+          const tgt = e.target as globalThis.Node | null;
+          if (tgt && chumsGRef.current?.contains(tgt)) {
+            chumGateRef.current = e.pointerId;
+            return;
+          }
           setPos(e.clientX, e.clientY);
           mouse.button = 0;
           flickBuf.length = 0;
@@ -7272,13 +7297,27 @@ export default function BreedTree({
             wake();
           }
         };
-        const onUp = () => { mouse.button = -1; };
+        const onUp = (e: PointerEvent) => {
+          // Only the pointer that opened the gate may close it.
+          if (chumGateRef.current === e.pointerId) chumGateRef.current = null;
+          // Release always goes through the button, never mcReleaseRef: that
+          // skips enddrag and leaves a held bomb's fuse burning.
+          mouse.button = -1;
+        };
+        // A release the window never hears (focus lost, tab hidden) must not
+        // leave the gate shut. Flag only: the button is left as it was.
+        const clearGate = () => { chumGateRef.current = null; };
         st.addEventListener("pointerdown", onDown);
         window.addEventListener("pointermove", onMove);
         window.addEventListener("pointerup", onUp);
         window.addEventListener("pointercancel", onUp);
+        window.addEventListener("blur", clearGate);
+        document.addEventListener("visibilitychange", clearGate);
         mcTeardown = () => {
           mcReleaseRef.current = null;
+          chumGateRef.current = null;
+          window.removeEventListener("blur", clearGate);
+          document.removeEventListener("visibilitychange", clearGate);
           Events.off(mc, "startdrag", onStartDrag);
           Events.off(mc, "enddrag", onEndDrag);
           // The fuse rides on the ENGINE, not the constraint, so it has to come
