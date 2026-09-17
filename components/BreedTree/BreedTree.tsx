@@ -6137,6 +6137,26 @@ export default function BreedTree({
          adds it to the removed set, which is what hides the circle itself. The
          same pair the learn completion has always used. */
       if (dogChainOn()) dogCloseRef.current = (n) => {
+        /* IT GIVES UP ITS BADGES ON THE WAY OUT (owner, 18 September 2026). A
+           closed circle used to leave nothing behind, so a chain paid in chips
+           only for the one circle the player opened. Now every circle in the
+           chain drops the chips it would have dropped had it been opened.
+
+           THE RULE IS popChildren's OWN, copied rather than invented: one chip
+           per non-echo child, carrying that child's share. A LEAF has no
+           children and would drop nothing at all, which would make the case this
+           feature exists for pay the least, so a leaf drops one chip carrying
+           its own share instead.
+
+           They land where the circle stood, and spawnBadge takes client pixels,
+           which is what pxFromWorld is for. */
+        const p = pxFromWorld(n.x, n.y);
+        const kids = (n.children ?? []).filter((ch) => !isEcho(ch));
+        if (kids.length) {
+          for (const ch of kids) spawnBadgeRef.current?.(p.x, p.y, badgeDrawForNode(ch.r, k), pctOf(ch));
+        } else {
+          spawnBadgeRef.current?.(p.x, p.y, badgeDrawForNode(n.r, k), pctOf(n));
+        }
         const b = pitBodiesRef.current?.find(n);
         if (b) b.held = true;
         poofAt(n.x, n.y, performance.now());
