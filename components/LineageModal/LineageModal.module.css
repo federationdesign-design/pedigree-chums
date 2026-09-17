@@ -1285,12 +1285,23 @@
    axis as the score and the slider. Moved by request: the top left is now three
    things deep and the foot of the pit is empty.
    env(safe-area-inset-bottom) keeps it off a phone's home indicator. */
+/* TOP LEFT, UNDER THE PORTRAIT (owner, 18 September 2026). It was bottom centre.
+
+   IN THE TITLE'S OWN COLUMN, not placed absolutely. .titleWrap is a flex column
+   of portrait rows anchored on the pit's left axis, so sitting in it as the last
+   child puts the pips directly under the profile image, on the same axis, with
+   the ladder's own 5px gap. A fixed offset would have been right for a one row
+   title and wrong for every deeper circle, because the ladder grows downwards
+   and would have run straight through the pips.
+
+   Nothing about the bar itself changes: .livesBar and .lifePip keep the size,
+   padding and spacing they had at the foot of the pit.
+
+   COLLISIONS. The score is top RIGHT and fixed, the title rows are above this,
+   and both debug readouts are right-hand. The one overlap left is ?chumbox=1,
+   whose panel is top left, and that is a diagnostic that is stripped before
+   launch. */
 .lives {
-  position: absolute;
-  bottom: calc(14px + env(safe-area-inset-bottom, 0px));
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 40;
   display: flex;
   align-items: center;
   pointer-events: none;

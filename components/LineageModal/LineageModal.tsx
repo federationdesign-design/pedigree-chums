@@ -665,6 +665,20 @@ export default function LineageModal({ name, image, character, lineage, fromRect
             percentage breakdown, which is the place a reader meets a figure and
             might take it literally. Nothing has been lost, only moved off a
             screen that was not asking the question. */}
+        {/* Lives belong to the round, not the menu. On the start screen there is
+            nothing at stake yet, so they arrive with PLAY. Moved here from the
+            foot of the pit on 18 September 2026 (owner): last in the title's own
+            column, so they sit under the portrait ladder however deep it runs.
+            See .lives in the stylesheet. */}
+        {running && typeof lives === "number" && (
+          <div className={css.lives} aria-label={`${lives} of ${livesMax} lives left`}>
+            <div className={css.livesBar} aria-hidden="true">
+              {Array.from({ length: livesMax }, (_, i) => (
+                <span key={i} className={`${css.lifePip}${i < lives ? "" : " " + css.lifePipSpent}`} />
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* The diagram owns everything below the header. BreedTree runs in
@@ -835,19 +849,6 @@ export default function LineageModal({ name, image, character, lineage, fromRect
           <span className={css.shakeIcon} aria-hidden="true" />
         </button>
         </>
-      )}
-
-      {/* Lives belong to the round, not the menu. On the start screen there is
-          nothing at stake yet, and the indicator sat over the title. It arrives
-          with PLAY, alongside the shake and slow-motion controls. */}
-      {running && typeof lives === "number" && (
-        <div className={css.lives} aria-label={`${lives} of ${livesMax} lives left`}>
-          <div className={css.livesBar} aria-hidden="true">
-            {Array.from({ length: livesMax }, (_, i) => (
-              <span key={i} className={`${css.lifePip}${i < lives ? "" : " " + css.lifePipSpent}`} />
-            ))}
-          </div>
-        </div>
       )}
 
       {/* Tapping a related dog offers its page, gated by the same leave-game
