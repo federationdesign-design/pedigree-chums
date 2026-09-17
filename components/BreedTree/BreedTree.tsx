@@ -935,6 +935,12 @@ const CHAIN_MIN_CARDS = 3; // two cards cannot form a loop
 const CHAIN_TAP_UNLOCK_AT = 4;
 const CHAIN_MULT_STEP = 0.1; // each chum in the chain adds this to a multiplier starting at 1
 const CHAIN_COLLAPSE_MS = 450;
+/* THE JOIN CLOCK (owner, 17 September 2026). Half a second from joining one card
+   to joining the next, the clock starting on every join, the first card
+   included. Run out and the chain dies where it stands, with the collapse and
+   the tone a break gets. Closing the circuit stops the clock for good: a closed
+   loop waits as long as the player likes before letting go. */
+const CHAIN_JOIN_TIMEOUT_MS = 500;
 type ChainSq = { x: number; y: number; a: number; h: number };
 /* Separating axis test for two rotated squares (centre, angle in radians, half
    side). Returns the largest gap along any of the four axes: zero or less means
@@ -7936,6 +7942,8 @@ export default function BreedTree({
       closed: boolean;
       // Refreshed every frame: closing from the last card would be legal now.
       canClose: boolean;
+      // When the last card joined, which is what the join clock counts from.
+      lastJoin: number;
     };
     // Links in the chain, and the two cards at each end of link s. A closed
     // loop has one link more than cards minus one: the closing link wraps.
@@ -8007,7 +8015,7 @@ export default function BreedTree({
       }
       if (cards.includes(i)) { note = `#${i} already in the chain`; return; }
       if (chumFlyRef.current.has(i)) { note = `#${i} is being collected`; return; }
-      if (last === undefined) { cards.push(i); note = `started on #${i}`; return; }
+      if (last === undefined) { cards.push(i); ch.lastJoin = performance.now(); note = `started on #${i}`; return; }
       const a = geo(last), b = geo(i);
       if (!a || !b) return;
       const side = Math.max(a.h, b.h) * 2;
@@ -8022,6 +8030,7 @@ export default function BreedTree({
         if (p && q && chainSegmentsCross(p, q, a, b)) { note = `#${i} would cross the path`; return; }
       }
       cards.push(i);
+      ch.lastJoin = performance.now(); // the join clock restarts on every card
       note = `joined #${i}`;
     };
     const sweep = (ch: Chain, cx: number, cy: number) => {
@@ -8089,12 +8098,22 @@ export default function BreedTree({
       }
       // The two cards either side of the break go red; the rest grey once dead.
       const n = cps.length;
-      const pulse = 1.7 + 0.3 * Math.sin(performance.now() / 90);
+      const now = performance.now();
+      const pulse = 1.7 + 0.3 * Math.sin(now / 90);
+      /* THE JOIN CLOCK IS THE LAST DOT: the card you have just landed on
+         shrinks as its half second runs down, and goes red for the last of it.
+         The dot was chosen over the line because that is where the finger is
+         and where the next card has to come from, and it leaves the line free
+         to keep saying white for open and yellow for the loop. */
+      const run = chain.closed || chain.dead ? 0 : Math.min(1, (now - chain.lastJoin) / CHAIN_JOIN_TIMEOUT_MS);
       const dotList = cps.map((q, d) => q
         ? {
             x: q.x, y: q.y,
-            col: dead ? (d === dead.link || d === (dead.link + 1) % n ? RED : GREY) : chain?.canClose && d === 0 ? GOLD : loopCol,
-            r: chain?.canClose && d === 0 ? pulse : 1,
+            col: dead ? (d === dead.link || d === (dead.link + 1) % n ? RED : GREY)
+              : chain?.canClose && d === 0 ? GOLD
+              : d === n - 1 && run > 0.6 ? RED
+              : loopCol,
+            r: chain?.canClose && d === 0 ? pulse : d === n - 1 ? 1 - 0.45 * run : 1,
           }
         : null);
       paint(segs, dotList, unit);
@@ -8235,6 +8254,23 @@ export default function BreedTree({
       return null;
     };
     let result = "none yet";
+    /* Kills a chain where it stands, mid gesture: the collapse and the tone
+       right now, rather than the quiet wait for release a broken link gets.
+       Used by the join clock, and by the rules that end a chain outright. The
+       caller is inside the frame loop or a pointer move, so the running frame
+       request carries the collapse; nothing is scheduled here. */
+    const killChain = (ch: Chain, text: string) => {
+      result = `FAILED, ${text}, nothing scored`;
+      note = result;
+      startCollapse(ch.cards, ch.closed);
+      failTone();
+      const held = chainHeldCollectRef.current;
+      if (held != null) {
+        chainHeldCollectRef.current = null;
+        note += `, collect of #${held} cancelled, still armed`;
+      }
+      chain = null;
+    };
     // Every existing link, every frame. Only the chain's own cards are measured.
     const checkLinks = (ch: Chain, now: number) => {
       if (ch.dead || ch.cards.length < 2) return;
@@ -8314,7 +8350,15 @@ export default function BreedTree({
         joinAt(chain, chain.px, chain.py);
         sweep(chain, fx, fy);
       }
-      checkLinks(chain, performance.now());
+      const now = performance.now();
+      // THE JOIN CLOCK. Open chains only: a closed loop has stopped it.
+      const idle = now - chain.lastJoin;
+      if (!chain.closed && !chain.dead && chain.cards.length && idle > CHAIN_JOIN_TIMEOUT_MS) {
+        killChain(chain, `TIMED OUT, ${Math.round(idle)}ms without a join`);
+        raf = requestAnimationFrame(tick);
+        return;
+      }
+      checkLinks(chain, now);
       // Cards drift, so whether the loop could close is re-asked every frame.
       chain.canClose = closeBlock(chain) === null;
       draw();
@@ -8332,7 +8376,7 @@ export default function BreedTree({
         if (chainGRef.current) chainGRef.current.style.opacity = "";
         paint([], [], 0);
       }
-      chain = { id: e.pointerId, pending: true, cards: [], px: e.clientX, py: e.clientY, fx: e.clientX, fy: e.clientY, strain: new Map(), dead: null, closed: false, canClose: false };
+      chain = { id: e.pointerId, pending: true, cards: [], px: e.clientX, py: e.clientY, fx: e.clientX, fy: e.clientY, strain: new Map(), dead: null, closed: false, canClose: false, lastJoin: performance.now() };
       note = "waiting for the gate";
       if (raf == null) raf = requestAnimationFrame(tick);
     };
@@ -8357,6 +8401,7 @@ export default function BreedTree({
         `chain    ${!chain ? "idle" : chain.pending ? `waiting, pointer ${chain.id}` : chain.dead ? `DEAD, pointer ${chain.id}` : `ACTIVE, pointer ${chain.id}`}`,
         `cards    ${chain ? `${chain.cards.length}${chain.cards.length ? ": #" + chain.cards.join(" #") : ""}` : "-"}`,
         `circuit  ${!chain || chain.pending ? "-" : chain.closed ? "CLOSED" : chain.canClose ? "open, CAN CLOSE on #" + chain.cards[0] : "open"}`,
+        `clock    ${!chain || chain.pending ? "-" : chain.closed ? "stopped, loop closed" : `idle ${Math.round(performance.now() - chain.lastJoin)}ms of ${CHAIN_JOIN_TIMEOUT_MS}ms`}`,
         `strain   ${!chain || !chain.strain.size ? "none" : [...chain.strain].map(([s, st]) => { const [a, b] = linkEnds(chain as Chain, s); return `#${a}-#${b} ${Math.round(st.share * 100)}%`; }).join(", ")}`,
         `break    ${!chain?.dead ? "none" : `#${chain.dead.a}-#${chain.dead.b} gap ${Math.round(chain.dead.share * 100)}% (slack ${Math.round(CHAIN_TOUCH_SLACK * 100)}%)`}`,
         `gate     ${gate == null ? "shut" : `open, pointer ${gate}`}`,
