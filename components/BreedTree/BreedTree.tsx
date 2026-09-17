@@ -945,13 +945,28 @@ const CHAIN_MULT_STEP = 0.1; // each chum in the chain adds this to a multiplier
    still paid for the connections the player actually made. Deliberate. */
 const CHAIN_JOIN_POINTS = 10;
 const CHAIN_COLLAPSE_MS = 450;
-/* THE JOIN CLOCK (owner, 17 September 2026, raised from 500ms to a second the
-   next day). That long from joining one card
-   to joining the next, the clock starting on every join, the first card
-   included. Run out and the chain dies where it stands, with the collapse and
-   the tone a break gets. Closing the circuit stops the clock for good: a closed
-   loop waits as long as the player likes before letting go. */
-const CHAIN_JOIN_TIMEOUT_MS = 1000;
+/* THE JOIN CLOCK. Time from joining one card to joining the next, the clock
+   starting on every join, the first card included. Run out and the chain dies
+   where it stands, with the collapse and the tone a break gets. Closing the
+   circuit stops the clock for good: a closed loop waits as long as the player
+   likes before letting go.
+
+   IT GROWS WITH THE CHAIN (owner, 18 September 2026). 500ms, then a second, and
+   now an allowance that lengthens with every connection made: the base for the
+   first link, and a second more for each one after it. So the first link has
+   1.5s, the second 2.5s, the third 3.5s, and so on.
+
+   NO CAP, deliberately. A long chain becomes effectively untimed, which is the
+   point: the clock is there to stop a chain being left half made, not to rush a
+   player who is clearly in the middle of one.
+
+   Both kinds of chain read this, so a chain of anything else is timed the same
+   way without a second set of figures. */
+const CHAIN_JOIN_BASE_MS = 1500;
+const CHAIN_JOIN_BONUS_MS = 1000;
+// The allowance for the next join, given how many connections are already made.
+const chainAllowanceMs = (connections: number) =>
+  CHAIN_JOIN_BASE_MS + CHAIN_JOIN_BONUS_MS * Math.max(0, connections);
 type ChainSq = { x: number; y: number; a: number; h: number };
 /* Separating axis test for two rotated squares (centre, angle in radians, half
    side). Returns the largest gap along any of the four axes: zero or less means
@@ -8157,7 +8172,10 @@ export default function BreedTree({
          shrinks as its time runs down, and now DIMS towards the end instead of
          going red. The dot was chosen over the line because that is where the
          finger is and where the next card has to come from. */
-      const run = chain.closed || chain.dead ? 0 : Math.min(1, (now - chain.lastJoin) / CHAIN_JOIN_TIMEOUT_MS);
+      // The allowance grows with the chain, so the dot always shows the whole of
+      // whatever this join is worth, however long that has become.
+      const allow = chainAllowanceMs(chain.cards.length - 1);
+      const run = chain.closed || chain.dead ? 0 : Math.min(1, (now - chain.lastJoin) / allow);
       const dotList = cps.map((q, d) => q
         ? {
             x: q.x, y: q.y,
@@ -8410,8 +8428,9 @@ export default function BreedTree({
       const now = performance.now();
       // THE JOIN CLOCK. Open chains only: a closed loop has stopped it.
       const idle = now - chain.lastJoin;
-      if (!chain.closed && !chain.dead && chain.cards.length && idle > CHAIN_JOIN_TIMEOUT_MS) {
-        killChain(chain, `TIMED OUT, ${Math.round(idle)}ms without a join`);
+      const allow = chainAllowanceMs(chain.cards.length - 1);
+      if (!chain.closed && !chain.dead && chain.cards.length && idle > allow) {
+        killChain(chain, `TIMED OUT, ${Math.round(idle)}ms without a join, allowance ${allow}ms`);
         raf = requestAnimationFrame(tick);
         return;
       }
@@ -8458,7 +8477,7 @@ export default function BreedTree({
         `chain    ${!chain ? "idle" : chain.pending ? `waiting, pointer ${chain.id}` : chain.dead ? `DEAD, pointer ${chain.id}` : `ACTIVE, pointer ${chain.id}`}`,
         `cards    ${chain ? `${chain.cards.length}${chain.cards.length ? ": #" + chain.cards.join(" #") : ""}` : "-"}`,
         `circuit  ${!chain || chain.pending ? "-" : chain.closed ? "CLOSED" : chain.canClose ? "open, CAN CLOSE on #" + chain.cards[0] : "open"}`,
-        `clock    ${!chain || chain.pending ? "-" : chain.closed ? "stopped, loop closed" : `idle ${Math.round(performance.now() - chain.lastJoin)}ms of ${CHAIN_JOIN_TIMEOUT_MS}ms`}`,
+        `clock    ${!chain || chain.pending ? "-" : chain.closed ? "stopped, loop closed" : `idle ${Math.round(performance.now() - chain.lastJoin)}ms of ${chainAllowanceMs(chain.cards.length - 1)}ms`}`,
         `strain   ${!chain || !chain.strain.size ? "none" : [...chain.strain].map(([s, st]) => { const [a, b] = linkEnds(chain as Chain, s); return `#${a}-#${b} ${Math.round(st.share * 100)}%`; }).join(", ")}`,
         `break    ${!chain?.dead ? "none" : `#${chain.dead.a}-#${chain.dead.b} gap ${Math.round(chain.dead.share * 100)}% (slack ${Math.round(CHAIN_TOUCH_SLACK * 100)}%)`}`,
         `gate     ${gate == null ? "shut" : `open, pointer ${gate}`}`,
