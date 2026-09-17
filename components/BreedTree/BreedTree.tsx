@@ -826,6 +826,34 @@ function chumBoxOn() {
 }
 
 /* ============================ REMOVE BEFORE LAUNCH ==========================
+   ?fusedebug=1 : the chum gate and bomb fuse readout, 17 September 2026.
+
+   THE QUESTION IT ANSWERS. Does a press that starts on a chum card really keep
+   the mouse constraint disarmed for the whole gesture, so that a swipe across
+   a bomb grabs nothing and lights nothing? By eye that is sparks or no sparks;
+   this prints the state that decides it.
+
+   HOW TO READ IT. Four lines, sampled ten times a second:
+     gate     open, and the pointerId holding it, or shut
+     button   ARMED (mouse.button 0) or off
+     holding  the body the constraint has, by kind and Matter id, or nothing
+     fuse     the pressed bomb: hits so far out of five and the time left if the
+              hold carries on, or none. A bomb whose heldSince is still set but
+              that is no longer the pressed one is listed as stale: that is the
+              mcReleaseRef hazard and should never appear
+
+   A swipe across a bomb passes when, for the whole gesture, gate reads open,
+   button reads off, holding reads nothing and fuse reads none.
+
+   Strip this, the handle ref, the line that sets it, the poll effect and the
+   panel once the chain has shipped.
+   ========================================================================== */
+function fuseDebugOn() {
+  if (typeof window === "undefined") return false;
+  return window.location.search.indexOf("fusedebug=1") > -1;
+}
+
+/* ============================ REMOVE BEFORE LAUNCH ==========================
    ?floorbox=1 : the level floor width diagnostic, 2 September 2026.
 
    THE QUESTION. The wooden floor stops short of both screen edges on a real
@@ -3044,6 +3072,11 @@ export default function BreedTree({
   const [chumDiag, setChumDiag] = useState<null | {
     n: number; asleep: number; contacts: number; other: number; meanDeg: number; maxDeg: number;
   }>(null);
+  /* REMOVE BEFORE LAUNCH, ?fusedebug=1. See fuseDebugOn() above. The mouse, the
+     constraint and the world are locals inside the sim effect; this is the only
+     handle on them, written only when the flag is on and cleared on teardown. */
+  const fuseDiagRef = useRef<{ mouse: { button: number }; mc: { body: unknown }; world: { bodies: unknown[] } } | null>(null);
+  const [fuseDiag, setFuseDiag] = useState<string[] | null>(null);
   // Filled by an effect below. The spawn runs several seconds after the drop,
   // so it is always populated by the time it is read.
   const chumImagesRef = useRef<{ image: string; band: string; name: string }[]>([]);
@@ -7056,6 +7089,8 @@ export default function BreedTree({
           constraint: { stiffness: 0.2, render: { visible: false } },
         });
         Composite.add(world, mc);
+        // REMOVE BEFORE LAUNCH, ?fusedebug=1. Read only, by the poll effect.
+        if (fuseDebugOn()) fuseDiagRef.current = { mouse, mc, world };
         // Release-velocity throw. FLICK_SCALE tunes it (1.0 = pointer speed);
         // FLICK_FLOOR is the tap floor in Matter px/step. flickBuf is the pointer
         // path in physics px, read on release to set the toy's velocity.
@@ -7316,6 +7351,7 @@ export default function BreedTree({
         mcTeardown = () => {
           mcReleaseRef.current = null;
           chumGateRef.current = null;
+          fuseDiagRef.current = null; // REMOVE BEFORE LAUNCH, ?fusedebug=1
           window.removeEventListener("blur", clearGate);
           document.removeEventListener("visibilitychange", clearGate);
           Events.off(mc, "startdrag", onStartDrag);
@@ -7692,6 +7728,53 @@ export default function BreedTree({
       window.removeEventListener("resize", read);
       window.visualViewport?.removeEventListener("resize", read);
     };
+  }, []);
+  /* ==================== REMOVE BEFORE LAUNCH, ?fusedebug=1 ====================
+     Ten times a second rather than per frame, for the same reason as the chumbox
+     poll below: a per-frame setState would load the pit it is watching. Fast
+     enough to catch a flick across a bomb, which lasts a few hundred ms. */
+  useEffect(() => {
+    if (!fuseDebugOn()) return;
+    type DiagBomb = { bomb?: boolean; blown?: boolean; bursting?: number; hits?: number; heldHits?: number; heldSince?: number };
+    type DiagBody = { id?: number; plugin?: { kind?: string; bridge?: DiagBomb; prop?: { toyKind?: string }; ui?: { kind?: string } } };
+    const id = window.setInterval(() => {
+      const now = performance.now();
+      const h = fuseDiagRef.current;
+      const gate = chumGateRef.current;
+      const lines = [`gate     ${gate == null ? "shut" : `OPEN, pointer ${gate}`}`];
+      if (!h) {
+        lines.push("button   (no constraint yet)", "holding  -", "fuse     -");
+        setFuseDiag(lines);
+        return;
+      }
+      lines.push(`button   ${h.mouse.button === 0 ? "ARMED" : "off"}`);
+      const held = h.mc.body as DiagBody | null;
+      if (!held) lines.push("holding  nothing");
+      else {
+        const pl = held.plugin;
+        const kind = pl?.kind ?? (pl?.ui ? `ui ${pl.ui.kind ?? "?"}` : "?");
+        const extra = pl?.prop?.toyKind ? ` ${pl.prop.toyKind}` : pl?.bridge?.bomb ? " BOMB" : "";
+        lines.push(`holding  ${kind}${extra} #${held.id ?? "?"}`);
+      }
+      const pressed = pressedBombRef.current as DiagBomb | null;
+      if (pressed && pressed.bomb && !pressed.blown && pressed.heldSince) {
+        const hits = pressed.hits || 0;
+        const left = Math.max(0, BOMB_HITS - hits);
+        const nextTick = pressed.heldSince + ((pressed.heldHits || 0) + 1) * BOMB_TICK_MS;
+        const ms = left ? Math.max(0, Math.round(nextTick - now + (left - 1) * BOMB_TICK_MS)) : 0;
+        lines.push(`fuse     BURNING, hits ${hits}/${BOMB_HITS}, ${ms}ms left`);
+      } else {
+        lines.push(`fuse     none${pressed && pressed.bursting ? " (bursting)" : ""}`);
+      }
+      let stale = 0;
+      for (const o of h.world.bodies as DiagBody[]) {
+        const br = o.plugin?.bridge;
+        if (br?.bomb && !br.blown && br.heldSince && br !== pressed) stale++;
+      }
+      if (stale) lines.push(`STALE    ${stale} bomb(s) with heldSince set, not pressed`);
+      setFuseDiag(lines);
+    }, 100);
+    return () => window.clearInterval(id);
   }, []);
   /* ===================== REMOVE BEFORE LAUNCH, ?chumbox=1 =====================
      Samples four times a second, not per frame: the panel is for reading, and a
@@ -10455,6 +10538,18 @@ export default function BreedTree({
               The readout. Fixed and top-left so it clears the bottom button row
               and the chum rail, and pointer-events none so it cannot take a tap
               from anything underneath while it is up. */}
+          {/* ==================== REMOVE BEFORE LAUNCH, ?fusedebug=1 ====================
+              The gate and fuse readout. Top RIGHT, so it can sit beside the
+              chumbox panel, and pointer-events none so a swipe passes through. */}
+          {fuseDiag && (
+            <div style={{
+              position: "fixed", top: 6, right: 6, zIndex: 9000, pointerEvents: "none",
+              background: "rgba(0,0,0,0.78)", color: "#0f0", padding: "6px 8px",
+              font: "11px/1.35 ui-monospace, monospace", borderRadius: 6, whiteSpace: "pre",
+            }}>
+              {fuseDiag.join("\n")}
+            </div>
+          )}
           {chumDiag && (
             <div style={{
               position: "fixed", top: 6, left: 6, zIndex: 9000, pointerEvents: "none",
