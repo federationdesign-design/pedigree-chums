@@ -9508,7 +9508,20 @@ export default function BreedTree({
                    Both figures are in px times upp, never bare, because this is
                    drawn in svg units and upp is the conversion. */
                 x={xMinC + vbWc - 97.5 * upp}
-                y={-vbHc / 2 + 49.75 * upp}
+                /* CLEAR OF THE TOP EDGE, 16 September 2026 (owner: the level number
+                   runs off screen on the desktop).
+
+                   THE ORIGIN WAS NEVER WRONG. -vbHc / 2 is the viewBox's own top and
+                   matches the real vbH exactly. The clearance was: 49.75 * upp put the
+                   BASELINE 28.7px below the top edge on the owner's desktop, and with
+                   dominantBaseline central a 123px glyph reaches about 61px above its
+                   baseline. So the digits were cut off by the edge, which reads as the
+                   number running off screen.
+
+                   Half the font plus the stroke that outlines it is the real minimum,
+                   and the old 49.75 * upp still wins wherever it is the larger, so
+                   every narrower viewport is unchanged. */
+                y={-vbHc / 2 + Math.max(49.75 * upp, (fsL * upp) / 2 + 9 * upp + 6 * upp)}
                 textAnchor="end"
                 dominantBaseline="central"
                 style={{
