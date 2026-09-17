@@ -935,12 +935,13 @@ const CHAIN_MIN_CARDS = 3; // two cards cannot form a loop
 const CHAIN_TAP_UNLOCK_AT = 4;
 const CHAIN_MULT_STEP = 0.1; // each chum in the chain adds this to a multiplier starting at 1
 const CHAIN_COLLAPSE_MS = 450;
-/* THE JOIN CLOCK (owner, 17 September 2026). Half a second from joining one card
+/* THE JOIN CLOCK (owner, 17 September 2026, raised from 500ms to a second the
+   next day). That long from joining one card
    to joining the next, the clock starting on every join, the first card
    included. Run out and the chain dies where it stands, with the collapse and
    the tone a break gets. Closing the circuit stops the clock for good: a closed
    loop waits as long as the player likes before letting go. */
-const CHAIN_JOIN_TIMEOUT_MS = 500;
+const CHAIN_JOIN_TIMEOUT_MS = 1000;
 type ChainSq = { x: number; y: number; a: number; h: number };
 /* Separating axis test for two rotated squares (centre, angle in radians, half
    side). Returns the largest gap along any of the four axes: zero or less means
@@ -8116,7 +8117,7 @@ export default function BreedTree({
       const now = performance.now();
       const pulse = 1.7 + 0.3 * Math.sin(now / 90);
       /* THE JOIN CLOCK IS THE LAST DOT: the card you have just landed on
-         shrinks as its half second runs down, and goes red for the last of it.
+         shrinks as its time runs down, and goes red for the last of it.
          The dot was chosen over the line because that is where the finger is
          and where the next card has to come from, and it leaves the line free
          to keep saying white for open and yellow for the loop. */
