@@ -3398,7 +3398,7 @@ export default function BreedTree({
      the swipe chain). The in-flight check only holds for the 520ms of the
      flight: stepChumFly deletes a card from the flight map when it lands, and
      chumGone only catches up on the next render. Called again in that gap or
-     after, this used to score the card a second time (another 1000), report it
+     after, this used to score the card a second time (another collect), report it
      through onChumCollected again, flash the corner and fly an invisible card.
      chumTakenRef records every card taken, synchronously and for good, so a
      second call for any card already taken does nothing. The tap never reached
@@ -5968,12 +5968,15 @@ export default function BreedTree({
          only at runtime, from the card's pointer handler, long after doFall
          has finished. It covers the case where the round has already ended and
          the loop has wound itself down. */
-      /* CHUM_COLLECT_POINTS matches the learn area's "Choose as pack chum"
-         button, which the owner raised to 1000 the same day, so the two ways of
-         taking a chum are worth the same. The position comes from the bridge,
+      /* CHUM_COLLECT_POINTS used to match the learn area's "Choose as pack chum"
+         button at 1000. REBASED TO 750, 18 September 2026 (owner). The green
+         button in LineageMap is NOT changed with it: that component is rendered
+         by both pits, so its 1000 plus 100 a frame is the main pit's figure too
+         and is the owner's call on its own. The position comes from the bridge,
          which still holds the card's last world coordinates after its body
-         leaves the world, so it flashes where the card actually was. */
-      const CHUM_COLLECT_POINTS = 1000;
+         leaves the world, so it flashes where the card actually was.
+         The chain multiplier reads this constant, so it follows on its own. */
+      const CHUM_COLLECT_POINTS = 750;
       chumScoreRef.current = (i: number) => {
         const b = chumBodiesRef.current[i];
         if (!b) return;
@@ -11546,9 +11549,10 @@ export default function BreedTree({
                       layer, doing what the green collect button does).
 
                       SAME TWO EFFECTS AS THAT BUTTON, deliberately: onChumCollected
-                      to record the chum, and onScore with the same 1000 the layer's
-                      flashNum awards. If that figure moves in LineageMap, move it
-                      here; they are the same action by two routes.
+                      to record the chum, and onScore with a figure priced under
+                      the layer's own flashNum award. The two were the same 1000
+                      until 18 September 2026; the shortcut is now 500 and the pit
+                      collect 750, while the layer's green button is unchanged.
 
                       Sits beside the "i" on the SELECTED card only, for the reason
                       given there: a badge on every card would be about 14px and
@@ -11634,7 +11638,10 @@ export default function BreedTree({
                            and the green Collect was rebased the same day to
                            1000 + 100 a frame, so this sits under it on every level of
                            three frames or more. */
-                        onScore?.(750);
+                        /* 750 -> 500, 18 September 2026 (owner), alongside the pit
+                           collect dropping from 1000 to 750, so the shortcut stays
+                           the cheaper of the two ways. */
+                        onScore?.(500);
                       }}
                     >
                       <svg viewBox="0 0 24 24" aria-hidden="true">
