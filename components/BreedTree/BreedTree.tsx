@@ -1659,6 +1659,18 @@ function TemperamentBody({ pros, cons, tab, setTab }: { pros: string[]; cons: st
   );
 }
 
+/* A fresh collect flight for one chum card. Out here rather than inside
+   collectChum because the React compiler lint reads a function in the component
+   body as render code and flags the clock and the random spin as impure. The
+   values and the order they are drawn in are unchanged. */
+function newChumFlight() {
+  return {
+    t0: performance.now(),
+    spin: (Math.random() < 0.5 ? -1 : 1) * (200 + Math.random() * 160),
+    tx: 0, ty: 0, got: false,
+  };
+}
+
 export default function BreedTree({
   root,
   rootImage,
@@ -3189,6 +3201,66 @@ export default function BreedTree({
     if (chumFlyRaf.current != null) cancelAnimationFrame(chumFlyRaf.current);
     if (cornerTimerRef.current != null) window.clearTimeout(cornerTimerRef.current);
   }, []);
+  /* COLLECTS ONE CHUM CARD, BY INDEX. Lifted out of the card's own
+     press handler so that one route takes a card, whatever asked for it. The
+     arming and the yellow and green edge stay with the tap: they are that
+     gesture's state, not part of taking the card.
+
+     SAFE TO CALL FOR SEVERAL CARDS IN A ROW. Each card is scored, leaves the
+     world and joins the flight map on its own. The flight loop is started once,
+     by whichever delay fires first, and flies the whole map as one batch. A card
+     already in flight is skipped, so the same index twice scores once.
+
+     IT DOES NOT GUARD A CARD THAT HAS ALREADY LANDED. The in-flight check above
+     only holds for the 520ms of the flight: stepChumFly deletes a card from the
+     flight map when it lands and moves it into chumGone. Called again after
+     that, this scores the card a second time (another 1000), reports it through
+     onChumCollected again, flashes the corner and flies an invisible card. The tap can never do it, because a landed card is
+     display none with pointer events off. A swipe chain, or any other caller
+     that picks cards by position, must check chumGone (and the flight map)
+     itself before calling this.
+
+     IT READS chumList FROM THE RENDER IT WAS CREATED IN. collectChum is a new
+     function on every render and closes over that render's chumList, which is
+     where the card's name for onChumCollected comes from. The tap is safe,
+     because its handler is rebuilt every render. A listener bound ONCE (a
+     document or window listener in an effect with [] dependencies, the way the
+     start screen swipe is bound) keeps the collectChum from its first render,
+     and so a chumList that may still be empty: every card is then scored and
+     flown but never counted as collected. Call it through a latest-value ref,
+     the pattern navRef uses, or rebind the listener when chumList changes. A
+     landed check that reads chumGone from the same stale closure has the same
+     problem. stepChumFly does not: it reads only refs and a functional
+     setChumGone, so an old copy of it flies cards correctly. */
+  const collectChum = (i: number) => {
+    // Already on its way, so leave it alone.
+    if (chumFlyRef.current.has(i)) return;
+    // Out of the physics world first, so nothing can knock a
+    // card that is already on its way to being collected.
+    const b = chumBodiesRef.current[i];
+    // CLEAR onFloor BEFORE removing the body. Removing it from the
+    // world does NOT fire collisionEnd, so onFloor would stay true
+    // and anyChumOnFloor() would never see the floor empty: the
+    // rescue would never fire and the whole feature would look
+    // broken. Clear it, drop the body, then re-test the countdown.
+    if (b) { b.onFloor = false; b.floorLostAt = 0; }
+    // Scored BEFORE the body goes, so the number flashes at the
+    // card rather than wherever the bridge was last written.
+    chumScoreRef.current?.(i);
+    if (b?.mb) { try { removeChumBodyRef.current?.(b.mb); } catch { /* already gone */ } }
+    tryCancelRef.current?.();
+    // Off it goes to the corner. It leaves the list when it
+    // lands, not now, so the flight has something to draw.
+    chumFlyRef.current.set(i, newChumFlight());
+    window.setTimeout(() => {
+      if (chumFlyRaf.current == null) chumFlyRaf.current = requestAnimationFrame(stepChumFly);
+    }, CHUM_TAKE_MS);
+    // Counted straight away, so the box pops and the number
+    // climbs as the card sets off, not when it lands.
+    const cm = chumList[i];
+    if (cm) onChumCollected?.(cm.name);
+    flashCorner();
+  };
   // The cookie panel's two answers. They are pit objects, not UI: they squeeze
   // out of the panel, tumble, can be dragged and barge like anything else.
   const btnBodiesRef = useRef<PropBody[]>([]);
@@ -8790,34 +8862,7 @@ export default function BreedTree({
                     // Second tap on the armed card: taken.
                     setArmedChum(null);
                     setTakenChum(i2);
-                    // Out of the physics world first, so nothing can knock a
-                    // card that is already on its way to being collected.
-                    const b = chumBodiesRef.current[i2];
-                    // CLEAR onFloor BEFORE removing the body. Removing it from the
-                    // world does NOT fire collisionEnd, so onFloor would stay true
-                    // and anyChumOnFloor() would never see the floor empty: the
-                    // rescue would never fire and the whole feature would look
-                    // broken. Clear it, drop the body, then re-test the countdown.
-                    if (b) { b.onFloor = false; b.floorLostAt = 0; }
-                    // Scored BEFORE the body goes, so the number flashes at the
-                    // card rather than wherever the bridge was last written.
-                    chumScoreRef.current?.(i2);
-                    if (b?.mb) { try { removeChumBodyRef.current?.(b.mb); } catch { /* already gone */ } }
-                    tryCancelRef.current?.();
-                    // Off it goes to the corner. It leaves the list when it
-                    // lands, not now, so the flight has something to draw.
-                    chumFlyRef.current.set(i2, {
-                      t0: performance.now(),
-                      spin: (Math.random() < 0.5 ? -1 : 1) * (200 + Math.random() * 160),
-                      tx: 0, ty: 0, got: false,
-                    });
-                    window.setTimeout(() => {
-                      if (chumFlyRaf.current == null) chumFlyRaf.current = requestAnimationFrame(stepChumFly);
-                    }, CHUM_TAKE_MS);
-                    // Counted straight away, so the box pops and the number
-                    // climbs as the card sets off, not when it lands.
-                    onChumCollected?.(cm.name);
-                    flashCorner();
+                    collectChum(i2);
                   }}
                 >
                   <clipPath id={`bt-chum-${i2}`}>
