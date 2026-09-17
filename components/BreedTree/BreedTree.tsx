@@ -7970,6 +7970,8 @@ export default function BreedTree({
     if (!chainDebugOn()) return;
     type Chain = {
       id: number; pending: boolean; cards: number[]; px: number; py: number; fx: number; fy: number;
+      // What this chain is made of. See ChainKind below.
+      kind: ChainKind;
       // Link index (cards[s] to cards[s + 1]) -> when it first went over the
       // slack and its gap now, as a share of a card side. Healthy links are absent.
       strain: Map<number, { since: number; share: number }>;
@@ -8016,41 +8018,100 @@ export default function BreedTree({
       const k = SIZE / v[2];
       return { x: (pr.x - v[0]) * k, y: (pr.y - v[1]) * k, a: pr.a, h: side / 2 };
     };
+    /* ONE GESTURE, A KIND PER THING IT CHAINS (18 September 2026).
+
+       Everything else in this effect is the gesture itself and knows nothing
+       about what is being chained: the finger sweep and its sampling, the join
+       clock, the crossing test, the per frame link test, the strain and break
+       states, the kill rules, the collapse, the tone, the drawing and the panel.
+
+       A kind supplies only the parts that differ: how to tell whether a press
+       belongs to it, what lies under a point, the shape of one of its things,
+       how far apart two of them are, whether one can be chained just now, any
+       rule of its own for joining, whether it must close a circuit, and what a
+       valid release does. Adding a chain of something else is one of these and
+       no changes here.
+
+       gapShare is the separation between two things as a SHARE OF THEIR SIZE, so
+       CHAIN_TOUCH_SLACK means the same thing whatever shape they are. */
+    type ChainKind = {
+      key: string;
+      on: boolean;                                        // its own debug flag
+      colour: string;                                     // the path's own colour
+      circuit: boolean;                                   // must close a loop to pay
+      minCards: number;                                   // fewest that can pay
+      owns: (t: globalThis.Node) => boolean;              // is this press ours
+      idAt: (cx: number, cy: number) => number | null;    // what is under a point
+      geo: (i: number) => ChainSq | null;                 // where and how big
+      gapShare: (a: ChainSq, b: ChainSq) => number;       // gap as a share of size
+      busy: (i: number) => boolean;                       // in flight, cannot join
+      taken: (i: number) => boolean;                      // gone since it joined
+      startable: (i: number) => boolean;                  // may open a chain
+      joinBlock: (ch: Chain, i: number) => string | null; // the kind's own rule
+      settle: (ch: Chain) => string;                      // a valid release
+    };
+    const CARD: ChainKind = {
+      key: "chum card",
+      on: chainDebugOn(),
+      colour: "#ffffff",
+      circuit: true,
+      minCards: CHAIN_MIN_CARDS,
+      owns: (t) => !!chumsGRef.current?.contains(t),
+      idAt: cardAt,
+      geo,
+      gapShare: (a, b) => chainSquareGap(a, b) / (Math.max(a.h, b.h) * 2),
+      busy: (i) => chumFlyRef.current.has(i),
+      taken: (i) => chumTakenRef.current.has(i),
+      startable: () => true,
+      joinBlock: () => null, // touching and no crossing is the whole rule
+      settle: (ch) => {
+        const cards = [...ch.cards];
+        chainClearRef.current?.(cards);
+        const r = chainBonusRef.current?.(cards);
+        return r
+          ? `CLEARED, circuit closed, ${cards.length} cards: ${r.sum} x${r.mult.toFixed(1)} = ${r.sum + r.bonus} (bonus ${r.bonus})`
+          : `CLEARED, circuit closed, ${cards.length} cards`;
+      },
+    };
+    const KINDS: ChainKind[] = [CARD];
     // Why the last card could not close the loop back to the first right now,
     // or null if it could. The same touching and crossing tests as any join.
     const closeBlock = (ch: Chain): string | null => {
       const cards = ch.cards;
+      const K = ch.kind;
+      if (!K.circuit) return "this chain does not close";
       if (ch.closed || ch.dead) return "no longer open";
-      if (cards.length < CHAIN_MIN_CARDS) return `a loop needs ${CHAIN_MIN_CARDS} cards`;
+      if (cards.length < K.minCards) return `a loop needs ${K.minCards} cards`;
       const first = cards[0], last = cards[cards.length - 1];
-      const a = geo(last), b = geo(first);
+      const a = K.geo(last), b = K.geo(first);
       if (!a || !b) return "could not be measured";
-      const share = chainSquareGap(a, b) / (Math.max(a.h, b.h) * 2);
+      const share = K.gapShare(a, b);
       if (share > CHAIN_TOUCH_SLACK) return `#${last} not touching #${first}, gap ${Math.round(share * 100)}%`;
       // Segment 0 starts at the first card and the last segment ends at the last
       // card; the crossing test ignores a shared end, so testing both is safe.
       for (let s = 0; s < cards.length - 1; s++) {
-        const p = geo(cards[s]), q = geo(cards[s + 1]);
+        const p = K.geo(cards[s]), q = K.geo(cards[s + 1]);
         if (p && q && chainSegmentsCross(p, q, a, b)) return "the closing link would cross the path";
       }
       return null;
     };
     const joinAt = (ch: Chain, cx: number, cy: number) => {
       if (ch.dead || ch.closed) return; // broken or complete: nothing more joins
-      const i = cardAt(cx, cy);
+      const K = ch.kind;
+      const i = K.idAt(cx, cy);
       if (i == null) return;
       const cards = ch.cards;
       const last = cards[cards.length - 1];
       if (i === last) return;
       // The first card again: the closing move, and the only repeat allowed.
-      if (i === cards[0] && cards.length > 1) {
+      if (K.circuit && i === cards[0] && cards.length > 1) {
         const why = closeBlock(ch);
         /* A closing move that is illegal kills the chain, exactly as any other
            wrong card does. The one exception is a chain still too short to be a
            loop: doubling back onto the first card of a two card chain is not a
            wrong card, it is a gesture that has not gone anywhere yet, so that
            one only refuses. */
-        if (why && cards.length < CHAIN_MIN_CARDS) { note = `cannot close on #${i}: ${why}`; return; }
+        if (why && cards.length < K.minCards) { note = `cannot close on #${i}: ${why}`; return; }
         if (why) { killChain(ch, `CANNOT CLOSE on #${i}, ${why}`); return; }
         ch.closed = true;
         ch.canClose = false;
@@ -8061,21 +8122,23 @@ export default function BreedTree({
       // A card already in the chain, and not the first: the chain dies. It used
       // to refuse and carry on.
       if (cards.includes(i)) { killChain(ch, `REPEAT CARD, #${i} was already in the chain`); return; }
-      if (chumFlyRef.current.has(i)) { note = `#${i} is being collected`; return; }
+      if (K.busy(i)) { note = `#${i} is being collected`; return; }
       if (last === undefined) { cards.push(i); ch.lastJoin = performance.now(); note = `started on #${i}`; return; }
-      const a = geo(last), b = geo(i);
+      // The kind's own rule, if it has one, before the shared geometry.
+      const own = K.joinBlock(ch, i);
+      if (own) { killChain(ch, own); return; }
+      const a = K.geo(last), b = K.geo(i);
       if (!a || !b) return;
-      const side = Math.max(a.h, b.h) * 2;
-      const gap = chainSquareGap(a, b);
+      const share = K.gapShare(a, b);
       // A card that does not touch the one before it: the chain dies. It used
       // to refuse and carry on, which read as the gesture being ignored.
-      if (gap > side * CHAIN_TOUCH_SLACK) {
-        killChain(ch, `STRAY CARD, #${i} not touching #${last}, gap ${Math.round((gap / side) * 100)}%`);
+      if (share > CHAIN_TOUCH_SLACK) {
+        killChain(ch, `STRAY CARD, #${i} not touching #${last}, gap ${Math.round(share * 100)}%`);
         return;
       }
       // Every earlier segment except the last one, which ends where this starts.
       for (let s = 0; s < cards.length - 2; s++) {
-        const p = geo(cards[s]), q = geo(cards[s + 1]);
+        const p = K.geo(cards[s]), q = K.geo(cards[s + 1]);
         if (p && q && chainSegmentsCross(p, q, a, b)) { killChain(ch, `CROSSING, #${i} would cross the path`); return; }
       }
       cards.push(i);
@@ -8134,7 +8197,7 @@ export default function BreedTree({
       const liveW = dead ? DIM_W : chain.closed ? CLOSED_W : chain.canClose ? READY_W : OPEN_W;
       // Index aligned with chain.cards; link s runs from cps[s] to the next,
       // wrapping to the first card for the closing link.
-      const cps = chain.cards.map((i) => geo(i));
+      const cps = chain.cards.map((i) => chain?.kind.geo(i) ?? null);
       const unit = cps.find((q) => q)?.h ?? 0;
       type Seg = { x1: number; y1: number; x2: number; y2: number; w: number; o: number };
       const segs: Seg[] = [];
@@ -8186,16 +8249,20 @@ export default function BreedTree({
             r: chain?.canClose && d === 0 ? pulse : d === n - 1 ? 1 - 0.45 * run : 1,
           }
         : null);
-      paint(segs, dotList, unit);
+      paint(segs, dotList, unit, chain.kind.colour);
     };
     // Writes lines and dots into the path layer. Shared by the live chain and
-    // the collapse, so the two can never be drawn two different ways.
+    // the collapse, so the two can never be drawn two different ways. The colour
+    // belongs to the kind: white for chum cards, and a chain of something else
+    // brings its own.
     const paint = (
-      // Always white. `w` scales the stroke weight and `o` its opacity: between
-      // them they carry every state the path used to say in colour.
+      // One colour throughout, the kind's own. `w` scales the stroke weight and
+      // `o` its opacity: between them they carry every state, which is why the
+      // chum card path can say everything it needs to in white alone.
       segs: { x1: number; y1: number; x2: number; y2: number; w?: number; o?: number }[],
       dotList: ({ x: number; y: number; r?: number; o?: number } | null)[],
       unit: number,
+      col: string,
     ) => {
       const g = chainGRef.current;
       const glow = g?.querySelector("[data-chain=glow]");
@@ -8214,7 +8281,7 @@ export default function BreedTree({
           const l = grp.children[j] as SVGLineElement;
           l.setAttribute("x1", String(sg.x1)); l.setAttribute("y1", String(sg.y1));
           l.setAttribute("x2", String(sg.x2)); l.setAttribute("y2", String(sg.y2));
-          l.style.stroke = "#ffffff";
+          l.style.stroke = col;
           l.style.strokeWidth = String(width * (sg.w ?? 1));
           l.style.opacity = String(sg.o ?? 1);
         });
@@ -8232,7 +8299,7 @@ export default function BreedTree({
         c.setAttribute("cx", String(q.x));
         c.setAttribute("cy", String(q.y));
         c.setAttribute("r", String(unit * 0.22 * (q.r ?? 1)));
-        c.style.fill = "#ffffff";
+        c.style.fill = col;
         c.style.opacity = String(q.o ?? 1);
       }
     };
@@ -8240,13 +8307,18 @@ export default function BreedTree({
        falling and fading over CHAIN_COLLAPSE_MS. Each half link drifts its own
        way so it reads as the chain coming apart, not the path sliding off. */
     type Collapse = {
-      t0: number; unit: number;
+      t0: number; unit: number; col: string;
       pieces: { x1: number; y1: number; x2: number; y2: number; drift: number }[];
       dots: { x: number; y: number; drift: number }[];
     };
     let collapse: Collapse | null = null;
-    // `loop` adds the closing link, last card back to first.
-    const startCollapse = (cards: number[], loop: boolean) => {
+    // The chain is gone by the time this is drawn, so its shape, its size and
+    // its colour are all taken here. `loop` adds the closing link, last card
+    // back to first.
+    const startCollapse = (ch: Chain) => {
+      const cards = ch.cards;
+      const loop = ch.closed;
+      const geo = ch.kind.geo;
       const cps = cards.map((i) => geo(i));
       const unit = cps.find((q) => q)?.h ?? 0;
       const pieces: Collapse["pieces"] = [];
@@ -8261,7 +8333,7 @@ export default function BreedTree({
         pieces.push({ x1: mx + ux * half, y1: my + uy * half, x2: q.x, y2: q.y, drift: Math.random() * 2 - 1 });
       }
       const dotsArr = cps.flatMap((q) => (q ? [{ x: q.x, y: q.y, drift: Math.random() * 2 - 1 }] : []));
-      collapse = { t0: performance.now(), unit, pieces, dots: dotsArr };
+      collapse = { t0: performance.now(), unit, col: ch.kind.colour, pieces, dots: dotsArr };
     };
     // Paints one collapse frame. False once it is over, having cleared the layer.
     const drawCollapse = (now: number): boolean => {
@@ -8271,17 +8343,18 @@ export default function BreedTree({
       if (t >= 1) {
         collapse = null;
         g.style.opacity = "";
-        paint([], [], 0);
+        paint([], [], 0, "#ffffff");
         return false;
       }
       const u = collapse.unit;
       const fall = u * 8 * t * t;
-      // White and thinned, like everything else on the path. The falling and the
-      // fade are unchanged: the group's own opacity still carries them.
+      // The chain's own colour, thinned. The falling and the fade are unchanged:
+      // the group's own opacity still carries them.
       paint(
         collapse.pieces.map((p) => ({ x1: p.x1 + p.drift * u * 1.5 * t, y1: p.y1 + fall, x2: p.x2 + p.drift * u * 1.5 * t, y2: p.y2 + fall, w: 0.6 })),
         collapse.dots.map((d) => ({ x: d.x + d.drift * u * t, y: d.y + fall })),
         u,
+        collapse.col,
       );
       g.style.opacity = String(1 - t);
       return true;
@@ -8314,16 +8387,18 @@ export default function BreedTree({
     // Why a released chain may not clear, or null if it may. No grace here.
     // A broken link is reported ahead of an open circuit: it is the real cause.
     const judge = (ch: Chain): string | null => {
+      const K = ch.kind;
       if (ch.dead) return `BROKEN LINK #${ch.dead.a}-#${ch.dead.b}, gap ${Math.round(ch.dead.share * 100)}%`;
-      if (!ch.closed) return `OPEN, circuit not closed (${ch.cards.length} cards)`;
+      if (K.circuit && !ch.closed) return `OPEN, circuit not closed (${ch.cards.length} cards)`;
+      if (ch.cards.length < K.minCards) return `TOO SHORT, ${ch.cards.length} of ${K.minCards}`;
       for (const i of ch.cards) {
-        if (chumFlyRef.current.has(i) || chumTakenRef.current.has(i)) return `#${i} was already taken`;
+        if (K.busy(i) || K.taken(i)) return `#${i} was already taken`;
       }
       for (let s = 0; s < linkCount(ch); s++) {
         const [ai, bi] = linkEnds(ch, s);
-        const a = geo(ai), b = geo(bi);
+        const a = K.geo(ai), b = K.geo(bi);
         if (!a || !b) return `#${!a ? ai : bi} could not be measured`;
-        const share = chainSquareGap(a, b) / (Math.max(a.h, b.h) * 2);
+        const share = K.gapShare(a, b);
         if (share > CHAIN_TOUCH_SLACK) return `BROKEN LINK #${ai}-#${bi}, gap ${Math.round(share * 100)}% at release`;
       }
       return null;
@@ -8337,7 +8412,7 @@ export default function BreedTree({
     const killChain = (ch: Chain, text: string) => {
       result = `FAILED, ${text}, nothing scored`;
       note = result;
-      startCollapse(ch.cards, ch.closed);
+      startCollapse(ch);
       failTone();
       const held = chainHeldCollectRef.current;
       if (held != null) {
@@ -8352,9 +8427,9 @@ export default function BreedTree({
       // The closing link too, once the loop is closed.
       for (let s = 0; s < linkCount(ch); s++) {
         const [ai, bi] = linkEnds(ch, s);
-        const a = geo(ai), b = geo(bi);
+        const a = ch.kind.geo(ai), b = ch.kind.geo(bi);
         if (!a || !b) continue;
-        const share = chainSquareGap(a, b) / (Math.max(a.h, b.h) * 2);
+        const share = ch.kind.gapShare(a, b);
         if (share <= CHAIN_TOUCH_SLACK) { ch.strain.delete(s); continue; }
         const st = ch.strain.get(s);
         if (!st) { ch.strain.set(s, { since: now, share }); continue; }
@@ -8381,15 +8456,12 @@ export default function BreedTree({
         const fail = judge(ch);
         if (fail) {
           result = `FAILED, ${fail}, nothing scored`;
-          startCollapse(ch.cards, ch.closed);
+          startCollapse(ch);
           failTone();
         } else {
-          const cards = [...ch.cards];
-          chainClearRef.current?.(cards);
-          const r = chainBonusRef.current?.(cards);
-          result = r
-            ? `CLEARED, circuit closed, ${n} cards: ${r.sum} x${r.mult.toFixed(1)} = ${r.sum + r.bonus} (bonus ${r.bonus})`
-            : `CLEARED, circuit closed, ${n} cards`;
+          // What a valid release does belongs to the kind: cards clear and score,
+          // and another kind will do something else entirely.
+          result = ch.kind.settle(ch);
           cleared = true;
         }
         note = result;
@@ -8445,14 +8517,25 @@ export default function BreedTree({
       if (chain && e.isPrimary) end("stale chain");
       if (chain) return; // one chain at a time, a second finger is ignored
       const t = e.target as globalThis.Node | null;
-      if (!t || !chumsGRef.current?.contains(t)) return;
+      if (!t) return;
+      // Whichever kind owns this press, if its flag is on and the thing pressed
+      // is allowed to open a chain. First match wins; there is only ever one.
+      let kind: ChainKind | null = null;
+      for (const k of KINDS) {
+        if (!k.on || !k.owns(t)) continue;
+        const i0 = k.idAt(e.clientX, e.clientY);
+        if (i0 != null && !k.startable(i0)) continue;
+        kind = k;
+        break;
+      }
+      if (!kind) return;
       // A new chain cuts short any collapse still falling.
       if (collapse) {
         collapse = null;
         if (chainGRef.current) chainGRef.current.style.opacity = "";
-        paint([], [], 0);
+        paint([], [], 0, "#ffffff");
       }
-      chain = { id: e.pointerId, pending: true, cards: [], px: e.clientX, py: e.clientY, fx: e.clientX, fy: e.clientY, strain: new Map(), dead: null, closed: false, canClose: false, lastJoin: performance.now() };
+      chain = { id: e.pointerId, kind, pending: true, cards: [], px: e.clientX, py: e.clientY, fx: e.clientX, fy: e.clientY, strain: new Map(), dead: null, closed: false, canClose: false, lastJoin: performance.now() };
       note = "waiting for the gate";
       if (raf == null) raf = requestAnimationFrame(tick);
     };
@@ -8474,7 +8557,7 @@ export default function BreedTree({
     const poll = window.setInterval(() => {
       const gate = chumGateRef.current;
       setChainDiag([
-        `chain    ${!chain ? "idle" : chain.pending ? `waiting, pointer ${chain.id}` : chain.dead ? `DEAD, pointer ${chain.id}` : `ACTIVE, pointer ${chain.id}`}`,
+        `chain    ${!chain ? "idle" : chain.pending ? `waiting, pointer ${chain.id}` : chain.dead ? `DEAD, pointer ${chain.id}` : `ACTIVE, pointer ${chain.id}`}${chain ? ` (${chain.kind.key})` : ""}`,
         `cards    ${chain ? `${chain.cards.length}${chain.cards.length ? ": #" + chain.cards.join(" #") : ""}` : "-"}`,
         `circuit  ${!chain || chain.pending ? "-" : chain.closed ? "CLOSED" : chain.canClose ? "open, CAN CLOSE on #" + chain.cards[0] : "open"}`,
         `clock    ${!chain || chain.pending ? "-" : chain.closed ? "stopped, loop closed" : `idle ${Math.round(performance.now() - chain.lastJoin)}ms of ${chainAllowanceMs(chain.cards.length - 1)}ms`}`,
