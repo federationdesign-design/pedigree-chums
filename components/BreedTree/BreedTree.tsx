@@ -7743,7 +7743,7 @@ export default function BreedTree({
       const gate = chumGateRef.current;
       const lines = [`gate     ${gate == null ? "shut" : `OPEN, pointer ${gate}`}`];
       if (!h) {
-        lines.push("button   (no constraint yet)", "holding  -", "fuse     -");
+        lines.push("button   waiting for pit", "holding  -", "fuse     -");
         setFuseDiag(lines);
         return;
       }
@@ -10310,6 +10310,22 @@ export default function BreedTree({
           }}
         />
       )}
+      {/* ==================== REMOVE BEFORE LAUNCH, ?fusedebug=1 ====================
+          The gate and fuse readout. Top RIGHT, so it can sit beside the chumbox
+          panel, and pointer-events none so a swipe passes through.
+          A SIBLING OF THE INFO BOX, NOT INSIDE IT. It first shipped inside the
+          caption, and the box is visibility hidden whenever the caption is
+          closed, which is the default in play, so the panel inherited hidden
+          and never showed. visibility is also set outright here. */}
+      {fuseDiag && (
+        <div style={{
+          position: "fixed", top: 6, right: 6, zIndex: 9000, pointerEvents: "none", visibility: "visible",
+          background: "rgba(0,0,0,0.78)", color: "#0f0", padding: "6px 8px",
+          font: "11px/1.35 ui-monospace, monospace", borderRadius: 6, whiteSpace: "pre",
+        }}>
+          {fuseDiag.join("\n")}
+        </div>
+      )}
       <div
         ref={asideRef}
         className={`${styles.aside}${dockAside ? " " + styles.asideDocked : ""}${dockAside && isMobile ? " " + styles.asideSheet : ""}`}
@@ -10538,18 +10554,6 @@ export default function BreedTree({
               The readout. Fixed and top-left so it clears the bottom button row
               and the chum rail, and pointer-events none so it cannot take a tap
               from anything underneath while it is up. */}
-          {/* ==================== REMOVE BEFORE LAUNCH, ?fusedebug=1 ====================
-              The gate and fuse readout. Top RIGHT, so it can sit beside the
-              chumbox panel, and pointer-events none so a swipe passes through. */}
-          {fuseDiag && (
-            <div style={{
-              position: "fixed", top: 6, right: 6, zIndex: 9000, pointerEvents: "none",
-              background: "rgba(0,0,0,0.78)", color: "#0f0", padding: "6px 8px",
-              font: "11px/1.35 ui-monospace, monospace", borderRadius: 6, whiteSpace: "pre",
-            }}>
-              {fuseDiag.join("\n")}
-            </div>
-          )}
           {chumDiag && (
             <div style={{
               position: "fixed", top: 6, left: 6, zIndex: 9000, pointerEvents: "none",
