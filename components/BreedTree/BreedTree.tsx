@@ -8068,38 +8068,50 @@ export default function BreedTree({
         dots.replaceChildren();
         return;
       }
-      const WHITE = "#ffffff", GREY = "#9ca3af", RED = "#ef4444", GOLD = "#ffd23e";
+      /* WHITE THROUGHOUT (owner, 18 September 2026). The path carries no colour
+         at all: every state is said with WEIGHT and GLOW instead, so the line
+         reads as one material that brightens, thickens, dims or thins.
+           open link      the resting state, and the headroom for the rest
+           can close      the whole line brightens and thickens, and the first
+                          card's dot swells and pulses, marking the target ahead
+                          of the finger: the loop shuts the instant the finger
+                          reaches it, so there is no hovering moment to use
+           closed         brighter and heavier again, and the finger's line goes
+           straining      that link alone dims and thins
+           dead           the whole path dims and thins, and the broken link is
+                          still cut open at its middle
+         The dimming, thinning and fading are the ones that were already there,
+         with the colour taken out. The card edges are NOT touched by any of
+         this: green taken, yellow armed, red on the floor and the breathing
+         yellow of the tap unlock all stay exactly as they are. */
+      const DIM_O = 0.4, DIM_W = 0.6;     // strained, dead, run down
+      const OPEN_O = 0.85, OPEN_W = 1;    // a live open link
+      const READY_O = 1, READY_W = 1.35;  // the loop could close from here
+      const CLOSED_O = 1, CLOSED_W = 1.6; // the loop is closed
       const dead = chain.dead;
-      /* THE CIRCUIT, ON SCREEN. Two states, both in the site yellow.
-         AVAILABLE: closing from the last card would be legal right now. The first
-         card's dot swells and pulses and the live line to the finger turns
-         yellow, so the target is marked before the finger reaches it. It has to
-         be shown AHEAD like this: the loop closes the instant the finger enters
-         the first card, so there is no moment of hovering over it still open.
-         CLOSED: the closing link is drawn and the whole loop, lines and dots,
-         turns yellow, and the finger's line goes because nothing more can join.
-         Grey strain and a red break still win over yellow on their own links. */
-      const loopCol = chain.closed ? GOLD : WHITE;
+      const liveO = dead ? DIM_O : chain.closed ? CLOSED_O : chain.canClose ? READY_O : OPEN_O;
+      const liveW = dead ? DIM_W : chain.closed ? CLOSED_W : chain.canClose ? READY_W : OPEN_W;
       // Index aligned with chain.cards; link s runs from cps[s] to the next,
       // wrapping to the first card for the closing link.
       const cps = chain.cards.map((i) => geo(i));
       const unit = cps.find((q) => q)?.h ?? 0;
-      type Seg = { x1: number; y1: number; x2: number; y2: number; col: string };
+      type Seg = { x1: number; y1: number; x2: number; y2: number; w: number; o: number };
       const segs: Seg[] = [];
       for (let s = 0; s < linkCount(chain); s++) {
         const p = cps[s], q = cps[(s + 1) % cps.length];
         if (!p || !q) continue;
         if (dead && dead.link === s) {
-          // The point of failure: red, and cut open at the middle, which is
-          // where the two cards should have been touching.
+          // The point of failure, cut open at the middle, which is where the two
+          // cards should have been touching.
           const len = Math.hypot(q.x - p.x, q.y - p.y) || 1;
           const ux = (q.x - p.x) / len, uy = (q.y - p.y) / len;
           const half = Math.min(len * 0.3, unit * 0.6);
           const mx = (p.x + q.x) / 2, my = (p.y + q.y) / 2;
-          segs.push({ x1: p.x, y1: p.y, x2: mx - ux * half, y2: my - uy * half, col: RED });
-          segs.push({ x1: mx + ux * half, y1: my + uy * half, x2: q.x, y2: q.y, col: RED });
+          segs.push({ x1: p.x, y1: p.y, x2: mx - ux * half, y2: my - uy * half, w: DIM_W, o: DIM_O });
+          segs.push({ x1: mx + ux * half, y1: my + uy * half, x2: q.x, y2: q.y, w: DIM_W, o: DIM_O });
         } else {
-          segs.push({ x1: p.x, y1: p.y, x2: q.x, y2: q.y, col: dead || chain.strain.has(s) ? GREY : loopCol });
+          const strained = !dead && chain.strain.has(s);
+          segs.push({ x1: p.x, y1: p.y, x2: q.x, y2: q.y, w: strained ? DIM_W : liveW, o: strained ? DIM_O : liveO });
         }
       }
       // The live end of the line is the finger itself, while the chain is open.
@@ -8110,25 +8122,23 @@ export default function BreedTree({
         const p = sv.createSVGPoint();
         p.x = chain.fx; p.y = chain.fy;
         const w = p.matrixTransform(ctm.inverse());
-        segs.push({ x1: lastP.x, y1: lastP.y, x2: w.x, y2: w.y, col: chain.canClose ? GOLD : WHITE });
+        segs.push({ x1: lastP.x, y1: lastP.y, x2: w.x, y2: w.y, w: liveW, o: liveO });
       }
-      // The two cards either side of the break go red; the rest grey once dead.
       const n = cps.length;
       const now = performance.now();
       const pulse = 1.7 + 0.3 * Math.sin(now / 90);
-      /* THE JOIN CLOCK IS THE LAST DOT: the card you have just landed on
-         shrinks as its time runs down, and goes red for the last of it.
-         The dot was chosen over the line because that is where the finger is
-         and where the next card has to come from, and it leaves the line free
-         to keep saying white for open and yellow for the loop. */
+      /* THE JOIN CLOCK IS STILL THE LAST DOT: the card you have just landed on
+         shrinks as its time runs down, and now DIMS towards the end instead of
+         going red. The dot was chosen over the line because that is where the
+         finger is and where the next card has to come from. */
       const run = chain.closed || chain.dead ? 0 : Math.min(1, (now - chain.lastJoin) / CHAIN_JOIN_TIMEOUT_MS);
       const dotList = cps.map((q, d) => q
         ? {
             x: q.x, y: q.y,
-            col: dead ? (d === dead.link || d === (dead.link + 1) % n ? RED : GREY)
-              : chain?.canClose && d === 0 ? GOLD
-              : d === n - 1 && run > 0.6 ? RED
-              : loopCol,
+            o: dead ? DIM_O
+              : chain?.canClose && d === 0 ? READY_O
+              : d === n - 1 ? liveO - (liveO - DIM_O) * run
+              : liveO,
             r: chain?.canClose && d === 0 ? pulse : d === n - 1 ? 1 - 0.45 * run : 1,
           }
         : null);
@@ -8137,8 +8147,10 @@ export default function BreedTree({
     // Writes lines and dots into the path layer. Shared by the live chain and
     // the collapse, so the two can never be drawn two different ways.
     const paint = (
-      segs: { x1: number; y1: number; x2: number; y2: number; col: string }[],
-      dotList: ({ x: number; y: number; col: string; r?: number } | null)[],
+      // Always white. `w` scales the stroke weight and `o` its opacity: between
+      // them they carry every state the path used to say in colour.
+      segs: { x1: number; y1: number; x2: number; y2: number; w?: number; o?: number }[],
+      dotList: ({ x: number; y: number; r?: number; o?: number } | null)[],
       unit: number,
     ) => {
       const g = chainGRef.current;
@@ -8158,8 +8170,9 @@ export default function BreedTree({
           const l = grp.children[j] as SVGLineElement;
           l.setAttribute("x1", String(sg.x1)); l.setAttribute("y1", String(sg.y1));
           l.setAttribute("x2", String(sg.x2)); l.setAttribute("y2", String(sg.y2));
-          l.style.stroke = sg.col;
-          l.style.strokeWidth = String(width);
+          l.style.stroke = "#ffffff";
+          l.style.strokeWidth = String(width * (sg.w ?? 1));
+          l.style.opacity = String(sg.o ?? 1);
         });
       };
       lay(glow, unit * 0.5);
@@ -8175,10 +8188,11 @@ export default function BreedTree({
         c.setAttribute("cx", String(q.x));
         c.setAttribute("cy", String(q.y));
         c.setAttribute("r", String(unit * 0.22 * (q.r ?? 1)));
-        c.style.fill = q.col;
+        c.style.fill = "#ffffff";
+        c.style.opacity = String(q.o ?? 1);
       }
     };
-    /* THE COLLAPSE. A failed chain's last shape, snapped open at every link, red,
+    /* THE COLLAPSE. A failed chain's last shape, snapped open at every link,
        falling and fading over CHAIN_COLLAPSE_MS. Each half link drifts its own
        way so it reads as the chain coming apart, not the path sliding off. */
     type Collapse = {
@@ -8218,10 +8232,11 @@ export default function BreedTree({
       }
       const u = collapse.unit;
       const fall = u * 8 * t * t;
-      const RED = "#ef4444";
+      // White and thinned, like everything else on the path. The falling and the
+      // fade are unchanged: the group's own opacity still carries them.
       paint(
-        collapse.pieces.map((p) => ({ x1: p.x1 + p.drift * u * 1.5 * t, y1: p.y1 + fall, x2: p.x2 + p.drift * u * 1.5 * t, y2: p.y2 + fall, col: RED })),
-        collapse.dots.map((d) => ({ x: d.x + d.drift * u * t, y: d.y + fall, col: RED })),
+        collapse.pieces.map((p) => ({ x1: p.x1 + p.drift * u * 1.5 * t, y1: p.y1 + fall, x2: p.x2 + p.drift * u * 1.5 * t, y2: p.y2 + fall, w: 0.6 })),
+        collapse.dots.map((d) => ({ x: d.x + d.drift * u * t, y: d.y + fall })),
         u,
       );
       g.style.opacity = String(1 - t);
