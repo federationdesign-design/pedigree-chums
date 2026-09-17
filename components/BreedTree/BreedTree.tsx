@@ -8007,27 +8007,37 @@ export default function BreedTree({
       // The first card again: the closing move, and the only repeat allowed.
       if (i === cards[0] && cards.length > 1) {
         const why = closeBlock(ch);
-        if (why) { note = `cannot close on #${i}: ${why}`; return; }
+        /* A closing move that is illegal kills the chain, exactly as any other
+           wrong card does. The one exception is a chain still too short to be a
+           loop: doubling back onto the first card of a two card chain is not a
+           wrong card, it is a gesture that has not gone anywhere yet, so that
+           one only refuses. */
+        if (why && cards.length < CHAIN_MIN_CARDS) { note = `cannot close on #${i}: ${why}`; return; }
+        if (why) { killChain(ch, `CANNOT CLOSE on #${i}, ${why}`); return; }
         ch.closed = true;
         ch.canClose = false;
         note = `CIRCUIT CLOSED on #${i}, ${cards.length} cards`;
         return;
       }
-      if (cards.includes(i)) { note = `#${i} already in the chain`; return; }
+      // A card already in the chain, and not the first: the chain dies. It used
+      // to refuse and carry on.
+      if (cards.includes(i)) { killChain(ch, `REPEAT CARD, #${i} was already in the chain`); return; }
       if (chumFlyRef.current.has(i)) { note = `#${i} is being collected`; return; }
       if (last === undefined) { cards.push(i); ch.lastJoin = performance.now(); note = `started on #${i}`; return; }
       const a = geo(last), b = geo(i);
       if (!a || !b) return;
       const side = Math.max(a.h, b.h) * 2;
       const gap = chainSquareGap(a, b);
+      // A card that does not touch the one before it: the chain dies. It used
+      // to refuse and carry on, which read as the gesture being ignored.
       if (gap > side * CHAIN_TOUCH_SLACK) {
-        note = `#${i} not touching #${last}, gap ${Math.round((gap / side) * 100)}% of a side`;
+        killChain(ch, `STRAY CARD, #${i} not touching #${last}, gap ${Math.round((gap / side) * 100)}%`);
         return;
       }
       // Every earlier segment except the last one, which ends where this starts.
       for (let s = 0; s < cards.length - 2; s++) {
         const p = geo(cards[s]), q = geo(cards[s + 1]);
-        if (p && q && chainSegmentsCross(p, q, a, b)) { note = `#${i} would cross the path`; return; }
+        if (p && q && chainSegmentsCross(p, q, a, b)) { killChain(ch, `CROSSING, #${i} would cross the path`); return; }
       }
       cards.push(i);
       ch.lastJoin = performance.now(); // the join clock restarts on every card
@@ -8036,7 +8046,12 @@ export default function BreedTree({
     const sweep = (ch: Chain, cx: number, cy: number) => {
       const dx = cx - ch.px, dy = cy - ch.py;
       const n = Math.max(1, Math.ceil(Math.hypot(dx, dy) / CHAIN_SAMPLE_PX));
-      for (let s = 1; s <= n; s++) joinAt(ch, ch.px + (dx * s) / n, ch.py + (dy * s) / n);
+      for (let s = 1; s <= n; s++) {
+        joinAt(ch, ch.px + (dx * s) / n, ch.py + (dy * s) / n);
+        // A sample can now kill the chain outright, and the rest of the finger's
+        // path belongs to no chain at all.
+        if (!chain) { ch.px = cx; ch.py = cy; return; }
+      }
       ch.px = cx; ch.py = cy;
     };
     const draw = () => {
