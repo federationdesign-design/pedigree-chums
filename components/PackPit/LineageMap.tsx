@@ -345,6 +345,17 @@ const PIT_NODE_SCALE = 0.659;
    1.045 IS THE COVER, and this constant is the margin on top of it, so the two
    reasons stay separate: if a card ever peeks again, nudge this, not the 1.045. */
 const CARD_COVER_MARGIN = 1.04;
+/* THE CARD'S FOOTPRINT AS A MULTIPLE OF ITS NODE'S RADIUS, the ring's outward
+   half plus the margin. Named because TWO things need it now: the card's own
+   scale, and the name pill, which has to sit clear of the card rather than clear
+   of the node. See PILL_CARD_GAP. */
+const CARD_COVER = 1.045 * CARD_COVER_MARGIN;
+/* How far above the card's rim the pill's own rim sits. Because the pill is
+   placed against the CARD's footprint and its own half-height, this gap is the
+   clearance at every node size AND at one line or two, where the old fixed
+   -r - 13 gave a one-line pill a margin that shrank as nodes grew and left a
+   two-line pill behind the card at every size. */
+const PILL_CARD_GAP = 6;
 /* The scale the node name pill is DRAWN at. Named because two places need it: the
    <g> that draws it on the tree, and scatterPills, which has to send the pit the
    drawn width rather than the raw one. */
@@ -2003,7 +2014,7 @@ export default function LineageMap({
          of the ring that sits outside it, plus CARD_COVER_MARGIN. Expressed as a
          scale because the whole card group is drawn at CW and scaled as one; see
          the draw site. A framed card is still exactly CW. */
-      const cardScale = live ? ((2 * nodeR(share) * 1.045 * CARD_COVER_MARGIN) / CW) : 1;
+      const cardScale = live ? ((2 * nodeR(share) * CARD_COVER) / CW) : 1;
       const ff = cardFrame.get(id);
       const cardX = ff ? ff.sx - pan.x : (pos ? pos.x : baseX);
       const cardY = ff ? ff.sy - pan.y : (pos ? pos.y : baseY);
@@ -3895,7 +3906,13 @@ export default function LineageMap({
                          of WALL_PAD's pill case and was itself comparing layout
                          units against screen pixels until this week. */
                       const pcx = 0;
-                      const pcy = -r - 13;
+                      /* CLEAR OF THE CARD, NOT OF THE NODE. It was -r - 13, written
+                         when the card sat BESIDE the node; the card is centred on
+                         it now and reaches r * CARD_COVER, so 13 was no longer
+                         clearance and never scaled. Measured against the card's
+                         footprint plus the pill's own half-height, so the gap is
+                         PILL_CARD_GAP at every node size and at one line or two. */
+                      const pcy = -(r * CARD_COVER + PILL_CARD_GAP + (nmH / 2) * PIT_PILL_SCALE);
                       return (
                         /* 10% SMALLER, 2 September 2026 (owner).
 
@@ -4284,6 +4301,18 @@ export default function LineageMap({
                     setDragXY(null);
                   }}
                   onPointerCancel={() => { if (DROP_DBG) dropLog(`CANCEL#${DROP_DBG_N} ${c.name}`); /* DIAGNOSTIC item 8, REMOVE ONCE FIXED */ cardDrag.current = null; setDragCat(null); setDragImg(null); setDragCardId(null); setDragXY(null); }}
+                  /* THE CARD ALSO NAMES ITS NODE. The node's own hover handlers
+                     cannot fire once a card is on it: cards are rendered after the
+                     nodes, so they paint on top, and this group carries drag
+                     handlers, which makes it hit-testable without needing any
+                     pointer-events rule. Before the card was centred it sat beside
+                     the node and the node was clear; centring it took the hover.
+                     c.id IS the node's _id, the same key namedNode is compared
+                     against, because cardIds is built from picked and pinned.
+                     enter and leave do not interfere with pointerdown, so the card
+                     stays fully draggable. */
+                  onPointerEnter={circular ? () => setNamedNode(c.id) : undefined}
+                  onPointerLeave={circular ? () => setNamedNode((cur) => (cur === c.id ? null : cur)) : undefined}
                 >
                   {/* THE WHOLE CARD SCALES AS ONE. Every child still measures
                       itself against CW, so the image, the rim, the clip, the grab
