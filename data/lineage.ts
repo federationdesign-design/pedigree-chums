@@ -1307,6 +1307,53 @@ const LINEAGE: Record<string, LineageNode> = {
      collapses any such node into that child: without the echo the Gordon would
      draw straight onto Land Spaniels and the setting dogs would vanish from the
      diagram. Value 0 so leafSum is unchanged and no share moves. */
+  /* THE GENERIC SETTER GOES BACK TOO (owner, 18 September 2026, overruling my
+     objection, and rightly).
+
+     WHAT I ARGUED AND WHY IT WAS WRONG. I held this node back on the grounds that
+     "Setter" is a vague label rather than a named stock, so giving it an ancestry
+     would assert a specific derivation for a node that deliberately has none. That
+     conflated two different unknowns. We do not know WHICH setter this is. We do
+     know what setters descend from, and the archive says so in three other places.
+     The first uncertainty does not spread to the second.
+
+     IT IS TRUE OF EVERY DOG THE LABEL CAN MEAN. English Setter, Irish Setter,
+     Gordon Setter and Old black-and-tan Setters all reach Land Spaniels. So
+     "whichever setter this is, it came from the land spaniels" is universally true
+     of the candidates, not a guess about which one is meant. There is no case in
+     this dataset where it is wrong.
+
+     AND ITS OWN NOTES ALREADY SAY IT. Both parents use it as a TYPE noun:
+     Pointer's reads "Setting-dog blood for style and steadiness" and
+     Flat-Coated Retriever's reads "Setter blood for feathering and a good nose".
+     Attaching Land Spaniels says what those notes already say, one generation back.
+
+     LEAVING IT BARE WAS NOT THE NEUTRAL CHOICE. It stopped dead in 15 trees, which
+     asserts that nothing is known about where setting dogs came from. That is the
+     false statement, and it was the one shipping.
+
+     THE NOTE STAYS IN TYPE LANGUAGE, deliberately: the stock every setter was built
+     up from, not a claim about one breed's line. The node is unspecific about WHICH
+     setter and must remain so.
+
+     BRITISH SETTERS IS HELD, not swept along. Its note is a temperament claim about
+     Victorian gundogs ("Added biddability and a love of working close with people on
+     the shoot"), not a reference to old setting stock, and it reaches 2 trees. Its
+     own look later.
+
+     THE ECHO IS LOAD-BEARING, as on Black and Tan Terrier and Old black-and-tan
+     Setters: after expandNode grafts, this node is valueless with a single child,
+     and LineageMap collapses any such node into that child. Value 0 so leafSum is
+     unchanged and no share moves. */
+  "Setter": {
+    name: "Setter",
+    note: "The setting dogs of the shooting field, bred to find birds and hold steady. Now in-decline.",
+    children: [
+      { name: "Land Spaniels", note: "The crouching land spaniels that marked game for the net, the stock every setter was built up from. Now extinct.", img: "/history/breeds/original-land-spaniel.jpg", value: 100 },
+      { name: "Setter", note: "The same dog carrying on: see the echo note in data/lineageShape.ts.", value: 0 }
+    ]
+  },
+
   "Old black-and-tan Setters": {
     name: "Old black-and-tan Setters",
     note: "The black-and-tan setting dogs worked in Britain before the Duke of Gordon's kennels took the type up. Now extinct.",
