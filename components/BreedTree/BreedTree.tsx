@@ -8564,6 +8564,43 @@ export default function BreedTree({
           const wSpd = worst ? Math.hypot(worst.velocity.x, worst.velocity.y) : 0;
           const dKE = spinLastAt ? ke - spinLastKE : 0;
           const per = (n: number) => (elapsed ? (n / elapsed).toFixed(1) : "-");
+          /* EVERY CIRCLE CARRYING AN INLINE FILL, with the three things the
+             paintable gate tests, so the element painting itself pale blue on the
+             Ancient Mastiff drop can be NAMED rather than guessed at.
+
+             WHY THESE FOUR COLUMNS. paintable is `!isWordNode && fill !== "none"
+             && opacity !== "0"`, and isWordNode is `fellRef && depth === 1`. So
+             depth says whether the word rule should have hidden it, ECHO says
+             whether the render should have given it fill="none", disp is what the
+             writer actually wrote, and `fill` is the attribute the gate reads. One
+             of those four will disagree with what the code says it should be, and
+             that is the fault.
+
+             `key` is the dataset value the fill writer keys on, which says WHICH
+             state painted it: held, twin, single or 0.
+
+             Reading el.style.fill is an inline-style property access, not a layout
+             read, so this costs nothing even at eight rows twice a second. Capped
+             at 8 so the line stays readable on a phone. Behind the flag. */
+          let inked = "INK none";
+          {
+            const cg2 = circlesRef.current;
+            const nds = nodesRef.current;
+            if (cg2) {
+              const rows: string[] = [];
+              for (let i2 = 0; i2 < cg2.children.length && rows.length < 8; i2++) {
+                const el2 = (cg2.children[i2] as SVGGElement)?.children[0] as SVGCircleElement | undefined;
+                if (!el2 || !el2.style.fill) continue;
+                const nd = nds[i2];
+                rows.push(
+                  `#${i2} ${(nd?.data.name ?? "?").slice(0, 10)} d${nd?.depth ?? "?"}${nd && isEcho(nd) ? " ECHO" : ""}` +
+                  ` disp ${el2.getAttribute("display") ?? "-"} fill ${el2.getAttribute("fill") ?? "-"}` +
+                  ` -> ${el2.style.fill} key ${el2.dataset.chained ?? "-"}`,
+                );
+              }
+              if (rows.length) inked = `INK ${rows.length}: ${rows.join("   |   ")}`;
+            }
+          }
           spinDiagRef.current = [
             `pts/s ${per(spinScored)}  drag ${dragRef.current ? "YES" : "none"}  bodies ${bods.length}  awake ${awake}  asleep ${bods.length - awake}${noBondsOn ? "   ?nobonds=1 NO CONSTRAINTS IN WORLD" : ""}`,
             /* made/s and cut/s turn the re-bonding into a number. A steady bond
@@ -8582,6 +8619,7 @@ export default function BreedTree({
                this rules the chain out. `held` is the node set that goes with it,
                so the two can be seen to agree. */
             `chain breed ${dogChainBreedRef.current ?? "none"}  held ${dogChainNodesRef.current.size}`,
+            inked,
             // The last detonation, standing until the next. Empty before the first.
             spinLastBlast || "BLAST none yet",
           ];
