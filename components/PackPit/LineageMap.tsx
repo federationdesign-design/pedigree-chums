@@ -174,6 +174,20 @@ const SPREADN = Math.PI * 0.9;
 const MAX_LEAN = 0.34;
 // size of the breed image card that pops out beside a clicked circle
 const CARD = 74; // card + frame + image size (reduced 10% further)
+/* A QUARTER OFF, ON THE LIFTED LAYER ONLY (owner, 18 September 2026). The cards
+   and the frames they sit in read too large when a dog is lifted out of the pit.
+
+   SCOPED BY `circular`, which is the lifted layer's own flag, so the chum tree
+   (`strongBg`) and the main pit both keep the figures they have today.
+
+   DESKTOP ONLY, and that is the owner's call rather than an oversight. On a
+   phone the card is not this number: the grid picks a column count and then
+   GROWS the card to fill the row, so CARD only sets a floor there and shrinking
+   it changes nothing unless the column count moves, which is deliberately left
+   alone. On desktop the card IS this number, so the quarter lands.
+
+   One number to nudge. */
+const LIFT_CARD_SCALE = 0.75;
 const PACK_BREEDS = new Set(breeds.map((b) => b.name)); // the 54 dogs in the card pack the site is about
 const PACK_IMG = new Map(breeds.map((b) => [b.name, b.image])); // pack breed -> its square cartoon card art
 // every white flash number is this small, fixed size, matching the pit; it never
@@ -757,7 +771,17 @@ export default function LineageMap({
           return Math.max(base, Math.min(byWidth, byHeight));
         })()
       : Math.round(CARD * 0.85)
-    : CARD;
+    // Desktop: the card IS this figure, so the lifted layer's quarter is taken
+    // here and nowhere else. See LIFT_CARD_SCALE. The phone branches above are
+    // untouched, along with the column count they choose.
+    : Math.round(CARD * (circular ? LIFT_CARD_SCALE : 1));
+  /* THE CARD'S TYPE DOES NOT COME DOWN WITH THE CARD (owner, 18 September 2026).
+     The lifted layer's card is a quarter smaller, and anything sized from CW
+     would have shrunk with it. Type and labels are read, not drawn to scale, so
+     they hold the size they had: this is the card width BEFORE the lift's
+     quarter, and it is what the wording is measured against. Everywhere the card
+     itself is drawn still uses CW. */
+  const CW_TYPE = Math.round(CW / (circular ? LIFT_CARD_SCALE : 1));
   /* The column count and gutter again, from the same three rules, for the grid to
      lay out with. Recomputed rather than carried out of the block above so CW
      stays a single expression; the inputs are identical, so they cannot disagree. */
@@ -3874,7 +3898,7 @@ className={[
                        itself. vectorEffect is non-scaling-stroke on this rect, so
                        the number is screen pixels and the two are comparable. */
                     style={circular ? { ...(ringColor ? { stroke: ringColor } : null), ...(c.ringW != null ? { strokeWidth: c.ringW } : null) } : undefined} />}
-                  {INSTR_NAMES.has(breed.name) && placedSet.has(c.id) && (() => { const words = c.name.split(" "); let l1="",l2=""; const mc=Math.floor(CW/7.5); for(const w of words){if((l1+(l1?" ":"")+w).length<=mc)l1+=(l1?" ":"")+w;else l2+=(l2?" ":"")+w;} const ls={fill:"#ffffff",fontFamily:'"Luckiest Guy",system-ui,sans-serif',fontSize:12,fontWeight:400,pointerEvents:"none" as const}; const by1=c.cardY+CW/2+48; const by2=c.cardY+CW/2+40; return l2?(<text x={c.cardX} textAnchor="middle" style={ls}><tspan x={c.cardX} y={by2}>{l1}</tspan><tspan x={c.cardX} dy={20}>{l2}</tspan></text>):(<text x={c.cardX} y={by1} textAnchor="middle" dominantBaseline="central" style={ls}>{l1}</text>); })()}
+                  {INSTR_NAMES.has(breed.name) && placedSet.has(c.id) && (() => { const words = c.name.split(" "); let l1="",l2=""; const mc=Math.floor(CW_TYPE/7.5); for(const w of words){if((l1+(l1?" ":"")+w).length<=mc)l1+=(l1?" ":"")+w;else l2+=(l2?" ":"")+w;} const ls={fill:"#ffffff",fontFamily:'"Luckiest Guy",system-ui,sans-serif',fontSize:12,fontWeight:400,pointerEvents:"none" as const}; const by1=c.cardY+CW/2+48; const by2=c.cardY+CW/2+40; return l2?(<text x={c.cardX} textAnchor="middle" style={ls}><tspan x={c.cardX} y={by2}>{l1}</tspan><tspan x={c.cardX} dy={20}>{l2}</tspan></text>):(<text x={c.cardX} y={by1} textAnchor="middle" dominantBaseline="central" style={ls}>{l1}</text>); })()}
                   {/* The status dot is reference information, so it belongs to
                       the learning side. The mini pit is a game: no dot there. */}
                   {!circular && isTopOfStack(c) && zoomedId !== c.id && !PACK_BREEDS.has(c.name) && !INSTR_NAMES.has(breed.name) && (() => {
@@ -4027,7 +4051,7 @@ className={[
             x={wrongDog.x}
             y={wrongDog.y}
             textAnchor="middle"
-            style={{ fontFamily: "var(--font-display, 'Luckiest Guy', system-ui)", fontSize: `${Math.round(CW * 0.22)}px`, fill: "#ff2d4f", pointerEvents: "none" }}
+            style={{ fontFamily: "var(--font-display, 'Luckiest Guy', system-ui)", fontSize: `${Math.round(CW_TYPE * 0.22)}px`, fill: "#ff2d4f", pointerEvents: "none" }}
             className={styles.wrongDogFlash}
           >
             Wrong dog
