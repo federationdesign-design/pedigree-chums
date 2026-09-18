@@ -862,18 +862,23 @@ const DOG_CHAIN_MIN = 2;
    strain check, the release judgement and the circuit close), so Infinity here
    means "no gap is ever too wide" and nothing else has to know about it.
 
-   WHAT STILL BOUNDS A CHAIN, since the gap no longer does. In the order they
-   bite:
-     1. A WRONG-BREED CIRCLE UNDER THE FINGER KILLS THE CHAIN, and the sweep
-        samples the finger's path every CHAIN_SAMPLE_PX, so a long reach has to
-        be steered through open floor. This is the real limit, not the clock.
-     2. A circle already in the chain, re-entered, kills it.
-     3. The path may not cross itself, which bites far harder once links are
-        long.
-     4. The pool: same breed, in the pit, not already removed.
-     5. The join clock, chainAllowanceMs, which is last and not first.
-   Owner's ruling, 18 September 2026: the kill at 1 stays, for both kinds, until
-   it has been played. */
+   WHAT BOUNDS A CHAIN, since the gap no longer does. REVISED 18 September 2026,
+   after the owner played it: the wrong-breed circle used to head this list and
+   killed the chain, which meant a chain still could not cross a packed pit. It
+   refuses now (see blockKills on the DOG kind) and has left the list entirely.
+   In the order they bite:
+     1. THE PATH MAY NOT CROSS ITSELF, measured centre to centre between the
+        circles, not along the finger's path. With links this long it is the
+        hard one, and it kills.
+     2. THE POOL: the same breed, in the pit, not already removed. A chain can
+        never hold more circles than the breed has duplicates.
+     3. A circle already in the chain, re-entered, kills it.
+     4. The finger must actually pass over each circle: the sweep samples every
+        CHAIN_SAMPLE_PX and joins what is under the sample, so the route is
+        still drawn, not chosen.
+     5. The join clock, chainAllowanceMs. It binds on the FIRST link, which has
+        the base allowance and the whole pit to cross; after that it grows by
+        CHAIN_JOIN_BONUS_MS a link and stops binding. */
 const DOG_CHAIN_SLACK = Infinity;
 /* HOW FAR THE FINGER MUST TRAVEL BEFORE A PRESS BECOMES A CHAIN, in client px,
    measured from the press point (owner, 18 September 2026).
@@ -8314,6 +8319,13 @@ export default function BreedTree({
       taken: (i: number) => boolean;                      // gone since it joined
       startable: (i: number) => boolean;                  // may open a chain
       joinBlock: (ch: Chain, i: number) => string | null; // the kind's own rule
+      /* WHAT THE KIND'S OWN RULE MEANS WHEN IT SAYS NO. True and the chain dies
+         where it stands, which is the cards. False and the thing under the
+         finger is simply not joined: the chain carries on, unharmed, and the
+         finger can keep going. Only joinBlock is softened by this. The shared
+         rules are not: re-entering a circle already in the chain and crossing
+         the path both still kill, for every kind. */
+      blockKills: boolean;
       settle: (ch: Chain) => string;                      // a valid release
       first?: (i: number) => void;                        // the chain's first thing
       joined?: (i: number) => void;                       // one more thing joined
@@ -8338,6 +8350,7 @@ export default function BreedTree({
       taken: (i) => chumTakenRef.current.has(i),
       startable: () => true,
       joinBlock: () => null, // touching and no crossing is the whole rule
+      blockKills: true, // the cards are unchanged: a wrong card kills the chain
       settle: (ch) => {
         const cards = [...ch.cards];
         chainClearRef.current?.(cards);
@@ -8435,6 +8448,31 @@ export default function BreedTree({
         if (n.data.name !== first.data.name) return `WRONG BREED, #${i} is ${n.data.name}, not ${first.data.name}`;
         return null;
       },
+      /* A WRONG BREED REFUSES, IT DOES NOT KILL (owner, 18 September 2026,
+         confirmed on the device).
+
+         WHAT WAS WRONG. Dropping the touching rule was supposed to let a chain
+         reach across the pit and did not, because the wrong-breed circle killed
+         it. The pit is packed and the sweep samples the finger's path every
+         CHAIN_SAMPLE_PX, so any reach worth the name crossed a circle of some
+         other breed within a few pixels of leaving the first one and the chain
+         died at once. Free links and a kill on everything between them cannot
+         both be true.
+
+         SO THE FINGER PASSES FREELY over other breeds on its way to the next
+         twin. They are simply not joined. Nothing about them is remembered and
+         the chain is not marked in any way.
+
+         A CIRCLE THAT WENT MISSING refuses too, and that is deliberate rather
+         than incidental: it is how the rest of the gesture already treats a
+         circle that has left, busy() and a null geo() both refuse, and judge()
+         catches a vanished card at release, where the chain is settled anyway.
+
+         WHAT STILL KILLS a dog chain, unchanged: re-entering a circle already in
+         it, and a link that crosses the path. Both are shared rules, neither is
+         this kind's own, and neither is touched here. The chum cards are not
+         touched at all. */
+      blockKills: false,
       /* THE FIRST CIRCLE OPENS, and only that one. The others stay where they
          are until it is completed, which is what closes them: see dogChainRef
          and the block in the layer's onRemove. The chain is remembered by NODE,
@@ -8528,9 +8566,11 @@ export default function BreedTree({
         K.first?.(i); // the kind may want to know what it started on
         return;
       }
-      // The kind's own rule, if it has one, before the shared geometry.
+      /* The kind's own rule, if it has one, before the shared geometry. What a
+         no means is the kind's too: the cards die on it, the circles simply do
+         not join and the finger carries on over. See blockKills. */
       const own = K.joinBlock(ch, i);
-      if (own) { killChain(ch); return; } // the kind's own rule said no
+      if (own) { if (K.blockKills) killChain(ch); return; }
       const a = K.geo(last), b = K.geo(i);
       if (!a || !b) return;
       const share = K.gapShare(a, b);
