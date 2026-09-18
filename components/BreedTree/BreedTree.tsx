@@ -9252,6 +9252,27 @@ export default function BreedTree({
        was TOUCHING, because a join asked the same. A join no longer asks it, so
        neither does this: the two are still the same question, which is the
        property that matters. See DOG_CHAIN_SLACK. */
+    /* THIS ANSWER IS LIVE, AND THAT IS THE POINT (owner, 18 September 2026).
+
+       It reads the owned set less removedNodes, so a breed with two circles is a
+       twin pair until one is collected, at which moment the survivor BECOMES
+       UNIQUE. A pit converges on uniqueness as it is played, so this changes
+       constantly through a round.
+
+       ANYTHING SHOWING "IS THIS UNIQUE" AT REST THEREFORE FLIPS MID-ROUND, and a
+       circle will change appearance as a consequence of a DIFFERENT circle being
+       collected. That was considered as a fault and ruled the other way: THE
+       COLOUR MUST ALWAYS BE TRUE. A signal that was frozen at the drop would go
+       on claiming a circle has a twin after the twin has gone, which is worse
+       than a change the player did not directly cause.
+
+       SO DO NOT FREEZE IT, and do not treat the flip as a bug to be smoothed
+       away. It is given a short fade rather than an instant cut, because the
+       change is information and an instant flip on an untouched circle reads as a
+       glitch, but the timing of the answer is not softened, only its paint.
+
+       Asking it per PRESS, which is what the chain does, has none of this to
+       think about: the answer only has to be true at the moment it is asked. */
     const dogHasTwin = (n: Node): boolean => {
       const owned = pitBodiesRef.current?.owned;
       if (!owned) return false;
@@ -10386,6 +10407,44 @@ export default function BreedTree({
                   //     HIT-TESTS for hover) - and at rest a tile-hover shows the yellow
                   // (a) exposed BAND through it, drawn by the punch-out path BEHIND the
                   //     circles (above). The yellow OUTLINE (stroke) shows on hover too.
+                  /* THE PICTURE AND THE COLOUR ARE THE SAME SLOT, AND THEY ARE
+                     MUTUALLY EXCLUSIVE. Read the ternary: a circle takes EITHER
+                     the image pattern OR fillFor's colour. The photograph is not
+                     drawn on top of a coloured disc, it IS the disc.
+
+                     WHY THAT MATTERS FAR BEYOND THIS LINE (recorded 18 September
+                     2026, after the owner considered restoring pictures to the
+                     live pit and then declined). The chain says THREE things with
+                     fill, and all three work only because a pit circle is a flat
+                     coloured disc with nothing in it:
+                       held circle        DOG_CHAIN_FILL, sky blue
+                       available twin     its RARITY_BAND tier colour
+                       everything else    fillFor's navy
+                     Those are set as inline styles, which beat this attribute, so
+                     with pictures on they would still win and a held circle would
+                     simply LOSE ITS DOG. Restoring photographs therefore does not
+                     cost a fill, it RETIRES THE FILL AS A SIGNALLING CHANNEL and
+                     takes the chain's three states with it. They would have to
+                     move to the ring and the glow, which sit outside the disc.
+
+                     IT ALSO RETIRES THE MEASUREMENTS. Every ratio the chain
+                     colours were chosen against is a ratio against a flat navy
+                     disc: navy on sky 6.03, white label on navy 11.96, the four
+                     depth rings on navy 10.23, 9.00, 4.01 and 5.39, the pink path
+                     on navy 3.45. A PHOTOGRAPH HAS NO SINGLE LUMINANCE, so none of
+                     those can be restated; rings and marks over pictures need an
+                     outline or a scrim, which is a design decision rather than a
+                     value.
+
+                     AND THE MARK LOSES ITS JOB. It exists because there is no
+                     photograph, see the note on QMARK_SRC. With one, it would be
+                     sitting on a dog's face saying nothing.
+
+                     THE 2 SEPTEMBER RULING STANDS, reaffirmed by the owner on 18
+                     September: the photograph is what you get for lifting a circle
+                     out onto the learn layer. Anyone proposing it again should
+                     know it is a redesign of the chain's colour system, not a flag
+                     in nodeImg. */
                   fill={hidden ? "none" : displayOnly ? (imgZoomOn && imgZoomSet?.has(d) && hasImg ? `url(#bt-img-${i})` : "transparent") : nodeImg(d) ? `url(#bt-img-${i})` : fillFor(d)}
                   // displayOnly (chums2 diagram): every circle outline is WHITE at
                   // every depth, in place of the yellow/navy/blue depth strokes. Only
