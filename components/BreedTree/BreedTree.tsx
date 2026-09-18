@@ -935,37 +935,35 @@ const DOG_CHAIN_SLACK = Infinity;
    this for circles and 0 for chum cards, whose press claims the gate outright as
    it always has. */
 const DOG_CHAIN_ARM_PX = 14;
-/* THE DOG PATH IS TWO-TONE: A LEMON CORE ON A NAVY CASING (owner, 18 September
-   2026). This is the answer to a problem that had already moved the hue twice, and
-   the reason it is the LAST time the hue should ever need to move.
+/* THE DOG PATH IS ONE LEMON LINE (owner, 18 September 2026, replacing the navy
+   casing that was here, with the cost stated and chosen).
 
-   WHAT A FLAT LINE WAS UP AGAINST. The path crosses five rarity tier fills, the
-   pit's navy ground, the held circle's sky blue and the percentage chips, which
-   run from luminance 0.038 to 0.65. The best possible worst-case for ANY single
-   colour across that range is about 2.8:1, and nothing reaches it: white bottoms
-   out at 1.44, black at 1.76, lemon at 1.19, the pink this replaces at 1.22.
-   The hue was moved to yellow, then to pink, chasing a fight that cannot be won.
+   WHAT A FLAT LINE IS UP AGAINST, and it has not changed: the path crosses five
+   rarity tier fills, the pit's navy ground, the held circle's sky blue and the
+   percentage chips, luminance 0.038 to 0.65. An exhaustive scan of the RGB cube
+   against those eight puts the best possible worst case at 1.76, and that is pure
+   BLACK, which is 1.76 on the pit floor itself, where most of a path lives.
+   White bottoms out at 1.21, lemon at 1.00, the pink it once was at 1.22.
 
-   ONCE THE PATH IS OUTLINED THE CORE STOPS HAVING TO WIN ANY CONTRAST FIGHT.
-   The casing does the separating, and it is navy because navy is the one thing
-   every object in this pit was already designed to sit on. So:
-     core #ffed00 on the casing          9.89
-     casing on a chip, CHIP_FILL #ffed00 9.89
-     casing on a light circle #5cc4ee    6.03
-     casing on the pit navy              1.00, invisible, and correct: there the
-                                         core does the work at 9.89
-   The core is EXACTLY CHIP_FILL, so over a percentage chip it vanishes entirely
-   and what you read is the navy line. That is not a fault, it is the design
-   working: the path always shows one of its two tones, never neither.
+   SO THIS FIGHT CANNOT BE WON AND IS NO LONGER BEING FOUGHT. The casing won it by
+   carrying a second tone; the owner has chosen the single line instead, knowing
+   what it costs:
+     lemon on the pit floor              9.89
+     lemon on a held circle's sky blue   1.64
+     lemon on a very-common twin         1.19
+     lemon on a percentage chip          1.00, the same hex as CHIP_FILL, so the
+                                         path VANISHES COMPLETELY over a chip
+   That last line is the accepted cost, not a fault to fix.
 
-   SO DO NOT FLIP THE HUE AGAIN. If the lemon reads badly the core can be any
-   colour at all without breaking anything, because nothing depends on it winning
-   a ratio. The only figure that matters is the casing's, and it is navy.
+   DO NOT FLIP THE HUE LOOKING FOR A WAY OUT. It has already been yellow, pink and
+   yellow again chasing this, and the scan above says there is nowhere better to
+   go. White is the only colour that beats lemon on every one of the eight, and
+   white is the CHUM chain's line: taking it would cost the glance that tells the
+   two kinds of chain apart. If the vanishing ever has to stop, the answer is the
+   casing again, not another hue.
 
-   THE CHUM CARDS KEEP A PLAIN WHITE LINE, casing undefined, so the two kinds of
-   chain are still told apart at a glance. */
+   THE CHUM CARDS ARE UNCHANGED, a plain white line, as they always were. */
 const DOG_CHAIN_COLOUR = "#ffed00";
-const DOG_CHAIN_CASING = "#0a3a57";
 /* A CIRCLE WITH NO TWIN IN THE PIT FILLS LIGHT, FROM THE DROP (owner,
    18 September 2026). It is the same #5cc4ee a held circle takes, deliberately:
    the pit has one light fill and one dark one, and what they mean is read off the
@@ -985,8 +983,9 @@ const DOG_CHAIN_CASING = "#0a3a57";
    navy instead and all of them measure 6.03.
 
    THE CHAIN PATH IS THE ONE THING THAT DOES NOT SWITCH, because one stroke
-   crosses both fills and the ground at once. It carries its own contrast instead:
-   see DOG_CHAIN_CASING.
+   crosses both fills and the ground at once. It no longer carries its own
+   contrast either: see DOG_CHAIN_COLOUR for what that costs and why it was
+   chosen.
 
    THE TWIN GLOW NEEDS NOTHING. It only shows on the live chain's breed and a
    chain needs duplicates, so a glowing circle is a twin and is dark filled, where
@@ -1008,14 +1007,6 @@ const DOG_FILL_FADE_MS = 150;
    because it is set on an SVG element from script, where a var() would not
    resolve. One name to change if another blue is wanted. */
 const DOG_CHAIN_FILL = "#5cc4ee";
-/* AND WHAT IS DRAWN ON THAT FILL (owner, 18 September 2026). The outline and the
-   tapped face were white, which is what the path uses, and against the light
-   blue fill they had almost nothing to read against. They are now the navy the
-   circle used to fill with, so the held circle reads as an inversion of its
-   resting state: navy on light blue instead of light blue on navy.
-   A twin that is NOT held keeps its white mark, which is the "you could join
-   this" signal, and the glow on twins is untouched. */
-const DOG_CHAIN_INK = "#0a3a57";
 /* AN AVAILABLE TWIN WEARS ITS BREED'S RARITY COLOUR (owner, 18 September 2026).
    A circle of the chain's breed that is NOT yet held fills with the very colour
    its rarity tag uses, so where you can connect is obvious AND says something
@@ -1063,28 +1054,27 @@ const DOG_CHAIN_INK = "#0a3a57";
    The fifth of the chain's colours and weights, all five in a row here, one line
    each to nudge. */
 const DOG_CHAIN_TWIN_STROKE_K = 2;
-/* A HELD CIRCLE'S RIM IS TWO STROKES, the same two the path is (owner,
-   18 September 2026). The circles and the line already share a glow: the same
-   bt-chain-glow filter and the same DOG_CHAIN_COLOUR, so nothing there had to
-   change. What a circle had no equivalent of was the path's CORE. Its single rim
-   was already playing the casing's part, navy, and there was no lemon on top,
-   which is why the line read as lit and the circle did not.
+/* ONE LEMON LINE, THE CASING DELETED (owner, 18 September 2026, with the cost
+   stated and chosen). The path and a held circle's rim are a single stroke of
+   DOG_CHAIN_COLOUR, like the chum chain's single white line, and the navy under
+   both is gone from the code rather than switched off.
 
-   SO THE RIM WIDENS AND A SECOND CIRCLE IS DRAWN INSIDE IT, navy outer, lemon
-   inner, on the same radius, exactly as paint lays casing under core.
+   WHAT IT COSTS, measured and accepted: the lemon is the same hex as CHIP_FILL,
+   so over a percentage chip the path measures 1.00 and DISAPPEARS COMPLETELY. It
+   is 1.19 over a very-common twin and 1.64 over a held circle's sky blue. On the
+   pit floor, where most of a path lives, it is 9.89.
 
-   THE WEIGHTS ARE SET BY THE SMALLEST CIRCLE, not by the look on a big one. A
-   depth-1 ring is 9% of its own radius, so the navy showing either side of the
-   lemon is (casing - core) / 2 of that. At 1.8 and 0.97, the path's own ratio,
-   that is 0.93px on a circle at the minCircleR floor of 25px radius: under a
-   pixel, which anti-aliases away and lets the lemon bleed into the sky blue fill
-   it sits on, where it measures 1.21:1 and would be invisible. At 2.3 it is
-   1.50px at the floor, 2.39 at 40 and 3.59 at 60.
+   AND NO SINGLE COLOUR FIXES IT. An exhaustive scan of the RGB cube against the
+   eight fills a path crosses puts the best possible worst case at 1.76, which is
+   pure black, and black is 1.76 on the pit floor itself. There is nothing to
+   swap to, so do not go looking: the choice is one line that sometimes vanishes
+   or two tones that never do, and one line is what was asked for.
 
-   SO THE LEMON READS AGAINST THE NAVY, 9.89:1, AT EVERY SIZE, which is the whole
-   point: it never has to be read against the sky blue. */
-const HELD_RIM_CASING_K = 2.3;
-const HELD_RIM_CORE_K = 0.97;
+   DELETED, NOT HIDDEN, and that is deliberate. The ghost path came from a group
+   that was half-removed; the casing group, its ChainKind field, its paint
+   parameter, the collapse's copy of it and the held rim's outer stroke all went
+   together. */
+const HELD_RIM_K = 1;
 /* HOW WIDE THE CHAIN'S CHIPS SCATTER, in client px, from the single point they
    all drop at (owner, 18 September 2026). A chain's chips used to appear where
    each closed circle stood, which read as several separate piles across the pit
@@ -5126,7 +5116,7 @@ export default function BreedTree({
         /* The mark has read all three states since the chain shipped; the ring
            only read the first, so a highlighted twin kept its own outline. Both
            states are now filled and inked: a held circle from DOG_CHAIN_FILL and
-           DOG_CHAIN_INK, an available twin from its own RARITY_BAND entry.
+           DOG_CHAIN_COLOUR, an available twin from its own RARITY_BAND entry.
            One key, still written only when the answer CHANGES and still tracked
            on the element, so a still pit costs nothing. */
         /* THE TIER RIDES IN THE KEY, so a twin whose rarity somehow differed from
@@ -5142,7 +5132,9 @@ export default function BreedTree({
           // The fade belongs to the fill and the ring, not to anything else, and
           // it is set here so it exists for the first write as well as the rest.
           c.style.transition = `fill ${DOG_FILL_FADE_MS}ms ease, stroke ${DOG_FILL_FADE_MS}ms ease`;
-          c.style.stroke = chHeld ? DOG_CHAIN_INK : band ? band.fg : chSingle ? DOG_SINGLE_INK : "";
+          // A held circle's rim IS the chain's line, one stroke of the same lemon.
+          // It was navy (DOG_CHAIN_INK) under a second lemon ring; both are gone.
+          c.style.stroke = chHeld ? DOG_CHAIN_COLOUR : band ? band.fg : chSingle ? DOG_SINGLE_INK : "";
           /* AND BOTH STATES ARE FILLED NOW. A held circle goes sky blue, and an
              available twin goes YELLOW, so the two things the chain has to say,
              "this one is in" and "this one is where you can go next", are both
@@ -5179,20 +5171,11 @@ export default function BreedTree({
            tracks the zoom, the difficulty slider and the hierarchy clamp on its
            own, and it returns to the normal weight on the first frame after the
            chain ends because chTwin is false by then. */
-        c.setAttribute("stroke-width", String(strokeWidthFor(d) * strokeK(v) * (chTwin ? DOG_CHAIN_TWIN_STROKE_K : chHeld ? HELD_RIM_CASING_K : 1)));
-        /* THE LEMON CORE ON TOP OF THAT CASING. A fourth child, appended after
-           the mark so the three the writer indexes keep their places, and drawn
-           only while the circle is held. It is a ring at the same radius, so it
-           never touches the mark in the middle. */
-        const rim = wrap?.children[3] as SVGCircleElement | undefined;
-        if (rim) {
-          rim.setAttribute("display", chHeld ? "inline" : "none");
-          if (chHeld) {
-            rim.setAttribute("transform", `translate(${tx},${ty})`);
-            rim.setAttribute("r", String(drawR(d, v, k)));
-            rim.setAttribute("stroke-width", String(strokeWidthFor(d) * strokeK(v) * HELD_RIM_CORE_K));
-          }
-        }
+        c.setAttribute("stroke-width", String(strokeWidthFor(d) * strokeK(v) * (chTwin ? DOG_CHAIN_TWIN_STROKE_K : chHeld ? HELD_RIM_K : 1)));
+        /* THE FOURTH CHILD HAS GONE with the casing. It was the lemon ring drawn
+           inside a widened navy rim; the rim is one lemon stroke now, written on
+           the circle itself two lines above, so there is nothing to draw on top of
+           and children[3] no longer exists. [0], [1] and [2] are unmoved. */
       }
       /* THE QUESTION MARK follows its circle. Shown only once the pit is live and
          only where a circle is actually drawn, so a depth-1 dog, which the pit
@@ -9634,10 +9617,6 @@ export default function BreedTree({
          on DOG's own. Undefined for a kind with no magnet. */
       nearAt?: (ch: Chain, cx: number, cy: number) => number | null;
       gapShare: (a: ChainSq, b: ChainSq) => number;       // gap as a share of size
-      /* A CASING UNDER THE CRISP CORE, or undefined for a kind that wants none.
-         Drawn wider than the core and in a colour chosen to separate it from the
-         ground rather than from any one thing it crosses. See DOG_CHAIN_CASING. */
-      casing?: string;
       /* HOW WIDE A GAP THIS KIND'S LINKS MAY HOLD, as a share of size, and the
          one place the touching rule lives. Every test reads it: the join, the
          per-frame strain check, the release judgement and the circuit close. The
@@ -9689,7 +9668,6 @@ export default function BreedTree({
       at: (i) => { const b = chumBodiesRef.current[i]; return b ? { x: b.x, y: b.y } : null; },
       gapShare: (a, b) => chainSquareGap(a, b) / (Math.max(a.h, b.h) * 2),
       slack: CHAIN_TOUCH_SLACK, // cards touch, exactly as they always have
-      casing: undefined, // the cards keep their plain white line
       armPx: 0, // a card's press IS the chain: it takes the gate on the spot
       busy: (i) => chumFlyRef.current.has(i),
       taken: (i) => chumTakenRef.current.has(i),
@@ -9867,7 +9845,6 @@ export default function BreedTree({
         return best >= 0 ? best : null;
       },
       slack: DOG_CHAIN_SLACK, // no touching rule at all: see the constant
-      casing: DOG_CHAIN_CASING,
       armPx: DOG_CHAIN_ARM_PX, // a short movement is a drag, a longer one a chain
       busy: (i) => !dogInPit(dogNode(i)),
       taken: (i) => !dogInPit(dogNode(i)),
@@ -10126,7 +10103,7 @@ export default function BreedTree({
        If you are reading 76476552 looking for the casing fix, the fill work
        (DOG_SINGLE_FILL, chSingle, pitBreedCount) is in the same commit and is a
        separate change with its own reasoning below. */
-    const CHAIN_GROUPS = ["glow", "casing", "core", "dots"] as const;
+    const CHAIN_GROUPS = ["glow", "core", "dots"] as const;
     const clearPath = () => {
       const g = chainGRef.current;
       if (!g) return;
@@ -10220,7 +10197,7 @@ export default function BreedTree({
             r: chain?.canClose && d === 0 ? pulse : d === n - 1 ? 1 - 0.45 * run : 1,
           }
         : null);
-      paint(segs, dotList, unit, chain.kind.colour, chain.kind.casing);
+      paint(segs, dotList, unit, chain.kind.colour);
     };
     // Writes lines and dots into the path layer. Shared by the live chain and
     // the collapse, so the two can never be drawn two different ways. The colour
@@ -10234,14 +10211,11 @@ export default function BreedTree({
       dotList: ({ x: number; y: number; r?: number; o?: number } | null)[],
       unit: number,
       col: string,
-      // The casing's colour, or undefined for a kind that wants none. The group is
       // emptied in that case, so a kind without one leaves nothing behind.
-      casing?: string,
     ) => {
       const g = chainGRef.current;
       const glow = g?.querySelector("[data-chain=glow]");
       const core = g?.querySelector("[data-chain=core]");
-      const cas = g?.querySelector("[data-chain=casing]");
       const blur = g?.querySelector("[data-chain=blur]");
       const dots = g?.querySelector("[data-chain=dots]");
       if (!glow || !core || !dots) return;
@@ -10262,13 +10236,6 @@ export default function BreedTree({
         });
       };
       lay(glow, unit * 0.5);
-      /* 0.26 against the core's 0.14, so the casing shows as an edge of about half
-         the core's width on each side. Wide enough to read at the sizes this path
-         is drawn at, narrow enough that the core is still the line you see. */
-      if (cas) {
-        if (casing) { lay(cas, unit * 0.26); for (const el of Array.from(cas.children)) (el as SVGLineElement).style.stroke = casing; }
-        else cas.replaceChildren();
-      }
       lay(core, unit * 0.14);
       blur?.setAttribute("stdDeviation", String(unit * 0.2));
       const n = dotList.length;
@@ -10292,8 +10259,6 @@ export default function BreedTree({
       t0: number; unit: number; col: string;
       pieces: { x1: number; y1: number; x2: number; y2: number; drift: number }[];
       dots: { x: number; y: number; drift: number }[];
-      // Carried so a falling path keeps its edge; see DOG_CHAIN_CASING.
-      casing?: string;
     };
     let collapse: Collapse | null = null;
     // The chain is gone by the time this is drawn, so its shape, its size and
@@ -10317,7 +10282,7 @@ export default function BreedTree({
         pieces.push({ x1: mx + ux * half, y1: my + uy * half, x2: q.x, y2: q.y, drift: Math.random() * 2 - 1 });
       }
       const dotsArr = cps.flatMap((q) => (q ? [{ x: q.x, y: q.y, drift: Math.random() * 2 - 1 }] : []));
-      collapse = { t0: performance.now(), unit, col: ch.kind.colour, casing: ch.kind.casing, pieces, dots: dotsArr };
+      collapse = { t0: performance.now(), unit, col: ch.kind.colour, pieces, dots: dotsArr };
     };
     // Paints one collapse frame. False once it is over, having cleared the layer.
     const drawCollapse = (now: number): boolean => {
@@ -10327,7 +10292,7 @@ export default function BreedTree({
       if (t >= 1) {
         collapse = null;
         g.style.opacity = "";
-        paint([], [], 0, "#ffffff", undefined);
+        paint([], [], 0, "#ffffff");
         return false;
       }
       const u = collapse.unit;
@@ -10339,7 +10304,6 @@ export default function BreedTree({
         collapse.dots.map((d) => ({ x: d.x + d.drift * u * t, y: d.y + fall })),
         u,
         collapse.col,
-        collapse.casing,
       );
       g.style.opacity = String(1 - t);
       return true;
@@ -10521,7 +10485,7 @@ export default function BreedTree({
       if (collapse) {
         collapse = null;
         if (chainGRef.current) chainGRef.current.style.opacity = "";
-        paint([], [], 0, "#ffffff", undefined);
+        paint([], [], 0, "#ffffff");
       }
       chain = { id: e.pointerId, kind, pending: true, cards: [], px: e.clientX, py: e.clientY, fx: e.clientX, fy: e.clientY, strain: new Map(), dead: null, closed: false, canClose: false, lastJoin: performance.now(), hold: kind.armPx > 0 ? { x: e.clientX, y: e.clientY } : null };
       if (raf == null) raf = requestAnimationFrame(tick);
@@ -11554,18 +11518,6 @@ export default function BreedTree({
                   {circleEl}
                   {labelEl}
                   {qmarkEl}
-                  {/* The held rim's lemon core, child [3]. FOURTH and last on
-                      purpose: the frame writer indexes [0], [1] and [2] for the
-                      circle, the label and the mark, so this can only be appended,
-                      never inserted. It is a ring at the circle's own radius, so
-                      drawing it over the mark costs nothing: they never meet.
-                      Hidden until the circle is held; see HELD_RIM_CASING_K. */}
-                  <circle
-                    display="none"
-                    fill="none"
-                    stroke={DOG_CHAIN_COLOUR}
-                    pointerEvents="none"
-                  />
                 </g>
               );
             })}
@@ -12671,10 +12623,6 @@ export default function BreedTree({
                 open where it broke. The glow group blurs a copy of the same
                 lines. */}
             <g data-chain="glow" filter="url(#bt-chain-glow)" />
-            {/* The casing sits between the soft glow and the crisp core: wider than
-                the core, hard edged, and only drawn for a kind that asks for one.
-                See DOG_CHAIN_CASING. */}
-            <g data-chain="casing" />
             <g data-chain="core" />
             <g data-chain="dots" />
           </g>
