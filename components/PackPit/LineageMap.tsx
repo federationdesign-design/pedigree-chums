@@ -2558,6 +2558,37 @@ export default function LineageMap({
     autoForceRef.current = false;
     autoPlaceRef.current = false;
     placeAllUnplaced();
+    /* AND ON THE PLAY LIFT, AUTO FINISHES THE JOB (owner, 18 September 2026).
+
+       PLAY AREA ONLY. `circular` is the lift; the learn area keeps what it had, so
+       AUTO there still leaves Complete to the player. One flag, no second path.
+
+       AT THE END OF THE RIPPLE, NOT AT THE PRESS, and that is the whole reason it
+       is here rather than inside autoCollect. circularComplete does not check
+       whether anything is open or placed: it scatters WHATEVER STATE THE TREE IS
+       IN. Fired on the press you would get a tap and then the pit, with no wave, no
+       cards and no reveal, which is a skip rather than a shortcut. Here it runs
+       after placeAllUnplaced on the same beat the placement already waited for, so
+       the wave plays out, the cards land in their frames, and then it completes:
+       about 2.4 seconds on a forty node dog, which reads as watching it done for
+       you.
+
+       NOTHING IN circularComplete ASSUMES A HUMAN PRESS. It takes no event and
+       reads no pointer state, circularDoneRef guards re-entry, and the solo leaf
+       path has been calling it from a setTimeout since it was written.
+
+       THE FLARE AND THE CHAIN ARE UNAFFECTED. The 250ms completion flare fires in
+       BreedTree before the lift ever opens, so it is upstream of this. The chain
+       closing its other circles hangs off onRemove, which circularComplete calls
+       synchronously, so it behaves identically whichever pressed it.
+
+       THE CONSEQUENCE, CHOSEN KNOWINGLY AND NOT OVERLOOKED. autoArmed resets on
+       every new lift, so ONE TAP PER LIFT MEANS ONE TAP PER CIRCLE: a twenty circle
+       level is twenty taps to clear. The owner has played it and wants it. If it
+       ever needs capping the lever is autoArmed, arming once per level or once
+       every few lifts, NOT the cost: AUTO already forfeits 500 a node in earnings
+       it never pays, so raising AUTO_COST_LIFT would bill the deep dogs twice. */
+    if (circular) circularComplete();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [picked, autoPlaceTick]);
 
