@@ -38,6 +38,11 @@ import type { LineageNode } from "./lineage";
 
 /* The signature is cached on the raw node in a WeakMap, because this is asked
    inside render and physics loops. Each LineageNode is walked once, ever. */
+/* KEPT DELIBERATELY, AND UNUSED FOR NOW (19 September 2026). Nothing calls this
+   since the duplicate-sibling rule was withdrawn. It stays because it is the test
+   that tells a true byte copy from two contributions that merely share a name, and
+   the 19 August device removal needs exactly that to know which 19 of the 20
+   duplicate patterns to merge and which one to leave alone. */
 const sigCache = new WeakMap<LineageNode, string>();
 export function subtreeSig(n: LineageNode): string {
   const hit = sigCache.get(n);
@@ -52,11 +57,17 @@ export function isEchoName(childName: string, parentName: string): boolean {
   return childName === parentName;
 }
 
-/* The composed rule, for a caller holding the sibling list. `earlier` is the
-   siblings BEFORE this one: the first copy is always the one that is drawn. */
-export function isHiddenCopyOf(child: LineageNode, earlier: readonly LineageNode[], parentName: string): boolean {
-  if (isEchoName(child.name, parentName)) return true;
-  const sig = subtreeSig(child);
-  for (const e of earlier) if (!isEchoName(e.name, parentName) && subtreeSig(e) === sig) return true;
-  return false;
+/* The composed rule, for a caller holding the sibling list.
+
+   THE DUPLICATE-SIBLING HALF IS WITHDRAWN (owner, 19 September 2026). It hid a child
+   whose name and whole subtree repeated an earlier sibling; it reached further than
+   the pit diagram it was written for and it hid a node without its descendants. The
+   duplicates are the 19 August display device and the answer is to take them out of
+   the DATA, not to hide them at render time. `earlier` is kept in the signature so
+   re-introducing a sibling rule needs no change at any call site.
+
+   ONLY THE ECHO RULE IS LIVE, which is the Celtic Heeler fix and predates all of
+   this. */
+export function isHiddenCopyOf(child: LineageNode, _earlier: readonly LineageNode[], parentName: string): boolean {
+  return isEchoName(child.name, parentName);
 }

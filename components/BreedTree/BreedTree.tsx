@@ -9,7 +9,7 @@ import { interpolateZoom } from "d3-interpolate";
 import type { LineageNode } from "../../data/lineage";
 import { nodeStatus, TAG_STYLE, type BreedTag } from "../BreedTreeMap/BreedTreeMap";
 import { descendantPackBreeds, ancestryFullList, ancestorShareOf, ancestorAppearancesOf, treesContaining } from "../../data/lineageArchive";
-import { subtreeSig, isEchoName } from "../../data/lineageShape";
+import { isEchoName } from "../../data/lineageShape";
 import { fireConfetti } from "../../lib/confetti";
 import TrainingCard from "../TrainingCard/TrainingCard";
 import { CONSENT_KEY } from "../../lib/consent";
@@ -1535,50 +1535,36 @@ function isEcho(d: Node): boolean {
   return !!d.parent && isEchoName(d.data.name, d.parent.data.name);
 }
 
-/* THE SAME FAULT, THE OTHER RELATIONSHIP (owner, 18 September 2026).
+/* THE DUPLICATE-SIBLING RULE IS WITHDRAWN (owner, 19 September 2026).
 
-   isEcho asks CHILD AGAINST PARENT. It cannot see a pair like Ancient Molossers'
-   two `Old Mastiffs of the East`, because those repeat EACH OTHER, not their
-   parent. Same dog drawn twice side by side, same name, same picture, 50% and 50%,
-   and the existing predicate was written for only one of the two shapes.
+   WHAT IT DID. Alongside the echo rule below it hid a child whose name AND whole
+   subtree repeated an earlier sibling: Ancient Molossers' two Old Mastiffs of the
+   East, Old working collies' two Shepherd's Dogs, twenty patterns in all.
 
-   IT IS NOT RARE. Twenty distinct duplicate-sibling patterns across the archive,
-   the largest reaching 37 trees and 138 occurrences. Ancient Molossers is 23 trees.
+   WHY IT IS GONE. It reached further than the pit diagram it was written for and
+   changed pages across the site, and it hid the node without its descendants, so a
+   hidden copy's children stayed exactly where pack had put them, floating inside a
+   ring that was no longer drawn (Curly-Coated Retriever, the second Water Spaniels).
+   The second fault had a fix, but fixing it would have been a patch on a patch on a
+   rule that was already in the wrong place.
 
-   ONLY AN IDENTICAL COPY IS HIDDEN, and that is the whole rule: same name AND the
-   same subtree, values included. Two of the twenty carry copies whose VALUES
-   differ (Old British ratting Terriers > Earth Dog, and Cairn Terrier > Skye
-   Terrier stock). Those are not copies, they are two contributions of different
-   weight that happen to share a name, and hiding one would either lose its share
-   or require summing it into the other. Summing would MOVE A PERCENTAGE, which is
-   the one guarantee that makes hiding safe at all, and it would do so across 138
-   occurrences. So they stay drawn, and the signature below is what decides.
+   THE DUPLICATES ARE STILL WRONG. They are the 19 August display device, written
+   into the DATA to solve a layout problem, and the answer is to take them out of the
+   data now that the layout handles a lone child: see SOLO_CHILD_K. Hiding them at
+   render time was treating the symptom.
 
-   THE FIRST ONE STAYS. Hidden means the second and any after it.
-
-   THE SIGNATURE IS CACHED ON THE RAW NODE, in a WeakMap, because this is asked
-   inside render and physics loops. Each raw LineageNode is walked once, ever. */
-/* THE SIGNATURE AND THE ECHO RULE MOVED OUT, to data/lineageShape.ts, so
-   LineageMap reads the same ones (18 September 2026). They lived here for a day
-   and that day produced five faults from the two files disagreeing about what a
-   copy is. What stays here is only the d3 shape of the question: these take a
-   HierarchyCircularNode and the shared module takes raw LineageNodes. */
-function isDupSibling(d: Node): boolean {
-  const p = d.parent;
-  if (!p || !p.children) return false;
-  const i = p.children.indexOf(d);
-  if (i <= 0) return false; // the first copy is the one that is drawn
-  const sig = subtreeSig(d.data);
-  for (let j = 0; j < i; j++) if (subtreeSig(p.children[j].data) === sig) return true;
-  return false;
-}
+   subtreeSig STAYS in data/lineageShape.ts, unused for now and deliberately so. It
+   is the thing that tells a true byte copy from two contributions that merely share
+   a name, and the device removal needs exactly that test to know which 19 of the 20
+   patterns to merge and which one to leave alone (Cairn Terrier's island and
+   mainland Skye stock, the only pair with distinct notes). */
 /* WHAT THE REST OF THE FILE SHOULD ASK. A circle the player never sees must also
    never be a body, never be counted as a breed in the pit, never drop a chip and
    never let a chain start on it. Both predicates mean exactly that, so every site
    that used to ask isEcho asks this instead. The one exception is ?spindiag=1,
    which names the two separately because telling them apart is its job. */
 function isHiddenCopy(d: Node): boolean {
-  return isEcho(d) || isDupSibling(d);
+  return isEcho(d);
 }
 
 /* WHAT IS LIVE IN THE PIT, BY BREED, ASKED IN ONE PLACE (owner, 18 September
@@ -9111,7 +9097,7 @@ export default function BreedTree({
                 if (!el2 || !el2.style.fill) continue;
                 const nd = nds[i2];
                 rows.push(
-                  `#${i2} ${(nd?.data.name ?? "?").slice(0, 10)} d${nd?.depth ?? "?"}${nd && isEcho(nd) ? " ECHO" : nd && isDupSibling(nd) ? " DUP" : ""}` +
+                  `#${i2} ${(nd?.data.name ?? "?").slice(0, 10)} d${nd?.depth ?? "?"}${nd && isEcho(nd) ? " ECHO" : ""}` +
                   ` disp ${el2.getAttribute("display") ?? "-"} fill ${el2.getAttribute("fill") ?? "-"}` +
                   ` -> ${el2.style.fill} key ${el2.dataset.chained ?? "-"}`,
                 );
