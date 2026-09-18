@@ -8264,6 +8264,17 @@ export default function BreedTree({
           }
           const chips = bods.filter((o) => o.plugin?.kind === "badge");
           const inert = chips.filter((o) => o.plugin?.bridge?.inert).length;
+          /* GHOSTS, and the column that settles the held-open space. A chip whose
+             bridge says `blown` but whose body is still in the world is invisible
+             and solid: killChained sets blown BEFORE it removes, so a non-zero
+             reading means a removal was skipped and that chip is holding its space
+             open. It should always be 0.
+
+             READ IT BESIDE `asleep`. If ghost is 0 after a blast and the space is
+             still held, nothing leaked: the pit around the hole is asleep and
+             never falls in, because removing a body does not wake its neighbours.
+             The two readings tell those apart, which no other column does. */
+          const ghost = chips.filter((o) => o.plugin?.bridge?.blown).length;
           const bonds = bondedPairs.size;
           const wIdx = worst?.plugin?.bridge?.idx;
           const wBonds = wIdx === undefined ? 0 : (bondsOf.get(wIdx)?.length ?? 0);
@@ -8277,7 +8288,7 @@ export default function BreedTree({
                re-made as fast as it cuts them, and only these two tell those
                apart: made near zero is a stalled sweep, made and cut both high
                and roughly equal is the churn. */
-            `chips ${chips.length} (inert ${inert})  bonds ${bonds} (made/s ${per(spinMade)} cut/s ${per(spinCut)})  KE ${ke.toFixed(3)}  dKE ${dKE >= 0 ? "+" : ""}${dKE.toFixed(3)}${dKE > 0 && !dragRef.current ? "  <-- ENERGY IN" : ""}`,
+            `chips ${chips.length} (inert ${inert})  ghost ${ghost}${ghost ? "  <-- INVISIBLE BODIES LEFT IN WORLD" : ""}  bonds ${bonds} (made/s ${per(spinMade)} cut/s ${per(spinCut)})  KE ${ke.toFixed(3)}  dKE ${dKE >= 0 ? "+" : ""}${dKE.toFixed(3)}${dKE > 0 && !dragRef.current ? "  <-- ENERGY IN" : ""}`,
             `sumW ${sumW.toFixed(3)}  maxW ${maxW.toFixed(4)} on ${worst?.plugin?.kind ?? "?"}${wIdx === undefined ? "" : ` #${wIdx}`} bonds ${wBonds} spd ${wSpd.toFixed(2)}`,
             /* THE CHAIN'S OWN STATE, for a leaked twin (owner, 18 September 2026:
                a yellow circle at rest with no chain running). An available twin
