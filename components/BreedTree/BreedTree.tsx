@@ -2,7 +2,7 @@
 
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { hierarchy, pack, packSiblings, packEnclose, type HierarchyCircularNode } from "d3-hierarchy";
-import { ringFrac, radius as pctRadius, RARITY_BAND } from "../PackPit/LineageMap";
+import { ringFrac, RARITY_BAND } from "../PackPit/LineageMap";
 import { createPitEffects } from "../PackPit/pitEffects";
 import { splitName } from "../PackPit/splitName";
 import { interpolateZoom } from "d3-interpolate";
@@ -1994,7 +1994,34 @@ const rollBomb = () => Math.random() < 1 / BOMB_ODDS;
    it up once it falls under BADGE_FLOOR_PX, so shrinking every badge by a fifth
    makes the smallest ones disappear at a slightly larger circle than before. That
    is the existing rule working, not a new fault. */
-const BADGE_FRAC = 0.20;
+// BADGE_FRAC was 0.20, the fraction of its dog's radius a chip took. Gone with
+// badgeDrawForNode and the ruling above: every chip is CHIP_R_PX now.
+/* THE OWNER RULING ABOVE IS REVERSED (owner, 18 September 2026). EVERY CHIP IS ONE
+   SIZE, wherever it spawns from and whatever dog it came out of. The note above is
+   left standing rather than deleted, because its reasoning was sound for the tree
+   it was written against and the measurement that overturned it is specific.
+
+   WHAT THE MEASUREMENT SHOWED. ?chipdebug=1 on Soft-Coated Wheaten Terrier, a
+   378px stage: seven different shares all reported EXACTLY 5.0px and one reported
+   10.2px. 5.0px is not a chip figure at all. It is POP_MIN_PX: a circle cannot be
+   smaller than 25px radius, 0.20 of that is 10.05 viewBox units, and at ctm.a
+   0.4974 that is 5.0px. Seven shares were identical because seven DOGS were all
+   clamped to the minimum circle size.
+
+   SO THE SIZE CARRIED NO INFORMATION. "Proportional to the dog it labels" stops
+   being true the moment most dogs sit on the floor, which on any deep evenly-split
+   tree is most of them. It was not saying "this dog is big", it was saying "this
+   dog is as small as a dog is allowed to be", for almost every chip on screen.
+
+   AND THEY WERE BELOW THE LEGIBILITY CUTOFF. BADGE_FLOOR_PX is 11px, the size at
+   which the % text stops reading. Those chips were at 5.0. The guard that was meant
+   to drop an unreadable badge to nothing never fired, because the badge was sized
+   from a radius that had already been clamped up.
+
+   IN CLIENT PIXELS, NOT VIEWBOX UNITS, so a chip is the same on a 378px stage and a
+   1200px one. Converted once per spawn site through fxScale, which is user units
+   per client px. */
+const CHIP_R_PX = 12;
 /* 13.5 -> 11, 9 Sept 2026 (owner).
    Not a taste change. The enclosing-circle fit landed earlier the same day made
    every multi-circle cluster smaller, because a constant circle in a portrait
@@ -2029,7 +2056,8 @@ const BADGE_FRAC = 0.20;
    readout reports against it and it is one line to put back. Nothing applies it
    any more. */
 const BADGE_FLOOR_PX = 11;
-const badgeDrawForNode = (nodeR: number, k: number) => BADGE_FRAC * nodeR * k;
+// badgeDrawForNode was here. It sized a chip from its dog and is gone with the
+// ruling above: see CHIP_R_PX for what replaced it and the measurement that did it.
 
 // Split words into exactly n lines as evenly as the word lengths allow.
 // Returns null when n lines are not reachable (a single long word can force
@@ -3693,6 +3721,15 @@ export default function BreedTree({
   // The legibility floor in viewBox units: BADGE_FLOOR_PX drawn px, converted by
   // the stage's short side so it is the same on-screen size on any device. Below
   // this a badge shows nothing rather than clamping up (see badgeDrawForNode).
+  /* CHIP_R_PX in viewBox units, the same conversion badgeFloorVb uses. The sim
+     effect has fxScale and uses that; this one is outside it and reads the stage,
+     which is why it is a function and not a constant. Called once per badge pass,
+     not per chip. */
+  const chipRVb = () => {
+    const st = stageRef.current;
+    const short = st ? Math.min(st.clientWidth, st.clientHeight) : SIZE;
+    return (CHIP_R_PX * SIZE) / short;
+  };
   const badgeFloorVb = () => {
     const st = stageRef.current;
     const short = st ? Math.min(st.clientWidth, st.clientHeight) : SIZE;
@@ -3925,16 +3962,19 @@ export default function BreedTree({
   }, []);
   useEffect(() => {
     if (!dockAside) return;
-    const k = SIZE / viewRef.current[2];
+
     /* THE ONE PLACE THAT DECIDES WHICH CIRCLES CARRY A BADGE. Stage 2 widens
        this filter and nothing else, because nothing else counts into the dog
        list any more. It is deliberately still depth 1 here. */
     const badgeNodes = badgeSourceNodes(nodes);
     badgeSrcRef.current = badgeNodes.slice();
+    // One layout read for the whole pass, not one per badge: chipRVb measures the
+    // stage, and every chip is the same size anyway.
+    const chipR = chipRVb();
     setBadgePcts(
       badgeNodes.map((n) => {
         const pct = n.parent ? Math.round(((n.value ?? 0) / (n.parent.value || 1)) * 100) : 0;
-        return { pct, r: badgeDrawForNode(n.r, k), src: n };
+        return { pct, r: chipR, src: n };
       }),
     );
     // k reads only viewRef.current[2], the view WIDTH, and the corrected seed above makes that width exact at
@@ -6246,6 +6286,8 @@ export default function BreedTree({
       const svgEl = st ? st.querySelector("svg") : null;
       const ctm0 = svgEl ? (svgEl as SVGSVGElement).getScreenCTM() : null;
       const fxScale = ctm0 && ctm0.a ? 1 / ctm0.a : vbHf / stageH;
+      // Every chip in the pit is this radius, in viewBox units: see CHIP_R_PX.
+      const chipR = CHIP_R_PX * fxScale;
       // ---- frozen drop-time transform: Matter bodies live in CLIENT PX ----
       // (the pit's native space, so every pit constant copies verbatim). World
       // coords stay the render currency: sync after each Engine.update, so
@@ -6340,7 +6382,7 @@ export default function BreedTree({
         // bottom LEFT of the circle: the right side is where the level's own
         // furniture sits, and a badge there crowded it
         n: null, x: n.x - n.r * 0.707, y: n.y + n.r * 0.707, vx: 0, vy: 0,
-        r: badgeDrawForNode(n.r, k) / k, rDraw: badgeDrawForNode(n.r, k), pct: pctOf(n), idx: i, lastFx: 0, popped: true, a: 0, va: 0, ia: 0, iva: 0, charges: 10, green: false,
+        r: chipR / k, rDraw: chipR, pct: pctOf(n), idx: i, lastFx: 0, popped: true, a: 0, va: 0, ia: 0, iva: 0, charges: 10, green: false,
       }));
       badgeBodiesRef.current = badges;
 
@@ -6820,7 +6862,7 @@ export default function BreedTree({
             const kidBomb = rollBomb();
             const kb: Body = {
               n: null, x: ch.x - ch.r * 0.6, y: ch.y + ch.r * 0.6, vx: 0, vy: 0,
-              r: badgeDrawForNode(ch.r, k) / k, rDraw: badgeDrawForNode(ch.r, k),
+              r: chipR / k, rDraw: chipR,
               pct: pctOf(ch), idx: bl.length, lastFx: 0, popped: true,
               a: 0, va: 0, ia: 0, iva: 0, charges: 10, green: false, bomb: kidBomb,
             };
@@ -6831,7 +6873,7 @@ export default function BreedTree({
             newMbs.push(mbb);
             // Both homes, same order. See badgeSrcRef.
             badgeSrcRef.current.push(ch);
-            setBadgePcts((l) => [...l, { pct: kb.pct, r: badgeDrawForNode(ch.r, k), bomb: kidBomb, src: ch }]);
+            setBadgePcts((l) => [...l, { pct: kb.pct, r: chipR, bomb: kidBomb, src: ch }]);
           }
         });
         // resolve the deliberate word/circle overlap without an explosion
@@ -6886,14 +6928,14 @@ export default function BreedTree({
             // the roll belongs here as much as in the scatter. Without it a bomb
             // only ever arrives from the lineage layer and stays rare.
             const popBomb = rollBomb();
-            const bb: Body = { n: null, x: ch.x - ch.r * 0.6, y: ch.y + ch.r * 0.6, vx: 0, vy: 0, r: badgeDrawForNode(ch.r, k) / k, rDraw: badgeDrawForNode(ch.r, k), pct: pctOf(ch), idx: bl.length, lastFx: 0, popped: true, a: 0, va: 0, ia: 0, iva: 0, charges: 10, green: false, bomb: popBomb };
+            const bb: Body = { n: null, x: ch.x - ch.r * 0.6, y: ch.y + ch.r * 0.6, vx: 0, vy: 0, r: chipR / k, rDraw: chipR, pct: pctOf(ch), idx: bl.length, lastFx: 0, popped: true, a: 0, va: 0, ia: 0, iva: 0, charges: 10, green: false, bomb: popBomb };
             bl.push(bb);
             all.push(bb);
             const mbb = mkCircle(bb, "badge", BADGE_OPTS);
             MBody.setVelocity(mbb, { x: mb.velocity.x * 0.8 + (Math.random() - 0.5) * vps(0.3), y: mb.velocity.y * 0.8 });
             newMbs.push(mbb);
             badgeSrcRef.current.push(ch);
-            setBadgePcts((l) => [...l, { pct: bb.pct, r: badgeDrawForNode(ch.r, k), bomb: popBomb, src: ch }]);
+            setBadgePcts((l) => [...l, { pct: bb.pct, r: chipR, bomb: popBomb, src: ch }]);
           }
         }
         if (newMbs.length > 1) ghost(newMbs);
@@ -7362,10 +7404,10 @@ export default function BreedTree({
         };
         const kids = (n.children ?? []).filter((ch) => !isHiddenCopy(ch));
         if (kids.length) {
-          for (const ch of kids) { const q = at(); spawnBadgeRef.current?.(q.x, q.y, badgeDrawForNode(ch.r, k), pctOf(ch)); }
+          for (const ch of kids) { const q = at(); spawnBadgeRef.current?.(q.x, q.y, chipR, pctOf(ch)); }
         } else {
           const q = at();
-          spawnBadgeRef.current?.(q.x, q.y, badgeDrawForNode(n.r, k), pctOf(n));
+          spawnBadgeRef.current?.(q.x, q.y, chipR, pctOf(n));
         }
         /* IT TAKES THE BODY OUT ITSELF (owner, 18 September 2026), rather than
            setting a flag and waiting for a tick that may not come.
@@ -7677,10 +7719,8 @@ export default function BreedTree({
         // share s lands at the badge a native pit dog of that share would carry.
         // All in viewBox units, the same space as chipFloor, so the cutoff compares
         // like for like; shows nothing only if even that pit-sized disc is under it.
-        const shareOf = (n: Node) => (n.parent ? Math.round(((n.value ?? 0) / (n.parent.value || 1)) * 100) : 0);
-        const pitD1 = nodes.filter((n) => n.depth === 1);
-        const pitPer = pitD1.length ? pitD1.reduce((a, n) => a + (n.r * kD) / pctRadius(shareOf(n)), 0) / pitD1.length : 0;
-        const chipBadge = BADGE_FRAC * pitPer * pctRadius(pctVal);
+        /* shareOf, pitD1, pitPer and chipBadge were here: the average-depth-1-dog
+           size a chip took when it arrived with no radius. Gone with CHIP_R_PX. */
         /* THE CHIP KEEPS THE SIZE IT HAD ON THE LIFTED LAYER, 15 September 2026
            (owner). REVERTED the same day to the plain drop-time conversion.
 
@@ -7733,12 +7773,13 @@ export default function BreedTree({
            LineageMap does not export PIT_NODE_SCALE, so the value is written out
            with its source named rather than plumbed through. If that dial ever
            moves, this moves with it. */
-        const LIFTED_NODE_SCALE = 0.78; // PIT_NODE_SCALE, LineageMap.tsx
-        const rDraw = opts?.label
-          ? (opts?.r ?? 0)
-          : opts?.r != null
-            ? opts.r * fxScale * LIFTED_NODE_SCALE
-            : chipBadge;
+        /* ONE SIZE, WHATEVER ARRIVED (owner, 18 September 2026). The three branches
+           here sized a chip from three different things: a lifted card's own radius,
+           an average depth-1 dog via pctRadius, or nothing at all. dogClose came in
+           through the last of those and had its carefully computed radius discarded.
+           All of them are now the one constant. Only opts.label is untouched: that
+           is a solo DOG CIRCLE arriving with its full radius, not a chip. */
+        const rDraw = opts?.label ? (opts?.r ?? 0) : CHIP_R_PX * fxScale;
         /* TWO CHIPS STAND OUTSIDE THE BOMB ROLL. A labelled circle, because it is
            a whole breed rather than a chip, and any caller that asks for noBomb.
            The solo leaf uses the second: it now drops an ordinary percentage
