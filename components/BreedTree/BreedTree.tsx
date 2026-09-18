@@ -1201,10 +1201,34 @@ const FX_NUM_CASING_K = 3;     // casing width, in the same units as the 15px ty
    now 8 rather than 4: see SPARK_FINAL_LINKS. It is twice what it was, but it is
    still a fifth of what the sixth connection throws, so the completion flare keeps
    its moment. */
-const SPARK_MAX = 40;          // hard cap, whatever the chain reaches
+/* STEPPED UP AGAIN (owner, 18 September 2026: the sixth connection should feel
+   like an event). Four dials move, and only one of them is the COUNT, because the
+   count was the wrong one to reach for:
+
+     COUNT makes the burst DENSER in the same small area. It was already at 38 of
+     a 40 cap by the sixth, so raising it further mostly overlaps streaks with each
+     other and reads as a blob rather than as more energy. It moves, but least.
+
+     SPARK_GROW_K makes the burst BIGGER: it multiplies both the speed and the
+     streak length, so it is the dial actually doing the engulfing.
+
+     SPARK_WIDTH_K is new and costs NOTHING. Every streak was a flat 1.6 wide
+     whatever the chain had reached; thickening them with the chain doubles the ink
+     on screen without creating one extra element.
+
+   n = min(SPARK_MAX, round(SPARK_BASE + links * SPARK_STEP)), so the cap now lands
+   exactly on the sixth connection rather than biting at the third:
+     1st  16 sparks, reach 1.2, width 1.8
+     3rd  32 sparks, reach 1.6, width 2.3
+     6th  56 sparks, reach 2.2, width 2.9
+   Element cost: peak alive goes from about 176 to about 246. Against a blast's
+   ~1,400 poof circles the combined worst case moves about 5%, so the bomb remains
+   the term that would cost frames, not this. */
+const SPARK_MAX = 56;          // hard cap, reached exactly at the sixth connection
 const SPARK_BASE = 8;          // the first connection, and the completing one
-const SPARK_STEP = 5;          // more per link after it
-const SPARK_GROW_K = 0.12;     // how much further a later link throws, per link
+const SPARK_STEP = 8;          // more per link after it
+const SPARK_GROW_K = 0.2;      // how much further a later link throws, per link
+const SPARK_WIDTH_K = 0.14;    // and how much thicker, per link. Free: no new elements
 const SPARK_LIFE_MS = 340;
 /* THE LAST CONNECTION THROWS WHAT THE FIRST ONE DID (owner, 18 September 2026).
 
@@ -1244,10 +1268,41 @@ const SPARK_FINAL_LINKS = 0;
 const CHAIN_FLARE_MS = 250;
 const CHAIN_FLARE_DOT_K = 2;      // unit * 0.22 becomes unit * 0.44 at the peak
 const CHAIN_FLARE_ATTACK = 0.45;  // below 1 loads the swell to the front
+/* THE GLOW GROWS WITH THE CHAIN (owner, 18 September 2026, and the dial wanted
+   most). It was FLAT: 0.5 and 0.2 for the whole chain however long it got, and it
+   only ever moved during the completion flare. So every bit of the chain's
+   intensity lived in flashes at the join and none of it in the line itself.
+
+   It now ramps from the resting pair to the full pair across CHAIN_GLOW_RAMP
+   connections, so the WHOLE LINE brightens as the chain is built. That is what
+   makes a sixth connection feel like an event rather than a bigger sparkle: it is
+   continuous, and it is still there between the bursts.
+
+   THE FLARE INTERPOLATES FROM WHEREVER THE CHAIN HAS REACHED, not from the resting
+   0.5 it used to assume. A chain six links long is already at 0.9 when it
+   completes, so flaring "up" to 0.8 would have dimmed it. chainGlow() is the one
+   place the ramp is computed and both the live path and the flare read it. */
 const CHAIN_GLOW_W = 0.5;         // the resting glow copy's width, a share of unit
 const CHAIN_GLOW_BLUR = 0.2;      // the resting blur, same units
-const CHAIN_FLARE_GLOW_W = 0.8;
-const CHAIN_FLARE_GLOW_BLUR = 0.35;
+const CHAIN_GLOW_FULL_W = 0.9;    // where the ramp arrives
+const CHAIN_GLOW_FULL_BLUR = 0.32;
+const CHAIN_GLOW_RAMP = 6;        // connections to get there
+const chainGlow = (links: number) => {
+  const t = Math.min(1, Math.max(0, links) / CHAIN_GLOW_RAMP);
+  return {
+    w: CHAIN_GLOW_W + (CHAIN_GLOW_FULL_W - CHAIN_GLOW_W) * t,
+    blur: CHAIN_GLOW_BLUR + (CHAIN_GLOW_FULL_BLUR - CHAIN_GLOW_BLUR) * t,
+  };
+};
+/* THE FLARE HAS TO CLEAR THE RAMP'S CEILING, and this is the figure that had to
+   move for it (18 September 2026). It was 0.8 and 0.35, chosen when the chain's
+   own glow was FLAT at 0.5: a step up from anywhere. With the ramp reaching 0.9
+   and 0.32 by the sixth connection, 0.8 is BELOW where a long chain already sits,
+   so the swell would have gone nowhere on exactly the chains it matters most on.
+   Set above CHAIN_GLOW_FULL_W and CHAIN_GLOW_FULL_BLUR, and it must stay above
+   them: if the ramp's ceiling is ever raised, raise these with it. */
+const CHAIN_FLARE_GLOW_W = 1.3;
+const CHAIN_FLARE_GLOW_BLUR = 0.5;
 /* THE FULL SWEEP BONUS (owner, 18 September 2026). Taking EVERY live circle of
    a breed pays on top of the connections.
 
@@ -7755,7 +7810,8 @@ export default function BreedTree({
           const sp = (0.6 + Math.random() * 1.8) * 60 * fxScale * grow;
           const el = document.createElementNS("http://www.w3.org/2000/svg", "line");
           el.setAttribute("stroke", colour);
-          el.setAttribute("stroke-width", String(1.6 * fxScale));
+          // Thickens with the chain, not flat: see SPARK_WIDTH_K.
+          el.setAttribute("stroke-width", String(1.6 * (1 + Math.min(links, 12) * SPARK_WIDTH_K) * fxScale));
           el.setAttribute("stroke-linecap", "round");
           el.style.pointerEvents = "none";
           fx2.appendChild(el);
@@ -10424,7 +10480,9 @@ export default function BreedTree({
             r: chain?.canClose && d === 0 ? pulse : d === n - 1 ? 1 - 0.45 * run : 1,
           }
         : null);
-      paint(segs, dotList, unit, chain.kind.colour);
+      // The glow now grows with the chain: see chainGlow. Connections, not cards,
+      // so a one-circle chain sits at the resting pair.
+      { const g2 = chainGlow(chain.cards.length - 1); paint(segs, dotList, unit, chain.kind.colour, g2.w, g2.blur); }
     };
     // Writes lines and dots into the path layer. Shared by the live chain and
     // the collapse, so the two can never be drawn two different ways. The colour
@@ -10501,6 +10559,10 @@ export default function BreedTree({
        the spot and still open the learn layer 250ms later. */
     type Flare = {
       t0: number; unit: number; col: string;
+      // Where the chain's own glow had reached when it completed. The flare swells
+      // UP FROM THIS, not from the resting pair: a six link chain is already at the
+      // full ramp, and flaring to a fixed 0.8 would have dimmed it.
+      fromW: number; fromBlur: number;
       segs: { x1: number; y1: number; x2: number; y2: number }[];
       dots: { x: number; y: number }[];
       at: number;        // which dot swells: the circle that completed the chain
@@ -10516,7 +10578,8 @@ export default function BreedTree({
         if (p && q) segs.push({ x1: p.x, y1: p.y, x2: q.x, y2: q.y });
       }
       const dots = cps.flatMap((q) => (q ? [{ x: q.x, y: q.y }] : []));
-      flare = { t0: performance.now(), unit, col: ch.kind.colour, segs, dots, at: dots.length - 1, done };
+      const g2 = chainGlow(ch.cards.length - 1);
+      flare = { t0: performance.now(), unit, col: ch.kind.colour, segs, dots, at: dots.length - 1, done, fromW: g2.w, fromBlur: g2.blur };
     };
     // Paints one flare frame. False once it is over, having cleared the layer and
     // run `done`, which is the lift.
@@ -10538,8 +10601,10 @@ export default function BreedTree({
         f.dots.map((d, i2) => ({ x: d.x, y: d.y, r: i2 === f.at ? dotK : 1 })),
         f.unit,
         f.col,
-        CHAIN_GLOW_W + (CHAIN_FLARE_GLOW_W - CHAIN_GLOW_W) * swell,
-        CHAIN_GLOW_BLUR + (CHAIN_FLARE_GLOW_BLUR - CHAIN_GLOW_BLUR) * swell,
+        // From where the chain got to, up to the flare pair, and never downwards:
+        // a long chain can already be above the flare's own figures.
+        f.fromW + Math.max(0, CHAIN_FLARE_GLOW_W - f.fromW) * swell,
+        f.fromBlur + Math.max(0, CHAIN_FLARE_GLOW_BLUR - f.fromBlur) * swell,
       );
       return true;
     };
