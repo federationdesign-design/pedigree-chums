@@ -1205,10 +1205,16 @@ export default function LineageMap({
   };
   // Exact copy of the pit's pink starburst: twelve spokes plus five sparkle dots,
   // sized from the circle itself so the family tree reads the same as the pit.
+  /* HOW LONG A BURST LIVES, named because something else now has to wait for it.
+     It was a literal inside burstAt alone. circularComplete holds the overlay open
+     for exactly this long so the starburst finishes before the layer unmounts, and
+     a second literal there would have been one edit away from a burst cut off
+     mid-flight. One figure, two readers. */
+  const BURST_LIFE_MS = 450;
   const burstAt = (x: number, y: number, s: number) => {
     const id = (fxId.current += 1);
     setBursts((b) => [...b, { id, x, y, s, born: performance.now() }]);
-    window.setTimeout(() => setBursts((b) => b.filter((n) => n.id !== id)), 450);
+    window.setTimeout(() => setBursts((b) => b.filter((n) => n.id !== id)), BURST_LIFE_MS);
   };
   // tick while a burst is alive so the spokes animate frame by frame, like the pit
   const [, setTick] = useState(0);
@@ -2281,8 +2287,31 @@ export default function LineageMap({
     if (!soloLeaf) pills.push(...scatterPills());
     onScatter?.({ circles: soloLeaf ? [] : circles, rods: soloLeaf ? [] : rods, pills, big });
   };
-  // Green Complete pressed: at the very same instant the layer stops drawing
-  // the tree and everything drops into the pit - zero-lag handover.
+  /* Green Complete pressed: the layer stops drawing the tree and everything drops
+     into the pit.
+
+     THE HANDOVER WAS NEVER ZERO-LAG, AND THIS NOTE USED TO SAY IT WAS (owner,
+     18 September 2026). The scatter, the burst and the big circle going were
+     always immediate, so the layer LOOKED handed over at once. The removal was
+     not: onRemove and onClose sat together on a single 900ms setTimeout, so the
+     circle the player opened stayed in the pit, a real owned body, for most of a
+     second after the button was pressed. The 900 appears to be what the confetti
+     needed, and the confetti was deleted on 31 August 2026 while its timer was
+     not: the only thing left on that side with a duration of its own is the
+     starburst, at BURST_LIFE_MS, half of it.
+
+     THE TWO ARE SPLIT NOW. onRemove fires on the press, synchronously, which is
+     what takes the circle out of the pit and carries the rest of the step with it:
+     the chain closing its other circles, the chips dropping from the opened
+     circle's bridge, and the round-won test that has to come after both. Only
+     onClose still waits, and only for the burst.
+
+     WHAT THAT CHANGES, recorded because it was accepted rather than missed: the
+     round-won test can now fire up to BURST_LIFE_MS before the overlay unmounts,
+     so a win screen may appear under a lifted layer that is still on top. The
+     owner has it to look at. The fallbacks, if it reads badly, are to close on the
+     press as well and lose the starburst, or to fire the burst through the pit's
+     own fx layer, which survives the close. */
   const circularComplete = () => {
     if (circularDoneRef.current) return;
     circularDoneRef.current = true;
@@ -2290,12 +2319,16 @@ export default function LineageMap({
     setScattered(true);
     burstAt(breed.x, breed.y, circR * 1.33);
     setRootGone(true);
+    // THE CIRCLE GOES ON THE PRESS. Before the close, and in the same order it
+    // always ran in: the scatter above has already landed its chips and rods.
+    onRemove?.(breed.name);
     /* CONFETTI REMOVED 31 August 2026 (Steve). 150 particles on a fixed
        full-screen canvas for about two seconds. This one was worse than the
        LineageModal burst because this overlay opens OVER A LIVE ROUND, so it
        took frames from the pit while the pit was still running. See the fuller
        note in LineageModal.tsx. */
-    window.setTimeout(() => { onRemove?.(breed.name); onClose(); }, 900);
+    // The overlay holds only for the starburst it just fired, nothing more.
+    window.setTimeout(() => { onClose(); }, BURST_LIFE_MS);
   };
   // Solo dog: there is no node to turn green and no Complete button to press,
   // so landing the image in its frame IS the completion. circularComplete does
