@@ -1370,6 +1370,27 @@ const LINEAGE: Record<string, LineageNode> = {
      THE ECHO IS LOAD-BEARING, as on every other one-line attach: after grafting this
      is a valueless node with a single child, and LineageMap collapses any such node
      into that child. Value 0, so leafSum is unchanged and no share moves. */
+  /* THE FELL TERRIERS COME FROM THE BLACK AND TAN (owner, 19 September 2026).
+
+     A ONE-LINE ATTACH, not research. Fell terrier is a TYPE rather than a breed,
+     and the fell terrier breeds and the Welsh Terrier descend from the Black and Tan
+     Terrier, which this archive already holds with a full tree. So this record's
+     only job is to name that parent and let expandNode carry the rest.
+
+     ONE TREE ONLY. It is a bare leaf in a single tree, which is why it went unnoticed
+     next to "Old fell Terriers", a separate and better-connected node that expands
+     properly in five. The two are not the same dog and the spelling is one word.
+
+     THE ECHO IS LOAD-BEARING: see data/lineageShape.ts. Value 0, so no share moves. */
+  "Old wirehaired fell Terriers": {
+    name: "Old wirehaired fell Terriers",
+    note: "The harsh-coated fox-working terriers of the northern fells, bred for grip and weather rather than looks. Now extinct.",
+    children: [
+      { name: "Black and Tan Terrier", note: "The old black-and-tan working terrier the fell and Welsh terriers were bred from. Now extinct.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 100 },
+      { name: "Old wirehaired fell Terriers", note: "The same dog carrying on: see the echo note in data/lineageShape.ts.", value: 0 }
+    ]
+  },
+
   "Old scenting Hounds": {
     name: "Old scenting Hounds",
     note: "The tracking hounds of medieval lords, the scenting stock behind the bloodhound and the old hunting hounds. Now extinct.",
