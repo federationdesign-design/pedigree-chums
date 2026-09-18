@@ -4675,6 +4675,22 @@ export default function BreedTree({
         const byBreed = new Map<string, Node[]>();
         for (const o of owned) {
           if (o.depth === 0 || isEcho(o) || removedNodesRef.current.has(o)) continue;
+          /* A WORD CIRCLE HAS NO DISC TO GLOW BEHIND (owner, 18 September 2026,
+             seen on "Celtic Hound" and "Old hunting dogs of the Celts").
+
+             WHAT IT LOOKED LIKE. A bare white ring round the name, rather than
+             the halo the glow is. The glow is a blurred copy of the circle's own
+             ring, drawn on a layer BEHIND the circles, so on an ordinary dog the
+             disc covers everything inside the rim and only the outside shows. A
+             depth-1 dog in a live pit IS its name: the frame writer sets its
+             circle to display none and draws a word in its place, see isWordNode
+             just above. Nothing was covering the ring, so all of it showed.
+
+             It is the SAME test, written the same way, so the two cannot drift:
+             a circle the pit does not draw does not glow. It was always wrong,
+             and only showed up now because dropping the touching rule put the
+             glow on many more circles than it used to reach. */
+          if (fellRef.current && o.depth === 1) continue;
           const list = byBreed.get(o.data.name);
           if (list) list.push(o); else byBreed.set(o.data.name, [o]);
         }
