@@ -1481,6 +1481,27 @@ const PIT_FULL_COVER = 0.72 / PIT_SHRINK;
    It was an inline literal inside computeFull. Named here so it sits with the
    other pit constants and is a one-line tune from now on. */
 const PIT_FULL_ZONE_PX = 90;
+/* NO PIT-FULL COUNTDOWN FOR THE FIRST 20 SECONDS OF A LEVEL (owner,
+   18 September 2026).
+
+   THE CLOCK STARTS AT THE LANDING, NOT AT THE ROUND. armToys() fires on the
+   first body to touch the floor, which is the moment the drop arrives and the
+   beat every toy already times off, so the grace runs from there: a slow drop
+   does not eat into it. It is ALSO seeded beside fullClock when the sim starts,
+   so a level where nothing ever reaches the floor still gets its 20 seconds
+   rather than none.
+
+   IT REUSES cdGraceRef, the 2.5s post-rescue grace, because both say exactly the
+   same thing: the countdown may not begin before this timestamp. Both trigger
+   paths already consult it, the occupancy poll in checkFull and the
+   chum-hits-floor branch in the collision listener, so nothing new had to be
+   threaded through either. cancelCountdown's 2.5s cannot shorten this one: a
+   cancel can only happen after a countdown started, which needs the grace to
+   have expired first.
+
+   THE POLL'S OWN 4s SETTLE-IN STAYS. It is a different guard for a different
+   reason (a pit that has not come to rest yet) and 20s dominates it. */
+const PIT_FULL_GRACE_MS = 20000;
 /* THE ONE YELLOW EVERY LIVE PERCENTAGE CHIP WEARS (owner, 18 September 2026,
    seen on Kerry Blue Terrier: two different yellows side by side in one pit).
 
@@ -6924,6 +6945,10 @@ export default function BreedTree({
       };
       const armToys = () => {
         if (toyTimers.length) return; // first landing only
+        // THE DROP HAS ARRIVED, so the countdown's grace runs from here rather
+        // than from the round starting: see PIT_FULL_GRACE_MS. Behind the same
+        // first-landing guard as the toys, so it is set once per level.
+        cdGraceRef.current = performance.now() + PIT_FULL_GRACE_MS;
         toyTimers.push(window.setTimeout(() => spawnToy("cookies"), TOY_COOKIES_DELAY));
         // Both tennis balls drop on EVERY level now (2026-08-12). The old
         // first-seven-levels `hideBalls` gate and its no-balls re-timing were
@@ -8084,6 +8109,11 @@ export default function BreedTree({
       // would restart the four seconds and the poll below would almost never
       // be allowed to run. This one is set once per level and never reset.
       const fullClock = performance.now();
+      // The level's grace floor. Re-set at the landing by armToys, which is the
+      // fairer start; this seeds it so a level whose drop never reaches the floor
+      // is still covered. Set here rather than in a mount effect so it resets with
+      // the level, on a retry as on a new one: this effect re-runs for each.
+      cdGraceRef.current = fullClock + PIT_FULL_GRACE_MS;
       pitEndedRef.current = false; // fresh sim, the poll is live again
       let stillFrames = 0;
       const SETTLE_PS = vps(0.012);
