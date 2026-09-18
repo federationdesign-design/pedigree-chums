@@ -1032,6 +1032,13 @@ const DOG_CHAIN_MIN = 2;
 // yellow for one day as the deliberate opposite of the cards; both paths are now
 // white, and so is the question mark highlight below.
 const DOG_CHAIN_COLOUR = "#ffffff";
+/* THE FILL A HELD CIRCLE TAKES (owner, 18 September 2026), alongside its white
+   outline and its tapped face. A pit circle is filled with the site's navy,
+   #0a3a57, which fillFor returns for every circle once the pit is live; this is
+   --blue-sky from globals.css, the site's own light blue, written as a hex here
+   because it is set on an SVG element from script, where a var() would not
+   resolve. One name to change if another blue is wanted. */
+const DOG_CHAIN_FILL = "#5cc4ee";
 /* Two circles, as a share of the larger diameter, so CHAIN_TOUCH_SLACK means the
    same for dogs as it does for cards. `h` is the radius here, and the angle is
    not read: a circle has no corners to turn. */
@@ -4642,6 +4649,12 @@ export default function BreedTree({
         if (c.dataset.chained !== want) {
           c.dataset.chained = want;
           c.style.stroke = want === "1" ? "#ffffff" : "";
+          /* AND THE FILL GOES SKY BLUE. Safe to set: a circle in the live pit
+             shows no photograph, because the pictures go the moment the drop
+             begins (see nodeImg), so every pit circle is a plain disc of
+             fillFor's navy and there is no image here to cover. Cleared the same
+             way the stroke is, so its own colour returns with the chain's end. */
+          c.style.fill = want === "1" ? DOG_CHAIN_FILL : "";
         }
       }
       if (c) {
