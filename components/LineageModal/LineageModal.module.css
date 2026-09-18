@@ -1312,6 +1312,45 @@
   align-items: center;
   pointer-events: none;
 }
+/* THE DOG CIRCLE COUNTER, 18 September 2026 (owner). Directly under the lives,
+   last in the title's own column, so it follows the portrait ladder however deep
+   it runs rather than being pinned to the viewport.
+
+   THE CHIP IS .frameCount's, from LineageMap.module.css, copied rather than
+   approximated so the three counters read as one family: the same navy, the same
+   display face at 24px, the same 20px radius, the same 10 16 6 16 padding (more
+   above than below, because the display font sits high in its own line box and
+   an even 5 reads bottom-heavy) and the same 3px navy drop shadow.
+
+   NOT position: fixed, and that is the one deliberate difference. .frameCount
+   and .cardCount are fixed because they belong to the lifted layer's own corner.
+   This one belongs to the header's column, under the lives, so it flows.
+
+   align-self: flex-start keeps it to its own width instead of stretching across
+   the column, and the 6px is the gap the lives already keep from the ladder. */
+.circleCount {
+  align-self: flex-start;
+  margin-top: 6px;
+  padding: 10px 16px 6px 16px;
+  border-radius: 20px;
+  background: var(--navy);
+  color: #ffffff;
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: 24px;
+  line-height: 1.1;
+  letter-spacing: 0.5px;
+  pointer-events: none;
+  box-shadow: 0 3px 0 rgba(10, 58, 87, 0.3);
+}
+/* The phone rule the frame counter keeps, for the same reason: 24px of display
+   face plus 32px of padding is a wide chip on a 390 screen. */
+@media (max-width: 640px) {
+  .circleCount {
+    padding: 8px 12px 5px 12px;
+    border-radius: 16px;
+    font-size: 18px;
+  }
+}
 .livesBar {
   display: flex;
   gap: 4px;

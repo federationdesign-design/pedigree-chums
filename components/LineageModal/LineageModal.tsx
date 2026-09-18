@@ -476,6 +476,12 @@ export default function LineageModal({ name, image, character, lineage, fromRect
      start screen, where PLAY has already become PLAY AGAIN and runs
      onResetRun. */
   const [scorePulse, setScorePulse] = useState(false);
+  /* THE DOG CIRCLE COUNTER, 18 September 2026 (owner). Collected out of the
+     total that has been in the pit, sent up by BreedTree only when either number
+     changes. Null until the pit has counted once, so nothing shows before a
+     round is under way. See onCircleCount in BreedTree for what it counts and
+     why it deliberately does not read the round-won test's own state. */
+  const [circleCount, setCircleCount] = useState<{ got: number; tot: number } | null>(null);
   const shakeFnRef = useRef<(() => void) | null>(null);
   const slowmoFnRef = useRef<(() => void) | null>(null);
   const [slowmo, setSlowmo] = useState(false);
@@ -679,6 +685,16 @@ export default function LineageModal({ name, image, character, lineage, fromRect
             </div>
           </div>
         )}
+        {/* The dog circles collected out of the total that has been in the pit.
+            Last in the title's own column, directly under the lives, and gated on
+            `running` exactly as they are so it arrives with PLAY and goes with the
+            round. The total climbs as circles pop, which is the frames counter's
+            behaviour too and is the owner's ruling. */}
+        {running && circleCount && circleCount.tot > 0 && (
+          <div className={css.circleCount} aria-label={`${circleCount.got} of ${circleCount.tot} dogs collected`}>
+            {circleCount.got}/{circleCount.tot}
+          </div>
+        )}
       </div>
 
       {/* The diagram owns everything below the header. BreedTree runs in
@@ -742,6 +758,7 @@ export default function LineageModal({ name, image, character, lineage, fromRect
              never read it. */
           currentScore={score}
           portraitAnchor={portraitAnchor}
+          onCircleCount={(got, tot) => setCircleCount((p) => (p && p.got === got && p.tot === tot ? p : { got, tot }))}
           registerShake={(fn) => { shakeFnRef.current = fn; }}
           registerSlowmo={(fn) => { slowmoFnRef.current = fn; }}
           onToggleCaption={() => setCaptionOpen((o) => !o)}

@@ -2055,6 +2055,7 @@ export default function BreedTree({
   rootImage,
   rootLabel,
   onActiveChange,
+  onCircleCount,
   onClose,
   centred = false,
   size = 760,
@@ -2171,6 +2172,26 @@ export default function BreedTree({
   onShownPathChange?: (path: { name: string; img: string | null; status: BreedTag | null }[]) => void;
   hideCaption?: boolean;
   onCaptionClose?: () => void;
+  /* THE DOG CIRCLE COUNTER, 18 September 2026 (owner). Collected out of the
+     total that has been in the pit, for the shell to show under the lives.
+
+     IT COUNTS WHAT THE PIT DRAWS, deliberately NOT the owned set the round-won
+     test reads. `owned` only ever grows, nothing prunes it, and it can hold a
+     node no route will remove, so a counter built on it could never reach full
+     on a level with one of those. This one can, and that is the point: a FULL
+     COUNTER WHILE THE ROUND IS STILL RUNNING is the signal that a node is stuck
+     in owned, which is what ?windiag=1 then names.
+
+     A CIRCLE LIFTED TO THE LEARN LAYER COUNTS AS GONE, and returns to the count
+     if the player backs out. It is hidden rather than removed, but the counter
+     reports what is IN THE PIT and a circle up on the layer is not; the pit
+     really does get it back, so the number going up and then down again is
+     honest rather than a flicker. It is also what makes the diagnostic above
+     work, since a stuck node is a held one.
+
+     Fired only when either number CHANGES, the same written-on-change pattern
+     the chain outline uses, so a still pit costs nothing. */
+  onCircleCount?: (collected: number, total: number) => void;
   onScore?: (v: number) => void;
   /* The live score, so the chum tree layer can show it. One-way in: BreedTree
      never sets it, it only passes it through. */
@@ -3557,6 +3578,9 @@ export default function BreedTree({
   const dogChainTakeoverRef = useRef<((pointerId: number) => boolean) | null>(null);
   const dogOpenRef = useRef<((i: number) => boolean) | null>(null);
   const dogCloseRef = useRef<((n: Node, from?: { x: number; y: number }) => void) | null>(null);
+  // The last pair reported by the counter, so the callback fires on a CHANGE and
+  // not sixty times a second. See onCircleCount for what the numbers mean.
+  const circleCountRef = useRef<{ got: number; tot: number }>({ got: -1, tot: -1 });
   // The removed set is a ref, so closing circles changes nothing React can see.
   // This is the nudge that gets them off the screen.
   const [, setDogChainClosed] = useState(0);
@@ -4998,6 +5022,43 @@ export default function BreedTree({
        RE-ASKED EVERY FRAME, because circles pop and are collected while a chain
        is being drawn. One pass over the pit's own circles, and only while a
        chain lives: with no chain there is no pass at all. */
+    /* ---- THE DOG CIRCLE COUNTER ------------------------------------------
+       Counted here because this writer already runs once a frame with the pit's
+       own refs in hand, and refs are what the removal routes write: nothing
+       re-renders when a circle leaves, so a React-side count could not see it.
+
+       WHAT IS COUNTED. Every node that has had a body this round, minus the ones
+       the pit is no longer drawing. A node is NOT drawn if it has been removed,
+       by any route at all since every route ends in removedNodes, or if its body
+       is HELD, which takes it out of the world and hides the circle: that is the
+       one lifted to the learn layer, and it comes back if the player backs out.
+       The root and the echoes are not circles the player clears, so neither is
+       counted on either side.
+
+       IT DOES NOT READ THE ROUND-WON TEST'S ANSWER, on purpose. See the note on
+       the onCircleCount prop: a full counter over a running round is the whole
+       diagnostic.
+
+       THE find() IS ONLY ASKED ABOUT CIRCLES STILL IN PLAY, which shrinks as the
+       round goes on, and the whole block is skipped until the pit is live. */
+    if (fellRef.current) {
+      const ownedC = pitBodiesRef.current?.owned;
+      if (ownedC) {
+        let tot = 0, got = 0;
+        for (const o of ownedC) {
+          if (o.depth === 0 || isEcho(o)) continue;
+          tot++;
+          if (removedNodesRef.current.has(o)) { got++; continue; }
+          const ob = pitBodiesRef.current?.find(o) as { held?: boolean } | undefined;
+          if (ob?.held) got++;
+        }
+        const prev = circleCountRef.current;
+        if (prev.got !== got || prev.tot !== tot) {
+          circleCountRef.current = { got, tot };
+          onCircleCount?.(got, tot);
+        }
+      }
+    }
     const tg = twinGlowGRef.current;
     if (tg) {
       // The breed of the chain being drawn, or null. With no chain there is
