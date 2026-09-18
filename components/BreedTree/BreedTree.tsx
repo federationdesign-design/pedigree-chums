@@ -7018,7 +7018,9 @@ export default function BreedTree({
           stiffness: BOND_STIFFNESS, damping: BOND_DAMPING,
           render: { visible: false },
         });
-        Composite.add(world, c);
+        // ?nobonds=1 keeps every book below and skips only this: see the flag.
+        if (!noBondsOn) Composite.add(world, c);
+        if (spinDiagOn) spinMade++;
         const rec: Bond = { c, a: x.idx, b: y.idx, key, at: performance.now() };
         bondedPairs.add(key);
         for (const id of [x.idx, y.idx]) {
@@ -7034,7 +7036,10 @@ export default function BreedTree({
          every step. Both ends are unhooked, so bondsOf can never keep a record
          the other side has already dropped. */
       const releaseBond = (rec: Bond) => {
+        // A no-op under ?nobonds=1, where the constraint was never added: matter
+        // filters its list, so removing something absent costs nothing.
         Composite.remove(world, rec.c);
+        if (spinDiagOn) spinCut++;
         bondedPairs.delete(rec.key);
         for (const id of [rec.a, rec.b]) {
           const ol = bondsOf.get(id);
@@ -7338,8 +7343,44 @@ export default function BreedTree({
         try { return new URLSearchParams(window.location.search).get("spindiag") === "1"; } catch { return false; }
       })();
       let spinScored = 0;      // 1-point collision awards since the last sample
+      let spinMade = 0;        // bonds created since the last sample
+      let spinCut = 0;         // bonds released since the last sample
       let spinLastKE = 0;      // total kinetic energy at the last sample
       let spinLastAt = 0;      // when that sample was taken
+      /* ?nobonds=1 : THE ONE VARIABLE, ISOLATED (owner, 18 September 2026).
+
+         WHAT IT IS FOR. Measured on a worked level, waited well past still and
+         with nothing touched, the pit holds KE between 12 and 25 and will not
+         fall: it gains energy, sheds it and gains again, with 171 of 204 bodies
+         awake. A pit with zero inert chips sleeps perfectly at KE 0.000. Two
+         candidates: matter's CONSTRAINT solver, or its contact solver with 150
+         overlapping discs.
+
+         READING THE DEPENDENCY RATHER THAN GUESSING, in matter-js 0.19:
+           Resolver.postSolvePosition moves position AND positionPrev by the same
+           impulse, under the comment "move the body without changing velocity",
+           so overlap resolution cannot inject energy.
+           Constraint.solve moves position by the full force and touches
+           positionPrev only by the much smaller damping term, and matter derives
+           velocity as (position - positionPrev), so a distance constraint WRITES
+           VELOCITY every time it corrects a length.
+           Constraint.postSolveAll then calls Sleeping.set(body, false) with no
+           condition beyond a non-zero cached impulse, which is why enableSleeping
+           cannot beat it, and Constraint._warming 0.4 carries that impulse on for
+           several steps after the push stops.
+
+         SO THIS FLAG SKIPS ONE LINE, the Composite.add that puts the constraint
+         in the world, and changes nothing else: the pair is still recorded, still
+         capped, still counted, still swept and still expired, so every column on
+         the readout means exactly what it meant before. If KE collapses and the
+         bodies sleep, the constraints are the source and it is proved on the
+         device rather than argued from the source of a dependency. If KE stays
+         between 12 and 25, the bonds are innocent and it is the contact solver.
+
+         WITH THE FLAG OFF NOTHING ABOUT THE PIT CHANGES. */
+      const noBondsOn = (() => {
+        try { return new URLSearchParams(window.location.search).get("nobonds") === "1"; } catch { return false; }
+      })();
       const FX_COOLDOWN = 220;
       const FX_MIN_PS = vps(0.05); // minimum impact speed to flash, px/step
       const isDragged = (b: unknown) => dragRef.current?.body === b;
@@ -7711,11 +7752,19 @@ export default function BreedTree({
           const wBonds = wIdx === undefined ? 0 : (bondsOf.get(wIdx)?.length ?? 0);
           const wSpd = worst ? Math.hypot(worst.velocity.x, worst.velocity.y) : 0;
           const dKE = spinLastAt ? ke - spinLastKE : 0;
+          const per = (n: number) => (elapsed ? (n / elapsed).toFixed(1) : "-");
           spinDiagRef.current = [
-            `pts/s ${elapsed ? (spinScored / elapsed).toFixed(1) : "-"}  drag ${dragRef.current ? "YES" : "none"}  bodies ${bods.length}  awake ${awake}  asleep ${bods.length - awake}`,
-            `chips ${chips.length} (inert ${inert})  bonds ${bonds}  KE ${ke.toFixed(3)}  dKE ${dKE >= 0 ? "+" : ""}${dKE.toFixed(3)}${dKE > 0 && !dragRef.current ? "  <-- ENERGY IN" : ""}`,
+            `pts/s ${per(spinScored)}  drag ${dragRef.current ? "YES" : "none"}  bodies ${bods.length}  awake ${awake}  asleep ${bods.length - awake}${noBondsOn ? "   ?nobonds=1 NO CONSTRAINTS IN WORLD" : ""}`,
+            /* made/s and cut/s turn the re-bonding into a number. A steady bond
+               count can mean the sweep is not running OR that pairs are being
+               re-made as fast as it cuts them, and only these two tell those
+               apart: made near zero is a stalled sweep, made and cut both high
+               and roughly equal is the churn. */
+            `chips ${chips.length} (inert ${inert})  bonds ${bonds} (made/s ${per(spinMade)} cut/s ${per(spinCut)})  KE ${ke.toFixed(3)}  dKE ${dKE >= 0 ? "+" : ""}${dKE.toFixed(3)}${dKE > 0 && !dragRef.current ? "  <-- ENERGY IN" : ""}`,
             `sumW ${sumW.toFixed(3)}  maxW ${maxW.toFixed(4)} on ${worst?.plugin?.kind ?? "?"}${wIdx === undefined ? "" : ` #${wIdx}`} bonds ${wBonds} spd ${wSpd.toFixed(2)}`,
           ];
+          spinMade = 0;
+          spinCut = 0;
           spinScored = 0;
           spinLastKE = ke;
           spinLastAt = nowRaf;
