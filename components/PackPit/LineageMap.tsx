@@ -2990,12 +2990,38 @@ export default function LineageMap({
                EXTREMELY RARE 2.9, against a floor of 9 in this very expression.
                Four of the five would be a smudge.
 
+               STILL ACCEPTED AS OF 18 SEPTEMBER, after a reversal that was
+               reversed again. Two changes were considered and measured:
+                 THE LABEL ONE POINT SMALLER. Shipped, for its own sake, and it
+                 clears nothing: see the note on the cap above.
+                 RAISING THE BAND BY 5 UNITS. NOT shipped, because it goes the
+                 wrong way. The label already sits BELOW the button, its centre at
+                 y 43.2 against the button's bottom at 37.19, so raising moves it
+                 INTO the box: the half-width budget falls from 13.8 to 3.6.
+               What would actually clear it is a DROP of about 19 units, labelY
+               from R*0.566 to about R*0.788, which puts the band 79% of the way
+               down the radius and narrows the chord from 140.1 to 104.6, taking
+               EXTREMELY RARE from 13.5 to about 10.1 against the floor of 9 in the
+               same expression. Declined as a worse trade than the overlap.
+
                THE THREE THINGS THAT WOULD FIX IT, all declined by the owner as
                changes to a signed-off layout: move the Complete button, push
                labelY down while doneRing is true, or cut the tilt (flat clears by
                10.9 with no size change at all, and anything at 8 degrees or less
                clears). The overlap stays. Do not shrink the label to dodge it. */
-            const fs = Math.max(9, Math.min(R * 0.208, (chord * 0.92) / (0.68 * band.label.length)));
+            /* THE CAP COMES DOWN ONE MORE POINT, 0.208 -> 0.196, 18 September
+               2026 (owner), 17.68 to 16.68 on a 390 phone. Wanted for its own
+               sake: the text reads a little smaller.
+
+               IT CLEARS NOTHING, and that is measured rather than hoped. The cap
+               only binds the SHORT labels: a width-fitted one has a half-width of
+               0.46 * chord whatever its character count, so EXTREMELY RARE does
+               not move at all and stays at 13.5. Per tier, half-width before and
+               after: RARE 24.0 -> 22.7, COMMON 36.1 -> 34.0, UNCOMMON 48.1 ->
+               45.3, VERY COMMON 64.5 -> 62.3, EXTREMELY RARE 64.5 unchanged. The
+               budget before the label enters the Complete button's box is 13.8, so
+               every tier still crosses it. See the accepted-overlap note below. */
+            const fs = Math.max(9, Math.min(R * 0.196, (chord * 0.92) / (0.68 * band.label.length)));
             // rect and text share one rotate(): the rect's top edge becomes the
             // diagonal chord, the text baseline tilts with it. The rect is drawn
             // oversized so the tilt never exposes a corner; the circle clip cuts it.
