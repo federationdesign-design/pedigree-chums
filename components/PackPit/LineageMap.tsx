@@ -413,6 +413,7 @@ export default function LineageMap({
   rootRadius,
   ringColor,
   rarityTier,
+  tierOf,
   strongBg = false,
   initialDepth,
   bounded = false,
@@ -436,6 +437,15 @@ export default function LineageMap({
   // Mini pit only: the rarity tier of the lifted dog, drawn as a coloured band
   // across the bottom of the circle. Set for every lifted dog (common included).
   rarityTier?: "extremelyRare" | "rare" | "uncommon" | "common" | "veryCommon";
+  /* THE TIER OF ANY BREED BY NAME, for the cards (owner, 18 September 2026).
+     rarityTier above is the LIFTED DOG's tier, one value for the whole layer. The
+     pop-out cards are that dog's ancestors and each is its own breed, so each has
+     its own tier, and this file cannot work one out: rarityTier() lives in
+     BreedTree and BreedTree already imports this file, so importing it back would
+     be circular. The caller holds both halves and passes the function down.
+     Optional, and every caller that does not supply it falls back to the level's
+     own tier, then to ringColor, so nothing else changes. */
+  tierOf?: (name: string) => "extremelyRare" | "rare" | "uncommon" | "common" | "veryCommon";
   // The heavier wash. It used to ride on `circular`, which was fine while the
   // only caller wanting it also wanted round cards. The chum family tree wants
   // the main pit's rectangular card AND the mini pit's darker background, so the
@@ -4232,13 +4242,62 @@ className={[
                     isDupImg(c.img) && !isTopOfStack(c) && !PACK_BREEDS.has(c.name) ? styles.pickCardStack : "",
                     (placedSet.has(c.id) || stackedIds.has(c.id)) ? (imagesAllHome.has(PACK_IMG.get(c.name) ?? c.img) ? styles.pickCardDone : styles.pickCardWaiting) : "",
                   ].filter(Boolean).join(" ")}
-                    /* Mini pit: a circle that popped out of a dog wears that
-                       dog's ring colour, so it is obvious where it came from.
-                       The main pit keeps its own blue and white scheme. */
-                    /* Colour from the dog it popped out of, weight from the node
-                       itself. vectorEffect is non-scaling-stroke on this rect, so
-                       the number is screen pixels and the two are comparable. */
-                    style={circular ? { ...(ringColor ? { stroke: ringColor } : null), ...(c.ringW != null ? { strokeWidth: c.ringW } : null) } : undefined} />}
+                    /* THE RIM IS THE RARITY COLOUR NOW (owner, 18 September 2026).
+                       It was ringColor, the lifted dog's own ring colour from the
+                       diagram, so that a card said where it came from. The level's
+                       tier says something the player cannot otherwise see on a card,
+                       and where it came from is already obvious from the node it now
+                       sits centred on.
+
+                       IT IS THE CARD'S OWN TIER, not the level's. Each card is its
+                       own breed, so each rim says something the player cannot see
+                       anywhere else on that card. This file cannot work a tier out
+                       for itself, because rarityTier() lives in BreedTree and
+                       BreedTree already imports this file, so the caller passes the
+                       function down as tierOf. Falls back to the level's tier and
+                       then to ringColor where no function is supplied, so the main
+                       pit and the learn area are untouched.
+
+                       READ THE SAME WAY as the rarity band, the two rings and the
+                       progress arc, so all five agree about a tier.
+
+                       IT DOES NOT FOLLOW doneRing, deliberately, unlike those four.
+                       They sit on the lifted CIRCLE, which is the thing that
+                       completes. A card is a different object with its own done
+                       state, .pickCardDone, driven by imagesAllHome per image rather
+                       than by the level, and two meanings of "done" on one rim would
+                       be worse than none.
+
+                       THE TWO DARK TIERS ARE INVISIBLE AGAINST THE WASH AND THAT IS
+                       ACCEPTED (owner). Measured against the lift wash, which
+                       composites to about #0d5a87 at centre and #083d62 at edge:
+                         rare           #2547c4   1.02 / 1.50
+                         extremely rare #4d2e91   1.34 / 1.14
+                         uncommon       #5dbf86   3.27 / 5.00
+                         common         #f47421   2.60 / 3.97
+                         very common    #ffd23e   5.14 / 7.84
+                       The white it replaces read 9.24 and 11.1 on those two. Against
+                       the card's own PHOTOGRAPH no number can be given, because a
+                       photograph has no single luminance, and the rim is 2.4px.
+                       lighten(), a few hundred lines above in the rarity ring block,
+                       is the fix if it ever matters: it keeps the hue and lifts the
+                       colour off the wash. Do not rediscover this.
+
+                       KNOWN AND UNCHANGED: this inline style applies whenever the
+                       layer is circular, so it also overrides .pickCardWaiting and
+                       .pickCardDone, which therefore do not show on the lift. That
+                       is pre-existing, it was true of ringColor too, and restoring
+                       them would be a behaviour change nobody asked for. Flagged
+                       rather than fixed.
+
+                       Weight still comes from the node itself. vectorEffect is
+                       non-scaling-stroke on this rect, so the number is screen
+                       pixels and the two are comparable. */
+                    style={circular ? (() => {
+                      const cardTier = tierOf ? tierOf(c.name) : rarityTier;
+                      const rim = cardTier ? RARITY_BAND[cardTier].bg : ringColor;
+                      return { ...(rim ? { stroke: rim } : null), ...(c.ringW != null ? { strokeWidth: c.ringW } : null) };
+                    })() : undefined} />}
                   {INSTR_NAMES.has(breed.name) && placedSet.has(c.id) && (() => { const words = c.name.split(" "); let l1="",l2=""; const mc=Math.floor(CW_TYPE/7.5); for(const w of words){if((l1+(l1?" ":"")+w).length<=mc)l1+=(l1?" ":"")+w;else l2+=(l2?" ":"")+w;} const ls={fill:"#ffffff",fontFamily:'"Luckiest Guy",system-ui,sans-serif',fontSize:12,fontWeight:400,pointerEvents:"none" as const}; const by1=c.cardY+CW/2+48; const by2=c.cardY+CW/2+40; return l2?(<text x={c.cardX} textAnchor="middle" style={ls}><tspan x={c.cardX} y={by2}>{l1}</tspan><tspan x={c.cardX} dy={20}>{l2}</tspan></text>):(<text x={c.cardX} y={by1} textAnchor="middle" dominantBaseline="central" style={ls}>{l1}</text>); })()}
                   {/* The status dot is reference information, so it belongs to
                       the learning side. The mini pit is a game: no dot there. */}
