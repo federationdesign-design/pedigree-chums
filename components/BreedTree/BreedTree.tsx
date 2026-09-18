@@ -1355,6 +1355,28 @@ const PIT_FULL_COVER = 0.72 / PIT_SHRINK;
    It was an inline literal inside computeFull. Named here so it sits with the
    other pit constants and is a one-line tune from now on. */
 const PIT_FULL_ZONE_PX = 90;
+/* THE ONE YELLOW EVERY LIVE PERCENTAGE CHIP WEARS (owner, 18 September 2026,
+   seen on Kerry Blue Terrier: two different yellows side by side in one pit).
+
+   WHAT WAS HAPPENING. The chip fill read `item.green ? "#ffed00" : "#ffd23e"`,
+   two hexes written into the render. `green` means the chip's picture had
+   already been placed on the layer it scattered from, and only ONE of the five
+   spawn routes ever sets it: the learn-layer scatter. The initial seed,
+   popChildren twice over, dogClose and the solo leaf all leave it false. So a
+   pit holding chips from a completed learn layer AND from the drop showed both
+   colours at once, which read as a fault rather than as a state.
+
+   ONE SOURCE NOW. Every live chip is lemon, from here, and the render carries no
+   chip hex at all. #ffed00 is the lemon rolled out across the reveal card, the
+   shortlist bar, the knockout round and the superpower pages.
+
+   WHAT `green` STILL DOES, because this does not retire it: the charge count
+   (20 against 10), the bond rule that only lets like stick to like, and the
+   INERT colour, where a spent learnt chip goes white and every other spent chip
+   goes blue. That last one is now the only place the flag shows on screen, so
+   two chips that look identical alive can still die different colours. Flagged
+   to the owner, left alone deliberately. */
+const CHIP_FILL = "#ffed00";
 // The yellow percentage badge, drawn and collided at this radius. Doubled from
 // 46: they were easy to lose against the circles, on the start screen and in
 // the pit alike.
@@ -10217,7 +10239,7 @@ export default function BreedTree({
                    inert, because it is navy in both states now. Ordinary
                    badges keep the blue inert fill (white on white would
                    disappear). */
-                <circle cx={0} cy={0} r={item.r} style={{ fill: inert ? (item.green ? "#ffffff" : "#0c5b92") : item.green ? "#ffed00" : item.label ? "#5cc4ee" : "#ffd23e", stroke: "#0a3a57", /* THE % BADGE'S RIM MATCHES THE NODE IT CAME FROM, 9 Sept 2026
+                <circle cx={0} cy={0} r={item.r} style={{ fill: inert ? (item.green ? "#ffffff" : "#0c5b92") : item.label ? "#5cc4ee" : CHIP_FILL, stroke: "#0a3a57", /* THE % BADGE'S RIM MATCHES THE NODE IT CAME FROM, 9 Sept 2026
                      (owner). It was a flat 0.19 of its own radius. ringFrac(1) is
                      0.09, the weight a first-generation circle wears on the lifted
                      screen, read from the shared RING_FRAC table rather than typed
