@@ -9589,6 +9589,12 @@ export default function BreedTree({
        THE FAULT WAS NOT THE CASING. It was a list of group names written out twice
        with the fourth added to only one copy. There is ONE list now and clearPath
        walks it, so a fifth group cannot be half-added again. */
+    /* LANDED UNDER ONE COMMIT WITH THE LIGHT-BLUE FILL, 76476552. They were built
+       as two and were meant to be pushed as two; the paste-able applied both
+       patches before it reached the commit, so the commit took the whole tree.
+       If you are reading 76476552 looking for the casing fix, the fill work
+       (DOG_SINGLE_FILL, chSingle, pitBreedCount) is in the same commit and is a
+       separate change with its own reasoning below. */
     const CHAIN_GROUPS = ["glow", "casing", "core", "dots"] as const;
     const clearPath = () => {
       const g = chainGRef.current;
