@@ -2647,7 +2647,30 @@ export default function LineageMap({
             const ringW = rootRingW + 6;            // the crisp ring's own width
             const r0 = R + rootRingW / 2;           // the ring's radius
             const ringOuter = r0 + ringW / 2;       // ...its outer edge, where the glow starts
-            const hex = RARITY_BAND[rarityTier].bg;
+            /* GREEN WINS ONCE THE CIRCLE IS READY (owner, 18 September 2026).
+
+               THE GREEN RING HAD NEVER BEEN VISIBLE ON THE LIFT. The root card's
+               own ring goes green on framesDone, a few lines above, and this crisp
+               rarity ring is drawn LAST, on top, at the same centre line and six
+               pixels wider, so it did not overlap the green ring, it buried it.
+               rarityTier is always set on the lift, so the gate above is always
+               true and the green was always covered.
+
+               ONE EXPRESSION IS THE WHOLE FIX, because `hex` feeds both this ring
+               and, through lighten(), the three glow bands, so the rim light turns
+               green with it rather than bleeding yellow round a green ring.
+               Re-ordering the layers was the alternative and is worse: the extra
+               six pixels would show as a coloured fringe outside the green.
+
+               framesDone || packed, matching the ring underneath exactly. Packing
+               the cards away is the other way to finish and the two rings
+               disagreeing on that would be this same bug again.
+
+               WHAT IT COSTS. This ring is the rarity signal on the lift, so the
+               tier stops being shown at the moment the dog is ready. Accepted by
+               the owner: the rarity band under the card still carries the tier,
+               and ready is the more urgent message. */
+            const hex = (framesDone || packed) ? "#22c55e" : RARITY_BAND[rarityTier].bg;
             const nHex = parseInt(hex.slice(1), 16);
             const cr = (nHex >> 16) & 255, cg = (nHex >> 8) & 255, cb = nHex & 255;
             const toHex = (r: number, g: number, b: number) => `#${((1 << 24) + (Math.round(r) << 16) + (Math.round(g) << 8) + Math.round(b)).toString(16).slice(1)}`;
