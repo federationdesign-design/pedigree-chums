@@ -853,6 +853,28 @@ export function resetToys() {
 // A run of dogs is an open chain, so two is a chain. Its own figure rather than
 // CHAIN_MIN_CARDS, which is the CARDS' loop minimum and means something else.
 const DOG_CHAIN_MIN = 2;
+/* DOG CIRCLES DO NOT HAVE TO TOUCH (owner, 18 September 2026). Any circle of the
+   breed can start a chain and any circle of the breed can join it, wherever it
+   sits in the pit. The chum cards are untouched and still must touch.
+
+   THIS IS THE KIND'S SLACK, not a second rule: the shared gesture measures every
+   link against ChainKind.slack in all four places it asks (the join, the live
+   strain check, the release judgement and the circuit close), so Infinity here
+   means "no gap is ever too wide" and nothing else has to know about it.
+
+   WHAT STILL BOUNDS A CHAIN, since the gap no longer does. In the order they
+   bite:
+     1. A WRONG-BREED CIRCLE UNDER THE FINGER KILLS THE CHAIN, and the sweep
+        samples the finger's path every CHAIN_SAMPLE_PX, so a long reach has to
+        be steered through open floor. This is the real limit, not the clock.
+     2. A circle already in the chain, re-entered, kills it.
+     3. The path may not cross itself, which bites far harder once links are
+        long.
+     4. The pool: same breed, in the pit, not already removed.
+     5. The join clock, chainAllowanceMs, which is last and not first.
+   Owner's ruling, 18 September 2026: the kill at 1 stays, for both kinds, until
+   it has been played. */
+const DOG_CHAIN_SLACK = Infinity;
 // WHITE, like the card chain (owner, 18 September 2026). It shipped in the site
 // yellow for one day as the deliberate opposite of the cards; both paths are now
 // white, and so is the question mark highlight below.
@@ -4581,20 +4603,32 @@ export default function BreedTree({
       }
     });
     /*        THE GLOW ON AVAILABLE TWINS. Any circle with another of its own breed
-       TOUCHING it is a circle a chain can be started from, and it says so by
-       wearing the chain path's own glow round its ring.
+       ANYWHERE IN THE PIT is a circle a chain can be started from, and it says so
+       by wearing the chain path's own glow round its ring.
+
+       THE TOUCHING CONDITION HAS GONE, 18 September 2026 (owner), with the one
+       on the join and the one on startable. The glow's contract is unchanged and
+       is the reason this had to move with them: what glows and what can be
+       chained can never disagree.
+
+       IT IS NOISIER NOW, and deliberately so. On a duplicate-heavy level such as
+       Scottish Terrier nearly every circle glows, because nearly every circle
+       really can start a chain. Owner's ruling: ship it honest and look at it on
+       the device. If it reads as noise the answer is to light the circles of the
+       LIVE chain's breed instead, which is the scarce information once the gap
+       no longer matters, and dogChainBreedRef already carries it.
 
        IT IS THE CHAIN'S GLOW, NOT A SECOND ONE: the same bt-chain-glow filter
        the path's own glow group uses. A blurred copy of the ring is drawn on a
        layer BEHIND the circles, exactly as the path draws a blurred copy of its
        line under the crisp one, so the picture inside the circle is untouched.
 
-       RE-ASKED EVERY FRAME, because circles drift in and out of contact as the
-       pit settles. The work is one pass over the pit's own circles to group them
-       by breed, then one pass within each breed, so a pit of a few dozen costs
-       almost nothing and a pit of one breed costs a few hundred comparisons.
-       The test is the same name test, geometry and CHAIN_TOUCH_SLACK a join
-       uses, so what glows and what can be chained can never disagree. */
+       RE-ASKED EVERY FRAME, because circles pop and are collected while the pit
+       runs, so a breed can lose its last duplicate at any moment. The work is now
+       ONE pass over the pit's own circles to group them by breed, and no pass
+       within each breed at all: the geometry that cost the inner loop has gone
+       with the touching rule. The test is the same name test startable uses, so
+       what glows and what can be chained can never disagree. */
     const tg = twinGlowGRef.current;
     if (tg) {
       const owned = pitBodiesRef.current?.owned;
@@ -4607,17 +4641,10 @@ export default function BreedTree({
           if (list) list.push(o); else byBreed.set(o.data.name, [o]);
         }
         for (const list of byBreed.values()) {
+          // One of its kind is not a duplicate, so it cannot start a chain.
           if (list.length < 2) continue;
-          for (let a = 0; a < list.length; a++) {
-            const A = list[a];
-            let touching = false;
-            for (let b = 0; b < list.length && !touching; b++) {
-              if (b === a) continue;
-              const B = list[b];
-              const gap = Math.hypot(B.x - A.x, B.y - A.y) - A.r - B.r;
-              touching = gap / (Math.max(A.r, B.r) * 2) <= CHAIN_TOUCH_SLACK;
-            }
-            if (touching) rings.push({ x: (A.x - v[0]) * k, y: (A.y - v[1]) * k, r: drawR(A, v, k), w: strokeWidthFor(A) * strokeK(v) });
+          for (const A of list) {
+            rings.push({ x: (A.x - v[0]) * k, y: (A.y - v[1]) * k, r: drawR(A, v, k), w: strokeWidthFor(A) * strokeK(v) });
           }
         }
       }
@@ -8188,6 +8215,12 @@ export default function BreedTree({
       idAt: (cx: number, cy: number) => number | null;    // what is under a point
       geo: (i: number) => ChainSq | null;                 // where and how big
       gapShare: (a: ChainSq, b: ChainSq) => number;       // gap as a share of size
+      /* HOW WIDE A GAP THIS KIND'S LINKS MAY HOLD, as a share of size, and the
+         one place the touching rule lives. Every test reads it: the join, the
+         per-frame strain check, the release judgement and the circuit close. The
+         cards keep CHAIN_TOUCH_SLACK; the circles take DOG_CHAIN_SLACK, which is
+         Infinity, so they do not have to touch at all. */
+      slack: number;
       busy: (i: number) => boolean;                       // in flight, cannot join
       taken: (i: number) => boolean;                      // gone since it joined
       startable: (i: number) => boolean;                  // may open a chain
@@ -8210,6 +8243,7 @@ export default function BreedTree({
       idAt: cardAt,
       geo,
       gapShare: (a, b) => chainSquareGap(a, b) / (Math.max(a.h, b.h) * 2),
+      slack: CHAIN_TOUCH_SLACK, // cards touch, exactly as they always have
       busy: (i) => chumFlyRef.current.has(i),
       taken: (i) => chumTakenRef.current.has(i),
       startable: () => true,
@@ -8246,30 +8280,22 @@ export default function BreedTree({
     // In the pit and still there: owned by the physics and not removed.
     const dogInPit = (n: Node | null): n is Node =>
       !!n && !!pitBodiesRef.current?.owned.has(n) && !removedNodesRef.current.has(n);
-    // How many circles of this breed are in the pit right now. Asked at the
-    // moment of the press and never cached: circles pop and go constantly.
-    // The hidden root and echoes (a circle named after its own parent) are not
-    // duplicates, so neither is counted.
-    // A circle as drawn, from the node itself. The kind's geo() is this by index.
-    const dogGeoOf = (n: Node): ChainSq | null => {
-      if (!dogInPit(n)) return null;
-      const v = viewRef.current;
-      const k = SIZE / v[2];
-      return { x: (n.x - v[0]) * k, y: (n.y - v[1]) * k, a: 0, h: n.r * k };
-    };
-    /* Is another circle of the same breed TOUCHING this one? The same question a
-       join asks, asked before the chain starts, so a circle only becomes a
-       starter when a chain could really be drawn from it. Costs one pass over
-       the pit's own circles, at the press and nowhere else. */
-    const dogTouchingTwin = (n: Node): boolean => {
-      const a = dogGeoOf(n);
+    /* Is there another circle of this breed in the pit at all? Asked at the
+       moment of the press and never cached: circles pop and go constantly. The
+       hidden root and echoes (a circle named after its own parent) are not
+       duplicates, so neither is counted.
+
+       NO GEOMETRY, 18 September 2026 (owner). This used to ask whether a twin
+       was TOUCHING, because a join asked the same. A join no longer asks it, so
+       neither does this: the two are still the same question, which is the
+       property that matters. See DOG_CHAIN_SLACK. */
+    const dogHasTwin = (n: Node): boolean => {
       const owned = pitBodiesRef.current?.owned;
-      if (!a || !owned) return false;
+      if (!owned) return false;
       for (const o of owned) {
         if (o === n || o.depth === 0 || isEcho(o) || o.data.name !== n.data.name) continue;
         if (removedNodesRef.current.has(o)) continue;
-        const b = dogGeoOf(o);
-        if (b && chainCircleGapShare(a, b) <= CHAIN_TOUCH_SLACK) return true;
+        return true;
       }
       return false;
     };
@@ -8289,31 +8315,28 @@ export default function BreedTree({
         return { x: (n.x - v[0]) * k, y: (n.y - v[1]) * k, a: 0, h: n.r * k };
       },
       gapShare: chainCircleGapShare,
+      slack: DOG_CHAIN_SLACK, // no touching rule at all: see the constant
       busy: (i) => !dogInPit(dogNode(i)),
       taken: (i) => !dogInPit(dogNode(i)),
-      // Duplicates only. A one-off dog cannot begin a chain, which is the whole
-      // rule: a chain is for a pit holding the same breed several times over.
-      /* A STARTER NEEDS A TWIN IT COULD ACTUALLY REACH (18 September 2026).
+      /* DUPLICATES ONLY, AND NOTHING ELSE (18 September 2026, owner). A one-off
+         dog cannot begin a chain, which is the whole rule: a chain is for a pit
+         holding the same breed several times over.
 
-         WHAT WAS WRONG. This asked whether the breed had duplicates ANYWHERE in
-         the pit, while a join asks whether the circle under the finger is the
-         same breed AND touching. Both compare the name the same way, exactly,
-         so the names were never the problem: the SCOPE was. On Scottish Terrier
-         the tree holds three Earth Dogs, three Ancient Celtic earth dogs and
-         three Early Badger hunting dogs, so once the pit has popped, almost
-         every circle has a duplicate somewhere, every press qualified as a
-         starter, the gate took it, and no circle could be dragged. The join then
-         failed on the neighbour, which is a different breed.
+         THE TOUCHING CONDITION HAS GONE WITH THE JOIN'S. For a day a starter
+         also needed a twin touching it, so that what could start a chain and
+         what could join one were the same question. They still are: a join now
+         asks only for the breed, so this asks only for the breed too.
 
-         THE TEST IS NOW THE JOIN'S OWN. A circle may start a chain only if
-         another circle of the same breed is TOUCHING it, by the same name test,
-         the same geometry and the same CHAIN_TOUCH_SLACK a join uses. So a
-         starter is a circle a chain can really be drawn from, and everything
-         else drags as it always did. */
+         THE DRAG. Making almost every circle on a duplicate-heavy level a
+         starter is exactly what broke dragging on Scottish Terrier before, when
+         a starter press disarmed the mouse constraint outright. It no longer
+         does: the press arms the drag as it always did and only a movement past
+         DOG_CHAIN_ARM_PX hands the pointer to the chain. That is the commit
+         that follows this one, and this rule leans on it. */
       startable: (i) => {
         const n = dogNode(i);
         if (!dogInPit(n) || n.depth === 0 || isEcho(n)) return false;
-        return dogTouchingTwin(n);
+        return dogHasTwin(n);
       },
       joinBlock: (ch, i) => {
         const first = dogNode(ch.cards[0]), n = dogNode(i);
@@ -8374,7 +8397,7 @@ export default function BreedTree({
       const a = K.geo(last), b = K.geo(first);
       if (!a || !b) return "could not be measured";
       const share = K.gapShare(a, b);
-      if (share > CHAIN_TOUCH_SLACK) return `#${last} not touching #${first}, gap ${Math.round(share * 100)}%`;
+      if (share > K.slack) return `#${last} not touching #${first}, gap ${Math.round(share * 100)}%`;
       // Segment 0 starts at the first card and the last segment ends at the last
       // card; the crossing test ignores a shared end, so testing both is safe.
       for (let s = 0; s < cards.length - 1; s++) {
@@ -8424,7 +8447,8 @@ export default function BreedTree({
       const share = K.gapShare(a, b);
       // A card that does not touch the one before it: the chain dies. It used
       // to refuse and carry on, which read as the gesture being ignored.
-      if (share > CHAIN_TOUCH_SLACK) {
+      // A kind whose slack is Infinity never reaches this, by design.
+      if (share > K.slack) {
         killChain(ch); // a stray card, not touching the one before it
         return;
       }
@@ -8666,7 +8690,7 @@ export default function BreedTree({
         const a = K.geo(ai), b = K.geo(bi);
         if (!a || !b) return `#${!a ? ai : bi} could not be measured`;
         const share = K.gapShare(a, b);
-        if (share > CHAIN_TOUCH_SLACK) return `BROKEN LINK #${ai}-#${bi}, gap ${Math.round(share * 100)}% at release`;
+        if (share > K.slack) return `BROKEN LINK #${ai}-#${bi}, gap ${Math.round(share * 100)}% at release`;
       }
       return null;
     };
@@ -8692,7 +8716,9 @@ export default function BreedTree({
         const a = ch.kind.geo(ai), b = ch.kind.geo(bi);
         if (!a || !b) continue;
         const share = ch.kind.gapShare(a, b);
-        if (share <= CHAIN_TOUCH_SLACK) { ch.strain.delete(s); continue; }
+        // A kind with no touching rule can never strain and can never break:
+        // every share is inside an infinite slack, so every link stays healthy.
+        if (share <= ch.kind.slack) { ch.strain.delete(s); continue; }
         const st = ch.strain.get(s);
         if (!st) { ch.strain.set(s, { since: now, share }); continue; }
         st.share = share;
