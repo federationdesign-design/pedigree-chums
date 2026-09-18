@@ -181,8 +181,19 @@ const BAND_SLIDE_DELAY = "0.65s";
 // distance from the dog to its direct ancestors (mirrors the canvas hover-fan)
 /* ROOT + 96 -> ROOT + 72, the first ring 25% shorter, 16 September 2026 (owner:
    the connectors coming off the central chum card are too long). Only the 96 is
-   cut: ROOT is the card's own radius and the ring has to clear it. */
-const RING1 = ROOT + 72;
+   cut: ROOT is the card's own radius and the ring has to clear it.
+
+   THE 72 IS BROKEN OUT, 18 September 2026 (owner), because the lift needs the
+   same DAYLIGHT round a different card. RING1 is built from ROOT, the default
+   root radius, but the lifted layer draws its root at liftR, which is computed
+   per screen and is far larger: 85 against ROOT's 58 on a 390 phone. So the
+   first ring was placed 130 out from a card whose own radius was 85, and the
+   ring's nodes sat BEHIND the card with only their percentage badges peeking out
+   above it, which read as badges floating with nothing under them.
+   RING1_GAP is the clearance, RING1 is the default card plus it, and the walk
+   adds it to liftR instead when the layer is the lift. */
+const RING1_GAP = 72;
+const RING1 = ROOT + RING1_GAP;
 // distance added at each deeper generation
 const RSTEP = 128;
 // the dog's first ring sweeps the same 270 degrees as the hover-fan, centred above it
@@ -1383,7 +1394,20 @@ export default function LineageMap({
       // below. RING1 is the root's own first ring and is left alone: it is
       // measured off ROOT, the card, which does not shrink.
       const rstep = RSTEP * (liftOrChum && isMobile ? PIT_NODE_SCALE * 0.9 : 1); // the same 0.9 as SPACING_K below
-      const dist = depth === 0 ? RING1 : (INSTR_NAMES.has(breed.name) ? rstep * 1.2 : rstep);
+      /* THE FIRST RING CLEARS THE CARD IT COMES OFF, whichever card that is
+         (owner, 18 September 2026). RING1 is ROOT + RING1_GAP and ROOT is the
+         DEFAULT root radius, so it is right for every mode except the lift, whose
+         root is liftR and is much bigger. The lift takes the same gap measured
+         from its own card. liftR is declared well above this walk, so it is in
+         scope here; RING1 is untouched and every other mode keeps it.
+
+         WHAT IT MOVES. Only ring 1. Every deeper generation is placed relative to
+         its PARENT, rOf(n) + rOf(k) + NODE_POKE on the clock path, so the tree
+         translates outward rigidly rather than being compressed: the spacing
+         between generations is unchanged. On a 390 phone the shift is
+         liftR + 72 - 130, which is 27 layout units, 21.6 screen px. */
+      const ring1 = circular ? liftR + RING1_GAP : RING1;
+      const dist = depth === 0 ? ring1 : (INSTR_NAMES.has(breed.name) ? rstep * 1.2 : rstep);
       // mini pit: the connector is aware of both circles' real sizes - the
       // child clears the parent's EDGE by 50px whatever size either circle is
       const rOf = (nd: Node): number => {
