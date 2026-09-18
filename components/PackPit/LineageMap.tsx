@@ -2837,7 +2837,31 @@ export default function LineageMap({
             // Fit-to-chord at the WORD's line (narrower than the top of the wedge),
             // so a long label never runs past the rim on the small phone card.
             const chord = 2 * Math.sqrt(Math.max(0, R * R - labelY * labelY));
-            const fs = Math.max(9, Math.min(R * 0.22, (chord * 0.92) / (0.6 * band.label.length)));
+            /* TWO LIMITS, AND THEY GOVERN DIFFERENT TIERS (owner, 18 September
+               2026, measured on a 390 phone where R is 85 and the chord 140.1).
+
+               THE CAP, 0.22 -> 0.208, one point down. It bound FOUR of the five
+               tiers at 18.7px: rare, common, uncommon and very common all drew at
+               exactly the same size whatever their length, because their width fit
+               came out above it. They now draw at 17.7.
+
+               THE WIDTH CONSTANT, 0.6 -> 0.68, and this is what EXTREMELY RARE
+               needed. It is the only tier the fit governs rather than the cap, at
+               15.3px, so taking a point off the cap would have done nothing for
+               it. 0.6 em a character is too generous for Luckiest Guy, a wide
+               display face whose caps average nearer 0.68, which is why the fit
+               said 15.3 would sit inside the chord when it does not. Extremely
+               rare now comes out at 13.5 and very common at 17.2, which is under
+               the new cap, so it becomes width-fitted too.
+
+               THE COMPLETE BUTTON IS NOT WHAT THIS FIXES. Measured: the button
+               spans y -20.9 to +31.1 and the tilted label's right end reaches
+               (78.9, 15.0), so the label climbs through the button's box. Smaller
+               text shortens the baseline and pulls that end out of the way, which
+               is a workaround. The fix is to move the button, push labelY down
+               while doneRing is true, or cut the 26 degree tilt, and none of those
+               is done here because each moves a signed-off layout. */
+            const fs = Math.max(9, Math.min(R * 0.208, (chord * 0.92) / (0.68 * band.label.length)));
             // rect and text share one rotate(): the rect's top edge becomes the
             // diagonal chord, the text baseline tilts with it. The rect is drawn
             // oversized so the tilt never exposes a corner; the circle clip cuts it.
@@ -2884,17 +2908,25 @@ export default function LineageMap({
                         colour. The same trap the ring fell into twice: the fix was
                         invisible because the symptom matched the bug.
 
-                        THE TEXT STAYS NAVY, and the owner asked for white. White
-                        on #22c55e measures 2.28:1, which fails: it is worse than
-                        the white-on-light-blue at 1.98 and the white-on-yellow at
-                        1.44 that were both rejected earlier in this sequence.
-                        Navy is 5.25:1 and is what the done band already used. If
-                        white is wanted, the band's green has to darken to about
-                        #15803d (5.02) or #166534 (7.13), and it would then no
-                        longer match the rings. Flagged to the owner rather than
-                        shipped unreadable. */}
+                        THE TEXT IS WHITE ON EVERY STATE (owner, 18 September
+                        2026), asked for knowing the numbers, which are these:
+                          extremely rare #4d2e91  9.93  passes
+                          rare           #2547c4  7.56  passes
+                          uncommon       #5dbf86  2.27  FAILS
+                          common         #f47421  2.85  FAILS
+                          very common    #ffd23e  1.44  FAILS, near invisible
+                          done green     #22c55e  2.28  FAILS
+                        Four of six fail, and the worst is the very common band the
+                        owner is looking at. The per-tier fg from RARITY_BAND and
+                        the navy done-state ink are both dropped for it.
+                        FOR THE RECORD this label was made white once before, on
+                        the same request, and reverted the same day for the same
+                        reason: see the note above it, which measured white on the
+                        old lemon at 1.21 and called it an invisible label rather
+                        than a contrast problem. If it reads badly again, the
+                        answer is to darken the fills, not to re-argue the ink. */}
                     <rect className={styles.bandFill} x={-R * 1.6} y={bandTop} width={R * 3.2} height={R * 1.6} style={{ fill: doneRing ? "#22c55e" : band.bg }} />
-                    <text className={styles.bandFill} x={labelX} y={labelY} textAnchor="middle" dominantBaseline="central" style={{ fontFamily: '"Luckiest Guy", system-ui, sans-serif', fontSize: fs, fontWeight: 400, fill: doneRing ? "var(--navy, #0a3a57)" : band.fg }}>{band.label}</text>
+                    <text className={styles.bandFill} x={labelX} y={labelY} textAnchor="middle" dominantBaseline="central" style={{ fontFamily: '"Luckiest Guy", system-ui, sans-serif', fontSize: fs, fontWeight: 400, fill: "#ffffff" }}>{band.label}</text>
                   </g>
                 </g>
               </g>
