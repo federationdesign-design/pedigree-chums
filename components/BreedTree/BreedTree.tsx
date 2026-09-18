@@ -1380,14 +1380,36 @@ const BOMB_TICK_MS = BOMB_FUSE_MS / BOMB_HITS; // one hit per half second held
 // every size handed to the shared effects, and the flat constants inside them.
 // 1 is main pit size. Lower is smaller.
 const FX_SCALE = 0.7;
-// How far the chain reaches, in hops. The chain is a flood fill: everything
-// touching the bomb goes, then everything touching those, and so on. Unlimited,
-// which is what it was, that means one bomb takes the entire connected mass of
-// chips, and in a crowded pit they are all in contact. So a single bomb cleared
-// the floor. Two hops is the bomb's neighbours and theirs, which still reads as
-// a chain reaction and still scales with how packed the pit is, without turning
-// every bomb into a full clear.
-const BOMB_CHAIN_HOPS = 2;
+/* How far the chain reaches, in hops. The chain is a flood fill: everything
+   touching the bomb goes, then everything touching those, and so on.
+
+   UNLIMITED AGAIN, 18 September 2026 (owner). THE HISTORY MATTERS, so nobody
+   puts the cap back without knowing what they are undoing:
+
+     IT WAS UNLIMITED ORIGINALLY, and it was capped at 2 because one bomb took
+     the entire connected mass of chips and in a crowded pit they are all in
+     contact, so a single bomb cleared the floor. That was a true observation and
+     the cap was the right call AT THE TIME.
+
+     IT IS LIFTED because a bomb that propagates through a cluster is now what is
+     wanted: the blast should follow touching chips as far as they go and stop at
+     the edge of the cluster, not at an arbitrary distance from the bomb. Owner's
+     call, made knowing it can clear a packed floor. That is the feature.
+
+     THREE THINGS MAKE IT PLAYABLE, and lifting the cap without them is what
+     would make it unplayable rather than exciting. All three went in with it:
+       1. ONLY CHIPS CONDUCT. Rods and pills are destroyed when the fill reaches
+          them but pass nothing on. A rod's radOf is half its LONGEST side, so a
+          long rod linked everything within about 100px of its centre to
+          everything else within 100px of it: a superconductor that would have
+          carried the blast across the pit whether or not any chips touched.
+       2. THE SLACK CAME DOWN, 10px to BOMB_TOUCH_SLACK_PX. A flat tolerance is
+          a per-hop gap-jumping budget once the hops are unlimited.
+       3. THE DEATHS ARE BATCHED AND THE STAGGER IS CAPPED. See
+          BOMB_CHAIN_MAX_MS.
+
+   The dial is kept rather than deleted, so a future cap is one number away. */
+const BOMB_CHAIN_HOPS = Infinity;
 // A circle that comes OUT of another circle grows a third as it enters the pit.
 // The pack sizes a dog's children as a share of it, so each generation is a
 // fraction of the last, and by the third or fourth the circles are too small to
@@ -1403,7 +1425,48 @@ const POP_GROW = 1.5;
 // about the smallest circle worth aiming a finger at.
 const POP_MIN_PX = 50;
 const BOMB_BURST_MS = 180;    // the squash-and-snap before the blast fires
-const BOMB_CHAIN_MS = 25;     // gap between each object going up in the chain
+const BOMB_CHAIN_MS = 25;     // gap between each WAVE of the chain going up
+/* THE WHOLE CHAIN'S BUDGET, 18 September 2026 (owner), and the reason a full
+   pit does not take ten seconds to blow up.
+
+   WHAT WAS WRONG. One object went up every BOMB_CHAIN_MS, so the chain lasted
+   chain.length * 25ms with nothing able to interrupt it: 40 chips 1s, 120 chips
+   3s, 200 chips 5s, 400 chips 10s. At two hops a chain was short and it never
+   showed. Unlimited, it is the whole connected cluster.
+
+   THE CHAIN GOES UP IN WAVES, at most BOMB_CHAIN_MAX_MS / BOMB_CHAIN_MS of
+   them, which is 48. A chain of 48 or fewer is ONE OBJECT PER WAVE and behaves
+   exactly as it always did, 25ms apart, so nothing about the ordinary blast has
+   changed. A longer one shares the same 48 waves out between more objects: 200
+   chips is 48 waves of about 4, 400 is 48 waves of about 8, and either way it is
+   over in 1.2 seconds.
+
+   THE RIPPLE SURVIVES because `chain` is built hop by hop, so consecutive
+   indices are at the same distance from the bomb and a wave is a ring, not a
+   scatter.
+
+   1200ms is the figure to tune. Lower and a big blast snaps; higher and it
+   starts to feel like waiting. The round-won sweep is 45ms a step for reference,
+   and the burst before the blast is BOMB_BURST_MS. */
+const BOMB_CHAIN_MAX_MS = 1200;
+/* HOW MUCH DAYLIGHT STILL COUNTS AS TOUCHING, in px, in the blast's flood fill.
+   It was a flat 10, which existed because the solver parts resting bodies by a
+   little and a chain must not miss two chips that are visibly in contact.
+
+   10 TO 3, 18 September 2026 (owner), with the hop cap. At two hops a flat
+   tolerance is applied twice and is harmless. At unlimited hops it is a
+   per-hop budget for crossing empty space: 10px a hop over thirty hops is 300px
+   of gaps jumped, in a pit about 390px across, so chips plainly not touching
+   would have chained. 3px is still well above the separation the solver actually
+   leaves between resting bodies, and it caps the budget at a third of what it
+   was.
+
+   FLAT, NOT PROPORTIONAL, deliberately. A share of the radii would have been the
+   tidier rule, and is what the swipe chain uses (CHAIN_TOUCH_SLACK), but radOf
+   returns half the LONGEST side for a rectangle, so a proportional slack would
+   hand every rod and pill an enormous tolerance for being reached. Flat cannot
+   do that. */
+const BOMB_TOUCH_SLACK_PX = 3;
 // ROUND WON sweep: the gap between each remaining prop popping, nearest-first.
 // Halved from 90 on 19 August 2026 because the sweep read as slow. The chain's
 // returned duration is targets.length * this, so the two must stay in step.
@@ -6923,7 +6986,15 @@ export default function BreedTree({
       // and have no circleRadius, so fall back to the larger half-extent.
       const radOf = (mb: MB) =>
         mb?.circleRadius ?? Math.max(mb.bounds.max.x - mb.bounds.min.x, mb.bounds.max.y - mb.bounds.min.y) / 2;
-      const killChained = (mb: MB, now2: number) => {
+      /* `deadOut` COLLECTS THE CHIPS THAT DIED rather than each one setting React
+         state for itself (18 September 2026, owner). One setDeadBadges per chip
+         copied the whole Set and re-rendered the whole badge map, so a chain of n
+         chips cost n renders and O(n squared) allocation. With the hop cap lifted
+         n is the whole cluster. The caller flushes the array once per wave, so a
+         400 chip chain costs 48 state updates instead of 400. Nothing else about
+         the kill has changed: the body still leaves the world here, the bonds
+         still drop before it goes, and the poof is still per chip. */
+      const killChained = (mb: MB, now2: number, deadOut: number[]) => {
         const p = mb.plugin || {};
         if (p.kind === "badge") {
           const br = p.bridge;
@@ -6932,7 +7003,7 @@ export default function BreedTree({
           dropBonds(br.idx); // before the body goes: see the bond block above
           poofAt(br.x, br.y, now2);
           if (br.mb && br.mbIn) { Composite.remove(world, br.mb); br.mbIn = false; }
-          setDeadBadges((q) => new Set(q).add(br.idx));
+          deadOut.push(br.idx);
           return 12; // flat score per chip, the main pit's figure
         }
         if (p.kind === "rod" || p.kind === "pill") {
@@ -6966,12 +7037,27 @@ export default function BreedTree({
           setDeadBadges((q) => new Set(q).add(b.idx));
           const live = (Composite.allBodies(world) as MB[]).filter((o) => !o.isStatic && o !== bombMb);
           const touch = (m1: MB, m2: MB) =>
-            Math.hypot(m1.position.x - m2.position.x, m1.position.y - m2.position.y) <= radOf(m1) + radOf(m2) + 10;
+            Math.hypot(m1.position.x - m2.position.x, m1.position.y - m2.position.y) <= radOf(m1) + radOf(m2) + BOMB_TOUCH_SLACK_PX;
+          // What the fill can DESTROY. Unchanged: live chips that are not
+          // themselves bombs, plus rods and pills.
           const pool = live.filter((o) => {
             const k2 = o.plugin?.kind;
             if (k2 === "badge") return !o.plugin?.bridge?.bomb && !o.plugin?.bridge?.blown;
             return k2 === "rod" || k2 === "pill";
           });
+          /* WHAT THE FILL CAN CONDUCT THROUGH: chips, and only chips
+             (18 September 2026, owner). A rod or a pill that the fill reaches is
+             destroyed with everything else, but the chain stops there and does
+             not spread out of it.
+
+             WHY. radOf is half the LONGEST side for a rectangle, and touch()
+             compares centre distance against the sum of the radii, so a 200px rod
+             reads as a 100px disc: it would have linked anything within 100px of
+             its centre to anything else within 100px of it. At two hops that
+             leaked a little. Unlimited, it is a superconductor, and the blast
+             would have crossed the pit whether or not any chips were touching,
+             which is the opposite of following a cluster. */
+          const conducts = (o: MB) => o.plugin?.kind === "badge";
           const claimed = new Set<MB>();
           let frontier = pool.filter((o) => touch(o, bombMb));
           frontier.forEach((o) => claimed.add(o));
@@ -6981,22 +7067,45 @@ export default function BreedTree({
             chain.push(...frontier);
             hops += 1;
             if (hops >= BOMB_CHAIN_HOPS) break;
-            const prev = frontier;
+            // Only the chips in this ring pass the blast on. A ring of nothing
+            // but rods and pills is the end of the chain.
+            const prev = frontier.filter(conducts);
+            if (!prev.length) break;
             frontier = pool.filter((o) => !claimed.has(o) && prev.some((f) => touch(f, o)));
             frontier.forEach((o) => claimed.add(o));
           }
-          chain.forEach((o, i) => {
+          /* THE CHAIN GOES UP IN WAVES, not one object per tick. See
+             BOMB_CHAIN_MAX_MS: at most 48 of them, so a chain of 48 or fewer is
+             one object per wave and is exactly what it always was, and a longer
+             one shares the same 48 waves out and is still over in 1.2 seconds.
+             `chain` is built hop by hop, so a wave is a ring at one distance from
+             the bomb rather than a scatter, and the ripple survives the
+             compression. */
+          const maxWaves = Math.max(1, Math.ceil(BOMB_CHAIN_MAX_MS / BOMB_CHAIN_MS));
+          const waveCount = Math.min(chain.length, maxWaves);
+          const waves: MB[][] = Array.from({ length: waveCount }, () => []);
+          chain.forEach((o, i) => { waves[Math.floor((i * waveCount) / chain.length)].push(o); });
+          waves.forEach((group, w) => {
             toyTimers.push(window.setTimeout(() => {
               const t2 = performance.now();
-              fx.explodeAt(o.position.x, o.position.y, radOf(o) * (1 + (o.plugin?.bridge?.pct || 0) / 25) * FX_SCALE);
-              fxKickRef.current?.();
-              const val = killChained(o, t2);
-              if (val) {
-                const w2 = worldFromPx(o.position.x, o.position.y);
-                numAt(w2.x, w2.y, val, t2);
+              // One array for the whole wave, flushed to React once below.
+              const dead: number[] = [];
+              for (const o of group) {
+                fx.explodeAt(o.position.x, o.position.y, radOf(o) * (1 + (o.plugin?.bridge?.pct || 0) / 25) * FX_SCALE);
+                const val = killChained(o, t2, dead);
+                if (val) {
+                  const w2 = worldFromPx(o.position.x, o.position.y);
+                  numAt(w2.x, w2.y, val, t2);
+                }
               }
+              // ONE state update a wave, however many chips went in it, and none
+              // at all for a wave that took only rods and pills.
+              if (dead.length) setDeadBadges((q) => { const n2 = new Set(q); for (const idx of dead) n2.add(idx); return n2; });
+              // Once a wave rather than once an object: it is a screen kick, and
+              // firing it eight times in the same millisecond said nothing extra.
+              fxKickRef.current?.();
               wake();
-            }, BOMB_CHAIN_MS * (i + 1)));
+            }, BOMB_CHAIN_MS * (w + 1)));
           });
           // Shockwave, plus bomb triggers bomb on three tiers: touching goes at
           // once, near takes two hits, far takes one and only if already lit.
