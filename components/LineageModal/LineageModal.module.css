@@ -57,6 +57,37 @@
   -webkit-user-select: none;
   animation: lmRise 0.32s cubic-bezier(0.2, 0.7, 0.3, 1);
 }
+/* THE SITE'S PAW PATTERN OVER THE FINISHED GREEN (owner, 18 September 2026), the
+   same paw-pattern2.svg the homepage, the main pit and the learn area's
+   .learnPattern all tile at 144px. One asset, four readers.
+
+   A ::before RATHER THAN AN ELEMENT, so LineageModal.tsx is untouched. The learn
+   area uses a real div because it fades in and out on a class; this one is simply
+   present whenever the level is complete and needs no state.
+
+   z-index -1 IS WHAT MAKES IT SAFE, and it is the learn area's own arrangement.
+   .overlayDone already sets isolation: isolate, so this creates no new stacking
+   context and a negative z-index child paints ABOVE the element's own gradient and
+   BELOW every piece of in-flow content. Nothing on the win screen has to know it
+   is there. inset 0 anchors to .overlay, which is position: fixed.
+
+   0.45, NOT THE LEARN AREA'S 0.5, AND THE 0.05 IS MEASURED. The pattern is two
+   fills, #fff466 and #00aeef. Blended at 0.5 the strongest paw reads 1.26 against
+   the learn blue's light end and 1.62 against its deep end; over this green the
+   same 0.5 gives 1.34 and 1.71, about 6% stronger, because the green sits closer
+   to both paw hues. 0.45 lands it on the learn area's strength almost exactly.
+   IF THE LEARN AREA'S FIGURE MOVES, move this one with it and keep the 6%. */
+.overlayDone::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: url("/paw-pattern2.svg");
+  background-repeat: repeat;
+  background-size: 144px auto;
+  opacity: 0.45;
+}
 /* NO ENTRY ANIMATION ON A QUIET CHANGE, 9 Sept 2026.
    This component remounts on every level change, so a swipe replayed lmRise and
    faded the ENTIRE pit in from opacity 0. Three things came out of that, all
