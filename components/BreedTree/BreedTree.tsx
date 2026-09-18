@@ -2,7 +2,7 @@
 
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { hierarchy, pack, packSiblings, packEnclose, type HierarchyCircularNode } from "d3-hierarchy";
-import { ringFrac, radius as pctRadius } from "../PackPit/LineageMap";
+import { ringFrac, radius as pctRadius, RARITY_BAND } from "../PackPit/LineageMap";
 import { createPitEffects } from "../PackPit/pitEffects";
 import { splitName } from "../PackPit/splitName";
 import { interpolateZoom } from "d3-interpolate";
@@ -919,11 +919,10 @@ const DOG_CHAIN_ARM_PX = 14;
    white. What the path says with WEIGHT and GLOW is untouched by this: both
    kinds still carry every state that way, and only the hue has moved.
 
-   THE CIRCLES DO NOT FOLLOW IT. A held circle is navy on sky blue and an
-   available twin is navy on yellow, all four named beside DOG_CHAIN_TWIN_FILL.
-   An available twin's fill happens to be this same #ffd23e today, written out
-   separately on purpose so the path and the fill can move apart. The twin GLOW
-   does follow it, see the note on the glow itself. */
+   THE CIRCLES DO NOT FOLLOW IT. A held circle is navy on sky blue, from
+   DOG_CHAIN_FILL and DOG_CHAIN_INK; an available twin takes its breed's own
+   RARITY_BAND colours and no longer has anything to do with this yellow. The
+   twin GLOW does follow it, see the note on the glow itself. */
 const DOG_CHAIN_COLOUR = "#ffd23e";
 /* THE FILL A HELD CIRCLE TAKES (owner, 18 September 2026), alongside its white
    outline and its tapped face. A pit circle is filled with the site's navy,
@@ -940,30 +939,40 @@ const DOG_CHAIN_FILL = "#5cc4ee";
    A twin that is NOT held keeps its white mark, which is the "you could join
    this" signal, and the glow on twins is untouched. */
 const DOG_CHAIN_INK = "#0a3a57";
-/* AND WHAT AN AVAILABLE TWIN WEARS (owner, 18 September 2026). A circle of the
-   chain's breed that is NOT yet held now FILLS YELLOW, so where you can connect
-   is obvious at a glance rather than something to be read off a thin ring.
+/* AN AVAILABLE TWIN WEARS ITS BREED'S RARITY COLOUR (owner, 18 September 2026).
+   A circle of the chain's breed that is NOT yet held fills with the very colour
+   its rarity tag uses, so where you can connect is obvious AND says something
+   about what you are connecting.
 
-   THE SITE YELLOW, the one DOG_CHAIN_COLOUR gives the path, written out again
-   rather than pointed at it. That is deliberate: the path and the fill are two
-   different objects that happen to agree today, and either should be able to
-   move without dragging the other. All four chain colours are one line each.
+   IT HAD A FLAT YELLOW FOR A DAY, DOG_CHAIN_TWIN_FILL, and a flat navy ink,
+   DOG_CHAIN_TWIN_INK. Both are gone: there is no single fill any more, so there
+   can be no single ink either.
 
-   NAVY INK, NOT WHITE. The outline and the mark were white for a day, which was
-   right while a twin was still filled with the pit's navy. On yellow, white is
-   the same mistake that was already made and fixed once on the light blue fill:
-   measured against #ffd23e, white is about 1.6:1 and navy #0a3a57 is about
-   8.9:1. So a twin is navy on yellow and a held circle is navy on light blue,
-   and the two read as one family with two states.
+   THE COLOURS COME FROM RARITY_BAND, exported from LineageMap rather than copied
+   here, because five hexes in two files is two tables that drift. `bg` is the
+   fill and `fg` is the ink, and the pair is already measured for exactly this
+   job:
+     extremely rare  #4d2e91 purple       white ink   9.93:1
+     rare            #2547c4 royal blue   white ink   7.56:1
+     uncommon        #5dbf86 green        black ink   9.26:1
+     common          #f47421 orange       black ink   7.37:1
+     very common     #fcee23 yellow       black ink  17.39:1
 
-   FOUR COLOURS, FOUR LINES, and they are the whole of the chain's palette:
-     DOG_CHAIN_COLOUR      the path
-     DOG_CHAIN_FILL        a HELD circle's fill
-     DOG_CHAIN_INK         a HELD circle's outline and mark
-     DOG_CHAIN_TWIN_FILL   an AVAILABLE twin's fill
-     DOG_CHAIN_TWIN_INK    an AVAILABLE twin's outline and mark */
-const DOG_CHAIN_TWIN_FILL = "#ffd23e";
-const DOG_CHAIN_TWIN_INK = "#0a3a57";
+   NAVY IS DROPPED FOR TWINS, and that is measured rather than a preference. Navy
+   against those five is 1.20, 1.58, 5.28, 4.20 and 9.91. It fails outright on
+   the purple and the royal blue, worse than the white-on-light-blue pair that was
+   rejected on the held circle and worse than the white-on-yellow this whole
+   sequence was started to fix. A HELD circle keeps navy on sky blue: that pair
+   is 8.9:1 and was never in question.
+
+   THE TIER IS A FUNCTION OF THE NAME ALONE, rarityTier(treesContaining(name)),
+   so every twin in a chain is guaranteed the same colour by construction rather
+   than by luck: they are the same breed, so they are the same tier.
+
+   A NAME THE ARCHIVE DOES NOT KNOW counts as 0 trees and falls through to
+   extremely rare, so nothing is ever left unfilled. The cost is that an unknown
+   name reads as purple. That is pre-existing, it is what the rarity tag already
+   does, and it means a purple twin is not proof of rarity. */
 /* AND HOW MUCH HEAVIER AN AVAILABLE TWIN'S RING IS (owner, 18 September 2026),
    on top of the yellow fill and the navy ink. A multiplier rather than a width,
    because a pit ring is a FRACTION OF ITS OWN RADIUS, not a flat number: see
@@ -4775,14 +4784,21 @@ export default function BreedTree({
       if (c) {
         /* The mark has read all three states since the chain shipped; the ring
            only read the first, so a highlighted twin kept its own outline. Both
-           states are now filled and inked from the constants beside
-           DOG_CHAIN_TWIN_FILL.
+           states are now filled and inked: a held circle from DOG_CHAIN_FILL and
+           DOG_CHAIN_INK, an available twin from its own RARITY_BAND entry.
            One key, still written only when the answer CHANGES and still tracked
            on the element, so a still pit costs nothing. */
-        const want = chHeld ? "held" : chTwin ? "twin" : "0";
+        /* THE TIER RIDES IN THE KEY, so a twin whose rarity somehow differed from
+           the last one written would be re-inked. It cannot today, since every
+           twin in a chain is the same breed and the tier is a function of the
+           name, but the key is what guarantees the element and the state agree
+           and it costs one string to keep that true. Looked up only for a twin,
+           which is a handful of circles while a chain lives and none otherwise. */
+        const band = chTwin ? RARITY_BAND[rarityTier(treesContaining(d.data.name))] : null;
+        const want = chHeld ? "held" : band ? `twin:${band.bg}` : "0";
         if (c.dataset.chained !== want) {
           c.dataset.chained = want;
-          c.style.stroke = chHeld ? DOG_CHAIN_INK : chTwin ? DOG_CHAIN_TWIN_INK : "";
+          c.style.stroke = chHeld ? DOG_CHAIN_INK : band ? band.fg : "";
           /* AND BOTH STATES ARE FILLED NOW. A held circle goes sky blue, and an
              available twin goes YELLOW, so the two things the chain has to say,
              "this one is in" and "this one is where you can go next", are both
@@ -4793,7 +4809,7 @@ export default function BreedTree({
              here to cover. Both are cleared the same way the stroke is, by
              writing the empty string, so a circle's own colour returns with the
              chain's end and nothing has to remember what it used to be. */
-          c.style.fill = chHeld ? DOG_CHAIN_FILL : chTwin ? DOG_CHAIN_TWIN_FILL : "";
+          c.style.fill = chHeld ? DOG_CHAIN_FILL : band ? band.bg : "";
         }
       }
       if (c) {
@@ -4879,14 +4895,14 @@ export default function BreedTree({
           const want = dogChainBreedRef.current && d.data.name === dogChainBreedRef.current ? "1" : "0";
           /* THREE STATES, ONE ATTRIBUTE. A circle HELD in the chain draws its
              mark in navy, to read against the light blue it is now filled with.
-             An available twin draws it in navy TOO, since it is now filled
-             yellow and white would be unreadable on it: both take bt-qmark-ink,
-             which is DOG_CHAIN_INK as a colour matrix. Everything else wears its
-             own depth colour.
-             bt-qmark-hi, the white one, is left in the defs: the mark still uses
-             it nowhere now, but it is one line to point a state back at. */
+             An available twin takes the ink its RARITY_BAND entry names, which is
+             white on the purple and the royal blue and black on the green, the
+             orange and the yellow: the mark follows the fill rather than being
+             chosen again here, so the two can never disagree. Everything else
+             wears its own depth colour. */
           const held = dogChainNodesRef.current.has(d);
-          const ink = held || want === "1" ? "ink" : `${(d.depth - 1 + 4) % 4}`;
+          const twinBand = !held && want === "1" ? RARITY_BAND[rarityTier(treesContaining(d.data.name))] : null;
+          const ink = held ? "ink" : twinBand ? (twinBand.fg === "#ffffff" ? "hi" : "black") : `${(d.depth - 1 + 4) % 4}`;
           if (q.dataset.hi !== ink) {
             q.dataset.hi = ink;
             qi.setAttribute("filter", `url(#bt-qmark-${ink})`);
@@ -9910,6 +9926,14 @@ export default function BreedTree({
                 because a filter matrix cannot take a variable. */}
             <filter id="bt-qmark-ink" x="0" y="0" width="100%" height="100%" colorInterpolationFilters="sRGB">
               <feColorMatrix type="matrix" values="0 0 0 0 0.039 0 0 0 0 0.227 0 0 0 0 0.341 0 0 0 1 0" />
+            </filter>
+            {/* BLACK, for a twin filled with a light rarity colour. bt-qmark-hi
+                is the white one and takes the dark three; between them they cover
+                RARITY_BAND's own fg, which is the ink already measured against
+                each of those five backgrounds. Every channel to 0, the exact
+                opposite of hi's every channel to 1. */}
+            <filter id="bt-qmark-black" x="0" y="0" width="100%" height="100%" colorInterpolationFilters="sRGB">
+              <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0" />
             </filter>
             {nodes.map((d, i) =>
               nodeImg(d) ? (

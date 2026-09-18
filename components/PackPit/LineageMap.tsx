@@ -139,7 +139,14 @@ const INSTR_NAMES = new Set(["Deal the cards","Head outside","Spot real dogs","M
    white on yellow is 1.21:1 and white on orange 2.85:1, which is the same
    unreadable pair that had to be reversed on the done band on 10 September. Do
    not "tidy" these to one colour. */
-const RARITY_BAND: Record<"extremelyRare" | "rare" | "uncommon" | "common" | "veryCommon", { bg: string; fg: string; label: string }> = {
+/* EXPORTED, 18 September 2026 (owner). The mini pit's chain fills an available
+   twin with its breed's rarity colour, and copying five hexes into BreedTree
+   would be two tables that drift. RING_FRAC is exported for the same reason and
+   in the same spirit: one source, read from both sides.
+   `fg` matters as much as `bg` to any consumer. It is the ink measured against
+   that background, and it is the reason the pair can be used anywhere: white on
+   the purple and the royal blue, black on the green, the orange and the yellow. */
+export const RARITY_BAND: Record<"extremelyRare" | "rare" | "uncommon" | "common" | "veryCommon", { bg: string; fg: string; label: string }> = {
   extremelyRare: { bg: "#4d2e91", fg: "#ffffff", label: "EXTREMELY RARE" }, // purple
   rare:          { bg: "#2547c4", fg: "#ffffff", label: "RARE" },           // royal blue
   uncommon:      { bg: "#5dbf86", fg: "#000000", label: "UNCOMMON" },       // green
