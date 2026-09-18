@@ -1181,6 +1181,48 @@ const SPARK_MAX = 20;          // hard cap, whatever the chain reaches
 const SPARK_BASE = 4;          // the first connection
 const SPARK_STEP = 1.5;        // more per link after it
 const SPARK_LIFE_MS = 340;
+/* THE LAST CONNECTION THROWS WHAT THE FIRST ONE DID (owner, 18 September 2026).
+
+   THE CLASH. Sparks grow with the chain, so the connection that COMPLETES it was
+   throwing the most: up to SPARK_MAX of them, in DOG_CHAIN_COLOUR, out of exactly
+   the dot the completion flare is trying to swell. Lemon streaks over a lemon dot
+   is not a contrast problem that can be tuned, it is the same ink twice, and the
+   flare loses.
+
+   IT IS CUT BY PASSING 0 LINKS rather than by a second count, so the final
+   connection throws SPARK_BASE and a `grow` of 1: the same short burst the FIRST
+   connection of any chain throws. That is the figure because it is the one already
+   in the file meaning "a connection happened, minimally", it needs no new number
+   to keep in step with SPARK_BASE, and it still says a link was made rather than
+   going silent, which would read as the chain breaking. */
+const SPARK_FINAL_LINKS = 0;
+/* THE COMPLETION FLARE (owner, 18 September 2026). Auto-complete fired the lift
+   the instant the last twin was held, with nothing between the join and a new
+   screen, which read as the game skipping a beat. The chain now holds for
+   CHAIN_FLARE_MS while the dot on the completing circle swells and the glow
+   comes up, then opens as before.
+
+   ONE HARD SWELL AND SETTLE, NOT A PULSE. At 250ms a sine pulse gets through
+   under half a cycle and reads as a single swell anyway; two swells would need
+   about 360ms. The owner chose 250 and the swell, so the attack is loaded to the
+   front (t to the power CHAIN_FLARE_ATTACK before the sine) to hit hard and
+   settle slowly, rather than easing in and out evenly.
+
+   THE HOLD IS MEASURED FROM THE JOIN, not from the sparks finishing. A spark can
+   live SPARK_LIFE_MS times 1.3, about 440ms, and waiting for that would make the
+   delay itself the thing the player notices. They are separated by cutting the
+   sparks instead: see SPARK_FINAL_LINKS.
+
+   THE GLOW FIGURES ARE THE RESTING ONES, NAMED. They were literals inside paint;
+   the flare interpolates from them to the flare pair on the same envelope as the
+   dot, so the line, the blur and the dot all swell together. */
+const CHAIN_FLARE_MS = 250;
+const CHAIN_FLARE_DOT_K = 2;      // unit * 0.22 becomes unit * 0.44 at the peak
+const CHAIN_FLARE_ATTACK = 0.45;  // below 1 loads the swell to the front
+const CHAIN_GLOW_W = 0.5;         // the resting glow copy's width, a share of unit
+const CHAIN_GLOW_BLUR = 0.2;      // the resting blur, same units
+const CHAIN_FLARE_GLOW_W = 0.8;
+const CHAIN_FLARE_GLOW_BLUR = 0.35;
 /* THE FULL SWEEP BONUS (owner, 18 September 2026). Taking EVERY live circle of
    a breed pays on top of the connections.
 
@@ -10087,18 +10129,23 @@ export default function BreedTree({
       }
       cards.push(i);
       ch.lastJoin = performance.now(); // the join clock restarts on every card
+      K.joined?.(i); // the kind may want to know what is now held
+      /* ASKED BEFORE THE SPARKS FIRE, not after, because the answer changes how
+         many of them there are: the connection that completes a chain throws the
+         first connection's burst instead of the largest. See SPARK_FINAL_LINKS. */
+      const swept = !!K.sweptAll?.(ch);
       // The connection just made, paid now and kept whatever becomes of the
       // chain. The first card is not a connection and pays nothing. After the
       // push, cards.length - 1 is the number of connections so far.
-      { const q = K.at(i); if (q) chainJoinScoreRef.current?.(q.x, q.y, K.colour, cards.length - 1); }
-      K.joined?.(i); // the kind may want to know what is now held
+      { const q = K.at(i); if (q) chainJoinScoreRef.current?.(q.x, q.y, K.colour, swept ? SPARK_FINAL_LINKS : cards.length - 1); }
       /* EVERY LIVE CIRCLE OF THE BREED IS NOW HELD, so there is nothing left to
          join and nothing to wait for: the chain completes here rather than on the
-         release. THE FIRING IS THE FEEDBACK, which is why no "all held" path
-         state went in beside it: that state would live for a single frame and
-         could never be seen. sweep() already re-checks `chain` after every sample,
-         so a chain ending mid-gesture is a path this code already supports. */
-      if (K.sweptAll?.(ch)) completeChain(ch);
+         release. sweep() already re-checks `chain` after every sample, so a chain
+         ending mid-gesture is a path this code already supports.
+
+         THE FIRING WAS THE ONLY FEEDBACK and that is what read as confusing, so
+         the completion now flares before it lifts: see CHAIN_FLARE_MS. */
+      if (swept) completeChain(ch);
     };
     const sweep = (ch: Chain, cx: number, cy: number) => {
       const dx = cx - ch.px, dy = cy - ch.py;
@@ -10241,7 +10288,10 @@ export default function BreedTree({
       dotList: ({ x: number; y: number; r?: number; o?: number } | null)[],
       unit: number,
       col: string,
-      // emptied in that case, so a kind without one leaves nothing behind.
+      // The glow's width and blur, as shares of unit. Defaulted to the resting
+      // pair so every existing caller is unchanged; the flare raises both.
+      glowW: number = CHAIN_GLOW_W,
+      glowBlur: number = CHAIN_GLOW_BLUR,
     ) => {
       const g = chainGRef.current;
       const glow = g?.querySelector("[data-chain=glow]");
@@ -10265,9 +10315,9 @@ export default function BreedTree({
           l.style.opacity = String(sg.o ?? 1);
         });
       };
-      lay(glow, unit * 0.5);
+      lay(glow, unit * glowW);
       lay(core, unit * 0.14);
-      blur?.setAttribute("stdDeviation", String(unit * 0.2));
+      blur?.setAttribute("stdDeviation", String(unit * glowBlur));
       const n = dotList.length;
       while (dots.children.length > n) dots.lastChild?.remove();
       while (dots.children.length < n) dots.appendChild(document.createElementNS("http://www.w3.org/2000/svg", "circle"));
@@ -10291,6 +10341,58 @@ export default function BreedTree({
       dots: { x: number; y: number; drift: number }[];
     };
     let collapse: Collapse | null = null;
+    /* THE FLARE. A completed chain's last shape, held still while the dot on the
+       circle that completed it swells, then handed on. Its own object beside the
+       collapse and for the same reason: `chain` is already null by the time it
+       draws, so it cannot ride on the live path.
+
+       `done` is what happens when it ends, which is the settle and the kind's own
+       teardown. Carrying it here is what lets completeChain kill the gesture on
+       the spot and still open the learn layer 250ms later. */
+    type Flare = {
+      t0: number; unit: number; col: string;
+      segs: { x1: number; y1: number; x2: number; y2: number }[];
+      dots: { x: number; y: number }[];
+      at: number;        // which dot swells: the circle that completed the chain
+      done: () => void;
+    };
+    let flare: Flare | null = null;
+    const startFlare = (ch: Chain, done: () => void) => {
+      const cps = ch.cards.map((i) => ch.kind.geo(i));
+      const unit = cps.find((q) => q)?.h ?? 0;
+      const segs: Flare["segs"] = [];
+      for (let s2 = 0; s2 < cps.length - 1; s2++) {
+        const p = cps[s2], q = cps[s2 + 1];
+        if (p && q) segs.push({ x1: p.x, y1: p.y, x2: q.x, y2: q.y });
+      }
+      const dots = cps.flatMap((q) => (q ? [{ x: q.x, y: q.y }] : []));
+      flare = { t0: performance.now(), unit, col: ch.kind.colour, segs, dots, at: dots.length - 1, done };
+    };
+    // Paints one flare frame. False once it is over, having cleared the layer and
+    // run `done`, which is the lift.
+    const drawFlare = (now: number): boolean => {
+      if (!flare) return false;
+      const f = flare;
+      const t = Math.min(1, (now - f.t0) / CHAIN_FLARE_MS);
+      if (t >= 1) {
+        flare = null;
+        paint([], [], 0, "#ffffff");
+        f.done();
+        return false;
+      }
+      // One swell, loaded to the front by the attack exponent: see CHAIN_FLARE_MS.
+      const swell = Math.sin(Math.pow(t, CHAIN_FLARE_ATTACK) * Math.PI);
+      const dotK = 1 + (CHAIN_FLARE_DOT_K - 1) * swell;
+      paint(
+        f.segs,
+        f.dots.map((d, i2) => ({ x: d.x, y: d.y, r: i2 === f.at ? dotK : 1 })),
+        f.unit,
+        f.col,
+        CHAIN_GLOW_W + (CHAIN_FLARE_GLOW_W - CHAIN_GLOW_W) * swell,
+        CHAIN_GLOW_BLUR + (CHAIN_FLARE_GLOW_BLUR - CHAIN_GLOW_BLUR) * swell,
+      );
+      return true;
+    };
     // The chain is gone by the time this is drawn, so its shape, its size and
     // its colour are all taken here. `loop` adds the closing link, last card
     // back to first.
@@ -10392,12 +10494,23 @@ export default function BreedTree({
        collapse or the redraw. */
     const completeChain = (ch: Chain) => {
       const fail = judge(ch);
-      if (fail) startCollapse(ch);
-      else ch.kind.settle(ch);
       // A chain that cleared takes the parked card with it, exactly as a release
       // that cleared does.
       chainHeldCollectRef.current = null;
-      ch.kind.over?.();
+      /* THE GESTURE DIES HERE, WHATEVER FOLLOWS. chain = null on this line and not
+         at the end of the flare, so move() returns on its first line for the whole
+         hold: no sweep, no join, no path. A new chain still needs a fresh
+         pointerdown, which a finger already down cannot produce. The flare draws
+         from its own snapshot, so nothing depends on the chain still existing. */
+      if (fail) {
+        startCollapse(ch);
+        ch.kind.over?.();
+        chain = null;
+        return;
+      }
+      // The lift waits for the flare; the kind's teardown waits with it, or the
+      // held circles would lose their rims halfway through their own moment.
+      startFlare(ch, () => { ch.kind.settle(ch); ch.kind.over?.(); });
       chain = null;
     };
     // Every existing link, every frame. Only the chain's own cards are measured.
@@ -10460,7 +10573,9 @@ export default function BreedTree({
     const tick = () => {
       raf = null;
       if (!chain) {
-        if (drawCollapse(performance.now())) raf = requestAnimationFrame(tick);
+        const now2 = performance.now();
+        // The flare first: a completed chain holds before anything else can run.
+        if (drawFlare(now2) || drawCollapse(now2)) raf = requestAnimationFrame(tick);
         else draw();
         return;
       }
