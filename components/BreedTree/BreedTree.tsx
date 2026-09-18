@@ -3330,6 +3330,9 @@ export default function BreedTree({
      held, and the frame writer turns their outlines white while they are. Held
      by node, like the remembered chain, so a re-pack cannot mix them up. */
   const dogChainNodesRef = useRef<Set<Node>>(new Set());
+  // The layer that carries the twin glow: one blurred ring per circle that has
+  // another of its breed touching it. See the note where it is written.
+  const twinGlowGRef = useRef<SVGGElement>(null);
   const dogChainRef = useRef<{ opened: Node; others: Node[] } | null>(null);
   const dogStarterAtRef = useRef<((cx: number, cy: number) => boolean) | null>(null);
   // REMOVE BEFORE LAUNCH, ?dragdebug=1. The same question as dogStarterAt, asked
@@ -4676,6 +4679,63 @@ export default function BreedTree({
         }
       }
     });
+    /* ==================== REMOVE BEFORE LAUNCH, ?dogchain=1 ===================
+       THE GLOW ON AVAILABLE TWINS. Any circle with another of its own breed
+       TOUCHING it is a circle a chain can be started from, and it says so by
+       wearing the chain path's own glow round its ring.
+
+       IT IS THE CHAIN'S GLOW, NOT A SECOND ONE: the same bt-chain-glow filter
+       the path's own glow group uses. A blurred copy of the ring is drawn on a
+       layer BEHIND the circles, exactly as the path draws a blurred copy of its
+       line under the crisp one, so the picture inside the circle is untouched.
+
+       RE-ASKED EVERY FRAME, because circles drift in and out of contact as the
+       pit settles. The work is one pass over the pit's own circles to group them
+       by breed, then one pass within each breed, so a pit of a few dozen costs
+       almost nothing and a pit of one breed costs a few hundred comparisons.
+       The test is the same name test, geometry and CHAIN_TOUCH_SLACK a join
+       uses, so what glows and what can be chained can never disagree. */
+    const tg = twinGlowGRef.current;
+    if (tg) {
+      const owned = dogChainOn() ? pitBodiesRef.current?.owned : null;
+      const rings: { x: number; y: number; r: number; w: number }[] = [];
+      if (owned) {
+        const byBreed = new Map<string, Node[]>();
+        for (const o of owned) {
+          if (o.depth === 0 || isEcho(o) || removedNodesRef.current.has(o)) continue;
+          const list = byBreed.get(o.data.name);
+          if (list) list.push(o); else byBreed.set(o.data.name, [o]);
+        }
+        for (const list of byBreed.values()) {
+          if (list.length < 2) continue;
+          for (let a = 0; a < list.length; a++) {
+            const A = list[a];
+            let touching = false;
+            for (let b = 0; b < list.length && !touching; b++) {
+              if (b === a) continue;
+              const B = list[b];
+              const gap = Math.hypot(B.x - A.x, B.y - A.y) - A.r - B.r;
+              touching = gap / (Math.max(A.r, B.r) * 2) <= CHAIN_TOUCH_SLACK;
+            }
+            if (touching) rings.push({ x: (A.x - v[0]) * k, y: (A.y - v[1]) * k, r: drawR(A, v, k), w: strokeWidthFor(A) * strokeK(v) });
+          }
+        }
+      }
+      while (tg.children.length > rings.length) tg.lastChild?.remove();
+      while (tg.children.length < rings.length) {
+        const el = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        el.style.fill = "none";
+        el.style.stroke = "#ffffff";
+        tg.appendChild(el);
+      }
+      rings.forEach((rg, ri) => {
+        const el = tg.children[ri] as SVGCircleElement;
+        el.setAttribute("cx", String(rg.x));
+        el.setAttribute("cy", String(rg.y));
+        el.setAttribute("r", String(rg.r));
+        el.style.strokeWidth = String(Math.max(1, rg.w * 2.2));
+      });
+    }
   }
 
   function zoom(d: Node) {
@@ -9495,6 +9555,13 @@ export default function BreedTree({
           <g pointerEvents="none" aria-hidden="true">
             <path ref={hlPathRef} fillRule="evenodd" fill="var(--yellow, #ffd23e)" />
           </g>
+          {/* REMOVE BEFORE LAUNCH, ?dogchain=1. The twin glow, written by the
+              frame writer: one blurred ring per circle that has another of its
+              breed touching it. BEHIND the circles, so the glow shows outside
+              their rims and no photograph is dimmed, and it never takes a
+              pointer, or it would answer the hit test in a circle's place.
+              It carries the swipe chain's own filter, not a second one. */}
+          <g ref={twinGlowGRef} filter="url(#bt-chain-glow)" style={{ pointerEvents: "none" }} />
           <g ref={circlesRef}>
             {nodes.map((d, i) => {
               // The outer breed circle (root) is hidden so only the ancestor
