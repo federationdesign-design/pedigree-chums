@@ -906,24 +906,42 @@ const DOG_CHAIN_SLACK = Infinity;
    this for circles and 0 for chum cards, whose press claims the gate outright as
    it always has. */
 const DOG_CHAIN_ARM_PX = 14;
-/* THE SITE YELLOW (owner, 18 September 2026), which is where this started. It
-   shipped as #ffd23e, --yellow, as the deliberate opposite of the white card
-   chain; it went white for a day so both paths matched; it is yellow again, and
-   the two kinds are told apart by colour once more.
+/* HOT PINK, 18 September 2026 (owner), and the reasoning is hue, not contrast.
 
-   HARD-CODED, like every other colour in this file that reaches an SVG element
-   from script, where a var() would not resolve. --yellow in globals.css is the
-   one to keep it in step with.
+   WHY IT MOVED. RARITY_BAND's veryCommon becomes #ffd23e in the commit beside
+   this one, and an available twin fills with its tier colour, so the path was
+   about to be drawn in exactly the colour of the circles it joins. A line that
+   vanishes into its own endpoints is the one thing the path cannot do.
 
-   THE DOG PATH ONLY. The chum cards take their colour from CARD.colour and stay
-   white. What the path says with WEIGHT and GLOW is untouched by this: both
-   kinds still carry every state that way, and only the hue has moved.
+   CONTRAST CANNOT BE WON HERE, and that is measured rather than assumed. The
+   path has to read over five tier fills, the pit's navy and the held circle's
+   sky blue, which run from luminance 0.038 to 0.65. The best possible worst-case
+   for ANY single colour across that range is about 2.8:1. Nothing reaches it:
+   white bottoms out at 1.44, black at 1.76, lemon at 1.19, cyan at 1.07.
 
-   THE CIRCLES DO NOT FOLLOW IT. A held circle is navy on sky blue, from
-   DOG_CHAIN_FILL and DOG_CHAIN_INK; an available twin takes its breed's own
-   RARITY_BAND colours and no longer has anything to do with this yellow. The
-   twin GLOW does follow it, see the note on the glow itself. */
-const DOG_CHAIN_COLOUR = "#ffd23e";
+   SO THE ARGUMENT IS HUE SEPARATION. #ff2d95 measures 3.45 on navy, 2.87 on the
+   purple, 2.40 on the yellow, 2.18 on the royal blue, 1.75 on the sky, 1.53 on
+   the green and 1.22 on the orange. Poor on paper. But pink is the ONE hue not
+   used by any tier, by the pit background, by the held circle's fill or by the
+   chum cards' white path, so where the luminance is close the hue is not, and
+   the two kinds of chain stay told apart by colour.
+
+   NOTHING ELSE IN THE PIT USES IT. The only near neighbour is LineageMap's pink
+   starburst, a transient effect on another layer.
+
+   ON THE RECORD, THE BETTER FIX IF THIS DOES NOT READ: a TWO-TONE path. The
+   gesture already draws a blurred glow under a crisp core and they are the same
+   colour today. Give the glow navy and the core white, or the reverse, and the
+   line carries its own contrast onto any background instead of depending on one
+   hue to beat seven. That is the proper answer and it is barely more work; this
+   is the one-line version.
+
+   THE DOG PATH ONLY. The chum cards take CARD.colour and stay white. What each
+   path says with WEIGHT and GLOW is untouched.
+
+   THE CIRCLES DO NOT FOLLOW IT. A held circle is navy on sky blue; an available
+   twin takes its breed's RARITY_BAND colours. The twin GLOW does follow it. */
+const DOG_CHAIN_COLOUR = "#ff2d95";
 /* THE FILL A HELD CIRCLE TAKES (owner, 18 September 2026), alongside its white
    outline and its tapped face. A pit circle is filled with the site's navy,
    #0a3a57, which fillFor returns for every circle once the pit is live; this is
