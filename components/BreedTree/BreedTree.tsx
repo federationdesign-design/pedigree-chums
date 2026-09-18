@@ -695,7 +695,14 @@ const CHUM_BAND: Record<string, number> = { small: 5 / 6, medium: 1, large: 4 / 
    four have to stay legible against each other as well as against a photograph.
    Depths 1 and 2 are both yellow and 3 and 4 are both blue, which is the owner's
    scheme; a child ring sitting inside its parent will read as the same colour. */
-const RING_PALETTE = ["#fff200", "#ffdf00", "#009fe0", "#36b8ff"];
+/* DEPTH 3 LIFTED, #009fe0 -> #1ab0f0, 18 September 2026 (owner). It measured
+   4.01:1 against the pit's navy fill, the only entry under 4.5 and a failure that
+   predates every recent change; it is 4.85 now. Nothing else moves.
+   THE FOUR bt-qmark-* FILTERS FOLLOW AUTOMATICALLY: they are generated from this
+   very array with RING_PALETTE.map, so the ring and the mark cannot drift apart.
+   The warning on those filters asks for them to be moved together and this is how
+   that is honoured, by their being derived rather than typed out twice. */
+const RING_PALETTE = ["#fff200", "#ffdf00", "#1ab0f0", "#36b8ff"];
 /* THE PIT MARK, 2 September 2026 (owner). A circle in the live pit shows this
    instead of its photograph; the picture is what you get for lifting it out.
 
@@ -906,42 +913,37 @@ const DOG_CHAIN_SLACK = Infinity;
    this for circles and 0 for chum cards, whose press claims the gate outright as
    it always has. */
 const DOG_CHAIN_ARM_PX = 14;
-/* HOT PINK, 18 September 2026 (owner), and the reasoning is hue, not contrast.
+/* THE DOG PATH IS TWO-TONE: A LEMON CORE ON A NAVY CASING (owner, 18 September
+   2026). This is the answer to a problem that had already moved the hue twice, and
+   the reason it is the LAST time the hue should ever need to move.
 
-   WHY IT MOVED. RARITY_BAND's veryCommon becomes #ffd23e in the commit beside
-   this one, and an available twin fills with its tier colour, so the path was
-   about to be drawn in exactly the colour of the circles it joins. A line that
-   vanishes into its own endpoints is the one thing the path cannot do.
+   WHAT A FLAT LINE WAS UP AGAINST. The path crosses five rarity tier fills, the
+   pit's navy ground, the held circle's sky blue and the percentage chips, which
+   run from luminance 0.038 to 0.65. The best possible worst-case for ANY single
+   colour across that range is about 2.8:1, and nothing reaches it: white bottoms
+   out at 1.44, black at 1.76, lemon at 1.19, the pink this replaces at 1.22.
+   The hue was moved to yellow, then to pink, chasing a fight that cannot be won.
 
-   CONTRAST CANNOT BE WON HERE, and that is measured rather than assumed. The
-   path has to read over five tier fills, the pit's navy and the held circle's
-   sky blue, which run from luminance 0.038 to 0.65. The best possible worst-case
-   for ANY single colour across that range is about 2.8:1. Nothing reaches it:
-   white bottoms out at 1.44, black at 1.76, lemon at 1.19, cyan at 1.07.
+   ONCE THE PATH IS OUTLINED THE CORE STOPS HAVING TO WIN ANY CONTRAST FIGHT.
+   The casing does the separating, and it is navy because navy is the one thing
+   every object in this pit was already designed to sit on. So:
+     core #ffed00 on the casing          9.89
+     casing on a chip, CHIP_FILL #ffed00 9.89
+     casing on a light circle #5cc4ee    6.03
+     casing on the pit navy              1.00, invisible, and correct: there the
+                                         core does the work at 9.89
+   The core is EXACTLY CHIP_FILL, so over a percentage chip it vanishes entirely
+   and what you read is the navy line. That is not a fault, it is the design
+   working: the path always shows one of its two tones, never neither.
 
-   SO THE ARGUMENT IS HUE SEPARATION. #ff2d95 measures 3.45 on navy, 2.87 on the
-   purple, 2.40 on the yellow, 2.18 on the royal blue, 1.75 on the sky, 1.53 on
-   the green and 1.22 on the orange. Poor on paper. But pink is the ONE hue not
-   used by any tier, by the pit background, by the held circle's fill or by the
-   chum cards' white path, so where the luminance is close the hue is not, and
-   the two kinds of chain stay told apart by colour.
+   SO DO NOT FLIP THE HUE AGAIN. If the lemon reads badly the core can be any
+   colour at all without breaking anything, because nothing depends on it winning
+   a ratio. The only figure that matters is the casing's, and it is navy.
 
-   NOTHING ELSE IN THE PIT USES IT. The only near neighbour is LineageMap's pink
-   starburst, a transient effect on another layer.
-
-   ON THE RECORD, THE BETTER FIX IF THIS DOES NOT READ: a TWO-TONE path. The
-   gesture already draws a blurred glow under a crisp core and they are the same
-   colour today. Give the glow navy and the core white, or the reverse, and the
-   line carries its own contrast onto any background instead of depending on one
-   hue to beat seven. That is the proper answer and it is barely more work; this
-   is the one-line version.
-
-   THE DOG PATH ONLY. The chum cards take CARD.colour and stay white. What each
-   path says with WEIGHT and GLOW is untouched.
-
-   THE CIRCLES DO NOT FOLLOW IT. A held circle is navy on sky blue; an available
-   twin takes its breed's RARITY_BAND colours. The twin GLOW does follow it. */
-const DOG_CHAIN_COLOUR = "#ff2d95";
+   THE CHUM CARDS KEEP A PLAIN WHITE LINE, casing undefined, so the two kinds of
+   chain are still told apart at a glance. */
+const DOG_CHAIN_COLOUR = "#ffed00";
+const DOG_CHAIN_CASING = "#0a3a57";
 /* THE FILL A HELD CIRCLE TAKES (owner, 18 September 2026), alongside its white
    outline and its tapped face. A pit circle is filled with the site's navy,
    #0a3a57, which fillFor returns for every circle once the pit is live; this is
@@ -9162,6 +9164,10 @@ export default function BreedTree({
       idAt: (cx: number, cy: number) => number | null;    // what is under a point
       geo: (i: number) => ChainSq | null;                 // where and how big
       gapShare: (a: ChainSq, b: ChainSq) => number;       // gap as a share of size
+      /* A CASING UNDER THE CRISP CORE, or undefined for a kind that wants none.
+         Drawn wider than the core and in a colour chosen to separate it from the
+         ground rather than from any one thing it crosses. See DOG_CHAIN_CASING. */
+      casing?: string;
       /* HOW WIDE A GAP THIS KIND'S LINKS MAY HOLD, as a share of size, and the
          one place the touching rule lives. Every test reads it: the join, the
          per-frame strain check, the release judgement and the circuit close. The
@@ -9205,6 +9211,7 @@ export default function BreedTree({
       geo,
       gapShare: (a, b) => chainSquareGap(a, b) / (Math.max(a.h, b.h) * 2),
       slack: CHAIN_TOUCH_SLACK, // cards touch, exactly as they always have
+      casing: undefined, // the cards keep their plain white line
       armPx: 0, // a card's press IS the chain: it takes the gate on the spot
       busy: (i) => chumFlyRef.current.has(i),
       taken: (i) => chumTakenRef.current.has(i),
@@ -9300,6 +9307,7 @@ export default function BreedTree({
       },
       gapShare: chainCircleGapShare,
       slack: DOG_CHAIN_SLACK, // no touching rule at all: see the constant
+      casing: DOG_CHAIN_CASING,
       armPx: DOG_CHAIN_ARM_PX, // a short movement is a drag, a longer one a chain
       busy: (i) => !dogInPit(dogNode(i)),
       taken: (i) => !dogInPit(dogNode(i)),
@@ -9575,7 +9583,7 @@ export default function BreedTree({
             r: chain?.canClose && d === 0 ? pulse : d === n - 1 ? 1 - 0.45 * run : 1,
           }
         : null);
-      paint(segs, dotList, unit, chain.kind.colour);
+      paint(segs, dotList, unit, chain.kind.colour, chain.kind.casing);
     };
     // Writes lines and dots into the path layer. Shared by the live chain and
     // the collapse, so the two can never be drawn two different ways. The colour
@@ -9589,10 +9597,14 @@ export default function BreedTree({
       dotList: ({ x: number; y: number; r?: number; o?: number } | null)[],
       unit: number,
       col: string,
+      // The casing's colour, or undefined for a kind that wants none. The group is
+      // emptied in that case, so a kind without one leaves nothing behind.
+      casing?: string,
     ) => {
       const g = chainGRef.current;
       const glow = g?.querySelector("[data-chain=glow]");
       const core = g?.querySelector("[data-chain=core]");
+      const cas = g?.querySelector("[data-chain=casing]");
       const blur = g?.querySelector("[data-chain=blur]");
       const dots = g?.querySelector("[data-chain=dots]");
       if (!glow || !core || !dots) return;
@@ -9613,6 +9625,13 @@ export default function BreedTree({
         });
       };
       lay(glow, unit * 0.5);
+      /* 0.26 against the core's 0.14, so the casing shows as an edge of about half
+         the core's width on each side. Wide enough to read at the sizes this path
+         is drawn at, narrow enough that the core is still the line you see. */
+      if (cas) {
+        if (casing) { lay(cas, unit * 0.26); for (const el of Array.from(cas.children)) (el as SVGLineElement).style.stroke = casing; }
+        else cas.replaceChildren();
+      }
       lay(core, unit * 0.14);
       blur?.setAttribute("stdDeviation", String(unit * 0.2));
       const n = dotList.length;
@@ -9636,6 +9655,8 @@ export default function BreedTree({
       t0: number; unit: number; col: string;
       pieces: { x1: number; y1: number; x2: number; y2: number; drift: number }[];
       dots: { x: number; y: number; drift: number }[];
+      // Carried so a falling path keeps its edge; see DOG_CHAIN_CASING.
+      casing?: string;
     };
     let collapse: Collapse | null = null;
     // The chain is gone by the time this is drawn, so its shape, its size and
@@ -9659,7 +9680,7 @@ export default function BreedTree({
         pieces.push({ x1: mx + ux * half, y1: my + uy * half, x2: q.x, y2: q.y, drift: Math.random() * 2 - 1 });
       }
       const dotsArr = cps.flatMap((q) => (q ? [{ x: q.x, y: q.y, drift: Math.random() * 2 - 1 }] : []));
-      collapse = { t0: performance.now(), unit, col: ch.kind.colour, pieces, dots: dotsArr };
+      collapse = { t0: performance.now(), unit, col: ch.kind.colour, casing: ch.kind.casing, pieces, dots: dotsArr };
     };
     // Paints one collapse frame. False once it is over, having cleared the layer.
     const drawCollapse = (now: number): boolean => {
@@ -9669,7 +9690,7 @@ export default function BreedTree({
       if (t >= 1) {
         collapse = null;
         g.style.opacity = "";
-        paint([], [], 0, "#ffffff");
+        paint([], [], 0, "#ffffff", undefined);
         return false;
       }
       const u = collapse.unit;
@@ -9681,6 +9702,7 @@ export default function BreedTree({
         collapse.dots.map((d) => ({ x: d.x + d.drift * u * t, y: d.y + fall })),
         u,
         collapse.col,
+        collapse.casing,
       );
       g.style.opacity = String(1 - t);
       return true;
@@ -9832,7 +9854,7 @@ export default function BreedTree({
       if (collapse) {
         collapse = null;
         if (chainGRef.current) chainGRef.current.style.opacity = "";
-        paint([], [], 0, "#ffffff");
+        paint([], [], 0, "#ffffff", undefined);
       }
       chain = { id: e.pointerId, kind, pending: true, cards: [], px: e.clientX, py: e.clientY, fx: e.clientX, fy: e.clientY, strain: new Map(), dead: null, closed: false, canClose: false, lastJoin: performance.now(), hold: kind.armPx > 0 ? { x: e.clientX, y: e.clientY } : null };
       if (raf == null) raf = requestAnimationFrame(tick);
@@ -11970,6 +11992,10 @@ export default function BreedTree({
                 open where it broke. The glow group blurs a copy of the same
                 lines. */}
             <g data-chain="glow" filter="url(#bt-chain-glow)" />
+            {/* The casing sits between the soft glow and the crisp core: wider than
+                the core, hard edged, and only drawn for a kind that asks for one.
+                See DOG_CHAIN_CASING. */}
+            <g data-chain="casing" />
             <g data-chain="core" />
             <g data-chain="dots" />
           </g>
