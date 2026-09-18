@@ -958,7 +958,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "A stocky white terrier built in Pembrokeshire by Captain John Edwardes to draw badger and otter alongside his hounds.",
     children: [
       { name: "Dandie Dinmont Terrier", note: "Brought in to shorten the leg and add bone.", img: "/history/breeds/dandie-dinmont-terrier.jpg", value: 35 },
-      { name: "West Highland White Terrier", note: "Used to set the white coat that kept it from being mistaken for the quarry.", img: "/history/breeds/West-Highland-White-Terrier.jpg", value: 35 },
+      { name: "West Highland Terrier", note: "Used to set the white coat that kept it from being mistaken for the quarry.", img: "/history/breeds/West-Highland-White-Terrier.jpg", value: 35 },
       { name: "Fox Terrier", note: "Added gameness and a sharp working drive. Now endangered.", img: "/history/breeds/fox_terrier-img.jpg", value: 30 }
     ]
   },

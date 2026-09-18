@@ -11,6 +11,7 @@ import { ancestralInfluence } from "../../data/lineageArchive";
 import { ukBreeds } from "../../data/uk-breeds";
 import { breeds } from "../../data/breeds";
 import { isHiddenCopyOf } from "../../data/lineageShape";
+import { resolveLineageName } from "../../data/lineageNames";
 import { breedInfo } from "../../data/breedInfo";
 import { splitName } from "./splitName";
 import styles from "./LineageMap.module.css";
@@ -221,6 +222,18 @@ const CARD = 74; // card + frame + image size (reduced 10% further)
 const LIFT_CARD_SCALE = 0.75;
 const PACK_BREEDS = new Set(breeds.map((b) => b.name)); // the 54 dogs in the card pack the site is about
 const PACK_IMG = new Map(breeds.map((b) => [b.name, b.image])); // pack breed -> its square cartoon card art
+/* THE LOOKUP HAS TO RUN THE ALIAS (owner, 19 September 2026). PACK_IMG is keyed on
+   the pack's own spelling and was being asked with the RAW node name, so a dog
+   written under an alias missed its card art and kept a historical painting:
+   "West Highland White Terrier" resolved correctly for ancestry, through
+   resolveLineageName, and then fell through to a nineteenth-century oil of a LIVING
+   pack breed. One dog when it was found, and it would have been the next one
+   silently.
+
+   The node itself has been renamed to the pack spelling, so this is the belt to that
+   braces: it protects every future alias rather than only the one that was caught. */
+const packArt = (name: string): string | undefined =>
+  PACK_IMG.get(name) ?? PACK_IMG.get(resolveLineageName(name));
 // every white flash number is this small, fixed size, matching the pit; it never
 // scales with the circle that was tapped
 const FLASH_SIZE = 15;
@@ -1362,7 +1375,7 @@ export default function LineageMap({
     const seenImg = new Set<string>();
     const all: { name: string; img: string; status: BreedTag | null }[] = [];
     const walk = (n: Node) => (n.children as Node[] | undefined)?.forEach((k) => {
-      if (k.img && !seenImg.has(k.img)) { seenImg.add(k.img); all.push({ name: k.name, img: PACK_IMG.get(k.name) ?? k.img, status: nodeStatus(k.name, k.note) }); }
+      if (k.img && !seenImg.has(k.img)) { seenImg.add(k.img); all.push({ name: k.name, img: packArt(k.name) ?? k.img, status: nodeStatus(k.name, k.note) }); }
       walk(k);
     });
     if (root) walk(root);
@@ -1376,7 +1389,7 @@ export default function LineageMap({
   const dupTotal = useMemo(() => {
     const m = new Map<string, number>();
     const walk = (n: Node) => (n.children as Node[] | undefined)?.forEach((k) => {
-      if (k.img) { const img = PACK_IMG.get(k.name) ?? k.img; m.set(img, (m.get(img) ?? 0) + 1); }
+      if (k.img) { const img = packArt(k.name) ?? k.img; m.set(img, (m.get(img) ?? 0) + 1); }
       walk(k);
     });
     if (root) walk(root);
@@ -1416,7 +1429,7 @@ export default function LineageMap({
         // at depth 1 the child IS the branch; deeper down it inherits it
         const br = depth === 1 ? k.name : branch;
         if (k.img && rootLeaves > 0) {
-          const key = PACK_IMG.get(k.name) ?? k.img;
+          const key = packArt(k.name) ?? k.img;
           const pct = (k._leaves / rootLeaves) * 100; // cumulative contribution of this appearance
           const a = apps.get(key) || []; a.push({ depth, pct, branch: br, name: k.name }); apps.set(key, a);
         }
@@ -2036,7 +2049,7 @@ export default function LineageMap({
       const snap = pinned.get(id);
       const name = live?.name ?? snap?.name ?? "";
       const rawImg = (live?.img ?? snap?.img) as string;
-      const img = PACK_IMG.get(name) ?? rawImg; // pack breeds flip to their square cartoon card
+      const img = packArt(name) ?? rawImg; // pack breeds flip to their square cartoon card
       const share = live ? Math.round((live._leaves / (live._parent as Node)._leaves) * 100) : snap?.share ?? 0;
       // cumulative share of the whole breed: a node's leaves over the root's leaves,
       // which is the product of every parent share down the chain
@@ -2159,7 +2172,7 @@ export default function LineageMap({
 
        isDupImg and the stacking logic use c.img directly and are unaffected: they
        ask whether THIS picture repeats, not how many of a dog exist. */
-    const keyOf = (c: { name: string; img: string }) => PACK_IMG.get(c.name) ?? c.img;
+    const keyOf = (c: { name: string; img: string }) => packArt(c.name) ?? c.img;
     const home = new Map<string, number>();
     for (const c of pickCards) {
       if (placedSet.has(c.id) || stackedIds.has(c.id) || packHidden.has(c.id)) {
@@ -3915,7 +3928,7 @@ export default function LineageMap({
                         rebalance rewards opening ANY circle equally, so a deep branch is not
                         worth less per tap than a leaf. The top-three multiplier still applies
                         on top. */
-                      const mult = topBonus.get(PACK_IMG.get(n.name) ?? (n.img as string)) ?? 1; // top-3 breeds score more
+                      const mult = topBonus.get(packArt(n.name) ?? (n.img as string)) ?? 1; // top-3 breeds score more
                       flashNum(n._x, n._y - r, firstHit ? Math.round(baseVal * mult) : 0, FLASH_SIZE); // only the first tap on a node scores; later taps read 0
                       follow(n);
                       // a card placed in a frame is protected: a node click won't remove it
@@ -4544,7 +4557,7 @@ export default function LineageMap({
 className={[
                     styles.pickCard,
                     isDupImg(c.img) && !isTopOfStack(c) && !PACK_BREEDS.has(c.name) ? styles.pickCardStack : "",
-                    (placedSet.has(c.id) || stackedIds.has(c.id)) ? (imagesAllHome.has(PACK_IMG.get(c.name) ?? c.img) ? styles.pickCardDone : styles.pickCardWaiting) : "",
+                    (placedSet.has(c.id) || stackedIds.has(c.id)) ? (imagesAllHome.has(packArt(c.name) ?? c.img) ? styles.pickCardDone : styles.pickCardWaiting) : "",
                   ].filter(Boolean).join(" ")}
                     /* THE RIM IS THE RARITY COLOUR NOW (owner, 18 September 2026).
                        It was ringColor, the lifted dog's own ring colour from the
@@ -4934,7 +4947,7 @@ className={[
                  turned green. */
               outline: circular
                 ? "none"
-                : `3px solid ${imagesAllHome.has(PACK_IMG.get(c.name) ?? c.img) ? "#22c55e" : "var(--yellow, #ffd23e)"}`,
+                : `3px solid ${imagesAllHome.has(packArt(c.name) ?? c.img) ? "#22c55e" : "var(--yellow, #ffd23e)"}`,
               outlineOffset: "-1px",
             }}
             onClick={(e) => { e.stopPropagation(); }}
