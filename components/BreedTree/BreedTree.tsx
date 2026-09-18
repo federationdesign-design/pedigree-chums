@@ -6940,7 +6940,58 @@ export default function BreedTree({
       const BOND_CAP = 3;
       const BOND_STIFFNESS = 0.7;
       const BOND_DAMPING = 0.2;
-      type Bond = { c: unknown; a: number; b: number; key: string };
+      /* ---- A BOND DOES NOT LAST (owner, 18 September 2026, measured) ----------
+         THE READING THAT SETTLED IT, from ?spindiag=1 on a settled pit with
+         nothing being dragged:
+
+           pts/s 88.0  bodies 204  awake 161  asleep 43
+           chips 128 (inert 109)  bonds 138  KE 31.721  dKE -13.197
+           sumW 5.646  maxW 0.3989 on badge #103 bonds 3 spd 2.82
+
+         dKE is firmly NEGATIVE, so nothing is adding energy: the pit sheds 42% of
+         its kinetic energy in half a second and is still sitting at 31.7, because
+         gravity keeps re-feeding it as the solver pulls bodies out of resting
+         contact and they fall back. The clump is not being pushed. It is simply
+         never allowed to settle, exactly as the note above predicts.
+
+         WHY A LIFETIME AND NOT A STILLNESS TEST. Releasing a clump once it goes
+         still was the obvious fix and it is the wrong one: the worst body was at
+         2.82px a step with an angular velocity of 0.4, which is a crawl, not a
+         jitter. A threshold low enough to mean "settled" would very likely never
+         fire. The bonds prevent the stillness that would release the bonds, and a
+         stillness trigger cannot break a deadlock whose symptom is the absence of
+         stillness.
+
+         WHY A LIFETIME IS ENOUGH. A bond's only job is to make chips stick WHILE
+         THEY ARE MOVING. Once the pile has arranged itself, contact and gravity
+         hold the shape, and the bond adds nothing that can be seen: bonds render
+         invisible. It costs the one thing that matters, which is sleep.
+
+         SO A BOND IS CUT 2500ms AFTER IT IS MADE, swept twice a second, and the
+         chips become ordinary resting discs that enableSleeping can put away. It
+         always fires, needs no group tracking, and at rest the bond count tends
+         to zero on its own.
+
+         IT RE-BONDS BY ITSELF. Disturb the pile and contacts begin again, which
+         is what joinChips listens for, so a clump that is knocked apart sticks
+         again with a fresh 2500ms. Nothing has to remember to re-arm it.
+
+         BOND_CAP STAYS AT 3, deliberately. One bond is enough to stop a body
+         sleeping, so the cap was never the cause: dropping it to 2 would have
+         saved about a fifth of the solver work and changed nothing about the
+         never-sleeps property. With bonds expiring, the cap only governs the
+         brief moving phase, where 3 is already the measured-best figure.
+
+         WHAT TO WATCH. A chip held at an odd angle by a bond alone can slip when
+         the bond is cut. Discs piled under gravity should hold, so the tell is a
+         clump that visibly SLUMPS or spreads about two and a half seconds after
+         it forms, or a readout showing bonds at zero while KE stays high, which
+         would mean the pile is re-arranging rather than settling. If that shows,
+         the answer is a longer BOND_LIFE_MS, not a return to permanent bonds. */
+      const BOND_LIFE_MS = 2500;
+      const BOND_SWEEP_MS = 500;
+      let bondSweptAt = 0;
+      type Bond = { c: unknown; a: number; b: number; key: string; at: number };
       const bondsOf = new Map<number, Bond[]>();
       const bondedPairs = new Set<string>();
       const bondKey = (ia: number, ib: number) => (ia < ib ? `${ia}:${ib}` : `${ib}:${ia}`);
@@ -6968,27 +7019,54 @@ export default function BreedTree({
           render: { visible: false },
         });
         Composite.add(world, c);
-        const rec: Bond = { c, a: x.idx, b: y.idx, key };
+        const rec: Bond = { c, a: x.idx, b: y.idx, key, at: performance.now() };
         bondedPairs.add(key);
         for (const id of [x.idx, y.idx]) {
           const list = bondsOf.get(id);
           if (list) list.push(rec); else bondsOf.set(id, [rec]);
         }
       };
+      /* ONE BOND, CUT. dropBonds below is every bond on one chip, which is what a
+         death or a teleport needs; an expiry needs a single record, so the
+         teardown lives here and both callers use it. The constraint leaving the
+         world is the part that must never be skipped: Composite.remove on the
+         BODY leaves the constraint behind, still referencing it and still solved
+         every step. Both ends are unhooked, so bondsOf can never keep a record
+         the other side has already dropped. */
+      const releaseBond = (rec: Bond) => {
+        Composite.remove(world, rec.c);
+        bondedPairs.delete(rec.key);
+        for (const id of [rec.a, rec.b]) {
+          const ol = bondsOf.get(id);
+          if (!ol) continue;
+          const kept = ol.filter((z) => z.key !== rec.key);
+          if (kept.length) bondsOf.set(id, kept); else bondsOf.delete(id);
+        }
+      };
       const dropBonds = (idx: number) => {
         const list = bondsOf.get(idx);
-        bondsOf.delete(idx);
         if (!list) return;
-        for (const rec of list) {
-          Composite.remove(world, rec.c);
-          bondedPairs.delete(rec.key);
-          const other = rec.a === idx ? rec.b : rec.a;
-          const ol = bondsOf.get(other);
-          if (ol) {
-            const kept = ol.filter((z) => z.key !== rec.key);
-            if (kept.length) bondsOf.set(other, kept); else bondsOf.delete(other);
+        // Copied, because releaseBond edits the very list being walked.
+        for (const rec of [...list]) releaseBond(rec);
+        bondsOf.delete(idx);
+      };
+      /* THE SWEEP. Twice a second, over each bond once rather than once per end,
+         which is what `seen` is for: every record sits in TWO lists in bondsOf.
+         Cutting is deferred until after the walk so releaseBond is never editing
+         the maps the walk is reading. */
+      const expireBonds = (now2: number) => {
+        if (now2 - bondSweptAt < BOND_SWEEP_MS) return;
+        bondSweptAt = now2;
+        const seen = new Set<string>();
+        const stale: Bond[] = [];
+        for (const list of bondsOf.values()) {
+          for (const rec of list) {
+            if (seen.has(rec.key)) continue;
+            seen.add(rec.key);
+            if (now2 - rec.at >= BOND_LIFE_MS) stale.push(rec);
           }
         }
+        for (const rec of stale) releaseBond(rec);
       };
       /* THE MOMENT A CHIP GOES INERT IT LOOKS AROUND. collisionStart only fires
          when a contact BEGINS, so two chips already resting against each other
@@ -7529,6 +7607,9 @@ export default function BreedTree({
           acc -= STEP;
           stepped++;
         }
+        // A bond is cut 2500ms after it is made, so a settled clump stops being
+        // held awake by its own constraints. See the bond block.
+        expireBonds(nowRaf);
         // ESCAPE NET. Anything that ends up below the floor is put back.
         //
         // Objects have been seen passing through the floor and continuing down,
