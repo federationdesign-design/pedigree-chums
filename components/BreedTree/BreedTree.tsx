@@ -8929,31 +8929,6 @@ export default function BreedTree({
       g.style.opacity = String(1 - t);
       return true;
     };
-    /* THE FAIL TONE. The site has no sound anywhere and no audio files, so this
-       is synthesised: a short triangle wave falling from 260Hz to 70Hz. The
-       context is made on first use, inside the release that failed, which is a
-       user gesture, so browsers allow it. Silent wherever audio is unavailable. */
-    let actx: AudioContext | null = null;
-    const failTone = () => {
-      try {
-        const AC = window.AudioContext ?? (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
-        if (!AC) return;
-        actx = actx ?? new AC();
-        if (actx.state === "suspended") void actx.resume();
-        const t = actx.currentTime;
-        const osc = actx.createOscillator();
-        const gain = actx.createGain();
-        osc.type = "triangle";
-        osc.frequency.setValueAtTime(260, t);
-        osc.frequency.exponentialRampToValueAtTime(70, t + 0.32);
-        gain.gain.setValueAtTime(0.0001, t);
-        gain.gain.exponentialRampToValueAtTime(0.3, t + 0.02);
-        gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.36);
-        osc.connect(gain).connect(actx.destination);
-        osc.start(t);
-        osc.stop(t + 0.38);
-      } catch { /* no audio available */ }
-    };
     // Why a released chain may not clear, or null if it may. No grace here.
     // A broken link is reported ahead of an open circuit: it is the real cause.
     const judge = (ch: Chain): string | null => {
@@ -8983,7 +8958,6 @@ export default function BreedTree({
       result = `FAILED, ${text}, nothing scored`;
       note = result;
       startCollapse(ch);
-      failTone();
       const held = chainHeldCollectRef.current;
       if (held != null) {
         chainHeldCollectRef.current = null;
@@ -9028,7 +9002,6 @@ export default function BreedTree({
         if (fail) {
           result = `FAILED, ${fail}, nothing scored`;
           startCollapse(ch);
-          failTone();
         } else {
           // What a valid release does belongs to the kind: cards clear and score,
           // and another kind will do something else entirely.
@@ -9157,7 +9130,6 @@ export default function BreedTree({
       dogStarterAtRef.current = null;
       dogChainBreedRef.current = null;
       dogChainNodesRef.current = new Set();
-      if (actx) void actx.close().catch(() => { /* already closed */ });
     };
   }, []);
   /* ==================== REMOVE BEFORE LAUNCH, ?dragdebug=1 ====================
