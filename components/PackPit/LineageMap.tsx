@@ -1180,9 +1180,20 @@ export default function LineageMap({
      state is true now and the timer below is gone; showAuto still hides it once
      every circle is seen, or while packing, collecting or removing, so it
      disappears when there is nothing left to shortcut. */
+  // What AUTO charges. A flat figure today; see the note on setPenalty for why the
+  // label reads it from the state rather than repeating it.
+  const AUTO_COST = 500;
   const [autoArmed, setAutoArmed] = useState(true);
   const [autoExposed, setAutoExposed] = useState<Set<string>>(new Set()); // nodes auto revealed; their leaf names stay hidden to cut clutter
-  const [penalty, setPenalty] = useState<number | null>(null); // animation key while the white -1000 floats up
+  /* THE FLOATING CHARGE, and it now carries the FIGURE as well as the key.
+
+     IT WAS LYING. The div was hard-coded "-2500" while autoCollect charged 500:
+     the cost was cut on 16 September 2026 and the label it prints was not, so the
+     player has been told a number five times what they were actually charged ever
+     since. A literal in the markup cannot follow a cost that changes, so the
+     charge itself rides in the state and the label prints what was taken. `v` is
+     the signed value handed to onScore, so the two cannot disagree again. */
+  const [penalty, setPenalty] = useState<{ k: number; v: number } | null>(null);
   const [idleHint, setIdleHint] = useState(false); // pulse the first ring of circles after 1s of no interaction
   const interacted = useRef(false);
   useEffect(() => {
@@ -2440,12 +2451,16 @@ export default function LineageMap({
     // than calling the placement themselves: one caller, one place to reason about.
     // Nothing to pop means fire on the next tick; otherwise wait out the ripple.
     window.setTimeout(() => { autoForceRef.current = true; setAutoPlaceTick((t) => t + 1); }, imgNodes.length === 0 ? 0 : rippleMs + 600);
-    onScore?.(-500); /* WAS -2500, 16 September 2026 (owner). The whole learn-area
-       scale was rebalanced that day to reward thoroughness: awards now run into
-       the tens of thousands on a deep dog, so a 2500 penalty read as ruinous. */
+    /* WAS -2500, 16 September 2026 (owner). The whole learn-area scale was
+       rebalanced that day to reward thoroughness: awards now run into the tens of
+       thousands on a deep dog, so a 2500 penalty read as ruinous.
+       Charged ONCE, into a local, so the score and the label are the same number
+       by construction rather than by two places agreeing. */
+    const charge = -AUTO_COST;
+    onScore?.(charge);
     const pk = (fxId.current += 1);
-    setPenalty(pk);
-    window.setTimeout(() => setPenalty((cur) => (cur === pk ? null : cur)), 1000);
+    setPenalty({ k: pk, v: charge });
+    window.setTimeout(() => setPenalty((cur) => (cur && cur.k === pk ? null : cur)), 1000);
     setAutoArmed(false);
   };
   /* Placing every loose card into its frame. It was written inline inside
@@ -5045,7 +5060,7 @@ className={[
         </div>
       </div>
     )}
-    {penalty !== null && <div key={penalty} className={styles.autoPenalty}>-2500</div>}
+    {penalty !== null && <div key={penalty.k} className={styles.autoPenalty}>{penalty.v}</div>}
     </>
   );
 }
