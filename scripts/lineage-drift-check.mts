@@ -56,12 +56,36 @@ const strict = process.argv.includes("--strict");
 
 type Occ = { tree: string; depth: number; kids: string[]; echo: boolean };
 const occ = new Map<string, Occ[]>();
+/* Duplicate SIBLINGS: the same name twice under one parent. Keyed parent > child.
+   `identical` is whether every pair found is a byte copy, values included, because
+   that is what decides whether BreedTree's isDupSibling hides the second: an
+   identical copy is hidden, a pair that differs is left drawn so its share is not
+   lost. See the note on isDupSibling. */
+const dups = new Map<string, { trees: Set<string>; count: number; identical: boolean }>();
+const sig = (n: N): string => `${n.name}:${n.value ?? ""}(${(n.children ?? []).map(sig).join(",")})`;
 
 for (const root of LINEAGE_ROOTS) {
   const t = getLineage(root) as N | null;
   if (!t) continue;
   const walk = (n: N, parent: N | null, depth: number) => {
     const kids = (n.children ?? []).filter((c) => c.name !== n.name);
+    /* DUPLICATE CHILDREN, WHICH THE SET COMPARISON BELOW CANNOT SEE. It compares
+       SETS of child names, so a name appearing twice collapses to one entry and the
+       two shapes look identical. That hole hid 20 patterns, the largest reaching 37
+       trees, including the Ancient Molossers pair and the Old working collies pair.
+       Recorded here, where the raw child list is still in hand. */
+    const seenKid = new Map<string, N>();
+    for (const c of n.children ?? []) {
+      if (c.name === n.name) continue; // an echo is not a duplicate, it is load-bearing
+      const prev = seenKid.get(c.name);
+      if (prev) {
+        const key = `${n.name} > ${c.name}`;
+        const same = sig(prev) === sig(c);
+        if (!dups.has(key)) dups.set(key, { trees: new Set(), count: 0, identical: true });
+        const e = dups.get(key)!;
+        e.trees.add(root); e.count++; if (!same) e.identical = false;
+      } else seenKid.set(c.name, c);
+    }
     const isEchoNode = !!parent && parent.name === n.name;
     if (depth > 0 && !isEchoNode) {
       if (!occ.has(n.name)) occ.set(n.name, []);
@@ -77,7 +101,7 @@ for (const root of LINEAGE_ROOTS) {
   walk(t, null, 0);
 }
 
-type Finding = { name: string; trees: number; kind: "gap" | "disjoint" | "ceiling"; detail: string };
+type Finding = { name: string; trees: number; kind: "gap" | "disjoint" | "ceiling" | "duplicate"; detail: string };
 const findings: Finding[] = [];
 
 for (const [name, list] of occ) {
@@ -114,8 +138,18 @@ for (const [name, list] of occ) {
       : variants.map((v) => `[${v.kids.join(", ") || "none"}] in ${v.trees.size}`).join("  vs  ") });
 }
 
+for (const [key, d] of dups) {
+  findings.push({
+    name: key, trees: d.trees.size, kind: "duplicate",
+    detail: `${d.count} occurrences, ${d.identical ? "byte-identical so BreedTree hides the second" : "VALUES DIFFER so both stay drawn"}`,
+  });
+}
 findings.sort((a, b) => b.trees - a.trees || a.name.localeCompare(b.name));
-const real = findings.filter((f) => f.kind !== "ceiling");
+// Duplicates are reported but not counted as drift: BreedTree hides the identical
+// ones and deliberately leaves the differing ones drawn, so neither is a fault to
+// fix in the data. They are here so the next person can see them at all.
+const real = findings.filter((f) => f.kind !== "ceiling" && f.kind !== "duplicate");
+const duplicates = findings.filter((f) => f.kind === "duplicate");
 const ceilings = findings.filter((f) => f.kind === "ceiling");
 
 const line = (f: Finding) => `  ${String(f.trees).padStart(3)} trees  ${f.kind.toUpperCase().padEnd(8)} ${f.name}\n              ${f.detail}`;
@@ -126,6 +160,8 @@ if (real.length) {
 } else {
   console.log("REAL DRIFT: none.");
 }
+console.log(`\nDUPLICATE CHILDREN (${duplicates.length} patterns), reported, not counted as drift:\n`);
+duplicates.forEach((f) => console.log(line(f)));
 console.log(`\nDEPTH CEILINGS (${ceilings.length}), not counted as drift${showAll ? "" : "; pass --all to list them"}:`);
 if (showAll) ceilings.forEach((f) => console.log(line(f)));
 

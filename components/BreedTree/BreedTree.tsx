@@ -1534,6 +1534,55 @@ function isEcho(d: Node): boolean {
   return !!d.parent && d.data.name === d.parent.data.name;
 }
 
+/* THE SAME FAULT, THE OTHER RELATIONSHIP (owner, 18 September 2026).
+
+   isEcho asks CHILD AGAINST PARENT. It cannot see a pair like Ancient Molossers'
+   two `Old Mastiffs of the East`, because those repeat EACH OTHER, not their
+   parent. Same dog drawn twice side by side, same name, same picture, 50% and 50%,
+   and the existing predicate was written for only one of the two shapes.
+
+   IT IS NOT RARE. Twenty distinct duplicate-sibling patterns across the archive,
+   the largest reaching 37 trees and 138 occurrences. Ancient Molossers is 23 trees.
+
+   ONLY AN IDENTICAL COPY IS HIDDEN, and that is the whole rule: same name AND the
+   same subtree, values included. Two of the twenty carry copies whose VALUES
+   differ (Old British ratting Terriers > Earth Dog, and Cairn Terrier > Skye
+   Terrier stock). Those are not copies, they are two contributions of different
+   weight that happen to share a name, and hiding one would either lose its share
+   or require summing it into the other. Summing would MOVE A PERCENTAGE, which is
+   the one guarantee that makes hiding safe at all, and it would do so across 138
+   occurrences. So they stay drawn, and the signature below is what decides.
+
+   THE FIRST ONE STAYS. Hidden means the second and any after it.
+
+   THE SIGNATURE IS CACHED ON THE RAW NODE, in a WeakMap, because this is asked
+   inside render and physics loops. Each raw LineageNode is walked once, ever. */
+const sigCache = new WeakMap<LineageNode, string>();
+function subtreeSig(n: LineageNode): string {
+  const hit = sigCache.get(n);
+  if (hit !== undefined) return hit;
+  const s = `${n.name}:${n.value ?? ""}(${(n.children ?? []).map(subtreeSig).join(",")})`;
+  sigCache.set(n, s);
+  return s;
+}
+function isDupSibling(d: Node): boolean {
+  const p = d.parent;
+  if (!p || !p.children) return false;
+  const i = p.children.indexOf(d);
+  if (i <= 0) return false; // the first copy is the one that is drawn
+  const sig = subtreeSig(d.data);
+  for (let j = 0; j < i; j++) if (subtreeSig(p.children[j].data) === sig) return true;
+  return false;
+}
+/* WHAT THE REST OF THE FILE SHOULD ASK. A circle the player never sees must also
+   never be a body, never be counted as a breed in the pit, never drop a chip and
+   never let a chain start on it. Both predicates mean exactly that, so every site
+   that used to ask isEcho asks this instead. The one exception is ?spindiag=1,
+   which names the two separately because telling them apart is its job. */
+function isHiddenCopy(d: Node): boolean {
+  return isEcho(d) || isDupSibling(d);
+}
+
 /* WHAT IS LIVE IN THE PIT, BY BREED, ASKED IN ONE PLACE (owner, 18 September
    2026).
 
@@ -1558,7 +1607,7 @@ function isEcho(d: Node): boolean {
    breed drops to one the moment its last duplicate is collected, and a pit
    converges on uniqueness as it is played. Do not cache it, do not freeze it. */
 function pitCountable(n: Node, removed: Set<Node>): boolean {
-  return n.depth !== 0 && !isEcho(n) && !removed.has(n);
+  return n.depth !== 0 && !isHiddenCopy(n) && !removed.has(n);
 }
 function liveBreedNodesIn(owned: Set<Node> | undefined, removed: Set<Node>, name: string): Node[] {
   if (!owned) return [];
@@ -1763,7 +1812,7 @@ const PIT_FULL_GRACE_FREE = 2;
 const PIT_FULL_GRACE_PER_CIRCLE_MS = 2500;
 function pitFullGraceMs(ns: Node[]): number {
   let n = 0;
-  for (const d of ns) if (d.depth > 0 && d.depth <= 2 && !isEcho(d)) n++;
+  for (const d of ns) if (d.depth > 0 && d.depth <= 2 && !isHiddenCopy(d)) n++;
   return PIT_FULL_GRACE_MS + Math.max(0, n - PIT_FULL_GRACE_FREE) * PIT_FULL_GRACE_PER_CIRCLE_MS;
 }
 /* THE ONE YELLOW EVERY LIVE PERCENTAGE CHIP WEARS (owner, 18 September 2026,
@@ -2806,7 +2855,7 @@ export default function BreedTree({
   // absolute stage px cancel out of the world->screen scale), so it touches no ref and
   // is safe in the useRef seeds below and re-run in the mount effect.
   const displayRestView = (): View => {
-    const vis = nodes.filter((d) => !(d.depth === 0 || isEcho(d)));
+    const vis = nodes.filter((d) => !(d.depth === 0 || isHiddenCopy(d)));
     if (vis.length === 0) return [nodes[0].x, nodes[0].y, nodes[0].r * 2 * (isMobile ? PAD : ZOOM_PAD)];
     let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
     for (const d of vis) {
@@ -5626,7 +5675,7 @@ export default function BreedTree({
            in this block and was O(n) inside an O(n) loop. */
         let tot = 0, done = 0;
         for (const o of ownedC) {
-          if (o.depth === 0 || isEcho(o)) continue;
+          if (o.depth === 0 || isHiddenCopy(o)) continue;
           tot++;
           if (removedNodesRef.current.has(o)) done++;
         }
@@ -5657,7 +5706,7 @@ export default function BreedTree({
       if (owned) {
         for (const o of owned) {
           if (o.data.name !== glowBreed) continue;
-          if (o.depth === 0 || isEcho(o) || removedNodesRef.current.has(o)) continue;
+          if (o.depth === 0 || isHiddenCopy(o) || removedNodesRef.current.has(o)) continue;
           /* A WORD CIRCLE HAS NO DISC TO GLOW BEHIND (owner, 18 September 2026,
              seen on "Celtic Hound" and "Old hunting dogs of the Celts").
 
@@ -6070,9 +6119,9 @@ export default function BreedTree({
       `M ${cx - r},${cy} a ${r},${r} 0 1,0 ${2 * r},0 a ${r},${r} 0 1,0 ${-2 * r},0 Z`;
     let dd = "";
     for (const d of nodes) {
-      if (d.depth === 0 || isEcho(d) || d.data.name !== highlightName) continue;
+      if (d.depth === 0 || isHiddenCopy(d) || d.data.name !== highlightName) continue;
       dd += disc((d.x - v[0]) * kk, (d.y - v[1]) * kk, d.r * kk);
-      for (const kid of d.children ?? []) if (!isEcho(kid)) dd += " " + disc((kid.x - v[0]) * kk, (kid.y - v[1]) * kk, kid.r * kk);
+      for (const kid of d.children ?? []) if (!isHiddenCopy(kid)) dd += " " + disc((kid.x - v[0]) * kk, (kid.y - v[1]) * kk, kid.r * kk);
     }
     p.setAttribute("d", dd);
   }, [displayOnly, highlightName, nodes, aspect]);
@@ -6686,7 +6735,7 @@ export default function BreedTree({
       // popped so popChildren early-returns and cannot double the circles.
       for (const b of bodies) {
         if (!b.n || !b.mb) continue;
-        const kids = (b.n.children ?? []).filter((ch) => !isEcho(ch));
+        const kids = (b.n.children ?? []).filter((ch) => !isHiddenCopy(ch));
         if (!kids.length) { b.popped = true; continue; }
         const wmb = b.mb; // narrowed and stable for the closure below
         // the word plus everything freed under it, immune to each other briefly
@@ -6760,7 +6809,7 @@ export default function BreedTree({
         b.popped = true;
         const newMbs: any[] = b.mb ? [b.mb] : [];
         for (const ch of b.n.children ?? []) {
-          if (isEcho(ch)) continue;
+          if (isHiddenCopy(ch)) continue;
           // Grown once, then floored. b.popped guards popChildren against a
           // second run, so this cannot compound down a deep tree. The floor is
           // given in screen pixels and converted here, because the packed radii
@@ -7260,7 +7309,7 @@ export default function BreedTree({
           const rad = DOG_CHAIN_CHIP_SPREAD_PX * Math.sqrt(Math.random());
           return { x: p.x + Math.cos(a2) * rad, y: p.y + Math.sin(a2) * rad };
         };
-        const kids = (n.children ?? []).filter((ch) => !isEcho(ch));
+        const kids = (n.children ?? []).filter((ch) => !isHiddenCopy(ch));
         if (kids.length) {
           for (const ch of kids) { const q = at(); spawnBadgeRef.current?.(q.x, q.y, badgeDrawForNode(ch.r, k), pctOf(ch)); }
         } else {
@@ -8903,7 +8952,7 @@ export default function BreedTree({
                 if (!el2 || !el2.style.fill) continue;
                 const nd = nds[i2];
                 rows.push(
-                  `#${i2} ${(nd?.data.name ?? "?").slice(0, 10)} d${nd?.depth ?? "?"}${nd && isEcho(nd) ? " ECHO" : ""}` +
+                  `#${i2} ${(nd?.data.name ?? "?").slice(0, 10)} d${nd?.depth ?? "?"}${nd && isEcho(nd) ? " ECHO" : nd && isDupSibling(nd) ? " DUP" : ""}` +
                   ` disp ${el2.getAttribute("display") ?? "-"} fill ${el2.getAttribute("fill") ?? "-"}` +
                   ` -> ${el2.style.fill} key ${el2.dataset.chained ?? "-"}`,
                 );
@@ -10217,7 +10266,7 @@ export default function BreedTree({
          that follows this one, and this rule leans on it. */
       startable: (i) => {
         const n = dogNode(i);
-        if (!dogInPit(n) || n.depth === 0 || isEcho(n)) return false;
+        if (!dogInPit(n) || n.depth === 0 || isHiddenCopy(n)) return false;
         return dogHasTwin(n);
       },
       joinBlock: (ch, i) => {
@@ -11445,7 +11494,7 @@ export default function BreedTree({
               // The outer breed circle (root) is hidden so only the ancestor
               // circles inside it show. It stays in the DOM (rendered invisible
               // and non-interactive) so the index alignment used by zoomTo holds.
-              const hidden = d.depth === 0 || isEcho(d);
+              const hidden = d.depth === 0 || isHiddenCopy(d);
               const hasImg = !hidden && !!nodeImg(d);
               // The larger "bottom" image in each circle stays full colour and
               // the images nested on top of it are tinted, alternating inward.
@@ -13662,7 +13711,7 @@ export default function BreedTree({
               const clearable = owned
                 ? [...owned].filter((n) => {
                     if (removedNodesRef.current.has(n)) return false;
-                    if (n.depth === 0 || isEcho(n)) return false;
+                    if (n.depth === 0 || isHiddenCopy(n)) return false;
                     const ob = pitBodiesRef.current?.find(n) as { held?: boolean } | undefined;
                     return !ob?.held;
                   })
