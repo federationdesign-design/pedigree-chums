@@ -3017,25 +3017,44 @@ export default function LineageMap({
                         colour. The same trap the ring fell into twice: the fix was
                         invisible because the symptom matched the bug.
 
-                        THE TEXT IS WHITE ON EVERY STATE (owner, 18 September
-                        2026), asked for knowing the numbers, which are these:
-                          extremely rare #4d2e91  9.93  passes
-                          rare           #2547c4  7.56  passes
-                          uncommon       #5dbf86  2.27  FAILS
-                          common         #f47421  2.85  FAILS
-                          very common    #ffd23e  1.44  FAILS, near invisible
-                          done green     #22c55e  2.28  FAILS
-                        Four of six fail, and the worst is the very common band the
-                        owner is looking at. The per-tier fg from RARITY_BAND and
-                        the navy done-state ink are both dropped for it.
-                        FOR THE RECORD this label was made white once before, on
-                        the same request, and reverted the same day for the same
-                        reason: see the note above it, which measured white on the
-                        old lemon at 1.21 and called it an invisible label rather
-                        than a contrast problem. If it reads badly again, the
-                        answer is to darken the fills, not to re-argue the ink. */}
+                        THE INK IS CHOSEN PER STATE, 18 September 2026 (owner),
+                        after a full audit rather than another one-at-a-time fix.
+
+                        THIS LABEL HAS BEEN FLIPPED THREE TIMES: navy, then white,
+                        then white again, each time on how ONE tier looked. Every
+                        flip broke the tiers nobody was looking at. ALL TWELVE
+                        PAIRS ARE MEASURED HERE SO IT IS NOT FLIPPED A FOURTH.
+
+                          state            bg        white   black
+                          extremely rare   #4d2e91    9.93    2.12
+                          rare             #2547c4    7.56    2.78
+                          uncommon         #5dbf86    2.27    9.26
+                          common           #f47421    2.85    7.37
+                          very common      #ffd23e    1.44   14.54
+                          done green       #22c55e    2.28    9.22
+
+                        WORST CASE BY RULE: white everywhere 1.44, black
+                        everywhere 2.12, INK PER STATE 7.37. Per state is more
+                        than three times better than either flat rule and is the
+                        only one that passes AA on all six. Its worst pair is black
+                        on the common orange at 7.37, and five of the six clear AAA.
+
+                        SO THE FIVE TIERS TAKE band.fg, which is what RARITY_BAND
+                        always held and what these numbers vindicate: white on the
+                        two dark tiers, black on the other three. The done green is
+                        the only state the table did not already answer, and black
+                        at 9.22 against white's 2.28 answers it.
+
+                        THE FILLS ARE NOT DARKENED, and that was the other route.
+                        To carry white they would need uncommon 32% darker,
+                        common 23%, very common 45% (#ffd23e to #8c7322, which stops
+                        being yellow at all) and the done green 31%. But bg drives
+                        five things, and only this one wants dark: the crisp rarity
+                        ring, its glow bands, seenFill, the twins in the pit and the
+                        progress arc all sit on dark grounds and want the fills
+                        LIGHTER. One element against three, and the ink is free. */}
                     <rect className={styles.bandFill} x={-R * 1.6} y={bandTop} width={R * 3.2} height={R * 1.6} style={{ fill: doneRing ? "#22c55e" : band.bg }} />
-                    <text className={styles.bandFill} x={labelX} y={labelY} textAnchor="middle" dominantBaseline="central" style={{ fontFamily: '"Luckiest Guy", system-ui, sans-serif', fontSize: fs, fontWeight: 400, fill: "#ffffff" }}>{band.label}</text>
+                    <text className={styles.bandFill} x={labelX} y={labelY} textAnchor="middle" dominantBaseline="central" style={{ fontFamily: '"Luckiest Guy", system-ui, sans-serif', fontSize: fs, fontWeight: 400, fill: doneRing ? "#000000" : band.fg }}>{band.label}</text>
                   </g>
                 </g>
               </g>
