@@ -700,6 +700,26 @@ const RING_PALETTE = ["#fff200", "#ffdf00", "#009fe0", "#36b8ff"];
    wide file uses less of the box's height. */
 const QMARK_VB = 720;
 const QMARK_SRC = "/dogfacequestion.svg";
+/* REMOVE BEFORE LAUNCH, ?dogchain=1. THE TAPPED FACE, worn by a circle that is
+   actually HELD in a chain, in place of the resting mark. Not by a glowing twin
+   and not by every circle of the chain's breed: those keep the ordinary mark,
+   turned white, which is the signal that they COULD join. This one says a circle
+   IS joined, alongside the white mark and the white outline it already wears.
+
+   IT DROPS STRAIGHT IN. Same 813.7 by 463.5 canvas as the resting mark, so it
+   lands at the same size and position with no geometry to change, and the swap
+   is one href.
+
+   NOTHING IN IT FIGHTS THE WHITE. The artwork is black and nothing else: four
+   filled paths with no fill of their own, so they paint the default black, and
+   one open path stroked black at 12 units for the mouth. The recolour filter
+   maps every pixel's RGB and leaves alpha alone, and it runs after the artwork
+   is painted, so the stroke is recoloured with the fills and the whole face
+   comes out white with its holes intact.
+
+   The underscore in the filename is deliberate: the file arrived with a space
+   in it, which is trouble in a URL. */
+const QMARK_TAPPED_SRC = "/dogfacequestion_tapped.svg";
 // stickBig is the same artwork half again as large, so the pair reads as two
 // sticks of different sizes rather than one drawn twice
 type ToyKind = "ball" | "flag" | "stick" | "stickBig" | "rock" | "ballPink" | "cookies" | "bone"
@@ -4661,6 +4681,15 @@ export default function BreedTree({
           if (q.dataset.hi !== want) {
             q.dataset.hi = want;
             qi.setAttribute("filter", want === "1" ? "url(#bt-qmark-hi)" : `url(#bt-qmark-${(d.depth - 1 + 4) % 4})`);
+          }
+          /* THE TAPPED FACE, for a circle actually HELD in the chain. The white
+             mark says a circle could join; this says it has. It swaps back the
+             moment the chain ends, the same way the outline colour returns,
+             because the chain's node set is cleared there and this reads it. */
+          const tap = dogChainNodesRef.current.has(d) ? "1" : "0";
+          if (q.dataset.tapped !== tap) {
+            q.dataset.tapped = tap;
+            qi.setAttribute("href", tap === "1" ? QMARK_TAPPED_SRC : QMARK_SRC);
           }
         }
       }
