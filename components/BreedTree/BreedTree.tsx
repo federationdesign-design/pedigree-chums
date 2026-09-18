@@ -3146,7 +3146,7 @@ export default function BreedTree({
   const [learnNode, setLearnNode] = useState<Node | null>(null);
   const [learnCard, setLearnCard] = useState<{ name: string; image: string; x: number; y: number; angle: number; r: number; ring: string; ringFrac: number; ringPx: number } | null>(null);
   const removedNodesRef = useRef<Set<Node>>(new Set());
-  const spawnBadgeRef = useRef<((x: number, y: number, r: number, pct: number, opts?: { r?: number; label?: string; charges?: number; green?: boolean }) => void) | null>(null);
+  const spawnBadgeRef = useRef<((x: number, y: number, r: number, pct: number, opts?: { r?: number; label?: string; charges?: number; green?: boolean; noBomb?: boolean }) => void) | null>(null);
   const spawnRodRef = useRef<((x1: number, y1: number, x2: number, y2: number, lit: boolean) => void) | null>(null);
   const spawnPillRef = useRef<((x: number, y: number, w: number, name: string) => void) | null>(null);
   // `toyKind` is only set on entries in toyBodiesRef, which is why it is
@@ -6351,15 +6351,15 @@ export default function BreedTree({
         setPillList((l) => [...l, { lines, w: pw * fxScale, h: ph * fxScale, unit: 13 * PILL_K * fxScale }]);
         wake();
       };
-      // opts is how the solo-dog circle arrives: its own radius, its breed name
-      // in place of a percentage, and a lower charge count because a circle that
-      // size gets struck far more often than a badge does.
+      // opts is how a chip says it is not the plain pit-sized one: its own
+      // radius, a breed name in place of a percentage, its own charge count, the
+      // learnt lemon fill, or noBomb to stand outside the bomb roll.
       spawnBadgeRef.current = (
         sx: number,
         sy: number,
         rPx: number,
         pctVal: number,
-        opts?: { r?: number; label?: string; charges?: number; green?: boolean }
+        opts?: { r?: number; label?: string; charges?: number; green?: boolean; noBomb?: boolean }
       ) => {
         // client px in, which is the physics space itself now
         const bl = badgeBodiesRef.current;
@@ -6434,9 +6434,12 @@ export default function BreedTree({
           : opts?.r != null
             ? opts.r * fxScale * LIFTED_NODE_SCALE
             : chipBadge;
-        // A solo dog circle arrives through this same call carrying a label,
-        // and that one is never a bomb: it is a whole breed, not a chip.
-        const isBomb = !opts?.label && rollBomb();
+        /* TWO CHIPS STAND OUTSIDE THE BOMB ROLL. A labelled circle, because it is
+           a whole breed rather than a chip, and any caller that asks for noBomb.
+           The solo leaf uses the second: it now drops an ordinary percentage
+           chip, so the label no longer speaks for it, but it is still never a
+           bomb. */
+        const isBomb = !opts?.label && !opts?.noBomb && rollBomb();
         const nb: Body = { n: null, x: w.x, y: w.y, vx: 0, vy: 0, rDraw, r: rDraw / kD, pct: pctVal, idx: bl.length, lastFx: 0, popped: true, a: 0, va: 0, ia: 0, iva: 0, charges: opts?.charges ?? (opts?.green ? 20 : 10), green: opts?.green, bomb: isBomb };
         bl.push(nb);
         all.push(nb);
@@ -11409,12 +11412,22 @@ export default function BreedTree({
                had no branch for it, so a leaf completion dropped nothing at all
                into the pit: measured as "layer scattered 0 circles".
 
-               IT IS SPAWNED LIKE ANY OTHER CHIP, through the same call, at the
-               position and radius the layer measured on screen. It carries the
-               dog's NAME as the label, which is the path spawnBadge already has
-               for exactly this ("a solo dog circle brings its own full radius"),
-               so it lands at the size it just had rather than being re-sized to a
-               percentage chip, and it is never rolled as a bomb.
+               IT DROPS A PLAIN PERCENTAGE CHIP, 18 September 2026 (owner). The
+               first version sent the breed name through as a label, which is
+               spawnBadge's full-radius path, so a leaf put a giant named circle
+               into the pit and read as a bug. No label and no opts.r now, which
+               is spawnBadge's chipBadge sizing: the badge a native pit dog of
+               that share would carry. That is the SAME path dogCloseRef uses for
+               the rest of a chain, so the circle the player opened and the
+               circles the chain closes behind it all drop the one kind of chip.
+
+               `b.r`, the layer's full circle radius, is deliberately not passed:
+               it is the size of the card's big circle, not of a chip, and it is
+               what made this read wrong. Only b.x and b.y are wanted, so the chip
+               lands where the dog stood.
+
+               IT IS STILL NEVER A BOMB, now said outright through noBomb rather
+               than falling out of the label, which has gone.
 
                ITS VALUE IS THE DOG'S OWN SHARE OF ITS PARENT, the same figure
                every other chip carries and the same formula the sim's pctOf and
@@ -11423,7 +11436,7 @@ export default function BreedTree({
             if (data.big && learnNode) {
               const b = data.big;
               const share = Math.round(((learnNode.value ?? 0) / (learnNode.parent?.value || 1)) * 100);
-              spawnBadgeRef.current?.(b.x, b.y, b.r, share, { r: b.r, label: b.name });
+              spawnBadgeRef.current?.(b.x, b.y, b.r, share, { noBomb: true });
             }
             for (const rd of data.rods ?? []) {
               spawnRodRef.current?.(rd.x1, rd.y1, rd.x2, rd.y2, !!rd.lit);
