@@ -8808,6 +8808,29 @@ export default function BreedTree({
              never falls in, because removing a body does not wake its neighbours.
              The two readings tell those apart, which no other column does. */
           const ghost = chips.filter((o) => o.plugin?.bridge?.blown).length;
+          /* AND THE SAME QUESTION FOR CIRCLES, which `ghost` above could not see
+             (owner, 18 September 2026). It filters kind "badge" and tests `blown`;
+             a dog circle is kind "circle" and a chain-closed one never sets blown,
+             it sets `held`. So the counter was blind to exactly the case being
+             chased: circles closed by a chain, gone from the screen, still holding
+             their space open.
+
+             WHAT COUNTS AS A GHOST CIRCLE. A body still in the world whose bridge
+             says `held`, or whose NODE is in removedNodes. Either is enough: held
+             means the step loop was told to take it out and has not, removed means
+             the drawing has already hidden it. Both should be zero the moment the
+             sim has had one tick.
+
+             READING IT. Non-zero for a few hundred ms after a chain completes is
+             the PAUSE holding the removal back, which is expected and self-heals.
+             Non-zero and STAYING non-zero is the other fault: dogClose's
+             `if (b) b.held = true` found no body, so nothing was ever marked. The
+             `no body` count beside it separates those two without a second run. */
+          const circs = bods.filter((o) => o.plugin?.kind === "circle");
+          const gcirc = circs.filter((o) => {
+            const br = o.plugin?.bridge;
+            return !!br && (!!br.held || (!!br.n && removedNodesRef.current.has(br.n)));
+          }).length;
           const bonds = bondedPairs.size;
           const wIdx = worst?.plugin?.bridge?.idx;
           const wBonds = wIdx === undefined ? 0 : (bondsOf.get(wIdx)?.length ?? 0);
@@ -8858,7 +8881,7 @@ export default function BreedTree({
                re-made as fast as it cuts them, and only these two tell those
                apart: made near zero is a stalled sweep, made and cut both high
                and roughly equal is the churn. */
-            `chips ${chips.length} (inert ${inert})  ghost ${ghost}${ghost ? "  <-- INVISIBLE BODIES LEFT IN WORLD" : ""}  bonds ${bonds} (made/s ${per(spinMade)} cut/s ${per(spinCut)})  KE ${ke.toFixed(3)}  dKE ${dKE >= 0 ? "+" : ""}${dKE.toFixed(3)}${dKE > 0 && !dragRef.current ? "  <-- ENERGY IN" : ""}`,
+            `chips ${chips.length} (inert ${inert})  ghost ${ghost}  circles ${circs.length} ghostC ${gcirc}${ghost || gcirc ? "  <-- INVISIBLE BODIES LEFT IN WORLD" : ""}  bonds ${bonds} (made/s ${per(spinMade)} cut/s ${per(spinCut)})  KE ${ke.toFixed(3)}  dKE ${dKE >= 0 ? "+" : ""}${dKE.toFixed(3)}${dKE > 0 && !dragRef.current ? "  <-- ENERGY IN" : ""}`,
             `sumW ${sumW.toFixed(3)}  maxW ${maxW.toFixed(4)} on ${worst?.plugin?.kind ?? "?"}${wIdx === undefined ? "" : ` #${wIdx}`} bonds ${wBonds} spd ${wSpd.toFixed(2)}`,
             /* THE CHAIN'S OWN STATE, for a leaked twin (owner, 18 September 2026:
                a yellow circle at rest with no chain running). An available twin
