@@ -24,7 +24,20 @@
   background: #22c55e;
   border-radius: 50%;
   box-sizing: border-box;
-  padding: 18%;
+  /* THE TICK WAS THERE ALL ALONG AND MEASURED ZERO, 18 September 2026 (owner: the
+     circle is green with nothing in it).
+
+     PERCENTAGE PADDING RESOLVES AGAINST THE CONTAINING BLOCK'S WIDTH, not against
+     the element's own size. The containing block is .titleRow, a flex row across
+     the header, so `padding: 18%` was 18% of the ROW, not of the 56px circle. On
+     any normal width that is more than half the circle on each side, and with
+     box-sizing: border-box the content box collapsed to zero. The svg inside is
+     `width: 100%; height: 100%`, so it measured 0 by 0 and drew nothing, while
+     the background and the border-radius still painted the full green disc.
+
+     calc(var(--tp) * 0.18) is the same 18% the original intended, measured
+     against the thing it was always meant to describe: the tick's own size. */
+  padding: calc(var(--tp) * 0.18);
   /* SIZED HERE, 16 September 2026. .titlePortraitWrap carries no dimensions of its
      own: the <img> inside it is what gives the row its height. Replacing that image
      with an svg collapsed the wrapper to nothing and the whole title row with it,
