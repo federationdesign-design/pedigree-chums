@@ -1039,6 +1039,14 @@ const DOG_CHAIN_COLOUR = "#ffffff";
    because it is set on an SVG element from script, where a var() would not
    resolve. One name to change if another blue is wanted. */
 const DOG_CHAIN_FILL = "#5cc4ee";
+/* AND WHAT IS DRAWN ON THAT FILL (owner, 18 September 2026). The outline and the
+   tapped face were white, which is what the path uses, and against the light
+   blue fill they had almost nothing to read against. They are now the navy the
+   circle used to fill with, so the held circle reads as an inversion of its
+   resting state: navy on light blue instead of light blue on navy.
+   A twin that is NOT held keeps its white mark, which is the "you could join
+   this" signal, and the glow on twins is untouched. */
+const DOG_CHAIN_INK = "#0a3a57";
 /* Two circles, as a share of the larger diameter, so CHAIN_TOUCH_SLACK means the
    same for dogs as it does for cards. `h` is the radius here, and the angle is
    not read: a circle has no corners to turn. */
@@ -4639,16 +4647,18 @@ export default function BreedTree({
       // way for it to half-apply.
       const isWordNode = fellRef.current && d.depth === 1;
       const c = wrap?.children[0] as SVGCircleElement | undefined;
-      /* REMOVE BEFORE LAUNCH, ?dogchain=1. A CIRCLE IN THE CHAIN WEARS WHITE.
-         Its own depth colour comes back the moment the chain ends, because this
-         only ever sets an inline stroke and then clears it again. Written on the
-         change alone, tracked on the element, so a still pit costs nothing. The
-         question mark does the same thing a few lines below. */
+      /* REMOVE BEFORE LAUNCH, ?dogchain=1. A CIRCLE IN THE CHAIN IS INVERTED:
+         light blue where it was navy, and navy where its outline was. It wore a
+         white outline for a day and there was almost nothing to read against the
+         light blue fill. Its own depth colour comes back the moment the chain
+         ends, because this only ever sets an inline stroke and fill and then
+         clears them again. Written on the change alone, tracked on the element,
+         so a still pit costs nothing. The question mark does the same below. */
       if (c) {
         const want = dogChainNodesRef.current.has(d) ? "1" : "0";
         if (c.dataset.chained !== want) {
           c.dataset.chained = want;
-          c.style.stroke = want === "1" ? "#ffffff" : "";
+          c.style.stroke = want === "1" ? DOG_CHAIN_INK : "";
           /* AND THE FILL GOES SKY BLUE. Safe to set: a circle in the live pit
              shows no photograph, because the pictures go the moment the drop
              begins (see nodeImg), so every pit circle is a plain disc of
@@ -4729,15 +4739,22 @@ export default function BreedTree({
         const qi = q.firstElementChild;
         if (qi) {
           const want = dogChainBreedRef.current && d.data.name === dogChainBreedRef.current ? "1" : "0";
-          if (q.dataset.hi !== want) {
-            q.dataset.hi = want;
-            qi.setAttribute("filter", want === "1" ? "url(#bt-qmark-hi)" : `url(#bt-qmark-${(d.depth - 1 + 4) % 4})`);
+          /* THREE STATES, ONE ATTRIBUTE. A circle HELD in the chain draws its
+             mark in navy, to read against the light blue it is now filled with.
+             A circle of the chain's breed that is NOT held keeps the white mark,
+             which is the "you could join this" signal. Everything else wears its
+             own depth colour. */
+          const held = dogChainNodesRef.current.has(d);
+          const ink = held ? "ink" : want === "1" ? "hi" : `${(d.depth - 1 + 4) % 4}`;
+          if (q.dataset.hi !== ink) {
+            q.dataset.hi = ink;
+            qi.setAttribute("filter", `url(#bt-qmark-${ink})`);
           }
-          /* THE TAPPED FACE, for a circle actually HELD in the chain. The white
-             mark says a circle could join; this says it has. It swaps back the
-             moment the chain ends, the same way the outline colour returns,
-             because the chain's node set is cleared there and this reads it. */
-          const tap = dogChainNodesRef.current.has(d) ? "1" : "0";
+          /* THE TAPPED FACE, for a circle actually HELD in the chain. The mark
+             says a circle could join; this says it has. It swaps back the moment
+             the chain ends, the same way the outline colour returns, because the
+             chain's node set is cleared there and this reads it. */
+          const tap = held ? "1" : "0";
           if (q.dataset.tapped !== tap) {
             q.dataset.tapped = tap;
             qi.setAttribute("href", tap === "1" ? QMARK_TAPPED_SRC : QMARK_SRC);
@@ -9521,6 +9538,14 @@ export default function BreedTree({
                 Same shape as the four above it, one colour. */}
             <filter id="bt-qmark-hi" x="0" y="0" width="100%" height="100%" colorInterpolationFilters="sRGB">
               <feColorMatrix type="matrix" values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1 0" />
+            </filter>
+            {/* REMOVE BEFORE LAUNCH, ?dogchain=1. The sixth, for a circle HELD in
+                the chain: DOG_CHAIN_INK, the navy the circle used to fill with,
+                so the face reads against the light blue it is filled with now.
+                The fractions are that hex over 255, and they are written out
+                because a filter matrix cannot take a variable. */}
+            <filter id="bt-qmark-ink" x="0" y="0" width="100%" height="100%" colorInterpolationFilters="sRGB">
+              <feColorMatrix type="matrix" values="0 0 0 0 0.039 0 0 0 0 0.227 0 0 0 0 0.341 0 0 0 1 0" />
             </filter>
             {nodes.map((d, i) =>
               nodeImg(d) ? (
