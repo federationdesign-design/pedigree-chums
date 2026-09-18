@@ -991,6 +991,29 @@ function dragDebugOn() {
   if (typeof window === "undefined") return false;
   return window.location.search.indexOf("dragdebug=1") > -1;
 }
+
+/* ============================ REMOVE BEFORE LAUNCH ==========================
+   ?chipcount=1 : how many chips a dog chain actually drops, 18 September 2026.
+
+   THE QUESTION. A chain of three looks like it pays about one circle's worth of
+   yellow chips rather than three. This counts them where they are spawned
+   instead of arguing about it: the circle the player opened, whose chips come
+   from the lineage layer as it drops, and each closed circle, whose chips come
+   from the pit's own rule, one per non-echo child.
+
+   HOW TO READ IT. One line per chain:
+     opened   the breed opened, and how many circles the layer scattered
+     closed   each circle closed, and how many chips it dropped, in order
+     total    the two added up
+   If `closed` reads +1 for every circle, they are taking the leaf fallback and
+   the pit subtree is where to look, not the spawner.
+
+   Strip this, the ref, the poll, the panel and the two counters that write it.
+   ========================================================================== */
+function chipCountOn() {
+  if (typeof window === "undefined") return false;
+  return window.location.search.indexOf("chipcount=1") > -1;
+}
 // A run of dogs is an open chain, so two is a chain. Its own figure rather than
 // CHAIN_MIN_CARDS, which is the CARDS' loop minimum and means something else.
 const DOG_CHAIN_MIN = 2;
@@ -3382,7 +3405,11 @@ export default function BreedTree({
   const dragDiagRef = useRef<string[] | null>(null);
   const [dragDiag, setDragDiag] = useState<string[] | null>(null);
   const dogOpenRef = useRef<((i: number) => boolean) | null>(null);
-  const dogCloseRef = useRef<((n: Node) => void) | null>(null);
+  // Returns how many chips the circle dropped, for the ?chipcount=1 readout.
+  const dogCloseRef = useRef<((n: Node) => number) | null>(null);
+  // REMOVE BEFORE LAUNCH, ?chipcount=1. The last chain's chip tally.
+  const chipDiagRef = useRef<string[] | null>(null);
+  const [chipDiag, setChipDiag] = useState<string[] | null>(null);
   // The removed set is a ref, so closing circles changes nothing React can see.
   // This is the nudge that gets them off the screen.
   const [, setDogChainClosed] = useState(0);
@@ -6291,15 +6318,18 @@ export default function BreedTree({
            which is what pxFromWorld is for. */
         const p = pxFromWorld(n.x, n.y);
         const kids = (n.children ?? []).filter((ch) => !isEcho(ch));
+        let dropped = 0;
         if (kids.length) {
-          for (const ch of kids) spawnBadgeRef.current?.(p.x, p.y, badgeDrawForNode(ch.r, k), pctOf(ch));
+          for (const ch of kids) { spawnBadgeRef.current?.(p.x, p.y, badgeDrawForNode(ch.r, k), pctOf(ch)); dropped++; }
         } else {
           spawnBadgeRef.current?.(p.x, p.y, badgeDrawForNode(n.r, k), pctOf(n));
+          dropped++;
         }
         const b = pitBodiesRef.current?.find(n);
         if (b) b.held = true;
         poofAt(n.x, n.y, performance.now());
         wake();
+        return dropped;
       };
       // One connection made, paid on the spot and flashed at the card it
       // reached. The bridge holds that card's live world position.
@@ -9098,6 +9128,16 @@ export default function BreedTree({
     }, 100);
     return () => window.clearInterval(id);
   }, []);
+  // REMOVE BEFORE LAUNCH, ?chipcount=1. The same pattern: written where the
+  // chips are spawned, copied out here for the panel.
+  useEffect(() => {
+    if (!chipCountOn()) return;
+    const id = window.setInterval(() => {
+      const lines = chipDiagRef.current;
+      setChipDiag((cur) => (lines === cur ? cur : lines));
+    }, 200);
+    return () => window.clearInterval(id);
+  }, []);
   /* ==================== REMOVE BEFORE LAUNCH, ?fusedebug=1 ====================
      Ten times a second rather than per frame, for the same reason as the chumbox
      poll below: a per-frame setState would load the pit it is watching. Fast
@@ -11714,11 +11754,25 @@ export default function BreedTree({
                 dogChainRef.current = null;
                 const pit = pitBodiesRef.current?.owned;
                 let shut = 0;
+                // REMOVE BEFORE LAUNCH, ?chipcount=1. Counted where they are
+                // spawned, one entry per circle closed.
+                const chips: string[] = [];
                 for (const other of dc.others) {
                   if (!pit?.has(other) || removedNodesRef.current.has(other)) continue;
                   removedNodesRef.current.add(other);
-                  dogCloseRef.current?.(other);
+                  const got = dogCloseRef.current?.(other) ?? 0;
+                  chips.push(`${other.data.name} +${got}`);
                   shut++;
+                }
+                if (chipCountOn()) {
+                  const opened = chipDiagRef.current?.[0] ?? "opened   (no scatter seen yet)";
+                  const closedTotal = chips.reduce((a, s) => a + Number(s.split("+").pop()), 0);
+                  const openedTotal = Number(opened.match(/(\d+) circles/)?.[1] ?? 0);
+                  chipDiagRef.current = [
+                    opened,
+                    `closed   ${chips.length ? chips.join(", ") : "none"}`,
+                    `total    ${openedTotal} + ${closedTotal} = ${openedTotal + closedTotal}`,
+                  ];
                 }
                 // The removed set is a ref, so nothing above would re-render.
                 if (shut) setDogChainClosed((c) => c + 1);
@@ -11737,6 +11791,12 @@ export default function BreedTree({
             }
           }}
           onScatter={(data) => {
+            // REMOVE BEFORE LAUNCH, ?chipcount=1. What the LAYER drops for the
+            // circle the player opened, which is a different count from the pit's
+            // own rule for the circles it closes.
+            if (chipCountOn()) {
+              chipDiagRef.current = [`opened   ${learnNode?.data.name ?? "?"}, layer scattered ${(data.circles ?? []).length} circles`];
+            }
             // the learnt % circles, their rods and the name pill tip into the
             // pit as live objects at the very instant the layer drops them
             for (const c of data.circles ?? []) {
@@ -11803,6 +11863,16 @@ export default function BreedTree({
           Why the last press on a circle did or did not take the gate. Left side,
           clear of the lives and the title, and a sibling of the info box like
           every other readout here. */}
+      {/* REMOVE BEFORE LAUNCH, ?chipcount=1. What a chain actually paid in chips. */}
+      {chipDiag && (
+        <div style={{
+          position: "fixed", bottom: 6, right: 6, zIndex: 9000, pointerEvents: "none", visibility: "visible",
+          background: "rgba(0,0,0,0.78)", color: "#0f0", padding: "6px 8px",
+          font: "11px/1.35 ui-monospace, monospace", borderRadius: 6, whiteSpace: "pre",
+        }}>
+          {chipDiag.join("\n")}
+        </div>
+      )}
       {dragDiag && (
         <div style={{
           position: "fixed", bottom: 6, left: 6, zIndex: 9000, pointerEvents: "none", visibility: "visible",
