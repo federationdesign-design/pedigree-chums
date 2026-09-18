@@ -2854,13 +2854,32 @@ export default function LineageMap({
                rare now comes out at 13.5 and very common at 17.2, which is under
                the new cap, so it becomes width-fitted too.
 
-               THE COMPLETE BUTTON IS NOT WHAT THIS FIXES. Measured: the button
-               spans y -20.9 to +31.1 and the tilted label's right end reaches
-               (78.9, 15.0), so the label climbs through the button's box. Smaller
-               text shortens the baseline and pulls that end out of the way, which
-               is a workaround. The fix is to move the button, push labelY down
-               while doneRing is true, or cut the 26 degree tilt, and none of those
-               is done here because each moves a signed-off layout. */
+               THE COMPLETE BUTTON OVERLAPS THE LABEL. KNOWN, MEASURED AND
+               ACCEPTED (owner, 18 September 2026). Written down so nobody spends
+               an afternoon rediscovering it.
+
+               THE GEOMETRY, on a 390 phone where R is 85:
+                 the label's centre lands at (21.1, 43.2), which is already BELOW
+                 the button, whose visible bottom is at +37.2 (the chumBase rect
+                 runs to +42 local, not the chumPill's +34: an earlier note of
+                 mine said +31.1 and was wrong)
+                 the baseline then RISES TO THE RIGHT AT 26 DEGREES, RARITY_TILT,
+                 and climbs back into the button's box after only 13.8 UNITS of
+                 half-width
+                 the button's box is x +/-76.5, y -21.0 to +37.2
+
+               SO NO READABLE FONT SIZE CLEARS IT. That 13.8 units is the entire
+               budget and every tier shares it whatever its length: at 0.68 em a
+               character it buys about four letters. To clear the box, RARE would
+               need 10.1px, COMMON 6.8, UNCOMMON 5.1, VERY COMMON 3.7 and
+               EXTREMELY RARE 2.9, against a floor of 9 in this very expression.
+               Four of the five would be a smudge.
+
+               THE THREE THINGS THAT WOULD FIX IT, all declined by the owner as
+               changes to a signed-off layout: move the Complete button, push
+               labelY down while doneRing is true, or cut the tilt (flat clears by
+               10.9 with no size change at all, and anything at 8 degrees or less
+               clears). The overlap stays. Do not shrink the label to dodge it. */
             const fs = Math.max(9, Math.min(R * 0.208, (chord * 0.92) / (0.68 * band.label.length)));
             // rect and text share one rotate(): the rect's top edge becomes the
             // diagonal chord, the text baseline tilts with it. The rect is drawn
