@@ -964,6 +964,19 @@ const DOG_CHAIN_INK = "#0a3a57";
      DOG_CHAIN_TWIN_INK    an AVAILABLE twin's outline and mark */
 const DOG_CHAIN_TWIN_FILL = "#ffd23e";
 const DOG_CHAIN_TWIN_INK = "#0a3a57";
+/* AND HOW MUCH HEAVIER AN AVAILABLE TWIN'S RING IS (owner, 18 September 2026),
+   on top of the yellow fill and the navy ink. A multiplier rather than a width,
+   because a pit ring is a FRACTION OF ITS OWN RADIUS, not a flat number: see
+   strokeWidthFor. A flat figure would read correctly on one circle and wrong on
+   every other size, and would not follow the difficulty slider or the zoom.
+
+   HELD CIRCLES ARE NOT TOUCHED. They are already said by the sky blue fill and
+   the tapped face, and thickening them too would leave the two states with
+   nothing to tell them apart but hue.
+
+   The fifth of the chain's colours and weights, all five in a row here, one line
+   each to nudge. */
+const DOG_CHAIN_TWIN_STROKE_K = 2;
 /* HOW WIDE THE CHAIN'S CHIPS SCATTER, in client px, from the single point they
    all drop at (owner, 18 September 2026). A chain's chips used to appear where
    each closed circle stood, which read as several separate piles across the pit
@@ -4753,16 +4766,19 @@ export default function BreedTree({
          ends, because this only ever sets an inline stroke and fill and then
          clears them again. Written on the change alone, tracked on the element,
          so a still pit costs nothing. The question mark does the same below. */
+      /* THREE STATES, THE SAME THREE THE MARK HAS. Held in the chain, of the
+         chain's breed but not yet held, or neither. Hoisted out of the block
+         below because the stroke WIDTH needs them too, and that is written on
+         its own line further down. */
+      const chHeld = dogChainNodesRef.current.has(d);
+      const chTwin = !chHeld && !!dogChainBreedRef.current && d.data.name === dogChainBreedRef.current;
       if (c) {
-        /* THREE STATES, THE SAME THREE THE MARK HAS. Held in the chain, of the
-           chain's breed but not yet held, or neither. The mark has read all
-           three since the chain shipped; the ring only read the first, so a
-           highlighted twin kept its own outline. Both states are now filled and
-           inked from the four constants beside DOG_CHAIN_TWIN_FILL.
+        /* The mark has read all three states since the chain shipped; the ring
+           only read the first, so a highlighted twin kept its own outline. Both
+           states are now filled and inked from the constants beside
+           DOG_CHAIN_TWIN_FILL.
            One key, still written only when the answer CHANGES and still tracked
            on the element, so a still pit costs nothing. */
-        const chHeld = dogChainNodesRef.current.has(d);
-        const chTwin = !chHeld && !!dogChainBreedRef.current && d.data.name === dogChainBreedRef.current;
         const want = chHeld ? "held" : chTwin ? "twin" : "0";
         if (c.dataset.chained !== want) {
           c.dataset.chained = want;
@@ -4786,7 +4802,16 @@ export default function BreedTree({
         c.setAttribute("r", String(drawR(d, v, k)));
         // The radius is scaled by the view but the stroke was not, so a circle
         // drawn small kept a full-size ring and read as heavy. Scale both.
-        c.setAttribute("stroke-width", String(strokeWidthFor(d) * strokeK(v)));
+        /* AN AVAILABLE TWIN WEARS DOG_CHAIN_TWIN_STROKE_K TIMES ITS OWN WEIGHT.
+           Written HERE, on the line that already runs every frame, rather than as
+           an inline style on the change alone like the colours: the base width
+           carries strokeK, which moves with the view, so an inline value set once
+           would go stale the moment the pit zoomed and, being a style, would beat
+           this attribute and freeze the ring. Multiplying here costs nothing and
+           tracks the zoom, the difficulty slider and the hierarchy clamp on its
+           own, and it returns to the normal weight on the first frame after the
+           chain ends because chTwin is false by then. */
+        c.setAttribute("stroke-width", String(strokeWidthFor(d) * strokeK(v) * (chTwin ? DOG_CHAIN_TWIN_STROKE_K : 1)));
       }
       /* THE QUESTION MARK follows its circle. Shown only once the pit is live and
          only where a circle is actually drawn, so a depth-1 dog, which the pit
