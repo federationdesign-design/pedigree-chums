@@ -875,6 +875,28 @@ const DOG_CHAIN_MIN = 2;
    Owner's ruling, 18 September 2026: the kill at 1 stays, for both kinds, until
    it has been played. */
 const DOG_CHAIN_SLACK = Infinity;
+/* HOW FAR THE FINGER MUST TRAVEL BEFORE A PRESS BECOMES A CHAIN, in client px,
+   measured from the press point (owner, 18 September 2026).
+
+   WHY IT EXISTS. Under DOG_CHAIN_SLACK almost every circle on a duplicate-heavy
+   level is a starter. A starter press used to disarm the mouse constraint on the
+   spot, which is precisely what stopped anything being dragged on Scottish
+   Terrier. Nothing is disarmed at the press now: the drag arms exactly as it
+   always did, and only a movement past this figure hands the pointer over. A
+   short movement stays a drag; a longer one becomes a chain.
+
+   IT MUST STAY ABOVE 8. The circle's own tap-to-open ignores a press that moved
+   8px or more (see the tapUp listener on the circle, which also wants under
+   350ms). Keeping this above that means a press can never be both a chain and a
+   tap: by the time the chain takes the pointer, the tap has already ruled itself
+   out. Below 8 and letting go of a short chain would open the learn layer as
+   well. 14 leaves a little room either side of that floor and is still a short
+   flick on a phone.
+
+   TUNE IT HERE and nowhere else: the gesture reads the kind's armPx, which is
+   this for circles and 0 for chum cards, whose press claims the gate outright as
+   it always has. */
+const DOG_CHAIN_ARM_PX = 14;
 // WHITE, like the card chain (owner, 18 September 2026). It shipped in the site
 // yellow for one day as the deliberate opposite of the cards; both paths are now
 // white, and so is the question mark highlight below.
@@ -3219,8 +3241,8 @@ export default function BreedTree({
      chain     the chain REMEMBERED from release until completion, which can be a
                minute later. Cleared when it is honoured, when the player backs
                out of the layer without completing, and when the pit is torn down
-     starterAt whether the circle at a point may open a chain, asked by the chum
-               gate so a starter is not draggable
+     takeover  the drag lets go and the chain takes the pointer, mid press, once
+               the finger has moved past DOG_CHAIN_ARM_PX
      open      lifts a circle into the layer, the same call the tap makes
      close     a circle leaves the pit: its body is held out of the world and it
                poofs where it stood */
@@ -3235,7 +3257,14 @@ export default function BreedTree({
   // another of its breed touching it. See the note where it is written.
   const twinGlowGRef = useRef<SVGGElement>(null);
   const dogChainRef = useRef<{ opened: Node; others: Node[] } | null>(null);
-  const dogStarterAtRef = useRef<((cx: number, cy: number) => boolean) | null>(null);
+  /* THE HANDOVER, which replaced dogStarterAtRef.
+     Called from the chain's own pointermove, once and only once,
+     at the moment the press stops being a drag and becomes a chain. It lives
+     inside the sim because everything it has to settle lives there: the mouse,
+     the flick buffer and the pressed bomb. Returns false if the press was not
+     ours to take, and the chain is dropped rather than drawn on a pointer
+     something else is already holding. See the note where it is written. */
+  const dogChainTakeoverRef = useRef<((pointerId: number) => boolean) | null>(null);
   const dogOpenRef = useRef<((i: number) => boolean) | null>(null);
   const dogCloseRef = useRef<((n: Node) => void) | null>(null);
   // The removed set is a ref, so closing circles changes nothing React can see.
@@ -7709,21 +7738,65 @@ export default function BreedTree({
             chumGateRef.current = e.pointerId;
             return;
           }
-          /* ONE MORE CONDITION ON THE SAME
-             GATE, not a gate of its own. A dog circle whose breed has duplicates
-             in the pit can start a chain, and a circle you can chain from must
-             not also be a circle you can drag, or the two gestures fight over
-             the same press. Every other circle is grabbed exactly as before. */
-          const dogStarter = !!(tgt && circlesRef.current?.contains(tgt) && dogStarterAtRef.current?.(e.clientX, e.clientY));
-          if (dogStarter) {
-            chumGateRef.current = e.pointerId;
-            return;
-          }
+          /* A DOG CIRCLE NO LONGER TAKES THE GATE AT THE PRESS, 18 September
+             2026 (owner). It used to: a circle that could start a chain was
+             refused to the constraint outright, so the two gestures could not
+             fight over one press. With the touching rule gone almost every
+             circle on a duplicate-heavy level is a starter, so that rule would
+             have made almost nothing draggable, which is exactly how Scottish
+             Terrier broke before.
+
+             EVERY CIRCLE ARMS THE DRAG NOW, and the chain takes the pointer off
+             it later, through dogChainTakeoverRef, only once the finger has
+             actually travelled DOG_CHAIN_ARM_PX. Nothing is decided here. */
           setPos(e.clientX, e.clientY);
           mouse.button = 0;
           flickBuf.length = 0;
           flickBuf.push({ t: performance.now(), x: mouse.position.x, y: mouse.position.y });
           wake();
+        };
+        /* THE HANDOVER: the drag lets go, mid press, and the chain takes the
+           pointer. Called from the chain's own pointermove the moment the finger
+           passes DOG_CHAIN_ARM_PX, and never otherwise.
+
+           THE THREE THINGS IT HAS TO SETTLE FIRST, in this order, because
+           releasing the constraint runs enddrag and enddrag reads all of them.
+           The constraint grabs whatever body lies under the press point IN
+           PHYSICS SPACE, which is not necessarily the dog circle whose element
+           was pressed: a chip, a bomb, a toy or the bone may be the thing
+           actually being carried.
+
+             A BOMB. startdrag set clickPending, and enddrag turns that into a
+             free hitBomb. A chain that happens to start over a bomb must not
+             detonate a hit, so the pending click is dropped before the release.
+
+             A TOY. enddrag reads flickBuf and can throw what it was holding.
+             DOG_CHAIN_ARM_PX of travel across a few frames is quite enough to
+             register as a flick, so the buffer is emptied and the n >= 2 guard
+             in onEndDrag fails.
+
+             THE BUTTON, NEVER mcReleaseRef. mcReleaseRef clears the constraint
+             by hand and skips enddrag altogether, which is what leaves a held
+             bomb's fuse burning (see the note on onUp). mouse.button = -1 is the
+             release that runs the whole teardown, one engine step later, which
+             is why the sim is woken: asleep, it would never take that step and
+             the body would stay attached to a pointer the chain now owns.
+
+           THE CARRIED BODY'S VELOCITY IS LEFT ALONE. It has been pulled up to
+           DOG_CHAIN_ARM_PX and it falls back carrying whatever the constraint
+           gave it, which is a few pixels' worth. Zeroing it would read as the
+           body freezing in mid air, which is worse than the drift. */
+        dogChainTakeoverRef.current = (pointerId: number) => {
+          // Another press already holds the gate: this one is not ours to take.
+          if (chumGateRef.current != null) return false;
+          // The ref is untyped, like every other reader of it: see the fuse.
+          const br = pressedBombRef.current as Body | null;
+          if (br) br.clickPending = false;
+          flickBuf.length = 0;
+          mouse.button = -1;
+          chumGateRef.current = pointerId;
+          wake();
+          return true;
         };
         const onMove = (e: PointerEvent) => {
           if (mouse.button === 0) {
@@ -7752,6 +7825,9 @@ export default function BreedTree({
         document.addEventListener("visibilitychange", clearGate);
         mcTeardown = () => {
           mcReleaseRef.current = null;
+          // It closes over this world's mouse and flick buffer, so it must not
+          // outlive them.
+          dogChainTakeoverRef.current = null;
           chumGateRef.current = null;
           window.removeEventListener("blur", clearGate);
           document.removeEventListener("visibilitychange", clearGate);
@@ -8157,6 +8233,12 @@ export default function BreedTree({
       canClose: boolean;
       // When the last card joined, which is what the join clock counts from.
       lastJoin: number;
+      /* WHERE THE PRESS LANDED, while it is still undecided. Set only for a kind
+         with an armPx, and cleared the moment the finger travels that far and
+         the chain takes the pointer off the drag. While it is set the chain is
+         inert: it joins nothing, draws nothing and its join clock has not
+         started, so a press held still for a minute is still just a press. */
+      hold: { x: number; y: number } | null;
     };
     // Links in the chain, and the two cards at each end of link s. A closed
     // loop has one link more than cards minus one: the closing link wraps.
@@ -8221,6 +8303,13 @@ export default function BreedTree({
          cards keep CHAIN_TOUCH_SLACK; the circles take DOG_CHAIN_SLACK, which is
          Infinity, so they do not have to touch at all. */
       slack: number;
+      /* HOW FAR THE FINGER MUST TRAVEL before a press of this kind becomes a
+         chain, in client px. 0 means the press is the chain, which is the chum
+         cards: their press claims the gate outright and no body underneath is
+         ever grabbed. The circles take DOG_CHAIN_ARM_PX, so the drag arms first
+         and the chain takes the pointer off it only once the finger has moved.
+         See the constant, and dogChainTakeoverRef for the handover itself. */
+      armPx: number;
       busy: (i: number) => boolean;                       // in flight, cannot join
       taken: (i: number) => boolean;                      // gone since it joined
       startable: (i: number) => boolean;                  // may open a chain
@@ -8244,6 +8333,7 @@ export default function BreedTree({
       geo,
       gapShare: (a, b) => chainSquareGap(a, b) / (Math.max(a.h, b.h) * 2),
       slack: CHAIN_TOUCH_SLACK, // cards touch, exactly as they always have
+      armPx: 0, // a card's press IS the chain: it takes the gate on the spot
       busy: (i) => chumFlyRef.current.has(i),
       taken: (i) => chumTakenRef.current.has(i),
       startable: () => true,
@@ -8316,6 +8406,7 @@ export default function BreedTree({
       },
       gapShare: chainCircleGapShare,
       slack: DOG_CHAIN_SLACK, // no touching rule at all: see the constant
+      armPx: DOG_CHAIN_ARM_PX, // a short movement is a drag, a longer one a chain
       busy: (i) => !dogInPit(dogNode(i)),
       taken: (i) => !dogInPit(dogNode(i)),
       /* DUPLICATES ONLY, AND NOTHING ELSE (18 September 2026, owner). A one-off
@@ -8379,12 +8470,10 @@ export default function BreedTree({
       needsHit: true,
     };
     const KINDS: ChainKind[] = [CARD, DOG];
-    // Asked by the chum gate, so a circle that can start a chain is not also a
-    // circle that can be dragged.
-    dogStarterAtRef.current = (cx, cy) => {
-      const i = circleAt(cx, cy);
-      return i != null && DOG.startable(i);
-    };
+    /* THE GATE NO LONGER ASKS ANYTHING AT THE PRESS, so the ref it used to ask,
+       dogStarterAtRef, has gone with it. A starter circle is now grabbed by the
+       constraint like any other and only gives the pointer up once the finger
+       has moved: see dogChainTakeoverRef and DOG_CHAIN_ARM_PX. */
     // Why the last card could not close the loop back to the first right now,
     // or null if it could. The same touching and crossing tests as any join.
     const closeBlock = (ch: Chain): string | null => {
@@ -8772,6 +8861,12 @@ export default function BreedTree({
         return;
       }
       if (chain.pending) {
+        /* STILL UNDECIDED. A kind with an armPx holds here, frame after frame,
+           until the finger travels far enough for move() to hand the pointer
+           over. Nothing below runs: no card joins, the path draws nothing (draw
+           bails on a pending chain) and the join clock has not started, because
+           it counts from the first join and there has not been one. */
+        if (chain.hold) { raf = requestAnimationFrame(tick); return; }
         // After dispatch, so the stage's onDown has had its say.
         if (chumGateRef.current !== chain.id) { chain = null; draw(); return; } // the gate did not open for this press
         chain.pending = false;
@@ -8818,12 +8913,28 @@ export default function BreedTree({
         if (chainGRef.current) chainGRef.current.style.opacity = "";
         paint([], [], 0, "#ffffff");
       }
-      chain = { id: e.pointerId, kind, pending: true, cards: [], px: e.clientX, py: e.clientY, fx: e.clientX, fy: e.clientY, strain: new Map(), dead: null, closed: false, canClose: false, lastJoin: performance.now() };
+      chain = { id: e.pointerId, kind, pending: true, cards: [], px: e.clientX, py: e.clientY, fx: e.clientX, fy: e.clientY, strain: new Map(), dead: null, closed: false, canClose: false, lastJoin: performance.now(), hold: kind.armPx > 0 ? { x: e.clientX, y: e.clientY } : null };
       if (raf == null) raf = requestAnimationFrame(tick);
     };
     const move = (e: PointerEvent) => {
       if (!chain || e.pointerId !== chain.id) return;
       chain.fx = e.clientX; chain.fy = e.clientY;
+      /* THE PRESS DECIDES HERE. Under the kind's armPx this is still a drag and
+         the constraint keeps the pointer, so nothing happens at all. At or past
+         it the chain asks the sim to let go, and the first circle joined is the
+         one that was PRESSED, not the one the finger has reached: px and py are
+         still the press point, and the pending block in tick joins there before
+         sweeping up to the finger.
+
+         A REFUSED HANDOVER DROPS THE CHAIN rather than drawing one on a pointer
+         something else is holding. It can only happen if another press took the
+         gate meanwhile, which is a second finger. */
+      if (chain.hold) {
+        if (Math.hypot(e.clientX - chain.hold.x, e.clientY - chain.hold.y) < chain.kind.armPx) return;
+        if (!dogChainTakeoverRef.current?.(chain.id)) { chain = null; return; }
+        chain.hold = null;
+        return; // tick resolves the pending chain on the very next frame
+      }
       if (!chain.pending) sweep(chain, e.clientX, e.clientY);
     };
     const up = (e: PointerEvent) => { if (chain && e.pointerId === chain.id) end("released"); };
@@ -8846,9 +8957,6 @@ export default function BreedTree({
       if (raf != null) cancelAnimationFrame(raf);
       chain = null;
       collapse = null;
-      // The gate asks this ref on every press,
-      // so it must not outlive the listeners that answer it.
-      dogStarterAtRef.current = null;
       dogChainBreedRef.current = null;
       dogChainNodesRef.current = new Set();
     };
