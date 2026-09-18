@@ -5576,6 +5576,36 @@ export default function BreedTree({
         return { x: vD0 + (CT.d * x0 - CT.c * y0) / det / kD, y: vD1 + (-CT.b * x0 + CT.a * y0) / det / kD };
       };
       const pxPerWorld = Math.hypot(CT.a, CT.b) * kD || 1;
+      /* THE SMALLEST A DOG CIRCLE MAY BE, as a world radius, named ONCE and read
+         by every route that puts a circle into the pit (owner, 18 September 2026).
+
+         WHY IT IS HERE AND NOT INSIDE popChildren. It used to be a local
+         expression in popChildren, which was the only route that created circles
+         when it was written. The drop was later changed to free a level dog's
+         children immediately, and that path grew its own body creation, copying
+         popChildren's burst velocity and its ghost grouping but NOT its floor. So
+         a low-share child of a level dog went into the pit at whatever the pack
+         made it, and at level 0 with a further quarter taken off by
+         DROP_SHRINK_0. A few pixels across, indistinguishable from the debris.
+
+         WHY THAT BLOCKED THE ROUND. Nothing can clear a circle that small. All
+         three routes that take one need the pointer on the disc: the chain
+         through elementsFromPoint, the drag through matter's own hit test, and
+         tap-to-open through the circle's own handler within 8px. A finger patch
+         is about 40px. And a bomb cannot help, because the blast's kill pool is
+         badges, rods and pills and never circles. So it stayed in `owned`
+         forever and the round-won test could never pass. See ?windiag=1.
+
+         IT FLOORS THE NODE, NOT THE BODY, and that is deliberate: nb.r is taken
+         from ch.r and mkCircle reads b.r, so flooring the node carries the
+         drawn radius, the physics body, the ring weight, the ring inset and the
+         label fitter together. Flooring only the body would give a circle you
+         can hit but cannot see, which is worse than the bug.
+
+         IT IS A DROP-TIME GUARANTEE. pxPerWorld is the frozen drop-time
+         transform, so this is 25 screen px at the zoom the pit started at, not
+         at every later zoom. */
+      const minCircleR = POP_MIN_PX / 2 / pxPerWorld;
       fxPxPerWorldRef.current = pxPerWorld; // J17: the effects layer's pixel-to-world scale
       fxFromPxRef.current = worldFromPx;
       const fx = createPitEffects(FX_SCALE);
@@ -6077,6 +6107,10 @@ export default function BreedTree({
           // See DROP_SHRINK_0. Done before the body and the chip are sized, so
           // both follow from one number.
           if (level === 0 && !DROP_SHRUNK.has(ch)) { DROP_SHRUNK.add(ch); ch.r *= DROP_SHRINK_0; }
+          /* AND THEN THE FLOOR, which this route never had. SHRINK FIRST, FLOOR
+             SECOND, never the other way about: flooring first would let level 0's
+             quarter come straight back off the floor itself. See minCircleR. */
+          ch.r = Math.max(ch.r, minCircleR);
           const nb: Body = { n: ch, x: ch.x, y: ch.y, vx: 0, vy: 0, r: ch.r, pct: pctOf(ch), idx: -1, lastFx: 0, popped: false, a: 0, va: 0, ia: 0, iva: 0 };
           owned.add(ch);
           all.push(nb);
@@ -6145,7 +6179,9 @@ export default function BreedTree({
           // are world units and the difficulty slider changes what a world unit
           // is worth: a fixed world figure would be the wrong size at one end of
           // the slider or the other.
-          ch.r = Math.max(ch.r * POP_GROW, POP_MIN_PX / 2 / pxPerWorld);
+          // The same floor the drop uses, read from the one name rather than
+          // written out again here, which is how the drop came to be without it.
+          ch.r = Math.max(ch.r * POP_GROW, minCircleR);
           const nb: Body = { n: ch, x: ch.x, y: ch.y, vx: 0, vy: 0, r: ch.r, pct: pctOf(ch), idx: -1, lastFx: 0, popped: false, a: 0, va: 0, ia: 0, iva: 0 };
           owned.add(ch);
           all.push(nb);
