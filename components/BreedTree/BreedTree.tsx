@@ -9,6 +9,7 @@ import { interpolateZoom } from "d3-interpolate";
 import type { LineageNode } from "../../data/lineage";
 import { nodeStatus, TAG_STYLE, type BreedTag } from "../BreedTreeMap/BreedTreeMap";
 import { descendantPackBreeds, ancestryFullList, ancestorShareOf, ancestorAppearancesOf, treesContaining } from "../../data/lineageArchive";
+import { subtreeSig, isEchoName } from "../../data/lineageShape";
 import { fireConfetti } from "../../lib/confetti";
 import TrainingCard from "../TrainingCard/TrainingCard";
 import { CONSENT_KEY } from "../../lib/consent";
@@ -1531,7 +1532,7 @@ type Node = HierarchyCircularNode<LineageNode>;
 // It is skipped in two places and only two: the drawing, and the pop that turns
 // children into physics bodies.
 function isEcho(d: Node): boolean {
-  return !!d.parent && d.data.name === d.parent.data.name;
+  return !!d.parent && isEchoName(d.data.name, d.parent.data.name);
 }
 
 /* THE SAME FAULT, THE OTHER RELATIONSHIP (owner, 18 September 2026).
@@ -1557,14 +1558,11 @@ function isEcho(d: Node): boolean {
 
    THE SIGNATURE IS CACHED ON THE RAW NODE, in a WeakMap, because this is asked
    inside render and physics loops. Each raw LineageNode is walked once, ever. */
-const sigCache = new WeakMap<LineageNode, string>();
-function subtreeSig(n: LineageNode): string {
-  const hit = sigCache.get(n);
-  if (hit !== undefined) return hit;
-  const s = `${n.name}:${n.value ?? ""}(${(n.children ?? []).map(subtreeSig).join(",")})`;
-  sigCache.set(n, s);
-  return s;
-}
+/* THE SIGNATURE AND THE ECHO RULE MOVED OUT, to data/lineageShape.ts, so
+   LineageMap reads the same ones (18 September 2026). They lived here for a day
+   and that day produced five faults from the two files disagreeing about what a
+   copy is. What stays here is only the d3 shape of the question: these take a
+   HierarchyCircularNode and the shared module takes raw LineageNodes. */
 function isDupSibling(d: Node): boolean {
   const p = d.parent;
   if (!p || !p.children) return false;

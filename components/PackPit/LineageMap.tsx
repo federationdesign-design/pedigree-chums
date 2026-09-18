@@ -10,6 +10,7 @@ import { bust } from "../../data/imgVersion";
 import { ancestralInfluence } from "../../data/lineageArchive";
 import { ukBreeds } from "../../data/uk-breeds";
 import { breeds } from "../../data/breeds";
+import { isHiddenCopyOf } from "../../data/lineageShape";
 import { breedInfo } from "../../data/breedInfo";
 import { splitName } from "./splitName";
 import styles from "./LineageMap.module.css";
@@ -1297,15 +1298,51 @@ export default function LineageMap({
   }, [root]);
   // every non-root node in the whole tree, open branch or not, so auto-collect can
   // reach the circles still tucked inside unopened branches
+  /* WHICH NODES ARE COPIES AND ARE NOT DRAWN (owner, 18 September 2026).
+
+     This file has never known about echoes or duplicate siblings, so it drew both:
+     two identical Ancient Molossers in the learn area, and the empty rings in the
+     Turnspit diagram. BreedTree has hidden them since the Celtic Heeler level. The
+     rule now lives in data/lineageShape.ts and both files read it.
+
+     BUILT ONCE PER TREE, as a set of _id, and applied at the RENDER ONLY. The nodes
+     stay in `shown` and in the layout, exactly as BreedTree leaves them in the pack:
+     the surviving circle keeps its size, its position and its share, and the copy's
+     place is simply empty. Filtering them out of the layout instead would move the
+     survivor, which is the one thing this must not do.
+
+     INSTRUCTION TREES ARE EXEMPT, and they had to be. `Head outside` is a root whose
+     only child is an echo of itself, and that echo carries go-outside-icon.svg. It is
+     the single image in the whole archive carried only by a hidden node, so hiding it
+     would delete the one frame those levels have. Six trees, gated by name. */
+  const hiddenIds = useMemo(() => {
+    const out = new Set<string>();
+    if (!root || INSTR_NAMES.has(breed.name)) return out;
+    const walkH = (n: Node) => {
+      const kids = (n.children as Node[] | undefined) ?? [];
+      kids.forEach((c, i) => {
+        if (isHiddenCopyOf(c, kids.slice(0, i), n.name)) out.add(c._id);
+        walkH(c);
+      });
+    };
+    walkH(root);
+    return out;
+  }, [root, breed.name]);
+
+  /* HIDDEN COPIES ARE NOT IN HERE, and that is the point (18 September 2026).
+     autoCollect opens, sees and POPS A CARD for every entry, so leaving them in
+     would pull 1,324 cards out of circles the player cannot see. Everything keyed
+     off this list follows for free: totalNodes, showAuto's "everything seen" test
+     and scoredRef. */
   const allNodes = useMemo(() => {
     const out: { id: string; hasKids: boolean; hasImg: boolean }[] = [];
     const walk = (n: Node) => (n.children as Node[] | undefined)?.forEach((k) => {
-      out.push({ id: k._id, hasKids: !!(k.children && k.children.length), hasImg: !!k.img });
+      if (!hiddenIds.has(k._id)) out.push({ id: k._id, hasKids: !!(k.children && k.children.length), hasImg: !!k.img });
       walk(k);
     });
     if (root) walk(root);
     return out;
-  }, [root]);
+  }, [root, hiddenIds]);
   // Every unique image-bearing ancestor, split into the living and the long-gone.
   // These define how many empty frames the player drags each collected card into.
   const frameSlots = useMemo(() => {
@@ -3790,7 +3827,7 @@ export default function LineageMap({
               // BOUNDED: full tree is laid out, so gate the drawn edges to nodes whose
               // parent is expanded (accumulating `open`). `!bounded ||` makes this a
               // no-op for the pit, whose `shown` already contains only open-parent nodes.
-              .filter((n) => n._parent && !soloLeaf && !n._tucked && (!bounded || open.has((n._parent as Node)._id)))
+              .filter((n) => n._parent && !soloLeaf && !n._tucked && !hiddenIds.has(n._id) && (!bounded || open.has((n._parent as Node)._id)))
               .map((n) => {
                 const p = n._parent as Node;
                 return (
@@ -3807,7 +3844,7 @@ export default function LineageMap({
             {shown
               // BOUNDED: same visibility gate as the edges - render only nodes whose
               // parent is expanded. No-op for the pit (see the edge filter above).
-              .filter((n) => n._parent && !soloLeaf && (!bounded || open.has((n._parent as Node)._id)))
+              .filter((n) => n._parent && !soloLeaf && !hiddenIds.has(n._id) && (!bounded || open.has((n._parent as Node)._id)))
               .map((n) => {
                 const hasKids = !!(n.children && n.children.length);
                 const isOpen = open.has(n._id) && hasKids;
