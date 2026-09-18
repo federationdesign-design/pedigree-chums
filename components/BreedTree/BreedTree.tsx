@@ -1377,6 +1377,20 @@ const PIT_FULL_ZONE_PX = 90;
    two chips that look identical alive can still die different colours. Flagged
    to the owner, left alone deliberately. */
 const CHIP_FILL = "#ffed00";
+/* HOW MANY KNOCKS A SCATTERED PROP TAKES before it goes. Two things carry it,
+   the name PILLS and the RODS, and until now it was an inline 2 written twice
+   with nothing tying them together.
+
+   THE PILLS ARE HALVED, 18 September 2026 (owner): 2 to 1, so one knock kills a
+   navy name pill. The rods keep 2 and have their own figure now, so halving one
+   can never quietly halve the other.
+
+   NOT the chips, which carry `charges` (10, or 20 once learnt), and NOT the
+   bombs, which take BOMB_HITS. Three different counters on three different
+   objects, named apart here so the next person does not have to work that out
+   from the call sites. */
+const PILL_HITS = 1;
+const ROD_HITS = 2;
 // The yellow percentage badge, drawn and collided at this radius. Doubled from
 // 46: they were easy to lose against the circles, on the start screen and in
 // the pit alike.
@@ -6473,7 +6487,7 @@ export default function BreedTree({
         const lenPx = Math.max(10, Math.hypot(x2 - x1, y2 - y1));
         const ang = Math.atan2(y2 - y1, x2 - x1);
         const w = worldFromPx((x1 + x2) / 2, (y1 + y2) / 2);
-        const pr = { x: w.x, y: w.y, vx: 0, vy: 0, a: ang, idx: rodBodiesRef.current.length, hits: 0, maxHits: 2, mb: null as any };
+        const pr = { x: w.x, y: w.y, vx: 0, vy: 0, a: ang, idx: rodBodiesRef.current.length, hits: 0, maxHits: ROD_HITS, mb: null as any };
         const mb = Bodies.rectangle((x1 + x2) / 2, (y1 + y2) / 2, lenPx, 8, { chamfer: { radius: 4 }, restitution: 0.4, friction: 0.1, frictionAir: 0.01, density: 0.001, angle: ang });
         mb.plugin = { prop: pr, kind: "rod" };
         pr.mb = mb;
@@ -6563,7 +6577,7 @@ export default function BreedTree({
         const PILL_K = 0.72;
         const pw = Math.max(44, Math.max(...lines.map((l) => l.length)) * 7.4 + 14 + (lines.length > 1 ? 10 : 0)) * PILL_K;
         const ph = (lines.length > 1 ? 40 : 22) * PILL_K;
-        const pr = { x: w.x, y: w.y, vx: 0, vy: 0, a: 0, idx: pillBodiesRef.current.length, hits: 0, maxHits: 2, mb: null as any };
+        const pr = { x: w.x, y: w.y, vx: 0, vy: 0, a: 0, idx: pillBodiesRef.current.length, hits: 0, maxHits: PILL_HITS, mb: null as any };
         const mb = Bodies.rectangle(sx, sy, pw, ph, { chamfer: { radius: ph / 2 }, restitution: 0.3, friction: 0.1, frictionAir: 0.012, density: 0.0012 });
         mb.plugin = { prop: pr, kind: "pill" };
         pr.mb = mb;
