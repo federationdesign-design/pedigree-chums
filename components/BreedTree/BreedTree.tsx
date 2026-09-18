@@ -4542,6 +4542,30 @@ export default function BreedTree({
   // objects in the main pit. Circles stay click-to-zoom only. The sim exposes
   // a wake() so a drag can restart physics after everything has settled.
   const wakeRef = useRef<(() => void) | null>(null);
+  /* THE PIT STOPS WHILE A CIRCLE IS LIFTED (owner, 18 September 2026).
+
+     WHY. The lift covers the pit completely, so every frame the sim draws while it
+     is open is work nobody can see. It is not free work either: AUTO on a 40 node
+     dog schedules about 80 separate timers, each its own task, so React cannot
+     batch them and the lift re-renders roughly 110 times over 2.4 seconds. The pit
+     shares that main thread and visibly stutters through it.
+
+     A REF, NOT THE STATE. The sim effect is bound once and holds an older closure,
+     so reading learnNode there would be a frame or two stale. Every other decision
+     in that loop reads a ref for the same reason.
+
+     THE LOOP DOES NOT SLEEP ON ITS OWN DURING A ROUND. The settle-and-stop path at
+     the loop's tail is gated on the round having ENDED, so `roundLive` keeps it
+     running unconditionally while the pit is playable. This is therefore a new
+     state rather than a reuse of that sleep, and it borrows its machinery. */
+  const liftPausedRef = useRef(false);
+  useEffect(() => {
+    const was = liftPausedRef.current;
+    liftPausedRef.current = !!learnNode;
+    // Resuming restarts the loop. wake() refuses while the flag is up, so this has
+    // to come after it is lowered, which it does.
+    if (was && !learnNode) wakeRef.current?.();
+  }, [learnNode]);
   // Slow motion. The fixed-timestep driver feeds Engine.update, which applies
   // engine.timing.timeScale itself, so a quarter speed toggle is all it takes.
   const slowmoRef = useRef<(() => void) | null>(null);
@@ -8544,6 +8568,13 @@ export default function BreedTree({
         return blocked;
       };
       const checkFull = (now: number) => {
+        /* THE POLL IS NOT ON THE rAF, so pausing the sim does not pause this: it
+           re-arms itself on its own 400ms timer and would go on testing occupancy
+           behind the lift. Without this a player could come back from reading a
+           learn layer into a countdown that started while they were in it, which
+           they never saw begin. Guarded inside checkFull rather than at the poll,
+           so the loop's own call is covered by the same line. */
+        if (liftPausedRef.current) return;
         if (now - fullClock < 4000 || now <= cdGraceRef.current) return;
         const full = computeFull();
         if (full && !fullTriggeredRef.current) {
@@ -8568,7 +8599,21 @@ export default function BreedTree({
         if (!computeFull() && !anyChumOnFloor()) cancelCountdown(now);
       };
       const step = (nowRaf: number) => {
+        /* PAUSED: stop dead, draw nothing, schedule nothing. NOT the tail's
+           stop-and-tear-down path below, which clears the flashing numbers and
+           drops `falling`: this is a freeze, and everything has to be exactly
+           where it was when the lift closes. Bodies cannot drift while stopped
+           because Engine.update is the only thing that integrates them, and
+           Matter's own per-body sleeping is untouched by our not calling it. */
+        if (liftPausedRef.current) { simRunningRef.current = false; return; }
         const now = performance.now();
+        /* THE RESUME'S ONE REAL HAZARD, and it is already handled. lastT is nulled
+           by wake() before this runs again, so the first frame back does not do
+           `acc += nowRaf - lastT` across the whole pause, which is the drift or
+           explode case. Even if that were missed, acc is clamped to MAX_ACC below,
+           so the engine could advance at most six steps rather than six hundred.
+           That clamp is why pausing here is safe where pausing physics generally
+           is not. */
         if (lastT === null) lastT = nowRaf;
         acc += Math.max(0, nowRaf - lastT);
         lastT = nowRaf;
@@ -8883,6 +8928,11 @@ export default function BreedTree({
         }
       };
       const wake = () => {
+        /* THE GOTCHA THIS GUARD IS FOR. toyTimers fire spawnToy, which calls wake,
+           so a tennis ball arriving mid-lift would restart the sim behind the
+           overlay and undo the pause. Checked here rather than only at the loop's
+           tail, because every caller comes through this one door. */
+        if (liftPausedRef.current) return;
         if (simRunningRef.current) return;
         simRunningRef.current = true;
         lastT = null;
