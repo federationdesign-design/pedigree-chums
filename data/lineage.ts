@@ -733,36 +733,43 @@ const LINEAGE: Record<string, LineageNode> = {
     ]
   },
 
-  /* TWO DOGS, TWO ERAS, ONE LINE (owner, 18 September 2026). This record and
-     "Old English Black and Tan Terrier" carried IDENTICAL children, which said they
-     were unconnected dogs that happened to share an ancestry. They are one lineage
-     in two stages: the medieval rough stock (1436) and its sleeker descendant
-     (1710), and everything later descends from the YOUNGER.
+  /* ONE DOG, FIVE NAMES (owner, 18 September 2026, reverting the two-stage split
+     built earlier the same day).
 
-     IT WAS WRONG IN EVERY TREE BUT THREE. All 14 parents of the older were dogs
-     anchored after 1710 (Whippet 1880, Fox Terrier 1872, Old fell Terriers 1745 and
-     the rest), hanging Victorian terriers straight off medieval stock and skipping
-     the dog in between. 131 occurrences across 34 trees. Only English Toy Terrier
-     and Manchester Terrier were attached correctly.
+     WHAT THE SPLIT CLAIMED. That "Old English Black and Tan Terrier" was a medieval
+     dog (1436) and this one its 1710 descendant, so everything later should hang off
+     this record and this record off that one. 17 literal leaves were re-pointed and
+     this record was rewired to carry the older as its only child.
 
-     SO THE 17 LITERAL LEAVES NOW NAME THIS RECORD, and this record's only real
-     child is the older one. expandNode grafts the older's own tree onto it, so the
-     ratting and earth stock still arrives, one generation further back where it
-     belongs, and no share moves: the branch carries the same total weight it always
-     did.
+     IT HAD NO SUPPORT, AND THE ARCHIVE'S OWN HISTORY SAYS SO. The mainstream reading
+     is one extinct breed under several names, Old English Black and Tan Terrier among
+     them; the English Toy Terrier Club uses both names for the same dog on one page,
+     and the ETT and Manchester descend from "the Old English Black and Tan Terrier"
+     and "the Black and Tan Terrier" respectively, which is one parent under two
+     spellings.
 
-     THE ECHO IS LOAD-BEARING AND CARRIES ZERO. LineageMap collapses any valueless
-     node with a single child, so with the older alone this record would be deleted
-     from every diagram and the two stages would fold back into one. The echo gives
-     it a second child. Its value is 0 deliberately: leafSum counts it, so any other
-     figure would dilute the branch and move every share above it. It is never drawn
-     in either file (see data/lineageShape.ts). */
+     AND THE SECOND RECORD WAS A DUPLICATE, not a second dog. This root came in with
+     the original terrier families; the "Old English" root was added on 10 August as
+     its own family record into a file that already had this one, carried IDENTICAL
+     children (ratting 60, earth 40), the SAME image and a note describing the same
+     dog. Its Medieval/1436 history card was auto-derived from that root nine days
+     later in a bulk pass over 23 roots, so the era that made the two-stage story look
+     measured was generated from the duplicate it was meant to prove.
+
+     THE 14 POST-1710 PARENTS WERE NOT EVIDENCE EITHER. That every parent of the
+     "older" record is a Victorian terrier is exactly what ONE extinct old terrier
+     ancestral to them looks like. It was read as proof of two dogs; it is consistent
+     with both, and the one-dog reading is the supported one.
+
+     SO THE CHILDREN ARE ITS OWN AGAIN. The 17 leaves keep this name, which is the
+     canonical one, and "Old English Black and Tan Terrier" is now an alias so the
+     name still resolves wherever it is written. */
   "Black and Tan Terrier": {
     name: "Black and Tan Terrier",
-    note: "The sleek black-and-tan ratter of the 1700s, bred down from the older rough working terrier. The dog Manchester, Toy and Heeler lines were built on. Now extinct.",
+    note: "The Old English Terrier, the extinct rough working terrier that nearly every British terrier descends from.",
     children: [
-      { name: "Old English Black and Tan Terrier", note: "The rough medieval black-and-tan working terrier it was bred down from. Now extinct.", img: "/history/breeds/old-english-black-and-tan-terrier-img.jpg", value: 100 },
-      { name: "Black and Tan Terrier", note: "The same dog carrying on: see the echo note in data/lineageShape.ts.", value: 0 }
+      { name: "Old British ratting Terriers", note: "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.", img: "/history/breeds/Old-British-ratting-terriers.jpg", value: 60 },
+      { name: "Earth and hunt terriers", note: "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.", img: "/history/breeds/Earth-and-hunt-terrier.jpg", value: 40 }
     ]
   },
 
@@ -903,21 +910,6 @@ const LINEAGE: Record<string, LineageNode> = {
   // bare leaves. Single-parent value 100, matching the shipped Wheaten. Earth Dog
   // is one hop, keeping Kerry Blue's chain (Kerry, Wheaten, Native Irish terriers,
   // OEBT, Earth Dog) at depth 4, inside MAX_LINEAGE_DEPTH.
-  "Old English Black and Tan Terrier": {
-    name: "Old English Black and Tan Terrier",
-    note: "The old British black-and-tan working terrier, the rough ratting and vermin stock much of Britain's terrier blood was drawn from. Now extinct.",
-    // 19 August 2026: pass-through fixed with a documented second parent, not
-    // the fallback. Wikipedia's "Black and Tan Terrier" traces the breed to the
-    // small black-and-tan ratting terriers noted from the sixteenth century, so
-    // its children are now Old British ratting terriers (60) and Earth and hunt
-    // terriers (40), mirroring how the sibling Black and Tan Terrier root is
-    // wired. The previous single Earth Dog link was dropped: the node's own note
-    // admitted it was a functional match rather than documented descent.
-    children: [
-      { name: "Old British ratting Terriers", note: "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.", img: "/history/breeds/Old-British-ratting-terriers.jpg", value: 60 },
-      { name: "Earth and hunt terriers", note: "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.", img: "/history/breeds/Earth-and-hunt-terrier.jpg", value: 40 }
-    ]
-  },
   "Old English White Terrier": {
     name: "Old English White Terrier",
     note: "The white-bodied working terriers bred out of the black-and-tan stock for coat colour. The split of this line into population and named breed is a useful reconstruction, not a documented distinction: the three white-terrier names all refer to one extinct breed. Now extinct.",
@@ -2660,6 +2652,12 @@ const MAX_LINEAGE_DEPTH = 7;
 const LINEAGE_ALIASES: Record<string, string> = {
   "Jack Russell": "Jack Russell Terrier",
   "Mastiff": "English Mastiff",
+  /* ONE DOG, FIVE NAMES (18 September 2026). "Old English Black and Tan Terrier"
+     had its own root for a month and was a duplicate of Black and Tan Terrier:
+     identical children, the same image, a note describing the same dog. The root
+     is gone and the name resolves here, so anything still written that way, in the
+     data, on a history card or in an old link, reaches the one record. */
+  "Old English Black and Tan Terrier": "Black and Tan Terrier",
   // SUPERSEDED 14 August 2026. The two Talbot spellings ("Talbot hounds",
   // "Talbot hound") used to appear as child nodes across many trees and were
   // aliased here so their branches grafted onto the Talbot's own ancestry.
