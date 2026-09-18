@@ -1667,9 +1667,15 @@ function rarityTier(count: number): RarityTier {
 // wrap that allows the largest type while keeping all four corners of the text
 // block inside the circle wins. A very long name therefore takes a third or
 // fourth line instead of spilling over the rim.
-// How much a lone child shrinks so its parent reads as a ring rather than a
-// hairline. See the pack pass in `nodes` for the whole reasoning.
-const SOLO_CHILD_K = 0.62;
+/* How much a lone child shrinks. See the pack pass in `nodes` for the whole
+   reasoning, including why it is then pushed to one side.
+
+   0.62 -> 0.75 (owner, 18 September 2026). 0.62 was chosen while the child was
+   still CENTRED, where the only separation was the ring and it had to be wide to
+   read at all. Once the child is tangent inside the rim the CRESCENT does that
+   work, so the child no longer has to be small: at 0.75 the crescent is wider at
+   its widest than the whole 0.62 ring was, with a child that is not shrunken. */
+const SOLO_CHILD_K = 0.75;
 const LABEL_MAX_LINES = 4;
 const LABEL_CHAR_W = 0.62; // fallback glyph width in ems, before the font loads
 // Line height in ems for every label inside a circle, and the single source
@@ -2846,13 +2852,53 @@ export default function BreedTree({
        too small, this wants a floor rather than a flat multiplier.
 
        TUNE HERE. 0.62 is a starting figure, not a measured one. */
-    for (const p of ns) {
-      const kids = p.children;
-      if (!kids || kids.length !== 1) continue;
-      for (const d of kids[0].descendants()) {
-        d.x = p.x + (d.x - p.x) * SOLO_CHILD_K;
-        d.y = p.y + (d.y - p.y) * SOLO_CHILD_K;
-        d.r *= SOLO_CHILD_K;
+    {
+      /* AND IT IS PUSHED TO ONE SIDE, NOT LEFT IN THE MIDDLE (owner, 18 September
+         2026, on seeing Cairn Terrier).
+
+         SHRINKING ALONE GAVE THE WRONG SHAPE, and it could not have given any other.
+         pack puts a lone child AT ITS PARENT'S CENTRE, so scaling about that centre
+         leaves it there whatever the factor: a ring with a disc floating in it, which
+         reads as a target rather than as a dog inside its ancestor. Only the size
+         changed and the size was never the problem.
+
+         WHAT NESTLED MEANS, TAKEN FROM PACK ITSELF. Give a parent TWO equal children
+         and pack gives each r = R/2 with its centre R/2 out, so each child's rim
+         TOUCHES the parent's rim and each leaves a crescent. That is why the
+         19 August duplicate device looked right: not the count, the offset. So a lone
+         child is placed the same way, centre at R - r, tangent inside the rim.
+
+         OUTWARD FROM THE DIAGRAM'S CENTRE, so the crescent falls on the inner side
+         where the eye is already travelling, and a subtree leans away from the middle
+         rather than into its siblings. A node sitting exactly at the centre has no
+         direction to take, so it falls back to straight down.
+
+         THE PARENT'S NAME IS COVERED, AND THAT IS NOT NEW. Labels are interleaved
+         with circles, so any nested child paints over its parent's label already; the
+         crescent is what makes the parent readable as a ring, not the text. See
+         labelBuried for the hover case, which is untouched.
+
+         CHAINS TAKE THE SAME DIRECTION, deliberately, as the first thing to judge
+         rather than the cleverest. An inner node is offset from its already-moved
+         position, so a chain leans consistently outward. Curly-Coated Retriever is
+         the level to look at: four wrappers from depth 2. If it drifts, alternating
+         or rotating per depth is the next thing to try. */
+      const cx = SIZE / 2, cy = SIZE / 2;
+      for (const p of ns) {
+        const kids = p.children;
+        if (!kids || kids.length !== 1) continue;
+        const c = kids[0];
+        const nr = c.r * SOLO_CHILD_K;
+        const off = Math.max(0, p.r - nr); // tangent to the inside of the parent's rim
+        let ux = p.x - cx, uy = p.y - cy;
+        const len = Math.hypot(ux, uy);
+        if (len < 1e-6) { ux = 0; uy = 1; } else { ux /= len; uy /= len; }
+        const dx = ux * off, dy = uy * off;
+        for (const d of c.descendants()) {
+          d.x = p.x + (d.x - p.x) * SOLO_CHILD_K + dx;
+          d.y = p.y + (d.y - p.y) * SOLO_CHILD_K + dy;
+          d.r *= SOLO_CHILD_K;
+        }
       }
     }
     normalizeTop(ns);
