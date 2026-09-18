@@ -1670,12 +1670,22 @@ function rarityTier(count: number): RarityTier {
 /* How much a lone child shrinks. See the pack pass in `nodes` for the whole
    reasoning, including why it is then pushed to one side.
 
-   0.62 -> 0.75 (owner, 18 September 2026). 0.62 was chosen while the child was
-   still CENTRED, where the only separation was the ring and it had to be wide to
-   read at all. Once the child is tangent inside the rim the CRESCENT does that
-   work, so the child no longer has to be small: at 0.75 the crescent is wider at
-   its widest than the whole 0.62 ring was, with a child that is not shrunken. */
-const SOLO_CHILD_K = 0.75;
+   0.62 -> 0.75 -> 0.5 (owner, 19 September 2026), and 0.5 is not a taste figure. It
+   is the one value at which a lone child is geometrically IDENTICAL to the shape the
+   19 August device produces, which is the look signed off on Ancient Mastiff: Dogs of
+   the Alan Horsemen offset inside Alaunt War Dogs.
+
+   THE TWO WERE DIFFERENT SHAPES. The device gives a node two equal children; pack
+   places them tangent to each other, so with padding P the parent's radius is 2r + P
+   and each child sits r from the centre. A lone child starts at R - P instead, so
+   matching it means halving: (R - P) / 2 is exactly the device's r. Hence 0.5, and
+   nothing else. 0.75 was reasoned from "the crescent does the work" without checking
+   it against the shape already agreed.
+
+   DO NOT RAISE IT without measuring against a device pair. The two paths have to
+   stay indistinguishable, because the device removal turns every one of those pairs
+   into a lone child. */
+const SOLO_CHILD_K = 0.5;
 const LABEL_MAX_LINES = 4;
 const LABEL_CHAR_W = 0.62; // fallback glyph width in ems, before the font loads
 // Line height in ems for every label inside a circle, and the single source
@@ -2827,7 +2837,10 @@ export default function BreedTree({
     // padding: 8px inset between nested circles in every game hosting. For the
     // /chums2 static diagram (displayOnly) the nested circles sit FLUSH (0), so a
     // parent and its children read as one solid nest with no gap ring. (chums2 #4.)
-    const ns = pack<LineageNode>().size([SIZE, SIZE]).padding(displayOnly ? 0 : 8)(h).descendants();
+    // Named because the lone-child pass below has to reproduce the gap pack leaves
+    // between two children, and a second literal would drift from this one.
+    const PACK_PAD = displayOnly ? 0 : 8;
+    const ns = pack<LineageNode>().size([SIZE, SIZE]).padding(PACK_PAD)(h).descendants();
     /* A LONE CHILD MUST NOT FILL ITS PARENT (owner, 18 September 2026).
 
        THE PROBLEM. d3.pack sizes a parent from its children, so a node with ONE
@@ -2889,7 +2902,15 @@ export default function BreedTree({
         if (!kids || kids.length !== 1) continue;
         const c = kids[0];
         const nr = c.r * SOLO_CHILD_K;
-        const off = Math.max(0, p.r - nr); // tangent to the inside of the parent's rim
+        /* THE PADDING GOES IN THE GAP, NOT INTO THE CHILD (owner, 19 September
+           2026). This was p.r - nr, which puts the child's rim exactly on the
+           parent's. A device pair does not do that: pack leaves P between the two
+           children, so the visible one's rim ends up P inside the parent's. Measured
+           on Alaunt War Dogs the gap was 7.31 against 0.00 here, which is the whole
+           of the remaining difference between the two shapes. Subtracting P closes
+           it, and at K 0.5 the result is offset == radius, which is what two tangent
+           equal circles give. */
+        const off = Math.max(0, p.r - nr - PACK_PAD); // the device's own rim gap
         let ux = p.x - cx, uy = p.y - cy;
         const len = Math.hypot(ux, uy);
         if (len < 1e-6) { ux = 0; uy = 1; } else { ux /= len; uy /= len; }

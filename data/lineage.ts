@@ -1341,8 +1341,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Setter",
     note: "The setting dogs of the shooting field, bred to find birds and hold steady. Now in-decline.",
     children: [
-      { name: "Land Spaniels", note: "The crouching land spaniels that marked game for the net, the stock every setter was built up from. Now extinct.", img: "/history/breeds/original-land-spaniel.jpg", value: 100 },
-      { name: "Setter", note: "The same dog carrying on: see the echo note in data/lineageShape.ts.", value: 0 }
+      { name: "Land Spaniels", note: "The crouching land spaniels that marked game for the net, the stock every setter was built up from. Now extinct.", img: "/history/breeds/original-land-spaniel.jpg", value: 100 }
     ]
   },
 
@@ -1386,8 +1385,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Old wirehaired fell Terriers",
     note: "The harsh-coated fox-working terriers of the northern fells, bred for grip and weather rather than looks. Now extinct.",
     children: [
-      { name: "Black and Tan Terrier", note: "The old black-and-tan working terrier the fell and Welsh terriers were bred from. Now extinct.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 100 },
-      { name: "Old wirehaired fell Terriers", note: "The same dog carrying on: see the echo note in data/lineageShape.ts.", value: 0 }
+      { name: "Black and Tan Terrier", note: "The old black-and-tan working terrier the fell and Welsh terriers were bred from. Now extinct.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 100 }
     ]
   },
 
@@ -1395,8 +1393,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Old scenting Hounds",
     note: "The tracking hounds of medieval lords, the scenting stock behind the bloodhound and the old hunting hounds. Now extinct.",
     children: [
-      { name: "Celtic Scent Hound", note: "Early Celtic tracking hound that followed game by scent, representing the roots of later European scent hounds. An extinct historical type.", img: "/history/breeds/ancient-celtic-scent-hound.jpg", value: 100 },
-      { name: "Old scenting Hounds", note: "The same dog carrying on: see the echo note in data/lineageShape.ts.", value: 0 }
+      { name: "Celtic Scent Hound", note: "Early Celtic tracking hound that followed game by scent, representing the roots of later European scent hounds. An extinct historical type.", img: "/history/breeds/ancient-celtic-scent-hound.jpg", value: 100 }
     ]
   },
 
@@ -1404,8 +1401,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Old black-and-tan Setters",
     note: "The black-and-tan setting dogs worked in Britain before the Duke of Gordon's kennels took the type up. Now extinct.",
     children: [
-      { name: "Land Spaniels", note: "The crouching land spaniels that marked game for the net, the stock every setter was built up from. Now extinct.", img: "/history/breeds/original-land-spaniel.jpg", value: 100 },
-      { name: "Old black-and-tan Setters", note: "The same dog carrying on: see the echo note in data/lineageShape.ts.", value: 0 }
+      { name: "Land Spaniels", note: "The crouching land spaniels that marked game for the net, the stock every setter was built up from. Now extinct.", img: "/history/breeds/original-land-spaniel.jpg", value: 100 }
     ]
   },
 
@@ -2544,8 +2540,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Lo-sze",
     note: "The ancient flat-faced Pug of the Song imperial court, carried to Europe by Dutch traders in the sixteenth century. Now extinct.",
     children: [
-      { name: "Ancient Chinese toy dogs", note: "The old Chinese flat-faced lapdogs kept in the imperial court alongside the Pekingese and lion dogs. Now extinct.", img: "/history/breeds/Ancient-Chinese-toy-dogs.jpg", value: 100 },
-      { name: "Lo-sze", note: "The same dog carrying on: see the echo note in data/lineageShape.ts.", value: 0 }
+      { name: "Ancient Chinese toy dogs", note: "The old Chinese flat-faced lapdogs kept in the imperial court alongside the Pekingese and lion dogs. Now extinct.", img: "/history/breeds/Ancient-Chinese-toy-dogs.jpg", value: 100 }
     ]
   },
 
