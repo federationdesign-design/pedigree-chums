@@ -327,6 +327,24 @@ function countProgenitors(n: LineageNode): number {
    is a flat 4.8. Below about 0.3 the ring is thicker than the circle is wide and
    the nodes stop reading as circles at all. */
 const PIT_NODE_SCALE = 0.659;
+/* HOW MUCH BIGGER THAN ITS NODE A POP-OUT CARD IS DRAWN (owner, 18 September
+   2026: the node's ring still shows behind the card).
+
+   THE CARD WAS 71.3% OF THE NODE'S RADIUS, at every share. cardScale mapped the
+   largest node to CW, but CW/2 is 23.5 against that node's radius of 32.95, so
+   the card was always the smaller of the two and the ring showed all the way
+   round. Not a corner problem: on the lift the card's rx is CW/2 on a square of
+   side CW, so it is drawn as a CIRCLE, not a rounded square, and its corners
+   never had to reach anywhere.
+
+   THE RING IS THE SECOND HALF, and that half was right. .disc strokes on the
+   node's radius, so it extends OUTWARD by half its width. At depth 1 the ring is
+   9% of nodeR, so the node's visual outer radius is nodeR * 1.045; depths 2 and 3
+   are 1.041 and 1.0375, so depth 1 is the worst case and covering it covers all.
+
+   1.045 IS THE COVER, and this constant is the margin on top of it, so the two
+   reasons stay separate: if a card ever peeks again, nudge this, not the 1.045. */
+const CARD_COVER_MARGIN = 1.04;
 /* The scale the node name pill is DRAWN at. Named because two places need it: the
    <g> that draws it on the tree, and scatterPills, which has to send the pit the
    drawn width rather than the raw one. */
@@ -1981,7 +1999,11 @@ export default function LineageMap({
 
          IT GROWS TO THE FRAME ON LANDING, so this only ever describes a loose
          card: see cardScale at the draw site. */
-      const cardScale = live ? nodeR(share) / nodeR(100) : 1;
+      /* Sized to COVER the node rather than to match it: its radius, plus the half
+         of the ring that sits outside it, plus CARD_COVER_MARGIN. Expressed as a
+         scale because the whole card group is drawn at CW and scaled as one; see
+         the draw site. A framed card is still exactly CW. */
+      const cardScale = live ? ((2 * nodeR(share) * 1.045 * CARD_COVER_MARGIN) / CW) : 1;
       const ff = cardFrame.get(id);
       const cardX = ff ? ff.sx - pan.x : (pos ? pos.x : baseX);
       const cardY = ff ? ff.sy - pan.y : (pos ? pos.y : baseY);
