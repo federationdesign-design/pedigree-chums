@@ -3193,6 +3193,63 @@ export default function BreedTree({
      scope, and writes finished lines into a ref. The effect below only prints
      them. Nothing is computed and no counter is incremented unless the flag is
      on. */
+  /* ---- ?windiag=1 : WHY THE ROUND WILL NOT END --------------------------------
+     Owner, 18 September 2026: every dog circle cleared, pit empty apart from
+     chips, toys and bombs, and the round did not end. Intermittent.
+
+     WHAT THE ROUND-WON TEST ACTUALLY ASKS. One line, in the learn layer's
+     onRemove: every node in pitBodiesRef.owned is in removedNodesRef. `owned` is
+     nodes that were GIVEN A BODY, and nothing is ever deleted from it, so the
+     test is really "has every node that ever had a body been removed". A single
+     node that gets a body and then becomes unclearable blocks the round for the
+     rest of the level, and nothing on screen says which one.
+
+     SO THIS LISTS THE BLOCKERS, and for each one the things that would explain
+     why the player cannot see it: its drawn radius, whether its circle is
+     display none or transparent, whether it still has a body, and whether that
+     body is HELD, which takes it out of the world and hides the circle.
+
+     Polls, like the other readouts. Nothing is created without the flag. */
+  useEffect(() => {
+    let d: HTMLDivElement | null = null;
+    let t = 0;
+    try {
+      if (new URLSearchParams(window.location.search).get("windiag") !== "1") return;
+      d = document.createElement("div");
+      d.style.cssText =
+        "position:fixed;left:0;right:0;bottom:0;z-index:99999;background:#000;color:#f6f;" +
+        "font:11px/1.4 monospace;padding:6px 8px;pointer-events:none;white-space:pre-wrap";
+      d.textContent = "win diag: start a round";
+      document.body.appendChild(d);
+      const el = d;
+      const tick = () => {
+        const pb = pitBodiesRef.current;
+        if (!pb) { el.textContent = "win diag: no pit yet"; return; }
+        const owned = [...pb.owned];
+        const rem = removedNodesRef.current;
+        const blocking = owned.filter((n) => !rem.has(n));
+        /* Read off the NODE and its body, never off nodesRef or the circle
+           elements. Reading either of those from an effect makes the lint rule
+           react-hooks/immutability flag the place they are written, which would
+           put a diagnostic's cost on production code. Everything needed is here
+           anyway: held with a body is the lifted-and-never-returned signature,
+           no body at all is a node that was given one and lost it, and depth 1
+           is a word rather than a circle. */
+        const rows = blocking.slice(0, 10).map((n) => {
+          const body = pb.find(n) as { held?: boolean } | undefined;
+          const why = !body ? "NO BODY" : body.held ? "HELD (out of the world, circle hidden)" : "in play";
+          return `d${n.depth} r=${n.r.toFixed(1)} ${why}  ${n.data.name}`;
+        });
+        el.textContent =
+          `owned ${owned.length}  removed ${rem.size}  BLOCKING ${blocking.length}` +
+          (blocking.length === 0 ? "   <-- the test would pass: the win never ran or was swallowed" : "") +
+          (rows.length ? "\n" + rows.join("\n") : "");
+      };
+      tick();
+      t = window.setInterval(tick, 500);
+    } catch {}
+    return () => { try { if (t) window.clearInterval(t); if (d) d.remove(); } catch {} };
+  }, []);
   const spinDiagRef = useRef<string[]>([]);
   useEffect(() => {
     let d: HTMLDivElement | null = null;
