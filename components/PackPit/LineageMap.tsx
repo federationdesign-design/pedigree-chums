@@ -1838,21 +1838,39 @@ export default function LineageMap({
       const mix = live ? (root ? Math.round((live._leaves / root._leaves) * 100) : share) : (snap?.mix ?? snap?.share ?? 0);
       const status = live ? nodeStatus(live.name, live.note) : snap?.status ?? null;
       const note = live?.note ?? snap?.note ?? "";
-      const r = nodeR(share);
-      const d = r + 10 + CW / 2;
-      // A solo dog has no node to pop from: the node was a duplicate of itself
-      // and is no longer drawn. Popping from its coordinates throws the card out
-      // to wherever that invisible node sat, which is a long way from the dog.
-      // For these dogs the card comes out of the big circle itself.
-      // A solo dog has no node to pop from. The card springs out of the big
-      // circle's top-right shoulder, offset by that circle's own radius so it
-      // sits clear whatever size the dog is, rather than hiding dead centre.
-      // circR is declared further down, so use the same expression it does:
-      // the dog's own radius, clamped, falling back to ROOT off the mini pit
-      const bigR = liftR;
-      const soloOff = bigR * 0.72;
-      const baseX = soloLeaf ? breed.x + soloOff : live ? live._x + Math.cos(live._dir) * d : 0;
-      const baseY = soloLeaf ? breed.y - soloOff : live ? live._y + Math.sin(live._dir) * d : 0;
+      /* THE CARD SITS ON ITS NODE (owner, 18 September 2026), centred exactly,
+         rather than springing out beside it.
+
+         WHAT IT WAS. `d` was nodeR(share) + 10 + CW/2, pushed along the node's own
+         slot direction _dir, so the card's near edge landed ten pixels off the
+         node's rim. Deliberate, and the whole design of the element: the node was
+         the source and the card the thing you carried, kept clear so the node
+         stayed readable underneath. On the clock layout _dir points outward from
+         the parent, which is why every card read as sitting up and to one side of
+         the disc it belonged to.
+
+         THE SOLO BRANCH GOES WITH IT. soloOff was liftR * 0.72 and existed for one
+         reason, that a dog with no node to pop from would otherwise "hide dead
+         centre". Centring is now what is wanted, so that reasoning is dead and the
+         solo card centres on the big circle like every other card centres on its
+         node.
+
+         TWO COSTS, BOTH ACCEPTED BY THE OWNER RATHER THAN OVERLOOKED:
+           THE PERCENTAGE GOES. The cards are drawn after the nodes, so a centred
+           card covers its node's disc, ring and % together. The share is still on
+           the rarity band, on the card and in the frames, but it is no longer on
+           the node, and on a very common dog that is most of the tree.
+           THE BIGGEST NODES ARE NOT COVERED. CW is grid-derived, 47 on a 390
+           phone, so a half-width of 23.5 against a node radius that runs from 13.8
+           at the floor to about 33 at full share. It engulfs the small ones and
+           sits inside the large ones, leaving a rim of disc showing round a square
+           portrait. Making it always cover would mean sizing the card from the
+           node rather than the grid, and CW also sizes the frames it drops into.
+
+         dragPos and cardFrame still override below, so dragging and framing are
+         untouched. */
+      const baseX = soloLeaf ? breed.x : live ? live._x : 0;
+      const baseY = soloLeaf ? breed.y : live ? live._y : 0;
       const pos = dragPos.get(id);
       const ff = cardFrame.get(id);
       const cardX = ff ? ff.sx - pan.x : (pos ? pos.x : baseX);
