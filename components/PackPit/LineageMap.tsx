@@ -1856,10 +1856,16 @@ export default function LineageMap({
          node.
 
          TWO COSTS, BOTH ACCEPTED BY THE OWNER RATHER THAN OVERLOOKED:
-           THE PERCENTAGE GOES. The cards are drawn after the nodes, so a centred
-           card covers its node's disc, ring and % together. The share is still on
-           the rarity band, on the card and in the frames, but it is no longer on
-           the node, and on a very common dog that is most of the tree.
+           THE PERCENTAGE IS COVERED on every picked node. The cards are drawn
+           after the nodes, so a centred card covers its node's disc, ring and %
+           together, and on a very common dog that is most of the tree.
+           IT IS NOT LOST TO THE PLAYER, AND THIS IS THE REASON THE COST IS
+           ACCEPTABLE: the figure is on screen BEFORE the card appears, which is
+           the whole time the player is reading the tree and deciding what to
+           open, and it is on screen AGAIN when the chip drops into the pit. The
+           card covers it only for the span between those two, when the thing in
+           hand is the portrait rather than the share. Do not revert this on the
+           grounds that a number went missing: it did not, it is bracketed.
            THE BIGGEST NODES ARE NOT COVERED. CW is grid-derived, 47 on a 390
            phone, so a half-width of 23.5 against a node radius that runs from 13.8
            at the floor to about 33 at full share. It engulfs the small ones and
