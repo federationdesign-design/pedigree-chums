@@ -228,6 +228,18 @@ const CARD_TILT = (2 * Math.PI) / 180;
 // The coloured rarity band's tilt (degrees), shared by the dog name above it so
 // the two sit on one axis. One dial: change it here and both rotate together.
 const RARITY_TILT = -26;
+/* TAP OUTSIDE A LIFTED CIRCLE TO CLOSE IT (owner, 18 September 2026), as a SECOND
+   way out beside the back button, which stays: it is the only discoverable exit,
+   the only one that works when the grid covers the backdrop, and the only one a
+   keyboard or a screen reader can reach.
+
+   IT WAS NEVER BUILT HERE. closeIfTap below carried "tap-to-close disabled" and
+   the reason, that a stray tap could wipe out a built tree. These two figures are
+   the answer to that: 6px of movement and 350ms, the same pair the pit's own
+   tap-to-open uses, so a hesitant press or a drag that ends on empty floor is not
+   a dismissal. */
+const TAP_CLOSE_SLOP = 6;
+const TAP_CLOSE_MS = 350;
 
 /* SOLO DOGS SHOW THEIR NAME, NOT THEIR PICTURE.
 
@@ -1043,6 +1055,12 @@ export default function LineageMap({
 
      THE BADGES ARE UNTOUCHED. Circles and percentages stay visible at rest. */
   const [namedNode, setNamedNode] = useState<string | null>(null);
+  /* WHERE AND WHEN THE PRESS LANDED, for the tap-outside close. Kept apart from
+     `drag`, which onPanDown abandons early when the grid is packed or the root is
+     draggable: in those states drag.current is never set, so suppressClick never
+     fires and the tap would have had no guards at all. This one is written before
+     any of those returns. */
+  const tapRef = useRef<{ x: number; y: number; t: number } | null>(null);
   const [infoHover, setInfoHover] = useState<string | null>(null);
   const [pctHover, setPctHover] = useState<string | null>(null); // which card's % explainer box is open
   const pctTimer = useRef<number | null>(null); // closes the % box a beat after the cursor leaves /* pct-close */
@@ -1621,6 +1639,8 @@ export default function LineageMap({
   // Drag anywhere to pan the diagram. A drag suppresses the click that would
   // otherwise close the overlay or select a circle.
   const onPanDown = (e: React.PointerEvent) => {
+    // Before every early return below: see tapRef.
+    tapRef.current = { x: e.clientX, y: e.clientY, t: performance.now() };
     if (packed) return; // Done state: the grid is fixed, only the main card moves
     if (canDragRoot) return; // all frames filled: only root card drag moves the tree
     suppressClick.current = false;
@@ -1639,12 +1659,34 @@ export default function LineageMap({
     drag.current = null;
     if (d && d.moved) suppressClick.current = true;
   };
-  const closeIfTap = () => {
-    // tap-to-close disabled: the family tree closes only via the X button, so a
-    // stray tap can't wipe out a built tree (and can't swallow the root card's
-    // double-click). A plain tap still just clears any open info label.
+  const closeIfTap = (e: React.MouseEvent) => {
+    // A pan that moved past 6px already set this, on the paths where onPanDown
+    // ran to completion. The tap's own guards below cover the paths where it
+    // did not.
     if (suppressClick.current) { suppressClick.current = false; return; }
     setInfoHover(null);
+    const t = tapRef.current;
+    tapRef.current = null;
+    /* THE LIFTED LAYER ONLY. The chum tree keeps its X-button-only rule: the
+       comment this replaces recorded that a stray tap there could wipe out a
+       tree the player had spent a level building, and nothing about that has
+       changed. A lifted circle has nothing to lose by closing. */
+    if (!circular || !t) return;
+    /* OUTSIDE MEANS THE BACKDROP ITSELF. e.target is the svg only when the tap
+       landed on genuinely empty ground: any drawn thing, a card, a node, the root
+       card, a button, a counter AND AN EMPTY FRAME CELL, is a descendant and is
+       therefore inside. That is a stricter test than a geometric one and it needs
+       no coordinates, which matters because this layer is drawn at LIFT_K and the
+       frames are positioned pan-fixed, so a geometric test would have to unscale
+       and un-pan to be right. */
+    if (e.target !== e.currentTarget) return;
+    if (performance.now() - t.t >= TAP_CLOSE_MS) return;
+    if (Math.hypot(e.clientX - t.x, e.clientY - t.y) >= TAP_CLOSE_SLOP) return;
+    /* THE SAME onClose THE BACK BUTTON CALLS, deliberately and not a teardown of
+       its own. That handler clears `held` so the circle falls back into the pit
+       and SPENDS a dog chain waiting on it; a second path that skipped it would
+       leave the chain pointing at a circle that is back in play. */
+    onClose?.();
   };
 
   // long names wrap to a second line via the shared splitName (see ./splitName):
