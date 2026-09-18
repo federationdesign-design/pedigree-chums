@@ -276,7 +276,7 @@ const LINEAGE: Record<string, LineageNode> = {
         note: "Gave the sleek coat, the tan points and the terrier fire. Developed from the Old English Black and Tan Terrier.",
         img: "/history/breeds/manchester-terrior.jpg",
         children: [
-          { name: "Old English Black & Tan Terrier", note: "The classic British ratting terrier, foundation of the Manchester Terrier line.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 14 },
+          { name: "Black and Tan Terrier", note: "The classic British ratting terrier, foundation of the Manchester Terrier line.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 14 },
           { name: "Whippet", note: "Slipped into some lines for a touch more refinement and speed.", img: "/history/breeds/whippet-photo.jpg", value: 8 }
         ]
       },
@@ -390,7 +390,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "A classic bull-and-terrier, bred in the Black Country by crossing the old bulldog with game local terriers for grip and gameness.",
     children: [
       { name: "Bulldog", note: "The old, athletic bull-baiting type, not the modern show dog, for strength and courage.", img: "/history/breeds/bulldog-photo.jpg", value: 55 },
-      { name: "Old English Black & Tan Terrier", note: "Added speed, agility and terrier fire to the heavier bulldog base.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 45 }
+      { name: "Black and Tan Terrier", note: "Added speed, agility and terrier fire to the heavier bulldog base.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 45 }
     ]
   },
 
@@ -400,7 +400,7 @@ const LINEAGE: Record<string, LineageNode> = {
     children: [
       { name: "Paisley Terrier", note: "A long-coated Scottish terrier that gave the silky, flowing coat.", img: "/history/breeds/Paisley-Terrier=photo.jpg", value: 45 },
       { name: "Skye Terrier", note: "Another Scottish terrier behind the long, fine hair.", img: "/history/breeds/skye-terrier-photo.webp", value: 30 },
-      { name: "Old English Black & Tan Terrier", note: "Local ratting terriers that brought the size down and the colour in.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 25 }
+      { name: "Black and Tan Terrier", note: "Local ratting terriers that brought the size down and the colour in.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 25 }
     ]
   },
 
@@ -507,7 +507,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "The poor man's racehorse. Northern miners bred a pocket-sized sighthound for weekend racing and rabbit coursing.",
     children: [
       { name: "Greyhound", note: "The core of the breed, scaled down for speed in a smaller, cheaper-to-keep package.", img: "/history/breeds/original-greyhound.jpg", value: 62 },
-      { name: "Old English Black & Tan Terrier", note: "Added grit and gameness for the rabbit-coursing the early dogs were bred for.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 23 },
+      { name: "Black and Tan Terrier", note: "Added grit and gameness for the rabbit-coursing the early dogs were bred for.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 23 },
       { name: "Italian Greyhound", note: "A later refinement for the elegant, fine-boned outline.", img: "/italian-greyhound-square.jpg", value: 15 }
     ]
   },
@@ -733,12 +733,36 @@ const LINEAGE: Record<string, LineageNode> = {
     ]
   },
 
+  /* TWO DOGS, TWO ERAS, ONE LINE (owner, 18 September 2026). This record and
+     "Old English Black and Tan Terrier" carried IDENTICAL children, which said they
+     were unconnected dogs that happened to share an ancestry. They are one lineage
+     in two stages: the medieval rough stock (1436) and its sleeker descendant
+     (1710), and everything later descends from the YOUNGER.
+
+     IT WAS WRONG IN EVERY TREE BUT THREE. All 14 parents of the older were dogs
+     anchored after 1710 (Whippet 1880, Fox Terrier 1872, Old fell Terriers 1745 and
+     the rest), hanging Victorian terriers straight off medieval stock and skipping
+     the dog in between. 131 occurrences across 34 trees. Only English Toy Terrier
+     and Manchester Terrier were attached correctly.
+
+     SO THE 17 LITERAL LEAVES NOW NAME THIS RECORD, and this record's only real
+     child is the older one. expandNode grafts the older's own tree onto it, so the
+     ratting and earth stock still arrives, one generation further back where it
+     belongs, and no share moves: the branch carries the same total weight it always
+     did.
+
+     THE ECHO IS LOAD-BEARING AND CARRIES ZERO. LineageMap collapses any valueless
+     node with a single child, so with the older alone this record would be deleted
+     from every diagram and the two stages would fold back into one. The echo gives
+     it a second child. Its value is 0 deliberately: leafSum counts it, so any other
+     figure would dilute the branch and move every share above it. It is never drawn
+     in either file (see data/lineageShape.ts). */
   "Black and Tan Terrier": {
     name: "Black and Tan Terrier",
-    note: "The Old English Terrier, the extinct rough working terrier that nearly every British terrier descends from.",
+    note: "The sleek black-and-tan ratter of the 1700s, bred down from the older rough working terrier. The dog Manchester, Toy and Heeler lines were built on. Now extinct.",
     children: [
-      { name: "Old British ratting Terriers", note: "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.", img: "/history/breeds/Old-British-ratting-terriers.jpg", value: 60 },
-      { name: "Earth and hunt terriers", note: "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.", img: "/history/breeds/Earth-and-hunt-terrier.jpg", value: 40 }
+      { name: "Old English Black and Tan Terrier", note: "The rough medieval black-and-tan working terrier it was bred down from. Now extinct.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 100 },
+      { name: "Black and Tan Terrier", note: "The same dog carrying on: see the echo note in data/lineageShape.ts.", value: 0 }
     ]
   },
 
@@ -823,8 +847,8 @@ const LINEAGE: Record<string, LineageNode> = {
     // differ in name from the parent, so isEcho, the pit words and the badge
     // paths do not touch them. This must NOT be read as two separate ancestors.
     children: [
-      { name: "Old English Black & Tan Terrier", note: "The old British black-and-tan working terrier, the shared ratting stock behind Britain and Ireland's farm terriers. Now extinct.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 50 },
-      { name: "Old English Black & Tan Terrier", note: "The old British black-and-tan working terrier, the shared ratting stock behind Britain and Ireland's farm terriers. Now extinct.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 50 }
+      { name: "Black and Tan Terrier", note: "The old British black-and-tan working terrier, the shared ratting stock behind Britain and Ireland's farm terriers. Now extinct.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 50 },
+      { name: "Black and Tan Terrier", note: "The old British black-and-tan working terrier, the shared ratting stock behind Britain and Ireland's farm terriers. Now extinct.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 50 }
     ]
   },
   "Old fell Terriers": {
@@ -848,8 +872,8 @@ const LINEAGE: Record<string, LineageNode> = {
     // differ in name from the parent, so isEcho, the pit words and the badge
     // paths do not touch them. This must NOT be read as two separate ancestors.
     children: [
-      { name: "Old English Black & Tan Terrier", note: "The old black-and-tan working terrier stock the fell terriers were bred from. Now extinct.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 50 },
-      { name: "Old English Black & Tan Terrier", note: "The old black-and-tan working terrier stock the fell terriers were bred from. Now extinct.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 50 }
+      { name: "Black and Tan Terrier", note: "The old black-and-tan working terrier stock the fell terriers were bred from. Now extinct.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 50 },
+      { name: "Black and Tan Terrier", note: "The old black-and-tan working terrier stock the fell terriers were bred from. Now extinct.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 50 }
     ]
   },
 
@@ -857,7 +881,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Welsh Terrier",
     note: "A wiry black-and-tan terrier from Wales, bred to face fox, otter and badger underground.",
     children: [
-      { name: "Old English Black & Tan Terrier", note: "The old rough black-and-tan working terrier it descends from almost unchanged.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 75 },
+      { name: "Black and Tan Terrier", note: "The old rough black-and-tan working terrier it descends from almost unchanged.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 75 },
       { name: "Old fell Terriers", note: "Hardy broken-coated working terriers of the hills. Now extinct.", img: "/history/breeds/Old-fell-terriers-Patterdale-Terrier-Working-hunt-terriers.jpg", value: 25 }
     ]
   },
@@ -879,8 +903,8 @@ const LINEAGE: Record<string, LineageNode> = {
   // bare leaves. Single-parent value 100, matching the shipped Wheaten. Earth Dog
   // is one hop, keeping Kerry Blue's chain (Kerry, Wheaten, Native Irish terriers,
   // OEBT, Earth Dog) at depth 4, inside MAX_LINEAGE_DEPTH.
-  "Old English Black & Tan Terrier": {
-    name: "Old English Black & Tan Terrier",
+  "Old English Black and Tan Terrier": {
+    name: "Old English Black and Tan Terrier",
     note: "The old British black-and-tan working terrier, the rough ratting and vermin stock much of Britain's terrier blood was drawn from. Now extinct.",
     // 19 August 2026: pass-through fixed with a documented second parent, not
     // the fallback. Wikipedia's "Black and Tan Terrier" traces the breed to the
@@ -914,8 +938,8 @@ const LINEAGE: Record<string, LineageNode> = {
     // differ in name from the parent, so isEcho, the pit words and the badge
     // paths do not touch them. This must NOT be read as two separate ancestors.
     children: [
-      { name: "Old English Black & Tan Terrier", note: "The black-and-tan working stock the white terriers were selected out of, for coat colour. Now extinct.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 50 },
-      { name: "Old English Black & Tan Terrier", note: "The black-and-tan working stock the white terriers were selected out of, for coat colour. Now extinct.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 50 }
+      { name: "Black and Tan Terrier", note: "The black-and-tan working stock the white terriers were selected out of, for coat colour. Now extinct.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 50 },
+      { name: "Black and Tan Terrier", note: "The black-and-tan working stock the white terriers were selected out of, for coat colour. Now extinct.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 50 }
     ]
   },
 
@@ -924,7 +948,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "A pricked-ear white terrier, a short-lived show breed drawn from Britain's old white working terriers, now extinct.",
     children: [
       { name: "Old English White Terrier", note: "The white-bodied fox-working terriers found across Britain since the 1700s.", img: "/history/breeds/old-english-white-terrier.jpg", value: 60 },
-      { name: "Old English Black & Tan Terrier", note: "The broader old black-and-tan terrier stock behind it.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 40 }
+      { name: "Black and Tan Terrier", note: "The broader old black-and-tan terrier stock behind it.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 40 }
     ]
   },
 
@@ -932,7 +956,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Airedale Terrier",
     note: "The 'King of Terriers', the largest of them all, made in Yorkshire's Aire valley to hunt otter and water rat.",
     children: [
-      { name: "Old English Black & Tan Terrier", note: "The broken-coated working terrier that gave its terrier grit.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 60 },
+      { name: "Black and Tan Terrier", note: "The broken-coated working terrier that gave its terrier grit.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 60 },
       { name: "Otterhound", note: "Crossed in for size, a good nose and a love of water.", img: "/history/breeds/otterhound-photo.jpg", value: 40 }
     ]
   },
@@ -971,7 +995,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Fox Terrier",
     note: "The classic earth dog of the foxhunt, carried to the field to bolt the fox when it went to ground.",
     children: [
-      { name: "Old English Black & Tan Terrier", note: "The smooth and rough black-and-tan terriers at its foundation.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 45 },
+      { name: "Black and Tan Terrier", note: "The smooth and rough black-and-tan terriers at its foundation.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 45 },
       { name: "English White Terrier", note: "Lent the predominantly white, easy-to-see coat.", img: "/history/breeds/english-white-terrier.jpg", value: 25 },
       { name: "Beagle", note: "A dash of hound for nose and cry.", img: "/history/breeds/beagle.jpg", value: 15 },
       { name: "Bull Terrier", note: "A touch of bull blood for grit.", img: "/bull-terrier-square.jpg", value: 15 }
@@ -1001,7 +1025,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "The 'daredevil' of Ireland, a fiery red terrier and one of the four native Irish terrier breeds.",
     children: [
       { name: "Native Irish Terriers", note: "The old Irish farm-terrier stock shared with the Wheaten and Kerry Blue. Now extinct.", img: "/history/breeds/native-irish-terriers.jpg", value: 60 },
-      { name: "Old English Black & Tan Terrier", note: "Wirehaired working terriers that shaped the harsh red coat.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 40 }
+      { name: "Black and Tan Terrier", note: "Wirehaired working terriers that shaped the harsh red coat.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 40 }
     ]
   },
 
@@ -1145,7 +1169,7 @@ const LINEAGE: Record<string, LineageNode> = {
     children: [
       { name: "Greyhound", note: "A sighthound for speed and a silent, sweeping run.", img: "/history/breeds/original-greyhound.jpg", value: 50 },
       { name: "Old working collies", note: "Herding or pastoral blood for brains and biddability. Now extinct.", img: "/history/breeds/Old-working-collies-cluster.jpg", value: 30 },
-      { name: "Old English Black & Tan Terrier", note: "Sometimes terrier blood for grit and a harder coat.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 20 }
+      { name: "Black and Tan Terrier", note: "Sometimes terrier blood for grit and a harder coat.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 20 }
     ]
   },
 
@@ -1253,6 +1277,42 @@ const LINEAGE: Record<string, LineageNode> = {
       { name: "Old working collies", note: "The old northern hill-collie landrace of Scotland and the borders, the shared working stock the Rough, Smooth and Border collies all grew from. Now extinct.", img: "/history/breeds/Old-working-collies-cluster.jpg", value: 65 },
       // 19 August 2026: this extinct ancestor was wearing a photograph of a living descendant, the Bearded Collie. Repointed to its own artwork.
       { name: "Old hill and bearded Collies", note: "Shaggy upland herding dogs of the same family. Now extinct.",  img: "/history/breeds/old-hill-and-bearded-collies.jpg", value: 35 }
+    ]
+  },
+
+  /* THE SETTING DOGS GET THEIR OWN ANCESTRY (owner, 18 September 2026).
+
+     WHY IT WAS A GAP. Old black-and-tan Setters was a bare leaf in all four trees
+     it appears in, so Gordon Setter's deepest line ran through Rough Collie at 15%
+     and the archive said the Gordon's oldest ancestry was HERDING. Its two
+     siblings already do this properly: English Setter carries Land Spaniels as a
+     direct child, and Irish Setter reaches it through English Setter. Gordon
+     Setter was the only one of the three that missed it.
+
+     ONE PARENT, NOT TWO, AND THE SECOND WOULD HAVE BEEN INVENTED. The Scottish
+     strand and the black-and-tan colour are both already in this tree as SIBLINGS
+     of this node, Rough Collie at 15% and Bloodhound at 20%, where the sources put
+     them: in the making of the Gordon Setter, not at the foundation of the setting
+     dogs it was made from. A second parent beneath here would count the same blood
+     twice, through a node with no name anyone ever used.
+
+     LAND SPANIELS IS THE SETTING SPANIEL, already, under the name the archive
+     uses. Its own note reads "The crouching land spaniels that marked game for the
+     net", and English Setter's reads "built up from the old setting spaniels".
+     Adding a separate "Old setting Spaniels" would have been the same dog under a
+     second name, which is the fault this file has just spent a day removing.
+
+     THE ECHO IS LOAD-BEARING, exactly as it is on Black and Tan Terrier. After
+     expandNode grafts, this node is valueless with a single child, and LineageMap
+     collapses any such node into that child: without the echo the Gordon would
+     draw straight onto Land Spaniels and the setting dogs would vanish from the
+     diagram. Value 0 so leafSum is unchanged and no share moves. */
+  "Old black-and-tan Setters": {
+    name: "Old black-and-tan Setters",
+    note: "The black-and-tan setting dogs worked in Britain before the Duke of Gordon's kennels took the type up. Now extinct.",
+    children: [
+      { name: "Land Spaniels", note: "The crouching land spaniels that marked game for the net, the stock every setter was built up from. Now extinct.", img: "/history/breeds/original-land-spaniel.jpg", value: 100 },
+      { name: "Old black-and-tan Setters", note: "The same dog carrying on: see the echo note in data/lineageShape.ts.", value: 0 }
     ]
   },
 
@@ -1672,7 +1732,7 @@ const LINEAGE: Record<string, LineageNode> = {
        and was named as a defensible second when this record was first built. */
     children: [
       { name: "Earth Dog", note: "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.", img: "/history/breeds/medieval-earth-dog.jpg", value: 65 },
-      { name: "Old English Black & Tan Terrier", note: "The old black-and-tan working terrier behind most of Britain's terrier families. Now extinct.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 35 },
+      { name: "Black and Tan Terrier", note: "The old black-and-tan working terrier behind most of Britain's terrier families. Now extinct.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 35 },
     ],
   },
   /* OLD SHORT-LEGGED WORKING DOGS REACH THE CELTIC HEELER, 15 September 2026

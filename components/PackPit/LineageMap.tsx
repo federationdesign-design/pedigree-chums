@@ -32,7 +32,7 @@ const PROGENITOR_STATUS: Record<string, BreedTag> = {
   "Talbot hounds": "extinct",
   "St Hubert Hound": "extinct",
   "Old scenting Hounds": "extinct",
-  "Old English Black & Tan Terrier": "extinct",
+  "Old English Black and Tan Terrier": "extinct",
   "White English Terrier": "extinct",
   "Old English White Terrier": "extinct",
   "English White Terrier": "extinct",
