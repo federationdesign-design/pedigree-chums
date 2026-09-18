@@ -8132,6 +8132,43 @@ export default function BreedTree({
               wake();
             }, BOMB_CHAIN_MS * (w + 1)));
           });
+          /* A BOMB CALLS THE PIT-FULL COUNTDOWN OFF (owner, 18 September 2026).
+
+             WHEN, AND WHY NOT AT THE DETONATION. At the moment a bomb goes off not
+             one chip has left the world: the waves above remove them over up to
+             BOMB_CHAIN_MAX_MS. Cancelling there would promise relief before any
+             space existed. This fires after the LAST wave, on the same clock the
+             waves use, so the count goes when the room appears.
+
+             EVERY BOMB, EVEN ONE THAT CLEARS NOTHING. Deliberate, and the
+             alternative was considered and rejected: gating on computeFull() after
+             the chain sounds more honest and produces a rule the player cannot see,
+             "why did that bomb not help". A bomb is something they spent and chose.
+             A blast that touches nothing has waveCount 0, so this fires at once,
+             which is also right.
+
+             STOP ONLY, NO NEW GRACE. cancelCountdown puts its usual 2.5s on
+             cdGraceRef and nothing more, so the pit becomes eligible again straight
+             after. Restarting PIT_FULL_GRACE_MS would hand a tap 30 to 65 seconds
+             of immunity; that grace is a level-start concession, not a reward.
+
+             STRAIGHT TO cancelCountdown, NOT THROUGH checkFull, which would put the
+             4s settle-in and the grace guard in front of it and swallow the cancel.
+             The chum-collect rescue (tryCancelRef) bypasses them for the same
+             reason.
+
+             GUARDED ON A COUNTDOWN ACTUALLY RUNNING, which is not the same as the
+             unconditional above: with none running there is nothing to stop, and
+             calling in anyway would put 2.5s of grace down for no reason.
+
+             NOT INDEFINITELY AVOIDABLE. Each cancel buys 2.5s plus the count's own
+             10s restarting. Bombs roll at 1 / BOMB_ODDS and come from the same pops
+             that fill the pit, so stalling costs ground: the supply is coupled to
+             the problem. */
+          toyTimers.push(window.setTimeout(() => {
+            if (!fullTriggeredRef.current) return;
+            cancelCountdown(performance.now());
+          }, waveCount * BOMB_CHAIN_MS));
           // Shockwave, plus bomb triggers bomb on three tiers: touching goes at
           // once, near takes two hits, far takes one and only if already lit.
           const SHOVE_R = bsz * 5.5;
