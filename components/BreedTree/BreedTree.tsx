@@ -6721,8 +6721,47 @@ export default function BreedTree({
 
            0.72 is that 0.8 times the 0.9 the lifted pill has just taken, so the
            two now come out the same size on screen. IF EITHER OF THOSE TWO
-           NUMBERS MOVES, this one has to move with it. */
-        const PILL_K = 0.72;
+           NUMBERS MOVES, this one has to move with it.
+
+           0.72 TO 0.612, 18 September 2026 (owner: the pit pill reads about 15%
+           too big against the lifted one). 0.72 less 15%.
+
+           THE TWO DO NOT SHARE A CONSTANT, and that is the first thing to know
+           before touching either. They are two formulas with two scales:
+             LIFTED  nodePillWidth = max(58, len*7.4 + 28 + (2 lines ? 10 : 0)),
+                     drawn inside a group at PIT_PILL_SCALE 0.683, and the whole
+                     layer is then drawn at LIFT_K 0.8. So on screen it is
+                     nodePillWidth * 0.5464.
+             PIT     this one, re-measured from the name rather than taken from
+                     the scatter's `w`: max(44, len*7.4 + 14 + (2 lines ? 10 : 0))
+                     times PILL_K. fxScale converts to svg units and cancels
+                     against the stage transform, so PILL_K's product IS the
+                     on-screen width in client px.
+           Changing PILL_K therefore cannot move the lifted pill, and nothing
+           here reads PIT_PILL_SCALE.
+
+           WHY 0.72 NO LONGER MATCHED. The note above was calibrated against a
+           0.9 the lifted pill has since left behind: PIT_PILL_SCALE is 0.683
+           now, so 0.683 * 0.8 is 0.5464 against this 0.72.
+
+           WHAT IT LANDS ON, measured rather than estimated. A 14 character name
+           on one line: lifted 71.9px on screen, pit 84.7 at 0.72, which is 18%
+           over and matches the owner's eye; at 0.612 the pit is 72.0, parity.
+
+           THE RATIO IS NOT FLAT, because the two formulas add 14 and 28. The pit
+           runs 11% over at 8 characters, 18% at 14 and 24% at 30, so one
+           multiplier cannot match every length. 15% lands parity at about 13
+           characters, a little under on long names and a little over on short.
+
+           THE HEIGHT IS A SEPARATE STORY. Both use the same 40 or 22, so their
+           ratio is purely the two scales, 0.72 against 0.5464, a flat 32% over.
+           15% leaves it about 12% proud. Exact parity on BOTH would be a PILL_K
+           of 0.5464, a 24% cut, which is not what was asked for and is recorded
+           here rather than taken.
+
+           `unit` reads PILL_K too, so the text comes down with the pill and
+           cannot overflow it. */
+        const PILL_K = 0.612;
         const pw = Math.max(44, Math.max(...lines.map((l) => l.length)) * 7.4 + 14 + (lines.length > 1 ? 10 : 0)) * PILL_K;
         const ph = (lines.length > 1 ? 40 : 22) * PILL_K;
         const pr = { x: w.x, y: w.y, vx: 0, vy: 0, a: 0, idx: pillBodiesRef.current.length, hits: 0, maxHits: PILL_HITS, mb: null as any };
