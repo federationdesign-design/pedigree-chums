@@ -4974,11 +4974,28 @@ export default function BreedTree({
             q.dataset.hi = ink;
             qi.setAttribute("filter", `url(#bt-qmark-${ink})`);
           }
-          /* THE TAPPED FACE, for a circle actually HELD in the chain. The mark
-             says a circle could join; this says it has. It swaps back the moment
-             the chain ends, the same way the outline colour returns, because the
-             chain's node set is cleared there and this reads it. */
-          const tap = held ? "1" : "0";
+          /* THE TAPPED FACE, FOR BOTH CHAIN STATES (owner, 18 September 2026).
+             It was the held circle's alone, saying "this one is in" against the
+             ordinary mark's "this one could join". Now every circle the chain
+             touches wears it, held or merely available, so the whole breed reads
+             as awake for as long as the chain lives and goes back to the ordinary
+             mark the moment it ends.
+
+             SO THE MARK NO LONGER TELLS HELD FROM AVAILABLE, and three things
+             still do, which was checked before this shipped rather than assumed:
+               THE FILL. Held is sky blue #5cc4ee; available is the tier colour.
+               Measured against the sky: purple 5.00, royal blue 3.81, green 1.14,
+               orange 1.44, yellow 1.37. The two blues separate on LUMINANCE, the
+               royal being plainly darker, and the other three on HUE, since green,
+               orange and yellow are nothing like a light blue whatever the
+               luminance says. Every tier is told apart by one or the other.
+               THE RING. An available twin wears DOG_CHAIN_TWIN_STROKE_K, twice
+               its own weight; a held circle wears its normal weight.
+               THE INK. Held is navy; available takes its band's fg, which is
+               white on the purple and the royal blue and black on the rest.
+             Three signals against one lost, and the weakest fill pair still has a
+             double-weight ring and a different coloured mark on it. Enough. */
+          const tap = held || twinBand ? "1" : "0";
           if (q.dataset.tapped !== tap) {
             q.dataset.tapped = tap;
             qi.setAttribute("href", tap === "1" ? QMARK_TAPPED_SRC : QMARK_SRC);
