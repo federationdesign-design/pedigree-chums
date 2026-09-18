@@ -11783,7 +11783,26 @@ export default function BreedTree({
                  It also settles a comment that had been wrong for a while.
                  LineageModal.tsx says the score can dip mid-play because the
                  learn shortcut costs points. Until now it did not. It does. */
-              onScore?.(LEARN_COST);
+              /* A SOLO LEAF IS NOT CHARGED (owner, 18 September 2026).
+
+                 WHY. Measured on Old hill and bearded Collies: completing a leaf
+                 dog cost the 2500 and paid NOTHING back. A leaf has no Complete
+                 button to award through, its completion runs the scatter and the
+                 close and never calls the award at all, and it scattered no chips
+                 either, so there was no delayed income to come. A score of about
+                 1285 went to -1215 on one completion. Charging a shortcut that
+                 saves the player nothing is the part that was wrong.
+
+                 THE SAME TEST THE LAYER IS GIVEN, and it has to be: soloLeaf is
+                 handed to LineageMap two lines below from this very expression,
+                 so the dog that is charged and the dog the layer treats as solo
+                 can never be two different answers.
+
+                 A DOG WITH A TREE STILL PAYS THE FULL 2500, untouched, and this
+                 is the play area's own handler: the learn area's chum tree has
+                 its own onRemove and never charged anything. */
+              const soloLeafDog = !(learnNode.data.children && learnNode.data.children.length > 0);
+              if (!soloLeafDog) onScore?.(LEARN_COST);
               removedNodesRef.current.add(learnNode);
               /* REMOVE BEFORE LAUNCH, ?dogchain=1. COMPLETING THE OPENED CIRCLE
                  CLOSES THE REST OF ITS CHAIN. This is the moment the chain was
