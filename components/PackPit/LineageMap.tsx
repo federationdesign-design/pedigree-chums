@@ -2808,11 +2808,35 @@ export default function LineageMap({
                  as the arc drew on. That is what the owner saw: green at 2/2,
                  then a yellow arc round it, then fully yellow.
 
-                 THE FILL STAYS LEMON, deliberately. The arc is the progress, and a
-                 part-green ring would say done before it is. It flips at the
-                 moment the last frame lands and holds, because nothing is painted
-                 after it. */
-              stroke={doneRing ? "#22c55e" : "#ffed00"}
+                 THE FILL IS THE DOG'S OWN TIER COLOUR NOW (owner, 18 September
+                 2026), not a flat lemon, read the same way the rarity band and the
+                 crisp ring read it so the three cannot disagree about a tier. The
+                 arc is already inside the rarityTier gate, so there is no null
+                 case to carry.
+
+                 doneRing IS STILL THE OUTER TEST, so green still wins the moment
+                 the last frame lands, and this element is still the top of the
+                 ring stack, so nothing is painted over that green. The tier colour
+                 only ever appears on the false branch.
+
+                 MEASURED WARNING, ACCEPTED BY THE OWNER. The lift wash composites
+                 to about #0d5a87 at its centre and #083d62 at its edge over the
+                 pit navy, and the five tiers measure against those:
+                   extremely rare #4d2e91  1.34 / 1.14   was 8.21 on the lemon
+                   rare           #2547c4  1.02 / 1.50   was 6.25
+                   uncommon       #5dbf86  3.27 / 5.00
+                   common         #f47421  2.60 / 3.97
+                   very common    #ffd23e  5.14 / 7.84
+                 On RARE and EXTREMELY RARE the arc is effectively invisible
+                 against the backdrop, and those are the tiers a player most wants
+                 to see; the lemon it replaces read at 6.25 and 8.21 there, which is
+                 why it was chosen. Very common measures 1.19 against the old lemon
+                 so that tier looks unchanged, which was expected.
+                 IF THE TWO RAREST READ BADLY, lighten those fills for this use the
+                 way the glow bands just above already do with lighten(). Do not
+                 revert to the flat lemon: that loses the tier everywhere to fix
+                 two cases. */
+              stroke={doneRing ? "#22c55e" : RARITY_BAND[rarityTier].bg}
               strokeWidth={rootRingW + 6}
               strokeLinecap="round"
               pathLength={1}
