@@ -925,6 +925,17 @@ const DOG_CHAIN_FILL = "#5cc4ee";
    A twin that is NOT held keeps its white mark, which is the "you could join
    this" signal, and the glow on twins is untouched. */
 const DOG_CHAIN_INK = "#0a3a57";
+/* THE OUTLINE A HIGHLIGHTED TWIN WEARS (owner, 18 September 2026). A circle of
+   the chain's breed that is NOT yet held already turns its mark white, through
+   the bt-qmark-hi filter, which is a colour matrix forcing every channel to 1.
+   Its ring stayed on its own depth colour, so the mark and the ring disagreed on
+   the same circle. The ring takes the mark's white, and the two now say the one
+   thing: you could join this.
+
+   WHITE, NOT THE PATH'S COLOUR. It is tied to the MARK, which is white, and not
+   to DOG_CHAIN_COLOUR, which the path carries and which is yellow. Moving the
+   path does not move this. */
+const DOG_CHAIN_TWIN_OUTLINE = "#ffffff";
 /* Two circles, as a share of the larger diameter, so CHAIN_TOUCH_SLACK means the
    same for dogs as it does for cards. `h` is the radius here, and the angle is
    not read: a circle has no corners to turn. */
@@ -4495,16 +4506,28 @@ export default function BreedTree({
          clears them again. Written on the change alone, tracked on the element,
          so a still pit costs nothing. The question mark does the same below. */
       if (c) {
-        const want = dogChainNodesRef.current.has(d) ? "1" : "0";
+        /* THREE STATES, THE SAME THREE THE MARK HAS. Held in the chain, of the
+           chain's breed but not yet held, or neither. The mark has read all
+           three since the chain shipped; the ring only read the first, so a
+           highlighted twin turned its mark white and kept its own outline. It
+           takes the white now, see DOG_CHAIN_TWIN_OUTLINE.
+           One key, still written only when the answer CHANGES and still tracked
+           on the element, so a still pit costs nothing. */
+        const chHeld = dogChainNodesRef.current.has(d);
+        const chTwin = !chHeld && !!dogChainBreedRef.current && d.data.name === dogChainBreedRef.current;
+        const want = chHeld ? "held" : chTwin ? "twin" : "0";
         if (c.dataset.chained !== want) {
           c.dataset.chained = want;
-          c.style.stroke = want === "1" ? DOG_CHAIN_INK : "";
-          /* AND THE FILL GOES SKY BLUE. Safe to set: a circle in the live pit
-             shows no photograph, because the pictures go the moment the drop
-             begins (see nodeImg), so every pit circle is a plain disc of
-             fillFor's navy and there is no image here to cover. Cleared the same
-             way the stroke is, so its own colour returns with the chain's end. */
-          c.style.fill = want === "1" ? DOG_CHAIN_FILL : "";
+          c.style.stroke = chHeld ? DOG_CHAIN_INK : chTwin ? DOG_CHAIN_TWIN_OUTLINE : "";
+          /* AND THE FILL GOES SKY BLUE, for a HELD circle only. A twin is not
+             filled: it is still an ordinary circle you have not reached yet, and
+             only its ring and its mark say otherwise.
+             Safe to set: a circle in the live pit shows no photograph, because
+             the pictures go the moment the drop begins (see nodeImg), so every
+             pit circle is a plain disc of fillFor's navy and there is no image
+             here to cover. Cleared the same way the stroke is, so its own colour
+             returns with the chain's end. */
+          c.style.fill = chHeld ? DOG_CHAIN_FILL : "";
         }
       }
       if (c) {
