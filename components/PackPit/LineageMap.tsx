@@ -721,11 +721,20 @@ export default function LineageMap({
     // -> Old English Black and Tan Terrier -> Earth Dog draws straight to Earth
     // Dog). Do NOT move this into expandNode and do NOT switch it to keep-parent:
     // the intervening-stock argument does not survive the 132/178 and 53-tree count.
-    const collapse = (n: Node): Node => {
-      const kids = ((n.children as Node[] | undefined) ?? []).map(collapse);
-      if (n.value === undefined && kids.length === 1) return kids[0]; // wrapper: keep the child
-      return { ...n, children: kids };
-    };
+    /* IT NO LONGER COLLAPSES (owner, 18 September 2026), matching BreedTree, where
+       the whole reasoning is written out beside the pack pass.
+
+       IN ONE LINE: a single-child wrapper was deleted because in the PIT's pack its
+       one child fills it completely. That is a layout problem, and it is now solved
+       in the layout. It cost 68 ancestors, and 329 once the 19 August duplicate-child
+       device is removed.
+
+       THIS LAYER NEEDS NO SOLO_CHILD_K. Children here sit on a ring AROUND their
+       parent rather than nested inside it, so a lone child is simply one circle on
+       that ring and never fills anything. It is changed only so the learn area and
+       the pit draw the same tree; letting one collapse and not the other would put
+       a dog in the diagram that the lift does not have. */
+    const collapse = (n: Node): Node => ({ ...n, children: ((n.children as Node[] | undefined) ?? []).map(collapse) });
     if (r.children) r.children = (r.children as Node[]).map(collapse);
     const assign = (n: Node, id: string, parent: Node | null) => {
       n._id = id;

@@ -1667,6 +1667,9 @@ function rarityTier(count: number): RarityTier {
 // wrap that allows the largest type while keeping all four corners of the text
 // block inside the circle wins. A very long name therefore takes a third or
 // fourth line instead of spilling over the rim.
+// How much a lone child shrinks so its parent reads as a ring rather than a
+// hairline. See the pack pass in `nodes` for the whole reasoning.
+const SOLO_CHILD_K = 0.62;
 const LABEL_MAX_LINES = 4;
 const LABEL_CHAR_W = 0.62; // fallback glyph width in ems, before the font loads
 // Line height in ems for every label inside a circle, and the single source
@@ -2761,11 +2764,28 @@ export default function BreedTree({
     // terriers -> Old English Black and Tan Terrier -> Earth Dog draws straight
     // to Earth Dog, both stacked wrappers gone). Do NOT move this into
     // expandNode and do NOT switch it to keep-parent.
-    const collapse = (n: LineageNode): LineageNode => {
-      const kids = (n.children ?? []).map(collapse);
-      if (n.value === undefined && kids.length === 1) return kids[0]; // wrapper: keep the child
-      return { ...n, children: kids };
-    };
+    /* AND IT NO LONGER COLLAPSES AT ALL (owner, 18 September 2026). The note above
+       is left standing because its reasoning still holds and its warning still
+       applies: this must not move into expandNode, and it must not become
+       keep-PARENT, which would hide the trail-completing card in 132 of 178 cases.
+
+       DRAWING BOTH IS NEITHER. The child stays visible; it is simply nested inside
+       the ancestor it came from, which is what the ancestor is for. The objection
+       recorded above was to HIDING the card, and nothing here hides it.
+
+       WHY IT HAD TO GO. A single-child wrapper was deleted because "in the pack its
+       one child fills it completely", which is a LAYOUT problem being solved by
+       throwing away a dog. It cost 68 ancestors today, and 329 once the 19 August
+       duplicate-child device is removed, including every node a one-line lineage
+       attach creates: Old black-and-tan Setters, Setter, Black and Tan Terrier, the
+       fell terriers and the Pug all become single-child nodes the moment their
+       ancestry is written.
+
+       THE LAYOUT IS FIXED WHERE THE LAYOUT IS, in the pack pass below: see
+       SOLO_CHILD_K. These two changes only make sense together, and shipping this
+       one alone leaves 68 ancestors drawn as an 8px hairline round a circle that
+       fills them, which is worse than deleting them. */
+    const collapse = (n: LineageNode): LineageNode => ({ ...n, children: (n.children ?? []).map(collapse) });
     const collapsed: LineageNode = { ...root, children: (root.children ?? []).map(collapse) };
     const h = hierarchy<LineageNode>(collapsed)
       .sum((d) => d.value ?? 0)
@@ -2774,6 +2794,39 @@ export default function BreedTree({
     // /chums2 static diagram (displayOnly) the nested circles sit FLUSH (0), so a
     // parent and its children read as one solid nest with no gap ring. (chums2 #4.)
     const ns = pack<LineageNode>().size([SIZE, SIZE]).padding(displayOnly ? 0 : 8)(h).descendants();
+    /* A LONE CHILD MUST NOT FILL ITS PARENT (owner, 18 September 2026).
+
+       THE PROBLEM. d3.pack sizes a parent from its children, so a node with ONE
+       child gets `parent r = child r + padding`. The child fills everything but the
+       8px ring and the ancestor reads as a hairline round a circle that is
+       effectively the same dog. That is what the 19 August "display device" was
+       working around, by writing the child into the data TWICE so two circles would
+       pack side by side. A layout problem solved in the data, which then got
+       grafted: 36% of every node drawn today is an identical copy of a sibling.
+
+       THE FIX, WHERE IT BELONGS. After the pack, any node with exactly one child has
+       that child's whole subtree scaled about the parent's centre. The child then
+       draws as a circle inside a visible annulus, reading roughly like a 38% share.
+       Pure geometry: no node is added, removed or reweighted, and every share, badge
+       and card is untouched. The same shape of post-pass as the displayOnly rotation
+       a few lines below.
+
+       IT COMPOUNDS ON A CHAIN, deliberately. descendants() is pre-order, so an outer
+       node scales its subtree and an inner single-child node then scales again about
+       its own moved centre: a two-deep chain lands at K squared, about 0.38. That is
+       the case to judge the figure on, not a lone wrapper. If the inner circle reads
+       too small, this wants a floor rather than a flat multiplier.
+
+       TUNE HERE. 0.62 is a starting figure, not a measured one. */
+    for (const p of ns) {
+      const kids = p.children;
+      if (!kids || kids.length !== 1) continue;
+      for (const d of kids[0].descendants()) {
+        d.x = p.x + (d.x - p.x) * SOLO_CHILD_K;
+        d.y = p.y + (d.y - p.y) * SOLO_CHILD_K;
+        d.r *= SOLO_CHILD_K;
+      }
+    }
     normalizeTop(ns);
     if (isMobile || dockAside) relayoutMobile(ns, aspectKey, dockAside ? level : null, isMobile ? 1 : 0.6, displayOnly);
     // /chums2 (displayOnly) OFF-CENTRE inner circles (chums2 #2, revised): d3 pack +
