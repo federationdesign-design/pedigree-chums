@@ -7382,7 +7382,29 @@ export default function BreedTree({
           const hitSide = (P: any, otherMb: any) => {
             const b: Body | undefined = P.bridge;
             if (!b || b.held) return;
-            if (!flashed && !b.inert && rv > FX_MIN_PS && now - b.lastFx > FX_COOLDOWN) {
+            /* A DEAD CHIP PAYS NOTHING (owner, 18 September 2026, measured).
+               ?spindiag=1 on a settled pit with nothing being dragged read
+               88.0 points a second. 128 chips less 109 inert leaves 19 live ones,
+               and 19 times the 220ms FX_COOLDOWN is a ceiling of 86.4 a second, so
+               every live chip was pinned at its maximum, permanently, for nothing
+               the player did. The knocks were coming from a clump of inert chips
+               that never settles.
+
+               THE SCORING GUARD ONLY EVER ASKED ABOUT THE BODY BEING PAID, never
+               about what hit it, so a live chip being nudged by dead matter read
+               exactly like a live chip being hit in play.
+
+               SECOND GUARD ON PURPOSE. The bond lifetime removes most of these
+               collisions by letting the clump sleep, and this commit is built
+               anyway: two independent causes deserve two independent guards, and
+               this one still holds the moment the pile is disturbed.
+
+               ONLY THE AWARD. popChildren and knockBadge below are untouched, so
+               a dead chip still pushes things about and still spends charges;
+               it just does not pay for doing it. Live chip hitting live chip
+               scores exactly as before. */
+            const deadPartner = otherMb?.plugin?.kind === "badge" && !!otherMb?.plugin?.bridge?.inert;
+            if (!flashed && !b.inert && !deadPartner && rv > FX_MIN_PS && now - b.lastFx > FX_COOLDOWN) {
               const c = (pair.collision.supports && pair.collision.supports[0]) || (b.mb ? b.mb.position : null);
               if (c) {
                 const w = worldFromPx(c.x, c.y);
