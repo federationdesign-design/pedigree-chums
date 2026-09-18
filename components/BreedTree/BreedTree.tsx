@@ -711,7 +711,7 @@ const RING_PALETTE = ["#fff200", "#ffdf00", "#009fe0", "#36b8ff"];
    wide file uses less of the box's height. */
 const QMARK_VB = 720;
 const QMARK_SRC = "/dogfacequestion.svg";
-/* REMOVE BEFORE LAUNCH, ?dogchain=1. THE TAPPED FACE, worn by a circle that is
+/* THE TAPPED FACE, worn by a circle that is
    actually HELD in a chain, in place of the resting mark. Not by a glowing twin
    and not by every circle of the chain's breed: those keep the ordinary mark,
    turned white, which is the signal that they COULD join. This one says a circle
@@ -845,186 +845,11 @@ export function resetToys() {
 // they are gone for that tab until this clears them.
 // Kept deliberately after the other test rigs were removed: it is harmless and
 // saves a console visit every time the pit is worked on.
-/* ============================ REMOVE BEFORE LAUNCH ==========================
-   ?chumbox=1 : the chum resting-gap diagnostic, 2 September 2026.
 
-   THE QUESTION IT ANSWERS. Cards come to rest with visible gaps between them.
-   Four candidates, and they need different fixes, so guessing is expensive:
-     1 rotation   cards spawn at up to +-40deg, so a tilted square rests corner
-                  to face and the flat image edges never meet
-     2 chamfer    the body's corners are cut by 22%, so two corners in contact
-                  still leave a void
-     3 artwork    each PNG has its own transparent margin inside the square
-     4 sleeping   enableSleeping was added on 1 September. A body that parks
-                  just short of contact will never close the gap, because Matter
-                  does not wake on proximity
 
-   HOW TO READ IT. The panel counts chum-to-chum contacts straight out of
-   Matter's own pair list, so it is the engine's answer, not a measurement:
-     contacts HIGH and the cards look apart  -> 1 and 2, a physics shape problem
-     contacts ~0 and asleep HIGH             -> 4, a sleeping problem
-     contacts HIGH and images touching       -> 3, an artwork problem, not code
 
-   The magenta outline on each card is the body's true shape and size, drawn in
-   the card's own transform. If magenta edges touch while white edges do not,
-   that is 1 and 2 on screen.
 
-   Strip this, the DIAG block in the sim effect, the panel and the outline once
-   the question is closed.
-   ========================================================================== */
-function chumBoxOn() {
-  if (typeof window === "undefined") return false;
-  return window.location.search.indexOf("chumbox=1") > -1;
-}
 
-/* ============================ REMOVE BEFORE LAUNCH ==========================
-   ?fusedebug=1 : the chum gate and bomb fuse readout, 17 September 2026.
-
-   THE QUESTION IT ANSWERS. Does a press that starts on a chum card really keep
-   the mouse constraint disarmed for the whole gesture, so that a swipe across
-   a bomb grabs nothing and lights nothing? By eye that is sparks or no sparks;
-   this prints the state that decides it.
-
-   HOW TO READ IT. Four lines, sampled ten times a second:
-     gate     open, and the pointerId holding it, or shut
-     button   ARMED (mouse.button 0) or off
-     holding  the body the constraint has, by kind and Matter id, or nothing
-     fuse     the pressed bomb: hits so far out of five and the time left if the
-              hold carries on, or none. A bomb whose heldSince is still set but
-              that is no longer the pressed one is listed as stale: that is the
-              mcReleaseRef hazard and should never appear
-
-   A swipe across a bomb passes when, for the whole gesture, gate reads open,
-   button reads off, holding reads nothing and fuse reads none.
-
-   Strip this, the handle ref, the line that sets it, the poll effect and the
-   panel once the chain has shipped.
-   ========================================================================== */
-function fuseDebugOn() {
-  if (typeof window === "undefined") return false;
-  return window.location.search.indexOf("fusedebug=1") > -1;
-}
-
-/* ============================ REMOVE BEFORE LAUNCH ==========================
-   ?chaindebug=1 : the swipe chain path, capture and render only, 17 September
-   2026. Press a chum card and drag through the cards touching it; a glowing
-   white line follows the finger with a dot on each card joined. On release the
-   path simply clears. Nothing is collected and nothing is scored.
-
-   THE ENTRY POINT IS THE CHUM GATE. The listeners are on the document in the
-   capture phase, because the card's own press handler stops propagation. That
-   also means they run BEFORE the stage's onDown has opened the gate, so a press
-   on a card only makes a candidate, and the first animation frame confirms it
-   against chumGateRef. A press the gate did not open never draws.
-
-   HOW A CARD JOINS. The finger's path since the last event is sampled every
-   CHAIN_SAMPLE_PX, and the browser's own hit test names the card under each
-   sample, so only the card under the finger is ever looked at, never the whole
-   pit. It joins when all three hold:
-     new        each card once
-     touching   its drawn square and the last card's drawn square overlap, or
-                sit within CHAIN_TOUCH_SLACK of a card side of each other.
-                Squares, from the same centre, angle and size the card is drawn
-                with. The rounded corners are ignored
-     no cross   the segment to it does not cross an earlier segment
-
-   HOW TO READ THE PANEL. chain state and pointer (ACTIVE, or DEAD once a link
-   has broken), the cards joined in order, any strained links with their gap,
-   the link that broke and the gap that broke it, the gate, and the last thing
-   that happened. See CHAIN_BREAK_GRACE_MS for strained against broken. A rejection says why, and a
-   "not touching" says the measured gap as a share of a card side, which is the
-   number to tune CHAIN_TOUCH_SLACK against.
-
-   Strip this, the helpers below, the refs, the effect, the path layer in the pit
-   SVG and the panel once the chain ships for real.
-   ========================================================================== */
-function chainDebugOn() {
-  if (typeof window === "undefined") return false;
-  return window.location.search.indexOf("chaindebug=1") > -1;
-}
-
-/* ============================ REMOVE BEFORE LAUNCH ==========================
-   ?dogchain=1 : the same swipe chain, on the dog circles, 18 September 2026.
-
-   THE CASE IT IS FOR. A level like Tweed Water Spaniel holds the same breed
-   several times over, a pit full of Otterhounds. Rather than lift them one at a
-   time, the player draws through a run of them and opens one for all of them.
-
-   THE RULES, and every one of them is the kind's, not the gesture's:
-     start    only a circle with another of the SAME BREED TOUCHING it, which is
-              the join's own test asked one move early. A duplicate somewhere
-              else in the pit is not enough: see startable for why
-     drag     a circle that can start one stops being draggable while pressed:
-              the chum gate does that, with one more condition, not a second gate
-     join     same breed as the first, and touching, like the cards
-     shape    open, never a circuit, never a lasso, two circles at least
-     leaves   a circle with nothing inside it can join. Most duplicates are
-              leaves and they are the whole point
-     release  the FIRST circle the player touched lifts and opens, exactly as a
-              tap on it would. The others stay where they are
-     after    completing that circle in the layer closes the rest of the chain
-     colour   white, the same as the cards
-     see it   every circle holding the chain's breed turns its question mark
-              white. The photograph is never touched
-
-   Strip this, the constants, the refs, the DOG kind, the gate condition, the
-   question mark highlight and the closing block in onRemove once it ships.
-   ========================================================================== */
-function dogChainOn() {
-  if (typeof window === "undefined") return false;
-  return window.location.search.indexOf("dogchain=1") > -1;
-}
-
-/* ============================ REMOVE BEFORE LAUNCH ==========================
-   ?dragdebug=1 : why a press on a dog circle did or did not take the gate,
-   18 September 2026.
-
-   THE QUESTION. With ?dogchain=1 on, NO circle can be dragged, when only a
-   circle whose breed has duplicates should be undraggable. Two readings of the
-   code failed to explain it, and the data killed both: most levels have no
-   duplicated circle at the top at all (166 levels, only 20 where every circle
-   is a duplicate), and the level this feature is for has two circles with
-   different names. So the rule cannot be answering "duplicate" honestly, and
-   this prints every step of its answer instead of a third guess.
-
-   HOW TO READ IT. One press, broken down:
-     target     what was actually pressed, and whether the circles group holds it
-     index      what the hit test made of it, and the node at that index
-     node       name, depth, echo, and whether the pit owns it
-     breed      how many circles of that name the pit holds right now
-     starter    the verdict the gate asked for
-     gate       which branch took the press, and where mouse.button ended up
-   The line that disagrees with the pit on screen is the culprit.
-
-   Strip this, the ref, the poll, the panel and the two blocks that write it.
-   ========================================================================== */
-function dragDebugOn() {
-  if (typeof window === "undefined") return false;
-  return window.location.search.indexOf("dragdebug=1") > -1;
-}
-
-/* ============================ REMOVE BEFORE LAUNCH ==========================
-   ?chipcount=1 : how many chips a dog chain actually drops, 18 September 2026.
-
-   THE QUESTION. A chain of three looks like it pays about one circle's worth of
-   yellow chips rather than three. This counts them where they are spawned
-   instead of arguing about it: the circle the player opened, whose chips come
-   from the lineage layer as it drops, and each closed circle, whose chips come
-   from the pit's own rule, one per non-echo child.
-
-   HOW TO READ IT. One line per chain:
-     opened   the breed opened, and how many circles the layer scattered
-     closed   each circle closed, and how many chips it dropped, in order
-     total    the two added up
-   If `closed` reads +1 for every circle, they are taking the leaf fallback and
-   the pit subtree is where to look, not the spawner.
-
-   Strip this, the ref, the poll, the panel and the two counters that write it.
-   ========================================================================== */
-function chipCountOn() {
-  if (typeof window === "undefined") return false;
-  return window.location.search.indexOf("chipcount=1") > -1;
-}
 // A run of dogs is an open chain, so two is a chain. Its own figure rather than
 // CHAIN_MIN_CARDS, which is the CARDS' loop minimum and means something else.
 const DOG_CHAIN_MIN = 2;
@@ -2916,18 +2741,6 @@ export default function BreedTree({
        phase still does the real work: startDrag calls stopPropagation on every
        circle, toy and pill, so a bubble-phase listener would never hear a swipe
        that began on a dog, and the owner asked for it to work anywhere. */
-    const dbg = (() => {
-      try {
-        if (new URLSearchParams(window.location.search).get("swipedebug") !== "1") return null;
-        const d = document.createElement("div");
-        d.style.cssText =
-          "position:fixed;left:0;right:0;top:0;z-index:99999;background:#000;color:#0f0;" +
-          "font:12px/1.4 monospace;padding:6px 8px;pointer-events:none;white-space:pre-wrap";
-        d.textContent = "swipe debug ready: flick anywhere on the pit";
-        document.body.appendChild(d);
-        return d;
-      } catch { return null; }
-    })();
     const down = (e: PointerEvent) => {
       /* Controls keep their own gestures. The difficulty slider in particular
          is a vertical drag on the start screen, which is exactly the shape of
@@ -2940,14 +2753,6 @@ export default function BreedTree({
     const up = (e: PointerEvent) => {
       const p = swipeRef.current;
       swipeRef.current = null;
-      if (dbg) {
-        const n0 = navRef.current;
-        const wired = [n0.prev ? "L" : "-", n0.next ? "R" : "-", n0.prevEra ? "U" : "-", n0.nextEra ? "D" : "-"].join("");
-        if (!p) { dbg.textContent = `ignored at press | on ${n0.on} | wired ${wired}`; return; }
-        dbg.textContent =
-          `dx ${Math.round(e.clientX - p.x)} dy ${Math.round(e.clientY - p.y)} ms ${Math.round(performance.now() - p.t)}` +
-          ` | on ${n0.on} | wired ${wired} | need ${SWIPE_MIN}px in ${SWIPE_MS}ms`;
-      }
       if (!p || !navRef.current.on) return;
       const dx = e.clientX - p.x, dy = e.clientY - p.y;
       const ax = Math.abs(dx), ay = Math.abs(dy);
@@ -2990,7 +2795,6 @@ export default function BreedTree({
       document.removeEventListener("pointerdown", down, { capture: true } as EventListenerOptions);
       document.removeEventListener("pointerup", up, { capture: true } as EventListenerOptions);
       document.removeEventListener("pointercancel", cancel, { capture: true } as EventListenerOptions);
-      dbg?.remove();
     };
   }, []);
   // LEARN ONLY: the top-right square goes back to the level's start screen, the
@@ -3365,24 +3169,9 @@ export default function BreedTree({
   const levelLayerRef = useRef<HTMLDivElement>(null);
   const levelFloorRef = useRef<HTMLImageElement>(null);
   const [floorDiag, setFloorDiag] = useState<string | null>(null);
-  /* REMOVE BEFORE LAUNCH, ?chumbox=1. See chumBoxOn() above. The engine is
-     otherwise a local inside the sim effect; this is the only handle on it and
-     it is written only when the flag is on. */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const diagEngineRef = useRef<any>(null);
-  const [chumDiag, setChumDiag] = useState<null | {
-    n: number; asleep: number; contacts: number; other: number; meanDeg: number; maxDeg: number;
-  }>(null);
-  /* REMOVE BEFORE LAUNCH, ?fusedebug=1. See fuseDebugOn() above. The mouse, the
-     constraint and the world are locals inside the sim effect; this is the only
-     handle on them, written only when the flag is on and cleared on teardown. */
-  const fuseDiagRef = useRef<{ mouse: { button: number }; mc: { body: unknown }; world: { bodies: unknown[] } } | null>(null);
-  const [fuseDiag, setFuseDiag] = useState<string[] | null>(null);
-  /* REMOVE BEFORE LAUNCH, ?chaindebug=1. See chainDebugOn() above. The path
-     layer inside the pit SVG, written directly each frame, and the panel lines. */
+  // The swipe chain's path layer inside the pit SVG, written directly each frame.
   const chainGRef = useRef<SVGGElement>(null);
-  const [chainDiag, setChainDiag] = useState<string[] | null>(null);
-  /* REMOVE BEFORE LAUNCH, ?chaindebug=1. THE SWIPE WINS OVER THE COLLECT (owner,
+  /* THE SWIPE WINS OVER THE COLLECT (owner,
      17 September 2026). A second press on an armed card collects it on the
      PRESS, before anyone can know whether a swipe follows. Under the chain flag,
      when that press also opened the chum gate, the collect is parked here by
@@ -3393,14 +3182,14 @@ export default function BreedTree({
      listeners are bound once and collectChum is a new function every render. */
   const chainHeldCollectRef = useRef<number | null>(null);
   const chainTapCollectRef = useRef<((i: number) => void) | null>(null);
-  /* REMOVE BEFORE LAUNCH, ?chaindebug=1. SCORING AND CLEARING A CHAIN.
+  /* SCORING AND CLEARING A CHAIN.
      chainClearRef clears a valid chain through collectChum, card by card, and is
      refreshed every render like chainTapCollectRef, so the collectChum it calls
      always closes over the current chumList. chainBonusRef is set inside the sim,
      where numAt and CHUM_COLLECT_POINTS live: it flashes the chain's multiplier
      bonus at the last card and scores it through the same onScore every collect
      uses, so the running total and the milestone celebration see it. */
-  /* REMOVE BEFORE LAUNCH, ?dogchain=1. See dogChainOn() above.
+  /* See dogChainOn() above.
      nodesRef  the packed nodes as a ref, because the chain's listeners are bound
                once and must never read state
      breed     the breed of the chain being drawn, or null. The frame writer
@@ -3415,7 +3204,7 @@ export default function BreedTree({
                poofs where it stood */
   const nodesRef = useRef<Node[]>([]);
   const dogChainBreedRef = useRef<string | null>(null);
-  /* REMOVE BEFORE LAUNCH, ?dogchain=1. The circles IN the chain being drawn. The
+  /* The circles IN the chain being drawn. The
      breed above says which circles to highlight; this says which are actually
      held, and the frame writer turns their outlines white while they are. Held
      by node, like the remembered chain, so a re-pack cannot mix them up. */
@@ -3425,17 +3214,8 @@ export default function BreedTree({
   const twinGlowGRef = useRef<SVGGElement>(null);
   const dogChainRef = useRef<{ opened: Node; others: Node[] } | null>(null);
   const dogStarterAtRef = useRef<((cx: number, cy: number) => boolean) | null>(null);
-  // REMOVE BEFORE LAUNCH, ?dragdebug=1. The same question as dogStarterAt, asked
-  // for a readout: every step of the answer rather than the answer.
-  const dogStarterWhyRef = useRef<((cx: number, cy: number) => string[]) | null>(null);
-  const dragDiagRef = useRef<string[] | null>(null);
-  const [dragDiag, setDragDiag] = useState<string[] | null>(null);
   const dogOpenRef = useRef<((i: number) => boolean) | null>(null);
-  // Returns how many chips the circle dropped, for the ?chipcount=1 readout.
-  const dogCloseRef = useRef<((n: Node) => number) | null>(null);
-  // REMOVE BEFORE LAUNCH, ?chipcount=1. The last chain's chip tally.
-  const chipDiagRef = useRef<string[] | null>(null);
-  const [chipDiag, setChipDiag] = useState<string[] | null>(null);
+  const dogCloseRef = useRef<((n: Node) => void) | null>(null);
   // The removed set is a ref, so closing circles changes nothing React can see.
   // This is the nudge that gets them off the screen.
   const [, setDogChainClosed] = useState(0);
@@ -3670,7 +3450,7 @@ export default function BreedTree({
     if (cm) onChumCollected?.(cm.name);
     flashCorner();
   };
-  // REMOVE BEFORE LAUNCH, ?chaindebug=1. The tap's own collect, the same three
+  // The tap's own collect, the same three
   // calls as the card handler, refreshed every render (the navRef pattern) so
   // the chain's once-bound listeners never call a stale collectChum.
   useEffect(() => {
@@ -4647,7 +4427,7 @@ export default function BreedTree({
       // way for it to half-apply.
       const isWordNode = fellRef.current && d.depth === 1;
       const c = wrap?.children[0] as SVGCircleElement | undefined;
-      /* REMOVE BEFORE LAUNCH, ?dogchain=1. A CIRCLE IN THE CHAIN IS INVERTED:
+      /* A CIRCLE IN THE CHAIN IS INVERTED:
          light blue where it was navy, and navy where its outline was. It wore a
          white outline for a day and there was almost nothing to read against the
          light blue fill. Its own depth colour comes back the moment the chain
@@ -4730,7 +4510,7 @@ export default function BreedTree({
           const sc = (drawR(d, v, k) * 1.4) / QMARK_VB;
           q.setAttribute("transform", `translate(${tx},${ty}) scale(${sc}) translate(${-QMARK_VB / 2},${-QMARK_VB / 2})`);
         }
-        /* REMOVE BEFORE LAUNCH, ?dogchain=1. THE MARK IS THE HIGHLIGHT. While a
+        /* THE MARK IS THE HIGHLIGHT. While a
            dog chain is being drawn, every circle holding its breed turns its
            question mark white, so the player can see where to drag next. The
            dog's photograph is never touched.
@@ -4800,8 +4580,7 @@ export default function BreedTree({
         }
       }
     });
-    /* ==================== REMOVE BEFORE LAUNCH, ?dogchain=1 ===================
-       THE GLOW ON AVAILABLE TWINS. Any circle with another of its own breed
+    /*        THE GLOW ON AVAILABLE TWINS. Any circle with another of its own breed
        TOUCHING it is a circle a chain can be started from, and it says so by
        wearing the chain path's own glow round its ring.
 
@@ -4818,7 +4597,7 @@ export default function BreedTree({
        uses, so what glows and what can be chained can never disagree. */
     const tg = twinGlowGRef.current;
     if (tg) {
-      const owned = dogChainOn() ? pitBodiesRef.current?.owned : null;
+      const owned = pitBodiesRef.current?.owned;
       const rings: { x: number; y: number; r: number; w: number }[] = [];
       if (owned) {
         const byBreed = new Map<string, Node[]>();
@@ -4951,7 +4730,7 @@ export default function BreedTree({
     return true;
   }
 
-  /* REMOVE BEFORE LAUNCH, ?dogchain=1. The nodes and the lift, as refs, for the
+  /* The nodes and the lift, as refs, for the
      chain's once-bound listeners. liftToLearn is the tap's own call, and the
      mouse constraint is let go first exactly as the tap does, so Matter is never
      left pulling a body the sim has just taken out of the world.
@@ -5391,8 +5170,6 @@ export default function BreedTree({
          To revert, set this back to Engine.create(). Leave wakeBody and its
          call sites in place: they are correct either way. */
       const engine = Engine.create({ enableSleeping: true });
-      // REMOVE BEFORE LAUNCH, ?chumbox=1.
-      if (chumBoxOn()) diagEngineRef.current = engine;
       engine.gravity.y = 1; // pit verbatim
       const world = engine.world;
       /* THE CATCH, and the reason wakeBody exists. Matter wakes a body by
@@ -6335,17 +6112,17 @@ export default function BreedTree({
         if (!b) return;
         numAt(b.x, b.y, CHUM_COLLECT_POINTS, performance.now());
       };
-      /* REMOVE BEFORE LAUNCH, ?chaindebug=1. THE CHAIN MULTIPLIER. Each chum in
+      /* THE CHAIN MULTIPLIER. Each chum in
          the chain adds CHAIN_MULT_STEP to a multiplier that starts at 1, and it
          applies to the summed value of the chain's chums. collectChum has
          already scored each card its own CHUM_COLLECT_POINTS, so this scores
          only the difference, once, flashed at the last card. */
-      /* REMOVE BEFORE LAUNCH, ?dogchain=1. A circle leaves the pit: its body is
+      /* A circle leaves the pit: its body is
          held, which is what takes it out of the physics world on the next step,
          and it poofs where it stood so it does not simply blink away. The caller
          adds it to the removed set, which is what hides the circle itself. The
          same pair the learn completion has always used. */
-      if (dogChainOn()) dogCloseRef.current = (n) => {
+      dogCloseRef.current = (n) => {
         /* IT GIVES UP ITS BADGES ON THE WAY OUT (owner, 18 September 2026). A
            closed circle used to leave nothing behind, so a chain paid in chips
            only for the one circle the player opened. Now every circle in the
@@ -6361,26 +6138,23 @@ export default function BreedTree({
            which is what pxFromWorld is for. */
         const p = pxFromWorld(n.x, n.y);
         const kids = (n.children ?? []).filter((ch) => !isEcho(ch));
-        let dropped = 0;
         if (kids.length) {
-          for (const ch of kids) { spawnBadgeRef.current?.(p.x, p.y, badgeDrawForNode(ch.r, k), pctOf(ch)); dropped++; }
+          for (const ch of kids) spawnBadgeRef.current?.(p.x, p.y, badgeDrawForNode(ch.r, k), pctOf(ch));
         } else {
           spawnBadgeRef.current?.(p.x, p.y, badgeDrawForNode(n.r, k), pctOf(n));
-          dropped++;
         }
         const b = pitBodiesRef.current?.find(n);
         if (b) b.held = true;
         poofAt(n.x, n.y, performance.now());
         wake();
-        return dropped;
       };
       // One connection made, paid on the spot and flashed at the card it
       // reached. The bridge holds that card's live world position.
-      if (chainDebugOn()) chainJoinScoreRef.current = (i: number) => {
+      chainJoinScoreRef.current = (i: number) => {
         const b = chumBodiesRef.current[i];
         if (b) numAt(b.x, b.y, CHAIN_JOIN_POINTS, performance.now());
       };
-      if (chainDebugOn()) chainBonusRef.current = (cards: number[]) => {
+      chainBonusRef.current = (cards: number[]) => {
         const sum = cards.length * CHUM_COLLECT_POINTS;
         const mult = 1 + CHAIN_MULT_STEP * cards.length;
         const bonus = Math.round(sum * mult) - sum;
@@ -7679,9 +7453,7 @@ export default function BreedTree({
           constraint: { stiffness: 0.2, render: { visible: false } },
         });
         Composite.add(world, mc);
-        // REMOVE BEFORE LAUNCH, ?fusedebug=1. Read only, by the poll effect.
-        if (fuseDebugOn()) fuseDiagRef.current = { mouse, mc, world };
-        // Release-velocity throw. FLICK_SCALE tunes it (1.0 = pointer speed);
+          // Release-velocity throw. FLICK_SCALE tunes it (1.0 = pointer speed);
         // FLICK_FLOOR is the tap floor in Matter px/step. flickBuf is the pointer
         // path in physics px, read on release to set the toy's velocity.
         const FLICK_SCALE = 1.0;
@@ -7907,22 +7679,12 @@ export default function BreedTree({
             chumGateRef.current = e.pointerId;
             return;
           }
-          /* REMOVE BEFORE LAUNCH, ?dogchain=1. ONE MORE CONDITION ON THE SAME
+          /* ONE MORE CONDITION ON THE SAME
              GATE, not a gate of its own. A dog circle whose breed has duplicates
              in the pit can start a chain, and a circle you can chain from must
              not also be a circle you can drag, or the two gestures fight over
              the same press. Every other circle is grabbed exactly as before. */
           const dogStarter = !!(tgt && circlesRef.current?.contains(tgt) && dogStarterAtRef.current?.(e.clientX, e.clientY));
-          // REMOVE BEFORE LAUNCH, ?dragdebug=1. Every step of that answer, plus
-          // what this press then did, written for the panel.
-          if (dragDebugOn()) {
-            const el = tgt as Element | null;
-            dragDiagRef.current = [
-              `target   <${el?.nodeName ?? "?"}> circles hold it ${tgt && circlesRef.current?.contains(tgt) ? "yes" : "no"}`,
-              ...(dogStarterWhyRef.current?.(e.clientX, e.clientY) ?? ["why      (chain listeners not bound)"]),
-              `gate     ${dogStarter ? "TAKEN by the dog rule, no drag" : "left open, the constraint may grab"}`,
-            ];
-          }
           if (dogStarter) {
             chumGateRef.current = e.pointerId;
             return;
@@ -7961,7 +7723,6 @@ export default function BreedTree({
         mcTeardown = () => {
           mcReleaseRef.current = null;
           chumGateRef.current = null;
-          fuseDiagRef.current = null; // REMOVE BEFORE LAUNCH, ?fusedebug=1
           window.removeEventListener("blur", clearGate);
           document.removeEventListener("visibilitychange", clearGate);
           Events.off(mc, "startdrag", onStartDrag);
@@ -7988,7 +7749,7 @@ export default function BreedTree({
         // Indices are per flood, so a new one must not inherit the old holes.
         setChumGone(new Set());
         chumTakenRef.current = new Set();
-        // REMOVE BEFORE LAUNCH, ?dogchain=1. A remembered chain belongs to the
+        // A remembered chain belongs to the
         // pit that made it: a level change must not leave one waiting on a
         // circle that no longer exists.
         dogChainRef.current = null;
@@ -8346,15 +8107,10 @@ export default function BreedTree({
       window.visualViewport?.removeEventListener("resize", read);
     };
   }, []);
-  /* ==================== REMOVE BEFORE LAUNCH, ?chaindebug=1 ===================
-     The swipe chain gesture, capture and render only. See chainDebugOn() above.
+  /*      The swipe chain gesture.
      Everything here reads refs, never state, so binding once is safe: this is
      the stale-closure trap noted on collectChum, avoided rather than risked. */
   useEffect(() => {
-    // Either flag brings the gesture up; the kinds below decide which of them
-    // a given press belongs to.
-    const cardOn = chainDebugOn(), dogOn = dogChainOn();
-    if (!cardOn && !dogOn) return;
     type Chain = {
       id: number; pending: boolean; cards: number[]; px: number; py: number; fx: number; fy: number;
       // What this chain is made of. See ChainKind below.
@@ -8377,7 +8133,6 @@ export default function BreedTree({
     const linkCount = (ch: Chain) => (ch.closed ? ch.cards.length : ch.cards.length - 1);
     const linkEnds = (ch: Chain, s: number): [number, number] => [ch.cards[s], ch.cards[(s + 1) % ch.cards.length]];
     let chain: Chain | null = null;
-    let note = "idle";
     let raf: number | null = null;
 
     // The card under a client point, by the browser's own hit test. Topmost
@@ -8423,7 +8178,6 @@ export default function BreedTree({
        CHAIN_TOUCH_SLACK means the same thing whatever shape they are. */
     type ChainKind = {
       key: string;
-      on: boolean;                                        // its own debug flag
       colour: string;                                     // the path's own colour
       circuit: boolean;                                   // must close a loop to pay
       minCards: number;                                   // fewest that can pay
@@ -8446,7 +8200,6 @@ export default function BreedTree({
     };
     const CARD: ChainKind = {
       key: "chum card",
-      on: cardOn,
       colour: "#ffffff",
       circuit: true,
       minCards: CHAIN_MIN_CARDS,
@@ -8467,7 +8220,7 @@ export default function BreedTree({
           : `CLEARED, circuit closed, ${cards.length} cards`;
       },
     };
-    /* REMOVE BEFORE LAUNCH, ?dogchain=1. The dog circles, as a kind. Everything
+    /* The dog circles, as a kind. Everything
        it does not name here it gets from the gesture: the sweep, the clock, the
        crossing test, the breaks, the kills, the collapse, the tone and the path.
 
@@ -8517,20 +8270,8 @@ export default function BreedTree({
       }
       return false;
     };
-    // Kept for the readout only: how many of a breed the pit holds, which is the
-    // number that used to decide a starter and no longer does.
-    const dogSameBreed = (name: string): number => {
-      const owned = pitBodiesRef.current?.owned;
-      if (!owned) return 0;
-      let n = 0;
-      for (const o of owned) {
-        if (o.depth > 0 && !isEcho(o) && o.data.name === name && !removedNodesRef.current.has(o)) n++;
-      }
-      return n;
-    };
     const DOG: ChainKind = {
       key: "dog circle",
-      on: dogOn,
       colour: DOG_CHAIN_COLOUR,
       circuit: false, // an open run, never a loop and never a lasso
       minCards: DOG_CHAIN_MIN,
@@ -8613,29 +8354,10 @@ export default function BreedTree({
     };
     const KINDS: ChainKind[] = [CARD, DOG];
     // Asked by the chum gate, so a circle that can start a chain is not also a
-    // circle that can be dragged. Off the flag it always answers no.
+    // circle that can be dragged.
     dogStarterAtRef.current = (cx, cy) => {
-      if (!DOG.on) return false;
       const i = circleAt(cx, cy);
       return i != null && DOG.startable(i);
-    };
-    /* REMOVE BEFORE LAUNCH, ?dragdebug=1. The same answer, shown working. Each
-       line is one step of dogStarterAt, so whichever step is lying can be read
-       off the screen rather than reasoned about. */
-    dogStarterWhyRef.current = (cx, cy) => {
-      const out = [`flag     dogchain ${DOG.on ? "on" : "off"}`];
-      const i = circleAt(cx, cy);
-      out.push(`index    ${i == null ? "no circle under the point" : `#${i} of ${nodesRef.current.length} nodes, ${circlesRef.current?.children.length ?? 0} drawn`}`);
-      if (i == null) return out;
-      const n = dogNode(i);
-      if (!n) { out.push("node     nothing at that index"); return out; }
-      const owned = pitBodiesRef.current?.owned;
-      out.push(`node     ${n.data.name}, depth ${n.depth}, echo ${isEcho(n) ? "yes" : "no"}`);
-      out.push(`in pit   owned ${owned?.has(n) ? "yes" : "no"}, removed ${removedNodesRef.current.has(n) ? "yes" : "no"}, pit holds ${owned?.size ?? 0}`);
-      out.push(`breed    ${dogSameBreed(n.data.name)} of "${n.data.name}" in the pit`);
-      out.push(`twin     ${dogTouchingTwin(n) ? "one of them is TOUCHING this circle" : "none of them is touching this circle"}`);
-      out.push(`starter  ${DOG.startable(i) ? "YES, gate will take it" : "no, it should drag"}`);
-      return out;
     };
     // Why the last card could not close the loop back to the first right now,
     // or null if it could. The same touching and crossing tests as any join.
@@ -8674,41 +8396,39 @@ export default function BreedTree({
            loop: doubling back onto the first card of a two card chain is not a
            wrong card, it is a gesture that has not gone anywhere yet, so that
            one only refuses. */
-        if (why && cards.length < K.minCards) { note = `cannot close on #${i}: ${why}`; return; }
-        if (why) { killChain(ch, `CANNOT CLOSE on #${i}, ${why}`); return; }
+        if (why && cards.length < K.minCards) return; // too short to be a loop: refuse, do not kill
+        if (why) { killChain(ch); return; } // an illegal close kills, like any wrong card
         ch.closed = true;
         ch.canClose = false;
         chainJoinScoreRef.current?.(i); // the closing link is a connection
-        note = `CIRCUIT CLOSED on #${i}, ${cards.length} cards`;
         return;
       }
       // A card already in the chain, and not the first: the chain dies. It used
       // to refuse and carry on.
-      if (cards.includes(i)) { killChain(ch, `REPEAT CARD, #${i} was already in the chain`); return; }
-      if (K.busy(i)) { note = `#${i} is being collected`; return; }
+      if (cards.includes(i)) { killChain(ch); return; } // already in the chain
+      if (K.busy(i)) return; // being collected: not a wrong card, just not available
       if (last === undefined) {
         cards.push(i);
         ch.lastJoin = performance.now();
         K.first?.(i); // the kind may want to know what it started on
-        note = `started on #${i}`;
         return;
       }
       // The kind's own rule, if it has one, before the shared geometry.
       const own = K.joinBlock(ch, i);
-      if (own) { killChain(ch, own); return; }
+      if (own) { killChain(ch); return; } // the kind's own rule said no
       const a = K.geo(last), b = K.geo(i);
       if (!a || !b) return;
       const share = K.gapShare(a, b);
       // A card that does not touch the one before it: the chain dies. It used
       // to refuse and carry on, which read as the gesture being ignored.
       if (share > CHAIN_TOUCH_SLACK) {
-        killChain(ch, `STRAY CARD, #${i} not touching #${last}, gap ${Math.round(share * 100)}%`);
+        killChain(ch); // a stray card, not touching the one before it
         return;
       }
       // Every earlier segment except the last one, which ends where this starts.
       for (let s = 0; s < cards.length - 2; s++) {
         const p = K.geo(cards[s]), q = K.geo(cards[s + 1]);
-        if (p && q && chainSegmentsCross(p, q, a, b)) { killChain(ch, `CROSSING, #${i} would cross the path`); return; }
+        if (p && q && chainSegmentsCross(p, q, a, b)) { killChain(ch); return; } // it would cross the path
       }
       cards.push(i);
       ch.lastJoin = performance.now(); // the join clock restarts on every card
@@ -8716,7 +8436,6 @@ export default function BreedTree({
       // chain. The first card is not a connection and pays nothing.
       chainJoinScoreRef.current?.(i);
       K.joined?.(i); // the kind may want to know what is now held
-      note = `joined #${i}`;
     };
     const sweep = (ch: Chain, cx: number, cy: number) => {
       const dx = cx - ch.px, dy = cy - ch.py;
@@ -8948,21 +8667,16 @@ export default function BreedTree({
       }
       return null;
     };
-    let result = "none yet";
-    /* Kills a chain where it stands, mid gesture: the collapse and the tone
-       right now, rather than the quiet wait for release a broken link gets.
-       Used by the join clock, and by the rules that end a chain outright. The
-       caller is inside the frame loop or a pointer move, so the running frame
-       request carries the collapse; nothing is scheduled here. */
-    const killChain = (ch: Chain, text: string) => {
-      result = `FAILED, ${text}, nothing scored`;
-      note = result;
+    /* Kills a chain where it stands, mid gesture: the collapse right now,
+       rather than the quiet wait for release a broken link gets. Used by the
+       join clock, and by the rules that end a chain outright. The caller is
+       inside the frame loop or a pointer move, so the running frame request
+       carries the collapse; nothing is scheduled here. */
+    const killChain = (ch: Chain) => {
       startCollapse(ch);
       const held = chainHeldCollectRef.current;
-      if (held != null) {
-        chainHeldCollectRef.current = null;
-        note += `, collect of #${held} cancelled, still armed`;
-      }
+      // a parked collect dies with the chain: the card stays armed
+      if (held != null) chainHeldCollectRef.current = null;
       ch.kind.over?.();
       chain = null;
     };
@@ -8982,7 +8696,6 @@ export default function BreedTree({
         if (now - st.since >= CHAIN_BREAK_GRACE_MS) {
           ch.dead = { link: s, a: ai, b: bi, share };
           ch.strain.clear();
-          note = `BROKE at #${ai}-#${bi}, gap ${Math.round(share * 100)}%`;
           return;
         }
       }
@@ -8990,25 +8703,20 @@ export default function BreedTree({
     const end = (why: string) => {
       const ch = chain;
       const n = ch?.cards.length ?? 0;
-      note = `${why}, ${n} card(s)${ch?.dead ? ", chain was broken" : ""}, path cleared`;
       // Only a real release of a real chain is judged. A cancel, a blur or a
       // stale end is not the player's doing, so it just clears, silently.
       // A single card is a tap, never a chain. Two or more is judged, and a two
       // card chain can only ever fail: it cannot close.
       const isTap = n < 2;
-      let cleared = false;
       if (ch && why === "released" && !isTap) {
         const fail = judge(ch);
         if (fail) {
-          result = `FAILED, ${fail}, nothing scored`;
           startCollapse(ch);
         } else {
           // What a valid release does belongs to the kind: cards clear and score,
           // and another kind will do something else entirely.
-          result = ch.kind.settle(ch);
-          cleared = true;
+          ch.kind.settle(ch);
         }
-        note = result;
       }
       // A parked collect (see chainHeldCollectRef) goes ahead only on a clean
       // release that never joined a second card, as the tap always did. A chain
@@ -9019,7 +8727,7 @@ export default function BreedTree({
       if (held != null) {
         chainHeldCollectRef.current = null;
         if (why === "released" && isTap) chainTapCollectRef.current?.(held);
-        else if (!cleared) note += `, collect of #${held} cancelled, still armed`;
+        // a chain that cleared took the card with it; anything else leaves it armed
       }
       ch?.kind.over?.();
       chain = null;
@@ -9036,7 +8744,7 @@ export default function BreedTree({
       }
       if (chain.pending) {
         // After dispatch, so the stage's onDown has had its say.
-        if (chumGateRef.current !== chain.id) { chain = null; note = "press did not open the gate"; draw(); return; }
+        if (chumGateRef.current !== chain.id) { chain = null; draw(); return; } // the gate did not open for this press
         chain.pending = false;
         const fx = chain.fx, fy = chain.fy;
         joinAt(chain, chain.px, chain.py);
@@ -9047,7 +8755,7 @@ export default function BreedTree({
       const idle = now - chain.lastJoin;
       const allow = chainAllowanceMs(chain.cards.length - 1);
       if (!chain.closed && !chain.dead && chain.cards.length && idle > allow) {
-        killChain(chain, `TIMED OUT, ${Math.round(idle)}ms without a join, allowance ${allow}ms`);
+        killChain(chain); // the join clock ran out
         raf = requestAnimationFrame(tick);
         return;
       }
@@ -9067,7 +8775,7 @@ export default function BreedTree({
       // is allowed to open a chain. First match wins; there is only ever one.
       let kind: ChainKind | null = null;
       for (const k of KINDS) {
-        if (!k.on || !k.owns(t)) continue;
+        if (!k.owns(t)) continue;
         const i0 = k.idAt(e.clientX, e.clientY);
         if (i0 == null && k.needsHit) continue;
         if (i0 != null && !k.startable(i0)) continue;
@@ -9082,7 +8790,6 @@ export default function BreedTree({
         paint([], [], 0, "#ffffff");
       }
       chain = { id: e.pointerId, kind, pending: true, cards: [], px: e.clientX, py: e.clientY, fx: e.clientX, fy: e.clientY, strain: new Map(), dead: null, closed: false, canClose: false, lastJoin: performance.now() };
-      note = "waiting for the gate";
       if (raf == null) raf = requestAnimationFrame(tick);
     };
     const move = (e: PointerEvent) => {
@@ -9100,20 +8807,6 @@ export default function BreedTree({
     document.addEventListener("pointercancel", cancel, opts);
     window.addEventListener("blur", lost);
     document.addEventListener("visibilitychange", lost);
-    const poll = window.setInterval(() => {
-      const gate = chumGateRef.current;
-      setChainDiag([
-        `chain    ${!chain ? "idle" : chain.pending ? `waiting, pointer ${chain.id}` : chain.dead ? `DEAD, pointer ${chain.id}` : `ACTIVE, pointer ${chain.id}`}${chain ? ` (${chain.kind.key})` : ""}`,
-        `cards    ${chain ? `${chain.cards.length}${chain.cards.length ? ": #" + chain.cards.join(" #") : ""}` : "-"}`,
-        `circuit  ${!chain || chain.pending ? "-" : chain.closed ? "CLOSED" : chain.canClose ? "open, CAN CLOSE on #" + chain.cards[0] : "open"}`,
-        `clock    ${!chain || chain.pending ? "-" : chain.closed ? "stopped, loop closed" : `idle ${Math.round(performance.now() - chain.lastJoin)}ms of ${chainAllowanceMs(chain.cards.length - 1)}ms`}`,
-        `strain   ${!chain || !chain.strain.size ? "none" : [...chain.strain].map(([s, st]) => { const [a, b] = linkEnds(chain as Chain, s); return `#${a}-#${b} ${Math.round(st.share * 100)}%`; }).join(", ")}`,
-        `break    ${!chain?.dead ? "none" : `#${chain.dead.a}-#${chain.dead.b} gap ${Math.round(chain.dead.share * 100)}% (slack ${Math.round(CHAIN_TOUCH_SLACK * 100)}%)`}`,
-        `gate     ${gate == null ? "shut" : `open, pointer ${gate}`}`,
-        `last     ${note}`,
-        `result   ${result}`,
-      ]);
-    }, 100);
     return () => {
       document.removeEventListener("pointerdown", down, opts);
       document.removeEventListener("pointermove", move, opts);
@@ -9121,128 +8814,15 @@ export default function BreedTree({
       document.removeEventListener("pointercancel", cancel, opts);
       window.removeEventListener("blur", lost);
       document.removeEventListener("visibilitychange", lost);
-      window.clearInterval(poll);
       if (raf != null) cancelAnimationFrame(raf);
       chain = null;
       collapse = null;
-      // REMOVE BEFORE LAUNCH, ?dogchain=1. The gate asks this ref on every press,
+      // The gate asks this ref on every press,
       // so it must not outlive the listeners that answer it.
       dogStarterAtRef.current = null;
       dogChainBreedRef.current = null;
       dogChainNodesRef.current = new Set();
     };
-  }, []);
-  /* ==================== REMOVE BEFORE LAUNCH, ?dragdebug=1 ====================
-     The last press, copied out of its ref for the panel. It is written at the
-     press itself, and only read here, so the pointer path never waits on React. */
-  useEffect(() => {
-    if (!dragDebugOn()) return;
-    const id = window.setInterval(() => {
-      const lines = dragDiagRef.current;
-      setDragDiag((cur) => (lines === cur ? cur : lines));
-    }, 100);
-    return () => window.clearInterval(id);
-  }, []);
-  // REMOVE BEFORE LAUNCH, ?chipcount=1. The same pattern: written where the
-  // chips are spawned, copied out here for the panel.
-  useEffect(() => {
-    if (!chipCountOn()) return;
-    const id = window.setInterval(() => {
-      const lines = chipDiagRef.current;
-      setChipDiag((cur) => (lines === cur ? cur : lines));
-    }, 200);
-    return () => window.clearInterval(id);
-  }, []);
-  /* ==================== REMOVE BEFORE LAUNCH, ?fusedebug=1 ====================
-     Ten times a second rather than per frame, for the same reason as the chumbox
-     poll below: a per-frame setState would load the pit it is watching. Fast
-     enough to catch a flick across a bomb, which lasts a few hundred ms. */
-  useEffect(() => {
-    if (!fuseDebugOn()) return;
-    type DiagBomb = { bomb?: boolean; blown?: boolean; bursting?: number; hits?: number; heldHits?: number; heldSince?: number };
-    type DiagBody = { id?: number; plugin?: { kind?: string; bridge?: DiagBomb; prop?: { toyKind?: string }; ui?: { kind?: string } } };
-    const id = window.setInterval(() => {
-      const now = performance.now();
-      const h = fuseDiagRef.current;
-      const gate = chumGateRef.current;
-      const lines = [`gate     ${gate == null ? "shut" : `OPEN, pointer ${gate}`}`];
-      if (!h) {
-        lines.push("button   waiting for pit", "holding  -", "fuse     -");
-        setFuseDiag(lines);
-        return;
-      }
-      lines.push(`button   ${h.mouse.button === 0 ? "ARMED" : "off"}`);
-      const held = h.mc.body as DiagBody | null;
-      if (!held) lines.push("holding  nothing");
-      else {
-        const pl = held.plugin;
-        const kind = pl?.kind ?? (pl?.ui ? `ui ${pl.ui.kind ?? "?"}` : "?");
-        const extra = pl?.prop?.toyKind ? ` ${pl.prop.toyKind}` : pl?.bridge?.bomb ? " BOMB" : "";
-        lines.push(`holding  ${kind}${extra} #${held.id ?? "?"}`);
-      }
-      const pressed = pressedBombRef.current as DiagBomb | null;
-      if (pressed && pressed.bomb && !pressed.blown && pressed.heldSince) {
-        const hits = pressed.hits || 0;
-        const left = Math.max(0, BOMB_HITS - hits);
-        const nextTick = pressed.heldSince + ((pressed.heldHits || 0) + 1) * BOMB_TICK_MS;
-        const ms = left ? Math.max(0, Math.round(nextTick - now + (left - 1) * BOMB_TICK_MS)) : 0;
-        lines.push(`fuse     BURNING, hits ${hits}/${BOMB_HITS}, ${ms}ms left`);
-      } else {
-        lines.push(`fuse     none${pressed && pressed.bursting ? " (bursting)" : ""}`);
-      }
-      let stale = 0;
-      for (const o of h.world.bodies as DiagBody[]) {
-        const br = o.plugin?.bridge;
-        if (br?.bomb && !br.blown && br.heldSince && br !== pressed) stale++;
-      }
-      if (stale) lines.push(`STALE    ${stale} bomb(s) with heldSince set, not pressed`);
-      setFuseDiag(lines);
-    }, 100);
-    return () => window.clearInterval(id);
-  }, []);
-  /* ===================== REMOVE BEFORE LAUNCH, ?chumbox=1 =====================
-     Samples four times a second, not per frame: the panel is for reading, and a
-     per-frame React setState on top of the pit would change the very thing the
-     diagnostic is measuring.
-
-     CONTACTS COME FROM MATTER'S OWN PAIR LIST, not from a distance calculation.
-     A pair is in the list once the engine has resolved a collision between the
-     two, so a non-zero count means the bodies are genuinely touching whatever
-     the gap between the pictures looks like. That is the whole point: it
-     separates a physics problem from a drawing problem in one number.
-     `isActive` is the flag Matter clears when a pair separates, so stale pairs
-     do not inflate the count. */
-  useEffect(() => {
-    if (!chumBoxOn()) return;
-    const id = window.setInterval(() => {
-      const eng = diagEngineRef.current;
-      const list = chumBodiesRef.current;
-      if (!eng || !list.length) return;
-      let asleep = 0, contacts = 0, other = 0, sum = 0, max = 0;
-      for (const c of list) {
-        if (!c?.mb) continue;
-        if (c.mb.isSleeping) asleep++;
-        const deg = Math.abs(((c.mb.angle * 180) / Math.PI) % 90);
-        sum += deg;
-        if (deg > max) max = deg;
-      }
-      for (const p of eng.pairs?.list ?? []) {
-        if (!p.isActive) continue;
-        const a = p.bodyA?.plugin?.kind, b = p.bodyB?.plugin?.kind;
-        if (a === "chum" && b === "chum") contacts++;
-        else if (a === "chum" || b === "chum") other++;
-      }
-      const live = list.filter((c: { mb?: unknown }) => !!c?.mb).length;
-      setChumDiag({
-        n: live,
-        asleep,
-        contacts,
-        other,
-        meanDeg: live ? Math.round(sum / live) : 0,
-        maxDeg: Math.round(max),
-      });
-    }, 250);
-    return () => window.clearInterval(id);
   }, []);
   // The running total for the corner. It lives in LineageModal, which is keyed
   // per level and remounts, so it starts each level at nothing.
@@ -9504,14 +9084,14 @@ export default function BreedTree({
                 />
               </filter>
             ))}
-            {/* REMOVE BEFORE LAUNCH, ?dogchain=1. The fifth question mark filter,
+            {/* The fifth question mark filter,
                 for a circle holding the breed of the chain being drawn. White,
                 like the path, changed from the site yellow on 18 September 2026.
                 Same shape as the four above it, one colour. */}
             <filter id="bt-qmark-hi" x="0" y="0" width="100%" height="100%" colorInterpolationFilters="sRGB">
               <feColorMatrix type="matrix" values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1 0" />
             </filter>
-            {/* REMOVE BEFORE LAUNCH, ?dogchain=1. The sixth, for a circle HELD in
+            {/* The sixth, for a circle HELD in
                 the chain: DOG_CHAIN_INK, the navy the circle used to fill with,
                 so the face reads against the light blue it is filled with now.
                 The fractions are that hex over 255, and they are written out
@@ -9679,7 +9259,7 @@ export default function BreedTree({
           <g pointerEvents="none" aria-hidden="true">
             <path ref={hlPathRef} fillRule="evenodd" fill="var(--yellow, #ffd23e)" />
           </g>
-          {/* REMOVE BEFORE LAUNCH, ?dogchain=1. The twin glow, written by the
+          {/* The twin glow, written by the
               frame writer: one blurred ring per circle that has another of its
               breed touching it. BEHIND the circles, so the glow shows outside
               their rims and no photograph is dimmed, and it never takes a
@@ -10456,10 +10036,10 @@ export default function BreedTree({
                     if (chumFlyRef.current.has(i2)) return;
                     // First tap on this card: arm it, and disarm any other.
                     if (armedChum !== i2) { setArmedChum(i2); return; }
-                    // REMOVE BEFORE LAUNCH, ?chaindebug=1. This press may start a
+                    // This press may start a
                     // swipe chain, so the chain decides on release. See
                     // chainHeldCollectRef. Off the flag, nothing here changes.
-                    if (chainDebugOn() && chumGateRef.current === e.pointerId) { chainHeldCollectRef.current = i2; return; }
+                    if (chumGateRef.current === e.pointerId) { chainHeldCollectRef.current = i2; return; }
                     // Second tap on the armed card: taken.
                     setArmedChum(null);
                     setTakenChum(i2);
@@ -10484,16 +10064,6 @@ export default function BreedTree({
                       strokeWidth: Math.max(2, cm.size * 0.055),
                       transition: "stroke 0.12s ease",
                     }} />
-                  {/* REMOVE BEFORE LAUNCH, ?chumbox=1. The BODY, not the card:
-                      same side, same 0.22 chamfer, drawn inside the card's own
-                      transform so it carries the same rotation. If two magenta
-                      edges touch while the white ones do not, the gap is the
-                      tilt and the rounded corners, and no amount of physics
-                      tuning will close it. */}
-                  {chumDiag && (
-                    <rect x={-half} y={-half} width={cm.size} height={cm.size} rx={rx}
-                      style={{ fill: "none", stroke: "#ff00ff", strokeWidth: 1.5, pointerEvents: "none" }} />
-                  )}
                 </g>
               );
             })}
@@ -11278,7 +10848,7 @@ export default function BreedTree({
               </text>
             );
           })()}
-          {/* REMOVE BEFORE LAUNCH, ?chaindebug=1. The swipe chain path. Last in
+          {/* The swipe chain path. Last in
               the pit SVG so it draws over every card, a direct child of the SVG
               like the chum cards so both share one coordinate space, and never
               takes a pointer, or the hit test that finds the card under the
@@ -11776,7 +11346,7 @@ export default function BreedTree({
               const soloLeafDog = !(learnNode.data.children && learnNode.data.children.length > 0);
               if (!soloLeafDog) onScore?.(LEARN_COST);
               removedNodesRef.current.add(learnNode);
-              /* REMOVE BEFORE LAUNCH, ?dogchain=1. COMPLETING THE OPENED CIRCLE
+              /* COMPLETING THE OPENED CIRCLE
                  CLOSES THE REST OF ITS CHAIN. This is the moment the chain was
                  remembered for: the player drew through a run of one breed, this
                  one opened, and finishing it settles all of them.
@@ -11796,25 +11366,11 @@ export default function BreedTree({
                 dogChainRef.current = null;
                 const pit = pitBodiesRef.current?.owned;
                 let shut = 0;
-                // REMOVE BEFORE LAUNCH, ?chipcount=1. Counted where they are
-                // spawned, one entry per circle closed.
-                const chips: string[] = [];
                 for (const other of dc.others) {
                   if (!pit?.has(other) || removedNodesRef.current.has(other)) continue;
                   removedNodesRef.current.add(other);
-                  const got = dogCloseRef.current?.(other) ?? 0;
-                  chips.push(`${other.data.name} +${got}`);
+                  dogCloseRef.current?.(other);
                   shut++;
-                }
-                if (chipCountOn()) {
-                  const opened = chipDiagRef.current?.[0] ?? "opened   (no scatter seen yet)";
-                  const closedTotal = chips.reduce((a, s) => a + Number(s.split("+").pop()), 0);
-                  const openedTotal = Number(opened.match(/(\d+) circles/)?.[1] ?? 0);
-                  chipDiagRef.current = [
-                    opened,
-                    `closed   ${chips.length ? chips.join(", ") : "none"}`,
-                    `total    ${openedTotal} + ${closedTotal} = ${openedTotal + closedTotal}`,
-                  ];
                 }
                 // The removed set is a ref, so nothing above would re-render.
                 if (shut) setDogChainClosed((c) => c + 1);
@@ -11833,12 +11389,6 @@ export default function BreedTree({
             }
           }}
           onScatter={(data) => {
-            // REMOVE BEFORE LAUNCH, ?chipcount=1. What the LAYER drops for the
-            // circle the player opened, which is a different count from the pit's
-            // own rule for the circles it closes.
-            if (chipCountOn()) {
-              chipDiagRef.current = [`opened   ${learnNode?.data.name ?? "?"}, layer scattered ${(data.circles ?? []).length} circles${data.big ? " + its own big one" : ""}`];
-            }
             // the learnt % circles, their rods and the name pill tip into the
             // pit as live objects at the very instant the layer drops them
             for (const c of data.circles ?? []) {
@@ -11894,7 +11444,7 @@ export default function BreedTree({
             if (body && learnNode && !removedNodesRef.current.has(learnNode)) {
               body.held = false; // falls back in from where it was lifted
             }
-            // REMOVE BEFORE LAUNCH, ?dogchain=1. Backed out without completing,
+            // Backed out without completing,
             // so the chain is SPENT: the others stay in the pit and nothing
             // closes. Drawing another chain is the way to try again.
             if (dogChainRef.current && dogChainRef.current.opened === learnNode) dogChainRef.current = null;
@@ -11903,57 +11453,6 @@ export default function BreedTree({
             wakeRef.current?.();
           }}
         />
-      )}
-      {/* ==================== REMOVE BEFORE LAUNCH, ?fusedebug=1 ====================
-          The gate and fuse readout. Top RIGHT, so it can sit beside the chumbox
-          panel, and pointer-events none so a swipe passes through.
-          A SIBLING OF THE INFO BOX, NOT INSIDE IT. It first shipped inside the
-          caption, and the box is visibility hidden whenever the caption is
-          closed, which is the default in play, so the panel inherited hidden
-          and never showed. visibility is also set outright here. */}
-      {fuseDiag && (
-        <div style={{
-          position: "fixed", top: 6, right: 6, zIndex: 9000, pointerEvents: "none", visibility: "visible",
-          background: "rgba(0,0,0,0.78)", color: "#0f0", padding: "6px 8px",
-          font: "11px/1.35 ui-monospace, monospace", borderRadius: 6, whiteSpace: "pre",
-        }}>
-          {fuseDiag.join("\n")}
-        </div>
-      )}
-      {/* ==================== REMOVE BEFORE LAUNCH, ?chaindebug=1 ===================
-          The chain readout. A sibling of the info box for the same reason as the
-          fuse panel above, and below it so both flags can be on together. */}
-      {/* ==================== REMOVE BEFORE LAUNCH, ?dragdebug=1 ===================
-          Why the last press on a circle did or did not take the gate. Left side,
-          clear of the lives and the title, and a sibling of the info box like
-          every other readout here. */}
-      {/* REMOVE BEFORE LAUNCH, ?chipcount=1. What a chain actually paid in chips. */}
-      {chipDiag && (
-        <div style={{
-          position: "fixed", bottom: 6, right: 6, zIndex: 9000, pointerEvents: "none", visibility: "visible",
-          background: "rgba(0,0,0,0.78)", color: "#0f0", padding: "6px 8px",
-          font: "11px/1.35 ui-monospace, monospace", borderRadius: 6, whiteSpace: "pre",
-        }}>
-          {chipDiag.join("\n")}
-        </div>
-      )}
-      {dragDiag && (
-        <div style={{
-          position: "fixed", bottom: 6, left: 6, zIndex: 9000, pointerEvents: "none", visibility: "visible",
-          background: "rgba(0,0,0,0.78)", color: "#0f0", padding: "6px 8px",
-          font: "11px/1.35 ui-monospace, monospace", borderRadius: 6, whiteSpace: "pre",
-        }}>
-          {dragDiag.join("\n")}
-        </div>
-      )}
-      {chainDiag && (
-        <div style={{
-          position: "fixed", top: 96, right: 6, zIndex: 9000, pointerEvents: "none", visibility: "visible",
-          background: "rgba(0,0,0,0.78)", color: "#0f0", padding: "6px 8px",
-          font: "11px/1.35 ui-monospace, monospace", borderRadius: 6, whiteSpace: "pre",
-        }}>
-          {chainDiag.join("\n")}
-        </div>
       )}
       <div
         ref={asideRef}
@@ -12179,26 +11678,6 @@ export default function BreedTree({
           {/* Related pack dogs, part of the box: they open and close with it
               and ride along when it is dragged. The 54-pack breeds that descend
               from this level's ancestors, as square cards down one side. */}
-          {/* ==================== REMOVE BEFORE LAUNCH, ?chumbox=1 ====================
-              The readout. Fixed and top-left so it clears the bottom button row
-              and the chum rail, and pointer-events none so it cannot take a tap
-              from anything underneath while it is up. */}
-          {chumDiag && (
-            <div style={{
-              position: "fixed", top: 6, left: 6, zIndex: 9000, pointerEvents: "none",
-              background: "rgba(0,0,0,0.78)", color: "#0f0", padding: "6px 8px",
-              font: "11px/1.35 ui-monospace, monospace", borderRadius: 6, whiteSpace: "pre",
-            }}>
-              {[
-                `chums live      ${chumDiag.n}`,
-                `asleep          ${chumDiag.asleep}`,
-                `chum<->chum     ${chumDiag.contacts}`,
-                `chum<->other    ${chumDiag.other}`,
-                `angle mean deg  ${chumDiag.meanDeg}`,
-                `angle max deg   ${chumDiag.maxDeg}`,
-              ].join("\n")}
-            </div>
-          )}
           {/* ZOOM OUT, bottom right, only while zoomed in.
               A tap on the background already does this, but since the background
               also pans there is no longer anything on screen saying so. This is
