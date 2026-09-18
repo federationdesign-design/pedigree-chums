@@ -570,8 +570,12 @@ const LOGO_BONE_FRAC = 584.1 / 595.3;
    THEY ARE STILL TIED. This scales the figure taken from the logo rather than
    replacing it, so moving the logo still moves the bone and the two can never
    drift apart. This is the only number to touch if the bone still looks wrong:
-   lower it to shrink the bone, raise it towards 1 to grow it. */
-const PIT_BONE_MATCH = 0.75;
+   lower it to shrink the bone, raise it towards 1 to grow it.
+
+   0.75 TO 0.56, 18 September 2026 (owner, on the device: still about 25% too
+   big). 0.56 is 0.75 less a quarter. The tie is untouched, and nothing else
+   moved with it. */
+const PIT_BONE_MATCH = 0.56;
 /* ---- Era props -------------------------------------------------------------
    Objects that belong to one era rather than to the pit as a whole. They take
    the place of the stick, big stick and rock in the props slot, and an era with
