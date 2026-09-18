@@ -996,6 +996,30 @@ export default function LineageMap({
     const raw = nodeR(Math.round((n._leaves / p._leaves) * 100)) * ringFrac(pd);
     return Math.min(raw, clampedRingW(p));
   };
+  /* ---- PILLS ON DEMAND, ON THE LIFT (owner, 18 September 2026) --------------
+     WHICH node is showing its name, or null. One at a time, never several.
+
+     WHY NO STANDING NAMES HERE. Measured: on a 390 phone the rings sit 60.7
+     screen px apart on this layer, and "Old hunting dogs of the Celts" is 28
+     characters, which nodePillWidth makes 235 layout units, 129 screen px once
+     PIT_PILL_SCALE and LIFT_K are applied. A third of the screen for one name
+     against 60.7px of gap. NO placement rule fits that, radial or parked above,
+     which is why the four-candidate scorer was deleted, why the radial version
+     that replaced it overlapped too, and why chasing a better rule was dropped.
+     Taking the names off the resting screen removes the problem rather than
+     laying it out around.
+
+     ONE AT A TIME, and that is the whole safety property: a single pill cannot
+     collide with another pill, so the entire class of fault goes rather than
+     being reduced. It can still cross a badge or the root card, which the owner
+     will judge separately now the names are out of the picture.
+
+     THE LIFT ONLY. The learn area (strongBg) and the chum pages keep their
+     standing names: they anchor the root at a fixed point with 542px of room
+     above it, so their names fit and always did.
+
+     THE BADGES ARE UNTOUCHED. Circles and percentages stay visible at rest. */
+  const [namedNode, setNamedNode] = useState<string | null>(null);
   const [infoHover, setInfoHover] = useState<string | null>(null);
   const [pctHover, setPctHover] = useState<string | null>(null); // which card's % explainer box is open
   const pctTimer = useRef<number | null>(null); // closes the % box a beat after the cursor leaves /* pct-close */
@@ -1592,11 +1616,17 @@ export default function LineageMap({
   const tagLines = circular ? splitName(breed.name) : [breed.name];
   const tagW = Math.max(...tagLines.map((l) => l.length)) * 9.5 + 28 + (tagLines.length > 1 ? 14 : 0);
   const tagH = tagLines.length > 1 ? 60 : 32;
-  // CHANGE 2, now the clock face: each node's pill sits just outside its node and
-  // points STRAIGHT AWAY FROM CENTRE along the node's slot direction (_dir). The
-  // old four-candidate scorer (card / nodes / pills / connectors / viewport) is
-  // gone: with slots 60deg apart in the top semicircle a radial pill cannot reach
-  // the card (it points away from it) and neighbours diverge instead of colliding.
+  /* pillPlacement IS DELETED, 18 September 2026 (owner), with the standing names
+     it existed to arrange. It placed each lifted node's pill radially along the
+     node's own slot direction, and before that a four-candidate scorer weighed
+     the card, the nodes, the pills, the connectors and the viewport. Both were
+     attempts to fit 129px of name into a 60.7px gap, which no rule can do. With
+     one name on screen at a time there is nothing to arrange: the pill sits above
+     its node, as it does in every other mode.
+
+     WALL_PAD goes with its only remaining reader here. Its other user, the
+     single-child wall swing above, still compares layout units against screen
+     pixels and is flagged in that block rather than changed. */
   /* PRE-COMPENSATING FOR THE LAYER'S 0.8 SCALE, 2 September 2026 (owner).
 
      THE PROBLEM. The overlay carries transform: scale(0.8), and a scale
@@ -1620,78 +1650,6 @@ export default function LineageMap({
   const LIFT_K = (circular || strongBg) && !bounded ? 0.8 : 1;
   const unscaleX = (x: number) => vp.w / 2 + (x - vp.w / 2) / LIFT_K;
   const unscaleY = (y: number) => vp.h / 2 + (y - vp.h / 2) / LIFT_K;
-  const pillPlacement = useMemo(() => {
-    const place = new Map<string, { ox: number; oy: number }>();
-    if (!circular) return place;
-    const vw = typeof window !== "undefined" ? window.innerWidth : 0;
-    const withPill = shown.filter((n) =>
-      !!n._parent && !soloLeaf &&
-      (!!(n.children && n.children.length) || !autoExposed.has(n._id)) &&
-      n.name !== breed.name
-    );
-    const GAP = 4;
-    for (const n of withPill) {
-      const share = Math.round((n._leaves / (n._parent as Node)._leaves) * 100);
-      const lines = splitName(n.name);
-      /* THE RESERVE IS THE SIZE THE PILL IS DRAWN AT, 18 September 2026 (owner).
-         nodePillWidth is the UNSCALED width and the pill is drawn inside a group
-         at PIT_PILL_SCALE, 0.683, so this reserved about 46% more room than the
-         pill occupies: it pushed every pill further out than it needed to go and
-         left daylight between a node and its own name. The height is inside the
-         same group and takes the same scale. The scatter at scatterPills already
-         does exactly this, and for the same reason. */
-      const r = nodeR(share);
-      const w = nodePillWidth(lines) * PIT_PILL_SCALE;
-      const h = (lines.length > 1 ? 40 : 22) * PIT_PILL_SCALE;
-      // reach clears the node radius, the GAP, and the pill's own half-extent in
-      // the slot direction, so the near edge lands GAP px off the node at any angle.
-      const dir = n._dir;
-      const reach = r + GAP + Math.abs(Math.cos(dir)) * (w / 2) + Math.abs(Math.sin(dir)) * (h / 2);
-      let ox = Math.cos(dir) * reach;
-      const oy = Math.sin(dir) * reach;
-      // EDGE PROTECTION, and now the ONLY one: the wall clamp is deleted, so this
-      // single nudge is all that keeps a pill on screen. It MOVES the pill sideways
-      // (shifts ox), it never shortens the pill and never pulls the node off its
-      // slot. The case that tests it is 3 o'clock on a 390 phone: a ~150px pill
-      // pointing straight right slides left until its right edge clears the wall,
-      // slipping back over its own node, readable. That is the old ruling, an
-      // overlap you can read beats a pill you cannot see.
-      /* IT WAS MEASURING THE SCREEN AGAINST THE LAYOUT, 18 September 2026 (owner).
-
-         `vw` is window.innerWidth, in CSS pixels. `n._x` and `ox` are in the
-         LAYER'S OWN units, and the layer is drawn at LIFT_K, 0.8. The two were
-         compared directly, so the clamp believed the screen ended a fifth sooner
-         than it does: on a 390 phone a pill at layout x 390 actually lands at
-         351, comfortably inside, and was shoved left anyway. Every pill down the
-         right-hand side of the tree was dragged inward by up to a fifth of the
-         screen width for no reason, and piled onto its neighbours.
-
-         unscaleX is the conversion the file already uses for exactly this, and
-         the frame grid's own F_LEFT_BASE goes through it. Passed the screen
-         position a pill may not cross, it returns the layout position that lands
-         there, so both sides of the comparison are now in layout units.
-
-         THE MARGIN IS F_EDGE, 14, not the WALL_PAD of 0 this used. Zero let a
-         pill sit hard against the glass, and 14 is the margin the card grid below
-         already keeps, so the tree and the grid line up on one figure.
-
-         WALL_PAD ITSELF IS LEFT AT 0 AND STILL WRONG. Its other reader, the
-         single-child wall swing above, compares `cx` in layout units against `vw`
-         in screen pixels in the very same way. Raising the shared constant would
-         have silently changed that swing as well, which is layout, and the owner
-         asked for the pill clamp alone. Flagged, not fixed. */
-      if (vw > 0) {
-        const wallL = unscaleX(F_EDGE);        // layout x that lands F_EDGE from the left
-        const wallR = unscaleX(vw - F_EDGE);   // and F_EDGE from the right
-        const pl = n._x + ox - w / 2, pr = n._x + ox + w / 2;
-        if (pr > wallR) ox -= pr - wallR;
-        else if (pl < wallL) ox += wallL - pl;
-      }
-      place.set(n._id, { ox, oy });
-    }
-    return place;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [shown, circular, soloLeaf, breed.x, breed.y, breed.name, autoExposed, liftR]);
   const clip = "lm-clip-root";
   // Mini pit, a dog with a tree: the root card and the Complete button inside it
   // are drawn in a second svg on top of the placed cards. Lifting the cards down
@@ -1721,8 +1679,8 @@ export default function LineageMap({
   const MCOLS = fiveUp ? fitCols : 4; // phones: one continuous grid, this many wide before it wraps
   // F_EDGE moved up beside F_GUT_MIN, 16 September 2026: CW's derivation reads it,
   // and CW is declared far earlier. One definition, used by both.
-  // LIFT_K, unscaleX and unscaleY have moved ABOVE pillPlacement, which needs
-  // them: see the block there. Everything below still reads them unchanged.
+  // LIFT_K, unscaleX and unscaleY are declared a little above, where the deleted
+  // pillPlacement used to sit. Everything below still reads them unchanged.
   /* The level's own profile portrait sits at --pit-axis less half of --tp:
      51.8 - 20.16 = 31.6 on a phone. The frame column's LEFT EDGE lines up with
      it, so F_LEFT, which is the first column's CENTRE, is that plus half a card. */
@@ -3364,6 +3322,21 @@ export default function LineageMap({
                     transform={`translate(${n._x},${n._y})`}
                     style={allBlue ? { pointerEvents: "none" } : undefined}
                     onMouseEnter={() => { if (!bounded && !drag.current?.moved) follow(n); }}
+                    /* TOUCHED, and it has to mean one thing on two devices.
+                       POINTER ENTER shows the name and POINTER LEAVE takes it
+                       away, which is hover on a desktop and is also raised on a
+                       touch tap in every engine this ships on. POINTER DOWN shows
+                       it too, because a touch that lands without moving cannot be
+                       relied on to raise enter first, and it is what makes a press
+                       and hold read the name on a phone. POINTER UP does NOT hide
+                       it: on a phone leave arrives when the finger goes elsewhere,
+                       and hiding on release would make a tap flash the name and
+                       lose it before it could be read.
+                       Only the lift asks for any of this; every other mode keeps
+                       its standing pill and these handlers do nothing there. */
+                    onPointerEnter={circular ? () => setNamedNode(n._id) : undefined}
+                    onPointerDown={circular ? () => setNamedNode(n._id) : undefined}
+                    onPointerLeave={circular ? () => setNamedNode((cur) => (cur === n._id ? null : cur)) : undefined}
                     onClick={(e) => {
                       e.stopPropagation();
                       if (suppressClick.current) { suppressClick.current = false; return; }
@@ -3509,7 +3482,11 @@ export default function LineageMap({
                       style={(!(n.img && (placedImgs.has(n.img as string) || packed)) && seen.has(n._id)) ? {fill:(rarityTier ? RARITY_BAND[rarityTier].fg : "#ffffff"),...(INSTR_NAMES.has(breed.name)?{fontFamily:'"Luckiest Guy",system-ui,sans-serif',fontWeight:400}:{})} : INSTR_NAMES.has(breed.name)?{fontFamily:'"Luckiest Guy",system-ui,sans-serif',fontWeight:400}:undefined}>
                       {INSTR_NAMES.has(breed.name) ? (n.value ?? "") : `${share}%`}
                     </text>
-                    {(hasKids || !autoExposed.has(n._id)) && !(circular && n.name === breed.name) ? (() => {
+                    {/* ON THE LIFT THE PILL IS ON DEMAND: drawn only for the node
+                        being touched, and nothing at rest. Every other mode keeps
+                        its standing name, so this gate is the only difference.
+                        See namedNode for the measurement behind it. */}
+                    {(hasKids || !autoExposed.has(n._id)) && !(circular && n.name === breed.name) && (!circular || namedNode === n._id) ? (() => {
                       // The pill is drawn at nodePillWidth, the SAME width the
                       // placement spaces siblings on, so the picture and the spacing
                       // can never drift. It matches the pit pill exactly. (The root
@@ -3525,10 +3502,16 @@ export default function LineageMap({
                       // to INSIDE its top, so in the main pit it read as sitting ON the
                       // node. Restored to -r - 13 (clear above the node). Do NOT
                       // re-apply -r + 22 thinking the above-circle spot is a drift.
-                      const nmY = -r - 13;
-                      const off = circular ? pillPlacement.get(n._id) : undefined;
-                      const pcx = off ? off.ox : 0;
-                      const pcy = off ? off.oy : nmY;
+                      /* ONE POSITION FOR EVERY MODE NOW, 18 September 2026. The
+                         lift used to read a radial offset out of pillPlacement,
+                         which is deleted with this: with one name on screen at a
+                         time there is nothing to place AROUND, so the clearest
+                         spot is simply above the node like everywhere else. That
+                         also retires the viewport nudge, which was the last user
+                         of WALL_PAD's pill case and was itself comparing layout
+                         units against screen pixels until this week. */
+                      const pcx = 0;
+                      const pcy = -r - 13;
                       return (
                         /* 10% SMALLER, 2 September 2026 (owner).
 
