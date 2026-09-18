@@ -1134,6 +1134,41 @@ const CHAIN_MULT_STEP = 0.1; // each chum in the chain adds this to a multiplier
    nothing, but these are banked as they are made, so a chain that dies has
    still paid for the connections the player actually made. Deliberate. */
 const CHAIN_JOIN_POINTS = 10;
+/* THE JOIN NUMBER IS OUTLINED, NOT RECOLOURED (owner, 18 September 2026).
+
+   A join number always lands ON a circle, never on bare floor, and no flat ink
+   can read on every circle the pit holds. White measures 11.96 on the pit navy
+   but 1.98 on a held circle's sky blue and 1.44 on the very-common yellow: to
+   clear 4.5 on the navy an ink needs luminance at or above 0.3450, and to clear
+   it on the sky blue at or below 0.0676. The floor sits above the ceiling, so
+   there is no such colour. Same proof as the two pit fills.
+
+   SO IT TAKES A CASING, exactly as the chain path does: a navy stroke behind a
+   white core, painted stroke-first so the core keeps its full weight.
+     white core on the navy casing          11.96
+     navy casing on a held circle           6.03
+     navy casing on the very-common yellow  8.28
+     navy casing on a percentage chip       9.89
+   On purple and royal blue twins the casing all but vanishes (1.20 and 1.58),
+   and it does not matter: there the WHITE CORE is doing the work, at 9.93 and
+   7.56 against those same fills. On the pit floor the casing disappears into
+   the navy and the core reads at 11.96, which is what it always did. Every
+   ground the number can land on is covered by one of the two. */
+const FX_NUM_CASING = "#0a3a57";
+const FX_NUM_CASING_K = 3;     // casing width, in the same units as the 15px type
+/* THE JOIN SPARK. A connection throws a short burst of streaks in the chain's
+   own colour out of the circle it just reached, so a join is felt as well as
+   counted. It grows with the chain, because a twelfth link should feel like
+   more than a second one, and is then CAPPED HARD.
+
+   WHY THE CAP IS NOT NEGOTIABLE. Each spark is an SVG element created, stepped
+   and removed. Uncapped growth on a long chain puts 20 on the twelfth link,
+   around 160 over the chain and perhaps 60 to 80 alive at once. 20 is the
+   ceiling the owner set and the reason it exists. */
+const SPARK_MAX = 20;          // hard cap, whatever the chain reaches
+const SPARK_BASE = 4;          // the first connection
+const SPARK_STEP = 1.5;        // more per link after it
+const SPARK_LIFE_MS = 340;
 const CHAIN_COLLAPSE_MS = 450;
 /* THE JOIN CLOCK. Time from joining one card to joining the next, the clock
    starting on every join, the first card included. Run out and the chain dies
@@ -3717,7 +3752,14 @@ export default function BreedTree({
   const chainBonusRef = useRef<((cards: number[]) => { sum: number; mult: number; bonus: number }) | null>(null);
   // Pays CHAIN_JOIN_POINTS at the card just joined. Set inside the sim beside
   // the other scoring refs, because numAt lives there.
-  const chainJoinScoreRef = useRef<((i: number) => void) | null>(null);
+  /* TAKES A POINT, NOT AN INDEX (owner, 18 September 2026). It used to take the
+     joined card's index and look it up in chumBodiesRef, which is the CHUM CARD
+     array: a dog chain passed a circle index into it, so the flash either landed
+     on an unrelated chum card or, past the end of that array, did not appear at
+     all. Both kinds now hand over world coordinates, taken from the kind's own
+     at(), plus the colour the sparks should wear and how many connections the
+     chain has made. See ChainKind.at. */
+  const chainJoinScoreRef = useRef<((x: number, y: number, colour: string, links: number) => void) | null>(null);
   // Filled by an effect below. The spawn runs several seconds after the drop,
   // so it is always populated by the time it is read.
   const chumImagesRef = useRef<{ image: string; band: string; name: string }[]>([]);
@@ -6920,9 +6962,10 @@ export default function BreedTree({
       };
       // One connection made, paid on the spot and flashed at the card it
       // reached. The bridge holds that card's live world position.
-      chainJoinScoreRef.current = (i: number) => {
-        const b = chumBodiesRef.current[i];
-        if (b) numAt(b.x, b.y, CHAIN_JOIN_POINTS, performance.now());
+      chainJoinScoreRef.current = (x: number, y: number, colour: string, links: number) => {
+        const now2 = performance.now();
+        numAt(x, y, CHAIN_JOIN_POINTS, now2);
+        sparkAt(x, y, colour, links, now2);
       };
       chainBonusRef.current = (cards: number[]) => {
         const sum = cards.length * CHUM_COLLECT_POINTS;
@@ -7280,6 +7323,12 @@ export default function BreedTree({
         el.style.fontWeight = "400";
         el.style.fontSize = `${15 * fxScale}px`;
         el.style.fill = "#ffffff";
+        // The casing, painted BEFORE the fill so the white core keeps its full
+        // weight rather than being eaten from both sides. See FX_NUM_CASING.
+        el.style.stroke = FX_NUM_CASING;
+        el.style.strokeWidth = `${FX_NUM_CASING_K * fxScale}px`;
+        el.style.strokeLinejoin = "round";
+        el.setAttribute("paint-order", "stroke");
         el.style.pointerEvents = "none";
         fx.appendChild(el);
         numbers.push({ el, x, y, born: now });
@@ -7395,6 +7444,7 @@ export default function BreedTree({
       const drawNumbers = (now: number, view: View) => {
         const kk = SIZE / view[2];
         stepGoo(now, view);
+        stepSparks(now, view);
         for (let i = parts.length - 1; i >= 0; i--) {
           const pp = parts[i];
           const t = (now - pp.born) / pp.life;
@@ -7429,6 +7479,62 @@ export default function BreedTree({
 
       // a solid knock spends one of a badge's 20 charges (600ms cooldown, like
       // the pit); at zero it goes inert: blue, silent, ungrabbable, with a poof
+      /* THE SPARKS RIDE THEIR OWN LIST, not `parts` above. That loop is circles:
+         one radius, one straight fade, cx/cy per frame. A streak needs two ends,
+         a length that shortens as it dies and a direction taken from its own
+         travel, so it gets its own array and its own step, exactly as the goo
+         does and for the same reason. */
+      type Spark = { el: SVGLineElement; x: number; y: number; vx: number; vy: number; len: number; born: number; life: number };
+      const sparks: Spark[] = [];
+      const sparkAt = (x: number, y: number, colour: string, links: number, now2: number) => {
+        const fx2 = fxRef.current;
+        if (!fx2) return;
+        // Grows with the chain, then stops dead at the cap. See SPARK_MAX.
+        const n = Math.min(SPARK_MAX, Math.round(SPARK_BASE + links * SPARK_STEP));
+        // A later link also throws a little further and a little longer, so the
+        // burst reads as building even after the COUNT has hit its ceiling.
+        const grow = 1 + Math.min(links, 12) * 0.06;
+        for (let i = 0; i < n; i++) {
+          const a = Math.random() * Math.PI * 2;
+          const sp = (0.6 + Math.random() * 1.8) * 60 * fxScale * grow;
+          const el = document.createElementNS("http://www.w3.org/2000/svg", "line");
+          el.setAttribute("stroke", colour);
+          el.setAttribute("stroke-width", String(1.6 * fxScale));
+          el.setAttribute("stroke-linecap", "round");
+          el.style.pointerEvents = "none";
+          fx2.appendChild(el);
+          sparks.push({
+            el, x, y,
+            vx: Math.cos(a) * sp,
+            vy: Math.sin(a) * sp - 20 * fxScale, // a shade upward, like the poof
+            len: (4 + Math.random() * 5) * fxScale * grow,
+            born: now2,
+            life: SPARK_LIFE_MS * (0.7 + Math.random() * 0.6),
+          });
+        }
+      };
+      const stepSparks = (now: number, view: View) => {
+        if (sparks.length === 0) return;
+        const kk = SIZE / view[2];
+        for (let i = sparks.length - 1; i >= 0; i--) {
+          const sk = sparks[i];
+          const t = (now - sk.born) / sk.life;
+          if (t >= 1) { sk.el.remove(); sparks.splice(i, 1); continue; }
+          sk.x += sk.vx / 60;
+          sk.y += sk.vy / 60;
+          sk.vy += 3.2 * fxScale; // a little weight, so they arc rather than fly flat
+          const px2 = (sk.x - view[0]) * kk, py2 = (sk.y - view[1]) * kk;
+          const sp = Math.hypot(sk.vx, sk.vy) || 1;
+          // The streak lies along its own travel and shortens as it dies, so it
+          // reads as motion rather than as a scatter of sticks.
+          const len = sk.len * (1 - t);
+          sk.el.setAttribute("x1", String(px2));
+          sk.el.setAttribute("y1", String(py2));
+          sk.el.setAttribute("x2", String(px2 - (sk.vx / sp) * len));
+          sk.el.setAttribute("y2", String(py2 - (sk.vy / sp) * len));
+          sk.el.style.opacity = String(1 - t);
+        }
+      };
       const poofAt = (x: number, y: number, now2: number) => {
         const fx = fxRef.current;
         if (!fx) return;
@@ -9336,6 +9442,13 @@ export default function BreedTree({
       owns: (t: globalThis.Node) => boolean;              // is this press ours
       idAt: (cx: number, cy: number) => number | null;    // what is under a point
       geo: (i: number) => ChainSq | null;                 // where and how big
+      /* WHERE A THING IS, IN WORLD COORDINATES, or null if it has gone. geo()
+         above cannot answer this: it returns SCREEN geometry for the path, so it
+         moves with the zoom. The join flash and its sparks are drawn in the fx
+         layer, which is world space, and each kind keeps its position in a
+         different place: a chum card in chumBodiesRef, a dog circle on its node.
+         One method, so the score hook does not have to know which. */
+      at: (i: number) => { x: number; y: number } | null;
       gapShare: (a: ChainSq, b: ChainSq) => number;       // gap as a share of size
       /* A CASING UNDER THE CRISP CORE, or undefined for a kind that wants none.
          Drawn wider than the core and in a colour chosen to separate it from the
@@ -9382,6 +9495,9 @@ export default function BreedTree({
       owns: (t) => !!chumsGRef.current?.contains(t),
       idAt: cardAt,
       geo,
+      // The card's own bridge, which holds its live world position whatever the
+      // physics has done with it.
+      at: (i) => { const b = chumBodiesRef.current[i]; return b ? { x: b.x, y: b.y } : null; },
       gapShare: (a, b) => chainSquareGap(a, b) / (Math.max(a.h, b.h) * 2),
       slack: CHAIN_TOUCH_SLACK, // cards touch, exactly as they always have
       casing: undefined, // the cards keep their plain white line
@@ -9479,6 +9595,9 @@ export default function BreedTree({
         return { x: (n.x - v[0]) * k, y: (n.y - v[1]) * k, a: 0, h: n.r * k };
       },
       gapShare: chainCircleGapShare,
+      // A circle IS its node, so the node carries the position. Null once it has
+      // left the pit, which is what dogInPit already answers everywhere else.
+      at: (i) => { const n = dogNode(i); return dogInPit(n) ? { x: n.x, y: n.y } : null; },
       slack: DOG_CHAIN_SLACK, // no touching rule at all: see the constant
       casing: DOG_CHAIN_CASING,
       armPx: DOG_CHAIN_ARM_PX, // a short movement is a drag, a longer one a chain
@@ -9615,7 +9734,9 @@ export default function BreedTree({
         if (why) { killChain(ch); return; } // an illegal close kills, like any wrong card
         ch.closed = true;
         ch.canClose = false;
-        chainJoinScoreRef.current?.(i); // the closing link is a connection
+        // The closing link is a connection, paid at the card it closed on. A
+        // closed loop has cards.length connections, not one fewer.
+        { const q = K.at(i); if (q) chainJoinScoreRef.current?.(q.x, q.y, K.colour, cards.length); }
         return;
       }
       // A card already in the chain, and not the first: the chain dies. It used
@@ -9651,8 +9772,9 @@ export default function BreedTree({
       cards.push(i);
       ch.lastJoin = performance.now(); // the join clock restarts on every card
       // The connection just made, paid now and kept whatever becomes of the
-      // chain. The first card is not a connection and pays nothing.
-      chainJoinScoreRef.current?.(i);
+      // chain. The first card is not a connection and pays nothing. After the
+      // push, cards.length - 1 is the number of connections so far.
+      { const q = K.at(i); if (q) chainJoinScoreRef.current?.(q.x, q.y, K.colour, cards.length - 1); }
       K.joined?.(i); // the kind may want to know what is now held
     };
     const sweep = (ch: Chain, cx: number, cy: number) => {
