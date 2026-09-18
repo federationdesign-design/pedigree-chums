@@ -1914,6 +1914,27 @@ export default function LineageMap({
   const packProgress = totalNodes > 0 ? Math.max(0.5, Math.min(1, seen.size / totalNodes)) : 0.5;
   const allBlue = totalNodes > 0 && seen.size >= totalNodes; // every circle ticked
   const framesDone = frameTotal > 0 && filled.size >= frameTotal;
+  /* THE ONE FLAG THE RING STACK READS (owner, 18 September 2026).
+
+     WHY IT EXISTS. Three separate elements are drawn on top of one another at the
+     lifted circle's rim, and all three have independently needed to know that the
+     dog is finished. They were fixed one at a time, a week apart, each time
+     because the one above it was still writing its own colour and burying the
+     one below:
+       1. the root card's ring, which has read the pair since 16 September
+       2. the crisp rarity ring, fixed on 18 September, which is six pixels wider
+          and had been covering layer 1 since the rarity work shipped
+       3. the progress arc, fixed in this commit, which is the SAME radius and
+          width as layer 2 and had been covering both since 9 September
+     Audited at the same time: those three are the whole stack. rootRingW appears
+     nowhere else, and the only other hard-coded colour in the region belongs to
+     the instruction card's inner rect, which is not on this ring.
+
+     SO THE NEXT ELEMENT ADDED HERE HAS ONE OBVIOUS THING TO READ instead of a
+     hex to hard-code, which is the only way this stops happening. `packed` is in
+     it because packing the cards away is the other way to finish, and a layer
+     that took framesDone alone would disagree with the two that do not. */
+  const doneRing = framesDone || packed;
   /* THE TREE STEPS BACK ONCE EVERY FRAME IS FILLED, 16 September 2026 (owner:
      after all the images are placed and the Learn button has gone, fade the tree
      nodes out and leave the central chum square, so the framed images and their
@@ -2637,7 +2658,7 @@ export default function LineageMap({
                Both fill and stroke change: the fill is the ring band behind the
                picture, so leaving it yellow would draw a yellow halo inside a green
                rim. */
-            style={circular && ringColor ? { fill: (framesDone || packed) ? "#22c55e" : ringColor, stroke: (framesDone || packed) ? "#22c55e" : ringColor } : undefined} />
+            style={circular && ringColor ? { fill: doneRing ? "#22c55e" : ringColor, stroke: doneRing ? "#22c55e" : ringColor } : undefined} />
           {breed.image ? <image href={bust(breed.image)} x={-R} y={-R} width={R*2} height={R*2} clipPath={`url(#${clip})`} preserveAspectRatio="xMidYMid slice" /> : null}
           {/* Rarity ring + OUTWARD glow. The crisp ring is drawn LAST, on top, in the
               tier colour. Behind it sit three blurred bands OFFSET OUTWARD so each one's
@@ -2682,7 +2703,7 @@ export default function LineageMap({
                tier stops being shown at the moment the dog is ready. Accepted by
                the owner: the rarity band under the card still carries the tier,
                and ready is the more urgent message. */
-            const hex = (framesDone || packed) ? "#22c55e" : RARITY_BAND[rarityTier].bg;
+            const hex = doneRing ? "#22c55e" : RARITY_BAND[rarityTier].bg;
             const nHex = parseInt(hex.slice(1), 16);
             const cr = (nHex >> 16) & 255, cg = (nHex >> 8) & 255, cb = nHex & 255;
             const toHex = (r: number, g: number, b: number) => `#${((1 << 24) + (Math.round(r) << 16) + (Math.round(g) << 8) + Math.round(b)).toString(16).slice(1)}`;
@@ -2753,11 +2774,21 @@ export default function LineageMap({
               cy={0}
               r={R + rootRingW / 2}
               fill="none"
-              /* LEMON, NOT GREEN, 9 Sept 2026 (owner): the whole done state now
-                 reads as the pit's learnt colour rather than a green of its own.
-                 At 100% this ring covers the lifted circle's own rim, so it is
-                 what you actually see round a finished dog. */
-              stroke="#ffed00"
+              /* LEMON WHILE IT FILLS, GREEN WHEN IT IS FULL (owner, 18 September
+                 2026). The note this replaces said the done state reads as the
+                 pit's learnt colour rather than a green of its own, and then
+                 observed the thing that made it a bug: "At 100% this ring covers
+                 the lifted circle's own rim, so it is what you actually see round
+                 a finished dog." It is the TOP of the stack, so its lemon was
+                 burying the green of both layers underneath and sweeping it away
+                 as the arc drew on. That is what the owner saw: green at 2/2,
+                 then a yellow arc round it, then fully yellow.
+
+                 THE FILL STAYS LEMON, deliberately. The arc is the progress, and a
+                 part-green ring would say done before it is. It flips at the
+                 moment the last frame lands and holds, because nothing is painted
+                 after it. */
+              stroke={doneRing ? "#22c55e" : "#ffed00"}
               strokeWidth={rootRingW + 6}
               strokeLinecap="round"
               pathLength={1}
