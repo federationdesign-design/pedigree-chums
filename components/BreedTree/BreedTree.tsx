@@ -1169,6 +1169,24 @@ const SPARK_MAX = 20;          // hard cap, whatever the chain reaches
 const SPARK_BASE = 4;          // the first connection
 const SPARK_STEP = 1.5;        // more per link after it
 const SPARK_LIFE_MS = 340;
+/* THE FULL SWEEP BONUS (owner, 18 September 2026). Taking EVERY live circle of
+   a breed pays on top of the connections.
+
+   IT IS A BONUS, NOT A RULE. A chain of any length still clears: the strict
+   version, where missing one circle failed the whole chain, was measured and
+   rejected. 102 of the 166 lineage trees hold a breed with four or more copies
+   and one holds 74, so a worked pit would have punished the player for a state
+   they did not choose, hardest on the stock ancestors they meet most.
+
+   WHY 10 A CIRCLE. A sweep of N already pays CHAIN_JOIN_POINTS * (N-1) in
+   connections, so a flat 10 * N roughly doubles the chain and stays in the round
+   units already flashing on screen. A 3 sweep goes 20 to 50, a 6 sweep 50 to 110.
+
+   WHY IT STARTS AT 3. Most pits hold pairs: at the first pop layer the worst
+   breed has exactly two copies in 67 of the 166 trees. Paying at 2 would pay a
+   bonus for the default case rather than for a sweep. */
+const CHAIN_SWEEP_MIN = 3;
+const CHAIN_SWEEP_POINTS = CHAIN_JOIN_POINTS; // 10 a circle, deliberately the same unit
 const CHAIN_COLLAPSE_MS = 450;
 /* THE JOIN CLOCK. Time from joining one card to joining the next, the clock
    starting on every join, the first card included. Run out and the chain dies
@@ -1366,6 +1384,39 @@ type Node = HierarchyCircularNode<LineageNode>;
 // children into physics bodies.
 function isEcho(d: Node): boolean {
   return !!d.parent && d.data.name === d.parent.data.name;
+}
+
+/* WHAT IS LIVE IN THE PIT, BY BREED, ASKED IN ONE PLACE (owner, 18 September
+   2026).
+
+   THREE THINGS READ THIS and they must never disagree: the chain's startable
+   rule (a chain needs a twin), the resting single-circle fill (chSingle, which
+   says "this breed has no other copy in the pit"), and the full sweep bonus (has
+   the chain taken every live circle of the breed). They used to be two separate
+   walks of the same set with the same filters, agreeing by construction rather
+   than by sharing code, which is one careless edit away from the rule and the
+   colours saying different things.
+
+   THE FILTER IS THE PART THAT MATTERS: the owned set, less the hidden root, less
+   the echoes (a circle named after its own parent), less anything already
+   removed. pitCountable is that filter and nothing else may re-spell it.
+
+   MODULE SCOPE ON PURPOSE. As a closure in the component these wanted to be a
+   dependency of the chain effect, which is bound once and must stay that way, so
+   they take what they read as arguments instead and cannot capture anything
+   stale.
+
+   THE ANSWER IS LIVE, AND THAT IS THE POINT. See the long note on dogHasTwin: a
+   breed drops to one the moment its last duplicate is collected, and a pit
+   converges on uniqueness as it is played. Do not cache it, do not freeze it. */
+function pitCountable(n: Node, removed: Set<Node>): boolean {
+  return n.depth !== 0 && !isEcho(n) && !removed.has(n);
+}
+function liveBreedNodesIn(owned: Set<Node> | undefined, removed: Set<Node>, name: string): Node[] {
+  if (!owned) return [];
+  const out: Node[] = [];
+  for (const o of owned) if (o.data.name === name && pitCountable(o, removed)) out.push(o);
+  return out;
 }
 
 // Rarity tiers, keyed to how many distinct lineage TREES the dog appears in
@@ -3760,6 +3811,8 @@ export default function BreedTree({
      at(), plus the colour the sparks should wear and how many connections the
      chain has made. See ChainKind.at. */
   const chainJoinScoreRef = useRef<((x: number, y: number, colour: string, links: number) => void) | null>(null);
+  // Pays the full sweep bonus at a point. See CHAIN_SWEEP_POINTS.
+  const chainSweepScoreRef = useRef<((x: number, y: number, val: number) => void) | null>(null);
   // Filled by an effect below. The spawn runs several seconds after the drop,
   // so it is always populated by the time it is read.
   const chumImagesRef = useRef<{ image: string; band: string; name: string }[]>([]);
@@ -4968,7 +5021,7 @@ export default function BreedTree({
     if (fellRef.current) {
       const ownedB = pitBodiesRef.current?.owned;
       if (ownedB) for (const o of ownedB) {
-        if (o.depth === 0 || isEcho(o) || removedNodesRef.current.has(o)) continue;
+        if (!pitCountable(o, removedNodesRef.current)) continue; // the one filter: see liveBreedNodesIn
         pitBreedCount.set(o.data.name, (pitBreedCount.get(o.data.name) ?? 0) + 1);
       }
     }
@@ -6962,6 +7015,11 @@ export default function BreedTree({
       };
       // One connection made, paid on the spot and flashed at the card it
       // reached. The bridge holds that card's live world position.
+      // The sweep bonus, flashed where the chain started. Its own hook because it
+      // carries a value: the join hook always pays CHAIN_JOIN_POINTS.
+      chainSweepScoreRef.current = (x: number, y: number, val: number) => {
+        numAt(x, y, val, performance.now());
+      };
       chainJoinScoreRef.current = (x: number, y: number, colour: string, links: number) => {
         const now2 = performance.now();
         numAt(x, y, CHAIN_JOIN_POINTS, now2);
@@ -9478,6 +9536,11 @@ export default function BreedTree({
          rules are not: re-entering a circle already in the chain and crossing
          the path both still kill, for every kind. */
       blockKills: boolean;
+      /* HAS THIS CHAIN TAKEN EVERY LIVE CIRCLE OF ITS BREED? Undefined for a
+         kind that has no such idea, which is the chum cards: their circuit is
+         untouched by every part of this. A kind that answers true is COMPLETED
+         ON THE SPOT, without waiting for the finger to lift: see completeChain. */
+      sweptAll?: (ch: Chain) => boolean;
       settle: (ch: Chain) => string;                      // a valid release
       first?: (i: number) => void;                        // the chain's first thing
       joined?: (i: number) => void;                       // one more thing joined
@@ -9569,16 +9632,11 @@ export default function BreedTree({
 
        Asking it per PRESS, which is what the chain does, has none of this to
        think about: the answer only has to be true at the moment it is asked. */
-    const dogHasTwin = (n: Node): boolean => {
-      const owned = pitBodiesRef.current?.owned;
-      if (!owned) return false;
-      for (const o of owned) {
-        if (o === n || o.depth === 0 || isEcho(o) || o.data.name !== n.data.name) continue;
-        if (removedNodesRef.current.has(o)) continue;
-        return true;
-      }
-      return false;
-    };
+    // ONE WALK, SHARED WITH chSingle AND THE SWEEP BONUS: see liveBreedNodesIn.
+    // n itself is countable, so "has a twin" is a live count above one.
+    const liveBreed = (name: string) =>
+      liveBreedNodesIn(pitBodiesRef.current?.owned, removedNodesRef.current, name);
+    const dogHasTwin = (n: Node): boolean => liveBreed(n.data.name).length > 1;
     const DOG: ChainKind = {
       key: "dog circle",
       colour: DOG_CHAIN_COLOUR,
@@ -9658,15 +9716,34 @@ export default function BreedTree({
          are until it is completed, which is what closes them: see dogChainRef
          and the block in the layer's onRemove. The chain is remembered by NODE,
          not by index, because a pop re-packs the tree and the indices move. */
+      /* SURVIVORS ONLY, AND ASKED PER JOIN, NOT PER FRAME. A bomb that kills a
+         twin while the chain is being drawn shrinks the target; the player is
+         never failed for a circle that died after they passed it, because there
+         is no failure here at all, only a bonus that becomes reachable. */
+      sweptAll: (ch) => {
+        const first = dogNode(ch.cards[0]);
+        if (!first) return false;
+        const live = liveBreed(first.data.name);
+        if (live.length < DOG_CHAIN_MIN) return false;
+        const held = new Set(ch.cards.map(dogNode).filter(dogInPit));
+        return live.every((n) => held.has(n));
+      },
       settle: (ch) => {
         const at = ch.cards[0];
         const opened = dogNode(at);
         const others = ch.cards.slice(1).map(dogNode).filter(dogInPit);
         if (!opened) return "the first circle went missing, nothing opened";
+        /* MEASURED BEFORE THE OPEN, not after: dogOpen takes the first circle out
+           of the pit, so asking afterwards would be counting a set the chain has
+           already changed. See CHAIN_SWEEP_POINTS for the figure and the floor. */
+        const live = liveBreed(opened.data.name);
+        const held = new Set([opened, ...others]);
+        const swept = live.length >= CHAIN_SWEEP_MIN && live.every((n) => held.has(n));
         const ok = dogOpenRef.current?.(at) ?? false;
         if (!ok) return `could not open #${at}, ${opened.data.name}`;
+        if (swept) chainSweepScoreRef.current?.(opened.x, opened.y, live.length * CHAIN_SWEEP_POINTS);
         dogChainRef.current = { opened, others };
-        return `OPENED ${opened.data.name}, ${others.length} more waiting on it`;
+        return `OPENED ${opened.data.name}, ${others.length} more waiting on it${swept ? `, SWEPT all ${live.length} for ${live.length * CHAIN_SWEEP_POINTS}` : ""}`;
       },
       // The highlight follows the chain: every circle of this breed turns its
       // question mark yellow while the chain lives, and back when it is gone.
@@ -9776,6 +9853,13 @@ export default function BreedTree({
       // push, cards.length - 1 is the number of connections so far.
       { const q = K.at(i); if (q) chainJoinScoreRef.current?.(q.x, q.y, K.colour, cards.length - 1); }
       K.joined?.(i); // the kind may want to know what is now held
+      /* EVERY LIVE CIRCLE OF THE BREED IS NOW HELD, so there is nothing left to
+         join and nothing to wait for: the chain completes here rather than on the
+         release. THE FIRING IS THE FEEDBACK, which is why no "all held" path
+         state went in beside it: that state would live for a single frame and
+         could never be seen. sweep() already re-checks `chain` after every sample,
+         so a chain ending mid-gesture is a path this code already supports. */
+      if (K.sweptAll?.(ch)) completeChain(ch);
     };
     const sweep = (ch: Chain, cx: number, cy: number) => {
       const dx = cx - ch.px, dy = cy - ch.py;
@@ -10057,6 +10141,36 @@ export default function BreedTree({
       const held = chainHeldCollectRef.current;
       // a parked collect dies with the chain: the card stays armed
       if (held != null) chainHeldCollectRef.current = null;
+      ch.kind.over?.();
+      chain = null;
+    };
+    /* COMPLETES A CHAIN WHERE IT STANDS, with the finger still down (owner,
+       18 September 2026). Everything a release does, minus the things that only
+       make sense once the gesture has ended.
+
+       WHY NOT CALL end("released"). end keys its whole body off that string and
+       would also run the parked-collect branch with the finger still on the
+       glass. Nothing else in end assumes the pointer is up, only that the CHAIN
+       is over, which is exactly the part taken here.
+
+       WHAT HAPPENS TO THE FINGER. chain = null makes move() return on its first
+       line, so nothing more joins and no path is drawn. A second chain cannot
+       start from the same press: down() is the only place a chain is made and it
+       needs a fresh pointerdown. The chum gate stays open until the real
+       pointerup clears it, and that is correct: an open gate is what stops the
+       sim treating the continuing drag as a new grab. The real up() then finds
+       chain already null and does nothing.
+
+       NOTHING IS SCHEDULED HERE, same as killChain: the caller is inside the
+       frame loop or a pointer move and the running frame request carries the
+       collapse or the redraw. */
+    const completeChain = (ch: Chain) => {
+      const fail = judge(ch);
+      if (fail) startCollapse(ch);
+      else ch.kind.settle(ch);
+      // A chain that cleared takes the parked card with it, exactly as a release
+      // that cleared does.
+      chainHeldCollectRef.current = null;
       ch.kind.over?.();
       chain = null;
     };
