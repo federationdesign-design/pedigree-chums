@@ -4685,12 +4685,27 @@ export default function BreedTree({
        is the reason this had to move with them: what glows and what can be
        chained can never disagree.
 
-       IT IS NOISIER NOW, and deliberately so. On a duplicate-heavy level such as
-       Scottish Terrier nearly every circle glows, because nearly every circle
-       really can start a chain. Owner's ruling: ship it honest and look at it on
-       the device. If it reads as noise the answer is to light the circles of the
-       LIVE chain's breed instead, which is the scarce information once the gap
-       no longer matters, and dogChainBreedRef already carries it.
+       AND IT MOVES ONTO THE CHAIN'S OWN BREED WHILE ONE IS BEING DRAWN (owner,
+       18 September 2026). Two states, one layer:
+
+         AT REST, no chain. Every circle of a breed with a duplicate in the pit
+         wears a WHITE ring. It says "a chain could start here".
+
+         WHILE A CHAIN LIVES. Only the chain's own breed wears one, in the PATH'S
+         OWN COLOUR, DOG_CHAIN_COLOUR. It says "this is where you can connect",
+         which is the scarce information once the gap no longer matters: the
+         circles are scattered across the pit and the player has to find them.
+         Every other breed goes dark, which is what makes the answer readable.
+
+       ONE RING PER CIRCLE, WHICH IS WHY IT CANNOT DOUBLE UP. The highlight is
+       not a second layer laid over the resting glow, it is the same ring
+       changing colour, so a circle that glows white at rest and yellow in a
+       chain never wears two. Any future highlight belongs here too, for the same
+       reason.
+
+       IT IS NOISY AT REST, and deliberately so. On a duplicate-heavy level such
+       as Scottish Terrier nearly every circle glows, because nearly every circle
+       really can start a chain.
 
        IT IS THE CHAIN'S GLOW, NOT A SECOND ONE: the same bt-chain-glow filter
        the path's own glow group uses. A blurred copy of the ring is drawn on a
@@ -4706,7 +4721,10 @@ export default function BreedTree({
     const tg = twinGlowGRef.current;
     if (tg) {
       const owned = pitBodiesRef.current?.owned;
-      const rings: { x: number; y: number; r: number; w: number }[] = [];
+      const rings: { x: number; y: number; r: number; w: number; col: string }[] = [];
+      // The breed of the chain being drawn, or null. It decides BOTH which
+      // circles glow and what colour they glow: see the note above.
+      const glowBreed = dogChainBreedRef.current;
       if (owned) {
         const byBreed = new Map<string, Node[]>();
         for (const o of owned) {
@@ -4733,8 +4751,13 @@ export default function BreedTree({
         for (const list of byBreed.values()) {
           // One of its kind is not a duplicate, so it cannot start a chain.
           if (list.length < 2) continue;
+          // A chain is being drawn, and this is not its breed: it is not a place
+          // the player can connect to, so it goes dark for as long as the chain
+          // lasts and comes straight back when it ends.
+          if (glowBreed && list[0].data.name !== glowBreed) continue;
+          const col = glowBreed ? DOG_CHAIN_COLOUR : "#ffffff";
           for (const A of list) {
-            rings.push({ x: (A.x - v[0]) * k, y: (A.y - v[1]) * k, r: drawR(A, v, k), w: strokeWidthFor(A) * strokeK(v) });
+            rings.push({ x: (A.x - v[0]) * k, y: (A.y - v[1]) * k, r: drawR(A, v, k), w: strokeWidthFor(A) * strokeK(v), col });
           }
         }
       }
@@ -4742,7 +4765,6 @@ export default function BreedTree({
       while (tg.children.length < rings.length) {
         const el = document.createElementNS("http://www.w3.org/2000/svg", "circle");
         el.style.fill = "none";
-        el.style.stroke = "#ffffff";
         tg.appendChild(el);
       }
       rings.forEach((rg, ri) => {
@@ -4751,6 +4773,10 @@ export default function BreedTree({
         el.setAttribute("cy", String(rg.y));
         el.setAttribute("r", String(rg.r));
         el.style.strokeWidth = String(Math.max(1, rg.w * 2.2));
+        // The ring carries its own colour now: white at rest, the path's colour
+        // while a chain is being drawn. Rings are reused as the list grows and
+        // shrinks, so this is set every frame rather than once at creation.
+        el.style.stroke = rg.col;
       });
     }
   }
