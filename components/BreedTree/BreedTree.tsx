@@ -3325,6 +3325,11 @@ export default function BreedTree({
                poofs where it stood */
   const nodesRef = useRef<Node[]>([]);
   const dogChainBreedRef = useRef<string | null>(null);
+  /* REMOVE BEFORE LAUNCH, ?dogchain=1. The circles IN the chain being drawn. The
+     breed above says which circles to highlight; this says which are actually
+     held, and the frame writer turns their outlines white while they are. Held
+     by node, like the remembered chain, so a re-pack cannot mix them up. */
+  const dogChainNodesRef = useRef<Set<Node>>(new Set());
   const dogChainRef = useRef<{ opened: Node; others: Node[] } | null>(null);
   const dogStarterAtRef = useRef<((cx: number, cy: number) => boolean) | null>(null);
   // REMOVE BEFORE LAUNCH, ?dragdebug=1. The same question as dogStarterAt, asked
@@ -4542,6 +4547,18 @@ export default function BreedTree({
       // way for it to half-apply.
       const isWordNode = fellRef.current && d.depth === 1;
       const c = wrap?.children[0] as SVGCircleElement | undefined;
+      /* REMOVE BEFORE LAUNCH, ?dogchain=1. A CIRCLE IN THE CHAIN WEARS WHITE.
+         Its own depth colour comes back the moment the chain ends, because this
+         only ever sets an inline stroke and then clears it again. Written on the
+         change alone, tracked on the element, so a still pit costs nothing. The
+         question mark does the same thing a few lines below. */
+      if (c) {
+        const want = dogChainNodesRef.current.has(d) ? "1" : "0";
+        if (c.dataset.chained !== want) {
+          c.dataset.chained = want;
+          c.style.stroke = want === "1" ? "#ffffff" : "";
+        }
+      }
       if (c) {
         c.setAttribute("display", isWordNode ? "none" : "inline");
         c.setAttribute("transform", `translate(${tx},${ty})`);
@@ -7782,6 +7799,7 @@ export default function BreedTree({
         // circle that no longer exists.
         dogChainRef.current = null;
         dogChainBreedRef.current = null;
+        dogChainNodesRef.current = new Set();
         if (chumFlyRaf.current != null) { cancelAnimationFrame(chumFlyRaf.current); chumFlyRaf.current = null; }
         chumFlyRef.current = new Map();
         setArmedChum(null);
@@ -8225,6 +8243,7 @@ export default function BreedTree({
       joinBlock: (ch: Chain, i: number) => string | null; // the kind's own rule
       settle: (ch: Chain) => string;                      // a valid release
       first?: (i: number) => void;                        // the chain's first thing
+      joined?: (i: number) => void;                       // one more thing joined
       over?: () => void;                                  // the chain is gone
       // A press that finds nothing under it cannot start this kind. The cards
       // start on the press itself and do not care; the circles must not, or a
@@ -8380,8 +8399,22 @@ export default function BreedTree({
       },
       // The highlight follows the chain: every circle of this breed turns its
       // question mark yellow while the chain lives, and back when it is gone.
-      first: (i) => { dogChainBreedRef.current = dogNode(i)?.data.name ?? null; },
-      over: () => { dogChainBreedRef.current = null; },
+      /* The breed drives the question marks, the node set drives the outlines.
+         Both are cleared when the chain ends, so every circle goes back to the
+         mark and the stroke colour it had. */
+      first: (i) => {
+        const n = dogNode(i);
+        dogChainBreedRef.current = n?.data.name ?? null;
+        dogChainNodesRef.current = new Set(n ? [n] : []);
+      },
+      joined: (i) => {
+        const n = dogNode(i);
+        if (n) dogChainNodesRef.current.add(n);
+      },
+      over: () => {
+        dogChainBreedRef.current = null;
+        dogChainNodesRef.current = new Set();
+      },
       needsHit: true,
     };
     const KINDS: ChainKind[] = [CARD, DOG];
@@ -8488,6 +8521,7 @@ export default function BreedTree({
       // The connection just made, paid now and kept whatever becomes of the
       // chain. The first card is not a connection and pays nothing.
       chainJoinScoreRef.current?.(i);
+      K.joined?.(i); // the kind may want to know what is now held
       note = `joined #${i}`;
     };
     const sweep = (ch: Chain, cx: number, cy: number) => {
@@ -8928,6 +8962,7 @@ export default function BreedTree({
       // so it must not outlive the listeners that answer it.
       dogStarterAtRef.current = null;
       dogChainBreedRef.current = null;
+      dogChainNodesRef.current = new Set();
       if (actx) void actx.close().catch(() => { /* already closed */ });
     };
   }, []);
