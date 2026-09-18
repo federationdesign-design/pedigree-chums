@@ -151,7 +151,19 @@ export const RARITY_BAND: Record<"extremelyRare" | "rare" | "uncommon" | "common
   rare:          { bg: "#2547c4", fg: "#ffffff", label: "RARE" },           // royal blue
   uncommon:      { bg: "#5dbf86", fg: "#000000", label: "UNCOMMON" },       // green
   common:        { bg: "#f47421", fg: "#000000", label: "COMMON" },         // orange
-  veryCommon:    { bg: "#fcee23", fg: "#000000", label: "VERY COMMON" },    // yellow
+  /* #fcee23 -> #ffd23e, 18 September 2026 (owner). The lemon becomes the site's
+     own --yellow, so the top tier sits in the palette rather than beside it.
+     ALL FIVE READERS MOVE TOGETHER and that is intended, audited before the
+     change: the lifted circle's crisp rarity ring and its three glow bands, the
+     rarity band under the lifted card, seenFill on every node tapped on the
+     lifted layer, and in the mini pit an available twin's fill and the ink its
+     mark takes from fg. The lifted layer's dominant colour changes with it,
+     because seenFill is most of the tree on a very common dog.
+     BLACK STAYS AS fg: measured 14.54:1 on the new colour against 17.39 on the
+     old, so the label is still comfortably readable.
+     The dog chain path moved OFF #ffd23e in the commit beside this one, or it
+     would have been drawn in exactly the colour of the circles it joins. */
+  veryCommon:    { bg: "#ffd23e", fg: "#000000", label: "VERY COMMON" },    // site yellow
 };
 // How long the rarity ring takes to draw itself on around the lifted circle, and
 // how long it waits first. The lift's own fade is 0.2s, so the draw holds back
