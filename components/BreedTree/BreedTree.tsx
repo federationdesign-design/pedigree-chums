@@ -6439,7 +6439,15 @@ export default function BreedTree({
         const targets: { x: number; y: number; go: () => void }[] = [];
         for (const b of all) {
           if (b.n || !b.mb || !b.mbIn || b.held) continue;
-          targets.push({ x: b.x, y: b.y, go: () => { poofAt(b.x, b.y, performance.now()); Composite.remove(world, b.mb); b.mbIn = false; setDeadBadges((p) => new Set(p).add(b.idx)); } });
+          /* `blown` IS NOT OPTIONAL HERE (owner, 18 September 2026). This killed a
+             chip by removing the body, clearing mbIn and hiding the sprite, and
+             never set `blown`. The physics loop re-adds anything matching
+             `!held && !mbIn && !blown` (see the block by wakeBody), so every chip
+             this chain took was put straight back into the world on the very next
+             step: invisible, solid, and holding its space open for the rest of the
+             round. detonate and killChained both set it for exactly this reason
+             and this one path did not. */
+          targets.push({ x: b.x, y: b.y, go: () => { poofAt(b.x, b.y, performance.now()); Composite.remove(world, b.mb); b.mbIn = false; b.blown = true; setDeadBadges((p) => new Set(p).add(b.idx)); } });
         }
         for (const [list, kind] of [[rodBodiesRef.current, "rod"], [pillBodiesRef.current, "pill"], [toyBodiesRef.current, "toy"]] as any[]) {
           for (const pr of list) if (!pr.dead && pr.mb) targets.push({ x: pr.x, y: pr.y, go: () => killProp(pr, kind, performance.now()) });
