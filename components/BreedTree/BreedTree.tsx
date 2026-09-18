@@ -9738,6 +9738,23 @@ export default function BreedTree({
          rules are not: re-entering a circle already in the chain and crossing
          the path both still kill, for every kind. */
       blockKills: boolean;
+      /* DOES A LINK CROSSING THE PATH KILL THIS KIND (owner, 18 September 2026).
+
+         The chum cards keep it, and it is half of what their circuit means: a loop
+         that crosses itself is not a loop the player drew round anything, so the
+         rule is the shape rule and it stays exactly as it is.
+
+         The circles do not. A dog chain reaches across a packed pit with no
+         touching rule at all (DOG_CHAIN_SLACK) and a magnet that pulls circles in
+         from beyond the finger, so a long run over a cluster crossed its own path
+         constantly and died for a shape nobody was trying to draw. It is scoped
+         here for the same reason slack and blockKills are: one field, both kinds,
+         no branch on the kind's key.
+
+         closeBlock's own crossing test is NOT gated, and does not need to be: it
+         returns early for a kind that does not close, and the circles are an open
+         run. Gating it would be dead code pretending to be a rule. */
+      crossKills: boolean;
       /* HAS THIS CHAIN TAKEN EVERY LIVE CIRCLE OF ITS BREED? Undefined for a
          kind that has no such idea, which is the chum cards: their circuit is
          untouched by every part of this. A kind that answers true is COMPLETED
@@ -9771,6 +9788,7 @@ export default function BreedTree({
       startable: () => true,
       joinBlock: () => null, // touching and no crossing is the whole rule
       blockKills: true, // the cards are unchanged: a wrong card kills the chain
+      crossKills: true, // and so does a link across the path: the loop is the point
       settle: (ch) => {
         const cards = [...ch.cards];
         chainClearRef.current?.(cards);
@@ -9996,6 +10014,7 @@ export default function BreedTree({
          this kind's own, and neither is touched here. The chum cards are not
          touched at all. */
       blockKills: false,
+      crossKills: false, // an open run over a packed pit may cross itself freely
       /* THE FIRST CIRCLE OPENS, and only that one. The others stay where they
          are until it is completed, which is what closes them: see dogChainRef
          and the block in the layer's onRemove. The chain is remembered by NODE,
@@ -10148,9 +10167,13 @@ export default function BreedTree({
         return;
       }
       // Every earlier segment except the last one, which ends where this starts.
-      for (let s = 0; s < cards.length - 2; s++) {
-        const p = K.geo(cards[s]), q = K.geo(cards[s + 1]);
-        if (p && q && chainSegmentsCross(p, q, a, b)) { killChain(ch); return; } // it would cross the path
+      // Skipped whole for a kind that may cross: see ChainKind.crossKills. The
+      // re-entry kill above is NOT part of this and still applies to both kinds.
+      if (K.crossKills) {
+        for (let s = 0; s < cards.length - 2; s++) {
+          const p = K.geo(cards[s]), q = K.geo(cards[s + 1]);
+          if (p && q && chainSegmentsCross(p, q, a, b)) { killChain(ch); return; } // it would cross the path
+        }
       }
       cards.push(i);
       ch.lastJoin = performance.now(); // the join clock restarts on every card
