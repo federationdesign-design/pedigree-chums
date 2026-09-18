@@ -2869,8 +2869,32 @@ export default function LineageMap({
                         ring and the figure had to move to navy for exactly this
                         reason when that chip went lemon on 31 Aug. .bandFill eases
                         the swap. */}
-                    <rect className={styles.bandFill} x={-R * 1.6} y={bandTop} width={R * 3.2} height={R * 1.6} style={{ fill: framesDone ? "#ffed00" : band.bg }} />
-                    <text className={styles.bandFill} x={labelX} y={labelY} textAnchor="middle" dominantBaseline="central" style={{ fontFamily: '"Luckiest Guy", system-ui, sans-serif', fontSize: fs, fontWeight: 400, fill: framesDone ? "var(--navy, #0a3a57)" : band.fg }}>{band.label}</text>
+                    {/* GREEN WHEN THE DOG IS DONE, 18 September 2026 (owner), the
+                        same #22c55e the three ring layers take and from the same
+                        doneRing flag, so the card and its rim finish together.
+                        `packed` comes with the flag, which the band did not read
+                        before: packing the cards away is the other way to finish
+                        and a band that took framesDone alone would disagree with
+                        the rim it sits under.
+
+                        IT ALREADY CHANGED ON COMPLETION and the owner could not
+                        see it. The done colour was #ffed00 lemon, and since very
+                        common became #ffd23e that is two nearly identical yellows,
+                        so on the top tier the band appeared to keep its rarity
+                        colour. The same trap the ring fell into twice: the fix was
+                        invisible because the symptom matched the bug.
+
+                        THE TEXT STAYS NAVY, and the owner asked for white. White
+                        on #22c55e measures 2.28:1, which fails: it is worse than
+                        the white-on-light-blue at 1.98 and the white-on-yellow at
+                        1.44 that were both rejected earlier in this sequence.
+                        Navy is 5.25:1 and is what the done band already used. If
+                        white is wanted, the band's green has to darken to about
+                        #15803d (5.02) or #166534 (7.13), and it would then no
+                        longer match the rings. Flagged to the owner rather than
+                        shipped unreadable. */}
+                    <rect className={styles.bandFill} x={-R * 1.6} y={bandTop} width={R * 3.2} height={R * 1.6} style={{ fill: doneRing ? "#22c55e" : band.bg }} />
+                    <text className={styles.bandFill} x={labelX} y={labelY} textAnchor="middle" dominantBaseline="central" style={{ fontFamily: '"Luckiest Guy", system-ui, sans-serif', fontSize: fs, fontWeight: 400, fill: doneRing ? "var(--navy, #0a3a57)" : band.fg }}>{band.label}</text>
                   </g>
                 </g>
               </g>
