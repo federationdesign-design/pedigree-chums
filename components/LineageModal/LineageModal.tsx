@@ -481,7 +481,7 @@ export default function LineageModal({ name, image, character, lineage, fromRect
      changes. Null until the pit has counted once, so nothing shows before a
      round is under way. See onCircleCount in BreedTree for what it counts and
      why it deliberately does not read the round-won test's own state. */
-  const [circleCount, setCircleCount] = useState<{ got: number; tot: number } | null>(null);
+  const [circleCount, setCircleCount] = useState<{ left: number; tot: number } | null>(null);
   /* THE PIT IS MID-GESTURE: a dog chain is being drawn, or a circle is up on the
      learn layer. The slow motion and shake controls fade out of the way while it
      is true. BreedTree derives it every frame from live state rather than
@@ -696,8 +696,12 @@ export default function LineageModal({ name, image, character, lineage, fromRect
             round. The total climbs as circles pop, which is the frames counter's
             behaviour too and is the owner's ruling. */}
         {running && circleCount && circleCount.tot > 0 && (
-          <div className={css.circleCount} aria-label={`${circleCount.got} of ${circleCount.tot} dogs collected`}>
-            {circleCount.got}/{circleCount.tot}
+          /* COUNTS DOWN, 18 September 2026 (owner): how many are left to collect,
+             not how many have been. The total stays in the label for a screen
+             reader, where "3 left of 12" is the useful sentence and a bare 3 is
+             not. It only falls on an actual completion: see onCircleCount. */
+          <div className={css.circleCount} aria-label={`${circleCount.left} of ${circleCount.tot} dogs left to collect`}>
+            {circleCount.left}
           </div>
         )}
       </div>
@@ -763,7 +767,7 @@ export default function LineageModal({ name, image, character, lineage, fromRect
              never read it. */
           currentScore={score}
           portraitAnchor={portraitAnchor}
-          onCircleCount={(got, tot) => setCircleCount((p) => (p && p.got === got && p.tot === tot ? p : { got, tot }))}
+          onCircleCount={(left, tot) => setCircleCount((p) => (p && p.left === left && p.tot === tot ? p : { left, tot }))}
           onPitBusy={setPitBusy}
           registerShake={(fn) => { shakeFnRef.current = fn; }}
           registerSlowmo={(fn) => { slowmoFnRef.current = fn; }}

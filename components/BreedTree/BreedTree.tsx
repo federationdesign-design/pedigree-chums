@@ -2194,19 +2194,25 @@ export default function BreedTree({
   /* THE DOG CIRCLE COUNTER, 18 September 2026 (owner). Collected out of the
      total that has been in the pit, for the shell to show under the lives.
 
-     IT COUNTS WHAT THE PIT DRAWS, deliberately NOT the owned set the round-won
-     test reads. `owned` only ever grows, nothing prunes it, and it can hold a
-     node no route will remove, so a counter built on it could never reach full
-     on a level with one of those. This one can, and that is the point: a FULL
-     COUNTER WHILE THE ROUND IS STILL RUNNING is the signal that a node is stuck
-     in owned, which is what ?windiag=1 then names.
+     IT COUNTS COMPLETIONS, 18 September 2026 (owner), and counts DOWN. It used
+     to count what the pit DREW, which included a held circle, so the number fell
+     the instant a dog was picked up and climbed back if the player backed out.
+     A lifted circle now holds its place until the dog is finished.
 
-     A CIRCLE LIFTED TO THE LEARN LAYER COUNTS AS GONE, and returns to the count
-     if the player backs out. It is hidden rather than removed, but the counter
-     reports what is IN THE PIT and a circle up on the layer is not; the pit
-     really does get it back, so the number going up and then down again is
-     honest rather than a flicker. It is also what makes the diagnostic above
-     work, since a stuck node is a held one.
+     WHAT THE DIAGNOSTIC IS NOW, and the history matters because the old one is
+     gone. This counter was built when the round-won test still read
+     owned.every(removed) and ignored `held`, while the counter read removed OR
+     held: the two disagreed, so a stuck held node made the counter full while the
+     test stayed false, and that gap was the signal. Option B then made the win
+     test exclude `held` as well, at which point the two became the same condition
+     inverted and the signal quietly stopped existing. It had been dead for
+     several commits.
+     Counting completions brings back a sharper one:
+       COUNTER ABOVE ZERO WHEN THE ROUND IS WON means a circle left the pit and
+       was never completed, which is the stuck-node signature after option B.
+       COUNTER AT ZERO AND THE ROUND CARRIES ON means everything was completed
+       but the win test did not fire, or fired and was swallowed.
+     Either way ?windiag=1 names the nodes.
 
      Fired only when either number CHANGES, the same written-on-change pattern
      the chain outline uses, so a still pit costs nothing. */
@@ -2227,7 +2233,7 @@ export default function BreedTree({
      a blur and a stale chain, and the effect's own teardown clears the ref
      outright. But this does not depend on that list being complete. */
   onPitBusy?: (busy: boolean) => void;
-  onCircleCount?: (collected: number, total: number) => void;
+  onCircleCount?: (left: number, total: number) => void;
   onScore?: (v: number) => void;
   /* The live score, so the chum tree layer can show it. One-way in: BreedTree
      never sets it, it only passes it through. */
@@ -3618,7 +3624,7 @@ export default function BreedTree({
   const dogCloseRef = useRef<((n: Node, from?: { x: number; y: number }) => void) | null>(null);
   // The last pair reported by the counter, so the callback fires on a CHANGE and
   // not sixty times a second. See onCircleCount for what the numbers mean.
-  const circleCountRef = useRef<{ got: number; tot: number }>({ got: -1, tot: -1 });
+  const circleCountRef = useRef<{ left: number; tot: number }>({ left: -1, tot: -1 });
   // The last busy answer reported, and whether a circle is up on the learn layer.
   // learnNode is state and the frame writer holds an older closure, so the effect
   // below mirrors it into a ref the writer can read safely. See onPitBusy.
@@ -5104,18 +5110,39 @@ export default function BreedTree({
     if (fellRef.current) {
       const ownedC = pitBodiesRef.current?.owned;
       if (ownedC) {
-        let tot = 0, got = 0;
+        /* COMPLETED ONLY, 18 September 2026 (owner). It used to count a circle as
+           gone the moment its body left the pit, which included `held`, so the
+           number dropped the instant you picked a dog up and came back if you
+           backed out of the learn layer. It holds now until the dog is actually
+           finished.
+
+           removedNodes IS EXACTLY THAT SET. Its two call sites are both in the
+           learn layer's onRemove: the circle the player completed, and each
+           circle a dog chain closes behind it. Nothing else adds to it, so
+           counting it is counting completions.
+
+           AND IT IS THE ONLY WAY OUT TODAY. A bomb never destroys a circle, the
+           escape net teleports rather than removes, and backing out clears `held`
+           and puts the circle back. So a circle leaving by some other route still
+           coming off the count is a CONTRACT rather than code: any future route
+           that takes a circle out of play must add it to removedNodes, which is
+           the same contract the round-won test already depends on. If one is
+           added that does not, the counter and the win test break together rather
+           than drifting apart, which is the safer failure.
+
+           IT ALSO DROPS THE find() PER CIRCLE, which was the only per-frame cost
+           in this block and was O(n) inside an O(n) loop. */
+        let tot = 0, done = 0;
         for (const o of ownedC) {
           if (o.depth === 0 || isEcho(o)) continue;
           tot++;
-          if (removedNodesRef.current.has(o)) { got++; continue; }
-          const ob = pitBodiesRef.current?.find(o) as { held?: boolean } | undefined;
-          if (ob?.held) got++;
+          if (removedNodesRef.current.has(o)) done++;
         }
+        const left = tot - done;
         const prev = circleCountRef.current;
-        if (prev.got !== got || prev.tot !== tot) {
-          circleCountRef.current = { got, tot };
-          onCircleCount?.(got, tot);
+        if (prev.left !== left || prev.tot !== tot) {
+          circleCountRef.current = { left, tot };
+          onCircleCount?.(left, tot);
         }
       }
       /* IS THE PIT BUSY WITH A GESTURE. Recomputed here, every frame, from the
