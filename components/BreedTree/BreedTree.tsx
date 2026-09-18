@@ -3623,6 +3623,19 @@ export default function BreedTree({
     return () => { try { if (t) window.clearInterval(t); if (d) d.remove(); } catch {} };
   }, []);
   const spinDiagRef = useRef<string[]>([]);
+  /* THE LAST CHAIN DEATH, written by the chain effect and read by the sim effect's
+     sampler. A ref rather than a local because the two live in DIFFERENT effects:
+     spinLastBlast can be a local inside the sim effect because detonate is in there
+     with it, and killChain is not. Behind the flag at the write, so a normal round
+     never touches it. */
+  const spinLastChainRef = useRef("");
+  // The flag itself, read once. The sim effect computes its own copy because it is
+  // in scope there; the chain effect is a different effect and needs this.
+  const spinOnRef = useRef(false);
+  useEffect(() => {
+    try { spinOnRef.current = new URLSearchParams(window.location.search).get("spindiag") === "1"; }
+    catch { spinOnRef.current = false; }
+  }, []);
   useEffect(() => {
     let d: HTMLDivElement | null = null;
     let t = 0;
@@ -8782,7 +8795,9 @@ export default function BreedTree({
                so the two can be seen to agree. */
             `chain breed ${dogChainBreedRef.current ?? "none"}  held ${dogChainNodesRef.current.size}`,
             inked,
-            // The last detonation, standing until the next. Empty before the first.
+            // The last chain death and the last detonation, each standing until the
+            // next. Empty before the first of either.
+            spinLastChainRef.current || "CHAIN none yet",
             spinLastBlast || "BLAST none yet",
           ];
           spinMade = 0;
@@ -10220,7 +10235,7 @@ export default function BreedTree({
            wrong card, it is a gesture that has not gone anywhere yet, so that
            one only refuses. */
         if (why && cards.length < K.minCards) return; // too short to be a loop: refuse, do not kill
-        if (why) { killChain(ch); return; } // an illegal close kills, like any wrong card
+        if (why) { killChain(ch, `illegal close: ${why}`); return; } // an illegal close kills, like any wrong card
         ch.closed = true;
         ch.canClose = false;
         // The closing link is a connection, paid at the card it closed on. A
@@ -10230,7 +10245,7 @@ export default function BreedTree({
       }
       // A card already in the chain, and not the first: the chain dies. It used
       // to refuse and carry on.
-      if (cards.includes(i)) { killChain(ch); return; } // already in the chain
+      if (cards.includes(i)) { killChain(ch, `RE-ENTERED #${i}, already at position ${cards.indexOf(i)}`); return; } // already in the chain
       if (K.busy(i)) return; // being collected: not a wrong card, just not available
       if (last === undefined) {
         cards.push(i);
@@ -10242,7 +10257,7 @@ export default function BreedTree({
          no means is the kind's too: the cards die on it, the circles simply do
          not join and the finger carries on over. See blockKills. */
       const own = K.joinBlock(ch, i);
-      if (own) { if (K.blockKills) killChain(ch); return; }
+      if (own) { if (K.blockKills) killChain(ch, `own rule: ${own}`); return; }
       const a = K.geo(last), b = K.geo(i);
       if (!a || !b) return;
       const share = K.gapShare(a, b);
@@ -10250,7 +10265,7 @@ export default function BreedTree({
       // to refuse and carry on, which read as the gesture being ignored.
       // A kind whose slack is Infinity never reaches this, by design.
       if (share > K.slack) {
-        killChain(ch); // a stray card, not touching the one before it
+        killChain(ch, `NOT TOUCHING #${last}-#${i}, gap ${Math.round(share * 100)}% over slack ${K.slack}`); // a stray card, not touching the one before it
         return;
       }
       // Every earlier segment except the last one, which ends where this starts.
@@ -10259,7 +10274,7 @@ export default function BreedTree({
       if (K.crossKills) {
         for (let s = 0; s < cards.length - 2; s++) {
           const p = K.geo(cards[s]), q = K.geo(cards[s + 1]);
-          if (p && q && chainSegmentsCross(p, q, a, b)) { killChain(ch); return; } // it would cross the path
+          if (p && q && chainSegmentsCross(p, q, a, b)) { killChain(ch, `CROSSED the path, link #${cards[s]}-#${cards[s + 1]}`); return; } // it would cross the path
         }
       }
       cards.push(i);
@@ -10599,7 +10614,18 @@ export default function BreedTree({
        join clock, and by the rules that end a chain outright. The caller is
        inside the frame loop or a pointer move, so the running frame request
        carries the collapse; nothing is scheduled here. */
-    const killChain = (ch: Chain) => {
+    const killChain = (ch: Chain, why: string) => {
+      /* WHY IT DIED, RECORDED (owner, 18 September 2026). A chain that dies
+         mid-gesture collapses over CHAIN_COLLAPSE_MS and looks EXACTLY THE SAME
+         whatever killed it, and killChain took no reason at all, so nothing
+         anywhere said which rule had fired. On a long chain that is a lot of
+         motion in under half a second and no information in any of it.
+
+         Standing until the next one, exactly as spinLastBlast does: a death is an
+         event and the sampler runs on its own clock. Costs one string per death
+         and only with the flag. `end()` already carried a reason for a RELEASE,
+         which is the other half of the same question and is recorded beside it. */
+      if (spinOnRef.current) spinLastChainRef.current = `CHAIN died: ${why}  after ${ch.cards.length} circles`;
       startCollapse(ch);
       const held = chainHeldCollectRef.current;
       // a parked collect dies with the chain: the card stays armed
@@ -10680,6 +10706,11 @@ export default function BreedTree({
       const isTap = n < 2;
       if (ch && why === "released" && !isTap) {
         const fail = judge(ch);
+        // The other half of the same question: a chain that died at the RELEASE
+        // rather than mid-gesture. Same line, so one reading covers both.
+        if (spinOnRef.current) spinLastChainRef.current = fail
+          ? `CHAIN failed at release: ${fail}  after ${n} circles`
+          : `CHAIN cleared on release, ${n} circles`;
         if (fail) {
           startCollapse(ch);
         } else {
@@ -10733,7 +10764,7 @@ export default function BreedTree({
       const idle = now - chain.lastJoin;
       const allow = chainAllowanceMs(chain.cards.length - 1);
       if (!chain.closed && !chain.dead && chain.cards.length && idle > allow) {
-        killChain(chain); // the join clock ran out
+        killChain(chain, `JOIN CLOCK ran out, idle ${Math.round(idle)}ms of ${Math.round(allow)}`); // the join clock ran out
         raf = requestAnimationFrame(tick);
         return;
       }
