@@ -8244,6 +8244,15 @@ export default function BreedTree({
                and roughly equal is the churn. */
             `chips ${chips.length} (inert ${inert})  bonds ${bonds} (made/s ${per(spinMade)} cut/s ${per(spinCut)})  KE ${ke.toFixed(3)}  dKE ${dKE >= 0 ? "+" : ""}${dKE.toFixed(3)}${dKE > 0 && !dragRef.current ? "  <-- ENERGY IN" : ""}`,
             `sumW ${sumW.toFixed(3)}  maxW ${maxW.toFixed(4)} on ${worst?.plugin?.kind ?? "?"}${wIdx === undefined ? "" : ` #${wIdx}`} bonds ${wBonds} spd ${wSpd.toFixed(2)}`,
+            /* THE CHAIN'S OWN STATE, for a leaked twin (owner, 18 September 2026:
+               a yellow circle at rest with no chain running). An available twin
+               takes its fill from RARITY_BAND and its tapped face from the same
+               condition, and both hang on dogChainBreedRef being set. If `breed`
+               names a dog while no chain is being drawn, the ref is leaking and
+               that is the fault; if it is none, the yellow is something else and
+               this rules the chain out. `held` is the node set that goes with it,
+               so the two can be seen to agree. */
+            `chain breed ${dogChainBreedRef.current ?? "none"}  held ${dogChainNodesRef.current.size}`,
             // The last detonation, standing until the next. Empty before the first.
             spinLastBlast || "BLAST none yet",
           ];
