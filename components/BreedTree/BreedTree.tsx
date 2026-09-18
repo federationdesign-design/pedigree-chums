@@ -864,6 +864,28 @@ export function resetToys() {
 // A run of dogs is an open chain, so two is a chain. Its own figure rather than
 // CHAIN_MIN_CARDS, which is the CARDS' loop minimum and means something else.
 const DOG_CHAIN_MIN = 2;
+/* THE CHAIN'S PULL, as a fraction of the CANDIDATE'S OWN radius outside its rim
+   (owner, 18 September 2026). A circle joins when the finger comes within
+   r * (1 + DOG_CHAIN_MAGNET) of its centre, so the finger no longer has to be
+   on the circle at all.
+
+   A FRACTION, NOT A FLAT NUMBER, because pit circles vary enormously and a flat
+   halo would be a generous pull on a small one and a rounding error on a big
+   one. Scaled to the candidate, the pull feels the same relative to whatever you
+   are reaching for: a 20px circle gains 12px of halo, a 60px one gains 36px.
+
+   FLOORED AT CHAIN_SAMPLE_PX. The sweep only tests every 12 client px, so a halo
+   thinner than that would be stepped straight over and the pull would be a
+   lottery. The floor is applied in the candidate's own space: see nearAt.
+
+   CIRCLES ONLY, AND THAT IS NOT AN OVERSIGHT. The chum cards must TOUCH to
+   chain (CHAIN_TOUCH_SLACK), and a card that does not touch the one before it
+   KILLS the chain. A magnet there would pull a card in and then lose the player
+   everything they had: they would feel the pull and be punished for it. The
+   circles have DOG_CHAIN_SLACK of Infinity, no touching rule at all, which is
+   exactly why the pull is free here. ChainKind.magnet is left undefined on CARD
+   so the cards can opt in later if that rule ever changes. */
+const DOG_CHAIN_MAGNET = 0.6;
 /* DOG CIRCLES DO NOT HAVE TO TOUCH (owner, 18 September 2026). Any circle of the
    breed can start a chain and any circle of the breed can join it, wherever it
    sits in the pit. The chum cards are untouched and still must touch.
@@ -9507,6 +9529,13 @@ export default function BreedTree({
          different place: a chum card in chumBodiesRef, a dog circle on its node.
          One method, so the score hook does not have to know which. */
       at: (i: number) => { x: number; y: number } | null;
+      /* HOW FAR THIS KIND PULLS, as a share of the candidate's radius, or
+         undefined for a kind that pulls not at all. See DOG_CHAIN_MAGNET. */
+      magnet?: number;
+      /* WHAT THE PULL FINDS, when the hit test found nothing. Given the chain so
+         it can refuse to name anything the rules would then punish: see the note
+         on DOG's own. Undefined for a kind with no magnet. */
+      nearAt?: (ch: Chain, cx: number, cy: number) => number | null;
       gapShare: (a: ChainSq, b: ChainSq) => number;       // gap as a share of size
       /* A CASING UNDER THE CRISP CORE, or undefined for a kind that wants none.
          Drawn wider than the core and in a colour chosen to separate it from the
@@ -9586,6 +9615,36 @@ export default function BreedTree({
        IT READS REFS, NEVER STATE. nodesRef is the packed nodes, the owned set is
        the live pit and the removed set is what has gone, all of them refs, so
        these listeners can stay bound once. */
+    /* CLIENT PIXELS INTO THE PATH'S OWN SPACE, and the matrix cached for a frame.
+
+       geo() answers in the pit's user units and a pointer event arrives in client
+       px, so the magnet has to cross between them. draw() already does this with
+       getScreenCTM for the finger's live end, but getScreenCTM FORCES LAYOUT and
+       the sweep can call this a dozen times inside a single pointermove. Reading
+       it once a frame costs what draw() already costs and no more.
+
+       `perPx` comes out of the same matrix and is what the CHAIN_SAMPLE_PX floor
+       is measured in, so the floor means the same thing at every zoom. */
+    let ctmAt = 0;
+    let ctmInv: DOMMatrix | null = null;
+    let ctmPerPx = 1;
+    const toUser = (cx: number, cy: number): { x: number; y: number } | null => {
+      const g = chainGRef.current;
+      const sv = g?.ownerSVGElement;
+      if (!g || !sv) return null;
+      const now = performance.now();
+      if (!ctmInv || now - ctmAt > 16) {
+        const m = g.getScreenCTM();
+        if (!m) return null;
+        ctmInv = m.inverse();
+        ctmPerPx = Math.hypot(ctmInv.a, ctmInv.b) || 1;
+        ctmAt = now;
+      }
+      const pt = sv.createSVGPoint();
+      pt.x = cx; pt.y = cy;
+      const q = pt.matrixTransform(ctmInv);
+      return { x: q.x, y: q.y };
+    };
     const circleAt = (cx: number, cy: number): number | null => {
       const cg = circlesRef.current;
       if (!cg) return null;
@@ -9637,6 +9696,17 @@ export default function BreedTree({
     const liveBreed = (name: string) =>
       liveBreedNodesIn(pitBodiesRef.current?.owned, removedNodesRef.current, name);
     const dogHasTwin = (n: Node): boolean => liveBreed(n.data.name).length > 1;
+    /* Named rather than inline, because the magnet measures with the SAME numbers
+       the path and the crossing test use. Two spellings of a circle's geometry is
+       how the two would quietly drift apart. */
+    const dogGeo = (i: number): ChainSq | null => {
+      const n = dogNode(i);
+      if (!dogInPit(n)) return null;
+      const v = viewRef.current;
+      const k = SIZE / v[2];
+      // `h` is the radius, and a circle has no angle worth reading.
+      return { x: (n.x - v[0]) * k, y: (n.y - v[1]) * k, a: 0, h: n.r * k };
+    };
     const DOG: ChainKind = {
       key: "dog circle",
       colour: DOG_CHAIN_COLOUR,
@@ -9644,18 +9714,61 @@ export default function BreedTree({
       minCards: DOG_CHAIN_MIN,
       owns: (t) => !!circlesRef.current?.contains(t),
       idAt: circleAt,
-      geo: (i) => {
-        const n = dogNode(i);
-        if (!dogInPit(n)) return null;
-        const v = viewRef.current;
-        const k = SIZE / v[2];
-        // `h` is the radius, and a circle has no angle worth reading.
-        return { x: (n.x - v[0]) * k, y: (n.y - v[1]) * k, a: 0, h: n.r * k };
-      },
+      geo: dogGeo,
       gapShare: chainCircleGapShare,
       // A circle IS its node, so the node carries the position. Null once it has
       // left the pit, which is what dogInPit already answers everywhere else.
       at: (i) => { const n = dogNode(i); return dogInPit(n) ? { x: n.x, y: n.y } : null; },
+      magnet: DOG_CHAIN_MAGNET,
+      /* NEAREST EDGE, NOT NEAREST CENTRE. Nearest centre systematically favours
+         big circles: a 60px circle whose rim is 50px away has a nearer CENTRE
+         than a 20px circle whose rim is 20px away, so the big one would win even
+         when the finger is plainly closer to the small one. `gap` is distance to
+         the rim, which is what the eye is judging, and it falls out of the same
+         measurement the halo needs anyway.
+
+         IT NAMES ONLY WHAT WOULD ACTUALLY JOIN, and that is the part to keep:
+
+           A circle ALREADY IN THE CHAIN is skipped. Re-entering one kills the
+           chain, and a kill must stay something the player DID: an exact hit
+           still kills, as it always has, but a near miss they never made must
+           never take the round off them.
+
+           A circle of the WRONG BREED is skipped. It would only refuse, so the
+           outcome would be the same, but it would have STOLEN the sample from a
+           right-breed circle that was also in range. The finger passing freely
+           over other breeds is the whole point of the reach.
+
+           AN EMPTY CHAIN pulls nothing. The first circle is the one PRESSED
+           (needsHit), and a chain that opened on a circle the player did not
+           choose is worse than one that did not open.
+
+         Everything else is left to joinAt exactly as before: the crossing test,
+         the join clock and the settle all run on whatever index comes back, so
+         the pull cannot smuggle a circle past a rule. */
+      nearAt: (ch, cx, cy) => {
+        const cards = ch.cards;
+        if (!cards.length) return null;
+        const first = dogNode(cards[0]);
+        if (!first) return null;
+        const u = toUser(cx, cy);
+        if (!u) return null;
+        const floor = CHAIN_SAMPLE_PX * ctmPerPx; // the sampling step, in user units
+        const nodes = nodesRef.current;
+        let best = -1, bestGap = Infinity;
+        for (let i = 0; i < nodes.length; i++) {
+          if (cards.includes(i)) continue;               // a pull must never kill
+          const n = nodes[i];
+          if (!n || n.data.name !== first.data.name) continue; // never steal the sample
+          const q = dogGeo(i);
+          if (!q) continue;                              // gone from the pit
+          const gap = Math.hypot(u.x - q.x, u.y - q.y) - q.h;
+          if (gap >= bestGap) continue;
+          if (gap > Math.max(q.h * DOG_CHAIN_MAGNET, floor)) continue;
+          bestGap = gap; best = i;
+        }
+        return best >= 0 ? best : null;
+      },
       slack: DOG_CHAIN_SLACK, // no touching rule at all: see the constant
       casing: DOG_CHAIN_CASING,
       armPx: DOG_CHAIN_ARM_PX, // a short movement is a drag, a longer one a chain
@@ -9794,7 +9907,12 @@ export default function BreedTree({
     const joinAt = (ch: Chain, cx: number, cy: number) => {
       if (ch.dead || ch.closed) return; // broken or complete: nothing more joins
       const K = ch.kind;
-      const i = K.idAt(cx, cy);
+      /* AN EXACT HIT FIRST, A PULL SECOND. Where the finger is genuinely on a
+         circle nothing has changed at all: the hit test answers and the magnet is
+         never consulted. The pull only speaks for a sample that found nothing,
+         which is why it can be added without disturbing a single existing
+         gesture. See ChainKind.nearAt. */
+      const i = K.idAt(cx, cy) ?? K.nearAt?.(ch, cx, cy) ?? null;
       if (i == null) return;
       const cards = ch.cards;
       const last = cards[cards.length - 1];
