@@ -540,6 +540,27 @@ const CHUM_MASK = 0xFFFFFFFF & ~MC_CAT;
    with only a few pixels of margin, so its width and the screen's are the same
    figure for this purpose. */
 const LOGO_PIT_FRACTION = 0.6;
+/* THE LOGO COMES DOWN A TENTH, AND THE PIT BONE IS TIED TO IT (owner,
+   18 September 2026).
+
+   The two bones on screen were different sizes: the pit's thrown bone and the
+   bone the PEDIGREE CHUMS logo is drawn inside. Measured on a 390 phone the
+   logo's bone was about 230px across and the pit's about 191px.
+
+   ONE SHRINK, APPLIED ONCE. LOGO_SHRINK multiplies the logo's drawn width
+   wherever that lands, so both branches of its clamp come down together: the
+   main pit's own figure on a wide screen and the share of the pit on a narrow
+   one.
+
+   THE PIT BONE IS NOT GIVEN A NUMBER. It is sized from the logo's width at the
+   moment the logo is sized, so the two track each other on every screen and
+   cannot drift apart again. LOGO_BONE_FRAC is the only measurement involved:
+   the bone silhouette is 584.1 of the logo artwork's 595.3 across, taken from
+   PC-bone.svg, which is that silhouette on the logo's own canvas. The pit bone's
+   own artwork fills its canvas edge to edge, 400.7 of 400.2 measured, so its
+   drawn width IS its bone's width and needs no allowance. */
+const LOGO_SHRINK = 0.9;
+const LOGO_BONE_FRAC = 584.1 / 595.3;
 /* ---- Era props -------------------------------------------------------------
    Objects that belong to one era rather than to the pit as a whole. They take
    the place of the stick, big stick and rock in the props slot, and an era with
@@ -3937,6 +3958,9 @@ export default function BreedTree({
   // J10b stage 2: lets a tap drop the mouse constraint before liftToLearn sets
   // held, so Matter is never left pulling a body that the sim has just taken
   // out of the world.
+  // The logo's drawn width, measured when the logo is built and read when the
+  // pit's bone is spawned, so the two bones are one size. See LOGO_BONE_FRAC.
+  const logoWpxRef = useRef(0);
   const mcReleaseRef = useRef<(() => void) | null>(null);
   /* THE CHUM GATE, 17 September 2026 (owner, option A of the swipe chain).
      The pointerId of a press that landed on a chum card, or null. While it is
@@ -5532,7 +5556,11 @@ export default function BreedTree({
              Its drawn width is the main pit's figure clamped to the pit, so a
              narrow phone gets one that fits between the walls. */
           (() => {
-            const lwPx = Math.min(84 * uppW * LOGO_BIG_MULT, ((pR.x - pL.x) * uppW) * LOGO_PIT_FRACTION);
+            // LOGO_SHRINK is the owner's tenth off, applied to whichever branch
+            // of the clamp wins, and logoWpxRef is what the pit's bone is sized
+            // from: see LOGO_BONE_FRAC.
+            const lwPx = Math.min(84 * uppW * LOGO_BIG_MULT, ((pR.x - pL.x) * uppW) * LOGO_PIT_FRACTION) * LOGO_SHRINK;
+            logoWpxRef.current = lwPx;
             const lhPx = lwPx / LOGO_ASPECT;
             return {
               x: v[0] + (xMinF + vbWf / 2) / k,
@@ -5903,10 +5931,14 @@ export default function BreedTree({
           : kind === "stick" ? ballDia * 1.6
           : kind === "stickBig" ? ballDia * 1.6 * 1.5
           : kind === "cookies" ? BIGT * 3.2
-          // the bone reads at the stick's width: both are elongated props, and
-          // its 2.05 aspect makes it twice the stick's depth, so it lands as a
-          // substantial object rather than a twig
-          : kind === "bone" ? ballDia * 1.68 // was 1.6, 5% bigger (owner, 2 Sept 2026)
+          /* THE BONE MATCHES THE LOGO'S BONE (owner, 18 September 2026), so the
+             two bones on screen are one size. It is taken from the logo's own
+             drawn width rather than given a figure of its own, which is what
+             keeps them together on every screen: see LOGO_BONE_FRAC.
+             The fallback is the old ballDia * 1.68 and is there for safety
+             alone: the logo is sized when the pit is built and the toys arrive
+             on timers seconds later, so it has always been measured by now. */
+          : kind === "bone" ? (logoWpxRef.current > 0 ? logoWpxRef.current * LOGO_BONE_FRAC : ballDia * 1.68)
           // Era props. The newspaper is a long roll so it takes the stick's
           // length; the fork and the shoe are hand-sized, so they read at the
           // ball's width like the rock does.
