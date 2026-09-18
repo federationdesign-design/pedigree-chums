@@ -4267,7 +4267,12 @@ export default function BreedTree({
   const rodsGRef = useRef<SVGGElement>(null);
   const pillsGRef = useRef<SVGGElement>(null);
   const [inertBadges, setInertBadges] = useState<Set<number>>(new Set());
-  const pitBodiesRef = useRef<{ find: (n: Node) => { x: number; y: number; vx: number; vy: number; held?: boolean } | undefined; owned: Set<Node> } | null>(null);
+  /* `find` RETURNS ENOUGH TO TAKE A BODY OUT, not just to read where it is
+     (18 September 2026). mb, mbIn and blown were left off this shape while the
+     only callers wanted coordinates; dogClose now removes the body itself rather
+     than flagging it for the step loop, so it needs the handle and the two flags
+     the loop reads. Same object either way, only the declared surface widened. */
+  const pitBodiesRef = useRef<{ find: (n: Node) => { x: number; y: number; vx: number; vy: number; held?: boolean; mb?: object; mbIn?: boolean; blown?: boolean } | undefined; owned: Set<Node> } | null>(null);
   // Each dropped name's real drawn box, measured off the DOM at drop time and
   // converted into world units. Measured rather than derived: the label sits
   // inside a group that zoomTo has already scaled, and its text block is offset
@@ -7262,8 +7267,40 @@ export default function BreedTree({
           const q = at();
           spawnBadgeRef.current?.(q.x, q.y, badgeDrawForNode(n.r, k), pctOf(n));
         }
+        /* IT TAKES THE BODY OUT ITSELF (owner, 18 September 2026), rather than
+           setting a flag and waiting for a tick that may not come.
+
+           WHAT IT USED TO DO. `b.held = true` and `wake()`, leaving the removal to
+           the step loop's `if (b.held && b.mbIn)` branch on the next tick. Three
+           things can eat that tick, and one of them is new: the pause added for the
+           lift refuses wake() outright, and onRemove fires on the Complete press
+           while the lift is STILL UP, so a chain's closed circles sat marked and
+           solid for the whole 450ms before onClose. The removal is not something to
+           request; it is something to do.
+
+           SO IT IS DONE HERE, the way killChained and the round-won chain already
+           do it: Composite.remove, mbIn false, on the spot.
+
+           AND `blown` GOES WITH IT, for the reason pc-1228 exists. The step loop
+           re-adds anything matching `!held && !mbIn && !blown`, so a circle whose
+           held flag is ever cleared would be put straight back into the world,
+           invisible and solid. blown is the one flag that branch cannot argue with.
+
+           THE FLAGS STAY TOO. `held` is still set because other things read it
+           (the frame writer's heldHidden, the occupancy test's `held` skip), and
+           setting it costs nothing now that the removal no longer depends on it. */
         const b = pitBodiesRef.current?.find(n);
-        if (b) b.held = true;
+        if (b) {
+          b.held = true;
+          b.blown = true; // see above: the re-add branch must never take it back
+          if (b.mb && b.mbIn) { Composite.remove(world, b.mb); b.mbIn = false; }
+        } else if (spinOnRef.current) {
+          /* THE ONE SILENT FAILURE, NOW AUDIBLE. `find` is an identity match on the
+             node; if it misses, nothing was ever marked and nothing removed, and
+             the circle is hidden by removedNodes while its body stays in the pit
+             for the rest of the round. There was no else at all here. */
+          spinLastChainRef.current = `CLOSE found no body for ${n.data.name}`;
+        }
         poofAt(n.x, n.y, performance.now());
         wake();
       };
