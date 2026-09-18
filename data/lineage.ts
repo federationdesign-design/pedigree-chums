@@ -1346,6 +1346,39 @@ const LINEAGE: Record<string, LineageNode> = {
     ]
   },
 
+  /* THE TRACKING HOUNDS GET A RECORD OF THEIR OWN (owner, 19 September 2026).
+
+     WHAT WAS WRONG. This name had no root record at all, so expandNode had nothing
+     to graft and it was only ever as deep as whoever wrote it inline chose. Talbot
+     and Rache each write it out WITH a Celtic Scent Hound child, and because those
+     two are grafted wherever their names appear, 550 occurrences inherited a proper
+     ancestry. Medieval Bloodhound, Bloodhound and Buckhound each wrote it as a bare
+     leaf, and nothing filled it in: 137 occurrences across 29 playable levels
+     stopping dead, at the same depth the full version sits at elsewhere. The drift
+     check called it a GENUINE GAP and it was right.
+
+     NO RESEARCH IN THIS. The answer is already in the file, twice, under Talbot and
+     under Rache. This is the same content put in the one place that reaches
+     everywhere, so the 137 fill in and the 550 are untouched: a node with inline
+     children never grafts.
+
+     THE TWO INLINE COPIES ARE LEFT ALONE, deliberately. They are now redundant, but
+     removing them is the 19 August device-removal job and doing it here would move
+     shares. Talbot's own comment already admits the cost of keeping them: "The
+     self-duplicate must be kept in step with this node by hand."
+
+     THE ECHO IS LOAD-BEARING, as on every other one-line attach: after grafting this
+     is a valueless node with a single child, and LineageMap collapses any such node
+     into that child. Value 0, so leafSum is unchanged and no share moves. */
+  "Old scenting Hounds": {
+    name: "Old scenting Hounds",
+    note: "The tracking hounds of medieval lords, the scenting stock behind the bloodhound and the old hunting hounds. Now extinct.",
+    children: [
+      { name: "Celtic Scent Hound", note: "Early Celtic tracking hound that followed game by scent, representing the roots of later European scent hounds. An extinct historical type.", img: "/history/breeds/ancient-celtic-scent-hound.jpg", value: 100 },
+      { name: "Old scenting Hounds", note: "The same dog carrying on: see the echo note in data/lineageShape.ts.", value: 0 }
+    ]
+  },
+
   "Old black-and-tan Setters": {
     name: "Old black-and-tan Setters",
     note: "The black-and-tan setting dogs worked in Britain before the Duke of Gordon's kennels took the type up. Now extinct.",

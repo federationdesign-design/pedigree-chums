@@ -32,10 +32,11 @@ import { LINEAGE_ROOTS, getLineage } from "../data/lineage";
 
 type N = { name: string; note?: string; value?: number; children?: N[] };
 
-/* THE BACKLOG, AND WHY THIS IS NOT ZERO YET (18 September 2026). SIX names are
-   genuinely drifted today: four gaps and two disjoint. It was seven; Manchester
-   Terrier came off the list when the Black and Tan Terrier spelling split was
-   resolved, which is what lowering this number is for. Until they are fixed the
+/* THE BACKLOG, AND WHY THIS IS NOT ZERO YET (18 September 2026). FIVE names are
+   genuinely drifted today: three gaps and two disjoint. It was seven. Manchester
+   Terrier came off when the Black and Tan Terrier spelling split was resolved, and
+   Old scenting Hounds came off when it was given a root record, which is what
+   lowering this number is for. Until they are fixed the
    check cannot fail a build without failing every build, so it reports by default
    and only fails when the count RISES above this line.
 
@@ -51,7 +52,7 @@ type N = { name: string; note?: string; value?: number; children?: N[] };
                            and "Black and Tan Terrier". That is one dog under two
                            spellings, so the fix is a rename, not a re-link, and it
                            also means treesContaining counts it as two dogs. */
-const BASELINE = 6;
+const BASELINE = 5;
 
 const showAll = process.argv.includes("--all");
 const strict = process.argv.includes("--strict");
