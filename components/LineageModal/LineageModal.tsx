@@ -681,7 +681,16 @@ export default function LineageModal({ name, image, character, lineage, fromRect
             foot of the pit on 18 September 2026 (owner): last in the title's own
             column, so they sit under the portrait ladder however deep it runs.
             See .lives in the stylesheet. */}
-        {running && typeof lives === "number" && (
+        {/* LIVES AND THE COUNTER SHARE ONE ROW, 18 September 2026 (owner), left to
+            right in the order they used to be top to bottom. They are wrapped
+            rather than unstacked, so .titleWrap stays a column and the title
+            ladder above is untouched however many rows it runs to: the pair is a
+            single item at the bottom of that column and moves down with it.
+            Both are still gated on `running`, separately, so a level with no
+            lives still shows the counter and the row simply holds one item. */}
+        {running && (typeof lives === "number" || (circleCount && circleCount.tot > 0)) && (
+        <div className={css.statusRow}>
+        {typeof lives === "number" && (
           <div className={css.lives} aria-label={`${lives} of ${livesMax} lives left`}>
             <div className={css.livesBar} aria-hidden="true">
               {Array.from({ length: livesMax }, (_, i) => (
@@ -695,7 +704,7 @@ export default function LineageModal({ name, image, character, lineage, fromRect
             `running` exactly as they are so it arrives with PLAY and goes with the
             round. The total climbs as circles pop, which is the frames counter's
             behaviour too and is the owner's ruling. */}
-        {running && circleCount && circleCount.tot > 0 && (
+        {circleCount && circleCount.tot > 0 && (
           /* COUNTS DOWN, 18 September 2026 (owner): how many are left to collect,
              not how many have been. The total stays in the label for a screen
              reader, where "3 left of 12" is the useful sentence and a bare 3 is
@@ -703,6 +712,8 @@ export default function LineageModal({ name, image, character, lineage, fromRect
           <div className={css.circleCount} aria-label={`${circleCount.left} of ${circleCount.tot} dogs left to collect`}>
             {circleCount.left}
           </div>
+        )}
+        </div>
         )}
       </div>
 

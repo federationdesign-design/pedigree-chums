@@ -1340,6 +1340,23 @@
    and both debug readouts are right-hand. The one overlap left is ?chumbox=1,
    whose panel is top left, and that is a diagnostic that is stripped before
    launch. */
+/* THE LIVES AND THE CIRCLE COUNTER, SIDE BY SIDE, 18 September 2026 (owner).
+   They were two items stacked in .titleWrap's column; they are now one item in it,
+   which is what keeps the title ladder above them untouched. The ladder can run to
+   six rows, and the column still places this pair after it however deep it goes.
+
+   align-items: center rather than flex-end, because the two are different heights,
+   36 for the lives bar against 31 for the counter chip on a phone, and a shared
+   centre line reads better than a shared baseline on two pills of different depth.
+
+   12px is .titleRow's own gap, so the header uses one figure throughout. */
+.statusRow {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  pointer-events: none;
+}
 .lives {
   display: flex;
   align-items: center;
@@ -1362,8 +1379,8 @@
    align-self: flex-start keeps it to its own width instead of stretching across
    the column, and the 6px is the gap the lives already keep from the ladder. */
 .circleCount {
-  align-self: flex-start;
-  margin-top: 6px;
+  /* align-self and margin-top are gone with the stack: the pair's own .statusRow
+     centres them and carries the gap, so a margin here would fight it. */
   padding: 10px 16px 6px 16px;
   border-radius: 20px;
   background: var(--navy);
