@@ -964,37 +964,51 @@ const DOG_CHAIN_ARM_PX = 14;
 
    THE CHUM CARDS ARE UNCHANGED, a plain white line, as they always were. */
 const DOG_CHAIN_COLOUR = "#ffed00";
-/* A CIRCLE WITH NO TWIN IN THE PIT FILLS LIGHT, FROM THE DROP (owner,
-   18 September 2026). It is the same #5cc4ee a held circle takes, deliberately:
-   the pit has one light fill and one dark one, and what they mean is read off the
-   ring and the mark rather than off a third and fourth hue.
+/* A CIRCLE WITH NO TWIN IN THE PIT FILLS BLACK, FROM THE DROP (owner,
+   18 September 2026, replacing the light blue it wore for a day).
 
-   ITS INK IS NAVY, the inverse of a dark circle's. Measured at 6.03:1, the same
-   pair the card counter already uses on --blue-sky.
+   THE HEX IS #0b1220, NOT PURE BLACK. It is the site's own night ground, the
+   Superpower page's --sp-ground, so it is a value the project already stands
+   behind rather than a new one, and it reads as very dark navy rather than as
+   absence. Pure black measures within a point of it on every pair below; the
+   choice is the look, not the numbers.
 
-   WHY EVERY OVERLAY HAD TO BE RE-INKED WITH IT, and this is the part that makes
-   it more than a fill swap. To clear 4.5 on the navy a colour needs luminance at
-   or above 0.3450; to clear 4.5 on this light blue it needs 0.0676 or below. The
-   floor is above the ceiling, so NO SINGLE COLOUR READS ON BOTH FILLS and every
-   mark that crosses them has to change with the fill. On the dark fill the
-   existing colours stand: the label at 11.96, its hover yellow at 8.28, and the
-   four RING_PALETTE depths at 10.23, 9.00, 4.85 and 5.39. On the light fill they
-   would have measured 1.98, 6.03, 1.70, 1.49, 1.50 and 1.12, so all of them take
-   navy instead and all of them measure 6.03.
+   ITS INK IS WHITE, the inverse of what the light fill took. 18.72:1.
 
-   THE CHAIN PATH IS THE ONE THING THAT DOES NOT SWITCH, because one stroke
-   crosses both fills and the ground at once. It no longer carries its own
-   contrast either: see DOG_CHAIN_COLOUR for what that costs and why it was
-   chosen.
+   WHY THIS IS MORE THAN A FILL SWAP. Every overlay that crosses a circle had to
+   be re-inked when the fill went light, because no single colour reads on both a
+   dark fill and a light one: to clear 4.5 on navy needs luminance 0.3450 or
+   above, and on the light blue 0.0676 or below, and the floor is above the
+   ceiling. Going back to a dark fill puts all of them back on white. Measured on
+   #0b1220:
+     white ring, mark and label   18.72   (was navy at 6.03 on the light fill)
+     the chain path and its sparks 15.48  (was 1.64, effectively invisible)
+     the site yellow of a hover   12.96   (was 1.37)
+   NOTHING FAILS, and the lemon path is the quiet win: it used to disappear over
+   a light single and now reads at 15.48.
 
-   THE TWIN GLOW NEEDS NOTHING. It only shows on the live chain's breed and a
-   chain needs duplicates, so a glowing circle is a twin and is dark filled, where
-   its white reads at 11.96. EDGE CASE, KNOWN AND LEFT: if a chain's breed loses
-   its last duplicate mid-chain, that circle turns light while still glowing and
-   the glow drops to 1.98 against it until the chain ends. Rare, self-correcting,
-   and not worth a special case. */
-const DOG_SINGLE_FILL = "#5cc4ee";
-const DOG_SINGLE_INK = "#0a3a57";
+   IT DOES NOT LOOK LIKE A HOLE, which was the worry. A dark disc on the pit's
+   blue would, with no rim; this one carries a WHITE ring at 18.72 against its own
+   fill and 9.44 against the background, which is a stronger edge than any other
+   circle in the pit has. It reads as the most present object on screen, which is
+   the right weight for "this breed has no twin left".
+
+   AGAINST ITS NEIGHBOURS, and the one weak figure is harmless. fillFor gives every
+   ordinary circle its own RING_PALETTE colour, so a single sits among yellow and
+   blue discs: 16.01, 14.09, 7.59 and 8.43. It is 9.44 against the pit's sky blue
+   and 3.95 against the deeper blue. It is only 1.57 against the pit navy, and
+   NO PIT CIRCLE IS NAVY: that colour appears as the label halo and the logo, never
+   as a disc beside this one.
+
+   THE CHAIN PATH STILL DOES NOT SWITCH, because one stroke crosses every fill and
+   the ground at once. See DOG_CHAIN_COLOUR for what that costs. It simply happens
+   to read far better on this fill than on the last one.
+
+   THE TWIN GLOW NEEDS NOTHING, and its known edge case is GONE with the light
+   fill: a chain breed losing its last duplicate mid-chain used to turn that circle
+   light and drop the glow to 1.98 against it. On black the glow reads throughout. */
+const DOG_SINGLE_FILL = "#0b1220";
+const DOG_SINGLE_INK = "#ffffff";
 /* HOW LONG THE FILL TAKES TO CHANGE. The answer is LIVE (see dogHasTwin), so a
    circle changes as a consequence of a DIFFERENT circle being collected. An
    instant flip on a circle the player never touched reads as a glitch; 150ms
@@ -5443,7 +5457,12 @@ export default function BreedTree({
              both need the dark mark. The four depth filters are for the dark
              fill only, where they measure 10.23, 9.00, 4.85 and 5.39; on the
              light fill they would have been 1.70, 1.49, 1.50 and 1.12. */
-          const ink = held || chSingle ? "ink" : twinBand ? (twinBand.fg === "#ffffff" ? "hi" : "black") : `${(d.depth - 1 + 4) % 4}`;
+          /* chSingle TAKES "hi", THE WHITE FILTER, not "ink". "ink" is the navy
+             one and it was right only while a single circle was filled light; on
+             #0b1220 navy measures 1.57 and the face would vanish. A HELD circle
+             keeps "ink", because its fill is still the sky blue DOG_CHAIN_FILL.
+             The two used to share a branch and no longer can. */
+          const ink = held ? "ink" : chSingle ? "hi" : twinBand ? (twinBand.fg === "#ffffff" ? "hi" : "black") : `${(d.depth - 1 + 4) % 4}`;
           if (q.dataset.hi !== ink) {
             q.dataset.hi = ink;
             qi.setAttribute("filter", `url(#bt-qmark-${ink})`);
