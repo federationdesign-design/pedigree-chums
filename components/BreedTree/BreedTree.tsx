@@ -11865,7 +11865,7 @@ export default function BreedTree({
             // circle the player opened, which is a different count from the pit's
             // own rule for the circles it closes.
             if (chipCountOn()) {
-              chipDiagRef.current = [`opened   ${learnNode?.data.name ?? "?"}, layer scattered ${(data.circles ?? []).length} circles`];
+              chipDiagRef.current = [`opened   ${learnNode?.data.name ?? "?"}, layer scattered ${(data.circles ?? []).length} circles${data.big ? " + its own big one" : ""}`];
             }
             // the learnt % circles, their rods and the name pill tip into the
             // pit as live objects at the very instant the layer drops them
@@ -11880,6 +11880,28 @@ export default function BreedTree({
                  scale on the way down, which read as a third bigger. Both colours
                  now keep their on-layer size. */
               spawnBadgeRef.current?.(c.x, c.y, c.r, Math.round(c.share), { r: c.r, green: c.green });
+            }
+            /* THE SOLO DOG'S OWN CIRCLE (owner, 18 September 2026). A leaf has no
+               nodes to scatter, so the layer sends its ONE full-size circle as
+               `big` instead. This handler looped over circles, rods and pills and
+               had no branch for it, so a leaf completion dropped nothing at all
+               into the pit: measured as "layer scattered 0 circles".
+
+               IT IS SPAWNED LIKE ANY OTHER CHIP, through the same call, at the
+               position and radius the layer measured on screen. It carries the
+               dog's NAME as the label, which is the path spawnBadge already has
+               for exactly this ("a solo dog circle brings its own full radius"),
+               so it lands at the size it just had rather than being re-sized to a
+               percentage chip, and it is never rolled as a bomb.
+
+               ITS VALUE IS THE DOG'S OWN SHARE OF ITS PARENT, the same figure
+               every other chip carries and the same formula the sim's pctOf and
+               the layer's own shareOf use, so a solo dog is worth what it was
+               worth in the tree it came out of. */
+            if (data.big && learnNode) {
+              const b = data.big;
+              const share = Math.round(((learnNode.value ?? 0) / (learnNode.parent?.value || 1)) * 100);
+              spawnBadgeRef.current?.(b.x, b.y, b.r, share, { r: b.r, label: b.name });
             }
             for (const rd of data.rods ?? []) {
               spawnRodRef.current?.(rd.x1, rd.y1, rd.x2, rd.y2, !!rd.lit);
