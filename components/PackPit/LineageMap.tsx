@@ -1590,6 +1590,29 @@ export default function LineageMap({
   // old four-candidate scorer (card / nodes / pills / connectors / viewport) is
   // gone: with slots 60deg apart in the top semicircle a radial pill cannot reach
   // the card (it points away from it) and neighbours diverge instead of colliding.
+  /* PRE-COMPENSATING FOR THE LAYER'S 0.8 SCALE, 2 September 2026 (owner).
+
+     THE PROBLEM. The overlay carries transform: scale(0.8), and a scale
+     multiplies the distance from the element's CENTRE, not from its edge. So
+     every coordinate near an edge is pulled a tenth of the viewport inwards: the
+     frame grid was written to start 14px from the left and was landing at 52.6,
+     and the rows were written at 111 and were landing far lower.
+
+     THE FIX, AND WHAT IT COSTS. These two helpers invert the scale, so a value
+     passed through them LANDS where it is written. That is why F_LEFT now comes
+     out NEGATIVE on a phone: to appear 31.6 from the edge, the column has to
+     start about 12px off screen before the scale pulls it back in. The number
+     looks wrong in isolation and is correct on screen.
+
+     IT IS TIED TO THE 0.8. Change the overlay's scale and every figure derived
+     from these is wrong, silently, because nothing here can see that transform.
+     The clean fix is to take the frames out of the scaled element the way the
+     back button and the counters were; this is the cheap one, chosen knowingly.
+
+     Identity off the lift, so the main pit and the chums2 tree are untouched. */
+  const LIFT_K = (circular || strongBg) && !bounded ? 0.8 : 1;
+  const unscaleX = (x: number) => vp.w / 2 + (x - vp.w / 2) / LIFT_K;
+  const unscaleY = (y: number) => vp.h / 2 + (y - vp.h / 2) / LIFT_K;
   const pillPlacement = useMemo(() => {
     const place = new Map<string, { ox: number; oy: number }>();
     if (!circular) return place;
@@ -1603,7 +1626,16 @@ export default function LineageMap({
     for (const n of withPill) {
       const share = Math.round((n._leaves / (n._parent as Node)._leaves) * 100);
       const lines = splitName(n.name);
-      const r = nodeR(share), w = nodePillWidth(lines), h = lines.length > 1 ? 40 : 22;
+      /* THE RESERVE IS THE SIZE THE PILL IS DRAWN AT, 18 September 2026 (owner).
+         nodePillWidth is the UNSCALED width and the pill is drawn inside a group
+         at PIT_PILL_SCALE, 0.683, so this reserved about 46% more room than the
+         pill occupies: it pushed every pill further out than it needed to go and
+         left daylight between a node and its own name. The height is inside the
+         same group and takes the same scale. The scatter at scatterPills already
+         does exactly this, and for the same reason. */
+      const r = nodeR(share);
+      const w = nodePillWidth(lines) * PIT_PILL_SCALE;
+      const h = (lines.length > 1 ? 40 : 22) * PIT_PILL_SCALE;
       // reach clears the node radius, the GAP, and the pill's own half-extent in
       // the slot direction, so the near edge lands GAP px off the node at any angle.
       const dir = n._dir;
@@ -1617,10 +1649,36 @@ export default function LineageMap({
       // pointing straight right slides left until its right edge clears the wall,
       // slipping back over its own node, readable. That is the old ruling, an
       // overlap you can read beats a pill you cannot see.
+      /* IT WAS MEASURING THE SCREEN AGAINST THE LAYOUT, 18 September 2026 (owner).
+
+         `vw` is window.innerWidth, in CSS pixels. `n._x` and `ox` are in the
+         LAYER'S OWN units, and the layer is drawn at LIFT_K, 0.8. The two were
+         compared directly, so the clamp believed the screen ended a fifth sooner
+         than it does: on a 390 phone a pill at layout x 390 actually lands at
+         351, comfortably inside, and was shoved left anyway. Every pill down the
+         right-hand side of the tree was dragged inward by up to a fifth of the
+         screen width for no reason, and piled onto its neighbours.
+
+         unscaleX is the conversion the file already uses for exactly this, and
+         the frame grid's own F_LEFT_BASE goes through it. Passed the screen
+         position a pill may not cross, it returns the layout position that lands
+         there, so both sides of the comparison are now in layout units.
+
+         THE MARGIN IS F_EDGE, 14, not the WALL_PAD of 0 this used. Zero let a
+         pill sit hard against the glass, and 14 is the margin the card grid below
+         already keeps, so the tree and the grid line up on one figure.
+
+         WALL_PAD ITSELF IS LEFT AT 0 AND STILL WRONG. Its other reader, the
+         single-child wall swing above, compares `cx` in layout units against `vw`
+         in screen pixels in the very same way. Raising the shared constant would
+         have silently changed that swing as well, which is layout, and the owner
+         asked for the pill clamp alone. Flagged, not fixed. */
       if (vw > 0) {
+        const wallL = unscaleX(F_EDGE);        // layout x that lands F_EDGE from the left
+        const wallR = unscaleX(vw - F_EDGE);   // and F_EDGE from the right
         const pl = n._x + ox - w / 2, pr = n._x + ox + w / 2;
-        if (pr > vw - WALL_PAD) ox -= pr - (vw - WALL_PAD);
-        else if (pl < WALL_PAD) ox += WALL_PAD - pl;
+        if (pr > wallR) ox -= pr - wallR;
+        else if (pl < wallL) ox += wallL - pl;
       }
       place.set(n._id, { ox, oy });
     }
@@ -1656,29 +1714,8 @@ export default function LineageMap({
   const MCOLS = fiveUp ? fitCols : 4; // phones: one continuous grid, this many wide before it wraps
   // F_EDGE moved up beside F_GUT_MIN, 16 September 2026: CW's derivation reads it,
   // and CW is declared far earlier. One definition, used by both.
-  /* PRE-COMPENSATING FOR THE LAYER'S 0.8 SCALE, 2 September 2026 (owner).
-
-     THE PROBLEM. The overlay carries transform: scale(0.8), and a scale
-     multiplies the distance from the element's CENTRE, not from its edge. So
-     every coordinate near an edge is pulled a tenth of the viewport inwards: the
-     frame grid was written to start 14px from the left and was landing at 52.6,
-     and the rows were written at 111 and were landing far lower.
-
-     THE FIX, AND WHAT IT COSTS. These two helpers invert the scale, so a value
-     passed through them LANDS where it is written. That is why F_LEFT now comes
-     out NEGATIVE on a phone: to appear 31.6 from the edge, the column has to
-     start about 12px off screen before the scale pulls it back in. The number
-     looks wrong in isolation and is correct on screen.
-
-     IT IS TIED TO THE 0.8. Change the overlay's scale and every figure derived
-     from these is wrong, silently, because nothing here can see that transform.
-     The clean fix is to take the frames out of the scaled element the way the
-     back button and the counters were; this is the cheap one, chosen knowingly.
-
-     Identity off the lift, so the main pit and the chums2 tree are untouched. */
-  const LIFT_K = (circular || strongBg) && !bounded ? 0.8 : 1;
-  const unscaleX = (x: number) => vp.w / 2 + (x - vp.w / 2) / LIFT_K;
-  const unscaleY = (y: number) => vp.h / 2 + (y - vp.h / 2) / LIFT_K;
+  // LIFT_K, unscaleX and unscaleY have moved ABOVE pillPlacement, which needs
+  // them: see the block there. Everything below still reads them unchanged.
   /* The level's own profile portrait sits at --pit-axis less half of --tp:
      51.8 - 20.16 = 31.6 on a phone. The frame column's LEFT EDGE lines up with
      it, so F_LEFT, which is the first column's CENTRE, is that plus half a card. */
