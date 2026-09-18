@@ -3148,6 +3148,58 @@ export default function BreedTree({
      list instead of arguing. It polls rather than logging at the spawn, so the
      total climbs as circles pop. Nothing is created and nothing runs without
      the flag. Placed here because it calls badgeFloorVb, declared above. */
+  /* ---- ?spindiag=1 : WHY THE PIT WILL NOT SETTLE -----------------------------
+     Owner, 18 September 2026: once chips go inert and start joining, they move
+     constantly, score a point per movement, and sometimes spin faster and faster
+     without stopping. This measures it rather than reasoning at it.
+
+     THE ONE NUMBER THAT SETTLES IT IS dKE. Total kinetic energy of every
+     non-static body, sampled twice a second, and the CHANGE since the last
+     sample. A pit with nothing being dragged can only lose energy: gravity does
+     work on the way down and friction takes it back. If dKE is repeatedly
+     POSITIVE while `drag` reads none, something is putting energy in, and the
+     rest of the line says what.
+
+     WHAT EACH COLUMN IS FOR:
+       pts/s    the 1-point collision award, counted at the award itself, so the
+                scoring rate is measured and not inferred
+       awake    matter's own sleeping flag. enableSleeping IS on, so a pit that
+                will not settle should show these falling to zero. Bonded chips
+                are expected to stay awake: see the bond block.
+       bonds    live bond constraints in the world
+       inert    chips in the state that bonds
+       KE/dKE   see above, in px^2/step^2 times mass, so it is comparable with
+                itself and nothing else
+       sumW     total |angular velocity| across the pit
+       maxW     the fastest spinner, with its kind, its bond count and its speed,
+                which is the runaway the owner is describing
+
+     The sampler runs inside the sim, where the world and the bond table are in
+     scope, and writes finished lines into a ref. The effect below only prints
+     them. Nothing is computed and no counter is incremented unless the flag is
+     on. */
+  const spinDiagRef = useRef<string[]>([]);
+  useEffect(() => {
+    let d: HTMLDivElement | null = null;
+    let t = 0;
+    try {
+      if (new URLSearchParams(window.location.search).get("spindiag") !== "1") return;
+      d = document.createElement("div");
+      d.style.cssText =
+        "position:fixed;left:0;right:0;top:0;z-index:99999;background:#000;color:#ff0;" +
+        "font:11px/1.4 monospace;padding:6px 8px;pointer-events:none;white-space:pre-wrap";
+      d.textContent = "spin diag: start a round";
+      document.body.appendChild(d);
+      const el = d;
+      const tick = () => {
+        const lines = spinDiagRef.current;
+        el.textContent = lines.length ? lines.join("\n") : "spin diag: no sim running";
+      };
+      tick();
+      t = window.setInterval(tick, 250);
+    } catch {}
+    return () => { try { if (t) window.clearInterval(t); if (d) d.remove(); } catch {} };
+  }, []);
   useEffect(() => {
     let d: HTMLDivElement | null = null;
     let t = 0;
@@ -7218,6 +7270,15 @@ export default function BreedTree({
           }
         }
       };
+      /* ?spindiag=1. Read once per round rather than per frame, and every
+         counter and every sample below is behind it, so the flag costs nothing
+         when it is off. See the block beside spinDiagRef. */
+      const spinDiagOn = (() => {
+        try { return new URLSearchParams(window.location.search).get("spindiag") === "1"; } catch { return false; }
+      })();
+      let spinScored = 0;      // 1-point collision awards since the last sample
+      let spinLastKE = 0;      // total kinetic energy at the last sample
+      let spinLastAt = 0;      // when that sample was taken
       const FX_COOLDOWN = 220;
       const FX_MIN_PS = vps(0.05); // minimum impact speed to flash, px/step
       const isDragged = (b: unknown) => dragRef.current?.body === b;
@@ -7278,6 +7339,7 @@ export default function BreedTree({
                    the variable at the word pop, and FUSE_POINTS. Those are now
                    worth far more relative to a hit, which is the point. */
                 numAt(w.x, w.y, 1, now);
+                if (spinDiagOn) spinScored++; // counted AT the award, not inferred
                 b.lastFx = now;
                 flashed = true;
               }
@@ -7537,6 +7599,40 @@ export default function BreedTree({
             Composite.add(world, b.mb);
             b.mbIn = true;
           }
+        }
+        /* ---- ?spindiag=1 SAMPLER. Twice a second, from inside the sim, where
+           the world and the bond table are in scope. Everything here is behind
+           the flag. See the block beside spinDiagRef for what the columns are
+           for and which one settles the question. */
+        if (spinDiagOn && nowRaf - spinLastAt >= 500) {
+          const elapsed = spinLastAt ? (nowRaf - spinLastAt) / 1000 : 0;
+          type DB = { isStatic?: boolean; isSleeping?: boolean; mass?: number; angularVelocity?: number; velocity: { x: number; y: number }; plugin?: { kind?: string; bridge?: Body } };
+          const bods = (Composite.allBodies(world) as DB[]).filter((o) => !o.isStatic);
+          let ke = 0, sumW = 0, awake = 0, maxW = 0;
+          let worst: DB | null = null;
+          for (const o of bods) {
+            const sp2 = o.velocity.x * o.velocity.x + o.velocity.y * o.velocity.y;
+            ke += 0.5 * (o.mass || 0) * sp2;
+            const w2 = Math.abs(o.angularVelocity || 0);
+            sumW += w2;
+            if (!o.isSleeping) awake++;
+            if (w2 > maxW) { maxW = w2; worst = o; }
+          }
+          const chips = bods.filter((o) => o.plugin?.kind === "badge");
+          const inert = chips.filter((o) => o.plugin?.bridge?.inert).length;
+          const bonds = bondedPairs.size;
+          const wIdx = worst?.plugin?.bridge?.idx;
+          const wBonds = wIdx === undefined ? 0 : (bondsOf.get(wIdx)?.length ?? 0);
+          const wSpd = worst ? Math.hypot(worst.velocity.x, worst.velocity.y) : 0;
+          const dKE = spinLastAt ? ke - spinLastKE : 0;
+          spinDiagRef.current = [
+            `pts/s ${elapsed ? (spinScored / elapsed).toFixed(1) : "-"}  drag ${dragRef.current ? "YES" : "none"}  bodies ${bods.length}  awake ${awake}  asleep ${bods.length - awake}`,
+            `chips ${chips.length} (inert ${inert})  bonds ${bonds}  KE ${ke.toFixed(3)}  dKE ${dKE >= 0 ? "+" : ""}${dKE.toFixed(3)}${dKE > 0 && !dragRef.current ? "  <-- ENERGY IN" : ""}`,
+            `sumW ${sumW.toFixed(3)}  maxW ${maxW.toFixed(4)} on ${worst?.plugin?.kind ?? "?"}${wIdx === undefined ? "" : ` #${wIdx}`} bonds ${wBonds} spd ${wSpd.toFixed(2)}`,
+          ];
+          spinScored = 0;
+          spinLastKE = ke;
+          spinLastAt = nowRaf;
         }
         let still = !dragRef.current;
         for (const b of all) {
