@@ -7040,11 +7040,11 @@ export default function BreedTree({
       // The sweep bonus, flashed where the chain started. Its own hook because it
       // carries a value: the join hook always pays CHAIN_JOIN_POINTS.
       chainSweepScoreRef.current = (x: number, y: number, val: number) => {
-        numAt(x, y, val, performance.now());
+        numAt(x, y, val, performance.now(), true); // lands on the chain's first circle
       };
       chainJoinScoreRef.current = (x: number, y: number, colour: string, links: number) => {
         const now2 = performance.now();
-        numAt(x, y, CHAIN_JOIN_POINTS, now2);
+        numAt(x, y, CHAIN_JOIN_POINTS, now2, true); // a join always lands on a circle
         sparkAt(x, y, colour, links, now2);
       };
       chainBonusRef.current = (cards: number[]) => {
@@ -7393,7 +7393,23 @@ export default function BreedTree({
       // 650ms life, alpha 1-t, rising 22 + t*34, weight 400, --font-pct
       const numbers: { el: SVGTextElement; x: number; y: number; born: number }[] = [];
       const pctFont = (getComputedStyle(document.documentElement).getPropertyValue("--font-pct").trim() || "Montserrat");
-      const numAt = (x: number, y: number, val: number, now: number) => {
+      /* `cased` IS OPT-IN, AND IT DEFAULTS TO OFF (owner, 18 September 2026).
+
+         WHAT WENT WRONG IN 1230. The casing was written straight into numAt, so
+         every caller took it: the blast's 250, the 12 a chip, the 2000 for
+         accepting the cookies, the chum collect, the fuse. None of them needed
+         it. They land on the pit floor, where plain white already reads 11.96,
+         and the owner had not asked for their style to be touched.
+
+         THE SIZE NEVER MOVED. fontSize is 15 * fxScale now exactly as it was.
+         What changed was WEIGHT: an SVG stroke is centred on the glyph outline,
+         so a 3px casing laid about 1.5px of extra ink on every edge and the
+         numbers read heavier and therefore larger. Taking the stroke off puts
+         them back precisely, with nothing else to restore.
+
+         ONLY THE CHAIN PASSES TRUE, because only the chain's numbers land on a
+         circle rather than on the floor. */
+      const numAt = (x: number, y: number, val: number, now: number, cased = false) => {
         const fx = fxRef.current;
         if (!fx) return;
         const el = document.createElementNS("http://www.w3.org/2000/svg", "text");
@@ -7403,12 +7419,14 @@ export default function BreedTree({
         el.style.fontWeight = "400";
         el.style.fontSize = `${15 * fxScale}px`;
         el.style.fill = "#ffffff";
-        // The casing, painted BEFORE the fill so the white core keeps its full
-        // weight rather than being eaten from both sides. See FX_NUM_CASING.
-        el.style.stroke = FX_NUM_CASING;
-        el.style.strokeWidth = `${FX_NUM_CASING_K * fxScale}px`;
-        el.style.strokeLinejoin = "round";
-        el.setAttribute("paint-order", "stroke");
+        if (cased) {
+          // Painted BEFORE the fill so the white core keeps its full weight
+          // rather than being eaten from both sides. See FX_NUM_CASING.
+          el.style.stroke = FX_NUM_CASING;
+          el.style.strokeWidth = `${FX_NUM_CASING_K * fxScale}px`;
+          el.style.strokeLinejoin = "round";
+          el.setAttribute("paint-order", "stroke");
+        }
         el.style.pointerEvents = "none";
         fx.appendChild(el);
         numbers.push({ el, x, y, born: now });
