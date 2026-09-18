@@ -964,6 +964,18 @@ const DOG_CHAIN_INK = "#0a3a57";
      DOG_CHAIN_TWIN_INK    an AVAILABLE twin's outline and mark */
 const DOG_CHAIN_TWIN_FILL = "#ffd23e";
 const DOG_CHAIN_TWIN_INK = "#0a3a57";
+/* HOW WIDE THE CHAIN'S CHIPS SCATTER, in client px, from the single point they
+   all drop at (owner, 18 September 2026). A chain's chips used to appear where
+   each closed circle stood, which read as several separate piles across the pit
+   rather than as one payout. They now all come from the circle the player
+   opened, and this is the only thing stopping them landing exactly on top of one
+   another: each chip takes a random angle and a radius of sqrt(random) times
+   this, which fills a disc evenly rather than bunching at the centre.
+
+   22 is about two chips across. Wide enough that the solver is not asked to
+   separate a stack of six coincident bodies on the first step, tight enough that
+   six chips still read as one burst from one place. */
+const DOG_CHAIN_CHIP_SPREAD_PX = 22;
 /* Two circles, as a share of the larger diameter, so CHAIN_TOUCH_SLACK means the
    same for dogs as it does for cards. `h` is the radius here, and the angle is
    not read: a circle has no corners to turn. */
@@ -3522,7 +3534,7 @@ export default function BreedTree({
      something else is already holding. See the note where it is written. */
   const dogChainTakeoverRef = useRef<((pointerId: number) => boolean) | null>(null);
   const dogOpenRef = useRef<((i: number) => boolean) | null>(null);
-  const dogCloseRef = useRef<((n: Node) => void) | null>(null);
+  const dogCloseRef = useRef<((n: Node, from?: { x: number; y: number }) => void) | null>(null);
   // The removed set is a ref, so closing circles changes nothing React can see.
   // This is the nudge that gets them off the screen.
   const [, setDogChainClosed] = useState(0);
@@ -6476,7 +6488,7 @@ export default function BreedTree({
          and it poofs where it stood so it does not simply blink away. The caller
          adds it to the removed set, which is what hides the circle itself. The
          same pair the learn completion has always used. */
-      dogCloseRef.current = (n) => {
+      dogCloseRef.current = (n, from) => {
         /* IT GIVES UP ITS BADGES ON THE WAY OUT (owner, 18 September 2026). A
            closed circle used to leave nothing behind, so a chain paid in chips
            only for the one circle the player opened. Now every circle in the
@@ -6488,14 +6500,38 @@ export default function BreedTree({
            feature exists for pay the least, so a leaf drops one chip carrying
            its own share instead.
 
-           They land where the circle stood, and spawnBadge takes client pixels,
-           which is what pxFromWorld is for. */
-        const p = pxFromWorld(n.x, n.y);
+           THEY ALL DROP FROM ONE POINT (owner, 18 September 2026). `from` is the
+           circle the player OPENED, passed in by the chain, so a chain pays out
+           as one burst from the place the player chose rather than as several
+           piles where each closed circle happened to be standing. The number of
+           chips is unchanged; only where they appear has moved.
+
+           WITHOUT `from` a circle still drops where it stands. That is the
+           fallback if the opened circle cannot be located, and it is what any
+           future non-chain caller gets.
+
+           THE POOF DOES NOT MOVE WITH THEM. That is this circle leaving the pit,
+           and it belongs where the circle was.
+
+           spawnBadge takes client pixels, which is what pxFromWorld is for. */
+        const src = from ?? { x: n.x, y: n.y };
+        const p = pxFromWorld(src.x, src.y);
+        /* A LITTLE SPREAD, or six chips would spawn as one stack and the solver
+           would have to blow them apart on the first step. A random angle with a
+           sqrt(random) radius fills the disc evenly instead of bunching at the
+           middle. Fresh per chip, so two circles closing into the same point
+           still read as one scatter rather than two rings. */
+        const at = () => {
+          const a2 = Math.random() * Math.PI * 2;
+          const rad = DOG_CHAIN_CHIP_SPREAD_PX * Math.sqrt(Math.random());
+          return { x: p.x + Math.cos(a2) * rad, y: p.y + Math.sin(a2) * rad };
+        };
         const kids = (n.children ?? []).filter((ch) => !isEcho(ch));
         if (kids.length) {
-          for (const ch of kids) spawnBadgeRef.current?.(p.x, p.y, badgeDrawForNode(ch.r, k), pctOf(ch));
+          for (const ch of kids) { const q = at(); spawnBadgeRef.current?.(q.x, q.y, badgeDrawForNode(ch.r, k), pctOf(ch)); }
         } else {
-          spawnBadgeRef.current?.(p.x, p.y, badgeDrawForNode(n.r, k), pctOf(n));
+          const q = at();
+          spawnBadgeRef.current?.(q.x, q.y, badgeDrawForNode(n.r, k), pctOf(n));
         }
         const b = pitBodiesRef.current?.find(n);
         if (b) b.held = true;
@@ -12077,11 +12113,37 @@ export default function BreedTree({
               if (dc && dc.opened === learnNode) {
                 dogChainRef.current = null;
                 const pit = pitBodiesRef.current?.owned;
+                /* EVERY CHIP IN THE CHAIN DROPS FROM THE FIRST CIRCLE THE PLAYER
+                   SELECTED (owner, 18 September 2026), so a chain reads as one
+                   payout from the place the player chose rather than as several
+                   piles scattered across the pit.
+
+                   WHICH POSITION, AND WHY. The opened circle's BRIDGE, not its
+                   node and not a position captured at the press. The bridge is
+                   the object the sim keeps beside each body, and the step loop
+                   stops updating it once `held` is set, which liftToLearn does
+                   at the instant the chain settles and the circle goes up to the
+                   layer. So its coordinates are already frozen at exactly the
+                   moment the player's chain opened it, and they survive the body
+                   leaving the world. Reading the NODE instead would be wrong:
+                   the node is moved by moveSubtree and by the re-pack, and by
+                   the time a player finishes in the learn layer, which can be
+                   minutes, it is nowhere useful.
+
+                   It is the same handle and the same reason the round-won flash
+                   uses `pitBodiesRef.find(learnNode)` a few lines below, and the
+                   same one the chum collect flash uses for a card whose body has
+                   gone.
+
+                   NO BRIDGE, NO CHANGE: each circle falls back to dropping where
+                   it stands, which is what it did before this. */
+                const ob = pitBodiesRef.current?.find(dc.opened);
+                const from = ob ? { x: ob.x, y: ob.y } : undefined;
                 let shut = 0;
                 for (const other of dc.others) {
                   if (!pit?.has(other) || removedNodesRef.current.has(other)) continue;
                   removedNodesRef.current.add(other);
-                  dogCloseRef.current?.(other);
+                  dogCloseRef.current?.(other, from);
                   shut++;
                 }
                 // The removed set is a ref, so nothing above would re-render.
