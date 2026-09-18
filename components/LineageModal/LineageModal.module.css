@@ -464,20 +464,26 @@
 }
 
 /* Shake button, copied from the pit. */
-/* Shake and slow motion match the in-pit squares exactly: the main pit's
+/* Shake and slow motion matched the in-pit squares exactly: the main pit's
    BIG * 1.2 (100.8px desktop, 67.5px at 768px and below), radius 0.3 of the
    size, 5px navy stroke, yellow fill. They were 84px flat, which read larger
-   than everything else in the mini pit. */
+   than everything else in the mini pit.
+
+   15% OFF BOTH, 18 September 2026 (owner). These two only: no other corner
+   furniture moves, so they no longer match the in-pit squares and that is the
+   point. Every figure below is its old value times 0.85, the button, its corner
+   radius and the glyph inside it alike, so the controls shrink as whole objects
+   rather than growing padding. The old figure is kept beside each one. */
 .shake,
 .slowmo {
   position: fixed;
   right: clamp(18px, 4vw, 48px);
   z-index: 30;
-  width: 100.8px;
-  height: 100.8px;
+  width: 85.68px;  /* 100.8 * 0.85 */
+  height: 85.68px; /* 100.8 * 0.85 */
   padding: 0;
   border: 0;
-  border-radius: 30.24px;
+  border-radius: 25.7px; /* 30.24 * 0.85 */
   display: grid;
   place-items: center;
   cursor: pointer;
@@ -510,29 +516,29 @@
 }
 .shakeIcon {
   display: block;
-  width: 77px;
-  height: 77px;
+  width: 65.45px;  /* 77 * 0.85 */
+  height: 65.45px; /* 77 * 0.85 */
   background: url("/jelly-shake.png") center / contain no-repeat;
 }
 .slowmoIcon {
   display: block;
-  width: 62px;
-  height: 62px;
+  width: 52.7px;  /* 62 * 0.85 */
+  height: 52.7px; /* 62 * 0.85 */
 }
 @media (max-width: 768px) {
   .shake,
   .slowmo {
-    width: 67.5px;
-    height: 67.5px;
-    border-radius: 20.25px;
+    width: 57.38px;  /* 67.5 * 0.85 */
+    height: 57.38px; /* 67.5 * 0.85 */
+    border-radius: 17.21px; /* 20.25 * 0.85 */
   }
   .shakeIcon {
-    width: 51px;
-    height: 51px;
+    width: 43.35px;  /* 51 * 0.85 */
+    height: 43.35px; /* 51 * 0.85 */
   }
   .slowmoIcon {
-    width: 41px;
-    height: 41px;
+    width: 34.85px;  /* 41 * 0.85 */
+    height: 34.85px; /* 41 * 0.85 */
   }
 }
 .shakeFlash {
