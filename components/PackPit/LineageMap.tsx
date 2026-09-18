@@ -5081,14 +5081,26 @@ className={[
         in this gate is gone: nothing in autoCollect ever needed the learn area, it
         touches only this component's own state and the placement step Complete
         already uses.
-        IT MOVES RATHER THAN APPEARING WHERE IT WAS. .autoWrap sits on the SHAKE
-        button's exact spot, bottom right, which is safe in the learn area because
-        the shake button is unreachable behind that overlay. On the play lift the
-        shake button is live and part of the round, so the lift takes
-        .autoWrapLift, under the BACK button in the top right, which is the lift's
-        own chrome. Both bottom corners belong to the pit. */}
+
+        AND IT SITS IN THE SAME PLACE IN BOTH, bottom right, on the SHAKE button's
+        spot. It went in under BACK for one commit on the belief that the shake
+        button was live behind the play lift and would be pressed through. IT IS
+        NOT, and the source says so plainly:
+
+          BreedTree.tsx recomputes `busy = !!dogChainBreedRef.current ||
+          learnOpenRef.current` every frame and reports it through onPitBusy;
+          learnOpenRef mirrors learnNode, so it is true for the whole lift.
+          LineageModal takes that into pitBusy and puts .pitCtlAway on BOTH the
+          shake and the slow motion buttons, and .pitCtlAway is
+          `opacity: 0; pointer-events: none`.
+
+        pointer-events: none is the half that settles it: the button is not merely
+        faded, it cannot take a press at all. So the position is free and the
+        conflict never existed. .autoWrapLift is deleted rather than left behind,
+        because a spare position class is the kind of thing that gets re-applied by
+        accident. */}
     {showAuto && !bounded && (
-      <div className={circular ? `${styles.autoWrap} ${styles.autoWrapLift}` : styles.autoWrap} onClick={autoCollect} onPointerDown={(e) => e.stopPropagation()} role="button" aria-label="Auto Find">
+      <div className={styles.autoWrap} onClick={autoCollect} onPointerDown={(e) => e.stopPropagation()} role="button" aria-label="Auto Find">
         <div className={styles.autoPop}>
           <img className={styles.autoBtn} src="/auto-icon-redux.svg" alt="Auto Find" />
         </div>
