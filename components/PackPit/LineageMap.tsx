@@ -1417,7 +1417,7 @@ export default function LineageMap({
       const kids = (bounded || open.has(n._id)) && n.children && n.children.length ? (n.children as Node[]) : null;
       if (!kids) return;
       const cnt = kids.length;
-      const spread = circular ? Math.PI * 0.42 : depth === 0 ? SPREAD1 : SPREADN;
+      const spread = circular ? (depth === 0 ? SPREAD1 : Math.PI * 0.42) : depth === 0 ? SPREAD1 : SPREADN;
       // RSTEP scaled with the nodes on the lift and the chum tree, see NODE_POKE
       // below. RING1 is the root's own first ring and is left alone: it is
       // measured off ROOT, the card, which does not shrink.
@@ -1466,12 +1466,41 @@ export default function LineageMap({
          applied; what went in instead was the clock face, recorded there as
          option B and not agreed.
 
-         THE ROOT KEEPS THE CLOCK FACE ON PURPOSE. It was written to fix a real
-         bug, a child spawning straight up under the pointer as the parent opens
-         and stealing the hover, and to keep nodes off the card and the Learn
-         button. Both of those are properties of the LIFTED card at depth 0. The
-         slot offsets below still apply at depth, they are just measured from the
-         node's own direction rather than from vertical.
+         THE ROOT NO LONGER KEEPS THE CLOCK FACE, 18 September 2026 (owner), and
+         the note that said it did is replaced here rather than left to mislead.
+         The clock put two first-layer branches 72 degrees apart in the top
+         semicircle, and since each then fans 36 either side, exactly half that
+         gap, the two met at depth 2 and interleaved below it. The LEARN AREA has
+         never had that problem because it derives its first fan from SPREAD1, 270
+         degrees, which puts two children 135 apart pointing away from each other.
+         Depth 0 now uses that same derivation. Compared side by side in
+         .scratch/learn-layout.png and .scratch/lift-overlap.png.
+
+         THE TWO THINGS THE CLOCK WAS PROTECTING BOTH SURVIVE, checked rather than
+         assumed:
+           THE HOVER BUG, a child spawning straight up under the pointer as the
+           parent opens. An even fan puts nothing at the centre; an ODD one does,
+           so odd counts are rotated by half a step. Nothing sits at offset 0.
+           CLEARING THE CARD. That was never the angles' doing: d2 is
+           rOf(parent) + rOf(child) + NODE_POKE, measured from the root's own
+           radius, so a first-layer child clears liftR EQUALLY AT EVERY ANGLE.
+           Left and right clear exactly as well as up-left and up-right.
+
+         AND THE LEARN BUTTON IS CLEAR, measured at the first ring's 109.5 units:
+           2 children  (-101,-42) (101,-42)
+           3 children  (-77,-77) (77,-77) (77,77)
+           4 children  (-107,21) (-61,-91) (61,-91) (107,21)
+         against a button box of x +/-76.5 and y 112 to 170. The lowest node any
+         of these produces is at y 77, still 35 above the button's top edge.
+
+         THE SLOT TABLE IS NOT DELETED. It still governs every depth BELOW the
+         first, measured from the node's own direction. Only depth 0 changed.
+
+         KNOWN: this does not fix convergence on its own, it moves it one
+         generation deeper. Two branches 135 apart clear at depth 2, but their
+         inner children are then 63 apart and a 36 fan on each overlaps by 9
+         degrees at depth 3. The fix for that is a fan that narrows with depth,
+         parked pending the owner looking at this first.
 
          KNOWN AND ACCEPTED: a deep child can now sit below the horizontal, which
          the clock face was partly written to avoid. That guarantee only ever
@@ -1560,7 +1589,15 @@ export default function LineageMap({
         Array.from({ length: cnt }, (_, i) => -Math.PI / 2 + (i * Math.PI) / Math.max(cnt - 1, 1));
       kids.forEach((k, i) => {
         const clock = circular && cnt >= 2;
-        const a = clock ? center + slots[i] : center + (i - (cnt - 1) / 2) * step;
+        /* Depth 0 takes its ANGLES from the learn area's derived fan; everything
+           below keeps the slot table. The distance and the tuck still read `clock`,
+           so a first-layer child is placed exactly as far out as before and only
+           its direction has moved. */
+        const firstFan = clock && depth === 0;
+        // Odd counts are rotated half a step so nothing sits straight up: see the
+        // hover bug in the note above.
+        const oddShift = firstFan && cnt % 2 === 1 ? step / 2 : 0;
+        const a = firstFan ? center + (i - (cnt - 1) / 2) * step + oddShift : clock ? center + slots[i] : center + (i - (cnt - 1) / 2) * step;
         // clock: the node sits just outside the parent edge (NODE_POKE daylight),
         // so it never tucks under the card. Single child keeps the shoulder tuck;
         // the big pit keeps its own ring (dist).
