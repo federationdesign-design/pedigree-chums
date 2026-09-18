@@ -1041,6 +1041,28 @@ const DOG_CHAIN_INK = "#0a3a57";
    The fifth of the chain's colours and weights, all five in a row here, one line
    each to nudge. */
 const DOG_CHAIN_TWIN_STROKE_K = 2;
+/* A HELD CIRCLE'S RIM IS TWO STROKES, the same two the path is (owner,
+   18 September 2026). The circles and the line already share a glow: the same
+   bt-chain-glow filter and the same DOG_CHAIN_COLOUR, so nothing there had to
+   change. What a circle had no equivalent of was the path's CORE. Its single rim
+   was already playing the casing's part, navy, and there was no lemon on top,
+   which is why the line read as lit and the circle did not.
+
+   SO THE RIM WIDENS AND A SECOND CIRCLE IS DRAWN INSIDE IT, navy outer, lemon
+   inner, on the same radius, exactly as paint lays casing under core.
+
+   THE WEIGHTS ARE SET BY THE SMALLEST CIRCLE, not by the look on a big one. A
+   depth-1 ring is 9% of its own radius, so the navy showing either side of the
+   lemon is (casing - core) / 2 of that. At 1.8 and 0.97, the path's own ratio,
+   that is 0.93px on a circle at the minCircleR floor of 25px radius: under a
+   pixel, which anti-aliases away and lets the lemon bleed into the sky blue fill
+   it sits on, where it measures 1.21:1 and would be invisible. At 2.3 it is
+   1.50px at the floor, 2.39 at 40 and 3.59 at 60.
+
+   SO THE LEMON READS AGAINST THE NAVY, 9.89:1, AT EVERY SIZE, which is the whole
+   point: it never has to be read against the sky blue. */
+const HELD_RIM_CASING_K = 2.3;
+const HELD_RIM_CORE_K = 0.97;
 /* HOW WIDE THE CHAIN'S CHIPS SCATTER, in client px, from the single point they
    all drop at (owner, 18 September 2026). A chain's chips used to appear where
    each closed circle stood, which read as several separate piles across the pit
@@ -4976,7 +4998,20 @@ export default function BreedTree({
            tracks the zoom, the difficulty slider and the hierarchy clamp on its
            own, and it returns to the normal weight on the first frame after the
            chain ends because chTwin is false by then. */
-        c.setAttribute("stroke-width", String(strokeWidthFor(d) * strokeK(v) * (chTwin ? DOG_CHAIN_TWIN_STROKE_K : 1)));
+        c.setAttribute("stroke-width", String(strokeWidthFor(d) * strokeK(v) * (chTwin ? DOG_CHAIN_TWIN_STROKE_K : chHeld ? HELD_RIM_CASING_K : 1)));
+        /* THE LEMON CORE ON TOP OF THAT CASING. A fourth child, appended after
+           the mark so the three the writer indexes keep their places, and drawn
+           only while the circle is held. It is a ring at the same radius, so it
+           never touches the mark in the middle. */
+        const rim = wrap?.children[3] as SVGCircleElement | undefined;
+        if (rim) {
+          rim.setAttribute("display", chHeld ? "inline" : "none");
+          if (chHeld) {
+            rim.setAttribute("transform", `translate(${tx},${ty})`);
+            rim.setAttribute("r", String(drawR(d, v, k)));
+            rim.setAttribute("stroke-width", String(strokeWidthFor(d) * strokeK(v) * HELD_RIM_CORE_K));
+          }
+        }
       }
       /* THE QUESTION MARK follows its circle. Shown only once the pit is live and
          only where a circle is actually drawn, so a depth-1 dog, which the pit
@@ -11002,6 +11037,18 @@ export default function BreedTree({
                   {circleEl}
                   {labelEl}
                   {qmarkEl}
+                  {/* The held rim's lemon core, child [3]. FOURTH and last on
+                      purpose: the frame writer indexes [0], [1] and [2] for the
+                      circle, the label and the mark, so this can only be appended,
+                      never inserted. It is a ring at the circle's own radius, so
+                      drawing it over the mark costs nothing: they never meet.
+                      Hidden until the circle is held; see HELD_RIM_CASING_K. */}
+                  <circle
+                    display="none"
+                    fill="none"
+                    stroke={DOG_CHAIN_COLOUR}
+                    pointerEvents="none"
+                  />
                 </g>
               );
             })}
