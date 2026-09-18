@@ -1349,12 +1349,17 @@
    36 for the lives bar against 31 for the counter chip on a phone, and a shared
    centre line reads better than a shared baseline on two pills of different depth.
 
-   12px is .titleRow's own gap, so the header uses one figure throughout. */
+   12px is .titleRow's own gap, so the header uses one figure throughout.
+
+   HALVED, 18 September 2026 (owner): the pips, the bar, the chip and its number
+   all come down 50%, so the gap between the two comes down with them or the row
+   would read as two small things held far apart. 12 to 6. Everything else in the
+   header keeps its own figures; only this pair has moved. */
 .statusRow {
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 12px;
+  gap: 6px;
   pointer-events: none;
 }
 .lives {
@@ -1381,41 +1386,59 @@
 .circleCount {
   /* align-self and margin-top are gone with the stack: the pair's own .statusRow
      centres them and carries the gap, so a margin here would fight it. */
-  padding: 10px 16px 6px 16px;
-  border-radius: 20px;
+  /* HALVED, 18 September 2026 (owner). Every figure is exactly half of what it
+     was: 10 16 6 16 padding, 20 radius, 24 face, 3 shadow. The chip no longer
+     matches .frameCount's, which is the one thing given up here and is recorded
+     rather than overlooked: the counters were a family at one size and this one
+     has been asked to be half of it. */
+  padding: 5px 8px 3px 8px;
+  border-radius: 10px;
   background: var(--navy);
   color: #ffffff;
   font-family: var(--font-display), system-ui, sans-serif;
-  font-size: 24px;
+  font-size: 12px;
   line-height: 1.1;
   letter-spacing: 0.5px;
   pointer-events: none;
-  box-shadow: 0 3px 0 rgba(10, 58, 87, 0.3);
+  box-shadow: 0 1.5px 0 rgba(10, 58, 87, 0.3);
 }
 /* The phone rule the frame counter keeps, for the same reason: 24px of display
    face plus 32px of padding is a wide chip on a 390 screen. */
 @media (max-width: 640px) {
   .circleCount {
-    padding: 8px 12px 5px 12px;
-    border-radius: 16px;
-    font-size: 18px;
+    padding: 4px 6px 2.5px 6px;
+    border-radius: 8px;
+    /* THE ONE FIGURE THAT IS NOT HALVED, AND IT IS DELIBERATE (owner asked to be
+       told rather than shipped a number under about 10px). Half of the phone's
+       18px is 9px, which is below that line. It holds at 12px, the same as the
+       desktop rule above, so the phone chip is never larger than the desktop one
+       and the number stays legible. Everything else in this rule IS halved.
+       One figure to change if 9px is wanted after all. */
+    font-size: 12px;
   }
 }
+/* HALVED, 18 September 2026 (owner). Every figure here is exactly half of what
+   it was: 4 gap, 5 7 padding, 3 border, 3 shadow, 13 x 20 pips with a 4 radius
+   and a 2 border. The radius stays 999px, which is a pill at any size.
+
+   The note further up saying "nothing about the bar itself changes" was true of
+   the move to the header and is no longer true of the bar's size. Left standing
+   because it is about the PLACEMENT, which has not moved. */
 .livesBar {
   display: flex;
-  gap: 4px;
-  padding: 5px 7px;
+  gap: 2px;
+  padding: 2.5px 3.5px;
   border-radius: 999px;
   background: var(--blue-deep, #0b78bd);
-  border: 3px solid var(--navy, #0a3a57);
-  box-shadow: 0 3px 0 rgba(10, 58, 87, 0.35);
+  border: 1.5px solid var(--navy, #0a3a57);
+  box-shadow: 0 1.5px 0 rgba(10, 58, 87, 0.35);
 }
 .lifePip {
-  width: 13px;
-  height: 20px;
-  border-radius: 4px;
+  width: 6.5px;
+  height: 10px;
+  border-radius: 2px;
   background: #e23b3b;
-  border: 2px solid var(--navy, #0a3a57);
+  border: 1px solid var(--navy, #0a3a57);
 }
 .lifePipSpent {
   background: rgba(10, 58, 87, 0.45);
