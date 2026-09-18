@@ -4299,7 +4299,14 @@ export default function LineageMap({
                       keeps a full-weight outline rather than a hairline. */}
                   <g
                     style={{
-                      transform: `scale(${placedSet.has(c.id) || stackedIds.has(c.id) ? 1 : c.cardScale})`,
+                      /* THE LIFT ONLY. It was not gated when it went in, which is
+                         the one gate every other change to this file carries: the
+                         SIZE was computed inside pickCards, which is shared by all
+                         three callers, and the gate was put on the card's STATE,
+                         placed or stacked, rather than on the layer. So the learn
+                         area's chum tree scaled its cards too and every image there
+                         came out smaller. `circular` restores its uniform CW. */
+                      transform: `scale(${!circular || placedSet.has(c.id) || stackedIds.has(c.id) ? 1 : c.cardScale})`,
                       transformOrigin: `${c.cardX}px ${c.cardY}px`,
                       transition: "transform 150ms ease",
                     }}
