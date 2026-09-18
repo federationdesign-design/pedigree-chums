@@ -944,6 +944,41 @@ const DOG_CHAIN_ARM_PX = 14;
    chain are still told apart at a glance. */
 const DOG_CHAIN_COLOUR = "#ffed00";
 const DOG_CHAIN_CASING = "#0a3a57";
+/* A CIRCLE WITH NO TWIN IN THE PIT FILLS LIGHT, FROM THE DROP (owner,
+   18 September 2026). It is the same #5cc4ee a held circle takes, deliberately:
+   the pit has one light fill and one dark one, and what they mean is read off the
+   ring and the mark rather than off a third and fourth hue.
+
+   ITS INK IS NAVY, the inverse of a dark circle's. Measured at 6.03:1, the same
+   pair the card counter already uses on --blue-sky.
+
+   WHY EVERY OVERLAY HAD TO BE RE-INKED WITH IT, and this is the part that makes
+   it more than a fill swap. To clear 4.5 on the navy a colour needs luminance at
+   or above 0.3450; to clear 4.5 on this light blue it needs 0.0676 or below. The
+   floor is above the ceiling, so NO SINGLE COLOUR READS ON BOTH FILLS and every
+   mark that crosses them has to change with the fill. On the dark fill the
+   existing colours stand: the label at 11.96, its hover yellow at 8.28, and the
+   four RING_PALETTE depths at 10.23, 9.00, 4.85 and 5.39. On the light fill they
+   would have measured 1.98, 6.03, 1.70, 1.49, 1.50 and 1.12, so all of them take
+   navy instead and all of them measure 6.03.
+
+   THE CHAIN PATH IS THE ONE THING THAT DOES NOT SWITCH, because one stroke
+   crosses both fills and the ground at once. It carries its own contrast instead:
+   see DOG_CHAIN_CASING.
+
+   THE TWIN GLOW NEEDS NOTHING. It only shows on the live chain's breed and a
+   chain needs duplicates, so a glowing circle is a twin and is dark filled, where
+   its white reads at 11.96. EDGE CASE, KNOWN AND LEFT: if a chain's breed loses
+   its last duplicate mid-chain, that circle turns light while still glowing and
+   the glow drops to 1.98 against it until the chain ends. Rare, self-correcting,
+   and not worth a special case. */
+const DOG_SINGLE_FILL = "#5cc4ee";
+const DOG_SINGLE_INK = "#0a3a57";
+/* HOW LONG THE FILL TAKES TO CHANGE. The answer is LIVE (see dogHasTwin), so a
+   circle changes as a consequence of a DIFFERENT circle being collected. An
+   instant flip on a circle the player never touched reads as a glitch; 150ms
+   reads as a response. It softens the paint, never the timing of the answer. */
+const DOG_FILL_FADE_MS = 150;
 /* THE FILL A HELD CIRCLE TAKES (owner, 18 September 2026), alongside its white
    outline and its tapped face. A pit circle is filled with the site's navy,
    #0a3a57, which fillFor returns for every circle once the pit is live; this is
@@ -4830,6 +4865,28 @@ export default function BreedTree({
         }
       }
     }
+    /* HOW MANY OF EACH BREED ARE IN THE PIT, counted ONCE for the whole frame.
+       The obvious way to ask "has this circle a twin" is dogHasTwin, which walks
+       the pit per circle; done for every node every frame that is O(n squared),
+       so the frame builds one map instead and each node reads it in O(1).
+
+       IT IS THE SAME QUESTION dogHasTwin ASKS, and deliberately the same rule:
+       in the pit, not removed, and neither the hidden root nor an echo, since
+       neither is a duplicate of anything. A depth-1 dog is counted even though the
+       pit draws it as a word, because the chain counts it too and the two must not
+       disagree about whether a breed has a twin.
+
+       LIVE, AND THAT IS THE POINT: see the note on dogHasTwin. A breed drops to
+       one the moment its last duplicate is collected, and the survivor changes
+       colour. */
+    const pitBreedCount = new Map<string, number>();
+    if (fellRef.current) {
+      const ownedB = pitBodiesRef.current?.owned;
+      if (ownedB) for (const o of ownedB) {
+        if (o.depth === 0 || isEcho(o) || removedNodesRef.current.has(o)) continue;
+        pitBreedCount.set(o.data.name, (pitBreedCount.get(o.data.name) ?? 0) + 1);
+      }
+    }
     nodes.forEach((d, i) => {
       const tx = (d.x - v[0]) * k;
       const ty = (d.y - v[1]) * k;
@@ -4856,6 +4913,12 @@ export default function BreedTree({
          its own line further down. */
       const chHeld = dogChainNodesRef.current.has(d);
       const chTwin = !chHeld && !!dogChainBreedRef.current && d.data.name === dogChainBreedRef.current;
+      /* THE FOURTH STATE, and the only one that is true at rest: a circle whose
+         breed has no other copy in the pit. See DOG_SINGLE_FILL. It ranks BELOW
+         the two chain states, because while a chain lives what a circle is doing
+         in that chain is the more urgent thing to say, and a single circle can
+         never be in one anyway: a chain needs a twin. */
+      const chSingle = !chHeld && !chTwin && fellRef.current && (pitBreedCount.get(d.data.name) ?? 0) === 1;
       if (c) {
         /* The mark has read all three states since the chain shipped; the ring
            only read the first, so a highlighted twin kept its own outline. Both
@@ -4870,10 +4933,13 @@ export default function BreedTree({
            and it costs one string to keep that true. Looked up only for a twin,
            which is a handful of circles while a chain lives and none otherwise. */
         const band = chTwin ? RARITY_BAND[rarityTier(treesContaining(d.data.name))] : null;
-        const want = chHeld ? "held" : band ? `twin:${band.bg}` : "0";
+        const want = chHeld ? "held" : band ? `twin:${band.bg}` : chSingle ? "single" : "0";
         if (c.dataset.chained !== want) {
           c.dataset.chained = want;
-          c.style.stroke = chHeld ? DOG_CHAIN_INK : band ? band.fg : "";
+          // The fade belongs to the fill and the ring, not to anything else, and
+          // it is set here so it exists for the first write as well as the rest.
+          c.style.transition = `fill ${DOG_FILL_FADE_MS}ms ease, stroke ${DOG_FILL_FADE_MS}ms ease`;
+          c.style.stroke = chHeld ? DOG_CHAIN_INK : band ? band.fg : chSingle ? DOG_SINGLE_INK : "";
           /* AND BOTH STATES ARE FILLED NOW. A held circle goes sky blue, and an
              available twin goes YELLOW, so the two things the chain has to say,
              "this one is in" and "this one is where you can go next", are both
@@ -4884,7 +4950,15 @@ export default function BreedTree({
              here to cover. Both are cleared the same way the stroke is, by
              writing the empty string, so a circle's own colour returns with the
              chain's end and nothing has to remember what it used to be. */
-          c.style.fill = chHeld ? DOG_CHAIN_FILL : band ? band.bg : "";
+          c.style.fill = chHeld ? DOG_CHAIN_FILL : band ? band.bg : chSingle ? DOG_SINGLE_FILL : "";
+          /* THE LABEL INVERTS WITH THE DISC. White reads 11.96 on the dark fill
+             and 1.98 on the light one, so it cannot stay put: on a light circle it
+             takes the same navy the ring does, 6.03. The empty string returns it
+             to whatever the render set, which is white, or the yellow of a hover.
+             lbl is children[1] of the same wrapper; the mark is children[2] and is
+             handled by its own filter below. */
+          const lbl = wrap?.children[1] as SVGTextElement | undefined;
+          if (lbl) lbl.style.fill = chSingle ? DOG_SINGLE_INK : "";
         }
       }
       if (c) {
@@ -4977,7 +5051,13 @@ export default function BreedTree({
              wears its own depth colour. */
           const held = dogChainNodesRef.current.has(d);
           const twinBand = !held && want === "1" ? RARITY_BAND[rarityTier(treesContaining(d.data.name))] : null;
-          const ink = held ? "ink" : twinBand ? (twinBand.fg === "#ffffff" ? "hi" : "black") : `${(d.depth - 1 + 4) % 4}`;
+          /* AND THE MARK INVERTS WITH THE DISC TOO. bt-qmark-ink IS navy as a
+             colour matrix, which is exactly DOG_SINGLE_INK, so a single circle
+             takes the same filter a held one does: both sit on a light fill and
+             both need the dark mark. The four depth filters are for the dark
+             fill only, where they measure 10.23, 9.00, 4.85 and 5.39; on the
+             light fill they would have been 1.70, 1.49, 1.50 and 1.12. */
+          const ink = held || chSingle ? "ink" : twinBand ? (twinBand.fg === "#ffffff" ? "hi" : "black") : `${(d.depth - 1 + 4) % 4}`;
           if (q.dataset.hi !== ink) {
             q.dataset.hi = ink;
             qi.setAttribute("filter", `url(#bt-qmark-${ink})`);
@@ -9493,6 +9573,28 @@ export default function BreedTree({
       }
       ch.px = cx; ch.py = cy;
     };
+    /* EVERY GROUP THE PATH IS DRAWN INTO, NAMED ONCE (owner, 18 September 2026).
+
+       THE GHOST PATH. The path was three groups until the casing made it four, and
+       this function's own early return emptied three of them BY HAND. A successful
+       collect sets chain = null and calls draw(), which cleared the glow, the core
+       and the dots and LEFT THE CASING ON SCREEN: a navy line in the shape of the
+       chain the player drew, for the rest of the level.
+
+       ONLY ON A SUCCESS, which is the opposite of what you would guess. A failed
+       chain goes through the collapse, and that finishes on paint([], [], 0, ...)
+       with no casing colour, which empties the casing group properly. So the one
+       path that cleared up after itself was the failure.
+
+       THE FAULT WAS NOT THE CASING. It was a list of group names written out twice
+       with the fourth added to only one copy. There is ONE list now and clearPath
+       walks it, so a fifth group cannot be half-added again. */
+    const CHAIN_GROUPS = ["glow", "casing", "core", "dots"] as const;
+    const clearPath = () => {
+      const g = chainGRef.current;
+      if (!g) return;
+      for (const nm of CHAIN_GROUPS) g.querySelector(`[data-chain=${nm}]`)?.replaceChildren();
+    };
     const draw = () => {
       const g = chainGRef.current;
       if (!g) return;
@@ -9501,9 +9603,7 @@ export default function BreedTree({
       const dots = g.querySelector("[data-chain=dots]");
       if (!glow || !core || !dots) return;
       if (!chain || chain.pending || !chain.cards.length) {
-        glow.replaceChildren();
-        core.replaceChildren();
-        dots.replaceChildren();
+        clearPath();
         return;
       }
       /* WHITE THROUGHOUT (owner, 18 September 2026). The path carries no colour
