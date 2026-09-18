@@ -9900,10 +9900,27 @@ export default function BreedTree({
         const held = new Set(ch.cards.map(dogNode).filter(dogInPit));
         return live.every((n) => held.has(n));
       },
+      /* THE LAST CIRCLE OPENS, NOT THE FIRST (owner, 18 September 2026).
+
+         WHY IT CHANGED. Auto-complete fires the chain the instant the last twin
+         is held, and the lift then jumped back to the circle the gesture STARTED
+         on, which is nowhere near the finger. The lift now comes out of the
+         circle under the finger at the moment it fires.
+
+         IT APPLIES TO A PLAIN RELEASE TOO, deliberately. On a release the last
+         joined circle is ALSO where the finger is, so one rule serves both: the
+         lift comes from where you are, never from where you were. Having the
+         sweep lift from one end and a release from the other would be two rules
+         for one gesture.
+
+         NOTHING IS LOST BY IT. Every circle in a dog chain is the same breed by
+         the join rule, so which one opens changes nothing the player sees on the
+         learn layer. It changes only where the lift flies from and, through the
+         bridge, where the chips drop back to. */
       settle: (ch) => {
-        const at = ch.cards[0];
+        const at = ch.cards[ch.cards.length - 1];
         const opened = dogNode(at);
-        const others = ch.cards.slice(1).map(dogNode).filter(dogInPit);
+        const others = ch.cards.slice(0, -1).map(dogNode).filter(dogInPit);
         if (!opened) return "the first circle went missing, nothing opened";
         /* MEASURED BEFORE THE OPEN, not after: dogOpen takes the first circle out
            of the pit, so asking afterwards would be counting a set the chain has
@@ -13119,10 +13136,16 @@ export default function BreedTree({
               if (dc && dc.opened === learnNode) {
                 dogChainRef.current = null;
                 const pit = pitBodiesRef.current?.owned;
-                /* EVERY CHIP IN THE CHAIN DROPS FROM THE FIRST CIRCLE THE PLAYER
-                   SELECTED (owner, 18 September 2026), so a chain reads as one
-                   payout from the place the player chose rather than as several
-                   piles scattered across the pit.
+                /* EVERY CHIP IN THE CHAIN DROPS FROM THE CIRCLE THAT OPENED
+                   (owner, 18 September 2026), so a chain reads as one payout from
+                   a single place rather than as several piles scattered across the
+                   pit.
+
+                   THAT IS NOW THE LAST CIRCLE, not the first. See DOG.settle: the
+                   lift comes out of the circle under the finger when the chain
+                   fires, and the chips drop back to the same spot. This block did
+                   not have to change for it, because it has always read
+                   dc.opened rather than picking an end for itself.
 
                    WHICH POSITION, AND WHY. The opened circle's BRIDGE, not its
                    node and not a position captured at the press. The bridge is
