@@ -1180,9 +1180,33 @@ export default function LineageMap({
      state is true now and the timer below is gone; showAuto still hides it once
      every circle is seen, or while packing, collecting or removing, so it
      disappears when there is nothing left to shortcut. */
-  // What AUTO charges. A flat figure today; see the note on setPenalty for why the
-  // label reads it from the state rather than repeating it.
-  const AUTO_COST = 500;
+  /* WHAT AUTO CHARGES. Two flat figures, one per place, and NO PER-NODE CURVE
+     ANYWHERE (owner, 18 September 2026).
+
+     WHY NOT PER NODE, and this is the part to read before anyone adds one. AUTO
+     does not pay for the nodes it opens: it calls setSeen and setPicked directly,
+     never flashNum, which is the only route to onScore, and it then marks every
+     node in scoredRef so they cannot be earned by hand afterwards either. So
+     pressing AUTO already costs the player 500 A NODE in forfeited earnings. A
+     per-node charge on top would be billing them twice for the same nodes, and it
+     scales with exactly the thing they have already given up.
+
+     THE FEE IS THEREFORE SMALL ON PURPOSE. The forfeit IS the price; this is a
+     token on top so the shortcut is not free.
+
+     TWO CONSTANTS, NOT ONE FORMULA. The learn area gets a whole tree, median 36
+     nodes; a lifted circle gets one circle's subtree, median 1 and p95 19. One
+     shared figure would be tuned for a 36-node tree and charged to a 1-node lift.
+     500 is the learn area's, tuned deliberately on 16 September and left alone.
+
+     250 IS THE LIFT'S, and half is the right half. On the commonest lift, a leaf
+     at one node, the fee is half that node's own value, so AUTO on a leaf costs
+     250 plus the 500 forfeited against the 500 tapping it would have paid: a clear
+     but small loss for saving one tap. By p95, 19 nodes, the fee is 2.6% of the
+     9,500 forfeited and on the biggest lift 0.24%, which is the design working:
+     past the smallest trees the forfeit is the only cost that matters. */
+  const AUTO_COST = 500;      // the learn area, a whole tree
+  const AUTO_COST_LIFT = 250; // the play area's lift, one circle's subtree
   const [autoArmed, setAutoArmed] = useState(true);
   const [autoExposed, setAutoExposed] = useState<Set<string>>(new Set()); // nodes auto revealed; their leaf names stay hidden to cut clutter
   /* THE FLOATING CHARGE, and it now carries the FIGURE as well as the key.
@@ -2456,7 +2480,7 @@ export default function LineageMap({
        thousands on a deep dog, so a 2500 penalty read as ruinous.
        Charged ONCE, into a local, so the score and the label are the same number
        by construction rather than by two places agreeing. */
-    const charge = -AUTO_COST;
+    const charge = -(circular ? AUTO_COST_LIFT : AUTO_COST);
     onScore?.(charge);
     const pk = (fxId.current += 1);
     setPenalty({ k: pk, v: charge });
@@ -5053,8 +5077,18 @@ className={[
     {boxPop && !circular && (
       <img className={styles.cardBox} src="/card-pack-box.svg" alt="" aria-hidden="true" />
     )}
-    {showAuto && !circular && !bounded && (
-      <div className={styles.autoWrap} onClick={autoCollect} onPointerDown={(e) => e.stopPropagation()} role="button" aria-label="Auto Find">
+    {/* ON THE LIFT TOO, 18 September 2026 (owner). The !circular that used to sit
+        in this gate is gone: nothing in autoCollect ever needed the learn area, it
+        touches only this component's own state and the placement step Complete
+        already uses.
+        IT MOVES RATHER THAN APPEARING WHERE IT WAS. .autoWrap sits on the SHAKE
+        button's exact spot, bottom right, which is safe in the learn area because
+        the shake button is unreachable behind that overlay. On the play lift the
+        shake button is live and part of the round, so the lift takes
+        .autoWrapLift, under the BACK button in the top right, which is the lift's
+        own chrome. Both bottom corners belong to the pit. */}
+    {showAuto && !bounded && (
+      <div className={circular ? `${styles.autoWrap} ${styles.autoWrapLift}` : styles.autoWrap} onClick={autoCollect} onPointerDown={(e) => e.stopPropagation()} role="button" aria-label="Auto Find">
         <div className={styles.autoPop}>
           <img className={styles.autoBtn} src="/auto-icon-redux.svg" alt="Auto Find" />
         </div>
