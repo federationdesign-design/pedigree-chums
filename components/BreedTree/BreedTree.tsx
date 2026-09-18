@@ -5071,14 +5071,57 @@ export default function BreedTree({
          chain's breed but not yet held, or neither. Hoisted out of the block
          below because the stroke WIDTH needs them too, and that is written on
          its own line further down. */
-      const chHeld = dogChainNodesRef.current.has(d);
-      const chTwin = !chHeld && !!dogChainBreedRef.current && d.data.name === dogChainBreedRef.current;
+      /* MAY THIS CIRCLE BE PAINTED AT ALL (owner, 18 September 2026).
+
+         THE FAULT IT FIXES. Every inline fill below was written without asking
+         whether the circle was visible, and an inline STYLE beats a presentation
+         ATTRIBUTE. A circle the render hides with fill="none" was therefore made
+         visible by being painted: on Ancient Mastiff the echo children of the
+         depth-1 words Ancient Molossers and Alaunt war dogs turned into pale blue
+         discs nested against their own parents. An echo is skipped by
+         pitBreedCount but was NOT skipped here, so it read the count for its
+         PARENT'S name, found one, and painted itself as a single circle.
+
+         THE THREE WAYS A CIRCLE HIDES, all covered here and each for its own
+         reason:
+           display none  a depth-1 word node, which the pit draws as its NAME.
+                         Taken from isWordNode rather than from the attribute,
+                         because the attribute is written further down this same
+                         function and would still hold LAST frame's answer here.
+                         isWordNode is what that line writes, so this is the same
+                         authority, one step earlier.
+           fill none     the render's `hidden` state: the root at depth 0 and
+                         every echo. Read off the element, because React owns it
+                         and an inline style never changes it, so the test stays
+                         true however often the circle is painted.
+           opacity 0     a collected or lifted dog. Also React's, also read off
+                         the element.
+
+         IT GATES ALL THREE STATES, not just the one that caused the fault. A
+         circle that may not be painted is not held, not a twin and not single, so
+         it takes no fill, no ink, no doubled twin ring and no held rim. Gating
+         only chSingle would have left the same bug reachable through a chain.
+
+         AND IT CLEARS RATHER THAN SKIPS. Forcing the three states false makes the
+         dataset key fall to "0", which is the branch that writes the empty string
+         back, so a circle painted in error before this landed loses that colour
+         on the next frame instead of keeping it for the round.
+
+         showQ BELOW READS THE SAME FLAG, so the mark and the fill can never
+         disagree about whether a circle is there to be decorated. It was already
+         testing these three; this is that test, hoisted and shared. */
+      const paintable =
+        !isWordNode &&
+        c?.getAttribute("fill") !== "none" &&
+        c?.style.opacity !== "0";
+      const chHeld = paintable && dogChainNodesRef.current.has(d);
+      const chTwin = paintable && !chHeld && !!dogChainBreedRef.current && d.data.name === dogChainBreedRef.current;
       /* THE FOURTH STATE, and the only one that is true at rest: a circle whose
          breed has no other copy in the pit. See DOG_SINGLE_FILL. It ranks BELOW
          the two chain states, because while a chain lives what a circle is doing
          in that chain is the more urgent thing to say, and a single circle can
          never be in one anyway: a chain needs a twin. */
-      const chSingle = !chHeld && !chTwin && fellRef.current && (pitBreedCount.get(d.data.name) ?? 0) === 1;
+      const chSingle = paintable && !chHeld && !chTwin && fellRef.current && (pitBreedCount.get(d.data.name) ?? 0) === 1;
       if (c) {
         /* The mark has read all three states since the chain shipped; the ring
            only read the first, so a highlighted twin kept its own outline. Both
@@ -5189,13 +5232,11 @@ export default function BreedTree({
 
            Both are read off the circle rather than recomputed here, so this
            cannot drift from what the render decided. */
-        const showQ =
-          fellRef.current &&
-          !isWordNode &&
-          d.depth > 0 &&
-          c?.getAttribute("fill") !== "none" &&
-          c?.getAttribute("display") !== "none" &&
-          c?.style.opacity !== "0";
+        // The three visibility tests this used to spell out are now `paintable`
+        // above, shared with the fill writer so the two cannot drift. The depth
+        // test stays here: the root is caught by fill="none" anyway, but the mark
+        // has its own reason to say so, and it is cheap.
+        const showQ = fellRef.current && d.depth > 0 && paintable;
         q.style.display = showQ ? "inline" : "none";
         if (showQ) {
           /* 0.9 -> 1.4 of the RADIUS, so the box is 70% of the disc across.
