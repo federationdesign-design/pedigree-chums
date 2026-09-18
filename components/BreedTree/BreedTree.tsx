@@ -7596,6 +7596,16 @@ export default function BreedTree({
              compression. */
           const maxWaves = Math.max(1, Math.ceil(BOMB_CHAIN_MAX_MS / BOMB_CHAIN_MS));
           const waveCount = Math.min(chain.length, maxWaves);
+          /* ?spindiag=1 : THE BLAST'S OWN NUMBERS, to settle whether a big bomb
+             takes a shorter chain or merely compresses a longer one into the same
+             48 waves. pct and bsz say how big the bomb was, chain says how much
+             it took, waves and per say how it will play out. Written here rather
+             than sampled, because a blast is an event and the sampler runs on its
+             own clock. Costs one string per detonation and only with the flag. */
+          if (spinDiagOn) {
+            const per = (chain.length / Math.max(1, waveCount)).toFixed(1);
+            spinLastBlast = `BLAST pct ${b.pct || 0}  bsz ${bsz.toFixed(1)}  chain ${chain.length}  waves ${waveCount}  per wave ${per}  ms ${(waveCount * BOMB_CHAIN_MS)}`;
+          }
           const waves: MB[][] = Array.from({ length: waveCount }, () => []);
           chain.forEach((o, i) => { waves[Math.floor((i * waveCount) / chain.length)].push(o); });
           waves.forEach((group, w) => {
@@ -7704,6 +7714,10 @@ export default function BreedTree({
       let spinScored = 0;      // 1-point collision awards since the last sample
       let spinMade = 0;        // bonds created since the last sample
       let spinCut = 0;         // bonds released since the last sample
+      /* THE LAST BLAST, for ?spindiag=1. Written at the moment of detonation and
+         left standing until the next one, so a bomb can be set off and the line
+         read at leisure. See the note where it is written. */
+      let spinLastBlast = "";
       let spinLastKE = 0;      // total kinetic energy at the last sample
       let spinLastAt = 0;      // when that sample was taken
       /* ?nobonds=1 : THE ONE VARIABLE, ISOLATED (owner, 18 September 2026).
@@ -8121,6 +8135,8 @@ export default function BreedTree({
                and roughly equal is the churn. */
             `chips ${chips.length} (inert ${inert})  bonds ${bonds} (made/s ${per(spinMade)} cut/s ${per(spinCut)})  KE ${ke.toFixed(3)}  dKE ${dKE >= 0 ? "+" : ""}${dKE.toFixed(3)}${dKE > 0 && !dragRef.current ? "  <-- ENERGY IN" : ""}`,
             `sumW ${sumW.toFixed(3)}  maxW ${maxW.toFixed(4)} on ${worst?.plugin?.kind ?? "?"}${wIdx === undefined ? "" : ` #${wIdx}`} bonds ${wBonds} spd ${wSpd.toFixed(2)}`,
+            // The last detonation, standing until the next. Empty before the first.
+            spinLastBlast || "BLAST none yet",
           ];
           spinMade = 0;
           spinCut = 0;
