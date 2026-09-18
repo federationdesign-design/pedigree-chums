@@ -12334,8 +12334,55 @@ export default function BreedTree({
                 // The removed set is a ref, so nothing above would re-render.
                 if (shut) setDogChainClosed((c) => c + 1);
               }
+              /* THE ROUND ENDS WHEN THERE IS NOTHING LEFT THE PLAYER CAN DO
+                 (owner, 18 September 2026), not when every node that ever had a
+                 body has been removed.
+
+                 WHAT THE OLD TEST ASKED, and why it could hang. `owned` is every
+                 node GIVEN A BODY this round and nothing ever deletes from it:
+                 popChildren adds, the drop adds, there is no owned.delete in the
+                 file. So "every owned node is in removedNodes" really asked
+                 whether every node that ever existed had been collected, and one
+                 node that could never be collected blocked the round for good.
+                 That is what a circle below the size floor did, and what
+                 ?windiag=1 was built to name.
+
+                 THE TEST IS POSITIVE NOW: is anything still CLEARABLE. Clearable
+                 is in the pit, not already removed, not held out of the world,
+                 and a real circle rather than the root or an echo. Nothing else
+                 reads this, so `owned` is left exactly as it is and dogInPit,
+                 startable, the twin glow, the counter and heldHidden all keep the
+                 answer they have today. The alternative was pruning `owned` at
+                 every non-removal exit, which is the same fault rebuilt: one
+                 missed call site and the round hangs again, silently.
+
+                 NO SIZE TEST HERE, deliberately. minCircleR guarantees size at
+                 every route a circle enters the pit, and a second size rule in
+                 the win condition would be a second place for the floor to
+                 disagree with itself.
+
+                 THE FLOOR MUST STAY. This is a safety net over a pit whose
+                 circles are already reachable, not a replacement for making them
+                 reachable. Take the floor out and this quietly ends rounds with
+                 circles still on screen that the player was never able to take,
+                 which is a worse failure than a round that will not end, because
+                 a hung round is visible and this would not be.
+
+                 IT STAYS SELF-DIAGNOSING. The circle counter reads what the pit
+                 DRAWS and this reads what is still CLEARABLE, so when the two
+                 disagree the difference is exactly the stuck nodes and windiag
+                 names them. Pruning `owned` would have made the two agree by
+                 construction and taken the diagnostic away. */
               const owned = pitBodiesRef.current?.owned;
-              if (owned && [...owned].every((n) => removedNodesRef.current.has(n))) {
+              const clearable = owned
+                ? [...owned].filter((n) => {
+                    if (removedNodesRef.current.has(n)) return false;
+                    if (n.depth === 0 || isEcho(n)) return false;
+                    const ob = pitBodiesRef.current?.find(n) as { held?: boolean } | undefined;
+                    return !ob?.held;
+                  })
+                : null;
+              if (clearable && clearable.length === 0) {
                 const fb = pitBodiesRef.current?.find(learnNode);
                 window.setTimeout(() => {
                   const total = chainRef.current ? chainRef.current(fb?.x ?? 0, fb?.y ?? 0) : 0;
