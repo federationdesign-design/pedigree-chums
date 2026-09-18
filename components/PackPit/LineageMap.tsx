@@ -716,60 +716,98 @@ export default function LineageMap({
   const F_GUT_MIN = 6;
   const F_GUT_WANT = 10;  // the gutter the card is chosen against
   const F_GUT_MAX = 24;   // the widest it may grow to soak up a height-capped card
+  /* THE GRID IS DERIVED ONCE NOW, AND READ TWICE (owner, 18 September 2026).
+
+     WHAT WAS WRONG. This ladder was written twice, here and again in fitCols
+     below, with a comment on each insisting the two must agree exactly. They did,
+     but only because nobody had touched one without the other, and this commit
+     had to touch both. One function, called for whatever ladder is wanted.
+
+     `floorW` IS THE SMALLEST A CARD MAY BE SQUEEZED TO, and it is what the fit
+     test asks about, so raising the ladder and lowering the floor are the same
+     move. It was always `base`, the card's own natural size, which is why the
+     card could only ever grow.
+
+     Returns null off the phone grid, where CW comes from its own branches. */
+  const GRID_BASE_W = Math.round(CARD * 0.85 * 0.95);
+  /* EIGHT COLUMNS ON THE LIFTED LAYER (owner, 18 September 2026). The quarter off
+     the card landed on DESKTOP ONLY, because a phone does not take CARD as its
+     card size: the grid picks a column count and then grows the card to fill the
+     row, so shrinking CARD changed nothing there. The column count is the only
+     dial that moves a phone card, so it is the one that moves.
+
+     SCOPED BY `circular`, the lifted layer's own flag. The chum tree (strongBg)
+     and the main pit keep the 6/5/4 ladder and the figures they have today.
+
+     THE FLOOR IS THE SAME QUARTER, base * LIFT_CARD_SCALE, rather than a new
+     magic number: the lifted card is allowed down to three quarters of its
+     natural size and no further, which is exactly what desktop already does. */
+  const LIFT_MAX_COLS = 8;
+  const LIFT_FLOOR_W = Math.round(GRID_BASE_W * LIFT_CARD_SCALE);
+  const gridFor = (maxCols: number, floorW: number) => {
+    if (!isMobile || !(circular || strongBg)) return null;
+    /* DIVIDED BY THE LAYER'S SCALE, 16 September 2026 (owner: the grid still
+       leaves about 15% of the width unused).
+
+       THE UNITS WERE THE FAULT. The grid is laid out in UNSCALED coordinates
+       and the whole layer is then drawn at LIFT_K, 0.8 on the lift and the
+       chum tree. Sizing the columns in screen pixels therefore produced a
+       grid that rendered at 80% of the width it was calculated for, which is
+       exactly the strip left over on the right.
+
+       LIFT_K is declared much further down, after the layout it feeds, so its
+       condition is repeated here rather than the constant moved. The two must
+       stay in step: (circular || strongBg) && !bounded. */
+    const k = (circular || strongBg) && !bounded ? 0.8 : 1;
+    const avail = (vp.w - 2 * F_EDGE) / k; // in the units the grid is laid out in
+    const fits = (n: number) => n * floorW + (n - 1) * F_GUT_MIN <= avail;
+    let cols = 4;
+    for (let n = maxCols; n > 4; n--) if (fits(n)) { cols = n; break; }
+    const gut = Math.max(F_GUT_MIN, Math.min(F_GUT_WANT, Math.floor((avail - cols * floorW) / Math.max(1, cols - 1))));
+    const byWidth = Math.max(floorW, Math.floor((avail - (cols - 1) * gut) / cols));
+    /* CAPPED BY HEIGHT TOO, 16 September 2026 (owner: on the deepest dogs the
+       bottom rows run off the page).
+
+       THE CARD WAS DERIVED FROM WIDTH ALONE, so nothing in it knew how many
+       rows it would produce or how tall the screen was. On a 768 tablet that
+       gave a 145px card and nine rows for the Jackapoo's 52 frames: 1,116px
+       of grid against about 764px of room. The wider the device, the worse
+       it got, which is why it was never seen on a phone.
+
+       THE BUDGET. The grid starts around 91px down, below the counters, and
+       has to finish clear of the chum card, the Learn and Collect buttons and
+       the progress bar along the foot. F_VERT_RESERVE is that furniture,
+       measured off the layout rather than guessed: the card is about 150 tall
+       with its name, the two buttons about 130 between them, and the bar 36.
+
+       Divided by k because everything here is in the layer's own units while
+       the screen is not, the same correction the width uses.
+
+       NEVER BELOW `floorW`. A phone already fits, so the cap must not bite
+       there; it only ever pulls a tablet's oversized card back down. More
+       columns means fewer rows, so it bites less at eight than it did at six. */
+    const rows = Math.max(1, Math.ceil(Math.max(1, frameCountEst) / cols));
+    /* THE ONE FIGURE IN HERE THAT IS AN ESTIMATE. The furniture below the grid
+       is drawn from several places and cannot be measured at this point in
+       the render, so 280 is the chum card, the two buttons and the progress
+       bar added up from their own constants. If the grid still runs long or
+       stops short on a device, THIS is the number to change; everything
+       around it is derived. */
+    const F_VERT_RESERVE = 280;
+    const availH = Math.max(0, vp.h - 91 - F_VERT_RESERVE) / k;
+    const byHeight = Math.floor(availH / rows) - gut;
+    return { cols, gut, cw: Math.max(floorW, Math.min(byWidth, byHeight)) };
+  };
+  /* THE LIVE GRID, and the grid the TYPE is measured against. The second is the
+     ladder as it stood before the lift went to eight, so the card comes down and
+     the wording does not, which is what desktop already does through CW_TYPE. */
+  const gridNow = circular ? gridFor(LIFT_MAX_COLS, LIFT_FLOOR_W) : gridFor(6, GRID_BASE_W);
+  const gridType = gridFor(6, GRID_BASE_W);
   const CW = isMobile
+    // The phone grid: the card the derivation above settled on, columns then
+    // gutter then card, capped by height.
     ? circular || strongBg
-      ? (() => {
-          const base = Math.round(CARD * 0.85 * 0.95);
-          /* DIVIDED BY THE LAYER'S SCALE, 16 September 2026 (owner: the grid still
-             leaves about 15% of the width unused).
-
-             THE UNITS WERE THE FAULT. The grid is laid out in UNSCALED coordinates
-             and the whole layer is then drawn at LIFT_K, 0.8 on the lift and the
-             chum tree. Sizing the columns in screen pixels therefore produced a
-             grid that rendered at 80% of the width it was calculated for, which is
-             exactly the strip left over on the right.
-
-             LIFT_K is declared much further down, after the layout it feeds, so its
-             condition is repeated here rather than the constant moved. The two must
-             stay in step: (circular || strongBg) && !bounded. */
-          const k = (circular || strongBg) && !bounded ? 0.8 : 1;
-          const avail = (vp.w - 2 * F_EDGE) / k; // in the units the grid is laid out in
-          const fits = (n: number) => n * base + (n - 1) * F_GUT_MIN <= avail;
-          const cols = fits(6) ? 6 : fits(5) ? 5 : 4;
-          const gut = Math.max(F_GUT_MIN, Math.min(F_GUT_WANT, Math.floor((avail - cols * base) / Math.max(1, cols - 1))));
-          const byWidth = Math.max(base, Math.floor((avail - (cols - 1) * gut) / cols));
-          /* CAPPED BY HEIGHT TOO, 16 September 2026 (owner: on the deepest dogs the
-             bottom rows run off the page).
-
-             THE CARD WAS DERIVED FROM WIDTH ALONE, so nothing in it knew how many
-             rows it would produce or how tall the screen was. On a 768 tablet that
-             gave a 145px card and nine rows for the Jackapoo's 52 frames: 1,116px
-             of grid against about 764px of room. The wider the device, the worse
-             it got, which is why it was never seen on a phone.
-
-             THE BUDGET. The grid starts around 91px down, below the counters, and
-             has to finish clear of the chum card, the Learn and Collect buttons and
-             the progress bar along the foot. F_VERT_RESERVE is that furniture,
-             measured off the layout rather than guessed: the card is about 150 tall
-             with its name, the two buttons about 130 between them, and the bar 36.
-
-             Divided by k because everything here is in the layer's own units while
-             the screen is not, the same correction the width uses.
-
-             NEVER BELOW `base`. A phone already fits, so the cap must not bite
-             there; it only ever pulls a tablet's oversized card back down. */
-          const rows = Math.max(1, Math.ceil(Math.max(1, frameCountEst) / cols));
-          /* THE ONE FIGURE IN HERE THAT IS AN ESTIMATE. The furniture below the grid
-             is drawn from several places and cannot be measured at this point in
-             the render, so 280 is the chum card, the two buttons and the progress
-             bar added up from their own constants. If the grid still runs long or
-             stops short on a device, THIS is the number to change; everything
-             around it is derived. */
-          const F_VERT_RESERVE = 280;
-          const availH = Math.max(0, vp.h - 91 - F_VERT_RESERVE) / k;
-          const byHeight = Math.floor(availH / rows) - gut;
-          return Math.max(base, Math.min(byWidth, byHeight));
-        })()
+      ? gridNow!.cw
       : Math.round(CARD * 0.85)
     // Desktop: the card IS this figure, so the lifted layer's quarter is taken
     // here and nowhere else. See LIFT_CARD_SCALE. The phone branches above are
@@ -780,20 +818,22 @@ export default function LineageMap({
      would have shrunk with it. Type and labels are read, not drawn to scale, so
      they hold the size they had: this is the card width BEFORE the lift's
      quarter, and it is what the wording is measured against. Everywhere the card
-     itself is drawn still uses CW. */
-  const CW_TYPE = Math.round(CW / (circular ? LIFT_CARD_SCALE : 1));
-  /* The column count and gutter again, from the same three rules, for the grid to
-     lay out with. Recomputed rather than carried out of the block above so CW
-     stays a single expression; the inputs are identical, so they cannot disagree. */
-  const fitCols = (() => {
-    if (!isMobile || !(circular || strongBg)) return 0;
-    const base = Math.round(CARD * 0.85 * 0.95);
-    // same scale correction as CW above; the two derivations must agree exactly
-    const k = (circular || strongBg) && !bounded ? 0.8 : 1;
-    const avail = (vp.w - 2 * F_EDGE) / k;
-    const fits = (n: number) => n * base + (n - 1) * F_GUT_MIN <= avail;
-    return fits(6) ? 6 : fits(5) ? 5 : 4;
-  })();
+     itself is drawn still uses CW.
+
+     AND THE SAME ON THE PHONE, 18 September 2026, with the eight-column ladder.
+     On a phone CW is not CARD at all, it is whatever the grid derives, so
+     dividing the LIVE CW would have let the type follow the card down from 67 to
+     47. It is measured against `gridType` instead: the card the OLD 6/5/4 ladder
+     would have produced on this screen, so the wording is exactly the size it is
+     today and only the card has moved. */
+  const CW_TYPE = isMobile && (circular || strongBg) && gridType
+    ? Math.round(gridType.cw / (circular ? LIFT_CARD_SCALE : 1))
+    : Math.round(CW / (circular ? LIFT_CARD_SCALE : 1));
+  /* ONE SOURCE, 18 September 2026 (owner). This used to repeat the whole ladder
+     with a comment warning that the two derivations must agree exactly. It now
+     reads the very same object CW was built from, so they cannot disagree at
+     all. 0 off the phone grid, as before. */
+  const fitCols = gridNow?.cols ?? 0;
   const [gridX, setGridX] = useState(0);
   useEffect(() => setGridX(0), [breed.name]);
   const gridDrag = useRef<{ id: number; sx: number; gx: number; moved: boolean } | null>(null);
