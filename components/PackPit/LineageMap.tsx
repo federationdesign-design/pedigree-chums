@@ -1930,6 +1930,21 @@ export default function LineageMap({
       const baseX = soloLeaf ? breed.x : live ? live._x : 0;
       const baseY = soloLeaf ? breed.y : live ? live._y : 0;
       const pos = dragPos.get(id);
+      /* THE CARD IS THE SIZE OF THE NODE IT CAME FROM (owner, 18 September 2026),
+         scaled so the largest possible node maps to CW and everything below it
+         comes down in proportion.
+
+         NO FLOOR AND NO CLAMP, chosen rather than overlooked. nodeR bottoms out at
+         radius()'s own floor of 21, which is 13.84 after PIT_NODE_SCALE on a
+         phone, against 32.95 at full share. So on a 390 phone the SMALLEST CARD IS
+         ABOUT 20px and every share at or below 10% draws at exactly that, because
+         they all sit on radius()'s floor. 20px is half a fingertip and well under
+         the usual 44px touch target; the owner has taken that deliberately, on the
+         grounds that a 10% dog giving a tiny card is the point.
+
+         IT GROWS TO THE FRAME ON LANDING, so this only ever describes a loose
+         card: see cardScale at the draw site. */
+      const cardScale = live ? nodeR(share) / nodeR(100) : 1;
       const ff = cardFrame.get(id);
       const cardX = ff ? ff.sx - pan.x : (pos ? pos.x : baseX);
       const cardY = ff ? ff.sy - pan.y : (pos ? pos.y : baseY);
@@ -1950,7 +1965,7 @@ export default function LineageMap({
         // in your hand sits inside nothing.
         ringW = nodeR(share) * ringFrac(pd);
       }
-      return { id, img, name, note, share, mix, status, cardX, cardY, ringW };
+      return { id, img, name, note, share, mix, status, cardX, cardY, ringW, cardScale };
     })
     .filter((c) => c.img);
   // images successfully placed in a frame -- turns their node green
@@ -4185,6 +4200,25 @@ export default function LineageMap({
                   }}
                   onPointerCancel={() => { if (DROP_DBG) dropLog(`CANCEL#${DROP_DBG_N} ${c.name}`); /* DIAGNOSTIC item 8, REMOVE ONCE FIXED */ cardDrag.current = null; setDragCat(null); setDragImg(null); setDragCardId(null); setDragXY(null); }}
                 >
+                  {/* THE WHOLE CARD SCALES AS ONE. Every child still measures
+                      itself against CW, so the image, the rim, the clip, the grab
+                      square and every corner adornment come down together and
+                      nothing has to be re-derived. Scaled about the card's own
+                      centre, so cardX and cardY still mean what they meant.
+
+                      A FRAMED CARD IS ALWAYS 1: the moment it lands it fills its
+                      frame, and the transition below is the 150ms grow. A snap
+                      from a fifth of the frame to all of it reads as a glitch.
+
+                      vectorEffect on the rim is non-scaling-stroke, so a tiny card
+                      keeps a full-weight outline rather than a hairline. */}
+                  <g
+                    style={{
+                      transform: `scale(${placedSet.has(c.id) || stackedIds.has(c.id) ? 1 : c.cardScale})`,
+                      transformOrigin: `${c.cardX}px ${c.cardY}px`,
+                      transition: "transform 150ms ease",
+                    }}
+                  >
                   <g className={styles.pickWobble}>
                   {isSelfCard(c.name) ? (() => {
                     // The block is as tall as the card was, and as wide as it likes.
@@ -4406,6 +4440,7 @@ className={[
                       </g>
                     );
                   })() : null}
+                  </g>
                   </g>
                 </g>
               );
