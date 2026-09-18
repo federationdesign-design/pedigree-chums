@@ -561,6 +561,17 @@ const LOGO_PIT_FRACTION = 0.6;
    drawn width IS its bone's width and needs no allowance. */
 const LOGO_SHRINK = 0.9;
 const LOGO_BONE_FRAC = 584.1 / 595.3;
+/* AND THEN THE ONE NUMBER TO NUDGE (owner, 18 September 2026). Matched to the
+   silhouette alone, the pit bone came out about a third too big by eye, and the
+   reason is that the logo's bone is not read as a bone: it holds the words, so
+   it reads as a sign the shape of a bone. The pit's bone is a bone and nothing
+   else, so it has to be smaller than the silhouette to look the same size.
+
+   THEY ARE STILL TIED. This scales the figure taken from the logo rather than
+   replacing it, so moving the logo still moves the bone and the two can never
+   drift apart. This is the only number to touch if the bone still looks wrong:
+   lower it to shrink the bone, raise it towards 1 to grow it. */
+const PIT_BONE_MATCH = 0.75;
 /* ---- Era props -------------------------------------------------------------
    Objects that belong to one era rather than to the pit as a whole. They take
    the place of the stick, big stick and rock in the props slot, and an era with
@@ -5987,14 +5998,16 @@ export default function BreedTree({
           : kind === "stick" ? ballDia * 1.6
           : kind === "stickBig" ? ballDia * 1.6 * 1.5
           : kind === "cookies" ? BIGT * 3.2
-          /* THE BONE MATCHES THE LOGO'S BONE (owner, 18 September 2026), so the
-             two bones on screen are one size. It is taken from the logo's own
-             drawn width rather than given a figure of its own, which is what
-             keeps them together on every screen: see LOGO_BONE_FRAC.
+          /* THE BONE IS SIZED FROM THE LOGO'S BONE (owner, 18 September 2026),
+             so the two track each other. It is taken from the logo's own drawn
+             width rather than given a figure of its own, which is what keeps
+             them together on every screen, then scaled by PIT_BONE_MATCH,
+             because the logo's bone carries the words and reads bigger than a
+             plain bone of the same width: see LOGO_BONE_FRAC and PIT_BONE_MATCH.
              The fallback is the old ballDia * 1.68 and is there for safety
              alone: the logo is sized when the pit is built and the toys arrive
              on timers seconds later, so it has always been measured by now. */
-          : kind === "bone" ? (logoWpxRef.current > 0 ? logoWpxRef.current * LOGO_BONE_FRAC : ballDia * 1.68)
+          : kind === "bone" ? (logoWpxRef.current > 0 ? logoWpxRef.current * LOGO_BONE_FRAC * PIT_BONE_MATCH : ballDia * 1.68)
           // Era props. The newspaper is a long roll so it takes the stick's
           // length; the fork and the shoe are hand-sized, so they read at the
           // ball's width like the rock does.
