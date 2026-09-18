@@ -761,7 +761,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Black and Tan Terrier",
     note: "The sleek black-and-tan ratter of the 1700s, bred down from the older rough working terrier. The dog Manchester, Toy and Heeler lines were built on. Now extinct.",
     children: [
-      { name: "Old English Black and Tan Terrier", note: "The rough medieval black-and-tan working terrier it was bred down from. Now extinct.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 100 },
+      { name: "Old English Black and Tan Terrier", note: "The rough medieval black-and-tan working terrier it was bred down from. Now extinct.", img: "/history/breeds/old-english-black-and-tan-terrier-img.jpg", value: 100 },
       { name: "Black and Tan Terrier", note: "The same dog carrying on: see the echo note in data/lineageShape.ts.", value: 0 }
     ]
   },
