@@ -1177,9 +1177,34 @@ const FX_NUM_CASING_K = 3;     // casing width, in the same units as the 15px ty
    and removed. Uncapped growth on a long chain puts 20 on the twelfth link,
    around 160 over the chain and perhaps 60 to 80 alive at once. 20 is the
    ceiling the owner set and the reason it exists. */
-const SPARK_MAX = 20;          // hard cap, whatever the chain reaches
-const SPARK_BASE = 4;          // the first connection
-const SPARK_STEP = 1.5;        // more per link after it
+/* TWICE AS INTENSE, AND STEEPER (owner, 18 September 2026). The burst was modest
+   and grew gently; by the sixth connection it should be engulfing the circle.
+
+   WHAT THE NUMBERS DO NOW. n = min(SPARK_MAX, round(SPARK_BASE + links * SPARK_STEP)):
+     1st connection    13
+     2nd               18
+     3rd               23
+     4th               28
+     5th               33
+     6th               38, which is the burst the owner asked to be large
+     7th and after     40, the cap
+   The base doubles from 4 to 8, the step goes 1.5 to 5, and the cap doubles from
+   20 to 40 so the sixth can actually reach the figure the step implies: at the old
+   cap everything from the third connection on would have looked identical.
+
+   SPARK_GROW_K IS THE OTHER HALF OF "ENGULFING". The count alone makes a denser
+   burst in the same small area; this is the speed and length multiplier, doubled
+   from 0.06, so by the sixth connection the streaks reach 1.72 times as far as the
+   first connection's instead of 1.36.
+
+   THE FINAL CONNECTION IS UNAFFECTED BY THE STEEPENING and still throws the base,
+   now 8 rather than 4: see SPARK_FINAL_LINKS. It is twice what it was, but it is
+   still a fifth of what the sixth connection throws, so the completion flare keeps
+   its moment. */
+const SPARK_MAX = 40;          // hard cap, whatever the chain reaches
+const SPARK_BASE = 8;          // the first connection, and the completing one
+const SPARK_STEP = 5;          // more per link after it
+const SPARK_GROW_K = 0.12;     // how much further a later link throws, per link
 const SPARK_LIFE_MS = 340;
 /* THE LAST CONNECTION THROWS WHAT THE FIRST ONE DID (owner, 18 September 2026).
 
@@ -7687,7 +7712,7 @@ export default function BreedTree({
         const n = Math.min(SPARK_MAX, Math.round(SPARK_BASE + links * SPARK_STEP));
         // A later link also throws a little further and a little longer, so the
         // burst reads as building even after the COUNT has hit its ceiling.
-        const grow = 1 + Math.min(links, 12) * 0.06;
+        const grow = 1 + Math.min(links, 12) * SPARK_GROW_K;
         for (let i = 0; i < n; i++) {
           const a = Math.random() * Math.PI * 2;
           const sp = (0.6 + Math.random() * 1.8) * 60 * fxScale * grow;
