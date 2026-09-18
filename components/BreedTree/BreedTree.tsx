@@ -1599,7 +1599,37 @@ const PIT_FULL_ZONE_PX = 90;
 
    THE POLL'S OWN 4s SETTLE-IN STAYS. It is a different guard for a different
    reason (a pit that has not come to rest yet) and 20s dominates it. */
-const PIT_FULL_GRACE_MS = 20000;
+const PIT_FULL_GRACE_MS = 30000;
+/* AND A BONUS FOR A BUSIER DIAGRAM (owner, 18 September 2026). A level with more
+   to work through gets longer before the countdown may start.
+
+   WHAT COUNTS AS A CIRCLE: depth 1 and depth 2, echoes excluded. That is what the
+   START SCREEN DRAWS, the big dogs and the one ring nested inside each of them,
+   which is the diagram the player is looking at when they press PLAY. Checked
+   against Ancient Mastiff, which draws 2 and 2 and counts 4.
+
+   THE TWO ALTERNATIVES WERE MEASURED AND REJECTED. Depth-1 dogs alone tops out at
+   FOUR across all 166 trees, so the bonus would never exceed 5 seconds and the
+   owner's own ten-circle example could not happen. Every non-hidden node in the
+   tree runs to 323 on Lucas Terrier, which at this rate would be twenty minutes
+   of immunity. Depth 1 and 2 is the only count that matches both the screen and
+   the intent.
+
+   THE FIRST TWO EARN NOTHING, so the floor is the flat 30 seconds: almost every
+   level has at least two, and paying for them would just be raising the base.
+
+   THE RATE IS 2.5 SECONDS, chosen over the 5 the owner also offered. Across the
+   166 trees the count runs 0 to 16, median 6. At 2.5 the median level gets 40
+   seconds and the busiest, Irish Setter at 16, gets 65. At 5 those become 50 and
+   100, and a hundred seconds of immunity is most of a round. One constant to
+   change if the longer end is wanted after all. */
+const PIT_FULL_GRACE_FREE = 2;
+const PIT_FULL_GRACE_PER_CIRCLE_MS = 2500;
+function pitFullGraceMs(ns: Node[]): number {
+  let n = 0;
+  for (const d of ns) if (d.depth > 0 && d.depth <= 2 && !isEcho(d)) n++;
+  return PIT_FULL_GRACE_MS + Math.max(0, n - PIT_FULL_GRACE_FREE) * PIT_FULL_GRACE_PER_CIRCLE_MS;
+}
 /* THE ONE YELLOW EVERY LIVE PERCENTAGE CHIP WEARS (owner, 18 September 2026,
    seen on Kerry Blue Terrier: two different yellows side by side in one pit).
 
@@ -7095,7 +7125,7 @@ export default function BreedTree({
         // THE DROP HAS ARRIVED, so the countdown's grace runs from here rather
         // than from the round starting: see PIT_FULL_GRACE_MS. Behind the same
         // first-landing guard as the toys, so it is set once per level.
-        cdGraceRef.current = performance.now() + PIT_FULL_GRACE_MS;
+        cdGraceRef.current = performance.now() + pitFullGraceMs(nodes);
         toyTimers.push(window.setTimeout(() => spawnToy("cookies"), TOY_COOKIES_DELAY));
         // Both tennis balls drop on EVERY level now (2026-08-12). The old
         // first-seven-levels `hideBalls` gate and its no-balls re-timing were
@@ -8341,7 +8371,7 @@ export default function BreedTree({
       // fairer start; this seeds it so a level whose drop never reaches the floor
       // is still covered. Set here rather than in a mount effect so it resets with
       // the level, on a retry as on a new one: this effect re-runs for each.
-      cdGraceRef.current = fullClock + PIT_FULL_GRACE_MS;
+      cdGraceRef.current = fullClock + pitFullGraceMs(nodes);
       pitEndedRef.current = false; // fresh sim, the poll is live again
       let stillFrames = 0;
       const SETTLE_PS = vps(0.012);
