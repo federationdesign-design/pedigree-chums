@@ -906,10 +906,23 @@ const DOG_CHAIN_SLACK = Infinity;
    this for circles and 0 for chum cards, whose press claims the gate outright as
    it always has. */
 const DOG_CHAIN_ARM_PX = 14;
-// WHITE, like the card chain (owner, 18 September 2026). It shipped in the site
-// yellow for one day as the deliberate opposite of the cards; both paths are now
-// white, and so is the question mark highlight below.
-const DOG_CHAIN_COLOUR = "#ffffff";
+/* THE SITE YELLOW (owner, 18 September 2026), which is where this started. It
+   shipped as #ffd23e, --yellow, as the deliberate opposite of the white card
+   chain; it went white for a day so both paths matched; it is yellow again, and
+   the two kinds are told apart by colour once more.
+
+   HARD-CODED, like every other colour in this file that reaches an SVG element
+   from script, where a var() would not resolve. --yellow in globals.css is the
+   one to keep it in step with.
+
+   THE DOG PATH ONLY. The chum cards take their colour from CARD.colour and stay
+   white. What the path says with WEIGHT and GLOW is untouched by this: both
+   kinds still carry every state that way, and only the hue has moved.
+
+   THE MARK AND THE TWIN OUTLINE DO NOT FOLLOW IT. They are white, tied to each
+   other, see DOG_CHAIN_TWIN_OUTLINE. The twin GLOW does follow it, see the note
+   on the glow itself. */
+const DOG_CHAIN_COLOUR = "#ffd23e";
 /* THE FILL A HELD CIRCLE TAKES (owner, 18 September 2026), alongside its white
    outline and its tapped face. A pit circle is filled with the site's navy,
    #0a3a57, which fillFor returns for every circle once the pit is live; this is
