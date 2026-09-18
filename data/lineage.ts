@@ -1477,7 +1477,18 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "An extinct miniature Bulldog of Victorian England, a small companion bull-type that helped give rise to the French Bulldog.",
     children: [
       { name: "Old English Bulldog", note: "Small specimens of the old bull-baiting dog, bred down in size. Now extinct.", img: "/history/breeds/Old-English-Bulldog.jpg", value: 65 },
-      { name: "Pug-type toy dogs", note: "Toy blood sometimes used to fix the small size. Now extinct.", img: "/history/breeds/pug-type-toy-dog.jpg", value: 35 }
+      /* "Pug-type toy dogs" WAS THE PUG (owner, 19 September 2026). A bare leaf in
+         this one tree, meaning "toy blood used to fix the small size" in a Toy
+         Bulldog: that is the Pug doing a specific job, not a type spanning unrelated
+         eastern lines. Named plainly, expandNode grafts the Pug's own ancestry and
+         the level gains three generations for one word.
+
+         THE PICTURE STAYS AS IT WAS. The Pug's pack art is /pug-square.jpg, at the
+         public root rather than under history/breeds, and LineageMap swaps a pack
+         dog to its square card art through PACK_IMG anyway. So this keeps the
+         history image it already had rather than naming a file that does not exist
+         in this folder. */
+      { name: "Pug", note: "Toy blood used to fix the small size. Now extinct as this cross.", img: "/history/breeds/pug-type-toy-dog.jpg", value: 35 }
     ]
   },
 
@@ -2513,10 +2524,31 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Pug",
     note: "A comical, flat-faced toy from ancient China, bred as a companion for emperors before Dutch traders carried it to Europe.",
     children: [
-      { name: "Ancient Chinese toy dogs", note: "The old Chinese flat-faced lapdogs kept in the imperial court alongside the Pekingese and lion dogs. Now extinct.", img: "/history/breeds/Ancient-Chinese-toy-dogs.jpg", value: 60 },
+      /* THE LO-SZE IS THE PUG'S NAMED ANCESTOR (owner, 19 September 2026). Three
+         flat-faced types were bred in China, the Lion dog, the Pekingese and the
+         Lo-sze, and the Lo-sze was the ancient Pug: at the Song imperial court, and
+         carried to Europe in the sixteenth century by the Dutch East India Company.
+
+         BETWEEN, NOT INSTEAD OF. It goes above the Pug and below Ancient Chinese toy
+         dogs, which is the broader stock it came out of. Replacing that node would
+         lose a generation; replacing the Lo-sze with it would lose the name. The 60
+         it inherits is unchanged, so no share moves. */
+      { name: "Lo-sze", note: "The ancient flat-faced Pug of the Song imperial court, carried to Europe by Dutch traders in the sixteenth century. Now extinct.", img: "/history/breeds/Ancient-Chinese-toy-dogs.jpg", value: 60 },
       { name: "Eastern Lion dogs", note: "The wider family of small eastern companion dogs it shares its roots with. Now extinct.", img: "/history/breeds/Tibetan-temple-dogs.jpg", value: 40 }
     ]
   },
+  /* See the note on the Pug for why the Lo-sze sits where it does. Its own parent is
+     the broader Chinese court stock it was bred out of, and the echo is load-bearing:
+     data/lineageShape.ts. Value 0, so no share moves. */
+  "Lo-sze": {
+    name: "Lo-sze",
+    note: "The ancient flat-faced Pug of the Song imperial court, carried to Europe by Dutch traders in the sixteenth century. Now extinct.",
+    children: [
+      { name: "Ancient Chinese toy dogs", note: "The old Chinese flat-faced lapdogs kept in the imperial court alongside the Pekingese and lion dogs. Now extinct.", img: "/history/breeds/Ancient-Chinese-toy-dogs.jpg", value: 100 },
+      { name: "Lo-sze", note: "The same dog carrying on: see the echo note in data/lineageShape.ts.", value: 0 }
+    ]
+  },
+
   "Great Dane": {
     name: "Great Dane",
     note: "Germany's giant boarhound, the Deutsche Dogge, built by crossing heavy war mastiffs with tall, fast coursing hounds.",
