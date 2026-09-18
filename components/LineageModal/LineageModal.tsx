@@ -482,6 +482,11 @@ export default function LineageModal({ name, image, character, lineage, fromRect
      round is under way. See onCircleCount in BreedTree for what it counts and
      why it deliberately does not read the round-won test's own state. */
   const [circleCount, setCircleCount] = useState<{ got: number; tot: number } | null>(null);
+  /* THE PIT IS MID-GESTURE: a dog chain is being drawn, or a circle is up on the
+     learn layer. The slow motion and shake controls fade out of the way while it
+     is true. BreedTree derives it every frame from live state rather than
+     toggling it on events, so it cannot stick on: see onPitBusy there. */
+  const [pitBusy, setPitBusy] = useState(false);
   const shakeFnRef = useRef<(() => void) | null>(null);
   const slowmoFnRef = useRef<(() => void) | null>(null);
   const [slowmo, setSlowmo] = useState(false);
@@ -759,6 +764,7 @@ export default function LineageModal({ name, image, character, lineage, fromRect
           currentScore={score}
           portraitAnchor={portraitAnchor}
           onCircleCount={(got, tot) => setCircleCount((p) => (p && p.got === got && p.tot === tot ? p : { got, tot }))}
+          onPitBusy={setPitBusy}
           registerShake={(fn) => { shakeFnRef.current = fn; }}
           registerSlowmo={(fn) => { slowmoFnRef.current = fn; }}
           onToggleCaption={() => setCaptionOpen((o) => !o)}
@@ -844,7 +850,7 @@ export default function LineageModal({ name, image, character, lineage, fromRect
         <>
         <button
           type="button"
-          className={`${css.slowmo}${slowmo ? " " + css.slowmoActive : ""}`}
+          className={`${css.slowmo}${slowmo ? " " + css.slowmoActive : ""}${pitBusy ? " " + css.pitCtlAway : ""}`}
           onClick={() => { slowmoFnRef.current?.(); setSlowmo((s2) => !s2); }}
           aria-label={slowmo ? "Normal speed" : "Slow motion"}
         >
@@ -854,7 +860,7 @@ export default function LineageModal({ name, image, character, lineage, fromRect
         {/* Shake button, straight from the pit: jelly icon, bottom right */}
         <button
           type="button"
-          className={css.shake}
+          className={`${css.shake}${pitBusy ? " " + css.pitCtlAway : ""}`}
           onClick={(e) => {
             shakeFnRef.current?.();
             const el = e.currentTarget;

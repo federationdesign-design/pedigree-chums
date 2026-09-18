@@ -2056,6 +2056,7 @@ export default function BreedTree({
   rootLabel,
   onActiveChange,
   onCircleCount,
+  onPitBusy,
   onClose,
   centred = false,
   size = 760,
@@ -2191,6 +2192,23 @@ export default function BreedTree({
 
      Fired only when either number CHANGES, the same written-on-change pattern
      the chain outline uses, so a still pit costs nothing. */
+  /* THE PIT IS BUSY WITH A GESTURE, so the shell can take its own controls out of
+     the way (owner, 18 September 2026). True while a dog chain is being drawn, or
+     while a circle is up on the learn layer.
+
+     IT IS DERIVED EVERY FRAME, NOT TOGGLED ON EVENTS, and that is the whole
+     safety argument. A stuck hidden state would leave the slow motion and shake
+     controls gone for the rest of the round, so there is deliberately no "hide"
+     and "show" pair to get out of step: the frame writer recomputes the answer
+     from live state on every frame of a live round and reports only when it
+     CHANGES. There is no end route to miss, because no end route is hooked.
+
+     Every way a chain ends does clear dogChainBreedRef in any case, through
+     ChainKind.over: killChain calls it for the join clock, a wrong circle, a
+     re-entered circle and a crossed path, end() calls it for a release, a cancel,
+     a blur and a stale chain, and the effect's own teardown clears the ref
+     outright. But this does not depend on that list being complete. */
+  onPitBusy?: (busy: boolean) => void;
   onCircleCount?: (collected: number, total: number) => void;
   onScore?: (v: number) => void;
   /* The live score, so the chum tree layer can show it. One-way in: BreedTree
@@ -3499,6 +3517,8 @@ export default function BreedTree({
      nothing has just been collected. */
   const [chumPop, setChumPop] = useState<number | null>(null);
   const [learnNode, setLearnNode] = useState<Node | null>(null);
+  // Mirrored for the frame writer, which cannot read state safely. See onPitBusy.
+  useEffect(() => { learnOpenRef.current = !!learnNode; }, [learnNode]);
   const [learnCard, setLearnCard] = useState<{ name: string; image: string; x: number; y: number; angle: number; r: number; ring: string; ringFrac: number; ringPx: number } | null>(null);
   const removedNodesRef = useRef<Set<Node>>(new Set());
   const spawnBadgeRef = useRef<((x: number, y: number, r: number, pct: number, opts?: { r?: number; label?: string; charges?: number; green?: boolean; noBomb?: boolean }) => void) | null>(null);
@@ -3581,6 +3601,11 @@ export default function BreedTree({
   // The last pair reported by the counter, so the callback fires on a CHANGE and
   // not sixty times a second. See onCircleCount for what the numbers mean.
   const circleCountRef = useRef<{ got: number; tot: number }>({ got: -1, tot: -1 });
+  // The last busy answer reported, and whether a circle is up on the learn layer.
+  // learnNode is state and the frame writer holds an older closure, so the effect
+  // below mirrors it into a ref the writer can read safely. See onPitBusy.
+  const pitBusyRef = useRef<boolean | null>(null);
+  const learnOpenRef = useRef(false);
   // The removed set is a ref, so closing circles changes nothing React can see.
   // This is the nudge that gets them off the screen.
   const [, setDogChainClosed] = useState(0);
@@ -5057,6 +5082,15 @@ export default function BreedTree({
           circleCountRef.current = { got, tot };
           onCircleCount?.(got, tot);
         }
+      }
+      /* IS THE PIT BUSY WITH A GESTURE. Recomputed here, every frame, from the
+         live refs rather than toggled by any of the routes that start or end a
+         chain: see onPitBusy for why that matters. Reported only on a change, so
+         a still pit costs one comparison. */
+      const busy = !!dogChainBreedRef.current || learnOpenRef.current;
+      if (pitBusyRef.current !== busy) {
+        pitBusyRef.current = busy;
+        onPitBusy?.(busy);
       }
     }
     const tg = twinGlowGRef.current;

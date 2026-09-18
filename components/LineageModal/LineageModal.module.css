@@ -490,6 +490,8 @@
   background: var(--yellow);
   color: var(--navy);
   box-shadow: 0 5px 0 rgba(10, 58, 87, 0.3);
+  /* Carries .pitCtlAway both ways. See its note below. */
+  transition: opacity 0.15s ease;
 }
 .shake {
   bottom: calc(18px + env(safe-area-inset-bottom, 0px));
@@ -502,6 +504,24 @@
   left: clamp(18px, 4vw, 48px);
   right: auto;
   bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+}
+/* OUT OF THE WAY WHILE THE PIT IS MID-GESTURE, 18 September 2026 (owner): a dog
+   chain being drawn, or a circle up on the learn layer.
+
+   A FADE, NOT AN INSTANT CUT, and 150ms is the figure. Two large yellow squares
+   vanishing on a frame reads as a glitch, and popping back reads as worse; at
+   150ms they get out of the way and return without drawing attention to either.
+   Short enough that a chain drawn straight into the corner is not racing them.
+
+   POINTER-EVENTS GOES WITH THE OPACITY, and that is the part that matters rather
+   than the look: an invisible button that still takes the press would let a chain
+   swept across the bottom corner fire the shake or the slow motion, which is a
+   worse fault than the one this fixes.
+
+   The transition lives on the buttons themselves below, so it carries both ways. */
+.pitCtlAway {
+  opacity: 0;
+  pointer-events: none;
 }
 .shake:active,
 .slowmo:active {
