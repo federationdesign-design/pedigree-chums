@@ -75,6 +75,33 @@ const CARD_TRAVEL_EASE = 1.4; // >1 accelerates the card into the vanishing poin
 const CARD_FALLBACK_W = 160;
 const CARD_FALLBACK_H = 200;
 
+/* THE MOBILE OBJECT IS THE GREEN BUTTON, NOT THE YELLOW CARD, 19 September 2026
+   (owner).
+
+   WHY. The diving object was drawn to look like the yellow dog card, because on
+   desktop that is the thing you clicked to get here. A phone never shows that
+   card: the reader taps the green button in the hero instead, so the object that
+   flew down the tunnel was a picture of something they had not seen.
+
+   DESKTOP IS UNTOUCHED BY CONSTRUCTION, which is the owner's condition on this
+   change. The card path below is not edited at all; this is a second draw
+   function and one branch that chooses between them.
+
+   DECIDED ONCE, AT MOUNT. The tunnel runs for two seconds and cannot be resized
+   into or out of during that, so there is no reason to re-ask per frame, and a
+   matchMedia read inside the draw loop would be a layout read at 60fps.
+
+   768 IS THE SITE'S OWN BREAKPOINT, the one deck.module.css and the Dogs at Work
+   pages already use. Not a new number. */
+const BTN_MOBILE_MAX = 768;
+const BTN_FILL = "#4CB847";   // --cta from globals.css, the hero button's green
+const BTN_EDGE = "#0a3a57";   // the same navy edge the card uses
+const BTN_TEXT = "#ffffff";
+/* A BUTTON IS A PILL, so the radius is half its height rather than the card's
+   fixed 22. Capped so a very flat rect cannot produce a negative arc. */
+const BTN_TEXT_W = 0.62;      // the white label bar, as a share of the button width
+const BTN_TEXT_H = 0.16;      // and of its height
+
 // Background transition: the tunnel starts flat navy and warms to the pit's own
 // start-screen gradient by the end of the run, so the reveal has no seam. That
 // gradient is the LineageModal overlay's: linear-gradient(to top right, #00e2ff,
@@ -208,8 +235,42 @@ export default function TimeTunnel({ onDone, onResolve, fromRect }: { onDone?: (
     const rect = rectRef.current;
     const fx = rect ? rect.x + rect.w / 2 : cx;
     const fy = rect ? rect.y + rect.h / 2 : cy;
+    /* Read once, here, for the reason given at BTN_MOBILE_MAX: the tunnel cannot
+       be resized into or out of mid-run, and a matchMedia read inside the draw
+       loop would be a layout read at 60fps. */
+    const onPhone = typeof window !== "undefined" && window.innerWidth <= BTN_MOBILE_MAX;
     const cardW0 = rect ? rect.w : CARD_FALLBACK_W;
     const cardH0 = rect ? rect.h : CARD_FALLBACK_H;
+    /* THE MOBILE BUTTON, diving in place of the card. It shares every bit of the
+       card's motion, the same ease, spin and shrink, so the two read as one
+       animation with a different object in it; only the drawing differs.
+       One white label bar, centred. The card's three description lines and its
+       link icon have no equivalent on a button and are deliberately absent. */
+    const drawButton = (now: number, startTs: number) => {
+      const p = Math.min(1, (now - startTs) / CARD_MS);
+      if (p >= 1) return;
+      const ease = Math.pow(p, CARD_TRAVEL_EASE);
+      const px = fx + (vx - fx) * ease;
+      const py = fy + (cy - fy) * ease;
+      const w = cardW0 * (1 - p), h = cardH0 * (1 - p);
+      const spin = CARD_SPINS * 2 * Math.PI * Math.pow(p, CARD_SPIN_EASE);
+      ctx.save();
+      ctx.translate(px, py);
+      ctx.rotate(spin);
+      ctx.fillStyle = BTN_FILL;
+      ctx.beginPath();
+      ctx.roundRect(-w / 2, -h / 2, w, h, Math.min(h / 2, Math.min(w, h) / 2));
+      ctx.fill();
+      ctx.lineWidth = 4 * (1 - p);
+      ctx.strokeStyle = BTN_EDGE;
+      ctx.stroke();
+      const tw = w * BTN_TEXT_W, th = h * BTN_TEXT_H;
+      ctx.fillStyle = BTN_TEXT;
+      ctx.beginPath();
+      ctx.roundRect(-tw / 2, -th / 2, tw, th, th / 2);
+      ctx.fill();
+      ctx.restore();
+    };
     const drawCard = (now: number, startTs: number) => {
       const p = Math.min(1, (now - startTs) / CARD_MS);
       if (p >= 1) return; // landed on the vanishing point, gone
@@ -291,7 +352,7 @@ export default function TimeTunnel({ onDone, onResolve, fromRect }: { onDone?: (
         for (const m of motes) { m.z -= MOTE_SPEED; m.age++; if (m.z <= MOTE_ZNEAR) seedMote(m, MOTE_ZFAR); }
         drawRings();
         drawMotes();
-        drawCard(now, start);
+        if (onPhone) drawButton(now, start); else drawCard(now, start);
       } else {
         // Resolve: fire the signal once (the pit grows its cluster ring and drops
         // the dogs off it), rush the rings outward past the camera, and fade the
