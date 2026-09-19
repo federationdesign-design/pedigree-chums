@@ -137,17 +137,21 @@
    the back-link breadcrumb, which read on the gradient and must invert with the
    prose. Opt-in cost: white bottoms out at ~1.45:1 on the gradient, a deliberate
    non-compliant state (Steve, 12 Aug 2026; breadcrumb added 17 Aug 2026). */
-:root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"] .essayBody p,
+:root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"] .essayBody > p,
 :root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"] .backLink {
   color: #ffffff;
 }
-.essayBody p {
+.essayBody > p {
   font-family: var(--font-body, "Montserrat", sans-serif);
   font-size: 1.25rem;
   font-weight: 500;
-  /* Body prose sits on the site gradient, where white fails WCAG 1.4.3 (max
-     ~3.3:1). Black clears 4.5:1 across the whole gradient. Headings (.subhead)
-     keep their white/yellow; only paragraphs change (Steve, 12 Aug 2026). */
+  /* BLACK IS NOW THE ACCESSIBILITY FALLBACK, NOT THE DEFAULT (Steve, 19 September
+     2026). It supersedes the note that stood here from 12 Aug 2026, which said
+     black was chosen because white failed WCAG 1.4.3 at about 3.3:1. That is still
+     true of white, but black is no longer what most readers see: the rule below
+     takes the prose to dark blue unless an accessibility contrast scheme is set,
+     in which case this declaration is what applies. See that rule for the numbers
+     and the decision. Headings (.subhead) keep their white/yellow, as before. */
   color: #000000;
   line-height: 1.3;
   margin: 0 0 18px;
@@ -162,13 +166,65 @@
   max-width: none;
 }
 
+/* THE PROSE SELECTORS ARE CHILD SELECTORS, NOT DESCENDANT (19 September 2026).
+
+   Every `.essayBody p` in this file is now `.essayBody > p`. This is the fix for the
+   black card text reported as tasks 3.5 to 3.11, and it is what makes 2.4 above safe
+   to ship.
+
+   THE CAUSE. On DESKTOP the sidebar cards render in `<aside class=sidebar>`, outside
+   `.essayBody`, so a prose rule cannot reach them. On MOBILE, MobileArticleBody
+   interleaves the cards INTO the body: it wraps prose and cards alike in one
+   `<div class={bodyClassName}>`, which is `.essayBody`. A descendant selector
+   therefore reached every `<p>` inside every card, and `.essayBody p` at (0,1,1)
+   beat SidebarCard's `.text` at (0,1,0). That is why the cards read black on
+   mobile only, and only on articles 4 to 6: articles 1 to 3 use inline styles,
+   which beat any stylesheet.
+
+   WHY IT HAD TO LAND WITH 2.4 RATHER THAN IN A LATER CHECKPOINT. Measured on the
+   navy card: black on navy was 1.76:1, bad but visible. Navy on navy is 1.00:1,
+   which is invisible. Shipping 2.4 on its own would have taken three live articles
+   from hard to read to unreadable.
+
+   The prose is a direct child of `.essayBody` in both the desktop body and
+   MobileArticleBody, and the cards are always nested inside a slot div, so the
+   child combinator keeps every prose rule and drops every card. No override is
+   needed on any card, which is what the brief asked for: fix the reach once rather
+   than patching each card. */
+
+/* 2.4 BODY PROSE IN DARK BLUE, ALL WIDTHS (Steve, 19 September 2026).
+
+   A DELIBERATE SUB-AA DIP, ACCEPTED, AND ON THE RECORD SO IT IS NOT REVERTED AS AN
+   OVERSIGHT. Steve reviewed this on the device and chose the dark blue. Measured
+   across the site gradient, which runs #00e2ff at the cyan end to #008eff at the
+   deep-blue end:
+
+     black #000000   13.32:1 cyan   6.31:1 deep   passes AA across the whole run
+     navy  #0a3a57    7.59:1 cyan   3.60:1 deep   FAILS AA on the deep-blue end
+
+   So this is not the free improvement it might look like: black cleared AA
+   everywhere and navy does not. The brief that asked for it quoted only the 7.59
+   figure. It is the same call already on record for /home and /about in
+   globals.css, where navy on this gradient is recorded at the same 7.6 to 3.6
+   range with the dip accepted.
+
+   GATED, SO THE READER CAN STILL GET THE PASSING COLOUR. Anyone on an
+   accessibility contrast scheme falls through to the black above. The gate is the
+   same one 1.5 uses on the index and globals.css uses throughout.
+
+   THE TOGGLE STILL WINS. The article text toggle's rule above is (0,4,2) against
+   this rule's (0,3,1), so toggle-on prose stays white and is unaffected. */
+:root:not([data-pc-contrast-scheme]) .essayBody > p {
+  color: var(--navy, #0a3a57);
+}
+
 /* First paragraph treatment, matching GDBD. Every Dogs at Work article opens
    with a prose paragraph, so its first .essayBody child is a <p>. */
 /* Wide-viewport type bumps, adopted from Good Dog Bad Dog (Steve, 12 Aug): body
    +3pt and the intro larger still at 1300+. Values match GDBD so the two
    templates read the same at width. */
 @media (min-width: 1300px) {
-  .essayBody p { font-size: 1.4375rem; }
+  .essayBody > p { font-size: 1.4375rem; }
   .essayBody > p:first-child,
   .essayBody .introPara { font-size: 1.8125rem; }
 }
@@ -613,8 +669,16 @@
   }
 
   /* 2.6 Body text down 1pt, from 1.25rem. */
-  .essayBody p {
+  .essayBody > p {
     font-size: calc(1.25rem - 1pt);
+  }
+
+  /* 2.7 Halve the air above the card title, legacy card system (articles 1 to 3).
+     The 40px is recorded at the base rule as a deliberate doubling from 20 on
+     12 Aug 2026 and stays for desktop. The component system's half of this task is
+     in SidebarCard.module.css, which needed a query of its own. */
+  .sidebarCard {
+    padding-top: 20px;
   }
 
   /* Lift the bottom-aligned title, pills and back link off the very bottom so the
