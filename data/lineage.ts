@@ -2781,8 +2781,33 @@ const LINEAGE: Record<string, LineageNode> = {
   "Fishermen's water dogs": {
     name: "Fishermen's water dogs",
     note: "The working water dogs the European fishing crews brought across the Atlantic. Now extinct.",
+    /* THE PORTUGUESE FLEET GETS NAMED, 19 September 2026 (owner). This record was
+       a single parent at 100; it is now a split.
+
+       WHY IT EARNED ITS OWN NODE. The St John's water dog is described in the
+       sources as a random-bred mix of old English, Irish and Portuguese working
+       dogs, and the Portuguese are the one of those three the archive did not
+       name. The English and continental side is this record and Old European water
+       dogs; the Irish side is already here as Old Irish water dogs. Portugal was
+       the gap, and its crews had been fishing the Grand Banks since the fifteenth
+       century, which is longer than anyone else on that list.
+
+       THE SIBLING NOW MEANS "THE REST OF IT". Portugal is in Europe, so Old
+       European water dogs has to be read as the remaining continental stock rather
+       than as all of it. Its note is unchanged because it already says "the old
+       continental water-dog stock they came from", which is still true of what is
+       left once the Portuguese are lifted out. If that ever stops reading clearly,
+       that note is the thing to sharpen, not this split.
+
+       60/40, AND IT IS A JUDGEMENT. Nothing in the sources weighs the three
+       national stocks against each other. 60 keeps the bulk with the wider
+       continental pool, since the Portuguese were one named fleet among several,
+       and 40 is generous to them because they were the longest established on
+       those banks. Change the pair if the reading changes; they are the only two
+       numbers here. */
     children: [
-      { name: "Old European water dogs", note: "The old continental water-dog stock they came from. Now extinct.", img: "/history/breeds/Old-European-water-dogs.jpg", value: 100 }
+      { name: "Old European water dogs", note: "The old continental water-dog stock they came from. Now extinct.", img: "/history/breeds/Old-European-water-dogs.jpg", value: 60 },
+      { name: "Portuguese fishing dogs", note: "The curly-coated water dogs of the Portuguese cod fleets, on the Grand Banks since the fifteenth century. Now extinct.", img: "/history/breeds/Portuguese-fishing-dogs.jpg", value: 40 }
     ]
   },
   "St John's Water Dog": {
