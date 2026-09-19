@@ -304,6 +304,14 @@ const SOLO_LINE_H = 0.95;
    line count. One word per line, so a six word name gets half the type a three
    word one does. That is the cost of breaking per word and it is his call. */
 const SOLO_TILT_DEG = 15;   // leans DOWN to the right, the opposite way to the circle labels
+/* DOES A SOLO DOG'S LOOSE CARD DRAW AS A WORD, 19 September 2026 (owner: the text
+   object that pops out of the lifted circle should be the dog's circle image).
+
+   FALSE, so it draws its picture like every other card. The word branch below and
+   soloWordFit are kept and are simply not reached: they carry the invisible grab
+   surface and the line-fitting maths, and rebuilding those to restore the word
+   later would be real work for no reason. One constant to flip. */
+const SOLO_DRAWS_AS_WORD = false;
 function soloWordFit(name: string, H: number): { lines: string[]; fs: number } {
   const lines = name.split(/\s+/).filter(Boolean);
   return { lines, fs: H / (lines.length * SOLO_LINE_H) };
@@ -4536,7 +4544,17 @@ export default function LineageMap({
                     }}
                   >
                   <g className={styles.pickWobble}>
-                  {isSelfCard(c.name) ? (() => {
+                  {/* THE SOLO DOG'S LOOSE CARD IS ITS PICTURE NOW, 19 September 2026
+                      (owner). It used to draw as a big tilted WORD, the same way the
+                      pit draws a loose solo dog, and the branch below is what did it.
+
+                      isSelfCard is now false everywhere this decides the render, so
+                      a solo dog takes the ordinary image branch and reads as its
+                      circle picture from the moment it pops out. The word branch is
+                      kept, unreached, because it carries the grab-surface rect and
+                      the fit maths that would have to be rebuilt to restore it.
+                      Flip this one constant to bring it back. */}
+                  {SOLO_DRAWS_AS_WORD && isSelfCard(c.name) ? (() => {
                     // The block is as tall as the card was, and as wide as it likes.
                     const f = soloWordFit(c.name, CW);
                     const y0 = -((f.lines.length - 1) * SOLO_LINE_H * f.fs) / 2;
@@ -4579,7 +4597,12 @@ export default function LineageMap({
                   {/* No ring on a self card. The word IS the object, exactly as
                       it is in the pit, so a circle round it would be the small
                       card coming back. */}
-                  {!INSTR_NAMES.has(breed.name) && !isSelfCard(c.name) && <rect x={c.cardX-CW/2} y={c.cardY-CW/2} width={CW} height={CW} rx={circular ? CW/2 : 15} vectorEffect="non-scaling-stroke" /* THREE STATES ON THE CARD'S OWN RIM, 16 September 2026 (owner). White while it is
+                  {/* AND THE RING COMES BACK WITH THE PICTURE, 19 September 2026. It
+                      was suppressed on a self card because "the word IS the object"
+                      and a circle round a word would have been the small card
+                      returning. With the picture there instead, the rim is what makes
+                      it read as a card and says its rarity tier. */}
+                  {!INSTR_NAMES.has(breed.name) && !(SOLO_DRAWS_AS_WORD && isSelfCard(c.name)) && <rect x={c.cardX-CW/2} y={c.cardY-CW/2} width={CW} height={CW} rx={circular ? CW/2 : 15} vectorEffect="non-scaling-stroke" /* THREE STATES ON THE CARD'S OWN RIM, 16 September 2026 (owner). White while it is
    loose and being dragged, YELLOW once it is in a frame but copies of it are still
    out, GREEN when every copy is home. A dog that appears once goes straight from
    white to green, because the first placement is also the last.
