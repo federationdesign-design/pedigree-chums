@@ -1890,6 +1890,23 @@ const ROD_HITS = 2;
    was "about the size of a node" rather than "10px", this is the one number to
    raise and 25 would do it. */
 const ROD_MAX_PX = 10;
+/* HOW THICK A CONNECTOR IS, 19 September 2026 (owner: 10px long is fine, but they
+   are too thick, the maximum should be 5px).
+
+   8 -> 5. It was a bare literal in TWO places that had to agree and were never
+   tied together: the Matter body in spawnRod and the drawn size pushed into
+   rodList. They now read this one constant, so the collider and the picture
+   cannot drift apart.
+
+   THE CHAMFER FOLLOWS IT. The body's corner radius was 4, exactly half the old 8,
+   which made the bar a capsule with fully rounded ends. Half of 5 keeps that
+   shape rather than turning it into a rectangle with slightly soft corners, so it
+   is derived here rather than left as its own literal.
+
+   IT IS NOW TWICE AS LONG AS IT IS THICK, 10 by 5, which reads as a short bar.
+   At the old 8 against the capped 10 it was very nearly square, which is part of
+   why they looked wrong once the length cap went in. */
+const ROD_H_PX = 5;
 // The yellow percentage badge, drawn and collided at this radius. Doubled from
 // 46: they were easy to lose against the circles, on the start screen and in
 // the pit alike.
@@ -8131,13 +8148,13 @@ export default function BreedTree({
         const ang = Math.atan2(y2 - y1, x2 - x1);
         const w = worldFromPx((x1 + x2) / 2, (y1 + y2) / 2);
         const pr = { x: w.x, y: w.y, vx: 0, vy: 0, a: ang, idx: rodBodiesRef.current.length, hits: 0, maxHits: ROD_HITS, mb: null as any };
-        const mb = Bodies.rectangle((x1 + x2) / 2, (y1 + y2) / 2, lenPx, 8, { chamfer: { radius: 4 }, restitution: 0.4, friction: 0.1, frictionAir: 0.01, density: 0.001, angle: ang });
+        const mb = Bodies.rectangle((x1 + x2) / 2, (y1 + y2) / 2, lenPx, ROD_H_PX, { chamfer: { radius: ROD_H_PX / 2 }, restitution: 0.4, friction: 0.1, frictionAir: 0.01, density: 0.001, angle: ang });
         mb.plugin = { prop: pr, kind: "rod" };
         pr.mb = mb;
         Composite.add(world, mb);
         MBody.setVelocity(mb, { x: (Math.random() - 0.5) * 3, y: 3 }); // pit scatter contract
         rodBodiesRef.current.push(pr);
-        setRodList((l) => [...l, { len: lenPx * fxScale, h: 8 * fxScale, lit }]);
+        setRodList((l) => [...l, { len: lenPx * fxScale, h: ROD_H_PX * fxScale, lit }]);
         wake();
       };
       // Tapping the cookie panel squeezes an Accept and a Reject out of it, which
