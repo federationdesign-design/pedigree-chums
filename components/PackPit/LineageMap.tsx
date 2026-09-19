@@ -2486,6 +2486,58 @@ export default function LineageMap({
     setOpen((prev) => { const s = new Set(prev); s.add(root._id); return s; });
   }, [soloLeaf, circular, root]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  /* AND ITS ONE CARD PLACES ITSELF, 19 September 2026 (owner: the image should
+     add to the frame without any action from the user, and the button should be
+     the green Complete rather than the blue Learn, completing in one click).
+
+     THIS IS STAGE ONE OF THREE AND IT IS MEANT TO DELIVER ALL THREE. The button
+     is not touched here, deliberately. `complete` is already `allBlue || packed`,
+     and that is what swaps the pill to the green tick and makes it the obvious
+     action. The blue Learn is on screen only because a solo dog arrives with its
+     single card UNPLACED, so allBlue is false. Place the card and allBlue goes
+     true on its own, the existing green button appears, and its existing
+     one-click path runs. No second completion path is added, which was the whole
+     reason for doing it in this order.
+
+     IF THE BUTTON DOES NOT FOLLOW, that theory is wrong and the next step is to
+     read what allBlue actually measures rather than to force the label.
+
+     IT REUSES THE INSTRUCTIONAL BRANCH'S MOVE, the three writes revealStep
+     already makes to place a card: picked, pinned and dragPos together. Same
+     geometry, same order. Nothing new is invented here.
+
+     WHY IT IS SAFE TO RUN ONCE. A solo dog has exactly one child and exactly one
+     frame, so there is no choosing and nothing to collide with. The guard ref
+     stops it re-running if the effect fires again on a re-pack.
+
+     IT WAITS FOR framesDone. The frame it places into does not exist until the
+     grid is laid out, and placing before that puts the card at a position the
+     layout then moves. */
+  const soloPlaced = useRef(false);
+  useEffect(() => {
+    if (!soloLeaf || !circular || !root || !framesDone) return;
+    if (soloPlaced.current) return;
+    const n = shown.find((x) => x.img && x._parent && !picked.has(x._id));
+    if (!n) return;
+    soloPlaced.current = true;
+    const sh = n._parent ? Math.round((n._leaves / (n._parent as Node)._leaves) * 100) : 100;
+    const rr = nodeR(sh), dd = rr + 10 + CW / 2;
+    const px1 = n._x + Math.cos(n._dir ?? 0) * dd, py1 = n._y + Math.sin(n._dir ?? 0) * dd;
+    /* THE WRITES LAND ON A LATER TICK, on purpose. Setting state synchronously in
+       an effect body is an error under this file's eslint config and the baseline
+       is not to be added to. The same requestAnimationFrame wrap is used by the
+       boneFuse effect in BreedTree for exactly this reason, and its note explains
+       it. It also happens to be correct here rather than merely quiet: the frame
+       geometry these three writes depend on is measured during the render this
+       effect runs after. */
+    const raf = requestAnimationFrame(() => {
+      setPicked((prev) => { const s = new Set(prev); s.add(n._id); return s; });
+      setPinned((m) => { const x = new Map(m); x.set(n._id, { img: n.img as string, name: n.name, note: n.note ?? "", share: sh, mix: sh, status: null }); return x; });
+      setDragPos((m) => { const x = new Map(m); x.set(n._id, { x: px1, y: py1 }); return x; });
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [soloLeaf, circular, root, framesDone, shown]); // eslint-disable-line react-hooks/exhaustive-deps
+
   useEffect(() => {
     if (!INSTR_NAMES.has(breed.name) || !framesDone) return;
     const t = window.setTimeout(() => { onRemove?.(breed.name); window.setTimeout(() => onClose(), 400); }, 2000);
