@@ -825,7 +825,8 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Black and Tan Terrier",
     note: "The Old English Terrier, the extinct rough working terrier that nearly every British terrier descends from.",
     children: [
-      { name: "Old English working Terriers", note: "The English farm and stable ratting dogs and the go-to-ground terriers that bolted fox and badger. Now extinct.", img: "/history/breeds/Old-British-ratting-terriers.jpg", value: 100 }
+      { name: "Old British ratting Terriers", note: "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.", img: "/history/breeds/Old-British-ratting-terriers.jpg", value: 60 },
+      { name: "Earth and hunt terriers", note: "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.", img: "/history/breeds/Earth-and-hunt-terrier.jpg", value: 40 }
     ]
   },
 
@@ -1190,7 +1191,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "The small terriers Cambridge undergraduates kept as college ratters in the 1870s, bought from a livery stable on Trumpington Street. The founding sire of the Norwich came out of them. Now extinct.",
     img: "/history/breeds/trumpington-terrier.jpg",
     children: [
-      { name: "Old English working Terriers", note: "The general farm and stable ratting stock the livery-yard terriers were drawn from. Now extinct.", img: "/history/breeds/Old-British-ratting-terriers.jpg", value: 100 }
+      { name: "Old British ratting Terriers", note: "The general farm and stable ratting stock the livery-yard terriers were drawn from. Now extinct.", img: "/history/breeds/Old-British-ratting-terriers.jpg", value: 100 }
     ]
   },
 
@@ -1909,6 +1910,21 @@ const LINEAGE: Record<string, LineageNode> = {
      Scottish pair fed only Skye, Scottish, Paisley, Cairn and Dandie Dinmont;
      the English pair fed only Black and Tan Terrier and Trumpington Terrier.
 
+
+     REVERSED IN PART, 20 September 2026 (owner). THE ENGLISH MERGE IS UNDONE and
+     the two English records are back. The Scottish merge below stands.
+
+     WHY. Levels 20 and 21 are the two English cards and the owner wants them to
+     read differently, at 50/50 and 60/40. One record holds one set of children,
+     so two splits need two records, and two records need two names. That is the
+     whole reason; it is a gameplay requirement, not a new historical finding.
+     The divergence between the ratting line and the earth line is a 19th century
+     one, downstream of these root nodes, so the sources do not settle it either
+     way at this depth.
+
+     AND IT FIXES Black and Tan Terrier for free: it goes back to two genuinely
+     different parents, 60 and 40, rather than one doubled one.
+
      THE OLD NAMES RESOLVE HERE through LINEAGE_ALIASES, the same route
      "Old English Black and Tan Terrier" has taken since 18 September. The three
      history cards keep their own names, their own write-ups and their own
@@ -1942,17 +1958,37 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Old Scottish working Terriers",
     note: "The old working-terrier stock of the Highlands and the Western Isles that every Scottish terrier springs from. Now extinct.",
     children: [
-      { name: "Earth Dog", note: "The old medieval earth-working dog type the Highland earth dogs go back to. Now extinct.", img: "/history/breeds/medieval-earth-dog.jpg", value: 100 }
+      /* 70/30, the owner's figure for level 17, 20 September 2026. A new dog is
+         not to come from a single parent, so the one documented ancestor is
+         drawn twice at two weights. */
+      { name: "Earth Dog", note: "The old medieval earth-working dog type the Highland earth dogs go back to. Now extinct.", img: "/history/breeds/medieval-earth-dog.jpg", value: 70 },
+      { name: "Earth Dog", note: "The old medieval earth-working dog type the Highland earth dogs go back to. Now extinct.", img: "/history/breeds/medieval-earth-dog.jpg", value: 30 }
     ]
   },
 
-  "Old English working Terriers": {
-    name: "Old English working Terriers",
-    note: "The farm, stable and go-to-ground terriers of England, kept for vermin and for bolting fox and badger long before breeds were named. Now extinct.",
+  /* RESTORED 20 September 2026. Was merged into "Old English working Terriers"
+     on 19 September and split again the next day; see the ruling above. The
+     50/50 is the owner's figure for level 20, replacing the 16 September 65/35,
+     which existed to separate this level from level 21. The two are separated by
+     their splits again now, 50/50 here and 60/40 there. */
+  "Old British ratting Terriers": {
+    name: "Old British ratting Terriers",
+    note: "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.",
     children: [
-      { name: "Earth Dog", note: "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.", img: "/history/breeds/medieval-earth-dog.jpg", value: 100 }
-    ]
+      { name: "Earth Dog", note: "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.", img: "/history/breeds/medieval-earth-dog.jpg", value: 50 },
+      { name: "Earth Dog", note: "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.", img: "/history/breeds/medieval-earth-dog.jpg", value: 50 }
+    ],
   },
+  /* RESTORED 20 September 2026, with the owner's 60/40 for level 21. */
+  "Earth and hunt terriers": {
+    name: "Earth and hunt terriers",
+    note: "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.",
+    children: [
+      { name: "Earth Dog", note: "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.", img: "/history/breeds/medieval-earth-dog.jpg", value: 60 },
+      { name: "Earth Dog", note: "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.", img: "/history/breeds/medieval-earth-dog.jpg", value: 40 }
+    ],
+  },
+
 
 
   // Playable like the two ancient additions above (owner instruction,
@@ -3183,8 +3219,6 @@ const LINEAGE_ALIASES: Record<string, string> = {
      record through here, so levels 17, 20 and 21 are untouched. */
   "Old Highland Terriers": "Old Scottish working Terriers",
   "Skye Terrier stock": "Old Scottish working Terriers",
-  "Old British ratting Terriers": "Old English working Terriers",
-  "Earth and hunt terriers": "Old English working Terriers",
   // SUPERSEDED 14 August 2026. The two Talbot spellings ("Talbot hounds",
   // "Talbot hound") used to appear as child nodes across many trees and were
   // aliased here so their branches grafted onto the Talbot's own ancestry.
