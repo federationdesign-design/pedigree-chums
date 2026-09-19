@@ -29,7 +29,7 @@ import pitStyles from "../PackPit/PackPit.module.css";
 import mapStyles from "../PackPit/LineageMap.module.css";
 import { BRAIN_PATH, BRAIN_ARTBOARD } from "../icons/brain";
 import LineageMap from "../PackPit/LineageMap";
-import { propsFor, mobilePropsForLevel, type LevelTheme } from "../../data/levelThemes";
+import { propsFor, toysForCircles, type LevelTheme } from "../../data/levelThemes";
 import { packArt } from "../../data/packArt";
 import BritainMessage from "../PackPit/BritainMessage";
 
@@ -779,10 +779,10 @@ type ToyKind = "ball" | "flag" | "stickBig" | "rock" | "ballPink" | "cookies" | 
 /* The props slot: the three objects that arrive together part way through the
    drop. A theme can replace them, which is how an era gets its own things to
    knock about. */
-/* TEMPORARY, 19 September 2026: the slipper is here only so it can be seen on
-   the device before the circle-count table lands. The table owns every toy from
-   that point, and the slipper comes back OUT of this default when it does. */
-export const DEFAULT_PROPS: ToyKind[] = ["stickBig", "slipper"]; // rock removed 2026-08-12 (no more rocks), small stick removed 2026-09-19. NB: THEMES_ENABLED is false, so this default is the ONLY prop set in play on every level.
+/* NO LONGER THE PROP SET, 19 September 2026. The band table in
+   data/levelThemes.ts now decides every toy, and armToys builds the prop slot
+   from it. This is kept only as the shape other callers import. */
+export const DEFAULT_PROPS: ToyKind[] = ["stickBig"]; // rock removed 2026-08-12 (no more rocks), small stick removed 2026-09-19.
 /* Which side the first prop falls on. Flipped every time a pit arms its props,
    so a reader playing several levels does not watch the same object land in the
    same corner every time. Module scope, so it survives a pit remounting. */
@@ -8141,40 +8141,48 @@ export default function BreedTree({
         // than from the round starting: see PIT_FULL_GRACE_MS. Behind the same
         // first-landing guard as the toys, so it is set once per level.
         cdGraceRef.current = performance.now() + pitFullGraceMs(nodes);
-        toyTimers.push(window.setTimeout(() => spawnToy("cookies"), TOY_COOKIES_DELAY));
-        // Both tennis balls drop on EVERY level now (2026-08-12). The old
-        // first-seven-levels `hideBalls` gate and its no-balls re-timing were
-        // removed entirely (see the handover note on the reversal). Ball at
-        // TOY_BALL_DELAY, pink after it, and the flag/props time off the ball as
-        // they always did with the balls present.
-        toyTimers.push(window.setTimeout(() => spawnToy("ball"), TOY_BALL_DELAY));
-        toyTimers.push(window.setTimeout(() => spawnToy("ballPink"), TOY_BALL_DELAY + BALL_PINK_GAP));
+        /* WHICH TOYS THIS LEVEL GETS, 19 September 2026 (owner). Every toy now
+           comes from the band table in data/levelThemes.ts, keyed on how many
+           circles the level's tree draws. Before this, five of the eight were
+           hard-wired here and dropped on every level whatever any table said:
+           the cookie bar, both tennis balls, the flag and the bone.
+
+           THE COUNT IS THE RENDERER'S OWN. Same predicate as displayRestView:
+           every node that is not the root and is not a hidden echo copy. It is
+           the number of circles actually on the diagram, which is what the rule
+           is written against. NOT pitFullGraceMs's depth 1 to 2 count, which is
+           a different measure for a different job.
+
+           TIMING IS UNCHANGED. Each toy keeps the beat it has always had; the
+           band only decides whether it is armed. The anchors below still time
+           off TOY_BALL_DELAY even on a level with no ball, so the props and the
+           flood land where they always did. */
+        const circleCount = nodes.filter((d) => !(d.depth === 0 || isHiddenCopy(d))).length;
+        const armed = new Set(toysForCircles(circleCount));
+        if (armed.has("cookies")) toyTimers.push(window.setTimeout(() => spawnToy("cookies"), TOY_COOKIES_DELAY));
+        /* The balls were made unconditional on 2026-08-12 when the old
+           first-seven-levels `hideBalls` gate was removed. That reversal stands:
+           what gates them now is the band, not a level number. */
+        if (armed.has("ball")) toyTimers.push(window.setTimeout(() => spawnToy("ball"), TOY_BALL_DELAY));
+        if (armed.has("ballPink")) toyTimers.push(window.setTimeout(() => spawnToy("ballPink"), TOY_BALL_DELAY + BALL_PINK_GAP));
         const flagAt = TOY_BALL_DELAY + TOY_FLAG_GAP;
-        toyTimers.push(window.setTimeout(() => spawnToy("flag"), flagAt));
+        if (armed.has("flag")) toyTimers.push(window.setTimeout(() => spawnToy("flag"), flagAt));
         const propsAt = flagAt + TOY_PROP_GAP;
-        /* THE PROPS SLOT, from the level's theme. An era with no set of its own
-           gets the stick, big stick and rock, which is what every era had.
-           The first two arrive together and the rest follow at the rock's gap,
-           so a set of any length keeps the original rhythm: a pair thumps in,
-           then the stragglers land one after another rather than in a heap. */
-        /* Most specific wins: this level's own set, then the era's, then the
-           pit's default. propsFor does that walk and, unlike levelThemeFor, it
-           is NOT gated on THEMES_ENABLED, so a level can have its own toys
-           without its backdrop, floor and sky coming back with them. See the
-           note above propsFor in data/levelThemes.ts. */
-        /* THE MOBILE TABLE WINS. Below 768px a level's toys come from the
-           owner's per-level list; above it, nothing changes and the era sets
-           apply as before. mobilePropsForLevel takes a ONE BASED level, and
-           levelNo is zero based (the pit paints "00" for the first level), so
-           the one is added here and nowhere else.
-           `??` and not `||`: an empty array from the table means deliberately
-           no props, and must not fall through to the default. */
-        const narrowPit = window.matchMedia("(max-width: 768px)").matches;
-        const mobileSet = narrowPit && levelNo !== undefined ? mobilePropsForLevel(levelNo + 1) : null;
+        /* THE PROPS SLOT. The three toys that fall on the prop beat rather than
+           on one of their own: the stick, the slipper and the bowl. The first
+           two arrive together and the rest follow at the rock's gap, so a set of
+           any length keeps the original rhythm: a pair thumps in, then the
+           stragglers land one after another rather than in a heap.
+
+           AN ERA OVERRIDE STILL WINS. propsFor is unchanged and, unlike
+           levelThemeFor, is NOT gated on THEMES_ENABLED, so an era can still
+           replace the slot without its backdrop, floor and sky coming back with
+           it. No era defines one today, so in practice the band decides. */
+        const PROP_SLOT: ToyKind[] = ["stickBig", "slipper", "bowl"];
         const themed = propsFor(era, levelName);
-        const props: ToyKind[] =
-          (mobileSet as ToyKind[] | null) ??
-          (themed?.length ? (themed as ToyKind[]) : DEFAULT_PROPS);
+        const props: ToyKind[] = themed?.length
+          ? (themed as ToyKind[])
+          : PROP_SLOT.filter((k) => armed.has(k));
         /* SIDES ALTERNATE, AND THE FIRST SIDE ALTERNATES TOO. Each prop lands on
            the opposite side to the one before it, so two can never come down
            together in the same corner, and the whole sequence starts on the
@@ -8204,7 +8212,10 @@ export default function BreedTree({
           const left = i % 2 === 0 ? firstLeft : !firstLeft;
           toyTimers.push(window.setTimeout(() => spawnToy(kind, left ? -1 : 1), at));
         });
-        toyTimers.push(window.setTimeout(() => spawnToy("bone"), boneAt));
+        // The bone is in every band (owner: the bone should always drop), so this
+        // reads as unconditional in practice. It is gated all the same, because
+        // the band table is the single source and nothing should sit outside it.
+        if (armed.has("bone")) toyTimers.push(window.setTimeout(() => spawnToy("bone"), boneAt));
         toyTimers.push(window.setTimeout(spawnChums, chumsAt));
       };
       spawnRodRef.current = (x1: number, y1: number, x2: number, y2: number, lit: boolean) => {
