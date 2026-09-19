@@ -3928,6 +3928,29 @@ export default function BreedTree({
      with it, and killChain is not. Behind the flag at the write, so a normal round
      never touches it. */
   const spinLastChainRef = useRef("");
+  /* EVERY SILENT REFUSAL, TALLIED BY REASON (19 September 2026).
+
+     WHY IT HAD TO EXIST. Four readings in a row came back "CHAIN none yet" while
+     the owner was plainly losing chains, and the reason is that a DOG chain has
+     SIX ways to stop that record nothing at all. killChain and end() both write a
+     line; these do not:
+       joinAt   the sample is on the circle already at the end of the chain
+       joinAt   the circle is busy, being collected or gone from the pit
+       joinAt   the wrong breed, which REFUSES rather than kills (blockKills false)
+       joinAt   geo() came back null for one end of the would-be link
+       tick     the chum gate did not open for this press
+       move     the sim refused the pointer handover
+     The last two END THE CHAIN outright, with `chain = null` and no other trace,
+     which is exactly the "it just broke" the owner is describing.
+
+     A TALLY, NOT A LAST-ONE-WINS STRING. "same circle" fires on nearly every
+     frame the finger rests anywhere, so a single last-reason line would be that
+     reason and nothing else for ever, and the interesting refusal would never be
+     seen. Counts per reason show the rare one next to the common one.
+
+     Cleared when a chain starts, so a reading always describes the gesture you
+     just made rather than the whole round. Behind the flag at every write. */
+  const spinRefuseRef = useRef<Map<string, number>>(new Map());
   // The flag itself, read once. The sim effect computes its own copy because it is
   // in scope there; the chain effect is a different effect and needs this.
   const spinOnRef = useRef(false);
@@ -3949,7 +3972,26 @@ export default function BreedTree({
       const el = d;
       const tick = () => {
         const lines = spinDiagRef.current;
-        el.textContent = lines.length ? lines.join("\n") : "spin diag: no sim running";
+        /* THE CHAIN LINES ARE WRITTEN HERE, not by the sim sampler, so they keep
+           updating when the physics loop is not stepping. See the note where they
+           used to live for what that cost us.
+             CHAIN NOW   the live gesture, read straight from the refs
+             CHAIN       the last death, including the two silent ones
+             REFUSED     the per-reason tally for the gesture just made
+           Sorted heaviest first and capped at six, so the line stays readable on
+           a phone. */
+        const refused = [...spinRefuseRef.current.entries()]
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 6)
+          .map(([why, n]) => `${why} x${n}`)
+          .join("   |   ");
+        const chainLines = [
+          `CHAIN NOW breed ${dogChainBreedRef.current ?? "none"}  held ${dogChainNodesRef.current.size}`,
+          spinLastChainRef.current || "CHAIN none yet",
+          refused ? `REFUSED ${refused}` : "REFUSED none this gesture",
+        ];
+        const body = lines.length ? lines : ["spin diag: no sim running"];
+        el.textContent = [...body, ...chainLines].join("\n");
       };
       tick();
       t = window.setInterval(tick, 250);
@@ -9206,9 +9248,23 @@ export default function BreedTree({
                so the two can be seen to agree. */
             `chain breed ${dogChainBreedRef.current ?? "none"}  held ${dogChainNodesRef.current.size}`,
             inked,
-            // The last chain death and the last detonation, each standing until the
-            // next. Empty before the first of either.
-            spinLastChainRef.current || "CHAIN none yet",
+            /* THE CHAIN LINES HAVE MOVED OUT OF HERE, 19 September 2026.
+
+               WHY. This sampler runs INSIDE the physics step, gated on 500ms of
+               rAF time. When the loop is not stepping it does not run, so the
+               whole panel freezes with it, and four screenshots taken 35 seconds
+               apart carried byte-identical numbers while the pit visibly changed.
+               A frozen CHAIN line reading "none yet" looks exactly like a chain
+               that never died, which is what sent this investigation the wrong
+               way three times.
+               The chain has nothing to do with physics anyway: it lives in the
+               pointer effect. It is now written by the panel's own 250ms interval
+               (see the ?spindiag=1 effect) straight from spinLastChainRef and
+               spinRefuseRef, so it keeps updating whatever the sim is doing.
+
+               BLAST STAYS. spinLastBlast is a LOCAL inside this effect, not a
+               ref, so it can only be reported from in here. It is a physics
+               event, so freezing with the physics is honest. */
             spinLastBlast || "BLAST none yet",
           ];
           spinMade = 0;
@@ -10624,6 +10680,14 @@ export default function BreedTree({
       }
       return null;
     };
+    /* ONE LINE PER SILENT REFUSAL. See spinRefuseRef for why a tally and not a
+       string, and for the list of six sites this is called from. Costs nothing
+       without the flag: the first line returns. */
+    const refuse = (why: string) => {
+      if (!spinOnRef.current) return;
+      const m = spinRefuseRef.current;
+      m.set(why, (m.get(why) ?? 0) + 1);
+    };
     const joinAt = (ch: Chain, cx: number, cy: number) => {
       if (ch.dead || ch.closed) return; // broken or complete: nothing more joins
       const K = ch.kind;
@@ -10636,7 +10700,7 @@ export default function BreedTree({
       if (i == null) return;
       const cards = ch.cards;
       const last = cards[cards.length - 1];
-      if (i === last) return;
+      if (i === last) { refuse("same circle as the last one"); return; }
       // The first card again: the closing move, and the only repeat allowed.
       if (K.circuit && i === cards[0] && cards.length > 1) {
         const why = closeBlock(ch);
@@ -10657,7 +10721,7 @@ export default function BreedTree({
       // A card already in the chain, and not the first: the chain dies. It used
       // to refuse and carry on.
       if (cards.includes(i)) { killChain(ch, `RE-ENTERED #${i}, already at position ${cards.indexOf(i)}`); return; } // already in the chain
-      if (K.busy(i)) return; // being collected: not a wrong card, just not available
+      if (K.busy(i)) { refuse(`busy or gone #${i}`); return; } // being collected: not a wrong card, just not available
       if (last === undefined) {
         cards.push(i);
         ch.lastJoin = performance.now();
@@ -10668,9 +10732,15 @@ export default function BreedTree({
          no means is the kind's too: the cards die on it, the circles simply do
          not join and the finger carries on over. See blockKills. */
       const own = K.joinBlock(ch, i);
-      if (own) { if (K.blockKills) killChain(ch, `own rule: ${own}`); return; }
+      if (own) {
+        if (K.blockKills) killChain(ch, `own rule: ${own}`);
+        // For DOG this is the WRONG BREED refusal and it is silent by design, so
+        // the tally is the only place it is ever visible.
+        else refuse(own.startsWith("WRONG BREED") ? "wrong breed" : own);
+        return;
+      }
       const a = K.geo(last), b = K.geo(i);
-      if (!a || !b) return;
+      if (!a || !b) { refuse(`no geometry for #${!a ? last : i}`); return; }
       const share = K.gapShare(a, b);
       // A card that does not touch the one before it: the chain dies. It used
       // to refuse and carry on, which read as the gesture being ignored.
@@ -11173,7 +11243,13 @@ export default function BreedTree({
            it counts from the first join and there has not been one. */
         if (chain.hold) { raf = requestAnimationFrame(tick); return; }
         // After dispatch, so the stage's onDown has had its say.
-        if (chumGateRef.current !== chain.id) { chain = null; draw(); return; } // the gate did not open for this press
+        if (chumGateRef.current !== chain.id) {
+          /* A SILENT CHAIN DEATH, now recorded. This ends the gesture outright
+             with no killChain and no end(), so before 19 September 2026 the diag
+             showed "CHAIN none yet" however many times it fired. */
+          if (spinOnRef.current) spinLastChainRef.current = "CHAIN dropped: the chum gate did not open for this press (no cards joined)";
+          chain = null; draw(); return; // the gate did not open for this press
+        }
         chain.pending = false;
         const fx = chain.fx, fy = chain.fy;
         joinAt(chain, chain.px, chain.py);
@@ -11218,6 +11294,8 @@ export default function BreedTree({
         if (chainGRef.current) chainGRef.current.style.opacity = "";
         paint([], [], 0, "#ffffff");
       }
+      // A reading describes ONE gesture, so the refusal tally starts empty with it.
+      if (spinOnRef.current) spinRefuseRef.current = new Map();
       chain = { id: e.pointerId, kind, pending: true, cards: [], px: e.clientX, py: e.clientY, fx: e.clientX, fy: e.clientY, strain: new Map(), dead: null, closed: false, canClose: false, lastJoin: performance.now(), hold: kind.armPx > 0 ? { x: e.clientX, y: e.clientY } : null };
       if (raf == null) raf = requestAnimationFrame(tick);
     };
@@ -11236,7 +11314,12 @@ export default function BreedTree({
          gate meanwhile, which is a second finger. */
       if (chain.hold) {
         if (Math.hypot(e.clientX - chain.hold.x, e.clientY - chain.hold.y) < chain.kind.armPx) return;
-        if (!dogChainTakeoverRef.current?.(chain.id)) { chain = null; return; }
+        if (!dogChainTakeoverRef.current?.(chain.id)) {
+          // The other silent death. Same story as the gate above: no killChain,
+          // no end(), nothing written until this line was added.
+          if (spinOnRef.current) spinLastChainRef.current = "CHAIN dropped: the sim refused the pointer handover (no cards joined)";
+          chain = null; return;
+        }
         chain.hold = null;
         return; // tick resolves the pending chain on the very next frame
       }
