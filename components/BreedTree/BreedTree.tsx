@@ -5751,7 +5751,10 @@ export default function BreedTree({
         if (wrap.dataset.chainDim !== dimWant) {
           wrap.dataset.chainDim = dimWant;
           wrap.style.transition = `filter ${DOG_FILL_FADE_MS}ms ease`;
-          wrap.style.filter = chDim ? "brightness(0.5)" : "";
+          /* 0.5 TO 0.75, 19 September 2026 (owner: the darken is too great, halve
+             the effect). 0.5 removed half the brightness, so halving the EFFECT
+             means removing a quarter of it. One number to tune. */
+          wrap.style.filter = chDim ? "brightness(0.75)" : "";
         }
       }
       /* THE FOURTH STATE, and the only one that is true at rest: a circle whose
