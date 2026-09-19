@@ -615,11 +615,15 @@
      that break readable while closing the block up on a phone. The .mBlue half of
      this task is at the foot of the file, and the note there says why. */
   .blueBody {
-    /* 0.9em -> 0.45em -> 0.225em, the second halving on 19 September 2026 (Steve).
-       The original 0.9em was set on 31 Aug 2026 to separate paragraphs split out of
-       one body string; at 0.225em that break is now slight, so this is close to the
-       floor before the paragraphs read as one block. */
-    margin-bottom: 0.225em;
+    /* 0.9em -> 0.45em -> 0.225em -> BACK TO 0.45em, all on 19 September 2026.
+
+       THE SECOND HALVING WENT TOO FAR AND WAS REVERSED. At 0.225em the gap measured
+       4px against a 15.7px font, and the paragraphs stopped reading as separate: on
+       the "Why dogs love doing" panel the bold lead ran straight into the body and
+       the body ran straight into the closing paragraph, which is what Steve
+       photographed. 0.45em gives 7px, which is a visible break and is half the
+       original rather than a quarter. This is the floor; do not halve it again. */
+    margin-bottom: 0.45em;
   }
 
   /* 1.3 Halve the air above the "Learn about" title. The base rule's 75px is
@@ -634,6 +638,47 @@
      0.85rem, so this lands a shade above it and the two read as one family. */
   .pill {
     font-size: 0.9rem;
+  }
+
+  /* THE 20px PANEL-4 INDENT IS OFF ON MOBILE (Steve, 19 September 2026, from the
+     annotated screenshot).
+
+     WHAT IT WAS. "Item 9" at the base rules: panel 4's content, its bullets, the
+     "Results in" list and the two closing paragraphs, indented a further 20px, but
+     not its subheading. That is why the whole block sat right of the heading while
+     every other panel lines up.
+
+     Zeroed here rather than deleted, so the desktop treatment the item was written
+     for is untouched.
+
+     THE BULLETS KEEP THEIR OWN 1.2em. That is the list indent the disc markers sit
+     in, not the panel-4 indent, and removing it would hang the markers outside the
+     text. So the paragraphs now align with the heading and the bullets sit one list
+     indent in, which is how every other panel reads. */
+  .blueBody.blueIndent {
+    padding-left: 0;
+  }
+  .blueBullets.blueIndent {
+    padding-left: 1.2em;
+  }
+
+  /* THE GAP BETWEEN TWO SECTIONS IN ONE PANEL, halved (Steve, 19 September 2026,
+     from the annotated screenshot of "To the dog / To humans").
+
+     MEASURED AT 58px, and it is two rules stacked, which is why halving either one
+     alone would not have done it: 20px of flex gap from .blueSections, plus the
+     37.5px margin-top the next heading carries. Both are halved here, so the total
+     lands at 28.75px.
+
+     THE FIRST HEADING IS DELIBERATELY EXCLUDED. Its 37.5px is what sets the gap at
+     the TOP of the panel, measured at 45px and already approved. `> * + *` takes
+     only headings inside a section that follows another one, so the panel top is
+     untouched. */
+  .blueSections {
+    gap: 10px;
+  }
+  .blueSections > * + * .blueSubheading {
+    margin-top: 18.75px;
   }
 
   /* The air above every blue panel subheading, halved (Steve, 19 September 2026,
@@ -700,7 +745,14 @@
      the padding were asked for. */
   .cta {
     font-size: clamp(1.125rem, 5.6vw, 2.3rem);
-    padding: 12px 28px;
+    /* Asymmetric on purpose, 19 September 2026 (Steve, exact values supplied): 19px
+       above the label against 12px below. It sits the word low in the pill rather
+       than centring it, and it adds 7px to the button's height. The side padding is
+       the 28px the one-line fit was measured against and must not change: at 320
+       wide the longest label, "Search and rescue dogs", needs 275px of the 288
+       available at 18px type with 28px sides, and 30px sides push it to 291px, which
+       wraps. */
+    padding: 19px 28px 12px 28px;
   }
 }
 
