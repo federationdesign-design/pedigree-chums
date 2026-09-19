@@ -2094,25 +2094,27 @@ const rollBomb = () => Math.random() < 1 / BOMB_ODDS;
    ONE CONSTANT TO FLIP. The words group, its positioning loop and the word bodies
    are all left in place and simply not shown. */
 const PIT_DRAWS_WORDS = false;
-/* 12 -> 24, 19 September 2026 (owner: make the yellow % circles on the start
-   screen twice as big, understanding that they will be bigger in the pit too).
+const CHIP_R_PX = 12;
+/* THE START SCREEN'S DIAGRAM BADGES ARE TWICE THE PIT'S, 19 September 2026
+   (owner). Doubling was tried on CHIP_R_PX itself first, which doubled BOTH,
+   and the owner's ruling on seeing it was: only the ones on the start screen,
+   every chip that falls into the pit back to its original size.
 
-   ONE CONSTANT, TWO PLACES, and that is why the owner's caveat matters. The start
-   screen's diagram badges read this through chipRVb, and every chip spawned into
-   the pit reads it through chipR at the scatter, the pop and spawnBadge. They
-   have been one size since 18 September and doubling it doubles both.
+   TWO CONSTANTS BECAUSE THERE ARE TWO READERS, and they were only ever one
+   number by coincidence:
+     chipRVb      the start screen's diagram badges, this constant
+     CHIP_R_PX    every chip spawned into the pit, at the scatter, the pop and
+                  spawnBadge
+   They have been the same figure since the 18 September one-size ruling, which
+   is about the PIT and is not reopened by this.
 
-   THE LEGIBILITY FLOOR IS UNAFFECTED. BADGE_FLOOR_PX is 11, the size at which the
-   % text stops reading, and a badge is dropped to nothing rather than clamped up
-   when it falls below it. At 24 nothing is anywhere near that, so the guard
-   simply never fires.
+   BOMBS ARE PIT CHIPS and therefore unaffected, which is the point: BOMB_R_PX 18
+   was tried earlier the same day and reverted as too big, and doubling CHIP_R_PX
+   would have made every bomb larger again.
 
-   BOMBS COME WITH THEM. A bomb is a chip and takes this radius, and its sprite is
-   drawn 2.4 radii wide, so a bomb is now about 115px across. BOMB_R_PX 18 was
-   tried earlier the same day and reverted as too big; this is larger again. If
-   bombs need holding back, they need their own radius, which is that reverted
-   patch. */
-const CHIP_R_PX = 24;
+   THE LEGIBILITY FLOOR IS UNTOUCHED. BADGE_FLOOR_PX is 11, the size at which the
+   % text stops reading, and it guards the pit path only. */
+const DIAGRAM_CHIP_R_PX = 24;
 /* 13.5 -> 11, 9 Sept 2026 (owner).
    Not a taste change. The enclosing-circle fit landed earlier the same day made
    every multi-circle cluster smaller, because a constant circle in a portrait
@@ -3919,7 +3921,7 @@ export default function BreedTree({
   const chipRVb = () => {
     const st = stageRef.current;
     const short = st ? Math.min(st.clientWidth, st.clientHeight) : SIZE;
-    return (CHIP_R_PX * SIZE) / short;
+    return (DIAGRAM_CHIP_R_PX * SIZE) / short;
   };
   const badgeFloorVb = () => {
     const st = stageRef.current;
