@@ -562,6 +562,43 @@ const LINEAGE: Record<string, LineageNode> = {
   // OFF the Shepherd's Dog herding line, with no honest Tudor terminal (its
   // deeper data is Family 8's Arctic sled dogs). Single-parent value 100 matches
   // the shipped Soft-Coated Wheaten Terrier.
+  /* ANGLO-SAXON HERDING DOGS GETS A RECORD OF ITS OWN, 19 September 2026 (owner),
+     so the node can reach the continental stock it has always pointed at. It
+     appears as a leaf in twenty-two trees and is authored once here; every one of
+     them grafts from this.
+
+     ITS PARENT IS THE STOCK IT CAME OVER WITH. See the long note beside the child
+     node in the herding record for why this is a continental parent and not the
+     native Celtic one, and for what must not be undone.
+
+     100, AND NOT A SPLIT, because the sources name one thing: the dogs the
+     Anglo-Saxons brought. There is no second contributor to weigh it against, and
+     inventing one to avoid a single-parent chain would be worse than the chain.
+     It is not a chain in any meaningful sense anyway, since the record below is
+     the honest edge of the data. */
+  "Anglo-Saxon herding dogs": {
+    name: "Anglo-Saxon herding dogs",
+    note: "Collie-sized herding dogs of Anglo-Saxon England, found at West Stow and Brandon. They arrived with the Anglo-Saxons from the North Sea coast rather than descending from the native Celtic stock. Now extinct.",
+    img: "/history/breeds/anglo-saxon-herding-dogs.jpg",
+    children: [
+      /* CONTINENTAL GERMANIC HERDING DOGS, added 19 September 2026 (owner).
+
+         The working herding dogs of the North Sea coastal plain, the Saxon and
+         Anglian homelands in what is now Lower Saxony, Schleswig-Holstein and the
+         northern Netherlands, before the migration. The old German and Dutch
+         herding landraces came from the same stock.
+
+         IT IS A LEAF, AND HONESTLY SO. Nothing documented sits above it: this is
+         pre-migration continental farm stock with no studbook and no named
+         progenitor. It is the edge of the data rather than a gap in it, exactly as
+         Norse settlers dogs is.
+
+         IT IS NOT A GERMAN SHEPHERD and must never be read as one. That breed is a
+         Victorian creation a thousand years younger. */
+      { name: "Continental Germanic herding dogs", note: "The herding dogs of the North Sea coastal plain, kept by the Saxons and Angles before the migration. They crossed to Britain with the people who kept them. Now extinct.", img: "/history/breeds/Continental-Germanic-herding-dogs.jpg", value: 100 }
+    ]
+  },
+
   "Old working collies": {
     name: "Old working collies",
     note: "The old northern hill-collie landrace of Scotland and the borders, the shared working stock the Rough, Smooth and Border collies all grew from. Now extinct.",
@@ -2092,22 +2129,32 @@ const LINEAGE: Record<string, LineageNode> = {
       // Added 18 August 2026. The Anglo-Saxon layer is supported by Crabtree's
       // East Anglia zooarchaeology; the Norse layer by the Heath Wood strontium
       // study.
-      /* NO PROGENITOR, AND THAT IS THE ANSWER, 19 September 2026 (owner). Recorded here
-         so nobody re-opens it: this dog is a leaf on purpose.
+      /* IT HAS ITS PROGENITOR NOW, 19 September 2026 (owner). The note that stood
+         here said this dog was a leaf on purpose because its ancestor was
+         "continental Germanic herding stock, which this archive does not hold".
+         It is held as of today, so that half of the argument has gone. The other
+         half is kept below because it still stands. The ancestry itself is
+         authored in this file's own "Anglo-Saxon herding dogs" record, so this
+         node grafts and nothing is repeated.
 
-         IT WAS CHECKED AGAINST THE CELTIC STOCK AND RULED OUT. The obvious move is to
-         hang it off Celtic herdsmen's dogs, which is a root sitting as its own sibling
-         on this very line. That would be wrong. These three are PARALLEL ARRIVALS, each
-         added on 18 August with its own archaeology: the Celtic layer is the native
-         one, the Anglo-Saxon layer comes from Crabtree's East Anglia zooarchaeology, and
-         the Norse layer from the Heath Wood strontium study. An Anglo-Saxon dog came
-         over WITH the Anglo-Saxons, so its ancestor is continental Germanic herding
-         stock, which this archive does not hold. Making it a child of the Celtic dogs
-         would collapse the three-layer story this record was built to tell.
+         THE CELTIC STOCK IS STILL RULED OUT, and this is the part not to undo.
+         The obvious move has always been to hang this off Celtic herdsmen's dogs,
+         which sits as its own sibling on this very line, and it would be wrong.
+         These three are PARALLEL ARRIVALS, each added on 18 August with its own
+         archaeology: the Celtic layer is the native one, the Anglo-Saxon layer
+         comes from Crabtree's East Anglia zooarchaeology, and the Norse layer from
+         the Heath Wood strontium study. Making this a child of the Celtic dogs
+         would collapse the three-layer story the record was built to tell.
 
-         Norse settlers dogs beside it is a leaf for the same reason and in the same
-         twenty trees. Neither is a gap in the data; both are the edge of it. */
-      { name: "Anglo-Saxon herding dogs", note: "Collie-sized herding dogs of Anglo-Saxon England, found at West Stow and Brandon. They arrived with the Anglo-Saxons rather than descending from the native Celtic stock, and the continental herding dogs behind them are not recorded here. Now extinct.", img: "/history/breeds/anglo-saxon-herding-dogs.jpg", value: 20 },
+         A CONTINENTAL PARENT STRENGTHENS THAT STORY rather than weakening it: it
+         now says where the Anglo-Saxon layer arrived FROM, which is the whole
+         point of calling it an arrival. Do not let it become a descent from the
+         Celtic dogs by the back door.
+
+         NORSE SETTLERS DOGS BESIDE IT IS STILL A LEAF, for the same original
+         reason: its own continental parent, the Scandinavian herding stock, is not
+         held here. If that is ever authored, this is the pattern to follow. */
+      { name: "Anglo-Saxon herding dogs", note: "Collie-sized herding dogs of Anglo-Saxon England, found at West Stow and Brandon. They arrived with the Anglo-Saxons from the North Sea coast rather than descending from the native Celtic stock. Now extinct.", img: "/history/breeds/anglo-saxon-herding-dogs.jpg", value: 20 },
       { name: "Norse settlers dogs", note: "Scandinavian dogs brought over with Viking settlement, likely mixed into local herding stock. Now extinct.", img: "/history/breeds/viking-herding-spitz.jpg", value: 20 }
     ]
   },
