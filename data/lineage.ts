@@ -1272,19 +1272,36 @@ const LINEAGE: Record<string, LineageNode> = {
       { name: "Otterhound", note: "The web-footed otter-hunting hound, the water-working Tudor root of the water spaniels. A functional match, not documented descent. Now endangered.", img: "/history/breeds/otterhound-photo.jpg", value: 40 }
     ]
   },
+  /* THE IRISH WATER DOGS ARE SPANIELS, 20 September 2026 (owner). This record was
+     the Otterhound drawn twice under the 19 August display device, while its own
+     note called it the southern and northern WATER SPANIELS of Ireland. The record
+     said spaniel and the data said hound.
+
+     IT IS THE SAME FIX "Water Spaniels" had on 19 July, on Caius 1576, and this
+     record was missed by that pass. By this period the spaniels had already split
+     into land spaniels, later the Springer and Cocker, and water spaniels, which
+     included the Irish. Until the mid 19th century Ireland held two types, a
+     southern and a northern, and Justin McCarthy of Dublin unified them in the
+     1830s. That pair is exactly what this record is.
+
+     THE CONTINENTAL HALF IS REAL AND IT IS COUNTED HERE, ONCE. McCarthy spent time
+     on the continent and may have seen Barbets, and the modern breed carries
+     continental influence. That blood used to arrive twice, once here through the
+     Otterhound's own water line and once directly on Irish Water Spaniel below. It
+     is now on this record alone.
+
+     NO OTTERHOUND. Not one source found names an otterhound anywhere near the
+     Irish strains; the candidates are the Poodle, the Barbet, the Portuguese Water
+     Dog and the extinct English Water Spaniel. */
   "Old Irish water dogs": {
     name: "Old Irish water dogs",
-    note: "The southern and northern water spaniels of Ireland. Now extinct.",
-    // 19 August 2026: display device. The single documented ancestor below is
-    // drawn twice, as two identical children at 50 each (same note and img), so
-    // the level shows two circles rather than one filling the ring. The children
-    // differ in name from the parent, so isEcho, the pit words and the badge
-    // paths do not touch them. This must NOT be read as two separate ancestors.
+    note: "The southern and northern water spaniels of Ireland, joined into one breed in the 1830s. Now extinct.",
     children: [
-      { name: "Otterhound", note: "The web-footed otter-hunting hound, the same water-working Tudor root, reached in parallel with the British water spaniels. Now endangered.", img: "/history/breeds/otterhound-photo.jpg", value: 50 },
-      { name: "Otterhound", note: "The web-footed otter-hunting hound, the same water-working Tudor root, reached in parallel with the British water spaniels. Now endangered.", img: "/history/breeds/otterhound-photo.jpg", value: 50 }
+      { name: "Land Spaniels", note: "The old land-spaniel stock the water spaniels were split off from. Now extinct.", img: "/history/breeds/original-land-spaniel.jpg", value: 60 },
+      { name: "Old European water dogs", note: "The continental curly water dogs that gave the coat and the love of cold water. Now extinct.", img: "/history/breeds/Old-European-water-dogs.jpg", value: 40 }
     ]
   },
+
   "English Water Spaniel": {
     name: "English Water Spaniel",
     note: "The extinct native English water spaniel, a working water dog of the fens and rivers. Now extinct.",
@@ -1398,9 +1415,11 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Irish Water Spaniel",
     note: "The tallest of the spaniels, a curly liver-brown water dog with a rat-like tail, one of Ireland's old gundog breeds.",
     children: [
-      { name: "Old Irish water dogs", note: "The southern and northern water spaniels of Ireland. Now extinct.", img: "/history/breeds/Old-Irish-water-dog.jpg", value: 55 },
-      // 19 August 2026: this extinct ancestor was wearing a photograph of a living descendant, the Poodle. Repointed to its own artwork.
-      { name: "Old European water dogs", note: "Continental curly water dogs that shaped the coat. Now extinct.", img: "/history/breeds/Old-European-water-dogs.jpg", value: 45 }
+      /* THE DIRECT CONTINENTAL EDGE IS GONE, 20 September 2026. This carried
+         "Old European water dogs" at 45 in its own right AND through its Irish
+         parent, so the same contribution arrived twice. It now arrives once,
+         inside Old Irish water dogs, which is where the sources put it. */
+      { name: "Old Irish water dogs", note: "The southern and northern water spaniels of Ireland, joined into one breed in the 1830s. Now extinct.", img: "/history/breeds/Old-Irish-water-dog.jpg", value: 100 }
     ]
   },
 
@@ -2137,7 +2156,7 @@ const LINEAGE: Record<string, LineageNode> = {
        spaniels both descend from the Otterhound. */
     children: [
       { name: "Land Spaniels", note: "The old English land-spaniel stock that every working spaniel springs from. Now extinct.", img: "/history/breeds/original-land-spaniel.jpg", value: 70 },
-      { name: "Barbet water dogs", note: "The curly continental water dogs, named in the breed histories as the possible source of the rough coat. Now extinct.", img: "/history/breeds/Barbet-water-dogs.jpg", value: 30 },
+      { name: "Old European water dogs", note: "The curly continental water dogs, named in the breed histories as the possible source of the rough coat. Now extinct.", img: "/history/breeds/Old-European-water-dogs.jpg", value: 30 },
     ],
   },
   /* OLD BORDER TERRIERS REACH THE MEDIEVAL EARTH DOG, 15 September 2026 (owner:
@@ -2878,7 +2897,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Bichon Frise",
     note: "A fluffy white charmer of the Mediterranean bichon family, carried between ports by sailors and later a favourite in the French court.",
     children: [
-      { name: "Barbet water dogs", note: "The curly Barbet, the water dog the little 'barbichon' dogs were bred down from. Now extinct.", img: "/history/breeds/Barbet-water-dogs.jpg", value: 50 },
+      { name: "Old European water dogs", note: "The curly Barbet, the water dog the little 'barbichon' dogs were bred down from. Now extinct.", img: "/history/breeds/Old-European-water-dogs.jpg", value: 50 },
       { name: "Mediterranean Bichon lapdogs", note: "The old white lapdogs of Malta, Bologna and Tenerife that make up the bichon family. Now extinct.", img: "/history/breeds/Mediterranean-bichon-lapdogs.jpg", value: 50 }
     ]
   },
@@ -2895,12 +2914,31 @@ const LINEAGE: Record<string, LineageNode> = {
   // British or water link at all). The combined-node split job, when it runs,
   // attaches its Barbet-type / Poodle-type outputs onto THIS terminal; it does
   // not need rewriting.
+  /* THE TRAIL STOPS HERE, 20 September 2026 (owner). This record had ONE parent,
+     the Otterhound, at 100, described in its own note as "a functional match, not
+     documented descent". A German and French water dog descending from an English
+     hound is backwards, and it was also the edge that made a cycle: this record ->
+     Otterhound -> Rough water dogs -> Barbet water dogs, which is this record
+     again once the two names are merged. Removing it kills the loop before the
+     merge rather than after.
+
+     WHY NOTHING REPLACES IT. The likeliest reading is that the European water dog
+     is an old shaggy herding landrace that specialised into water work: the same
+     stock produced the Poodle, the Lagotto, the Barbet and the Iberian water dogs,
+     was bred down into the bichons, and kept its herding branch in dogs like the
+     Bearded Collie and the Polish Lowland Sheepdog. Germany still has a landrace
+     called a sheep-poodle. But that is a described TYPE, not a named dog, and the
+     sources disagree flatly about where it entered Europe: North African stock
+     through Iberia with the Moors, or Asian herding stock moving west. Portuguese
+     and Spanish water dogs are agreed to share a common ancestor with the Poodle,
+     and the direction of travel between them is itself disputed.
+
+     So this is now one of the file's open roots, like the other deep ancestors
+     with nothing authored behind them. A parent is one edit away whenever the
+     evidence settles. */
   "Old European water dogs": {
     name: "Old European water dogs",
-    note: "The rough water-retrieving dogs of Germany and France that fetched waterfowl for hunters. Now extinct.",
-    children: [
-      { name: "Otterhound", note: "The web-footed water-working hound, the Tudor root shared with the water spaniels: one water card for both water lines. A functional match, not documented descent. Now endangered.", img: "/history/breeds/otterhound-photo.jpg", value: 100 }
-    ]
+    note: "The pan-European water dog: England's Great Water Dog, Germany's Pudelhund, France's Barbet. Most likely an old shaggy herding stock that took to the water, though where it first came from is still argued over. Now extinct.",
   },
   "Fishermen's water dogs": {
     name: "Fishermen's water dogs",
@@ -2947,8 +2985,12 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Poodle",
     note: "Now a clever companion and show dog, but built as a water-retrieving gundog. The name comes from the German 'Pudel', meaning to splash about.",
     children: [
-      { name: "Old European water dogs", note: "The rough water-retrieving dogs of Germany and France that fetched waterfowl for hunters. Now extinct.", img: "/history/breeds/Old-European-water-dogs.jpg", value: 55 },
-      { name: "Barbet water dogs", note: "The curly-coated continental Barbet, an old European water dog and the root of the poodle line. A modelled half of the pair, not a recorded mating. Now extinct.", img: "/history/breeds/Barbet-water-dogs.jpg", value: 22.5 },
+      /* ONE DOG, COUNTED ONCE, 20 September 2026. This carried BOTH names as
+         separate parents, 55 and 22.5, which is 77.5% of the Poodle spent twice on
+         the same animal. They are one dog under two local names, so the two shares
+         are added rather than one being dropped: nothing is lost, it is just no
+         longer double-counted. */
+      { name: "Old European water dogs", note: "The pan-European water dog, Germany's own Pudelhund, from which the Poodle takes its name. Now extinct.", img: "/history/breeds/Old-European-water-dogs.jpg", value: 77.5 },
       { name: "Water Spaniels", note: "The British working water-spaniel branch crossed in alongside them, listed separately from the water dogs by Caius in 1576. Now extinct.", img: "/history/breeds/original-water-spaniel.jpg", value: 22.5 }
     ]
   },
@@ -3283,7 +3325,10 @@ const LINEAGE_ALIASES: Record<string, string> = {
   "Old heeler stock": "Celtic Heeler",
   "Collie or working dog": "Old working collies",
   // duplicates rather than aliases: one dog, two spellings
-  "Barbet-type water dogs": "Barbet water dogs",
+  // Retargeted 20 September 2026 with the Barbet merge; aliasName resolves ONE
+  // level, so this would otherwise reach a name with no record.
+  "Barbet-type water dogs": "Old European water dogs",
+  "Barbet water dogs": "Old European water dogs",
   "Spitz-type dogs": "Ancient Spitz dogs",
 };
 function aliasName(name: string): string {
