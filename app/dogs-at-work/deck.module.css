@@ -442,7 +442,13 @@
 }
 
 .learnAboutAccent {
-  color: var(--emphasis);
+  /* --emphasis (pale, #FFED60) to --yellow-header (lemon, #ffed00), 19 September
+     2026 (Steve: wrong yellow). ALL WIDTHS, because a wrong colour is wrong at every
+     size, and it matches the article card titles which went lemon at all widths in
+     task 2.8. Say the word and it becomes mobile only; nothing forces it either way
+     here, unlike the card titles. --emphasis itself is untouched and still carries
+     the yellow highlight inside the blue panel copy on this page. */
+  color: var(--yellow-header);
 }
 
 .articleMeta {
@@ -596,11 +602,12 @@
      layout. The .m* classes are not repeated here because .mobile is
      display:none above this breakpoint, so they are already mobile only. */
 
-  /* 1.1 Intro down 3pt. calc on the whole clamp so it comes down by the same
-     3pt at every width rather than only where one term happens to bite. At 390
-     the 28px floor governs, so this reads 24px. */
+  /* 1.1 Intro down 3pt, then a further 3pt on 19 September 2026 (Steve). 6pt off
+     the base in total. calc on the whole clamp so it comes down by the same amount
+     at every width rather than only where one term happens to bite. At 390 the 28px
+     floor governs, so this reads 20px. */
   .introText {
-    font-size: calc(clamp(28px, 3.6vw, 36px) - 3pt);
+    font-size: calc(clamp(28px, 3.6vw, 36px) - 6pt);
   }
 
   /* 1.2, first half. The paragraph gap. The 0.9em was set on 31 Aug 2026 to
@@ -608,13 +615,19 @@
      that break readable while closing the block up on a phone. The .mBlue half of
      this task is at the foot of the file, and the note there says why. */
   .blueBody {
-    margin-bottom: 0.45em;
+    /* 0.9em -> 0.45em -> 0.225em, the second halving on 19 September 2026 (Steve).
+       The original 0.9em was set on 31 Aug 2026 to separate paragraphs split out of
+       one body string; at 0.225em that break is now slight, so this is close to the
+       floor before the paragraphs read as one block. */
+    margin-bottom: 0.225em;
   }
 
   /* 1.3 Halve the air above the "Learn about" title. The base rule's 75px is
      recorded as Item 3 and stays for desktop. */
+  /* 75px -> 37.5px -> 18.75px, the second halving on 19 September 2026 (Steve).
+     The base 75px is recorded as Item 3 and stays for desktop. */
   .learnAbout {
-    padding-top: 37.5px;
+    padding-top: 18.75px;
   }
 
   /* 1.4 Pill text 25% smaller: 1.2rem x 0.75. The article pages' own .tag is
@@ -652,9 +665,11 @@
     color: var(--cream);
   }
 
-  /* 1.6 Article headline leading opened from 1.05 to 1.3em. */
+  /* 1.6 Article headline leading. Opened from 1.05 to 1.3em earlier today, then
+     pulled back to 1.1em on 19 September 2026 (Steve). 1.3 was the brief's figure
+     and it read too loose once the rest of the block tightened around it. */
   .headline {
-    line-height: 1.3em;
+    line-height: 1.1em;
   }
 
   /* 1.7 The green CTA must never wrap. MEASURED, not estimated: at 320 wide the
@@ -798,8 +813,11 @@
 
    The side padding is deliberately untouched, so only the vertical closes up. */
 @media (max-width: 768px) {
+  /* Halved once on 19 September 2026, then halved again the same day (Steve), so a
+     quarter of the base clamp(22px, 8cqi, 34px). At 390 this reads about 7px against
+     the 28.6px it started at. The side padding is still untouched. */
   .mBlue {
-    padding-top: clamp(11px, 4cqi, 17px);
-    padding-bottom: clamp(11px, 4cqi, 17px);
+    padding-top: clamp(5.5px, 2cqi, 8.5px);
+    padding-bottom: clamp(5.5px, 2cqi, 8.5px);
   }
 }
