@@ -1069,26 +1069,59 @@
    share this corner. Same bottom as PLAY and the zoom-out, so all three sit on
    one line.
    =========================================================================== */
+/* THE PAD IS NO LONGER A PAD, 19 September 2026 (owner). The four arrows were a
+   2x2 cluster in the bottom right corner; they are now one per screen edge,
+   each centred on that edge, pointing the way it goes.
+
+   `display: contents` RATHER THAN A POSITIONED BOX. The group element still
+   exists, and it has to: role="group" with its aria-label is what names these
+   four controls together to a screen reader, and deleting the wrapper would take
+   that with it. contents removes only its BOX, so each button positions itself
+   against the viewport instead of against a corner container.
+
+   THE OLD GRID RULES ARE GONE rather than left dormant: grid-template-columns,
+   the gap and the 1 / -1 spans described a cluster that no longer exists, and a
+   stale layout rule on a live class is exactly the kind of thing that gets
+   half-reapplied later. .navLabel below is a different case and is still kept
+   on purpose, see its own note. */
 .navPad {
-  position: fixed;
-  right: 16px;
-  bottom: calc(3% + 5px);
-  z-index: 15;
-  display: grid;
-  /* Two columns for the left/right pair; up and down span both and centre.
-     HALVED 9 Sept 2026 (owner): 62.5 to 31.25 and the 10px gap to 5px, so the
-     whole pad scales rather than just the buttons. Footprint drops from 145px
-     wide to 72.5px, which is one PLAY button's worth of the bottom row instead
-     of nearly half of it. */
-  grid-template-columns: repeat(2, 31.25px);
-  gap: 5px;
-  justify-items: center;
-  align-items: center;
-  pointer-events: auto;
+  display: contents;
 }
+/* ONE EDGE EACH. Every one is fixed to the viewport, at the same z-index the
+   cluster had, with the same 16px margin the corner squares use.
+   THE SAFE AREA INSETS MATTER HERE and did not before: the top and bottom
+   arrows now sit on the edges a phone draws its own furniture over, so each adds
+   its inset. Left and right take theirs too, which is zero in portrait and real
+   in landscape.
+   CENTRING IS A TRANSFORM, so the press below CANNOT ALSO BE ONE: it uses the
+   standalone `translate` property instead, which composes separately and does
+   not overwrite this. That is the same trap the rail cards hit with `rotate`. */
 .navUp,
+.navDown,
+.navLeft,
+.navRight {
+  position: fixed;
+  z-index: 15;
+}
+.navLeft {
+  left: calc(16px + env(safe-area-inset-left, 0px));
+  top: 50%;
+  transform: translateY(-50%);
+}
+.navRight {
+  right: calc(16px + env(safe-area-inset-right, 0px));
+  top: 50%;
+  transform: translateY(-50%);
+}
+.navUp {
+  top: calc(16px + env(safe-area-inset-top, 0px));
+  left: 50%;
+  transform: translateX(-50%);
+}
 .navDown {
-  grid-column: 1 / -1;
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  left: 50%;
+  transform: translateX(-50%);
 }
 /* RETIRED 9 Sept 2026, not deleted. The four labels came off the pad to see how
    it reads on the arrows alone. Kept here so restoring them is four spans in the
@@ -1120,12 +1153,14 @@
   height: 31.25px;
   border-radius: 8.875px;
   border: none;
-  /* YELLOW RIM, 9 Sept 2026 (owner), was navy on navy. The arrow inside is
-     already yellow, so the button is now a navy square outlined and filled with
-     the one accent, which is what the corner squares do too. */
-  outline: 2.5px solid var(--yellow, #ffd23e);
-  background: var(--navy, #0a3a57);
-  color: var(--yellow, #ffd23e);
+  /* INVERTED, 19 September 2026 (owner): a yellow button with a blue arrow,
+     where it was a navy button with a yellow one. All three values swap
+     together, rim included, or the square ends up yellow on yellow.
+     Its history: the rim was navy on navy until 9 Sept 2026, then yellow on
+     navy, and is now navy on yellow. */
+  outline: 2.5px solid var(--navy, #0a3a57);
+  background: var(--yellow, #ffd23e);
+  color: var(--navy, #0a3a57);
   display: grid;
   place-items: center;
   padding: 0;
@@ -1137,8 +1172,13 @@
   height: 60%;
   display: block;
 }
+/* THE PRESS USES `translate`, NOT `transform`. Each arrow is centred on its edge
+   with a transform, and a transform here would replace that outright and fling
+   the button back to the corner of its own box on every tap. The standalone
+   property composes with the transform instead of overwriting it.
+   Same lesson as the rail cards and `rotate`. */
 .navBtn:active {
-  transform: translateY(2px);
+  translate: 0 2px;
 }
 /* THE ENDS OF THE LINE. Dimmed, not hidden, by decision: hiding one would
    reflow the pad and move the other buttons under the reader's thumb between

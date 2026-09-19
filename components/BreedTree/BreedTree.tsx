@@ -13075,15 +13075,22 @@ export default function BreedTree({
                than 20. */
             const ROW_DROP = 10 * upp;
             /* NO PLAY ON A FINISHED LEVEL, 16 September 2026 (owner). Filtered out
-               of the words array rather than hidden in the render, so LEARN keeps
-               its own x: that is xMinC + m + SQ + SQ_GAP, an absolute position
-               rather than one measured from PLAY, so it does not slide left into
-               the gap. The level stays readable and re-learnable; only the round
-               is gone. */
+               of the words array rather than hidden in the render.
+
+               AND LEARN NOW TAKES PLAY'S PLACE, 19 September 2026 (owner),
+               REVERSING the rule that used to sit here. The old note said LEARN
+               keeps its own absolute x "so it does not slide left into the gap",
+               which was the deliberate choice at the time. The owner has since
+               seen it on the device: with PLAY gone, holding LEARN in the second
+               slot leaves an empty square of dead space at the left of the row
+               and the foot of the screen reads as broken rather than reduced.
+               So on a completed level LEARN sits at xMinC + m, PLAY's own x, and
+               the row starts where it always starts. DO NOT RESTORE THE OLD RULE
+               without reading this. */
             type Word = { key: "learn" | "start"; label: string; x: number; y: number; anchor: "start" | "end" };
             const words: Word[] = ([
               { key: "start", label: "PLAY", x: xMinC + m, y: vbHc * WORD_START_Y + ROW_DROP, anchor: "start" },
-              { key: "learn", label: "LEARN", x: xMinC + m + SQ + SQ_GAP, y: vbHc * WORD_START_Y + ROW_DROP, anchor: "start" },
+              { key: "learn", label: "LEARN", x: levelCompleted ? xMinC + m : xMinC + m + SQ + SQ_GAP, y: vbHc * WORD_START_Y + ROW_DROP, anchor: "start" },
             ] as Word[]).filter((w) => !(levelCompleted && w.key === "start"));
             return words.map((w) => (
               <g
@@ -13216,58 +13223,125 @@ export default function BreedTree({
             // 10% OFF, 2 September 2026 (owner): the trailing 0.5 becomes 0.45.
             // NOTE the comment above is now out of date by request: the number no
             // longer matches LEARN, which came down 25% in the same pass.
-            const fsL = Math.min(Math.min(Math.max(54.4, stW * 0.12), 128) * START_SCALE, (stW * 0.92) / 3.17) * 0.45;
+            /* 15% OFF, 19 September 2026 (owner): the trailing 0.45 becomes
+               0.3825. Everything below is sized from this one figure, so the
+               ordinal and the word "dog" come down with it. */
+            const fsL = Math.min(Math.min(Math.max(54.4, stW * 0.12), 128) * START_SCALE, (stW * 0.92) / 3.17) * 0.3825;
+            /* THE ORDINAL AND THE WORD, 19 September 2026 (owner).
+
+               THE DIGITS CHANGED TOO, and this is the part to read before anyone
+               "fixes" it back. levelNo is ZERO BASED: it is a findIndex result
+               from BreedStrip, so this element painted "00" on level one for as
+               long as it has existed. An ordinal on a zero-based, zero-padded
+               number gives "00th", which is why the owner chose to show
+               levelNo + 1 unpadded: 1st, 2nd, 13th. The padStart is therefore
+               gone on purpose. THE PROP IS UNCHANGED and still zero based; only
+               what is painted moved. Nothing else reads this element.
+
+               THE SUFFIX RULE is the ordinary English one, teens included: 11th,
+               12th and 13th rather than 11st, 12nd, 13rd. Worth keeping, because
+               the level list is long enough to reach them. */
+            const levelOrdinal = levelNo + 1;
+            const ordSuffix = (() => {
+              const v = levelOrdinal % 100;
+              if (v >= 11 && v <= 13) return "th";
+              return ["th", "st", "nd", "rd"][v % 10] ?? "th";
+            })();
+            /* TWO SIZES BELOW THE NUMBER, both expressed as a fraction of fsL so
+               a change to the figure above carries through:
+                 the superscript   half the number, raised by 0.35 of it
+                 the word "dog"    0.45 of the number
+               AND THE LINE HEIGHT IS 1.1em (owner), em being the NUMBER's size,
+               which is the ordinary CSS reading of a line-height set on a block
+               whose first line is the big one. Centre to centre, because both
+               lines use dominantBaseline central. ONE NUMBER TO CHANGE if the
+               gap wants opening or closing. */
+            const fsOrd = fsL * 0.5;
+            const fsDog = fsL * 0.45;
+            const lineDy = fsL * 1.1;
             const vbWc = aspect >= 1 ? SIZE * aspect : SIZE;
             const vbHc = aspect >= 1 ? SIZE : SIZE / aspect;
             const xMinC = -vbWc / 2;
             // the old 18px side margin went with the move to the top line
+            /* LEVEL WITH THE PROFILE NAME, NOT THE X SQUARE, 19 September 2026
+               (owner). It used to centre on the red corner square: 16px margin
+               plus half of 67.5 is 49.75px down. It now centres on the FIRST
+               TITLE ROW instead, the portrait and the level's own name at the top
+               left, so the two ends of that line read as one row.
+
+               MIRRORED, NOT MEASURED. .titleWrap is DOM in LineageModal and this
+               is svg in BreedTree, so there is no shared box to read. Its rule is
+               `top: 12px` with `--tp: clamp(40.32px, 7.92vw, 56.16px)`, and the
+               row's centre is half a portrait below that top. The same clamp is
+               already mirrored a few hundred lines below for the hover hint, with
+               the same warning: IF .titleWrap's top OR --tp CHANGES, CHANGE THIS
+               TO MATCH. vw is the window, not the stage, because that is what the
+               CSS unit means.
+
+               THE X IS UNMOVED and so is the horizontal position: the number
+               still ends 97.5px in from the right, just to the square's left. Only
+               the vertical anchor changed. */
+            const winWL = typeof window !== "undefined" ? window.innerWidth : 390;
+            const tpL = Math.min(Math.max(40.32, 7.92 * (winWL / 100)), 56.16);
+            const titleRowCentre = 12 + tpL / 2;
+            /* CLEAR OF THE TOP EDGE, 16 September 2026 (owner: the level number
+               runs off screen on the desktop). Half the font plus the stroke that
+               outlines it is the real minimum, and whichever of the two is larger
+               wins, so a viewport that cannot fit the number on the title's line
+               drops it just far enough to be whole.
+               THE STROKE FIGURE IN HERE MOVED WITH THE ONE BELOW, 9 to 6.3. */
+            const numY = -vbHc / 2 + Math.max(titleRowCentre * upp, (fsL * upp) / 2 + 6.3 * upp + 6 * upp);
+            const numX = xMinC + vbWc - 97.5 * upp;
+            /* TWO SEPARATE <text> NODES, not tspans on one. A tspan inherits the
+               parent's dominantBaseline and its dy stacks on top of that, which
+               makes a mixed-size two-line block very hard to reason about; two
+               nodes each centred on their own y is plainly readable and each line
+               keeps its own font size and stroke. The ordinal IS a tspan, because
+               it shares its line with the number and wants to ride on it. */
+            const numStyle = {
+              fill: "#000000",
+              stroke: "#ffffff",
+              /* 30% OFF, 19 September 2026 (owner): 9 becomes 6.3. It had been
+                 4, then 7, then 9 over two rounds of growth; this is the first
+                 time it has come back down. */
+              strokeWidth: `${6.3 * upp}px`,
+              paintOrder: "stroke" as const,
+              strokeLinejoin: "round" as const,
+              fontFamily: "var(--font-display), system-ui, sans-serif",
+              letterSpacing: `${2 * upp}px`,
+              pointerEvents: "none" as const,
+              userSelect: "none" as const,
+            };
             return (
-              <text
-                /* MOVED TO THE TOP LINE, 9 Sept 2026 (owner's mockup). It used
-                   to sit bottom right at the end of the PLAY/LEARN row, which is
-                   exactly where the new D-pad now goes; the two cannot share
-                   that corner.
-                   It now sits on the same line as the red corner square, just to
-                   its left. The square is 67.5px with a 16px margin, so its left
-                   edge is 83.5px in from the right; 14px of air, the same gap the
-                   corner squares stack with, puts this text's right edge at 97.5.
-                   Vertically it centres on the square: 16px margin plus half of
-                   67.5 is 49.75px down from the top.
-                   Both figures are in px times upp, never bare, because this is
-                   drawn in svg units and upp is the conversion. */
-                x={xMinC + vbWc - 97.5 * upp}
-                /* CLEAR OF THE TOP EDGE, 16 September 2026 (owner: the level number
-                   runs off screen on the desktop).
-
-                   THE ORIGIN WAS NEVER WRONG. -vbHc / 2 is the viewBox's own top and
-                   matches the real vbH exactly. The clearance was: 49.75 * upp put the
-                   BASELINE 28.7px below the top edge on the owner's desktop, and with
-                   dominantBaseline central a 123px glyph reaches about 61px above its
-                   baseline. So the digits were cut off by the edge, which reads as the
-                   number running off screen.
-
-                   Half the font plus the stroke that outlines it is the real minimum,
-                   and the old 49.75 * upp still wins wherever it is the larger, so
-                   every narrower viewport is unchanged. */
-                y={-vbHc / 2 + Math.max(49.75 * upp, (fsL * upp) / 2 + 9 * upp + 6 * upp)}
-                textAnchor="end"
-                dominantBaseline="central"
-                style={{
-                  fill: "#000000",
-                  stroke: "#ffffff",
-                  strokeWidth: `${9 * upp}px`, // 4, then 7, now 9: two rounds of +3 and +2
-                  paintOrder: "stroke",
-                  strokeLinejoin: "round",
-                  fontFamily: "var(--font-display), system-ui, sans-serif",
-                  fontSize: `${fsL * upp}px`,
-                  letterSpacing: `${2 * upp}px`,
-                  pointerEvents: "none",
-                  userSelect: "none",
-                }}
-                aria-label={`Level ${levelNo}`}
-              >
-                {String(levelNo).padStart(2, "0")}
-              </text>
+              <g aria-label={`${levelOrdinal}${ordSuffix} dog`} role="img">
+                <text
+                  x={numX}
+                  y={numY}
+                  textAnchor="end"
+                  dominantBaseline="central"
+                  style={{ ...numStyle, fontSize: `${fsL * upp}px` }}
+                >
+                  {levelOrdinal}
+                  {/* The suffix rides half-height and half-size, the ordinary
+                      superscript. baselineShift is not reliable across engines on
+                      svg text, so this is a plain dy, which is. */}
+                  <tspan
+                    dy={`${-fsL * 0.35 * upp}`}
+                    style={{ fontSize: `${fsOrd * upp}px` }}
+                  >
+                    {ordSuffix}
+                  </tspan>
+                </text>
+                <text
+                  x={numX}
+                  y={numY + lineDy * upp}
+                  textAnchor="end"
+                  dominantBaseline="central"
+                  style={{ ...numStyle, fontSize: `${fsDog * upp}px` }}
+                >
+                  dog
+                </text>
+              </g>
             );
           })()}
           {/* Item 5: the hover instruction, next to the play button. Shows on the
