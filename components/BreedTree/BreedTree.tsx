@@ -13297,10 +13297,13 @@ export default function BreedTree({
             // 10% OFF, 2 September 2026 (owner): the trailing 0.5 becomes 0.45.
             // NOTE the comment above is now out of date by request: the number no
             // longer matches LEARN, which came down 25% in the same pass.
-            /* 15% OFF, 19 September 2026 (owner): the trailing 0.45 becomes
-               0.3825. Everything below is sized from this one figure, so the
-               ordinal and the word "dog" come down with it. */
-            const fsL = Math.min(Math.min(Math.max(54.4, stW * 0.12), 128) * START_SCALE, (stW * 0.92) / 3.17) * 0.3825;
+            /* THE WHOLE BLOCK'S SIZE, IN ONE FIGURE. Everything below is derived
+               from it, so the number, the superscript and the word "dog" always
+               move together.
+               History of the trailing constant: 0.45 as built, then 0.3825 on
+               19 September 2026 (15% off, owner), then 0.286875 the same day
+               (a further 25% off, owner). */
+            const fsL = Math.min(Math.min(Math.max(54.4, stW * 0.12), 128) * START_SCALE, (stW * 0.92) / 3.17) * 0.286875;
             /* THE ORDINAL AND THE WORD, 19 September 2026 (owner).
 
                THE DIGITS CHANGED TOO, and this is the part to read before anyone
@@ -13354,8 +13357,11 @@ export default function BreedTree({
                So the figure carries the font's own 0.6: 1.1 * 0.6 = 0.66. That is
                a VISUAL 1.1em, which is what was actually wanted. The same 0.6 is
                already on record for this font elsewhere in the project.
-               IF THE FONT CHANGES, this 0.6 changes with it. */
-            const lineDy = fsL * 1.1 * 0.6;
+               IF THE FONT CHANGES, this 0.6 changes with it.
+               1.1 TO 1.0, 19 September 2026 (owner), with the 25% size cut. The
+               0.6 is the font's business and stays; the 1.0 is the line height
+               being asked for and is the number to change. */
+            const lineDy = fsL * 1.0 * 0.6;
             /* HALF THE NUMBER'S STROKE on the two smaller pieces, 19 September
                2026 (owner). 6.3 becomes 3.15. A stroke sized for a 100px glyph
                swamps a 25px one: paintOrder is "stroke", so the fill paints over
