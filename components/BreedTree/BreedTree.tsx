@@ -2070,6 +2070,24 @@ const rollBomb = () => Math.random() < 1 / BOMB_ODDS;
    IN CLIENT PIXELS, NOT VIEWBOX UNITS, so a chip is the same on a 378px stage and a
    1200px one. Converted once per spawn site through fxScale, which is user units
    per client px. */
+/* DOES A LEVEL DOG DRAW AS ITS NAME IN THE PIT, 19 September 2026 (owner: revert
+   these text objects to the dog circles).
+
+   FALSE, so a depth-1 dog draws as a circle like every other node. It used to
+   stand its circle down and draw a big tilted word in its place, which is what
+   the note on isWordNode describes.
+
+   NO PHYSICS CHANGES. wordBodiesRef is assigned the very same `bodies` array the
+   circles use, one body per dog, so the word was only ever a different PICTURE of
+   the same circular body. Nothing about collision, drag or the drop moves.
+
+   WHAT COMES BACK WITH THE CIRCLE. A depth-1 node is now `paintable`, so it takes
+   the chain fills, the rarity colours and the face mark like any other circle. It
+   was excluded from all of those purely because it was not drawn as a disc.
+
+   ONE CONSTANT TO FLIP. The words group, its positioning loop and the word bodies
+   are all left in place and simply not shown. */
+const PIT_DRAWS_WORDS = false;
 const CHIP_R_PX = 12;
 /* 13.5 -> 11, 9 Sept 2026 (owner).
    Not a taste change. The enclosing-circle fit landed earlier the same day made
@@ -5694,7 +5712,7 @@ export default function BreedTree({
       // Once the pit is live a level dog IS its name, drawn in its own group
       // below, so the circle stands down. Keyed off depth alone: no lookup, no
       // way for it to half-apply.
-      const isWordNode = fellRef.current && d.depth === 1;
+      const isWordNode = PIT_DRAWS_WORDS && fellRef.current && d.depth === 1;
       const c = wrap?.children[0] as SVGCircleElement | undefined;
       /* A CIRCLE IN THE CHAIN IS INVERTED:
          light blue where it was navy, and navy where its outline was. It wore a
@@ -13048,7 +13066,12 @@ export default function BreedTree({
               `display` on the CHILDREN of this group, never on the group itself. The
               two rules do not fight. A hidden group also takes no pointer events, so a
               word cannot be tapped through the card either. */}
-          <g ref={wordsGRef} textAnchor="middle" style={{ display: dropped && !learnNode ? "inline" : "none" }}>
+          {/* The words group is switched off wholesale by PIT_DRAWS_WORDS, so the
+              per-word positioning loop above can stay exactly as it is: it writes
+              to a group nobody can see and costs a handful of attribute sets a
+              frame. Left running rather than gated so restoring the words is the
+              one constant and nothing else. */}
+          <g ref={wordsGRef} textAnchor="middle" style={{ display: PIT_DRAWS_WORDS && dropped && !learnNode ? "inline" : "none" }}>
             {wordList.map((w, i2) => (
               <g
                 key={i2}
