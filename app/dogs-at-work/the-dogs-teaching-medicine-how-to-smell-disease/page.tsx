@@ -62,6 +62,12 @@ const BODY: (string | { h: string; id: string })[] = [
 // carries the full reasoning. --emphasis itself is unchanged; it still carries the
 // index page's blue-panel highlight.
 const cardTitle: React.CSSProperties = { fontFamily: "var(--font-display)", fontSize: "38.67px", letterSpacing: "0", color: "var(--yellow-header)", lineHeight: 0.9, textTransform: "uppercase", margin: "0 0 6px" };
+// Tasks 3.1 and 3.3, 19 September 2026 (Steve): two lines inside "The 2025 study"
+// box come down 2pt from cardBody's 1.087rem. Applied as a per-site override rather
+// than to cardBody itself, because three other paragraphs in this file use a bare
+// style={cardBody} and are NOT in scope. Declared here so the two sites cannot drift
+// apart.
+const CARD_BODY_DOWN_2PT = "calc(1.087rem - 2pt)";
 const cardBody: React.CSSProperties = { fontFamily: "var(--font-body)", fontSize: "1.087rem", fontWeight: 500, color: "#fff", lineHeight: 1.5, margin: 0 };
 const statLabel: React.CSSProperties = { fontFamily: "var(--font-body)", fontSize: "0.66rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--yellow)", marginBottom: 4 };
 const statValue: React.CSSProperties = { fontFamily: "var(--font-display)", fontSize: "2rem", color: "#fff", lineHeight: 1 };
@@ -89,7 +95,7 @@ const CARDS: ArticleCard[] = [
       <div className={styles.sidebarCard}>
         <div style={{ padding: "32px 40px 12px" }}>
           <p style={cardTitle}>The 2025 study</p>
-          <p style={{ ...cardBody, fontWeight: 600 }}>Dogs detect Parkinson&apos;s by smell</p>
+          <p style={{ ...cardBody, fontWeight: 600, fontSize: CARD_BODY_DOWN_2PT }}>Dogs detect Parkinson&apos;s by smell</p>
         </div>
         <div style={{ padding: "20px 40px 8px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
           {[
@@ -104,7 +110,7 @@ const CARDS: ArticleCard[] = [
           ))}
         </div>
         <div style={{ padding: "24px 40px 52px" }}>
-          <p style={cardBody}><strong>Dogs:</strong> Bumper (Golden Retriever) &amp; Peanut (Black Labrador).<br /><strong>Method:</strong> double-blind, skin swabs.<br /><strong>Partners:</strong> Medical Detection Dogs, University of Bristol &amp; University of Manchester (published 15 July 2025).</p>
+          <p style={{ ...cardBody, fontSize: CARD_BODY_DOWN_2PT }}><strong>Dogs:</strong> Bumper (Golden Retriever) &amp; Peanut (Black Labrador).<br /><strong>Method:</strong> double-blind, skin swabs.<br /><strong>Partners:</strong> Medical Detection Dogs, University of Bristol &amp; University of Manchester (published 15 July 2025).</p>
         </div>
       </div>
     ),

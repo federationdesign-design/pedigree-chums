@@ -111,7 +111,14 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--yellow, #ffd23e);
+  /* 3.7 The wrong yellow, 19 September 2026 (Steve). Was --yellow (#ffd23e), the
+     body yellow used by 96 files, which read noticeably duller than the card title
+     directly above it and is what made this box look wrong. --yellow-header is the
+     same lemon the title now carries, so the two read as one card.
+     On the navy card: --yellow was 8.28:1, --yellow-header is 9.89:1.
+     ALL WIDTHS, matching the ruling on 2.8 and 2.9 and keeping this file free of a
+     colour media query. The token itself is untouched; only this consumer changes. */
+  color: var(--yellow-header, #ffed00);
   margin: 0;
 }
 
