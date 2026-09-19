@@ -1016,13 +1016,12 @@ const DOG_SINGLE_INK = "#ffffff";
    instant flip on a circle the player never touched reads as a glitch; 150ms
    reads as a response. It softens the paint, never the timing of the answer. */
 const DOG_FILL_FADE_MS = 150;
-/* THE FILL A HELD CIRCLE TAKES (owner, 18 September 2026), alongside its white
-   outline and its tapped face. A pit circle is filled with the site's navy,
-   #0a3a57, which fillFor returns for every circle once the pit is live; this is
-   --blue-sky from globals.css, the site's own light blue, written as a hex here
-   because it is set on an SVG element from script, where a var() would not
-   resolve. One name to change if another blue is wanted. */
-const DOG_CHAIN_FILL = "#5cc4ee";
+/* DOG_CHAIN_FILL, the sky blue #5cc4ee a held circle wore from 18 September
+   2026, WAS REMOVED ON 19 September 2026 (owner). A held circle now takes its
+   own RARITY_BAND colour, the same entry an available twin draws: see the fill
+   writer's note in the paint loop for what that costs and what still separates
+   the two states. The constant went with it rather than being left unused.
+   DO NOT REINSTATE IT without reading that note first. */
 /* AN AVAILABLE TWIN WEARS ITS BREED'S RARITY COLOUR (owner, 18 September 2026).
    A circle of the chain's breed that is NOT yet held fills with the very colour
    its rarity tag uses, so where you can connect is obvious AND says something
@@ -5559,8 +5558,9 @@ export default function BreedTree({
       if (c) {
         /* The mark has read all three states since the chain shipped; the ring
            only read the first, so a highlighted twin kept its own outline. Both
-           states are now filled and inked: a held circle from DOG_CHAIN_FILL and
-           DOG_CHAIN_COLOUR, an available twin from its own RARITY_BAND entry.
+           states are now filled and inked: BOTH from the breed's own RARITY_BAND
+           entry since 19 September 2026, the held one keeping DOG_CHAIN_COLOUR on
+           its rim, which is the chain's line.
            One key, still written only when the answer CHANGES and still tracked
            on the element, so a still pit costs nothing. */
         /* THE TIER RIDES IN THE KEY, so a twin whose rarity somehow differed from
@@ -5569,8 +5569,8 @@ export default function BreedTree({
            name, but the key is what guarantees the element and the state agree
            and it costs one string to keep that true. Looked up only for a twin,
            which is a handful of circles while a chain lives and none otherwise. */
-        const band = chTwin ? RARITY_BAND[rarityTier(treesContaining(d.data.name))] : null;
-        const want = chHeld ? "held" : band ? `twin:${band.bg}` : chSingle ? "single" : "0";
+        const band = (chHeld || chTwin) ? RARITY_BAND[rarityTier(treesContaining(d.data.name))] : null;
+        const want = chHeld ? `held:${band?.bg}` : band ? `twin:${band.bg}` : chSingle ? "single" : "0";
         if (c.dataset.chained !== want) {
           c.dataset.chained = want;
           // The fade belongs to the fill and the ring, not to anything else, and
@@ -5579,17 +5579,34 @@ export default function BreedTree({
           // A held circle's rim IS the chain's line, one stroke of the same lemon.
           // It was navy (DOG_CHAIN_INK) under a second lemon ring; both are gone.
           c.style.stroke = chHeld ? DOG_CHAIN_COLOUR : band ? band.fg : chSingle ? DOG_SINGLE_INK : "";
-          /* AND BOTH STATES ARE FILLED NOW. A held circle goes sky blue, and an
-             available twin goes YELLOW, so the two things the chain has to say,
-             "this one is in" and "this one is where you can go next", are both
-             said by the fill rather than one of them by a ring alone.
-             Safe to set: a circle in the live pit shows no photograph, because
-             the pictures go the moment the drop begins (see nodeImg), so every
-             pit circle is a plain disc of fillFor's navy and there is no image
-             here to cover. Both are cleared the same way the stroke is, by
-             writing the empty string, so a circle's own colour returns with the
-             chain's end and nothing has to remember what it used to be. */
-          c.style.fill = chHeld ? DOG_CHAIN_FILL : band ? band.bg : chSingle ? DOG_SINGLE_FILL : "";
+          /* A HELD CIRCLE TAKES ITS RARITY COLOUR, 19 September 2026 (owner),
+             replacing DOG_CHAIN_FILL, the sky blue #5cc4ee it wore since the
+             chain shipped. The owner wants the circle to keep saying what the
+             dog IS while it is in a chain, rather than borrowing a colour that
+             belongs to the gesture.
+
+             WHAT THIS COSTS, stated rather than discovered later. Held and
+             available twins are now THE SAME FILL, since a twin has always drawn
+             its own RARITY_BAND entry. The note beside the tapped face below
+             lists three signals that separate them; this spends one of the three
+             and leaves two:
+               THE RIM COLOUR. Held wears DOG_CHAIN_COLOUR, the chain's own
+               lemon, because a held circle's rim IS the chain's line. A twin
+               wears its band's fg, white on the purple and the royal blue and
+               black on the other three.
+               THE RIM WEIGHT. A twin wears DOG_CHAIN_TWIN_STROKE_K, twice its
+               own weight; a held circle wears HELD_RIM_K, which is 1.
+             KNOWN AND ACCEPTED: on the VERY COMMON tier the band is #ffd23e and
+             the lemon rim is #ffed00, so a held circle's rim all but vanishes
+             into its own disc on that tier alone. The rim WEIGHT still separates
+             it from a twin there, and the path running through it still reads.
+             Do not fix this by moving the rim off the chain's colour: the rim
+             and the path are deliberately one stroke.
+
+             An available twin is unchanged. So is a single circle, which still
+             takes DOG_SINGLE_FILL, and the clear-to-empty-string behaviour that
+             returns a circle's own colour when the chain ends. */
+          c.style.fill = band ? band.bg : chSingle ? DOG_SINGLE_FILL : "";
           /* THE LABEL INVERTS WITH THE DISC. White reads 11.96 on the dark fill
              and 1.98 on the light one, so it cannot stay put: on a light circle it
              takes the same navy the ring does, 6.03. The empty string returns it
@@ -5691,7 +5708,14 @@ export default function BreedTree({
              chosen again here, so the two can never disagree. Everything else
              wears its own depth colour. */
           const held = dogChainNodesRef.current.has(d);
-          const twinBand = !held && want === "1" ? RARITY_BAND[rarityTier(treesContaining(d.data.name))] : null;
+          /* ONE BAND FOR BOTH CHAIN STATES, 19 September 2026, with the fill
+             swap above. A held circle is filled from RARITY_BAND now, exactly as
+             a twin has always been, so its mark has to follow the same entry:
+             navy on the purple or the royal blue would be the vanishing act the
+             filters exist to prevent. twinBand is kept as its own name because
+             the tapped face below still asks specifically about a twin. */
+          const chainBand = want === "1" ? RARITY_BAND[rarityTier(treesContaining(d.data.name))] : null;
+          const twinBand = !held ? chainBand : null;
           /* AND THE MARK INVERTS WITH THE DISC TOO. bt-qmark-ink IS navy as a
              colour matrix, which is exactly DOG_SINGLE_INK, so a single circle
              takes the same filter a held one does: both sit on a light fill and
@@ -5700,10 +5724,13 @@ export default function BreedTree({
              light fill they would have been 1.70, 1.49, 1.50 and 1.12. */
           /* chSingle TAKES "hi", THE WHITE FILTER, not "ink". "ink" is the navy
              one and it was right only while a single circle was filled light; on
-             #0b1220 navy measures 1.57 and the face would vanish. A HELD circle
-             keeps "ink", because its fill is still the sky blue DOG_CHAIN_FILL.
-             The two used to share a branch and no longer can. */
-          const ink = held ? "ink" : chSingle ? "hi" : twinBand ? (twinBand.fg === "#ffffff" ? "hi" : "black") : `${(d.depth - 1 + 4) % 4}`;
+             #0b1220 navy measures 1.57 and the face would vanish.
+             A HELD CIRCLE NO LONGER TAKES "ink" EITHER, 19 September 2026: its
+             fill came off the sky blue DOG_CHAIN_FILL and onto its band, so it
+             now reads the band exactly as a twin does and the two branches have
+             collapsed into one. "ink" is left to chSingle's opposite number and
+             to nothing else here. */
+          const ink = chainBand ? (chainBand.fg === "#ffffff" ? "hi" : "black") : chSingle ? "hi" : `${(d.depth - 1 + 4) % 4}`;
           if (q.dataset.hi !== ink) {
             q.dataset.hi = ink;
             qi.setAttribute("filter", `url(#bt-qmark-${ink})`);
@@ -11762,7 +11789,8 @@ export default function BreedTree({
                      live pit and then declined). The chain says THREE things with
                      fill, and all three work only because a pit circle is a flat
                      coloured disc with nothing in it:
-                       held circle        DOG_CHAIN_FILL, sky blue
+                       held circle        its RARITY_BAND tier colour (was the
+                                          sky blue DOG_CHAIN_FILL until 19 Sept 2026)
                        available twin     its RARITY_BAND tier colour
                        everything else    fillFor's navy
                      Those are set as inline styles, which beat this attribute, so
