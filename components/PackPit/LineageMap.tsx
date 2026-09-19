@@ -1902,6 +1902,10 @@ export default function LineageMap({
 
   // long names wrap to a second line via the shared splitName (see ./splitName):
   // the pill grows in depth, the corner radius stays fixed so the shape holds.
+  /* See the long note at the pill gate below. True means every node on the lift
+     wears its name at rest, which is the owner's call of 19 September 2026 and
+     brings pill-on-pill overlap with it. False restores the on-demand pill. */
+  const LIFT_STANDING_PILLS = true;
   const tagLines = circular ? splitName(breed.name) : [breed.name];
   const tagW = Math.max(...tagLines.map((l) => l.length)) * 9.5 + 28 + (tagLines.length > 1 ? 14 : 0);
   const tagH = tagLines.length > 1 ? 60 : 32;
@@ -4080,11 +4084,31 @@ export default function LineageMap({
                       style={(!(n.img && (placedImgs.has(n.img as string) || packed)) && seen.has(n._id)) ? {fill:(rarityTier ? RARITY_BAND[rarityTier].fg : "#ffffff"),...(INSTR_NAMES.has(breed.name)?{fontFamily:'"Luckiest Guy",system-ui,sans-serif',fontWeight:400}:{})} : INSTR_NAMES.has(breed.name)?{fontFamily:'"Luckiest Guy",system-ui,sans-serif',fontWeight:400}:undefined}>
                       {INSTR_NAMES.has(breed.name) ? (n.value ?? "") : `${share}%`}
                     </text>
-                    {/* ON THE LIFT THE PILL IS ON DEMAND: drawn only for the node
-                        being touched, and nothing at rest. Every other mode keeps
-                        its standing name, so this gate is the only difference.
-                        See namedNode for the measurement behind it. */}
-                    {(hasKids || !autoExposed.has(n._id)) && !(circular && n.name === breed.name) && (!circular || namedNode === n._id) ? (() => {
+                    {/* STANDING PILLS ARE BACK ON THE LIFT, 19 September 2026 (owner),
+                        REVERSING the 18 September ruling. That ruling made the lift's
+                        pill ON DEMAND, drawn only for the node being touched and
+                        nothing at rest, and the comment that stood here said so.
+
+                        WHY IT WAS TURNED OFF, because this is the part worth keeping.
+                        Standing pills on the lift mean fitting about 129px of name
+                        into about a 60.7px gap, which no placement rule can do. Two
+                        were built and both failed: pillPlacement, which ran each
+                        pill out radially along its node's own slot, and before that a
+                        four-candidate scorer weighing the card, the nodes, the pills,
+                        the connectors and the viewport. See the note at the deleted
+                        pillPlacement for the full account.
+
+                        THE OVERLAP IS ACCEPTED, EXPLICITLY. The owner has asked for
+                        every name standing and has taken the overlap that comes with
+                        it. Pills WILL cross each other and cross the connectors on a
+                        busy lift; that is not a fault to be quietly fixed, it is the
+                        trade that was chosen. Do not respond to it by building a
+                        third placement pass.
+
+                        LIFT_STANDING_PILLS IS THE ONE FLIP. Setting it false restores
+                        the on-demand behaviour exactly, and namedNode still feeds the
+                        gate, so nothing else has to be put back. */}
+                    {(hasKids || !autoExposed.has(n._id)) && !(circular && n.name === breed.name) && (!circular || LIFT_STANDING_PILLS || namedNode === n._id) ? (() => {
                       // The pill is drawn at nodePillWidth, the SAME width the
                       // placement spaces siblings on, so the picture and the spacing
                       // can never drift. It matches the pit pill exactly. (The root
