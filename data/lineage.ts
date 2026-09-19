@@ -2787,6 +2787,41 @@ const LINEAGE: Record<string, LineageNode> = {
     ]
   },
 
+  /* CARRIAGE GUARD DOGS REACHES THE POINTER, 19 September 2026 (owner).
+
+     WHAT THIS RECORD IS. The Dalmatian's own ancestor: the road dogs kept to run
+     with the horses and mind the coach. It was one of only two named dead ends in
+     the archive that were not ancient progenitors, and the owner asked for it to
+     be closed.
+
+     THE CLAIM, AND ITS STANDING, because the two are not the same thing. The
+     Dalmatian's origin is one of the most contested in canine history. The FCI
+     gives Croatia; church records from Dakovo document a "Canis Dalmaticus" in
+     1719; and the breed as we know it was made in England, where virtually every
+     modern Dalmatian traces to British stock. The ancestry usually repeated is
+     "certain breeds of pointers and a spotted Great Dane", which is nineteenth
+     century cynology rather than documented descent, in the same class as the
+     Laconian claim carried on the St Hubert Hound.
+
+     SO THE NOTE SAYS SO. The owner's call is to record the pointer half, and it is
+     recorded as what it is: the usual account, not a proven line. The Great Dane
+     half is NOT taken, deliberately, because it was not asked for; the record
+     exists in this archive if it is ever wanted, and adding it would make this a
+     two-parent split rather than the single line below.
+
+     WHAT IS NOT CLAIMED. Nothing here says the Dalmatian came out of Britain, only
+     that the road dogs behind it carry pointer blood. The Egyptian frescoes and
+     the King Cheops story are left out entirely: they are unverified and the
+     archive does not trade in them. */
+  "Carriage guard dogs": {
+    name: "Carriage guard dogs",
+    note: "The road dogs kept to run with the horses and mind the coach, the job the Dalmatian was made for. Now extinct.",
+    img: "/history/breeds/Carriage-guard-dogs-Stallpinscher-escorts.jpg",
+    children: [
+      { name: "Pointer", note: "Pointer blood is the ancestry usually given for the spotted coach dogs. It is the traditional account rather than documented descent. Now in-decline.", img: "/history/breeds/british-pointers.jpg", value: 100 }
+    ]
+  },
+
   "Great Dane": {
     name: "Great Dane",
     note: "Germany's giant boarhound, the Deutsche Dogge, built by crossing heavy war mastiffs with tall, fast coursing hounds.",
