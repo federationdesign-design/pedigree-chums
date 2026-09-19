@@ -725,10 +725,19 @@
     color: var(--cream);
   }
 
-  /* 1.6 Article headline leading. Opened from 1.05 to 1.3em earlier today, then
-     pulled back to 1.1em on 19 September 2026 (Steve). 1.3 was the brief's figure
-     and it read too loose once the rest of the block tightened around it. */
+  /* 1.6 Article headline, the title in the navy block at the foot of the page.
+
+     LEADING: opened from 1.05 to 1.3em earlier today on the brief's figure, then
+     pulled back to 1.1em (Steve, 19 September 2026) once the rest of the block
+     tightened around it. Asked for again in a later round; it was already 1.1em and
+     is unchanged by that request.
+
+     SIZE: down 2pt (Steve, 19 September 2026). The base clamp is
+     clamp(3.5rem, 2vw, 2rem), whose min exceeds its max, so it resolves to the
+     3.5rem floor at every width. 56px becomes 53.33px. calc on the whole clamp so
+     the reduction holds whatever that odd clamp is doing. */
   .headline {
+    font-size: calc(clamp(3.5rem, 2vw, 2rem) - 2pt);
     line-height: 1.1em;
   }
 
