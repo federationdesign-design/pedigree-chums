@@ -1135,14 +1135,34 @@ const LINEAGE: Record<string, LineageNode> = {
   "English Water Spaniel": {
     name: "English Water Spaniel",
     note: "The extinct native English water spaniel, a working water dog of the fens and rivers. Now extinct.",
-    // 19 August 2026: display device. The single documented ancestor below is
-    // drawn twice, as two identical children at 50 each (same note and img), so
-    // the level shows two circles rather than one filling the ring. The children
-    // differ in name from the parent, so isEcho, the pit words and the badge
-    // paths do not touch them. This must NOT be read as two separate ancestors.
+    /* THE LAND SPANIELS BECOME A DIRECT PARENT, 19 September 2026 (owner: match the
+       setters rather than reaching it four levels down).
+
+       IT ALREADY REACHED THEM, which is why this is a re-shaping and not a new claim.
+       The route was English Water Spaniel > Water Spaniels > Otterhound > Rough water
+       dogs > Land Spaniels, worth 17.5% of the dog, and every other water spaniel in
+       the archive reaches them through the same Otterhound funnel. What it did not do
+       was say so where a player could see it.
+
+       THE SOURCE IS THE ONE ALREADY CITED HERE. The note on Rough water dogs quotes
+       Frank Jackson's Encyclopedia of Dog Terms for exactly this: the English Water
+       Spaniel came out of the old land spaniel stock. Caius in 1576 divided spaniels
+       into land and water kinds as two branches of one stock, so a direct edge is the
+       reading that treats them as one family rather than one descended from the other
+       through a hound.
+
+       THE SPLIT IS MINE. No numbers were given. The water-spaniel population stays the
+       senior parent at 65 because that is what the dog was; the land spaniels take 35
+       as the older stock behind it. Both still reach Land Spaniels, so the total share
+       of that node RISES: it is now carried directly as well as through the Otterhound.
+
+       THE 19 AUGUST DISPLAY DEVICE IS GONE WITH IT. Water Spaniels was written twice,
+       at 50 each, purely so the level drew two circles instead of one filling the ring.
+       Two real parents do that on their own now, and SOLO_CHILD_K handles the case
+       where they do not. */
     children: [
-      { name: "Water Spaniels", note: "The broad old British water-spaniel population it came from. Now extinct.", img: "/history/breeds/original-water-spaniel.jpg", value: 50 },
-      { name: "Water Spaniels", note: "The broad old British water-spaniel population it came from. Now extinct.", img: "/history/breeds/original-water-spaniel.jpg", value: 50 }
+      { name: "Water Spaniels", note: "The broad old British water-spaniel population it came from. Now extinct.", img: "/history/breeds/original-water-spaniel.jpg", value: 65 },
+      { name: "Land Spaniels", note: "The old English land-spaniel stock every working spaniel springs from, the land half of the spaniel family Caius split in 1576. Now extinct.", img: "/history/breeds/original-land-spaniel.jpg", value: 35 }
     ]
   },
 
