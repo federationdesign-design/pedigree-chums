@@ -1873,8 +1873,20 @@ const BOMB_ODDS = 16;
 //   2. one hit per whole second becomes one hit per half second
 //   3. the vibration step doubles, so it reaches the same peak in half the time
 //   4. clicks step by whole hits, so a click is now worth twice as much
-const BOMB_HITS = 5;          // hits to detonate
-const BOMB_FUSE_MS = 2500;    // the whole fuse
+/* 5 HITS TO 3, AND THE FUSE 2500 TO 1500, 19 September 2026 (owner: "knocking it
+   five times" to three, "held bomb takes 2.5 seconds" to 1.5).
+
+   THE TICK IS THE INVARIANT. BOMB_TICK_MS is the quotient of the two, so holding
+   still costs one hit every 500ms exactly as it did; there are simply two fewer
+   of them to spend. Change one of these and the other has to move with it or the
+   hold and the knock stop agreeing about what a hit is worth.
+
+   THE FUSE ARTWORK HAD TO MOVE TOO. Its ramp was a literal six-entry array with
+   the five stages written into it, so at three hits it would have topped out at
+   0.4 and the wick would never have reached full before the blast. See the
+   burnFuse block for the curve that replaced it. */
+const BOMB_HITS = 3;          // hits to detonate
+const BOMB_FUSE_MS = 1500;    // the whole fuse
 const BOMB_TICK_MS = BOMB_FUSE_MS / BOMB_HITS; // one hit per half second held
 // The blast is tuned for the main pit, whose cards are far bigger than a mini
 // pit chip, so a straight copy reads as an overreaction. ONE dial: it scales
@@ -8437,12 +8449,36 @@ export default function BreedTree({
       // heavy one, so it counts for ten ordinary knocks.
       const ROCK_KNOCK = 10;
       const knockBadge = (b: Body, rv: number, now2: number, spend = 1) => {
-        // J17: a bomb is outside the charge system, exactly as in the main pit,
-        // where onPctHit skips any body with plugin.bomb. Without this a bomb
-        // spends its twenty charges, goes inert and the badge group is given
-        // pointerEvents none, so it keeps the sprite but stops responding.
-        // Object knocks feed the fuse instead, from stage 4.
-        if (b.bomb) return;
+        /* A BOMB IS OUTSIDE THE CHARGE SYSTEM, exactly as in the main pit, where
+           onPctHit skips any body with plugin.bomb. Without that a bomb spends
+           its twenty charges, goes inert and the badge group is given
+           pointerEvents none, so it keeps the sprite but stops responding.
+
+           AND OBJECT KNOCKS NOW FEED THE FUSE, 19 September 2026 (owner: "allow
+           bombs to take hits from other objects"). The line above this used to
+           promise exactly that, "from stage 4", and this is stage 4. A knock is
+           now worth one hit, the same as a click and the same as half a second
+           of holding.
+
+           THE TWO GUARDS BELOW ARE THE POINT and both are borrowed from the
+           charge path rather than invented: rv < 5 is the pit's own test for a
+           real knock rather than a nudge, without which a bomb resting against
+           anything would tick itself down; and the 600ms cooldown stops one
+           collision registering across several frames. With BOMB_HITS at 3 a
+           bomb that took a hit per frame would detonate in under a twentieth of
+           a second.
+
+           ONE HIT PER KNOCK, NEVER `spend`. The rock carries ROCK_KNOCK, which is
+           ten, because it is spending a chip's twenty charges. Ten against three
+           would mean the rock detonates any bomb it grazes on contact, with no
+           fuse and no warning. The rock is heavy, not a detonator. */
+        if (b.bomb) {
+          if (rv < 5) return;
+          if (b.lastKnock && now2 - b.lastKnock < 600) return;
+          b.lastKnock = now2;
+          hitBomb(b);
+          return;
+        }
         if (b.n || b.inert || b.charges === undefined) return; // badges only
         if (rv < 5) return; // pit onPctHit verbatim: a real knock, not a nudge
         if (b.lastKnock && now2 - b.lastKnock < 600) return;
@@ -9323,7 +9359,17 @@ export default function BreedTree({
           if (!fb.bomb || fb.blown || !fb.mb || !fb.mbIn) continue;
           const fh = fb.hits || 0;
           if (fh < fx.FUSE_LIGHT_AT) continue;
-          const fTarget = [0, 0, 0.16, 0.4, 0.68, 1][Math.min(fh, BOMB_HITS)];
+          /* WAS A LITERAL [0, 0, 0.16, 0.4, 0.68, 1], 19 September 2026. That array
+             had the five hits baked into its length, so when BOMB_HITS came down
+             to 3 it indexed 0 to 3 and the wick stopped at 0.4: lit, but never
+             reaching full before the bomb went off.
+             The curve replaces it and reproduces the old figures to within 0.04
+             at every one of the five old stages, so nothing about how it LOOKED
+             at five hits has changed. It now reaches 1 on the last hit whatever
+             BOMB_HITS is. The fuse still stays dark on hit 1, which is
+             fx.FUSE_LIGHT_AT above, and the t below starts from there. */
+          const fT = Math.max(0, (Math.min(fh, BOMB_HITS) - 1) / Math.max(1, BOMB_HITS - 1));
+          const fTarget = Math.pow(fT, 1.5);
           fb.fuseCur = (fb.fuseCur || 0) + (fTarget - (fb.fuseCur || 0)) * 0.1;
           if (fb.fuseCur < 0.03) continue;
           // the wick sits at the top right of the sprite, which is drawn 2.4
