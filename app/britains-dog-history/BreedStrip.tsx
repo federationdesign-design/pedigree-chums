@@ -593,7 +593,24 @@ export default function BreedStrip({
         const na = nb ? buildActive(nb) : null;
         if (na) setActive(na);
       }}
-      onLost={() => setStreak(0)} // a loss breaks the run toward the next life
+      onLost={() => {
+        /* THE LIFE IS SPENT ON THE LOSS, 19 September 2026 (owner). It used to
+           be charged by onStartOver, the retry, which made the try again
+           screen's "N more tries left" untrue: at one life the retry spent the
+           last one, the modal remounted with lives at 0, and LineageModal's
+           showEnding (phase !== "play" || outOfLives) covered the fresh round
+           with GAME OVER before it could be played. LIVES_START of 2 therefore
+           bought only ONE attempt.
+           Charged here, the count means playable attempts: lose, see the count
+           already decremented, retry for free, and a loss at 0 is the ending.
+           DO NOT PUT THE CHARGE BACK ON THE RETRY.
+           Safe to charge here because the loss has exactly one source,
+           onPitFull in LineageModal, which BreedTree guards with pitEndedRef so
+           it cannot fire twice in a round. onClose does not charge, so walking
+           out after a loss does not pay twice either. */
+        setLives((l) => Math.max(0, l - 1));
+        setStreak(0); // a loss breaks the run toward the next life
+      }}
       onSpendLife={() => {
         // Leaving a live round to go and read costs a life, exactly like a
         // retry does, and breaks the streak for the same reason.
@@ -614,12 +631,15 @@ export default function BreedStrip({
         resetToys();
       }}
       onStartOver={() => {
-        // A retry costs a life and replays THIS level. It used to rebuild
-        // level one and wipe the campaign total, so failing level two threw
-        // away every level already cleared as well as the score. Losing your
-        // place is what running out of lives is for, and the modal only
-        // offers Restart while lives remain.
-        setLives((l) => Math.max(0, l - 1));
+        // A retry replays THIS level. It used to rebuild level one and wipe the
+        // campaign total, so failing level two threw away every level already
+        // cleared as well as the score. Losing your place is what running out
+        // of lives is for, and the modal only offers Restart while lives
+        // remain.
+        /* THE RETRY NO LONGER COSTS A LIFE, 19 September 2026 (owner). The loss
+           already charged it: see onLost above for why the charge moved and why
+           it must not come back here. The streak still breaks, because that is
+           about the run and not about this press. */
         setStreak(0);
         // The retry starts from the BANKED total, not from whatever the failed
         // attempt reached. The remount below re-seeds the modal from
