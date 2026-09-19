@@ -1020,6 +1020,12 @@ const DOG_CHAIN_COLOUR = "#ffed00";
    fill: a chain breed losing its last duplicate mid-chain used to turn that circle
    light and drop the glow to 1.98 against it. On black the glow reads throughout. */
 const DOG_SINGLE_FILL = "#0b1220";
+/* HOW MANY ORDINARY NAVY CIRCLES THE PIT MUST HOLD BEFORE THE BLACK FILL IS USED
+   (owner, 19 September 2026). Below this the single circle takes fillFor's navy
+   instead, so a pit with nothing to contrast against never goes black.
+   ONE is the honest floor: black says "this one has no twin", which needs at
+   least one circle that does. Raise it if "lots" should mean more. */
+const DOG_SINGLE_MIN_PLAIN = 1;
 const DOG_SINGLE_INK = "#ffffff";
 /* HOW LONG THE FILL TAKES TO CHANGE. The answer is LIVE (see dogHasTwin), so a
    circle changes as a consequence of a DIFFERENT circle being collected. An
@@ -5694,12 +5700,29 @@ export default function BreedTree({
        one the moment its last duplicate is collected, and the survivor changes
        colour. */
     const pitBreedCount = new Map<string, number>();
+    /* HOW MANY ORDINARY NAVY CIRCLES THE PIT IS HOLDING, counted in the same pass
+       (owner, 19 September 2026: black should only be used when there are lots of
+       circles in the pit already coloured blue, and if there are none the circle
+       should be dark blue instead).
+
+       WHY IT IS NEEDED NOW. The black fill, DOG_SINGLE_FILL, says "this breed has
+       no twin in the pit, so it can never be chained". That is only information if
+       there is something to contrast it against. Level dogs became paintable when
+       they stopped being drawn as words, and a level dog is unique by definition,
+       so on a two-circle level BOTH circles went black and the fill said nothing.
+
+       A CIRCLE COUNTS AS NAVY WHEN ITS BREED HAS A TWIN, the exact complement of
+       the single test below, so the two cannot disagree. */
+    let pitPlainCount = 0;
     if (fellRef.current) {
       const ownedB = pitBodiesRef.current?.owned;
       if (ownedB) for (const o of ownedB) {
         if (!pitCountable(o, removedNodesRef.current)) continue; // the one filter: see liveBreedNodesIn
         pitBreedCount.set(o.data.name, (pitBreedCount.get(o.data.name) ?? 0) + 1);
       }
+      // Second pass, because a breed's total is only known once the first has
+      // finished: a circle is navy when its own breed has a twin.
+      for (const n2 of pitBreedCount.values()) if (n2 > 1) pitPlainCount += n2;
     }
     nodes.forEach((d, i) => {
       const tx = (d.x - v[0]) * k;
@@ -5810,7 +5833,13 @@ export default function BreedTree({
          the two chain states, because while a chain lives what a circle is doing
          in that chain is the more urgent thing to say, and a single circle can
          never be in one anyway: a chain needs a twin. */
-      const chSingle = paintable && !chHeld && !chTwin && fellRef.current && (pitBreedCount.get(d.data.name) ?? 0) === 1;
+      /* `pitPlainCount >= DOG_SINGLE_MIN_PLAIN` added 19 September 2026: below it
+         the circle falls through to fillFor's navy, which is the dark blue the
+         owner asked for. DOG_SINGLE_MIN_PLAIN is the number to raise if "lots"
+         should mean more than one. */
+      const chSingle = paintable && !chHeld && !chTwin && fellRef.current
+        && (pitBreedCount.get(d.data.name) ?? 0) === 1
+        && pitPlainCount >= DOG_SINGLE_MIN_PLAIN;
       if (c) {
         /* The mark has read all three states since the chain shipped; the ring
            only read the first, so a highlighted twin kept its own outline. Both
@@ -6839,7 +6868,26 @@ export default function BreedTree({
         Composite.add(world, mb);
         return mb;
       };
-      for (const b of bodies) mkWord(b, CIRCLE_OPTS);
+      /* THE BODY FOLLOWS THE PICTURE, 19 September 2026 (owner: the circles are
+         sinking below the floor, the pit still thinks the objects are a different
+         shape). He was exactly right.
+
+         WHAT WENT WRONG. Turning PIT_DRAWS_WORDS off changed only what was DRAWN.
+         mkWord was still giving every level dog a RECTANGLE sized to the word it
+         used to be, as its own comment above says: "A dog is its NAME in the pit,
+         so its body is the box that name draws in, not a circle." So a full-size
+         disc was drawn over a small word-shaped box, and the visible circle hung
+         well outside its own collider, through the floor and through everything
+         else. The physics was never wrong; the picture had stopped matching it.
+
+         mkCircle takes b.r, which is the node's own radius and the very figure
+         drawR draws from, so the two now agree by construction rather than by
+         coincidence.
+
+         BOTH PATHS ARE KEPT, on the one constant, because the word body is not a
+         detail of the word: it is a different collider with its own chamfer and
+         its own minimum, and rebuilding it later would be real work. */
+      for (const b of bodies) { if (PIT_DRAWS_WORDS) mkWord(b, CIRCLE_OPTS); else mkCircle(b, "circle", CIRCLE_OPTS); }
       for (const b of badges) mkCircle(b, "badge", BADGE_OPTS);
       // The opening shove: up and out, the first name one way and the next the
       // other, with a spin so they arrive already tumbling rather than dropping
