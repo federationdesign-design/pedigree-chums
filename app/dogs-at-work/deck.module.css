@@ -738,7 +738,14 @@
      the reduction holds whatever that odd clamp is doing. */
   .headline {
     font-size: calc(clamp(3.5rem, 2vw, 2rem) - 2pt);
-    line-height: 1.1em;
+    /* 1.1em -> 0.99em, a straight 10% off the leading (Steve, 19 September 2026).
+
+       WHY 1.1em DID NOTHING. An em is a multiple of the FONT SIZE, and the 2pt
+       reduction above cut that at the same time. 56 x 1.05 came to 58.8px and
+       53.33 x 1.1 comes to 58.67px, so the two changes cancelled to within 0.13px
+       and the leading looked untouched because it effectively was. 0.99em takes the
+       computed value to 52.8px, a real 10% off. */
+    line-height: 0.99em;
   }
 
   /* 1.7 The green CTA must never wrap. MEASURED, not estimated: at 320 wide the

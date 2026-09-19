@@ -425,6 +425,34 @@
 }
 .backLink:hover { color: var(--blue-deep, #0b78bd); }
 
+/* THE COLOUR TOGGLE'S PLACE ON THE INDEX PAGE (Steve, 19 September 2026, from the
+   annotated screenshot: move it down to sit just above the title).
+
+   WHY A WRAPPER HERE RATHER THAN A CHANGE TO THE COMPONENT. ArticleTextToggle is
+   shared with Good Dog Bad Dog, smarter-than-the-test, /home and /about, and the
+   brief puts it out of scope. Its own stylesheet also records .wrap as "the single
+   owner of the hero to body vertical space", so its margins are load bearing on
+   those pages. Nothing in that file is touched; this wrapper is owned by the index
+   page and reaches nothing else.
+
+   WHY transform AND NOT margin. The toggle sits in normal flow above the title, so
+   a margin would push the title and the whole page down with it. A transform moves
+   the control on screen and leaves the flow alone, which is what the screenshot
+   asks for: the title stays where it is and only the icon drops.
+
+   THE FIGURE IS MEASURED. The toggle's centre sat at y 56 and the target in the
+   screenshot is about y 144, so 88px. There is 96px of clear space between the
+   toggle and the title, so it lands 8px above the title with nothing to collide
+   with. Desktop is untouched, as instructed. */
+/* Declared only inside the query on purpose: desktop keeps exactly what the shared
+   component gives it, and an empty base rule risks a minifier dropping the class
+   name so styles.toggleSlot comes back undefined. */
+@media (max-width: 900px) {
+  .toggleSlot {
+    transform: translateY(88px);
+  }
+}
+
 /* ── Legacy card text, moved out of the page files (19 September 2026) ───────
 
    WHY THESE EXIST. The blue box SHELL was always shared: articles 1 to 6 all use
