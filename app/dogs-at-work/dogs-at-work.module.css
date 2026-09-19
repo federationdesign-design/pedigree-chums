@@ -662,17 +662,18 @@
     letter-spacing: 0;
   }
 
-  /* 2.5 Intro paragraph down 2pt from 1.625rem, then a further 1pt on 19 September
-     2026 (Steve), so 3pt in total off the base. */
+  /* 2.5 Intro paragraph down 2pt from 1.625rem, then 1pt more, then 1pt more again,
+     all on 19 September 2026 (Steve). 4pt in total off the base. */
   .essayBody > p:first-child,
   .essayBody .introPara {
-    font-size: calc(1.625rem - 3pt);
+    font-size: calc(1.625rem - 4pt);
   }
 
-  /* 2.6 Body text down 1pt from 1.25rem, then a further 1pt on 19 September 2026
-     (Steve), so 2pt in total off the base. */
+  /* 2.6 Body text down 1pt from 1.25rem, then 1pt more, then 1pt more again, all on
+     19 September 2026 (Steve). 3pt in total off the base, which lands it at 16px on
+     a 390 phone. */
   .essayBody > p {
-    font-size: calc(1.25rem - 2pt);
+    font-size: calc(1.25rem - 3pt);
   }
 
   /* 19 September 2026 (Steve). The back link comes down 1pt and loses half its
@@ -684,9 +685,19 @@
   }
 
   /* 19 September 2026 (Steve): article hero pills 25% smaller, 0.85rem x 0.75. This
-     is .tag on the article pages, not .pill on the index, which came down 25% to
-     0.9rem in task 1.4. The two are separate rules in separate files. */
-  .tag {
+     is .tag and .tagBreed on the article pages, not .pill on the index, which came
+     down 25% to 0.9rem in task 1.4. The two sets are separate rules in separate
+     files.
+
+     BOTH PILLS, because the hero meta always renders a PAIR: a family pill (.tag
+     plus a colour variant) and a breed pill (.tagBreed). Sizing only .tag left the
+     second one at full size beside a shrunken first. The variants, .tagGood,
+     .tagRural, .tagEmergency and the rest, set background and colour only and carry
+     no size of their own, so these two rules cover every article.
+     .tagBad is deliberately not here: it is 0.65rem already and is rendered by none
+     of the six. */
+  .tag,
+  .tagBreed {
     font-size: 0.6375rem;
   }
 
