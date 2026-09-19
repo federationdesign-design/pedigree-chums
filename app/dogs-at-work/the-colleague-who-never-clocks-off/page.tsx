@@ -56,7 +56,14 @@ const BODY: (string | { h: string; id: string })[] = [
   "Listening. Or rather, smelling. Mostly smelling.",
 ];
 
-const cardTitle: React.CSSProperties = { fontFamily: "var(--font-display)", fontSize: "38.67px", letterSpacing: "0", color: "var(--emphasis)", lineHeight: 0.9, textTransform: "uppercase", margin: "0 0 6px" };
+// 19 September 2026 (Steve): card titles moved from --emphasis (pale, #FFED60) to
+// --yellow-header (lemon, #ffed00), and the small print's muted #aac4d4 to white.
+// ALL WIDTHS, not mobile only: these are inline styles and cannot carry a media
+// query, so scoping the component's half to a breakpoint would have split the two
+// card systems on desktop. The matching change is in SidebarCard.module.css, which
+// carries the full reasoning. --emphasis itself is unchanged; it still carries the
+// index page's blue-panel highlight.
+const cardTitle: React.CSSProperties = { fontFamily: "var(--font-display)", fontSize: "38.67px", letterSpacing: "0", color: "var(--yellow-header)", lineHeight: 0.9, textTransform: "uppercase", margin: "0 0 6px" };
 const cardBody: React.CSSProperties = { fontFamily: "var(--font-body)", fontSize: "1.087rem", fontWeight: 500, color: "#fff", lineHeight: 1.5, margin: 0 };
 
 // Sidebar cards as an explicit list. Desktop renders them in the sticky sidebar
@@ -117,14 +124,14 @@ const CARDS: ArticleCard[] = [
             <div key={role} style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 10, borderBottom: "1px solid rgba(255,255,255,0.1)", paddingBottom: 10 }}>
               <div>
                 <p style={{ ...cardBody, fontWeight: 700 }}>{role}</p>
-                <p style={{ ...cardBody, fontSize: "0.72rem", color: "#aac4d4" }}>{detail}</p>
+                <p style={{ ...cardBody, fontSize: "0.72rem", color: "#ffffff" }}>{detail}</p>
               </div>
               <p style={{ fontFamily: "var(--font-display)", fontSize: "1.5rem", color: "#fff", whiteSpace: "nowrap", lineHeight: 1 }}>{value}</p>
             </div>
           ))}
         </div>
         <div style={{ padding: "8px 40px 52px" }}>
-          <p style={{ ...cardBody, fontSize: "0.78rem", color: "#aac4d4" }}>Given free to the people who need them, funded almost entirely by public donations. Sources: Guide Dogs; Medical Detection Dogs.</p>
+          <p style={{ ...cardBody, fontSize: "0.78rem", color: "#ffffff" }}>Given free to the people who need them, funded almost entirely by public donations. Sources: Guide Dogs; Medical Detection Dogs.</p>
         </div>
       </div>
     ),

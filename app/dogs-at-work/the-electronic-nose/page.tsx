@@ -49,7 +49,14 @@ const BODY: (string | { h: string; id: string })[] = [
   "The dog taught the machine to smell. The machine will reach a thousand hospitals the dog never could. And the dog, gloriously, will never know and never care - because there's a ball by the back door, and the day is young.",
 ];
 
-const cardTitle: React.CSSProperties = { fontFamily: "var(--font-display)", fontSize: "38.67px", letterSpacing: "0", color: "var(--emphasis)", lineHeight: 0.9, textTransform: "uppercase", margin: "0 0 6px" };
+// 19 September 2026 (Steve): card titles moved from --emphasis (pale, #FFED60) to
+// --yellow-header (lemon, #ffed00), and the small print's muted #aac4d4 to white.
+// ALL WIDTHS, not mobile only: these are inline styles and cannot carry a media
+// query, so scoping the component's half to a breakpoint would have split the two
+// card systems on desktop. The matching change is in SidebarCard.module.css, which
+// carries the full reasoning. --emphasis itself is unchanged; it still carries the
+// index page's blue-panel highlight.
+const cardTitle: React.CSSProperties = { fontFamily: "var(--font-display)", fontSize: "38.67px", letterSpacing: "0", color: "var(--yellow-header)", lineHeight: 0.9, textTransform: "uppercase", margin: "0 0 6px" };
 const cardBody: React.CSSProperties = { fontFamily: "var(--font-body)", fontSize: "1.087rem", fontWeight: 500, color: "#fff", lineHeight: 1.5, margin: 0 };
 const statLabel: React.CSSProperties = { fontFamily: "var(--font-body)", fontSize: "0.66rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--yellow)", marginBottom: 4 };
 const statValue: React.CSSProperties = { fontFamily: "var(--font-display)", fontSize: "2rem", color: "#fff", lineHeight: 1 };
@@ -87,7 +94,7 @@ const CARDS: ArticleCard[] = [
           ].map(({ label, value }) => (
             <div key={label} style={{ textAlign: "center" }}>
               <p style={statValue}>{value}</p>
-              <p style={{ ...statLabel, color: "#aac4d4", marginTop: 4 }}>{label}</p>
+              <p style={{ ...statLabel, color: "#ffffff", marginTop: 4 }}>{label}</p>
             </div>
           ))}
         </div>
@@ -113,7 +120,7 @@ const CARDS: ArticleCard[] = [
           ].map(({ label, value }) => (
             <div key={label} style={{ textAlign: "center" }}>
               <p style={statValue}>{value}</p>
-              <p style={{ ...statLabel, color: "#aac4d4", marginTop: 4 }}>{label}</p>
+              <p style={{ ...statLabel, color: "#ffffff", marginTop: 4 }}>{label}</p>
             </div>
           ))}
         </div>
