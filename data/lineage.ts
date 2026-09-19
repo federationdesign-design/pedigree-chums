@@ -1062,26 +1062,81 @@ const LINEAGE: Record<string, LineageNode> = {
     children: [
       { name: "Irish Terrier", note: "Small red Irish terriers in the early Trumpington stock.", img: "/history/breeds/irish-terrier-photo.jpg", value: 40 },
       { name: "Yorkshire Terrier", note: "A bigger silky terrier said to be in the early mix.", img: "/history/breeds/yorkshire-terrier-photo.jpg", value: 30 },
-      /* NO DOCUMENTED ANCESTRY ABOVE THIS, 19 September 2026 (owner). Recorded here
-         so nobody reopens it: this dog is a leaf on purpose, not a gap waiting to be
-         filled. It was on the research queue and has been researched.
+      /* IT IS NO LONGER A LEAF, 19 September 2026 (owner). The note that stood here
+         said "no documented ancestry sits above this" and recorded it as terminal
+         after research. That ruling asked the right question of the WRONG
+         POPULATION and the answer to that question has not changed: nothing is
+         written down above the Norfolk farm and Romani ratters themselves.
 
-         WHAT THE RECORD ACTUALLY IS. A regional working landrace, not a breed: the
-         small red ratters kept on Norfolk farms and by Romani families, chosen for
-         how fast they killed and never written down. There is no studbook, no
-         recorded mating and no named progenitor to attach. Its red carried into the
-         Norwich and the Norfolk, which is what it is here to say.
+         WHAT THE EARLIER PASS MISSED is that the sources name a SECOND population
+         feeding the same red stock, and that one is documented in detail. Jodrell
+         Hopkins of Trumpington Street, Cambridge, mated a brindle Aberdeen-type
+         Scottish Terrier bitch to a small red dog called Jack, recorded as having a
+         long silky coat. Their pup was Rags, who went to the master of the Norwich
+         Staghounds and is the founding sire of the breed. The Cambridge terriers he
+         came from are named in the literature as the Trumpington or Cantab
+         terriers.
 
-         WHAT WAS RULED OUT. The tempting move is Old British ratting Terriers, which
-         is the archive's deep terrier root and would graft in one line. It was not
-         taken. That node is the broad national ratting stock and this one is a LOCAL
-         East Anglian population named for its own county; hanging one off the other
-         would invent a descent the sources do not make, and it would say nothing the
-         Norwich's own ancestry does not already say through its other parents.
+         SO THE TWO PARENTS ARE THE TWO SIDES OF RAGS. Scottish Terrier stands for
+         the Aberdeen-type bitch, and Trumpington Terrier for the Cambridge stock
+         Jack belonged to and the pool the type was drawn from.
+
+         50/50, NOT A GUESS DRESSED AS A FIGURE. Rags had two parents and the
+         sources name one on each side, so an even split is the only honest reading
+         of what is recorded. Nothing says which contributed more.
+
+         WHAT IS STILL RULED OUT, and the earlier pass was right about it: hanging
+         this straight off Old British ratting Terriers. That node is the broad
+         national stock and this one is a local East Anglian population. Trumpington
+         reaches it instead, which is correct, because the Cambridge livery-stable
+         dogs really were general working terriers rather than a county landrace.
 
          ONE LINE REACHES THREE TREES. This is the only place the name is authored;
          Lucas Terrier and Norfolk Terrier reach it by grafting the Norwich. */
-      { name: "Local red ratting Terriers", note: "The small red working terriers of Norfolk farms and the Romani ratters. No documented ancestry sits above them. Now extinct.", img: "/history/breeds/Local-red-ratting-terriers.jpg", value: 30 }
+      { name: "Local red ratting Terriers", note: "The small red working terriers of Norfolk farms and the Romani ratters, and the Cambridge stock that made the founding sire. Now extinct.", img: "/history/breeds/Local-red-ratting-terriers.jpg", value: 30 }
+    ]
+  },
+
+  /* LOCAL RED RATTING TERRIERS GETS A RECORD OF ITS OWN, 19 September 2026
+     (owner). Authored here rather than inside the Norwich, so Norfolk Terrier and
+     Lucas Terrier reach the same ancestry by grafting rather than by repetition.
+     See the note in the Norwich record for the history and for why the split is
+     even. */
+  "Local red ratting Terriers": {
+    name: "Local red ratting Terriers",
+    note: "The small red working terriers of Norfolk farms and the Romani ratters, and the Cambridge stock that made the founding sire. Now extinct.",
+    img: "/history/breeds/Local-red-ratting-terriers.jpg",
+    children: [
+      { name: "Trumpington Terrier", note: "The Cambridge terriers the founding sire came out of. Now extinct.", img: "/history/breeds/Local-red-ratting-terriers.jpg", value: 50 },
+      { name: "Scottish Terrier", note: "The brindle Aberdeen-type bitch on the other side of that mating.", img: "/history/breeds/Scottish-Terrier.jpg", value: 50 }
+    ]
+  },
+
+  /* THE TRUMPINGTON TERRIER, added 19 September 2026 (owner).
+
+     A REAL NAMED DOG, not a type noun invented to fill a gap. Cambridge
+     undergraduates in the 1870s and 80s kept small terriers bought from a livery
+     stable on Trumpington Street as dorm ratters, and the literature calls them
+     Trumpington or Cantab terriers. Rags, the Norwich's founding sire, came out of
+     that scene. It is one of the better stories in the archive and it was sitting
+     one generation above a node recorded as terminal.
+
+     ITS OWN PARENT IS THE NATIONAL STOCK, and this is the one place that graft is
+     right: livery-stable terriers were general working dogs bought by the yard,
+     not a county landrace, which is exactly the distinction the Norwich's note
+     draws. Old British ratting Terriers carries its own ancestry beneath it, so
+     this reaches the deep terrier root in one edit.
+
+     THE ARTWORK IS BORROWED and needs replacing. It wears
+     Local-red-ratting-terriers.jpg, its own descendant's picture, because no
+     Trumpington art exists. That is the same fault that helped retire the Lo-sze
+     earlier today, so it is flagged here rather than left to be discovered. */
+  "Trumpington Terrier": {
+    name: "Trumpington Terrier",
+    note: "The small terriers Cambridge undergraduates kept as college ratters in the 1870s, bought from a livery stable on Trumpington Street. The founding sire of the Norwich came out of them. Now extinct.",
+    img: "/history/breeds/Local-red-ratting-terriers.jpg",
+    children: [
+      { name: "Old British ratting Terriers", note: "The general farm and stable ratting stock the livery-yard terriers were drawn from. Now extinct.", img: "/history/breeds/Old-British-ratting-terriers.jpg", value: 100 }
     ]
   },
 
