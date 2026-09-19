@@ -564,9 +564,57 @@
      viewport height:  overlap = |payslip margin-top| - 48;
                        title clearance = hero-content padding-bottom - overlap. */
 
-  /* 1. Hero twice as tall: every term of the base clamp doubled. */
+  /* 1. HERO HEIGHT. Was "twice as tall: every term of the base clamp doubled",
+     clamp(816px, 120vh, 1344px), set 12 Aug 2026. Brought down to a flat 500px on
+     19 September 2026 (Steve).
+
+     MEASURED BEFORE AND AFTER, at 390 wide on all six articles. Before: every hero
+     was 1013px, because 120vh on an 844 viewport won and the title never came near
+     it. After: 500px on all six.
+
+     THE TITLE CUT BELOW IS LOAD-BEARING, NOT COSMETIC. With this at 500 and the
+     title left alone, the longest of the six, "The Dogs Teaching Medicine How to
+     Smell Disease", needs 561px of content and would push the hero straight back
+     out to 561. The two changes only work together.
+
+     THE PAYSLIP BAND IS DELIBERATELY NOT REBUILT. The geometry recorded above is
+     all relative to the hero's BOTTOM edge (overlap = |payslip margin-top| - 48;
+     title clearance = hero-content padding-bottom - overlap), so the 140px overlap
+     and the 50px clearance hold at any hero height and the payslip rides up with
+     it. Verified on the device rather than trusted.
+
+     TASK 2.1 ASKED FOR A max-height AND THAT CANNOT WORK. min-height beats
+     max-height, so a max-height of 500 against a min-height of 816 does nothing at
+     all. The min-height is the only lever. */
   .essayHero {
-    min-height: clamp(816px, 120vh, 1344px);
+    min-height: 500px;
+  }
+
+  /* 2.3 HERO TITLE. The brief asked for line-height 1.1em; it already reads 1.1 and
+     the leading was never the problem. What made the hero look loose was the type
+     size: the base is calc(clamp(2.7rem, 6vw, 4.5rem) + 2pt), and at 390 wide 6vw
+     is only 23.4px, so the 2.7rem floor wins and the title sets at 45.9px. Uppercase
+     with 0.04em tracking, in a column of about 342px, the longest title wrapped to
+     five lines.
+
+     Floor dropped 2.7rem to 2rem and the tracking to 0 (Steve, 19 September 2026).
+     Measured: 34.7px, three lines on the longest title. Removing the floor entirely
+     was tried and gave 26.1px on two lines, rejected as too close to body size for
+     a hero. line-height is untouched. */
+  .essayHeroTitle {
+    font-size: calc(clamp(2rem, 6vw, 4.5rem) + 2pt);
+    letter-spacing: 0;
+  }
+
+  /* 2.5 Intro paragraph down 2pt, from 1.625rem. */
+  .essayBody > p:first-child,
+  .essayBody .introPara {
+    font-size: calc(1.625rem - 2pt);
+  }
+
+  /* 2.6 Body text down 1pt, from 1.25rem. */
+  .essayBody p {
+    font-size: calc(1.25rem - 1pt);
   }
 
   /* Lift the bottom-aligned title, pills and back link off the very bottom so the

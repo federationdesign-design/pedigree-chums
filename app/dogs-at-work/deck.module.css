@@ -623,6 +623,35 @@
     font-size: 0.9rem;
   }
 
+  /* 1.5 Pill text white on the three families that read navy.
+
+     A DELIBERATE WCAG AA FAILURE, ACCEPTED BY STEVE ON 19 SEPTEMBER 2026 FOR THE
+     LOOK. This is not an oversight and it is not to be reverted as one. The navy
+     it replaces was chosen because it passes and white does not. Measured, text
+     on the pill's own background:
+
+       Medical                #17C138   navy 4.97:1 pass   white 2.41:1 FAIL
+       Rural and Traditional  #97AA31   navy 4.62:1 pass   white 2.59:1 FAIL
+       Science                #10D1B7   navy 6.17:1 pass   white 1.94:1 FAIL
+
+     White on Science at 1.94:1 is the worst of the three and is close to
+     unreadable. Steve was given these three figures before the change and chose
+     white anyway.
+
+     THE READER CAN STILL GET THE PASSING COLOUR. Gated on
+     :root:not([data-pc-contrast-scheme]), the same gate this file and globals.css
+     already use, so anyone on an accessibility contrast scheme keeps the navy.
+     The gate also lifts specificity to (0,4,0) against the base rules' (0,2,0),
+     so this cannot be undone by source order the way task 1.2 was.
+
+     The other three families, Security, Emergency and People, are already white
+     on their own backgrounds and are not touched. */
+  :root:not([data-pc-contrast-scheme]) .pill[data-family="Medical"],
+  :root:not([data-pc-contrast-scheme]) .pill[data-family="Rural and Traditional"],
+  :root:not([data-pc-contrast-scheme]) .pill[data-family="Science"] {
+    color: var(--cream);
+  }
+
   /* 1.6 Article headline leading opened from 1.05 to 1.3em. */
   .headline {
     line-height: 1.3em;
