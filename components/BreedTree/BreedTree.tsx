@@ -2094,7 +2094,25 @@ const rollBomb = () => Math.random() < 1 / BOMB_ODDS;
    ONE CONSTANT TO FLIP. The words group, its positioning loop and the word bodies
    are all left in place and simply not shown. */
 const PIT_DRAWS_WORDS = false;
-const CHIP_R_PX = 12;
+/* 12 -> 24, 19 September 2026 (owner: make the yellow % circles on the start
+   screen twice as big, understanding that they will be bigger in the pit too).
+
+   ONE CONSTANT, TWO PLACES, and that is why the owner's caveat matters. The start
+   screen's diagram badges read this through chipRVb, and every chip spawned into
+   the pit reads it through chipR at the scatter, the pop and spawnBadge. They
+   have been one size since 18 September and doubling it doubles both.
+
+   THE LEGIBILITY FLOOR IS UNAFFECTED. BADGE_FLOOR_PX is 11, the size at which the
+   % text stops reading, and a badge is dropped to nothing rather than clamped up
+   when it falls below it. At 24 nothing is anywhere near that, so the guard
+   simply never fires.
+
+   BOMBS COME WITH THEM. A bomb is a chip and takes this radius, and its sprite is
+   drawn 2.4 radii wide, so a bomb is now about 115px across. BOMB_R_PX 18 was
+   tried earlier the same day and reverted as too big; this is larger again. If
+   bombs need holding back, they need their own radius, which is that reverted
+   patch. */
+const CHIP_R_PX = 24;
 /* 13.5 -> 11, 9 Sept 2026 (owner).
    Not a taste change. The enclosing-circle fit landed earlier the same day made
    every multi-circle cluster smaller, because a constant circle in a portrait
