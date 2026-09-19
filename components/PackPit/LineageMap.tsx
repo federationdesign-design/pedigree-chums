@@ -472,6 +472,7 @@ export default function LineageMap({
   strongBg = false,
   initialDepth,
   bounded = false,
+  roundOver = false,
   hideLeafImages = false,
   onNodeClick,
 }: {
@@ -532,6 +533,16 @@ export default function LineageMap({
   // the whole tree is container-relative. The host passes breed.x/y as
   // container-local coords and gives the region position:relative + a size.
   bounded?: boolean;
+  /* THE ROUND HAS ENDED BEHIND THIS LAYER (owner, 19 September 2026). The play
+     area's lift is a fixed overlay and so is its AUTO button, at z-index 10000,
+     which is well above the ending screen's 300. So a round that ended while a
+     circle was lifted left the AUTO button sitting on top of TRY AGAIN, still
+     pressable, offering a shortcut through a round that was already over.
+     It became reachable when the pit stopped pausing behind a lift, the same
+     day. Only the button is gated: the lift itself is left alone, because
+     closing it from here would drop the held circle back into a dead pit.
+     Default false, so every other caller is unchanged. */
+  roundOver?: boolean;
   // hideLeafImages (added 2026-08-23): suppress revealing breed IMAGE tiles when
   // a node is clicked; the deepest nodes stay labelled % circles. Expansion,
   // scoring and the seen/blue recolour are untouched. Used by /chums2 (the
@@ -2471,7 +2482,8 @@ export default function LineageMap({
   // Auto-collect: the shortcut shows once armed (5s) while yellow circles remain.
   // One tap opens every branch, turns all circles blue and pops all cards out, the
   // same as tapping each one, but it costs a flat 1000 off the running total.
-  const showAuto = autoArmed && totalNodes > 0 && seen.size < totalNodes && !packed && !collecting && !removing;
+  // `!roundOver` added 19 September 2026: see the prop's own note for why.
+  const showAuto = autoArmed && totalNodes > 0 && seen.size < totalNodes && !packed && !collecting && !removing && !roundOver;
   /* Set when AUTO has popped everything and the cards still need placing. */
   const autoPlaceRef = useRef(false);
   /* Bumped by the stall guard in autoCollect so the finishing effect below re-runs

@@ -11,7 +11,11 @@
   font-family: var(--font-body), system-ui, sans-serif;
   font-size: clamp(11px, 1.4vw, 13px);
   font-weight: 700;
-  color: var(--blue-sky);
+  /* WHITE, 19 September 2026 (owner), replacing var(--blue-sky). Asked for on the
+     mini pit's game over screen. THIS COMPONENT IS SHARED: PitEnd, the main pit's
+     ending, draws the same table, so that heading turns white too. Both sit on a
+     dark wash, so it reads on either. */
+  color: #ffffff;
   text-align: center;
   letter-spacing: 0.12em;
   text-transform: uppercase;

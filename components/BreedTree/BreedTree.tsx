@@ -2534,6 +2534,7 @@ export default function BreedTree({
   onNavNextEra,
   onRoundWon,
   onPitFull,
+  roundEnded = false,
   rootNote,
   levelTheme = null,
   era,
@@ -2685,6 +2686,12 @@ export default function BreedTree({
   onNavNextEra?: () => void;
   onRoundWon?: () => void;
   onPitFull?: () => void;
+  /* THE ENDING SCREEN IS UP (owner, 19 September 2026). Passed straight through
+     to the lift's LineageMap as roundOver, which is the only thing that reads it:
+     see the prop's note there for what it hides and why. LineageModal sends its
+     own showEnding, so the flag is true for a won round, a lost one and a spent
+     run alike. */
+  roundEnded?: boolean;
   rootNote?: string;
   levelTheme?: LevelTheme | null;
   /* Which era this level belongs to. Used to scope a retired toy: the balls
@@ -13806,6 +13813,9 @@ export default function BreedTree({
               : { ...learnNode.data, children: [{ ...learnNode.data, children: undefined }] }
           }
           circular
+          // Hides the AUTO button once the round is over; nothing else. See the
+          // roundOver note in LineageMap.
+          roundOver={roundEnded}
           ringColor={learnCard.ring}
           // Rarity band across the lifted circle: tier from the lifted dog's
           // in-pit appearance count. Every dog gets one (common is not silent).

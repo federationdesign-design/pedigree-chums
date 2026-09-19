@@ -649,6 +649,23 @@ export default function BreedStrip({
         // would not remount and the round would not reset. The run counter
         // is what forces it.
         setRunKey((k) => k + 1);
+        /* NO TIME TUNNEL ON A RETRY, 19 September 2026 (owner: go directly back
+           to the start screen).
+
+           A COMMENT IN LineageModal SAID THIS ALREADY WORKED and it did not. It
+           reads "it stays down after the first play, so an in-pit retry does not
+           replay it", which was true when tunnelActive was plain state inside a
+           modal that survived the retry. The line above remounts the modal, so
+           the state is rebuilt from scratch and the tunnel plays again. Code
+           over doc, as usual.
+           The fix is `quiet`, which the modal already reads at mount and which
+           BreedStrip already sets for D-pad and swipe navigation for exactly the
+           same reason: that is browsing, and this is a replay. It also drops
+           holdEntrance, so the circles arrive without the held entrance, which is
+           what "directly back to the start screen" asks for.
+           It stays set on this level until the player navigates or advances,
+           both of which rebuild `active` through buildActive and clear it. */
+        setActive((a) => (a ? { ...a, quiet: true } : a));
         // AND THE TOYS COME BACK, because a retry is not progress. Throwing a
         // ball out costs it for the rest of the level and for every level you go
         // on to clear; it does not cost it for an attempt you failed.

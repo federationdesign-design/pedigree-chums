@@ -837,6 +837,9 @@ export default function LineageModal({ name, image, character, lineage, fromRect
              you on the board. Nothing is clamped at zero, owner's call: a
              negative total is expected and allowed. */
           onPitFull={() => { setPhase("lost"); setScore(bankedScore ?? 0); onLost?.(); }}
+          /* Hides the lift layer's AUTO button once this screen is up, and does
+             nothing else. See roundOver in LineageMap for the whole story. */
+          roundEnded={showEnding}
           rootNote={character}
           onClose={onClose}
         />
@@ -1144,7 +1147,11 @@ export default function LineageModal({ name, image, character, lineage, fromRect
                       Two words still, so the two-line flash layout is unchanged.
                       It also reads as the question the buttons below answer,
                       which is the point of this screen having tries left. */}
-                  <div className={css.endFlash}>
+                  {/* .endFlashTry is a 10% reduction on .endFlash, owner, 19
+                      September 2026, and it is deliberately NOT on GAME OVER:
+                      the two screens are different moments and only this one was
+                      asked to come down. See the stylesheet for the arithmetic. */}
+                  <div className={`${css.endFlash} ${css.endFlashTry}`}>
                     <span className={css.endFlashWord}>TRY</span>
                     <span className={css.endFlashWord}>AGAIN?</span>
                   </div>
@@ -1159,21 +1166,14 @@ export default function LineageModal({ name, image, character, lineage, fromRect
                   )}
                 </>
               )}
-              {/* THIS ROUND, on every life lost. The pack it was measured
-                  against is the flood this level dropped, so it is the same
-                  figure the win screen would have shown had it gone the other
-                  way. Hidden when the level had no chums in it. */}
-              {packSize > 0 && (
-                <div className={css.endRound}>
-                  <span className={css.endRoundTitle}>Chum rate:</span>
-                  <span className={css.endRoundValue}>
-                    {Math.min(100, Math.round((collectedChums.size / packSize) * 100))}%
-                  </span>
-                  <span className={css.endRoundDetail}>
-                    {collectedChums.size} of {Math.max(packSize, collectedChums.size)} chums found
-                  </span>
-                </div>
-              )}
+              {/* THE ROUND'S CHUM RATE IS GONE, 19 September 2026 (owner):
+                  "Chum rate: N%" and "X of Y chums found" both. It sat between
+                  the tries count and the run total and said a third thing about
+                  a round the player had just lost.
+                  NOTHING ELSE WENT WITH IT. packSize and collectedChums are
+                  still computed and still read by ShareCard below, which reports
+                  the same rate where it is actually wanted. The RUN TOTAL just
+                  below is untouched and still shows on both end states. */}
               {/* THE RUN TOTAL, on BOTH end states. It sits outside the
                   outOfLives branch above, so LEVEL FAILED and GAME OVER both
                   carry it. The round that just failed is NOT in it, by
@@ -1200,9 +1200,16 @@ export default function LineageModal({ name, image, character, lineage, fromRect
                       biggest type on the block, so nothing else it could be.
                       The words move to aria-label, because a bare number read
                       out on its own means nothing without them. */}
-                  <div className={css.endSummaryScore} aria-label={`Total score ${score.toLocaleString()}`}>
-                    {score.toLocaleString()}
-                  </div>
+                  {/* A ZERO IS NOT WORTH SAYING, 19 September 2026 (owner). The
+                      figure is hidden at exactly 0 and at nothing else: a
+                      NEGATIVE total still shows, because the time drain's floor
+                      was deliberately removed on 15 September and a minus is a
+                      real result the player should see, not an empty space. */}
+                  {score !== 0 && (
+                    <div className={css.endSummaryScore} aria-label={`Total score ${score.toLocaleString()}`}>
+                      {score.toLocaleString()}
+                    </div>
+                  )}
                   {/* REMOVED 2 September 2026 (owner): the run's average chum
                       rate and the "most caught" dog. Both had been in this file
                       for some time but were invisible, because .endSummary and

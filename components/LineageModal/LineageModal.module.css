@@ -762,6 +762,20 @@
 .endFlashWord {
   display: block;
 }
+/* TRY AGAIN? IS 10% SMALLER THAN GAME OVER, owner, 19 September 2026. A modifier
+   rather than a change to .endFlash, because GAME OVER was not asked to move and
+   the two share that rule.
+   BOTH CLAMPS HAVE TO BE RESTATED. The desktop media query below sets its own
+   font-size on .endFlash, so a single value here would be overridden there and
+   the reduction would apply on mobile only. Each term is the original times 0.9:
+     mobile   6.717 / 24vw / 15.917  ->  6.045 / 21.6vw / 14.325
+     desktop  4.467 / 13vw / 10.617  ->  4.020 / 11.7vw / 9.555
+   The desktop copy lives in the media query at the foot of this block, next to
+   the rule it has to beat. Nothing else about the flash changes: same font, same
+   line-height, same pop animation, same 25px top nudge. */
+.endFlashTry {
+  font-size: clamp(6.045rem, 21.6vw, 14.325rem);
+}
 /* DESKTOP ONLY: a third smaller, and GAME OVER on one line.
    Mobile keeps the two stacked blocks at full size, which is what the narrow
    column wants. 769px is the breakpoint the rest of this file uses.
@@ -777,6 +791,12 @@
        and changes nothing above 1320px. */
     font-size: clamp(4.467rem, 13vw, 10.617rem);
     white-space: nowrap;
+  }
+  /* The desktop half of the 10% reduction. See .endFlashTry above. It must come
+     after .endFlash in this query, which it does, and it carries the same
+     specificity, so source order is what decides it. */
+  .endFlashTry {
+    font-size: clamp(4.020rem, 11.7vw, 9.555rem);
   }
   .endFlashWord {
     display: inline;
@@ -1564,7 +1584,10 @@
   z-index: 2;
   margin: 6px 0 2px;
   text-align: center;
-  font-size: 22pt;
+  /* 22pt -> 19.8pt and weight 500, owner, 19 September 2026. Ten per cent off,
+     kept in pt so it still reads against the 22pt it came from. */
+  font-size: 19.8pt;
+  font-weight: 500;
   color: var(--yellow, #ffd23e);
 }
 .endRound {
