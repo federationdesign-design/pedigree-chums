@@ -631,7 +631,6 @@ const ROCK_ASPECT = 756.3 / 659.2;
 // scope, so a fresh visit starts clean. Swap to localStorage to make it forever.
 const TOY_FLAG_SEEN_KEY = "pc-minipit-flag-seen";
 const TOY_BALL_GONE_KEY = "pc-minipit-ball-gone";
-const TOY_STICK_GONE_KEY = "pc-minipit-stick-gone";
 const TOY_STICK_BIG_GONE_KEY = "pc-minipit-stickbig-gone";
 const TOY_ROCK_GONE_KEY = "pc-minipit-rock-gone";
 // The pink ball. The yellow one is gone the first time it leaves the pit; this
@@ -744,20 +743,29 @@ const QMARK_SRC = "/dogfacequestion.svg";
    The underscore in the filename is deliberate: the file arrived with a space
    in it, which is trouble in a URL. */
 const QMARK_TAPPED_SRC = "/dogfacequestion_tapped.svg";
-// stickBig is the same artwork half again as large, so the pair reads as two
-// sticks of different sizes rather than one drawn twice
-type ToyKind = "ball" | "flag" | "stick" | "stickBig" | "rock" | "ballPink" | "cookies" | "bone"
+/* ONE STICK ONLY, 19 September 2026 (owner: remove the small stick, leaving
+   only the big one, and give the big one the small one's physics).
+
+   REVERSED DECISION, recorded rather than quietly applied. The pair existed so
+   two sticks of different sizes read as two objects rather than one drawn
+   twice. The owner has withdrawn the small one. "stickBig" keeps its own name
+   and its own 1.5x size, so nothing downstream has to be renamed, and it now
+   carries the physics and the drawn start angle that used to be the small
+   stick's alone: restitution 0.35, friction 0.35, frictionAir 0.004, density
+   0.002. Before this it fell past that branch to the generic default and was
+   three times as dense and noticeably bouncier. */
+type ToyKind = "ball" | "flag" | "stickBig" | "rock" | "ballPink" | "cookies" | "bone"
   | "newspaper" | "fork" | "shoe" | "bowl";
 /* The props slot: the three objects that arrive together part way through the
    drop. A theme can replace them, which is how an era gets its own things to
    knock about. */
-export const DEFAULT_PROPS: ToyKind[] = ["stick", "stickBig"]; // rock removed 2026-08-12 (no more rocks). NB: THEMES_ENABLED is false, so this default is the ONLY prop set in play on every level.
+export const DEFAULT_PROPS: ToyKind[] = ["stickBig"]; // rock removed 2026-08-12 (no more rocks), small stick removed 2026-09-19. NB: THEMES_ENABLED is false, so this default is the ONLY prop set in play on every level.
 /* Which side the first prop falls on. Flipped every time a pit arms its props,
    so a reader playing several levels does not watch the same object land in the
    same corner every time. Module scope, so it survives a pit remounting. */
 let propStartLeft = true;
 const TOY_SRC: Record<ToyKind, string> = {
-  ball: TOY_BALL_SRC, flag: TOY_FLAG_SRC, stick: TOY_STICK_SRC,
+  ball: TOY_BALL_SRC, flag: TOY_FLAG_SRC,
   stickBig: TOY_STICK_SRC, rock: TOY_ROCK_SRC, ballPink: TOY_BALL_SRC,
   cookies: TOY_COOKIES_SRC,
   bone: TOY_BONE_SRC,
@@ -767,7 +775,7 @@ const TOY_SRC: Record<ToyKind, string> = {
 // every prop except the flag leaves for good once it is thrown clear of the pit
 const TOY_GONE_KEY: Record<ToyKind, string> = {
   ball: TOY_BALL_GONE_KEY, flag: TOY_FLAG_SEEN_KEY,
-  stick: TOY_STICK_GONE_KEY, stickBig: TOY_STICK_BIG_GONE_KEY,
+  stickBig: TOY_STICK_BIG_GONE_KEY,
   rock: TOY_ROCK_GONE_KEY, ballPink: TOY_BALL_PINK_GONE_KEY,
   cookies: TOY_COOKIES_SEEN_KEY,
   bone: TOY_BONE_GONE_KEY,
@@ -831,7 +839,7 @@ const PERMANENT_TOYS: string[] = ["flag"];
    checkEscapeRef when it passes the top of the stage.
    "stickBig" is in it and was the omission that started this: see the note at
    the watch itself. */
-const THROWABLE_TOYS = new Set<ToyKind>(["ball", "ballPink", "stick", "stickBig", "rock"]);
+const THROWABLE_TOYS = new Set<ToyKind>(["ball", "ballPink", "stickBig", "rock"]);
 
 /* GIVE THE TOYS BACK, 2 September 2026 (owner).
 
@@ -7618,7 +7626,6 @@ export default function BreedTree({
         const dia =
           kind === "ball" || kind === "ballPink" ? ballDia
           : kind === "rock" ? ballDia
-          : kind === "stick" ? ballDia * 1.6
           : kind === "stickBig" ? ballDia * 1.6 * 1.5
           : kind === "cookies" ? BIGT * 3.2
           /* THE BONE IS SIZED FROM THE LOGO'S BONE (owner, 18 September 2026),
@@ -7652,7 +7659,7 @@ export default function BreedTree({
           // still gets the main pit's size and a phone gets one that fits.
           : kind === "bowl" ? Math.min(BIGT * 9.38 * (isNarrow ? 0.85 : 1), wPx * BOWL_PIT_FRACTION)
           : BIGT * 0.6 * 2;
-        const hgt = kind === "stick" || kind === "stickBig" ? dia / STICK_ASPECT : kind === "rock" ? dia / ROCK_ASPECT : kind === "cookies" ? dia / COOKIES_ASPECT : kind === "bone" ? dia / BONE_ASPECT
+        const hgt = kind === "stickBig" ? dia / STICK_ASPECT : kind === "rock" ? dia / ROCK_ASPECT : kind === "cookies" ? dia / COOKIES_ASPECT : kind === "bone" ? dia / BONE_ASPECT
           : kind === "newspaper" ? dia / TOY_NEWSPAPER_ASPECT
           : kind === "fork" ? dia / TOY_FORK_ASPECT
           : kind === "shoe" ? dia / TOY_SHOE_ASPECT
@@ -7692,7 +7699,9 @@ export default function BreedTree({
           kind === "ball" || kind === "ballPink" ? { restitution: 0.85, friction: 0.05, frictionStatic: 0.4, frictionAir: 0.003, density: 0.0006 } // bouncy, but SETTLES: restitution 0.85 is what kills the freeze (was 0.97, never reached 12 still frames, froze the pit at 30s, see handover 17). frictionStatic 0.8 -> 0.4 (2026-08-12) so a resting ball is easier to flick: 0.8 gripped the launch. Settle re-checked in a headless Matter sim, 2.7-7.1s to still at 0.4, identical to 0.8, so no freeze; if it ever returns do NOT lower this further, raise frictionAir to 0.006 instead.
           : kind === "rock" ? { restitution: 0.12, friction: 0.75, frictionStatic: 1.2, frictionAir: 0.006, density: 0.02 }
           : kind === "cookies" ? { restitution: 0.3, friction: 0.4, frictionAir: 0.012, density: 0.004 } // the main pit's own panel figures
-          : kind === "stick" ? { restitution: 0.35, friction: 0.35, frictionAir: 0.004, density: 0.002 }
+          // The small stick's own figures, inherited 19 September 2026 when it was
+          // removed and this became the only stick. It used to fall past here.
+          : kind === "stickBig" ? { restitution: 0.35, friction: 0.35, frictionAir: 0.004, density: 0.002 }
           // the main pit's own bone figures, PackPit line 405
           : kind === "bone" ? { restitution: 0.3, friction: 0.3, frictionAir: 0.012, density: 0.0008 }
           // A rolled newspaper and a wooden-soled shoe land dead and stay put.
@@ -7711,7 +7720,7 @@ export default function BreedTree({
         // Chamfered, so it reads as a rounded stick and cannot catch on a corner.
         // The rock is a seven-sided polygon rather than a circle: a circle would
         // roll away down the sloped ground, and a rock should sit where it lands.
-        const isStick = kind === "stick" || kind === "stickBig";
+        const isStick = kind === "stickBig";
         const startAngle = isStick ? (Math.random() - 0.5) * 0.8 : 0;
         // The stick is a tapered, kinked branch, not a sausage: traced from the
         // artwork it is thin at the left tip, fat through the middle where the
@@ -7836,7 +7845,7 @@ export default function BreedTree({
         Composite.add(world, mb);
         // the pit gives the flag a throw and lets the ball simply drop
         if (kind === "flag") MBody.setVelocity(mb, { x: (Math.random() - 0.5) * 3, y: 3 });
-        if (kind === "stick") pr.a = startAngle;
+        if (kind === "stickBig") pr.a = startAngle;
         toyBodiesRef.current.push(pr);
         if (kind === "flag") flagIdxRef.current = idx;
         if (kind === "cookies") cookiesIdxRef.current = idx;
@@ -7859,7 +7868,7 @@ export default function BreedTree({
 
            THE BUG THIS FIXES, and it was one word. The old line read
            `!== "ball" && !== "stick" && !== "rock" && !== "ballPink"`, and
-           "stickBig" was never in it. DEFAULT_PROPS is ["stick", "stickBig"], so
+           "stickBig" was never in it. DEFAULT_PROPS was ["stick", "stickBig"], so
            BOTH sticks are in play on every level, and the big one was simply
            never watched: it could be thrown clear of the stage and nothing ever
            called retireToy for it, so it respawned on the next level for ever.

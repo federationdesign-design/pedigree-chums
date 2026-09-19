@@ -180,7 +180,10 @@ export function propsFor(era?: string, levelName?: string): string[] | null {
 
    AN EMPTY ARRAY MEANS DELIBERATELY NOTHING, and is not the same as having no
    entry at all. A level with no entry (2 and 10) falls through to the pit's own
-   DEFAULT_PROPS and keeps both sticks. Ten levels below are deliberately bare.
+   DEFAULT_PROPS, which is the one stick. Ten levels below are deliberately bare.
+
+   THE SMALL STICK IS GONE, 19 September 2026 (owner). Every "stick" here became
+   "stickBig", and the two levels that listed both now list one.
 
    FRAGILE BY NATURE. These are positions, not names, so adding a play level or
    changing a breed's anchor shifts everything after it. MOBILE_PROPS_LEVELS is
@@ -189,37 +192,37 @@ export function propsFor(era?: string, levelName?: string): string[] | null {
 export const MOBILE_PROPS_LEVELS = 92;
 /* From this level to the end: one stick, nothing else. */
 const MOBILE_PROPS_TAIL_FROM = 30;
-const MOBILE_PROPS_TAIL: string[] = ["stick"];
+const MOBILE_PROPS_TAIL: string[] = ["stickBig"];
 const MOBILE_PROPS: Record<number, string[]> = {
-  1: ["stick", "bowl"],           // Celtic Hound
-  // 2 Ancient Mastiff: no entry, keeps both sticks
-  3: ["stick"],                   // Celtic Coursing Hound
-  4: ["stick"],                   // Celtic Scent Hound
-  5: ["stick"],                   // Livestock Dog
-  6: ["stick"],                   // Old British bandogs
-  7: ["stick", "bowl"],           // Celtic Heeler
-  8: ["stick", "stickBig", "bowl"], // Shepherd's Dog
-  9: ["stick"],                   // Drover's Dog
-  // 10 Earth Dog: no entry, keeps both sticks
+  1: ["stickBig", "bowl"],           // Celtic Hound
+  // 2 Ancient Mastiff: no entry, keeps the default stick
+  3: ["stickBig"],                   // Celtic Coursing Hound
+  4: ["stickBig"],                   // Celtic Scent Hound
+  5: ["stickBig"],                   // Livestock Dog
+  6: ["stickBig"],                   // Old British bandogs
+  7: ["stickBig", "bowl"],           // Celtic Heeler
+  8: ["stickBig", "bowl"], // Shepherd's Dog
+  9: ["stickBig"],                   // Drover's Dog
+  // 10 Earth Dog: no entry, keeps the default stick
   11: [],                         // Scottish Deerhound
-  12: ["stick", "bowl"],          // Rache
+  12: ["stickBig", "bowl"],          // Rache
   13: [],                         // Talbot
   14: [],                         // Buckhound
-  15: ["stick", "bowl"],          // Southern Hound
+  15: ["stickBig", "bowl"],          // Southern Hound
   16: [],                         // Old Highland terriers
   17: [],                         // Old working collies
-  18: ["stick", "bowl"],          // Welsh herding dogs
-  19: ["stick", "stickBig", "bowl"], // Old British ratting terriers
-  20: ["stick", "bowl"],          // Earth and hunt terriers
+  18: ["stickBig", "bowl"],          // Welsh herding dogs
+  19: ["stickBig", "bowl"], // Old British ratting terriers
+  20: ["stickBig", "bowl"],          // Earth and hunt terriers
   21: [],                         // Old English Black and Tan Terrier
   22: [],                         // Land spaniels
   23: [],                         // Old Welsh land spaniels
-  24: ["stick"],                  // Basset and heavy hounds
-  25: ["stick", "bowl"],          // Old English Bulldog
+  24: ["stickBig"],                  // Basset and heavy hounds
+  25: ["stickBig", "bowl"],          // Old English Bulldog
   26: [],                         // Skye Terrier
   27: [],                         // English Foxhound
-  28: ["stick", "stickBig", "bowl"], // Otterhound
-  29: ["stick", "stickBig", "bowl"], // Low-slung soldiers' dogs
+  28: ["stickBig", "bowl"], // Otterhound
+  29: ["stickBig", "bowl"], // Low-slung soldiers' dogs
 };
 
 /* The mobile answer for ONE BASED level `level`.
