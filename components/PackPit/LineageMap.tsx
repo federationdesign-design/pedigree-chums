@@ -5119,12 +5119,41 @@ className={[
            measured, so the raw anchor is used exactly as before and the clamp
            takes effect on the next render. */
         const M = 8;                       // keep-off margin from every edge
-        const bw = pctSize?.w ?? 288;      // 288 is the maxWidth set below
+        /* THE WIDTH IS DECIDED HERE AND WRITTEN ONTO THE BOX, 19 September 2026
+           (owner: opening this from a card near the right edge squeezes the box to
+           about a third of its width and stretches it nearly the full height).
+
+           THE FAULT WAS A STABLE FEEDBACK LOOP, not a missing clamp. The box
+           carried maxWidth and no WIDTH, and it is absolutely positioned with only
+           `left` set, so it shrink-to-fits against whatever room is left to its
+           right. Near the right edge that is about 200px, so:
+             frame 1  pctSize is null by design, the clamp does not run, the raw
+                      anchor is used and the box wraps to a narrow column
+             then     it is measured, and bw becomes that SQUEEZED width
+             frame 2  the clamp reads left = min(left, vp.w - bw - M), and with bw
+                      at 200 rather than 288 the limit sits 88px further right, so
+                      the box barely moves and stays squeezed
+           It settles into the wrong answer instead of correcting, which is why it
+           never recovers however many frames pass.
+
+           SO THE WIDTH IS NO LONGER MEASURED. bw is what the box is TOLD to be and
+           the same figure is written to the style below, so it cannot shrink-to-fit
+           and the clamp is right on the FIRST frame, before any measurement. 288 is
+           the old maxWidth, kept; the vp.w term is the narrow-viewport guard, where
+           288 plus two margins would not fit.
+
+           THE HEIGHT IS STILL MEASURED, and has to be: the box runs from about 120
+           to 500 tall depending on how many generations the breed lists, which is
+           not knowable up front. That is what the note on pctBoxRef describes and
+           it is unchanged. Only the width stopped being a question. */
+        const bw = Math.min(288, Math.max(160, vp.w - M * 2));
         const bh = pctSize?.h ?? 0;
         let left = c.cardX - CW / 2 + pan.x;
         let top = c.cardY + CW / 2 + 6 + pan.y;
+        // The horizontal clamp no longer waits for a measurement, because bw is
+        // known. Only the vertical flip below still needs pctSize.
+        left = Math.max(M, Math.min(left, vp.w - bw - M));
         if (pctSize) {
-          left = Math.max(M, Math.min(left, vp.w - bw - M));
           if (top + bh > vp.h - M) {
             const above = c.cardY - CW / 2 - 6 - bh + pan.y;
             top = above >= M ? above : Math.max(M, vp.h - bh - M);
@@ -5176,7 +5205,10 @@ className={[
             onMouseEnter={pctKeep}
             onMouseLeave={pctClose}
             style={{
-              position: bounded ? "absolute" : "fixed", left, top, maxWidth: 288, zIndex: 100, pointerEvents: "auto", /* pct-close: hoverable so it can self-dismiss */
+              /* width, NOT maxWidth: see the note by bw above. A maxWidth alone lets
+                 this box shrink-to-fit against the right edge, which is the whole
+                 fault. The same figure the clamp used, so the two cannot disagree. */
+              position: bounded ? "absolute" : "fixed", left, top, width: bw, zIndex: 100, pointerEvents: "auto", /* pct-close: hoverable so it can self-dismiss */
               background: "rgba(10, 58, 87, 0.92)", color: "#ffffff",
               /* 11px ON SCREEN, 19 September 2026 (owner), matching the learn area's
                  blue card. Written as the size it LANDS at and divided by the overlay's
