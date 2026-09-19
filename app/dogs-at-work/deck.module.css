@@ -587,6 +587,62 @@
   .blueSectionBody {
     max-width: 100%;
   }
+
+  /* ── Mobile presentation pass, 19 September 2026 ──────────────────────────
+     Tasks 1.1 to 1.7 of the Dogs at Work mobile brief. Every rule here is
+     inside this query on purpose: .introText, .blueBody, .learnAbout, .pill,
+     .headline and .cta are all shared by the desktop markup and the mobile
+     stack, so a change to the base rule would move the signed-off desktop
+     layout. The .m* classes are not repeated here because .mobile is
+     display:none above this breakpoint, so they are already mobile only. */
+
+  /* 1.1 Intro down 3pt. calc on the whole clamp so it comes down by the same
+     3pt at every width rather than only where one term happens to bite. At 390
+     the 28px floor governs, so this reads 24px. */
+  .introText {
+    font-size: calc(clamp(28px, 3.6vw, 36px) - 3pt);
+  }
+
+  /* 1.2, first half. The paragraph gap. The 0.9em was set on 31 Aug 2026 to
+     separate paragraphs split out of one body string; halving it to 0.45em keeps
+     that break readable while closing the block up on a phone. The .mBlue half of
+     this task is at the foot of the file, and the note there says why. */
+  .blueBody {
+    margin-bottom: 0.45em;
+  }
+
+  /* 1.3 Halve the air above the "Learn about" title. The base rule's 75px is
+     recorded as Item 3 and stays for desktop. */
+  .learnAbout {
+    padding-top: 37.5px;
+  }
+
+  /* 1.4 Pill text 25% smaller: 1.2rem x 0.75. The article pages' own .tag is
+     0.85rem, so this lands a shade above it and the two read as one family. */
+  .pill {
+    font-size: 0.9rem;
+  }
+
+  /* 1.6 Article headline leading opened from 1.05 to 1.3em. */
+  .headline {
+    line-height: 1.3em;
+  }
+
+  /* 1.7 The green CTA must never wrap. MEASURED, not estimated: at 320 wide the
+     button has 288px of room, and the longest of the six labels, "Search and
+     rescue dogs" at 22 characters, needs 454px at the base 28.8px/52px and
+     wraps to two lines. 18px type with 28px side padding needs 275px and fits
+     with 13px to spare; 19px/30px needs 291px and does not. The floor is
+     therefore 1.125rem, and 5.6vw reaches it at exactly 320 so the button still
+     grows on a larger phone. The base rule's doubling is recorded as Item 4 in
+     this file and is untouched for desktop.
+     NOTE: the 12px drop shadow was doubled with the original type and now sits
+     under type less than half that size. Left alone because only the font and
+     the padding were asked for. */
+  .cta {
+    font-size: clamp(1.125rem, 5.6vw, 2.3rem);
+    padding: 12px 28px;
+  }
 }
 
 .mIntro {
@@ -700,4 +756,21 @@
 }
 :root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .cta {
   color: var(--navy, #0a3a57);
+}
+
+/* 1.2, second half: less air above and below the copy inside the blue panel.
+
+   WHY THIS IS AT THE FOOT OF THE FILE AND NOT IN THE BLOCK WITH THE REST. The
+   base .mBlue rule is declared further down this stylesheet than the mobile query
+   the other six tasks live in, and it sets the shorthand `padding`. A media query
+   adds no specificity, so the later shorthand simply overwrote an earlier
+   padding-top and the change read as not applied at all (measured: still 28.64px
+   on a 390 phone). Declared after the base rule, it wins on source order.
+
+   The side padding is deliberately untouched, so only the vertical closes up. */
+@media (max-width: 768px) {
+  .mBlue {
+    padding-top: clamp(11px, 4cqi, 17px);
+    padding-bottom: clamp(11px, 4cqi, 17px);
+  }
 }
