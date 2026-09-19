@@ -30,6 +30,7 @@ import mapStyles from "../PackPit/LineageMap.module.css";
 import { BRAIN_PATH, BRAIN_ARTBOARD } from "../icons/brain";
 import LineageMap from "../PackPit/LineageMap";
 import { propsFor, mobilePropsForLevel, type LevelTheme } from "../../data/levelThemes";
+import { packArt } from "../../data/packArt";
 import BritainMessage from "../PackPit/BritainMessage";
 
 // Reference-info marker on the learn-box portrait: the same red/amber/green
@@ -5149,12 +5150,21 @@ export default function BreedTree({
        the drop, so dropped is false and the photographs show as they always did.
 
        THE LIFTED CARD IS UNAFFECTED, and that is by construction rather than by
-       luck: setLearnCard reads d.data.img DIRECTLY at both of its call sites, not
+       luck: setLearnCard builds its own image at both of its call sites, not
        through this function, so the card carries its picture out of a pit that is
        showing none. If that ever changes to read nodeImg, this rule would blank
-       the lifted card too. */
+       the lifted card too. (Those two sites run packArt first, the same as this
+       one does, so a pack dog lifts its card art; that is the only part of them
+       that is shared with this function.) */
     if (dropped) return undefined;
-    return d.depth === 0 ? rootImage ?? d.data.img : d.data.img;
+    /* A PACK DOG SHOWS ITS CARD ART, 19 September 2026 (owner). See data/packArt.ts.
+       Only the fallback changes: rootImage still wins at depth 0, because that is
+       the level's own picture and the level already knows its own dog. Below the
+       root, one of the fifty-four takes its cartoon instead of the archive's
+       painting, and every other circle is untouched. */
+    return d.depth === 0
+      ? rootImage ?? packArt(d.data.name) ?? d.data.img
+      : packArt(d.data.name) ?? d.data.img;
   }
   function fillFor(d: Node): string {
     /* IN THE LIVE PIT A CIRCLE IS FILLED WITH ITS OWN RING COLOUR,
@@ -5977,7 +5987,7 @@ export default function BreedTree({
     const cr = el.getBoundingClientRect();
     setLearnCard({
       name: d.data.name,
-      image: d.data.img ?? rootImage ?? "",
+      image: packArt(d.data.name) ?? d.data.img ?? rootImage ?? "", // a pack dog lifts its card art: see data/packArt.ts
       x: cr.left + cr.width / 2,
       y: cr.top + cr.height / 2,
       angle: (body as unknown as { a?: number }).a ?? 0,
@@ -6093,7 +6103,7 @@ export default function BreedTree({
         const cr = el.getBoundingClientRect();
         setLearnCard({
           name: d.data.name,
-          image: d.data.img ?? rootImage ?? "",
+          image: packArt(d.data.name) ?? d.data.img ?? rootImage ?? "", // a pack dog lifts its card art: see data/packArt.ts
           x: cr.left + cr.width / 2,
           y: cr.top + cr.height / 2,
           angle: (body as unknown as { a?: number }).a ?? 0,
@@ -6312,7 +6322,7 @@ export default function BreedTree({
   useEffect(() => {
     const sh = (hovered ?? focus) as Node;
     onShownChange?.(sh.data.name);
-    const shImg = sh === nodes[0] ? (rootImage ?? sh.data.img) : sh.data.img;
+    const shImg = sh === nodes[0] ? (rootImage ?? packArt(sh.data.name) ?? sh.data.img) : (packArt(sh.data.name) ?? sh.data.img);
     onShownImageChange?.(shImg ? bust(shImg) : null);
     const shNote = sh === nodes[0] ? (rootNote ?? sh.data.note ?? "") : (sh.data.note ?? "");
     onShownStatusChange?.(nodeStatus(sh.data.name, shNote));
@@ -6322,7 +6332,7 @@ export default function BreedTree({
     onShownPathChange?.(
       (sh.ancestors() as Node[]).reverse().map((n) => {
         const isRoot = n === nodes[0];
-        const img = isRoot ? (rootImage ?? n.data.img) : n.data.img;
+        const img = isRoot ? (rootImage ?? packArt(n.data.name) ?? n.data.img) : (packArt(n.data.name) ?? n.data.img);
         const note = isRoot ? (rootNote ?? n.data.note ?? "") : (n.data.note ?? "");
         return { name: n.data.name, img: img ? bust(img) : null, status: nodeStatus(n.data.name, note) };
       }),
@@ -9923,7 +9933,7 @@ export default function BreedTree({
   const headTag = ancestryFor ? nodeStatus(ancestryFor.name, ancestryFor.note ?? "") : rootTag;
   // The box header now follows the shown circle, mirroring the page-top title:
   // its image and its living/extinct status, updated as you hover.
-  const shownHeadImg = shown === nodes[0] ? (rootImage ?? nodes[0].data.img) : shown.data.img;
+  const shownHeadImg = shown === nodes[0] ? (rootImage ?? packArt(nodes[0].data.name) ?? nodes[0].data.img) : (packArt(shown.data.name) ?? shown.data.img);
   const shownTag = nodeStatus(shown.data.name, shown === nodes[0] ? (rootNote ?? nodes[0].data.note ?? "") : (shown.data.note ?? ""));
   // The related-dogs rail follows the shown circle: each ancestor has its own
   // set of pack descendants (an uneven split), so it changes as you hover.

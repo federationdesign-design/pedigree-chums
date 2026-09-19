@@ -11,7 +11,7 @@ import { ancestralInfluence } from "../../data/lineageArchive";
 import { ukBreeds } from "../../data/uk-breeds";
 import { breeds } from "../../data/breeds";
 import { isHiddenCopyOf } from "../../data/lineageShape";
-import { resolveLineageName } from "../../data/lineageNames";
+import { packArt } from "../../data/packArt"; // resolveLineageName moved in there with it
 import { breedInfo } from "../../data/breedInfo";
 import { splitName } from "./splitName";
 import styles from "./LineageMap.module.css";
@@ -221,19 +221,12 @@ const CARD = 74; // card + frame + image size (reduced 10% further)
    One number to nudge. */
 const LIFT_CARD_SCALE = 0.75;
 const PACK_BREEDS = new Set(breeds.map((b) => b.name)); // the 54 dogs in the card pack the site is about
-const PACK_IMG = new Map(breeds.map((b) => [b.name, b.image])); // pack breed -> its square cartoon card art
-/* THE LOOKUP HAS TO RUN THE ALIAS (owner, 19 September 2026). PACK_IMG is keyed on
-   the pack's own spelling and was being asked with the RAW node name, so a dog
-   written under an alias missed its card art and kept a historical painting:
-   "West Highland White Terrier" resolved correctly for ancestry, through
-   resolveLineageName, and then fell through to a nineteenth-century oil of a LIVING
-   pack breed. One dog when it was found, and it would have been the next one
-   silently.
-
-   The node itself has been renamed to the pack spelling, so this is the belt to that
-   braces: it protects every future alias rather than only the one that was caught. */
-const packArt = (name: string): string | undefined =>
-  PACK_IMG.get(name) ?? PACK_IMG.get(resolveLineageName(name));
+/* PACK_IMG AND packArt MOVED OUT, 19 September 2026 (owner). They now live in
+   data/packArt.ts, unchanged, so BreedTree can run the same lookup: it does not
+   import data/breeds at all and was painting sixteen of the fifty-four pack dogs
+   from the lineage record's historical picture. Nothing about this file's own
+   behaviour changes; every call site below reads the identical function. The alias
+   note that used to sit here has moved with it. */
 // every white flash number is this small, fixed size, matching the pit; it never
 // scales with the circle that was tapped
 const FLASH_SIZE = 15;
