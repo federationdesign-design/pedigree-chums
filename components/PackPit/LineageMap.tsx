@@ -220,6 +220,25 @@ const CARD = 74; // card + frame + image size (reduced 10% further)
 
    One number to nudge. */
 const LIFT_CARD_SCALE = 0.75;
+/* THE OVERLAY'S OWN SCALE, AND ITS INVERSE (owner, 19 September 2026: the small info
+   card on the lifted layer is too small).
+
+   WHY THE TWO INFO BOXES READ SMALL. The overlay carries transform: scale(0.8) whenever
+   (circular || strongBg) && !bounded, and a transform shrinks every descendant. Both
+   boxes sit inside it, so their declared 12px was landing at 9.6px on screen while the
+   learn area's .cNote, which is outside any scaled element, was a true 12px. They were
+   raised from 11 to 12 on 16 September to match that card and still came out a fifth
+   short, because the NUMBER was never the problem.
+
+   THE CHEAP FIX, KNOWINGLY. The frame grid below already inverts this same 0.8 for its
+   coordinates, and records that the clean fix is to take the element out of the scaled
+   overlay. This is the same cheap trade applied to type: a figure passed through liftPx
+   LANDS at the size it names.
+
+   IT IS CONDITIONAL, AND IT HAS TO BE. When `bounded` is set the overlay carries no
+   transform, so pre-compensating there would make the boxes a quarter too BIG. The
+   guard is the same expression as the style it inverts; if one moves, move both. */
+const LIFT_OVERLAY_SCALE = 0.8;
 const PACK_BREEDS = new Set(breeds.map((b) => b.name)); // the 54 dogs in the card pack the site is about
 /* PACK_IMG AND packArt MOVED OUT, 19 September 2026 (owner). They now live in
    data/packArt.ts, unchanged, so BreedTree can run the same lookup: it does not
@@ -841,6 +860,10 @@ export default function LineageMap({
      natural size and no further, which is exactly what desktop already does. */
   const LIFT_MAX_COLS = 8;
   const LIFT_FLOOR_W = Math.round(GRID_BASE_W * LIFT_CARD_SCALE);
+  /* Type inside the scaled overlay is written at the size it should LAND at and divided
+     by that scale. See LIFT_OVERLAY_SCALE. The factor is 1 when nothing scales. */
+  const liftK = (circular || strongBg) && !bounded ? 1 / LIFT_OVERLAY_SCALE : 1;
+  const liftPx = (px: number) => `${+(px * liftK).toFixed(2)}px`;
   const gridFor = (maxCols: number, floorW: number) => {
     if (!isMobile || !(circular || strongBg)) return null;
     /* DIVIDED BY THE LAYER'S SCALE, 16 September 2026 (owner: the grid still
@@ -4808,20 +4831,21 @@ className={[
             style={{
               position: bounded ? "absolute" : "fixed", left, top, maxWidth: PANEL_W, zIndex: 100, pointerEvents: "auto",
               background: "rgba(10, 58, 87, 0.92)", color: "#ffffff",
-              /* 11 -> 12, 16 September 2026 (owner: the two boxes on the family tree
-                 layer did not grow with the blue card).
+              /* 11px ON SCREEN, 19 September 2026 (owner: match the learn area's blue
+                 card). Written as the size it LANDS at and divided by the overlay's
+                 scale: see LIFT_OVERLAY_SCALE, which is why the 12 this used to carry
+                 was reading as 9.6.
 
                  THIS IS THE SECOND BOX, the note that opens off a card's own info
-                 badge. The earlier pass raised the blue card and the PERCENTAGE box
-                 below, and missed this one entirely because it sets its own font
-                 shorthand three hundred lines away from the other. Three boxes now
-                 read at 12: this, the percentage box, and the learn card. The
-                 leading is brought to 1.45 with it so all three match. */
-              font: "500 12px/1.45 Montserrat, system-ui, sans-serif", padding: "7px 10px",
+                 badge. It sets its own font shorthand three hundred lines from the
+                 percentage box, which is how the two drifted apart before. Both now
+                 land on the same figure as .cNote in BreedTree.module.css; if that
+                 moves, all three move. The 1.45 leading is unchanged. */
+              font: `500 ${liftPx(11)}/1.45 Montserrat, system-ui, sans-serif`, padding: "7px 10px",
               borderRadius: "8px", boxShadow: "0 4px 12px rgba(10, 58, 87, 0.35)",
             }}
           >
-            <div style={{ fontFamily: "'Luckiest Guy', system-ui", fontSize: "13px", marginBottom: "4px", color: "var(--yellow, #ffd23e)" }}>{c.name}</div>
+            <div style={{ fontFamily: "'Luckiest Guy', system-ui", fontSize: liftPx(12.48), marginBottom: "4px", color: "var(--yellow, #ffd23e)" }}>{c.name}</div>
             {text}
           </div>
         );
@@ -5108,16 +5132,17 @@ className={[
             style={{
               position: bounded ? "absolute" : "fixed", left, top, maxWidth: 288, zIndex: 100, pointerEvents: "auto", /* pct-close: hoverable so it can self-dismiss */
               background: "rgba(10, 58, 87, 0.92)", color: "#ffffff",
-              /* 11 -> 12, 16 September 2026 (owner), matching the learn area's blue
-                 card, which moved to the same 12 the same day. The two boxes share no
-                 code, which is how they drifted apart in the first place; if either
-                 moves again, move both. */
-              font: "500 12px/1.45 Montserrat, system-ui, sans-serif", padding: "9px 12px",
+              /* 11px ON SCREEN, 19 September 2026 (owner), matching the learn area's
+                 blue card. Written as the size it LANDS at and divided by the overlay's
+                 scale: see LIFT_OVERLAY_SCALE. The 12 this used to carry was reading as
+                 9.6, which is why raising the number on 16 September did not close the
+                 gap. The two boxes still share no code, so if either moves, move both. */
+              font: `500 ${liftPx(11)}/1.45 Montserrat, system-ui, sans-serif`, padding: "9px 12px",
               borderRadius: "8px", boxShadow: "0 4px 12px rgba(10, 58, 87, 0.35)",
             }}
           >
-            <div style={{ fontSize: 13, fontWeight: 700, color: "#ffd23e", marginBottom: 1 }}>{c.name}</div> {/* pct-name */}
-            <div style={{ fontSize: 18, fontWeight: 800, lineHeight: 1.15, marginBottom: 6 }}>
+            <div style={{ fontSize: liftPx(12.48), fontWeight: 700, color: "#ffd23e", marginBottom: 1 }}>{c.name}</div> {/* pct-name */}
+            <div style={{ fontSize: liftPx(18), fontWeight: 800, lineHeight: 1.15, marginBottom: 6 }}>
               {pctTxt(norm)} of your chum
             </div>
             {apps.length > 0 && (
