@@ -1166,7 +1166,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "The small red working terriers of Norfolk farms and the Romani ratters, and the Cambridge stock that made the founding sire. Now extinct.",
     img: "/history/breeds/Local-red-ratting-terriers.jpg",
     children: [
-      { name: "Trumpington Terrier", note: "The Cambridge terriers the founding sire came out of. Now extinct.", img: "/history/breeds/Local-red-ratting-terriers.jpg", value: 50 },
+      { name: "Trumpington Terrier", note: "The Cambridge terriers the founding sire came out of. Now extinct.", img: "/history/breeds/trumpington-terrier.jpg", value: 50 },
       { name: "Scottish Terrier", note: "The brindle Aberdeen-type bitch on the other side of that mating.", img: "/history/breeds/Scottish-Terrier.jpg", value: 50 }
     ]
   },
@@ -1186,14 +1186,15 @@ const LINEAGE: Record<string, LineageNode> = {
      draws. Old British ratting Terriers carries its own ancestry beneath it, so
      this reaches the deep terrier root in one edit.
 
-     THE ARTWORK IS BORROWED and needs replacing. It wears
-     Local-red-ratting-terriers.jpg, its own descendant's picture, because no
-     Trumpington art exists. That is the same fault that helped retire the Lo-sze
-     earlier today, so it is flagged here rather than left to be discovered. */
+     THE ARTWORK IS ITS OWN NOW, 19 September 2026, later the same day. It was
+     authored wearing Local-red-ratting-terriers.jpg, its own descendant's picture,
+     because no Trumpington art existed, and that was flagged here rather than left
+     to be discovered. The picture was made and this record and its child node both
+     point at it. No file is shared between two names again. */
   "Trumpington Terrier": {
     name: "Trumpington Terrier",
     note: "The small terriers Cambridge undergraduates kept as college ratters in the 1870s, bought from a livery stable on Trumpington Street. The founding sire of the Norwich came out of them. Now extinct.",
-    img: "/history/breeds/Local-red-ratting-terriers.jpg",
+    img: "/history/breeds/trumpington-terrier.jpg",
     children: [
       { name: "Old British ratting Terriers", note: "The general farm and stable ratting stock the livery-yard terriers were drawn from. Now extinct.", img: "/history/breeds/Old-British-ratting-terriers.jpg", value: 100 }
     ]
