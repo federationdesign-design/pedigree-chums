@@ -768,8 +768,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Skye Terrier",
     note: "One of the oldest terriers in Britain, a long, low, heavy-coated earth dog from the Isle of Skye and the Western Highlands.",
     children: [
-      { name: "Old Highland Terriers", note: "The old working-terrier stock of the Highlands that every Scottish terrier springs from. Now extinct.", img: "/history/breeds/Old-Highland-terriers.jpg", value: 60 },
-      { name: "Skye Terrier stock", note: "The long-coated Isle of Skye earth dogs at the root of the whole Highland terrier family. Now endangered.", img: "/history/breeds/Isle-of-Skye-earth-dogs.jpg", value: 40 }
+      { name: "Old Scottish working Terriers", note: "The long-coated island and Highland earth dogs at the root of the whole Scottish terrier family. Now extinct.", img: "/history/breeds/Isle-of-Skye-earth-dogs.jpg", value: 100 }
     ]
   },
 
@@ -777,8 +776,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Scottish Terrier",
     note: "The 'diehard' of the Highlands, drawn from the old Scottish terrier stock into a sturdy, short-legged earth dog.",
     children: [
-      { name: "Old Highland Terriers", note: "The shared Highland working-terrier stock, once all just called Scottish terriers. Now extinct.", img: "/history/breeds/Old-Highland-terriers.jpg", value: 60 },
-      { name: "Skye Terrier stock", note: "The long-coated island terriers from the same rootstock. Now endangered.", img: "/history/breeds/Isle-of-Skye-earth-dogs.jpg", value: 40 }
+      { name: "Old Scottish working Terriers", note: "The shared Scottish working-terrier stock, once all just called Scottish terriers. Now extinct.", img: "/history/breeds/Isle-of-Skye-earth-dogs.jpg", value: 100 }
     ]
   },
 
@@ -787,7 +785,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "A long-bodied terrier of the Anglo-Scottish border with a soft topknot, named after a character in a Walter Scott novel.",
     children: [
       { name: "Old Border Terriers", note: "The rough working terriers of the border country, kept by families like the Allans of Holystone. Now extinct.", img: "/history/breeds/Old-Border-terriers.jpg", value: 65 },
-      { name: "Skye Terrier stock", note: "Long, low Scottish terriers, one suggested source of its weasel shape. Now endangered.", img: "/history/breeds/Isle-of-Skye-earth-dogs.jpg", value: 20 },
+      { name: "Old Scottish working Terriers", note: "Long, low Scottish terriers, one suggested source of its weasel shape. Now extinct.", img: "/history/breeds/Isle-of-Skye-earth-dogs.jpg", value: 20 },
       { name: "Otterhound", note: "A little hound blood is thought to have added size and the soft coat.", img: "/history/breeds/otterhound-photo.jpg", value: 15 }
     ]
   },
@@ -827,8 +825,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Black and Tan Terrier",
     note: "The Old English Terrier, the extinct rough working terrier that nearly every British terrier descends from.",
     children: [
-      { name: "Old British ratting Terriers", note: "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.", img: "/history/breeds/Old-British-ratting-terriers.jpg", value: 60 },
-      { name: "Earth and hunt terriers", note: "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.", img: "/history/breeds/Earth-and-hunt-terrier.jpg", value: 40 }
+      { name: "Old English working Terriers", note: "The English farm and stable ratting dogs and the go-to-ground terriers that bolted fox and badger. Now extinct.", img: "/history/breeds/Old-British-ratting-terriers.jpg", value: 100 }
     ]
   },
 
@@ -858,13 +855,7 @@ const LINEAGE: Record<string, LineageNode> = {
   // which is a Family 6 writing job, so those lines wait for Family 6. The
   // single-parent value of 100 is deliberate and honest, matching the shipped
   // Soft-Coated Wheaten Terrier, not the valueless-branch shape.
-  "Skye Terrier stock": {
-    name: "Skye Terrier stock",
-    note: "The long-coated Isle of Skye earth dogs at the root of the whole Highland terrier family. Now extinct.",
-    children: [
-      { name: "Earth Dog", note: "The old medieval earth-working dog type the Highland earth dogs go back to. Now extinct.", img: "/history/breeds/medieval-earth-dog.jpg", value: 100 }
-    ]
-  },
+
   "Low-slung soldiers' dogs": {
     name: "Low-slung soldiers' dogs",
     note: "Short-legged dogs left by Flemish and Hessian soldiers settled in the glen. Now extinct.",
@@ -1026,8 +1017,12 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Cairn Terrier",
     note: "A small, shaggy Highland terrier named for the rock cairns it bolted vermin from, the closest of all to the original Scottish working terrier.",
     children: [
-      { name: "Skye Terrier stock", note: "The island working terriers it was once grouped with as a 'short-haired Skye'. Now endangered.", img: "/history/breeds/Isle-of-Skye-earth-dogs.jpg", value: 55 },
-      { name: "Skye Terrier stock", note: "The mainland Highland branch of the same Skye earth-dog stock, shared with the Scottie and Westie. Now extinct.", img: "/history/breeds/Isle-of-Skye-earth-dogs.jpg", value: 45 }
+      /* THE ONE PAIR THAT IS NOT A COPY. Two real contributions that share a
+         name: the island stock and the mainland Highland branch, and their notes
+         say so. Renamed with the rest on 19 September 2026 and deliberately NOT
+         merged. See the ruling above and subtreeSig in data/lineageShape.ts. */
+      { name: "Old Scottish working Terriers", note: "The island working terriers it was once grouped with as a 'short-haired Skye'. Now extinct.", img: "/history/breeds/Isle-of-Skye-earth-dogs.jpg", value: 55 },
+      { name: "Old Scottish working Terriers", note: "The mainland Highland branch of the same Skye earth-dog stock, shared with the Scottie and Westie. Now extinct.", img: "/history/breeds/Isle-of-Skye-earth-dogs.jpg", value: 45 }
     ]
   },
 
@@ -1066,8 +1061,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Paisley Terrier",
     note: "A silky, blue show terrier from around Paisley and Clydeside, the glamorous strain of the Skye that helped create the Yorkshire.",
     children: [
-      { name: "Skye Terrier stock", note: "The long-coated Scottish terriers it was bred for beauty from. Now endangered.", img: "/history/breeds/Isle-of-Skye-earth-dogs.jpg", value: 65 },
-      { name: "Old Highland Terriers", note: "The working Scottish terriers behind the silky Clydeside strains. Now extinct.", img: "/history/breeds/Old-Highland-terriers.jpg", value: 35 }
+      { name: "Old Scottish working Terriers", note: "The long-coated Scottish working terriers behind the silky Clydeside strains. Now extinct.", img: "/history/breeds/Isle-of-Skye-earth-dogs.jpg", value: 100 }
     ]
   },
 
@@ -1196,7 +1190,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "The small terriers Cambridge undergraduates kept as college ratters in the 1870s, bought from a livery stable on Trumpington Street. The founding sire of the Norwich came out of them. Now extinct.",
     img: "/history/breeds/trumpington-terrier.jpg",
     children: [
-      { name: "Old British ratting Terriers", note: "The general farm and stable ratting stock the livery-yard terriers were drawn from. Now extinct.", img: "/history/breeds/Old-British-ratting-terriers.jpg", value: 100 }
+      { name: "Old English working Terriers", note: "The general farm and stable ratting stock the livery-yard terriers were drawn from. Now extinct.", img: "/history/breeds/Old-British-ratting-terriers.jpg", value: 100 }
     ]
   },
 
@@ -1898,62 +1892,69 @@ const LINEAGE: Record<string, LineageNode> = {
   // each stock per the split rule, Celtic Heeler pattern. The owner accepted
   // the surfacing scope deliberately: these stocks are shared, so the
   // foundation appears in twelve trees (docs/lineage/BRIEF.md section 5).
-  "Old Highland Terriers": {
-    name: "Old Highland Terriers",
-    note: "The old working-terrier stock of the Highlands that every Scottish terrier springs from. Now extinct.",
-    // 19 August 2026: display device. The single documented ancestor (Earth Dog)
-    // is drawn twice, as two identical children at 50 each (same note and img),
-    // so the level shows two circles rather than one filling the ring. The
-    // children differ in name from the parent, so isEcho, the pit words and the
-    // badge paths do not touch them. This must NOT be read as two separate
-    // ancestors.
-    children: [
-      { name: "Earth Dog", note: "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.", img: "/history/breeds/medieval-earth-dog.jpg", value: 50 },
-      { name: "Earth Dog", note: "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.", img: "/history/breeds/medieval-earth-dog.jpg", value: 50 }
-    ],
-  },
-  "Old British ratting Terriers": {
-    name: "Old British ratting Terriers",
-    note: "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.",
-    // 19 August 2026: display device. The single documented ancestor (Earth Dog)
-    // is drawn twice, as two identical children (same note and img), so the level
-    // shows two circles rather than one filling the ring. The children differ in
-    // name from the parent, so isEcho, the pit words and the badge paths do not
-    // touch them. This must NOT be read as two separate ancestors.
-    /* 65/35, NOT 50/50, 16 September 2026 (owner: 19 and 20 have the same lineage
-       and the same figures and need to be unique).
+  /* ONE SCOTTISH STOCK AND ONE ENGLISH STOCK, 19 September 2026 (owner).
 
-       FOUR LEVELS used the same Earth Dog 50/50 signature: 16 Old Highland
-       terriers, this one, 20 Earth and hunt terriers and 29 Low-slung soldiers'
-       dogs. They look identical because they genuinely have one parent each and
-       all four use this same device. Level 20 keeps 50/50 and this one takes
-       65/35, which is what the owner asked for and which separates the two he
-       named.
+     FOUR RECORDS BECOME TWO. "Old Highland Terriers" and "Skye Terrier stock"
+     were two names for one pool: before 1873 every terrier in Scotland was
+     called a Scottish Terrier, and the same dogs were also written up as
+     Highland Terriers, Skye Otter Terriers and Todhunters. "Old British ratting
+     Terriers" and "Earth and hunt terriers" were the English farm, stable and
+     go-to-ground stock under two names.
 
-       SAID PLAINLY, BECAUSE IT WAS RAISED AND OVERRULED: this does not make the
-       ANCESTRY unique. It is still Earth Dog twice, now drawn at two sizes rather
-       than two equal ones. What it does do is stop levels 19 and 20 reading as
-       the same screen. Levels 16 and 29 still carry 50/50 and so still match
-       level 20. */
+     THEY ARE NOT MERGED INTO ONE, and that was the owner's revision to his own
+     earlier ruling of a single "Old British working terriers". The ratting line
+     took bull blood and became the Black and Tan and Manchester line; the earth
+     line did not. More plainly, one is Scotland and one is England, and the data
+     already agreed: not one parent in this file mixed the two groups. The
+     Scottish pair fed only Skye, Scottish, Paisley, Cairn and Dandie Dinmont;
+     the English pair fed only Black and Tan Terrier and Trumpington Terrier.
+
+     THE OLD NAMES RESOLVE HERE through LINEAGE_ALIASES, the same route
+     "Old English Black and Tan Terrier" has taken since 18 September. The three
+     history cards keep their own names, their own write-ups and their own
+     levels: 17, 20 and 21 still play and the running order does not move.
+
+     THE 19 AUGUST DISPLAY DEVICE GOES WITH THEM. Earth Dog was drawn twice under
+     each of these so a level showed two circles rather than one filling its
+     parent's ring. SOLO_CHILD_K now draws a lone child at half its parent's
+     radius, so the reason for the device is gone and what is left is a single
+     ancestor drawn as two, which reads as two contributions and is not true.
+     The same removal applies to the four parents below that listed two of these
+     four names and nothing else.
+
+     THE ONE PAIR THAT STAYS TWO is Cairn Terrier's. Its two entries carry
+     DIFFERENT notes, the island stock and the mainland Highland branch, so they
+     are two real contributions that share a name rather than a copy. This is the
+     pair subtreeSig is kept in data/lineageShape.ts to tell apart. Renamed, not
+     merged.
+
+     KNOWN CONSEQUENCES, recorded rather than discovered later:
+       Levels 20 and 21 now open the same tree. That undoes the 16 September
+       65/35 ruling, which existed only to stop those two reading alike.
+       The single-ancestor audit goes from 29 to 31. Those parents always had one
+       ancestor; two names were hiding it. The audit now tells the truth.
+       Skye Terrier stock was tagged endangered and Old Highland Terriers
+       extinct. One dog takes one status, and it is extinct.
+       The merged names take the MAJORITY picture, the rule used for the five
+       one-picture-per-dog merges of 16 September: Isle-of-Skye-earth-dogs.jpg
+       (6 uses against 3) and Old-British-ratting-terriers.jpg (5 against 2). */
+  "Old Scottish working Terriers": {
+    name: "Old Scottish working Terriers",
+    note: "The old working-terrier stock of the Highlands and the Western Isles that every Scottish terrier springs from. Now extinct.",
     children: [
-      { name: "Earth Dog", note: "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.", img: "/history/breeds/medieval-earth-dog.jpg", value: 65 },
-      { name: "Earth Dog", note: "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.", img: "/history/breeds/medieval-earth-dog.jpg", value: 35 }
-    ],
+      { name: "Earth Dog", note: "The old medieval earth-working dog type the Highland earth dogs go back to. Now extinct.", img: "/history/breeds/medieval-earth-dog.jpg", value: 100 }
+    ]
   },
-  "Earth and hunt terriers": {
-    name: "Earth and hunt terriers",
-    note: "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.",
-    // 19 August 2026: display device. The single documented ancestor (Earth Dog)
-    // is drawn twice, as two identical children at 50 each (same note and img),
-    // so the level shows two circles rather than one filling the ring. The
-    // children differ in name from the parent, so isEcho, the pit words and the
-    // badge paths do not touch them. This must NOT be read as two separate
-    // ancestors.
+
+  "Old English working Terriers": {
+    name: "Old English working Terriers",
+    note: "The farm, stable and go-to-ground terriers of England, kept for vermin and for bolting fox and badger long before breeds were named. Now extinct.",
     children: [
-      { name: "Earth Dog", note: "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.", img: "/history/breeds/medieval-earth-dog.jpg", value: 50 },
-      { name: "Earth Dog", note: "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.", img: "/history/breeds/medieval-earth-dog.jpg", value: 50 }
-    ],
+      { name: "Earth Dog", note: "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.", img: "/history/breeds/medieval-earth-dog.jpg", value: 100 }
+    ]
   },
+
+
   // Playable like the two ancient additions above (owner instruction,
   // 4 August), same Celtic Heeler shape and section 7 rules. This record is
   // grafted inside the Talbot and Rache "Old scenting Hounds" branches,
@@ -3176,6 +3177,14 @@ const LINEAGE_ALIASES: Record<string, string> = {
      is gone and the name resolves here, so anything still written that way, in the
      data, on a history card or in an old link, reaches the one record. */
   "Old English Black and Tan Terrier": "Black and Tan Terrier",
+  /* THE FOUR TERRIER NAMES, 19 September 2026. Two Scottish and two English
+     records became one each; see the ruling beside "Old Scottish working Terriers".
+     The three history cards still carry the old names and reach the merged
+     record through here, so levels 17, 20 and 21 are untouched. */
+  "Old Highland Terriers": "Old Scottish working Terriers",
+  "Skye Terrier stock": "Old Scottish working Terriers",
+  "Old British ratting Terriers": "Old English working Terriers",
+  "Earth and hunt terriers": "Old English working Terriers",
   // SUPERSEDED 14 August 2026. The two Talbot spellings ("Talbot hounds",
   // "Talbot hound") used to appear as child nodes across many trees and were
   // aliased here so their branches grafted onto the Talbot's own ancestry.
@@ -3231,7 +3240,9 @@ const LINEAGE_ALIASES: Record<string, string> = {
   "Wire Fox Terrier": "Fox Terrier",
   "Deerhound": "Scottish Deerhound",
   "Norwich terrier stock": "Norwich Terrier",
-  "Highland mainland terriers": "Skye Terrier stock",
+  // Retargeted 19 September 2026: aliasName resolves ONE level, so this had to
+  // move with "Skye Terrier stock" or it would have reached a deleted record.
+  "Highland mainland terriers": "Old Scottish working Terriers",
   "Continental water dogs": "Old European water dogs",
   "Farm and kitchen curs": "Cur",
   "White English Terrier": "Old English White Terrier",
