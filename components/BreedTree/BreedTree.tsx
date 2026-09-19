@@ -1870,6 +1870,26 @@ const CHIP_FILL = "#ffed00";
    from the call sites. */
 const PILL_HITS = 1;
 const ROD_HITS = 2;
+/* HOW LONG A CONNECTOR MAY BE WHEN IT FALLS, 19 September 2026 (owner: the
+   connectors are way too big, sometimes the size of the bone, and they should
+   never be bigger than 10px).
+
+   WHY THEY CAME OUT HUGE. A rod's length was the REAL DISTANCE between the two
+   nodes it joined, Math.hypot(x2 - x1, y2 - y1) straight off the tree geometry,
+   with only a 10px floor and no ceiling at all. In a wide or deep tree two nodes
+   can sit hundreds of pixels apart, so the connector that dropped was hundreds of
+   pixels long. It scaled with the diagram rather than with the thing it connects.
+
+   WHAT IT IS MEASURED AGAINST NOW. The owner's reasoning: a node is about 25px
+   across, so the bar that joins two of them has no business being larger than the
+   nodes themselves. This is that ceiling.
+
+   NOTE IT MEETS THE EXISTING FLOOR. The floor below is also 10, so with this cap
+   every rod now lands at exactly 10px long against its 8px thickness, which is a
+   small nub rather than a bar. That is what the stated figure gives. If the intent
+   was "about the size of a node" rather than "10px", this is the one number to
+   raise and 25 would do it. */
+const ROD_MAX_PX = 10;
 // The yellow percentage badge, drawn and collided at this radius. Doubled from
 // 46: they were easy to lose against the circles, on the start screen and in
 // the pit alike.
@@ -1878,7 +1898,8 @@ const ROD_HITS = 2;
 // was raised from 1 in 35 for better chain reactions.
 // 2 September 2026 (owner): 20 -> 16, a wildcard in every sixteen. Both roll
 // sites read this one constant, the scatter and the pop, so they cannot drift.
-const BOMB_ODDS = 16;
+// 19 September 2026 (owner): 16 -> 10, a wildcard in every ten.
+const BOMB_ODDS = 10;
 // The fuse is 2.5 seconds, half the main pit's five. Five is not a magic number
 // there, it is a divisor in four places, and all four are halved together here
 // or the sparks peak after the blast, or fizz at full doing nothing:
@@ -8104,7 +8125,9 @@ export default function BreedTree({
         toyTimers.push(window.setTimeout(spawnChums, chumsAt));
       };
       spawnRodRef.current = (x1: number, y1: number, x2: number, y2: number, lit: boolean) => {
-        const lenPx = Math.max(10, Math.hypot(x2 - x1, y2 - y1));
+        // Floor then ceiling, in that order: see ROD_MAX_PX for why the tree's own
+        // distance is no longer allowed through unbounded.
+        const lenPx = Math.min(ROD_MAX_PX, Math.max(10, Math.hypot(x2 - x1, y2 - y1)));
         const ang = Math.atan2(y2 - y1, x2 - x1);
         const w = worldFromPx((x1 + x2) / 2, (y1 + y2) / 2);
         const pr = { x: w.x, y: w.y, vx: 0, vy: 0, a: ang, idx: rodBodiesRef.current.length, hits: 0, maxHits: ROD_HITS, mb: null as any };
