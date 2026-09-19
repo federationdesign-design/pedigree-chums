@@ -2624,27 +2624,29 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Pug",
     note: "A comical, flat-faced toy from ancient China, bred as a companion for emperors before Dutch traders carried it to Europe.",
     children: [
-      /* THE LO-SZE IS THE PUG'S NAMED ANCESTOR (owner, 19 September 2026). Three
-         flat-faced types were bred in China, the Lion dog, the Pekingese and the
-         Lo-sze, and the Lo-sze was the ancient Pug: at the Song imperial court, and
-         carried to Europe in the sixteenth century by the Dutch East India Company.
+      /* THE LO-SZE WAS ADDED AND THEN REMOVED ON THE SAME DAY, 19 September 2026
+         (owner). It sat here as a named generation between the Pug and Ancient
+         Chinese toy dogs: the ancient flat-faced Pug of the Song imperial court,
+         carried to Europe in the sixteenth century by the Dutch East India
+         Company. The history is sound and the note was accurate.
 
-         BETWEEN, NOT INSTEAD OF. It goes above the Pug and below Ancient Chinese toy
-         dogs, which is the broader stock it came out of. Replacing that node would
-         lose a generation; replacing the Lo-sze with it would lose the name. The 60
-         it inherits is unchanged, so no share moves. */
-      { name: "Lo-sze", note: "The ancient flat-faced Pug of the Song imperial court, carried to Europe by Dutch traders in the sixteenth century. Now extinct.", img: "/history/breeds/Ancient-Chinese-toy-dogs.jpg", value: 60 },
+         WHY IT WENT. It is a name almost nobody meets, it had no artwork of its
+         own and borrowed its parent's picture, and its own record carried exactly
+         one child at 100%, which an audit of all 171 records flagged as one of
+         only four single-parent chains in the archive. The owner's call was that
+         a generation the reader cannot place is not worth the depth.
+
+         NOTHING ELSE HAD TO MOVE. The name appeared in this file and nowhere
+         else: no LINEAGE_ALIASES entry, no breedInfo record, nothing in
+         lineageShape.ts. The 60 below is the share the Lo-sze was carrying, so
+         Ancient Chinese toy dogs simply takes back the slot it held before this
+         morning and no percentage changes anywhere.
+
+         IF IT IS EVER RESTORED, it goes BETWEEN the two, not instead of either:
+         replacing Ancient Chinese toy dogs would lose the broader stock, and
+         replacing the Lo-sze with it is exactly what this edit does. */
+      { name: "Ancient Chinese toy dogs", note: "The old Chinese flat-faced lapdogs kept in the imperial court alongside the Pekingese and lion dogs. Now extinct.", img: "/history/breeds/Ancient-Chinese-toy-dogs.jpg", value: 60 },
       { name: "Eastern Lion dogs", note: "The wider family of small eastern companion dogs it shares its roots with. Now extinct.", img: "/history/breeds/Tibetan-temple-dogs.jpg", value: 40 }
-    ]
-  },
-  /* See the note on the Pug for why the Lo-sze sits where it does. Its own parent is
-     the broader Chinese court stock it was bred out of, and the echo is load-bearing:
-     data/lineageShape.ts. Value 0, so no share moves. */
-  "Lo-sze": {
-    name: "Lo-sze",
-    note: "The ancient flat-faced Pug of the Song imperial court, carried to Europe by Dutch traders in the sixteenth century. Now extinct.",
-    children: [
-      { name: "Ancient Chinese toy dogs", note: "The old Chinese flat-faced lapdogs kept in the imperial court alongside the Pekingese and lion dogs. Now extinct.", img: "/history/breeds/Ancient-Chinese-toy-dogs.jpg", value: 100 }
     ]
   },
 
