@@ -10782,7 +10782,31 @@ export default function BreedTree({
     };
     const DOG: ChainKind = {
       key: "dog circle",
-      colour: DOG_CHAIN_COLOUR,
+      /* THE PATH TAKES THE CHAINED BREED'S RARITY COLOUR (owner, 19 September
+         2026), replacing the flat DOG_CHAIN_COLOUR lemon.
+
+         A GETTER, NOT A VALUE, because the answer is not known when this object
+         is built: the breed is decided at the first join. Every reader already
+         goes through K.colour or ch.kind.colour, so they all pick it up with no
+         other change. There are five of them: the join spark, the swept spark,
+         the per-frame paint, the flare and the collapse.
+
+         READ ORDER IS SAFE, checked rather than assumed. The flare and the
+         collapse both capture the colour at their START, and dogChainBreedRef is
+         not cleared until ch.kind.over() runs after that, so neither can fall
+         back to the lemon part way through its own animation.
+
+         THE LEMON IS THE FALLBACK and nothing else now: it is what the path draws
+         before the first circle joins, and if a breed ever fails to resolve a
+         tier.
+
+         THE CHUM CARDS ARE UNTOUCHED. Their kind keeps a plain static colour. */
+      get colour() {
+        const bn = dogChainBreedRef.current;
+        if (!bn) return DOG_CHAIN_COLOUR;
+        const band = RARITY_BAND[rarityTier(treesContaining(bn))];
+        return band ? band.bg : DOG_CHAIN_COLOUR;
+      },
       circuit: false, // an open run, never a loop and never a lasso
       minCards: DOG_CHAIN_MIN,
       owns: (t) => !!circlesRef.current?.contains(t),
