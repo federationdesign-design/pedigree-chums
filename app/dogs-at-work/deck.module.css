@@ -636,6 +636,21 @@
     font-size: 0.9rem;
   }
 
+  /* The air above every blue panel subheading, halved (Steve, 19 September 2026,
+     from the annotated screenshot).
+
+     IT WAS NOT THE PANEL PADDING. That had already come down to a quarter of its
+     base, 28.64px to 7.16px, and the gap the arrow marked was still 82px. Measured:
+     75px of it is this heading's own margin-top, recorded at the base rule as
+     "Item 3: 75px above every panel subheading". The panel padding was 7px of the 82.
+
+     The base 75px stays for desktop, where it is deliberately matched to the panel-1
+     thumbnail drop so the heading's top edge lines up with it. That alignment does
+     not exist in the mobile stack, which has no thumbnails. */
+  .blueSubheading {
+    margin-top: 37.5px;
+  }
+
   /* 1.5 Pill text white on the three families that read navy.
 
      A DELIBERATE WCAG AA FAILURE, ACCEPTED BY STEVE ON 19 SEPTEMBER 2026 FOR THE
