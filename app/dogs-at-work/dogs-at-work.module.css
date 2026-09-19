@@ -453,45 +453,57 @@
     transform: translateY(88px);
   }
 
-  /* THE ARTICLE PAGES: below the payslip, above the body (Steve, 19 September 2026).
+  /* THE ARTICLE PAGES: the toggle sits IN THE FLOW between the payslip and the body
+     (Steve, 19 September 2026).
 
-     IT WAS NEVER MISSING ON MOBILE. It rendered, it was visible, and the payslip was
-     drawn on top of it. Measured at 390: the toggle sits at y 536 to 576 and the
-     payslip card spans y 381 to 803 at z-index 2, so the control was completely
-     covered. A hit test at the toggle's centre returned the payslip div; the same
-     test on desktop returns the button, which is why it shows there.
+     IT WAS NEVER MISSING ON MOBILE. It rendered and was visible, and the payslip was
+     drawn on top of it: the toggle sat at y 536 and the payslip card spans 381 to 803
+     at z-index 2. A hit test at the toggle's centre returned the payslip div, while
+     the same test on desktop returns the button.
 
-     WHY IT MOVES RATHER THAN RISING ABOVE THE CARD. The card spans x 14 to 376, so
-     raising its z-index would have put the icon on the pale yellow payslip and it
-     would read as part of it. This keeps the desktop relationship instead: the
-     toggle sits immediately above the body text it controls, on the gradient.
+     TWO EARLIER ATTEMPTS FAILED AND BOTH ARE WORTH RECORDING. Translating the toggle
+     down a fixed distance cannot work, because the payslip is a different height on
+     every article: card bottoms run 803, 803, 815, 815, 869 and 866 at 390 wide, a
+     66px spread. Any single offset clears the tallest card on one page and leaves a
+     77px hole on another, so the space above and below the control came out different
+     on every article. That unevenness is what Steve photographed.
 
-     THE TWO FIGURES ARE TIED AND BOTH ARE MEASURED. A first pass used 274px and 48px
-     and it failed on two of the six, because THE PAYSLIP IS A DIFFERENT HEIGHT ON
-     EVERY ARTICLE. Card bottoms at 390 wide:
+     SO IT GOES IN THE FLOW INSTEAD, which is the only way the two gaps can be equal
+     everywhere: the browser places it after the payslip whatever height that is.
 
-       medicine 803   colleague 803   machine 815   farm 815   finds 869   world 866
-
-     A 66px spread. So the offset has to clear the TALLEST card and the body has to
-     drop far enough to clear the toggle on the SHORTEST one. Body top is always the
-     card bottom plus 63, which is what makes the arithmetic work:
-
-       toggle top  = 880, which is 11px below the tallest card (finds, 869)
-       body top    = card bottom + 63 + 70, so 936 on the shortest (medicine)
-       clearance   = 936 - 920 = 16px below the toggle, on the worst case
-
-     KNOWN AND ACCEPTED: with a fixed offset the toggle sits 11px below the card on
-     finds and 77px below it on medicine. That gap cannot be made even without
-     rendering the control inside .articleMobile, which means rendering it twice,
-     once per layout. Steve chose to move the text down instead.
-
-     Change either number and re-measure both ends: the icon either collides with the
-     first paragraph or floats back under the card. */
-  .articleMobile .essayBody {
-    padding-top: 118px;
-  }
+     THE COST IS THAT THE CONTROL IS RENDERED TWICE, once per layout, because
+     .essayLayout and .articleMobile are each display:none at the other breakpoint and
+     neither can share a child. Only one is ever in the tree. Both read the same
+     sessionStorage key on mount and set the same attribute on <main>, so they cannot
+     disagree about state, and display:none keeps the hidden one out of the
+     accessibility tree rather than leaving a duplicate button in it. */
   .toggleSlotArticle {
-    transform: translateY(344px);
+    display: none;
+  }
+
+  /* The component carries its own margin, 36px auto 12px, which is its spacing on the
+     essay axis and is wrong here. Zeroed so the slot owns both gaps and they come out
+     equal. The 24px meets the payslip wrapper's own 24px bottom margin and the two
+     collapse to 24, so the gap above and the gap below are the same number. */
+  .toggleSlotMobile > div {
+    /* > div, not > *, on purpose. The component's .wrap is a single class, so a
+       universal child selector ties on specificity and loses on stylesheet order.
+       Its 36px top margin then collapsed straight out through this slot and became
+       the gap above the icon: measured 36px above against 24px below, which is the
+       unevenness this whole rule exists to remove. */
+    margin: 0;
+  }
+  .toggleSlotMobile {
+    margin: 24px 0;
+  }
+}
+
+/* The mobile-only half of the article toggle pair. Hidden above the breakpoint so
+   only the .toggleSlotArticle instance renders there. See the note in the 900px
+   block for why there are two. */
+@media (min-width: 901px) {
+  .toggleSlotMobile {
+    display: none;
   }
 }
 

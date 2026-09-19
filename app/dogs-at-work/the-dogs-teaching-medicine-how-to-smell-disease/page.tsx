@@ -250,6 +250,11 @@ export default function BioDetectionPage() {
           <div className={styles.mobilePayslip}>
             <Payslip data={PAYSLIPS["the-dogs-teaching-medicine-how-to-smell-disease"]} />
           </div>
+          {/* The colour toggle, IN THE FLOW between the payslip and the body.
+              Mobile only; the desktop one is above. See .toggleSlotMobile. */}
+          <div className={styles.toggleSlotMobile}>
+            <ArticleTextToggle />
+          </div>
           <MobileArticleBody
             body={BODY}
             cards={CARDS}

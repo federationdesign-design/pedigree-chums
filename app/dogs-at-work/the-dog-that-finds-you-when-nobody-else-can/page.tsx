@@ -274,6 +274,11 @@ export default function SearchRescuePage() {
           <div className={styles.mobilePayslip}>
             <Payslip data={PAYSLIPS["the-dog-that-finds-you-when-nobody-else-can"]} />
           </div>
+          {/* The colour toggle, IN THE FLOW between the payslip and the body.
+              Mobile only; the desktop one is above. See .toggleSlotMobile. */}
+          <div className={styles.toggleSlotMobile}>
+            <ArticleTextToggle />
+          </div>
           <MobileArticleBody
             body={BODY}
             cards={CARDS}

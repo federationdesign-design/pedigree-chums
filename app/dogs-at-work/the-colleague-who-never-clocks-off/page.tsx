@@ -236,6 +236,11 @@ export default function AlertDogPage() {
           <div className={styles.mobilePayslip}>
             <Payslip data={PAYSLIPS["the-colleague-who-never-clocks-off"]} />
           </div>
+          {/* The colour toggle, IN THE FLOW between the payslip and the body.
+              Mobile only; the desktop one is above. See .toggleSlotMobile. */}
+          <div className={styles.toggleSlotMobile}>
+            <ArticleTextToggle />
+          </div>
           <MobileArticleBody
             body={BODY}
             cards={CARDS}
