@@ -448,8 +448,50 @@
    component gives it, and an empty base rule risks a minifier dropping the class
    name so styles.toggleSlot comes back undefined. */
 @media (max-width: 900px) {
+  /* THE INDEX PAGE: 88px down, to sit just above the title. */
   .toggleSlot {
     transform: translateY(88px);
+  }
+
+  /* THE ARTICLE PAGES: below the payslip, above the body (Steve, 19 September 2026).
+
+     IT WAS NEVER MISSING ON MOBILE. It rendered, it was visible, and the payslip was
+     drawn on top of it. Measured at 390: the toggle sits at y 536 to 576 and the
+     payslip card spans y 381 to 803 at z-index 2, so the control was completely
+     covered. A hit test at the toggle's centre returned the payslip div; the same
+     test on desktop returns the button, which is why it shows there.
+
+     WHY IT MOVES RATHER THAN RISING ABOVE THE CARD. The card spans x 14 to 376, so
+     raising its z-index would have put the icon on the pale yellow payslip and it
+     would read as part of it. This keeps the desktop relationship instead: the
+     toggle sits immediately above the body text it controls, on the gradient.
+
+     THE TWO FIGURES ARE TIED AND BOTH ARE MEASURED. A first pass used 274px and 48px
+     and it failed on two of the six, because THE PAYSLIP IS A DIFFERENT HEIGHT ON
+     EVERY ARTICLE. Card bottoms at 390 wide:
+
+       medicine 803   colleague 803   machine 815   farm 815   finds 869   world 866
+
+     A 66px spread. So the offset has to clear the TALLEST card and the body has to
+     drop far enough to clear the toggle on the SHORTEST one. Body top is always the
+     card bottom plus 63, which is what makes the arithmetic work:
+
+       toggle top  = 880, which is 11px below the tallest card (finds, 869)
+       body top    = card bottom + 63 + 70, so 936 on the shortest (medicine)
+       clearance   = 936 - 920 = 16px below the toggle, on the worst case
+
+     KNOWN AND ACCEPTED: with a fixed offset the toggle sits 11px below the card on
+     finds and 77px below it on medicine. That gap cannot be made even without
+     rendering the control inside .articleMobile, which means rendering it twice,
+     once per layout. Steve chose to move the text down instead.
+
+     Change either number and re-measure both ends: the icon either collides with the
+     first paragraph or floats back under the card. */
+  .articleMobile .essayBody {
+    padding-top: 118px;
+  }
+  .toggleSlotArticle {
+    transform: translateY(344px);
   }
 }
 

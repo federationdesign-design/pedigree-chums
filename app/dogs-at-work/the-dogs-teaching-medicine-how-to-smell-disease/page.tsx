@@ -216,7 +216,11 @@ export default function BioDetectionPage() {
           </div>
         </div>
 
-        <ArticleTextToggle />
+        {/* Wrapped so the article pages can place the toggle on mobile without
+            touching the shared component. See .toggleSlot in dogs-at-work.module.css. */}
+        <div className={styles.toggleSlotArticle}>
+          <ArticleTextToggle />
+        </div>
 
         <div className={styles.essayLayout}>
           <article className={styles.essay}>
