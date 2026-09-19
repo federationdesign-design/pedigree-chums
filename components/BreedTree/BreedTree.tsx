@@ -907,7 +907,9 @@ const DOG_CHAIN_MAGNET = 0.6;
         hard one, and it kills.
      2. THE POOL: the same breed, in the pit, not already removed. A chain can
         never hold more circles than the breed has duplicates.
-     3. A circle already in the chain, re-entered, kills it.
+     3. A circle already in the chain, re-entered. It REFUSES for a dog chain as
+        of 19 September 2026 and does not kill: see ChainKind.reentryKills. It
+        still kills for the chum cards.
      4. The finger must actually pass over each circle: the sweep samples every
         CHAIN_SAMPLE_PX and joins what is under the sample, so the route is
         still drawn, not chosen.
@@ -10318,8 +10320,9 @@ export default function BreedTree({
          where it stands, which is the cards. False and the thing under the
          finger is simply not joined: the chain carries on, unharmed, and the
          finger can keep going. Only joinBlock is softened by this. The shared
-         rules are not: re-entering a circle already in the chain and crossing
-         the path both still kill, for every kind. */
+         rules are not. Both of those are now per-kind flags of their own:
+         reentryKills and crossKills, each false for the circles and true for the
+         cards. */
       blockKills: boolean;
       /* DOES A LINK CROSSING THE PATH KILL THIS KIND (owner, 18 September 2026).
 
@@ -10338,6 +10341,32 @@ export default function BreedTree({
          returns early for a kind that does not close, and the circles are an open
          run. Gating it would be dead code pretending to be a rule. */
       crossKills: boolean;
+      /* DOES PASSING BACK OVER A CIRCLE ALREADY IN THE CHAIN KILL IT (owner,
+         19 September 2026, after he worked out on the device that this was the
+         fault: "its when I cross over an already connected dog circle").
+
+         THE THIRD FIELD OF EXACTLY THIS SHAPE, after blockKills and crossKills,
+         and it is here for the same reason both of those are: a rule that is
+         right for a lasso round a handful of cards is wrong for an open run
+         across a pit packed with 60 circles.
+
+         THE CHUM CARDS KEEP IT. Their circuit is the point: a loop that doubles
+         back through itself is not a loop the player drew round anything, so
+         re-entry there is a real shape error and still kills.
+
+         THE CIRCLES DO NOT. crossKills was already false for them, so a dog chain
+         is allowed to cross its own path, and a crossing path passes back over
+         circles it has already taken as a matter of course. The magnet makes that
+         likelier still, since it pulls circles in from beyond the finger. So the
+         two rules contradicted each other: one said cross freely, the other
+         killed you for what crossing does.
+
+         NOTHING STRUCTURAL DEPENDS ON THE KILL, checked rather than assumed. The
+         `cards.includes(i)` test that precedes it already stops a circle being
+         joined twice, so refusing leaves the chain exactly as correct as killing
+         did; and judge() never asks about re-entry, so a released chain is scored
+         the same either way. The kill was punishment, not safety. */
+      reentryKills: boolean;
       /* HAS THIS CHAIN TAKEN EVERY LIVE CIRCLE OF ITS BREED? Undefined for a
          kind that has no such idea, which is the chum cards: their circuit is
          untouched by every part of this. A kind that answers true is COMPLETED
@@ -10372,6 +10401,7 @@ export default function BreedTree({
       joinBlock: () => null, // touching and no crossing is the whole rule
       blockKills: true, // the cards are unchanged: a wrong card kills the chain
       crossKills: true, // and so does a link across the path: the loop is the point
+      reentryKills: true, // doubling back through the loop is a real shape error here
       settle: (ch) => {
         const cards = [...ch.cards];
         chainClearRef.current?.(cards);
@@ -10502,10 +10532,12 @@ export default function BreedTree({
 
          IT NAMES ONLY WHAT WOULD ACTUALLY JOIN, and that is the part to keep:
 
-           A circle ALREADY IN THE CHAIN is skipped. Re-entering one kills the
-           chain, and a kill must stay something the player DID: an exact hit
-           still kills, as it always has, but a near miss they never made must
-           never take the round off them.
+           A circle ALREADY IN THE CHAIN is skipped, and it stays skipped even
+           though re-entry no longer kills a dog chain (19 September 2026,
+           reentryKills). The reason has changed rather than gone: the magnet must
+           not name a circle that cannot be joined, or the pull would spend itself
+           on a circle already taken instead of finding the next free twin beyond
+           it.
 
            A circle of the WRONG BREED is skipped. It would only refuse, so the
            outcome would be the same, but it would have STOLEN the sample from a
@@ -10592,12 +10624,15 @@ export default function BreedTree({
          circle that has left, busy() and a null geo() both refuse, and judge()
          catches a vanished card at release, where the chain is settled anyway.
 
-         WHAT STILL KILLS a dog chain, unchanged: re-entering a circle already in
-         it, and a link that crosses the path. Both are shared rules, neither is
-         this kind's own, and neither is touched here. The chum cards are not
-         touched at all. */
+         WHAT KILLS A DOG CHAIN, as of 19 September 2026: the join clock, and
+         nothing else in this list. Crossing the path stopped killing on
+         18 September (crossKills) and re-entering a circle already held stopped
+         killing on the 19th (reentryKills), once the owner established on the
+         device that the two contradicted each other: a crossing path passes back
+         over its own circles by design. The chum cards keep both rules. */
       blockKills: false,
       crossKills: false, // an open run over a packed pit may cross itself freely
+      reentryKills: false, // and crossing means passing back over your own circles
       /* THE FIRST CIRCLE OPENS, and only that one. The others stay where they
          are until it is completed, which is what closes them: see dogChainRef
          and the block in the layer's onRemove. The chain is remembered by NODE,
@@ -10732,9 +10767,17 @@ export default function BreedTree({
         { const q = K.at(i); if (q) chainJoinScoreRef.current?.(q.x, q.y, K.colour, cards.length); }
         return;
       }
-      // A card already in the chain, and not the first: the chain dies. It used
-      // to refuse and carry on.
-      if (cards.includes(i)) { killChain(ch, `RE-ENTERED #${i}, already at position ${cards.indexOf(i)}`); return; } // already in the chain
+      /* A CARD ALREADY IN THE CHAIN, AND NOT THE FIRST. Whether that kills is now
+         the kind's business: see ChainKind.reentryKills. It killed for every kind
+         until 19 September 2026, and before that it refused and carried on for
+         every kind, so this line has been round the houses. The flag is what stops
+         the next round: cards kill, circles refuse, and neither has to know about
+         the other. */
+      if (cards.includes(i)) {
+        if (K.reentryKills) killChain(ch, `RE-ENTERED #${i}, already at position ${cards.indexOf(i)}`);
+        else refuse(`re-entered #${i}, already at position ${cards.indexOf(i)}`);
+        return;
+      }
       if (K.busy(i)) { refuse(`busy or gone #${i}`); return; } // being collected: not a wrong card, just not available
       if (last === undefined) {
         cards.push(i);
