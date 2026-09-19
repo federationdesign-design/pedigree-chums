@@ -1410,7 +1410,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "Once called the Wavy-Coated Retriever, the smart, glossy black gundog that was the gamekeeper's favourite before the Labrador rose.",
     children: [
       { name: "St John's Water Dog", note: "The Newfoundland fishing dog behind all the retrievers. Now extinct.", img: "/history/breeds/St-Johns-Water-Dog.jpg", value: 50 },
-      { name: "Setter", note: "Setter blood for feathering and a good nose. Now in-decline.", img: "/history/breeds/british-setters.jpg", value: 30 },
+      { name: "British Setters", note: "Setter blood for feathering and a good nose. Now in-decline.", img: "/history/breeds/british-setters.jpg", value: 30 },
       { name: "Water Spaniels", note: "Working water spaniels that added drive and a love of wet cover. Now extinct.", img: "/history/breeds/original-water-spaniel.jpg", value: 10 },
       { name: "Shepherd's Dogs", note: "Practical medieval working dog used to move and protect sheep, forming an early root of Britain's collie families. An extinct historical type.", img: "/history/breeds/medieval-shepherds-dog.jpg", value: 10 }
     ]
@@ -1491,13 +1491,6 @@ const LINEAGE: Record<string, LineageNode> = {
      Setters: after expandNode grafts, this node is valueless with a single child,
      and LineageMap collapses any such node into that child. Value 0 so leafSum is
      unchanged and no share moves. */
-  "Setter": {
-    name: "Setter",
-    note: "The setting dogs of the shooting field, bred to find birds and hold steady. Now in-decline.",
-    children: [
-      { name: "Land Spaniels", note: "The crouching land spaniels that marked game for the net, the stock every setter was built up from. Now extinct.", img: "/history/breeds/original-land-spaniel.jpg", value: 100 }
-    ]
-  },
 
   /* THE TRACKING HOUNDS GET A RECORD OF THEIR OWN (owner, 19 September 2026).
 
@@ -1649,6 +1642,28 @@ const LINEAGE: Record<string, LineageNode> = {
      meaningful sense, because Land Spaniels carries Rache and Talbot beneath it,
      so the full list resolves to three contributors and the medieval era. Giving
      the two setter records different parents would have been the odd choice. */
+  /* "Setter" IS MERGED INTO THIS RECORD, 19 September 2026 (owner).
+
+     THEY WERE THE SAME DOG WRITTEN TWICE. Both carried Land Spaniels at 100 with
+     the same child note word for word, and both described the setting dogs of the
+     shooting field. British Setters was authored earlier the same day, so the
+     duplication is hours old rather than historic.
+
+     THIS NAME SURVIVES because "Setter" is a type noun rather than a dog, which
+     is the fault already recorded against it, and the same fault that closed
+     "British Pointers" this morning. The two child nodes that said Setter, in the
+     Flat-Coated Retriever and the Pointer, now say British Setters and graft
+     here.
+
+     OLD BLACK-AND-TAN SETTERS IS DELIBERATELY NOT MERGED, and this is the part
+     not to undo. It looks like a third copy because it also carries Land Spaniels
+     at 100, but it is a real black-and-tan strain worked in Britain before the
+     Duke of Gordon's kennels took the type, and it is the Gordon Setter's largest
+     parent at 65. Merging it would delete the one fact it exists to carry.
+
+     TWO IMAGE FILES FOR ONE DOG, NOT RESOLVED HERE. This record wears
+     setters.jpg and every child node wears british-setters.jpg. Both are in the
+     repo and both are this dog; worth a look, out of scope for a merge. */
   "British Setters": {
     name: "British Setters",
     note: "The British setting dogs of the shooting field, bred to find birds and drop steady in front of them. Now in-decline.",
@@ -2650,7 +2665,7 @@ const LINEAGE: Record<string, LineageNode> = {
       { name: "English Foxhound", note: "Stamina, drive and a steady temperament.", img: "/history/breeds/english-foxhound.jpg", value: 30 },
       { name: "Greyhound", note: "Speed and a racy, galloping build.", img: "/history/breeds/original-greyhound.jpg", value: 25 },
       { name: "Bloodhound", note: "A deeper nose for finding game.", img: "/history/breeds/modern-bloodhound.jpg", value: 25 },
-      { name: "Setter", note: "Setting-dog blood for style and steadiness. Now in-decline.", img: "/history/breeds/british-setters.jpg", value: 20 }
+      { name: "British Setters", note: "Setting-dog blood for style and steadiness. Now in-decline.", img: "/history/breeds/british-setters.jpg", value: 20 }
     ]
   },
 
@@ -3185,6 +3200,7 @@ const LINEAGE_ALIASES: Record<string, string> = {
      the node itself has been renamed to Pointer in the data, so nothing reaches
      this today, but an older spelling returning still grafts rather than becoming
      a fresh dead end. */
+  "Setter": "British Setters",
   "British Pointers": "Pointer",
   "Wavy-Coated Retriever": "Flat-Coated Retriever",
   "Old setting spaniels": "Land Spaniels",
