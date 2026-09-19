@@ -1151,16 +1151,30 @@
      working behind the originals is on .zoomOutBtn. */
   width: 31.25px;
   height: 31.25px;
-  border-radius: 8.875px;
   border: none;
-  /* INVERTED, 19 September 2026 (owner): a yellow button with a blue arrow,
-     where it was a navy button with a yellow one. All three values swap
-     together, rim included, or the square ends up yellow on yellow.
-     Its history: the rim was navy on navy until 9 Sept 2026, then yellow on
-     navy, and is now navy on yellow. */
-  outline: 2.5px solid var(--navy, #0a3a57);
-  background: var(--yellow, #ffd23e);
-  color: var(--navy, #0a3a57);
+  /* THE CONTAINER IS GONE, 19 September 2026 (owner): a bare white arrow with a
+     soft shadow, no square behind it.
+
+     Its whole history in one place, because this rule has now been four things:
+     navy square with a navy rim, then navy square with a yellow rim (9 Sept),
+     then yellow square with a navy rim and a navy arrow (19 Sept, morning), and
+     now no square at all.
+
+     THE BOX IS KEPT AT 31.25px EVEN THOUGH NOTHING IS DRAWN IN IT. It is the tap
+     target, and it is already at the small end for a thumb; shrinking it to the
+     glyph would make these four controls genuinely hard to hit on a phone. The
+     background, the rim and the radius all go, so the box is invisible and only
+     the arrow shows.
+
+     THE SHADOW IS A drop-shadow FILTER, not a box-shadow. box-shadow follows the
+     element's BOX, which is now an invisible square, so it would draw a soft
+     square floating behind the arrow. drop-shadow follows the rendered alpha, so
+     it follows the triangle itself. It goes on the button rather than the svg so
+     the arrow and its shadow scale together. */
+  outline: none;
+  background: none;
+  color: #ffffff;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.45));
   display: grid;
   place-items: center;
   padding: 0;
@@ -1168,8 +1182,12 @@
   pointer-events: auto;
 }
 .navBtn svg {
-  width: 60%;
-  height: 60%;
+  /* Was 60% of the square, which was right while there was a square to sit
+     inside. With the container gone, 60% would make the visible control a third
+     smaller than it has ever been, so the glyph takes the whole box and the
+     drawn arrow ends up about the size the yellow square used to be. */
+  width: 100%;
+  height: 100%;
   display: block;
 }
 /* THE PRESS USES `translate`, NOT `transform`. Each arrow is centred on its edge
@@ -1188,11 +1206,23 @@
   opacity: 0.35;
   cursor: default;
 }
+/* BOTH OF THESE SAID `transform: none` UNTIL 19 SEPTEMBER 2026 AND WERE A LIVE
+   BUG from the moment the arrows moved to the screen edges earlier the same day.
+
+   WHY. Each arrow is centred on its edge with a transform (.navLeft and friends),
+   and both of these selectors are MORE SPECIFIC than those single-class rules, so
+   `transform: none` did not cancel the press, it cancelled the CENTRING and flung
+   the arrow to the corner of its own invisible box. Under reduced motion that
+   fired on every press of every arrow, not just a disabled one.
+
+   The press itself moved to the standalone `translate` property for exactly this
+   reason. These two had to move with it and were missed. Same lesson as the rail
+   cards and `rotate`, for the third time in this file. */
 .navBtn:disabled:active {
-  transform: none;
+  translate: none;
 }
 @media (prefers-reduced-motion: reduce) {
-  .navBtn:active { transform: none; }
+  .navBtn:active { translate: none; }
 }
 
 /* The way back out of a zoom.
