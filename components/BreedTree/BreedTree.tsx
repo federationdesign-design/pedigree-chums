@@ -4297,6 +4297,26 @@ export default function BreedTree({
   // another of its breed touching it. See the note where it is written.
   const twinGlowGRef = useRef<SVGGElement>(null);
   const dogChainRef = useRef<{ opened: Node; others: Node[] } | null>(null);
+  /* IS THIS CIRCLE HELD BY A CHAIN, LIVE OR WAITING (owner, 19 September 2026:
+     the rarity fill should persist once the chain's circle has been lifted).
+
+     TWO REFS, ONE ANSWER, and that is the whole point of hoisting it. While the
+     finger is down the chain lives in dogChainNodesRef. The moment it completes,
+     DOG.settle lifts the last circle onto the learn layer and hands the rest to
+     dogChainRef.others, and ch.kind.over() clears dogChainNodesRef immediately
+     after. So there was a handover during which the waiting circles were in
+     neither set the paint loop asked about, and they fell straight back to
+     fillFor's depth blue while still plainly part of an unfinished chain.
+
+     THE WAITING SET IS ALREADY CORRECTLY SCOPED, which is why this is safe:
+     dogChainRef is cleared when the lifted circle is completed, when the player
+     backs out of the lift, and on a fresh flood. The fill now lasts exactly as
+     long as the chain's claim on those circles does, and no longer.
+
+     BOTH THE FILL AND THE MARK read this, so the disc and the face can never
+     disagree about whether a circle is in. */
+  const chainHolds = (d: Node) =>
+    dogChainNodesRef.current.has(d) || (dogChainRef.current?.others.includes(d) ?? false);
   /* THE HANDOVER, which replaced dogStarterAtRef.
      Called from the chain's own pointermove, once and only once,
      at the moment the press stops being a drag and becomes a chain. It lives
@@ -5692,7 +5712,7 @@ export default function BreedTree({
         !isWordNode &&
         c?.getAttribute("fill") !== "none" &&
         c?.style.opacity !== "0";
-      const chHeld = paintable && dogChainNodesRef.current.has(d);
+      const chHeld = paintable && chainHolds(d);
       const chTwin = paintable && !chHeld && !!dogChainBreedRef.current && d.data.name === dogChainBreedRef.current;
       /* THE FOURTH STATE, and the only one that is true at rest: a circle whose
          breed has no other copy in the pit. See DOG_SINGLE_FILL. It ranks BELOW
@@ -5852,14 +5872,20 @@ export default function BreedTree({
              orange and the yellow: the mark follows the fill rather than being
              chosen again here, so the two can never disagree. Everything else
              wears its own depth colour. */
-          const held = dogChainNodesRef.current.has(d);
+          const held = chainHolds(d);
           /* ONE BAND FOR BOTH CHAIN STATES, 19 September 2026, with the fill
              swap above. A held circle is filled from RARITY_BAND now, exactly as
              a twin has always been, so its mark has to follow the same entry:
              navy on the purple or the royal blue would be the vanishing act the
              filters exist to prevent. twinBand is kept as its own name because
              the tapped face below still asks specifically about a twin. */
-          const chainBand = want === "1" ? RARITY_BAND[rarityTier(treesContaining(d.data.name))] : null;
+          /* `held ||` added 19 September 2026 with chainHolds. `want` is driven by
+             dogChainBreedRef, which is cleared the moment a chain settles, so a
+             circle still waiting on a lifted one would have kept its band FILL
+             from the line above and lost the band's ink here, leaving a dark
+             depth-filtered face on a purple or royal blue disc. The two have to
+             ask the same question. */
+          const chainBand = (held || want === "1") ? RARITY_BAND[rarityTier(treesContaining(d.data.name))] : null;
           const twinBand = !held ? chainBand : null;
           /* AND THE MARK INVERTS WITH THE DISC TOO. bt-qmark-ink IS navy as a
              colour matrix, which is exactly DOG_SINGLE_INK, so a single circle
