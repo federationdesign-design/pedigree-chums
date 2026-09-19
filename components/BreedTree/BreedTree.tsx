@@ -420,6 +420,26 @@ const TOY_BOWL_GONE_KEY = "pc-minipit-bowl-gone";
    wedged between them: about 34px each side on a 360 phone and 39px on a 414.
    See the clamp in spawnToy for why this exists at all. */
 const BOWL_PIT_FRACTION = 0.8855; // was 0.805, 10% bigger (owner, 2 Sept 2026)
+/* ---- The slipper, ported from the main pit 19 September 2026 (owner) --------
+   PackPit.tsx lines 367 and 375 to 392. Same artwork, same artboard, the same
+   five part compound and the same physics figures, which in the main pit it
+   shares with the bone under HEAVY and which are already this pit's bone
+   figures.
+
+   IT TAKES THE BOWL'S CLAMP, and for the same reason. The main pit is a full
+   width canvas; this one is only as wide as its walls, about 380 to 414px on a
+   phone. BIGT * 6.65 comes out at roughly 374px there, so an unclamped slipper
+   is all but the whole floor. Whichever is smaller wins.
+
+   NO CENTROID OFFSET. The main pit carries ox/oy to nudge the sprite over its
+   compound centre, about 4% of the width. This pit has no offset mechanism for
+   toys and the bone and the bowl manage without one, so the sprite sits on the
+   body's own centre. */
+const TOY_SLIPPER_SRC = "/slipper-edit2.svg";
+const SLIPPER_ASPECT = 2.721;
+const SLIPPER_VB_W = 1108.5;
+const SLIPPER_VB_H = 407.4;
+const TOY_SLIPPER_GONE_KEY = "pc-minipit-slipper-gone";
 /* ---- The breakable logo, stage 1 -------------------------------------------
    The Pedigree Chums mark, ported from the main pit (PackPit.tsx:536 to 560).
    It sits fixed near the top of the pit, the pack and the toys bounce off it,
@@ -755,11 +775,14 @@ const QMARK_TAPPED_SRC = "/dogfacequestion_tapped.svg";
    0.002. Before this it fell past that branch to the generic default and was
    three times as dense and noticeably bouncier. */
 type ToyKind = "ball" | "flag" | "stickBig" | "rock" | "ballPink" | "cookies" | "bone"
-  | "newspaper" | "fork" | "shoe" | "bowl";
+  | "newspaper" | "fork" | "shoe" | "bowl" | "slipper";
 /* The props slot: the three objects that arrive together part way through the
    drop. A theme can replace them, which is how an era gets its own things to
    knock about. */
-export const DEFAULT_PROPS: ToyKind[] = ["stickBig"]; // rock removed 2026-08-12 (no more rocks), small stick removed 2026-09-19. NB: THEMES_ENABLED is false, so this default is the ONLY prop set in play on every level.
+/* TEMPORARY, 19 September 2026: the slipper is here only so it can be seen on
+   the device before the circle-count table lands. The table owns every toy from
+   that point, and the slipper comes back OUT of this default when it does. */
+export const DEFAULT_PROPS: ToyKind[] = ["stickBig", "slipper"]; // rock removed 2026-08-12 (no more rocks), small stick removed 2026-09-19. NB: THEMES_ENABLED is false, so this default is the ONLY prop set in play on every level.
 /* Which side the first prop falls on. Flipped every time a pit arms its props,
    so a reader playing several levels does not watch the same object land in the
    same corner every time. Module scope, so it survives a pit remounting. */
@@ -770,7 +793,7 @@ const TOY_SRC: Record<ToyKind, string> = {
   cookies: TOY_COOKIES_SRC,
   bone: TOY_BONE_SRC,
   newspaper: TOY_NEWSPAPER_SRC, fork: TOY_FORK_SRC, shoe: TOY_SHOE_SRC,
-  bowl: TOY_BOWL_SRC,
+  bowl: TOY_BOWL_SRC, slipper: TOY_SLIPPER_SRC,
 };
 // every prop except the flag leaves for good once it is thrown clear of the pit
 const TOY_GONE_KEY: Record<ToyKind, string> = {
@@ -780,7 +803,7 @@ const TOY_GONE_KEY: Record<ToyKind, string> = {
   cookies: TOY_COOKIES_SEEN_KEY,
   bone: TOY_BONE_GONE_KEY,
   newspaper: TOY_NEWSPAPER_GONE_KEY, fork: TOY_FORK_GONE_KEY, shoe: TOY_SHOE_GONE_KEY,
-  bowl: TOY_BOWL_GONE_KEY,
+  bowl: TOY_BOWL_GONE_KEY, slipper: TOY_SLIPPER_GONE_KEY,
 };
 function toyRetired(key: string): boolean {
   try { return sessionStorage.getItem(key) === "1"; } catch { return false; }
@@ -7658,12 +7681,16 @@ export default function BreedTree({
           // allowed to take. Whichever is smaller wins, so a wide desktop pit
           // still gets the main pit's size and a phone gets one that fits.
           : kind === "bowl" ? Math.min(BIGT * 9.38 * (isNarrow ? 0.85 : 1), wPx * BOWL_PIT_FRACTION)
+          // The main pit's own slipper width, clamped to this pit: see the note
+          // at TOY_SLIPPER_SRC.
+          : kind === "slipper" ? Math.min(BIGT * (isNarrow ? 6.65 : 8.31), wPx * BOWL_PIT_FRACTION)
           : BIGT * 0.6 * 2;
         const hgt = kind === "stickBig" ? dia / STICK_ASPECT : kind === "rock" ? dia / ROCK_ASPECT : kind === "cookies" ? dia / COOKIES_ASPECT : kind === "bone" ? dia / BONE_ASPECT
           : kind === "newspaper" ? dia / TOY_NEWSPAPER_ASPECT
           : kind === "fork" ? dia / TOY_FORK_ASPECT
           : kind === "shoe" ? dia / TOY_SHOE_ASPECT
           : kind === "bowl" ? dia / BOWL_ASPECT
+          : kind === "slipper" ? dia / SLIPPER_ASPECT
           : dia;
         const r = dia / 2;
         // ball drops anywhere across the pit, flag comes in at 70% like the pit
@@ -7715,6 +7742,9 @@ export default function BreedTree({
           // The main pit's own bowl figures, PackPit line 397. frictionAir 0.012
           // rides on the compound body itself, below, exactly as it does there.
           : kind === "bowl" ? { restitution: 0.3, friction: 0.3, density: 0.006 }
+          // PackPit's own _spo plus its frictionAir: the slipper and the bone are
+          // one group there (HEAVY) and these are already this pit's bone figures.
+          : kind === "slipper" ? { restitution: 0.3, friction: 0.3, frictionAir: 0.012, density: 0.0008 }
           : { restitution: 0.5, friction: 0.3, frictionAir: 0.004, density: 0.006 };
         // A long thin body needs a real rectangle or it spins like a propeller.
         // Chamfered, so it reads as a rounded stick and cannot catch on a corner.
@@ -7811,6 +7841,33 @@ export default function BreedTree({
                   ];
                   const body = MBody.create({ parts, ...opts, frictionAir: 0.012 });
                   MBody.setAngle(body, (BOWL_DROP_DEG * Math.PI) / 180);
+                  return body;
+                })()
+            : kind === "slipper"
+              ? (() => {
+                  /* THE COMPOUND SLIPPER, PackPit.tsx:382 to 388 scaled to this
+                     pit's pixels. Five parts against the artwork's own
+                     1108.5 x 407.4 artboard: the sole, the round body, the toe,
+                     the upper leaning back at 18.7 degrees, and the heel.
+
+                     A PLAIN RECTANGLE WOULD BE A BRICK. The slipper is mostly
+                     air above the sole, so a bounding box would hold dogs a
+                     third of its height off the floor. */
+                  const sk = dia / SLIPPER_VB_W;
+                  const scx = SLIPPER_VB_W / 2, scy = SLIPPER_VB_H / 2;
+                  const sR = (vx: number, vy: number, w: number, h: number) =>
+                    Bodies.rectangle(px + (vx - scx) * sk, py + (vy - scy) * sk, w * sk, h * sk, opts);
+                  const sC = (vx: number, vy: number, rad: number) =>
+                    Bodies.circle(px + (vx - scx) * sk, py + (vy - scy) * sk, rad * sk, opts);
+                  const parts = [
+                    sR(554, 363, 1107, 84),   // sole
+                    sC(546, 241, 154),        // body
+                    sC(124, 333, 97),         // toe
+                    Bodies.rectangle(px + (370 - scx) * sk, py + (143 - scy) * sk, 380 * sk, 70 * sk, { ...opts, angle: (-18.7 * Math.PI) / 180 }), // upper
+                    sR(891, 336, 349, 64),    // heel
+                  ];
+                  const body = MBody.create({ parts, ...opts, frictionAir: 0.012 });
+                  MBody.setAngle(body, (Math.random() - 0.5) * 0.4);
                   return body;
                 })()
             : kind === "rock"

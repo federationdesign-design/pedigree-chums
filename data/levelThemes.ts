@@ -194,7 +194,10 @@ export const MOBILE_PROPS_LEVELS = 92;
 const MOBILE_PROPS_TAIL_FROM = 30;
 const MOBILE_PROPS_TAIL: string[] = ["stickBig"];
 const MOBILE_PROPS: Record<number, string[]> = {
-  1: ["stickBig", "bowl"],           // Celtic Hound
+  // TEMPORARY, 19 Sept 2026: the slipper rides on level 1 only, so it can be
+  // checked on a phone before the circle-count table lands. It comes back out
+  // with the rest of this table.
+  1: ["stickBig", "bowl", "slipper"], // Celtic Hound
   // 2 Ancient Mastiff: no entry, keeps the default stick
   3: ["stickBig"],                   // Celtic Coursing Hound
   4: ["stickBig"],                   // Celtic Scent Hound
