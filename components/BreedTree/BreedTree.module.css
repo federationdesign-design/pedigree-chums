@@ -123,11 +123,16 @@
 .cNote {
   margin: 7px 0 0;
   line-height: 1.6;
-  /* 12px, 16 September 2026 (owner: raise both boxes to 12). The write-up and the
-     figures under it now share one size, and the family tree layer's info box is set
-     to the same 12 in LineageMap.tsx. A fixed px rather than a rem: the two files
-     have to agree on a number, and a rem would mean agreeing on a root size too. */
-  font-size: 12px;
+  /* 12 -> 11px, 19 September 2026 (owner). The write-up and the figures under it share
+     one size, and the family tree layer's two info boxes are set to the same 11 in
+     LineageMap.tsx. A fixed px rather than a rem: the three places have to agree on a
+     number, and a rem would mean agreeing on a root size too.
+
+     THOSE TWO BOXES DO NOT WRITE 11 LITERALLY. They sit inside an overlay carrying
+     transform: scale(0.8), so they write the landing size and divide by it; see
+     LIFT_OVERLAY_SCALE there. Matching them to this line means matching what LANDS,
+     not what is declared. */
+  font-size: 11px;
   font-weight: 600;
   font-family: var(--font-body, "Montserrat", system-ui);
   color: #ffffff;
@@ -325,7 +330,20 @@
   /* Narrowed to a left column (was 53.6%): the box lives in the room the
      shift = 0.66 offset already reserves on the left, clear of the circles that
      sit centre-right. The write-up reflows; no type changes size. */
-  width: 40%;
+  /* 40% -> 44%, 19 September 2026 (owner: 10% wider). DESKTOP ONLY, and that is not a
+     choice: on a phone .asideSheet below sets its own width, and its max-width cap
+     (100vw - 76px) is what is actually binding there, so raising anything on the phone
+     branch is a no-op until that cap moves. Measured at 390: the width sum already
+     computes 327px and the cap holds it at 314.
+
+     KNOWN AND ACCEPTED. The box's right edge moves from 570 to 621 on a 1280 stage.
+     The chum rail hangs off that edge at left: calc(100% - 2px) and moves with it, and
+     at 1280 it still ends around 763 with room to spare. Measured on production, the
+     box and the circles ALREADY overlap horizontally at 40%: box 58 to 478, circles
+     373 to 907. This pushes that overlap from 105px to 143px. The box sits above the
+     circles (z-index 15 against the stage's 1), so it covers more of them; it does not
+     collide with the screen edge. Put 40% back to undo. */
+  width: 44%;
   max-width: none;
   z-index: 15;
   gap: 12px;
@@ -370,7 +388,7 @@
 }
 .asideDocked .cNote {
   margin-top: 4px;
-  font-size: 12px;  /* see the note on .cNote */
+  font-size: 11px;  /* see the note on .cNote */
   line-height: 1.45;
 }
 .asideDocked .cName {
@@ -879,7 +897,10 @@
      than as a smaller footnote. The weight drops to 500 with it: 600 was carrying
      the emphasis that now belongs to the figures alone. */
   font-weight: 500;
-  font-size: 12px;  /* see the note on .cNote */
+  /* 12 -> 11px with .cNote, 19 September 2026. Its own note above requires this to BE
+     the write-up's size, so the two move together or the breakdown stops reading as the
+     same paragraph style. Put both back to 12 to undo. */
+  font-size: 11px;  /* see the note on .cNote */
   line-height: 1.3em;
   opacity: 0.95;
 }
