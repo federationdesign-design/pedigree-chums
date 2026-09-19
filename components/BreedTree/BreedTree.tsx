@@ -4128,6 +4128,28 @@ export default function BreedTree({
     return () => { try { if (t) window.clearInterval(t); if (d) d.remove(); } catch {} };
   }, []);
   const spinDiagRef = useRef<string[]>([]);
+  /* DIAGNOSTIC, ?fulldiag=1, 19 September 2026. REMOVE ONCE ANSWERED.
+     The question: the pit-full countdown starts on a pit that is not full, and
+     then starts again and again. Two readings of the source have not settled
+     which body is tripping it, so this measures instead of guessing a third
+     time.
+
+     WHAT IT PRINTS, straight out of computeFull on every poll:
+       the zone line, the pit width and the threshold
+       one line per body IN ZONE: what it is, its x, its radius, its top edge
+       a tally of what was rejected and why: held, still moving, below the zone
+       the merged coverage, as a figure and as a share of the pit width
+       the verdict, and the guards that could still be holding it off
+     Plus a HIT block, frozen at the moment the countdown last started, because
+     the live lines have moved on by the time you look.
+
+     WHAT TO LOOK FOR. If IN ZONE names a body that is not really up there, the
+     list it came from is stale. If it names one real body and the verdict is
+     FULL, the missing two-body floor is the fault (see PIT_FULL_COVER, whose
+     own comment claims a floor the code does not have). */
+  const fullDiagRef = useRef<string[]>([]);
+  const fullDiagGuardRef = useRef<string[]>([]);
+  const fullDiagHitRef = useRef<string[]>([]);
   /* THE LAST CHAIN DEATH, written by the chain effect and read by the sim effect's
      sampler. A ref rather than a local because the two live in DIFFERENT effects:
      spinLastBlast can be a local inside the sim effect because detonate is in there
@@ -4177,6 +4199,30 @@ export default function BreedTree({
   useEffect(() => {
     try { spinOnRef.current = new URLSearchParams(window.location.search).get("spindiag") === "1"; }
     catch { spinOnRef.current = false; }
+  }, []);
+  useEffect(() => {
+    let d: HTMLDivElement | null = null;
+    let t = 0;
+    try {
+      if (new URLSearchParams(window.location.search).get("fulldiag") !== "1") return;
+      d = document.createElement("div");
+      d.style.cssText =
+        "position:fixed;left:0;right:0;bottom:0;z-index:99999;background:#000;color:#0f0;" +
+        "font:10px/1.35 monospace;padding:6px 8px;pointer-events:none;white-space:pre-wrap";
+      d.textContent = "full diag: start a round";
+      document.body.appendChild(d);
+      const el = d;
+      const tick = () => {
+        const guard = fullDiagGuardRef.current;
+        const live = fullDiagRef.current;
+        const hit = fullDiagHitRef.current;
+        const out = guard.concat(live, hit.length ? [""].concat(hit) : []);
+        el.textContent = out.length ? out.join("\n") : "full diag: waiting for the first poll";
+      };
+      t = window.setInterval(tick, 300);
+      tick();
+    } catch { /* diagnostic only */ }
+    return () => { if (t) window.clearInterval(t); if (d && d.parentNode) d.parentNode.removeChild(d); };
   }, []);
   useEffect(() => {
     let d: HTMLDivElement | null = null;
@@ -9304,6 +9350,10 @@ export default function BreedTree({
          between 12 and 25, the bonds are innocent and it is the contact solver.
 
          WITH THE FLAG OFF NOTHING ABOUT THE PIT CHANGES. */
+      // ?fulldiag=1, read once here because computeFull lives in this effect.
+      const fullDiagOn = (() => {
+        try { return new URLSearchParams(window.location.search).get("fulldiag") === "1"; } catch { return false; }
+      })();
       const noBondsOn = (() => {
         try { return new URLSearchParams(window.location.search).get("nobonds") === "1"; } catch { return false; }
       })();
@@ -9526,12 +9576,23 @@ export default function BreedTree({
         // counted twice, and compare against the width between the pit walls.
         const spans: [number, number][] = [];
         // (the `inZone` counter went with the `>= 5` rule below)
-        const occupy = (x: number, y: number, r: number, vx: number, vy: number, held?: boolean) => {
-          if (held) return;
-          if (Math.hypot(vx, vy) > worldH * 0.03) return;
-          if (y - r < zoneY) { spans.push([x - r, x + r]); }
+        // ?fulldiag=1 only: what each body did, so a phantom occupier names itself.
+        const dLines: string[] = [];
+        let dHeld = 0, dMoving = 0, dBelow = 0;
+        const occupy = (x: number, y: number, r: number, vx: number, vy: number, held?: boolean, label?: string) => {
+          if (held) { dHeld++; return; }
+          if (Math.hypot(vx, vy) > worldH * 0.03) { dMoving++; return; }
+          if (y - r < zoneY) {
+            spans.push([x - r, x + r]);
+            if (fullDiagOn) dLines.push(`  IN ZONE ${label ?? "?"} x${x.toFixed(0)} r${r.toFixed(0)} top${(y - r).toFixed(0)} w${((2 * r) / ((xR - xL) || 1) * 100).toFixed(0)}%`);
+          } else dBelow++;
         };
-        for (const b of all) occupy(b.x, b.y, b.r, b.vx, b.vy, b.held);
+        for (const b of all) {
+          const label = b.n
+            ? String(b.n.data.name).slice(0, 22)
+            : b.bomb ? "bomb" : b.rDraw ? "chip" : "body";
+          occupy(b.x, b.y, b.r, b.vx, b.vy, b.held, label);
+        }
         // The CHUM CARDS count too: `all` is only the level's own dogs and chips,
         // and the chums live in their own list, so without this a pit stuffed with
         // chum cards never reached the threshold. Their body is a square of side
@@ -9539,7 +9600,7 @@ export default function BreedTree({
         // drawn size the same way everything else here is.
         for (const c of chumBodiesRef.current) {
           const cr = ((c.mb?.bounds?.max?.x ?? 0) - (c.mb?.bounds?.min?.x ?? 0)) / 2 / pxPerWorld;
-          if (cr > 0) occupy(c.x, c.y, cr, c.vx, c.vy, c.held);
+          if (cr > 0) occupy(c.x, c.y, cr, c.vx, c.vy, c.held, "chum");
         }
         let covered = 0;
         if (spans.length) {
@@ -9556,6 +9617,14 @@ export default function BreedTree({
         // past the visible stage
         const pitW = (xR - xL) || 1;
         const blocked = spans.length > 0 && covered / pitW >= PIT_FULL_COVER;
+        if (fullDiagOn) {
+          fullDiagRef.current = [
+            `FULL? ${blocked ? "YES" : "no"}   bodies in zone ${spans.length}   cover ${(covered / pitW * 100).toFixed(1)}% of pit   needs ${(PIT_FULL_COVER * 100).toFixed(1)}%`,
+            `zone line y ${zoneY.toFixed(0)} (${PIT_FULL_ZONE_PX}px from stage top)   pit ${xL.toFixed(0)} to ${xR.toFixed(0)}   list all=${all.length} chums=${chumBodiesRef.current.length}`,
+            `rejected: held ${dHeld}  moving ${dMoving}  below zone ${dBelow}`,
+            ...dLines.slice(0, 12),
+          ];
+        }
         /* `|| inZone >= 5` DELETED, 9 Sept 2026 (owner). It was the OLD rule,
            a count borrowed from the main pit, and the comment at the top of this
            function says occupancy replaced it. It was never removed, so it sat
@@ -9573,11 +9642,17 @@ export default function BreedTree({
            learn layer into a countdown that started while they were in it, which
            they never saw begin. Guarded inside checkFull rather than at the poll,
            so the loop's own call is covered by the same line. */
+        if (fullDiagOn) {
+          fullDiagGuardRef.current = [
+            `guards: lift ${liftPausedRef.current ? "PAUSED" : "ok"}  settle ${Math.max(0, 4000 - (now - fullClock)).toFixed(0)}ms  grace ${Math.max(0, cdGraceRef.current - now).toFixed(0)}ms  counting ${fullTriggeredRef.current ? "YES" : "no"}`,
+          ];
+        }
         if (liftPausedRef.current) return;
         if (now - fullClock < 4000 || now <= cdGraceRef.current) return;
         const full = computeFull();
         if (full && !fullTriggeredRef.current) {
           fullTriggeredRef.current = true;
+          if (fullDiagOn) fullDiagHitRef.current = [`HIT at ${(now / 1000).toFixed(1)}s, frozen:`, ...fullDiagGuardRef.current, ...fullDiagRef.current];
           runCountdown();
         } else if (!full && fullTriggeredRef.current && !anyChumOnFloor()) {
           // ROOM AGAIN and no chum left on the floor, so the countdown is called
