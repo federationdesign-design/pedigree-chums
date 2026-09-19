@@ -1062,7 +1062,26 @@ const LINEAGE: Record<string, LineageNode> = {
     children: [
       { name: "Irish Terrier", note: "Small red Irish terriers in the early Trumpington stock.", img: "/history/breeds/irish-terrier-photo.jpg", value: 40 },
       { name: "Yorkshire Terrier", note: "A bigger silky terrier said to be in the early mix.", img: "/history/breeds/yorkshire-terrier-photo.jpg", value: 30 },
-      { name: "Local red ratting Terriers", note: "The small working terriers of Norfolk farms and gypsy ratters. Now extinct.", img: "/history/breeds/Local-red-ratting-terriers.jpg", value: 30 }
+      /* NO DOCUMENTED ANCESTRY ABOVE THIS, 19 September 2026 (owner). Recorded here
+         so nobody reopens it: this dog is a leaf on purpose, not a gap waiting to be
+         filled. It was on the research queue and has been researched.
+
+         WHAT THE RECORD ACTUALLY IS. A regional working landrace, not a breed: the
+         small red ratters kept on Norfolk farms and by Romani families, chosen for
+         how fast they killed and never written down. There is no studbook, no
+         recorded mating and no named progenitor to attach. Its red carried into the
+         Norwich and the Norfolk, which is what it is here to say.
+
+         WHAT WAS RULED OUT. The tempting move is Old British ratting Terriers, which
+         is the archive's deep terrier root and would graft in one line. It was not
+         taken. That node is the broad national ratting stock and this one is a LOCAL
+         East Anglian population named for its own county; hanging one off the other
+         would invent a descent the sources do not make, and it would say nothing the
+         Norwich's own ancestry does not already say through its other parents.
+
+         ONE LINE REACHES THREE TREES. This is the only place the name is authored;
+         Lucas Terrier and Norfolk Terrier reach it by grafting the Norwich. */
+      { name: "Local red ratting Terriers", note: "The small red working terriers of Norfolk farms and the Romani ratters. No documented ancestry sits above them. Now extinct.", img: "/history/breeds/Local-red-ratting-terriers.jpg", value: 30 }
     ]
   },
 
