@@ -2127,6 +2127,42 @@ const LINEAGE: Record<string, LineageNode> = {
     ]
   },
 
+  /* THE ROUGH NORTHERN SIGHTHOUNDS REACH THE CELTIC COURSING HOUND, 19 September
+     2026 (owner, researched). A dead end until now: the name appeared as a leaf in
+     two trees, the Scottish Deerhound and the Longdog, with no record of its own.
+
+     WHAT THE RESEARCH SAYS. The Deerhound descends from ancient Celtic hounds and
+     from the coarse-haired hunting hounds of the early Scots and Picts, the shaggy
+     type being formed in the north. The Field calls the rough-coated hounds of
+     Celtic myth the ancestors of the modern greyhound and deerhound. So this is an
+     attach to stock the archive already holds, not a gap needing a new dog.
+
+     WHY THE COURSING HOUND AND NOT THE CELTIC HOUND. Both are roots and either
+     would be defensible on the sources, which name "Celtic hounds" without
+     distinguishing the two. The Coursing Hound wins on two counts. Its own note
+     calls it "an early root of later British and Irish sighthounds", which is
+     exactly what a northern British shaggy courser should come from. And the
+     Celtic Hound is ALREADY the 60% sibling of this node inside the Scottish
+     Deerhound, so putting it here as well would make that level Celtic Hound down
+     both branches and say nothing it does not already say. The Celtic Hound is
+     still reached, one step further back, through the Coursing Hound's own 20%.
+
+     NO LOOP. Neither the Celtic Coursing Hound's tree nor the Celtic Hound's
+     contains this node.
+
+     ONE PARENT, ON PURPOSE. The single-child wrapper collapse is gone (19
+     September), so a one-parent record now draws as a nested circle instead of
+     vanishing into its parent. No second parent was researched, so none is
+     invented. */
+  "Rough northern sighthounds": {
+    name: "Rough northern sighthounds",
+    note: "Shaggy-coated coursing dogs built for cold, rough ground, the coarse-haired hunting hounds of the early Scots and Picts. Now extinct.",
+    img: "/history/breeds/rough-northern-sighthounds.jpg",
+    children: [
+      { name: "Celtic Coursing Hound", note: "Swift Celtic sight-hunting dog described by classical writers, the sighthound stock the northern rough-coated type was formed from. Now extinct.", img: "/history/breeds/ancient-celtic-coursing-hound.jpg", value: 100 },
+    ],
+  },
+
   "Celtic Hound": {
     name: "Celtic Hound",
     note: "An ancient running hound of the Celts, the deep root behind the Greyhound, Wolfhound and Deerhound.",
