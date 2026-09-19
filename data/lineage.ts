@@ -1243,14 +1243,38 @@ const LINEAGE: Record<string, LineageNode> = {
     // Water spaniels branch here, so it reads as green. Its dominant 55% St John's
     // water-dog line still dead-ends until Family 5, which traces its principal
     // ancestry. A green Labrador does NOT mean its main line is finished.
-    // 19 August 2026: display device. The single documented ancestor below is
-    // drawn twice, as two identical children at 50 each (same note and img), so
-    // the level shows two circles rather than one filling the ring. The children
-    // differ in name from the parent, so isEcho, the pit words and the badge
-    // paths do not touch them. This must NOT be read as two separate ancestors.
+    /* IT HAS A REAL SECOND PARENT NOW, 19 September 2026 (owner: the water
+       spaniels look wrong, it is the same parent twice).
+
+       WHAT WAS HERE. The 19 August display device: ONE ancestor, the Otterhound,
+       drawn twice at 50 each so the level showed two circles instead of one
+       filling the ring. Two circles, one dog. The owner is right that it reads as
+       a cross and was not one.
+
+       AND THE SINGLE PARENT ITSELF DOES NOT HOLD. The 10 August family note above
+       this record roots the British and Irish water spaniels in the Otterhound as
+       a "functional match" on web feet and otter work, and says it is
+       "deliberately distinct from the land-spaniel Rache". CAIUS 1576 SAYS
+       OTHERWISE, and he is the source this archive already leans on elsewhere:
+       "There be two sortes. The first findeth game on the land. The other findeth
+       game on the water." Both are spaniels. The eighteenth century split ran land
+       spaniels, water spaniels and toy spaniels, one family, and a period
+       description has the water spaniels differing from the common spaniel "only
+       in the roughness of their coats".
+
+       SO THE SPANIEL IS THE MAIN LINE and the Otterhound is what it says it is:
+       the coat, the web feet and the water work, a functional contribution rather
+       than documented descent. That wording is kept on its node, unchanged.
+
+       60/40 (owner). Land Spaniels leads because Caius puts the water spaniel
+       inside the spaniel family rather than beside it.
+
+       OLD IRISH WATER DOGS STILL CARRIES THE DOUBLED OTTERHOUND. It is the same
+       shape and probably the same answer, but the Irish Water Spaniel's ancestry
+       is its own argument and was deliberately left for a separate look. */
     children: [
-      { name: "Otterhound", note: "The web-footed otter-hunting hound, the water-working Tudor root of the water spaniels. A functional match, not documented descent. Now endangered.", img: "/history/breeds/otterhound-photo.jpg", value: 50 },
-      { name: "Otterhound", note: "The web-footed otter-hunting hound, the water-working Tudor root of the water spaniels. A functional match, not documented descent. Now endangered.", img: "/history/breeds/otterhound-photo.jpg", value: 50 }
+      { name: "Land Spaniels", note: "The old English land-spaniel stock the water spaniels sat inside, differing from it mainly in the roughness of the coat. Now extinct.", img: "/history/breeds/original-land-spaniel.jpg", value: 60 },
+      { name: "Otterhound", note: "The web-footed otter-hunting hound, the water-working Tudor root of the water spaniels. A functional match, not documented descent. Now endangered.", img: "/history/breeds/otterhound-photo.jpg", value: 40 }
     ]
   },
   "Old Irish water dogs": {
