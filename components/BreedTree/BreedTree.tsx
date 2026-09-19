@@ -825,6 +825,14 @@ function retireToyForever(key: string) {
 }
 const PERMANENT_TOYS: string[] = ["flag"];
 
+/* WHICH TOYS CAN BE THROWN CLEAR OF THE PIT AND RETIRE FOR IT, 19 September 2026.
+   The flag is not here: it leaves by having its message read, not by being
+   launched. Everything here is watched by throwWatchRef and retired by
+   checkEscapeRef when it passes the top of the stage.
+   "stickBig" is in it and was the omission that started this: see the note at
+   the watch itself. */
+const THROWABLE_TOYS = new Set<ToyKind>(["ball", "ballPink", "stick", "stickBig", "rock"]);
+
 /* GIVE THE TOYS BACK, 2 September 2026 (owner).
 
    THE RULE IS PROGRESS, NOT TIME. A thrown ball is spent for the rest of the
@@ -5714,6 +5722,38 @@ export default function BreedTree({
         c?.style.opacity !== "0";
       const chHeld = paintable && chainHolds(d);
       const chTwin = paintable && !chHeld && !!dogChainBreedRef.current && d.data.name === dogChainBreedRef.current;
+      /* EVERY OTHER BREED RECEDES WHILE A CHAIN IS LIVE (owner, 19 September
+         2026: once the first is selected, darken the circles that cannot be
+         linked so the ones that can are obvious).
+
+         A FILTER ON THE WRAPPER, NOT AN OPACITY ON THE DISC. Opacity would let
+         the pit floor through, and these circles overlap heavily, so a half
+         transparent one reads as a hole rather than as something turned down.
+         brightness() darkens the disc, the ring, the label and the face in one
+         pass and keeps them opaque, which is what "darken by 50%" means.
+
+         IT IS THE WRAPPER SO THE WHOLE CIRCLE GOES TOGETHER. Darkening the disc
+         alone would leave a full-strength ring and a full-strength face on a
+         dark disc, which reads as broken rather than dimmed.
+
+         SCOPED TO A LIVE CHAIN ONLY, via dogChainBreedRef, which is set on the
+         first join and cleared the moment the chain ends however it ends. It is
+         deliberately NOT chainHolds: circles waiting on a lifted one keep their
+         rarity fill, but the gesture is over and there is nothing left to pick
+         out, so the pit comes back to full strength with the lift.
+
+         WRITTEN ONLY WHEN THE ANSWER CHANGES, tracked on the element, the same
+         rule every other write in this loop follows. A still pit costs nothing
+         and a filter is not re-applied per frame. */
+      const chDim = paintable && !chHeld && !chTwin && !!dogChainBreedRef.current;
+      if (wrap) {
+        const dimWant = chDim ? "1" : "0";
+        if (wrap.dataset.chainDim !== dimWant) {
+          wrap.dataset.chainDim = dimWant;
+          wrap.style.transition = `filter ${DOG_FILL_FADE_MS}ms ease`;
+          wrap.style.filter = chDim ? "brightness(0.5)" : "";
+        }
+      }
       /* THE FOURTH STATE, and the only one that is true at rest: a circle whose
          breed has no other copy in the pit. See DOG_SINGLE_FILL. It ranks BELOW
          the two chain states, because while a chain lives what a circle is doing
@@ -7574,7 +7614,25 @@ export default function BreedTree({
       let thrownBall: any = null;
       throwWatchRef.current = (pr: any) => {
         // the flag leaves by having its message read, badges are not in scope
-        if (pr?.toyKind !== "ball" && pr?.toyKind !== "stick" && pr?.toyKind !== "rock" && pr?.toyKind !== "ballPink") return;
+        /* A SET, NOT A CHAIN OF !== TESTS, 19 September 2026 (owner: sticks
+           ejected from the pit come back).
+
+           THE BUG THIS FIXES, and it was one word. The old line read
+           `!== "ball" && !== "stick" && !== "rock" && !== "ballPink"`, and
+           "stickBig" was never in it. DEFAULT_PROPS is ["stick", "stickBig"], so
+           BOTH sticks are in play on every level, and the big one was simply
+           never watched: it could be thrown clear of the stage and nothing ever
+           called retireToy for it, so it respawned on the next level for ever.
+           The small stick worked correctly the whole time, which is why this
+           read as "sometimes" rather than "always".
+
+           A SET IS THE REAL FIX. The chain of comparisons is exactly the shape
+           that silently omits a new toy, and this file has added six of them
+           since it was written. TOY_GONE_KEY already names every toy; this names
+           the ones that can leave by being thrown, which is not the same list
+           (the flag leaves by having its message read). Add a throwable toy here
+           and to nowhere else. */
+        if (!THROWABLE_TOYS.has(pr?.toyKind as ToyKind)) return;
         if (pr.mb && pr.mb.velocity.y < -4) thrownBall = pr; // pit threshold
         else if (thrownBall === pr) thrownBall = null;
       };
