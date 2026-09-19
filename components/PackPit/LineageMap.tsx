@@ -5002,22 +5002,56 @@ className={[
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="22" y2="22"/></svg>
               </button>
             )}
-            {/* status dot top-left */}
+            {/* ALL FOUR CORNER MARKERS SIT INSIDE THE CARD, 19 September 2026 (owner).
+
+               WHAT WAS WRONG. Three of the four hung outside their card: the status dot
+               at left/top -4, the info button at right/top -14, the percentage pill at
+               right -2. Only the magnify was already inside, at left 4 bottom 4.
+
+               THE OVERLAP. Card N's info button is 28px wide at right -14, so it is
+               centred exactly on the card's top-right corner and needs 14px of gutter.
+               Card N+1's dot claims 4px to the left of its own edge. That is 18px of
+               demand against a gutter of 6 to 10 (F_GUT_MIN and F_GUT_WANT), so the two
+               collided on every card pair in every row.
+
+               WHY NOT A WIDER GUTTER, which was the other option. The gutter is not a
+               setting, it is leftover space: gut = max(6, min(F_GUT_WANT, floor((avail -
+               cols * floorW) / (cols - 1)))). Raising F_GUT_WANT to 18 costs 6 to 7px of
+               card width at every size, about 10% at 390, and STILL fails below 390: at
+               380 the card is already on its 60px floor and the gutter clamps to 16, at
+               360 to 11. It would have left the fault on the narrowest phones.
+
+               AND IT FIXES THE WHITE CROSS FOR FREE. Each card carries transform:
+               rotate(cardDeg), and a transform creates a stacking context, so the info
+               button's zIndex 65 only ranked it inside its own card. The overhang sat in
+               the neighbour's box, and the neighbour, being later in the DOM, painted its
+               rim over it: that is the cross through the "i". Nothing overhangs now, so no
+               neighbour's box contains these markers and nothing can paint over them. The
+               card's own background and border paint before its positioned children, so
+               its own frame cannot cross them either.
+
+               THE INSET IS 4, matching the magnify exactly. Checked against the card's
+               15px corner radius: a 28px disc at inset 4 sits fully inside the arc.
+
+               NON-CIRCULAR ONLY. The circular branch places these off RIM_IN on the
+               lifted layer and is untouched. */}
+            {/* status dot top-left, inside */}
             {isTopOfStack(c) && !PACK_BREEDS.has(c.name) && !INSTR_NAMES.has(breed.name) && (() => {
               const ts = TAG_STYLE[c.status ?? "extinct"];
               return (
-                <div title={ts.label} style={{ position: "absolute", left: circular ? RIM_IN - 6 : -4, top: circular ? RIM_IN - 6 : -4, width: 12, height: 12, borderRadius: "50%", background: ts.bg, border: "1.5px solid #fff", pointerEvents: "none" }} />
+                <div title={ts.label} style={{ position: "absolute", left: circular ? RIM_IN - 6 : 4, top: circular ? RIM_IN - 6 : 4, width: 12, height: 12, borderRadius: "50%", background: ts.bg, border: "1.5px solid #fff", pointerEvents: "none" }} />
               );
             })()}
-            {/* info icon top-right */}
+            {/* info icon top-right, inside: see the corner-marker note above */}
             {isTopOfStack(c) && !INSTR_NAMES.has(breed.name) && (breedInfo[c.name] || c.note) && (
               <button
-                style={{ position: "absolute", right: circular ? RIM_IN - 14 : -14, top: circular ? RIM_IN - 14 : -14, width: 28, height: 28, border: "2px solid #fff", borderRadius: "50%", background: "var(--blue-deep, #0c5b92)", color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", padding: 0, fontStyle: "italic", fontWeight: 700, fontSize: 14, fontFamily: "Georgia, serif", zIndex: 65 }}
+                style={{ position: "absolute", right: circular ? RIM_IN - 14 : 4, top: circular ? RIM_IN - 14 : 4, width: 28, height: 28, border: "2px solid #fff", borderRadius: "50%", background: "var(--blue-deep, #0c5b92)", color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", padding: 0, fontStyle: "italic", fontWeight: 700, fontSize: 14, fontFamily: "Georgia, serif", zIndex: 65 }}
                 onClick={(e) => { e.stopPropagation(); if (infoHover === c.id) { setInfoHover(null); } else { closeAll(); setInfoHover(c.id); } }}
                 onPointerDown={(e) => e.stopPropagation()}
               >i</button>
             )}
-            {/* % pill bottom-right */}
+            {/* % pill bottom-right, inside. bottom stays 2 rather than the magnify's 4: only
+                the horizontal edge was asked for, and the pill is shorter than the buttons. */}
             {isTopOfStack(c) && !INSTR_NAMES.has(breed.name) && (() => {
               const pillMix = breedMix.get(c.img)?.norm ?? c.mix;
               const pillTxt = pillMix < 1 ? "<1%*" : `${Math.round(pillMix)}%${c.share !== pillMix ? "*" : ""}`;
@@ -5025,7 +5059,7 @@ className={[
                 <div
                   onClick={(e) => { e.stopPropagation(); if (pctHover === c.id) { setPctHover(null); } else { closeAll(); setPctHover(c.id); } }}
                   onPointerDown={(e) => e.stopPropagation()}
-                  style={{ position: "absolute", ...(circular ? { left: "50%", transform: "translateX(-50%)", bottom: -12 } : { right: -2, bottom: 2 }), background: "var(--navy, #0a3a57)", color: "#ffd23e", borderRadius: 12, padding: "2px 8px", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "Montserrat, system-ui", zIndex: 64, boxShadow: "0 1px 4px rgba(0,0,0,0.35)" }}
+                  style={{ position: "absolute", ...(circular ? { left: "50%", transform: "translateX(-50%)", bottom: -12 } : { right: 4, bottom: 2 }), background: "var(--navy, #0a3a57)", color: "#ffd23e", borderRadius: 12, padding: "2px 8px", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "Montserrat, system-ui", zIndex: 64, boxShadow: "0 1px 4px rgba(0,0,0,0.35)" }}
                 >
                   {pillTxt}
                 </div>
