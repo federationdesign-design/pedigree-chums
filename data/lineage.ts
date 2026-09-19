@@ -1936,7 +1936,22 @@ const LINEAGE: Record<string, LineageNode> = {
       // Added 18 August 2026. The Anglo-Saxon layer is supported by Crabtree's
       // East Anglia zooarchaeology; the Norse layer by the Heath Wood strontium
       // study.
-      { name: "Anglo-Saxon herding dogs", note: "Collie-sized herding dogs of Anglo-Saxon England, found at West Stow and Brandon. Now extinct.", img: "/history/breeds/anglo-saxon-herding-dogs.jpg", value: 20 },
+      /* NO PROGENITOR, AND THAT IS THE ANSWER, 19 September 2026 (owner). Recorded here
+         so nobody re-opens it: this dog is a leaf on purpose.
+
+         IT WAS CHECKED AGAINST THE CELTIC STOCK AND RULED OUT. The obvious move is to
+         hang it off Celtic herdsmen's dogs, which is a root sitting as its own sibling
+         on this very line. That would be wrong. These three are PARALLEL ARRIVALS, each
+         added on 18 August with its own archaeology: the Celtic layer is the native
+         one, the Anglo-Saxon layer comes from Crabtree's East Anglia zooarchaeology, and
+         the Norse layer from the Heath Wood strontium study. An Anglo-Saxon dog came
+         over WITH the Anglo-Saxons, so its ancestor is continental Germanic herding
+         stock, which this archive does not hold. Making it a child of the Celtic dogs
+         would collapse the three-layer story this record was built to tell.
+
+         Norse settlers dogs beside it is a leaf for the same reason and in the same
+         twenty trees. Neither is a gap in the data; both are the edge of it. */
+      { name: "Anglo-Saxon herding dogs", note: "Collie-sized herding dogs of Anglo-Saxon England, found at West Stow and Brandon. They arrived with the Anglo-Saxons rather than descending from the native Celtic stock, and the continental herding dogs behind them are not recorded here. Now extinct.", img: "/history/breeds/anglo-saxon-herding-dogs.jpg", value: 20 },
       { name: "Norse settlers dogs", note: "Scandinavian dogs brought over with Viking settlement, likely mixed into local herding stock. Now extinct.", img: "/history/breeds/viking-herding-spitz.jpg", value: 20 }
     ]
   },
