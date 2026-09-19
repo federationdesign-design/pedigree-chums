@@ -4683,7 +4683,9 @@ export default function BreedTree({
   // (the "0" hold and the "Oh no" hand-off) and the Phew beat's two timers. Used
   // by endPitRound, by cancelCountdown, and defensively at the top of runCountdown.
   const clearCdTimers = () => {
-    if (cdTickRef.current !== null) { window.clearInterval(cdTickRef.current); cdTickRef.current = null; }
+    // clearTimeout, not clearInterval: the count is a rescheduling timeout as of
+    // 19 September 2026 so it can change speed with the pit. See runCountdown.
+    if (cdTickRef.current !== null) { window.clearTimeout(cdTickRef.current); cdTickRef.current = null; }
     if (cdHoldRef.current !== null) { window.clearTimeout(cdHoldRef.current); cdHoldRef.current = null; }
     if (cdOverRef.current !== null) { window.clearTimeout(cdOverRef.current); cdOverRef.current = null; }
     for (const t of cdPhewRef.current) window.clearTimeout(t);
@@ -4802,15 +4804,37 @@ export default function BreedTree({
     setFullAlpha(0);
     cdElRef.current = el;
     cdMidElRef.current = elMid;
-    const tick = window.setInterval(() => {
+    /* A RESCHEDULING TIMEOUT, NOT AN INTERVAL, 19 September 2026 (owner: the
+       countdown should slow by four with the pit).
+
+       WHY IT HAD TO CHANGE SHAPE. An interval fixes its period when it is
+       created, so slow motion pressed DURING a count would have done nothing to
+       it and slow motion released during one would have left it crawling. Each
+       step now schedules the next and reads slowmoOnRef as it does, so the count
+       changes speed the moment the snail is pressed, in either direction, part
+       way through.
+
+       ONE SECOND, OR FOUR IN SLOW MOTION. The same quarter the engine takes
+       (engine.timing.timeScale 0.25) and the same multiple the score drain in
+       LineageModal already used, so the three now agree.
+
+       THE TWO TAIL BEATS ARE LEFT ALONE: the 1200ms hold on zero and the 1400ms
+       "Oh no" hand-off. They are the ending, not the count, and stretching a
+       loss to eleven seconds of slow motion would be a worse experience, not a
+       fairer one. Say if that should change too.
+
+       cdTickRef NOW HOLDS A TIMEOUT ID. clearCdTimers was changed to clear it
+       with clearTimeout to match. */
+    const cdStepMs = () => (slowmoOnRef.current ? 4000 : 1000);
+    const step = () => {
       i++;
       if (i < steps.length) {
         el.textContent = steps[i];
         if (cdMidElRef.current) cdMidElRef.current.textContent = steps[i];
         setFullAlpha(i / 10);
+        cdTickRef.current = window.setTimeout(step, cdStepMs());
         return;
       }
-      window.clearInterval(tick);
       cdTickRef.current = null;
       // The count has reached zero: a rescue from here on plays "Phew!" rather
       // than silently clearing the digits. Still fully rescuable until onPitFull.
@@ -4856,8 +4880,8 @@ export default function BreedTree({
           pitEndedRef.current = true; onPitFull?.();
         }, 1400);
       }, 1200);
-    }, 1000);
-    cdTickRef.current = tick;
+    };
+    cdTickRef.current = window.setTimeout(step, cdStepMs());
   };
   // Kill any countdown timer if the component unmounts mid-count (e.g. the modal
   // closes): without this the "Oh no" hand-off could fire onPitFull after teardown.
@@ -4989,6 +5013,20 @@ export default function BreedTree({
   // Slow motion. The fixed-timestep driver feeds Engine.update, which applies
   // engine.timing.timeScale itself, so a quarter speed toggle is all it takes.
   const slowmoRef = useRef<(() => void) | null>(null);
+  /* IS SLOW MOTION ON RIGHT NOW (owner, 19 September 2026: the countdown timer
+     still runs at normal speed while the pit is slowed, and should run at a
+     quarter with it).
+
+     WHY A SEPARATE FLAG. slowmoRef above is the TOGGLE, not the state, and the
+     state it toggles is engine.timing.timeScale, which lives inside the sim
+     effect and is not reachable from runCountdown. This mirrors it at the one
+     place that flips it, so there is a single writer and nothing to drift.
+
+     IT RESETS ON ITS OWN. LineageModal keys BreedTree on runKey, so every path
+     that clears slow motion up there (a retry, a trip to learn, the start
+     screen) remounts this component and the ref is born false beside a fresh
+     engine at timeScale 1. Nothing has to remember to clear it. */
+  const slowmoOnRef = useRef(false);
   const simRunningRef = useRef(false);
   const matterCleanupRef = useRef<(() => void) | null>(null);
   const chainRef = useRef<((ox: number, oy: number) => number) | null>(null);
@@ -9543,6 +9581,9 @@ export default function BreedTree({
       wakeRef.current = wake;
       slowmoRef.current = () => {
         engine.timing.timeScale = engine.timing.timeScale === 1 ? 0.25 : 1;
+        // The single writer for the mirror the countdown reads. Derived from the
+        // engine rather than toggled independently, so the two cannot disagree.
+        slowmoOnRef.current = engine.timing.timeScale !== 1;
         wake(); // a settled pit still needs to be woken to show the change
       };
       // ---- J10b stage 1: Matter's own MouseConstraint, badges only --------
