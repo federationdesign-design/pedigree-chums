@@ -12551,7 +12551,30 @@ export default function BreedTree({
               group so nothing that governs the packed labels can touch them.
               Luckiest Guy in white over a navy halo, paint-order stroke, the
               same treatment a name wears inside its circle. */}
-          <g ref={wordsGRef} textAnchor="middle" style={{ display: dropped ? "inline" : "none" }}>
+          {/* NO PIT WORDS WHILE A CIRCLE IS LIFTED, 19 September 2026 (owner: the word
+              tile behind the lifted circle).
+
+              WHAT WAS ACTUALLY SHOWING. Not the lifted dog's own word. The per-word
+              rule in the frame writer is `b.held || removedNodes.has(b.n)`, and
+              liftToLearn does set held on that shared body, so lifting a DEPTH-1 dog
+              already hides its own word correctly. The words only exist for depth-1
+              nodes, though, so lifting anything deeper, which is every circle that has
+              been popped out of its parent, leaves the depth-1 ANCESTOR's word lying in
+              the pit with the card sitting on top of it. On Celtic Heeler that ancestor
+              is Early Badger hunting dogs, which is why it read as the lifted dog's own
+              word: the ring and the circle inside it carried the same name.
+
+              WHY THE GROUP AND NOT THE BODY RULE. Hiding the lifted dog's word alone
+              would fix the depth-1 case that is already fixed and miss the one that is
+              broken. Nothing in the pit is meant to be readable behind a lifted card,
+              so the whole group stands down for as long as one is up.
+
+              REACT STATE IS SAFE HERE, unlike inside the frame writer: this is the
+              render, so learnNode is current, and the physics loop only ever writes
+              `display` on the CHILDREN of this group, never on the group itself. The
+              two rules do not fight. A hidden group also takes no pointer events, so a
+              word cannot be tapped through the card either. */}
+          <g ref={wordsGRef} textAnchor="middle" style={{ display: dropped && !learnNode ? "inline" : "none" }}>
             {wordList.map((w, i2) => (
               <g
                 key={i2}
