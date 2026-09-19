@@ -2071,6 +2071,29 @@ const rollBomb = () => Math.random() < 1 / BOMB_ODDS;
    1200px one. Converted once per spawn site through fxScale, which is user units
    per client px. */
 const CHIP_R_PX = 12;
+/* A BOMB IS BIGGER THAN A CHIP (owner, 19 September 2026: bombs appear very very
+   small, which makes them hard to tap or move).
+
+   THE MEASUREMENT. At CHIP_R_PX the bomb sprite, drawn 2.4 radii wide, is 28.8px
+   across and its tap circle (r * 1.13) is 27px. The usual figure for a thumb is
+   44px. So the ball itself was the problem, not the hit test: the hit circle
+   already matched the drawn ball almost exactly. At 18 the ball is 43px and the
+   tap circle 41px.
+
+   IT IS THE ONLY CHIP WITH ITS OWN SIZE, and that is the point of it. Every
+   ordinary chip is CHIP_R_PX, which is the 18 September ruling above and is not
+   being reopened: a bomb is not a percentage chip, it is a thing you have to hit.
+
+   THE BLAST DOES NOT GROW WITH IT. Three things read a bomb's radius and all
+   three are now anchored to CHIP_R_PX instead: bsz, which drives the boom and
+   SHOVE_R; SHOVE_F, the shove itself; and nothing else. Without that anchor a
+   50% bigger bomb would have been a 50% harder blast, which would have undone
+   the wave budget tuning from earlier the same day. See the anchor in detonate.
+
+   THE CHAIN SEED DOES GROW, deliberately and as the one exception. The flood fill
+   starts from what is TOUCHING the bomb body, so a bigger bomb takes a wider first
+   ring. That is the direction the owner wants: a bomb that ripples further. */
+const BOMB_R_PX = 18;
 /* 13.5 -> 11, 9 Sept 2026 (owner).
    Not a taste change. The enclosing-circle fit landed earlier the same day made
    every multi-circle cluster smaller, because a constant circle in a portrait
@@ -6655,6 +6678,8 @@ export default function BreedTree({
       const fxScale = ctm0 && ctm0.a ? 1 / ctm0.a : vbHf / stageH;
       // Every chip in the pit is this radius, in viewBox units: see CHIP_R_PX.
       const chipR = CHIP_R_PX * fxScale;
+      // A bomb is the one exception, and it is bigger: see BOMB_R_PX.
+      const bombR = BOMB_R_PX * fxScale;
       // ---- frozen drop-time transform: Matter bodies live in CLIENT PX ----
       // (the pit's native space, so every pit constant copies verbatim). World
       // coords stay the render currency: sync after each Engine.update, so
@@ -7259,9 +7284,11 @@ export default function BreedTree({
           const bl = badgeBodiesRef.current;
           if (bl) {
             const kidBomb = rollBomb();
+            // The roll comes FIRST so the radius can read it: a bomb is bigger.
+            const kbR = kidBomb ? bombR : chipR;
             const kb: Body = {
               n: null, x: ch.x - ch.r * 0.6, y: ch.y + ch.r * 0.6, vx: 0, vy: 0,
-              r: chipR / k, rDraw: chipR,
+              r: kbR / k, rDraw: kbR,
               pct: pctOf(ch), idx: bl.length, lastFx: 0, popped: true,
               a: 0, va: 0, ia: 0, iva: 0, charges: 10, green: false, bomb: kidBomb,
             };
@@ -7272,7 +7299,7 @@ export default function BreedTree({
             newMbs.push(mbb);
             // Both homes, same order. See badgeSrcRef.
             badgeSrcRef.current.push(ch);
-            setBadgePcts((l) => [...l, { pct: kb.pct, r: chipR, bomb: kidBomb, src: ch }]);
+            setBadgePcts((l) => [...l, { pct: kb.pct, r: kbR, bomb: kidBomb, src: ch }]);
           }
         });
         // resolve the deliberate word/circle overlap without an explosion
@@ -7327,14 +7354,15 @@ export default function BreedTree({
             // the roll belongs here as much as in the scatter. Without it a bomb
             // only ever arrives from the lineage layer and stays rare.
             const popBomb = rollBomb();
-            const bb: Body = { n: null, x: ch.x - ch.r * 0.6, y: ch.y + ch.r * 0.6, vx: 0, vy: 0, r: chipR / k, rDraw: chipR, pct: pctOf(ch), idx: bl.length, lastFx: 0, popped: true, a: 0, va: 0, ia: 0, iva: 0, charges: 10, green: false, bomb: popBomb };
+            const pbR = popBomb ? bombR : chipR;
+            const bb: Body = { n: null, x: ch.x - ch.r * 0.6, y: ch.y + ch.r * 0.6, vx: 0, vy: 0, r: pbR / k, rDraw: pbR, pct: pctOf(ch), idx: bl.length, lastFx: 0, popped: true, a: 0, va: 0, ia: 0, iva: 0, charges: 10, green: false, bomb: popBomb };
             bl.push(bb);
             all.push(bb);
             const mbb = mkCircle(bb, "badge", BADGE_OPTS);
             MBody.setVelocity(mbb, { x: mb.velocity.x * 0.8 + (Math.random() - 0.5) * vps(0.3), y: mb.velocity.y * 0.8 });
             newMbs.push(mbb);
             badgeSrcRef.current.push(ch);
-            setBadgePcts((l) => [...l, { pct: bb.pct, r: chipR, bomb: popBomb, src: ch }]);
+            setBadgePcts((l) => [...l, { pct: bb.pct, r: pbR, bomb: popBomb, src: ch }]);
           }
         }
         if (newMbs.length > 1) ghost(newMbs);
@@ -8196,13 +8224,15 @@ export default function BreedTree({
            through the last of those and had its carefully computed radius discarded.
            All of them are now the one constant. Only opts.label is untouched: that
            is a solo DOG CIRCLE arriving with its full radius, not a chip. */
-        const rDraw = opts?.label ? (opts?.r ?? 0) : CHIP_R_PX * fxScale;
+        /* THE ROLL MOVED ABOVE THE RADIUS, 19 September 2026, so a bomb can be
+           sized as one: see BOMB_R_PX. It used to sit two lines below this. */
+        const isBomb = !opts?.label && !opts?.noBomb && rollBomb();
+        const rDraw = opts?.label ? (opts?.r ?? 0) : (isBomb ? BOMB_R_PX : CHIP_R_PX) * fxScale;
         /* TWO CHIPS STAND OUTSIDE THE BOMB ROLL. A labelled circle, because it is
            a whole breed rather than a chip, and any caller that asks for noBomb.
            The solo leaf uses the second: it now drops an ordinary percentage
            chip, so the label no longer speaks for it, but it is still never a
            bomb. */
-        const isBomb = !opts?.label && !opts?.noBomb && rollBomb();
         const nb: Body = { n: null, x: w.x, y: w.y, vx: 0, vy: 0, rDraw, r: rDraw / kD, pct: pctVal, idx: bl.length, lastFx: 0, popped: true, a: 0, va: 0, ia: 0, iva: 0, charges: opts?.charges ?? (opts?.green ? 20 : 10), green: opts?.green, bomb: isBomb };
         bl.push(nb);
         all.push(nb);
@@ -8771,7 +8801,18 @@ export default function BreedTree({
         const bombMb = b.mb as MB;
         if (!bombMb) return;
         const bx = bombMb.position.x, by = bombMb.position.y;
-        const bsz = radOf(bombMb) * (1 + (b.pct || 0) / 25); // a bigger figure, a bigger boom
+        /* ANCHORED TO CHIP_R_PX, NOT TO THE BOMB'S OWN RADIUS, 19 September 2026.
+           A bomb is now BOMB_R_PX, half again a chip, and this line used to read
+           radOf(bombMb): the blast would have grown 50% with it, and SHOVE_F
+           below the same, which would have quietly undone the wave budget tuning
+           from earlier today. The owner asked for a bigger TARGET, not a bigger
+           bang, so the size of the bomb and the size of its blast are now two
+           separate questions. blastR is what the blast is measured in and it is
+           exactly what it was before the bomb grew.
+           TO MAKE THE BLAST SCALE WITH THE BOMB AGAIN, put radOf(bombMb) back in
+           this one line and SHOVE_F follows it. */
+        const blastR = radOf(bombMb) * (CHIP_R_PX / BOMB_R_PX);
+        const bsz = blastR * (1 + (b.pct || 0) / 25); // a bigger figure, a bigger boom
         wake();
         toyTimers.push(window.setTimeout(() => {
           const now2 = performance.now();
@@ -8907,7 +8948,9 @@ export default function BreedTree({
           // heavier and a shove that size reads as a thump. In the mini pit the
           // same figure cleared the whole floor. Cut to a sixth. The reach is
           // unchanged: it was the force that was wrong, not how far it carried.
-          const SHOVE_F = 0.171 * radOf(bombMb); // 0.19, down a tenth by request
+          // Anchored with bsz above: blastR is the bomb's radius scaled back to a
+          // chip's, so the shove is exactly what it was before bombs grew.
+          const SHOVE_F = 0.171 * blastR; // 0.19, down a tenth by request
           for (const o of live) {
             if (claimed.has(o)) continue;
             const dx = o.position.x - bx, dy = o.position.y - by;
