@@ -1960,8 +1960,33 @@ const BOMB_CHAIN_MS = 25;     // gap between each WAVE of the chain going up
 
    1200ms is the figure to tune. Lower and a big blast snaps; higher and it
    starts to feel like waiting. The round-won sweep is 45ms a step for reference,
-   and the burst before the blast is BOMB_BURST_MS. */
-const BOMB_CHAIN_MAX_MS = 1200;
+   and the burst before the blast is BOMB_BURST_MS.
+
+   1200 TO 3000, 19 September 2026 (owner: a big bomb does not ripple the way a
+   small one does, the chips just go).
+
+   WHAT THIS IS FIXING, and it is worth being exact because the owner's first
+   reading of it was different. He thought the blast was shoving the chips apart
+   so they no longer chained. It cannot: detonate skips every badge in the shove
+   loop, chips are chained or spared and never pushed, and the flood fill is
+   computed in ONE PASS at detonation before any body has moved. A bigger bomb
+   also has exactly the same chain SEED as a small one, since the frontier is
+   built from the bomb body's radius and every chip in the pit is CHIP_R_PX. The
+   only things that grow with the bomb's percentage are the pop-art boom and
+   SHOVE_R, neither of which touches a chip.
+
+   So the compression is the remaining candidate: a long chain sharing 48 waves
+   is 8 chips going at once, which reads as a mass disappearance rather than a
+   ripple. 3000ms is 120 waves, so 400 chips is about 3 a wave instead of 8, and
+   a chain under 120 is back to one a wave exactly as it always was.
+
+   THIS IS A TUNING CHANGE MADE WITHOUT THE READING, by decision. The ?spindiag=1
+   BLAST line already reports chain, waves and per wave, and the honest test is to
+   blow a small bomb and a big one and compare. If a big bomb still reads about 1
+   per wave then compression was never the cause and this should go back to 1200
+   rather than be raised again: the answer would be the boom and the shove
+   drowning the ripple, which is a different fix entirely. */
+const BOMB_CHAIN_MAX_MS = 3000;
 /* HOW MUCH DAYLIGHT STILL COUNTS AS TOUCHING, in px, in the blast's flood fill.
    It was a flat 10, which existed because the solver parts resting bodies by a
    little and a chain must not miss two chips that are visibly in contact.
