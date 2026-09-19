@@ -1546,9 +1546,56 @@ const LINEAGE: Record<string, LineageNode> = {
   "Old scenting Hounds": {
     name: "Old scenting Hounds",
     note: "The tracking hounds of medieval lords, the scenting stock behind the bloodhound and the old hunting hounds. Now extinct.",
+    /* THE CRUSADER HOUNDS JOIN THE CELTIC STOCK, 19 September 2026 (owner). This
+       record had ONE ancestor at 100 and sits in SEVENTY-FIVE trees, which made it
+       the largest single-ancestor record in the archive and the first one taken
+       from that audit.
+
+       WHAT THE OWNER EXPECTED, AND WHAT THE RESEARCH FOUND. The instinct was
+       continental input carried over by aristocratic marriage. The mechanism is
+       right and the direction was not: the Norman route into Britain runs through
+       the St Hubert Hound, which in this archive already DESCENDS from this node,
+       so that would have been a cycle. This node is itself the continental stock,
+       as the St Hubert's own note says.
+
+       AND THE OBVIOUS SECOND PARENT WAS ALREADY BELOW IT. The Gaulish Segusian
+       that Arrian described, routinely called the prototype of the bloodhound and
+       the foxhound, sits under Celtic Scent Hound at 40 along with the Laconian.
+       Adding it here would have said the same thing twice.
+
+       THE CHIEN-GRIS IS THE ONE NON-CELTIC STREAM. The Grey Hound of Saint Louis
+       held the French royal packs almost exclusively from about 1250 to 1470, and
+       Charles IX recorded that Louis IX met them as a prisoner on Crusade and was
+       later given some. It is aristocratic movement carrying a bloodline west,
+       exactly the shape the owner expected, by Crusade rather than by marriage.
+
+       IT IS TRADITION, NOT PROOF, and the note says so. Medieval hunting writers
+       liked a remote pedigree and this one claimed Tartary. The same standing as
+       the Laconian claim carried on the St Hubert Hound, and phrased the same way.
+
+       75/25 (owner). The Celtic stock stays the main line because the Chien-gris
+       arrived in 1250 into a tracking stock already centuries old. */
     children: [
-      { name: "Celtic Scent Hound", note: "Early Celtic tracking hound that followed game by scent, representing the roots of later European scent hounds. An extinct historical type.", img: "/history/breeds/ancient-celtic-scent-hound.jpg", value: 100 }
+      { name: "Celtic Scent Hound", note: "Early Celtic tracking hound that followed game by scent, representing the roots of later European scent hounds. An extinct historical type.", img: "/history/breeds/ancient-celtic-scent-hound.jpg", value: 75 },
+      { name: "Chien-gris", note: "The grey hounds of the French royal packs, said to have come west with Louis IX from the Crusades. The old account rather than documented descent. Now extinct.", img: "/history/breeds/Chien-gris.jpg", value: 25 }
     ]
+  },
+
+  /* THE CHIEN-GRIS, added 19 September 2026 (owner). The Gris de Saint-Louis, or
+     Dun Hound: the grey scent hounds that made up the royal packs of France almost
+     exclusively from about 1250 to 1470, larger than the St Hubert and preferred by
+     the kings for it, though reckoned the poorer nose of the two. Counted as the
+     ancestor of the French rough-coated Griffon breeds.
+
+     IT IS A LEAF, AND HONESTLY SO. Its own origin is the Crusade story and beyond
+     that a claim of Tartary, which is a medieval hunting writer's flourish rather
+     than anything that can be authored as a parent. The edge of the data, like the
+     Norse and continental Germanic leaves. */
+  "Chien-gris": {
+    name: "Chien-gris",
+    note: "The Grey Hound of Saint Louis, a large grey and tan scent hound that held the French royal packs from about 1250 to 1470. Now extinct.",
+    img: "/history/breeds/Chien-gris.jpg",
+    children: []
   },
 
   /* THE ST HUBERT HOUND GETS A RECORD OF ITS OWN (owner, 19 September 2026).
