@@ -662,15 +662,32 @@
     letter-spacing: 0;
   }
 
-  /* 2.5 Intro paragraph down 2pt, from 1.625rem. */
+  /* 2.5 Intro paragraph down 2pt from 1.625rem, then a further 1pt on 19 September
+     2026 (Steve), so 3pt in total off the base. */
   .essayBody > p:first-child,
   .essayBody .introPara {
-    font-size: calc(1.625rem - 2pt);
+    font-size: calc(1.625rem - 3pt);
   }
 
-  /* 2.6 Body text down 1pt, from 1.25rem. */
+  /* 2.6 Body text down 1pt from 1.25rem, then a further 1pt on 19 September 2026
+     (Steve), so 2pt in total off the base. */
   .essayBody > p {
-    font-size: calc(1.25rem - 1pt);
+    font-size: calc(1.25rem - 2pt);
+  }
+
+  /* 19 September 2026 (Steve). The back link comes down 1pt and loses half its
+     bottom margin so it sits closer to the pills. Measured: the gap between the link
+     and the pill row IS this margin, 20px, so 10px halves it exactly. */
+  .backLink {
+    font-size: calc(0.75rem - 1pt);
+    margin-bottom: 10px;
+  }
+
+  /* 19 September 2026 (Steve): article hero pills 25% smaller, 0.85rem x 0.75. This
+     is .tag on the article pages, not .pill on the index, which came down 25% to
+     0.9rem in task 1.4. The two are separate rules in separate files. */
+  .tag {
+    font-size: 0.6375rem;
   }
 
   /* 2.7 Halve the air above the card title, legacy card system (articles 1 to 3).
@@ -685,8 +702,16 @@
      overlaid payslip below has a clear band to sit in (the mobile stand-in for the
      desktop 60%-width title cap). 190 - 140 overlap = 50px nominal clearance,
      comfortably past the tilted card's raised corner. */
+  /* 190 -> 140, 19 September 2026 (Steve: nudge the hero content down 50px). The
+     block is align-self: flex-end, so the bottom padding is what holds it up and
+     taking 50 off moves the whole group down 50.
+
+     IT SPENDS THE PAYSLIP CLEARANCE, and the note above is the one to read. Measured
+     at 390 before this pass: the title's baseline sat 90px above the tilted card's
+     top. Down 50 here, and up 10 on the card below, leaves 30px. Still clear, but it
+     is the margin now, so anything further wants measuring first. */
   .essayHeroContent {
-    padding-bottom: 190px;
+    padding-bottom: 140px;
   }
 
   .articleMobile {
@@ -715,7 +740,10 @@
      above the tint, matching the desktop sidebar (z-index 10). It clears the hero
      title/pills/back link by design, so sitting above them covers nothing. */
   .mobilePayslip {
-    margin-top: -188px;
+    /* -188 -> -198, 19 September 2026 (Steve: nudge the payslip up 10px). Raises the
+       hero overlap from 100 to 110 and takes 10 more off the title clearance; see the
+       .essayHeroContent note above for the combined figure. */
+    margin-top: -198px;
     position: relative;
     z-index: 2;
   }
