@@ -244,6 +244,27 @@ const DIFF_STOP_10 = 1;
    which is what a change of difficulty or level causes, starts clean. */
 const DROP_SHRINK_0 = 0.75;
 const DROP_SHRUNK = new WeakSet<object>();
+/* THE PARENT CIRCLES DROP A QUARTER SMALLER, 19 September 2026 (owner: reduce
+   the big dog circles that drop in at the start of the game by 25%, and only
+   the big parent circles).
+
+   DEPTH 1 ONLY. These are the level's own top circles, the ones carrying the
+   yellow share badge. Their children keep the size the pack gave them, so a
+   popped circle releases the same dogs it always did.
+
+   IT SHRINKS THE NODE, NOT THE BODY, and that is the whole trick. drawR reads
+   d.r and mkCircle reads b.r, which is copied from n.r when the bodies are
+   built. Moving only the body would put a full size picture over a small
+   collider, which is the exact fault recorded at mkWord below. One number,
+   both follow.
+
+   THE START SCREEN IS UNTOUCHED. This runs inside doFall, so the circles are
+   full size while you are reading them and a quarter smaller once they drop.
+
+   WeakSet guarded, like DROP_SHRINK_0, so a second drop on the same nodes
+   cannot take another quarter off. */
+const DROP_SHRINK_D1 = 0.75;
+const DROP_SHRUNK_D1 = new WeakSet<object>();
 // The docked view zooms out to 1.21x the frame, so the visible pit is this much
 // wider than SIZE. DIFF_INSET holds back enough for the 5px stroke and the pit
 // walls, which sit 4 svg units inside the stage edges.
@@ -6900,6 +6921,14 @@ export default function BreedTree({
 
       type Body = { n: Node | null; x: number; y: number; vx: number; vy: number; r: number; pct: number; idx: number; lastFx: number; popped: boolean; a: number; va: number; ia: number; iva: number; held?: boolean; charges?: number; lastKnock?: number; inert?: boolean; mb?: any; mbIn?: boolean; bomb?: boolean; blown?: boolean; bursting?: number; fuseCur?: number; rDraw?: number; hits?: number; heldSince?: number; heldHits?: number; clickPending?: boolean; green?: boolean };
       const d1 = nodes.filter((n) => n.depth === 1);
+      /* SHRINK FIRST, FLOOR SECOND, never the other way about: flooring first
+         would let the quarter come straight back off the floor. Same order as
+         the freed-children route below. See DROP_SHRINK_D1. */
+      for (const n of d1) {
+        if (DROP_SHRUNK_D1.has(n)) continue;
+        DROP_SHRUNK_D1.add(n);
+        n.r = Math.max(n.r * DROP_SHRINK_D1, minCircleR);
+      }
       const pctOf = (n: Node) => (n.parent ? Math.round(((n.value ?? 0) / (n.parent.value || 1)) * 100) : 0);
       const bodies: Body[] = d1.map((n, i) => ({ n, x: n.x, y: n.y, vx: 0, vy: 0, r: n.r, pct: pctOf(n), idx: i, lastFx: 0, popped: false, a: 0, va: 0, ia: 0, iva: 0 }));
       if (bodies.length === 0) { setFalling(false); return; }
