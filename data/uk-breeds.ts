@@ -243,7 +243,32 @@ export const ukBreeds: UKBreed[] = [
   { name: "Land Spaniels", strip: "medieval", era: "Medieval", anchor: 1475, note: "The old English land-spaniel stock that every working spaniel springs from.", image: "/history/breeds/original-land-spaniel.jpg", tag: "extinct" },
   { name: "Old Welsh Land Spaniels", strip: "c1500", era: "1500s", anchor: 1511, note: "The native red-and-white working spaniels of Wales.", image: "/history/breeds/Old-Welsh-land-spaniels.jpg", tag: "extinct" },
   { name: "Basset and heavy Hounds", strip: "c1500", era: "1500s", anchor: 1525, note: "Low, long, heavy scenting-hound stock that lent weight and bone to the stouter spaniels.", image: "/history/breeds/basset-and-heavy-hounds.jpg", tag: "extinct" },
-  { name: "Low-slung soldiers' dogs", strip: "c1500", era: "late 1500s", anchor: 1575, note: "Short-legged dogs left by Flemish and Hessian soldiers settled in the glen.", image: "/history/breeds/low-slung-soldiers-dogs.jpg", tag: "extinct" },
+  /* LOW-SLUNG SOLDIERS' DOGS IS OFF THE STRIP, 19 September 2026 (owner: it is
+     not a British dog, so it should not be a playable era level, but it stays in
+     the lineage).
+
+     WHAT WENT AND WHAT STAYED. Only this strip card. The lineage record is
+     untouched, so the Glen of Imaal still reaches it as an ancestor and the dog
+     is still in the archive; it simply stops being one of the ninety-three
+     levels and stops appearing on the history strip.
+
+     WHY IT WAS A LEVEL AT ALL. breedCardKind returns "play" for any strip card
+     whose lineage record has children, and this one does. It was never chosen as
+     a level; it qualified as one.
+
+     THE RENUMBERING WAS CHECKED AND COSTS NOTHING. It was level 30 of 93, so 63
+     levels shift down by one. levelThemes.ts is keyed by level number and its
+     highest key is 29, below this dog, so no theme can land on the wrong level.
+     Confirmed against the runtime, not inferred: the start screen read "30th
+     DOG" and the pit was plain blue, which is what a level with no theme looks
+     like.
+
+     A SEPARATE FINDING, NOT FIXED HERE. That check turned up that levelThemes'
+     COMMENTS are one out: key 29 is labelled "Low-slung soldiers' dogs" and
+     level 29 is the Otterhound. The keys apply to the levels they name
+     numerically, so nothing is broken on screen, but each toy set is attached to
+     the dog above the one its comment claims. Worth its own look; out of scope
+     for this change. */
   { name: "Old Toy Spaniels", strip: "c1500", era: "1600s", anchor: 1650, note: "The small sporting and lap spaniels of Tudor and Stuart England.", image: "/history/breeds/Old-sporting-toy-spaniels.jpg", tag: "extinct" },
   { name: "Water Spaniels", strip: "c1500", era: "1600s", anchor: 1653, note: "The old rough-coated working water spaniels of Britain's rivers and fens.", image: "/history/breeds/original-water-spaniel.jpg", tag: "extinct" },
   { name: "Old Irish water dogs", strip: "c1700", era: "1700s", anchor: 1705, note: "The southern and northern water spaniels of Ireland.", image: "/history/breeds/Old-Irish-water-dog.jpg", tag: "extinct" },
