@@ -1053,7 +1053,12 @@ export default function LineageModal({ name, image, character, lineage, fromRect
                       not gain a near-duplicate rule. */}
                   {(runChumsPossible ?? 0) > 0 && (
                     <span className={css.winRate}>
-                      <span className={css.winRateTitle}>Run total:</span>
+                      {/* NO TITLE ON THIS ONE, 19 September 2026 (owner). The figure and
+                          the line under it carry it: "found from N chums so far" already
+                          says what the number is, and the words were the third stacked
+                          label in a corner block that is hand-cleared by .winWrap's
+                          padding. Only the SPAN is gone. .winRateTitle stays, because
+                          "Chum rate:" above still wears it and it is a shared rule. */}
                       <span className={css.winRateValue}>{runChumsFound ?? 0}</span>
                       <span className={css.winRateDetail}>
                         found from {runChumsPossible} chums so far
