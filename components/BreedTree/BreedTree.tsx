@@ -3564,8 +3564,20 @@ export default function BreedTree({
 
      Held in state rather than a ref because the inline style has to survive a
      re-render, and this box re-renders on every hover in the pit behind it. */
-  const [sheetPos, setSheetPos] = useState<{ left: number; bottom: number } | null>(null);
-  const sheetDrag = useRef<{ sx: number; sy: number; ol: number; ob: number; w: number; h: number } | null>(null);
+  /* `bottom` -> `top`, 19 September 2026 (owner: I cannot drag it down, only left
+     and right, it seems to be on a rail).
+
+     THE CAUSE. This state wrote `bottom` as an inline style, but .asideSheet has
+     set `top: 9px; bottom: auto` since 16 September, when the box moved from the
+     foot of the screen to the top left. A position:fixed box with an auto height
+     resolves TOP first and ignores a bottom it cannot stretch to, so the class
+     pinned the vertical position and only `left` ever had any effect. The drag
+     handler was writing a number nothing read.
+
+     TOP IS NOW THE ONE AXIS BOTH AGREE ON. The class sets it, the drag overrides
+     it, and `bottom` is left to the class's own `auto`. */
+  const [sheetPos, setSheetPos] = useState<{ left: number; top: number } | null>(null);
+  const sheetDrag = useRef<{ sx: number; sy: number; ol: number; ot: number; w: number; h: number } | null>(null);
   // The WHOLE box is the handle. It was the head row only, because the box scrolled
   // its write-up and on a touch screen a drag and a scroll are the same gesture, so
   // one had to own it. The sheet no longer scrolls (max-height and overflow are gone,
@@ -3582,7 +3594,7 @@ export default function BreedTree({
     e.stopPropagation();
     sheetDrag.current = {
       sx: e.clientX, sy: e.clientY,
-      ol: r.left, ob: window.innerHeight - r.bottom,
+      ol: r.left, ot: r.top,
       w: r.width, h: r.height,
     };
     try { el.setPointerCapture(e.pointerId); } catch { /* no capture available */ }
@@ -3594,10 +3606,14 @@ export default function BreedTree({
     // box has to stay in view on every edge.
     const KEEP = 24;
     const maxL = window.innerWidth - KEEP;
-    const maxB = window.innerHeight - KEEP;
+    // Downward now measured on TOP, so the clamp flips with it: the lowest the box
+    // may go is the viewport height less KEEP, which leaves 24px of it showing at
+    // the foot, and the highest is KEEP - its own height, which leaves 24px showing
+    // at the head. Same guarantee as before, expressed on the axis that works.
+    const maxT = window.innerHeight - KEEP;
     const left = Math.min(maxL, Math.max(KEEP - d.w, d.ol + (e.clientX - d.sx)));
-    const bottom = Math.min(maxB, Math.max(KEEP - d.h, d.ob - (e.clientY - d.sy)));
-    setSheetPos({ left, bottom });
+    const top = Math.min(maxT, Math.max(KEEP - d.h, d.ot + (e.clientY - d.sy)));
+    setSheetPos({ left, top });
   };
   const sheetUp = (e: React.PointerEvent) => {
     sheetDrag.current = null;
@@ -14829,7 +14845,7 @@ export default function BreedTree({
           // Only once it has actually been dragged; until then the CSS owns the
           // load position, so the 48px / 60px in .asideSheet stay the single source.
           ...(dockAside && isMobile && sheetPos
-            ? { left: `${sheetPos.left}px`, bottom: `${sheetPos.bottom}px` }
+            ? { left: `${sheetPos.left}px`, top: `${sheetPos.top}px` }
             : null),
         }}
         onPointerDown={dockAside ? (isMobile ? sheetDown : asideDown) : undefined}

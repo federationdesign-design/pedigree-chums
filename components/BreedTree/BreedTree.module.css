@@ -437,7 +437,16 @@
      the owner's call; drop the 1.2 back to 1 to undo it. */
   right: auto;
   /* 1.2 -> 1.32 (31 Aug 2026, a further 10% on top of the first 20%). */
-  width: calc((100vw - 66px - 2 * clamp(38px, 7.5vw, 56px)) * 1.32);
+  /* THE 66 BECOMES 8, 19 September 2026 (owner: this blue container is still not
+     wider). This is the change the 16 September note directly above prescribed and
+     deliberately did not make: "To fill the width as well, the 66 in the sum and
+     the 76 in the cap both become 8. Not done here: moving a box and resizing it
+     are two different requests." This is that second request.
+     The 66 was 58px of rail clearance plus the old 8px left inset. The box sits at
+     left: -23px now, so neither figure describes anything, and the sum was holding
+     back 58px of width for a rail the box already laps over by the owner's own
+     earlier ruling. */
+  width: calc((100vw - 8px - 2 * clamp(38px, 7.5vw, 56px)) * 1.32);
   /* 31 Aug 2026: was bottom 0, which buried the learn PLAY button. PLAY is
      .learnPlay at bottom 3%, 67.5px tall on a phone (84 * 0.67 * 1.2), and both
      elements are measured against the same full-viewport overlay, so 3% + 80px put
@@ -466,7 +475,11 @@
      This caps it at whatever room is actually left, keeping 8px of air. A ceiling
      only, so it does nothing at the widths where the sum already fits. It replaces
      `max-width: none`, whose job was to beat .aside's 460px; a calc() beats that too. */
-  max-width: calc(100vw - 76px);
+  /* AND THE CAP WITH IT, 76 -> 8. The cap was 68 of left inset plus 8 of air, and
+     the box moved to left: -23px on 16 September, so 76 was reserving room on the
+     right for a left inset that no longer exists. It is still a ceiling only: 8px
+     of air on the right, measured from a box that starts 23px off the left edge. */
+  max-width: calc(100vw - 8px);
   /* NO SCROLLBAR, 31 Aug 2026. This was max-height: 38vh with overflow-y: auto,
      which put a scrollbar on the box and cut the write-up mid-sentence. The box now
      SIZES TO ITS CONTENT: the write-up always shows in full, and everything from the
