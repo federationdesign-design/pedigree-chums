@@ -13339,9 +13339,31 @@ export default function BreedTree({
                whose first line is the big one. Centre to centre, because both
                lines use dominantBaseline central. ONE NUMBER TO CHANGE if the
                gap wants opening or closing. */
-            const fsOrd = fsL * 0.5;
+            /* THE SUPERSCRIPT CAME DOWN 50%, 19 September 2026 (owner: it is 2x
+               bigger than it should be). 0.5 of the number becomes 0.25. */
+            const fsOrd = fsL * 0.25;
             const fsDog = fsL * 0.45;
-            const lineDy = fsL * 1.1;
+            /* THE LINE GAP, AND WHY 1.1 DID NOT LOOK LIKE 1.1 (owner: too much
+               line height, close it up to 1.1em).
+
+               THE CAUSE IS THE FONT, not the arithmetic. Luckiest Guy's visible
+               cap height is about 0.6 of its em box, and both lines here are
+               centred with dominantBaseline central, so a centre-to-centre gap of
+               1.1 em boxes puts 1.1 * fsL between two glyph blocks that only fill
+               0.6 of it each. The INK gap reads close to double what was asked
+               for, which is exactly what the owner saw.
+
+               So the figure carries the font's own 0.6: 1.1 * 0.6 = 0.66. That is
+               a VISUAL 1.1em, which is what was actually wanted. The same 0.6 is
+               already on record for this font elsewhere in the project.
+               IF THE FONT CHANGES, this 0.6 changes with it. */
+            const lineDy = fsL * 1.1 * 0.6;
+            /* HALF THE NUMBER'S STROKE on the two smaller pieces, 19 September
+               2026 (owner). 6.3 becomes 3.15. A stroke sized for a 100px glyph
+               swamps a 25px one: paintOrder is "stroke", so the fill paints over
+               half the width and what is left reads as an outline nearly as thick
+               as the letter it is outlining. The NUMBER keeps the full 6.3. */
+            const strokeSmall = 3.15;
             const vbWc = aspect >= 1 ? SIZE * aspect : SIZE;
             const vbHc = aspect >= 1 ? SIZE : SIZE / aspect;
             const xMinC = -vbWc / 2;
@@ -13408,9 +13430,13 @@ export default function BreedTree({
                   {/* The suffix rides half-height and half-size, the ordinary
                       superscript. baselineShift is not reliable across engines on
                       svg text, so this is a plain dy, which is. */}
+                  {/* DOWN 10px, 19 September 2026 (owner), so the suffix sits in
+                      line with the TOP of the number rather than floating above
+                      it. The 10 is CSS px and is multiplied by upp like every
+                      other px figure in this block. */}
                   <tspan
-                    dy={`${-fsL * 0.35 * upp}`}
-                    style={{ fontSize: `${fsOrd * upp}px` }}
+                    dy={`${-fsL * 0.35 * upp + 10 * upp}`}
+                    style={{ fontSize: `${fsOrd * upp}px`, strokeWidth: `${strokeSmall * upp}px` }}
                   >
                     {ordSuffix}
                   </tspan>
@@ -13420,7 +13446,7 @@ export default function BreedTree({
                   y={numY + lineDy * upp}
                   textAnchor="end"
                   dominantBaseline="central"
-                  style={{ ...numStyle, fontSize: `${fsDog * upp}px` }}
+                  style={{ ...numStyle, fontSize: `${fsDog * upp}px`, strokeWidth: `${strokeSmall * upp}px` }}
                 >
                   dog
                 </text>
