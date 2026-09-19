@@ -206,8 +206,30 @@ const LINEAGE: Record<string, LineageNode> = {
           { name: "Newfoundland landrace dogs", note: "The local island dogs they crossed with once they landed. Now extinct.", img: "/history/breeds/Newfoundland-landrace-dog.jpg", value: 21 }
         ]
       },
+      /* "British Pointers" -> "Pointer", 19 September 2026 (owner).
+
+         IT WAS A TYPE NOUN, NOT A DOG, which is the same fault already recorded
+         against the Setter node: a vague plural that no amount of research can
+         give an ancestry, because there is no dog by that name to research. It
+         was one of only two named dead ends in the archive that were not ancient
+         progenitors.
+
+         POINTER IS A REAL RECORD AND IT WAS ALREADY HERE, with English Foxhound,
+         Greyhound, Bloodhound and Setter beneath it. So this is not new authoring
+         at all: the history existed and the name was the only thing keeping it
+         out of reach. The same two-step the Talbot and Old setting spaniels
+         entries describe, and the same reasoning that closed the Wavy-Coated
+         Retriever earlier today.
+
+         THE ARTWORK COMES WITH IT. british-pointers.jpg was used by this node and
+         by nothing else, so it simply becomes the Pointer's picture and no file
+         ends up shared between two names, which is the rule this file holds to.
+
+         EXPECT PERCENTAGES TO MOVE in the Labrador's tree. A dead end is a
+         progenitor; now it grafts, which lengthens the list beneath it and
+         rescales the shares. The 17 itself is unchanged. */
       {
-        name: "British Pointers",
+        name: "Pointer",
         note: "Crossed in by British breeders for nose and a steady, focused drive in the field. Now in-decline.",
         img: "/history/breeds/british-pointers.jpg",
         value: 17
@@ -3004,6 +3026,11 @@ const LINEAGE_ALIASES: Record<string, string> = {
      so renaming the node would put a Victorian ring name into an 1860s breeding
      record. The cost is that the rarity tier counts the two names separately;
      the owner took that trade knowingly. */
+  /* Kept as a no-op, 19 September 2026, the same way the Talbot spellings are:
+     the node itself has been renamed to Pointer in the data, so nothing reaches
+     this today, but an older spelling returning still grafts rather than becoming
+     a fresh dead end. */
+  "British Pointers": "Pointer",
   "Wavy-Coated Retriever": "Flat-Coated Retriever",
   "Old setting spaniels": "Land Spaniels",
   "Wire Fox Terrier": "Fox Terrier",
