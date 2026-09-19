@@ -1436,6 +1436,66 @@ const LINEAGE: Record<string, LineageNode> = {
     ]
   },
 
+  /* THE ST HUBERT HOUND GETS A RECORD OF ITS OWN (owner, 19 September 2026).
+
+     WHY IT MATTERS MOST. It was the widest gap in the archive: a player meets it
+     in more than two levels in five, 5 nodes across 70 trees, and it stopped dead
+     one generation in. This is a graft rather than a research job, because both
+     its parents were already here.
+
+     ITS DESCENT, and the two claims are not of equal weight, so the note says so.
+     The FCI's own standard for the breed records it as presumed to descend from
+     the black and black-and-tan pack hounds the monk Hubert hunted with in the
+     seventh century, and the abbey at Saint-Hubert was founded in 687 and became
+     a noted centre of hound breeding; the hound carried the name from about 1000
+     AD. That earlier continental stock is what Old scenting Hounds already is
+     here, so it takes the larger share.
+
+     THE LACONIAN IS THE TRADITIONAL ACCOUNT, NOT THE EVIDENCED ONE, and the owner
+     asked for it in knowing that. The line that St Hubert's hounds came down from
+     the Laconian or Spartan hound of Greece is repeated widely and is nineteenth
+     century cynology rather than documented descent. It is carried at the smaller
+     share and the note names it as tradition, which is the same treatment Land
+     Spaniels gives its own inferred roots.
+
+     NO NEW ARTWORK WAS NEEDED. Laconian tracking Hounds already appears in the
+     data with /history/greek-harehound.jpg.
+
+     THE BLOODHOUND IS NOT ITS SIBLING, checked rather than assumed. FCI Standard
+     84 is titled "Chien de Saint-Hubert (Bloodhound)", origin Belgium: they are
+     ONE breed, and "Bloodhound" is what the dog was called in England after the
+     Normans brought it over. So the existing shape, Bloodhound descending FROM
+     the St Hubert Hound, is right and is left alone. */
+  "St Hubert Hound": {
+    name: "St Hubert Hound",
+    note: "The abbey scent hound of the Ardennes, bred by the monks of Saint-Hubert and carried to England by the Normans, where it became the Bloodhound. Now extinct.",
+    img: "/history/breeds/St-Hubert-Hound.jpg",
+    children: [
+      { name: "Old scenting Hounds", note: "The heavy continental tracking stock the abbey built its hounds from. Now extinct.", img: "/history/breeds/Old-scenting-hounds.jpg", value: 70 },
+      { name: "Laconian tracking Hounds", note: "The keen-nosed hare-tracking hounds of ancient Greece. The old account has the abbey's hounds descending from them; it is tradition rather than documented descent. Now extinct.", img: "/history/greek-harehound.jpg", value: 30 }
+    ]
+  },
+
+  /* BRITISH SETTERS REACHES ITS STOCK (owner, 19 September 2026). It was held
+     back from the September setter work because its note is a temperament claim
+     about Victorian gundogs rather than a reference to old setting stock, so the
+     Land Spaniels argument did not obviously carry. The owner has now made the
+     call that it does.
+
+     THE SAME SHAPE AS "Setter" ABOVE, deliberately: Land Spaniels at 100, which
+     is the record Setter itself uses. It is not a single-parent chain in any
+     meaningful sense, because Land Spaniels carries Rache and Talbot beneath it,
+     so the full list resolves to three contributors and the medieval era. Giving
+     the two setter records different parents would have been the odd choice. */
+  "British Setters": {
+    name: "British Setters",
+    note: "The British setting dogs of the shooting field, bred to find birds and drop steady in front of them. Now in-decline.",
+    img: "/history/breeds/setters.jpg",
+    children: [
+      { name: "Land Spaniels", note: "The crouching land spaniels that marked game for the net, the stock every setter was built up from. Now extinct.", img: "/history/breeds/original-land-spaniel.jpg", value: 100 }
+    ]
+  },
+
   "Old black-and-tan Setters": {
     name: "Old black-and-tan Setters",
     note: "The black-and-tan setting dogs worked in Britain before the Duke of Gordon's kennels took the type up. Now extinct.",
@@ -2876,6 +2936,20 @@ const LINEAGE_ALIASES: Record<string, string> = {
      progenitor. Now it grafts, which lengthens the progenitor list of every
      tree it sits in and rescales the shares beneath it. tests/lineage guards the
      property that matters, that every list still totals exactly 100%. */
+  /* THE WAVY-COATED RETRIEVER IS THE FLAT-COATED RETRIEVER, 19 September 2026
+     (owner). The same dog under its older name: the Flat-Coated Retriever's own
+     note opens "Once called the Wavy-Coated Retriever", and the Wavy node in the
+     Golden Retriever tree already wears flatcoated_retriever-photo.jpg. So the
+     ancestry was present all along and simply unreachable, exactly the case the
+     block above describes.
+
+     ALIASED RATHER THAN RENAMED, which is the one difference from the Talbot and
+     Old setting spaniels entries. Tweedmouth's foundation dog was a yellow
+     WAVY-coated retriever in the 1860s, and "Flat-Coated" is the later show name,
+     so renaming the node would put a Victorian ring name into an 1860s breeding
+     record. The cost is that the rarity tier counts the two names separately;
+     the owner took that trade knowingly. */
+  "Wavy-Coated Retriever": "Flat-Coated Retriever",
   "Old setting spaniels": "Land Spaniels",
   "Wire Fox Terrier": "Fox Terrier",
   "Deerhound": "Scottish Deerhound",
