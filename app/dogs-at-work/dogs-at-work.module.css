@@ -425,6 +425,67 @@
 }
 .backLink:hover { color: var(--blue-deep, #0b78bd); }
 
+/* ── Legacy card text, moved out of the page files (19 September 2026) ───────
+
+   WHY THESE EXIST. The blue box SHELL was always shared: articles 1 to 6 all use
+   .sidebarCard above for the navy panel. Only the text inside was done two ways.
+   Articles 4 to 6 use SidebarCard.module.css; articles 1 to 3 and CostToTrainCard
+   carried four React.CSSProperties objects each, copied between the files.
+
+   The four objects were byte-identical in every file, so they were a copy, not a
+   design decision, and they are reproduced here value for value.
+
+   WHAT IT FIXES. An inline style cannot carry a media query, so every change to
+   the legacy cards had to apply at all widths, while the same change on the
+   component cards could be mobile only. That is why the two halves kept drifting
+   and why a phones-only tweak to card text was impossible. As classes they can now
+   do whatever the component half does.
+
+   THE BRIEF SAID NOT TO DO THIS. Section 4: "Do not refactor articles 1 to 3 onto
+   the component". Overruled by Steve on 19 September 2026, on seeing that the
+   inconsistency could not otherwise be closed. Note this is the LIGHT version: the
+   markup is untouched and nothing moves onto the SidebarCard component. Only the
+   text styling moves from the page file into this stylesheet.
+
+   VERIFIED AS A NO-OP. Every text element on each article was captured at 390,
+   1280 and 1760 before and after: font, size, weight, colour, leading, tracking,
+   case, margin, padding and box. Identical, or the change was not shipped. */
+.cardTitle2 {
+  font-family: var(--font-display);
+  font-size: 38.67px;
+  letter-spacing: 0;
+  color: var(--yellow-header);
+  line-height: 0.9;
+  text-transform: uppercase;
+  margin: 0 0 6px;
+}
+
+.cardBody2 {
+  font-family: var(--font-body);
+  font-size: 1.087rem;
+  font-weight: 500;
+  color: #fff;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.statLabel2 {
+  font-family: var(--font-body);
+  font-size: 0.66rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--yellow);
+  margin-bottom: 4px;
+}
+
+.statValue2 {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  color: #fff;
+  line-height: 1;
+}
+
 /* ── Hero content (h1 + pills inside hero) ──────────────────── */
 .essayHeroContent {
   composes: heroContent from "../../components/EssayShell/EssayShell.module.css";
@@ -707,6 +768,20 @@
      in SidebarCard.module.css, which needed a query of its own. */
   .sidebarCard {
     padding-top: 20px;
+  }
+
+  /* Blue box paragraph text down 2pt with the leading tightened to 1.3em, PHONES
+     ONLY (Steve, 19 September 2026).
+
+     THIS RULE IS THE WHOLE POINT OF THE REFACTOR ABOVE. Until the legacy card text
+     moved out of the page files it was an inline style, and an inline style cannot
+     carry a media query, so this change could only ever have applied at every width
+     and would have moved the signed-off desktop layout. As a class it can be scoped
+     to the breakpoint like anything else. The component half is the matching rule in
+     SidebarCard.module.css, at the same 900px. Move one, move both. */
+  .cardBody2 {
+    font-size: calc(1.087rem - 2pt);
+    line-height: 1.3em;
   }
 
   /* Lift the bottom-aligned title, pills and back link off the very bottom so the

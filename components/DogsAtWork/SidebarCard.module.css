@@ -155,4 +155,17 @@
   .card {
     padding-top: 20px;
   }
+
+  /* Card paragraph text down 2pt with the leading tightened to 1.3em, PHONES ONLY
+     (Steve, 19 September 2026). The legacy half is .cardBody2 in
+     app/dogs-at-work/dogs-at-work.module.css, at this same 900px. Move one, move
+     both, or the two card systems drift again.
+     .subtitle is deliberately not here: it is a labelled item header rather than
+     paragraph text. */
+  .text,
+  .attrDetail,
+  .sources {
+    font-size: calc(1.087rem - 2pt);
+    line-height: 1.3em;
+  }
 }
