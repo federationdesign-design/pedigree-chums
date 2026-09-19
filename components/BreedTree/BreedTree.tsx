@@ -5487,9 +5487,12 @@ export default function BreedTree({
       /* A COMPLETED LEVEL RINGS GREEN, 19 September 2026 (owner: once completed,
          the circle stroke line should be green not yellow).
 
-         #22c55e is the same green the completed tick, the frame, the Collect
-         button and the collected rail card already use, so "this one is done"
-         reads one colour wherever it appears.
+         #2fd46b, 19 September 2026 (owner: a brighter green). It started as
+         #22c55e, the site's done-green used by the completed tick, the frame, the
+         Collect button and the collected rail card, and was raised one step on
+         the owner seeing it on the device. THOSE FOUR ARE UNCHANGED and still sit
+         on #22c55e: only the start screen's rings moved, which is what was asked
+         for. If the two should match again, this is the line to bring back.
 
          IT REPLACES THE WHOLE PALETTE, not just the yellow entries. The four
          depth colours exist to tell circles apart from their own children, and a
@@ -5503,7 +5506,7 @@ export default function BreedTree({
 
          START SCREEN ONLY IN PRACTICE, because levelCompleted is only true for a
          level already cleared, and the pit re-arms from its own start screen. */
-      const base = levelCompleted ? "#22c55e" : RING_PALETTE[(d.depth - 1 + 4) % 4];
+      const base = levelCompleted ? "#2fd46b" : RING_PALETTE[(d.depth - 1 + 4) % 4];
       /* THE PIT NO LONGER OVERRIDES THIS. It briefly did: while the circles were
          FILLED with their depth colour, a ring at that same colour vanished into
          its own disc, so every pit ring was forced to navy. The fill and the ring
