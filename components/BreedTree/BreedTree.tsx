@@ -3951,6 +3951,20 @@ export default function BreedTree({
      Cleared when a chain starts, so a reading always describes the gesture you
      just made rather than the whole round. Behind the flag at every write. */
   const spinRefuseRef = useRef<Map<string, number>>(new Map());
+  /* THE LEVEL NUMBER'S FIRST LINE, held so the word under it can be CENTRED on it
+     (owner, 19 September 2026: "dog" was right aligned under the number).
+
+     WHY A MEASUREMENT AND NOT ARITHMETIC. The first line is the digits plus a
+     half-size superscript, so its width changes with the level: "1st" and "24th"
+     and "100th" are three different widths, and Luckiest Guy's advance widths are
+     not something to estimate. getComputedTextLength gives the exact advance of a
+     <text> including its tspans, which is precisely the number wanted.
+
+     WRITTEN STRAIGHT ONTO THE SIBLING, not into state. This sits inside the pit's
+     render, which runs constantly; a setState here would loop. The ref callbacks
+     fire in tree order on every commit, the number is first in the tree, so by the
+     time the word's callback runs the element is there to measure. */
+  const lvlNumElRef = useRef<SVGTextElement | null>(null);
   // The flag itself, read once. The sim effect computes its own copy because it is
   // in scope there; the chain effect is a different effect and needs this.
   const spinOnRef = useRef(false);
@@ -13065,47 +13079,24 @@ export default function BreedTree({
                     <line x1="12" y1="11" x2="12" y2="16.8" strokeWidth={2.6} />
                   </g>
                 )}
-                {/* Start-screen only: the two-line caption under the red close
-                    square. Forced to two lines by request. Gone the instant PLAY
-                    sets `started`, so it never rides a moving square. */}
-                {d.kind === "close" && !learning && !started ? (
-                  <text
-                    className={styles.autoLabel}
-                    x={0}
-                    // 18 Aug 2026: nudged down another 10px (18 to 28), stacking
-                    // on the earlier 10px move in e984ef95.
-                    // 31 Aug 2026, MOBILE ONLY: 28 back down to 14. Desktop keeps
-                    // 28 and is not touched by any of the three mobile values here.
-                    y={half + (isMobile ? 14 : 28) * upp}
-                    textAnchor="middle"
-                    dominantBaseline="text-before-edge"
-                    // MOBILE ONLY: 24 to 16 (a third smaller, by request), which
-                    // also stops "main page" clipping the right edge: the square's
-                    // centre is only about 50px from it, and the line was ~125px
-                    // wide. Stroke 2 to 3 and forced to true black; .autoLabel's
-                    // navy stays on desktop. paint-order is stroke, so the fill
-                    // covers half the width and 3 reads as a 1.5px outline.
-                    /* 25% off with the square, 2 September 2026: 16 -> 12 and
-                       24 -> 18, stroke 3 -> 2.25 and 2 -> 1.5. THIS IS THE SAME
-                       MISS AS THE PLAY AND LEARN WORDS. Those were flat numbers
-                       too, stayed at full size when their squares shrank, and had
-                       to be corrected in a second pass. A caption is read against
-                       the thing it labels, so it moves with it.
-                       For the record, the UI_DRAWN comment says this caption
-                       "appears nowhere in this repo". It is right here. */
-                    style={{
-                      fontSize: `${(isMobile ? 12 : 18) * upp}px`,
-                      strokeWidth: `${(isMobile ? 2.25 : 1.5) * upp}px`,
-                      stroke: isMobile ? "#000000" : undefined,
-                    }}
-                  >
-                    {/* "back to main page" -> "back", 2 September 2026 (owner).
-                        One tspan, not two: the second carried a dy of 1.05em and
-                        with nothing under it that line would have reserved space
-                        for a row that is no longer there. */}
-                    <tspan x={0}>back</tspan>
-                  </text>
-                ) : null}
+                {/* THE "back" CAPTION IS REMOVED, 19 September 2026 (owner).
+
+                    WHAT WAS HERE. A start-screen-only caption under the red close
+                    square, reading "back to main page" until 2 September 2026 and
+                    "back" after it, with three separate rounds of mobile size and
+                    offset work on top: 18 to 28 on 18 August, 28 down to 14 for
+                    mobile on 31 August, and a 25% shrink with the square on
+                    2 September. The square is a red X in the top right corner and
+                    says close on its own, so the word was doing no work.
+
+                    DELETED, NOT GATED. A caption behind a false flag is something
+                    the next person half-restores. The gate it used to carry was
+                    `d.kind === "close" && !learning && !started`.
+
+                    NOTHING ELSE MOVES. The isMobile figures it carried, 12 / 18
+                    for the size and 2.25 / 1.5 for the stroke, are DUPLICATED on
+                    the play and learn captions further down this file, which still
+                    use them. That duplication is noted there and is unchanged. */}
               </g>
             ))}<g ref={pairsGRef}>{pitPairs.flatMap((id) => [pairSquare(id, "leave"), pairSquare(id, "restart")])}</g></>);
           })()}
@@ -13341,6 +13332,13 @@ export default function BreedTree({
                gap wants opening or closing. */
             /* THE SUPERSCRIPT CAME DOWN 50%, 19 September 2026 (owner: it is 2x
                bigger than it should be). 0.5 of the number becomes 0.25. */
+            /* THE NUMBER ALONE COMES DOWN 1pt, 19 September 2026 (owner). 1pt is
+               1.3333 CSS px and fsL is in CSS px, so it is a straight subtraction.
+               APPLIED ONLY TO THE DIGITS, deliberately: fsOrd, fsDog and lineDy all
+               derive from fsL, and taking it off fsL itself would quietly shrink the
+               suffix and the word and reopen the line gap the owner has just signed
+               off. This is the size the number glyphs draw at and nothing else. */
+            const fsNum = fsL - 1.3333;
             const fsOrd = fsL * 0.25;
             const fsDog = fsL * 0.45;
             /* THE LINE GAP, AND WHY 1.1 DID NOT LOOK LIKE 1.1 (owner: too much
@@ -13395,7 +13393,16 @@ export default function BreedTree({
                wins, so a viewport that cannot fit the number on the title's line
                drops it just far enough to be whole.
                THE STROKE FIGURE IN HERE MOVED WITH THE ONE BELOW, 9 to 6.3. */
-            const numY = -vbHc / 2 + Math.max(titleRowCentre * upp, (fsL * upp) / 2 + 6.3 * upp + 6 * upp);
+            /* DOWN 5px, 19 September 2026 (owner: the top of the number reads about
+               5px too high against the close square and the profile portrait).
+
+               WHY IT SAT HIGH. The block is CENTRED on the title row, and the digits
+               are by far the tallest thing on that line, so an exact centre match
+               still puts their cap line above everything else's. Aligning the tops
+               properly would mean measuring the glyph's cap height, which varies by
+               font; the owner has measured the gap on the device instead, and 5px is
+               his figure. Tune this one number if the font ever changes. */
+            const numY = -vbHc / 2 + Math.max(titleRowCentre * upp, (fsL * upp) / 2 + 6.3 * upp + 6 * upp) + 5 * upp;
             const numX = xMinC + vbWc - 97.5 * upp;
             /* TWO SEPARATE <text> NODES, not tspans on one. A tspan inherits the
                parent's dominantBaseline and its dy stacks on top of that, which
@@ -13420,11 +13427,12 @@ export default function BreedTree({
             return (
               <g aria-label={`${levelOrdinal}${ordSuffix} dog`} role="img">
                 <text
+                  ref={(el) => { lvlNumElRef.current = el; }}
                   x={numX}
                   y={numY}
                   textAnchor="end"
                   dominantBaseline="central"
-                  style={{ ...numStyle, fontSize: `${fsL * upp}px` }}
+                  style={{ ...numStyle, fontSize: `${fsNum * upp}px` }}
                 >
                   {levelOrdinal}
                   {/* The suffix rides half-height and half-size, the ordinary
@@ -13441,10 +13449,26 @@ export default function BreedTree({
                     {ordSuffix}
                   </tspan>
                 </text>
+                {/* CENTRED UNDER THE LINE ABOVE, 19 September 2026 (owner), where
+                    it used to be right aligned with it.
+                    The anchor is "middle" and the x is the first line's own centre,
+                    measured rather than guessed: the line's right edge is numX and
+                    its advance comes from getComputedTextLength, so the centre is
+                    numX minus half of it. See lvlNumElRef for why this is measured.
+                    THE FALLBACK IS numX, the old right-aligned position, so a
+                    browser that refuses the measurement gets the previous behaviour
+                    rather than a word stacked in the wrong place. */}
                 <text
+                  ref={(el) => {
+                    if (!el) return;
+                    const src = lvlNumElRef.current;
+                    let cx = numX;
+                    try { if (src) cx = numX - src.getComputedTextLength() / 2; } catch { /* no measurement available */ }
+                    el.setAttribute("x", String(cx));
+                  }}
                   x={numX}
                   y={numY + lineDy * upp}
-                  textAnchor="end"
+                  textAnchor="middle"
                   dominantBaseline="central"
                   style={{ ...numStyle, fontSize: `${fsDog * upp}px`, strokeWidth: `${strokeSmall * upp}px` }}
                 >
