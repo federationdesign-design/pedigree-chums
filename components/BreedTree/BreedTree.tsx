@@ -2572,6 +2572,7 @@ export default function BreedTree({
   levelCompleted = false,
   registerShake,
   registerSlowmo,
+  onSlowmoChange,
   onToggleCaption,
   onPitClose,
   onBackToStart,
@@ -2715,6 +2716,14 @@ export default function BreedTree({
   levelCompleted?: boolean;
   registerShake?: (fn: () => void) => void;
   registerSlowmo?: (fn: () => void) => void;
+  /* SLOW MOTION IS NOW TOGGLED FROM INSIDE THE PIT, 19 September 2026, so the
+     shell has to be told when it changes rather than being the thing that
+     changed it. LineageModal keeps its own `slowmo` state for the SCORE DRAIN,
+     which runs at four points a second while the pit is slowed; without this the
+     in-pit snail would slow the physics and the countdown and leave the drain at
+     one, which is the same split M1 was fixing a few hours earlier.
+     Reports the state AFTER the toggle, not a request to toggle. */
+  onSlowmoChange?: (on: boolean) => void;
   onToggleCaption?: () => void;
   onPitClose?: () => void;
   /* The pit menu's green rewind: back to THIS level's start screen. Owned by
@@ -5070,7 +5079,26 @@ export default function BreedTree({
   // the BODY only. No art swap through the six damaged stages and no dropped
   // pieces; those are stages 2 and 3, and both need the SVG equivalents of the
   // main pit's canvas work.
-  type UiKind = "close" | "desc" | "learn" | "leave" | "restart" | "logo";
+  /* "slowmo" AND "shake" JOINED THE IN-PIT SET, 19 September 2026 (owner: the
+     slow motion button should be an object within the pit, fixed in position, so
+     no other object can fall behind it, and the same for shake).
+
+     WHAT THEY WERE. Two DOM buttons in LineageModal, position: fixed at z-index
+     30, pinned to the bottom corners of the VIEWPORT. They sat above the pit
+     rather than in it, which is exactly why things fell behind them.
+
+     THEY DIFFER FROM EVERY OTHER MEMBER OF THIS SET in one way, and it is
+     deliberate: they never give way. The close X, the brain and the logo all
+     sink a notch per knock and come loose on the fifth. These two stay fixed for
+     the whole round, because a slow motion control you have to hunt for is worse
+     than one you cannot knock. See the hits branch in the collision loop, where
+     they are held out.
+
+     THE COST, STATED RATHER THAN DISCOVERED. Two permanently solid bodies hold
+     floor space that nothing can occupy, and the pit-full countdown is triggered
+     by occupancy, so the pit fills marginally sooner than it did. That was put
+     to the owner before this was built and accepted. */
+  type UiKind = "close" | "desc" | "learn" | "leave" | "restart" | "logo" | "slowmo" | "shake";
   // w and h are the DRAWN size in world units, and only the logo carries them:
   // every other UI object is a square and its `half` says everything. They live
   // on the body rather than being recomputed in the render, because the sim and
@@ -5104,8 +5132,10 @@ export default function BreedTree({
   const uiLeaveRef = useRef<SVGGElement>(null);
   const uiRestartRef = useRef<SVGGElement>(null);
   const uiLogoRef = useRef<SVGGElement>(null);
+  const uiSlowmoRef = useRef<SVGGElement>(null);
+  const uiShakeRef = useRef<SVGGElement>(null);
   const uiRefFor = (k: UiKind) =>
-    k === "close" ? uiCloseRef : k === "desc" ? uiDescRef : k === "learn" ? uiLearnRef : k === "leave" ? uiLeaveRef : k === "logo" ? uiLogoRef : uiRestartRef;
+    k === "close" ? uiCloseRef : k === "desc" ? uiDescRef : k === "learn" ? uiLearnRef : k === "leave" ? uiLeaveRef : k === "logo" ? uiLogoRef : k === "slowmo" ? uiSlowmoRef : k === "shake" ? uiShakeRef : uiRestartRef;
   const pressRef = useRef<{ x: number; y: number; t: number } | null>(null);
   // Where and when a press on the pit background began, so a drag can be told
   // apart from a tap. Read by onBackground.
@@ -6990,6 +7020,28 @@ export default function BreedTree({
              different places without ever colliding. */
           { x: ux - (UI_DRAWN + UI_GAP) / k, y: v[1] + (-vbHf / 2 + m + uSz / 2 + UI_NUDGE_Y) / k, vx: 0, vy: 0, r: UI_HIT_R, half: uSz / 2, a: 0, va: 0, fixed: true, hits: 0, kind: "desc" },
           { x: ux, y: v[1] + (-vbHf / 2 + m + uSz / 2 + UI_DRAWN + UI_GAP + UI_NUDGE_Y) / k, vx: 0, vy: 0, r: UI_HIT_R, half: uSz / 2, a: 0, va: 0, fixed: true, hits: 0, kind: "learn" },
+          /* THE SLOW MOTION SNAIL AND THE SHAKE JELLY, 19 September 2026 (owner).
+             Bottom corners, snail left and jelly right, which is where the DOM
+             buttons they replace already sat.
+
+             THE MIRROR OF THE TOP ROW, term for term. ux above is the right edge
+             anchor; these take the same margin m and the same uSz/2 half-slot,
+             one from the left edge and one from the right, and their y is the
+             BOTTOM inset rather than the top: +vbHf/2 - m - uSz/2.
+
+             UI_NUDGE_X AND UI_NUDGE_Y ARE NOT APPLIED HERE, deliberately. Both
+             were measured against the start screen's red X in the TOP RIGHT
+             corner: the x term pushes right into that corner and the y term
+             pushes up. On a bottom-left object the x nudge would push it away
+             from its own edge and the y nudge would lift it off the floor. The
+             only part that carries over is UI_INSET, which corrects for the
+             square being DRAWN at 0.75 of its slot, and that is direction-
+             dependent too, so it is added toward each object's own corner.
+
+             FIXED FOR THE WHOLE ROUND. See the UiKind note for why these two do
+             not give way on the fifth knock like the rest of the set. */
+          { x: v[0] + (xMinF + m + uSz / 2 + UI_INSET) / k, y: v[1] + (vbHf / 2 - m - uSz / 2 - UI_INSET) / k, vx: 0, vy: 0, r: UI_HIT_R, half: uSz / 2, a: 0, va: 0, fixed: true, hits: 0, kind: "slowmo" },
+          { x: v[0] + (xMinF + vbWf - m - uSz / 2 - UI_INSET) / k, y: v[1] + (vbHf / 2 - m - uSz / 2 - UI_INSET) / k, vx: 0, vy: 0, r: UI_HIT_R, half: uSz / 2, a: 0, va: 0, fixed: true, hits: 0, kind: "shake" },
           /* THE LOGO. Top CENTRE, not the top-right corner the three squares
              share, and 20% down the stage like the main pit's own placement.
              Its drawn width is the main pit's figure clamped to the pit, so a
@@ -9077,6 +9129,15 @@ export default function BreedTree({
             if (pr.hits >= pr.maxHits) killProp(pr, P.kind, now);
           }
           for (const [P] of [[pa], [pb2]] as any[]) {
+            /* THE SNAIL AND THE JELLY NEVER GIVE WAY, 19 September 2026 (owner).
+               Every other member of this set sinks a notch per knock and comes
+               loose on the fifth, which is the branch below. These two are
+               controls you must be able to find at any point in a round, so they
+               take no damage at all: no hits counted, no sink, no tilt, no
+               tumble. Skipped at the top rather than guarded at the `>= 5` line,
+               so they do not silently accumulate a hit count that some later
+               reader acts on. */
+            if (P.ui && (P.ui.kind === "slowmo" || P.ui.kind === "shake")) continue;
             if (P.ui && P.ui.fixed && rv > FX_MIN_PS * 0.3) {
               const u = P.ui;
               u.hits += 1;
@@ -10072,7 +10133,7 @@ export default function BreedTree({
       setStarted(true);
       doFall();
     }
-    registerSlowmo?.(() => slowmoRef.current?.());
+    registerSlowmo?.(() => { slowmoRef.current?.(); onSlowmoChange?.(slowmoOnRef.current); });
     registerShake?.(() => {
       // a shake also starts the round, so the button never blocks the pit
       if (!fellRef.current) { setLearnPeek(false); setStartPeek(false); setStarted(true); runFallRef.current?.(); }
@@ -13068,12 +13129,18 @@ export default function BreedTree({
                open. The menu only exists during a round: on the start screen
                and in learn the X already closes or goes back outright, so
                there is nothing to warn about. */
+            /* THE TWO BOTTOM-CORNER CONTROLS ARE ADDED WHILE A ROUND IS RUNNING,
+               19 September 2026, matching the gate the DOM buttons they replace
+               already used: LineageModal renders them on `running`, which is this
+               component's own `started` reported upward. They are absent on the
+               start screen and in learn, where there is no pit to slow or shake. */
             const kinds = ([
               ...(started && onBackToLearn
                 ? ["close", "learn"]
                 : learning && hideCaption
                 ? ["close", "desc"]
                 : ["close"]),
+              ...(started ? ["slowmo", "shake"] : []),
             ]) as readonly UiKind[];
             const defs: { kind: UiKind; wx: number; wy: number; a: number }[] = kinds.map((kind) => {
               const b = ub?.find((u) => u.kind === kind);
@@ -13088,8 +13155,16 @@ export default function BreedTree({
                    It matches the split above: desc goes left of the X, learn goes
                    below it. Keyed off the KIND, not off idx, because the two no
                    longer share a direction. */
-                wx: b ? b.x : v[0] + (xMinR + vbWr - m - uSz / 2 - (kind === "desc" ? uSz + 14 * upp : 0)) / kk,
-                wy: b ? b.y : v[1] + (-vbHr / 2 + m + uSz / 2 + (kind === "learn" ? uSz + 14 * upp : 0)) / kk,
+                /* The two bottom-corner controls need their own fallback, or for the
+                   frame before the bodies exist they would be drawn in the top
+                   right with the rest and then jump to the floor, which reads as
+                   a glitch exactly as the note above describes. */
+                wx: b ? b.x : kind === "slowmo"
+                  ? v[0] + (xMinR + m + uSz / 2) / kk
+                  : v[0] + (xMinR + vbWr - m - uSz / 2 - (kind === "desc" ? uSz + 14 * upp : 0)) / kk,
+                wy: b ? b.y : (kind === "slowmo" || kind === "shake")
+                  ? v[1] + (vbHr / 2 - m - uSz / 2) / kk
+                  : v[1] + (-vbHr / 2 + m + uSz / 2 + (kind === "learn" ? uSz + 14 * upp : 0)) / kk,
                 a: b ? b.a : 0,
               };
             });
@@ -13180,6 +13255,10 @@ export default function BreedTree({
                     ? "Back to the start screen"
                     : d.kind === "learn"
                     ? "Back to the learn area"
+                    : d.kind === "slowmo"
+                    ? "Slow motion"
+                    : d.kind === "shake"
+                    ? "Shake the pit"
                     : "Breed information"
                 }
                 transform={`translate(${(d.wx - v[0]) * kk},${(d.wy - v[1]) * kk}) rotate(${d.a * 57.2958})`}
@@ -13220,7 +13299,27 @@ export default function BreedTree({
                           : onPitClose)
                       : d.kind === "learn"
                       ? onBackToLearn
+                      /* THE TWO BOTTOM CONTROLS, 19 September 2026. They call the
+                         very functions the DOM buttons called through
+                         registerSlowmo and registerShake, so there is one
+                         implementation of each and no chance of the two drifting.
+                         The snail reports its new state upward for the score
+                         drain: see onSlowmoChange.
+                         The shake also starts the round if it has not started,
+                         which is the rule the registered version already carried,
+                         so pressing it on a still pit is never a dead tap. */
+                      : d.kind === "slowmo"
+                      ? () => { slowmoRef.current?.(); onSlowmoChange?.(slowmoOnRef.current); }
+                      : d.kind === "shake"
+                      ? () => {
+                          if (!fellRef.current) { setLearnPeek(false); setStartPeek(false); setStarted(true); runFallRef.current?.(); }
+                          shakeInnerRef.current?.();
+                        }
                       : onToggleCaption;
+                  /* `b && !b.fixed` IS WHAT MAKES THESE TAP-ONLY. These two are
+                     fixed for the whole round and never come loose, so the drag
+                     body is always null for them and startDrag runs the action on
+                     release without ever moving anything. Nothing extra needed. */
                   startDrag(e, b && !b.fixed ? b : null, act);
                 }}>
                 <rect x={-half} y={-half} width={uSz} height={uSz} rx={uSz * 0.3}
@@ -13242,7 +13341,34 @@ export default function BreedTree({
                     stroke: d.kind === "close" && (learning || !started) ? "#ffffff" : "var(--navy, #0a3a57)",
                     strokeWidth: 5 * upp,
                   }} />
-                {d.kind === "leave" ? (
+                {d.kind === "slowmo" || d.kind === "shake" ? (
+                  /* THE TWO ARTWORK ICONS, 19 September 2026. Both are existing
+                     assets: the snail is an SVG and the jelly a PNG, and both were
+                     already being served to the DOM buttons these replace, so
+                     nothing new ships.
+
+                     DRAWN AS <image>, not redrawn as paths, because there is no
+                     path to copy: /jelly-shake.png is a bitmap. The snail could
+                     have been inlined but is kept as an image beside it so the
+                     pair is sized by one rule rather than two.
+
+                     THE SIZES MIRROR THE DOM BUTTONS they replace, as a fraction
+                     of the square rather than in pixels, because these are drawn
+                     in svg units: the snail was 52.7 in an 85.68 button, the jelly
+                     65.45, which is 0.615 and 0.764 of the box.
+
+                     pointerEvents none on the image itself so the tap lands on
+                     the group, the same rule the logo already follows. */
+                  <image
+                    href={d.kind === "slowmo" ? "/svg-snail-icon.svg" : "/jelly-shake.png"}
+                    x={-uSz * (d.kind === "slowmo" ? 0.615 : 0.764) / 2}
+                    y={-uSz * (d.kind === "slowmo" ? 0.615 : 0.764) / 2}
+                    width={uSz * (d.kind === "slowmo" ? 0.615 : 0.764)}
+                    height={uSz * (d.kind === "slowmo" ? 0.615 : 0.764)}
+                    preserveAspectRatio="xMidYMid meet"
+                    style={{ pointerEvents: "none" }}
+                  />
+                ) : d.kind === "leave" ? (
                   // White on red, the same X the corner uses.
                   <g stroke="#ffffff" strokeWidth={iconStroke} strokeLinecap="round">
                     <line x1={-half * 0.34} y1={-half * 0.34} x2={half * 0.34} y2={half * 0.34} />
