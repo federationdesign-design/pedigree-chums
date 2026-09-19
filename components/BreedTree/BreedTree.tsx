@@ -5484,7 +5484,26 @@ export default function BreedTree({
          caution as the pair above: adjacent depths that share a hue read as one
          colour where one circle sits inside the other. Two yellows then two
          blues is the owner's scheme, recorded as chosen. */
-      const base = RING_PALETTE[(d.depth - 1 + 4) % 4];
+      /* A COMPLETED LEVEL RINGS GREEN, 19 September 2026 (owner: once completed,
+         the circle stroke line should be green not yellow).
+
+         #22c55e is the same green the completed tick, the frame, the Collect
+         button and the collected rail card already use, so "this one is done"
+         reads one colour wherever it appears.
+
+         IT REPLACES THE WHOLE PALETTE, not just the yellow entries. The four
+         depth colours exist to tell circles apart from their own children, and a
+         finished level is not being read that way any more: it is being read as
+         finished. Leaving depths 3 and 4 blue against green ones would have said
+         a level was half done.
+
+         THE LIFT STILL APPLIES below, so the circle being read is still a lighter
+         green than its neighbours; it is the hue that stops varying, not the
+         brightness.
+
+         START SCREEN ONLY IN PRACTICE, because levelCompleted is only true for a
+         level already cleared, and the pit re-arms from its own start screen. */
+      const base = levelCompleted ? "#22c55e" : RING_PALETTE[(d.depth - 1 + 4) % 4];
       /* THE PIT NO LONGER OVERRIDES THIS. It briefly did: while the circles were
          FILLED with their depth colour, a ring at that same colour vanished into
          its own disc, so every pit ring was forced to navy. The fill and the ring
