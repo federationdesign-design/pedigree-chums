@@ -2166,6 +2166,11 @@ export default function LineageMap({
     })
     .filter((c) => c.img);
   // images successfully placed in a frame -- turns their node green
+  /* THE PLACED CARDS, DERIVED ONCE, 19 September 2026. Two layers draw from it
+     now, the cards themselves and the corner marker layer that follows them, and
+     they must agree exactly or a card could show without its markers. Hoisted
+     rather than repeated so the collectRef read that decides it happens once. */
+  const placedCards = pickCards.filter((c) => cardFrame.has(c.id) && !collectRef.current && !stackedIds.has(c.id));
   const placedImgs = new Set(pickCards.filter((c) => placedSet.has(c.id)).map((c) => c.img));
   // Duplicate cards of one breed stack at the same spot; only the top of each
   // stack (the last in order) shows its status dot, % pill and info icon.
@@ -4905,7 +4910,10 @@ className={[
         });
       })}
       {/* Placed cards rendered as position:fixed HTML -- completely immune to SVG pan */}
-      {pickCards.filter((c) => cardFrame.has(c.id) && !collectRef.current && !stackedIds.has(c.id)).map((c) => {
+      {/* ONE LIST, TWO LAYERS, 19 September 2026. The corner markers below render
+          from the very same array, so a card can never appear without its markers
+          or the other way round. */}
+      {placedCards.map((c) => {
         const ff2 = cardFrame.get(c.id)!;
         const left = ff2.sx - CW / 2;
         const top = ff2.sy - CW / 2;
@@ -5047,6 +5055,62 @@ className={[
 
                NON-CIRCULAR ONLY. The circular branch places these off RIM_IN on the
                lifted layer and is untouched. */}
+            {/* THE THREE CORNER MARKERS HAVE MOVED OUT OF THE CARD, 19 September
+                2026 (owner). They are rendered in one layer after every card, just
+                below this map's closing brace. See the note there for why. */}
+          </div>
+        );
+      })}
+      {/* ===== THE CORNER MARKER LAYER, 19 September 2026 (owner) ==============
+          The status dot, the info "i" and the percentage pill used to be children
+          of each placed card. They are now one layer of their own, rendered after
+          every card, so nothing a card draws can paint over them.
+
+          THE FAULT IT FIXES, and it is the second time this exact bug has been
+          hit. Each card carries transform: rotate(cardDeg), and a transform
+          creates a stacking context, so a marker's zIndex only ever ranked it
+          INSIDE its own card. On the lifted layer the info button sits at
+          RIM_IN - 14, which on a phone-sized card is about MINUS 5, so it
+          deliberately straddles the circle's rim and overhangs the card's box.
+          That overhanging sliver landed in the NEIGHBOUR's box, and the
+          neighbour, later in the DOM, painted its white rim straight across it.
+          On screen that is a white cross through the blue "i".
+
+          THE 16 SEPTEMBER FIX SOLVED THIS FOR THE NON-CIRCULAR GRID by pulling
+          the markers inside the card at a flat inset of 4, and its own comment
+          says "NON-CIRCULAR ONLY. The circular branch places these off RIM_IN on
+          the lifted layer and is untouched." This is that untouched branch.
+
+          WHY A LAYER AND NOT ANOTHER CLAMP. Clamping was offered and declined:
+          on a circle the marker is MEANT to straddle the rim at 45 degrees, and
+          pulling it inside would have made the lifted layer look like the flat
+          grid. A layer keeps the geometry exactly as designed and removes the
+          only reason it failed.
+
+          HOW IT STAYS IN REGISTER. Each wrapper repeats the card's own box, the
+          same left, top, CW and rotate(cardDeg) about the same centre, so every
+          marker keeps the exact offsets it had. If the card's position or tilt
+          ever changes, this has to change with it: they are two copies of one
+          layout and nothing enforces that they agree.
+
+          POINTER EVENTS. The wrapper is `none` so it cannot swallow a tap meant
+          for the card underneath, and the two interactive markers turn it back on
+          for themselves. The dot never was interactive. ==================== */}
+      {placedCards.map((c) => {
+        const ff3 = cardFrame.get(c.id)!;
+        const left = ff3.sx - CW / 2;
+        const top = ff3.sy - CW / 2;
+        return (
+          <div
+            key={`marks-${c.id}`}
+            style={{
+              position: bounded ? "absolute" : "fixed", left, top, width: CW, height: CW,
+              transform: `rotate(${cardDeg}deg)`,
+              transformOrigin: "center",
+              pointerEvents: "none",
+              zIndex: 66,
+            }}
+          >
             {/* status dot top-left, inside */}
             {isTopOfStack(c) && !PACK_BREEDS.has(c.name) && !INSTR_NAMES.has(breed.name) && (() => {
               const ts = TAG_STYLE[c.status ?? "extinct"];
@@ -5057,7 +5121,7 @@ className={[
             {/* info icon top-right, inside: see the corner-marker note above */}
             {isTopOfStack(c) && !INSTR_NAMES.has(breed.name) && (breedInfo[c.name] || c.note) && (
               <button
-                style={{ position: "absolute", right: circular ? RIM_IN - 14 : 4, top: circular ? RIM_IN - 14 : 4, width: 28, height: 28, border: "2px solid #fff", borderRadius: "50%", background: "var(--blue-deep, #0c5b92)", color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", padding: 0, fontStyle: "italic", fontWeight: 700, fontSize: 14, fontFamily: "Georgia, serif", zIndex: 65 }}
+                style={{ position: "absolute", right: circular ? RIM_IN - 14 : 4, top: circular ? RIM_IN - 14 : 4, width: 28, height: 28, border: "2px solid #fff", borderRadius: "50%", background: "var(--blue-deep, #0c5b92)", color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", padding: 0, fontStyle: "italic", fontWeight: 700, fontSize: 14, fontFamily: "Georgia, serif", zIndex: 65, pointerEvents: "auto" }}
                 onClick={(e) => { e.stopPropagation(); if (infoHover === c.id) { setInfoHover(null); } else { closeAll(); setInfoHover(c.id); } }}
                 onPointerDown={(e) => e.stopPropagation()}
               >i</button>
@@ -5071,7 +5135,7 @@ className={[
                 <div
                   onClick={(e) => { e.stopPropagation(); if (pctHover === c.id) { setPctHover(null); } else { closeAll(); setPctHover(c.id); } }}
                   onPointerDown={(e) => e.stopPropagation()}
-                  style={{ position: "absolute", ...(circular ? { left: "50%", transform: "translateX(-50%)", bottom: -12 } : { right: 4, bottom: 2 }), background: "var(--navy, #0a3a57)", color: "#ffd23e", borderRadius: 12, padding: "2px 8px", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "Montserrat, system-ui", zIndex: 64, boxShadow: "0 1px 4px rgba(0,0,0,0.35)" }}
+                  style={{ position: "absolute", ...(circular ? { left: "50%", transform: "translateX(-50%)", bottom: -12 } : { right: 4, bottom: 2 }), background: "var(--navy, #0a3a57)", color: "#ffd23e", borderRadius: 12, padding: "2px 8px", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "Montserrat, system-ui", zIndex: 64, boxShadow: "0 1px 4px rgba(0,0,0,0.35)", pointerEvents: "auto" }}
                 >
                   {pillTxt}
                 </div>
