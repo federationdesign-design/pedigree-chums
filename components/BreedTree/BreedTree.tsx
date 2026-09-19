@@ -7029,19 +7029,29 @@ export default function BreedTree({
              one from the left edge and one from the right, and their y is the
              BOTTOM inset rather than the top: +vbHf/2 - m - uSz/2.
 
-             UI_NUDGE_X AND UI_NUDGE_Y ARE NOT APPLIED HERE, deliberately. Both
-             were measured against the start screen's red X in the TOP RIGHT
-             corner: the x term pushes right into that corner and the y term
-             pushes up. On a bottom-left object the x nudge would push it away
-             from its own edge and the y nudge would lift it off the floor. The
-             only part that carries over is UI_INSET, which corrects for the
-             square being DRAWN at 0.75 of its slot, and that is direction-
-             dependent too, so it is added toward each object's own corner.
+             THE NUDGES ARE MIRRORED, NOT DROPPED. CORRECTED 19 September 2026
+             (owner: the positioning should match the padding of the other assets
+             in each corner).
+
+             WHAT I GOT WRONG FIRST TIME. I left UI_NUDGE_X and UI_NUDGE_Y off
+             these two on the grounds that both were measured for the TOP RIGHT
+             corner, and applied a bare UI_INSET instead. But those nudges are not
+             corner-specific decoration, they ARE the padding: UI_NUDGE_Y is
+             -15 - UI_INSET, so the top squares sit 15px plus an inset CLOSER to
+             their edge than m alone would put them. Dropping it and then adding
+             UI_INSET the wrong way round put these two 15px plus twice the inset
+             too far in, which is the gap the owner measured off the screen.
+
+             SO EACH NUDGE IS NEGATED RATHER THAN OMITTED. A nudge that means
+             "toward the top right" means "toward the bottom left" with its sign
+             flipped, which is exactly what a mirrored corner wants. The shake
+             lands on ux itself, the same x the close X and the brain share, so
+             the right-hand column is one line top to bottom.
 
              FIXED FOR THE WHOLE ROUND. See the UiKind note for why these two do
              not give way on the fifth knock like the rest of the set. */
-          { x: v[0] + (xMinF + m + uSz / 2 + UI_INSET) / k, y: v[1] + (vbHf / 2 - m - uSz / 2 - UI_INSET) / k, vx: 0, vy: 0, r: UI_HIT_R, half: uSz / 2, a: 0, va: 0, fixed: true, hits: 0, kind: "slowmo" },
-          { x: v[0] + (xMinF + vbWf - m - uSz / 2 - UI_INSET) / k, y: v[1] + (vbHf / 2 - m - uSz / 2 - UI_INSET) / k, vx: 0, vy: 0, r: UI_HIT_R, half: uSz / 2, a: 0, va: 0, fixed: true, hits: 0, kind: "shake" },
+          { x: v[0] + (xMinF + m + uSz / 2 - UI_NUDGE_X) / k, y: v[1] + (vbHf / 2 - m - uSz / 2 - UI_NUDGE_Y) / k, vx: 0, vy: 0, r: UI_HIT_R, half: uSz / 2, a: 0, va: 0, fixed: true, hits: 0, kind: "slowmo" },
+          { x: ux, y: v[1] + (vbHf / 2 - m - uSz / 2 - UI_NUDGE_Y) / k, vx: 0, vy: 0, r: UI_HIT_R, half: uSz / 2, a: 0, va: 0, fixed: true, hits: 0, kind: "shake" },
           /* THE LOGO. Top CENTRE, not the top-right corner the three squares
              share, and 20% down the stage like the main pit's own placement.
              Its drawn width is the main pit's figure clamped to the pit, so a
@@ -13338,8 +13348,14 @@ export default function BreedTree({
                            rather than backing out. */
                         : d.kind === "close" && (learning || !started) ? "#ef4444"
                         : "var(--yellow, #ffd23e)",
-                    stroke: d.kind === "close" && (learning || !started) ? "#ffffff" : "var(--navy, #0a3a57)",
-                    strokeWidth: 5 * upp,
+                    /* NO OUTLINE ON THE SNAIL OR THE JELLY, 19 September 2026
+                       (owner). Every other square in this set carries a 5px rim,
+                       navy on yellow or white on red. These two are plain yellow
+                       tiles with the artwork on them, which is how they read as
+                       controls rather than as another way out of the round. */
+                    stroke: d.kind === "slowmo" || d.kind === "shake" ? "none"
+                      : d.kind === "close" && (learning || !started) ? "#ffffff" : "var(--navy, #0a3a57)",
+                    strokeWidth: d.kind === "slowmo" || d.kind === "shake" ? 0 : 5 * upp,
                   }} />
                 {d.kind === "slowmo" || d.kind === "shake" ? (
                   /* THE TWO ARTWORK ICONS, 19 September 2026. Both are existing
