@@ -137,7 +137,13 @@ type Props = {
      event that advances the banked total. The score is passed rather than read
      upstream so the two can never be a render out of step. */
   onBankScore?: (s: number) => void;
-  onNextLevel?: () => void;
+  /* NOW CARRIES THE BUTTON'S OWN RECT, 19 September 2026 (owner: on the Next
+     Level route the object drops from the middle of the page and is the wrong
+     shape). It took no argument, so BreedStrip built the next level with no
+     fromRect and TimeTunnel fell back to a 160 by 200 box at the screen centre.
+     That one omission is both faults: the wrong place and the wrong aspect.
+     Optional, so a caller that does not care can still pass a bare handler. */
+  onNextLevel?: (rect?: { x: number; y: number; w: number; h: number }) => void;
   /* START SCREEN NAVIGATION (2 Sept 2026). Straight pass-through to BreedTree.
      BreedStrip owns the campaign list and supplies these; undefined means there
      is nowhere to go in that direction, which the pit shows as a dimmed control.
@@ -1107,7 +1113,16 @@ export default function LineageModal({ name, image, character, lineage, fromRect
                   clamps. */}
               <div className={css.winFoot}>
                 {goReady && (nextLevelLabel && onNextLevel ? (
-                  <button type="button" className={`${css.endBtnGo} ${css.winGo}`} onClick={onNextLevel}>Next Level</button>
+                  <button type="button" className={`${css.endBtnGo} ${css.winGo}`} onClick={(e) => {
+                    /* The rect is read off the button at the moment it is pressed,
+                       which is the only moment it is certainly on screen and in its
+                       final position. Same shape as the history card's own capture
+                       in BreedStrip.
+                       NOT A JSX COMMENT ABOVE THIS TAG: it sits in a ternary
+                       branch, where two children would need a fragment. */
+                    const r = e.currentTarget.getBoundingClientRect();
+                    onNextLevel?.({ x: r.x, y: r.y, w: r.width, h: r.height });
+                  }}>Next Level</button>
                 ) : (
                   // Last level, so there is nothing to go on to. The way out has
                   // to come back, or the player is stuck on this screen.

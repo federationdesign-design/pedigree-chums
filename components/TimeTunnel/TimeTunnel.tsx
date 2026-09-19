@@ -101,6 +101,17 @@ const BTN_TEXT = "#ffffff";
    fixed 22. Capped so a very flat rect cannot produce a negative arc. */
 const BTN_TEXT_W = 0.62;      // the white label bar, as a share of the button width
 const BTN_TEXT_H = 0.16;      // and of its height
+/* A BUTTON-SHAPED FALLBACK, 19 September 2026 (owner: on the Next Level route the
+   object is the wrong shape and size).
+
+   THE CARD'S FALLBACK IS 160 BY 200, a PORTRAIT box, because a dog card is taller
+   than it is wide. Drawn as a pill with a radius of half its height that comes out
+   as a near-circle, which is what the owner photographed. The real cause was the
+   missing rect, now carried through from the Next Level button itself, but a
+   fallback that should never fire is still a fallback that should be right: a
+   button is landscape. */
+const BTN_FALLBACK_W = 220;
+const BTN_FALLBACK_H = 64;
 
 // Background transition: the tunnel starts flat navy and warms to the pit's own
 // start-screen gradient by the end of the run, so the reveal has no seam. That
@@ -239,8 +250,8 @@ export default function TimeTunnel({ onDone, onResolve, fromRect }: { onDone?: (
        be resized into or out of mid-run, and a matchMedia read inside the draw
        loop would be a layout read at 60fps. */
     const onPhone = typeof window !== "undefined" && window.innerWidth <= BTN_MOBILE_MAX;
-    const cardW0 = rect ? rect.w : CARD_FALLBACK_W;
-    const cardH0 = rect ? rect.h : CARD_FALLBACK_H;
+    const cardW0 = rect ? rect.w : (onPhone ? BTN_FALLBACK_W : CARD_FALLBACK_W);
+    const cardH0 = rect ? rect.h : (onPhone ? BTN_FALLBACK_H : CARD_FALLBACK_H);
     /* THE MOBILE BUTTON, diving in place of the card. It shares every bit of the
        card's motion, the same ease, spin and shrink, so the two read as one
        animation with a different object in it; only the drawing differs.

@@ -578,7 +578,7 @@ export default function BreedStrip({
       onNavNext={nextLevelOf(active.name) ? () => navTo(nextLevelOf(active.name)) : undefined}
       onNavPrevEra={prevEraOf(active.name) ? () => navTo(prevEraOf(active.name)) : undefined}
       onNavNextEra={nextEraOf(active.name) ? () => navTo(nextEraOf(active.name)) : undefined}
-      onNextLevel={() => {
+      onNextLevel={(rect) => {
         // The one place a level is known to be finished, so the one place this is
         // recorded. Keyed by name, which is the same key the timeline and the
         // lineage records use.
@@ -591,7 +591,12 @@ export default function BreedStrip({
         });
         const nb = nextLevelOf(active.name);
         const na = nb ? buildActive(nb) : null;
-        if (na) setActive(na);
+        /* THE BUTTON'S RECT COMES WITH IT, 19 September 2026. buildActive returns
+           no fromRect, because it is built from a breed record rather than from
+           anything on screen, so this route reached TimeTunnel with none and the
+           object dived from the screen centre at a fallback size. The Next Level
+           button now reports its own rect and it is carried here. */
+        if (na) setActive({ ...na, fromRect: rect });
       }}
       onLost={() => {
         /* THE LIFE IS SPENT ON THE LOSS, 19 September 2026 (owner). It used to
