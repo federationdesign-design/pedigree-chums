@@ -2811,7 +2811,7 @@ export default function BreedTree({
        fell terriers and the Pug all become single-child nodes the moment their
        ancestry is written.
 
-       THE LAYOUT IS FIXED WHERE THE LAYOUT IS, in the pack pass below: see
+       THE LAYOUT IS FIXED WHERE THE LAYOUT IS, in the post-relayout pass below: see
        SOLO_CHILD_K. These two changes only make sense together, and shipping this
        one alone leaves 68 ancestors drawn as an 8px hairline round a circle that
        fills them, which is worse than deleting them. */
@@ -2827,6 +2827,25 @@ export default function BreedTree({
     // between two children, and a second literal would drift from this one.
     const PACK_PAD = displayOnly ? 0 : 8;
     const ns = pack<LineageNode>().size([SIZE, SIZE]).padding(PACK_PAD)(h).descendants();
+    normalizeTop(ns);
+    if (isMobile || dockAside) relayoutMobile(ns, aspectKey, dockAside ? level : null, isMobile ? 1 : 0.6, displayOnly);
+    /* THIS PASS RUNS AFTER THE RELAYOUT, 19 September 2026 (owner: the nested circle
+       sits at the bottom the way Celtic Heeler does).
+
+       IT USED TO RUN BEFORE, straight off the pack, and that is why "straight down"
+       did not come out down. relayoutMobile rotates the whole cloud a quarter turn
+       whenever the depth-1 cluster is wider than tall, so a downward offset chosen in
+       pack space arrives on screen pointing RIGHT. Choosing the direction after every
+       transform has run is the only way for down to mean down.
+
+       IT IS SAFE HERE, and that was measured rather than assumed: relayoutMobile fits
+       the cluster from the DEPTH-1 circles alone, and across all 93 levels there is
+       not one lone-child parent at depth 0. Every one of the 125 sits at depth 1 or
+       deeper, so this pass never resizes a circle the fit was measured from. If a
+       level ever authors a root with exactly one child, that stops being true and
+       this has to move back above normalizeTop with the rotation compensated for.
+
+       The displayOnly rotation below still runs last, as its own note requires. */
     /* A LONE CHILD MUST NOT FILL ITS PARENT (owner, 18 September 2026).
 
        THE PROBLEM. d3.pack sizes a parent from its children, so a node with ONE
@@ -2867,22 +2886,42 @@ export default function BreedTree({
          19 August duplicate device looked right: not the count, the offset. So a lone
          child is placed the same way, centre at R - r, tangent inside the rim.
 
-         OUTWARD FROM THE DIAGRAM'S CENTRE, so the crescent falls on the inner side
-         where the eye is already travelling, and a subtree leans away from the middle
-         rather than into its siblings. A node sitting exactly at the centre has no
-         direction to take, so it falls back to straight down.
+         STRAIGHT DOWN, ALWAYS (owner, 19 September 2026). This was "outward from the
+         diagram's centre", on the reasoning that the crescent should fall on the
+         inner side and a subtree should lean away from its siblings. It buried the
+         parent's name on 39 of the 115 lone-child nodes, across 30 levels, and
+         Scottish Terrier (level 35) and King Charles Spaniel (level 37) are the two
+         that were reported.
 
-         THE PARENT'S NAME IS COVERED, AND THAT IS NOT NEW. Labels are interleaved
-         with circles, so any nested child paints over its parent's label already; the
-         crescent is what makes the parent readable as a ring, not the text. See
-         labelBuried for the hover case, which is untouched.
+         WHY OUTWARD COULD NOT WORK. The direction used to be decided in PACK space,
+         before the relayout, and relayoutMobile then rotates the WHOLE cloud a quarter
+         turn whenever the depth-1 cluster is wider than tall:
+         `if (w0 > h0) { const t = p.x; p.x = p.y; p.y = -t; }`. That maps rightward
+         onto UPWARD. Both reported levels offset dead horizontally in pack space,
+         ux 1.00 and uy 0.00, and arrived on screen pointing at the ceiling. So
+         "outward" was outward from a centre the circles no longer had by the time
+         they were drawn. This pass now runs after every transform, so the coordinates
+         it reads are the ones you see: see the note above it.
 
-         CHAINS TAKE THE SAME DIRECTION, deliberately, as the first thing to judge
-         rather than the cleverest. An inner node is offset from its already-moved
-         position, so a chain leans consistently outward. Curly-Coated Retriever is
-         the level to look at: four wrappers from depth 2. If it drifts, alternating
-         or rotating per depth is the next thing to try. */
-      const cx = SIZE / 2, cy = SIZE / 2;
+         AND THE LABEL IS ALWAYS AT THE TOP. titleDy(r) is -0.65 * r, drawn per circle
+         at render time, so it does not rotate with the cloud. Anything with an upward
+         component lands on the name. Down is the only direction that cannot.
+
+         MEASURED, over all 93 levels: outward buries 39, straight down buries 0.
+         Handing the placement to pack instead, by giving the lone child an equal-value
+         echo sibling the way Celtic Heeler does, was measured too and buries 40: pack
+         lays a pair out horizontally and the same rotation stands it on end. The
+         rotation is the cause, not the chooser.
+
+         THE PRICE, AND IT IS REAL: a subtree can now lean into a neighbouring circle
+         rather than away from it, because nothing is steering it any more. Accepted:
+         39 buried names is the worse trade. The alternative, moving the label off the
+         top, reaches every label on every circle at every depth including the chum
+         pages and /chums2, which is far wider than this bug.
+
+         CHAINS STILL COMPOUND, unchanged. descendants() is pre-order, so an inner
+         lone child offsets again from its already-moved centre and a chain walks
+         steadily downward. Curly-Coated Retriever is still the level to look at. */
       for (const p of ns) {
         const kids = p.children;
         if (!kids || kids.length !== 1) continue;
@@ -2897,19 +2936,13 @@ export default function BreedTree({
            it, and at K 0.5 the result is offset == radius, which is what two tangent
            equal circles give. */
         const off = Math.max(0, p.r - nr - PACK_PAD); // the device's own rim gap
-        let ux = p.x - cx, uy = p.y - cy;
-        const len = Math.hypot(ux, uy);
-        if (len < 1e-6) { ux = 0; uy = 1; } else { ux /= len; uy /= len; }
-        const dx = ux * off, dy = uy * off;
         for (const d of c.descendants()) {
-          d.x = p.x + (d.x - p.x) * SOLO_CHILD_K + dx;
-          d.y = p.y + (d.y - p.y) * SOLO_CHILD_K + dy;
+          d.x = p.x + (d.x - p.x) * SOLO_CHILD_K;
+          d.y = p.y + (d.y - p.y) * SOLO_CHILD_K + off; // straight down: see above
           d.r *= SOLO_CHILD_K;
         }
       }
     }
-    normalizeTop(ns);
-    if (isMobile || dockAside) relayoutMobile(ns, aspectKey, dockAside ? level : null, isMobile ? 1 : 0.6, displayOnly);
     // /chums2 (displayOnly) OFF-CENTRE inner circles (chums2 #2, revised): d3 pack +
     // the relayout leave a parent's child cluster on the parent's vertical centreline,
     // over its name label. A leftward shift did not clear it (the pair re-centred), so

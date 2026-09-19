@@ -2047,9 +2047,24 @@ const LINEAGE: Record<string, LineageNode> = {
     // has been reversed: Celtic Heeler is now a child of that root instead. To
     // avoid leaving Celtic Heeler a single pass-through child, "Old hunting dogs
     // of the Celts" was promoted out of the removed ring into a direct child
-    // here. Early badger 60, Old hunting dogs 40. The ring carries no value of
-    // its own, so Early badger's 60 is written as two even children of 30
-    // (30 + 30 = 60), and 60 + 40 = 100.
+    // here. Early badger 60, Old hunting dogs 40.
+    /* THE SELF-ECHO IS GONE, 19 September 2026 (owner). Early badger's 60 used to be
+       written as TWO even children of 30: Ancient Celtic earth dogs, and a copy of
+       Early badger itself. The copy was a LAYOUT device. A lone child used to be
+       deleted as a redundant wrapper, and before that it filled its parent's ring
+       entirely, so writing a second child was how the ancestor was made to draw.
+
+       IT WAS NOT FREE, AND THAT IS WHY IT HAD TO GO. The copy is a real leaf with a
+       real value, so it entered this dog's progenitor list under its own name
+       holding 30% of the dog, listing Early Badger hunting dogs as an ancestor of
+       Early Badger hunting dogs, and it pushed the two genuine progenitors down to
+       make room. The list still totalled 100, which is the only property
+       tests/lineage guards, so it passed for a month.
+
+       NOTHING IS NEEDED IN ITS PLACE. The wrapper collapse went on 18 September and
+       SOLO_CHILD_K now nests a lone child inside its parent geometrically, after the
+       pack, moving no share at all. So the one real child simply carries the whole
+       60, which is what was authored in the first place. */
     children: [
       {
         name: "Early Badger hunting dogs",
@@ -2057,11 +2072,10 @@ const LINEAGE: Record<string, LineageNode> = {
         img: "/history/breeds/early-badger-hunting-dogs.jpg",
         // No value of its own. A parent's share is the sum of its children, and
         // d3 adds an owned value ON TOP of them, so carrying both would count
-        // this line twice. The two 30s below are Early badger's 60 share written
-        // as two even children; the self-duplicate keeps the ancestor in step.
+        // this line twice. The 60 below IS this ring's share, held by its one
+        // documented ancestor.
         children: [
-          { name: "Ancient Celtic earth dogs", note: "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.", img: "/history/breeds/ancient-celtic-earth-dog.jpg", value: 30 },
-          { name: "Early Badger hunting dogs", note: "The long, low hunting dogs the Celts are said to have brought to Cardiganshire -- short-legged earth dogs bred to pursue badger and fox. Now extinct.", img: "/history/breeds/early-badger-hunting-dogs.jpg", value: 30 },
+          { name: "Ancient Celtic earth dogs", note: "Pre-Roman low-slung hunting dogs used by Celtic tribes across northern Europe. Now extinct.", img: "/history/breeds/ancient-celtic-earth-dog.jpg", value: 60 },
         ],
       },
       { name: "Old hunting dogs of the Celts", note: "The native running dogs of Iron Age Europe. Now extinct.", img: "/history/breeds/Old-hunting-dogs-of-the-Celts.jpg", value: 40 },
