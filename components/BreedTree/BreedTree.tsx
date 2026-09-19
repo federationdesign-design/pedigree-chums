@@ -5504,9 +5504,22 @@ export default function BreedTree({
          green than its neighbours; it is the hue that stops varying, not the
          brightness.
 
-         START SCREEN ONLY IN PRACTICE, because levelCompleted is only true for a
-         level already cleared, and the pit re-arms from its own start screen. */
-      const base = levelCompleted ? "#2fd46b" : RING_PALETTE[(d.depth - 1 + 4) % 4];
+         START SCREEN ONLY, AND IT HAS TO BE SAID IN CODE, 19 September 2026.
+
+         THE NOTE HERE USED TO CLAIM IT WAS "start screen only in practice,
+         because levelCompleted is only true for a level already cleared". That
+         was wrong and shipped: levelCompleted stays true for the whole session on
+         a cleared level, the pit re-arms from that same start screen without the
+         prop changing, and strokeColorFor is what every PIT circle wears too. So
+         replaying a finished level turned the whole pit green, which the owner
+         saw as a green glow on circles that could be chained.
+
+         `!fellRef.current` IS THE GATE. fellRef is set by the drop and is the
+         file's own answer to "is the pit live", used by the word rule, the chip
+         count and the single-circle fill. Before the drop this is the start
+         screen and the green is right; after it the pit takes its depth palette
+         back, which is what the chain's own colours are measured against. */
+      const base = levelCompleted && !fellRef.current ? "#2fd46b" : RING_PALETTE[(d.depth - 1 + 4) % 4];
       /* THE PIT NO LONGER OVERRIDES THIS. It briefly did: while the circles were
          FILLED with their depth colour, a ring at that same colour vanished into
          its own disc, so every pit ring was forced to navy. The fill and the ring
