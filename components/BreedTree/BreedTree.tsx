@@ -4855,29 +4855,34 @@ export default function BreedTree({
   // objects in the main pit. Circles stay click-to-zoom only. The sim exposes
   // a wake() so a drag can restart physics after everything has settled.
   const wakeRef = useRef<(() => void) | null>(null);
-  /* THE PIT STOPS WHILE A CIRCLE IS LIFTED (owner, 18 September 2026).
+  /* THE PIT STOPPED WHILE A CIRCLE WAS LIFTED (owner, 18 September 2026).
+     REVERSED 19 September 2026 (owner): the pit is now ALWAYS ACTIVE, lift or no
+     lift, countdown included. The owner was offered a middle option, physics
+     live but the pit-full poll still held, and chose the full version knowingly:
+     a round CAN now end while you are reading the learn layer.
 
-     WHY. The lift covers the pit completely, so every frame the sim draws while it
-     is open is work nobody can see. It is not free work either: AUTO on a 40 node
-     dog schedules about 80 separate timers, each its own task, so React cannot
-     batch them and the lift re-renders roughly 110 times over 2.4 seconds. The pit
-     shares that main thread and visibly stutters through it.
+     THE FLAG AND ITS THREE GUARDS ARE DELIBERATELY LEFT IN PLACE and simply
+     never raised, so restoring the old behaviour is one line here rather than a
+     rebuild. Do not tidy them away.
 
-     A REF, NOT THE STATE. The sim effect is bound once and holds an older closure,
-     so reading learnNode there would be a frame or two stale. Every other decision
-     in that loop reads a ref for the same reason.
+     WHAT THE PAUSE WAS FOR, so nobody has to rediscover it. The lift covers the
+     pit completely, so every frame the sim drew behind it was work nobody could
+     see, and it was not free: AUTO on a 40 node dog schedules about 80 separate
+     timers, each its own task, so React cannot batch them and the lift
+     re-renders roughly 110 times over 2.4 seconds. The pit shares that main
+     thread. EXPECT THAT STUTTER BACK. If it is bad on a real device, the middle
+     option above is the place to go, not a full re-pause.
 
-     THE LOOP DOES NOT SLEEP ON ITS OWN DURING A ROUND. The settle-and-stop path at
-     the loop's tail is gated on the round having ENDED, so `roundLive` keeps it
-     running unconditionally while the pit is playable. This is therefore a new
-     state rather than a reuse of that sleep, and it borrows its machinery. */
+     A REF, NOT THE STATE. The sim effect is bound once and holds an older
+     closure, so reading learnNode there would be a frame or two stale. Every
+     other decision in that loop reads a ref for the same reason. */
   const liftPausedRef = useRef(false);
   useEffect(() => {
-    const was = liftPausedRef.current;
-    liftPausedRef.current = !!learnNode;
-    // Resuming restarts the loop. wake() refuses while the flag is up, so this has
-    // to come after it is lowered, which it does.
-    if (was && !learnNode) wakeRef.current?.();
+    // The pause is never armed now, so nothing has to be lowered. The wake is
+    // kept: if the sim had settled and stopped of its own accord while the lift
+    // was open, closing it should still bring the pit back, and this costs
+    // nothing when the loop is already running (wake returns early).
+    if (!learnNode) wakeRef.current?.();
   }, [learnNode]);
   // Slow motion. The fixed-timestep driver feeds Engine.update, which applies
   // engine.timing.timeScale itself, so a quarter speed toggle is all it takes.
