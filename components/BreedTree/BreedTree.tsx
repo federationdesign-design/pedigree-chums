@@ -8058,8 +8058,32 @@ export default function BreedTree({
 
              FIXED FOR THE WHOLE ROUND. See the UiKind note for why these two do
              not give way on the fifth knock like the rest of the set. */
-          { x: v[0] + (xMinF + m + uSz / 2 - UI_NUDGE_X) / k, y: v[1] + (vbHf / 2 - m - uSz / 2 - UI_NUDGE_Y) / k, vx: 0, vy: 0, r: UI_HIT_R, half: uSz / 2, a: 0, va: 0, fixed: true, hits: 0, kind: "slowmo" },
-          { x: ux, y: v[1] + (vbHf / 2 - m - uSz / 2 - UI_NUDGE_Y) / k, vx: 0, vy: 0, r: UI_HIT_R, half: uSz / 2, a: 0, va: 0, fixed: true, hits: 0, kind: "shake" },
+          /* THE BOTTOM PAIR KEEP THEIR MARGIN ON DESKTOP, 20 September 2026
+             (owner: the shake and the slow motion buttons are fixed to the very
+             corners, they should be indented as they are on mobile).
+
+             WHAT THE NUDGE IS FOR. UI_NUDGE_X and UI_NUDGE_Y were measured for
+             the TOP RIGHT pair, to line the pit's yellow X up with the start
+             screen's red one, and they push OUTWARD, into that corner. The
+             bottom pair take them negated, which is right in direction: outward
+             for the top right is outward for the bottom left too.
+
+             WHY IT ONLY SHOWS ON DESKTOP. Every term in the nudge scales with
+             uppW, and so does the margin m, but the nudge also carries
+             UI_DRAWN_FULL * 0.27, and UI_DRAWN_FULL scales with pitScale as well.
+             pitScale is 0.67 on a phone and 1 on a wide screen, so the outward
+             push grows faster than the margin it is eating and on desktop it
+             swallows it entirely.
+
+             THE TOP PAIR ARE LEFT ALONE. Their nudge is doing the job it was
+             measured for and the owner says they look right. Only the mirrored
+             copy is dropped, and only where it overruns. */
+          { x: v[0] + (xMinF + m + uSz / 2 - (isMobileRef.current ? UI_NUDGE_X : 0)) / k, y: v[1] + (vbHf / 2 - m - uSz / 2 - (isMobileRef.current ? UI_NUDGE_Y : 0)) / k, vx: 0, vy: 0, r: UI_HIT_R, half: uSz / 2, a: 0, va: 0, fixed: true, hits: 0, kind: "slowmo" },
+          /* ITS OWN X, NOT `ux`. ux carries UI_NUDGE_X for the top-right column,
+             so reusing it here would have left the jelly hard against the right
+             edge while the snail sat properly inset. Same expression as ux with
+             the nudge dropped. */
+          { x: v[0] + (xMinF + vbWf - m - uSz / 2 + (isMobileRef.current ? UI_NUDGE_X : 0)) / k, y: v[1] + (vbHf / 2 - m - uSz / 2 - (isMobileRef.current ? UI_NUDGE_Y : 0)) / k, vx: 0, vy: 0, r: UI_HIT_R, half: uSz / 2, a: 0, va: 0, fixed: true, hits: 0, kind: "shake" },
           /* THE LOGO. Top CENTRE, not the top-right corner the three squares
              share, and 20% down the stage like the main pit's own placement.
              Its drawn width is the main pit's figure clamped to the pit, so a
