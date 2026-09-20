@@ -1830,7 +1830,31 @@ const TITLE_BOOST = 2;
 // The trade, honestly: this puts the pit word within 5% of the size the label
 // was inside its circle, which is the situation the constant was raised to fix
 // in the first place. 1.3 is the middle if that reads too quiet.
-const PIT_WORD_SCALE = 2.268; // 1.05 -> 0.84 -> 0.756 -> 2.268 (3x bigger, 14 August 2026). Play-area pit words only; separate from the learn labels' size factor. Pure multiplier applied AFTER the fit at line 3307, so nothing caps it.
+/* SUPERSEDED 20 September 2026 (owner: word width equals 1.75 the circle's
+   diameter). PIT_WORD_SCALE was a pure multiplier on a size the fitter had
+   already chosen, and the fitter's own Math.max(10, ...) floor was doing the
+   choosing for any name long enough to be squeezed: on level one BOTH names
+   came out at exactly 22.7 despite different circles, so the size carried no
+   information about the dog. The comment above is kept because it is the record
+   of why 1.95 was wrong, and that reasoning still stands.
+
+   THE RULE NOW. A word is drawn exactly PIT_WORD_WIDTH times its circle's
+   DIAMETER wide, and the type size falls out of that. Proportional again by
+   construction: a big circle gets a big word, and a long name on a small circle
+   gets small type rather than the floor.
+
+   THE CAP IS THE STAGE. The one failure the old note records is a word wider
+   than the pit, which cannot fit however it tumbles. 1.75 diameters on a large
+   circle can exceed the stage, so the width is capped at PIT_WORD_MAX_STAGE of
+   it and the type shrinks to suit. Only the cap can make a word narrower than
+   the rule asks for.
+
+   NO FLOOR. The old 10px floor is deliberately not carried over: it is what
+   broke the proportionality. A very small circle therefore gets a very small
+   word, which may be unreadable. ?wordfit=1 prints the smallest size in the pit
+   so that is a decision made on numbers rather than on a guess. */
+const PIT_WORD_WIDTH = 1.75;
+const PIT_WORD_MAX_STAGE = 0.92;
 // A constant lean added to each pit word's LIVE tumble angle, in degrees (negative =
 // counter-clockwise). It rides the physics rotation, so it is imperceptible while a
 // word spins and reads as a fixed lean once the word settles. Play words only.
@@ -2374,30 +2398,45 @@ function fitLabel(name: string, r: number, capFs: number, font: string | null): 
    and at any minute of the round, so the measurement has to be callable rather
    than a single pass taken before anything falls.
 
-   THE MATHS IS LIFTED UNCHANGED from that pass: the same fitter, the same
-   LABEL_SAFE, the same 132 cap, the same TITLE_BOOST and the same
-   PIT_WORD_SCALE, in the same order. doFall now calls this instead of doing it
-   inline, so the two can never drift apart.
+   WHAT IT KEEPS FROM THAT PASS: the line breaking. fitLabel still chooses how
+   the name wraps, because balancing the lines is the part that has been tuned
+   and is not what changed. `fits` is still reported, since a name that never sat
+   inside its own circle is worth knowing about even now that the word is drawn
+   larger than one.
+
+   WHAT IT NO LONGER USES: the size fitLabel returns, TITLE_BOOST, and the old
+   multiplier. See PIT_WORD_WIDTH for why. The size now comes from the width the
+   owner asked for, divided by the measured width of the widest line in ems, so
+   the drawn word is that width by construction rather than by tuning.
 
    rView IS THE NODE RADIUS IN VIEW UNITS, n.r * k, at the DROP-TIME k. The word
    is drawn at a font size in those units and does not rescale with zoom, so
    measuring against a later k would size a word for a view it is not drawn in.
    See dropKRef.
 
-   CACHED BY EXACT KEY, no rounding, so a cached fit is the same number the
-   inline version would have produced. Node radii are stable once the layout has
-   run, so the cache hits on every later call for the same circle. */
-type PitWordFit = { lines: string[]; fs: number; wv: number; hv: number; fits: boolean };
+   stageW IS THE CAP, in the same units, and is optional only because a caller
+   that has no stage to measure against should get the uncapped rule rather than
+   a wrong one. Every caller in the pit passes it.
+
+   CACHED BY EXACT KEY, no rounding, so a cached fit is the same number a fresh
+   call would produce. Node radii are stable once the layout has run, so the
+   cache hits on every later call for the same circle. */
+type PitWordFit = { lines: string[]; fs: number; wv: number; hv: number; fits: boolean; capped: boolean };
 const pitWordFitCache = new Map<string, PitWordFit>();
-function pitWordFit(name: string, rView: number, font: string | null): PitWordFit {
-  const key = `${font ?? ""}|${rView}|${name}`;
+function pitWordFit(name: string, rView: number, font: string | null, stageW?: number): PitWordFit {
+  const key = `${font ?? ""}|${rView}|${stageW ?? 0}|${name}`;
   const hit = pitWordFitCache.get(key);
   if (hit) return hit;
   const fit = fitLabel(name.toUpperCase(), rView * LABEL_SAFE, 132, font);
-  const fs = Math.max(10, fit.fs + TITLE_BOOST) * PIT_WORD_SCALE;
-  const wv = Math.max(...fit.lines.map((l) => measureEm(l, font))) * fs;
+  // The widest line decides the size: every other line is narrower, so sizing on
+  // the widest is what makes the BLOCK the requested width.
+  const widthEm = Math.max(...fit.lines.map((l) => measureEm(l, font))) || 1;
+  const want = rView * 2 * PIT_WORD_WIDTH;
+  const lim = stageW ? stageW * PIT_WORD_MAX_STAGE : Infinity;
+  const wv = Math.min(want, lim);
+  const fs = wv / widthEm;
   const hv = fit.lines.length * fs * LABEL_LINE_H;
-  const out: PitWordFit = { lines: fit.lines, fs, wv, hv, fits: fit.fits };
+  const out: PitWordFit = { lines: fit.lines, fs, wv, hv, fits: fit.fits, capped: wv < want - 0.001 };
   pitWordFitCache.set(key, out);
   return out;
 }
@@ -4273,12 +4312,17 @@ export default function BreedTree({
         type Row = { n: Node; f: PitWordFit; solo: boolean };
         const rows: Row[] = live.map((n) => ({
           n,
-          f: pitWordFit(n.data.name, n.r * kD, labelFont),
+          f: pitWordFit(n.data.name, n.r * kD, labelFont, stageW),
           solo: (per.get(n.data.name) ?? 0) === 1,
         }));
         const solo = rows.filter((r) => r.solo);
         const nofit = rows.filter((r) => !r.f.fits);
+        const capped = rows.filter((r) => r.f.capped);
         const widest = rows.reduce((a, b) => (b.f.wv > a ? b.f.wv : a), 0);
+        // The two numbers the no-floor decision rests on: if the smallest word in
+        // the pit is unreadable, that is what a floor would be for.
+        const small = rows.reduce((a, b) => (b.f.fs < a ? b.f.fs : a), Infinity);
+        const big = rows.reduce((a, b) => (b.f.fs > a ? b.f.fs : a), 0);
         const byDepth = new Map<number, Row[]>();
         for (const r of rows) byDepth.set(r.n.depth, [...(byDepth.get(r.n.depth) ?? []), r]);
         const depths = [...byDepth.keys()].sort((a, b) => a - b).map((dp) => {
@@ -4289,12 +4333,12 @@ export default function BreedTree({
         });
         const worst = [...rows].sort((a, b) => b.f.wv - a.f.wv).slice(0, 8).map((r) => {
           const pc = ((r.f.wv / stageW) * 100).toFixed(0);
-          return `  d${r.n.depth} ${r.solo ? "SINGLE" : "twin  "} ${r.f.fits ? "    " : "NOFIT"}` +
+          return `  d${r.n.depth} ${r.solo ? "SINGLE" : "twin  "} ${r.f.fits ? "     " : "NOFIT"}${r.f.capped ? "CAP" : "   "}` +
             ` w ${pc.padStart(3)}%  fs ${r.f.fs.toFixed(1)}  ${r.f.lines.length}ln  ${r.n.data.name}`;
         });
         el.textContent =
-          `word fit  live ${live.length}  single ${solo.length}  nofit ${nofit.length}` +
-          `  widest ${((widest / stageW) * 100).toFixed(0)}% of stage  k ${kD.toFixed(3)}` +
+          `word fit  live ${live.length}  single ${solo.length}  nofit ${nofit.length}  capped ${capped.length}` +
+          `  widest ${((widest / stageW) * 100).toFixed(0)}% of stage  fs ${small === Infinity ? 0 : small.toFixed(1)} to ${big.toFixed(1)}  k ${kD.toFixed(3)}` +
           (labelFont ? "" : "   <-- NO FONT YET: widths are the flat average, not real glyphs") +
           "\n" + depths.join("\n") +
           "\n  widest names:\n" + worst.join("\n");
@@ -7231,7 +7275,9 @@ export default function BreedTree({
       // across the top of the stage. The four lines that did this moved into
       // pitWordFit unchanged (W1 stage 1), so every depth measures the same way
       // depth 1 always did.
-      const wordFits = d1.map((n) => pitWordFit(n.data.name, n.r * k, labelFont));
+      // vbWf is the stage in the very units the word is drawn in, so it is the
+      // cap PIT_WORD_MAX_STAGE measures against. See pitWordFit.
+      const wordFits = d1.map((n) => pitWordFit(n.data.name, n.r * k, labelFont, vbWf));
       setWordList(wordFits.map((f) => ({ lines: f.lines, fs: f.fs })));
       wordBodiesRef.current = bodies;
       wordPopAtRef.current = performance.now();
