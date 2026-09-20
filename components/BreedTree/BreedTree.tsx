@@ -6332,6 +6332,8 @@ export default function BreedTree({
        one the moment its last duplicate is collected, and the survivor changes
        colour. */
     const pitBreedCount = new Map<string, number>();
+    // What the WORD rule counts. See the note below it.
+    const levelBreedLeft = new Map<string, number>();
     /* HOW MANY ORDINARY NAVY CIRCLES THE PIT IS HOLDING, counted in the same pass
        (owner, 19 September 2026: black should only be used when there are lots of
        circles in the pit already coloured blue, and if there are none the circle
@@ -6351,6 +6353,30 @@ export default function BreedTree({
       if (ownedB) for (const o of ownedB) {
         if (!pitCountable(o, removedNodesRef.current)) continue; // the one filter: see liveBreedNodesIn
         pitBreedCount.set(o.data.name, (pitBreedCount.get(o.data.name) ?? 0) + 1);
+      }
+      /* HOW MANY OF EACH BREED ARE LEFT IN THE LEVEL, not just in the pit, 20
+         September 2026 (owner: on Drover's Dog, three breeds appear BOTH as a
+         word and as several circles).
+
+         WHAT WENT WRONG. The word rule counted pitBreedCount, which counts
+         BODIES. A breed's other copies sit nested inside their parents until
+         those parents pop, so early in a round a circle can be the only one of
+         its breed IN THE PIT while four more are still folded up elsewhere. It
+         latched as a word, correctly by that test, and then its siblings popped
+         out behind it as circles.
+
+         THE RIGHT QUESTION IS THE LEVEL, NOT THE PIT: is this the last copy of
+         its breed still to be collected? Counted over every node in the layout,
+         minus the echoes, minus what has already been taken, so a breed with four
+         copies cannot word until three of them are gone.
+
+         IT ALSO AGREES WITH STAGE 2 BY CONSTRUCTION. twinNames, which decides the
+         depth-1 words before anything falls, is this same count at full: more than
+         one copy in the layout. The two rules are now the same idea measured at
+         two moments, rather than two different ideas. */
+      for (const d2 of nodes) {
+        if (d2.depth === 0 || isHiddenCopy(d2) || removedNodesRef.current.has(d2)) continue;
+        levelBreedLeft.set(d2.data.name, (levelBreedLeft.get(d2.data.name) ?? 0) + 1);
       }
       // Second pass, because a breed's total is only known once the first has
       // finished: a circle is navy when its own breed has a twin.
@@ -6518,7 +6544,7 @@ export default function BreedTree({
          place rather than torn out here: that is the spec's stage 4, and it was
          not asked for. */
       const wantWord = paintable && !chHeld && !chTwin && fellRef.current
-        && (pitBreedCount.get(d.data.name) ?? 0) === 1
+        && (levelBreedLeft.get(d.data.name) ?? 0) === 1
         && !!pitBodiesRef.current?.owned.has(d);
       if (wantWord && !orphanWord) {
         orphanSetRef.current.add(d);
