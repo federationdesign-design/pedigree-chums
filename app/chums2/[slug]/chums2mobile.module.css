@@ -173,13 +173,18 @@
 }
 
 /* Tap popouts: the i card and the % card, anchored to the tile. */
+/* FIXED AND CLAMPED, 20 September 2026 (owner). left/top/width come from
+   popBox() in Chums2Mobile, computed from the button's own rect, so the box can
+   no longer run off the side of a right-hand tile. The max-height keeps a long
+   write-up from running off the bottom instead, and 320 is the same figure
+   popBox uses to decide whether to flip above the button. */
 .framePopover {
-  position: absolute;
-  left: 0;
-  top: 26px;
+  position: fixed;
   z-index: 20;
-  min-width: 200px;
-  max-width: 72vw;
+  min-width: 0;
+  max-height: 320px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   background: rgba(10, 58, 87, 0.97);
   border: 1.5px solid rgba(255, 210, 62, 0.4);
   border-radius: 12px;
@@ -208,14 +213,16 @@
   line-height: 1.5;
   color: #ffffff;
 }
+/* Same treatment as .framePopover above; see the note there. The translate that
+   centred it on its tile goes with the absolute positioning, or it would pull the
+   clamped box half its width back off the edge. */
 .framePctCard {
-  position: absolute;
-  left: 50%;
-  top: 26px;
-  transform: translateX(-50%);
+  position: fixed;
   z-index: 20;
-  min-width: 210px;
-  max-width: 74vw;
+  min-width: 0;
+  max-height: 320px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   background: rgba(10, 58, 87, 0.97);
   border: 1.5px solid rgba(255, 210, 62, 0.4);
   border-radius: 12px;

@@ -113,6 +113,39 @@ export default function Chums2Mobile({ name, slug, image, info, lineage }: Props
   // outside closes the i/% cards (their trigger/body stop propagation); the image self-
   // closes the mini pit's way. Same shape/data as desktop.
   const [openPop, setOpenPop] = useState<{ id: string; kind: "info" | "pct" | "image"; anchor?: { x: number; y: number; size: number } } | null>(null);
+  /* KEEP A POPOVER ON THE SCREEN, 20 September 2026 (owner: the pop-up dialogue
+     box goes off the page, the same issue we had in the learn area).
+
+     WHAT WAS WRONG. Both popovers were absolutely positioned inside their own
+     TILE, at left 0 or centred on it, with a max-width in vw. A tile in the
+     right-hand columns therefore started its box near the right edge and the box
+     ran straight off. The pack grid is five columns, so two in every five were
+     affected, which is what the screenshot shows.
+
+     FIXED, NOT ABSOLUTE, AND CLAMPED. The box is taken out of the tile and placed
+     against the viewport from the button's own rect, which the image popup on
+     this page already captures the same way. Its width is set here rather than
+     measured, so there is nothing to wait a frame for: no first-render flash and
+     no feedback loop of the kind the LineageMap version had to be rescued from.
+
+     BOTH AXES. Horizontally it is clamped between the margins. Vertically it
+     FLIPS above the button when there is no room below, rather than sliding up
+     over the tile it belongs to, and only clamps if it fits neither way. */
+  const POP_W = 320, POP_M = 8;
+  const popBox = (a?: { x: number; y: number; size: number }) => {
+    if (!a) return undefined;
+    const vw = typeof window === "undefined" ? 400 : window.innerWidth;
+    const vh = typeof window === "undefined" ? 800 : window.innerHeight;
+    const w = Math.min(POP_W, vw - POP_M * 2);
+    const left = Math.max(POP_M, Math.min(a.x + a.size / 2 - w / 2, vw - w - POP_M));
+    const below = a.y + a.size + 6;
+    // 320 is the tallest the box is allowed to draw, see the max-height in the
+    // stylesheet, so it is what "will it fit below" has to ask about.
+    const flip = below + 320 > vh - POP_M && a.y - 6 - 320 > POP_M;
+    return flip
+      ? { left, top: Math.max(POP_M, a.y - 6 - 320), width: w }
+      : { left, top: Math.min(below, Math.max(POP_M, vh - POP_M - 120)), width: w };
+  };
 
   const frameBorder = (status?: FrameNode["status"]) =>
     status === "extinct" ? "#ef4444" : status === "endangered" || status === "in-decline" ? "#f97316" : "#22c55e";
@@ -339,11 +372,11 @@ export default function Chums2Mobile({ name, slug, image, info, lineage }: Props
                   <button
                     type="button"
                     className={styles.frameInfoBtn}
-                    onClick={(e) => { e.stopPropagation(); setOpenPop(openPop?.id === f.id && openPop.kind === "info" ? null : { id: f.id, kind: "info" }); }}
+                    onClick={(e) => { e.stopPropagation(); const r = (e.currentTarget as HTMLElement).getBoundingClientRect(); setOpenPop(openPop?.id === f.id && openPop.kind === "info" ? null : { id: f.id, kind: "info", anchor: { x: r.left, y: r.top, size: r.width } }); }}
                     aria-label={`About ${f.name}`}
                   >i</button>
                   {openPop?.id === f.id && openPop.kind === "info" && (
-                    <div className={styles.framePopover} onClick={(e) => e.stopPropagation()}>
+                    <div className={styles.framePopover} style={popBox(openPop.anchor)} onClick={(e) => e.stopPropagation()}>
                       <p className={styles.framePopoverName}>{f.name}</p>
                       {f.era && <p className={styles.framePopoverEra}>Era: {f.era}</p>}
                       {f.note && <p className={styles.framePopoverNote}>{f.note}</p>}
@@ -353,11 +386,11 @@ export default function Chums2Mobile({ name, slug, image, info, lineage }: Props
                   <button
                     type="button"
                     className={styles.framePct}
-                    onClick={(e) => { e.stopPropagation(); setOpenPop(openPop?.id === f.id && openPop.kind === "pct" ? null : { id: f.id, kind: "pct" }); }}
+                    onClick={(e) => { e.stopPropagation(); const r = (e.currentTarget as HTMLElement).getBoundingClientRect(); setOpenPop(openPop?.id === f.id && openPop.kind === "pct" ? null : { id: f.id, kind: "pct", anchor: { x: r.left, y: r.top, size: r.width } }); }}
                     aria-label={`Percentage detail for ${f.name}`}
                   >{f.pct != null && f.pct < 1 ? "<1%" : `${f.pct ?? "?"}%`}</button>
                   {openPop?.id === f.id && openPop.kind === "pct" && (
-                    <div className={styles.framePctCard} onClick={(e) => e.stopPropagation()}>
+                    <div className={styles.framePctCard} style={popBox(openPop.anchor)} onClick={(e) => e.stopPropagation()}>
                       <button type="button" className={styles.framePopoverClose} onClick={(e) => { e.stopPropagation(); setOpenPop(null); }} aria-label="Close">&times;</button>
                       <p className={styles.pctCardName}>{f.name}</p>
                       <p className={styles.pctCardBig}>{pctTxt(f.pct ?? 0)} ancestral influence</p>
