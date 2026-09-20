@@ -908,10 +908,24 @@
      above the tint, matching the desktop sidebar (z-index 10). It clears the hero
      title/pills/back link by design, so sitting above them covers nothing. */
   .mobilePayslip {
-    /* -188 -> -198, 19 September 2026 (Steve: nudge the payslip up 10px). Raises the
-       hero overlap from 100 to 110 and takes 10 more off the title clearance; see the
-       .essayHeroContent note above for the combined figure. */
-    margin-top: -198px;
+    /* -188 -> -198 (19 Sept, nudge up 10px) -> -117 (20 Sept, Steve: the payslip is
+       covering the hero title).
+
+       THE CLEARANCE FIGURE IN THE NOTE ABOVE WAS MEASURED WRONG AND IS CORRECTED
+       HERE. It was taken to this WRAPPER's top edge. The card inside is tilted, so
+       its rotated box reaches about 97px higher than the wrapper does, and that is
+       what is actually on screen. The reported "30px clearance" was in reality a
+       67px OVERLAP: the card's visible top sat at 293 and the title ran to 360.
+
+       RE-TESTED PROPERLY, by sampling ten points along the title's last line and
+       asking the document what is painted on top. Before: covered at 10 of 10 points
+       on all six articles. After: 0 of 10.
+
+       81px is the minimum that uncovers the text and is what this figure buys. It
+       leaves 14px between the title and the card, and the card still overlays the
+       hero by 126px, so the treatment the block above describes is intact. Anything
+       taken off this comes straight out of that 126px. */
+    margin-top: -117px;
     position: relative;
     z-index: 2;
   }
