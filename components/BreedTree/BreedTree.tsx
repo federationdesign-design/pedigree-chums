@@ -5554,7 +5554,30 @@ export default function BreedTree({
        the lifted card too. (Those two sites run packArt first, the same as this
        one does, so a pack dog lifts its card art; that is the only part of them
        that is shared with this function.) */
-    if (dropped) return undefined;
+    /* SOLO CIRCLES KEEP THEIR PICTURE, 20 September 2026 (owner: a single dog in
+       the pit shows a navy disc and the dog-face mark; show the actual image).
+
+       A SOLO CIRCLE IS A LEAF, one with no children of its own. It is the same
+       test the lift is given for soloLeaf, deliberately, so the circle that shows
+       a photograph in the pit and the circle the lift treats as solo can never be
+       two different answers.
+
+       WHY ONLY LEAVES. The 2 September ruling above is about circles you play
+       through: their rings, labels, badges and chain path were all measured
+       against flat navy, and a photograph has no single luminance. A leaf has
+       nothing to open, so the mark that stands in for its picture is saying
+       nothing, which is the case the QMARK_SRC note itself describes.
+
+       WHAT THIS DOES NOT SOLVE, and it should be looked at on the device: a leaf
+       still wears the mark and the ring, and both are now over a picture rather
+       than over navy. On a leaf in a chain the white mark and the tapped face are
+       the chain's own signals. They are legible on the archive paintings tried
+       here, but this is the part of the 2 September objection that survives, and
+       it is a design judgement rather than a measurement.
+
+       TWINS BOTH SHOW IT. Two circles of one dog are two leaves with one picture,
+       so both carry it rather than one flipping to the mark. */
+    if (dropped && ((d.data.children?.length ?? 0) > 0)) return undefined;
     /* A PACK DOG SHOWS ITS CARD ART, 19 September 2026 (owner). See data/packArt.ts.
        Only the fallback changes: rootImage still wins at depth 0, because that is
        the level's own picture and the level already knows its own dog. Below the

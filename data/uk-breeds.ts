@@ -16,6 +16,37 @@ export type UKBreed = {
   tag?: "extinct" | "trending" | "popular" | "endangered" | "in-decline";
 };
 
+/* STATUSES CHECKED AGAINST THE KENNEL CLUB, 20 September 2026 (owner).
+
+   THE RULE, as the owner set it: `endangered` means the Kennel Club's Vulnerable
+   Native Breeds list, under 300 UK registrations a year, PLUS rare non-KC types
+   kept on editorial judgement. `in-decline` means the At Watch list, 300 to 450.
+   That is why Longdog, Lucas Terrier and Northern Inuit Dog keep `endangered`
+   although no KC list names them: they are not KC breeds at all.
+
+   NINE CARDS MOVED, measured against the Kennel Club's own 2024 and 2025
+   vulnerable-breed class lists:
+     to endangered   English Foxhound, Fox Terrier, Greyhound, Irish Terrier
+     to in-decline   Bedlington Terrier, Bullmastiff, Old English Sheepdog,
+                     Welsh Terrier, and Jack Russell Terrier, which read
+                     "trending"
+   Four were understated and five overstated.
+
+   THE FIRST SETTERS GOES TO EXTINCT, which is a different kind of correction and
+   the owner's own catch: the undifferentiated British setting dog no longer
+   exists, having become the English, Gordon and Irish Setters. Its note was
+   written as a general "setter" description and had inherited the modern breed's
+   status. Its lineage notes move with it.
+
+   GORDON SETTER AND KING CHARLES SPANIEL ARE DELIBERATELY UNCHANGED. They were
+   re-classed as viable in 2007, which is easy to find and would look like a fault
+   here, but that was later reversed and both are on the Kennel Club's current
+   lists. They are right as they stand.
+
+   ONE CAVEAT ON THE SPLIT. The KC publishes vulnerable and at-watch separately
+   but only ever prints them merged for competitions, so the division above is
+   reconstructed from two years of those merged lists rather than read off one
+   official table. Good, not certain. */
 export const ukBreeds: UKBreed[] = [
   // Ancient, then Medieval: split into two strips (owner request, 4 August)
   { name: "Irish Wolfhound", strip: "ancient", era: "Ancient", anchor: 100, note: "Towering ancient Irish hound, bred to hunt wolves and guard halls.", image: "/woldhound-square.jpg", tag: "endangered" },
@@ -24,7 +55,7 @@ export const ukBreeds: UKBreed[] = [
   // Each moves to its modern formalisation point: the Mastiff to 1883, when
   // the standard type was refined, and the Greyhound to the 1700s.
   { name: "Mastiff", strip: "late1800", era: "late 1800s", anchor: 1883, note: "Britain's ancient war and guard dog, known since Roman times.", image: "/mastiff-square.jpg", tag: "endangered" },
-  { name: "Greyhound", strip: "c1700", era: "1700s", anchor: 1745, note: "The fastest of all dogs, a sighthound in Britain since antiquity.", image: "/greyhound-square.jpg", tag: "in-decline" },
+  { name: "Greyhound", strip: "c1700", era: "1700s", anchor: 1745, note: "The fastest of all dogs, a sighthound in Britain since antiquity.", image: "/greyhound-square.jpg", tag: "endangered" },
   // The two ancient additions (docs/lineage/BRIEF.md section 4): extinct
   // historical types placed beside their modern descendants. The Mastiff and
   // Greyhound rows above are deliberately untouched.
@@ -58,13 +89,13 @@ export const ukBreeds: UKBreed[] = [
   // not arithmetic.
   { name: "Old English Bulldog", strip: "c1500", era: "1500s", anchor: 1550, note: "Stocky bull-baiting dog, ancestor of today's Bulldog.", image: "/history/breeds/Old-English-Bulldog.jpg", tag: "extinct" },
   { name: "Skye Terrier", strip: "c1500", era: "1500s", anchor: 1560, note: "Long-bodied, long-coated terrier from Scotland's Isle of Skye.", image: "/history/breeds/skye-terrier-photo.webp", tag: "endangered" },
-  { name: "English Foxhound", strip: "c1500", era: "1500s", anchor: 1570, note: "Pack hound bred on great estates for the fox hunt.", image: "/history/breeds/english-foxhound.jpg", tag: "in-decline" },
+  { name: "English Foxhound", strip: "c1500", era: "1500s", anchor: 1570, note: "Pack hound bred on great estates for the fox hunt.", image: "/history/breeds/english-foxhound.jpg", tag: "endangered" },
   { name: "Otterhound", strip: "c1500", era: "1500s", anchor: 1575, note: "Web-footed otter-hunting hound, now the rarest native breed.", image: "/history/breeds/otterhound-photo.jpg", tag: "endangered" },
   { name: "Turnspit Dog", strip: "c1500", era: "1500s", anchor: 1576, note: "Short-legged dog bred to run in a wheel and turn the spit.", image: "/history/breeds/Turnspitdog-drawing-remake.jpg", tag: "extinct" },
   { name: "Staghound", strip: "c1500", era: "1600s", anchor: 1650, note: "English pack hound used to hunt red deer.", image: "/history/breeds/staghound.jpg", tag: "extinct" },
 
   // The 1700s
-  { name: "Old English Sheepdog", strip: "c1700", era: "1700s", anchor: 1700, note: "Shaggy West-Country drover, once known as the Bobtail.", image: "/old-english-square.jpg", tag: "endangered" },
+  { name: "Old English Sheepdog", strip: "c1700", era: "1700s", anchor: 1700, note: "Shaggy West-Country drover, once known as the Bobtail.", image: "/old-english-square.jpg", tag: "in-decline" },
   { name: "Scottish Terrier", strip: "c1700", era: "1700s", anchor: 1700, note: "Sturdy Highland earth-dog with a determined streak.", image: "/history/breeds/scottish-terrier-image.jpg", tag: "in-decline" },
   { name: "King Charles Spaniel", strip: "c1700", era: "1700s", anchor: 1710, note: "Royal toy spaniel beloved at the Stuart court.", image: "/history/breeds/king-charles-spaniel-photo.jpg", tag: "endangered" },
   { name: "Pointer", strip: "c1700", era: "1700s", anchor: 1720, note: "Gundog that freezes and 'points' to hidden game birds.", image: "/history/breeds/pointer-photo.jpg", tag: "in-decline" },
@@ -87,7 +118,7 @@ export const ukBreeds: UKBreed[] = [
   // a researched date. Lurcher (1802) and Longdog (1803) read "1800s" and are now
   // banded as "early 1800s" like the rest of the strip.
   { name: "Manchester Terrier", strip: "early1800", era: "early 1800s", anchor: 1820, note: "Sleek black-and-tan terrier bred to clear city rats.", image: "/history/breeds/manchester-terrior.jpg", tag: "endangered" },
-  { name: "Bedlington Terrier", strip: "early1800", era: "early 1800s", anchor: 1825, note: "Lamb-like terrier with surprising grit.", image: "/history/breeds/Bedlington Terrier-photo.jpg", tag: "endangered" },
+  { name: "Bedlington Terrier", strip: "early1800", era: "early 1800s", anchor: 1825, note: "Lamb-like terrier with surprising grit.", image: "/history/breeds/Bedlington Terrier-photo.jpg", tag: "in-decline" },
 
   // The spaniel explosion
   // 19 August 2026: spaniels group era labels reconciled with the file
@@ -119,11 +150,11 @@ export const ukBreeds: UKBreed[] = [
   // Whippet at 1872 to 1880, sit outside a strict mid-1800s reading but stay in
   // this strip deliberately: strip membership is an editorial grouping, not
   // arithmetic.
-  { name: "Jack Russell Terrier", strip: "mid1800", era: "1820s", anchor: 1820, note: "Bold fox-bolting terrier bred by the Reverend John Russell.", image: "/jack-russel-square.jpg", tag: "trending" },
+  { name: "Jack Russell Terrier", strip: "mid1800", era: "1820s", anchor: 1820, note: "Bold fox-bolting terrier bred by the Reverend John Russell.", image: "/jack-russel-square.jpg", tag: "in-decline" },
   { name: "Kerry Blue Terrier", strip: "mid1800", era: "1840s", anchor: 1847, note: "Blue-coated Irish all-rounder, first documented in 1847.", image: "/history/breeds/Kerry_Blue_Terrier_photo.jpg", tag: "endangered" },
   { name: "Bull Terrier", strip: "early1800", era: "early 1800s", anchor: 1830, note: "Egg-headed dog from crossing bulldogs with terriers.", image: "/bull-terrier-square37.jpg" , tag: "in-decline" },
   { name: "Staffordshire Bull Terrier", strip: "early1800", era: "early 1800s", anchor: 1832, note: "Bull-and-terrier fighting dog turned devoted family friend.", image: "/staffy-square.jpg", tag: "popular" },
-  { name: "Bullmastiff", strip: "mid1800", era: "1860s", anchor: 1866, note: "Powerful night dog bred to pin poachers on Victorian estates.", image: "/history/breeds/Bullmastiff-photo.jpg", tag: "endangered" },
+  { name: "Bullmastiff", strip: "mid1800", era: "1860s", anchor: 1866, note: "Powerful night dog bred to pin poachers on Victorian estates.", image: "/history/breeds/Bullmastiff-photo.jpg", tag: "in-decline" },
   { name: "Whippet", strip: "mid1800", era: "1880s", anchor: 1880, note: "The 'poor man's racehorse', a miniature coursing sighthound.", image: "/Whippet-square.jpg" , tag: "popular" },
   { name: "Lurcher", strip: "early1800", era: "early 1800s", anchor: 1802, note: "Sighthound crossed with a working dog, the poacher's companion.", image: "/lercher-square.jpg" , tag: "popular" },
   { name: "Longdog", strip: "early1800", era: "early 1800s", anchor: 1803, note: "A cross of two sighthounds, bred purely for speed.", image: "/history/breeds/long-dog-photo.jpg" , tag: "endangered" },
@@ -146,12 +177,12 @@ export const ukBreeds: UKBreed[] = [
   { name: "Cairn Terrier", strip: "late1800", era: "late 1800s", anchor: 1871, note: "Highland vermin-hunter that flushed prey from rock cairns.", image: "/history/breeds/cairn-terrier-photo.jpg", tag: "in-decline" },
   { name: "Border Terrier", strip: "late1800", era: "late 1800s", anchor: 1874, note: "Tough little fell terrier from the English-Scottish border.", image: "/border terrier-square.jpg" , tag: "popular" },
   { name: "Lakeland Terrier", strip: "late1800", era: "late 1800s", anchor: 1872, note: "Fell-pack terrier from the Lake District.", image: "/history/breeds/lakeland-terrier-photo.jpg", tag: "endangered" },
-  { name: "Welsh Terrier", strip: "early1800", era: "early 1800s", anchor: 1805, note: "Black-and-tan Welsh terrier for fox and badger.", image: "/history/breeds/welsh-terrier-photo.jpg", tag: "endangered" },
-  { name: "Fox Terrier", strip: "mid1800", era: "1870s", anchor: 1872, note: "Smart white terrier with a full pedigree kept from 1870.", image: "/history/breeds/fox_terrier-img.jpg", tag: "in-decline" },
+  { name: "Welsh Terrier", strip: "early1800", era: "early 1800s", anchor: 1805, note: "Black-and-tan Welsh terrier for fox and badger.", image: "/history/breeds/welsh-terrier-photo.jpg", tag: "in-decline" },
+  { name: "Fox Terrier", strip: "mid1800", era: "1870s", anchor: 1872, note: "Smart white terrier with a full pedigree kept from 1870.", image: "/history/breeds/fox_terrier-img.jpg", tag: "endangered" },
   { name: "English Toy Terrier", strip: "mid1800", era: "1850s", anchor: 1856, note: "Tiny black-and-tan toy bred down from the ratting terriers.", image: "/history/breeds/English-Toy-Terrier.jpg",  tag: "endangered" },
 
   // The late 1800s
-  { name: "Irish Terrier", strip: "late1800", era: "late 1800s", anchor: 1875, note: "Fiery red terrier, the 'daredevil' of Ireland.", image: "/history/breeds/irish-terrier-photo.jpg", tag: "in-decline" },
+  { name: "Irish Terrier", strip: "late1800", era: "late 1800s", anchor: 1875, note: "Fiery red terrier, the 'daredevil' of Ireland.", image: "/history/breeds/irish-terrier-photo.jpg", tag: "endangered" },
   { name: "Soft-Coated Wheaten Terrier", strip: "late1800", era: "late 1800s", anchor: 1876, note: "Silky-coated Irish farm terrier.", image: "/history/breeds/soft-coated--wheaten-terrier-photo.jpg", tag: "endangered" },
   { name: "Glen of Imaal Terrier", strip: "late1800", era: "late 1800s", anchor: 1877, note: "Low-slung Wicklow terrier of great strength.", image: "/history/breeds/glen-of-Imaal-terrier.jpg", tag: "endangered" },
   { name: "Gordon Setter", strip: "late1800", era: "late 1800s", anchor: 1878, note: "Black-and-tan setter from the Scottish Highlands.", image: "/history/breeds/gordon-setter-photo.jpg", tag: "endangered" },
@@ -313,7 +344,7 @@ export const ukBreeds: UKBreed[] = [
      only remaining reader of a level number is the "Nth DOG" ordinal on the
      start screen. Nothing is stored by number. Checked before this was added. */
   { name: "Rough northern sighthounds", strip: "ancient", era: "Ancient", anchor: 400, note: "Shaggy coursing dogs built for cold, rough ground, the coarse-haired hunting hounds of the early Scots and Picts.", image: "/history/breeds/rough-northern-sighthounds.jpg", tag: "extinct" },
-  { name: "The First Setters", strip: "c1500", era: "1500s", anchor: 1577, note: "The British setting dogs of the shooting field, bred to find birds and drop steady in front of them.", image: "/history/breeds/british-setters.jpg", tag: "in-decline" },
+  { name: "The First Setters", strip: "c1500", era: "1500s", anchor: 1577, note: "The British setting dogs of the shooting field, bred to find birds and drop steady in front of them.", image: "/history/breeds/british-setters.jpg", tag: "extinct" },
   { name: "Old wirehaired fell Terriers", strip: "c1700", era: "1700s", anchor: 1748, note: "The harsh-coated fox-working terriers of the northern fells, bred for grip and weather rather than looks.", image: "/history/breeds/Old-wirehaired-fell-terrier.jpg", tag: "extinct" },
   { name: "Old black-and-tan Setters", strip: "c1700", era: "1700s", anchor: 1792, note: "The black-and-tan setting dogs worked in Britain before the Duke of Gordon's kennels took the type up.", image: "/history/breeds/black-and-tan-setters.jpg", tag: "extinct" },
   { name: "Trumpington Terrier", strip: "late1800", era: "late 1800s", anchor: 1881, note: "The small terriers Cambridge undergraduates kept as college ratters, bought from a livery stable on Trumpington Street.", image: "/history/breeds/trumpington-terrier.jpg", tag: "extinct" },
