@@ -14119,35 +14119,34 @@ export default function BreedTree({
               group so nothing that governs the packed labels can touch them.
               Luckiest Guy in white over a navy halo, paint-order stroke, the
               same treatment a name wears inside its circle. */}
-          {/* NO PIT WORDS WHILE A CIRCLE IS LIFTED, 19 September 2026 (owner: the word
-              tile behind the lifted circle).
+          {/* REVERSED 20 September 2026 (owner: no items should disappear from the
+              pit unless they are the lifted circle that was clicked). The group no
+              longer stands down on a lift; only the lifted dog's own word hides,
+              through the per-word `held` rule in the frame writer.
 
-              WHAT WAS ACTUALLY SHOWING. Not the lifted dog's own word. The per-word
-              rule in the frame writer is `b.held || removedNodes.has(b.n)`, and
-              liftToLearn does set held on that shared body, so lifting a DEPTH-1 dog
-              already hides its own word correctly. The words only exist for depth-1
-              nodes, though, so lifting anything deeper, which is every circle that has
-              been popped out of its parent, leaves the depth-1 ANCESTOR's word lying in
-              the pit with the card sitting on top of it. On Celtic Heeler that ancestor
-              is Early Badger hunting dogs, which is why it read as the lifted dog's own
-              word: the ring and the circle inside it carried the same name.
+              WHAT THE OLD RULE WAS FOR, 19 September, and why it has expired.
+              Words existed at DEPTH 1 ONLY. Lifting anything deeper, which is any
+              circle popped out of its parent, left the depth-1 ANCESTOR's word
+              lying under the card, and since the ring and the circle carried the
+              same name it read as the lifted dog's own word. Hiding one word would
+              have fixed the depth-1 case that already worked and missed the broken
+              one, so the whole group was stood down.
 
-              WHY THE GROUP AND NOT THE BODY RULE. Hiding the lifted dog's word alone
-              would fix the depth-1 case that is already fixed and miss the one that is
-              broken. Nothing in the pit is meant to be readable behind a lifted card,
-              so the whole group stands down for as long as one is up.
+              WHY IT IS SAFE TO DROP NOW. Since W1 a word exists at every depth, so
+              the deeper circle the player lifted has a word of its own and the
+              per-word rule hides THAT one. The ancestor is no longer standing in
+              for it, and the pit behind the card now behaves like everything else
+              in it: dimmed, still there.
 
-              REACT STATE IS SAFE HERE, unlike inside the frame writer: this is the
-              render, so learnNode is current, and the physics loop only ever writes
-              `display` on the CHILDREN of this group, never on the group itself. The
-              two rules do not fight. A hidden group also takes no pointer events, so a
-              word cannot be tapped through the card either. */}
+              IT ALSO MAKES THE TWO GROUPS AGREE. The node-indexed group the orphan
+              words live in never had this rule, which is how a depth-1 word could
+              vanish behind a card while an orphan word beside it stayed. */}
           {/* The words group is switched off wholesale by PIT_DRAWS_WORDS, so the
               per-word positioning loop above can stay exactly as it is: it writes
               to a group nobody can see and costs a handful of attribute sets a
               frame. Left running rather than gated so restoring the words is the
               one constant and nothing else. */}
-          <g ref={wordsGRef} textAnchor="middle" style={{ display: PIT_DRAWS_WORDS && dropped && !learnNode ? "inline" : "none" }}>
+          <g ref={wordsGRef} textAnchor="middle" style={{ display: PIT_DRAWS_WORDS && dropped ? "inline" : "none" }}>
             {wordList.map((w, i2) => (
               <g
                 key={i2}
