@@ -875,7 +875,23 @@ function toyRetiredForever(key: string): boolean {
 function retireToyForever(key: string) {
   try { localStorage.setItem(key, "1"); } catch { /* private mode */ }
 }
-const PERMANENT_TOYS: string[] = ["flag"];
+/* THE COOKIE PANEL JOINS THE FLAG, 20 September 2026 (owner: it needs to work
+   like the UK flag, appears until opened, then does not appear again).
+
+   WHAT IT DID BEFORE. It retired into SESSION storage on the tap, so opening the
+   panel silenced it for that tab only and it fell again on the next visit. The
+   only thing that stopped it for good was a recorded answer, through
+   cookieConsentGiven, which is a different key and a different question.
+
+   BOTH DOORS ARE PERMANENT NOW. Opening it retires it through
+   retireToyForever, and answering it still writes CONSENT_KEY, so either one
+   ends it. That is the owner's call, made knowing the cost below.
+
+   THE COST, STATED. A visitor who taps the panel and never answers is not asked
+   again by the pit, and with no consent recorded GA stays off and the kill switch
+   stays set. The notice itself is still reachable from the cookie settings link
+   in the footer and the nav, which is the route that exists for exactly this. */
+const PERMANENT_TOYS: string[] = ["flag", "cookies"];
 
 /* WHICH TOYS CAN BE THROWN CLEAR OF THE PIT AND RETIRE FOR IT, 19 September 2026.
    The flag is not here: it leaves by having its message read, not by being
@@ -13821,7 +13837,8 @@ export default function BreedTree({
                       if (Math.hypot(ev.clientX - p0.x, ev.clientY - p0.y) >= 8) return;
                       mcReleaseRef.current?.();
                       if (isCookies) {
-                        retireToy(TOY_COOKIES_SEEN_KEY);
+                        // Permanent, like the flag: see PERMANENT_TOYS.
+                        retireToyForever(TOY_COOKIES_SEEN_KEY);
                         // the notice CookieBanner already renders above the pit
                         window.dispatchEvent(new Event("pc:open-cookies"));
                         const cb = toyBodiesRef.current[i2]?.mb;
