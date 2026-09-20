@@ -13625,6 +13625,29 @@ export default function BreedTree({
               const bx = b ? b.x : d1n ? d1n.x - d1n.r * 0.707 : v[0];
               const by = b ? b.y : d1n ? d1n.y + d1n.r * 0.707 : v[1] - 99999;
               const inert = inertBadges.has(i);
+              /* A CHIP WEARS ITS DOG'S RARITY COLOUR, 20 September 2026 (owner:
+                 the yellow % tokens that drop into the pit should take the
+                 rarity colour).
+
+                 SAME TABLE, SAME PAIR, SAME KEY as an available twin and a held
+                 circle: RARITY_BAND, exported from LineageMap, indexed by
+                 rarityTier(treesContaining(name)). `bg` fills and `fg` inks, and
+                 the pair is already measured for this job, which is why the
+                 figure moves off navy with it. Navy against the purple and the
+                 royal blue is 1.20 and 1.58 and would vanish; the band's own fg
+                 is white on those two and black on the other three.
+
+                 ONLY A CHIP THAT CAME FROM A CIRCLE. `src` is null for a chip
+                 scattered in from the learn layer, which has no dog in this pit
+                 to take a tier from, so those keep the lemon CHIP_FILL.
+
+                 THE OTHER THREE STATES ARE UNTOUCHED, and each says something
+                 the rarity does not: inert blue for a spent chip, inert white for
+                 a spent learnt one, sky blue for the labelled solo-dog circle. A
+                 bomb draws a sprite and never reaches this. */
+              const chipBand = !item.bomb && !inert && !item.label && item.src
+                ? RARITY_BAND[rarityTier(treesContaining(item.src.data.name))]
+                : null;
               if (deadBadges.has(i)) return <g key={i} style={{ display: "none" }} />;
               if (item.r <= 0) return <g key={i} style={{ display: "none" }} />; // dog below the legibility floor: no badge
               return (
@@ -13687,7 +13710,7 @@ export default function BreedTree({
                    inert, because it is navy in both states now. Ordinary
                    badges keep the blue inert fill (white on white would
                    disappear). */
-                <circle cx={0} cy={0} r={item.r} style={{ fill: inert ? (item.green ? "#ffffff" : "#0c5b92") : item.label ? "#5cc4ee" : CHIP_FILL, stroke: "#0a3a57", /* THE % BADGE'S RIM MATCHES THE NODE IT CAME FROM, 9 Sept 2026
+                <circle cx={0} cy={0} r={item.r} style={{ fill: inert ? (item.green ? "#ffffff" : "#0c5b92") : item.label ? "#5cc4ee" : chipBand ? chipBand.bg : CHIP_FILL, stroke: "#0a3a57", /* THE % BADGE'S RIM MATCHES THE NODE IT CAME FROM, 9 Sept 2026
                      (owner). It was a flat 0.19 of its own radius. ringFrac(1) is
                      0.09, the weight a first-generation circle wears on the lifted
                      screen, read from the shared RING_FRAC table rather than typed
@@ -13715,7 +13738,7 @@ export default function BreedTree({
                     );
                   })()
                 ) : (
-                  <text x={0} y={0} dominantBaseline="central" style={{ fill: "#0a3a57", fontFamily: "Montserrat, var(--font-body), system-ui, sans-serif", fontWeight: 800, fontSize: `${item.r * 0.7}px`, pointerEvents: "none", userSelect: "none" }}>
+                  <text x={0} y={0} dominantBaseline="central" style={{ fill: chipBand ? chipBand.fg : "#0a3a57", fontFamily: "Montserrat, var(--font-body), system-ui, sans-serif", fontWeight: 800, fontSize: `${item.r * 0.7}px`, pointerEvents: "none", userSelect: "none" }}>
                     {`${item.pct}%`}
                   </text>
                 ))}
