@@ -96,8 +96,8 @@ export const SECTIONS: Section[] = [
       { text: "Mastiff-type 'bandogs' were chained up by day and let loose at night to guard farms from thieves and even wolves.", image: "/history/breeds/Old-English-Bulldog.jpg", imageAlt: "A stocky brindle and white bulldog standing in a field by a stone wall.", imagePos: "74% 28%" },
       { text: "One of the first books written in English, 'The Master of Game' from around 1406, was a guide to hunting hounds and their care.", image: "/history/breeds/staghound.jpg", imageAlt: "A tricolour pack hound standing on a hillside under a cloudy sky.", imagePos: "74% 30%" },
     ],
-    image: "/history/medieveal-dogs.jpg",
-    imageAlt: "Medieval hunting hounds and a Tudor lapdog",
+    image: "/history/Tudor-era.jpg",
+    imageAlt: "Tudor dogs at the royal court",
   },
   {
     title: "Dogs in the armed forces",
