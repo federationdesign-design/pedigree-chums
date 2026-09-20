@@ -1988,7 +1988,22 @@ export default function LineageMap({
      with the columns now sized to fill the width, the grid has to begin at the same
      F_EDGE its width was calculated from or it runs off the right. unscaleX puts
      that screen position back into the layout's own coordinates. */
-  const F_LEFT_BASE = fiveUp ? unscaleX(F_EDGE) + CW / 2 : isMobile ? 52 : 96;
+  /* DESKTOP GETS THE UNSCALE TOO, 20 September 2026 (owner: on the lifted layer
+     move the frames and the counters, desktop only, mobile is perfect).
+
+     THE SAME FAULT THE PHONE HAD, LEFT UNFIXED ON THE WIDE SCREEN. The overlay
+     carries transform: scale(0.8), which multiplies the distance from the
+     element's CENTRE, so a coordinate written near an edge lands pulled a fifth
+     of the way inwards. On 16 September the phone branch was given unscaleX and
+     unscaleY and started landing where it was written. The desktop branch was
+     left on its raw numbers, and the wider the window the further in they drift:
+     on a 1940 viewport a 96 lands at about 271.
+
+     SO THE NUMBER IS UNCHANGED, 96 is still the intended left edge, and this only
+     makes it arrive there. Identity off the lift, where LIFT_K is 1, so the main
+     pit and the chums2 tree are untouched, and the phone branch above is not
+     reached on desktop at all. */
+  const F_LEFT_BASE = fiveUp ? unscaleX(F_EDGE) + CW / 2 : isMobile ? 52 : unscaleX(96);
   // On a circle the rim at 45 degrees sits this far in from the bounding box, so
   // corner adornments tuck against the edge instead of floating outside it.
   const RIM_IN = (CW / 2) * (1 - Math.SQRT1_2);
@@ -2039,7 +2054,16 @@ export default function LineageMap({
      unscaleY for the same reason as F_LEFT above. The frame counter moved up and
      left earlier the same day, so the grid is following it rather than crowding
      it. */
-  const chumTop = fiveUp ? unscaleY(91) : circular ? (isMobile ? 118 : 168) : isMobile ? 170 : 240; // 96, down 15 to clear the top-right button
+  /* AND THE ROW'S TOP WITH IT. Same fault, same fix, and it carries the counter:
+     .frameCount's top is DERIVED from chumTop, so putting the row where it was
+     written puts the counter back up beside the level portrait without a second
+     number to keep in step. aliveTop and extinctTop are offsets from this, so the
+     section headings follow too.
+
+     ONLY THE CIRCULAR LIFT, the dog pulled out of the pit, which is what the
+     owner is looking at. The strongBg family tree keeps its 240 until it is asked
+     for. */
+  const chumTop = fiveUp ? unscaleY(91) : circular ? unscaleY(isMobile ? 118 : 168) : isMobile ? 170 : 240; // 96, down 15 to clear the top-right button
   const frames: { id: string; cat: "chum" | "alive" | "extinct"; img: string; sx: number; sy: number }[] = [];
   let aliveTop = chumTop, extinctTop = chumTop; // only the desktop section headers use these
   if (isMobile) {
