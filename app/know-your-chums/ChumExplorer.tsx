@@ -4,6 +4,10 @@ import { useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { breeds, type Breed } from "../../data/breeds";
+/* The status band along the foot of the card, matching Britain's dog history.
+   A dog with no status simply shows no band, which is how that page behaves
+   too: see the `b.tag &&` guard in britains-dog-history-2/TimelineRun.tsx. */
+import { statusFor, STATUS_LABEL } from "../../data/breedStatus";
 /* The same search as the home page, lifted whole rather than remade
    (owner instruction, 5 August). It replaces the old grid-filtering box: this
    one suggests dogs from the pack as you type and goes straight to the chum. */
@@ -105,6 +109,7 @@ function sentenceCase(text: string): string {
 }
 
 function ChumCard({ breed }: { breed: Breed }) {
+  const status = statusFor(breed.name);
   return (
     <Link href={`/chums/${breed.slug}`} className={styles.chumCard} aria-label={`Explore ${breed.name}`}>
       <div className={styles.flipInner}>
@@ -115,6 +120,11 @@ function ChumCard({ breed }: { breed: Breed }) {
               this page has a chum page of its own to go to. */}
           <span className={styles.chumWedge} aria-hidden="true" />
           <span className={styles.chumFlash} aria-hidden="true" />
+          {status && (
+            <span className={`${styles.chumTag} ${styles[`chumTag_${status.replace("-", "")}`]}`}>
+              {STATUS_LABEL[status]}
+            </span>
+          )}
         </div>
         {/* The yellow reverse, matching Britain's dog history: the green tap
             pill, the dog's name and its write-up. */}

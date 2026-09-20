@@ -445,6 +445,35 @@
   pointer-events: none;
   z-index: 2;
 }
+
+/* The status band along the foot of the card front, taken from
+   app/britains-dog-history-2/history2.module.css (.dogTag and its colours) so
+   the two pages read identically. Popular and trending share one green,
+   endangered and in decline one amber, exactly as they do there. A dog with no
+   status renders no band at all, so there is no empty state to style. */
+.chumTag {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-align: center;
+  padding: 7px 0;
+  color: #ffffff;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  pointer-events: none;
+  z-index: 2;
+}
+.chumTag_trending { background: #2e9e5b; }
+.chumTag_popular { background: #2e9e5b; }
+.chumTag_endangered { background: #e08a1e; }
+.chumTag_indecline { background: #e08a1e; }
+
 .chumImg {
   width: 100%;
   height: 100%;
