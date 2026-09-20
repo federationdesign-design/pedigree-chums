@@ -8699,13 +8699,19 @@ export default function BreedTree({
            breed name and this site passed none, so only the opened circle's chip
            came down coloured and the payout read as one token.
 
-           WHICH NAME. A chip stands for the dog whose share it carries, so a
-           child's chip takes the CHILD's name and a leaf's takes its own. The
-           chain payout is a lifted dog's payout, which is the one case the owner
-           scoped the colour to. */
+           WHICH NAME, CORRECTED 20 September 2026 (owner: completing an uncommon
+           dog gives a mixture of orange and yellow when all of it should be
+           green). The first cut gave a child's chip the CHILD's name, so a payout
+           came down in as many colours as there were breeds under the circle.
+
+           THE COLOUR BELONGS TO THE DOG YOU LIFTED, not to the share the chip
+           carries. A payout is one event with one dog behind it, so every chip in
+           it takes `n`, the circle being closed, and a chain is all one breed by
+           construction, so the whole payout is one colour. The percentage on the
+           face still belongs to the child; only the colour is the parent's. */
         const kids = (n.children ?? []).filter((ch) => !isHiddenCopy(ch));
         if (kids.length) {
-          for (const ch of kids) { const q = at(); spawnBadgeRef.current?.(q.x, q.y, chipR, pctOf(ch), { name: ch.data.name }); }
+          for (const ch of kids) { const q = at(); spawnBadgeRef.current?.(q.x, q.y, chipR, pctOf(ch), { name: n.data.name }); }
         } else {
           const q = at();
           spawnBadgeRef.current?.(q.x, q.y, chipR, pctOf(n), { name: n.data.name });
@@ -15666,9 +15672,13 @@ export default function BreedTree({
                  green only, and yellow circles were re-sized to the pit-dog chip
                  scale on the way down, which read as a third bigger. Both colours
                  now keep their on-layer size. */
-              // the name rides down with the chip so it can wear its own rarity
-              // colour in the pit. See BadgeItem.rarity.
-              spawnBadgeRef.current?.(c.x, c.y, c.r, Math.round(c.share), { r: c.r, green: c.green, name: c.name });
+              /* THE LIFTED DOG'S NAME, NOT THE CARD'S OWN, 20 September 2026
+                 (owner). `c.name` is the breed on that particular card, so a
+                 tree of mixed breeds scattered in several colours at once. The
+                 colour says which dog you completed, so every chip in the scatter
+                 takes the lifted dog's tier and the payout reads as one event.
+                 The share on the face is still the card's own. */
+              spawnBadgeRef.current?.(c.x, c.y, c.r, Math.round(c.share), { r: c.r, green: c.green, name: learnNode?.data.name });
             }
             /* THE SOLO DOG'S OWN CIRCLE (owner, 18 September 2026). A leaf has no
                nodes to scatter, so the layer sends its ONE full-size circle as
