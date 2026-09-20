@@ -901,6 +901,18 @@
      the 28.6px it started at. The side padding is still untouched. */
   .mBlue {
     padding-top: clamp(5.5px, 2cqi, 8.5px);
-    padding-bottom: clamp(5.5px, 2cqi, 8.5px);
+    /* THE BOTTOM MATCHES THE TOP AS SEEN, NOT AS DECLARED (Steve, 20 September 2026).
+
+       The two paddings were already the same number, and the panel still looked
+       top-heavy, because the space above the copy is not made by this padding alone.
+       Measured at 390: the gap from the panel's top edge to the heading is 45px,
+       7.16px of padding plus the 37.5px margin-top the heading carries. The bottom
+       has no such margin, so it was only the 7.16px.
+
+       Adding the same 37.5px here makes both visible gaps 45px. The clamp is kept so
+       the padding still tracks the panel width in container units; only the fixed
+       part is added, and it is the same figure the heading uses, so the two stay in
+       step if that margin is ever retuned. */
+    padding-bottom: calc(clamp(5.5px, 2cqi, 8.5px) + 37.5px);
   }
 }
