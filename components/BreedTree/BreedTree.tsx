@@ -582,6 +582,9 @@ const CHUM_MASK = 0xFFFFFFFF & ~MC_CAT;
    31 August 2026, no more than 60% of the screen. The pit runs wall to wall
    with only a few pixels of margin, so its width and the screen's are the same
    figure for this purpose. */
+/* THE START SCREEN'S DROP-IN ENTRANCE. Off since 20 September 2026; see the
+   branch that reads it, in the effect that packs the circles. */
+const PIT_DROP_IN = false;
 const LOGO_PIT_FRACTION = 0.6;
 /* THE LOGO COMES DOWN A TENTH, AND THE PIT BONE IS TIED TO IT (owner,
    18 September 2026).
@@ -7386,9 +7389,23 @@ export default function BreedTree({
     // reduced-motion user since the entrance was written.
     // Read through the ref, not the isMobile state, so the effect keeps its
     // [nodes, dropArmed] deps; the ref is assigned during render, so it is current
-    // by the time this runs. To drop the entrance on DESKTOP too, delete the
-    // isMobileRef term.
-    if (reduce || resizeOnlyRef.current || displayOnly || isMobileRef.current) {
+    // by the time this runs.
+    /* DESKTOP JOINS MOBILE, 20 September 2026 (owner: on the start screen the
+       circles drop down into position, remove that, just like we did on mobile).
+
+       PIT_DROP_IN IS THE SWITCH, and it is off. The reasoning that retired the
+       entrance on phones on 31 August applies whole: `entered` is false for 700ms
+       plus 45ms per circle, which holds back the difficulty slider, the circle
+       names, the badges, PLAY, LEARN and the level number, and zoomTo only runs
+       when the drop FINISHES, so the dashed cluster ring is drawn from a stale
+       viewRef for that entire time and comes in oversized.
+
+       THE ENTRANCE CODE IS LEFT STANDING rather than deleted. It is a hundred
+       lines of choreography with a tunnel hand-off in it, and this is one
+       constant to flip if it is ever wanted back. isMobileRef is kept in the test
+       for the same reason: it says what the phone rule was, so turning the
+       entrance back on does not silently turn it back on for phones too. */
+    if (!PIT_DROP_IN || reduce || resizeOnlyRef.current || displayOnly || isMobileRef.current) {
       resizeOnlyRef.current = false;
       zoomTo(v);
       setEntered(true);
