@@ -96,6 +96,41 @@ type Node = LineageNode & {
   _dir: number; // outward direction this node sits at, so its own children fan away
 };
 
+/* THE SHARE IS OUT OF WHAT IS DRAWN, 20 September 2026 (owner: display a 100%
+   figure so the diagram makes sense, rather than deleting anything).
+
+   THE FAULT. 1,577 nodes across 112 of the 176 trees carry a child with THEIR OWN
+   NAME. A node cannot be its own ancestor, so the drawing filters those out, but
+   the percentage did not: it divided by the parent's total leaves, which still
+   counted the half that is never shown. On screen that is a lone parent labelled
+   50% with no sibling anywhere, which is what the owner photographed on Drover's
+   Dog, Livestock Dog and Celtic herdsmen's dogs.
+
+   WHY NOT FIX THE DATA. Measured before choosing: stripping the duplicates
+   removes 1,579 nodes, shrinks 112 levels (Golden Retriever 672 nodes to 599),
+   and moves depth-1 splits by up to 60 points (Paisley Terrier 80% to 20%). The
+   owner declined that, so the numbers stay and the DIVISOR changes instead.
+
+   IT CHANGES ONLY THE BROKEN CASE, and that is measured too, not assumed: all
+   1,576 affected dog parents have EXACTLY ONE real child. So for every other
+   parent this returns the same figure as before, because a node's leaves are the
+   sum of its children's leaves and no child is being skipped. The one exception
+   is an instruction card, "Head outside", whose only child is self-named.
+
+   THE PARENT'S OWN _leaves IS UNTOUCHED, deliberately. Changing that would change
+   what the parent contributes to ITS parent, which cascades into exactly the
+   percentage shifts the owner turned down. Only the denominator of a child's own
+   share moves.
+
+   BreedTreeMap.tsx carries its own copy of this maths and is NOT changed here. */
+function drawnLeaves(p: Node): number {
+  const kids = (p.children as Node[] | undefined) ?? [];
+  let t = 0;
+  for (const k of kids) if (k.name !== p.name) t += k._leaves;
+  return t > 0 ? t : Math.max(1, p._leaves);
+}
+
+
 // Collect the ids of every node shallower than `depth`, so seeding the `open`
 // set with them reveals the tree down to `depth` levels. A node renders its
 // children only when its id is in `open` (see the layout walk), so opening every
@@ -1125,7 +1160,7 @@ export default function LineageMap({
     if (strongBg && !circular) return FLAT_RING_W;
     let pd = 1;
     for (let a: Node | null = p; a; a = a._parent) pd += 1;
-    const raw = nodeR(Math.round((n._leaves / p._leaves) * 100)) * ringFrac(pd);
+    const raw = nodeR(Math.round((n._leaves / drawnLeaves(p)) * 100)) * ringFrac(pd);
     return Math.min(raw, clampedRingW(p));
   };
   /* ---- PILLS ON DEMAND, ON THE LIFT (owner, 18 September 2026) --------------
@@ -1613,7 +1648,7 @@ export default function LineageMap({
         // share cap and the rootRadius, so the old min(220)/max(40) clamp of the
         // raw tapped radius is subsumed. (The mini pit uses dist, not this.)
         if (!p) return liftR;
-        return nodeR(Math.round((nd._leaves / Math.max(1, p._leaves)) * 100));
+        return nodeR(Math.round((nd._leaves / drawnLeaves(p)) * 100));
       };
       /* THE CLOCK FACE IS THE ROOT'S ONLY, FROM DEPTH 1 THE FAN FOLLOWS _dir,
          15 September 2026 (owner: the nodes still overlay each other awkwardly,
@@ -2147,7 +2182,7 @@ export default function LineageMap({
       const name = live?.name ?? snap?.name ?? "";
       const rawImg = (live?.img ?? snap?.img) as string;
       const img = packArt(name) ?? rawImg; // pack breeds flip to their square cartoon card
-      const share = live ? Math.round((live._leaves / (live._parent as Node)._leaves) * 100) : snap?.share ?? 0;
+      const share = live ? Math.round((live._leaves / drawnLeaves(live._parent as Node)) * 100) : snap?.share ?? 0;
       // cumulative share of the whole breed: a node's leaves over the root's leaves,
       // which is the product of every parent share down the chain
       const mix = live ? (root ? Math.round((live._leaves / root._leaves) * 100) : share) : (snap?.mix ?? snap?.share ?? 0);
@@ -2461,7 +2496,7 @@ export default function LineageMap({
       .filter((n) => (n.children && n.children.length) || !autoExposed.has(n._id))
       .slice(0, 50)
       .map((n) => {
-        const share = Math.round((n._leaves / (n._parent as Node)._leaves) * 100);
+        const share = Math.round((n._leaves / drawnLeaves(n._parent as Node)) * 100);
         /* THE WIDTH IS SENT AT THE SIZE IT IS DRAWN, 16 September 2026 (owner: the
            pills that drop into the pit are about 40% bigger than the ones on the
            family tree).
@@ -2476,7 +2511,7 @@ export default function LineageMap({
     const pills = [{ x: breed.x + pan.x, y: breed.y + pan.y + circR, w: tagW, name: breed.name }];
     if (!includeNodes) { onScatter?.({ circles: [], rods: [], pills }); return; }
     const vis = shown.filter((n) => n._parent);
-    const shareOf = (n: Node) => Math.round((n._leaves / (n._parent as Node)._leaves) * 100);
+    const shareOf = (n: Node) => Math.round((n._leaves / drawnLeaves(n._parent as Node)) * 100);
     const circles = vis.slice(0, 60).map((n) => {
       const share = shareOf(n);
       // Same test the node's own fill uses, so the chip cannot disagree with it.
@@ -2611,7 +2646,7 @@ export default function LineageMap({
     const target = frames.find((f) => f.img === n.img && !filled.has(f.id));
     if (!target) return; // no frame to fly to: leave the card alone rather than strand it
     soloPlaced.current = true;
-    const sh = n._parent ? Math.round((n._leaves / (n._parent as Node)._leaves) * 100) : 100;
+    const sh = n._parent ? Math.round((n._leaves / drawnLeaves(n._parent as Node)) * 100) : 100;
 
     /* IT FLIES FROM THE CIRCLE'S CENTRE, 20 September 2026 (owner: the smaller
        image flies out from where the lifted circle is and lands in the frame,
@@ -2883,7 +2918,7 @@ export default function LineageMap({
       const firstUnpicked = shown.filter((n) => n.img && !picked.has(n._id) && n._parent);
       if (firstUnpicked.length > 0) {
         const n = firstUnpicked[0];
-        const sh = n._parent ? Math.round((n._leaves / (n._parent as Node)._leaves) * 100) : 50;
+        const sh = n._parent ? Math.round((n._leaves / drawnLeaves(n._parent as Node)) * 100) : 50;
         const rr = nodeR(sh), dd = rr + 10 + CW / 2;
         const px1 = n._x + Math.cos(n._dir ?? 0) * dd, py1 = n._y + Math.sin(n._dir ?? 0) * dd;
         setPicked((prev) => { const s = new Set(prev); s.add(n._id); return s; });
@@ -2915,7 +2950,7 @@ export default function LineageMap({
         newKids.forEach((n, i) => {
           window.setTimeout(() => {
             setPicked((prev) => { const s = new Set(prev); s.add(n._id); return s; });
-            const sh = n._parent ? Math.round((n._leaves / (n._parent as Node)._leaves) * 100) : 50;
+            const sh = n._parent ? Math.round((n._leaves / drawnLeaves(n._parent as Node)) * 100) : 50;
             const rr = nodeR(sh), dd = rr + 10 + CW / 2;
             const px1 = n._x + Math.cos(n._dir) * dd, py1 = n._y + Math.sin(n._dir) * dd;
             setPinned((m) => { const x = new Map(m); x.set(n._id, { img: n.img as string, name: n.name, note: n.note, share: sh, mix: sh, status: nodeStatus(n.name, n.note) }); return x; });
@@ -2941,7 +2976,7 @@ export default function LineageMap({
         window.setTimeout(() => setPicked((prev) => { const s = new Set(prev); s.add(n._id); return s; }), i * 45);
         if (!scoredRef.current.has(n._id)) { scoredRef.current.add(n._id); flashNum(n._x, n._y - 8, -10, FLASH_SIZE /* 16 Sept 2026 (owner), learn-area rebalance: see the table at the top of the flashNum group. */); }
         if (INSTR_NAMES.has(breed.name) && n.img && n._parent) {
-          const sh = Math.round((n._leaves / (n._parent as Node)._leaves) * 100);
+          const sh = Math.round((n._leaves / drawnLeaves(n._parent as Node)) * 100);
           const rr = nodeR(sh), dd = rr + 10 + CW / 2;
           const INSTR_OFFSETS: Record<number,{dx:number;dy:number}> = {1:{dx:-50,dy:-5},2:{dx:25,dy:-5},3:{dx:-50,dy:-5},4:{dx:25,dy:-5}};
           const iOff = INSTR_OFFSETS[n.value as number] ?? {dx:0,dy:0};
@@ -3099,7 +3134,7 @@ export default function LineageMap({
     // hit; they fall from each node's spot in the family tree, and the connecting rods and the
     // blue name pills tip in with them. Node coords are user coords, so add the pan for the screen.
     const vis = shown.filter((n) => n._parent);
-    const shareOf = (n: Node) => Math.round((n._leaves / (n._parent as Node)._leaves) * 100);
+    const shareOf = (n: Node) => Math.round((n._leaves / drawnLeaves(n._parent as Node)) * 100);
     const circles = INSTR_NAMES.has(breed.name) ? [] : vis.slice(0, 60).map((n) => {
       const share = shareOf(n);
       // Same test the node's own fill uses, so the chip cannot disagree with it.
@@ -4154,7 +4189,7 @@ export default function LineageMap({
               .map((n) => {
                 const hasKids = !!(n.children && n.children.length);
                 const isOpen = open.has(n._id) && hasKids;
-                const share = Math.round((n._leaves / (n._parent as Node)._leaves) * 100);
+                const share = Math.round((n._leaves / drawnLeaves(n._parent as Node)) * 100);
                 const r = nodeR(share);
                 return (
                   <g
@@ -4233,7 +4268,7 @@ export default function LineageMap({
                         setDragPos((m) => { if (!m.has(n._id)) return m; const x = new Map(m); x.delete(n._id); return x; });
                       } else if (n.img && n._parent) {
                         // pin the opened card at its current spot so it stays on screen even after this branch closes
-                        const sh = Math.round((n._leaves / (n._parent as Node)._leaves) * 100);
+                        const sh = Math.round((n._leaves / drawnLeaves(n._parent as Node)) * 100);
                         const rr = nodeR(sh), dd = rr + 10 + CW / 2;
                         const px = n._x + Math.cos(n._dir) * dd, py = n._y + Math.sin(n._dir) * dd;
                         setPinned((m) => { const x = new Map(m); x.set(n._id, { img: n.img as string, name: n.name, note: n.note, share: sh, mix: root ? Math.round((n._leaves / root._leaves) * 100) : sh, status: nodeStatus(n.name, n.note) }); return x; });
