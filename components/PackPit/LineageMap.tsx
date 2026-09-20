@@ -2468,15 +2468,21 @@ export default function LineageMap({
     // The overlay holds only for the starburst it just fired, nothing more.
     window.setTimeout(() => { onClose(); }, BURST_LIFE_MS);
   };
-  // Solo dog: there is no node to turn green and no Complete button to press,
-  // so landing the image in its frame IS the completion. circularComplete does
-  // the rest, which is what the green button has always called: scatter into the
-  // pit, burst the big circle, remove and close. (Confetti removed, 31 Aug 2026.)
-  useEffect(() => {
-    if (!soloLeaf || !circular || !framesDone) return;
-    const t = window.setTimeout(() => circularComplete(), 420); // let the frame settle first
-    return () => window.clearTimeout(t);
-  }, [soloLeaf, circular, framesDone]); // eslint-disable-line react-hooks/exhaustive-deps
+  /* THE SOLO DOG NOW WAITS FOR A PRESS, 20 September 2026 (owner). What was here
+     was an effect that fired circularComplete() 420ms after framesDone, so a
+     one-circle dog placed its own card and closed itself with no press at all.
+
+     THE OWNER WANTS A DELIBERATE PRESS: green Complete instead of blue Learn, the
+     image moves to the frame ON the press, and the layer ends once it has landed.
+     That reverses the 19 September ruling which made it automatic. The 420ms it
+     used to wait is kept as the settle time below, because it is this file's own
+     measure of how long a card takes to reach its frame.
+
+     WHAT MADE THIS SUBTLER THAN IT LOOKS. framesDone is `filled.size >=
+     frameTotal`, so it cannot be true until the card is already placed. The green
+     button could not be gated on it, or the press that does the placing would
+     never have a button to happen on. The button's condition below now reads
+     soloLeaf as well. */
 
   // A solo dog's synthetic child is opened on arrival, so the first double-click
   // pops the card straight out of the big circle rather than spending a step
@@ -2514,8 +2520,13 @@ export default function LineageMap({
      grid is laid out, and placing before that puts the card at a position the
      layout then moves. */
   const soloPlaced = useRef(false);
-  useEffect(() => {
-    if (!soloLeaf || !circular || !root || !framesDone) return;
+  const soloClosing = useRef(false);
+  /* CALLED BY THE GREEN BUTTON, not by an effect, since 20 September 2026. It was
+     a useEffect gated on framesDone; see the note above for why that could not
+     survive the press being the thing that places the card. The body is unchanged
+     apart from losing the effect's own guards. */
+  const placeSoloCard = () => {
+    if (!soloLeaf || !circular || !root) return;
     if (soloPlaced.current) return;
     const n = shown.find((x) => x.img && x._parent && !picked.has(x._id));
     if (!n) return;
@@ -2530,13 +2541,12 @@ export default function LineageMap({
        it. It also happens to be correct here rather than merely quiet: the frame
        geometry these three writes depend on is measured during the render this
        effect runs after. */
-    const raf = requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
       setPicked((prev) => { const s = new Set(prev); s.add(n._id); return s; });
       setPinned((m) => { const x = new Map(m); x.set(n._id, { img: n.img as string, name: n.name, note: n.note ?? "", share: sh, mix: sh, status: null }); return x; });
       setDragPos((m) => { const x = new Map(m); x.set(n._id, { x: px1, y: py1 }); return x; });
     });
-    return () => cancelAnimationFrame(raf);
-  }, [soloLeaf, circular, root, framesDone, shown]); // eslint-disable-line react-hooks/exhaustive-deps
+  };
 
   useEffect(() => {
     if (!INSTR_NAMES.has(breed.name) || !framesDone) return;
@@ -3494,7 +3504,11 @@ export default function LineageMap({
         {/* the 3-D Collect button sits on top; it orders the pack into the grid */}
         {/* Blue Learn button - on ALL cards including instructional. Off in
             bounded (/chums2): the display tree has no learn/collect game. */}
-        {!bounded && !packed && !collecting && !framesDone ? (() => {
+        {/* NOT ON A SOLO DOG, 20 September 2026 (owner: a single leaf gets the
+            green Complete, not the blue Learn). A one-circle dog has no tree to
+            step through, so Learn had nothing to do on it; it was simply the only
+            button this layer rendered before framesDone. */}
+        {!bounded && !packed && !collecting && !framesDone && !soloLeaf ? (() => {
           /* THE STEP COUNT IS GONE WITH ITS LABEL, 16 September 2026 (owner: the
              progress bar says the same thing now).
 
@@ -3553,12 +3567,29 @@ export default function LineageMap({
           </g>
           );
         })() : null}
-        {/* Mini pit: green Complete replaces Learn once every frame is filled */}
-        {circular && framesDone && !rootGone && !scattered ? (
+        {/* Mini pit: green Complete replaces Learn once every frame is filled.
+            ON A SOLO DOG IT IS THERE FROM THE START, 20 September 2026 (owner),
+            because framesDone cannot be true until the card is placed and the
+            press is what places it. */}
+        {circular && (framesDone || soloLeaf) && !rootGone && !scattered ? (
           <g
             className={styles.removeBtn}
             transform={`translate(0,${4 * learnBtnScale + 2}) scale(${learnBtnScale})`}
-            onClick={(e) => { e.stopPropagation(); circularComplete(); }}
+            /* SOLO: place the card, let it land, then finish. 420ms is the settle
+               time the old automatic path used, kept rather than re-guessed. The
+               ref stops a second press starting a second close while the first is
+               still running its move. */
+            onClick={(e) => {
+              e.stopPropagation();
+              if (soloLeaf && !framesDone) {
+                if (soloClosing.current) return;
+                soloClosing.current = true;
+                placeSoloCard();
+                window.setTimeout(() => circularComplete(), 420);
+                return;
+              }
+              circularComplete();
+            }}
             role="button"
             aria-label="Complete"
           >
