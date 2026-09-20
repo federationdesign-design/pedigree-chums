@@ -6466,7 +6466,37 @@ export default function BreedTree({
          `now` is zero on every caller that is not the physics loop, and a zero
          start would leave the pop frozen at nothing, so the clock falls back to
          the wall clock rather than to no animation. */
-      if (chSingle && !orphanWord) {
+      /* EVERY SINGLE CIRCLE IS A WORD, AT EVERY DEPTH, 20 September 2026 (owner).
+         This used to latch on chSingle, the black fill's own test, which carries
+         three terms a word does not want:
+
+           everTwinRef        black means "you took the others", so a breed that
+                              was NEVER doubled kept its circle and, if it was a
+                              leaf, its photograph. That is the gap the owner
+                              found on the Longdog level.
+           pitPlainCount      black needs other navy circles to contrast against.
+                              A word is legible on its own, so it has no such
+                              floor.
+           DOG_SINGLE_MIN_PLAIN  the number behind that floor.
+
+         WHAT IS LEFT is the spec's own rule: in the pit, one copy of this breed,
+         not in a chain. Both of W1's cases now land here, the never-doubled and
+         the last survivor, and they are the same thing to look at.
+
+         AND IT MUST HAVE ITS OWN BODY. pitBreedCount is built from the bodies in
+         the pit, so a circle still nested inside its parent is not counted, and
+         without this line one could read its POPPED twin's count of 1 and turn
+         into a word while it was still drawn inside another circle. It also
+         guarantees the body swap below has a body to swap.
+
+         THE BLACK FILL IS NOW UNREACHABLE for a paintable circle, since a single
+         circle becomes a word and a word is not paintable. Its code is left in
+         place rather than torn out here: that is the spec's stage 4, and it was
+         not asked for. */
+      const wantWord = paintable && !chHeld && !chTwin && fellRef.current
+        && (pitBreedCount.get(d.data.name) ?? 0) === 1
+        && !!pitBodiesRef.current?.owned.has(d);
+      if (wantWord && !orphanWord) {
         orphanSetRef.current.add(d);
         orphanPopRef.current.set(d, now || performance.now());
         const of = orphanFitsRef.current[i];
