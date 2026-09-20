@@ -83,7 +83,7 @@
 .lead {
   font-family: var(--font-body), system-ui, sans-serif;
   font-weight: 600;
-  font-size: calc(clamp(1.1rem, 2.4vw, 1.4rem) - 2pt); /* down 2pt with the rule above */
+  font-size: calc(clamp(1.5rem, 3vw, 1.9rem) - 2pt); /* matched to .statsIntro, see the !important rule */
   line-height: 1.5;
   color: var(--white);
   max-width: 62ch;
@@ -857,10 +857,14 @@
 
 /* Page title and lead. */
 .title { font-size: clamp(4.8rem, 14vw, 11rem) !important; line-height: 0.95; }
-/* Intro down 2pt, 20 September 2026 (Steve). BOTH .lead rules move: this one carries
-   !important and is the one that actually governs, and the base rule below the fold
-   is kept in step so the two never disagree. */
-.lead { font-size: calc(clamp(28px, 3.6vw, 36px) - 2pt) !important; max-width: 56ch; }
+/* MATCHED TO .statsIntro, 20 September 2026 (Steve): the intro is now the same
+   size as "The most common dogs across all ages ...". It carries that rule's
+   exact expression rather than a copied pixel value, so the two keep step as the
+   viewport changes; the earlier "down 2pt" scale is superseded by it.
+   BOTH .lead rules move: this one carries !important and is the one that
+   actually governs, and the base rule below the fold is kept in step so the two
+   never disagree. Change .statsIntro and this must change with it. */
+.lead { font-size: calc(clamp(1.5rem, 3vw, 1.9rem) - 2pt) !important; max-width: 56ch; }
 
 /* The blue gradient container runs full bleed, as it does on history. */
 .factsPanel {
