@@ -5426,7 +5426,31 @@ export default function BreedTree({
        cdTickRef NOW HOLDS A TIMEOUT ID. clearCdTimers was changed to clear it
        with clearTimeout to match. */
     const cdStepMs = () => (slowmoOnRef.current ? 4000 : 1000);
+    /* THE COUNT HOLDS WHILE A DOG IS LIFTED, 20 September 2026 (owner: the
+       countdown timer is not pausing when the dog is lifted, I want this to
+       happen).
+
+       WHY IT DID NOT ALREADY. The pit-full POLL has been guarded on
+       liftPausedRef since it was written, so a countdown could never START
+       behind the learn layer. Nothing guarded a countdown that had already
+       started: the tick is a plain rescheduling timeout and simply kept going.
+       The layer covers the pit, so the player watched nothing and lost anyway,
+       which is worst of all during AUTO, the longest stretch of not touching the
+       pit.
+
+       NOT liftPausedRef. That flag stops the physics and the poll as well, and
+       raising it would undo the owner's own reversal of 19 September, which put
+       the pit back to always active. This holds the COUNT alone: the pit keeps
+       running behind the layer and can still fill, it just cannot run the clock
+       down while it is covered.
+
+       IT RESCHEDULES WITHOUT ADVANCING, so the number on screen holds and the
+       count resumes from where it was. Granularity is one step, so at most a
+       second of the count is given away on the way in or out, which is on the
+       player's side. A ref, like slowmoOnRef above, because this closure is
+       older than the state. */
     const step = () => {
+      if (learnOpenRef.current) { cdTickRef.current = window.setTimeout(step, cdStepMs()); return; }
       i++;
       if (i < steps.length) {
         el.textContent = steps[i];
