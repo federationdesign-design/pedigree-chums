@@ -5581,8 +5581,17 @@ className={[
             }}
           >
             <div style={{ fontSize: liftPx(12.48), fontWeight: 700, color: "#ffd23e", marginBottom: 1 }}>{c.name}</div> {/* pct-name */}
+            {/* NOT "your chum", 20 September 2026 (owner). A chum is one of the 54
+                cards. The breed this popout is about is an ancestor in the tree and
+                is usually not a chum at all, so the phrase claimed something untrue
+                of most of the dogs it appeared over.
+
+                THE WORDING IS THE MINI PIT'S, not a new one: BreedTree's own share
+                box reads "{pct} historical influence" over "Share of this dog:
+                {pct}". Taking those exact two lines keeps the two boxes saying the
+                same thing in the same words. */}
             <div style={{ fontSize: liftPx(18), fontWeight: 800, lineHeight: 1.15, marginBottom: 6 }}>
-              {pctTxt(norm)} of your chum
+              {pctTxt(norm)} historical influence
             </div>
             {apps.length > 0 && (
               <div style={{ fontWeight: 600, marginBottom: 6 }}>
@@ -5594,7 +5603,7 @@ className={[
                 {multi && (
                   <div style={{ marginTop: 2 }}>Combined: {routes.map(([, p]) => pctTxt(p)).join(" + ")} = {pctTxt(sum)}</div>
                 )}
-                <div style={{ marginTop: 2 }}>Share of your chum: {pctTxt(norm)}</div>
+                <div style={{ marginTop: 2 }}>Share of this dog: {pctTxt(norm)}</div>
               </div>
             )}
             <div style={{ fontWeight: 700, marginBottom: 3 }}>{TITLES[ti]}</div>
