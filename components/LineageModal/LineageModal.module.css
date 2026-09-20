@@ -149,7 +149,25 @@
 
   /* Centred on the pit's left axis, with the slider, the score and PLAY. */
   left: calc(var(--pit-axis, 51.8px) - var(--tp) / 2);
-  max-width: 82%;
+  /* IT STOPS SHORT OF THE UP ARROW, 20 September 2026 (owner: the name must never
+     overlay the navigation arrow).
+
+     WAS max-width: 82%, which is 82% of the whole stage and ran straight under
+     the arrow, the ordinal and the close X, all three of which are separate
+     absolutely positioned elements that know nothing about this one.
+
+     THE FIGURE IS THE ARROW'S OWN. .navUp in BreedTree.module.css is
+     position: fixed, left: 50%, translateX(-50%), on a 31.25px box, so its left
+     edge sits at 50% minus 15.625px. 10px of air is added to that, giving
+     50% + 25.63px as the right edge here.
+
+     BOTH EDGES ARE SET, so the element spans between them and the browser wraps
+     the name inside a width that is now true. `left` is unchanged and still
+     differs between desktop and phone; only the right-hand limit is new.
+
+     IF THE ARROW MOVES, this number moves with it. It is the only place the two
+     are related, and nothing computes it at runtime. */
+  right: calc(50% + 25.63px);
   /* LEVEL WITH THE SCORE, 16 September 2026 (owner: the profile image and the dog
      name should sit at the same z-index as the score).
 
