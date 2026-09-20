@@ -619,6 +619,27 @@ const LOGO_BONE_FRAC = 584.1 / 595.3;
    big). 0.56 is 0.75 less a quarter. The tie is untouched, and nothing else
    moved with it. */
 const PIT_BONE_MATCH = 0.56;
+/* DESKTOP TAKES THE TRUE MATCH, 20 September 2026 (owner: the bone and the logo
+   are significantly different sizes in the pit, make the bone bigger so it
+   matches).
+
+   WHY THE PHONE FIGURE DOES NOT CARRY OVER. 0.56 above was measured by eye on a
+   390 phone, where the logo wins the pit-fraction branch of its clamp and is
+   drawn enormous against the stage. At that size the logo reads as a SIGN shaped
+   like a bone, and a real bone beside it has to be smaller to look equal. On a
+   wide screen the logo hits the other branch of the clamp and stops growing, so
+   it is a far smaller object against the pit, the sign effect goes with it, and
+   the same 0.56 leaves the thrown bone looking like a different object.
+
+   1 IS THE SILHOUETTE MATCH, not a guess: LOGO_BONE_FRAC already converts the
+   logo's drawn width to the width of the bone inside it, so a factor of 1 draws
+   the pit bone at exactly that width. This is the one number to nudge if it now
+   reads too big: it is the desktop twin of PIT_BONE_MATCH and nothing else reads
+   it.
+
+   THE TIE IS UNTOUCHED. Both figures scale the logo's own width, so moving the
+   logo still moves the bone on either screen. */
+const PIT_BONE_MATCH_DESKTOP = 1;
 /* ---- Era props -------------------------------------------------------------
    Objects that belong to one era rather than to the pit as a whole. They take
    the place of the stick, big stick and rock in the props slot, and an era with
@@ -8424,7 +8445,7 @@ export default function BreedTree({
              The fallback is the old ballDia * 1.68 and is there for safety
              alone: the logo is sized when the pit is built and the toys arrive
              on timers seconds later, so it has always been measured by now. */
-          : kind === "bone" ? (logoWpxRef.current > 0 ? logoWpxRef.current * LOGO_BONE_FRAC * PIT_BONE_MATCH : ballDia * 1.68)
+          : kind === "bone" ? (logoWpxRef.current > 0 ? logoWpxRef.current * LOGO_BONE_FRAC * (isMobileRef.current ? PIT_BONE_MATCH : PIT_BONE_MATCH_DESKTOP) : ballDia * 1.68)
           // Era props. The newspaper is a long roll so it takes the stick's
           // length; the fork and the shoe are hand-sized, so they read at the
           // ball's width like the rock does.
