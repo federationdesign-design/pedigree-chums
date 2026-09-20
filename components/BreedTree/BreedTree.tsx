@@ -5183,14 +5183,19 @@ export default function BreedTree({
      every frame would turn the word straight back into a circle. Once a circle
      has popped it stays popped for the rest of the round.
 
-     THE BODY KEEPS ITS SHAPE. It is still a circle; it is grown to a radius that
-     encloses the drawn name, so the picture and the collider agree without a
-     shape swap and without touching anything that reads `held`. The cost is a
-     generous hit area on a wide one-line name. See wordGrowRef. */
+     THE BODY BECOMES THE NAME. The circle body is removed and a chamfered
+     rectangle the size of the drawn word is added in its place, carrying the
+     position, angle, velocity and spin across. It is the same shape mkWord
+     builds at the drop, so both kinds of word collide alike. See wordSwapRef.
+
+     THIS REPLACES AN EARLIER, SAFER VERSION, 20 September 2026: the body used to
+     stay a circle and simply grow to enclose the name. It worked, but the owner
+     saw the two kinds of word behaving differently in the pit and ruled for the
+     exact match. Do not restore the grow without asking. */
   const orphanSetRef = useRef<Set<Node>>(new Set());
   const orphanPopRef = useRef<Map<Node, number>>(new Map());
   const owordsGRef = useRef<SVGGElement | null>(null);
-  const wordGrowRef = useRef<((n: Node, rPx: number) => void) | null>(null);
+  const wordSwapRef = useRef<((n: Node, wPx: number, hPx: number) => void) | null>(null);
   // The stage and the pixel scale, both frozen at the drop in the units a word
   // is drawn in. See pitWordFit.
   const stageWvRef = useRef<number>(0);
@@ -6451,9 +6456,9 @@ export default function BreedTree({
           const want = Math.min(rv * 2 * PIT_WORD_WIDTH, (stageWvRef.current || Infinity) * PIT_WORD_MAX_STAGE);
           const fsw = want / of.widthEm;
           const hvw = of.lines.length * fsw * LABEL_LINE_H;
-          // the circle that encloses the drawn block, so nothing of the name
-          // hangs outside its own collider
-          wordGrowRef.current?.(d, 0.5 * Math.hypot(want, hvw) * pxPerViewRef.current);
+          // the drawn block itself, in the pixels Matter bodies live in, so the
+          // new collider is the name rather than a circle around it
+          wordSwapRef.current?.(d, want * pxPerViewRef.current, hvw * pxPerViewRef.current);
         }
       }
       if (c) {
@@ -7479,21 +7484,46 @@ export default function BreedTree({
          view units into the pixels Matter bodies actually live in. */
       stageWvRef.current = vbWf;
       pxPerViewRef.current = pxPerWorld / k;
-      /* GROW THE CIRCLE TO FIT THE NAME (W1 stage 3). The body stays a CIRCLE, so
-         nothing that reads `held` changes and no collider is rebuilt: only the
-         radius moves, and only outwards. Matter keeps circleRadius on a circle
-         body and scales it with the body, so the two cannot fall out of step.
+      /* THE BODY BECOMES THE WORD (W1 stage 3, owner 20 September 2026: swap at
+         the moment it pops, exact match with the drop's words).
 
-         ONCE, AND ONLY UP. The caller latches, so this runs on the transition
-         frame alone, and a factor at or below 1 is ignored rather than shrinking
-         a circle that is already bigger than its name. */
-      wordGrowRef.current = (n: Node, rPx: number) => {
+         THE SAME SHAPE mkWord BUILDS, and deliberately so: a chamfered rectangle
+         the size of the drawn name, with the chamfer derived from the shorter
+         side. A dog that was a word from the drop and a dog that popped into one
+         mid-round now collide identically, which is the whole point of the swap.
+
+         EVERY CARRIED VALUE IS READ OFF THE OLD BODY, not reset: position, angle,
+         velocity and spin. A swap the player can feel is a swap that went wrong.
+
+         THREE THINGS THAT WOULD BREAK QUIETLY, all handled here:
+           THE MOUSE. MouseConstraint may be holding the old body at this instant.
+           Removing a body the constraint points at leaves it dragging a corpse,
+           so the grab is released first.
+           `held`. A lifted circle has ALREADY been taken out of the world, with
+           mbIn false. The new body inherits that state rather than being added
+           blindly, or a lifted dog would be back in the pit colliding with things
+           while its card is up.
+           THE OVERLAP. The name is wider than the disc it replaces, so it can
+           appear inside its neighbours. It takes the same brief ghost immunity
+           the drop gives its deliberate overlaps, and rejoins on the usual
+           timer. */
+      wordSwapRef.current = (n: Node, wPx: number, hPx: number) => {
         const b = all.find((x) => x.n === n);
-        const mb = b?.mb;
-        if (!b || !mb || !mb.circleRadius) return;
-        const f = rPx / mb.circleRadius;
-        if (!(f > 1.001)) return;
-        MBody.scale(mb, f, f);
+        const old = b?.mb;
+        if (!b || !old) return;
+        mcReleaseRef.current?.();
+        const wasIn = b.mbIn;
+        if (wasIn) Composite.remove(world, old);
+        const nb = Bodies.rectangle(old.position.x, old.position.y, Math.max(8, wPx), Math.max(8, hPx), {
+          ...CIRCLE_OPTS,
+          angle: old.angle,
+          chamfer: { radius: Math.min(Math.max(8, wPx), Math.max(8, hPx)) * 0.18 },
+        });
+        MBody.setVelocity(nb, { x: old.velocity.x, y: old.velocity.y });
+        MBody.setAngularVelocity(nb, old.angularVelocity);
+        nb.plugin = { bridge: b, kind: "circle" };
+        b.mb = nb;
+        if (wasIn) { Composite.add(world, nb); ghost([nb]); }
       };
       setWordList(wordFits.map((f) => ({ lines: f.lines, fs: f.fs })));
       wordBodiesRef.current = bodies;
