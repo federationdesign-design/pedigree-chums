@@ -4151,7 +4151,11 @@ export default function BreedTree({
 
      THIS STAGE IS MEANT TO BE INVISIBLE. The badges are still seeded from the
      same depth-1 circles as before. Nothing on screen should move. */
-  type BadgeItem = { pct: number; r: number; label?: string; bomb?: boolean; green?: boolean; src?: Node | null };
+  /* `rarity` IS THE BREED NAME OF THE DOG A CHIP FELL OFF, and it is set at ONE
+     spawn site only: the scatter from the learn layer. It is what the rarity
+     colour is keyed on, so a chip that has no name stays lemon by construction
+     rather than by a test somewhere else. See the render. */
+  type BadgeItem = { pct: number; r: number; label?: string; bomb?: boolean; green?: boolean; src?: Node | null; rarity?: string };
   const [badgePcts, setBadgePcts] = useState<BadgeItem[]>([]);
   const badgeSrcRef = useRef<(Node | null)[]>([]);
   /* THE ONE RULE for which circles carry a badge. Stage 2 widens THIS and
@@ -4727,7 +4731,7 @@ export default function BreedTree({
   useEffect(() => { learnOpenRef.current = !!learnNode; }, [learnNode]);
   const [learnCard, setLearnCard] = useState<{ name: string; image: string; x: number; y: number; angle: number; r: number; ring: string; ringFrac: number; ringPx: number } | null>(null);
   const removedNodesRef = useRef<Set<Node>>(new Set());
-  const spawnBadgeRef = useRef<((x: number, y: number, r: number, pct: number, opts?: { r?: number; label?: string; charges?: number; green?: boolean; noBomb?: boolean }) => void) | null>(null);
+  const spawnBadgeRef = useRef<((x: number, y: number, r: number, pct: number, opts?: { r?: number; label?: string; charges?: number; green?: boolean; noBomb?: boolean; name?: string }) => void) | null>(null);
   const spawnRodRef = useRef<((x1: number, y1: number, x2: number, y2: number, lit: boolean) => void) | null>(null);
   const spawnPillRef = useRef<((x: number, y: number, w: number, name: string) => void) | null>(null);
   // `toyKind` is only set on entries in toyBodiesRef, which is why it is
@@ -8987,7 +8991,9 @@ export default function BreedTree({
         sy: number,
         rPx: number,
         pctVal: number,
-        opts?: { r?: number; label?: string; charges?: number; green?: boolean; noBomb?: boolean }
+        // `name` is the breed the chip fell off, set by the learn-layer scatter
+        // only. See BadgeItem.rarity.
+        opts?: { r?: number; label?: string; charges?: number; green?: boolean; noBomb?: boolean; name?: string }
       ) => {
         // client px in, which is the physics space itself now
         const bl = badgeBodiesRef.current;
@@ -9076,7 +9082,7 @@ export default function BreedTree({
            come from, so its slot is null. The slot still has to exist or the two
            lists stop lining up. */
         badgeSrcRef.current.push(null);
-        setBadgePcts((l) => [...l, { pct: pctVal, r: rDraw, label: opts?.label, bomb: isBomb, green: opts?.green }]);
+        setBadgePcts((l) => [...l, { pct: pctVal, r: rDraw, label: opts?.label, bomb: isBomb, green: opts?.green, rarity: opts?.name }]);
         wake();
       };
 
@@ -13625,28 +13631,32 @@ export default function BreedTree({
               const bx = b ? b.x : d1n ? d1n.x - d1n.r * 0.707 : v[0];
               const by = b ? b.y : d1n ? d1n.y + d1n.r * 0.707 : v[1] - 99999;
               const inert = inertBadges.has(i);
-              /* A CHIP WEARS ITS DOG'S RARITY COLOUR, 20 September 2026 (owner:
-                 the yellow % tokens that drop into the pit should take the
-                 rarity colour).
+              /* ONLY A CHIP OFF A LIFTED DOG WEARS THE RARITY COLOUR, 20
+                 September 2026 (owner). The first cut of this, earlier the same
+                 day, keyed on `src` and got it exactly backwards: `src` is the
+                 circle a chip was PARKED ON, which is set for the start screen
+                 and for every chip the drop and the pop throw out, and null for
+                 the scatter off the learn layer. So the colour landed on all the
+                 chips that were meant to stay lemon and on none of the chips that
+                 were meant to change.
 
-                 SAME TABLE, SAME PAIR, SAME KEY as an available twin and a held
-                 circle: RARITY_BAND, exported from LineageMap, indexed by
-                 rarityTier(treesContaining(name)). `bg` fills and `fg` inks, and
-                 the pair is already measured for this job, which is why the
-                 figure moves off navy with it. Navy against the purple and the
-                 royal blue is 1.20 and 1.58 and would vanish; the band's own fg
-                 is white on those two and black on the other three.
+                 THE KEY IS `rarity`, the breed name, set at the scatter and
+                 nowhere else. The start screen and everything that falls from the
+                 diagram carry no name, so they keep CHIP_FILL without a test of
+                 their own.
 
-                 ONLY A CHIP THAT CAME FROM A CIRCLE. `src` is null for a chip
-                 scattered in from the learn layer, which has no dog in this pit
-                 to take a tier from, so those keep the lemon CHIP_FILL.
+                 SAME TABLE, SAME PAIR as an available twin and a held circle:
+                 RARITY_BAND, indexed by rarityTier(treesContaining(name)). `bg`
+                 fills and `fg` inks, and the pair is already measured, which is
+                 why the figure moves off navy with it. Navy against the purple
+                 and the royal blue is 1.20 and 1.58 and would vanish.
 
-                 THE OTHER THREE STATES ARE UNTOUCHED, and each says something
-                 the rarity does not: inert blue for a spent chip, inert white for
-                 a spent learnt one, sky blue for the labelled solo-dog circle. A
+                 THE OTHER THREE STATES ARE UNTOUCHED, and each says something the
+                 rarity does not: inert blue for a spent chip, inert white for a
+                 spent learnt one, sky blue for the labelled solo-dog circle. A
                  bomb draws a sprite and never reaches this. */
-              const chipBand = !item.bomb && !inert && !item.label && item.src
-                ? RARITY_BAND[rarityTier(treesContaining(item.src.data.name))]
+              const chipBand = !item.bomb && !inert && !item.label && item.rarity
+                ? RARITY_BAND[rarityTier(treesContaining(item.rarity))]
                 : null;
               if (deadBadges.has(i)) return <g key={i} style={{ display: "none" }} />;
               if (item.r <= 0) return <g key={i} style={{ display: "none" }} />; // dog below the legibility floor: no badge
@@ -15626,7 +15636,9 @@ export default function BreedTree({
                  green only, and yellow circles were re-sized to the pit-dog chip
                  scale on the way down, which read as a third bigger. Both colours
                  now keep their on-layer size. */
-              spawnBadgeRef.current?.(c.x, c.y, c.r, Math.round(c.share), { r: c.r, green: c.green });
+              // the name rides down with the chip so it can wear its own rarity
+              // colour in the pit. See BadgeItem.rarity.
+              spawnBadgeRef.current?.(c.x, c.y, c.r, Math.round(c.share), { r: c.r, green: c.green, name: c.name });
             }
             /* THE SOLO DOG'S OWN CIRCLE (owner, 18 September 2026). A leaf has no
                nodes to scatter, so the layer sends its ONE full-size circle as
@@ -15658,7 +15670,7 @@ export default function BreedTree({
             if (data.big && learnNode) {
               const b = data.big;
               const share = Math.round(((learnNode.value ?? 0) / (learnNode.parent?.value || 1)) * 100);
-              spawnBadgeRef.current?.(b.x, b.y, b.r, share, { noBomb: true });
+              spawnBadgeRef.current?.(b.x, b.y, b.r, share, { noBomb: true, name: learnNode.data.name });
             }
             for (const rd of data.rods ?? []) {
               spawnRodRef.current?.(rd.x1, rd.y1, rd.x2, rd.y2, !!rd.lit);
