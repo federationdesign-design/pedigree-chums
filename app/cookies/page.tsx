@@ -111,8 +111,8 @@ export default function CookiesPage() {
             For how we handle your personal data, see our{" "}
             <Link href="/privacy">Privacy Policy</Link>. If you have any
             questions, email us at{" "}
-            <a href="mailto:enquiries@pedigreechums.co.uk">
-              enquiries@pedigreechums.co.uk
+            <a href="mailto:hello@pedigreechums.co.uk">
+              hello@pedigreechums.co.uk
             </a>
             .
           </p>
