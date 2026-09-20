@@ -1201,6 +1201,9 @@ export default function LineageMap({
   const magnifyHold = (id: string) => { closeAll(); setZoomedId(id); setInfoHover(id); };
 
   // Dismiss a fixed/opened card (the X in its corner).
+  /* Whether a loose card carries its own close X. Off since 20 September 2026;
+     see the note at the control itself. */
+  const CARD_CLOSE = false;
   const removeCard = (id: string) => {
     setPicked((cur) => { if (!cur.has(id)) return cur; const s = new Set(cur); s.delete(id); return s; });
     setPinned((m) => { if (!m.has(id)) return m; const x = new Map(m); x.delete(id); return x; });
@@ -4898,7 +4901,18 @@ className={[
                       </circle>
                     );
                   })()}
-                  {!packed && !placedSet.has(c.id) && (() => {
+                  {/* THE CLOSE X IS OFF, 20 September 2026 (owner: remove the black
+                      close icon on all the images that pop out of the notes, this
+                      stops people closing them and that is fine).
+
+                      IT WAS ALREADY OFF ON THE PIT LIFT, through the `display:
+                      circular` line below, which is why this only shows on the
+                      chum's family tree. CARD_CLOSE turns off the remaining case
+                      rather than deleting the control: removeCard has no other
+                      caller, so cutting the button would leave it unused and take
+                      the undo mechanism out of the file with it. One constant to
+                      flip if it is ever wanted back. */}
+                  {CARD_CLOSE && !packed && !placedSet.has(c.id) && (() => {
                     const ccx = c.cardX - CW / 2, ccy = c.cardY + CW / 2; // bottom-left corner, on loose cards only (placed cards show the magnifier)
                     return (
                       <g
