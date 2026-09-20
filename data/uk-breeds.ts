@@ -281,4 +281,40 @@ export const ukBreeds: UKBreed[] = [
   { name: "Old Scotch Collie", strip: "early1800", era: "early 1800s", anchor: 1825, note: "The old Scottish shepherd's collie, the pre-show hill-herding landrace behind the working border strain.", image: "/history/breeds/Old-Scotch-Collie.jpg", tag: "extinct" },
   { name: "Old Cumberland herding dogs", strip: "early1800", era: "early 1800s", anchor: 1826, note: "Northern English herding dogs from the same border country.", image: "/history/breeds/cumberland-sheepdog-photo.jpg", tag: "extinct" },
   { name: "Old sporting toy Spaniels", strip: "mid1800", era: "mid 1800s", anchor: 1865, note: "The longer-muzzled toy spaniels of the older paintings.", image: "/history/breeds/Old-sporting-toy-spaniels.jpg", tag: "extinct" },
+
+  /* FIVE GENUINE UK DOGS BECOME PLAYABLE LEVELS, 20 September 2026 (owner).
+     Each already had a lineage record and artwork on disk; all that was missing
+     was a card. 92 levels becomes 97.
+
+     ANCHORS ARE RESEARCHED, NOT GUESSED, and each is one past the date the
+     sources give because the exact year was already taken. Ties fall back to
+     array order in the sort, which is fragile, so none is added here:
+       Rough northern sighthounds  400   Roman pottery from Argyll, 1st century
+                                         AD, shows rough-coated hounds coursing
+                                         deer; the Pictish stones follow. The
+                                         name Scottish Deerhound is only early
+                                         19th century, so this is the TYPE.
+       British Setters             1577  Caius names the Setter, "in Latine
+                                         Index", 1570, translated 1576. 1576 is
+                                         the Turnspit Dog's.
+       Old wirehaired fell Terriers 1748 The fell type has been known since the
+                                         1700s. 1750 is the Clumber Spaniel's.
+       Old black-and-tan Setters   1792  Breeders began selecting for the black
+                                         and tan coat in the late 1700s, and the
+                                         dog predates the Duke of Gordon, whose
+                                         kennel is c1820. 1790 is the English
+                                         Water Spaniel's.
+       Trumpington Terrier         1881  The Cambridge fashion ran through the
+                                         1870s and 80s; Rags went to Norwich
+                                         c1900. 1880 is already doubled.
+
+     ADDING A CARD RENUMBERS EVERY LEVEL AFTER IT. That used to break
+     levelThemes.ts, which was keyed to level number; that table is gone, and the
+     only remaining reader of a level number is the "Nth DOG" ordinal on the
+     start screen. Nothing is stored by number. Checked before this was added. */
+  { name: "Rough northern sighthounds", strip: "ancient", era: "Ancient", anchor: 400, note: "Shaggy coursing dogs built for cold, rough ground, the coarse-haired hunting hounds of the early Scots and Picts.", image: "/history/breeds/rough-northern-sighthounds.jpg", tag: "extinct" },
+  { name: "British Setters", strip: "c1500", era: "1500s", anchor: 1577, note: "The British setting dogs of the shooting field, bred to find birds and drop steady in front of them.", image: "/history/breeds/british-setters.jpg", tag: "in-decline" },
+  { name: "Old wirehaired fell Terriers", strip: "c1700", era: "1700s", anchor: 1748, note: "The harsh-coated fox-working terriers of the northern fells, bred for grip and weather rather than looks.", image: "/history/breeds/Old-wirehaired-fell-terrier.jpg", tag: "extinct" },
+  { name: "Old black-and-tan Setters", strip: "c1700", era: "1700s", anchor: 1792, note: "The black-and-tan setting dogs worked in Britain before the Duke of Gordon's kennels took the type up.", image: "/history/breeds/black-and-tan-setters.jpg", tag: "extinct" },
+  { name: "Trumpington Terrier", strip: "late1800", era: "late 1800s", anchor: 1881, note: "The small terriers Cambridge undergraduates kept as college ratters, bought from a livery stable on Trumpington Street.", image: "/history/breeds/trumpington-terrier.jpg", tag: "extinct" },
 ];

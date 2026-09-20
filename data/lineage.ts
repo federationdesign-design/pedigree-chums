@@ -1190,8 +1190,12 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Trumpington Terrier",
     note: "The small terriers Cambridge undergraduates kept as college ratters in the 1870s, bought from a livery stable on Trumpington Street. The founding sire of the Norwich came out of them. Now extinct.",
     img: "/history/breeds/trumpington-terrier.jpg",
+    /* A PLAYABLE LEVEL NEEDS TWO CIRCLES, 20 September 2026 (owner: a new dog
+       cannot come from just one parent). The one documented ancestor is drawn
+       twice at 50 each. This must NOT be read as two separate ancestors. */
     children: [
-      { name: "Old British ratting Terriers", note: "The general farm and stable ratting stock the livery-yard terriers were drawn from. Now extinct.", img: "/history/breeds/Old-British-ratting-terriers.jpg", value: 100 }
+      { name: "Old British ratting Terriers", note: "The general farm and stable ratting stock the livery-yard terriers were drawn from. Now extinct.", img: "/history/breeds/Old-British-ratting-terriers.jpg", value: 50 },
+      { name: "Old British ratting Terriers", note: "The general farm and stable ratting stock the livery-yard terriers were drawn from. Now extinct.", img: "/history/breeds/Old-British-ratting-terriers.jpg", value: 50 }
     ]
   },
 
@@ -1569,8 +1573,12 @@ const LINEAGE: Record<string, LineageNode> = {
   "Old wirehaired fell Terriers": {
     name: "Old wirehaired fell Terriers",
     note: "The harsh-coated fox-working terriers of the northern fells, bred for grip and weather rather than looks. Now extinct.",
+    /* A PLAYABLE LEVEL NEEDS TWO CIRCLES, 20 September 2026 (owner: a new dog
+       cannot come from just one parent). The one documented ancestor is drawn
+       twice at 50 each. This must NOT be read as two separate ancestors. */
     children: [
-      { name: "Black and Tan Terrier", note: "The old black-and-tan working terrier the fell and Welsh terriers were bred from. Now extinct.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 100 }
+      { name: "Black and Tan Terrier", note: "The old black-and-tan working terrier the fell and Welsh terriers were bred from. Now extinct.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 50 },
+      { name: "Black and Tan Terrier", note: "The old black-and-tan working terrier the fell and Welsh terriers were bred from. Now extinct.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 50 }
     ]
   },
 
@@ -1706,16 +1714,24 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "British Setters",
     note: "The British setting dogs of the shooting field, bred to find birds and drop steady in front of them. Now in-decline.",
     img: "/history/breeds/setters.jpg",
+    /* A PLAYABLE LEVEL NEEDS TWO CIRCLES, 20 September 2026 (owner: a new dog
+       cannot come from just one parent). The one documented ancestor is drawn
+       twice at 50 each. This must NOT be read as two separate ancestors. */
     children: [
-      { name: "Land Spaniels", note: "The crouching land spaniels that marked game for the net, the stock every setter was built up from. Now extinct.", img: "/history/breeds/original-land-spaniel.jpg", value: 100 }
+      { name: "Land Spaniels", note: "The crouching land spaniels that marked game for the net, the stock every setter was built up from. Now extinct.", img: "/history/breeds/original-land-spaniel.jpg", value: 50 },
+      { name: "Land Spaniels", note: "The crouching land spaniels that marked game for the net, the stock every setter was built up from. Now extinct.", img: "/history/breeds/original-land-spaniel.jpg", value: 50 }
     ]
   },
 
   "Old black-and-tan Setters": {
     name: "Old black-and-tan Setters",
     note: "The black-and-tan setting dogs worked in Britain before the Duke of Gordon's kennels took the type up. Now extinct.",
+    /* A PLAYABLE LEVEL NEEDS TWO CIRCLES, 20 September 2026 (owner: a new dog
+       cannot come from just one parent). The one documented ancestor is drawn
+       twice at 50 each. This must NOT be read as two separate ancestors. */
     children: [
-      { name: "Land Spaniels", note: "The crouching land spaniels that marked game for the net, the stock every setter was built up from. Now extinct.", img: "/history/breeds/original-land-spaniel.jpg", value: 100 }
+      { name: "Land Spaniels", note: "The crouching land spaniels that marked game for the net, the stock every setter was built up from. Now extinct.", img: "/history/breeds/original-land-spaniel.jpg", value: 50 },
+      { name: "Land Spaniels", note: "The crouching land spaniels that marked game for the net, the stock every setter was built up from. Now extinct.", img: "/history/breeds/original-land-spaniel.jpg", value: 50 }
     ]
   },
 
@@ -2553,8 +2569,12 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Rough northern sighthounds",
     note: "Shaggy-coated coursing dogs built for cold, rough ground, the coarse-haired hunting hounds of the early Scots and Picts. Now extinct.",
     img: "/history/breeds/rough-northern-sighthounds.jpg",
+    /* A PLAYABLE LEVEL NEEDS TWO CIRCLES, 20 September 2026 (owner: a new dog
+       cannot come from just one parent). The one documented ancestor is drawn
+       twice at 50 each. This must NOT be read as two separate ancestors. */
     children: [
-      { name: "Celtic Coursing Hound", note: "Swift Celtic sight-hunting dog described by classical writers, the sighthound stock the northern rough-coated type was formed from. Now extinct.", img: "/history/breeds/ancient-celtic-coursing-hound.jpg", value: 100 },
+      { name: "Celtic Coursing Hound", note: "Swift Celtic sight-hunting dog described by classical writers, the sighthound stock the northern rough-coated type was formed from. Now extinct.", img: "/history/breeds/ancient-celtic-coursing-hound.jpg", value: 50 },
+      { name: "Celtic Coursing Hound", note: "Swift Celtic sight-hunting dog described by classical writers, the sighthound stock the northern rough-coated type was formed from. Now extinct.", img: "/history/breeds/ancient-celtic-coursing-hound.jpg", value: 50 },
     ],
   },
 
