@@ -235,7 +235,7 @@ const LINEAGE: Record<string, LineageNode> = {
         value: 17
       },
       {
-        name: "British Setters",
+        name: "The First Setters",
         note: "Added biddability and a love of working close with people on the shoot. Now in-decline.",
         /* ITS OWN PICTURE, 16 September 2026 (owner supplied it). This was the LAST
            of four dogs sharing british-setters.jpg: British Setters, Setter, English
@@ -1476,7 +1476,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "Once called the Wavy-Coated Retriever, the smart, glossy black gundog that was the gamekeeper's favourite before the Labrador rose.",
     children: [
       { name: "St John's Water Dog", note: "The Newfoundland fishing dog behind all the retrievers. Now extinct.", img: "/history/breeds/St-Johns-Water-Dog.jpg", value: 50 },
-      { name: "British Setters", note: "Setter blood for feathering and a good nose. Now in-decline.", img: "/history/breeds/british-setters.jpg", value: 30 },
+      { name: "The First Setters", note: "Setter blood for feathering and a good nose. Now in-decline.", img: "/history/breeds/british-setters.jpg", value: 30 },
       { name: "Water Spaniels", note: "Working water spaniels that added drive and a love of wet cover. Now extinct.", img: "/history/breeds/original-water-spaniel.jpg", value: 10 },
       { name: "Shepherd's Dogs", note: "Practical medieval working dog used to move and protect sheep, forming an early root of Britain's collie families. An extinct historical type.", img: "/history/breeds/medieval-shepherds-dog.jpg", value: 10 }
     ]
@@ -1734,8 +1734,8 @@ const LINEAGE: Record<string, LineageNode> = {
      TWO IMAGE FILES FOR ONE DOG, NOT RESOLVED HERE. This record wears
      setters.jpg and every child node wears british-setters.jpg. Both are in the
      repo and both are this dog; worth a look, out of scope for a merge. */
-  "British Setters": {
-    name: "British Setters",
+  "The First Setters": {
+    name: "The First Setters",
     note: "The British setting dogs of the shooting field, bred to find birds and drop steady in front of them. Now in-decline.",
     img: "/history/breeds/setters.jpg",
     /* A PLAYABLE LEVEL NEEDS TWO CIRCLES, 20 September 2026 (owner: a new dog
@@ -2808,7 +2808,7 @@ const LINEAGE: Record<string, LineageNode> = {
       { name: "English Foxhound", note: "Stamina, drive and a steady temperament.", img: "/history/breeds/english-foxhound.jpg", value: 30 },
       { name: "Greyhound", note: "Speed and a racy, galloping build.", img: "/history/breeds/original-greyhound.jpg", value: 25 },
       { name: "Bloodhound", note: "A deeper nose for finding game.", img: "/history/breeds/modern-bloodhound.jpg", value: 25 },
-      { name: "British Setters", note: "Setting-dog blood for style and steadiness. Now in-decline.", img: "/history/breeds/british-setters.jpg", value: 20 }
+      { name: "The First Setters", note: "Setting-dog blood for style and steadiness. Now in-decline.", img: "/history/breeds/british-setters.jpg", value: 20 }
     ]
   },
 
@@ -3374,7 +3374,11 @@ const LINEAGE_ALIASES: Record<string, string> = {
      the node itself has been renamed to Pointer in the data, so nothing reaches
      this today, but an older spelling returning still grafts rather than becoming
      a fresh dead end. */
-  "Setter": "British Setters",
+  /* RENAMED 20 September 2026 (owner: "British Setters" becomes "The First
+     Setters"). Both older names resolve here, so the 19 July "Setter" merge and
+     anything still written the old way still reach this record. */
+  "Setter": "The First Setters",
+  "British Setters": "The First Setters",
   "British Pointers": "Pointer",
   "Wavy-Coated Retriever": "Flat-Coated Retriever",
   "Old setting spaniels": "Land Spaniels",
