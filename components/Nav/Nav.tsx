@@ -10,6 +10,7 @@ import AccessibleMenu from "./AccessibleMenu";
 import PcContrastToolbar from "../PcContrastToolbar/PcContrastToolbar";
 import OutboundLink from "../OutboundLink/OutboundLink";
 import CookieSettingsButton from "../CookieSettings/CookieSettingsButton";
+import BasketIcon from "./BasketIcon";
 import { getScheme, getHideImages, CONTRAST_EVENT } from "../../lib/contrastScheme";
 import styles from "./Nav.module.css";
 
@@ -320,9 +321,15 @@ export default function Nav({ hideLogo = false, dockBottomLeft = false, showLogo
                 <span className={styles.topNavSep}>|</span>
                 <Link href="/about" className={styles.topNavLink} onClick={closeForNav}>About</Link>
                 <span className={styles.topNavSep}>|</span>
-                <Link href="/preorder" className={styles.topNavLink} onClick={closeForNav}>Pre-order</Link>
+                {/* The mark, not the words (Steve, 20 September 2026). .socialIcon so it
+                    sits on the same optical line as the cookie and the social marks; the
+                    label moves to aria-label so the link still reads as "Pre-order". */}
+                <Link href="/preorder" className={styles.socialIcon} aria-label="Pre-order" onClick={closeForNav}><BasketIcon /></Link>
                 <span className={styles.topNavSep}>|</span>
-                <CookieSettingsButton className={styles.topNavLink} onActivate={closeForNav} />
+                {/* The mark, not the words, and sized by .socialIcon so it matches the
+                    Instagram and TikTok icons beside it. The Footer's copy of this
+                    button keeps its label: see the note on the icon prop. */}
+                <CookieSettingsButton icon className={styles.socialIcon} onActivate={closeForNav} />
                 <OutboundLink href="https://www.instagram.com/pedigree_chums_game/" className={styles.socialIcon} aria-label="Instagram">
                   {/* The viewBox was 440 0 261 341 and the artwork does not fit
                       inside it: the paths run from x 379.4 to 719.5, so 61 units
