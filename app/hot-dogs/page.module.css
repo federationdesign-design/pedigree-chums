@@ -818,6 +818,56 @@
   }
 }
 
+/* MOBILE: THE HEAT ALERTS AND THE SAFETY CARDS SCROLL SIDEWAYS TOO,
+   20 September 2026 (Steve). Same reasoning as the conga above: at 390px the
+   three alerts stacked into three full-width rows and the three safety cards
+   into a single grid column, so both read as a long vertical list rather than a
+   set to compare. Desktop is untouched, three across in both cases.
+
+   THE TWO CONTAINERS NEED DIFFERENT TREATMENT, which is why this is not one
+   shared rule. .heatAlerts is flex, so it takes `flex-wrap: nowrap` plus a
+   flex-basis on the child, and the child's `min-width: 220px` has to be cleared
+   or it would fight the basis. .safetyCards is a GRID using
+   `repeat(auto-fit, minmax(180px, 1fr))`, so wrap does not apply: the columns
+   have to be switched off and re-flowed along the row instead.
+
+   No padding is needed here, unlike the conga: nothing in either component is
+   positioned outside its own box, so turning on overflow clips nothing. That was
+   measured, not assumed. */
+@media (max-width: 768px) {
+  .heatAlerts {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .heatAlerts::-webkit-scrollbar {
+    display: none;
+  }
+  .heatAlerts .alert {
+    flex: 0 0 80%;
+    min-width: 0; /* clears the 220px basis above, which would override the flex */
+    scroll-snap-align: center;
+  }
+
+  .safetyCards {
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    grid-auto-columns: 80%;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .safetyCards::-webkit-scrollbar {
+    display: none;
+  }
+  .safetyCard {
+    scroll-snap-align: center;
+  }
+}
+
 /* Batch 7: safety-column body paragraphs, +4pt and fluid (was fixed 1.3rem). */
 .safetyCol p:not(.lead) { font-size: clamp(1.2rem, 2.3vw, 1.633rem); font-weight: 500; }
 
