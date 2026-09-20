@@ -187,7 +187,23 @@ export const RARITY_BAND: Record<"extremelyRare" | "rare" | "uncommon" | "common
   extremelyRare: { bg: "#4d2e91", fg: "#ffffff", label: "EXTREMELY RARE" }, // purple
   rare:          { bg: "#2547c4", fg: "#ffffff", label: "RARE" },           // royal blue
   uncommon:      { bg: "#5dbf86", fg: "#000000", label: "UNCOMMON" },       // green
-  common:        { bg: "#f47421", fg: "#000000", label: "COMMON" },         // orange
+  /* #f47421 -> #ffed00, 20 September 2026 (owner). Common leaves the orange for
+     the site's lemon, sitting beside very common's #ffd23e rather than across the
+     scale from it. The owner chose this knowing the two neighbouring tiers now
+     read as two yellows; it was put to him with a swap and a new fifth colour as
+     the alternatives and he ruled for this.
+
+     BLACK STAYS AS fg and does not need re-measuring: #ffed00 is lighter than the
+     orange it replaces, so the label's contrast goes up, not down.
+
+     TWO THINGS ALREADY WEAR THIS EXACT HEX in the pit, and neither is a bug but
+     both are worth knowing. CHIP_FILL is #ffed00, so a chip off a COMMON dog is
+     now indistinguishable from a plain lemon chip that carries no rarity at all.
+     DOG_CHAIN_COLOUR is #ffed00 too, which is the fallback the chain path and its
+     glow use when there is no breed to read; chaining a common dog therefore
+     draws in the same colour as that fallback. If either starts to read as a
+     fault, those are the two constants to move, not this one. */
+  common:        { bg: "#ffed00", fg: "#000000", label: "COMMON" },         // site lemon
   /* #fcee23 -> #ffd23e, 18 September 2026 (owner). The lemon becomes the site's
      own --yellow, so the top tier sits in the palette rather than beside it.
      ALL FIVE READERS MOVE TOGETHER and that is intended, audited before the
