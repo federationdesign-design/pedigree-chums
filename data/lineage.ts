@@ -767,16 +767,28 @@ const LINEAGE: Record<string, LineageNode> = {
   "Skye Terrier": {
     name: "Skye Terrier",
     note: "One of the oldest terriers in Britain, a long, low, heavy-coated earth dog from the Isle of Skye and the Western Highlands.",
+    /* A PLAYABLE LEVEL NEEDS TWO CIRCLES, 20 September 2026 (owner: a new dog
+       cannot come from just one parent). The one documented ancestor is drawn
+       twice, at the owner's own split. This must NOT be read as two ancestors.
+       Scope is playable levels only; the same shape elsewhere in this file was
+       deliberately left alone. */
     children: [
-      { name: "Old Scottish working Terriers", note: "The long-coated island and Highland earth dogs at the root of the whole Scottish terrier family. Now extinct.", img: "/history/breeds/Isle-of-Skye-earth-dogs.jpg", value: 100 }
+      { name: "Old Scottish working Terriers", note: "The long-coated island and Highland earth dogs at the root of the whole Scottish terrier family. Now extinct.", img: "/history/breeds/Isle-of-Skye-earth-dogs.jpg", value: 50 },
+      { name: "Old Scottish working Terriers", note: "The long-coated island and Highland earth dogs at the root of the whole Scottish terrier family. Now extinct.", img: "/history/breeds/Isle-of-Skye-earth-dogs.jpg", value: 50 }
     ]
   },
 
   "Scottish Terrier": {
     name: "Scottish Terrier",
     note: "The 'diehard' of the Highlands, drawn from the old Scottish terrier stock into a sturdy, short-legged earth dog.",
+    /* A PLAYABLE LEVEL NEEDS TWO CIRCLES, 20 September 2026 (owner: a new dog
+       cannot come from just one parent). The one documented ancestor is drawn
+       twice, at the owner's own split. This must NOT be read as two ancestors.
+       Scope is playable levels only; the same shape elsewhere in this file was
+       deliberately left alone. */
     children: [
-      { name: "Old Scottish working Terriers", note: "The shared Scottish working-terrier stock, once all just called Scottish terriers. Now extinct.", img: "/history/breeds/Isle-of-Skye-earth-dogs.jpg", value: 100 }
+      { name: "Old Scottish working Terriers", note: "The shared Scottish working-terrier stock, once all just called Scottish terriers. Now extinct.", img: "/history/breeds/Isle-of-Skye-earth-dogs.jpg", value: 30 },
+      { name: "Old Scottish working Terriers", note: "The shared Scottish working-terrier stock, once all just called Scottish terriers. Now extinct.", img: "/history/breeds/Isle-of-Skye-earth-dogs.jpg", value: 70 }
     ]
   },
 
@@ -1061,8 +1073,14 @@ const LINEAGE: Record<string, LineageNode> = {
   "Paisley Terrier": {
     name: "Paisley Terrier",
     note: "A silky, blue show terrier from around Paisley and Clydeside, the glamorous strain of the Skye that helped create the Yorkshire.",
+    /* A PLAYABLE LEVEL NEEDS TWO CIRCLES, 20 September 2026 (owner: a new dog
+       cannot come from just one parent). The one documented ancestor is drawn
+       twice, at the owner's own split. This must NOT be read as two ancestors.
+       Scope is playable levels only; the same shape elsewhere in this file was
+       deliberately left alone. */
     children: [
-      { name: "Old Scottish working Terriers", note: "The long-coated Scottish working terriers behind the silky Clydeside strains. Now extinct.", img: "/history/breeds/Isle-of-Skye-earth-dogs.jpg", value: 100 }
+      { name: "Old Scottish working Terriers", note: "The long-coated Scottish working terriers behind the silky Clydeside strains. Now extinct.", img: "/history/breeds/Isle-of-Skye-earth-dogs.jpg", value: 80 },
+      { name: "Old Scottish working Terriers", note: "The long-coated Scottish working terriers behind the silky Clydeside strains. Now extinct.", img: "/history/breeds/Isle-of-Skye-earth-dogs.jpg", value: 20 }
     ]
   },
 
@@ -1418,12 +1436,18 @@ const LINEAGE: Record<string, LineageNode> = {
   "Irish Water Spaniel": {
     name: "Irish Water Spaniel",
     note: "The tallest of the spaniels, a curly liver-brown water dog with a rat-like tail, one of Ireland's old gundog breeds.",
+    /* A PLAYABLE LEVEL NEEDS TWO CIRCLES, 20 September 2026 (owner: a new dog
+       cannot come from just one parent). The one documented ancestor is drawn
+       twice, at the owner's own split. This must NOT be read as two ancestors.
+       Scope is playable levels only; the same shape elsewhere in this file was
+       deliberately left alone. */
     children: [
       /* THE DIRECT CONTINENTAL EDGE IS GONE, 20 September 2026. This carried
          "Old European water dogs" at 45 in its own right AND through its Irish
          parent, so the same contribution arrived twice. It now arrives once,
          inside Old Irish water dogs, which is where the sources put it. */
-      { name: "Old Irish water dogs", note: "The southern and northern water spaniels of Ireland, joined into one breed in the 1830s. Now extinct.", img: "/history/breeds/Old-Irish-water-dog.jpg", value: 100 }
+      { name: "Old Irish water dogs", note: "The southern and northern water spaniels of Ireland, joined into one breed in the 1830s. Now extinct.", img: "/history/breeds/Old-Irish-water-dog.jpg", value: 60 },
+      { name: "Old Irish water dogs", note: "The southern and northern water spaniels of Ireland, joined into one breed in the 1830s. Now extinct.", img: "/history/breeds/Old-Irish-water-dog.jpg", value: 40 }
     ]
   },
 
