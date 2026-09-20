@@ -274,7 +274,12 @@
    that card's body. The box is the positioning context for the X; when open it clears room
    for it. Card BODIES reuse the desktop content styles (cardStyles); the box only frames them. */
 .introBox { position: relative; }
-.slotOpen { padding-top: 44px; }
+/* 44 -> 22, 20 September 2026 (owner: too much padding at the top of the blue
+   box, reduce it by 50%). The 44 was clearing the close X, which sits at top 10
+   and is 30 tall, so its bottom edge is at 40. At 22 the heading starts above
+   that, which is fine because the two never share horizontal space: the heading
+   is left-aligned and the X is pinned right. */
+.slotOpen { padding-top: 22px; }
 .slotCard { position: relative; }
 .slotClose {
   position: absolute;
@@ -318,22 +323,36 @@
   right: 0;
   bottom: 0;
   z-index: 90;
-  /* Exactly 5 per row, two even rows: 9 icons land 5 + 4, no ragged wrap. The track group is
-     centred; the 4-icon row sits under the first four columns. */
+  /* ONE ROW OF NINE, 20 September 2026 (owner: make the icons smaller so they fit
+     on a single row rather than going onto two).
+
+     WHAT IT REPLACES: five fixed 46px columns, which put the nine icons on two
+     rows as 5 + 4. That was deliberate at 46px, because nine of them at that size
+     do not fit a phone.
+
+     FRACTIONS, NOT A FIXED PIXEL SIZE. Nine columns at a flat width that suits a
+     390 screen overflows a 320 one, and small screens are the whole point of this
+     rail. 1fr each with a 6px gap means the icon is whatever nine-across allows:
+     about 36px on a 390, 32 on a 360, 28 on a 320. The icon itself is sized from
+     the column below rather than carrying its own number. */
   display: grid;
-  grid-template-columns: repeat(5, 46px);
+  grid-template-columns: repeat(9, minmax(0, 1fr));
   justify-content: center;
-  gap: 8px 10px;
+  gap: 6px;
   padding: 10px 10px calc(10px + env(safe-area-inset-bottom, 0px));
   background: var(--navy, #0a3a57);
   border-top: 2px solid var(--yellow, #fff200);
   box-sizing: border-box;
 }
 .railIcon {
-  width: 46px;
-  height: 46px;
+  /* Fills its own column and stays square, so the size comes from the grid above
+     and there is one number to change, not two. 13px on a 46 box is a 28% radius;
+     10 keeps that proportion at the smaller sizes. */
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
   flex: 0 0 auto;
-  border-radius: 13px;
+  border-radius: 10px;
   background: var(--navy, #0a3a57);
   border: 2px solid var(--yellow, #fff200);
   cursor: pointer;
@@ -348,8 +367,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 26px;
-  height: 26px;
+  /* 26 of 46 is 57%, so the glyph keeps the same share of the button at whatever
+     width nine-across gives it. */
+  width: 57%;
+  height: 57%;
   color: var(--yellow, #fff200);
   line-height: 1;
 }
