@@ -29,7 +29,7 @@ import pitStyles from "../PackPit/PackPit.module.css";
 import mapStyles from "../PackPit/LineageMap.module.css";
 import { BRAIN_PATH, BRAIN_ARTBOARD } from "../icons/brain";
 import LineageMap from "../PackPit/LineageMap";
-import { propsFor, mobilePropsForLevel, type LevelTheme } from "../../data/levelThemes";
+import { propsFor, toysForCircles, type LevelTheme } from "../../data/levelThemes";
 import { packArt } from "../../data/packArt";
 import BritainMessage from "../PackPit/BritainMessage";
 
@@ -244,6 +244,27 @@ const DIFF_STOP_10 = 1;
    which is what a change of difficulty or level causes, starts clean. */
 const DROP_SHRINK_0 = 0.75;
 const DROP_SHRUNK = new WeakSet<object>();
+/* THE PARENT CIRCLES DROP A QUARTER SMALLER, 19 September 2026 (owner: reduce
+   the big dog circles that drop in at the start of the game by 25%, and only
+   the big parent circles).
+
+   DEPTH 1 ONLY. These are the level's own top circles, the ones carrying the
+   yellow share badge. Their children keep the size the pack gave them, so a
+   popped circle releases the same dogs it always did.
+
+   IT SHRINKS THE NODE, NOT THE BODY, and that is the whole trick. drawR reads
+   d.r and mkCircle reads b.r, which is copied from n.r when the bodies are
+   built. Moving only the body would put a full size picture over a small
+   collider, which is the exact fault recorded at mkWord below. One number,
+   both follow.
+
+   THE START SCREEN IS UNTOUCHED. This runs inside doFall, so the circles are
+   full size while you are reading them and a quarter smaller once they drop.
+
+   WeakSet guarded, like DROP_SHRINK_0, so a second drop on the same nodes
+   cannot take another quarter off. */
+const DROP_SHRINK_D1 = 0.75;
+const DROP_SHRUNK_D1 = new WeakSet<object>();
 // The docked view zooms out to 1.21x the frame, so the visible pit is this much
 // wider than SIZE. DIFF_INSET holds back enough for the 5px stroke and the pit
 // walls, which sit 4 svg units inside the stage edges.
@@ -420,6 +441,26 @@ const TOY_BOWL_GONE_KEY = "pc-minipit-bowl-gone";
    wedged between them: about 34px each side on a 360 phone and 39px on a 414.
    See the clamp in spawnToy for why this exists at all. */
 const BOWL_PIT_FRACTION = 0.8855; // was 0.805, 10% bigger (owner, 2 Sept 2026)
+/* ---- The slipper, ported from the main pit 19 September 2026 (owner) --------
+   PackPit.tsx lines 367 and 375 to 392. Same artwork, same artboard, the same
+   five part compound and the same physics figures, which in the main pit it
+   shares with the bone under HEAVY and which are already this pit's bone
+   figures.
+
+   IT TAKES THE BOWL'S CLAMP, and for the same reason. The main pit is a full
+   width canvas; this one is only as wide as its walls, about 380 to 414px on a
+   phone. BIGT * 6.65 comes out at roughly 374px there, so an unclamped slipper
+   is all but the whole floor. Whichever is smaller wins.
+
+   NO CENTROID OFFSET. The main pit carries ox/oy to nudge the sprite over its
+   compound centre, about 4% of the width. This pit has no offset mechanism for
+   toys and the bone and the bowl manage without one, so the sprite sits on the
+   body's own centre. */
+const TOY_SLIPPER_SRC = "/slipper-edit2.svg";
+const SLIPPER_ASPECT = 2.721;
+const SLIPPER_VB_W = 1108.5;
+const SLIPPER_VB_H = 407.4;
+const TOY_SLIPPER_GONE_KEY = "pc-minipit-slipper-gone";
 /* ---- The breakable logo, stage 1 -------------------------------------------
    The Pedigree Chums mark, ported from the main pit (PackPit.tsx:536 to 560).
    It sits fixed near the top of the pit, the pack and the toys bounce off it,
@@ -631,7 +672,6 @@ const ROCK_ASPECT = 756.3 / 659.2;
 // scope, so a fresh visit starts clean. Swap to localStorage to make it forever.
 const TOY_FLAG_SEEN_KEY = "pc-minipit-flag-seen";
 const TOY_BALL_GONE_KEY = "pc-minipit-ball-gone";
-const TOY_STICK_GONE_KEY = "pc-minipit-stick-gone";
 const TOY_STICK_BIG_GONE_KEY = "pc-minipit-stickbig-gone";
 const TOY_ROCK_GONE_KEY = "pc-minipit-rock-gone";
 // The pink ball. The yellow one is gone the first time it leaves the pit; this
@@ -744,35 +784,47 @@ const QMARK_SRC = "/dogfacequestion.svg";
    The underscore in the filename is deliberate: the file arrived with a space
    in it, which is trouble in a URL. */
 const QMARK_TAPPED_SRC = "/dogfacequestion_tapped.svg";
-// stickBig is the same artwork half again as large, so the pair reads as two
-// sticks of different sizes rather than one drawn twice
-type ToyKind = "ball" | "flag" | "stick" | "stickBig" | "rock" | "ballPink" | "cookies" | "bone"
-  | "newspaper" | "fork" | "shoe" | "bowl";
+/* ONE STICK ONLY, 19 September 2026 (owner: remove the small stick, leaving
+   only the big one, and give the big one the small one's physics).
+
+   REVERSED DECISION, recorded rather than quietly applied. The pair existed so
+   two sticks of different sizes read as two objects rather than one drawn
+   twice. The owner has withdrawn the small one. "stickBig" keeps its own name
+   and its own 1.5x size, so nothing downstream has to be renamed, and it now
+   carries the physics and the drawn start angle that used to be the small
+   stick's alone: restitution 0.35, friction 0.35, frictionAir 0.004, density
+   0.002. Before this it fell past that branch to the generic default and was
+   three times as dense and noticeably bouncier. */
+type ToyKind = "ball" | "flag" | "stickBig" | "rock" | "ballPink" | "cookies" | "bone"
+  | "newspaper" | "fork" | "shoe" | "bowl" | "slipper";
 /* The props slot: the three objects that arrive together part way through the
    drop. A theme can replace them, which is how an era gets its own things to
    knock about. */
-export const DEFAULT_PROPS: ToyKind[] = ["stick", "stickBig"]; // rock removed 2026-08-12 (no more rocks). NB: THEMES_ENABLED is false, so this default is the ONLY prop set in play on every level.
+/* NO LONGER THE PROP SET, 19 September 2026. The band table in
+   data/levelThemes.ts now decides every toy, and armToys builds the prop slot
+   from it. This is kept only as the shape other callers import. */
+export const DEFAULT_PROPS: ToyKind[] = ["stickBig"]; // rock removed 2026-08-12 (no more rocks), small stick removed 2026-09-19.
 /* Which side the first prop falls on. Flipped every time a pit arms its props,
    so a reader playing several levels does not watch the same object land in the
    same corner every time. Module scope, so it survives a pit remounting. */
 let propStartLeft = true;
 const TOY_SRC: Record<ToyKind, string> = {
-  ball: TOY_BALL_SRC, flag: TOY_FLAG_SRC, stick: TOY_STICK_SRC,
+  ball: TOY_BALL_SRC, flag: TOY_FLAG_SRC,
   stickBig: TOY_STICK_SRC, rock: TOY_ROCK_SRC, ballPink: TOY_BALL_SRC,
   cookies: TOY_COOKIES_SRC,
   bone: TOY_BONE_SRC,
   newspaper: TOY_NEWSPAPER_SRC, fork: TOY_FORK_SRC, shoe: TOY_SHOE_SRC,
-  bowl: TOY_BOWL_SRC,
+  bowl: TOY_BOWL_SRC, slipper: TOY_SLIPPER_SRC,
 };
 // every prop except the flag leaves for good once it is thrown clear of the pit
 const TOY_GONE_KEY: Record<ToyKind, string> = {
   ball: TOY_BALL_GONE_KEY, flag: TOY_FLAG_SEEN_KEY,
-  stick: TOY_STICK_GONE_KEY, stickBig: TOY_STICK_BIG_GONE_KEY,
+  stickBig: TOY_STICK_BIG_GONE_KEY,
   rock: TOY_ROCK_GONE_KEY, ballPink: TOY_BALL_PINK_GONE_KEY,
   cookies: TOY_COOKIES_SEEN_KEY,
   bone: TOY_BONE_GONE_KEY,
   newspaper: TOY_NEWSPAPER_GONE_KEY, fork: TOY_FORK_GONE_KEY, shoe: TOY_SHOE_GONE_KEY,
-  bowl: TOY_BOWL_GONE_KEY,
+  bowl: TOY_BOWL_GONE_KEY, slipper: TOY_SLIPPER_GONE_KEY,
 };
 function toyRetired(key: string): boolean {
   try { return sessionStorage.getItem(key) === "1"; } catch { return false; }
@@ -824,6 +876,14 @@ function retireToyForever(key: string) {
   try { localStorage.setItem(key, "1"); } catch { /* private mode */ }
 }
 const PERMANENT_TOYS: string[] = ["flag"];
+
+/* WHICH TOYS CAN BE THROWN CLEAR OF THE PIT AND RETIRE FOR IT, 19 September 2026.
+   The flag is not here: it leaves by having its message read, not by being
+   launched. Everything here is watched by throwWatchRef and retired by
+   checkEscapeRef when it passes the top of the stage.
+   "stickBig" is in it and was the omission that started this: see the note at
+   the watch itself. */
+const THROWABLE_TOYS = new Set<ToyKind>(["ball", "ballPink", "stickBig", "rock"]);
 
 /* GIVE THE TOYS BACK, 2 September 2026 (owner).
 
@@ -907,7 +967,9 @@ const DOG_CHAIN_MAGNET = 0.6;
         hard one, and it kills.
      2. THE POOL: the same breed, in the pit, not already removed. A chain can
         never hold more circles than the breed has duplicates.
-     3. A circle already in the chain, re-entered, kills it.
+     3. A circle already in the chain, re-entered. It REFUSES for a dog chain as
+        of 19 September 2026 and does not kill: see ChainKind.reentryKills. It
+        still kills for the chum cards.
      4. The finger must actually pass over each circle: the sweep samples every
         CHAIN_SAMPLE_PX and joins what is under the sample, so the route is
         still drawn, not chosen.
@@ -1010,6 +1072,12 @@ const DOG_CHAIN_COLOUR = "#ffed00";
    fill: a chain breed losing its last duplicate mid-chain used to turn that circle
    light and drop the glow to 1.98 against it. On black the glow reads throughout. */
 const DOG_SINGLE_FILL = "#0b1220";
+/* HOW MANY ORDINARY NAVY CIRCLES THE PIT MUST HOLD BEFORE THE BLACK FILL IS USED
+   (owner, 19 September 2026). Below this the single circle takes fillFor's navy
+   instead, so a pit with nothing to contrast against never goes black.
+   ONE is the honest floor: black says "this one has no twin", which needs at
+   least one circle that does. Raise it if "lots" should mean more. */
+const DOG_SINGLE_MIN_PLAIN = 1;
 const DOG_SINGLE_INK = "#ffffff";
 /* HOW LONG THE FILL TAKES TO CHANGE. The answer is LIVE (see dogHasTwin), so a
    circle changes as a consequence of a DIFFERENT circle being collected. An
@@ -1854,6 +1922,43 @@ const CHIP_FILL = "#ffed00";
    from the call sites. */
 const PILL_HITS = 1;
 const ROD_HITS = 2;
+/* HOW LONG A CONNECTOR MAY BE WHEN IT FALLS, 19 September 2026 (owner: the
+   connectors are way too big, sometimes the size of the bone, and they should
+   never be bigger than 10px).
+
+   WHY THEY CAME OUT HUGE. A rod's length was the REAL DISTANCE between the two
+   nodes it joined, Math.hypot(x2 - x1, y2 - y1) straight off the tree geometry,
+   with only a 10px floor and no ceiling at all. In a wide or deep tree two nodes
+   can sit hundreds of pixels apart, so the connector that dropped was hundreds of
+   pixels long. It scaled with the diagram rather than with the thing it connects.
+
+   WHAT IT IS MEASURED AGAINST NOW. The owner's reasoning: a node is about 25px
+   across, so the bar that joins two of them has no business being larger than the
+   nodes themselves. This is that ceiling.
+
+   NOTE IT MEETS THE EXISTING FLOOR. The floor below is also 10, so with this cap
+   every rod now lands at exactly 10px long against its 8px thickness, which is a
+   small nub rather than a bar. That is what the stated figure gives. If the intent
+   was "about the size of a node" rather than "10px", this is the one number to
+   raise and 25 would do it. */
+const ROD_MAX_PX = 10;
+/* HOW THICK A CONNECTOR IS, 19 September 2026 (owner: 10px long is fine, but they
+   are too thick, the maximum should be 5px).
+
+   8 -> 5. It was a bare literal in TWO places that had to agree and were never
+   tied together: the Matter body in spawnRod and the drawn size pushed into
+   rodList. They now read this one constant, so the collider and the picture
+   cannot drift apart.
+
+   THE CHAMFER FOLLOWS IT. The body's corner radius was 4, exactly half the old 8,
+   which made the bar a capsule with fully rounded ends. Half of 5 keeps that
+   shape rather than turning it into a rectangle with slightly soft corners, so it
+   is derived here rather than left as its own literal.
+
+   IT IS NOW TWICE AS LONG AS IT IS THICK, 10 by 5, which reads as a short bar.
+   At the old 8 against the capped 10 it was very nearly square, which is part of
+   why they looked wrong once the length cap went in. */
+const ROD_H_PX = 5;
 // The yellow percentage badge, drawn and collided at this radius. Doubled from
 // 46: they were easy to lose against the circles, on the start screen and in
 // the pit alike.
@@ -1862,7 +1967,8 @@ const ROD_HITS = 2;
 // was raised from 1 in 35 for better chain reactions.
 // 2 September 2026 (owner): 20 -> 16, a wildcard in every sixteen. Both roll
 // sites read this one constant, the scatter and the pop, so they cannot drift.
-const BOMB_ODDS = 16;
+// 19 September 2026 (owner): 16 -> 10, a wildcard in every ten.
+const BOMB_ODDS = 10;
 // The fuse is 2.5 seconds, half the main pit's five. Five is not a magic number
 // there, it is a divisor in four places, and all four are halved together here
 // or the sparks peak after the blast, or fizz at full doing nothing:
@@ -1871,8 +1977,20 @@ const BOMB_ODDS = 16;
 //   2. one hit per whole second becomes one hit per half second
 //   3. the vibration step doubles, so it reaches the same peak in half the time
 //   4. clicks step by whole hits, so a click is now worth twice as much
-const BOMB_HITS = 5;          // hits to detonate
-const BOMB_FUSE_MS = 2500;    // the whole fuse
+/* 5 HITS TO 3, AND THE FUSE 2500 TO 1500, 19 September 2026 (owner: "knocking it
+   five times" to three, "held bomb takes 2.5 seconds" to 1.5).
+
+   THE TICK IS THE INVARIANT. BOMB_TICK_MS is the quotient of the two, so holding
+   still costs one hit every 500ms exactly as it did; there are simply two fewer
+   of them to spend. Change one of these and the other has to move with it or the
+   hold and the knock stop agreeing about what a hit is worth.
+
+   THE FUSE ARTWORK HAD TO MOVE TOO. Its ramp was a literal six-entry array with
+   the five stages written into it, so at three hits it would have topped out at
+   0.4 and the wick would never have reached full before the blast. See the
+   burnFuse block for the curve that replaced it. */
+const BOMB_HITS = 3;          // hits to detonate
+const BOMB_FUSE_MS = 1500;    // the whole fuse
 const BOMB_TICK_MS = BOMB_FUSE_MS / BOMB_HITS; // one hit per half second held
 // The blast is tuned for the main pit, whose cards are far bigger than a mini
 // pit chip, so a straight copy reads as an overreaction. ONE dial: it scales
@@ -1946,8 +2064,33 @@ const BOMB_CHAIN_MS = 25;     // gap between each WAVE of the chain going up
 
    1200ms is the figure to tune. Lower and a big blast snaps; higher and it
    starts to feel like waiting. The round-won sweep is 45ms a step for reference,
-   and the burst before the blast is BOMB_BURST_MS. */
-const BOMB_CHAIN_MAX_MS = 1200;
+   and the burst before the blast is BOMB_BURST_MS.
+
+   1200 TO 3000, 19 September 2026 (owner: a big bomb does not ripple the way a
+   small one does, the chips just go).
+
+   WHAT THIS IS FIXING, and it is worth being exact because the owner's first
+   reading of it was different. He thought the blast was shoving the chips apart
+   so they no longer chained. It cannot: detonate skips every badge in the shove
+   loop, chips are chained or spared and never pushed, and the flood fill is
+   computed in ONE PASS at detonation before any body has moved. A bigger bomb
+   also has exactly the same chain SEED as a small one, since the frontier is
+   built from the bomb body's radius and every chip in the pit is CHIP_R_PX. The
+   only things that grow with the bomb's percentage are the pop-art boom and
+   SHOVE_R, neither of which touches a chip.
+
+   So the compression is the remaining candidate: a long chain sharing 48 waves
+   is 8 chips going at once, which reads as a mass disappearance rather than a
+   ripple. 3000ms is 120 waves, so 400 chips is about 3 a wave instead of 8, and
+   a chain under 120 is back to one a wave exactly as it always was.
+
+   THIS IS A TUNING CHANGE MADE WITHOUT THE READING, by decision. The ?spindiag=1
+   BLAST line already reports chain, waves and per wave, and the honest test is to
+   blow a small bomb and a big one and compare. If a big bomb still reads about 1
+   per wave then compression was never the cause and this should go back to 1200
+   rather than be raised again: the answer would be the boom and the shove
+   drowning the ripple, which is a different fix entirely. */
+const BOMB_CHAIN_MAX_MS = 3000;
 /* HOW MUCH DAYLIGHT STILL COUNTS AS TOUCHING, in px, in the blast's flood fill.
    It was a flat 10, which existed because the solver parts resting bodies by a
    little and a chain must not miss two chips that are visibly in contact.
@@ -2023,7 +2166,45 @@ const rollBomb = () => Math.random() < 1 / BOMB_ODDS;
    IN CLIENT PIXELS, NOT VIEWBOX UNITS, so a chip is the same on a 378px stage and a
    1200px one. Converted once per spawn site through fxScale, which is user units
    per client px. */
+/* DOES A LEVEL DOG DRAW AS ITS NAME IN THE PIT, 19 September 2026 (owner: revert
+   these text objects to the dog circles).
+
+   FALSE, so a depth-1 dog draws as a circle like every other node. It used to
+   stand its circle down and draw a big tilted word in its place, which is what
+   the note on isWordNode describes.
+
+   NO PHYSICS CHANGES. wordBodiesRef is assigned the very same `bodies` array the
+   circles use, one body per dog, so the word was only ever a different PICTURE of
+   the same circular body. Nothing about collision, drag or the drop moves.
+
+   WHAT COMES BACK WITH THE CIRCLE. A depth-1 node is now `paintable`, so it takes
+   the chain fills, the rarity colours and the face mark like any other circle. It
+   was excluded from all of those purely because it was not drawn as a disc.
+
+   ONE CONSTANT TO FLIP. The words group, its positioning loop and the word bodies
+   are all left in place and simply not shown. */
+const PIT_DRAWS_WORDS = false;
 const CHIP_R_PX = 12;
+/* THE START SCREEN'S DIAGRAM BADGES ARE TWICE THE PIT'S, 19 September 2026
+   (owner). Doubling was tried on CHIP_R_PX itself first, which doubled BOTH,
+   and the owner's ruling on seeing it was: only the ones on the start screen,
+   every chip that falls into the pit back to its original size.
+
+   TWO CONSTANTS BECAUSE THERE ARE TWO READERS, and they were only ever one
+   number by coincidence:
+     chipRVb      the start screen's diagram badges, this constant
+     CHIP_R_PX    every chip spawned into the pit, at the scatter, the pop and
+                  spawnBadge
+   They have been the same figure since the 18 September one-size ruling, which
+   is about the PIT and is not reopened by this.
+
+   BOMBS ARE PIT CHIPS and therefore unaffected, which is the point: BOMB_R_PX 18
+   was tried earlier the same day and reverted as too big, and doubling CHIP_R_PX
+   would have made every bomb larger again.
+
+   THE LEGIBILITY FLOOR IS UNTOUCHED. BADGE_FLOOR_PX is 11, the size at which the
+   % text stops reading, and it guards the pit path only. */
+const DIAGRAM_CHIP_R_PX = 24;
 /* 13.5 -> 11, 9 Sept 2026 (owner).
    Not a taste change. The enclosing-circle fit landed earlier the same day made
    every multi-circle cluster smaller, because a constant circle in a portrait
@@ -2525,6 +2706,7 @@ export default function BreedTree({
   levelCompleted = false,
   registerShake,
   registerSlowmo,
+  onSlowmoChange,
   onToggleCaption,
   onPitClose,
   onBackToStart,
@@ -2668,6 +2850,14 @@ export default function BreedTree({
   levelCompleted?: boolean;
   registerShake?: (fn: () => void) => void;
   registerSlowmo?: (fn: () => void) => void;
+  /* SLOW MOTION IS NOW TOGGLED FROM INSIDE THE PIT, 19 September 2026, so the
+     shell has to be told when it changes rather than being the thing that
+     changed it. LineageModal keeps its own `slowmo` state for the SCORE DRAIN,
+     which runs at four points a second while the pit is slowed; without this the
+     in-pit snail would slow the physics and the countdown and leave the drain at
+     one, which is the same split M1 was fixing a few hours earlier.
+     Reports the state AFTER the toggle, not a request to toggle. */
+  onSlowmoChange?: (on: boolean) => void;
   onToggleCaption?: () => void;
   onPitClose?: () => void;
   /* The pit menu's green rewind: back to THIS level's start screen. Owned by
@@ -3464,8 +3654,20 @@ export default function BreedTree({
 
      Held in state rather than a ref because the inline style has to survive a
      re-render, and this box re-renders on every hover in the pit behind it. */
-  const [sheetPos, setSheetPos] = useState<{ left: number; bottom: number } | null>(null);
-  const sheetDrag = useRef<{ sx: number; sy: number; ol: number; ob: number; w: number; h: number } | null>(null);
+  /* `bottom` -> `top`, 19 September 2026 (owner: I cannot drag it down, only left
+     and right, it seems to be on a rail).
+
+     THE CAUSE. This state wrote `bottom` as an inline style, but .asideSheet has
+     set `top: 9px; bottom: auto` since 16 September, when the box moved from the
+     foot of the screen to the top left. A position:fixed box with an auto height
+     resolves TOP first and ignores a bottom it cannot stretch to, so the class
+     pinned the vertical position and only `left` ever had any effect. The drag
+     handler was writing a number nothing read.
+
+     TOP IS NOW THE ONE AXIS BOTH AGREE ON. The class sets it, the drag overrides
+     it, and `bottom` is left to the class's own `auto`. */
+  const [sheetPos, setSheetPos] = useState<{ left: number; top: number } | null>(null);
+  const sheetDrag = useRef<{ sx: number; sy: number; ol: number; ot: number; w: number; h: number } | null>(null);
   // The WHOLE box is the handle. It was the head row only, because the box scrolled
   // its write-up and on a touch screen a drag and a scroll are the same gesture, so
   // one had to own it. The sheet no longer scrolls (max-height and overflow are gone,
@@ -3482,7 +3684,7 @@ export default function BreedTree({
     e.stopPropagation();
     sheetDrag.current = {
       sx: e.clientX, sy: e.clientY,
-      ol: r.left, ob: window.innerHeight - r.bottom,
+      ol: r.left, ot: r.top,
       w: r.width, h: r.height,
     };
     try { el.setPointerCapture(e.pointerId); } catch { /* no capture available */ }
@@ -3494,10 +3696,14 @@ export default function BreedTree({
     // box has to stay in view on every edge.
     const KEEP = 24;
     const maxL = window.innerWidth - KEEP;
-    const maxB = window.innerHeight - KEEP;
+    // Downward now measured on TOP, so the clamp flips with it: the lowest the box
+    // may go is the viewport height less KEEP, which leaves 24px of it showing at
+    // the foot, and the highest is KEEP - its own height, which leaves 24px showing
+    // at the head. Same guarantee as before, expressed on the axis that works.
+    const maxT = window.innerHeight - KEEP;
     const left = Math.min(maxL, Math.max(KEEP - d.w, d.ol + (e.clientX - d.sx)));
-    const bottom = Math.min(maxB, Math.max(KEEP - d.h, d.ob - (e.clientY - d.sy)));
-    setSheetPos({ left, bottom });
+    const top = Math.min(maxT, Math.max(KEEP - d.h, d.ot + (e.clientY - d.sy)));
+    setSheetPos({ left, top });
   };
   const sheetUp = (e: React.PointerEvent) => {
     sheetDrag.current = null;
@@ -3821,7 +4027,7 @@ export default function BreedTree({
   const chipRVb = () => {
     const st = stageRef.current;
     const short = st ? Math.min(st.clientWidth, st.clientHeight) : SIZE;
-    return (CHIP_R_PX * SIZE) / short;
+    return (DIAGRAM_CHIP_R_PX * SIZE) / short;
   };
   const badgeFloorVb = () => {
     const st = stageRef.current;
@@ -3922,6 +4128,28 @@ export default function BreedTree({
     return () => { try { if (t) window.clearInterval(t); if (d) d.remove(); } catch {} };
   }, []);
   const spinDiagRef = useRef<string[]>([]);
+  /* DIAGNOSTIC, ?fulldiag=1, 19 September 2026. REMOVE ONCE ANSWERED.
+     The question: the pit-full countdown starts on a pit that is not full, and
+     then starts again and again. Two readings of the source have not settled
+     which body is tripping it, so this measures instead of guessing a third
+     time.
+
+     WHAT IT PRINTS, straight out of computeFull on every poll:
+       the zone line, the pit width and the threshold
+       one line per body IN ZONE: what it is, its x, its radius, its top edge
+       a tally of what was rejected and why: held, still moving, below the zone
+       the merged coverage, as a figure and as a share of the pit width
+       the verdict, and the guards that could still be holding it off
+     Plus a HIT block, frozen at the moment the countdown last started, because
+     the live lines have moved on by the time you look.
+
+     WHAT TO LOOK FOR. If IN ZONE names a body that is not really up there, the
+     list it came from is stale. If it names one real body and the verdict is
+     FULL, the missing two-body floor is the fault (see PIT_FULL_COVER, whose
+     own comment claims a floor the code does not have). */
+  const fullDiagRef = useRef<string[]>([]);
+  const fullDiagGuardRef = useRef<string[]>([]);
+  const fullDiagHitRef = useRef<string[]>([]);
   /* THE LAST CHAIN DEATH, written by the chain effect and read by the sim effect's
      sampler. A ref rather than a local because the two live in DIFFERENT effects:
      spinLastBlast can be a local inside the sim effect because detonate is in there
@@ -3971,6 +4199,30 @@ export default function BreedTree({
   useEffect(() => {
     try { spinOnRef.current = new URLSearchParams(window.location.search).get("spindiag") === "1"; }
     catch { spinOnRef.current = false; }
+  }, []);
+  useEffect(() => {
+    let d: HTMLDivElement | null = null;
+    let t = 0;
+    try {
+      if (new URLSearchParams(window.location.search).get("fulldiag") !== "1") return;
+      d = document.createElement("div");
+      d.style.cssText =
+        "position:fixed;left:0;right:0;bottom:0;z-index:99999;background:#000;color:#0f0;" +
+        "font:10px/1.35 monospace;padding:6px 8px;pointer-events:none;white-space:pre-wrap";
+      d.textContent = "full diag: start a round";
+      document.body.appendChild(d);
+      const el = d;
+      const tick = () => {
+        const guard = fullDiagGuardRef.current;
+        const live = fullDiagRef.current;
+        const hit = fullDiagHitRef.current;
+        const out = guard.concat(live, hit.length ? [""].concat(hit) : []);
+        el.textContent = out.length ? out.join("\n") : "full diag: waiting for the first poll";
+      };
+      t = window.setInterval(tick, 300);
+      tick();
+    } catch { /* diagnostic only */ }
+    return () => { if (t) window.clearInterval(t); if (d && d.parentNode) d.parentNode.removeChild(d); };
   }, []);
   useEffect(() => {
     let d: HTMLDivElement | null = null;
@@ -4258,6 +4510,26 @@ export default function BreedTree({
   // another of its breed touching it. See the note where it is written.
   const twinGlowGRef = useRef<SVGGElement>(null);
   const dogChainRef = useRef<{ opened: Node; others: Node[] } | null>(null);
+  /* IS THIS CIRCLE HELD BY A CHAIN, LIVE OR WAITING (owner, 19 September 2026:
+     the rarity fill should persist once the chain's circle has been lifted).
+
+     TWO REFS, ONE ANSWER, and that is the whole point of hoisting it. While the
+     finger is down the chain lives in dogChainNodesRef. The moment it completes,
+     DOG.settle lifts the last circle onto the learn layer and hands the rest to
+     dogChainRef.others, and ch.kind.over() clears dogChainNodesRef immediately
+     after. So there was a handover during which the waiting circles were in
+     neither set the paint loop asked about, and they fell straight back to
+     fillFor's depth blue while still plainly part of an unfinished chain.
+
+     THE WAITING SET IS ALREADY CORRECTLY SCOPED, which is why this is safe:
+     dogChainRef is cleared when the lifted circle is completed, when the player
+     backs out of the lift, and on a fresh flood. The fill now lasts exactly as
+     long as the chain's claim on those circles does, and no longer.
+
+     BOTH THE FILL AND THE MARK read this, so the disc and the face can never
+     disagree about whether a circle is in. */
+  const chainHolds = (d: Node) =>
+    dogChainNodesRef.current.has(d) || (dogChainRef.current?.others.includes(d) ?? false);
   /* THE HANDOVER, which replaced dogStarterAtRef.
      Called from the chain's own pointermove, once and only once,
      at the moment the press stops being a drag and becomes a chain. It lives
@@ -4644,7 +4916,9 @@ export default function BreedTree({
   // (the "0" hold and the "Oh no" hand-off) and the Phew beat's two timers. Used
   // by endPitRound, by cancelCountdown, and defensively at the top of runCountdown.
   const clearCdTimers = () => {
-    if (cdTickRef.current !== null) { window.clearInterval(cdTickRef.current); cdTickRef.current = null; }
+    // clearTimeout, not clearInterval: the count is a rescheduling timeout as of
+    // 19 September 2026 so it can change speed with the pit. See runCountdown.
+    if (cdTickRef.current !== null) { window.clearTimeout(cdTickRef.current); cdTickRef.current = null; }
     if (cdHoldRef.current !== null) { window.clearTimeout(cdHoldRef.current); cdHoldRef.current = null; }
     if (cdOverRef.current !== null) { window.clearTimeout(cdOverRef.current); cdOverRef.current = null; }
     for (const t of cdPhewRef.current) window.clearTimeout(t);
@@ -4763,15 +5037,37 @@ export default function BreedTree({
     setFullAlpha(0);
     cdElRef.current = el;
     cdMidElRef.current = elMid;
-    const tick = window.setInterval(() => {
+    /* A RESCHEDULING TIMEOUT, NOT AN INTERVAL, 19 September 2026 (owner: the
+       countdown should slow by four with the pit).
+
+       WHY IT HAD TO CHANGE SHAPE. An interval fixes its period when it is
+       created, so slow motion pressed DURING a count would have done nothing to
+       it and slow motion released during one would have left it crawling. Each
+       step now schedules the next and reads slowmoOnRef as it does, so the count
+       changes speed the moment the snail is pressed, in either direction, part
+       way through.
+
+       ONE SECOND, OR FOUR IN SLOW MOTION. The same quarter the engine takes
+       (engine.timing.timeScale 0.25) and the same multiple the score drain in
+       LineageModal already used, so the three now agree.
+
+       THE TWO TAIL BEATS ARE LEFT ALONE: the 1200ms hold on zero and the 1400ms
+       "Oh no" hand-off. They are the ending, not the count, and stretching a
+       loss to eleven seconds of slow motion would be a worse experience, not a
+       fairer one. Say if that should change too.
+
+       cdTickRef NOW HOLDS A TIMEOUT ID. clearCdTimers was changed to clear it
+       with clearTimeout to match. */
+    const cdStepMs = () => (slowmoOnRef.current ? 4000 : 1000);
+    const step = () => {
       i++;
       if (i < steps.length) {
         el.textContent = steps[i];
         if (cdMidElRef.current) cdMidElRef.current.textContent = steps[i];
         setFullAlpha(i / 10);
+        cdTickRef.current = window.setTimeout(step, cdStepMs());
         return;
       }
-      window.clearInterval(tick);
       cdTickRef.current = null;
       // The count has reached zero: a rescue from here on plays "Phew!" rather
       // than silently clearing the digits. Still fully rescuable until onPitFull.
@@ -4817,8 +5113,8 @@ export default function BreedTree({
           pitEndedRef.current = true; onPitFull?.();
         }, 1400);
       }, 1200);
-    }, 1000);
-    cdTickRef.current = tick;
+    };
+    cdTickRef.current = window.setTimeout(step, cdStepMs());
   };
   // Kill any countdown timer if the component unmounts mid-count (e.g. the modal
   // closes): without this the "Oh no" hand-off could fire onPitFull after teardown.
@@ -4950,6 +5246,20 @@ export default function BreedTree({
   // Slow motion. The fixed-timestep driver feeds Engine.update, which applies
   // engine.timing.timeScale itself, so a quarter speed toggle is all it takes.
   const slowmoRef = useRef<(() => void) | null>(null);
+  /* IS SLOW MOTION ON RIGHT NOW (owner, 19 September 2026: the countdown timer
+     still runs at normal speed while the pit is slowed, and should run at a
+     quarter with it).
+
+     WHY A SEPARATE FLAG. slowmoRef above is the TOGGLE, not the state, and the
+     state it toggles is engine.timing.timeScale, which lives inside the sim
+     effect and is not reachable from runCountdown. This mirrors it at the one
+     place that flips it, so there is a single writer and nothing to drift.
+
+     IT RESETS ON ITS OWN. LineageModal keys BreedTree on runKey, so every path
+     that clears slow motion up there (a retry, a trip to learn, the start
+     screen) remounts this component and the ref is born false beside a fresh
+     engine at timeScale 1. Nothing has to remember to clear it. */
+  const slowmoOnRef = useRef(false);
   const simRunningRef = useRef(false);
   const matterCleanupRef = useRef<(() => void) | null>(null);
   const chainRef = useRef<((ox: number, oy: number) => number) | null>(null);
@@ -4965,7 +5275,26 @@ export default function BreedTree({
   // the BODY only. No art swap through the six damaged stages and no dropped
   // pieces; those are stages 2 and 3, and both need the SVG equivalents of the
   // main pit's canvas work.
-  type UiKind = "close" | "desc" | "learn" | "leave" | "restart" | "logo";
+  /* "slowmo" AND "shake" JOINED THE IN-PIT SET, 19 September 2026 (owner: the
+     slow motion button should be an object within the pit, fixed in position, so
+     no other object can fall behind it, and the same for shake).
+
+     WHAT THEY WERE. Two DOM buttons in LineageModal, position: fixed at z-index
+     30, pinned to the bottom corners of the VIEWPORT. They sat above the pit
+     rather than in it, which is exactly why things fell behind them.
+
+     THEY DIFFER FROM EVERY OTHER MEMBER OF THIS SET in one way, and it is
+     deliberate: they never give way. The close X, the brain and the logo all
+     sink a notch per knock and come loose on the fifth. These two stay fixed for
+     the whole round, because a slow motion control you have to hunt for is worse
+     than one you cannot knock. See the hits branch in the collision loop, where
+     they are held out.
+
+     THE COST, STATED RATHER THAN DISCOVERED. Two permanently solid bodies hold
+     floor space that nothing can occupy, and the pit-full countdown is triggered
+     by occupancy, so the pit fills marginally sooner than it did. That was put
+     to the owner before this was built and accepted. */
+  type UiKind = "close" | "desc" | "learn" | "leave" | "restart" | "logo" | "slowmo" | "shake";
   // w and h are the DRAWN size in world units, and only the logo carries them:
   // every other UI object is a square and its `half` says everything. They live
   // on the body rather than being recomputed in the render, because the sim and
@@ -4999,8 +5328,10 @@ export default function BreedTree({
   const uiLeaveRef = useRef<SVGGElement>(null);
   const uiRestartRef = useRef<SVGGElement>(null);
   const uiLogoRef = useRef<SVGGElement>(null);
+  const uiSlowmoRef = useRef<SVGGElement>(null);
+  const uiShakeRef = useRef<SVGGElement>(null);
   const uiRefFor = (k: UiKind) =>
-    k === "close" ? uiCloseRef : k === "desc" ? uiDescRef : k === "learn" ? uiLearnRef : k === "leave" ? uiLeaveRef : k === "logo" ? uiLogoRef : uiRestartRef;
+    k === "close" ? uiCloseRef : k === "desc" ? uiDescRef : k === "learn" ? uiLearnRef : k === "leave" ? uiLeaveRef : k === "logo" ? uiLogoRef : k === "slowmo" ? uiSlowmoRef : k === "shake" ? uiShakeRef : uiRestartRef;
   const pressRef = useRef<{ x: number; y: number; t: number } | null>(null);
   // Where and when a press on the pit background began, so a drag can be told
   // apart from a tap. Read by onBackground.
@@ -5305,7 +5636,42 @@ export default function BreedTree({
          caution as the pair above: adjacent depths that share a hue read as one
          colour where one circle sits inside the other. Two yellows then two
          blues is the owner's scheme, recorded as chosen. */
-      const base = RING_PALETTE[(d.depth - 1 + 4) % 4];
+      /* A COMPLETED LEVEL RINGS GREEN, 19 September 2026 (owner: once completed,
+         the circle stroke line should be green not yellow).
+
+         #2fd46b, 19 September 2026 (owner: a brighter green). It started as
+         #22c55e, the site's done-green used by the completed tick, the frame, the
+         Collect button and the collected rail card, and was raised one step on
+         the owner seeing it on the device. THOSE FOUR ARE UNCHANGED and still sit
+         on #22c55e: only the start screen's rings moved, which is what was asked
+         for. If the two should match again, this is the line to bring back.
+
+         IT REPLACES THE WHOLE PALETTE, not just the yellow entries. The four
+         depth colours exist to tell circles apart from their own children, and a
+         finished level is not being read that way any more: it is being read as
+         finished. Leaving depths 3 and 4 blue against green ones would have said
+         a level was half done.
+
+         THE LIFT STILL APPLIES below, so the circle being read is still a lighter
+         green than its neighbours; it is the hue that stops varying, not the
+         brightness.
+
+         START SCREEN ONLY, AND IT HAS TO BE SAID IN CODE, 19 September 2026.
+
+         THE NOTE HERE USED TO CLAIM IT WAS "start screen only in practice,
+         because levelCompleted is only true for a level already cleared". That
+         was wrong and shipped: levelCompleted stays true for the whole session on
+         a cleared level, the pit re-arms from that same start screen without the
+         prop changing, and strokeColorFor is what every PIT circle wears too. So
+         replaying a finished level turned the whole pit green, which the owner
+         saw as a green glow on circles that could be chained.
+
+         `!fellRef.current` IS THE GATE. fellRef is set by the drop and is the
+         file's own answer to "is the pit live", used by the word rule, the chip
+         count and the single-circle fill. Before the drop this is the start
+         screen and the green is right; after it the pit takes its depth palette
+         back, which is what the chain's own colours are measured against. */
+      const base = levelCompleted && !fellRef.current ? "#2fd46b" : RING_PALETTE[(d.depth - 1 + 4) % 4];
       /* THE PIT NO LONGER OVERRIDES THIS. It briefly did: while the circles were
          FILLED with their depth colour, a ring at that same colour vanished into
          its own disc, so every pit ring was forced to navy. The fill and the ring
@@ -5541,12 +5907,29 @@ export default function BreedTree({
        one the moment its last duplicate is collected, and the survivor changes
        colour. */
     const pitBreedCount = new Map<string, number>();
+    /* HOW MANY ORDINARY NAVY CIRCLES THE PIT IS HOLDING, counted in the same pass
+       (owner, 19 September 2026: black should only be used when there are lots of
+       circles in the pit already coloured blue, and if there are none the circle
+       should be dark blue instead).
+
+       WHY IT IS NEEDED NOW. The black fill, DOG_SINGLE_FILL, says "this breed has
+       no twin in the pit, so it can never be chained". That is only information if
+       there is something to contrast it against. Level dogs became paintable when
+       they stopped being drawn as words, and a level dog is unique by definition,
+       so on a two-circle level BOTH circles went black and the fill said nothing.
+
+       A CIRCLE COUNTS AS NAVY WHEN ITS BREED HAS A TWIN, the exact complement of
+       the single test below, so the two cannot disagree. */
+    let pitPlainCount = 0;
     if (fellRef.current) {
       const ownedB = pitBodiesRef.current?.owned;
       if (ownedB) for (const o of ownedB) {
         if (!pitCountable(o, removedNodesRef.current)) continue; // the one filter: see liveBreedNodesIn
         pitBreedCount.set(o.data.name, (pitBreedCount.get(o.data.name) ?? 0) + 1);
       }
+      // Second pass, because a breed's total is only known once the first has
+      // finished: a circle is navy when its own breed has a twin.
+      for (const n2 of pitBreedCount.values()) if (n2 > 1) pitPlainCount += n2;
     }
     nodes.forEach((d, i) => {
       const tx = (d.x - v[0]) * k;
@@ -5559,7 +5942,7 @@ export default function BreedTree({
       // Once the pit is live a level dog IS its name, drawn in its own group
       // below, so the circle stands down. Keyed off depth alone: no lookup, no
       // way for it to half-apply.
-      const isWordNode = fellRef.current && d.depth === 1;
+      const isWordNode = PIT_DRAWS_WORDS && fellRef.current && d.depth === 1;
       const c = wrap?.children[0] as SVGCircleElement | undefined;
       /* A CIRCLE IN THE CHAIN IS INVERTED:
          light blue where it was navy, and navy where its outline was. It wore a
@@ -5615,14 +5998,55 @@ export default function BreedTree({
         !isWordNode &&
         c?.getAttribute("fill") !== "none" &&
         c?.style.opacity !== "0";
-      const chHeld = paintable && dogChainNodesRef.current.has(d);
+      const chHeld = paintable && chainHolds(d);
       const chTwin = paintable && !chHeld && !!dogChainBreedRef.current && d.data.name === dogChainBreedRef.current;
+      /* EVERY OTHER BREED RECEDES WHILE A CHAIN IS LIVE (owner, 19 September
+         2026: once the first is selected, darken the circles that cannot be
+         linked so the ones that can are obvious).
+
+         A FILTER ON THE WRAPPER, NOT AN OPACITY ON THE DISC. Opacity would let
+         the pit floor through, and these circles overlap heavily, so a half
+         transparent one reads as a hole rather than as something turned down.
+         brightness() darkens the disc, the ring, the label and the face in one
+         pass and keeps them opaque, which is what "darken by 50%" means.
+
+         IT IS THE WRAPPER SO THE WHOLE CIRCLE GOES TOGETHER. Darkening the disc
+         alone would leave a full-strength ring and a full-strength face on a
+         dark disc, which reads as broken rather than dimmed.
+
+         SCOPED TO A LIVE CHAIN ONLY, via dogChainBreedRef, which is set on the
+         first join and cleared the moment the chain ends however it ends. It is
+         deliberately NOT chainHolds: circles waiting on a lifted one keep their
+         rarity fill, but the gesture is over and there is nothing left to pick
+         out, so the pit comes back to full strength with the lift.
+
+         WRITTEN ONLY WHEN THE ANSWER CHANGES, tracked on the element, the same
+         rule every other write in this loop follows. A still pit costs nothing
+         and a filter is not re-applied per frame. */
+      const chDim = paintable && !chHeld && !chTwin && !!dogChainBreedRef.current;
+      if (wrap) {
+        const dimWant = chDim ? "1" : "0";
+        if (wrap.dataset.chainDim !== dimWant) {
+          wrap.dataset.chainDim = dimWant;
+          wrap.style.transition = `filter ${DOG_FILL_FADE_MS}ms ease`;
+          /* 0.5 TO 0.75, 19 September 2026 (owner: the darken is too great, halve
+             the effect). 0.5 removed half the brightness, so halving the EFFECT
+             means removing a quarter of it. One number to tune. */
+          wrap.style.filter = chDim ? "brightness(0.75)" : "";
+        }
+      }
       /* THE FOURTH STATE, and the only one that is true at rest: a circle whose
          breed has no other copy in the pit. See DOG_SINGLE_FILL. It ranks BELOW
          the two chain states, because while a chain lives what a circle is doing
          in that chain is the more urgent thing to say, and a single circle can
          never be in one anyway: a chain needs a twin. */
-      const chSingle = paintable && !chHeld && !chTwin && fellRef.current && (pitBreedCount.get(d.data.name) ?? 0) === 1;
+      /* `pitPlainCount >= DOG_SINGLE_MIN_PLAIN` added 19 September 2026: below it
+         the circle falls through to fillFor's navy, which is the dark blue the
+         owner asked for. DOG_SINGLE_MIN_PLAIN is the number to raise if "lots"
+         should mean more than one. */
+      const chSingle = paintable && !chHeld && !chTwin && fellRef.current
+        && (pitBreedCount.get(d.data.name) ?? 0) === 1
+        && pitPlainCount >= DOG_SINGLE_MIN_PLAIN;
       if (c) {
         /* The mark has read all three states since the chain shipped; the ring
            only read the first, so a highlighted twin kept its own outline. Both
@@ -5775,14 +6199,20 @@ export default function BreedTree({
              orange and the yellow: the mark follows the fill rather than being
              chosen again here, so the two can never disagree. Everything else
              wears its own depth colour. */
-          const held = dogChainNodesRef.current.has(d);
+          const held = chainHolds(d);
           /* ONE BAND FOR BOTH CHAIN STATES, 19 September 2026, with the fill
              swap above. A held circle is filled from RARITY_BAND now, exactly as
              a twin has always been, so its mark has to follow the same entry:
              navy on the purple or the royal blue would be the vanishing act the
              filters exist to prevent. twinBand is kept as its own name because
              the tapped face below still asks specifically about a twin. */
-          const chainBand = want === "1" ? RARITY_BAND[rarityTier(treesContaining(d.data.name))] : null;
+          /* `held ||` added 19 September 2026 with chainHolds. `want` is driven by
+             dogChainBreedRef, which is cleared the moment a chain settles, so a
+             circle still waiting on a lifted one would have kept its band FILL
+             from the line above and lost the band's ink here, leaving a dark
+             depth-filtered face on a purple or royal blue disc. The two have to
+             ask the same question. */
+          const chainBand = (held || want === "1") ? RARITY_BAND[rarityTier(treesContaining(d.data.name))] : null;
           const twinBand = !held ? chainBand : null;
           /* AND THE MARK INVERTS WITH THE DISC TOO. bt-qmark-ink IS navy as a
              colour matrix, which is exactly DOG_SINGLE_INK, so a single circle
@@ -6537,6 +6967,14 @@ export default function BreedTree({
 
       type Body = { n: Node | null; x: number; y: number; vx: number; vy: number; r: number; pct: number; idx: number; lastFx: number; popped: boolean; a: number; va: number; ia: number; iva: number; held?: boolean; charges?: number; lastKnock?: number; inert?: boolean; mb?: any; mbIn?: boolean; bomb?: boolean; blown?: boolean; bursting?: number; fuseCur?: number; rDraw?: number; hits?: number; heldSince?: number; heldHits?: number; clickPending?: boolean; green?: boolean };
       const d1 = nodes.filter((n) => n.depth === 1);
+      /* SHRINK FIRST, FLOOR SECOND, never the other way about: flooring first
+         would let the quarter come straight back off the floor. Same order as
+         the freed-children route below. See DROP_SHRINK_D1. */
+      for (const n of d1) {
+        if (DROP_SHRUNK_D1.has(n)) continue;
+        DROP_SHRUNK_D1.add(n);
+        n.r = Math.max(n.r * DROP_SHRINK_D1, minCircleR);
+      }
       const pctOf = (n: Node) => (n.parent ? Math.round(((n.value ?? 0) / (n.parent.value || 1)) * 100) : 0);
       const bodies: Body[] = d1.map((n, i) => ({ n, x: n.x, y: n.y, vx: 0, vy: 0, r: n.r, pct: pctOf(n), idx: i, lastFx: 0, popped: false, a: 0, va: 0, ia: 0, iva: 0 }));
       if (bodies.length === 0) { setFalling(false); return; }
@@ -6645,7 +7083,26 @@ export default function BreedTree({
         Composite.add(world, mb);
         return mb;
       };
-      for (const b of bodies) mkWord(b, CIRCLE_OPTS);
+      /* THE BODY FOLLOWS THE PICTURE, 19 September 2026 (owner: the circles are
+         sinking below the floor, the pit still thinks the objects are a different
+         shape). He was exactly right.
+
+         WHAT WENT WRONG. Turning PIT_DRAWS_WORDS off changed only what was DRAWN.
+         mkWord was still giving every level dog a RECTANGLE sized to the word it
+         used to be, as its own comment above says: "A dog is its NAME in the pit,
+         so its body is the box that name draws in, not a circle." So a full-size
+         disc was drawn over a small word-shaped box, and the visible circle hung
+         well outside its own collider, through the floor and through everything
+         else. The physics was never wrong; the picture had stopped matching it.
+
+         mkCircle takes b.r, which is the node's own radius and the very figure
+         drawR draws from, so the two now agree by construction rather than by
+         coincidence.
+
+         BOTH PATHS ARE KEPT, on the one constant, because the word body is not a
+         detail of the word: it is a different collider with its own chamfer and
+         its own minimum, and rebuilding it later would be real work. */
+      for (const b of bodies) { if (PIT_DRAWS_WORDS) mkWord(b, CIRCLE_OPTS); else mkCircle(b, "circle", CIRCLE_OPTS); }
       for (const b of badges) mkCircle(b, "badge", BADGE_OPTS);
       // The opening shove: up and out, the first name one way and the next the
       // other, with a spin so they arrive already tumbling rather than dropping
@@ -6844,6 +7301,38 @@ export default function BreedTree({
              different places without ever colliding. */
           { x: ux - (UI_DRAWN + UI_GAP) / k, y: v[1] + (-vbHf / 2 + m + uSz / 2 + UI_NUDGE_Y) / k, vx: 0, vy: 0, r: UI_HIT_R, half: uSz / 2, a: 0, va: 0, fixed: true, hits: 0, kind: "desc" },
           { x: ux, y: v[1] + (-vbHf / 2 + m + uSz / 2 + UI_DRAWN + UI_GAP + UI_NUDGE_Y) / k, vx: 0, vy: 0, r: UI_HIT_R, half: uSz / 2, a: 0, va: 0, fixed: true, hits: 0, kind: "learn" },
+          /* THE SLOW MOTION SNAIL AND THE SHAKE JELLY, 19 September 2026 (owner).
+             Bottom corners, snail left and jelly right, which is where the DOM
+             buttons they replace already sat.
+
+             THE MIRROR OF THE TOP ROW, term for term. ux above is the right edge
+             anchor; these take the same margin m and the same uSz/2 half-slot,
+             one from the left edge and one from the right, and their y is the
+             BOTTOM inset rather than the top: +vbHf/2 - m - uSz/2.
+
+             THE NUDGES ARE MIRRORED, NOT DROPPED. CORRECTED 19 September 2026
+             (owner: the positioning should match the padding of the other assets
+             in each corner).
+
+             WHAT I GOT WRONG FIRST TIME. I left UI_NUDGE_X and UI_NUDGE_Y off
+             these two on the grounds that both were measured for the TOP RIGHT
+             corner, and applied a bare UI_INSET instead. But those nudges are not
+             corner-specific decoration, they ARE the padding: UI_NUDGE_Y is
+             -15 - UI_INSET, so the top squares sit 15px plus an inset CLOSER to
+             their edge than m alone would put them. Dropping it and then adding
+             UI_INSET the wrong way round put these two 15px plus twice the inset
+             too far in, which is the gap the owner measured off the screen.
+
+             SO EACH NUDGE IS NEGATED RATHER THAN OMITTED. A nudge that means
+             "toward the top right" means "toward the bottom left" with its sign
+             flipped, which is exactly what a mirrored corner wants. The shake
+             lands on ux itself, the same x the close X and the brain share, so
+             the right-hand column is one line top to bottom.
+
+             FIXED FOR THE WHOLE ROUND. See the UiKind note for why these two do
+             not give way on the fifth knock like the rest of the set. */
+          { x: v[0] + (xMinF + m + uSz / 2 - UI_NUDGE_X) / k, y: v[1] + (vbHf / 2 - m - uSz / 2 - UI_NUDGE_Y) / k, vx: 0, vy: 0, r: UI_HIT_R, half: uSz / 2, a: 0, va: 0, fixed: true, hits: 0, kind: "slowmo" },
+          { x: ux, y: v[1] + (vbHf / 2 - m - uSz / 2 - UI_NUDGE_Y) / k, vx: 0, vy: 0, r: UI_HIT_R, half: uSz / 2, a: 0, va: 0, fixed: true, hits: 0, kind: "shake" },
           /* THE LOGO. Top CENTRE, not the top-right corner the three squares
              share, and 20% down the stage like the main pit's own placement.
              Its drawn width is the main pit's figure clamped to the pit, so a
@@ -7235,7 +7724,6 @@ export default function BreedTree({
         const dia =
           kind === "ball" || kind === "ballPink" ? ballDia
           : kind === "rock" ? ballDia
-          : kind === "stick" ? ballDia * 1.6
           : kind === "stickBig" ? ballDia * 1.6 * 1.5
           : kind === "cookies" ? BIGT * 3.2
           /* THE BONE IS SIZED FROM THE LOGO'S BONE (owner, 18 September 2026),
@@ -7268,12 +7756,16 @@ export default function BreedTree({
           // allowed to take. Whichever is smaller wins, so a wide desktop pit
           // still gets the main pit's size and a phone gets one that fits.
           : kind === "bowl" ? Math.min(BIGT * 9.38 * (isNarrow ? 0.85 : 1), wPx * BOWL_PIT_FRACTION)
+          // The main pit's own slipper width, clamped to this pit: see the note
+          // at TOY_SLIPPER_SRC.
+          : kind === "slipper" ? Math.min(BIGT * (isNarrow ? 6.65 : 8.31), wPx * BOWL_PIT_FRACTION)
           : BIGT * 0.6 * 2;
-        const hgt = kind === "stick" || kind === "stickBig" ? dia / STICK_ASPECT : kind === "rock" ? dia / ROCK_ASPECT : kind === "cookies" ? dia / COOKIES_ASPECT : kind === "bone" ? dia / BONE_ASPECT
+        const hgt = kind === "stickBig" ? dia / STICK_ASPECT : kind === "rock" ? dia / ROCK_ASPECT : kind === "cookies" ? dia / COOKIES_ASPECT : kind === "bone" ? dia / BONE_ASPECT
           : kind === "newspaper" ? dia / TOY_NEWSPAPER_ASPECT
           : kind === "fork" ? dia / TOY_FORK_ASPECT
           : kind === "shoe" ? dia / TOY_SHOE_ASPECT
           : kind === "bowl" ? dia / BOWL_ASPECT
+          : kind === "slipper" ? dia / SLIPPER_ASPECT
           : dia;
         const r = dia / 2;
         // ball drops anywhere across the pit, flag comes in at 70% like the pit
@@ -7309,7 +7801,9 @@ export default function BreedTree({
           kind === "ball" || kind === "ballPink" ? { restitution: 0.85, friction: 0.05, frictionStatic: 0.4, frictionAir: 0.003, density: 0.0006 } // bouncy, but SETTLES: restitution 0.85 is what kills the freeze (was 0.97, never reached 12 still frames, froze the pit at 30s, see handover 17). frictionStatic 0.8 -> 0.4 (2026-08-12) so a resting ball is easier to flick: 0.8 gripped the launch. Settle re-checked in a headless Matter sim, 2.7-7.1s to still at 0.4, identical to 0.8, so no freeze; if it ever returns do NOT lower this further, raise frictionAir to 0.006 instead.
           : kind === "rock" ? { restitution: 0.12, friction: 0.75, frictionStatic: 1.2, frictionAir: 0.006, density: 0.02 }
           : kind === "cookies" ? { restitution: 0.3, friction: 0.4, frictionAir: 0.012, density: 0.004 } // the main pit's own panel figures
-          : kind === "stick" ? { restitution: 0.35, friction: 0.35, frictionAir: 0.004, density: 0.002 }
+          // The small stick's own figures, inherited 19 September 2026 when it was
+          // removed and this became the only stick. It used to fall past here.
+          : kind === "stickBig" ? { restitution: 0.35, friction: 0.35, frictionAir: 0.004, density: 0.002 }
           // the main pit's own bone figures, PackPit line 405
           : kind === "bone" ? { restitution: 0.3, friction: 0.3, frictionAir: 0.012, density: 0.0008 }
           // A rolled newspaper and a wooden-soled shoe land dead and stay put.
@@ -7323,12 +7817,15 @@ export default function BreedTree({
           // The main pit's own bowl figures, PackPit line 397. frictionAir 0.012
           // rides on the compound body itself, below, exactly as it does there.
           : kind === "bowl" ? { restitution: 0.3, friction: 0.3, density: 0.006 }
+          // PackPit's own _spo plus its frictionAir: the slipper and the bone are
+          // one group there (HEAVY) and these are already this pit's bone figures.
+          : kind === "slipper" ? { restitution: 0.3, friction: 0.3, frictionAir: 0.012, density: 0.0008 }
           : { restitution: 0.5, friction: 0.3, frictionAir: 0.004, density: 0.006 };
         // A long thin body needs a real rectangle or it spins like a propeller.
         // Chamfered, so it reads as a rounded stick and cannot catch on a corner.
         // The rock is a seven-sided polygon rather than a circle: a circle would
         // roll away down the sloped ground, and a rock should sit where it lands.
-        const isStick = kind === "stick" || kind === "stickBig";
+        const isStick = kind === "stickBig";
         const startAngle = isStick ? (Math.random() - 0.5) * 0.8 : 0;
         // The stick is a tapered, kinked branch, not a sausage: traced from the
         // artwork it is thin at the left tip, fat through the middle where the
@@ -7421,6 +7918,33 @@ export default function BreedTree({
                   MBody.setAngle(body, (BOWL_DROP_DEG * Math.PI) / 180);
                   return body;
                 })()
+            : kind === "slipper"
+              ? (() => {
+                  /* THE COMPOUND SLIPPER, PackPit.tsx:382 to 388 scaled to this
+                     pit's pixels. Five parts against the artwork's own
+                     1108.5 x 407.4 artboard: the sole, the round body, the toe,
+                     the upper leaning back at 18.7 degrees, and the heel.
+
+                     A PLAIN RECTANGLE WOULD BE A BRICK. The slipper is mostly
+                     air above the sole, so a bounding box would hold dogs a
+                     third of its height off the floor. */
+                  const sk = dia / SLIPPER_VB_W;
+                  const scx = SLIPPER_VB_W / 2, scy = SLIPPER_VB_H / 2;
+                  const sR = (vx: number, vy: number, w: number, h: number) =>
+                    Bodies.rectangle(px + (vx - scx) * sk, py + (vy - scy) * sk, w * sk, h * sk, opts);
+                  const sC = (vx: number, vy: number, rad: number) =>
+                    Bodies.circle(px + (vx - scx) * sk, py + (vy - scy) * sk, rad * sk, opts);
+                  const parts = [
+                    sR(554, 363, 1107, 84),   // sole
+                    sC(546, 241, 154),        // body
+                    sC(124, 333, 97),         // toe
+                    Bodies.rectangle(px + (370 - scx) * sk, py + (143 - scy) * sk, 380 * sk, 70 * sk, { ...opts, angle: (-18.7 * Math.PI) / 180 }), // upper
+                    sR(891, 336, 349, 64),    // heel
+                  ];
+                  const body = MBody.create({ parts, ...opts, frictionAir: 0.012 });
+                  MBody.setAngle(body, (Math.random() - 0.5) * 0.4);
+                  return body;
+                })()
             : kind === "rock"
               ? Bodies.polygon(px, py, 7, r, { ...opts, chamfer: { radius: r * 0.12 } })
               : kind === "cookies"
@@ -7453,7 +7977,7 @@ export default function BreedTree({
         Composite.add(world, mb);
         // the pit gives the flag a throw and lets the ball simply drop
         if (kind === "flag") MBody.setVelocity(mb, { x: (Math.random() - 0.5) * 3, y: 3 });
-        if (kind === "stick") pr.a = startAngle;
+        if (kind === "stickBig") pr.a = startAngle;
         toyBodiesRef.current.push(pr);
         if (kind === "flag") flagIdxRef.current = idx;
         if (kind === "cookies") cookiesIdxRef.current = idx;
@@ -7471,7 +7995,25 @@ export default function BreedTree({
       let thrownBall: any = null;
       throwWatchRef.current = (pr: any) => {
         // the flag leaves by having its message read, badges are not in scope
-        if (pr?.toyKind !== "ball" && pr?.toyKind !== "stick" && pr?.toyKind !== "rock" && pr?.toyKind !== "ballPink") return;
+        /* A SET, NOT A CHAIN OF !== TESTS, 19 September 2026 (owner: sticks
+           ejected from the pit come back).
+
+           THE BUG THIS FIXES, and it was one word. The old line read
+           `!== "ball" && !== "stick" && !== "rock" && !== "ballPink"`, and
+           "stickBig" was never in it. DEFAULT_PROPS was ["stick", "stickBig"], so
+           BOTH sticks are in play on every level, and the big one was simply
+           never watched: it could be thrown clear of the stage and nothing ever
+           called retireToy for it, so it respawned on the next level for ever.
+           The small stick worked correctly the whole time, which is why this
+           read as "sometimes" rather than "always".
+
+           A SET IS THE REAL FIX. The chain of comparisons is exactly the shape
+           that silently omits a new toy, and this file has added six of them
+           since it was written. TOY_GONE_KEY already names every toy; this names
+           the ones that can leave by being thrown, which is not the same list
+           (the flag leaves by having its message read). Add a throwable toy here
+           and to nowhere else. */
+        if (!THROWABLE_TOYS.has(pr?.toyKind as ToyKind)) return;
         if (pr.mb && pr.mb.velocity.y < -4) thrownBall = pr; // pit threshold
         else if (thrownBall === pr) thrownBall = null;
       };
@@ -7674,40 +8216,48 @@ export default function BreedTree({
         // than from the round starting: see PIT_FULL_GRACE_MS. Behind the same
         // first-landing guard as the toys, so it is set once per level.
         cdGraceRef.current = performance.now() + pitFullGraceMs(nodes);
-        toyTimers.push(window.setTimeout(() => spawnToy("cookies"), TOY_COOKIES_DELAY));
-        // Both tennis balls drop on EVERY level now (2026-08-12). The old
-        // first-seven-levels `hideBalls` gate and its no-balls re-timing were
-        // removed entirely (see the handover note on the reversal). Ball at
-        // TOY_BALL_DELAY, pink after it, and the flag/props time off the ball as
-        // they always did with the balls present.
-        toyTimers.push(window.setTimeout(() => spawnToy("ball"), TOY_BALL_DELAY));
-        toyTimers.push(window.setTimeout(() => spawnToy("ballPink"), TOY_BALL_DELAY + BALL_PINK_GAP));
+        /* WHICH TOYS THIS LEVEL GETS, 19 September 2026 (owner). Every toy now
+           comes from the band table in data/levelThemes.ts, keyed on how many
+           circles the level's tree draws. Before this, five of the eight were
+           hard-wired here and dropped on every level whatever any table said:
+           the cookie bar, both tennis balls, the flag and the bone.
+
+           THE COUNT IS THE RENDERER'S OWN. Same predicate as displayRestView:
+           every node that is not the root and is not a hidden echo copy. It is
+           the number of circles actually on the diagram, which is what the rule
+           is written against. NOT pitFullGraceMs's depth 1 to 2 count, which is
+           a different measure for a different job.
+
+           TIMING IS UNCHANGED. Each toy keeps the beat it has always had; the
+           band only decides whether it is armed. The anchors below still time
+           off TOY_BALL_DELAY even on a level with no ball, so the props and the
+           flood land where they always did. */
+        const circleCount = nodes.filter((d) => !(d.depth === 0 || isHiddenCopy(d))).length;
+        const armed = new Set(toysForCircles(circleCount));
+        if (armed.has("cookies")) toyTimers.push(window.setTimeout(() => spawnToy("cookies"), TOY_COOKIES_DELAY));
+        /* The balls were made unconditional on 2026-08-12 when the old
+           first-seven-levels `hideBalls` gate was removed. That reversal stands:
+           what gates them now is the band, not a level number. */
+        if (armed.has("ball")) toyTimers.push(window.setTimeout(() => spawnToy("ball"), TOY_BALL_DELAY));
+        if (armed.has("ballPink")) toyTimers.push(window.setTimeout(() => spawnToy("ballPink"), TOY_BALL_DELAY + BALL_PINK_GAP));
         const flagAt = TOY_BALL_DELAY + TOY_FLAG_GAP;
-        toyTimers.push(window.setTimeout(() => spawnToy("flag"), flagAt));
+        if (armed.has("flag")) toyTimers.push(window.setTimeout(() => spawnToy("flag"), flagAt));
         const propsAt = flagAt + TOY_PROP_GAP;
-        /* THE PROPS SLOT, from the level's theme. An era with no set of its own
-           gets the stick, big stick and rock, which is what every era had.
-           The first two arrive together and the rest follow at the rock's gap,
-           so a set of any length keeps the original rhythm: a pair thumps in,
-           then the stragglers land one after another rather than in a heap. */
-        /* Most specific wins: this level's own set, then the era's, then the
-           pit's default. propsFor does that walk and, unlike levelThemeFor, it
-           is NOT gated on THEMES_ENABLED, so a level can have its own toys
-           without its backdrop, floor and sky coming back with them. See the
-           note above propsFor in data/levelThemes.ts. */
-        /* THE MOBILE TABLE WINS. Below 768px a level's toys come from the
-           owner's per-level list; above it, nothing changes and the era sets
-           apply as before. mobilePropsForLevel takes a ONE BASED level, and
-           levelNo is zero based (the pit paints "00" for the first level), so
-           the one is added here and nowhere else.
-           `??` and not `||`: an empty array from the table means deliberately
-           no props, and must not fall through to the default. */
-        const narrowPit = window.matchMedia("(max-width: 768px)").matches;
-        const mobileSet = narrowPit && levelNo !== undefined ? mobilePropsForLevel(levelNo + 1) : null;
+        /* THE PROPS SLOT. The three toys that fall on the prop beat rather than
+           on one of their own: the stick, the slipper and the bowl. The first
+           two arrive together and the rest follow at the rock's gap, so a set of
+           any length keeps the original rhythm: a pair thumps in, then the
+           stragglers land one after another rather than in a heap.
+
+           AN ERA OVERRIDE STILL WINS. propsFor is unchanged and, unlike
+           levelThemeFor, is NOT gated on THEMES_ENABLED, so an era can still
+           replace the slot without its backdrop, floor and sky coming back with
+           it. No era defines one today, so in practice the band decides. */
+        const PROP_SLOT: ToyKind[] = ["stickBig", "slipper", "bowl"];
         const themed = propsFor(era, levelName);
-        const props: ToyKind[] =
-          (mobileSet as ToyKind[] | null) ??
-          (themed?.length ? (themed as ToyKind[]) : DEFAULT_PROPS);
+        const props: ToyKind[] = themed?.length
+          ? (themed as ToyKind[])
+          : PROP_SLOT.filter((k) => armed.has(k));
         /* SIDES ALTERNATE, AND THE FIRST SIDE ALTERNATES TOO. Each prop lands on
            the opposite side to the one before it, so two can never come down
            together in the same corner, and the whole sequence starts on the
@@ -7737,21 +8287,26 @@ export default function BreedTree({
           const left = i % 2 === 0 ? firstLeft : !firstLeft;
           toyTimers.push(window.setTimeout(() => spawnToy(kind, left ? -1 : 1), at));
         });
-        toyTimers.push(window.setTimeout(() => spawnToy("bone"), boneAt));
+        // The bone is in every band (owner: the bone should always drop), so this
+        // reads as unconditional in practice. It is gated all the same, because
+        // the band table is the single source and nothing should sit outside it.
+        if (armed.has("bone")) toyTimers.push(window.setTimeout(() => spawnToy("bone"), boneAt));
         toyTimers.push(window.setTimeout(spawnChums, chumsAt));
       };
       spawnRodRef.current = (x1: number, y1: number, x2: number, y2: number, lit: boolean) => {
-        const lenPx = Math.max(10, Math.hypot(x2 - x1, y2 - y1));
+        // Floor then ceiling, in that order: see ROD_MAX_PX for why the tree's own
+        // distance is no longer allowed through unbounded.
+        const lenPx = Math.min(ROD_MAX_PX, Math.max(10, Math.hypot(x2 - x1, y2 - y1)));
         const ang = Math.atan2(y2 - y1, x2 - x1);
         const w = worldFromPx((x1 + x2) / 2, (y1 + y2) / 2);
         const pr = { x: w.x, y: w.y, vx: 0, vy: 0, a: ang, idx: rodBodiesRef.current.length, hits: 0, maxHits: ROD_HITS, mb: null as any };
-        const mb = Bodies.rectangle((x1 + x2) / 2, (y1 + y2) / 2, lenPx, 8, { chamfer: { radius: 4 }, restitution: 0.4, friction: 0.1, frictionAir: 0.01, density: 0.001, angle: ang });
+        const mb = Bodies.rectangle((x1 + x2) / 2, (y1 + y2) / 2, lenPx, ROD_H_PX, { chamfer: { radius: ROD_H_PX / 2 }, restitution: 0.4, friction: 0.1, frictionAir: 0.01, density: 0.001, angle: ang });
         mb.plugin = { prop: pr, kind: "rod" };
         pr.mb = mb;
         Composite.add(world, mb);
         MBody.setVelocity(mb, { x: (Math.random() - 0.5) * 3, y: 3 }); // pit scatter contract
         rodBodiesRef.current.push(pr);
-        setRodList((l) => [...l, { len: lenPx * fxScale, h: 8 * fxScale, lit }]);
+        setRodList((l) => [...l, { len: lenPx * fxScale, h: ROD_H_PX * fxScale, lit }]);
         wake();
       };
       // Tapping the cookie panel squeezes an Accept and a Reject out of it, which
@@ -8435,12 +8990,36 @@ export default function BreedTree({
       // heavy one, so it counts for ten ordinary knocks.
       const ROCK_KNOCK = 10;
       const knockBadge = (b: Body, rv: number, now2: number, spend = 1) => {
-        // J17: a bomb is outside the charge system, exactly as in the main pit,
-        // where onPctHit skips any body with plugin.bomb. Without this a bomb
-        // spends its twenty charges, goes inert and the badge group is given
-        // pointerEvents none, so it keeps the sprite but stops responding.
-        // Object knocks feed the fuse instead, from stage 4.
-        if (b.bomb) return;
+        /* A BOMB IS OUTSIDE THE CHARGE SYSTEM, exactly as in the main pit, where
+           onPctHit skips any body with plugin.bomb. Without that a bomb spends
+           its twenty charges, goes inert and the badge group is given
+           pointerEvents none, so it keeps the sprite but stops responding.
+
+           AND OBJECT KNOCKS NOW FEED THE FUSE, 19 September 2026 (owner: "allow
+           bombs to take hits from other objects"). The line above this used to
+           promise exactly that, "from stage 4", and this is stage 4. A knock is
+           now worth one hit, the same as a click and the same as half a second
+           of holding.
+
+           THE TWO GUARDS BELOW ARE THE POINT and both are borrowed from the
+           charge path rather than invented: rv < 5 is the pit's own test for a
+           real knock rather than a nudge, without which a bomb resting against
+           anything would tick itself down; and the 600ms cooldown stops one
+           collision registering across several frames. With BOMB_HITS at 3 a
+           bomb that took a hit per frame would detonate in under a twentieth of
+           a second.
+
+           ONE HIT PER KNOCK, NEVER `spend`. The rock carries ROCK_KNOCK, which is
+           ten, because it is spending a chip's twenty charges. Ten against three
+           would mean the rock detonates any bomb it grazes on contact, with no
+           fuse and no warning. The rock is heavy, not a detonator. */
+        if (b.bomb) {
+          if (rv < 5) return;
+          if (b.lastKnock && now2 - b.lastKnock < 600) return;
+          b.lastKnock = now2;
+          hitBomb(b);
+          return;
+        }
         if (b.n || b.inert || b.charges === undefined) return; // badges only
         if (rv < 5) return; // pit onPctHit verbatim: a real knock, not a nudge
         if (b.lastKnock && now2 - b.lastKnock < 600) return;
@@ -8771,6 +9350,10 @@ export default function BreedTree({
          between 12 and 25, the bonds are innocent and it is the contact solver.
 
          WITH THE FLAG OFF NOTHING ABOUT THE PIT CHANGES. */
+      // ?fulldiag=1, read once here because computeFull lives in this effect.
+      const fullDiagOn = (() => {
+        try { return new URLSearchParams(window.location.search).get("fulldiag") === "1"; } catch { return false; }
+      })();
       const noBondsOn = (() => {
         try { return new URLSearchParams(window.location.search).get("nobonds") === "1"; } catch { return false; }
       })();
@@ -8889,6 +9472,15 @@ export default function BreedTree({
             if (pr.hits >= pr.maxHits) killProp(pr, P.kind, now);
           }
           for (const [P] of [[pa], [pb2]] as any[]) {
+            /* THE SNAIL AND THE JELLY NEVER GIVE WAY, 19 September 2026 (owner).
+               Every other member of this set sinks a notch per knock and comes
+               loose on the fifth, which is the branch below. These two are
+               controls you must be able to find at any point in a round, so they
+               take no damage at all: no hits counted, no sink, no tilt, no
+               tumble. Skipped at the top rather than guarded at the `>= 5` line,
+               so they do not silently accumulate a hit count that some later
+               reader acts on. */
+            if (P.ui && (P.ui.kind === "slowmo" || P.ui.kind === "shake")) continue;
             if (P.ui && P.ui.fixed && rv > FX_MIN_PS * 0.3) {
               const u = P.ui;
               u.hits += 1;
@@ -8984,12 +9576,23 @@ export default function BreedTree({
         // counted twice, and compare against the width between the pit walls.
         const spans: [number, number][] = [];
         // (the `inZone` counter went with the `>= 5` rule below)
-        const occupy = (x: number, y: number, r: number, vx: number, vy: number, held?: boolean) => {
-          if (held) return;
-          if (Math.hypot(vx, vy) > worldH * 0.03) return;
-          if (y - r < zoneY) { spans.push([x - r, x + r]); }
+        // ?fulldiag=1 only: what each body did, so a phantom occupier names itself.
+        const dLines: string[] = [];
+        let dHeld = 0, dMoving = 0, dBelow = 0;
+        const occupy = (x: number, y: number, r: number, vx: number, vy: number, held?: boolean, label?: string) => {
+          if (held) { dHeld++; return; }
+          if (Math.hypot(vx, vy) > worldH * 0.03) { dMoving++; return; }
+          if (y - r < zoneY) {
+            spans.push([x - r, x + r]);
+            if (fullDiagOn) dLines.push(`  IN ZONE ${label ?? "?"} x${x.toFixed(0)} r${r.toFixed(0)} top${(y - r).toFixed(0)} w${((2 * r) / ((xR - xL) || 1) * 100).toFixed(0)}%`);
+          } else dBelow++;
         };
-        for (const b of all) occupy(b.x, b.y, b.r, b.vx, b.vy, b.held);
+        for (const b of all) {
+          const label = b.n
+            ? String(b.n.data.name).slice(0, 22)
+            : b.bomb ? "bomb" : b.rDraw ? "chip" : "body";
+          occupy(b.x, b.y, b.r, b.vx, b.vy, b.held, label);
+        }
         // The CHUM CARDS count too: `all` is only the level's own dogs and chips,
         // and the chums live in their own list, so without this a pit stuffed with
         // chum cards never reached the threshold. Their body is a square of side
@@ -8997,7 +9600,7 @@ export default function BreedTree({
         // drawn size the same way everything else here is.
         for (const c of chumBodiesRef.current) {
           const cr = ((c.mb?.bounds?.max?.x ?? 0) - (c.mb?.bounds?.min?.x ?? 0)) / 2 / pxPerWorld;
-          if (cr > 0) occupy(c.x, c.y, cr, c.vx, c.vy, c.held);
+          if (cr > 0) occupy(c.x, c.y, cr, c.vx, c.vy, c.held, "chum");
         }
         let covered = 0;
         if (spans.length) {
@@ -9014,6 +9617,14 @@ export default function BreedTree({
         // past the visible stage
         const pitW = (xR - xL) || 1;
         const blocked = spans.length > 0 && covered / pitW >= PIT_FULL_COVER;
+        if (fullDiagOn) {
+          fullDiagRef.current = [
+            `FULL? ${blocked ? "YES" : "no"}   bodies in zone ${spans.length}   cover ${(covered / pitW * 100).toFixed(1)}% of pit   needs ${(PIT_FULL_COVER * 100).toFixed(1)}%`,
+            `zone line y ${zoneY.toFixed(0)} (${PIT_FULL_ZONE_PX}px from stage top)   pit ${xL.toFixed(0)} to ${xR.toFixed(0)}   list all=${all.length} chums=${chumBodiesRef.current.length}`,
+            `rejected: held ${dHeld}  moving ${dMoving}  below zone ${dBelow}`,
+            ...dLines.slice(0, 12),
+          ];
+        }
         /* `|| inZone >= 5` DELETED, 9 Sept 2026 (owner). It was the OLD rule,
            a count borrowed from the main pit, and the comment at the top of this
            function says occupancy replaced it. It was never removed, so it sat
@@ -9031,11 +9642,17 @@ export default function BreedTree({
            learn layer into a countdown that started while they were in it, which
            they never saw begin. Guarded inside checkFull rather than at the poll,
            so the loop's own call is covered by the same line. */
+        if (fullDiagOn) {
+          fullDiagGuardRef.current = [
+            `guards: lift ${liftPausedRef.current ? "PAUSED" : "ok"}  settle ${Math.max(0, 4000 - (now - fullClock)).toFixed(0)}ms  grace ${Math.max(0, cdGraceRef.current - now).toFixed(0)}ms  counting ${fullTriggeredRef.current ? "YES" : "no"}`,
+          ];
+        }
         if (liftPausedRef.current) return;
         if (now - fullClock < 4000 || now <= cdGraceRef.current) return;
         const full = computeFull();
         if (full && !fullTriggeredRef.current) {
           fullTriggeredRef.current = true;
+          if (fullDiagOn) fullDiagHitRef.current = [`HIT at ${(now / 1000).toFixed(1)}s, frozen:`, ...fullDiagGuardRef.current, ...fullDiagRef.current];
           runCountdown();
         } else if (!full && fullTriggeredRef.current && !anyChumOnFloor()) {
           // ROOM AGAIN and no chum left on the floor, so the countdown is called
@@ -9321,7 +9938,17 @@ export default function BreedTree({
           if (!fb.bomb || fb.blown || !fb.mb || !fb.mbIn) continue;
           const fh = fb.hits || 0;
           if (fh < fx.FUSE_LIGHT_AT) continue;
-          const fTarget = [0, 0, 0.16, 0.4, 0.68, 1][Math.min(fh, BOMB_HITS)];
+          /* WAS A LITERAL [0, 0, 0.16, 0.4, 0.68, 1], 19 September 2026. That array
+             had the five hits baked into its length, so when BOMB_HITS came down
+             to 3 it indexed 0 to 3 and the wick stopped at 0.4: lit, but never
+             reaching full before the bomb went off.
+             The curve replaces it and reproduces the old figures to within 0.04
+             at every one of the five old stages, so nothing about how it LOOKED
+             at five hits has changed. It now reaches 1 on the last hit whatever
+             BOMB_HITS is. The fuse still stays dark on hit 1, which is
+             fx.FUSE_LIGHT_AT above, and the t below starts from there. */
+          const fT = Math.max(0, (Math.min(fh, BOMB_HITS) - 1) / Math.max(1, BOMB_HITS - 1));
+          const fTarget = Math.pow(fT, 1.5);
           fb.fuseCur = (fb.fuseCur || 0) + (fTarget - (fb.fuseCur || 0)) * 0.1;
           if (fb.fuseCur < 0.03) continue;
           // the wick sits at the top right of the sprite, which is drawn 2.4
@@ -9470,6 +10097,9 @@ export default function BreedTree({
       wakeRef.current = wake;
       slowmoRef.current = () => {
         engine.timing.timeScale = engine.timing.timeScale === 1 ? 0.25 : 1;
+        // The single writer for the mirror the countdown reads. Derived from the
+        // engine rather than toggled independently, so the two cannot disagree.
+        slowmoOnRef.current = engine.timing.timeScale !== 1;
         wake(); // a settled pit still needs to be woken to show the change
       };
       // ---- J10b stage 1: Matter's own MouseConstraint, badges only --------
@@ -9871,7 +10501,7 @@ export default function BreedTree({
       setStarted(true);
       doFall();
     }
-    registerSlowmo?.(() => slowmoRef.current?.());
+    registerSlowmo?.(() => { slowmoRef.current?.(); onSlowmoChange?.(slowmoOnRef.current); });
     registerShake?.(() => {
       // a shake also starts the round, so the button never blocks the pit
       if (!fellRef.current) { setLearnPeek(false); setStartPeek(false); setStarted(true); runFallRef.current?.(); }
@@ -10318,8 +10948,9 @@ export default function BreedTree({
          where it stands, which is the cards. False and the thing under the
          finger is simply not joined: the chain carries on, unharmed, and the
          finger can keep going. Only joinBlock is softened by this. The shared
-         rules are not: re-entering a circle already in the chain and crossing
-         the path both still kill, for every kind. */
+         rules are not. Both of those are now per-kind flags of their own:
+         reentryKills and crossKills, each false for the circles and true for the
+         cards. */
       blockKills: boolean;
       /* DOES A LINK CROSSING THE PATH KILL THIS KIND (owner, 18 September 2026).
 
@@ -10338,6 +10969,32 @@ export default function BreedTree({
          returns early for a kind that does not close, and the circles are an open
          run. Gating it would be dead code pretending to be a rule. */
       crossKills: boolean;
+      /* DOES PASSING BACK OVER A CIRCLE ALREADY IN THE CHAIN KILL IT (owner,
+         19 September 2026, after he worked out on the device that this was the
+         fault: "its when I cross over an already connected dog circle").
+
+         THE THIRD FIELD OF EXACTLY THIS SHAPE, after blockKills and crossKills,
+         and it is here for the same reason both of those are: a rule that is
+         right for a lasso round a handful of cards is wrong for an open run
+         across a pit packed with 60 circles.
+
+         THE CHUM CARDS KEEP IT. Their circuit is the point: a loop that doubles
+         back through itself is not a loop the player drew round anything, so
+         re-entry there is a real shape error and still kills.
+
+         THE CIRCLES DO NOT. crossKills was already false for them, so a dog chain
+         is allowed to cross its own path, and a crossing path passes back over
+         circles it has already taken as a matter of course. The magnet makes that
+         likelier still, since it pulls circles in from beyond the finger. So the
+         two rules contradicted each other: one said cross freely, the other
+         killed you for what crossing does.
+
+         NOTHING STRUCTURAL DEPENDS ON THE KILL, checked rather than assumed. The
+         `cards.includes(i)` test that precedes it already stops a circle being
+         joined twice, so refusing leaves the chain exactly as correct as killing
+         did; and judge() never asks about re-entry, so a released chain is scored
+         the same either way. The kill was punishment, not safety. */
+      reentryKills: boolean;
       /* HAS THIS CHAIN TAKEN EVERY LIVE CIRCLE OF ITS BREED? Undefined for a
          kind that has no such idea, which is the chum cards: their circuit is
          untouched by every part of this. A kind that answers true is COMPLETED
@@ -10372,6 +11029,7 @@ export default function BreedTree({
       joinBlock: () => null, // touching and no crossing is the whole rule
       blockKills: true, // the cards are unchanged: a wrong card kills the chain
       crossKills: true, // and so does a link across the path: the loop is the point
+      reentryKills: true, // doubling back through the loop is a real shape error here
       settle: (ch) => {
         const cards = [...ch.cards];
         chainClearRef.current?.(cards);
@@ -10482,7 +11140,31 @@ export default function BreedTree({
     };
     const DOG: ChainKind = {
       key: "dog circle",
-      colour: DOG_CHAIN_COLOUR,
+      /* THE PATH TAKES THE CHAINED BREED'S RARITY COLOUR (owner, 19 September
+         2026), replacing the flat DOG_CHAIN_COLOUR lemon.
+
+         A GETTER, NOT A VALUE, because the answer is not known when this object
+         is built: the breed is decided at the first join. Every reader already
+         goes through K.colour or ch.kind.colour, so they all pick it up with no
+         other change. There are five of them: the join spark, the swept spark,
+         the per-frame paint, the flare and the collapse.
+
+         READ ORDER IS SAFE, checked rather than assumed. The flare and the
+         collapse both capture the colour at their START, and dogChainBreedRef is
+         not cleared until ch.kind.over() runs after that, so neither can fall
+         back to the lemon part way through its own animation.
+
+         THE LEMON IS THE FALLBACK and nothing else now: it is what the path draws
+         before the first circle joins, and if a breed ever fails to resolve a
+         tier.
+
+         THE CHUM CARDS ARE UNTOUCHED. Their kind keeps a plain static colour. */
+      get colour() {
+        const bn = dogChainBreedRef.current;
+        if (!bn) return DOG_CHAIN_COLOUR;
+        const band = RARITY_BAND[rarityTier(treesContaining(bn))];
+        return band ? band.bg : DOG_CHAIN_COLOUR;
+      },
       circuit: false, // an open run, never a loop and never a lasso
       minCards: DOG_CHAIN_MIN,
       owns: (t) => !!circlesRef.current?.contains(t),
@@ -10502,10 +11184,12 @@ export default function BreedTree({
 
          IT NAMES ONLY WHAT WOULD ACTUALLY JOIN, and that is the part to keep:
 
-           A circle ALREADY IN THE CHAIN is skipped. Re-entering one kills the
-           chain, and a kill must stay something the player DID: an exact hit
-           still kills, as it always has, but a near miss they never made must
-           never take the round off them.
+           A circle ALREADY IN THE CHAIN is skipped, and it stays skipped even
+           though re-entry no longer kills a dog chain (19 September 2026,
+           reentryKills). The reason has changed rather than gone: the magnet must
+           not name a circle that cannot be joined, or the pull would spend itself
+           on a circle already taken instead of finding the next free twin beyond
+           it.
 
            A circle of the WRONG BREED is skipped. It would only refuse, so the
            outcome would be the same, but it would have STOLEN the sample from a
@@ -10592,12 +11276,15 @@ export default function BreedTree({
          circle that has left, busy() and a null geo() both refuse, and judge()
          catches a vanished card at release, where the chain is settled anyway.
 
-         WHAT STILL KILLS a dog chain, unchanged: re-entering a circle already in
-         it, and a link that crosses the path. Both are shared rules, neither is
-         this kind's own, and neither is touched here. The chum cards are not
-         touched at all. */
+         WHAT KILLS A DOG CHAIN, as of 19 September 2026: the join clock, and
+         nothing else in this list. Crossing the path stopped killing on
+         18 September (crossKills) and re-entering a circle already held stopped
+         killing on the 19th (reentryKills), once the owner established on the
+         device that the two contradicted each other: a crossing path passes back
+         over its own circles by design. The chum cards keep both rules. */
       blockKills: false,
       crossKills: false, // an open run over a packed pit may cross itself freely
+      reentryKills: false, // and crossing means passing back over your own circles
       /* THE FIRST CIRCLE OPENS, and only that one. The others stay where they
          are until it is completed, which is what closes them: see dogChainRef
          and the block in the layer's onRemove. The chain is remembered by NODE,
@@ -10732,9 +11419,17 @@ export default function BreedTree({
         { const q = K.at(i); if (q) chainJoinScoreRef.current?.(q.x, q.y, K.colour, cards.length); }
         return;
       }
-      // A card already in the chain, and not the first: the chain dies. It used
-      // to refuse and carry on.
-      if (cards.includes(i)) { killChain(ch, `RE-ENTERED #${i}, already at position ${cards.indexOf(i)}`); return; } // already in the chain
+      /* A CARD ALREADY IN THE CHAIN, AND NOT THE FIRST. Whether that kills is now
+         the kind's business: see ChainKind.reentryKills. It killed for every kind
+         until 19 September 2026, and before that it refused and carried on for
+         every kind, so this line has been round the houses. The flag is what stops
+         the next round: cards kill, circles refuse, and neither has to know about
+         the other. */
+      if (cards.includes(i)) {
+        if (K.reentryKills) killChain(ch, `RE-ENTERED #${i}, already at position ${cards.indexOf(i)}`);
+        else refuse(`re-entered #${i}, already at position ${cards.indexOf(i)}`);
+        return;
+      }
       if (K.busy(i)) { refuse(`busy or gone #${i}`); return; } // being collected: not a wrong card, just not available
       if (last === undefined) {
         cards.push(i);
@@ -12711,7 +13406,12 @@ export default function BreedTree({
               `display` on the CHILDREN of this group, never on the group itself. The
               two rules do not fight. A hidden group also takes no pointer events, so a
               word cannot be tapped through the card either. */}
-          <g ref={wordsGRef} textAnchor="middle" style={{ display: dropped && !learnNode ? "inline" : "none" }}>
+          {/* The words group is switched off wholesale by PIT_DRAWS_WORDS, so the
+              per-word positioning loop above can stay exactly as it is: it writes
+              to a group nobody can see and costs a handful of attribute sets a
+              frame. Left running rather than gated so restoring the words is the
+              one constant and nothing else. */}
+          <g ref={wordsGRef} textAnchor="middle" style={{ display: PIT_DRAWS_WORDS && dropped && !learnNode ? "inline" : "none" }}>
             {wordList.map((w, i2) => (
               <g
                 key={i2}
@@ -12826,12 +13526,18 @@ export default function BreedTree({
                open. The menu only exists during a round: on the start screen
                and in learn the X already closes or goes back outright, so
                there is nothing to warn about. */
+            /* THE TWO BOTTOM-CORNER CONTROLS ARE ADDED WHILE A ROUND IS RUNNING,
+               19 September 2026, matching the gate the DOM buttons they replace
+               already used: LineageModal renders them on `running`, which is this
+               component's own `started` reported upward. They are absent on the
+               start screen and in learn, where there is no pit to slow or shake. */
             const kinds = ([
               ...(started && onBackToLearn
                 ? ["close", "learn"]
                 : learning && hideCaption
                 ? ["close", "desc"]
                 : ["close"]),
+              ...(started ? ["slowmo", "shake"] : []),
             ]) as readonly UiKind[];
             const defs: { kind: UiKind; wx: number; wy: number; a: number }[] = kinds.map((kind) => {
               const b = ub?.find((u) => u.kind === kind);
@@ -12846,8 +13552,16 @@ export default function BreedTree({
                    It matches the split above: desc goes left of the X, learn goes
                    below it. Keyed off the KIND, not off idx, because the two no
                    longer share a direction. */
-                wx: b ? b.x : v[0] + (xMinR + vbWr - m - uSz / 2 - (kind === "desc" ? uSz + 14 * upp : 0)) / kk,
-                wy: b ? b.y : v[1] + (-vbHr / 2 + m + uSz / 2 + (kind === "learn" ? uSz + 14 * upp : 0)) / kk,
+                /* The two bottom-corner controls need their own fallback, or for the
+                   frame before the bodies exist they would be drawn in the top
+                   right with the rest and then jump to the floor, which reads as
+                   a glitch exactly as the note above describes. */
+                wx: b ? b.x : kind === "slowmo"
+                  ? v[0] + (xMinR + m + uSz / 2) / kk
+                  : v[0] + (xMinR + vbWr - m - uSz / 2 - (kind === "desc" ? uSz + 14 * upp : 0)) / kk,
+                wy: b ? b.y : (kind === "slowmo" || kind === "shake")
+                  ? v[1] + (vbHr / 2 - m - uSz / 2) / kk
+                  : v[1] + (-vbHr / 2 + m + uSz / 2 + (kind === "learn" ? uSz + 14 * upp : 0)) / kk,
                 a: b ? b.a : 0,
               };
             });
@@ -12938,6 +13652,10 @@ export default function BreedTree({
                     ? "Back to the start screen"
                     : d.kind === "learn"
                     ? "Back to the learn area"
+                    : d.kind === "slowmo"
+                    ? "Slow motion"
+                    : d.kind === "shake"
+                    ? "Shake the pit"
                     : "Breed information"
                 }
                 transform={`translate(${(d.wx - v[0]) * kk},${(d.wy - v[1]) * kk}) rotate(${d.a * 57.2958})`}
@@ -12978,7 +13696,27 @@ export default function BreedTree({
                           : onPitClose)
                       : d.kind === "learn"
                       ? onBackToLearn
+                      /* THE TWO BOTTOM CONTROLS, 19 September 2026. They call the
+                         very functions the DOM buttons called through
+                         registerSlowmo and registerShake, so there is one
+                         implementation of each and no chance of the two drifting.
+                         The snail reports its new state upward for the score
+                         drain: see onSlowmoChange.
+                         The shake also starts the round if it has not started,
+                         which is the rule the registered version already carried,
+                         so pressing it on a still pit is never a dead tap. */
+                      : d.kind === "slowmo"
+                      ? () => { slowmoRef.current?.(); onSlowmoChange?.(slowmoOnRef.current); }
+                      : d.kind === "shake"
+                      ? () => {
+                          if (!fellRef.current) { setLearnPeek(false); setStartPeek(false); setStarted(true); runFallRef.current?.(); }
+                          shakeInnerRef.current?.();
+                        }
                       : onToggleCaption;
+                  /* `b && !b.fixed` IS WHAT MAKES THESE TAP-ONLY. These two are
+                     fixed for the whole round and never come loose, so the drag
+                     body is always null for them and startDrag runs the action on
+                     release without ever moving anything. Nothing extra needed. */
                   startDrag(e, b && !b.fixed ? b : null, act);
                 }}>
                 <rect x={-half} y={-half} width={uSz} height={uSz} rx={uSz * 0.3}
@@ -12997,10 +13735,43 @@ export default function BreedTree({
                            rather than backing out. */
                         : d.kind === "close" && (learning || !started) ? "#ef4444"
                         : "var(--yellow, #ffd23e)",
-                    stroke: d.kind === "close" && (learning || !started) ? "#ffffff" : "var(--navy, #0a3a57)",
-                    strokeWidth: 5 * upp,
+                    /* NO OUTLINE ON THE SNAIL OR THE JELLY, 19 September 2026
+                       (owner). Every other square in this set carries a 5px rim,
+                       navy on yellow or white on red. These two are plain yellow
+                       tiles with the artwork on them, which is how they read as
+                       controls rather than as another way out of the round. */
+                    stroke: d.kind === "slowmo" || d.kind === "shake" ? "none"
+                      : d.kind === "close" && (learning || !started) ? "#ffffff" : "var(--navy, #0a3a57)",
+                    strokeWidth: d.kind === "slowmo" || d.kind === "shake" ? 0 : 5 * upp,
                   }} />
-                {d.kind === "leave" ? (
+                {d.kind === "slowmo" || d.kind === "shake" ? (
+                  /* THE TWO ARTWORK ICONS, 19 September 2026. Both are existing
+                     assets: the snail is an SVG and the jelly a PNG, and both were
+                     already being served to the DOM buttons these replace, so
+                     nothing new ships.
+
+                     DRAWN AS <image>, not redrawn as paths, because there is no
+                     path to copy: /jelly-shake.png is a bitmap. The snail could
+                     have been inlined but is kept as an image beside it so the
+                     pair is sized by one rule rather than two.
+
+                     THE SIZES MIRROR THE DOM BUTTONS they replace, as a fraction
+                     of the square rather than in pixels, because these are drawn
+                     in svg units: the snail was 52.7 in an 85.68 button, the jelly
+                     65.45, which is 0.615 and 0.764 of the box.
+
+                     pointerEvents none on the image itself so the tap lands on
+                     the group, the same rule the logo already follows. */
+                  <image
+                    href={d.kind === "slowmo" ? "/svg-snail-icon.svg" : "/jelly-shake.png"}
+                    x={-uSz * (d.kind === "slowmo" ? 0.615 : 0.764) / 2}
+                    y={-uSz * (d.kind === "slowmo" ? 0.615 : 0.764) / 2}
+                    width={uSz * (d.kind === "slowmo" ? 0.615 : 0.764)}
+                    height={uSz * (d.kind === "slowmo" ? 0.615 : 0.764)}
+                    preserveAspectRatio="xMidYMid meet"
+                    style={{ pointerEvents: "none" }}
+                  />
+                ) : d.kind === "leave" ? (
                   // White on red, the same X the corner uses.
                   <g stroke="#ffffff" strokeWidth={iconStroke} strokeLinecap="round">
                     <line x1={-half * 0.34} y1={-half * 0.34} x2={half * 0.34} y2={half * 0.34} />
@@ -13297,10 +14068,13 @@ export default function BreedTree({
             // 10% OFF, 2 September 2026 (owner): the trailing 0.5 becomes 0.45.
             // NOTE the comment above is now out of date by request: the number no
             // longer matches LEARN, which came down 25% in the same pass.
-            /* 15% OFF, 19 September 2026 (owner): the trailing 0.45 becomes
-               0.3825. Everything below is sized from this one figure, so the
-               ordinal and the word "dog" come down with it. */
-            const fsL = Math.min(Math.min(Math.max(54.4, stW * 0.12), 128) * START_SCALE, (stW * 0.92) / 3.17) * 0.3825;
+            /* THE WHOLE BLOCK'S SIZE, IN ONE FIGURE. Everything below is derived
+               from it, so the number, the superscript and the word "dog" always
+               move together.
+               History of the trailing constant: 0.45 as built, then 0.3825 on
+               19 September 2026 (15% off, owner), then 0.286875 the same day
+               (a further 25% off, owner). */
+            const fsL = Math.min(Math.min(Math.max(54.4, stW * 0.12), 128) * START_SCALE, (stW * 0.92) / 3.17) * 0.286875;
             /* THE ORDINAL AND THE WORD, 19 September 2026 (owner).
 
                THE DIGITS CHANGED TOO, and this is the part to read before anyone
@@ -13354,8 +14128,11 @@ export default function BreedTree({
                So the figure carries the font's own 0.6: 1.1 * 0.6 = 0.66. That is
                a VISUAL 1.1em, which is what was actually wanted. The same 0.6 is
                already on record for this font elsewhere in the project.
-               IF THE FONT CHANGES, this 0.6 changes with it. */
-            const lineDy = fsL * 1.1 * 0.6;
+               IF THE FONT CHANGES, this 0.6 changes with it.
+               1.1 TO 1.0, 19 September 2026 (owner), with the 25% size cut. The
+               0.6 is the font's business and stays; the 1.0 is the line height
+               being asked for and is the number to change. */
+            const lineDy = fsL * 1.0 * 0.6;
             /* HALF THE NUMBER'S STROKE on the two smaller pieces, 19 September
                2026 (owner). 6.3 becomes 3.15. A stroke sized for a 100px glyph
                swamps a 25px one: paintOrder is "stroke", so the fill paints over
@@ -14289,7 +15066,7 @@ export default function BreedTree({
           // Only once it has actually been dragged; until then the CSS owns the
           // load position, so the 48px / 60px in .asideSheet stay the single source.
           ...(dockAside && isMobile && sheetPos
-            ? { left: `${sheetPos.left}px`, bottom: `${sheetPos.bottom}px` }
+            ? { left: `${sheetPos.left}px`, top: `${sheetPos.top}px` }
             : null),
         }}
         onPointerDown={dockAside ? (isMobile ? sheetDown : asideDown) : undefined}

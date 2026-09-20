@@ -206,8 +206,30 @@ const LINEAGE: Record<string, LineageNode> = {
           { name: "Newfoundland landrace dogs", note: "The local island dogs they crossed with once they landed. Now extinct.", img: "/history/breeds/Newfoundland-landrace-dog.jpg", value: 21 }
         ]
       },
+      /* "British Pointers" -> "Pointer", 19 September 2026 (owner).
+
+         IT WAS A TYPE NOUN, NOT A DOG, which is the same fault already recorded
+         against the Setter node: a vague plural that no amount of research can
+         give an ancestry, because there is no dog by that name to research. It
+         was one of only two named dead ends in the archive that were not ancient
+         progenitors.
+
+         POINTER IS A REAL RECORD AND IT WAS ALREADY HERE, with English Foxhound,
+         Greyhound, Bloodhound and Setter beneath it. So this is not new authoring
+         at all: the history existed and the name was the only thing keeping it
+         out of reach. The same two-step the Talbot and Old setting spaniels
+         entries describe, and the same reasoning that closed the Wavy-Coated
+         Retriever earlier today.
+
+         THE ARTWORK COMES WITH IT. british-pointers.jpg was used by this node and
+         by nothing else, so it simply becomes the Pointer's picture and no file
+         ends up shared between two names, which is the rule this file holds to.
+
+         EXPECT PERCENTAGES TO MOVE in the Labrador's tree. A dead end is a
+         progenitor; now it grafts, which lengthens the list beneath it and
+         rescales the shares. The 17 itself is unchanged. */
       {
-        name: "British Pointers",
+        name: "Pointer",
         note: "Crossed in by British breeders for nose and a steady, focused drive in the field. Now in-decline.",
         img: "/history/breeds/british-pointers.jpg",
         value: 17
@@ -540,6 +562,43 @@ const LINEAGE: Record<string, LineageNode> = {
   // OFF the Shepherd's Dog herding line, with no honest Tudor terminal (its
   // deeper data is Family 8's Arctic sled dogs). Single-parent value 100 matches
   // the shipped Soft-Coated Wheaten Terrier.
+  /* ANGLO-SAXON HERDING DOGS GETS A RECORD OF ITS OWN, 19 September 2026 (owner),
+     so the node can reach the continental stock it has always pointed at. It
+     appears as a leaf in twenty-two trees and is authored once here; every one of
+     them grafts from this.
+
+     ITS PARENT IS THE STOCK IT CAME OVER WITH. See the long note beside the child
+     node in the herding record for why this is a continental parent and not the
+     native Celtic one, and for what must not be undone.
+
+     100, AND NOT A SPLIT, because the sources name one thing: the dogs the
+     Anglo-Saxons brought. There is no second contributor to weigh it against, and
+     inventing one to avoid a single-parent chain would be worse than the chain.
+     It is not a chain in any meaningful sense anyway, since the record below is
+     the honest edge of the data. */
+  "Anglo-Saxon herding dogs": {
+    name: "Anglo-Saxon herding dogs",
+    note: "Collie-sized herding dogs of Anglo-Saxon England, found at West Stow and Brandon. They arrived with the Anglo-Saxons from the North Sea coast rather than descending from the native Celtic stock. Now extinct.",
+    img: "/history/breeds/anglo-saxon-herding-dogs.jpg",
+    children: [
+      /* CONTINENTAL GERMANIC HERDING DOGS, added 19 September 2026 (owner).
+
+         The working herding dogs of the North Sea coastal plain, the Saxon and
+         Anglian homelands in what is now Lower Saxony, Schleswig-Holstein and the
+         northern Netherlands, before the migration. The old German and Dutch
+         herding landraces came from the same stock.
+
+         IT IS A LEAF, AND HONESTLY SO. Nothing documented sits above it: this is
+         pre-migration continental farm stock with no studbook and no named
+         progenitor. It is the edge of the data rather than a gap in it, exactly as
+         Norse settlers dogs is.
+
+         IT IS NOT A GERMAN SHEPHERD and must never be read as one. That breed is a
+         Victorian creation a thousand years younger. */
+      { name: "Continental Germanic herding dogs", note: "The herding dogs of the North Sea coastal plain, kept by the Saxons and Angles before the migration. They crossed to Britain with the people who kept them. Now extinct.", img: "/history/breeds/Continental-Germanic-herding-dogs.jpg", value: 100 }
+    ]
+  },
+
   "Old working collies": {
     name: "Old working collies",
     note: "The old northern hill-collie landrace of Scotland and the borders, the shared working stock the Rough, Smooth and Border collies all grew from. Now extinct.",
@@ -708,18 +767,28 @@ const LINEAGE: Record<string, LineageNode> = {
   "Skye Terrier": {
     name: "Skye Terrier",
     note: "One of the oldest terriers in Britain, a long, low, heavy-coated earth dog from the Isle of Skye and the Western Highlands.",
+    /* A PLAYABLE LEVEL NEEDS TWO CIRCLES, 20 September 2026 (owner: a new dog
+       cannot come from just one parent). The one documented ancestor is drawn
+       twice, at the owner's own split. This must NOT be read as two ancestors.
+       Scope is playable levels only; the same shape elsewhere in this file was
+       deliberately left alone. */
     children: [
-      { name: "Old Highland Terriers", note: "The old working-terrier stock of the Highlands that every Scottish terrier springs from. Now extinct.", img: "/history/breeds/Old-Highland-terriers.jpg", value: 60 },
-      { name: "Skye Terrier stock", note: "The long-coated Isle of Skye earth dogs at the root of the whole Highland terrier family. Now endangered.", img: "/history/breeds/Isle-of-Skye-earth-dogs.jpg", value: 40 }
+      { name: "Old Scottish working Terriers", note: "The long-coated island and Highland earth dogs at the root of the whole Scottish terrier family. Now extinct.", img: "/history/breeds/Isle-of-Skye-earth-dogs.jpg", value: 50 },
+      { name: "Old Scottish working Terriers", note: "The long-coated island and Highland earth dogs at the root of the whole Scottish terrier family. Now extinct.", img: "/history/breeds/Isle-of-Skye-earth-dogs.jpg", value: 50 }
     ]
   },
 
   "Scottish Terrier": {
     name: "Scottish Terrier",
     note: "The 'diehard' of the Highlands, drawn from the old Scottish terrier stock into a sturdy, short-legged earth dog.",
+    /* A PLAYABLE LEVEL NEEDS TWO CIRCLES, 20 September 2026 (owner: a new dog
+       cannot come from just one parent). The one documented ancestor is drawn
+       twice, at the owner's own split. This must NOT be read as two ancestors.
+       Scope is playable levels only; the same shape elsewhere in this file was
+       deliberately left alone. */
     children: [
-      { name: "Old Highland Terriers", note: "The shared Highland working-terrier stock, once all just called Scottish terriers. Now extinct.", img: "/history/breeds/Old-Highland-terriers.jpg", value: 60 },
-      { name: "Skye Terrier stock", note: "The long-coated island terriers from the same rootstock. Now endangered.", img: "/history/breeds/Isle-of-Skye-earth-dogs.jpg", value: 40 }
+      { name: "Old Scottish working Terriers", note: "The shared Scottish working-terrier stock, once all just called Scottish terriers. Now extinct.", img: "/history/breeds/Isle-of-Skye-earth-dogs.jpg", value: 30 },
+      { name: "Old Scottish working Terriers", note: "The shared Scottish working-terrier stock, once all just called Scottish terriers. Now extinct.", img: "/history/breeds/Isle-of-Skye-earth-dogs.jpg", value: 70 }
     ]
   },
 
@@ -728,7 +797,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "A long-bodied terrier of the Anglo-Scottish border with a soft topknot, named after a character in a Walter Scott novel.",
     children: [
       { name: "Old Border Terriers", note: "The rough working terriers of the border country, kept by families like the Allans of Holystone. Now extinct.", img: "/history/breeds/Old-Border-terriers.jpg", value: 65 },
-      { name: "Skye Terrier stock", note: "Long, low Scottish terriers, one suggested source of its weasel shape. Now endangered.", img: "/history/breeds/Isle-of-Skye-earth-dogs.jpg", value: 20 },
+      { name: "Old Scottish working Terriers", note: "Long, low Scottish terriers, one suggested source of its weasel shape. Now extinct.", img: "/history/breeds/Isle-of-Skye-earth-dogs.jpg", value: 20 },
       { name: "Otterhound", note: "A little hound blood is thought to have added size and the soft coat.", img: "/history/breeds/otterhound-photo.jpg", value: 15 }
     ]
   },
@@ -799,13 +868,7 @@ const LINEAGE: Record<string, LineageNode> = {
   // which is a Family 6 writing job, so those lines wait for Family 6. The
   // single-parent value of 100 is deliberate and honest, matching the shipped
   // Soft-Coated Wheaten Terrier, not the valueless-branch shape.
-  "Skye Terrier stock": {
-    name: "Skye Terrier stock",
-    note: "The long-coated Isle of Skye earth dogs at the root of the whole Highland terrier family. Now extinct.",
-    children: [
-      { name: "Earth Dog", note: "The old medieval earth-working dog type the Highland earth dogs go back to. Now extinct.", img: "/history/breeds/medieval-earth-dog.jpg", value: 100 }
-    ]
-  },
+
   "Low-slung soldiers' dogs": {
     name: "Low-slung soldiers' dogs",
     note: "Short-legged dogs left by Flemish and Hessian soldiers settled in the glen. Now extinct.",
@@ -967,8 +1030,12 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Cairn Terrier",
     note: "A small, shaggy Highland terrier named for the rock cairns it bolted vermin from, the closest of all to the original Scottish working terrier.",
     children: [
-      { name: "Skye Terrier stock", note: "The island working terriers it was once grouped with as a 'short-haired Skye'. Now endangered.", img: "/history/breeds/Isle-of-Skye-earth-dogs.jpg", value: 55 },
-      { name: "Skye Terrier stock", note: "The mainland Highland branch of the same Skye earth-dog stock, shared with the Scottie and Westie. Now extinct.", img: "/history/breeds/Isle-of-Skye-earth-dogs.jpg", value: 45 }
+      /* THE ONE PAIR THAT IS NOT A COPY. Two real contributions that share a
+         name: the island stock and the mainland Highland branch, and their notes
+         say so. Renamed with the rest on 19 September 2026 and deliberately NOT
+         merged. See the ruling above and subtreeSig in data/lineageShape.ts. */
+      { name: "Old Scottish working Terriers", note: "The island working terriers it was once grouped with as a 'short-haired Skye'. Now extinct.", img: "/history/breeds/Isle-of-Skye-earth-dogs.jpg", value: 55 },
+      { name: "Old Scottish working Terriers", note: "The mainland Highland branch of the same Skye earth-dog stock, shared with the Scottie and Westie. Now extinct.", img: "/history/breeds/Isle-of-Skye-earth-dogs.jpg", value: 45 }
     ]
   },
 
@@ -1006,9 +1073,14 @@ const LINEAGE: Record<string, LineageNode> = {
   "Paisley Terrier": {
     name: "Paisley Terrier",
     note: "A silky, blue show terrier from around Paisley and Clydeside, the glamorous strain of the Skye that helped create the Yorkshire.",
+    /* A PLAYABLE LEVEL NEEDS TWO CIRCLES, 20 September 2026 (owner: a new dog
+       cannot come from just one parent). The one documented ancestor is drawn
+       twice, at the owner's own split. This must NOT be read as two ancestors.
+       Scope is playable levels only; the same shape elsewhere in this file was
+       deliberately left alone. */
     children: [
-      { name: "Skye Terrier stock", note: "The long-coated Scottish terriers it was bred for beauty from. Now endangered.", img: "/history/breeds/Isle-of-Skye-earth-dogs.jpg", value: 65 },
-      { name: "Old Highland Terriers", note: "The working Scottish terriers behind the silky Clydeside strains. Now extinct.", img: "/history/breeds/Old-Highland-terriers.jpg", value: 35 }
+      { name: "Old Scottish working Terriers", note: "The long-coated Scottish working terriers behind the silky Clydeside strains. Now extinct.", img: "/history/breeds/Isle-of-Skye-earth-dogs.jpg", value: 80 },
+      { name: "Old Scottish working Terriers", note: "The long-coated Scottish working terriers behind the silky Clydeside strains. Now extinct.", img: "/history/breeds/Isle-of-Skye-earth-dogs.jpg", value: 20 }
     ]
   },
 
@@ -1062,26 +1134,86 @@ const LINEAGE: Record<string, LineageNode> = {
     children: [
       { name: "Irish Terrier", note: "Small red Irish terriers in the early Trumpington stock.", img: "/history/breeds/irish-terrier-photo.jpg", value: 40 },
       { name: "Yorkshire Terrier", note: "A bigger silky terrier said to be in the early mix.", img: "/history/breeds/yorkshire-terrier-photo.jpg", value: 30 },
-      /* NO DOCUMENTED ANCESTRY ABOVE THIS, 19 September 2026 (owner). Recorded here
-         so nobody reopens it: this dog is a leaf on purpose, not a gap waiting to be
-         filled. It was on the research queue and has been researched.
+      /* IT IS NO LONGER A LEAF, 19 September 2026 (owner). The note that stood here
+         said "no documented ancestry sits above this" and recorded it as terminal
+         after research. That ruling asked the right question of the WRONG
+         POPULATION and the answer to that question has not changed: nothing is
+         written down above the Norfolk farm and Romani ratters themselves.
 
-         WHAT THE RECORD ACTUALLY IS. A regional working landrace, not a breed: the
-         small red ratters kept on Norfolk farms and by Romani families, chosen for
-         how fast they killed and never written down. There is no studbook, no
-         recorded mating and no named progenitor to attach. Its red carried into the
-         Norwich and the Norfolk, which is what it is here to say.
+         WHAT THE EARLIER PASS MISSED is that the sources name a SECOND population
+         feeding the same red stock, and that one is documented in detail. Jodrell
+         Hopkins of Trumpington Street, Cambridge, mated a brindle Aberdeen-type
+         Scottish Terrier bitch to a small red dog called Jack, recorded as having a
+         long silky coat. Their pup was Rags, who went to the master of the Norwich
+         Staghounds and is the founding sire of the breed. The Cambridge terriers he
+         came from are named in the literature as the Trumpington or Cantab
+         terriers.
 
-         WHAT WAS RULED OUT. The tempting move is Old British ratting Terriers, which
-         is the archive's deep terrier root and would graft in one line. It was not
-         taken. That node is the broad national ratting stock and this one is a LOCAL
-         East Anglian population named for its own county; hanging one off the other
-         would invent a descent the sources do not make, and it would say nothing the
-         Norwich's own ancestry does not already say through its other parents.
+         SO THE TWO PARENTS ARE THE TWO SIDES OF RAGS. Scottish Terrier stands for
+         the Aberdeen-type bitch, and Trumpington Terrier for the Cambridge stock
+         Jack belonged to and the pool the type was drawn from.
+
+         50/50, NOT A GUESS DRESSED AS A FIGURE. Rags had two parents and the
+         sources name one on each side, so an even split is the only honest reading
+         of what is recorded. Nothing says which contributed more.
+
+         WHAT IS STILL RULED OUT, and the earlier pass was right about it: hanging
+         this straight off Old British ratting Terriers. That node is the broad
+         national stock and this one is a local East Anglian population. Trumpington
+         reaches it instead, which is correct, because the Cambridge livery-stable
+         dogs really were general working terriers rather than a county landrace.
 
          ONE LINE REACHES THREE TREES. This is the only place the name is authored;
          Lucas Terrier and Norfolk Terrier reach it by grafting the Norwich. */
-      { name: "Local red ratting Terriers", note: "The small red working terriers of Norfolk farms and the Romani ratters. No documented ancestry sits above them. Now extinct.", img: "/history/breeds/Local-red-ratting-terriers.jpg", value: 30 }
+      { name: "Local red ratting Terriers", note: "The small red working terriers of Norfolk farms and the Romani ratters, and the Cambridge stock that made the founding sire. Now extinct.", img: "/history/breeds/Local-red-ratting-terriers.jpg", value: 30 }
+    ]
+  },
+
+  /* LOCAL RED RATTING TERRIERS GETS A RECORD OF ITS OWN, 19 September 2026
+     (owner). Authored here rather than inside the Norwich, so Norfolk Terrier and
+     Lucas Terrier reach the same ancestry by grafting rather than by repetition.
+     See the note in the Norwich record for the history and for why the split is
+     even. */
+  "Local red ratting Terriers": {
+    name: "Local red ratting Terriers",
+    note: "The small red working terriers of Norfolk farms and the Romani ratters, and the Cambridge stock that made the founding sire. Now extinct.",
+    img: "/history/breeds/Local-red-ratting-terriers.jpg",
+    children: [
+      { name: "Trumpington Terrier", note: "The Cambridge terriers the founding sire came out of. Now extinct.", img: "/history/breeds/trumpington-terrier.jpg", value: 50 },
+      { name: "Scottish Terrier", note: "The brindle Aberdeen-type bitch on the other side of that mating.", img: "/history/breeds/Scottish-Terrier.jpg", value: 50 }
+    ]
+  },
+
+  /* THE TRUMPINGTON TERRIER, added 19 September 2026 (owner).
+
+     A REAL NAMED DOG, not a type noun invented to fill a gap. Cambridge
+     undergraduates in the 1870s and 80s kept small terriers bought from a livery
+     stable on Trumpington Street as dorm ratters, and the literature calls them
+     Trumpington or Cantab terriers. Rags, the Norwich's founding sire, came out of
+     that scene. It is one of the better stories in the archive and it was sitting
+     one generation above a node recorded as terminal.
+
+     ITS OWN PARENT IS THE NATIONAL STOCK, and this is the one place that graft is
+     right: livery-stable terriers were general working dogs bought by the yard,
+     not a county landrace, which is exactly the distinction the Norwich's note
+     draws. Old British ratting Terriers carries its own ancestry beneath it, so
+     this reaches the deep terrier root in one edit.
+
+     THE ARTWORK IS ITS OWN NOW, 19 September 2026, later the same day. It was
+     authored wearing Local-red-ratting-terriers.jpg, its own descendant's picture,
+     because no Trumpington art existed, and that was flagged here rather than left
+     to be discovered. The picture was made and this record and its child node both
+     point at it. No file is shared between two names again. */
+  "Trumpington Terrier": {
+    name: "Trumpington Terrier",
+    note: "The small terriers Cambridge undergraduates kept as college ratters in the 1870s, bought from a livery stable on Trumpington Street. The founding sire of the Norwich came out of them. Now extinct.",
+    img: "/history/breeds/trumpington-terrier.jpg",
+    /* A PLAYABLE LEVEL NEEDS TWO CIRCLES, 20 September 2026 (owner: a new dog
+       cannot come from just one parent). The one documented ancestor is drawn
+       twice at 50 each. This must NOT be read as two separate ancestors. */
+    children: [
+      { name: "Old British ratting Terriers", note: "The general farm and stable ratting stock the livery-yard terriers were drawn from. Now extinct.", img: "/history/breeds/Old-British-ratting-terriers.jpg", value: 50 },
+      { name: "Old British ratting Terriers", note: "The general farm and stable ratting stock the livery-yard terriers were drawn from. Now extinct.", img: "/history/breeds/Old-British-ratting-terriers.jpg", value: 50 }
     ]
   },
 
@@ -1128,29 +1260,70 @@ const LINEAGE: Record<string, LineageNode> = {
     // Water spaniels branch here, so it reads as green. Its dominant 55% St John's
     // water-dog line still dead-ends until Family 5, which traces its principal
     // ancestry. A green Labrador does NOT mean its main line is finished.
-    // 19 August 2026: display device. The single documented ancestor below is
-    // drawn twice, as two identical children at 50 each (same note and img), so
-    // the level shows two circles rather than one filling the ring. The children
-    // differ in name from the parent, so isEcho, the pit words and the badge
-    // paths do not touch them. This must NOT be read as two separate ancestors.
+    /* IT HAS A REAL SECOND PARENT NOW, 19 September 2026 (owner: the water
+       spaniels look wrong, it is the same parent twice).
+
+       WHAT WAS HERE. The 19 August display device: ONE ancestor, the Otterhound,
+       drawn twice at 50 each so the level showed two circles instead of one
+       filling the ring. Two circles, one dog. The owner is right that it reads as
+       a cross and was not one.
+
+       AND THE SINGLE PARENT ITSELF DOES NOT HOLD. The 10 August family note above
+       this record roots the British and Irish water spaniels in the Otterhound as
+       a "functional match" on web feet and otter work, and says it is
+       "deliberately distinct from the land-spaniel Rache". CAIUS 1576 SAYS
+       OTHERWISE, and he is the source this archive already leans on elsewhere:
+       "There be two sortes. The first findeth game on the land. The other findeth
+       game on the water." Both are spaniels. The eighteenth century split ran land
+       spaniels, water spaniels and toy spaniels, one family, and a period
+       description has the water spaniels differing from the common spaniel "only
+       in the roughness of their coats".
+
+       SO THE SPANIEL IS THE MAIN LINE and the Otterhound is what it says it is:
+       the coat, the web feet and the water work, a functional contribution rather
+       than documented descent. That wording is kept on its node, unchanged.
+
+       60/40 (owner). Land Spaniels leads because Caius puts the water spaniel
+       inside the spaniel family rather than beside it.
+
+       OLD IRISH WATER DOGS STILL CARRIES THE DOUBLED OTTERHOUND. It is the same
+       shape and probably the same answer, but the Irish Water Spaniel's ancestry
+       is its own argument and was deliberately left for a separate look. */
     children: [
-      { name: "Otterhound", note: "The web-footed otter-hunting hound, the water-working Tudor root of the water spaniels. A functional match, not documented descent. Now endangered.", img: "/history/breeds/otterhound-photo.jpg", value: 50 },
-      { name: "Otterhound", note: "The web-footed otter-hunting hound, the water-working Tudor root of the water spaniels. A functional match, not documented descent. Now endangered.", img: "/history/breeds/otterhound-photo.jpg", value: 50 }
+      { name: "Land Spaniels", note: "The old English land-spaniel stock the water spaniels sat inside, differing from it mainly in the roughness of the coat. Now extinct.", img: "/history/breeds/original-land-spaniel.jpg", value: 60 },
+      { name: "Otterhound", note: "The web-footed otter-hunting hound, the water-working Tudor root of the water spaniels. A functional match, not documented descent. Now endangered.", img: "/history/breeds/otterhound-photo.jpg", value: 40 }
     ]
   },
+  /* THE IRISH WATER DOGS ARE SPANIELS, 20 September 2026 (owner). This record was
+     the Otterhound drawn twice under the 19 August display device, while its own
+     note called it the southern and northern WATER SPANIELS of Ireland. The record
+     said spaniel and the data said hound.
+
+     IT IS THE SAME FIX "Water Spaniels" had on 19 July, on Caius 1576, and this
+     record was missed by that pass. By this period the spaniels had already split
+     into land spaniels, later the Springer and Cocker, and water spaniels, which
+     included the Irish. Until the mid 19th century Ireland held two types, a
+     southern and a northern, and Justin McCarthy of Dublin unified them in the
+     1830s. That pair is exactly what this record is.
+
+     THE CONTINENTAL HALF IS REAL AND IT IS COUNTED HERE, ONCE. McCarthy spent time
+     on the continent and may have seen Barbets, and the modern breed carries
+     continental influence. That blood used to arrive twice, once here through the
+     Otterhound's own water line and once directly on Irish Water Spaniel below. It
+     is now on this record alone.
+
+     NO OTTERHOUND. Not one source found names an otterhound anywhere near the
+     Irish strains; the candidates are the Poodle, the Barbet, the Portuguese Water
+     Dog and the extinct English Water Spaniel. */
   "Old Irish water dogs": {
     name: "Old Irish water dogs",
-    note: "The southern and northern water spaniels of Ireland. Now extinct.",
-    // 19 August 2026: display device. The single documented ancestor below is
-    // drawn twice, as two identical children at 50 each (same note and img), so
-    // the level shows two circles rather than one filling the ring. The children
-    // differ in name from the parent, so isEcho, the pit words and the badge
-    // paths do not touch them. This must NOT be read as two separate ancestors.
+    note: "The southern and northern water spaniels of Ireland, joined into one breed in the 1830s. Now extinct.",
     children: [
-      { name: "Otterhound", note: "The web-footed otter-hunting hound, the same water-working Tudor root, reached in parallel with the British water spaniels. Now endangered.", img: "/history/breeds/otterhound-photo.jpg", value: 50 },
-      { name: "Otterhound", note: "The web-footed otter-hunting hound, the same water-working Tudor root, reached in parallel with the British water spaniels. Now endangered.", img: "/history/breeds/otterhound-photo.jpg", value: 50 }
+      { name: "Land Spaniels", note: "The old land-spaniel stock the water spaniels were split off from. Now extinct.", img: "/history/breeds/original-land-spaniel.jpg", value: 60 },
+      { name: "Old European water dogs", note: "The continental curly water dogs that gave the coat and the love of cold water. Now extinct.", img: "/history/breeds/Old-European-water-dogs.jpg", value: 40 }
     ]
   },
+
   "English Water Spaniel": {
     name: "English Water Spaniel",
     note: "The extinct native English water spaniel, a working water dog of the fens and rivers. Now extinct.",
@@ -1263,10 +1436,18 @@ const LINEAGE: Record<string, LineageNode> = {
   "Irish Water Spaniel": {
     name: "Irish Water Spaniel",
     note: "The tallest of the spaniels, a curly liver-brown water dog with a rat-like tail, one of Ireland's old gundog breeds.",
+    /* A PLAYABLE LEVEL NEEDS TWO CIRCLES, 20 September 2026 (owner: a new dog
+       cannot come from just one parent). The one documented ancestor is drawn
+       twice, at the owner's own split. This must NOT be read as two ancestors.
+       Scope is playable levels only; the same shape elsewhere in this file was
+       deliberately left alone. */
     children: [
-      { name: "Old Irish water dogs", note: "The southern and northern water spaniels of Ireland. Now extinct.", img: "/history/breeds/Old-Irish-water-dog.jpg", value: 55 },
-      // 19 August 2026: this extinct ancestor was wearing a photograph of a living descendant, the Poodle. Repointed to its own artwork.
-      { name: "Old European water dogs", note: "Continental curly water dogs that shaped the coat. Now extinct.", img: "/history/breeds/Old-European-water-dogs.jpg", value: 45 }
+      /* THE DIRECT CONTINENTAL EDGE IS GONE, 20 September 2026. This carried
+         "Old European water dogs" at 45 in its own right AND through its Irish
+         parent, so the same contribution arrived twice. It now arrives once,
+         inside Old Irish water dogs, which is where the sources put it. */
+      { name: "Old Irish water dogs", note: "The southern and northern water spaniels of Ireland, joined into one breed in the 1830s. Now extinct.", img: "/history/breeds/Old-Irish-water-dog.jpg", value: 60 },
+      { name: "Old Irish water dogs", note: "The southern and northern water spaniels of Ireland, joined into one breed in the 1830s. Now extinct.", img: "/history/breeds/Old-Irish-water-dog.jpg", value: 40 }
     ]
   },
 
@@ -1295,7 +1476,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "Once called the Wavy-Coated Retriever, the smart, glossy black gundog that was the gamekeeper's favourite before the Labrador rose.",
     children: [
       { name: "St John's Water Dog", note: "The Newfoundland fishing dog behind all the retrievers. Now extinct.", img: "/history/breeds/St-Johns-Water-Dog.jpg", value: 50 },
-      { name: "Setter", note: "Setter blood for feathering and a good nose. Now in-decline.", img: "/history/breeds/british-setters.jpg", value: 30 },
+      { name: "British Setters", note: "Setter blood for feathering and a good nose. Now in-decline.", img: "/history/breeds/british-setters.jpg", value: 30 },
       { name: "Water Spaniels", note: "Working water spaniels that added drive and a love of wet cover. Now extinct.", img: "/history/breeds/original-water-spaniel.jpg", value: 10 },
       { name: "Shepherd's Dogs", note: "Practical medieval working dog used to move and protect sheep, forming an early root of Britain's collie families. An extinct historical type.", img: "/history/breeds/medieval-shepherds-dog.jpg", value: 10 }
     ]
@@ -1376,13 +1557,6 @@ const LINEAGE: Record<string, LineageNode> = {
      Setters: after expandNode grafts, this node is valueless with a single child,
      and LineageMap collapses any such node into that child. Value 0 so leafSum is
      unchanged and no share moves. */
-  "Setter": {
-    name: "Setter",
-    note: "The setting dogs of the shooting field, bred to find birds and hold steady. Now in-decline.",
-    children: [
-      { name: "Land Spaniels", note: "The crouching land spaniels that marked game for the net, the stock every setter was built up from. Now extinct.", img: "/history/breeds/original-land-spaniel.jpg", value: 100 }
-    ]
-  },
 
   /* THE TRACKING HOUNDS GET A RECORD OF THEIR OWN (owner, 19 September 2026).
 
@@ -1423,24 +1597,165 @@ const LINEAGE: Record<string, LineageNode> = {
   "Old wirehaired fell Terriers": {
     name: "Old wirehaired fell Terriers",
     note: "The harsh-coated fox-working terriers of the northern fells, bred for grip and weather rather than looks. Now extinct.",
+    /* A PLAYABLE LEVEL NEEDS TWO CIRCLES, 20 September 2026 (owner: a new dog
+       cannot come from just one parent). The one documented ancestor is drawn
+       twice at 50 each. This must NOT be read as two separate ancestors. */
     children: [
-      { name: "Black and Tan Terrier", note: "The old black-and-tan working terrier the fell and Welsh terriers were bred from. Now extinct.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 100 }
+      { name: "Black and Tan Terrier", note: "The old black-and-tan working terrier the fell and Welsh terriers were bred from. Now extinct.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 50 },
+      { name: "Black and Tan Terrier", note: "The old black-and-tan working terrier the fell and Welsh terriers were bred from. Now extinct.", img: "/history/breeds/Old-English-Black-and-Tan-Terrier.jpg", value: 50 }
     ]
   },
 
   "Old scenting Hounds": {
     name: "Old scenting Hounds",
     note: "The tracking hounds of medieval lords, the scenting stock behind the bloodhound and the old hunting hounds. Now extinct.",
+    /* THE CRUSADER HOUNDS JOIN THE CELTIC STOCK, 19 September 2026 (owner). This
+       record had ONE ancestor at 100 and sits in SEVENTY-FIVE trees, which made it
+       the largest single-ancestor record in the archive and the first one taken
+       from that audit.
+
+       WHAT THE OWNER EXPECTED, AND WHAT THE RESEARCH FOUND. The instinct was
+       continental input carried over by aristocratic marriage. The mechanism is
+       right and the direction was not: the Norman route into Britain runs through
+       the St Hubert Hound, which in this archive already DESCENDS from this node,
+       so that would have been a cycle. This node is itself the continental stock,
+       as the St Hubert's own note says.
+
+       AND THE OBVIOUS SECOND PARENT WAS ALREADY BELOW IT. The Gaulish Segusian
+       that Arrian described, routinely called the prototype of the bloodhound and
+       the foxhound, sits under Celtic Scent Hound at 40 along with the Laconian.
+       Adding it here would have said the same thing twice.
+
+       THE CHIEN-GRIS IS THE ONE NON-CELTIC STREAM. The Grey Hound of Saint Louis
+       held the French royal packs almost exclusively from about 1250 to 1470, and
+       Charles IX recorded that Louis IX met them as a prisoner on Crusade and was
+       later given some. It is aristocratic movement carrying a bloodline west,
+       exactly the shape the owner expected, by Crusade rather than by marriage.
+
+       IT IS TRADITION, NOT PROOF, and the note says so. Medieval hunting writers
+       liked a remote pedigree and this one claimed Tartary. The same standing as
+       the Laconian claim carried on the St Hubert Hound, and phrased the same way.
+
+       75/25 (owner). The Celtic stock stays the main line because the Chien-gris
+       arrived in 1250 into a tracking stock already centuries old. */
     children: [
-      { name: "Celtic Scent Hound", note: "Early Celtic tracking hound that followed game by scent, representing the roots of later European scent hounds. An extinct historical type.", img: "/history/breeds/ancient-celtic-scent-hound.jpg", value: 100 }
+      { name: "Celtic Scent Hound", note: "Early Celtic tracking hound that followed game by scent, representing the roots of later European scent hounds. An extinct historical type.", img: "/history/breeds/ancient-celtic-scent-hound.jpg", value: 75 },
+      { name: "Chien-gris", note: "The grey hounds of the French royal packs, said to have come west with Louis IX from the Crusades. The old account rather than documented descent. Now extinct.", img: "/history/breeds/Chien-gris.jpg", value: 25 }
+    ]
+  },
+
+  /* THE CHIEN-GRIS, added 19 September 2026 (owner). The Gris de Saint-Louis, or
+     Dun Hound: the grey scent hounds that made up the royal packs of France almost
+     exclusively from about 1250 to 1470, larger than the St Hubert and preferred by
+     the kings for it, though reckoned the poorer nose of the two. Counted as the
+     ancestor of the French rough-coated Griffon breeds.
+
+     IT IS A LEAF, AND HONESTLY SO. Its own origin is the Crusade story and beyond
+     that a claim of Tartary, which is a medieval hunting writer's flourish rather
+     than anything that can be authored as a parent. The edge of the data, like the
+     Norse and continental Germanic leaves. */
+  "Chien-gris": {
+    name: "Chien-gris",
+    note: "The Grey Hound of Saint Louis, a large grey and tan scent hound that held the French royal packs from about 1250 to 1470. Now extinct.",
+    img: "/history/breeds/Chien-gris.jpg",
+    children: []
+  },
+
+  /* THE ST HUBERT HOUND GETS A RECORD OF ITS OWN (owner, 19 September 2026).
+
+     WHY IT MATTERS MOST. It was the widest gap in the archive: a player meets it
+     in more than two levels in five, 5 nodes across 70 trees, and it stopped dead
+     one generation in. This is a graft rather than a research job, because both
+     its parents were already here.
+
+     ITS DESCENT, and the two claims are not of equal weight, so the note says so.
+     The FCI's own standard for the breed records it as presumed to descend from
+     the black and black-and-tan pack hounds the monk Hubert hunted with in the
+     seventh century, and the abbey at Saint-Hubert was founded in 687 and became
+     a noted centre of hound breeding; the hound carried the name from about 1000
+     AD. That earlier continental stock is what Old scenting Hounds already is
+     here, so it takes the larger share.
+
+     THE LACONIAN IS THE TRADITIONAL ACCOUNT, NOT THE EVIDENCED ONE, and the owner
+     asked for it in knowing that. The line that St Hubert's hounds came down from
+     the Laconian or Spartan hound of Greece is repeated widely and is nineteenth
+     century cynology rather than documented descent. It is carried at the smaller
+     share and the note names it as tradition, which is the same treatment Land
+     Spaniels gives its own inferred roots.
+
+     NO NEW ARTWORK WAS NEEDED. Laconian tracking Hounds already appears in the
+     data with /history/greek-harehound.jpg.
+
+     THE BLOODHOUND IS NOT ITS SIBLING, checked rather than assumed. FCI Standard
+     84 is titled "Chien de Saint-Hubert (Bloodhound)", origin Belgium: they are
+     ONE breed, and "Bloodhound" is what the dog was called in England after the
+     Normans brought it over. So the existing shape, Bloodhound descending FROM
+     the St Hubert Hound, is right and is left alone. */
+  "St Hubert Hound": {
+    name: "St Hubert Hound",
+    note: "The abbey scent hound of the Ardennes, bred by the monks of Saint-Hubert and carried to England by the Normans, where it became the Bloodhound. Now extinct.",
+    img: "/history/breeds/St-Hubert-Hound.jpg",
+    children: [
+      { name: "Old scenting Hounds", note: "The heavy continental tracking stock the abbey built its hounds from. Now extinct.", img: "/history/breeds/Old-scenting-hounds.jpg", value: 70 },
+      { name: "Laconian tracking Hounds", note: "The keen-nosed hare-tracking hounds of ancient Greece. The old account has the abbey's hounds descending from them; it is tradition rather than documented descent. Now extinct.", img: "/history/greek-harehound.jpg", value: 30 }
+    ]
+  },
+
+  /* BRITISH SETTERS REACHES ITS STOCK (owner, 19 September 2026). It was held
+     back from the September setter work because its note is a temperament claim
+     about Victorian gundogs rather than a reference to old setting stock, so the
+     Land Spaniels argument did not obviously carry. The owner has now made the
+     call that it does.
+
+     THE SAME SHAPE AS "Setter" ABOVE, deliberately: Land Spaniels at 100, which
+     is the record Setter itself uses. It is not a single-parent chain in any
+     meaningful sense, because Land Spaniels carries Rache and Talbot beneath it,
+     so the full list resolves to three contributors and the medieval era. Giving
+     the two setter records different parents would have been the odd choice. */
+  /* "Setter" IS MERGED INTO THIS RECORD, 19 September 2026 (owner).
+
+     THEY WERE THE SAME DOG WRITTEN TWICE. Both carried Land Spaniels at 100 with
+     the same child note word for word, and both described the setting dogs of the
+     shooting field. British Setters was authored earlier the same day, so the
+     duplication is hours old rather than historic.
+
+     THIS NAME SURVIVES because "Setter" is a type noun rather than a dog, which
+     is the fault already recorded against it, and the same fault that closed
+     "British Pointers" this morning. The two child nodes that said Setter, in the
+     Flat-Coated Retriever and the Pointer, now say British Setters and graft
+     here.
+
+     OLD BLACK-AND-TAN SETTERS IS DELIBERATELY NOT MERGED, and this is the part
+     not to undo. It looks like a third copy because it also carries Land Spaniels
+     at 100, but it is a real black-and-tan strain worked in Britain before the
+     Duke of Gordon's kennels took the type, and it is the Gordon Setter's largest
+     parent at 65. Merging it would delete the one fact it exists to carry.
+
+     TWO IMAGE FILES FOR ONE DOG, NOT RESOLVED HERE. This record wears
+     setters.jpg and every child node wears british-setters.jpg. Both are in the
+     repo and both are this dog; worth a look, out of scope for a merge. */
+  "British Setters": {
+    name: "British Setters",
+    note: "The British setting dogs of the shooting field, bred to find birds and drop steady in front of them. Now in-decline.",
+    img: "/history/breeds/setters.jpg",
+    /* A PLAYABLE LEVEL NEEDS TWO CIRCLES, 20 September 2026 (owner: a new dog
+       cannot come from just one parent). The one documented ancestor is drawn
+       twice at 50 each. This must NOT be read as two separate ancestors. */
+    children: [
+      { name: "Land Spaniels", note: "The crouching land spaniels that marked game for the net, the stock every setter was built up from. Now extinct.", img: "/history/breeds/original-land-spaniel.jpg", value: 50 },
+      { name: "Land Spaniels", note: "The crouching land spaniels that marked game for the net, the stock every setter was built up from. Now extinct.", img: "/history/breeds/original-land-spaniel.jpg", value: 50 }
     ]
   },
 
   "Old black-and-tan Setters": {
     name: "Old black-and-tan Setters",
     note: "The black-and-tan setting dogs worked in Britain before the Duke of Gordon's kennels took the type up. Now extinct.",
+    /* A PLAYABLE LEVEL NEEDS TWO CIRCLES, 20 September 2026 (owner: a new dog
+       cannot come from just one parent). The one documented ancestor is drawn
+       twice at 50 each. This must NOT be read as two separate ancestors. */
     children: [
-      { name: "Land Spaniels", note: "The crouching land spaniels that marked game for the net, the stock every setter was built up from. Now extinct.", img: "/history/breeds/original-land-spaniel.jpg", value: 100 }
+      { name: "Land Spaniels", note: "The crouching land spaniels that marked game for the net, the stock every setter was built up from. Now extinct.", img: "/history/breeds/original-land-spaniel.jpg", value: 50 },
+      { name: "Land Spaniels", note: "The crouching land spaniels that marked game for the net, the stock every setter was built up from. Now extinct.", img: "/history/breeds/original-land-spaniel.jpg", value: 50 }
     ]
   },
 
@@ -1475,7 +1790,11 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "A 1920s revival of the older, longer-nosed toy spaniel of the Stuart court, bred back from the flat-faced King Charles Spaniel.",
     children: [
       { name: "King Charles Spaniel", note: "The modern flat-faced toy spaniel it was bred back from.", img: "/history/breeds/king-charles-spaniel-photo.jpg", value: 70 },
-      { name: "Old sporting toy Spaniels", note: "The longer-muzzled toy spaniels of older paintings. Now extinct.", img: "/history/breeds/Old-sporting-toy-spaniels.jpg", value: 30 }
+      /* THE SAME DOG THE KING CHARLES CAME FROM, and that is the point. The
+         Cavalier was bred BACK toward the old long-nosed type out of King Charles
+         kennels after Roswell Eldridge's 1926 Crufts prize, so King Charles leads
+         and the old stock follows. Renamed 20 September 2026 with the merge. */
+      { name: "Old Toy Spaniels", note: "The longer-muzzled toy spaniels of the older paintings, before the Victorians shortened the face. Now extinct.", img: "/history/breeds/Old-sporting-toy-spaniels.jpg", value: 30 }
     ]
   },
 
@@ -1637,62 +1956,104 @@ const LINEAGE: Record<string, LineageNode> = {
   // each stock per the split rule, Celtic Heeler pattern. The owner accepted
   // the surfacing scope deliberately: these stocks are shared, so the
   // foundation appears in twelve trees (docs/lineage/BRIEF.md section 5).
-  "Old Highland Terriers": {
-    name: "Old Highland Terriers",
-    note: "The old working-terrier stock of the Highlands that every Scottish terrier springs from. Now extinct.",
-    // 19 August 2026: display device. The single documented ancestor (Earth Dog)
-    // is drawn twice, as two identical children at 50 each (same note and img),
-    // so the level shows two circles rather than one filling the ring. The
-    // children differ in name from the parent, so isEcho, the pit words and the
-    // badge paths do not touch them. This must NOT be read as two separate
-    // ancestors.
+  /* ONE SCOTTISH STOCK AND ONE ENGLISH STOCK, 19 September 2026 (owner).
+
+     FOUR RECORDS BECOME TWO. "Old Highland Terriers" and "Skye Terrier stock"
+     were two names for one pool: before 1873 every terrier in Scotland was
+     called a Scottish Terrier, and the same dogs were also written up as
+     Highland Terriers, Skye Otter Terriers and Todhunters. "Old British ratting
+     Terriers" and "Earth and hunt terriers" were the English farm, stable and
+     go-to-ground stock under two names.
+
+     THEY ARE NOT MERGED INTO ONE, and that was the owner's revision to his own
+     earlier ruling of a single "Old British working terriers". The ratting line
+     took bull blood and became the Black and Tan and Manchester line; the earth
+     line did not. More plainly, one is Scotland and one is England, and the data
+     already agreed: not one parent in this file mixed the two groups. The
+     Scottish pair fed only Skye, Scottish, Paisley, Cairn and Dandie Dinmont;
+     the English pair fed only Black and Tan Terrier and Trumpington Terrier.
+
+
+     REVERSED IN PART, 20 September 2026 (owner). THE ENGLISH MERGE IS UNDONE and
+     the two English records are back. The Scottish merge below stands.
+
+     WHY. Levels 20 and 21 are the two English cards and the owner wants them to
+     read differently, at 50/50 and 60/40. One record holds one set of children,
+     so two splits need two records, and two records need two names. That is the
+     whole reason; it is a gameplay requirement, not a new historical finding.
+     The divergence between the ratting line and the earth line is a 19th century
+     one, downstream of these root nodes, so the sources do not settle it either
+     way at this depth.
+
+     AND IT FIXES Black and Tan Terrier for free: it goes back to two genuinely
+     different parents, 60 and 40, rather than one doubled one.
+
+     THE OLD NAMES RESOLVE HERE through LINEAGE_ALIASES, the same route
+     "Old English Black and Tan Terrier" has taken since 18 September. The three
+     history cards keep their own names, their own write-ups and their own
+     levels: 17, 20 and 21 still play and the running order does not move.
+
+     THE 19 AUGUST DISPLAY DEVICE GOES WITH THEM. Earth Dog was drawn twice under
+     each of these so a level showed two circles rather than one filling its
+     parent's ring. SOLO_CHILD_K now draws a lone child at half its parent's
+     radius, so the reason for the device is gone and what is left is a single
+     ancestor drawn as two, which reads as two contributions and is not true.
+     The same removal applies to the four parents below that listed two of these
+     four names and nothing else.
+
+     THE ONE PAIR THAT STAYS TWO is Cairn Terrier's. Its two entries carry
+     DIFFERENT notes, the island stock and the mainland Highland branch, so they
+     are two real contributions that share a name rather than a copy. This is the
+     pair subtreeSig is kept in data/lineageShape.ts to tell apart. Renamed, not
+     merged.
+
+     KNOWN CONSEQUENCES, recorded rather than discovered later:
+       Levels 20 and 21 now open the same tree. That undoes the 16 September
+       65/35 ruling, which existed only to stop those two reading alike.
+       The single-ancestor audit goes from 29 to 31. Those parents always had one
+       ancestor; two names were hiding it. The audit now tells the truth.
+       Skye Terrier stock was tagged endangered and Old Highland Terriers
+       extinct. One dog takes one status, and it is extinct.
+       The merged names take the MAJORITY picture, the rule used for the five
+       one-picture-per-dog merges of 16 September: Isle-of-Skye-earth-dogs.jpg
+       (6 uses against 3) and Old-British-ratting-terriers.jpg (5 against 2). */
+  "Old Scottish working Terriers": {
+    name: "Old Scottish working Terriers",
+    note: "The old working-terrier stock of the Highlands and the Western Isles that every Scottish terrier springs from. Now extinct.",
     children: [
-      { name: "Earth Dog", note: "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.", img: "/history/breeds/medieval-earth-dog.jpg", value: 50 },
-      { name: "Earth Dog", note: "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.", img: "/history/breeds/medieval-earth-dog.jpg", value: 50 }
-    ],
+      /* 70/30, the owner's figure for level 17, 20 September 2026. A new dog is
+         not to come from a single parent, so the one documented ancestor is
+         drawn twice at two weights. */
+      { name: "Earth Dog", note: "The old medieval earth-working dog type the Highland earth dogs go back to. Now extinct.", img: "/history/breeds/medieval-earth-dog.jpg", value: 70 },
+      { name: "Earth Dog", note: "The old medieval earth-working dog type the Highland earth dogs go back to. Now extinct.", img: "/history/breeds/medieval-earth-dog.jpg", value: 30 }
+    ]
   },
+
+  /* RESTORED 20 September 2026. Was merged into "Old English working Terriers"
+     on 19 September and split again the next day; see the ruling above. The
+     50/50 is the owner's figure for level 20, replacing the 16 September 65/35,
+     which existed to separate this level from level 21. The two are separated by
+     their splits again now, 50/50 here and 60/40 there. */
   "Old British ratting Terriers": {
     name: "Old British ratting Terriers",
     note: "The ancient ratting and vermin dogs kept on farms long before breeds were named. Now extinct.",
-    // 19 August 2026: display device. The single documented ancestor (Earth Dog)
-    // is drawn twice, as two identical children (same note and img), so the level
-    // shows two circles rather than one filling the ring. The children differ in
-    // name from the parent, so isEcho, the pit words and the badge paths do not
-    // touch them. This must NOT be read as two separate ancestors.
-    /* 65/35, NOT 50/50, 16 September 2026 (owner: 19 and 20 have the same lineage
-       and the same figures and need to be unique).
-
-       FOUR LEVELS used the same Earth Dog 50/50 signature: 16 Old Highland
-       terriers, this one, 20 Earth and hunt terriers and 29 Low-slung soldiers'
-       dogs. They look identical because they genuinely have one parent each and
-       all four use this same device. Level 20 keeps 50/50 and this one takes
-       65/35, which is what the owner asked for and which separates the two he
-       named.
-
-       SAID PLAINLY, BECAUSE IT WAS RAISED AND OVERRULED: this does not make the
-       ANCESTRY unique. It is still Earth Dog twice, now drawn at two sizes rather
-       than two equal ones. What it does do is stop levels 19 and 20 reading as
-       the same screen. Levels 16 and 29 still carry 50/50 and so still match
-       level 20. */
-    children: [
-      { name: "Earth Dog", note: "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.", img: "/history/breeds/medieval-earth-dog.jpg", value: 65 },
-      { name: "Earth Dog", note: "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.", img: "/history/breeds/medieval-earth-dog.jpg", value: 35 }
-    ],
-  },
-  "Earth and hunt terriers": {
-    name: "Earth and hunt terriers",
-    note: "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.",
-    // 19 August 2026: display device. The single documented ancestor (Earth Dog)
-    // is drawn twice, as two identical children at 50 each (same note and img),
-    // so the level shows two circles rather than one filling the ring. The
-    // children differ in name from the parent, so isEcho, the pit words and the
-    // badge paths do not touch them. This must NOT be read as two separate
-    // ancestors.
     children: [
       { name: "Earth Dog", note: "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.", img: "/history/breeds/medieval-earth-dog.jpg", value: 50 },
       { name: "Earth Dog", note: "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.", img: "/history/breeds/medieval-earth-dog.jpg", value: 50 }
     ],
   },
+  /* RESTORED 20 September 2026, with the owner's 60/40 for level 21. */
+  "Earth and hunt terriers": {
+    name: "Earth and hunt terriers",
+    note: "Hardy go-to-ground terriers used to bolt fox and badger. Now extinct.",
+    children: [
+      { name: "Earth Dog", note: "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.", img: "/history/breeds/medieval-earth-dog.jpg", value: 60 },
+      { name: "Earth Dog", note: "Small, determined hunting and vermin dog that followed quarry underground. An extinct historical type.", img: "/history/breeds/medieval-earth-dog.jpg", value: 40 }
+    ],
+  },
+
+
+
   // Playable like the two ancient additions above (owner instruction,
   // 4 August), same Celtic Heeler shape and section 7 rules. This record is
   // grafted inside the Talbot and Rache "Old scenting Hounds" branches,
@@ -1839,7 +2200,7 @@ const LINEAGE: Record<string, LineageNode> = {
        spaniels both descend from the Otterhound. */
     children: [
       { name: "Land Spaniels", note: "The old English land-spaniel stock that every working spaniel springs from. Now extinct.", img: "/history/breeds/original-land-spaniel.jpg", value: 70 },
-      { name: "Barbet water dogs", note: "The curly continental water dogs, named in the breed histories as the possible source of the rough coat. Now extinct.", img: "/history/breeds/Barbet-water-dogs.jpg", value: 30 },
+      { name: "Old European water dogs", note: "The curly continental water dogs, named in the breed histories as the possible source of the rough coat. Now extinct.", img: "/history/breeds/Old-European-water-dogs.jpg", value: 30 },
     ],
   },
   /* OLD BORDER TERRIERS REACH THE MEDIEVAL EARTH DOG, 15 September 2026 (owner:
@@ -1955,22 +2316,32 @@ const LINEAGE: Record<string, LineageNode> = {
       // Added 18 August 2026. The Anglo-Saxon layer is supported by Crabtree's
       // East Anglia zooarchaeology; the Norse layer by the Heath Wood strontium
       // study.
-      /* NO PROGENITOR, AND THAT IS THE ANSWER, 19 September 2026 (owner). Recorded here
-         so nobody re-opens it: this dog is a leaf on purpose.
+      /* IT HAS ITS PROGENITOR NOW, 19 September 2026 (owner). The note that stood
+         here said this dog was a leaf on purpose because its ancestor was
+         "continental Germanic herding stock, which this archive does not hold".
+         It is held as of today, so that half of the argument has gone. The other
+         half is kept below because it still stands. The ancestry itself is
+         authored in this file's own "Anglo-Saxon herding dogs" record, so this
+         node grafts and nothing is repeated.
 
-         IT WAS CHECKED AGAINST THE CELTIC STOCK AND RULED OUT. The obvious move is to
-         hang it off Celtic herdsmen's dogs, which is a root sitting as its own sibling
-         on this very line. That would be wrong. These three are PARALLEL ARRIVALS, each
-         added on 18 August with its own archaeology: the Celtic layer is the native
-         one, the Anglo-Saxon layer comes from Crabtree's East Anglia zooarchaeology, and
-         the Norse layer from the Heath Wood strontium study. An Anglo-Saxon dog came
-         over WITH the Anglo-Saxons, so its ancestor is continental Germanic herding
-         stock, which this archive does not hold. Making it a child of the Celtic dogs
-         would collapse the three-layer story this record was built to tell.
+         THE CELTIC STOCK IS STILL RULED OUT, and this is the part not to undo.
+         The obvious move has always been to hang this off Celtic herdsmen's dogs,
+         which sits as its own sibling on this very line, and it would be wrong.
+         These three are PARALLEL ARRIVALS, each added on 18 August with its own
+         archaeology: the Celtic layer is the native one, the Anglo-Saxon layer
+         comes from Crabtree's East Anglia zooarchaeology, and the Norse layer from
+         the Heath Wood strontium study. Making this a child of the Celtic dogs
+         would collapse the three-layer story the record was built to tell.
 
-         Norse settlers dogs beside it is a leaf for the same reason and in the same
-         twenty trees. Neither is a gap in the data; both are the edge of it. */
-      { name: "Anglo-Saxon herding dogs", note: "Collie-sized herding dogs of Anglo-Saxon England, found at West Stow and Brandon. They arrived with the Anglo-Saxons rather than descending from the native Celtic stock, and the continental herding dogs behind them are not recorded here. Now extinct.", img: "/history/breeds/anglo-saxon-herding-dogs.jpg", value: 20 },
+         A CONTINENTAL PARENT STRENGTHENS THAT STORY rather than weakening it: it
+         now says where the Anglo-Saxon layer arrived FROM, which is the whole
+         point of calling it an arrival. Do not let it become a descent from the
+         Celtic dogs by the back door.
+
+         NORSE SETTLERS DOGS BESIDE IT IS STILL A LEAF, for the same original
+         reason: its own continental parent, the Scandinavian herding stock, is not
+         held here. If that is ever authored, this is the pattern to follow. */
+      { name: "Anglo-Saxon herding dogs", note: "Collie-sized herding dogs of Anglo-Saxon England, found at West Stow and Brandon. They arrived with the Anglo-Saxons from the North Sea coast rather than descending from the native Celtic stock. Now extinct.", img: "/history/breeds/anglo-saxon-herding-dogs.jpg", value: 20 },
       { name: "Norse settlers dogs", note: "Scandinavian dogs brought over with Viking settlement, likely mixed into local herding stock. Now extinct.", img: "/history/breeds/viking-herding-spitz.jpg", value: 20 }
     ]
   },
@@ -2226,8 +2597,12 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Rough northern sighthounds",
     note: "Shaggy-coated coursing dogs built for cold, rough ground, the coarse-haired hunting hounds of the early Scots and Picts. Now extinct.",
     img: "/history/breeds/rough-northern-sighthounds.jpg",
+    /* A PLAYABLE LEVEL NEEDS TWO CIRCLES, 20 September 2026 (owner: a new dog
+       cannot come from just one parent). The one documented ancestor is drawn
+       twice at 50 each. This must NOT be read as two separate ancestors. */
     children: [
-      { name: "Celtic Coursing Hound", note: "Swift Celtic sight-hunting dog described by classical writers, the sighthound stock the northern rough-coated type was formed from. Now extinct.", img: "/history/breeds/ancient-celtic-coursing-hound.jpg", value: 100 },
+      { name: "Celtic Coursing Hound", note: "Swift Celtic sight-hunting dog described by classical writers, the sighthound stock the northern rough-coated type was formed from. Now extinct.", img: "/history/breeds/ancient-celtic-coursing-hound.jpg", value: 50 },
+      { name: "Celtic Coursing Hound", note: "Swift Celtic sight-hunting dog described by classical writers, the sighthound stock the northern rough-coated type was formed from. Now extinct.", img: "/history/breeds/ancient-celtic-coursing-hound.jpg", value: 50 },
     ],
   },
 
@@ -2368,6 +2743,33 @@ const LINEAGE: Record<string, LineageNode> = {
   // lapdogs; it reaches no era card and is not meant to. Mediterranean bichon
   // lapdogs is left a bare leaf for the same reason as Spitz-type dogs: no card
   // to reach, and rooting it in the Barbet line would be a false water-dog claim.
+  /* ONE OLD TOY SPANIEL, 20 September 2026 (owner). "Old sporting toy Spaniels"
+     is merged into this record and resolves here through LINEAGE_ALIASES.
+
+     THEY WERE ALREADY IDENTICAL IN THE DATA: both were Land Spaniels drawn twice
+     at 50, under the 19 August display device. Only the notes differed, one
+     calling them the Tudor and Stuart lap spaniels and the other the
+     longer-muzzled dogs of the older paintings.
+
+     THOSE ARE THE SAME ANIMAL. The toy spaniels in the sixteenth, seventeenth and
+     eighteenth century paintings by Titian, Van Dyck, Lely, Stubbs, Gainsborough,
+     Reynolds and Romney show flat heads, high-set ears, almond eyes and rather
+     pointed noses. In Tudor times they were the ladies' Comforter Spaniel; under
+     the Stuarts they took the royal name.
+
+     THE SHORT FACE IS A VICTORIAN EVENT, NOT A SECOND STOCK. By the mid 1800s the
+     breed had been altered to a domed skull, very short muzzle, laid-back nose and
+     undershot jaw, following the fashion for Asian flat-faced toys, and by 1900 the
+     King Charles had become the English Toy Spaniel. The long-nosed dog was all but
+     extinct by the mid 1920s. So "longer-muzzled" describes this record at an
+     earlier date, not a different ancestor.
+
+     AND THE DATA ALREADY PUTS THAT CHANGE IN THE RIGHT PLACE: King Charles Spaniel
+     carries "Asian flat-faced toy dogs" at 40, which is exactly where the flat face
+     belongs. No Asian blood goes on this record; these are the pre-Asian dogs.
+
+     BOTH CARDS SURVIVE. Levels 34 and 77 keep their own names, notes and artwork
+     and both still play, the same route "Old English Black and Tan Terrier" takes. */
   "Old Toy Spaniels": {
     name: "Old Toy Spaniels",
     note: "The small sporting and lap spaniels of Tudor and Stuart England. Now extinct.",
@@ -2381,19 +2783,7 @@ const LINEAGE: Record<string, LineageNode> = {
       { name: "Land Spaniels", note: "The old sporting land-spaniel stock the court toy spaniels were bred down from. Now extinct.", img: "/history/breeds/original-land-spaniel.jpg", value: 50 }
     ]
   },
-  "Old sporting toy Spaniels": {
-    name: "Old sporting toy Spaniels",
-    note: "The longer-muzzled toy spaniels of the older paintings. Now extinct.",
-    // 19 August 2026: display device. The single documented ancestor below is
-    // drawn twice, as two identical children at 50 each (same note and img), so
-    // the level shows two circles rather than one filling the ring. The children
-    // differ in name from the parent, so isEcho, the pit words and the badge
-    // paths do not touch them. This must NOT be read as two separate ancestors.
-    children: [
-      { name: "Land Spaniels", note: "The old sporting land-spaniel stock behind the toy spaniels. Now extinct.", img: "/history/breeds/original-land-spaniel.jpg", value: 50 },
-      { name: "Land Spaniels", note: "The old sporting land-spaniel stock behind the toy spaniels. Now extinct.", img: "/history/breeds/original-land-spaniel.jpg", value: 50 }
-    ]
-  },
+
   "Asian flat-faced toy dogs": {
     name: "Asian flat-faced toy dogs",
     note: "The oriental toy blood, pug and eastern lapdog, that shortened the toy spaniel's muzzle. Now extinct.",
@@ -2418,7 +2808,7 @@ const LINEAGE: Record<string, LineageNode> = {
       { name: "English Foxhound", note: "Stamina, drive and a steady temperament.", img: "/history/breeds/english-foxhound.jpg", value: 30 },
       { name: "Greyhound", note: "Speed and a racy, galloping build.", img: "/history/breeds/original-greyhound.jpg", value: 25 },
       { name: "Bloodhound", note: "A deeper nose for finding game.", img: "/history/breeds/modern-bloodhound.jpg", value: 25 },
-      { name: "Setter", note: "Setting-dog blood for style and steadiness. Now in-decline.", img: "/history/breeds/british-setters.jpg", value: 20 }
+      { name: "British Setters", note: "Setting-dog blood for style and steadiness. Now in-decline.", img: "/history/breeds/british-setters.jpg", value: 20 }
     ]
   },
 
@@ -2570,7 +2960,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Bichon Frise",
     note: "A fluffy white charmer of the Mediterranean bichon family, carried between ports by sailors and later a favourite in the French court.",
     children: [
-      { name: "Barbet water dogs", note: "The curly Barbet, the water dog the little 'barbichon' dogs were bred down from. Now extinct.", img: "/history/breeds/Barbet-water-dogs.jpg", value: 50 },
+      { name: "Old European water dogs", note: "The curly Barbet, the water dog the little 'barbichon' dogs were bred down from. Now extinct.", img: "/history/breeds/Old-European-water-dogs.jpg", value: 50 },
       { name: "Mediterranean Bichon lapdogs", note: "The old white lapdogs of Malta, Bologna and Tenerife that make up the bichon family. Now extinct.", img: "/history/breeds/Mediterranean-bichon-lapdogs.jpg", value: 50 }
     ]
   },
@@ -2587,18 +2977,62 @@ const LINEAGE: Record<string, LineageNode> = {
   // British or water link at all). The combined-node split job, when it runs,
   // attaches its Barbet-type / Poodle-type outputs onto THIS terminal; it does
   // not need rewriting.
+  /* THE TRAIL STOPS HERE, 20 September 2026 (owner). This record had ONE parent,
+     the Otterhound, at 100, described in its own note as "a functional match, not
+     documented descent". A German and French water dog descending from an English
+     hound is backwards, and it was also the edge that made a cycle: this record ->
+     Otterhound -> Rough water dogs -> Barbet water dogs, which is this record
+     again once the two names are merged. Removing it kills the loop before the
+     merge rather than after.
+
+     WHY NOTHING REPLACES IT. The likeliest reading is that the European water dog
+     is an old shaggy herding landrace that specialised into water work: the same
+     stock produced the Poodle, the Lagotto, the Barbet and the Iberian water dogs,
+     was bred down into the bichons, and kept its herding branch in dogs like the
+     Bearded Collie and the Polish Lowland Sheepdog. Germany still has a landrace
+     called a sheep-poodle. But that is a described TYPE, not a named dog, and the
+     sources disagree flatly about where it entered Europe: North African stock
+     through Iberia with the Moors, or Asian herding stock moving west. Portuguese
+     and Spanish water dogs are agreed to share a common ancestor with the Poodle,
+     and the direction of travel between them is itself disputed.
+
+     So this is now one of the file's open roots, like the other deep ancestors
+     with nothing authored behind them. A parent is one edit away whenever the
+     evidence settles. */
   "Old European water dogs": {
     name: "Old European water dogs",
-    note: "The rough water-retrieving dogs of Germany and France that fetched waterfowl for hunters. Now extinct.",
-    children: [
-      { name: "Otterhound", note: "The web-footed water-working hound, the Tudor root shared with the water spaniels: one water card for both water lines. A functional match, not documented descent. Now endangered.", img: "/history/breeds/otterhound-photo.jpg", value: 100 }
-    ]
+    note: "The pan-European water dog: England's Great Water Dog, Germany's Pudelhund, France's Barbet. Most likely an old shaggy herding stock that took to the water, though where it first came from is still argued over. Now extinct.",
   },
   "Fishermen's water dogs": {
     name: "Fishermen's water dogs",
     note: "The working water dogs the European fishing crews brought across the Atlantic. Now extinct.",
+    /* THE PORTUGUESE FLEET GETS NAMED, 19 September 2026 (owner). This record was
+       a single parent at 100; it is now a split.
+
+       WHY IT EARNED ITS OWN NODE. The St John's water dog is described in the
+       sources as a random-bred mix of old English, Irish and Portuguese working
+       dogs, and the Portuguese are the one of those three the archive did not
+       name. The English and continental side is this record and Old European water
+       dogs; the Irish side is already here as Old Irish water dogs. Portugal was
+       the gap, and its crews had been fishing the Grand Banks since the fifteenth
+       century, which is longer than anyone else on that list.
+
+       THE SIBLING NOW MEANS "THE REST OF IT". Portugal is in Europe, so Old
+       European water dogs has to be read as the remaining continental stock rather
+       than as all of it. Its note is unchanged because it already says "the old
+       continental water-dog stock they came from", which is still true of what is
+       left once the Portuguese are lifted out. If that ever stops reading clearly,
+       that note is the thing to sharpen, not this split.
+
+       60/40, AND IT IS A JUDGEMENT. Nothing in the sources weighs the three
+       national stocks against each other. 60 keeps the bulk with the wider
+       continental pool, since the Portuguese were one named fleet among several,
+       and 40 is generous to them because they were the longest established on
+       those banks. Change the pair if the reading changes; they are the only two
+       numbers here. */
     children: [
-      { name: "Old European water dogs", note: "The old continental water-dog stock they came from. Now extinct.", img: "/history/breeds/Old-European-water-dogs.jpg", value: 100 }
+      { name: "Old European water dogs", note: "The old continental water-dog stock they came from. Now extinct.", img: "/history/breeds/Old-European-water-dogs.jpg", value: 60 },
+      { name: "Portuguese fishing dogs", note: "The curly-coated water dogs of the Portuguese cod fleets, on the Grand Banks since the fifteenth century. Now extinct.", img: "/history/breeds/Portuguese-fishing-dogs.jpg", value: 40 }
     ]
   },
   "St John's Water Dog": {
@@ -2614,8 +3048,12 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Poodle",
     note: "Now a clever companion and show dog, but built as a water-retrieving gundog. The name comes from the German 'Pudel', meaning to splash about.",
     children: [
-      { name: "Old European water dogs", note: "The rough water-retrieving dogs of Germany and France that fetched waterfowl for hunters. Now extinct.", img: "/history/breeds/Old-European-water-dogs.jpg", value: 55 },
-      { name: "Barbet water dogs", note: "The curly-coated continental Barbet, an old European water dog and the root of the poodle line. A modelled half of the pair, not a recorded mating. Now extinct.", img: "/history/breeds/Barbet-water-dogs.jpg", value: 22.5 },
+      /* ONE DOG, COUNTED ONCE, 20 September 2026. This carried BOTH names as
+         separate parents, 55 and 22.5, which is 77.5% of the Poodle spent twice on
+         the same animal. They are one dog under two local names, so the two shares
+         are added rather than one being dropped: nothing is lost, it is just no
+         longer double-counted. */
+      { name: "Old European water dogs", note: "The pan-European water dog, Germany's own Pudelhund, from which the Poodle takes its name. Now extinct.", img: "/history/breeds/Old-European-water-dogs.jpg", value: 77.5 },
       { name: "Water Spaniels", note: "The British working water-spaniel branch crossed in alongside them, listed separately from the water dogs by Caius in 1576. Now extinct.", img: "/history/breeds/original-water-spaniel.jpg", value: 22.5 }
     ]
   },
@@ -2624,27 +3062,64 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Pug",
     note: "A comical, flat-faced toy from ancient China, bred as a companion for emperors before Dutch traders carried it to Europe.",
     children: [
-      /* THE LO-SZE IS THE PUG'S NAMED ANCESTOR (owner, 19 September 2026). Three
-         flat-faced types were bred in China, the Lion dog, the Pekingese and the
-         Lo-sze, and the Lo-sze was the ancient Pug: at the Song imperial court, and
-         carried to Europe in the sixteenth century by the Dutch East India Company.
+      /* THE LO-SZE WAS ADDED AND THEN REMOVED ON THE SAME DAY, 19 September 2026
+         (owner). It sat here as a named generation between the Pug and Ancient
+         Chinese toy dogs: the ancient flat-faced Pug of the Song imperial court,
+         carried to Europe in the sixteenth century by the Dutch East India
+         Company. The history is sound and the note was accurate.
 
-         BETWEEN, NOT INSTEAD OF. It goes above the Pug and below Ancient Chinese toy
-         dogs, which is the broader stock it came out of. Replacing that node would
-         lose a generation; replacing the Lo-sze with it would lose the name. The 60
-         it inherits is unchanged, so no share moves. */
-      { name: "Lo-sze", note: "The ancient flat-faced Pug of the Song imperial court, carried to Europe by Dutch traders in the sixteenth century. Now extinct.", img: "/history/breeds/Ancient-Chinese-toy-dogs.jpg", value: 60 },
+         WHY IT WENT. It is a name almost nobody meets, it had no artwork of its
+         own and borrowed its parent's picture, and its own record carried exactly
+         one child at 100%, which an audit of all 171 records flagged as one of
+         only four single-parent chains in the archive. The owner's call was that
+         a generation the reader cannot place is not worth the depth.
+
+         NOTHING ELSE HAD TO MOVE. The name appeared in this file and nowhere
+         else: no LINEAGE_ALIASES entry, no breedInfo record, nothing in
+         lineageShape.ts. The 60 below is the share the Lo-sze was carrying, so
+         Ancient Chinese toy dogs simply takes back the slot it held before this
+         morning and no percentage changes anywhere.
+
+         IF IT IS EVER RESTORED, it goes BETWEEN the two, not instead of either:
+         replacing Ancient Chinese toy dogs would lose the broader stock, and
+         replacing the Lo-sze with it is exactly what this edit does. */
+      { name: "Ancient Chinese toy dogs", note: "The old Chinese flat-faced lapdogs kept in the imperial court alongside the Pekingese and lion dogs. Now extinct.", img: "/history/breeds/Ancient-Chinese-toy-dogs.jpg", value: 60 },
       { name: "Eastern Lion dogs", note: "The wider family of small eastern companion dogs it shares its roots with. Now extinct.", img: "/history/breeds/Tibetan-temple-dogs.jpg", value: 40 }
     ]
   },
-  /* See the note on the Pug for why the Lo-sze sits where it does. Its own parent is
-     the broader Chinese court stock it was bred out of, and the echo is load-bearing:
-     data/lineageShape.ts. Value 0, so no share moves. */
-  "Lo-sze": {
-    name: "Lo-sze",
-    note: "The ancient flat-faced Pug of the Song imperial court, carried to Europe by Dutch traders in the sixteenth century. Now extinct.",
+
+  /* CARRIAGE GUARD DOGS REACHES THE POINTER, 19 September 2026 (owner).
+
+     WHAT THIS RECORD IS. The Dalmatian's own ancestor: the road dogs kept to run
+     with the horses and mind the coach. It was one of only two named dead ends in
+     the archive that were not ancient progenitors, and the owner asked for it to
+     be closed.
+
+     THE CLAIM, AND ITS STANDING, because the two are not the same thing. The
+     Dalmatian's origin is one of the most contested in canine history. The FCI
+     gives Croatia; church records from Dakovo document a "Canis Dalmaticus" in
+     1719; and the breed as we know it was made in England, where virtually every
+     modern Dalmatian traces to British stock. The ancestry usually repeated is
+     "certain breeds of pointers and a spotted Great Dane", which is nineteenth
+     century cynology rather than documented descent, in the same class as the
+     Laconian claim carried on the St Hubert Hound.
+
+     SO THE NOTE SAYS SO. The owner's call is to record the pointer half, and it is
+     recorded as what it is: the usual account, not a proven line. The Great Dane
+     half is NOT taken, deliberately, because it was not asked for; the record
+     exists in this archive if it is ever wanted, and adding it would make this a
+     two-parent split rather than the single line below.
+
+     WHAT IS NOT CLAIMED. Nothing here says the Dalmatian came out of Britain, only
+     that the road dogs behind it carry pointer blood. The Egyptian frescoes and
+     the King Cheops story are left out entirely: they are unverified and the
+     archive does not trade in them. */
+  "Carriage guard dogs": {
+    name: "Carriage guard dogs",
+    note: "The road dogs kept to run with the horses and mind the coach, the job the Dalmatian was made for. Now extinct.",
+    img: "/history/breeds/Carriage-guard-dogs-Stallpinscher-escorts.jpg",
     children: [
-      { name: "Ancient Chinese toy dogs", note: "The old Chinese flat-faced lapdogs kept in the imperial court alongside the Pekingese and lion dogs. Now extinct.", img: "/history/breeds/Ancient-Chinese-toy-dogs.jpg", value: 100 }
+      { name: "Pointer", note: "Pointer blood is the ancestry usually given for the spotted coach dogs. It is the traditional account rather than documented descent. Now in-decline.", img: "/history/breeds/british-pointers.jpg", value: 100 }
     ]
   },
 
@@ -2843,6 +3318,14 @@ const LINEAGE_ALIASES: Record<string, string> = {
      is gone and the name resolves here, so anything still written that way, in the
      data, on a history card or in an old link, reaches the one record. */
   "Old English Black and Tan Terrier": "Black and Tan Terrier",
+  // Merged 20 September 2026; see the ruling beside "Old Toy Spaniels".
+  "Old sporting toy Spaniels": "Old Toy Spaniels",
+  /* THE FOUR TERRIER NAMES, 19 September 2026. Two Scottish and two English
+     records became one each; see the ruling beside "Old Scottish working Terriers".
+     The three history cards still carry the old names and reach the merged
+     record through here, so levels 17, 20 and 21 are untouched. */
+  "Old Highland Terriers": "Old Scottish working Terriers",
+  "Skye Terrier stock": "Old Scottish working Terriers",
   // SUPERSEDED 14 August 2026. The two Talbot spellings ("Talbot hounds",
   // "Talbot hound") used to appear as child nodes across many trees and were
   // aliased here so their branches grafted onto the Talbot's own ancestry.
@@ -2874,18 +3357,43 @@ const LINEAGE_ALIASES: Record<string, string> = {
      progenitor. Now it grafts, which lengthens the progenitor list of every
      tree it sits in and rescales the shares beneath it. tests/lineage guards the
      property that matters, that every list still totals exactly 100%. */
+  /* THE WAVY-COATED RETRIEVER IS THE FLAT-COATED RETRIEVER, 19 September 2026
+     (owner). The same dog under its older name: the Flat-Coated Retriever's own
+     note opens "Once called the Wavy-Coated Retriever", and the Wavy node in the
+     Golden Retriever tree already wears flatcoated_retriever-photo.jpg. So the
+     ancestry was present all along and simply unreachable, exactly the case the
+     block above describes.
+
+     ALIASED RATHER THAN RENAMED, which is the one difference from the Talbot and
+     Old setting spaniels entries. Tweedmouth's foundation dog was a yellow
+     WAVY-coated retriever in the 1860s, and "Flat-Coated" is the later show name,
+     so renaming the node would put a Victorian ring name into an 1860s breeding
+     record. The cost is that the rarity tier counts the two names separately;
+     the owner took that trade knowingly. */
+  /* Kept as a no-op, 19 September 2026, the same way the Talbot spellings are:
+     the node itself has been renamed to Pointer in the data, so nothing reaches
+     this today, but an older spelling returning still grafts rather than becoming
+     a fresh dead end. */
+  "Setter": "British Setters",
+  "British Pointers": "Pointer",
+  "Wavy-Coated Retriever": "Flat-Coated Retriever",
   "Old setting spaniels": "Land Spaniels",
   "Wire Fox Terrier": "Fox Terrier",
   "Deerhound": "Scottish Deerhound",
   "Norwich terrier stock": "Norwich Terrier",
-  "Highland mainland terriers": "Skye Terrier stock",
+  // Retargeted 19 September 2026: aliasName resolves ONE level, so this had to
+  // move with "Skye Terrier stock" or it would have reached a deleted record.
+  "Highland mainland terriers": "Old Scottish working Terriers",
   "Continental water dogs": "Old European water dogs",
   "Farm and kitchen curs": "Cur",
   "White English Terrier": "Old English White Terrier",
   "Old heeler stock": "Celtic Heeler",
   "Collie or working dog": "Old working collies",
   // duplicates rather than aliases: one dog, two spellings
-  "Barbet-type water dogs": "Barbet water dogs",
+  // Retargeted 20 September 2026 with the Barbet merge; aliasName resolves ONE
+  // level, so this would otherwise reach a name with no record.
+  "Barbet-type water dogs": "Old European water dogs",
+  "Barbet water dogs": "Old European water dogs",
   "Spitz-type dogs": "Ancient Spitz dogs",
 };
 function aliasName(name: string): string {

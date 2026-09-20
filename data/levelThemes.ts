@@ -105,11 +105,11 @@ const THEMES: Record<string, LevelTheme> = {
 
        An empty list is not the same as no list, but it behaves the same way
        here: propsFor tests theme.props?.length, so [] falls through to null and
-       the pit uses DEFAULT_PROPS, the stick and the big stick, exactly as the
+       the pit builds its prop slot from the band table below, exactly as the
        ancient and medieval eras already do.
 
-       Mobile never saw these anyway. The per-level table below beats propsFor
-       outright at 768px and under, on the reversed decision of 31 August. This
+       Mobile never saw these anyway. The per-level table that used to beat
+       propsFor at 768px and under is gone, replaced by the bands below. This
        only changes desktop. */
     props: [],
   },
@@ -144,8 +144,9 @@ export function levelThemeFor(era?: string): LevelTheme | null {
    point is that the two can be switched independently.
 
    Returns null when there is nothing specific to say, and the pit falls back to
-   its own DEFAULT_PROPS. Ordering is most specific first: the named level, then
-   the era, then nothing. */
+   the band table below. Ordering is most specific first: the named level, then
+   the era, then the bands. No era defines a prop set today, so in practice the
+   bands decide. */
 const PROPS_ENABLED = true;
 export function propsFor(era?: string, levelName?: string): string[] | null {
   if (!PROPS_ENABLED) return null;
@@ -158,75 +159,59 @@ export function propsFor(era?: string, levelName?: string): string[] | null {
 }
 
 /* ===========================================================================
-   THE MOBILE PER-LEVEL TOY TABLE
-   31 August 2026, owner's list, transcribed and checked against the running
-   order before it was written here.
+   THE TOY BANDS
+   19 September 2026, owner's rule. This REPLACES the per-level mobile table of
+   31 August, which is deleted rather than kept alongside.
 
-   MOBILE ONLY. Desktop is untouched and keeps DEFAULT_PROPS, plus the era sets
-   above where propsFor supplies them. Everything in this table applies at
-   768px and below, which is the same test the pit uses for its own sizes.
+   WHY THE OLD TABLE HAD TO GO, and it is worth recording because it is the
+   reason this exists. It keyed toys by LEVEL NUMBER. Level numbers come from a
+   findIndex into a filtered, sorted list, so adding one play dog shifted every
+   entry after it by one. It had already drifted: on 19 September the running
+   order was measured against the table's own comments and every entry from 11
+   upward named the dog BELOW the one it fed, entries 8, 9 and 10 were scrambled
+   among themselves, and key 29 named a dog that is not a level at all. A rule
+   that reads the tree cannot drift, because nothing has to be transcribed.
 
-   REVERSED DECISION, recorded rather than quietly applied: earlier in the same
-   session the call was "Tudor props win on mobile", then "lose all Tudor
-   props". The second one stands. So on mobile this table beats propsFor
-   entirely, and the Tudor levels (23 to 34) get what is written here rather
-   than newspaper, fork and shoe. SUPERSEDED 15 September 2026: desktop no
-   longer gets the Tudor set either, since the owner removed those three props.
+   ONE TABLE, DESKTOP AND MOBILE. The old one was mobile only and desktop kept
+   DEFAULT_PROPS on every level. Both now read this.
 
-   LEVELS ARE ONE BASED HERE. Level 1 is Celtic Hound, the first level of the
-   campaign. Note that the pit PAINTS it as "00", because levelNo comes from a
-   findIndex and is zero based. The caller adds the one. Getting this backwards
-   shifts every entry by a dog, which is why it is spelled out.
+   THE COUNT IS EVERY DRAWN CIRCLE IN THE LEVEL'S TREE, root excluded and hidden
+   echo copies excluded: the same predicate the renderer uses to decide what is
+   on screen (BreedTree, displayRestView). Measured across the 92 play levels it
+   runs 2 to 408. Do NOT confuse it with the depth 1 to 2 count in
+   pitFullGraceMs, which is a different measure for a different job and tops out
+   at 14.
 
-   AN EMPTY ARRAY MEANS DELIBERATELY NOTHING, and is not the same as having no
-   entry at all. A level with no entry (2 and 10) falls through to the pit's own
-   DEFAULT_PROPS and keeps both sticks. Ten levels below are deliberately bare.
+   THE BANDS, and how many levels sit in each as measured on 19 September:
 
-   FRAGILE BY NATURE. These are positions, not names, so adding a play level or
-   changing a breed's anchor shifts everything after it. MOBILE_PROPS_LEVELS is
-   the count this table was written against; the pit checks it and shouts in
-   development if the running order has moved underneath it. */
-export const MOBILE_PROPS_LEVELS = 92;
-/* From this level to the end: one stick, nothing else. */
-const MOBILE_PROPS_TAIL_FROM = 30;
-const MOBILE_PROPS_TAIL: string[] = ["stick"];
-const MOBILE_PROPS: Record<number, string[]> = {
-  1: ["stick", "bowl"],           // Celtic Hound
-  // 2 Ancient Mastiff: no entry, keeps both sticks
-  3: ["stick"],                   // Celtic Coursing Hound
-  4: ["stick"],                   // Celtic Scent Hound
-  5: ["stick"],                   // Livestock Dog
-  6: ["stick"],                   // Old British bandogs
-  7: ["stick", "bowl"],           // Celtic Heeler
-  8: ["stick", "stickBig", "bowl"], // Shepherd's Dog
-  9: ["stick"],                   // Drover's Dog
-  // 10 Earth Dog: no entry, keeps both sticks
-  11: [],                         // Scottish Deerhound
-  12: ["stick", "bowl"],          // Rache
-  13: [],                         // Talbot
-  14: [],                         // Buckhound
-  15: ["stick", "bowl"],          // Southern Hound
-  16: [],                         // Old Highland terriers
-  17: [],                         // Old working collies
-  18: ["stick", "bowl"],          // Welsh herding dogs
-  19: ["stick", "stickBig", "bowl"], // Old British ratting terriers
-  20: ["stick", "bowl"],          // Earth and hunt terriers
-  21: [],                         // Old English Black and Tan Terrier
-  22: [],                         // Land spaniels
-  23: [],                         // Old Welsh land spaniels
-  24: ["stick"],                  // Basset and heavy hounds
-  25: ["stick", "bowl"],          // Old English Bulldog
-  26: [],                         // Skye Terrier
-  27: [],                         // English Foxhound
-  28: ["stick", "stickBig", "bowl"], // Otterhound
-  29: ["stick", "stickBig", "bowl"], // Low-slung soldiers' dogs
-};
+     under 8 circles    every toy            11 levels
+     under 12           every toy but bowl    5 levels
+     under 20           the two balls, bone   9 levels
+     20 and over        bone only            67 levels
 
-/* The mobile answer for ONE BASED level `level`.
-   Returns null when this table has nothing to say, and the caller falls back to
-   its own default. Returns an empty array when the level is deliberately bare. */
-export function mobilePropsForLevel(level?: number): string[] | null {
-  if (level === undefined || !Number.isFinite(level) || level < 1) return null;
-  if (level >= MOBILE_PROPS_TAIL_FROM) return MOBILE_PROPS_TAIL;
-  return MOBILE_PROPS[level] ?? null;
+   THE BONE IS IN EVERY BAND, deliberately (owner: the bone should always drop).
+   It is the floor of the scale, not a band of its own.
+
+   ORDER IS NOT TIMING. Each toy keeps its own beat in the pit's arming
+   sequence; this only decides which ones are armed at all. */
+export const ALL_TOYS: string[] = [
+  "bone", "stickBig", "ball", "ballPink", "cookies", "flag", "slipper", "bowl",
+];
+
+type ToyBand = { under: number; toys: string[] };
+/* Read in order, first match wins. The last entry has no ceiling. */
+const TOY_BANDS: ToyBand[] = [
+  { under: 8,        toys: ALL_TOYS },
+  { under: 12,       toys: ALL_TOYS.filter((t) => t !== "bowl") },
+  { under: 20,       toys: ["ball", "ballPink", "bone"] },
+  { under: Infinity, toys: ["bone"] },
+];
+
+/* The toys for a level holding `circles` drawn circles. Always returns a list:
+   the last band has no ceiling, so every level is covered. A count that has not
+   been measured yet falls to the smallest set rather than to the largest, so a
+   pit can never arm the full eight by accident. */
+export function toysForCircles(circles?: number): string[] {
+  if (circles === undefined || !Number.isFinite(circles) || circles < 0) return ["bone"];
+  return (TOY_BANDS.find((b) => circles < b.under) ?? TOY_BANDS[TOY_BANDS.length - 1]).toys;
 }

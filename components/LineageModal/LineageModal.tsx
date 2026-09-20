@@ -137,7 +137,13 @@ type Props = {
      event that advances the banked total. The score is passed rather than read
      upstream so the two can never be a render out of step. */
   onBankScore?: (s: number) => void;
-  onNextLevel?: () => void;
+  /* NOW CARRIES THE BUTTON'S OWN RECT, 19 September 2026 (owner: on the Next
+     Level route the object drops from the middle of the page and is the wrong
+     shape). It took no argument, so BreedStrip built the next level with no
+     fromRect and TimeTunnel fell back to a 160 by 200 box at the screen centre.
+     That one omission is both faults: the wrong place and the wrong aspect.
+     Optional, so a caller that does not care can still pass a bare handler. */
+  onNextLevel?: (rect?: { x: number; y: number; w: number; h: number }) => void;
   /* START SCREEN NAVIGATION (2 Sept 2026). Straight pass-through to BreedTree.
      BreedStrip owns the campaign list and supplies these; undefined means there
      is nowhere to go in that direction, which the pit shows as a dimmed control.
@@ -782,6 +788,9 @@ export default function LineageModal({ name, image, character, lineage, fromRect
           onPitBusy={setPitBusy}
           registerShake={(fn) => { shakeFnRef.current = fn; }}
           registerSlowmo={(fn) => { slowmoFnRef.current = fn; }}
+          /* The pit owns the snail now, so it tells us. This drives ONE thing,
+             the score drain at four points a second: see slowmoDrainRef. */
+          onSlowmoChange={(on) => setSlowmo(on)}
           onToggleCaption={() => setCaptionOpen((o) => !o)}
           /* NOTHING TO PAUSE, NOTHING TO CONFIRM. The X used to raise the
              PAUSED panel unconditionally, including on the learn and start
@@ -862,35 +871,34 @@ export default function LineageModal({ name, image, character, lineage, fromRect
         )}
       </div>
 
-      {/* Slow motion, straight from the main pit: snail icon, sits above shake.
-          Quarter speed while active, navy while on. */}
-      {running && (
-        <>
-        <button
-          type="button"
-          className={`${css.slowmo}${slowmo ? " " + css.slowmoActive : ""}${pitBusy ? " " + css.pitCtlAway : ""}`}
-          onClick={() => { slowmoFnRef.current?.(); setSlowmo((s2) => !s2); }}
-          aria-label={slowmo ? "Normal speed" : "Slow motion"}
-        >
-          <img src="/svg-snail-icon.svg" alt="" aria-hidden="true" className={css.slowmoIcon} />
-        </button>
+      {/* THE SNAIL AND THE JELLY MOVED INTO THE PIT, 19 September 2026 (owner: they
+         should be objects within the pit, fixed in position, so no other object
+         can fall behind them).
 
-        {/* Shake button, straight from the pit: jelly icon, bottom right */}
-        <button
-          type="button"
-          className={`${css.shake}${pitBusy ? " " + css.pitCtlAway : ""}`}
-          onClick={(e) => {
-            shakeFnRef.current?.();
-            const el = e.currentTarget;
-            el.classList.add(css.shakeFlash);
-            window.setTimeout(() => el.classList.remove(css.shakeFlash), 300);
-          }}
-          aria-label="Shake the pit"
-        >
-          <span className={css.shakeIcon} aria-hidden="true" />
-        </button>
-        </>
-      )}
+         WHAT WAS HERE. Two position: fixed DOM buttons at z-index 30, pinned to
+         the bottom corners of the viewport, faded out by .pitCtlAway whenever a
+         chain was being drawn or a circle lifted. They sat ABOVE the pit rather
+         than in it, which is exactly the fault: things fell behind them.
+
+         WHERE THEY ARE NOW. Two entries in BreedTree's uiBodiesRef, beside the
+         close X, the brain and the logo: real physics bodies, solid, anchored to
+         the stage so they pan and zoom with the pit. See the UiKind note there
+         for why they alone never give way on the fifth knock.
+
+         WHAT CAME WITH THEM, AND WHAT DID NOT:
+           the fade on a busy pit is GONE. A solid body cannot fade without
+           leaving an invisible wall, and the reason it existed was that the
+           buttons floated over the gesture. They no longer do.
+           the score drain STAYS HERE. `slowmo` below still gates it at four
+           points a second; BreedTree now reports the toggle through
+           onSlowmoChange instead of this button setting it.
+           slowmoFnRef and shakeFnRef STAY REGISTERED. Nothing in this file calls
+           them now, but they are the same functions the in-pit objects call, and
+           the registration is what makes that one implementation rather than two.
+
+         The .slowmo, .shake, .slowmoIcon, .shakeIcon, .slowmoActive, .shakeFlash
+         and .pitCtlAway rules are left in the stylesheet on purpose: putting these
+         back is this block and no styling work. */}
 
       {/* Tapping a related dog offers its page, gated by the same leave-game
           confirm so a stray tap never drops the player out mid-round. */}
@@ -1105,7 +1113,16 @@ export default function LineageModal({ name, image, character, lineage, fromRect
                   clamps. */}
               <div className={css.winFoot}>
                 {goReady && (nextLevelLabel && onNextLevel ? (
-                  <button type="button" className={`${css.endBtnGo} ${css.winGo}`} onClick={onNextLevel}>Next Level</button>
+                  <button type="button" className={`${css.endBtnGo} ${css.winGo}`} onClick={(e) => {
+                    /* The rect is read off the button at the moment it is pressed,
+                       which is the only moment it is certainly on screen and in its
+                       final position. Same shape as the history card's own capture
+                       in BreedStrip.
+                       NOT A JSX COMMENT ABOVE THIS TAG: it sits in a ternary
+                       branch, where two children would need a fragment. */
+                    const r = e.currentTarget.getBoundingClientRect();
+                    onNextLevel?.({ x: r.x, y: r.y, w: r.width, h: r.height });
+                  }}>Next Level</button>
                 ) : (
                   // Last level, so there is nothing to go on to. The way out has
                   // to come back, or the player is stuck on this screen.

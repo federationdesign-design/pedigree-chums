@@ -304,6 +304,14 @@ const SOLO_LINE_H = 0.95;
    line count. One word per line, so a six word name gets half the type a three
    word one does. That is the cost of breaking per word and it is his call. */
 const SOLO_TILT_DEG = 15;   // leans DOWN to the right, the opposite way to the circle labels
+/* DOES A SOLO DOG'S LOOSE CARD DRAW AS A WORD, 19 September 2026 (owner: the text
+   object that pops out of the lifted circle should be the dog's circle image).
+
+   FALSE, so it draws its picture like every other card. The word branch below and
+   soloWordFit are kept and are simply not reached: they carry the invisible grab
+   surface and the line-fitting maths, and rebuilding those to restore the word
+   later would be real work for no reason. One constant to flip. */
+const SOLO_DRAWS_AS_WORD = false;
 function soloWordFit(name: string, H: number): { lines: string[]; fs: number } {
   const lines = name.split(/\s+/).filter(Boolean);
   return { lines, fs: H / (lines.length * SOLO_LINE_H) };
@@ -1894,6 +1902,10 @@ export default function LineageMap({
 
   // long names wrap to a second line via the shared splitName (see ./splitName):
   // the pill grows in depth, the corner radius stays fixed so the shape holds.
+  /* See the long note at the pill gate below. True means every node on the lift
+     wears its name at rest, which is the owner's call of 19 September 2026 and
+     brings pill-on-pill overlap with it. False restores the on-demand pill. */
+  const LIFT_STANDING_PILLS = true;
   const tagLines = circular ? splitName(breed.name) : [breed.name];
   const tagW = Math.max(...tagLines.map((l) => l.length)) * 9.5 + 28 + (tagLines.length > 1 ? 14 : 0);
   const tagH = tagLines.length > 1 ? 60 : 32;
@@ -2166,6 +2178,11 @@ export default function LineageMap({
     })
     .filter((c) => c.img);
   // images successfully placed in a frame -- turns their node green
+  /* THE PLACED CARDS, DERIVED ONCE, 19 September 2026. Two layers draw from it
+     now, the cards themselves and the corner marker layer that follows them, and
+     they must agree exactly or a card could show without its markers. Hoisted
+     rather than repeated so the collectRef read that decides it happens once. */
+  const placedCards = pickCards.filter((c) => cardFrame.has(c.id) && !collectRef.current && !stackedIds.has(c.id));
   const placedImgs = new Set(pickCards.filter((c) => placedSet.has(c.id)).map((c) => c.img));
   // Duplicate cards of one breed stack at the same spot; only the top of each
   // stack (the last in order) shows its status dot, % pill and info icon.
@@ -2468,6 +2485,58 @@ export default function LineageMap({
     if (!soloLeaf || !circular || !root) return;
     setOpen((prev) => { const s = new Set(prev); s.add(root._id); return s; });
   }, [soloLeaf, circular, root]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  /* AND ITS ONE CARD PLACES ITSELF, 19 September 2026 (owner: the image should
+     add to the frame without any action from the user, and the button should be
+     the green Complete rather than the blue Learn, completing in one click).
+
+     THIS IS STAGE ONE OF THREE AND IT IS MEANT TO DELIVER ALL THREE. The button
+     is not touched here, deliberately. `complete` is already `allBlue || packed`,
+     and that is what swaps the pill to the green tick and makes it the obvious
+     action. The blue Learn is on screen only because a solo dog arrives with its
+     single card UNPLACED, so allBlue is false. Place the card and allBlue goes
+     true on its own, the existing green button appears, and its existing
+     one-click path runs. No second completion path is added, which was the whole
+     reason for doing it in this order.
+
+     IF THE BUTTON DOES NOT FOLLOW, that theory is wrong and the next step is to
+     read what allBlue actually measures rather than to force the label.
+
+     IT REUSES THE INSTRUCTIONAL BRANCH'S MOVE, the three writes revealStep
+     already makes to place a card: picked, pinned and dragPos together. Same
+     geometry, same order. Nothing new is invented here.
+
+     WHY IT IS SAFE TO RUN ONCE. A solo dog has exactly one child and exactly one
+     frame, so there is no choosing and nothing to collide with. The guard ref
+     stops it re-running if the effect fires again on a re-pack.
+
+     IT WAITS FOR framesDone. The frame it places into does not exist until the
+     grid is laid out, and placing before that puts the card at a position the
+     layout then moves. */
+  const soloPlaced = useRef(false);
+  useEffect(() => {
+    if (!soloLeaf || !circular || !root || !framesDone) return;
+    if (soloPlaced.current) return;
+    const n = shown.find((x) => x.img && x._parent && !picked.has(x._id));
+    if (!n) return;
+    soloPlaced.current = true;
+    const sh = n._parent ? Math.round((n._leaves / (n._parent as Node)._leaves) * 100) : 100;
+    const rr = nodeR(sh), dd = rr + 10 + CW / 2;
+    const px1 = n._x + Math.cos(n._dir ?? 0) * dd, py1 = n._y + Math.sin(n._dir ?? 0) * dd;
+    /* THE WRITES LAND ON A LATER TICK, on purpose. Setting state synchronously in
+       an effect body is an error under this file's eslint config and the baseline
+       is not to be added to. The same requestAnimationFrame wrap is used by the
+       boneFuse effect in BreedTree for exactly this reason, and its note explains
+       it. It also happens to be correct here rather than merely quiet: the frame
+       geometry these three writes depend on is measured during the render this
+       effect runs after. */
+    const raf = requestAnimationFrame(() => {
+      setPicked((prev) => { const s = new Set(prev); s.add(n._id); return s; });
+      setPinned((m) => { const x = new Map(m); x.set(n._id, { img: n.img as string, name: n.name, note: n.note ?? "", share: sh, mix: sh, status: null }); return x; });
+      setDragPos((m) => { const x = new Map(m); x.set(n._id, { x: px1, y: py1 }); return x; });
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [soloLeaf, circular, root, framesDone, shown]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!INSTR_NAMES.has(breed.name) || !framesDone) return;
@@ -4067,11 +4136,31 @@ export default function LineageMap({
                       style={(!(n.img && (placedImgs.has(n.img as string) || packed)) && seen.has(n._id)) ? {fill:(rarityTier ? RARITY_BAND[rarityTier].fg : "#ffffff"),...(INSTR_NAMES.has(breed.name)?{fontFamily:'"Luckiest Guy",system-ui,sans-serif',fontWeight:400}:{})} : INSTR_NAMES.has(breed.name)?{fontFamily:'"Luckiest Guy",system-ui,sans-serif',fontWeight:400}:undefined}>
                       {INSTR_NAMES.has(breed.name) ? (n.value ?? "") : `${share}%`}
                     </text>
-                    {/* ON THE LIFT THE PILL IS ON DEMAND: drawn only for the node
-                        being touched, and nothing at rest. Every other mode keeps
-                        its standing name, so this gate is the only difference.
-                        See namedNode for the measurement behind it. */}
-                    {(hasKids || !autoExposed.has(n._id)) && !(circular && n.name === breed.name) && (!circular || namedNode === n._id) ? (() => {
+                    {/* STANDING PILLS ARE BACK ON THE LIFT, 19 September 2026 (owner),
+                        REVERSING the 18 September ruling. That ruling made the lift's
+                        pill ON DEMAND, drawn only for the node being touched and
+                        nothing at rest, and the comment that stood here said so.
+
+                        WHY IT WAS TURNED OFF, because this is the part worth keeping.
+                        Standing pills on the lift mean fitting about 129px of name
+                        into about a 60.7px gap, which no placement rule can do. Two
+                        were built and both failed: pillPlacement, which ran each
+                        pill out radially along its node's own slot, and before that a
+                        four-candidate scorer weighing the card, the nodes, the pills,
+                        the connectors and the viewport. See the note at the deleted
+                        pillPlacement for the full account.
+
+                        THE OVERLAP IS ACCEPTED, EXPLICITLY. The owner has asked for
+                        every name standing and has taken the overlap that comes with
+                        it. Pills WILL cross each other and cross the connectors on a
+                        busy lift; that is not a fault to be quietly fixed, it is the
+                        trade that was chosen. Do not respond to it by building a
+                        third placement pass.
+
+                        LIFT_STANDING_PILLS IS THE ONE FLIP. Setting it false restores
+                        the on-demand behaviour exactly, and namedNode still feeds the
+                        gate, so nothing else has to be put back. */}
+                    {(hasKids || !autoExposed.has(n._id)) && !(circular && n.name === breed.name) && (!circular || LIFT_STANDING_PILLS || namedNode === n._id) ? (() => {
                       // The pill is drawn at nodePillWidth, the SAME width the
                       // placement spaces siblings on, so the picture and the spacing
                       // can never drift. It matches the pit pill exactly. (The root
@@ -4531,7 +4620,17 @@ export default function LineageMap({
                     }}
                   >
                   <g className={styles.pickWobble}>
-                  {isSelfCard(c.name) ? (() => {
+                  {/* THE SOLO DOG'S LOOSE CARD IS ITS PICTURE NOW, 19 September 2026
+                      (owner). It used to draw as a big tilted WORD, the same way the
+                      pit draws a loose solo dog, and the branch below is what did it.
+
+                      isSelfCard is now false everywhere this decides the render, so
+                      a solo dog takes the ordinary image branch and reads as its
+                      circle picture from the moment it pops out. The word branch is
+                      kept, unreached, because it carries the grab-surface rect and
+                      the fit maths that would have to be rebuilt to restore it.
+                      Flip this one constant to bring it back. */}
+                  {SOLO_DRAWS_AS_WORD && isSelfCard(c.name) ? (() => {
                     // The block is as tall as the card was, and as wide as it likes.
                     const f = soloWordFit(c.name, CW);
                     const y0 = -((f.lines.length - 1) * SOLO_LINE_H * f.fs) / 2;
@@ -4574,7 +4673,12 @@ export default function LineageMap({
                   {/* No ring on a self card. The word IS the object, exactly as
                       it is in the pit, so a circle round it would be the small
                       card coming back. */}
-                  {!INSTR_NAMES.has(breed.name) && !isSelfCard(c.name) && <rect x={c.cardX-CW/2} y={c.cardY-CW/2} width={CW} height={CW} rx={circular ? CW/2 : 15} vectorEffect="non-scaling-stroke" /* THREE STATES ON THE CARD'S OWN RIM, 16 September 2026 (owner). White while it is
+                  {/* AND THE RING COMES BACK WITH THE PICTURE, 19 September 2026. It
+                      was suppressed on a self card because "the word IS the object"
+                      and a circle round a word would have been the small card
+                      returning. With the picture there instead, the rim is what makes
+                      it read as a card and says its rarity tier. */}
+                  {!INSTR_NAMES.has(breed.name) && !(SOLO_DRAWS_AS_WORD && isSelfCard(c.name)) && <rect x={c.cardX-CW/2} y={c.cardY-CW/2} width={CW} height={CW} rx={circular ? CW/2 : 15} vectorEffect="non-scaling-stroke" /* THREE STATES ON THE CARD'S OWN RIM, 16 September 2026 (owner). White while it is
    loose and being dragged, YELLOW once it is in a frame but copies of it are still
    out, GREEN when every copy is home. A dog that appears once goes straight from
    white to green, because the first placement is also the last.
@@ -4905,7 +5009,10 @@ className={[
         });
       })}
       {/* Placed cards rendered as position:fixed HTML -- completely immune to SVG pan */}
-      {pickCards.filter((c) => cardFrame.has(c.id) && !collectRef.current && !stackedIds.has(c.id)).map((c) => {
+      {/* ONE LIST, TWO LAYERS, 19 September 2026. The corner markers below render
+          from the very same array, so a card can never appear without its markers
+          or the other way round. */}
+      {placedCards.map((c) => {
         const ff2 = cardFrame.get(c.id)!;
         const left = ff2.sx - CW / 2;
         const top = ff2.sy - CW / 2;
@@ -5047,6 +5154,62 @@ className={[
 
                NON-CIRCULAR ONLY. The circular branch places these off RIM_IN on the
                lifted layer and is untouched. */}
+            {/* THE THREE CORNER MARKERS HAVE MOVED OUT OF THE CARD, 19 September
+                2026 (owner). They are rendered in one layer after every card, just
+                below this map's closing brace. See the note there for why. */}
+          </div>
+        );
+      })}
+      {/* ===== THE CORNER MARKER LAYER, 19 September 2026 (owner) ==============
+          The status dot, the info "i" and the percentage pill used to be children
+          of each placed card. They are now one layer of their own, rendered after
+          every card, so nothing a card draws can paint over them.
+
+          THE FAULT IT FIXES, and it is the second time this exact bug has been
+          hit. Each card carries transform: rotate(cardDeg), and a transform
+          creates a stacking context, so a marker's zIndex only ever ranked it
+          INSIDE its own card. On the lifted layer the info button sits at
+          RIM_IN - 14, which on a phone-sized card is about MINUS 5, so it
+          deliberately straddles the circle's rim and overhangs the card's box.
+          That overhanging sliver landed in the NEIGHBOUR's box, and the
+          neighbour, later in the DOM, painted its white rim straight across it.
+          On screen that is a white cross through the blue "i".
+
+          THE 16 SEPTEMBER FIX SOLVED THIS FOR THE NON-CIRCULAR GRID by pulling
+          the markers inside the card at a flat inset of 4, and its own comment
+          says "NON-CIRCULAR ONLY. The circular branch places these off RIM_IN on
+          the lifted layer and is untouched." This is that untouched branch.
+
+          WHY A LAYER AND NOT ANOTHER CLAMP. Clamping was offered and declined:
+          on a circle the marker is MEANT to straddle the rim at 45 degrees, and
+          pulling it inside would have made the lifted layer look like the flat
+          grid. A layer keeps the geometry exactly as designed and removes the
+          only reason it failed.
+
+          HOW IT STAYS IN REGISTER. Each wrapper repeats the card's own box, the
+          same left, top, CW and rotate(cardDeg) about the same centre, so every
+          marker keeps the exact offsets it had. If the card's position or tilt
+          ever changes, this has to change with it: they are two copies of one
+          layout and nothing enforces that they agree.
+
+          POINTER EVENTS. The wrapper is `none` so it cannot swallow a tap meant
+          for the card underneath, and the two interactive markers turn it back on
+          for themselves. The dot never was interactive. ==================== */}
+      {placedCards.map((c) => {
+        const ff3 = cardFrame.get(c.id)!;
+        const left = ff3.sx - CW / 2;
+        const top = ff3.sy - CW / 2;
+        return (
+          <div
+            key={`marks-${c.id}`}
+            style={{
+              position: bounded ? "absolute" : "fixed", left, top, width: CW, height: CW,
+              transform: `rotate(${cardDeg}deg)`,
+              transformOrigin: "center",
+              pointerEvents: "none",
+              zIndex: 66,
+            }}
+          >
             {/* status dot top-left, inside */}
             {isTopOfStack(c) && !PACK_BREEDS.has(c.name) && !INSTR_NAMES.has(breed.name) && (() => {
               const ts = TAG_STYLE[c.status ?? "extinct"];
@@ -5057,7 +5220,7 @@ className={[
             {/* info icon top-right, inside: see the corner-marker note above */}
             {isTopOfStack(c) && !INSTR_NAMES.has(breed.name) && (breedInfo[c.name] || c.note) && (
               <button
-                style={{ position: "absolute", right: circular ? RIM_IN - 14 : 4, top: circular ? RIM_IN - 14 : 4, width: 28, height: 28, border: "2px solid #fff", borderRadius: "50%", background: "var(--blue-deep, #0c5b92)", color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", padding: 0, fontStyle: "italic", fontWeight: 700, fontSize: 14, fontFamily: "Georgia, serif", zIndex: 65 }}
+                style={{ position: "absolute", right: circular ? RIM_IN - 14 : 4, top: circular ? RIM_IN - 14 : 4, width: 28, height: 28, border: "2px solid #fff", borderRadius: "50%", background: "var(--blue-deep, #0c5b92)", color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", padding: 0, fontStyle: "italic", fontWeight: 700, fontSize: 14, fontFamily: "Georgia, serif", zIndex: 65, pointerEvents: "auto" }}
                 onClick={(e) => { e.stopPropagation(); if (infoHover === c.id) { setInfoHover(null); } else { closeAll(); setInfoHover(c.id); } }}
                 onPointerDown={(e) => e.stopPropagation()}
               >i</button>
@@ -5071,7 +5234,7 @@ className={[
                 <div
                   onClick={(e) => { e.stopPropagation(); if (pctHover === c.id) { setPctHover(null); } else { closeAll(); setPctHover(c.id); } }}
                   onPointerDown={(e) => e.stopPropagation()}
-                  style={{ position: "absolute", ...(circular ? { left: "50%", transform: "translateX(-50%)", bottom: -12 } : { right: 4, bottom: 2 }), background: "var(--navy, #0a3a57)", color: "#ffd23e", borderRadius: 12, padding: "2px 8px", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "Montserrat, system-ui", zIndex: 64, boxShadow: "0 1px 4px rgba(0,0,0,0.35)" }}
+                  style={{ position: "absolute", ...(circular ? { left: "50%", transform: "translateX(-50%)", bottom: -12 } : { right: 4, bottom: 2 }), background: "var(--navy, #0a3a57)", color: "#ffd23e", borderRadius: 12, padding: "2px 8px", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "Montserrat, system-ui", zIndex: 64, boxShadow: "0 1px 4px rgba(0,0,0,0.35)", pointerEvents: "auto" }}
                 >
                   {pillTxt}
                 </div>
@@ -5119,12 +5282,41 @@ className={[
            measured, so the raw anchor is used exactly as before and the clamp
            takes effect on the next render. */
         const M = 8;                       // keep-off margin from every edge
-        const bw = pctSize?.w ?? 288;      // 288 is the maxWidth set below
+        /* THE WIDTH IS DECIDED HERE AND WRITTEN ONTO THE BOX, 19 September 2026
+           (owner: opening this from a card near the right edge squeezes the box to
+           about a third of its width and stretches it nearly the full height).
+
+           THE FAULT WAS A STABLE FEEDBACK LOOP, not a missing clamp. The box
+           carried maxWidth and no WIDTH, and it is absolutely positioned with only
+           `left` set, so it shrink-to-fits against whatever room is left to its
+           right. Near the right edge that is about 200px, so:
+             frame 1  pctSize is null by design, the clamp does not run, the raw
+                      anchor is used and the box wraps to a narrow column
+             then     it is measured, and bw becomes that SQUEEZED width
+             frame 2  the clamp reads left = min(left, vp.w - bw - M), and with bw
+                      at 200 rather than 288 the limit sits 88px further right, so
+                      the box barely moves and stays squeezed
+           It settles into the wrong answer instead of correcting, which is why it
+           never recovers however many frames pass.
+
+           SO THE WIDTH IS NO LONGER MEASURED. bw is what the box is TOLD to be and
+           the same figure is written to the style below, so it cannot shrink-to-fit
+           and the clamp is right on the FIRST frame, before any measurement. 288 is
+           the old maxWidth, kept; the vp.w term is the narrow-viewport guard, where
+           288 plus two margins would not fit.
+
+           THE HEIGHT IS STILL MEASURED, and has to be: the box runs from about 120
+           to 500 tall depending on how many generations the breed lists, which is
+           not knowable up front. That is what the note on pctBoxRef describes and
+           it is unchanged. Only the width stopped being a question. */
+        const bw = Math.min(288, Math.max(160, vp.w - M * 2));
         const bh = pctSize?.h ?? 0;
         let left = c.cardX - CW / 2 + pan.x;
         let top = c.cardY + CW / 2 + 6 + pan.y;
+        // The horizontal clamp no longer waits for a measurement, because bw is
+        // known. Only the vertical flip below still needs pctSize.
+        left = Math.max(M, Math.min(left, vp.w - bw - M));
         if (pctSize) {
-          left = Math.max(M, Math.min(left, vp.w - bw - M));
           if (top + bh > vp.h - M) {
             const above = c.cardY - CW / 2 - 6 - bh + pan.y;
             top = above >= M ? above : Math.max(M, vp.h - bh - M);
@@ -5176,7 +5368,10 @@ className={[
             onMouseEnter={pctKeep}
             onMouseLeave={pctClose}
             style={{
-              position: bounded ? "absolute" : "fixed", left, top, maxWidth: 288, zIndex: 100, pointerEvents: "auto", /* pct-close: hoverable so it can self-dismiss */
+              /* width, NOT maxWidth: see the note by bw above. A maxWidth alone lets
+                 this box shrink-to-fit against the right edge, which is the whole
+                 fault. The same figure the clamp used, so the two cannot disagree. */
+              position: bounded ? "absolute" : "fixed", left, top, width: bw, zIndex: 100, pointerEvents: "auto", /* pct-close: hoverable so it can self-dismiss */
               background: "rgba(10, 58, 87, 0.92)", color: "#ffffff",
               /* 11px ON SCREEN, 19 September 2026 (owner), matching the learn area's
                  blue card. Written as the size it LANDS at and divided by the overlay's

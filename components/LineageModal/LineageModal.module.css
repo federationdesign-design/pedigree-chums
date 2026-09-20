@@ -47,6 +47,15 @@
   width: var(--tp);
   height: var(--tp);
   flex: none;
+  /* A WHITE RING ROUND THE TICK, 19 September 2026 (owner). The dog's portrait it
+     replaces reads as a disc against the green because a photograph always
+     differs from its background; a green tick on a green screen has no edge of
+     its own, so it is given one.
+     2.5px matches the .titleStatus dot's own white rim in weight, which is the
+     only other white outline in this header.
+     border-box is already set above, so the ring eats into the padding rather
+     than growing the circle: the tick stays exactly the size the portrait was. */
+  border: 2.5px solid #ffffff;
 }
 .titleDone svg { width: 100%; height: 100%; display: block; }
 .overlayDone {
