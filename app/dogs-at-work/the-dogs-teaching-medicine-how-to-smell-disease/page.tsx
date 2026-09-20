@@ -153,7 +153,7 @@ const CARDS: ArticleCard[] = [
       <div className={styles.sidebarCard}>
         <div style={{ padding: "32px 40px 52px" }}>
           <p className={styles.cardTitle2}>Sources</p>
-          <p className={styles.cardBody2} style={{ fontSize: "0.987rem" }}>
+          <p className={`${styles.cardBody2} ${styles.cardSources}`}>
             <strong>Parkinson&apos;s study</strong> - University of Bristol (2025).<br />
             <strong>Cancer detection &amp; NHS trials</strong> - Medical Detection Dogs.<br />
             <strong>Bladder-cancer proof of principle</strong> - <em>BMJ</em>, September 2004.
