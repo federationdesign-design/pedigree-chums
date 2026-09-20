@@ -473,6 +473,10 @@
 .chumTag_popular { background: #2e9e5b; }
 .chumTag_endangered { background: #e08a1e; }
 .chumTag_indecline { background: #e08a1e; }
+/* Amber reads as "scarce" across all three, which is what these bands share.
+   "Rare in the UK" is the longest label, so it keeps the band on one line by
+   dropping the letter-spacing rather than the type size. */
+.chumTag_rare { background: #e08a1e; letter-spacing: 0.02em; }
 
 .chumImg {
   width: 100%;

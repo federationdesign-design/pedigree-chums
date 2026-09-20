@@ -23,13 +23,14 @@
 
 import { ukBreeds } from "./uk-breeds";
 
-export type BreedStatus = "trending" | "popular" | "endangered" | "in-decline";
+export type BreedStatus = "trending" | "popular" | "endangered" | "in-decline" | "rare";
 
 export const STATUS_LABEL: Record<BreedStatus, string> = {
   trending: "Trending",
   popular: "Popular",
   endangered: "Endangered",
   "in-decline": "In decline",
+  rare: "Rare in the UK",
 };
 
 /* Pack name to uk-breeds name, where the two differ. Owner rulings,
@@ -70,14 +71,27 @@ const IMPORT_STATUS: Record<string, BreedStatus> = {
   "Great Dane": "popular", //            678
   Weimaraner: "popular", //              629
   "Italian Greyhound": "trending", //    541 and climbing, the one riser
-};
 
-/* DELIBERATELY ABSENT, owner's ruling of 20 September 2026: these five are too
-   low for `popular` to be honest and cannot take a rare band, because neither
-   Kennel Club list admits an imported breed. They show no band at all.
-     Saint Bernard 350, Siberian Husky 310, Bichon Frise 308,
-     Papillon 248, Afghan Hound 75
-   Do not "complete the set" by inventing a status for them. */
+  /* THE FIVE SCARCE IMPORTS, owner's ruling of 20 September 2026. They were
+     blank at first, then given their own word rather than `endangered`.
+
+     WHY NOT `endangered`. The Kennel Club's criteria are British or Irish
+     origin AND 300 or fewer registrations; an import is not eligible at any
+     number. Marking these five endangered would make one band mean two
+     different things, and on a children's site the word reads as "dying out".
+     None of them is: they are globally numerous and merely scarce in British
+     pedigree registrations, which is exactly what "Rare in the UK" says.
+
+     WHY ALL FIVE, INCLUDING THE HUSKY. The proposal was to except the Siberian
+     Husky. The registrations do not separate it: at 310 in 2024 it sits third
+     of the five, above the Bichon and the Papillon, and in 2025 all five fall
+     under 300. There is no year in which the husky is the odd one out. */
+  "Saint Bernard": "rare", //            350
+  "Siberian Husky": "rare", //           310
+  "Bichon Frise": "rare", //             308
+  Papillon: "rare", //                   248
+  "Afghan Hound": "rare", //              75, the scarcest dog in the pack
+};
 
 const ukTag = new Map(ukBreeds.map((b) => [b.name, b.tag]));
 
