@@ -634,16 +634,38 @@ export default function KnockoutRound({ shortlist, recommended = [], breed, onBa
                 {shareOpen && (
                   <>
                     <div onClick={() => setShareOpen(false)} style={{ position:"fixed", inset:0, zIndex:40 }} />
-                    <div role="menu" style={{ position:"absolute", bottom:"calc(100% + 12px)", left:"50%", transform:"translateX(-50%)", zIndex:50, width:"min(360px, 88vw)", background:"var(--navy, #0a3a57)", borderRadius:16, boxShadow:"0 14px 44px rgba(10,58,87,0.45)", padding:"12px 10px 10px", textAlign:"left" }}>
+                    {/* NG-SHARE-7, 20 September 2026 (owner: it looks like it pops
+                        out of the button, so we are not using all of the vertical
+                        space; and the link does not fit its container).
+
+                        OFF THE BUTTON, ONTO THE SCREEN. It was anchored above the
+                        button with `bottom: calc(100% + 12px)` and a CSS triangle
+                        pointing back down at it, so its height was whatever was
+                        left between the button and the top of the page. Centred on
+                        the viewport instead, it can take 78% of the height and
+                        show every caption without the page scrolling behind it.
+                        The arrow went with the anchoring: it pointed at a button
+                        the panel no longer sits above.
+
+                        THE BACKDROP IS UNCHANGED, still the fixed inset-0 sheet
+                        just above, so a tap outside still closes it. */}
+                    <div role="menu" style={{ position:"fixed", top:"50%", left:"50%", transform:"translate(-50%, -50%)", zIndex:50, width:"min(420px, 92vw)", maxHeight:"min(78vh, 680px)", overflowY:"auto", overscrollBehavior:"contain", background:"var(--navy, #0a3a57)", borderRadius:16, boxShadow:"0 14px 44px rgba(10,58,87,0.45)", padding:"12px 10px 10px", textAlign:"left" }}>
                       <p style={{ margin:"2px 8px 10px", fontSize:"0.68rem", fontWeight:800, letterSpacing:"0.09em", textTransform:"uppercase", color:"var(--yellow)", fontFamily:"var(--font-body,sans-serif)" }}>Pick a caption to share</p>
                       {messages.map((msg, i) => (
                         <button key={i} onClick={() => shareWithCaption(`${msg}\n${tags}`)}
                           style={{ display:"block", width:"100%", textAlign:"left", background:"rgba(255,255,255,0.07)", border:"1px solid rgba(255,255,255,0.12)", borderRadius:10, padding:"10px 12px", marginBottom:6, cursor:"pointer", fontFamily:"var(--font-body,sans-serif)", fontSize:"0.8rem", lineHeight:1.4 }}>
                           <span style={{ display:"block", color:"#ffffff", fontWeight:700 }}>{msg}</span>
-                          <span style={{ display:"block", marginTop:4, color:"var(--yellow)", fontWeight:600 }}>{tags}</span>
+                          {/* ONE LINE, CLIPPED. The tags line ends in the share URL,
+                              which carries the encoded podium and runs to about 90
+                              characters, so it wrapped to three lines and pushed out
+                              of the card. It is not there to be read: the caption is
+                              what the player is choosing between, and the whole
+                              string is sent whatever is shown here. So it is held to
+                              one line at a smaller size and truncated, which keeps
+                              the two hashtags legible and lets the URL run out. */}
+                          <span style={{ display:"block", marginTop:4, color:"var(--yellow)", fontWeight:600, fontSize:"0.72rem", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{tags}</span>
                         </button>
                       ))}
-                      <div style={{ position:"absolute", top:"100%", left:"50%", transform:"translateX(-50%)", width:0, height:0, borderLeft:"9px solid transparent", borderRight:"9px solid transparent", borderTop:"9px solid var(--navy, #0a3a57)" }} />
                     </div>
                   </>
                 )}
