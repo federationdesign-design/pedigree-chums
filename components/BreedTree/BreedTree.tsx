@@ -14894,7 +14894,19 @@ export default function BreedTree({
               })}
             </svg>
             <span className={styles.tallyNum}>{chumsCollected}</span>
-            <span className={styles.tallyPlusOne} aria-hidden="true">+1</span>
+            {/* +N, NOT +1, 20 September 2026 (owner: it always says +1 yet I am
+                lassoing several, so it should say +X).
+
+                THE BATCH IS cornerShot AND ALWAYS WAS. flashCorner bumps it once
+                per collect and resets its 1600ms timer on each one, so during a
+                lasso it climbs 1, 2, 3 with the cards and drops back to 0 after
+                the burst goes quiet. It was already the number the label needed;
+                the label was a hard-coded string and never read it.
+
+                THE BIG NUMBER BESIDE IT IS UNTOUCHED. chumsCollected is the
+                running total, which is correct and is what "26" was in the
+                owner's screenshot. This span is the increment under it. */}
+            <span className={styles.tallyPlusOne} aria-hidden="true">+{cornerShot}</span>
           </div>
         </div>
       )}
