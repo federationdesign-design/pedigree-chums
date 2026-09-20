@@ -1299,25 +1299,35 @@
    concept: caps about 32.5 CSS px tall, which is roughly a 45px face. */
 /* END OF AN ERA, on the final dog of a run.
 
-   The band it lives in is measured, not chosen: the status bar sits at the
-   bottom and is about 26px tall, and the name is anchored at 62px. So there is
-   roughly 36px between them and the mark is 30px to sit inside it.
+   IT SAT BELOW THE NAME until 20 September 2026, in the 36px band between the
+   name and the status bar, which is why it was 30px. The owner has moved it
+   ABOVE the name and doubled it, so neither figure applies any more.
 
-   If the supplied artwork needs more room the honest fix is to lift the name,
-   not to shrink this until it cannot be read. Two numbers: `bottom` here and
-   `bottom` on .dogNameOver. */
+   HOW IT CLEARS THE NAME. The name is anchored at bottom 62px and is one line
+   of clamp(2rem, 10vw, 3.2rem) at line-height 0.95, a height that moves with the
+   viewport. `bottom` here is that same clamp expressed in the element's OWN
+   font-size, so 0.95em is exactly one line of the name whatever width the card
+   is drawn at, plus 10px of air. Tracking it beats a fixed number that would be
+   right on one screen and wrong on the next.
+
+   IT ASSUMES THE NAME IS ONE LINE, which is what every card shows today. If a
+   long name ever wraps, the mark will sit on the second line and the honest fix
+   is to wrap the name and the mark in one flex column rather than to add a
+   second guess here. */
 .dogEraEnd {
   position: absolute;
   left: 12px;
   right: 12px;
-  bottom: 32px;
+  font-size: clamp(2rem, 10vw, 3.2rem);
+  bottom: calc(62px + 0.95em + 10px);
   z-index: 1;
   display: flex;
   justify-content: center;
   pointer-events: none;
 }
 .dogEraEndImg {
-  height: 30px;
+  /* 30 -> 60, 20 September 2026 (owner: make it 2x bigger). */
+  height: 60px;
   width: auto;
   max-width: 100%;
   object-fit: contain;
