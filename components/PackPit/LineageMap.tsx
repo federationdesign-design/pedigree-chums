@@ -3992,7 +3992,21 @@ export default function LineageMap({
             each side. 10 is the gap. The floor of 58 keeps it clear of the level
             portrait, whose bottom edge is at 52.3, on a screen short enough for
             the two to argue. */}
-        {frameTotal > 0 && !packed && !collecting && (
+        {/* NO COUNTERS ON THE DISPLAY TREE, 20 September 2026 (owner: on the
+            individual chum page there are no frames to place into, so the counter
+            should not be there).
+
+            `bounded` IS THAT PAGE AND ONLY THAT PAGE. It is the flag /chums2
+            passes for its inline family tree, and the file already treats it as
+            the display tree: the lift's 0.8 scale excludes it outright, and so
+            does the tree-fade rule added earlier today. The learn area and the
+            pit pass `circular` or `strongBg` without it, so neither is touched.
+
+            BOTH COUNTERS, one reason. The light blue one counts cards placed and
+            means as little here as the frames one; only the frames counter is
+            visible on that page today, because the card count is zero, but they
+            share the corner and should not start disagreeing. */}
+        {!bounded && frameTotal > 0 && !packed && !collecting && (
           <div
             className={styles.frameCount}
             /* UP 20px, 9 Sept 2026 (owner), item 13, in two passes of 10: at
@@ -4057,7 +4071,7 @@ export default function LineageMap({
             SAME TOP, SET FROM THE SAME EXPRESSION, so the pair stay level whatever
             the measured position or the floor decides. Only the left differs, in the
             stylesheet. */}
-        {totalCards > 0 && !packed && !collecting && (
+        {!bounded && totalCards > 0 && !packed && !collecting && (
           <div
             className={styles.cardCount}
             /* THE TOP OF THE PAGE ON DESKTOP, 20 September 2026 (owner: move the
