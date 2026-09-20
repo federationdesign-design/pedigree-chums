@@ -2003,7 +2003,20 @@ export default function LineageMap({
      makes it arrive there. Identity off the lift, where LIFT_K is 1, so the main
      pit and the chums2 tree are untouched, and the phone branch above is not
      reached on desktop at all. */
-  const F_LEFT_BASE = fiveUp ? unscaleX(F_EDGE) + CW / 2 : isMobile ? 52 : unscaleX(96);
+  /* THE DESKTOP COLUMN LINES UP WITH THE COUNTER, 20 September 2026 (owner: on
+     the learn area, the same issue as the play area, move the frames left).
+
+     ONE NUMBER, SHARED. .frameCount's left is clamp(6px, 3.5vw, 50px) and the
+     grid was on a flat 96, so the two sat about 22px apart on a 980 window and
+     read as two different left margins. This is that clamp in JS, plus half a
+     card because F_LEFT is the column's CENTRE, not its edge. If the stylesheet's
+     clamp moves, this moves with it.
+
+     STILL INSIDE unscaleX, so it lands where it is written despite the overlay's
+     0.8. Both lift layers take this branch: the dog pulled out of the pit and the
+     chum's own family tree. */
+  const F_COUNT_LEFT = Math.min(50, Math.max(6, vp.w * 0.035));
+  const F_LEFT_BASE = fiveUp ? unscaleX(F_EDGE) + CW / 2 : isMobile ? 52 : unscaleX(F_COUNT_LEFT) + CW / 2;
   // On a circle the rim at 45 degrees sits this far in from the bounding box, so
   // corner adornments tuck against the edge instead of floating outside it.
   const RIM_IN = (CW / 2) * (1 - Math.SQRT1_2);
@@ -2063,7 +2076,12 @@ export default function LineageMap({
      ONLY THE CIRCULAR LIFT, the dog pulled out of the pit, which is what the
      owner is looking at. The strongBg family tree keeps its 240 until it is asked
      for. */
-  const chumTop = fiveUp ? unscaleY(91) : circular ? unscaleY(isMobile ? 118 : 168) : isMobile ? 170 : 240; // 96, down 15 to clear the top-right button
+  /* THE FAMILY-TREE LAYER JOINS THE OTHER TWO, 20 September 2026 (owner: move the
+     counter up). 240 was the last raw figure left inside the 0.8 overlay, so on a
+     950-tall window the row landed at 287 instead of 240 and the counter, which is
+     derived from it, at 171 instead of 124. The row rises with the counter,
+     because one number governs both and that is what keeps them from arguing. */
+  const chumTop = fiveUp ? unscaleY(91) : circular ? unscaleY(isMobile ? 118 : 168) : isMobile ? 170 : unscaleY(240); // 96, down 15 to clear the top-right button
   const frames: { id: string; cat: "chum" | "alive" | "extinct"; img: string; sx: number; sy: number }[] = [];
   let aliveTop = chumTop, extinctTop = chumTop; // only the desktop section headers use these
   if (isMobile) {
