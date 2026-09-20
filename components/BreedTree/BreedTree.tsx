@@ -8690,12 +8690,25 @@ export default function BreedTree({
           const rad = DOG_CHAIN_CHIP_SPREAD_PX * Math.sqrt(Math.random());
           return { x: p.x + Math.cos(a2) * rad, y: p.y + Math.sin(a2) * rad };
         };
+        /* EACH CHIP CARRIES ITS OWN DOG'S NAME, 20 September 2026 (owner: a
+           chain of nine leaves paid out one coloured token, not nine).
+
+           THE COUNT WAS NEVER WRONG. Every circle in the chain already closes
+           through here and already drops its chip, so nine circles dropped nine
+           chips. Eight of them were LEMON, because the rarity colour keys on the
+           breed name and this site passed none, so only the opened circle's chip
+           came down coloured and the payout read as one token.
+
+           WHICH NAME. A chip stands for the dog whose share it carries, so a
+           child's chip takes the CHILD's name and a leaf's takes its own. The
+           chain payout is a lifted dog's payout, which is the one case the owner
+           scoped the colour to. */
         const kids = (n.children ?? []).filter((ch) => !isHiddenCopy(ch));
         if (kids.length) {
-          for (const ch of kids) { const q = at(); spawnBadgeRef.current?.(q.x, q.y, chipR, pctOf(ch)); }
+          for (const ch of kids) { const q = at(); spawnBadgeRef.current?.(q.x, q.y, chipR, pctOf(ch), { name: ch.data.name }); }
         } else {
           const q = at();
-          spawnBadgeRef.current?.(q.x, q.y, chipR, pctOf(n));
+          spawnBadgeRef.current?.(q.x, q.y, chipR, pctOf(n), { name: n.data.name });
         }
         /* IT TAKES THE BODY OUT ITSELF (owner, 18 September 2026), rather than
            setting a flag and waiting for a tick that may not come.
