@@ -1766,7 +1766,11 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "A 1920s revival of the older, longer-nosed toy spaniel of the Stuart court, bred back from the flat-faced King Charles Spaniel.",
     children: [
       { name: "King Charles Spaniel", note: "The modern flat-faced toy spaniel it was bred back from.", img: "/history/breeds/king-charles-spaniel-photo.jpg", value: 70 },
-      { name: "Old sporting toy Spaniels", note: "The longer-muzzled toy spaniels of older paintings. Now extinct.", img: "/history/breeds/Old-sporting-toy-spaniels.jpg", value: 30 }
+      /* THE SAME DOG THE KING CHARLES CAME FROM, and that is the point. The
+         Cavalier was bred BACK toward the old long-nosed type out of King Charles
+         kennels after Roswell Eldridge's 1926 Crufts prize, so King Charles leads
+         and the old stock follows. Renamed 20 September 2026 with the merge. */
+      { name: "Old Toy Spaniels", note: "The longer-muzzled toy spaniels of the older paintings, before the Victorians shortened the face. Now extinct.", img: "/history/breeds/Old-sporting-toy-spaniels.jpg", value: 30 }
     ]
   },
 
@@ -2715,6 +2719,33 @@ const LINEAGE: Record<string, LineageNode> = {
   // lapdogs; it reaches no era card and is not meant to. Mediterranean bichon
   // lapdogs is left a bare leaf for the same reason as Spitz-type dogs: no card
   // to reach, and rooting it in the Barbet line would be a false water-dog claim.
+  /* ONE OLD TOY SPANIEL, 20 September 2026 (owner). "Old sporting toy Spaniels"
+     is merged into this record and resolves here through LINEAGE_ALIASES.
+
+     THEY WERE ALREADY IDENTICAL IN THE DATA: both were Land Spaniels drawn twice
+     at 50, under the 19 August display device. Only the notes differed, one
+     calling them the Tudor and Stuart lap spaniels and the other the
+     longer-muzzled dogs of the older paintings.
+
+     THOSE ARE THE SAME ANIMAL. The toy spaniels in the sixteenth, seventeenth and
+     eighteenth century paintings by Titian, Van Dyck, Lely, Stubbs, Gainsborough,
+     Reynolds and Romney show flat heads, high-set ears, almond eyes and rather
+     pointed noses. In Tudor times they were the ladies' Comforter Spaniel; under
+     the Stuarts they took the royal name.
+
+     THE SHORT FACE IS A VICTORIAN EVENT, NOT A SECOND STOCK. By the mid 1800s the
+     breed had been altered to a domed skull, very short muzzle, laid-back nose and
+     undershot jaw, following the fashion for Asian flat-faced toys, and by 1900 the
+     King Charles had become the English Toy Spaniel. The long-nosed dog was all but
+     extinct by the mid 1920s. So "longer-muzzled" describes this record at an
+     earlier date, not a different ancestor.
+
+     AND THE DATA ALREADY PUTS THAT CHANGE IN THE RIGHT PLACE: King Charles Spaniel
+     carries "Asian flat-faced toy dogs" at 40, which is exactly where the flat face
+     belongs. No Asian blood goes on this record; these are the pre-Asian dogs.
+
+     BOTH CARDS SURVIVE. Levels 34 and 77 keep their own names, notes and artwork
+     and both still play, the same route "Old English Black and Tan Terrier" takes. */
   "Old Toy Spaniels": {
     name: "Old Toy Spaniels",
     note: "The small sporting and lap spaniels of Tudor and Stuart England. Now extinct.",
@@ -2728,19 +2759,7 @@ const LINEAGE: Record<string, LineageNode> = {
       { name: "Land Spaniels", note: "The old sporting land-spaniel stock the court toy spaniels were bred down from. Now extinct.", img: "/history/breeds/original-land-spaniel.jpg", value: 50 }
     ]
   },
-  "Old sporting toy Spaniels": {
-    name: "Old sporting toy Spaniels",
-    note: "The longer-muzzled toy spaniels of the older paintings. Now extinct.",
-    // 19 August 2026: display device. The single documented ancestor below is
-    // drawn twice, as two identical children at 50 each (same note and img), so
-    // the level shows two circles rather than one filling the ring. The children
-    // differ in name from the parent, so isEcho, the pit words and the badge
-    // paths do not touch them. This must NOT be read as two separate ancestors.
-    children: [
-      { name: "Land Spaniels", note: "The old sporting land-spaniel stock behind the toy spaniels. Now extinct.", img: "/history/breeds/original-land-spaniel.jpg", value: 50 },
-      { name: "Land Spaniels", note: "The old sporting land-spaniel stock behind the toy spaniels. Now extinct.", img: "/history/breeds/original-land-spaniel.jpg", value: 50 }
-    ]
-  },
+
   "Asian flat-faced toy dogs": {
     name: "Asian flat-faced toy dogs",
     note: "The oriental toy blood, pug and eastern lapdog, that shortened the toy spaniel's muzzle. Now extinct.",
@@ -3275,6 +3294,8 @@ const LINEAGE_ALIASES: Record<string, string> = {
      is gone and the name resolves here, so anything still written that way, in the
      data, on a history card or in an old link, reaches the one record. */
   "Old English Black and Tan Terrier": "Black and Tan Terrier",
+  // Merged 20 September 2026; see the ruling beside "Old Toy Spaniels".
+  "Old sporting toy Spaniels": "Old Toy Spaniels",
   /* THE FOUR TERRIER NAMES, 19 September 2026. Two Scottish and two English
      records became one each; see the ruling beside "Old Scottish working Terriers".
      The three history cards still carry the old names and reach the merged
