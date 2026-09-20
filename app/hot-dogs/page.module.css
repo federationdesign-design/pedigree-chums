@@ -279,6 +279,10 @@
   color: #ffffff;
   margin: 0 0 clamp(8px, 1vw, 12px);
   text-align: left;
+  /* 1.1em, 20 September 2026 (Steve). This declared no line-height at all and
+     inherited 1.5 from the prose above it, which on a 128px heading opened a
+     64px gap between the lines. */
+  line-height: 1.1em;
 }
 .rule { display: none; margin: 0; }
 .legal {
@@ -340,7 +344,7 @@
   font-size: clamp(1.15rem, 2.3vw, 1.6rem);
   color: var(--yellow, #ffd23e);
   margin: 0 0 8px;
-  line-height: 1.2;
+  line-height: 1.1em; /* was 1.2, tightened with the other headings, 20 September 2026 */
 }
 .safetyCard p {
   font-family: Montserrat, sans-serif;
@@ -460,6 +464,9 @@
   color: #ffffff;
   display: block;
   margin-bottom: 4px;
+  /* A heading in all but tag name: display:block at ~40px. It inherited 1.5
+     from the step's prose. 1.1em, 20 September 2026 (Steve). */
+  line-height: 1.1em;
 }
 .ruleStep p {
   font-family: Montserrat, sans-serif;
@@ -564,6 +571,10 @@
   font-size: clamp(4rem, 12vw, 9rem) !important;
   color: var(--yellow, #ffd23e) !important;
   margin-top: clamp(20px, 3vw, 32px) !important;
+  /* .endBig overrides .endLine's font and size but used to leave its
+     line-height: 1.5 in place, so a 144px display line kept body-copy leading.
+     1.1em, 20 September 2026 (Steve). */
+  line-height: 1.1em !important;
 }
 
 @media (prefers-reduced-motion: reduce) {
