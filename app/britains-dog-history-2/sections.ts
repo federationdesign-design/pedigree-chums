@@ -103,14 +103,14 @@ export const SECTIONS: Section[] = [
       { text: "Mastiff-type 'bandogs' were chained up by day and let loose at night to guard farms from thieves and even wolves.", image: "/history/breeds/Old-English-Bulldog.jpg", imageAlt: "A stocky brindle and white bulldog standing in a field by a stone wall.", imagePos: "74% 28%" },
       { text: "One of the first books written in English, 'The Master of Game' from around 1406, was a guide to hunting hounds and their care.", image: "/history/breeds/staghound.jpg", imageAlt: "A tricolour pack hound standing on a hillside under a cloudy sky.", imagePos: "74% 30%" },
     ],
-    image: "/history/medieveal-dogs.jpg",
+    image: "/history/Tudor-era.jpg",
     /* The scroll-scrubbed video is off. It was 9MB, and every frame of it had
        to be a keyframe for the scrub to track, so it could never be made small.
        The still it falls back to is the image it already used as its poster,
        so the first frame on screen is unchanged.
        ScrubVideo and the `video` field both stay: putting it back is this one
        line. */
-    imageAlt: "Medieval hunting hounds and a Tudor lapdog",
+    imageAlt: "Tudor dogs at the royal court",
   },
   {
     title: "Dogs in the armed forces",
