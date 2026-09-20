@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Dela_Gothic_One, Luckiest_Guy, Montserrat, Open_Sans, Press_Start_2P, Unica_One } from "next/font/google";
 import localFont from "next/font/local";
 import CookieDrop from "../components/CookieDrop/CookieDrop";
-import FallingCookie from "../components/FallingCookie/FallingCookie";
 import Analytics from "../components/Analytics/Analytics";
 import CookieBar from "../components/CookieBar/CookieBar";
 import MetaPixel from "../components/MetaPixel/MetaPixel";
@@ -248,7 +247,16 @@ export default function RootLayout({
         {/* G01 awards on the first pointer interaction with the Main Pit
             (CHANGE-LIST C01), wired inside PackPit. RouteWatcher was removed
             (NEEDS_OWNER Q06). */}
-        <FallingCookie />
+        {/* The COOKIES POLICY sticker that fell in and settled at the foot of the
+            screen was removed here on 20 September 2026 (Steve): CookieBar below
+            supersedes it. The sticker existed because nothing on the site
+            presented the choice by itself, so it was a target you had to notice
+            and tap. CookieBar asks every undecided visitor outright, on every
+            page, which is the job the sticker was doing less well. Consent is
+            still reachable four other ways: this bar, the Footer's Cookie
+            settings, the pit's own cookie object on "/", and the panel at the top
+            of /cookies. The component was deleted with it; restore from git if it
+            is ever wanted back. */}
         {/* The fixed top bar that actually ASKS. CookieDrop below still owns the
             writing, the manage dialog and the pit's own Accept and Reject
             objects; this only presents the choice to a visitor who has not made
