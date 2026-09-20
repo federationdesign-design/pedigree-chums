@@ -63,7 +63,7 @@
 
 .slash {
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
-  color: var(--yellow, #ffd23e);
+  color: var(--yellow-header, #ffed00);
 }
 
 .heroSub {
@@ -90,7 +90,7 @@
   margin: 0 0 6px;
   line-height: 1.5;
 }
-.wordplay em { font-style: normal; color: var(--yellow, #ffd23e); font-weight: 700; }
+.wordplay em { font-style: normal; color: var(--yellow-header, #ffed00); font-weight: 700; }
 .wordplayWarning {
   color: #ffffff !important;
   font-weight: 700 !important;
@@ -128,7 +128,7 @@
   transition: filter 0.15s, transform 0.15s;
   letter-spacing: 0.03em;
 }
-.pill:hover { background: var(--navy, #0a3a57); color: var(--yellow, #ffd23e); transform: translateY(-2px); }
+.pill:hover { background: var(--navy, #0a3a57); color: var(--yellow-header, #ffed00); transform: translateY(-2px); }
 
 /* ── Shared section layout ───────────────────────────────────────────────── */
 .section,
@@ -169,7 +169,7 @@
    heading stays white, only the span is yellow. It is a yellow accent, so it stays
    yellow in both toggle states while the heading base flips white -> navy. */
 .sectionTitle span,
-.noteTitleMain span { color: var(--yellow, #ffd23e); }
+.noteTitleMain span { color: var(--yellow-header, #ffed00); }
 .subTitle {
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
   font-size: clamp(1.38rem, 2.9vw, 2.2rem);
@@ -192,7 +192,7 @@
   line-height: 1.7;
   margin: 0 0 clamp(10px, 1.5vw, 16px);
 }
-.sectionInner em { font-style: italic; color: var(--yellow, #ffd23e); }
+.sectionInner em { font-style: italic; color: var(--yellow-header, #ffed00); }
 .sectionInner strong { color: #ffffff; }
 
 /* ── Note section ────────────────────────────────────────────────────────── */
@@ -293,7 +293,7 @@
 .conga {
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
   font-size: clamp(0.85rem, 1.6vw, 1.1rem);
-  color: var(--yellow, #ffd23e);
+  color: var(--yellow-header, #ffed00);
   letter-spacing: 0.04em;
   background: rgba(10,58,87,0.3);
   border-radius: 12px;
@@ -342,7 +342,7 @@
 .safetyCard h3 {
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
   font-size: clamp(1.15rem, 2.3vw, 1.6rem);
-  color: var(--yellow, #ffd23e);
+  color: var(--yellow-header, #ffed00);
   margin: 0 0 8px;
   line-height: 1.1em; /* was 1.2, tightened with the other headings, 20 September 2026 */
 }
@@ -452,7 +452,7 @@
 .ruleNum {
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
   font-size: clamp(2.07rem, 4.6vw, 3.45rem);
-  color: var(--yellow, #ffd23e);
+  color: var(--yellow-header, #ffed00);
   line-height: 1;
   flex: 0 0 auto;
   min-width: 36px;
@@ -521,7 +521,7 @@
   content: "+";
   font-family: var(--font-display, 'Luckiest Guy', system-ui);
   font-size: 1.6rem;
-  color: var(--yellow, #ffd23e);
+  color: var(--yellow-header, #ffed00);
   flex: 0 0 auto;
   transition: transform 0.2s;
 }
@@ -569,7 +569,7 @@
 .endBig {
   font-family: var(--font-display, 'Luckiest Guy', system-ui) !important;
   font-size: clamp(4rem, 12vw, 9rem) !important;
-  color: var(--yellow, #ffd23e) !important;
+  color: var(--yellow-header, #ffed00) !important;
   margin-top: clamp(20px, 3vw, 32px) !important;
   /* .endBig overrides .endLine's font and size but used to leave its
      line-height: 1.5 in place, so a 144px display line kept body-copy leading.
@@ -740,7 +740,7 @@
 .congaStep strong {
   font-family: var(--font-display, "Luckiest Guy", system-ui);
   font-size: clamp(1.5rem, 3.2vw, 1.96rem);
-  color: var(--yellow, #ffd23e);
+  color: var(--yellow-header, #ffed00);
   display: block;
   margin-bottom: 8px;
 }
@@ -868,6 +868,69 @@
   }
 }
 
+/* MOBILE TYPE AND SPACING PASS, 20 September 2026 (Steve). Five changes, all
+   mobile only: the desktop rendering is signed off and none of this reaches it.
+   It sits here, after every base rule it overrides, because a media query adds
+   no specificity and would lose from higher up the file. `.alert p` in
+   particular is re-declared around line 631, well above this.
+
+   CENTRED TEXT. Scoped through `.main` so it cannot leak to the nav or footer,
+   which sit outside it. Headings and paragraphs only: `.signsList li` and the
+   other lists stay left, because centring a bulleted list breaks its left edge
+   and reads as a mistake rather than a choice.
+
+   MONTSERRAT AT 1.3em. The leading ran from 1.5 to 2.0 depending on the block,
+   not a single 1.5, and naming the selectors individually missed two dozen
+   paragraphs (.urgentNote, .safetyNote, .congaCaption, .miniA and the unclassed
+   ones). Hence the blanket `.main p`. It is safe: every paragraph inside main is
+   Montserrat except `.endBig`, which is Luckiest Guy and holds its own
+   `1.1em !important`, so this cannot reach it. Verified by walking the DOM, not
+   by reading the stylesheet. Lists are included because .signsList sat at 2.0,
+   the loosest leading on the page.
+
+   THE SAFETY IMAGES. 420px was set for the wide desktop card (22 Aug 2026). In
+   an 80% mobile slide that crops the dog badly, so they come down to 220px. */
+@media (max-width: 768px) {
+  .main h1,
+  .main h2,
+  .main h3,
+  .main p {
+    text-align: center;
+  }
+  .wordplay {
+    text-align: center;
+  }
+
+  .main p,
+  .main li,
+  /* These two are declared as `.faqItem .faqA` and `.miniAccordion .miniA`, two
+     classes each, which outranks `.main p` and left them at 1.7. Matched here
+     rather than beaten with !important. `.miniA` needs a third class because its
+     rule sits BELOW this block (line ~989) and would win the tie on source
+     order; that rule is deliberate, so this outranks it instead of moving it. */
+  .main .faqA,
+  .main .miniAccordion .miniA {
+    line-height: 1.3em;
+  }
+
+  .safetyCardImg {
+    height: 220px;
+  }
+
+  /* Down 2pt from the clamp declared around line 631, which is the one that
+     governs, not the smaller clamp beside the base .alert p rule. */
+  .alert p {
+    font-size: calc(clamp(1.1rem, 1.7vw, 1.27rem) - 2pt);
+  }
+
+  /* The numbered steps sat tight against the panel edge. The shorthand above
+     sets both axes, so only the two sides being changed are named here. */
+  .ruleStep {
+    padding-top: 28px;
+    padding-bottom: 28px;
+  }
+}
+
 /* Batch 7: safety-column body paragraphs, +4pt and fluid (was fixed 1.3rem). */
 .safetyCol p:not(.lead) { font-size: clamp(1.2rem, 2.3vw, 1.633rem); font-weight: 500; }
 
@@ -922,7 +985,7 @@
   gap: 12px;
 }
 .miniQ::-webkit-details-marker { display: none; }
-.miniQ::after { content: "+"; font-family: var(--font-display, 'Luckiest Guy', system-ui); font-size: 1.6rem; color: var(--yellow, #ffd23e); flex: 0 0 auto; transition: transform 0.2s; }
+.miniQ::after { content: "+"; font-family: var(--font-display, 'Luckiest Guy', system-ui); font-size: 1.6rem; color: var(--yellow-header, #ffed00); flex: 0 0 auto; transition: transform 0.2s; }
 details[open] .miniQ::after { transform: rotate(45deg); }
 /* `.miniAccordion .miniA` (0,2,0) beats the blackening's `.foodCol p` (0,1,1) leak. */
 .miniAccordion .miniA {
