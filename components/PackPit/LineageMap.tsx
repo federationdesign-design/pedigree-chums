@@ -2336,7 +2336,23 @@ export default function LineageMap({
   const cardsAllPlaced =
     pickCards.length > 0 &&
     pickCards.every((c) => placedSet.has(c.id) || stackedIds.has(c.id) || packHidden.has(c.id));
-  const treeDone = strongBg && !circular && framesDone && cardsAllPlaced;
+  /* BOTH LIFT LAYERS NOW, 20 September 2026 (owner: the play area should fade the
+     tree out when everything is placed, like the learn area already does).
+
+     IT WAS `strongBg && !circular`, the chum family tree alone, because that is
+     the only layer the 16 September request named. The pit lift runs the same
+     frames, the same Collect and the same completion, so it kept a full tree
+     sitting behind a finished board.
+
+     `(circular || strongBg) && !bounded` IS THE FILE'S OWN NAME FOR "a lift
+     layer": it is the same test LIFT_K uses. The main pit passes neither flag and
+     is untouched, and bounded, the chums2 display tree, is excluded outright as
+     it is everywhere else.
+
+     The condition itself is unchanged: every frame filled AND every card
+     accounted for, which is what stopped it vanishing early on a dog with
+     duplicates. */
+  const treeDone = (circular || strongBg) && !bounded && framesDone && cardsAllPlaced;
 
   /* THE RUNNING-DOG PROGRESS BAR, 16 September 2026 (owner: a bar along the bottom
      showing how much has been exposed and placed, like the Argos article's).
