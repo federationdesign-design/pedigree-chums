@@ -4564,6 +4564,20 @@ export default function BreedTree({
                poofs where it stood */
   const nodesRef = useRef<Node[]>([]);
   const dogChainBreedRef = useRef<string | null>(null);
+  /* WHICH BREEDS THIS PIT HAS EVER HELD MORE THAN ONE OF, 20 September 2026
+     (owner: if all the other twins are collected, leaving just one dog circle,
+     THAT is the state to mark). Accumulating and never forgetting: a name goes in
+     on the first frame its count is seen above one, and stays for the round.
+
+     IT IS WHAT SPLITS "never had a twin" FROM "your twins are gone". Those two
+     shared the black fill and they are not the same thing. The first is a
+     property of the level, true before anything falls; the second is an event.
+
+     MEASURED BEFORE THE CHANGE, across all 98 levels: 413 circles, 5.1%, were
+     black FROM THE DROP because their breed simply appears once, and SIX LEVELS
+     dropped entirely black. Celtic Hound and Ancient Mastiff were 100%. Those now
+     keep fillFor's ordinary depth navy. */
+  const everTwinRef = useRef<Set<string>>(new Set());
   // How many circles of the chain's breed were in the pit when it started. Fixed
   // for the life of the chain; see the note where it is set.
   const chainTotalRef = useRef(0);
@@ -6023,7 +6037,7 @@ export default function BreedTree({
       }
       // Second pass, because a breed's total is only known once the first has
       // finished: a circle is navy when its own breed has a twin.
-      for (const n2 of pitBreedCount.values()) if (n2 > 1) pitPlainCount += n2;
+      for (const [nm, n2] of pitBreedCount) if (n2 > 1) { pitPlainCount += n2; everTwinRef.current.add(nm); }
     }
     nodes.forEach((d, i) => {
       const tx = (d.x - v[0]) * k;
@@ -6138,8 +6152,12 @@ export default function BreedTree({
          the circle falls through to fillFor's navy, which is the dark blue the
          owner asked for. DOG_SINGLE_MIN_PLAIN is the number to raise if "lots"
          should mean more than one. */
+      /* AND IT MUST HAVE HAD A TWIN, 20 September 2026 (owner). A breed that was
+         never doubled in this level is an ordinary circle and keeps its depth
+         navy; black now means "you took the others". See everTwinRef. */
       const chSingle = paintable && !chHeld && !chTwin && fellRef.current
         && (pitBreedCount.get(d.data.name) ?? 0) === 1
+        && everTwinRef.current.has(d.data.name)
         && pitPlainCount >= DOG_SINGLE_MIN_PLAIN;
       if (c) {
         /* The mark has read all three states since the chain shipped; the ring
