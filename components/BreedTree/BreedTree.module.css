@@ -2507,12 +2507,21 @@
   position: fixed;
   left: 50%;
   transform: translateX(-50%);
-  bottom: calc(96px + env(safe-area-inset-bottom, 0px));
+  /* HARD TO THE BOTTOM, 20 September 2026 (owner: move it to the bottom of the
+     screen). Was 96px up, which was clearing the PLAY and AUTO squares; the owner
+     wants it lower, so it sits on the floor strip with only the safe area and a
+     little air under it. */
+  bottom: calc(10px + env(safe-area-inset-bottom, 0px));
   z-index: 62;
   padding: 10px 16px 6px 16px;
   border-radius: 20px;
-  background: var(--navy);
-  color: #ffffff;
+  /* LIGHT BLUE, 20 September 2026 (owner), --blue-sky from globals.css.
+     THE TEXT GOES NAVY WITH IT, and that is not a taste change: white on
+     #5cc4ee measures about 1.9, which is unreadable, while navy on it is about
+     6.5. The pill is the same shape and size as the lifted layer's counters;
+     only the two colours are swapped. */
+  background: var(--blue-sky);
+  color: var(--navy);
   font-family: var(--font-display), system-ui, sans-serif;
   font-size: 24px;
   line-height: 1.1;
