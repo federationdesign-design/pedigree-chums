@@ -6484,7 +6484,29 @@ export default function BreedTree({
         // above, shared with the fill writer so the two cannot drift. The depth
         // test stays here: the root is caught by fill="none" anyway, but the mark
         // has its own reason to say so, and it is cheap.
-        const showQ = fellRef.current && d.depth > 0 && paintable;
+        /* A CIRCLE SHOWING ITS PHOTOGRAPH WEARS NO MARK, 20 September 2026
+           (owner: remove the dog question svg from the dogs that are single
+           leaves).
+
+           WHY THE MARK WAS THERE AT ALL. Its own note says it stands in for the
+           picture: the pit plays imageless, so the face is what a navy disc wears
+           instead of a dog. The 20 September solo-leaf rule gave unique leaves
+           their real photograph back, and the stand-in was left sitting on top of
+           the very thing it was standing in for.
+
+           READ OFF THE CIRCLE, NOT RECOMPUTED. The render paints a photograph by
+           setting the fill ATTRIBUTE to a url(#bt-img-N) pattern, so asking the
+           element is asking what the render actually decided and cannot drift
+           from it. The inline style check matters because a band or the single
+           black fill is written as a STYLE and beats the attribute: a circle
+           whose picture has been painted over is back to a flat disc, and it
+           keeps its mark.
+
+           IT IS NOT SPELLED "SOLO LEAF" ON PURPOSE. The population is identical
+           today, but the question the mark should ask is "is there a picture
+           here", and that stays true if the photograph rule is ever widened. */
+        const hasPhoto = (c?.getAttribute("fill") ?? "").startsWith("url(") && !c?.style.fill;
+        const showQ = fellRef.current && d.depth > 0 && paintable && !hasPhoto;
         q.style.display = showQ ? "inline" : "none";
         if (showQ) {
           /* 0.9 -> 1.4 of the RADIUS, so the box is 70% of the disc across.
