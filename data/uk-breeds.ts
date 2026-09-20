@@ -150,7 +150,16 @@ export const ukBreeds: UKBreed[] = [
   // Whippet at 1872 to 1880, sit outside a strict mid-1800s reading but stay in
   // this strip deliberately: strip membership is an editorial grouping, not
   // arithmetic.
-  { name: "Jack Russell Terrier", strip: "mid1800", era: "1820s", anchor: 1820, note: "Bold fox-bolting terrier bred by the Reverend John Russell.", image: "/jack-russel-square.jpg", tag: "in-decline" },
+  /* BACK TO "trending", 20 September 2026. The At Watch listing I put here belongs
+     to the PARSON Russell Terrier, added below: the Kennel Club recognises that dog
+     and not this one, so no KC list can describe this card. See the ruling beside
+     "Parson Russell Terrier" in data/lineage.ts. */
+  { name: "Jack Russell Terrier", strip: "mid1800", era: "1820s", anchor: 1820, note: "Bold fox-bolting terrier bred by the Reverend John Russell.", image: "/jack-russel-square.jpg", tag: "trending" },
+  /* THE KENNEL CLUB'S RUSSELL, 20 September 2026 (owner). Anchored at 1999, the
+     year the UK name changed. It descends from the Jack Russell rather than sitting
+     beside it; the reasoning and the sources are in data/lineage.ts. NO ARTWORK YET,
+     so this card shows the fallback dog icon until a picture is supplied. */
+  { name: "Parson Russell Terrier", strip: "c1900", era: "1990s", anchor: 1999, note: "The Kennel Club's Russell terrier, taller and squarer than the working Jack Russell.", tag: "in-decline" },
   { name: "Kerry Blue Terrier", strip: "mid1800", era: "1840s", anchor: 1847, note: "Blue-coated Irish all-rounder, first documented in 1847.", image: "/history/breeds/Kerry_Blue_Terrier_photo.jpg", tag: "endangered" },
   { name: "Bull Terrier", strip: "early1800", era: "early 1800s", anchor: 1830, note: "Egg-headed dog from crossing bulldogs with terriers.", image: "/bull-terrier-square37.jpg" , tag: "in-decline" },
   { name: "Staffordshire Bull Terrier", strip: "early1800", era: "early 1800s", anchor: 1832, note: "Bull-and-terrier fighting dog turned devoted family friend.", image: "/staffy-square.jpg", tag: "popular" },
