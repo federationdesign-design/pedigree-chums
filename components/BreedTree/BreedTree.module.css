@@ -2484,3 +2484,39 @@
     max-width: 420px;
   }
 }
+
+/* THE CHAIN COUNTER, 20 September 2026 (owner: a counter for the chain, in the
+   same style as the counters on the lifted layer).
+
+   THE STYLE IS LINEAGEMAP'S .frameCount, copied deliberately rather than shared:
+   the two files have separate stylesheets and no import between them, and the
+   owner asked for "the same style" rather than for one rule in two places. Navy
+   pill, display font at 24px, white, 20px radius, the same 3px navy drop shadow
+   and the same uneven 10/16/6/16 padding, which exists because the display font
+   sits high in its own line box.
+
+   BOTTOM CENTRE, and that is the one number to change if it is wrong. The lifted
+   layer puts its counters top left, but in the pit that corner already holds the
+   level portrait, the name and the score, and the top right holds the close X and
+   the menu. Bottom centre is the only clear strip, sitting above the floor and
+   between the PLAY square and the AUTO square.
+
+   pointer-events: none, because it must never take a press meant for a circle
+   underneath it. */
+.chainCount {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: calc(96px + env(safe-area-inset-bottom, 0px));
+  z-index: 62;
+  padding: 10px 16px 6px 16px;
+  border-radius: 20px;
+  background: var(--navy);
+  color: #ffffff;
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: 24px;
+  line-height: 1.1;
+  letter-spacing: 0.5px;
+  pointer-events: none;
+  box-shadow: 0 3px 0 rgba(10, 58, 87, 0.3);
+}

@@ -4523,6 +4523,14 @@ export default function BreedTree({
   const [floorDiag, setFloorDiag] = useState<string | null>(null);
   // The swipe chain's path layer inside the pit SVG, written directly each frame.
   const chainGRef = useRef<SVGGElement>(null);
+  /* THE CHAIN COUNTER, 20 September 2026 (owner: a counter for the chain, so
+     picking a dog with eight twins reads 1/8 and climbs as each one joins).
+
+     A REF AND textContent, NOT STATE. The chain's first/joined/over hooks run
+     from the pointer loop, and setting React state there would re-render the
+     whole pit on every join. The lifted layer's own counters are plain DOM for
+     the same reason. Written by paintChainCount below and by nothing else. */
+  const chainCountRef = useRef<HTMLDivElement>(null);
   /* THE SWIPE WINS OVER THE COLLECT (owner,
      17 September 2026). A second press on an armed card collects it on the
      PRESS, before anyone can know whether a swipe follows. Under the chain flag,
@@ -4556,6 +4564,9 @@ export default function BreedTree({
                poofs where it stood */
   const nodesRef = useRef<Node[]>([]);
   const dogChainBreedRef = useRef<string | null>(null);
+  // How many circles of the chain's breed were in the pit when it started. Fixed
+  // for the life of the chain; see the note where it is set.
+  const chainTotalRef = useRef(0);
   /* The circles IN the chain being drawn. The
      breed above says which circles to highlight; this says which are actually
      held, and the frame writer turns their outlines white while they are. Held
@@ -11210,6 +11221,18 @@ export default function BreedTree({
     const liveBreed = (name: string) =>
       liveBreedNodesIn(pitBodiesRef.current?.owned, removedNodesRef.current, name);
     const dogHasTwin = (n: Node): boolean => liveBreed(n.data.name).length > 1;
+    /* Writes the counter and shows or hides it. Shown only while a chain is being
+       drawn: the hooks clear it on `over`, which is every way a chain ends. */
+    const paintChainCount = () => {
+      const el = chainCountRef.current;
+      if (!el) return;
+      const total = chainTotalRef.current;
+      if (!total) { el.style.display = "none"; return; }
+      const held = dogChainNodesRef.current.size;
+      el.textContent = `${held}/${total}`;
+      el.setAttribute("aria-label", `${held} of ${total} joined`);
+      el.style.display = "block";
+    };
     /* Named rather than inline, because the magnet measures with the SAME numbers
        the path and the crossing test use. Two spellings of a circle's geometry is
        how the two would quietly drift apart. */
@@ -11427,14 +11450,24 @@ export default function BreedTree({
         const n = dogNode(i);
         dogChainBreedRef.current = n?.data.name ?? null;
         dogChainNodesRef.current = new Set(n ? [n] : []);
+        /* THE TOTAL IS TAKEN ONCE, HERE, and held for the life of the chain.
+           liveBreed is deliberately live (see its note): a breed drops to one the
+           moment a twin is collected. Re-asking it per join would let the
+           denominator fall while the player is drawing, so 3/8 could become 3/7
+           under their finger. The numerator climbs, the total does not move. */
+        chainTotalRef.current = n ? liveBreed(n.data.name).length : 0;
+        paintChainCount();
       },
       joined: (i) => {
         const n = dogNode(i);
         if (n) dogChainNodesRef.current.add(n);
+        paintChainCount();
       },
       over: () => {
         dogChainBreedRef.current = null;
         dogChainNodesRef.current = new Set();
+        chainTotalRef.current = 0;
+        paintChainCount();
       },
       needsHit: true,
     };
@@ -12288,6 +12321,11 @@ export default function BreedTree({
         ref={stageRef}
         onDragStart={(e) => e.preventDefault()}
       >
+      {/* THE CHAIN COUNTER, 20 September 2026 (owner). Hidden until a chain is
+          drawn; written imperatively by paintChainCount, see the note on
+          chainCountRef. A plain div rather than SVG so it can reuse the lifted
+          layer's own counter styling, which is what the owner asked it to match. */}
+      <div ref={chainCountRef} className={styles.chainCount} style={{ display: "none" }} role="status" />
         <svg
           viewBox={viewBox}
           // Records the press only. No stopPropagation: the stage listener above
