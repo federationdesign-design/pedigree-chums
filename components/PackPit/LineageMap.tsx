@@ -2062,7 +2062,20 @@ export default function LineageMap({
     : 0;
   const F_LEFT = F_LEFT_BASE + F_SLACK;
   const F_ROW = fiveUp ? F_COL : circular ? CW + 3 : isMobile ? 92 : 112;
-  const fCols = Math.max(2, Math.min(7, Math.floor((vp.w - 120) / F_COL)));
+  /* MORE COLUMNS ON A WIDE SCREEN, 20 September 2026 (owner: add more columns to
+     the frames so they do not run off the bottom of the page).
+
+     THE CAP WAS 7 AND THE WIDTH WAS NOT THE LIMIT. On a 1134 window the divide
+     gives 9 and the cap threw two away, so a 49-frame dog laid out 7 rows of 7
+     plus its section headings and ran past the foot of the screen. Raising the
+     cap turns rows into columns, which is the axis that has room.
+
+     14, NOT NO CAP AT ALL. The divide is still what usually decides and is what
+     keeps the last column inside the margin; the cap only stops a very wide
+     monitor spreading a handful of frames into a thin band.
+
+     PHONE UNTOUCHED: it takes the fiveUp grid above and never reaches this. */
+  const fCols = Math.max(2, Math.min(isMobile ? 7 : 14, Math.floor((vp.w - 120) / F_COL)));
   // Tucked under the X/XX counter, which sits at top 26 and is about 32 tall.
   // 111 is unchanged as the INTENDED top; unscaleY is what makes it land there
   // again now the layer is scaled. See the note by F_LEFT.
@@ -3950,7 +3963,23 @@ export default function LineageMap({
                the offset -106 -> -116. Both numbers move together every time,
                because whichever is larger is the one that governs: the measured
                expression on a tall screen, the floor on a short one. */
-            style={{ top: Math.max(8, vp.h / 2 + LIFT_K * (chumTop - vp.h / 2) - 116) }}
+            /* THE TOP OF THE PAGE ON DESKTOP, 20 September 2026 (owner: move the
+               counters up so they appear much higher, at the top).
+
+               NO INLINE TOP AT ALL, so the stylesheet's own `top: 16px` applies.
+               The measured expression was written to make the counter ride above
+               the FRAME ROW, which on a phone sits low enough to matter. On
+               desktop the row is near the top already and the derivation pinned
+               the counter about 110px down, level with the first frames rather
+               than above them.
+
+               AN INLINE STYLE BEATS A CLASS, which is why two stylesheet edits in
+               September did nothing here. Removing the inline value is the whole
+               fix; the rule was always there and always correct.
+
+               BOTH COUNTERS CARRY THIS. They share the corner and must not
+               disagree. The phone keeps the measured expression, untouched. */
+            style={isMobile ? { top: Math.max(8, vp.h / 2 + LIFT_K * (chumTop - vp.h / 2) - 116) } : undefined}
             aria-label={`${filled.size} of ${frameTotal} frames filled`}
           >
             {filled.size}/{frameTotal}
@@ -3975,7 +4004,23 @@ export default function LineageMap({
         {totalCards > 0 && !packed && !collecting && (
           <div
             className={styles.cardCount}
-            style={{ top: Math.max(8, vp.h / 2 + LIFT_K * (chumTop - vp.h / 2) - 116) }}
+            /* THE TOP OF THE PAGE ON DESKTOP, 20 September 2026 (owner: move the
+               counters up so they appear much higher, at the top).
+
+               NO INLINE TOP AT ALL, so the stylesheet's own `top: 16px` applies.
+               The measured expression was written to make the counter ride above
+               the FRAME ROW, which on a phone sits low enough to matter. On
+               desktop the row is near the top already and the derivation pinned
+               the counter about 110px down, level with the first frames rather
+               than above them.
+
+               AN INLINE STYLE BEATS A CLASS, which is why two stylesheet edits in
+               September did nothing here. Removing the inline value is the whole
+               fix; the rule was always there and always correct.
+
+               BOTH COUNTERS CARRY THIS. They share the corner and must not
+               disagree. The phone keeps the measured expression, untouched. */
+            style={isMobile ? { top: Math.max(8, vp.h / 2 + LIFT_K * (chumTop - vp.h / 2) - 116) } : undefined}
             aria-label={`${cardsDone} of ${totalCards} images placed`}
           >
             {cardsDone}/{totalCards}

@@ -836,6 +836,12 @@
    shrink either counter. */
 .cardCount {
   position: fixed;
+  /* THE TOP WAS MISSING HERE, 20 September 2026. This counter had no `top` of its
+     own at all: an inline style set it on every render, so the gap never showed.
+     Desktop now drops that inline value, which would have left this at `auto`,
+     so the pair get the same 16 .frameCount already carries. The phone still
+     receives the inline value and is unaffected either way. */
+  top: 16px;
   /* The same clamp as .frameCount, plus its width and a gap. Both ends move together
      or the pair stop being a row. */
   left: calc(clamp(6px, 3.5vw, 50px) + 100px);
