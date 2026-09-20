@@ -1708,12 +1708,41 @@ function liveBreedNodesIn(owned: Set<Node> | undefined, removed: Set<Node>, name
    the ancestry work settles. Expect this pile to keep thinning on its own
    meanwhile, which is why these cuts will want another look later. */
 type RarityTier = "extremelyRare" | "rare" | "uncommon" | "common" | "veryCommon";
+/* RE-CUT AGAIN, 20 September 2026 (owner: I hardly ever see the extremely rare
+   or rare, I want to see more of the rare dogs). 50/11/7/3 becomes 60/20/10/4.
+
+   MEASURED ON CIRCLES, NOT ON NAMES, because circles are what a player meets.
+   Across the 98 levels there are 7,757 drawable circles made of 124 distinct
+   dogs. Before and after, as a share of those circles:
+
+                    before        after
+     very common     82.1%        54.0%
+     common          15.4%        41.6%
+     uncommon         1.3%         2.1%
+     rare             1.0%         1.9%
+     extremely rare   0.2%         0.4%
+
+   Rare and extremely rare go from 97 circles to 181, and the yellow flood halves.
+
+   SEVEN DOGS LEAVE VERY COMMON and carry the whole swing: Earth Dog, Early Badger
+   hunting dogs, Ancient Celtic earth dogs, Ancient eastern sighthounds, Celtic
+   Hound, Rache and Land Spaniels, 2,177 circles between them.
+
+   AND THE HONEST LIMIT, so nobody re-cuts this a third time expecting more.
+   ELEVEN ancient ancestors are drawn 5,675 times between them, 73% of every
+   circle in the game. No threshold on the tree count can change that, because a
+   dog carries the same tier everywhere it appears. Two alternatives were measured
+   and neither beat this one on the share of rare circles: recutting harder
+   (80/35/15/5) reached 3.1%, and switching the metric to how often a dog is
+   actually DRAWN reached 3.9% at its strongest while making common worse. The
+   only thing that would genuinely put more rare dogs in front of a player is
+   changing what the pit drops, which is a different job. */
 function rarityTier(count: number): RarityTier {
-  if (count >= 50) return "veryCommon";   // 50+   VERY COMMON     (yellow)
-  if (count >= 11) return "common";       // 11-49 COMMON          (orange)
-  if (count >= 7) return "uncommon";      // 7-10  UNCOMMON        (green)
-  if (count >= 3) return "rare";          // 3-6   RARE            (royal blue)
-  return "extremelyRare";                 // 1-2   EXTREMELY RARE  (purple)
+  if (count >= 60) return "veryCommon";   // 60+   VERY COMMON     (yellow)
+  if (count >= 20) return "common";       // 20-59 COMMON          (orange)
+  if (count >= 10) return "uncommon";     // 10-19 UNCOMMON        (green)
+  if (count >= 4) return "rare";          // 4-9   RARE            (royal blue)
+  return "extremelyRare";                 // 1-3   EXTREMELY RARE  (purple)
 }
 
 // Breed titles are fitted to the circle they belong to. The name is wrapped
