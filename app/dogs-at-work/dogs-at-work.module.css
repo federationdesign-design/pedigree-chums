@@ -137,17 +137,21 @@
    the back-link breadcrumb, which read on the gradient and must invert with the
    prose. Opt-in cost: white bottoms out at ~1.45:1 on the gradient, a deliberate
    non-compliant state (Steve, 12 Aug 2026; breadcrumb added 17 Aug 2026). */
-:root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"] .essayBody p,
+:root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"] .essayBody > p,
 :root:not([data-pc-contrast-scheme]) main[data-pc-textinvert="on"] .backLink {
   color: #ffffff;
 }
-.essayBody p {
+.essayBody > p {
   font-family: var(--font-body, "Montserrat", sans-serif);
   font-size: 1.25rem;
   font-weight: 500;
-  /* Body prose sits on the site gradient, where white fails WCAG 1.4.3 (max
-     ~3.3:1). Black clears 4.5:1 across the whole gradient. Headings (.subhead)
-     keep their white/yellow; only paragraphs change (Steve, 12 Aug 2026). */
+  /* BLACK IS NOW THE ACCESSIBILITY FALLBACK, NOT THE DEFAULT (Steve, 19 September
+     2026). It supersedes the note that stood here from 12 Aug 2026, which said
+     black was chosen because white failed WCAG 1.4.3 at about 3.3:1. That is still
+     true of white, but black is no longer what most readers see: the rule below
+     takes the prose to dark blue unless an accessibility contrast scheme is set,
+     in which case this declaration is what applies. See that rule for the numbers
+     and the decision. Headings (.subhead) keep their white/yellow, as before. */
   color: #000000;
   line-height: 1.3;
   margin: 0 0 18px;
@@ -162,13 +166,65 @@
   max-width: none;
 }
 
+/* THE PROSE SELECTORS ARE CHILD SELECTORS, NOT DESCENDANT (19 September 2026).
+
+   Every `.essayBody p` in this file is now `.essayBody > p`. This is the fix for the
+   black card text reported as tasks 3.5 to 3.11, and it is what makes 2.4 above safe
+   to ship.
+
+   THE CAUSE. On DESKTOP the sidebar cards render in `<aside class=sidebar>`, outside
+   `.essayBody`, so a prose rule cannot reach them. On MOBILE, MobileArticleBody
+   interleaves the cards INTO the body: it wraps prose and cards alike in one
+   `<div class={bodyClassName}>`, which is `.essayBody`. A descendant selector
+   therefore reached every `<p>` inside every card, and `.essayBody p` at (0,1,1)
+   beat SidebarCard's `.text` at (0,1,0). That is why the cards read black on
+   mobile only, and only on articles 4 to 6: articles 1 to 3 use inline styles,
+   which beat any stylesheet.
+
+   WHY IT HAD TO LAND WITH 2.4 RATHER THAN IN A LATER CHECKPOINT. Measured on the
+   navy card: black on navy was 1.76:1, bad but visible. Navy on navy is 1.00:1,
+   which is invisible. Shipping 2.4 on its own would have taken three live articles
+   from hard to read to unreadable.
+
+   The prose is a direct child of `.essayBody` in both the desktop body and
+   MobileArticleBody, and the cards are always nested inside a slot div, so the
+   child combinator keeps every prose rule and drops every card. No override is
+   needed on any card, which is what the brief asked for: fix the reach once rather
+   than patching each card. */
+
+/* 2.4 BODY PROSE IN DARK BLUE, ALL WIDTHS (Steve, 19 September 2026).
+
+   A DELIBERATE SUB-AA DIP, ACCEPTED, AND ON THE RECORD SO IT IS NOT REVERTED AS AN
+   OVERSIGHT. Steve reviewed this on the device and chose the dark blue. Measured
+   across the site gradient, which runs #00e2ff at the cyan end to #008eff at the
+   deep-blue end:
+
+     black #000000   13.32:1 cyan   6.31:1 deep   passes AA across the whole run
+     navy  #0a3a57    7.59:1 cyan   3.60:1 deep   FAILS AA on the deep-blue end
+
+   So this is not the free improvement it might look like: black cleared AA
+   everywhere and navy does not. The brief that asked for it quoted only the 7.59
+   figure. It is the same call already on record for /home and /about in
+   globals.css, where navy on this gradient is recorded at the same 7.6 to 3.6
+   range with the dip accepted.
+
+   GATED, SO THE READER CAN STILL GET THE PASSING COLOUR. Anyone on an
+   accessibility contrast scheme falls through to the black above. The gate is the
+   same one 1.5 uses on the index and globals.css uses throughout.
+
+   THE TOGGLE STILL WINS. The article text toggle's rule above is (0,4,2) against
+   this rule's (0,3,1), so toggle-on prose stays white and is unaffected. */
+:root:not([data-pc-contrast-scheme]) .essayBody > p {
+  color: var(--navy, #0a3a57);
+}
+
 /* First paragraph treatment, matching GDBD. Every Dogs at Work article opens
    with a prose paragraph, so its first .essayBody child is a <p>. */
 /* Wide-viewport type bumps, adopted from Good Dog Bad Dog (Steve, 12 Aug): body
    +3pt and the intro larger still at 1300+. Values match GDBD so the two
    templates read the same at width. */
 @media (min-width: 1300px) {
-  .essayBody p { font-size: 1.4375rem; }
+  .essayBody > p { font-size: 1.4375rem; }
   .essayBody > p:first-child,
   .essayBody .introPara { font-size: 1.8125rem; }
 }
@@ -369,6 +425,149 @@
 }
 .backLink:hover { color: var(--blue-deep, #0b78bd); }
 
+/* THE COLOUR TOGGLE'S PLACE ON THE INDEX PAGE (Steve, 19 September 2026, from the
+   annotated screenshot: move it down to sit just above the title).
+
+   WHY A WRAPPER HERE RATHER THAN A CHANGE TO THE COMPONENT. ArticleTextToggle is
+   shared with Good Dog Bad Dog, smarter-than-the-test, /home and /about, and the
+   brief puts it out of scope. Its own stylesheet also records .wrap as "the single
+   owner of the hero to body vertical space", so its margins are load bearing on
+   those pages. Nothing in that file is touched; this wrapper is owned by the index
+   page and reaches nothing else.
+
+   WHY transform AND NOT margin. The toggle sits in normal flow above the title, so
+   a margin would push the title and the whole page down with it. A transform moves
+   the control on screen and leaves the flow alone, which is what the screenshot
+   asks for: the title stays where it is and only the icon drops.
+
+   THE FIGURE IS MEASURED. The toggle's centre sat at y 56 and the target in the
+   screenshot is about y 144, so 88px. There is 96px of clear space between the
+   toggle and the title, so it lands 8px above the title with nothing to collide
+   with. Desktop is untouched, as instructed. */
+/* Declared only inside the query on purpose: desktop keeps exactly what the shared
+   component gives it, and an empty base rule risks a minifier dropping the class
+   name so styles.toggleSlot comes back undefined. */
+@media (max-width: 900px) {
+  /* THE INDEX PAGE: 88px down, to sit just above the title. */
+  .toggleSlot {
+    transform: translateY(88px);
+  }
+
+  /* THE ARTICLE PAGES: the toggle sits IN THE FLOW between the payslip and the body
+     (Steve, 19 September 2026).
+
+     IT WAS NEVER MISSING ON MOBILE. It rendered and was visible, and the payslip was
+     drawn on top of it: the toggle sat at y 536 and the payslip card spans 381 to 803
+     at z-index 2. A hit test at the toggle's centre returned the payslip div, while
+     the same test on desktop returns the button.
+
+     TWO EARLIER ATTEMPTS FAILED AND BOTH ARE WORTH RECORDING. Translating the toggle
+     down a fixed distance cannot work, because the payslip is a different height on
+     every article: card bottoms run 803, 803, 815, 815, 869 and 866 at 390 wide, a
+     66px spread. Any single offset clears the tallest card on one page and leaves a
+     77px hole on another, so the space above and below the control came out different
+     on every article. That unevenness is what Steve photographed.
+
+     SO IT GOES IN THE FLOW INSTEAD, which is the only way the two gaps can be equal
+     everywhere: the browser places it after the payslip whatever height that is.
+
+     THE COST IS THAT THE CONTROL IS RENDERED TWICE, once per layout, because
+     .essayLayout and .articleMobile are each display:none at the other breakpoint and
+     neither can share a child. Only one is ever in the tree. Both read the same
+     sessionStorage key on mount and set the same attribute on <main>, so they cannot
+     disagree about state, and display:none keeps the hidden one out of the
+     accessibility tree rather than leaving a duplicate button in it. */
+  .toggleSlotArticle {
+    display: none;
+  }
+
+  /* The component carries its own margin, 36px auto 12px, which is its spacing on the
+     essay axis and is wrong here. Zeroed so the slot owns both gaps and they come out
+     equal. The 24px meets the payslip wrapper's own 24px bottom margin and the two
+     collapse to 24, so the gap above and the gap below are the same number. */
+  .toggleSlotMobile > div {
+    /* > div, not > *, on purpose. The component's .wrap is a single class, so a
+       universal child selector ties on specificity and loses on stylesheet order.
+       Its 36px top margin then collapsed straight out through this slot and became
+       the gap above the icon: measured 36px above against 24px below, which is the
+       unevenness this whole rule exists to remove. */
+    margin: 0;
+  }
+  .toggleSlotMobile {
+    margin: 24px 0;
+  }
+}
+
+/* The mobile-only half of the article toggle pair. Hidden above the breakpoint so
+   only the .toggleSlotArticle instance renders there. See the note in the 900px
+   block for why there are two. */
+@media (min-width: 901px) {
+  .toggleSlotMobile {
+    display: none;
+  }
+}
+
+/* ── Legacy card text, moved out of the page files (19 September 2026) ───────
+
+   WHY THESE EXIST. The blue box SHELL was always shared: articles 1 to 6 all use
+   .sidebarCard above for the navy panel. Only the text inside was done two ways.
+   Articles 4 to 6 use SidebarCard.module.css; articles 1 to 3 and CostToTrainCard
+   carried four React.CSSProperties objects each, copied between the files.
+
+   The four objects were byte-identical in every file, so they were a copy, not a
+   design decision, and they are reproduced here value for value.
+
+   WHAT IT FIXES. An inline style cannot carry a media query, so every change to
+   the legacy cards had to apply at all widths, while the same change on the
+   component cards could be mobile only. That is why the two halves kept drifting
+   and why a phones-only tweak to card text was impossible. As classes they can now
+   do whatever the component half does.
+
+   THE BRIEF SAID NOT TO DO THIS. Section 4: "Do not refactor articles 1 to 3 onto
+   the component". Overruled by Steve on 19 September 2026, on seeing that the
+   inconsistency could not otherwise be closed. Note this is the LIGHT version: the
+   markup is untouched and nothing moves onto the SidebarCard component. Only the
+   text styling moves from the page file into this stylesheet.
+
+   VERIFIED AS A NO-OP. Every text element on each article was captured at 390,
+   1280 and 1760 before and after: font, size, weight, colour, leading, tracking,
+   case, margin, padding and box. Identical, or the change was not shipped. */
+.cardTitle2 {
+  font-family: var(--font-display);
+  font-size: 38.67px;
+  letter-spacing: 0;
+  color: var(--yellow-header);
+  line-height: 0.9;
+  text-transform: uppercase;
+  margin: 0 0 6px;
+}
+
+.cardBody2 {
+  font-family: var(--font-body);
+  font-size: 1.087rem;
+  font-weight: 500;
+  color: #fff;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.statLabel2 {
+  font-family: var(--font-body);
+  font-size: 0.66rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--yellow);
+  margin-bottom: 4px;
+}
+
+.statValue2 {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  color: #fff;
+  line-height: 1;
+}
+
 /* ── Hero content (h1 + pills inside hero) ──────────────────── */
 .essayHeroContent {
   composes: heroContent from "../../components/EssayShell/EssayShell.module.css";
@@ -564,17 +763,123 @@
      viewport height:  overlap = |payslip margin-top| - 48;
                        title clearance = hero-content padding-bottom - overlap. */
 
-  /* 1. Hero twice as tall: every term of the base clamp doubled. */
+  /* 1. HERO HEIGHT. Was "twice as tall: every term of the base clamp doubled",
+     clamp(816px, 120vh, 1344px), set 12 Aug 2026. Brought down to a flat 500px on
+     19 September 2026 (Steve).
+
+     MEASURED BEFORE AND AFTER, at 390 wide on all six articles. Before: every hero
+     was 1013px, because 120vh on an 844 viewport won and the title never came near
+     it. After: 500px on all six.
+
+     THE TITLE CUT BELOW IS LOAD-BEARING, NOT COSMETIC. With this at 500 and the
+     title left alone, the longest of the six, "The Dogs Teaching Medicine How to
+     Smell Disease", needs 561px of content and would push the hero straight back
+     out to 561. The two changes only work together.
+
+     THE PAYSLIP BAND IS DELIBERATELY NOT REBUILT. The geometry recorded above is
+     all relative to the hero's BOTTOM edge (overlap = |payslip margin-top| - 48;
+     title clearance = hero-content padding-bottom - overlap), so the 140px overlap
+     and the 50px clearance hold at any hero height and the payslip rides up with
+     it. Verified on the device rather than trusted.
+
+     TASK 2.1 ASKED FOR A max-height AND THAT CANNOT WORK. min-height beats
+     max-height, so a max-height of 500 against a min-height of 816 does nothing at
+     all. The min-height is the only lever. */
   .essayHero {
-    min-height: clamp(816px, 120vh, 1344px);
+    min-height: 500px;
+  }
+
+  /* 2.3 HERO TITLE. The brief asked for line-height 1.1em; it already reads 1.1 and
+     the leading was never the problem. What made the hero look loose was the type
+     size: the base is calc(clamp(2.7rem, 6vw, 4.5rem) + 2pt), and at 390 wide 6vw
+     is only 23.4px, so the 2.7rem floor wins and the title sets at 45.9px. Uppercase
+     with 0.04em tracking, in a column of about 342px, the longest title wrapped to
+     five lines.
+
+     Floor dropped 2.7rem to 2rem and the tracking to 0 (Steve, 19 September 2026).
+     Measured: 34.7px, three lines on the longest title. Removing the floor entirely
+     was tried and gave 26.1px on two lines, rejected as too close to body size for
+     a hero. line-height is untouched. */
+  .essayHeroTitle {
+    font-size: calc(clamp(2rem, 6vw, 4.5rem) + 2pt);
+    letter-spacing: 0;
+  }
+
+  /* 2.5 Intro paragraph down 2pt from 1.625rem, then 1pt more, then 1pt more again,
+     all on 19 September 2026 (Steve). 4pt in total off the base. */
+  .essayBody > p:first-child,
+  .essayBody .introPara {
+    font-size: calc(1.625rem - 4pt);
+  }
+
+  /* 2.6 Body text down 1pt from 1.25rem, then 1pt more, then 1pt more again, all on
+     19 September 2026 (Steve). 3pt in total off the base, which lands it at 16px on
+     a 390 phone. */
+  .essayBody > p {
+    font-size: calc(1.25rem - 3pt);
+  }
+
+  /* 19 September 2026 (Steve). The back link comes down 1pt and loses half its
+     bottom margin so it sits closer to the pills. Measured: the gap between the link
+     and the pill row IS this margin, 20px, so 10px halves it exactly. */
+  .backLink {
+    font-size: calc(0.75rem - 1pt);
+    margin-bottom: 10px;
+  }
+
+  /* 19 September 2026 (Steve): article hero pills 25% smaller, 0.85rem x 0.75. This
+     is .tag and .tagBreed on the article pages, not .pill on the index, which came
+     down 25% to 0.9rem in task 1.4. The two sets are separate rules in separate
+     files.
+
+     BOTH PILLS, because the hero meta always renders a PAIR: a family pill (.tag
+     plus a colour variant) and a breed pill (.tagBreed). Sizing only .tag left the
+     second one at full size beside a shrunken first. The variants, .tagGood,
+     .tagRural, .tagEmergency and the rest, set background and colour only and carry
+     no size of their own, so these two rules cover every article.
+     .tagBad is deliberately not here: it is 0.65rem already and is rendered by none
+     of the six. */
+  .tag,
+  .tagBreed {
+    font-size: 0.6375rem;
+  }
+
+  /* 2.7 Halve the air above the card title, legacy card system (articles 1 to 3).
+     The 40px is recorded at the base rule as a deliberate doubling from 20 on
+     12 Aug 2026 and stays for desktop. The component system's half of this task is
+     in SidebarCard.module.css, which needed a query of its own. */
+  .sidebarCard {
+    padding-top: 20px;
+  }
+
+  /* Blue box paragraph text down 2pt with the leading tightened to 1.3em, PHONES
+     ONLY (Steve, 19 September 2026).
+
+     THIS RULE IS THE WHOLE POINT OF THE REFACTOR ABOVE. Until the legacy card text
+     moved out of the page files it was an inline style, and an inline style cannot
+     carry a media query, so this change could only ever have applied at every width
+     and would have moved the signed-off desktop layout. As a class it can be scoped
+     to the breakpoint like anything else. The component half is the matching rule in
+     SidebarCard.module.css, at the same 900px. Move one, move both. */
+  .cardBody2 {
+    font-size: calc(1.087rem - 2pt);
+    line-height: 1.3em;
   }
 
   /* Lift the bottom-aligned title, pills and back link off the very bottom so the
      overlaid payslip below has a clear band to sit in (the mobile stand-in for the
      desktop 60%-width title cap). 190 - 140 overlap = 50px nominal clearance,
      comfortably past the tilted card's raised corner. */
+  /* 190 -> 140, 19 September 2026 (Steve: nudge the hero content down 50px). The
+     block is align-self: flex-end, so the bottom padding is what holds it up and
+     taking 50 off moves the whole group down 50.
+
+     IT SPENDS THE PAYSLIP CLEARANCE, and the note above is the one to read. Measured
+     at 390 before this pass: the title's baseline sat 90px above the tilted card's
+     top. Down 50 here, and up 10 on the card below, leaves 30px. Still clear, but it
+     is the margin now, so anything further wants measuring first. */
   .essayHeroContent {
-    padding-bottom: 190px;
+    padding-bottom: 140px;
   }
 
   .articleMobile {
@@ -603,7 +908,10 @@
      above the tint, matching the desktop sidebar (z-index 10). It clears the hero
      title/pills/back link by design, so sitting above them covers nothing. */
   .mobilePayslip {
-    margin-top: -188px;
+    /* -188 -> -198, 19 September 2026 (Steve: nudge the payslip up 10px). Raises the
+       hero overlap from 100 to 110 and takes 10 more off the title clearance; see the
+       .essayHeroContent note above for the combined figure. */
+    margin-top: -198px;
     position: relative;
     z-index: 2;
   }

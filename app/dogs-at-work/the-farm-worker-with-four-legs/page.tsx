@@ -238,7 +238,11 @@ export default function SheepdogsPage() {
           </div>
         </div>
 
-        <ArticleTextToggle />
+        {/* Wrapped so the article pages can place the toggle on mobile without
+            touching the shared component. See .toggleSlot in dogs-at-work.module.css. */}
+        <div className={styles.toggleSlotArticle}>
+          <ArticleTextToggle />
+        </div>
 
         <div className={styles.essayLayout}>
           <article className={styles.essay}>
@@ -269,6 +273,11 @@ export default function SheepdogsPage() {
         <div className={styles.articleMobile}>
           <div className={styles.mobilePayslip}>
             <Payslip data={PAYSLIPS["the-farm-worker-with-four-legs"]} />
+          </div>
+          {/* The colour toggle, IN THE FLOW between the payslip and the body.
+              Mobile only; the desktop one is above. See .toggleSlotMobile. */}
+          <div className={styles.toggleSlotMobile}>
+            <ArticleTextToggle />
           </div>
           <MobileArticleBody
             body={BODY}

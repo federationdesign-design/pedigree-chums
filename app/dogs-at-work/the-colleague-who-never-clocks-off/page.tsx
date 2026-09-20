@@ -10,6 +10,11 @@ import Payslip from "../../../components/Payslip/Payslip";
 import MobileArticleBody, { type ArticleCard } from "../../../components/DogsAtWork/MobileArticleBody";
 import { PAYSLIPS } from "../data/payslips";
 
+// CARD TEXT IS CLASSES NOW, 19 September 2026 (Steve). The React.CSSProperties
+// objects that used to live here are .cardTitle2, .cardBody2, .statLabel2 and
+// .statValue2 in dogs-at-work.module.css, value for value. See the note there for
+// why. Per-site overrides stay inline, because they are genuinely per site.
+
 export const metadata: Metadata = {
   title: "The Colleague Who Never Clocks Off | Dogs at Work",
   description:
@@ -56,8 +61,6 @@ const BODY: (string | { h: string; id: string })[] = [
   "Listening. Or rather, smelling. Mostly smelling.",
 ];
 
-const cardTitle: React.CSSProperties = { fontFamily: "var(--font-display)", fontSize: "38.67px", letterSpacing: "0", color: "var(--emphasis)", lineHeight: 0.9, textTransform: "uppercase", margin: "0 0 6px" };
-const cardBody: React.CSSProperties = { fontFamily: "var(--font-body)", fontSize: "1.087rem", fontWeight: 500, color: "#fff", lineHeight: 1.5, margin: 0 };
 
 // Sidebar cards as an explicit list. Desktop renders them in the sticky sidebar
 // in this order; mobile renders each above the H2 named in pairWith (Read next to
@@ -69,8 +72,8 @@ const CARDS: ArticleCard[] = [
     node: (
       <div className={styles.sidebarCard}>
         <div style={{ padding: "32px 40px 52px" }}>
-          <p style={cardTitle}>Editor&apos;s note</p>
-          <p style={{ ...cardBody, fontStyle: "italic" }}>&quot;Bramble&quot; and &quot;Sarah&quot; are illustrative while we finalise a real, currently-working alert dog to feature - with the organisation&apos;s and owner&apos;s permission.</p>
+          <p className={styles.cardTitle2}>Editor&apos;s note</p>
+          <p className={styles.cardBody2} style={{ fontStyle: "italic" }}>&quot;Bramble&quot; and &quot;Sarah&quot; are illustrative while we finalise a real, currently-working alert dog to feature - with the organisation&apos;s and owner&apos;s permission.</p>
         </div>
       </div>
     ),
@@ -81,9 +84,9 @@ const CARDS: ArticleCard[] = [
     node: (
       <div className={styles.sidebarCard}>
         <div style={{ padding: "32px 40px 52px" }}>
-          <p style={cardTitle}>What the dog thinks it&apos;s doing</p>
-          <p style={{ ...cardBody, marginBottom: 8 }}><strong>What humans think:</strong> a medical alert dog is detecting the odour change linked to a dangerous drop in blood sugar and warning its owner in time to act.</p>
-          <p style={cardBody}><strong>What Bramble thinks:</strong> Sarah smells wrong. Boop Sarah. Receive biscuit. Be brilliant.</p>
+          <p className={styles.cardTitle2}>What the dog thinks it&apos;s doing</p>
+          <p className={styles.cardBody2} style={{ marginBottom: 8 }}><strong>What humans think:</strong> a medical alert dog is detecting the odour change linked to a dangerous drop in blood sugar and warning its owner in time to act.</p>
+          <p className={styles.cardBody2}><strong>What Bramble thinks:</strong> Sarah smells wrong. Boop Sarah. Receive biscuit. Be brilliant.</p>
         </div>
       </div>
     ),
@@ -94,8 +97,8 @@ const CARDS: ArticleCard[] = [
     node: (
       <div className={styles.sidebarCard}>
         <div style={{ padding: "32px 40px 52px" }}>
-          <p style={cardTitle}>What they can be trained for</p>
-          <p style={cardBody}>Medical alert assistance dogs are trained to detect the minute odour changes linked to conditions such as diabetes (blood sugar), PoTS, cardiac arrhythmias, Addison&apos;s disease and severe allergies - and can be trained to alert to seizure activity. Always alongside, never instead of, medical care.</p>
+          <p className={styles.cardTitle2}>What they can be trained for</p>
+          <p className={styles.cardBody2}>Medical alert assistance dogs are trained to detect the minute odour changes linked to conditions such as diabetes (blood sugar), PoTS, cardiac arrhythmias, Addison&apos;s disease and severe allergies - and can be trained to alert to seizure activity. Always alongside, never instead of, medical care.</p>
         </div>
       </div>
     ),
@@ -106,7 +109,7 @@ const CARDS: ArticleCard[] = [
     node: (
       <div className={styles.sidebarCard}>
         <div style={{ padding: "32px 40px 16px" }}>
-          <p style={cardTitle}>What it costs to train a dog</p>
+          <p className={styles.cardTitle2}>What it costs to train a dog</p>
         </div>
         <div style={{ padding: "0 40px 16px", display: "flex", flexDirection: "column", gap: 12 }}>
           {[
@@ -116,15 +119,15 @@ const CARDS: ArticleCard[] = [
           ].map(({ role, detail, value }) => (
             <div key={role} style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 10, borderBottom: "1px solid rgba(255,255,255,0.1)", paddingBottom: 10 }}>
               <div>
-                <p style={{ ...cardBody, fontWeight: 700 }}>{role}</p>
-                <p style={{ ...cardBody, fontSize: "0.72rem", color: "#aac4d4" }}>{detail}</p>
+                <p className={styles.cardBody2} style={{ fontWeight: 700 }}>{role}</p>
+                <p className={styles.cardBody2} style={{ fontSize: "0.72rem", color: "#ffffff" }}>{detail}</p>
               </div>
               <p style={{ fontFamily: "var(--font-display)", fontSize: "1.5rem", color: "#fff", whiteSpace: "nowrap", lineHeight: 1 }}>{value}</p>
             </div>
           ))}
         </div>
         <div style={{ padding: "8px 40px 52px" }}>
-          <p style={{ ...cardBody, fontSize: "0.78rem", color: "#aac4d4" }}>Given free to the people who need them, funded almost entirely by public donations. Sources: Guide Dogs; Medical Detection Dogs.</p>
+          <p className={styles.cardBody2} style={{ fontSize: "0.78rem", color: "#ffffff" }}>Given free to the people who need them, funded almost entirely by public donations. Sources: Guide Dogs; Medical Detection Dogs.</p>
         </div>
       </div>
     ),
@@ -135,8 +138,8 @@ const CARDS: ArticleCard[] = [
     node: (
       <div className={styles.sidebarCard}>
         <div style={{ padding: "32px 40px 52px" }}>
-          <p style={cardTitle}>Read next</p>
-          <p style={{ ...cardBody, marginBottom: 10 }}>The other end of the same nose: the dogs helping scientists work out whether disease has a smell.</p>
+          <p className={styles.cardTitle2}>Read next</p>
+          <p className={styles.cardBody2} style={{ marginBottom: 10 }}>The other end of the same nose: the dogs helping scientists work out whether disease has a smell.</p>
           <Link href="/dogs-at-work/the-dogs-teaching-medicine-how-to-smell-disease" className={styles.readMore}>The lab dogs →</Link>
         </div>
       </div>
@@ -196,7 +199,11 @@ export default function AlertDogPage() {
           </div>
         </div>
 
-        <ArticleTextToggle />
+        {/* Wrapped so the article pages can place the toggle on mobile without
+            touching the shared component. See .toggleSlot in dogs-at-work.module.css. */}
+        <div className={styles.toggleSlotArticle}>
+          <ArticleTextToggle />
+        </div>
 
         <div className={styles.essayLayout}>
           <article className={styles.essay}>
@@ -228,6 +235,11 @@ export default function AlertDogPage() {
         <div className={styles.articleMobile}>
           <div className={styles.mobilePayslip}>
             <Payslip data={PAYSLIPS["the-colleague-who-never-clocks-off"]} />
+          </div>
+          {/* The colour toggle, IN THE FLOW between the payslip and the body.
+              Mobile only; the desktop one is above. See .toggleSlotMobile. */}
+          <div className={styles.toggleSlotMobile}>
+            <ArticleTextToggle />
           </div>
           <MobileArticleBody
             body={BODY}

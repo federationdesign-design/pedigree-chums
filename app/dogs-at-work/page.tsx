@@ -62,7 +62,11 @@ export default function DogsAtWorkPage() {
         {/* Article text toggle, centred as on /home. Inverts white text to dark
             blue; the blue GlowPanel copy and the navy article-panel copy are
             excluded (they would be unreadable navy). See deck.module.css. */}
-        <ArticleTextToggle centered />
+        {/* Wrapped so the index page can place the toggle without touching the
+            shared component. See .toggleSlot in dogs-at-work.module.css. */}
+        <div className={styles.toggleSlot}>
+          <ArticleTextToggle centered />
+        </div>
         {/* Desktop mechanic: three regions, counter-motion, dots (checkpoint 3). */}
         <WorkDeck slides={liveSlides} />
         <div className={styles.page}>

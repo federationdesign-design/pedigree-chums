@@ -442,7 +442,13 @@
 }
 
 .learnAboutAccent {
-  color: var(--emphasis);
+  /* --emphasis (pale, #FFED60) to --yellow-header (lemon, #ffed00), 19 September
+     2026 (Steve: wrong yellow). ALL WIDTHS, because a wrong colour is wrong at every
+     size, and it matches the article card titles which went lemon at all widths in
+     task 2.8. Say the word and it becomes mobile only; nothing forces it either way
+     here, unlike the card titles. --emphasis itself is untouched and still carries
+     the yellow highlight inside the blue panel copy on this page. */
+  color: var(--yellow-header);
 }
 
 .articleMeta {
@@ -587,6 +593,183 @@
   .blueSectionBody {
     max-width: 100%;
   }
+
+  /* ── Mobile presentation pass, 19 September 2026 ──────────────────────────
+     Tasks 1.1 to 1.7 of the Dogs at Work mobile brief. Every rule here is
+     inside this query on purpose: .introText, .blueBody, .learnAbout, .pill,
+     .headline and .cta are all shared by the desktop markup and the mobile
+     stack, so a change to the base rule would move the signed-off desktop
+     layout. The .m* classes are not repeated here because .mobile is
+     display:none above this breakpoint, so they are already mobile only. */
+
+  /* 1.1 Intro down 3pt, then a further 3pt on 19 September 2026 (Steve). 6pt off
+     the base in total. calc on the whole clamp so it comes down by the same amount
+     at every width rather than only where one term happens to bite. At 390 the 28px
+     floor governs, so this reads 20px. */
+  .introText {
+    font-size: calc(clamp(28px, 3.6vw, 36px) - 6pt);
+  }
+
+  /* 1.2, first half. The paragraph gap. The 0.9em was set on 31 Aug 2026 to
+     separate paragraphs split out of one body string; halving it to 0.45em keeps
+     that break readable while closing the block up on a phone. The .mBlue half of
+     this task is at the foot of the file, and the note there says why. */
+  .blueBody {
+    /* 0.9em -> 0.45em -> 0.225em -> BACK TO 0.45em, all on 19 September 2026.
+
+       THE SECOND HALVING WENT TOO FAR AND WAS REVERSED. At 0.225em the gap measured
+       4px against a 15.7px font, and the paragraphs stopped reading as separate: on
+       the "Why dogs love doing" panel the bold lead ran straight into the body and
+       the body ran straight into the closing paragraph, which is what Steve
+       photographed. 0.45em gives 7px, which is a visible break and is half the
+       original rather than a quarter. This is the floor; do not halve it again. */
+    margin-bottom: 0.45em;
+  }
+
+  /* 1.3 Halve the air above the "Learn about" title. The base rule's 75px is
+     recorded as Item 3 and stays for desktop. */
+  /* 75px -> 37.5px -> 18.75px, the second halving on 19 September 2026 (Steve).
+     The base 75px is recorded as Item 3 and stays for desktop. */
+  .learnAbout {
+    padding-top: 18.75px;
+  }
+
+  /* 1.4 Pill text 25% smaller: 1.2rem x 0.75. The article pages' own .tag is
+     0.85rem, so this lands a shade above it and the two read as one family. */
+  .pill {
+    font-size: 0.9rem;
+  }
+
+  /* THE 20px PANEL-4 INDENT IS OFF ON MOBILE (Steve, 19 September 2026, from the
+     annotated screenshot).
+
+     WHAT IT WAS. "Item 9" at the base rules: panel 4's content, its bullets, the
+     "Results in" list and the two closing paragraphs, indented a further 20px, but
+     not its subheading. That is why the whole block sat right of the heading while
+     every other panel lines up.
+
+     Zeroed here rather than deleted, so the desktop treatment the item was written
+     for is untouched.
+
+     THE BULLETS KEEP THEIR OWN 1.2em. That is the list indent the disc markers sit
+     in, not the panel-4 indent, and removing it would hang the markers outside the
+     text. So the paragraphs now align with the heading and the bullets sit one list
+     indent in, which is how every other panel reads. */
+  .blueBody.blueIndent {
+    padding-left: 0;
+  }
+  .blueBullets.blueIndent {
+    padding-left: 1.2em;
+  }
+
+  /* THE GAP BETWEEN TWO SECTIONS IN ONE PANEL, halved (Steve, 19 September 2026,
+     from the annotated screenshot of "To the dog / To humans").
+
+     MEASURED AT 58px, and it is two rules stacked, which is why halving either one
+     alone would not have done it: 20px of flex gap from .blueSections, plus the
+     37.5px margin-top the next heading carries. Both are halved here, so the total
+     lands at 28.75px.
+
+     THE FIRST HEADING IS DELIBERATELY EXCLUDED. Its 37.5px is what sets the gap at
+     the TOP of the panel, measured at 45px and already approved. `> * + *` takes
+     only headings inside a section that follows another one, so the panel top is
+     untouched. */
+  .blueSections {
+    gap: 10px;
+  }
+  .blueSections > * + * .blueSubheading {
+    margin-top: 18.75px;
+  }
+
+  /* The air above every blue panel subheading, halved (Steve, 19 September 2026,
+     from the annotated screenshot).
+
+     IT WAS NOT THE PANEL PADDING. That had already come down to a quarter of its
+     base, 28.64px to 7.16px, and the gap the arrow marked was still 82px. Measured:
+     75px of it is this heading's own margin-top, recorded at the base rule as
+     "Item 3: 75px above every panel subheading". The panel padding was 7px of the 82.
+
+     The base 75px stays for desktop, where it is deliberately matched to the panel-1
+     thumbnail drop so the heading's top edge lines up with it. That alignment does
+     not exist in the mobile stack, which has no thumbnails. */
+  .blueSubheading {
+    margin-top: 37.5px;
+  }
+
+  /* 1.5 Pill text white on the three families that read navy.
+
+     A DELIBERATE WCAG AA FAILURE, ACCEPTED BY STEVE ON 19 SEPTEMBER 2026 FOR THE
+     LOOK. This is not an oversight and it is not to be reverted as one. The navy
+     it replaces was chosen because it passes and white does not. Measured, text
+     on the pill's own background:
+
+       Medical                #17C138   navy 4.97:1 pass   white 2.41:1 FAIL
+       Rural and Traditional  #97AA31   navy 4.62:1 pass   white 2.59:1 FAIL
+       Science                #10D1B7   navy 6.17:1 pass   white 1.94:1 FAIL
+
+     White on Science at 1.94:1 is the worst of the three and is close to
+     unreadable. Steve was given these three figures before the change and chose
+     white anyway.
+
+     THE READER CAN STILL GET THE PASSING COLOUR. Gated on
+     :root:not([data-pc-contrast-scheme]), the same gate this file and globals.css
+     already use, so anyone on an accessibility contrast scheme keeps the navy.
+     The gate also lifts specificity to (0,4,0) against the base rules' (0,2,0),
+     so this cannot be undone by source order the way task 1.2 was.
+
+     The other three families, Security, Emergency and People, are already white
+     on their own backgrounds and are not touched. */
+  :root:not([data-pc-contrast-scheme]) .pill[data-family="Medical"],
+  :root:not([data-pc-contrast-scheme]) .pill[data-family="Rural and Traditional"],
+  :root:not([data-pc-contrast-scheme]) .pill[data-family="Science"] {
+    color: var(--cream);
+  }
+
+  /* 1.6 Article headline, the title in the navy block at the foot of the page.
+
+     LEADING: opened from 1.05 to 1.3em earlier today on the brief's figure, then
+     pulled back to 1.1em (Steve, 19 September 2026) once the rest of the block
+     tightened around it. Asked for again in a later round; it was already 1.1em and
+     is unchanged by that request.
+
+     SIZE: down 2pt (Steve, 19 September 2026). The base clamp is
+     clamp(3.5rem, 2vw, 2rem), whose min exceeds its max, so it resolves to the
+     3.5rem floor at every width. 56px becomes 53.33px. calc on the whole clamp so
+     the reduction holds whatever that odd clamp is doing. */
+  .headline {
+    font-size: calc(clamp(3.5rem, 2vw, 2rem) - 2pt);
+    /* 1.1em -> 0.99em, a straight 10% off the leading (Steve, 19 September 2026).
+
+       WHY 1.1em DID NOTHING. An em is a multiple of the FONT SIZE, and the 2pt
+       reduction above cut that at the same time. 56 x 1.05 came to 58.8px and
+       53.33 x 1.1 comes to 58.67px, so the two changes cancelled to within 0.13px
+       and the leading looked untouched because it effectively was. 0.99em takes the
+       computed value to 52.8px, a real 10% off. */
+    line-height: 0.99em;
+  }
+
+  /* 1.7 The green CTA must never wrap. MEASURED, not estimated: at 320 wide the
+     button has 288px of room, and the longest of the six labels, "Search and
+     rescue dogs" at 22 characters, needs 454px at the base 28.8px/52px and
+     wraps to two lines. 18px type with 28px side padding needs 275px and fits
+     with 13px to spare; 19px/30px needs 291px and does not. The floor is
+     therefore 1.125rem, and 5.6vw reaches it at exactly 320 so the button still
+     grows on a larger phone. The base rule's doubling is recorded as Item 4 in
+     this file and is untouched for desktop.
+     NOTE: the 12px drop shadow was doubled with the original type and now sits
+     under type less than half that size. Left alone because only the font and
+     the padding were asked for. */
+  .cta {
+    font-size: clamp(1.125rem, 5.6vw, 2.3rem);
+    /* Asymmetric on purpose, 19 September 2026 (Steve, exact values supplied): 19px
+       above the label against 12px below. It sits the word low in the pill rather
+       than centring it, and it adds 7px to the button's height. The side padding is
+       the 28px the one-line fit was measured against and must not change: at 320
+       wide the longest label, "Search and rescue dogs", needs 275px of the 288
+       available at 18px type with 28px sides, and 30px sides push it to 291px, which
+       wraps. */
+    padding: 19px 28px 12px 28px;
+  }
 }
 
 .mIntro {
@@ -700,4 +883,24 @@
 }
 :root:not([data-pc-contrast-scheme]) :global(main[data-pc-textinvert="on"]) .cta {
   color: var(--navy, #0a3a57);
+}
+
+/* 1.2, second half: less air above and below the copy inside the blue panel.
+
+   WHY THIS IS AT THE FOOT OF THE FILE AND NOT IN THE BLOCK WITH THE REST. The
+   base .mBlue rule is declared further down this stylesheet than the mobile query
+   the other six tasks live in, and it sets the shorthand `padding`. A media query
+   adds no specificity, so the later shorthand simply overwrote an earlier
+   padding-top and the change read as not applied at all (measured: still 28.64px
+   on a 390 phone). Declared after the base rule, it wins on source order.
+
+   The side padding is deliberately untouched, so only the vertical closes up. */
+@media (max-width: 768px) {
+  /* Halved once on 19 September 2026, then halved again the same day (Steve), so a
+     quarter of the base clamp(22px, 8cqi, 34px). At 390 this reads about 7px against
+     the 28.6px it started at. The side padding is still untouched. */
+  .mBlue {
+    padding-top: clamp(5.5px, 2cqi, 8.5px);
+    padding-bottom: clamp(5.5px, 2cqi, 8.5px);
+  }
 }

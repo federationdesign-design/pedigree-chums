@@ -54,10 +54,22 @@ const BODY: (string | { h: string; id: string })[] = [
   "Somewhere, a machine that can smell disease is being invented. And somewhere in that machine's family tree there will be a golden retriever and a black Labrador who once sniffed a row of pots, found the strange one, and looked up for their biscuit - with absolutely no idea they had just shown medicine where to look.",
 ];
 
-const cardTitle: React.CSSProperties = { fontFamily: "var(--font-display)", fontSize: "38.67px", letterSpacing: "0", color: "var(--emphasis)", lineHeight: 0.9, textTransform: "uppercase", margin: "0 0 6px" };
-const cardBody: React.CSSProperties = { fontFamily: "var(--font-body)", fontSize: "1.087rem", fontWeight: 500, color: "#fff", lineHeight: 1.5, margin: 0 };
-const statLabel: React.CSSProperties = { fontFamily: "var(--font-body)", fontSize: "0.66rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--yellow)", marginBottom: 4 };
-const statValue: React.CSSProperties = { fontFamily: "var(--font-display)", fontSize: "2rem", color: "#fff", lineHeight: 1 };
+// CARD TEXT IS CLASSES NOW, 19 September 2026 (Steve). The four
+// React.CSSProperties objects that used to live here (cardTitle, cardBody,
+// statLabel, statValue) are .cardTitle2, .cardBody2, .statLabel2 and .statValue2 in
+// dogs-at-work.module.css, value for value. See the note there for why.
+// Per-site overrides stay inline, because they are genuinely per site.
+// Tasks 3.1 and 3.3, 19 September 2026 (Steve): two lines inside "The 2025 study"
+// box come down 2pt from cardBody's 1.087rem. Applied as a per-site override rather
+// than to cardBody itself, because three other paragraphs in this file use a bare
+// className={styles.cardBody2} and are NOT in scope. Declared here so the two sites cannot drift
+// apart.
+const CARD_BODY_DOWN_2PT = "calc(1.087rem - 2pt)";
+// Card paragraph text down 2pt and the leading tightened to 1.3em, 19 September
+// 2026 (Steve). Matches .text in SidebarCard.module.css, which carries the
+// reasoning. The per-site fontSize overrides further down each file (0.72rem,
+// 0.78rem, 0.987rem and CARD_BODY_DOWN_2PT) are deliberate small print that is
+// already reduced, so they keep their own size and only inherit the new leading.
 
 // Sidebar cards as an explicit list. Desktop renders them in the sticky sidebar
 // in this order; mobile renders each above the H2 named in pairWith (Sources to
@@ -69,8 +81,8 @@ const CARDS: ArticleCard[] = [
     node: (
       <div className={styles.sidebarCard}>
         <div style={{ padding: "32px 40px 52px" }}>
-          <p style={cardTitle}>The honest version</p>
-          <p style={cardBody}>Dogs have shown in published studies that they can detect disease odours - including bladder cancer and Parkinson&apos;s - but they are <strong>not</strong> a routine NHS diagnostic service. Think &quot;research&quot; and &quot;scent signatures&quot;, not &quot;your dog can diagnose your cancer&quot;. Their bigger role may be helping humans discover what disease smells like, so future machines can detect it.</p>
+          <p className={styles.cardTitle2}>The honest version</p>
+          <p className={styles.cardBody2}>Dogs have shown in published studies that they can detect disease odours - including bladder cancer and Parkinson&apos;s - but they are <strong>not</strong> a routine NHS diagnostic service. Think &quot;research&quot; and &quot;scent signatures&quot;, not &quot;your dog can diagnose your cancer&quot;. Their bigger role may be helping humans discover what disease smells like, so future machines can detect it.</p>
         </div>
       </div>
     ),
@@ -81,8 +93,8 @@ const CARDS: ArticleCard[] = [
     node: (
       <div className={styles.sidebarCard}>
         <div style={{ padding: "32px 40px 12px" }}>
-          <p style={cardTitle}>The 2025 study</p>
-          <p style={{ ...cardBody, fontWeight: 600 }}>Dogs detect Parkinson&apos;s by smell</p>
+          <p className={styles.cardTitle2}>The 2025 study</p>
+          <p className={styles.cardBody2} style={{ fontWeight: 600, fontSize: CARD_BODY_DOWN_2PT }}>Dogs detect Parkinson&apos;s by smell</p>
         </div>
         <div style={{ padding: "20px 40px 8px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
           {[
@@ -90,14 +102,14 @@ const CARDS: ArticleCard[] = [
             { label: "Sensitivity", value: "80%" },
           ].map(({ label, value }) => (
             <div key={label} style={{ textAlign: "center" }}>
-              <p style={statLabel}>up to</p>
-              <p style={statValue}>{value}</p>
-              <p style={{ ...statLabel, color: "#aac4d4", marginTop: 4 }}>{label}</p>
+              <p className={styles.statLabel2}>up to</p>
+              <p className={styles.statValue2}>{value}</p>
+              <p className={styles.statLabel2} style={{ color: "#ffffff", marginTop: 4 }}>{label}</p>
             </div>
           ))}
         </div>
         <div style={{ padding: "24px 40px 52px" }}>
-          <p style={cardBody}><strong>Dogs:</strong> Bumper (Golden Retriever) &amp; Peanut (Black Labrador).<br /><strong>Method:</strong> double-blind, skin swabs.<br /><strong>Partners:</strong> Medical Detection Dogs, University of Bristol &amp; University of Manchester (published 15 July 2025).</p>
+          <p className={styles.cardBody2} style={{ fontSize: CARD_BODY_DOWN_2PT }}><strong>Dogs:</strong> Bumper (Golden Retriever) &amp; Peanut (Black Labrador).<br /><strong>Method:</strong> double-blind, skin swabs.<br /><strong>Partners:</strong> Medical Detection Dogs, University of Bristol &amp; University of Manchester (published 15 July 2025).</p>
         </div>
       </div>
     ),
@@ -108,8 +120,8 @@ const CARDS: ArticleCard[] = [
     node: (
       <div className={styles.sidebarCard}>
         <div style={{ padding: "32px 40px 52px" }}>
-          <p style={cardTitle}>How a scent line-up works</p>
-          <p style={cardBody}>A carousel of sample pots. One target hidden among controls. The dog sniffs each for a second or two and freezes at the one that smells different. Do it blind, repeatedly, with fresh samples - and a &quot;that one&quot; becomes data.</p>
+          <p className={styles.cardTitle2}>How a scent line-up works</p>
+          <p className={styles.cardBody2}>A carousel of sample pots. One target hidden among controls. The dog sniffs each for a second or two and freezes at the one that smells different. Do it blind, repeatedly, with fresh samples - and a &quot;that one&quot; becomes data.</p>
         </div>
       </div>
     ),
@@ -127,9 +139,9 @@ const CARDS: ArticleCard[] = [
     node: (
       <div className={styles.sidebarCard}>
         <div style={{ padding: "32px 40px 52px" }}>
-          <p style={cardTitle}>What the dog thinks it&apos;s doing</p>
-          <p style={{ ...cardBody, marginBottom: 8 }}><strong>What humans think:</strong> a trained detection dog is screening samples for disease biomarkers.</p>
-          <p style={cardBody}><strong>What the dog thinks:</strong> sniff pots, sit near the weird one, receive biscuit, be brilliant.</p>
+          <p className={styles.cardTitle2}>What the dog thinks it&apos;s doing</p>
+          <p className={styles.cardBody2} style={{ marginBottom: 8 }}><strong>What humans think:</strong> a trained detection dog is screening samples for disease biomarkers.</p>
+          <p className={styles.cardBody2}><strong>What the dog thinks:</strong> sniff pots, sit near the weird one, receive biscuit, be brilliant.</p>
         </div>
       </div>
     ),
@@ -140,8 +152,8 @@ const CARDS: ArticleCard[] = [
     node: (
       <div className={styles.sidebarCard}>
         <div style={{ padding: "32px 40px 52px" }}>
-          <p style={cardTitle}>Sources</p>
-          <p style={{ ...cardBody, fontSize: "0.987rem" }}>
+          <p className={styles.cardTitle2}>Sources</p>
+          <p className={styles.cardBody2} style={{ fontSize: "0.987rem" }}>
             <strong>Parkinson&apos;s study</strong> - University of Bristol (2025).<br />
             <strong>Cancer detection &amp; NHS trials</strong> - Medical Detection Dogs.<br />
             <strong>Bladder-cancer proof of principle</strong> - <em>BMJ</em>, September 2004.
@@ -204,7 +216,11 @@ export default function BioDetectionPage() {
           </div>
         </div>
 
-        <ArticleTextToggle />
+        {/* Wrapped so the article pages can place the toggle on mobile without
+            touching the shared component. See .toggleSlot in dogs-at-work.module.css. */}
+        <div className={styles.toggleSlotArticle}>
+          <ArticleTextToggle />
+        </div>
 
         <div className={styles.essayLayout}>
           <article className={styles.essay}>
@@ -233,6 +249,11 @@ export default function BioDetectionPage() {
         <div className={styles.articleMobile}>
           <div className={styles.mobilePayslip}>
             <Payslip data={PAYSLIPS["the-dogs-teaching-medicine-how-to-smell-disease"]} />
+          </div>
+          {/* The colour toggle, IN THE FLOW between the payslip and the body.
+              Mobile only; the desktop one is above. See .toggleSlotMobile. */}
+          <div className={styles.toggleSlotMobile}>
+            <ArticleTextToggle />
           </div>
           <MobileArticleBody
             body={BODY}

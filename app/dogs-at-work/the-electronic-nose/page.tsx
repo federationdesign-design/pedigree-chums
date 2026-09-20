@@ -10,6 +10,11 @@ import Payslip from "../../../components/Payslip/Payslip";
 import MobileArticleBody, { type ArticleCard } from "../../../components/DogsAtWork/MobileArticleBody";
 import { PAYSLIPS } from "../data/payslips";
 
+// CARD TEXT IS CLASSES NOW, 19 September 2026 (Steve). The React.CSSProperties
+// objects that used to live here are .cardTitle2, .cardBody2, .statLabel2 and
+// .statValue2 in dogs-at-work.module.css, value for value. See the note there for
+// why. Per-site overrides stay inline, because they are genuinely per site.
+
 export const metadata: Metadata = {
   title: "The Machine That May Owe Dogs a Biscuit | Dogs at Work",
   description:
@@ -49,10 +54,6 @@ const BODY: (string | { h: string; id: string })[] = [
   "The dog taught the machine to smell. The machine will reach a thousand hospitals the dog never could. And the dog, gloriously, will never know and never care - because there's a ball by the back door, and the day is young.",
 ];
 
-const cardTitle: React.CSSProperties = { fontFamily: "var(--font-display)", fontSize: "38.67px", letterSpacing: "0", color: "var(--emphasis)", lineHeight: 0.9, textTransform: "uppercase", margin: "0 0 6px" };
-const cardBody: React.CSSProperties = { fontFamily: "var(--font-body)", fontSize: "1.087rem", fontWeight: 500, color: "#fff", lineHeight: 1.5, margin: 0 };
-const statLabel: React.CSSProperties = { fontFamily: "var(--font-body)", fontSize: "0.66rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--yellow)", marginBottom: 4 };
-const statValue: React.CSSProperties = { fontFamily: "var(--font-display)", fontSize: "2rem", color: "#fff", lineHeight: 1 };
 
 // Sidebar cards as an explicit list. Desktop renders them in the sticky sidebar
 // in this order; mobile renders each above the H2 named in pairWith. Three go to
@@ -65,8 +66,8 @@ const CARDS: ArticleCard[] = [
     node: (
       <div className={styles.sidebarCard}>
         <div style={{ padding: "32px 40px 52px" }}>
-          <p style={cardTitle}>The honest version</p>
-          <p style={cardBody}>Electronic noses are emerging technology in <strong>trials and research</strong>, not a test you can book at the GP yet. They are being built to scale up what dogs proved is possible - reading disease from its scent - so think &quot;promising and coming&quot;, not &quot;finished and available&quot;.</p>
+          <p className={styles.cardTitle2}>The honest version</p>
+          <p className={styles.cardBody2}>Electronic noses are emerging technology in <strong>trials and research</strong>, not a test you can book at the GP yet. They are being built to scale up what dogs proved is possible - reading disease from its scent - so think &quot;promising and coming&quot;, not &quot;finished and available&quot;.</p>
         </div>
       </div>
     ),
@@ -77,8 +78,8 @@ const CARDS: ArticleCard[] = [
     node: (
       <div className={styles.sidebarCard}>
         <div style={{ padding: "32px 40px 12px" }}>
-          <p style={cardTitle}>The dog-built machine</p>
-          <p style={{ ...cardBody, fontWeight: 600 }}>UK e-nose prostate-cancer trial</p>
+          <p className={styles.cardTitle2}>The dog-built machine</p>
+          <p className={styles.cardBody2} style={{ fontWeight: 600 }}>UK e-nose prostate-cancer trial</p>
         </div>
         <div style={{ padding: "20px 40px 8px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
           {[
@@ -86,13 +87,13 @@ const CARDS: ArticleCard[] = [
             { label: "Began", value: "Nov 2025" },
           ].map(({ label, value }) => (
             <div key={label} style={{ textAlign: "center" }}>
-              <p style={statValue}>{value}</p>
-              <p style={{ ...statLabel, color: "#aac4d4", marginTop: 4 }}>{label}</p>
+              <p className={styles.statValue2}>{value}</p>
+              <p className={styles.statLabel2} style={{ color: "#ffffff", marginTop: 4 }}>{label}</p>
             </div>
           ))}
         </div>
         <div style={{ padding: "24px 40px 52px" }}>
-          <p style={cardBody}>Built by quantum physicist <strong>Dr Andreas Mershin</strong> from <strong>Medical Detection Dogs&apos;</strong> own detection data, with the University of Texas at El Paso. Running at <strong>Milton Keynes University Hospital</strong> - the same hospital as the dogs&apos; prostate trial.</p>
+          <p className={styles.cardBody2}>Built by quantum physicist <strong>Dr Andreas Mershin</strong> from <strong>Medical Detection Dogs&apos;</strong> own detection data, with the University of Texas at El Paso. Running at <strong>Milton Keynes University Hospital</strong> - the same hospital as the dogs&apos; prostate trial.</p>
         </div>
       </div>
     ),
@@ -103,8 +104,8 @@ const CARDS: ArticleCard[] = [
     node: (
       <div className={styles.sidebarCard}>
         <div style={{ padding: "32px 40px 12px" }}>
-          <p style={cardTitle}>The dogs&apos; scorecard</p>
-          <p style={{ ...cardBody, fontWeight: 600 }}>Prostate screening, by nose</p>
+          <p className={styles.cardTitle2}>The dogs&apos; scorecard</p>
+          <p className={styles.cardBody2} style={{ fontWeight: 600 }}>Prostate screening, by nose</p>
         </div>
         <div style={{ padding: "20px 40px 8px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
           {[
@@ -112,13 +113,13 @@ const CARDS: ArticleCard[] = [
             { label: "Sensitivity", value: "71%" },
           ].map(({ label, value }) => (
             <div key={label} style={{ textAlign: "center" }}>
-              <p style={statValue}>{value}</p>
-              <p style={{ ...statLabel, color: "#aac4d4", marginTop: 4 }}>{label}</p>
+              <p className={styles.statValue2}>{value}</p>
+              <p className={styles.statLabel2} style={{ color: "#ffffff", marginTop: 4 }}>{label}</p>
             </div>
           ))}
         </div>
         <div style={{ padding: "24px 40px 52px" }}>
-          <p style={cardBody}>The dogs could also flag cancer in men whose PSA blood test was misleading - exactly where standard testing struggles.</p>
+          <p className={styles.cardBody2}>The dogs could also flag cancer in men whose PSA blood test was misleading - exactly where standard testing struggles.</p>
         </div>
       </div>
     ),
@@ -129,8 +130,8 @@ const CARDS: ArticleCard[] = [
     node: (
       <div className={styles.sidebarCard}>
         <div style={{ padding: "32px 40px 52px" }}>
-          <p style={cardTitle}>How an electronic nose works</p>
-          <p style={cardBody}>An array of chemical sensors reads the volatile compounds in a sample, and machine learning looks for the pattern linked to disease - trained, reward-style, much like a dog. No wet nose required, but the same job: spot the smell that shouldn&apos;t be there.</p>
+          <p className={styles.cardTitle2}>How an electronic nose works</p>
+          <p className={styles.cardBody2}>An array of chemical sensors reads the volatile compounds in a sample, and machine learning looks for the pattern linked to disease - trained, reward-style, much like a dog. No wet nose required, but the same job: spot the smell that shouldn&apos;t be there.</p>
         </div>
       </div>
     ),
@@ -141,8 +142,8 @@ const CARDS: ArticleCard[] = [
     node: (
       <div className={styles.sidebarCard}>
         <div style={{ padding: "32px 40px 52px" }}>
-          <p style={cardTitle}>Other machines that smell</p>
-          <p style={cardBody}><strong>Owlstone Medical</strong> (Cambridge) built &quot;Breath Biopsy&quot; - capturing the volatile compounds in your breath to read for disease. Its breathalyser-style tests have run in UK trials for cancers including lung cancer, with NHS hospitals involved.</p>
+          <p className={styles.cardTitle2}>Other machines that smell</p>
+          <p className={styles.cardBody2}><strong>Owlstone Medical</strong> (Cambridge) built &quot;Breath Biopsy&quot; - capturing the volatile compounds in your breath to read for disease. Its breathalyser-style tests have run in UK trials for cancers including lung cancer, with NHS hospitals involved.</p>
         </div>
       </div>
     ),
@@ -153,9 +154,9 @@ const CARDS: ArticleCard[] = [
     node: (
       <div className={styles.sidebarCard}>
         <div style={{ padding: "32px 40px 52px" }}>
-          <p style={cardTitle}>What the dog thinks happened</p>
-          <p style={{ ...cardBody, marginBottom: 8 }}><strong>What humans think:</strong> a machine is running dog-derived scent data to detect cancer at scale.</p>
-          <p style={cardBody}><strong>What the dog thinks:</strong> I found the weird pot. I got a biscuit. Apparently I am now in a science magazine.</p>
+          <p className={styles.cardTitle2}>What the dog thinks happened</p>
+          <p className={styles.cardBody2} style={{ marginBottom: 8 }}><strong>What humans think:</strong> a machine is running dog-derived scent data to detect cancer at scale.</p>
+          <p className={styles.cardBody2}><strong>What the dog thinks:</strong> I found the weird pot. I got a biscuit. Apparently I am now in a science magazine.</p>
         </div>
       </div>
     ),
@@ -166,8 +167,8 @@ const CARDS: ArticleCard[] = [
     node: (
       <div className={styles.sidebarCard}>
         <div style={{ padding: "32px 40px 52px" }}>
-          <p style={cardTitle}>The medical trilogy</p>
-          <p style={{ ...cardBody, marginBottom: 10 }}>Start at the beginning: the dogs that proved disease has a smell, and the dogs that warn one person before their own body does.</p>
+          <p className={styles.cardTitle2}>The medical trilogy</p>
+          <p className={styles.cardBody2} style={{ marginBottom: 10 }}>Start at the beginning: the dogs that proved disease has a smell, and the dogs that warn one person before their own body does.</p>
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             <Link href="/dogs-at-work/the-dogs-teaching-medicine-how-to-smell-disease" className={styles.readMore}>1 · The lab dogs →</Link>
             <Link href="/dogs-at-work/the-colleague-who-never-clocks-off" className={styles.readMore}>2 · The alert dogs →</Link>
@@ -182,8 +183,8 @@ const CARDS: ArticleCard[] = [
     node: (
       <div className={styles.sidebarCard}>
         <div style={{ padding: "32px 40px 52px" }}>
-          <p style={cardTitle}>Sources</p>
-          <p style={{ ...cardBody, fontSize: "0.987rem" }}>
+          <p className={styles.cardTitle2}>Sources</p>
+          <p className={styles.cardBody2} style={{ fontSize: "0.987rem" }}>
             <strong>Dog-inspired e-nose prostate trial (Nov 2025)</strong> - Medical Detection Dogs; Dr Andreas Mershin; Milton Keynes University Hospital.<br />
             <strong>Breath Biopsy</strong> - Owlstone Medical, Cambridge.
           </p>
@@ -245,7 +246,11 @@ export default function ElectronicNosePage() {
           </div>
         </div>
 
-        <ArticleTextToggle />
+        {/* Wrapped so the article pages can place the toggle on mobile without
+            touching the shared component. See .toggleSlot in dogs-at-work.module.css. */}
+        <div className={styles.toggleSlotArticle}>
+          <ArticleTextToggle />
+        </div>
 
         <div className={styles.essayLayout}>
           <article className={styles.essay}>
@@ -274,6 +279,11 @@ export default function ElectronicNosePage() {
         <div className={styles.articleMobile}>
           <div className={styles.mobilePayslip}>
             <Payslip data={PAYSLIPS["the-electronic-nose"]} />
+          </div>
+          {/* The colour toggle, IN THE FLOW between the payslip and the body.
+              Mobile only; the desktop one is above. See .toggleSlotMobile. */}
+          <div className={styles.toggleSlotMobile}>
+            <ArticleTextToggle />
           </div>
           <MobileArticleBody
             body={BODY}

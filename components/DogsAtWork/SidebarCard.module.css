@@ -28,7 +28,17 @@
      concept card titles; colour is --emphasis (#FFED60). */
   font-size: 38.67px;
   letter-spacing: 0;
-  color: var(--emphasis, #ffed60);
+  /* 2.8 Pale yellow to lemon, ALL WIDTHS (Steve, 19 September 2026). Was
+     --emphasis (#FFED60). Kept out of a media query on purpose: four of the five
+     title sites in this section are inline styles in articles 1 to 3 and
+     CostToTrainCard, which cannot be scoped to a breakpoint, so a mobile-only rule
+     here would have shown pale yellow on desktop for articles 4 to 6 and lemon for
+     1 to 3. --emphasis itself is NOT redefined: it still carries the yellow
+     highlight inside the blue panel copy on the index, which is not part of this
+     job. Only the consumers on card titles change.
+     Both read well on the navy card: --emphasis was 9.99:1, --yellow-header is
+     9.89:1. */
+  color: var(--yellow-header, #ffed00);
   line-height: 0.9;
   text-transform: uppercase;
   margin: 0 0 10px;
@@ -101,7 +111,14 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--yellow, #ffd23e);
+  /* 3.7 The wrong yellow, 19 September 2026 (Steve). Was --yellow (#ffd23e), the
+     body yellow used by 96 files, which read noticeably duller than the card title
+     directly above it and is what made this box look wrong. --yellow-header is the
+     same lemon the title now carries, so the two read as one card.
+     On the navy card: --yellow was 8.28:1, --yellow-header is 9.89:1.
+     ALL WIDTHS, matching the ruling on 2.8 and 2.9 and keeping this file free of a
+     colour media query. The token itself is untouched; only this consumer changes. */
+  color: var(--yellow-header, #ffed00);
   margin: 0;
 }
 
@@ -122,4 +139,33 @@
   color: #ffffff;
   line-height: 1.6;
   margin: 0;
+}
+
+/* 2.7 Halve the air above the card title on mobile (Steve, 19 September 2026).
+   The base 40px is recorded above as a deliberate doubling from 20 on 12 Aug 2026
+   and stays for desktop.
+
+   THIS IS THE ONLY MEDIA QUERY IN THIS FILE, AND IT IS DELIBERATE. 2.8 and 2.9 are
+   colour and were ruled all-widths, because most of their sites are inline styles
+   that cannot carry a breakpoint. 2.7 is layout, so it is genuinely mobile only.
+   900px is the breakpoint the article layout switches at in
+   app/dogs-at-work/dogs-at-work.module.css, where the legacy half of this same task
+   lives. The two must stay in step. */
+@media (max-width: 900px) {
+  .card {
+    padding-top: 20px;
+  }
+
+  /* Card paragraph text down 2pt with the leading tightened to 1.3em, PHONES ONLY
+     (Steve, 19 September 2026). The legacy half is .cardBody2 in
+     app/dogs-at-work/dogs-at-work.module.css, at this same 900px. Move one, move
+     both, or the two card systems drift again.
+     .subtitle is deliberately not here: it is a labelled item header rather than
+     paragraph text. */
+  .text,
+  .attrDetail,
+  .sources {
+    font-size: calc(1.087rem - 2pt);
+    line-height: 1.3em;
+  }
 }
