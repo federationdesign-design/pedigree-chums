@@ -46,6 +46,26 @@
   touch-action: pinch-zoom;
 }
 
+/* THE CONTAINER IS TRANSPARENT TO THE POINTER, 20 September 2026 (owner: the red
+   back button in the top right cannot be clicked in learn or on the start
+   screen).
+
+   WHY IT WAS. This element's BOX is much wider than the panel you can see.
+   .asideSheet, the phone branch, computes its width as
+   (100vw - 8 - 2 x rail column) x 1.32 and is capped at 100vw - 8px, so on a
+   phone the box is the whole screen bar 8px. At pointer-events: auto it took
+   every tap in the top right corner.
+
+   WHY THE Z-INDEX CANNOT BE THE ANSWER. The red control is not a DOM element. It
+   is drawn inside the pit's SVG as one of the physics bodies (d.kind === "close")
+   and has no z-index of its own; the only thing with one is the stage, at 1.
+   Raising it above this box at 15 would put every falling dog over the box too.
+
+   SO THE BOX GIVES THE POINTER BACK. `none` here, which .asideSheet inherits,
+   and `auto` on the three things that are actually drawn: the panel (.caption),
+   the breadcrumbs (.crumbs) and the chum rail (.relRail). ANYTHING ADDED INSIDE
+   THIS ELEMENT IN FUTURE NEEDS ITS OWN `auto` or it will not be clickable. That
+   is the cost, and it is why this is written down rather than just changed. */
 .aside {
   position: absolute;
   left: 0px;
@@ -53,7 +73,7 @@
   width: 34%;
   max-width: 460px;
   z-index: 3;
-  pointer-events: auto;
+  pointer-events: none;
   display: flex;
   flex-direction: column;
   align-items: stretch;
@@ -61,6 +81,8 @@
 }
 
 .crumbs {
+  /* Given back by hand: its container is pointer-events: none. See .aside. */
+  pointer-events: auto;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -93,6 +115,9 @@
 }
 
 .caption {
+  /* Given back by hand: its container is pointer-events: none. See .aside. This
+     is the visible blue panel, and it carries the close X and the drag handle. */
+  pointer-events: auto;
   background: var(--navy);
   color: var(--white);
   border-radius: 14px;
@@ -1025,6 +1050,8 @@
    top and side offsets are pulled back by the 12px the frame adds, which keeps
    the cards themselves exactly where they were. */
 .relRail {
+  /* Given back by hand: its container is pointer-events: none. See .aside. */
+  pointer-events: auto;
   position: absolute;
   /* 10% SMALLER, 16 September 2026 (owner). A scale on the rail rather than a
      smaller card size, so the cards, their gaps, the tick and the two badges all
