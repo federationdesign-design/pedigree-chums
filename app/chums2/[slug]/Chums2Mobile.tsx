@@ -298,8 +298,26 @@ export default function Chums2Mobile({ name, slug, image, info, lineage }: Props
           const el = slotRef.current;
           if (!el) return;
           const r = el.getBoundingClientRect();
-          if (r.top >= 0 && r.top <= 24) return; // slot top already at the top: no-op
-          window.scrollBy({ top: r.top - 12, left: 0, behavior: "smooth" });
+          /* STOP BELOW THE FIXED HEADER, 20 September 2026 (owner: the box loads
+             under the logo and the navigation).
+
+             WHAT WAS WRONG. This scrolled the slot's top to 12px from the top of
+             the VIEWPORT, but the logo, the Pick a Chum chip and the burger are
+             fixed over that band, so the card's own heading arrived underneath
+             them. The card was in the right place; the resting point was not.
+
+             96 IS THE SITE'S OWN CLEARANCE, not a new guess: it is the same figure
+             .page already uses for its top padding, and its note records where it
+             came from, PickAChum's mobile panel docking below the mobile header.
+             One number for the band, used twice.
+
+             THE ALREADY-THERE TEST MOVES WITH IT. It asked whether the slot was
+             within 24px of the viewport top; it now asks about the resting point,
+             or a card opened when the slot was already parked correctly would
+             scroll itself back under the header. */
+          const HEADER = 96;
+          if (r.top >= HEADER - 12 && r.top <= HEADER + 24) return; // already parked below the header
+          window.scrollBy({ top: r.top - HEADER, left: 0, behavior: "smooth" });
         }, 60);
       }
       return next;
