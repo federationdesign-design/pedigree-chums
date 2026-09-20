@@ -3,6 +3,7 @@ import Nav from "../../components/Nav/Nav";
 import Footer from "../../components/Footer/Footer";
 import ArticleTextToggle from "../../components/ArticleTextToggle/ArticleTextToggle";
 import OutboundLink from "../../components/OutboundLink/OutboundLink";
+import ScrollRail from "../../components/ScrollRail/ScrollRail";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
@@ -259,7 +260,10 @@ export default function HotDogs() {
             </div>
 
             <div className={styles.congaFeature}>
-              <div className={styles.congaChain}>
+              {/* The rail carries the site's yellow draggable scrollbar, the same
+                  one /home and /about use. It hides itself on desktop, where the
+                  five steps sit in a static row and there is nothing to scroll. */}
+              <ScrollRail className={styles.congaChain} label="Etymology steps">
                 <span className={styles.congaStep}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -293,7 +297,7 @@ export default function HotDogs() {
                   <strong>Hot/Dogs</strong>
                   <em>2024, Britain. A card game about spotting dog breeds. Named after sausages named after dogs named after badger holes. The dachshund appears on card 14. It looks like it knows exactly what happened.</em>
                 </span>
-              </div>
+              </ScrollRail>
               <p className={styles.congaCaption}>
                 This is not etymology anymore. It is a conga line. The dachshund started it.
                 The English language was too polite to say no.

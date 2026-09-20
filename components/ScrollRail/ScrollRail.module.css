@@ -1,0 +1,35 @@
+/* The site's established horizontal scrollbar, lifted from
+   components/CardRail/CardRail.module.css (.scrollbar and .scrollThumb) so the
+   rails on /home, /about and here read identically: a translucent white track
+   with a yellow thumb, both fully rounded.
+
+   ONE DIFFERENCE FROM CardRail, and it is deliberate. There the track is
+   absolutely positioned and pinned to the bottom edge of the pitch panel. Here
+   it sits in normal flow directly under its rail, because this component has no
+   panel to pin itself to and has to work wherever it is dropped. */
+
+.track {
+  position: relative;
+  height: 12px;
+  margin-top: 16px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.thumb {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 30%;
+  min-width: 44px;
+  border-radius: 999px;
+  background: var(--yellow);
+  cursor: grab;
+  /* Lets the browser keep pinch-zoom while the thumb owns horizontal drags. */
+  touch-action: pinch-zoom;
+}
+
+.thumb:active {
+  cursor: grabbing;
+}
