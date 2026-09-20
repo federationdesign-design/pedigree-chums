@@ -39,7 +39,7 @@ const ROWS: { title: string; accent: string; names: string[] }[] = [
   {
     title: "Employed dogs",
     accent: "dogs",
-    names: ["Labrador", "Cocker Spaniel", "Golden Retriever", "Springer Spaniel", "Cockapoo", "German Shepherd", "Rottweiler", "Doberman Pinscher", "Border Collie"],
+    names: ["Labrador", "Border Collie", "Cocker Spaniel", "Golden Retriever", "Springer Spaniel", "Cockapoo", "German Shepherd", "Rottweiler", "Doberman Pinscher"],
   },
   {
     title: "Popular UK breeds",
