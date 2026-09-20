@@ -261,8 +261,15 @@ export default function TimeTunnel({ onDone, onResolve, fromRect, diver }: { onD
        be resized into or out of mid-run, and a matchMedia read inside the draw
        loop would be a layout read at 60fps. */
     const onPhone = typeof window !== "undefined" && window.innerWidth <= BTN_MOBILE_MAX;
-    const cardW0 = rect ? rect.w : (onPhone ? BTN_FALLBACK_W : CARD_FALLBACK_W);
-    const cardH0 = rect ? rect.h : (onPhone ? BTN_FALLBACK_H : CARD_FALLBACK_H);
+    /* THE CALLER'S WORD FIRST, the width only when it has not said. See the note
+       above the component. THIS LINE IS THE WHOLE POINT OF THE `diver` PROP: it
+       was added on 20 September in the same change, and shipped WITHOUT this, so
+       the prop was accepted and then ignored and every phone route still dived as
+       a button. Delivered in two halves, which is the failure this file's sibling
+       BreedTree already carries a warning about. */
+    const useButton = diver ? diver === "button" : onPhone;
+    const cardW0 = rect ? rect.w : (useButton ? BTN_FALLBACK_W : CARD_FALLBACK_W);
+    const cardH0 = rect ? rect.h : (useButton ? BTN_FALLBACK_H : CARD_FALLBACK_H);
     /* THE MOBILE BUTTON, diving in place of the card. It shares every bit of the
        card's motion, the same ease, spin and shrink, so the two read as one
        animation with a different object in it; only the drawing differs.
@@ -374,7 +381,7 @@ export default function TimeTunnel({ onDone, onResolve, fromRect, diver }: { onD
         for (const m of motes) { m.z -= MOTE_SPEED; m.age++; if (m.z <= MOTE_ZNEAR) seedMote(m, MOTE_ZFAR); }
         drawRings();
         drawMotes();
-        if (onPhone) drawButton(now, start); else drawCard(now, start);
+        if (useButton) drawButton(now, start); else drawCard(now, start);
       } else {
         // Resolve: fire the signal once (the pit grows its cluster ring and drops
         // the dogs off it), rush the rings outward past the camera, and fade the
