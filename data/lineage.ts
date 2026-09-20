@@ -236,7 +236,7 @@ const LINEAGE: Record<string, LineageNode> = {
       },
       {
         name: "The First Setters",
-        note: "Added biddability and a love of working close with people on the shoot. Now in-decline.",
+        note: "Added biddability and a love of working close with people on the shoot. Now extinct.",
         /* ITS OWN PICTURE, 16 September 2026 (owner supplied it). This was the LAST
            of four dogs sharing british-setters.jpg: British Setters, Setter, English
            Setter and Old black-and-tan Setters. The game builds one frame per
@@ -1476,7 +1476,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "Once called the Wavy-Coated Retriever, the smart, glossy black gundog that was the gamekeeper's favourite before the Labrador rose.",
     children: [
       { name: "St John's Water Dog", note: "The Newfoundland fishing dog behind all the retrievers. Now extinct.", img: "/history/breeds/St-Johns-Water-Dog.jpg", value: 50 },
-      { name: "The First Setters", note: "Setter blood for feathering and a good nose. Now in-decline.", img: "/history/breeds/british-setters.jpg", value: 30 },
+      { name: "The First Setters", note: "Setter blood for feathering and a good nose. Now extinct.", img: "/history/breeds/british-setters.jpg", value: 30 },
       { name: "Water Spaniels", note: "Working water spaniels that added drive and a love of wet cover. Now extinct.", img: "/history/breeds/original-water-spaniel.jpg", value: 10 },
       { name: "Shepherd's Dogs", note: "Practical medieval working dog used to move and protect sheep, forming an early root of Britain's collie families. An extinct historical type.", img: "/history/breeds/medieval-shepherds-dog.jpg", value: 10 }
     ]
@@ -1736,7 +1736,12 @@ const LINEAGE: Record<string, LineageNode> = {
      repo and both are this dog; worth a look, out of scope for a merge. */
   "The First Setters": {
     name: "The First Setters",
-    note: "The British setting dogs of the shooting field, bred to find birds and drop steady in front of them. Now in-decline.",
+    /* EXTINCT, not in-decline, 20 September 2026 (owner). The undifferentiated
+       British setting dog no longer exists: it became the English, the Gordon and
+       the Irish Setter. This note was written as a general "setter" description
+       and had inherited the modern breeds' status. Its three child notes move
+       with it; see the ruling at the head of data/uk-breeds.ts. */
+    note: "The British setting dogs of the shooting field, bred to find birds and drop steady in front of them. Now extinct.",
     img: "/history/breeds/setters.jpg",
     /* A PLAYABLE LEVEL NEEDS TWO CIRCLES, 20 September 2026 (owner: a new dog
        cannot come from just one parent). The one documented ancestor is drawn
@@ -2845,7 +2850,7 @@ const LINEAGE: Record<string, LineageNode> = {
       { name: "English Foxhound", note: "Stamina, drive and a steady temperament.", img: "/history/breeds/english-foxhound.jpg", value: 30 },
       { name: "Greyhound", note: "Speed and a racy, galloping build.", img: "/history/breeds/original-greyhound.jpg", value: 25 },
       { name: "Bloodhound", note: "A deeper nose for finding game.", img: "/history/breeds/modern-bloodhound.jpg", value: 25 },
-      { name: "The First Setters", note: "Setting-dog blood for style and steadiness. Now in-decline.", img: "/history/breeds/british-setters.jpg", value: 20 }
+      { name: "The First Setters", note: "Setting-dog blood for style and steadiness. Now extinct.", img: "/history/breeds/british-setters.jpg", value: 20 }
     ]
   },
 
