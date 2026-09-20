@@ -770,6 +770,54 @@
   padding-top: 16px;
 }
 
+/* MOBILE: THE CONGA BECOMES A SLIDER, 20 September 2026 (Steve).
+   `flex-wrap: wrap` plus `min-width: 140px` broke the five steps into three
+   ragged rows at 390px (two, then one centred on its own, then two), so a
+   sequence read as a broken grid. One row that scrolls sideways keeps the order.
+   Desktop is untouched: it stays the five-column row and is signed off.
+
+   Two things this block has to handle.
+   1. `overflow-x: auto` forces the computed `overflow-y` to `auto` as well, so
+      the chain now clips vertically. Each step's yellow SVG arrow is positioned
+      at `top: -18px`, above the step's own box, and would be sliced off. The
+      padding-top below is what keeps it inside the scroll box.
+      THE PADDING IS 36px, NOT 18px, AND THAT IS NOT ARBITRARY. The arrow is a
+      68px square carrying `transform: rotate(-45deg)`, so its rendered box is
+      68 x root2, about 96px, and it reaches 18 + 14 = 32px above the step.
+      Measuring the untransformed 68px gives a false clearance and clips it by
+      8px. Measure the rect, not the declared size, before reducing this.
+   2. The small text arrows between steps are redundant here, because every step
+      already carries its own SVG arrow, so they are hidden rather than left to
+      sit between the cards and fight the snap points.
+
+   These rules must stay AFTER the base .congaChain and .congaStep above: a media
+   query adds no specificity, so declared first it would silently lose. */
+@media (max-width: 768px) {
+  .congaChain {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    overflow-x: auto;
+    padding-top: 36px;
+    gap: 4px;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .congaChain::-webkit-scrollbar {
+    display: none;
+  }
+  .congaStep {
+    /* 80% leaves the next step peeking at the edge, which is the affordance
+       that says this scrolls. */
+    flex: 0 0 80%;
+    min-width: 0;
+    scroll-snap-align: center;
+  }
+  .congaArrow {
+    display: none;
+  }
+}
+
 /* Batch 7: safety-column body paragraphs, +4pt and fluid (was fixed 1.3rem). */
 .safetyCol p:not(.lead) { font-size: clamp(1.2rem, 2.3vw, 1.633rem); font-weight: 500; }
 
