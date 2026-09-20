@@ -22,15 +22,22 @@ import styles from "./CookieChoicesInline.module.css";
    It reads the stored choice only to SHOW it, and re-reads on pc:consent so the
    line stays true when a choice is made anywhere else on the page. */
 export default function CookieChoicesInline() {
-  const [current, setCurrent] = useState<string | null>(null);
+  /* Three states, not two, and the third one matters. `null` means "not read
+     yet": the server render and the first paint both produce nothing, so there
+     is no hydration mismatch and, more visibly, no flash of the question for
+     someone who decided months ago. `true` means a stored choice exists and this
+     stands down. `false` means genuinely undecided, so ask. */
+  const [decided, setDecided] = useState<boolean | null>(null);
 
   useEffect(() => {
     const read = () => {
       try {
-        setCurrent(localStorage.getItem(CONSENT_KEY));
+        setDecided(!!localStorage.getItem(CONSENT_KEY));
       } catch {
-        /* Private mode: storage throws. Show no state line rather than guess. */
-        setCurrent(null);
+        /* Private mode: storage throws, so a choice could never be remembered
+           and the question would return on every visit. Stay quiet instead,
+           which is the same call CookieBar makes. */
+        setDecided(true);
       }
     };
     /* rAF for the reason MetaPixel and CookieBar use one: keeps the first paint
@@ -48,9 +55,22 @@ export default function CookieChoicesInline() {
     window.dispatchEvent(new Event(accept ? "pc:cookies-accepted" : "pc:cookies-rejected"));
   };
 
+  /* Hidden once a choice exists, and hidden again on every later visit, because
+     the answer is read from storage rather than from this session (Steve,
+     20 September 2026). CookieDrop's persist() is what writes it and then fires
+     pc:consent, which is what the listener above is waiting for, so the panel
+     clears itself the moment a button is pressed, with no reload. */
+  if (decided !== false) return null;
+
   return (
-    <section className={styles.panel} aria-label="Cookie choices">
-      <h2 className={styles.title}>Cookies on Pedigree Chums</h2>
+    /* NOT "Cookie choices": CookieBar already labels its own region that, and on
+       this page both can be present, which gave a screen reader two landmarks
+       with the same name and no way to tell them apart. */
+    <section className={styles.panel} aria-label="Your cookie choices">
+      {/* The heading is deliberately not rendered: the panel sits directly under
+          the page's own "Cookie Policy" H1, so a second title restated the same
+          thing twice in a row (Steve, 20 September 2026). The section keeps its
+          aria-label, so it is still announced as "Cookie choices". */}
       <p className={styles.text}>
         We use cookies to make the site work and to show our product video. If you
         accept, we also use Google Analytics to see how the site is used, and the
@@ -58,11 +78,9 @@ export default function CookieChoicesInline() {
         Instagram) so we can measure our advertising and show you relevant ads.
         Nothing beyond the essentials loads unless you accept.
       </p>
-      {current && (
-        <p className={styles.state}>
-          You currently {current === "accepted" ? "accept" : "reject"} non-essential cookies.
-        </p>
-      )}
+      {/* The "you currently accept/reject" line has been removed, not hidden: it
+          could only appear once a choice existed, and at that point this panel no
+          longer renders at all. */}
       <div className={styles.actions}>
         <button
           type="button"

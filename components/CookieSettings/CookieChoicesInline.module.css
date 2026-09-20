@@ -32,10 +32,11 @@
   margin: 0 0 10px;
 }
 
+/* Down 2pt, 20 September 2026 (Steve). */
 .panel .text {
   font-family: var(--font-body, Montserrat), sans-serif;
   font-weight: 600;
-  font-size: clamp(1rem, 2vw, 1.12rem);
+  font-size: calc(clamp(1rem, 2vw, 1.12rem) - 2pt);
   line-height: 1.4em;
   color: #ffffff;
   margin: 0 0 14px;
@@ -46,34 +47,36 @@
   text-decoration: underline;
 }
 
-/* The current choice, shown only once one exists. */
-.panel .state {
-  font-family: var(--font-body, Montserrat), sans-serif;
-  font-weight: 700;
-  font-size: clamp(0.95rem, 1.9vw, 1.05rem);
-  color: #ffffff;
-  margin: 0 0 14px;
-}
-
+/* The pair sit on ONE ROW (Steve, 20 September 2026), which is what the smaller
+   buttons below are for. nowrap rather than leaving it to chance: with wrap, the
+   two would silently drop back to a stacked column at the first narrow width or
+   long translation, which is the layout this change exists to get rid of. */
 .actions {
   display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
+  flex-wrap: nowrap;
+  gap: 10px;
 }
 
 /* Both buttons carry the same weight on purpose. Under PECR, rejecting has to be
    as easy as accepting, so neither is styled as the quiet option. Same rule
    CookieBar records. */
+/* SMALLER SO THE PAIR FIT SIDE BY SIDE (Steve, 20 September 2026): the internal
+   padding down 10% (14px to 12.6px, 34px to 30.6px) and the type down 10% on top
+   of that. The horizontal padding also drops its floor at narrow widths, because
+   at 390px a fixed 30.6px each side was still wider than the row could hold: the
+   clamp is what actually buys the space, the 10% alone did not. Measured at 390,
+   not assumed. */
 .btn {
   flex: 0 1 auto;
   font-family: var(--font-body, Montserrat), sans-serif;
   font-weight: 800;
-  font-size: clamp(1rem, 2.2vw, 1.15rem);
-  padding: 14px 34px;
+  font-size: calc(clamp(1rem, 2.2vw, 1.15rem) * 0.9);
+  padding: 12.6px clamp(16px, 5vw, 30.6px);
   border-radius: 999px;
   border: 3px solid var(--navy, #0a3a57);
   color: #ffffff;
   cursor: pointer;
+  white-space: nowrap;
 }
 
 .accept {
