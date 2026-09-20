@@ -3163,6 +3163,32 @@ export default function BreedTree({
     return ns;
   }, [root, isMobile, aspectKey, dockAside, level, displayOnly]);
 
+  /* WHICH BREEDS THIS LEVEL DRAWS MORE THAN ONCE, 20 September 2026 (owner: a
+     twin should not carry its picture, only the background colour).
+
+     FROM THE LAYOUT, NOT FROM THE LIVE PIT, and that is deliberate. The pit's own
+     pitBreedCount is live: a breed drops to one the moment its last duplicate is
+     collected, so a survivor would gain a picture mid-round. The owner asked for
+     twins to show the background colour, not to show it until a sibling is taken,
+     so this is counted once per level and does not move.
+
+     IT IS ALSO THE ONLY VERSION THAT PASSES react-hooks/refs. nodeImg runs during
+     render, so reading the frame loop's map through a ref is a ref read in render
+     and adds to this file's lint baseline, which is not allowed.
+
+     SAME EXCLUSIONS AS THE RENDERER: the root is not a duplicate of anything, and
+     a hidden echo copy is not drawn, so neither counts. */
+  const twinNames = useMemo<Set<string>>(() => {
+    const seen = new Map<string, number>();
+    for (const d of nodes) {
+      if (d.depth === 0 || isHiddenCopy(d)) continue;
+      seen.set(d.data.name, (seen.get(d.data.name) ?? 0) + 1);
+    }
+    const out = new Set<string>();
+    seen.forEach((n, name) => { if (n > 1) out.add(name); });
+    return out;
+  }, [nodes]);
+
   // Rarity band: per-level count of each dog among the CIRCLES that drop (nodes,
   // echo-excluded, root excluded, so it matches what a player sees). The band is
   // painted across the bottom of the lifted circle by LineageMap and stays while
@@ -5575,9 +5601,14 @@ export default function BreedTree({
        here, but this is the part of the 2 September objection that survives, and
        it is a design judgement rather than a measurement.
 
-       TWINS BOTH SHOW IT. Two circles of one dog are two leaves with one picture,
-       so both carry it rather than one flipping to the mark. */
+       TWINS DO NOT, 20 September 2026 (owner: if there are any twin dogs they
+       should not have the image, just the background colour). The first version of
+       this gave both twins the picture and the owner has ruled the other way, so a
+       circle needs to be a leaf AND the only one of its breed in the level. See
+       twinNames for why that is counted from the layout rather than from the live
+       pit. */
     if (dropped && ((d.data.children?.length ?? 0) > 0)) return undefined;
+    if (dropped && twinNames.has(d.data.name)) return undefined;
     /* A PACK DOG SHOWS ITS CARD ART, 19 September 2026 (owner). See data/packArt.ts.
        Only the fallback changes: rootImage still wins at depth 0, because that is
        the level's own picture and the level already knows its own dog. Below the
