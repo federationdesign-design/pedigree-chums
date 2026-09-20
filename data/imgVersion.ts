@@ -6,7 +6,15 @@
    in place when the Barbet merged into it, so one picture now has to stand for
    England's Great Water Dog, Germany's Pudelhund and France's Barbet. Same
    filename, new picture, which is exactly the case this constant exists for. */
-export const IMG_VERSION = 4;
+/* 4 -> 5, 20 September 2026: original-water-spaniel.jpg replaced in place. It
+   was an IRISH Water Spaniel, identifiable by its topknot, its bare rat tail and
+   its smooth face, and it was standing in for the generic British water spaniel
+   in nine nodes plus the English Water Spaniel. The 16 September one-picture-
+   per-dog pass put it there on a majority count of 23 nodes to 2; the majority
+   was the wrong dog. The new picture is the English type: liver and white, white
+   legs, neck and belly, tight wig-like curls, smooth face, long feathered ears
+   and a short curled tail. */
+export const IMG_VERSION = 5;
 
 // Append the version query to a site-relative image path. Idempotent, and it
 // leaves data URLs and already-versioned URLs untouched.
