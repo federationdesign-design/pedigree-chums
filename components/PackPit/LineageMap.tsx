@@ -3469,7 +3469,17 @@ export default function LineageMap({
                         always held and what these numbers vindicate: white on the
                         two dark tiers, black on the other three. The done green is
                         the only state the table did not already answer, and black
-                        at 9.22 against white's 2.28 answers it.
+                        at 9.22 against white's 2.28 answered it.
+
+                        REVERSED 20 September 2026 (owner: when the circle turns
+                        green, the word common should change to white). The ink on
+                        the done green is now WHITE. The measurement above has not
+                        changed and is left standing: white on #22c55e is 2.28:1,
+                        which is under the 3:1 large-text line, where the black it
+                        replaces was 9.22:1. It is the owner's call, made on the
+                        device, and it is recorded here so it is not quietly
+                        "fixed" back later. The other four tiers still take band.fg
+                        from the table and are untouched.
 
                         THE FILLS ARE NOT DARKENED, and that was the other route.
                         To carry white they would need uncommon 32% darker,
@@ -3480,7 +3490,7 @@ export default function LineageMap({
                         progress arc all sit on dark grounds and want the fills
                         LIGHTER. One element against three, and the ink is free. */}
                     <rect className={styles.bandFill} x={-R * 1.6} y={bandTop} width={R * 3.2} height={R * 1.6} style={{ fill: doneRing ? "#22c55e" : band.bg }} />
-                    <text className={styles.bandFill} x={labelX} y={labelY} textAnchor="middle" dominantBaseline="central" style={{ fontFamily: '"Luckiest Guy", system-ui, sans-serif', fontSize: fs, fontWeight: 400, fill: doneRing ? "#000000" : band.fg }}>{band.label}</text>
+                    <text className={styles.bandFill} x={labelX} y={labelY} textAnchor="middle" dominantBaseline="central" style={{ fontFamily: '"Luckiest Guy", system-ui, sans-serif', fontSize: fs, fontWeight: 400, fill: doneRing ? "#ffffff" : band.fg }}>{band.label}</text>
                   </g>
                 </g>
               </g>
