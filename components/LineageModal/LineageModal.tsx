@@ -27,6 +27,28 @@ const STATUS_LABEL: Record<BreedTag, string> = {
 
 // Breed names longer than 11 characters break onto a second line at the
 // nearest word boundary, so long names never force a tiny single line.
+/* titleLines IS GONE, 20 September 2026 (owner: the name drops to a second line
+   after "Old" when there is clearly room for the next word, and the wrapped text
+   lands on top of the up arrow).
+
+   WHAT IT DID. On a screen under 900px it packed words onto the first line only
+   while they fitted inside ELEVEN CHARACTERS, then put the whole remainder on a
+   second line. A character count, with no reference to the font, the width, or
+   how much room the row actually had, and it could only ever produce two lines.
+
+   WHY "OLD" WAS ALWAYS ALONE. "Old" is 3. "Old Cumberland" is 14 and "Old
+   sporting" is 12, both over the 11, so the loop stopped at the first word every
+   time. Any name whose second word is long enough to cross 11 broke this way.
+
+   THE BROWSER DOES IT NOW, against the real width, so a short second word joins
+   the first line and a very long name is free to take a third. The width it
+   wraps against is set on .titleWrap, which stops short of the up arrow; see the
+   note there.
+
+   IT IS KEPT FOR THE WIN SCREEN ALONE, which draws the name as its own stacked
+   spans (.winDoneLine) rather than as wrapping text, and was not what the owner
+   was looking at. Untouched on purpose. If that screen ever wants real wrapping
+   too, this function has no other caller left and can go with it. */
 function titleLines(name: string): string[] {
   if (name.length <= 11 || !name.includes(" ")) return [name];
   const words = name.split(" ");
@@ -58,7 +80,7 @@ function scoreText(n: number) {
 // One line of the stacked title: round portrait, status dot, name. Pulled out
 // because the level's dog and the circle being looked at are now drawn with the
 // same markup, one above the other.
-function TitleRow({ img, name, status, isNarrow, imgRef, done = false }: { img: string | null; name: string; status: BreedTag | null; isNarrow: boolean; imgRef?: Ref<HTMLImageElement>; done?: boolean }) {
+function TitleRow({ img, name, status, imgRef, done = false }: { img: string | null; name: string; status: BreedTag | null; imgRef?: Ref<HTMLImageElement>; done?: boolean }) {
   return (
     <div className={css.titleRow}>
       {/* A FINISHED LEVEL SHOWS A TICK INSTEAD OF THE DOG, 16 September 2026
@@ -95,9 +117,7 @@ function TitleRow({ img, name, status, isNarrow, imgRef, done = false }: { img: 
       <h3 className={css.title}>
         {done
           ? <span>Complete</span>
-          : (isNarrow ? titleLines(name) : [name]).map((line, i, arr) => (
-              <span key={i}>{line}{i < arr.length - 1 && <br />}</span>
-            ))}
+          : name}
       </h3>
     </div>
   );
@@ -112,6 +132,9 @@ type Props = {
   /* The clicked history card's viewport rect, so the time tunnel's card dives
      from where it sat. Optional: absent means the tunnel dives from centre. */
   fromRect?: { x: number; y: number; w: number; h: number };
+  // Which object dives down the time tunnel. Passed straight through; see the
+  // note at the top of TimeTunnel.
+  diver?: "card" | "button";
   /* Skip the time tunnel: this level change is navigation between start
      screens, not an entry into the pit. Set by BreedStrip's navTo. */
   quiet?: boolean;
@@ -203,7 +226,7 @@ type Props = {
   era?: string;
 };
 
-export default function LineageModal({ name, image, character, lineage, fromRect, onClose, quiet, navFading, nextLevelLabel, onNextLevel, onNavPrev, onNavNext, onNavPrevEra, onNavNextEra, onStartOver, initialScore, onScoreChange, bankedScore, onBankScore, era, lives, livesMax = 6, onLost, onSpendLife, onResetRun, nextLevelImage, levelCompleted = false, levelNo, eraJoinLabel, onLevelChums, onChumCaught, topChum, runChumsFound, runChumsPossible }: Props) {
+export default function LineageModal({ name, image, character, lineage, fromRect, diver, onClose, quiet, navFading, nextLevelLabel, onNextLevel, onNavPrev, onNavNext, onNavPrevEra, onNavNextEra, onStartOver, initialScore, onScoreChange, bankedScore, onBankScore, era, lives, livesMax = 6, onLost, onSpendLife, onResetRun, nextLevelImage, levelCompleted = false, levelNo, eraJoinLabel, onLevelChums, onChumCaught, topChum, runChumsFound, runChumsPossible }: Props) {
   const theme = levelThemeFor(era);
   // The close X asks before it closes. A round can take a couple of minutes to
   // build up, and losing it to a mis-tap in the corner is a rotten exit.
@@ -263,15 +286,11 @@ export default function LineageModal({ name, image, character, lineage, fromRect
      which is the case this was built for. Deeper than that it does not fit, so
      the middle collapses into a count: see LADDER_ROWS below. */
   const [shownPath, setShownPath] = useState<{ name: string; img: string | null; status: BreedTag | null }[]>([]);
-  const [isNarrow, setIsNarrow] = useState(false);
+  /* THE 900px MEDIA QUERY WENT WITH titleLines, 20 September 2026. isNarrow was
+     read in exactly one place, to decide whether to hand-break the title, and the
+     browser does that now. The state, its setter and the listener are all gone
+     rather than left dangling. */
   useEffect(() => { exitAskRef.current = exitAsk; }, [exitAsk]);
-  useEffect(() => {
-    const mq = window.matchMedia("(max-width: 900px)");
-    const apply = () => setIsNarrow(mq.matches);
-    apply();
-    mq.addEventListener("change", apply);
-    return () => mq.removeEventListener("change", apply);
-  }, []);
   // Publish the top-left level portrait's live screen position to BreedTree, so its
   // cluster connector points at the real image on every width, not a fixed guess.
   // A ResizeObserver is the primary trigger: it fires on mount for the first measure
@@ -611,7 +630,7 @@ export default function LineageModal({ name, image, character, lineage, fromRect
       aria-label={name}
     >
       {/* The time tunnel covers the pit while it arrives, then removes itself. */}
-      {tunnelActive && <TimeTunnel fromRect={fromRect} onResolve={() => setResolving(true)} onDone={() => setTunnelActive(false)} />}
+      {tunnelActive && <TimeTunnel fromRect={fromRect} diver={diver} onResolve={() => setResolving(true)} onDone={() => setTunnelActive(false)} />}
       {/* Score, top of the pit on the same axis as the level portrait.
 
           SHOWN DURING PLAY AGAIN, 31 August 2026 (Steve), to match the main
@@ -658,15 +677,15 @@ export default function LineageModal({ name, image, character, lineage, fromRect
         className={css.titleWrap}
         style={{ ["--rows" as string]: Math.max(1, shownPath.length || (shownName !== name ? 2 : 1)) }}
       >
-        <TitleRow img={image} name={name} status={levelStatus} isNarrow={isNarrow} imgRef={portraitRef} done={levelCompleted} />
+        <TitleRow img={image} name={name} status={levelStatus} imgRef={portraitRef} done={levelCompleted} />
         {shownPath.length > 1
           ? shownPath.slice(1).map((step, i) => (
-              <TitleRow key={`${i}-${step.name}`} img={step.img} name={step.name} status={step.status} isNarrow={isNarrow} />
+              <TitleRow key={`${i}-${step.name}`} img={step.img} name={step.name} status={step.status} />
             ))
           : /* The path callback has not arrived yet: fall back to the old
                single-row comparison so the title is never blank. */
             shownName !== name && (
-              <TitleRow img={shownImg} name={shownName} status={shownStatus} isNarrow={isNarrow} />
+              <TitleRow img={shownImg} name={shownName} status={shownStatus} />
             )}
         {/* THE GLOBAL EXPLANATION IS GONE from the title band. Owner ruling.
 

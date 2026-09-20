@@ -2521,6 +2521,10 @@ export default function LineageMap({
      layout then moves. */
   const soloPlaced = useRef(false);
   const soloClosing = useRef(false);
+  // Set by the green button just before it calls placeSoloCard, and fired by the
+  // tween's onDone. The close therefore waits for the landing rather than for a
+  // guessed delay, which is what the old 420ms was.
+  const soloLanded = useRef<(() => void) | null>(null);
   /* CALLED BY THE GREEN BUTTON, not by an effect, since 20 September 2026. It was
      a useEffect gated on framesDone; see the note above for why that could not
      survive the press being the thing that places the card. The body is unchanged
@@ -2530,21 +2534,53 @@ export default function LineageMap({
     if (soloPlaced.current) return;
     const n = shown.find((x) => x.img && x._parent && !picked.has(x._id));
     if (!n) return;
+    const target = frames.find((f) => f.img === n.img && !filled.has(f.id));
+    if (!target) return; // no frame to fly to: leave the card alone rather than strand it
     soloPlaced.current = true;
     const sh = n._parent ? Math.round((n._leaves / (n._parent as Node)._leaves) * 100) : 100;
-    const rr = nodeR(sh), dd = rr + 10 + CW / 2;
-    const px1 = n._x + Math.cos(n._dir ?? 0) * dd, py1 = n._y + Math.sin(n._dir ?? 0) * dd;
-    /* THE WRITES LAND ON A LATER TICK, on purpose. Setting state synchronously in
-       an effect body is an error under this file's eslint config and the baseline
-       is not to be added to. The same requestAnimationFrame wrap is used by the
-       boneFuse effect in BreedTree for exactly this reason, and its note explains
-       it. It also happens to be correct here rather than merely quiet: the frame
-       geometry these three writes depend on is measured during the render this
-       effect runs after. */
-    requestAnimationFrame(() => {
-      setPicked((prev) => { const s = new Set(prev); s.add(n._id); return s; });
-      setPinned((m) => { const x = new Map(m); x.set(n._id, { img: n.img as string, name: n.name, note: n.note ?? "", share: sh, mix: sh, status: null }); return x; });
-      setDragPos((m) => { const x = new Map(m); x.set(n._id, { x: px1, y: py1 }); return x; });
+
+    /* IT FLIES FROM THE CIRCLE'S CENTRE, 20 September 2026 (owner: the smaller
+       image flies out from where the lifted circle is and lands in the frame,
+       and only then does the layer close).
+
+       NO NEW ANIMATION WAS WRITTEN. This is the double-click glide from the card
+       block below, called from here instead: pin first so the card outlives any
+       branch closing, tween 460ms on the same ease-out cubic, drop the same
+       bubble trail along the path, then fill the frame and puff on landing.
+
+       THE START POINT IS THE CIRCLE ITSELF, and it is free. A solo card's home is
+       `baseX = soloLeaf ? breed.x` in the card block, which IS the lifted circle's
+       centre, so simply NOT writing dragPos leaves it there. The old code wrote a
+       dragPos offset beside the node, which is why the card appeared away from the
+       circle rather than leaving it.
+
+       NO SCORE. The double-click path calls flashNum for the shortcut it rewards.
+       Nothing is being shortcut here, so this does not pay.
+
+       THE CIRCLE OUTLIVES THE FLIGHT because rootGone is only ever set by
+       circularComplete, which the caller now runs from this tween's onDone. */
+    const sx0 = breed.x, sy0 = breed.y;                    // the lifted circle, content space
+    const ex = target.sx - pan.x, ey = target.sy - pan.y;  // the frame, converted to content space
+    setPicked((prev) => { const s = new Set(prev); s.add(n._id); return s; });
+    setPinned((m) => { const x = new Map(m); x.set(n._id, { img: n.img as string, name: n.name, note: n.note ?? "", share: sh, mix: sh, status: null }); return x; });
+    let lastBub = 0;
+    tween(460, (t) => {
+      const e2 = 1 - Math.pow(1 - t, 3);
+      const gx = sx0 + (ex - sx0) * e2, gy = sy0 + (ey - sy0) * e2;
+      setDragPos((m) => { const x = new Map(m); x.set(n._id, { x: gx, y: gy }); return x; });
+      if (t - lastBub > 0.12 && t < 0.95) {
+        lastBub = t;
+        const bid = bubbleSeq.current++;
+        setBubbles((b) => [...b, { id: bid, sx: gx + pan.x + (Math.random() - 0.5) * 14, sy: gy + pan.y + (Math.random() - 0.5) * 14 }]);
+        window.setTimeout(() => setBubbles((b) => b.filter((x) => x.id !== bid)), 620);
+      }
+    }, () => {
+      setFilled((m) => { const x = new Map(m); x.set(target.id, n._id); return x; });
+      setDragPos((m) => { if (!m.has(n._id)) return m; const x = new Map(m); x.delete(n._id); return x; });
+      const pid = puffSeq.current++;
+      setPuffs((pp) => [...pp, { id: pid, sx: target.sx, sy: target.sy }]);
+      window.setTimeout(() => setPuffs((pp) => pp.filter((x) => x.id !== pid)), 480);
+      soloLanded.current?.();
     });
   };
 
@@ -3584,8 +3620,12 @@ export default function LineageMap({
               if (soloLeaf && !framesDone) {
                 if (soloClosing.current) return;
                 soloClosing.current = true;
+                /* THE CLOSE WAITS FOR THE LANDING, not for a timer. The 420ms
+                   that used to sit here was the old automatic path's guess at how
+                   long a card takes to reach its frame; the glide now says so
+                   itself. 140ms after it lands, so the puff is seen. */
+                soloLanded.current = () => window.setTimeout(() => circularComplete(), 140);
                 placeSoloCard();
-                window.setTimeout(() => circularComplete(), 420);
                 return;
               }
               circularComplete();

@@ -519,7 +519,7 @@ const LINEAGE: Record<string, LineageNode> = {
     note: "Once a fierce bull-baiting dog, then bred into the gentle, wrinkly companion we know after blood sports were banned in 1835.",
     children: [
       { name: "Old English Bulldog", note: "The athletic bull-baiting dog at the root of it all, leaner and fiercer than today's Bulldog. Now extinct.", img: "/history/breeds/Old-English-Bulldog.jpg", value: 60 },
-      { name: "Mastiff", note: "The old Molosser guard-and-war dogs that gave the breed its bulk and broad head.", img: "/history/breeds/medieval-british-mastiff.jpg", value: 25 },
+      { name: "Medieval British Mastiff", note: "The old Molosser guard-and-war dogs that gave the breed its bulk and broad head. Now extinct.", img: "/history/breeds/medieval-british-mastiff.jpg", value: 25 },
       { name: "Pug", note: "Crossed in during the 1800s to shorten the face and soften the temperament.", img: "/pug-square.jpg", value: 15 }
     ]
   },
@@ -2419,6 +2419,43 @@ const LINEAGE: Record<string, LineageNode> = {
     ]
   },
 
+  /* TWO DOGS, TWO NAMES, 20 September 2026 (owner: the medieval British mastiff
+     and the modern Mastiff are genuinely two dogs, and "English Mastiff" is kept
+     because it is a genuine breed).
+
+     WHAT WAS WRONG. Two child nodes, on Bulldog and on Great Dane, were named
+     "Mastiff". Both described the old Molosser war and guard dogs and both wore
+     medieval-british-mastiff.jpg, but "Mastiff" aliases to "English Mastiff", so
+     opening either one arrived at the LIVING breed's ancestry. The data already
+     held two dogs, with two pictures and two notes; it just filed them under one
+     name.
+
+     THE CARD IS UNTOUCHED. The history card is still "Mastiff", still anchored at
+     1883, and still reaches "English Mastiff" through its alias. The Kennel Club's
+     own name for the living breed is Mastiff, so the card is right as it stands.
+
+     THE SPLIT IS REAL, and the sources put the break in the 1880s rather than at
+     any later date: the modern type was stabilised in the 1880s, its traceable
+     lineage runs back only to the early 19th century, and it took significant
+     Alpine Mastiff blood along the way. It is still a vulnerable native breed,
+     104 UK births in 2020.
+
+     NOT DONE HERE, AND WORTH DOING: "English Mastiff" still descends straight from
+     Ancient Molossers and Old British Bandogs, so the medieval dog sits beside the
+     modern one rather than between it and the ancient stock. The sourced chain
+     would be modern <- medieval <- ancient, with Alpine Mastiff crossed in during
+     the 19th century. That changes what two pack breeds inherit and was left for
+     the owner to rule on. */
+  "Medieval British Mastiff": {
+    name: "Medieval British Mastiff",
+    note: "The heavy Molosser war and guard dogs of medieval Britain, the mastiff of the old chronicles rather than the show breed. Now extinct.",
+    img: "/history/breeds/medieval-british-mastiff.jpg",
+    children: [
+      { name: "Old British Bandogs", note: "The heavy chained dogs of old England, kept tied by day and set loose at night. Now extinct.", img: "/history/breeds/Old-British-bandogs.jpg", value: 55 },
+      { name: "Ancient Mastiff", note: "The ancient British guard and war dog praised by Roman writers. An extinct historical type.", img: "/history/breeds/ancient-british-mastiff-type.jpg", value: 45 }
+    ]
+  },
+
   "English Mastiff": {
     name: "English Mastiff",
     note: "Britain's ancient war and guard dog, a giant Molosser prized here since Roman times.",
@@ -3127,7 +3164,7 @@ const LINEAGE: Record<string, LineageNode> = {
     name: "Great Dane",
     note: "Germany's giant boarhound, the Deutsche Dogge, built by crossing heavy war mastiffs with tall, fast coursing hounds.",
     children: [
-      { name: "Mastiff", note: "The heavy Molosser war and hunting dogs that gave it bulk and bone.", img: "/history/breeds/medieval-british-mastiff.jpg", value: 25 },
+      { name: "Medieval British Mastiff", note: "The heavy Molosser war and hunting dogs that gave it bulk and bone. Now extinct.", img: "/history/breeds/medieval-british-mastiff.jpg", value: 25 },
       { name: "Alaunt war dogs", note: "The fierce Alaunt catch dogs that gave it a fearless front. A modelled half of the pair, not a recorded mating. Now extinct.", img: "/history/breeds/alunt-war-dogs.jpg", value: 25 },
       { name: "Irish Wolfhound", note: "Tall coursing hounds crossed in for height, reach and the speed to pull down boar.", img: "/history/breeds/irish-wolfhound-photo.jpg", value: 30 },
       { name: "Old German boarhounds", note: "The regional hunting packs that did the real boar work before the breed was fixed. Now extinct.", img: "/history/breeds/Old-German-boarhounds.jpg", value: 20 }

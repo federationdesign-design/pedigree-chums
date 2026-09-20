@@ -156,7 +156,18 @@ function bonePath(): Path2D {
 type Mote = { z: number; ang: number; rad: number; shape: number; color: string; spin0: number; spinRate: number; age: number };
 type Rect = { x: number; y: number; w: number; h: number };
 
-export default function TimeTunnel({ onDone, onResolve, fromRect }: { onDone?: () => void; onResolve?: () => void; fromRect?: Rect }) {
+/* WHAT DIVES IS WHAT WAS CLICKED, 20 September 2026 (owner: clicking a dog level
+   from the horizontal slider must still drop the yellow card).
+
+   THE 19 SEPTEMBER RULE WAS THE SCREEN WIDTH ALONE, on the reasoning that a
+   phone never shows the yellow card. It does. The era sliders and the rail draw
+   the same dog cards at every width, so on a phone EVERY route dived as a green
+   button, including the one where the reader had just tapped a yellow card.
+
+   SO THE CALLER SAYS. `diver` is set by whoever opened the tunnel: the dog cards
+   pass "card", the Next Level button passes "button". Left unset it falls back to
+   the width rule exactly as before, so nothing that does not pass it changes. */
+export default function TimeTunnel({ onDone, onResolve, fromRect, diver }: { onDone?: () => void; onResolve?: () => void; fromRect?: Rect; diver?: "card" | "button" }) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   // Keep the latest callbacks without re-running the tunnel effect below. Updated
   // in an effect, never during render, so they do not trip the refs rule. onResolve
@@ -250,8 +261,15 @@ export default function TimeTunnel({ onDone, onResolve, fromRect }: { onDone?: (
        be resized into or out of mid-run, and a matchMedia read inside the draw
        loop would be a layout read at 60fps. */
     const onPhone = typeof window !== "undefined" && window.innerWidth <= BTN_MOBILE_MAX;
-    const cardW0 = rect ? rect.w : (onPhone ? BTN_FALLBACK_W : CARD_FALLBACK_W);
-    const cardH0 = rect ? rect.h : (onPhone ? BTN_FALLBACK_H : CARD_FALLBACK_H);
+    /* THE CALLER'S WORD FIRST, the width only when it has not said. See the note
+       above the component. THIS LINE IS THE WHOLE POINT OF THE `diver` PROP: it
+       was added on 20 September in the same change, and shipped WITHOUT this, so
+       the prop was accepted and then ignored and every phone route still dived as
+       a button. Delivered in two halves, which is the failure this file's sibling
+       BreedTree already carries a warning about. */
+    const useButton = diver ? diver === "button" : onPhone;
+    const cardW0 = rect ? rect.w : (useButton ? BTN_FALLBACK_W : CARD_FALLBACK_W);
+    const cardH0 = rect ? rect.h : (useButton ? BTN_FALLBACK_H : CARD_FALLBACK_H);
     /* THE MOBILE BUTTON, diving in place of the card. It shares every bit of the
        card's motion, the same ease, spin and shrink, so the two read as one
        animation with a different object in it; only the drawing differs.
@@ -363,7 +381,7 @@ export default function TimeTunnel({ onDone, onResolve, fromRect }: { onDone?: (
         for (const m of motes) { m.z -= MOTE_SPEED; m.age++; if (m.z <= MOTE_ZNEAR) seedMote(m, MOTE_ZFAR); }
         drawRings();
         drawMotes();
-        if (onPhone) drawButton(now, start); else drawCard(now, start);
+        if (useButton) drawButton(now, start); else drawCard(now, start);
       } else {
         // Resolve: fire the signal once (the pit grows its cluster ring and drops
         // the dogs off it), rush the rings outward past the camera, and fade the
