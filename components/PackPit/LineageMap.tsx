@@ -3928,8 +3928,13 @@ export default function LineageMap({
             artwork and the dog would be lost without it; the lift, circular, sits on
             plain pit blue and needs nothing. Everything else about the bar is shared,
             so only that one prop is gated. */}
+        {/* THE BAR WEARS THE LIFTED DOG'S RARITY, 20 September 2026 (owner, both
+            screens). rarityTier is the prop this layer already receives, one value
+            for the whole lift, so the bar matches the ring, the band and the chips
+            without a second lookup. It is optional on ReadingProgress, so when the
+            tier is absent the bar keeps its yellow. */}
         {liftOrChum && !bounded && (
-          <ReadingProgress progress={learnProgress} active={dogRunning} runOffEnds backdrop={strongBg && !circular} />
+          <ReadingProgress progress={learnProgress} active={dogRunning} runOffEnds backdrop={strongBg && !circular} fillColor={rarityTier ? RARITY_BAND[rarityTier].bg : undefined} />
         )}
         {strongBg && !circular && !bounded && (
           <div className={styles.chumScore} aria-label={`Score ${currentScore}`}>

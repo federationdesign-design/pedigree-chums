@@ -21,6 +21,7 @@ export default function ReadingProgress({
   active,
   runOffEnds = false,
   backdrop = false,
+  fillColor,
 }: {
   articleSelector?: string;
   /* Controlled mode: when a number is given, the bar is driven by this
@@ -38,6 +39,19 @@ export default function ReadingProgress({
      unless asked for so /good-dog-bad-dog/argos and the press carousel are
      untouched. */
   runOffEnds?: boolean;
+  /* THE FILL'S OWN COLOUR, 20 September 2026 (owner: the progress bar should take
+     the rarity colour, desktop and mobile). Optional and ignored once the bar is
+     full, because 100% goes green and that rule is older and says something the
+     rarity does not: finished.
+
+     A STRING, NOT A TIER. This component sits under /good-dog-bad-dog/argos and
+     the press carousel as well as the game, and neither of those has any idea
+     what a rarity is. The caller looks the colour up and passes a hex, so nothing
+     about the game leaks into an article's scroll bar.
+
+     OMITTED IS THE OLD LOOK. Without it the stylesheet's var(--yellow) applies
+     exactly as before, so the two non-game users are untouched. */
+  fillColor?: string;
   /* A GRADIENT BEHIND THE BAR AND THE DOG, 16 September 2026 (owner, for the chum
      tree layer): with every node and card exposed, the bar sits over a busy screen
      and the dog is lost in it. Opt-in and off by default, so the article and the
@@ -146,7 +160,8 @@ export default function ReadingProgress({
         {/* GREEN AT THE END, 16 September 2026 (owner). Reuses `done`, the same
             flag that already starts the dog's wobble, so the bar and the dog agree
             on what finished means rather than testing the percentage twice. */}
-        <div className={`${styles.fill} ${done ? styles.fillDone : ""}`} id="rp-fill" style={{ width: `${displayPct}%` }} />
+        {/* `done` wins: a full bar is green whatever the dog's rarity. See fillColor. */}
+        <div className={`${styles.fill} ${done ? styles.fillDone : ""}`} id="rp-fill" style={{ width: `${displayPct}%`, ...(fillColor && !done ? { background: fillColor } : null) }} />
       </div>
 
       {/* The dog. Source SVGs face left -- flipped via CSS (scaleX(-1) in
