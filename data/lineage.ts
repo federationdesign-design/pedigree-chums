@@ -734,6 +734,41 @@ const LINEAGE: Record<string, LineageNode> = {
     ]
   },
 
+  /* THE PARSON IS THE KENNEL CLUB'S DOG, 20 September 2026 (owner).
+
+     ONE DOG UNTIL THE 1980s. Both trace to the Reverend John Russell, born 1795,
+     who bought a small white and tan bitch called Trump from a milkman in 1819,
+     and they share a history until the early 1980s. So the Parson is drawn BELOW
+     the Jack Russell rather than beside it: it is the same stock, fixed to a show
+     standard, not a second root.
+
+     WHY IT IS HERE AT ALL, on a Britain-first site. The UK Kennel Club recognises
+     the PARSON Russell Terrier and not the Jack Russell. The name was changed to
+     its current form in 1999 in the UK and every international club had followed
+     by 2008. Recognition of the Jack Russell was opposed by the breed's own parent
+     societies, and that opposition is what produced the Parson as a registered
+     breed. Only the Australian, New Zealand and United kennel clubs register both.
+
+     AND IT CORRECTS A TAG I PUT ON THE WRONG DOG. The At Watch listing belongs to
+     the Parson, because the Jack Russell is not a KC breed at all. The Jack Russell
+     card goes back to "trending", which is what it read before 20 September.
+
+     THE DIFFERENCE, for the write-up: the Parson is taller and square, 13 to 15
+     inches, height about equal to body length, bred to a strictly enforced show
+     standard. The Jack Russell is shorter and rectangular, 10 to 12 inches, and its
+     clubs put working ability before conformation, so it varies far more.
+
+     TWO CIRCLES, one ancestor, per the owner's rule that a playable level cannot
+     come from a single parent. */
+  "Parson Russell Terrier": {
+    name: "Parson Russell Terrier",
+    note: "The Kennel Club's Russell: the parson's terrier fixed to a show standard, taller and squarer than the working Jack Russell it was split from.",
+    children: [
+      { name: "Jack Russell Terrier", note: "The working parson's terrier the show standard was drawn from, one dog until the 1980s.", img: "/history/breeds/jack_russell_terrier_photo.jpg", value: 60 },
+      { name: "Jack Russell Terrier", note: "The working parson's terrier the show standard was drawn from, one dog until the 1980s.", img: "/history/breeds/jack_russell_terrier_photo.jpg", value: 40 }
+    ]
+  },
+
   "Jack Russell Terrier": {
     name: "Jack Russell Terrier",
     note: "Bred by a hunting parson, the Reverend John Russell, in the early 1800s for a game little terrier that could bolt a fox and keep up with the hounds.",
