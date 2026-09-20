@@ -172,9 +172,9 @@ export const ukBreeds: UKBreed[] = [
   { name: "Jack Russell Terrier", strip: "mid1800", era: "1820s", anchor: 1820, note: "Bold fox-bolting terrier bred by the Reverend John Russell.", image: "/jack-russel-square.jpg", tag: "trending" },
   /* THE KENNEL CLUB'S RUSSELL, 20 September 2026 (owner). Anchored at 1999, the
      year the UK name changed. It descends from the Jack Russell rather than sitting
-     beside it; the reasoning and the sources are in data/lineage.ts. NO ARTWORK YET,
-     so this card shows the fallback dog icon until a picture is supplied. */
-  { name: "Parson Russell Terrier", strip: "c1900", era: "1990s", anchor: 1999, note: "The Kennel Club's Russell terrier, taller and squarer than the working Jack Russell.", tag: "in-decline" },
+     beside it; the reasoning and the sources are in data/lineage.ts. Artwork
+     supplied by the owner, 20 September 2026. */
+  { name: "Parson Russell Terrier", strip: "c1900", era: "1990s", anchor: 1999, note: "The Kennel Club's Russell terrier, taller and squarer than the working Jack Russell.", image: "/history/breeds/parson-russell-terrier.jpg", tag: "in-decline" },
   { name: "Kerry Blue Terrier", strip: "mid1800", era: "1840s", anchor: 1847, note: "Blue-coated Irish all-rounder, first documented in 1847.", image: "/history/breeds/Kerry_Blue_Terrier_photo.jpg", tag: "endangered" },
   { name: "Bull Terrier", strip: "early1800", era: "early 1800s", anchor: 1830, note: "Egg-headed dog from crossing bulldogs with terriers.", image: "/bull-terrier-square37.jpg" , tag: "in-decline" },
   { name: "Staffordshire Bull Terrier", strip: "early1800", era: "early 1800s", anchor: 1832, note: "Bull-and-terrier fighting dog turned devoted family friend.", image: "/staffy-square.jpg", tag: "popular" },
