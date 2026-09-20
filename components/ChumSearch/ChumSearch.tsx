@@ -15,21 +15,34 @@ import { useRouter } from "next/navigation";
 import { breeds } from "../../data/breeds";
 import styles from "./ChumSearch.module.css";
 
-export default function ChumSearch() {
+// `hint` replaces the example-breed placeholder with a fixed one. Opt-in, because
+// this search is also on /home, where the "Labrador..." example is doing a different
+// job: it shows you what to type. Know your chums asked for a plain instruction
+// instead (Steve, 20 September 2026). Pass nothing and /home is unchanged.
+export default function ChumSearch({ hint }: { hint?: string } = {}) {
   const router = useRouter();
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
-  const [placeholder, setPlaceholder] = useState("Labrador...");
+  const [example, setExample] = useState("Labrador...");
   const wrapRef = useRef<HTMLDivElement>(null);
 
-  // Mobile shows a single example breed; wider screens show the full list.
+  /* Mobile shows a single example breed; wider screens show the full list.
+
+     A FIXED HINT IS DERIVED, NOT STORED. The first version set state inside this
+     effect when `hint` was passed, which eslint rejects: a synchronous setState in
+     an effect body causes a cascading render. There is nothing to synchronise in
+     that case anyway, so the hint simply wins at the point of use below and the
+     effect returns before it subscribes to anything. */
   useEffect(() => {
+    if (hint) return;
     const mq = window.matchMedia("(max-width: 768px)");
-    const apply = () => setPlaceholder(mq.matches ? "Labrador" : "Labrador...");
+    const apply = () => setExample(mq.matches ? "Labrador" : "Labrador...");
     apply();
     mq.addEventListener("change", apply);
     return () => mq.removeEventListener("change", apply);
-  }, []);
+  }, [hint]);
+
+  const placeholder = hint ?? example;
 
   const filtered = query.trim().length === 0
     ? []

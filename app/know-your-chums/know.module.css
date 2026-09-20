@@ -83,7 +83,7 @@
 .lead {
   font-family: var(--font-body), system-ui, sans-serif;
   font-weight: 600;
-  font-size: clamp(1.1rem, 2.4vw, 1.4rem);
+  font-size: calc(clamp(1.1rem, 2.4vw, 1.4rem) - 2pt); /* down 2pt with the rule above */
   line-height: 1.5;
   color: var(--white);
   max-width: 62ch;
@@ -150,7 +150,9 @@
 .factLabel {
   font-family: var(--font-body), system-ui, sans-serif;
   font-weight: 600;
-  font-size: clamp(0.78rem, 1.6vw, 0.95rem);
+  /* Up 2pt, 20 September 2026 (Steve). This is the Montserrat line under the white
+     Luckiest Guy figure (.factHero) inside the blue facts panel. */
+  font-size: calc(clamp(0.78rem, 1.6vw, 0.95rem) + 2pt);
   line-height: 1.35;
   color: var(--yellow);
 }
@@ -175,7 +177,7 @@
 .statsIntro {
   font-family: var(--font-body), system-ui, sans-serif;
   font-weight: 600;
-  font-size: clamp(1rem, 2vw, 1.18rem);
+  font-size: calc(clamp(1rem, 2vw, 1.18rem) - 2pt); /* down 2pt with the !important rule */
   line-height: 1.55;
   color: var(--white);
   max-width: 70ch;
@@ -822,7 +824,10 @@
 
 /* Page title and lead. */
 .title { font-size: clamp(4.8rem, 14vw, 11rem) !important; line-height: 0.95; }
-.lead { font-size: clamp(28px, 3.6vw, 36px) !important; max-width: 56ch; }
+/* Intro down 2pt, 20 September 2026 (Steve). BOTH .lead rules move: this one carries
+   !important and is the one that actually governs, and the base rule below the fold
+   is kept in step so the two never disagree. */
+.lead { font-size: calc(clamp(28px, 3.6vw, 36px) - 2pt) !important; max-width: 56ch; }
 
 /* The blue gradient container runs full bleed, as it does on history. */
 .factsPanel {
@@ -893,7 +898,9 @@
 }
 
 /* The two stats paragraphs and the source line, doubled. */
-.statsIntro { font-size: clamp(1.5rem, 3vw, 1.9rem) !important; }
+/* Down 2pt, 20 September 2026 (Steve). !important here, so this is the rule that
+   governs; the base .statsIntro is kept in step below. */
+.statsIntro { font-size: calc(clamp(1.5rem, 3vw, 1.9rem) - 2pt) !important; }
 .statCaption {
   font-family: var(--font-display), system-ui, sans-serif;
   font-size: clamp(2.4rem, 5vw, 3.4rem) !important;

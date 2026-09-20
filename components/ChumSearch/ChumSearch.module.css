@@ -130,3 +130,24 @@
   font-size: 15px;
   font-style: italic;
 }
+
+/* MOBILE SEARCH FIELD, 20 September 2026 (Steve).
+
+   7. The bar needs air at the sides: the wrapper had none, so on a phone the field
+      ran edge to edge.
+   8. The field's own padding is halved. The desktop value, 40px top and bottom with
+      56px on the left, was set for type at clamp(32px, 4.4vw, 44px) and is far too
+      generous once the field is 390px wide.
+
+   768px is the breakpoint this component already uses: the placeholder swap in
+   ChumSearch.tsx watches the same width, so the two stay in step. */
+@media (max-width: 768px) {
+  .searchWrap {
+    padding-left: 16px;
+    padding-right: 16px;
+    box-sizing: border-box;
+  }
+  .searchInput {
+    padding: 20px clamp(48px, 6vw, 75px) 20px 28px;
+  }
+}

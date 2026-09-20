@@ -28,51 +28,55 @@ const ROWS: { title: string; accent: string; names: string[] }[] = [
   {
     title: "The top dogs",
     accent: "dogs",
-    names: ["Staffordshire Bull Terrier", "French Bulldog", "Chihuahua", "Dachshund", "Bulldog"],
+    names: ["Bulldog", "Dachshund", "French Bulldog", "Chihuahua", "Staffordshire Bull Terrier"],
   },
   /* Bred for a job and still doing one: herding, guarding, police and
      military work, mountain rescue. */
   {
     title: "Employed dogs",
     accent: "dogs",
-    names: ["Labrador", "Cocker Spaniel", "Golden Retriever", "Springer Spaniel", "Cockapoo", "German Shepherd", "Rottweiler", "Doberman Pinscher"],
+    names: ["Labrador", "Cocker Spaniel", "Golden Retriever", "Springer Spaniel", "Cockapoo", "German Shepherd", "Rottweiler", "Doberman Pinscher", "Border Collie"],
   },
   {
     title: "Popular UK breeds",
     accent: "breeds",
-    names: ["Jack Russell Terrier", "Border Collie", "Greyhound", "Miniature Schnauzer", "Boxer", "Bull Terrier"],
+    names: ["Boxer", "Jack Russell Terrier", "Greyhound", "Miniature Schnauzer", "Bull Terrier"],
   },
   /* The rest of the small dogs, once the rows above have taken the ones they
      describe better. */
   {
     title: "Pint-sized pups",
     accent: "pups",
-    names: ["Pomeranian", "Maltese", "Bichon Frise", "Papillon", "Italian Greyhound", "Chihuahua"],
+    names: ["Pomeranian", "Pug", "Maltese", "Bichon Frise", "Papillon", "Italian Greyhound", "Chihuahua"],
   },
   {
     title: "The ol' favourites",
     accent: "favourites",
-    names: ["West Highland Terrier", "Yorkshire Terrier", "Cavalier King Charles Spaniel", "Whippet", "Border Terrier", "Lurcher"],
+    names: ["Border Terrier", "West Highland Terrier", "Yorkshire Terrier", "Cavalier King Charles Spaniel", "Whippet", "Lurcher"],
   },
-  /* The pack's crossbreeds (Cockapoo now sits with the working dogs above). */
+  /* The pack's crossbreeds (Cockapoo now sits with the employed dogs above, and the
+     Border Collie joined them on 20 September 2026). */
   {
     title: "The new favourites",
     accent: "favourites",
-    names: ["Cavapoo", "Labradoodle", "Goldendoodle", "Cavachon", "Maltipoo", "Jackapoo"],
+    names: ["Maltipoo", "Cavachon", "Cavapoo", "Labradoodle", "Goldendoodle", "Jackapoo"],
   },
   {
     title: "Oldest UK breeds",
     accent: "breeds",
-    names: ["Irish Wolfhound", "Corgi", "Beagle", "Basset Hound"],
+    names: ["Irish Wolfhound", "Corgi", "Beagle", "Basset Hound", "Irish Setter"],
   },
   /* Dogs whose homeland is not Britain. */
   {
     title: "Furthest from home",
     accent: "home",
-    names: ["Afghan Hound", "Shih Tzu", "Pug", "Siberian Husky", "Great Dane", "Saint Bernard", "Dalmatian", "Weimaraner", "Poodle", "Boston Terrier"],
+    names: ["Afghan Hound", "Boston Terrier", "Shih Tzu", "Siberian Husky", "Great Dane", "Saint Bernard", "Dalmatian", "Weimaraner", "Poodle"],
   },
-  /* The pack's vulnerable natives, minus the English Setter, which is not in
-     the pack (Irish Setter takes its place). */
+  /* The pack's vulnerable natives. The English Setter is not in the pack, and the
+     Irish Setter, which stood in for it here, moved to Oldest UK breeds on
+     20 September 2026 (Steve). Rows de-duplicate and Oldest is declared first, so
+     this row no longer draws a setter at all. Said plainly because the previous
+     note promised one. */
   {
     title: "Endangered dogs",
     accent: "dogs",
@@ -253,7 +257,7 @@ export default function ChumExplorer() {
     // reaches this section (the Collie then names three of the pack). A marker only; no behaviour here.
     <section className={styles.explorer} data-pc-appear="rails">
       <div className={styles.searchWrap}>
-        <ChumSearch />
+        <ChumSearch hint="Search breeds" />
       </div>
 
       {rows.map((row) => (

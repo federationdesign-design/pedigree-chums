@@ -44,14 +44,16 @@ const PUPPIES: Bar[] = [
 
 // The rarest breeds in the pack, by estimated share of the UK dog population.
 // Derived from Kennel Club annual puppy registrations (2024): Bloodhound ~50,
-// Mastiff ~100, Irish Wolfhound 165, English Setter 185, Old English Sheepdog 241.
+// Mastiff ~100, Irish Wolfhound 165, Old English Sheepdog 241.
+// The English Setter (185) was dropped on 20 September 2026 (Steve): it is not in
+// the chum pack, and this chart is explicitly the rarest breeds IN the pack. Four
+// bars now, not five.
 // `w` is the bar width (%); the labels carry the true estimated share. Bars are
 // scaled up for legibility so the breed name sits inside the bar.
 const RARE: Bar[] = [
   { name: "Bloodhound", pct: 0.004, label: "0.004%", w: 34, img: "/bloodhound-square.png" },
   { name: "Mastiff", pct: 0.007, label: "0.007%", w: 42, img: "/mastiff-square.jpg" },
   { name: "Irish Wolfhound", short: "Wolfhound", pct: 0.01, label: "0.01%", w: 50, img: "/Irish Wolfhound-square.jpg" },
-  { name: "English Setter", pct: 0.019, label: "0.019%", w: 56, img: "/english-setter-square.jpg" },
   { name: "Old English Sheepdog", short: "Old English", pct: 0.024, label: "0.024%", w: 70, img: "/old-english-square.png" },
 ];
 
@@ -149,8 +151,8 @@ export default function BreedStats() {
       <BarTable caption="The most common dog breeds across all ages" bars={ALL_AGES} />
 
       <p className={styles.statsIntro}>
-        The most common dogs across all ages were the crossbreed, Labrador and
-        Jack Russell. But look at the puppies: among dogs under one year, the
+        The most common dogs across all ages are the Labrador and the Jack
+        Russell. But look at the puppies: among dogs under one year, the
         French Bulldog and Cockapoo had surged into the top three, a sign of the
         designer-crossbreed boom. The pack has both the classics and the new
         favourites.
@@ -159,7 +161,7 @@ export default function BreedStats() {
       <BarTable caption="The most common puppy breeds" bars={PUPPIES} />
 
       <p className={styles.statsIntro}>
-        Now the other end of the lead. These five are in the pack too, yet you
+        Now the other end of the lead. These four are in the pack too, yet you
         would be lucky to pass one in the park. Each makes up the tiniest sliver
         of Britain&apos;s dogs: the Bloodhound, with only around fifty puppies
         registered a year, the gentle Mastiff at roughly a hundred, and three
