@@ -12339,11 +12339,6 @@ export default function BreedTree({
         ref={stageRef}
         onDragStart={(e) => e.preventDefault()}
       >
-      {/* THE CHAIN COUNTER, 20 September 2026 (owner). Hidden until a chain is
-          drawn; written imperatively by paintChainCount, see the note on
-          chainCountRef. A plain div rather than SVG so it can reuse the lifted
-          layer's own counter styling, which is what the owner asked it to match. */}
-      <div ref={chainCountRef} className={styles.chainCount} style={{ display: "none" }} role="status" />
         <svg
           viewBox={viewBox}
           // Records the press only. No stopPropagation: the stage listener above
@@ -14870,6 +14865,18 @@ export default function BreedTree({
           opens the My Chums dock. A tappable thing sat over the pit floor could
           take a press from an object underneath it, which is not a trade worth
           making for a number. Shown in the pit only, not in the learn area. */}
+      {/* THE CHAIN COUNTER, 20 September 2026 (owner). Hidden until a chain is
+          drawn; written imperatively by paintChainCount, see the note on
+          chainCountRef.
+
+          MOVED OUT OF THE STAGE, same day (owner: it appears in the middle). It
+          was mounted inside .stage, and a position: fixed child of a TRANSFORMED
+          ancestor is positioned against that ancestor rather than the viewport,
+          so "bottom" meant the bottom of the stage. This repo already carries
+          that trap in writing: a fixed child inside the scale(0.8) overlay has to
+          be a SIBLING of it. It now sits beside the pit tally below, which is
+          fixed and lands where it says it will. */}
+      <div ref={chainCountRef} className={styles.chainCount} style={{ display: "none" }} role="status" />
       {dockAside && dropped && cornerShot > 0 && chumsCollected > 0 && (
         // eslint-disable-next-line @next/next/no-img-element -- a fixed-size decorative SVG, next/image buys nothing here
         <img key={`chumbox-${cornerShot}`} className={styles.cardBox} src="/card-pack-box.svg" alt="" aria-hidden="true" />
